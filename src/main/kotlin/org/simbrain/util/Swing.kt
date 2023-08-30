@@ -4,7 +4,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
-import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor2
 import org.simbrain.util.propertyeditor.EditableObject
 import java.awt.Component
 import java.awt.event.*
@@ -210,21 +209,21 @@ fun <T : JComponent> T.createAction(
  */
 @JvmOverloads
 fun <E : EditableObject> E.createDialog(block: (E) -> Unit = {}): StandardDialog {
-    val editor = AnnotatedPropertyEditor(this)
+    val editor = AnnotatedPropertyEditor(listOf(this))
     return StandardDialog(editor).apply {
         addClosingTask {
             editor.commitChanges()
-            block(editor.editedObject as E)
+            block(this@createDialog)
         }
     }
 }
 
 @JvmOverloads
 fun <E : EditableObject> E.createDialog2(block: (E) -> Unit = {}): StandardDialog {
-    val editor = AnnotatedPropertyEditor2(listOf(this))
+    val editor = AnnotatedPropertyEditor(listOf(this))
     return StandardDialog(editor).apply {
         addClosingTask {
-            editor.commit()
+            editor.commitChanges()
             block(this@createDialog2)
         }
     }

@@ -22,7 +22,6 @@ import org.simbrain.util.CmdOrCtrl;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.SwingKt;
-import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -260,16 +259,14 @@ public class SensorEffectorPanel extends JPanel {
             return;
         }
 
-        AnnotatedPropertyEditor attributePanel = new AnnotatedPropertyEditor(attribute);
-        StandardDialog dialog = attributePanel.getDialog();
+        var dialog = SwingKt.createDialog(attribute);
         SwingUtilities.invokeLater(() -> {
             dialog.setLocation(parentWindow.getX() - dialog.getWidth(), parentWindow.getY());
         });
         dialog.addClosingTask(() -> {
             attribute.getEvents().getPropertyChanged().fireAndForget();
         });
-        dialog.pack();
-        dialog.setVisible(true);
+        SwingKt.display(dialog);
     }
 
     /**

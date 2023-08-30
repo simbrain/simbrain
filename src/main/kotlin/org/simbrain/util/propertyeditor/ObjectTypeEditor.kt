@@ -85,7 +85,7 @@ class ObjectTypeEditor private constructor(
     /**
      * Editor panel for the set of objects (null panel if they are inconsistent).
      */
-    private var editorPanel: AnnotatedPropertyEditor? = null
+    private var editorPanel = AnnotatedPropertyEditor(emptyList())
 
     /**
      * For showing/hiding the property editor.
@@ -206,7 +206,6 @@ class ObjectTypeEditor private constructor(
      * objects being edited.
      */
     fun fillFieldValues() {
-        editorPanel!!.fillFieldValues(objectList)
     }
 
     /**
@@ -283,21 +282,21 @@ class ObjectTypeEditor private constructor(
      */
     private fun updateEditorPanel() {
 
-        // This occurs when the object type is inconsistent, i
-        // i.e.  "..." in the combo box
-        if (editorPanel!!.widgets == null) {
-            return
-        }
-
-        // In the case where the object has no properties at all to edit, and
-        // the type editor is just being used to set a type, just remove
-        // everything from the panel, and hide the detail triangle.
-        if (editorPanel!!.widgets.size == 0) {
-            detailTriangle!!.isVisible = false
-            editorPanel!!.removeAll()
-        } else {
-            detailTriangle!!.isVisible = true
-        }
+        // // This occurs when the object type is inconsistent, i
+        // // i.e.  "..." in the combo box
+        // if (editorPanel!!.widgets == null) {
+        //     return
+        // }
+        //
+        // // In the case where the object has no properties at all to edit, and
+        // // the type editor is just being used to set a type, just remove
+        // // everything from the panel, and hide the detail triangle.
+        // if (editorPanel!!.widgets.size == 0) {
+        //     detailTriangle!!.isVisible = false
+        //     editorPanel!!.removeAll()
+        // } else {
+        //     detailTriangle!!.isVisible = true
+        // }
     }
 
     /**
@@ -335,19 +334,19 @@ class ObjectTypeEditor private constructor(
      * Commit any changes made.
      */
     fun commitChanges() {
-        if (dropDown!!.selectedItem === SimbrainConstants.NULL_STRING) {
-            return
-        }
-        if (isPrototypeMode) {
-            // Sync prototype object to editor panel
-            editorPanel!!.commitChanges(mutableListOf(prototypeObject!!))
-            // TODO: The object type change happens in the ape. Not sure why it has to happen there
-            // for (EditableObject o : objectList) {
-            //    o = prototypeObject.copy();
-            //}
-        } else {
-            editorPanel!!.commitChanges(objectList)
-        }
+        // if (dropDown!!.selectedItem === SimbrainConstants.NULL_STRING) {
+        //     return
+        // }
+        // if (isPrototypeMode) {
+        //     // Sync prototype object to editor panel
+        //     editorPanel!!.commitChanges(mutableListOf(prototypeObject!!))
+        //     // TODO: The object type change happens in the ape. Not sure why it has to happen there
+        //     // for (EditableObject o : objectList) {
+        //     //    o = prototypeObject.copy();
+        //     //}
+        // } else {
+        //     editorPanel!!.commitChanges(objectList)
+        // }
     }
 
     /**

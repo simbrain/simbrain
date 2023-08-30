@@ -18,14 +18,14 @@
  */
 package org.simbrain.plot.barchart;
 
+import kotlin.Unit;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.simbrain.plot.actions.PlotActionManager;
-import org.simbrain.util.StandardDialog;
+import org.simbrain.util.SwingKt;
 import org.simbrain.util.genericframe.GenericFrame;
-import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.gui.DesktopComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
@@ -157,9 +157,7 @@ public class BarChartDesktopComponent extends DesktopComponent<BarChartComponent
     @Override
     public void actionPerformed(final ActionEvent arg0) {
         if (arg0.getActionCommand().equalsIgnoreCase("dialog")) {
-            AnnotatedPropertyEditor editor = new AnnotatedPropertyEditor(getWorkspaceComponent().getModel());
-            StandardDialog dialog = editor.getDialog();
-            dialog.addClosingTask(() -> {
+            var dialog = SwingKt.createDialog(getWorkspaceComponent().getModel(), (e) -> {
                 chart.getCategoryPlot()
                         .getRenderer()
                         .setSeriesPaint(0, getWorkspaceComponent().getModel().getBarColor());
@@ -172,11 +170,9 @@ public class BarChartDesktopComponent extends DesktopComponent<BarChartComponent
                                     getWorkspaceComponent().getModel().getUpperBound()
                             );
                 }
+                return Unit.INSTANCE;
             });
-            dialog.setModal(true);
-            dialog.pack();
-            dialog.setLocationRelativeTo(null);
-            dialog.setVisible(true);
+            SwingKt.display(dialog);
         }
 
     }

@@ -126,7 +126,6 @@ fun getPreferenceDialog(prefHolder: PreferenceHolder): StandardDialog {
                 val result = showWarningConfirmDialog("Reverting to default preferences. This action cannot be undone.")
                 if (result == JOptionPane.YES_OPTION) {
                     prefHolder.revertToDefault()
-                    ape.fillFieldValues()
                 }
             }
         })

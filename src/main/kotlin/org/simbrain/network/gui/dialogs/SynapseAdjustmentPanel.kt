@@ -29,7 +29,6 @@ import org.simbrain.util.complement
 import org.simbrain.util.displayInDialog
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
-import org.simbrain.util.propertyeditor.ObjectTypeEditor
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.ProbabilityDistribution.Randomizer
 import org.simbrain.util.stats.distributions.NormalDistribution
@@ -121,10 +120,11 @@ SynapseAdjustmentPanel(
         histogramPanel.setxAxisName("Synapse Strength")
         histogramPanel.setyAxisName("# of Synapses")
 
-        (inhibitoryPanel.widgets.first().component as ObjectTypeEditor).dropDown.addActionListener {
-            inhibitoryRandomizer.probabilityDistribution.useInhibitoryParams()
-            inhibitoryPanel.fillFieldValues()
-        }
+        // TODO: use update
+        // (inhibitoryPanel.widgets.first().component as ObjectTypeEditor).dropDown.addActionListener {
+        //     inhibitoryRandomizer.probabilityDistribution.useInhibitoryParams()
+        //     inhibitoryPanel.fillFieldValues()
+        // }
 
         layout = GridBagLayout()
         val synTypePanel = JPanel().apply {

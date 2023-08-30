@@ -115,9 +115,9 @@ public class EntityDialog extends StandardDialog {
      * Fills the values within the fields of the dialog.
      */
     private void fillFieldValues() {
-        if (mainEditor != null) {
-            mainEditor.fillFieldValues();
-        }
+        // if (mainEditor != null) {
+        //     mainEditor.fillFieldValues();
+        // }
     }
 
 

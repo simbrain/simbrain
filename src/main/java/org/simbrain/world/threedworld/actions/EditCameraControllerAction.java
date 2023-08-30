@@ -18,15 +18,14 @@
  */
 package org.simbrain.world.threedworld.actions;
 
+import kotlin.Unit;
 import org.simbrain.util.ResourceManager;
-import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
+import org.simbrain.util.SwingKt;
 import org.simbrain.world.threedworld.ThreeDWorld;
 import org.simbrain.world.threedworld.engine.ThreeDEngine;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 
 /**
  * Action for showing world preferences.
@@ -49,16 +48,10 @@ public final class EditCameraControllerAction extends AbstractAction {
     public void actionPerformed(final ActionEvent event) {
         ThreeDEngine.State previousState = world.getEngine().getState();
         world.getEngine().queueState(ThreeDEngine.State.SystemPause, true);
-        AnnotatedPropertyEditor editor = new AnnotatedPropertyEditor(world.getCameraController());
-        JDialog dialog = editor.getDialog();
-        dialog.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosed(WindowEvent event) {
-                world.getEngine().queueState(previousState, false);
-            }
+        var dialog = SwingKt.createDialog(world.getCameraController(), (e) -> {
+            world.getEngine().queueState(previousState, false);
+            return Unit.INSTANCE;
         });
-        dialog.pack();
-        dialog.setLocationRelativeTo(null);
-        dialog.setVisible(true);
+        SwingKt.display(dialog);
     }
 }

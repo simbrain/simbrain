@@ -19,7 +19,7 @@
 package org.simbrain.world.odorworld.actions;
 
 import org.simbrain.util.ResourceManager;
-import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
+import org.simbrain.util.SwingKt;
 import org.simbrain.world.odorworld.OdorWorldPanel;
 
 import javax.swing.*;
@@ -55,11 +55,8 @@ public final class ShowWorldPrefsAction extends AbstractAction {
 
     @Override
     public void actionPerformed(final ActionEvent event) {
-        AnnotatedPropertyEditor editor = new AnnotatedPropertyEditor(component.getWorld());
-        JDialog dialog = editor.getDialog();
-        dialog.pack();
-        dialog.setLocationRelativeTo(null);
-        dialog.setVisible(true);
+        var dialog = SwingKt.createDialog(component.getWorld());
+        SwingKt.display(dialog);
 
     }
 }

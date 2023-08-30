@@ -22,9 +22,8 @@ import org.simbrain.network.trainers.ErrorListener;
 import org.simbrain.network.trainers.IterableTrainer;
 import org.simbrain.util.LabelledItemPanel;
 import org.simbrain.util.ResourceManager;
-import org.simbrain.util.StandardDialog;
+import org.simbrain.util.SwingKt;
 import org.simbrain.util.Utils;
-import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 
 import javax.swing.*;
 import java.util.concurrent.Executors;
@@ -238,10 +237,8 @@ public class IterativeControlsPanel extends JPanel {
     }
 
     private void editTrainerProperties() {
-        AnnotatedPropertyEditor trainerProps = new AnnotatedPropertyEditor(trainer);
-        StandardDialog dialog = trainerProps.getDialog();
-        dialog.pack();
-        dialog.setVisible(true);
+        var dialog = SwingKt.createDialog(trainer);
+        SwingKt.display(dialog);
     }
 
 

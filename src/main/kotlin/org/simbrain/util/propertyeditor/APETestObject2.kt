@@ -8,13 +8,13 @@ import org.simbrain.util.UserParameter
 import org.simbrain.util.allPropertiesToString
 import org.simbrain.util.displayInDialog
 
-class APETestObject2 {
+class APETestObject2: EditableObject {
 
     // var simpleInt by UserParameter2(
     //     initValue = 1
     // )
 
-    var name by GuiEditable(
+    override var name by GuiEditable(
         initValue = "test",
         displayOnly = true,
     )
@@ -130,9 +130,9 @@ fun main() {
         // (testObject as AnnotatedPropertyEditorTestObject2.TestInnerObject1).test1Int = 3
         testObject = APETestObject2.TestInnerObject2(3, false)
     }
-    val editor = AnnotatedPropertyEditor2(editingObject)
+    val editor = AnnotatedPropertyEditor(editingObject)
     editor.displayInDialog {
-        commit()
+        commitChanges()
         editingObject.forEach { println(it) }
     }
 

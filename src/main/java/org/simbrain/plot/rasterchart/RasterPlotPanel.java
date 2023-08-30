@@ -18,14 +18,14 @@
  */
 package org.simbrain.plot.rasterchart;
 
+import kotlin.Unit;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.simbrain.util.StandardDialog;
-import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
+import org.simbrain.util.SwingKt;
 
 import javax.swing.*;
 import java.awt.*;
@@ -189,15 +189,11 @@ public class RasterPlotPanel extends JPanel {
      * Show properties dialog.
      */
     public void showPropertiesDialog() {
-        AnnotatedPropertyEditor editor = (new AnnotatedPropertyEditor(model));
-        StandardDialog dialog = editor.getDialog();
-        dialog.addClosingTask(() -> {
+        var dialog = SwingKt.createDialog(model, (e) -> {
             updateChartSettings();
+            return Unit.INSTANCE;
         });
-        dialog.setModal(true);
-        dialog.pack();
-        dialog.setLocationRelativeTo(null);
-        dialog.setVisible(true);
+        SwingKt.display(dialog);
     }
 
     public ChartPanel getChartPanel() {

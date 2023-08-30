@@ -4,6 +4,7 @@ import org.piccolo2d.PCanvas
 import org.piccolo2d.PLayer
 import org.piccolo2d.nodes.PPath
 import org.simbrain.util.StandardDialog
+import org.simbrain.util.displayInDialog
 import org.simbrain.util.onDoubleClick
 import org.simbrain.util.piccolo.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
@@ -84,7 +85,7 @@ fun List<TileSet>.tilePicker(currentGid: Int, block: (Int) -> Unit) = StandardDi
                             it.select()
                             pickedTile = it.gid
                         } else if (it is PTiledImage && event.clickCount == 2) {
-                            AnnotatedPropertyEditor.getDialog(tileSet[pickedTile]).makeVisible()
+                            AnnotatedPropertyEditor(tileSet[pickedTile]).displayInDialog()
                         }
                     }
                 }

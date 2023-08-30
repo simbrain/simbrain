@@ -161,11 +161,11 @@ public class AddNeuronsDialog extends StandardDialog {
 
         // Neuron Properties Panel
         addNeuronsPanel.add(combinedNeuronInfoPanel);
-        combinedNeuronInfoPanel.setDetailTrianglesOpen(false);
+        // combinedNeuronInfoPanel.setDetailTrianglesOpen(false);
 
         // Layout Panel
         selectLayout = new AnnotatedPropertyEditor(layoutObject);
-        selectLayout.setDetailTrianglesOpen(false);
+        // selectLayout.setDetailTrianglesOpen(false);
         addNeuronsPanel.add(selectLayout);
 
         // Group Panel

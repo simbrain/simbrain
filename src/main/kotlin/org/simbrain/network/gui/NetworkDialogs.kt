@@ -22,9 +22,9 @@ import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.createDialog
 import org.simbrain.util.display
+import org.simbrain.util.displayInDialog
 import org.simbrain.util.piccolo.SceneGraphBrowser
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
-import org.simbrain.util.propertyeditor.ObjectTypeEditor
 import org.simbrain.util.propertyeditor.ParameterWidget
 import org.simbrain.util.table.*
 import org.simbrain.util.widgets.ApplyPanel.createApplyPanel
@@ -201,63 +201,53 @@ fun SynapseGroup2Node.getDialog(): StandardDialog {
  */
 fun NetworkPanel.showClassifierCreationDialog() {
     val creator = SmileClassifier.ClassifierCreator(network.idManager.getProposedId(SmileClassifier::class.java))
-    val dialog = StandardDialog()
-    val ape: AnnotatedPropertyEditor
-
-    dialog.contentPane = JPanel().apply {
-        layout = BoxLayout(this, BoxLayout.PAGE_AXIS)
-        ape = AnnotatedPropertyEditor(creator)
-        add(ape)
-    }
-
-    dialog.addClosingTask {
-        ape.commitChanges()
+    AnnotatedPropertyEditor(creator).displayInDialog {
+        commitChanges()
         network.addNetworkModelAsync(creator.create(network))
+    }.also {
+        it.title = "Create Smile Classifier"
     }
-    dialog.title = "Create Smile Classifier"
-    dialog.makeVisible()
 }
 
 class ConnectionStrategyPanel(val connectionSelector: ConnectionSelector): EditablePanel() {
 
-    val editor: AnnotatedPropertyEditor
-    var ote: ParameterWidget
+    val editor = AnnotatedPropertyEditor(connectionSelector)
+    var ote: ParameterWidget = TODO()
     val selectedStrategy: ConnectionStrategy get() = connectionSelector.cs
     val percentExcitatoryPanel = PercentExcitatoryPanel(selectedStrategy.percentExcitatory)
     var sparsePanel: SparsePanel? = null
 
     init {
-            editor = AnnotatedPropertyEditor(connectionSelector)
-            add(editor)
-            ote = editor.getWidget("Connection Strategy") as ParameterWidget
-            val comp = editor.getWidget("Connection Strategy")?.component
-
-            fun updatePanel() {
-                if (ote.widgetValue is ConnectionStrategy) {
-                    connectionSelector.cs = ote.widgetValue as ConnectionStrategy
-                    // Add percent excitatory panel if the connection strategy requires it
-                    if (selectedStrategy.usesPolarity) {
-                        editor.addItem(percentExcitatoryPanel)
-                    } else {
-                        editor.removeItem(percentExcitatoryPanel)
-                    }
-                    // Custom Sparse Panel
-                    if (selectedStrategy is Sparse) {
-                        editor.removeItem(sparsePanel)
-                        sparsePanel = SparsePanel(selectedStrategy as Sparse)
-                        editor.addItem(sparsePanel)
-                        // TODO: Put it in the panel itself?
-                        // comp.editorPanel.addItem(sparsePanel)
-                    } else {
-                        editor.removeItem(sparsePanel)
-                        // comp.editorPanel.removeItem(sparsePanel)
-                    }
-                }
-            }
-            (comp as ObjectTypeEditor).setObjectChangedTask {
-                updatePanel()
-            }
-            updatePanel()
+            // add(editor)
+            // ote = editor.getWidget("Connection Strategy") as ParameterWidget
+            // val comp = editor.getWidget("Connection Strategy")?.component
+            //
+            // fun updatePanel() {
+            //     if (ote.widgetValue is ConnectionStrategy) {
+            //         connectionSelector.cs = ote.widgetValue as ConnectionStrategy
+            //         // Add percent excitatory panel if the connection strategy requires it
+            //         if (selectedStrategy.usesPolarity) {
+            //             editor.addItem(percentExcitatoryPanel)
+            //         } else {
+            //             editor.removeItem(percentExcitatoryPanel)
+            //         }
+            //         // Custom Sparse Panel
+            //         if (selectedStrategy is Sparse) {
+            //             editor.removeItem(sparsePanel)
+            //             sparsePanel = SparsePanel(selectedStrategy as Sparse)
+            //             editor.addItem(sparsePanel)
+            //             // TODO: Put it in the panel itself?
+            //             // comp.editorPanel.addItem(sparsePanel)
+            //         } else {
+            //             editor.removeItem(sparsePanel)
+            //             // comp.editorPanel.removeItem(sparsePanel)
+            //         }
+            //     }
+            // }
+            // (comp as ObjectTypeEditor).setObjectChangedTask {
+            //     updatePanel()
+            // }
+            // updatePanel()
         }
 
         override fun fillFieldValues() {

@@ -21,8 +21,6 @@ package org.simbrain.network.gui.dialogs.group;
 import org.simbrain.network.core.Connector;
 import org.simbrain.network.core.Layer;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.matrix.WeightMatrix;
-import org.simbrain.network.matrix.ZoeConnector;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 
@@ -86,16 +84,16 @@ public final class ConnectorDialog extends StandardDialog {
      */
     public void commitChanges() {
         var net = networkPanel.getNetwork();
-        var widget = (Connector.ConnectorEnum) mainPanel.getWidget("Connector type").getWidgetValue();
-        for (Layer source: sources) {
-            for (Layer target: targets) {
-                if (widget == Connector.ConnectorEnum.DENSE) {
-                    net.addNetworkModelAsync(new WeightMatrix(net, source, target));
-                } else if (widget == Connector.ConnectorEnum.ZOE) {
-                    net.addNetworkModelAsync(new ZoeConnector(net, source, target));
-                }
-            }
-        }
+        // var widget = (Connector.ConnectorEnum) mainPanel.getWidget("Connector type").getWidgetValue();
+        // for (Layer source: sources) {
+        //     for (Layer target: targets) {
+        //         if (widget == Connector.ConnectorEnum.DENSE) {
+        //             net.addNetworkModelAsync(new WeightMatrix(net, source, target));
+        //         } else if (widget == Connector.ConnectorEnum.ZOE) {
+        //             net.addNetworkModelAsync(new ZoeConnector(net, source, target));
+        //         }
+        //     }
+        // }
     }
 
     @Override

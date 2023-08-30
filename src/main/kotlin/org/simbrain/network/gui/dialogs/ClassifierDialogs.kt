@@ -100,7 +100,7 @@ fun SmileClassifier.getTrainingDialog(): StandardDialog {
             }
         }
 
-        if (!classfierProps.widgets.isEmpty()) {
+        if (classfierProps.parameterWidgetMap.isNotEmpty()) {
             add(classfierProps, "wrap")
             addClosingTask(classfierProps::commitChanges)
             add(JSeparator(), "growx, span, wrap")

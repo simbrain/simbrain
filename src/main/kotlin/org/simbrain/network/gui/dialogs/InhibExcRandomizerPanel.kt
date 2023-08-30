@@ -113,7 +113,7 @@ class EditableRandomizerPanel : JPanel {
     /**
      * The randomizer panel used as a basis for this panel.
      */
-    private var randomizerPanel: AnnotatedPropertyEditor? = null
+    private var randomizerPanel = AnnotatedPropertyEditor(randomizer)
 
     /**
      * A DropDownTriangle used to show or hide [.randomizerPanel]. The
@@ -169,7 +169,6 @@ class EditableRandomizerPanel : JPanel {
      * Initializes the layout of the panel
      */
     private fun init() {
-        randomizerPanel = AnnotatedPropertyEditor(randomizer)
         layout = GridBagLayout()
         // val colorBorder = BorderFactory.createLineBorder(if (Polarity.EXCITATORY == polarity) Color.red else Color.blue)
         // this.setBorder(BorderFactory.createTitledBorder(colorBorder, polarity?.title()));

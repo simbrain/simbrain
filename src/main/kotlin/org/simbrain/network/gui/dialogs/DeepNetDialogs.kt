@@ -25,7 +25,7 @@ fun NetworkPanel.showDeepNetCreationDialog() {
 
     val creator = DeepNet.DeepNetCreator(network.idManager.getProposedId(DeepNet::class.java))
     val dialog = StandardDialog()
-    val ape: AnnotatedPropertyEditor
+    val ape = AnnotatedPropertyEditor(creator)
 
     val layerList = LayerEditor(
         arrayListOf(TFInputLayer(10), TFDenseLayer(), TFDenseLayer())
@@ -33,7 +33,6 @@ fun NetworkPanel.showDeepNetCreationDialog() {
 
     dialog.contentPane = JPanel().apply {
         layout = BoxLayout(this, BoxLayout.PAGE_AXIS)
-        ape = AnnotatedPropertyEditor(creator)
         add(ape)
         add(layerList)
     }

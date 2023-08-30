@@ -69,13 +69,7 @@ val DataViewerTable.editRandomizerAction
         description = "Edit table wide randomizer",
         iconPath = "menu_icons/Prefs.png"
     ) {
-        val editor = AnnotatedPropertyEditor(model.cellRandomizer)
-        val dialog: StandardDialog = editor.dialog
-        // dialog.addClosingTask { updateChartSettings() }
-        dialog.isModal = true
-        dialog.pack()
-        dialog.setLocationRelativeTo(null)
-        dialog.isVisible = true
+        AnnotatedPropertyEditor(model.cellRandomizer).displayInDialog()
     }
 
 val DataViewerTable.insertColumnAction
@@ -250,14 +244,8 @@ val DataViewerTable.editColumnAction
     ) {
         if (model is BasicDataWrapper) {
             if (selectedColumn >= 0) {
-                val editor = AnnotatedPropertyEditor(model.columns[selectedColumn])
-                val dialog: StandardDialog = editor.dialog
-                dialog.addClosingTask { model.fireTableStructureChanged() }
                 // TODO: Add access to histogram etc. from here?
-                dialog.isModal = true
-                dialog.pack()
-                dialog.setLocationRelativeTo(null)
-                dialog.isVisible = true
+                AnnotatedPropertyEditor(model.columns[selectedColumn]).displayInDialog()
             }
         }
     }

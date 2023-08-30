@@ -34,7 +34,7 @@ class EmbeddedObjectEditor(
     /**
      * Editor panel for the set of objects (null panel if they are inconsistent).
      */
-    private var editorPanel: AnnotatedPropertyEditor? = null
+    private var editorPanel = AnnotatedPropertyEditor(emptyList())
 
     /**
      * For showing/hiding the property editor.
@@ -136,7 +136,6 @@ class EmbeddedObjectEditor(
      * objects being edited.
      */
     fun fillFieldValues() {
-        editorPanel!!.fillFieldValues(objectList)
     }
 
     /**
@@ -161,7 +160,7 @@ class EmbeddedObjectEditor(
         // In the case where the object has no properties at all to edit, and
         // the type editor is just being used to set a type, just remove
         // everything from the panel, and hide the detail triangle.
-        if (editorPanel!!.widgets.size == 0) {
+        if (editorPanel!!.parameterWidgetMap.size == 0) {
             isVisible = false
         } else {
             isVisible = true
@@ -227,12 +226,12 @@ class EmbeddedObjectEditor(
         if (!consistent) {
             return
         }
-        if (isPrototypeMode) {
-            // Sync prototype object to editor panel
-            editorPanel!!.commitChanges(mutableListOf(prototypeObject!!))
-        } else {
-            editorPanel!!.commitChanges(objectList)
-        }
+        // if (isPrototypeMode) {
+        //     // Sync prototype object to editor panel
+        //     editorPanel!!.commitChanges(mutableListOf(prototypeObject!!))
+        // } else {
+        //     editorPanel!!.commitChanges(objectList)
+        // }
     }
 
     /**

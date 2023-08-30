@@ -45,7 +45,7 @@ class ParameterWidget(
     /**
      * Parent property editor.
      */
-    private val parent: AnnotatedPropertyEditor,
+    private val parent: AnnotatedPropertyEditor1,
     /**
      * The parameter for this widget.
      */

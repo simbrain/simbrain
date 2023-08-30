@@ -31,14 +31,14 @@ import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.jvmErasure
 
 /**
- * A special kind of value that can be parsed by an [AnnotatedPropertyEditor2].
+ * A special kind of value that can be parsed by an [AnnotatedPropertyEditor].
  *
  * Example activation = UserParameter<Neuron, Double>(0.0)
  *
  * @param O the type of the base object that holds the parameter
  * @param T the type of the value of this property
  */
-class GuiEditable<O : Any, T>(
+class GuiEditable<O : EditableObject, T>(
     initValue: T,
     label: String? = null,
     val description: String? = null,
@@ -113,7 +113,7 @@ class GuiEditable<O : Any, T>(
 /**
  * Converts [UserParameter] annotation to [GuiEditable].
  */
-fun <O : Any> UserParameter.toGuiEditable(initValue: Any): GuiEditable<O, Any> {
+fun <O : EditableObject> UserParameter.toGuiEditable(initValue: Any): GuiEditable<O, Any> {
 
     fun Any.matchDataTypeTo(match: Any): Any? {
         val thisNumber = this as Double
@@ -147,8 +147,8 @@ fun <O : Any> UserParameter.toGuiEditable(initValue: Any): GuiEditable<O, Any> {
  * Provides a context for the update function.
  * O and T must match O and T of the parent user parameter.
  */
-class UpdateFunctionContext<O : Any, T>(
-    private val editor: AnnotatedPropertyEditor2<O>,
+class UpdateFunctionContext<O : EditableObject, T>(
+    private val editor: AnnotatedPropertyEditor<O>,
     private val parameter: GuiEditable<O, T>,
     val updateEventProperty: KProperty<*>,
     private val enableWidgetProvider: (Boolean) -> Unit,
@@ -195,13 +195,13 @@ class UpdateFunctionContext<O : Any, T>(
  * Events to fire when the property dialog changes. Changing boolean values, editing text, etc. will fire this event.
  * Allows some dialog entries to respond to others.
  */
-class ParameterEvents<O : Any, T> : Events2() {
+class ParameterEvents<O : EditableObject, T> : Events2() {
 
     val valueChanged = AddedEvent<KMutableProperty1<O, T>>()
 
 }
 
-sealed class ParameterWidget2<O : Any, T>(val parameter: GuiEditable<O, T>, var isConsistent: Boolean) {
+sealed class ParameterWidget2<O : EditableObject, T>(val parameter: GuiEditable<O, T>, var isConsistent: Boolean) {
 
     val events = ParameterEvents<O, T>()
 
@@ -213,8 +213,8 @@ sealed class ParameterWidget2<O : Any, T>(val parameter: GuiEditable<O, T>, var 
 
 }
 
-class EnumWidget<O : Any, T : Enum<*>>(
-    val editor: AnnotatedPropertyEditor2<O>,
+class EnumWidget<O : EditableObject, T : Enum<*>>(
+    val editor: AnnotatedPropertyEditor<O>,
     parameter: GuiEditable<O, T>,
     isConsistent: Boolean
 ) : ParameterWidget2<O, T>(parameter, isConsistent) {
@@ -227,6 +227,8 @@ class EnumWidget<O : Any, T : Enum<*>>(
         ChoicesWithNull(enumValues as Array<T>).also {
             if (!isConsistent) {
                 it.setNull()
+            } else {
+                it.selectedItem = parameter.value
             }
         }
     }
@@ -252,8 +254,8 @@ class EnumWidget<O : Any, T : Enum<*>>(
     }
 }
 
-class BooleanWidget<O : Any>(
-    val editor: AnnotatedPropertyEditor2<O>,
+class BooleanWidget<O : EditableObject>(
+    val editor: AnnotatedPropertyEditor<O>,
     parameter: GuiEditable<O, Boolean>,
     isConsistent: Boolean
 ) : ParameterWidget2<O, Boolean>(parameter, isConsistent) {
@@ -291,8 +293,8 @@ class BooleanWidget<O : Any>(
     }
 }
 
-class NumericWidget2<O : Any, T>(
-    val editor: AnnotatedPropertyEditor2<O>,
+class NumericWidget2<O : EditableObject, T>(
+    val editor: AnnotatedPropertyEditor<O>,
     parameter: GuiEditable<O, T>,
     isConsistent: Boolean
 ) : ParameterWidget2<O, T>(parameter, isConsistent) {
@@ -392,8 +394,8 @@ class NumericWidget2<O : Any, T>(
 
 }
 
-class DisplayOnlyWidget<O : Any, T>(
-    val editor: AnnotatedPropertyEditor2<O>,
+class DisplayOnlyWidget<O : EditableObject, T>(
+    val editor: AnnotatedPropertyEditor<O>,
     parameter: GuiEditable<O, T>,
     isConsistent: Boolean
 ) : ParameterWidget2<O, T>(parameter, isConsistent) {
@@ -420,8 +422,8 @@ class DisplayOnlyWidget<O : Any, T>(
     }
 }
 
-class StringWidget<O : Any>(
-    val editor: AnnotatedPropertyEditor2<O>,
+class StringWidget<O : EditableObject>(
+    val editor: AnnotatedPropertyEditor<O>,
     parameter: GuiEditable<O, String>,
     isConsistent: Boolean
 ) : ParameterWidget2<O, String>(parameter, isConsistent) {
@@ -469,8 +471,8 @@ class StringWidget<O : Any>(
     }
 }
 
-class ColorWidget<O : Any>(
-    val editor: AnnotatedPropertyEditor2<O>,
+class ColorWidget<O : EditableObject>(
+    val editor: AnnotatedPropertyEditor<O>,
     parameter: GuiEditable<O, Color>,
     isConsistent: Boolean
 ) : ParameterWidget2<O, Color>(parameter, isConsistent) {
@@ -502,8 +504,8 @@ class ColorWidget<O : Any>(
 }
 
 
-class DoubleArrayWidget<O : Any>(
-    val editor: AnnotatedPropertyEditor2<O>,
+class DoubleArrayWidget<O : EditableObject>(
+    val editor: AnnotatedPropertyEditor<O>,
     parameter: GuiEditable<O, DoubleArray>,
     isConsistent: Boolean
 ) : ParameterWidget2<O, DoubleArray>(parameter, isConsistent) {
@@ -543,8 +545,8 @@ class DoubleArrayWidget<O : Any>(
     }
 }
 
-class ObjectWidget<O : Any, T : CopyableObject>(
-    private val editor: AnnotatedPropertyEditor2<O>,
+class ObjectWidget<O : EditableObject, T : CopyableObject>(
+    private val editor: AnnotatedPropertyEditor<O>,
     private val objectList: List<T>,
     parameter: GuiEditable<O, T>,
     isConsistent: Boolean
@@ -577,7 +579,7 @@ class ObjectWidget<O : Any, T : CopyableObject>(
 
     private val editorPanelContainer = JPanel()
 
-    lateinit var objectTypeEditor: AnnotatedPropertyEditor2<T>
+    lateinit var objectTypeEditor: AnnotatedPropertyEditor<T>
         private set
 
     /**
@@ -596,7 +598,7 @@ class ObjectWidget<O : Any, T : CopyableObject>(
                     val clazz = typeMap[selectedItem as String]
                     if (clazz != null) {
                         val prototypeObject = clazz.callNoArgConstructor() as T
-                        objectTypeEditor = AnnotatedPropertyEditor2(listOf(prototypeObject))
+                        objectTypeEditor = AnnotatedPropertyEditor(listOf(prototypeObject))
                         _prototypeObject = prototypeObject
                         editorPanelContainer.removeAll()
                         editorPanelContainer.add(objectTypeEditor)
@@ -655,9 +657,9 @@ class ObjectWidget<O : Any, T : CopyableObject>(
                 topPanel.add(Box.createHorizontalGlue())
                 topPanel.add(detailTriangle)
             }
-            objectTypeEditor = AnnotatedPropertyEditor2(objectList)
+            objectTypeEditor = AnnotatedPropertyEditor(objectList)
             editorPanelContainer.add(objectTypeEditor)
-            if (objectTypeEditor.parameterWidgetMap.isEmpty()) {
+            if (dropDown == null && objectTypeEditor.parameterWidgetMap.isEmpty()) {
                 isVisible = false
             }
         }
@@ -678,7 +680,7 @@ class ObjectWidget<O : Any, T : CopyableObject>(
             },
             refreshSourceProvider = { newValue ->
                 _prototypeObject = newValue
-                objectTypeEditor = AnnotatedPropertyEditor2(listOf(newValue))
+                objectTypeEditor = AnnotatedPropertyEditor(listOf(newValue))
                 editorPanelContainer.removeAll()
                 editorPanelContainer.add(objectTypeEditor)
                 if (objectTypeEditor.parameterWidgetMap.isEmpty()) {

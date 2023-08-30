@@ -18,12 +18,12 @@
  */
 package org.simbrain.plot.timeseries;
 
+import kotlin.Unit;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
-import org.simbrain.util.StandardDialog;
-import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
+import org.simbrain.util.SwingKt;
 
 import javax.swing.*;
 import java.awt.*;
@@ -183,16 +183,11 @@ public class TimeSeriesPlotPanel extends JPanel {
      * Show properties dialog.
      */
     public void showPropertiesDialog() {
-        AnnotatedPropertyEditor editor = (new AnnotatedPropertyEditor(model));
-        StandardDialog dialog = editor.getDialog();
-        dialog.addClosingTask(() -> {
+        var dialog = SwingKt.createDialog(model, (e) -> {
             updateChartSettings();
+            return Unit.INSTANCE;
         });
-        dialog.setModal(true);
-        dialog.pack();
-        dialog.setLocationRelativeTo(null);
-        dialog.setVisible(true);
-        dialog.setAlwaysOnTop(true);
+        SwingKt.display(dialog);
     }
 
     public ChartPanel getChartPanel() {

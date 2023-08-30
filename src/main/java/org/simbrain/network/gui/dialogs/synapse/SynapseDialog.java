@@ -20,11 +20,8 @@ package org.simbrain.network.gui.dialogs.synapse;
 
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.nodes.SynapseNode;
-import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
-import org.simbrain.util.propertyeditor.ObjectTypeEditor;
-import org.simbrain.util.propertyeditor.ParameterWidget;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
@@ -132,9 +129,9 @@ public final class SynapseDialog extends StandardDialog {
      * update rule.
      */
     private void addListeners() {
-        JComponent component = synapseEditingPanel.getWidget("Learning Rule").getComponent();
-        ((ObjectTypeEditor) component).getDropDown().addActionListener(
-            e -> SwingUtilities.invokeLater(() -> updateHelp()));
+        // JComponent component = synapseEditingPanel.getWidget("Learning Rule").getComponent();
+        // ((ObjectTypeEditor) component).getDropDown().addActionListener(
+        //     e -> SwingUtilities.invokeLater(() -> updateHelp()));
     }
 
     /**
@@ -159,16 +156,16 @@ public final class SynapseDialog extends StandardDialog {
      */
     public void updateHelp() {
 
-        ParameterWidget pw = synapseEditingPanel.getWidget("Learning Rule");
-        String selection = (String) ((ObjectTypeEditor) pw.getComponent()).getDropDown().getSelectedItem();
-
-        if (selection == SimbrainConstants.NULL_STRING) {
-           helpAction = new ShowHelpAction("Pages/Network/synapse.html");
-       } else {
-           selection = selection.replaceAll("\\s", ""); // Remove white space
-           helpAction = new ShowHelpAction("Pages/Network/synapse/" + selection + ".html");
-       }
-       helpButton.setAction(helpAction);
+       //  ParameterWidget pw = synapseEditingPanel.getWidget("Learning Rule");
+       //  String selection = (String) ((ObjectTypeEditor) pw.getComponent()).getDropDown().getSelectedItem();
+       //
+       //  if (selection == SimbrainConstants.NULL_STRING) {
+       //     helpAction = new ShowHelpAction("Pages/Network/synapse.html");
+       // } else {
+       //     selection = selection.replaceAll("\\s", ""); // Remove white space
+       //     helpAction = new ShowHelpAction("Pages/Network/synapse/" + selection + ".html");
+       // }
+       // helpButton.setAction(helpAction);
     }
 
     /**

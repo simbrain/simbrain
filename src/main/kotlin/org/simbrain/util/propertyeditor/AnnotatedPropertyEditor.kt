@@ -2,6 +2,7 @@ package org.simbrain.util.propertyeditor
 
 import org.simbrain.util.LabelledItemPanel
 import org.simbrain.util.UserParameter
+import smile.math.matrix.Matrix
 import java.awt.Color
 import javax.swing.JPanel
 import javax.swing.JTabbedPane
@@ -23,6 +24,9 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
 
     val parameterWidgetMap = editingObjects.first().let { obj ->
 
+
+        val delegatedPropertyNames = HashSet<String>()
+
         /**
          * Properties using [GuiEditable].
          *
@@ -34,10 +38,14 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
         val delegated = (obj::class.allSuperclasses + obj::class)
             .map { it.declaredMemberProperties }
             .flatten()
-            .asSequence()
             .filterIsInstance<KMutableProperty1<O, *>>()
             .onEach { it.isAccessible = true }
-            .mapNotNull { property -> property.getDelegate(obj)?.also { property.get(obj) } }
+            .mapNotNull { property ->
+                property.getDelegate(obj)?.also {
+                    property.get(obj)
+                    delegatedPropertyNames.add(property.name)
+                }
+            }
             .filterIsInstance<GuiEditable<O, *>>()
 
         /**
@@ -52,7 +60,10 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
         val annotated = (obj::class.allSuperclasses + obj::class)
             .map { it.declaredMemberProperties }
             .flatten()
-            .asSequence()
+            .filterNot {
+                // If a property has both a UserParameter annotation and a GuiEditable delegation, only keep the delegation
+                delegatedPropertyNames.contains(it.name)
+            }
             .mapNotNull {
                 (it.annotations
                     .filterIsInstance<UserParameter>()
@@ -61,7 +72,8 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
                     ?.also { up -> up.getValue(obj, it) })
             }
 
-        (delegated + annotated).map { parameter ->
+        (delegated + annotated)
+            .map { parameter ->
                 parameter to makeWidget(
                     parameter,
                     if (parameter.value is CopyableObject) {
@@ -74,10 +86,14 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
 
     }
 
+    val propertyWidgetMap = parameterWidgetMap.map { (parameter, widget) ->
+        parameter.property to widget
+    }.toMap()
+
     val labelledItemPanelsByTab = LinkedHashMap<String?, LabelledItemPanel>()
 
     private fun getLabelledItemPanel(tab: String?): LabelledItemPanel {
-        return labelledItemPanelsByTab.getOrPut(tab) {
+        return labelledItemPanelsByTab.getOrPut(if (tab.isNullOrEmpty()) "Main" else tab) {
             LabelledItemPanel()
         }
     }
@@ -107,7 +123,7 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
     } else {
         JTabbedPane().also {
             labelledItemPanelsByTab.forEach { (tab, panel) ->
-                it.addTab(if (tab.isNullOrEmpty()) "Main" else tab, panel)
+                it.addTab(tab, panel)
             }
         }
     }.also { add(it) }
@@ -170,6 +186,13 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
                 userParameter as GuiEditable<O, DoubleArray>,
                 isConsistent
             ) as ParameterWidget2<O, T>
+
+            is Matrix -> MatrixWidget2(
+                this@AnnotatedPropertyEditor,
+                userParameter as GuiEditable<O, Matrix>,
+                isConsistent
+            ) as ParameterWidget2<O, T>
+
 
             is CopyableObject -> ObjectWidget(
                 this@AnnotatedPropertyEditor,

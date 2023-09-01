@@ -8,6 +8,7 @@ import org.simbrain.util.widgets.ChoicesWithNull
 import org.simbrain.util.widgets.ColorSelector
 import org.simbrain.util.widgets.DropDownTriangle
 import org.simbrain.util.widgets.YesNoNull
+import smile.math.matrix.Matrix
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
@@ -100,7 +101,11 @@ class GuiEditable<O : EditableObject, T>(
             _baseObject = baseObject
         }
         if (_property == null) {
-            val kMutableProperty1 = property as KMutableProperty1<O, T>
+            val kMutableProperty1 = try {
+                property as KMutableProperty1<O, T>
+            } catch (e: ClassCastException) {
+                throw ClassCastException("Failed to cast property ${property.name} to KMutableProperty1<O, T>. Is it not mutable?")
+            }
             _property = kMutableProperty1
         }
         if (_label == null) {
@@ -163,12 +168,8 @@ class UpdateFunctionContext<O : EditableObject, T>(
      */
     fun <WT> widgetValue(property: KMutableProperty1<O, WT>): WT {
         property.isAccessible = true
-        val parameter = property.getDelegate(parameter.baseObject)
-        return if (parameter is GuiEditable<*, *>) {
-            editor.parameterWidgetMap[parameter]!!.value as WT
-        } else {
-            throw IllegalArgumentException("Property $property is not a user parameter")
-        }
+        return editor.propertyWidgetMap[property]?.value as? WT
+            ?: throw IllegalArgumentException("Property $property is not a user parameter")
     }
 
     fun onChange(property: KProperty<*>, block: () -> Unit) {
@@ -229,6 +230,11 @@ class EnumWidget<O : EditableObject, T : Enum<*>>(
                 it.setNull()
             } else {
                 it.selectedItem = parameter.value
+            }
+            it.addActionListener { _ ->
+                events.valueChanged.fireAndBlock(parameter.property)
+                this@EnumWidget.isConsistent = true
+                it.removeNull()
             }
         }
     }
@@ -510,7 +516,7 @@ class DoubleArrayWidget<O : EditableObject>(
     isConsistent: Boolean
 ) : ParameterWidget2<O, DoubleArray>(parameter, isConsistent) {
 
-    private var model = MatrixDataWrapper(parameter.value.toMatrix().transpose())
+    private var model = MatrixDataWrapper(parameter.value.toMatrix())
 
     override val widget by lazy {
         JPanel().apply {
@@ -529,6 +535,47 @@ class DoubleArrayWidget<O : EditableObject>(
 
     override val value: DoubleArray
         get() = model.get2DDoubleArray().first()
+
+    override fun refresh(property: KProperty<*>) {
+        parameter.onUpdate(UpdateFunctionContext(
+            editor,
+            parameter,
+            property,
+            enableWidgetProvider = { enabled ->
+                widget.isEnabled = enabled
+            },
+            widgetVisibilityProvider = { visible ->
+                widget.isVisible = visible
+            }
+        ))
+    }
+}
+
+class MatrixWidget2<O : EditableObject>(
+    val editor: AnnotatedPropertyEditor<O>,
+    parameter: GuiEditable<O, Matrix>,
+    isConsistent: Boolean
+) : ParameterWidget2<O, Matrix>(parameter, isConsistent) {
+
+    private var model = MatrixDataWrapper(parameter.value)
+
+    override val widget by lazy {
+        JPanel().apply {
+            layout = BorderLayout()
+            SimbrainDataViewer(
+                model, useDefaultToolbarAndMenu = false, useHeaders = false,
+                usePadding = false
+            ).also {
+                it.table.tableHeader = null
+                add(it)
+                minimumSize = Dimension(200, min((model.rowCount + 1) * 17 + 2, 100))
+                preferredSize = Dimension(200, min((model.rowCount + 1) * 17 + 2, 100))
+            }
+        }
+    }
+
+    override val value: Matrix
+        get() = model.data
 
     override fun refresh(property: KProperty<*>) {
         parameter.onUpdate(UpdateFunctionContext(
@@ -572,7 +619,14 @@ class ObjectWidget<O : EditableObject, T : CopyableObject>(
             } else {
                 val property =
                     it.companionObject?.memberProperties?.firstOrNull { prop -> prop.name == "types" } as? KProperty1<Any?, Any?>
-                property?.get(it.companionObjectInstance) as? List<KClass<*>>
+                (property?.get(it.companionObjectInstance) as? List<*>)
+                    ?.map { klass ->
+                        when (klass) {
+                            is KClass<*> -> klass
+                            is Class<*> -> klass.kotlin
+                            else -> throw IllegalArgumentException("Unsupported type $it")
+                        }
+                    }
             }
         }.firstOrNull()
     )?.associateBy { it.simpleName!! }

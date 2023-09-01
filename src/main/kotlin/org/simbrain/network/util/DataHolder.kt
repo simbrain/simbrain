@@ -2,6 +2,7 @@ package org.simbrain.network.util
 
 import org.simbrain.util.UserParameter
 import org.simbrain.util.Utils
+import org.simbrain.util.copyFrom
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.toDoubleArray
 import org.simbrain.workspace.AttributeContainer
@@ -24,6 +25,9 @@ object EmptyMatrixData : MatrixDataHolder {
 class BiasedMatrixData(var size: Int) : MatrixDataHolder, AttributeContainer {
     @UserParameter(label = "Biases", description = "Biases for each neuron")
     var biases = Matrix(size, 1)
+        set(value) {
+            field.copyFrom(value)
+        }
 
     @get:Producible
     val biasesArray: DoubleArray

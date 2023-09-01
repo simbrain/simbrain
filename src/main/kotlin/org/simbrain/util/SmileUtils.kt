@@ -16,11 +16,13 @@ fun Matrix.validateSameShape(target: Matrix) {
 }
 
 /**
+ * Copy the entries of [toCopy] into the receiver matrix.
+ *
  * @param allowShapeMismatch If true, then smaller arrays are copied into larger ones (and the other entries in the
  *          larger one are ignored), and larger arrays are trimmed and copied to smaller arrays.
  */
 @JvmOverloads
-fun Matrix.copy(toCopy: Matrix, allowShapeMismatch: Boolean = false) {
+fun Matrix.copyFrom(toCopy: Matrix, allowShapeMismatch: Boolean = false) {
     if (!allowShapeMismatch) {
         validateSameShape(toCopy)
     }
@@ -38,7 +40,7 @@ fun Matrix.copy(toCopy: Matrix, allowShapeMismatch: Boolean = false) {
  */
 fun Matrix.reshape(newNrows: Int, newNcols: Int): Matrix {
     val newMatrix = Matrix(newNrows, newNcols)
-    newMatrix.copy(this, allowShapeMismatch = true)
+    newMatrix.copyFrom(this, allowShapeMismatch = true)
     return newMatrix
 }
 

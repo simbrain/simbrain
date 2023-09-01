@@ -16,214 +16,159 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.neuron_update_rules;
+package org.simbrain.network.neuron_update_rules
 
-import org.simbrain.network.core.Layer;
-import org.simbrain.network.core.Network.TimeType;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule;
-import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
-import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule;
-import org.simbrain.network.util.BiasedMatrixData;
-import org.simbrain.network.util.BiasedScalarData;
-import org.simbrain.util.UserParameter;
-import org.simbrain.util.math.SimbrainMath;
-import org.simbrain.util.stats.ProbabilityDistribution;
-import org.simbrain.util.stats.distributions.UniformRealDistribution;
-
-import java.util.Map;
-import java.util.function.Function;
-
-import static java.lang.Math.max;
+import org.simbrain.network.core.Layer
+import org.simbrain.network.core.Network
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.NeuronUpdateRule
+import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule
+import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
+import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
+import org.simbrain.network.util.BiasedMatrixData
+import org.simbrain.network.util.BiasedScalarData
+import org.simbrain.util.UserParameter
+import org.simbrain.util.math.SimbrainMath
+import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.util.stats.ProbabilityDistribution
+import org.simbrain.util.stats.distributions.UniformRealDistribution
+import kotlin.math.max
 
 /**
- * <b>LinearNeuron</b> is a standard linear neuron.
+ * **LinearNeuron** is a standard linear neuron.
  */
-public class LinearRule extends NeuronUpdateRule<BiasedScalarData, BiasedMatrixData> implements DifferentiableUpdateRule,
-        NoisyUpdateRule, BoundedUpdateRule {
+open class LinearRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>(), DifferentiableUpdateRule,
+    NoisyUpdateRule, BoundedUpdateRule {
+    override var upperBound by GuiEditable(
+        initValue = DEFAULT_UPPER_BOUND,
+        label = "Upper Bound",
+        description = "Upper bound that determines the maximum level of activity of a node.",
+        order = -20,
+        onUpdate = {
+            if (updateEventProperty == LinearRule::clippingType) {
+                enableWidget(widgetValue(LinearRule::clippingType) == ClippingType.PiecewiseLinear)
+            }
+        }
+    )
 
-    /**
-     * The Default upper bound.
-     */
-    private static final double DEFAULT_UPPER_BOUND = 10.0;
-
-    /**
-     * The Default lower bound.
-     */
-    private static final double DEFAULT_LOWER_BOUND = -10.0;
-
-    private double upperBound = DEFAULT_UPPER_BOUND;
-
-    private double lowerBound = DEFAULT_LOWER_BOUND;
+    override var lowerBound by GuiEditable(
+        initValue = DEFAULT_LOWER_BOUND,
+        label = "Lower Bound",
+        description = "Lower bound that determines the minimum level of activity of a node.",
+        order = -10,
+        onUpdate = {
+            if (updateEventProperty == LinearRule::clippingType) {
+                enableWidget(
+                    widgetValue(LinearRule::clippingType) == ClippingType.PiecewiseLinear ||
+                            widgetValue(LinearRule::clippingType) == ClippingType.Relu
+                )
+            }
+        }
+    )
 
     @UserParameter(
-            label = "Type",
-            description = "No clipping, clip floor and ceiling (piecewise linear), clip floor (relu)",
-            order = 10)
-    private ClippingType clippingType = ClippingType.PiecewiseLinear;
+        label = "Type",
+        description = "No clipping, clip floor and ceiling (piecewise linear), clip floor (relu)",
+        order = 10
+    )
+    var clippingType = ClippingType.PiecewiseLinear
 
     /**
      * Note that Relu case ignores provided bounds, though those bounds are still used by contextual increment and
      * decrement.
      */
-    public enum ClippingType {
+    enum class ClippingType {
         NoClipping {
-            @Override
-            public String toString() {
-                return "No clipping";
+            override fun toString(): String {
+                return "No clipping"
             }
         },
         PiecewiseLinear {
-            @Override
-            public String toString() {
-                return "Piecewise Linear";
+            override fun toString(): String {
+                return "Piecewise Linear"
             }
         },
-
         Relu {
-            @Override
-            public String toString() {
-                return "Relu";
+            override fun toString(): String {
+                return "Relu"
             }
         }
     }
 
-    @UserParameter(
-            label = "Slope",
-            description = "Slope of linear rule",
-            increment = .1,
-            order = 20)
-    private double slope = 1;
-
-    private ProbabilityDistribution noiseGenerator = new UniformRealDistribution();
+    @UserParameter(label = "Slope", description = "Slope of linear rule", increment = .1, order = 20)
+    var slope = 1.0
+    override var noiseGenerator: ProbabilityDistribution = UniformRealDistribution()
 
     /**
      * Add noise to the neuron.
      */
-    private boolean addNoise = false;
-
-    @Override
-    public void apply(Neuron neuron, BiasedScalarData data) {
-        neuron.setActivation(linearRule(neuron.getInput(), data.getBias()));
+    override var addNoise = false
+    override fun apply(neuron: Neuron, data: BiasedScalarData) {
+        neuron!!.setActivation(linearRule(neuron.input, data.bias))
     }
-    @Override
-    public void apply(Layer array, BiasedMatrixData data) {
-        for (int i = 0; i < array.getOutputs().nrow() ; i++) {
-            array.getOutputs().set(i, 0, linearRule(array.getInputs().get(i, 0), data.getBiases().get(i, 0)));
+
+
+
+    override fun apply(array: Layer, data: BiasedMatrixData) {
+        for (i in 0 until array!!.outputs.nrow()) {
+            array.outputs[i, 0] = linearRule(array.inputs[i, 0], data.biases[i, 0])
         }
     }
 
-    public double linearRule(double input, double bias) {
-        double ret = input * slope + bias;
+    fun linearRule(input: Double, bias: Double): Double {
+        var ret = input * slope + bias
         if (addNoise) {
-            ret  += noiseGenerator.sampleDouble();
+            ret += noiseGenerator.sampleDouble()
         }
-        return switch (clippingType) {
-            case NoClipping -> ret;
-            case Relu -> max(0, ret);
-            case PiecewiseLinear -> SimbrainMath.clip(ret, lowerBound, upperBound);
-        };
+        return when (clippingType) {
+            ClippingType.NoClipping -> ret
+            ClippingType.Relu -> max(0.0, ret)
+            ClippingType.PiecewiseLinear -> SimbrainMath.clip(ret, lowerBound, upperBound)
+        }
     }
 
-    @Override
-    public BiasedMatrixData createMatrixData(int size) {
-        return new BiasedMatrixData(size);
+    override fun createMatrixData(size: Int): BiasedMatrixData {
+        return BiasedMatrixData(size)
     }
 
-    @Override
-    public BiasedScalarData createScalarData() {
-        return new BiasedScalarData();
+    override fun createScalarData(): BiasedScalarData {
+        return BiasedScalarData()
     }
 
-    @Override
-    public TimeType getTimeType() {
-        return TimeType.DISCRETE;
+    override val timeType: Network.TimeType
+        get() = Network.TimeType.DISCRETE
+
+    override fun deepCopy(): LinearRule {
+        val ln = LinearRule()
+        ln.slope = slope
+        ln.clippingType = clippingType
+        ln.addNoise = addNoise
+        ln.upperBound = upperBound
+        ln.lowerBound = lowerBound
+        ln.noiseGenerator = noiseGenerator.deepCopy()
+        return ln
     }
 
-    @Override
-    public LinearRule deepCopy() {
-        LinearRule ln = new LinearRule();
-        ln.setSlope(getSlope());
-        ln.setClippingType(getClippingType());
-        ln.setAddNoise(getAddNoise());
-        ln.setUpperBound(getUpperBound());
-        ln.setLowerBound(getLowerBound());
-        ln.noiseGenerator = noiseGenerator.deepCopy();
-        return ln;
+    override fun getDerivative(`val`: Double): Double {
+        return when (clippingType) {
+            ClippingType.NoClipping -> slope
+            ClippingType.Relu -> if (`val` <= 0) 0.0 else slope
+            ClippingType.PiecewiseLinear -> if (`val` <= lowerBound || `val` >= upperBound) 0.0 else slope
+        }
     }
 
-    @Override
-    public double getDerivative(double val) {
-        return switch (clippingType) {
-            case NoClipping -> slope;
-            case Relu -> val <= 0 ? 0 : slope;
-            case PiecewiseLinear -> (val <= lowerBound || val >= upperBound) ? 0 : slope;
-        };
-    }
 
-    public void setSlope(final double slope) {
-        this.slope = slope;
-    }
-
-    public double getSlope() {
-        return slope;
-    }
-
-    @Override
-    public ProbabilityDistribution getNoiseGenerator() {
-        return noiseGenerator;
-    }
-
-    @Override
-    public void setNoiseGenerator(final ProbabilityDistribution noise) {
-        this.noiseGenerator = noise;
-    }
-
-    @Override
-    public boolean getAddNoise() {
-        return addNoise;
-    }
-
-    @Override
-    public void setAddNoise(final boolean addNoise) {
-        this.addNoise = addNoise;
-    }
-
-    @Override
-    public String getName() {
-        return "Linear";
-    }
-
-    public double getUpperBound() {
-        return upperBound;
-    }
-
-    public double getLowerBound() {
-        return lowerBound;
-    }
-
-    public void setUpperBound(double upperBound) {
-        this.upperBound = upperBound;
-    }
-
-    public void setLowerBound(double lowerBound) {
-        this.lowerBound = lowerBound;
-    }
-
-    public ClippingType getClippingType() {
-        return clippingType;
-    }
-
-    public void setClippingType(ClippingType clippingType) {
-        this.clippingType = clippingType;
-    }
-
-    /**
-     * Called by reflection via {@link UserParameter#conditionalEnablingMethod()}
-     */
-    public Function<Map<String, Object>, Boolean> requiresBounds() {
-        return  (map) -> map.get("Type") == ClippingType.PiecewiseLinear;
-    }
+    override val name: String
+        get() = "Linear"
 
 }
+
+/**
+ * The Default upper bound.
+ */
+private const val DEFAULT_UPPER_BOUND = 10.0
+
+/**
+ * The Default lower bound.
+ */
+private const val DEFAULT_LOWER_BOUND = -10.0

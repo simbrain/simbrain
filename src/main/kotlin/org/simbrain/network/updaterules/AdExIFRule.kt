@@ -388,13 +388,12 @@ open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), Noi
     override val name: String
         get() = "AdEx Integrate and Fire"
 
-    override fun getGraphicalLowerBound(): Double {
-        return leakReversal - 20
-    }
+    override val graphicalLowerBound: Double
+        get() = leakReversal - 20
 
-    override fun getGraphicalUpperBound(): Double {
-        return v_Th + 10
-    }
+
+    override val graphicalUpperBound: Double
+        get() = v_Th + 10
 
     /**
      * A converter from pA to nA, since most other sims in Simbrain use
@@ -417,6 +416,10 @@ open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), Noi
 
 class AdexMatrixData(size: Int) : SpikingMatrixData(size) {
     @get:Producible
+    @UserParameter(
+        label = "w", description = "Adaptation variable: Roughly speaking amount of metabolite currently " +
+                "in the cell. Expelled during spiking and then replenished."
+    )
     var w = DoubleArray(size)
     override fun copy() = AdexMatrixData(size).also {
         commonCopy(it)

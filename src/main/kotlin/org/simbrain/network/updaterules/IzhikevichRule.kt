@@ -128,11 +128,10 @@ class IzhikevichRule : SpikingNeuronUpdateRule<SpikingScalarData, SpikingMatrixD
         neuron.activation = value
     }
 
-    override fun getRandomValue(): Double {
-        // Equal chance of spiking or not spiking, taking on any value between
-        // the resting potential and the threshold if not.
-        return 2 * (threshold - c) * Math.random() + c
-    }
+    // Equal chance of spiking or not spiking, taking on any value between
+    // the resting potential and the threshold if not.
+    override val randomValue: Double
+        get() = 2 * (threshold - c) * Math.random() + c
 
     fun getiBg(): Double {
         return iBg
@@ -145,13 +144,12 @@ class IzhikevichRule : SpikingNeuronUpdateRule<SpikingScalarData, SpikingMatrixD
     override val name: String
         get() = "Izhikevich"
 
-    override fun getGraphicalUpperBound(): Double {
-        return threshold
-    }
+    override val graphicalUpperBound: Double
+        get() = threshold
 
-    override fun getGraphicalLowerBound(): Double {
-        return c
-    }
+    override val graphicalLowerBound: Double
+        get() = c
+
 }
 
 

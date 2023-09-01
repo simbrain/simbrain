@@ -15,8 +15,7 @@ abstract class ArrayLayer(
 ) : Layer() {
 
     @UserParameter(label = "Increment amount", increment = .1, order = 20)
-    val increment = .1
-        get() = field
+    var increment = .1
 
     @UserParameter(label = "Clamped", description = "Clamping", order = 3)
     var isClamped = false

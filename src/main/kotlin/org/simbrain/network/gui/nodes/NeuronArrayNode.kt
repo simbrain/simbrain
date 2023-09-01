@@ -134,10 +134,10 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         val events = neuronArray.events as NeuronArrayEvents2
 
         events.visualPropertiesChanged.on {
-            gridMode = neuronArray.isGridMode
+            gridMode = neuronArray.gridMode
             showBias = neuronArray.isShowBias
         }
-        gridMode = neuronArray.isGridMode
+        gridMode = neuronArray.gridMode
         showBias = neuronArray.isShowBias
 
         // TODO: Link to network preferences
@@ -273,7 +273,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         ) {
             networkPanel.selectionManager
                 .filterSelectedModels<NeuronArray>()
-                .forEach { it.isGridMode = !it.isGridMode }
+                .forEach { it.gridMode = !it.gridMode }
         }
         contextMenu.add(switchStyle)
         val toggleShowBias: Action = networkPanel.createAction(
@@ -363,7 +363,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         // Projection Plot Action
         contextMenu.addSeparator()
         contextMenu.add(actionManager.createCoupledPlotMenu(
-            neuronArray.getProducer(NeuronArray::getActivationArray),
+            neuronArray.getProducer(NeuronArray::activationArray),
             objectName = "${neuronArray.id ?: "Neuron Array"} Activations",
             menuTitle = "Plot Activation"
         ))
@@ -382,7 +382,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             neuronArray.getConsumer(NeuronArray::addInputsMismatched),
             neuronArray.size(),
             menuTitle = "Add coupled image world",
-            postActionBlock = { neuronArray.isGridMode = true }
+            postActionBlock = { neuronArray.gridMode = true }
         ))
 
         // Coupling menu

@@ -205,20 +205,18 @@ open class IntegrateAndFireRule : SpikingNeuronUpdateRule<SpikingScalarData, Spi
 
     override val name = "Integrate and Fire"
 
-    override fun getRandomValue(): Double {
-        // Equal chance of spiking or not spiking, taking on any value between
-        // the resting potential and the threshold if not.
-        return 2 * (threshold - restingPotential) * Math.random() + restingPotential
-    }
+    // Equal chance of spiking or not spiking, taking on any value between
+    // the resting potential and the threshold if not.
+    override val randomValue: Double
+        get() = 2 * (threshold - restingPotential) * Math.random() + restingPotential
 
     // An alternative here would be to have reset potential be the zero point
     // so that colors would track hyper and de-polarization. That could be
     // achieved by resetPotential-(resetPotential-threshold)
-    override fun getGraphicalLowerBound(): Double {
-        return resetPotential
-    }
+    override val graphicalLowerBound: Double
+        get() = resetPotential
 
-    override fun getGraphicalUpperBound(): Double {
-        return threshold
-    }
+    override val graphicalUpperBound: Double
+        get() = threshold
+
 }

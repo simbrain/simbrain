@@ -35,9 +35,7 @@ import org.simbrain.util.add
  */
 class SigmoidalRule : AbstractSigmoidalRule() {
 
-    override fun getTimeType(): Network.TimeType {
-        return Network.TimeType.DISCRETE
-    }
+    override val timeType: Network.TimeType = Network.TimeType.DISCRETE
 
     override fun apply(neuron: Neuron, data: BiasedScalarData) {
         var weightedInput = neuron.input + data.bias

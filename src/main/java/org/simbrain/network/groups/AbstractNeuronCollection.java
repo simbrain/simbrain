@@ -97,7 +97,7 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
      */
     protected ActivationRecorder activationRecorder;
 
-    @UserParameter(label = "Increment amount", increment = .1, order = 100)
+    @UserParameter(label = "Increment amount", increment = .1, order = 90)
     private double increment = .1;
 
     /**

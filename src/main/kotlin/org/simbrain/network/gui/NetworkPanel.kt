@@ -791,7 +791,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         val weightMatrixTree = WeightMatrixTree(sources, target)
         weightMatrixTree.tree.flatten().forEach { it.select() }
         weightMatrixTree.forwardPass(sources.map { it.activations })
-        weightMatrixTree.backpropError(target.targetValues, 0.0001)
+        weightMatrixTree.backpropError(target.targetValues!!, 0.0001)
     }
 
 }

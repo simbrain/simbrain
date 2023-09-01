@@ -170,11 +170,8 @@ class FitzhughNagumo : SpikingNeuronUpdateRule<FitzHughData, FitzHughMatrixData>
         return FitzHughMatrixData(size)
     }
 
-    override fun getRandomValue(): Double {
-        // Equal chance of spiking or not spiking, taking on any value between
-        // the resting potential and the threshold if not.
-        return 2 * (threshold - c) * Math.random() + c
-    }
+    override val randomValue: Double
+        get() = 2 * (threshold - c) * Math.random() + c
 
     fun getiBg(): Double {
         return iBg

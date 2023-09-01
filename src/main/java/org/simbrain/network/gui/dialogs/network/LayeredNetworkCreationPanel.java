@@ -24,6 +24,8 @@ import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.subnetworks.FeedForward;
 import org.simbrain.network.updaterules.SigmoidalRule;
+import org.simbrain.network.util.MatrixDataHolder;
+import org.simbrain.network.util.ScalarDataHolder;
 
 import javax.swing.*;
 import java.awt.*;
@@ -70,7 +72,7 @@ public class LayeredNetworkCreationPanel extends JPanel {
      * Maps string values to corresponding NeuronUpdateRules for the combo-boxes
      * governing desired Neuron type for a given layer.
      */
-    public static HashMap<String, NeuronUpdateRule> DEFAULT_NEURON_TYPES = new HashMap<String, NeuronUpdateRule>();
+    public static HashMap<String, NeuronUpdateRule<? extends ScalarDataHolder, ? extends MatrixDataHolder>> DEFAULT_NEURON_TYPES = new HashMap<>();
 
     /**
      * Default mapping of Strings to NeuronUpdateRules.
@@ -211,7 +213,7 @@ public class LayeredNetworkCreationPanel extends JPanel {
         /**
          * Mapping from string descriptions of rules to neuron update rules.
          */
-        private final HashMap<String, NeuronUpdateRule> neuronTypeMap;
+        private final HashMap<String, NeuronUpdateRule<? extends ScalarDataHolder, ? extends MatrixDataHolder>> neuronTypeMap;
 
         /**
          * Construct a layer creation panel.
@@ -220,7 +222,7 @@ public class LayeredNetworkCreationPanel extends JPanel {
          * @param label         the label for the text field
          * @param numNeurons    initial number of neurons
          */
-        public LayerCreationPanel(final HashMap<String, NeuronUpdateRule> neuronTypeMap, final String label, final int numNeurons) {
+        public LayerCreationPanel(final HashMap<String, NeuronUpdateRule<? extends ScalarDataHolder, ? extends MatrixDataHolder>> neuronTypeMap, final String label, final int numNeurons) {
 
             this.neuronTypeMap = neuronTypeMap;
 
@@ -269,7 +271,7 @@ public class LayeredNetworkCreationPanel extends JPanel {
          *
          * @return current neuron update rule.
          */
-        public NeuronUpdateRule getNeuronType() {
+        public NeuronUpdateRule<? extends ScalarDataHolder, ? extends MatrixDataHolder> getNeuronType() {
             return neuronTypeMap.get(neuronTypeComboBox.getSelectedItem());
         }
 

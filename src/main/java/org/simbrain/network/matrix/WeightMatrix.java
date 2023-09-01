@@ -135,7 +135,7 @@ public class WeightMatrix extends Connector {
 
     @Consumable
     public void setMatrixValues(Matrix otherWeightMatrix) {
-        SmileUtilsKt.copy(weightMatrix, otherWeightMatrix);
+        SmileUtilsKt.copyFrom(weightMatrix, otherWeightMatrix);
         getEvents().getUpdated().fireAndForget();
     }
 
@@ -145,7 +145,7 @@ public class WeightMatrix extends Connector {
     public void diagonalize() {
         clear();
         var diag = Matrix.eye(target.inputSize(), source.outputSize());
-        SmileUtilsKt.copy(weightMatrix, diag);
+        SmileUtilsKt.copyFrom(weightMatrix, diag);
         getEvents().getUpdated().fireAndForget();
     }
 
@@ -276,7 +276,7 @@ public class WeightMatrix extends Connector {
      * Set all entries to 0.
      */
     public void hardClear() {
-        SmileUtilsKt.copy(weightMatrix, new Matrix(weightMatrix.nrow(), weightMatrix.ncol()));
+        SmileUtilsKt.copyFrom(weightMatrix, new Matrix(weightMatrix.nrow(), weightMatrix.ncol()));
         getEvents().getUpdated().fireAndForget();
     }
 

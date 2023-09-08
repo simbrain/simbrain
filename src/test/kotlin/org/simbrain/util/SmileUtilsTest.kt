@@ -40,4 +40,21 @@ class SmileUtilsTest {
         assertArrayEquals(doubleArrayOf(0.0, 5.0, 16.0), testMatrix.broadcastMultiply(vector).col(1))
         assertArrayEquals(doubleArrayOf(0.0, 6.0, 18.0), testMatrix.broadcastMultiply(vector).col(2))
     }
+
+
+    @Test
+    fun testMaxEigen() {
+        assertEquals(1.0, Matrix.eye(2).maxEigenvalue())
+        assertEquals(2.0, Matrix.eye(2).mul(2.0).maxEigenvalue())
+        val ut=  Matrix.of(arrayOf(
+            doubleArrayOf(-2.0, 4.0),
+            doubleArrayOf(0.0, 7.0)
+        ))
+        assertEquals(7.0, ut.maxEigenvalue())
+    }
+
+    @Test
+    fun testSpectralRadius() {
+        assertEquals(.9, testMatrix.setSpectralRadius(.9).maxEigenvalue(), .01)
+    }
 }

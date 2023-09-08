@@ -17,7 +17,7 @@ import org.simbrain.custom_sims.simulations.hippocampus.Hippocampus
 import org.simbrain.custom_sims.simulations.mpfs_som.MpfsSOM
 import org.simbrain.custom_sims.simulations.patterns_of_activity.KuramotoOscillators
 import org.simbrain.custom_sims.simulations.patterns_of_activity.PatternsOfActivity
-import org.simbrain.custom_sims.simulations.patterns_of_activity.edgeOfChaosThreeObjects
+import org.simbrain.custom_sims.simulations.patterns_of_activity.cogMap3Objects
 import org.simbrain.custom_sims.simulations.sorn.SORN
 import org.simbrain.custom_sims.simulations.test.ConvertSim
 import org.simbrain.custom_sims.simulations.test.lstmBlock
@@ -42,13 +42,6 @@ val simulations = dir<Any>("Simulations") {
             item("3. Recurrent Hebb") { hebbianAssociator }
             item("4. Hopfield") { hopfieldSim }
         }
-        dir("Cognitive Maps") {
-            item("Agent Trails") { kAgentTrails }
-            item("RandomizedPursuer") { RandomizedPursuer() }
-            item("Edge of chaos 3 objects") { edgeOfChaosThreeObjects }
-            // item("ModularOscillatoryNetwork") {ModularOscillatoryNetwork()}
-            item("KuramotoOscillators") { KuramotoOscillators() }
-        }
         dir("RL") {
             item("Actor Critic") { actorCritic }
         }
@@ -65,12 +58,22 @@ val simulations = dir<Any>("Simulations") {
         }
     }
 
+
     dir("Behaviorism") {
         item("Operant With Environment") { OperantWithEnvironment() }
         item("Classical Conditioning") { ClassicalConditioning() }
         item("Operant Conditioning") { OperantConditioning() }
         item("Simple Operant") { SimpleOperant() }
     }
+
+    dir("Cognitive Maps") {
+        item("Agent Trails") { kAgentTrails }
+        item("RandomizedPursuer") { RandomizedPursuer() }
+        item("Generic 3 objects") { cogMap3Objects }
+        // item("ModularOscillatoryNetwork") {ModularOscillatoryNetwork()}
+        item("KuramotoOscillators") { KuramotoOscillators() }
+    }
+
     dir("NLP") {
         // item("NLP") { nlpSim }
         item("1. Introduction") { nlpSim_basic }

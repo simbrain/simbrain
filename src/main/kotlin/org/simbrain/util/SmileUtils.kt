@@ -157,3 +157,9 @@ fun Matrix.showHistogram(title: String = "Show Histogram", label: String = ""): 
     histogramPanel.displayInDialog().apply { this.title = title }
     return { matrix -> histogramPanel.model.resetData(mutableListOf(matrix.flatten()), mutableListOf(label)) }
 }
+
+fun Matrix.maxEigenvalue() = eigen().wr.max()
+
+fun Matrix.setSpectralRadius(spectralRadius: Double): Matrix {
+    return mul(spectralRadius/maxEigenvalue())
+}

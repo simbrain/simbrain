@@ -611,7 +611,7 @@ class ObjectWidget<O : EditableObject, T : CopyableObject>(
      * Finds first superclass with a getTypes method, and if one is found a dropdown is provided that allows the
      * object’s type to be edited. Otherwise, simply embed the object with its own APE.
      */
-    private val typeMap = (value::class.superclasses.asSequence()
+    private val typeMap = (value::class.allSuperclasses.asSequence()
         .mapNotNull {
             val fromJava =
                 (it.staticFunctions.firstOrNull { it.name == "getTypes" }?.call() as? List<Class<*>>)?.map { it.kotlin }

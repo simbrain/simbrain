@@ -2,11 +2,14 @@ package org.simbrain.util
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.simbrain.network.NetworkModel
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
-import org.simbrain.util.widgets.NumericWidget
-import org.simbrain.util.widgets.TextWithNull
+import org.simbrain.util.propertyeditor.NumericWidget2
+import org.simbrain.util.propertyeditor.StringWidget
+import kotlin.reflect.KProperty1
+import kotlin.reflect.full.declaredMemberProperties
 
 /**
  * Also see [AnnotatedPropertyEditorTestObject.java]
@@ -26,7 +29,8 @@ class AnnotatedPropertyEditorTest {
     @Test
     fun `test commit numeric widget`() {
         val ape = AnnotatedPropertyEditor(n1)
-        (ape.getWidget("Activation")?.component as NumericWidget).value = .75
+        val prop = Neuron::class.declaredMemberProperties.first { it.name == "activation" }
+        (ape.propertyWidgetMap[prop] as NumericWidget2).widget.value = .75
         ape.commitChanges()
         assertEquals(.75, n1.activation)
     }
@@ -35,14 +39,16 @@ class AnnotatedPropertyEditorTest {
     fun `test fill field value numeric widget`() {
         n1.forceSetActivation(.75)
         val ape = AnnotatedPropertyEditor(n1)
-        val widgetVal = (ape.getWidget("Activation")?.component as NumericWidget).value
+        val prop = Neuron::class.declaredMemberProperties.first { it.name == "activation" }
+        val widgetVal = (ape.propertyWidgetMap[prop] as NumericWidget2).widget.value
         assertEquals(.75, widgetVal)
     }
 
     @Test
     fun `test commit string widget`() {
         val ape = AnnotatedPropertyEditor(n1)
-        (ape.getWidget("Label")?.component as TextWithNull).text = "test"
+        val prop = NetworkModel::class.declaredMemberProperties.first { it.name == "label" }
+        (ape.propertyWidgetMap[prop as KProperty1<*, *>] as StringWidget).widget.text = "test"
         ape.commitChanges()
         assertEquals("test", n1.label)
     }
@@ -51,52 +57,35 @@ class AnnotatedPropertyEditorTest {
     fun `test fill field value string widget`() {
         n1.label = "test"
         val ape = AnnotatedPropertyEditor(n1)
-        val widgetVal = (ape.getWidget("Label")?.component as TextWithNull).text
+        val prop = NetworkModel::class.declaredMemberProperties.first { it.name == "label" }
+        val widgetVal = (ape.propertyWidgetMap[prop as KProperty1<*, *>] as StringWidget).widget.text
         assertEquals("test", widgetVal)
     }
 
     @Test
-    fun `test fill field value with two consistent values`() {
+    fun `test behavior two consistent values`() {
         n1.forceSetActivation(.75)
         n2.forceSetActivation(.75)
-        val ape = AnnotatedPropertyEditor(listOf(n1, n2))
-        val widgetVal = (ape.getWidget("Activation")?.component as NumericWidget).value
-        assertEquals(.75, widgetVal)
-    }
-
-    @Test
-    fun `test fill field value with two inconsistent values`() {
-        n1.forceSetActivation(.75)
-        n2.forceSetActivation(.74)
-        val ape = AnnotatedPropertyEditor(listOf(n1, n2))
-        val widget = (ape.getWidget("Activation")?.component as NumericWidget)
-        assertEquals(true, widget.isNull)
-    }
-
-    @Test
-    fun `test commit when two inconsistent values were made consistent`() {
-        n1.forceSetActivation(.75)
-        n2.forceSetActivation(.74)
-        val ape = AnnotatedPropertyEditor(listOf(n1, n2))
-        val widget = (ape.getWidget("Activation")?.component as NumericWidget)
-        widget.value = .8
+        val ape = AnnotatedPropertyEditor(n1, n2)
+        val prop = Neuron::class.declaredMemberProperties.first { it.name == "activation" }
+        assertEquals(true, (ape.propertyWidgetMap[prop] as NumericWidget2).isConsistent)
+        (ape.propertyWidgetMap[prop] as NumericWidget2).widget.value = .25
         ape.commitChanges()
-        assertEquals(.8, n1.activation)
-        assertEquals(.8, n2.activation)
+        assertEquals(.25, n1.activation)
+        assertEquals(.25, n2.activation)
     }
 
     @Test
-    fun `test commit of null state on numeric widget`() {
+    fun `test behavior with inconsistent values`() {
         n1.forceSetActivation(.75)
         n2.forceSetActivation(.74)
-        val ape = AnnotatedPropertyEditor(listOf(n1, n2))
-        val widget = (ape.getWidget("Activation")?.component as NumericWidget)
+        val ape = AnnotatedPropertyEditor(n1, n2)
+        val prop = Neuron::class.declaredMemberProperties.first { it.name == "activation" }
+        assertEquals(false, (ape.propertyWidgetMap[prop] as NumericWidget2).isConsistent)
+        (ape.propertyWidgetMap[prop] as NumericWidget2).widget.value = .25
         ape.commitChanges()
-        // States should be unchanged
-        assertEquals(.75, n1.activation)
-        assertEquals(.74, n2.activation)
+        assertEquals(.25, n1.activation)
+        assertEquals(.25, n2.activation)
     }
-
-
 
 }

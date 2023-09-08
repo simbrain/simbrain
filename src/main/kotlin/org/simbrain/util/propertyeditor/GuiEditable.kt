@@ -62,6 +62,7 @@ class GuiEditable<O : EditableObject, T>(
             return _baseObject!!
         }
 
+    @Transient
     private var _property: KMutableProperty1<O, T>? = null
     val property: KMutableProperty1<O, T>
         get() {
@@ -619,7 +620,10 @@ class ObjectWidget<O : EditableObject, T : CopyableObject>(
             } else {
                 val property =
                     it.companionObject?.memberProperties?.firstOrNull { prop -> prop.name == "types" } as? KProperty1<Any?, Any?>
-                (property?.get(it.companionObjectInstance) as? List<*>)
+                val function by lazy {
+                    it.companionObject?.functions?.firstOrNull { fn -> fn.name == "getTypes" }
+                }
+                ((property?.get(it.companionObjectInstance) ?: function?.call(it.companionObjectInstance)) as? List<*>)
                     ?.map { klass ->
                         when (klass) {
                             is KClass<*> -> klass

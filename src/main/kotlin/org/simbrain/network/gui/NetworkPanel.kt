@@ -349,11 +349,11 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
                 }
             }
         }
-        SynapseGroup2Node(this, synapseGroup)
+        SynapseGroup2Node(this, synapseGroup).also { SwingUtilities.invokeLater { it.lower() } }
     }
 
     fun createNode(weightMatrix: Connector) = addScreenElement {
-        WeightMatrixNode(this, weightMatrix).also { it.lower() }
+        WeightMatrixNode(this, weightMatrix).also { SwingUtilities.invokeLater { it.lowerToBottom() } }
     }
 
     fun createNode(text: NetworkTextObject) = addScreenElement {

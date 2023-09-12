@@ -34,6 +34,8 @@ abstract class LocatableModel() : NetworkModel() {
     /**
      * Must call this _after_ adding a network model, because adding the model places the model using the layout
      * manager.
+     *
+     * Sets the center location
      */
     fun setLocation(x: Double, y: Double) {
         location = Point2D.Double(x,y)

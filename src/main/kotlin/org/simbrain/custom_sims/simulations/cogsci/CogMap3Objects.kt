@@ -50,7 +50,7 @@ val cogMap3Objects = newSim {
     inputNetwork.layout = LineLayout()
     inputNetwork.applyLayout()
     network.addNetworkModelAsync(inputNetwork)
-    inputNetwork.setLocation(100.0, 751.0)
+    inputNetwork.setLocation(400.0, 751.0)
 
     val sparseExcitatory = Sparse(0.7, true, false)
     sparseExcitatory.percentExcitatory = 100.0

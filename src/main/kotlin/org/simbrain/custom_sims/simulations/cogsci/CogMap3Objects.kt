@@ -3,7 +3,7 @@ package org.simbrain.custom_sims.simulations.patterns_of_activity
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.SynapseGroup2
-import org.simbrain.network.core.addNeuronGroup
+import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.plot.projection.ProjectionComponent2
@@ -31,7 +31,7 @@ val cogMap3Objects = newSim {
     place(networkComponent,0, 6, 480, 522)
 
     // Make reservoir
-    val recurrent = network.addNeuronGroup(NUM_NEURONS).apply {
+    val recurrent = NeuronGroup(network, NUM_NEURONS).apply {
         // layout(GridLayout())
         label = "Recurrent"
         // setNeuronType(LinearRule())
@@ -40,17 +40,17 @@ val cogMap3Objects = newSim {
     val weightMatrix = WeightMatrix(network, recurrent, recurrent)
     weightMatrix.randomize()
     weightMatrix.weightMatrix.setSpectralRadius(spectralRadius)
-    network.addNetworkModelsAsync(listOf(recurrent, weightMatrix))
+    network.addNetworkModels(recurrent, weightMatrix)
 
     // Inputs to reservoir
-    val inputNetwork = network.addNeuronGroup(1.0, 1.0, 3)
+    val inputNetwork = NeuronGroup(network, 3)
     inputNetwork.setLowerBound(-1.0)
     inputNetwork.setUpperBound(1.0)
     inputNetwork.label = "Sensory Neurons"
     inputNetwork.layout = LineLayout()
     inputNetwork.applyLayout()
-    network.addNetworkModelAsync(inputNetwork)
-    inputNetwork.setLocation(400.0, 751.0)
+    network.addNetworkModel(inputNetwork)
+    inputNetwork.setLocation(0.0, 751.0)
 
     val sparseExcitatory = Sparse(0.7, true, false)
     sparseExcitatory.percentExcitatory = 100.0

@@ -7,6 +7,7 @@ import org.simbrain.util.line
 import org.simbrain.util.p
 import org.simbrain.util.widgets.BezierArrow
 import org.simbrain.util.widgets.bezierArrow
+import javax.swing.SwingUtilities
 
 /**
  * PNode representation of a directed "green arrow" (representing a group of synapses) from one
@@ -31,7 +32,7 @@ class SynapseGroup2NodeDirected(private val synapseGroupNode: SynapseGroup2Node)
         onUpdated { curve ->
             val offset = if (isBidirectional()) 0.75 else 0.5
             val (x, y) = curve?.p(offset) ?: line(source.location, target.location).p(offset)
-            synapseGroupNode.interactionBox.centerFullBoundsOnPoint(x, y)
+            SwingUtilities.invokeLater { synapseGroupNode.interactionBox.centerFullBoundsOnPoint(x, y) }
         }
 
     }.also { addChild(it) }

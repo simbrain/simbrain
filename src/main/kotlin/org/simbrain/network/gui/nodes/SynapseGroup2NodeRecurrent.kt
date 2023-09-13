@@ -24,6 +24,7 @@ import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Polygon
 import java.awt.geom.Arc2D
+import javax.swing.SwingUtilities
 
 /**
  * PNode representation of a recurrent "green arrow" (representing a group of synapses) from a
@@ -98,7 +99,7 @@ class SynapseGroup2NodeRecurrent(group: SynapseGroup2Node) : PNode(), SynapseGro
                 recArc.endPoint.y - 0.9 * 2 * strokeWidth
             ), false
         )
-        parent.interactionBox.centerFullBoundsOnPoint(recArc.centerX, recArc.centerY)
+        SwingUtilities.invokeLater { parent.interactionBox.centerFullBoundsOnPoint(recArc.centerX, recArc.centerY) }
     }
 
     private fun traceArrowHead(theta: Double, tarX: Double, tarY: Double): Polygon {

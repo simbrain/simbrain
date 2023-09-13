@@ -39,6 +39,11 @@ public abstract class Connector extends NetworkModel implements EditableObject, 
     private boolean enableRendering = true;
 
     /**
+     * If true render an image showing all weight strengths as pixels
+     */
+    private boolean showWeights = true;
+
+    /**
      * Construct a connector and initialize events.
      */
     public Connector(Layer source, Layer target, Network net) {
@@ -98,6 +103,15 @@ public abstract class Connector extends NetworkModel implements EditableObject, 
     @Override
     public ConnectorEvents2 getEvents() {
         return events;
+    }
+
+    public boolean isShowWeights() {
+        return showWeights;
+    }
+
+    public void setShowWeights(boolean showWeights) {
+        this.showWeights = showWeights;
+        events.getShowWeightsChanged().fireAndBlock();
     }
 
     /**

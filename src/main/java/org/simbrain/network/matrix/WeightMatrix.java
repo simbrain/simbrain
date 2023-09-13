@@ -95,6 +95,8 @@ public class WeightMatrix extends Connector {
 
         psrMatrix = new Matrix(target.inputSize(), source.outputSize());
 
+        setLabel(source.getNetwork().getIdManager().getProposedId(WeightMatrix.class));
+
         getEvents().getUpdated().on(null, true, () -> {
            updateExcitatoryMask();
            updateInhibitoryMask();

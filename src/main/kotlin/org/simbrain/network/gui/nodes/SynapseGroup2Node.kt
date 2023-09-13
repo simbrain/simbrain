@@ -95,6 +95,7 @@ class SynapseGroup2Node(networkPanel: NetworkPanel, val synapseGroup: SynapseGro
             refreshVisible()
         }
         setVisibility()
+        interactionBox.invalidateFullBounds()
     }
 
     private fun removeEverythingButInteractionBox() {

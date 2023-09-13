@@ -7,5 +7,6 @@ import java.awt.geom.Point2D
  */
 class ConnectorEvents2: NetworkModelEvents2() {
     val locationChanged = ChangedEvent<Point2D>()
+    val showWeightsChanged = NoArgEvent()
     val lineUpdated = NoArgEvent()
 }

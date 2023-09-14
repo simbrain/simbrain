@@ -12,12 +12,11 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 /**
- * Represents a self directed connection from a neuron group to itself via a weight matrix.
- * Could potentially generalize this to be used by synapse groups too.
+ * Represents a self-directed connection from a group to itself.
  *
  * Centered by default on 0,0.  Can be offset by whoever calls this.
  */
-class RecurrentArrow : PNode() {
+class RecurrentArrow(color: Color) : PNode() {
 
     private val radius = 100.0
     private val startDeg = 20.0
@@ -32,7 +31,7 @@ class RecurrentArrow : PNode() {
             .toPolygon()
             .let { polygon -> PArea(polygon, null) }
             .apply {
-                paint = Color.ORANGE
+                paint = color
                 val arrowTipRadian = endDeg.toRadian()
                 rotate(-arrowTipRadian)
                 offset(cos(arrowTipRadian) * radius, -sin(arrowTipRadian) * radius)
@@ -45,7 +44,7 @@ class RecurrentArrow : PNode() {
         .apply {
             paint = null
             stroke = BasicStroke(20.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER)
-            strokePaint = Color.ORANGE
+            strokePaint = color
             transparency = 0.5f
         }.also { addChild(it) }
 

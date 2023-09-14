@@ -2,12 +2,12 @@ package org.simbrain.network.gui
 
 import org.piccolo2d.PNode
 import org.simbrain.network.core.ArrayLayer
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.WeightMatrixNode
 import org.simbrain.util.*
 import org.simbrain.util.widgets.BezierArrow
 import org.simbrain.util.widgets.RecurrentArrow
 import org.simbrain.util.widgets.bezierArrow
-import java.awt.Color
 
 class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode() {
 
@@ -16,10 +16,10 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
     private fun isBidirectional() = target.outgoingConnectors.any { it.target == source }
 
     private val arrow = if (source == target) {
-        RecurrentArrow()
+        RecurrentArrow(NetworkPreferences.weightMatrixArrowColor)
     } else {
         bezierArrow {
-            color = Color.ORANGE
+            color = NetworkPreferences.weightMatrixArrowColor
 
             padding {
                 tail = when (source) {

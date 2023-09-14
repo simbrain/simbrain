@@ -29,6 +29,12 @@ object NetworkPreferences: PreferenceHolder() {
     @UserParameter(label = "Zero color", tab = "Colors", order = 80)
     var zeroWeightColor by ColorPreference(Color.LIGHT_GRAY)
 
+    @UserParameter(label = "Weight Matrix arrow color ", tab = "Colors", order = 90)
+    var weightMatrixArrowColor by ColorPreference(Color.ORANGE)
+
+    @UserParameter(label = "Synapse Group arrow color ", tab = "Colors", order = 100)
+    var synapseGroupArrowColor by ColorPreference(Color.GREEN)
+
     @UserParameter(label = "Min synapse size", tab = "GUI")
     var minWeightSize by IntegerPreference(7)
 

@@ -1,6 +1,7 @@
 package org.simbrain.network.gui.nodes
 
 import org.piccolo2d.PNode
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.component1
 import org.simbrain.util.component2
 import org.simbrain.util.line
@@ -24,6 +25,8 @@ class SynapseGroup2NodeDirected(private val synapseGroupNode: SynapseGroup2Node)
     private fun isBidirectional() = target.outgoingSg.any { it.target == source }
 
     private val arrow: BezierArrow = bezierArrow {
+
+        color = NetworkPreferences.synapseGroupArrowColor
 
         lateralOffset {
             if (isBidirectional()) 0.35 else 0.5

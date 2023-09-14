@@ -24,6 +24,7 @@ import org.simbrain.network.core.SynapseGroup2
 import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.WeightMatrixViewer
+import org.simbrain.util.*
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 
@@ -49,11 +50,6 @@ class SynapseGroup2Node(networkPanel: NetworkPanel, val synapseGroup: SynapseGro
     private var directedNode: SynapseGroup2NodeDirected? = null
 
     /**
-     * PNode that represents a recurrent arrow from a neuron group to itself.
-     */
-    private var recurrentNode: SynapseGroup2NodeRecurrent? = null
-
-    /**
      * The interaction box for this neuron group.
      */
     var interactionBox: SynapseGroup2InteractionBox
@@ -67,12 +63,18 @@ class SynapseGroup2Node(networkPanel: NetworkPanel, val synapseGroup: SynapseGro
         fun invalidateArrow() {
             when (currentNode) {
                 directedNode -> directedNode?.invalidateFullBounds()
-                recurrentNode -> recurrentNode?.invalidateFullBounds()
                 expandedNode -> expandedNode?.invalidateFullBounds()
             }
         }
-        synapseGroup.source.events.locationChanged.on(Dispatchers.Swing) { invalidateArrow() }
-        synapseGroup.target.events.locationChanged.on(Dispatchers.Swing) { invalidateArrow() }
+        synapseGroup.source.events.locationChanged.on(Dispatchers.Swing) {
+            invalidateArrow()
+            updateInteractionBoxLocation()
+        }
+        synapseGroup.target.events.locationChanged.on(Dispatchers.Swing) {
+            invalidateArrow()
+            updateInteractionBoxLocation()
+        }
+        updateInteractionBoxLocation()
 
         // Handle events
         val events = synapseGroup.events
@@ -100,7 +102,6 @@ class SynapseGroup2Node(networkPanel: NetworkPanel, val synapseGroup: SynapseGro
     private fun removeEverythingButInteractionBox() {
         removeChild(directedNode)
         removeChild(expandedNode)
-        removeChild(recurrentNode)
     }
 
     private fun refreshVisible() {
@@ -109,7 +110,12 @@ class SynapseGroup2Node(networkPanel: NetworkPanel, val synapseGroup: SynapseGro
         setVisibility()
     }
 
-    fun setVisibility() {
+    private fun updateInteractionBoxLocation() {
+        val (x, y) = ((synapseGroup.target.location - synapseGroup.source.location) / 2) + synapseGroup.source.location
+        interactionBox.centerFullBoundsOnPoint(x, y)
+    }
+
+    private fun setVisibility() {
         if (synapseGroup.displaySynapses) {
             removeEverythingButInteractionBox()
             if (expandedNode == null) {
@@ -120,14 +126,7 @@ class SynapseGroup2Node(networkPanel: NetworkPanel, val synapseGroup: SynapseGro
             currentNode = expandedNode
         } else {
             removeEverythingButInteractionBox()
-            if (synapseGroup.isRecurrent()) {
-                if (recurrentNode == null) {
-                    recurrentNode = SynapseGroup2NodeRecurrent(this)
-                }
-                addChild(recurrentNode)
-                interactionBox.raiseAbove(recurrentNode)
-                currentNode = recurrentNode
-            } else {
+            if (!synapseGroup.isRecurrent()) {
                 if (directedNode == null) {
                     directedNode = SynapseGroup2NodeDirected(this)
                 }
@@ -138,7 +137,6 @@ class SynapseGroup2Node(networkPanel: NetworkPanel, val synapseGroup: SynapseGro
         }
         raiseToTop()
     }
-
 
     /**
      * Update the text in the interaction box.

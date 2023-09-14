@@ -121,6 +121,7 @@ annotation class BezierArrowMaker
 @BezierArrowMaker
 class BezierArrowTemplate {
 
+    // Default color for all arrows
     var color: Color = Color.GREEN
 
     var thickness = 20.0f

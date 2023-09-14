@@ -691,7 +691,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             modelAdded.on(Dispatchers.Swing) { list ->
                 list.forEach { createNode(it) }
             }
-            modelRemoved.on(Dispatchers.Swing) {
+            modelRemoved.on {
                 zoomToFitPage.fireAndForget()
                 modelNodeMap.remove(it)
             }

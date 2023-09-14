@@ -20,7 +20,6 @@ package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
-import org.simbrain.network.NetworkModel
 import org.simbrain.network.core.SynapseGroup2
 import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.gui.NetworkPanel
@@ -77,8 +76,8 @@ class SynapseGroup2Node(networkPanel: NetworkPanel, val synapseGroup: SynapseGro
 
         // Handle events
         val events = synapseGroup.events
-        events.deleted.on { s: NetworkModel -> removeFromParent() }
-        events.labelChanged.on { o: String, n: String -> updateText() }
+        events.deleted.on(Dispatchers.Swing) { removeFromParent() }
+        events.labelChanged.on { _: String, _: String -> updateText() }
         events.visibilityChanged.on {
             setVisibility()
         }

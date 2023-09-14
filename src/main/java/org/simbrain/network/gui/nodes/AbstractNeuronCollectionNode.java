@@ -1,5 +1,6 @@
 package org.simbrain.network.gui.nodes;
 
+import kotlinx.coroutines.Dispatchers;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.events.NeuronCollectionEvents2;
 import org.simbrain.network.events.NeuronEvents2;
@@ -52,13 +53,13 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
         addChild(outlinedObjects);
 
         NeuronCollectionEvents2 events = nc.getEvents();
-        events.getDeleted().on(n ->  {
+        events.getDeleted().on(Dispatchers.getMain(), n ->  {
             removeFromParent();
         });
-        events.getLabelChanged().on((o,n) -> {
+        events.getLabelChanged().on(Dispatchers.getMain(), (o,n) -> {
             updateText();
         });
-        events.getLocationChanged().on(() -> {
+        events.getLocationChanged().on(Dispatchers.getMain(), () -> {
             pullPositionFromModel();
             outlinedObjects.updateBounds();
         });
@@ -112,12 +113,12 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
         for (NeuronNode neuronNode : neuronNodes) {
             // Listen directly to neuron nodes for property change events
             NeuronEvents2 neuronEvents = neuronNode.getNeuron().getEvents();
-            neuronEvents.getDeleted().on(n -> {
+            neuronEvents.getDeleted().on(Dispatchers.getMain(), n -> {
                 this.neuronNodes.remove(neuronNode);
                 outlinedObjects.resetOutlinedNodes(this.neuronNodes);
             });
-            neuronEvents.getLocationChanged().on(() -> outlinedObjects.resetOutlinedNodes(this.neuronNodes));
-            neuronEvents.getLabelChanged().on((o,n) -> outlinedObjects.resetOutlinedNodes(this.neuronNodes));
+            neuronEvents.getLocationChanged().on(Dispatchers.getMain(), () -> outlinedObjects.resetOutlinedNodes(this.neuronNodes));
+            neuronEvents.getLabelChanged().on(Dispatchers.getMain(), (o,n) -> outlinedObjects.resetOutlinedNodes(this.neuronNodes));
         }
         outlinedObjects.resetOutlinedNodes(this.neuronNodes);
     }

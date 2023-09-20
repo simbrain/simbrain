@@ -1,5 +1,7 @@
 package org.simbrain.util
 
+import java.lang.reflect.Field
+import java.lang.reflect.Modifier
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.declaredMemberProperties
@@ -44,3 +46,5 @@ fun Class<*>.isKotlinClass(): Boolean {
         it.annotationClass.qualifiedName == "kotlin.Metadata"
     }
 }
+
+fun Field.isTransient() = modifiers.let { mod -> Modifier.isTransient(mod) }

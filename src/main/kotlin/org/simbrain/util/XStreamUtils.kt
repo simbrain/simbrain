@@ -12,7 +12,6 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter
 import com.thoughtworks.xstream.io.xml.DomDriver
 import com.thoughtworks.xstream.mapper.Mapper
 import org.simbrain.network.core.XStreamConstructor
-import java.lang.reflect.Modifier
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.hasAnnotation
@@ -45,14 +44,20 @@ fun getSimbrainXStream(): XStream {
                 "java.util.concurrent.**"
             )
         )
+        registerConverter(DoubleArrayConverter())
+        registerConverter(MatrixConverter())
     }
 }
 
 /**
- * XStream support for classes that require a primary constructor call.
+ * XStream support for Kotlin classes that require a constructor call. Which constructor to use can be specified by
+ * [XStreamConstructor].
  *
- * Limitation: Field names must match primary constructor param names.
- * Untested on Java classes.
+ * Must be used to properly serialize Kotlin classes that use delegation.
+ *
+ * Field names must match constructor param names.
+ *
+ * @param clazz: the class we want to convert
  */
 @JvmOverloads
 fun <T : Any> createConstructorCallingConverter(
@@ -65,11 +70,15 @@ fun <T : Any> createConstructorCallingConverter(
 
         override fun marshal(source: Any, writer: HierarchicalStreamWriter, context: MarshallingContext) {
             source::class.memberProperties
-                .filter { it.javaField?.modifiers?.let { mod -> Modifier.isTransient(mod) } != true }
+                 // allows null and non-transient properties
+                 // (delegates have null backing fields and thus have no javafields)
+                .filter { it.javaField?.isTransient() != true}
                 .forEach { property ->
+                    // Get the value of the property and write it into xml
                     property.withTempPublicAccess { getter.call(source) }?.let { value ->
                         writer.startNode(property.name)
                         if (!isXStreamBasicType(value)) {
+                            // xstream expects these class annotations
                             writer.addAttribute("class", value::class.java.name)
                         }
                         context.convertAnother(value)
@@ -88,18 +97,21 @@ fun <T : Any> createConstructorCallingConverter(
         @OptIn(ExperimentalStdlibApi::class)
         override fun unmarshal(reader: HierarchicalStreamReader, context: UnmarshallingContext): Any {
 
-            // cls can be a subclass of clazz
-            @Suppress("UNCHECKED_CAST") // checked by canConvert
+            // Get a class from an xml node
+            @Suppress("UNCHECKED_CAST")
             val cls: KClass<out T> = (try {
                 Class.forName(reader.nodeName).kotlin
             } catch (e: ClassNotFoundException) {
                 Class.forName(reader.getAttribute("class")).kotlin
             }) as KClass<out T>
 
-            // Kotlin Properties
+            // Map from variable names to corresponding Kotlin properties.
+            // Ex: activation -> Neuron::activation
             val propertyMap =
                 cls.memberProperties
                     .associateBy { it.name }
+
+            // Map from names to values. Ex: activation -> 1.0
             val propertyValueMap = HashMap<String, Any?>()
 
             fun read() {
@@ -114,9 +126,7 @@ fun <T : Any> createConstructorCallingConverter(
             }
 
             fun stepIn() {
-                if (!reader.nodeName.startsWith("\$\$delegate")) {
-                    read()
-                }
+                read()
                 while (reader.hasMoreChildren()) {
                     reader.moveDown()
                     stepIn()
@@ -125,20 +135,19 @@ fun <T : Any> createConstructorCallingConverter(
             }
             stepIn()
 
-            val unmarshallingObject = if (cls.objectInstance != null) {
+            // The object we get from calling the constructor
+            val convertedObject = if (cls.objectInstance != null) {
                 cls.objectInstance!!
             } else {
-                val primaryConstructor = cls.constructors
+                // The constructor used to create the object
+                val constructor = cls.constructors
                     .firstOrNull { it.hasAnnotation<XStreamConstructor>() }
                     ?: cls.primaryConstructor
                     ?: throw IllegalArgumentException("Class $cls does not have a primary constructor.")
-
-                primaryConstructor.let { constructor ->
-                    val paramNames = constructor.parameters
-                    val paramValues = paramNames.associateWith { param -> param.name?.let { propertyValueMap[it] } }
-                        .filterValues { it != null }
-                    constructor.callBy(paramValues)
-                }
+                val paramNames = constructor.parameters
+                val paramValues = paramNames.associateWith { param -> param.name?.let { propertyValueMap[it] } }
+                    .filterValues { it != null }
+                constructor.callBy(paramValues)
             }
 
             propertyValueMap.forEach { (name, value) ->
@@ -146,13 +155,13 @@ fun <T : Any> createConstructorCallingConverter(
                     if (property is KMutableProperty<*>) {
                         val oldAccessible = property.isAccessible
                         property.isAccessible = true
-                        property.setter.call(unmarshallingObject, value)
+                        property.setter.call(convertedObject, value)
                         property.isAccessible = oldAccessible
                     }
                 }
             }
 
-            return unmarshallingObject
+            return convertedObject
         }
 
         override fun canConvert(type: Class<*>?): Boolean {

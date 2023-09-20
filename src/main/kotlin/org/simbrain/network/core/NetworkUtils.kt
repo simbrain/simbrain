@@ -122,8 +122,6 @@ val List<Synapse>.lengths: List<Double>
 fun getNetworkXStream(): XStream {
     val xstream = getSimbrainXStream()
     xstream.registerConverter(NetworkModelListConverter())
-    xstream.registerConverter(DoubleArrayConverter())
-    xstream.registerConverter(MatrixConverter())
     xstream.registerConverter(
         createConstructorCallingConverter(
             EditableObject::class.java,

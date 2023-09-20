@@ -423,18 +423,23 @@ class Workspace: CoroutineScope {
      * [WorkspaceSerializer] produces.
      */
     val zipData: ByteArray?
-        get() {
-            try {
-                val serializer = WorkspaceSerializer(this)
-                val bas = ByteArrayOutputStream()
-                serializer.serialize(bas)
-                bas.close()
-                return bas.toByteArray()
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
-            return null
+        get() = generateZipData(false)
+
+    val zipDataHeadless: ByteArray?
+        get() = generateZipData(true)
+
+    private fun generateZipData(headless: Boolean): ByteArray? {
+        try {
+            val serializer = WorkspaceSerializer(this)
+            val bas = ByteArrayOutputStream()
+            serializer.serialize(bas, headless)
+            bas.close()
+            return bas.toByteArray()
+        } catch (e: IOException) {
+            e.printStackTrace()
         }
+        return null
+    }
 
     /**
      * Open a workspace from the flat representation provided by [.getZipData] }.

@@ -69,7 +69,7 @@ public class WorkspaceTest {
 
         // "Save" to output stream
         ByteArrayOutputStream bas = new ByteArrayOutputStream();
-        serializer.serialize(bas);
+        serializer.serialize(bas, true);
         bas.close();
 
         // Clear workspace
@@ -97,7 +97,7 @@ public class WorkspaceTest {
     @Test
     public void testZipMethods() throws IOException {
 
-        byte[] byteArray = workspace.getZipData();
+        byte[] byteArray = workspace.getZipDataHeadless();
         workspace.openFromZipData(byteArray);
 
         // Check everything is as expected in the deserialized net

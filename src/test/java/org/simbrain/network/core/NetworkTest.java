@@ -7,7 +7,6 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.network.matrix.WeightMatrix;
-import org.simbrain.util.XStreamUtils;
 
 import java.util.List;
 
@@ -97,8 +96,8 @@ public class NetworkTest {
 
     @Test
     public void testXML() {
-        String xmlRep = XStreamUtils.getSimbrainXStream().toXML(net);
-        Network fromXml = (Network) XStreamUtils.getSimbrainXStream().fromXML(xmlRep);
+        String xmlRep = NetworkUtilsKt.getNetworkXStream().toXML(net);
+        Network fromXml = (Network) NetworkUtilsKt.getNetworkXStream().fromXML(xmlRep);
 
         assertNotNull(getModelByLabel(fromXml, Neuron.class, "neuron1"));
         assertNotNull(getModelByLabel(fromXml, Neuron.class, "neuron2"));

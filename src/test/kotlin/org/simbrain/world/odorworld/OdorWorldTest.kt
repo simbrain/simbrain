@@ -35,7 +35,7 @@ class OdorWorldTest {
 
         // Create xstream for world
         val xstream = oc.xml
-        // println(xstream)
+        println(xstream)
         val stream: InputStream = ByteArrayInputStream(xstream.toByteArray(StandardCharsets.UTF_8))
 
         // Unmarshall from xstream

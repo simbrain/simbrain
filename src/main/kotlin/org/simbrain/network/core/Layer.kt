@@ -32,11 +32,13 @@ abstract class Layer : LocatableModel(), AttributeContainer {
     /**
      * "Fan-in" of incoming connectors.
      */
+    @Transient
     val incomingConnectors: MutableList<Connector> = ArrayList()
 
     /**
      * "Fan-out" of outgoing connectors.
      */
+    @Transient
     val outgoingConnectors: MutableList<Connector> = ArrayList()
 
     /**

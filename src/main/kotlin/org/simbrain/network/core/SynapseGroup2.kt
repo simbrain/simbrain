@@ -21,12 +21,13 @@ import smile.math.matrix.Matrix
 class SynapseGroup2 @JvmOverloads constructor(
     val source: AbstractNeuronCollection,
     val target: AbstractNeuronCollection,
-    connection: ConnectionStrategy = AllToAll(),
+    val connection: ConnectionStrategy = AllToAll(),
     val synapses: MutableList<Synapse> = connection.connectNeurons(source.network, source.neuronList, target
         .neuronList, false).toMutableList()
 ) : NetworkModel(), AttributeContainer {
 
-    var connectionSelector: ConnectionSelector = ConnectionSelector(connection)
+    @Transient
+    val connectionSelector: ConnectionSelector = ConnectionSelector(connection)
 
     // TODO: When passing in synapses check all source are in source and all target are in target
     // reuse this in addsynapse
@@ -36,11 +37,13 @@ class SynapseGroup2 @JvmOverloads constructor(
     /**
      * Randomizer for all weights, regardless of polarity. Applying it can change the polarity of a weight.
      */
+    @Transient
     val weightRandomizer = ProbabilityDistribution.Randomizer(UniformRealDistribution(-1.0, 1.0))
 
     /**
      * Randomizer for excitatory weights.
      */
+    @Transient
     val excitatoryRandomizer = ProbabilityDistribution.Randomizer(UniformRealDistribution(0.0, 1.0))
 
     // TODO. Grab stuff from SynapseAdjustPanel.kt. Expand to all randomizers
@@ -54,6 +57,7 @@ class SynapseGroup2 @JvmOverloads constructor(
     /**
      * Randomizer for inhibitory weights.
      */
+    @Transient
     var inhibitoryRandomizer = ProbabilityDistribution.Randomizer(UniformRealDistribution(-1.0, 0.0))
 
     @Transient

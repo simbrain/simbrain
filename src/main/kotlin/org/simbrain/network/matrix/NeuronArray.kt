@@ -22,7 +22,7 @@ import java.awt.geom.Rectangle2D
 /**
  * A "neuron array" backed by a Smile Matrix. Stored as a column vector.
  */
-class NeuronArray(net: Network?, size: Int) : ArrayLayer(net!!, size), EditableObject, AttributeContainer {
+class NeuronArray(parent: Network, inputSize: Int) : ArrayLayer(parent, inputSize), EditableObject, AttributeContainer {
     @UserParameter(label = "Update Rule", useSetter = true, isObjectType = true, order = 100)
     var updateRule: NeuronUpdateRule<ScalarDataHolder, MatrixDataHolder> = LinearRule()
         set(value) {
@@ -39,7 +39,7 @@ class NeuronArray(net: Network?, size: Int) : ArrayLayer(net!!, size), EditableO
      * Holds data for prototype rule.
      */
     var dataHolder: MatrixDataHolder by GuiEditable(
-        initValue = updateRule.createMatrixData(size),
+        initValue = updateRule.createMatrixData(inputSize),
         order = 99,
         onUpdate = {
             if (updateEventProperty == NeuronArray::updateRule) {
@@ -56,7 +56,7 @@ class NeuronArray(net: Network?, size: Int) : ArrayLayer(net!!, size), EditableO
      * other network components via [Layer].
      */
     @UserParameter(label = "Activations", description = "Neuron activations", order = 1)
-    var activations: Matrix = Matrix(size, 1)
+    var activations: Matrix = Matrix(inputSize, 1)
         set(newActivations) {
             field.copyFrom(newActivations)
             events.updated.fireAndForget()
@@ -110,7 +110,7 @@ class NeuronArray(net: Network?, size: Int) : ArrayLayer(net!!, size), EditableO
      * @param newParent the new parent network
      * @return the deep copy
      */
-    fun deepCopy(newParent: Network?): NeuronArray {
+    fun deepCopy(newParent: Network): NeuronArray {
         val copy = NeuronArray(newParent, outputSize())
         copy.location = location
         copy.gridMode = gridMode
@@ -183,7 +183,7 @@ class NeuronArray(net: Network?, size: Int) : ArrayLayer(net!!, size), EditableO
          * @param network the network this neuron array adds to
          * @return the created neuron array
          */
-        fun create(network: Network?): NeuronArray {
+        fun create(network: Network): NeuronArray {
             return NeuronArray(network, numNodes)
         }
 

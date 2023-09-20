@@ -43,12 +43,12 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
     /**
      * Set of incoming synapse groups.
      */
-    private final HashSet<SynapseGroup2> incomingSgs = new HashSet<>();
+    transient private HashSet<SynapseGroup2> incomingSgs = new HashSet<>();
 
     /**
      * Set of outgoing synapse groups.
      */
-    private final HashSet<SynapseGroup2> outgoingSgs = new HashSet<>();
+    transient private HashSet<SynapseGroup2> outgoingSgs = new HashSet<>();
 
     /**
      * Optional information about the current state of the group. For display in
@@ -729,6 +729,9 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
         if (events == null) {
             events = new NeuronCollectionEvents2();
         }
+
+        incomingSgs = new HashSet<>();
+        outgoingSgs = new HashSet<>();
 
         // TODO: Resave and remove
         if (activationRecorder == null) {

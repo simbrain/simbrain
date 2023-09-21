@@ -11,7 +11,6 @@ import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
-import org.simbrain.util.propertyeditor.EditableObject
 import java.awt.geom.Point2D
 
 /**
@@ -122,16 +121,6 @@ val List<Synapse>.lengths: List<Double>
 fun getNetworkXStream(): XStream {
     val xstream = getSimbrainXStream()
     xstream.registerConverter(NetworkModelListConverter())
-    xstream.registerConverter(
-        createConstructorCallingConverter(
-            EditableObject::class.java,
-            xstream.mapper,
-            xstream.reflectionProvider,
-            excludedTypes = listOf(
-                Network::class.java,
-            )
-        )
-    )
     return xstream
 }
 

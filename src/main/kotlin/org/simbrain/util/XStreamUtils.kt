@@ -11,7 +11,10 @@ import com.thoughtworks.xstream.io.HierarchicalStreamReader
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter
 import com.thoughtworks.xstream.io.xml.DomDriver
 import com.thoughtworks.xstream.mapper.Mapper
+import org.simbrain.network.core.Network
 import org.simbrain.network.core.XStreamConstructor
+import org.simbrain.util.piccolo.Tile
+import org.simbrain.util.propertyeditor.EditableObject
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.full.hasAnnotation
@@ -46,6 +49,17 @@ fun getSimbrainXStream(): XStream {
         )
         registerConverter(DoubleArrayConverter())
         registerConverter(MatrixConverter())
+        registerConverter(
+            createConstructorCallingConverter(
+                EditableObject::class.java,
+                mapper,
+                reflectionProvider,
+                excludedTypes = listOf(
+                    Network::class.java,
+                    Tile::class.java
+                )
+            )
+        )
     }
 }
 

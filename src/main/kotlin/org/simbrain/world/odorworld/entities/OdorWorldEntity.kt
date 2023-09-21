@@ -58,11 +58,9 @@ class OdorWorldEntity @JvmOverloads constructor(
      */
     var smellSource = SmellSource(10)
 
-    private val _sensors: MutableList<Sensor> = ArrayList()
-    val sensors: List<Sensor> get() = _sensors
+    val sensors: MutableList<Sensor> = ArrayList()
 
-    private val _effectors: MutableList<Effector> = ArrayList()
-    val effectors: List<Effector> get() = _effectors
+    val effectors: MutableList<Effector> = ArrayList()
 
     /**
      * Whatever phrases the entity can currently "hear".
@@ -158,7 +156,7 @@ class OdorWorldEntity @JvmOverloads constructor(
     }
 
     fun addEffector(effector: Effector) {
-        _effectors.add(effector)
+        effectors.add(effector)
         if (effector.id == null) {
             effector.setId(world.effectorIDGenerator.andIncrement)
         }
@@ -166,17 +164,17 @@ class OdorWorldEntity @JvmOverloads constructor(
     }
 
     fun removeAllEffectors() {
-        _effectors.forEach { events.effectorRemoved.fireAndForget(it) }
-        _effectors.clear()
+        effectors.forEach { events.effectorRemoved.fireAndForget(it) }
+        effectors.clear()
     }
 
     fun removeEffector(effector: Effector) {
-        _effectors.remove(effector)
+        effectors.remove(effector)
         events.effectorRemoved.fireAndForget(effector)
     }
 
     fun addSensor(sensor: Sensor) {
-        _sensors.add(sensor)
+        sensors.add(sensor)
         if (sensor.id == null) {
             sensor.setId(world.sensorIDGenerator.andIncrement)
         }
@@ -203,12 +201,12 @@ class OdorWorldEntity @JvmOverloads constructor(
     }
 
     fun removeAllSensors() {
-        _sensors.forEach { events.sensorRemoved.fireAndForget(it) }
-        _sensors.clear()
+        sensors.forEach { events.sensorRemoved.fireAndForget(it) }
+        sensors.clear()
     }
 
     fun removeSensor(sensor: Sensor) {
-        _sensors.remove(sensor)
+        sensors.remove(sensor)
         events.sensorRemoved.fireAndForget(sensor)
     }
 

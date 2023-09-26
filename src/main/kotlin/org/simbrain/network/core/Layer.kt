@@ -33,13 +33,13 @@ abstract class Layer : LocatableModel(), AttributeContainer {
      * "Fan-in" of incoming connectors.
      */
     @Transient
-    val incomingConnectors: MutableList<Connector> = ArrayList()
+    var incomingConnectors: MutableList<Connector> = ArrayList()
 
     /**
      * "Fan-out" of outgoing connectors.
      */
     @Transient
-    val outgoingConnectors: MutableList<Connector> = ArrayList()
+    var outgoingConnectors: MutableList<Connector> = ArrayList()
 
     /**
      * Collects inputs from other network models using arrays. Cannot be set directly. Use [addInputs] instead.
@@ -137,6 +137,8 @@ abstract class Layer : LocatableModel(), AttributeContainer {
         if (events == null) {
             events = LocationEvents2()
         }
+        incomingConnectors = ArrayList()
+        outgoingConnectors = ArrayList()
     }
 
     override fun delete() {

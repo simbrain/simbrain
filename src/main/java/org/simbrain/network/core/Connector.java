@@ -75,6 +75,8 @@ public abstract class Connector extends NetworkModel implements EditableObject, 
             events = new ConnectorEvents2();
         }
         initEvents();
+        source.addOutgoingConnector(this);
+        target.addIncomingConnector(this);
     }
 
     @Override

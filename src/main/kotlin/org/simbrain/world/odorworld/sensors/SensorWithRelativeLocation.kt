@@ -84,7 +84,7 @@ abstract class SensorWithRelativeLocation(
 
     fun <T: SensorWithRelativeLocation> T.applyCommonCopy(): T {
         return apply {
-            setId(this@SensorWithRelativeLocation.id)
+            id = this@SensorWithRelativeLocation.id
             baseValue = this@SensorWithRelativeLocation.baseValue
             isShowLabel = this@SensorWithRelativeLocation.isShowLabel
             theta = this@SensorWithRelativeLocation.theta

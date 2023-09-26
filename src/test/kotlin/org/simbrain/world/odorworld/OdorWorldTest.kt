@@ -53,7 +53,7 @@ class OdorWorldTest {
         assertEquals(mouse.location, newMouse?.location)
         assertEquals(swiss.location, newSwiss?.location)
         assertEquals(1, newMouse?.sensors?.size)
-        assertEquals(1, newMouse?.sensors?.size)
+        assertEquals(1, newMouse?.effectors?.size)
 
     }
 

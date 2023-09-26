@@ -41,12 +41,10 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
             .filterIsInstance<KMutableProperty1<O, *>>()
             .onEach { it.isAccessible = true }
             .mapNotNull { property ->
-                property.getDelegate(obj)?.also {
-                    property.get(obj)
-                    delegatedPropertyNames.add(property.name)
-                }
+                property.getDelegate(obj)?.also { property.get(obj) }
             }
             .filterIsInstance<GuiEditable<O, *>>()
+            .onEach { delegatedPropertyNames.add(it.property.name) }
 
         /**
          * Properties using [UserParameter] annotations

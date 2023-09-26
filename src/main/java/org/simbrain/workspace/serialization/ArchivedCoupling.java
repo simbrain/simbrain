@@ -2,6 +2,8 @@ package org.simbrain.workspace.serialization;
 
 import org.simbrain.workspace.*;
 
+import java.util.Objects;
+
 /**
  * Class used to represent a coupling in the archive.
  *
@@ -56,7 +58,7 @@ class ArchivedCoupling {
     private AttributeContainer getObjectFromWorkspace(Workspace workspace, ArchivedAttribute attribute) {
         WorkspaceComponent component = workspace.getComponent(attribute.getComponentId());
         for(AttributeContainer container : component.getAttributeContainers()) {
-            if (container.getId().equals(attribute.getAttributeId())) {
+            if (Objects.equals(container.getId(), attribute.getAttributeId())) {
                 return container;
             }
         }

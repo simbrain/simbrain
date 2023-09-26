@@ -86,9 +86,9 @@ public class ComponentPanel extends JPanel {
         add(panel);
 
         WorkspaceEvents2 events = desktop.getWorkspace().getEvents();
-        events.getWorkspaceCleared().on(Dispatchers.getDefault(), model::clear);
-        events.getComponentAdded().on(Dispatchers.getDefault(), model::addRow);
-        events.getComponentRemoved().on(Dispatchers.getDefault(), model::removeRow);
+        events.getWorkspaceCleared().on(Dispatchers.getMain(), model::clear);
+        events.getComponentAdded().on(Dispatchers.getMain(), model::addRow);
+        events.getComponentRemoved().on(Dispatchers.getMain(), model::removeRow);
     }
 
     /**

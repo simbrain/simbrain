@@ -1,7 +1,6 @@
 package org.simbrain.plot.projection
 
 import com.thoughtworks.xstream.XStream
-import org.simbrain.util.DoubleArrayConverter
 import org.simbrain.util.getSimbrainXStream
 import org.simbrain.util.projection.DataPoint2
 import org.simbrain.util.projection.KDTreeConvertor
@@ -51,12 +50,11 @@ class ProjectionComponent2 @JvmOverloads constructor(name: String, val projector
         private fun getProjectorXStream(): XStream {
             val xstream = getSimbrainXStream()
             xstream.registerConverter(KDTreeConvertor())
-            xstream.registerConverter(DoubleArrayConverter())
             return xstream
         }
 
         @JvmStatic
-        fun open(input: InputStream?, name: String, format: String): ProjectionComponent2 {
+        fun open(input: InputStream?, name: String, format: String?): ProjectionComponent2 {
             val proj = getProjectorXStream().fromXML(input) as Projector2
             return ProjectionComponent2(name, proj)
         }

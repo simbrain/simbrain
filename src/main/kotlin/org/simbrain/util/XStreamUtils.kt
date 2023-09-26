@@ -14,6 +14,7 @@ import com.thoughtworks.xstream.mapper.Mapper
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.util.piccolo.Tile
+import org.simbrain.util.projection.Projector2
 import org.simbrain.util.propertyeditor.EditableObject
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
@@ -56,7 +57,8 @@ fun getSimbrainXStream(): XStream {
                 reflectionProvider,
                 excludedTypes = listOf(
                     Network::class.java,
-                    Tile::class.java
+                    Tile::class.java,
+                    Projector2::class.java
                 )
             )
         )
@@ -84,9 +86,7 @@ fun <T : Any> createConstructorCallingConverter(
 
         override fun marshal(source: Any, writer: HierarchicalStreamWriter, context: MarshallingContext) {
             source::class.memberProperties
-                 // allows null and non-transient properties
-                 // (delegates have null backing fields and thus have no javafields)
-                .filter { it.javaField?.isTransient() != true}
+                .filter { it.javaField?.isTransient() == false }
                 .forEach { property ->
                     // Get the value of the property and write it into xml
                     property.withTempPublicAccess { getter.call(source) }?.let { value ->
@@ -167,10 +167,19 @@ fun <T : Any> createConstructorCallingConverter(
             propertyValueMap.forEach { (name, value) ->
                 propertyMap[name]?.let { property ->
                     if (property is KMutableProperty<*>) {
+                        // property is a var
                         val oldAccessible = property.isAccessible
                         property.isAccessible = true
                         property.setter.call(convertedObject, value)
                         property.isAccessible = oldAccessible
+                    } else {
+                        // property is a val
+                        property.javaField?.let { field ->
+                            val oldAccessible = field.isAccessible
+                            field.isAccessible = true
+                            field.set(convertedObject, value)
+                            field.isAccessible = oldAccessible
+                        }
                     }
                 }
             }

@@ -17,6 +17,7 @@ import org.simbrain.world.odorworld.sensors.GridSensor
 import org.simbrain.world.odorworld.sensors.ObjectSensor
 import org.simbrain.world.odorworld.sensors.Sensor
 import org.simbrain.world.odorworld.sensors.WithDispersion
+import java.awt.geom.Point2D
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -26,18 +27,56 @@ class OdorWorldEntity @JvmOverloads constructor(
     var entityType: EntityType = EntityType.SWISS,
     @Transient
     var events: EntityEvents2 = EntityEvents2(),
-) :
-    EditableObject,
-    AttributeContainer,
-    Locatable by Location(events),
-    Rotatable by Rotation(events),
-    Movable,
-    WithSize by Size(entityType.imageWidth, entityType.imageHeight), Bounded, WithDispersion {
+) : EditableObject, AttributeContainer, Locatable, Rotatable, Movable, WithSize, Bounded, WithDispersion {
 
     override var id: String? = null
 
     @UserParameter(label = "Name", order = 1)
     override var name: String = "null"
+
+    @Transient
+    private var locationPointDirty = true
+
+    @UserParameter(label = "X", description = "X Position", useSetter = true, order = 3)
+    override var x = 0.0
+        set(value) {
+            field = value
+            events.moved.fireAndForget()
+            locationPointDirty = true
+        }
+
+    @UserParameter(label = "Y", description = "Y Position", useSetter = true, order = 3)
+    override var y = 0.0
+        set(value) {
+            field = value
+            events.moved.fireAndForget()
+            locationPointDirty = true
+        }
+
+    @Transient
+    override var location: Point2D = point(x, y)
+        get() {
+            if (locationPointDirty) {
+                field = point(x, y)
+            }
+            locationPointDirty = false
+            return field
+        }
+        set(value) {
+            field = value
+            x = value.x
+            y = value.y
+        }
+
+    @UserParameter(label = "heading", description = "heading", order = 2)
+    override var heading = 0.0
+        set(value) {
+            field = ((value % 360.0) + 360.0) % 360.0
+            events.moved.fireAndForget()
+        }
+
+    override val width: Double = entityType.imageWidth
+    override val height: Double = entityType.imageHeight
 
     @UserParameter(label = "Enable Sensors", order = 6)
     var isSensorsEnabled: Boolean = true
@@ -58,9 +97,9 @@ class OdorWorldEntity @JvmOverloads constructor(
      */
     var smellSource = SmellSource(10)
 
-    val sensors: MutableList<Sensor> = ArrayList()
+    val sensors = ArrayList<Sensor>()
 
-    val effectors: MutableList<Effector> = ArrayList()
+    val effectors = ArrayList<Effector>()
 
     /**
      * Whatever phrases the entity can currently "hear".
@@ -176,7 +215,7 @@ class OdorWorldEntity @JvmOverloads constructor(
     fun addSensor(sensor: Sensor) {
         sensors.add(sensor)
         if (sensor.id == null) {
-            sensor.setId(world.sensorIDGenerator.andIncrement)
+            sensor.id = world.sensorIDGenerator.andIncrement
         }
         events.sensorAdded.fireAndForget(sensor)
     }

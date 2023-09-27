@@ -1,6 +1,10 @@
 package org.simbrain.custom_sims.simulations
 
-import org.simbrain.custom_sims.*
+import org.simbrain.custom_sims.addProjectionPlot2
+import org.simbrain.custom_sims.addTextWorld
+import org.simbrain.custom_sims.couplingManager
+import org.simbrain.custom_sims.newSim
+import org.simbrain.util.Utils
 import org.simbrain.util.place
 import org.simbrain.util.point
 
@@ -31,7 +35,7 @@ val nlpSim_corpusQuality = newSim {
     // Text World
     val twc = addTextWorld("Text World")
     val textWorld = twc.world
-    val text = getResource("nlp/mlk.txt")
+    val text = Utils.readFileContents("simulations/texts/mlk.txt")
     textWorld.loadDictionary(text)
     textWorld.text = text
 

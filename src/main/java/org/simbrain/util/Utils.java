@@ -678,6 +678,19 @@ public class Utils {
     }
 
     /**
+     * Returns the contents of the file specified by a path. The path is relative to user.dir (the directory where
+     * Simbrain is launched from).
+     */
+    public static String readFileContents(String path) {
+        try {
+            File file = new File(Utils.USER_DIR, path);
+            return Utils.readFileContents(file);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Path " + path + " to requested resource incorrect");
+        }
+    }
+
+    /**
      * Returns the contents of a file as a String.
      *
      * @param file the file to read

@@ -39,7 +39,7 @@ val nlpSim = newSim {
     // Text World
     val twc = addTextWorld("Text World")
     val textWorld = twc.world
-    val text = getResource("nlp/mlk.txt")
+    val text = readSimulationFileContents("nlp/mlk.txt")
     textWorld.loadDictionary(text)
     textWorld.text = text
 

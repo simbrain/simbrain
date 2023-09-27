@@ -130,8 +130,11 @@ suspend fun SimulationScope.placeComponent(component: WorkspaceComponent, x: Int
     }
 }
 
-fun SimulationScope.getResource(fileName: String): String {
-    return ResourceManager.getString(
+/**
+ * Grabs a resource from the src/main/resources/custom_sims directory and returns it as a string.
+ */
+fun SimulationScope.readSimulationFileContents(fileName: String): String {
+    return ResourceManager.readFileContents(
         "custom_sims" + Utils.FS + fileName
     )
 }
@@ -146,7 +149,7 @@ fun SimulationScope.getResource(fileName: String): String {
 fun SimulationScope.addDocViewer(title: String?, fileName: String): DocViewerComponent {
 
     val docViewer = DocViewerComponent(title)
-    val html = ResourceManager.getString(
+    val html = ResourceManager.readFileContents(
         "custom_sims" + Utils.FS + fileName
     )
     docViewer.text = html

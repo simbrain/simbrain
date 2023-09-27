@@ -24,7 +24,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.Objects;
@@ -75,14 +74,14 @@ public class ResourceManager {
     }
 
     /**
-     * Returns a string (e.g. an html string) from a specified path.
+     * Read file contents from a path specified relative to the resource directory (src/main/resources).
      */
-    public static String getString(String name) {
+    public static String readFileContents(String name) {
         try {
             File file = Paths.get(Objects.requireNonNull(ClassLoader.getSystemClassLoader()
                     .getResource(name)).toURI()).toFile();
             return Utils.readFileContents(file);
-        } catch (URISyntaxException e) {
+        } catch (Exception e) {
             throw new IllegalArgumentException("Path " + name + " to requested resource incorrect");
         }
     }

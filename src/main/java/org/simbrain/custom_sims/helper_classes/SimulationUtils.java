@@ -109,7 +109,7 @@ public class SimulationUtils {
      */
     public DocViewerComponent addDocViewer(int x, int y, int width, int height, String title, String fileName) {
         DocViewerComponent docViewer = new DocViewerComponent(title);
-        String html = getResource(fileName);
+        String html = readSimulationFileContents(fileName);
         docViewer.setText(html);
         workspace.addWorkspaceComponent(docViewer);
         SwingUtilities.invokeLater(() -> desktop.getDesktopComponent(docViewer).parentFrame.setBounds(x, y, width, height));
@@ -117,10 +117,10 @@ public class SimulationUtils {
     }
 
     /**
-     * Returns a string resource from the custom_sim directory.
+     * Returns the contents of a file in the custom_sim directory as a string.
      */
-    public String getResource(String fileName) {
-        return ResourceManager.getString("custom_sims"
+    public String readSimulationFileContents(String fileName) {
+        return ResourceManager.readFileContents("custom_sims"
                 + Utils.FS + fileName);
     }
 

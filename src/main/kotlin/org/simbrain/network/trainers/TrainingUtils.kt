@@ -73,10 +73,16 @@ fun WeightMatrix.trainCurrentOutputLMS(epsilon: Double = .1) {
 fun WeightMatrix.backpropError(layerError: Matrix, epsilon: Double = .1): Matrix {
     layerError.validateSameShape(target.outputs)
     val weightDeltas = layerError.mm(source.outputs.transpose())
+
+    // Backpropagate the layer error through the weights to get new error
+    //  Prefer this to layerError.T.mm(wm).T because that requies an extra transpose
+    val backropagatedError = weightMatrix.transpose().mm(layerError)
+
+    // Update weights
     weightMatrix.add(weightDeltas.mul(epsilon))
     events.updated.fireAndBlock()
-    // Backpropagate the layer error through the weights to get new error
-    return weightMatrix.transpose().mm(layerError)
+
+    return backropagatedError
 }
 
 /**

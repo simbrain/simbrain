@@ -224,3 +224,16 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
     }
 
 }
+
+class APEObjectWrapper<O : EditableObject>(val label: String, obj: O) : EditableObject {
+    var editingObject: O by GuiEditable(
+        initValue = obj,
+        label = label,
+    )
+}
+
+/**
+ * Wraps an [EditableObject] so that it can be used in an [org.simbrain.util.propertyeditor.AnnotatedPropertyEditor]
+ * so that we can edit the object itself with a dropdown.
+ */
+fun <O : EditableObject> objectWrapper(label: String, obj: O) = APEObjectWrapper(label, obj)

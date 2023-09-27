@@ -29,6 +29,7 @@ import org.simbrain.util.complement
 import org.simbrain.util.displayInDialog
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
+import org.simbrain.util.propertyeditor.objectWrapper
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.ProbabilityDistribution.Randomizer
 import org.simbrain.util.stats.distributions.NormalDistribution
@@ -50,9 +51,9 @@ import javax.swing.*
 class
 SynapseAdjustmentPanel(
     var synapses: List<Synapse>,
-    var allRandomizer: Randomizer = Randomizer(UniformRealDistribution(-1.0, 1.0)),
-    var excitatoryRandomizer: Randomizer = Randomizer(UniformRealDistribution(0.0, 1.0)),
-    var inhibitoryRandomizer: Randomizer = Randomizer(UniformRealDistribution(-1.0, 0.0))
+    var allRandomizer: ProbabilityDistribution = UniformRealDistribution(-1.0, 1.0),
+    var excitatoryRandomizer: ProbabilityDistribution = UniformRealDistribution(0.0, 1.0),
+    var inhibitoryRandomizer: ProbabilityDistribution = UniformRealDistribution(-1.0, 0.0)
 ) : JPanel() {
 
     // TODO: Some of the logical operations here could be moved to utility classes or Network.kt
@@ -68,9 +69,9 @@ SynapseAdjustmentPanel(
     // TODO: Simplify by replacing with excitatoryArray and inhibitoryArray.
     private val weights = arrayOf(doubleArrayOf(), doubleArrayOf())
 
-    private val allPanel = AnnotatedPropertyEditor(allRandomizer)
-    private val excitatoryPanel = AnnotatedPropertyEditor(excitatoryRandomizer)
-    private val inhibitoryPanel = AnnotatedPropertyEditor(inhibitoryRandomizer)
+    private val allPanel = AnnotatedPropertyEditor(objectWrapper("All Randomizer", allRandomizer))
+    private val excitatoryPanel = AnnotatedPropertyEditor(objectWrapper("Excitatory Randomizer", excitatoryRandomizer))
+    private val inhibitoryPanel = AnnotatedPropertyEditor(objectWrapper("Inhibitory Randomizer", inhibitoryRandomizer))
 
     private var chooseRandomizerPanel = JPanel()
     private val randomizeButton = JButton("Apply")
@@ -604,9 +605,9 @@ SynapseAdjustmentPanel(
 
 fun createSynapseAdjustmentPanel(
     synapses: List<Synapse>,
-    all: Randomizer = Randomizer(UniformRealDistribution(-1.0, 1.0)),
-    excitatoryRandomizer: Randomizer = Randomizer(UniformRealDistribution(0.0, 1.0)),
-    inhibitoryRandomizer: Randomizer = Randomizer(UniformRealDistribution(-1.0, 0.0))
+    all: ProbabilityDistribution = UniformRealDistribution(-1.0, 1.0),
+    excitatoryRandomizer: ProbabilityDistribution = UniformRealDistribution(0.0, 1.0),
+    inhibitoryRandomizer: ProbabilityDistribution = UniformRealDistribution(-1.0, 0.0)
 ): SynapseAdjustmentPanel? {
     val sap = SynapseAdjustmentPanel(synapses, all, excitatoryRandomizer, inhibitoryRandomizer)
     if (synapses.isEmpty()) {

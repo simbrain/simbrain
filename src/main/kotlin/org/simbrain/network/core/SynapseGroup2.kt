@@ -32,19 +32,18 @@ class SynapseGroup2 @JvmOverloads constructor(
     // TODO: When passing in synapses check all source are in source and all target are in target
     // reuse this in addsynapse
 
-    // TODO: Should the randomizers and connection strategy be editable?
 
     /**
      * Randomizer for all weights, regardless of polarity. Applying it can change the polarity of a weight.
      */
     @Transient
-    val weightRandomizer = ProbabilityDistribution.Randomizer(UniformRealDistribution(-1.0, 1.0))
+    var weightRandomizer: ProbabilityDistribution = UniformRealDistribution(-1.0, 1.0)
 
     /**
      * Randomizer for excitatory weights.
      */
     @Transient
-    val excitatoryRandomizer = ProbabilityDistribution.Randomizer(UniformRealDistribution(0.0, 1.0))
+    var excitatoryRandomizer: ProbabilityDistribution = UniformRealDistribution(0.0, 1.0)
 
     // TODO. Grab stuff from SynapseAdjustPanel.kt. Expand to all randomizers
     fun randomizeExcitatory() {
@@ -58,7 +57,7 @@ class SynapseGroup2 @JvmOverloads constructor(
      * Randomizer for inhibitory weights.
      */
     @Transient
-    var inhibitoryRandomizer = ProbabilityDistribution.Randomizer(UniformRealDistribution(-1.0, 0.0))
+    var inhibitoryRandomizer: ProbabilityDistribution = UniformRealDistribution(-1.0, 0.0)
 
     @Transient
     override var events = SynapseGroup2Events2()

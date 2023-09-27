@@ -16,7 +16,7 @@ class UniformRealDistribution(floor:Double = 0.0, ceil: Double = 1.0) : Probabil
     var ceil = ceil
         set(value) {
             field = value
-            dist = org.apache.commons.math3.distribution.UniformRealDistribution(randomGenerator, floor, value)
+            dist = org.apache.commons.math3.distribution.UniformRealDistribution(randomGenerator, dist.supportLowerBound, value)
         }
 
     @UserParameter(
@@ -27,7 +27,7 @@ class UniformRealDistribution(floor:Double = 0.0, ceil: Double = 1.0) : Probabil
     var floor = floor
         set(value) {
             field = value
-            dist = org.apache.commons.math3.distribution.UniformRealDistribution(randomGenerator, value, ceil)
+            dist = org.apache.commons.math3.distribution.UniformRealDistribution(randomGenerator, value, dist.supportUpperBound)
         }
 
     @Transient
@@ -52,6 +52,7 @@ class UniformRealDistribution(floor:Double = 0.0, ceil: Double = 1.0) : Probabil
     override fun deepCopy(): UniformRealDistribution {
         val copy = UniformRealDistribution()
         copy.randomSeed = randomSeed
+        copy.dist = org.apache.commons.math3.distribution.UniformRealDistribution(randomGenerator, floor, ceil)
         copy.ceil = ceil
         copy.floor = floor
         return copy

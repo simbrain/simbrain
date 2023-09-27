@@ -251,9 +251,9 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     ) {
         createSynapseAdjustmentPanel(
             network.getModels<Synapse>().toList(),
-            ProbabilityDistribution.Randomizer(network.weightRandomizer),
-            ProbabilityDistribution.Randomizer(network.excitatoryRandomizer),
-            ProbabilityDistribution.Randomizer(network.inhibitoryRandomizer)
+            network.weightRandomizer,
+            network.excitatoryRandomizer,
+            network.inhibitoryRandomizer
         )?.displayInDialog()
     }
 

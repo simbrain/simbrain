@@ -7,6 +7,8 @@ import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.util.UserParameter
 import org.simbrain.util.allPropertiesToString
 import org.simbrain.util.displayInDialog
+import org.simbrain.util.stats.ProbabilityDistribution
+import org.simbrain.util.stats.distributions.UniformRealDistribution
 
 class APETestObject2: EditableObject {
 
@@ -17,6 +19,11 @@ class APETestObject2: EditableObject {
     override var name by GuiEditable(
         initValue = "test",
         displayOnly = true,
+    )
+
+    var randomizer: ProbabilityDistribution by GuiEditable(
+        initValue = UniformRealDistribution(),
+        tab = "Test Tab"
     )
 
     @UserParameter(label = "Annotated Int", description = "Annotated Int Description", tab = "Test Tab", order = 10)
@@ -135,6 +142,14 @@ fun main() {
         commitChanges()
         editingObject.forEach { println(it) }
     }
+
+    // AnnotatedPropertyEditor(objectWrapper<ProbabilityDistribution>("randomizer", UniformRealDistribution())).displayInDialog {
+    //     commitChanges()
+    //     editingObjects.forEach {
+    //         val thing = it.editingObject
+    //         println(thing.name)
+    //     }
+    // }
 
 
 }

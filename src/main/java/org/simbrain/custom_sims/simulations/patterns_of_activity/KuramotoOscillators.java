@@ -132,8 +132,7 @@ public class KuramotoOscillators extends Simulation {
         sparseExcitatory.setPercentExcitatory(100);
         SynapseGroup2 inputToRes = new SynapseGroup2(inputNetwork, reservoirNet, sparseExcitatory);
 
-        inputToRes.getExcitatoryRandomizer()
-                .setProbabilityDistribution(new NormalDistribution(10.0, 1.0));
+        inputToRes.setExcitatoryRandomizer(new NormalDistribution(10.0, 1.0));
         inputToRes.setDisplaySynapses(false);
         net.addNetworkModelAsync(inputToRes);
         inputToRes.randomizeExcitatory();

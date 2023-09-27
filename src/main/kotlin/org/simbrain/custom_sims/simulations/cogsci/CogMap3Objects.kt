@@ -56,8 +56,7 @@ val cogMap3Objects = newSim {
     sparseExcitatory.percentExcitatory = 100.0
     val inputToRes = SynapseGroup2(inputNetwork, recurrent, sparseExcitatory)
 
-    inputToRes.excitatoryRandomizer
-        .probabilityDistribution = NormalDistribution(10.0, 1.0)
+    inputToRes.excitatoryRandomizer = NormalDistribution(10.0, 1.0)
     inputToRes.displaySynapses = false
     inputToRes.label = "Sparse Excitatory"
     inputToRes.randomizeExcitatory()

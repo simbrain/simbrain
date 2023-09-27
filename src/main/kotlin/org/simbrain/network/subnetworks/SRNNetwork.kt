@@ -122,7 +122,7 @@ open class SRNNetwork(
     class SRNCreator(proposedLabel: String, val initialPosition: Point2D) : EditableObject {
 
         @UserParameter(label = "Label", order = 5)
-        private val label = proposedLabel
+        var label = proposedLabel
 
         @UserParameter(label = "Number of inputs", order = 10)
         var nin = 5

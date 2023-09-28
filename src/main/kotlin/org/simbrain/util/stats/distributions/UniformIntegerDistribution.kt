@@ -51,6 +51,7 @@ class UniformIntegerDistribution(floor:Int = 0, ceil: Int = 1) : ProbabilityDist
     override fun deepCopy(): UniformIntegerDistribution {
         val copy = UniformIntegerDistribution()
         copy.randomSeed = randomSeed
+        copy.dist = org.apache.commons.math3.distribution.UniformIntegerDistribution(randomGenerator, floor, ceil)
         copy.ceil = ceil
         copy.floor = floor
         return copy

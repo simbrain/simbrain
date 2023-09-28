@@ -250,7 +250,7 @@ class DeepNet(
     class DeepNetCreator(proposedLabel: String) : EditableObject {
 
         @UserParameter(label = "Label", order = 10)
-        private val label = proposedLabel
+        private var label = proposedLabel
 
         override val name = "Deep Network"
 

@@ -26,9 +26,10 @@ import org.simbrain.network.core.Synapse
 import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.displayInDialog
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
+import org.simbrain.util.propertyeditor.objectWrapper
 import org.simbrain.util.stats.ProbabilityDistribution
-import org.simbrain.util.stats.ProbabilityDistribution.Randomizer
 import org.simbrain.util.stats.distributions.NormalDistribution
+import org.simbrain.util.stats.distributions.UniformRealDistribution
 import org.simbrain.util.widgets.DropDownTriangle
 import org.simbrain.util.widgets.DropDownTriangle.UpDirection
 import java.awt.*
@@ -108,12 +109,12 @@ class EditableRandomizerPanel : JPanel {
      * The PolaraizedRandomizer this panel will either use to fill field
      * values and edit, or which this panel will create and then edit.
      */
-    private val randomizer = Randomizer()
+    private var randomizer: ProbabilityDistribution = UniformRealDistribution()
 
     /**
      * The randomizer panel used as a basis for this panel.
      */
-    private var randomizerPanel = AnnotatedPropertyEditor(randomizer)
+    private var randomizerPanel = AnnotatedPropertyEditor(objectWrapper("Rand", randomizer))
 
     /**
      * A DropDownTriangle used to show or hide [.randomizerPanel]. The
@@ -142,7 +143,7 @@ class EditableRandomizerPanel : JPanel {
      */
     @JvmOverloads
     constructor(parent: Window?, dist: ProbabilityDistribution, enabled: Boolean = true) {
-        randomizer.probabilityDistribution = dist
+        randomizer = dist
         // Below used to set color of boundary, which we are ok without
         // polarity = randomizer.getProbabilityDistribution().getPolarity();
         enableStatusTriangle = DropDownTriangle(UpDirection.LEFT, enabled, "Disabled", "Enabled", parent)

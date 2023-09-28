@@ -98,7 +98,7 @@ class SmileClassifier(
     class ClassifierCreator(proposedLabel: String) : EditableObject {
 
         @UserParameter(label = "Label", order = 5)
-        private val label = proposedLabel
+        private var label = proposedLabel
 
         @UserParameter(label = "Number of inputs", order = 10)
         var nin = 4

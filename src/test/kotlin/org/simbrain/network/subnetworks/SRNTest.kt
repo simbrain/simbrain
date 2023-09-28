@@ -25,6 +25,7 @@ class SRNTest {
         srn.inputLayer.setActivations(DoubleArray(3) { 0.0 }.also { it[0] = 1.0 })
         srn.update()
         // Expecting 0,1,0
+        // Assertions.assertArrayEquals()
         print(srn.outputLayer.activations)
     }
 

@@ -31,7 +31,6 @@ import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.objectWrapper
 import org.simbrain.util.stats.ProbabilityDistribution
-import org.simbrain.util.stats.ProbabilityDistribution.Randomizer
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.stats.distributions.UniformIntegerDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
@@ -77,8 +76,7 @@ SynapseAdjustmentPanel(
     private val randomizeButton = JButton("Apply")
 
     private val perturber: ProbabilityDistribution = UniformRealDistribution(-0.1, .01)
-    private val perturberRandomizer = Randomizer(perturber)
-    private val perturberPanel = AnnotatedPropertyEditor(perturberRandomizer)
+    private val perturberPanel = AnnotatedPropertyEditor(objectWrapper("Perturber", perturber))
     private val perturbButton = JButton("Apply")
 
     /**

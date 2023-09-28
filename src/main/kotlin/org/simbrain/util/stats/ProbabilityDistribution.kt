@@ -11,7 +11,6 @@ import org.simbrain.util.UserParameter
 import org.simbrain.util.createConstructorCallingConverter
 import org.simbrain.util.getSimbrainXStream
 import org.simbrain.util.propertyeditor.CopyableObject
-import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.distributions.*
 import kotlin.reflect.KParameter
 import kotlin.reflect.jvm.javaType
@@ -87,25 +86,6 @@ abstract class ProbabilityDistribution() : CopyableObject {
                 UniformIntegerDistribution::class.java
             )
         }
-    }
-
-    // TODO: Phase this out by allowing APE to construct a containing object directly
-    /**
-     * Utility class that encapsulates a probability distribution so that it can
-     * be used in an [org.simbrain.util.propertyeditor.AnnotatedPropertyEditor]
-     * so that it's easy to create a property editor to edit a probability
-     * distribution.
-     */
-    class Randomizer(probabilityDistribution: ProbabilityDistribution = UniformRealDistribution()) : EditableObject {
-
-        @UserParameter(label = "Randomizer", isObjectType = true)
-        var probabilityDistribution: ProbabilityDistribution = probabilityDistribution
-
-        // Forward to dist
-        fun sampleDouble(): Double = probabilityDistribution.sampleDouble()
-        fun sampleInt(): Int = probabilityDistribution.sampleInt()
-
-        override val name = "Randomizer"
     }
 
 }

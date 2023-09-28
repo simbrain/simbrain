@@ -26,7 +26,9 @@ import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
+import org.simbrain.util.propertyeditor.objectWrapper
 import org.simbrain.util.stats.ProbabilityDistribution
+import org.simbrain.util.stats.distributions.UniformRealDistribution
 import java.awt.event.KeyEvent
 import javax.swing.AbstractAction
 import javax.swing.JCheckBoxMenuItem
@@ -382,9 +384,9 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         enablingCondition = EnablingCondition.NEURONS
     ) {
         // TODO: Indicate the threshold somehow in a prompt
-        ProbabilityDistribution.Randomizer().createDialog { dist ->
+        objectWrapper<ProbabilityDistribution>("Randomize polarity", UniformRealDistribution()).createDialog { dist ->
             selectionManager.filterSelectedModels<Neuron>().forEach { n ->
-                if (dist.sampleDouble() > .5) n.polarity = SimbrainConstants.Polarity.EXCITATORY
+                if (dist.editingObject.sampleDouble() > .5) n.polarity = SimbrainConstants.Polarity.EXCITATORY
                 else n.polarity = SimbrainConstants.Polarity.INHIBITORY
             }
         }.display()

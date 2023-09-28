@@ -95,6 +95,8 @@ open class SRNNetwork(
         contextLayer.activations = hiddenLayer.activations.clone()
         outputLayer.updateInputs()
         outputLayer.update()
+        // Since it's expected, updating weight matrices in case learning rules have been added. In the normal case
+        // there is no such rule and these calls are bypassed.
         wmList.forEach { it.update() }
         contextToHidden.update()
     }

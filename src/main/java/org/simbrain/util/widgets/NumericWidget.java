@@ -13,6 +13,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
+import static org.simbrain.util.propertyeditor.AnnotatedPropertyEditorKt.objectWrapper;
+
 /**
  * Used in the {@link ParameterWidget} for numeric
  * fields. Has an an "up / down" spinner and the option of a randomization
@@ -71,8 +73,7 @@ public class NumericWidget extends JPanel {
 
                 ProbabilityDistribution dist = new NormalDistribution();
 
-                AnnotatedPropertyEditor randEditor =
-                        new AnnotatedPropertyEditor(new ProbabilityDistribution.Randomizer(dist));
+                var randEditor = new AnnotatedPropertyEditor(objectWrapper("Rand", dist));
                 StandardDialog dialog = new StandardDialog();
                 dialog.setContentPane(randEditor);
                 dialog.pack();

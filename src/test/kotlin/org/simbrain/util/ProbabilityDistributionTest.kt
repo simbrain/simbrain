@@ -257,11 +257,11 @@ class ProbabilityDistributionTest {
         }
 
         // Test randomizer serializes properly
-        val randomizer = ProbabilityDistribution.Randomizer(NormalDistribution(1.0, 0.25))
+        val randomizer = NormalDistribution(1.0, 0.25)
         with(randomizer) {
             val xml = ProbabilityDistribution.getXStream().toXML(this)
-            val deserialized = ProbabilityDistribution.getXStream().fromXML(xml) as ProbabilityDistribution.Randomizer
-            with(deserialized.probabilityDistribution as NormalDistribution) {
+            val deserialized = ProbabilityDistribution.getXStream().fromXML(xml) as ProbabilityDistribution
+            with(deserialized as NormalDistribution) {
                 assertNotNull(randomGenerator)
                 assertTrue(mean == 1.0)
                 assertTrue(standardDeviation == 0.25)

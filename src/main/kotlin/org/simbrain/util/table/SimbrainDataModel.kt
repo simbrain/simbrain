@@ -41,7 +41,7 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
      * Table-wide cell randomizer for arbitrary groups of cells.
      */
     @UserParameter(label = "Table Randomizer", isObjectType = true)
-    var cellRandomizer = ProbabilityDistribution.Randomizer()
+    var cellRandomizer = UniformRealDistribution()
 
     /**
      * Check that the provided column index is within range

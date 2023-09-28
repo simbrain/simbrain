@@ -7,6 +7,7 @@ import kotlinx.coroutines.withContext
 import org.simbrain.plot.projection.ProjectionComponent2
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
+import org.simbrain.util.propertyeditor.objectWrapper
 import org.simbrain.workspace.gui.SimbrainDesktop
 import smile.io.Read
 import smile.plot.swing.BoxPlot
@@ -69,7 +70,7 @@ val DataViewerTable.editRandomizerAction
         description = "Edit table wide randomizer",
         iconPath = "menu_icons/Prefs.png"
     ) {
-        AnnotatedPropertyEditor(model.cellRandomizer).displayInDialog()
+        AnnotatedPropertyEditor(objectWrapper("Table Randomizer", model.cellRandomizer)).displayInDialog()
     }
 
 val DataViewerTable.insertColumnAction

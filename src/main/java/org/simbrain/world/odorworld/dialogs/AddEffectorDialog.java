@@ -14,9 +14,12 @@
 package org.simbrain.world.odorworld.dialogs;
 
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.propertyeditor.APEObjectWrapper;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditorKt;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.world.odorworld.effectors.Effector;
+import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 import javax.swing.*;
@@ -66,9 +69,8 @@ public class AddEffectorDialog extends StandardDialog {
         setTitle(title);
         ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/OdorWorld/effectors.html");
         addButton(new JButton(helpAction));
-        effectorCreator = new Effector.EffectorCreator(
-                entity.getParentWorld().getEffectorIDGenerator().getProposedId());
-        effectorCreatorPanel = new AnnotatedPropertyEditor(effectorCreator);
+        effectorCreatorPanel = new AnnotatedPropertyEditor(AnnotatedPropertyEditorKt.objectWrapper("Add Effector",
+                new StraightMovement(entity.getWorld().getEffectorIDGenerator().getProposedId())));
         mainPanel.add(effectorCreatorPanel);
         setContentPane(mainPanel);
     }
@@ -77,14 +79,7 @@ public class AddEffectorDialog extends StandardDialog {
     protected void closeDialogOk() {
         super.closeDialogOk();
         effectorCreatorPanel.commitChanges();
-        commitChanges();
+        entity.addEffector(((APEObjectWrapper<Effector>)effectorCreatorPanel.getEditingObjects().stream().findFirst().get()).getEditingObject());
     }
 
-
-    /**
-     * Called externally when the dialog is closed, to commit any changes made.
-     */
-    public void commitChanges() {
-        entity.addEffector(effectorCreator.getEffector());
-    }
 }

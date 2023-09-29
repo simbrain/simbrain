@@ -32,7 +32,7 @@ public abstract class Effector implements PeripheralAttribute {
 
     /**
      * Distributions for drop-down list used by
-     * {@link org.simbrain.util.propertyeditor.ObjectTypeEditor}
+     * {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}
      * to set a type of effector.
      */
     private static List<Class<? extends Effector>> EFFECTORS_LIST = List.of(
@@ -51,8 +51,8 @@ public abstract class Effector implements PeripheralAttribute {
     /**
      * The id of this smell effector.
      */
-    @UserParameter(label = "Effector ID", description = "A unique id for this effector",
-            order = 0, displayOnly = true)
+    // @UserParameter(label = "Effector ID", description = "A unique id for this effector",
+    //         order = 0, displayOnly = true)
     private String id;
 
     /**

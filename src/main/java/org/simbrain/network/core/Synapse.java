@@ -200,13 +200,13 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     /**
      * Data holder for synapse
      */
-    @UserParameter(label = "Learning data", isEmbeddedObject = true, order = 100)
+    @UserParameter(label = "Learning data",  order = 100)
     private ScalarDataHolder dataHolder = learningRule.createScalarData();
 
     /**
      * Data holder for spiker responder.
      */
-    @UserParameter(label = "Spike data", isEmbeddedObject = true, order = 110)
+    @UserParameter(label = "Spike data", order = 110)
     private ScalarDataHolder spikeResponderData = spikeResponder.createResponderData();
 
     /**

@@ -212,7 +212,6 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
                 isConsistent
             ) as ParameterWidget2<O, T>
 
-
             is CopyableObject -> ObjectWidget(
                 this@AnnotatedPropertyEditor,
                 editingObjects.map { eo -> userParameter.property.get(eo) as CopyableObject },

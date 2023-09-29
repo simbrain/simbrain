@@ -68,17 +68,14 @@ public class EntityDialog extends StandardDialog {
      */
     private void init() {
 
-        mainEditor = new AnnotatedPropertyEditor(entityRef);
-
-        fillFieldValues();
+        mainEditor = new AnnotatedPropertyEditor<>(entityRef);
 
         tabbedPane.addTab("Main", new JScrollPane(mainEditor));
 
         // Smell tabs
-        if (entityRef.getSmellSource() != null) {
-            smellPanel = new AnnotatedPropertyEditor(entityRef.getSmellSource());
-            tabbedPane.addTab("Smell", smellPanel);
-        }
+        entityRef.getSmellSource();
+        smellPanel = new AnnotatedPropertyEditor<>(entityRef.getSmellSource());
+        tabbedPane.addTab("Smell", smellPanel);
 
         // Sensor / effector display
         if (entityRef.isSensorsEnabled()) {
@@ -110,15 +107,5 @@ public class EntityDialog extends StandardDialog {
     protected void closeDialogCancel() {
         super.closeDialogCancel();
     }
-
-    /**
-     * Fills the values within the fields of the dialog.
-     */
-    private void fillFieldValues() {
-        // if (mainEditor != null) {
-        //     mainEditor.fillFieldValues();
-        // }
-    }
-
 
 }

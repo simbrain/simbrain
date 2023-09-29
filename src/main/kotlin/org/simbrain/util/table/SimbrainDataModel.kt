@@ -252,7 +252,7 @@ class Column(
     /**
      * Randomizer for this column.
      */
-    @UserParameter(label = "Column Randomizer", isEmbeddedObject = true, order = 20)
+    @UserParameter(label = "Column Randomizer", order = 20)
     var columnRandomizer: ProbabilityDistribution = UniformRealDistribution()
 
     fun getRandom(): Number {

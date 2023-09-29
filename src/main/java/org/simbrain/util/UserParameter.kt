@@ -139,20 +139,6 @@ annotation class UserParameter(
     /**
      * Name of a method which returns a lambda which is used to determine whether this component is enabled or not.
      */
-    val conditionalEnablingMethod: String = "",
-    /**
-     * Returns true if the annotated field contains an object with its own annotated fields, allowing for recursie
-     * embedding of property editors.
-     */
-    val isEmbeddedObject: Boolean = false,
-    /**
-     * Used when the state of this field should be updated based on the state of another field, which must be an enum or
-     * object type editor which changed its state.  Specifies a method called by reflection when that state change occurs.
-     *
-     * The method is specified in the format of `updateRule.createMatrixData`. In this example, when updateRule was changed,
-     * the annotated field will be updated to the value provided by `updateRule.createMatrixData()`.
-     *
-     * If this is used, [isEmbeddedObject] must be true.
-     */
-    val refreshSource: String = "",
+    val conditionalEnablingMethod: String = ""
+
 )

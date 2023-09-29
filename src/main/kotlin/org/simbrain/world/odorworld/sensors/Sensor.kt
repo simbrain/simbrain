@@ -1,7 +1,6 @@
 package org.simbrain.world.odorworld.sensors
 
 import org.simbrain.util.UserParameter
-import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.world.odorworld.entities.PeripheralAttribute
 import org.simbrain.world.odorworld.events.SensorEffectorEvents2
 import java.util.*
@@ -14,7 +13,7 @@ abstract class Sensor : PeripheralAttribute {
     /**
      * The id of this smell sensor.
      */
-    @UserParameter(label = "Sensor ID", description = "A unique id for this sensor", order = 0, displayOnly = true)
+    // @UserParameter(label = "Sensor ID", description = "A unique id for this sensor", order = 0, displayOnly = true)
     override var id: String? = null
 
     /**
@@ -74,17 +73,6 @@ abstract class Sensor : PeripheralAttribute {
     fun readResolve(): Any {
         events = SensorEffectorEvents2()
         return this
-    }
-
-    class SensorCreator(proposedLabel: String) : EditableObject {
-        @JvmField
-        @UserParameter(label = "Sensor", isObjectType = true)
-        var sensor: Sensor = SmellSensor()
-
-        init {
-            sensor.label = proposedLabel
-        }
-
     }
 
     companion object {

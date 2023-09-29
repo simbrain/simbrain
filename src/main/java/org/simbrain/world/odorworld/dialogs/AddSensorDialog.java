@@ -14,10 +14,13 @@
 package org.simbrain.world.odorworld.dialogs;
 
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.propertyeditor.APEObjectWrapper;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditorKt;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.Sensor;
+import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 import javax.swing.*;
 
@@ -33,11 +36,6 @@ public class AddSensorDialog extends StandardDialog {
      * Entity to which sensor is being added.
      */
     private OdorWorldEntity entity;
-
-    /**
-     * The editable object APE is going to edit.
-     */
-    private Sensor.SensorCreator sensorCreator;
 
     /**
      * Main editing panel.
@@ -66,9 +64,8 @@ public class AddSensorDialog extends StandardDialog {
         setTitle(title);
         ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/OdorWorld/sensors.html");
         addButton(new JButton(helpAction));
-        sensorCreator = new Sensor.SensorCreator(
-                entity.getParentWorld().getSensorIDGenerator().getProposedId());
-        sensorCreatorPanel = new AnnotatedPropertyEditor(sensorCreator);
+        sensorCreatorPanel = new AnnotatedPropertyEditor<>(AnnotatedPropertyEditorKt.objectWrapper("Add Sensor",
+                new SmellSensor(entity.getWorld().getSensorIDGenerator().getProposedId())));
         mainPanel.add(sensorCreatorPanel);
         setContentPane(mainPanel);
     }
@@ -77,13 +74,7 @@ public class AddSensorDialog extends StandardDialog {
     protected void closeDialogOk() {
         super.closeDialogOk();
         sensorCreatorPanel.commitChanges();
-        commitChanges();
+        entity.addSensor(((APEObjectWrapper<Sensor>)sensorCreatorPanel.getEditingObjects().stream().findFirst().get()).getEditingObject());
     }
 
-    /**
-     * Called externally when the dialog is closed, to commit any changes made.
-     */
-    public void commitChanges() {
-        entity.addSensor(sensorCreator.sensor);
-    }
 }

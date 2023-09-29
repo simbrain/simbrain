@@ -57,6 +57,5 @@ public final class ShowWorldPrefsAction extends AbstractAction {
     public void actionPerformed(final ActionEvent event) {
         var dialog = SwingKt.createDialog(component.getWorld());
         SwingKt.display(dialog);
-
     }
 }

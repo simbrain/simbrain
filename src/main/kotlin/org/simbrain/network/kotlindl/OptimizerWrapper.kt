@@ -33,13 +33,13 @@ abstract class OptimizerWrapper() : CopyableObject {
 
 class AdaDeltaWrapper() : OptimizerWrapper() {
     @UserParameter(label = "LearningRate", order = 10)
-    private val learningRate: Float = 0.1f
+    private var learningRate: Float = 0.1f
 
     @UserParameter(label = "Rho", order = 20)
-    private val rho: Float = 0.95f
+    private var rho: Float = 0.95f
 
     @UserParameter(label = "Epsilon", order = 30)
-    private val epsilon: Float = 1e-8f
+    private var epsilon: Float = 1e-8f
 
     init {
         optimizer = AdaDelta()
@@ -55,10 +55,10 @@ class AdaDeltaWrapper() : OptimizerWrapper() {
 
 class AdaGradWrapper() : OptimizerWrapper() {
     @UserParameter(label = "LearningRate", order = 10)
-    private val learningRate: Float = 0.1f
+    private var learningRate: Float = 0.1f
 
     @UserParameter(label = "InitialAccumulatorValue", order = 20)
-    private val initialAccumulatorValue: Float = 0.01f
+    private var initialAccumulatorValue: Float = 0.01f
 
     init {
         optimizer = AdaGrad()
@@ -74,16 +74,16 @@ class AdaGradWrapper() : OptimizerWrapper() {
 
 class AdaGradaWrapper() : OptimizerWrapper() {
     @UserParameter(label = "LearningRate", order = 10)
-    private val learningRate: Float = 0.1f
+    private var learningRate: Float = 0.1f
 
     @UserParameter(label = "InitialAccumulatorValue", order = 20)
-    private val initialAccumulatorValue: Float = 0.01f
+    private var initialAccumulatorValue: Float = 0.01f
 
     @UserParameter(label = "L1Strength", order = 30)
-    private val l1Strength: Float = 0.01f
+    private var l1Strength: Float = 0.01f
 
     @UserParameter(label = "L2Strength", order = 40)
-    private val l2Strength: Float = 0.01f
+    private var l2Strength: Float = 0.01f
 
 
     init {
@@ -101,20 +101,19 @@ class AdaGradaWrapper() : OptimizerWrapper() {
 class AdamWrapper() : OptimizerWrapper() {
 
     @UserParameter(label = "LearningRate",  minimumValue = 0.0, increment = .01, order = 10)
-    private val learningRate: Float = 0.001f
+    private var learningRate: Float = 0.001f
 
     @UserParameter(label = "Beta1", minimumValue = 0.0, maximumValue = 1.0, order = 20)
-    private val beta1: Float = 0.9f
+    private var beta1: Float = 0.9f
 
     @UserParameter(label = "Beta2", minimumValue = 0.0, maximumValue = 1.0, increment = .01, order = 30)
-    private val beta2: Float = 0.999f
+    private var beta2: Float = 0.999f
 
     @UserParameter(label = "Epsilon", minimumValue = 0.0, increment = .01, order = 40)
-    private val epsilon: Float = 1e-07f
+    private var epsilon: Float = 1e-07f
 
     @UserParameter(label = "UseNesterov", order = 50)
-    private val useNesterov: Boolean = false
-
+    private var useNesterov: Boolean = false
 
     init {
         optimizer = Adam()
@@ -169,16 +168,16 @@ class AdamaxWrapper() : OptimizerWrapper() {
 
 class FtrlWrapper() : OptimizerWrapper() {
     @UserParameter(label = "LearningRate", order = 10)
-    private val learningRate: Float = 0.001f
+    private var learningRate: Float = 0.001f
 
     @UserParameter(label = "L1RegularizationStrength", order = 20)
-    private val l1RegularizationStrength: Float = 0.0f
+    private var l1RegularizationStrength: Float = 0.0f
 
     @UserParameter(label = "LearningRatePower", order = 30)
-    private val learningRatePower: Float = -0.5f
+    private var learningRatePower: Float = -0.5f
 
     @UserParameter(label = "L2ShrinkageRegularizationStrength", order = 40)
-    private val l2ShrinkageRegularizationStrength: Float = 0.0f
+    private var l2ShrinkageRegularizationStrength: Float = 0.0f
 
     @UserParameter(label = "InitialAccumulatorValue", order = 50)
     private var initialAccumulatorValue: Float = 0.0f
@@ -198,13 +197,13 @@ class FtrlWrapper() : OptimizerWrapper() {
 class MomentumWrapper() : OptimizerWrapper() {
 
     @UserParameter(label = "LearningRate", order = 10)
-    private val learningRate: Float = 0.001f
+    private var learningRate: Float = 0.001f
 
     @UserParameter(label = "Momentum", order = 20)
-    private val momentum: Float = 0.99f
+    private var momentum: Float = 0.99f
 
     @UserParameter(label = "UseNesterov", order = 30)
-    private val useNesterov: Boolean = true
+    private var useNesterov: Boolean = true
 
     init {
         optimizer = Momentum()
@@ -220,13 +219,13 @@ class MomentumWrapper() : OptimizerWrapper() {
 class RMSPropWrapper() : OptimizerWrapper() {
 
     @UserParameter(label = "LearningRate", order = 10)
-    private val learningRate: Float = 0.001f
+    private var learningRate: Float = 0.001f
 
     @UserParameter(label = "Momentum", order = 20)
-    private val momentum: Float = 0.99f
+    private var momentum: Float = 0.99f
 
     @UserParameter(label = "UseNesterov", order = 30)
-    private val useNesterov: Boolean = true
+    private var useNesterov: Boolean = true
 
     init {
         optimizer = RMSProp()

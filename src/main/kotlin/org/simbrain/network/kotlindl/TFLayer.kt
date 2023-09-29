@@ -21,7 +21,7 @@ abstract class TFLayer<T : Layer> : CopyableObject {
     //     set(tr) { layer?.let { it.isTrainable = tr!! }}
 
     override fun copy(): CopyableObject {
-        TODO("Not yet implemented")
+        return this
     }
 
     /**

@@ -128,7 +128,7 @@ annotation class UserParameter(
      */
     val typeListMethod: String = "getTypes",
     /**
-     * Set to false to make this a "display" type.
+     * If true only show the value but don't allow editing.
      */
     val displayOnly: Boolean = false,
     /**

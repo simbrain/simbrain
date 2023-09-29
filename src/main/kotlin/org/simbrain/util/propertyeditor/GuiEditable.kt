@@ -34,7 +34,9 @@ import kotlin.reflect.jvm.jvmErasure
 /**
  * A special kind of value that can be parsed by an [AnnotatedPropertyEditor].
  *
- * Example activation = UserParameter<Neuron, Double>(0.0)
+ * Example: activation by GuiEditable(1.0, ...). See [LinearRule]
+ *
+ * Can only be used in Kotlin. In java use the [UserParameter] annotation.
  *
  * @param O the type of the base object that holds the parameter
  * @param T the type of the value of this property

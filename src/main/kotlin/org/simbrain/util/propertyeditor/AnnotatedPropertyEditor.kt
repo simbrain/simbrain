@@ -11,12 +11,23 @@ import kotlin.reflect.full.allSuperclasses
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.isAccessible
 
-// TODO: Adapt javadoc from APE
 /**
  * A panel that takes a set of objects either annotated with [UserParameter] or set to [GuiEditable] objects, and
- * produces a set of appropriate widgets for editing each object in a provided list.
+ * produces a set of appropriate widgets for editing each object in a provided list. Each annotated field is
+ * represented by an appropriate [ParameterWidget2] class.
  *
- * @param O the type of the edited objects. Example Neuron when editing a list of neurons.
+ * When edited objects have different values a null value "..." is shown.  Null values are ignored when the panel is
+ * closed, and any values in the panel are written to it.
+ *
+ * Note that annotated interfaces must be in Kotlin.
+ *
+ * Object types are created by copying a prototype object. Thus object types must implement [CopyableObject].
+ *
+ * @param O the type of the edited objects. Example: Neuron when editing a list of neurons.
+ *
+ * @author Yulin Li
+ * @author Jeff Yoshimi
+ * @author Oliver Coleman
  */
 class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) : JPanel() {
 

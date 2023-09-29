@@ -8,7 +8,6 @@ import org.simbrain.util.StandardDialog
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.APEObjectWrapper
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
-import org.simbrain.util.propertyeditor.ObjectTypeEditor
 import org.simbrain.util.propertyeditor.objectWrapper
 import org.simbrain.util.stats.distributions.UniformIntegerDistribution
 import org.simbrain.util.table.*
@@ -103,7 +102,9 @@ class LayerEditor(
     fun checkValidLayers(): Boolean {
         var validLayerSequence = true
         var errorMessage = "Invalid sequence of layers"
-        components.filterIsInstance<ObjectTypeEditor>().map { it.value }.windowed(2) { (first, second) ->
+        components.filterIsInstance<AnnotatedPropertyEditor<*>>()
+            .map { (it.editingObjects.first() as APEObjectWrapper<*>).editingObject}
+            .windowed(2) { (first, second) ->
             if (second is TFDenseLayer) {
                 if (first !is TFFlattenLayer && first !is TFDenseLayer && first !is TFInputLayer) {
                     errorMessage = "Dense layers must come after input, flatten, or dense layers"

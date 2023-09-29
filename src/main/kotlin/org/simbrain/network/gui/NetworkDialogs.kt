@@ -1,7 +1,6 @@
 package org.simbrain.network.gui
 
 import org.simbrain.network.NetworkComponent
-import org.simbrain.network.connections.ConnectionSelector
 import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.Neuron
@@ -24,8 +23,9 @@ import org.simbrain.util.createDialog
 import org.simbrain.util.display
 import org.simbrain.util.displayInDialog
 import org.simbrain.util.piccolo.SceneGraphBrowser
+import org.simbrain.util.propertyeditor.APEObjectWrapper
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
-import org.simbrain.util.propertyeditor.ParameterWidget
+import org.simbrain.util.propertyeditor.objectWrapper
 import org.simbrain.util.table.*
 import org.simbrain.util.widgets.ApplyPanel.createApplyPanel
 import org.simbrain.util.widgets.EditablePanel
@@ -101,7 +101,7 @@ fun showNetwork(networkComponent: NetworkComponent) {
     val frame = JFrame()
     val np = NetworkPanel(networkComponent)
     // component?.getDesktop()?.addInternalFrame(frame)
-    //np.initScreenElements()
+    // np.initScreenElements()
     frame.contentPane = np
     frame.preferredSize = Dimension(500, 500)
     frame.pack()
@@ -111,7 +111,7 @@ fun showNetwork(networkComponent: NetworkComponent) {
             System.exit(0)
         }
     })
-    //System.out.println(np.debugString());
+    // System.out.println(np.debugString());
 }
 
 fun NetworkPanel.showPiccoloDebugger() {
@@ -165,7 +165,7 @@ fun SynapseGroup2Node.getDialog(): StandardDialog {
         synapseGroup.inhibitoryRandomizer
     )
 
-    val connPanel = ConnectionStrategyPanel(synapseGroup.connectionSelector)
+    val connPanel = ConnectionStrategyPanel(synapseGroup.connection)
     val connectionStrategyPanel = createApplyPanel(connPanel).apply {
         addActionListener {
             synapseGroup.applyConnectionStrategy()
@@ -209,59 +209,59 @@ fun NetworkPanel.showClassifierCreationDialog() {
     }
 }
 
-class ConnectionStrategyPanel(val connectionSelector: ConnectionSelector): EditablePanel() {
+class ConnectionStrategyPanel(connectionStrategy: ConnectionStrategy) : EditablePanel() {
 
-    val editor = AnnotatedPropertyEditor(connectionSelector)
-    var ote: ParameterWidget = TODO()
-    val selectedStrategy: ConnectionStrategy get() = connectionSelector.cs
-    val percentExcitatoryPanel = PercentExcitatoryPanel(selectedStrategy.percentExcitatory)
+    val strategySelector = objectWrapper("Connection Strategy", connectionStrategy)
+    val connectionStrategy get() = strategySelector.editingObject
+    val editor = AnnotatedPropertyEditor(strategySelector)
+    val percentExcitatoryPanel = PercentExcitatoryPanel(connectionStrategy.percentExcitatory)
     var sparsePanel: SparsePanel? = null
 
     init {
-            // add(editor)
-            // ote = editor.getWidget("Connection Strategy") as ParameterWidget
-            // val comp = editor.getWidget("Connection Strategy")?.component
-            //
-            // fun updatePanel() {
-            //     if (ote.widgetValue is ConnectionStrategy) {
-            //         connectionSelector.cs = ote.widgetValue as ConnectionStrategy
-            //         // Add percent excitatory panel if the connection strategy requires it
-            //         if (selectedStrategy.usesPolarity) {
-            //             editor.addItem(percentExcitatoryPanel)
-            //         } else {
-            //             editor.removeItem(percentExcitatoryPanel)
-            //         }
-            //         // Custom Sparse Panel
-            //         if (selectedStrategy is Sparse) {
-            //             editor.removeItem(sparsePanel)
-            //             sparsePanel = SparsePanel(selectedStrategy as Sparse)
-            //             editor.addItem(sparsePanel)
-            //             // TODO: Put it in the panel itself?
-            //             // comp.editorPanel.addItem(sparsePanel)
-            //         } else {
-            //             editor.removeItem(sparsePanel)
-            //             // comp.editorPanel.removeItem(sparsePanel)
-            //         }
-            //     }
-            // }
-            // (comp as ObjectTypeEditor).setObjectChangedTask {
-            //     updatePanel()
-            // }
-            // updatePanel()
-        }
+        add(editor)
+        val widget = editor.propertyWidgetMap[APEObjectWrapper<ConnectionStrategy>::editingObject]!!
 
-        override fun fillFieldValues() {
-        }
-
-        override fun commitChanges(): Boolean {
-            editor.commitChanges()
-            selectedStrategy.percentExcitatory = percentExcitatoryPanel.getPercentAsProbability() * 100
-            selectedStrategy.let {
-                if (it is Sparse) {
-                    sparsePanel?.applyChanges(it)
+        fun updatePanel(value: Any?) {
+            if (value is ConnectionStrategy) {
+                val itemPanel = editor.defaultLabelledItemPanel
+                if (value.usesPolarity) {
+                    itemPanel.addItem(percentExcitatoryPanel)
+                } else {
+                    itemPanel.remove(percentExcitatoryPanel)
+                }
+                // Custom Sparse Panel
+                if (value is Sparse) {
+                    sparsePanel?.let { itemPanel.remove(it) }
+                    sparsePanel = SparsePanel(value)
+                    itemPanel.addItem(sparsePanel)
+                    // TODO: Put it in the panel itself?
+                    // comp.editorPanel.addItem(sparsePanel)
+                } else {
+                    sparsePanel?.let { itemPanel.remove(it) }
+                    // comp.editorPanel.removeItem(sparsePanel)
                 }
             }
-            return true
         }
+
+        widget.events.valueChanged.on {
+            updatePanel(widget.value)
+        }
+
+        updatePanel(widget.value)
+    }
+
+    override fun fillFieldValues() {
+    }
+
+    override fun commitChanges(): Boolean {
+        editor.commitChanges()
+        connectionStrategy.percentExcitatory = percentExcitatoryPanel.getPercentAsProbability() * 100
+        connectionStrategy.let {
+            if (it is Sparse) {
+                sparsePanel?.applyChanges(it)
+            }
+        }
+        return true
+    }
 
 }

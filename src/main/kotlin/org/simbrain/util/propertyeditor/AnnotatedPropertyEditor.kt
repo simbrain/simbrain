@@ -90,6 +90,9 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
 
     val labelledItemPanelsByTab = LinkedHashMap<String?, LabelledItemPanel>()
 
+    val defaultLabelledItemPanel: LabelledItemPanel
+        get() = getLabelledItemPanel(null)
+
     private fun getLabelledItemPanel(tab: String?): LabelledItemPanel {
         return labelledItemPanelsByTab.getOrPut(if (tab.isNullOrEmpty()) "Main" else tab) {
             LabelledItemPanel()

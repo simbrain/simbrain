@@ -25,7 +25,6 @@ import org.simbrain.network.gui.ConnectionStrategyPanel
 import org.simbrain.util.UserParameter
 import org.simbrain.util.displayInDialog
 import org.simbrain.util.propertyeditor.CopyableObject
-import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.NormalDistribution
 
@@ -125,19 +124,7 @@ abstract class ConnectionStrategy : CopyableObject {
 
 }
 
-/**
- * TODO. See comments at Randomizer.
- */
-class ConnectionSelector(cs: ConnectionStrategy = AllToAll()) : EditableObject {
-
-    @UserParameter(label = "Connection Strategy", isObjectType = true)
-    var cs: ConnectionStrategy = cs
-
-    override val name = "Connection Strategy"
-
-}
-
 
 fun main() {
-    ConnectionStrategyPanel(ConnectionSelector(Sparse())).displayInDialog()
+    ConnectionStrategyPanel(Sparse()).displayInDialog()
 }

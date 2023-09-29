@@ -279,10 +279,9 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             name = "Connect ${strategy.name}...",
             enablingCondition = EnablingCondition.SOURCE_AND_TARGET_NEURONS
         ) {
-            val connectionSelector = ConnectionSelector(strategy)
-            ConnectionStrategyPanel(connectionSelector).displayInDialog {
+            ConnectionStrategyPanel(strategy).displayInDialog {
                 commitChanges()
-                connectionSelector.cs.connectNeurons(
+                connectionStrategy.connectNeurons(
                     network,
                     selectionManager.filterSelectedSourceModels<Neuron>(),
                     selectionManager.filterSelectedModels<Neuron>()
@@ -305,8 +304,9 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val editConnectionStrategy = networkPanel.createAction(
         name = "Edit connection strategy...",
     ) {
-        ConnectionStrategyPanel(ConnectionSelector(network.connectionStrategy)).displayInDialog {
+        ConnectionStrategyPanel(network.connectionStrategy).displayInDialog {
             commitChanges()
+            network.connectionStrategy = this.connectionStrategy
         }
     }
 

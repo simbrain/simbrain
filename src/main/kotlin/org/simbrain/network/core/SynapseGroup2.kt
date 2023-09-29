@@ -2,7 +2,6 @@ package org.simbrain.network.core
 
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.AllToAll
-import org.simbrain.network.connections.ConnectionSelector
 import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.events.SynapseGroup2Events2
 import org.simbrain.network.groups.AbstractNeuronCollection
@@ -25,9 +24,6 @@ class SynapseGroup2 @JvmOverloads constructor(
     val synapses: MutableList<Synapse> = connection.connectNeurons(source.network, source.neuronList, target
         .neuronList, false).toMutableList()
 ) : NetworkModel(), AttributeContainer {
-
-    @Transient
-    val connectionSelector: ConnectionSelector = ConnectionSelector(connection)
 
     // TODO: When passing in synapses check all source are in source and all target are in target
     // reuse this in addsynapse
@@ -164,12 +160,12 @@ class SynapseGroup2 @JvmOverloads constructor(
                 Synapse(it.parentNetwork, mapping[it.source], mapping[it.target], it )
             }.toMutableList()
 
-        return SynapseGroup2(src, tar, connectionSelector.cs.copy(), syns)
+        return SynapseGroup2(src, tar, connection, syns)
     }
 
     fun applyConnectionStrategy() {
         synapses.toList().forEach { removeSynapse(it) }
-        val syns = connectionSelector.cs.connectNeurons(
+        val syns = connection.connectNeurons(
             source.network,
             source.neuronList,
             target.neuronList,

@@ -181,7 +181,7 @@ class ParameterWidget(
             return MatrixWidget()
         }
         if (parameter.isIntArray) {
-            return IntArrayWidget()
+            return IntArrayWidget1()
         }
         if (parameter.isEnum) {
             try {
@@ -297,7 +297,7 @@ class ParameterWidget(
         } else if (parameter.isDoubleArray) {
             (component as MatrixWidget?)!!.values.transpose().toDoubleArray()
         } else if (parameter.isIntArray) {
-            (component as IntArrayWidget?)!!.values
+            (component as IntArrayWidget1?)!!.values
         } else if (parameter.isMatrix) {
             (component as MatrixWidget?)!!.values.let {
                 if (it.nrow() == 1) {
@@ -330,7 +330,7 @@ class ParameterWidget(
             } else if (parameter.isDoubleArray) {
                 (component as MatrixWidget?)!!.values = (value as DoubleArray).toMatrix().transpose()
             } else if (parameter.isIntArray) {
-                (component as IntArrayWidget?)!!.values = value as IntArray?
+                (component as IntArrayWidget1?)!!.values = value as IntArray?
             } else if (parameter.isMatrix) {
                 (component as MatrixWidget?)!!.values = (value as Matrix).let {
                     if (it.ncol() == 1) {

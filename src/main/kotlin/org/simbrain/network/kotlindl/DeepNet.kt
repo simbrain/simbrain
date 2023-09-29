@@ -38,7 +38,7 @@ class DeepNet(
     /**
      * Output matrix
      */
-    override var outputs: Matrix = Matrix(outputSize(), 1)
+    override lateinit var outputs: Matrix
 
     var prediction: Int = -1
     private set
@@ -117,6 +117,7 @@ class DeepNet(
                 floatArrayOf(0.0f)
             }
         }
+        outputs = Matrix(outputSize(), 1)
     }
 
     fun buildNetwork() {

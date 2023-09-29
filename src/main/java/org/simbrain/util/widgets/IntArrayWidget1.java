@@ -7,7 +7,7 @@ import java.awt.*;
 /**
  * A parameter widget to edit integer arrays.
  */
-public class IntArrayWidget extends JPanel {
+public class IntArrayWidget1 extends JPanel {
 
     // TODO: Abstract between this and DoubleArrayWidget?
     // TODO: Write values as soon as cell is changed (now must click outside a cell)
@@ -25,7 +25,7 @@ public class IntArrayWidget extends JPanel {
     /**
      * Construct a double array widget with 10 rows.
      */
-    public IntArrayWidget() {
+    public IntArrayWidget1() {
         model = new DefaultTableModel(10, 1);
         table.setModel(model);
         table.setGridColor(Color.gray);

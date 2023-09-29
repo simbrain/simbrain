@@ -188,6 +188,13 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
                 isConsistent
             ) as ParameterWidget2<O, T>
 
+            is IntArray -> IntArrayWidget(
+                this@AnnotatedPropertyEditor,
+                userParameter as GuiEditable<O, IntArray>,
+                isConsistent
+            ) as ParameterWidget2<O, T>
+
+
             is Matrix -> MatrixWidget2(
                 this@AnnotatedPropertyEditor,
                 userParameter as GuiEditable<O, Matrix>,

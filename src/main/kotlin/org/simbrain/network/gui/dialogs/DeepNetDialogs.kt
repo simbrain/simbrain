@@ -6,9 +6,10 @@ import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.kotlindl.*
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.math.SimbrainMath
+import org.simbrain.util.propertyeditor.APEObjectWrapper
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
-import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.ObjectTypeEditor
+import org.simbrain.util.propertyeditor.objectWrapper
 import org.simbrain.util.stats.distributions.UniformIntegerDistribution
 import org.simbrain.util.table.*
 import org.simbrain.util.widgets.EditableList
@@ -67,13 +68,6 @@ fun getDeepNetEditDialog(deepNet: DeepNet): StandardDialog {
     return dialog
 }
 
-fun getEditor(obj: CopyableObject): JPanel {
-    return ObjectTypeEditor.createEditor(
-        listOf(obj), "getTypes", "Layer",
-        false
-    )
-}
-
 /**
  * Assumes first layer is an input layer. Populated with [TFLayer] objects which can then be used to create a [DeepNet].
  */
@@ -86,10 +80,10 @@ class LayerEditor(
     init {
         // By default add dense layers
         newElementTask = {
-            addElement(getEditor(TFDenseLayer()))
+            addElement(AnnotatedPropertyEditor(objectWrapper("Layer ${layers.size + 1}", TFDenseLayer())))
         }
-        layers.forEach() {
-            addElement(getEditor(it))
+        layers.forEachIndexed { index, layer ->
+            addElement(AnnotatedPropertyEditor(objectWrapper("Layer ${index + 1}", layer)))
         }
     }
 
@@ -124,10 +118,10 @@ class LayerEditor(
     }
 
     fun commitChanges() {
-        layers.clear();
-        components.filterIsInstance<ObjectTypeEditor>().forEach {
+        layers.clear()
+        components.filterIsInstance<AnnotatedPropertyEditor<*>>().forEach {
             it.commitChanges()
-            layers.add(it.value as TFLayer<*>)
+            layers.add((it.editingObjects.first() as APEObjectWrapper<TFLayer<*>>).editingObject)
         }
     }
 

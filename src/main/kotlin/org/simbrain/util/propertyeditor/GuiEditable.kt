@@ -552,6 +552,47 @@ class DoubleArrayWidget<O : EditableObject>(
     }
 }
 
+class IntArrayWidget<O : EditableObject>(
+    val editor: AnnotatedPropertyEditor<O>,
+    parameter: GuiEditable<O, IntArray>,
+    isConsistent: Boolean
+) : ParameterWidget2<O, IntArray>(parameter, isConsistent) {
+
+    private var model = MatrixDataWrapper(parameter.value.toDoubleArray().toMatrix())
+
+    override val widget by lazy {
+        JPanel().apply {
+            layout = BorderLayout()
+            SimbrainDataViewer(
+                model, useDefaultToolbarAndMenu = false, useHeaders = false,
+                usePadding = false
+            ).also {
+                it.table.tableHeader = null
+                add(it)
+                minimumSize = Dimension(200, min((model.rowCount + 1) * 17 + 2, 100))
+                preferredSize = Dimension(200, min((model.rowCount + 1) * 17 + 2, 100))
+            }
+        }
+    }
+
+    override val value: IntArray
+        get() = model.get2DDoubleArray().first().toIntArray()
+
+    override fun refresh(property: KProperty<*>) {
+        parameter.onUpdate(UpdateFunctionContext(
+            editor,
+            parameter,
+            property,
+            enableWidgetProvider = { enabled ->
+                widget.isEnabled = enabled
+            },
+            widgetVisibilityProvider = { visible ->
+                widget.isVisible = visible
+            }
+        ))
+    }
+}
+
 class MatrixWidget2<O : EditableObject>(
     val editor: AnnotatedPropertyEditor<O>,
     parameter: GuiEditable<O, Matrix>,

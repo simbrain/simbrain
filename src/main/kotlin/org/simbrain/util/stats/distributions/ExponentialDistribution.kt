@@ -14,7 +14,6 @@ class ExponentialDistribution(lambda: Double = 1.0, negate: Boolean = false)
 
     @UserParameter(
         label = "Rate (\u03BB)",
-        useSetter = true,
         description = "The rate of exponential decay. The mean is 1/λ. For higher λ the mean is closer to 0 " +
                 "For lower λ the mean is farther from 0 and the tail is longer.",
         minimumValue = 0.00001,

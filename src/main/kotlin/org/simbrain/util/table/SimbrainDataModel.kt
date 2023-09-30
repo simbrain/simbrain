@@ -40,7 +40,7 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
     /**
      * Table-wide cell randomizer for arbitrary groups of cells.
      */
-    @UserParameter(label = "Table Randomizer", isObjectType = true)
+    @UserParameter(label = "Table Randomizer")
     var cellRandomizer = UniformRealDistribution()
 
     /**

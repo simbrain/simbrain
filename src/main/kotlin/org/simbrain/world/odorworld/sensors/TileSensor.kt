@@ -27,7 +27,7 @@ class TileSensor @JvmOverloads constructor(
     /**
      * Decay function
      */
-    @UserParameter(label = "Decay Function", isObjectType = true, showDetails = false, order = 15)
+    @UserParameter(label = "Decay Function", showDetails = false, order = 15)
     override var decayFunction: DecayFunction = LinearDecayFunction(70.0)
         set(value) {
             field = value

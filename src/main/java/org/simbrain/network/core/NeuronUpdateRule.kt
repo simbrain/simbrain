@@ -210,7 +210,7 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
 
     companion object {
         /**
-         * Called via reflection using [UserParameter.typeListMethod].
+         * Called via reflection.
          */
         /**
          * Rules for drop-down list used by [org.simbrain.util.propertyeditor.ObjectTypeEditor] to set the update rule

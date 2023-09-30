@@ -88,7 +88,7 @@ public abstract class IterableTrainer implements EditableObject {
         }
     }
 
-    @UserParameter(label = "Randomizer", isObjectType = true, order = 200)
+    @UserParameter(label = "Randomizer", order = 200)
     private ProbabilityDistribution randomizer = new UniformRealDistribution();
 
     /**

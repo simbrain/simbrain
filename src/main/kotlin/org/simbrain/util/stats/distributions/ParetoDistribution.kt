@@ -14,7 +14,6 @@ class ParetoDistribution(shape: Double = 3.0, scale: Double = 1.0, negate: Boole
 
     @UserParameter(
         label = "Shape (α)",
-        useSetter = true,
         description = "The power of the distribution.",
         minimumValue = 0.0001,
         order = 1)
@@ -26,7 +25,6 @@ class ParetoDistribution(shape: Double = 3.0, scale: Double = 1.0, negate: Boole
 
     @UserParameter(
         label = "Scale (x)",
-        useSetter = true,
         description = "The minimum value the distribution will produce.",
         minimumValue = 0.0001,
         order = 2

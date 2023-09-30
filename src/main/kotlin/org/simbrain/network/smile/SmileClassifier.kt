@@ -107,7 +107,7 @@ class SmileClassifier(
                 " that can only produce 2 outputs", conditionalEnablingMethod = "usesOutputs", order = 20)
         var nout = 2
 
-        @UserParameter(label = "Classifier Type", isObjectType = true, showDetails = false, order = 40)
+        @UserParameter(label = "Classifier Type", showDetails = false, order = 40)
         var classifierType: ClassificationAlgorithm = SVMClassifier()
 
         override val name = "Classifier"

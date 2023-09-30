@@ -31,7 +31,6 @@ public class ImageSourceProperties implements EditableObject, CopyableObject {
 
     @UserParameter(
             label = "Filter",
-            isObjectType = true,
             order = 4
     )
     private transient ImageOperation colorOp = new IdentityOp();

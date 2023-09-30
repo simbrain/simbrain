@@ -274,7 +274,7 @@ class TrainingParameters (
 
 class OptimizerParameters (
 
-    @UserParameter(label="Optimizer", isObjectType = true, showDetails = false, order = 10)
+    @UserParameter(label="Optimizer", showDetails = false, order = 10)
     var optimizerWrapper: OptimizerWrapper = AdamWrapper(),
 
     @UserParameter(label="Loss Function", order = 20)

@@ -37,7 +37,7 @@ class OdorWorldEntity @JvmOverloads constructor(
     @Transient
     private var locationPointDirty = true
 
-    @UserParameter(label = "X", description = "X Position", useSetter = true, order = 3)
+    @UserParameter(label = "X", description = "X Position", order = 3)
     override var x = 0.0
         set(value) {
             field = value
@@ -45,7 +45,7 @@ class OdorWorldEntity @JvmOverloads constructor(
             locationPointDirty = true
         }
 
-    @UserParameter(label = "Y", description = "Y Position", useSetter = true, order = 3)
+    @UserParameter(label = "Y", description = "Y Position", order = 3)
     override var y = 0.0
         set(value) {
             field = value
@@ -332,14 +332,14 @@ class OdorWorldEntity @JvmOverloads constructor(
         return sensor
     }
 
-    @get:UserParameter(label = "Linear Speed", order = 9, useSetter = true)
+    @get:UserParameter(label = "Linear Speed", order = 9)
     override var speed: Double
         get() = if (manualMovement.speed != 0.0 || manualMovement.dtheta != 0.0) manualMovement.speed else movement.speed
         set(value) {
             movement.speed = value
         }
 
-    @get:UserParameter(label = "Angular speed", order = 10, useSetter = true)
+    @get:UserParameter(label = "Angular speed", order = 10)
     override var dtheta: Double
         get() = if (manualMovement.speed != 0.0 || manualMovement.dtheta != 0.0) manualMovement.dtheta else movement.dtheta
         set(value) {

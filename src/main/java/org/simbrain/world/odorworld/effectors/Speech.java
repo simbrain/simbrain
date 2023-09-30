@@ -74,7 +74,7 @@ public class Speech extends Effector implements VisualizableEntityAttribute {
             order = 5)
     private double threshold = DEFAULT_THRESHOLD;
 
-    @UserParameter(label = "Decay Function", isObjectType = true, order = 10, tab = "Dispersion")
+    @UserParameter(label = "Decay Function", order = 10, tab = "Dispersion")
     private DecayFunction decayFunction = new LinearDecayFunction(128);
 
     /**

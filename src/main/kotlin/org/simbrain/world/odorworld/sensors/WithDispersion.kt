@@ -7,7 +7,6 @@ interface WithDispersion {
     @get:UserParameter(
         label = "Show dispersion",
         description = "Show dispersion of the sensor",
-        useSetter = true,
         order = 4
     )
     var showDispersion: Boolean

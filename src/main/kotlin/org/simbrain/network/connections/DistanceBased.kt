@@ -35,7 +35,6 @@ class DistanceBased (
     @UserParameter(
         label = "Distance Function",
         description = "Decay function for connectionprobability",
-        isObjectType = true,
         order = 1)
     var decayFunction: DecayFunction = GaussianDecayFunction()
 

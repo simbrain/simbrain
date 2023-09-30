@@ -69,7 +69,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
     /**
      * The layout for the neurons in this group.
      */
-    @UserParameter(label = "Layout", isObjectType = true, tab = "Layout", order = 150)
+    @UserParameter(label = "Layout", tab = "Layout", order = 150)
     private Layout layout = DEFAULT_LAYOUT;
 
     /**
@@ -83,7 +83,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     private int betweenNeuronInterval = 50;
 
-    @UserParameter(label = "Update Rule", useSetter = true, isObjectType = true, order = 100)
+    @UserParameter(label = "Update Rule", order = 100)
     private NeuronUpdateRule prototypeRule = new LinearRule();
 
     /**
@@ -391,11 +391,11 @@ public class NeuronGroup extends AbstractNeuronCollection {
         /**
          * A label for this Neuron Group for display purposes.
          */
-        @UserParameter(label = "Label", initialValueMethod = "getLabel", order = 10)
+        @UserParameter(label = "Label", order = 10)
         private String label;
 
         // Add this once it's possible enable based on group type
-        // @UserParameter(label = "Update Rule", isObjectType = true, order = 20)
+        // @UserParameter(label = "Update Rule", order = 20)
         // private NeuronUpdateRule prototype = new LinearRule();
 
         @UserParameter(label = "Group type", order = 30)
@@ -404,7 +404,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
         /**
          * The layout for the neurons in this group.
          */
-        @UserParameter(label = "Layout", isObjectType = true, tab = "Layout", order = 50)
+        @UserParameter(label = "Layout", tab = "Layout", order = 50)
         private Layout layout = DEFAULT_LAYOUT;
 
         /**
@@ -439,13 +439,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
             ng.setLayout(layout);
             ng.applyLayout();
             return ng;
-        }
-
-        /**
-         * Getter called by reflection by {@link UserParameter#initialValueMethod}
-         */
-        public String getLabel() {
-            return label;
         }
 
         @Override

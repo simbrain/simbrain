@@ -42,7 +42,7 @@ public abstract class Effector implements PeripheralAttribute {
     );
 
     /**
-     * Called via reflection using {@link UserParameter#typeListMethod()}.
+     * Called via reflection.
      */
     public static List<Class<? extends Effector>> getTypes() {
         return EFFECTORS_LIST;
@@ -58,8 +58,7 @@ public abstract class Effector implements PeripheralAttribute {
     /**
      * Public label of this effector.
      */
-    @UserParameter(label = "Label", description = "Optional string description associated with this effector",
-            initialValueMethod = "getLabel", order = 2)
+    @UserParameter(label = "Label", description = "Optional string description associated with this effector", order = 2)
     private String label = "";
 
     /**
@@ -127,7 +126,7 @@ public abstract class Effector implements PeripheralAttribute {
 
     public static class EffectorCreator implements EditableObject {
 
-        @UserParameter(label="Effector", isObjectType = true)
+        @UserParameter(label="Effector")
         private Effector effector = new StraightMovement();
 
         public EffectorCreator(String proposedLabel) {

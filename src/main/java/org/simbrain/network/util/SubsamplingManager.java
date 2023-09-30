@@ -18,7 +18,7 @@ public class SubsamplingManager {
      * turned on, a vector with this many components is returned by (
      * {@link #getActivations()}
      */
-    @UserParameter(label = "Number of subsamples", useSetter = true)
+    @UserParameter(label = "Number of subsamples")
     private int numSubSamples = 100;
 
     /**

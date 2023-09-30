@@ -4,7 +4,6 @@ import org.simbrain.network.smile.classifiers.KNNClassifier
 import org.simbrain.network.smile.classifiers.LogisticRegClassifier
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.network.trainers.ClassificationDataset
-import org.simbrain.util.UserParameter
 import org.simbrain.util.Utils
 import org.simbrain.util.getOneHot
 import org.simbrain.util.propertyeditor.CopyableObject
@@ -69,7 +68,7 @@ abstract class ClassificationAlgorithm(
 
     companion object {
         /**
-         * Called via reflection using [UserParameter.typeListMethod].
+         * Called via reflection.
          */
         @JvmStatic
         fun getTypes(): List<Class<*>> {

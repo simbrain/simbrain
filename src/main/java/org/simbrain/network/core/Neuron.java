@@ -65,7 +65,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * The update method of this neuron, which corresponds to what kind of
      * neuron it is.
      */
-    @UserParameter(label = "Update Rule", isObjectType = true, useSetter = true,
+    @UserParameter(label = "Update Rule",
             conditionalVisibilityMethod = "notInNeuronGroup", order = 100)
     private NeuronUpdateRule updateRule = DEFAULT_UPDATE_RULE;
 
@@ -74,7 +74,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      */
     @UserParameter(label = "Activation", description = "Neuron activation. If you want a value greater" +
             " than upper bound or less than lower bound you must set those first, and close this dialog.",
-            increment = .5, probDist = "Normal", useSetter = true, order = 1)
+            increment = .5, probDist = "Normal", order = 1)
     private double activation;
 
     /**
@@ -177,7 +177,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * By default, this is set to 0 for all the neurons. If you want a subset of
      * neurons to fire before other neurons, assign it a smaller priority value.
      */
-    @UserParameter(label = "Update Priority", useSetter = true, description = "What order neurons should be updated" +
+    @UserParameter(label = "Update Priority", description = "What order neurons should be updated" +
             "in, starting with lower values. <br> Only used with priority-based network update",
             order = 20)
     private int updatePriority;
@@ -196,7 +196,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     /**
      * Local data holder for neuron update rule.
      */
-    @UserParameter(label = "State variables", useSetter = true, order = 100)
+    @UserParameter(label = "State variables", order = 100)
     private ScalarDataHolder dataHolder = updateRule.createScalarData();
 
     /**

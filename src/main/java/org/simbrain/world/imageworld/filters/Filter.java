@@ -49,11 +49,7 @@ public class Filter implements AttributeContainer, EditableObject {
     )
     private int height;
 
-    @UserParameter(
-            label = "Filter",
-            order = 3,
-            isObjectType = true
-    )
+    @UserParameter(label = "Filter", order = 3)
     private ImageOperation imageOp;
 
     /**

@@ -21,7 +21,7 @@ abstract class OptimizerWrapper() : CopyableObject {
      */
     companion object {
         /**
-         * Called via reflection using [UserParameter.typeListMethod].
+         * Called via reflection.
          */
         @JvmStatic
         fun getTypes(): List<Class<*>> {

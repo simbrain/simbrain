@@ -70,7 +70,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     /**
      * Strength of synapse.
      */
-    @UserParameter(label = "Strength", useSetter = true, description = "Weight Strength. If you want a value greater" +
+    @UserParameter(label = "Strength", description = "Weight Strength. If you want a value greater" +
             "than upper bound or less than lower bound you must set those first, and close this dialog.",
             probDist = "Normal", probParam1 = .1, probParam2 = .5,
             order = 1)
@@ -105,15 +105,13 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     /**
      * The update method of this synapse, which corresponds to what kind of synapse it is.
      */
-    @UserParameter(label = "Learning Rule", useSetter = true,
-            isObjectType = true, order = 100)
+    @UserParameter(label = "Learning Rule", order = 100)
     private SynapseUpdateRule learningRule = DEFAULT_LEARNING_RULE;
 
     /**
      * Only used if source neuron is a spiking neuron.
      */
-    @UserParameter(label = "Spike Responder", isObjectType = true,
-            useSetter = true, showDetails = false, order = 200)
+    @UserParameter(label = "Spike Responder", showDetails = false, order = 200)
     private SpikeResponder spikeResponder = DEFAULT_SPIKE_RESPONDER;
     // TODO: Conditionally enable based on type of source neuron?
 
@@ -151,7 +149,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     /**
      * Time to delay sending activation to target neuron.
      */
-    @UserParameter(label = "Delay", useSetter = true, description = "delay", minimumValue = 0, order = 5)
+    @UserParameter(label = "Delay", description = "delay", minimumValue = 0, order = 5)
     private int delay;
 
     /**

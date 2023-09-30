@@ -57,25 +57,11 @@ annotation class UserParameter(
      */
     val maximumValue: Double = Double.NaN,
     /**
-     * Name of a method which returns a String, which is the initial value for the String widget.
-     * Note: Currently only supported for setting a String field for a single object.
-     */
-    // TODO: Possibly generalize to objects of any type. Currently only works with String based fields.
-    // TODO: Think about multi-object case.
-    val initialValueMethod: String = "",
-    /**
      * Amount that the [org.simbrain.util.widgets.SpinnerNumberModelWithNull]
      * changes when clicked up or down. Note that it is up to the user of the
      * annotation to set this so that it makes sense.
      */
     val increment: Double = 1.0,
-    /**
-     * If set to true, then when setting a parameter value the setter is invoked.
-     * Assumes that the setter is named set + fieldName, where the first letter
-     * of field name is capitalized. E.g. activation -> setActivation.
-     */
-    val useSetter: Boolean = false,
-
     /**
      * The probability distribution to use when generating random values for
      * this parameter. For options see [ProbabilityDistribution]
@@ -106,27 +92,10 @@ annotation class UserParameter(
      */
     val tab: String = "",
     /**
-     * Whether the parameter represents an object to be edited by
-     * a [org.simbrain.util.propertyeditor.ObjectTypeEditor]. Assumes
-     * the relevant object is an abstract class and the user wants to specify
-     * the type of that class: examples include NeuronUpdateRules and their types,
-     * SynapseUpdateRules and their types, etc.
-     */
-    val isObjectType: Boolean = false,
-    /**
      * For object type editors, whether the detail triangle should be present when opening
      * the editor
      */
     val showDetails: Boolean = true,
-    /**
-     * Method name for static method returning the type map for an [org.simbrain.util.propertyeditor.ObjectTypeEditor],
-     * e.g. "getTypeMap".  Defaults to "getTypes". This method should be contained in the
-     * class whose types are being edited. For example [ProbabilityDistribution] has a `getTypes()` method that
-     * returns a list of the types of its subclasses.
-     *
-     * @return the name of the method that returns types.  The default is usually fine.
-     */
-    val typeListMethod: String = "getTypes",
     /**
      * If true only show the value but don't allow editing.
      */

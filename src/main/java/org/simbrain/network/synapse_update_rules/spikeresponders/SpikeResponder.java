@@ -25,7 +25,6 @@ import org.simbrain.network.util.EmptyMatrixData;
 import org.simbrain.network.util.EmptyScalarData;
 import org.simbrain.network.util.MatrixDataHolder;
 import org.simbrain.network.util.ScalarDataHolder;
-import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.CopyableObject;
 
 import java.util.ArrayList;
@@ -50,7 +49,7 @@ public abstract class SpikeResponder implements CopyableObject {
         RiseAndDecay.class, StepResponder.class, UDF.class);
 
     /**
-     * Called via reflection using {@link UserParameter#typeListMethod()}.
+     * Called via reflection.
      */
     public static List<Class> getTypes() {
         return RESPONDER_LIST;

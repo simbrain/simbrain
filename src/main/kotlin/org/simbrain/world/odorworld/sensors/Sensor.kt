@@ -22,7 +22,6 @@ abstract class Sensor : PeripheralAttribute {
     @UserParameter(
         label = "Label",
         description = "Optional string description associated with this sensor",
-        initialValueMethod = "getLabel",
         order = 1
     )
     private var label = ""

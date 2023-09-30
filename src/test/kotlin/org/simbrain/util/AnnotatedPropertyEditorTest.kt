@@ -6,7 +6,7 @@ import org.simbrain.network.NetworkModel
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
-import org.simbrain.util.propertyeditor.NumericWidget2
+import org.simbrain.util.propertyeditor.NumericWidget
 import org.simbrain.util.propertyeditor.StringWidget
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.declaredMemberProperties
@@ -30,7 +30,7 @@ class AnnotatedPropertyEditorTest {
     fun `test commit numeric widget`() {
         val ape = AnnotatedPropertyEditor(n1)
         val prop = Neuron::class.declaredMemberProperties.first { it.name == "activation" }
-        (ape.propertyWidgetMap[prop] as NumericWidget2).widget.value = .75
+        (ape.propertyWidgetMap[prop] as NumericWidget).widget.value = .75
         ape.commitChanges()
         assertEquals(.75, n1.activation)
     }
@@ -40,7 +40,7 @@ class AnnotatedPropertyEditorTest {
         n1.forceSetActivation(.75)
         val ape = AnnotatedPropertyEditor(n1)
         val prop = Neuron::class.declaredMemberProperties.first { it.name == "activation" }
-        val widgetVal = (ape.propertyWidgetMap[prop] as NumericWidget2).widget.value
+        val widgetVal = (ape.propertyWidgetMap[prop] as NumericWidget).widget.value
         assertEquals(.75, widgetVal)
     }
 
@@ -68,8 +68,8 @@ class AnnotatedPropertyEditorTest {
         n2.forceSetActivation(.75)
         val ape = AnnotatedPropertyEditor(n1, n2)
         val prop = Neuron::class.declaredMemberProperties.first { it.name == "activation" }
-        assertEquals(true, (ape.propertyWidgetMap[prop] as NumericWidget2).isConsistent)
-        (ape.propertyWidgetMap[prop] as NumericWidget2).widget.value = .25
+        assertEquals(true, (ape.propertyWidgetMap[prop] as NumericWidget).isConsistent)
+        (ape.propertyWidgetMap[prop] as NumericWidget).widget.value = .25
         ape.commitChanges()
         assertEquals(.25, n1.activation)
         assertEquals(.25, n2.activation)
@@ -81,8 +81,8 @@ class AnnotatedPropertyEditorTest {
         n2.forceSetActivation(.74)
         val ape = AnnotatedPropertyEditor(n1, n2)
         val prop = Neuron::class.declaredMemberProperties.first { it.name == "activation" }
-        assertEquals(false, (ape.propertyWidgetMap[prop] as NumericWidget2).isConsistent)
-        (ape.propertyWidgetMap[prop] as NumericWidget2).widget.value = .25
+        assertEquals(false, (ape.propertyWidgetMap[prop] as NumericWidget).isConsistent)
+        (ape.propertyWidgetMap[prop] as NumericWidget).widget.value = .25
         ape.commitChanges()
         assertEquals(.25, n1.activation)
         assertEquals(.25, n2.activation)

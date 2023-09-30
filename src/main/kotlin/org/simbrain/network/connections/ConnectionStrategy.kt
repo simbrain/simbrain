@@ -22,7 +22,6 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.gui.ConnectionStrategyPanel
-import org.simbrain.util.UserParameter
 import org.simbrain.util.displayInDialog
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.stats.ProbabilityDistribution
@@ -106,7 +105,7 @@ abstract class ConnectionStrategy : CopyableObject {
 
     companion object {
         /**
-         * Called via reflection using [UserParameter.typeListMethod].
+         * Called via reflection.
          */
         @JvmStatic
         fun getTypes(): List<Class<*>> {

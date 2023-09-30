@@ -76,15 +76,14 @@ public class TimeSeriesModel implements AttributeContainer, EditableObject {
     private double rangeLowerBound = 0;
 
     @UserParameter(label = "Fixed Width", description = "If true, the time series window never " +
-            "extends beyond a fixed with", useSetter = true, order = 60)
+            "extends beyond a fixed with", order = 60)
     private boolean fixedWidth = false;
 
     /**
      * Size of window when fixed width is being used.
      */
     @UserParameter(label = "Window Size", description = "Number of time points to restrict window to, " +
-            "when fixedWidth is turned on", minimumValue = 10, conditionalEnablingMethod = "usesFixedWidth",
-            useSetter = true, increment = 10, order = 70)
+            "when fixedWidth is turned on", minimumValue = 10, conditionalEnablingMethod = "usesFixedWidth", increment = 10, order = 70)
     private int windowSize = 100;
 
     /**

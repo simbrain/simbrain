@@ -58,7 +58,7 @@ abstract class DecayFunction(
         /**
          * The layout for the neurons in this group.
          */
-        @UserParameter(label = "Decay Function", isObjectType = true, tab = "Layout", order = 50)
+        @UserParameter(label = "Decay Function", tab = "Layout", order = 50)
         var decayFunction: DecayFunction = decayFunction
 
         override val name = "Decay Function"

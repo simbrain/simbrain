@@ -36,7 +36,7 @@ class Projector2(initialDimension: Int = 25) : EditableObject, CoroutineScope {
     /**
      * The method used to project from high dimensional data upstairs to low dimensional data downstairs.
      */
-    @UserParameter(label = "Projection Method", useSetter = true, isObjectType = true, order = 100)
+    @UserParameter(label = "Projection Method", order = 100)
     var projectionMethod: ProjectionMethod2 = PCAProjection2()
         set(value) {
             val oldMethod = field
@@ -63,7 +63,7 @@ class Projector2(initialDimension: Int = 25) : EditableObject, CoroutineScope {
     @UserParameter(label = "Use hot point", description = "If true, current point is rendered using the hotpoint color", order = 50)
     var useHotColor = true
 
-    @UserParameter(label = "Coloring Manager", isObjectType = true, order = 110)
+    @UserParameter(label = "Coloring Manager", order = 110)
     var coloringManager: ColoringManager = NoOpColoringManager().also { it.projector = this }
 
     fun addDataPoint(newPoint: DataPoint2) {

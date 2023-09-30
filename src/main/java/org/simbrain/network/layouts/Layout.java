@@ -36,7 +36,7 @@ import java.util.List;
 public abstract class Layout implements CopyableObject {
 
     /**
-     * Called via reflection using {@link UserParameter#typeListMethod()}.
+     * Called via reflection.
      */
     public static List<Class> getTypes() {
         return Arrays.asList(LineLayout.class, GridLayout.class, HexagonalGridLayout.class);
@@ -75,7 +75,7 @@ public abstract class Layout implements CopyableObject {
      */
     public static class LayoutEditor implements EditableObject {
 
-        @UserParameter(label = "Layout", isObjectType = true)
+        @UserParameter(label = "Layout")
         private Layout layout = new GridLayout();
 
         public Layout getLayout() {

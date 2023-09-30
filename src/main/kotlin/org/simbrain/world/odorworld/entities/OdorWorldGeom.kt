@@ -26,7 +26,7 @@ class Location(@Transient private val event: EntityLocationEvent) : Locatable {
     @Transient
     private var dirty = true
 
-    @UserParameter(label = "X", description = "X Position", useSetter = true, order = 3)
+    @UserParameter(label = "X", description = "X Position", order = 3)
     override var x = 0.0
         set(value) {
             field = value
@@ -34,7 +34,7 @@ class Location(@Transient private val event: EntityLocationEvent) : Locatable {
             dirty = true
         }
 
-    @UserParameter(label = "Y", description = "Y Position", useSetter = true, order = 3)
+    @UserParameter(label = "Y", description = "Y Position", order = 3)
     override var y = 0.0
         set(value) {
             field = value
@@ -122,7 +122,7 @@ interface ManuallyMovable : Movable {
     /**
      * Amount to manually move forward or in cardinal directions.
      */
-    @get:UserParameter(label = "Straight movement", order = 10, useSetter = true)
+    @get:UserParameter(label = "Straight movement", order = 10)
     var manualStraightMovementIncrement: Double
 
     /**

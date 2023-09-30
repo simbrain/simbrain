@@ -23,7 +23,7 @@ import java.awt.geom.Rectangle2D
  * A "neuron array" backed by a Smile Matrix. Stored as a column vector.
  */
 class NeuronArray(parent: Network, inputSize: Int) : ArrayLayer(parent, inputSize), EditableObject, AttributeContainer {
-    @UserParameter(label = "Update Rule", useSetter = true, isObjectType = true, order = 100)
+    @UserParameter(label = "Update Rule", order = 100)
     var updateRule: NeuronUpdateRule<ScalarDataHolder, MatrixDataHolder> = LinearRule()
         set(value) {
             val typeChanged = field::class != value::class
@@ -75,7 +75,7 @@ class NeuronArray(parent: Network, inputSize: Int) : ArrayLayer(parent, inputSiz
     var isRenderActivations = true
 
     @UserParameter(
-        label = "Grid Mode", useSetter = true, description = "If true, show activations as a grid, " +
+        label = "Grid Mode", description = "If true, show activations as a grid, " +
                 "otherwise show them as a line", order = 10
     )
     var gridMode = false
@@ -84,7 +84,7 @@ class NeuronArray(parent: Network, inputSize: Int) : ArrayLayer(parent, inputSiz
             (events as NeuronArrayEvents2).visualPropertiesChanged.fireAndBlock()
         }
 
-    @UserParameter(label = "Biases Visible", useSetter = true, description = "If true, show biases.", order = 11)
+    @UserParameter(label = "Biases Visible", description = "If true, show biases.", order = 11)
     var isShowBias = false
         set(showBias) {
             field = showBias

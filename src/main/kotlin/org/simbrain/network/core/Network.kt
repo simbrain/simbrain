@@ -86,7 +86,6 @@ class Network: CoroutineScope, EditableObject {
     @UserParameter(
         label = "Neuron Connector",
         description = "Strategy for connecting free neurons.",
-        isObjectType = true,
         showDetails = false,
         order = 0
     )
@@ -95,7 +94,6 @@ class Network: CoroutineScope, EditableObject {
     @UserParameter(
         label = "Weight Randomizer",
         description = "Randomizer for all free weights, regardless of polarity. Applying it can change the polarity of a neuron.",
-        isObjectType = true,
         showDetails = false,
         order = 10
     )
@@ -104,7 +102,6 @@ class Network: CoroutineScope, EditableObject {
     @UserParameter(
         label = "Excitatory Randomizer",
         description = "Randomizer for all weights from polarized excitatory neurons. Applying it will not change the polarity of a neuron.",
-        isObjectType = true,
         showDetails = false,
         order = 20
     )
@@ -113,7 +110,6 @@ class Network: CoroutineScope, EditableObject {
     @UserParameter(
         label = "Inhibitory Randomizer",
         description = "Randomizer for all weights from polarized inhibitory neurons. Applying it will not change the polarity of a neuron.",
-        isObjectType = true,
         showDetails = false,
         order = 30
     )
@@ -122,7 +118,6 @@ class Network: CoroutineScope, EditableObject {
     @UserParameter(
         label = "Bias Randomizer",
         description = "Randomizer for all biases.",
-        isObjectType = true,
         showDetails = false,
         order = 40
     )

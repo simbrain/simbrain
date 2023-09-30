@@ -8,10 +8,10 @@ import org.simbrain.util.stats.ProbabilityDistribution
  * numbers.
  */
 class TwoValued(
-    @UserParameter(label = "Lower value", useSetter = true, order = 1)
+    @UserParameter(label = "Lower value", order = 1)
     var lowerValue: Double = -1.0,
 
-    @UserParameter(label = "Upper value", useSetter = true, order = 2)
+    @UserParameter(label = "Upper value", order = 2)
     var upperValue: Double = 1.0,
 
     @UserParameter(

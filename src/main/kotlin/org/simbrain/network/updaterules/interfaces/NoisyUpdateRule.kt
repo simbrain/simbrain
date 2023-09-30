@@ -15,7 +15,7 @@ interface NoisyUpdateRule {
      *
      * @param rand the generator to set
      */
-    @UserParameter(label = "Randomizer", isObjectType = true, showDetails = false, order = 1000, tab = "Noise")
+    @UserParameter(label = "Randomizer", showDetails = false, order = 1000, tab = "Noise")
     var noiseGenerator: ProbabilityDistribution
 
     /**

@@ -32,14 +32,13 @@ public class WeightMatrix extends Connector {
     @UserParameter(label = "Increment amount", increment = .1, order = 20)
     private double increment = .1;
 
-    @UserParameter(label = "Learning Rule", useSetter = true, isObjectType = true, order = 100)
+    @UserParameter(label = "Learning Rule", order = 100)
     SynapseUpdateRule learningRule = new StaticSynapseRule();
 
     /**
      * Only used if source connector's rule is spiking.
      */
-    @UserParameter(label = "Spike Responder", isObjectType = true,
-            useSetter = true, showDetails = false, order = 200)
+    @UserParameter(label = "Spike Responder", showDetails = false, order = 200)
     private SpikeResponder spikeResponder = new NonResponder();
     // TODO: Conditionally enable based on type of source array rule?
 

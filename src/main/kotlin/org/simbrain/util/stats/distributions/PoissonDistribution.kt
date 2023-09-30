@@ -14,7 +14,6 @@ class PoissonDistribution(p: Double = 1.0, negate: Boolean = false)
 
     @UserParameter(
         label = "Mean value",
-        useSetter = true,
         description = "The discrete value you should expect to see most often. Also called lambda/",
         minimumValue = 0.00001,
         increment = 1.0,

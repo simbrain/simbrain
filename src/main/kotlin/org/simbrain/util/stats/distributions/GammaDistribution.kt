@@ -14,7 +14,6 @@ class GammaDistribution(shape: Double = 2.0, scale: Double = 1.0, negate: Boolea
 
     @UserParameter(
         label = "Shape (k)",
-        useSetter = true,
         description = "Shape (k).",
         minimumValue = 0.0001,
         order = 1)
@@ -25,7 +24,6 @@ class GammaDistribution(shape: Double = 2.0, scale: Double = 1.0, negate: Boolea
         }
 
     @UserParameter(label = "Scale (\u03B8)",
-        useSetter = true,
         description = "Scale (\u03B8).",
         minimumValue = 0.0001,
         order = 2)

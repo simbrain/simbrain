@@ -16,7 +16,6 @@ class LogNormalDistribution(location: Double = 1.0, scale: Double = .5, negate: 
     // TODO: Should this be min 0? The apache requires it but wiki suggests not.
     @UserParameter(
         label = "Location (μ)",
-        useSetter = true,
         description = "The mean μ of the logarithm of this distribution.",
         increment = .1,
         order = 1
@@ -29,7 +28,6 @@ class LogNormalDistribution(location: Double = 1.0, scale: Double = .5, negate: 
 
     @UserParameter(
         label = "Scale (σ)",
-        useSetter = true,
         description = "The standard deviation or shape σ of the logarithm of this distribution.",
         minimumValue = 0.0,
         increment = .1,

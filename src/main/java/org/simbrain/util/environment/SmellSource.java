@@ -54,7 +54,6 @@ public class SmellSource implements EditableObject {
             label = "Decay function",
             description = "Way of decaying the stimulus",
             showDetails = false,
-            isObjectType = true,
             order= 5
     )
     private DecayFunction decayFunction = new LinearDecayFunction(70);
@@ -74,7 +73,6 @@ public class SmellSource implements EditableObject {
      */
     @UserParameter(
             label = "Randomizer",
-            isObjectType = true,
             showDetails = false,
             conditionalEnablingMethod = "useRandomWinner",
             order = 15)

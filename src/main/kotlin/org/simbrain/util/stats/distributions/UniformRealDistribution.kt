@@ -10,7 +10,6 @@ class UniformRealDistribution(floor:Double = 0.0, ceil: Double = 1.0) : Probabil
 
     @UserParameter(
         label = "Ceiling",
-        useSetter = true,
         description = "Max of the uniform distribution.",
         order = 1)
     var ceil = ceil
@@ -21,7 +20,6 @@ class UniformRealDistribution(floor:Double = 0.0, ceil: Double = 1.0) : Probabil
 
     @UserParameter(
         label = "Floor",
-        useSetter = true,
         description = "Min of the uniform distribution.",
         order = 2)
     var floor = floor

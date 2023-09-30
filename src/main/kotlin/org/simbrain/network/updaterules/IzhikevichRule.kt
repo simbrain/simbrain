@@ -53,7 +53,6 @@ class IzhikevichRule : SpikingNeuronUpdateRule<SpikingScalarData, SpikingMatrixD
         description = "Parameter for recovery variable.",
         increment = .01,
         order = 2,
-        useSetter = true,
         probDist = "Uniform",
         probParam1 = .15,
         probParam2 = .3

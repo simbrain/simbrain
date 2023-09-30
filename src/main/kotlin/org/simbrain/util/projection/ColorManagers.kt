@@ -88,7 +88,7 @@ class DecayColoringManager @JvmOverloads constructor(projector: Projector2? = nu
             valuesToColors = initColors()
         }
 
-    @UserParameter(label = "Steps", description = "Steps to base color", useSetter = true, minimumValue = 0.0)
+    @UserParameter(label = "Steps", description = "Steps to base color", minimumValue = 0.0)
     var stepsToBase = 100
         set(value) {
             field = value

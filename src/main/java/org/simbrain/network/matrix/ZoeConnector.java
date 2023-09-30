@@ -20,7 +20,7 @@ public class ZoeConnector extends Connector {
     @UserParameter(label = "Increment amount", increment = .1, order = 20)
     private double increment = .1;
 
-    @UserParameter(label = "Learning Rule", useSetter = true, isObjectType = true, order = 100)
+    @UserParameter(label = "Learning Rule", order = 100)
     SynapseUpdateRule prototypeRule = new StaticSynapseRule();
 
     /**

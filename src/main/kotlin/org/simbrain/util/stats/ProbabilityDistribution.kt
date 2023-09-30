@@ -7,7 +7,6 @@ import com.thoughtworks.xstream.converters.reflection.ReflectionProvider
 import com.thoughtworks.xstream.io.HierarchicalStreamReader
 import com.thoughtworks.xstream.mapper.Mapper
 import org.apache.commons.math3.random.JDKRandomGenerator
-import org.simbrain.util.UserParameter
 import org.simbrain.util.createConstructorCallingConverter
 import org.simbrain.util.getSimbrainXStream
 import org.simbrain.util.propertyeditor.CopyableObject
@@ -73,7 +72,7 @@ abstract class ProbabilityDistribution() : CopyableObject {
         }
 
         /**
-         * Called via reflection using [UserParameter.typeListMethod].
+         * Called via reflection.
          */
         @JvmStatic
         fun getTypes(): List<Class<*>> {

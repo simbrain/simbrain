@@ -21,7 +21,7 @@ abstract class NetworkModel {
      */
     @get:Producible(defaultVisibility = false)
     @set:Consumable(defaultVisibility = false)
-    @UserParameter(label = "Label", description = "Optional string description", useSetter = true, order = 2)
+    @UserParameter(label = "Label", description = "Optional string description", order = 2)
     var label: String? = ""
         set(label) {
             val oldLabel = this.label

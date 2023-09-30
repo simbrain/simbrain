@@ -57,7 +57,7 @@ abstract class TFLayer<T : Layer> : CopyableObject {
 
     companion object {
         /**
-         * Called via reflection using [UserParameter.typeListMethod].
+         * Called via reflection.
          */
         @JvmStatic
         fun getTypes(): List<Class<*>> {

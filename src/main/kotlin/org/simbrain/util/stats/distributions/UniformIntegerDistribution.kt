@@ -10,7 +10,6 @@ class UniformIntegerDistribution(floor:Int = 0, ceil: Int = 1) : ProbabilityDist
 
     @UserParameter(
         label = "Ceiling",
-        useSetter = true,
         description = "Highest integer possible.",
         order = 1)
     var ceil = ceil
@@ -20,7 +19,6 @@ class UniformIntegerDistribution(floor:Int = 0, ceil: Int = 1) : ProbabilityDist
         }
 
     @UserParameter(label = "Floor",
-        useSetter = true,
         description = "Smallest integer possible.",
         order = 2)
     var floor = floor

@@ -205,7 +205,7 @@ class ParameterEvents<O : EditableObject, T> : Events2() {
 
 }
 
-sealed class ParameterWidget2<O : EditableObject, T>(val parameter: GuiEditable<O, T>, var isConsistent: Boolean) {
+sealed class ParameterWidget<O : EditableObject, T>(val parameter: GuiEditable<O, T>, var isConsistent: Boolean) {
 
     val events = ParameterEvents<O, T>()
 
@@ -221,7 +221,7 @@ class EnumWidget<O : EditableObject, T : Enum<*>>(
     val editor: AnnotatedPropertyEditor<O>,
     parameter: GuiEditable<O, T>,
     isConsistent: Boolean
-) : ParameterWidget2<O, T>(parameter, isConsistent) {
+) : ParameterWidget<O, T>(parameter, isConsistent) {
 
     override val widget by lazy {
 
@@ -267,7 +267,7 @@ class BooleanWidget<O : EditableObject>(
     val editor: AnnotatedPropertyEditor<O>,
     parameter: GuiEditable<O, Boolean>,
     isConsistent: Boolean
-) : ParameterWidget2<O, Boolean>(parameter, isConsistent) {
+) : ParameterWidget<O, Boolean>(parameter, isConsistent) {
 
     override val widget by lazy {
         YesNoNull().also {
@@ -302,11 +302,11 @@ class BooleanWidget<O : EditableObject>(
     }
 }
 
-class NumericWidget2<O : EditableObject, T>(
+class NumericWidget<O : EditableObject, T>(
     val editor: AnnotatedPropertyEditor<O>,
     parameter: GuiEditable<O, T>,
     isConsistent: Boolean
-) : ParameterWidget2<O, T>(parameter, isConsistent) {
+) : ParameterWidget<O, T>(parameter, isConsistent) {
 
     val type = parameter.property.returnType.classifier as KClass<*>
 
@@ -379,7 +379,7 @@ class NumericWidget2<O : EditableObject, T>(
         }.also {
             it.addChangeListener {
                 events.valueChanged.fireAndBlock(parameter.property)
-                this@NumericWidget2.isConsistent = true
+                this@NumericWidget.isConsistent = true
             }
         }
     }
@@ -407,7 +407,7 @@ class DisplayOnlyWidget<O : EditableObject, T>(
     val editor: AnnotatedPropertyEditor<O>,
     parameter: GuiEditable<O, T>,
     isConsistent: Boolean
-) : ParameterWidget2<O, T>(parameter, isConsistent) {
+) : ParameterWidget<O, T>(parameter, isConsistent) {
 
     override val widget by lazy {
         JLabel().also {
@@ -435,7 +435,7 @@ class StringWidget<O : EditableObject>(
     val editor: AnnotatedPropertyEditor<O>,
     parameter: GuiEditable<O, String>,
     isConsistent: Boolean
-) : ParameterWidget2<O, String>(parameter, isConsistent) {
+) : ParameterWidget<O, String>(parameter, isConsistent) {
 
     override val widget by lazy {
         JTextField().also {
@@ -484,7 +484,7 @@ class ColorWidget<O : EditableObject>(
     val editor: AnnotatedPropertyEditor<O>,
     parameter: GuiEditable<O, Color>,
     isConsistent: Boolean
-) : ParameterWidget2<O, Color>(parameter, isConsistent) {
+) : ParameterWidget<O, Color>(parameter, isConsistent) {
 
     override val widget by lazy {
         ColorSelector().also {
@@ -517,7 +517,7 @@ class DoubleArrayWidget<O : EditableObject>(
     val editor: AnnotatedPropertyEditor<O>,
     parameter: GuiEditable<O, DoubleArray>,
     isConsistent: Boolean
-) : ParameterWidget2<O, DoubleArray>(parameter, isConsistent) {
+) : ParameterWidget<O, DoubleArray>(parameter, isConsistent) {
 
     private var model = MatrixDataWrapper(parameter.value.toMatrix())
 
@@ -558,7 +558,7 @@ class IntArrayWidget<O : EditableObject>(
     val editor: AnnotatedPropertyEditor<O>,
     parameter: GuiEditable<O, IntArray>,
     isConsistent: Boolean
-) : ParameterWidget2<O, IntArray>(parameter, isConsistent) {
+) : ParameterWidget<O, IntArray>(parameter, isConsistent) {
 
     private var model = MatrixDataWrapper(parameter.value.toDoubleArray().toMatrix())
 
@@ -595,11 +595,11 @@ class IntArrayWidget<O : EditableObject>(
     }
 }
 
-class MatrixWidget2<O : EditableObject>(
+class MatrixWidget<O : EditableObject>(
     val editor: AnnotatedPropertyEditor<O>,
     parameter: GuiEditable<O, Matrix>,
     isConsistent: Boolean
-) : ParameterWidget2<O, Matrix>(parameter, isConsistent) {
+) : ParameterWidget<O, Matrix>(parameter, isConsistent) {
 
     private var model = MatrixDataWrapper(parameter.value)
 
@@ -641,7 +641,7 @@ class ObjectWidget<O : EditableObject, T : CopyableObject>(
     private val objectList: List<T>,
     parameter: GuiEditable<O, T>,
     isConsistent: Boolean
-) : ParameterWidget2<O, T>(parameter, isConsistent) {
+) : ParameterWidget<O, T>(parameter, isConsistent) {
 
     private var _prototypeObject: T? = null
 

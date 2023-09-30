@@ -14,7 +14,7 @@ import kotlin.reflect.jvm.isAccessible
 /**
  * A panel that takes a set of objects either annotated with [UserParameter] or set to [GuiEditable] objects, and
  * produces a set of appropriate widgets for editing each object in a provided list. Each annotated field is
- * represented by an appropriate [ParameterWidget2] class.
+ * represented by an appropriate [ParameterWidget] class.
  *
  * When edited objects have different values a null value "..." is shown.  Null values are ignored when the panel is
  * closed, and any values in the panel are written to it.
@@ -152,7 +152,7 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
             }
         }
 
-    fun <T> makeWidget(userParameter: GuiEditable<O, T>, isConsistent: Boolean): ParameterWidget2<O, T> {
+    fun <T> makeWidget(userParameter: GuiEditable<O, T>, isConsistent: Boolean): ParameterWidget<O, T> {
         if (userParameter.displayOnly) {
             return DisplayOnlyWidget(
                 this@AnnotatedPropertyEditor,
@@ -167,57 +167,57 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
                 this@AnnotatedPropertyEditor,
                 userParameter as GuiEditable<O, String>,
                 isConsistent
-            ) as ParameterWidget2<O, T>
+            ) as ParameterWidget<O, T>
 
             is Boolean -> BooleanWidget(
                 this@AnnotatedPropertyEditor,
                 userParameter as GuiEditable<O, Boolean>,
                 isConsistent
-            ) as ParameterWidget2<O, T>
+            ) as ParameterWidget<O, T>
 
-            is Int, is Short, is Long, is Double, is Float -> NumericWidget2(
+            is Int, is Short, is Long, is Double, is Float -> NumericWidget(
                 this@AnnotatedPropertyEditor,
                 userParameter as GuiEditable<O, *>,
                 isConsistent
-            ) as ParameterWidget2<O, T>
+            ) as ParameterWidget<O, T>
 
             is Color -> ColorWidget(
                 this@AnnotatedPropertyEditor,
                 userParameter as GuiEditable<O, Color>,
                 isConsistent
-            ) as ParameterWidget2<O, T>
+            ) as ParameterWidget<O, T>
 
             is Enum<*> -> EnumWidget(
                 this@AnnotatedPropertyEditor,
                 userParameter as GuiEditable<O, Enum<*>>,
                 isConsistent
-            ) as ParameterWidget2<O, T>
+            ) as ParameterWidget<O, T>
 
             is DoubleArray -> DoubleArrayWidget(
                 this@AnnotatedPropertyEditor,
                 userParameter as GuiEditable<O, DoubleArray>,
                 isConsistent
-            ) as ParameterWidget2<O, T>
+            ) as ParameterWidget<O, T>
 
             is IntArray -> IntArrayWidget(
                 this@AnnotatedPropertyEditor,
                 userParameter as GuiEditable<O, IntArray>,
                 isConsistent
-            ) as ParameterWidget2<O, T>
+            ) as ParameterWidget<O, T>
 
 
-            is Matrix -> MatrixWidget2(
+            is Matrix -> MatrixWidget(
                 this@AnnotatedPropertyEditor,
                 userParameter as GuiEditable<O, Matrix>,
                 isConsistent
-            ) as ParameterWidget2<O, T>
+            ) as ParameterWidget<O, T>
 
             is CopyableObject -> ObjectWidget(
                 this@AnnotatedPropertyEditor,
                 editingObjects.map { eo -> userParameter.property.get(eo) as CopyableObject },
                 userParameter as GuiEditable<O, CopyableObject>,
                 isConsistent
-            ) as ParameterWidget2<O, T>
+            ) as ParameterWidget<O, T>
 
             else -> throw IllegalArgumentException("Unsupported type: ${userParameter.value!!::class.simpleName}")
         }
@@ -243,7 +243,7 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
         parameterWidgetMap.map { (_, widget) -> parameterWidgetMap.forEach { (_, w) -> w.refresh(widget.parameter.property) } }
     }
 
-    private fun getWidgetByLabel(label: String): ParameterWidget2<O, *> {
+    private fun getWidgetByLabel(label: String): ParameterWidget<O, *> {
         return propertyWidgetMap.values.first { it.isConsistent && it.parameter.label == label }
     }
 

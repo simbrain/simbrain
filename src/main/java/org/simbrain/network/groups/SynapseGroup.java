@@ -117,19 +117,17 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
     @UserParameter(label = "Excitatory ratio", displayOnly = true, order = 50)
     private double excitatoryRatio = DEFAULT_EXCITATORY_RATIO;
 
-    @UserParameter(label = "Excitatory Learning Rule", useSetter = true,
-            isObjectType = true, order = 100)
+    @UserParameter(label = "Excitatory Learning Rule", order = 100)
     private SynapseUpdateRule exLearningRule = new StaticSynapseRule();
 
-    @UserParameter(label = "Excitatory Spike Responder", isObjectType = true,
+    @UserParameter(label = "Excitatory Spike Responder",
             showDetails = false, order = 200)
     private SpikeResponder exSpikeResponder = new NonResponder();
 
-    @UserParameter(label = "Inhibitory Learning Rule", useSetter = true,
-            isObjectType = true, order = 100)
+    @UserParameter(label = "Inhibitory Learning Rule", order = 100)
     private SynapseUpdateRule inLearningRule = new StaticSynapseRule();
 
-    @UserParameter(label = "Inhibitory Spike Responder", isObjectType = true,
+    @UserParameter(label = "Inhibitory Spike Responder",
             showDetails = false, order = 200)
     private SpikeResponder inSpikeResponder = new NonResponder();
 

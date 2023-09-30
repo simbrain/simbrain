@@ -24,7 +24,6 @@ import org.simbrain.network.util.EmptyMatrixData;
 import org.simbrain.network.util.EmptyScalarData;
 import org.simbrain.network.util.MatrixDataHolder;
 import org.simbrain.network.util.ScalarDataHolder;
-import org.simbrain.util.UserParameter;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.CopyableObject;
 
@@ -48,7 +47,7 @@ public abstract class SynapseUpdateRule<DS extends ScalarDataHolder, DM extends 
         STDPRule.class, SubtractiveNormalizationRule.class);
 
     /**
-     * Called via reflection using {@link UserParameter#typeListMethod()}.
+     * Called via reflection.
      */
     public static List<Class> getTypes() {
         return RULE_LIST;

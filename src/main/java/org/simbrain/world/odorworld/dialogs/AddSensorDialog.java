@@ -40,7 +40,7 @@ public class AddSensorDialog extends StandardDialog {
     /**
      * Main editing panel.
      */
-    private AnnotatedPropertyEditor sensorCreatorPanel;
+    private AnnotatedPropertyEditor<APEObjectWrapper<Sensor>> sensorCreatorPanel;
 
     /**
      * Main dialog box.
@@ -74,7 +74,7 @@ public class AddSensorDialog extends StandardDialog {
     protected void closeDialogOk() {
         super.closeDialogOk();
         sensorCreatorPanel.commitChanges();
-        entity.addSensor(((APEObjectWrapper<Sensor>)sensorCreatorPanel.getEditingObjects().stream().findFirst().get()).getEditingObject());
+        entity.addSensor(AnnotatedPropertyEditorKt.getWrapperWidgetValue(sensorCreatorPanel));
     }
 
 }

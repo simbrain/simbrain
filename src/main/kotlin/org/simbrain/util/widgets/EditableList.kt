@@ -2,6 +2,8 @@ package org.simbrain.util.widgets
 
 import org.simbrain.util.LabelledItemPanel
 import org.simbrain.util.ResourceManager
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
+import org.simbrain.util.propertyeditor.EditableObject
 import java.awt.BorderLayout
 import java.awt.Dimension
 import javax.swing.*
@@ -13,10 +15,10 @@ import javax.swing.*
  *
  * @author Jeff Yoshimi
  */
-open class EditableList(private val showAddRemove: Boolean = true) : JPanel() {
+open class EditableList<O: EditableObject>(private val showAddRemove: Boolean = true) : JPanel() {
 
 
-    val components: MutableList<JComponent> = arrayListOf()
+    val components: MutableList<AnnotatedPropertyEditor<O>> = arrayListOf()
     val mainPanel = EditableItemPanel(components)
 
     /**
@@ -48,7 +50,7 @@ open class EditableList(private val showAddRemove: Boolean = true) : JPanel() {
         })
     }
 
-    fun addElement(c: JComponent) {
+    fun addElement(c: AnnotatedPropertyEditor<O>) {
         components.add(c)
         mainPanel.addItem(c)
     }

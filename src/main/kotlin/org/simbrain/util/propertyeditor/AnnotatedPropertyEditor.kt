@@ -243,6 +243,18 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
         parameterWidgetMap.map { (_, widget) -> parameterWidgetMap.forEach { (_, w) -> w.refresh(widget.parameter.property) } }
     }
 
+    private fun getWidgetByLabel(label: String): ParameterWidget2<O, *> {
+        return propertyWidgetMap.values.first { it.isConsistent && it.parameter.label == label }
+    }
+
+    fun getWidgetValueByLabel(label: String): Any? {
+        return getWidgetByLabel(label).value
+    }
+
+    fun getWidgetEventsByLabel(label: String): ParameterEvents<*, *> {
+        return getWidgetByLabel(label).events
+    }
+
 }
 
 class APEObjectWrapper<O : EditableObject>(val label: String, obj: O) : EditableObject {
@@ -257,3 +269,15 @@ class APEObjectWrapper<O : EditableObject>(val label: String, obj: O) : Editable
  * so that we can edit the object itself with a dropdown.
  */
 fun <O : EditableObject> objectWrapper(label: String, obj: O) = APEObjectWrapper(label, obj)
+
+/**
+ * Returns the widget associated with the object being edited.
+ * Example: the [ObjectWidget] used to select a probability distribution.
+ */
+val <O: EditableObject> AnnotatedPropertyEditor<APEObjectWrapper<O>>.wrapperWidget get() = parameterWidgetMap.values.first()
+
+/**
+ * Returns the value of the widget associated with the edited object.
+ * Example: the probability distribution currently selected by [ObjectWidget]
+ */
+val <O: EditableObject> AnnotatedPropertyEditor<APEObjectWrapper<O>>.wrapperWidgetValue get() = wrapperWidget.value as O

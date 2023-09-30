@@ -45,7 +45,7 @@ public class AddEffectorDialog extends StandardDialog {
     /**
      * Main editing panel.
      */
-    private AnnotatedPropertyEditor effectorCreatorPanel;
+    private AnnotatedPropertyEditor<APEObjectWrapper<Effector>> effectorCreatorPanel;
 
     /**
      * Main dialog box.
@@ -79,7 +79,7 @@ public class AddEffectorDialog extends StandardDialog {
     protected void closeDialogOk() {
         super.closeDialogOk();
         effectorCreatorPanel.commitChanges();
-        entity.addEffector(((APEObjectWrapper<Effector>)effectorCreatorPanel.getEditingObjects().stream().findFirst().get()).getEditingObject());
+        entity.addEffector(AnnotatedPropertyEditorKt.getWrapperWidgetValue(effectorCreatorPanel));
     }
 
 }

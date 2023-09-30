@@ -9,6 +9,7 @@ import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.APEObjectWrapper
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.objectWrapper
+import org.simbrain.util.propertyeditor.wrapperWidgetValue
 import org.simbrain.util.stats.distributions.UniformIntegerDistribution
 import org.simbrain.util.table.*
 import org.simbrain.util.widgets.EditableList
@@ -74,7 +75,7 @@ class LayerEditor(
     val layers: ArrayList<TFLayer<*>>,
     // True  only at creation when layers can be added or removed.
     val addRemove: Boolean = true
-) : EditableList(addRemove) {
+) : EditableList<APEObjectWrapper<TFLayer<*>>>(addRemove) {
 
     init {
         // By default add dense layers
@@ -102,9 +103,7 @@ class LayerEditor(
     fun checkValidLayers(): Boolean {
         var validLayerSequence = true
         var errorMessage = "Invalid sequence of layers"
-        components.filterIsInstance<AnnotatedPropertyEditor<*>>()
-            .map { (it.editingObjects.first() as APEObjectWrapper<*>).editingObject}
-            .windowed(2) { (first, second) ->
+        components.map { it.wrapperWidgetValue }.windowed(2) { (first, second) ->
             if (second is TFDenseLayer) {
                 if (first !is TFFlattenLayer && first !is TFDenseLayer && first !is TFInputLayer) {
                     errorMessage = "Dense layers must come after input, flatten, or dense layers"
@@ -120,9 +119,9 @@ class LayerEditor(
 
     fun commitChanges() {
         layers.clear()
-        components.filterIsInstance<AnnotatedPropertyEditor<*>>().forEach {
+        components.forEach {
             it.commitChanges()
-            layers.add((it.editingObjects.first() as APEObjectWrapper<TFLayer<*>>).editingObject)
+            layers.add(it.wrapperWidgetValue)
         }
     }
 

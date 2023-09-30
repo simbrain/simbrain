@@ -19,6 +19,7 @@
 package org.simbrain.network.gui.dialogs.synapse;
 
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
@@ -45,7 +46,7 @@ public final class SynapseDialog extends StandardDialog {
     /**
      * Main panel for editing synapses.
      */
-    private AnnotatedPropertyEditor synapseEditingPanel;
+    private AnnotatedPropertyEditor<Synapse> synapseEditingPanel;
 
     /**
      * Help Button. Links to information about the currently selected synapse
@@ -117,21 +118,12 @@ public final class SynapseDialog extends StandardDialog {
         if (synapseList.size() == 0) {
             return;
         }
-        synapseEditingPanel  = new AnnotatedPropertyEditor(synapseList);
+        synapseEditingPanel  = new AnnotatedPropertyEditor<>(synapseList);
         initializeLayout();
-        addListeners();
-        updateHelp();
-    }
-
-    /**
-     * Add listeners to the components of the dialog. Specifically alters the
-     * destination of the help button to reflect the currently selected neuron
-     * update rule.
-     */
-    private void addListeners() {
-        // JComponent component = synapseEditingPanel.getWidget("Learning Rule").getComponent();
-        // ((ObjectTypeEditor) component).getDropDown().addActionListener(
-        //     e -> SwingUtilities.invokeLater(() -> updateHelp()));
+        updateHelp(synapseList.stream().findFirst().get().getLearningRule());
+        synapseEditingPanel.getWidgetEventsByLabel("Learning Rule").getValueChanged().on(newValue -> {
+            updateHelp((SynapseUpdateRule<?, ?>) synapseEditingPanel.getWidgetValueByLabel("Learning Rule"));
+        });
     }
 
     /**
@@ -154,18 +146,14 @@ public final class SynapseDialog extends StandardDialog {
     /**
      * Set the help page based on the currently selected synapse type.
      */
-    public void updateHelp() {
-
-       //  ParameterWidget pw = synapseEditingPanel.getWidget("Learning Rule");
-       //  String selection = (String) ((ObjectTypeEditor) pw.getComponent()).getDropDown().getSelectedItem();
-       //
-       //  if (selection == SimbrainConstants.NULL_STRING) {
-       //     helpAction = new ShowHelpAction("Pages/Network/synapse.html");
-       // } else {
-       //     selection = selection.replaceAll("\\s", ""); // Remove white space
-       //     helpAction = new ShowHelpAction("Pages/Network/synapse/" + selection + ".html");
-       // }
-       // helpButton.setAction(helpAction);
+    public void updateHelp(SynapseUpdateRule<?, ?> updateRule) {
+        if (updateRule == null) {
+            helpAction = new ShowHelpAction("Pages/Network/synapse.html");
+        } else {
+            String name = updateRule.getName().replaceAll("\\s", "");
+            helpAction = new ShowHelpAction("Pages/Network/synapse/" + name + ".html");
+        }
+        helpButton.setAction(helpAction);
     }
 
     /**

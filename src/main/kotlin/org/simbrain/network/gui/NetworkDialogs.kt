@@ -23,9 +23,9 @@ import org.simbrain.util.createDialog
 import org.simbrain.util.display
 import org.simbrain.util.displayInDialog
 import org.simbrain.util.piccolo.SceneGraphBrowser
-import org.simbrain.util.propertyeditor.APEObjectWrapper
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.objectWrapper
+import org.simbrain.util.propertyeditor.wrapperWidget
 import org.simbrain.util.table.*
 import org.simbrain.util.widgets.ApplyPanel.createApplyPanel
 import org.simbrain.util.widgets.EditablePanel
@@ -219,7 +219,7 @@ class ConnectionStrategyPanel(connectionStrategy: ConnectionStrategy) : Editable
 
     init {
         add(editor)
-        val widget = editor.propertyWidgetMap[APEObjectWrapper<ConnectionStrategy>::editingObject]!!
+        val widget = editor.wrapperWidget
 
         fun updatePanel(value: Any?) {
             if (value is ConnectionStrategy) {

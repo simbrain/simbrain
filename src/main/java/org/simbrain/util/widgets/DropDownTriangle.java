@@ -18,6 +18,7 @@
  */
 package org.simbrain.util.widgets;
 
+import org.simbrain.network.gui.dialogs.InhibExcRandomizerPanel;
 import org.simbrain.util.ResourceManager;
 
 import javax.swing.*;
@@ -31,7 +32,7 @@ import java.awt.event.MouseListener;
  * It does not "contain" the thing that becomes visible or invisible An action
  * listener must be added for that.
  * <p>
- * An example usage is in {@link org.simbrain.util.propertyeditor.ObjectTypeEditor}.
+ * An example usage is in {@link InhibExcRandomizerPanel}.
  *
  * @author Zoë Tosi
  */

@@ -12,23 +12,21 @@ import kotlin.math.floor
 import kotlin.math.min
 import kotlin.math.pow
 
+fun Float.toSimbrainColor() = clip(-1.0f..1.0f).let {
+    if (it < 0) Color.HSBtoRGB(2/3f, -it, 1.0f) else Color.HSBtoRGB(0.0f, it, 1.0f)
+}
+
+fun Double.toSimbrainColor() = toFloat().toSimbrainColor()
+
 /**
  * Convert array of float values to array of RGB color values.
  */
-fun FloatArray.toSimbrainColor() = map { value ->
-    value.clip(-1.0f..1.0f).let {
-        if (it < 0) Color.HSBtoRGB(2/3f, -it, 1.0f) else Color.HSBtoRGB(0.0f, it, 1.0f)
-    }
-}.toIntArray()
+fun FloatArray.toSimbrainColor() = map { it.toSimbrainColor() }.toIntArray()
 
 /**
  * Convert array of double values to array of RGB color values.
  */
-fun DoubleArray.toSimbrainColor() = map { value ->
-    value.clip(-1.0..1.0).let {
-        if (it < 0) Color.HSBtoRGB(2/3f, (-it).toFloat(), 1.0F) else Color.HSBtoRGB(0.0f, it.toFloat(), 1.0f)
-    }
-}.toIntArray()
+fun DoubleArray.toSimbrainColor() = map { it.toSimbrainColor() }.toIntArray()
 
 /**
  * Converts a double array to matrix representation (as a Buffered Image) with a specified width and height, in pixels.

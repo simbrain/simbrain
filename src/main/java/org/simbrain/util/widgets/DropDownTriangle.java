@@ -18,7 +18,6 @@
  */
 package org.simbrain.util.widgets;
 
-import org.simbrain.network.gui.dialogs.InhibExcRandomizerPanel;
 import org.simbrain.util.ResourceManager;
 
 import javax.swing.*;
@@ -32,15 +31,12 @@ import java.awt.event.MouseListener;
  * It does not "contain" the thing that becomes visible or invisible An action
  * listener must be added for that.
  * <p>
- * An example usage is in {@link InhibExcRandomizerPanel}.
+ * Suggested usage is with {@link org.simbrain.util.DetailTrianglePanel}
  *
  * @author Zoë Tosi
  */
 public class DropDownTriangle extends JPanel implements MouseListener {
 
-
-    //TODO: Some wrappers would be nice here, like a panel where you add a
-    // component and the triangle is already there ready to be used
     /**
      * Direction the triangle faces when it is "up".
      */
@@ -71,24 +67,15 @@ public class DropDownTriangle extends JPanel implements MouseListener {
     private boolean down;
 
     /**
-     * A reference to the window containing this component for ensuring that
-     * changes in size due to changes in label are reflected in the parent
-     * container.
-     */
-    private final Window parent;
-
-    /**
      * Creates an unlabeled drop down triangle pointing either left or right in
      * the "up" state and starting either "up" or down.
      *
      * @param upState The direction the triangle points when in the "up" state
      * @param down    Whether or not the triangle is initialized in the "up" or down
      *                state
-     * @param parent  The parent window, allowing this component to ensure it fits
-     *                in its container.
      */
-    public DropDownTriangle(UpDirection upState, boolean down, final Window parent) {
-        this(upState, down, "", "", parent);
+    public DropDownTriangle(UpDirection upState, boolean down) {
+        this(upState, down, "", "");
     }
 
     /**
@@ -102,14 +89,11 @@ public class DropDownTriangle extends JPanel implements MouseListener {
      *                  state
      * @param upLabel   The label displayed when the triangle is in the "up" state
      * @param downLabel The label displayed when the triangle is in the down state.
-     * @param parent    The parent window, allowing this component to ensure it fits
-     *                  in its container.
      */
-    public DropDownTriangle(final UpDirection upState, final boolean down, final String upLabel, final String downLabel, final Window parent) {
+    public DropDownTriangle(final UpDirection upState, final boolean down, final String upLabel, final String downLabel) {
         ddTriangle = new ClickableTriangle(upState, down);
         upTriLabel = new JLabel(upLabel);
         downTriLabel = new JLabel(downLabel);
-        this.parent = parent;
         this.down = down;
         this.setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         initLayout();
@@ -124,14 +108,6 @@ public class DropDownTriangle extends JPanel implements MouseListener {
         this.add(label);
         this.add(Box.createHorizontalStrut(10));
         this.add(ddTriangle);
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                if(parent != null) {
-                    parent.pack();
-                }
-            }
-        });
     }
 
     /**
@@ -310,7 +286,7 @@ public class DropDownTriangle extends JPanel implements MouseListener {
 
     public static void main(String[] args) {
         JFrame f = new JFrame();
-        DropDownTriangle ddt = new DropDownTriangle(UpDirection.LEFT, false, "X", "Y", f);
+        DropDownTriangle ddt = new DropDownTriangle(UpDirection.LEFT, false, "X", "Y");
         f.setContentPane(ddt);
         f.pack();
         f.setVisible(true);

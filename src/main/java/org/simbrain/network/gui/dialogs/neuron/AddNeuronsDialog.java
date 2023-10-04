@@ -21,6 +21,7 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.neuron_update_rules.LinearRule;
+import org.simbrain.util.DetailTrianglePanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
@@ -116,8 +117,7 @@ public class AddNeuronsDialog extends StandardDialog {
      */
     public static AddNeuronsDialog createAddNeuronsDialog(final NetworkPanel networkPanel) {
         final AddNeuronsDialog addND = new AddNeuronsDialog(networkPanel);
-        addND.combinedNeuronInfoPanel = new AnnotatedPropertyEditor(Collections.singletonList(addND.baseNeuron));
-        addND.combinedNeuronInfoPanel.setBorder(BorderFactory.createTitledBorder("Neuron Type"));
+        addND.combinedNeuronInfoPanel = new AnnotatedPropertyEditor<>(Collections.singletonList(addND.baseNeuron));
         addND.init();
         return addND;
     }
@@ -160,13 +160,15 @@ public class AddNeuronsDialog extends StandardDialog {
         addNeuronsPanel.add(basicsPanel);
 
         // Neuron Properties Panel
-        addNeuronsPanel.add(combinedNeuronInfoPanel);
-        // combinedNeuronInfoPanel.setDetailTrianglesOpen(false);
+        var combinedNeuronInfoDetailPanel = new DetailTrianglePanel(combinedNeuronInfoPanel, false);
+        combinedNeuronInfoDetailPanel.setBorder(BorderFactory.createTitledBorder("Neuron Type"));
+        addNeuronsPanel.add(combinedNeuronInfoDetailPanel);
 
         // Layout Panel
-        selectLayout = new AnnotatedPropertyEditor(layoutObject);
-        // selectLayout.setDetailTrianglesOpen(false);
-        addNeuronsPanel.add(selectLayout);
+        selectLayout = new AnnotatedPropertyEditor<>(layoutObject);
+        var selectLayoutDetailPanel = new DetailTrianglePanel(selectLayout, false);
+        selectLayoutDetailPanel.setBorder(BorderFactory.createTitledBorder("Neuron Layout"));
+        addNeuronsPanel.add(selectLayoutDetailPanel);
 
         // Group Panel
         groupPanel = new NeuronGroupPanelLite(networkPanel);

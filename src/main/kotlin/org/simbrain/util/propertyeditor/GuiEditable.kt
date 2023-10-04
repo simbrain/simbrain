@@ -2,19 +2,17 @@ package org.simbrain.util.propertyeditor
 
 import org.simbrain.util.*
 import org.simbrain.util.SimbrainConstants.NULL_STRING
+import org.simbrain.util.table.Column
 import org.simbrain.util.table.MatrixDataWrapper
 import org.simbrain.util.table.SimbrainDataViewer
 import org.simbrain.util.widgets.ChoicesWithNull
 import org.simbrain.util.widgets.ColorSelector
-import org.simbrain.util.widgets.DropDownTriangle
 import org.simbrain.util.widgets.YesNoNull
 import smile.math.matrix.Matrix
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.event.ActionEvent
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import javax.swing.*
@@ -560,7 +558,7 @@ class IntArrayWidget<O : EditableObject>(
     isConsistent: Boolean
 ) : ParameterWidget<O, IntArray>(parameter, isConsistent) {
 
-    private var model = MatrixDataWrapper(parameter.value.toDoubleArray().toMatrix())
+    private var model = MatrixDataWrapper(parameter.value.toDoubleArray().toMatrix(), columns = parameter.value.toDoubleArray().mapIndexed { index, _ -> Column("Column ${index + 1}", Column.DataType.IntType) }.toMutableList())
 
     override val widget by lazy {
         JPanel().apply {
@@ -645,8 +643,6 @@ class ObjectWidget<O : EditableObject, T : CopyableObject>(
 
     private var _prototypeObject: T? = null
 
-    private var detailTriangle: DropDownTriangle? = null
-
     override val value: T
         get() = _prototypeObject ?: objectList.first()
 
@@ -717,55 +713,27 @@ class ObjectWidget<O : EditableObject, T : CopyableObject>(
     }
 
     override val widget = JPanel().apply {
-        layout = BoxLayout(this, BoxLayout.Y_AXIS)
-        val padding = BorderFactory.createEmptyBorder(5, 5, 5, 5)
-
-        // Top Panel contains the combo box and detail triangle
-        val topPanel = JPanel()
-        topPanel.layout = BoxLayout(topPanel, BoxLayout.X_AXIS)
+        this.add(Box.createRigidArea(Dimension(0, 5)))
         val tb = BorderFactory.createTitledBorder(parameter.label)
         border = tb
-        topPanel.alignmentX = JPanel.CENTER_ALIGNMENT
-        topPanel.border = padding
-        this.add(Box.createRigidArea(Dimension(0, 5)))
-        this.add(topPanel)
-
-        dropDown?.let { topPanel.add(it) }
-
+        val detailTrianglePanel = DetailTrianglePanel(
+            editorPanelContainer,
+            defaultOpen = parameter.showDetails,
+            topPanelComponent = dropDown
+        )
+        add(detailTrianglePanel)
         if (!isConsistent) {
             dropDown?.apply {
                 addItem(NULL_STRING)
                 setSelectedIndex(itemCount - 1)
             }
         } else {
-            val window = SwingUtilities.getWindowAncestor(this)
-            if (dropDown != null) {
-                // Set up detail triangle
-                detailTriangle =
-                    DropDownTriangle(
-                        DropDownTriangle.UpDirection.LEFT, parameter.showDetails, "Settings", "Settings",
-                        window
-                    )
-                detailTriangle!!.addMouseListener(object : MouseAdapter() {
-                    override fun mouseClicked(arg0: MouseEvent) {
-                        editorPanelContainer.isVisible = detailTriangle!!.isDown
-                        repaint()
-                        window?.pack()
-                    }
-                })
-                editorPanelContainer.isVisible = detailTriangle!!.isDown
-                topPanel.add(Box.createHorizontalStrut(30))
-                topPanel.add(Box.createHorizontalGlue())
-                topPanel.add(detailTriangle)
-            }
             objectTypeEditor = AnnotatedPropertyEditor(objectList)
             editorPanelContainer.add(objectTypeEditor)
             if (dropDown == null && objectTypeEditor.parameterWidgetMap.isEmpty()) {
                 isVisible = false
             }
         }
-
-        add(editorPanelContainer)
     }
 
     override fun refresh(property: KProperty<*>) {

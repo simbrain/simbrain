@@ -5,6 +5,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.widgets.DropDownTriangle
 import java.awt.Component
 import java.awt.event.*
 import java.io.File
@@ -240,4 +241,56 @@ fun showWarningConfirmDialog(message: String): Int {
     val dialog = JDialog()
     dialog.isAlwaysOnTop = true
     return JOptionPane.showConfirmDialog(dialog, message, "Warning!", JOptionPane.WARNING_MESSAGE)
+}
+
+/**
+ * Collapsable panel that uses  a [DetailTriangle]
+ */
+class DetailTrianglePanel @JvmOverloads constructor(
+    val contentPanel: JPanel,
+    defaultOpen: Boolean = true,
+    upLabel: String = "Settings",
+    downLabel: String = upLabel,
+    val topPanelComponent: JComponent? = null,
+): JPanel() {
+
+    val topPanel = JPanel().apply {
+        val padding = BorderFactory.createEmptyBorder(5, 5, 5, 5)
+        layout = BoxLayout(this, BoxLayout.X_AXIS)
+        alignmentX = CENTER_ALIGNMENT
+        border = padding
+
+        if (topPanelComponent != null) {
+            add(topPanelComponent)
+        }
+
+        add(Box.createHorizontalStrut(30))
+        add(Box.createHorizontalGlue())
+    }.also {
+        add(it)
+    }
+
+    val detailTriangle = DropDownTriangle(
+        DropDownTriangle.UpDirection.LEFT,
+        defaultOpen,
+        upLabel,
+        downLabel
+    ).also {
+        it.addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(arg0: MouseEvent) {
+                contentPanel.isVisible = it.isDown
+                repaint()
+                SwingUtilities.getWindowAncestor(this@DetailTrianglePanel)?.pack()
+            }
+        })
+        topPanel.add(it)
+    }
+
+    init {
+        layout = BoxLayout(this, BoxLayout.Y_AXIS)
+        contentPanel.isVisible = detailTriangle.isDown
+        add(contentPanel)
+    }
+
+
 }

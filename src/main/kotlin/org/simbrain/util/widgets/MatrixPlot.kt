@@ -1,17 +1,33 @@
 package org.simbrain.util.widgets
 
-import org.simbrain.util.toSimbrainColor
+import org.simbrain.util.*
+import smile.math.matrix.Matrix
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Graphics
-import javax.swing.JFrame
 import javax.swing.JPanel
 import kotlin.math.abs
 import kotlin.random.Random
 
-class MatrixPlot(private val labels: List<String>, private val data: List<List<Double>>) : JPanel() {
+/**
+ * Produce something like an R Corrplot.
+ *
+ * @param labels column and row headings
+ * @param daa the matrix data to represent
+ */
+class MatrixPlot(private val labels: List<String>, private val data: Array<DoubleArray>) : JPanel() {
+
     private val cellSize = 50
     private val labelOffset = cellSize
+
+    constructor(labels: List<String>, data: Matrix): this(labels, data.toArray())
+
+    init {
+        if (labels.size != data.size) {
+            throw IllegalArgumentException("Number of labels (${labels.size}) does not match the size of data (${data.size}).")
+        }
+        preferredSize = Dimension((labels.size + 2) * 50, (labels.size + 2) * 50)
+    }
 
     override fun paintComponent(g: Graphics) {
         super.paintComponent(g)
@@ -38,15 +54,15 @@ class MatrixPlot(private val labels: List<String>, private val data: List<List<D
 
 fun main() {
     val labels = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
-    val data = List(10) {
-        List(10) {
-            Random.nextDouble(-1.0, 1.0)
-        }
-    }
-
-    val frame = JFrame("Matrix Plot")
-    frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
-    frame.size = Dimension((labels.size + 2) * 50, (labels.size + 2) * 50)
-    frame.add(MatrixPlot(labels, data))
-    frame.isVisible = true
+    val data = Array(10) { DoubleArray(10) { Random.nextDouble(-1.0, 1.0) } }
+    MatrixPlot(labels, data).displayInDialog()
 }
+
+// fun main() {
+//
+//     val text = "The cat can run. The dog can run. The cat eats food. The dog eats food. Please bring lunch to the " +
+//             "table."
+//     val coc = generateCooccurrenceMatrix(text, 2, true)
+//     MatrixPlot(coc.first, coc.second).displayInDialog()
+//
+// }

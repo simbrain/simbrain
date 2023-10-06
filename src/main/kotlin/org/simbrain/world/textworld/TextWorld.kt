@@ -170,7 +170,7 @@ class TextWorld : AttributeContainer, EditableObject {
     private var matcher: Matcher = pattern.matcher(text)
 
     @Transient
-    var events = TextWorldEvents2()
+    var events = TextWorldEvents()
 
     /**
      * Returns the double array associated with the currently selected token
@@ -362,7 +362,7 @@ class TextWorld : AttributeContainer, EditableObject {
      * See [org.simbrain.workspace.serialization.WorkspaceComponentDeserializer]
      */
     fun readResolve(): TextWorld {
-        events = TextWorldEvents2()
+        events = TextWorldEvents()
         return this
     }
 

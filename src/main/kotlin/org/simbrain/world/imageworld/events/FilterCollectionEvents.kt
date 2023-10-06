@@ -1,12 +1,12 @@
 package org.simbrain.world.imageworld.events
 
-import org.simbrain.util.Events2
+import org.simbrain.util.Events
 import org.simbrain.world.imageworld.filters.Filter
 
 /**
- * See [Events2].
+ * See [Events].
  */
-class FilterCollectionEvents2: Events2() {
+class FilterCollectionEvents: Events() {
 
     val filterAdded = AddedEvent<Filter>()
     val filterRemoved = RemovedEvent<Filter>()

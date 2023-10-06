@@ -24,7 +24,7 @@ import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PImage
 import org.piccolo2d.nodes.PText
 import org.simbrain.network.core.randomizeBiases
-import org.simbrain.network.events.NeuronArrayEvents2
+import org.simbrain.network.events.NeuronArrayEvents
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.actions.edit.CopyAction
 import org.simbrain.network.gui.actions.edit.CutAction
@@ -131,7 +131,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
     init {
 
         // TODO: fixed events type on override
-        val events = neuronArray.events as NeuronArrayEvents2
+        val events = neuronArray.events as NeuronArrayEvents
 
         events.visualPropertiesChanged.on {
             gridMode = neuronArray.gridMode

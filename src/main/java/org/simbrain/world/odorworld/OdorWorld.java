@@ -30,7 +30,7 @@ import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.entities.Bounded;
 import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.events.OdorWorldEvents2;
+import org.simbrain.world.odorworld.events.OdorWorldEvents;
 import org.simbrain.world.odorworld.sensors.Sensor;
 
 import java.awt.geom.Point2D;
@@ -105,7 +105,7 @@ public class OdorWorld implements EditableObject, Bounded {
     /**
      * Event support
      */
-    protected transient OdorWorldEvents2 events = new OdorWorldEvents2();
+    protected transient OdorWorldEvents events = new OdorWorldEvents();
 
     /**
      * Last clicked position.
@@ -380,7 +380,7 @@ public class OdorWorld implements EditableObject, Bounded {
      */
     private Object readResolve() {
 
-        events = new OdorWorldEvents2();
+        events = new OdorWorldEvents();
 
         for (OdorWorldEntity entity : entityList) {
 //            entity.postSerializationInit();
@@ -539,7 +539,7 @@ public class OdorWorld implements EditableObject, Bounded {
         return "Odor World";
     }
 
-    public OdorWorldEvents2 getEvents() {
+    public OdorWorldEvents getEvents() {
         return events;
     }
 

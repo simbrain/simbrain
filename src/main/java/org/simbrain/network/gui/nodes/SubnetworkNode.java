@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import org.piccolo2d.PNode;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.NetworkModel;
-import org.simbrain.network.events.LocationEvents2;
+import org.simbrain.network.events.LocationEvents;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.SubnetworkPanel;
@@ -94,7 +94,7 @@ public class SubnetworkNode extends ScreenElement {
 
         setContextMenu(this.getDefaultContextMenu());
 
-        LocationEvents2 events = subnetwork.getEvents();
+        LocationEvents events = subnetwork.getEvents();
         events.getDeleted().on(n -> removeFromParent());
         events.getLabelChanged().on((o, n) -> updateText());
         events.getLocationChanged().on(Dispatchers.getMain(), this::layoutChildren);

@@ -9,7 +9,7 @@ import org.jetbrains.kotlinx.dl.dataset.Dataset
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.simbrain.network.core.ArrayLayer
 import org.simbrain.network.core.Network
-import org.simbrain.network.events.TrainerEvents2
+import org.simbrain.network.events.TrainerEvents
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.workspace.AttributeContainer
@@ -82,7 +82,7 @@ class DeepNet(
     /**
      * Events specific to training, as contrasted with [events] which are common to all [NetworkModel]s.
      */
-    val trainerEvents = TrainerEvents2()
+    val trainerEvents = TrainerEvents()
 
     /**
      * Parameters editable using an [AnnotatedPropertyEditor]

@@ -1,7 +1,7 @@
 package org.simbrain.network.core
 
 import org.simbrain.network.LocatableModel
-import org.simbrain.network.events.LocationEvents2
+import org.simbrain.network.events.LocationEvents
 import org.simbrain.util.toDoubleArray
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Producible
@@ -97,7 +97,7 @@ abstract class Layer : LocatableModel(), AttributeContainer {
      * Event support.
      */
     @Transient
-    override var events = LocationEvents2()
+    override var events = LocationEvents()
         protected set
 
     /**
@@ -135,7 +135,7 @@ abstract class Layer : LocatableModel(), AttributeContainer {
 
     override fun postOpenInit() {
         if (events == null) {
-            events = LocationEvents2()
+            events = LocationEvents()
         }
         incomingConnectors = ArrayList()
         outgoingConnectors = ArrayList()
@@ -149,7 +149,7 @@ abstract class Layer : LocatableModel(), AttributeContainer {
      * See [org.simbrain.workspace.serialization.WorkspaceComponentDeserializer]
      */
     open fun readResolve(): Any? {
-        events = LocationEvents2()
+        events = LocationEvents()
         return this
     }
 

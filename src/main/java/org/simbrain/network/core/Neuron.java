@@ -21,7 +21,7 @@ package org.simbrain.network.core;
 import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.core.Network.TimeType;
-import org.simbrain.network.events.NeuronEvents2;
+import org.simbrain.network.events.NeuronEvents;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
@@ -191,7 +191,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     /**
      * Support for property change events.
      */
-    private transient NeuronEvents2 events = new NeuronEvents2();
+    private transient NeuronEvents events = new NeuronEvents();
 
     /**
      * Local data holder for neuron update rule.
@@ -261,7 +261,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
 
     @Override
     public void postOpenInit() {
-        events = new NeuronEvents2();
+        events = new NeuronEvents();
         fanOut = new HashMap<>();
         fanIn = new ArrayList<>();
         if (polarity == null) {
@@ -1026,7 +1026,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         return getId();
     }
 
-    public NeuronEvents2 getEvents() {
+    public NeuronEvents getEvents() {
         return events;
     }
 

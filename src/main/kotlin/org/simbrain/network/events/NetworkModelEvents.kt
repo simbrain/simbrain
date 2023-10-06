@@ -1,12 +1,12 @@
 package org.simbrain.network.events
 
 import org.simbrain.network.NetworkModel
-import org.simbrain.util.Events2
+import org.simbrain.util.Events
 
 /**
- * See [Events2].
+ * See [Events].
  */
-open class NetworkModelEvents2: Events2() {
+open class NetworkModelEvents: Events() {
 
     val selected = AddedEvent<NetworkModel>()
     var deleted = RemovedEvent<NetworkModel>()

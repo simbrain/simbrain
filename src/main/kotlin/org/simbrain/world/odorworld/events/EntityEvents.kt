@@ -1,6 +1,6 @@
 package org.simbrain.world.odorworld.events
 
-import org.simbrain.util.Events2
+import org.simbrain.util.Events
 import org.simbrain.world.odorworld.effectors.Effector
 import org.simbrain.world.odorworld.entities.Bounded
 import org.simbrain.world.odorworld.entities.EntityType
@@ -9,13 +9,13 @@ import org.simbrain.world.odorworld.sensors.Sensor
 
 
 interface EntityLocationEvent {
-    val moved: Events2.NoArgEvent
+    val moved: Events.NoArgEvent
 }
 
 /**
- * See [Events2].
+ * See [Events].
  */
-class EntityEvents2: Events2(), EntityLocationEvent {
+class EntityEvents: Events(), EntityLocationEvent {
     val updated = NoArgEvent()
     val typeChanged = ChangedEvent<EntityType>()
     val deleted = RemovedEvent<OdorWorldEntity>()
@@ -29,9 +29,9 @@ class EntityEvents2: Events2(), EntityLocationEvent {
 
 }
 /**
- * See [Events2]
+ * See [Events]
  */
-class SensorEffectorEvents2: Events2() {
+class SensorEffectorEvents: Events() {
     val updated = NoArgEvent()
     val propertyChanged = NoArgEvent()
 }

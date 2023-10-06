@@ -1,12 +1,12 @@
 package org.simbrain.network.events
 
 import org.simbrain.network.core.SynapseUpdateRule
-import org.simbrain.util.Events2
+import org.simbrain.util.Events
 
 /**
- * See [Events2]
+ * See [Events]
  */
-class SynapseEvents2: NetworkModelEvents2() {
+class SynapseEvents: NetworkModelEvents() {
     val strengthUpdated = NoArgEvent()
     val learningRuleUpdated = ChangedEvent<SynapseUpdateRule<*,*>>()
     val visbilityChanged = ChangedEvent<Boolean>()

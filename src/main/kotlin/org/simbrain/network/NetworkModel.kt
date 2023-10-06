@@ -1,6 +1,6 @@
 package org.simbrain.network
 
-import org.simbrain.network.events.NetworkModelEvents2
+import org.simbrain.network.events.NetworkModelEvents
 import org.simbrain.util.UserParameter
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
@@ -45,7 +45,7 @@ abstract class NetworkModel {
     /**
      * Return a reference to that model type's instance of [NetworkModelEvent]
      */
-    abstract val events: NetworkModelEvents2
+    abstract val events: NetworkModelEvents
 
     /**
      * Select this network model.

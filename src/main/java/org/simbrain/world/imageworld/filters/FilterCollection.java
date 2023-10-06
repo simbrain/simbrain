@@ -1,7 +1,7 @@
 package org.simbrain.world.imageworld.filters;
 
 import org.simbrain.world.imageworld.ImageSource;
-import org.simbrain.world.imageworld.events.FilterCollectionEvents2;
+import org.simbrain.world.imageworld.events.FilterCollectionEvents;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ public class FilterCollection {
     /**
      * Handle FilterSelector Events.
      */
-    private transient FilterCollectionEvents2 events = new FilterCollectionEvents2();
+    private transient FilterCollectionEvents events = new FilterCollectionEvents();
 
     public FilterCollection(ImageSource imageSource) {
         this.imageSource = imageSource;
@@ -46,7 +46,7 @@ public class FilterCollection {
      * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
      */
     public Object readResolve() {
-        events = new FilterCollectionEvents2();
+        events = new FilterCollectionEvents();
         imageSource.getEvents().getResize().on(() -> {
             filters.forEach(Filter::initScaleOp);
         });
@@ -138,7 +138,7 @@ public class FilterCollection {
         this.currentFilter = currentFilter;
     }
 
-    public FilterCollectionEvents2 getEvents() {
+    public FilterCollectionEvents getEvents() {
         return events;
     }
 

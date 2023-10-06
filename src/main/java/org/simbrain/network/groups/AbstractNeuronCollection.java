@@ -3,7 +3,7 @@ package org.simbrain.network.groups;
 import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.LocatableModelKt;
 import org.simbrain.network.core.*;
-import org.simbrain.network.events.NeuronCollectionEvents2;
+import org.simbrain.network.events.NeuronCollectionEvents;
 import org.simbrain.network.util.ActivationInputManager;
 import org.simbrain.network.util.ActivationRecorder;
 import org.simbrain.network.util.SubsamplingManager;
@@ -59,7 +59,7 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
     /**
      * Support for property change events.
      */
-    protected transient NeuronCollectionEvents2 events = new NeuronCollectionEvents2();
+    protected transient NeuronCollectionEvents events = new NeuronCollectionEvents();
 
     /**
      * Cache of neuron activation values.
@@ -728,7 +728,7 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
     public void postOpenInit() {
         super.postOpenInit();
         if (events == null) {
-            events = new NeuronCollectionEvents2();
+            events = new NeuronCollectionEvents();
         }
 
         incomingSgs = new HashSet<>();
@@ -740,7 +740,7 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
         }
     }
 
-    public NeuronCollectionEvents2 getEvents() {
+    public NeuronCollectionEvents getEvents() {
         return events;
     }
 

@@ -1,11 +1,11 @@
 package org.simbrain.network.events
 
-import org.simbrain.util.Events2
+import org.simbrain.util.Events
 
 /**
- * See [Events2].
+ * See [Events].
  */
-class NeuronArrayEvents2: LocationEvents2() {
+class NeuronArrayEvents: LocationEvents() {
     val visualPropertiesChanged = NoArgEvent()
     val updateRuleChanged = NoArgEvent()
 }

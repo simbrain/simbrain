@@ -1,12 +1,12 @@
 package org.simbrain.network.events
 
 import org.simbrain.network.core.NeuronUpdateRule
-import org.simbrain.util.Events2
+import org.simbrain.util.Events
 
 /**
- * See [Events2].
+ * See [Events].
  */
-class NeuronEvents2: LocationEvents2() {
+class NeuronEvents: LocationEvents() {
 
     val activationChanged = ChangedEvent<Double>()
     val spiked = AddedEvent<Boolean>()

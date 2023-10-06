@@ -20,7 +20,7 @@ import java.util.function.Consumer
  *
  * For examples see [TrainerEvents2]
  */
-open class Events2: CoroutineScope {
+open class Events: CoroutineScope {
 
     private val job = SupervisorJob()
 

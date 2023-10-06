@@ -11,7 +11,7 @@ import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.effectors.Effector
 import org.simbrain.world.odorworld.effectors.StraightMovement
 import org.simbrain.world.odorworld.effectors.Turning
-import org.simbrain.world.odorworld.events.EntityEvents2
+import org.simbrain.world.odorworld.events.EntityEvents
 import org.simbrain.world.odorworld.intersect
 import org.simbrain.world.odorworld.sensors.GridSensor
 import org.simbrain.world.odorworld.sensors.ObjectSensor
@@ -26,7 +26,7 @@ class OdorWorldEntity @JvmOverloads constructor(
     @UserParameter(label = "Type", order = 2)
     var entityType: EntityType = EntityType.SWISS,
     @Transient
-    var events: EntityEvents2 = EntityEvents2(),
+    var events: EntityEvents = EntityEvents(),
 ) : EditableObject, AttributeContainer, Locatable, Rotatable, Movable, WithSize, Bounded, WithDispersion {
 
     override var id: String? = null

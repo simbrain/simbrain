@@ -1,12 +1,12 @@
 package org.simbrain.world.odorworld.events
 
-import org.simbrain.util.Events2
+import org.simbrain.util.Events
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 
 /**
- * See [Events2].
+ * See [Events].
  */
-class OdorWorldEvents2: Events2() {
+class OdorWorldEvents: Events() {
     val updated = NoArgEvent()
     val frameAdvanced = NoArgEvent()
     val worldStarted = NoArgEvent()

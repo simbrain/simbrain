@@ -14,7 +14,7 @@
 package org.simbrain.network.trainers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.simbrain.network.events.TrainerEvents2
+import org.simbrain.network.events.TrainerEvents
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.subnetworks.LMSNetwork
 import org.simbrain.network.subnetworks.SRNNetwork
@@ -43,7 +43,7 @@ abstract class IterableTrainer2(val net: Trainable2): EditableObject {
 
     var isRunning = false
 
-    val events = TrainerEvents2()
+    val events = TrainerEvents()
 
     suspend fun startTraining() {
         isRunning = true

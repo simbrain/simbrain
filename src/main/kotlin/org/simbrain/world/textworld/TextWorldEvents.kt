@@ -1,11 +1,11 @@
 package org.simbrain.world.textworld
 
-import org.simbrain.util.Events2
+import org.simbrain.util.Events
 
 /**
- * See [Events2].
+ * See [Events].
  */
-class TextWorldEvents2: Events2() {
+class TextWorldEvents: Events() {
 
     val textChanged = NoArgEvent()
     val tokenVectorMapChanged = NoArgEvent()

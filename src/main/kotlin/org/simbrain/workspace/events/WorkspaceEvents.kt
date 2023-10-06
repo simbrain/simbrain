@@ -1,12 +1,12 @@
 package org.simbrain.workspace.events
 
-import org.simbrain.util.Events2
+import org.simbrain.util.Events
 import org.simbrain.workspace.WorkspaceComponent
 
 /**
- * See [Events2].
+ * See [Events].
  */
-class WorkspaceEvents2: Events2() {
+class WorkspaceEvents: Events() {
     val workspaceCleared = NoArgEvent()
     val workspaceOpened = NoArgEvent()
     val componentAdded = AddedEvent<WorkspaceComponent>()

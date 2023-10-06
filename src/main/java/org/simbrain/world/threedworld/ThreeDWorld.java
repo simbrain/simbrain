@@ -12,7 +12,7 @@ import org.simbrain.world.threedworld.controllers.SelectionController;
 import org.simbrain.world.threedworld.engine.ThreeDEngine;
 import org.simbrain.world.threedworld.entities.Agent;
 import org.simbrain.world.threedworld.entities.Entity;
-import org.simbrain.world.threedworld.events.ThreeDWorldEvents2;
+import org.simbrain.world.threedworld.events.ThreeDWorldEvents;
 
 import javax.swing.*;
 import java.util.ArrayList;
@@ -41,7 +41,7 @@ public class ThreeDWorld implements AppState {
     private transient ContextMenu contextMenu;
     private AtomicInteger idCounter;
 
-    private transient ThreeDWorldEvents2 events = new ThreeDWorldEvents2();
+    private transient ThreeDWorldEvents events = new ThreeDWorldEvents();
 
     /**
      * Construct a new default ThreeDWorld().
@@ -67,7 +67,7 @@ public class ThreeDWorld implements AppState {
      * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
      */
     public Object readResolve() {
-        events = new ThreeDWorldEvents2();
+        events = new ThreeDWorldEvents();
         initialized = false;
         engine.getStateManager().attach(this);
         //cameraController = new CameraController(this);
@@ -246,7 +246,7 @@ public class ThreeDWorld implements AppState {
 
     // TODO: Add agent removed
 
-    public ThreeDWorldEvents2 getEvents() {
+    public ThreeDWorldEvents getEvents() {
         return events;
     }
 }

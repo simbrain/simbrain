@@ -4,8 +4,8 @@ import org.simbrain.network.core.ArrayLayer
 import org.simbrain.network.core.Connector
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NeuronUpdateRule
-import org.simbrain.network.events.LocationEvents2
-import org.simbrain.network.events.NeuronArrayEvents2
+import org.simbrain.network.events.LocationEvents
+import org.simbrain.network.events.NeuronArrayEvents
 import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.util.MatrixDataHolder
 import org.simbrain.network.util.ScalarDataHolder
@@ -81,18 +81,18 @@ class NeuronArray(parent: Network, inputSize: Int) : ArrayLayer(parent, inputSiz
     var gridMode = false
         set(value) {
             field = value
-            (events as NeuronArrayEvents2).visualPropertiesChanged.fireAndBlock()
+            (events as NeuronArrayEvents).visualPropertiesChanged.fireAndBlock()
         }
 
     @UserParameter(label = "Biases Visible", description = "If true, show biases.", order = 11)
     var isShowBias = false
         set(showBias) {
             field = showBias
-            (events as NeuronArrayEvents2).visualPropertiesChanged.fireAndBlock()
+            (events as NeuronArrayEvents).visualPropertiesChanged.fireAndBlock()
         }
 
     @Transient
-    override var events: LocationEvents2 = NeuronArrayEvents2()
+    override var events: LocationEvents = NeuronArrayEvents()
 
     /**
      * Construct a neuron array.
@@ -249,7 +249,7 @@ $dataHolder"""
      * See [org.simbrain.workspace.serialization.WorkspaceComponentDeserializer]
      */
     override fun readResolve(): Any? {
-        events = NeuronArrayEvents2()
+        events = NeuronArrayEvents()
         return this
     }
 

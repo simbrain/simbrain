@@ -1,7 +1,7 @@
 package org.simbrain.world.imageworld;
 
 import org.simbrain.util.ImageKt;
-import org.simbrain.world.imageworld.events.ImageEvents2;
+import org.simbrain.world.imageworld.events.ImageEvents;
 
 import java.awt.image.BufferedImage;
 
@@ -32,7 +32,7 @@ public abstract class ImageSource  {
     /**
      * Handle Image source Events.
      */
-    private transient ImageEvents2 events = new ImageEvents2();
+    private transient ImageEvents events = new ImageEvents();
 
     /**
      * Construct a new ImageSourceAdapter and initialize the current image.
@@ -55,7 +55,7 @@ public abstract class ImageSource  {
      * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
      */
     public Object readResolve() {
-        events = new ImageEvents2();
+        events = new ImageEvents();
         return this;
     }
 
@@ -109,7 +109,7 @@ public abstract class ImageSource  {
         return currentImage.getHeight();
     }
 
-    public ImageEvents2 getEvents() {
+    public ImageEvents getEvents() {
         return events;
     }
 }

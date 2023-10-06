@@ -96,7 +96,7 @@ public class Projector implements AttributeContainer {
     /**
      * Handle network events.
      */
-    private transient ProjectorEvents2 events = new ProjectorEvents2();
+    private transient ProjectorEvents events = new ProjectorEvents();
 
     /**
      * Probability of the current state relative to the {@link #predictor} object.
@@ -168,7 +168,7 @@ public class Projector implements AttributeContainer {
      * Updates datasets from persistent forms of data.
      */
     public void postOpenInit() {
-        events = new ProjectorEvents2();
+        events = new ProjectorEvents();
         init();
     }
 
@@ -503,7 +503,7 @@ public class Projector implements AttributeContainer {
         return "Projector";
     }
 
-    public ProjectorEvents2 getEvents() {
+    public ProjectorEvents getEvents() {
         return events;
     }
 

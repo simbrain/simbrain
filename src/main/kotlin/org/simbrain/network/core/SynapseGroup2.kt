@@ -3,7 +3,7 @@ package org.simbrain.network.core
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.ConnectionStrategy
-import org.simbrain.network.events.SynapseGroup2Events2
+import org.simbrain.network.events.SynapseGroup2Events
 import org.simbrain.network.groups.AbstractNeuronCollection
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.SynapseNode
@@ -56,7 +56,7 @@ class SynapseGroup2 @JvmOverloads constructor(
     var inhibitoryRandomizer: ProbabilityDistribution = UniformRealDistribution(-1.0, 0.0)
 
     @Transient
-    override var events = SynapseGroup2Events2()
+    override var events = SynapseGroup2Events()
 
     /**
      * Flag for whether synapses should be displayed in a GUI representation of this object.
@@ -133,7 +133,7 @@ class SynapseGroup2 @JvmOverloads constructor(
 
     override fun postOpenInit() {
         if (events == null) {
-            events = SynapseGroup2Events2()
+            events = SynapseGroup2Events()
         }
         this.synapses.forEach { it.postOpenInit() }
     }

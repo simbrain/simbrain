@@ -1,12 +1,12 @@
 package org.simbrain.workspace.events
 
-import org.simbrain.util.Events2
+import org.simbrain.util.Events
 import org.simbrain.workspace.AttributeContainer
 
 /**
- * See [Events2].
+ * See [Events].
  */
-class WorkspaceComponentEvents2: Events2() {
+class WorkspaceComponentEvents: Events() {
     val componentUpdated = NoArgEvent()
     val componentMinimized = AddedEvent<Boolean>()
     val guiToggled = NoArgEvent()

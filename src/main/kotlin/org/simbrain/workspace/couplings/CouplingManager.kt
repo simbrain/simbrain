@@ -51,7 +51,7 @@ class CouplingManager(val workspace: Workspace) {
     /**
      * List of listeners to fire updates when couplings are changed.
      */
-    val events = CouplingEvents2()
+    val events = CouplingEvents()
 
     /**
      * A collection of all producible and consumable methods that are visible

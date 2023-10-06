@@ -16,8 +16,8 @@ import org.simbrain.network.NetworkModel;
 import org.simbrain.network.connections.ConnectionStrategy;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.*;
-import org.simbrain.network.events.NetworkModelEvents2;
-import org.simbrain.network.events.SynapseGroup2Events2;
+import org.simbrain.network.events.NetworkModelEvents;
+import org.simbrain.network.events.SynapseGroup2Events;
 import org.simbrain.network.gui.dialogs.NetworkPreferences;
 import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.network.spikeresponders.NonResponder;
@@ -76,7 +76,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
     /**
      * Event support
      */
-    protected transient SynapseGroup2Events2 events = new SynapseGroup2Events2();
+    protected transient SynapseGroup2Events events = new SynapseGroup2Events();
 
     /**
      * The <b>default>/b> polarized randomizer associated with excitatory.
@@ -834,7 +834,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
     @Override
     public void postOpenInit() {
         if (events == null) {
-            events = new SynapseGroup2Events2();
+            events = new SynapseGroup2Events();
         }
         exSynapseSet.forEach(Synapse::postOpenInit);
         inSynapseSet.forEach(Synapse::postOpenInit);
@@ -863,7 +863,7 @@ public class SynapseGroup extends NetworkModel implements EditableObject, Attrib
         return parentNetwork;
     }
 
-    public NetworkModelEvents2 getEvents() {
+    public NetworkModelEvents getEvents() {
         return events;
     }
 

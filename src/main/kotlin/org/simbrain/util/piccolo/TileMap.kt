@@ -4,7 +4,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute
 import com.thoughtworks.xstream.annotations.XStreamImplicit
 import org.piccolo2d.nodes.PImage
-import org.simbrain.world.odorworld.events.TileMapEvents2
+import org.simbrain.world.odorworld.events.TileMapEvents
 import java.awt.Color
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
@@ -116,7 +116,7 @@ class TileMap(width: Int, height: Int) {
     private var guiEnabled = false
 
     @Transient
-    var events = TileMapEvents2()
+    var events = TileMapEvents()
         private set
 
     /**
@@ -313,7 +313,7 @@ class TileMap(width: Int, height: Int) {
      * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
      */
     private fun readResolve(): Any {
-        events = TileMapEvents2()
+        events = TileMapEvents()
         tileSetRanges = tileSets.map { it.firstgid..(it.tilecount + it.firstgid) to it }
         idTileMapping = HashMap()
         return this

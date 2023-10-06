@@ -1,7 +1,7 @@
 package org.simbrain.network.gui.dialogs
 
 import net.miginfocom.swing.MigLayout
-import org.simbrain.util.Events2
+import org.simbrain.util.Events
 import org.simbrain.util.ResourceManager
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.table.NumericTable
@@ -63,7 +63,7 @@ class DataPanel: JPanel() {
         toolbars.add(this)
     }
 
-    val events = DataPanelEvents2()
+    val events = DataPanelEvents()
 
     fun applyData() {
         val data = sequence {
@@ -84,9 +84,9 @@ class DataPanel: JPanel() {
 }
 
 /**
- * See [Events2].
+ * See [Events].
  */
-class DataPanelEvents2: Events2() {
+class DataPanelEvents: Events() {
     val updateData = AddedEvent<Array<DoubleArray>>()
     val insertRow = AddedEvent<Int>()
 }

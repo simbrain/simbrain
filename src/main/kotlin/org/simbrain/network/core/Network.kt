@@ -5,7 +5,7 @@ import org.simbrain.network.LocatableModel
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.ConnectionStrategy
-import org.simbrain.network.events.NetworkEvents2
+import org.simbrain.network.events.NetworkEvents
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.groups.Subnetwork
@@ -70,7 +70,7 @@ class Network: CoroutineScope, EditableObject {
      * Handle network events.
      */
     @Transient
-    var events = NetworkEvents2()
+    var events = NetworkEvents()
         private set
 
     /**
@@ -406,7 +406,7 @@ class Network: CoroutineScope, EditableObject {
 
         placementManager = PlacementManager()
 
-        events = NetworkEvents2()
+        events = NetworkEvents()
         updateCompleted = AtomicBoolean(false)
         updatePriorityList();
 

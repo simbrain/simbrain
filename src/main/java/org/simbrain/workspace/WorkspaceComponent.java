@@ -20,7 +20,7 @@ package org.simbrain.workspace;
 
 import org.pmw.tinylog.Logger;
 import org.simbrain.workspace.couplings.CouplingManager;
-import org.simbrain.workspace.events.WorkspaceComponentEvents2;
+import org.simbrain.workspace.events.WorkspaceComponentEvents;
 import org.simbrain.workspace.gui.ComponentPanel;
 import org.simbrain.workspace.gui.DesktopComponent;
 
@@ -46,7 +46,7 @@ public abstract class WorkspaceComponent {
      */
     private Workspace workspace;
 
-    transient private WorkspaceComponentEvents2 events = new WorkspaceComponentEvents2();
+    transient private WorkspaceComponentEvents events = new WorkspaceComponentEvents();
 
     /**
      * Whether this component has changed since last save.
@@ -325,7 +325,7 @@ public abstract class WorkspaceComponent {
         this.serializePriority = serializePriority;
     }
 
-    public WorkspaceComponentEvents2 getEvents() {
+    public WorkspaceComponentEvents getEvents() {
         return events;
     }
 

@@ -22,7 +22,7 @@ import kotlinx.coroutines.Dispatchers;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.util.PBounds;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.events.SynapseEvents2;
+import org.simbrain.network.events.SynapseEvents;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.NetworkPreferences;
 
@@ -149,7 +149,7 @@ public final class SynapseNode extends ScreenElement {
         circle.setPickable(true);
         line.setPickable(false);
 
-        SynapseEvents2 events = synapse.getEvents();
+        SynapseEvents events = synapse.getEvents();
 
         events.getDeleted().on(Dispatchers.getMain(), s -> removeFromParent());
         events.getStrengthUpdated().on(() -> {

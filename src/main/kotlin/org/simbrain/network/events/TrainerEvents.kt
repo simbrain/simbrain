@@ -1,11 +1,11 @@
 package org.simbrain.network.events
 
-import org.simbrain.util.Events2
+import org.simbrain.util.Events
 
 /**
- * See [Events2].
+ * See [Events].
  */
-class TrainerEvents2: Events2() {
+class TrainerEvents: Events() {
     val beginTraining = NoArgEvent()
     val endTraining = NoArgEvent()
     val errorUpdated = AddedEvent<Double>()

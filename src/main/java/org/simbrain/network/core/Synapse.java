@@ -19,7 +19,7 @@
 package org.simbrain.network.core;
 
 import org.simbrain.network.NetworkModel;
-import org.simbrain.network.events.SynapseEvents2;
+import org.simbrain.network.events.SynapseEvents;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.spikeresponders.NonResponder;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
@@ -210,7 +210,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     /**
      * Support for property change events.
      */
-    private transient SynapseEvents2 events = new SynapseEvents2();
+    private transient SynapseEvents events = new SynapseEvents();
 
     /**
      * Construct a synapse using a source and target neuron, defaulting to ClampedSynapse and assuming the parent of the
@@ -736,7 +736,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
         // SynapseGroup.setAndComformToTemplate. Template synapses don't seem to have
         // change support initialized.
         if (events == null) {
-            events = new SynapseEvents2();
+            events = new SynapseEvents();
         }
         events.getLearningRuleUpdated().fireAndForget(oldRule, learningRule);
     }
@@ -843,7 +843,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
 
     @Override
     public void postOpenInit() {
-        events = new SynapseEvents2();
+        events = new SynapseEvents();
         if (getTarget() != null) {
             if (getTarget().getFanIn() != null) {
                 getTarget().addToFanIn(this);
@@ -887,7 +887,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
         setFrozen(!isFrozen());
     }
 
-    public SynapseEvents2 getEvents() {
+    public SynapseEvents getEvents() {
         return events;
     }
 

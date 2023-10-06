@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test
 import kotlin.system.measureTimeMillis
 
 
-class TestEvents : Events2() {
+class TestEvents : Events() {
     val throttlingEvent = NoArgEvent(interval = 100, timingMode = TimingMode.Throttle)
     val debouncingEvent = NoArgEvent(interval = 100, timingMode = TimingMode.Debounce)
     val longEvent = NoArgEvent()

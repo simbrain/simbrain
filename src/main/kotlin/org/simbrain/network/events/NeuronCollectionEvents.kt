@@ -1,11 +1,11 @@
 package org.simbrain.network.events
 
-import org.simbrain.util.Events2
+import org.simbrain.util.Events
 
 /**
- * See [Events2].
+ * See [Events].
  */
-class NeuronCollectionEvents2: LocationEvents2() {
+class NeuronCollectionEvents: LocationEvents() {
     val recordingStarted = NoArgEvent()
     val recordingStopped = NoArgEvent()
 }

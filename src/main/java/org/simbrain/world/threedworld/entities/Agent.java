@@ -7,7 +7,7 @@ import com.jme3.scene.Node;
 import org.jetbrains.annotations.Nullable;
 import org.simbrain.world.threedworld.engine.ThreeDEngine;
 import org.simbrain.world.threedworld.entities.EditorDialog.Editor;
-import org.simbrain.world.threedworld.events.EntityEvents2;
+import org.simbrain.world.threedworld.events.EntityEvents;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +21,7 @@ public class Agent implements Entity {
     private ModelEntity model;
     private List<Sensor> sensors = new ArrayList<Sensor>();
     private List<Effector> effectors = new ArrayList<Effector>();
-    private transient EntityEvents2 events = new EntityEvents2();
+    private transient EntityEvents events = new EntityEvents();
 
     /**
      * Construct a new Agent.
@@ -206,7 +206,7 @@ public class Agent implements Entity {
         return model.getEditor();
     }
 
-    public EntityEvents2 getEvents() {
+    public EntityEvents getEvents() {
         return events;
     }
 

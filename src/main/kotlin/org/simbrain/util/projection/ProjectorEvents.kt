@@ -1,11 +1,11 @@
 package org.simbrain.util.projection
 
-import org.simbrain.util.Events2
+import org.simbrain.util.Events
 
 /**
- * See [Events2].
+ * See [Events].
  */
-class ProjectorEvents2: Events2() {
+class ProjectorEvents: Events() {
     val dataChanged = NoArgEvent()
     val pointFound = AddedEvent<DataPoint>()
     val colorsChanged = NoArgEvent()
@@ -14,7 +14,7 @@ class ProjectorEvents2: Events2() {
 
 }
 
-class ProjectorEvents3: Events2() {
+class ProjectorEvents3: Events() {
     val pointAdded = AddedEvent<DoubleArray>()
     val datasetChanged = NoArgEvent()
     val datasetCleared = NoArgEvent()

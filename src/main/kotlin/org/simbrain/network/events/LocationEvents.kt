@@ -1,10 +1,10 @@
 package org.simbrain.network.events
 
-import org.simbrain.util.Events2
+import org.simbrain.util.Events
 
 /**
- * See [Events2]
+ * See [Events]
  */
-open class LocationEvents2: NetworkModelEvents2() {
+open class LocationEvents: NetworkModelEvents() {
     val locationChanged = NoArgEvent()
 }

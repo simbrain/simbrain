@@ -13,7 +13,7 @@ import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.HexagonalGridLayout
 import org.simbrain.network.layouts.Layout
 import org.simbrain.network.layouts.LineLayout
-import org.simbrain.util.Events2
+import org.simbrain.util.Events
 import org.simbrain.util.propertyeditor.CopyableObject
 
 /**
@@ -37,7 +37,7 @@ class NodeGene private constructor(val template: Neuron = Neuron(null)): Network
 
     override val product = CompletableDeferred<Neuron>()
 
-    val events = NodeGeneEvents2()
+    val events = NodeGeneEvents()
 
     fun mutate(config: Neuron.() -> Unit) {
         template.apply(config)
@@ -55,7 +55,7 @@ class NodeGene private constructor(val template: Neuron = Neuron(null)): Network
 
 }
 
-class NodeGeneEvents2: Events2() {
+class NodeGeneEvents: Events() {
     val copy = AddedEvent<NodeGene>()
 }
 

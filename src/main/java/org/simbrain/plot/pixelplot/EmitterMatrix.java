@@ -3,7 +3,7 @@ package org.simbrain.plot.pixelplot;
 import org.simbrain.util.UserParameter;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
-import org.simbrain.world.imageworld.events.ImageEvents2;
+import org.simbrain.world.imageworld.events.ImageEvents;
 import org.simbrain.world.imageworld.filters.Filter;
 
 import java.awt.image.BufferedImage;
@@ -49,7 +49,7 @@ public class EmitterMatrix implements AttributeContainer {
     /**
      * Handle Image source Events.
      */
-    private transient ImageEvents2 events = new ImageEvents2();
+    private transient ImageEvents events = new ImageEvents();
 
     /**
      * Construct an empty emitter matrix.
@@ -191,7 +191,7 @@ public class EmitterMatrix implements AttributeContainer {
         return "Emitter Matrix";
     }
 
-    public ImageEvents2 getEvents() {
+    public ImageEvents getEvents() {
         return events;
     }
 
@@ -199,7 +199,7 @@ public class EmitterMatrix implements AttributeContainer {
      * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
      */
     public Object readResolve() {
-        events = new ImageEvents2();
+        events = new ImageEvents();
         return this;
     }
 }

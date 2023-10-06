@@ -2,7 +2,7 @@ package org.simbrain.world.odorworld.sensors
 
 import org.simbrain.util.UserParameter
 import org.simbrain.world.odorworld.entities.PeripheralAttribute
-import org.simbrain.world.odorworld.events.SensorEffectorEvents2
+import org.simbrain.world.odorworld.events.SensorEffectorEvents
 import java.util.*
 
 /**
@@ -30,7 +30,7 @@ abstract class Sensor : PeripheralAttribute {
      * Handle events.
      */
     @Transient
-    private var events = SensorEffectorEvents2()
+    private var events = SensorEffectorEvents()
 
     /**
      * Construct a sensor.
@@ -65,12 +65,12 @@ abstract class Sensor : PeripheralAttribute {
     }
 
     abstract override fun copy(): Sensor
-    override fun getEvents(): SensorEffectorEvents2 {
+    override fun getEvents(): SensorEffectorEvents {
         return events
     }
 
     fun readResolve(): Any {
-        events = SensorEffectorEvents2()
+        events = SensorEffectorEvents()
         return this
     }
 

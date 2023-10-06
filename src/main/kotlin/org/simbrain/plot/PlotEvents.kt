@@ -1,9 +1,9 @@
 package org.simbrain.plot
 
 import org.simbrain.plot.timeseries.TimeSeriesModel
-import org.simbrain.util.Events2
+import org.simbrain.util.Events
 
-open class PlotEvents: Events2() {
+open class PlotEvents: Events() {
     val propertyChanged = NoArgEvent()
 }
 

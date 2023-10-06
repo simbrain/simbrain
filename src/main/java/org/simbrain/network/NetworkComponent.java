@@ -18,7 +18,7 @@
 package org.simbrain.network;
 
 import org.simbrain.network.core.Network;
-import org.simbrain.network.events.NetworkEvents2;
+import org.simbrain.network.events.NetworkEvents;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.util.XStreamUtils;
 import org.simbrain.workspace.AttributeContainer;
@@ -68,7 +68,7 @@ public final class NetworkComponent extends WorkspaceComponent {
      */
     private void init() {
 
-        NetworkEvents2 event = network.getEvents();
+        NetworkEvents event = network.getEvents();
 
         event.getModelAdded().on(null, true, list -> {
             list.forEach(m -> {

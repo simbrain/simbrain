@@ -2,8 +2,8 @@ package org.simbrain.network.gui.nodes;
 
 import kotlinx.coroutines.Dispatchers;
 import org.simbrain.network.NetworkModel;
-import org.simbrain.network.events.NeuronCollectionEvents2;
-import org.simbrain.network.events.NeuronEvents2;
+import org.simbrain.network.events.NeuronCollectionEvents;
+import org.simbrain.network.events.NeuronEvents;
 import org.simbrain.network.groups.AbstractNeuronCollection;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.SFileChooser;
@@ -52,7 +52,7 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
 
         addChild(outlinedObjects);
 
-        NeuronCollectionEvents2 events = nc.getEvents();
+        NeuronCollectionEvents events = nc.getEvents();
         events.getDeleted().on(Dispatchers.getMain(), n ->  {
             removeFromParent();
         });
@@ -112,7 +112,7 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
         this.neuronNodes.addAll(neuronNodes);
         for (NeuronNode neuronNode : neuronNodes) {
             // Listen directly to neuron nodes for property change events
-            NeuronEvents2 neuronEvents = neuronNode.getNeuron().getEvents();
+            NeuronEvents neuronEvents = neuronNode.getNeuron().getEvents();
             neuronEvents.getDeleted().on(Dispatchers.getMain(), n -> {
                 this.neuronNodes.remove(neuronNode);
                 outlinedObjects.resetOutlinedNodes(this.neuronNodes);

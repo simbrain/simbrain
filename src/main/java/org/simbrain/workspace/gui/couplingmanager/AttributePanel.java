@@ -19,8 +19,8 @@
 package org.simbrain.workspace.gui.couplingmanager;
 
 import org.simbrain.workspace.*;
-import org.simbrain.workspace.events.WorkspaceComponentEvents2;
-import org.simbrain.workspace.events.WorkspaceEvents2;
+import org.simbrain.workspace.events.WorkspaceComponentEvents;
+import org.simbrain.workspace.events.WorkspaceEvents;
 
 import javax.swing.*;
 import java.awt.*;
@@ -135,7 +135,7 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
      */
     private void addAttributeListener(WorkspaceComponent component) {
 
-        WorkspaceComponentEvents2 events = component.getEvents();
+        WorkspaceComponentEvents events = component.getEvents();
 
         events.getAttributeContainerAdded().on(ac -> {
             if (isSelectedComponent(component)) {
@@ -280,7 +280,7 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
                 AttributePanel.this.refresh((WorkspaceComponent) this.getItemAt(0));
             }
 
-            WorkspaceEvents2 events = workspace.getEvents();
+            WorkspaceEvents events = workspace.getEvents();
 
             events.getComponentAdded().on(wc -> {
                 this.addItem(wc);

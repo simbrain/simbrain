@@ -6,7 +6,7 @@ import org.simbrain.util.SimpleIdManager
 import org.simbrain.util.Utils
 import org.simbrain.workspace.couplings.Coupling
 import org.simbrain.workspace.couplings.CouplingManager
-import org.simbrain.workspace.events.WorkspaceEvents2
+import org.simbrain.workspace.events.WorkspaceEvents
 import org.simbrain.workspace.serialization.WorkspaceSerializer
 import org.simbrain.workspace.updater.UpdateAction
 import org.simbrain.workspace.updater.WorkspaceUpdater
@@ -87,7 +87,7 @@ class Workspace: CoroutineScope {
      * because writes to this list are uncommon.
      */
     @Transient
-    val events = WorkspaceEvents2()
+    val events = WorkspaceEvents()
 
     @Transient
     lateinit var idManager: SimpleIdManager

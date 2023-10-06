@@ -1,12 +1,12 @@
 package org.simbrain.world.threedworld.events
 
-import org.simbrain.util.Events2
+import org.simbrain.util.Events
 import org.simbrain.world.threedworld.entities.Agent
 
 /**
- * See [Events2].
+ * See [Events].
  */
-class ThreeDWorldEvents2: Events2() {
+class ThreeDWorldEvents: Events() {
     val initialized = NoArgEvent()
     val closed = NoArgEvent()
     val updated = NoArgEvent()

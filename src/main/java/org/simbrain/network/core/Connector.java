@@ -1,7 +1,7 @@
 package org.simbrain.network.core;
 
 import org.simbrain.network.NetworkModel;
-import org.simbrain.network.events.ConnectorEvents2;
+import org.simbrain.network.events.ConnectorEvents;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
@@ -31,7 +31,7 @@ public abstract class Connector extends NetworkModel implements EditableObject, 
     /**
      * Event support.
      */
-    private transient ConnectorEvents2 events = new ConnectorEvents2();
+    private transient ConnectorEvents events = new ConnectorEvents();
 
     /**
      * Whether to render an image of this entity.
@@ -72,7 +72,7 @@ public abstract class Connector extends NetworkModel implements EditableObject, 
     @Override
     public void postOpenInit() {
         if (events == null) {
-            events = new ConnectorEvents2();
+            events = new ConnectorEvents();
         }
         initEvents();
         source.addOutgoingConnector(this);
@@ -103,7 +103,7 @@ public abstract class Connector extends NetworkModel implements EditableObject, 
     }
 
     @Override
-    public ConnectorEvents2 getEvents() {
+    public ConnectorEvents getEvents() {
         return events;
     }
 

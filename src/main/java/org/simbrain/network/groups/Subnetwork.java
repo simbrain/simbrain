@@ -19,7 +19,7 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkModelList;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.events.LocationEvents2;
+import org.simbrain.network.events.LocationEvents;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 
@@ -51,7 +51,7 @@ public abstract class Subnetwork extends LocatableModel implements EditableObjec
     /**
      * Event support.
      */
-    protected transient LocationEvents2 events = new LocationEvents2();
+    protected transient LocationEvents events = new LocationEvents();
 
     /**
      * List of neuron groups.
@@ -162,7 +162,7 @@ public abstract class Subnetwork extends LocatableModel implements EditableObjec
     @Override
     public void postOpenInit() {
         if (events == null) {
-            events = new LocationEvents2();
+            events = new LocationEvents();
         }
         modelList.getAllInReconstructionOrder().forEach(NetworkModel::postOpenInit);
     }
@@ -189,7 +189,7 @@ public abstract class Subnetwork extends LocatableModel implements EditableObjec
 
     @NotNull
     @Override
-    public LocationEvents2 getEvents() {
+    public LocationEvents getEvents() {
         return events;
     }
 }

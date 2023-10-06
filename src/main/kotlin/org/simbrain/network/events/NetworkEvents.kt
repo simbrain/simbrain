@@ -2,12 +2,12 @@ package org.simbrain.network.events
 
 import org.simbrain.network.NetworkModel
 import org.simbrain.util.Event
-import org.simbrain.util.Events2
+import org.simbrain.util.Events
 
 /**
  * All Network events are defined here. Main docs at [Event].
  */
-class NetworkEvents2: Events2() {
+class NetworkEvents: Events() {
     val zoomToFitPage = NoArgEvent(interval = 20)
     val updated = NoArgEvent()
     val modelAdded = BatchAddedEvent<NetworkModel>(interval = 20)

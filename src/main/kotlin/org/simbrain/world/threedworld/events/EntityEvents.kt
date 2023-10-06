@@ -1,14 +1,14 @@
 package org.simbrain.world.threedworld.events
 
-import org.simbrain.util.Events2
+import org.simbrain.util.Events
 import org.simbrain.world.threedworld.entities.Effector
 import org.simbrain.world.threedworld.entities.Entity
 import org.simbrain.world.threedworld.entities.Sensor
 
 /**
- * See [Events2].
+ * See [Events].
  */
-class EntityEvents2: Events2() {
+class EntityEvents: Events() {
     val entityDeleted = RemovedEvent<Entity>()
     val entityAdded = AddedEvent<Entity>()
     val sensorDeleted = RemovedEvent<Sensor>()

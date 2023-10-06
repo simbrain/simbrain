@@ -31,6 +31,8 @@ import org.simbrain.world.imageworld.ImageWorldComponent;
 import org.simbrain.world.imageworld.gui.ImageWorldDesktopComponent;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent;
+import org.simbrain.world.soundworld.SoundWorldComponent;
+import org.simbrain.world.soundworld.gui.SoundWorldDesktopComponent;
 import org.simbrain.world.textworld.TextWorldComponent;
 import org.simbrain.world.textworld.gui.TextWorldDesktopComponent;
 import org.simbrain.world.threedworld.ThreeDDesktopComponent;
@@ -76,6 +78,9 @@ public class AbstractComponentFactory {
 
         putWorkspaceComponentFactory("Image World", ImageWorldComponent::new);
         putGuiComponentFactory(ImageWorldComponent.class, ImageWorldDesktopComponent::new);
+
+        putWorkspaceComponentFactory("Sound World", () -> new SoundWorldComponent(""));
+        putGuiComponentFactory(SoundWorldComponent.class, SoundWorldDesktopComponent::new);
 
         // putWorkspaceComponentFactory("Pixel Plot", PixelPlotComponent::new);
         // putGuiComponentFactory(PixelPlotComponent.class, PixelPlotDesktopComponent::new);

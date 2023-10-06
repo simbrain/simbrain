@@ -15,9 +15,9 @@ package org.simbrain.network.subnetworks
 
 import org.simbrain.network.core.Network
 import org.simbrain.network.neuron_update_rules.LinearRule
-import org.simbrain.network.trainers.BackpropTrainer2
+import org.simbrain.network.trainers.BackpropTrainer
 import org.simbrain.network.trainers.MatrixDataset
-import org.simbrain.network.trainers.Trainable2
+import org.simbrain.network.trainers.Trainable
 import org.simbrain.network.trainers.createDiagonalDataset
 import java.awt.geom.Point2D
 import kotlin.math.min
@@ -28,12 +28,12 @@ import kotlin.math.min
  * @author Jeff Yoshimi
  */
 open class BackpropNetwork(network: Network, nodesPerLayer: IntArray, initialPosition: Point2D?) :
-    FeedForward(network, nodesPerLayer, initialPosition), Trainable2 {
+    FeedForward(network, nodesPerLayer, initialPosition), Trainable {
 
     override lateinit var trainingSet: MatrixDataset
 
     override val trainer by lazy {
-        BackpropTrainer2(this)
+        BackpropTrainer(this)
     }
 
     init {

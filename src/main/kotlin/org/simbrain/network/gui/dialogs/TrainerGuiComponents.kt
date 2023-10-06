@@ -5,7 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
-import org.simbrain.network.trainers.IterableTrainer2
+import org.simbrain.network.trainers.IterableTrainer
 import org.simbrain.plot.timeseries.TimeSeriesModel
 import org.simbrain.plot.timeseries.TimeSeriesPlotActions
 import org.simbrain.plot.timeseries.TimeSeriesPlotPanel
@@ -25,7 +25,7 @@ import javax.swing.JProgressBar
 /**
  * Controls used by Supervised learning dialogs.
  */
-class TrainerControls(trainer: IterableTrainer2, errorText: String = "Error") : JPanel(), CoroutineScope {
+class TrainerControls(trainer: IterableTrainer, errorText: String = "Error") : JPanel(), CoroutineScope {
 
     private val job = SupervisorJob()
 
@@ -110,7 +110,7 @@ class TrainerControls(trainer: IterableTrainer2, errorText: String = "Error") : 
 
 }
 
-class ErrorTimeSeries(trainer: IterableTrainer2, errorText: String = "Error") : JPanel() {
+class ErrorTimeSeries(trainer: IterableTrainer, errorText: String = "Error") : JPanel() {
 
     val graphPanel: TimeSeriesPlotPanel
 

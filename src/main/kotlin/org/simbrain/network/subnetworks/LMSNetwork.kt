@@ -16,9 +16,9 @@ package org.simbrain.network.subnetworks
 import org.simbrain.network.core.Network
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.neuron_update_rules.LinearRule
-import org.simbrain.network.trainers.LMSTrainer2
+import org.simbrain.network.trainers.LMSTrainer
 import org.simbrain.network.trainers.MatrixDataset
-import org.simbrain.network.trainers.Trainable2
+import org.simbrain.network.trainers.Trainable
 import org.simbrain.network.trainers.createDiagonalDataset
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
@@ -30,12 +30,12 @@ import java.awt.geom.Point2D
  * @author Jeff Yoshimi
  */
 class LMSNetwork(network: Network, nInputs: Int, nOutputs: Int, initialPosition: Point2D? = null) :
-    FeedForward(network, intArrayOf(nInputs, nOutputs), initialPosition), Trainable2 {
+    FeedForward(network, intArrayOf(nInputs, nOutputs), initialPosition), Trainable {
 
     override lateinit var trainingSet: MatrixDataset
 
     override val trainer by lazy {
-        LMSTrainer2(this)
+        LMSTrainer(this)
     }
 
     init {

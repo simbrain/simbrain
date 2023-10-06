@@ -20,7 +20,7 @@ package org.simbrain.network.gui.dialogs.network;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.TestInputPanel;
-import org.simbrain.network.trainers.Trainable2;
+import org.simbrain.network.trainers.Trainable;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.table.BasicDataWrapperKt;
 import org.simbrain.util.table.SimbrainDataViewer;
@@ -54,7 +54,7 @@ public abstract class SupervisedTrainingDialog extends StandardDialog {
     /**
      * Reference to the trainable network being edited.
      */
-    private Trainable2 trainable;
+    private Trainable trainable;
 
     /**
      * Reference to input data panel.
@@ -76,7 +76,7 @@ public abstract class SupervisedTrainingDialog extends StandardDialog {
      */
     private List<Component> tabs = new ArrayList<Component>();
 
-    public SupervisedTrainingDialog(Frame parent, NetworkPanel networkPanel, Trainable2 trainable) {
+    public SupervisedTrainingDialog(Frame parent, NetworkPanel networkPanel, Trainable trainable) {
         super(parent, "");
         this.networkPanel = networkPanel;
         this.trainable = trainable;

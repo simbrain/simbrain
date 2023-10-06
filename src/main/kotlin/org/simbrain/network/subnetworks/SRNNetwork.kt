@@ -18,7 +18,7 @@ import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SRNTrainer
-import org.simbrain.network.trainers.Trainable2
+import org.simbrain.network.trainers.Trainable
 import org.simbrain.network.trainers.createDiagonalDataset
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.util.Direction
@@ -43,7 +43,7 @@ open class SRNNetwork(
     initialPosition: Point2D = point(0, 0)) :
         FeedForward(network,
             intArrayOf(numInputNodes, numHiddenNodes, numOutputNodes),
-            initialPosition), Trainable2 {
+            initialPosition), Trainable {
 
     var hiddenLayer: NeuronArray = layerList[1]
 

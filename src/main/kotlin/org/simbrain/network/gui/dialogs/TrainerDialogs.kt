@@ -7,7 +7,7 @@ import org.simbrain.network.gui.nodes.SRNNode
 import org.simbrain.network.subnetworks.LMSNetwork
 import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.network.trainers.MatrixDataset
-import org.simbrain.network.trainers.Trainable2
+import org.simbrain.network.trainers.Trainable
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.createAction
 import org.simbrain.util.createDialog
@@ -21,7 +21,7 @@ import javax.swing.JSeparator
 /**
  * Generic training dialog for supervised learning.
  */
-fun Trainable2.getTrainingDialog(): StandardDialog {
+fun Trainable.getTrainingDialog(): StandardDialog {
     return StandardDialog().apply {
 
         title = "Train Network"

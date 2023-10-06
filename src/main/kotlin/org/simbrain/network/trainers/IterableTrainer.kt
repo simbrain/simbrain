@@ -29,7 +29,7 @@ import kotlin.random.Random
 // Loss Function
 // See API for kotlindl
 
-abstract class IterableTrainer2(val net: Trainable2): EditableObject {
+abstract class IterableTrainer(val net: Trainable): EditableObject {
 
     @UserParameter(label = "Learning Rate", order = 1)
     var learningRate = .01
@@ -100,7 +100,7 @@ abstract class IterableTrainer2(val net: Trainable2): EditableObject {
 
 }
 
-class LMSTrainer2(val lmsNet: LMSNetwork) : IterableTrainer2(lmsNet) {
+class LMSTrainer(val lmsNet: LMSNetwork) : IterableTrainer(lmsNet) {
 
     override fun trainRow(rowNum: Int) {
         if (rowNum !in 0 until lmsNet.trainingSet.inputs.nrow()) {
@@ -122,7 +122,7 @@ class LMSTrainer2(val lmsNet: LMSNetwork) : IterableTrainer2(lmsNet) {
 
 }
 
-class BackpropTrainer2(val bp: BackpropNetwork) : IterableTrainer2(bp) {
+class BackpropTrainer(val bp: BackpropNetwork) : IterableTrainer(bp) {
 
     override fun trainRow(rowNum: Int) {
         bp.inputLayer.setActivations(bp.trainingSet.inputs.row(rowNum))
@@ -137,7 +137,7 @@ class BackpropTrainer2(val bp: BackpropNetwork) : IterableTrainer2(bp) {
 
 }
 
-class SRNTrainer(val srn: SRNNetwork) : IterableTrainer2(srn) {
+class SRNTrainer(val srn: SRNNetwork) : IterableTrainer(srn) {
 
     val weightMatrixTree = WeightMatrixTree(listOf(srn.inputLayer, srn.contextLayer), srn.outputLayer)
 

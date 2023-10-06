@@ -26,9 +26,7 @@ import org.simbrain.network.NetworkModel;
 import org.simbrain.network.events.LocationEvents2;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.network.gui.dialogs.network.SubnetworkPanel;
-import org.simbrain.network.trainers.Trainable;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.piccolo.Outline;
@@ -223,10 +221,10 @@ public class SubnetworkNode extends ScreenElement {
 
         ret.add(renameAction);
         ret.add(removeAction);
-        if (subnetwork instanceof Trainable) {
-            ret.addSeparator();
-            ret.add(testInputAction);
-        }
+        // if (subnetwork instanceof Trainable) {
+        //     ret.addSeparator();
+        //     ret.add(testInputAction);
+        // }
         return ret;
     }
 
@@ -299,10 +297,10 @@ public class SubnetworkNode extends ScreenElement {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            if (subnetwork instanceof Trainable) {
-                TestInputPanel testInputPanel = TestInputPanel.createTestInputPanel(getNetworkPanel(), ((Trainable) subnetwork).getInputNeurons(), ((Trainable) subnetwork).getTrainingSet().getInputDataMatrix());
-                getNetworkPanel().displayPanel(testInputPanel, "Test inputs");
-            }
+            // if (subnetwork instanceof Trainable) {
+            //     TestInputPanel testInputPanel = TestInputPanel.createTestInputPanel(getNetworkPanel(), ((Trainable) subnetwork).getInputNeurons(), ((Trainable) subnetwork).getTrainingSet().getInputDataMatrix());
+            //     getNetworkPanel().displayPanel(testInputPanel, "Test inputs");
+            // }
         }
     };
 

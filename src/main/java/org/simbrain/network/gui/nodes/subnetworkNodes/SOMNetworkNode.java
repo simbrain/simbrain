@@ -19,7 +19,6 @@
 package org.simbrain.network.gui.nodes.subnetworkNodes;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.network.SOMTrainingDialog;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.subnetworks.SOMNetwork;
 import org.simbrain.util.StandardDialog;
@@ -47,8 +46,9 @@ public class SOMNetworkNode extends SubnetworkNode {
 
     @Override
     public StandardDialog getPropertyDialog() {
-        return new SOMTrainingDialog(getNetworkPanel(),
-                        (SOMNetwork) getSubnetwork());
+        return null;
+        // return new SOMTrainingDialog(getNetworkPanel(),
+        //                 (SOMNetwork) getSubnetwork());
     }
 
     /**

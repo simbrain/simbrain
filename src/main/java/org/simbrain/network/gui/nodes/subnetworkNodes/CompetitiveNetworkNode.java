@@ -19,7 +19,6 @@
 package org.simbrain.network.gui.nodes.subnetworkNodes;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.network.CompetitiveTrainingDialog;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.subnetworks.CompetitiveNetwork;
 import org.simbrain.util.StandardDialog;
@@ -47,8 +46,9 @@ public class CompetitiveNetworkNode extends SubnetworkNode {
 
     @Override
     public StandardDialog getPropertyDialog() {
-        return new CompetitiveTrainingDialog(getNetworkPanel(),
-                (CompetitiveNetwork) getSubnetwork());
+        return null;
+        // return new CompetitiveTrainingDialog(getNetworkPanel(),
+        //         (CompetitiveNetwork) getSubnetwork());
     }
 
     /**

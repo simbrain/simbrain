@@ -24,8 +24,6 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SynapseGroup2;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
-import org.simbrain.network.trainers.Trainable;
-import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 
@@ -38,7 +36,7 @@ import java.util.List;
  *
  * @author Jeff Yoshimi
  */
-public class CompetitiveNetwork extends Subnetwork implements Trainable {
+public class CompetitiveNetwork extends Subnetwork {
 
     /**
      * The competitive network.
@@ -53,7 +51,7 @@ public class CompetitiveNetwork extends Subnetwork implements Trainable {
     /**
      * Training set.
      */
-    private final TrainingSet trainingSet = new TrainingSet();
+    // private final TrainingSet trainingSet = new TrainingSet();
 
     /**
      * Construct an SOM Network.
@@ -86,24 +84,20 @@ public class CompetitiveNetwork extends Subnetwork implements Trainable {
 
     }
 
-    @Override
+    // @Override
     public List<Neuron> getInputNeurons() {
         return inputLayer.getNeuronList();
     }
 
-    @Override
+    // @Override
     public List<Neuron> getOutputNeurons() {
         return competitive.getNeuronList();
     }
 
-    @Override
-    public TrainingSet getTrainingSet() {
-        return trainingSet;
-    }
-
-    @Override
-    public void initNetwork() {
-    }
+    // @Override
+    // public TrainingSet getTrainingSet() {
+    //     return trainingSet;
+    // }
 
     /**
      * @return the competitive network
@@ -116,7 +110,7 @@ public class CompetitiveNetwork extends Subnetwork implements Trainable {
         return inputLayer;
     }
 
-    @Override
+    // @Override
     public NetworkModel getNetwork() {
         return this;
     }

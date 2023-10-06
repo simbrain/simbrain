@@ -1,7 +1,6 @@
 package org.simbrain.network.gui.dialogs
 
 import net.miginfocom.swing.MigLayout
-import org.simbrain.network.gui.trainer.TrainerGuiActions
 import org.simbrain.util.Events2
 import org.simbrain.util.ResourceManager
 import org.simbrain.util.StandardDialog
@@ -45,7 +44,7 @@ class DataPanel: JPanel() {
         .also { add("Center", it) }
 
     private val fileToolBar = JToolBar().apply {
-        add(TrainerGuiActions.getOpenCSVAction(jTable, null))
+        // add(TrainerGuiActions.getOpenCSVAction(jTable, null))
         add(TableActionManager.getSaveCSVAction(table))
         toolbars.add(this)
     }

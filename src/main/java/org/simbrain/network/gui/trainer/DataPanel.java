@@ -149,7 +149,7 @@ public class DataPanel extends JPanel {
 
         // Open / Save Tools
         JToolBar fileToolBar = new JToolBar();
-        fileToolBar.add(TrainerGuiActions.getOpenCSVAction(table, dataHolder));
+        // fileToolBar.add(TrainerGuiActions.getOpenCSVAction(table, dataHolder));
         fileToolBar.add(TableActionManager.getSaveCSVAction((NumericTable) table.getData()));
         toolbars.add(fileToolBar);
 

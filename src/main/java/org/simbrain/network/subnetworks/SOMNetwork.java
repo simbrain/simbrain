@@ -26,8 +26,6 @@ import org.simbrain.network.core.SynapseGroup2;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.groups.SynapseGroup;
-import org.simbrain.network.trainers.Trainable;
-import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.network.util.Direction;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
@@ -43,7 +41,7 @@ import static org.simbrain.network.util.NetworkLayoutManagerKt.offsetNeuronGroup
  *
  * @author Jeff Yoshimi
  */
-public class SOMNetwork extends Subnetwork implements Trainable {
+public class SOMNetwork extends Subnetwork {
 
     /**
      * The self organizing map.
@@ -58,7 +56,7 @@ public class SOMNetwork extends Subnetwork implements Trainable {
     /**
      * Training set.
      */
-    private final TrainingSet trainingSet = new TrainingSet();
+    // private final TrainingSet trainingSet = new TrainingSet();
 
     /**
      * Construct an SOM Network.
@@ -94,22 +92,22 @@ public class SOMNetwork extends Subnetwork implements Trainable {
         offsetNeuronGroup(inputLayer, som, Direction.NORTH, 250);
     }
 
-    @Override
+    // @Override
     public List<Neuron> getInputNeurons() {
         return inputLayer.getNeuronList();
     }
 
-    @Override
+    // @Override
     public List<Neuron> getOutputNeurons() {
         return som.getNeuronList();
     }
 
-    @Override
-    public TrainingSet getTrainingSet() {
-        return trainingSet;
-    }
+    // @Override
+    // public TrainingSet getTrainingSet() {
+    //     return trainingSet;
+    // }
 
-    @Override
+    // @Override
     public void initNetwork() {
         // No implementation
     }
@@ -122,7 +120,7 @@ public class SOMNetwork extends Subnetwork implements Trainable {
         return inputLayer;
     }
 
-    @Override
+    // @Override
     public NetworkModel getNetwork() {
         return this;
     }

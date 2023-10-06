@@ -14,7 +14,6 @@ import org.simbrain.custom_sims.simulations.creatures.CreaturesSim
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaosBitStream
 import org.simbrain.custom_sims.simulations.hippocampus.Hippocampus
-import org.simbrain.custom_sims.simulations.mpfs_som.MpfsSOM
 import org.simbrain.custom_sims.simulations.patterns_of_activity.KuramotoOscillators
 import org.simbrain.custom_sims.simulations.patterns_of_activity.PatternsOfActivity
 import org.simbrain.custom_sims.simulations.patterns_of_activity.cogMap3Objects
@@ -120,7 +119,7 @@ val simulations = dir<Any>("Simulations") {
         dir("Defunct?") {
             item("ConvertSim") { ConvertSim() }
             item("Creatures") { CreaturesSim() }
-            item("MPFS") { MpfsSOM() }
+            // item("MPFS") { MpfsSOM() }
             item("PatternsOfActivity") { PatternsOfActivity() }
             item("SORN") { SORN() }
             item("Cortical Branching") { CorticalBranching() }

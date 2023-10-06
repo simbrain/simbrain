@@ -25,8 +25,6 @@ import org.simbrain.network.core.SynapseGroup2;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
-import org.simbrain.network.trainers.Trainable;
-import org.simbrain.network.trainers.TrainingSet;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 
@@ -38,7 +36,7 @@ import java.util.List;
 /**
  * <b>Hopfield</b> is a basic implementation of a discrete Hopfield network.
  */
-public class Hopfield extends Subnetwork implements Trainable {
+public class Hopfield extends Subnetwork  {
 
     /**
      * Custom update rule for Hopfield.
@@ -63,7 +61,7 @@ public class Hopfield extends Subnetwork implements Trainable {
     /**
      * Training set.
      */
-    private final TrainingSet trainingSet = new TrainingSet();
+    // private final TrainingSet trainingSet = new TrainingSet();
 
     /**
      * Creates a new Hopfield network.
@@ -110,12 +108,12 @@ public class Hopfield extends Subnetwork implements Trainable {
         getSynapseGroup().randomizeSymmetric();
     }
 
-    @Override
+    // @Override
     public void update() {
         updateFunc.update(this);
     }
 
-    @Override
+    // @Override
     public NetworkModel getNetwork() {
         return this;
     }
@@ -128,22 +126,22 @@ public class Hopfield extends Subnetwork implements Trainable {
         return weights;
     }
 
-    @Override
+    // @Override
     public List<Neuron> getInputNeurons() {
         return this.getFlatNeuronList();
     }
 
-    @Override
+    // @Override
     public List<Neuron> getOutputNeurons() {
         return this.getFlatNeuronList();
     }
 
-    @Override
-    public TrainingSet getTrainingSet() {
-        return trainingSet;
-    }
+    // @Override
+    // public TrainingSet getTrainingSet() {
+    //     return trainingSet;
+    // }
 
-    @Override
+    // @Override
     public void initNetwork() {
         // No implementation
     }

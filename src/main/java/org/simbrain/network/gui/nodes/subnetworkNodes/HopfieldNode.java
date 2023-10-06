@@ -19,7 +19,6 @@
 package org.simbrain.network.gui.nodes.subnetworkNodes;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.network.HopfieldEditTrainDialog;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.subnetworks.Hopfield;
 import org.simbrain.util.StandardDialog;
@@ -57,7 +56,8 @@ public class HopfieldNode extends SubnetworkNode {
 
     @Override
     public StandardDialog getPropertyDialog() {
-        return new HopfieldEditTrainDialog(getNetworkPanel(), (Hopfield) getSubnetwork());
+        return null;
+        // return new HopfieldEditTrainDialog(getNetworkPanel(), (Hopfield) getSubnetwork());
     }
 
     /**

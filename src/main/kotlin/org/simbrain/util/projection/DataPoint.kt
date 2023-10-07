@@ -2,7 +2,7 @@ package org.simbrain.util.projection
 
 import org.simbrain.util.euclideanDistance
 
-class DataPoint2(val upstairsPoint: DoubleArray, downstairsDimension: Int = 2, var label: String? = null) {
+class DataPoint @JvmOverloads constructor(val upstairsPoint: DoubleArray, downstairsDimension: Int = 2, var label: String? = null) {
 
     val downstairsPoint = DoubleArray(downstairsDimension)
 
@@ -14,7 +14,7 @@ class DataPoint2(val upstairsPoint: DoubleArray, downstairsDimension: Int = 2, v
         System.arraycopy(data, 0, this.downstairsPoint, 0, this.downstairsPoint.size)
     }
 
-    fun euclideanDistance(other: DataPoint2) = this.upstairsPoint.euclideanDistance(other.upstairsPoint)
+    fun euclideanDistance(other: DataPoint) = this.upstairsPoint.euclideanDistance(other.upstairsPoint)
 
     override fun toString() = """
         upstairs: ${upstairsPoint.contentToString()}

@@ -24,7 +24,7 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.trainer.DataPanel
-import org.simbrain.plot.projection.ProjectionComponent2
+import org.simbrain.plot.projection.ProjectionComponent
 import org.simbrain.util.createAction
 import org.simbrain.util.math.NumericMatrix
 import org.simbrain.util.table.NumericTable
@@ -154,7 +154,7 @@ class TestInputPanel private constructor(
         iconPath = "menu_icons/ProjectionIcon.png",
         description = "Open Projection"
     ) {
-        val projectionComponent = ProjectionComponent2("$name Projection")
+        val projectionComponent = ProjectionComponent("$name Projection")
         projectionComponent.projector.useHotColor = false
         SimbrainDesktop.workspace.addWorkspaceComponent(projectionComponent)
         val points = table.data.rowData.map { row -> row.map { (it as Double) }.toDoubleArray() }

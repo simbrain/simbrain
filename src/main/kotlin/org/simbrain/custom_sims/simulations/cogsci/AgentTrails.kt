@@ -10,7 +10,7 @@ import org.simbrain.util.component2
 import org.simbrain.util.environment.SmellSource
 import org.simbrain.util.place
 import org.simbrain.util.point
-import org.simbrain.util.projection.DataPoint2
+import org.simbrain.util.projection.DataPoint
 import org.simbrain.util.projection.HaloColoringManager
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.sensors.SmellSensor
@@ -246,7 +246,7 @@ val kAgentTrails = newSim {
 
         workspace.addUpdateAction(updateAction("Color projection points") {
             val predictedState = predictionNet.activations
-            haloColoringManager.customCenter = DataPoint2(predictedState)
+            haloColoringManager.customCenter = DataPoint(predictedState)
             haloColoringManager.radius = errorNeuron.activation + 0.2
         })
     }

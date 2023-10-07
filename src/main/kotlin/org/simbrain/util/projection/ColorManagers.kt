@@ -9,7 +9,7 @@ import java.awt.Color
 import kotlin.math.min
 
 /**
- * Manages the colors of datapoints in a [DataPoint2]]. Most subclasses maintain a mapping from datapoints to values
+ * Manages the colors of datapoints in a [DataPoint]]. Most subclasses maintain a mapping from datapoints to values
  * which are then mapped to colors.
  */
 abstract class ColoringManager: CopyableObject {
@@ -17,16 +17,16 @@ abstract class ColoringManager: CopyableObject {
     /**
      * Gets the color associated with a datapoint.
      */
-    context(Projector2)
-    abstract fun getColor(dataPoint: DataPoint2): Color?
+    context(Projector)
+    abstract fun getColor(dataPoint: DataPoint): Color?
 
     /**
-     * Sets this point as the "active" point, i.e the [Dataset2.currentPoint].
+     * Sets this point as the "active" point, i.e the [Dataset.currentPoint].
      */
-    abstract fun activate(dataPoint: DataPoint2)
+    abstract fun activate(dataPoint: DataPoint)
 
     /**
-     * Update colors associated with all points in the [Dataset2]
+     * Update colors associated with all points in the [Dataset]
      */
     abstract fun updateAllColors()
 
@@ -52,12 +52,12 @@ abstract class ColoringManager: CopyableObject {
 class NoOpColoringManager: ColoringManager() {
 
 
-    context(Projector2)
-    override fun getColor(dataPoint: DataPoint2): Color? {
+    context(Projector)
+    override fun getColor(dataPoint: DataPoint): Color? {
         return null
     }
 
-    override fun activate(dataPoint: DataPoint2) {
+    override fun activate(dataPoint: DataPoint) {
     }
 
     override fun updateAllColors() {
@@ -81,7 +81,7 @@ class NoOpColoringManager: ColoringManager() {
 
 
 /**
- * When activated a color goes to [Projector2.hotColor] then decays to [Projector2.baseColor] in a set number of steps.
+ * When activated a color goes to [Projector.hotColor] then decays to [Projector.baseColor] in a set number of steps.
  */
 class DecayColoringManager: ColoringManager() {
 
@@ -120,21 +120,21 @@ class DecayColoringManager: ColoringManager() {
 
     private var isValuesToColorsDirty = true
 
-    context(Projector2)
+    context(Projector)
     fun initColors(): List<Color> {
         this@DecayColoringManager.baseColor = baseColor
         this@DecayColoringManager.hotColor = hotColor
         return HSBInterpolate(baseColor.toHSB(), hotColor.toHSB(), stepsToBase)
     }
 
-    private val pointsToValues: MutableMap<DataPoint2, Int> = HashMap()
+    private val pointsToValues: MutableMap<DataPoint, Int> = HashMap()
 
-    override fun activate(dataPoint: DataPoint2) {
+    override fun activate(dataPoint: DataPoint) {
         pointsToValues[dataPoint] = stepsToBase - 1
     }
 
-    context(Projector2)
-    override fun getColor(dataPoint: DataPoint2): Color {
+    context(Projector)
+    override fun getColor(dataPoint: DataPoint): Color {
         if (isValuesToColorsDirty) {
             valuesToColors = initColors()
             isValuesToColorsDirty = false
@@ -180,19 +180,19 @@ class FrequencyColoringManager: ColoringManager() {
     @UserParameter(label = "High frequency color", order = 10)
     var highFrequencyColor = Color.green
 
-    private val visitCounts: MutableMap<DataPoint2, Int> = HashMap()
+    private val visitCounts: MutableMap<DataPoint, Int> = HashMap()
 
     private var maxCount = 1
 
-    override fun activate(dataPoint: DataPoint2) {
+    override fun activate(dataPoint: DataPoint) {
         val count = visitCounts.getOrDefault(dataPoint, 0)
         visitCounts[dataPoint] = count + 1
         maxCount = max(maxCount, count)
     }
 
     // TODO: Cache hotcolor and bascolor
-    context(Projector2)
-    override fun getColor(dataPoint: DataPoint2): Color {
+    context(Projector)
+    override fun getColor(dataPoint: DataPoint): Color {
         val t = (visitCounts[dataPoint] ?: 0).toDouble() / maxCount
         return HSBInterpolate(baseColor.toHSB(), highFrequencyColor.toHSB(), t)
     }
@@ -222,13 +222,13 @@ class MarkovColoringManager: ColoringManager() {
     @UserParameter(label = "High frequency color", order = 10)
     var highFrequencyColor = Color.green
 
-    private val transitionCounts: MutableMap<DataPoint2, MutableMap<DataPoint2, Int>> = HashMap()
+    private val transitionCounts: MutableMap<DataPoint, MutableMap<DataPoint, Int>> = HashMap()
 
-    private var lastPoint: DataPoint2? = null
+    private var lastPoint: DataPoint? = null
 
-    private var maxCounts: MutableMap<DataPoint2, Int> = HashMap()
+    private var maxCounts: MutableMap<DataPoint, Int> = HashMap()
 
-    override fun activate(dataPoint: DataPoint2) {
+    override fun activate(dataPoint: DataPoint) {
         lastPoint?.let { prev ->
             transitionCounts.getOrPut(prev) {
                 mutableMapOf(dataPoint to 0)
@@ -240,8 +240,8 @@ class MarkovColoringManager: ColoringManager() {
         lastPoint = dataPoint
     }
 
-    context(Projector2)
-    override fun getColor(dataPoint: DataPoint2): Color {
+    context(Projector)
+    override fun getColor(dataPoint: DataPoint): Color {
         val currentPoint = dataset.currentPoint
         val t = (transitionCounts[currentPoint]?.get(dataPoint) ?: 0).toDouble() / (maxCounts[currentPoint] ?: 1)
         return HSBInterpolate(baseColor.toHSB(), highFrequencyColor.toHSB(), t)
@@ -278,7 +278,7 @@ class HaloColoringManager: ColoringManager() {
 
     var useCustomCenter = false
 
-    private var center: DataPoint2? = null
+    private var center: DataPoint? = null
 
     var customCenter
         get() = center
@@ -287,14 +287,14 @@ class HaloColoringManager: ColoringManager() {
             center = value
         }
 
-    override fun activate(dataPoint: DataPoint2) {
+    override fun activate(dataPoint: DataPoint) {
         if (!useCustomCenter) {
             center = dataPoint
         }
     }
 
-    context(Projector2)
-    override fun getColor(dataPoint: DataPoint2): Color {
+    context(Projector)
+    override fun getColor(dataPoint: DataPoint): Color {
         return center?.let { target ->
             val distance = dataPoint.euclideanDistance(target)
             val t = (distance / radius).coerceIn(0.0, 1.0)

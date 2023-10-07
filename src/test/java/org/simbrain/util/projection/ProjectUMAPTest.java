@@ -8,9 +8,9 @@ public class ProjectUMAPTest {
     public void testUMAP() {
 
         // Creation projector
-        Projector proj = new Projector(5);
-        proj.setUseColorManager(false);
-        proj.setProjectionMethod("UMAP");
+        // Projector proj = new Projector(5);
+        // proj.setUseColorManager(false);
+        // proj.setProjectionMethod("UMAP");
 
         // try {
         //     proj.getUpstairs().setData(Read.arff("simulations/tables/iris.arff").toArray());

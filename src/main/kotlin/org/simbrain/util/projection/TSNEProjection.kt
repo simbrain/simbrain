@@ -3,7 +3,7 @@ package org.simbrain.util.projection
 import org.simbrain.util.UserParameter
 import smile.manifold.TSNE
 
-class TSNEProjection: ProjectionMethod2(), IterableProjectionMethod2  {
+class TSNEProjection: ProjectionMethod(), IterableProjectionMethod  {
 
     // TODO: Re-init when setting these parameters
 
@@ -13,20 +13,20 @@ class TSNEProjection: ProjectionMethod2(), IterableProjectionMethod2  {
     @UserParameter(label = "Learning Rate")
     var eta: Double = 200.0
 
-    val downstairsInitializationMethod = CoordinateProjection2()
-    val downstairsInitializationMethod2 = TriangulateProjection2()
+    val downstairsInitializationMethod = CoordinateProjection()
+    val downstairsInitializationMethod2 = TriangulateProjection()
 
     // TODO: Option for PCA initialization
 
     var tsne: TSNE? = null
 
-    override fun init(dataset: Dataset2) {
+    override fun init(dataset: Dataset) {
         tsne = TSNE(dataset.computeUpstairsArray(), 2, perplexity, eta, 1000).also {
             dataset.setDownstairsData(it.coordinates)
         }
     }
 
-    override fun addPoint(dataset: Dataset2, point: DataPoint2) {
+    override fun addPoint(dataset: Dataset, point: DataPoint) {
         synchronized(dataset) {
             if (dataset.kdTree.size < 15) {
                 downstairsInitializationMethod.addPoint(dataset, point)
@@ -38,7 +38,7 @@ class TSNEProjection: ProjectionMethod2(), IterableProjectionMethod2  {
 
     override var error: Double = 0.0
 
-    override fun iterate(dataset: Dataset2) {
+    override fun iterate(dataset: Dataset) {
         tsne?.let {
             it.update(1000)
             dataset.setDownstairsData(it.coordinates)
@@ -53,7 +53,7 @@ class TSNEProjection: ProjectionMethod2(), IterableProjectionMethod2  {
     companion object {
         @JvmStatic
         fun getTypes(): List<Class<*>> {
-            return ProjectionMethod2.getTypes()
+            return ProjectionMethod.getTypes()
         }
     }
 

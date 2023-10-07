@@ -8,14 +8,14 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter
 import java.util.*
 import kotlin.math.abs
 
-class KDTree(val dimension: Int) : Iterable<DataPoint2> {
+class KDTree(val dimension: Int) : Iterable<DataPoint> {
 
     @Transient
     private var pointCount = 0
     val size get() = pointCount
 
     private data class Node(
-        var point: DataPoint2,
+        var point: DataPoint,
         val axis: Int,
         var left: Node? = null,
         var right: Node? = null
@@ -24,7 +24,7 @@ class KDTree(val dimension: Int) : Iterable<DataPoint2> {
     @Transient
     private var root: Node? = null
 
-    private fun buildTree(points: List<DataPoint2>, depth: Int): Node? {
+    private fun buildTree(points: List<DataPoint>, depth: Int): Node? {
         if (points.isEmpty()) {
             return null
         }
@@ -41,12 +41,12 @@ class KDTree(val dimension: Int) : Iterable<DataPoint2> {
         )
     }
 
-    fun insert(point: DataPoint2) {
+    fun insert(point: DataPoint) {
         root = insert(root, point, 0)
         pointCount++
     }
 
-    private fun insert(node: Node?, point: DataPoint2, depth: Int): Node {
+    private fun insert(node: Node?, point: DataPoint, depth: Int): Node {
         if (node == null) {
             return Node(point, depth % dimension)
         }
@@ -73,9 +73,9 @@ class KDTree(val dimension: Int) : Iterable<DataPoint2> {
         }
     }
 
-    fun findClosestPoint(target: DataPoint2) = findClosestNPoints(target, 1).firstOrNull()
+    fun findClosestPoint(target: DataPoint) = findClosestNPoints(target, 1).firstOrNull()
 
-    fun findClosestNPoints(target: DataPoint2, n: Int): List<DataPoint2> {
+    fun findClosestNPoints(target: DataPoint, n: Int): List<DataPoint> {
         val closestNPoints = PriorityQueue<SearchNode>()
 
         fun searchClosest(node: Node?, depth: Int) {
@@ -111,15 +111,15 @@ class KDTree(val dimension: Int) : Iterable<DataPoint2> {
         return closestNPoints.map { it.node.point }
     }
 
-    private fun inOrderTraversal(node: Node?, action: (DataPoint2) -> Unit) {
+    private fun inOrderTraversal(node: Node?, action: (DataPoint) -> Unit) {
         if (node == null) return
         inOrderTraversal(node.left, action)
         action(node.point)
         inOrderTraversal(node.right, action)
     }
 
-    override fun iterator(): Iterator<DataPoint2> {
-        val nodes = mutableListOf<DataPoint2>()
+    override fun iterator(): Iterator<DataPoint> {
+        val nodes = mutableListOf<DataPoint>()
         inOrderTraversal(root) { nodes.add(it) }
         return nodes.iterator()
     }
@@ -137,11 +137,11 @@ class KDTree(val dimension: Int) : Iterable<DataPoint2> {
             .minByOrNull { it.point.upstairsPoint[targetAxis] }
     }
 
-    fun delete(target: DataPoint2): Boolean {
+    fun delete(target: DataPoint): Boolean {
         return delete(null, root, target, 0) != null
     }
 
-    private fun delete(parent: Node?, node: Node?, target: DataPoint2, depth: Int): Node? {
+    private fun delete(parent: Node?, node: Node?, target: DataPoint, depth: Int): Node? {
         if (node == null) {
             return null
         }
@@ -216,7 +216,7 @@ class KDTreeConvertor : Converter {
         val dims = reader.value.toInt()
         reader.moveUp()
         reader.moveDown()
-        val datapoints = context.convertAnother(reader.value, ArrayList::class.java) as List<DataPoint2>
+        val datapoints = context.convertAnother(reader.value, ArrayList::class.java) as List<DataPoint>
         reader.moveUp()
         val kdTree = KDTree(dims)
         datapoints.forEach { kdTree.insert(it) }
@@ -227,12 +227,12 @@ class KDTreeConvertor : Converter {
 
 fun main() {
     val points = listOf(
-        DataPoint2(doubleArrayOf(9.0, 9.0)),
-        DataPoint2(doubleArrayOf(8.0, 8.0)),
-        DataPoint2(doubleArrayOf(11.0, 12.0)),
-        DataPoint2(doubleArrayOf(6.0, 12.0)),
-        DataPoint2(doubleArrayOf(-9.0, 1.0)),
-        DataPoint2(doubleArrayOf(2.0, -7.0))
+        DataPoint(doubleArrayOf(9.0, 9.0)),
+        DataPoint(doubleArrayOf(8.0, 8.0)),
+        DataPoint(doubleArrayOf(11.0, 12.0)),
+        DataPoint(doubleArrayOf(6.0, 12.0)),
+        DataPoint(doubleArrayOf(-9.0, 1.0)),
+        DataPoint(doubleArrayOf(2.0, -7.0))
     )
 
     val kdTree = KDTree(2)
@@ -240,7 +240,7 @@ fun main() {
         kdTree.insert(point)
     }
 
-    val searchPoint = DataPoint2(doubleArrayOf(10.0, 10.0))
+    val searchPoint = DataPoint(doubleArrayOf(10.0, 10.0))
     val closestPoints = kdTree.findClosestNPoints(searchPoint, 3)
     closestPoints.forEach { point ->
         println("Closest point: (${point.upstairsPoint[0]}, ${point.upstairsPoint[1]})")
@@ -251,7 +251,7 @@ fun main() {
         println("Point: (${point.upstairsPoint[0]}, ${point.upstairsPoint[1]})")
     }
 
-    val pointToDelete = DataPoint2(doubleArrayOf(6.0, 12.0))
+    val pointToDelete = DataPoint(doubleArrayOf(6.0, 12.0))
     if (kdTree.delete(pointToDelete)) {
         println("Deleted point: (${pointToDelete.upstairsPoint[0]}, ${pointToDelete.upstairsPoint[1]})")
     } else {

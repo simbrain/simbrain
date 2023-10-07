@@ -9,7 +9,7 @@ import org.simbrain.util.display
 import org.simbrain.util.propertyeditor.EditableObject
 import java.awt.Color
 
-class Projector2(initialDimension: Int = 25) : EditableObject, CoroutineScope {
+class Projector(initialDimension: Int = 25) : EditableObject, CoroutineScope {
 
     @Transient
     private var job = SupervisorJob()
@@ -18,26 +18,26 @@ class Projector2(initialDimension: Int = 25) : EditableObject, CoroutineScope {
     override var coroutineContext = Dispatchers.Default + job
 
     @Transient
-    var events = ProjectorEvents3()
+    var events = ProjectorEvents()
 
     var dimension: Int = initialDimension
         set(value) {
-            dataset = Dataset2(value)
+            dataset = Dataset(value)
             field = value
         }
 
     /**
-     * The main data structure for a projection. A set of [DataPoint2]s, each of which has two double arrays, one of
+     * The main data structure for a projection. A set of [DataPoint]s, each of which has two double arrays, one of
      * which ("upstairs") represents the high dimensional data, and the other of which ("downstairs") represents the
      * low dimensional data.
      */
-    var dataset = Dataset2(dimension)
+    var dataset = Dataset(dimension)
 
     /**
      * The method used to project from high dimensional data upstairs to low dimensional data downstairs.
      */
     @UserParameter(label = "Projection Method", order = 100)
-    var projectionMethod: ProjectionMethod2 = PCAProjection2()
+    var projectionMethod: ProjectionMethod = PCAProjection()
         set(value) {
             val oldMethod = field
             field = value
@@ -66,7 +66,7 @@ class Projector2(initialDimension: Int = 25) : EditableObject, CoroutineScope {
     @UserParameter(label = "Coloring Manager", order = 110)
     var coloringManager: ColoringManager = NoOpColoringManager()
 
-    fun addDataPoint(newPoint: DataPoint2) {
+    fun addDataPoint(newPoint: DataPoint) {
         synchronized(dataset) {
             val closestPoint = dataset.kdTree.findClosestPoint(newPoint)
             if (closestPoint != null && closestPoint.euclideanDistance(newPoint) < tolerance) {
@@ -84,19 +84,19 @@ class Projector2(initialDimension: Int = 25) : EditableObject, CoroutineScope {
         projectionMethod.init(dataset)
     }
 
-    fun addDataPoint(array: DoubleArray) = addDataPoint(DataPoint2(array))
+    fun addDataPoint(array: DoubleArray) = addDataPoint(DataPoint(array))
 
     private fun readResolve(): Any {
         job = SupervisorJob()
         coroutineContext = Dispatchers.Default + job
-        events = ProjectorEvents3()
+        events = ProjectorEvents()
         return this
     }
 
 }
 
 fun main() {
-    val projector = Projector2(4)
+    val projector = Projector(4)
     projector.init()
     println(projector.dataset)
     projector.addDataPoint(doubleArrayOf(1.0, 2.0, 3.0, 4.0, 5.0))

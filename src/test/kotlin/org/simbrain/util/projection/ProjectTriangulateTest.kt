@@ -12,17 +12,17 @@ class ProjectTriangulateTest {
 
     @Test
     fun `initial test`() {
-        val proj = Projector(5)
-        proj.projectionMethod = ProjectTriangulate(proj)
-        proj.addDatapoint(p1)
-        proj.projectionMethod.project()
-        print(proj.downstairs)
-        proj.addDatapoint(p2)
-        proj.projectionMethod.project()
-        print(proj.downstairs)
-        proj.addDatapoint(p3)
-        proj.projectionMethod.project()
-        print(proj.downstairs)
+        // val proj = Projector(5)
+        // proj.projectionMethod = ProjectTriangulate(proj)
+        // proj.addDatapoint(p1)
+        // proj.projectionMethod.project()
+        // print(proj.downstairs)
+        // proj.addDatapoint(p2)
+        // proj.projectionMethod.project()
+        // print(proj.downstairs)
+        // proj.addDatapoint(p3)
+        // proj.projectionMethod.project()
+        // print(proj.downstairs)
         
     }
 

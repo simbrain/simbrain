@@ -12,7 +12,7 @@ import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.neuron_update_rules.KuramotoRule;
 import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.plot.projection.ProjectionComponent2;
+import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.piccolo.TMXUtils;
 import org.simbrain.util.stats.distributions.NormalDistribution;
@@ -39,7 +39,7 @@ public class KuramotoOscillators extends Simulation {
 
     // References
     Network net;
-    ProjectionComponent2 plot;
+    ProjectionComponent plot;
     NeuronGroup reservoirNet, predictionRes, inputNetwork;
     SynapseGroup2 predictionSg;
     Neuron errorNeuron;

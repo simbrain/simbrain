@@ -14,13 +14,12 @@ public class ProjectPCATest {
 
         // Creation projector
         Projector proj = new Projector(3);
-        proj.setUseColorManager(false);
-        proj.setProjectionMethod("PCA");
+        proj.setProjectionMethod(new PCAProjection());
 
         // Create upstairs data
-        proj.addDatapoint(new DataPoint(new double[]{-1, -1, 1}));
-        proj.addDatapoint(new DataPoint(new double[]{-2, -1, 2}));
-        proj.addDatapoint(new DataPoint(new double[]{-3, -2, 1}));
+        proj.addDataPoint(new DataPoint(new double[]{-1, -1, 1}));
+        proj.addDataPoint(new DataPoint(new double[]{-2, -1, 2}));
+        proj.addDataPoint(new DataPoint(new double[]{-3, -2, 1}));
 
         // Reference interpoint distances based on sklearn PCA
         double largestInterpointDist = 2.2360679774997894;
@@ -28,7 +27,7 @@ public class ProjectPCATest {
         double smallestInterpointDist = 1.4142135623730954;
 
         // Get Simbrain interpoint distances
-        double[][] downstairs = proj.getDownstairs().getDoubleArray();
+        double[][] downstairs = proj.getDataset().computeDownstairsArray();
         double[] interpointDistances = new double[3];
         interpointDistances[0] = SimbrainMath.distance(downstairs[0], downstairs[1]);
         interpointDistances[1] = SimbrainMath.distance(downstairs[1], downstairs[2]);

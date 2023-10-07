@@ -8,13 +8,13 @@ import kotlin.math.pow
  *
  * https://www.sciencedirect.com/science/article/abs/pii/S0167865597000937
  */
-class TriangulateProjection2: ProjectionMethod2() {
+class TriangulateProjection: ProjectionMethod() {
 
-    override fun init(dataset: Dataset2) {
+    override fun init(dataset: Dataset) {
 
     }
 
-    private fun triangulatePoint(dataset: Dataset2, point: DataPoint2) {
+    private fun triangulatePoint(dataset: Dataset, point: DataPoint) {
         when (dataset.kdTree.size) {
             0 -> point.setDownstairs(doubleArrayOf(0.0, 0.0))
             1 -> {
@@ -85,11 +85,11 @@ class TriangulateProjection2: ProjectionMethod2() {
         }
     }
 
-    override fun addPoint(dataset: Dataset2, point: DataPoint2) {
+    override fun addPoint(dataset: Dataset, point: DataPoint) {
         triangulatePoint(dataset, point)
     }
 
-    override fun copy() = TriangulateProjection2()
+    override fun copy() = TriangulateProjection()
 
     override val name = "Triangulate"
 
@@ -97,7 +97,7 @@ class TriangulateProjection2: ProjectionMethod2() {
     companion object {
         @JvmStatic
         fun getTypes(): List<Class<*>> {
-            return ProjectionMethod2.getTypes()
+            return ProjectionMethod.getTypes()
         }
     }
 }

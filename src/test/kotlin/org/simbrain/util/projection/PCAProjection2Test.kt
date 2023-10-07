@@ -10,8 +10,8 @@ class PCAProjection2Test {
     fun checkPCAProjection() {
 
         // Creation projector
-        val proj = Projector2(3)
-        proj.projectionMethod = PCAProjection2()
+        val proj = Projector(3)
+        proj.projectionMethod = PCAProjection()
 
         // Create upstairs data
         proj.addDataPoint(doubleArrayOf(-1.0, -1.0, 1.0))

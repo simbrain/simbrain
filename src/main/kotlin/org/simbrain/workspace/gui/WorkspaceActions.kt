@@ -24,7 +24,7 @@ import org.simbrain.plot.piechart.PieChartComponent
 import org.simbrain.plot.piechart.PieChartModel
 import org.simbrain.plot.pixelplot.EmitterMatrix
 import org.simbrain.plot.pixelplot.PixelPlotComponent
-import org.simbrain.plot.projection.ProjectionComponent2
+import org.simbrain.plot.projection.ProjectionComponent
 import org.simbrain.plot.rasterchart.RasterModel
 import org.simbrain.plot.rasterchart.RasterPlotComponent
 import org.simbrain.plot.timeseries.TimeSeriesModel
@@ -298,7 +298,7 @@ class WorkspaceActions {
         plotType = plotType,
         objectName = objectName,
         iconPath = "menu_icons/ProjectionIcon.png",
-        componentCreator = { name -> ProjectionComponent2(name) },
+        componentCreator = { name -> ProjectionComponent(name) },
         consumerProvider = {
             it.getConsumer("addPoint")
         }

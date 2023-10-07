@@ -3,19 +3,19 @@ package org.simbrain.util.projection
 import org.simbrain.util.UserParameter
 import kotlin.math.pow
 
-class SammonProjection2: ProjectionMethod2(), IterableProjectionMethod2 {
+class SammonProjection: ProjectionMethod(), IterableProjectionMethod {
 
-    val downstairsInitializationMethod = CoordinateProjection2()
-    val downstairsInitializationMethod2 = TriangulateProjection2()
+    val downstairsInitializationMethod = CoordinateProjection()
+    val downstairsInitializationMethod2 = TriangulateProjection()
 
     @UserParameter(label = "Epsilon", minimumValue = 0.0, increment = .1)
     var epsilon = 100.0
 
-    override fun init(dataset: Dataset2) {
+    override fun init(dataset: Dataset) {
         initDistances(dataset)
     }
 
-    private fun initDistances(dataset: Dataset2) {
+    private fun initDistances(dataset: Dataset) {
         synchronized(dataset) {
             upstairsDistances = dataset.computeUpstairsDistances()
             upstairsDistanceSum = upstairsDistances?.sumOf { it.sum() }
@@ -23,7 +23,7 @@ class SammonProjection2: ProjectionMethod2(), IterableProjectionMethod2 {
         }
     }
 
-    override fun addPoint(dataset: Dataset2, point: DataPoint2) {
+    override fun addPoint(dataset: Dataset, point: DataPoint) {
         synchronized(dataset) {
             if (dataset.kdTree.size < 15) {
                 downstairsInitializationMethod.addPoint(dataset, point)
@@ -38,7 +38,7 @@ class SammonProjection2: ProjectionMethod2(), IterableProjectionMethod2 {
     var downstairsDistances: List<List<Double>>? = null
     var upstairsDistanceSum: Double? = null
 
-    override fun iterate(dataset: Dataset2) {
+    override fun iterate(dataset: Dataset) {
         synchronized(dataset) {
             if (dataset.kdTree.size < 2) return
             downstairsDistances = dataset.computeDownstairsDistances()
@@ -73,13 +73,13 @@ class SammonProjection2: ProjectionMethod2(), IterableProjectionMethod2 {
 
     override val name = "Sammon"
 
-    override fun copy() = SammonProjection2()
+    override fun copy() = SammonProjection()
 
     // Kotlin hack to support "static method in superclass"
     companion object {
         @JvmStatic
         fun getTypes(): List<Class<*>> {
-            return ProjectionMethod2.getTypes()
+            return ProjectionMethod.getTypes()
         }
     }
 }

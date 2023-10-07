@@ -17,7 +17,7 @@ import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.network.updaterules.IntegrateAndFireRule;
 import org.simbrain.network.updaterules.SigmoidalRule;
 import org.simbrain.network.util.SpikingScalarData;
-import org.simbrain.plot.projection.ProjectionComponent2;
+import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.piccolo.TMXUtils;
@@ -528,7 +528,7 @@ public class PatternsOfActivity extends Simulation {
     private void addProjection(NeuronGroup toPlot, int x, int y, double tolerance, String methodName) {
 
         // Create projection component
-        ProjectionComponent2 pc = sim.addProjectionPlot(x, y, 362, 320, toPlot.getLabel());
+        ProjectionComponent pc = sim.addProjectionPlot(x, y, 362, 320, toPlot.getLabel());
         pc.getProjector().init();
         pc.getProjector().setTolerance(tolerance);
         pc.getProjector().setColoringManager(new MarkovColoringManager());

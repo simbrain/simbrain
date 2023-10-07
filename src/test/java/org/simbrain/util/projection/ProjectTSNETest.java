@@ -8,9 +8,9 @@ public class ProjectTSNETest {
     public void testTSNE() {
 
         // Creation projector
-        Projector proj = new Projector(5);
-        proj.setUseColorManager(false);
-        proj.setProjectionMethod("TSNE");
+        // Projector proj = new Projector(5);
+        // proj.setUseColorManager(false);
+        // proj.setProjectionMethod("TSNE");
 
         // try {
         //     proj.getUpstairs().setData(Read.arff("simulations/tables/iris.arff").toArray());

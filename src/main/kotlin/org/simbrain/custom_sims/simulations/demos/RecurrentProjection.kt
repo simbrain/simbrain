@@ -10,7 +10,7 @@ import org.simbrain.network.core.connect
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.util.place
 import org.simbrain.util.point
-import org.simbrain.util.projection.PCAProjection2
+import org.simbrain.util.projection.PCAProjection
 import javax.swing.JOptionPane
 
 /**
@@ -51,7 +51,7 @@ val recurrentProjection = newSim {
     // Location of the projection in the desktop
     val projectionPlot = addProjectionPlot2("Activations")
     projectionPlot.projector.tolerance = 2.0
-    projectionPlot.projector.projectionMethod = PCAProjection2()
+    projectionPlot.projector.projectionMethod = PCAProjection()
     withGui {
         place(projectionPlot) {
             location = point(410, 0)

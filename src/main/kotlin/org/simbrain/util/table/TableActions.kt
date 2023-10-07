@@ -4,7 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
-import org.simbrain.plot.projection.ProjectionComponent2
+import org.simbrain.plot.projection.ProjectionComponent
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.objectWrapper
@@ -158,7 +158,7 @@ val DataViewerTable.openProjectionAction get() = createAction(
     description = "Open Projection"
 ) {
     withContext(Dispatchers.Default) {
-        val projectionComponent = ProjectionComponent2("$name Projection")
+        val projectionComponent = ProjectionComponent("$name Projection")
         projectionComponent.projector.useHotColor = false
         SimbrainDesktop.workspace.addWorkspaceComponent(projectionComponent)
         val points = model.get2DDoubleArray()

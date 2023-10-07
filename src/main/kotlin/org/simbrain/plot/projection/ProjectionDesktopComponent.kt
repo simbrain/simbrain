@@ -18,10 +18,10 @@ import org.jfree.data.xy.XYSeries
 import org.jfree.data.xy.XYSeriesCollection
 import org.simbrain.util.*
 import org.simbrain.util.genericframe.GenericFrame
-import org.simbrain.util.projection.DataPoint2
-import org.simbrain.util.projection.IterableProjectionMethod2
-import org.simbrain.util.projection.ProjectionMethod2
-import org.simbrain.util.projection.Projector2
+import org.simbrain.util.projection.DataPoint
+import org.simbrain.util.projection.IterableProjectionMethod
+import org.simbrain.util.projection.ProjectionMethod
+import org.simbrain.util.projection.Projector
 import org.simbrain.util.widgets.ToggleButton
 import org.simbrain.workspace.gui.DesktopComponent
 import java.awt.*
@@ -29,8 +29,8 @@ import java.awt.geom.Ellipse2D
 import javax.swing.*
 import kotlin.reflect.full.primaryConstructor
 
-class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComponent2)
-    : DesktopComponent<ProjectionComponent2>(frame, component), CoroutineScope {
+class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionComponent)
+    : DesktopComponent<ProjectionComponent>(frame, component), CoroutineScope {
 
     val projector = component.projector
     override var coroutineContext = projector.coroutineContext
@@ -38,9 +38,9 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
     var running = false
 
     /**
-     * Ordered list of [DataPoint2] points so that the renderer can access points by index.
+     * Ordered list of [DataPoint] points so that the renderer can access points by index.
      */
-    val pointList = ArrayList<DataPoint2>()
+    val pointList = ArrayList<DataPoint>()
 
     // Actions
     val iterateAction = createAction(
@@ -107,15 +107,15 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
     }
 
     // Top stuff
-    val projectionMethods = ProjectionMethod2.getTypes()
+    val projectionMethods = ProjectionMethod.getTypes()
         .associateWith { it.kotlin.primaryConstructor!!.call() }
-    val projectionSelector = JComboBox<ProjectionMethod2>().apply {
+    val projectionSelector = JComboBox<ProjectionMethod>().apply {
         maximumSize = Dimension(200, 100)
         projectionMethods.values.forEach {
             addItem(it)
         }.also {
             addActionListener {
-                projector.projectionMethod = (selectedItem as ProjectionMethod2)
+                projector.projectionMethod = (selectedItem as ProjectionMethod)
             }
         }
         selectedItem = projectionMethods[projector.projectionMethod.javaClass]
@@ -147,7 +147,7 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
     // Central Chart Panel
     private suspend fun iterate() {
         projector.projectionMethod.let { projection ->
-            if (projection is IterableProjectionMethod2) {
+            if (projection is IterableProjectionMethod) {
                 projection.iterate(projector.dataset)
                 projector.events.iterated.fire(projection.error)
             }
@@ -165,10 +165,10 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
     private val renderer = CustomRenderer2(this).apply {
         setSeriesLinesVisible(0, projector.connectPoints)
         setSeriesShape(0, Ellipse2D.Double(-7.0, -7.0, 7.0, 7.0))
-        val generator = CustomToolTipGenerator(this@ProjectionDesktopComponent2)
+        val generator = CustomToolTipGenerator(this@ProjectionDesktopComponent)
         setSeriesToolTipGenerator(0, generator)
         defaultItemLabelsVisible = true
-        defaultItemLabelGenerator = LegendXYItemLabelGenerator(this@ProjectionDesktopComponent2)
+        defaultItemLabelGenerator = LegendXYItemLabelGenerator(this@ProjectionDesktopComponent)
     }
 
 
@@ -260,7 +260,7 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
             projectionSelector.selectedItem = projectionMethods[n.javaClass]
             running = false
             projector.events.stopIterating.fireAndBlock()
-            if (n is IterableProjectionMethod2) {
+            if (n is IterableProjectionMethod) {
                 topPanel.add(runToolbar)
                 bottomPanel.add(errorLabel)
             } else {
@@ -284,7 +284,7 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
 }
 
 fun main() {
-    val projector = Projector2(5).apply {
+    val projector = Projector(5).apply {
         // val random = Random(1)
         // repeat(100) {
         //     projector.addDataPoint(DoubleArray(5) { random.nextDouble() })
@@ -293,21 +293,21 @@ fun main() {
         //     epsilon = 100.0
         // }
         (0 until 40).forEach {p ->
-            val point= DataPoint2(DoubleArray(100) { p.toDouble() }, label = "$p")
+            val point= DataPoint(DoubleArray(100) { p.toDouble() }, label = "$p")
             addDataPoint(point)
         }
         dataset.randomizeDownstairs()
         init()
     }
     StandardDialog().apply{
-        val desktopComponent = ProjectionDesktopComponent2(
-            this, ProjectionComponent2("test", projector))
+        val desktopComponent = ProjectionDesktopComponent(
+            this, ProjectionComponent("test", projector))
         contentPane = desktopComponent
         makeVisible()
     }
 }
 
-private class CustomRenderer2(val proj: ProjectionDesktopComponent2) : XYLineAndShapeRenderer() {
+private class CustomRenderer2(val proj: ProjectionDesktopComponent) : XYLineAndShapeRenderer() {
     override fun getItemPaint(series: Int, index: Int): Paint {
         val projector = proj.projector
         val hotColor = if (projector.useHotColor) projector.hotColor else projector.baseColor
@@ -320,13 +320,13 @@ private class CustomRenderer2(val proj: ProjectionDesktopComponent2) : XYLineAnd
     }
 }
 
-private class CustomToolTipGenerator(val proj: ProjectionDesktopComponent2) : CustomXYToolTipGenerator() {
+private class CustomToolTipGenerator(val proj: ProjectionDesktopComponent) : CustomXYToolTipGenerator() {
     override fun generateToolTip(data: XYDataset, series: Int, index: Int): String {
         return proj.pointList[index].upstairsPoint.format(2)
     }
 }
 
-class LegendXYItemLabelGenerator(val proj: ProjectionDesktopComponent2) : StandardXYItemLabelGenerator(), XYItemLabelGenerator {
+class LegendXYItemLabelGenerator(val proj: ProjectionDesktopComponent) : StandardXYItemLabelGenerator(), XYItemLabelGenerator {
     override fun generateLabel(dataset: XYDataset, series: Int, index: Int): String? {
         return if (proj.projector.showLabels) proj.pointList[index].label else null
     }

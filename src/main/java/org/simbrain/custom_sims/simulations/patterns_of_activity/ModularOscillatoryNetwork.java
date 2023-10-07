@@ -15,7 +15,7 @@ import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
 import org.simbrain.network.neuron_update_rules.DecayRule;
 import org.simbrain.network.neuron_update_rules.KuramotoRule;
-import org.simbrain.plot.projection.ProjectionComponent2;
+import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
@@ -205,7 +205,7 @@ public class ModularOscillatoryNetwork extends Simulation {
     private void addProjection(NeuronGroup toPlot, int x, int y, double tolerance) {
 
         // Create projection component
-        ProjectionComponent2 pc = sim.addProjectionPlot(x, y, 362, 320, toPlot.getLabel());
+        ProjectionComponent pc = sim.addProjectionPlot(x, y, 362, 320, toPlot.getLabel());
         pc.getProjector().init();
         pc.getProjector().setTolerance(tolerance);
         //plot.getProjector().useColorManager = false;

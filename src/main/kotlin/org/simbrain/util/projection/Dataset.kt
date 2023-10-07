@@ -3,7 +3,7 @@ package org.simbrain.util.projection
 import org.simbrain.util.euclideanDistance
 import kotlin.random.Random
 
-class Dataset2(val dimension: Int) {
+class Dataset(val dimension: Int) {
 
     val kdTree = KDTree(dimension)
 
@@ -23,7 +23,7 @@ class Dataset2(val dimension: Int) {
         }
     }
 
-    var currentPoint: DataPoint2? = null
+    var currentPoint: DataPoint? = null
 
     fun setDownstairsData(data: Array<DoubleArray>) {
         (kdTree zip data).forEach { (datapoint, downstairsPoint) ->

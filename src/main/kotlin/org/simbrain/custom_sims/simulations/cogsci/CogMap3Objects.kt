@@ -6,7 +6,7 @@ import org.simbrain.network.core.SynapseGroup2
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.matrix.WeightMatrix
-import org.simbrain.plot.projection.ProjectionComponent2
+import org.simbrain.plot.projection.ProjectionComponent
 import org.simbrain.util.environment.SmellSource
 import org.simbrain.util.place
 import org.simbrain.util.point
@@ -122,7 +122,7 @@ val cogMap3Objects = newSim {
     with(couplingManager) {
         recurrent couple projectionPlot
         mouse.getProducer(OdorWorldEntity::getNearbyObjectName) couple
-                projectionPlot.getConsumer(ProjectionComponent2::setLabel)
+                projectionPlot.getConsumer(ProjectionComponent::setLabel)
     }
 
 }

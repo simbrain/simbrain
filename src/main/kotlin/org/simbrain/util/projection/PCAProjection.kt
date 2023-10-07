@@ -3,20 +3,20 @@ package org.simbrain.util.projection
 import org.simbrain.util.UserParameter
 import smile.feature.extraction.PCA
 
-class PCAProjection2: ProjectionMethod2() {
+class PCAProjection: ProjectionMethod() {
 
     @UserParameter(label = "Freeze space", description = "If true, project to existing components each update. If " +
             "false, refit PCA components each update")
     var freeze: Boolean = false
 
-    val initialProjectionMethod = CoordinateProjection2()
+    val initialProjectionMethod = CoordinateProjection()
 
     var pca: PCA? = null
 
     /**
      * This re-fits PCA.
      */
-    override fun init(dataset: Dataset2) {
+    override fun init(dataset: Dataset) {
         // The first few datapoinst can be projected using coordinate projection
         if (dataset.kdTree.size < 3) {
             initialProjectionMethod.init(dataset)
@@ -25,7 +25,7 @@ class PCAProjection2: ProjectionMethod2() {
         reFitPCA(dataset)
     }
 
-    override fun addPoint(dataset: Dataset2, point: DataPoint2) {
+    override fun addPoint(dataset: Dataset, point: DataPoint) {
         if (dataset.kdTree.size < 3) {
             initialProjectionMethod.addPoint(dataset, point)
             return
@@ -37,14 +37,14 @@ class PCAProjection2: ProjectionMethod2() {
         point.setDownstairs(pca!!.apply(point.upstairsPoint))
     }
 
-    private fun reFitPCA(dataset: Dataset2) {
+    private fun reFitPCA(dataset: Dataset) {
         val upstairs = dataset.computeUpstairsArray()
         pca = PCA.fit(upstairs).getProjection(2).also {
             dataset.setDownstairsData(it.apply(upstairs))
         }
     }
 
-    override fun copy() = PCAProjection2()
+    override fun copy() = PCAProjection()
 
     override val name = "PCA"
 
@@ -52,7 +52,7 @@ class PCAProjection2: ProjectionMethod2() {
     companion object {
         @JvmStatic
         fun getTypes(): List<Class<*>> {
-            return ProjectionMethod2.getTypes()
+            return ProjectionMethod.getTypes()
         }
     }
 }

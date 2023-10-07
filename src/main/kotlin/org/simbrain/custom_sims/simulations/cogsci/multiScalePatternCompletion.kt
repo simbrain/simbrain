@@ -12,7 +12,7 @@ import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.util.place
 import org.simbrain.util.point
-import org.simbrain.util.projection.PCAProjection2
+import org.simbrain.util.projection.PCAProjection
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.workspace.updater.UpdateComponent
 import org.simbrain.workspace.updater.UpdateCoupling
@@ -146,7 +146,7 @@ val allostaticPatternCompletion = newSim {
     // PCA
     val pca = addProjectionPlot2("Activations")
     pca.projector.tolerance = .2
-    pca.projector.projectionMethod = PCAProjection2()
+    pca.projector.projectionMethod = PCAProjection()
     withGui {
         place(pca) {
             location = point(143, 200)

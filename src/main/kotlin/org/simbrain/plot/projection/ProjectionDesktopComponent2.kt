@@ -206,7 +206,6 @@ class ProjectionDesktopComponent2(frame: GenericFrame, component: ProjectionComp
     fun showPrefDialog() {
         projector.createDialog {
             it.init()
-            it.coloringManager.projector = it
             launch {
                 it.events.settingsChanged.fire()
                 update()
@@ -315,7 +314,9 @@ private class CustomRenderer2(val proj: ProjectionDesktopComponent2) : XYLineAnd
         if (proj.pointList[index] === proj.projector.dataset.currentPoint) {
             return hotColor
         }
-        return projector.coloringManager.getColor(proj.pointList[index])?: projector.baseColor
+        return with(projector) {
+            projector.coloringManager.getColor(proj.pointList[index])?: projector.baseColor
+        }
     }
 }
 

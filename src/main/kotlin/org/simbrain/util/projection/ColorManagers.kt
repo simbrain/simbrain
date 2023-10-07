@@ -12,11 +12,12 @@ import kotlin.math.min
  * Manages the colors of datapoints in a [DataPoint2]]. Most subclasses maintain a mapping from datapoints to values
  * which are then mapped to colors.
  */
-abstract class ColoringManager(open var projector: Projector2? = null): CopyableObject {
+abstract class ColoringManager: CopyableObject {
 
     /**
      * Gets the color associated with a datapoint.
      */
+    context(Projector2)
     abstract fun getColor(dataPoint: DataPoint2): Color?
 
     /**
@@ -48,9 +49,10 @@ abstract class ColoringManager(open var projector: Projector2? = null): Copyable
 /**
  * "Null" coloring manager for when we don't use colors.
  */
-class NoOpColoringManager @JvmOverloads constructor(projector: Projector2? = null): ColoringManager(projector) {
+class NoOpColoringManager: ColoringManager() {
 
 
+    context(Projector2)
     override fun getColor(dataPoint: DataPoint2): Color? {
         return null
     }
@@ -81,30 +83,49 @@ class NoOpColoringManager @JvmOverloads constructor(projector: Projector2? = nul
 /**
  * When activated a color goes to [Projector2.hotColor] then decays to [Projector2.baseColor] in a set number of steps.
  */
-class DecayColoringManager @JvmOverloads constructor(projector: Projector2? = null): ColoringManager(projector) {
-
-    override var projector: Projector2? = projector
-        set(value) {
-            field = value
-            valuesToColors = initColors()
-        }
+class DecayColoringManager: ColoringManager() {
 
     @UserParameter(label = "Steps", description = "Steps to base color", minimumValue = 0.0)
     var stepsToBase = 100
         set(value) {
-            field = value
-            valuesToColors = initColors()
-            updateAllColors()
+            if (field != value) {
+                field = value
+                isValuesToColorsDirty = true
+                updateAllColors()
+            }
+        }
+
+    var baseColor = Color.DARK_GRAY
+        set(value) {
+            if (field != value) {
+                field = value
+                isValuesToColorsDirty = true
+                updateAllColors()
+            }
+        }
+
+    var hotColor = Color.red
+        set(value) {
+            if (field != value) {
+                field = value
+                isValuesToColorsDirty = true
+                updateAllColors()
+            }
         }
 
     /**
      * A list of colors indexed by values.
      */
-    var valuesToColors = initColors()
+    lateinit var valuesToColors: List<Color>
 
-    fun initColors() = projector?.let {
-        HSBInterpolate(it.baseColor.toHSB(), it.hotColor.toHSB(), stepsToBase)
-    } ?: listOf()
+    private var isValuesToColorsDirty = true
+
+    context(Projector2)
+    fun initColors(): List<Color> {
+        this@DecayColoringManager.baseColor = baseColor
+        this@DecayColoringManager.hotColor = hotColor
+        return HSBInterpolate(baseColor.toHSB(), hotColor.toHSB(), stepsToBase)
+    }
 
     private val pointsToValues: MutableMap<DataPoint2, Int> = HashMap()
 
@@ -112,7 +133,12 @@ class DecayColoringManager @JvmOverloads constructor(projector: Projector2? = nu
         pointsToValues[dataPoint] = stepsToBase - 1
     }
 
+    context(Projector2)
     override fun getColor(dataPoint: DataPoint2): Color {
+        if (isValuesToColorsDirty) {
+            valuesToColors = initColors()
+            isValuesToColorsDirty = false
+        }
         val colorIndex = pointsToValues.getOrDefault(dataPoint, 0)
         return valuesToColors[colorIndex]
     }
@@ -133,7 +159,6 @@ class DecayColoringManager @JvmOverloads constructor(projector: Projector2? = nu
 
     override fun copy(): DecayColoringManager {
         return DecayColoringManager().also {
-            it.projector = projector
             it.stepsToBase = stepsToBase
         }
     }
@@ -150,7 +175,7 @@ class DecayColoringManager @JvmOverloads constructor(projector: Projector2? = nu
 /**
  * Colors points so that more frequently visited points are colored hotter.
  */
-class FrequencyColoringManager @JvmOverloads constructor(projector: Projector2? = null): ColoringManager(projector) {
+class FrequencyColoringManager: ColoringManager() {
 
     @UserParameter(label = "High frequency color", order = 10)
     var highFrequencyColor = Color.green
@@ -166,9 +191,10 @@ class FrequencyColoringManager @JvmOverloads constructor(projector: Projector2? 
     }
 
     // TODO: Cache hotcolor and bascolor
+    context(Projector2)
     override fun getColor(dataPoint: DataPoint2): Color {
         val t = (visitCounts[dataPoint] ?: 0).toDouble() / maxCount
-        return HSBInterpolate(projector!!.baseColor.toHSB(), highFrequencyColor.toHSB(), t)
+        return HSBInterpolate(baseColor.toHSB(), highFrequencyColor.toHSB(), t)
     }
 
     override fun updateAllColors() {
@@ -191,7 +217,7 @@ class FrequencyColoringManager @JvmOverloads constructor(projector: Projector2? 
 }
 
 
-class MarkovColoringManager @JvmOverloads constructor(projector: Projector2? = null): ColoringManager(projector) {
+class MarkovColoringManager: ColoringManager() {
 
     @UserParameter(label = "High frequency color", order = 10)
     var highFrequencyColor = Color.green
@@ -214,10 +240,11 @@ class MarkovColoringManager @JvmOverloads constructor(projector: Projector2? = n
         lastPoint = dataPoint
     }
 
+    context(Projector2)
     override fun getColor(dataPoint: DataPoint2): Color {
-        val currentPoint = projector!!.dataset.currentPoint
+        val currentPoint = dataset.currentPoint
         val t = (transitionCounts[currentPoint]?.get(dataPoint) ?: 0).toDouble() / (maxCounts[currentPoint] ?: 1)
-        return HSBInterpolate(projector!!.baseColor.toHSB(), highFrequencyColor.toHSB(), t)
+        return HSBInterpolate(baseColor.toHSB(), highFrequencyColor.toHSB(), t)
     }
 
     override fun updateAllColors() {
@@ -240,7 +267,7 @@ class MarkovColoringManager @JvmOverloads constructor(projector: Projector2? = n
     }
 }
 
-class HaloColoringManager @JvmOverloads constructor(override var projector: Projector2? = null): ColoringManager(projector) {
+class HaloColoringManager: ColoringManager() {
 
     @UserParameter(label = "Radius", description = "Radius of the halo", minimumValue = 0.0)
     var radius = 0.2
@@ -266,12 +293,13 @@ class HaloColoringManager @JvmOverloads constructor(override var projector: Proj
         }
     }
 
+    context(Projector2)
     override fun getColor(dataPoint: DataPoint2): Color {
         return center?.let { target ->
             val distance = dataPoint.euclideanDistance(target)
             val t = (distance / radius).coerceIn(0.0, 1.0)
-            HSBInterpolate(projector!!.hotColor.toHSB(), projector!!.baseColor.toHSB(), t)
-        } ?: projector!!.baseColor
+            HSBInterpolate(hotColor.toHSB(), baseColor.toHSB(), t)
+        } ?: baseColor
     }
 
     override fun updateAllColors() {
@@ -283,7 +311,6 @@ class HaloColoringManager @JvmOverloads constructor(override var projector: Proj
 
     override fun copy(): HaloColoringManager {
         return HaloColoringManager().also {
-            it.projector = projector
             it.radius = radius
         }
     }

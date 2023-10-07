@@ -68,7 +68,7 @@ val hebbianAssociator = newSim {
 
     // Location of the projection in the desktop
     val projectionPlot = addProjectionPlot2("Activations")
-    projectionPlot.projector.coloringManager = FrequencyColoringManager(projectionPlot.projector)
+    projectionPlot.projector.coloringManager = FrequencyColoringManager()
     withGui {
         place(projectionPlot) {
             location = point(667, 10)

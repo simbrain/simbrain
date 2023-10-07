@@ -64,11 +64,7 @@ class Projector2(initialDimension: Int = 25) : EditableObject, CoroutineScope {
     var useHotColor = true
 
     @UserParameter(label = "Coloring Manager", order = 110)
-    var coloringManager: ColoringManager = NoOpColoringManager().also { it.projector = this }
-        set(value) {
-            field = value
-            field.projector = this
-        }
+    var coloringManager: ColoringManager = NoOpColoringManager()
 
     fun addDataPoint(newPoint: DataPoint2) {
         synchronized(dataset) {

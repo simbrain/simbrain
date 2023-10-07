@@ -1,7 +1,7 @@
 package org.simbrain.world.textworld
 
-import org.simbrain.util.projection.DataPoint
-import org.simbrain.util.projection.NTree
+import org.simbrain.util.projection.DataPoint2
+import org.simbrain.util.projection.KDTree
 import org.simbrain.util.table.SimbrainDataModel
 import org.simbrain.util.table.createFromDoubleArray
 import smile.math.matrix.Matrix
@@ -39,9 +39,9 @@ class TokenVectorMap(
     /**
      * N-Tree (optimized to find vectors near a given vector) associating vectors with tokens.
      */
-    private val treeMap = NTree(dimension).apply {
+    private val treeMap = KDTree(dimension).apply {
         tokensMap.forEach { (token, i) ->
-            add(DataPoint(tokenVectorMatrix.row(i), token))
+            insert(DataPoint2(tokenVectorMatrix.row(i), label = token))
         }
     }
 
@@ -70,7 +70,7 @@ class TokenVectorMap(
      */
     fun getClosestWord(key: DoubleArray): String {
         // TODO: Add a default minimum distance and if above that, return null or zero vector
-        return treeMap.getClosestPoint(DataPoint(key)).label
+        return treeMap.findClosestPoint(DataPoint2(key))?.label!!
     }
 
     fun createTableModel(): SimbrainDataModel {

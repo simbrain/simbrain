@@ -10,7 +10,8 @@ import org.simbrain.util.component2
 import org.simbrain.util.environment.SmellSource
 import org.simbrain.util.place
 import org.simbrain.util.point
-import org.simbrain.util.projection.Halo
+import org.simbrain.util.projection.DataPoint2
+import org.simbrain.util.projection.HaloColoringManager
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.sensors.SmellSensor
 import java.awt.geom.Point2D
@@ -239,11 +240,14 @@ val kAgentTrails = newSim {
             }
         }
 
-        // Prediction halo
-        plot.projector.isUseColorManager = false
+
+        val haloColoringManager = HaloColoringManager()
+        plot.projector.coloringManager = haloColoringManager
+
         workspace.addUpdateAction(updateAction("Color projection points") {
-            val predictedState: DoubleArray = predictionNet.activations
-            Halo.makeHalo(plot.projector, predictedState, errorNeuron.activation.toFloat())
+            val predictedState = predictionNet.activations
+            haloColoringManager.customCenter = DataPoint2(predictedState)
+            haloColoringManager.radius = errorNeuron.activation + 0.2
         })
     }
 

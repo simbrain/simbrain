@@ -4,7 +4,6 @@ import org.simbrain.docviewer.DocViewerComponent;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.desktop.NetworkDesktopComponent;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.plot.projection.ProjectionComponent2;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.util.ResourceManager;
@@ -87,11 +86,11 @@ public class SimulationUtils {
     }
 
     /**
-     * Add a named {@link ProjectionComponent} to a specific location.
+     * Add a named {@link ProjectionComponent2} to a specific location.
      */
     @Deprecated()
-    public ProjectionComponent addProjectionPlot(int x, int y, int width, int height, String name) {
-        ProjectionComponent projectionComponent = new ProjectionComponent(name);
+    public ProjectionComponent2 addProjectionPlot(int x, int y, int width, int height, String name) {
+        ProjectionComponent2 projectionComponent = new ProjectionComponent2(name);
         addComponent(projectionComponent, x, y, width, height);
         return projectionComponent;
     }

@@ -12,7 +12,7 @@ import org.simbrain.network.core.SynapseGroup2;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
-import org.simbrain.plot.projection.ProjectionComponent;
+import org.simbrain.plot.projection.ProjectionComponent2;
 import org.simbrain.util.decayfunctions.StepDecayFunction;
 import org.simbrain.util.stats.ProbabilityDistribution;
 import org.simbrain.util.stats.distributions.NormalDistribution;
@@ -63,7 +63,7 @@ public class EdgeOfChaos extends Simulation {
         buildNetwork();
 
         // Projection plot
-        ProjectionComponent pc = sim.addProjectionPlot(447,248,412,372, "PCA");
+        ProjectionComponent2 pc = sim.addProjectionPlot(447,248,412,372, "PCA");
         sim.couple(reservoir, pc);
 
         // Odor world sim

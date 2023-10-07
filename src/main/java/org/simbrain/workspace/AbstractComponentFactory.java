@@ -14,9 +14,7 @@ import org.simbrain.plot.piechart.PieChartComponent;
 import org.simbrain.plot.piechart.PieChartDesktopComponent;
 import org.simbrain.plot.pixelplot.PixelPlotComponent;
 import org.simbrain.plot.pixelplot.PixelPlotDesktopComponent;
-import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.plot.projection.ProjectionComponent2;
-import org.simbrain.plot.projection.ProjectionDesktopComponent;
 import org.simbrain.plot.projection.ProjectionDesktopComponent2;
 import org.simbrain.plot.rasterchart.RasterPlotComponent;
 import org.simbrain.plot.rasterchart.RasterPlotDesktopComponent;
@@ -97,9 +95,6 @@ public class AbstractComponentFactory {
 
         putWorkspaceComponentFactory("Pixel Plot", () -> new PixelPlotComponent(""));
         putGuiComponentFactory(PixelPlotComponent.class, PixelPlotDesktopComponent::new);
-
-        putWorkspaceComponentFactory("Projection Plot", () -> new ProjectionComponent(""));
-        putGuiComponentFactory(ProjectionComponent.class, ProjectionDesktopComponent::new);
 
         putWorkspaceComponentFactory("Projection2 Plot", () -> new ProjectionComponent2(""));
         putGuiComponentFactory(ProjectionComponent2.class, ProjectionDesktopComponent2::new);

@@ -17,10 +17,11 @@ import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
 import org.simbrain.network.updaterules.IntegrateAndFireRule;
 import org.simbrain.network.updaterules.SigmoidalRule;
 import org.simbrain.network.util.SpikingScalarData;
-import org.simbrain.plot.projection.ProjectionComponent;
+import org.simbrain.plot.projection.ProjectionComponent2;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.piccolo.TMXUtils;
+import org.simbrain.util.projection.MarkovColoringManager;
 import org.simbrain.util.stats.distributions.NormalDistribution;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
@@ -527,10 +528,10 @@ public class PatternsOfActivity extends Simulation {
     private void addProjection(NeuronGroup toPlot, int x, int y, double tolerance, String methodName) {
 
         // Create projection component
-        ProjectionComponent pc = sim.addProjectionPlot(x, y, 362, 320, toPlot.getLabel());
-        pc.getProjector().init(toPlot.size());
+        ProjectionComponent2 pc = sim.addProjectionPlot(x, y, 362, 320, toPlot.getLabel());
+        pc.getProjector().init();
         pc.getProjector().setTolerance(tolerance);
-        pc.getProjector().getColorManager().setColoringMethod("Bayesian");
+        pc.getProjector().setColoringManager(new MarkovColoringManager());
 
         // Coupling
         Producer inputProducer = sim.getProducer(toPlot, methodName);

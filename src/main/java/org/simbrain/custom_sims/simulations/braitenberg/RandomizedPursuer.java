@@ -7,10 +7,11 @@ import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.groups.NeuronCollection;
-import org.simbrain.plot.projection.ProjectionComponent;
+import org.simbrain.plot.projection.ProjectionComponent2;
 import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
-import org.simbrain.util.projection.Projector;
+import org.simbrain.util.projection.MarkovColoringManager;
+import org.simbrain.util.projection.Projector2;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.gui.SimbrainDesktop;
@@ -114,8 +115,8 @@ public class RandomizedPursuer extends Simulation {
     private void setUpPlots() {
 
         // Projection plot
-        ProjectionComponent projComp = sim.addProjectionPlot(10,304,441,308, "Sensory states");
-        Projector proj = projComp.getProjector();
+        ProjectionComponent2 projComp = sim.addProjectionPlot(10,304,441,308, "Sensory states");
+        Projector2 proj = projComp.getProjector();
         proj.setTolerance(1);
         //proj.setProjectionMethod("Coordinate Projection");
         //((ProjectCoordinate)proj.getProjectionMethod()).setAutoFind(false);
@@ -123,7 +124,7 @@ public class RandomizedPursuer extends Simulation {
         //((ProjectCoordinate)proj.getProjectionMethod()).setHiD2(1);
         // TODO: Below can be sensorNodes or vehicleNetwork
         sim.couple(vehicleNetwork, projComp);
-        projComp.getProjector().getColorManager().setColoringMethod("Bayesian");
+        proj.setColoringManager(new MarkovColoringManager());
 
         // Time series
         TimeSeriesPlotComponent tsPlot = sim.addTimeSeries(440,304,384,308, "Prediction Error");

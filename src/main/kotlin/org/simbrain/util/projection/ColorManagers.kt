@@ -38,7 +38,8 @@ abstract class ColoringManager(open var projector: Projector2? = null): Copyable
             NoOpColoringManager::class.java,
             DecayColoringManager::class.java,
             FrequencyColoringManager::class.java,
-            MarkovColoringManager::class.java
+            MarkovColoringManager::class.java,
+            HaloColoringManager::class.java
         )
     }
 
@@ -231,6 +232,63 @@ class MarkovColoringManager @JvmOverloads constructor(projector: Projector2? = n
     override fun copy() = MarkovColoringManager()
 
     override val name = "MarkovColoringManager"
+
+    companion object {
+
+        @JvmStatic
+        fun getTypes() = ColoringManager.getTypes()
+    }
+}
+
+class HaloColoringManager @JvmOverloads constructor(override var projector: Projector2? = null): ColoringManager(projector) {
+
+    @UserParameter(label = "Radius", description = "Radius of the halo", minimumValue = 0.0)
+    var radius = 0.2
+        set(value) {
+            field = value
+            updateAllColors()
+        }
+
+    var useCustomCenter = false
+
+    private var center: DataPoint2? = null
+
+    var customCenter
+        get() = center
+        set(value) {
+            useCustomCenter = true
+            center = value
+        }
+
+    override fun activate(dataPoint: DataPoint2) {
+        if (!useCustomCenter) {
+            center = dataPoint
+        }
+    }
+
+    override fun getColor(dataPoint: DataPoint2): Color {
+        return center?.let { target ->
+            val distance = dataPoint.euclideanDistance(target)
+            val t = (distance / radius).coerceIn(0.0, 1.0)
+            HSBInterpolate(projector!!.hotColor.toHSB(), projector!!.baseColor.toHSB(), t)
+        } ?: projector!!.baseColor
+    }
+
+    override fun updateAllColors() {
+    }
+
+    override fun reset() {
+
+    }
+
+    override fun copy(): HaloColoringManager {
+        return HaloColoringManager().also {
+            it.projector = projector
+            it.radius = radius
+        }
+    }
+
+    override val name = "HaloColoringManager"
 
     companion object {
 

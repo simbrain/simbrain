@@ -110,17 +110,17 @@ fun manualPPMI(cocMatrix: Matrix, positive: Boolean = true): Matrix {
 /**
  * Generates co-occurrence matrix from a provided [docString].
  *
- * Example: if [windowSize] is 2 and [skipGram] is true, then the context for "dog" in "the quick dog ran fastly"
- * is ["the", "quick", "ran", "fastly"].  If [windowSize] 2 and [skipGram] false, then the context for "dog"
+ * Example: if [windowSize] is 2 and [bidirectional] is true, then the context for "dog" in "the quick [dog] ran fastly"
+ * is ["the", "quick", "ran", "fastly"].  If [windowSize] 2 and [bidirectional] false, then the context for "dog"
  * is ["the", "quick"].
  *
  * @param windowSize specifies how many words should be included in a context.
- * @param skipGram  if true, window includes this many tokens before AND after; if false the window only includes
+ * @param bidirectional  if true, window includes this many tokens before AND after; if false the window only includes
  * previous tokens.
  * @return a symmetrical co-occurrence matrix with as many rows and columns as there are unique tokens in [docString].
  *
  */
-fun generateCooccurrenceMatrix(docString: String, windowSize: Int = 2, skipGram: Boolean = false , usePPMI: Boolean = true):
+fun generateCooccurrenceMatrix(docString: String, windowSize: Int = 2, bidirectional: Boolean = false, usePPMI: Boolean = true):
         Pair<List<String>, Matrix> {
     // println(docString)
     val convertedDocString = docString.removeSpecialCharacters()
@@ -151,7 +151,7 @@ fun generateCooccurrenceMatrix(docString: String, windowSize: Int = 2, skipGram:
             val currentToken = tokenizedSentence[sentenceIndex] // Current iterated token
 
             val contextLowerLimit = sentenceIndex - windowSize
-            val contextUpperLimit = if (skipGram) (sentenceIndex + windowSize) else (sentenceIndex)
+            val contextUpperLimit = if (bidirectional) (sentenceIndex + windowSize) else (sentenceIndex)
 
             for (contextIndex in contextLowerLimit..contextUpperLimit) {
                 if (contextIndex in 0..maxIndex && contextIndex != sentenceIndex) {

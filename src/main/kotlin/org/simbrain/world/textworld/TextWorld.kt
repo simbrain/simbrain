@@ -60,8 +60,8 @@ class TextWorld : AttributeContainer, EditableObject {
     @UserParameter(label = "Window size", minimumValue =  1.0, order = 20 )
     var windowSize = 5
 
-    @UserParameter(label = "SkipGram", order = 30 )
-    var skipGram = true
+    @UserParameter(label = "Bidirectional", order = 30 )
+    var bidirectional = true
 
     @UserParameter(label = "Use PPMI", order = 40 )
     var usePPMI = true
@@ -399,7 +399,7 @@ class TextWorld : AttributeContainer, EditableObject {
             tokenVectorMap = TokenVectorMap(tokens, Matrix.eye(tokens.size))
 
         } else {
-            val result = generateCooccurrenceMatrix(docString, windowSize,skipGram, usePPMI)
+            val result = generateCooccurrenceMatrix(docString, windowSize,bidirectional, usePPMI)
             tokenVectorMap = TokenVectorMap(result.first, result.second)
         }
     }

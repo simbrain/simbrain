@@ -147,5 +147,24 @@ class TextUtilsTest {
         }
     }
 
+    @Test
+    fun `remove stopwords from matrix`() {
+        val result = generateCooccurrenceMatrix(windowSizeText, 2, true)
+        val coocMatrix = result.second
+        val tokens = result.first
+        val targets = removeStopWords(tokens)
+
+        var approvedIndeces = intArrayOf()
+        for (token in tokens){
+            if (targets.contains(token)) approvedIndeces += intArrayOf(tokens.indexOf(token))
+        }
+        val cooc2 = coocMatrix.rows(*approvedIndeces)
+
+        val cooc3 = removeStopWordsFromMatrix(coocMatrix, tokens)
+
+        assertTrue(cooc2.ncol() == cooc3.ncol())
+        assertTrue(cooc2.nrow() == cooc3.nrow())
+    }
+
 }
 

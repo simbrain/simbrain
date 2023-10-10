@@ -10,11 +10,13 @@ import org.simbrain.plot.projection.ProjectionComponent
 import org.simbrain.util.environment.SmellSource
 import org.simbrain.util.place
 import org.simbrain.util.point
+import org.simbrain.util.projection.HaloColoringManager
 import org.simbrain.util.setSpectralRadius
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.sensors.SmellSensor
+import java.awt.Color
 
 /**
  * Generic 3 object -> recurrent net example using neuron array
@@ -118,6 +120,12 @@ val cogMap3Objects = newSim {
     // Plot
     val projectionPlot = addProjectionPlot2("Cognitive Map")
     projectionPlot.projector.tolerance = .9
+    projectionPlot.projector.connectPoints = true
+    projectionPlot.projector.baseColor = Color.GRAY.brighter()
+    projectionPlot.projector.coloringManager = HaloColoringManager().also{
+        it.radius = 50.0
+    }
+
     place(projectionPlot,930, 0, 518, 520)
     with(couplingManager) {
         recurrent couple projectionPlot

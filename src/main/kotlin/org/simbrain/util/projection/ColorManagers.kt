@@ -15,7 +15,8 @@ import kotlin.math.min
 abstract class ColoringManager: CopyableObject {
 
     /**
-     * Gets the color associated with a datapoint.
+     * Gets the color associated with a datapoint. This is called once per datapoint every iteration so avoid
+     * computationally intensive code.
      */
     context(Projector)
     abstract fun getColor(dataPoint: DataPoint): Color?
@@ -64,7 +65,6 @@ class NoOpColoringManager: ColoringManager() {
     }
 
     override fun reset() {
-
     }
 
     override fun copy(): NoOpColoringManager {
@@ -166,7 +166,6 @@ class DecayColoringManager: ColoringManager() {
     override val name = "DecayColoringManager"
 
     companion object {
-
         @JvmStatic
         fun getTypes() = ColoringManager.getTypes()
     }

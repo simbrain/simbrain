@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 import org.simbrain.util.math.SimbrainMath
 import java.util.*
 
-class PCAProjection2Test {
+class PCAProjectionTest {
     @Test
     fun checkPCAProjection() {
 

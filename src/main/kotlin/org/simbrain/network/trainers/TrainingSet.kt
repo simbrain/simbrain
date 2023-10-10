@@ -2,7 +2,7 @@ package org.simbrain.network.trainers
 
 import org.simbrain.util.clip
 
-class TrainingSet2 {
+class TrainingSet {
 
     private val _allSet: MutableList<Pair<MutableList<Double>, MutableList<Double>>> = ArrayList()
 

@@ -162,7 +162,7 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
         addSeries(XYSeries("Data", false, true))
     }
 
-    private val renderer = CustomRenderer2(this).apply {
+    private val renderer = CustomRenderer(this).apply {
         setSeriesLinesVisible(0, projector.connectPoints)
         setSeriesShape(0, Ellipse2D.Double(-7.0, -7.0, 7.0, 7.0))
         val generator = CustomToolTipGenerator(this@ProjectionDesktopComponent)
@@ -307,7 +307,7 @@ fun main() {
     }
 }
 
-private class CustomRenderer2(val proj: ProjectionDesktopComponent) : XYLineAndShapeRenderer() {
+private class CustomRenderer(val proj: ProjectionDesktopComponent) : XYLineAndShapeRenderer() {
     override fun getItemPaint(series: Int, index: Int): Paint {
         val projector = proj.projector
         val hotColor = if (projector.useHotColor) projector.hotColor else projector.baseColor

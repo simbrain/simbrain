@@ -17,19 +17,19 @@ class TestEvents : Events() {
     val changedEvent = ChangedEvent<String>()
 }
 
-class Event2Testing {
+class EventTesting {
 
-    val testEvents2 = TestEvents()
+    val testEvents = TestEvents()
 
     @Test
     fun `ensure throttle is limiting rates`() {
         var counter = 0
-        testEvents2.throttlingEvent.on {
+        testEvents.throttlingEvent.on {
             counter++
         }
         runBlocking {
             repeat(20) {
-                testEvents2.throttlingEvent.fireAndForget()
+                testEvents.throttlingEvent.fireAndForget()
                 delay(50L)
             }
             // 10 events for 1 second (20*50 milliseconds)
@@ -40,11 +40,11 @@ class Event2Testing {
     @Test
     fun `ensure debounce is limiting rates`() {
         var counter = 0
-        testEvents2.debouncingEvent.on {
+        testEvents.debouncingEvent.on {
             counter++
         }
         runBlocking {
-            testEvents2.debouncingEvent.fireAndForget()
+            testEvents.debouncingEvent.fireAndForget()
             delay(50L)
             assertEquals(0, counter, "should not fire before timeout")
             delay(100L)
@@ -53,7 +53,7 @@ class Event2Testing {
             counter = 0
 
             repeat(10) {
-                testEvents2.debouncingEvent.fireAndForget()
+                testEvents.debouncingEvent.fireAndForget()
                 delay(50L)
             }
             delay(100L)
@@ -63,13 +63,13 @@ class Event2Testing {
 
     @Test
     fun `ensure suspending events wait for handler to complete`() {
-        testEvents2.longEvent.on(wait = true) {
+        testEvents.longEvent.on(wait = true) {
             delay(100L)
         }
         val time = measureTimeMillis {
             runBlocking {
                 repeat(10) {
-                    testEvents2.longEvent.fire()
+                    testEvents.longEvent.fire()
                 }
             }
         }
@@ -78,14 +78,14 @@ class Event2Testing {
 
     @Test
     fun `ensure blocking events wait for handler to complete`() {
-        testEvents2.blockingEvent.on(wait = true) {
+        testEvents.blockingEvent.on(wait = true) {
             runBlocking {
                 delay(100L)
             }
         }
         val time = measureTimeMillis {
             repeat(10) {
-                testEvents2.blockingEvent.fireAndBlock()
+                testEvents.blockingEvent.fireAndBlock()
             }
         }
         assert(time > 1000) { "expect test to take longer than 1 seconds, took actually ${time}ms" }
@@ -93,12 +93,12 @@ class Event2Testing {
 
     @Test
     fun `ensure fireAndForget() doesn't wait for handler to complete`() {
-        testEvents2.longFireAndForgetEvent.on(Dispatchers.Default) {
+        testEvents.longFireAndForgetEvent.on(Dispatchers.Default) {
             delay(200L)
         }
         val time = measureTimeMillis {
             repeat(20) {
-                testEvents2.longFireAndForgetEvent.fireAndBlock()
+                testEvents.longFireAndForgetEvent.fireAndBlock()
             }
         }
         assert(time < 1500) { "expect test to take only a bit more than 1 second, took actually ${time}ms" }
@@ -107,12 +107,12 @@ class Event2Testing {
     @Test
     fun `if old and new are the same, event should not fire, else it should fire`() {
         var fired = false
-        testEvents2.changedEvent.on(wait = true) { _, _ ->
+        testEvents.changedEvent.on(wait = true) { _, _ ->
             fired = true
         }
-        testEvents2.changedEvent.fireAndBlock("test", "test")
+        testEvents.changedEvent.fireAndBlock("test", "test")
         assert(!fired) { "event should not have fired" }
-        testEvents2.changedEvent.fireAndBlock("test", "test2")
+        testEvents.changedEvent.fireAndBlock("test", "test2")
         assert(fired) { "event should have fired" }
     }
 }

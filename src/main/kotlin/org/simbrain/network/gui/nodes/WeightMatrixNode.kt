@@ -185,6 +185,19 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
                         "Plot Weight Matrix"
                     )
             )
+            contextMenu.add(
+                networkPanel.createAction(
+                    name = "Set Spectral Radius...",
+                    description = "Rescale matrix so that max eigenvalue is the specified value. < .9 decays; .9" +
+                            " churns; > 1 explodes."
+                ) {
+                    val radius = showNumericInputDialog("Set spectral Radius:", weightMatrix.weightMatrix.maxEigenvalue())
+                    if (radius != null) {
+                        weightMatrix.weightMatrix.setSpectralRadius(radius)
+                        weightMatrix.events.updated.fire()
+                    }
+                }
+            )
         }
 
         if (model.source is AbstractNeuronCollection) {

@@ -57,7 +57,11 @@ fun main() {
     // showSaveDialog("", "test.txt") {
     //     writeText("testing...")
     // }
-    print(showDirectorySelectionDialog())
+
+    // print(showDirectorySelectionDialog())
+    // val userInput = showNumericInputDialog("Enter a number:", 1)
+    val userInput = showNumericInputDialog("Enter a number:", 1.0)
+    println("User entered: $userInput")
 }
 
 /**
@@ -236,7 +240,6 @@ fun showWarningDialog(message: String) {
     JOptionPane.showMessageDialog(dialog, message, "Warning!", JOptionPane.WARNING_MESSAGE)
 }
 
-
 fun showWarningConfirmDialog(message: String): Int {
     val dialog = JDialog()
     dialog.isAlwaysOnTop = true
@@ -244,7 +247,52 @@ fun showWarningConfirmDialog(message: String): Int {
 }
 
 /**
- * Collapsable panel that uses  a [DetailTriangle]
+ * Create a dialog that takes an input in a text field and returns it as a string.
+ */
+fun showInputDialog(message: String): String {
+    val dialog = JDialog()
+    dialog.isAlwaysOnTop = true
+    return JOptionPane.showInputDialog(dialog, message)
+}
+
+/**
+ * Create a dialog that takes an input in a text field and returns it as a number.
+ * Returns null if user cancels the input.
+ *
+ * Init value determines the type. Int and Double supported.
+ */
+fun <T: Number> showNumericInputDialog(message: String, initValue: T): T? {
+    val dialog = JDialog()
+    dialog.isAlwaysOnTop = true
+    while (true) {
+        val result = JOptionPane.showInputDialog(dialog, message, initValue)
+        if (result == null) {
+            // User cancelled
+            return null
+        }
+
+        when (initValue) {
+            is Int -> {
+                try {
+                    return Integer.parseInt(result) as T
+                } catch (e: NumberFormatException) { /* continue below */ }
+            }
+            is Double -> {
+                try {
+                    return java.lang.Double.parseDouble(result) as T
+                } catch (e: NumberFormatException) { /* continue below */ }
+            }
+            else -> {
+                JOptionPane.showMessageDialog(dialog, "Unsupported number type!", "Error", JOptionPane.ERROR_MESSAGE)
+                return null
+            }
+        }
+        JOptionPane.showMessageDialog(dialog, "Please enter a valid number!", "Warning", JOptionPane.WARNING_MESSAGE)
+    }
+}
+
+/**
+ * Collapsable panel that uses a [DetailTriangle]
  */
 class DetailTrianglePanel @JvmOverloads constructor(
     val contentPanel: JPanel,

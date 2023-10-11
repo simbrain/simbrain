@@ -18,7 +18,7 @@ import javax.swing.SwingUtilities
  * @author Jeff Yoshimi
  * @author Leo Yulin Li
  */
-class SynapseGroup2NodeDirected(private val synapseGroupNode: SynapseGroup2Node) : PNode(), SynapseGroup2Node.Arrow {
+class SynapseGroupNodeDirected(private val synapseGroupNode: SynapseGroupNode) : PNode(), SynapseGroupNode.Arrow {
 
     private val source = synapseGroupNode.synapseGroup.source
     private val target = synapseGroupNode.synapseGroup.target

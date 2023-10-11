@@ -23,7 +23,7 @@ fun reconstructionOrder(obj: NetworkModel): Int = when (obj) {
     is NeuronCollection -> 30
     is NeuronArray -> 40
     is Connector -> 50
-    is SynapseGroup2 -> 60
+    is SynapseGroup -> 60
     is Subnetwork -> 70
     is Synapse -> 80
     else -> 55
@@ -237,8 +237,8 @@ suspend fun Network.addNeuronCollection(numNeurons: Int, template: Neuron.() -> 
  *
  * @return the new synapse group
  */
-fun Network.addSynapseGroup(source: NeuronGroup, target: NeuronGroup): SynapseGroup2 {
-    val sg = SynapseGroup2(source, target)
+fun Network.addSynapseGroup(source: NeuronGroup, target: NeuronGroup): SynapseGroup {
+    val sg = SynapseGroup(source, target)
     addNetworkModelAsync(sg)
     return sg
 }

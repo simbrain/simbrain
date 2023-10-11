@@ -8,7 +8,7 @@ import org.simbrain.network.connections.FixedDegree;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.core.SynapseGroup2;
+import org.simbrain.network.core.SynapseGroup;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
@@ -46,7 +46,7 @@ public class EdgeOfChaos extends Simulation {
 
     // References
     Network net;
-    SynapseGroup2 sgReservoir, cheeseToRes, flowersToRes;
+    SynapseGroup sgReservoir, cheeseToRes, flowersToRes;
     NeuronGroup reservoir, sensorNodes;
     OdorWorldComponent oc;
     OdorWorldEntity mouse;
@@ -137,7 +137,7 @@ public class EdgeOfChaos extends Simulation {
         return ng;
     }
 
-    public static SynapseGroup2 connectReservoir(Network parentNet, NeuronGroup res, double variance, int k) {
+    public static SynapseGroup connectReservoir(Network parentNet, NeuronGroup res, double variance, int k) {
 
         ProbabilityDistribution exRand = new NormalDistribution(0.0, Math.sqrt(variance));
         ProbabilityDistribution inRand =  new NormalDistribution(0.0, Math.sqrt(variance));
@@ -146,7 +146,7 @@ public class EdgeOfChaos extends Simulation {
         con.setDegree(k);
         con.setDirection(Direction.IN);
 
-        SynapseGroup2 reservoir = new SynapseGroup2(res, res, con);
+        SynapseGroup reservoir = new SynapseGroup(res, res, con);
         // TODO:  0.5, exRand, inRand);
         reservoir.setLabel("Recurrent Synapses");
         parentNet.addNetworkModelAsync(reservoir);
@@ -172,8 +172,8 @@ public class EdgeOfChaos extends Simulation {
      * @param quadrantNumber 1,2,3 or 4 from upper-left clockwise
      * @return the resulting synapse group
      */
-    private SynapseGroup2 sensorConnections(NeuronGroup src, NeuronGroup tar, int[] srcNodeIndices, double sparsity,
-                                            int quadrantNumber) {
+    private SynapseGroup sensorConnections(NeuronGroup src, NeuronGroup tar, int[] srcNodeIndices, double sparsity,
+                                           int quadrantNumber) {
 
         double xStart, yStart, xEnd, yEnd;
 
@@ -193,7 +193,7 @@ public class EdgeOfChaos extends Simulation {
             xEnd = tar.getMaxX();
         }
 
-        SynapseGroup2 src2Res = new SynapseGroup2(src, tar);
+        SynapseGroup src2Res = new SynapseGroup(src, tar);
         List<Neuron> tarNList = tar.getNeuronList();
         for (int ii = 0; ii < tar.size(); ++ii) {
             double x = tarNList.get(ii).getX();

@@ -3,7 +3,7 @@ package org.simbrain.custom_sims.simulations.creatures;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.SynapseGroup2;
+import org.simbrain.network.core.SynapseGroup;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.LineLayout;
@@ -149,13 +149,13 @@ public class CreaturesBrain {
         lobe.applyLayout(-5, -85);
     }
 
-    public SynapseGroup2 createSynapseGroup(NeuronGroup sourceLobe, NeuronGroup targetLobe, String groupName) {
+    public SynapseGroup createSynapseGroup(NeuronGroup sourceLobe, NeuronGroup targetLobe, String groupName) {
         // TODO: Modify this method to take in a CreaturesSynapseRule, and maybe
         // have it
         // generate a customized ConnectNeurons object to use.
 
         // Temporary method call
-        SynapseGroup2 synapseGroup = addSynapseGroup(nc.getNetwork(), sourceLobe, targetLobe);
+        SynapseGroup synapseGroup = addSynapseGroup(nc.getNetwork(), sourceLobe, targetLobe);
 
         synapseGroup.setLabel(groupName);
 

@@ -22,7 +22,7 @@ import org.simbrain.network.NetworkModel;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.SynapseGroup2;
+import org.simbrain.network.core.SynapseGroup;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.util.Direction;
@@ -85,7 +85,7 @@ public class SOMNetwork extends Subnetwork {
         inputLayer.setClamped(true);
         
         // Connect layers
-        SynapseGroup2 sg = new SynapseGroup2(inputLayer, som, new AllToAll());
+        SynapseGroup sg = new SynapseGroup(inputLayer, som, new AllToAll());
         addModel(sg);
 
         offsetNeuronGroup(inputLayer, som, Direction.NORTH, 250);

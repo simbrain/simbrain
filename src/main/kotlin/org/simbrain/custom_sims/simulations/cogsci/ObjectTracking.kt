@@ -62,7 +62,7 @@ val objectTrackingSim = newSim {
     reservoir.label = "Reservoir"
     reservoir.layout(GridLayout())
     reservoir.location = point(0, 0)
-    val reservoirSynapseGroup = SynapseGroup2(reservoir, reservoir, sparse)
+    val reservoirSynapseGroup = SynapseGroup(reservoir, reservoir, sparse)
     network.addNetworkModelAsync(reservoirSynapseGroup)
     val dist = NormalDistribution(1.0, .1)
     reservoirSynapseGroup.synapses.forEach { s ->
@@ -96,12 +96,12 @@ val objectTrackingSim = newSim {
     rightInputs.location = point(-616, 225)
 
     // Connect input nodes to reservoir
-    val leftInputsToRes = SynapseGroup2(leftInputs, reservoir, sparse)
+    val leftInputsToRes = SynapseGroup(leftInputs, reservoir, sparse)
     network.addNetworkModelAsync(leftInputsToRes)
     leftInputsToRes.synapses.forEach { s ->
         s.strength = 0.75
     }
-    val rightInputsToRes = SynapseGroup2(rightInputs, reservoir, sparse)
+    val rightInputsToRes = SynapseGroup(rightInputs, reservoir, sparse)
     network.addNetworkModelAsync(rightInputsToRes)
     rightInputsToRes.synapses.forEach { s ->
         s.strength = 0.75
@@ -122,9 +122,9 @@ val objectTrackingSim = newSim {
     network.addNetworkModelAsync(rightTurnCollection)
     leftTurnNeuron.location = point(546, -203)
     rightTurnNeuron.location = point(573, 323)
-    val resToLeftTurn = SynapseGroup2(reservoir, leftTurnCollection, sparse)
+    val resToLeftTurn = SynapseGroup(reservoir, leftTurnCollection, sparse)
     network.addNetworkModelAsync(resToLeftTurn)
-    val resToRightTurn = SynapseGroup2(reservoir, rightTurnCollection, sparse)
+    val resToRightTurn = SynapseGroup(reservoir, rightTurnCollection, sparse)
     network.addNetworkModelAsync(resToRightTurn)
 
     // Location of the network in the desktop

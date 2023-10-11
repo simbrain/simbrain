@@ -6,7 +6,7 @@ import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.SynapseGroup2;
+import org.simbrain.network.core.SynapseGroup;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.layouts.LineLayout;
@@ -41,7 +41,7 @@ public class KuramotoOscillators extends Simulation {
     Network net;
     ProjectionComponent plot;
     NeuronGroup reservoirNet, predictionRes, inputNetwork;
-    SynapseGroup2 predictionSg;
+    SynapseGroup predictionSg;
     Neuron errorNeuron;
 
     OdorWorldEntity mouse;
@@ -130,7 +130,7 @@ public class KuramotoOscillators extends Simulation {
         // Inputs to reservoir
         var sparseExcitatory = new Sparse(0.7, true, false);
         sparseExcitatory.setPercentExcitatory(100);
-        SynapseGroup2 inputToRes = new SynapseGroup2(inputNetwork, reservoirNet, sparseExcitatory);
+        SynapseGroup inputToRes = new SynapseGroup(inputNetwork, reservoirNet, sparseExcitatory);
 
         inputToRes.getConnectionStrategy().setExRandomizer(new NormalDistribution(10.0, 1.0));
         inputToRes.setDisplaySynapses(false);

@@ -3,7 +3,7 @@ package org.simbrain.custom_sims.simulations
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.SynapseGroup2
+import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.addNeuronCollectionAsync
 import org.simbrain.network.core.setLabels
 import org.simbrain.network.groups.NeuronCollection
@@ -95,7 +95,7 @@ val allostaticPatternCompletion = newSim {
     reservoir.layout(GridLayout())
     val sparse = Sparse()
     sparse.connectionDensity = .1
-    val reservoirSynapseGroup = SynapseGroup2(reservoir, reservoir, sparse)
+    val reservoirSynapseGroup = SynapseGroup(reservoir, reservoir, sparse)
     val dist = NormalDistribution(0.0, 1.0)
     reservoirSynapseGroup.synapses.forEach { s ->
         s.strength = dist.sampleDouble()
@@ -115,7 +115,7 @@ val allostaticPatternCompletion = newSim {
     }
 
     // Connect input nodes to reservoir
-    val inputsToRes = SynapseGroup2(inputs, reservoir, sparse)
+    val inputsToRes = SynapseGroup(inputs, reservoir, sparse)
     inputsToRes.label = "Inputs to Res"
     network.addNetworkModelAsync(inputsToRes)
     inputsToRes.synapses.forEach { s ->

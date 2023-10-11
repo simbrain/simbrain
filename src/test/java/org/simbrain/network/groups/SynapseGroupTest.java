@@ -3,7 +3,7 @@ package org.simbrain.network.groups;
 import org.junit.jupiter.api.Test;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
-import org.simbrain.network.core.SynapseGroup2;
+import org.simbrain.network.core.SynapseGroup;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -14,7 +14,7 @@ public class SynapseGroupTest {
         Network net = new Network();
         NeuronGroup source = new NeuronGroup(net, 2);
         NeuronGroup target = new NeuronGroup(net, 2);
-        SynapseGroup2 sg = new SynapseGroup2(source, target, new AllToAll());
+        SynapseGroup sg = new SynapseGroup(source, target, new AllToAll());
         assertEquals(sg.size(), 4);
     }
 

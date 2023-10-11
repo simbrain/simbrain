@@ -29,8 +29,8 @@ import org.simbrain.network.gui.NetworkPanel
  * PNodes representing individual synapses are managed via the isVisible field in [Synapse]. Changes to visibility
  * fire an event which is received by [SynapseNode].
  */
-class SynapseGroup2NodeExpanded(networkPanel: NetworkPanel, val parent: SynapseGroup2Node):
-    PNode(), SynapseGroup2Node.Arrow  {
+class SynapseGroupNodeExpanded(networkPanel: NetworkPanel, val parent: SynapseGroupNode):
+    PNode(), SynapseGroupNode.Arrow  {
 
     /**
      * Override PNode layoutChildren method in order to properly set the

@@ -6,7 +6,7 @@ import org.simbrain.custom_sims.helper_classes.ControlPanel
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.SynapseGroup2
+import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.updaterules.IntegrateAndFireRule
 import org.simbrain.util.SimbrainConstants.Polarity
@@ -125,7 +125,7 @@ class CortexSimple : Simulation {
         layer_56.setLocation(500.0, 1850.0)
 
         // Connect layers
-        val synGroups: MutableMap<String, SynapseGroup2> = HashMap()
+        val synGroups: MutableMap<String, SynapseGroup> = HashMap()
         synGroups["L2/3 Rec."] = connectLayers(layer_23, layer_23, .12)
         synGroups["L4 Rec."] = connectLayers(layer_4, layer_4, .24)
         synGroups["L5/6 Rec."] = connectLayers(layer_56, layer_56, .24)
@@ -190,12 +190,12 @@ class CortexSimple : Simulation {
     private fun connectLayers(
         src: NeuronGroup, tar: NeuronGroup,
         sparsity: Double
-    ): SynapseGroup2 {
+    ): SynapseGroup {
         val exRand: ProbabilityDistribution = LogNormalDistribution(exlocation, exscale, false)
         val inRand: ProbabilityDistribution = LogNormalDistribution(exlocation, exscale, true)
         val con = Sparse(sparsity, false, false)
         con.connectionDensity = 0.65
-        val sg = SynapseGroup2(src, tar, con)
+        val sg = SynapseGroup(src, tar, con)
         // sg.setRandomizers(exRand, inRand);
         sg.label = "Synapses"
         sg.displaySynapses = false

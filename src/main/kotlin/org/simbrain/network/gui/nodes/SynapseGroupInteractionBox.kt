@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.gui.nodes
 
-import org.simbrain.network.core.SynapseGroup2
+import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.createCouplingMenu
 import org.simbrain.network.gui.getDialog
@@ -27,17 +27,17 @@ import org.simbrain.util.display
 import javax.swing.*
 
 
-class SynapseGroup2InteractionBox(
+class SynapseGroupInteractionBox(
     networkPanel: NetworkPanel,
-    val synapseGroup: SynapseGroup2,
-    val synapseGroupNode: SynapseGroup2Node
+    val synapseGroup: SynapseGroup,
+    val synapseGroupNode: SynapseGroupNode
 ) : InteractionBox(networkPanel) {
 
     override fun getPropertyDialog(): JDialog {
        return synapseGroupNode.getDialog()
     }
 
-    override fun getModel(): SynapseGroup2 {
+    override fun getModel(): SynapseGroup {
         return synapseGroup
     }
 

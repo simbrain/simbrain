@@ -21,7 +21,7 @@ package org.simbrain.network.subnetworks;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.SynapseGroup2;
+import org.simbrain.network.core.SynapseGroup;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
@@ -45,7 +45,7 @@ public class Hopfield extends Subnetwork  {
 
     private NeuronGroup neuronGroup;
 
-    private SynapseGroup2 weights;
+    private SynapseGroup weights;
 
     /**
      * Default number of neurons.
@@ -94,7 +94,7 @@ public class Hopfield extends Subnetwork  {
         neuronGroup.setIncrement(1);
 
         // Connect the neurons together
-        weights = new SynapseGroup2(neuronGroup, neuronGroup);
+        weights = new SynapseGroup(neuronGroup, neuronGroup);
         weights.setDisplaySynapses(false);
         addModel(weights);
 
@@ -122,7 +122,7 @@ public class Hopfield extends Subnetwork  {
         return neuronGroup;
     }
 
-    public SynapseGroup2 getSynapseGroup() {
+    public SynapseGroup getSynapseGroup() {
         return weights;
     }
 

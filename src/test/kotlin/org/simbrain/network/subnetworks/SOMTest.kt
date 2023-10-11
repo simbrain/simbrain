@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.core.SynapseGroup2
+import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.nodes.NeuronNode
 
@@ -23,7 +23,7 @@ class SOMTest {
         assertEquals(2, som.inputLayer.size())
         assertEquals(0, net.freeSynapses.size)
         assertEquals(0, som.modelList.get<Synapse>().size)
-        assertEquals(2, som.modelList.get<SynapseGroup2>().first().size())
+        assertEquals(2, som.modelList.get<SynapseGroup>().first().size())
     }
 
     @Test

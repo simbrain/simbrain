@@ -314,13 +314,13 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Toggle visibility of selected synapse groups",
         keyboardShortcut = CmdOrCtrl + 'T',
         initBlock = {
-            isEnabled = networkPanel.selectionManager.filterSelectedModels<SynapseGroup2>().isNotEmpty() &&
-                    networkPanel.selectionManager.filterSelectedModels<SynapseGroup2>().none {
+            isEnabled = networkPanel.selectionManager.filterSelectedModels<SynapseGroup>().isNotEmpty() &&
+                    networkPanel.selectionManager.filterSelectedModels<SynapseGroup>().none {
                         it.synapses.size > NetworkPreferences.synapseVisibilityThreshold
                     }
         }
     ) {
-        val sgs = selectionManager.filterSelectedModels<SynapseGroup2>()
+        val sgs = selectionManager.filterSelectedModels<SynapseGroup>()
         sgs.forEach {
             it.displaySynapses = !it.displaySynapses
         }

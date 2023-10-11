@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations.patterns_of_activity
 
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.Sparse
-import org.simbrain.network.core.SynapseGroup2
+import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.matrix.WeightMatrix
@@ -56,7 +56,7 @@ val cogMap3Objects = newSim {
 
     val sparseExcitatory = Sparse(0.7, true, false)
     sparseExcitatory.percentExcitatory = 100.0
-    val inputToRes = SynapseGroup2(inputNetwork, recurrent, sparseExcitatory)
+    val inputToRes = SynapseGroup(inputNetwork, recurrent, sparseExcitatory)
 
     inputToRes.connectionStrategy.exRandomizer = NormalDistribution(10.0, 1.0)
     inputToRes.displaySynapses = false

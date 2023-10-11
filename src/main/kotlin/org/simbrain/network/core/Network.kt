@@ -253,7 +253,7 @@ class Network: CoroutineScope, EditableObject {
         NeuronCollection::class.java,
         NeuronArray::class.java,
         Connector::class.java,
-        SynapseGroup2::class.java,
+        SynapseGroup::class.java,
         Subnetwork::class.java,
         Synapse::class.java)
             .flatMap { networkModels[it] }
@@ -313,9 +313,9 @@ class Network: CoroutineScope, EditableObject {
     val flatSynapseList: List<Synapse>
         get() = sequence {
             yieldAll(networkModels.get<Synapse>())
-            yieldAll(networkModels.get<SynapseGroup2>().flatMap { sg -> sg.synapses })
+            yieldAll(networkModels.get<SynapseGroup>().flatMap { sg -> sg.synapses })
             yieldAll(networkModels.get<Subnetwork>().flatMap { subnetwork ->
-                subnetwork.modelList.get<SynapseGroup2>().flatMap { it.synapses }
+                subnetwork.modelList.get<SynapseGroup>().flatMap { it.synapses }
             })
         }.toList()
 
@@ -331,9 +331,9 @@ class Network: CoroutineScope, EditableObject {
     /**
      * Returns a list of all synapse groups including those in subnetworks.
      */
-    val flatSynapseGroupList: List<SynapseGroup2>
+    val flatSynapseGroupList: List<SynapseGroup>
         get() = sequence {
-            yieldAll(networkModels.get<SynapseGroup2>())
+            yieldAll(networkModels.get<SynapseGroup>())
             yieldAll(networkModels.get<Subnetwork>().flatMap { it.modelList.get() })
         }.toList()
 

@@ -278,7 +278,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             is NeuronArray -> createNode(model)
             is NeuronCollection -> createNode(model)
             is NeuronGroup -> createNode(model)
-            is SynapseGroup2 -> createNode(model)
+            is SynapseGroup -> createNode(model)
             is Connector -> createNode(model)
             is Subnetwork -> createNode(model)
             is NetworkTextObject -> createNode(model)
@@ -341,7 +341,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         NeuronCollectionNode(this, neuronCollection).apply { addNeuronNodes(neuronNodes) }
     }
 
-    fun createNode(synapseGroup: SynapseGroup2) = addScreenElement {
+    fun createNode(synapseGroup: SynapseGroup) = addScreenElement {
         with(synapseGroup.synapses) {
             if (size < NetworkPreferences.synapseVisibilityThreshold) {
                 forEach {
@@ -349,7 +349,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
                 }
             }
         }
-        SynapseGroup2Node(this, synapseGroup).also { SwingUtilities.invokeLater { it.lower() } }
+        SynapseGroupNode(this, synapseGroup).also { SwingUtilities.invokeLater { it.lower() } }
     }
 
     fun createNode(weightMatrix: Connector) = addScreenElement {
@@ -515,7 +515,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         clearSelectedObjects();
         selectionManager.filterSelectedModels<Synapse>().forEach { it.hardClear() }
         selectionManager.filterSelectedModels<WeightMatrix>().forEach { it.hardClear() }
-        selectionManager.filterSelectedModels<SynapseGroup2>().forEach { it.hardClear() }
+        selectionManager.filterSelectedModels<SynapseGroup>().forEach { it.hardClear() }
     }
 
     fun selectNeuronsInNeuronGroups() {
@@ -644,7 +644,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         val src = filterSelectedSourceModels(AbstractNeuronCollection::class.java)
         val tar = filterSelectedModels(AbstractNeuronCollection::class.java)
         if (src.isNotEmpty() && tar.isNotEmpty()) {
-            network.addNetworkModelAsync(SynapseGroup2(src.first(), tar.first()))
+            network.addNetworkModelAsync(SynapseGroup(src.first(), tar.first()))
             return true;
         }
         return false

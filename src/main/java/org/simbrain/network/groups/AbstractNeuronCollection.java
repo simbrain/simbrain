@@ -43,12 +43,12 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
     /**
      * Set of incoming synapse groups.
      */
-    transient private HashSet<SynapseGroup2> incomingSgs = new HashSet<>();
+    transient private HashSet<SynapseGroup> incomingSgs = new HashSet<>();
 
     /**
      * Set of outgoing synapse groups.
      */
-    transient private HashSet<SynapseGroup2> outgoingSgs = new HashSet<>();
+    transient private HashSet<SynapseGroup> outgoingSgs = new HashSet<>();
 
     /**
      * Optional information about the current state of the group. For display in
@@ -391,27 +391,27 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
         }
     }
 
-    public HashSet<SynapseGroup2> getIncomingSgs() {
+    public HashSet<SynapseGroup> getIncomingSgs() {
         return incomingSgs;
     }
 
-    public HashSet<SynapseGroup2> getOutgoingSg() {
+    public HashSet<SynapseGroup> getOutgoingSg() {
         return outgoingSgs;
     }
 
-    public boolean removeIncomingSg(SynapseGroup2 sg) {
+    public boolean removeIncomingSg(SynapseGroup sg) {
         return incomingSgs.remove(sg);
     }
 
-    public boolean removeOutgoingSg(SynapseGroup2 sg) {
+    public boolean removeOutgoingSg(SynapseGroup sg) {
         return outgoingSgs.remove(sg);
     }
 
     @Override
     public void delete() {
         super.delete();
-        outgoingSgs.forEach(SynapseGroup2::delete);
-        incomingSgs.forEach(SynapseGroup2::delete);
+        outgoingSgs.forEach(SynapseGroup::delete);
+        incomingSgs.forEach(SynapseGroup::delete);
     }
 
     @Override

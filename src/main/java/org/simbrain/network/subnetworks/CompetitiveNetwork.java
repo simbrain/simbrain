@@ -21,7 +21,7 @@ package org.simbrain.network.subnetworks;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.SynapseGroup2;
+import org.simbrain.network.core.SynapseGroup;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.util.UserParameter;
@@ -76,7 +76,7 @@ public class CompetitiveNetwork extends Subnetwork {
         inputLayer.setLayoutBasedOnSize();
         inputLayer.getNeuronList().forEach(n -> n.setLowerBound(0));
 
-        SynapseGroup2 sg = new SynapseGroup2(inputLayer, competitive);
+        SynapseGroup sg = new SynapseGroup(inputLayer, competitive);
         this.addModel(sg);
         sg.getSynapses().forEach(s -> s.setLowerBound(0));
 

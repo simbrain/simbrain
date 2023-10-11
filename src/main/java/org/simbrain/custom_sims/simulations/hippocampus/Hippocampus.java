@@ -7,7 +7,7 @@ import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkUtilsKt;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.core.SynapseGroup2;
+import org.simbrain.network.core.SynapseGroup;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.util.math.SimbrainMath;
@@ -53,7 +53,7 @@ public class Hippocampus extends Simulation {
      * References to main neuron and synapse groups.
      */
     AlvarezSquire LC1, LC2, RC1, RC2, hippocampus;
-    SynapseGroup2 HtoLC1, HtoLC2, HtoRC1, HtoRC2, LC1toH, LC2toH, RC1toH, RC2toH;
+    SynapseGroup HtoLC1, HtoLC2, HtoRC1, HtoRC2, LC1toH, LC2toH, RC1toH, RC2toH;
 
     /**
      * The four main network patterns.
@@ -152,11 +152,11 @@ public class Hippocampus extends Simulation {
     /**
      * Add and properly initialize a synapse group.
      */
-    private SynapseGroup2 addSynapseGroup(NeuronGroup source, NeuronGroup target,
+    private SynapseGroup addSynapseGroup(NeuronGroup source, NeuronGroup target,
                                          String name) {
 
         // Initialize with uniform distribution from 0 to .1
-        SynapseGroup2 synGroup = new SynapseGroup2(source, target,
+        SynapseGroup synGroup = new SynapseGroup(source, target,
                new AllToAll());
         synGroup.setLabel(name);
         // TODO: Weight matrices?

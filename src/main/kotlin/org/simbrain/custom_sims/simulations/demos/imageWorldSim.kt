@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.Sparse
-import org.simbrain.network.core.SynapseGroup2
+import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.network.core.connect
 import org.simbrain.network.layouts.GridLayout
@@ -39,7 +39,7 @@ val imageWorldSim = newSim {
     })
 
     // Input to recurrent
-    SynapseGroup2(inputs, recurrentNet, Sparse().apply {
+    SynapseGroup(inputs, recurrentNet, Sparse().apply {
         connectionDensity = .25
     }).also {
         network.addNetworkModel(it)

@@ -20,7 +20,7 @@ package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
-import org.simbrain.network.core.SynapseGroup2
+import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.WeightMatrixViewer
 import org.simbrain.util.*
@@ -28,7 +28,7 @@ import javax.swing.JPanel
 import javax.swing.JScrollPane
 
 
-class SynapseGroup2Node(networkPanel: NetworkPanel, val synapseGroup: SynapseGroup2) :
+class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGroup) :
     ScreenElement(networkPanel) {
 
     /**
@@ -40,23 +40,23 @@ class SynapseGroup2Node(networkPanel: NetworkPanel, val synapseGroup: SynapseGro
      * PNode that represents an aggregate of visible "loose" [SynapseNode]s.
      * when [SynapseGroup.isDisplaySynapses] is true.
      */
-    private var expandedNode: SynapseGroup2NodeExpanded? = null
+    private var expandedNode: SynapseGroupNodeExpanded? = null
 
     /**
      * PNode that represents a single one-directional green arrow from
      * one neuron group to another.
      */
-    private var directedNode: SynapseGroup2NodeDirected? = null
+    private var directedNode: SynapseGroupNodeDirected? = null
 
     /**
      * The interaction box for this neuron group.
      */
-    var interactionBox: SynapseGroup2InteractionBox
+    var interactionBox: SynapseGroupInteractionBox
 
     init {
         // Note the children pnodes to outlined objects are created in
         // networkpanel and added externally to outlined objects
-        interactionBox = SynapseGroup2InteractionBox(networkPanel, synapseGroup, this)
+        interactionBox = SynapseGroupInteractionBox(networkPanel, synapseGroup, this)
         interactionBox.setText(synapseGroup.label)
         addChild(interactionBox)
         fun invalidateArrow() {
@@ -83,7 +83,7 @@ class SynapseGroup2Node(networkPanel: NetworkPanel, val synapseGroup: SynapseGro
             setVisibility()
         }
         events.synapseAdded.on { s ->
-            this@SynapseGroup2Node.networkPanel.createNode(s)
+            this@SynapseGroupNode.networkPanel.createNode(s)
             refreshVisible()
         }
         events.synapseRemoved.on { s ->
@@ -118,7 +118,7 @@ class SynapseGroup2Node(networkPanel: NetworkPanel, val synapseGroup: SynapseGro
         if (synapseGroup.displaySynapses) {
             removeEverythingButInteractionBox()
             if (expandedNode == null) {
-                expandedNode = SynapseGroup2NodeExpanded(networkPanel, this)
+                expandedNode = SynapseGroupNodeExpanded(networkPanel, this)
             }
             addChild(expandedNode)
             interactionBox.raiseAbove(expandedNode)
@@ -127,7 +127,7 @@ class SynapseGroup2Node(networkPanel: NetworkPanel, val synapseGroup: SynapseGro
             removeEverythingButInteractionBox()
             if (!synapseGroup.isRecurrent()) {
                 if (directedNode == null) {
-                    directedNode = SynapseGroup2NodeDirected(this)
+                    directedNode = SynapseGroupNodeDirected(this)
                 }
                 addChild(directedNode)
                 interactionBox.raiseAbove(directedNode)
@@ -152,7 +152,7 @@ class SynapseGroup2Node(networkPanel: NetworkPanel, val synapseGroup: SynapseGro
         return false
     }
 
-    override fun getModel(): SynapseGroup2 {
+    override fun getModel(): SynapseGroup {
         return synapseGroup
     }
 

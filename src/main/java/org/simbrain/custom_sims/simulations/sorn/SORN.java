@@ -8,7 +8,7 @@ import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.core.SynapseGroup2;
+import org.simbrain.network.core.SynapseGroup;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.util.SimbrainConstants.Polarity;
@@ -107,7 +107,7 @@ public class SORN extends Simulation {
         int x_loc = (int) (Math.sqrt(numNeurons) * gridSpace + 300);
         ngIn.applyLayout(new Point(1810, 141));
 
-        SynapseGroup2 sg_ee = connectGroups(net, ng, ng, eeKIn, defWtPD, Polarity.EXCITATORY,
+        SynapseGroup sg_ee = connectGroups(net, ng, ng, eeKIn, defWtPD, Polarity.EXCITATORY,
                 "Exc. \u2192 Exc.");
         connectGroups(net, ngIn, ng, ieKIn, new UniformRealDistribution(-1,0),
                 Polarity.INHIBITORY,
@@ -147,7 +147,7 @@ public class SORN extends Simulation {
         input.applyLayout(new Point(x_loc, y_loc));
 
         Sparse input_ee_con = new Sparse(0.05, false, false);
-        SynapseGroup2 input_ee = new SynapseGroup2(input, ng, input_ee_con);
+        SynapseGroup input_ee = new SynapseGroup(input, ng, input_ee_con);
         input_ee.getConnectionStrategy().setPercentExcitatory(1.0);
         input_ee.getConnectionStrategy().setExRandomizer(defWtPD);
         input_ee.getConnectionStrategy().setInRandomizer(defWtPD);
@@ -165,7 +165,7 @@ public class SORN extends Simulation {
 //        network.addGroup(ee_input);
 
         Sparse input_ie_con = new Sparse(0.05, true, false);
-        SynapseGroup2 input_ie = new SynapseGroup2(input, ngIn, input_ie_con);
+        SynapseGroup input_ie = new SynapseGroup(input, ngIn, input_ie_con);
         input_ie.getConnectionStrategy().setPercentExcitatory(1.0);
         input_ie.getConnectionStrategy().setExRandomizer(defWtPD);
         input_ie.getConnectionStrategy().setInRandomizer(defWtPD);
@@ -248,7 +248,7 @@ public class SORN extends Simulation {
         }
     }
 
-    private static SynapseGroup2 connectGroups(Network network, NeuronGroup src, NeuronGroup tar, int kIn,
+    private static SynapseGroup connectGroups(Network network, NeuronGroup src, NeuronGroup tar, int kIn,
                                               ProbabilityDistribution random, Polarity polarity, String label) {
         double excRat = polarity != Polarity.INHIBITORY ? 1.0 : 0.0;
         FixedDegree connector = new FixedDegree();
@@ -259,7 +259,7 @@ public class SORN extends Simulation {
         // src.setPolarity(polarity);
         // connector.setExcCons(kIn);
         // connector.setInhCons(kIn);
-        SynapseGroup2 sg = new SynapseGroup2(src, tar, connector);
+        SynapseGroup sg = new SynapseGroup(src, tar, connector);
         sg.getConnectionStrategy().setPercentExcitatory(excRat);
         sg.getConnectionStrategy().setExRandomizer(random);
         sg.getConnectionStrategy().setInRandomizer(random);

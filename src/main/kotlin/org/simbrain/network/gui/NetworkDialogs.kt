@@ -14,7 +14,7 @@ import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog
 import org.simbrain.network.gui.dialogs.text.TextDialog
-import org.simbrain.network.gui.nodes.SynapseGroup2Node
+import org.simbrain.network.gui.nodes.SynapseGroupNode
 import org.simbrain.network.gui.nodes.TextNode
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.smile.SmileClassifier
@@ -152,7 +152,7 @@ fun NetworkPanel.showWeightMatrix() {
     }
 }
 
-fun SynapseGroup2Node.getDialog(): StandardDialog {
+fun SynapseGroupNode.getDialog(): StandardDialog {
 
     val dialog = StandardDialog()
     val tabbedPane = JTabbedPane()

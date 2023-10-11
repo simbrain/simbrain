@@ -3,7 +3,7 @@ package org.simbrain.network.core
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.ConnectionStrategy
-import org.simbrain.network.events.SynapseGroup2Events
+import org.simbrain.network.events.SynapseGroupEvents
 import org.simbrain.network.groups.AbstractNeuronCollection
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.SynapseNode
@@ -18,7 +18,7 @@ import smile.math.matrix.Matrix
  * Lightweight collection of synapses. Contains references to a source and target layer, a connection strategy, and a
  * list of synapses.
  */
-class SynapseGroup2 @JvmOverloads constructor(
+class SynapseGroup @JvmOverloads constructor(
     val source: AbstractNeuronCollection,
     val target: AbstractNeuronCollection,
     val connectionStrategy: ConnectionStrategy = AllToAll(),
@@ -38,7 +38,7 @@ class SynapseGroup2 @JvmOverloads constructor(
 
 
     @Transient
-    override var events = SynapseGroup2Events()
+    override var events = SynapseGroupEvents()
 
     /**
      * Flag for whether synapses should be displayed in a GUI representation of this object.
@@ -131,7 +131,7 @@ class SynapseGroup2 @JvmOverloads constructor(
 
     override fun postOpenInit() {
         if (events == null) {
-            events = SynapseGroup2Events()
+            events = SynapseGroupEvents()
         }
         this.synapses.forEach { it.postOpenInit() }
     }
@@ -145,7 +145,7 @@ class SynapseGroup2 @JvmOverloads constructor(
     /**
      * Copy this synapse group onto another neurongroup source/target pair.
      */
-    fun copy(src: AbstractNeuronCollection, tar: AbstractNeuronCollection): SynapseGroup2 {
+    fun copy(src: AbstractNeuronCollection, tar: AbstractNeuronCollection): SynapseGroup {
         
         require(!(source.size() != src.size() || target.size() != tar.size())) { "Size of source and " +
                 "target of this synapse group do not match." }
@@ -158,7 +158,7 @@ class SynapseGroup2 @JvmOverloads constructor(
                 Synapse(it.parentNetwork, mapping[it.source], mapping[it.target], it )
             }.toMutableList()
 
-        return SynapseGroup2(src, tar, connectionStrategy, syns)
+        return SynapseGroup(src, tar, connectionStrategy, syns)
     }
 
     fun applyConnectionStrategy() {

@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.network.matrix.WeightMatrix;
 
@@ -23,7 +22,7 @@ public class NetworkTest {
     NeuronCollection nc1;
     WeightMatrix wm1;
 
-    SynapseGroup2 sg1;
+    SynapseGroup sg1;
 
     @BeforeEach
     public void setUpNetwork() {
@@ -49,7 +48,7 @@ public class NetworkTest {
         ng2.setLabel("ng2");
         net.addNetworkModelAsync(ng2);
 
-        sg1 = new SynapseGroup2(ng1, ng2);
+        sg1 = new SynapseGroup(ng1, ng2);
         net.addNetworkModelAsync(sg1);
 
         na1 = new NeuronArray(net, 10);

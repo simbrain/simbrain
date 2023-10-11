@@ -8,7 +8,7 @@ import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.core.SynapseGroup2;
+import org.simbrain.network.core.SynapseGroup;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.layouts.LineLayout;
@@ -80,12 +80,12 @@ public class ModularOscillatoryNetwork extends Simulation {
 
         // Sensory network
         sensory = addModule(-115, 10, 49, "Sensory", new DecayRule());
-        SynapseGroup2 recSensory = connectRadialGaussian(sensory,sensory);
+        SynapseGroup recSensory = connectRadialGaussian(sensory,sensory);
         recSensory.setLabel("Recurrent Sensory");
 
         // Motor Network
         motor = addModule(322, 10, 16, "Motor", new KuramotoRule());
-        SynapseGroup2 recMotor = connectRadialGaussian(motor, motor);
+        SynapseGroup recMotor = connectRadialGaussian(motor, motor);
         recMotor.setLabel("Recurrent Motor");
 
         // Sensori-Motor Connection
@@ -160,18 +160,18 @@ public class ModularOscillatoryNetwork extends Simulation {
         return ng;
     }
 
-    private SynapseGroup2 connectRadialGaussian(NeuronGroup sourceNg, NeuronGroup targetNg) {
+    private SynapseGroup connectRadialGaussian(NeuronGroup sourceNg, NeuronGroup targetNg) {
         ConnectionStrategy radialConnection = new RadialGaussian(DEFAULT_EE_CONST * 1, DEFAULT_EI_CONST * 2,
             DEFAULT_IE_CONST * 3, DEFAULT_II_CONST * 0, .25, 50.0);
-        SynapseGroup2 sg = new SynapseGroup2(sourceNg, targetNg, radialConnection);
+        SynapseGroup sg = new SynapseGroup(sourceNg, targetNg, radialConnection);
         net.addNetworkModelAsync(sg);
         sg.setDisplaySynapses(false);
         return sg;
     }
 
-    private SynapseGroup2 connectModules(NeuronGroup sourceNg, NeuronGroup targetNg, double density, double exRatio) {
+    private SynapseGroup connectModules(NeuronGroup sourceNg, NeuronGroup targetNg, double density, double exRatio) {
         Sparse sparse = new Sparse(density);
-        SynapseGroup2 sg = new SynapseGroup2(sourceNg, targetNg);
+        SynapseGroup sg = new SynapseGroup(sourceNg, targetNg);
         // TODO!
         // , exRatio)
 //        sparse.connectNeurons(sg);

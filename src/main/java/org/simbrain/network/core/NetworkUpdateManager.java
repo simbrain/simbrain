@@ -107,7 +107,7 @@ public class NetworkUpdateManager {
                 Stream.of(  network.getModels(NeuronGroup.class),
                             network.getModels(NeuronCollection.class),
                             network.getModels(Subnetwork.class),
-                            network.getModels(SynapseGroup2.class),
+                            network.getModels(SynapseGroup.class),
                             network.getModels(NeuronArray.class),
                             network.getModels(WeightMatrix.class))
                         .flatMap(Collection::stream).collect(Collectors.toList());

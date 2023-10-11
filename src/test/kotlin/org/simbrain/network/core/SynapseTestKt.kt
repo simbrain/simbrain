@@ -3,7 +3,7 @@ package org.simbrain.network.core
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
-class SynapseTest2 {
+class SynapseTestKt {
 
     val network = Network()
 

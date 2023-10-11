@@ -19,7 +19,6 @@
 package org.simbrain.network.desktop
 
 import org.simbrain.network.NetworkComponent
-import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.gui.*
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.genericframe.GenericFrame
@@ -29,7 +28,6 @@ import java.awt.BorderLayout
 import java.awt.Dimension
 import javax.swing.JMenu
 import javax.swing.JMenuBar
-import javax.swing.JOptionPane
 
 /**
  * Network desktop component. An extension of the Gui component for this class
@@ -55,47 +53,9 @@ class NetworkDesktopComponent(frame: GenericFrame, component: NetworkComponent) 
         return fileMenu
     }
 
-    override fun showExportDialog() {
-        if (showUncompressedSynapseGroupWarning()) {
-            super.showExportDialog()
-        }
-    }
-
-    override fun save() {
-        if (showUncompressedSynapseGroupWarning()) {
-            super.save()
-        }
-    }
-
     override fun close() {
         super.close()
         NetworkPreferences.unregisterChangeListener(networkPanel.preferenceLoader)
-    }
-
-    /**
-     * If at least one synapse group has a large number of synapses that are not
-     * going to be saved using compression, show the user a warning.
-     *
-     * @return true if the save operation should proceed, false if the save
-     * operation should be cancelled.
-     */
-    private fun showUncompressedSynapseGroupWarning(): Boolean {
-        val showPanel = networkPanel.network.getModels<SynapseGroup>().any {
-            false // TODO
-            // it.allSynapses.size > saveWarningThreshold && !it.isUseFullRepOnSave w
-        }
-        if (showPanel) {
-            val n = JOptionPane.showConfirmDialog(
-                null,
-                "<html><body><p style='width: 200px;'>You are saving at least one large synapse group without compression. " + "It is reccomended that you enable 'optimize as group' in all large synapse groups so that " + "their weight matrices are compressed.   Otherwise the save will take a " + "long time and the saved file will be large. Click Cancel to go ahead with the save, " + "and OK to return to the network and change settings.</body></html>",
-                "Save Warning",
-                JOptionPane.OK_CANCEL_OPTION
-            )
-            if (n == JOptionPane.OK_OPTION) {
-                return false
-            }
-        }
-        return true
     }
 
     companion object {

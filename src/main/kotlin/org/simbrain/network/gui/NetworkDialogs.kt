@@ -161,11 +161,11 @@ fun SynapseGroup2Node.getDialog(): StandardDialog {
     val sap = SynapseAdjustmentPanel(
         synapseGroup.synapses,
         synapseGroup.weightRandomizer,
-        synapseGroup.excitatoryRandomizer,
-        synapseGroup.inhibitoryRandomizer
+        synapseGroup.connectionStrategy.exRandomizer,
+        synapseGroup.connectionStrategy.inRandomizer
     )
 
-    val connPanel = ConnectionStrategyPanel(synapseGroup.connection)
+    val connPanel = ConnectionStrategyPanel(synapseGroup.connectionStrategy)
     val connectionStrategyPanel = createApplyPanel(connPanel).apply {
         addActionListener {
             synapseGroup.applyConnectionStrategy()

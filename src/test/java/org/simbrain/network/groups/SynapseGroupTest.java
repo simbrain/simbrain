@@ -14,7 +14,7 @@ public class SynapseGroupTest {
         Network net = new Network();
         NeuronGroup source = new NeuronGroup(net, 2);
         NeuronGroup target = new NeuronGroup(net, 2);
-        SynapseGroup2 sg = SynapseGroup.createSynapseGroup(source, target, new AllToAll());
+        SynapseGroup2 sg = new SynapseGroup2(source, target, new AllToAll());
         assertEquals(sg.size(), 4);
     }
 
@@ -31,12 +31,12 @@ public class SynapseGroupTest {
     //     NeuronGroup nonSpikingNg = new NeuronGroup(net, 2);
     //
     //     // Spike to non-spiking synapse group should have spike responders
-    //     SynapseGroup sg1 = SynapseGroup.createSynapseGroup(spikingNg,nonSpikingNg, new AllToAll());
+    //     SynapseGroup sg1 = new SynapseGroup2(spikingNg,nonSpikingNg, new AllToAll());
     //     assertTrue(sg1.getExcitatoryPrototype().getSpikeResponder().getClass() != NonResponder.class);
     //     assertTrue(sg1.getInhibitoryPrototype().getSpikeResponder().getClass() != NonResponder.class);
     //
     //     // Non-spiking to to non-spiking synapse group should have non-responders
-    //     SynapseGroup sg2 = SynapseGroup.createSynapseGroup(nonSpikingNg, spikingNg, new AllToAll());
+    //     SynapseGroup sg2 = new SynapseGroup2(nonSpikingNg, spikingNg, new AllToAll());
     //     assertTrue(sg2.getExcitatoryPrototype().getSpikeResponder().getClass() == NonResponder.class);
     //     assertTrue(sg2.getInhibitoryPrototype().getSpikeResponder().getClass() == NonResponder.class);
     //

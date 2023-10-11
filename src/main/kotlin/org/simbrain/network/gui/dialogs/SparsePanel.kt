@@ -1,10 +1,8 @@
 package org.simbrain.network.gui.dialogs
 
 import org.simbrain.network.connections.*
-import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.util.SwitchableChangeListener
 import org.simbrain.util.SwitchablePropertyChangeListener
 import org.simbrain.util.Utils
@@ -63,10 +61,6 @@ class SparsePanel(
      * Panel for self connection check box.
      */
     private var allowSelfConnectPanel = JPanel()
-    private val network: Network? = null
-    private val synapseGroup: SynapseGroup? = null
-    private val sourceNeurons: List<Neuron>? = null
-    private val targetNeurons: List<Neuron>? = null
 
     /**
      * A property change listener for the density text field which can be

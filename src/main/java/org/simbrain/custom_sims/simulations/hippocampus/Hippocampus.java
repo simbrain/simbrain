@@ -9,7 +9,6 @@ import org.simbrain.network.core.NetworkUtilsKt;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseGroup2;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.stats.ProbabilityDistribution;
@@ -157,7 +156,7 @@ public class Hippocampus extends Simulation {
                                          String name) {
 
         // Initialize with uniform distribution from 0 to .1
-        SynapseGroup2 synGroup = SynapseGroup.createSynapseGroup(source, target,
+        SynapseGroup2 synGroup = new SynapseGroup2(source, target,
                new AllToAll());
         synGroup.setLabel(name);
         // TODO: Weight matrices?

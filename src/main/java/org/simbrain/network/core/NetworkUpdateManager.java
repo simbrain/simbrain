@@ -22,7 +22,6 @@ import org.simbrain.network.NetworkModel;
 import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
-import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.network.update_actions.BufferedUpdate;
@@ -108,7 +107,7 @@ public class NetworkUpdateManager {
                 Stream.of(  network.getModels(NeuronGroup.class),
                             network.getModels(NeuronCollection.class),
                             network.getModels(Subnetwork.class),
-                            network.getModels(SynapseGroup.class),
+                            network.getModels(SynapseGroup2.class),
                             network.getModels(NeuronArray.class),
                             network.getModels(WeightMatrix.class))
                         .flatMap(Collection::stream).collect(Collectors.toList());

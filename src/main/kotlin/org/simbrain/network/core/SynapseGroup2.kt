@@ -8,6 +8,7 @@ import org.simbrain.network.groups.AbstractNeuronCollection
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.SynapseNode
 import org.simbrain.network.util.SimnetUtils
+import org.simbrain.util.SimbrainConstants
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 import org.simbrain.workspace.AttributeContainer
@@ -20,8 +21,8 @@ import smile.math.matrix.Matrix
 class SynapseGroup2 @JvmOverloads constructor(
     val source: AbstractNeuronCollection,
     val target: AbstractNeuronCollection,
-    val connection: ConnectionStrategy = AllToAll(),
-    val synapses: MutableList<Synapse> = connection.connectNeurons(source.network, source.neuronList, target
+    val connectionStrategy: ConnectionStrategy = AllToAll(),
+    val synapses: MutableList<Synapse> = connectionStrategy.connectNeurons(source.network, source.neuronList, target
         .neuronList, false).toMutableList()
 ) : NetworkModel(), AttributeContainer {
 
@@ -35,25 +36,6 @@ class SynapseGroup2 @JvmOverloads constructor(
     @Transient
     var weightRandomizer: ProbabilityDistribution = UniformRealDistribution(-1.0, 1.0)
 
-    /**
-     * Randomizer for excitatory weights.
-     */
-    @Transient
-    var excitatoryRandomizer: ProbabilityDistribution = UniformRealDistribution(0.0, 1.0)
-
-    // TODO. Grab stuff from SynapseAdjustPanel.kt. Expand to all randomizers
-    fun randomizeExcitatory() {
-        this.synapses.forEach {  it.forceSetStrength(excitatoryRandomizer.sampleDouble()) }
-        // this.synapses
-        //     .filter { s -> s.target.polarity == SimbrainConstants.Polarity.EXCITATORY }
-        //     .forEach { it.forceSetStrength(excitatoryRandomizer.sampleDouble()) }
-    }
-
-    /**
-     * Randomizer for inhibitory weights.
-     */
-    @Transient
-    var inhibitoryRandomizer: ProbabilityDistribution = UniformRealDistribution(-1.0, 0.0)
 
     @Transient
     override var events = SynapseGroup2Events()
@@ -116,15 +98,31 @@ class SynapseGroup2 @JvmOverloads constructor(
 
     fun size(): Int = this.synapses.size
 
-    // TODO: Not using the sg randomizers
     fun randomizeSymmetric() {
-        // Inefficient but good enough
-        this.synapses.forEach { it.randomizeSymmetric() }
+        randomize()
+        this.synapses.forEach { it.symmetricSynapse?.let { s -> it.forceSetStrength(s.strength) } }
     }
 
-    // TODO: Not using the sg randomizers
     override fun randomize() {
-        this.synapses.forEach { it.randomize() }
+        this.synapses.forEach {
+            when (it.target.polarity) {
+                SimbrainConstants.Polarity.EXCITATORY -> it.forceSetStrength(connectionStrategy.exRandomizer.sampleDouble())
+                SimbrainConstants.Polarity.INHIBITORY -> it.forceSetStrength(connectionStrategy.inRandomizer.sampleDouble())
+                SimbrainConstants.Polarity.BOTH -> it.forceSetStrength(weightRandomizer.sampleDouble())
+            }
+        }
+    }
+
+    fun randomizeExcitatory() {
+        this.synapses
+            .filter { s -> s.target.polarity == SimbrainConstants.Polarity.EXCITATORY }
+            .forEach { it.forceSetStrength(connectionStrategy.exRandomizer.sampleDouble()) }
+    }
+
+    fun randomizeInhibitory() {
+        this.synapses
+            .filter { s -> s.target.polarity == SimbrainConstants.Polarity.INHIBITORY }
+            .forEach { it.forceSetStrength(connectionStrategy.exRandomizer.sampleDouble()) }
     }
 
     override fun toggleClamping() {
@@ -160,12 +158,12 @@ class SynapseGroup2 @JvmOverloads constructor(
                 Synapse(it.parentNetwork, mapping[it.source], mapping[it.target], it )
             }.toMutableList()
 
-        return SynapseGroup2(src, tar, connection, syns)
+        return SynapseGroup2(src, tar, connectionStrategy, syns)
     }
 
     fun applyConnectionStrategy() {
         synapses.toList().forEach { removeSynapse(it) }
-        val syns = connection.connectNeurons(
+        val syns = connectionStrategy.connectNeurons(
             source.network,
             source.neuronList,
             target.neuronList,
@@ -182,4 +180,9 @@ class SynapseGroup2 @JvmOverloads constructor(
     fun getWeightMatrix(): Matrix {
         return Matrix.of(SimnetUtils.getWeights(source.neuronList, target.neuronList));
     }
+
+    fun hardClear() {
+        synapses.forEach { it.hardClear() }
+    }
+
 }

@@ -20,7 +20,6 @@ package org.simbrain.network.core;
 
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.events.SynapseEvents;
-import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.spikeresponders.NonResponder;
 import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
 import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder;
@@ -151,11 +150,6 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
      */
     @UserParameter(label = "Delay", description = "delay", minimumValue = 0, order = 5)
     private int delay;
-
-    /**
-     * Parent group, if any (null if none).
-     */
-    private SynapseGroup parentGroup;
 
     /**
      * Boolean flag, indicating whether this type of synapse participates in the computation of weighted input. Set to a
@@ -794,14 +788,6 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
         this.target = target;
         this.parentNetwork = parent;
         return new Synapse(this);
-    }
-
-    public SynapseGroup getParentGroup() {
-        return parentGroup;
-    }
-
-    public void setParentGroup(SynapseGroup parentGroup) {
-        this.parentGroup = parentGroup;
     }
 
     /**

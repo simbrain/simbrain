@@ -476,11 +476,11 @@
 //         itr.setLabel("In \u2192 Res");
 //         esn.addSynapseGroup(itr);
 //
-//         SynapseGroup rto = SynapseGroup.createSynapseGroup(reservoirLayer, outputLayer, 0.5);
+//         SynapseGroup rto = new SynapseGroup2(reservoirLayer, outputLayer, 0.5);
 //         rto.setLabel("Res \u2192 Out");
 //         esn.addSynapseGroup(rto);
 //         if (allowRecurrentOutputs.isSelected()) {
-//             SynapseGroup oto = SynapseGroup.createSynapseGroup(outputLayer, outputLayer, 0.5);
+//             SynapseGroup oto = new SynapseGroup2(outputLayer, outputLayer, 0.5);
 //             oto.setLabel("Out \u2192 Out");
 //             esn.addSynapseGroup(oto);
 //         }
@@ -490,7 +490,7 @@
 //             esn.addSynapseGroup(otr);
 //         }
 //         if (directInputToOutput.isSelected()) {
-//             SynapseGroup ito = SynapseGroup.createSynapseGroup(inputLayer, outputLayer, 0.5);
+//             SynapseGroup ito = new SynapseGroup2(inputLayer, outputLayer, 0.5);
 //             ito.setLabel("In \u2192 Out");
 //             esn.addSynapseGroup(ito);
 //         }

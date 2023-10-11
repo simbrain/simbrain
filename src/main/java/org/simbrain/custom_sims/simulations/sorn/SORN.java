@@ -10,7 +10,6 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseGroup2;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.stats.ProbabilityDistribution;
@@ -148,8 +147,10 @@ public class SORN extends Simulation {
         input.applyLayout(new Point(x_loc, y_loc));
 
         Sparse input_ee_con = new Sparse(0.05, false, false);
-        SynapseGroup2 input_ee = SynapseGroup.createSynapseGroup(input, ng, input_ee_con,
-                1.0, defWtPD, defWtPD);
+        SynapseGroup2 input_ee = new SynapseGroup2(input, ng, input_ee_con);
+        input_ee.getConnectionStrategy().setPercentExcitatory(1.0);
+        input_ee.getConnectionStrategy().setExRandomizer(defWtPD);
+        input_ee.getConnectionStrategy().setInRandomizer(defWtPD);
         input_ee.setLabel("Input -> Excitatory");
         // TODO
         // input_ee.setLearningRule(stdp, Polarity.BOTH);
@@ -157,15 +158,17 @@ public class SORN extends Simulation {
         net.addNetworkModelAsync(input_ee);
 
 //        Sparse ee_input_con = new Sparse(0.01, false, false);
-//        SynapseGroup ee_input = SynapseGroup.createSynapseGroup(ng, input, ee_input_con, 1.0, exRand, inRand);
+//        SynapseGroup ee_input = new SynapseGroup2(ng, input, ee_input_con, 1.0, exRand, inRand);
 //        ee_input.setLabel("Excitatory -> Input");
 //        ee_input.setLearningRule(stdp, Polarity.BOTH);
 //        ee_input.setSpikeResponder(new Step(), Polarity.BOTH);
 //        network.addGroup(ee_input);
 
         Sparse input_ie_con = new Sparse(0.05, true, false);
-        SynapseGroup2 input_ie = SynapseGroup.createSynapseGroup(input, ngIn,
-                input_ie_con, 1.0, defWtPD, defWtPD);
+        SynapseGroup2 input_ie = new SynapseGroup2(input, ngIn, input_ie_con);
+        input_ie.getConnectionStrategy().setPercentExcitatory(1.0);
+        input_ie.getConnectionStrategy().setExRandomizer(defWtPD);
+        input_ie.getConnectionStrategy().setInRandomizer(defWtPD);
         input_ie.setLabel("Input -> Inhibitory");
         // TODO
         // input_ie.setSpikeResponder(new Step(), Polarity.BOTH);
@@ -173,7 +176,7 @@ public class SORN extends Simulation {
         net.addNetworkModelAsync(input_ie);
 
 //        Sparse ie_input_con = new Sparse(0.01, true, false);
-//        SynapseGroup ie_input = SynapseGroup.createSynapseGroup(ngIn, input, input_ie_con, 1.0, exRand, inRand);
+//        SynapseGroup ie_input = new SynapseGroup2(ngIn, input, input_ie_con, 1.0, exRand, inRand);
 //        ie_input.setLabel("Inhibitory -> Input");
 //        ie_input.setSpikeResponder(new Step(), Polarity.BOTH);
 //        network.addGroup(ie_input);
@@ -256,8 +259,10 @@ public class SORN extends Simulation {
         // src.setPolarity(polarity);
         // connector.setExcCons(kIn);
         // connector.setInhCons(kIn);
-        SynapseGroup2 sg = SynapseGroup
-                .createSynapseGroup(src, tar, connector, excRat, random, random);
+        SynapseGroup2 sg = new SynapseGroup2(src, tar, connector);
+        sg.getConnectionStrategy().setPercentExcitatory(excRat);
+        sg.getConnectionStrategy().setExRandomizer(random);
+        sg.getConnectionStrategy().setInRandomizer(random);
         sg.setLabel(label);
         // TODO
         // sg.setSpikeResponder(new Step(),

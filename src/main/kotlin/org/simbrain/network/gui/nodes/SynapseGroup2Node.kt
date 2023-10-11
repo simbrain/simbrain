@@ -21,7 +21,6 @@ package org.simbrain.network.gui.nodes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.simbrain.network.core.SynapseGroup2
-import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.WeightMatrixViewer
 import org.simbrain.util.*

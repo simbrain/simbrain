@@ -9,7 +9,6 @@ import org.simbrain.network.events.NetworkEvents
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.groups.Subnetwork
-import org.simbrain.network.groups.SynapseGroup
 import org.simbrain.network.gui.PlacementManager
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.matrix.NeuronArray
@@ -254,7 +253,7 @@ class Network: CoroutineScope, EditableObject {
         NeuronCollection::class.java,
         NeuronArray::class.java,
         Connector::class.java,
-        SynapseGroup::class.java,
+        SynapseGroup2::class.java,
         Subnetwork::class.java,
         Synapse::class.java)
             .flatMap { networkModels[it] }
@@ -316,7 +315,7 @@ class Network: CoroutineScope, EditableObject {
             yieldAll(networkModels.get<Synapse>())
             yieldAll(networkModels.get<SynapseGroup2>().flatMap { sg -> sg.synapses })
             yieldAll(networkModels.get<Subnetwork>().flatMap { subnetwork ->
-                subnetwork.modelList.get<SynapseGroup>().flatMap { it.allSynapses }
+                subnetwork.modelList.get<SynapseGroup2>().flatMap { it.synapses }
             })
         }.toList()
 
@@ -332,9 +331,9 @@ class Network: CoroutineScope, EditableObject {
     /**
      * Returns a list of all synapse groups including those in subnetworks.
      */
-    val flatSynapseGroupList: List<SynapseGroup>
+    val flatSynapseGroupList: List<SynapseGroup2>
         get() = sequence {
-            yieldAll(networkModels.get<SynapseGroup>())
+            yieldAll(networkModels.get<SynapseGroup2>())
             yieldAll(networkModels.get<Subnetwork>().flatMap { it.modelList.get() })
         }.toList()
 

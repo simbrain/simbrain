@@ -9,7 +9,6 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseGroup2;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.neuron_update_rules.TimedAccumulatorRule;
 import org.simbrain.util.SimbrainConstants;
@@ -82,7 +81,7 @@ public class CorticalBranching extends Simulation {
         con.setUseRadius(true);
         con.setRadius(RADIUS);
 
-        SynapseGroup2 sg = SynapseGroup.createSynapseGroup(ng1, ng1, con);
+        SynapseGroup2 sg = new SynapseGroup2(ng1, ng1, con);
             // sg.setRandomizers(exRand, inRand);
             // sg.setConnectionManager(con);
             // sg.makeConnections();

@@ -148,22 +148,25 @@ class TextUtilsTest {
     }
 
     @Test
-    fun `remove stopwords from matrix`() {
-        val result = generateCooccurrenceMatrix(windowSizeText, 2, true)
-        val coocMatrix = result.second
-        val tokens = result.first
-        val targets = removeStopWords(tokens)
+    fun `remove stopwords removes words it should`() {
+        // "This", "not", and "is" are stop words, the names are not
+        val coc = generateCooccurrenceMatrix("This is Balthazar not Mordrax", 2, true)
+        var tokens = coc.first
+        tokens = removeStopWords(tokens)
+        assertEquals(2, tokens.size)
+    }
 
-        var approvedIndeces = intArrayOf()
-        for (token in tokens){
-            if (targets.contains(token)) approvedIndeces += intArrayOf(tokens.indexOf(token))
-        }
-        val cooc2 = coocMatrix.rows(*approvedIndeces)
-
-        val cooc3 = removeStopWordsFromMatrix(coocMatrix, tokens)
-
-        assertTrue(cooc2.ncol() == cooc3.ncol())
-        assertTrue(cooc2.nrow() == cooc3.nrow())
+    @Test
+    fun `removeStopWordsFromMatrix appropriately filters a rows but not columns`() {
+        val coc = generateCooccurrenceMatrix("This is Balthazar not Mordrax", 2, true)
+        val tokens = coc.first
+        val matrix = coc.second
+        val coc2 = removeStopWordsFromMatrix(matrix, tokens)
+        // This should be 2x5
+        //  5 columns for 5 tokens
+        //  2 rows for the 2 words that are not stopwords
+        assertEquals(5, coc2.ncol())
+        assertEquals(2, coc2.nrow())
     }
 
 }

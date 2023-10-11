@@ -11,30 +11,25 @@ import org.simbrain.util.projection.PCAProjection
 import java.io.File
 
 /**
- * Todo
+ * Study the geometric structure of a word embedding on a document.
+ *
+ * Load a text that was crafted so that certain words would be nearby each other, because of shared co-occurrences.
+ *
+ * Examples:
+ *  bus ~ butterfly
+ *  walked ~ along
+ *  ...
  *
  */
 val nlpSim_geomSpace = newSim {
 
-    // 2. "Geometric thinking and vector spaces"
-    //
-    // Start with a pre-trained dictionary.
-    // Multiple dimensionality reduction methods:
-    // - 2d vector space
-    // - 3d vector space
-    // - Nd vector space
-    // Illustrate how the word are embedded into a high dimensional space
-    //
-    // Second point: distance and similarity
-    // Show how distance would be calculated in the various vector spaces
-    // Comparison of Euclidean distance vs cosine distance
 
     workspace.clearWorkspace()
 
     // Text World
     val twc = addTextWorld("Text World")
     val textWorld = twc.world
-    val text = File("simulations" + FS + "texts" + FS + "mlk.txt").readText()
+    val text = File("simulations" + FS + "texts" + FS + "corpus_artificial_similarity.txt").readText()
     textWorld.loadDictionary(text)
     textWorld.text = text
 
@@ -46,22 +41,6 @@ val nlpSim_geomSpace = newSim {
         }
     }
 
-    // Network
-    // val networkComponent = addNetworkComponent("Network")
-    // val network = networkComponent.network
-    // val nc = network.createNeuronCollection(textWorld.tokenVectorMap.size).apply {
-    //     label = "Vector Embeddings for Word Tokens"
-    //     location = point(0, 0)
-    //     layout(GridLayout())
-    // }
-
-    // withGui {
-    //     place(networkComponent) {
-    //         location = point(450, 0)
-    //         width = 400
-    //         height = 400
-    //     }
-    // }
 
     // Location of the projection in the desktop
     val projectionPlot = addProjectionPlot2("Activations")

@@ -1,6 +1,7 @@
 package org.simbrain.util.widgets
 
-import org.simbrain.util.*
+import org.simbrain.util.displayInDialog
+import org.simbrain.util.toSimbrainColor
 import smile.math.matrix.Matrix
 import java.awt.Color
 import java.awt.Dimension
@@ -13,13 +14,16 @@ import kotlin.random.Random
  * Produce something like an R Corrplot.
  *
  * @param labels column and row headings
- * @param daa the matrix data to represent
+ * @param data the matrix data to represent
  */
 class MatrixPlot(private val labels: List<String>, private val data: Array<DoubleArray>) : JPanel() {
 
     private val cellSize = 50
     private val labelOffset = cellSize
 
+    /**
+     * Construct with a Smile Matrix
+     */
     constructor(labels: List<String>, data: Matrix): this(labels, data.toArray())
 
     init {

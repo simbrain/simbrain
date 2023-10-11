@@ -168,6 +168,8 @@ fun SynapseGroupNode.getDialog(): StandardDialog {
     val connPanel = ConnectionStrategyPanel(synapseGroup.connectionStrategy)
     val connectionStrategyPanel = createApplyPanel(connPanel).apply {
         addActionListener {
+            connPanel.commitChanges()
+            synapseGroup.connectionStrategy = connPanel.connectionStrategy
             synapseGroup.applyConnectionStrategy()
         }
     }

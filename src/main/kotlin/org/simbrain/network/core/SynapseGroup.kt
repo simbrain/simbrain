@@ -21,7 +21,7 @@ import smile.math.matrix.Matrix
 class SynapseGroup @JvmOverloads constructor(
     val source: AbstractNeuronCollection,
     val target: AbstractNeuronCollection,
-    val connectionStrategy: ConnectionStrategy = AllToAll(),
+    var connectionStrategy: ConnectionStrategy = AllToAll(),
     val synapses: MutableList<Synapse> = connectionStrategy.connectNeurons(source.network, source.neuronList, target
         .neuronList, false).toMutableList()
 ) : NetworkModel(), AttributeContainer {

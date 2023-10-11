@@ -82,15 +82,17 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
         events.visibilityChanged.on {
             setVisibility()
         }
-        events.synapseAdded.on { s ->
-            this@SynapseGroupNode.networkPanel.createNode(s)
+        events.synapseAdded.on(dispatcher = Dispatchers.Swing) {
+            this@SynapseGroupNode.networkPanel.createNode(it)
             refreshVisible()
         }
-        events.synapseRemoved.on { s ->
+        events.synapseRemoved.on(wait = true) { s ->
             s.delete()
+        }
+        events.synapseRemoved.on(dispatcher = Dispatchers.Swing) {
             refreshVisible()
         }
-        events.synapseListChanged.on{
+        events.synapseListChanged.on(dispatcher = Dispatchers.Swing) {
             setVisibility()
             refreshVisible()
         }

@@ -1,4 +1,4 @@
-package org.simbrain.util.geneticalgorithm2
+package org.simbrain.util.geneticalgorithm
 
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -8,13 +8,13 @@ import org.simbrain.workspace.Workspace
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
-interface Genotype2 {
+interface Genotype {
     val random: Random
 }
 
-abstract class Gene2<P> {
+abstract class Gene<P> {
     abstract val template: P
-    abstract fun copy(): Gene2<P>
+    abstract fun copy(): Gene<P>
 
     fun mutate(block: P.() -> Unit) {
         template.apply(block)
@@ -32,17 +32,17 @@ interface EvoSim {
 /**
  * A typed list of Genes, with functions to copy and concatenate.
  */
-class Chromosome2<P, G : Gene2<P>>(genes: List<G>) : MutableList<G> by ArrayList(genes) {
+class Chromosome<P, G : Gene<P>>(genes: List<G>) : MutableList<G> by ArrayList(genes) {
 
     /**
      * Provides a copy of the chromosome.
      */
-    fun copy() = Chromosome2(map { it.copy() as G })
+    fun copy() = Chromosome(map { it.copy() as G })
 
     /**
      * Provides the ability to concatenate chromsomes. See usages.
      */
-    operator fun plus(other: Chromosome2<P, G>) = Chromosome2(buildList { addAll(this@Chromosome2); addAll(other); })
+    operator fun plus(other: Chromosome<P, G>) = Chromosome(buildList { addAll(this@Chromosome); addAll(other); })
 }
 
 /**
@@ -57,7 +57,7 @@ class Chromosome2<P, G : Gene2<P>>(genes: List<G>) : MutableList<G> by ArrayList
  * number and for fitness.
  * @param peek code to run each iteration, for example to update a progress bar
  */
-suspend fun evaluator2(
+suspend fun evaluator(
 
     populatingFunction: (index: Int) -> EvoSim,
     populationSize: Int,

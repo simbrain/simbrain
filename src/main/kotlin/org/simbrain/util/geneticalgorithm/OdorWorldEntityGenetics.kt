@@ -1,4 +1,4 @@
-package org.simbrain.util.geneticalgorithm2
+package org.simbrain.util.geneticalgorithm
 
 import org.simbrain.world.odorworld.effectors.Effector
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
@@ -6,18 +6,18 @@ import org.simbrain.world.odorworld.entities.PeripheralAttribute
 import org.simbrain.world.odorworld.sensors.Sensor
 import kotlin.reflect.full.primaryConstructor
 
-abstract class OdorWorldEntityGene2<P : PeripheralAttribute> : Gene2<P>() {
+abstract class OdorWorldEntityGene<P : PeripheralAttribute> : Gene<P>() {
     abstract suspend fun express(entity: OdorWorldEntity): P
 }
 
-class SensorGene2<S: Sensor>(override val template: S): OdorWorldEntityGene2<S>() {
+class SensorGene<S: Sensor>(override val template: S): OdorWorldEntityGene<S>() {
     override suspend fun express(entity: OdorWorldEntity): S = template.copy().also { entity.addSensor(it) } as S
 
-    override fun copy(): OdorWorldEntityGene2<S> = SensorGene2(template::class.primaryConstructor!!.call(template.copy()))
+    override fun copy(): OdorWorldEntityGene<S> = SensorGene(template::class.primaryConstructor!!.call(template.copy()))
 }
 
-class EffectorGene2<E: Effector>(override val template: E): OdorWorldEntityGene2<E>() {
+class EffectorGene<E: Effector>(override val template: E): OdorWorldEntityGene<E>() {
     override suspend fun express(entity: OdorWorldEntity): E = template.copy().also { entity.addEffector(it) } as E
 
-    override fun copy(): OdorWorldEntityGene2<E> = EffectorGene2(template::class.primaryConstructor!!.call(template.copy()))
+    override fun copy(): OdorWorldEntityGene<E> = EffectorGene(template::class.primaryConstructor!!.call(template.copy()))
 }

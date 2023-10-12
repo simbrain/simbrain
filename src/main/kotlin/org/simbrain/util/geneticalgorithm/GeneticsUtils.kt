@@ -1,4 +1,4 @@
-package org.simbrain.util.geneticalgorithm2
+package org.simbrain.util.geneticalgorithm
 
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.core.Network
@@ -6,11 +6,11 @@ import org.simbrain.util.sampleWithReplacement
 import org.simbrain.util.sampleWithoutReplacement
 import kotlin.math.roundToInt
 
-context(Genotype2)
-fun <P, G : Gene2<P>> Chromosome2<P, G>.sample() = this[random.nextInt(size)]
+context(Genotype)
+fun <P, G : Gene<P>> Chromosome<P, G>.sample() = this[random.nextInt(size)]
 
-context(Genotype2)
-fun <P, G : Gene2<P>> sampleFrom(vararg chromosomes: Chromosome2<P, G>): G {
+context(Genotype)
+fun <P, G : Gene<P>> sampleFrom(vararg chromosomes: Chromosome<P, G>): G {
     val nonEmptyChromosomes = chromosomes.filter { it.isNotEmpty() }
     if (nonEmptyChromosomes.isEmpty()) {
         throw NoSuchElementException()
@@ -24,26 +24,26 @@ fun <P, G : Gene2<P>> sampleFrom(vararg chromosomes: Chromosome2<P, G>): G {
     }
 }
 
-context(Genotype2)
-fun <P, G : Gene2<P>> Chromosome2<P, G>.sampleWithReplacement() = sampleWithReplacement(random)
+context(Genotype)
+fun <P, G : Gene<P>> Chromosome<P, G>.sampleWithReplacement() = sampleWithReplacement(random)
 
-context(Genotype2)
-fun <P, G : Gene2<P>> Chromosome2<P, G>.sampleWithoutReplacement(restartIfExhausted: Boolean = true) =
+context(Genotype)
+fun <P, G : Gene<P>> Chromosome<P, G>.sampleWithoutReplacement(restartIfExhausted: Boolean = true) =
     sampleWithoutReplacement(random, restartIfExhausted)
 
-context(Genotype2)
-fun <P : NetworkModel, G : NetworkGene2<P>> chromosome2(repeat: Int = 1, block: Chromosome2<P, G>.() -> Unit) =
-    Chromosome2<P, G>(
+context(Genotype)
+fun <P : NetworkModel, G : NetworkGene<P>> chromosome(repeat: Int = 1, block: Chromosome<P, G>.() -> Unit) =
+    Chromosome<P, G>(
         listOf()
     ).apply { repeat(repeat) { block() } }
 
 /**
  * Utility to create network models in a network, given their description as NetworkGenes.
  */
-context(Genotype2)
-suspend fun <P : NetworkModel, G : NetworkGene2<P>>
-        Network.express(Chromosome2: Chromosome2<P, G>): List<P> {
-    return Chromosome2.map { it.express(this@express) }
+context(Genotype)
+suspend fun <P : NetworkModel, G : NetworkGene<P>>
+        Network.express(Chromosome: Chromosome<P, G>): List<P> {
+    return Chromosome.map { it.express(this@express) }
 }
 
 data class GenerationFitnessPair(val generation: Int, val fitnessScores: List<Double>) {

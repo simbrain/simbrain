@@ -10,7 +10,7 @@ import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.StepDecayFunction
-import org.simbrain.util.geneticalgorithm2.*
+import org.simbrain.util.geneticalgorithm.*
 import org.simbrain.util.piccolo.loadTileMap
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.Workspace
@@ -38,25 +38,25 @@ val grazingCows = newSim { optionString ->
     // If not, use min to compute group level fitness across cows
     var useAverage = false
 
-    class CowGenotype(seed: Long = Random.nextLong()) : Genotype2 {
+    class CowGenotype(seed: Long = Random.nextLong()) : Genotype {
         override val random: Random = Random(seed)
-        var inputChromosome = chromosome2(1) {
+        var inputChromosome = chromosome(1) {
             // Dandelion and cow sensors
             repeat(6) {
-                add(nodeGene2 { isClamped = true })
+                add(nodeGene { isClamped = true })
             }
             // Won't get coupled to. Serves as an initial "drive" neuron
-            add(nodeGene2 { isClamped = true; forceSetActivation(1.0) })
+            add(nodeGene { isClamped = true; forceSetActivation(1.0) })
         }
-        var hiddenChromosome = chromosome2(2) { add(nodeGene2()) }
-        var outputChromosome = chromosome2(3) { add(nodeGene2 { upperBound = 10.0; lowerBound = -10.0 }) }
-        var connectionChromosome = chromosome2(1) {
+        var hiddenChromosome = chromosome(2) { add(nodeGene()) }
+        var outputChromosome = chromosome(3) { add(nodeGene { upperBound = 10.0; lowerBound = -10.0 }) }
+        var connectionChromosome = chromosome(1) {
             repeat(3) {
-                add(connectionGene2(inputChromosome.sampleOne(), hiddenChromosome.sampleOne()))
-                add(connectionGene2(hiddenChromosome.sampleOne(), outputChromosome.sampleOne()))
+                add(connectionGene(inputChromosome.sampleOne(), hiddenChromosome.sampleOne()))
+                add(connectionGene(hiddenChromosome.sampleOne(), outputChromosome.sampleOne()))
             }
             // Force an initial "drive"
-            add(connectionGene2(inputChromosome[3], hiddenChromosome.sampleOne()))
+            add(connectionGene(inputChromosome[3], hiddenChromosome.sampleOne()))
         }
 
         inner class Phenotype(
@@ -109,12 +109,12 @@ val grazingCows = newSim { optionString ->
                 ((inputChromosome + hiddenChromosome + outputChromosome) cartesianProduct (hiddenChromosome + outputChromosome)) - existingPairs
             if (random.nextDouble() < 0.25 && availableConnections.isNotEmpty()) {
                 val (source, target) = availableConnections.sampleOne(random)
-                connectionChromosome.add(connectionGene2(source, target) { strength = random.nextDouble(-1.0, 1.0) })
+                connectionChromosome.add(connectionGene(source, target) { strength = random.nextDouble(-1.0, 1.0) })
             }
 
             // Make hidden layer larger
             if (random.nextDouble() < 0.1) {
-                hiddenChromosome.add(nodeGene2())
+                hiddenChromosome.add(nodeGene())
             }
         }
     }
@@ -269,7 +269,7 @@ val grazingCows = newSim { optionString ->
                     setLocationRelativeTo(null)
                 }
             }
-            val cowSims = evaluator2(
+            val cowSims = evaluator(
                 populatingFunction = { CowSim() },
                 populationSize = populationSize,
                 eliminationRatio = eliminationRatio,

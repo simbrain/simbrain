@@ -99,7 +99,7 @@ val simulations = dir<Any>("Simulations") {
         // item("Evolve Pursuer") { evolvePursuer }
         // item("Evolve Mouse (Sandbox)") { evolveMouse }
         // item("Evolve XOR") { evolveXor }
-        item("Evolve XOR2") { evolveXor2 }
+        item("Evolve XOR2") { evolveXor }
     }
 
     dir("Demos") {

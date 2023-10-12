@@ -10,24 +10,24 @@ import org.simbrain.network.core.activations
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.*
-import org.simbrain.util.geneticalgorithm2.*
+import org.simbrain.util.geneticalgorithm.*
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.Workspace
 import java.awt.Dimension
 import kotlin.random.Random
 
-val evolveXor2 = newSim {
+val evolveXor = newSim {
 
-    class XorGenotype(seed: Long = Random.nextLong()) : Genotype2 {
+    class XorGenotype(seed: Long = Random.nextLong()) : Genotype {
 
         override val random: Random = Random(seed)
 
-        var inputLayerChromosome = chromosome2(2) { add(nodeGene2 { isClamped = true; upperBound = 1.0; lowerBound = -1.0 }) }
-        var hiddenLayerChromosome = chromosome2(2) { add(nodeGene2 { upperBound = 1.0; lowerBound = -1.0 }) }
-        var outputLayerChromosome = chromosome2(1) { add(nodeGene2 { upperBound = 1.0; lowerBound = -1.0 }) }
-        var connectionChromosome = chromosome2(1) {
-            add(connectionGene2(inputLayerChromosome.sampleOne(random), hiddenLayerChromosome.sampleOne(random)))
-            add(connectionGene2(hiddenLayerChromosome.sampleOne(random), outputLayerChromosome.sampleOne(random)))
+        var inputLayerChromosome = chromosome(2) { add(nodeGene { isClamped = true; upperBound = 1.0; lowerBound = -1.0 }) }
+        var hiddenLayerChromosome = chromosome(2) { add(nodeGene { upperBound = 1.0; lowerBound = -1.0 }) }
+        var outputLayerChromosome = chromosome(1) { add(nodeGene { upperBound = 1.0; lowerBound = -1.0 }) }
+        var connectionChromosome = chromosome(1) {
+            add(connectionGene(inputLayerChromosome.sampleOne(random), hiddenLayerChromosome.sampleOne(random)))
+            add(connectionGene(hiddenLayerChromosome.sampleOne(random), outputLayerChromosome.sampleOne(random)))
         }
 
         inner class Phenotype(
@@ -83,20 +83,20 @@ val evolveXor2 = newSim {
                     // Make a new connection from the hidden to output layer
                     availableHiddenToTarget.sampleOne()
                 }
-                connectionChromosome.add(connectionGene2(source, target) { strength = random.nextDouble(-1.0, 1.0) })
+                connectionChromosome.add(connectionGene(source, target) { strength = random.nextDouble(-1.0, 1.0) })
             }
 
             // Add a new hidden unit
             if (random.nextDouble() < 0.1) {
-                hiddenLayerChromosome.add(nodeGene2())
+                hiddenLayerChromosome.add(nodeGene())
             }
 
         }
 
     }
 
-    class Xor2Sim(
-        val xor2Genotype: XorGenotype = XorGenotype(),
+    class XorSim(
+        val xorGenotype: XorGenotype = XorGenotype(),
         val workspace: Workspace = Workspace()
     ) : EvoSim {
 
@@ -108,21 +108,21 @@ val evolveXor2 = newSim {
         val phenotype: Deferred<XorGenotype.Phenotype> by this::_phenotype
 
         override fun mutate() {
-            xor2Genotype.mutate()
+            xorGenotype.mutate()
         }
 
         override suspend fun build() {
             if (!_phenotype.isCompleted) {
-                _phenotype.complete(xor2Genotype.expressWith(network))
+                _phenotype.complete(xorGenotype.expressWith(network))
             }
         }
 
-        override fun visualize(workspace: Workspace): Xor2Sim {
-            return Xor2Sim(xor2Genotype.copy(), workspace)
+        override fun visualize(workspace: Workspace): XorSim {
+            return XorSim(xorGenotype.copy(), workspace)
         }
 
         override fun copy(): EvoSim {
-            return Xor2Sim(xor2Genotype.copy(), Workspace())
+            return XorSim(xorGenotype.copy(), Workspace())
         }
 
         override suspend fun eval(): Double {
@@ -150,8 +150,8 @@ val evolveXor2 = newSim {
         minimumSize = Dimension(300, 100)
         setLocationRelativeTo(null)
     }
-    val lastGeneration = evaluator2(
-        populatingFunction = { Xor2Sim() },
+    val lastGeneration = evaluator(
+        populatingFunction = { XorSim() },
         populationSize = 100,
         eliminationRatio = 0.5,
         peek = {
@@ -169,7 +169,7 @@ val evolveXor2 = newSim {
     )
 
     lastGeneration.take(1).forEach {
-        with(it.visualize(workspace) as Xor2Sim) {
+        with(it.visualize(workspace) as XorSim) {
             build()
             val phenotype = this.phenotype.await()
             phenotype.inputs.neuronList.forEach { it.increment = 1.0 }

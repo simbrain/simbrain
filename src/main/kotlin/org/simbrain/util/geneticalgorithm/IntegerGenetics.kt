@@ -1,4 +1,4 @@
-package org.simbrain.util.geneticalgorithm2
+package org.simbrain.util.geneticalgorithm
 
 import org.simbrain.util.propertyeditor.CopyableObject
 

@@ -11,7 +11,7 @@ import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.cartesianProduct
 import org.simbrain.util.format
-import org.simbrain.util.geneticalgorithm2.*
+import org.simbrain.util.geneticalgorithm.*
 import org.simbrain.util.piccolo.createTileMapLayer
 import org.simbrain.util.piccolo.loadTileMap
 import org.simbrain.util.piccolo.makeLake
@@ -33,19 +33,19 @@ val evolveCow = newSim {
     val maxGenerations = 50
     val iterationsPerRun = 2000
 
-    class CowGenotype(seed: Long = Random.nextLong()) : Genotype2 {
+    class CowGenotype(seed: Long = Random.nextLong()) : Genotype {
         override val random: Random = Random(seed)
-        var inputChromosome = chromosome2(3) { add(nodeGene2 { isClamped = true }) }
-        var hiddenChromosome = chromosome2(2) { add(nodeGene2()) }
-        var outputChromosome = chromosome2(3) { add(nodeGene2 { upperBound = 10.0; lowerBound = -10.0 }) }
-        var driveChromosome = chromosome2(1) { add(nodeGene2 { activation = 10.0; upperBound = 10.0; isClamped = true
+        var inputChromosome = chromosome(3) { add(nodeGene { isClamped = true }) }
+        var hiddenChromosome = chromosome(2) { add(nodeGene()) }
+        var outputChromosome = chromosome(3) { add(nodeGene { upperBound = 10.0; lowerBound = -10.0 }) }
+        var driveChromosome = chromosome(1) { add(nodeGene { activation = 10.0; upperBound = 10.0; isClamped = true
         }) }
-        var connectionChromosome = chromosome2(1) {
+        var connectionChromosome = chromosome(1) {
             repeat(3) {
-                add(connectionGene2(inputChromosome.sampleOne(), hiddenChromosome.sampleOne()))
-                add(connectionGene2(hiddenChromosome.sampleOne(), outputChromosome.sampleOne()))
+                add(connectionGene(inputChromosome.sampleOne(), hiddenChromosome.sampleOne()))
+                add(connectionGene(hiddenChromosome.sampleOne(), outputChromosome.sampleOne()))
             }
-            add(connectionGene2(driveChromosome[0], hiddenChromosome.sampleOne()))
+            add(connectionGene(driveChromosome[0], hiddenChromosome.sampleOne()))
         }
 
         inner class Phenotype(
@@ -102,18 +102,18 @@ val evolveCow = newSim {
             val availableConnections = ((inputChromosome + hiddenChromosome + outputChromosome) cartesianProduct (hiddenChromosome + outputChromosome)) - existingPairs
             if (random.nextDouble() < 0.25 && availableConnections.isNotEmpty()) {
                 val (source, target) = availableConnections.sampleOne(random)
-                connectionChromosome.add(connectionGene2(source, target) { strength = random.nextDouble(-1.0, 1.0) })
+                connectionChromosome.add(connectionGene(source, target) { strength = random.nextDouble(-1.0, 1.0) })
             }
 
             val availablePairs = (driveChromosome cartesianProduct (inputChromosome + hiddenChromosome + outputChromosome)) - existingPairs
             if (random.nextDouble() < 0.25 && availablePairs.isNotEmpty()) {
                 val (source, target) = availablePairs.sampleOne(random)
-                connectionChromosome.add(connectionGene2(source, target) { strength = random.nextDouble(-1.0, 1.0) })
+                connectionChromosome.add(connectionGene(source, target) { strength = random.nextDouble(-1.0, 1.0) })
             }
 
             // Make hidden layer larger
             if (random.nextDouble() < 0.1) {
-                hiddenChromosome.add(nodeGene2())
+                hiddenChromosome.add(nodeGene())
             }
         }
     }
@@ -280,7 +280,7 @@ val evolveCow = newSim {
             minimumSize = Dimension(300, 100)
             setLocationRelativeTo(null)
         }
-        val cowSims = evaluator2(
+        val cowSims = evaluator(
             populatingFunction = { CowSim() },
             populationSize = 100,
             eliminationRatio = 0.5,

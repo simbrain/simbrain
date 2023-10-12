@@ -2,11 +2,12 @@ package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.addProjectionPlot2
 import org.simbrain.custom_sims.addTextWorld
-import org.simbrain.custom_sims.couplingManager
 import org.simbrain.custom_sims.newSim
+import org.simbrain.custom_sims.updateAction
 import org.simbrain.util.Utils.FS
 import org.simbrain.util.place
 import org.simbrain.util.point
+import org.simbrain.util.projection.DataPoint
 import org.simbrain.util.projection.PCAProjection
 import java.io.File
 
@@ -54,20 +55,11 @@ val nlpSim_geomSpace = newSim {
         }
     }
 
-    // Couple the text world to neuron collection
-    with(couplingManager) {
-        // createCoupling(
-        //     textWorld.getProducer("getCurrentVector"),
-        //     nc.getConsumer("addInputs")
-        // )
-        createCoupling(
-            textWorld.getProducer("getCurrentVector"),
-            projectionPlot.getConsumer("addPoint")
-        )
-        createCoupling(
-            textWorld.getProducer("getCurrentToken"),
-            projectionPlot.getConsumer("setLabel")
-        )
-    }
+    workspace.addUpdateAction(updateAction("Couplings") {
+        val point = DataPoint(textWorld.currentVector).apply {
+            label = textWorld.currentToken
+        }
+        projectionPlot.projector.addDataPoint(point)
+    })
 
 }

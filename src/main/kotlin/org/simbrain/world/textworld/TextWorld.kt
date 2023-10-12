@@ -149,8 +149,10 @@ class TextWorld : AttributeContainer, EditableObject {
     /**
      * Regular expression for matcher.
      */
-    @UserParameter(label = "Regular Expression", description = "Regular expression for matcher.", order = 2)
-    private var regularExpression = "(\\S+)"
+    @UserParameter(label = "Regular Expression",
+        description = "Regular expression used to select tokens",
+        order = 2)
+    private var regularExpression = "(\\w+)"
         set(value) {
             field = value
             pattern = Pattern.compile(regularExpression)

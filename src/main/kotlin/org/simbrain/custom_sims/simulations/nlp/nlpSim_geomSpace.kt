@@ -59,7 +59,7 @@ val nlpSim_geomSpace = newSim {
         val point = DataPoint(textWorld.currentVector).apply {
             label = textWorld.currentToken
         }
-        projectionPlot.projector.addDataPoint(point)
+        projectionPlot.addPoint(point)
     })
 
 }

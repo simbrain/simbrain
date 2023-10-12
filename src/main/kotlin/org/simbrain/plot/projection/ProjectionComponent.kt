@@ -16,7 +16,11 @@ class ProjectionComponent @JvmOverloads constructor(name: String, val projector:
 
     @Consumable
     fun addPoint(newPoint: DoubleArray) {
-        projector.events.pointAdded.fireAndBlock(newPoint)
+        projector.addDataPoint(DataPoint(newPoint))
+    }
+
+    fun addPoint(newPoint: DataPoint) {
+        projector.addDataPoint(newPoint)
     }
 
     @Consumable
@@ -35,11 +39,7 @@ class ProjectionComponent @JvmOverloads constructor(name: String, val projector:
     }
 
     init {
-        projector.events.pointAdded.on(wait = true) {
-            if (it.size != projector.dimension) {
-                projector.dimension = it.size
-            }
-            projector.addDataPoint(DataPoint(it))
+        projector.events.pointUpdated.on(wait = true) {
             projector.coloringManager.updateAllColors()
             projector.dataset.currentPoint?.let { projector.coloringManager.activate(it) }
         }

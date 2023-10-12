@@ -3,7 +3,7 @@ package org.simbrain.util.projection
 import org.simbrain.util.Events
 
 class ProjectorEvents: Events() {
-    val pointAdded = AddedEvent<DoubleArray>()
+    val pointUpdated = AddedEvent<DataPoint>()
     val datasetChanged = NoArgEvent()
     val datasetCleared = NoArgEvent()
     val settingsChanged = NoArgEvent()

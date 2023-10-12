@@ -67,6 +67,10 @@ class Projector(initialDimension: Int = 25) : EditableObject, CoroutineScope {
     var coloringManager: ColoringManager = NoOpColoringManager()
 
     fun addDataPoint(newPoint: DataPoint) {
+        // If a different size point is added simply reset the dataset to match
+        if (newPoint.upstairsPoint.size != dimension) {
+            dimension = newPoint.upstairsPoint.size
+        }
         synchronized(dataset) {
             val closestPoint = dataset.kdTree.findClosestPoint(newPoint)
             if (closestPoint != null && closestPoint.euclideanDistance(newPoint) < tolerance) {
@@ -75,8 +79,9 @@ class Projector(initialDimension: Int = 25) : EditableObject, CoroutineScope {
                 dataset.kdTree.insert(newPoint)
                 dataset.currentPoint = newPoint
                 projectionMethod.addPoint(dataset, newPoint)
+                events.datasetChanged.fireAndBlock()
             }
-            events.datasetChanged.fireAndBlock()
+            events.pointUpdated.fireAndBlock(newPoint)
         }
     }
 

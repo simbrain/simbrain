@@ -15,7 +15,7 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
 import java.awt.*;
 import java.util.List;
 
-import static org.simbrain.network.connections.ConnectionUtilitiesKt.polarizeSynapses;
+import static org.simbrain.network.connections.ConnectionUtilsKt.polarizeSynapses;
 import static org.simbrain.network.connections.SparseKt.createSparseSynapses;
 
 /**

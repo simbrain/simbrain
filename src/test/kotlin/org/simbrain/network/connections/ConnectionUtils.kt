@@ -6,7 +6,7 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 
-class ConnectionUtilitiesTest {
+class ConnectionUtils {
 
     @Test
     fun `check that polarizeSynapses produces the appropriate percentage of excitatory synapses`() {

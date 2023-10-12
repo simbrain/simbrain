@@ -31,7 +31,7 @@ import org.simbrain.network.gui.actions.edit.CopyAction;
 import org.simbrain.network.gui.actions.edit.CutAction;
 import org.simbrain.network.gui.actions.edit.PasteAction;
 import org.simbrain.util.SwingKt;
-import org.simbrain.util.TextUtilitiesKt;
+import org.simbrain.util.TextUtilsKt;
 
 import javax.swing.*;
 import javax.swing.text.*;
@@ -116,7 +116,7 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
 
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    SwingKt.display(TextUtilitiesKt.textEntryDialog(getTextObject().getText(), "Edit Text", 20, 5, (text) -> {
+                    SwingKt.display(TextUtilsKt.textEntryDialog(getTextObject().getText(), "Edit Text", 20, 5, (text) -> {
                         getTextObject().setText(text);
                         update();
                         return Unit.INSTANCE;
@@ -217,7 +217,7 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
     @Nullable
     @Override
     public JDialog getPropertyDialog() {
-        return TextUtilitiesKt.textEntryDialog(getTextObject().getText(), "Edit Text", 20, 5, (text) -> {
+        return TextUtilsKt.textEntryDialog(getTextObject().getText(), "Edit Text", 20, 5, (text) -> {
             getTextObject().setText(text);
             update();
             return Unit.INSTANCE;

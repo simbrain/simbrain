@@ -9,7 +9,6 @@ import org.jdesktop.swingx.JXTableHeader
 import org.simbrain.util.cartesianProduct
 import org.simbrain.util.displayInDialog
 import org.simbrain.util.widgets.RowNumberTable
-import smile.math.matrix.Matrix
 import java.awt.AWTEvent
 import java.awt.BorderLayout
 import java.awt.Color
@@ -337,10 +336,21 @@ class DataViewerTable(val model: SimbrainDataModel, useHeaders: Boolean = true) 
 
 fun main() {
 
-    val model = MatrixDataWrapper(Matrix.randn(10, 4))
+    // val model = MatrixDataWrapper(Matrix.randn(10, 4))
     // val model = DataFrameWrapper(read.csv("simulations/tables/toy-test.txt", delimiter='\t', header=false))
     // val model = DataFrameWrapper(Read.arff("simulations/tables/iris.arff"))
     // val model = createFromDoubleArray(Matrix.randn(10, 4).toArray())
+
+    val numbersWithNulls: MutableList<MutableList<Any?>> = mutableListOf(
+        mutableListOf(1, 2, 3, null, 5),
+        mutableListOf(6, null, 8, 9, 10),
+        mutableListOf(null, 12, 13, 14, 15),
+        mutableListOf(16, 17, null, 19, 20),
+        mutableListOf(21, 22, 23, 24, null)
+    )
+    val model = BasicDataWrapper(numbersWithNulls)
     SimbrainDataViewer(model).displayInDialog()
+
+
 
 }

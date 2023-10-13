@@ -6,6 +6,6 @@ import org.simbrain.util.Utils
 
 object TextWorldPreferences: PreferenceHolder() {
 
-    var dictionaryDirectory by StringPreference("." + Utils.FS +"simulations" + Utils.FS + "texts")
+    var tokenEmbeddingDirectory by StringPreference("." + Utils.FS +"simulations" + Utils.FS + "texts")
 
 }

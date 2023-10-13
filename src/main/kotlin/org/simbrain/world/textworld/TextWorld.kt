@@ -35,15 +35,13 @@ import java.util.regex.Pattern
  * TextWorld is an environment for modeling speech and reading and other linguistic phenomena and their interactions
  * with a neural network.
  *
- * A dictionary object associates words or other tokens with vectors and vice versa, using [Coupling]s.
+ * A [TokenEmbedding] object associates words or other tokens with vectors and vice versa, using [Coupling]s.
  *
- * Text in the main window is parsed and highlighted, and if a corresponding entry is found in the dictionary, a
+ * Text in the main window is parsed and highlighted, and if a corresponding entry is found in the token embedding, a
  * vector is sent to any coupled objects, for example the input layer of a neural network.
  *
- * Output from a neural network can also be sent to the world. The closest matching vector in the dictionary is found
- * and then the corresponding token in the dictionary is printed to the main window.
- *
- * The dictionary can be generated in several ways, which correspond to methods of word embedding.
+ * Output from a neural network can also be sent to the world. The closest matching vector in the token embedding is
+ * found and then the corresponding token in the embedding is printed to the main window.
  *
  * @see https://en.wikipedia.org/wiki/Word_embedding
  * @author Jeff Yoshimi
@@ -72,7 +70,7 @@ class TextWorld : AttributeContainer, EditableObject {
     /**
      * Associates string tokens with arrays of doubles and vice-versa
      */
-    var tokenVectorMap = TokenVectorMap(
+    var tokenEmbedding = TokenEmbedding(
         tokens = listOf("Dog", "Cat", "Hello", "how", "are", "you"),
         tokenVectorMatrix = Matrix.eye(6)
     )
@@ -186,21 +184,20 @@ class TextWorld : AttributeContainer, EditableObject {
         get() = currentItem.let {
             if (it == null) {
                 // Zero vector if no current item
-                DoubleArray(tokenVectorMap.dimension)
+                DoubleArray(tokenEmbedding.dimension)
             } else {
                 // TODO: Not sure if this is the best place to call lowercase()
-                tokenVectorMap.get(it.text.lowercase())
+                tokenEmbedding.get(it.text.lowercase())
             }
         }
 
     /**
-     * Display the string associated with the closest matching vector in the
-     * dictionary.
+     * Display the string associated with the closest matching vector in the embedding
      */
     @Consumable()
     fun displayClosestWord(key: DoubleArray) {
         // Using addTextAtCursor produces strange results. Must be better synced with cursor.
-        addTextAtEnd(tokenVectorMap.getClosestWord(key))
+        addTextAtEnd(tokenEmbedding.getClosestWord(key))
     }
 
     /**
@@ -402,11 +399,11 @@ class TextWorld : AttributeContainer, EditableObject {
         when (embeddingType) {
             EmbeddingType.ONE_HOT -> {
                 val tokens = docString.tokenizeWordsFromSentence().uniqueTokensFromArray()
-                tokenVectorMap = TokenVectorMap(tokens, Matrix.eye(tokens.size))
+                tokenEmbedding = TokenEmbedding(tokens, Matrix.eye(tokens.size))
             }
             EmbeddingType.COC -> {
                 val result = generateCooccurrenceMatrix(docString, windowSize, bidirectional, usePPMI)
-                tokenVectorMap = TokenVectorMap(result.first, result.second)
+                tokenEmbedding = TokenEmbedding(result.first, result.second)
             }
             else -> {
                 throw IllegalStateException("Custom embeddings must be manually loaded")
@@ -415,7 +412,7 @@ class TextWorld : AttributeContainer, EditableObject {
     }
 
     fun loadCustomEmbedding(tokens: List<String>, embeddings: Matrix) {
-        tokenVectorMap = TokenVectorMap(tokens, embeddings)
+        tokenEmbedding = TokenEmbedding(tokens, embeddings)
     }
 }
 

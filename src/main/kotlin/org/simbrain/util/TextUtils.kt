@@ -127,8 +127,6 @@ fun manualPPMI(cocMatrix: Matrix, positive: Boolean = true): Matrix {
     return adjustedMatrix
 }
 
-// TODO: Return a TokenVectorDictionary
-
 /**
  * Generates co-occurrence matrix from a provided [docString].
  *

@@ -96,12 +96,12 @@ class TextWorldPanel private constructor(
         // if (openCloseToolBar != null) {
         //     topToolbarPanel.add(openCloseToolBar);
         // }
-        val dictionaryToolBar = JToolBar()
-        dictionaryToolBar.add(world.embeddingEditor)
-        dictionaryToolBar.add(world.textWorldPrefs)
-        dictionaryToolBar.add(world.extractDictionary)
-        dictionaryToolBar.add(world.calculateCosineSimilarity)
-        topToolbarPanel.add(dictionaryToolBar)
+        val tokenEmbeddingToolbar = JToolBar()
+        tokenEmbeddingToolbar.add(world.viewTokenEmbedding)
+        tokenEmbeddingToolbar.add(world.textWorldPrefs)
+        tokenEmbeddingToolbar.add(world.extractEmbedding)
+        tokenEmbeddingToolbar.add(world.calculateCosineSimilarity)
+        topToolbarPanel.add(tokenEmbeddingToolbar)
         add(topToolbarPanel, BorderLayout.NORTH)
         val bottomToolbarPanel = JPanel()
         bottomToolbarPanel.layout = FlowLayout(FlowLayout.LEFT)

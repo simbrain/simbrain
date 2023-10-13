@@ -16,7 +16,7 @@ fun TextWorld.showComparisonDialog(): StandardDialog {
         contentPane = JPanel()
         layout = MigLayout("ins 0, gap 20px 20px")
 
-        val filteredTerms = removeStopWords(tokenVectorMap.tokensMap.keys.toList())
+        val filteredTerms = removeStopWords(tokenEmbedding.tokensMap.keys.toList())
 
         var distanceFunction: (DoubleArray, DoubleArray) -> Double = MathEx::cos
 
@@ -27,8 +27,8 @@ fun TextWorld.showComparisonDialog(): StandardDialog {
         val similarity = JLabel("Similarity: ")
 
         fun updatePanel() {
-            val vec1 = tokenVectorMap.get(word1cb.selectedItem as String)
-            val vec2 = tokenVectorMap.get(word2cb.selectedItem as String)
+            val vec1 = tokenEmbedding.get(word1cb.selectedItem as String)
+            val vec2 = tokenEmbedding.get(word2cb.selectedItem as String)
             when (similarityMethod.selectedItem as String) {
                 "Cosine Similarity" -> {
                     distanceFunction = MathEx::cos

@@ -55,11 +55,6 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
     private val edit = JMenu("Edit")
 
     /**
-     * Opens the dialog to define TextWorld Dictionary.
-     */
-    private val loadDictionary = JMenuItem("Edit dictionary...")
-
-    /**
      * Opens user preferences dialog.
      */
     private val preferences = JMenuItem("Preferences")
@@ -129,9 +124,6 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
         file.add(SimbrainDesktop.actionManager.createCloseAction(this))
 
         // Edit menu
-        // loadDictionary.setAction(TextWorldActions.showDictionaryEditor(world));
-        // edit.add(loadDictionary);
-        // edit.addSeparator()
         preferences.action = world.textWorldPrefs
         edit.add(preferences)
         menuBar.add(edit)

@@ -7,11 +7,12 @@ import org.simbrain.util.table.BasicDataWrapper
 import org.simbrain.util.table.SimbrainDataViewer
 import org.simbrain.util.table.createFromDoubleArray
 import smile.math.matrix.Matrix
-
 /**
- * Associates string tokens with vector representations and vice-versa.
+ * Associates string tokens with vector representations.
+ *
+ * Also allows for reverse mappings from vectors back to tokens using a [KDTree].
  */
-class TokenVectorMap(
+class TokenEmbedding(
     tokens: List<String>,
     /**
      * Matrix whose rows correspond to vector representations of corresponding tokens.
@@ -25,7 +26,7 @@ class TokenVectorMap(
     var tokensMap: Map<String, Int> = tokens.mapIndexed{i, t -> t to i}.toMap()
 
     /**
-     * Number of entries in the dictionary, i.e. number of words that have associated embeddings.
+     * Number of entries in the embedding, i.e. number of words that have associated embeddings.
      */
     val size = tokensMap.size
 
@@ -99,6 +100,6 @@ fun main() {
     )
     textworld.loadCustomEmbedding(listOf("Word 1", "Word 2"), embeddings)
     val viewer = SimbrainDataViewer(textworld
-        .tokenVectorMap.createTableModel(TextWorld.EmbeddingType.CUSTOM))
+        .tokenEmbedding.createTableModel(TextWorld.EmbeddingType.CUSTOM))
     viewer.displayInDialog()
 }

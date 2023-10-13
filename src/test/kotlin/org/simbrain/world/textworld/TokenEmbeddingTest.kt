@@ -4,9 +4,9 @@ import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Test
 import smile.math.matrix.Matrix
 
-class TokenVectorMapTest {
+class TokenEmbeddingTest {
 
-    var map = TokenVectorMap(listOf("A", "B"), Matrix.eye(2))
+    var map = TokenEmbedding(listOf("A", "B"), Matrix.eye(2))
 
     @Test
     fun `test retrieval`() {

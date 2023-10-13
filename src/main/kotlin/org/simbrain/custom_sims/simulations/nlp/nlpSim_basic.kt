@@ -37,12 +37,12 @@ val nlpSim_basic = newSim {
         val internalFrame = JInternalFrame("Co-occurrence matrix", true, true)
         internalFrame.setLocation(400, 10)
         addInternalFrame(internalFrame)
-        val tableViewer = SimbrainDataViewer(textWorld.tokenVectorMap.createTableModel(TextWorld.EmbeddingType.COC))
+        val tableViewer = SimbrainDataViewer(textWorld.tokenEmbedding.createTableModel(TextWorld.EmbeddingType.COC))
         internalFrame.contentPane = tableViewer
         internalFrame.isVisible = true
         internalFrame.pack()
         textWorld.events.tokenVectorMapChanged.on {
-            tableViewer.model = textWorld.tokenVectorMap.createTableModel(TextWorld.EmbeddingType.COC)
+            tableViewer.model = textWorld.tokenEmbedding.createTableModel(TextWorld.EmbeddingType.COC)
         }
     }
 

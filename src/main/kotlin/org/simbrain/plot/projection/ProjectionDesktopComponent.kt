@@ -208,12 +208,12 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
             it.init()
             launch {
                 it.events.settingsChanged.fire()
-                update()
+                redrawAllPoints()
             }
         }.display()
     }
 
-    suspend fun update() {
+    private suspend fun redrawAllPoints() {
         withContext(Dispatchers.Swing) {
             xyCollection.getSeries(0).clear()
             pointList.clear()
@@ -248,7 +248,10 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
         }
 
         projector.events.datasetChanged.on {
-            update()
+            redrawAllPoints()
+        }
+        projector.events.pointUpdated.on {
+            chart.fireChartChanged()
         }
         projector.events.datasetCleared.on {
             projector.coloringManager.reset()
@@ -271,13 +274,13 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
             topPanel.repaint()
             bottomPanel.revalidate()
             bottomPanel.repaint()
-            launch { update() }
+            launch { redrawAllPoints() }
         }
         projector.events.iterated.on { error ->
             errorLabel.text = "Error: ${error.format(2)}"
         }
         launch {
-            update()
+            redrawAllPoints()
         }
     }
 

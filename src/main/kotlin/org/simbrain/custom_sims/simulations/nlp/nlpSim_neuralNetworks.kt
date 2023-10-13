@@ -26,7 +26,7 @@ val nlpSim_neuralNetworks = newSim {
     // Text World for Inputs
     val textWorld = addTextWorld("Text World (Inputs)")
     val text = File("simulations" + Utils.FS + "texts" + Utils.FS + "mlk.txt").readText()
-    textWorld.world.loadDictionary(text)
+    textWorld.world.extractEmbedding(text)
     textWorld.world.text = text
 
     withGui {
@@ -58,7 +58,7 @@ val nlpSim_neuralNetworks = newSim {
 
     // Text World for Outputs
     val textWorldOut = addTextWorld("Text World (Outputs)")
-    textWorldOut.world.loadDictionary(text)
+    textWorldOut.world.extractEmbedding(text)
 
     withGui {
         place(textWorldOut) {

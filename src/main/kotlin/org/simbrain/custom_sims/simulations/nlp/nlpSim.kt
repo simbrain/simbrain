@@ -40,7 +40,7 @@ val nlpSim = newSim {
     val twc = addTextWorld("Text World")
     val textWorld = twc.world
     val text = readSimulationFileContents("nlp/mlk.txt")
-    textWorld.loadDictionary(text)
+    textWorld.extractEmbedding(text)
     textWorld.text = text
 
     withGui {

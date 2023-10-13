@@ -18,29 +18,31 @@ val TextWorld.extractDictionary get() = createAction(
     val chooser = SFileChooser(dictionaryDirectory, "text file", "txt")
     val theFile = chooser.showOpenDialog()
     if (theFile != null) {
-        loadDictionary(Utils.readFileContents(theFile))
+        extractEmbedding(Utils.readFileContents(theFile))
     }
 }
 
+// TODO: Need a separate viewer and ability to disable editor
 /**
- * Action for showing the vector dictionary editor, either the
- * token-to-vector dictionary used in readerworld or the vector-to-token
- * dictionary used in display world.
+ * Action for viewing and editing the embedding.
  */
-val TextWorld.dictionaryEditor
+val TextWorld.embeddingEditor
     get() = createAction(
-        name = "Edit dictionary...",
-        description = "Edit dictionary...",
+        name = "View embedding...",
+        description = "View embedding...",
         iconPath = "menu_icons/Table.png"
     ) {
 
-        val viewer = SimbrainDataViewer(tokenVectorMap.createTableModel())
+        val viewer = SimbrainDataViewer(tokenVectorMap.createTableModel(embeddingType).apply {
+            isMutable = false
+        })
         viewer.displayInDialog().apply {
             title = "Dictionary with ${tokenVectorMap.size} unique entries"
         }
-        events.tokenVectorMapChanged.on {
-            viewer.model = tokenVectorMap.createTableModel()
-        }
+        // TODO: Use this when reintroducing editable embeddings
+        // events.tokenVectorMapChanged.on {
+        //     viewer.model = tokenVectorMap.createTableModel(embeddingType)
+        // }
     }
 
 /**
@@ -76,7 +78,7 @@ val TextWorld.textWorldPrefs
         createDialog {}.also {
             it.title = "Text World Preferences"
             it.addClosingTask {
-                loadDictionary(text)
+                extractEmbedding(text)
             }
         }.display()
     }

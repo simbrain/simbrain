@@ -8,6 +8,7 @@ import org.simbrain.util.Utils.FS
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.util.table.SimbrainDataViewer
+import org.simbrain.world.textworld.TextWorld
 import java.io.File
 import javax.swing.JInternalFrame
 
@@ -23,7 +24,7 @@ val nlpSim_basic = newSim {
     val textWorld = twc.world
     val text = File("simulations" + FS + "texts" + FS + "river_streams.txt").readText()
     // Example: check "river" and "ocean", "river" and "stream", "lake" and "ocean", n.b. regenerate embeddings after settings change
-    textWorld.loadDictionary(text)
+    textWorld.extractEmbedding(text)
     textWorld.text = text
 
     withGui {
@@ -36,12 +37,12 @@ val nlpSim_basic = newSim {
         val internalFrame = JInternalFrame("Co-occurrence matrix", true, true)
         internalFrame.setLocation(400, 10)
         addInternalFrame(internalFrame)
-        val tableViewer = SimbrainDataViewer(textWorld.tokenVectorMap.createTableModel())
+        val tableViewer = SimbrainDataViewer(textWorld.tokenVectorMap.createTableModel(TextWorld.EmbeddingType.COC))
         internalFrame.contentPane = tableViewer
         internalFrame.isVisible = true
         internalFrame.pack()
         textWorld.events.tokenVectorMapChanged.on {
-            tableViewer.model = textWorld.tokenVectorMap.createTableModel()
+            tableViewer.model = textWorld.tokenVectorMap.createTableModel(TextWorld.EmbeddingType.COC)
         }
     }
 

@@ -8,6 +8,7 @@ import org.simbrain.util.Utils.FS
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.util.projection.DataPoint
+import org.simbrain.util.projection.HaloColoringManager
 import org.simbrain.util.projection.PCAProjection
 import java.io.File
 
@@ -31,7 +32,7 @@ val nlpSim_geomSpace = newSim {
     val twc = addTextWorld("Text World")
     val textWorld = twc.world
     val text = File("simulations" + FS + "texts" + FS + "corpus_artificial_similarity.txt").readText()
-    textWorld.loadDictionary(text)
+    textWorld.extractEmbedding(text)
     textWorld.text = text
 
     withGui {
@@ -47,6 +48,9 @@ val nlpSim_geomSpace = newSim {
     val projectionPlot = addProjectionPlot2("Activations")
     projectionPlot.projector.tolerance = .2
     projectionPlot.projector.projectionMethod = PCAProjection()
+    projectionPlot.projector.coloringManager = HaloColoringManager().apply{
+        radius = 10.0
+    }
     withGui {
         place(projectionPlot) {
             location = point(450, 0)

@@ -13,7 +13,7 @@ class BasicDataWrapper(
     override var columns: MutableList<Column> = inferColumns(data)
 ) : SimbrainDataModel() {
 
-    override val isMutable = true
+    override var isMutable = true
 
     var data: MutableList<MutableList<Any?>> = data
         set(value) {

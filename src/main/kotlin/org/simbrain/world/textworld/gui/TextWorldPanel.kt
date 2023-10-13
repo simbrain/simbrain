@@ -97,7 +97,7 @@ class TextWorldPanel private constructor(
         //     topToolbarPanel.add(openCloseToolBar);
         // }
         val dictionaryToolBar = JToolBar()
-        dictionaryToolBar.add(world.dictionaryEditor)
+        dictionaryToolBar.add(world.embeddingEditor)
         dictionaryToolBar.add(world.textWorldPrefs)
         dictionaryToolBar.add(world.extractDictionary)
         dictionaryToolBar.add(world.calculateCosineSimilarity)

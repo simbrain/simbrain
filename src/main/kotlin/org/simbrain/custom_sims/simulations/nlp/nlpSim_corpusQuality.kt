@@ -36,7 +36,7 @@ val nlpSim_corpusQuality = newSim {
     val twc = addTextWorld("Text World")
     val textWorld = twc.world
     val text = Utils.readFileContents("simulations/texts/mlk.txt")
-    textWorld.loadDictionary(text)
+    textWorld.extractEmbedding(text)
     textWorld.text = text
 
     withGui {

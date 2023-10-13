@@ -1,8 +1,10 @@
 package org.simbrain.world.textworld
 
+import org.simbrain.util.displayInDialog
 import org.simbrain.util.projection.DataPoint
 import org.simbrain.util.projection.KDTree
-import org.simbrain.util.table.SimbrainDataModel
+import org.simbrain.util.table.BasicDataWrapper
+import org.simbrain.util.table.SimbrainDataViewer
 import org.simbrain.util.table.createFromDoubleArray
 import smile.math.matrix.Matrix
 
@@ -73,11 +75,30 @@ class TokenVectorMap(
         return treeMap.findClosestPoint(DataPoint(key))?.label!!
     }
 
-    fun createTableModel(): SimbrainDataModel {
+    /**
+     * Creates a table model object for an embedding.  Column headings are the same as row headings for one-hot and
+     * default co-occurrence matrices.
+     */
+    fun createTableModel(type: TextWorld.EmbeddingType): BasicDataWrapper {
         val table = createFromDoubleArray(tokenVectorMatrix.replaceNaN(0.0).toArray())
-        table.setColumnNames(tokensMap.keys.toList())
         table.rowNames = tokensMap.keys.toList()
+        if (type == TextWorld.EmbeddingType.COC || type == TextWorld.EmbeddingType.ONE_HOT) {
+            table.setColumnNames(tokensMap.keys.toList())
+        }
         return table
     }
+}
 
+fun main() {
+    val textworld = TextWorld()
+    val embeddings = Matrix.of(
+        arrayOf(
+            doubleArrayOf(1.0, 2.0, 3.0),
+            doubleArrayOf(4.0, 5.0, 6.0),
+        )
+    )
+    textworld.loadCustomEmbedding(listOf("Word 1", "Word 2"), embeddings)
+    val viewer = SimbrainDataViewer(textworld
+        .tokenVectorMap.createTableModel(TextWorld.EmbeddingType.CUSTOM))
+    viewer.displayInDialog()
 }

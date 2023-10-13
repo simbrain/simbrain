@@ -52,7 +52,7 @@ import java.util.regex.Pattern
  */
 class TextWorld : AttributeContainer, EditableObject {
 
-    enum class EmbeddingType {ONE_HOT, COC}
+    enum class EmbeddingType {ONE_HOT, COC, CUSTOM}
 
     @UserParameter(label = "Embedding type", description = "Method for converting text to vectors", order = 1 )
     var embeddingType = EmbeddingType.COC
@@ -395,15 +395,30 @@ class TextWorld : AttributeContainer, EditableObject {
         }
     }
 
-    fun loadDictionary(docString: String) {
-        if (embeddingType == EmbeddingType.ONE_HOT) {
-            val tokens = docString.tokenizeWordsFromSentence().uniqueTokensFromArray()
-            tokenVectorMap = TokenVectorMap(tokens, Matrix.eye(tokens.size))
-
-        } else {
-            val result = generateCooccurrenceMatrix(docString, windowSize,bidirectional, usePPMI)
-            tokenVectorMap = TokenVectorMap(result.first, result.second)
+    /**
+     * Extract a token embedding from the provided string.
+     */
+    fun extractEmbedding(docString: String) {
+        when (embeddingType) {
+            EmbeddingType.ONE_HOT -> {
+                val tokens = docString.tokenizeWordsFromSentence().uniqueTokensFromArray()
+                tokenVectorMap = TokenVectorMap(tokens, Matrix.eye(tokens.size))
+            }
+            EmbeddingType.COC -> {
+                val result = generateCooccurrenceMatrix(docString, windowSize, bidirectional, usePPMI)
+                tokenVectorMap = TokenVectorMap(result.first, result.second)
+            }
+            else -> {
+                throw IllegalStateException("Custom embeddings must be manually loaded")
+            }
         }
     }
+
+    fun loadCustomEmbedding(tokens: List<String>, embeddings: Matrix) {
+        tokenVectorMap = TokenVectorMap(tokens, embeddings)
+    }
 }
+
+
+
 

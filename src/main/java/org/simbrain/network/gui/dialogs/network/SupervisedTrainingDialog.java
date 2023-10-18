@@ -19,7 +19,6 @@
 package org.simbrain.network.gui.dialogs.network;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.table.BasicDataWrapperKt;
@@ -69,7 +68,7 @@ public abstract class SupervisedTrainingDialog extends StandardDialog {
     /**
      * Reference to validate inputs panel
      */
-    private TestInputPanel validateInputsPanel;
+    private JPanel validateInputsPanel;
 
     /**
      * List of tabs in the dialog.

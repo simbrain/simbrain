@@ -21,10 +21,9 @@ import org.simbrain.plot.rasterchart.RasterPlotDesktopComponent;
 import org.simbrain.plot.timeseries.TimeSeriesDesktopComponent;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.util.genericframe.GenericFrame;
-import org.simbrain.util.table.NumericTable;
 import org.simbrain.workspace.gui.DesktopComponent;
 import org.simbrain.world.dataworld.DataWorldComponent;
-import org.simbrain.world.dataworld.DataWorldDesktopComponent;
+import org.simbrain.world.dataworld.gui.DataWorldDesktopComponent;
 import org.simbrain.world.imageworld.ImageWorldComponent;
 import org.simbrain.world.imageworld.gui.ImageWorldDesktopComponent;
 import org.simbrain.world.odorworld.OdorWorldComponent;
@@ -68,7 +67,7 @@ public class AbstractComponentFactory {
         putWorkspaceComponentFactory("Odor World", () -> new OdorWorldComponent(""));
         putGuiComponentFactory(OdorWorldComponent.class, OdorWorldDesktopComponent::new);
 
-        putWorkspaceComponentFactory("Data Table", () -> DataWorldComponent.createDataWorld(new NumericTable(), ""));
+        putWorkspaceComponentFactory("Data Table", () -> new DataWorldComponent(""));
         putGuiComponentFactory(DataWorldComponent.class, DataWorldDesktopComponent::new);
 
         putWorkspaceComponentFactory("Text World", () -> new TextWorldComponent(""));

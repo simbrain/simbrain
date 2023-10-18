@@ -70,8 +70,8 @@ class DeepNet(
     /**
      * The training data that can be edited by the user.
      */
-    var inputData: Array<FloatArray>
-    var targetData: FloatArray
+    var deepNetInputData: Array<FloatArray>
+    var deepNetTargetData: FloatArray
 
     /**
      * The data used internally by KotlinDL.
@@ -107,8 +107,8 @@ class DeepNet(
     init {
         label = network.idManager.getProposedId(this.javaClass)
         buildNetwork()
-        inputData = Array(nsamples) { FloatArray(inputSize()) }
-        targetData = FloatArray(nsamples)
+        deepNetInputData = Array(nsamples) { FloatArray(inputSize()) }
+        deepNetTargetData = FloatArray(nsamples)
         activations = deepNetLayers.layers.dropLast(1).filter { it.hasActivation }.map {
             if (it.outputShape.rank() == 4) {
                 val filters = it.outputShape[3].toInt()
@@ -134,7 +134,7 @@ class DeepNet(
     }
 
     fun initializeDatasets() {
-        val data = OnHeapDataset.create(inputData, targetData)
+        val data = OnHeapDataset.create(deepNetInputData, deepNetTargetData)
         // TODO: Make split ratio settable
         data.shuffle()
         val (train, test) = data.split(.7)

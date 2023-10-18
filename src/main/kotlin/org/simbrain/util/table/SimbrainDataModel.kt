@@ -17,6 +17,8 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
 
     abstract var columns: MutableList<Column>
 
+    val events = TableEvents()
+
     // constructor with list of strings
     // constructor with list of datatypes
     // constructor with both
@@ -42,6 +44,11 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
      */
     @UserParameter(label = "Table Randomizer")
     var cellRandomizer = UniformRealDistribution()
+
+    /**
+     * This can be directly edited, but events must be manually fired. See dataworld.update
+     */
+    var currentRowIndex = 0
 
     /**
      * Check that the provided column index is within range
@@ -190,6 +197,24 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
     }
 
     /**
+     * Returns a list of the provided type.
+     * If columns do not have consistent types of class cast exception will be thrown.
+     */
+    inline fun <reified T> getRow(index: Int): List<T> = (0 until columnCount).map {
+        when(T::class) {
+            String::class -> getValueAt(index, it).toString()
+            Double::class -> (getValueAt(index, it) as Number).toDouble()
+            Float::class -> (getValueAt(index, it) as Number).toFloat()
+            Int::class -> (getValueAt(index, it) as Number).toInt()
+            else -> throw IllegalArgumentException("Unsupported type ${T::class}")
+        } as T
+    }
+
+    fun getCurrentStringRow() = getRow<String>(currentRowIndex)
+
+    fun getCurrentDoubleRow() = getRow<Double>(currentRowIndex)
+
+    /**
      * Returns an array of float array columns for the table.
      *
      * Doubles and ints are cast to floats.
@@ -210,11 +235,19 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
 
     open fun deleteColumn(selectedColumn: Int, fireEvent: Boolean = true) {}
 
-    open fun setColumnNames(columnNames: List<String?>) {
-        columns = columns.mapIndexed { i, col ->
-            Column(columnNames.getOrNull(i) ?: "Column ${i + 1}", col.type)
-        }.toMutableList()
-    }
+    var rowNames = listOf<String?>()
+        set(value) {
+            field = value
+            fireTableDataChanged()
+        }
+
+    var columNames: List<String?>
+        get() = columns.map { it.name }
+        set(value) {
+            columns = columns.mapIndexed { i, col ->
+                Column(value.getOrNull(i) ?: "Column ${i + 1}", col.type)
+            }.toMutableList()
+        }
 
     open fun insertRow(selectedRow: Int) {}
 

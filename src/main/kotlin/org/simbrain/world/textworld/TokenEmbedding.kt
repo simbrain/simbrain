@@ -85,7 +85,7 @@ class TokenEmbedding(
         val table = createFromDoubleArray(tokenVectorMatrix.replaceNaN(0.0).toArray())
         table.rowNames = tokensMap.keys.toList()
         if (type == TextWorld.EmbeddingType.COC || type == TextWorld.EmbeddingType.ONE_HOT) {
-            table.setColumnNames(tokensMap.keys.toList())
+            table.columNames = tokensMap.keys.toList()
         }
         return table
     }

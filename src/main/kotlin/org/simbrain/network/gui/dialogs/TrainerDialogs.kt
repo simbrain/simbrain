@@ -9,10 +9,12 @@ import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.Trainable
 import org.simbrain.util.StandardDialog
-import org.simbrain.util.createAction
 import org.simbrain.util.createDialog
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.table.MatrixDataWrapper
+import org.simbrain.util.table.createAdvanceRowAction
+import org.simbrain.util.table.createApplyAction
+import org.simbrain.util.table.createApplyAndAdvanceAction
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JSeparator
@@ -32,29 +34,14 @@ fun Trainable.getTrainingDialog(): StandardDialog {
         val trainerControls = TrainerControls(trainer)
         val inputs = MatrixEditor(trainingSet.inputs)
         inputs.toolbar.addSeparator()
-        inputs.toolbar.add(createAction(
-            name = "Apply Input",
-            description = "Apply current row as input to network",
-            iconPath = "menu_icons/Step.png",
-        ) {
-            inputs.table.initRowSelection()
+        inputs.toolbar.add(
+            inputs.table.createApplyAction("Apply Inputs") { selectedRow ->
+                trainer.applyInputs(selectedRow)
+            }
+        )
+        inputs.toolbar.add(inputs.table.createAdvanceRowAction())
+        inputs.toolbar.add(inputs.table.createApplyAndAdvanceAction {
             trainer.applyInputs(inputs.table.selectedRow)
-        })
-        inputs.toolbar.add(createAction(
-            name = "Advance Row",
-            description = "Increment the current row",
-            iconPath = "menu_icons/Plus.png",
-        ) {
-            inputs.table.incrementSelectedRow()
-        })
-        inputs.toolbar.add(createAction(
-            name = "Apply and Advance",
-            description = "Apply current row as input and increment selected row",
-            iconPath = "menu_icons/Step.png",
-        ) {
-            inputs.table.initRowSelection()
-            trainer.applyInputs(inputs.table.selectedRow)
-            inputs.table.incrementSelectedRow()
         })
 
         val targets = MatrixEditor(trainingSet.targets)

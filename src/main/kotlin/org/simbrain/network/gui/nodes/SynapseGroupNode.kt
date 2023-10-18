@@ -24,8 +24,6 @@ import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.WeightMatrixViewer
 import org.simbrain.util.*
-import javax.swing.JPanel
-import javax.swing.JScrollPane
 
 
 class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGroup) :
@@ -165,20 +163,6 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
         fun layoutChildren()
     }
 
-    fun weightMatrixViewer() : JScrollPane {
-        val weightMatrixPanel = JPanel()
-        val matrixScrollPane = JScrollPane(weightMatrixPanel)
-        matrixScrollPane.border = null
-        weightMatrixPanel.add(
-            WeightMatrixViewer.getWeightMatrixPanel(
-                WeightMatrixViewer(
-                    synapseGroup.source.neuronList,
-                    synapseGroup.target.neuronList,
-                    networkPanel
-                )
-            )
-        )
-        return matrixScrollPane
-    }
+    fun weightMatrixViewer() = WeightMatrixViewer(synapseGroup.source.neuronList, synapseGroup.target.neuronList)
 
 }

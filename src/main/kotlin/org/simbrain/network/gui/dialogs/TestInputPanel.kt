@@ -18,292 +18,66 @@
  */
 package org.simbrain.network.gui.dialogs
 
-import kotlinx.coroutines.*
-import org.simbrain.network.core.Network
+import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Neuron
-import org.simbrain.network.groups.NeuronGroup
-import org.simbrain.network.gui.NetworkPanel
-import org.simbrain.network.gui.trainer.DataPanel
-import org.simbrain.plot.projection.ProjectionComponent
+import org.simbrain.network.core.activations
+import org.simbrain.network.groups.AbstractNeuronCollection
+import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.util.createAction
-import org.simbrain.util.math.NumericMatrix
-import org.simbrain.util.table.NumericTable
-import org.simbrain.util.table.SimbrainJTable
+import org.simbrain.util.table.*
+import org.simbrain.util.toMatrix
 import org.simbrain.workspace.gui.SimbrainDesktop
-import java.beans.PropertyChangeEvent
-import javax.swing.*
+import smile.math.matrix.Matrix
+import javax.swing.JCheckBox
+import javax.swing.JCheckBoxMenuItem
+import javax.swing.JLabel
 
 /**
- * Panel for sending inputs from a table to a network. The action that calls
- * this class provides the input neurons and network panel from which the action
- * gets the network to be updated.
- *
- * @author Jeff Yoshimi
- * @author Lam Nguyen
+ * Panel for sending inputs from a table to a [Layer].
  */
-class TestInputPanel private constructor(
-    networkPanel: NetworkPanel?,
-    inputNeurons: List<Neuron>,
-    dataHolder: NumericMatrix
-) : DataPanel(inputNeurons, dataHolder, 5, "Test Inputs"), CoroutineScope {
-
-    @Transient
-    private var job = SupervisorJob()
-
-    @Transient
-    override var coroutineContext = Dispatchers.Default + job
-
-    /**
-     * Network panel.
-     */
-    private val networkPanel: NetworkPanel
-
-    /**
-     * True when iteration mode is on.
-     */
-    private var iterationMode = true
-
-    /**
-     * Button used to advance row. Disabled when iteration mode is on.
-     */
-    private var advance: JButton? = null
-
-    /**
-     * This is the network that should be updated whenever the input neurons are
-     * updated. If null, update the whole network
-     */
-    private var network: Network? = null
-
-    /**
-     * Reference to neuron group for cases when that is what's being edited.
-     */
-    private var neuronGroup: NeuronGroup? = null
-    // TODO
-    // LMSNetwork lms;
-    // public TestInputPanel(NetworkPanel networkPanel, LMSNetwork lms) {
-    //     super(lms.getInputData());
-    //     this.lms = lms;
-    //     if (networkPanel == null) {
-    //         throw new IllegalArgumentException("networkPanel must not be null");
-    //     }
-    //     this.networkPanel = networkPanel;
-    //     initTestInputPanel();
-    // }
-    /**
-     * Initiate the test network panel using the network panel.
-     */
-    private fun initTestInputPanel() {
-        network = networkPanel.network
-        (table.data as NumericTable).isIterationMode = iterationMode
-        val test = JButton(testRowAction)
-        advance = JButton(advanceRowAction)
-        val testTable = JButton(testTableAction)
-        val iterationCheckBox = JCheckBox(iterationModeAction)
-        iterationCheckBox.isSelected = iterationMode
-        toolbars.add(table.toolbarEditRows)
-
-        val projectionToolbar = JToolBar()
-        projectionToolbar.add(openProjectionAction)
-        toolbars.add(projectionToolbar)
-
-        val testToolBar = JToolBar()
-        testToolBar.add(test)
-        testToolBar.add(advance)
-        // testToolBar.add(testTable)
-        testToolBar.add(iterationCheckBox)
-        toolbars.add(testToolBar)
+fun createTestInputPanel(layer: Layer) = createTestInputPanel(layer.inputData) {
+    if (layer is AbstractNeuronCollection && layer.isAllClamped) {
+        layer.neuronList.activations = table.model.getCurrentDoubleRow()
+    } else if (layer is NeuronArray && layer.isClamped) {
+        layer.setActivations(table.model.getCurrentDoubleRow().toDoubleArray())
+    } else {
+        layer.addInputs(table.model.getCurrentDoubleRow().toDoubleArray().toMatrix())
     }
+    layer.update()
+}
 
-    /**
-     * Action for advancing a row to be tested.
-     */
-    private val advanceRowAction = createAction(
-        iconPath = "menu_icons/plus.png",
-        description = "Advance row"
-    ) {
-        advanceRow()
-    }
+/**
+ * Panel for sending inputs from a table to a list of [Neuron].
+ */
+fun createTestInputPanel(neurons: List<Neuron>, initData: Matrix = Matrix.eye(neurons.size)) = createTestInputPanel(initData) { selectedRow ->
+    neurons.activations = table.model.getCurrentDoubleRow()
+}
 
-    private val testRowAction = createAction(
-        iconPath = "menu_icons/Step.png",
-        description = "Test row"
-    ) {
-        testRow()
-    }
-
-    private val iterationModeAction = createAction(
-        name = "Iteration mode"
-    ) {
-        if (iterationMode) {
-            iterationMode = false
-            advance!!.isEnabled = true
-        } else {
-            iterationMode = true
-            advance!!.isEnabled = false
+private fun createTestInputPanel(initData: Matrix, applyInputs: suspend MatrixEditor.(selectedRow: Int) -> Unit) = MatrixEditor(initData).apply {
+    var workspaceMode = false
+    toolbar.addSeparator()
+    toolbar.add(JLabel("Workspace Mode"))
+    toolbar.add(JCheckBox(createAction(
+        description = "Workspace Mode"
+    ) { event ->
+        event.source.let {
+            workspaceMode = if (it is JCheckBoxMenuItem) it.state else !workspaceMode
         }
-    }
-
-    private val testTableAction = createAction(
-        iconPath = "menu_icons/Play.png",
-        description = "Test table"
-    ) {
-        testTable()
-    }
-
-    private val openProjectionAction = createAction(
-        iconPath = "menu_icons/ProjectionIcon.png",
-        description = "Open Projection"
-    ) {
-        val projectionComponent = ProjectionComponent("$name Projection")
-        projectionComponent.projector.useHotColor = false
-        SimbrainDesktop.workspace.addWorkspaceComponent(projectionComponent)
-        val points = table.data.rowData.map { row -> row.map { (it as Double) }.toDoubleArray() }
-        points.forEach { projectionComponent.addPoint(it) }
-    }
-
-    /**
-     * Construct the panel using a reference to a class that has a double array.
-     * Changes to the table will change the data in that class.
-     *
-     * @param networkPanel networkPanel, must not be null
-     * @param inputNeurons input neurons of the network to be tested
-     * @param dataHolder   the class whose data should be edited.
-     */
-    init {
-        requireNotNull(networkPanel) { "networkPanel must not be null" }
-        this.dataHolder = dataHolder
-        this.networkPanel = networkPanel
-        initTestInputPanel()
-    }
-
-    /**
-     * Advances the row to test.
-     */
-    private fun advanceRow() {
-        (table.data as NumericTable).updateCurrentRow()
-        table.updateRowSelection()
-        table.scrollRectToVisible(table.getCellRect((table.data as NumericTable).currentRow, table.columnCount, true))
-    }
-
-    /**
-     * Test the selected row.
-     */
-    private fun testRow() {
-        var testRow = (table.data as NumericTable).currentRow
-        if (testRow >= (table.data as NumericTable).rowCount) {
-            testRow = 0
+    }).apply { this.isSelected = workspaceMode })
+    toolbar.addSeparator()
+    toolbar.add(table.createApplyAction("Apply Inputs") {
+        applyInputs(it)
+        if (workspaceMode) {
+            SimbrainDesktop.workspace.updater.iterate(1)
         }
-        table.updateRowSelection()
-
-        // TODO: Replace with explicit boolean
-        if (inputNeurons == null) {
-            // lms.getNAList().get(0).setValues(((NumericTable) table.getData()).getVectorCurrentRow());
-        } else {
-            for (j in inputNeurons.indices) {
-                inputNeurons[j].forceSetActivation((table.data as NumericTable).getLogicalValueAt(testRow, j))
-            }
+    })
+    toolbar.add(table.createAdvanceRowAction())
+    toolbar.add(table.createApplyAndAdvanceAction {
+        applyInputs(it)
+        if (workspaceMode) {
+            SimbrainDesktop.workspace.updater.iterate(1)
         }
-        if (network != null) {
-            network!!.update()
-        } else {
-            inputNeurons[0].network.update()
-        }
-        if (iterationMode) {
-            advanceRow()
-        }
-    }
-
-    /**
-     * Advance through the entire table and test each row.
-     */
-    private fun testTable() {
-        for (j in 0 until (table.data as NumericTable).rowCount) {
-            (table.data as NumericTable).currentRow = j
-            table.scrollRectToVisible(
-                table.getCellRect(
-                    (table.data as NumericTable).currentRow,
-                    table.columnCount,
-                    true
-                )
-            )
-            testRow()
-        }
-    }
-
-    override fun getTable(): SimbrainJTable {
-        return table
-    }
-
-    /**
-     * Resest the data in this panel.
-     *
-     * @param data the data to set
-     */
-    fun setData(data: Array<DoubleArray?>?) {
-        if (data != null) {
-            (table.data as NumericTable).setData(data)
-        }
-        if (neuronGroup != null) {
-            neuronGroup!!.inputManager.data = data
-        }
-    }
-
-    companion object {
-        @JvmStatic
-        fun createTestInputPanel(networkPanel: NetworkPanel, neuronGroup: NeuronGroup): TestInputPanel {
-            val tip = createTestInputPanel(networkPanel, neuronGroup.neuronList)
-            tip.neuronGroup = neuronGroup
-            return tip
-        }
-
-        /**
-         * Create panel using a network panel and a list of selected neurons for
-         * case where no data holder is provided (currently, applying test inputs to
-         * an arbitrary set of loose neurons).
-         *
-         * @param networkPanel networkPanel, must not be null
-         * @param inputNeurons input neurons of the network to be tested
-         * @return the constructed panel
-         */
-        @JvmStatic
-        fun createTestInputPanel(networkPanel: NetworkPanel, inputNeurons: List<Neuron>): TestInputPanel {
-            val dataHolder: NumericMatrix = object : NumericMatrix {
-                var dataMatrix = Array(5) { DoubleArray(inputNeurons.size) }
-                override fun setData(data: Array<DoubleArray>) {
-                    dataMatrix = data
-                }
-
-                override fun getData(): Array<DoubleArray> {
-                    return dataMatrix
-                }
-            }
-            val panel = TestInputPanel(networkPanel, inputNeurons, dataHolder)
-            panel.addPropertyChangeListener { evt: PropertyChangeEvent? ->
-                panel.commitChanges() // TODO: More efficient way?
-            }
-            return panel
-        }
-
-        /**
-         * Create the test input panel.
-         *
-         * @param networkPanel networkPanel, must not be null.
-         * @param inputNeurons input neurons of the network to be tested.
-         * @param dataHolder   the class whose data should be edited.
-         * @return the constructed panel.
-         */
-        @JvmStatic
-        fun createTestInputPanel(
-            networkPanel: NetworkPanel?,
-            inputNeurons: List<Neuron>,
-            dataHolder: NumericMatrix
-        ): TestInputPanel {
-            val panel = TestInputPanel(networkPanel, inputNeurons, dataHolder)
-            panel.addPropertyChangeListener { evt: PropertyChangeEvent? ->
-                panel.commitChanges() // TODO: More efficient way?
-            }
-            return panel
-        }
-    }
-
+    })
+    toolbar.add(table.insertRowAction)
+    toolbar.add(table.deleteRowAction)
 }

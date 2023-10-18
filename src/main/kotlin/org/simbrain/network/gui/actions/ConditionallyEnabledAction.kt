@@ -30,6 +30,7 @@ abstract class ConditionallyEnabledAction(
     init {
         updateAction()
         networkPanel.selectionManager.events.selection.on { _, _ -> updateAction() }
+        networkPanel.selectionManager.events.sourceSelection.on { _, _ -> updateAction() }
     }
 
     private fun updateAction() {

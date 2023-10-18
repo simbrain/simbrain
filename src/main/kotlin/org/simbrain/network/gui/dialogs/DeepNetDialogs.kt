@@ -149,7 +149,7 @@ fun showDeepNetTrainingDialog(deepNet: DeepNet) {
 
         // Data Panels
         val inputPanel = SimbrainDataViewer(
-            createFromFloatArray(deepNet.inputData), useDefaultToolbarAndMenu =
+            createFromFloatArray(deepNet.deepNetInputData), useDefaultToolbarAndMenu =
             false
         ).apply {
             addFixedColumnActions()
@@ -157,7 +157,7 @@ fun showDeepNetTrainingDialog(deepNet: DeepNet) {
         }
 
         val targetPanel = SimbrainDataViewer(
-            createFromColumn(deepNet.targetData), useDefaultToolbarAndMenu =
+            createFromColumn(deepNet.deepNetTargetData), useDefaultToolbarAndMenu =
             false
         ).apply {
             addFixedColumnActions()
@@ -176,8 +176,8 @@ fun showDeepNetTrainingDialog(deepNet: DeepNet) {
 
         // Helper to commit data from data tables
         fun commitData() {
-            deepNet.inputData = inputPanel.model.getFloat2DArray()
-            deepNet.targetData = targetPanel.model.getFloatColumn(0)
+            deepNet.deepNetInputData = inputPanel.model.getFloat2DArray()
+            deepNet.deepNetTargetData = targetPanel.model.getFloatColumn(0)
             deepNet.initializeDatasets()
         }
 
@@ -265,8 +265,8 @@ fun testTrainingDialog() {
         4
     )
     // XOR
-    dn.inputData = arrayOf(floatArrayOf(0f, 0f), floatArrayOf(1f, 0f), floatArrayOf(0f, 1f), floatArrayOf(1f, 1f))
-    dn.targetData = floatArrayOf(0f, 1f, 1f, 0f)
+    dn.deepNetInputData = arrayOf(floatArrayOf(0f, 0f), floatArrayOf(1f, 0f), floatArrayOf(0f, 1f), floatArrayOf(1f, 1f))
+    dn.deepNetTargetData = floatArrayOf(0f, 1f, 1f, 0f)
     dn.initializeDatasets()
     showDeepNetTrainingDialog(dn)
 }

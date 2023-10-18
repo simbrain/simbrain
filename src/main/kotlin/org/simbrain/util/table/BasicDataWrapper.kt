@@ -21,12 +21,6 @@ class BasicDataWrapper(
             columns = inferColumns(columns.map { it.columName }, value)
         }
 
-    var rowNames = listOf<String?>()
-        set(value) {
-            field = value
-            fireTableDataChanged()
-        }
-
     /**
      * Insert column to left, unless the index is -1 (no selection) in which case it is added as the right-most column.
      */
@@ -145,13 +139,13 @@ class BasicDataWrapper(
  * Infer a column from a 2d array of data.
  */
 private fun inferColumns(data: MutableList<MutableList<Any?>>) =
-    data[0].mapIndexed { i, value ->
-        createColumn("Column ${i + 1}", value)
+    data.mapIndexed { i, values ->
+        createColumn("Column ${i + 1}", values.firstNotNullOfOrNull { it })
     }.toMutableList()
 
 private fun inferColumns(names: List<String?>, data: MutableList<MutableList<Any?>>) =
-    data[0].mapIndexed { i, value ->
-        createColumn(names.getOrNull(i) ?: "Column ${i + 1}", value)
+    data.mapIndexed { i, values ->
+        createColumn(names.getOrNull(i) ?: "Column ${i + 1}", values.firstNotNullOfOrNull { it })
     }.toMutableList()
 
 fun createFrom2DArray(data: Array<out Array<out Any?>>): BasicDataWrapper {

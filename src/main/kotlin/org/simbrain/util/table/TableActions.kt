@@ -250,3 +250,30 @@ val DataViewerTable.editColumnAction
             }
         }
     }
+
+fun DataViewerTable.createApplyAction(name: String = "Apply", applyInputs: suspend (selectedRow: Int) -> Unit) = createAction(
+        name = name,
+        description = "Apply current row as input to network",
+        iconPath = "menu_icons/Step.png",
+    ) {
+        initRowSelection()
+        applyInputs(selectedRow)
+    }
+
+fun DataViewerTable.createAdvanceRowAction() = createAction(
+        name = "Advance Row",
+        description = "Increment the current row",
+        iconPath = "menu_icons/Plus.png",
+    ) {
+        incrementSelectedRow()
+    }
+
+fun DataViewerTable.createApplyAndAdvanceAction(applyInputs: suspend (selectedRow: Int) -> Unit) = createAction(
+        name = "Apply and Advance",
+        description = "Apply current row as input and increment selected row",
+        iconPath = "menu_icons/Step.png",
+    ) {
+        initRowSelection()
+        applyInputs(selectedRow)
+        incrementSelectedRow()
+    }

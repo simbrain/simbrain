@@ -6,10 +6,7 @@ import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.groups.NeuronGroup
-import org.simbrain.network.gui.dialogs.PercentExcitatoryPanel
-import org.simbrain.network.gui.dialogs.SparsePanel
-import org.simbrain.network.gui.dialogs.SynapseAdjustmentPanel
-import org.simbrain.network.gui.dialogs.TestInputPanel
+import org.simbrain.network.gui.dialogs.*
 import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog
@@ -129,26 +126,17 @@ fun NetworkPanel.showPiccoloDebugger() {
  * Shows a dialog that allows the user to send inputs from a [SimbrainDataTable] to the provided neurons.
  */
 fun NetworkPanel.showInputPanel(neurons: List<Neuron>) {
-    TestInputPanel.createTestInputPanel(this, neurons).apply {
-        val dialog = StandardDialog()
-        dialog.contentPane = this
-        dialog.setLocationRelativeTo(null)
-        dialog.pack()
-        dialog.isVisible = true
-    }
+    createTestInputPanel(neurons).displayInDialog()
 }
 
 /**
  * Show weight matrix panel for weights connecting current source (red) and target (green) nodes.
  */
 fun NetworkPanel.showWeightMatrix() {
-    WeightMatrixViewer.getWeightMatrixPanel(WeightMatrixViewer(this)).apply {
-        val dialog = StandardDialog()
-        dialog.contentPane = this
-        dialog.setLocationRelativeTo(null)
-        dialog.pack()
-        dialog.title = "Weight Matrix Viewer"
-        dialog.isVisible = true
+    createWeightMatrixViewerOnSelectedNeurons().displayInDialog {
+        commitChanges()
+    }.apply {
+        title = "Weight Matrix Viewer"
     }
 }
 
@@ -156,7 +144,7 @@ fun SynapseGroupNode.getDialog(): StandardDialog {
 
     val dialog = StandardDialog()
     val tabbedPane = JTabbedPane()
-    var matrixViewerPanel = JPanel()
+    var matrixViewerPanel = weightMatrixViewer()
 
     val sap = SynapseAdjustmentPanel(
         synapseGroup.synapses,
@@ -174,18 +162,9 @@ fun SynapseGroupNode.getDialog(): StandardDialog {
         }
     }
 
-    fun initWeightMatrixViewer() {
-        // if (synapseGroup.size() < 10000) {
-        val matrixViewer = weightMatrixViewer()
-        matrixViewerPanel.removeAll()
-        matrixViewerPanel.add(matrixViewer)
-    }
-
     synapseGroup.events.synapseListChanged.on {
         sap.fullUpdate()
-        initWeightMatrixViewer()
     }
-    initWeightMatrixViewer()
 
     dialog.contentPane = JPanel().apply {
         layout = BoxLayout(this, BoxLayout.PAGE_AXIS)
@@ -193,6 +172,10 @@ fun SynapseGroupNode.getDialog(): StandardDialog {
         tabbedPane.addTab("Weights", sap)
         tabbedPane.addTab("Connection Strategy", connectionStrategyPanel)
         tabbedPane.add("Weight Matrix", matrixViewerPanel)
+    }
+
+    dialog.addClosingTask {
+        matrixViewerPanel.commitChanges()
     }
 
     return dialog

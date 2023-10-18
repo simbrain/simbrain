@@ -20,14 +20,14 @@ package org.simbrain.network.gui.dialogs.group;
 
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.math.NumericMatrix;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
 import java.awt.*;
+
+import static org.simbrain.network.gui.dialogs.TestInputPanelKt.createTestInputPanel;
 
 /**
  * Dialog for editing neuron groups.
@@ -111,20 +111,7 @@ public final class NeuronGroupDialog extends StandardDialog {
         setContentPane(mainPanel);
 
         if(!isCreationDialog) {
-            // Input panel
-            NumericMatrix matrix = new NumericMatrix() {
-
-                @Override
-                public void setData(double[][] data) {
-                    neuronGroup.getInputManager().setData(data);
-                }
-
-                @Override
-                public double[][] getData() {
-                    return neuronGroup.getInputManager().getData();
-                }
-            };
-            JPanel inputDataPanel = TestInputPanel.createTestInputPanel(networkPanel, neuronGroup.getNeuronList(), matrix);
+            JPanel inputDataPanel = createTestInputPanel(neuronGroup);
             ((JTabbedPane) mainPanel.getMainPanel()).addTab("Input Data", inputDataPanel);
         }
 

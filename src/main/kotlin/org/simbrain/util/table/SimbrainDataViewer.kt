@@ -77,6 +77,10 @@ open class SimbrainDataViewer @JvmOverloads constructor(
             table.tableHeader?.revalidate()
             scrollPane.updateResizeMode(it.source as TableModel)
         }
+
+        model.events.currentRowChanged.on {
+            table.selectedRow = model.currentRowIndex
+        }
     }
 
 
@@ -127,7 +131,22 @@ class DataViewerScrollPane(val table: JTable, useHeaders: Boolean = true): JScro
     /**
      * Custom table with row numbers shown
      */
-    val rowTable by lazy { RowNumberTable(table) }
+    val rowTable by lazy {
+        RowNumberTable(table).apply {
+            // Main mouse listener. Handle row selection and popup menu
+            addMouseListener(object : MouseAdapter() {
+
+                override fun mouseReleased(e: MouseEvent) {
+                    val row = rowAtPoint(e.getPoint())
+                    if (e.isControlDown || e.button == 1 && table is DataViewerTable) {
+                        for (j in 0 until table.columnCount) {
+                            table.changeSelection(row, j, true, true)
+                        }
+                    }
+                }
+            })
+        }
+    }
 
     init {
         if (useHeaders) {
@@ -163,6 +182,11 @@ class DataViewerTable(val model: SimbrainDataModel, useHeaders: Boolean = true) 
     override var coroutineContext = Dispatchers.Swing + job
 
     val popUpMenu = JPopupMenu()
+
+    /**
+     * If false, null entries cannot be edited.
+     */
+    var allowNullEditing = false
 
     init {
         columnSelectionAllowed = true
@@ -205,6 +229,12 @@ class DataViewerTable(val model: SimbrainDataModel, useHeaders: Boolean = true) 
                 }
             }
         })
+
+        selectionModel.addListSelectionListener {
+            if (!it.valueIsAdjusting) {
+                model.currentRowIndex = selectedRow
+            }
+        }
     }
 
     fun setSelectedRow(row: Int) {
@@ -213,6 +243,7 @@ class DataViewerTable(val model: SimbrainDataModel, useHeaders: Boolean = true) 
         }
         selectAll()
         setRowSelectionInterval(row, row)
+        model.currentRowIndex = row
     }
 
     fun initRowSelection() {
@@ -221,7 +252,8 @@ class DataViewerTable(val model: SimbrainDataModel, useHeaders: Boolean = true) 
 
     fun incrementSelectedRow() {
         // if none selected, select first row (because selectedRow returns -1 in that case)
-        val nextRow = (selectedRow + 1) % rowCount
+        val nextRow = (model.currentRowIndex + 1) % model.rowCount
+        model.currentRowIndex = nextRow
         selectedRow = nextRow
     }
 
@@ -291,6 +323,9 @@ class DataViewerTable(val model: SimbrainDataModel, useHeaders: Boolean = true) 
      * Override to provide Select All editing functionality
      */
     override fun editCellAt(row: Int, column: Int, e: EventObject?): Boolean {
+        if (getValueAt(row, column) == null && !allowNullEditing) {
+            return false
+        }
         val result = super.editCellAt(row, column, e)
         if (isSelectAllForMouseEvent || isSelectAllForActionEvent || isSelectAllForKeyEvent) {
             selectAll(e)

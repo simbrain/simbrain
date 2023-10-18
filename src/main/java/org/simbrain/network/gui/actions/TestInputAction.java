@@ -19,13 +19,11 @@
 package org.simbrain.network.gui.actions;
 
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.gui.NetworkDialogsKt;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.util.ResourceManager;
 
 import java.awt.event.ActionEvent;
-import  org.simbrain.network.gui.NetworkDialogsKt;
-import java.util.stream.Collectors;
 
 /**
  * Action to construct a test input panel. The user of this class provides the

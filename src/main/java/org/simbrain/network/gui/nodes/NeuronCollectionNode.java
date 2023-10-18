@@ -22,12 +22,10 @@ import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.AbstractNeuronCollection;
 import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.TestInputPanel;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.SimpleFrame;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
-import org.simbrain.util.math.NumericMatrix;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import javax.swing.*;
@@ -35,6 +33,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 
 import static org.simbrain.network.gui.NetworkPanelMenusKt.createCouplingMenu;
+import static org.simbrain.network.gui.dialogs.TestInputPanelKt.createTestInputPanel;
 
 /**
  * PNode representation of a {@link NeuronCollection}.
@@ -141,20 +140,7 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
         Action testInputs = new AbstractAction("Input Data...") {
             @Override
             public void actionPerformed(final ActionEvent event) {
-                // Input panel
-                NumericMatrix matrix = new NumericMatrix() {
-
-                    @Override
-                    public void setData(double[][] data) {
-                        neuronCollection.getInputManager().setData(data);
-                    }
-
-                    @Override
-                    public double[][] getData() {
-                        return neuronCollection.getInputManager().getData();
-                    }
-                };
-                JPanel inputDataPanel = TestInputPanel.createTestInputPanel(getNetworkPanel(), neuronCollection.getNeuronList(), matrix);
+                JPanel inputDataPanel = createTestInputPanel(neuronCollection);
                 SimpleFrame.displayPanel(inputDataPanel);
             }
         };

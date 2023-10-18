@@ -30,18 +30,17 @@ import org.simbrain.network.gui.actions.edit.CopyAction
 import org.simbrain.network.gui.actions.edit.CutAction
 import org.simbrain.network.gui.actions.edit.PasteAction
 import org.simbrain.network.gui.createCouplingMenu
+import org.simbrain.network.gui.dialogs.createTestInputPanel
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.addBorder
-import org.simbrain.util.table.NumericTable
-import org.simbrain.util.table.SimbrainJTable
-import org.simbrain.util.table.SimbrainJTableScrollPanel
+import org.simbrain.util.table.MatrixDataWrapper
+import org.simbrain.util.table.SimbrainDataViewer
 import org.simbrain.workspace.couplings.getConsumer
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
-import smile.math.matrix.Matrix
 import java.awt.Color
 import java.awt.event.ActionEvent
 import java.util.*
@@ -325,6 +324,15 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
 
         contextMenu.addSeparator()
 
+        val applyInputs: Action = networkPanel.createAction(
+            name = "Input Data...",
+        ) {
+            createTestInputPanel(neuronArray).displayInDialog()
+        }
+        contextMenu.add(applyInputs)
+
+        contextMenu.addSeparator()
+
         // Randomize Action
         val randomizeAction = networkPanel.networkActions.randomizeObjectsAction
 
@@ -345,12 +353,9 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         val editComponents: Action = object : AbstractAction("Edit Components...") {
             override fun actionPerformed(event: ActionEvent) {
                 val dialog = StandardDialog()
-                val arrayData = NumericTable(neuronArray.outputs.toDoubleArray())
-                dialog.contentPane = SimbrainJTableScrollPanel(
-                    SimbrainJTable.createTable(arrayData)
-                )
+                val arrayData = MatrixDataWrapper(neuronArray.outputs)
+                dialog.contentPane = SimbrainDataViewer(arrayData)
                 dialog.addClosingTask {
-                    neuronArray.addInputs(Matrix.column(arrayData.vectorCurrentRow))
                     neuronArray.update()
                 }
                 dialog.pack()

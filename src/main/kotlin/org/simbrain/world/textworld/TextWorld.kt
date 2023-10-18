@@ -402,8 +402,7 @@ class TextWorld : AttributeContainer, EditableObject {
                 tokenEmbedding = TokenEmbedding(tokens, Matrix.eye(tokens.size))
             }
             EmbeddingType.COC -> {
-                val result = generateCooccurrenceMatrix(docString, windowSize, bidirectional, usePPMI)
-                tokenEmbedding = TokenEmbedding(result.first, result.second)
+                tokenEmbedding = generateCooccurrenceMatrix(docString, windowSize, bidirectional, usePPMI)
             }
             else -> {
                 throw IllegalStateException("Custom embeddings must be manually loaded")

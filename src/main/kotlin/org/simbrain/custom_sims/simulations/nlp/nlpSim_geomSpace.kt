@@ -13,9 +13,9 @@ import org.simbrain.util.projection.PCAProjection
 import java.io.File
 
 /**
- * Study the geometric structure of a word embedding on a document.
+ * Initial study of word embeddings.
  *
- * Load a text that was crafted so that certain words would be nearby each other, because of shared co-occurrences.
+ * Loads a text that was crafted so that certain words would be nearby each other, because of shared co-occurrences.
  *
  * Examples:
  *  bus ~ butterfly
@@ -23,7 +23,7 @@ import java.io.File
  *  ...
  *
  */
-val nlpSim_geomSpace = newSim {
+val nlpSimBasic = newSim {
 
 
     workspace.clearWorkspace()

@@ -74,9 +74,6 @@ val TextWorld.textWorldPrefs
     ) {
         createDialog {}.also {
             it.title = "Text World Preferences"
-            it.addClosingTask {
-                extractEmbedding(text)
-            }
         }.display()
     }
 

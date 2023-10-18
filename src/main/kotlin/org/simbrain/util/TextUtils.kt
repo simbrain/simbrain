@@ -1,6 +1,7 @@
 package org.simbrain.util
 
 import org.simbrain.util.Utils.FS
+import org.simbrain.world.textworld.TokenEmbedding
 import smile.math.matrix.Matrix
 import smile.nlp.tokenizer.SimpleSentenceSplitter
 import java.util.*
@@ -69,15 +70,14 @@ fun removeStopWords(words: List<String>) : List<String> {
  * The resulting matrix has the same number of columns it started with, but only as many rows as there are after
  * filtering out stopwords.
  */
-fun removeStopWordsFromMatrix(cocMatrix: Matrix, tokens: List<String>) : Matrix {
+fun removeStopWordsFromMatrix(cocMatrix: Matrix, tokens: List<String>) : TokenEmbedding {
     val targets = removeStopWords(tokens)
     var approvedIndices = intArrayOf()
     for (token in tokens){
         if (targets.contains(token)) approvedIndices += intArrayOf(tokens.indexOf(token))
     }
 
-    val cooc2 = cocMatrix.rows(*approvedIndices)
-    return cooc2
+    return TokenEmbedding(targets, cocMatrix.rows(*approvedIndices))
 }
 
 
@@ -140,8 +140,9 @@ fun manualPPMI(cocMatrix: Matrix, positive: Boolean = true): Matrix {
  * @return a symmetrical co-occurrence matrix with as many rows and columns as there are unique tokens in [docString].
  *
  */
-fun generateCooccurrenceMatrix(docString: String, windowSize: Int = 2, bidirectional: Boolean = false, usePPMI: Boolean = true, removeStopwords: Boolean = false):
-        Pair<List<String>, Matrix> {
+fun generateCooccurrenceMatrix(docString: String, windowSize: Int = 2, bidirectional: Boolean = false, usePPMI:
+Boolean = true, removeStopwords: Boolean = true):
+        TokenEmbedding {
     // println(docString)
     val convertedDocString = docString.removeSpecialCharacters()
 
@@ -190,21 +191,17 @@ fun generateCooccurrenceMatrix(docString: String, windowSize: Int = 2, bidirecti
     }
 
     if (removeStopwords){
-        cooccurrenceSmileMatrix = removeStopWordsFromMatrix(cooccurrenceSmileMatrix, tokens)
+        if (usePPMI) {
+            return removeStopWordsFromMatrix(manualPPMI(cooccurrenceSmileMatrix, true).replaceNaN(0.0), tokens)
+        } else {
+            return removeStopWordsFromMatrix(cooccurrenceSmileMatrix.replaceNaN(0.0), tokens)
+        }
     }
 
     if (usePPMI) {
-        return Pair(tokens, manualPPMI(cooccurrenceSmileMatrix, true).replaceNaN(0.0))
+        return TokenEmbedding(tokens, manualPPMI(cooccurrenceSmileMatrix, true).replaceNaN(0.0))
     }
-    return Pair(tokens, cooccurrenceSmileMatrix.replaceNaN(0.0))
-}
-
-/**
- * Get an embedding from a matrix given matrix, index, and word
- */
-fun wordEmbeddingQuery(targetWord: String, tokens: List<String>, cooccurrenceMatrix: Matrix): DoubleArray {
-    val targetWordIndex = tokens.indexOf(targetWord.lowercase())
-    return cooccurrenceMatrix.row(targetWordIndex)
+    return TokenEmbedding(tokens, cooccurrenceSmileMatrix.replaceNaN(0.0))
 }
 
 /**

@@ -13,7 +13,7 @@ import smile.math.matrix.Matrix
  * Also allows for reverse mappings from vectors back to tokens using a [KDTree].
  */
 class TokenEmbedding(
-    tokens: List<String>,
+    val tokens: List<String>,
     /**
      * Matrix whose rows correspond to vector representations of corresponding tokens.
      */
@@ -57,8 +57,9 @@ class TokenEmbedding(
     /**
      * Return the vector associated with given string or a 0 vector if none found
      */
-    fun get(token: String): DoubleArray {
-        val tokenIndex = tokensMap[token]
+    fun get(token: String, lowerCase: Boolean = true): DoubleArray {
+        val searchToken = if (lowerCase) token.lowercase() else token
+        val tokenIndex = tokensMap[searchToken]
         if (tokenIndex != null) {
             return tokenVectorMatrix.row(tokenIndex)
         } else {

@@ -24,25 +24,25 @@ import javax.swing.text.JTextComponent
  * The main Simbrain table visualization. Can be used to represent mutable or immutable data, which can be numeric or
  * mixed. Provides ability to edit the table, randomize numeric values, produce plots and visualizations, etc.
  *
- * Visualization for [SimbrainDataModel], which in turns wraps several types of table. Depending on whether the
+ * Visualization for [SimbrainDataFrame], which in turns wraps several types of table. Depending on whether the
  * model is mutable or not, different GUI actions are enabled. These actions can be further customized  depending on
  * the context.
  */
-open class SimbrainDataViewer @JvmOverloads constructor(
-    model: SimbrainDataModel,
+open class SimbrainTablePanel @JvmOverloads constructor(
+    model: SimbrainDataFrame,
     useDefaultToolbarAndMenu: Boolean = true,
     useHeaders: Boolean = true,
     usePadding: Boolean = true,
 ) : JPanel() {
 
-    val table = DataViewerTable(model, useHeaders)
+    val table = SimbrainJTable(model, useHeaders)
     val toolbar by lazy {
         JToolBar().also { add(it, BorderLayout.NORTH) }
     }
 
     val scrollPane = DataViewerScrollPane(table, useHeaders)
 
-    var model:SimbrainDataModel
+    var model:SimbrainDataFrame
         get() = table.model
         set(value) {
             // TODO: Allow for structure changes
@@ -102,7 +102,7 @@ open class SimbrainDataViewer @JvmOverloads constructor(
             addAction(table.randomizeColumnAction)
             addAction(table.editColumnAction)
         }
-        if (model is DataFrameWrapper) {
+        if (model is SmileDataFrame) {
             addAction(table.showScatterPlotAction)
         }
         addAction(table.openProjectionAction)
@@ -138,7 +138,7 @@ class DataViewerScrollPane(val table: JTable, useHeaders: Boolean = true): JScro
 
                 override fun mouseReleased(e: MouseEvent) {
                     val row = rowAtPoint(e.getPoint())
-                    if (e.isControlDown || e.button == 1 && table is DataViewerTable) {
+                    if (e.isControlDown || e.button == 1 && table is SimbrainJTable) {
                         for (j in 0 until table.columnCount) {
                             table.changeSelection(row, j, true, true)
                         }
@@ -175,7 +175,7 @@ class DataViewerScrollPane(val table: JTable, useHeaders: Boolean = true): JScro
 
 }
 
-class DataViewerTable(val model: SimbrainDataModel, useHeaders: Boolean = true) : JTable(model), CoroutineScope {
+class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) : JTable(model), CoroutineScope {
 
     private var job = SupervisorJob()
 
@@ -202,9 +202,9 @@ class DataViewerTable(val model: SimbrainDataModel, useHeaders: Boolean = true) 
         val unfocusedEvent = AWTEventListener { event ->
             if (event is MouseEvent
                 && event.id == MouseEvent.MOUSE_PRESSED
-                && this@DataViewerTable.isEditing) {
+                && this@SimbrainJTable.isEditing) {
 
-                val editor = this@DataViewerTable.editorComponent
+                val editor = this@SimbrainJTable.editorComponent
                 if (editor != null && event.source !== editor) {
                     cellEditor.stopCellEditing()
                 }
@@ -225,7 +225,7 @@ class DataViewerTable(val model: SimbrainDataModel, useHeaders: Boolean = true) 
         addMouseListener(object : MouseAdapter() {
             override fun mousePressed(e: MouseEvent) {
                 if (e.isPopupTrigger) {
-                    popUpMenu.show(this@DataViewerTable, e.x, e.y)
+                    popUpMenu.show(this@SimbrainJTable, e.x, e.y)
                 }
             }
         })
@@ -383,8 +383,8 @@ fun main() {
         mutableListOf(16, 17, null, 19, 20),
         mutableListOf(21, 22, 23, 24, null)
     )
-    val model = BasicDataWrapper(numbersWithNulls)
-    SimbrainDataViewer(model).displayInDialog()
+    val model = BasicDataFrame(numbersWithNulls)
+    SimbrainTablePanel(model).displayInDialog()
 
 
 

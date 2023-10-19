@@ -1,7 +1,7 @@
 package org.simbrain.world.textworld
 
 import org.simbrain.util.*
-import org.simbrain.util.table.SimbrainDataViewer
+import org.simbrain.util.table.SimbrainTablePanel
 import org.simbrain.world.textworld.gui.showComparisonDialog
 import java.util.*
 
@@ -32,7 +32,7 @@ val TextWorld.viewTokenEmbedding
         iconPath = "menu_icons/Table.png"
     ) {
 
-        val viewer = SimbrainDataViewer(tokenEmbedding.createTableModel(embeddingType).apply {
+        val viewer = SimbrainTablePanel(tokenEmbedding.createTableModel(embeddingType).apply {
             isMutable = false
         })
         viewer.displayInDialog().apply {

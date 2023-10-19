@@ -36,8 +36,8 @@ import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.addBorder
-import org.simbrain.util.table.MatrixDataWrapper
-import org.simbrain.util.table.SimbrainDataViewer
+import org.simbrain.util.table.MatrixDataFrame
+import org.simbrain.util.table.SimbrainTablePanel
 import org.simbrain.workspace.couplings.getConsumer
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
@@ -353,8 +353,8 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         val editComponents: Action = object : AbstractAction("Edit Components...") {
             override fun actionPerformed(event: ActionEvent) {
                 val dialog = StandardDialog()
-                val arrayData = MatrixDataWrapper(neuronArray.outputs)
-                dialog.contentPane = SimbrainDataViewer(arrayData)
+                val arrayData = MatrixDataFrame(neuronArray.outputs)
+                dialog.contentPane = SimbrainTablePanel(arrayData)
                 dialog.addClosingTask {
                     neuronArray.update()
                 }

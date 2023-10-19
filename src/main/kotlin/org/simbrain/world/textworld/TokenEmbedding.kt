@@ -3,8 +3,8 @@ package org.simbrain.world.textworld
 import org.simbrain.util.displayInDialog
 import org.simbrain.util.projection.DataPoint
 import org.simbrain.util.projection.KDTree
-import org.simbrain.util.table.BasicDataWrapper
-import org.simbrain.util.table.SimbrainDataViewer
+import org.simbrain.util.table.BasicDataFrame
+import org.simbrain.util.table.SimbrainTablePanel
 import org.simbrain.util.table.createFromDoubleArray
 import smile.math.matrix.Matrix
 /**
@@ -81,11 +81,11 @@ class TokenEmbedding(
      * Creates a table model object for an embedding.  Column headings are the same as row headings for one-hot and
      * default co-occurrence matrices.
      */
-    fun createTableModel(type: TextWorld.EmbeddingType): BasicDataWrapper {
+    fun createTableModel(type: TextWorld.EmbeddingType): BasicDataFrame {
         val table = createFromDoubleArray(tokenVectorMatrix.replaceNaN(0.0).toArray())
         table.rowNames = tokensMap.keys.toList()
         if (type == TextWorld.EmbeddingType.COC || type == TextWorld.EmbeddingType.ONE_HOT) {
-            table.columNames = tokensMap.keys.toList()
+            table.columnNames = tokensMap.keys.toList()
         }
         return table
     }
@@ -100,7 +100,7 @@ fun main() {
         )
     )
     textworld.loadCustomEmbedding(listOf("Word 1", "Word 2"), embeddings)
-    val viewer = SimbrainDataViewer(textworld
+    val viewer = SimbrainTablePanel(textworld
         .tokenEmbedding.createTableModel(TextWorld.EmbeddingType.CUSTOM))
     viewer.displayInDialog()
 }

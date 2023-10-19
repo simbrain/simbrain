@@ -2,8 +2,8 @@ package org.simbrain.network.gui
 
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.getFreeSynapse
-import org.simbrain.util.table.BasicDataWrapper
-import org.simbrain.util.table.SimbrainDataViewer
+import org.simbrain.util.table.BasicDataFrame
+import org.simbrain.util.table.SimbrainTablePanel
 import javax.swing.JPanel
 
 class WeightMatrixViewer(val sources: List<Neuron>, val targets: List<Neuron>): JPanel() {
@@ -14,18 +14,18 @@ class WeightMatrixViewer(val sources: List<Neuron>, val targets: List<Neuron>): 
         }.toMutableList()
     }.toMutableList()
 
-    val dataModel = BasicDataWrapper(
+    val dataModel = BasicDataFrame(
         data = sourceToTargetSynapseMap.map {
             it.map {
                 it?.strength as Any?
             }.toMutableList()
         }.toMutableList()
     ).apply {
-        columNames = targets.map { it.id }
+        columnNames = targets.map { it.id }
         rowNames = sources.map { it.id }
     }
 
-    val dataViewer = SimbrainDataViewer(dataModel).also {
+    val dataViewer = SimbrainTablePanel(dataModel).also {
         add(it)
     }
 

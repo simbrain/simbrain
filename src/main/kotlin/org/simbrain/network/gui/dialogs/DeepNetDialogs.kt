@@ -139,7 +139,7 @@ fun showDeepNetTrainingDialog(deepNet: DeepNet) {
 
         layout = MigLayout("wrap 3")
 
-        fun SimbrainDataViewer.addFixedColumnActions() {
+        fun SimbrainTablePanel.addFixedColumnActions() {
             addAction(table.importCSVAction(true))
             addAction(table.zeroFillAction)
             addAction(table.randomizeColumnAction)
@@ -148,7 +148,7 @@ fun showDeepNetTrainingDialog(deepNet: DeepNet) {
         }
 
         // Data Panels
-        val inputPanel = SimbrainDataViewer(
+        val inputPanel = SimbrainTablePanel(
             createFromFloatArray(deepNet.deepNetInputData), useDefaultToolbarAndMenu =
             false
         ).apply {
@@ -156,7 +156,7 @@ fun showDeepNetTrainingDialog(deepNet: DeepNet) {
             addAction(table.randomizeAction)
         }
 
-        val targetPanel = SimbrainDataViewer(
+        val targetPanel = SimbrainTablePanel(
             createFromColumn(deepNet.deepNetTargetData), useDefaultToolbarAndMenu =
             false
         ).apply {

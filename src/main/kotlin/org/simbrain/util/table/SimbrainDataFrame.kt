@@ -10,19 +10,17 @@ import smile.data.type.DataType
 import javax.swing.table.AbstractTableModel
 
 /**
- * Abstract data model that is viewed by [SimbrainDataViewer]. Subclasses wrap particular
- * table implementations.
+ * Provides access to tabular data that can be viewed by a [SimbrainTablePanel].
+ * Meant to be similar to a Pandas dataframe.
+ * TODO: Methods similar to those found in Pandas should be added as the need arises
+ * BasicDataFrame is the main implementation of this class.
+ * MatrixDataFrame is for purely numeric data.
  */
-abstract class SimbrainDataModel() : AbstractTableModel() {
+abstract class SimbrainDataFrame : AbstractTableModel() {
 
     abstract var columns: MutableList<Column>
 
     val events = TableEvents()
-
-    // constructor with list of strings
-    // constructor with list of datatypes
-    // constructor with both
-    // But replace construction logic with function
 
     /**
      * Index list of column classes. Previously overrode [getColumnClass] but this created problems.
@@ -241,7 +239,7 @@ abstract class SimbrainDataModel() : AbstractTableModel() {
             fireTableDataChanged()
         }
 
-    var columNames: List<String?>
+    var columnNames: List<String?>
         get() = columns.map { it.name }
         set(value) {
             columns = columns.mapIndexed { i, col ->

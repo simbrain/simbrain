@@ -42,7 +42,7 @@ fun SmileClassifier.getTrainingDialog(): StandardDialog {
         }
 
         // Data Panels
-        val inputs = SimbrainDataViewer(
+        val inputs = SimbrainTablePanel(
             createFromDoubleArray(classifier.trainingData.featureVectors), false
         ).apply {
             addAction(table.importCsv)
@@ -53,7 +53,7 @@ fun SmileClassifier.getTrainingDialog(): StandardDialog {
             }
         }
 
-        val targets = SimbrainDataViewer(createFromColumn(classifier.trainingData.targetLabels), false).apply {
+        val targets = SimbrainTablePanel(createFromColumn(classifier.trainingData.targetLabels), false).apply {
             addAction(table.importCsv)
             addAction(table.randomizeColumnAction)
             preferredSize = Dimension(200, 300)

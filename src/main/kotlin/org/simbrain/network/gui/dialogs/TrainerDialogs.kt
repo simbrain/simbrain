@@ -11,7 +11,7 @@ import org.simbrain.network.trainers.Trainable
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.createDialog
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
-import org.simbrain.util.table.MatrixDataWrapper
+import org.simbrain.util.table.MatrixDataFrame
 import org.simbrain.util.table.createAdvanceRowAction
 import org.simbrain.util.table.createApplyAction
 import org.simbrain.util.table.createApplyAndAdvanceAction
@@ -49,7 +49,7 @@ fun Trainable.getTrainingDialog(): StandardDialog {
 
         trainer.events.beginTraining.on {
             trainerProps.commitChanges()
-            trainingSet = MatrixDataset((inputs.table.model as MatrixDataWrapper).data, (targets.table.model as MatrixDataWrapper).data)
+            trainingSet = MatrixDataset((inputs.table.model as MatrixDataFrame).data, (targets.table.model as MatrixDataFrame).data)
         }
 
         contentPane.add(trainerProps, "span, wrap")
@@ -65,7 +65,7 @@ fun Trainable.getTrainingDialog(): StandardDialog {
 
         addClosingTask {
             trainerProps.commitChanges()
-            trainingSet = MatrixDataset((inputs.table.model as MatrixDataWrapper).data, (targets.table.model as MatrixDataWrapper).data)
+            trainingSet = MatrixDataset((inputs.table.model as MatrixDataFrame).data, (targets.table.model as MatrixDataFrame).data)
         }
     }
 }

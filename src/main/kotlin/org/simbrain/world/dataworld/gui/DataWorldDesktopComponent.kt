@@ -19,7 +19,7 @@
 package org.simbrain.world.dataworld.gui
 
 import org.simbrain.util.genericframe.GenericFrame
-import org.simbrain.util.table.SimbrainDataViewer
+import org.simbrain.util.table.SimbrainTablePanel
 import org.simbrain.util.widgets.ShowHelpAction
 import org.simbrain.workspace.gui.DesktopComponent
 import org.simbrain.workspace.gui.SimbrainDesktop
@@ -71,7 +71,7 @@ class DataWorldDesktopComponent(frame: GenericFrame, component: DataWorldCompone
     /**
      * The pane representing the sound world.
      */
-    private val panel: SimbrainDataViewer = SimbrainDataViewer(component.dataWorld.dataModel)
+    private val panel: SimbrainTablePanel = SimbrainTablePanel(component.dataWorld.dataModel)
 
     /**
      * The sound world.

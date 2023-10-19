@@ -10,7 +10,7 @@ import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.smile.classifiers.LogisticRegClassifier
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.util.Utils
-import org.simbrain.util.table.DataFrameWrapper
+import org.simbrain.util.table.SmileDataFrame
 import org.simbrain.util.toDoubleArray
 import smile.classification.DecisionTree
 import smile.classification.NaiveBayes
@@ -177,7 +177,7 @@ class SmileClassifierTest {
     fun `test logistic regression with bank data`() {
         // csv(file: String, delimiter: Char = ',', header: Boolean = true, quote: Char = '"', escape: Char =
         // '\\', schema: StructType? = null): DataFram
-        val data = DataFrameWrapper(read.csv("simulations/tables/bank-full.csv", header = true))
+        val data = SmileDataFrame(read.csv("simulations/tables/bank-full.csv", header = true))
 
         val targets = data.getIntColumn(data.columnCount-1)
         val inputs = data.get2DDoubleArray(listOf(0, 5, 11, 12, 13, 14))
@@ -203,7 +203,7 @@ class SmileClassifierTest {
 
     @Test
     fun `test decision tree classifier`() {
-        val data = DataFrameWrapper(Read.arff("simulations/tables/iris.arff"))
+        val data = SmileDataFrame(Read.arff("simulations/tables/iris.arff"))
         val decisionTree = DecisionTree.fit(Formula.of("class", "."), data.df)
         println(decisionTree.predict(Tuple.of(doubleArrayOf(5.4,3.9,1.3,0.4), data.df.schema())))
         // Use debugger to get a sense of what this has

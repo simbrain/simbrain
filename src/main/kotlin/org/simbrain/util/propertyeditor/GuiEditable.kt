@@ -3,8 +3,8 @@ package org.simbrain.util.propertyeditor
 import org.simbrain.util.*
 import org.simbrain.util.SimbrainConstants.NULL_STRING
 import org.simbrain.util.table.Column
-import org.simbrain.util.table.MatrixDataWrapper
-import org.simbrain.util.table.SimbrainDataViewer
+import org.simbrain.util.table.MatrixDataFrame
+import org.simbrain.util.table.SimbrainTablePanel
 import org.simbrain.util.widgets.ChoicesWithNull
 import org.simbrain.util.widgets.ColorSelector
 import org.simbrain.util.widgets.YesNoNull
@@ -517,12 +517,12 @@ class DoubleArrayWidget<O : EditableObject>(
     isConsistent: Boolean
 ) : ParameterWidget<O, DoubleArray>(parameter, isConsistent) {
 
-    private var model = MatrixDataWrapper(parameter.value.toMatrix())
+    private var model = MatrixDataFrame(parameter.value.toMatrix())
 
     override val widget by lazy {
         JPanel().apply {
             layout = BorderLayout()
-            SimbrainDataViewer(
+            SimbrainTablePanel(
                 model, useDefaultToolbarAndMenu = false, useHeaders = false,
                 usePadding = false
             ).also {
@@ -558,12 +558,12 @@ class IntArrayWidget<O : EditableObject>(
     isConsistent: Boolean
 ) : ParameterWidget<O, IntArray>(parameter, isConsistent) {
 
-    private var model = MatrixDataWrapper(parameter.value.toDoubleArray().toMatrix(), columns = parameter.value.toDoubleArray().mapIndexed { index, _ -> Column("Column ${index + 1}", Column.DataType.IntType) }.toMutableList())
+    private var model = MatrixDataFrame(parameter.value.toDoubleArray().toMatrix(), columns = parameter.value.toDoubleArray().mapIndexed { index, _ -> Column("Column ${index + 1}", Column.DataType.IntType) }.toMutableList())
 
     override val widget by lazy {
         JPanel().apply {
             layout = BorderLayout()
-            SimbrainDataViewer(
+            SimbrainTablePanel(
                 model, useDefaultToolbarAndMenu = false, useHeaders = false,
                 usePadding = false
             ).also {
@@ -599,12 +599,12 @@ class MatrixWidget<O : EditableObject>(
     isConsistent: Boolean
 ) : ParameterWidget<O, Matrix>(parameter, isConsistent) {
 
-    private var model = MatrixDataWrapper(parameter.value)
+    private var model = MatrixDataFrame(parameter.value)
 
     override val widget by lazy {
         JPanel().apply {
             layout = BorderLayout()
-            SimbrainDataViewer(
+            SimbrainTablePanel(
                 model, useDefaultToolbarAndMenu = false, useHeaders = false,
                 usePadding = false
             ).also {

@@ -1,6 +1,6 @@
 package org.simbrain.util.widgets
 
-import org.simbrain.util.table.BasicDataWrapper
+import org.simbrain.util.table.BasicDataFrame
 import java.awt.Color
 import java.awt.Component
 import java.awt.Font
@@ -28,7 +28,7 @@ import javax.swing.table.TableColumn
  */
 class RowNumberTable(private val main: JTable) : JTable(), ChangeListener, PropertyChangeListener, TableModelListener {
 
-    var rowNames = main.model.let { if (it is BasicDataWrapper) it.rowNames else listOf() }
+    var rowNames = main.model.let { if (it is BasicDataFrame) it.rowNames else listOf() }
         set(value) {
             field = value
             revalidate()
@@ -118,7 +118,7 @@ class RowNumberTable(private val main: JTable) : JTable(), ChangeListener, Prope
     //
     override fun tableChanged(e: TableModelEvent) {
         if (main != null) { // do not simplify this. the super constructor calls this before main is set up.
-            rowNames = main.model.let { if (it is BasicDataWrapper) it.rowNames else listOf() }
+            rowNames = main.model.let { if (it is BasicDataFrame) it.rowNames else listOf() }
         }
         revalidate()
     }

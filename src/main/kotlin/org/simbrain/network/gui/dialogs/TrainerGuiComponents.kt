@@ -149,8 +149,8 @@ class ErrorTimeSeries(trainer: IterableTrainer, errorText: String = "Error") : J
 /**
  * Default config for a matrix editor.
  */
-class MatrixEditor(matrix: Matrix) : SimbrainDataViewer(
-    MatrixDataWrapper(matrix), false
+class MatrixEditor(matrix: Matrix) : SimbrainTablePanel(
+    MatrixDataFrame(matrix), false
 ) {
     init {
         addAction(table.importCsv)
@@ -164,7 +164,7 @@ class MatrixEditor(matrix: Matrix) : SimbrainDataViewer(
 /**
  * Panel with buttons to add or removes rows from the end of the provided tables
  */
-class AddRemoveRows(val table1: DataViewerTable, val table2: DataViewerTable) : JPanel() {
+class AddRemoveRows(val table1: SimbrainJTable, val table2: SimbrainJTable) : JPanel() {
 
     init {
         // Add row

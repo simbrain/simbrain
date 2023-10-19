@@ -6,12 +6,12 @@ import smile.math.matrix.Matrix
 /**
  * Wraps a Smile Matrix.
  */
-class MatrixDataWrapper @JvmOverloads constructor(
+class MatrixDataFrame @JvmOverloads constructor(
     var data: Matrix,
     override var columns: MutableList<Column> = List(data.ncol()) { colNum ->
         Column("Column ${colNum + 1}", Column.DataType.DoubleType)
     }.toMutableList()
-) : SimbrainDataModel() {
+) : SimbrainDataFrame() {
 
     override val isMutable = true
 

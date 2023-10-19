@@ -20,12 +20,12 @@ import javax.swing.JOptionPane
  */
 private val TABLE_DIRECTORY = "." + Utils.FS + "simulations" + Utils.FS + "tables"
 
-fun SimbrainDataViewer.addSimpleDefaults()  {
+fun SimbrainTablePanel.addSimpleDefaults()  {
     addAction(table.zeroFillAction)
     addAction(table.randomizeAction)
 }
 
-val DataViewerTable.randomizeAction
+val SimbrainJTable.randomizeAction
     get() = createAction(
         name = "Randomize",
         description = "Randomize selected cells",
@@ -35,7 +35,7 @@ val DataViewerTable.randomizeAction
         randomizeSelectedCells()
     }
 
-val DataViewerTable.randomizeColumnAction
+val SimbrainJTable.randomizeColumnAction
     get() = createAction(
         name = "Randomize column",
         description = "Randomize cells in selected column",
@@ -44,7 +44,7 @@ val DataViewerTable.randomizeColumnAction
         model.randomizeColumn(selectedColumn)
     }
 
-val DataViewerTable.zeroFillAction
+val SimbrainJTable.zeroFillAction
     get() = createAction(
         name = "Zero Fill",
         description = "Zero Fill selected cells",
@@ -54,7 +54,7 @@ val DataViewerTable.zeroFillAction
         zeroFillSelectedCells()
     }
 
-val DataViewerTable.fillAction
+val SimbrainJTable.fillAction
     get() = createAction(
         name = "Fill...",
         description = "Fill selected cells",
@@ -64,7 +64,7 @@ val DataViewerTable.fillAction
         fillSelectedCells(fillVal)
     }
 
-val DataViewerTable.editRandomizerAction
+val SimbrainJTable.editRandomizerAction
     get() = createAction(
         name = "Edit randomizer...",
         description = "Edit table wide randomizer",
@@ -73,7 +73,7 @@ val DataViewerTable.editRandomizerAction
         AnnotatedPropertyEditor(objectWrapper("Table Randomizer", model.cellRandomizer)).displayInDialog()
     }
 
-val DataViewerTable.insertColumnAction
+val SimbrainJTable.insertColumnAction
     get() = createAction(
         name = "Insert column",
         description = "Insert column to the right of selected column, or as the left-most column if none is selected.",
@@ -82,7 +82,7 @@ val DataViewerTable.insertColumnAction
         insertColumn()
     }
 
-val DataViewerTable.deleteColumnAction
+val SimbrainJTable.deleteColumnAction
     get() = createAction(
         name = "Delete columns",
         description = "Delete selected columns",
@@ -91,7 +91,7 @@ val DataViewerTable.deleteColumnAction
         deleteSelectedColumns()
     }
 
-val DataViewerTable.insertRowAction
+val SimbrainJTable.insertRowAction
     get() = createAction(
         name = "Insert row",
         description = "Insert row to above the selected row, or as the bottom row if none is selected.",
@@ -100,7 +100,7 @@ val DataViewerTable.insertRowAction
         insertRow()
     }
 
-val DataViewerTable.deleteRowAction
+val SimbrainJTable.deleteRowAction
     get() = createAction(
         name = "Delete rows",
         description = "Delete selected rows",
@@ -110,7 +110,7 @@ val DataViewerTable.deleteRowAction
     }
 
 
-val DataViewerTable.showHistogramAction
+val SimbrainJTable.showHistogramAction
     get() = createAction(
         iconPath = "menu_icons/histogram.png",
         name = "Histogram",
@@ -122,7 +122,7 @@ val DataViewerTable.showHistogramAction
         }
     }
 
-val DataViewerTable.showBoxPlotAction
+val SimbrainJTable.showBoxPlotAction
     get() = createAction(
         name = "Boxplot column",
         description = "Create boxplot for data all numeric columns",
@@ -137,7 +137,7 @@ val DataViewerTable.showBoxPlotAction
 
 // TODO: Make this usable outside of DataFrameWrapper
 // Maybe be possible to adapt that code to a more generic context
-val DataViewerTable.showScatterPlotAction
+val SimbrainJTable.showScatterPlotAction
     get() = createAction(
         name = "Scatter Plots",
         description = "Show all pairwise scatter plots across columns",
@@ -146,14 +146,14 @@ val DataViewerTable.showScatterPlotAction
         launch(context = Dispatchers.Default) {
             // TODO: User should be able to set which column is class
             // TODO: Set mark
-            if (model is DataFrameWrapper) {
+            if (model is SmileDataFrame) {
                 val canvas = PlotGrid.splom(model.df, '.', "V1")
                 canvas.window()
             }
         }
     }
 
-val DataViewerTable.openProjectionAction get() = createAction(
+val SimbrainJTable.openProjectionAction get() = createAction(
     iconPath = "menu_icons/ProjectionIcon.png",
     description = "Open Projection"
 ) {
@@ -166,7 +166,7 @@ val DataViewerTable.openProjectionAction get() = createAction(
     }
 }
 
-val DataViewerTable.importArff
+val SimbrainJTable.importArff
     get() = createAction(
         name = "Import arff file...",
         description = "Import WEKA arff file",
@@ -176,10 +176,10 @@ val DataViewerTable.importArff
         val arffFile = chooser.showOpenDialog()
         if (arffFile != null) {
             model.let {
-                if (it is DataFrameWrapper) {
+                if (it is SmileDataFrame) {
                     it.df = Read.arff(arffFile.absolutePath)
                     it.fireTableStructureChanged()
-                } else if (it is BasicDataWrapper) {
+                } else if (it is BasicDataFrame) {
                     val df = Read.arff(arffFile.absolutePath)
                     val columns = df.names().zip(df.types())
                         .map { (name, type) -> Column(name, type.getColumnDataType()) }.toMutableList()
@@ -196,10 +196,10 @@ val DataViewerTable.importArff
         }
     }
 
-val DataViewerTable.importCsv
+val SimbrainJTable.importCsv
     get() = importCSVAction()
 
-fun DataViewerTable.importCSVAction(fixedColumns: Boolean = false) = createAction(
+fun SimbrainJTable.importCSVAction(fixedColumns: Boolean = false) = createAction(
     name ="Import csv...",
     description = "Import comma separated values file",
     iconPath= "menu_icons/Import.png"
@@ -220,13 +220,13 @@ fun DataViewerTable.importCSVAction(fixedColumns: Boolean = false) = createActio
     }
     if (csvFile != null) {
         model.let {
-            if (it is BasicDataWrapper) {
+            if (it is BasicDataFrame) {
                 val importedData = createFrom2DArray(Utils.getStringMatrix(csvFile))
                 if (checkColumns(importedData.columnCount)) {
                     it.data = importedData.data
                     it.fireTableStructureChanged()
                 }
-            } else if (it is DataFrameWrapper) {
+            } else if (it is SmileDataFrame) {
                 val data = Read.csv(csvFile.absolutePath)
                 if (checkColumns(data.ncol())) {
                     it.df = data
@@ -237,13 +237,13 @@ fun DataViewerTable.importCSVAction(fixedColumns: Boolean = false) = createActio
     }
 }
 
-val DataViewerTable.editColumnAction
+val SimbrainJTable.editColumnAction
     get() = createAction(
         name = "Edit column...",
         description =  "Edit column properties",
         iconPath = "menu_icons/Prefs.png"
     ) {
-        if (model is BasicDataWrapper) {
+        if (model is BasicDataFrame) {
             if (selectedColumn >= 0) {
                 // TODO: Add access to histogram etc. from here?
                 AnnotatedPropertyEditor(model.columns[selectedColumn]).displayInDialog()
@@ -251,7 +251,7 @@ val DataViewerTable.editColumnAction
         }
     }
 
-fun DataViewerTable.createApplyAction(name: String = "Apply", applyInputs: suspend (selectedRow: Int) -> Unit) = createAction(
+fun SimbrainJTable.createApplyAction(name: String = "Apply", applyInputs: suspend (selectedRow: Int) -> Unit) = createAction(
         name = name,
         description = "Apply current row as input to network",
         iconPath = "menu_icons/Step.png",
@@ -260,7 +260,7 @@ fun DataViewerTable.createApplyAction(name: String = "Apply", applyInputs: suspe
         applyInputs(selectedRow)
     }
 
-fun DataViewerTable.createAdvanceRowAction() = createAction(
+fun SimbrainJTable.createAdvanceRowAction() = createAction(
         name = "Advance Row",
         description = "Increment the current row",
         iconPath = "menu_icons/Plus.png",
@@ -268,7 +268,7 @@ fun DataViewerTable.createAdvanceRowAction() = createAction(
         incrementSelectedRow()
     }
 
-fun DataViewerTable.createApplyAndAdvanceAction(applyInputs: suspend (selectedRow: Int) -> Unit) = createAction(
+fun SimbrainJTable.createApplyAndAdvanceAction(applyInputs: suspend (selectedRow: Int) -> Unit) = createAction(
         name = "Apply and Advance",
         description = "Apply current row as input and increment selected row",
         iconPath = "menu_icons/Step.png",

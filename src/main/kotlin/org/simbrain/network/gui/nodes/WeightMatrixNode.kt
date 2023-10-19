@@ -16,8 +16,8 @@ import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.matrix.ZoeConnector
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
-import org.simbrain.util.table.MatrixDataWrapper
-import org.simbrain.util.table.SimbrainDataViewer
+import org.simbrain.util.table.MatrixDataFrame
+import org.simbrain.util.table.SimbrainTablePanel
 import org.simbrain.util.table.addSimpleDefaults
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
@@ -232,8 +232,8 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
 
             // Weight matrix
             if (weightMatrix is WeightMatrix) {
-                val wm = MatrixDataWrapper(weightMatrix.weightMatrix)
-                val wmViewer = SimbrainDataViewer(wm, false)
+                val wm = MatrixDataFrame(weightMatrix.weightMatrix)
+                val wmViewer = SimbrainTablePanel(wm, false)
                 wmViewer.addSimpleDefaults()
                 tabs.addTab("Weight Matrix", wmViewer)
                 weightMatrix.events.updated.on { wmViewer.model.fireTableDataChanged() }

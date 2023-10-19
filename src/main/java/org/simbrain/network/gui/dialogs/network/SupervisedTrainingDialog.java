@@ -21,8 +21,8 @@ package org.simbrain.network.gui.dialogs.network;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.trainers.Trainable;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.table.BasicDataWrapperKt;
-import org.simbrain.util.table.SimbrainDataViewer;
+import org.simbrain.util.table.BasicDataFrameKt;
+import org.simbrain.util.table.SimbrainTablePanel;
 import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
@@ -58,12 +58,12 @@ public abstract class SupervisedTrainingDialog extends StandardDialog {
     /**
      * Reference to input data panel.
      */
-    private SimbrainDataViewer inputPanel;
+    private SimbrainTablePanel inputPanel;
 
     /**
      * Reference to training data panel.
      */
-    private SimbrainDataViewer trainingPanel;
+    private SimbrainTablePanel trainingPanel;
 
     /**
      * Reference to validate inputs panel
@@ -103,14 +103,14 @@ public abstract class SupervisedTrainingDialog extends StandardDialog {
 
         // Input data tab
         inputPanel =
-                new SimbrainDataViewer(BasicDataWrapperKt.createFromMatrix(trainable.getTrainingSet().getInputs()), true);
+                new SimbrainTablePanel(BasicDataFrameKt.createFromMatrix(trainable.getTrainingSet().getInputs()), true);
         // inputPanel = new DataPanel(trainable.getInputNeurons(), trainable.getTrainingSet().getInputDataMatrix(), 5, "Input");
         // inputPanel.setFrame(this);
         addTab("Input data", inputPanel);
 
         // Training data tab
         trainingPanel =
-                new SimbrainDataViewer(BasicDataWrapperKt.createFromMatrix(trainable.getTrainingSet().getTargets()), true);
+                new SimbrainTablePanel(BasicDataFrameKt.createFromMatrix(trainable.getTrainingSet().getTargets()), true);
         // trainingPanel.setFrame(this);
         addTab("Target data", trainingPanel);
 

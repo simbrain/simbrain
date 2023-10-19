@@ -8,10 +8,12 @@ import smile.math.matrix.Matrix
 /**
  * Mutable table whose columns have arbitrary types.
  */
-class BasicDataWrapper(
+class BasicDataFrame(
     data: MutableList<MutableList<Any?>>,
     override var columns: MutableList<Column> = inferColumns(data)
-) : SimbrainDataModel() {
+) : SimbrainDataFrame() {
+
+    constructor(m: Int, n: Int, init: (Int) -> Any = { 0.0 }): this(MutableList(m) { MutableList(n, init) })
 
     override var isMutable = true
 
@@ -148,38 +150,39 @@ private fun inferColumns(names: List<String?>, data: MutableList<MutableList<Any
         createColumn(names.getOrNull(i) ?: "Column ${i + 1}", values.firstNotNullOfOrNull { it })
     }.toMutableList()
 
-fun createFrom2DArray(data: Array<out Array<out Any?>>): BasicDataWrapper {
-    return BasicDataWrapper(data.map { it.toMutableList() }.toMutableList())
+fun createFrom2DArray(data: Array<out Array<out Any?>>): BasicDataFrame {
+    return BasicDataFrame(data.map { it.toMutableList() }.toMutableList())
 }
 
-fun createFromDoubleArray(data: Array<DoubleArray>): BasicDataWrapper {
-    return BasicDataWrapper(data.map { it.toMutableList() as MutableList<Any?> }.toMutableList())
+fun createFromDoubleArray(data: Array<DoubleArray>): BasicDataFrame {
+    return BasicDataFrame(data.map { it.toMutableList() as MutableList<Any?> }.toMutableList())
 }
 
-fun createFromMatrix(data: Matrix): BasicDataWrapper {
-    return BasicDataWrapper(
-        data.toArray().map { it.toMutableList() as MutableList<Any?> }.toMutableList(),
-        (1..data.ncol()).map { createColumn("$it", 0.0) }.toMutableList()
-    )
+fun createFromMatrix(data: Matrix): BasicDataFrame {
+    return BasicDataFrame(
+        data.toArray().map { it.toMutableList() as MutableList<Any?> }.toMutableList()
+    ).apply {
+        columnNames = (1..data.ncol()).map { "$it" }.toMutableList()
+    }
 }
 
-fun createFromFloatArray(data: Array<FloatArray>): BasicDataWrapper {
-    return BasicDataWrapper(data.map { it.toMutableList() as MutableList<Any?> }.toMutableList())
+fun createFromFloatArray(data: Array<FloatArray>): BasicDataFrame {
+    return BasicDataFrame(data.map { it.toMutableList() as MutableList<Any?> }.toMutableList())
 }
 
-fun createFromColumn(data: DoubleArray): BasicDataWrapper {
-    return BasicDataWrapper(data.map { mutableListOf(it as Any?) }.toMutableList())
+fun createFromColumn(data: DoubleArray): BasicDataFrame {
+    return BasicDataFrame(data.map { mutableListOf(it as Any?) }.toMutableList())
 }
 
-fun createFromColumn(data: FloatArray): BasicDataWrapper {
-    return BasicDataWrapper(data.map { mutableListOf(it as Any?) }.toMutableList())
+fun createFromColumn(data: FloatArray): BasicDataFrame {
+    return BasicDataFrame(data.map { mutableListOf(it as Any?) }.toMutableList())
 }
 
-fun createFromColumn(data: IntArray): BasicDataWrapper {
-    return BasicDataWrapper(data.map { mutableListOf(it as Any?) }.toMutableList())
+fun createFromColumn(data: IntArray): BasicDataFrame {
+    return BasicDataFrame(data.map { mutableListOf(it as Any?) }.toMutableList())
 }
 
-fun createFromColumn(data: Array<String>): BasicDataWrapper {
-    return BasicDataWrapper(data.map { mutableListOf(it as Any?) }.toMutableList())
+fun createFromColumn(data: Array<String>): BasicDataFrame {
+    return BasicDataFrame(data.map { mutableListOf(it as Any?) }.toMutableList())
 }
 

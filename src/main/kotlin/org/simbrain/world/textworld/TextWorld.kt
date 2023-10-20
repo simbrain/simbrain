@@ -19,10 +19,7 @@
 package org.simbrain.world.textworld
 
 import org.simbrain.util.UserParameter
-import org.simbrain.util.generateCooccurrenceMatrix
 import org.simbrain.util.propertyeditor.EditableObject
-import org.simbrain.util.tokenizeWordsFromSentence
-import org.simbrain.util.uniqueTokensFromArray
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
@@ -49,23 +46,6 @@ import java.util.regex.Pattern
  *
  */
 class TextWorld : AttributeContainer, EditableObject {
-
-    enum class EmbeddingType {ONE_HOT, COC, CUSTOM}
-
-    @UserParameter(label = "Embedding type", description = "Method for converting text to vectors", order = 1 )
-    var embeddingType = EmbeddingType.COC
-
-    @UserParameter(label = "Window size", minimumValue =  1.0, order = 20 )
-    var windowSize = 5
-
-    @UserParameter(label = "Bidirectional", order = 30 )
-    var bidirectional = true
-
-    @UserParameter(label = "Use PPMI", order = 40 )
-    var usePPMI = true
-
-    @UserParameter(label = "Use cosine sim", order = 50 )
-    var useCosine = true
 
     /**
      * Associates string tokens with arrays of doubles and vice-versa
@@ -390,28 +370,6 @@ class TextWorld : AttributeContainer, EditableObject {
         override fun toString(): String {
             return "($beginPosition,$endPosition) $text"
         }
-    }
-
-    /**
-     * Extract a token embedding from the provided string.
-     */
-    fun extractEmbedding(docString: String) {
-        when (embeddingType) {
-            EmbeddingType.ONE_HOT -> {
-                val tokens = docString.tokenizeWordsFromSentence().uniqueTokensFromArray()
-                tokenEmbedding = TokenEmbedding(tokens, Matrix.eye(tokens.size))
-            }
-            EmbeddingType.COC -> {
-                tokenEmbedding = generateCooccurrenceMatrix(docString, windowSize, bidirectional, usePPMI)
-            }
-            else -> {
-                throw IllegalStateException("Custom embeddings must be manually loaded")
-            }
-        }
-    }
-
-    fun loadCustomEmbedding(tokens: List<String>, embeddings: Matrix) {
-        tokenEmbedding = TokenEmbedding(tokens, embeddings)
     }
 }
 

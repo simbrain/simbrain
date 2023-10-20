@@ -100,7 +100,7 @@ public class APETestObject implements EditableObject {
      */
     public static void main(String[] args) {
         APETestObject testObject = new APETestObject();
-        StandardDialog dialog = SwingKt.createDialog2(testObject);
+        StandardDialog dialog = SwingKt.createDialog(testObject);
         dialog.addClosingTask(() -> {
             System.out.println(ReflectionUtilsKt.allPropertiesToString(testObject, "\n"));
         });

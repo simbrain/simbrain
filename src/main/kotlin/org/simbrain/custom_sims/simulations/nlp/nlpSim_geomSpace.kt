@@ -10,6 +10,7 @@ import org.simbrain.util.point
 import org.simbrain.util.projection.DataPoint
 import org.simbrain.util.projection.HaloColoringManager
 import org.simbrain.util.projection.PCAProjection
+import org.simbrain.world.textworld.TokenEmbeddingBuilder
 import java.io.File
 
 /**
@@ -32,7 +33,7 @@ val nlpSimBasic = newSim {
     val twc = addTextWorld("Text World")
     val textWorld = twc.world
     val text = File("simulations" + FS + "texts" + FS + "corpus_artificial_similarity.txt").readText()
-    textWorld.extractEmbedding(text)
+    TokenEmbeddingBuilder().build(text)
     textWorld.text = text
 
     withGui {

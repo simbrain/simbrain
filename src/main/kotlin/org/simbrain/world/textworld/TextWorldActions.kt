@@ -18,7 +18,10 @@ val TextWorld.extractEmbedding get() = createAction(
     val chooser = SFileChooser(tokenEmbeddingDirectory, "text file", "txt")
     val theFile = chooser.showOpenDialog()
     if (theFile != null) {
-        extractEmbedding(Utils.readFileContents(theFile))
+        val tokenEmbeddingBuilder = TokenEmbeddingBuilder()
+        tokenEmbeddingBuilder.createDialog {
+            tokenEmbedding = tokenEmbeddingBuilder.build(Utils.readFileContents(theFile))
+        }.display()
     }
 }
 
@@ -32,9 +35,7 @@ val TextWorld.viewTokenEmbedding
         iconPath = "menu_icons/Table.png"
     ) {
 
-        val viewer = SimbrainTablePanel(tokenEmbedding.createTableModel(embeddingType).apply {
-            isMutable = false
-        })
+        val viewer = SimbrainTablePanel(tokenEmbedding.createTableModel())
         viewer.displayInDialog().apply {
             title = "Embedding has ${tokenEmbedding.size} unique entries"
         }

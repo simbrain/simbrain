@@ -1,6 +1,7 @@
 package org.simbrain.util
 
 import org.simbrain.util.Utils.FS
+import org.simbrain.world.textworld.EmbeddingType
 import org.simbrain.world.textworld.TokenEmbedding
 import smile.math.matrix.Matrix
 import smile.nlp.tokenizer.SimpleSentenceSplitter
@@ -140,9 +141,13 @@ fun manualPPMI(cocMatrix: Matrix, positive: Boolean = true): Matrix {
  * @return a symmetrical co-occurrence matrix with as many rows and columns as there are unique tokens in [docString].
  *
  */
-fun generateCooccurrenceMatrix(docString: String, windowSize: Int = 2, bidirectional: Boolean = false, usePPMI:
-Boolean = true, removeStopwords: Boolean = true):
-        TokenEmbedding {
+fun generateCooccurrenceMatrix(
+    docString: String,
+    windowSize: Int = 2,
+    bidirectional: Boolean = false,
+    usePPMI: Boolean = true,
+    removeStopwords: Boolean = true
+): TokenEmbedding {
     // println(docString)
     val convertedDocString = docString.removeSpecialCharacters()
 
@@ -201,7 +206,7 @@ Boolean = true, removeStopwords: Boolean = true):
     if (usePPMI) {
         return TokenEmbedding(tokens, manualPPMI(cooccurrenceSmileMatrix, true).replaceNaN(0.0))
     }
-    return TokenEmbedding(tokens, cooccurrenceSmileMatrix.replaceNaN(0.0))
+    return TokenEmbedding(tokens, cooccurrenceSmileMatrix.replaceNaN(0.0), EmbeddingType.COC)
 }
 
 /**

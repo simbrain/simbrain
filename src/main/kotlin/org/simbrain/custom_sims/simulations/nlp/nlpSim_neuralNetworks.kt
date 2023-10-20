@@ -8,6 +8,7 @@ import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.util.Utils
 import org.simbrain.util.place
 import org.simbrain.util.point
+import org.simbrain.world.textworld.TokenEmbeddingBuilder
 import java.io.File
 
 /**
@@ -26,7 +27,7 @@ val nlpSim_neuralNetworks = newSim {
     // Text World for Inputs
     val textWorld = addTextWorld("Text World (Inputs)")
     val text = File("simulations" + Utils.FS + "texts" + Utils.FS + "mlk.txt").readText()
-    textWorld.world.extractEmbedding(text)
+    TokenEmbeddingBuilder().build(text)
     textWorld.world.text = text
 
     withGui {
@@ -58,7 +59,7 @@ val nlpSim_neuralNetworks = newSim {
 
     // Text World for Outputs
     val textWorldOut = addTextWorld("Text World (Outputs)")
-    textWorldOut.world.extractEmbedding(text)
+    TokenEmbeddingBuilder().build(text)
 
     withGui {
         place(textWorldOut) {

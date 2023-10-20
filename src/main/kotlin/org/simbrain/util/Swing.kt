@@ -223,17 +223,6 @@ fun <E : EditableObject> E.createDialog(block: (E) -> Unit = {}): StandardDialog
     }
 }
 
-@JvmOverloads
-fun <E : EditableObject> E.createDialog2(block: (E) -> Unit = {}): StandardDialog {
-    val editor = AnnotatedPropertyEditor(listOf(this))
-    return StandardDialog(editor).apply {
-        addClosingTask {
-            editor.commitChanges()
-            block(this@createDialog2)
-        }
-    }
-}
-
 fun showWarningDialog(message: String) {
     val dialog = JDialog()
     dialog.isAlwaysOnTop = true

@@ -109,6 +109,7 @@ open class SimbrainTablePanel @JvmOverloads constructor(
         addSeparator()
         addAction(table.showHistogramAction)
         addAction(table.showBoxPlotAction)
+        addAction(table.createShowMatrixPlotAction())
     }
 
     fun addSeparator() {
@@ -366,6 +367,10 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
 
         // Camick end
     }
+
+    fun getSelectedRowDoubleValues() = selectedRows.map { model.getRow<Double>(it) }
+
+    fun getSelectedRowNames() = selectedRows.map { model.getRowName(it) }
 
 }
 

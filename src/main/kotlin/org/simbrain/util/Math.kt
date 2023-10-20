@@ -32,6 +32,8 @@ infix fun Iterable<Double>.mse(other: Iterable<Double>) = (this squaredError oth
 infix fun DoubleArray.squaredError(other: DoubleArray) =
     this.zip(other).map { (a, b) -> (a - b).let { it * it } }
 
+infix fun DoubleArray.dot(other: DoubleArray) = this.zip(other).sumOf { (a, b) -> a * b }
+
 infix fun DoubleArray.sse(other: DoubleArray) = (this squaredError other).sum()
 
 infix fun DoubleArray.mse(other: DoubleArray) = (this squaredError other).average()
@@ -199,3 +201,33 @@ operator fun FloatArray.minus(other: FloatArray) = (this zip other).map { (a, b)
 operator fun FloatArray.div(scalar: Float) = map { it / scalar }.toFloatArray()
 
 operator fun FloatArray.times(scalar: Float) = map { it * scalar }.toFloatArray()
+
+fun createMatrix(m: Int, n: Int, binaryOperation: (i: Int, j: Int) -> Double): Array<DoubleArray> {
+    val matrix = Array(m) { DoubleArray(n) }
+    for (i in 0 until m) {
+        for (j in 0 until n) {
+            matrix[i][j] = binaryOperation(i, j)
+        }
+    }
+    return matrix
+}
+
+fun computeCorrelationMatrix(data: Array<DoubleArray>) = createMatrix(data.size, data.size) { i, j ->
+    computeCorrelation(data[i], data[j])
+}
+
+fun computeCovarianceMatrix(data: Array<DoubleArray>) = createMatrix(data.size, data.size) { i, j ->
+    computeCovariance(data[i], data[j])
+}
+
+fun computeSimilarityMatrix(data: Array<DoubleArray>) = createMatrix(data.size, data.size) { i, j ->
+    data[i].euclideanDistance(data[j])
+}
+
+fun computeCosineSimilarityMatrix(data: Array<DoubleArray>) = createMatrix(data.size, data.size) { i, j ->
+    smile.math.MathEx.cos(data[i], data[j])
+}
+
+fun computeDotProductMatrix(data: Array<DoubleArray>) = createMatrix(data.size, data.size) { i, j ->
+    data[i] dot data[j]
+}

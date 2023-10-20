@@ -141,13 +141,13 @@ class BasicDataFrame(
  * Infer a column from a 2d array of data.
  */
 private fun inferColumns(data: MutableList<MutableList<Any?>>) =
-    data.mapIndexed { i, values ->
-        createColumn("Column ${i + 1}", values.firstNotNullOfOrNull { it })
+    (0..data.first().lastIndex).map { i ->
+        createColumn("Column ${i + 1}", data.asSequence().map { it[i] }.firstNotNullOfOrNull { it })
     }.toMutableList()
 
 private fun inferColumns(names: List<String?>, data: MutableList<MutableList<Any?>>) =
-    data.mapIndexed { i, values ->
-        createColumn(names.getOrNull(i) ?: "Column ${i + 1}", values.firstNotNullOfOrNull { it })
+    (0..data.first().lastIndex).map { i ->
+        createColumn(names.getOrNull(i) ?: "Column ${i + 1}", data.asSequence().map { it[i] }.firstNotNullOfOrNull { it })
     }.toMutableList()
 
 fun createFrom2DArray(data: Array<out Array<out Any?>>): BasicDataFrame {

@@ -8,12 +8,15 @@ import org.simbrain.plot.projection.ProjectionComponent
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.objectWrapper
+import org.simbrain.util.widgets.MatrixPlot
 import org.simbrain.workspace.gui.SimbrainDesktop
 import smile.io.Read
 import smile.plot.swing.BoxPlot
 import smile.plot.swing.Histogram
 import smile.plot.swing.PlotGrid
-import javax.swing.JOptionPane
+import java.awt.BorderLayout
+import java.awt.Dimension
+import javax.swing.*
 
 /**
  * Default directory where tables are stored.
@@ -277,3 +280,50 @@ fun SimbrainJTable.createApplyAndAdvanceAction(applyInputs: suspend (selectedRow
         applyInputs(selectedRow)
         incrementSelectedRow()
     }
+
+fun SimbrainJTable.createShowMatrixPlotAction() = createAction(
+    name = "Show Matrix Plot",
+    description = "Show plots (like correlation plot) that display pairwise relation between row vectors in this table.",
+    iconPath = "menu_icons/grid.png",
+) {
+
+    val binaryOperations = arrayOf("Correlation", "Covariance", "Cosine Similarity", "Euclidean Distance", "Dot Product")
+
+    val (data, rowNames) = if (selectedRows.size > 0) {
+        getSelectedRowDoubleValues().toDoubleArray() to getSelectedRowNames()
+    } else {
+        model.get2DDoubleArray() to model.getAllRowNames()
+    }
+
+    val panel = JPanel(BorderLayout())
+
+    var matrixPlotPanel = MatrixPlot(rowNames, computeCorrelationMatrix(data))
+
+    val toolbar = JToolBar()
+    toolbar.isFloatable = false
+    toolbar.add(JLabel("Comparison Function: "))
+    toolbar.add(JComboBox(binaryOperations).apply {
+        addActionListener { e ->
+            val functionSelected = (e?.source as? JComboBox<*>)?.selectedItem as? String
+            val newPanel = when (functionSelected) {
+                "Correlation" -> MatrixPlot(rowNames, computeCorrelationMatrix(data))
+                "Covariance" -> MatrixPlot(rowNames, computeCovarianceMatrix(data))
+                "Cosine Similarity" -> MatrixPlot(rowNames, computeCosineSimilarityMatrix(data))
+                "Euclidean Distance" -> MatrixPlot(rowNames, computeSimilarityMatrix(data))
+                "Dot Product" -> MatrixPlot(rowNames, computeDotProductMatrix(data))
+                else -> MatrixPlot(rowNames, computeCorrelationMatrix(data))
+            }
+            panel.remove(matrixPlotPanel)
+            matrixPlotPanel = newPanel
+            panel.add(matrixPlotPanel, BorderLayout.CENTER)
+            panel.revalidate()
+        }
+        maximumSize = Dimension(150, preferredSize.height)
+    })
+
+    panel.add(toolbar, BorderLayout.NORTH)
+    panel.add(matrixPlotPanel, BorderLayout.CENTER)
+
+    panel.displayInDialog()
+
+}

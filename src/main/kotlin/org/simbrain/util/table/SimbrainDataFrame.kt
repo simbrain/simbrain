@@ -239,6 +239,12 @@ abstract class SimbrainDataFrame : AbstractTableModel() {
             fireTableDataChanged()
         }
 
+    fun getRowName(row: Int): String {
+        return rowNames.getOrNull(row) ?: (row + 1).toString()
+    }
+
+    fun getAllRowNames() = (0 until rowCount).map { getRowName(it) }
+
     var columnNames: List<String?>
         get() = columns.map { it.name }
         set(value) {

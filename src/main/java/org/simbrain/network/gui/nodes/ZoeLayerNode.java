@@ -26,7 +26,7 @@ import org.simbrain.network.NetworkModel;
 import org.simbrain.network.events.LocationEvents;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.matrix.ZoeLayer;
-import org.simbrain.util.ImageKt;
+import org.simbrain.util.ImageUtilsKt;
 import org.simbrain.util.math.SimbrainMath;
 
 import java.awt.*;
@@ -118,7 +118,7 @@ public class ZoeLayerNode extends ScreenElement {
     private void renderArrayToActivationsImage() {
         double[] activations = SimbrainMath.randomVector(100);
         int len = (int) Math.sqrt(activations.length);
-        BufferedImage img = ImageKt.toSimbrainColorImage(
+        BufferedImage img = ImageUtilsKt.toSimbrainColorImage(
                 activations,len,len);
         mainImage.setImage(img);
         // TODO: Adjust this to look nice

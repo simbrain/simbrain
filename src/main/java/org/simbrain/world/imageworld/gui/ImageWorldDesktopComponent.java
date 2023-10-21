@@ -1,7 +1,7 @@
 package org.simbrain.world.imageworld.gui;
 
 import kotlinx.coroutines.Dispatchers;
-import org.simbrain.util.ImageKt;
+import org.simbrain.util.ImageUtilsKt;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.SFileChooser;
 import org.simbrain.util.genericframe.GenericFrame;
@@ -177,7 +177,7 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
                 return;
             }
             if (evt.isShiftDown()) {
-                image.setRGB(x, y, ImageKt.invert(penColor).getRGB());
+                image.setRGB(x, y, ImageUtilsKt.invert(penColor).getRGB());
             } else {
                 image.setRGB(x, y, penColor.getRGB());
             }

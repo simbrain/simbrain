@@ -1,6 +1,6 @@
 package org.simbrain.world.imageworld;
 
-import org.simbrain.util.ImageKt;
+import org.simbrain.util.ImageUtilsKt;
 import org.simbrain.world.imageworld.events.ImageEvents;
 
 import java.awt.image.BufferedImage;
@@ -98,7 +98,7 @@ public abstract class ImageSource  {
      * @param image The image to assign to the current image.
      */
     protected void setCurrentImage(BufferedImage image) {
-        setCurrentImage(ImageKt.copy(image), true);
+        setCurrentImage(ImageUtilsKt.copy(image), true);
     }
 
     public int getWidth() {

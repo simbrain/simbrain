@@ -1,7 +1,7 @@
 package org.simbrain.world.imageworld;
 
 import org.jetbrains.annotations.Nullable;
-import org.simbrain.util.ImageKt;
+import org.simbrain.util.ImageUtilsKt;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
@@ -160,7 +160,7 @@ public class ImageAlbum extends ImageSource implements AttributeContainer, Edita
      * Add the current image world image to the album.
      */
     public void takeSnapshot() {
-        var snapshot = ImageKt.copy(getCurrentImage());
+        var snapshot = ImageUtilsKt.copy(getCurrentImage());
         addImage(snapshot);
     }
 

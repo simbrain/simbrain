@@ -1,6 +1,6 @@
 package org.simbrain.world.imageworld.filters;
 
-import org.simbrain.util.CollectionsKt;
+import org.simbrain.util.CollectionUtilsKt;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
@@ -131,7 +131,7 @@ public class Filter implements AttributeContainer, EditableObject {
 
     @Producible()
     public double[] getFlattenedRGB() {
-        return CollectionsKt.flattenArray(channels);
+        return CollectionUtilsKt.flattenArray(channels);
     }
 
     @Producible( defaultVisibility = false)

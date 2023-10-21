@@ -30,7 +30,7 @@ public class MatrixConverter implements Converter {
         writer.endNode();
 
         writer.startNode("data");
-        double[] flatArray = CollectionsKt.flattenArray(matrix.toArray());
+        double[] flatArray = CollectionUtilsKt.flattenArray(matrix.toArray());
         context.convertAnother(DoubleArrayConverter.arrayToString(flatArray));
         writer.endNode();
     }
@@ -50,7 +50,7 @@ public class MatrixConverter implements Converter {
         double[] flatData = DoubleArrayConverter.stringToArray(reader.getValue());
         reader.moveUp();
 
-        return Matrix.of(CollectionsKt.reshape(rows, cols, flatData));
+        return Matrix.of(CollectionUtilsKt.reshape(rows, cols, flatData));
     }
 
 }

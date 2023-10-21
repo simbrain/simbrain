@@ -19,7 +19,7 @@ val TextWorld.extractEmbedding get() = createAction(
     val theFile = chooser.showOpenDialog()
     if (theFile != null) {
         val tokenEmbeddingBuilder = TokenEmbeddingBuilder()
-        tokenEmbeddingBuilder.createDialog {
+        tokenEmbeddingBuilder.createEditorDialog {
             tokenEmbedding = tokenEmbeddingBuilder.build(Utils.readFileContents(theFile))
         }.display()
     }
@@ -73,7 +73,7 @@ val TextWorld.textWorldPrefs
         name = "Show preferences...",
         iconPath = "menu_icons/Prefs.png"
     ) {
-        createDialog {}.also {
+        createEditorDialog {}.also {
             it.title = "Text World Preferences"
         }.display()
     }

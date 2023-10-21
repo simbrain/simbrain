@@ -750,7 +750,7 @@ public class Utils {
         return setA.size() > 0;
     }
 
-    // TODO: Remove and use Swing.kt version instead
+    // TODO: Remove and use SwingUtils.kt version instead
     /**
      * Helper to create abstract actions.
      *

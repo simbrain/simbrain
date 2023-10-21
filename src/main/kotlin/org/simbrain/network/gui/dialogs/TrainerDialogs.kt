@@ -9,7 +9,7 @@ import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.Trainable
 import org.simbrain.util.StandardDialog
-import org.simbrain.util.createDialog
+import org.simbrain.util.createEditorDialog
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.table.MatrixDataFrame
 import org.simbrain.util.table.createAdvanceRowAction
@@ -76,7 +76,7 @@ fun NetworkPanel.showSRNCreationDialog(): StandardDialog {
         network.idManager.getProposedId(SRNNetwork::class.java),
         network.placementManager.lastClickedLocation
     )
-    return creator.createDialog {
+    return creator.createEditorDialog {
         network.addNetworkModelAsync(creator.create(network))
     }
 
@@ -115,7 +115,7 @@ fun NetworkPanel.showLMSCreationDialog(): StandardDialog {
         network.idManager.getProposedId(LMSNetwork::class.java),
         network.placementManager.lastClickedLocation
     )
-    return creator.createDialog {
+    return creator.createEditorDialog {
         network.addNetworkModelAsync(creator.create(network))
     }
 

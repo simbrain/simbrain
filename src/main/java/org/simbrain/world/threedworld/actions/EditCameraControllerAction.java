@@ -20,7 +20,7 @@ package org.simbrain.world.threedworld.actions;
 
 import kotlin.Unit;
 import org.simbrain.util.ResourceManager;
-import org.simbrain.util.SwingKt;
+import org.simbrain.util.SwingUtilsKt;
 import org.simbrain.world.threedworld.ThreeDWorld;
 import org.simbrain.world.threedworld.engine.ThreeDEngine;
 
@@ -48,10 +48,10 @@ public final class EditCameraControllerAction extends AbstractAction {
     public void actionPerformed(final ActionEvent event) {
         ThreeDEngine.State previousState = world.getEngine().getState();
         world.getEngine().queueState(ThreeDEngine.State.SystemPause, true);
-        var dialog = SwingKt.createDialog(world.getCameraController(), (e) -> {
+        var dialog = SwingUtilsKt.createEditorDialog(world.getCameraController(), (e) -> {
             world.getEngine().queueState(previousState, false);
             return Unit.INSTANCE;
         });
-        SwingKt.display(dialog);
+        SwingUtilsKt.display(dialog);
     }
 }

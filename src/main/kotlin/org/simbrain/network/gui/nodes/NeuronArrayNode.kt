@@ -398,7 +398,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
     }
 
     override fun getPropertyDialog(): JDialog {
-        return neuronArray.createDialog { updateInfoText()}
+        return neuronArray.createEditorDialog { updateInfoText()}
     }
 
     override fun getModel(): NeuronArray {

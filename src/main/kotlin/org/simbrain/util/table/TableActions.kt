@@ -324,7 +324,7 @@ fun SimbrainJTable.createShowMatrixPlotAction() = createAction(
         name = "Show preferences...",
         iconPath = "menu_icons/Prefs.png"
     ) {
-        matrixPlotPanel.properties.createDialog{
+        matrixPlotPanel.properties.createEditorDialog{
             matrixPlotPanel.repaint()
         }.also {
             it.title = "Text World Preferences"

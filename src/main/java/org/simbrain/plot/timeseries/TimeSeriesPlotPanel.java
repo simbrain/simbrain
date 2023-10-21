@@ -23,7 +23,7 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
-import org.simbrain.util.SwingKt;
+import org.simbrain.util.SwingUtilsKt;
 
 import javax.swing.*;
 import java.awt.*;
@@ -183,11 +183,11 @@ public class TimeSeriesPlotPanel extends JPanel {
      * Show properties dialog.
      */
     public void showPropertiesDialog() {
-        var dialog = SwingKt.createDialog(model, (e) -> {
+        var dialog = SwingUtilsKt.createEditorDialog(model, (e) -> {
             updateChartSettings();
             return Unit.INSTANCE;
         });
-        SwingKt.display(dialog);
+        SwingUtilsKt.display(dialog);
     }
 
     public ChartPanel getChartPanel() {

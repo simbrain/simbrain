@@ -16,7 +16,7 @@ import org.simbrain.network.gui.nodes.TextNode
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.util.StandardDialog
-import org.simbrain.util.createDialog
+import org.simbrain.util.createEditorDialog
 import org.simbrain.util.display
 import org.simbrain.util.displayInDialog
 import org.simbrain.util.piccolo.SceneGraphBrowser
@@ -60,7 +60,7 @@ fun NetworkPanel.showSelectedSynapseProperties() {
 
 
 fun NetworkPanel.showNeuronArrayCreationDialog() {
-    NeuronArray.CreationTemplate().createDialog {
+    NeuronArray.CreationTemplate().createEditorDialog {
         val neuronArray = it.create(network)
         network.addNetworkModelAsync(neuronArray)
     }.also {

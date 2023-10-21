@@ -213,12 +213,12 @@ fun <T : JComponent> T.createAction(
  * closing the dialog. Add [display] after this call to create and display the dialog.
  */
 @JvmOverloads
-fun <E : EditableObject> E.createDialog(block: (E) -> Unit = {}): StandardDialog {
+fun <E : EditableObject> E.createEditorDialog(block: (E) -> Unit = {}): StandardDialog {
     val editor = AnnotatedPropertyEditor(listOf(this))
     return StandardDialog(editor).apply {
         addClosingTask {
             editor.commitChanges()
-            block(this@createDialog)
+            block(this@createEditorDialog)
         }
     }
 }
@@ -328,6 +328,5 @@ class DetailTrianglePanel @JvmOverloads constructor(
         contentPanel.isVisible = detailTriangle.isDown
         add(contentPanel)
     }
-
 
 }

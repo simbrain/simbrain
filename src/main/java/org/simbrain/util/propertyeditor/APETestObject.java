@@ -4,7 +4,7 @@ import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.util.ReflectionUtilsKt;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.SwingKt;
+import org.simbrain.util.SwingUtilsKt;
 import org.simbrain.util.UserParameter;
 import smile.math.matrix.Matrix;
 
@@ -100,11 +100,11 @@ public class APETestObject implements EditableObject {
      */
     public static void main(String[] args) {
         APETestObject testObject = new APETestObject();
-        StandardDialog dialog = SwingKt.createDialog(testObject);
+        StandardDialog dialog = SwingUtilsKt.createEditorDialog(testObject);
         dialog.addClosingTask(() -> {
             System.out.println(ReflectionUtilsKt.allPropertiesToString(testObject, "\n"));
         });
-        SwingKt.display(dialog);
+        SwingUtilsKt.display(dialog);
     }
 
 

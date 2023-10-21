@@ -204,7 +204,7 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
     }
 
     fun showPrefDialog() {
-        projector.createDialog {
+        projector.createEditorDialog {
             it.init()
             launch {
                 it.events.settingsChanged.fire()

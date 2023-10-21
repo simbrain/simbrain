@@ -24,7 +24,7 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.simbrain.plot.actions.PlotActionManager;
-import org.simbrain.util.SwingKt;
+import org.simbrain.util.SwingUtilsKt;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.gui.DesktopComponent;
@@ -157,7 +157,7 @@ public class BarChartDesktopComponent extends DesktopComponent<BarChartComponent
     @Override
     public void actionPerformed(final ActionEvent arg0) {
         if (arg0.getActionCommand().equalsIgnoreCase("dialog")) {
-            var dialog = SwingKt.createDialog(getWorkspaceComponent().getModel(), (e) -> {
+            var dialog = SwingUtilsKt.createEditorDialog(getWorkspaceComponent().getModel(), (e) -> {
                 chart.getCategoryPlot()
                         .getRenderer()
                         .setSeriesPaint(0, getWorkspaceComponent().getModel().getBarColor());
@@ -172,7 +172,7 @@ public class BarChartDesktopComponent extends DesktopComponent<BarChartComponent
                 }
                 return Unit.INSTANCE;
             });
-            SwingKt.display(dialog);
+            SwingUtilsKt.display(dialog);
         }
 
     }

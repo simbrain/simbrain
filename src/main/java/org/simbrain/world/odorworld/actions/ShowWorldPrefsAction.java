@@ -19,7 +19,7 @@
 package org.simbrain.world.odorworld.actions;
 
 import org.simbrain.util.ResourceManager;
-import org.simbrain.util.SwingKt;
+import org.simbrain.util.SwingUtilsKt;
 import org.simbrain.world.odorworld.OdorWorldPanel;
 
 import javax.swing.*;
@@ -55,7 +55,7 @@ public final class ShowWorldPrefsAction extends AbstractAction {
 
     @Override
     public void actionPerformed(final ActionEvent event) {
-        var dialog = SwingKt.createDialog(component.getWorld());
-        SwingKt.display(dialog);
+        var dialog = SwingUtilsKt.createEditorDialog(component.getWorld());
+        SwingUtilsKt.display(dialog);
     }
 }

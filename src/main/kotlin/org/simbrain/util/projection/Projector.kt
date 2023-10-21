@@ -4,7 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import org.simbrain.util.UserParameter
-import org.simbrain.util.createDialog
+import org.simbrain.util.createEditorDialog
 import org.simbrain.util.display
 import org.simbrain.util.propertyeditor.EditableObject
 import java.awt.Color
@@ -112,7 +112,7 @@ fun main() {
     println(projector.dataset)
     projector.init()
     println(projector.dataset)
-    projector.createDialog {
+    projector.createEditorDialog {
 
     }.display()
 }

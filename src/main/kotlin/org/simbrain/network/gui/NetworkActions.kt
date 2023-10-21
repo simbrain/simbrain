@@ -151,7 +151,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         description = " These are properties that are different for each network in the Simbrain workspace.",
         iconPath = "menu_icons/Properties.png"
     ) {
-        network.createDialog().display()
+        network.createEditorDialog().display()
     }
 
     val iterateNetworkAction = networkPanel.createAction(
@@ -333,7 +333,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Decay selected weights based on axon length",
         enablingCondition = EnablingCondition.SYNAPSES
     ) {
-        DecayFunction.DecayFunctionSelector().createDialog {
+        DecayFunction.DecayFunctionSelector().createEditorDialog {
             selectionManager.filterSelectedModels<Synapse>()
                 .decayStrengthBasedOnLength(it.decayFunction)
         }.display()
@@ -384,7 +384,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         enablingCondition = EnablingCondition.NEURONS
     ) {
         // TODO: Indicate the threshold somehow in a prompt
-        objectWrapper<ProbabilityDistribution>("Randomize polarity", UniformRealDistribution()).createDialog { dist ->
+        objectWrapper<ProbabilityDistribution>("Randomize polarity", UniformRealDistribution()).createEditorDialog { dist ->
             selectionManager.filterSelectedModels<Neuron>().forEach { n ->
                 if (dist.editingObject.sampleDouble() > .5) n.polarity = SimbrainConstants.Polarity.EXCITATORY
                 else n.polarity = SimbrainConstants.Polarity.INHIBITORY

@@ -10,6 +10,7 @@ import org.simbrain.util.point
 import org.simbrain.util.projection.DataPoint
 import org.simbrain.util.projection.HaloColoringManager
 import org.simbrain.util.projection.PCAProjection
+import org.simbrain.world.textworld.EmbeddingType
 import org.simbrain.world.textworld.TokenEmbeddingBuilder
 import java.io.File
 
@@ -26,15 +27,16 @@ import java.io.File
  */
 val nlpSimBasic = newSim {
 
-
     workspace.clearWorkspace()
 
     // Text World
     val twc = addTextWorld("Text World")
     val textWorld = twc.world
     val text = File("simulations" + FS + "texts" + FS + "corpus_artificial_similarity.txt").readText()
-    TokenEmbeddingBuilder().build(text)
     textWorld.text = text
+    textWorld.tokenEmbedding = TokenEmbeddingBuilder().apply {
+        embeddingType = EmbeddingType.COC
+    }.build(text)
 
     withGui {
         place(twc) {
@@ -43,7 +45,6 @@ val nlpSimBasic = newSim {
             height = 500
         }
     }
-
 
     // Location of the projection in the desktop
     val projectionPlot = addProjectionPlot2("Activations")

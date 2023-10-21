@@ -8,6 +8,7 @@ import org.simbrain.util.table.BasicDataFrame
 import org.simbrain.util.table.SimbrainTablePanel
 import org.simbrain.util.table.createFromDoubleArray
 import smile.math.matrix.Matrix
+
 /**
  * Associates string tokens with vector representations.
  *
@@ -25,7 +26,7 @@ class TokenEmbedding(
     /**
      * Assume indices of the token list correspond to rows of the cocMatrix
      */
-    var tokensMap: Map<String, Int> = tokens.mapIndexed{i, t -> t to i}.toMap()
+    var tokensMap: Map<String, Int> = tokens.mapIndexed{i, t -> t.lowercase() to i}.toMap()
 
     /**
      * Number of entries in the embedding, i.e. number of words that have associated embeddings.
@@ -59,8 +60,8 @@ class TokenEmbedding(
     /**
      * Return the vector associated with given string or a 0 vector if none found
      */
-    fun get(token: String, lowerCase: Boolean = true): DoubleArray {
-        val searchToken = if (lowerCase) token.lowercase() else token
+    fun get(token: String): DoubleArray {
+        val searchToken = token.lowercase()
         val tokenIndex = tokensMap[searchToken]
         if (tokenIndex != null) {
             return tokenVectorMatrix.row(tokenIndex)
@@ -95,8 +96,8 @@ class TokenEmbedding(
 }
 
 enum class EmbeddingType {ONE_HOT, COC, CUSTOM}
-class TokenEmbeddingBuilder(): EditableObject {
 
+class TokenEmbeddingBuilder(): EditableObject {
 
     @UserParameter(label = "Embedding type", description = "Method for converting text to vectors", order = 1 )
     var embeddingType = EmbeddingType.COC
@@ -113,6 +114,9 @@ class TokenEmbeddingBuilder(): EditableObject {
     @UserParameter(label = "Use cosine sim", order = 50 )
     var useCosine = true
 
+    @UserParameter(label = "Remove stopwords", order = 60 )
+    var removeStopWords = false
+
     /**
      * Extract a token embedding from the provided string.
      */
@@ -122,7 +126,7 @@ class TokenEmbeddingBuilder(): EditableObject {
             TokenEmbedding(tokens, Matrix.eye(tokens.size), EmbeddingType.ONE_HOT)
         }
         EmbeddingType.COC -> {
-            generateCooccurrenceMatrix(docString, windowSize, bidirectional, usePPMI)
+            generateCooccurrenceMatrix(docString, windowSize, bidirectional, usePPMI, removeStopWords)
         }
         else -> {
             throw IllegalStateException("Custom embeddings must be manually loaded")

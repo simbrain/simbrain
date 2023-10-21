@@ -138,7 +138,9 @@ fun manualPPMI(cocMatrix: Matrix, positive: Boolean = true): Matrix {
  * @param windowSize specifies how many words should be included in a context.
  * @param bidirectional  if true, window includes this many tokens before AND after; if false the window only includes
  * previous tokens.
- * @return a symmetrical co-occurrence matrix with as many rows and columns as there are unique tokens in [docString].
+ * @param removeStopwords if true remove stopwords. They are removed only from rows, so that the matrix is no longer
+ * square.
+ * @return a co-occurrence matrix with as many rows as there are unique tokens in [docString].
  *
  */
 fun generateCooccurrenceMatrix(
@@ -146,7 +148,7 @@ fun generateCooccurrenceMatrix(
     windowSize: Int = 2,
     bidirectional: Boolean = false,
     usePPMI: Boolean = true,
-    removeStopwords: Boolean = true
+    removeStopwords: Boolean = false
 ): TokenEmbedding {
     // println(docString)
     val convertedDocString = docString.removeSpecialCharacters()
@@ -155,15 +157,17 @@ fun generateCooccurrenceMatrix(
 
     // get tokens from whole document
     val tokenizedSentence = convertedDocString.tokenizeWordsFromSentence()
-    val tokens = tokenizedSentence.uniqueTokensFromArray()
-    val targets = removeStopWords(tokens)
+    var tokens = tokenizedSentence.uniqueTokensFromArray()
+    if (removeStopwords) {
+        tokens = removeStopWords(tokens)
+    }
 
     // Split document into sentences
     val sentences = convertedDocString.tokenizeSentencesFromDoc()
 
     // Set up matrix
     val matrixSize = tokens.size
-    var cooccurrenceSmileMatrix = Matrix(matrixSize, matrixSize)
+    var cocMatrix = Matrix(matrixSize, matrixSize)
 
     // cooccurrenceMatrix[0][1] = 2 // cooccurrenceMatrix[target][context]
 
@@ -186,27 +190,22 @@ fun generateCooccurrenceMatrix(
                     val contextCoordinate = tokens.indexOf(currentContext)
                     // print(listOf("Current Token:", currentToken, tokenCoordinate))
                     // println(listOf("Current Context",currentContext, contextCoordinate))
-                    cooccurrenceSmileMatrix[tokenCoordinate, contextCoordinate] =
-                        cooccurrenceSmileMatrix[tokenCoordinate, contextCoordinate] + 1
+                    cocMatrix[tokenCoordinate, contextCoordinate] =
+                        cocMatrix[tokenCoordinate, contextCoordinate] + 1
                 }
             }
-
-
-        }
-    }
-
-    if (removeStopwords){
-        if (usePPMI) {
-            return removeStopWordsFromMatrix(manualPPMI(cooccurrenceSmileMatrix, true).replaceNaN(0.0), tokens)
-        } else {
-            return removeStopWordsFromMatrix(cooccurrenceSmileMatrix.replaceNaN(0.0), tokens)
         }
     }
 
     if (usePPMI) {
-        return TokenEmbedding(tokens, manualPPMI(cooccurrenceSmileMatrix, true).replaceNaN(0.0))
+        cocMatrix = manualPPMI(cocMatrix, true)
     }
-    return TokenEmbedding(tokens, cooccurrenceSmileMatrix.replaceNaN(0.0), EmbeddingType.COC)
+
+    // if (removeStopwords){
+    //     cocMatrix = removeStopWordsFromMatrix(cocMatrix, tokens)
+    // }
+
+    return TokenEmbedding(tokens, cocMatrix.replaceNaN(0.0), EmbeddingType.COC)
 }
 
 /**

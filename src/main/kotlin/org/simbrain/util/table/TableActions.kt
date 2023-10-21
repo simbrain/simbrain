@@ -320,9 +320,19 @@ fun SimbrainJTable.createShowMatrixPlotAction() = createAction(
         }
         maximumSize = Dimension(150, preferredSize.height)
     })
+    toolbar.add(createAction(
+        name = "Show preferences...",
+        iconPath = "menu_icons/Prefs.png"
+    ) {
+        matrixPlotPanel.properties.createDialog{
+            matrixPlotPanel.repaint()
+        }.also {
+            it.title = "Text World Preferences"
+        }.display()
+    })
 
     panel.add(toolbar, BorderLayout.NORTH)
-    panel.add(matrixPlotPanel, BorderLayout.CENTER)
+    panel.add(JScrollPane(matrixPlotPanel).apply { border = null }, BorderLayout.CENTER)
 
     panel.displayInDialog()
 

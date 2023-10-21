@@ -146,3 +146,6 @@ fun linspace(start: Int, stop: Int, numPoints: Int) = Array(numPoints) { start +
 
 fun linspace(start: Double, stop: Double, numPoints: Int) = DoubleArray(numPoints) { start + it * ((stop - start) /
         (numPoints - 1)) }
+
+fun Array<DoubleArray>.flatten() = flattenArray(this)
+fun Array<FloatArray>.flatten() = flattenArray(this)

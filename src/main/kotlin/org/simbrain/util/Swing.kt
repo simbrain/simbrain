@@ -85,7 +85,7 @@ fun showDirectorySelectionDialog(): String? {
  * Place the panel in a [StandardDialog] and show the dialog.
  */
 @JvmOverloads
-fun <T : JPanel> T.displayInDialog(block: T.() -> Unit = {}): StandardDialog {
+fun <T : JComponent> T.displayInDialog(block: T.() -> Unit = {}): StandardDialog {
     val dialog = StandardDialog()
     dialog.contentPane = this
     dialog.makeVisible()

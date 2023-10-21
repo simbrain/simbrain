@@ -1,5 +1,6 @@
 package org.simbrain.util
 
+import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.stats.distributions.UniformIntegerDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 import java.awt.Color
@@ -11,6 +12,14 @@ import javax.swing.JPanel
 import kotlin.math.floor
 import kotlin.math.min
 import kotlin.math.pow
+
+fun Double.toSimbrainColor(range: ClosedFloatingPointRange<Double>, coolHue: Float = 2/3f, hotHue: Float = 0.0f) = clip(range).let {
+    if (it < 0) {
+        Color.HSBtoRGB(coolHue, SimbrainMath.rescale(-it, 0.0, -range.start, 0.0, 1.0).toFloat(), 1.0f)
+    } else {
+        Color.HSBtoRGB(hotHue, SimbrainMath.rescale(it, 0.0, range.endInclusive, 0.0, 1.0).toFloat(), 1.0f)
+    }
+}
 
 fun Float.toSimbrainColor() = clip(-1.0f..1.0f).let {
     if (it < 0) Color.HSBtoRGB(2/3f, -it, 1.0f) else Color.HSBtoRGB(0.0f, it, 1.0f)

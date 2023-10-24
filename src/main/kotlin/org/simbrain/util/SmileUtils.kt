@@ -163,3 +163,16 @@ fun Matrix.maxEigenvalue() = eigen().wr.max()
 fun Matrix.setSpectralRadius(spectralRadius: Double): Matrix {
     return mul(spectralRadius/maxEigenvalue())
 }
+
+fun Matrix.appendRow(row: DoubleArray): Matrix {
+    val newMatrix = Matrix(nrow() + 1, ncol())
+    for (i in 0 until nrow()) {
+        for (j in 0 until ncol()) {
+            newMatrix[i,j] = get(i,j)
+        }
+    }
+    for (j in 0 until ncol()) {
+        newMatrix[nrow(),j] = row[j]
+    }
+    return newMatrix
+}

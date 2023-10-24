@@ -30,7 +30,6 @@ import org.simbrain.network.gui.actions.edit.CopyAction
 import org.simbrain.network.gui.actions.edit.CutAction
 import org.simbrain.network.gui.actions.edit.PasteAction
 import org.simbrain.network.gui.createCouplingMenu
-import org.simbrain.network.gui.dialogs.createTestInputPanel
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.network.util.SpikingMatrixData
@@ -321,16 +320,12 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             networkPanel.applyImmediateLearning()
         }
         contextMenu.add(applyLearning)
-
         contextMenu.addSeparator()
 
-        val applyInputs: Action = networkPanel.createAction(
-            name = "Input Data...",
-        ) {
-            createTestInputPanel(neuronArray).displayInDialog()
-        }
+        val applyInputs: Action = networkPanel.networkActions.createTestInputPanelAction(neuronArray)
         contextMenu.add(applyInputs)
-
+        val addActivationToInput = networkPanel.networkActions.createAddActivationToInputAction(neuronArray)
+        contextMenu.add(addActivationToInput)
         contextMenu.addSeparator()
 
         // Randomize Action

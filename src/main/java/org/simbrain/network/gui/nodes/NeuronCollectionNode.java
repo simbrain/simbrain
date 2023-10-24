@@ -23,7 +23,6 @@ import org.simbrain.network.groups.AbstractNeuronCollection;
 import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.ResourceManager;
-import org.simbrain.util.SimpleFrame;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
 import org.simbrain.workspace.gui.SimbrainDesktop;
@@ -33,7 +32,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 
 import static org.simbrain.network.gui.NetworkPanelMenusKt.createCouplingMenu;
-import static org.simbrain.network.gui.dialogs.TestInputPanelKt.createTestInputPanel;
 
 /**
  * PNode representation of a {@link NeuronCollection}.
@@ -137,14 +135,10 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
 
         // Test Input Panel
         menu.addSeparator();
-        Action testInputs = new AbstractAction("Input Data...") {
-            @Override
-            public void actionPerformed(final ActionEvent event) {
-                JPanel inputDataPanel = createTestInputPanel(neuronCollection);
-                SimpleFrame.displayPanel(inputDataPanel);
-            }
-        };
+        Action testInputs = getNetworkPanel().getNetworkActions().createTestInputPanelAction(neuronCollection);
         menu.add(testInputs);
+        Action addActivationToInput = getNetworkPanel().getNetworkActions().createAddActivationToInputAction(neuronCollection);
+        menu.add(addActivationToInput);
 
         // Clamping actions
         menu.addSeparator();

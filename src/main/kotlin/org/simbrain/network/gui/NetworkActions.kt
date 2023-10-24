@@ -3,6 +3,7 @@ package org.simbrain.network.gui
 import kotlinx.coroutines.launch
 import org.simbrain.network.connections.*
 import org.simbrain.network.core.*
+import org.simbrain.network.groups.AbstractNeuronCollection
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction.EnablingCondition
 import org.simbrain.network.gui.actions.ShowLayoutDialogAction
 import org.simbrain.network.gui.actions.TestInputAction
@@ -415,5 +416,27 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             GridLayout().layoutNeurons(this)
         }.also { network.selectModels(it) }
         network.events.zoomToFitPage.fire()
+    }
+
+    fun createTestInputPanelAction(layer: Layer) = networkPanel.createAction(
+        name = "Input Data...",
+        description = "Opens a dialog that can be used to send inputs to this layer",
+        iconPath = "menu_icons/TestInput.png"
+    ) {
+        createTestInputPanel(layer).displayInDialog()
+    }
+
+    fun createAddActivationToInputAction(layer: Layer) = networkPanel.createAction(
+        name = "Add current pattern to input data...",
+        description = "Add the current activation of this layer to the input data table",
+        iconPath = "menu_icons/TestInput.png"
+    ) {
+        layer.inputData = layer.inputData.appendRow(
+            when (layer) {
+                is NeuronArray -> layer.activations.toDoubleArray()
+                is AbstractNeuronCollection -> layer.activations
+                else -> throw IllegalArgumentException("Cannot add activation to input for layer of type ${layer::class.simpleName}")
+            }
+        )
     }
 }

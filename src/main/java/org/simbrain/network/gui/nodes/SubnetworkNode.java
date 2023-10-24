@@ -221,10 +221,6 @@ public class SubnetworkNode extends ScreenElement {
 
         ret.add(renameAction);
         ret.add(removeAction);
-        // if (subnetwork instanceof Trainable) {
-        //     ret.addSeparator();
-        //     ret.add(testInputAction);
-        // }
         return ret;
     }
 
@@ -264,43 +260,6 @@ public class SubnetworkNode extends ScreenElement {
         @Override
         public void actionPerformed(ActionEvent arg0) {
             subnetwork.delete();
-        }
-    };
-
-    // TODO
-    // /**
-    //  * Action for adding the current pattern in the network to the training data
-    //  */
-    // protected Action addInputRowAction = new AbstractAction() {
-    //
-    //     {
-    //         putValue(NAME, "Add current pattern to input data...");
-    //         putValue(SHORT_DESCRIPTION, "Add current pattern to input data...");
-    //     }
-    //
-    //     @Override
-    //     public void actionPerformed(ActionEvent arg0) {
-    //         subnetwork.addRowToTrainingSet();
-    //     }
-    // };
-
-    /**
-     * Action for testing inputs to trainable networks.
-     */
-    private Action testInputAction = new AbstractAction() {
-
-        {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/TestInput.png"));
-            putValue(NAME, "Test network...");
-            putValue(SHORT_DESCRIPTION, "Test network...");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent arg0) {
-            // if (subnetwork instanceof Trainable) {
-            //     TestInputPanel testInputPanel = TestInputPanel.createTestInputPanel(getNetworkPanel(), ((Trainable) subnetwork).getInputNeurons(), ((Trainable) subnetwork).getTrainingSet().getInputDataMatrix());
-            //     getNetworkPanel().displayPanel(testInputPanel, "Test inputs");
-            // }
         }
     };
 

@@ -20,6 +20,10 @@ class TokenEmbedding(
      * Matrix whose rows correspond to vector representations of corresponding tokens.
      */
     var tokenVectorMatrix: Matrix,
+    /**
+     * This is (currently) only used for generating a data frame for viewing the embedding (e.g. how row and column
+     * headings are displayed).
+     */
     val embeddingType: EmbeddingType = EmbeddingType.CUSTOM
 ) {
 
@@ -111,9 +115,6 @@ class TokenEmbeddingBuilder(): EditableObject {
     @UserParameter(label = "Use PPMI", order = 40 )
     var usePPMI = true
 
-    @UserParameter(label = "Use cosine sim", order = 50 )
-    var useCosine = true
-
     @UserParameter(label = "Remove stopwords", order = 60 )
     var removeStopWords = false
 
@@ -122,7 +123,7 @@ class TokenEmbeddingBuilder(): EditableObject {
      */
     fun build(docString: String) = when (embeddingType) {
         EmbeddingType.ONE_HOT -> {
-            val tokens = docString.tokenizeWordsFromSentence().uniqueTokensFromArray()
+            val tokens = docString.tokenizeWordsFromString().uniqueTokensFromArray()
             TokenEmbedding(tokens, Matrix.eye(tokens.size), EmbeddingType.ONE_HOT)
         }
         EmbeddingType.COC -> {

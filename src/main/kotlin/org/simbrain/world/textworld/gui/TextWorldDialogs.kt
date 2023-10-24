@@ -8,7 +8,6 @@ import javax.swing.JComboBox
 import javax.swing.JLabel
 import javax.swing.JPanel
 
-// TODO: Enum for distance types
 fun TextWorld.showComparisonDialog(): StandardDialog {
     return StandardDialog().apply {
 

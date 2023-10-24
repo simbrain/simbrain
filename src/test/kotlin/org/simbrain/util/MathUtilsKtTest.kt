@@ -49,5 +49,15 @@ class MathUtilsKtTest {
         val array = doubleArrayOf(1.0,2.0)
         assertEquals(5.0,array.summedSquares())
     }
+
+    @Test
+    fun `test outer product`() {
+        val vectorU = doubleArrayOf(1.0, 2.0, 3.0)
+        val vectorV = doubleArrayOf(4.0, 5.0, 6.0, 7.0)
+        val outerProductUV = vectorU.outerProduct(vectorV)
+        assertEquals(outerProductUV[2,0], outerProductUV[1,2]) //row, col
+        assertEquals(3, outerProductUV.nrow())
+        assertEquals(4, outerProductUV.ncol())
+    }
 }
 

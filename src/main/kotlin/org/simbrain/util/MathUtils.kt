@@ -231,3 +231,6 @@ fun computeCosineSimilarityMatrix(data: Array<DoubleArray>) = createMatrix(data.
 fun computeDotProductMatrix(data: Array<DoubleArray>) = createMatrix(data.size, data.size) { i, j ->
     data[i] dot data[j]
 }
+
+fun DoubleArray.outerProduct(other: DoubleArray) = toMatrix().mt(other.toMatrix())
+

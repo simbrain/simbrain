@@ -36,7 +36,7 @@ class TextUtilsTest {
     @Test
     fun `correct number of words parsed from sentence`() {
         val sample = "This, is text!"
-        assertEquals(3, sample.tokenizeWordsFromSentence().size)
+        assertEquals(3, sample.tokenizeWordsFromString().size)
     }
 
     @Test
@@ -57,18 +57,10 @@ class TextUtilsTest {
     @Test
     fun `get unique tokens from sentences`() {
         val sentence = "a A a b. B c b d c c"
-        val tokenizedSentence = sentence.tokenizeWordsFromSentence()
+        val tokenizedSentence = sentence.tokenizeWordsFromString()
         val uniqueTokens = tokenizedSentence.uniqueTokensFromArray()
         // println(uniqueTokens)
         assertEquals(listOf("a","b","c","d"), uniqueTokens)
-    }
-
-    @Test
-    fun `outer-product computed correctly`() {
-        val vectorU = doubleArrayOf(1.0, 2.0, 3.0)
-        val vectorV = doubleArrayOf(4.0, 5.0, 6.0, 7.0)
-        val outerProductUV = outerProduct(vectorU, vectorV)
-        assertEquals(outerProductUV[2,0], outerProductUV[1,2]) //row, col
     }
 
     @Test
@@ -86,13 +78,13 @@ class TextUtilsTest {
 
     @Test
     fun `Remove stopwords`() {
-        val tokens = simpleText.tokenizeWordsFromSentence().uniqueTokensFromArray()
+        val tokens = simpleText.tokenizeWordsFromString().uniqueTokensFromArray()
         assertEquals(listOf<String>("simple","sentence","hard"), removeStopWords(tokens))
     }
 
     @Test
     fun `co-occurrence matrix is correct size`() {
-        val tokens = simpleText.tokenizeWordsFromSentence().uniqueTokensFromArray()
+        val tokens = simpleText.tokenizeWordsFromString().uniqueTokensFromArray()
         val cooccurrenceMatrix = generateCooccurrenceMatrix(simpleText, 2, true, removeStopwords = false)
         assertEquals(tokens.size, cooccurrenceMatrix.tokenVectorMatrix.nrow())
         assertEquals(tokens.size, cooccurrenceMatrix.tokenVectorMatrix.ncol())
@@ -100,7 +92,7 @@ class TextUtilsTest {
 
     @Test
     fun `word embedding have correct size`() {
-        val tokenizedSentence = harderText.tokenizeWordsFromSentence()
+        val tokenizedSentence = harderText.tokenizeWordsFromString()
         val tokens = tokenizedSentence.uniqueTokensFromArray()
         val cooccurrenceMatrix = generateCooccurrenceMatrix(harderText, 2, true)
         assertEquals(tokens.size, cooccurrenceMatrix.get("obstacles").size)
@@ -123,7 +115,7 @@ class TextUtilsTest {
 
     @Test
     fun `computes cosine similarity between two vectors`() {
-        val tokenizedSentence = similarText.tokenizeWordsFromSentence()
+        val tokenizedSentence = similarText.tokenizeWordsFromString()
         val tokens = tokenizedSentence.uniqueTokensFromArray()
         val cooccurrenceMatrix = generateCooccurrenceMatrix(similarText, 2, true)
         val vectorA = cooccurrenceMatrix.get("cat")
@@ -150,17 +142,6 @@ class TextUtilsTest {
         val coc = generateCooccurrenceMatrix("This is Balthazar not Mordrax", 2, true)
         val filteredTokens = removeStopWords(coc.tokens)
         assertEquals(2, filteredTokens.size)
-    }
-
-    @Test
-    fun `removeStopWordsFromMatrix appropriately filters a rows but not columns`() {
-        val docString = "This is Balthazar not Mordrax"
-        val cocTokensNoStopWords = generateCooccurrenceMatrix(docString, removeStopwords = true)
-        // This should be 2x5
-        //  5 columns for 5 tokens
-        //  2 rows for the 2 words that are not stopwords
-        assertEquals(5, cocTokensNoStopWords.tokenVectorMatrix.ncol())
-        assertEquals(2, cocTokensNoStopWords.tokenVectorMatrix.nrow())
     }
 
 }

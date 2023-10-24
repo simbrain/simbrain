@@ -9,6 +9,10 @@ import java.util.*
 import javax.swing.JScrollPane
 import javax.swing.JTextArea
 
+val stopWords = ResourceManager
+    .readFileContents("textworld" + FS + "stopwords.txt")
+    .split("\n").toSet()
+
 /**
  * Sentence tokenizer: parse document into sentences and return as a list of sentences.
  *
@@ -33,9 +37,9 @@ fun String.removePunctuation(): String {
 }
 
 /**
- * Word tokenizer: parse sentence into words.
+ * Word tokenizer: parse string into words.
  */
-fun String.tokenizeWordsFromSentence(): List<String> {
+fun String.tokenizeWordsFromString(): List<String> {
     return this.lowercase().removePunctuation().split(" ")
 }
 
@@ -54,43 +58,7 @@ fun List<String>.uniqueTokensFromArray(): List<String> {
  * Stopwords obtained from https://gist.github.com/larsyencken/1440509#file-stopwords-txt
  */
 fun removeStopWords(words: List<String>) : List<String> {
-    val stopWords = ResourceManager
-        .readFileContents("textworld" + FS + "stopwords.txt")
-        .split("\n").toSet()
-    val uniqueTargets = words.distinctBy { it.lowercase() }
-    val filteredTargets = mutableListOf<String>()
-    for (target in uniqueTargets) {
-        if (!stopWords.contains(target)) filteredTargets += listOf(target)
-    }
-    return filteredTargets
-}
-
-/**
- * Removes stopwords from provided list of tokens, and then filters the rows by the resulting "meaningful" word list
- *
- * The resulting matrix has the same number of columns it started with, but only as many rows as there are after
- * filtering out stopwords.
- */
-fun removeStopWordsFromMatrix(cocMatrix: Matrix, tokens: List<String>) : TokenEmbedding {
-    val targets = removeStopWords(tokens)
-    var approvedIndices = intArrayOf()
-    for (token in tokens){
-        if (targets.contains(token)) approvedIndices += intArrayOf(tokens.indexOf(token))
-    }
-
-    return TokenEmbedding(targets, cocMatrix.rows(*approvedIndices))
-}
-
-
-// After writing, found out that SimBrain already has an outerProduct function.
-fun outerProduct(vectorU: DoubleArray, vectorV: DoubleArray): Matrix {
-    // u (*) v = [u1 ... ui].vertical * [v1 ... vj].horizontal
-    val rows = vectorU.size
-    val cols = vectorV.size
-    val outerProductMatrix = Matrix(rows, cols)
-    for (indexU in vectorU.indices) for (indexV in vectorV.indices) outerProductMatrix[indexU, indexV] =
-        vectorU[indexU] * vectorV[indexV]
-    return outerProductMatrix
+    return words.distinctBy { it.lowercase() }.filter { !stopWords.contains(it) }
 }
 
 /**
@@ -113,7 +81,7 @@ fun manualPPMI(cocMatrix: Matrix, positive: Boolean = true): Matrix {
     val totalSum = columnTotals.sum()
     val rowTotals = cocMatrix.rowSums()
 
-    val expectedValues = outerProduct(rowTotals, columnTotals) / totalSum
+    val expectedValues = rowTotals.outerProduct(columnTotals) / totalSum
     val adjustedMatrix = cocMatrix.clone().div(expectedValues)
 
     if (positive) {
@@ -150,17 +118,23 @@ fun generateCooccurrenceMatrix(
     usePPMI: Boolean = true,
     removeStopwords: Boolean = false
 ): TokenEmbedding {
-    // println(docString)
-    val convertedDocString = docString.removeSpecialCharacters()
 
     if (windowSize == 0) throw IllegalArgumentException("windowsize must be greater than 0")
 
-    // get tokens from whole document
-    val tokenizedSentence = convertedDocString.tokenizeWordsFromSentence()
-    var tokens = tokenizedSentence.uniqueTokensFromArray()
-    if (removeStopwords) {
-        tokens = removeStopWords(tokens)
-    }
+    val convertedDocString = docString.removeSpecialCharacters()
+
+    // Get tokens from whole document
+    val tokenizedString = convertedDocString
+        .tokenizeWordsFromString()
+        .filter {
+            if (removeStopwords) {
+                !stopWords.contains(it)
+            } else {
+                true
+            }
+        }
+
+    val tokens = tokenizedString.uniqueTokensFromArray()
 
     // Split document into sentences
     val sentences = convertedDocString.tokenizeSentencesFromDoc()
@@ -169,12 +143,17 @@ fun generateCooccurrenceMatrix(
     val matrixSize = tokens.size
     var cocMatrix = Matrix(matrixSize, matrixSize)
 
-    // cooccurrenceMatrix[0][1] = 2 // cooccurrenceMatrix[target][context]
-
     // Loop through sentences, through words
     for (sentence in sentences) {
-        // println(sentence)
-        val tokenizedSentence = sentence.tokenizeWordsFromSentence()
+        // TODO: Address redundancy
+        val tokenizedSentence = sentence.tokenizeWordsFromString()
+            .filter {
+                if (removeStopwords) {
+                    !stopWords.contains(it)
+                } else {
+                    true
+                }
+            }
         for (sentenceIndex in tokenizedSentence.indices) {
             val maxIndex = tokenizedSentence.size - 1  // used for window range check
 
@@ -200,10 +179,6 @@ fun generateCooccurrenceMatrix(
     if (usePPMI) {
         cocMatrix = manualPPMI(cocMatrix, true)
     }
-
-    // if (removeStopwords){
-    //     cocMatrix = removeStopWordsFromMatrix(cocMatrix, tokens)
-    // }
 
     return TokenEmbedding(tokens, cocMatrix.replaceNaN(0.0), EmbeddingType.COC)
 }

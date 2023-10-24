@@ -1,4 +1,3 @@
-
 /*
  * Part of Simbrain--a java-based neural network kit Copyright (C) 2005,2007 The
  * Authors. See http://www.simbrain.net/credits This program is free software;
@@ -28,8 +27,8 @@ import smile.math.matrix.Matrix
 import java.util.*
 
 // TODO: Need a way to generalize across NeuronArrays and NeuronCollections
-val WeightMatrix.src get()= source as NeuronArray
-val WeightMatrix.tar get()= target as NeuronArray
+val WeightMatrix.src get() = source as NeuronArray
+val WeightMatrix.tar get() = target as NeuronArray
 
 /**
  * Return the difference between the provided vector and the current activations in this layer.
@@ -90,7 +89,7 @@ fun WeightMatrix.backpropError(layerError: Matrix, epsilon: Double = .1): Matrix
  */
 fun NeuronArray.updateBiases(error: Matrix, epsilon: Double = .1) {
     activations.validateSameShape(error)
-    dataHolder.let{
+    dataHolder.let {
         if (it is BiasedMatrixData) {
             val biasDelta = error.clone().mul(epsilon)
             it.biases += biasDelta
@@ -108,7 +107,7 @@ fun List<WeightMatrix>.printActivationsAndWeights(showWeights: Boolean = false) 
         wm.target.updateInputs()
         wm.target.update()
         println(wm)
-        if(showWeights) {
+        if (showWeights) {
             println(wm.weightMatrix)
         }
         println(wm.target)
@@ -132,7 +131,7 @@ fun List<WeightMatrix>.forwardPass(inputVector: Matrix) {
  * Apply backprop algorithm to this list of matrices, for the provided input/target pair. Assumes weight matrices are
  * stored in a sequence from input to output layers
  */
-fun List<WeightMatrix>.backpropError(targetValues: Matrix, epsilon: Double = .1): Double  {
+fun List<WeightMatrix>.backpropError(targetValues: Matrix, epsilon: Double = .1): Double {
 
     targetValues.validateSameShape(last().tar.outputs)
 
@@ -169,12 +168,13 @@ fun WeightMatrixTree.forwardPass(inputVectors: List<Matrix>) {
  *
  * Weight matrices are updated one “weight layer” at a time. See [WeightMatrixTree] for more information.
  */
-fun WeightMatrixTree.backpropError(targetValues: Matrix, epsilon: Double = .0001): Double  {
+fun WeightMatrixTree.backpropError(targetValues: Matrix, epsilon: Double = .0001): Double {
 
     targetValues.validateSameShape(outputWeightLayer.tar.outputs)
 
     val error = outputWeightLayer.tar.outputs sse targetValues
-    var errorVectors: Map<NeuronArray, Matrix> = mapOf(outputWeightLayer.tar to outputWeightLayer.tar.getError(targetValues))
+    var errorVectors: Map<NeuronArray, Matrix> =
+        mapOf(outputWeightLayer.tar to outputWeightLayer.tar.getError(targetValues))
     // TODO: Creating a map every iteration is a potential performance drain.
     tree.reversed().forEach { wms ->
         errorVectors = wms.associate { wm ->

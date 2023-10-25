@@ -22,10 +22,7 @@ import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.widgets.ShowHelpAction
 import org.simbrain.workspace.gui.DesktopComponent
 import org.simbrain.workspace.gui.SimbrainDesktop
-import org.simbrain.world.textworld.TextWorld
-import org.simbrain.world.textworld.TextWorldComponent
-import org.simbrain.world.textworld.loadText
-import org.simbrain.world.textworld.textWorldPrefs
+import org.simbrain.world.textworld.*
 import java.awt.Dimension
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
@@ -117,7 +114,7 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
         file.add(SimbrainDesktop.actionManager.createImportAction(this))
         file.add(SimbrainDesktop.actionManager.createExportAction(this))
         file.addSeparator()
-        file.add(world.loadText)
+        file.add(loadTextAction)
         file.addSeparator()
         file.add(SimbrainDesktop.actionManager.createRenameAction(this))
         file.addSeparator()

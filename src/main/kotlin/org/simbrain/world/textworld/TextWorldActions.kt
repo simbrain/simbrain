@@ -2,6 +2,7 @@ package org.simbrain.world.textworld
 
 import org.simbrain.util.*
 import org.simbrain.util.table.SimbrainTablePanel
+import org.simbrain.world.textworld.gui.TextWorldDesktopComponent
 import org.simbrain.world.textworld.gui.showComparisonDialog
 import java.util.*
 
@@ -48,7 +49,7 @@ val TextWorld.viewTokenEmbedding
 /**
  * Load text into text world.
  */
-val TextWorld.loadText
+val TextWorldDesktopComponent.loadTextAction
     get() = createAction(
         name = "Load text...",
         iconPath = "menu_icons/Import.png"
@@ -56,7 +57,7 @@ val TextWorld.loadText
         val chooser = SFileChooser(".", "Text import", "txt")
         val theFile = chooser.showOpenDialog()
         if (theFile != null) {
-            text = Utils.readFileContents(theFile)
+            workspaceComponent.world.text = Utils.readFileContents(theFile)
         }
     }
 

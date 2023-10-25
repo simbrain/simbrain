@@ -161,7 +161,7 @@ class TextWorldPanel private constructor(
                 // inputScrollPane.revalidate();
             }
         })
-        world.events.textChanged.on(Dispatchers.Swing, wait = true) {
+        world.events.textChanged.on(Dispatchers.Swing) {
             textArea.text = world.text
             if (world.position < textArea.document.length) {
                 textArea.caretPosition = world.position

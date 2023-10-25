@@ -29,7 +29,9 @@ import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.actions.edit.CopyAction
 import org.simbrain.network.gui.actions.edit.CutAction
 import org.simbrain.network.gui.actions.edit.PasteAction
+import org.simbrain.network.gui.alignMenu
 import org.simbrain.network.gui.createCouplingMenu
+import org.simbrain.network.gui.spaceMenu
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.network.util.SpikingMatrixData
@@ -384,6 +386,10 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             menuTitle = "Add coupled image world",
             postActionBlock = { neuronArray.gridMode = true }
         ))
+
+        contextMenu.addSeparator()
+        contextMenu.add(networkPanel.alignMenu)
+        contextMenu.add(networkPanel.spaceMenu)
 
         // Coupling menu
         contextMenu.addSeparator()

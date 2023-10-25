@@ -451,42 +451,50 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     }
 
     fun alignHorizontal() {
-        val neurons = selectionManager.filterSelectedModels<Neuron>()
-        val minY = neurons.map { it.y }.minOrNull() ?: Double.MAX_VALUE
-        neurons.forEach { it.y = minY }
+        val models = selectionManager.filterSelectedModels<LocatableModel>()
+
+        if (models.isEmpty()) return
+
+        val minY = models.minOf { it.locationY }
+        models.forEach { it.locationY = minY }
         repaint()
     }
 
     fun alignVertical() {
-        val neurons = selectionManager.filterSelectedModels<Neuron>()
-        val minX = neurons.map { it.x }.minOrNull() ?: Double.MAX_VALUE
-        neurons.forEach { it.x = minX }
+        val models = selectionManager.filterSelectedModels<LocatableModel>()
+
+        if (models.isEmpty()) return
+
+        val minX = models.minOf { it.locationX }
+        models.forEach { it.locationX = minX }
         repaint()
     }
 
     fun spaceHorizontal() {
-        val neurons = selectionManager.filterSelectedModels<Neuron>()
-        if (neurons.size > 1) {
-            val sortedNeurons = neurons.sortedBy { it.x }
-            val min = neurons.first().x
-            val max = neurons.last().x
-            val spacing = (max - min) / neurons.size - 1
+        val models = selectionManager.filterSelectedModels<LocatableModel>()
 
-            sortedNeurons.forEachIndexed { i, neuron -> neuron.x = min + spacing * i }
-        }
+        if (models.isEmpty()) return
+
+        val sortedModels = models.sortedBy { it.locationX }
+        val min = sortedModels.first().locationX
+        val max = sortedModels.last().locationX
+        val spacing = (max - min) / (models.size - 1)
+
+        sortedModels.forEachIndexed { i, model -> model.locationX = min + spacing * i }
         repaint()
     }
 
     fun spaceVertical() {
-        val neurons = selectionManager.filterSelectedModels<Neuron>()
-        if (neurons.size > 1) {
-            val sortedNeurons = neurons.sortedBy { it.y }
-            val min = neurons.first().y
-            val max = neurons.last().y
-            val spacing = (max - min) / neurons.size - 1
+        val models = selectionManager.filterSelectedModels<LocatableModel>()
 
-            sortedNeurons.forEachIndexed { i, neuron -> neuron.y = min + spacing * i }
-        }
+        if (models.isEmpty()) return
+
+        val sortedModels = models.sortedBy { it.locationY }
+        val min = sortedModels.first().locationY
+        val max = sortedModels.last().locationY
+        val spacing = (max - min) / (models.size - 1)
+
+        sortedModels.forEachIndexed { i, model -> model.locationY = min + spacing * i }
         repaint()
     }
 

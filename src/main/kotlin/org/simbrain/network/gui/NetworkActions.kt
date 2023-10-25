@@ -39,8 +39,22 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 
     // TODO: Convert these to inline actions as below.
     val addNeuronsAction = AddNeuronsAction(networkPanel)
-    val alignHorizontalAction = AlignHorizontalAction(networkPanel)
-    val alignVerticalAction = AlignVerticalAction(networkPanel)
+    val alignHorizontalAction = networkPanel.createConditionallyEnabledAction(
+        name = "Align Horizontal",
+        description = "Align selected nodes horizontally",
+        iconPath = "menu_icons/AlignHorizontal.png",
+        enablingCondition = EnablingCondition.ALLITEMS
+    ) {
+        alignHorizontal()
+    }
+    val alignVerticalAction = networkPanel.createConditionallyEnabledAction(
+        name = "Align Vertical",
+        description = "Align selected nodes vertically",
+        iconPath = "menu_icons/AlignVertical.png",
+        enablingCondition = EnablingCondition.ALLITEMS
+    ) {
+        alignVertical()
+    }
     val clearNodeActivationsAction = ClearSelectedObjects(networkPanel)
     val clearSourceNeurons = ClearSourceNeurons(networkPanel)
     val copyAction = CopyAction(networkPanel)
@@ -108,11 +122,26 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val showLayoutDialogAction = ShowLayoutDialogAction(networkPanel)
     val showPrioritiesAction = ShowPrioritiesAction(networkPanel)
     val showWeightMatrixAction = ShowWeightMatrixAction(networkPanel)
-    val spaceHorizontalAction = SpaceHorizontalAction(networkPanel)
-    val spaceVerticalAction = SpaceVerticalAction(networkPanel)
+
+    val spaceHorizontalAction = networkPanel.createConditionallyEnabledAction(
+        name = "Space Horizontal",
+        description = "Space selected nodes horizontally",
+        iconPath = "menu_icons/SpaceHorizontal.png",
+        enablingCondition = EnablingCondition.ALLITEMS
+    ) {
+        spaceHorizontal()
+    }
+
+    val spaceVerticalAction = networkPanel.createConditionallyEnabledAction(
+        name = "Space Vertical",
+        description = "Space selected nodes vertically",
+        iconPath = "menu_icons/SpaceVertical.png",
+        enablingCondition = EnablingCondition.ALLITEMS
+    ) {
+        spaceVertical()
+    }
     val testInputAction = TestInputAction(networkPanel)
     val wandEditModeAction = WandEditModeAction(networkPanel)
-    val zoomToFitPageAction = ZoomToFitPageAction(networkPanel)
 
     val showMainToolBarAction = ShowMainToolBarAction(networkPanel)
 

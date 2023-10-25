@@ -16,7 +16,7 @@ abstract class ConditionallyEnabledAction(
      * Possible conditions under which to enable the action:
      * - NEURONS: if at least one neuron is selected
      * - SYNAPSES: if at least one synapse is selected
-     * - ALLITEMS: if at least one synapse or neuron is selected
+     * - ALLITEMS: if at least one network model is selected
      * - SOURCE_NEURONS: if at least one neuron is designated as source neuron
      * - SOURCE_AND_TARGET_NEURONS: if at least one neuron is designated as
      * source and one neuron is designated as target.

@@ -41,6 +41,18 @@ abstract class LocatableModel() : NetworkModel() {
         location = Point2D.Double(x,y)
     }
 
+    var locationX: Double
+        get() = location.x
+        set(value) {
+            location = Point2D.Double(value, location.y)
+        }
+
+    var locationY: Double
+        get() = location.y
+        set(value) {
+            location = Point2D.Double(location.x, value)
+        }
+
 }
 
 /**

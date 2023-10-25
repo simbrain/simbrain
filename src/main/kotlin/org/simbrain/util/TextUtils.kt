@@ -11,7 +11,7 @@ import javax.swing.JTextArea
 
 val stopWords = ResourceManager
     .readFileContents("textworld" + FS + "stopwords.txt")
-    .split("\n").toSet()
+    .split("\n").toSet().toList()
 
 /**
  * Sentence tokenizer: parse document into sentences and return as a list of sentences.
@@ -26,8 +26,13 @@ fun String.tokenizeSentencesFromDoc(): List<String> {
  * Trims extra whitespace and removes newlines, returns, and tabs.
  */
 fun String.removeSpecialCharacters(): String {
-    return this.trim().replace("[\n\r\t]".toRegex(), " ").replace("\\s+".toRegex(), " ")
+    return this.trim().normalizeSpacing()
 }
+
+/**
+ * Removes extra spaces and newlines
+ */
+fun String.normalizeSpacing(): String = replace("[\n\r\t]".toRegex(), " ").replace("\\s+".toRegex(), " ")
 
 /**
  * https://www.techiedelight.com/remove-punctuation-from-a-string-in-kotlin/
@@ -96,6 +101,15 @@ fun manualPPMI(cocMatrix: Matrix, positive: Boolean = true): Matrix {
     return adjustedMatrix
 }
 
+fun String.removeWords(wordsToRemove: List<String>): String {
+    var result = this
+    for (word in wordsToRemove) {
+        result = result.replace("\\b$word\\b".toRegex(), "") // using word boundaries to match whole words
+    }
+    return result.trim().normalizeSpacing()
+}
+
+
 /**
  * Generates co-occurrence matrix from a provided [docString].
  *
@@ -121,20 +135,13 @@ fun generateCooccurrenceMatrix(
 
     if (windowSize == 0) throw IllegalArgumentException("windowsize must be greater than 0")
 
-    val convertedDocString = docString.removeSpecialCharacters()
+    var convertedDocString = docString.lowercase().removeSpecialCharacters()
 
-    // Get tokens from whole document
-    val tokenizedString = convertedDocString
-        .tokenizeWordsFromString()
-        .filter {
-            if (removeStopwords) {
-                !stopWords.contains(it)
-            } else {
-                true
-            }
-        }
+    if(removeStopwords) {
+        convertedDocString = convertedDocString.removeWords(stopWords)
+    }
 
-    val tokens = tokenizedString.uniqueTokensFromArray()
+    val tokens = convertedDocString.tokenizeWordsFromString().uniqueTokensFromArray()
 
     // Split document into sentences
     val sentences = convertedDocString.tokenizeSentencesFromDoc()
@@ -145,15 +152,8 @@ fun generateCooccurrenceMatrix(
 
     // Loop through sentences, through words
     for (sentence in sentences) {
-        // TODO: Address redundancy
         val tokenizedSentence = sentence.tokenizeWordsFromString()
-            .filter {
-                if (removeStopwords) {
-                    !stopWords.contains(it)
-                } else {
-                    true
-                }
-            }
+
         for (sentenceIndex in tokenizedSentence.indices) {
             val maxIndex = tokenizedSentence.size - 1  // used for window range check
 

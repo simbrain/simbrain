@@ -112,7 +112,6 @@ class TextUtilsTest {
         assertTrue(smallWindowSimilarity < longWindowSimilarity)
     }
 
-
     @Test
     fun `computes cosine similarity between two vectors`() {
         val tokenizedSentence = similarText.tokenizeWordsFromString()
@@ -142,6 +141,13 @@ class TextUtilsTest {
         val coc = generateCooccurrenceMatrix("This is Balthazar not Mordrax", 2, true)
         val filteredTokens = removeStopWords(coc.tokens)
         assertEquals(2, filteredTokens.size)
+    }
+
+    @Test
+    fun `removeWords removes words from strings and words only`() {
+        val inputString = "worldblahtest world blah test"
+        val words = listOf("world", "test")
+        assertEquals("worldblahtest blah", inputString.removeWords(words))
     }
 
 }

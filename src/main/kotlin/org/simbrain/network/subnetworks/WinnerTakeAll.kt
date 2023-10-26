@@ -65,11 +65,7 @@ class WinnerTakeAll : NeuronGroup {
         label = "Random prob",
         initValue = .1,
         order = 80,
-        onUpdate = {
-            if (updateEventProperty == WinnerTakeAll::isUseRandom) {
-                enableWidget(widgetValue(WinnerTakeAll::isUseRandom))
-            }
-        }
+        conditionallyEnabledBy = WinnerTakeAll::isUseRandom,
     )
 
     /**

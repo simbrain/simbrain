@@ -39,13 +39,25 @@ class APETestObjectKotlin: EditableObject {
         order = 1
     )
 
-    var conditionallyEnabledInt by GuiEditable(
+    var conditionallyEnabledBooleanShort by GuiEditable(
+        initValue = true,
+        conditionallyEnabledBy = APETestObjectKotlin::testBoolean,
+        order = 1
+    )
+
+    var conditionallyVisibleInt by GuiEditable(
         initValue = 1,
         onUpdate = {
             if (updateEventProperty == APETestObjectKotlin::testBoolean) {
                 showWidget(widgetValue(APETestObjectKotlin::testBoolean))
             }
         },
+        order = 2
+    )
+
+    var conditionallyVisibleIntShort by GuiEditable(
+        initValue = 1,
+        conditionallyVisibleBy = APETestObjectKotlin::testBoolean,
         order = 2
     )
 

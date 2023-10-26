@@ -50,7 +50,9 @@ class GuiEditable<O : EditableObject, T>(
     val displayOnly: Boolean = false,
     val showDetails: Boolean = true,
     val tab: String? = null,
-    val onUpdate: UpdateFunctionContext<O, T>.() -> Unit = { }
+    val conditionallyEnabledBy: KMutableProperty1<O, Boolean>? = null,
+    val conditionallyVisibleBy: KMutableProperty1<O, Boolean>? = null,
+    private val onUpdate: (UpdateFunctionContext<O, T>).() -> Unit = { }
 ) {
 
     var value: T = initValue
@@ -112,6 +114,18 @@ class GuiEditable<O : EditableObject, T>(
         if (_label == null) {
             _label = property.name.convertCamelCaseToSpaces()
         }
+    }
+
+    fun update(context: UpdateFunctionContext<O, T>) {
+        with(context) {
+            if (updateEventProperty == conditionallyEnabledBy) {
+                enableWidget(widgetValue(conditionallyEnabledBy))
+            }
+            if (updateEventProperty == conditionallyVisibleBy) {
+                showWidget(widgetValue(conditionallyVisibleBy))
+            }
+        }
+        onUpdate(context)
     }
 
 }
@@ -247,7 +261,7 @@ class EnumWidget<O : EditableObject, T : Enum<*>>(
         }
 
     override fun refresh(property: KProperty<*>) {
-        parameter.onUpdate(UpdateFunctionContext(
+        parameter.update(UpdateFunctionContext(
             editor,
             parameter,
             property,
@@ -286,7 +300,7 @@ class BooleanWidget<O : EditableObject>(
         get() = widget.isSelected
 
     override fun refresh(property: KProperty<*>) {
-        parameter.onUpdate(UpdateFunctionContext(
+        parameter.update(UpdateFunctionContext(
             editor,
             parameter,
             property,
@@ -386,7 +400,7 @@ class NumericWidget<O : EditableObject, T>(
         get() = widget.value as T
 
     override fun refresh(property: KProperty<*>) {
-        parameter.onUpdate(UpdateFunctionContext(
+        parameter.update(UpdateFunctionContext(
             editor,
             parameter,
             property,
@@ -417,7 +431,7 @@ class DisplayOnlyWidget<O : EditableObject, T>(
         get() = parameter.value
 
     override fun refresh(property: KProperty<*>) {
-        parameter.onUpdate(UpdateFunctionContext(
+        parameter.update(UpdateFunctionContext(
             editor,
             parameter,
             property,
@@ -464,7 +478,7 @@ class StringWidget<O : EditableObject>(
         get() = widget.text
 
     override fun refresh(property: KProperty<*>) {
-        parameter.onUpdate(UpdateFunctionContext(
+        parameter.update(UpdateFunctionContext(
             editor,
             parameter,
             property,
@@ -496,7 +510,7 @@ class ColorWidget<O : EditableObject>(
         get() = widget.value
 
     override fun refresh(property: KProperty<*>) {
-        parameter.onUpdate(UpdateFunctionContext(
+        parameter.update(UpdateFunctionContext(
             editor,
             parameter,
             property,
@@ -538,7 +552,7 @@ class DoubleArrayWidget<O : EditableObject>(
         get() = model.get2DDoubleArray().first()
 
     override fun refresh(property: KProperty<*>) {
-        parameter.onUpdate(UpdateFunctionContext(
+        parameter.update(UpdateFunctionContext(
             editor,
             parameter,
             property,
@@ -579,7 +593,7 @@ class IntArrayWidget<O : EditableObject>(
         get() = model.get2DDoubleArray().first().toIntArray()
 
     override fun refresh(property: KProperty<*>) {
-        parameter.onUpdate(UpdateFunctionContext(
+        parameter.update(UpdateFunctionContext(
             editor,
             parameter,
             property,
@@ -620,7 +634,7 @@ class MatrixWidget<O : EditableObject>(
         get() = model.data
 
     override fun refresh(property: KProperty<*>) {
-        parameter.onUpdate(UpdateFunctionContext(
+        parameter.update(UpdateFunctionContext(
             editor,
             parameter,
             property,
@@ -737,7 +751,7 @@ class ObjectWidget<O : EditableObject, T : CopyableObject>(
     }
 
     override fun refresh(property: KProperty<*>) {
-        parameter.onUpdate(UpdateFunctionContext(
+        parameter.update(UpdateFunctionContext(
             editor,
             parameter,
             property,

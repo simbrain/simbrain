@@ -22,6 +22,7 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.NormalDistribution
 
@@ -59,13 +60,7 @@ class FixedDegree(
     )
     var useRadius: Boolean = false,
 
-    @UserParameter(
-        label = "Radius",
-        description = "Radius within which to make connections",
-        conditionalEnablingMethod = "usesRadius",
-        order = 30
-    )
-    var radius: Double = 200.0,
+    radius: Double = 200.0,
 
     @UserParameter(
         label = "Allow self connections",
@@ -75,6 +70,13 @@ class FixedDegree(
     var allowSelfConnections: Boolean = false
 
     ) : ConnectionStrategy(), EditableObject {
+
+    var radius by GuiEditable(
+        description = "Radius within which to make connections",
+        initValue = radius,
+        conditionallyEnabledBy = FixedDegree::useRadius,
+        order = 30
+    )
 
     override fun connectNeurons(
         network: Network,

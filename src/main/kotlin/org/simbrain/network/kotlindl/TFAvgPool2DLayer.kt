@@ -13,7 +13,7 @@ class TFAvgPool2DLayer : TFLayer<AvgPool2D>() {
         initValue = intArrayOf(3,3),
         order = 20,
         onUpdate = {
-            enableWidget(layer != null)
+            enableWidget(layer == null)
         },
     )
 
@@ -21,7 +21,7 @@ class TFAvgPool2DLayer : TFLayer<AvgPool2D>() {
         initValue = intArrayOf(1,1,1,1),
         order = 30,
         onUpdate = {
-            enableWidget(layer != null)
+            enableWidget(layer == null)
         },
     )
 
@@ -29,7 +29,7 @@ class TFAvgPool2DLayer : TFLayer<AvgPool2D>() {
         initValue = ConvPadding.SAME,
         order = 80,
         onUpdate = {
-            enableWidget(layer != null)
+            enableWidget(layer == null)
         },
     )
 

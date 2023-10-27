@@ -15,7 +15,7 @@ class TFFlattenLayer : TFLayer<Flatten>() {
         initValue = 5,
         order = 10,
         onUpdate = {
-            enableWidget(layer != null)
+            enableWidget(layer == null)
         },
     )
 
@@ -23,7 +23,7 @@ class TFFlattenLayer : TFLayer<Flatten>() {
         initValue = Activations.Relu,
         order = 50,
         onUpdate = {
-            enableWidget(layer != null)
+            enableWidget(layer == null)
         },
     )
 

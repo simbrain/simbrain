@@ -88,8 +88,8 @@ class LayerEditor(
     }
 
     override fun removeElement() {
-        // Don't allow input layer and one layer after that to be removed
-        if (components.size > 2) {
+        // Don't allow input layer to be removed
+        if (components.size > 1) {
             removeLast();
         }
     }
@@ -254,8 +254,8 @@ fun showDeepNetTrainingDialog(deepNet: DeepNet) {
 
 fun main() {
     // TODO: Move some of this to test classes
-//    testLayerList()
-     testTrainingDialog()
+    testLayerList()
+    // testTrainingDialog()
 }
 
 fun testTrainingDialog() {

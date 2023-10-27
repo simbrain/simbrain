@@ -23,7 +23,7 @@ class TFDenseLayer(val size: Int = 5) : TFLayer<Dense>() {
         initValue = Activations.Relu,
         order = 20,
         onUpdate = {
-            enableWidget(layer != null)
+            enableWidget(layer == null)
         },
     )
 
@@ -31,7 +31,7 @@ class TFDenseLayer(val size: Int = 5) : TFLayer<Dense>() {
         initValue = "",
         order = 30,
         onUpdate = {
-            enableWidget(layer != null)
+            enableWidget(layer == null)
         },
     )
 
@@ -39,7 +39,7 @@ class TFDenseLayer(val size: Int = 5) : TFLayer<Dense>() {
         initValue = "",
         order = 40,
         onUpdate = {
-            enableWidget(layer != null)
+            enableWidget(layer == null)
         },
     )
 

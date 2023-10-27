@@ -575,7 +575,8 @@ class IntArrayWidget<O : EditableObject>(
     isConsistent: Boolean
 ) : ParameterWidget<O, IntArray>(parameter, isConsistent) {
 
-    private var model = MatrixDataFrame(parameter.value.toDoubleArray().toMatrix(), columns = parameter.value.toDoubleArray().mapIndexed { index, _ -> Column("Column ${index + 1}", Column.DataType.IntType) }.toMutableList())
+    private var model = MatrixDataFrame(parameter.value.toDoubleArray().toMatrix(), columns = parameter.value
+        .toDoubleArray().mapIndexed { index, _ -> Column("Column ${index + 1}", Column.DataType.DoubleType) }.toMutableList())
 
     override val widget by lazy {
         JPanel().apply {
@@ -667,7 +668,7 @@ class ObjectWidget<O : EditableObject, T : CopyableObject>(
      * Finds first superclass with a getTypes method, and if one is found a dropdown is provided that allows the
      * object’s type to be edited. Otherwise, simply embed the object with its own APE.
      */
-    private val typeMap = (value::class.allSuperclasses.asSequence()
+    private val typeMap = (sequence { yield(value::class); yieldAll(value::class.allSuperclasses) }
         .mapNotNull {
             val fromJava =
                 (it.staticFunctions.firstOrNull { it.name == "getTypes" }?.call() as? List<Class<*>>)?.map { it.kotlin }

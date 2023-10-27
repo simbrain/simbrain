@@ -18,7 +18,7 @@ class TFConv2DLayer : TFLayer<Conv2D>() {
         initValue = 5,
         order = 10,
         onUpdate = {
-            enableWidget(layer != null)
+            enableWidget(layer == null)
         },
     )
 
@@ -26,7 +26,7 @@ class TFConv2DLayer : TFLayer<Conv2D>() {
         initValue = intArrayOf(3,3),
         order = 20,
         onUpdate = {
-            enableWidget(layer != null)
+            enableWidget(layer == null)
         },
     )
 
@@ -34,7 +34,7 @@ class TFConv2DLayer : TFLayer<Conv2D>() {
         initValue = intArrayOf(1,1,1,1),
         order = 30,
         onUpdate = {
-            enableWidget(layer != null)
+            enableWidget(layer == null)
         },
     )
 
@@ -42,7 +42,7 @@ class TFConv2DLayer : TFLayer<Conv2D>() {
         initValue = intArrayOf(1,1,1,1),
         order = 40,
         onUpdate = {
-            enableWidget(layer != null)
+            enableWidget(layer == null)
         },
     )
 
@@ -50,7 +50,7 @@ class TFConv2DLayer : TFLayer<Conv2D>() {
         initValue = Activations.Relu,
         order = 50,
         onUpdate = {
-            enableWidget(layer != null)
+            enableWidget(layer == null)
         },
     )
 
@@ -58,7 +58,7 @@ class TFConv2DLayer : TFLayer<Conv2D>() {
         initValue = ConvPadding.SAME,
         order = 80,
         onUpdate = {
-            enableWidget(layer != null)
+            enableWidget(layer == null)
         },
     )
 
@@ -66,7 +66,7 @@ class TFConv2DLayer : TFLayer<Conv2D>() {
         initValue = true,
         order = 90,
         onUpdate = {
-            enableWidget(layer != null)
+            enableWidget(layer == null)
         },
     )
 

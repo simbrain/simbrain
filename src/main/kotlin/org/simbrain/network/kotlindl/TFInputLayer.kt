@@ -12,7 +12,7 @@ class TFInputLayer(rows: Int = 10, cols: Int = 1, channels: Int = 1) : TFLayer<I
         initValue = rows,
         order = 20,
         onUpdate = {
-            enableWidget(layer != null)
+            enableWidget(layer == null)
         },
     )
 
@@ -20,7 +20,7 @@ class TFInputLayer(rows: Int = 10, cols: Int = 1, channels: Int = 1) : TFLayer<I
         initValue = cols,
         order = 30,
         onUpdate = {
-            enableWidget(layer != null)
+            enableWidget(layer == null)
         }
     )
 
@@ -28,7 +28,7 @@ class TFInputLayer(rows: Int = 10, cols: Int = 1, channels: Int = 1) : TFLayer<I
         initValue = channels,
         order = 40,
         onUpdate = {
-            enableWidget(layer != null)
+            enableWidget(layer == null)
         }
     )
 

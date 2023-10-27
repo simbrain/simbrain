@@ -34,7 +34,6 @@ class NeuronArray(parent: Network, inputSize: Int) : ArrayLayer(parent, inputSiz
             events.updated.fireAndForget()
         }
 
-
     /**
      * Holds data for prototype rule.
      */
@@ -42,7 +41,7 @@ class NeuronArray(parent: Network, inputSize: Int) : ArrayLayer(parent, inputSiz
         initValue = updateRule.createMatrixData(inputSize),
         order = 99,
         onUpdate = {
-            if (updateEventProperty == NeuronArray::updateRule) {
+            onChange(NeuronArray::updateRule) {
                 val proposedDataHolder = updateRule.createMatrixData(size())
                 if (widgetValue(NeuronArray::dataHolder)::class != proposedDataHolder::class) {
                     refreshValue(proposedDataHolder)

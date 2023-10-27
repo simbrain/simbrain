@@ -18,18 +18,15 @@
  */
 package org.simbrain.util
 
+import org.simbrain.util.propertyeditor.GuiEditable
+
 /**
  * Annotation for user-configurable parameter fields that provides for
  * specifying meta-data such as label, description, and validation criteria.
  * This information may be used by dialog builders to construct input fields.
- * <br></br>
- * The annotation can be used on fields or getter or setter named using java conventions.
- * <br></br>
- * When used in a method, it should be used on a getter, and the interface that
- * contains the getter should have an appropriately named corresponding setter.
- * E.g. `getLowerBound` will try to find a setter named
- * `setUpperBound` or `isClipped` will be associated with
- * `setClipped`.
+ *
+ * We have migrated to [GuiEditable] but java classes must use annotations and there are a few other cases where
+ * GuiEditable can't be used.
  *
  * @author O. J. Coleman
  */

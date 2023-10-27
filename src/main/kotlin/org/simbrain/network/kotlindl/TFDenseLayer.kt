@@ -3,14 +3,21 @@ package org.simbrain.network.kotlindl
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
 import org.simbrain.util.UserParameter
+import org.simbrain.util.propertyeditor.GuiEditable
 
 /**
  * Wrapper for tensor flow dense layer
  */
 class TFDenseLayer(val size: Int = 5) : TFLayer<Dense>() {
 
-    @UserParameter(label = "Number of outputs",  conditionalEnablingMethod = "creationMode", order = 10)
-    var nout = size
+    var nout by GuiEditable(
+        initValue = size,
+        label = "Number of outputs",
+        order = 10,
+        onUpdate = {
+            enableWidget(layer == null)
+        },
+    )
 
     @UserParameter(label = "Activation function",  conditionalEnablingMethod = "creationMode",  order = 20)
     var activations = Activations.Relu

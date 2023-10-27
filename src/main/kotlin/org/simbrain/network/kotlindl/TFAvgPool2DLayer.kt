@@ -3,6 +3,7 @@ package org.simbrain.network.kotlindl
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.AvgPool2D
 import org.simbrain.util.UserParameter
+import org.simbrain.util.propertyeditor.GuiEditable
 
 /**
  * Wrapper for kotlin dl Average pooling layer
@@ -10,7 +11,13 @@ import org.simbrain.util.UserParameter
 class TFAvgPool2DLayer : TFLayer<AvgPool2D>() {
 
     @UserParameter(label = "Pool size",  conditionalEnablingMethod = "creationMode", order = 20)
-    var poolSize = intArrayOf(3,3)
+    var poolSize by GuiEditable(
+        initValue = intArrayOf(3,3),
+        order = 20,
+        onUpdate = {
+            enableWidget(layer != null)
+        },
+    )
 
     @UserParameter(label = "Strides",  conditionalEnablingMethod = "creationMode", order = 30)
     var strides = intArrayOf(1,1,1,1)

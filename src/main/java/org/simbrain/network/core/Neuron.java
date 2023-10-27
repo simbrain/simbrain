@@ -64,6 +64,7 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
     /**
      * The update method of this neuron, which corresponds to what kind of
      * neuron it is.
+     * TODO: When moving to Kotlin implement conditional visibility
      */
     @UserParameter(label = "Update Rule",
             conditionalVisibilityMethod = "notInNeuronGroup", order = 100)

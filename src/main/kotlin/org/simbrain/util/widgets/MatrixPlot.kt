@@ -80,21 +80,13 @@ class MatrixPlotProperties: EditableObject {
     var minValue by GuiEditable(
         initValue = -1.0,
         max = 0.0,
-        onUpdate = {
-            if (updateEventProperty == MatrixPlotProperties::fixedColorScale) {
-                enableWidget(widgetValue(MatrixPlotProperties::fixedColorScale))
-            }
-        }
+        conditionallyEnabledBy = MatrixPlotProperties::fixedColorScale
     )
 
     var maxValue by GuiEditable(
         initValue = 1.0,
         min = 0.0,
-        onUpdate = {
-            if (updateEventProperty == MatrixPlotProperties::fixedColorScale) {
-                enableWidget(widgetValue(MatrixPlotProperties::fixedColorScale))
-            }
-        }
+        conditionallyEnabledBy = MatrixPlotProperties::fixedColorScale
     )
 }
 

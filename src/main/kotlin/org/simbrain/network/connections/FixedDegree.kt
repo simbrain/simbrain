@@ -102,13 +102,6 @@ class FixedDegree(
         return name
     }
 
-    /**
-     * Called by reflection via [UserParameter.conditionalEnablingMethod]
-     */
-    fun usesRadius(): (Map<String, Any?>) -> Boolean {
-        return {map -> map["Use radius"] as Boolean }
-    }
-
     override fun copy(): FixedDegree {
         return FixedDegree(degree, direction, useRadius, radius, allowSelfConnections).also {
             commonCopy(it)

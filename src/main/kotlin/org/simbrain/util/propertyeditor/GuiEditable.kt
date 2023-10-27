@@ -32,7 +32,10 @@ import kotlin.reflect.jvm.jvmErasure
 /**
  * A special kind of value that can be parsed by an [AnnotatedPropertyEditor].
  *
- * Example: activation by GuiEditable(1.0, ...). See [LinearRule]
+ * Examples which illustrates how this works can be found in [APETestObjectKotlin].
+ *
+ * The [onUpdate] function can be used to set the state of the parameter when the property editor changes state. When
+ * doing this, the values of other editor components can be queried using [UpdateFunctionContext.widgetValue].
  *
  * Can only be used in Kotlin. In java use the [UserParameter] annotation.
  *

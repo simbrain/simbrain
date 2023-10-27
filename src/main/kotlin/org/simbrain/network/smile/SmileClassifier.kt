@@ -5,6 +5,7 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.toDoubleArray
 import org.simbrain.workspace.Producible
 import smile.math.matrix.Matrix
@@ -37,7 +38,7 @@ class SmileClassifier(
      */
     val winningLabel: String?
         @Producible
-        get() = classifier.trainingData.labelTargetMap.getInverse(winner)?:""
+        get() = classifier.trainingData.labelTargetMap.getInverse(winner) ?: ""
 
     /**
      * Output matrix.
@@ -74,7 +75,7 @@ class SmileClassifier(
             if (classifier.model != null) {
                 outputs = try {
                     classifier.getOutputVector(winner)
-                } catch(e: IllegalArgumentException) {
+                } catch (e: IllegalArgumentException) {
                     System.err.println(e.message)
                     Matrix(outputSize(), 1)
                 }
@@ -103,21 +104,22 @@ class SmileClassifier(
         @UserParameter(label = "Number of inputs", order = 10)
         var nin = 4
 
-        @UserParameter(label = "Number of outputs (classes)",  description = "Ignored for some classifiers (e.g. SVM)" +
-                " that can only produce 2 outputs", conditionalEnablingMethod = "usesOutputs", order = 20)
-        var nout = 2
+        var nout by GuiEditable(
+            initValue = 2,
+            label = "Number of outputs (classes)",
+            description = "Ignored for some classifiers (e.g. SVM) that can only produce 2 outputs",
+            onUpdate = {
+                onChange(ClassifierCreator::classifierType) {
+                    enableWidget(widgetValue(ClassifierCreator::classifierType) !is SVMClassifier)
+                }
+            },
+            order = 20
+        )
 
         @UserParameter(label = "Classifier Type", showDetails = false, order = 40)
         var classifierType: ClassificationAlgorithm = SVMClassifier()
 
         override val name = "Classifier"
-
-        /**
-         * Called by reflection via [UserParameter.conditionalEnablingMethod]
-         */
-        fun usesOutputs(): (Map<String, Any?>) -> Boolean {
-            return {map -> map["Classifier Type"] !is SVMClassifier}
-        }
 
         fun create(net: Network): SmileClassifier {
             val classifier = classifierType::class.primaryConstructor?.let { constructor ->

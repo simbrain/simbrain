@@ -25,7 +25,6 @@ import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.GuiEditable
 import java.util.*
-import java.util.function.Function
 
 /**
  * **WinnerTakeAll**.The neuron with the highest weighted input in a
@@ -127,13 +126,6 @@ class WinnerTakeAll : NeuronGroup {
          * @return winning neuron
          */
         get() = getWinner(getNeuronList())
-
-    /**
-     * Called by reflection via [UserParameter.conditionalEnablingMethod]
-     */
-    fun useRandomWinner(): Function<Map<String?, Any?>, Boolean?> {
-        return Function { map: Map<String?, Any?> -> map["Random winner"] as Boolean? }
-    }
 
     companion object {
         /**

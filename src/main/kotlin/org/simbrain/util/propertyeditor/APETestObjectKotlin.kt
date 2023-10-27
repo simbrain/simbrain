@@ -29,71 +29,74 @@ class APETestObjectKotlin: EditableObject {
         initValue = "test",
         tab = "Test Tab",
     )
+
+    var controlBoolean by GuiEditable(
+        initValue = true,
+        description = "This controls the state of several other widgets in this panel",
+        order = 1
+    )
+
     var conditionallyEnabledBoolean by GuiEditable(
         initValue = true,
+        conditionallyEnabledBy = APETestObjectKotlin::controlBoolean,
+        order = 10
+    )
+
+    /**
+     * Use this "onChange" approach to perform custom actions when the specified property is updated
+     */
+    var conditionallyDisabledBoolean by GuiEditable(
+        initValue = true,
         onUpdate = {
-            if (updateEventProperty == APETestObjectKotlin::testBoolean) {
-                enableWidget(widgetValue(APETestObjectKotlin::testBoolean))
+            onChange(APETestObjectKotlin::controlBoolean) {
+                enableWidget(!widgetValue(APETestObjectKotlin::controlBoolean))
             }
         },
-        order = 1
+        order = 20
     )
 
-    var conditionallyEnabledBooleanShort by GuiEditable(
-        initValue = true,
-        conditionallyEnabledBy = APETestObjectKotlin::testBoolean,
-        order = 1
+    var conditionalVisibileInt by GuiEditable(
+        initValue = 1,
+        conditionallyVisibleBy = APETestObjectKotlin::controlBoolean,
+        order = 30
     )
 
-    var conditionallyVisibleInt by GuiEditable(
+    var conditionallyHiddenInt by GuiEditable(
         initValue = 1,
         onUpdate = {
-            if (updateEventProperty == APETestObjectKotlin::testBoolean) {
-                showWidget(widgetValue(APETestObjectKotlin::testBoolean))
+            if (updateEventProperty == APETestObjectKotlin::controlBoolean) {
+                showWidget(!widgetValue(APETestObjectKotlin::controlBoolean))
             }
         },
-        order = 2
-    )
-
-    var conditionallyVisibleIntShort by GuiEditable(
-        initValue = 1,
-        conditionallyVisibleBy = APETestObjectKotlin::testBoolean,
-        order = 2
-    )
-
-
-    var testBoolean by GuiEditable(
-        initValue = true,
-        order = 3
+        order = 40
     )
 
     var testDouble by GuiEditable(
         initValue = 1.3,
-        order = 4
+        order = 50
     )
 
     var testObject: TestObjectBase by GuiEditable(
         initValue = TestInnerObject1(1),
-        order = 5
+        order = 60
     )
 
     var neuronUpdateRule: NeuronUpdateRule<*, *> by GuiEditable(
         initValue = LinearRule(),
         showDetails = false,
-        order = 10
+        order = 70
     )
 
     var dataHolder: ScalarDataHolder by GuiEditable(
         initValue = BiasedScalarData(1.0),
         onUpdate = {
-            if (updateEventProperty == APETestObjectKotlin::neuronUpdateRule) {
+            onChange(APETestObjectKotlin::neuronUpdateRule) {
                 refreshValue(widgetValue(APETestObjectKotlin::neuronUpdateRule).createScalarData())
                 // showWidget(widgetValue(APETestObject2::testBoolean))
             }
         },
-        order = 11
+        order = 80
     )
-
 
     abstract class TestObjectBase: CopyableObject {
         companion object {
@@ -147,7 +150,6 @@ class APETestObjectKotlin: EditableObject {
 fun main() {
     val editingObject = List(2) { APETestObjectKotlin() }
     editingObject.first().apply {
-        testBoolean = false
         testDouble = 2.3
         testString = "test1"
         name = "test1"

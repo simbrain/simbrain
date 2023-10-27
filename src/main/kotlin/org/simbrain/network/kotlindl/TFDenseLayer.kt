@@ -2,7 +2,6 @@ package org.simbrain.network.kotlindl
 
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense
-import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.GuiEditable
 
 /**
@@ -19,14 +18,30 @@ class TFDenseLayer(val size: Int = 5) : TFLayer<Dense>() {
         },
     )
 
-    @UserParameter(label = "Activation function",  conditionalEnablingMethod = "creationMode",  order = 20)
-    var activations = Activations.Relu
+    var activations by GuiEditable(
+        label = "Activation function",
+        initValue = Activations.Relu,
+        order = 20,
+        onUpdate = {
+            enableWidget(layer != null)
+        },
+    )
 
-    @UserParameter(label = "Kernel initializer",  conditionalEnablingMethod = "creationMode", order = 30)
-    var kernelInitializer = ""
+    var kernelInitializer by GuiEditable(
+        initValue = "",
+        order = 30,
+        onUpdate = {
+            enableWidget(layer != null)
+        },
+    )
 
-    @UserParameter(label = "Bias initializer",  conditionalEnablingMethod = "creationMode", order = 40)
-    var biasInitializer = ""
+    var biasInitializer by GuiEditable(
+        initValue = "",
+        order = 40,
+        onUpdate = {
+            enableWidget(layer != null)
+        },
+    )
 
     override var layer: Dense? = null
 

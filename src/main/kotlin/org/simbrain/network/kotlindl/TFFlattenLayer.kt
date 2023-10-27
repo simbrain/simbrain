@@ -3,18 +3,29 @@ package org.simbrain.network.kotlindl
 import org.jetbrains.kotlinx.dl.api.core.activation.Activations
 import org.jetbrains.kotlinx.dl.api.core.layer.reshaping.Flatten
 import org.jetbrains.kotlinx.dl.api.core.shape.TensorShape
-import org.simbrain.util.UserParameter
+import org.simbrain.util.propertyeditor.GuiEditable
 
 /**
  * Wrapper for tensor flow dense layer
  */
 class TFFlattenLayer : TFLayer<Flatten>() {
 
-    @UserParameter(label = "Number of outputs",  conditionalEnablingMethod = "creationMode", order = 10)
-    var nout = 5
+    var nout by GuiEditable(
+        label = "Number of outputs",
+        initValue = 5,
+        order = 10,
+        onUpdate = {
+            enableWidget(layer != null)
+        },
+    )
 
-    @UserParameter(label = "Activation function", order = 20)
-    var activations = Activations.Relu
+    var activations by GuiEditable(
+        initValue = Activations.Relu,
+        order = 50,
+        onUpdate = {
+            enableWidget(layer != null)
+        },
+    )
 
     override var layer: Flatten? = null
 

@@ -1,18 +1,36 @@
 package org.simbrain.network.kotlindl
 
 import org.jetbrains.kotlinx.dl.api.core.layer.core.Input
-import org.simbrain.util.UserParameter
+import org.simbrain.util.propertyeditor.GuiEditable
 
 /**
  * Wrapper for tensor flow input layer
  */
-class TFInputLayer(
-    @UserParameter(label = "Rows",  conditionalEnablingMethod = "creationMode", order = 20)
-    var rows: Int = 10,
-    @UserParameter(label = "Columns",  conditionalEnablingMethod = "creationMode", order = 30)
-    var cols: Int = 1,
-    @UserParameter(label = "Channels",  conditionalEnablingMethod = "creationMode", order = 40)
-    var channels: Int = 1) : TFLayer<Input>() {
+class TFInputLayer(rows: Int = 10, cols: Int = 1, channels: Int = 1) : TFLayer<Input>() {
+
+    var rows by GuiEditable(
+        initValue = rows,
+        order = 20,
+        onUpdate = {
+            enableWidget(layer != null)
+        },
+    )
+
+    var cols by GuiEditable(
+        initValue = cols,
+        order = 30,
+        onUpdate = {
+            enableWidget(layer != null)
+        }
+    )
+
+    var channels by GuiEditable(
+        initValue = channels,
+        order = 40,
+        onUpdate = {
+            enableWidget(layer != null)
+        }
+    )
 
     override var layer: Input? = null
 

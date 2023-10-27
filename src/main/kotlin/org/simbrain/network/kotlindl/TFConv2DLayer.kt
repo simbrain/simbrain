@@ -6,33 +6,69 @@ import org.jetbrains.kotlinx.dl.api.core.initializer.HeUniform
 import org.jetbrains.kotlinx.dl.api.core.initializer.Initializer
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.Conv2D
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
-import org.simbrain.util.UserParameter
+import org.simbrain.util.propertyeditor.GuiEditable
 
 /**
  * Wrapper for kotlin dl convolutional 2d layer
  */
 class TFConv2DLayer : TFLayer<Conv2D>() {
 
-    @UserParameter(label = "Number of filters",  conditionalEnablingMethod = "creationMode", order = 10)
-    var nfilters = 5
+    var nfilters by GuiEditable(
+        label = "Number of filters",
+        initValue = 5,
+        order = 10,
+        onUpdate = {
+            enableWidget(layer != null)
+        },
+    )
 
-    @UserParameter(label = "Kernel size",  conditionalEnablingMethod = "creationMode", order = 20)
-    var kernelSize = intArrayOf(3,3)
+    var kernelSize by GuiEditable(
+        initValue = intArrayOf(3,3),
+        order = 20,
+        onUpdate = {
+            enableWidget(layer != null)
+        },
+    )
 
-    @UserParameter(label = "Strides",  conditionalEnablingMethod = "creationMode", order = 30)
-    var strides = intArrayOf(1,1,1,1)
+    var strides by GuiEditable(
+        initValue = intArrayOf(1,1,1,1),
+        order = 30,
+        onUpdate = {
+            enableWidget(layer != null)
+        },
+    )
 
-    @UserParameter(label = "Dilations",  conditionalEnablingMethod = "creationMode", order = 40)
-    var dilations = intArrayOf(1,1,1,1)
+    var dilations by GuiEditable(
+        initValue = intArrayOf(1,1,1,1),
+        order = 40,
+        onUpdate = {
+            enableWidget(layer != null)
+        },
+    )
 
-    @UserParameter(label = "Activation function",  conditionalEnablingMethod = "creationMode", order = 50)
-    var activations = Activations.Relu
+    var activations by GuiEditable(
+        initValue = Activations.Relu,
+        order = 50,
+        onUpdate = {
+            enableWidget(layer != null)
+        },
+    )
 
-    @UserParameter(label = "Padding",  conditionalEnablingMethod = "creationMode", order = 80)
-    var padding = ConvPadding.SAME
+    var padding by GuiEditable(
+        initValue = ConvPadding.SAME,
+        order = 80,
+        onUpdate = {
+            enableWidget(layer != null)
+        },
+    )
 
-    @UserParameter(label = "Use bias",  conditionalEnablingMethod = "creationMode", order = 90)
-    var useBias = true
+    var useBias by GuiEditable(
+        initValue = true,
+        order = 90,
+        onUpdate = {
+            enableWidget(layer != null)
+        },
+    )
 
     var kernelInitializer: Initializer = HeNormal()
 

@@ -2,7 +2,6 @@ package org.simbrain.network.kotlindl
 
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.jetbrains.kotlinx.dl.api.core.layer.pooling.AvgPool2D
-import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.GuiEditable
 
 /**
@@ -10,7 +9,6 @@ import org.simbrain.util.propertyeditor.GuiEditable
  */
 class TFAvgPool2DLayer : TFLayer<AvgPool2D>() {
 
-    @UserParameter(label = "Pool size",  conditionalEnablingMethod = "creationMode", order = 20)
     var poolSize by GuiEditable(
         initValue = intArrayOf(3,3),
         order = 20,
@@ -19,11 +17,21 @@ class TFAvgPool2DLayer : TFLayer<AvgPool2D>() {
         },
     )
 
-    @UserParameter(label = "Strides",  conditionalEnablingMethod = "creationMode", order = 30)
-    var strides = intArrayOf(1,1,1,1)
+    var strides by GuiEditable(
+        initValue = intArrayOf(1,1,1,1),
+        order = 30,
+        onUpdate = {
+            enableWidget(layer != null)
+        },
+    )
 
-    @UserParameter(label = "Padding",  conditionalEnablingMethod = "creationMode", order = 80)
-    var padding = ConvPadding.SAME
+    var padding by GuiEditable(
+        initValue = ConvPadding.SAME,
+        order = 80,
+        onUpdate = {
+            enableWidget(layer != null)
+        },
+    )
 
     override var layer: AvgPool2D? = null
 

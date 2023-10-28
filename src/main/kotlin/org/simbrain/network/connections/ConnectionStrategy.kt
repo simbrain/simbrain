@@ -105,24 +105,6 @@ abstract class ConnectionStrategy : CopyableObject {
 
     override fun getTypeList() = connectionTypes
 
-    companion object {
-        /**
-         * Called via reflection.
-         */
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return listOf(
-                AllToAll::class.java,
-                DistanceBased::class.java,
-                OneToOne::class.java,
-                FixedDegree::class.java,
-                RadialGaussian::class.java,
-                RadialProbabilistic::class.java,
-                Sparse::class.java
-            )
-        }
-    }
-
 }
 
 val connectionTypes = listOf(

@@ -62,11 +62,4 @@ class GammaDistribution(shape: Double = 2.0, scale: Double = 1.0, negate: Boolea
 
     override val name = "Gamma"
 
-    // Kotlin hack to support "static method in superclass"
-    companion object {
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return ProbabilityDistribution.getTypes()
-        }
-    }
 }

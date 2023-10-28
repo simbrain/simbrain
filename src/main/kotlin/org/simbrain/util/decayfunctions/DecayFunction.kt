@@ -66,25 +66,10 @@ abstract class DecayFunction(
 
     override fun getTypeList() = decayFunctionTypes
 
-    companion object {
-
-        /**
-         * Decay functions for drop-down list used by [org.simbrain.util.propertyeditor.ObjectTypeEditor] to set a
-         * type of probability distribution.
-         */
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return listOf(
-                StepDecayFunction::class.java,
-                LinearDecayFunction::class.java,
-                GaussianDecayFunction::class.java,
-            )
-        }
-    }
-
-    val decayFunctionTypes = listOf(
-        StepDecayFunction::class.java,
-        LinearDecayFunction::class.java,
-        GaussianDecayFunction::class.java,
-    )
 }
+
+val decayFunctionTypes = listOf(
+    StepDecayFunction::class.java,
+    LinearDecayFunction::class.java,
+    GaussianDecayFunction::class.java,
+)

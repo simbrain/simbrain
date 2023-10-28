@@ -55,12 +55,4 @@ class ExponentialDistribution(lambda: Double = 1.0, negate: Boolean = false)
 
     override val name = "Exponential"
 
-    // Kotlin hack to support "static method in superclass"
-    companion object {
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return ProbabilityDistribution.getTypes()
-        }
-    }
-
 }

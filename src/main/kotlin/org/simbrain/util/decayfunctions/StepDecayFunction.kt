@@ -18,11 +18,4 @@ class StepDecayFunction @JvmOverloads constructor(dispersion: Double = 70.0) : D
 
     override val name = "Step"
 
-    // Kotlin hack to support "static method in superclass"
-    companion object {
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return DecayFunction.getTypes()
-        }
-    }
 }

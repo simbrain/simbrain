@@ -31,18 +31,6 @@ abstract class ProjectionMethod() : CopyableObject {
 
     override fun getTypeList() = projectionTypes
 
-    companion object {
-
-        @JvmStatic
-        fun getTypes() = listOf(
-            CoordinateProjection::class.java,
-            PCAProjection::class.java,
-            SammonProjection::class.java,
-            TriangulateProjection::class.java,
-            TSNEProjection::class.java
-        )
-    }
-
 }
 
 val projectionTypes = listOf(

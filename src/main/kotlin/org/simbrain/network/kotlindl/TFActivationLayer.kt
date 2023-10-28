@@ -24,11 +24,4 @@ class TFActivationLayer(val size: Int = 5) : TFLayer<ActivationLayer>() {
 
     override val name = "Activation layer"
 
-    companion object {
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return TFLayer.getTypes()
-        }
-    }
-
 }

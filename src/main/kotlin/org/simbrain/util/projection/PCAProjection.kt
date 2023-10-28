@@ -48,11 +48,4 @@ class PCAProjection: ProjectionMethod() {
 
     override val name = "PCA"
 
-    // Kotlin hack to support "static method in superclass"
-    companion object {
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return ProjectionMethod.getTypes()
-        }
-    }
 }

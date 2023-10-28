@@ -21,8 +21,11 @@ import javax.swing.event.DocumentListener
 import javax.swing.text.DefaultFormatterFactory
 import javax.swing.text.NumberFormatter
 import kotlin.math.min
-import kotlin.reflect.*
-import kotlin.reflect.full.*
+import kotlin.reflect.KClass
+import kotlin.reflect.KFunction
+import kotlin.reflect.KMutableProperty1
+import kotlin.reflect.KProperty
+import kotlin.reflect.full.functions
 import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.jvmErasure
 
@@ -34,7 +37,8 @@ import kotlin.reflect.jvm.jvmErasure
  * The [onUpdate] function can be used to set the state of the parameter when the property editor changes state. When
  * doing this, the values of other editor components can be queried using [UpdateFunctionContext.widgetValue].
  *
- * Can only be used in Kotlin. In java use the [UserParameter] annotation.
+ * Can only be used in Kotlin. In java use the [UserParameter] annotation. [UserParameter] must also be used when custom
+ * getter/setter functions are used.
  *
  * @param O the type of the base object that holds the parameter
  * @param T the type of the value of this property
@@ -52,7 +56,7 @@ class GuiEditable<O : EditableObject, T>(
     val tab: String? = null,
     val conditionallyEnabledBy: KMutableProperty1<O, Boolean>? = null,
     val conditionallyVisibleBy: KMutableProperty1<O, Boolean>? = null,
-    val typeMapProvider: KFunction<List<Class<out EditableObject>>>? = null,
+    val typeMapProvider: KFunction<List<Class<out CopyableObject>>>? = null,
     private val onUpdate: (UpdateFunctionContext<O, T>).() -> Unit = { }
 ) {
 
@@ -160,7 +164,7 @@ fun <O : EditableObject> UserParameter.toGuiEditable(initValue: Any): GuiEditabl
         showDetails = showDetails,
         tab = tab,
         typeMapProvider = if (typeMapProvider.isNotEmpty()) {
-            initValue::class.functions.first { it.name == typeMapProvider } as KFunction<List<Class<out EditableObject>>>
+            initValue::class.functions.first { it.name == typeMapProvider } as KFunction<List<Class<out CopyableObject>>>
         } else {
            null
        },
@@ -674,28 +678,7 @@ class ObjectWidget<O : EditableObject, T : CopyableObject>(
     private val typeMap = (if (parameter.typeMapProvider != null) {
         parameter.typeMapProvider.call(value).map { it.kotlin }
     } else {
-        sequence { yield(value::class); yieldAll(value::class.allSuperclasses) }
-            .mapNotNull {
-                val fromJava =
-                    (it.staticFunctions.firstOrNull { it.name == "getTypes" }?.call() as? List<Class<*>>)?.map { it.kotlin }
-                if (fromJava != null) {
-                    fromJava
-                } else {
-                    val property =
-                        it.companionObject?.memberProperties?.firstOrNull { prop -> prop.name == "types" } as? KProperty1<Any?, Any?>
-                    val function by lazy {
-                        it.companionObject?.functions?.firstOrNull { fn -> fn.name == "getTypes" }
-                    }
-                    ((property?.get(it.companionObjectInstance) ?: function?.call(it.companionObjectInstance)) as? List<*>)
-                        ?.map { klass ->
-                            when (klass) {
-                                is KClass<*> -> klass
-                                is Class<*> -> klass.kotlin
-                                else -> throw IllegalArgumentException("Unsupported type $it")
-                            }
-                        }
-                }
-            }.firstOrNull()
+        value.getTypeList()?.map { it.kotlin }
     })?.associateBy { it.simpleName!! }
 
     private val editorPanelContainer = JPanel()

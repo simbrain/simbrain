@@ -38,11 +38,4 @@ class TFFlattenLayer : TFLayer<Flatten>() {
 
     override val name = "Flatten layer"
 
-    companion object {
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return TFLayer.getTypes()
-        }
-    }
-
 }

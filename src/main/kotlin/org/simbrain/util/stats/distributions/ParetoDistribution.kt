@@ -60,11 +60,4 @@ class ParetoDistribution(shape: Double = 3.0, scale: Double = 1.0, negate: Boole
 
     override val name = "Pareto"
 
-    // Kotlin hack to support "static method in superclass"
-    companion object {
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return ProbabilityDistribution.getTypes()
-        }
-    }
 }

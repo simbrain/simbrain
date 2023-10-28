@@ -99,12 +99,10 @@ class APETestObjectKotlin: EditableObject {
     )
 
     abstract class TestObjectBase: CopyableObject {
-        companion object {
-            val types = listOf(
-                TestInnerObject1::class,
-                TestInnerObject2::class,
-            )
-        }
+        override fun getTypeList() = listOf(
+            TestInnerObject1::class.java,
+            TestInnerObject2::class.java,
+        )
     }
 
     class TestInnerObject1(testInt: Int = 1): TestObjectBase() {

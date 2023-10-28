@@ -18,13 +18,13 @@
  */
 package org.simbrain.network.layouts;
 
+import org.jetbrains.annotations.Nullable;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.CopyableObject;
 import org.simbrain.util.propertyeditor.EditableObject;
 
 import java.awt.geom.Point2D;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -38,8 +38,13 @@ public abstract class Layout implements CopyableObject {
     /**
      * Called via reflection.
      */
-    public static List<Class> getTypes() {
-        return Arrays.asList(LineLayout.class, GridLayout.class, HexagonalGridLayout.class);
+    public static List<Class<? extends CopyableObject>> TYPE_LIST
+            = List.of(LineLayout.class, GridLayout.class, HexagonalGridLayout.class);
+
+    @Nullable
+    @Override
+    public List<Class<? extends CopyableObject>> getTypeList() {
+        return TYPE_LIST;
     }
 
     /**

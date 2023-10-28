@@ -53,11 +53,7 @@ class TFInputLayer(rows: Int = 10, cols: Int = 1, channels: Int = 1) : TFLayer<I
     val numElements
         get() = rows * cols * channels
 
-    companion object {
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return listOf(TFInputLayer::class.java)
-        }
-    }
-
+    override fun getTypeList() = tfInputLayerTypes
 }
+
+val tfInputLayerTypes = listOf(TFInputLayer::class.java)

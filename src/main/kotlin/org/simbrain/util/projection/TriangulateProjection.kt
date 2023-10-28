@@ -93,11 +93,4 @@ class TriangulateProjection: ProjectionMethod() {
 
     override val name = "Triangulate"
 
-    // Kotlin hack to support "static method in superclass"
-    companion object {
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return ProjectionMethod.getTypes()
-        }
-    }
 }

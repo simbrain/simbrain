@@ -58,11 +58,4 @@ class LogisticRegClassifier @JvmOverloads constructor(inputSize: Int = 4, output
 
     override val name = "Logistic Regression"
 
-    companion object {
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return ClassificationAlgorithm.getTypes()
-        }
-    }
-
 }

@@ -57,17 +57,6 @@ abstract class TFLayer<T : Layer> : CopyableObject {
 
     override fun getTypeList() = layerTypes
 
-    companion object {
-        /**
-         * Called via reflection.
-         */
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return listOf(TFConv2DLayer::class.java, TFDenseLayer::class.java,
-                TFAvgPool2DLayer::class.java, TFFlattenLayer::class.java)
-        }
-    }
-
 }
 
 val layerTypes = listOf(TFConv2DLayer::class.java, TFDenseLayer::class.java,

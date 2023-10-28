@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.synapse_update_rules.spikeresponders;
 
+import org.jetbrains.annotations.Nullable;
 import org.simbrain.network.core.Connector;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.spikeresponders.*;
@@ -43,15 +44,14 @@ public abstract class SpikeResponder implements CopyableObject {
      * {@link org.simbrain.util.propertyeditor.ObjectTypeEditor}
      * to set the spike responder on a synapse.
      */
-    public static List<Class> RESPONDER_LIST = Arrays.asList(
+    public static List<Class<? extends CopyableObject>> RESPONDER_LIST = Arrays.asList(
         NonResponder.class, JumpAndDecay.class,
         ConvolvedJumpAndDecay.class, ProbabilisticResponder.class,
         RiseAndDecay.class, StepResponder.class, UDF.class);
 
-    /**
-     * Called via reflection.
-     */
-    public static List<Class> getTypes() {
+    @Nullable
+    @Override
+    public List<Class<? extends CopyableObject>> getTypeList() {
         return RESPONDER_LIST;
     }
 

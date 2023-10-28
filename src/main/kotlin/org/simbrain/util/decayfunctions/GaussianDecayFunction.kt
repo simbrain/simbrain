@@ -31,11 +31,4 @@ class GaussianDecayFunction @JvmOverloads constructor(dispersion: Double = 70.0)
 
     override val name = "Exponential"
 
-    // Kotlin hack to support "static method in superclass"
-    companion object {
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return DecayFunction.getTypes()
-        }
-    }
 }

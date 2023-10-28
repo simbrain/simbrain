@@ -18,19 +18,6 @@ abstract class OptimizerWrapper() : CopyableObject {
 
     override fun getTypeList() = optimizerTypes
 
-    /**
-     * To get a static method
-     */
-    companion object {
-        /**
-         * Called via reflection.
-         */
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return listOf(AdaDeltaWrapper::class.java, AdaGradWrapper::class.java, AdaGradaWrapper::class.java, AdamWrapper::class.java, AdamaxWrapper::class.java, FtrlWrapper::class.java, MomentumWrapper::class.java, RMSPropWrapper::class.java, SGDWrapper::class.java)
-        }
-    }
-
 }
 
 val optimizerTypes = listOf(AdaDeltaWrapper::class.java, AdaGradWrapper::class.java, AdaGradaWrapper::class.java, AdamWrapper::class.java, AdamaxWrapper::class.java, FtrlWrapper::class.java,
@@ -133,14 +120,6 @@ class AdamWrapper() : OptimizerWrapper() {
     }
 
     override val name = "Adam"
-
-    // Kotlin hack to support "static method in superclass"
-    companion object {
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return OptimizerWrapper.getTypes()
-        }
-    }
 
 }
 
@@ -257,15 +236,6 @@ class SGDWrapper() : OptimizerWrapper() {
     }
 
     override val name = "SGD"
-
-
-    // Kotlin hack to support "static method in superclass"
-    companion object {
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return OptimizerWrapper.getTypes()
-        }
-    }
 
 }
 

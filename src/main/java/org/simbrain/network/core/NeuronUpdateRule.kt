@@ -212,15 +212,9 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
 
     fun getNeuronArrayTypeMap() = neuronArrayUpdateRules
 
-    override fun getTypeList() = allUpdateRules
+    override fun getTypeList(): List<Class<out CopyableObject>> = allUpdateRules
 
     companion object {
-
-        /**
-         * Rules for drop-down list used by [org.simbrain.util.propertyeditor.ObjectTypeEditor] to set the update rule
-         * on a neuron.
-         */
-        var types = allUpdateRules
 
         /**
          * The maximum number of digits to display in the tool tip.

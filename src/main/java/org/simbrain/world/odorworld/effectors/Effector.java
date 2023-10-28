@@ -18,7 +18,9 @@
  */
 package org.simbrain.world.odorworld.effectors;
 
+import org.jetbrains.annotations.Nullable;
 import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor.CopyableObject;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.world.odorworld.entities.PeripheralAttribute;
 import org.simbrain.world.odorworld.events.SensorEffectorEvents;
@@ -35,16 +37,15 @@ public abstract class Effector implements PeripheralAttribute {
      * {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}
      * to set a type of effector.
      */
-    private static List<Class<? extends Effector>> EFFECTORS_LIST = List.of(
+    private static List<Class<? extends CopyableObject>> EFFECTORS_LIST = List.of(
             Speech.class,
             StraightMovement.class,
             Turning.class
     );
 
-    /**
-     * Called via reflection.
-     */
-    public static List<Class<? extends Effector>> getTypes() {
+    @Nullable
+    @Override
+    public List<Class<? extends CopyableObject>> getTypeList() {
         return EFFECTORS_LIST;
     }
 

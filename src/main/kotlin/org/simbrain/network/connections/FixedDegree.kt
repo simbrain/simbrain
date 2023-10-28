@@ -109,12 +109,6 @@ class FixedDegree(
 
     }
 
-    companion object {
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return ConnectionStrategy.getTypes()
-        }
-    }
 }
 
 /**

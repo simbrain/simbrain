@@ -141,13 +141,6 @@ class RadialProbabilistic(
         }
     }
 
-    companion object {
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return ConnectionStrategy.getTypes()
-        }
-    }
-
 }
 
 fun createProbabilisticallySynapses(

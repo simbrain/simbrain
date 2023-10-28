@@ -55,11 +55,4 @@ class UniformIntegerDistribution(floor:Int = 0, ceil: Int = 1) : ProbabilityDist
         return copy
     }
 
-    // Kotlin hack to support "static method in superclass"
-    companion object {
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return ProbabilityDistribution.getTypes()
-        }
-    }
 }

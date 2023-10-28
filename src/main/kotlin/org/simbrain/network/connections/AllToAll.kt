@@ -67,13 +67,6 @@ class AllToAll(
         return syns
     }
 
-    companion object {
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return ConnectionStrategy.getTypes()
-        }
-    }
-
 }
 
 /**

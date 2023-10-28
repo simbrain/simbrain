@@ -253,12 +253,6 @@ class RadialGaussian(
 
     override val name = "Radial (Gaussian)"
 
-    companion object {
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return ConnectionStrategy.getTypes()
-        }
-    }
 }
 
 fun createRadialPolarizedSynapses(

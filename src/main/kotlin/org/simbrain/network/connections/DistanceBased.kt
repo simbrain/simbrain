@@ -66,12 +66,6 @@ class DistanceBased (
 
     override val name = "Distance Based"
 
-    companion object {
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return ConnectionStrategy.getTypes()
-        }
-    }
 }
 
 fun createRadialSynapses (

@@ -35,18 +35,6 @@ abstract class ColoringManager: CopyableObject {
 
     override fun getTypeList() = coloringManagerTypes
 
-    companion object {
-
-        @JvmStatic
-        fun getTypes() = listOf(
-            NoOpColoringManager::class.java,
-            DecayColoringManager::class.java,
-            FrequencyColoringManager::class.java,
-            MarkovColoringManager::class.java,
-            HaloColoringManager::class.java
-        )
-    }
-
 }
 
 val coloringManagerTypes = listOf(
@@ -83,10 +71,6 @@ class NoOpColoringManager: ColoringManager() {
 
     override val name = "None"
 
-    companion object {
-        @JvmStatic
-        fun getTypes() = ColoringManager.getTypes()
-    }
 }
 
 
@@ -175,10 +159,6 @@ class DecayColoringManager: ColoringManager() {
 
     override val name = "DecayColoringManager"
 
-    companion object {
-        @JvmStatic
-        fun getTypes() = ColoringManager.getTypes()
-    }
 }
 
 /**
@@ -218,11 +198,6 @@ class FrequencyColoringManager: ColoringManager() {
 
     override val name = "FrequencyColoringManager"
 
-    companion object {
-
-        @JvmStatic
-        fun getTypes() = ColoringManager.getTypes()
-    }
 }
 
 
@@ -269,11 +244,6 @@ class MarkovColoringManager: ColoringManager() {
 
     override val name = "MarkovColoringManager"
 
-    companion object {
-
-        @JvmStatic
-        fun getTypes() = ColoringManager.getTypes()
-    }
 }
 
 class HaloColoringManager: ColoringManager() {
@@ -326,9 +296,4 @@ class HaloColoringManager: ColoringManager() {
 
     override val name = "HaloColoringManager"
 
-    companion object {
-
-        @JvmStatic
-        fun getTypes() = ColoringManager.getTypes()
-    }
 }

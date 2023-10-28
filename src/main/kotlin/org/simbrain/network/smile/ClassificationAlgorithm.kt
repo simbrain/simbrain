@@ -68,17 +68,6 @@ abstract class ClassificationAlgorithm(
 
     override fun getTypeList() = classifierTypes
 
-    companion object {
-        /**
-         * Called via reflection.
-         */
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return listOf(
-                LogisticRegClassifier::class.java, SVMClassifier::class.java, KNNClassifier::class.java)
-        }
-    }
-
 }
 
 val classifierTypes = listOf(

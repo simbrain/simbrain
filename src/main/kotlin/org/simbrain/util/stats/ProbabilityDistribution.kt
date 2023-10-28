@@ -72,21 +72,6 @@ abstract class ProbabilityDistribution() : CopyableObject {
             xstream.registerConverter(createConstructorCallingConverter(ProbabilityDistribution::class.java, xstream.mapper, xstream.reflectionProvider))
             return xstream
         }
-
-        /**
-         * Called via reflection.
-         */
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return listOf(
-                ExponentialDistribution::class.java,
-                GammaDistribution::class.java, LogNormalDistribution::class.java,
-                NormalDistribution::class.java, ParetoDistribution::class.java,
-                UniformRealDistribution::class.java,
-                PoissonDistribution::class.java,
-                UniformIntegerDistribution::class.java
-            )
-        }
     }
 
 }

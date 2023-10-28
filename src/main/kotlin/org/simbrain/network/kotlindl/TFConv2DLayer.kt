@@ -94,11 +94,4 @@ class TFConv2DLayer : TFLayer<Conv2D>() {
 
     override val name = "Convolutional 2d"
 
-    companion object {
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return TFLayer.getTypes()
-        }
-    }
-
 }

@@ -120,13 +120,6 @@ class Sparse @JvmOverloads constructor(
         }
     }
 
-    companion object {
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return ConnectionStrategy.getTypes()
-        }
-    }
-
 }
 
 fun createEqualizedSynapses(

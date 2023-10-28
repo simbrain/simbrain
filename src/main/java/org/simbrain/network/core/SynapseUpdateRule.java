@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.core;
 
+import org.jetbrains.annotations.Nullable;
 import org.simbrain.network.learningrules.OjaRule;
 import org.simbrain.network.synapse_update_rules.*;
 import org.simbrain.network.util.EmptyMatrixData;
@@ -41,15 +42,14 @@ public abstract class SynapseUpdateRule<DS extends ScalarDataHolder, DM extends 
      * Rules for drop-down list used by {@link org.simbrain.util.propertyeditor.ObjectTypeEditor}
      * to set the learning rule on a synapse.
      */
-    public static List<Class> RULE_LIST = Arrays.asList(StaticSynapseRule.class,
+    public static List<Class<? extends CopyableObject>> RULE_LIST = Arrays.asList(StaticSynapseRule.class,
         HebbianRule.class, HebbianCPCARule.class, HebbianThresholdRule.class,
         OjaRule.class, PfisterGerstner2006Rule.class, ShortTermPlasticityRule.class,
         STDPRule.class, SubtractiveNormalizationRule.class);
 
-    /**
-     * Called via reflection.
-     */
-    public static List<Class> getTypes() {
+    @Nullable
+    @Override
+    public List<Class<? extends CopyableObject>> getTypeList() {
         return RULE_LIST;
     }
 

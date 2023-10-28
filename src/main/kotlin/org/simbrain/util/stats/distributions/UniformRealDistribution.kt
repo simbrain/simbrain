@@ -56,12 +56,4 @@ class UniformRealDistribution(floor:Double = 0.0, ceil: Double = 1.0) : Probabil
         return copy
     }
 
-    // Kotlin hack to support "static method in superclass"
-    companion object {
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return ProbabilityDistribution.getTypes()
-        }
-    }
-
 }

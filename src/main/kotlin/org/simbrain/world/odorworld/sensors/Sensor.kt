@@ -1,9 +1,9 @@
 package org.simbrain.world.odorworld.sensors
 
 import org.simbrain.util.UserParameter
+import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.world.odorworld.entities.PeripheralAttribute
 import org.simbrain.world.odorworld.events.SensorEffectorEvents
-import java.util.*
 
 /**
  * Interface for 2d world sensors.  Sensors have a position given in polar
@@ -74,14 +74,15 @@ abstract class Sensor : PeripheralAttribute {
         return this
     }
 
-    companion object {
-        var types = Arrays.asList<Class<*>>(
-            SmellSensor::class.java,
-            Hearing::class.java,
-            GridSensor::class.java,
-            ObjectSensor::class.java,
-            BumpSensor::class.java,
-            TileSensor::class.java
-        )
-    }
+    override fun getTypeList(): List<Class<out CopyableObject>> = sensorTypes
+
 }
+
+val sensorTypes: List<Class<out CopyableObject>> = listOf(
+    SmellSensor::class.java,
+    Hearing::class.java,
+    GridSensor::class.java,
+    ObjectSensor::class.java,
+    BumpSensor::class.java,
+    TileSensor::class.java
+)

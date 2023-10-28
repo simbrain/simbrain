@@ -29,11 +29,4 @@ class CoordinateProjection: ProjectionMethod() {
 
     override val name = "Coordinate"
 
-    // Kotlin hack to support "static method in superclass"
-    companion object {
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return ProjectionMethod.getTypes()
-        }
-    }
 }

@@ -47,11 +47,4 @@ class TFAvgPool2DLayer : TFLayer<AvgPool2D>() {
 
     override val name = "Average Pool 2d"
 
-    companion object {
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return TFLayer.getTypes()
-        }
-    }
-
 }

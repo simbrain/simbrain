@@ -18,10 +18,7 @@ import org.jfree.data.xy.XYSeries
 import org.jfree.data.xy.XYSeriesCollection
 import org.simbrain.util.*
 import org.simbrain.util.genericframe.GenericFrame
-import org.simbrain.util.projection.DataPoint
-import org.simbrain.util.projection.IterableProjectionMethod
-import org.simbrain.util.projection.ProjectionMethod
-import org.simbrain.util.projection.Projector
+import org.simbrain.util.projection.*
 import org.simbrain.util.widgets.ToggleButton
 import org.simbrain.workspace.gui.DesktopComponent
 import java.awt.*
@@ -107,7 +104,7 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
     }
 
     // Top stuff
-    val projectionMethods = ProjectionMethod.getTypes()
+    val projectionMethods = projectionTypes
         .associateWith { it.kotlin.primaryConstructor!!.call() }
     val projectionSelector = JComboBox<ProjectionMethod>().apply {
         maximumSize = Dimension(200, 100)

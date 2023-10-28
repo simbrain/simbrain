@@ -52,11 +52,4 @@ class NormalDistribution(mean: Double = 0.0, standardDeviation: Double = 1.0): P
         return copy
     }
 
-    // Kotlin hack to support "static method in superclass"
-    companion object {
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return ProbabilityDistribution.getTypes()
-        }
-    }
 }

@@ -67,12 +67,4 @@ class SVMClassifier @JvmOverloads constructor(inputSize: Int = 4):
         }
     }
 
-    // Kotlin hack to support "static method in superclass"
-    companion object {
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return ClassificationAlgorithm.getTypes()
-        }
-    }
-
 }

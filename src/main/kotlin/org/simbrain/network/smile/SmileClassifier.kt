@@ -130,12 +130,5 @@ class SmileClassifier(
             return SmileClassifier(net, classifier)
         }
 
-        companion object {
-            @JvmStatic
-            fun getTypes(): List<Class<*>> {
-                return ClassificationAlgorithm.getTypes()
-            }
-        }
-
     }
 }

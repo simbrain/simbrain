@@ -50,11 +50,4 @@ class TSNEProjection: ProjectionMethod(), IterableProjectionMethod  {
 
     override val name = "TSNE"
 
-    companion object {
-        @JvmStatic
-        fun getTypes(): List<Class<*>> {
-            return ProjectionMethod.getTypes()
-        }
-    }
-
 }

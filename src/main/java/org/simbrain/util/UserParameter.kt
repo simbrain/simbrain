@@ -105,6 +105,6 @@ annotation class UserParameter(
     /**
      * Name of a method which returns a lambda which is used to determine whether this component is enabled or not.
      */
-    val conditionalEnablingMethod: String = ""
-
+    val conditionalEnablingMethod: String = "",
+    val typeMapProvider: String = "",
 )

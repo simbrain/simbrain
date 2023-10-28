@@ -18,10 +18,13 @@
  */
 package org.simbrain.network.core
 
-import org.simbrain.network.neuron_update_rules.UpdateRuleEnum
-import org.simbrain.network.updaterules.AdExIFRule
-import org.simbrain.network.updaterules.IntegrateAndFireRule
-import org.simbrain.network.updaterules.IzhikevichRule
+import org.simbrain.custom_sims.simulations.AllostaticUpdateRule
+import org.simbrain.network.neuron_update_rules.*
+import org.simbrain.network.neuron_update_rules.activity_generators.LogisticRule
+import org.simbrain.network.neuron_update_rules.activity_generators.RandomNeuronRule
+import org.simbrain.network.neuron_update_rules.activity_generators.SinusoidalRule
+import org.simbrain.network.neuron_update_rules.activity_generators.StochasticRule
+import org.simbrain.network.updaterules.*
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.EmptyScalarData
@@ -31,7 +34,6 @@ import org.simbrain.util.Utils
 import org.simbrain.util.propertyeditor.CopyableObject
 import java.util.*
 import java.util.function.Supplier
-import java.util.stream.Collectors
 
 /**
  * A rule for updating a neuron.
@@ -208,6 +210,10 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
         return n.activation
     }
 
+    fun getNeuronArrayTypeMap() = neuronArrayUpdateRules
+
+    override fun typeMapProvider() = allUpdateRules
+
     companion object {
         /**
          * Called via reflection.
@@ -216,9 +222,7 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
          * Rules for drop-down list used by [org.simbrain.util.propertyeditor.ObjectTypeEditor] to set the update rule
          * on a neuron.
          */
-        var types = Arrays.stream(UpdateRuleEnum.values())
-            .map { obj: UpdateRuleEnum -> obj.rule }
-            .collect(Collectors.toList())
+        var types = allUpdateRules
 
         /**
          * The maximum number of digits to display in the tool tip.
@@ -257,3 +261,40 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
         }
     }
 }
+
+val allUpdateRules = listOf(
+    AdditiveRule::class.java,
+    AdExIFRule::class.java,
+    AllostaticUpdateRule::class.java,
+    BinaryRule::class.java,
+    ContinuousSigmoidalRule::class.java,
+    DecayRule::class.java,
+    FitzhughNagumo::class.java,
+    IACRule::class.java,
+    IntegrateAndFireRule::class.java,
+    IzhikevichRule::class.java,
+    KuramotoRule::class.java,
+    LinearRule::class.java,
+    LogisticRule::class.java,
+    MorrisLecarRule::class.java,
+    NakaRushtonRule::class.java,
+    ProductRule::class.java,
+    RandomNeuronRule::class.java,
+    SigmoidalRule::class.java,
+    SinusoidalRule::class.java,
+    SpikingThresholdRule::class.java,
+    StochasticRule::class.java,
+    ThreeValueRule::class.java,
+    TimedAccumulatorRule::class.java
+)
+
+val neuronArrayUpdateRules = listOf(
+    AdExIFRule::class.java,
+    BinaryRule::class.java,
+    DecayRule::class.java,
+    FitzhughNagumo::class.java,
+    LinearRule::class.java,
+    NakaRushtonRule::class.java,
+    SigmoidalRule::class.java,
+    SpikingNeuronUpdateRule::class.java
+)

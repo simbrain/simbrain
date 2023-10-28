@@ -23,7 +23,7 @@ import java.awt.geom.Rectangle2D
  * A "neuron array" backed by a Smile Matrix. Stored as a column vector.
  */
 class NeuronArray(parent: Network, inputSize: Int) : ArrayLayer(parent, inputSize), EditableObject, AttributeContainer {
-    @UserParameter(label = "Update Rule", order = 100)
+    @UserParameter(label = "Update Rule", order = 100, typeMapProvider = "getNeuronArrayTypeMap")
     var updateRule: NeuronUpdateRule<ScalarDataHolder, MatrixDataHolder> = LinearRule()
         set(value) {
             val typeChanged = field::class != value::class

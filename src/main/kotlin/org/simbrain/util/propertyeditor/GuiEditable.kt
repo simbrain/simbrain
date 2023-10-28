@@ -21,10 +21,7 @@ import javax.swing.event.DocumentListener
 import javax.swing.text.DefaultFormatterFactory
 import javax.swing.text.NumberFormatter
 import kotlin.math.min
-import kotlin.reflect.KClass
-import kotlin.reflect.KMutableProperty1
-import kotlin.reflect.KProperty
-import kotlin.reflect.KProperty1
+import kotlin.reflect.*
 import kotlin.reflect.full.*
 import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.jvmErasure
@@ -55,6 +52,7 @@ class GuiEditable<O : EditableObject, T>(
     val tab: String? = null,
     val conditionallyEnabledBy: KMutableProperty1<O, Boolean>? = null,
     val conditionallyVisibleBy: KMutableProperty1<O, Boolean>? = null,
+    val typeMapProvider: KFunction<List<Class<out EditableObject>>>? = null,
     private val onUpdate: (UpdateFunctionContext<O, T>).() -> Unit = { }
 ) {
 
@@ -161,6 +159,11 @@ fun <O : EditableObject> UserParameter.toGuiEditable(initValue: Any): GuiEditabl
         displayOnly = displayOnly,
         showDetails = showDetails,
         tab = tab,
+        typeMapProvider = if (typeMapProvider.isNotEmpty()) {
+            initValue::class.functions.first { it.name == typeMapProvider } as KFunction<List<Class<out EditableObject>>>
+        } else {
+           null
+       },
         onUpdate = {
         }
     )
@@ -668,29 +671,32 @@ class ObjectWidget<O : EditableObject, T : CopyableObject>(
      * Finds first superclass with a getTypes method, and if one is found a dropdown is provided that allows the
      * object’s type to be edited. Otherwise, simply embed the object with its own APE.
      */
-    private val typeMap = (sequence { yield(value::class); yieldAll(value::class.allSuperclasses) }
-        .mapNotNull {
-            val fromJava =
-                (it.staticFunctions.firstOrNull { it.name == "getTypes" }?.call() as? List<Class<*>>)?.map { it.kotlin }
-            if (fromJava != null) {
-                fromJava
-            } else {
-                val property =
-                    it.companionObject?.memberProperties?.firstOrNull { prop -> prop.name == "types" } as? KProperty1<Any?, Any?>
-                val function by lazy {
-                    it.companionObject?.functions?.firstOrNull { fn -> fn.name == "getTypes" }
-                }
-                ((property?.get(it.companionObjectInstance) ?: function?.call(it.companionObjectInstance)) as? List<*>)
-                    ?.map { klass ->
-                        when (klass) {
-                            is KClass<*> -> klass
-                            is Class<*> -> klass.kotlin
-                            else -> throw IllegalArgumentException("Unsupported type $it")
-                        }
+    private val typeMap = (if (parameter.typeMapProvider != null) {
+        parameter.typeMapProvider.call(value).map { it.kotlin }
+    } else {
+        sequence { yield(value::class); yieldAll(value::class.allSuperclasses) }
+            .mapNotNull {
+                val fromJava =
+                    (it.staticFunctions.firstOrNull { it.name == "getTypes" }?.call() as? List<Class<*>>)?.map { it.kotlin }
+                if (fromJava != null) {
+                    fromJava
+                } else {
+                    val property =
+                        it.companionObject?.memberProperties?.firstOrNull { prop -> prop.name == "types" } as? KProperty1<Any?, Any?>
+                    val function by lazy {
+                        it.companionObject?.functions?.firstOrNull { fn -> fn.name == "getTypes" }
                     }
-            }
-        }.firstOrNull()
-    )?.associateBy { it.simpleName!! }
+                    ((property?.get(it.companionObjectInstance) ?: function?.call(it.companionObjectInstance)) as? List<*>)
+                        ?.map { klass ->
+                            when (klass) {
+                                is KClass<*> -> klass
+                                is Class<*> -> klass.kotlin
+                                else -> throw IllegalArgumentException("Unsupported type $it")
+                            }
+                        }
+                }
+            }.firstOrNull()
+    })?.associateBy { it.simpleName!! }
 
     private val editorPanelContainer = JPanel()
 

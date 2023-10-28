@@ -35,4 +35,7 @@ interface EditableObject {
      * A method to be invoked at the end of [AnnotatedPropertyEditor.commitChanges]
      */
     fun onCommit() {}
+
+
+    fun typeMapProvider(): List<Class<out EditableObject>>? = null
 }

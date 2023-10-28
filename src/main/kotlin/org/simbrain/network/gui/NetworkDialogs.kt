@@ -146,6 +146,8 @@ fun SynapseGroupNode.getDialog(): StandardDialog {
     val tabbedPane = JTabbedPane()
     var matrixViewerPanel = weightMatrixViewer()
 
+    val synapsesEditor = AnnotatedPropertyEditor(synapseGroup.synapses)
+
     val sap = SynapseAdjustmentPanel(
         synapseGroup.synapses,
         synapseGroup.weightRandomizer,
@@ -170,12 +172,14 @@ fun SynapseGroupNode.getDialog(): StandardDialog {
         layout = BoxLayout(this, BoxLayout.PAGE_AXIS)
         add(tabbedPane)
         tabbedPane.addTab("Weights", sap)
+        tabbedPane.addTab("Update Rule", synapsesEditor)
         tabbedPane.addTab("Connection Strategy", connectionStrategyPanel)
         tabbedPane.add("Weight Matrix", matrixViewerPanel)
     }
 
     dialog.addClosingTask {
         matrixViewerPanel.commitChanges()
+        synapsesEditor.commitChanges()
     }
 
     return dialog

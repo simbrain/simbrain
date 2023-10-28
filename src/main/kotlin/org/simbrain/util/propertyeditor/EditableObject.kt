@@ -25,17 +25,12 @@ package org.simbrain.util.propertyeditor
  * @author Jeff Yoshimi
  */
 interface EditableObject {
-    /**
-     * Returns the name of this object.
-     */
+
     val name: String
         get() = "No-name (be sure getName() is overridden)"
-    // See ParameterWidget#getTypeMap
+
     /**
      * A method to be invoked at the end of [AnnotatedPropertyEditor.commitChanges]
      */
     fun onCommit() {}
-
-
-    fun typeMapProvider(): List<Class<out EditableObject>>? = null
 }

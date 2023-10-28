@@ -63,6 +63,8 @@ abstract class ProbabilityDistribution() : CopyableObject {
         return deepCopy()
     }
 
+    override fun getTypeList() = probDistTypes
+
     companion object {
 
         fun getXStream(): XStream {
@@ -88,6 +90,15 @@ abstract class ProbabilityDistribution() : CopyableObject {
     }
 
 }
+
+val probDistTypes = listOf(
+    ExponentialDistribution::class.java,
+    GammaDistribution::class.java, LogNormalDistribution::class.java,
+    NormalDistribution::class.java, ParetoDistribution::class.java,
+    UniformRealDistribution::class.java,
+    PoissonDistribution::class.java,
+    UniformIntegerDistribution::class.java
+)
 
 /**
  * De-serialize by explicitly the calling the primary constructor.

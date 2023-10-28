@@ -16,6 +16,8 @@ abstract class OptimizerWrapper() : CopyableObject {
      */
     abstract override fun copy(): OptimizerWrapper
 
+    override fun getTypeList() = optimizerTypes
+
     /**
      * To get a static method
      */
@@ -30,6 +32,9 @@ abstract class OptimizerWrapper() : CopyableObject {
     }
 
 }
+
+val optimizerTypes = listOf(AdaDeltaWrapper::class.java, AdaGradWrapper::class.java, AdaGradaWrapper::class.java, AdamWrapper::class.java, AdamaxWrapper::class.java, FtrlWrapper::class.java,
+    MomentumWrapper::class.java, RMSPropWrapper::class.java, SGDWrapper::class.java)
 
 class AdaDeltaWrapper() : OptimizerWrapper() {
     @UserParameter(label = "LearningRate", order = 10)

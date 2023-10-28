@@ -66,6 +66,8 @@ abstract class ClassificationAlgorithm(
      */
     abstract override fun copy(): ClassificationAlgorithm
 
+    override fun getTypeList() = classifierTypes
+
     companion object {
         /**
          * Called via reflection.
@@ -78,3 +80,6 @@ abstract class ClassificationAlgorithm(
     }
 
 }
+
+val classifierTypes = listOf(
+    LogisticRegClassifier::class.java, SVMClassifier::class.java, KNNClassifier::class.java)

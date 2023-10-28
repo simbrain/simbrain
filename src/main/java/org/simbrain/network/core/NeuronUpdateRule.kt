@@ -212,12 +212,10 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
 
     fun getNeuronArrayTypeMap() = neuronArrayUpdateRules
 
-    override fun typeMapProvider() = allUpdateRules
+    override fun getTypeList() = allUpdateRules
 
     companion object {
-        /**
-         * Called via reflection.
-         */
+
         /**
          * Rules for drop-down list used by [org.simbrain.util.propertyeditor.ObjectTypeEditor] to set the update rule
          * on a neuron.

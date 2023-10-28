@@ -103,6 +103,8 @@ abstract class ConnectionStrategy : CopyableObject {
     val stringDescription: String
         get() = "" + this.javaClass.simpleName
 
+    override fun getTypeList() = connectionTypes
+
     companion object {
         /**
          * Called via reflection.
@@ -122,6 +124,16 @@ abstract class ConnectionStrategy : CopyableObject {
     }
 
 }
+
+val connectionTypes = listOf(
+    AllToAll::class.java,
+    DistanceBased::class.java,
+    OneToOne::class.java,
+    FixedDegree::class.java,
+    RadialGaussian::class.java,
+    RadialProbabilistic::class.java,
+    Sparse::class.java
+)
 
 
 fun main() {

@@ -64,6 +64,8 @@ abstract class DecayFunction(
         override val name = "Decay Function"
     }
 
+    override fun getTypeList() = decayFunctionTypes
+
     companion object {
 
         /**
@@ -79,4 +81,10 @@ abstract class DecayFunction(
             )
         }
     }
+
+    val decayFunctionTypes = listOf(
+        StepDecayFunction::class.java,
+        LinearDecayFunction::class.java,
+        GaussianDecayFunction::class.java,
+    )
 }

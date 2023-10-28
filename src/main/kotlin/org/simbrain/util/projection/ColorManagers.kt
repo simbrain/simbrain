@@ -33,6 +33,8 @@ abstract class ColoringManager: CopyableObject {
 
     abstract fun reset()
 
+    override fun getTypeList() = coloringManagerTypes
+
     companion object {
 
         @JvmStatic
@@ -46,6 +48,14 @@ abstract class ColoringManager: CopyableObject {
     }
 
 }
+
+val coloringManagerTypes = listOf(
+    NoOpColoringManager::class.java,
+    DecayColoringManager::class.java,
+    FrequencyColoringManager::class.java,
+    MarkovColoringManager::class.java,
+    HaloColoringManager::class.java
+)
 
 /**
  * "Null" coloring manager for when we don't use colors.

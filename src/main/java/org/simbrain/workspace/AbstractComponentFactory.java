@@ -60,7 +60,6 @@ public class AbstractComponentFactory {
         putWorkspaceComponentFactory("Network", () -> new NetworkComponent(""));
         putGuiComponentFactory(NetworkComponent.class, NetworkDesktopComponent::new);
 
-        // World components
         putWorkspaceComponentFactory("3D World", () -> ThreeDWorldComponent.create(workspace, ""));
         putGuiComponentFactory(ThreeDWorldComponent.class, ThreeDDesktopComponent::new);
 
@@ -79,10 +78,6 @@ public class AbstractComponentFactory {
         putWorkspaceComponentFactory("Sound World", () -> new SoundWorldComponent(""));
         putGuiComponentFactory(SoundWorldComponent.class, SoundWorldDesktopComponent::new);
 
-        // putWorkspaceComponentFactory("Pixel Plot", PixelPlotComponent::new);
-        // putGuiComponentFactory(PixelPlotComponent.class, PixelPlotDesktopComponent::new);
-
-        // Plot components
         putWorkspaceComponentFactory("Bar Chart", () -> new BarChartComponent(""));
         putGuiComponentFactory(BarChartComponent.class, BarChartDesktopComponent::new);
 
@@ -95,7 +90,7 @@ public class AbstractComponentFactory {
         putWorkspaceComponentFactory("Pixel Plot", () -> new PixelPlotComponent(""));
         putGuiComponentFactory(PixelPlotComponent.class, PixelPlotDesktopComponent::new);
 
-        putWorkspaceComponentFactory("Projection2 Plot", () -> new ProjectionComponent(""));
+        putWorkspaceComponentFactory("Projection Plot", () -> new ProjectionComponent(""));
         putGuiComponentFactory(ProjectionComponent.class, ProjectionDesktopComponent::new);
 
         putWorkspaceComponentFactory("Time Series", () -> new TimeSeriesPlotComponent(""));
@@ -104,9 +99,9 @@ public class AbstractComponentFactory {
         putWorkspaceComponentFactory("Raster Plot", () -> new RasterPlotComponent(""));
         putGuiComponentFactory(RasterPlotComponent.class, RasterPlotDesktopComponent::new);
 
-        // Other
         putWorkspaceComponentFactory("Document Viewer", () -> new DocViewerComponent(""));
         putGuiComponentFactory(DocViewerComponent.class, DocViewerDesktopComponent::new);
+
         putWorkspaceComponentFactory("Console", () -> new ConsoleComponent(""));
         putGuiComponentFactory(ConsoleComponent.class, ConsoleDesktopComponent::new);
     }

@@ -48,7 +48,7 @@ fun updateNeurons(neuronList: List<Neuron>) {
  * @param tar target neuron
  * @return synapse from source to target
  */
-fun getFreeSynapse(src: Neuron, tar: Neuron): Synapse? = src.fanOut[tar]
+fun getSynapse(src: Neuron, tar: Neuron): Synapse? = src.fanOut[tar]
 
 /**
  * Returns a network model with a matching label.  If more than one

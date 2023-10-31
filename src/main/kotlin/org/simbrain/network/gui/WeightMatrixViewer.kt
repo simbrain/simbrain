@@ -1,7 +1,7 @@
 package org.simbrain.network.gui
 
 import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.getFreeSynapse
+import org.simbrain.network.core.getSynapse
 import org.simbrain.util.table.BasicDataFrame
 import org.simbrain.util.table.SimbrainTablePanel
 import javax.swing.JPanel
@@ -10,7 +10,7 @@ class WeightMatrixViewer(val sources: List<Neuron>, val targets: List<Neuron>): 
 
     private val sourceToTargetSynapseMap = sources.map { source ->
         targets.map { target ->
-            getFreeSynapse(source, target)
+            getSynapse(source, target)
         }.toMutableList()
     }.toMutableList()
 

@@ -263,7 +263,7 @@ public class OperantWithEnvironment extends Simulation {
         // If there are inputs, update weights
         if(totalActivation > .1) {
             Neuron src = WinnerTakeAll.getWinner(stimulusNet.getNeuronList(), true);
-            Synapse s_r = getFreeSynapse(src,winner);
+            Synapse s_r = getSynapse(src,winner);
             // Strengthen or weaken active S-R Pair
             s_r.setStrength(s_r.getStrength() + valence);
 

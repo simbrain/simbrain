@@ -198,7 +198,7 @@ public class OperantConditioning extends Simulation {
                 // Update weight on active node
                 for (Neuron src : stimulusNet.getNeuronList()) {
                     if (src.getActivation() > 0) {
-                        Synapse s = getFreeSynapse(src, tar);
+                        Synapse s = getSynapse(src, tar);
                         s.setStrength(Math.max(s.getStrength() + valence, 0));
                     }
                 }

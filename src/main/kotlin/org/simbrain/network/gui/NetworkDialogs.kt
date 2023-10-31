@@ -129,22 +129,11 @@ fun NetworkPanel.showInputPanel(neurons: List<Neuron>) {
     createTestInputPanel(neurons).displayInDialog()
 }
 
-/**
- * Show weight matrix panel for weights connecting current source (red) and target (green) nodes.
- */
-fun NetworkPanel.showWeightMatrix() {
-    createWeightMatrixViewerOnSelectedNeurons().displayInDialog {
-        commitChanges()
-    }.apply {
-        title = "Weight Matrix Viewer"
-    }
-}
-
 fun SynapseGroupNode.getDialog(): StandardDialog {
 
     val dialog = StandardDialog()
     val tabbedPane = JTabbedPane()
-    var matrixViewerPanel = weightMatrixViewer()
+    val matrixViewerPanel = WeightMatrixViewer(synapseGroup.source.neuronList, synapseGroup.target.neuronList)
 
     val synapsesEditor = AnnotatedPropertyEditor(synapseGroup.synapses)
 

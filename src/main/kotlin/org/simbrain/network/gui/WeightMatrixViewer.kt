@@ -41,13 +41,3 @@ class WeightMatrixViewer(val sources: List<Neuron>, val targets: List<Neuron>): 
     }
 
 }
-
-fun NetworkPanel.createWeightMatrixViewerOnSelectedNeurons(): WeightMatrixViewer {
-    val sources = selectionManager.filterSelectedSourceModels<Neuron>()
-    val targets = selectionManager.filterSelectedModels<Neuron>()
-    if (sources.isNotEmpty() && targets.isNotEmpty()) {
-        return WeightMatrixViewer(sources, targets)
-    } else {
-        throw IllegalArgumentException("Must select at least one source and one target neuron.")
-    }
-}

@@ -22,7 +22,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.gui.NetworkPanel
-import org.simbrain.network.gui.WeightMatrixViewer
 import org.simbrain.util.*
 
 
@@ -162,7 +161,5 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
     interface Arrow {
         fun layoutChildren()
     }
-
-    fun weightMatrixViewer() = WeightMatrixViewer(synapseGroup.source.neuronList, synapseGroup.target.neuronList)
 
 }

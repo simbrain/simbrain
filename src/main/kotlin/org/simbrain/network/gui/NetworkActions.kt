@@ -17,7 +17,6 @@ import org.simbrain.network.gui.actions.neuron.SetNeuronPropertiesAction
 import org.simbrain.network.gui.actions.neuron.ShowPrioritiesAction
 import org.simbrain.network.gui.actions.selection.*
 import org.simbrain.network.gui.actions.synapse.SetSynapsePropertiesAction
-import org.simbrain.network.gui.actions.synapse.ShowWeightMatrixAction
 import org.simbrain.network.gui.actions.toolbar.ShowEditToolBarAction
 import org.simbrain.network.gui.actions.toolbar.ShowMainToolBarAction
 import org.simbrain.network.gui.dialogs.*
@@ -121,7 +120,24 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val showEditToolBarAction = ShowEditToolBarAction(networkPanel)
     val showLayoutDialogAction = ShowLayoutDialogAction(networkPanel)
     val showPrioritiesAction = ShowPrioritiesAction(networkPanel)
-    val showWeightMatrixAction = ShowWeightMatrixAction(networkPanel)
+    val showWeightMatrixAction = networkPanel.createConditionallyEnabledAction(
+        name = "Display / Edit Weight Matrix...",
+        description = "Show a weight matrix connecting source neurons (adorned with red squares) and target neurons (regular green selection)",
+        iconPath = "menu_icons/grid.png",
+        enablingCondition = EnablingCondition.SOURCE_AND_TARGET_NEURONS
+    ) {
+        val sources = selectionManager.filterSelectedSourceModels<Neuron>()
+        val targets = selectionManager.filterSelectedModels<Neuron>()
+        if (sources.isNotEmpty() && targets.isNotEmpty()) {
+            WeightMatrixViewer(sources, targets).displayInDialog {
+                commitChanges()
+            }.apply {
+                title = "Weight Matrix Viewer"
+            }
+        } else {
+            throw IllegalArgumentException("Must select at least one source and one target neuron.")
+        }
+    }
 
     val spaceHorizontalAction = networkPanel.createConditionallyEnabledAction(
         name = "Space Horizontal",

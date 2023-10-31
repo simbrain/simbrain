@@ -20,10 +20,11 @@ package org.simbrain.network.gui.nodes
 
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.network.gui.WeightMatrixViewer
 import org.simbrain.network.gui.createCouplingMenu
 import org.simbrain.network.gui.getDialog
 import org.simbrain.util.createAction
-import org.simbrain.util.display
+import org.simbrain.util.displayInDialog
 import javax.swing.*
 
 
@@ -84,9 +85,9 @@ class SynapseGroupInteractionBox(
             iconPath = "menu_icons/grid.png",
             name = "Show weight matrix...",
         ) {
-            JDialog().also{
-                it.add(synapseGroupNode.weightMatrixViewer())
-            }.display()
+            WeightMatrixViewer(synapseGroup.source.neuronList, synapseGroup.target.neuronList).displayInDialog {
+                commitChanges()
+            }
         }))
 
         // Freezing actions

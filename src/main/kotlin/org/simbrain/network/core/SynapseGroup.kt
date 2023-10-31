@@ -32,6 +32,7 @@ class SynapseGroup @JvmOverloads constructor(
 
     /**
      * Randomizer for all weights, regardless of polarity. Applying it can change the polarity of a weight.
+     * The connection strategy contains randomizers for excitatory and inhibitory weights specifically.
      */
     @Transient
     var weightRandomizer: ProbabilityDistribution = UniformRealDistribution(-1.0, 1.0)

@@ -238,6 +238,10 @@ class PercentExcitatoryPanel(percentExcitatory: Double = 50.0) : JPanel() {
         return Utils.doubleParsable(eRatio) / 100
     }
 
+    fun setPercentExcitatory(percent: Double) {
+        ratioSlider.value = percent.toInt()
+    }
+
 }
 
 fun main() {

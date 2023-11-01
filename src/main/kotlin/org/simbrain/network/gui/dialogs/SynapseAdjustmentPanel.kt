@@ -47,12 +47,12 @@ import javax.swing.*
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
-class
-SynapseAdjustmentPanel(
+class SynapseAdjustmentPanel(
     var synapses: List<Synapse>,
     var allRandomizer: ProbabilityDistribution = UniformRealDistribution(-1.0, 1.0),
     var excitatoryRandomizer: ProbabilityDistribution = UniformRealDistribution(0.0, 1.0),
-    var inhibitoryRandomizer: ProbabilityDistribution = UniformRealDistribution(-1.0, 0.0)
+    var inhibitoryRandomizer: ProbabilityDistribution = UniformRealDistribution(-1.0, 0.0),
+    val onApply: () -> Unit = {}
 ) : JPanel() {
 
     // TODO: Some of the logical operations here could be moved to utility classes or Network.kt
@@ -315,6 +315,7 @@ SynapseAdjustmentPanel(
             parent.revalidate()
             parent.repaint()
         }
+        onApply()
     }
 
     /**

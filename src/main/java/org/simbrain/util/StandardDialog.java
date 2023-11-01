@@ -356,6 +356,10 @@ public class StandardDialog extends GenericJDialog {
         return okButton;
     }
 
+    public JButton getCancelButton() {
+        return cancelButton;
+    }
+
     /**
      * If called then this becomes a "Done" dialog. The cancel button is removed
      * and "Ok" is renamed "Done".

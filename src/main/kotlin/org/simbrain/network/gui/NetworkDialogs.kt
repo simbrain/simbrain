@@ -5,6 +5,7 @@ import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.percentExcitatory
 import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.gui.dialogs.*
 import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog
@@ -15,17 +16,12 @@ import org.simbrain.network.gui.nodes.SynapseGroupNode
 import org.simbrain.network.gui.nodes.TextNode
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.smile.SmileClassifier
-import org.simbrain.util.StandardDialog
-import org.simbrain.util.createEditorDialog
-import org.simbrain.util.display
-import org.simbrain.util.displayInDialog
+import org.simbrain.util.*
 import org.simbrain.util.piccolo.SceneGraphBrowser
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.objectWrapper
 import org.simbrain.util.propertyeditor.wrapperWidget
 import org.simbrain.util.table.*
-import org.simbrain.util.widgets.ApplyPanel.createApplyPanel
-import org.simbrain.util.widgets.EditablePanel
 import java.awt.Dialog
 import java.awt.Dimension
 import java.awt.event.WindowAdapter
@@ -131,44 +127,55 @@ fun NetworkPanel.showInputPanel(neurons: List<Neuron>) {
 
 fun SynapseGroupNode.getDialog(): StandardDialog {
 
-    val dialog = StandardDialog()
+    val dialog = StandardDialog().also { it.okButton.isVisible = false; it.cancelButton.isVisible = false }
     val tabbedPane = JTabbedPane()
-    val matrixViewerPanel = WeightMatrixViewer(synapseGroup.source.neuronList, synapseGroup.target.neuronList)
+
 
     val synapsesEditor = AnnotatedPropertyEditor(synapseGroup.synapses)
+    val connectionStrategyPanel = ConnectionStrategyPanel(synapseGroup.connectionStrategy)
+    val matrixViewer = WeightMatrixViewer(synapseGroup.source.neuronList, synapseGroup.target.neuronList)
 
-    val sap = SynapseAdjustmentPanel(
+    val synapseAdjustmentPanel = SynapseAdjustmentPanel(
         synapseGroup.synapses,
         synapseGroup.weightRandomizer,
         synapseGroup.connectionStrategy.exRandomizer,
         synapseGroup.connectionStrategy.inRandomizer
-    )
-
-    val connPanel = ConnectionStrategyPanel(synapseGroup.connectionStrategy)
-    val connectionStrategyPanel = createApplyPanel(connPanel).apply {
-        addActionListener {
-            connPanel.commitChanges()
-            synapseGroup.connectionStrategy = connPanel.connectionStrategy
-            synapseGroup.applyConnectionStrategy()
-        }
+    ) {
+        synapsesEditor.refreshValues()
+        matrixViewer.refreshValues()
+        connectionStrategyPanel.percentExcitatoryPanel.setPercentExcitatory(synapseGroup.synapses.percentExcitatory())
     }
 
-    synapseGroup.events.synapseListChanged.on {
-        sap.fullUpdate()
+    val synapsesEditorApplyPanel = synapsesEditor.createApplyPanel {
+        commitChanges()
+        synapseAdjustmentPanel.fullUpdate()
+        matrixViewer.refreshValues()
+        connectionStrategyPanel.percentExcitatoryPanel.setPercentExcitatory(synapseGroup.synapses.percentExcitatory())
+    }
+
+    val connectionStrategyApplyPanel = connectionStrategyPanel.createApplyPanel {
+        commitChanges()
+        synapseGroup.connectionStrategy = connectionStrategy
+        synapseGroup.applyConnectionStrategy()
+        synapseAdjustmentPanel.fullUpdate()
+        synapsesEditor.refreshValues()
+        matrixViewer.refreshValues()
+    }
+
+    val matrixViewerApplyPanel = matrixViewer.createApplyPanel {
+        commitChanges()
+        synapseAdjustmentPanel.fullUpdate()
+        synapsesEditor.refreshValues()
+        connectionStrategyPanel.percentExcitatoryPanel.setPercentExcitatory(synapseGroup.synapses.percentExcitatory())
     }
 
     dialog.contentPane = JPanel().apply {
         layout = BoxLayout(this, BoxLayout.PAGE_AXIS)
         add(tabbedPane)
-        tabbedPane.addTab("Weights", sap)
-        tabbedPane.addTab("Update Rule", synapsesEditor)
-        tabbedPane.addTab("Connection Strategy", connectionStrategyPanel)
-        tabbedPane.add("Weight Matrix", matrixViewerPanel)
-    }
-
-    dialog.addClosingTask {
-        matrixViewerPanel.commitChanges()
-        synapsesEditor.commitChanges()
+        tabbedPane.addTab("Weights", synapseAdjustmentPanel)
+        tabbedPane.addTab("Update Rule", synapsesEditorApplyPanel)
+        tabbedPane.addTab("Connection Strategy", connectionStrategyApplyPanel)
+        tabbedPane.add("Weight Matrix", matrixViewerApplyPanel)
     }
 
     return dialog
@@ -187,7 +194,7 @@ fun NetworkPanel.showClassifierCreationDialog() {
     }
 }
 
-class ConnectionStrategyPanel(connectionStrategy: ConnectionStrategy) : EditablePanel() {
+class ConnectionStrategyPanel(connectionStrategy: ConnectionStrategy) : JPanel() {
 
     val strategySelector = objectWrapper("Connection Strategy", connectionStrategy)
     val connectionStrategy get() = strategySelector.editingObject
@@ -228,10 +235,8 @@ class ConnectionStrategyPanel(connectionStrategy: ConnectionStrategy) : Editable
         updatePanel(widget.value)
     }
 
-    override fun fillFieldValues() {
-    }
 
-    override fun commitChanges(): Boolean {
+    fun commitChanges(): Boolean {
         editor.commitChanges()
         connectionStrategy.percentExcitatory = percentExcitatoryPanel.getPercentAsProbability() * 100
         connectionStrategy.let {

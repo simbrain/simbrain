@@ -40,4 +40,12 @@ class WeightMatrixViewer(val sources: List<Neuron>, val targets: List<Neuron>): 
         }
     }
 
+    fun refreshValues() {
+        dataModel.data = sourceToTargetSynapseMap.map {
+            it.map {
+                it?.strength as Any?
+            }.toMutableList()
+        }.toMutableList()
+    }
+
 }

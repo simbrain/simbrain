@@ -6,7 +6,9 @@ import kotlinx.coroutines.runBlocking
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.widgets.DropDownTriangle
+import java.awt.BorderLayout
 import java.awt.Component
+import java.awt.FlowLayout
 import java.awt.event.*
 import java.io.File
 import javax.swing.*
@@ -329,4 +331,19 @@ class DetailTrianglePanel @JvmOverloads constructor(
         add(contentPanel)
     }
 
+}
+
+fun <C: JComponent> C.createApplyPanel(commitAction: C.() -> Unit): JPanel {
+    val component = this
+    return JPanel().apply {
+        layout = BorderLayout()
+        add(component)
+        JButton("Apply").apply {
+            addActionListener {
+                commitAction()
+            }
+        }.also { applyButton ->
+            add(JPanel(FlowLayout(FlowLayout.RIGHT)).also { it.add(applyButton) }, BorderLayout.SOUTH)
+        }
+    }
 }

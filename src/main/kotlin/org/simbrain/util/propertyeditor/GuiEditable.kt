@@ -13,6 +13,8 @@ import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.event.ActionEvent
+import java.awt.event.FocusAdapter
+import java.awt.event.FocusEvent
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import javax.swing.*
@@ -392,12 +394,20 @@ class NumericWidget<O : EditableObject, T>(
             formatterEditor.valueClass = type.javaObjectType
             val factory = DefaultFormatterFactory(formatterEditor)
             val ftf: JFormattedTextField = (it.editor as JSpinner.DefaultEditor).textField
+            ftf.setFocusLostBehavior(JFormattedTextField.PERSIST)
             ftf.columns = 10
             ftf.isEditable = true
             ftf.setFormatterFactory(factory)
             if (!isConsistent) {
                 (it.editor as JSpinner.DefaultEditor).textField?.text = NULL_STRING
             }
+            ftf.addFocusListener(object : FocusAdapter() {
+                override fun focusLost(e: FocusEvent) {
+                    if (ftf.isValid) {
+                        ftf.commitEdit()
+                    }
+                }
+            })
         }.also {
             it.addChangeListener {
                 events.valueChanged.fireAndBlock(parameter.property)

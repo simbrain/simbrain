@@ -2,6 +2,7 @@ package org.simbrain.util.propertyeditor
 
 import org.simbrain.util.LabelledItemPanel
 import org.simbrain.util.UserParameter
+import org.simbrain.util.invokeSetter
 import smile.math.matrix.Matrix
 import java.awt.Color
 import javax.swing.JPanel
@@ -227,11 +228,12 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
         parameterWidgetMap.forEach { (parameter, widget) ->
             editingObjects.forEach { eo ->
                 if (widget.isConsistent) {
+                    val property = parameter.property
                     if (widget is ObjectWidget<*, *>) {
                         widget.objectTypeEditor.commitChanges()
-                        parameter.property.setter.call(eo, widget.value.copy())
+                        property.invokeSetter(eo, widget.value.copy())
                     } else {
-                        parameter.property.setter.call(eo, widget.value)
+                        property.invokeSetter(eo, widget.value)
                     }
                 }
 
@@ -239,8 +241,12 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
         }
     }
 
-    init {
+    fun refreshValues() {
         parameterWidgetMap.map { (_, widget) -> parameterWidgetMap.forEach { (_, w) -> w.refresh(widget.parameter.property) } }
+    }
+
+    init {
+        refreshValues()
     }
 
     private fun getWidgetByLabel(label: String): ParameterWidget<O, *> {

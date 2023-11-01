@@ -3,9 +3,11 @@ package org.simbrain.util
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 import kotlin.reflect.KClass
+import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.isAccessible
+import kotlin.reflect.jvm.javaField
 
 fun <T : Any> KClass<T>.callNoArgConstructor(): T = constructors.asSequence().mapNotNull {
     try {
@@ -48,3 +50,17 @@ fun Class<*>.isKotlinClass(): Boolean {
 }
 
 fun Field.isTransient() = modifiers.let { mod -> Modifier.isTransient(mod) }
+
+/**
+ * An improved version of the javaSetter provided by kotlin that searches for a setter with the same name as the property.
+ */
+val <O, T> KMutableProperty1<O, T>.legacySetter
+    get() = javaField?.let { field ->
+        field.declaringClass.methods.firstOrNull { it.name == "set${name.capitalize()}" }
+    }
+
+fun <O, T> KMutableProperty1<O, T>.invokeSetter(receiver: O, value: Any?) {
+    // if there is a legacy setter (java setter) use it, otherwise use the kotlin setter
+    legacySetter?.invoke(receiver, value)
+        ?: setter.call(receiver, value)
+}

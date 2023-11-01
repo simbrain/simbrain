@@ -154,8 +154,7 @@ fun main() {
         // (testObject as AnnotatedPropertyEditorTestObject2.TestInnerObject1).test1Int = 3
         testObject = APETestObjectKotlin.TestInnerObject2(3, false)
     }
-    val editor = AnnotatedPropertyEditor(editingObject)
-    editor.displayInDialog {
+    val editor = AnnotatedPropertyEditor(editingObject).displayInDialog {
         commitChanges()
         editingObject.forEach { println(it) }
     }

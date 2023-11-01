@@ -31,16 +31,12 @@ import org.simbrain.network.trainers.backpropError
 import org.simbrain.network.trainers.forwardPass
 import org.simbrain.util.cartesianProduct
 import org.simbrain.util.complement
-import org.simbrain.util.genericframe.GenericJDialog
 import org.simbrain.util.piccolo.unionOfGlobalFullBounds
-import org.simbrain.util.widgets.EditablePanel
 import java.awt.*
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.util.prefs.PreferenceChangeListener
 import javax.swing.*
-import javax.swing.event.InternalFrameAdapter
-import javax.swing.event.InternalFrameEvent
 
 /**
  * Main GUI representation of a [Network].
@@ -656,34 +652,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             return true;
         }
         return false
-    }
-
-
-    // TODO: Move to NetworkDialogs.kt
-    @Deprecated("Consider removing or refactor out of NetworkPanel")
-    fun displayPanel(panel: JPanel, title: String) = GenericJDialog().apply {
-        if (this is JInternalFrame) {
-            addInternalFrameListener(object : InternalFrameAdapter() {
-                override fun internalFrameClosed(e: InternalFrameEvent) {
-                    if (panel is EditablePanel) {
-                        panel.commitChanges()
-                    }
-                }
-            })
-        }
-        this.title = title
-        contentPane = panel
-        pack()
-        isVisible = true
-    }
-
-    // TODO: Move to NetworkDialogs.kt
-    @Deprecated("Consider removing or refactor out of NetworkPanel")
-    fun displayPanelInWindow(panel: JPanel, title: String) = GenericJDialog().apply {
-        this.title = title
-        contentPane = panel
-        pack()
-        isVisible = true
     }
 
     private fun createMainToolBar() = CustomToolBar().apply {

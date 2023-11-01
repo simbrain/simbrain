@@ -288,3 +288,5 @@ fun NeuronArray.randomizeBiases() {
         }
     }
 }
+
+fun List<Synapse>.percentExcitatory() = count { it.strength > 0.0 } / size.toDouble() * 100

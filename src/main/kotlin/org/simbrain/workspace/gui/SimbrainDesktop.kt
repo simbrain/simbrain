@@ -646,6 +646,7 @@ object SimbrainDesktop {
      * Shows the dialog for opening a workspace file.
      */
     fun openWorkspace() {
+        workspace.stop()
         val simulationChooser = SFileChooser(WorkspacePreferences.simulationDirectory, "Zip Archive", "zip")
         val simFile = simulationChooser.showOpenDialog()
         if (simFile != null) {
@@ -685,6 +686,8 @@ object SimbrainDesktop {
      */
     fun save() {
 
+        workspace.stop()
+
         // Ignore the save command if there are no changes
         if (workspace.changesExist()) {
             if (workspace.currentFile != null) {
@@ -711,6 +714,8 @@ object SimbrainDesktop {
      * Clear desktop of all components. Show a save-as dialog if there have been changes.
      */
     fun clearDesktop() {
+
+        workspace.stop()
 
         // If there have been changes, show a save-as dialog
         if (workspace.changesExist()) {

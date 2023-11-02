@@ -139,6 +139,7 @@ abstract class DesktopComponent<E : WorkspaceComponent>(
      * Dialog for importing a workspace component.
      */
     suspend fun showImportDialog() {
+        workspace.stop()
         val chooser = SFileChooser(getDefaultDirectory(workspaceComponent.javaClass), null)
         for (format in workspaceComponent.formats) {
             chooser.addExtension(format)
@@ -189,6 +190,7 @@ abstract class DesktopComponent<E : WorkspaceComponent>(
      * Dialog for explorting a workspace component to xml.
      */
     open fun showExportDialog() {
+        workspace.stop()
         var theFile = workspaceComponent.currentFile
         if (theFile == null) {
             theFile = File(name)

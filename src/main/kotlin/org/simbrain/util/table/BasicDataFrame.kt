@@ -89,7 +89,7 @@ class BasicDataFrame(
     }
 
     override fun setValueAt(value: Any?, rowIndex: Int, colIndex: Int) {
-        if (validateRowIndex(rowIndex) && validateColumnIndex(colIndex)) {
+        if (canEditAt(rowIndex, colIndex) && validateRowIndex(rowIndex) && validateColumnIndex(colIndex)) {
             withValidatedValue(value, colIndex) {
                 data[rowIndex][colIndex] = it
                 fireTableDataChanged()

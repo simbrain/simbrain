@@ -187,7 +187,7 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
     /**
      * If false, null entries cannot be edited.
      */
-    var allowNullEditing = false
+    var allowNullEditing by model::allowNullEditing
 
     init {
         columnSelectionAllowed = true

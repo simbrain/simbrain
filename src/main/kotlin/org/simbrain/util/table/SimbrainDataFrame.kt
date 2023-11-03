@@ -23,6 +23,11 @@ abstract class SimbrainDataFrame : AbstractTableModel() {
     val events = TableEvents()
 
     /**
+     * If false, null entries cannot be edited.
+     */
+    var allowNullEditing = false
+
+    /**
      * Index list of column classes. Previously overrode [getColumnClass] but this created problems.
      */
     val columnClasses: List<Class<*>>
@@ -130,7 +135,7 @@ abstract class SimbrainDataFrame : AbstractTableModel() {
     private fun getDoubleRowUnsafe(row: Int): DoubleArray {
         // No type check
         return (0 until columnCount)
-            .map { (getValueAt(row, it) as Number).toDouble() }
+            .map { ((getValueAt(row, it) ?: Double.NaN) as Number).toDouble() }
             .toDoubleArray()
     }
 
@@ -201,8 +206,8 @@ abstract class SimbrainDataFrame : AbstractTableModel() {
     inline fun <reified T> getRow(index: Int): List<T> = (0 until columnCount).map {
         when(T::class) {
             String::class -> getValueAt(index, it).toString()
-            Double::class -> (getValueAt(index, it) as Number).toDouble()
-            Float::class -> (getValueAt(index, it) as Number).toFloat()
+            Double::class -> getValueAt(index, it)?.let { (it as Number).toDouble() } ?: Double.NaN
+            Float::class -> getValueAt(index, it)?.let { (it as Number).toFloat() } ?: Float.NaN
             Int::class -> (getValueAt(index, it) as Number).toInt()
             else -> throw IllegalArgumentException("Unsupported type ${T::class}")
         } as T
@@ -265,6 +270,9 @@ abstract class SimbrainDataFrame : AbstractTableModel() {
         deleteRow(rowCount - 1 , true)
     }
 
+    fun canEditAt(rowIndex: Int, columnIndex: Int): Boolean {
+        return allowNullEditing || getValueAt(rowIndex, columnIndex) != null
+    }
 }
 
 class Column(

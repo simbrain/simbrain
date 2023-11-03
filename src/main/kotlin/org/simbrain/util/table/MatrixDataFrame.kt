@@ -31,7 +31,7 @@ class MatrixDataFrame @JvmOverloads constructor(
     }
 
     override fun setValueAt(value: Any?, rowIndex: Int, colIndex: Int) {
-        if (validateRowIndex(rowIndex) && validateColumnIndex(colIndex)) {
+        if (canEditAt(rowIndex, colIndex) && validateRowIndex(rowIndex) && validateColumnIndex(colIndex)) {
             data.set(rowIndex, colIndex, tryParsingDouble(value))
             fireTableDataChanged()
         }

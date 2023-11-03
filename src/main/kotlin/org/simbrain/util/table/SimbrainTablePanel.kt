@@ -372,6 +372,11 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
 
     fun getSelectedRowNames() = selectedRows.map { model.getRowName(it) }
 
+
+    init {
+        // a hack to force something to put the table in a state where row selection works
+        setColumnSelectionInterval(0, 0)
+    }
 }
 
 fun main() {

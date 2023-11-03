@@ -27,6 +27,8 @@ import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 
+import javax.swing.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
@@ -234,12 +236,18 @@ public class RasterModel implements EditableObject {
 
         @Consumable()
         public void setValues(final double[] values) {
-            if (values.length == 0) {
-                getDataset().getSeries(index).add(timeSupplier.get(), null);
-                return;
-            }
-            for (int i = 0, n = values.length; i < n; i++) {
-                getDataset().getSeries(index).add(timeSupplier.get(), (Double) values[i]);
+            try {
+                SwingUtilities.invokeAndWait(() -> {
+                    if (values.length == 0) {
+                        getDataset().getSeries(index).add(timeSupplier.get(), null);
+                        return;
+                    }
+                    for (int i = 0, n = values.length; i < n; i++) {
+                        getDataset().getSeries(index).add(timeSupplier.get(), (Double) values[i]);
+                    }
+                });
+            } catch (InterruptedException | InvocationTargetException e) {
+                throw new RuntimeException(e);
             }
         }
 

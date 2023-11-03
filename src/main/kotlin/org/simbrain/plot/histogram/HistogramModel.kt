@@ -17,6 +17,7 @@ import org.simbrain.plot.histogram.OverwritableHistogramDataset.ColoredDataSerie
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import java.awt.Color
+import javax.swing.SwingUtilities
 
 /**
  * Underlying model for the histogram data, in the form of a list of double
@@ -84,7 +85,7 @@ class HistogramModel(
      */
     @Consumable
     fun addData(histData: DoubleArray) {
-        addDataToDataSeries(histData, 0)
+        SwingUtilities.invokeAndWait { addDataToDataSeries(histData, 0) }
     }
 
     fun applyCurrentData() {

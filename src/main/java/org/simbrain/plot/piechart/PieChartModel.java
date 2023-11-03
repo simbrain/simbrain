@@ -25,6 +25,8 @@ import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 
+import javax.swing.*;
+import java.lang.reflect.InvocationTargetException;
 import java.util.stream.DoubleStream;
 
 /**
@@ -84,21 +86,26 @@ public class PieChartModel implements AttributeContainer, EditableObject {
      */
     @Consumable()
     public void setValues(double[] vector) {
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                // Take care of size mismatches
+                if (vector.length != numSlices) {
+                    dataset.clear();
+                    numSlices = vector.length;
+                }
 
-        // Take care of size mismatches
-        if (vector.length != numSlices) {
-            dataset.clear();
-            numSlices = vector.length;
-        }
-
-        // Write the data
-        double total = DoubleStream.of(vector).sum() + .001;
-        for (int i = 0; i < vector.length; i++) {
-            if (i < sliceNames.length) {
-                dataset.setValue(sliceNames[i], Math.abs(vector[i] / total));
-            } else {
-                dataset.setValue("" + i, Math.abs(vector[i] / total));
-            }
+                // Write the data
+                double total = DoubleStream.of(vector).sum() + .001;
+                for (int i = 0; i < vector.length; i++) {
+                    if (i < sliceNames.length) {
+                        dataset.setValue(sliceNames[i], Math.abs(vector[i] / total));
+                    } else {
+                        dataset.setValue("" + i, Math.abs(vector[i] / total));
+                    }
+                }
+            });
+        } catch (InterruptedException | InvocationTargetException e) {
+            throw new RuntimeException(e);
         }
     }
 

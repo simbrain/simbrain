@@ -26,7 +26,9 @@ import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 
+import javax.swing.*;
 import java.awt.*;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * Data for a JFreeChart bar chart.
@@ -148,21 +150,26 @@ public class BarChartModel implements AttributeContainer, EditableObject {
      */
     @Consumable()
     public void setBarValues(double[] newPoint) {
+        try {
+            SwingUtilities.invokeAndWait(() -> {
+                // Take care of size mismatches
+                if (newPoint.length != numBars) {
+                    dataset.clear();
+                    numBars = newPoint.length;
+                }
 
-        // Take care of size mismatches
-        if (newPoint.length != numBars) {
-            dataset.clear();
-            numBars = newPoint.length;
-        }
-
-        // Write the data
-        for (int i = 0; i < newPoint.length; i++) {
-            if (i < barNames.length) {
-                dataset.setValue((Number) newPoint[i], 1, barNames[i]);
-            } else {
-                // TODO: May need to go to this condition for if barNames is empty
-                dataset.setValue((Number) newPoint[i], 1, "" + (i + 1));
-            }
+                // Write the data
+                for (int i = 0; i < newPoint.length; i++) {
+                    if (i < barNames.length) {
+                        dataset.setValue((Number) newPoint[i], 1, barNames[i]);
+                    } else {
+                        // TODO: May need to go to this condition for if barNames is empty
+                        dataset.setValue((Number) newPoint[i], 1, "" + (i + 1));
+                    }
+                }
+            });
+        } catch (InterruptedException | InvocationTargetException e) {
+            throw new RuntimeException(e);
         }
     }
 

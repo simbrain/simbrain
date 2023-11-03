@@ -90,11 +90,11 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
 
         // Main image
         add(new ImagePanel(), BorderLayout.CENTER);
-        imageWorld.getImageAlbum().getEvents().getImageUpdate().on(Dispatchers.getDefault(), true, () -> {
+        imageWorld.getImageAlbum().getEvents().getImageUpdate().on(Dispatchers.getMain(), true, () -> {
             updateToolbar();
             repaint();
         });
-        imageWorld.getFilterCollection().getEvents().getFilterChanged().on((o, n) -> this.repaint());
+        imageWorld.getFilterCollection().getEvents().getFilterChanged().on(Dispatchers.getMain(), (o, n) -> this.repaint());
 
         // Toolbars
         add(toolbars, BorderLayout.NORTH);

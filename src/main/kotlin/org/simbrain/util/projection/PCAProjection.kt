@@ -11,6 +11,7 @@ class PCAProjection: ProjectionMethod() {
 
     val initialProjectionMethod = CoordinateProjection()
 
+    @Transient
     var pca: PCA? = null
 
     /**

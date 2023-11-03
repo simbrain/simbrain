@@ -2,7 +2,6 @@ package org.simbrain.network.core
 
 import org.simbrain.network.LocatableModel
 import org.simbrain.network.events.LocationEvents
-import org.simbrain.util.lazyVar
 import org.simbrain.util.toDoubleArray
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Producible
@@ -47,10 +46,21 @@ abstract class Layer : LocatableModel(), AttributeContainer {
      */
     abstract val inputs: Matrix
 
+    private var _inputData: Matrix? = null
+
     /**
      * This data can be used to update the layer’s state. It will often be empty. Currently used by [createTestInputPanel]
      */
-    var inputData: Matrix by lazyVar { Matrix.eye(inputSize()) }
+    var inputData: Matrix
+        get() {
+            if (_inputData == null) {
+                _inputData = inputs
+            }
+            return _inputData!!
+        }
+        set(inputData) {
+            _inputData = inputData
+        }
 
     /**
      * Add inputs to input vector. Performed in first pass of [org.simbrain.network.update_actions.BufferedUpdate]

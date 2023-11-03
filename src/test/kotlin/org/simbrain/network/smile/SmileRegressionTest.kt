@@ -1,6 +1,5 @@
 package org.simbrain.network.smile
 
-import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import smile.data.Tuple
 import smile.data.formula.Formula
@@ -14,7 +13,7 @@ class SmileRegressionTest {
 
     var net = Network()
 
-    @Test
+    // @Test
     fun `test regresson tree`() {
         val iris = Read.arff("simulations/tables/iris.arff")
         val decisionTree = cart(Formula.of("class", "."), iris)

@@ -18,6 +18,7 @@
  */
 package org.simbrain.workspace.gui.couplingmanager;
 
+import kotlinx.coroutines.Dispatchers;
 import org.simbrain.workspace.*;
 import org.simbrain.workspace.events.WorkspaceComponentEvents;
 import org.simbrain.workspace.events.WorkspaceEvents;
@@ -282,19 +283,19 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
 
             WorkspaceEvents events = workspace.getEvents();
 
-            events.getComponentAdded().on(wc -> {
+            events.getComponentAdded().on(Dispatchers.getMain(), wc -> {
                 this.addItem(wc);
                 addAttributeListener(wc);
             });
 
-            events.getComponentRemoved().on(wc -> {
+            events.getComponentRemoved().on(Dispatchers.getMain(), wc -> {
                 this.removeItem(wc);
                 if (this.getItemCount() == 0) {
                     AttributePanel.this.clearList();
                 }
             });
 
-            events.getWorkspaceCleared().on(() -> {
+            events.getWorkspaceCleared().on(Dispatchers.getMain(), () -> {
                 this.removeAllItems();
                 AttributePanel.this.clearList();
             });

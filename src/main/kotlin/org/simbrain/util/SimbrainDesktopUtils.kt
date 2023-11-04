@@ -77,6 +77,10 @@ class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, tru
         addComponent(JSeparator(SwingConstants.HORIZONTAL))
     }
 
+    fun addLabelledText(label: String, text: String) = JLabel(text).also {
+        mainPanel.addItem(label, it)
+    }
+
     fun addButton(label: String, task: suspend (ActionEvent) -> Unit) = JButton(label).apply {
         addActionListener {
             launch { task(it) }

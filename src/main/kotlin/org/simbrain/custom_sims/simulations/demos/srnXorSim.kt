@@ -1,14 +1,16 @@
 package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.addNetworkComponent
+import org.simbrain.custom_sims.addTimeSeries
+import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.network.trainers.IterableTrainer
 import org.simbrain.network.trainers.MatrixDataset
-import org.simbrain.util.place
-import org.simbrain.util.point
-import org.simbrain.util.shiftUpAndPadEndWithZero
+import org.simbrain.util.*
 import smile.math.matrix.Matrix
+import kotlin.math.floor
+import kotlin.math.max
 import kotlin.random.Random
 
 /**
@@ -24,29 +26,75 @@ val srnXORSim = newSim {
     network.addNetworkModel(srn)
 
     // Load with xor data
-    val xorInputs = generateTemporalXORData(100)
+    val xorInputs = generateTemporalXORData(1000)
     srn.trainingSet = MatrixDataset(xorInputs, xorInputs.shiftUpAndPadEndWithZero())
     srn.trainer.updateType = IterableTrainer.UpdateMethod.STOCHASTIC
 
     // Train
-    repeat(20) {
+    repeat(600) {
         srn.trainer.iterate()
         if (it % 10 == 0) {
             println("iteration ${it}: ${srn.trainer.error}")
         }
     }
 
-    // Load input data into input array
-    srn.inputLayer.inputData = xorInputs
+    val testData = generateTemporalXORData(1200 / 3)
 
-    // TODO. Run a performance test where all the input is run back through, or new inputs are used, and the
-    // output error / rmse is shown
+    srn.inputLayer.inputData = testData
+
+    var counter = 0
 
     withGui {
         place(networkComponent) {
-            location = point(460, 0)
+            location = point(200, 10)
             width = 500
             height = 550
+        }
+
+        val timeSeries = addTimeSeries("Errors")
+
+        place(timeSeries) {
+            location = point(700, 10)
+            width = 500
+            height = 550
+        }
+
+        val sumWindow = MutableList(12) { 0.0 }
+
+        createControlPanel("Control Panel", 5, 10) {
+            val actualText = addLabelledText("Actual Next: ", "0.000")
+            val predictedText = addLabelledText("Predicted Next: ", "0.000")
+            val errorText = addLabelledText("Error: ", "0.000")
+
+            suspend fun test() {
+                fun index() = counter % testData.nrow()
+                srn.inputLayer.activations = testData.row(index()).toMatrix()
+                counter += 1
+                workspace.iterateSuspend()
+                val output = srn.outputLayer.activations
+                actualText.text = testData.row(index())[0].format(3)
+                predictedText.text = output[0].format(3)
+                val error = output rmse testData.row(index()).toMatrix()
+                errorText.text = error.format(3)
+
+                sumWindow[counter % 12] += error
+                if (counter % 12 == 0) {
+                    // println(sumWindow.map { it / max(1.0, floor(counter / 12.0)) }.map { it.format(3) })
+                    timeSeries.model.timeSeriesList[0].series.clear()
+                }
+                timeSeries.model.timeSeriesList[0].series.add(counter % 12, sumWindow[counter % 12] / max(1.0, floor(counter / 12.0)))
+            }
+
+            addButton("Test") {
+                test()
+            }
+
+            addButton("Test 1200") {
+                repeat(1200) {
+                    test()
+                }
+            }
+
         }
     }
 

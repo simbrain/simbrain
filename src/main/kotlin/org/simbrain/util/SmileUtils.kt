@@ -4,6 +4,7 @@ import org.simbrain.plot.histogram.HistogramModel
 import org.simbrain.plot.histogram.HistogramPanel
 import smile.math.matrix.Matrix
 import kotlin.math.min
+import kotlin.math.sqrt
 
 /**
  * Make sure the two matrices have the same shape
@@ -49,6 +50,10 @@ val Matrix.shapeString get() = "(${nrow()},${ncol()})"
 
 // TODO: Flatten the two arrays so that this can be used for arbitrary matrices (currently works only on vectors)
 infix fun Matrix.sse(other: Matrix) = (this.toDoubleArray() sse other.toDoubleArray())
+
+infix fun Matrix.mse(other: Matrix) = (this.toDoubleArray() mse other.toDoubleArray())
+
+infix fun Matrix.rmse(other: Matrix) = sqrt(this mse other)
 
 /**
  * Returns the matrix at a row, transposed.

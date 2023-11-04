@@ -215,7 +215,7 @@ class Workspace: CoroutineScope {
         stop()
     }
 
-    suspend fun iterateSuspend(numIterations: Int) {
+    suspend fun iterateSuspend(numIterations: Int = 1) {
         for (wc in componentList) {
             wc.start()
         }

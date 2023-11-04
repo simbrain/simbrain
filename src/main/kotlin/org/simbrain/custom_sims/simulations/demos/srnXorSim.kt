@@ -3,6 +3,7 @@ package org.simbrain.custom_sims.simulations
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.subnetworks.SRNNetwork
+import org.simbrain.network.trainers.IterableTrainer
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.util.place
 import org.simbrain.util.point
@@ -25,6 +26,7 @@ val srnXORSim = newSim {
     // Load with xor data
     val xorInputs = generateTemporalXORData(100)
     srn.trainingSet = MatrixDataset(xorInputs, xorInputs.shiftUpAndPadEndWithZero())
+    srn.trainer.updateType = IterableTrainer.UpdateMethod.STOCHASTIC
 
     // Train
     repeat(20) {

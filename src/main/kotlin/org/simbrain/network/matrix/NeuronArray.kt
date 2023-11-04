@@ -203,6 +203,14 @@ class NeuronArray(parent: Network, inputSize: Int) : ArrayLayer(parent, inputSiz
         activations = Matrix.column(newActivations)
     }
 
+    /**
+     * Set all activations in the array to the specified value.
+     */
+    fun fillActivations(value: Double) {
+        activations.setCol(0, value)
+    }
+
+
     fun fireLocationChange() {
         events.locationChanged.fireAndForget()
     }

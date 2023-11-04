@@ -121,6 +121,40 @@ fun Matrix.shiftRight(shiftAmount: Int = 1): Matrix {
     return shiftedMatrix
 }
 
+fun Matrix.shiftUp(shiftAmount: Int = 1): Matrix {
+    val shiftedMatrix = Matrix(nrow(), ncol())
+    for (i in 0 until nrow()) {
+        for (j in 0 until ncol()) {
+            shiftedMatrix[i,j] = this[(i + nrow() + shiftAmount) % nrow(), j]
+        }
+    }
+    return shiftedMatrix
+}
+
+/**
+ * Set all elements of indicated row to the same provided value
+ */
+fun Matrix.setRow(rowIndex: Int, value: Double) {
+    for (i in 0 until ncol()) {
+        this[rowIndex, i] = value
+    }
+}
+
+/**
+ * Set all elements of indicated column to the same provided value
+ */
+fun Matrix.setCol(colIndex: Int, value: Double) {
+    for (i in 0 until nrow()) {
+        this[i, colIndex] = value
+    }
+}
+
+fun Matrix.shiftUpAndPadEndWithZero(): Matrix {
+    val shifted = this.shiftUp()
+    shifted.setRow(ncol() - 1, 0.0)
+    return shifted
+}
+
 /**
  * Element-wise multiplication that broadcasts across columns.
  *

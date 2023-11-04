@@ -61,6 +61,7 @@ open class SRNNetwork(
         label = "SRN"
 
         contextLayer = NeuronArray(network, numHiddenNodes)
+        contextLayer.fillActivations(.5)
         addModels(contextLayer)
 
         inputLayer.isClamped = true

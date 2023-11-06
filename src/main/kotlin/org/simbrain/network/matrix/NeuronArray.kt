@@ -41,11 +41,9 @@ class NeuronArray(parent: Network, inputSize: Int) : ArrayLayer(parent, inputSiz
         initValue = updateRule.createMatrixData(inputSize),
         order = 99,
         onUpdate = {
-            onChange(NeuronArray::updateRule) {
-                val proposedDataHolder = widgetValue(NeuronArray::updateRule).createMatrixData(size())
-                if (widgetValue(NeuronArray::dataHolder)::class != proposedDataHolder::class) {
-                    refreshValue(proposedDataHolder)
-                }
+            val proposedDataHolder = widgetValue(::updateRule).createMatrixData(size())
+            if (widgetValue(::dataHolder)::class != proposedDataHolder::class) {
+                refreshValue(proposedDataHolder)
             }
         }
     )

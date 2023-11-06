@@ -15,6 +15,7 @@ import java.util.*
 import javax.swing.*
 import javax.swing.table.TableModel
 import javax.swing.text.JTextComponent
+import kotlin.math.max
 
 
 /**
@@ -71,7 +72,7 @@ open class SimbrainTablePanel @JvmOverloads constructor(
                 // If scrolling is needed, calculate the new view position.
                 if (toScroll != 0) {
                     val newViewPosY = viewRect.y + toScroll
-                    val newPoint = Point(viewRect.x, Math.max(0, newViewPosY))
+                    val newPoint = Point(viewRect.x, max(0, newViewPosY))
                     scrollPane.viewport.viewPosition = newPoint
                 }
 

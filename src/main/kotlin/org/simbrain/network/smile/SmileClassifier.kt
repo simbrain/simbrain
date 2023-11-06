@@ -109,9 +109,7 @@ class SmileClassifier(
             label = "Number of outputs (classes)",
             description = "Ignored for some classifiers (e.g. SVM) that can only produce 2 outputs",
             onUpdate = {
-                onChange(ClassifierCreator::classifierType) {
-                    enableWidget(widgetValue(ClassifierCreator::classifierType) !is SVMClassifier)
-                }
+                enableWidget(widgetValue(::classifierType) !is SVMClassifier)
             },
             order = 20
         )

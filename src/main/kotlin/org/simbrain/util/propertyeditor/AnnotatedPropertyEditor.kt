@@ -96,8 +96,8 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
 
     }
 
-    val propertyWidgetMap = parameterWidgetMap.map { (parameter, widget) ->
-        parameter.property to widget
+    val propertyNameWidgetMap = parameterWidgetMap.map { (parameter, widget) ->
+        parameter.property.name to widget
     }.toMap()
 
     val labelledItemPanelsByTab = LinkedHashMap<String?, LabelledItemPanel>()
@@ -250,7 +250,7 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
     }
 
     private fun getWidgetByLabel(label: String): ParameterWidget<O, *> {
-        return propertyWidgetMap.values.first { it.isConsistent && it.parameter.label == label }
+        return propertyNameWidgetMap.values.first { it.isConsistent && it.parameter.label == label }
     }
 
     fun getWidgetValueByLabel(label: String): Any? {

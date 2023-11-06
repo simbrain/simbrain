@@ -45,9 +45,7 @@ open class LinearRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>(), 
         description = "Upper bound that determines the maximum level of activity of a node.",
         order = -20,
         onUpdate = {
-            onChange(LinearRule::clippingType) {
-                enableWidget(widgetValue(LinearRule::clippingType) == ClippingType.PiecewiseLinear)
-            }
+            enableWidget(widgetValue(::clippingType) == ClippingType.PiecewiseLinear)
         }
     )
 
@@ -57,12 +55,10 @@ open class LinearRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>(), 
         description = "Lower bound that determines the minimum level of activity of a node.",
         order = -10,
         onUpdate = {
-            onChange(LinearRule::clippingType) {
-                enableWidget(
-                    widgetValue(LinearRule::clippingType) == ClippingType.PiecewiseLinear ||
-                            widgetValue(LinearRule::clippingType) == ClippingType.Relu
-                )
-            }
+            enableWidget(
+                widgetValue(::clippingType) == ClippingType.PiecewiseLinear ||
+                        widgetValue(::clippingType) == ClippingType.Relu
+            )
         }
     )
 

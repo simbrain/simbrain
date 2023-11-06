@@ -23,12 +23,8 @@ import javax.swing.event.DocumentListener
 import javax.swing.text.DefaultFormatterFactory
 import javax.swing.text.NumberFormatter
 import kotlin.math.min
-import kotlin.reflect.KClass
-import kotlin.reflect.KFunction
-import kotlin.reflect.KMutableProperty1
-import kotlin.reflect.KProperty
+import kotlin.reflect.*
 import kotlin.reflect.full.functions
-import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.jvmErasure
 
 /**
@@ -59,6 +55,8 @@ class GuiEditable<O : EditableObject, T>(
     val conditionallyEnabledBy: KMutableProperty1<O, Boolean>? = null,
     val conditionallyVisibleBy: KMutableProperty1<O, Boolean>? = null,
     val typeMapProvider: KFunction<List<Class<out CopyableObject>>>? = null,
+    val getter: (GuiEditableGetterContext<O, T>.() -> T)? = null,
+    val setter: (GuiEditableSetterContext<O, T>.(T) -> Unit)? = null,
     private val onUpdate: (UpdateFunctionContext<O, T>).() -> Unit = { }
 ) {
 
@@ -88,11 +86,14 @@ class GuiEditable<O : EditableObject, T>(
 
     operator fun getValue(baseObject: O, property: KProperty<*>): T {
         initInternalValues(baseObject, property)
-        return value
+        return getter?.invoke(GuiEditableGetterContext()) ?: value
     }
 
     @JvmName("getValueNoArgs")
     fun getValue(): T = getValue(baseObject, property)
+
+    @JvmName("setValueNoArgs")
+    fun setValue(value: T) = setValue(baseObject, property, value)
 
     operator fun setValue(
         baseObject: O,
@@ -100,7 +101,11 @@ class GuiEditable<O : EditableObject, T>(
         value: T
     ) {
         initInternalValues(baseObject, property)
-        this.value = value
+        if (setter != null) {
+            setter.invoke(GuiEditableSetterContext(), value)
+        } else {
+            this.value = value
+        }
     }
 
     private fun initInternalValues(
@@ -132,9 +137,24 @@ class GuiEditable<O : EditableObject, T>(
                 showWidget(widgetValue(conditionallyVisibleBy))
             }
         }
-        onUpdate(context)
+        if (context.updateEventProperty.name in context.monitoringPropertyNames) {
+            onUpdate(context)
+        }
     }
 
+}
+
+context(GuiEditable<O, T>)
+class GuiEditableGetterContext<O : EditableObject, T> {
+    val field get() = value
+}
+
+context(GuiEditable<O, T>)
+class GuiEditableSetterContext<O : EditableObject, T> {
+    var field get() = value
+        set(newValue) {
+            value = newValue
+        }
 }
 
 /**
@@ -188,20 +208,25 @@ class UpdateFunctionContext<O : EditableObject, T>(
     private val refreshSourceProvider: (T) -> Unit = {},
 ) {
 
+    val monitoringPropertyNames = HashSet<String>()
+
     /**
      * Provides the value of a widget that can be used inside the update function.
      * Example: `widgetValue(Neuron::activation)` returns the current value of the text field used to edit activation
      * (NOT the actual activation of the model neuron).
      */
     fun <WT> widgetValue(property: KMutableProperty1<O, WT>): WT {
-        property.isAccessible = true
-        return editor.propertyWidgetMap[property]?.value as? WT
-            ?: throw IllegalArgumentException("Property $property is not a user parameter")
+        monitoringPropertyNames.add(property.name)
+        return property.withTempPublicAccess {
+            editor.propertyNameWidgetMap[property.name]?.value as? WT
+                ?: throw IllegalArgumentException("Property $property is not a user parameter")
+        }
     }
 
-    fun onChange(property: KProperty<*>, block: () -> Unit) {
-        if (this.updateEventProperty == property) {
-            block()
+    fun <WT> widgetValue(property: KMutableProperty0<WT>): WT {
+        return property.withTempPublicAccess {
+            editor.propertyNameWidgetMap[property.name]?.value as? WT
+                ?: throw IllegalArgumentException("Property $property is not a user parameter")
         }
     }
 

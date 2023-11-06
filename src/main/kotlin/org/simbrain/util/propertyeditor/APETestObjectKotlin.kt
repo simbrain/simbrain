@@ -48,9 +48,7 @@ class APETestObjectKotlin: EditableObject {
     var conditionallyDisabledBoolean by GuiEditable(
         initValue = true,
         onUpdate = {
-            onChange(APETestObjectKotlin::controlBoolean) {
-                enableWidget(!widgetValue(APETestObjectKotlin::controlBoolean))
-            }
+            enableWidget(!widgetValue(::controlBoolean))
         },
         order = 20
     )
@@ -90,12 +88,24 @@ class APETestObjectKotlin: EditableObject {
     var dataHolder: ScalarDataHolder by GuiEditable(
         initValue = BiasedScalarData(1.0),
         onUpdate = {
-            onChange(APETestObjectKotlin::neuronUpdateRule) {
-                refreshValue(widgetValue(APETestObjectKotlin::neuronUpdateRule).createScalarData())
-                // showWidget(widgetValue(APETestObject2::testBoolean))
-            }
+            refreshValue(widgetValue(::neuronUpdateRule).createScalarData())
         },
         order = 80
+    )
+
+    private var _intValue: Int = 0
+
+    var intValueWithCustomBacking: Int by GuiEditable(
+        initValue = _intValue,
+        order = 90,
+        getter = {
+            println("Getting value from _intValue: $_intValue")
+            _intValue
+         },
+        setter = {
+            println("Setting value to _intValue: $_intValue")
+            _intValue = it
+        },
     )
 
     abstract class TestObjectBase: CopyableObject {

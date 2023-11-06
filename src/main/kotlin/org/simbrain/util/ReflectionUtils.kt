@@ -4,6 +4,7 @@ import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
+import kotlin.reflect.KProperty0
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.isAccessible
@@ -36,6 +37,14 @@ fun Any.allPropertiesToString(separator: String = "\n") = this::class.declaredMe
  * Calls the given block with this property accessible, then restores the original accessibility.
  */
 fun <T, U, R> KProperty1<T, U>.withTempPublicAccess(block: KProperty1<T, U>.() -> R): R {
+    val oldAccessible = isAccessible
+    isAccessible = true
+    val result = block()
+    isAccessible = oldAccessible
+    return result
+}
+
+fun <U, R> KProperty0<U>.withTempPublicAccess(block: KProperty0<U>.() -> R): R {
     val oldAccessible = isAccessible
     isAccessible = true
     val result = block()

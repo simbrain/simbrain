@@ -112,4 +112,6 @@ annotation class UserParameter(
      * Specify the name of a custom get type function when more than one is needed, beyond [CopyableObject.getTypeList]
      */
     val typeMapProvider: String = "",
+
+    val useLegacySetter: Boolean = false,
 )

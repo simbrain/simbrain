@@ -2,7 +2,7 @@ package org.simbrain.util.propertyeditor
 
 import org.simbrain.util.LabelledItemPanel
 import org.simbrain.util.UserParameter
-import org.simbrain.util.invokeSetter
+import org.simbrain.util.invokeLegacySetter
 import smile.math.matrix.Matrix
 import java.awt.Color
 import javax.swing.JPanel
@@ -231,9 +231,17 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
                     val property = parameter.property
                     if (widget is ObjectWidget<*, *>) {
                         widget.objectTypeEditor.commitChanges()
-                        property.invokeSetter(eo, widget.value.copy())
+                        if (parameter.useLegacySetter) {
+                            property.invokeLegacySetter(eo, widget.value.copy())
+                        } else {
+                            property.setter.call(eo, widget.value.copy())
+                        }
                     } else {
-                        property.invokeSetter(eo, widget.value)
+                        if (parameter.useLegacySetter) {
+                            property.invokeLegacySetter(eo, widget.value)
+                        } else {
+                            property.setter.call(eo, widget.value)
+                        }
                     }
                 }
 

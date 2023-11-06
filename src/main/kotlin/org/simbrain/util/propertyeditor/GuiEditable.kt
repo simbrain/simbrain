@@ -51,6 +51,7 @@ class GuiEditable<O : EditableObject, T>(
     val order: Int = 0,
     val displayOnly: Boolean = false,
     val showDetails: Boolean = true,
+    val useLegacySetter: Boolean = false,
     val tab: String? = null,
     val conditionallyEnabledBy: KMutableProperty1<O, Boolean>? = null,
     val conditionallyVisibleBy: KMutableProperty1<O, Boolean>? = null,
@@ -137,7 +138,7 @@ class GuiEditable<O : EditableObject, T>(
                 showWidget(widgetValue(conditionallyVisibleBy))
             }
         }
-        if (context.updateEventProperty.name in context.monitoringPropertyNames) {
+        if (context.monitoringPropertyNames == null || context.updateEventProperty.name in context.monitoringPropertyNames!!) {
             onUpdate(context)
         }
     }
@@ -184,6 +185,7 @@ fun <O : EditableObject> UserParameter.toGuiEditable(initValue: Any): GuiEditabl
         order = order,
         displayOnly = displayOnly,
         showDetails = showDetails,
+        useLegacySetter = useLegacySetter,
         tab = tab,
         typeMapProvider = if (typeMapProvider.isNotEmpty()) {
             initValue::class.functions.first { it.name == typeMapProvider } as KFunction<List<Class<out CopyableObject>>>
@@ -208,7 +210,14 @@ class UpdateFunctionContext<O : EditableObject, T>(
     private val refreshSourceProvider: (T) -> Unit = {},
 ) {
 
-    val monitoringPropertyNames = HashSet<String>()
+    var monitoringPropertyNames: HashSet<String>? = null
+
+    fun initializeOrGetMonitoringPropertyNames(): HashSet<String> {
+        if (monitoringPropertyNames == null) {
+            monitoringPropertyNames = HashSet()
+        }
+        return monitoringPropertyNames!!
+    }
 
     /**
      * Provides the value of a widget that can be used inside the update function.
@@ -216,7 +225,7 @@ class UpdateFunctionContext<O : EditableObject, T>(
      * (NOT the actual activation of the model neuron).
      */
     fun <WT> widgetValue(property: KMutableProperty1<O, WT>): WT {
-        monitoringPropertyNames.add(property.name)
+        initializeOrGetMonitoringPropertyNames().add(property.name)
         return property.withTempPublicAccess {
             editor.propertyNameWidgetMap[property.name]?.value as? WT
                 ?: throw IllegalArgumentException("Property $property is not a user parameter")
@@ -224,6 +233,7 @@ class UpdateFunctionContext<O : EditableObject, T>(
     }
 
     fun <WT> widgetValue(property: KMutableProperty0<WT>): WT {
+        initializeOrGetMonitoringPropertyNames().add(property.name)
         return property.withTempPublicAccess {
             editor.propertyNameWidgetMap[property.name]?.value as? WT
                 ?: throw IllegalArgumentException("Property $property is not a user parameter")
@@ -748,6 +758,7 @@ class ObjectWidget<O : EditableObject, T : CopyableObject>(
                         SwingUtilities.getWindowAncestor(this)?.pack()
                     }
                 } catch (exception: Exception) {
+                    println("Failed to create prototype object for $parameter with type $selectedItem and class ${typeMap[selectedItem as String]}")
                     exception.printStackTrace()
                 }
             }

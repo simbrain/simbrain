@@ -66,10 +66,10 @@ fun Field.isTransient() = modifiers.let { mod -> Modifier.isTransient(mod) }
 val <O, T> KMutableProperty1<O, T>.legacySetter
     get() = javaField?.let { field ->
         field.declaringClass.methods.firstOrNull { it.name == "set${name.capitalize()}" }
-    }
+            ?: throw IllegalStateException("No legacy setter found for property $name in class ${field.declaringClass.name}")
+    } ?: throw IllegalStateException("No java field found for property $name")
 
-fun <O, T> KMutableProperty1<O, T>.invokeSetter(receiver: O, value: Any?) {
+fun <O, T> KMutableProperty1<O, T>.invokeLegacySetter(receiver: O, value: Any?) {
     // if there is a legacy setter (java setter) use it, otherwise use the kotlin setter
-    legacySetter?.invoke(receiver, value)
-        ?: setter.call(receiver, value)
+    legacySetter.invoke(receiver, value)
 }

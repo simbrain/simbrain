@@ -71,7 +71,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
      */
     @UserParameter(label = "Strength", description = "Weight Strength. If you want a value greater" +
             "than upper bound or less than lower bound you must set those first, and close this dialog.",
-            probDist = "Normal", probParam1 = .1, probParam2 = .5,
+            probDist = "Normal", probParam1 = .1, probParam2 = .5, useLegacySetter = true,
             order = 1)
     private double strength = 1;
 

@@ -133,7 +133,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         // TODO: fixed events type on override
         val events = neuronArray.events as NeuronArrayEvents
 
-        events.visualPropertiesChanged.on {
+        events.visualPropertiesChanged.on(Dispatchers.Swing) {
             gridMode = neuronArray.gridMode
             showBias = neuronArray.isShowBias
         }

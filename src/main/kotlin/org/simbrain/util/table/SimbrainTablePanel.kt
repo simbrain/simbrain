@@ -9,10 +9,7 @@ import org.jdesktop.swingx.JXTableHeader
 import org.simbrain.util.cartesianProduct
 import org.simbrain.util.displayInDialog
 import org.simbrain.util.widgets.RowNumberTable
-import java.awt.AWTEvent
-import java.awt.BorderLayout
-import java.awt.Color
-import java.awt.Toolkit
+import java.awt.*
 import java.awt.event.*
 import java.util.*
 import javax.swing.*
@@ -54,6 +51,40 @@ open class SimbrainTablePanel @JvmOverloads constructor(
         }
 
     init {
+
+        fun scrollToVisible(row: Int) {
+            val cellRect = table.getCellRect(row, 0, true)
+            val viewRect = scrollPane.viewport.viewRect
+
+            // Determine if the cell is not visible within the viewport.
+            if (!viewRect.contains(cellRect)) {
+                // Determine the scroll direction and distance.
+                val toScroll = when {
+                    // Scroll up if the cell is above the viewport
+                    cellRect.y < viewRect.y -> cellRect.y - viewRect.y
+                    // Scroll down if the cell is below the viewport
+                    cellRect.y + cellRect.height > viewRect.y + viewRect.height -> cellRect.y + cellRect.height - viewRect.y - viewRect.height
+                    // No scrolling necessary if the cell is already visible
+                    else -> 0
+                }
+
+                // If scrolling is needed, calculate the new view position.
+                if (toScroll != 0) {
+                    val newViewPosY = viewRect.y + toScroll
+                    val newPoint = Point(viewRect.x, Math.max(0, newViewPosY))
+                    scrollPane.viewport.viewPosition = newPoint
+                }
+
+                // Revalidate and repaint the scroll pane to reflect changes.
+                scrollPane.revalidate()
+                scrollPane.repaint()
+            }
+        }
+
+
+        model.events.currentRowChanged.on(Dispatchers.Swing) {
+            scrollToVisible(table.selectedRow)
+        }
 
         // Putting the toolbar in the top part of a border layout to avoid problems with horizontal scrollbars in the
         // main panel

@@ -210,6 +210,9 @@ class UpdateFunctionContext<O : EditableObject, T>(
     private val refreshSourceProvider: (T) -> Unit = {},
 ) {
 
+    /**
+     * For any property names in this set, if any of them changed, the update function will be called.
+     */
     var monitoringPropertyNames: HashSet<String>? = null
 
     fun initializeOrGetMonitoringPropertyNames(): HashSet<String> {
@@ -223,6 +226,8 @@ class UpdateFunctionContext<O : EditableObject, T>(
      * Provides the value of a widget that can be used inside the update function.
      * Example: `widgetValue(Neuron::activation)` returns the current value of the text field used to edit activation
      * (NOT the actual activation of the model neuron).
+     *
+     * Note: Since widgetValue is also used to register [monitoringPropertyNames], it must not be hidden behind a conditional
      */
     fun <WT> widgetValue(property: KMutableProperty1<O, WT>): WT {
         initializeOrGetMonitoringPropertyNames().add(property.name)
@@ -232,6 +237,11 @@ class UpdateFunctionContext<O : EditableObject, T>(
         }
     }
 
+    /**
+     * See [widgetValue].
+     * Provides a simpler way to access to property.
+     * Example: `widgetValue(::activation)` in Neuron
+     */
     fun <WT> widgetValue(property: KMutableProperty0<WT>): WT {
         initializeOrGetMonitoringPropertyNames().add(property.name)
         return property.withTempPublicAccess {

@@ -1,8 +1,10 @@
 package org.simbrain.util
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.swing.Swing
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.widgets.DropDownTriangle
@@ -347,3 +349,5 @@ fun <C: JComponent> C.createApplyPanel(commitAction: C.() -> Unit): JPanel {
         }
     }
 }
+
+val swingDispatcher get() = Dispatchers.Swing

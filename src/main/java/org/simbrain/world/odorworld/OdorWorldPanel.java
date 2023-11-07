@@ -18,7 +18,6 @@
  */
 package org.simbrain.world.odorworld;
 
-import kotlinx.coroutines.Dispatchers;
 import org.piccolo2d.PCamera;
 import org.piccolo2d.PCanvas;
 import org.piccolo2d.PNode;
@@ -44,6 +43,8 @@ import java.util.List;
 import java.util.Timer;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.simbrain.util.SwingUtilsKt.getSwingDispatcher;
 
 /**
  * <b>OdorWorldPanel</b> represent the OdorWorld.
@@ -224,13 +225,13 @@ public class OdorWorldPanel extends JPanel {
 
         // PCamera camera = canvas.getCamera();
 
-        world.getEvents().getEntityAdded().on(Dispatchers.getMain(), e -> {
+        world.getEvents().getEntityAdded().on(getSwingDispatcher(), e -> {
             EntityNode node = new EntityNode(world, e);
             canvas.getLayer().addChild(node);
             selectionModel.setSelection(Collections.singleton(node)); // not working
             repaint();
         });
-        world.getEvents().getEntityRemoved().on(Dispatchers.getMain(), e -> {
+        world.getEvents().getEntityRemoved().on(getSwingDispatcher(), e -> {
             var entityNode = canvas.getLayer().getAllNodes()
                     .stream().filter(n -> n instanceof EntityNode)
                     .filter(n -> ((EntityNode)n).getEntity() == e)
@@ -240,14 +241,14 @@ public class OdorWorldPanel extends JPanel {
                 repaint();
             }
         });
-        world.getEvents().getUpdated().on(Dispatchers.getMain(), true, this::centerCameraToSelectedEntity);
-        world.getEvents().getFrameAdvanced().on(Dispatchers.getMain(), () -> {
+        world.getEvents().getUpdated().on(getSwingDispatcher(), true, this::centerCameraToSelectedEntity);
+        world.getEvents().getFrameAdvanced().on(getSwingDispatcher(), () -> {
             canvas.getLayer().getChildrenReference().stream()
                     .filter(i -> i instanceof EntityNode)
                     .forEach(i -> ((EntityNode) i).advance());
             repaint();
         });
-        world.getEvents().getAnimationStopped().on(Dispatchers.getMain(), () -> {
+        world.getEvents().getAnimationStopped().on(getSwingDispatcher(), () -> {
             // When movement is stopped use the "static" animation so we don't show entities in strange
             // intermediate states
             canvas.getLayer().getChildrenReference().stream()
@@ -257,17 +258,17 @@ public class OdorWorldPanel extends JPanel {
         });
 
         // Full tile map update
-        world.getEvents().getTileMapChanged().on(Dispatchers.getMain(), () -> {
-            world.getTileMap().getEvents().getLayerAdded().on(Dispatchers.getMain(), () -> {
+        world.getEvents().getTileMapChanged().on(getSwingDispatcher(), () -> {
+            world.getTileMap().getEvents().getLayerAdded().on(getSwingDispatcher(), () -> {
                 renderAllLayers(world);
             });
 
-            world.getTileMap().getEvents().getMapSizeChanged().on(Dispatchers.getMain(), () -> {
+            world.getTileMap().getEvents().getMapSizeChanged().on(getSwingDispatcher(), () -> {
                 world.events.getTileMapChanged().fireAndBlock();
             });
 
             // Single layer update
-            world.getTileMap().getEvents().getLayerImageChanged().on(Dispatchers.getMain(), (oldImage, newImage) -> {
+            world.getTileMap().getEvents().getLayerImageChanged().on(getSwingDispatcher(), (oldImage, newImage) -> {
                 int index = canvas.getLayer().indexOfChild(oldImage);
                 canvas.getLayer().removeChild(oldImage);
                 if (index != -1) {

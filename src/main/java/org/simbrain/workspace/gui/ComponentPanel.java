@@ -18,7 +18,6 @@
  */
 package org.simbrain.workspace.gui;
 
-import kotlinx.coroutines.Dispatchers;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.events.WorkspaceEvents;
 
@@ -27,6 +26,8 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.util.ArrayList;
+
+import static org.simbrain.util.SwingUtilsKt.getSwingDispatcher;
 
 /**
  * Displays a list of all currently open workspace components.
@@ -86,9 +87,9 @@ public class ComponentPanel extends JPanel {
         add(panel);
 
         WorkspaceEvents events = desktop.getWorkspace().getEvents();
-        events.getWorkspaceCleared().on(Dispatchers.getMain(), model::clear);
-        events.getComponentAdded().on(Dispatchers.getMain(), model::addRow);
-        events.getComponentRemoved().on(Dispatchers.getMain(), model::removeRow);
+        events.getWorkspaceCleared().on(getSwingDispatcher(), model::clear);
+        events.getComponentAdded().on(getSwingDispatcher(), model::addRow);
+        events.getComponentRemoved().on(getSwingDispatcher(), model::removeRow);
     }
 
     /**

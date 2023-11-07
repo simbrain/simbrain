@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import kotlinx.coroutines.Dispatchers;
 import org.jetbrains.annotations.Nullable;
 import org.piccolo2d.PNode;
 import org.simbrain.network.LocatableModel;
@@ -35,6 +34,8 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.util.LinkedHashSet;
 import java.util.Set;
+
+import static org.simbrain.util.SwingUtilsKt.getSwingDispatcher;
 
 /**
  * PNode representation of a subnetwork. This class contains an interaction box
@@ -97,7 +98,7 @@ public class SubnetworkNode extends ScreenElement {
         LocationEvents events = subnetwork.getEvents();
         events.getDeleted().on(n -> removeFromParent());
         events.getLabelChanged().on((o, n) -> updateText());
-        events.getLocationChanged().on(Dispatchers.getMain(), this::layoutChildren);
+        events.getLocationChanged().on(getSwingDispatcher(), this::layoutChildren);
     }
 
     @Override

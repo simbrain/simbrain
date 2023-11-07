@@ -1,6 +1,5 @@
 package org.simbrain.network.gui.nodes;
 
-import kotlinx.coroutines.Dispatchers;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.events.NeuronCollectionEvents;
 import org.simbrain.network.events.NeuronEvents;
@@ -16,6 +15,8 @@ import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.simbrain.util.SwingUtilsKt.getSwingDispatcher;
 
 public abstract class AbstractNeuronCollectionNode extends ScreenElement {
 
@@ -53,13 +54,13 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
         addChild(outlinedObjects);
 
         NeuronCollectionEvents events = nc.getEvents();
-        events.getDeleted().on(Dispatchers.getMain(), n ->  {
+        events.getDeleted().on(getSwingDispatcher(), n ->  {
             removeFromParent();
         });
-        events.getLabelChanged().on(Dispatchers.getMain(), (o,n) -> {
+        events.getLabelChanged().on(getSwingDispatcher(), (o,n) -> {
             updateText();
         });
-        events.getLocationChanged().on(Dispatchers.getMain(), () -> {
+        events.getLocationChanged().on(getSwingDispatcher(), () -> {
             pullPositionFromModel();
             outlinedObjects.updateBounds();
         });
@@ -113,12 +114,12 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
         for (NeuronNode neuronNode : neuronNodes) {
             // Listen directly to neuron nodes for property change events
             NeuronEvents neuronEvents = neuronNode.getNeuron().getEvents();
-            neuronEvents.getDeleted().on(Dispatchers.getMain(), n -> {
+            neuronEvents.getDeleted().on(getSwingDispatcher(), n -> {
                 this.neuronNodes.remove(neuronNode);
                 outlinedObjects.resetOutlinedNodes(this.neuronNodes);
             });
-            neuronEvents.getLocationChanged().on(Dispatchers.getMain(), () -> outlinedObjects.resetOutlinedNodes(this.neuronNodes));
-            neuronEvents.getLabelChanged().on(Dispatchers.getMain(), (o,n) -> outlinedObjects.resetOutlinedNodes(this.neuronNodes));
+            neuronEvents.getLocationChanged().on(getSwingDispatcher(), () -> outlinedObjects.resetOutlinedNodes(this.neuronNodes));
+            neuronEvents.getLabelChanged().on(getSwingDispatcher(), (o,n) -> outlinedObjects.resetOutlinedNodes(this.neuronNodes));
         }
         outlinedObjects.resetOutlinedNodes(this.neuronNodes);
     }

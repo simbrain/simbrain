@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import kotlinx.coroutines.Dispatchers;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.util.PBounds;
 import org.simbrain.network.core.Synapse;
@@ -35,6 +34,7 @@ import java.awt.geom.Point2D;
 
 import static org.simbrain.network.gui.NetworkDialogsKt.getSynapseDialog;
 import static org.simbrain.network.gui.NetworkPanelMenusKt.getSynapseContextMenu;
+import static org.simbrain.util.SwingUtilsKt.getSwingDispatcher;
 
 /**
  * <b>SynapseNode</b> is a Piccolo PNode corresponding to a Neuron in the neural
@@ -151,7 +151,7 @@ public final class SynapseNode extends ScreenElement {
 
         SynapseEvents events = synapse.getEvents();
 
-        events.getDeleted().on(Dispatchers.getMain(), s -> removeFromParent());
+        events.getDeleted().on(getSwingDispatcher(), s -> removeFromParent());
         events.getStrengthUpdated().on(() -> {
             updateColor();
             updateDiameter();

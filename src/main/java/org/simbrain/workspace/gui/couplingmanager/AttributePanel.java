@@ -18,7 +18,6 @@
  */
 package org.simbrain.workspace.gui.couplingmanager;
 
-import kotlinx.coroutines.Dispatchers;
 import org.simbrain.workspace.*;
 import org.simbrain.workspace.events.WorkspaceComponentEvents;
 import org.simbrain.workspace.events.WorkspaceEvents;
@@ -28,6 +27,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.simbrain.util.SwingUtilsKt.getSwingDispatcher;
 
 /**
  * Displays a panel with a JComboBox, which the user uses to select a component,
@@ -283,19 +284,19 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
 
             WorkspaceEvents events = workspace.getEvents();
 
-            events.getComponentAdded().on(Dispatchers.getMain(), wc -> {
+            events.getComponentAdded().on(getSwingDispatcher(), wc -> {
                 this.addItem(wc);
                 addAttributeListener(wc);
             });
 
-            events.getComponentRemoved().on(Dispatchers.getMain(), wc -> {
+            events.getComponentRemoved().on(getSwingDispatcher(), wc -> {
                 this.removeItem(wc);
                 if (this.getItemCount() == 0) {
                     AttributePanel.this.clearList();
                 }
             });
 
-            events.getWorkspaceCleared().on(Dispatchers.getMain(), () -> {
+            events.getWorkspaceCleared().on(getSwingDispatcher(), () -> {
                 this.removeAllItems();
                 AttributePanel.this.clearList();
             });

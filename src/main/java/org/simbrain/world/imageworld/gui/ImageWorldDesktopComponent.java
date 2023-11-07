@@ -1,6 +1,5 @@
 package org.simbrain.world.imageworld.gui;
 
-import kotlinx.coroutines.Dispatchers;
 import org.simbrain.util.ImageUtilsKt;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.SFileChooser;
@@ -21,6 +20,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.LinkedList;
+
+import static org.simbrain.util.SwingUtilsKt.getSwingDispatcher;
 
 public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldComponent> {
 
@@ -90,11 +91,11 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
 
         // Main image
         add(new ImagePanel(), BorderLayout.CENTER);
-        imageWorld.getImageAlbum().getEvents().getImageUpdate().on(Dispatchers.getMain(), () -> {
+        imageWorld.getImageAlbum().getEvents().getImageUpdate().on(getSwingDispatcher(), () -> {
             updateToolbar();
             repaint();
         });
-        imageWorld.getFilterCollection().getEvents().getFilterChanged().on(Dispatchers.getMain(), (o, n) -> this.repaint());
+        imageWorld.getFilterCollection().getEvents().getFilterChanged().on(getSwingDispatcher(), (o, n) -> this.repaint());
 
         // Toolbars
         add(toolbars, BorderLayout.NORTH);

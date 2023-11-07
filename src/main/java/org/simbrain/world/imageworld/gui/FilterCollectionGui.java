@@ -1,6 +1,5 @@
 package org.simbrain.world.imageworld.gui;
 
-import kotlinx.coroutines.Dispatchers;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
@@ -14,6 +13,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+
+import static org.simbrain.util.SwingUtilsKt.getSwingDispatcher;
 
 /**
  * Provides a toolbar for adding, deleting, and setting a current {@link Filter}
@@ -30,9 +31,9 @@ public class FilterCollectionGui {
     public FilterCollectionGui(ImageWorldDesktopComponent parent, FilterCollection filterCollection) {
         this.parent = parent;
         this.filterCollection = filterCollection;
-        filterCollection.getEvents().getFilterAdded().on(Dispatchers.getMain(), s -> updateComboBox());
-        filterCollection.getEvents().getFilterRemoved().on(Dispatchers.getMain(), (Consumer<Filter>) s -> updateComboBox());
-        filterCollection.getEvents().getFilterChanged().on(Dispatchers.getMain(),
+        filterCollection.getEvents().getFilterAdded().on(getSwingDispatcher(), s -> updateComboBox());
+        filterCollection.getEvents().getFilterRemoved().on(getSwingDispatcher(), (Consumer<Filter>) s -> updateComboBox());
+        filterCollection.getEvents().getFilterChanged().on(getSwingDispatcher(),
                 (BiConsumer<Filter, Filter>) (o, n) -> setComboBoxSelection(n));
     }
 

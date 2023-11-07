@@ -79,6 +79,16 @@ class APETestObjectKotlin: EditableObject {
         order = 60
     )
 
+    var testDoubleArray by GuiEditable(
+        initValue = doubleArrayOf(1.0, -1.0),
+        order = 65
+    )
+
+    var testIntArray by GuiEditable(
+        initValue = intArrayOf(1, -1),
+        order = 67
+    )
+
     var neuronUpdateRule: NeuronUpdateRule<*, *> by GuiEditable(
         initValue = LinearRule(),
         showDetails = false,
@@ -166,7 +176,7 @@ fun main() {
     }
     val editor = AnnotatedPropertyEditor(editingObject).displayInDialog {
         commitChanges()
-        editingObject.forEach { println(it) }
+        println(editingObject)
     }
 
     // AnnotatedPropertyEditor(objectWrapper<ProbabilityDistribution>("randomizer", UniformRealDistribution())).displayInDialog {

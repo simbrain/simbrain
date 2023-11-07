@@ -24,6 +24,7 @@ fun Any.allPropertiesToString(separator: String = "\n") = this::class.declaredMe
         is String -> value
         is List<*> -> value.joinToString(", ")
         is Array<*> -> value.contentDeepToString()
+        is IntArray -> value.joinToString(", ")
         is DoubleArray -> value.joinToString(", ")
         is FloatArray -> value.joinToString(", ")
         else -> value.toString()

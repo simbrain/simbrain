@@ -85,7 +85,7 @@ class TFConv2DLayer : TFLayer<Conv2D>() {
             activation = activations,
             kernelInitializer = kernelInitializer,
             biasInitializer = biasInitializer,
-            padding = ConvPadding.SAME,
+            padding = padding,
             useBias = useBias
         ).also {
             layer = it

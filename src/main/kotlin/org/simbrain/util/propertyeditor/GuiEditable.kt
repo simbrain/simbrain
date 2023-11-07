@@ -614,7 +614,7 @@ class DoubleArrayWidget<O : EditableObject>(
     }
 
     override val value: DoubleArray
-        get() = model.get2DDoubleArray().first()
+        get() = model.getDoubleColumn(0)
 
     override fun refresh(property: KProperty<*>) {
         parameter.update(UpdateFunctionContext(
@@ -656,7 +656,7 @@ class IntArrayWidget<O : EditableObject>(
     }
 
     override val value: IntArray
-        get() = model.get2DDoubleArray().first().toIntArray()
+        get() = model.getIntColumn(0)
 
     override fun refresh(property: KProperty<*>) {
         parameter.update(UpdateFunctionContext(

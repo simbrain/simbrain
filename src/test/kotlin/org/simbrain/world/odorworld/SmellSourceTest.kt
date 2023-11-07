@@ -2,7 +2,7 @@ package org.simbrain.world.odorworld
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import org.simbrain.util.environment.SmellSource
+import org.simbrain.util.SmellSource
 
 /**
  * Test decay functions

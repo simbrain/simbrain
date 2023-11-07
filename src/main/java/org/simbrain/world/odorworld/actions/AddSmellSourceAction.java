@@ -18,7 +18,7 @@
  */
 package org.simbrain.world.odorworld.actions;
 
-import org.simbrain.util.environment.SmellSource;
+import org.simbrain.util.SmellSource;
 import org.simbrain.world.odorworld.OdorWorldPanel;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 

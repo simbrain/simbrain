@@ -20,8 +20,8 @@ package org.simbrain.world.odorworld;
 
 import org.jetbrains.annotations.NotNull;
 import org.simbrain.util.SimpleIdManager;
+import org.simbrain.util.SmellSource;
 import org.simbrain.util.UserParameter;
-import org.simbrain.util.environment.SmellSource;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.piccolo.TMXUtils;
 import org.simbrain.util.piccolo.TileMap;

@@ -24,6 +24,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SynapseGroup;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
+import org.simbrain.network.neurongroups.CompetitiveGroup;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 

@@ -16,88 +16,90 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.subnetworks;
+package org.simbrain.network.neurongroups
 
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
-import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.util.UserParameter;
-
-import java.util.Iterator;
-import java.util.Map;
-import java.util.function.Function;
+import org.simbrain.network.core.Network
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.groups.NeuronGroup
+import org.simbrain.network.neuron_update_rules.LinearRule
+import org.simbrain.util.UserParameter
+import org.simbrain.util.propertyeditor.GuiEditable
 
 /**
- * <b>Competitive</b> implements a simple competitive network.
- * <p>
+ * Implements a simple competitive network.
+ *
  * Current implementations include Rummelhart-Zipser (PDP, 151-193), and
  * Alvarez-Squire 1994, PNAS, 7041-7045.
  *
  * @author Jeff Yoshimi
  */
-public class CompetitiveGroup extends NeuronGroup {
+open class CompetitiveGroup : NeuronGroup {
 
-    // TODO: Add "recall" function as with SOM
+    val DEFAULT_LEARNING_RATE = .1
 
-    public static final double DEFAULT_LEARNING_RATE  = .1;
-    public static final double DEFAULT_WIN_VALUE  = 1;
-    public static final double DEFAULT_LOSE_VALUE  = 0;
-    public static final boolean DEFAULT_NORM_INPUTS  = true;
-    public static final boolean DEFAULT_USE_LEAKY  = false;
-    public static final double DEFAULT_LEAKY_RATE  = DEFAULT_LEARNING_RATE/4;
-    public static final double DEFAULT_DECAY_PERCENT  = .0008;
-    public static final UpdateMethod DEFAULT_UPDATE_METHOD = UpdateMethod.RUMM_ZIPSER;
+    val DEFAULT_WIN_VALUE = 1.0
+
+    val DEFAULT_LOSE_VALUE = 0.0
+
+    val DEFAULT_NORM_INPUTS = true
+
+    val DEFAULT_USE_LEAKY = false
+
+    val DEFAULT_LEAKY_RATE = DEFAULT_LEARNING_RATE / 4
+
+    val DEFAULT_DECAY_PERCENT = .0008
+
+    val DEFAULT_UPDATE_METHOD = UpdateMethod.RUMM_ZIPSER
 
     @UserParameter(label = "Update method", order = 30)
-    private UpdateMethod updateMethod = DEFAULT_UPDATE_METHOD;
+    var updateMethod = DEFAULT_UPDATE_METHOD
 
     @UserParameter(label = "Learning rate", order = 40)
-    private double learningRate = DEFAULT_LEARNING_RATE;
+    var learningRate = DEFAULT_LEARNING_RATE
 
     @UserParameter(label = "Winner Value", order = 50)
-    private double winValue = DEFAULT_WIN_VALUE;
+    var winValue = DEFAULT_WIN_VALUE
 
     @UserParameter(label = "Lose Value", order = 60)
-    private double loseValue = DEFAULT_LOSE_VALUE;
+    var loseValue = DEFAULT_LOSE_VALUE
 
     @UserParameter(label = "Normalize inputs", order = 70)
-    private boolean normalizeInputs = DEFAULT_NORM_INPUTS;
+    var normalizeInputs = DEFAULT_NORM_INPUTS
 
     @UserParameter(label = "Use Leaky learning", order = 80)
-    private boolean useLeakyLearning = DEFAULT_USE_LEAKY;
+    var useLeakyLearning = DEFAULT_USE_LEAKY
 
-    @UserParameter(label = "Leaky learning rate", conditionalEnablingMethod = "usesLeakyLearning", order = 90)
-    private double leakyLearningRate = DEFAULT_LEAKY_RATE;
+    var leakyLearningRate by GuiEditable(
+        initValue = DEFAULT_LEAKY_RATE,
+        conditionallyEnabledBy = CompetitiveGroup::useLeakyLearning,
+        order = 90
+    )
 
-    /**
-     * Percentage by which to decay synapses on each update for Alvarez-Squire update.
-     */
-    @UserParameter(label = "Decay percent", order = 100)
-    private double synpaseDecayPercent = DEFAULT_DECAY_PERCENT;
+    @UserParameter(label = "Decay percent", description = "Percentage by which to decay synapses on each update for Alvarez-Squire update.", order = 100)
+    var synpaseDecayPercent = DEFAULT_DECAY_PERCENT
 
     /**
      * Max, value and activation values.
      */
-    private double max, val, activation;
+    private var max = 0.0
+    private var `val` = 0.0
+    private var activation = 0.0
 
     /**
      * Winner value.
      */
-    private int winner;
+    private var winner = 0
 
     /**
      * Specific implementation of competitive learning.
      */
-    public enum UpdateMethod {
+    enum class UpdateMethod {
         /**
          * Rummelhart-Zipser.
          */
         RUMM_ZIPSER {
-            @Override
-            public String toString() {
-                return "Rummelhart-Zipser";
+            override fun toString(): String {
+                return "Rummelhart-Zipser"
             }
         },
 
@@ -105,9 +107,8 @@ public class CompetitiveGroup extends NeuronGroup {
          * Alvarez-Squire.
          */
         ALVAREZ_SQUIRE {
-            @Override
-            public String toString() {
-                return "Alvarez-Squire";
+            override fun toString(): String {
+                return "Alvarez-Squire"
             }
         }
     }
@@ -118,12 +119,11 @@ public class CompetitiveGroup extends NeuronGroup {
      * @param numNeurons size of this network in neurons
      * @param root       reference to Network.
      */
-    public CompetitiveGroup(final Network root, final int numNeurons) {
-        super(root);
-        for (int i = 0; i < numNeurons; i++) {
-            addNeuron(new Neuron(root, new LinearRule()));
+    constructor(root: Network?, numNeurons: Int) : super(root) {
+        for (i in 0 until numNeurons) {
+            addNeuron(Neuron(root, LinearRule()))
         }
-        setLabel("Competitive Group");
+        label = "Competitive Group"
     }
 
     /**
@@ -132,72 +132,65 @@ public class CompetitiveGroup extends NeuronGroup {
      * @param newRoot new root network
      * @param oldNet  old network.
      */
-    public CompetitiveGroup(Network newRoot, CompetitiveGroup oldNet) {
-        super(newRoot, oldNet);
-        this.learningRate = oldNet.getLearningRate();
-        this.winValue = oldNet.getWinValue();
-        this.loseValue = oldNet.loseValue;
-        this.normalizeInputs = oldNet.normalizeInputs;
-        this.useLeakyLearning = oldNet.useLeakyLearning;
-        this.leakyLearningRate = oldNet.leakyLearningRate;
-        this.synpaseDecayPercent = oldNet.synpaseDecayPercent;
-        this.max = oldNet.max;
-        this.val = oldNet.val;
-        this.activation = oldNet.activation;
-        this.winner = oldNet.winner;
-        this.updateMethod = oldNet.updateMethod;
-        setLabel("Competitive Group (copy)");
+    constructor(newRoot: Network?, oldNet: CompetitiveGroup) : super(newRoot, oldNet) {
+        learningRate = oldNet.learningRate
+        winValue = oldNet.winValue
+        loseValue = oldNet.loseValue
+        normalizeInputs = oldNet.normalizeInputs
+        useLeakyLearning = oldNet.useLeakyLearning
+        leakyLearningRate = oldNet.leakyLearningRate
+        synpaseDecayPercent = oldNet.synpaseDecayPercent
+        max = oldNet.max
+        `val` = oldNet.`val`
+        activation = oldNet.activation
+        winner = oldNet.winner
+        updateMethod = oldNet.updateMethod
+        label = "Competitive Group (copy)"
     }
 
-    @Override
-    public CompetitiveGroup deepCopy(Network newParent) {
-        return new CompetitiveGroup(newParent, this);
+    override fun deepCopy(newParent: Network): CompetitiveGroup {
+        return CompetitiveGroup(newParent, this)
     }
 
-    @Override
-    public String getTypeDescription() {
-        return "Competitive Group";
+    override fun getTypeDescription(): String {
+        return "Competitive Group"
     }
 
-    @Override
-    public void update() {
-
-        super.update();
-
-        max = 0;
-        winner = 0;
+    override fun update() {
+        super.update()
+        max = 0.0
+        winner = 0
 
         // Determine Winner
-        for (int i = 0; i < getNeuronList().size(); i++) {
-            Neuron n = getNeuronList().get(i);
-            if (!n.isClamped()) {
-                n.update();
+        for (i in getNeuronList().indices) {
+            val n = getNeuronList()[i]
+            if (!n.isClamped) {
+                n.update()
             }
-            if (n.getActivation() > max) {
-                max = n.getActivation();
-                winner = i;
+            if (n.activation > max) {
+                max = n.activation
+                winner = i
             }
         }
 
         // Update weights on winning neuron
-        for (int i = 0; i < getNeuronList().size(); i++) {
-            Neuron neuron = getNeuronList().get(i);
+        for (i in getNeuronList().indices) {
+            val neuron = getNeuronList()[i]
             if (i == winner) {
-                neuron.setActivation(winValue);
-                neuron.setSpike(neuron.isSpike());
-                if (updateMethod == UpdateMethod.RUMM_ZIPSER) {
-                    rummelhartZipser(neuron);
-                } else if (updateMethod == UpdateMethod.ALVAREZ_SQUIRE) {
-                    squireAlvarezWeightUpdate(neuron);
-                    decayAllSynapses();
+                neuron.activation = winValue
+                neuron.isSpike = neuron.isSpike
+                if (updateMethod === UpdateMethod.RUMM_ZIPSER) {
+                    rummelhartZipser(neuron)
+                } else if (updateMethod === UpdateMethod.ALVAREZ_SQUIRE) {
+                    squireAlvarezWeightUpdate(neuron)
+                    decayAllSynapses()
                 }
             } else {
-                neuron.setActivation(loseValue);
-                neuron.setSpike(neuron.isSpike());
+                neuron.activation = loseValue
+                neuron.isSpike = neuron.isSpike
                 if (useLeakyLearning) {
-                    leakyLearning(neuron);
+                    leakyLearning(neuron)
                 }
-
             }
         }
         // normalizeIncomingWeights();
@@ -211,10 +204,11 @@ public class CompetitiveGroup extends NeuronGroup {
      *
      * @param neuron winning neuron.
      */
-    private void squireAlvarezWeightUpdate(final Neuron neuron) {
-        for (Synapse synapse : neuron.getFanIn()) {
-            double deltaw = learningRate * synapse.getTarget().getActivation() * (synapse.getSource().getActivation() - synapse.getTarget().getAverageInput());
-            synapse.setStrength(synapse.clip(synapse.getStrength() + deltaw));
+    private fun squireAlvarezWeightUpdate(neuron: Neuron) {
+        for (synapse in neuron.fanIn) {
+            val deltaw =
+                learningRate * synapse.target.activation * (synapse.source.activation - synapse.target.averageInput)
+            synapse.strength = synapse.clip(synapse.strength + deltaw)
         }
     }
 
@@ -223,34 +217,32 @@ public class CompetitiveGroup extends NeuronGroup {
      *
      * @param neuron winning neuron.
      */
-    private void rummelhartZipser(final Neuron neuron) {
-        double sumOfInputs = neuron.getTotalInput();
+    private fun rummelhartZipser(neuron: Neuron) {
+        val sumOfInputs = neuron.totalInput
         // Apply learning rule
-        for (Synapse synapse : neuron.getFanIn()) {
-            activation = synapse.getSource().getActivation();
+        for (synapse in neuron.fanIn) {
+            activation = synapse.source.activation
 
             // Normalize the input values
             if (normalizeInputs) {
-                if (sumOfInputs != 0) {
-                    activation = activation / sumOfInputs;
+                if (sumOfInputs != 0.0) {
+                    activation = activation / sumOfInputs
                 }
             }
-
-            double deltaw = learningRate * (activation - synapse.getStrength());
-            synapse.setStrength(synapse.clip(synapse.getStrength() + deltaw));
+            val deltaw = learningRate * (activation - synapse.strength)
+            synapse.strength = synapse.clip(synapse.strength + deltaw)
         }
     }
 
     /**
      * Decay attached synapses in accordance with Alvarez and Squire 1994, eq 3.
      */
-    private void decayAllSynapses() {
-        for (Neuron n : getNeuronList()) {
-            for (Synapse synapse : n.getFanIn()) {
-                synapse.decay(synpaseDecayPercent);
+    private fun decayAllSynapses() {
+        for (n in getNeuronList()) {
+            for (synapse in n.fanIn) {
+                synapse.decay(synpaseDecayPercent)
             }
         }
-
     }
 
     /**
@@ -258,29 +250,27 @@ public class CompetitiveGroup extends NeuronGroup {
      *
      * @param neuron neuron to apply leaky learning to
      */
-    private void leakyLearning(final Neuron neuron) {
-        double sumOfInputs = neuron.getTotalInput();
-        for (Synapse incoming : neuron.getFanIn()) {
-            activation = incoming.getSource().getActivation();
+    private fun leakyLearning(neuron: Neuron) {
+        val sumOfInputs = neuron.totalInput
+        for (incoming in neuron.fanIn) {
+            activation = incoming.source.activation
             if (normalizeInputs) {
-                if (sumOfInputs != 0) {
-                    activation = activation / sumOfInputs;
+                if (sumOfInputs != 0.0) {
+                    activation = activation / sumOfInputs
                 }
             }
-            val = incoming.getStrength() + leakyLearningRate * (activation - incoming.getStrength());
-            incoming.setStrength(val);
+            incoming.strength = incoming.strength + leakyLearningRate * (activation - incoming.strength)
         }
     }
 
     /**
      * Normalize weights coming in to this network, separately for each neuron.
      */
-    public void normalizeIncomingWeights() {
-
-        for (Neuron n : getNeuronList()) {
-            double normFactor = n.getSummedIncomingWeights();
-            for (Synapse s : n.getFanIn()) {
-                s.setStrength(s.getStrength() / normFactor);
+    fun normalizeIncomingWeights() {
+        for (n in getNeuronList()) {
+            val normFactor = n.summedIncomingWeights
+            for (s in n.fanIn) {
+                s.strength = s.strength / normFactor
             }
         }
     }
@@ -288,27 +278,25 @@ public class CompetitiveGroup extends NeuronGroup {
     /**
      * Normalize all weights coming in to this network.
      */
-    public void normalizeAllIncomingWeights() {
-
-        double normFactor = getSummedIncomingWeights();
-        for (Neuron n : getNeuronList()) {
-            for (Synapse s : n.getFanIn()) {
-                s.setStrength(s.getStrength() / normFactor);
+    fun normalizeAllIncomingWeights() {
+        val normFactor = summedIncomingWeights
+        for (n in getNeuronList()) {
+            for (s in n.fanIn) {
+                s.strength = s.strength / normFactor
             }
         }
     }
 
     /**
      * Randomize all weights coming in to this network.
-     * <p>
      * TODO: Add gaussian option...
      */
-    public void randomizeIncomingWeights() {
-
-        for (Iterator<Neuron> i = getNeuronList().iterator(); i.hasNext(); ) {
-            Neuron n = i.next();
-            for (Synapse s : n.getFanIn()) {
-                s.randomize();
+    override fun randomizeIncomingWeights() {
+        val i: Iterator<Neuron> = getNeuronList().iterator()
+        while (i.hasNext()) {
+            val n = i.next()
+            for (s in n.fanIn) {
+                s.randomize()
             }
         }
     }
@@ -318,177 +306,36 @@ public class CompetitiveGroup extends NeuronGroup {
      *
      * @return the sum of all incoming weights to this network.
      */
-    private double getSummedIncomingWeights() {
-        double ret = 0;
-        for (Iterator<Neuron> i = getNeuronList().iterator(); i.hasNext(); ) {
-            Neuron n = i.next();
-            ret += n.getSummedIncomingWeights();
+    private val summedIncomingWeights: Double
+        private get() {
+            var ret = 0.0
+            val i: Iterator<Neuron> = getNeuronList().iterator()
+            while (i.hasNext()) {
+                val n = i.next()
+                ret += n.summedIncomingWeights
+            }
+            return ret
         }
-        return ret;
-    }
 
     /**
      * Randomize and normalize weights.
      */
-    public void randomize() {
-        randomizeIncomingWeights();
-        normalizeIncomingWeights();
-    }
-
-    /**
-     * Return the learning rate.
-     *
-     * @return the learning rate
-     */
-    public double getLearningRate() {
-        return learningRate;
-    }
-
-    /**
-     * Sets learning rate.
-     *
-     * @param rate The new epsilon value.
-     */
-    public void setLearningRate(final double rate) {
-        this.learningRate = rate;
-    }
-
-    /**
-     * Return the loser value.
-     *
-     * @return the loser Value
-     */
-    public final double getLoseValue() {
-        return loseValue;
-    }
-
-    /**
-     * Sets the loser value.
-     *
-     * @param loseValue The new loser value
-     */
-    public final void setLoseValue(final double loseValue) {
-        this.loseValue = loseValue;
-    }
-
-    /**
-     * Return the winner value.
-     *
-     * @return the winner value
-     */
-    public final double getWinValue() {
-        return winValue;
-    }
-
-    /**
-     * Sets the winner value.
-     *
-     * @param winValue The new winner value
-     */
-    public final void setWinValue(final double winValue) {
-        this.winValue = winValue;
-    }
-
-    /**
-     * Return leaky learning rate.
-     *
-     * @return Leaky learning rate
-     */
-    public double getLeakyLearningRate() {
-        return leakyLearningRate;
-    }
-
-    /**
-     * Sets the leaky learning rate.
-     *
-     * @param leakyRate Leaky rate value to set
-     */
-    public void setLeakyLearningRate(final double leakyRate) {
-        this.leakyLearningRate = leakyRate;
-    }
-
-    /**
-     * Return the normalize inputs value.
-     *
-     * @return the normailize inputs value
-     */
-    public boolean getNormalizeInputs() {
-        return normalizeInputs;
-    }
-
-    /**
-     * Sets the normalize inputs value.
-     *
-     * @param normalizeInputs Normalize inputs value to set
-     */
-    public void setNormalizeInputs(final boolean normalizeInputs) {
-        this.normalizeInputs = normalizeInputs;
-    }
-
-    /**
-     * Return the leaky learning value.
-     *
-     * @return the leaky learning value
-     */
-    public boolean getUseLeakyLearning() {
-        return useLeakyLearning;
-    }
-
-    /**
-     * Called by reflection via {@link UserParameter#conditionalEnablingMethod()}
-     */
-    public Function<Map<String, Object>, Boolean> usesLeakyLearning() {
-        return (map) -> (Boolean) map.get("Use Leaky learning");
-    }
-
-    /**
-     * Sets the leaky learning value.
-     *
-     * @param useLeakyLearning The leaky learning value to set
-     */
-    public void setUseLeakyLearning(final boolean useLeakyLearning) {
-        this.useLeakyLearning = useLeakyLearning;
-    }
-
-    /**
-     * @return the synpaseDecayPercent
-     */
-    public double getSynpaseDecayPercent() {
-        return synpaseDecayPercent;
-    }
-
-    /**
-     * @param synpaseDecayPercent the synpaseDecayPercent to set
-     */
-    public void setSynpaseDecayPercent(double synpaseDecayPercent) {
-        this.synpaseDecayPercent = synpaseDecayPercent;
-    }
-
-    /**
-     * @return the updateMethod
-     */
-    public UpdateMethod getUpdateMethod() {
-        return updateMethod;
-    }
-
-    /**
-     * @param updateMethod the updateMethod to set
-     */
-    public void setUpdateMethod(UpdateMethod updateMethod) {
-        this.updateMethod = updateMethod;
+    override fun randomize() {
+        randomizeIncomingWeights()
+        normalizeIncomingWeights()
     }
 
     /**
      * Convenience method for setting update style from scripts.
      *
      * @param updateMethod string name of method: "RZ" for Rummelhart Zipser;
-     *                     "AS" for Alvarez-Squire
+     * "AS" for Alvarez-Squire
      */
-    public void setUpdateMethod(String updateMethod) {
-        if (updateMethod.equalsIgnoreCase("RZ")) {
-            this.updateMethod = UpdateMethod.RUMM_ZIPSER;
-        } else if (updateMethod.equalsIgnoreCase("AS")) {
-            this.updateMethod = UpdateMethod.ALVAREZ_SQUIRE;
+    fun setUpdateMethod(updateMethod: String) {
+        if (updateMethod.equals("RZ", ignoreCase = true)) {
+            this.updateMethod = UpdateMethod.RUMM_ZIPSER
+        } else if (updateMethod.equals("AS", ignoreCase = true)) {
+            this.updateMethod = UpdateMethod.ALVAREZ_SQUIRE
         }
     }
 

@@ -3,7 +3,7 @@ package org.simbrain.custom_sims.simulations.creatures;
 import org.simbrain.custom_sims.Simulation;
 import org.simbrain.custom_sims.helper_classes.SimulationUtils;
 import org.simbrain.network.NetworkComponent;
-import org.simbrain.util.environment.SmellSource;
+import org.simbrain.util.SmellSource;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.updater.UpdateActionKt;
 import org.simbrain.world.odorworld.OdorWorldComponent;

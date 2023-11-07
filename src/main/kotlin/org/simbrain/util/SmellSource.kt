@@ -16,81 +16,55 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.util.environment;
+package org.simbrain.util
 
-import org.simbrain.util.UserParameter;
-import org.simbrain.util.decayfunctions.DecayFunction;
-import org.simbrain.util.decayfunctions.LinearDecayFunction;
-import org.simbrain.util.propertyeditor.EditableObject;
-import org.simbrain.util.stats.ProbabilityDistribution;
-import org.simbrain.util.stats.distributions.UniformRealDistribution;
-
-import java.util.Arrays;
-import java.util.Map;
-import java.util.function.Function;
+import org.simbrain.util.decayfunctions.DecayFunction
+import org.simbrain.util.decayfunctions.LinearDecayFunction
+import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.util.stats.ProbabilityDistribution
+import org.simbrain.util.stats.distributions.UniformRealDistribution
+import java.util.*
 
 /**
- * <b>Stimulus</b> represent a distal stimulus in the form of a vector. It can
- * have noise added and has built in functions to compute decay.
- * <p>
- * Standardly these objects represent "distal stimuli" relative to an organism.
+ * Stimulus represents a "distal stimulus" in the form of a vector that can decay with distance, have noise added, etc.
  */
-public class SmellSource implements EditableObject {
+class SmellSource : EditableObject {
 
-    /**
-     * Vector of base stimulus values associated to object.
-     */
-    @UserParameter(
-            label = "Stimulus vector",
-            description = "Values associated with this smell",
-            order = 1)
-    private double[] stimulusVector;
+    @UserParameter(label = "Stimulus vector", description = "Stimulus values associated with this smell", order
+    = 1)
+    var stimulusVector: DoubleArray?
+        private set
 
-    /**
-     * Method for calculating decay of stimulus as a function of distance from
-     * object.
-     */
     @UserParameter(
-            label = "Decay function",
-            description = "Way of decaying the stimulus",
-            showDetails = false,
-            order= 5
+        label = "Decay function",
+        description = "Method for calculating decay of stimulus as a function of distance",
+        showDetails = false,
+        order = 5
     )
-    private DecayFunction decayFunction = new LinearDecayFunction(70);
+    var decayFunction: DecayFunction = LinearDecayFunction(70.0)
 
-    /**
-     * If true, add noise to object's stimulus vector.
-     */
-    @UserParameter(
-            label = "Add noise",
-            description = "If true, add noise to object's stimulus vector.",
-            order = 10
+    @UserParameter(label = "Add noise", description = "If true, add noise to object's stimulus vector.", order = 10)
+    var addNoise = false
+
+    var randomizer: ProbabilityDistribution by GuiEditable(
+        initValue = UniformRealDistribution(),
+        label = "Randomizer",
+        description = "Noise generator for this decay function if \"addNoise\" is true.",
+        showDetails = false,
+        conditionallyEnabledBy = SmellSource::addNoise,
+        order = 15
     )
-    private boolean addNoise = false;
 
-    /**
-     * Noise generator for this decay function if [DecayFunction.addNoise] is true.
-     */
-    @UserParameter(
-            label = "Randomizer",
-            showDetails = false,
-            conditionalEnablingMethod = "useRandomWinner",
-            order = 15)
-    private ProbabilityDistribution randomizer  = new UniformRealDistribution();
-
-    public SmellSource(final double[] distalstim) {
-        this.stimulusVector = distalstim;
+    constructor(distalstim: DoubleArray?) {
+        stimulusVector = distalstim
     }
 
-    public SmellSource(final int numDimensions) {
-        this.stimulusVector = new double[numDimensions];
-        for (int i = 0; i < numDimensions; i++) {
-            stimulusVector[i] = Math.random();
+    constructor(numDimensions: Int) {
+        stimulusVector = DoubleArray(numDimensions)
+        for (i in 0 until numDimensions) {
+            stimulusVector!![i] = Math.random()
         }
-    }
-
-    public static SmellSource createScalarSource(final double val) {
-        return new SmellSource(new double[] {val});
     }
 
     /**
@@ -102,67 +76,46 @@ public class SmellSource implements EditableObject {
      * @param distance distance of creature from object
      * @return proximal stimulus to creature caused by this object
      */
-    public double[] getStimulus(final double distance) {
-        var scalingFactor = decayFunction.getScalingFactor(distance);
+    fun getStimulus(distance: Double): DoubleArray {
+        val scalingFactor = decayFunction.getScalingFactor(distance)
         return Arrays.stream(stimulusVector)
-                .map(s -> s * scalingFactor + getNoise())
-                .toArray();
+            .map { s: Double -> s * scalingFactor + noise }
+            .toArray()
     }
 
-    private Double getNoise() {
-        if (addNoise) {
-            return randomizer.sampleDouble();
+    private val noise: Double
+        private get() = if (addNoise) {
+            randomizer.sampleDouble()
         } else {
-            return 0.0;
+            0.0
         }
-    }
 
     /**
      * Randomize values.
      */
-    public void randomize() {
-        for (int i = 0; i < getStimulusDimension(); i++) {
-            stimulusVector[i] = randomizer.sampleDouble();
+    fun randomize() {
+        for (i in 0 until stimulusDimension) {
+            stimulusVector!![i] = randomizer.sampleDouble()
         }
     }
 
     /**
      * Return the number of dimensions in the stimulus vector.
-     *
-     * @return the dimension of the stimulus
      */
-    public int getStimulusDimension() {
-        if (stimulusVector == null) {
-            return 0;
+    val stimulusDimension: Int
+        get() = if (stimulusVector == null) {
+            0
+        } else stimulusVector!!.size
+
+    var dispersion: Double
+        get() = decayFunction.dispersion
+        set(d) {
+            decayFunction.dispersion = d
         }
-        return stimulusVector.length;
-    }
 
-    public void setDispersion(final double d) {
-        decayFunction.setDispersion(d);
+    companion object {
+        fun createScalarSource(`val`: Double): SmellSource {
+            return SmellSource(doubleArrayOf(`val`))
+        }
     }
-
-    public double getDispersion() {
-        return decayFunction.getDispersion();
-    }
-
-    public DecayFunction getDecayFunction() {
-        return decayFunction;
-    }
-
-    public void setDecayFunction(DecayFunction decayFunction) {
-        this.decayFunction = decayFunction;
-    }
-
-    public double[] getStimulusVector() {
-        return stimulusVector;
-    }
-
-    /**
-     * Called by reflection via {@link UserParameter#conditionalEnablingMethod()}
-     */
-    public Function<Map<String, Object>, Boolean> useRandomWinner() {
-        return (map) -> (Boolean) map.get("Add noise");
-    }
-
 }

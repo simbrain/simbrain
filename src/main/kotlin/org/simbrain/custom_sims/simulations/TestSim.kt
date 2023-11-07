@@ -10,7 +10,7 @@ import org.simbrain.network.core.addSynapse
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.HexagonalGridLayout
 import org.simbrain.network.neuron_update_rules.DecayRule
-import org.simbrain.util.environment.SmellSource
+import org.simbrain.util.SmellSource
 import org.simbrain.util.piccolo.asGridCoordinate
 import org.simbrain.util.piccolo.makeLake
 import org.simbrain.util.place

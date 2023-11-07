@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations.hippocampus;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.subnetworks.CompetitiveGroup;
+import org.simbrain.network.neurongroups.CompetitiveGroup;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.stats.ProbabilityDistribution;
 import org.simbrain.util.stats.distributions.UniformRealDistribution;

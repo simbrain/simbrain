@@ -3,11 +3,10 @@ package org.simbrain.custom_sims.simulations
 import kotlinx.coroutines.launch
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.*
-
 import org.simbrain.network.layouts.LineLayout
+import org.simbrain.util.SmellSource
 import org.simbrain.util.component1
 import org.simbrain.util.component2
-import org.simbrain.util.environment.SmellSource
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.util.projection.DataPoint
@@ -15,6 +14,14 @@ import org.simbrain.util.projection.HaloColoringManager
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.sensors.SmellSensor
 import java.awt.geom.Point2D
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.component3
+import kotlin.collections.forEach
+import kotlin.collections.listOf
+import kotlin.collections.map
+import kotlin.collections.sum
+import kotlin.collections.zip
 import kotlin.math.sqrt
 
 val kAgentTrails = newSim {

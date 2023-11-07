@@ -14,7 +14,6 @@ import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.network.util.SpikingScalarData
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.StepDecayFunction
-import org.simbrain.util.environment.SmellSource
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.world.odorworld.OdorWorldComponent
 import org.simbrain.world.odorworld.entities.EntityType

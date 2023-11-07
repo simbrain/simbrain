@@ -104,11 +104,6 @@ annotation class UserParameter(
      */
     val conditionalVisibilityMethod: String = "",
     /**
-     * Name of a method which returns a lambda which is used to determine whether this component is enabled or not.
-     */
-    val conditionalEnablingMethod: String = "",
-
-    /**
      * Specify the name of a custom get type function when more than one is needed, beyond [CopyableObject.getTypeList]
      */
     val typeMapProvider: String = "",

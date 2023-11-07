@@ -7,7 +7,7 @@ import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.plot.projection.ProjectionComponent
-import org.simbrain.util.environment.SmellSource
+import org.simbrain.util.SmellSource
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.util.projection.HaloColoringManager

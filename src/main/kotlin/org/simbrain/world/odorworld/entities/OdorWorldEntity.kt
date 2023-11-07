@@ -2,7 +2,6 @@ package org.simbrain.world.odorworld.entities
 
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
-import org.simbrain.util.environment.SmellSource
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 import org.simbrain.workspace.AttributeContainer

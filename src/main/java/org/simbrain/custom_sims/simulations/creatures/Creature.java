@@ -5,7 +5,7 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.groups.NeuronGroup;
-import org.simbrain.util.environment.SmellSource;
+import org.simbrain.util.SmellSource;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.world.odorworld.effectors.Speech;

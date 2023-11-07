@@ -117,7 +117,7 @@ public class TimeSeriesPlotPanel extends JPanel {
     public void updateChartSettings() {
 
         // No idea why this is needed, but it makes the width get updated upon closing the settings dialog
-        model.setFixedWidth(model.isFixedWidth());
+        model.setFixedWidth(model.getFixedWidth());
 
         if (model.isAutoRange()) {
             if (model.isUseFixedRangeWindow()) {

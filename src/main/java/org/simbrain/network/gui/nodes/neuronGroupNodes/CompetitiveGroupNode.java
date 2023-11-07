@@ -20,7 +20,7 @@ package org.simbrain.network.gui.nodes.neuronGroupNodes;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.NeuronGroupNode;
-import org.simbrain.network.subnetworks.CompetitiveGroup;
+import org.simbrain.network.neurongroups.CompetitiveGroup;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;

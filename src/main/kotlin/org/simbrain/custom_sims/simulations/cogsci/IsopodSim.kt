@@ -7,8 +7,8 @@ import org.simbrain.network.core.addNeuron
 import org.simbrain.network.core.connect
 import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.util.BiasedScalarData
+import org.simbrain.util.SmellSource
 import org.simbrain.util.decayfunctions.LinearDecayFunction
-import org.simbrain.util.environment.SmellSource
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.util.showSaveDialog

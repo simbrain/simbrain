@@ -24,6 +24,7 @@ import org.simbrain.network.kotlindl.DeepNet
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.matrix.ZoeLayer
+import org.simbrain.network.neurongroups.CompetitiveGroup
 import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.subnetworks.*
 import org.simbrain.network.trainers.WeightMatrixTree

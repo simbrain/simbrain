@@ -27,9 +27,6 @@ import org.simbrain.network.core.NetworkTextObject;
 import org.simbrain.network.events.LocationEvents;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.actions.SetTextPropertiesAction;
-import org.simbrain.network.gui.actions.edit.CopyAction;
-import org.simbrain.network.gui.actions.edit.CutAction;
-import org.simbrain.network.gui.actions.edit.PasteAction;
 import org.simbrain.util.SwingUtilsKt;
 import org.simbrain.util.TextUtilsKt;
 
@@ -96,9 +93,11 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
     public JPopupMenu getContextMenu() {
         JPopupMenu contextMenu = new JPopupMenu();
 
-        contextMenu.add(new CutAction(getNetworkPanel()));
-        contextMenu.add(new CopyAction(getNetworkPanel()));
-        contextMenu.add(new PasteAction(getNetworkPanel()));
+        var actions = getNetworkPanel().getNetworkActions();
+
+        contextMenu.add(actions.getCutAction());
+        contextMenu.add(actions.getCopyAction());
+        contextMenu.add(actions.getPasteAction());
         contextMenu.addSeparator();
 
         final var textNodes = getNetworkPanel().getSelectionManager().getSelection().stream()

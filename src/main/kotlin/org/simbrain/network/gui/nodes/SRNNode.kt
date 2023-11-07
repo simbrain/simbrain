@@ -2,9 +2,6 @@ package org.simbrain.network.gui.nodes
 
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
-import org.simbrain.network.gui.actions.edit.CopyAction
-import org.simbrain.network.gui.actions.edit.CutAction
-import org.simbrain.network.gui.actions.edit.PasteAction
 import org.simbrain.network.gui.dialogs.getTrainingDialog
 import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.util.StandardDialog
@@ -30,9 +27,9 @@ class SRNNode(networkPanel: NetworkPanel, private val srn: SRNNetwork):
 
     override fun getContextMenu(): JPopupMenu {
         val contextMenu = JPopupMenu()
-        contextMenu.add(CutAction(networkPanel))
-        contextMenu.add(CopyAction(networkPanel))
-        contextMenu.add(PasteAction(networkPanel))
+        contextMenu.add(networkPanel.networkActions.cutAction)
+        contextMenu.add(networkPanel.networkActions.copyAction)
+        contextMenu.add(networkPanel.networkActions.pasteAction)
         contextMenu.addSeparator()
 
         // Edit Submenu

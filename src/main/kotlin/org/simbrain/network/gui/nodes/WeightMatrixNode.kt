@@ -8,9 +8,6 @@ import org.simbrain.network.groups.AbstractNeuronCollection
 import org.simbrain.network.gui.ImageBox
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.WeightMatrixArrow
-import org.simbrain.network.gui.actions.edit.CopyAction
-import org.simbrain.network.gui.actions.edit.CutAction
-import org.simbrain.network.gui.actions.edit.PasteAction
 import org.simbrain.network.gui.createCouplingMenu
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.matrix.ZoeConnector
@@ -145,9 +142,9 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
 
     override fun getContextMenu(): JPopupMenu {
         val contextMenu = JPopupMenu()
-        contextMenu.add(CutAction(getNetworkPanel()))
-        contextMenu.add(CopyAction(getNetworkPanel()))
-        contextMenu.add(PasteAction(getNetworkPanel()))
+        contextMenu.add(networkPanel.networkActions.cutAction)
+        contextMenu.add(networkPanel.networkActions.copyAction)
+        contextMenu.add(networkPanel.networkActions.pasteAction)
         contextMenu.addSeparator()
 
         // Edit Submenu

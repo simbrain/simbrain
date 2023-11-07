@@ -5,9 +5,6 @@ import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
-import org.simbrain.network.gui.actions.edit.CopyAction
-import org.simbrain.network.gui.actions.edit.CutAction
-import org.simbrain.network.gui.actions.edit.PasteAction
 import org.simbrain.network.gui.dialogs.getDeepNetEditDialog
 import org.simbrain.network.gui.dialogs.showDeepNetTrainingDialog
 import org.simbrain.network.kotlindl.DeepNet
@@ -70,15 +67,15 @@ class DeepNetNode(networkPanel: NetworkPanel, private val deepNet: DeepNet):
         return deepNet
     }
 
-    override fun getToolTipText(): String? {
+    override fun getToolTipText(): String {
         return deepNet.toString()
     }
 
-    override fun getContextMenu(): JPopupMenu? {
+    override fun getContextMenu(): JPopupMenu {
         val contextMenu = JPopupMenu()
-        contextMenu.add(CutAction(networkPanel))
-        contextMenu.add(CopyAction(networkPanel))
-        contextMenu.add(PasteAction(networkPanel))
+        contextMenu.add(networkPanel.networkActions.cutAction)
+        contextMenu.add(networkPanel.networkActions.copyAction)
+        contextMenu.add(networkPanel.networkActions.pasteAction)
         contextMenu.addSeparator()
 
         // Edit Submenu
@@ -114,7 +111,7 @@ class DeepNetNode(networkPanel: NetworkPanel, private val deepNet: DeepNet):
         return contextMenu
     }
 
-    override fun getPropertyDialog(): JDialog? {
+    override fun getPropertyDialog(): JDialog {
         return getDeepNetEditDialog(deepNet)
     }
 

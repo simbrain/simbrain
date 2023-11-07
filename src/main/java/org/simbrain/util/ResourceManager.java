@@ -66,11 +66,16 @@ public class ResourceManager {
      * @return Returns a scaled ImageIcon.
      */
     public static ImageIcon getSmallIcon(final String path) {
-        URL url = ClassLoader.getSystemClassLoader().getResource(path);
-        ImageIcon imageIcon = new ImageIcon(url);
-        Image image = imageIcon.getImage().getScaledInstance(smallIconSize, smallIconSize, Image.SCALE_AREA_AVERAGING);
-        imageIcon.setImage(image);
-        return imageIcon;
+        try {
+            URL url = ClassLoader.getSystemClassLoader().getResource(path);
+            ImageIcon imageIcon = new ImageIcon(url);
+            Image image = imageIcon.getImage().getScaledInstance(smallIconSize, smallIconSize, Image.SCALE_AREA_AVERAGING);
+            imageIcon.setImage(image);
+            return imageIcon;
+        } catch (Exception e) {
+            System.err.println("Could not load icon: " + path);
+            return null;
+        }
     }
 
     /**

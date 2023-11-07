@@ -4,24 +4,17 @@ import kotlinx.coroutines.launch
 import org.simbrain.network.connections.*
 import org.simbrain.network.core.*
 import org.simbrain.network.groups.AbstractNeuronCollection
+import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.gui.actions.ConditionallyEnabledAction.EnablingCondition
-import org.simbrain.network.gui.actions.ShowLayoutDialogAction
-import org.simbrain.network.gui.actions.TestInputAction
-import org.simbrain.network.gui.actions.connection.ClearSourceNeurons
-import org.simbrain.network.gui.actions.connection.SetSourceNeurons
-import org.simbrain.network.gui.actions.edit.*
-import org.simbrain.network.gui.actions.modelgroups.AddGroupAction
-import org.simbrain.network.gui.actions.modelgroups.NeuronCollectionAction
-import org.simbrain.network.gui.actions.neuron.AddNeuronsAction
-import org.simbrain.network.gui.actions.neuron.SetNeuronPropertiesAction
-import org.simbrain.network.gui.actions.neuron.ShowPrioritiesAction
-import org.simbrain.network.gui.actions.selection.*
-import org.simbrain.network.gui.actions.synapse.SetSynapsePropertiesAction
-import org.simbrain.network.gui.actions.toolbar.ShowEditToolBarAction
-import org.simbrain.network.gui.actions.toolbar.ShowMainToolBarAction
 import org.simbrain.network.gui.dialogs.*
 import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog
+import org.simbrain.network.gui.dialogs.layout.LayoutDialog
 import org.simbrain.network.gui.dialogs.network.*
+import org.simbrain.network.gui.dialogs.neuron.AddNeuronsDialog.createAddNeuronsDialog
+import org.simbrain.network.gui.nodes.NeuronArrayNode
+import org.simbrain.network.gui.nodes.NeuronNode
+import org.simbrain.network.gui.nodes.SynapseNode
+import org.simbrain.network.gui.nodes.WeightMatrixNode
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.util.*
@@ -31,13 +24,22 @@ import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 import java.awt.event.KeyEvent
 import javax.swing.AbstractAction
+import javax.swing.Action
 import javax.swing.JCheckBoxMenuItem
 import javax.swing.JOptionPane
 
 class NetworkActions(val networkPanel: NetworkPanel) {
-
-    // TODO: Convert these to inline actions as below.
-    val addNeuronsAction = AddNeuronsAction(networkPanel)
+    val addNeuronsAction = networkPanel.createAction(
+        name = "Add Neurons...",
+        description = "Add a set of neurons to the network",
+        keyboardShortcut = KeyCombination('N')
+    ) {
+        createAddNeuronsDialog(networkPanel).apply {
+            pack()
+            setLocationRelativeTo(null)
+            isVisible = true
+        }
+    }
     val alignHorizontalAction = networkPanel.createConditionallyEnabledAction(
         name = "Align Horizontal",
         description = "Align selected nodes horizontally",
@@ -54,10 +56,45 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     ) {
         alignVertical()
     }
-    val clearNodeActivationsAction = ClearSelectedObjects(networkPanel)
-    val clearSourceNeurons = ClearSourceNeurons(networkPanel)
-    val copyAction = CopyAction(networkPanel)
-    val cutAction = CutAction(networkPanel)
+    val clearNodeActivationsAction = networkPanel.createAction(
+        name = "Clear activations of all nodes",
+        description = "Clear all node activations (c)",
+        iconPath = "menu_icons/Eraser.png",
+        keyboardShortcut = KeyCombination('C')
+    ) {
+        clearSelectedObjects()
+    }
+    val clearSourceNeurons = networkPanel.createConditionallyEnabledAction(
+        name = "Clear Source Neurons",
+        description = "Remove all source neurons (neurons with red squares around them)",
+        enablingCondition = EnablingCondition.SOURCE_NEURONS
+    ) {
+        selectionManager.clearAllSource()
+    }
+    val copyAction = networkPanel.createAction(
+        name = "Copy",
+        description = "Copy selected neurons, (connected) synapses, and neuron groups",
+        keyboardShortcut = CmdOrCtrl + 'C',
+        iconPath = "menu_icons/Copy.png"
+    ) {
+        copy()
+    }
+    val cutAction = networkPanel.createAction(
+        name = "Cut",
+        description = "Cut selected neurons, (connected) synapses, and neuron groups",
+        keyboardShortcut = CmdOrCtrl + 'X',
+        iconPath = "menu_icons/Cut.png"
+    ) {
+        cut()
+    }
+    val pasteAction = networkPanel.createAction(
+        name = "Paste",
+        description = "Paste copied neurons, (connected) synapses, and neuron groups",
+        keyboardShortcut = CmdOrCtrl + 'V',
+        iconPath = "menu_icons/Paste.png"
+    ) {
+        paste()
+    }
     val addNeuronArrayAction = networkPanel.createAction(
         name = "Add Neuron Array...",
         description = "Add a neuron array to the network",
@@ -74,7 +111,22 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     ) {
         launch { deleteSelectedObjects() }
     }
-    val neuronCollectionAction = NeuronCollectionAction(networkPanel)
+
+    val neuronCollectionAction = networkPanel.createConditionallyEnabledAction(
+        name = "Add Neurons to Collection",
+        description = "Add selected neurons to a neuron collection (Cmd-G)",
+        enablingCondition = EnablingCondition.NEURONS,
+        keyboardShortcuts = CmdOrCtrl + 'G'
+    ) {
+        val neuronList = selectionManager.filterSelectedModels<Neuron>()
+        if (neuronList.isNotEmpty()) {
+            val nc = NeuronCollection(network, neuronList)
+            if (nc.shouldAdd()) {
+                nc.label = network.idManager.getProposedId(nc::class.java)
+                network.addNetworkModelAsync(nc)
+            }
+        }
+    }
     val newNeuronAction = networkPanel.createAction(
         name = "Add Neuron",
         description = """Add or "put" new node (p)""",
@@ -85,7 +137,6 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         network.addNetworkModel(neuron)
         network.selectModels(listOf(neuron))
     }
-    val pasteAction = PasteAction(networkPanel)
     val randomizeObjectsAction = networkPanel.createAction(
         name = "Randomize selection",
         description = "Randomize Selected Elements (r)",
@@ -107,19 +158,146 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             .filterIsInstance<NeuronArray>()
             .map { it.randomizeBiases() }
     }
-    val selectAllAction = SelectAllAction(networkPanel)
-    val selectAllNeuronsAction = SelectAllNeuronsAction(networkPanel)
-    val selectAllWeightsAction = SelectAllWeightsAction(networkPanel)
-    val selectIncomingWeightsAction = SelectIncomingWeightsAction(networkPanel)
-    val selectOutgoingWeightsAction = SelectOutgoingWeightsAction(networkPanel)
-    val selectionEditModeAction = SelectionEditModeAction(networkPanel)
-    val setNeuronPropertiesAction = SetNeuronPropertiesAction(networkPanel)
-    val setSourceNeurons = SetSourceNeurons(networkPanel)
-    val setSynapsePropertiesAction = SetSynapsePropertiesAction(networkPanel)
+    val selectAllAction = networkPanel.createAction(
+        name = "Select All",
+        description = "Select all network items",
+        keyboardShortcut = KeyCombination('A')
+    ) {
+        selectionManager.selectAll()
+    }
 
-    val showEditToolBarAction = ShowEditToolBarAction(networkPanel)
-    val showLayoutDialogAction = ShowLayoutDialogAction(networkPanel)
-    val showPrioritiesAction = ShowPrioritiesAction(networkPanel)
+    val selectAllNeuronsAction = networkPanel.createAction(
+        name = "Select All Neurons",
+        description = "Select all neurons (n)",
+        keyboardShortcut = KeyCombination('N')
+    ) {
+        selectionManager.clear()
+        selectionManager.set(filterScreenElements<NeuronNode>())
+        selectionManager.add(filterScreenElements<NeuronArrayNode>())
+    }
+
+
+    val selectAllWeightsAction = networkPanel.createAction(
+        name = "Select All Weights",
+        description = "Select all weights (w)",
+        keyboardShortcut = KeyCombination('W')
+    ) {
+        selectionManager.clear()
+        selectionManager.set(filterScreenElements<SynapseNode>())
+        selectionManager.add(filterScreenElements<WeightMatrixNode>())
+    }
+
+    val selectIncomingWeightsAction = networkPanel.createAction(
+        name = "Select Incoming Weights",
+        description = "Select All Incoming Weights",
+    ) {
+        val selectedNeurons = selectionManager.filterSelectedModels<Neuron>()
+        selectionManager.clear()
+        selectedNeurons.forEach { neuron ->
+            neuron.fanIn.forEach { synapse ->
+                synapse.select()
+            }
+        }
+    }
+    val selectOutgoingWeightsAction = networkPanel.createAction(
+        name = "Select Outgoing Weights",
+        description = "Select All Outgoing Weights",
+    ) {
+        val selectedNeurons = selectionManager.filterSelectedModels<Neuron>()
+        selectionManager.clear()
+        selectedNeurons.forEach { neuron ->
+            neuron.fanOut.values.forEach { synapse ->
+                synapse.select()
+            }
+        }
+    }
+
+    val selectionEditModeAction = networkPanel.createAction(
+        name = "Selection",
+        description = "Selection mode",
+        iconPath = "menu_icons/Arrow.png"
+    ) {
+        networkPanel.editMode = EditMode.SELECTION
+    }
+    val setNeuronPropertiesAction = networkPanel.createAction(
+        name = "Neuron Properties...",
+        description = "Set the properties of selected neurons",
+        iconPath = "menu_icons/Properties.png",
+        keyboardShortcut = CmdOrCtrl + 'E',
+        initBlock = {
+            fun updateAction() {
+                isEnabled = networkPanel.selectionManager.filterSelectedModels<Neuron>().isNotEmpty()
+                val numNeurons = networkPanel.selectionManager.filterSelectedModels<Neuron>().size
+                if (numNeurons > 0) {
+                    putValue(Action.NAME, "Edit $numNeurons Selected ${if (numNeurons > 1) "Neurons" else "Neuron"}")
+                } else {
+                    putValue(Action.NAME, "Edit Selected Neuron(s)")
+                }
+            }
+            updateAction()
+            networkPanel.selectionManager.events.selection.on { _, _ ->
+                updateAction()
+            }
+        }
+    ) {
+        networkPanel.showSelectedNeuronProperties()
+    }
+    val setSourceNeurons get() = networkPanel.createConditionallyEnabledAction(
+        name = "Set Source Neurons",
+        description = "Set selected neurons as source neurons.  They can then be connected to target neurons using the connect commands.",
+        enablingCondition = EnablingCondition.NEURONS
+    ) {
+        selectionManager.convertSelectedNodesToSourceNodes()
+    }
+
+    val setSynapsePropertiesAction get() = networkPanel.createAction(
+        name = "Synapse Properties...",
+        description = "Set the properties of selected synapses",
+        iconPath = "menu_icons/Properties.png",
+        keyboardShortcut = KeyCombination('E'),
+        initBlock = {
+            fun updateAction() {
+                isEnabled = networkPanel.selectionManager.filterSelectedModels<Synapse>().isNotEmpty()
+                val numSynapses = networkPanel.selectionManager.filterSelectedModels<Synapse>().size
+                if (numSynapses > 0) {
+                    putValue(Action.NAME, "Edit $numSynapses Selected ${if (numSynapses > 1) "Synapses" else "Synapse"}")
+                } else {
+                    putValue(Action.NAME, "Edit Selected Synapse(s)")
+                }
+            }
+            updateAction()
+            networkPanel.selectionManager.events.selection.on { _, _ ->
+                updateAction()
+            }
+        }
+    ) {
+        networkPanel.showSelectedSynapseProperties()
+    }
+    val showEditToolBarAction = networkPanel.createAction(
+        name = "Edit Toolbar",
+        description = "Show the edit toolbar",
+    ) {
+        val cb = it.source as JCheckBoxMenuItem
+        editToolBar.isVisible = cb.isSelected
+    }
+    val showLayoutDialogAction = networkPanel.createConditionallyEnabledAction(
+        name = "Layout Neurons...",
+        description = "Lay out the selected neurons",
+        enablingCondition = EnablingCondition.NEURONS
+    ) {
+        LayoutDialog(networkPanel).apply {
+            pack()
+            setLocationRelativeTo(null)
+            isVisible = true
+        }
+    }
+    val showPrioritiesAction = networkPanel.createAction(
+        name = "Show Neuron Priorities",
+        description = "Show neuron priorities (for use in priority update)",
+    ) {
+        val cb = it.source as JCheckBoxMenuItem
+        prioritiesVisible = cb.isSelected
+    }
     val showWeightMatrixAction = networkPanel.createConditionallyEnabledAction(
         name = "Display / Edit Weight Matrix...",
         description = "Show a weight matrix connecting source neurons (adorned with red squares) and target neurons (regular green selection)",
@@ -156,10 +334,32 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     ) {
         spaceVertical()
     }
-    val testInputAction = TestInputAction(networkPanel)
-    val wandEditModeAction = WandEditModeAction(networkPanel)
 
-    val showMainToolBarAction = ShowMainToolBarAction(networkPanel)
+    val testInputAction = networkPanel.createConditionallyEnabledAction(
+        name = "Create Input Table...",
+        description = "Create a table whose rows provide input to selected neurons",
+        iconPath = "menu_icons/TestInput.png",
+        enablingCondition = EnablingCondition.NEURONS
+    ) {
+        showInputPanel(networkPanel.selectionManager.filterSelectedModels<Neuron>())
+    }
+
+    val wandEditModeAction = networkPanel.createAction(
+        name = "Wand",
+        description = "Wand Mode (I)",
+        iconPath = "menu_icons/Wand.png",
+        keyboardShortcut = KeyCombination('I')
+    ) {
+        networkPanel.editMode = EditMode.WAND
+    }
+
+    val showMainToolBarAction = networkPanel.createAction(
+        name = "Main Toolbar",
+        description = "Show the main toolbar",
+    ) {
+        val cb = it.source as JCheckBoxMenuItem
+        mainToolBar.isVisible = cb.isSelected
+    }
 
     val addTextAction = networkPanel.createAction(
         name = "Add Text",
@@ -305,9 +505,20 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         )?.displayInDialog()
     }
 
-    // TODO: Note: the lambda parameter `NetworkPanel` is not used
-    private fun addGroupAction(name: String, createDialog: AddGroupAction.(NetworkPanel) -> StandardDialog) =
-        AddGroupAction(networkPanel, name, createDialog)
+    private fun addGroupAction(name: String, createDialog: (NetworkPanel) -> StandardDialog) = networkPanel.createAction(
+        name = name,
+        description = "Add $name group to network",
+    ) {
+        with(createDialog(networkPanel)) {
+            pack()
+            setLocationRelativeTo(networkPanel)
+            isVisible = true
+
+            // Not sure why call below needed, but for some reason the ok button
+            // sometimes goes out of focus when creating a new dialog.
+            rootPane.defaultButton = okButton
+        }
+    }
 
     val newNetworkActions
         get() = listOf(

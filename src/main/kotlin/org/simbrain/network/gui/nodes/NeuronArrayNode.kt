@@ -26,9 +26,6 @@ import org.piccolo2d.nodes.PText
 import org.simbrain.network.core.randomizeBiases
 import org.simbrain.network.events.NeuronArrayEvents
 import org.simbrain.network.gui.NetworkPanel
-import org.simbrain.network.gui.actions.edit.CopyAction
-import org.simbrain.network.gui.actions.edit.CutAction
-import org.simbrain.network.gui.actions.edit.PasteAction
 import org.simbrain.network.gui.alignMenu
 import org.simbrain.network.gui.createCouplingMenu
 import org.simbrain.network.gui.spaceMenu
@@ -250,9 +247,9 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         val contextMenu = JPopupMenu()
 
         // Edit Menu
-        contextMenu.add(CutAction(networkPanel))
-        contextMenu.add(CopyAction(networkPanel))
-        contextMenu.add(PasteAction(networkPanel))
+        contextMenu.add(networkPanel.networkActions.cutAction)
+        contextMenu.add(networkPanel.networkActions.copyAction)
+        contextMenu.add(networkPanel.networkActions.pasteAction)
         contextMenu.addSeparator()
         val editArray: Action = object : AbstractAction("Edit...") {
             override fun actionPerformed(event: ActionEvent) {

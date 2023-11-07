@@ -186,7 +186,9 @@ public class Filter implements AttributeContainer, EditableObject {
         filteredImage = applyFilter();
 
         if (filteredImage.getHeight() != height || filteredImage.getWidth() != width) {
-            throw new AssertionError("Filtered image size not equal to filter size");
+            throw new AssertionError(String.format("Filtered image size not equal to filter size" +
+                    " (filtered image size: %d x %d, filter size: %d x %d)", filteredImage.getWidth(),
+                    filteredImage.getHeight(), width, height));
         }
 
         // Set values of channels

@@ -3,6 +3,7 @@ package org.simbrain.custom_sims.simulations
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.jetbrains.kotlinx.dl.dataset.embedded.TEST_IMAGES_ARCHIVE
 import org.jetbrains.kotlinx.dl.dataset.embedded.extractImages
 import org.jetbrains.kotlinx.dl.dataset.embedded.mnist
@@ -49,6 +50,7 @@ val mnistSim = newSim {
     val iwc = addImageWorld("Image World")
     placeComponent(iwc,166,9,500,405)
     val world = iwc.world
+    world.imageAlbum.reset(28, 28)
     // world.setCurrentFilter("Threshold 10x10")
 
     val threshold400 = Filter("Threshold 20x20", world.imageAlbum, ThresholdOp(), 20, 20)
@@ -68,16 +70,15 @@ val mnistSim = newSim {
 
         progressWindow.text = "Extracted 0/1000 images"
         progressWindow.pack()
-        launch(Dispatchers.Default) {
+        withContext(Dispatchers.IO) {
             extractImages("cache/$TEST_IMAGES_ARCHIVE")
                 .take(1000)
-                .map {it.toGrayScaleImage(28,28)}
-                .forEachIndexed { i, it ->
-                    world.imageAlbum.addImage(it)
-                    progressWindow.invokeUpdateAction(i)
-                }
-            progressWindow.close()
-        }
+        }.map {it.toGrayScaleImage(28,28)}
+            .forEachIndexed { i, it ->
+                world.imageAlbum.addImage(it)
+                progressWindow.invokeUpdateAction(i)
+            }
+        progressWindow.close()
     }
 
     // world.imageAlbum.addImage(ResourceManager.getBufferedImage("odorworld/static/Swiss.gif"))

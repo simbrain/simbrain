@@ -81,15 +81,23 @@ fun IntArray.toRGBImage(width: Int, height: Int): BufferedImage {
  *
  * TODO: Does not work with scale command
  */
-fun FloatArray.toGrayScaleImage(width: Int, height: Int) = this
-        .map { (it.clip(0.0f, 1.0f) * 255).toInt().toByte() }
-        .toByteArray()
-        .let {
-            val colorModel = DirectColorModel(8, 0xff, 0xff, 0xff)
-            val sampleModel = colorModel.createCompatibleSampleModel(width, height)
-            val raster = Raster.createWritableRaster(sampleModel, DataBufferByte(it, it.size), null)
-            BufferedImage(colorModel, raster, false, null)
-        }
+fun FloatArray.toGrayScaleImage(width: Int, height: Int): BufferedImage {
+    if (this.size != width * height) {
+        throw IllegalArgumentException("Size of FloatArray ($size) does not match the dimensions ($width x $height) provided.")
+    }
+
+    val image = BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY)
+    val raster = image.raster
+
+    this.forEachIndexed { index, value ->
+        val intValue = (value * 255).coerceIn(0f, 255f).toInt()
+        val x = index % width
+        val y = index / width
+        raster.setSample(x, y, 0, intValue)
+    }
+
+    return image
+}
 
 private val cache = HashMap<Pair<Int, Int>, BufferedImage>()
 
@@ -187,9 +195,14 @@ fun HSBInterpolate(fromColor: FloatArray, toColor: FloatArray, t: Double): Color
 }
 
 fun BufferedImage.copy(): BufferedImage {
-    val result = BufferedImage(width, height, type)
-    copyData(result.raster)
-    return result
+    try {
+        val result = BufferedImage(width, height, type)
+        copyData(result.raster)
+        return result
+    } catch (e: Exception) {
+        System.err.println("Failed to copy an image of size $width x $height and type $type")
+        return FloatArray(width * height).toSimbrainColorImage(width, height)
+    }
 }
 
 fun Color.invert() = Color(255 - red, 255 - green, 255 - blue)

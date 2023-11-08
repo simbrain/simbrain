@@ -160,7 +160,7 @@ class APETestObjectKotlin: EditableObject {
     }
 
     override fun toString(): String {
-        return "APETestObject2(${allPropertiesToString(", ")})"
+        return "APETestObject2(${allPropertiesToString()})"
     }
 
 }

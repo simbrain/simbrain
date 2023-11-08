@@ -74,7 +74,7 @@ fun Matrix.rowVectorTransposed(rowIndex: Int): Matrix {
 /**
  * Convert a double array to a Smile Matrix / column vector.
  */
-fun DoubleArray.toMatrix() = Matrix.column(this)!!
+fun DoubleArray.toMatrix(): Matrix = Matrix.column(this)
 
 /**
  * Add the entries of a double array in-place to a Smile matrix / column vector. Assumes the matrix has as many rows

@@ -157,7 +157,7 @@ fun showDeepNetTrainingDialog(deepNet: DeepNet) {
         }
 
         val targetPanel = SimbrainTablePanel(
-            createFromColumn(deepNet.deepNetTargetData), useDefaultToolbarAndMenu =
+            createBasicDataFrameFromColumn(deepNet.deepNetTargetData), useDefaultToolbarAndMenu =
             false
         ).apply {
             addFixedColumnActions()

@@ -170,19 +170,19 @@ fun createFromFloatArray(data: Array<FloatArray>): BasicDataFrame {
     return BasicDataFrame(data.map { it.toMutableList() as MutableList<Any?> }.toMutableList())
 }
 
-fun createFromColumn(data: DoubleArray): BasicDataFrame {
+fun createBasicDataFrameFromColumn(data: DoubleArray): BasicDataFrame {
     return BasicDataFrame(data.map { mutableListOf(it as Any?) }.toMutableList())
 }
 
-fun createFromColumn(data: FloatArray): BasicDataFrame {
+fun createBasicDataFrameFromColumn(data: FloatArray): BasicDataFrame {
     return BasicDataFrame(data.map { mutableListOf(it as Any?) }.toMutableList())
 }
 
-fun createFromColumn(data: IntArray): BasicDataFrame {
+fun createBasicDataFrameFromColumn(data: IntArray): BasicDataFrame {
     return BasicDataFrame(data.map { mutableListOf(it as Any?) }.toMutableList())
 }
 
-fun createFromColumn(data: Array<String>): BasicDataFrame {
+fun createBasicDataFrameFromColumn(data: Array<String>): BasicDataFrame {
     return BasicDataFrame(data.map { mutableListOf(it as Any?) }.toMutableList())
 }
 

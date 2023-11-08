@@ -83,16 +83,24 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
             }
 
         (delegated + annotated)
-            .map { parameter ->
-                parameter to makeWidget(
+            .associateWith { parameter ->
+                makeWidget(
                     parameter,
                     if (parameter.value is CopyableObject) {
                         editingObjects.map { eo -> parameter.property.getter.call(eo)!!::class }.toSet().size == 1
                     } else {
-                        editingObjects.map { eo -> parameter.property.getter.call(eo) }.toSet().size == 1
+                        editingObjects
+                            .map { eo -> parameter.property.getter.call(eo) }
+                            .map { value ->
+                                when (value) {
+                                    is IntArray -> value.contentHashCode()
+                                    is DoubleArray -> value.contentHashCode()
+                                    else -> value.hashCode()
+                                }
+                            }.toSet().size == 1
                     }
                 )
-            }.toMap()
+        }
 
     }
 

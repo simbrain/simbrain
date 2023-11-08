@@ -2,9 +2,9 @@ package org.simbrain.util.propertyeditor
 
 import org.simbrain.util.*
 import org.simbrain.util.SimbrainConstants.NULL_STRING
-import org.simbrain.util.table.Column
 import org.simbrain.util.table.MatrixDataFrame
 import org.simbrain.util.table.SimbrainTablePanel
+import org.simbrain.util.table.createBasicDataFrameFromColumn
 import org.simbrain.util.widgets.ChoicesWithNull
 import org.simbrain.util.widgets.ColorSelector
 import org.simbrain.util.widgets.YesNoNull
@@ -596,7 +596,7 @@ class DoubleArrayWidget<O : EditableObject>(
     isConsistent: Boolean
 ) : ParameterWidget<O, DoubleArray>(parameter, isConsistent) {
 
-    private var model = MatrixDataFrame(parameter.value.toMatrix())
+    private var model = createBasicDataFrameFromColumn(parameter.value)
 
     override val widget by lazy {
         JPanel().apply {
@@ -637,8 +637,7 @@ class IntArrayWidget<O : EditableObject>(
     isConsistent: Boolean
 ) : ParameterWidget<O, IntArray>(parameter, isConsistent) {
 
-    private var model = MatrixDataFrame(parameter.value.toDoubleArray().toMatrix(), columns = parameter.value
-        .toDoubleArray().mapIndexed { index, _ -> Column("Column ${index + 1}", Column.DataType.DoubleType) }.toMutableList())
+    private var model = createBasicDataFrameFromColumn(parameter.value)
 
     override val widget by lazy {
         JPanel().apply {

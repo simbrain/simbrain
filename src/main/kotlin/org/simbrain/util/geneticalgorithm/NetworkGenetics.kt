@@ -6,6 +6,10 @@ import org.simbrain.network.NetworkModel
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
+import org.simbrain.network.layouts.GridLayout
+import org.simbrain.network.layouts.HexagonalGridLayout
+import org.simbrain.network.layouts.Layout
+import org.simbrain.network.layouts.LineLayout
 
 abstract class NetworkGene<P : NetworkModel> : Gene<P>() {
     abstract suspend fun express(network: Network): P
@@ -60,9 +64,48 @@ class ConnectionGene(override val template: Synapse, val source: NodeGene, val t
     }
 }
 
+data class LayoutGeneWrapper(var layoutType: Layout = GridLayout(), var hSpacing: Double = GridLayout.DEFAULT_H_SPACING, var vSpacing: Double = GridLayout.DEFAULT_V_SPACING) {
+    fun express() = layoutType.copy().also {
+        when (it) {
+            is GridLayout -> {
+                it.hSpacing = hSpacing
+                it.vSpacing = vSpacing
+            }
+            is HexagonalGridLayout -> {
+                it.hSpacing = hSpacing
+                it.vSpacing = vSpacing
+            }
+            is LineLayout -> when (it.orientation) {
+                LineLayout.LineOrientation.HORIZONTAL -> it.spacing = hSpacing
+                LineLayout.LineOrientation.VERTICAL -> it.spacing = vSpacing
+            }
+        }
+    }
+    fun copy() = LayoutGeneWrapper(layoutType.copy(), hSpacing, vSpacing)
+}
+
+class LayoutGene(override val template: LayoutGeneWrapper) : TopLevelGene<LayoutGeneWrapper>() {
+
+    private val _expressedLayout = CompletableDeferred<LayoutGeneWrapper>()
+
+    val expressedLayout by this::_expressedLayout
+
+    override fun express() = template.copy().also {
+        expressedLayout.complete(it)
+    }
+
+    override fun copy(): LayoutGene {
+        return LayoutGene(template.copy())
+    }
+
+}
+
 fun nodeGene(block: Neuron.() -> Unit = {}) = NodeGene(template = Neuron(null)).apply { template.block() }
 
 fun connectionGene(source: NodeGene, target: NodeGene, block: Synapse.() -> Unit = {}) = ConnectionGene(
     template = Synapse(null as Neuron?, null),
     source, target
 ).apply { template.block() }
+
+fun layoutGene(block: LayoutGeneWrapper.() -> Unit = {}) =
+    LayoutGene(template = LayoutGeneWrapper()).apply { template.block() }

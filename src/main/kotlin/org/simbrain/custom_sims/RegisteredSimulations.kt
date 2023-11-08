@@ -92,7 +92,7 @@ val simulations = dir<Any>("Simulations") {
         item("Evolve Grazing Cows") { grazingCows }
         // item("Evolve AutoEncoder") { evolveAutoAssociator }
         // item("Evolve Modular (Clune et. al.)") { evolveModularity }
-        // item("Evolve Network (Sandbox)") { evolveNetwork }
+        item("Evolve Network (Sandbox)") { evolveNetwork }
         // item("Evolve Pursuer") { evolvePursuer }
         // item("Evolve Mouse (Sandbox)") { evolveMouse }
         // item("Evolve XOR") { evolveXor }

@@ -18,11 +18,11 @@
  */
 package org.simbrain.network.layouts;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.CopyableObject;
-import org.simbrain.util.propertyeditor.EditableObject;
 
 import java.awt.geom.Point2D;
 import java.util.List;
@@ -78,7 +78,7 @@ public abstract class Layout implements CopyableObject {
      * Helper class for editing layouts using
      * {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.
      */
-    public static class LayoutEditor implements EditableObject {
+    public static class LayoutEditor implements CopyableObject {
 
         @UserParameter(label = "Layout")
         private Layout layout = new GridLayout();
@@ -87,9 +87,20 @@ public abstract class Layout implements CopyableObject {
             return layout;
         }
 
+        public void setLayout(Layout layout) {
+            this.layout = layout;
+        }
+
         @Override
-        public String getName() {
+        public @NotNull String getName() {
             return "Layout";
+        }
+
+        @Override
+        public @NotNull LayoutEditor copy() {
+            LayoutEditor copy = new LayoutEditor();
+            copy.layout = layout.copy();
+            return copy;
         }
     }
 

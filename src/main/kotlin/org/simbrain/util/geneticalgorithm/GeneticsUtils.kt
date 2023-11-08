@@ -32,18 +32,22 @@ fun <P, G : Gene<P>> Chromosome<P, G>.sampleWithoutReplacement(restartIfExhauste
     sampleWithoutReplacement(random, restartIfExhausted)
 
 context(Genotype)
-fun <P : NetworkModel, G : NetworkGene<P>> chromosome(repeat: Int = 1, block: Chromosome<P, G>.() -> Unit) =
+fun <P, G : Gene<P>> chromosome(repeat: Int = 0, block: Chromosome<P, G>.(index: Int) -> Unit = { }) =
     Chromosome<P, G>(
         listOf()
-    ).apply { repeat(repeat) { block() } }
+    ).apply { repeat(repeat) { block(it) } }
 
 /**
  * Utility to create network models in a network, given their description as NetworkGenes.
  */
 context(Genotype)
-suspend fun <P : NetworkModel, G : NetworkGene<P>>
-        Network.express(Chromosome: Chromosome<P, G>): List<P> {
-    return Chromosome.map { it.express(this@express) }
+suspend fun <P : NetworkModel, G : NetworkGene<P>> Network.express(chromosome: Chromosome<P, G>): List<P> {
+    return chromosome.map { it.express(this@express) }
+}
+
+context(Genotype)
+fun <P, G : TopLevelGene<P>> express(chromosome: Chromosome<P, G>): List<P> {
+    return chromosome.map { it.express() }
 }
 
 data class GenerationFitnessPair(val generation: Int, val fitnessScores: List<Double>) {

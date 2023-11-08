@@ -12,6 +12,9 @@ interface Genotype {
     val random: Random
 }
 
+/**
+ * Subclasses should provide a domain specific express function
+ */
 abstract class Gene<P> {
     abstract val template: P
     abstract fun copy(): Gene<P>
@@ -20,6 +23,15 @@ abstract class Gene<P> {
         template.apply(block)
     }
 }
+
+/**
+ * An interface provides a zero arg express function.
+ */
+abstract class TopLevelGene<P>: Gene<P>() {
+    abstract fun express(): P
+}
+
+object TopLevelGeneticsContext
 
 interface EvoSim {
     fun mutate()

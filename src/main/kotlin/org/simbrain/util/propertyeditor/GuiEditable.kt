@@ -5,6 +5,7 @@ import org.simbrain.util.SimbrainConstants.NULL_STRING
 import org.simbrain.util.table.MatrixDataFrame
 import org.simbrain.util.table.SimbrainTablePanel
 import org.simbrain.util.table.createBasicDataFrameFromColumn
+import org.simbrain.util.table.createFrom2DArray
 import org.simbrain.util.widgets.ChoicesWithNull
 import org.simbrain.util.widgets.ColorSelector
 import org.simbrain.util.widgets.YesNoNull
@@ -56,6 +57,7 @@ class GuiEditable<O : EditableObject, T>(
     val conditionallyEnabledBy: KMutableProperty1<O, Boolean>? = null,
     val conditionallyVisibleBy: KMutableProperty1<O, Boolean>? = null,
     val typeMapProvider: KFunction<List<Class<out CopyableObject>>>? = null,
+    val columnMode: Boolean = true,
     val getter: (GuiEditableGetterContext<O, T>.() -> T)? = null,
     val setter: (GuiEditableSetterContext<O, T>.(T) -> Unit)? = null,
     private val onUpdate: (UpdateFunctionContext<O, T>).() -> Unit = { }
@@ -596,7 +598,11 @@ class DoubleArrayWidget<O : EditableObject>(
     isConsistent: Boolean
 ) : ParameterWidget<O, DoubleArray>(parameter, isConsistent) {
 
-    private var model = createBasicDataFrameFromColumn(parameter.value)
+    private var model = if (parameter.columnMode) {
+        createBasicDataFrameFromColumn(parameter.value)
+    } else {
+        createFrom2DArray(arrayOf(parameter.value.toTypedArray()))
+    }
 
     override val widget by lazy {
         JPanel().apply {
@@ -614,7 +620,12 @@ class DoubleArrayWidget<O : EditableObject>(
     }
 
     override val value: DoubleArray
-        get() = model.getDoubleColumn(0)
+        get() = if (parameter.columnMode) {
+            model.getDoubleColumn(0)
+        } else {
+            model.getRow<Double>(0).toDoubleArray()
+        }
+
 
     override fun refresh(property: KProperty<*>) {
         parameter.update(UpdateFunctionContext(
@@ -637,7 +648,11 @@ class IntArrayWidget<O : EditableObject>(
     isConsistent: Boolean
 ) : ParameterWidget<O, IntArray>(parameter, isConsistent) {
 
-    private var model = createBasicDataFrameFromColumn(parameter.value)
+    private var model = if (parameter.columnMode) {
+        createBasicDataFrameFromColumn(parameter.value)
+    } else {
+        createFrom2DArray(arrayOf(parameter.value.toTypedArray()))
+    }
 
     override val widget by lazy {
         JPanel().apply {
@@ -655,7 +670,11 @@ class IntArrayWidget<O : EditableObject>(
     }
 
     override val value: IntArray
-        get() = model.getIntColumn(0)
+        get() = if (parameter.columnMode) {
+            model.getIntColumn(0)
+        } else {
+            model.getRow<Int>(0).toIntArray()
+        }
 
     override fun refresh(property: KProperty<*>) {
         parameter.update(UpdateFunctionContext(

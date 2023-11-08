@@ -81,11 +81,13 @@ class APETestObjectKotlin: EditableObject {
 
     var testDoubleArray by GuiEditable(
         initValue = doubleArrayOf(1.0, -1.0),
+        columnMode = false,
         order = 65
     )
 
     var testIntArray by GuiEditable(
         initValue = intArrayOf(1, -1),
+        columnMode = false,
         order = 67
     )
 

@@ -86,7 +86,7 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
             .associateWith { parameter ->
                 makeWidget(
                     parameter,
-                    if (parameter.value is CopyableObject) {
+                    isConsistent = if (parameter.value is CopyableObject) {
                         editingObjects.map { eo -> parameter.property.getter.call(eo)!!::class }.toSet().size == 1
                     } else {
                         editingObjects
@@ -100,7 +100,7 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
                             }.toSet().size == 1
                     }
                 )
-        }
+            }
 
     }
 
@@ -296,10 +296,10 @@ fun <O : EditableObject> objectWrapper(label: String, obj: O) = APEObjectWrapper
  * Returns the widget associated with the object being edited.
  * Example: the [ObjectWidget] used to select a probability distribution.
  */
-val <O: EditableObject> AnnotatedPropertyEditor<APEObjectWrapper<O>>.wrapperWidget get() = parameterWidgetMap.values.first()
+val <O : EditableObject> AnnotatedPropertyEditor<APEObjectWrapper<O>>.wrapperWidget get() = parameterWidgetMap.values.first()
 
 /**
  * Returns the value of the widget associated with the edited object.
  * Example: the probability distribution currently selected by [ObjectWidget]
  */
-val <O: EditableObject> AnnotatedPropertyEditor<APEObjectWrapper<O>>.wrapperWidgetValue get() = wrapperWidget.value as O
+val <O : EditableObject> AnnotatedPropertyEditor<APEObjectWrapper<O>>.wrapperWidgetValue get() = wrapperWidget.value as O

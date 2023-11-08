@@ -4,9 +4,7 @@ import org.piccolo2d.PNode;
 import org.piccolo2d.util.PBounds;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.actions.UngroupAction;
 
-import javax.swing.*;
 import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -79,13 +77,6 @@ public class ViewGroupNode extends ScreenElement implements PropertyChangeListen
     @Override
     public boolean isDraggable() {
         return true;
-    }
-
-    @Override
-    public JPopupMenu getContextMenu() {
-        JPopupMenu contextMenu = new JPopupMenu();
-        contextMenu.add(new UngroupAction(getNetworkPanel(), this));
-        return contextMenu;
     }
 
     @Override

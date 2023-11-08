@@ -1,7 +1,5 @@
 package org.simbrain.network.gui
 
-import org.simbrain.network.gui.actions.ConditionallyEnabledAction
-import org.simbrain.network.gui.actions.checkEnablingFunction
 import org.simbrain.util.KeyCombination
 import org.simbrain.util.createAction
 import java.awt.event.ActionEvent

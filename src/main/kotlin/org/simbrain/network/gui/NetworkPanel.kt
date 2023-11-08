@@ -13,7 +13,6 @@ import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.core.*
 import org.simbrain.network.groups.*
 import org.simbrain.network.gui.UndoManager.UndoableAction
-import org.simbrain.network.gui.actions.edit.ToggleAutoZoom
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.dialogs.group.ConnectorDialog
 import org.simbrain.network.gui.nodes.*
@@ -30,6 +29,7 @@ import org.simbrain.network.subnetworks.*
 import org.simbrain.network.trainers.WeightMatrixTree
 import org.simbrain.network.trainers.backpropError
 import org.simbrain.network.trainers.forwardPass
+import org.simbrain.util.ResourceManager
 import org.simbrain.util.cartesianProduct
 import org.simbrain.util.complement
 import org.simbrain.util.piccolo.unionOfGlobalFullBounds
@@ -659,7 +659,21 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         with(networkActions) {
             networkModeActions.forEach { add(it) }
             addSeparator()
-            add(ToggleAutoZoom(this@NetworkPanel))
+            add(JToggleButton().apply {
+                icon = ResourceManager.getImageIcon("menu_icons/ZoomFitPage.png")
+                fun updateButton() {
+                    isSelected = autoZoom
+                    border = if (autoZoom) BorderFactory.createLoweredBevelBorder() else BorderFactory.createEmptyBorder()
+                    val onOff = if (autoZoom) "on" else "off"
+                    toolTipText = "Autozoom is $onOff"
+                }
+                updateButton()
+                addActionListener { e ->
+                    val button = e.source as JToggleButton
+                    autoZoom = button.isSelected
+                    updateButton()
+                }
+            })
         }
     }
 

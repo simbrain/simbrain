@@ -1,7 +1,5 @@
-package org.simbrain.network.gui.actions
+package org.simbrain.network.gui
 
-import org.simbrain.network.gui.NetworkPanel
-import org.simbrain.network.gui.NetworkSelectionManager
 import org.simbrain.network.gui.nodes.NeuronNode
 import org.simbrain.network.gui.nodes.SynapseNode
 import javax.swing.AbstractAction

@@ -5,16 +5,13 @@ import org.simbrain.network.connections.*
 import org.simbrain.network.core.*
 import org.simbrain.network.groups.AbstractNeuronCollection
 import org.simbrain.network.groups.NeuronCollection
-import org.simbrain.network.gui.actions.ConditionallyEnabledAction.EnablingCondition
+import org.simbrain.network.gui.ConditionallyEnabledAction.EnablingCondition
 import org.simbrain.network.gui.dialogs.*
 import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog
 import org.simbrain.network.gui.dialogs.layout.LayoutDialog
 import org.simbrain.network.gui.dialogs.network.*
 import org.simbrain.network.gui.dialogs.neuron.AddNeuronsDialog.createAddNeuronsDialog
-import org.simbrain.network.gui.nodes.NeuronArrayNode
-import org.simbrain.network.gui.nodes.NeuronNode
-import org.simbrain.network.gui.nodes.SynapseNode
-import org.simbrain.network.gui.nodes.WeightMatrixNode
+import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.util.*
@@ -694,5 +691,13 @@ class NetworkActions(val networkPanel: NetworkPanel) {
                 else -> throw IllegalArgumentException("Cannot add activation to input for layer of type ${layer::class.simpleName}")
             }
         )
+    }
+
+    fun setTextPropertiesAction(textNodes: Collection<TextNode>) = networkPanel.createAction(
+        name = "Text Properties...",
+        description = "Set the properties of this text, e.g. font and size",
+        iconPath = "menu_icons/Properties.png"
+    ) {
+        networkPanel.showTextPropertyDialog(textNodes)
     }
 }

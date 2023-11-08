@@ -26,7 +26,6 @@ import org.piccolo2d.util.PBounds;
 import org.simbrain.network.core.NetworkTextObject;
 import org.simbrain.network.events.LocationEvents;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.actions.SetTextPropertiesAction;
 import org.simbrain.util.SwingUtilsKt;
 import org.simbrain.util.TextUtilsKt;
 
@@ -124,7 +123,7 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
             });
         }
 
-        contextMenu.add(new SetTextPropertiesAction(getNetworkPanel(), textNodes));
+        contextMenu.add(getNetworkPanel().getNetworkActions().setTextPropertiesAction(textNodes));
 
         contextMenu.addSeparator();
         contextMenu.add(getNetworkPanel().getNetworkActions().getDeleteAction());

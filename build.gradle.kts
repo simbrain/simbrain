@@ -52,7 +52,7 @@ dependencies {
     // Kotlin DL
     implementation("org.jetbrains.kotlinx:kotlin-deeplearning-tensorflow:0.5.0")
     implementation("org.jetbrains.kotlinx:kotlin-deeplearning-dataset:0.5.0")
-    implementation("org.jetbrains.kotlinx:kotlin-deeplearning-dataset-jvm:0.5.0")
+    implementation("org.jetbrains.kotlinx:kotlin-deeplearning-dataset-jvm:0.5.2")
 
     // Smile
     implementation(group = "com.github.haifengl", name = "smile-core", version = "3.0.1")

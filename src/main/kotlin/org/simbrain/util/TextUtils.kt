@@ -45,7 +45,7 @@ fun String.removePunctuation(): String {
  * Word tokenizer: parse string into words.
  */
 fun String.tokenizeWordsFromString(): List<String> {
-    return this.lowercase().removePunctuation().split(" ")
+    return this.lowercase().removeSpecialCharacters().removePunctuation().split(" ")
 }
 
 /**

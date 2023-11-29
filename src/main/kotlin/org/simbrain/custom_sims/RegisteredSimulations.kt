@@ -93,10 +93,10 @@ val simulations = dir<Any>("Simulations") {
         // item("Evolve AutoEncoder") { evolveAutoAssociator }
         // item("Evolve Modular (Clune et. al.)") { evolveModularity }
         item("Evolve Network (Sandbox)") { evolveNetwork }
-        // item("Evolve Pursuer") { evolvePursuer }
+        item("Evolve Resource Pursuer") { evolveResourcePursuer }
         // item("Evolve Mouse (Sandbox)") { evolveMouse }
         // item("Evolve XOR") { evolveXor }
-        item("Evolve XOR2") { evolveXor }
+        item("Evolve XOR") { evolveXor }
     }
 
     // TODO: Disaggregate this into more meaningful submenus

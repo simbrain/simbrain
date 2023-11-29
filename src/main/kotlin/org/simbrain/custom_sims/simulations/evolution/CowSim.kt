@@ -135,7 +135,7 @@ val evolveCow = newSim {
         private val lakeSize
             get() = random.nextInt(2,8)
 
-        val odorWorld = OdorWorldComponent("Odor World 1").also {
+        val odorWorld = OdorWorldComponent("Odor World").also {
             workspace.addWorkspaceComponent(it)
         }.world.apply {
             loadTileMap("empty.tmx")

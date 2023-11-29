@@ -8,7 +8,6 @@ import org.simbrain.world.odorworld.events.TileMapEvents
 import java.awt.Color
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
-import java.util.*
 
 /**
  * Java representation of a .tmx tilemap produced by the Tiled app
@@ -304,7 +303,9 @@ class TileMap(width: Int, height: Int) {
         this.height = height
         layers.forEach {
             it.clear(width, height)
-            it.renderImage(tileSets, true)
+            if (guiEnabled) {
+                it.renderImage(tileSets, true)
+            }
         }
         events.mapSizeChanged.fireAndBlock()
     }

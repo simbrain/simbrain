@@ -49,17 +49,13 @@ val evolveResourcePursuer = newSim {
     /**
      * Iterations to run for each simulation. If < 3000 success is usually by luck.
      */
-    val iterationsPerRun = 4000
+    val iterationsPerRun = 100
 
     val thirstThreshold = 5.0
 
     class EvolvePursuerGenotype(seed: Long = Random.nextLong()) : Genotype {
 
         override val random: Random = Random(seed)
-
-        // TODO
-        //   memory error / make world bigger
-        //   persisting lake artifact
 
         // TODO (Work on some of this is in evolveresourcepursuer2.kt)
         // Fixed input nodes with couplings (not evolved)
@@ -197,11 +193,10 @@ val evolveResourcePursuer = newSim {
             workspace.addWorkspaceComponent(it)
         }.world.apply {
             loadTileMap("empty.tmx")
-            // TODO: Below creates out of memory error
-            // with(tileMap) {
-            //     updateMapSize(32, 32)
-            //     fill("Grass1")
-            // }
+            with(tileMap) {
+                updateMapSize(32, 32)
+                fill("Grass1")
+            }
         }
         val lakeLayer = odorWorld.tileMap.run {
             addLayer(createTileMapLayer("Lake Layer"))

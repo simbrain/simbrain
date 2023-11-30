@@ -109,3 +109,18 @@ fun connectionGene(source: NodeGene, target: NodeGene, block: Synapse.() -> Unit
 
 fun layoutGene(block: LayoutGeneWrapper.() -> Unit = {}) =
     LayoutGene(template = LayoutGeneWrapper()).apply { template.block() }
+
+context(Genotype)
+fun LayoutGene.mutateParam() = mutate {
+    hSpacing += random.nextDouble(-1.0, 1.0)
+    vSpacing += random.nextDouble(-1.0, 1.0)
+}
+
+context(Genotype)
+fun LayoutGene.mutateType() = mutate {
+    when (random.nextDouble()) {
+        in 0.0..0.5 -> layoutType = GridLayout()
+        in 0.5..1.0 -> layoutType = HexagonalGridLayout()
+        // in 0.1..0.15 -> layout = LineLayout()
+    }
+}

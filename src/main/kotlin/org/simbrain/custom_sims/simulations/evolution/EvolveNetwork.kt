@@ -6,8 +6,6 @@ import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.bound
 import org.simbrain.network.core.*
-import org.simbrain.network.layouts.GridLayout
-import org.simbrain.network.layouts.HexagonalGridLayout
 import org.simbrain.network.layouts.Layout
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.cartesianProduct
@@ -18,20 +16,8 @@ import org.simbrain.util.sampleOne
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.Workspace
 import java.awt.Dimension
-import kotlin.collections.List
-import kotlin.collections.average
 import kotlin.collections.component1
 import kotlin.collections.component2
-import kotlin.collections.first
-import kotlin.collections.forEach
-import kotlin.collections.isNotEmpty
-import kotlin.collections.joinToString
-import kotlin.collections.listOf
-import kotlin.collections.map
-import kotlin.collections.minus
-import kotlin.collections.sum
-import kotlin.collections.take
-import kotlin.collections.toSet
 import kotlin.math.abs
 import kotlin.random.Random
 
@@ -85,17 +71,6 @@ val evolveNetwork = newSim {
 
         fun mutate() {
             layoutChromosome.forEach {
-                fun LayoutGene.mutateParam() = mutate {
-                    hSpacing += random.nextDouble(-1.0, 1.0)
-                    vSpacing += random.nextDouble(-1.0, 1.0)
-                }
-                fun LayoutGene.mutateType() = mutate {
-                    when (random.nextDouble()) {
-                        in 0.0..0.5 -> layoutType = GridLayout()
-                        in 0.5..1.0 -> layoutType = HexagonalGridLayout()
-                        // in 0.1..0.15 -> layout = LineLayout()
-                    }
-                }
                 it.mutateParam()
                 it.mutateType()
             }

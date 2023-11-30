@@ -3,10 +3,10 @@ package org.simbrain.custom_sims.simulations
 import kotlinx.coroutines.CompletableDeferred
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
-import org.simbrain.network.bound
-import org.simbrain.network.core.*
-import org.simbrain.network.layouts.GridLayout
-import org.simbrain.network.layouts.HexagonalGridLayout
+import org.simbrain.network.core.Network
+import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.activations
+import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.layouts.Layout
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.cartesianProduct
@@ -25,9 +25,9 @@ import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.sensors.TileSensor
 import java.awt.Dimension
-import kotlin.collections.component1
-import kotlin.collections.component2
 import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.pow
 import kotlin.random.Random
 
 /**
@@ -49,80 +49,75 @@ val evolveResourcePursuer = newSim {
     /**
      * Iterations to run for each simulation. If < 3000 success is usually by luck.
      */
-    val iterationsPerRun = 100
-
-    val thirstThreshold = 5.0
+    val iterationsPerRun = 1000
 
     class EvolvePursuerGenotype(seed: Long = Random.nextLong()) : Genotype {
 
         override val random: Random = Random(seed)
 
-        // TODO (Work on some of this is in evolveresourcepursuer2.kt)
-        // Fixed input nodes with couplings (not evolved)
-        // Hidden Nodes
-        // Output nodes with couplings (not evolved)
-        // Drive / Fixed nodes
-
-        // Improve energy model and fold into fitness function
-
-        // Connection Strategy
-        // Layout Strategy
-
-        var motivationNodeChromosome = chromosome(2) {
-            add(nodeGene {
-                label = "Fixed node ${it + 1}"
-                location = point(it * 100, -50)
-                lowerBound = -10.0
-                upperBound = 10.0
-            })
+        var inputChromosome = chromosome(3) {
+            add(nodeGene { isClamped = true })
         }
-        var nodeChromosome = chromosome(2) {
-            add(nodeGene { upperBound = 10.0; lowerBound = -10.0 })
+        var driveChromosome = chromosome(1) {
+            add(nodeGene { isClamped = true; upperBound = 100.0; lowerBound = 0.0; label = "Thirst" })
+            add(nodeGene { isClamped = true; upperBound = 100.0; lowerBound = 0.0 })
         }
-        // TODO: Evolve a connection strategy
-        var connectionChromosome = chromosome<Synapse, ConnectionGene>()
-
+        var hiddenChromosome = chromosome(2) { add(nodeGene()) }
+        var outputChromosome = chromosome(3) { add(nodeGene { upperBound = 10.0; lowerBound = -10.0 }) }
+        var connectionChromosome = chromosome(1) {
+            repeat(3) {
+                add(connectionGene(inputChromosome.sampleOne(), hiddenChromosome.sampleOne()))
+                add(connectionGene(hiddenChromosome.sampleOne(), outputChromosome.sampleOne()))
+            }
+            add(connectionGene(driveChromosome.first(), hiddenChromosome.sampleOne()))
+        }
         var layoutChromosome = chromosome(1) { 
             add(layoutGene()) 
         }
 
         inner class Phenotype(
-            val layout: Layout,
-            val motivations: List<Neuron>,
-            val nodes: List<Neuron>,
-            val connections: List<Synapse>
+            val driveNeurons: NeuronCollection,
+            val inputNeurons: NeuronCollection,
+            val hiddenNeurons: NeuronCollection,
+            val outputNeurons: NeuronCollection,
+            val connections: List<Synapse>,
+            val layout: Layout
         )
 
         suspend fun expressWith(network: Network): Phenotype {
-            val layout = express(layoutChromosome).first().express()
-            val motivations = network.express(motivationNodeChromosome)
-            val nodes = network.express(nodeChromosome)
+            val driveNeurons = NeuronCollection(network, network.express(driveChromosome)).also {
+                network.addNetworkModelAsync(it); it.label = "drives"
+            }
+            val inputNeurons = NeuronCollection(network, network.express(inputChromosome)).also {
+                network.addNetworkModelAsync(it); it.label = "inputs"
+            }
+            val hiddenNeurons = NeuronCollection(network, network.express(hiddenChromosome)).also {
+                network.addNetworkModelAsync(it); it.label = "hidden"
+            }
+            val outputNeurons = NeuronCollection(network, network.express(outputChromosome)).also {
+                network.addNetworkModelAsync(it); it.label = "outputs"
+            }
             val connections = network.express(connectionChromosome)
-            layout.layoutNeurons(nodes)
-            return Phenotype(layout, motivations, nodes, connections)
+            val layout = express(layoutChromosome).first().express()
+            layout.layoutNeurons(hiddenNeurons.neuronList)
+            return Phenotype(driveNeurons, inputNeurons, hiddenNeurons, outputNeurons, connections, layout)
         }
 
         fun copy() = EvolvePursuerGenotype(random.nextLong()).apply {
             val current = this@EvolvePursuerGenotype
             val new = this@apply
 
-            new.layoutChromosome = current.layoutChromosome.copy()
-            new.motivationNodeChromosome = current.motivationNodeChromosome.copy()
-            new.nodeChromosome = current.nodeChromosome.copy()
+            new.driveChromosome = current.driveChromosome.copy()
+            new.inputChromosome = current.inputChromosome.copy()
+            new.hiddenChromosome = current.hiddenChromosome.copy()
+            new.outputChromosome = current.outputChromosome.copy()
             new.connectionChromosome = current.connectionChromosome.copy()
+            new.layoutChromosome = current.layoutChromosome.copy()
         }
 
         fun mutate() {
 
-            nodeChromosome.forEach {
-                it.mutate {
-                    with(dataHolder as BiasedScalarData) {
-                        bias += random.nextDouble(-1.0, 1.0)
-                    }
-                }
-            }
-
-            motivationNodeChromosome.forEach {
+            hiddenChromosome.forEach {
                 it.mutate {
                     with(dataHolder as BiasedScalarData) {
                         bias += random.nextDouble(-1.0, 1.0)
@@ -138,29 +133,19 @@ val evolveResourcePursuer = newSim {
 
             // Ensure existing connections are not used when creating new connections
             val existingConnections = connectionChromosome.map { it.source to it.target }.toSet()
-            val availableConnections = (nodeChromosome cartesianProduct nodeChromosome) - existingConnections
+            val availableConnections = ((inputChromosome + hiddenChromosome + driveChromosome) cartesianProduct hiddenChromosome) +
+                    (hiddenChromosome cartesianProduct outputChromosome) - existingConnections
             if (random.nextDouble() < 0.25 && availableConnections.isNotEmpty()) {
                 val (source, target) = availableConnections.sampleOne()
                 connectionChromosome.add(connectionGene(source, target) { strength = random.nextDouble(-1.0, 1.0) })
             }
 
             // Add a new hidden unit
-            if (random.nextDouble() < 0.1) {
-                nodeChromosome.add(nodeGene())
+            if (random.nextDouble() < 0.8) {
+                hiddenChromosome.add(nodeGene())
             }
 
             layoutChromosome.forEach {
-                fun LayoutGene.mutateParam() = mutate {
-                    hSpacing += random.nextDouble(-1.0, 1.0)
-                    vSpacing += random.nextDouble(-1.0, 1.0)
-                }
-                fun LayoutGene.mutateType() = mutate {
-                    when (random.nextDouble()) {
-                        in 0.0..0.5 -> layoutType = GridLayout()
-                        in 0.5..1.0 -> layoutType = HexagonalGridLayout()
-                        // in 0.1..0.15 -> layout = LineLayout()
-                    }
-                }
                 it.mutateParam()
                 it.mutateType()
             }
@@ -182,8 +167,7 @@ val evolveResourcePursuer = newSim {
 
         val phenotypeDeferred = CompletableDeferred<EvolvePursuerGenotype.Phenotype>()
 
-        val thirstThreshold = 5.0
-        val fitness = 0.0
+        var calories = 400.0
 
         fun randomTileCoordinate() = with(odorWorld.tileMap) { random.nextGridCoordinate() }
         private val lakeSize
@@ -221,8 +205,6 @@ val evolveResourcePursuer = newSim {
             decayFunction.dispersion = EntityType.LION.imageWidth / 1.4
         }.also { evolvedAgent.addSensor(it) }
 
-        var numDrinks = 0
-
         init {
             List(1) { randomTileCoordinate() }.forEach {
                 with(odorWorld.tileMap) {
@@ -233,25 +215,27 @@ val evolveResourcePursuer = newSim {
             evolvedAgent.addDefaultEffectors()
             evolvedAgent.addSensor(centerLakeSensor)
 
-            // val thirstNeuron = phenotype.neuronList.first()
+            workspace.addUpdateAction("update energy") {
+                with(phenotypeDeferred.await()) {
+                    val outputsActivations = outputNeurons.activations.sumOf { 1.2.pow(if (it < 0) it * -2 else it) - 1 }
+                    val allActivations = (inputNeurons.neuronList + hiddenNeurons.neuronList).activations.sumOf { abs(it) } * 2
+                    calories = max(0.0, calories - (outputsActivations + allActivations) * (1 / iterationsPerRun))
+                    val (thirstNeuron, secondNeuron) = driveNeurons.neuronList
+                    thirstNeuron.forceSetActivation(10.0 / iterationsPerRun + thirstNeuron.activation)
+                }
+            }
 
             // What to do when a cow finds water
             workspace.addUpdateAction("water found") {
+                val (thirstNeuron, secondNeuron) = phenotypeDeferred.await().driveNeurons.neuronList
                 with(odorWorld.tileMap) {
                     centerLakeSensor.let { sensor ->
                         // Water found
                         if (sensor.currentValue > 0.5) {
-
-                            // Reset thirst node
-                            // TDDO
-
-                            // thirstNeuron.forceSetActivation(0.0)
-                            //     fun addFitness(fitnessDelta: Double) {
-                            //         cowFitnesses[cow] = (cowFitnesses[cow]?:0.0) + fitnessDelta
-                            //     }
-                            
-                            // Update fitness
-                            numDrinks++
+                            // Reset thirst
+                            thirstNeuron.forceSetActivation(0.0)
+                            // Drink the sugar water
+                            calories += 100.0
                             // Relocate the lake
                             clear(lakeLayer)
                             val newLocation = randomTileCoordinate()
@@ -261,34 +245,6 @@ val evolveResourcePursuer = newSim {
                 }
 
             }
-
-
-            // Update thirst and fitness
-            // workspace.addUpdateAction("update thirst") {
-            //     thirstNeuron.forceSetActivation(thirstNeuron.activation + 0.005)
-            //     addFitness(-thirstNeuron.activation)
-            //     // if (thirstNeuron.activation > thirstThreshold) {
-            //     //     // Thirsty! Reduce fitness
-            //     //     // addFitness(-(thirstNeuron.activation - thirstThreshold) * (20.0 / iterationsPerRun))
-            //     // } else {
-            //     //     // Satiated. Increase fitness. Scale by iterations by run so that 10 is max fitness from
-            //     //     // satiation per trial.
-            //     //     addFitness(10.0 / iterationsPerRun)
-            //     // }
-            // }
-
-            //     // Impose a fitness cost for motion and increase thirst with motion
-            //     workspace.addUpdateAction("update energy") {
-            //         // val outputsActivations =
-            //         //     cow.outputs.activations.sumOf { 1.2.pow(if (it < 0) it * -2 else it) - 1 }
-            //         // val allActivations =
-            //         //     (cow.inputs.neuronList + cow.outputs.neuronList).activations.sumOf { abs(it) } * 2
-            //         // val energy = (outputsActivations + allActivations) * (1 / iterationsPerRun)
-            //         val energy = (entity.speed * entity.speed)  / (iterationsPerRun*2)
-            //         // addFitness(-energy)
-            //         // thirstNeuron.activation += energy
-            //     }
-            // }
         }
 
         override fun mutate() {
@@ -300,10 +256,10 @@ val evolveResourcePursuer = newSim {
                 // Express the genotypes
                 phenotypeDeferred.complete(evolvePursuerGenotype.expressWith(network))
                 // Make couplings
-                //  TODO: Improve this
+                val agent = phenotypeDeferred.await()
                 with(workspace.couplingManager) {
-                    sensors couple network.freeNeurons
-                    network.freeNeurons couple evolvedAgent.effectors
+                    sensors couple agent.inputNeurons.neuronList
+                    agent.outputNeurons.neuronList couple evolvedAgent.effectors
                 }
             }
         }
@@ -321,39 +277,12 @@ val evolveResourcePursuer = newSim {
             // Build the sim then wait.
             build()
             
-            //  TODO: Agent network?
             val phenotype = phenotypeDeferred.await()
             
             // Iterate the sim
             workspace.iterateSuspend(iterationsPerRun)
 
-            // Comment / Uncomment different choices of fitness function here
-            // Move some of this to update function or reverse
-            suspend fun fitness(): Double {
-                val avgLength = phenotype.connections.lengths.average()
-                val numWeights = phenotype.connections.size
-                val avgActivation = phenotype.nodes.activations.average()
-                val totalActivation = phenotype.nodes.activations.sum()
-                // Evolve fixed nodes to have specific activations 2.5 and -3
-                val (m1, m2) = phenotype.motivations
-                val m1error = abs(m1.activation - 2.5)
-                val m2error = abs(m2.activation + 3)
-                // TODO: Normalize errors and provide for weightings
-                val numNodesError = abs(phenotype.nodes.size - 20).toDouble()
-                val numWeightsError = abs(numWeights - 40)
-                val axonLengthError = abs(avgLength - 250)
-                val avgActivationError = abs(avgActivation - 5)
-                val totalActivationError = abs(totalActivation - 10)
-                // Area in thousands of pixels
-                val bounds = network.freeNeurons.bound
-                val size = (bounds.height * bounds.width) / 10_000
-                val areaError = abs(size - 10)
-                return -numDrinks + numNodesError + totalActivationError
-            
-            }
-            // print("${network.looseNeurons.size},")
-            // return -fitness()
-            return numDrinks.toDouble()
+            return calories - phenotype.driveNeurons.neuronList.first().activation * 4
         }
 
     }
@@ -364,7 +293,7 @@ val evolveResourcePursuer = newSim {
     }
     val lastGeneration = evaluator(
         populatingFunction = { EvolveResourcePursuerSim() },
-        populationSize = 1000,
+        populationSize = 100,
         eliminationRatio = 0.25,
         peek = {
             listOf(0, 10, 25, 50, 75, 90, 100).joinToString(" ") {
@@ -376,7 +305,7 @@ val evolveResourcePursuer = newSim {
             }
         },
         stoppingFunction = {
-            nthPercentileFitness(5) > 10.0 || generation > maxGenerations
+            nthPercentileFitness(5) > 1000.0 || generation > maxGenerations
         }
     )
 
@@ -384,6 +313,14 @@ val evolveResourcePursuer = newSim {
         with(it.visualize(workspace) as EvolveResourcePursuerSim) {
             build()
             val phenotype = this.phenotypeDeferred.await()
+
+            phenotype.apply {
+                driveNeurons.location = point(-150, 150)
+                inputNeurons.location = point(0, 150)
+                hiddenNeurons.location = point(0, 60)
+                outputNeurons.location = point(0, -25)
+            }
+
         }
     }
     progressWindow.close()

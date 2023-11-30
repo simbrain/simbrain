@@ -28,13 +28,13 @@ val srnXORSim = newSim {
     // Load with xor data
     val xorInputs = generateTemporalXORData(1000)
     srn.trainingSet = MatrixDataset(xorInputs, xorInputs.shiftUpAndPadEndWithZero())
-    srn.trainer.updateType = IterableTrainer.UpdateMethod.STOCHASTIC
+    srn.trainer.updateType = IterableTrainer.UpdateMethod.Stochastic()
 
     // Train
     repeat(600) {
-        srn.trainer.iterate()
+        srn.trainer.trainOnce()
         if (it % 10 == 0) {
-            println("iteration ${it}: ${srn.trainer.error}")
+            println("iteration ${it}: ${srn.trainer.lossFunction.loss}")
         }
     }
 

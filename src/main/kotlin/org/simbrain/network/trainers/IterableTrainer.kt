@@ -12,6 +12,7 @@
  * - Suite 330, Boston, MA 02111-1307, USA.
  */
 package org.simbrain.network.trainers
+
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.simbrain.network.events.TrainerEvents
@@ -19,8 +20,11 @@ import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.subnetworks.LMSNetwork
 import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.util.UserParameter
+import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.rowVectorTransposed
+import kotlin.math.sqrt
 import kotlin.random.Random
 
 
@@ -29,17 +33,18 @@ import kotlin.random.Random
 // Loss Function
 // See API for kotlindl
 
-abstract class IterableTrainer(val net: Trainable): EditableObject {
+abstract class IterableTrainer(val net: Trainable) : EditableObject {
 
     @UserParameter(label = "Learning Rate", order = 1)
     var learningRate = .01
 
-    @UserParameter(label = "Update type", order = 1)
-    var updateType = UpdateMethod.STOCHASTIC
+    @UserParameter(label = "Update type", order = 2)
+    open var updateType: UpdateMethod = UpdateMethod.Stochastic()
+
+    @UserParameter(label = "Loss Function", order = 3, showDetails = false)
+    var lossFunction: LossFunction = LossFunction.SumSquaredError()
 
     var iteration = 0
-
-    var error = 0.0
 
     var isRunning = false
 
@@ -49,8 +54,8 @@ abstract class IterableTrainer(val net: Trainable): EditableObject {
         isRunning = true
         events.beginTraining.fireAndForget()
         withContext(Dispatchers.Default) {
-            while(isRunning) {
-                iterate()
+            while (isRunning) {
+                trainOnce()
             }
         }
     }
@@ -60,29 +65,39 @@ abstract class IterableTrainer(val net: Trainable): EditableObject {
         events.endTraining.fireAndForget()
     }
 
-    suspend fun iterate(iterations: Int) {
+    suspend fun train(iterations: Int) {
         repeat(iterations) {
-            iterate()
+            trainOnce()
         }
     }
 
-    suspend fun iterate() {
+    suspend fun trainOnce() {
         iteration++
-        if (updateType == UpdateMethod.STOCHASTIC) {
-            trainRow(Random.nextInt(net.trainingSet.inputs.nrow()))
-        } else if (updateType == UpdateMethod.EPOCH) {
-            // TODO: Batch updating
-            var totalError = 0.0
-            for (i in 0 until net.trainingSet.size) {
-                trainRow(i)
-                totalError += error
+        with(updateType) {
+            lossFunction.reset()
+            when (this) {
+                is UpdateMethod.Stochastic -> lossFunction.accumulateError(trainRow(Random.nextInt(net.trainingSet.inputs.nrow())))
+                is UpdateMethod.Epoch -> {
+                    for (i in 0 until net.trainingSet.size) {
+                        val error = trainRow(i)
+                        lossFunction.accumulateError(error)
+                    }
+                }
+                is UpdateMethod.Batch -> {
+                    var totalError = 0.0
+                    val startIndex = Random.nextInt(0, net.trainingSet.size - batchSize)
+                    val endIndex = startIndex + batchSize
+                    for (i in (startIndex..endIndex)) {
+                        val error = trainRow(i)
+                        lossFunction.accumulateError(error)
+                    }
+                }
             }
-            error = totalError
         }
-        events.errorUpdated.fire(error)
+        events.errorUpdated.fire(lossFunction)
     }
 
-    abstract fun trainRow(rowNum: Int)
+    abstract fun trainRow(rowNum: Int): Double
 
     open fun applyInputs(rowNum: Int) {
         net.inputLayer.activations = net.trainingSet.inputs.rowVectorTransposed(rowNum)
@@ -91,18 +106,104 @@ abstract class IterableTrainer(val net: Trainable): EditableObject {
 
     abstract fun randomize()
 
-    // TODO: Better name?
-    enum class UpdateMethod {
-        EPOCH { override fun toString() = "Epoch (whole dataset per iteration)" },
-        STOCHASTIC { override fun toString() = "Stochastic (random row per iteration)" },
-        SINGLE { override fun toString() = "Single (one row per iteration)" }
+    sealed class UpdateMethod: CopyableObject {
+        class Stochastic : UpdateMethod() {
+            override fun copy() = this
+        }
+
+        class Epoch : UpdateMethod() {
+            override fun copy() = this
+        }
+
+        class Batch(@UserParameter(label = "Batch Size", order = 1) var batchSize: Int = 5) : UpdateMethod() {
+            override fun copy() = Batch(batchSize)
+        }
+
+        override fun getTypeList(): List<Class<out CopyableObject>>? {
+            return listOf(
+                Stochastic::class.java,
+                Epoch::class.java,
+                Batch::class.java
+            )
+        }
+
+        /**
+         * Given the temporal nature of the rule, only Epoch should be used with SRN
+         */
+        fun srnTypeList() = listOf(Epoch::class.java)
+    }
+
+    sealed class LossFunction: CopyableObject {
+
+        protected var runningError = 0.0
+
+        protected var runningCount = 0
+
+        abstract val loss: Double
+
+        abstract fun accumulateError(error: Double)
+
+        fun reset() {
+            runningError = 0.0
+            runningCount = 0
+        }
+
+        class MeanSquaredError : LossFunction() {
+            override fun accumulateError(error: Double) {
+                runningError += error * error
+                runningCount++
+            }
+
+            override val loss: Double
+                get() = runningError / runningCount
+
+            override fun copy() = MeanSquaredError()
+
+            override val name: String = "Mean Squared Error"
+        }
+
+        class SumSquaredError : LossFunction() {
+            override fun accumulateError(error: Double) {
+                runningError += error * error
+                runningCount++
+            }
+
+            override val loss: Double
+                get() = runningError
+
+            override fun copy() = SumSquaredError()
+
+            override val name: String = "Sum Squared Error"
+        }
+
+        class RootMeanSquaredError : LossFunction() {
+            override fun accumulateError(error: Double) {
+                runningError += error * error
+                runningCount++
+            }
+
+            override val loss: Double
+                get() = sqrt(runningError / runningCount)
+
+            override fun copy() = RootMeanSquaredError()
+
+            override val name: String = "Root Mean Squared Error"
+        }
+
+        override fun getTypeList(): List<Class<out CopyableObject>>? {
+            return listOf(
+                MeanSquaredError::class.java,
+                SumSquaredError::class.java,
+                RootMeanSquaredError::class.java
+            )
+        }
     }
 
 }
 
 class LMSTrainer(val lmsNet: LMSNetwork) : IterableTrainer(lmsNet) {
 
-    override fun trainRow(rowNum: Int) {
+    override fun trainRow(rowNum: Int): Double {
         if (rowNum !in 0 until lmsNet.trainingSet.inputs.nrow()) {
             throw IllegalArgumentException("Trying to train invalid row number $rowNum")
         }
@@ -113,7 +214,7 @@ class LMSTrainer(val lmsNet: LMSNetwork) : IterableTrainer(lmsNet) {
         val outputs = lmsNet.outputLayer.activations
         val rowError = targetVec.sub(outputs)
         lmsNet.weightMatrix.applyLMS(rowError, learningRate)
-        error = rowError.transpose().mm(rowError).sum()
+        return rowError.transpose().mm(rowError).sum()
     }
 
     override fun randomize() {
@@ -124,11 +225,11 @@ class LMSTrainer(val lmsNet: LMSNetwork) : IterableTrainer(lmsNet) {
 
 class BackpropTrainer(val bp: BackpropNetwork) : IterableTrainer(bp) {
 
-    override fun trainRow(rowNum: Int) {
+    override fun trainRow(rowNum: Int): Double {
         bp.inputLayer.setActivations(bp.trainingSet.inputs.row(rowNum))
         val targetVec = bp.trainingSet.targets.rowVectorTransposed(rowNum)
         bp.wmList.forwardPass(bp.inputLayer.activations)
-        error = bp.wmList.backpropError(targetVec)
+        return bp.wmList.backpropError(targetVec)
     }
 
     override fun randomize() {
@@ -141,18 +242,19 @@ class SRNTrainer(val srn: SRNNetwork) : IterableTrainer(srn) {
 
     val weightMatrixTree = WeightMatrixTree(listOf(srn.inputLayer, srn.contextLayer), srn.outputLayer)
 
-    init {
-        updateType = UpdateMethod.EPOCH
-    }
+    override var updateType: UpdateMethod by GuiEditable(
+        initValue = UpdateMethod.Epoch(),
+        typeMapProvider = UpdateMethod::srnTypeList
+    )
 
-    override fun trainRow(rowNum: Int) {
+    override fun trainRow(rowNum: Int): Double {
 
         val targetVec = srn.trainingSet.targets.rowVectorTransposed(rowNum)
         val inputVec = srn.trainingSet.inputs.rowVectorTransposed(rowNum)
 
         srn.inputLayer.activations = inputVec
         srn.update()
-        error = weightMatrixTree.backpropError(targetVec, epsilon = learningRate)
+        return weightMatrixTree.backpropError(targetVec, epsilon = learningRate)
     }
 
     override fun randomize() {

@@ -20,22 +20,17 @@ import java.awt.Dimension
 import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
-import javax.swing.JProgressBar
 
 /**
  * Controls used by Supervised learning dialogs.
  */
-class TrainerControls(trainer: IterableTrainer, errorText: String = "Error") : JPanel(), CoroutineScope {
+class TrainerControls(trainer: IterableTrainer) : JPanel(), CoroutineScope {
 
     private val job = SupervisorJob()
 
     override val coroutineContext = Dispatchers.Swing + job
 
     val iterationsLabel = JLabel("--- ")
-
-    var errorBar = JProgressBar()
-
-    var numTicks = 1000
 
     private val runAction = createAction(
         name = "Run",
@@ -58,7 +53,9 @@ class TrainerControls(trainer: IterableTrainer, errorText: String = "Error") : J
         description = "Iterate training once",
         iconPath =  "menu_icons/Step.png",
     ) {
-        trainer.iterate()
+        trainer.events.beginTraining.fire()
+        trainer.trainOnce()
+        trainer.events.endTraining.fire()
     }
 
     private val randomizeAction = createAction(
@@ -71,7 +68,7 @@ class TrainerControls(trainer: IterableTrainer, errorText: String = "Error") : J
 
     init {
 
-        val errorPlot = ErrorTimeSeries(trainer, errorText)
+        val errorPlot = ErrorTimeSeries(trainer)
 
         val runTools = JPanel().apply { layout = MigLayout("nogrid ") }
         runTools.add(ToggleButton(listOf(runAction, stopAction)).apply {
@@ -91,16 +88,14 @@ class TrainerControls(trainer: IterableTrainer, errorText: String = "Error") : J
         runTools.add(JButton(TimeSeriesPlotActions.getPropertiesDialogAction(errorPlot.graphPanel)), "wrap")
         val labelPanel = LabelledItemPanel()
         labelPanel.addItem("Iterations:", iterationsLabel)
-        numTicks = 10
-        errorBar = JProgressBar(0, numTicks)
-        errorBar.isStringPainted = true
-        labelPanel.addItem(errorText, errorBar)
+        val errorValue = JLabel("0.0")
+        val errorLabel = labelPanel.addItem(trainer.lossFunction.name, errorValue)
         runTools.add(labelPanel)
 
         trainer.events.errorUpdated.on {
             iterationsLabel.text = "" + trainer.iteration
-            errorBar.value = (numTicks * trainer.error).toInt()
-            errorBar.string = "" + round(trainer.error, 4)
+            errorValue.text = "" + round(it.loss, 4)
+            errorLabel.text = it.name
         }
 
         layout = MigLayout("ins 0, gap 0px 0px")
@@ -110,7 +105,7 @@ class TrainerControls(trainer: IterableTrainer, errorText: String = "Error") : J
 
 }
 
-class ErrorTimeSeries(trainer: IterableTrainer, errorText: String = "Error") : JPanel() {
+class ErrorTimeSeries(trainer: IterableTrainer) : JPanel() {
 
     val graphPanel: TimeSeriesPlotPanel
 
@@ -127,7 +122,7 @@ class ErrorTimeSeries(trainer: IterableTrainer, errorText: String = "Error") : J
         graphPanel = TimeSeriesPlotPanel(model)
         graphPanel.chartPanel.chart.setTitle("")
         graphPanel.chartPanel.chart.xyPlot.domainAxis.label = "Iterations"
-        graphPanel.chartPanel.chart.xyPlot.rangeAxis.label = "Error"
+        graphPanel.chartPanel.chart.xyPlot.rangeAxis.label = trainer.lossFunction.name
         graphPanel.chartPanel.chart.removeLegend()
         graphPanel.preferredSize = Dimension(graphPanel.preferredSize.width, 200)
 
@@ -138,9 +133,10 @@ class ErrorTimeSeries(trainer: IterableTrainer, errorText: String = "Error") : J
         mainPanel.add(graphPanel)
         add(mainPanel)
 
-        model.addScalarTimeSeries(errorText)
+        model.addScalarTimeSeries(trainer.lossFunction.name)
         trainer.events.errorUpdated.on(Dispatchers.Swing, wait = true) {
-            model.addData(0, trainer.iteration.toDouble(), trainer.error)
+            model.addData(0, trainer.iteration.toDouble(), it.loss)
+            graphPanel.chartPanel.chart.xyPlot.rangeAxis.label = trainer.lossFunction.name
         }
     }
 }

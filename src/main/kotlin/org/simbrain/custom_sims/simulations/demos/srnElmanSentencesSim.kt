@@ -59,9 +59,9 @@ val srnElmanSentences = newSim {
 
     srn.trainingSet = MatrixDataset(trainingInputs, trainingTarget)
     srn.trainer.learningRate = 0.04
-    srn.trainer.updateType = IterableTrainer.UpdateMethod.EPOCH
-    srn.trainer.iterate(10)
-    println("Training Error: ${srn.trainer.error}")
+    srn.trainer.updateType = IterableTrainer.UpdateMethod.Epoch()
+    srn.trainer.train(10)
+    println("Training Error: ${srn.trainer.lossFunction.loss}")
 
     withGui {
         place(networkComponent) {

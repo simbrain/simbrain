@@ -138,6 +138,9 @@ class ErrorTimeSeries(trainer: IterableTrainer) : JPanel() {
             model.addData(0, trainer.iteration.toDouble(), it.loss)
             graphPanel.chartPanel.chart.xyPlot.rangeAxis.label = trainer.lossFunction.name
         }
+        trainer.events.iterationReset.on(Dispatchers.Swing, wait = true) {
+            model.clearData()
+        }
     }
 }
 

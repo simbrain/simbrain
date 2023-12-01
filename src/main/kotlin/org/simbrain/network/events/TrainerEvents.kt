@@ -11,4 +11,5 @@ class TrainerEvents: Events() {
     val endTraining = NoArgEvent()
     val errorUpdated = AddedEvent<IterableTrainer.LossFunction>()
     val progressUpdated = AddedEvent<Pair<String, Int>>()
+    val iterationReset = NoArgEvent()
 }

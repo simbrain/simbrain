@@ -44,18 +44,34 @@ abstract class IterableTrainer(val net: Trainable) : EditableObject {
     @UserParameter(label = "Loss Function", order = 3, showDetails = false)
     var lossFunction: LossFunction = LossFunction.SumSquaredError()
 
+    var stoppingCondition by GuiEditable(
+        initValue = StoppingCondition(),
+        order = 4
+    )
+
     var iteration = 0
 
     var isRunning = false
 
+    private var stoppingConditionReached = false
+
     val events = TrainerEvents()
 
     suspend fun startTraining() {
+        if (stoppingConditionReached) {
+            stoppingConditionReached = false
+            iteration = 0
+            events.iterationReset.fire()
+        }
         isRunning = true
         events.beginTraining.fireAndForget()
         withContext(Dispatchers.Default) {
             while (isRunning) {
                 trainOnce()
+                if (stoppingCondition.validate(iteration, lossFunction.loss)) {
+                    stoppingConditionReached = true
+                    stopTraining()
+                }
             }
         }
     }
@@ -196,6 +212,34 @@ abstract class IterableTrainer(val net: Trainable) : EditableObject {
                 SumSquaredError::class.java,
                 RootMeanSquaredError::class.java
             )
+        }
+    }
+
+    class StoppingCondition: CopyableObject {
+        var maxIterations by GuiEditable(
+            initValue = 1000,
+            order = 1
+        )
+        var useErrorThreshold by GuiEditable(
+            initValue = false,
+            order = 2
+        )
+        var errorThreshold by GuiEditable(
+            0.1,
+            order = 3,
+            conditionallyEnabledBy = StoppingCondition::useErrorThreshold
+        )
+
+        override fun copy(): CopyableObject {
+            return StoppingCondition().also {
+                it.maxIterations = maxIterations
+                it.useErrorThreshold = useErrorThreshold
+                it.errorThreshold = errorThreshold
+            }
+        }
+
+        fun validate(iterations: Int, error: Double): Boolean {
+            return iterations >= maxIterations || (useErrorThreshold && error < errorThreshold)
         }
     }
 

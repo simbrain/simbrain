@@ -8,6 +8,7 @@ import org.simbrain.network.subnetworks.LMSNetwork
 import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.Trainable
+import org.simbrain.util.ResizableTabbedPane
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.createApplyPanel
 import org.simbrain.util.createEditorDialog
@@ -19,6 +20,7 @@ import org.simbrain.util.table.createApplyAndAdvanceAction
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JSeparator
+import javax.swing.JTabbedPane
 
 
 /**
@@ -28,11 +30,16 @@ fun Trainable.getTrainingDialog(): StandardDialog {
     return StandardDialog().apply {
 
         title = "Train Network"
-        contentPane = JPanel()
-        layout = MigLayout("gap 0px 0px, ins 0")
+        contentPane = ResizableTabbedPane()
 
+        // Edit Trainer Properties
         val trainerProps = AnnotatedPropertyEditor(trainer)
         val trainerPropsPanel = trainerProps.createApplyPanel()
+        (contentPane as JTabbedPane).addTab("Trainer Properties", trainerPropsPanel)
+
+        // Run training algorithm
+        val runControls = JPanel()
+        runControls.layout = MigLayout("gap 0px 0px, ins 0")
         val trainerControls = TrainerControls(trainer)
         val inputs = MatrixEditor(trainingSet.inputs)
         inputs.toolbar.addSeparator()
@@ -45,24 +52,21 @@ fun Trainable.getTrainingDialog(): StandardDialog {
         inputs.toolbar.add(inputs.table.createApplyAndAdvanceAction {
             trainer.applyInputs(inputs.table.selectedRow)
         })
-
         val targets = MatrixEditor(trainingSet.targets)
         val addRemoveRows = AddRemoveRows(inputs.table, targets.table)
-
         trainer.events.beginTraining.on {
             trainingSet = MatrixDataset((inputs.table.model as MatrixDataFrame).data, (targets.table.model as MatrixDataFrame).data)
         }
-
-        contentPane.add(trainerPropsPanel, "span, wrap")
-        contentPane.add(JSeparator(), "span, growx, wrap")
-        contentPane.add(trainerControls, "span, growx, wrap")
-        contentPane.add(JSeparator(), "span, growx, wrap")
-        contentPane.add(JLabel("Inputs"))
-        contentPane.add(JLabel("Targets"), "wrap")
-        contentPane.add(inputs)
-        contentPane.add(targets, "wrap")
-        contentPane.add(JLabel("Add / Remove rows:"), "split 2")
-        contentPane.add(addRemoveRows)
+        runControls.add(JSeparator(), "span, growx, wrap")
+        runControls.add(trainerControls, "span, growx, wrap")
+        runControls.add(JSeparator(), "span, growx, wrap")
+        runControls.add(JLabel("Inputs"))
+        runControls.add(JLabel("Targets"), "wrap")
+        runControls.add(inputs)
+        runControls.add(targets, "wrap")
+        runControls.add(JLabel("Add / Remove rows:"), "split 2")
+        runControls.add(addRemoveRows)
+        (contentPane as JTabbedPane).addTab("Run Trainer", runControls)
 
         addClosingTask {
             trainerProps.commitChanges()
@@ -93,7 +97,6 @@ fun NetworkPanel.showSRNCreationDialog(): StandardDialog {
 //     }
 //     LMSNetworkNode(np,result ).propertyDialog.run { makeVisible() }
 // }
-
 
 fun main() {
     val networkComponent = NetworkComponent("")

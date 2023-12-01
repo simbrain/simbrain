@@ -8,12 +8,11 @@ import kotlinx.coroutines.swing.Swing
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.widgets.DropDownTriangle
-import java.awt.BorderLayout
-import java.awt.Component
-import java.awt.FlowLayout
+import java.awt.*
 import java.awt.event.*
 import java.io.File
 import javax.swing.*
+
 
 inline fun StandardDialog.onClosed(crossinline block: (WindowEvent?) -> Unit) = apply {
     addWindowListener(object : WindowAdapter() {
@@ -355,3 +354,29 @@ fun <O: EditableObject> AnnotatedPropertyEditor<O>.createApplyPanel(): JPanel {
 }
 
 val swingDispatcher get() = Dispatchers.Swing
+
+/**
+ * Custom JTabbedPane that automatically resizes to fit components while switching between tabs.
+ */
+class ResizableTabbedPane : JTabbedPane() {
+
+    init {
+        addChangeListener { resizeTabbedPane() }
+    }
+
+    private fun resizeTabbedPane() {
+        if (selectedComponent != null) {
+            // Calculate the preferred size of the currently selected tab
+            val preferredSize: Dimension = selectedComponent.preferredSize
+
+            // Fudge factor (TODO). Not sure why the extra height is needed.
+            preferredSize.height += 30
+
+            // Resize the tabbed pane
+            setPreferredSize(preferredSize)
+
+            // Resize and revalidate the parent container
+            SwingUtilities.getWindowAncestor(this)?.pack()
+        }
+    }
+}

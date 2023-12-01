@@ -350,4 +350,8 @@ fun <C: JComponent> C.createApplyPanel(commitAction: C.() -> Unit): JPanel {
     }
 }
 
+fun <O: EditableObject> AnnotatedPropertyEditor<O>.createApplyPanel(): JPanel {
+    return this.createApplyPanel { commitChanges() }
+}
+
 val swingDispatcher get() = Dispatchers.Swing

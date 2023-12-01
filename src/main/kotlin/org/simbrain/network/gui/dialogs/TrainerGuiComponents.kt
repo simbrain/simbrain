@@ -92,7 +92,7 @@ class TrainerControls(trainer: IterableTrainer) : JPanel(), CoroutineScope {
         val errorLabel = labelPanel.addItem(trainer.lossFunction.name, errorValue)
         runTools.add(labelPanel)
 
-        trainer.events.errorUpdated.on {
+        trainer.events.errorUpdated.on(Dispatchers.Swing, wait = true) {
             iterationsLabel.text = "" + trainer.iteration
             errorValue.text = "" + round(it.loss, 4)
             errorLabel.text = it.name

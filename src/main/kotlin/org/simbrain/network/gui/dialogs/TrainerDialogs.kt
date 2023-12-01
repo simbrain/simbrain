@@ -9,6 +9,7 @@ import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.Trainable
 import org.simbrain.util.StandardDialog
+import org.simbrain.util.createApplyPanel
 import org.simbrain.util.createEditorDialog
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.table.MatrixDataFrame
@@ -31,6 +32,7 @@ fun Trainable.getTrainingDialog(): StandardDialog {
         layout = MigLayout("gap 0px 0px, ins 0")
 
         val trainerProps = AnnotatedPropertyEditor(trainer)
+        val trainerPropsPanel = trainerProps.createApplyPanel()
         val trainerControls = TrainerControls(trainer)
         val inputs = MatrixEditor(trainingSet.inputs)
         inputs.toolbar.addSeparator()
@@ -48,11 +50,10 @@ fun Trainable.getTrainingDialog(): StandardDialog {
         val addRemoveRows = AddRemoveRows(inputs.table, targets.table)
 
         trainer.events.beginTraining.on {
-            trainerProps.commitChanges()
             trainingSet = MatrixDataset((inputs.table.model as MatrixDataFrame).data, (targets.table.model as MatrixDataFrame).data)
         }
 
-        contentPane.add(trainerProps, "span, wrap")
+        contentPane.add(trainerPropsPanel, "span, wrap")
         contentPane.add(JSeparator(), "span, growx, wrap")
         contentPane.add(trainerControls, "span, growx, wrap")
         contentPane.add(JSeparator(), "span, growx, wrap")

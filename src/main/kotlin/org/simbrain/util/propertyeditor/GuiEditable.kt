@@ -188,6 +188,7 @@ fun <O : EditableObject> UserParameter.toGuiEditable(initValue: Any): GuiEditabl
         displayOnly = displayOnly,
         showDetails = showDetails,
         useLegacySetter = useLegacySetter,
+        columnMode = columnMode,
         tab = tab,
         typeMapProvider = if (typeMapProvider.isNotEmpty()) {
             initValue::class.functions.first { it.name == typeMapProvider } as KFunction<List<Class<out CopyableObject>>>
@@ -697,7 +698,13 @@ class MatrixWidget<O : EditableObject>(
     isConsistent: Boolean
 ) : ParameterWidget<O, Matrix>(parameter, isConsistent) {
 
-    private var model = MatrixDataFrame(parameter.value)
+    private var model = MatrixDataFrame(
+        if (parameter.columnMode) {
+            parameter.value
+        } else {
+            parameter.value.transpose()
+        }
+    )
 
     override val widget by lazy {
         JPanel().apply {
@@ -715,7 +722,11 @@ class MatrixWidget<O : EditableObject>(
     }
 
     override val value: Matrix
-        get() = model.data
+        get() = if (parameter.columnMode) {
+            model.data
+        } else {
+            model.data.transpose()
+        }
 
     override fun refresh(property: KProperty<*>) {
         parameter.update(UpdateFunctionContext(

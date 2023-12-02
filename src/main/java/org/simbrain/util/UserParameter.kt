@@ -109,4 +109,6 @@ annotation class UserParameter(
     val typeMapProvider: String = "",
 
     val useLegacySetter: Boolean = false,
+
+    val columnMode: Boolean = true,
 )

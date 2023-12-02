@@ -110,5 +110,5 @@ annotation class UserParameter(
 
     val useLegacySetter: Boolean = false,
 
-    val columnMode: Boolean = true,
+    val columnMode: Boolean = false,
 )

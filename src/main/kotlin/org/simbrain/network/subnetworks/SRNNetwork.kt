@@ -16,6 +16,7 @@ package org.simbrain.network.subnetworks
 import org.simbrain.network.core.Network
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
+import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SRNTrainer
 import org.simbrain.network.trainers.Trainable
@@ -40,14 +41,17 @@ open class SRNNetwork(
     numInputNodes: Int = 10,
     numHiddenNodes: Int = 10,
     numOutputNodes: Int = 10,
-    initialPosition: Point2D = point(0, 0)) :
-        FeedForward(network,
+    initialPosition: Point2D = point(0, 0)) : FeedForward(network,
             intArrayOf(numInputNodes, numHiddenNodes, numOutputNodes),
             initialPosition), Trainable {
 
-    var hiddenLayer: NeuronArray = layerList[1]
+    var hiddenLayer: NeuronArray = layerList[1].also {
+        it.updateRule = SigmoidalRule()
+    }
 
-    var contextLayer: NeuronArray = NeuronArray(network, numHiddenNodes)
+    var contextLayer: NeuronArray = NeuronArray(network, numHiddenNodes).apply {
+        updateRule = LinearRule()
+    }
 
     val contextToHidden: WeightMatrix
 

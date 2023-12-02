@@ -14,6 +14,7 @@ import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.workspace.AttributeContainer
+import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
 import smile.math.matrix.Matrix
 import smile.stat.distribution.GaussianDistribution
@@ -65,7 +66,6 @@ class NeuronArray(parent: Network, inputSize: Int) : ArrayLayer(parent, inputSiz
 
     @get:Producible
     override val outputs: Matrix get() = activations
-
 
     private var targets: Matrix? = null
 
@@ -262,12 +262,18 @@ $dataHolder"""
         return this
     }
 
+    @Consumable
+    fun forceSetActivations(activations: DoubleArray) {
+        this.activations = activations.toMatrix()
+    }
+
     val excitatoryInputs: DoubleArray
         get() = incomingConnectors.stream()
             .filter { wm: Connector? -> wm is WeightMatrix }
             .map { wm: Connector -> (wm as WeightMatrix).getExcitatoryOutputs() }
             .reduce { base: DoubleArray?, add: DoubleArray? -> SimbrainMath.addVector(base, add) }
             .orElse(DoubleArray(inputSize()))
+
     val inhibitoryInputs: DoubleArray
         get() = incomingConnectors.stream()
             .filter { wm: Connector? -> wm is WeightMatrix }

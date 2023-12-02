@@ -28,11 +28,9 @@ import kotlin.math.sqrt
 import kotlin.random.Random
 
 
-// Randomization / Initialization strategy
-// Stopping Condition. See iterable trainer.
-// Loss Function
-// See API for kotlindl
-
+/**
+ * Manage iteration based training algorithms and provides an object that can be edited in the GUI.
+ */
 abstract class IterableTrainer(val net: Trainable) : EditableObject {
 
     @UserParameter(label = "Learning Rate", order = 1)

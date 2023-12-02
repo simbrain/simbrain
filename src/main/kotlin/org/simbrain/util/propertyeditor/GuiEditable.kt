@@ -57,7 +57,7 @@ class GuiEditable<O : EditableObject, T>(
     val conditionallyEnabledBy: KMutableProperty1<O, Boolean>? = null,
     val conditionallyVisibleBy: KMutableProperty1<O, Boolean>? = null,
     val typeMapProvider: KFunction<List<Class<out CopyableObject>>>? = null,
-    val columnMode: Boolean = true,
+    val columnMode: Boolean = false,
     val getter: (GuiEditableGetterContext<O, T>.() -> T)? = null,
     val setter: (GuiEditableSetterContext<O, T>.(T) -> Unit)? = null,
     private val onUpdate: (UpdateFunctionContext<O, T>).() -> Unit = { }
@@ -592,7 +592,6 @@ class ColorWidget<O : EditableObject>(
     }
 }
 
-
 class DoubleArrayWidget<O : EditableObject>(
     val editor: AnnotatedPropertyEditor<O>,
     parameter: GuiEditable<O, DoubleArray>,
@@ -626,7 +625,6 @@ class DoubleArrayWidget<O : EditableObject>(
         } else {
             model.getRow<Double>(0).toDoubleArray()
         }
-
 
     override fun refresh(property: KProperty<*>) {
         parameter.update(UpdateFunctionContext(

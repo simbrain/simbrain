@@ -17,7 +17,6 @@ import org.simbrain.world.textworld.TokenEmbeddingBuilder
  */
 val srnElmanSentences = newSim {
 
-
     workspace.clearWorkspace()
 
     // Text World for Inputs
@@ -49,7 +48,7 @@ val srnElmanSentences = newSim {
         point(0,0))
     network.addNetworkModel(srn)
 
-    val trainingInputs = makeElmanVector(1000)
+    val trainingInputs = makeElmanVector(100)
         .tokenizeWordsFromString()
         .map {
             tokenEmbedding.get(it)
@@ -59,9 +58,11 @@ val srnElmanSentences = newSim {
 
     srn.trainingSet = MatrixDataset(trainingInputs, trainingTarget)
     srn.trainer.learningRate = 0.04
-    srn.trainer.updateType = IterableTrainer.UpdateMethod.Epoch()
-    srn.trainer.train(10)
-    println("Training Error: ${srn.trainer.lossFunction.loss}")
+    srn.trainer.lossFunction = IterableTrainer.LossFunction.RootMeanSquaredError()
+    repeat(10) {
+        srn.trainer.trainOnce()
+        println("${srn.trainer.lossFunction.name}: ${srn.trainer.lossFunction.loss}")
+    }
 
     withGui {
         place(networkComponent) {
@@ -88,7 +89,7 @@ val srnElmanSentences = newSim {
     with(couplingManager) {
         createCoupling(
             textWorldInputs.world.getProducer("getCurrentVector"),
-            srn.getConsumer("addInputs")
+            srn.inputLayer.getConsumer("forceSetActivations")
         )
         // createCoupling(
         //     srn.getProducer("getOutputs"),

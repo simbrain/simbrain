@@ -18,3 +18,15 @@ Some things you can do to get a quick sense of how Simbrain works.
 1) Open different workspaces using File > Open Workspace and press play in the in the workspace toolbar.
 
 2) Run different scripts using the Script menu in the workspace menu, and pressing play in the workspace toolbar.
+
+## Build process
+
+All builds are coordinated using `build.gradle.kts`
+
+- For mac, use the `signMacApp` task then `pushMacInstaller`
+- For pc, use the `signWindowsApp` task then `pushWindowsInstaller`
+- For Linux, use `createZip` then `pushZip`
+
+Note: notarization (only used on Mac) is not yet implemented
+
+Debugging the install. If app fails to run go to `Simbrain.app/Contents/app` and invoke using `java -jar Simbrain.jar`

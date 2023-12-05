@@ -247,6 +247,17 @@ if (OperatingSystem.current().isMacOsX) {
             executable("codesign")
             args("-fs", signingIdentity, appPath)
         }
+
+        // Copying over from Simbrain 3 script where we finally got this working. Not yet ported.
+        // # submit + wait .dmg for notarization and acceptance.
+        // output=$(xcrun notarytool submit "$DIST_DIR"/"$VERSION".dmg -p "jyoshimi" --wait | tee /dev/tty)
+        // # if accepted, staple ticket to dmg file for distribution
+        // if echo "$output" | grep -q "status: Accepted"; then
+        // echo "Application has been accepted for notarization. Stapling ticket to .dmg and application is ready for distribution."
+        // xcrun stapler staple "$DIST_DIR"/"$VERSION".dmg
+        // else
+        // echo "Application has not been accepted for notarization, please check the 'Submission Id' for reason"
+        // fi
     }
 
     tasks.register<Exec>("createMacDmg") {

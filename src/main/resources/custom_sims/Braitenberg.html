@@ -1,43 +1,34 @@
 <html>
 <body>
 <h1>Braitenberg Vehicles</h1>
-(Based on work by Scott Hotton and Jeff Yoshimi)
+Simbrain simulations to accompany the book <i>The Open Dynamics of Braitenberg Vehicles</i>, MIT Press, 2023, by Scott Hotton and Jeff Yoshimi.
 <br><br>
-In this simulation you can set the weights of two Braitenberg vehicles
-and observe the behaviors that result.   By using the sample parameters
-below you can produce revolving behaviors where the two vehicles revolve
-around each other, or translating behaviors where they move alongside one
-another.
+In this simulation you can set the weights of two Braitenberg vehicles and observe the resulting behavior. By using the sample parameters below you can produce revolving behaviors (where the two vehicles revolve around each other), translating behaviors (where they move alongside another), and various types of "meandering" behaviors where they spin while they revolve around each other or travel side by side. Other behaviors are possible, many of which are described in the book.
 <br><br>
-<h2>Getting started</h2>
-To start try pressing the <b>pursuer's</b> button.   This sets both agents to having the same
-weights as is in the set weights dialog.   Then move the two agents to being within
-range of each other.   Then press run.  They should eventually settle in to
-stable behavior (these are "attracting relative equilibria").
+The simulation shows two vehicles, Vehicle 1 and Vehicle 2. You can set the
+properties of the vehicles directly in the network windows, as with any
+Simbrain simulation, although this simulation is designed to make it easy for
+you to reproduce the behaviors described in the book.
 <br><br>
-Having done that, you can try setting other parameter values listed below, to
-see other kinds of stable behaviors.   These will be various versions of
-revolving around each other, including "meanders" where they are spinning
-while they revolve around each other.
-<br><br>
-By pressing the <b>Reverse weights</b> button vehicle 2's weights are set to
-be the reverse of vehicle 1's weights (vehicle 2's left weight is vehicle 1's
-right weight, and  vehicle 2's right weight becomes vehicle 1's left weight.
-When this is done (and obviously when vehicle 1's weights are different) then
-the stable behavior tends to be translating.   The two vehicles trave alongside
-one another.  Meanders can happen in this case too.
-<br>
-<h2>Sample parameter values</h2>
-Enter the values below in the left weight and right weight fields, then press the button indicated, then press
-run to see the corresponding behavior.
-<br>
-<br>
-(100, 50) - Press pursuers.  Right classical revolving
-<br>
-(100,90) - Press pursuers then reverse.  Right meander with long straight lines
-<br>
-(50,55) - Press pursuers then reverse.  Translating type meander should result.
-<br>
-(20, 25) - Press pursuers then reverse.  Heart shaped translating.
+In general, set the weights directly or with the button panel, press the play button, and watch the vehicles go! If they move too far away from each other you can grab them and pull them next to each other.
+
+<h2>The Button Panel</h2>
+The button panel contains two fields labeled "left weight" and "right weight" where you can set the weights of the two vehicles, using one of the three buttons described below.  In general, pairs of positive weights create pursuers, and pairs of negative weights create avoiders.  The buttons work as follows:
+<ul>
+    <li><b>Same pair</b>.Takes the left and right weights in those text fields and copies them to both vehicles. Thus the two vehicles have the same pair of weights. This is a point in what we call W_same in the book.  These vehicles can pursue each other in circles or in meanders.</li>
+    <li><b>Reversed pair</b>. Takes the left and right weights and applies them directly to vehicle 1, and in reverse order to vehicle 2.  Thus we have a pair of vehicles with reversed weights.  Example: vehicle 1 has weights (100,50) and vehicle 2 has weights (50,100).  This is a point in what we call W_rev in the book.  These vehicles can move side by side, sometimes while meandering or counter-rotating.</li>
+    <li><b>Opposite pair</b>.Take the left and right weights and applies them directly to vehicle 1, then multiply each by -1 and applies these "opposite" values to vehicle 2.  This produces a pair of vehicles with opposite weights. These form pursuer-avoider pairs.
+    </li>
+</ul>
+<h2>Examples</h2>
+Enter the values below in the left weight and right weight fields, press the button indicated, and press run to see the corresponding behavior.
+<ul>
+    <li>(100, 50) and <b>Same pair</b>. Revolving behavior (attracting revolving type relative equilibrium).</li>
+    <li>(100, 80) and <b>Same pair</b>. Revolving meander (attracting relative periodic orbit).</li>
+    <li>(100, 50) and <b>Reversed pair</b>. Side by side behavior (attracting translating type relative equilibrium).</li>
+    <li>(20, 25) and <b>Reversed pair</b>. Side by side meander (attracting translating type relative periodic orbit).</li>
+    <li>(100, 50) and <b>Opposite pair</b>. Pursuer-avoider behavior.</li>
+</ul>
+You can see several bifurcations by setting the <b>left weight</b> to 100, and then varying the <b>right weight</b> (each time you change the number press <b>Same pair</b> and run the sim to get a feel for what happens). You can start at 75 and slowly raise the value past 80, and then past 100. The Hopf-like bifurcation occurs around 80, and at 100 we pass through W_eq (equal weights) and the vehicles change direction. Other behaviors from the book can be observed, for example around 76 we see "billiard-like" behaviors.
 </body>
 </html>

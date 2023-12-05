@@ -5,7 +5,6 @@ import org.simbrain.custom_sims.simulations.behaviorism.ClassicalConditioning
 import org.simbrain.custom_sims.simulations.behaviorism.OperantConditioning
 import org.simbrain.custom_sims.simulations.behaviorism.OperantWithEnvironment
 import org.simbrain.custom_sims.simulations.behaviorism.SimpleOperant
-import org.simbrain.custom_sims.simulations.braitenberg.Braitenberg
 import org.simbrain.custom_sims.simulations.braitenberg.RandomizedPursuer
 import org.simbrain.custom_sims.simulations.cerebellum.Cerebellum
 import org.simbrain.custom_sims.simulations.cortex.CortexSimple
@@ -46,7 +45,7 @@ val simulations = dir<Any>("Simulations") {
         }
         dir("Braitenberg") {
             item("Isopod Simulation") { isopodSim }
-            item("Braitenberg") { Braitenberg() }
+            item("Braitenberg") { braitenbergSim }
         }
         dir("Reservoir") {
             item("Binary Reservoir") { binaryReservoir }

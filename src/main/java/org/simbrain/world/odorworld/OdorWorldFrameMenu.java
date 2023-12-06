@@ -197,6 +197,20 @@ public class OdorWorldFrameMenu extends JMenuBar {
         });
         editMenu.add(addAgent);
 
+        editMenu.addSeparator();
+
+        JMenuItem turnOnAllTrails = new JMenuItem("Turn on all trails");
+        turnOnAllTrails.addActionListener(odorWorldActions.getTurnOnTrails());
+        editMenu.add(turnOnAllTrails);
+
+        JMenuItem turnOffAllTrails = new JMenuItem("Turn off all trails");
+        turnOffAllTrails.addActionListener(odorWorldActions.getTurnOffTrails());
+        editMenu.add(turnOffAllTrails);
+
+        JMenuItem clearAllTrails = new JMenuItem("Clear all trails");
+        clearAllTrails.addActionListener(odorWorldActions.getClearAllTrails());
+        editMenu.add(clearAllTrails);
+
         // JMenuItem loadVectors = new JMenuItem("Load stimulus vectors...");
         // loadVectors.addActionListener(new ActionListener() {
         //     public void actionPerformed(ActionEvent e) {

@@ -1,6 +1,9 @@
 package org.simbrain.world.odorworld.gui
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
+import org.piccolo2d.nodes.PPath
 import org.simbrain.util.piccolo.Animations
 import org.simbrain.util.piccolo.RotatingSprite
 import org.simbrain.util.piccolo.Sprite
@@ -12,19 +15,14 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.entities.RotatingEntityManager
 import org.simbrain.world.odorworld.sensors.Sensor
 import org.simbrain.world.odorworld.sensors.VisualizableEntityAttribute
+import java.awt.geom.Point2D
 import java.util.stream.Collectors
 
 /**
  * Piccolo representation of an [OdorWorldEntity].
  */
 class EntityNode(
-    /**
-     * Parent odor world.
-     */
     private val parent: OdorWorld,
-    /**
-     * Model entity being represented.
-     */
     val entity: OdorWorldEntity
 ) : PNode(), NodeWithDispersion by DispersionNode(entity) {
 
@@ -32,6 +30,13 @@ class EntityNode(
      * Sprite representing this entity.
      */
     var sprite: Sprite? = null
+
+    /**
+     * Represents path taken by the agent, if [OdorWorldEntity.isShowTrail] is turned on
+     */
+    var trail: PPath = PPath.createPolyline(arrayOf(Point2D.Float(entity.x.toFloat(),entity.y.toFloat()))).apply {
+        paint = null
+    }
 
     /**
      * For advancing animation proportional to velocity.
@@ -54,8 +59,25 @@ class EntityNode(
         updateEntityAttributeModel()
         setOffset(entity.x, entity.y)
         entity.events.deleted.on { e: OdorWorldEntity? -> removeFromParent() }
-        entity.events.moved.on { update() }
+        entity.events.moved.on(Dispatchers.Swing) { update() }
         entity.events.typeChanged.on { o: EntityType?, n: EntityType? -> updateImage() }
+        entity.events.trailVisibilityChanged.on { new, _ ->
+            if (new) {
+                trail = PPath.createPolyline(arrayOf(Point2D.Float(entity.x.toFloat(),entity.y.toFloat()))).apply {
+                    paint = null
+                }
+                addChild(trail)
+            } else {
+                removeChild(trail)
+            }
+        }
+        entity.events.trailCleared.on {
+            removeChild(trail)
+            trail = PPath.createPolyline(arrayOf(Point2D.Float(entity.x.toFloat(),entity.y.toFloat()))).apply {
+                paint = null
+            }
+            addChild(trail)
+        }
 
         fun updateSensorsEffectorsVisibility() {
             visualizableAttributeMap.values.forEach { it?.visible = entity.isShowSensorsAndEffectors }
@@ -66,7 +88,7 @@ class EntityNode(
             updateSensorsEffectorsVisibility()
         }
 
-        entity.events.updated.on { update() }
+        entity.events.updated.on(Dispatchers.Swing) { update() }
         entity.events.sensorAdded.on { s: Sensor? ->
             if (s is VisualizableEntityAttribute) {
                 val toAdd = s as VisualizableEntityAttribute
@@ -94,6 +116,10 @@ class EntityNode(
         drawDispersionCircleAround(this)
         entity.events.propertyChanged.on {
             drawDispersionCircleAround(this)
+        }
+
+        if (entity.isShowTrail) {
+            addChild(trail)
         }
     }
 
@@ -211,6 +237,13 @@ class EntityNode(
         }
         updateAttributesNodes()
         setOffset(entity.x, entity.y)
+        if (entity.isShowTrail) {
+            if ((entity.x != trail.path.currentPoint.x) || (entity.y != trail.path.currentPoint.y)) {
+                trail.setOffset(-entity.x, -entity.y)
+                trail.lineTo(entity.x, entity.y)
+            }
+        }
+
     }
 
     /**

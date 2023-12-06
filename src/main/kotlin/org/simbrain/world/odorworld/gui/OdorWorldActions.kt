@@ -23,4 +23,22 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
         }
     }
 
+    val clearAllTrails = odorWorldPanel.createAction("Clear all trails") {
+        world.entityList.map {
+            it.clearTrail()
+        }
+    }
+
+    val turnOnTrails = odorWorldPanel.createAction("Turn on trails") {
+        world.entityList.map {
+            it.isShowTrail = true
+        }
+    }
+
+    val turnOffTrails = odorWorldPanel.createAction("Turn off trails") {
+        world.entityList.map {
+            it.isShowTrail = false
+        }
+    }
+
 }

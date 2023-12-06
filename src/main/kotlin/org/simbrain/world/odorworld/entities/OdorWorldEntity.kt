@@ -90,6 +90,18 @@ class OdorWorldEntity @JvmOverloads constructor(
     )
     var isShowSensorsAndEffectors = true
 
+    @UserParameter(
+        label = "Show Trail",
+        description = "If true, a path is shown indicating where the entity travels",
+        order = 40
+    )
+    var isShowTrail = false
+        set(value) {
+            val oldValue = field
+            field = value
+            events.trailVisibilityChanged.fireAndBlock(value, oldValue)
+        }
+
     /**
      * Smell Source (if any). Initialize to random smell source with 10
      * components.
@@ -354,6 +366,10 @@ class OdorWorldEntity @JvmOverloads constructor(
         return (world.entityList - this).firstOrNull() {
             this.location.distance(it.location) < radius
         }?.entityType?.description
+    }
+
+    fun clearTrail() {
+        events.trailCleared.fireAndBlock()
     }
 
     override val childrenContainers: List<AttributeContainer>

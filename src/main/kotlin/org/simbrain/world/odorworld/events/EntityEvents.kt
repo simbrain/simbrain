@@ -26,6 +26,8 @@ class EntityEvents: Events(), EntityLocationEvent {
     val propertyChanged = NoArgEvent()
     val collided = AddedEvent<Bounded>()
     override val moved = NoArgEvent()
+    val trailVisibilityChanged = ChangedEvent<Boolean>()
+    val trailCleared = NoArgEvent()
 
 }
 /**

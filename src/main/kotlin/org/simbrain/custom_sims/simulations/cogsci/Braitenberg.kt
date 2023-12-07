@@ -103,20 +103,19 @@ val braitenbergSim = newSim {
 
     withGui {
         createControlPanel("Control Panel", 5, 320) {
-            addTextField("Left weight", initValue = "100") {
-                leftWeight = it.toDouble()
+            addFormattedNumericTextField("Left weight", initValue = 100.0) {
+                leftWeight = it
             }
-            addTextField("Right weight", initValue = "50") {
-                rightWeight = it.toDouble()
+            addFormattedNumericTextField("Right weight", initValue = 50.0) {
+                rightWeight = it
             }
-            addTextField("Velocity", initValue = "1") {
-                velocity = it.toDouble()
+            addFormattedNumericTextField("Velocity", initValue = 1.0) {
+                velocity = it
             }
             fun setVelocity() {
                 vehicle1.straight.forceSetActivation(velocity)
                 vehicle2.straight.forceSetActivation(velocity)
             }
-
             addButton("Same pair") {
                 vehicle1.leftSynapse.strength = leftWeight
                 vehicle1.rightSynapse.strength = rightWeight
@@ -124,7 +123,6 @@ val braitenbergSim = newSim {
                 vehicle2.rightSynapse.strength = rightWeight
                 vehicle2.rightSynapse.strength = rightWeight
                 setVelocity()
-                workspace.iterate()
             }
             addButton("Reversed pair") {
                 vehicle1.leftSynapse.strength = leftWeight
@@ -132,7 +130,6 @@ val braitenbergSim = newSim {
                 vehicle2.leftSynapse.strength = rightWeight
                 vehicle2.rightSynapse.strength = leftWeight
                 setVelocity()
-                workspace.iterate()
             }
             addButton("Opposite pair") {
                 vehicle1.leftSynapse.strength = leftWeight
@@ -140,7 +137,6 @@ val braitenbergSim = newSim {
                 vehicle2.leftSynapse.strength = -leftWeight
                 vehicle2.rightSynapse.strength = -rightWeight
                 setVelocity()
-                workspace.iterate()
             }
         }
     }

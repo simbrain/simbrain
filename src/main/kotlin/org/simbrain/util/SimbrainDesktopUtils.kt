@@ -8,9 +8,15 @@ import java.awt.BorderLayout
 import java.awt.Point
 import java.awt.Rectangle
 import java.awt.event.ActionEvent
+import java.awt.event.FocusAdapter
+import java.awt.event.FocusEvent
+import java.text.DecimalFormat
+import java.text.NumberFormat
 import javax.swing.*
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
+import javax.swing.text.DefaultFormatterFactory
+import javax.swing.text.NumberFormatter
 
 /**
  * Utility to make it easy to set location of a [SimbrainDesktop] component.
@@ -89,6 +95,9 @@ class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, tru
         pack()
     }
 
+    /**
+     * Blocks passed to onChange are applied every time the text field is edited
+     */
     fun addTextField(label: String, initValue: String, onChange: (String) -> Unit = {}) = JTextField(initValue).apply {
         document.addDocumentListener(object : DocumentListener {
             override fun insertUpdate(e: DocumentEvent?) {
@@ -101,6 +110,55 @@ class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, tru
 
             override fun changedUpdate(e: DocumentEvent?) {
                 onChange(text)
+            }
+
+        })
+        mainPanel.addItem(label, this)
+    }
+
+    /**
+     * Add a text field that will parse numbers.
+     * The initvalue determines the type.
+     *
+     * Blocks passed to onChange are applied every time the text field is edited
+     */
+    inline fun <reified T: Any> addFormattedNumericTextField(
+        label: String,
+        initValue: T,
+        columns: Int = 8,
+        maximumFractionDigits: Int = 12,
+        crossinline onChange: (T) -> Unit
+    ) = JFormattedTextField(initValue).apply {
+        val format = if (T::class == Int::class || T::class == Long::class || T::class == Short::class) {
+            NumberFormat.getIntegerInstance(getLocale())
+        } else {
+            NumberFormat.getNumberInstance(getLocale()).apply { this.maximumFractionDigits = maximumFractionDigits }
+        } as DecimalFormat
+        val formatterEditor = NumberFormatter(format)
+        formatterEditor.valueClass = T::class.java
+        val factory = DefaultFormatterFactory(formatterEditor)
+        setFocusLostBehavior(JFormattedTextField.PERSIST)
+        this.columns = columns
+        isEditable = true
+        setFormatterFactory(factory)
+        addFocusListener(object : FocusAdapter() {
+            override fun focusLost(e: FocusEvent) {
+                if (isValid) {
+                    commitEdit()
+                }
+            }
+        })
+        document.addDocumentListener(object : DocumentListener {
+            override fun insertUpdate(e: DocumentEvent?) {
+                onChange(value as T)
+            }
+
+            override fun removeUpdate(e: DocumentEvent?) {
+                onChange(value as T)
+            }
+
+            override fun changedUpdate(e: DocumentEvent?) {
+                onChange(value as T)
             }
 
         })

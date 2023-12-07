@@ -16,6 +16,8 @@ val docs = "docs"
 val dist = "${buildDir}/dist"
 val buildMain = "${buildDir}/main"
 
+project.version = version
+
 val pushDest = System.getenv("DEST") ?: ""
 
 val simbrainJvmArgs = listOf(
@@ -210,7 +212,7 @@ if (OperatingSystem.current().isMacOsX) {
         doFirst {
             // Define JVM arguments
             val jvmArgs = listOf(
-                "-Duser.dir=\\\$APPDIR",
+                "-Duser.dir=\\\$APPDIR/",
                 "--add-opens=java.base/java.util=ALL-UNNAMED",
                 "--add-opens=java.desktop/java.awt=ALL-UNNAMED",
                 "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED"

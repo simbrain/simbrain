@@ -99,14 +99,31 @@ val braitenbergSim = newSim {
 
     var leftWeight = 100.0
     var rightWeight = 50.0
+    var velocity = 1.0
 
     withGui {
         createControlPanel("Control Panel", 5, 320) {
+            addTextField("Left weight", initValue = "100") {
+                leftWeight = it.toDouble()
+            }
+            addTextField("Right weight", initValue = "50") {
+                rightWeight = it.toDouble()
+            }
+            addTextField("Velocity", initValue = "1") {
+                velocity = it.toDouble()
+            }
+            fun setVelocity() {
+                vehicle1.straight.forceSetActivation(velocity)
+                vehicle2.straight.forceSetActivation(velocity)
+            }
+
             addButton("Same pair") {
                 vehicle1.leftSynapse.strength = leftWeight
                 vehicle1.rightSynapse.strength = rightWeight
                 vehicle2.leftSynapse.strength = leftWeight
                 vehicle2.rightSynapse.strength = rightWeight
+                vehicle2.rightSynapse.strength = rightWeight
+                setVelocity()
                 workspace.iterate()
             }
             addButton("Reversed pair") {
@@ -114,6 +131,7 @@ val braitenbergSim = newSim {
                 vehicle1.rightSynapse.strength = rightWeight
                 vehicle2.leftSynapse.strength = rightWeight
                 vehicle2.rightSynapse.strength = leftWeight
+                setVelocity()
                 workspace.iterate()
             }
             addButton("Opposite pair") {
@@ -121,13 +139,8 @@ val braitenbergSim = newSim {
                 vehicle1.rightSynapse.strength = rightWeight
                 vehicle2.leftSynapse.strength = -leftWeight
                 vehicle2.rightSynapse.strength = -rightWeight
+                setVelocity()
                 workspace.iterate()
-            }
-            addTextField("Left weight", initValue = "100") {
-                leftWeight = it.toDouble()
-            }
-            addTextField("Right weight", initValue = "50") {
-                rightWeight = it.toDouble()
             }
         }
     }

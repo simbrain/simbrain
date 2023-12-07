@@ -2,6 +2,7 @@ package org.simbrain.world.odorworld.gui
 
 import org.simbrain.util.createAction
 import org.simbrain.world.odorworld.OdorWorldPanel
+import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.showTilePicker
 import javax.swing.JOptionPane
 
@@ -39,6 +40,11 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
         world.entityList.map {
             it.isShowTrail = false
         }
+    }
+
+    @JvmOverloads
+    fun toggleTrailAction(entity: OdorWorldEntity) = odorWorldPanel.createAction("Toggle show trails") {
+        entity.isShowTrail = !entity.isShowTrail
     }
 
 }

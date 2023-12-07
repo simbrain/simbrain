@@ -4,9 +4,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PPath
+import org.simbrain.util.magnitude
+import org.simbrain.util.minus
 import org.simbrain.util.piccolo.Animations
 import org.simbrain.util.piccolo.RotatingSprite
 import org.simbrain.util.piccolo.Sprite
+import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.OdorWorldResourceManager
 import org.simbrain.world.odorworld.effectors.Effector
@@ -17,6 +20,7 @@ import org.simbrain.world.odorworld.sensors.Sensor
 import org.simbrain.world.odorworld.sensors.VisualizableEntityAttribute
 import java.awt.geom.Point2D
 import java.util.stream.Collectors
+import kotlin.math.absoluteValue
 
 /**
  * Piccolo representation of an [OdorWorldEntity].
@@ -112,6 +116,9 @@ class EntityNode(
                 val toRemove = e as VisualizableEntityAttribute
                 removeAttribute(toRemove)
             }
+        }
+        entity.world.events.worldStarted.on {
+            trail.moveTo(entity.x, entity.y)
         }
         drawDispersionCircleAround(this)
         entity.events.propertyChanged.on {
@@ -237,11 +244,21 @@ class EntityNode(
         }
         updateAttributesNodes()
         setOffset(entity.x, entity.y)
-        if (entity.isShowTrail) {
+        if (entity.isShowTrail && SimbrainDesktop.workspace.updater.isRunning) {
+            fun isCrossingBroder(): Boolean {
+                val delta = (trail.path.currentPoint - entity.location).magnitude.absoluteValue
+                val veolocity = entity.speed.absoluteValue
+                return delta > veolocity + 0.5 // add a little bit of tolerance
+            }
+            if (isCrossingBroder()) {
+                trail.moveTo(entity.x, entity.y)
+            }
             if ((entity.x != trail.path.currentPoint.x) || (entity.y != trail.path.currentPoint.y)) {
-                trail.setOffset(-entity.x, -entity.y)
                 trail.lineTo(entity.x, entity.y)
             }
+        }
+        if (entity.isShowTrail) {
+            trail.setOffset(-entity.x, -entity.y)
         }
 
     }

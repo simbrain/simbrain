@@ -97,21 +97,20 @@ class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, tru
 
     /**
      * Blocks passed to onChange are applied every time the text field is edited
+     * If an onChange block is provided and the values are converted to numbers, [addFormattedNumericTextField]
+     * should be used instead.
      */
     fun addTextField(label: String, initValue: String, onChange: (String) -> Unit = {}) = JTextField(initValue).apply {
         document.addDocumentListener(object : DocumentListener {
             override fun insertUpdate(e: DocumentEvent?) {
                 onChange(text)
             }
-
             override fun removeUpdate(e: DocumentEvent?) {
                 onChange(text)
             }
-
             override fun changedUpdate(e: DocumentEvent?) {
                 onChange(text)
             }
-
         })
         mainPanel.addItem(label, this)
     }
@@ -152,15 +151,12 @@ class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, tru
             override fun insertUpdate(e: DocumentEvent?) {
                 onChange(value as T)
             }
-
             override fun removeUpdate(e: DocumentEvent?) {
                 onChange(value as T)
             }
-
             override fun changedUpdate(e: DocumentEvent?) {
                 onChange(value as T)
             }
-
         })
         mainPanel.addItem(label, this)
     }

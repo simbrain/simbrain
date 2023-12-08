@@ -16,10 +16,9 @@ val version = "4.0.0"
 val docs = "docs"
 val dist = "${buildDir}/dist"
 val buildMain = "${buildDir}/main"
+val pushDest = System.getenv("DEST") ?: ""
 
 project.version = version
-
-val pushDest = System.getenv("DEST") ?: ""
 
 val simbrainJvmArgs = listOf(
     "--add-opens", "java.base/java.util=ALL-UNNAMED",
@@ -245,8 +244,9 @@ if (OperatingSystem.current().isMacOsX) {
 
         @TaskAction
         fun notarize() {
+            val notarizationProfileName = System.getenv("USER")?: throw IllegalStateException("Notarizaton profile name not defined")
             val distDir = File(distPath)
-            val dmgFile = File(distDir, "$versionString.dmg")
+            val dmgFile = File(distDir, "Simbrain${versionString}.dmg")
 
             // Create .dmg file
             project.exec {
@@ -259,7 +259,7 @@ if (OperatingSystem.current().isMacOsX) {
             // Submit .dmg for notarization and wait
             val outputStream = ByteArrayOutputStream()
             project.exec {
-                commandLine("xcrun", "notarytool", "submit", dmgFile.path, "-p", "jyoshimi", "--wait")
+                commandLine("xcrun", "notarytool", "submit", dmgFile.path, "-p", notarizationProfileName, "--wait", "-v")
                 standardOutput = outputStream
             }
             val notarizationOutput = outputStream.toString()
@@ -280,13 +280,16 @@ if (OperatingSystem.current().isMacOsX) {
         onlyIf { OperatingSystem.current().isMacOsX }
         dependsOn("jpackageMacOS")
         distPath = dist
-        versionString = version
+        versionString = versionName
     }
 
+    /**
+     * For testing dmg separate from notarization.
+     */
     tasks.register<Exec>("createMacDmg") {
         onlyIf { OperatingSystem.current().isMacOsX }
 
-        dependsOn("signMacApp")
+        dependsOn("jpackageMacOS")
 
         val appPath = "${dist}/Simbrain.app"
         val dmgPath = "${dist}/Simbrain${versionName}.dmg"
@@ -374,7 +377,6 @@ if (OperatingSystem.current().isWindows) {
                 from(dist)
                 into(dist)
                 include("Simbrain-${project.version}.exe")
-
                 rename("Simbrain-${project.version}.exe", "Simbrain${versionName}.exe")
             }
         }
@@ -383,6 +385,9 @@ if (OperatingSystem.current().isWindows) {
     }
 }
 
+/**
+ * Run script for Linux distribution. Avoids headaches of file copying and maintenance for a specific distribution.
+ */
 val runScriptFile = File.createTempFile("run", ".sh").apply {
     val dollar = "$"
     writeText("""

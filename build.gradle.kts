@@ -1,5 +1,6 @@
 import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.io.ByteArrayOutputStream
 
 plugins {
     `java-library`
@@ -52,8 +53,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.3")
 
     // Kotlin DL
-    implementation("org.jetbrains.kotlinx:kotlin-deeplearning-tensorflow:0.5.0")
-    implementation("org.jetbrains.kotlinx:kotlin-deeplearning-dataset:0.5.0")
+    implementation("org.jetbrains.kotlinx:kotlin-deeplearning-tensorflow:0.5.2")
+    implementation("org.jetbrains.kotlinx:kotlin-deeplearning-dataset:0.5.2")
     implementation("org.jetbrains.kotlinx:kotlin-deeplearning-dataset-jvm:0.5.2")
 
     // Smile
@@ -212,7 +213,7 @@ if (OperatingSystem.current().isMacOsX) {
         doFirst {
             // Define JVM arguments
             val jvmArgs = listOf(
-                "-Duser.dir=\\\$APPDIR/",
+                "-Duser.dir=\$APPDIR",
                 "--add-opens=java.base/java.util=ALL-UNNAMED",
                 "--add-opens=java.desktop/java.awt=ALL-UNNAMED",
                 "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED"
@@ -225,6 +226,8 @@ if (OperatingSystem.current().isMacOsX) {
                 "--dest", dist,
                 "--name", "Simbrain",
                 "--app-version", project.version,
+                "--mac-sign",
+                "--mac-signing-key-user-name", "Regents of the University of CA, Merced (W8BB6W47ZR)",
                 "--icon", iconFile,
                 "--java-options", jvmArgs,
                 "--type", "app-image"
@@ -232,34 +235,52 @@ if (OperatingSystem.current().isMacOsX) {
         }
     }
 
-    tasks.register<Exec>("signMacApp") {
-        onlyIf { OperatingSystem.current().isMacOsX }
+    open class NotarizeMacApp: DefaultTask() {
 
-        dependsOn("jpackageMacOS")
+        @Input
+        var distPath: String = ""
 
-        val appPath = "${dist}/Simbrain.app"
-        val signingIdentity = System.getenv("SIGNING_IDENTITY")
+        @Input
+        var versionString: String = ""
 
-        doFirst {
-            if (signingIdentity == null || signingIdentity.isEmpty()) {
-                throw GradleException("SIGNING_IDENTITY environment variable is not set or empty.")
+        @TaskAction
+        fun notarize() {
+            val distDir = File(distPath)
+            val dmgFile = File(distDir, "$versionString.dmg")
+
+            // Create .dmg file
+            project.exec {
+                commandLine("hdiutil", "create", "-volname", versionString, "-srcfolder", "${distDir.path}/Simbrain.app", "-ov", "-format", "UDZO", dmgFile.path)
             }
 
-            // Set up the codesign command and its arguments
-            executable("codesign")
-            args("-fs", signingIdentity, appPath)
-        }
+            // Delete Simbrain.app
+            File("${distDir.path}/Simbrain.app").deleteRecursively()
 
-        // Copying over from Simbrain 3 script where we finally got this working. Not yet ported.
-        // # submit + wait .dmg for notarization and acceptance.
-        // output=$(xcrun notarytool submit "$DIST_DIR"/"$VERSION".dmg -p "jyoshimi" --wait | tee /dev/tty)
-        // # if accepted, staple ticket to dmg file for distribution
-        // if echo "$output" | grep -q "status: Accepted"; then
-        // echo "Application has been accepted for notarization. Stapling ticket to .dmg and application is ready for distribution."
-        // xcrun stapler staple "$DIST_DIR"/"$VERSION".dmg
-        // else
-        // echo "Application has not been accepted for notarization, please check the 'Submission Id' for reason"
-        // fi
+            // Submit .dmg for notarization and wait
+            val outputStream = ByteArrayOutputStream()
+            project.exec {
+                commandLine("xcrun", "notarytool", "submit", dmgFile.path, "-p", "jyoshimi", "--wait")
+                standardOutput = outputStream
+            }
+            val notarizationOutput = outputStream.toString()
+
+            // Check notarization status and staple if accepted
+            if ("status: Accepted" in notarizationOutput) {
+                println("Application has been accepted for notarization. Stapling ticket to .dmg and application is ready for distribution.")
+                project.exec {
+                    commandLine("xcrun", "stapler", "staple", dmgFile.path)
+                }
+            } else {
+                println("Application has not been accepted for notarization, please check the 'Submission Id' for reason")
+            }
+        }
+    }
+
+    tasks.register<NotarizeMacApp>("notarizeMacApp") {
+        onlyIf { OperatingSystem.current().isMacOsX }
+        dependsOn("jpackageMacOS")
+        distPath = dist
+        versionString = version
     }
 
     tasks.register<Exec>("createMacDmg") {

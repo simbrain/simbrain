@@ -59,7 +59,7 @@ public class Utils {
      * @return the formatted time string
      */
     public static String getTimeString() {
-        return new SimpleDateFormat("MM-dd-YY_k-mm").format(Calendar.getInstance().getTime());
+        return new SimpleDateFormat("MM-dd-yy_k-mm").format(Calendar.getInstance().getTime());
     }
 
     /**

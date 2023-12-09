@@ -28,10 +28,7 @@ import org.simbrain.console.ConsoleDesktopComponent
 import org.simbrain.custom_sims.NewSimulation
 import org.simbrain.custom_sims.Simulation
 import org.simbrain.custom_sims.simulations
-import org.simbrain.util.ResourceManager
-import org.simbrain.util.SFileChooser
-import org.simbrain.util.StandardDialog
-import org.simbrain.util.Utils
+import org.simbrain.util.*
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.genericframe.GenericJFrame
 import org.simbrain.util.genericframe.GenericJInternalFrame
@@ -45,6 +42,8 @@ import java.awt.*
 import java.awt.event.*
 import java.beans.PropertyVetoException
 import java.io.File
+import java.io.PrintWriter
+import java.io.StringWriter
 import java.util.*
 import javax.swing.*
 import javax.swing.event.*
@@ -746,6 +745,21 @@ object SimbrainDesktop {
      * Create the GUI and show it. For thread safety, this method should be invoked from the event-dispatching thread.
      */
     private fun createAndShowGUI() {
+        // any time an exception occurs, present a dialog box with the error to the user
+        Thread.setDefaultUncaughtExceptionHandler { t, e ->
+            val sw = StringWriter()
+            e.printStackTrace(PrintWriter(sw))
+            val stackTrace = sw.toString()
+            val textArea = JTextArea("An error occurred: ${e.message}\n\n$stackTrace").apply {
+                isEditable = false
+                rows = 10
+                columns = 50
+            }
+            val scrollPane = JScrollPane(textArea)
+            SwingUtilities.invokeLater {
+                JOptionPane.showMessageDialog(null, scrollPane, "Uncaught Exception", JOptionPane.ERROR_MESSAGE)
+            }
+        }
         /*
          * Make sure we have nice window decorations.
          * JFrame.setDefaultLookAndFeelDecorated(true); Create and set up the

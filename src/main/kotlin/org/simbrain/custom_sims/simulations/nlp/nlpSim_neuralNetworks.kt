@@ -1,15 +1,11 @@
 package org.simbrain.custom_sims.simulations
 
-import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.addTextWorld
-import org.simbrain.custom_sims.couplingManager
-import org.simbrain.custom_sims.newSim
+import org.simbrain.custom_sims.*
 import org.simbrain.network.subnetworks.SRNNetwork
-import org.simbrain.util.Utils
+import org.simbrain.util.div
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.world.textworld.TokenEmbeddingBuilder
-import java.io.File
 
 /**
  * Todo
@@ -26,7 +22,7 @@ val nlpSim_neuralNetworks = newSim {
 
     // Text World for Inputs
     val textWorld = addTextWorld("Text World (Inputs)")
-    val text = File("simulations" + Utils.FS + "texts" + Utils.FS + "mlk.txt").readText()
+    val text = readSimulationFileContents("texts" / "mlk.txt")
     TokenEmbeddingBuilder().build(text)
     textWorld.world.text = text
 

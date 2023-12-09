@@ -1,10 +1,7 @@
 package org.simbrain.custom_sims.simulations
 
-import org.simbrain.custom_sims.addProjectionPlot2
-import org.simbrain.custom_sims.addTextWorld
-import org.simbrain.custom_sims.newSim
-import org.simbrain.custom_sims.updateAction
-import org.simbrain.util.Utils.FS
+import org.simbrain.custom_sims.*
+import org.simbrain.util.div
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.util.projection.DataPoint
@@ -12,7 +9,6 @@ import org.simbrain.util.projection.HaloColoringManager
 import org.simbrain.util.projection.PCAProjection
 import org.simbrain.world.textworld.EmbeddingType
 import org.simbrain.world.textworld.TokenEmbeddingBuilder
-import java.io.File
 
 /**
  * Initial study of word embeddings.
@@ -32,7 +28,7 @@ val nlpSimBasic = newSim {
     // Text World
     val twc = addTextWorld("Text World")
     val textWorld = twc.world
-    val text = File("simulations" + FS + "texts" + FS + "corpus_artificial_similarity.txt").readText()
+    val text = readSimulationFileContents("texts" / "corpus_artificial_similarity.txt")
     textWorld.text = text
     textWorld.tokenEmbedding = TokenEmbeddingBuilder().apply {
         embeddingType = EmbeddingType.COC

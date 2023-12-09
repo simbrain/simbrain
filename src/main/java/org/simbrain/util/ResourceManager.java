@@ -22,11 +22,12 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
-import java.nio.file.Paths;
-import java.util.Objects;
+import java.nio.charset.StandardCharsets;
+import java.util.Optional;
+import java.util.Scanner;
 
 /**
  * <b>ResourceManager</b> provides convenient access to resource files. Pass in paths relative to the resource
@@ -79,16 +80,30 @@ public class ResourceManager {
     }
 
     /**
+     * Produces a Scanner from the file resource specified by the 'name' parameter.
+     * Returns an Optional of Scanner if the file resource is found, or an empty Optional otherwise.
+     */
+    private static Optional<Scanner> createScannerFromResource(String name) {
+        InputStream stream = ClassLoader.getSystemClassLoader().getResourceAsStream(name);
+        return Optional.ofNullable(stream)
+                .map(s -> new Scanner(s, StandardCharsets.UTF_8));
+    }
+
+    /**
+     * Reads the entire contents of the Scanner into a String.
+     * Returns an empty string if the Scanner has not got any data.
+     */
+    private static String readScannerContents(Scanner scanner) {
+        return scanner.useDelimiter("\\A").hasNext() ? scanner.next() : "";
+    }
+
+    /**
      * Read file contents from a path specified relative to the resource directory (src/main/resources).
      */
     public static String readFileContents(String name) {
-        try {
-            File file = Paths.get(Objects.requireNonNull(ClassLoader.getSystemClassLoader()
-                    .getResource(name)).toURI()).toFile();
-            return Utils.readFileContents(file);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Path " + name + " to requested resource incorrect");
-        }
+        return createScannerFromResource(name)
+                .map(ResourceManager::readScannerContents)
+                .orElse("");
     }
 
     /**

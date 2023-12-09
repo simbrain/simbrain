@@ -17,6 +17,7 @@ import org.simbrain.workspace.updater.UpdateAction
 import org.simbrain.world.imageworld.ImageWorldComponent
 import org.simbrain.world.odorworld.OdorWorldComponent
 import org.simbrain.world.textworld.TextWorldComponent
+import java.io.File
 
 class SimulationScope private constructor(
     val desktop: SimbrainDesktop?,
@@ -133,9 +134,7 @@ suspend fun SimulationScope.placeComponent(component: WorkspaceComponent, x: Int
  * Grabs a resource from the src/main/resources/custom_sims directory and returns it as a string.
  */
 fun SimulationScope.readSimulationFileContents(fileName: String): String {
-    return ResourceManager.readFileContents(
-        "custom_sims" + Utils.FS + fileName
-    )
+    return File(Utils.USER_DIR / "simulations" / fileName).readText()
 }
 
 /**

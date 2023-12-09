@@ -266,7 +266,7 @@ fun SimbrainJTable.createApplyAction(name: String = "Apply", applyInputs: suspen
 fun SimbrainJTable.createAdvanceRowAction() = createAction(
         name = "Advance Row",
         description = "Increment the current row",
-        iconPath = "menu_icons/Plus.png",
+        iconPath = "menu_icons/plus.png",
     ) {
         incrementSelectedRow()
     }

@@ -9,9 +9,11 @@ import java.util.*
 import javax.swing.JScrollPane
 import javax.swing.JTextArea
 
-val stopWords = ResourceManager
-    .readFileContents("textworld" + FS + "stopwords.txt")
-    .split("\n").toSet().toList()
+val stopWords by lazy {
+    ResourceManager
+        .readFileContents("textworld" + FS + "stopwords.txt")
+        .split("\n").toSet().toList()
+}
 
 /**
  * Sentence tokenizer: parse document into sentences and return as a list of sentences.
@@ -230,4 +232,11 @@ fun main() {
         val text = Utils.readFileContents(theFile)
         generateCooccurrenceMatrix(text)
     }
+}
+
+/**
+ * Allow file separators to be indicated with a forward slash.
+ */
+operator fun String.div(other: String): String {
+    return this + FS + other
 }

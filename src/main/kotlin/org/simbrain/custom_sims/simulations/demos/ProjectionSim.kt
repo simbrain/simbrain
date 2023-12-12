@@ -7,7 +7,6 @@ import org.simbrain.custom_sims.newSim
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.util.place
-import org.simbrain.util.point
 
 /**
  * Create with a neuron array and a projection
@@ -27,21 +26,13 @@ val projectionSim = newSim {
 
     // Location of the network in the desktop
     withGui {
-        place(networkComponent) {
-            location = point(0, 0)
-            width = 400
-            height = 400
-        }
+        place(networkComponent, 0, 0, 400, 400)
     }
 
     // Location of the projection in the desktop
     val projectionPlot = addProjectionPlot2("Activations")
     withGui {
-        place(projectionPlot) {
-            location = point(410, 0)
-            width = 400
-            height = 400
-        }
+        place(projectionPlot, 405, 0, 400, 400)
     }
 
     // Couple the neuron array to the projection plot

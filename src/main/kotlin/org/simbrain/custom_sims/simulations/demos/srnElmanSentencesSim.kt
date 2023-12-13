@@ -2,7 +2,6 @@ package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addTextWorld
-import org.simbrain.custom_sims.couplingManager
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.network.trainers.IterableTrainer
@@ -29,13 +28,9 @@ val srnElmanSentences = newSim {
     textWorldInputs.world.text = text
     textWorldInputs.world.tokenEmbedding = tokenEmbedding
 
-    withGui {
-        place(textWorldInputs) {
-            location = point(0, 0)
-            width = 450
-            height = 250
-        }
-    }
+    // Text World for Outputs
+    val textWorldOut = addTextWorld("Text World (Outputs)")
+    TokenEmbeddingBuilder().build(text)
 
     // Network
     val networkComponent = addNetworkComponent("Network")
@@ -43,12 +38,12 @@ val srnElmanSentences = newSim {
     val srn = SRNNetwork(
         network,
         textWorldInputs.world.tokenEmbedding.dimension,
-        50,
+        150,
         textWorldInputs.world.tokenEmbedding.dimension,
         point(0,0))
     network.addNetworkModel(srn)
 
-    val trainingInputs = makeElmanVector(100)
+    val trainingInputs = makeElmanVector(1000)
         .tokenizeWordsFromString()
         .map {
             tokenEmbedding.get(it)
@@ -59,47 +54,49 @@ val srnElmanSentences = newSim {
     srn.trainingSet = MatrixDataset(trainingInputs, trainingTarget)
     srn.trainer.learningRate = 0.04
     srn.trainer.lossFunction = IterableTrainer.LossFunction.RootMeanSquaredError()
-    repeat(10) {
+    repeat(6) {
         srn.trainer.trainOnce()
         println("${srn.trainer.lossFunction.name}: ${srn.trainer.lossFunction.loss}")
     }
 
     withGui {
-        place(networkComponent) {
-            location = point(460, 0)
-            width = 500
-            height = 550
-        }
+        place(textWorldInputs, 0, 0, 450, 250)
+        place(textWorldOut, 0, 265, 450, 350)
+        place(networkComponent, 460, 0, 500, 550)
     }
 
-    // // Text World for Outputs
-    // val textWorldOut = addTextWorld("Text World (Outputs)")
-    // textWorldOut.world.tokenEmbedding = tokenEmbedding
-    //
-    // withGui {
-    //     place(textWorldOut) {
-    //         location = point(0, 265)
-    //         width = 450
-    //         height = 250
-    //     }
-    // }
+    workspace.updater.updateManager.clear()
 
+    workspace.addUpdateAction("Update Inputs") {
+        textWorldInputs.update()
+    }
 
-    // Couple the text world to neuron collection
-    with(couplingManager) {
-        createCoupling(
-            textWorldInputs.world.getProducer("getCurrentVector"),
-            srn.inputLayer.getConsumer("forceSetActivations")
+    workspace.addUpdateAction("Set Current Word as Input Activations") {
+        val currentVector = textWorldInputs.world.currentVector
+        srn.inputLayer.forceSetActivations(currentVector)
+    }
+
+    workspace.addUpdateAction("Update Network") {
+        networkComponent.update()
+    }
+
+    workspace.addUpdateAction("Write Predicted Next Word to Output") {
+        val totalActivations = srn.outputLayer.activations.toDoubleArray().sum()
+        val choices = srn.outputLayer.activations.toDoubleArray().mapIndexed { index, d -> index to d }
+            .sortedByDescending { (_, d) -> d }
+            .take(5)
+        val chosenWords = choices.map { (index, _) -> tokenEmbedding.tokens[index] }
+        val chosenProbs = choices.map { (_, d) -> d / totalActivations }
+        val chosen = chosenWords.zip(chosenProbs).joinToString(" ") { (word, prob) -> "$word (${prob.format(3)})" }
+        textWorldOut.world.addTextAtEnd(
+            """
+                |Current Word: ${textWorldInputs.world.currentToken}
+                |Predicted Next Words: $chosen
+                |
+                |
+            """.trimMargin("|"),
+            ""
         )
-        // createCoupling(
-        //     srn.getProducer("getOutputs"),
-        //     textWorldOut.world.getConsumer("displayClosestWord")
-        // )
-    }
-
-    workspace.addUpdateAction("Print Predicted Next Word") {
-        val closestWord = tokenEmbedding.getClosestWord(srn.outputLayer.activations.toDoubleArray())
-        println("Predicted Next Word: $closestWord")
     }
 
 }

@@ -18,6 +18,7 @@ fun <T : Comparable<T>> T.clip(range: ClosedRange<T>) =
  * Reference: https://stackoverflow.com/a/23088000
  */
 fun Double.format(digits: Int) = "%.${digits}f".format(this)
+fun Double.roundToString(digits: Int) = format(digits)
 
 fun DoubleArray.summedSquares() =
     sumOf { it * it }

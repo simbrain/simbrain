@@ -294,9 +294,10 @@ class TextWorld : AttributeContainer, EditableObject {
      * Add a text to the end of the world text.
      */
     @Consumable
-    fun addTextAtEnd(newText: String) {
+    fun addTextAtEnd(newText: String, spacing: String = " ") {
         position = text.length
-        text += " $newText"
+        text += "$spacing$newText"
+        position = text.length
         events.textChanged.fireAndForget()
     }
 

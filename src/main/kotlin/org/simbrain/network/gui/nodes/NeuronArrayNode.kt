@@ -241,7 +241,11 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         infoText.text = computeInfoText()
     }
 
-    override fun getToolTipText() = neuronArray.toString()
+    override fun getToolTipText() = """
+        <html>
+        ${neuronArray.toString().split("\n").joinToString("<br>")}
+        </html>
+    """.trimIndent()
 
     override fun getContextMenu(): JPopupMenu {
         val contextMenu = JPopupMenu()

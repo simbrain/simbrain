@@ -233,9 +233,11 @@ class NeuronArray(parent: Network, inputSize: Int) : ArrayLayer(parent, inputSiz
     }
 
     override fun toString(): String {
-        return """$id with ${outputs.size()} components. 
-Activations: ${Utils.getTruncatedArrayString(activationArray, 10)}
-$dataHolder"""
+        return """
+            $id with ${outputs.size()} components.
+            Activations: ${Utils.getTruncatedArrayString(activationArray, 10)}
+            $dataHolder
+        """.trimIndent()
     }
 
     override fun clear() {

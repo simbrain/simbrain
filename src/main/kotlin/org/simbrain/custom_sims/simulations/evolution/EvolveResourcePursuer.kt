@@ -1,6 +1,8 @@
 package org.simbrain.custom_sims.simulations
 
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.withContext
+import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
@@ -44,12 +46,13 @@ val evolveResourcePursuer = newSim {
     /**
      * Max generation to run before giving up
      */
-    val maxGenerations = 15
+    var maxGenerations = 15
 
     /**
      * Iterations to run for each simulation. If < 3000 success is usually by luck.
+     * A bit like its lifespan.
      */
-    val iterationsPerRun = 1000
+    var iterationsPerRun = 1000
 
     class EvolvePursuerGenotype(seed: Long = Random.nextLong()) : Genotype {
 
@@ -69,10 +72,11 @@ val evolveResourcePursuer = newSim {
                 add(connectionGene(inputChromosome.sampleOne(), hiddenChromosome.sampleOne()))
                 add(connectionGene(hiddenChromosome.sampleOne(), outputChromosome.sampleOne()))
             }
-            add(connectionGene(driveChromosome.first(), hiddenChromosome.sampleOne()))
+            val thirstGene = driveChromosome.first()
+            add(connectionGene(thirstGene, hiddenChromosome.sampleOne()))
         }
-        var layoutChromosome = chromosome(1) { 
-            add(layoutGene()) 
+        var layoutChromosome = chromosome(1) {
+            add(layoutGene())
         }
 
         inner class Phenotype(
@@ -82,7 +86,9 @@ val evolveResourcePursuer = newSim {
             val outputNeurons: NeuronCollection,
             val connections: List<Synapse>,
             val layout: Layout
-        )
+        ) {
+            val thirstNeuron get() = driveNeurons.neuronList.first()
+        }
 
         suspend fun expressWith(network: Network): Phenotype {
             val driveNeurons = NeuronCollection(network, network.express(driveChromosome)).also {
@@ -133,8 +139,9 @@ val evolveResourcePursuer = newSim {
 
             // Ensure existing connections are not used when creating new connections
             val existingConnections = connectionChromosome.map { it.source to it.target }.toSet()
-            val availableConnections = ((inputChromosome + hiddenChromosome + driveChromosome) cartesianProduct hiddenChromosome) +
-                    (hiddenChromosome cartesianProduct outputChromosome) - existingConnections
+            val availableConnections =
+                ((inputChromosome + hiddenChromosome + driveChromosome) cartesianProduct hiddenChromosome) +
+                        (hiddenChromosome cartesianProduct outputChromosome) - existingConnections
             if (random.nextDouble() < 0.25 && availableConnections.isNotEmpty()) {
                 val (source, target) = availableConnections.sampleOne()
                 connectionChromosome.add(connectionGene(source, target) { strength = random.nextDouble(-1.0, 1.0) })
@@ -217,17 +224,18 @@ val evolveResourcePursuer = newSim {
 
             workspace.addUpdateAction("update energy") {
                 with(phenotypeDeferred.await()) {
-                    val outputsActivations = outputNeurons.activations.sumOf { 1.2.pow(if (it < 0) it * -2 else it) - 1 }
-                    val allActivations = (inputNeurons.neuronList + hiddenNeurons.neuronList).activations.sumOf { abs(it) } * 2
+                    val outputsActivations =
+                        outputNeurons.activations.sumOf { 1.2.pow(if (it < 0) it * -2 else it) - 1 }
+                    val allActivations =
+                        (inputNeurons.neuronList + hiddenNeurons.neuronList).activations.sumOf { abs(it) } * 2
                     calories = max(0.0, calories - (outputsActivations + allActivations) * (1 / iterationsPerRun))
-                    val (thirstNeuron, secondNeuron) = driveNeurons.neuronList
                     thirstNeuron.forceSetActivation(10.0 / iterationsPerRun + thirstNeuron.activation)
                 }
             }
 
             // What to do when a cow finds water
             workspace.addUpdateAction("water found") {
-                val (thirstNeuron, secondNeuron) = phenotypeDeferred.await().driveNeurons.neuronList
+                val thirstNeuron = phenotypeDeferred.await().thirstNeuron
                 with(odorWorld.tileMap) {
                     centerLakeSensor.let { sensor ->
                         // Water found
@@ -273,55 +281,85 @@ val evolveResourcePursuer = newSim {
         }
 
         override suspend fun eval(): Double {
-            
+
             // Build the sim then wait.
             build()
-            
+
             val phenotype = phenotypeDeferred.await()
-            
+
             // Iterate the sim
             workspace.iterateSuspend(iterationsPerRun)
 
-            return calories - phenotype.driveNeurons.neuronList.first().activation * 4
+            return calories - phenotype.thirstNeuron.activation * 4
         }
 
     }
 
-    val progressWindow = ProgressWindow(maxGenerations, "Error").apply {
-        minimumSize = Dimension(300, 100)
-        setLocationRelativeTo(null)
-    }
-    val lastGeneration = evaluator(
-        populatingFunction = { EvolveResourcePursuerSim() },
-        populationSize = 100,
-        eliminationRatio = 0.25,
-        peek = {
-            listOf(0, 10, 25, 50, 75, 90, 100).joinToString(" ") {
-                "$it: ${nthPercentileFitness(it).format(3)}"
-            }.also {
-                println("[$generation] $it")
-                progressWindow.text = "5th Percentile MSE: ${nthPercentileFitness(5).format(3)}"
-                progressWindow.value = generation
-            }
-        },
-        stoppingFunction = {
-            nthPercentileFitness(5) > 1000.0 || generation > maxGenerations
-        }
-    )
-
-    lastGeneration.take(1).forEach {
-        with(it.visualize(workspace) as EvolveResourcePursuerSim) {
-            build()
-            val phenotype = this.phenotypeDeferred.await()
-
-            phenotype.apply {
-                driveNeurons.location = point(-150, 150)
-                inputNeurons.location = point(0, 150)
-                hiddenNeurons.location = point(0, 60)
-                outputNeurons.location = point(0, -25)
+    suspend fun runSim() {
+        withContext(workspace.coroutineContext) {
+            val progressWindow = ProgressWindow(maxGenerations, "10th Percentile Fitness:").apply {
+                minimumSize = Dimension(300, 100)
+                setLocationRelativeTo(null)
             }
 
+            val lastGeneration = evaluator(
+                populatingFunction = { EvolveResourcePursuerSim() },
+                populationSize = 100,
+                eliminationRatio = 0.25,
+                peek = {
+                    listOf(0, 10, 25, 50, 75, 90, 100).joinToString(" ") {
+                        "$it: ${nthPercentileFitness(it).format(3)}"
+                    }.also {
+                        println("[$generation] $it")
+                        progressWindow.apply {
+                            text = "10th Percentile Fitness: ${nthPercentileFitness(10).format(3)}"
+                            value = generation
+                        }
+                    }
+                },
+                stoppingFunction = {
+                    nthPercentileFitness(5) > 1000.0 || generation > maxGenerations
+                }
+            )
+            lastGeneration.take(1).forEach {
+                with(it.visualize(workspace) as EvolveResourcePursuerSim) {
+                    build()
+                    val phenotype = this.phenotypeDeferred.await()
+
+                    phenotype.apply {
+                        driveNeurons.location = point(-150, 150)
+                        inputNeurons.location = point(0, 150)
+                        hiddenNeurons.location = point(0, 60)
+                        outputNeurons.location = point(0, -25)
+                    }
+
+                }
+            }
+            progressWindow.close()
+        }
+
+    }
+
+    withGui {
+        workspace.clearWorkspace()
+        createControlPanel("Control Panel", 5, 10) {
+
+            val maxGenTf = addTextField("Max Generations", "" + maxGenerations)
+            val iterationsPerRunTf = addTextField("Num iterations per generation", "" + iterationsPerRun)
+            // val populationSizeTf = addTextField("Population size", "" + populationSize)
+            // val eliminationRatioTf = addTextField("Elimination ratio", "" + eliminationRatio)
+
+            addButton("Evolve") {
+                workspace.removeAllComponents()
+                maxGenerations = maxGenTf.text.toInt()
+                iterationsPerRun = iterationsPerRunTf.text.toInt()
+                // populationSize = populationSizeTf.text.toInt()
+                // eliminationRatio = eliminationRatioTf.text.toDouble()
+                runSim()
+            }
+
+
         }
     }
-    progressWindow.close()
+
 }

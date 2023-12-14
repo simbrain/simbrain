@@ -63,6 +63,12 @@ data class GenerationFitnessPair(val generation: Int, val fitnessScores: List<Do
 
 }
 
+/**
+ * Given a list of <number,block> pairs, choose one of the blocks to execute. Treat the numbers as weights.
+ *
+ * Example: Random.runOne(1 to { print("A") }, 1 to { print("B") }) will print A or B with equal probability
+ *
+ */
 fun Random.runOne(vararg functions: Pair<Number, () -> Unit>) {
     val total = functions.sumOf { it.first.toDouble() }
     val random = nextDouble() * total

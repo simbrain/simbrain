@@ -10,6 +10,7 @@ import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.activations
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.layouts.Layout
+import org.simbrain.network.neuron_update_rules.DecayRule
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.cartesianProduct
 import org.simbrain.util.format
@@ -78,6 +79,9 @@ val evolveResourcePursuer = newSim {
         var layoutChromosome = chromosome(1) {
             add(layoutGene())
         }
+        var hiddenUpdateRuleChromosome = chromosome(hiddenChromosome.size) {
+            add(neuronRuleGene(DecayRule()))
+        }
 
         inner class Phenotype(
             val driveNeurons: NeuronCollection,
@@ -106,6 +110,10 @@ val evolveResourcePursuer = newSim {
             val connections = network.express(connectionChromosome)
             val layout = express(layoutChromosome).first().express()
             layout.layoutNeurons(hiddenNeurons.neuronList)
+            val hiddenUpdateRules = express(hiddenUpdateRuleChromosome)
+            hiddenNeurons.neuronList.zip(hiddenUpdateRules).forEach { (neuron, rule) ->
+                neuron.updateRule = rule.updateRule
+            }
             return Phenotype(driveNeurons, inputNeurons, hiddenNeurons, outputNeurons, connections, layout)
         }
 
@@ -119,6 +127,7 @@ val evolveResourcePursuer = newSim {
             new.outputChromosome = current.outputChromosome.copy()
             new.connectionChromosome = current.connectionChromosome.copy()
             new.layoutChromosome = current.layoutChromosome.copy()
+            new.hiddenUpdateRuleChromosome = current.hiddenUpdateRuleChromosome.copy()
         }
 
         fun mutate() {
@@ -150,9 +159,15 @@ val evolveResourcePursuer = newSim {
             // Add a new hidden unit
             if (random.nextDouble() < 0.8) {
                 hiddenChromosome.add(nodeGene())
+                hiddenUpdateRuleChromosome.add(neuronRuleGene(DecayRule()))
             }
 
             layoutChromosome.forEach {
+                it.mutateParam()
+                it.mutateType()
+            }
+
+            hiddenUpdateRuleChromosome.forEach {
                 it.mutateParam()
                 it.mutateType()
             }

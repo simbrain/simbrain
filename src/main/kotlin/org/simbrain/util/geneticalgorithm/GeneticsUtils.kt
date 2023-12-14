@@ -5,6 +5,7 @@ import org.simbrain.network.core.Network
 import org.simbrain.util.sampleWithReplacement
 import org.simbrain.util.sampleWithoutReplacement
 import kotlin.math.roundToInt
+import kotlin.random.Random
 
 context(Genotype)
 fun <P, G : Gene<P>> Chromosome<P, G>.sample() = this[random.nextInt(size)]
@@ -60,4 +61,17 @@ data class GenerationFitnessPair(val generation: Int, val fitnessScores: List<Do
 
     fun nthPercentileFitness(nth: Double) = fitnessScores[(fitnessScores.lastIndex * nth / 100).roundToInt()]
 
+}
+
+fun Random.runOne(vararg functions: Pair<Number, () -> Unit>) {
+    val total = functions.sumOf { it.first.toDouble() }
+    val random = nextDouble() * total
+    var sum = 0.0
+    for ((weight, function) in functions) {
+        sum += weight.toDouble()
+        if (random < sum) {
+            function()
+            return
+        }
+    }
 }

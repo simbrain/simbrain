@@ -3,13 +3,18 @@ package org.simbrain.util.geneticalgorithm
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.withTimeout
 import org.simbrain.network.NetworkModel
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.*
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.HexagonalGridLayout
 import org.simbrain.network.layouts.Layout
 import org.simbrain.network.layouts.LineLayout
+import org.simbrain.network.neuron_update_rules.BinaryRule
+import org.simbrain.network.neuron_update_rules.DecayRule
+import org.simbrain.network.neuron_update_rules.LinearRule
+import org.simbrain.network.updaterules.SigmoidalRule
+import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
+import kotlin.reflect.KClass
+import kotlin.reflect.full.createInstance
 
 abstract class NetworkGene<P : NetworkModel> : Gene<P>() {
     abstract suspend fun express(network: Network): P
@@ -84,6 +89,10 @@ data class LayoutGeneWrapper(var layoutType: Layout = GridLayout(), var hSpacing
     fun copy() = LayoutGeneWrapper(layoutType.copy(), hSpacing, vSpacing)
 }
 
+class NeuronRuleGeneWrapper(var updateRule: NeuronUpdateRule<*, *>) {
+    fun copy() = NeuronRuleGeneWrapper(updateRule.copy())
+}
+
 class LayoutGene(override val template: LayoutGeneWrapper) : TopLevelGene<LayoutGeneWrapper>() {
 
     private val _expressedLayout = CompletableDeferred<LayoutGeneWrapper>()
@@ -96,6 +105,22 @@ class LayoutGene(override val template: LayoutGeneWrapper) : TopLevelGene<Layout
 
     override fun copy(): LayoutGene {
         return LayoutGene(template.copy())
+    }
+
+}
+
+class NeuronRuleGene(override val template: NeuronRuleGeneWrapper) : TopLevelGene<NeuronRuleGeneWrapper>() {
+
+    private val _expressedNeuronRule = CompletableDeferred<NeuronRuleGeneWrapper>()
+
+    val expressedNeuronRule by this::_expressedNeuronRule
+
+    override fun express() = template.copy().also {
+        expressedNeuronRule.complete(it)
+    }
+
+    override fun copy(): NeuronRuleGene {
+        return NeuronRuleGene(template.copy())
     }
 
 }
@@ -123,4 +148,45 @@ fun LayoutGene.mutateType() = mutate {
         in 0.5..1.0 -> layoutType = HexagonalGridLayout()
         // in 0.1..0.15 -> layout = LineLayout()
     }
+}
+
+fun neuronRuleGene(initialRule: NeuronUpdateRule<*, *>, block: NeuronRuleGeneWrapper.() -> Unit = {}) =
+    NeuronRuleGene(template = NeuronRuleGeneWrapper(initialRule)).apply { template.block() }
+
+context(Genotype)
+fun NeuronRuleGene.mutateParam() = mutate {
+    with(updateRule) {
+        when (this) {
+            is LinearRule -> {
+                slope += random.nextDouble(-1.0, 1.0)
+                upperBound += random.nextDouble(-1.0, 1.0)
+            }
+            is SigmoidalRule -> {
+                slope += random.nextDouble(-1.0, 1.0)
+            }
+            is BinaryRule -> {
+                threshold += random.nextDouble(-1.0, 1.0)
+            }
+            is DecayRule -> {
+                upperBound += random.nextDouble(-1.0, 1.0)
+                decayAmount += random.nextDouble(-1.0, 1.0)
+            }
+        }
+        if (this is NoisyUpdateRule) {
+            addNoise = random.nextBoolean()
+        }
+    }
+}
+
+context(Genotype)
+fun NeuronRuleGene.mutateType(allowedTypes: List<Pair<Number, KClass<out NeuronUpdateRule<*, *>>>> = allUpdateRules.map { 1 to it.kotlin }, nonMutatingWeight: Number = allowedTypes.size * 1.5) = mutate {
+    fun changeIfNotSameType(newType: KClass<out NeuronUpdateRule<*, *>>) {
+        if (updateRule::class != newType) {
+            updateRule = newType.createInstance()
+        }
+    }
+    random.runOne(
+        nonMutatingWeight to {  },
+        *allowedTypes.map { (weight, type) -> weight to { changeIfNotSameType(type) } }.toTypedArray()
+    )
 }

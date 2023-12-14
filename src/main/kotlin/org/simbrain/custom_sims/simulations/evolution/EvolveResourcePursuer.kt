@@ -1,6 +1,7 @@
 package org.simbrain.custom_sims.simulations
 
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
@@ -12,15 +13,12 @@ import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.layouts.Layout
 import org.simbrain.network.neuron_update_rules.DecayRule
 import org.simbrain.network.util.BiasedScalarData
-import org.simbrain.util.cartesianProduct
-import org.simbrain.util.format
+import org.simbrain.util.*
 import org.simbrain.util.geneticalgorithm.*
 import org.simbrain.util.piccolo.createTileMapLayer
 import org.simbrain.util.piccolo.loadTileMap
 import org.simbrain.util.piccolo.makeLake
 import org.simbrain.util.piccolo.nextGridCoordinate
-import org.simbrain.util.point
-import org.simbrain.util.sampleOne
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.Workspace
 import org.simbrain.world.odorworld.OdorWorldComponent
@@ -168,8 +166,8 @@ val evolveResourcePursuer = newSim {
             }
 
             hiddenUpdateRuleChromosome.forEach {
-                it.mutateParam()
-                it.mutateType()
+                it.mutateParam(mutateBounds = false)
+                it.mutateStandardTypes()
             }
 
         }
@@ -178,12 +176,19 @@ val evolveResourcePursuer = newSim {
 
     class EvolveResourcePursuerSim(
         val evolvePursuerGenotype: EvolvePursuerGenotype = EvolvePursuerGenotype(),
-        val workspace: Workspace = Workspace()
+        val workspace: Workspace = Workspace(),
+        val isVisualized: Boolean = false
     ) : EvoSim {
 
         val random = Random(42)
 
-        val networkComponent = NetworkComponent("Network").also { workspace.addWorkspaceComponent(it) }
+        val networkComponent = NetworkComponent("Network")
+            .also { workspace.addWorkspaceComponent(it) }
+            .also {
+                if (isVisualized) {
+                    runBlocking { place(it, 281, 8, 374, 470) }
+                }
+            }
 
         val network = networkComponent.network
 
@@ -197,6 +202,9 @@ val evolveResourcePursuer = newSim {
 
         val odorWorld = OdorWorldComponent("Odor World").also {
             workspace.addWorkspaceComponent(it)
+            if (isVisualized) {
+                runBlocking { place(it, 646, 10, 711, 681) }
+            }
         }.world.apply {
             loadTileMap("empty.tmx")
             with(tileMap) {
@@ -288,7 +296,7 @@ val evolveResourcePursuer = newSim {
         }
 
         override fun visualize(workspace: Workspace): EvolveResourcePursuerSim {
-            return EvolveResourcePursuerSim(evolvePursuerGenotype.copy(), workspace)
+            return EvolveResourcePursuerSim(evolvePursuerGenotype.copy(), workspace, true)
         }
 
         override fun copy(): EvoSim {

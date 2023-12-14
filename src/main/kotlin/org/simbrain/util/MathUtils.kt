@@ -235,3 +235,11 @@ fun computeDotProductMatrix(data: Array<DoubleArray>) = createMatrix(data.size, 
 
 fun DoubleArray.outerProduct(other: DoubleArray) = toMatrix().mt(other.toMatrix())
 
+fun Double.toRatio(): Double {
+    if (this == 1.0) {
+        return Double.POSITIVE_INFINITY  // or some large number to represent infinity
+    }
+    val complement = 1 - this
+    val ratio = this / complement
+    return ratio
+}

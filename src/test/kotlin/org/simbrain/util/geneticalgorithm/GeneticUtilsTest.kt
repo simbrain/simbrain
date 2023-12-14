@@ -1,17 +1,22 @@
 package org.simbrain.util.geneticalgorithm
 
 import org.junit.jupiter.api.Test
+import org.simbrain.network.neuron_update_rules.BinaryRule
 import kotlin.random.Random
 
 class GeneticUtilsTest {
 
     @Test
-    fun `test run one`() {
-        var count = 100
-        val expected = count
-        repeat(100) {
-            Random.runOne(1 to { count++ }, 1 to { count-- })
+    fun `test mutate type`() {
+        class myGenotype: Genotype {
+            override val random: Random = Random(40L)
+            val gene = neuronRuleGene(BinaryRule())
+            fun mutate() {
+                gene.mutateType(probabilityOfChange = 0.0)
+            }
         }
-        assert(count in expected-20..expected+20)
+        val genotype = myGenotype()
+        genotype.mutate()
+        assert(genotype.gene.template.updateRule is BinaryRule)
     }
 }

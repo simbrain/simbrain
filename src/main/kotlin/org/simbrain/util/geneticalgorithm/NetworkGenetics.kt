@@ -12,7 +12,10 @@ import org.simbrain.network.neuron_update_rules.BinaryRule
 import org.simbrain.network.neuron_update_rules.DecayRule
 import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.updaterules.SigmoidalRule
+import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
+import org.simbrain.util.sampleOne
+import org.simbrain.util.toRatio
 import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance
 
@@ -150,36 +153,60 @@ fun LayoutGene.mutateType() = mutate {
     }
 }
 
-fun neuronRuleGene(initialRule: NeuronUpdateRule<*, *>, block: NeuronRuleGeneWrapper.() -> Unit = {}) =
+fun neuronRuleGene(initialRule: NeuronUpdateRule<*, *> = LinearRule(), block: NeuronRuleGeneWrapper.() -> Unit = {}) =
     NeuronRuleGene(template = NeuronRuleGeneWrapper(initialRule)).apply { template.block() }
 
 context(Genotype)
-fun NeuronRuleGene.mutateParam() = mutate {
+fun NeuronRuleGene.mutateParam(
+    changeProbability: Double = .1,
+    mutateNoise:Boolean = true,
+    mutateBounds:Boolean  = true
+) = mutate {
     with(updateRule) {
-        when (this) {
-            is LinearRule -> {
-                slope += random.nextDouble(-1.0, 1.0)
-                upperBound += random.nextDouble(-1.0, 1.0)
-            }
-            is SigmoidalRule -> {
-                slope += random.nextDouble(-1.0, 1.0)
-            }
-            is BinaryRule -> {
-                threshold += random.nextDouble(-1.0, 1.0)
-            }
-            is DecayRule -> {
-                upperBound += random.nextDouble(-1.0, 1.0)
-                decayAmount += random.nextDouble(-1.0, 1.0)
-            }
-        }
-        if (this is NoisyUpdateRule) {
+
+        if (mutateNoise && this is NoisyUpdateRule) {
             addNoise = random.nextBoolean()
         }
+
+        if (mutateBounds && this is BoundedUpdateRule) {
+            lowerBound += random.nextDouble(-1.0, -0.2)
+            upperBound += random.nextDouble(0.2, 1.0)
+        }
+
+        // Util for changing a parameter
+        fun changeParam(block: () -> Unit) {
+            if (random.nextDouble() < changeProbability) {
+                block()
+            }
+        }
+
+        // TODO: More cases
+        when (this) {
+            is LinearRule -> {
+                changeParam{clippingType = LinearRule.ClippingType.entries.sampleOne()}
+            }
+            is BinaryRule -> {
+                changeParam { threshold += random.nextDouble(-1.0, 1.0) }
+            }
+            is DecayRule -> {
+                changeParam {decayAmount += random.nextDouble(-1.0, 1.0)}
+            }
+        }
+
     }
 }
 
+/**
+ * Mutate between one of the provided types of Neuron rule (default is all of them).
+ *
+ * @param probabilityOfChange change to one of the allowed types (with equal weighting between them) with this probability
+ */
 context(Genotype)
-fun NeuronRuleGene.mutateType(allowedTypes: List<Pair<Number, KClass<out NeuronUpdateRule<*, *>>>> = allUpdateRules.map { 1 to it.kotlin }, nonMutatingWeight: Number = allowedTypes.size * 1.5) = mutate {
+fun NeuronRuleGene.mutateType(
+    allowedTypes: List<Pair<Number, KClass<out NeuronUpdateRule<*, *>>>> = allUpdateRules.map { 1 to it.kotlin },
+    probabilityOfChange: Double = .9
+) = mutate {
+    val nonMutatingWeight: Double = (1 - probabilityOfChange).toRatio() * allowedTypes.size
     fun changeIfNotSameType(newType: KClass<out NeuronUpdateRule<*, *>>) {
         if (updateRule::class != newType) {
             updateRule = newType.createInstance()
@@ -190,3 +217,8 @@ fun NeuronRuleGene.mutateType(allowedTypes: List<Pair<Number, KClass<out NeuronU
         *allowedTypes.map { (weight, type) -> weight to { changeIfNotSameType(type) } }.toTypedArray()
     )
 }
+
+context(Genotype)
+fun NeuronRuleGene.mutateStandardTypes() = mutateType(
+    allowedTypes = listOf(1 to LinearRule::class, 1 to SigmoidalRule::class, 1 to BinaryRule::class, 1 to SigmoidalRule::class),
+)

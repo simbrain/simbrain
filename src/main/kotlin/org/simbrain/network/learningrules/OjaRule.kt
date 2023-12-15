@@ -37,7 +37,7 @@ class OjaRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>() {
     /**
      * Learning rate.
      */
-    @UserParameter(label = "Learning rate", description = "Learning rate for Oja rule", increment = .1, order = 1)
+    @UserParameter(label = "Learning rate", description = "Learning rate for Oja rule", increment = .1, minimumValue = 0.0, order = 1)
     var learningRate = defaultLearningRate
 
     // TODO: check description

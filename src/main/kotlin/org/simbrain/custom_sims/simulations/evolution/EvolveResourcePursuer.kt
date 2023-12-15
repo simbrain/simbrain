@@ -10,7 +10,6 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.activations
 import org.simbrain.network.groups.NeuronCollection
-import org.simbrain.network.layouts.Layout
 import org.simbrain.network.neuron_update_rules.DecayRule
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.*
@@ -74,8 +73,14 @@ val evolveResourcePursuer = newSim {
             val thirstGene = driveChromosome.first()
             add(connectionGene(thirstGene, hiddenChromosome.sampleOne()))
         }
+        var synapseRuleChromosome = chromosome(connectionChromosome.size) {
+            add(synapseRuleGene())
+        }
         var layoutChromosome = chromosome(1) {
             add(layoutGene())
+        }
+        var connectionStrategyChromosome = chromosome(1) {
+            add(connectionStrategyGene())
         }
         var hiddenUpdateRuleChromosome = chromosome(hiddenChromosome.size) {
             add(neuronRuleGene(DecayRule()))
@@ -86,8 +91,7 @@ val evolveResourcePursuer = newSim {
             val inputNeurons: NeuronCollection,
             val hiddenNeurons: NeuronCollection,
             val outputNeurons: NeuronCollection,
-            val connections: List<Synapse>,
-            val layout: Layout
+            val connections: List<Synapse>
         ) {
             val thirstNeuron get() = driveNeurons.neuronList.first()
         }
@@ -105,14 +109,26 @@ val evolveResourcePursuer = newSim {
             val outputNeurons = NeuronCollection(network, network.express(outputChromosome)).also {
                 network.addNetworkModelAsync(it); it.label = "outputs"
             }
+
             val connections = network.express(connectionChromosome)
             val layout = express(layoutChromosome).first().express()
             layout.layoutNeurons(hiddenNeurons.neuronList)
+
+            val synapseRules = express(synapseRuleChromosome)
+            connections.zip(synapseRules).forEach { (connection, rule) ->
+                connection.learningRule = rule.learningRule
+            }
+
+            val connectionStrategyWrapper = express(connectionStrategyChromosome).first()
+            connectionStrategyWrapper.connectionStrategy.connectNeurons(network, hiddenNeurons.neuronList, hiddenNeurons.neuronList)
+            hiddenNeurons.label = connectionStrategyWrapper.connectionStrategy.toString()
+
             val hiddenUpdateRules = express(hiddenUpdateRuleChromosome)
             hiddenNeurons.neuronList.zip(hiddenUpdateRules).forEach { (neuron, rule) ->
                 neuron.updateRule = rule.updateRule
             }
-            return Phenotype(driveNeurons, inputNeurons, hiddenNeurons, outputNeurons, connections, layout)
+
+            return Phenotype(driveNeurons, inputNeurons, hiddenNeurons, outputNeurons, connections)
         }
 
         fun copy() = EvolvePursuerGenotype(random.nextLong()).apply {
@@ -124,7 +140,9 @@ val evolveResourcePursuer = newSim {
             new.hiddenChromosome = current.hiddenChromosome.copy()
             new.outputChromosome = current.outputChromosome.copy()
             new.connectionChromosome = current.connectionChromosome.copy()
+            new.synapseRuleChromosome = current.synapseRuleChromosome.copy()
             new.layoutChromosome = current.layoutChromosome.copy()
+            new.connectionStrategyChromosome = current.connectionStrategyChromosome.copy()
             new.hiddenUpdateRuleChromosome = current.hiddenUpdateRuleChromosome.copy()
         }
 
@@ -144,14 +162,25 @@ val evolveResourcePursuer = newSim {
                 }
             }
 
+            synapseRuleChromosome.forEach {
+                it.mutateParam()
+                it.mutateType()
+            }
+
             // Ensure existing connections are not used when creating new connections
             val existingConnections = connectionChromosome.map { it.source to it.target }.toSet()
+            val weights1Source = inputChromosome + driveChromosome // if connection gene is used hidden can be added to this list
+            val weights1Target = hiddenChromosome
+            val weights2Source = hiddenChromosome
+            val weights2Target = outputChromosome
             val availableConnections =
-                ((inputChromosome + hiddenChromosome + driveChromosome) cartesianProduct hiddenChromosome) +
-                        (hiddenChromosome cartesianProduct outputChromosome) - existingConnections
+                (weights1Source cartesianProduct weights1Target) +
+                (weights2Source cartesianProduct weights2Target) -
+                existingConnections
             if (random.nextDouble() < 0.25 && availableConnections.isNotEmpty()) {
                 val (source, target) = availableConnections.sampleOne()
                 connectionChromosome.add(connectionGene(source, target) { strength = random.nextDouble(-1.0, 1.0) })
+                synapseRuleChromosome.add(synapseRuleGene())
             }
 
             // Add a new hidden unit
@@ -161,6 +190,11 @@ val evolveResourcePursuer = newSim {
             }
 
             layoutChromosome.forEach {
+                it.mutateParam()
+                it.mutateType()
+            }
+
+            connectionStrategyChromosome.forEach {
                 it.mutateParam()
                 it.mutateType()
             }
@@ -251,7 +285,9 @@ val evolveResourcePursuer = newSim {
                         outputNeurons.activations.sumOf { 1.2.pow(if (it < 0) it * -2 else it) - 1 }
                     val allActivations =
                         (inputNeurons.neuronList + hiddenNeurons.neuronList).activations.sumOf { abs(it) } * 2
-                    calories = max(0.0, calories - (outputsActivations + allActivations) * (1 / iterationsPerRun))
+                    val movementPenalty = abs(evolvedAgent.speed * 3) + abs(evolvedAgent.dtheta * 2)
+                    val activationPenalty = outputsActivations + allActivations
+                    calories = max(0.0, calories - (activationPenalty + movementPenalty) * (1 / iterationsPerRun))
                     thirstNeuron.forceSetActivation(10.0 / iterationsPerRun + thirstNeuron.activation)
                 }
             }
@@ -341,7 +377,7 @@ val evolveResourcePursuer = newSim {
                     }
                 },
                 stoppingFunction = {
-                    nthPercentileFitness(5) > 1000.0 || generation > maxGenerations
+                    nthPercentileFitness(10) > 1500.0 || generation > maxGenerations
                 }
             )
             lastGeneration.take(1).forEach {

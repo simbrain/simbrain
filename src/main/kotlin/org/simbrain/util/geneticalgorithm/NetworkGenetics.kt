@@ -3,14 +3,18 @@ package org.simbrain.util.geneticalgorithm
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.withTimeout
 import org.simbrain.network.NetworkModel
+import org.simbrain.network.connections.*
 import org.simbrain.network.core.*
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.HexagonalGridLayout
 import org.simbrain.network.layouts.Layout
 import org.simbrain.network.layouts.LineLayout
+import org.simbrain.network.learningrules.OjaRule
 import org.simbrain.network.neuron_update_rules.BinaryRule
 import org.simbrain.network.neuron_update_rules.DecayRule
 import org.simbrain.network.neuron_update_rules.LinearRule
+import org.simbrain.network.synapse_update_rules.HebbianRule
+import org.simbrain.network.synapse_update_rules.StaticSynapseRule
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
@@ -92,8 +96,16 @@ data class LayoutGeneWrapper(var layoutType: Layout = GridLayout(), var hSpacing
     fun copy() = LayoutGeneWrapper(layoutType.copy(), hSpacing, vSpacing)
 }
 
+class ConnectionStrategyGeneWrapper(var connectionStrategy: ConnectionStrategy) {
+    fun copy() = ConnectionStrategyGeneWrapper(connectionStrategy.copy())
+}
+
 class NeuronRuleGeneWrapper(var updateRule: NeuronUpdateRule<*, *>) {
     fun copy() = NeuronRuleGeneWrapper(updateRule.copy())
+}
+
+class SynapseRuleGeneWrapper(var learningRule: SynapseUpdateRule<*, *>) {
+    fun copy() = SynapseRuleGeneWrapper(learningRule.copy())
 }
 
 class LayoutGene(override val template: LayoutGeneWrapper) : TopLevelGene<LayoutGeneWrapper>() {
@@ -108,6 +120,22 @@ class LayoutGene(override val template: LayoutGeneWrapper) : TopLevelGene<Layout
 
     override fun copy(): LayoutGene {
         return LayoutGene(template.copy())
+    }
+
+}
+
+class ConnectionStrategyGene(override val template: ConnectionStrategyGeneWrapper) : TopLevelGene<ConnectionStrategyGeneWrapper>() {
+
+    private val _expressedConnectionStrategy = CompletableDeferred<ConnectionStrategyGeneWrapper>()
+
+    val expressedConnectionStrategy by this::_expressedConnectionStrategy
+
+    override fun express() = template.copy().also {
+        expressedConnectionStrategy.complete(it)
+    }
+
+    override fun copy(): ConnectionStrategyGene {
+        return ConnectionStrategyGene(template.copy())
     }
 
 }
@@ -128,6 +156,22 @@ class NeuronRuleGene(override val template: NeuronRuleGeneWrapper) : TopLevelGen
 
 }
 
+class SynapseRuleGene(override val template: SynapseRuleGeneWrapper) : TopLevelGene<SynapseRuleGeneWrapper>() {
+
+    private val _expressedSynapseRule = CompletableDeferred<SynapseRuleGeneWrapper>()
+
+    val expressedSynapseRule by this::_expressedSynapseRule
+
+    override fun express() = template.copy().also {
+        expressedSynapseRule.complete(it)
+    }
+
+    override fun copy(): SynapseRuleGene {
+        return SynapseRuleGene(template.copy())
+    }
+
+}
+
 fun nodeGene(block: Neuron.() -> Unit = {}) = NodeGene(template = Neuron(null)).apply { template.block() }
 
 fun connectionGene(source: NodeGene, target: NodeGene, block: Synapse.() -> Unit = {}) = ConnectionGene(
@@ -137,6 +181,15 @@ fun connectionGene(source: NodeGene, target: NodeGene, block: Synapse.() -> Unit
 
 fun layoutGene(block: LayoutGeneWrapper.() -> Unit = {}) =
     LayoutGene(template = LayoutGeneWrapper()).apply { template.block() }
+
+fun connectionStrategyGene(block: ConnectionStrategyGeneWrapper.() -> Unit = {}) =
+    ConnectionStrategyGene(template = ConnectionStrategyGeneWrapper(Sparse())).apply { template.block() }
+
+fun neuronRuleGene(initialRule: NeuronUpdateRule<*, *> = LinearRule(), block: NeuronRuleGeneWrapper.() -> Unit = {}) =
+    NeuronRuleGene(template = NeuronRuleGeneWrapper(initialRule)).apply { template.block() }
+
+fun synapseRuleGene(initialRule: SynapseUpdateRule<*, *> = StaticSynapseRule(), block: SynapseRuleGeneWrapper.() -> Unit = {}) =
+    SynapseRuleGene(template = SynapseRuleGeneWrapper(initialRule)).apply { template.block() }
 
 context(Genotype)
 fun LayoutGene.mutateParam() = mutate {
@@ -153,8 +206,58 @@ fun LayoutGene.mutateType() = mutate {
     }
 }
 
-fun neuronRuleGene(initialRule: NeuronUpdateRule<*, *> = LinearRule(), block: NeuronRuleGeneWrapper.() -> Unit = {}) =
-    NeuronRuleGene(template = NeuronRuleGeneWrapper(initialRule)).apply { template.block() }
+context(Genotype)
+fun ConnectionStrategyGene.mutateParam(changeProbability: Double = .1,) = mutate {
+    random.nextDouble().let {
+        if (it < changeProbability) {
+            with(connectionStrategy) {
+                // Sparse: connection density
+                if (this is Sparse) {
+                    random.mutateProperty(::connectionDensity, delta = 0.1)
+                }
+                // RadialProbabilistic: excitatoryProbability, inhibitoryProbability, excitatoryRadius, inhibitoryRadius
+                if (this is RadialProbabilistic) {
+                    random.mutateProperty(::excitatoryProbability, delta = 0.1)
+                    random.mutateProperty(::inhibitoryProbability, delta = 0.1)
+                    random.mutateProperty(::excitatoryRadius, delta = 0.1)
+                    random.mutateProperty(::inhibitoryRadius, delta = 0.1)
+                }
+                // FixedDegree: degree, direction
+                if (this is FixedDegree) {
+                    random.mutateProperty(::degree, delta = 1)
+                    random.nextBoolean().let { direction = if (it) Direction.IN else Direction.OUT }
+                }
+                if (this is RadialGaussian) {
+                    random.mutateProperty(::distConst, delta = 0.1)
+                }
+            }
+        }
+    }
+}
+
+context(Genotype)
+fun ConnectionStrategyGene.mutateType(
+    allowedTypes: List<Pair<Number, KClass<out ConnectionStrategy>>> = (
+            connectionTypes -
+                    setOf(
+                        AllToAll::class.java,
+                        DistanceBased::class.java,
+                        OneToOne::class.java
+                    )
+            ).map { 1 to it.kotlin },
+    probabilityOfChange: Double = .9
+) = mutate {
+    val nonMutatingWeight: Double = (1 - probabilityOfChange).toRatio() * allowedTypes.size
+    fun changeIfNotSameType(newType: KClass<out ConnectionStrategy>) {
+        if (connectionStrategy::class != newType) {
+            connectionStrategy = newType.createInstance()
+        }
+    }
+    random.runOne(
+        nonMutatingWeight to {  },
+        *allowedTypes.map { (weight, type) -> weight to { changeIfNotSameType(type) } }.toTypedArray()
+    )
+}
 
 context(Genotype)
 fun NeuronRuleGene.mutateParam(
@@ -222,3 +325,49 @@ context(Genotype)
 fun NeuronRuleGene.mutateStandardTypes() = mutateType(
     allowedTypes = listOf(1 to LinearRule::class, 1 to SigmoidalRule::class, 1 to BinaryRule::class, 1 to SigmoidalRule::class),
 )
+
+context(Genotype)
+fun SynapseRuleGene.mutateParam(
+    changeProbability: Double = .1,
+) = mutate {
+    random.nextDouble().let {
+        if (it < changeProbability) {
+            with(learningRule) {
+                // Hebbian: learningRate
+                if (this is HebbianRule) {
+                    random.nextDouble(-0.1, 0.1).let { delta ->
+                        learningRate += delta
+                        if (learningRate < 0) {
+                            learningRate = 0.0
+                        }
+                    }
+                }
+                // Oja: learningRate
+                if (this is OjaRule) {
+                    random.mutateProperty(::learningRate, delta = 0.1)
+                }
+            }
+        }
+    }
+}
+
+context(Genotype)
+fun SynapseRuleGene.mutateType(
+    allowedTypes: List<Pair<Number, KClass<out SynapseUpdateRule<*, *>>>> = listOf(
+        1 to StaticSynapseRule::class,
+        1 to HebbianRule::class,
+        1 to OjaRule::class,
+    ),
+    probabilityOfChange: Double = .9
+) = mutate {
+    val nonMutatingWeight: Double = (1 - probabilityOfChange).toRatio() * allowedTypes.size
+    fun changeIfNotSameType(newType: KClass<out SynapseUpdateRule<*, *>>) {
+        if (learningRule::class != newType) {
+            learningRule = newType.createInstance()
+        }
+    }
+    random.runOne(
+        nonMutatingWeight to {  },
+        *allowedTypes.map { (weight, type) -> weight to { changeIfNotSameType(type) } }.toTypedArray()
+    )
+}

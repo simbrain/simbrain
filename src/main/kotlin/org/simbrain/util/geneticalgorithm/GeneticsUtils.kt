@@ -2,10 +2,13 @@ package org.simbrain.util.geneticalgorithm
 
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.core.Network
+import org.simbrain.util.UserParameter
+import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.sampleWithReplacement
 import org.simbrain.util.sampleWithoutReplacement
 import kotlin.math.roundToInt
 import kotlin.random.Random
+import kotlin.reflect.KMutableProperty0
 
 context(Genotype)
 fun <P, G : Gene<P>> Chromosome<P, G>.sample() = this[random.nextInt(size)]
@@ -80,4 +83,33 @@ fun Random.runOne(vararg functions: Pair<Number, () -> Unit>) {
             return
         }
     }
+}
+
+/**
+ * Mutate a property by a random delta.  If min and max values are not specified, [UserParameter.minimumValue] and [UserParameter.maximumValue] are used, if available.
+ */
+fun <T: Number> Random.mutateProperty(property: KMutableProperty0<T>, delta: T, min: Double = Double.NEGATIVE_INFINITY, max: Double = Double.POSITIVE_INFINITY) {
+    val userParameter = property.annotations.filterIsInstance<UserParameter>().firstOrNull()
+    val guiEditable = property.getDelegate().let { it as? GuiEditable<*, *> }
+
+    val lowerBound = if (min.isFinite()) {
+        min
+    } else {
+        userParameter?.minimumValue ?: (guiEditable?.min as? Number?)?.toDouble() ?: Double.NEGATIVE_INFINITY
+    }
+
+    val upperBound = if (max.isFinite()) {
+        max
+    } else {
+        userParameter?.maximumValue ?: (guiEditable?.max as? Number?)?.toDouble() ?: Double.POSITIVE_INFINITY
+    }
+
+    fun mutateData() = when (property.get()) {
+        is Int -> property.set((property.get().toInt() + nextInt(-delta.toInt(), delta.toInt())).coerceIn(lowerBound.toInt(), upperBound.toInt()) as T)
+        is Long -> property.set((property.get().toLong() + nextLong(-delta.toLong(), delta.toLong())).coerceIn(lowerBound.toLong(), upperBound.toLong()) as T)
+        is Double -> property.set((property.get().toDouble() + nextDouble(-delta.toDouble(), delta.toDouble())).coerceIn(lowerBound, upperBound) as T)
+        else -> throw IllegalArgumentException("Unsupported type ${property.get()::class.simpleName}")
+    }
+
+    mutateData()
 }

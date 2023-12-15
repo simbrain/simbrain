@@ -74,7 +74,7 @@ val simulations = dir<Any>("Simulations") {
 
     dir("NLP") {
         item("Basic Word Embeddings") { nlpSimBasic }
-        item("Process Language with SRN") { nlpSim_neuralNetworks }
+        item("Next-Word Prediction") { srnElmanSentences }
     }
 
     dir("Neuroscience") {
@@ -101,8 +101,7 @@ val simulations = dir<Any>("Simulations") {
     // TODO: Disaggregate this into more meaningful submenus
     dir("Demos") {
         item("Projection") { projectionSim }
-        item("SRN - Temporal XOR") { srnXORSim }
-        item("SRN - ElmanSentences") { srnElmanSentences }
+        // item("SRN - Temporal XOR") { srnXORSim }
         item("Recurrent network") { recurrentProjection }
         item("Iris Classifier") { irisClassifier }
         item("Deep Net - Mnist") { deepNetSim }

@@ -18,9 +18,13 @@ val srnElmanSentences = newSim {
 
     workspace.clearWorkspace()
 
+    val numInputSentences = 100
+    val numTrainingSentences = 1000 // 10,000 in Elman's paper
+    val learningRate = .04
+
     // Text World for Inputs
     val textWorldInputs = addTextWorld("Text World (Inputs)")
-    val text = makeElmanVector(100)
+    val text = makeElmanVector(numInputSentences)
     val tokenEmbedding = TokenEmbeddingBuilder().apply {
         embeddingType = EmbeddingType.ONE_HOT
     }.build(text)
@@ -43,7 +47,7 @@ val srnElmanSentences = newSim {
         point(0,0))
     network.addNetworkModel(srn)
 
-    val trainingInputs = makeElmanVector(1000)
+    val trainingInputs = makeElmanVector(numTrainingSentences)
         .tokenizeWordsFromString()
         .map {
             tokenEmbedding.get(it)
@@ -52,12 +56,16 @@ val srnElmanSentences = newSim {
     val trainingTarget = trainingInputs.shiftUpAndPadEndWithZero()
 
     srn.trainingSet = MatrixDataset(trainingInputs, trainingTarget)
-    srn.trainer.learningRate = 0.04
+    srn.trainer.learningRate = learningRate
     srn.trainer.lossFunction = IterableTrainer.LossFunction.RootMeanSquaredError()
-    repeat(6) {
-        srn.trainer.trainOnce()
-        println("${srn.trainer.lossFunction.name}: ${srn.trainer.lossFunction.loss}")
-    }
+
+    // Comment this out to pretrain the network
+    // From the original paper: "The training continued in this manner until the network had experienced 6 complete passes
+    // through the sequence."
+    // repeat(6) {
+    //     srn.trainer.trainOnce()
+    //     println("${srn.trainer.lossFunction.name}: ${srn.trainer.lossFunction.loss}")
+    // }
 
     withGui {
         place(textWorldInputs, 0, 0, 450, 250)
@@ -141,6 +149,7 @@ fun makeElmanVector(numSentences: Int): String {
 
 }
 fun main() {
+    // For testing makeElmanVector
     println(makeElmanVector(10))
 }
 

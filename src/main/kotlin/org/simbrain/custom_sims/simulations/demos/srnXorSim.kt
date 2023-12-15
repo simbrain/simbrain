@@ -15,6 +15,8 @@ import kotlin.random.Random
 
 /**
  * Simulate temporal xor in a simple recurrent network as described by Elman (1990).
+ *
+ * TODO: After ElmanSentences was fixed work on this dropped off. It was never made to work but getting it to work should not be too hard.
  */
 val srnXORSim = newSim {
 

@@ -2,6 +2,8 @@ package org.simbrain.util
 
 import kotlinx.coroutines.*
 import org.simbrain.custom_sims.SimulationScope
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
+import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.gui.SimbrainDesktop
 import java.awt.BorderLayout
@@ -170,6 +172,10 @@ class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, tru
             }
         }
         pack()
+    }
+
+    fun <O: EditableObject> addAnnotatedPropertyEditor(editor: AnnotatedPropertyEditor<O>) {
+        mainPanel.addItem(editor)
     }
 
 }

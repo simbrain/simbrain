@@ -9,14 +9,25 @@ import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.activations
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.util.BiasedScalarData
-import org.simbrain.util.*
 import org.simbrain.util.geneticalgorithm.*
-import org.simbrain.util.widgets.ProgressWindow
+import org.simbrain.util.place
+import org.simbrain.util.point
+import org.simbrain.util.sse
 import org.simbrain.workspace.Workspace
-import java.awt.Dimension
 import kotlin.random.Random
 
 val evolveXor = newSim {
+
+
+    val evaluatorParams = EvaluatorParams(
+        populationSize = 100,
+        eliminationRatio = 0.5,
+        targetFitness = 0.01,
+        stoppingCondition = EvaluatorParams.StoppingCondition.Error,
+        maxGenerations = 500,
+        iterationsPerRun = 2,
+        seed = 42
+    )
 
     class XorGenotype(seed: Long = Random.nextLong()) : Genotype {
 
@@ -26,8 +37,12 @@ val evolveXor = newSim {
         var hiddenLayerChromosome = chromosome(2) { add(nodeGene { upperBound = 1.0; lowerBound = -1.0 }) }
         var outputLayerChromosome = chromosome(1) { add(nodeGene { upperBound = 1.0; lowerBound = -1.0 }) }
         var connectionChromosome = chromosome(1) {
-            add(connectionGene(inputLayerChromosome.sampleOne(random), hiddenLayerChromosome.sampleOne(random)))
-            add(connectionGene(hiddenLayerChromosome.sampleOne(random), outputLayerChromosome.sampleOne(random)))
+            createGene(inputLayerChromosome to hiddenLayerChromosome) {
+                strength = random.nextDouble(-1.0, 1.0)
+            }
+            createGene(hiddenLayerChromosome to outputLayerChromosome) {
+                strength = random.nextDouble(-1.0, 1.0)
+            }
         }
 
         inner class Phenotype(
@@ -71,19 +86,11 @@ val evolveXor = newSim {
                 }
             }
 
-            // Ensure existing connections are not used when creating new connections
-            val existingConnections = connectionChromosome.map { it.source to it.target }.toSet()
-            val availableInputToHidden = (inputLayerChromosome cartesianProduct hiddenLayerChromosome) - existingConnections
-            val availableHiddenToTarget = (hiddenLayerChromosome cartesianProduct outputLayerChromosome) - existingConnections
-            if (random.nextDouble() < 0.25 && availableInputToHidden.isNotEmpty() && availableHiddenToTarget.isNotEmpty()) {
-                val (source, target) = if (random.nextBoolean()) {
-                    // Make a new connection from the input to hidden layer
-                    availableInputToHidden.sampleOne()
-                } else {
-                    // Make a new connection from the hidden to output layer
-                    availableHiddenToTarget.sampleOne()
-                }
-                connectionChromosome.add(connectionGene(source, target) { strength = random.nextDouble(-1.0, 1.0) })
+            withProbability(0.25) {
+                connectionChromosome.createGene(
+                    inputLayerChromosome to hiddenLayerChromosome,
+                    hiddenLayerChromosome to outputLayerChromosome
+                ) { strength = random.nextDouble(-1.0, 1.0) }
             }
 
             // Add a new hidden unit
@@ -137,46 +144,43 @@ val evolveXor = newSim {
             return testData.sumOf { (input, output) ->
                 phenotype.await().inputs.neuronList.activations = input
                 // Iterate more each run if allowing recurrent connections
-                workspace.iterateSuspend(2)
+                workspace.iterateSuspend(evaluatorParams.iterationsPerRun)
                 val error = (phenotype.await().outputs.neuronList.activations sse output)
-                -error
+                error
             }
         }
 
     }
 
-    val maxGenerations = 500
-    val progressWindow = ProgressWindow(maxGenerations, "Error").apply {
-        minimumSize = Dimension(300, 100)
-        setLocationRelativeTo(null)
-    }
-    val lastGeneration = evaluator(
-        populatingFunction = { XorSim() },
-        populationSize = 100,
-        eliminationRatio = 0.5,
-        peek = {
-            listOf(0, 10, 25, 50, 75, 90, 100).joinToString(" ") {
-                "$it: ${nthPercentileFitness(it).format(3)}"
-            }.also {
-                println("[$generation] $it")
-                progressWindow.text = "5th Percentile MSE: ${nthPercentileFitness(5).format(3)}"
-                progressWindow.value = generation
+    suspend fun runSim() {
+        val lastGeneration = evaluator(
+            evaluatorParams,
+            populatingFunction = { XorSim(XorGenotype(seed = seed)) }
+        )
+        lastGeneration.take(1).forEach {
+            with(it.visualize(workspace) as XorSim) {
+                build()
+                val phenotype = this.phenotype.await()
+                phenotype.inputs.neuronList.forEach { it.increment = 1.0 }
+                phenotype.inputs.location = point( 0, 150)
+                phenotype.hiddens.location = point( 0, 60)
+                phenotype.outputs.location = point(0, -25)
+                withGui {
+                    place(networkComponent, 340, 10, 384, 480)
+                }
             }
-        },
-        stoppingFunction = {
-            nthPercentileFitness(5) > -0.01 || generation > maxGenerations
-        }
-    )
-
-    lastGeneration.take(1).forEach {
-        with(it.visualize(workspace) as XorSim) {
-            build()
-            val phenotype = this.phenotype.await()
-            phenotype.inputs.neuronList.forEach { it.increment = 1.0 }
-            phenotype.inputs.location = point( 0, 150)
-            phenotype.hiddens.location = point( 0, 60)
-            phenotype.outputs.location = point(0, -25)
         }
     }
-    progressWindow.close()
+
+
+
+    withGui {
+        workspace.clearWorkspace()
+        evaluatorParams.createControlPanel("Control Panel", 5, 10)
+        evaluatorParams.addControlPanelButton("Evolve") {
+            workspace.removeAllComponents()
+            evaluatorParams.addProgressWindow()
+            runSim()
+        }
+    }
 }

@@ -113,3 +113,12 @@ fun <T: Number> Random.mutateProperty(property: KMutableProperty0<T>, delta: T, 
 
     mutateData()
 }
+
+context(Genotype)
+fun <T> withProbability(probability: Double, block: () -> T): T? {
+    return if (random.nextDouble() < probability) {
+        block()
+    } else {
+        null
+    }
+}

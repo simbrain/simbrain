@@ -18,6 +18,7 @@ import org.simbrain.network.synapse_update_rules.StaticSynapseRule
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
+import org.simbrain.util.cartesianProduct
 import org.simbrain.util.sampleOne
 import org.simbrain.util.toRatio
 import kotlin.reflect.KClass
@@ -370,4 +371,28 @@ fun SynapseRuleGene.mutateType(
         nonMutatingWeight to {  },
         *allowedTypes.map { (weight, type) -> weight to { changeIfNotSameType(type) } }.toTypedArray()
     )
+}
+
+
+/**
+ * Creates a connection gene between two groups of node genes.
+ * Provide one or more lists of possible connections to choose from.
+ * Ex: input to hidden, hidden to input, input + hidden to output.
+ */
+context(Genotype)
+fun Chromosome<Synapse, ConnectionGene>.createGene(
+    vararg sourceTargetChromosomeGroups: Pair<Chromosome<Neuron, NodeGene>, Chromosome<Neuron, NodeGene>>,
+    synapseGeneTemplate: Synapse.() -> Unit = {}
+): ConnectionGene? {
+    val existingConnections = this.map { it.source to it.target }.toSet()
+    val availableConnections = sourceTargetChromosomeGroups.flatMap { (sources, targets) ->
+        sources cartesianProduct targets
+    }.toSet()
+    val availableConnectionsNotInExisting = (availableConnections - existingConnections).toList()
+    if (availableConnectionsNotInExisting.isNotEmpty()) {
+        val (source, target) = availableConnectionsNotInExisting.sampleOne(random)
+        return connectionGene(source, target, synapseGeneTemplate).also { add(it) }
+    } else {
+        return null
+    }
 }

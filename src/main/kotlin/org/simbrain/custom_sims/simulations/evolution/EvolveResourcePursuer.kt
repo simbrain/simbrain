@@ -1,9 +1,7 @@
 package org.simbrain.custom_sims.simulations
 
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
-import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
@@ -12,19 +10,19 @@ import org.simbrain.network.core.activations
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.neuron_update_rules.DecayRule
 import org.simbrain.network.util.BiasedScalarData
-import org.simbrain.util.*
 import org.simbrain.util.geneticalgorithm.*
 import org.simbrain.util.piccolo.createTileMapLayer
 import org.simbrain.util.piccolo.loadTileMap
 import org.simbrain.util.piccolo.makeLake
 import org.simbrain.util.piccolo.nextGridCoordinate
-import org.simbrain.util.widgets.ProgressWindow
+import org.simbrain.util.place
+import org.simbrain.util.point
+import org.simbrain.util.sampleOne
 import org.simbrain.workspace.Workspace
 import org.simbrain.world.odorworld.OdorWorldComponent
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.sensors.TileSensor
-import java.awt.Dimension
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.pow
@@ -41,16 +39,19 @@ import kotlin.random.Random
  */
 val evolveResourcePursuer = newSim {
 
-    /**
-     * Max generation to run before giving up
-     */
-    var maxGenerations = 15
+    val evaluatorParams = EvaluatorParams(
+        populationSize = 100,
+        eliminationRatio = 0.25,
+        maxGenerations = 15,
+        iterationsPerRun = 1000,
+        seed = 42
+    )
 
     /**
      * Iterations to run for each simulation. If < 3000 success is usually by luck.
      * A bit like its lifespan.
      */
-    var iterationsPerRun = 1000
+    var iterationsPerRun by evaluatorParams::iterationsPerRun
 
     class EvolvePursuerGenotype(seed: Long = Random.nextLong()) : Genotype {
 
@@ -167,19 +168,13 @@ val evolveResourcePursuer = newSim {
                 it.mutateType()
             }
 
-            // Ensure existing connections are not used when creating new connections
-            val existingConnections = connectionChromosome.map { it.source to it.target }.toSet()
-            val weights1Source = inputChromosome + driveChromosome // if connection gene is used hidden can be added to this list
-            val weights1Target = hiddenChromosome
-            val weights2Source = hiddenChromosome
-            val weights2Target = outputChromosome
-            val availableConnections =
-                (weights1Source cartesianProduct weights1Target) +
-                (weights2Source cartesianProduct weights2Target) -
-                existingConnections
-            if (random.nextDouble() < 0.25 && availableConnections.isNotEmpty()) {
-                val (source, target) = availableConnections.sampleOne()
-                connectionChromosome.add(connectionGene(source, target) { strength = random.nextDouble(-1.0, 1.0) })
+            val newConnectionGene = withProbability(0.25) {
+                connectionChromosome.createGene(
+                    inputChromosome + driveChromosome to hiddenChromosome,
+                    hiddenChromosome to outputChromosome
+                ) { strength = random.nextDouble(-1.0, 1.0) }
+            }
+            if (newConnectionGene != null) {
                 synapseRuleChromosome.add(synapseRuleGene())
             }
 
@@ -211,18 +206,13 @@ val evolveResourcePursuer = newSim {
     class EvolveResourcePursuerSim(
         val evolvePursuerGenotype: EvolvePursuerGenotype = EvolvePursuerGenotype(),
         val workspace: Workspace = Workspace(),
-        val isVisualized: Boolean = false
+        seed: Long = Random.nextLong(),
     ) : EvoSim {
 
-        val random = Random(42)
+        val random = Random(seed)
 
         val networkComponent = NetworkComponent("Network")
             .also { workspace.addWorkspaceComponent(it) }
-            .also {
-                if (isVisualized) {
-                    runBlocking { place(it, 281, 8, 374, 470) }
-                }
-            }
 
         val network = networkComponent.network
 
@@ -234,12 +224,10 @@ val evolveResourcePursuer = newSim {
         private val lakeSize
             get() = random.nextInt(2, 8)
 
-        val odorWorld = OdorWorldComponent("Odor World").also {
+        val odorWorldComponent = OdorWorldComponent("Odor World").also {
             workspace.addWorkspaceComponent(it)
-            if (isVisualized) {
-                runBlocking { place(it, 646, 10, 711, 681) }
-            }
-        }.world.apply {
+        }
+        val odorWorld = odorWorldComponent.world.apply {
             loadTileMap("empty.tmx")
             with(tileMap) {
                 updateMapSize(32, 32)
@@ -332,7 +320,7 @@ val evolveResourcePursuer = newSim {
         }
 
         override fun visualize(workspace: Workspace): EvolveResourcePursuerSim {
-            return EvolveResourcePursuerSim(evolvePursuerGenotype.copy(), workspace, true)
+            return EvolveResourcePursuerSim(evolvePursuerGenotype.copy(), workspace)
         }
 
         override fun copy(): EvoSim {
@@ -356,68 +344,37 @@ val evolveResourcePursuer = newSim {
 
     suspend fun runSim() {
         withContext(workspace.coroutineContext) {
-            val progressWindow = ProgressWindow(maxGenerations, "10th Percentile Fitness:").apply {
-                minimumSize = Dimension(300, 100)
-                setLocationRelativeTo(null)
-            }
-
             val lastGeneration = evaluator(
-                populatingFunction = { EvolveResourcePursuerSim() },
-                populationSize = 100,
-                eliminationRatio = 0.25,
-                peek = {
-                    listOf(0, 10, 25, 50, 75, 90, 100).joinToString(" ") {
-                        "$it: ${nthPercentileFitness(it).format(3)}"
-                    }.also {
-                        println("[$generation] $it")
-                        progressWindow.apply {
-                            text = "10th Percentile Fitness: ${nthPercentileFitness(10).format(3)}"
-                            value = generation
-                        }
-                    }
-                },
-                stoppingFunction = {
-                    nthPercentileFitness(10) > 1500.0 || generation > maxGenerations
-                }
+                evaluatorParams = evaluatorParams,
+                populatingFunction = { EvolveResourcePursuerSim(seed = seed) }
             )
             lastGeneration.take(1).forEach {
                 with(it.visualize(workspace) as EvolveResourcePursuerSim) {
                     build()
                     val phenotype = this.phenotypeDeferred.await()
-
                     phenotype.apply {
                         driveNeurons.location = point(-150, 150)
                         inputNeurons.location = point(0, 150)
                         hiddenNeurons.location = point(0, 60)
                         outputNeurons.location = point(0, -25)
                     }
-
+                    withGui {
+                        place(networkComponent, 5, 375, 340, 430)
+                        place(odorWorldComponent, 340, 10, 800, 800)
+                    }
                 }
             }
-            progressWindow.close()
         }
 
     }
 
     withGui {
         workspace.clearWorkspace()
-        createControlPanel("Control Panel", 5, 10) {
-
-            val maxGenTf = addTextField("Max Generations", "" + maxGenerations)
-            val iterationsPerRunTf = addTextField("Num iterations per generation", "" + iterationsPerRun)
-            // val populationSizeTf = addTextField("Population size", "" + populationSize)
-            // val eliminationRatioTf = addTextField("Elimination ratio", "" + eliminationRatio)
-
-            addButton("Evolve") {
-                workspace.removeAllComponents()
-                maxGenerations = maxGenTf.text.toInt()
-                iterationsPerRun = iterationsPerRunTf.text.toInt()
-                // populationSize = populationSizeTf.text.toInt()
-                // eliminationRatio = eliminationRatioTf.text.toDouble()
-                runSim()
-            }
-
-
+        evaluatorParams.createControlPanel("Control Panel", 5, 10)
+        evaluatorParams.addControlPanelButton("Evolve") {
+            workspace.removeAllComponents()
+            evaluatorParams.addProgressWindow()
+            runSim()
         }
     }
 

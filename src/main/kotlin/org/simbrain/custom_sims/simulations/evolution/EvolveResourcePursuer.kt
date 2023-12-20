@@ -44,6 +44,7 @@ val evolveResourcePursuer = newSim {
         eliminationRatio = 0.25,
         maxGenerations = 15,
         iterationsPerRun = 1000,
+        targetValue = 1000.0,
         seed = 42
     )
 

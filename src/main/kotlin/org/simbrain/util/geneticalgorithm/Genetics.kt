@@ -153,7 +153,7 @@ class EvaluatorParams(
     maxGenerations: Int = 500,
     percentile: Int = 5,
     var stoppingCondition: StoppingCondition = StoppingCondition.Fitness,
-    targetFitness: Double = 1500.0,
+    targetValue: Double,
     seed: Int = Random.nextInt()
 ): EditableObject {
 
@@ -191,7 +191,7 @@ class EvaluatorParams(
 
     var targetMetric by GuiEditable(
         label = if (stoppingCondition == StoppingCondition.Error) "Target Error" else "Target Fitness",
-        initValue = targetFitness,
+        initValue = targetValue,
         min = 0.0,
         order = 50
     )

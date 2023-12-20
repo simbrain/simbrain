@@ -384,6 +384,7 @@ fun Chromosome<Synapse, ConnectionGene>.createGene(
     vararg sourceTargetChromosomeGroups: Pair<Chromosome<Neuron, NodeGene>, Chromosome<Neuron, NodeGene>>,
     synapseGeneTemplate: Synapse.() -> Unit = {}
 ): ConnectionGene? {
+    // Ensure existing connections are not used when creating new connections
     val existingConnections = this.map { it.source to it.target }.toSet()
     val availableConnections = sourceTargetChromosomeGroups.flatMap { (sources, targets) ->
         sources cartesianProduct targets

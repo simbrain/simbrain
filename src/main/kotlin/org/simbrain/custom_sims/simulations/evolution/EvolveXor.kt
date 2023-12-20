@@ -18,11 +18,10 @@ import kotlin.random.Random
 
 val evolveXor = newSim {
 
-
     val evaluatorParams = EvaluatorParams(
         populationSize = 100,
         eliminationRatio = 0.5,
-        targetFitness = 0.01,
+        targetValue = 0.01,
         stoppingCondition = EvaluatorParams.StoppingCondition.Error,
         maxGenerations = 500,
         iterationsPerRun = 2,
@@ -171,8 +170,6 @@ val evolveXor = newSim {
             }
         }
     }
-
-
 
     withGui {
         workspace.clearWorkspace()

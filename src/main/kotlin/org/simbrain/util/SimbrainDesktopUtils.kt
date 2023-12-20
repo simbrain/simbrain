@@ -82,7 +82,7 @@ class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, tru
     }
 
     fun addSeparator() {
-        addComponent(JSeparator(SwingConstants.HORIZONTAL))
+        mainPanel.addItem(JSeparator(SwingConstants.HORIZONTAL))
     }
 
     fun addLabelledText(label: String, text: String) = JLabel(text).also {

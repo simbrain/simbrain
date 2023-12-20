@@ -120,6 +120,22 @@ class APETestObjectKotlin: EditableObject {
         },
     )
 
+    var intEnablingCheckBox = false
+
+    var intValueWithEnablingCheckBox: Int by GuiEditable(
+        initValue = 0,
+        order = 100,
+        useCheckboxFrom = APETestObjectKotlin::intEnablingCheckBox,
+        getter = {
+            println("Getting value from _intValue: $_intValue")
+            _intValue
+         },
+        setter = {
+            println("Setting value to _intValue: $_intValue")
+            _intValue = it
+        },
+    )
+
     abstract class TestObjectBase: CopyableObject {
         override fun getTypeList() = listOf(
             TestInnerObject1::class.java,

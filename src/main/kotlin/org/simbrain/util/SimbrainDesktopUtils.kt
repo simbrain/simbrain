@@ -163,12 +163,12 @@ class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, tru
         mainPanel.addItem(label, this)
     }
 
-    fun addCheckBox(label: String, checked: Boolean, task: suspend (ActionEvent) -> Unit = {}) = JCheckBox().apply {
+    fun addCheckBox(label: String, checked: Boolean, onChange: suspend (Boolean) -> Unit = {}) = JCheckBox().apply {
         isSelected = checked
         mainPanel.addItem(label, this)
         addActionListener {
             launch {
-                task(it)
+                onChange(isSelected)
             }
         }
         pack()

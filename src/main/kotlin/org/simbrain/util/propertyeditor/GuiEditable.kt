@@ -56,6 +56,7 @@ class GuiEditable<O : EditableObject, T>(
     val tab: String? = null,
     val conditionallyEnabledBy: KMutableProperty1<O, Boolean>? = null,
     val conditionallyVisibleBy: KMutableProperty1<O, Boolean>? = null,
+    val useCheckboxFrom: KMutableProperty1<O, Boolean>? = null,
     val typeMapProvider: KFunction<List<Class<out CopyableObject>>>? = null,
     val columnMode: Boolean = false,
     val getter: (GuiEditableGetterContext<O, T>.() -> T)? = null,
@@ -283,9 +284,36 @@ sealed class ParameterWidget<O : EditableObject, T>(val parameter: GuiEditable<O
 
     abstract val widget: JComponent
 
+    val component by lazy {
+        if (parameter.useCheckboxFrom != null) {
+            JPanel().also {
+                it.layout = BoxLayout(it, BoxLayout.X_AXIS)
+                it.add(enablingCheckbox)
+                it.add(widget)
+            }
+        } else {
+            widget
+        }
+    }
+
     abstract val value: T
 
     abstract fun refresh(property: KProperty<*>)
+
+    private val enablingCheckbox by lazy {
+        if (parameter.useCheckboxFrom != null) {
+            JCheckBox().also {
+                it.isSelected = parameter.useCheckboxFrom.get(parameter.baseObject)
+                widget.isEnabled = it.isSelected
+                it.addActionListener { _ ->
+                    parameter.useCheckboxFrom.set(parameter.baseObject, it.isSelected)
+                    widget.isEnabled = it.isSelected
+                }
+            }
+        } else {
+            null
+        }
+    }
 
 }
 

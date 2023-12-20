@@ -124,13 +124,13 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
         .mapNotNull { (parameter, widget) ->
             // object widgets span the dialog and don’t use labels
             if (widget is ObjectWidget<*, *>) {
-                getLabelledItemPanel(parameter.tab).addItem(widget.widget)
+                getLabelledItemPanel(parameter.tab).addItem(widget.component)
                 widget.events.valueChanged.on {
                     parameterWidgetMap.forEach { (_, w) -> w.refresh(widget.parameter.property) }
                 }
                 null
             } else {
-                val label = getLabelledItemPanel(parameter.tab).addItem(parameter.label, widget.widget)
+                val label = getLabelledItemPanel(parameter.tab).addItem(parameter.label, widget.component)
                 label.toolTipText = parameter.description
                 widget.events.valueChanged.on {
                     parameterWidgetMap.forEach { (_, w) -> w.refresh(widget.parameter.property) }

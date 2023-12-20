@@ -63,7 +63,7 @@ public abstract class WorkspaceComponent {
     private boolean guiOn = true;
 
     /**
-     * Whether to update this component.
+     * Whether to update this component when updated from the workspace.
      */
     private boolean updateOn = true;
 

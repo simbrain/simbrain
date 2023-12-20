@@ -23,7 +23,7 @@ val srnElmanSentences = newSim {
     val learningRate = .04
 
     // Text World for Inputs
-    val textWorldInputs = addTextWorld("Text World (Inputs)")
+    val textWorldInputs = addTextWorld("Text World (Inputs)").apply { updateOn = false }
     val text = makeElmanVector(numInputSentences)
     val tokenEmbedding = TokenEmbeddingBuilder().apply {
         embeddingType = EmbeddingType.ONE_HOT
@@ -33,11 +33,11 @@ val srnElmanSentences = newSim {
     textWorldInputs.world.tokenEmbedding = tokenEmbedding
 
     // Text World for Outputs
-    val textWorldOut = addTextWorld("Text World (Outputs)")
+    val textWorldOut = addTextWorld("Text World (Outputs)").apply { updateOn = false }
     TokenEmbeddingBuilder().build(text)
 
     // Network
-    val networkComponent = addNetworkComponent("Network")
+    val networkComponent = addNetworkComponent("Network").apply { updateOn = false }
     val network = networkComponent.network
     val srn = SRNNetwork(
         network,
@@ -73,8 +73,6 @@ val srnElmanSentences = newSim {
         place(networkComponent, 460, 0, 500, 550)
     }
 
-    workspace.updater.updateManager.clear()
-
     workspace.addUpdateAction("Update Inputs") {
         textWorldInputs.update()
     }
@@ -106,6 +104,8 @@ val srnElmanSentences = newSim {
             ""
         )
     }
+
+    workspace.simpleIterate()
 
 }
 

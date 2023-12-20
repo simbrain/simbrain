@@ -20,6 +20,9 @@ package org.simbrain.world.dataworld.gui
 
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.table.SimbrainTablePanel
+import org.simbrain.util.table.fillAction
+import org.simbrain.util.table.importCsv
+import org.simbrain.util.table.randomizeAction
 import org.simbrain.util.widgets.ShowHelpAction
 import org.simbrain.workspace.gui.DesktopComponent
 import org.simbrain.workspace.gui.SimbrainDesktop
@@ -31,76 +34,55 @@ import java.awt.event.ComponentEvent
 import javax.swing.JMenu
 import javax.swing.JMenuBar
 import javax.swing.JMenuItem
-import javax.swing.JToolBar
 
 /**
  * **ReaderComponentDesktopGui** is the gui view for the reader world.
  */
 class DataWorldDesktopComponent(frame: GenericFrame, component: DataWorldComponent) :
     DesktopComponent<DataWorldComponent>(frame, component) {
-    /**
-     * Menu Bar.
-     */
+
     private val menuBar = JMenuBar()
 
-    /**
-     * File menu for saving and opening world files.
-     */
     private val file = JMenu("File")
 
-    /**
-     * Edit menu Item.
-     */
     private val edit = JMenu("Edit")
 
-    /**
-     * Opens user preferences dialog.
-     */
     private val preferences = JMenuItem("Preferences")
 
-    /**
-     * Opens the help dialog for SoundWorld.
-     */
     private val help = JMenu("Help")
 
-    /**
-     * Help menu item.
-     */
     private val helpItem = JMenuItem("Reader Help")
 
-    /**
-     * The pane representing the sound world.
-     */
-    private val panel: SimbrainTablePanel = SimbrainTablePanel(component.dataWorld.dataModel)
+    private val tablePanel: SimbrainTablePanel = SimbrainTablePanel(
+        component.dataWorld.dataModel, false
+    )
 
-    /**
-     * The sound world.
-     */
-    private val world: DataWorld = component.dataWorld
+    private val dataWorld: DataWorld = component.dataWorld
 
-    /**
-     * Creates a new frame of type SoundWorld.
-     *
-     * @param frame
-     * @param component
-     */
     init {
-        val openSaveToolBar = JToolBar()
-        openSaveToolBar.add(SimbrainDesktop.actionManager.createImportAction(this))
-        openSaveToolBar.add(SimbrainDesktop.actionManager.createExportAction(this))
-        this.preferredSize = Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT)
+
+        this.preferredSize = Dimension(250, 400)
+
+        // Menus
         addMenuBar()
-        add(panel)
+
+        // Main panel
+        tablePanel.addAction(tablePanel.table.importCsv)
+        tablePanel.addAction(tablePanel.table.fillAction)
+        tablePanel.addAction(tablePanel.table.randomizeAction)
+        // TODO: Add more actions
+        add(tablePanel)
         frame.pack()
 
         // Force component to fill up parent panel
         addComponentListener(object : ComponentAdapter() {
             override fun componentResized(e: ComponentEvent) {
                 val component = e.component
-                panel.preferredSize = Dimension(component.width, component.height)
-                panel.revalidate()
+                tablePanel.preferredSize = Dimension(component.width, component.height)
+                tablePanel.revalidate()
             }
         })
+
         parentFrame.pack()
     }
 
@@ -125,15 +107,4 @@ class DataWorldDesktopComponent(frame: GenericFrame, component: DataWorldCompone
         parentFrame.jMenuBar = menuBar
     }
 
-    companion object {
-        /**
-         * Default height.
-         */
-        private const val DEFAULT_HEIGHT = 250
-
-        /**
-         * Default width.
-         */
-        private const val DEFAULT_WIDTH = 400
-    }
 }

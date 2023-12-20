@@ -61,7 +61,7 @@ val SimbrainJTable.fillAction
     get() = createAction(
         name = "Fill...",
         description = "Fill selected cells",
-        iconPath = "menu_icons/Fill.png"
+        iconPath = "menu_icons/fill.png"
     ) {
         val fillVal = JOptionPane.showInputDialog(this, "Value:", "0").toDouble()
         fillSelectedCells(fillVal)

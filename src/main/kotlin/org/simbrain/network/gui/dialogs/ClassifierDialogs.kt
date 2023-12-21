@@ -46,6 +46,7 @@ fun SmileClassifier.getTrainingDialog(): StandardDialog {
             createFromDoubleArray(classifier.trainingData.featureVectors), false
         ).apply {
             addAction(table.importCsv)
+            addAction(table.exportCsv())
             addAction(table.randomizeAction)
             preferredSize = Dimension(300, 300)
             addClosingTask {
@@ -55,6 +56,7 @@ fun SmileClassifier.getTrainingDialog(): StandardDialog {
 
         val targets = SimbrainTablePanel(createBasicDataFrameFromColumn(classifier.trainingData.targetLabels), false).apply {
             addAction(table.importCsv)
+            addAction(table.exportCsv())
             addAction(table.randomizeColumnAction)
             preferredSize = Dimension(200, 300)
             addClosingTask {

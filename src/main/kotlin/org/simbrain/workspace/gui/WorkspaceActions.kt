@@ -39,6 +39,8 @@ import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.couplings.CouplingManager
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager
+import org.simbrain.world.dataworld.DataWorld
+import org.simbrain.world.dataworld.DataWorldComponent
 import org.simbrain.world.imageworld.ImageWorldComponent
 import org.simbrain.world.imageworld.filters.Filter
 import java.lang.Math.ceil
@@ -362,6 +364,18 @@ class WorkspaceActions {
             it.emitter.getConsumer(EmitterMatrix::setBrightness)
         }
     )
+
+    fun createCoupledDataWorldAction(name: String = "Record Data", producer: Producer, sourceName: String, numCols: Int) = SimbrainDesktop.desktopPane.createAction(
+        name = name,
+        iconPath = "menu_icons/Table.png",
+        coroutineScope = workspace
+    ) {
+        val component = DataWorldComponent(sourceName, DataWorld(cols = numCols))
+        workspace.addWorkspaceComponent(component)
+        with(workspace.couplingManager) {
+            producer couple component.dataWorld.getConsumer(DataWorld::setCurrentNumericRow)
+        }
+    }
 
     @JvmOverloads
     fun createCoupledPlotMenu(producer: Producer, objectName: String, menuTitle: String = "Couple Plots"): JMenu {

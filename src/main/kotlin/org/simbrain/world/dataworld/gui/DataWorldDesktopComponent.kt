@@ -18,14 +18,14 @@
  */
 package org.simbrain.world.dataworld.gui
 
+import org.simbrain.util.createAction
+import org.simbrain.util.createEditorDialog
+import org.simbrain.util.display
 import org.simbrain.util.genericframe.GenericFrame
-import org.simbrain.util.table.SimbrainTablePanel
-import org.simbrain.util.table.fillAction
-import org.simbrain.util.table.importCsv
-import org.simbrain.util.table.randomizeAction
+import org.simbrain.util.table.*
 import org.simbrain.util.widgets.ShowHelpAction
 import org.simbrain.workspace.gui.DesktopComponent
-import org.simbrain.workspace.gui.SimbrainDesktop
+import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import org.simbrain.world.dataworld.DataWorld
 import org.simbrain.world.dataworld.DataWorldComponent
 import java.awt.Dimension
@@ -38,7 +38,7 @@ import javax.swing.JMenuItem
 /**
  * **ReaderComponentDesktopGui** is the gui view for the reader world.
  */
-class DataWorldDesktopComponent(frame: GenericFrame, component: DataWorldComponent) :
+class DataWorldDesktopComponent(frame: GenericFrame, val component: DataWorldComponent) :
     DesktopComponent<DataWorldComponent>(frame, component) {
 
     private val menuBar = JMenuBar()
@@ -68,8 +68,12 @@ class DataWorldDesktopComponent(frame: GenericFrame, component: DataWorldCompone
 
         // Main panel
         tablePanel.addAction(tablePanel.table.importCsv)
+        tablePanel.addAction(tablePanel.table.exportCsv(component.name))
         tablePanel.addAction(tablePanel.table.fillAction)
         tablePanel.addAction(tablePanel.table.randomizeAction)
+        tablePanel.addAction(tablePanel.table.showBoxPlotAction)
+        tablePanel.addAction(tablePanel.table.showHistogramAction)
+        tablePanel.addAction(tablePanel.table.createShowMatrixPlotAction())
         // TODO: Add more actions
         add(tablePanel)
         frame.pack()
@@ -93,9 +97,17 @@ class DataWorldDesktopComponent(frame: GenericFrame, component: DataWorldCompone
 
         // File Menu
         menuBar.add(file)
-        file.add(SimbrainDesktop.actionManager.createImportAction(this))
-        file.add(SimbrainDesktop.actionManager.createExportAction(this))
+        file.add(actionManager.createImportAction(this))
+        file.add(actionManager.createExportAction(this))
         file.addSeparator()
+        file.add(createAction(name = "Preferences...") {
+            component.dataWorld.createEditorDialog().display()
+        })
+        file.addSeparator()
+        file.add(actionManager.createRenameAction(this))
+        file.addSeparator()
+        file.add(actionManager.createCloseAction(this))
+
 
         // Help Menu
         menuBar.add(help)

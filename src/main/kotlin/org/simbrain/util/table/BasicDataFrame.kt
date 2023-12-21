@@ -51,11 +51,26 @@ class BasicDataFrame(
     /**
      * Insert row above, unless the index is -1 (no selection) in which case it is added as the bottom.
      */
-    override fun insertRow(rowIndex: Int) {
-        val newRowIndex = if (rowIndex == -1) rowCount else rowIndex
-        if (rowIndex in -1 until rowCount) {
-            data.add(newRowIndex, MutableList(columnCount) { null })
+    override fun insertRow(selectedRow: Int) {
+        val newRowIndex = if (selectedRow == -1) rowCount else selectedRow
+        if (selectedRow in -1..rowCount) {
+            data.add(newRowIndex, MutableList(columnCount) {
+                when (columns[it].type) {
+                    Column.DataType.DoubleType -> 0.0
+                    Column.DataType.IntType -> 0
+                    Column.DataType.StringType -> ""
+                }
+            })
             fireTableStructureChanged()
+        }
+    }
+
+    override fun setRow(selectedRow: Int, row: Array<out Any?>) {
+        if (validateRowIndex(selectedRow) && row.size == columnCount) {
+            data[selectedRow].forEachIndexed { index, _ ->
+                setValueAt(row[index], selectedRow, index)
+            }
+            fireTableDataChanged()
         }
     }
 

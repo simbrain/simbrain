@@ -260,6 +260,8 @@ abstract class SimbrainDataFrame : AbstractTableModel() {
 
     open fun insertRow(selectedRow: Int) {}
 
+    open fun setRow(selectedRow: Int, row: Array<out Any?>) {}
+
     open fun deleteRow(selectedRow: Int, fireEvent: Boolean = true) {}
 
     fun insertRowAtBottom() {

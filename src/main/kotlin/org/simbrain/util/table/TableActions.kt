@@ -1,5 +1,6 @@
 package org.simbrain.util.table
 
+import com.Ostermiller.util.CSVPrinter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
@@ -239,6 +240,25 @@ fun SimbrainJTable.importCSVAction(fixedColumns: Boolean = false) = createAction
         }
     }
 }
+
+fun SimbrainJTable.exportCsv(fileName: String = "") = createAction(
+        name = "Export csv...",
+        description = "Export comma separated values file",
+        iconPath = "menu_icons/Import.png"
+    ) {
+        val chooser = SFileChooser(TABLE_DIRECTORY, "", "csv")
+        val csvFile = chooser.showSaveDialog(fileName)
+        if (csvFile != null) {
+            val writer = csvFile.bufferedWriter()
+            val printer = CSVPrinter(writer)
+            (0 until model.rowCount).forEach { i ->
+                val row = (0 until model.columnCount).map { j ->
+                    model.getValueAt(i, j).toString()
+                }.toTypedArray()
+                printer.writeln(row)
+            }
+        }
+    }
 
 val SimbrainJTable.editColumnAction
     get() = createAction(

@@ -119,7 +119,7 @@ open class SimbrainTablePanel @JvmOverloads constructor(
     fun initDefaultToolbarAndMenu() {
         if (model.isMutable) {
             addAction(table.importCsv)
-            addAction(table.importArff)
+            addAction(table.exportCsv())
             addSeparator()
             addAction(table.insertColumnAction)
             addAction(table.deleteColumnAction)
@@ -278,6 +278,8 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
         setRowSelectionInterval(row, row)
         model.currentRowIndex = row
     }
+
+    override fun getSelectedRow() = model.currentRowIndex
 
     fun initRowSelection() {
         if (selectedRow == -1) selectedRow = 0

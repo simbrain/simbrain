@@ -53,6 +53,15 @@ class MatrixDataFrame @JvmOverloads constructor(
         }
     }
 
+    override fun setRow(selectedRow: Int, row: Array<out Any?>) {
+        if (validateRowIndex(selectedRow) && row.size == columnCount) {
+            for (i in 0 until columnCount) {
+                data[selectedRow, i] = tryParsingDouble(row[i])
+            }
+            fireTableDataChanged()
+        }
+    }
+
     override fun deleteRow(rowIndex: Int, fireEvent: Boolean) {
         if (rowCount == 1) {
             return

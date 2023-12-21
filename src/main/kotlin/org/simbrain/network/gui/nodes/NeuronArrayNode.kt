@@ -387,6 +387,22 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             menuTitle = "Add coupled image world",
             postActionBlock = { neuronArray.gridMode = true }
         ))
+        contextMenu.add(actionManager.createCoupledDataWorldAction(
+            name = "Record Activations",
+            neuronArray.getProducer(NeuronArray::activationArray),
+            sourceName = "${neuronArray.id ?: "Neuron Array"} Activations",
+            neuronArray.size()
+        ))
+        neuronArray.dataHolder.let {
+            if (it is BiasedMatrixData) {
+                contextMenu.add(actionManager.createCoupledDataWorldAction(
+                    name = "Record Biases",
+                    it.getProducer(BiasedMatrixData::biasesArray),
+                    sourceName = "${neuronArray.id ?: "Neuron Array"} Biases",
+                    neuronArray.size()
+                ))
+            }
+        }
 
         contextMenu.addSeparator()
         contextMenu.add(networkPanel.alignMenu)

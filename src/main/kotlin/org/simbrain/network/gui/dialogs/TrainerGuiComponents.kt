@@ -153,6 +153,7 @@ class MatrixEditor(matrix: Matrix) : SimbrainTablePanel(
 ) {
     init {
         addAction(table.importCsv)
+        addAction(table.exportCsv())
         addAction(table.randomizeAction)
         addAction(table.showBoxPlotAction)
         addAction(table.showHistogramAction)

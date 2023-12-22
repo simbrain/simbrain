@@ -1,8 +1,6 @@
 package org.simbrain.util
 
 import org.simbrain.util.math.SimbrainMath
-import org.simbrain.util.stats.distributions.UniformIntegerDistribution
-import org.simbrain.util.stats.distributions.UniformRealDistribution
 import java.awt.Color
 import java.awt.geom.AffineTransform
 import java.awt.image.*
@@ -11,7 +9,6 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import kotlin.math.floor
 import kotlin.math.min
-import kotlin.math.pow
 
 fun Double.toSimbrainColor(range: ClosedFloatingPointRange<Double>, coolHue: Float = 2/3f, hotHue: Float = 0.0f) = clip(range).let {
     if (it < 0) {
@@ -207,16 +204,32 @@ fun BufferedImage.copy(): BufferedImage {
 
 fun Color.invert() = Color(255 - red, 255 - green, 255 - blue)
 
+/**
+ * Used to get decent upper bounds from a given value, e.g. 820 -> 900
+ */
+fun graphicalUpperBound(value: Double): Double {
+    return when {
+        value < 100 -> floor(value / 10) * 10 + 10
+        value < 1000 -> floor(value / 100) * 100 + 100
+        value < 10000 -> floor(value / 1000) * 1000 + 1000
+        else -> floor(value / 10000) * 10000 + 10000
+    }
+}
+
+
 fun main() {
-    val arr = UniformRealDistribution(0.0,1.0).sampleDouble(100)
-    val intArray =  UniformIntegerDistribution().apply {
-        floor = 0
-        ceil = 2.0.pow(24.0).toInt()
-    }.sampleInt(100)
-    val boolArray = intArray.map { it % 2 == 1 }.toBooleanArray()
+    println(graphicalUpperBound(820.0))
+    println(graphicalUpperBound(1220.0))
+    println(graphicalUpperBound(18020.0))
+    // val arr = UniformRealDistribution(0.0,1.0).sampleDouble(100)
+    // val intArray =  UniformIntegerDistribution().apply {
+    //     floor = 0
+    //     ceil = 2.0.pow(24.0).toInt()
+    // }.sampleInt(100)
+    // val boolArray = intArray.map { it % 2 == 1 }.toBooleanArray()
     // arr.toSimbrainColorImage(10,10).scale(100, 100).display()
     // arr.toSimbrainColorImage(10,10).scale(20.0).display()
     // intArray.toRGBImage(10,10).scale(10.0).display()
     // arr.toFloatArray().toGrayScaleImage(10,10).display()
-    boolArray.toOverlay(10,10, Color.yellow).scale(10.0).display()
+    // boolArray.toOverlay(10,10, Color.yellow).scale(10.0).display()
 }

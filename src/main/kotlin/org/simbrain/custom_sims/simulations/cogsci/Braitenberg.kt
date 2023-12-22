@@ -4,12 +4,14 @@ import org.simbrain.custom_sims.*
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.addNeuron
 import org.simbrain.network.core.addSynapse
+import org.simbrain.util.graphicalUpperBound
 import org.simbrain.util.place
 import org.simbrain.world.odorworld.entities.EntityType
 import java.awt.geom.Point2D
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.component3
+import kotlin.math.max
 
 /**
  * Braitenberg sim to accompany "Open Dynamics of Braitenberg Vehicles"
@@ -116,13 +118,33 @@ val braitenbergSim = newSim {
                 vehicle1.straight.forceSetActivation(velocity)
                 vehicle2.straight.forceSetActivation(velocity)
             }
+            // Update neuron and weight bounds to reasonable values given weight values
+            fun updateBounds(w1: Double, w2: Double) {
+                val bound = graphicalUpperBound(max(w1, w2))
+                vehicle1.leftSynapse.upperBound = bound
+                vehicle1.rightSynapse.upperBound = bound
+                vehicle2.leftSynapse.upperBound = bound
+                vehicle2.rightSynapse.upperBound = bound
+                vehicle1.leftSynapse.lowerBound = -bound
+                vehicle1.rightSynapse.lowerBound = -bound
+                vehicle2.leftSynapse.lowerBound = -bound
+                vehicle2.rightSynapse.lowerBound = -bound
+                vehicle1.leftTurn.upperBound = bound
+                vehicle1.rightTurn.upperBound = bound
+                vehicle2.leftTurn.upperBound = bound
+                vehicle2.rightTurn.upperBound = bound
+                vehicle1.leftTurn.lowerBound = -bound
+                vehicle1.rightTurn.lowerBound = -bound
+                vehicle2.leftTurn.lowerBound = -bound
+                vehicle2.rightTurn.lowerBound = -bound
+            }
             addButton("Same pair") {
                 vehicle1.leftSynapse.strength = leftWeight
                 vehicle1.rightSynapse.strength = rightWeight
                 vehicle2.leftSynapse.strength = leftWeight
                 vehicle2.rightSynapse.strength = rightWeight
-                vehicle2.rightSynapse.strength = rightWeight
                 setVelocity()
+                updateBounds(leftWeight, rightWeight)
             }
             addButton("Reversed pair") {
                 vehicle1.leftSynapse.strength = leftWeight
@@ -130,6 +152,7 @@ val braitenbergSim = newSim {
                 vehicle2.leftSynapse.strength = rightWeight
                 vehicle2.rightSynapse.strength = leftWeight
                 setVelocity()
+                updateBounds(leftWeight, rightWeight)
             }
             addButton("Opposite pair") {
                 vehicle1.leftSynapse.strength = leftWeight
@@ -137,6 +160,7 @@ val braitenbergSim = newSim {
                 vehicle2.leftSynapse.strength = -leftWeight
                 vehicle2.rightSynapse.strength = -rightWeight
                 setVelocity()
+                updateBounds(leftWeight, rightWeight)
             }
         }
     }

@@ -122,3 +122,27 @@ fun <T> withProbability(probability: Double, block: () -> T): T? {
         null
     }
 }
+
+
+/**
+ * Convert a number that is a probability into a ratio where the right side is 1.
+ * Used in conjunction with [runOne] to produce weights from probs. This is a bit overkill
+ * but we already wrote the docs and tests so...
+ *
+ * Examples:
+ *  .5 goes with the ratio 1:1 and so this function maps .5 to 1.
+ *  .75 goes with the ratio 3:1 and so this function maps .75 to 3.
+ *  .25 goes with the ratio 1:3 or 1/3:1  so this function maps .25 to 1/3
+ *  1.0 goes basically goes with infinity to 1 so 1.0 maps to POSITIVE_INFINITY
+ *
+ */
+fun Double.toProbabilityWeight(): Double {
+    require(this in 0.0..1.0) { "Input must be a valid probability between 0 and 1, inclusive." }
+
+    if (this == 1.0) {
+        return Double.POSITIVE_INFINITY  // or some large number to represent infinity
+    }
+    val complement = 1 - this
+    val ratio = this / complement
+    return ratio
+}

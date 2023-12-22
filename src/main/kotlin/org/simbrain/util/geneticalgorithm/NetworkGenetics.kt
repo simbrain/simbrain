@@ -20,7 +20,6 @@ import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
 import org.simbrain.util.cartesianProduct
 import org.simbrain.util.sampleOne
-import org.simbrain.util.toRatio
 import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance
 
@@ -248,7 +247,7 @@ fun ConnectionStrategyGene.mutateType(
             ).map { 1 to it.kotlin },
     probabilityOfChange: Double = .9
 ) = mutate {
-    val nonMutatingWeight: Double = (1 - probabilityOfChange).toRatio() * allowedTypes.size
+    val nonMutatingWeight: Double = (1 - probabilityOfChange).toProbabilityWeight() * allowedTypes.size
     fun changeIfNotSameType(newType: KClass<out ConnectionStrategy>) {
         if (connectionStrategy::class != newType) {
             connectionStrategy = newType.createInstance()
@@ -310,7 +309,7 @@ fun NeuronRuleGene.mutateType(
     allowedTypes: List<Pair<Number, KClass<out NeuronUpdateRule<*, *>>>> = allUpdateRules.map { 1 to it.kotlin },
     probabilityOfChange: Double = .9
 ) = mutate {
-    val nonMutatingWeight: Double = (1 - probabilityOfChange).toRatio() * allowedTypes.size
+    val nonMutatingWeight: Double = (1 - probabilityOfChange).toProbabilityWeight() * allowedTypes.size
     fun changeIfNotSameType(newType: KClass<out NeuronUpdateRule<*, *>>) {
         if (updateRule::class != newType) {
             updateRule = newType.createInstance()
@@ -361,7 +360,7 @@ fun SynapseRuleGene.mutateType(
     ),
     probabilityOfChange: Double = .9
 ) = mutate {
-    val nonMutatingWeight: Double = (1 - probabilityOfChange).toRatio() * allowedTypes.size
+    val nonMutatingWeight: Double = (1 - probabilityOfChange).toProbabilityWeight() * allowedTypes.size
     fun changeIfNotSameType(newType: KClass<out SynapseUpdateRule<*, *>>) {
         if (learningRule::class != newType) {
             learningRule = newType.createInstance()

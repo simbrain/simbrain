@@ -3,6 +3,7 @@ package org.simbrain.util
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.simbrain.util.geneticalgorithm.toProbabilityWeight
 
 class MathUtilsKtTest {
 
@@ -58,6 +59,15 @@ class MathUtilsKtTest {
         assertEquals(outerProductUV[2,0], outerProductUV[1,2]) //row, col
         assertEquals(3, outerProductUV.nrow())
         assertEquals(4, outerProductUV.ncol())
+    }
+
+    @Test
+    fun `test conversion of probabilities to weights`() {
+        assertEquals(1.0, .5.toProbabilityWeight())
+        assertEquals(Double.POSITIVE_INFINITY, 1.0.toProbabilityWeight())
+        assertEquals(0.0, 0.0.toProbabilityWeight())
+        assertEquals(3.0, .75.toProbabilityWeight())
+        assertEquals(1.0/3, .25.toProbabilityWeight(), .001)
     }
 }
 

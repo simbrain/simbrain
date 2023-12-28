@@ -49,6 +49,6 @@ public final class AddAgentAction extends AbstractAction {
 
     @Override
     public void actionPerformed(final ActionEvent event) {
-        worldPanel.getWorld().addAgent();
+        worldPanel.world.addAgent();
     }
 }

@@ -19,7 +19,6 @@
 package org.simbrain.world.odorworld.actions;
 
 import org.simbrain.util.ResourceManager;
-import org.simbrain.world.odorworld.OdorWorldPanel;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 import javax.swing.*;
@@ -31,26 +30,13 @@ import java.awt.event.ActionEvent;
 public final class DeleteEntityAction extends AbstractAction {
 
     /**
-     * Reference to Panel; the action refers to the panel because it needs
-     * information on mouse clicks, etc.
-     */
-    private final OdorWorldPanel worldPanel;
-
-    /**
      * Entity to edit.
      */
     private final OdorWorldEntity entity;
 
-    /**
-     * Create a delete entity action.
-     *
-     * @param worldPanel parent panel
-     * @param entity     entity to delete
-     */
-    public DeleteEntityAction(final OdorWorldPanel worldPanel, OdorWorldEntity entity) {
+    public DeleteEntityAction(OdorWorldEntity entity) {
 
         super("Delete entity");
-        this.worldPanel = worldPanel;
         this.entity = entity;
         putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Delete.png"));
         putValue(SHORT_DESCRIPTION, "Delete entity");
@@ -58,6 +44,6 @@ public final class DeleteEntityAction extends AbstractAction {
 
     @Override
     public void actionPerformed(final ActionEvent event) {
-        worldPanel.getWorld().deleteEntity(entity);
+        entity.getWorld().deleteEntity(entity);
     }
 }

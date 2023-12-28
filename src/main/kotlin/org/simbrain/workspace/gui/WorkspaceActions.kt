@@ -370,7 +370,9 @@ class WorkspaceActions {
         iconPath = "menu_icons/Table.png",
         coroutineScope = workspace
     ) {
-        val component = DataWorldComponent(sourceName, DataWorld(cols = numCols))
+        val component = DataWorldComponent(sourceName, DataWorld(cols = numCols)).apply {
+            dataWorld.appendMode = DataWorld.DataEntryMode.APPEND
+        }
         workspace.addWorkspaceComponent(component)
         with(workspace.couplingManager) {
             producer couple component.dataWorld.getConsumer(DataWorld::setCurrentNumericRow)

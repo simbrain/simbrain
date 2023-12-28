@@ -18,7 +18,7 @@ public class KeyBindings {
     public static void addBindings(OdorWorldPanel worldPanel) {
 
         PCanvas canvas = worldPanel.getCanvas();
-        OdorWorld world = worldPanel.getWorld();
+        OdorWorld world = worldPanel.world;
 
         // Add / delete
         canvas.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("P"), "addEntity");

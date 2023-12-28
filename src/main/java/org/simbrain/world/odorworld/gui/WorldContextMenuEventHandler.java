@@ -38,21 +38,19 @@ public class WorldContextMenuEventHandler extends PBasicInputEventHandler {
             return;
         }
 
-        // Set last clicked position, used in many areas for "placement" of
-        // objects in the last clicked position on screen.
-        world.setLastClickedPosition(mouseEvent.getCanvasPosition());
+        var menuPosition = mouseEvent.getCanvasPosition();
 
         // Set picked node
         PNode pickedNode = mouseEvent.getPath().getPickedNode();
 
         // Show context menu for right click
         if (mouseEvent.isControlDown() || (mouseEvent.getButton() == MouseEvent.BUTTON3)) {
-            if (pickedNode.getParent() instanceof EntityNode) {
-                JPopupMenu menu = odorWorldPanel.getContextMenu(((EntityNode) pickedNode.getParent()).getEntity());
-                menu.show(odorWorldPanel, (int) world.getLastClickedPosition().getX(), (int) world.getLastClickedPosition().getY());
+            if (pickedNode.getParent() instanceof EntityNode entity) {
+                JPopupMenu menu = entity.createContextMenu(odorWorldPanel);
+                menu.show(odorWorldPanel, (int) menuPosition.getX(), (int) menuPosition.getY());
             } else {
-                JPopupMenu menu = odorWorldPanel.getContextMenu(null);
-                menu.show(odorWorldPanel, (int) world.getLastClickedPosition().getX(), (int) world.getLastClickedPosition().getY());
+                JPopupMenu menu = odorWorldPanel.getContextMenu();
+                menu.show(odorWorldPanel, (int) menuPosition.getX(), (int) menuPosition.getY());
             }
         }
     }

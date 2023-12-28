@@ -33,7 +33,7 @@ public class LoadTileMapAction extends AbstractAction {
         SFileChooser chooser = new SFileChooser(OdorWorldPreferences.INSTANCE.getDirectory(), "Load TMX Tilemap");
         File theFile = chooser.showOpenDialog();
         if (theFile != null) {
-            component.getWorld().setTileMap(TMXUtils.loadTileMap(theFile));
+            component.world.setTileMap(TMXUtils.loadTileMap(theFile));
             OdorWorldPreferences.INSTANCE.setDirectory(chooser.getCurrentLocation());
         }
     }

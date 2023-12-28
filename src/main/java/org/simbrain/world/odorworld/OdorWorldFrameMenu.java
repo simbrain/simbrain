@@ -99,7 +99,7 @@ public class OdorWorldFrameMenu extends JMenuBar {
     public OdorWorldFrameMenu(final OdorWorldDesktopComponent frame, OdorWorld world) {
         parent = frame;
         this.world = world;
-        odorWorldActions = parent.getWorldPanel().getOdorWorldActions();
+        odorWorldActions = parent.getWorldPanel().odorWorldActions;
     }
 
     /**
@@ -134,7 +134,7 @@ public class OdorWorldFrameMenu extends JMenuBar {
         loadTileMapMenu.add(new JMenuItem(new AbstractAction("Load Empty World") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                parent.getWorldPanel().getWorld().setTileMap(TMXUtils.loadTileMap("empty.tmx"));
+                parent.getWorldPanel().world.setTileMap(TMXUtils.loadTileMap("empty.tmx"));
             }
         }));
 
@@ -142,14 +142,14 @@ public class OdorWorldFrameMenu extends JMenuBar {
         loadTileMapMenu.add(new JMenuItem(new AbstractAction("Load Ari's World") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                parent.getWorldPanel().getWorld().setTileMap(TMXUtils.loadTileMap("aris_world.tmx"));
+                parent.getWorldPanel().world.setTileMap(TMXUtils.loadTileMap("aris_world.tmx"));
             }
         }));
 
         loadTileMapMenu.add(new JMenuItem(new AbstractAction("Load Yulin's World") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                parent.getWorldPanel().getWorld().setTileMap(TMXUtils.loadTileMap("yulins_world.tmx"));
+                parent.getWorldPanel().world.setTileMap(TMXUtils.loadTileMap("yulins_world.tmx"));
             }
         }));
 

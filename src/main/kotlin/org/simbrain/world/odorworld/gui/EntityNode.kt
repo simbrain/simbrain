@@ -4,14 +4,19 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PPath
+import org.simbrain.util.distanceTo
 import org.simbrain.util.magnitude
 import org.simbrain.util.minus
 import org.simbrain.util.piccolo.Animations
 import org.simbrain.util.piccolo.RotatingSprite
 import org.simbrain.util.piccolo.Sprite
+import org.simbrain.workspace.couplings.getProducer
+import org.simbrain.workspace.gui.CouplingMenu
 import org.simbrain.workspace.gui.SimbrainDesktop
-import org.simbrain.world.odorworld.OdorWorld
+import org.simbrain.world.odorworld.OdorWorldPanel
 import org.simbrain.world.odorworld.OdorWorldResourceManager
+import org.simbrain.world.odorworld.actions.DeleteEntityAction
+import org.simbrain.world.odorworld.actions.ShowEntityDialogAction
 import org.simbrain.world.odorworld.effectors.Effector
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
@@ -20,13 +25,14 @@ import org.simbrain.world.odorworld.sensors.Sensor
 import org.simbrain.world.odorworld.sensors.VisualizableEntityAttribute
 import java.awt.geom.Point2D
 import java.util.stream.Collectors
+import javax.swing.JMenuItem
+import javax.swing.JPopupMenu
 import kotlin.math.absoluteValue
 
 /**
  * Piccolo representation of an [OdorWorldEntity].
  */
 class EntityNode(
-    private val parent: OdorWorld,
     val entity: OdorWorldEntity
 ) : PNode(), NodeWithDispersion by DispersionNode(entity) {
 
@@ -247,13 +253,13 @@ class EntityNode(
         if (entity.isShowTrail && SimbrainDesktop.workspace.updater.isRunning) {
             fun isCrossingBroder(): Boolean {
                 val delta = (trail.path.currentPoint - entity.location).magnitude.absoluteValue
-                val veolocity = entity.speed.absoluteValue
-                return delta > veolocity + 0.5 // add a little bit of tolerance
+                val velocity = entity.speed.absoluteValue
+                return delta > velocity + 0.5 // add a little bit of tolerance
             }
             if (isCrossingBroder()) {
                 trail.moveTo(entity.x, entity.y)
             }
-            if ((entity.x != trail.path.currentPoint.x) || (entity.y != trail.path.currentPoint.y)) {
+            if (entity.location distanceTo trail.path.currentPoint > 0.25) { // don't add points too close to each other
                 trail.lineTo(entity.x, entity.y)
             }
         }
@@ -283,10 +289,22 @@ class EntityNode(
         sprite!!.resetToStaticFrame()
     }
 
-    companion object {
-        /**
-         * Default image.
-         */
-        private const val DEFAULT_IMAGE = "Swiss.gif"
+    fun createContextMenu(odorWorldPanel: OdorWorldPanel) = JPopupMenu().apply {
+        add(JMenuItem(ShowEntityDialogAction(entity)))
+        add(JMenuItem(DeleteEntityAction(entity)))
+        addSeparator()
+        add(JMenuItem(odorWorldPanel.odorWorldActions.toggleTrailAction(entity)))
+        addSeparator()
+        add(
+            SimbrainDesktop.actionManager.createCoupledDataWorldAction(
+            name = "Record Locations",
+            entity.getProducer(OdorWorldEntity::locationArray),
+            sourceName = "${entity.id ?: "Entity"} Location",
+            numCols = 2
+        ))
+        addSeparator()
+        val couplingMenu = CouplingMenu(odorWorldPanel.odorWorldComponent, entity)
+        couplingMenu.setCustomName("Create couplings")
+        add(couplingMenu)
     }
 }

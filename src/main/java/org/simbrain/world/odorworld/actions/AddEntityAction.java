@@ -49,6 +49,6 @@ public final class AddEntityAction extends AbstractAction {
 
 
     public void actionPerformed(final ActionEvent event) {
-        worldPanel.getWorld().addEntity();
+        worldPanel.world.addEntity();
     }
 }

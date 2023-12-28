@@ -55,7 +55,7 @@ public final class ShowWorldPrefsAction extends AbstractAction {
 
     @Override
     public void actionPerformed(final ActionEvent event) {
-        var dialog = SwingUtilsKt.createEditorDialog(component.getWorld());
+        var dialog = SwingUtilsKt.createEditorDialog(component.world);
         SwingUtilsKt.display(dialog);
     }
 }

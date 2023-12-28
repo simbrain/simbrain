@@ -374,4 +374,8 @@ class OdorWorldEntity @JvmOverloads constructor(
 
     override val childrenContainers: List<AttributeContainer>
         get() = sensors + effectors
+
+    @get:Producible
+    val locationArray
+        get() = doubleArrayOf(x, y)
 }

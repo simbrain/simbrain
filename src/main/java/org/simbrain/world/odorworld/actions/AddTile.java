@@ -25,6 +25,6 @@ public class AddTile extends AbstractAction {
 
 
     public void actionPerformed(final ActionEvent event) {
-        worldPanel.getWorld().addTile();
+        worldPanel.world.addTile();
     }
 }

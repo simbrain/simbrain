@@ -117,7 +117,7 @@ public final class WorldMouseHandler extends PDragSequenceEventHandler {
 
         // Set last clicked position, used in many areas for "placement" of
         // objects in the last clicked position on screen.
-        world.setLastClickedPosition(mouseEvent.getCanvasPosition());
+        world.setLastClickedPosition(mouseEvent.getPosition());
 
     }
 
@@ -143,10 +143,10 @@ public final class WorldMouseHandler extends PDragSequenceEventHandler {
             } else {
                 // TODO: On right click, show sub-menu with layers, then show dialog below
 
-                var tileMap = odorWorldPanel.getWorld().getTileMap();
+                var tileMap = odorWorldPanel.world.getTileMap();
                 showTilePicker(tileMap.getTileSets(), (tileId) -> {
                     var p= tileMap.pixelToGridCoordinate(world.getLastClickedPosition());
-                    odorWorldPanel.getWorld().getTileMap().setTile(p.getX(), p.getY(), tileId);
+                    odorWorldPanel.world.getTileMap().setTile(p.getX(), p.getY(), tileId);
                 });
 
             }

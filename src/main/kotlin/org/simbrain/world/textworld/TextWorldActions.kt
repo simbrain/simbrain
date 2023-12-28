@@ -14,7 +14,7 @@ import java.util.*
 val TextWorld.extractEmbedding get() = createAction(
     name = "Extract embedding...",
     description = "Extract embedding from text file...",
-    iconPath = "menu_icons/Import.png"
+    iconPath = "menu_icons/import.png"
 ) {
     val chooser = SFileChooser(tokenEmbeddingDirectory, "text file", "txt")
     val theFile = chooser.showOpenDialog()

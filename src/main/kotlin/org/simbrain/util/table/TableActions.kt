@@ -174,7 +174,7 @@ val SimbrainJTable.importArff
     get() = createAction(
         name = "Import arff file...",
         description = "Import WEKA arff file",
-        iconPath = "menu_icons/Import.png"
+        iconPath = "menu_icons/import.png"
     ) {
         val chooser = SFileChooser(TABLE_DIRECTORY, "", "arff")
         val arffFile = chooser.showOpenDialog()
@@ -206,7 +206,7 @@ val SimbrainJTable.importCsv
 fun SimbrainJTable.importCSVAction(fixedColumns: Boolean = false) = createAction(
     name ="Import csv...",
     description = "Import comma separated values file",
-    iconPath= "menu_icons/Import.png"
+    iconPath= "menu_icons/import.png"
 ) {
     val chooser = SFileChooser(TABLE_DIRECTORY, "", "csv")
     val csvFile = chooser.showOpenDialog()
@@ -244,7 +244,7 @@ fun SimbrainJTable.importCSVAction(fixedColumns: Boolean = false) = createAction
 fun SimbrainJTable.exportCsv(fileName: String = "") = createAction(
         name = "Export csv...",
         description = "Export comma separated values file",
-        iconPath = "menu_icons/Import.png"
+        iconPath = "menu_icons/export.png"
     ) {
         val chooser = SFileChooser(TABLE_DIRECTORY, "", "csv")
         val csvFile = chooser.showSaveDialog(fileName)

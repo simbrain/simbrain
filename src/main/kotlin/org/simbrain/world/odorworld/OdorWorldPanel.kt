@@ -12,6 +12,7 @@ import org.simbrain.network.gui.CustomToolBar
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.SceneGraphBrowser
 import org.simbrain.util.piccolo.Tile
+import org.simbrain.util.piccolo.setViewBoundsNoOverflow
 import org.simbrain.world.odorworld.actions.*
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.gui.*
@@ -23,7 +24,6 @@ import java.awt.geom.Rectangle2D
 import java.util.*
 import java.util.Timer
 import javax.swing.*
-import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.pow
 
@@ -193,9 +193,9 @@ class OdorWorldPanel(
             val (x, y, w, h) = bounds
             val newWidth = min(w, world.width)
             val newHeight = min(h, world.height)
-            val newX = min(max(0.0, x), world.width - newWidth)
-            val newY = min(max(0.0, y), world.height - newHeight)
-            canvas.camera.setViewBounds(
+            val newX = x.coerceIn(0.0, world.width - newWidth)
+            val newY = y.coerceIn(0.0, world.height - newHeight)
+            canvas.camera.setViewBoundsNoOverflow(
                 Rectangle2D.Double(
                     newX,
                     newY,

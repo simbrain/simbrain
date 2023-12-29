@@ -16,6 +16,8 @@ import org.simbrain.util.piccolo.setViewBoundsNoOverflow
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.gui.*
 import java.awt.*
+import java.awt.event.ComponentAdapter
+import java.awt.event.ComponentEvent
 import java.awt.event.MouseEvent
 import java.awt.event.MouseWheelEvent
 import java.awt.geom.Point2D
@@ -340,6 +342,13 @@ class OdorWorldPanel(
         world.getEvents().tileMapChanged.fireAndForget()
 
         canvas.setViewBounds(Rectangle2D.Double(0.0, 0.0, world.width, world.height))
+
+        // Repaint whenever window is opened or changed.
+        addComponentListener(object : ComponentAdapter() {
+            override fun componentResized(arg0: ComponentEvent) {
+                scalingFactor = scalingFactor // force invoke setter
+            }
+        })
     }
 
     private fun renderAllLayers(world: OdorWorld) {
@@ -359,40 +368,13 @@ class OdorWorldPanel(
             return
         }
 
-        if (!selectedModelEntities.isEmpty()) {
-            val worldHeight = world.height
-            val worldWidth = world.width
-            val camera = canvas.camera
-            val cameraBounds = camera.fullBounds
-
-            val firstNode = firstSelectedEntityNode ?: return
-
-            val firstNodeBounds = firstNode.fullBounds
-
-            var cameraNewX = -cameraBounds.width / 2 + firstNodeBounds.x + firstNodeBounds.width / 2
-            var cameraNewY = -cameraBounds.height / 2 + firstNodeBounds.y + firstNodeBounds.height / 2
-
-            // Stop centering the entity if the view is going out of bound of the bound of the world.
-            if (cameraNewX < 0) {
-                cameraNewX = 0.0
-            }
-            if (cameraNewY < 0) {
-                cameraNewY = 0.0
-            }
-            if (cameraNewX + cameraBounds.width > worldWidth) {
-                cameraNewX = worldWidth - cameraBounds.width
-            }
-            if (cameraNewY + cameraBounds.height > worldHeight) {
-                cameraNewY = worldHeight - cameraBounds.height
-            }
-            if (cameraBounds.width > worldWidth) {
-                cameraNewX = 0.0
-            }
-            if (cameraBounds.height > worldHeight) {
-                cameraNewY = 0.0
-            }
-
-            camera.setViewBounds(Rectangle2D.Double(cameraNewX, cameraNewY, cameraBounds.width, cameraBounds.height))
+        if (selectedModelEntities.isNotEmpty()) {
+            canvas.setViewBounds(Rectangle2D.Double(
+                firstSelectedEntityModel!!.x - canvas.camera.viewBounds.width / 2,
+                firstSelectedEntityModel!!.y - canvas.camera.viewBounds.height / 2,
+                canvas.camera.viewBounds.width,
+                canvas.camera.viewBounds.height
+            ))
             repaint()
         }
     }
@@ -495,7 +477,7 @@ class OdorWorldPanel(
         selectionManager.clear()
     }
 
-    var selection: Collection<PNode>
+    var selection: MutableSet<PNode>
         get() = selectionManager.selection
         set(elements) {
             selectionManager.clear()

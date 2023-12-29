@@ -13,7 +13,6 @@ import org.simbrain.util.*
 import org.simbrain.util.piccolo.SceneGraphBrowser
 import org.simbrain.util.piccolo.Tile
 import org.simbrain.util.piccolo.setViewBoundsNoOverflow
-import org.simbrain.world.odorworld.actions.*
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.gui.*
 import java.awt.*
@@ -231,7 +230,7 @@ class OdorWorldPanel(
         canvas.removeInputEventListener(zoomEventHandler)
 
         // Add key bindings
-        KeyBindings.addBindings(this)
+        OdorWorldKeyBindings.addBindings(this)
 
         // Mouse events
         canvas.addInputEventListener(WorldMouseHandler(this, world))
@@ -476,7 +475,6 @@ class OdorWorldPanel(
         }
     }
 
-
     /**
      * Create a popup menu based on location of mouse `click`.
      *
@@ -484,13 +482,13 @@ class OdorWorldPanel(
      * @return the popup menu
      */
     fun getContextMenu() = JPopupMenu().apply {
-        add(JMenuItem(AddEntityAction(this@OdorWorldPanel)))
-        add(JMenuItem(AddAgentAction(this@OdorWorldPanel)))
+        add(JMenuItem(odorWorldActions.addAgentAction()))
+        add(JMenuItem(odorWorldActions.addEntityAction()))
+        addSeparator()
         add(JMenuItem(odorWorldActions.addTileAction))
         add(JMenuItem(odorWorldActions.fillLayerAction))
         addSeparator()
-        add(JMenuItem(ShowWorldPrefsAction(this@OdorWorldPanel)))
-        add(JMenuItem(odorWorldActions.showInfoAction))
+        add(JMenuItem(odorWorldActions.showWorldPrefsAction()))
     }
 
     fun clearSelection() {
@@ -562,6 +560,10 @@ class OdorWorldPanel(
         get() = manualMovementKeyState > 0
 
     private fun createMainToolBar() = CustomToolBar().apply {
+        add(odorWorldActions.addAgentAction())
+        add(odorWorldActions.addEntityAction())
+        add(odorWorldActions.deleteSelectedAction())
+        addSeparator()
         add(odorWorldActions.resetZoomAction())
         add(odorWorldActions.zoomInAction())
         add(odorWorldActions.zoomOutAction())

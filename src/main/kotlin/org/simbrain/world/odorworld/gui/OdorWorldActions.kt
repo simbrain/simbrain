@@ -1,21 +1,57 @@
 package org.simbrain.world.odorworld.gui
 
-import org.simbrain.util.CmdOrCtrl
-import org.simbrain.util.createAction
+import org.simbrain.util.*
 import org.simbrain.world.odorworld.OdorWorldPanel
+import org.simbrain.world.odorworld.dialogs.EntityDialog
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.showTilePicker
 import java.awt.event.KeyEvent
-import javax.swing.JOptionPane
 
 class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
 
-    val showInfoAction = odorWorldPanel.createAction("Get info...") {
-        // TODO: Provide more information. For now size was all I needed.
-        JOptionPane.showMessageDialog(null, "World is ${world.width} by ${world.height} pixels",
-            "Odor world info", JOptionPane.INFORMATION_MESSAGE)
+    fun addAgentAction() = odorWorldPanel.createAction(
+        name = "Add agent",
+        iconPath = "odorworld/rotating/mouse/Mouse_225.gif",
+        keyboardShortcut = CmdOrCtrl + 'P'
+    ) {
+        world.addAgent()
     }
 
+    fun addEntityAction() = odorWorldPanel.createAction(
+        name = "Add entity",
+        iconPath = "odorworld/static/Swiss.gif",
+        keyboardShortcut = 'P'
+    ) {
+        world.addEntity()
+    }
+
+    fun deleteSelectedAction() = odorWorldPanel.createAction(
+        name = "Delete selected entities",
+        iconPath = "menu_icons/Eraser.png",
+        keyboardShortcuts = listOf(KeyCombination(KeyEvent.VK_DELETE), KeyCombination(KeyEvent.VK_BACK_SPACE))
+    ) {
+        odorWorldPanel.deleteSelectedEntities()
+    }
+
+    fun showWorldPrefsAction() = odorWorldPanel.createAction(
+        name = "Preferences...",
+        iconPath = "menu_icons/Prefs.png",
+        keyboardShortcut = CmdOrCtrl + ','
+    ) {
+        world.createEditorDialog().apply { title = "World Preferences" }.display()
+    }
+
+    val showPropertyDialogAction = odorWorldPanel.createAction(
+        name = "Edit..",
+        iconPath = "menu_icons/Properties.png",
+        keyboardShortcut = CmdOrCtrl + 'E'
+    ) {
+        odorWorldPanel.selectedEntities.firstOrNull()?.let {
+            EntityDialog(it.entity).apply { title = "Edit ${it.entity.name}"  }.display()
+        }
+    }
+
+    // TODO: Add images and to toolbar
     val addTileAction = odorWorldPanel.createAction("Add Tile") {
         world.addTile()
     }

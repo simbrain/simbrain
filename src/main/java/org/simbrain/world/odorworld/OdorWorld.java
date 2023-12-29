@@ -463,18 +463,16 @@ public class OdorWorld implements EditableObject, Bounded {
 
     /**
      * Returns width of world in pixels.
-     *
-     * @return width in pixels.
      */
+    @UserParameter(label = "Width", displayOnly = true)
     public double getWidth() {
         return tileMap.getMapWidth();
     }
 
     /**
      * Returns height of world in pixels.
-     *
-     * @return height of world
      */
+    @UserParameter(label = "Height", displayOnly = true)
     public double getHeight() {
         return tileMap.getMapHeight();
     }

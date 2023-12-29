@@ -15,8 +15,6 @@ import org.simbrain.workspace.gui.CouplingMenu
 import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.world.odorworld.OdorWorldPanel
 import org.simbrain.world.odorworld.OdorWorldResourceManager
-import org.simbrain.world.odorworld.actions.DeleteEntityAction
-import org.simbrain.world.odorworld.actions.ShowEntityDialogAction
 import org.simbrain.world.odorworld.effectors.Effector
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
@@ -290,8 +288,7 @@ class EntityNode(
     }
 
     fun createContextMenu(odorWorldPanel: OdorWorldPanel) = JPopupMenu().apply {
-        add(JMenuItem(ShowEntityDialogAction(entity)))
-        add(JMenuItem(DeleteEntityAction(entity)))
+        add(odorWorldPanel.odorWorldActions.showPropertyDialogAction)
         addSeparator()
         add(JMenuItem(odorWorldPanel.odorWorldActions.toggleTrailAction(entity)))
         addSeparator()

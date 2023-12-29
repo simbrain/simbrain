@@ -8,48 +8,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 /**
- * Add key bindings to network panel. Controls many keyboard shortcuts. Bindings
+ * Add key bindings to odor world. Controls many keyboard shortcuts. Bindings
  * not found here are in the action classes.
  *
  * TODO: Migrate to KeystrokeUtils.kt
  */
-public class KeyBindings {
+public class OdorWorldKeyBindings {
 
     public static void addBindings(OdorWorldPanel worldPanel) {
 
         PCanvas canvas = worldPanel.getCanvas();
         OdorWorld world = worldPanel.world;
 
-        // Add / delete
-        canvas.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("P"), "addEntity");
-        canvas.getActionMap().put("addEntity", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                world.addEntity();
-                // TODO: Reuse network panel "click stream" logic
-            }
-        });
-
-        canvas.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.SHIFT_MASK), "addAgent");
-        canvas.getActionMap().put("addAgent", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                world.addAgent();
-            }
-        });
-
-        canvas.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("BACK_SPACE"), "deleteSelection");
-        canvas.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("DELETE"), "deleteSelection");
-        canvas.getActionMap().put("deleteSelection", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                worldPanel.deleteSelectedEntities();
-            }
-        });
-        canvas.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("BACK_SPACE"), "deleteSelection");
-        canvas.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("DELETE"), "deleteSelection");
-        canvas.getActionMap().put("deleteSelection", new AbstractAction() {
-            public void actionPerformed(ActionEvent e) {
-                worldPanel.deleteSelectedEntities();
-            }
-        });
 
         canvas.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("B"), "tooltipTest");
         canvas.getActionMap().put("tooltipTest", new AbstractAction() {

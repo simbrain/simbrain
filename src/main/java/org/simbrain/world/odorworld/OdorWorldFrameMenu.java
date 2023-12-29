@@ -18,16 +18,16 @@
  */
 package org.simbrain.world.odorworld;
 
+import org.simbrain.util.SFileChooser;
 import org.simbrain.util.piccolo.TMXUtils;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.gui.SimbrainDesktop;
-import org.simbrain.world.odorworld.actions.LoadTileMapAction;
-import org.simbrain.world.odorworld.actions.ShowWorldPrefsAction;
 import org.simbrain.world.odorworld.gui.OdorWorldActions;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
 /**
  * <b>OdorWorldFrameMenu</b>.
@@ -127,7 +127,17 @@ public class OdorWorldFrameMenu extends JMenuBar {
         fileMenu.addSeparator();
 
         JMenu loadTileMapMenu = new JMenu("Load Tile Map...");
-        JMenuItem loadTileMapItem = new JMenuItem(new LoadTileMapAction(parent.getWorldPanel()));
+        JMenuItem loadTileMapItem = new JMenuItem(new AbstractAction("Load Tile Map...") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SFileChooser chooser = new SFileChooser(OdorWorldPreferences.INSTANCE.getDirectory(), "Load TMX Tilemap");
+                File theFile = chooser.showOpenDialog();
+                if (theFile != null) {
+                    world.setTileMap(TMXUtils.loadTileMap(theFile));
+                    OdorWorldPreferences.INSTANCE.setDirectory(chooser.getCurrentLocation());
+                }
+            }
+        });
         loadTileMapMenu.add(loadTileMapItem);
         loadTileMapMenu.addSeparator();
 
@@ -155,8 +165,7 @@ public class OdorWorldFrameMenu extends JMenuBar {
 
         fileMenu.add(loadTileMapMenu);
         fileMenu.addSeparator();
-        fileMenu.add(new ShowWorldPrefsAction(parent.getWorldPanel()));
-        fileMenu.add(odorWorldActions.getShowInfoAction());
+        fileMenu.add(odorWorldActions.showWorldPrefsAction());
         fileMenu.addSeparator();
         fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createRenameAction(parent));
         fileMenu.addSeparator();

@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.gui.nodes;
 
-import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.groups.AbstractNeuronCollection;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
@@ -46,7 +46,7 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
     /**
      * Reference to represented group node.
      */
-    private final NeuronGroup neuronGroup;
+    private final AbstractNeuronCollection neuronGroup;
 
     /**
      * List of custom menu items added by subclasses.
@@ -59,7 +59,7 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
      * @param networkPanel parent panel
      * @param group        the neuron group
      */
-    public NeuronGroupNode(NetworkPanel networkPanel, NeuronGroup group) {
+    public NeuronGroupNode(NetworkPanel networkPanel, AbstractNeuronCollection group) {
         super(networkPanel, group);
         this.neuronGroup = group;
         setInteractionBox(new NeuronGroupInteractionBox(networkPanel));
@@ -71,7 +71,7 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
      *
      * @return reference to the neuron group.
      */
-    public NeuronGroup getNeuronGroup() {
+    public AbstractNeuronCollection getNeuronGroup() {
         return neuronGroup;
     }
 
@@ -227,7 +227,7 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
         }
 
         @Override
-        public NeuronGroup getModel() {
+        public AbstractNeuronCollection getModel() {
             return NeuronGroupNode.this.getNeuronGroup();
         }
 
@@ -252,7 +252,7 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
     }
 
     @Override
-    public NeuronGroup getModel() {
+    public AbstractNeuronCollection getModel() {
         return neuronGroup;
     }
 

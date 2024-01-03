@@ -17,10 +17,12 @@
  */
 package org.simbrain.network.groups;
 
+import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.layouts.Layout;
+import org.simbrain.util.propertyeditor.CopyableObject;
 
 import java.util.Collection;
 import java.util.List;
@@ -152,5 +154,11 @@ public class NeuronCollection extends AbstractNeuronCollection {
      */
     public void layout(Layout layout) {
         layout.layoutNeurons(neuronList);
+    }
+
+    @NotNull
+    @Override
+    public CopyableObject copy() {
+        return new NeuronCollection(getNetwork(), getNeuronList());
     }
 }

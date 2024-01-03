@@ -8,7 +8,7 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkUtilsKt;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseGroup;
-import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.groups.AbstractNeuronCollection;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.stats.ProbabilityDistribution;
@@ -152,7 +152,7 @@ public class Hippocampus extends Simulation {
     /**
      * Add and properly initialize a synapse group.
      */
-    private SynapseGroup addSynapseGroup(NeuronGroup source, NeuronGroup target,
+    private SynapseGroup addSynapseGroup(AbstractNeuronCollection source, AbstractNeuronCollection target,
                                          String name) {
 
         // Initialize with uniform distribution from 0 to .1

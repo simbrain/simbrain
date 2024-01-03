@@ -54,7 +54,7 @@ public class AlvarezSquire extends CompetitiveGroup {
                 alvarezSquireUpdate(neuron);
                 updateWeights(neuron);
             } else {
-                neuron.setActivation(this.getLoseValue());
+                // neuron.setActivation(this.getLoseValue());
             }
         }
         decaySynapses();
@@ -77,14 +77,14 @@ public class AlvarezSquire extends CompetitiveGroup {
         double rho;
         for (Neuron n : getNeuronList()) {
             for (Synapse synapse : n.getFanIn()) {
-                if (synapse.getSource().getParentGroup() == hippo.hippocampus) {
-                    rho = .04;
-                } else if (synapse.getTarget().getParentGroup() == hippo.hippocampus) {
-                    rho = .04;
-                } else {
-                    rho = .0008;
-                }
-                synapse.decay(rho);
+                // if (synapse.getSource().getParentGroup() == hippo.hippocampus) {
+                //     rho = .04;
+                // } else if (synapse.getTarget().getParentGroup() == hippo.hippocampus) {
+                //     rho = .04;
+                // } else {
+                //     rho = .0008;
+                // }
+                // synapse.decay(rho);
             }
         }
 
@@ -99,15 +99,15 @@ public class AlvarezSquire extends CompetitiveGroup {
         double lambda;
 
         for (Synapse synapse : neuron.getFanIn()) {
-            if (synapse.getSource().getParentGroup() == hippo.hippocampus) {
-                lambda = .1;
-            } else if (synapse.getTarget().getParentGroup() == hippo.hippocampus) {
-                lambda = .1;
-            } else {
-                lambda = .002;
-            }
-            double deltaw = lambda * synapse.getTarget().getActivation() * (synapse.getSource().getActivation() - synapse.getTarget().getAverageInput());
-            synapse.setStrength(synapse.clip(synapse.getStrength() + deltaw));
+            // if (synapse.getSource().getParentGroup() == hippo.hippocampus) {
+            //     lambda = .1;
+            // } else if (synapse.getTarget().getParentGroup() == hippo.hippocampus) {
+            //     lambda = .1;
+            // } else {
+            //     lambda = .002;
+            // }
+            // double deltaw = lambda * synapse.getTarget().getActivation() * (synapse.getSource().getActivation() - synapse.getTarget().getAverageInput());
+            // synapse.setStrength(synapse.clip(synapse.getStrength() + deltaw));
 
         }
     }

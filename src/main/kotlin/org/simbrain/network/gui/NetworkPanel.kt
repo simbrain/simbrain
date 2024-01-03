@@ -275,6 +275,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             is NeuronArray -> createNode(model)
             is NeuronCollection -> createNode(model)
             is NeuronGroup -> createNode(model)
+            is AbstractNeuronCollection -> createNode(model)
             is SynapseGroup -> createNode(model)
             is Connector -> createNode(model)
             is Subnetwork -> createNode(model)
@@ -308,6 +309,17 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
         fun createNeuronGroupNode() = when (neuronGroup) {
             is SOMGroup -> SOMGroupNode(this, neuronGroup)
+            else -> NeuronGroupNode(this, neuronGroup)
+        }
+
+        val neuronNodes = neuronGroup.neuronList.map { neuron -> createNode(neuron).also { modelNodeMap[neuron] = it } }
+        // neuronGroup.applyLayout()
+        createNeuronGroupNode().apply { addNeuronNodes(neuronNodes) }
+    }
+
+    fun createNode(neuronGroup: AbstractNeuronCollection) = addScreenElement {
+
+        fun createNeuronGroupNode() = when (neuronGroup) {
             is CompetitiveGroup -> CompetitiveGroupNode(this, neuronGroup)
             else -> NeuronGroupNode(this, neuronGroup)
         }

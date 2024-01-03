@@ -20,8 +20,7 @@ package org.simbrain.network.neurongroups
 
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
-import org.simbrain.network.groups.NeuronGroup
-import org.simbrain.network.neuron_update_rules.LinearRule
+import org.simbrain.network.groups.AbstractNeuronCollection
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.GuiEditable
 
@@ -33,61 +32,16 @@ import org.simbrain.util.propertyeditor.GuiEditable
  *
  * @author Jeff Yoshimi
  */
-open class CompetitiveGroup : NeuronGroup {
+open class CompetitiveGroup @JvmOverloads constructor(network: Network, neurons: List<Neuron>, val params: CompetitiveGroupParams = CompetitiveGroupParams()) : AbstractNeuronCollection(network) {
 
-    val DEFAULT_LEARNING_RATE = .1
+    constructor(network: Network, numNeurons: Int) : this(network, List(numNeurons) { Neuron(network) })
 
-    val DEFAULT_WIN_VALUE = 1.0
+    init {
+        addNeurons(neurons)
+    }
 
-    val DEFAULT_LOSE_VALUE = 0.0
-
-    val DEFAULT_NORM_INPUTS = true
-
-    val DEFAULT_USE_LEAKY = false
-
-    val DEFAULT_LEAKY_RATE = DEFAULT_LEARNING_RATE / 4
-
-    val DEFAULT_DECAY_PERCENT = .0008
-
-    val DEFAULT_UPDATE_METHOD = UpdateMethod.RUMM_ZIPSER
-
-    @UserParameter(label = "Update method", order = 30)
-    var updateMethod = DEFAULT_UPDATE_METHOD
-
-    @UserParameter(label = "Learning rate", order = 40)
-    var learningRate = DEFAULT_LEARNING_RATE
-
-    @UserParameter(label = "Winner Value", order = 50)
-    var winValue = DEFAULT_WIN_VALUE
-
-    @UserParameter(label = "Lose Value", order = 60)
-    var loseValue = DEFAULT_LOSE_VALUE
-
-    @UserParameter(label = "Normalize inputs", order = 70)
-    var normalizeInputs = DEFAULT_NORM_INPUTS
-
-    @UserParameter(label = "Use Leaky learning", order = 80)
-    var useLeakyLearning = DEFAULT_USE_LEAKY
-
-    var leakyLearningRate by GuiEditable(
-        initValue = DEFAULT_LEAKY_RATE,
-        conditionallyEnabledBy = CompetitiveGroup::useLeakyLearning,
-        order = 90
-    )
-
-    @UserParameter(label = "Decay percent", description = "Percentage by which to decay synapses on each update for Alvarez-Squire update.", order = 100)
-    var synpaseDecayPercent = DEFAULT_DECAY_PERCENT
-
-    /**
-     * Max, value and activation values.
-     */
     private var max = 0.0
-    private var `val` = 0.0
     private var activation = 0.0
-
-    /**
-     * Winner value.
-     */
     private var winner = 0
 
     /**
@@ -113,60 +67,27 @@ open class CompetitiveGroup : NeuronGroup {
         }
     }
 
-    /**
-     * Constructs a competitive network with specified number of neurons.
-     *
-     * @param numNeurons size of this network in neurons
-     * @param root       reference to Network.
-     */
-    constructor(root: Network?, numNeurons: Int) : super(root) {
-        for (i in 0 until numNeurons) {
-            addNeuron(Neuron(root, LinearRule()))
+
+    fun deepCopy(newParent: Network): CompetitiveGroup {
+        return CompetitiveGroup(newParent, neuronList.map { it.deepCopy() }, params.copy()).also {
+            it.max = max
+            it.activation = activation
         }
-        label = "Competitive Group"
     }
 
-    /**
-     * Copy constructor.
-     *
-     * @param newRoot new root network
-     * @param oldNet  old network.
-     */
-    constructor(newRoot: Network?, oldNet: CompetitiveGroup) : super(newRoot, oldNet) {
-        learningRate = oldNet.learningRate
-        winValue = oldNet.winValue
-        loseValue = oldNet.loseValue
-        normalizeInputs = oldNet.normalizeInputs
-        useLeakyLearning = oldNet.useLeakyLearning
-        leakyLearningRate = oldNet.leakyLearningRate
-        synpaseDecayPercent = oldNet.synpaseDecayPercent
-        max = oldNet.max
-        `val` = oldNet.`val`
-        activation = oldNet.activation
-        winner = oldNet.winner
-        updateMethod = oldNet.updateMethod
-        label = "Competitive Group (copy)"
-    }
-
-    override fun deepCopy(newParent: Network): CompetitiveGroup {
-        return CompetitiveGroup(newParent, this)
-    }
-
-    override fun getTypeDescription(): String {
-        return "Competitive Group"
-    }
+    override fun copy() = deepCopy(network)
 
     override fun update() {
-        super.update()
-        max = 0.0
+
+        neuronList.forEach { it.updateInputs() }
+        neuronList.forEach { it.update() }
+
+        max = Double.MIN_VALUE
         winner = 0
 
         // Determine Winner
         for (i in getNeuronList().indices) {
             val n = getNeuronList()[i]
-            if (!n.isClamped) {
-                n.update()
-            }
             if (n.activation > max) {
                 max = n.activation
                 winner = i
@@ -177,18 +98,18 @@ open class CompetitiveGroup : NeuronGroup {
         for (i in getNeuronList().indices) {
             val neuron = getNeuronList()[i]
             if (i == winner) {
-                neuron.activation = winValue
+                neuron.activation = params.winValue
                 neuron.isSpike = neuron.isSpike
-                if (updateMethod === UpdateMethod.RUMM_ZIPSER) {
+                if (params.updateMethod === UpdateMethod.RUMM_ZIPSER) {
                     rummelhartZipser(neuron)
-                } else if (updateMethod === UpdateMethod.ALVAREZ_SQUIRE) {
+                } else if (params.updateMethod === UpdateMethod.ALVAREZ_SQUIRE) {
                     squireAlvarezWeightUpdate(neuron)
                     decayAllSynapses()
                 }
             } else {
-                neuron.activation = loseValue
+                neuron.activation = params.loseValue
                 neuron.isSpike = neuron.isSpike
-                if (useLeakyLearning) {
+                if (params.useLeakyLearning) {
                     leakyLearning(neuron)
                 }
             }
@@ -207,7 +128,7 @@ open class CompetitiveGroup : NeuronGroup {
     private fun squireAlvarezWeightUpdate(neuron: Neuron) {
         for (synapse in neuron.fanIn) {
             val deltaw =
-                learningRate * synapse.target.activation * (synapse.source.activation - synapse.target.averageInput)
+                params.learningRate * synapse.target.activation * (synapse.source.activation - synapse.target.averageInput)
             synapse.strength = synapse.clip(synapse.strength + deltaw)
         }
     }
@@ -224,12 +145,12 @@ open class CompetitiveGroup : NeuronGroup {
             activation = synapse.source.activation
 
             // Normalize the input values
-            if (normalizeInputs) {
+            if (params.normalizeInputs) {
                 if (sumOfInputs != 0.0) {
                     activation = activation / sumOfInputs
                 }
             }
-            val deltaw = learningRate * (activation - synapse.strength)
+            val deltaw = params.learningRate * (activation - synapse.strength)
             synapse.strength = synapse.clip(synapse.strength + deltaw)
         }
     }
@@ -240,7 +161,7 @@ open class CompetitiveGroup : NeuronGroup {
     private fun decayAllSynapses() {
         for (n in getNeuronList()) {
             for (synapse in n.fanIn) {
-                synapse.decay(synpaseDecayPercent)
+                synapse.decay(params.synpaseDecayPercent)
             }
         }
     }
@@ -254,12 +175,12 @@ open class CompetitiveGroup : NeuronGroup {
         val sumOfInputs = neuron.totalInput
         for (incoming in neuron.fanIn) {
             activation = incoming.source.activation
-            if (normalizeInputs) {
+            if (params.normalizeInputs) {
                 if (sumOfInputs != 0.0) {
                     activation = activation / sumOfInputs
                 }
             }
-            incoming.strength = incoming.strength + leakyLearningRate * (activation - incoming.strength)
+            incoming.strength = incoming.strength + params.leakyLearningRate * (activation - incoming.strength)
         }
     }
 
@@ -333,10 +254,73 @@ open class CompetitiveGroup : NeuronGroup {
      */
     fun setUpdateMethod(updateMethod: String) {
         if (updateMethod.equals("RZ", ignoreCase = true)) {
-            this.updateMethod = UpdateMethod.RUMM_ZIPSER
+            params.updateMethod = UpdateMethod.RUMM_ZIPSER
         } else if (updateMethod.equals("AS", ignoreCase = true)) {
-            this.updateMethod = UpdateMethod.ALVAREZ_SQUIRE
+            params.updateMethod = UpdateMethod.ALVAREZ_SQUIRE
         }
     }
 
+}
+
+class CompetitiveGroupParams : NeuronGroupParams() {
+    val DEFAULT_LEARNING_RATE = .1
+
+    val DEFAULT_WIN_VALUE = 1.0
+
+    val DEFAULT_LOSE_VALUE = 0.0
+
+    val DEFAULT_NORM_INPUTS = true
+
+    val DEFAULT_USE_LEAKY = false
+
+    val DEFAULT_LEAKY_RATE = DEFAULT_LEARNING_RATE / 4
+
+    val DEFAULT_DECAY_PERCENT = .0008
+
+    val DEFAULT_UPDATE_METHOD = CompetitiveGroup.UpdateMethod.RUMM_ZIPSER
+
+    @UserParameter(label = "Update method", order = 30)
+    var updateMethod = DEFAULT_UPDATE_METHOD
+
+    @UserParameter(label = "Learning rate", order = 40)
+    var learningRate = DEFAULT_LEARNING_RATE
+
+    @UserParameter(label = "Winner Value", order = 50)
+    var winValue = DEFAULT_WIN_VALUE
+
+    @UserParameter(label = "Lose Value", order = 60)
+    var loseValue = DEFAULT_LOSE_VALUE
+
+    @UserParameter(label = "Normalize inputs", order = 70)
+    var normalizeInputs = DEFAULT_NORM_INPUTS
+
+    @UserParameter(label = "Use Leaky learning", order = 80)
+    var useLeakyLearning = DEFAULT_USE_LEAKY
+
+    var leakyLearningRate by GuiEditable(
+        initValue = DEFAULT_LEAKY_RATE,
+        conditionallyEnabledBy = CompetitiveGroupParams::useLeakyLearning,
+        order = 90
+    )
+
+    @UserParameter(label = "Decay percent", description = "Percentage by which to decay synapses on each update for Alvarez-Squire update.", order = 100)
+    var synpaseDecayPercent = DEFAULT_DECAY_PERCENT
+
+    override fun create(net: Network): CompetitiveGroup {
+        return CompetitiveGroup(net, List(numNeurons) { Neuron(net) }, this)
+    }
+
+    override fun copy(): CompetitiveGroupParams {
+        return CompetitiveGroupParams().also {
+            it.numNeurons = numNeurons
+            it.updateMethod = updateMethod
+            it.learningRate = learningRate
+            it.winValue = winValue
+            it.loseValue = loseValue
+            it.normalizeInputs = normalizeInputs
+            it.useLeakyLearning = useLeakyLearning
+            it.leakyLearningRate = leakyLearningRate
+            it.synpaseDecayPercent = synpaseDecayPercent
+        }
+    }
 }

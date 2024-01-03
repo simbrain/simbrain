@@ -1,8 +1,11 @@
 package org.simbrain.network.neurongroups
 
 import org.simbrain.network.core.Network
+import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.activations
-import org.simbrain.network.groups.NeuronGroup
+import org.simbrain.network.groups.AbstractNeuronCollection
+import org.simbrain.util.propertyeditor.CopyableObject
+import kotlin.math.exp
 
 /**
  * Softmax. From wiki: "after applying softmax, each component will be in the interval (0,1),
@@ -11,26 +14,35 @@ import org.simbrain.network.groups.NeuronGroup
  * This applies the activation rules of the underlying nodes before normalizing so be sure to check that it is
  * appropriate, e.g. that any min and max value is appropriate.
  */
-class SoftmaxGroup(net: Network, val numNeurons: Int): NeuronGroup(net, numNeurons) {
+class SoftmaxGroup(net: Network, neurons: List<Neuron>): AbstractNeuronCollection(net), CopyableObject {
+
+    constructor(net: Network, numNeurons: Int): this(net, List(numNeurons) { Neuron(net) })
 
     init {
         label = "Softmax"
+        addNeurons(neurons)
     }
 
     override fun update() {
-        super.update()
-        val exponentials = neuronList
-            .activations.map{a -> Math.exp(a)}
+        neuronList.forEach { it.updateInputs() }
+        neuronList.forEach { it.update() }
+        val exponentials = neuronList.activations.map { exp(it) }
         val total = exponentials.sum()
         neuronList.forEachIndexed { i, n -> n.activation = exponentials[i]/total }
     }
 
-    override fun deepCopy(newParent: Network): NeuronGroup {
-        return SoftmaxGroup(newParent, this.numNeurons)
+    override fun copy(): AbstractNeuronCollection {
+        return SoftmaxGroup(network, neuronList.map { it.deepCopy() })
+    }
+}
+
+class SoftmaxGroupParams: NeuronGroupParams() {
+
+    override fun create(net: Network): SoftmaxGroup {
+        return SoftmaxGroup(net, List(numNeurons) { Neuron(net) })
     }
 
-    override fun getTypeDescription(): String? {
-        return "Softmax"
+    override fun copy(): CopyableObject {
+        return SoftmaxGroupParams().also { it.numNeurons = numNeurons }
     }
-
 }

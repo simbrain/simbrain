@@ -4,6 +4,9 @@ import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.LocatableModelKt;
 import org.simbrain.network.core.*;
 import org.simbrain.network.events.NeuronCollectionEvents;
+import org.simbrain.network.layouts.GridLayout;
+import org.simbrain.network.layouts.Layout;
+import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.util.ActivationInputManager;
 import org.simbrain.network.util.ActivationRecorder;
 import org.simbrain.network.util.SubsamplingManager;
@@ -99,6 +102,28 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
 
     @UserParameter(label = "Increment amount", increment = .1, order = 90)
     private double increment = .1;
+
+    /**
+     * Space between neurons within a layer.
+     */
+    private int betweenNeuronInterval = 50;
+
+    /**
+     * In method setLayoutBasedOnSize, this is used as the threshold number of neurons in the group, above which to use
+     * grid layout instead of line layout.
+     */
+    private int gridThreshold = 9;
+
+    /**
+     * Default layout for neuron groups.
+     */
+    public static final Layout DEFAULT_LAYOUT = new GridLayout();
+
+    /**
+     * The layout for the neurons in this group.
+     */
+    @UserParameter(label = "Layout", tab = "Layout", order = 150)
+    private Layout layout = DEFAULT_LAYOUT;
 
     /**
      * Default constructor.
@@ -702,11 +727,6 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
     }
 
     @Override
-    public AbstractNeuronCollection copy() {
-        return null;
-    }
-
-    @Override
     public String getName() {
         return null; //TODO
     }
@@ -807,4 +827,93 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
         neuronList.forEach(Neuron::toggleClamping);
     }
 
+    /**
+     * If more than gridThreshold neurons use a grid layout, else a horizontal line layout.
+     */
+    public void setLayoutBasedOnSize() {
+        setLayoutBasedOnSize(new Point2D.Double(0, 0));
+    }
+
+    /**
+     * If more than gridThreshold neurons use a grid layout, else a horizontal line layout.
+     *
+     * @param initialPosition the initial Position for the layout
+     */
+    public void setLayoutBasedOnSize(Point2D initialPosition) {
+        if (initialPosition == null) {
+            initialPosition = new Point2D.Double(0, 0);
+        }
+        LineLayout lineLayout = new LineLayout(betweenNeuronInterval, LineLayout.LineOrientation.HORIZONTAL);
+        GridLayout gridLayout = new GridLayout(betweenNeuronInterval, betweenNeuronInterval);
+        if (getNeuronList().size() < gridThreshold) {
+            lineLayout.setInitialLocation(initialPosition);
+            setLayout(lineLayout);
+        } else {
+            gridLayout.setInitialLocation(initialPosition);
+            setLayout(gridLayout);
+        }
+        // Used rather than apply layout to make sure initial position is used.
+        getLayout().layoutNeurons(getNeuronList());
+    }
+
+    public Point2D.Double getTopLeftLocation() {
+        return LocatableModelKt.getTopLeftLocation(neuronList);
+    }
+
+    /**
+     * Apply this group's layout to its neurons.
+     */
+    public void applyLayout() {
+        layout.setInitialLocation(getTopLeftLocation());
+        layout.layoutNeurons(getNeuronList());
+    }
+
+    /**
+     * Apply this group's layout to its neurons based on a specified top-left initial position.
+     *
+     * @param initialPosition the position from which to begin the layout.
+     */
+    public void applyLayout(Point2D initialPosition) {
+        layout.setInitialLocation(initialPosition);
+        layout.layoutNeurons(getNeuronList());
+    }
+
+    /**
+     * Forwards to {@link #applyLayout(Point2D)}
+     */
+    public void applyLayout(int x, int y) {
+        applyLayout(new Point2D.Double(x,y));
+    }
+
+    /**
+     * Sets a new layout and applies it, using the groups' current location.
+     */
+    public void applyLayout(Layout newLayout) {
+        layout = newLayout;
+        applyLayout(getLocation());
+    }
+
+    public int getBetweenNeuronInterval() {
+        return betweenNeuronInterval;
+    }
+
+    public void setBetweenNeuronInterval(int betweenNeuronInterval) {
+        this.betweenNeuronInterval = betweenNeuronInterval;
+    }
+
+    public int getGridThreshold() {
+        return gridThreshold;
+    }
+
+    public void setGridThreshold(int gridThreshold) {
+        this.gridThreshold = gridThreshold;
+    }
+
+    public Layout getLayout() {
+        return layout;
+    }
+
+    public void setLayout(Layout layout) {
+        this.layout = layout;
+    }
 }

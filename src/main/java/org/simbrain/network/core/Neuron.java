@@ -22,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.core.Network.TimeType;
 import org.simbrain.network.events.NeuronEvents;
-import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
 import org.simbrain.network.updaterules.interfaces.ClippedUpdateRule;
@@ -166,12 +165,6 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * Memory of last activation.
      */
     private double lastActivation;
-
-    /**
-     * Parent {@link NeuronGroup}, if any (null if none).  Does not apply to {@link org.simbrain.network.groups.NeuronCollection},
-     * which is not a subclass of group.
-     */
-    private NeuronGroup parentGroup;
 
     /**
      * Sequence in which the update function should be called for this neuron.
@@ -782,15 +775,6 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         return neuronList.stream().map(Neuron::getUpdateRule).collect(Collectors.toList());
     }
 
-    // Search for old commented out uses
-    public NeuronGroup getParentGroup() {
-        return parentGroup;
-    }
-
-    public void setParentGroup(NeuronGroup parentGroup) {
-        this.parentGroup = parentGroup;
-    }
-
     /**
      * Convenience method to set upper bound on the neuron's update rule, if it
      * is a bounded update rule.
@@ -847,13 +831,6 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
         } else {
             return updateRule.getGraphicalLowerBound();
         }
-    }
-
-    /**
-     * Used by reflection by {@link #updateRule} to determine if the update rule should be editable or not.
-     */
-    public boolean notInNeuronGroup() {
-        return !(this.getParentGroup() instanceof NeuronGroup);
     }
 
     public double getIncrement() {

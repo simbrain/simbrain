@@ -27,8 +27,6 @@ import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.network.neurongroups.CompetitiveGroup;
-import org.simbrain.network.neurongroups.SoftmaxGroup;
 import org.simbrain.network.subnetworks.SOMGroup;
 import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.network.util.BiasedScalarData;
@@ -107,10 +105,7 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     public NeuronGroup(final Network net, final List<Neuron> neurons) {
         this(net);
-        neurons.forEach(n -> {
-            super.addNeuron(n);
-            n.setParentGroup(this);
-        });
+        neurons.forEach(super::addNeuron);
         prototypeRule = neurons.get(0).getUpdateRule();
         setNeuronType(prototypeRule);
         dataHolder = prototypeRule.createScalarData();
@@ -147,14 +142,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
      */
     public NeuronGroup deepCopy(Network newParent) {
         return new NeuronGroup(newParent, this);
-    }
-
-    /**
-     * Add a neuron to the neuron group and designate parent group properly.
-     */
-    protected void addNeuron(Neuron neuron) {
-        super.addNeuron(neuron);
-        neuron.setParentGroup(this);
     }
 
     /**
@@ -429,12 +416,8 @@ public class NeuronGroup extends AbstractNeuronCollection {
                 ng.setLabel(label);
             } else if (groupType == GroupEnum.WTA) {
                 ng = new WinnerTakeAll(network, numNeurons);
-            } else if (groupType == GroupEnum.COMPETITIVE) {
-                ng = new CompetitiveGroup(network, numNeurons);
             } else if (groupType == GroupEnum.SOM) {
                 ng = new SOMGroup(network, numNeurons);
-            } else if (groupType == GroupEnum.SOFTMAX){
-                ng = new SoftmaxGroup(network, numNeurons);
             }
             ng.setLayout(layout);
             ng.applyLayout();

@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.dialogs.group;
 
+import org.simbrain.network.groups.AbstractNeuronCollection;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.StandardDialog;
@@ -45,7 +46,7 @@ public final class NeuronGroupDialog extends StandardDialog {
     /**
      * Neuron Group being created or edited.
      */
-    private NeuronGroup neuronGroup;
+    private AbstractNeuronCollection neuronGroup;
 
     /**
      * If true this is a creation dialog. Otherwise it is an edit dialog.
@@ -79,7 +80,7 @@ public final class NeuronGroupDialog extends StandardDialog {
      * @param np Parent network panel
      * @param ng Neuron group being edited
      */
-    public NeuronGroupDialog(final NetworkPanel np, final NeuronGroup ng) {
+    public NeuronGroupDialog(final NetworkPanel np, final AbstractNeuronCollection ng) {
         networkPanel = np;
         neuronGroup = ng;
         isCreationDialog = false;

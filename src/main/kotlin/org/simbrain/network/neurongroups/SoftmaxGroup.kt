@@ -36,13 +36,13 @@ class SoftmaxGroup(net: Network, neurons: List<Neuron>): AbstractNeuronCollectio
     }
 }
 
-class SoftmaxGroupParams: NeuronGroupParams() {
+class SoftmaxParams: NeuronGroupParams() {
 
     override fun create(net: Network): SoftmaxGroup {
         return SoftmaxGroup(net, List(numNeurons) { Neuron(net) })
     }
 
     override fun copy(): CopyableObject {
-        return SoftmaxGroupParams().also { it.numNeurons = numNeurons }
+        return SoftmaxParams().also { it.numNeurons = numNeurons }
     }
 }

@@ -27,8 +27,6 @@ import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.network.layouts.LineLayout.LineOrientation;
 import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.network.subnetworks.SOMGroup;
-import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.network.util.BiasedScalarData;
 import org.simbrain.network.util.ScalarDataHolder;
 import org.simbrain.util.UserParameter;
@@ -399,29 +397,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
          */
         public NeuronGroupCreator(String proposedLabel) {
             this.label = proposedLabel;
-        }
-
-        /**
-         * Add a neuron array to network created from field values which should be setup by an Annotated Property
-         * Editor.
-         *
-         * @param network the network this neuron array adds to
-         * @return the created neuron array
-         */
-        public NeuronGroup create(Network network) {
-            NeuronGroup ng = null;
-            if (groupType == GroupEnum.DEFAULT) {
-                ng = new NeuronGroup(network, numNeurons);
-                // ng.setPrototypeRule(prototype);
-                ng.setLabel(label);
-            } else if (groupType == GroupEnum.WTA) {
-                ng = new WinnerTakeAll(network, numNeurons);
-            } else if (groupType == GroupEnum.SOM) {
-                ng = new SOMGroup(network, numNeurons);
-            }
-            ng.setLayout(layout);
-            ng.applyLayout();
-            return ng;
         }
 
         @Override

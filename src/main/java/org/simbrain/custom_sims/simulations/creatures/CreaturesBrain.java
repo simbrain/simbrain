@@ -4,10 +4,11 @@ import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SynapseGroup;
+import org.simbrain.network.groups.AbstractNeuronCollection;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.LineLayout;
-import org.simbrain.network.subnetworks.WinnerTakeAll;
+import org.simbrain.network.neurongroups.WinnerTakeAll;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.couplings.Coupling;
@@ -29,7 +30,7 @@ public class CreaturesBrain {
     /**
      * List of lobes.
      */
-    private List<NeuronGroup> lobes = new ArrayList();
+    private List<AbstractNeuronCollection> lobes = new ArrayList();
 
     /**
      * Reference to the NetworkComponent object this wraps around.
@@ -73,7 +74,7 @@ public class CreaturesBrain {
     public WinnerTakeAll createWTALobe(double x, double y, int numNeurons, String layoutName, String lobeName) {
         WinnerTakeAll lobe = new WinnerTakeAll(getNetwork(), numNeurons);
         lobe.setLabel(lobeName);
-        lobe.setNeuronType(new CreaturesNeuronRule());
+        // lobe.setNeuronType(new CreaturesNeuronRule());
         // TODO: Either make the below method public, or copy & paste it to this
         // class,
         // or call this method in the builder's addWTAGroup method
@@ -305,10 +306,6 @@ public class CreaturesBrain {
         return nc.getNetwork();
     }
 
-    public List<NeuronGroup> getLobeList() {
-        return lobes;
-    }
-
     /**
      * Returns the label of a neuron of a given lobe.
      *
@@ -318,23 +315,6 @@ public class CreaturesBrain {
      */
     public String getNeuronLabel(NeuronGroup lobe, int neuronIndex) {
         return lobe.getNeuronList().get(neuronIndex).getLabel();
-    }
-
-    /**
-     * Returns a lobe with a given label.
-     *
-     * @param label
-     * @return
-     */
-    // Was not here before last pull
-    public NeuronGroup getLobeByLabel(String label) {
-        for (NeuronGroup lobe : lobes) {
-            if (lobe.getLabel().equalsIgnoreCase(label)) {
-                return lobe;
-            }
-        }
-
-        return null;
     }
 
     private static void layoutNeuronGroup(NeuronGroup ng, String layoutName) {

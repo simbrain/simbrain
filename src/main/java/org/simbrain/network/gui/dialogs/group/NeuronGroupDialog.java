@@ -135,8 +135,7 @@ public final class NeuronGroupDialog extends StandardDialog {
         mainPanel.commitChanges();
 
         if (isCreationDialog) {
-            neuronGroup = ngCreator.create(networkPanel.getNetwork());
-            networkPanel.getNetwork().addNetworkModelAsync(neuronGroup);
+            // This class slated for deletion
         } else {
             neuronGroup.applyLayout();
         }

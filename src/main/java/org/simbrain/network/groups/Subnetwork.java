@@ -53,9 +53,6 @@ public abstract class Subnetwork extends LocatableModel implements EditableObjec
      */
     protected transient LocationEvents events = new LocationEvents();
 
-    /**
-     * List of neuron groups.
-     */
     private final NetworkModelList modelList = new NetworkModelList();
 
     /**

@@ -7,7 +7,6 @@ import org.simbrain.network.groups.AbstractNeuronCollection
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.gui.ConditionallyEnabledAction.EnablingCondition
 import org.simbrain.network.gui.dialogs.*
-import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog
 import org.simbrain.network.gui.dialogs.layout.LayoutDialog
 import org.simbrain.network.gui.dialogs.network.*
 import org.simbrain.network.gui.dialogs.neuron.AddNeuronsDialog.createAddNeuronsDialog
@@ -15,7 +14,7 @@ import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.neurongroups.NeuronGroupParams
-import org.simbrain.network.neurongroups.SoftmaxGroupParams
+import org.simbrain.network.neurongroups.SoftmaxParams
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.propertyeditor.objectWrapper
@@ -474,11 +473,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         selectionManager.connectNeuronGroups()
     }
 
-    val neuronGroupAction = addGroupAction("Add Neuron Group...") {
-        NeuronGroupDialog(it)
-    }
-
-    val addGroupAction = addGroupAction()
+    val addGroupAction = addNeuronGroupAction()
 
     val clipboardActions
         get() = listOf(copyAction, cutAction, pasteAction)
@@ -506,9 +501,9 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         )?.displayInDialog()
     }
 
-    private fun addGroupAction(name: String, createDialog: (NetworkPanel) -> StandardDialog) = networkPanel.createAction(
+    private fun addSubnetAction(name: String, createDialog: (NetworkPanel) -> StandardDialog) = networkPanel.createAction(
         name = name,
-        description = "Add $name group to network",
+        description = "Add $name to network",
     ) {
         with(createDialog(networkPanel)) {
             pack()
@@ -521,11 +516,11 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         }
     }
 
-    private fun addGroupAction() = networkPanel.createAction(
+    private fun addNeuronGroupAction() = networkPanel.createAction(
         name = "Add Neuron Group...",
         description = "Add a neuron group to network",
     ) {
-        objectWrapper("Neuron Group Parameters", SoftmaxGroupParams() as NeuronGroupParams).createEditorDialog {
+        objectWrapper("Neuron Group Parameters", SoftmaxParams() as NeuronGroupParams).createEditorDialog {
             it.editingObject.create(network).also { group ->
                 group.label = network.idManager.getProposedId(group::class.java)
                 group.applyLayout()
@@ -536,13 +531,13 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 
     val newNetworkActions
         get() = listOf(
-            addGroupAction("Backprop") { BackpropCreationDialog(networkPanel) },
-            addGroupAction("Competitive Network") { CompetitiveCreationDialog(networkPanel) },
-            addGroupAction("Feed Forward Network") { FeedForwardCreationDialog(networkPanel) },
-            addGroupAction("Hopfield") { HopfieldCreationDialog(networkPanel) },
-            addGroupAction("LMS (Least Mean Squares)") { networkPanel.showLMSCreationDialog() },
-            addGroupAction("SOM Network") { SOMCreationDialog(networkPanel) },
-            addGroupAction("SRN (Simple Recurrent Network)") { networkPanel.showSRNCreationDialog() }
+            addSubnetAction("Backprop") { BackpropCreationDialog(networkPanel) },
+            addSubnetAction("Competitive Network") { CompetitiveCreationDialog(networkPanel) },
+            addSubnetAction("Feed Forward Network") { FeedForwardCreationDialog(networkPanel) },
+            addSubnetAction("Hopfield") { HopfieldCreationDialog(networkPanel) },
+            addSubnetAction("LMS (Least Mean Squares)") { networkPanel.showLMSCreationDialog() },
+            addSubnetAction("SOM Network") { SOMCreationDialog(networkPanel) },
+            addSubnetAction("SRN (Simple Recurrent Network)") { networkPanel.showSRNCreationDialog() }
         )
 
     fun applyConnectionAction(strategy: ConnectionStrategy): AbstractAction {

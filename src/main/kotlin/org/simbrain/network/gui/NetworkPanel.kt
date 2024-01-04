@@ -17,7 +17,6 @@ import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.dialogs.group.ConnectorDialog
 import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.gui.nodes.neuronGroupNodes.CompetitiveGroupNode
-import org.simbrain.network.gui.nodes.neuronGroupNodes.SOMGroupNode
 import org.simbrain.network.gui.nodes.subnetworkNodes.*
 import org.simbrain.network.kotlindl.DeepNet
 import org.simbrain.network.matrix.NeuronArray
@@ -304,18 +303,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         val target = modelNodeMap[synapse.target] as? NeuronNode ?: throw IllegalStateException("Neuron node does not exist")
         SynapseNode(this, source, target, synapse)
     }.also { it.lowerToBottom() }
-
-    fun createNode(neuronGroup: NeuronGroup) = addScreenElement {
-
-        fun createNeuronGroupNode() = when (neuronGroup) {
-            is SOMGroup -> SOMGroupNode(this, neuronGroup)
-            else -> NeuronGroupNode(this, neuronGroup)
-        }
-
-        val neuronNodes = neuronGroup.neuronList.map { neuron -> createNode(neuron).also { modelNodeMap[neuron] = it } }
-        // neuronGroup.applyLayout()
-        createNeuronGroupNode().apply { addNeuronNodes(neuronNodes) }
-    }
 
     fun createNode(neuronGroup: AbstractNeuronCollection) = addScreenElement {
 

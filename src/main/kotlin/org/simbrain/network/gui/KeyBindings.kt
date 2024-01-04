@@ -28,7 +28,7 @@ fun NetworkPanel.addKeyBindings() {
     bind(CmdOrCtrl + 'E') {
         selectionManager.selection.firstNotNullOfOrNull { it.propertyDialog }?.display()
     }
-    bindTo("G", networkActions.neuronGroupAction)
+    bindTo("G", networkActions.addGroupAction)
     bindTo("I", networkActions.wandEditModeAction)
     bind("K") { selectionManager.set(filterScreenElements<NeuronNode>()); clearSelectedObjects() }
     bind("K") { selectionManager.set(filterScreenElements<NeuronNode>()); clearSelectedObjects() }

@@ -8,7 +8,6 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.layouts.LineLayout;
-import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.updater.UpdateActionKt;
@@ -22,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.simbrain.network.core.NetworkUtilsKt.*;
+import static org.simbrain.network.neurongroups.WinnerTakeAllKt.getWinner;
 
 
 /**
@@ -258,11 +258,11 @@ public class OperantWithEnvironment extends Simulation {
         }
 
         double totalActivation = stimulusNet.getNeuronList().stream().mapToDouble(Neuron::getActivation).sum();
-        Neuron winner = WinnerTakeAll.getWinner(behaviorNet.getNeuronList(), true);
+        Neuron winner = getWinner(behaviorNet.getNeuronList(), true);
 
         // If there are inputs, update weights
         if(totalActivation > .1) {
-            Neuron src = WinnerTakeAll.getWinner(stimulusNet.getNeuronList(), true);
+            Neuron src = getWinner(stimulusNet.getNeuronList(), true);
             Synapse s_r = getSynapse(src,winner);
             // Strengthen or weaken active S-R Pair
             s_r.setStrength(s_r.getStrength() + valence);

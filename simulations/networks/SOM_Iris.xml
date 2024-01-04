@@ -12,7 +12,7 @@
         <java.util.concurrent.CopyOnWriteArrayList>
           <default/>
           <int>2</int>
-          <org.simbrain.network.subnetworks.SOMGroup>
+          <org.simbrain.network.neurongroups.SOMGroup>
             <parentNetwork reference="../../../../../.."/>
             <label>SOM</label>
             <stateInfo>Learning rate (0.00) N-size (0.00)</stateInfo>
@@ -50,7 +50,7 @@
                 <z>0.0</z>
                 <clamped>false</clamped>
                 <targetValue>0.0</targetValue>
-                <parentGroup class="org.simbrain.network.subnetworks.SOMGroup" reference="../../.."/>
+                <parentGroup class="org.simbrain.network.neurongroups.SOMGroup" reference="../../.."/>
                 <updatePriority>0</updatePriority>
                 <auxValue>0.0</auxValue>
               </org.simbrain.network.core.Neuron>
@@ -85,7 +85,7 @@
                 <z>0.0</z>
                 <clamped>false</clamped>
                 <targetValue>0.0</targetValue>
-                <parentGroup class="org.simbrain.network.subnetworks.SOMGroup" reference="../../.."/>
+                <parentGroup class="org.simbrain.network.neurongroups.SOMGroup" reference="../../.."/>
                 <updatePriority>0</updatePriority>
                 <auxValue>0.0</auxValue>
               </org.simbrain.network.core.Neuron>
@@ -120,7 +120,7 @@
                 <z>0.0</z>
                 <clamped>false</clamped>
                 <targetValue>0.0</targetValue>
-                <parentGroup class="org.simbrain.network.subnetworks.SOMGroup" reference="../../.."/>
+                <parentGroup class="org.simbrain.network.neurongroups.SOMGroup" reference="../../.."/>
                 <updatePriority>0</updatePriority>
                 <auxValue>0.0</auxValue>
               </org.simbrain.network.core.Neuron>
@@ -1392,7 +1392,7 @@
                 </exSynapseSet>
                 <inSynapseSet/>
                 <sourceNeuronGroup reference="../exSynapseSet/org.simbrain.network.core.Synapse/source/parentGroup"/>
-                <targetNeuronGroup class="org.simbrain.network.subnetworks.SOMGroup" reference="../../.."/>
+                <targetNeuronGroup class="org.simbrain.network.neurongroups.SOMGroup" reference="../../.."/>
                 <connectionManager class="org.simbrain.network.connections.AllToAll">
                   <selfConnectionAllowed>true</selfConnectionAllowed>
                 </connectionManager>
@@ -1466,21 +1466,21 @@
             <batchSize>100</batchSize>
             <alphaDecayRate>0.002</alphaDecayRate>
             <neighborhoodDecayAmount>0.05</neighborhoodDecayAmount>
-          </org.simbrain.network.subnetworks.SOMGroup>
-          <org.simbrain.network.groups.NeuronGroup reference="../org.simbrain.network.subnetworks.SOMGroup/incomingSgs/org.simbrain.network.groups.SynapseGroup/exSynapseSet/org.simbrain.network.core.Synapse/source/parentGroup"/>
+          </org.simbrain.network.neurongroups.SOMGroup>
+          <org.simbrain.network.groups.NeuronGroup reference="../org.simbrain.network.neurongroups.SOMGroup/incomingSgs/org.simbrain.network.groups.SynapseGroup/exSynapseSet/org.simbrain.network.core.Synapse/source/parentGroup"/>
         </java.util.concurrent.CopyOnWriteArrayList>
       </neuronGroupList>
       <synapseGroupList class="java.util.concurrent.CopyOnWriteArrayList" serialization="custom">
         <java.util.concurrent.CopyOnWriteArrayList>
           <default/>
           <int>1</int>
-          <org.simbrain.network.groups.SynapseGroup reference="../../../neuronGroupList/java.util.concurrent.CopyOnWriteArrayList/org.simbrain.network.subnetworks.SOMGroup/incomingSgs/org.simbrain.network.groups.SynapseGroup"/>
+          <org.simbrain.network.groups.SynapseGroup reference="../../../neuronGroupList/java.util.concurrent.CopyOnWriteArrayList/org.simbrain.network.neurongroups.SOMGroup/incomingSgs/org.simbrain.network.groups.SynapseGroup"/>
         </java.util.concurrent.CopyOnWriteArrayList>
       </synapseGroupList>
       <displayNeuronGroups>true</displayNeuronGroups>
       <numMembers>19</numMembers>
-      <som reference="../neuronGroupList/java.util.concurrent.CopyOnWriteArrayList/org.simbrain.network.subnetworks.SOMGroup"/>
-      <inputLayer reference="../neuronGroupList/java.util.concurrent.CopyOnWriteArrayList/org.simbrain.network.subnetworks.SOMGroup/incomingSgs/org.simbrain.network.groups.SynapseGroup/exSynapseSet/org.simbrain.network.core.Synapse/source/parentGroup"/>
+      <som reference="../neuronGroupList/java.util.concurrent.CopyOnWriteArrayList/org.simbrain.network.neurongroups.SOMGroup"/>
+      <inputLayer reference="../neuronGroupList/java.util.concurrent.CopyOnWriteArrayList/org.simbrain.network.neurongroups.SOMGroup/incomingSgs/org.simbrain.network.groups.SynapseGroup/exSynapseSet/org.simbrain.network.core.Synapse/source/parentGroup"/>
       <trainingSet>
         <inputData>
           <double-array>
@@ -2442,13 +2442,13 @@
       <updatePriority>0</updatePriority>
       <auxValue>0.0</auxValue>
     </org.simbrain.network.core.Neuron>
-    <org.simbrain.network.core.Neuron reference="../../groupList/org.simbrain.network.subnetworks.SOMNetwork/neuronGroupList/java.util.concurrent.CopyOnWriteArrayList/org.simbrain.network.subnetworks.SOMGroup/neuronList/org.simbrain.network.core.Neuron"/>
-    <org.simbrain.network.core.Neuron reference="../../groupList/org.simbrain.network.subnetworks.SOMNetwork/neuronGroupList/java.util.concurrent.CopyOnWriteArrayList/org.simbrain.network.subnetworks.SOMGroup/neuronList/org.simbrain.network.core.Neuron[2]"/>
-    <org.simbrain.network.core.Neuron reference="../../groupList/org.simbrain.network.subnetworks.SOMNetwork/neuronGroupList/java.util.concurrent.CopyOnWriteArrayList/org.simbrain.network.subnetworks.SOMGroup/neuronList/org.simbrain.network.core.Neuron[3]"/>
-    <org.simbrain.network.core.Neuron reference="../../groupList/org.simbrain.network.subnetworks.SOMNetwork/neuronGroupList/java.util.concurrent.CopyOnWriteArrayList/org.simbrain.network.subnetworks.SOMGroup/incomingSgs/org.simbrain.network.groups.SynapseGroup/exSynapseSet/org.simbrain.network.core.Synapse/source/parentGroup/neuronList/java.util.concurrent.CopyOnWriteArrayList/org.simbrain.network.core.Neuron"/>
-    <org.simbrain.network.core.Neuron reference="../../groupList/org.simbrain.network.subnetworks.SOMNetwork/neuronGroupList/java.util.concurrent.CopyOnWriteArrayList/org.simbrain.network.subnetworks.SOMGroup/incomingSgs/org.simbrain.network.groups.SynapseGroup/exSynapseSet/org.simbrain.network.core.Synapse/source"/>
-    <org.simbrain.network.core.Neuron reference="../../groupList/org.simbrain.network.subnetworks.SOMNetwork/neuronGroupList/java.util.concurrent.CopyOnWriteArrayList/org.simbrain.network.subnetworks.SOMGroup/incomingSgs/org.simbrain.network.groups.SynapseGroup/exSynapseSet/org.simbrain.network.core.Synapse/source/parentGroup/neuronList/java.util.concurrent.CopyOnWriteArrayList/org.simbrain.network.core.Neuron[3]"/>
-    <org.simbrain.network.core.Neuron reference="../../groupList/org.simbrain.network.subnetworks.SOMNetwork/neuronGroupList/java.util.concurrent.CopyOnWriteArrayList/org.simbrain.network.subnetworks.SOMGroup/incomingSgs/org.simbrain.network.groups.SynapseGroup/exSynapseSet/org.simbrain.network.core.Synapse/source/parentGroup/neuronList/java.util.concurrent.CopyOnWriteArrayList/org.simbrain.network.core.Neuron[4]"/>
+    <org.simbrain.network.core.Neuron reference="../../groupList/org.simbrain.network.subnetworks.SOMNetwork/neuronGroupList/java.util.concurrent.CopyOnWriteArrayList/org.simbrain.network.neurongroups.SOMGroup/neuronList/org.simbrain.network.core.Neuron"/>
+    <org.simbrain.network.core.Neuron reference="../../groupList/org.simbrain.network.subnetworks.SOMNetwork/neuronGroupList/java.util.concurrent.CopyOnWriteArrayList/org.simbrain.network.neurongroups.SOMGroup/neuronList/org.simbrain.network.core.Neuron[2]"/>
+    <org.simbrain.network.core.Neuron reference="../../groupList/org.simbrain.network.subnetworks.SOMNetwork/neuronGroupList/java.util.concurrent.CopyOnWriteArrayList/org.simbrain.network.neurongroups.SOMGroup/neuronList/org.simbrain.network.core.Neuron[3]"/>
+    <org.simbrain.network.core.Neuron reference="../../groupList/org.simbrain.network.subnetworks.SOMNetwork/neuronGroupList/java.util.concurrent.CopyOnWriteArrayList/org.simbrain.network.neurongroups.SOMGroup/incomingSgs/org.simbrain.network.groups.SynapseGroup/exSynapseSet/org.simbrain.network.core.Synapse/source/parentGroup/neuronList/java.util.concurrent.CopyOnWriteArrayList/org.simbrain.network.core.Neuron"/>
+    <org.simbrain.network.core.Neuron reference="../../groupList/org.simbrain.network.subnetworks.SOMNetwork/neuronGroupList/java.util.concurrent.CopyOnWriteArrayList/org.simbrain.network.neurongroups.SOMGroup/incomingSgs/org.simbrain.network.groups.SynapseGroup/exSynapseSet/org.simbrain.network.core.Synapse/source"/>
+    <org.simbrain.network.core.Neuron reference="../../groupList/org.simbrain.network.subnetworks.SOMNetwork/neuronGroupList/java.util.concurrent.CopyOnWriteArrayList/org.simbrain.network.neurongroups.SOMGroup/incomingSgs/org.simbrain.network.groups.SynapseGroup/exSynapseSet/org.simbrain.network.core.Synapse/source/parentGroup/neuronList/java.util.concurrent.CopyOnWriteArrayList/org.simbrain.network.core.Neuron[3]"/>
+    <org.simbrain.network.core.Neuron reference="../../groupList/org.simbrain.network.subnetworks.SOMNetwork/neuronGroupList/java.util.concurrent.CopyOnWriteArrayList/org.simbrain.network.neurongroups.SOMGroup/incomingSgs/org.simbrain.network.groups.SynapseGroup/exSynapseSet/org.simbrain.network.core.Synapse/source/parentGroup/neuronList/java.util.concurrent.CopyOnWriteArrayList/org.simbrain.network.core.Neuron[4]"/>
   </prioritySortedNeuronList>
   <priorityComparator>
     <outer-class reference="../.."/>

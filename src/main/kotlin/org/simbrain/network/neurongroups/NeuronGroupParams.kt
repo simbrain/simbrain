@@ -16,7 +16,9 @@ sealed class NeuronGroupParams: CopyableObject {
     abstract fun create(net: Network): AbstractNeuronCollection
 
     override fun getTypeList(): List<Class<out CopyableObject>> = listOf(
-        SoftmaxGroupParams::class.java,
-        CompetitiveGroupParams::class.java
+        CompetitiveGroupParams::class.java,
+        SoftmaxParams::class.java,
+        SOMParams::class.java,
+        WinnerTakeAllParams::class.java
     )
 }

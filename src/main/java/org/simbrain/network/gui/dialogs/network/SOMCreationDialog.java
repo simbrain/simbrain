@@ -21,7 +21,7 @@ package org.simbrain.network.gui.dialogs.network;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.layouts.Layout;
-import org.simbrain.network.subnetworks.SOMGroup;
+import org.simbrain.network.neurongroups.SOMGroup;
 import org.simbrain.network.subnetworks.SOMNetwork;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;

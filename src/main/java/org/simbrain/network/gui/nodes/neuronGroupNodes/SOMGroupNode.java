@@ -20,7 +20,7 @@ package org.simbrain.network.gui.nodes.neuronGroupNodes;
 
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.NeuronGroupNode;
-import org.simbrain.network.subnetworks.SOMGroup;
+import org.simbrain.network.neurongroups.SOMGroup;
 import org.simbrain.util.Utils;
 
 import javax.swing.*;
@@ -58,7 +58,7 @@ public class SOMGroupNode extends NeuronGroupNode {
 
         @Override
         public String getToolTipText() {
-            return "Current learning rate: " + Utils.round(((SOMGroup) getNeuronGroup()).getAlpha(), 2) + "  Current neighborhood size: " + Utils.round(((SOMGroup) getNeuronGroup()).getNeighborhoodSize(), 2);
+            return "Current learning rate: " + Utils.round(((SOMGroup) getNeuronGroup()).getLearningRate(), 2) + "  Current neighborhood size: " + Utils.round(((SOMGroup) getNeuronGroup()).getNeighborhoodSize(), 2);
         }
     }
 

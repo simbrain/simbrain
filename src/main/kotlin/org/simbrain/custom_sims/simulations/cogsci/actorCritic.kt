@@ -5,7 +5,7 @@ import org.simbrain.custom_sims.*
 import org.simbrain.network.core.*
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.LineLayout
-import org.simbrain.network.subnetworks.WinnerTakeAll
+import org.simbrain.network.neurongroups.WinnerTakeAll
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
 import org.simbrain.util.decayfunctions.StepDecayFunction
 import org.simbrain.util.place
@@ -106,9 +106,9 @@ val actorCritic = newSim {
     // Outputs
     val outputs = WinnerTakeAll(network, 4).apply{
         network.addNetworkModel(this)
-        isUseRandom = true
-        randomProb = epsilon
-        winValue = tileSize
+        params.isUseRandom = true
+        params.randomProb = epsilon
+        params.winValue = tileSize
         // Add a little extra spacing between neurons to accommodate labels
         layout = LineLayout(80.0, LineLayout.LineOrientation.HORIZONTAL)
         applyLayout(-5, -85)
@@ -226,7 +226,7 @@ val actorCritic = newSim {
                     gamma = tfGamma.text.toDouble()
                     alpha = tfAlpha.text.toDouble()
                     epsilon = tfEpsilon.text.toDouble()
-                    outputs.randomProb = epsilon
+                    outputs.params.randomProb = epsilon
 
                     stop = false
 

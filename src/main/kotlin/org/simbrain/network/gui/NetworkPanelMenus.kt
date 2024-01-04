@@ -56,7 +56,6 @@ val NetworkPanel.insertMenu
             add(newNeuronAction)
             add(addNeuronsAction)
             addSeparator()
-            add(neuronGroupAction)
             add(addGroupAction)
             add(addNeuronArrayAction)
             add(addDeepNetAction)

@@ -3,9 +3,10 @@ package org.simbrain.custom_sims.simulations.hippocampus;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.neurongroups.CompetitiveGroup;
-import org.simbrain.network.subnetworks.WinnerTakeAll;
 import org.simbrain.util.stats.ProbabilityDistribution;
 import org.simbrain.util.stats.distributions.UniformRealDistribution;
+
+import static org.simbrain.network.neurongroups.WinnerTakeAllKt.getWinner;
 
 /**
  * Extends competitive group with functions specific to the hippocampus
@@ -43,7 +44,7 @@ public class AlvarezSquire extends CompetitiveGroup {
         // For this simulation we can assume that if one neuron is clamped, they
         // all are
         boolean clamped = getNeuronList().get(0).isClamped();
-        Neuron winner = WinnerTakeAll.getWinner(getNeuronList(), clamped);
+        Neuron winner = getWinner(getNeuronList(), clamped);
 
         // Update weights on winning neuron
         for (int i = 0; i < getNeuronList().size(); i++) {

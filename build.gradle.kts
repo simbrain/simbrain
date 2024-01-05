@@ -325,7 +325,7 @@ if (OperatingSystem.current().isWindows) {
         doFirst {
             // Define JVM arguments
             val jvmArgs = listOf(
-                "-Duser.dir=\\\$APPDIR",
+                "-Duser.dir=\$APPDIR",
                 "--add-opens=java.base/java.util=ALL-UNNAMED",
                 "--add-opens=java.desktop/java.awt=ALL-UNNAMED",
                 "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED"

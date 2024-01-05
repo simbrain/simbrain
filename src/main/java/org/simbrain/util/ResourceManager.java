@@ -85,7 +85,7 @@ public class ResourceManager {
     /**
      * Calls to {@link ClassLoader#getResource(String)} require forward slashes, even on Windows.
      */
-    private static String assertForwardSlash(String path) {
+    public static String assertForwardSlash(String path) {
         return path.replace('\\', '/');
     }
 

@@ -896,12 +896,12 @@ object SimbrainDesktop {
      */
     init {
         frame.iconImages = Arrays.asList(
-            ResourceManager.getImage("simbrain_iconset" + Utils.FS + "icon_20x20.png"),
-            ResourceManager.getImage("simbrain_iconset" + Utils.FS + "icon_32x32.png"),
-            ResourceManager.getImage("simbrain_iconset" + Utils.FS + "icon_40x40.png"),
-            ResourceManager.getImage("simbrain_iconset" + Utils.FS + "icon_64x64.png"),
-            ResourceManager.getImage("simbrain_iconset" + Utils.FS + "icon_128x128.png"),
-            ResourceManager.getImage("simbrain_iconset" + Utils.FS + "icon_512x512.png")
+            ResourceManager.getImage("simbrain_iconset/icon_20x20.png"),
+            ResourceManager.getImage("simbrain_iconset/icon_32x32.png"),
+            ResourceManager.getImage("simbrain_iconset/icon_40x40.png"),
+            ResourceManager.getImage("simbrain_iconset/icon_64x64.png"),
+            ResourceManager.getImage("simbrain_iconset/icon_128x128.png"),
+            ResourceManager.getImage("simbrain_iconset/icon_512x512.png")
         )
         createAndAttachMenus()
         wsToolBar = createToolBar()
@@ -985,7 +985,7 @@ object SimbrainDesktop {
 
         // Set the "dock" image.
         if (Taskbar.isTaskbarSupported() && Taskbar.getTaskbar().isSupported(Taskbar.Feature.ICON_IMAGE)) {
-            Taskbar.getTaskbar().iconImage = ResourceManager.getImage("simbrain_iconset" + Utils.FS + "icon_128x128.png")
+            Taskbar.getTaskbar().iconImage = ResourceManager.getImage("simbrain_iconset/icon_128x128.png")
         }
 
         // Start terminal

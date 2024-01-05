@@ -27,6 +27,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 
+import static org.simbrain.util.ResourceManager.assertForwardSlash;
+
 /**
  * <b>OdorWorldResourceManager</b> provides resources used by odor world.
  */
@@ -68,7 +70,7 @@ public class OdorWorldResourceManager {
          * does not seem to allow immediate retrieval of the image size
          * so this method is needed to correctly set the bound for the PNodes.
          */
-        URL url = ClassLoader.getSystemClassLoader().getResource("odorworld" + File.separator + name);
+        URL url = ClassLoader.getSystemClassLoader().getResource(assertForwardSlash("odorworld" + File.separator + name));
         BufferedImage image = null;
         try {
             // source: https://stackoverflow.com/a/44170254
@@ -83,8 +85,9 @@ public class OdorWorldResourceManager {
         return image;
     }
 
-    public static URL getFileURL(final String path) {
-        return ClassLoader.getSystemClassLoader().getResource("odorworld" + Utils.FS + path);
+    public static URL getFileURL(String path) {
+        path = assertForwardSlash("odorworld/" + path);
+        return ClassLoader.getSystemClassLoader().getResource(path);
     }
 
 }

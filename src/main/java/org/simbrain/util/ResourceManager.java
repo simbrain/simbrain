@@ -43,7 +43,8 @@ public class ResourceManager {
      * @param path name of the image file to retrieve
      * @return the ImageIcon which can be used with Swing components, etc
      */
-    public static ImageIcon getImageIcon(final String path) {
+    public static ImageIcon getImageIcon(String path) {
+        path = assertForwardSlash(path);
         URL url = ClassLoader.getSystemClassLoader().getResource(path);
         return new ImageIcon(url);
     }
@@ -54,7 +55,8 @@ public class ResourceManager {
      * @param path name of the image file to retrieve
      * @return the Image which can be used with Swing components, etc
      */
-    public static Image getImage(final String path) {
+    public static Image getImage(String path) {
+        path = assertForwardSlash(path);
         URL url = ClassLoader.getSystemClassLoader().getResource(path);
         java.awt.Toolkit toolKit = java.awt.Toolkit.getDefaultToolkit();
         return toolKit.getImage(url);
@@ -66,7 +68,8 @@ public class ResourceManager {
      * @param path The path of the icon to load within the resources directory.
      * @return Returns a scaled ImageIcon.
      */
-    public static ImageIcon getSmallIcon(final String path) {
+    public static ImageIcon getSmallIcon(String path) {
+        path = assertForwardSlash(path);
         try {
             URL url = ClassLoader.getSystemClassLoader().getResource(path);
             ImageIcon imageIcon = new ImageIcon(url);
@@ -80,10 +83,18 @@ public class ResourceManager {
     }
 
     /**
+     * Calls to {@link ClassLoader#getResource(String)} require forward slashes, even on Windows.
+     */
+    private static String assertForwardSlash(String path) {
+        return path.replace('\\', '/');
+    }
+
+    /**
      * Produces a Scanner from the file resource specified by the 'name' parameter.
      * Returns an Optional of Scanner if the file resource is found, or an empty Optional otherwise.
      */
     private static Optional<Scanner> createScannerFromResource(String name) {
+        name = assertForwardSlash(name);
         InputStream stream = ClassLoader.getSystemClassLoader().getResourceAsStream(name);
         return Optional.ofNullable(stream)
                 .map(s -> new Scanner(s, StandardCharsets.UTF_8));

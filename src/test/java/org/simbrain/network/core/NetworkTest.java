@@ -4,14 +4,18 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.network.matrix.WeightMatrix;
+import org.simbrain.network.neurongroups.SoftmaxGroup;
+import org.simbrain.network.subnetworks.BackpropNetwork;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.simbrain.network.core.NetworkUtilsKt.getModelByLabel;
+import static org.simbrain.util.GeomKt.point;
 
 public class NetworkTest {
     Network net;
@@ -21,8 +25,9 @@ public class NetworkTest {
     NeuronArray na1, na2;
     NeuronCollection nc1;
     WeightMatrix wm1;
-
     SynapseGroup sg1;
+    SoftmaxGroup softmax;
+    BackpropNetwork bp;
 
     @BeforeEach
     public void setUpNetwork() {
@@ -55,6 +60,15 @@ public class NetworkTest {
         na2 = new NeuronArray(net, 10);
         wm1 = new WeightMatrix(net ,na1, na2);
         net.addNetworkModelsAsync(List.of(na1,na2, wm1));
+
+        softmax = new SoftmaxGroup(net, 5);
+        net.addNetworkModelAsync(softmax);
+        softmax.setLabel("softmax");
+
+        bp = new BackpropNetwork(net, new int[] {3,5,4}, point(0,0));
+        net.addNetworkModelAsync(bp);
+        bp.setLabel("backprop");
+
     }
 
     @Test
@@ -83,6 +97,17 @@ public class NetworkTest {
         // Deleting the neuron group should also delete the synapse group
         assertEquals(0, net.getModels(WeightMatrix.class).size());
 
+        // Subnets and custom groups
+        assertEquals(1, net.getModels(SoftmaxGroup.class).size());
+        // TODO: getModels(BackpropNetwork.class) fails, because of how the
+        //  NetworkModelList is created (see NetworkModel.add). But changing that
+        //  breaks things and we don't yet have use cases for getmodels on specific subnets
+        assertEquals(1, net.getModels(BackpropNetwork.class).size());
+        softmax.delete();
+        bp.delete();
+        assertEquals(0, net.getModels(SoftmaxGroup.class).size());
+        assertEquals(0, net.getModels(Subnetwork.class).size());
+
     }
 
     @Test
@@ -102,6 +127,8 @@ public class NetworkTest {
         assertNotNull(getModelByLabel(fromXml, Neuron.class, "neuron2"));
         assertNotNull(getModelByLabel(fromXml, NeuronGroup.class, "neuron_group_1"));
         assertNotNull(getModelByLabel(fromXml, NeuronGroup.class, "ng2"));
+        // assertNotNull(getModelByLabel(fromXml, SoftmaxGroup.class, "softmax"));
+        assertNotNull(getModelByLabel(fromXml, BackpropNetwork.class, "backprop"));
     }
 
     @Test

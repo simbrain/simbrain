@@ -5,11 +5,13 @@ import kotlinx.coroutines.withContext
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
+import org.simbrain.network.core.NetworkTextObject
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.activations
 import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.neuron_update_rules.DecayRule
 import org.simbrain.network.util.BiasedScalarData
+import org.simbrain.util.format
 import org.simbrain.util.geneticalgorithm.*
 import org.simbrain.util.piccolo.createTileMapLayer
 import org.simbrain.util.piccolo.loadTileMap
@@ -231,7 +233,7 @@ val evolveResourcePursuer = newSim {
         val odorWorld = odorWorldComponent.world.apply {
             loadTileMap("empty.tmx")
             with(tileMap) {
-                updateMapSize(32, 32)
+                updateMapSize(24, 24)
                 fill("Grass1")
             }
         }
@@ -276,7 +278,8 @@ val evolveResourcePursuer = newSim {
                         (inputNeurons.neuronList + hiddenNeurons.neuronList).activations.sumOf { abs(it) } * 2
                     val movementPenalty = abs(evolvedAgent.speed * 3) + abs(evolvedAgent.dtheta * 2)
                     val activationPenalty = outputsActivations + allActivations
-                    calories = max(0.0, calories - (activationPenalty + movementPenalty) * (1 / iterationsPerRun))
+                    calories = max(0.0, calories - (activationPenalty + movementPenalty) * (1.0 / iterationsPerRun))
+                    // println("movement penalty: $movementPenalty, activation penalty: $activationPenalty, calories: $calories")
                     thirstNeuron.forceSetActivation(10.0 / iterationsPerRun + thirstNeuron.activation)
                 }
             }
@@ -359,9 +362,15 @@ val evolveResourcePursuer = newSim {
                         hiddenNeurons.location = point(0, 60)
                         outputNeurons.location = point(0, -25)
                     }
+                    val energyText = NetworkTextObject(networkComponent.network, "Energy: ${calories.format(2)}")
+                    networkComponent.network.addNetworkModels(energyText)
+                    workspace.addUpdateAction("update energy text") {
+                        energyText.text = "Energy: ${calories.format(2)}"
+                    }
+                    energyText.location = point(-160, -20)
                     withGui {
                         place(networkComponent, 5, 375, 340, 430)
-                        place(odorWorldComponent, 340, 10, 800, 800)
+                        place(odorWorldComponent, 340, 10, 800, 900)
                     }
                 }
             }

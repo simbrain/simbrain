@@ -24,7 +24,6 @@ import org.jetbrains.annotations.Nullable;
 import org.piccolo2d.extras.nodes.PStyledText;
 import org.piccolo2d.util.PBounds;
 import org.simbrain.network.core.NetworkTextObject;
-import org.simbrain.network.events.LocationEvents;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.SwingUtilsKt;
 import org.simbrain.util.TextUtilsKt;
@@ -70,9 +69,10 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
         this.setBounds(pStyledText.getBounds());
         addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
 
-        LocationEvents events = text.getEvents();
+        var events = text.getEvents();
         events.getDeleted().on(n -> removeFromParent());
         events.getLocationChanged().on(this::pullViewPositionFromModel);
+        events.getTextUpdated().on(this::update);
 
         update();
         pushViewPositionToModel();

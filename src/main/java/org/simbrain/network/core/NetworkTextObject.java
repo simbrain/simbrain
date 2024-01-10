@@ -21,7 +21,7 @@ package org.simbrain.network.core;
 import org.jetbrains.annotations.NotNull;
 import org.piccolo2d.event.PInputEvent;
 import org.simbrain.network.LocatableModel;
-import org.simbrain.network.events.LocationEvents;
+import org.simbrain.network.events.TextObjectEvents;
 
 import java.awt.geom.Point2D;
 
@@ -75,7 +75,7 @@ public class NetworkTextObject extends LocatableModel {
     /**
      * Support for property change events.
      */
-    private transient LocationEvents events = new LocationEvents();
+    private transient TextObjectEvents events = new TextObjectEvents();
 
     // TODO: Temporary so that when added to networkpanel the event is availalble
     public transient PInputEvent inputEvent;
@@ -119,6 +119,7 @@ public class NetworkTextObject extends LocatableModel {
 
     public void setText(String text) {
         this.text = text;
+        this.events.getTextUpdated().fireAndBlock();
     }
 
     public String getFontName() {
@@ -160,7 +161,7 @@ public class NetworkTextObject extends LocatableModel {
 
     @Override
     public void postOpenInit() {
-        events = new LocationEvents();
+        events = new TextObjectEvents();
     }
 
     @NotNull
@@ -176,7 +177,7 @@ public class NetworkTextObject extends LocatableModel {
         events.getLocationChanged().fireAndForget();
     }
 
-    public LocationEvents getEvents() {
+    public TextObjectEvents getEvents() {
         return events;
     }
 

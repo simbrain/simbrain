@@ -218,8 +218,11 @@ class EvaluatorParams(
         controlPanel!!
     }
 
-    private fun getProgressText(metricsString: String) = """
-            $percentile Percentile ${if (stoppingCondition == StoppingCondition.Error) "Error" else "Fitness"}: $metricsString
+    private fun getProgressText(metricsString: String, generation: Int) = """
+            <html>
+                Generation: $generation<br />
+                $percentile Percentile ${if (stoppingCondition == StoppingCondition.Error) "Error" else "Fitness"}: $metricsString
+            </html>
         """.trimIndent()
 
     context(SimbrainDesktop)
@@ -231,7 +234,7 @@ class EvaluatorParams(
     }
 
     fun addProgressWindow() {
-        progressWindow = ProgressWindow(maxGenerations, getProgressText("")).apply {
+        progressWindow = ProgressWindow(maxGenerations, getProgressText("", 0)).apply {
             minimumSize = java.awt.Dimension(300, 100)
             setLocationRelativeTo(null)
         }
@@ -239,7 +242,7 @@ class EvaluatorParams(
 
     fun updateProgressWindow(generationFitnessPair: GenerationFitnessPair) {
         progressWindow?.apply {
-            text = getProgressText(generationFitnessPair.nthPercentileFitness(percentile).format(3))
+            text = getProgressText(generationFitnessPair.nthPercentileFitness(percentile).format(3), generationFitnessPair.generation)
             value = generationFitnessPair.generation
         }
     }

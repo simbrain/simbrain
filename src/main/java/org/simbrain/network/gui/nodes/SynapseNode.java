@@ -152,22 +152,22 @@ public final class SynapseNode extends ScreenElement {
         SynapseEvents events = synapse.getEvents();
 
         events.getDeleted().on(getSwingDispatcher(), s -> removeFromParent());
-        events.getStrengthUpdated().on(() -> {
+        events.getStrengthUpdated().on(getSwingDispatcher(), () -> {
             updateColor();
             updateDiameter();
         });
-        events.getColorPreferencesChanged().on(() -> {
+        events.getColorPreferencesChanged().on(getSwingDispatcher(), () -> {
             updateColor();
             updateDiameter();
             updateSpikeColor();
         });
-        events.getVisbilityChanged().on((oldVisibility, newVisibility) -> setVisible(newVisibility));
+        events.getVisbilityChanged().on(getSwingDispatcher(), (oldVisibility, newVisibility) -> setVisible(newVisibility));
         setVisible(synapse.isVisible());
         events.getClampChanged().on(this::updateClampStatus);
         updateClampStatus();
 
         // Respond to spiking events
-        source.getNeuron().getEvents().getSpiked().on(s -> updateSpikeColor());
+        source.getNeuron().getEvents().getSpiked().on(getSwingDispatcher(), s -> updateSpikeColor());
 
     }
 

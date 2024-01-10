@@ -449,11 +449,12 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
         if (!isFrozen()) {
             forceSetStrength(clip(source.getPolarity().clip(wt)));
         }
+        events.getStrengthUpdated().fireAndBlock();
     }
 
     public void forceSetStrength(final double wt) {
         strength = wt;
-        events.getStrengthUpdated().fireAndForget();
+        events.getStrengthUpdated().fireAndBlock();
     }
 
     public double getUpperBound() {

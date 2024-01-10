@@ -19,6 +19,8 @@ import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import javax.swing.text.DefaultFormatterFactory
 import javax.swing.text.NumberFormatter
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * Utility to make it easy to set location of a [SimbrainDesktop] component.
@@ -89,9 +91,9 @@ class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, tru
         mainPanel.addItem(label, it)
     }
 
-    fun addButton(label: String, task: suspend (ActionEvent) -> Unit) = JButton(label).apply {
+    fun addButton(label: String, context: CoroutineContext = EmptyCoroutineContext, task: suspend (ActionEvent) -> Unit) = JButton(label).apply {
         addActionListener {
-            launch { task(it) }
+            launch(context) { task(it) }
         }
         mainPanel.addItem(this)
         pack()

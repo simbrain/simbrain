@@ -37,7 +37,6 @@ import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * A 2d environment. Contains a list of {@link OdorWorldEntity}s, which can either be agents or static objects.
@@ -52,7 +51,7 @@ public class OdorWorld implements EditableObject, Bounded {
     /**
      * List of odor world entities.
      */
-    private List<OdorWorldEntity> entityList = new CopyOnWriteArrayList<OdorWorldEntity>();
+    private List<OdorWorldEntity> entityList = new ArrayList<>();
 
     /**
      * Basic tilemap that determines the size and basic features of the world.

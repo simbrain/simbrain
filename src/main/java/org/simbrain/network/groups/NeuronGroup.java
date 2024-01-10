@@ -149,7 +149,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
         super.delete();
         events.getDeleted().fireAndForget(this);
         neuronList.forEach(Neuron::delete);
-        activationRecorder.stopRecording();
     }
 
     /**
@@ -171,7 +170,6 @@ public class NeuronGroup extends AbstractNeuronCollection {
      * @param base the neuron update rule to set.
      */
     public void setNeuronType(NeuronUpdateRule base) {
-        inputManager.setInputSpikes(base.isSpikingRule());
         prototypeRule = base;
         dataHolder = prototypeRule.createScalarData();
         // Have to also set node rules to support randomization, increment, etc.

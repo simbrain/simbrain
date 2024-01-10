@@ -78,17 +78,17 @@ public class EdgeOfChaosBitStream extends Simulation {
 
             // Update strength of bitstream signals
             // TODO: Complain if input strength set to 0.
-            double new_ubar = Double.parseDouble(input_tf.getText());
-            for (double[] row : bitStream1.getInputManager().getData()) {
-                if (row[0] != 0) {
-                    row[0] = new_ubar;
-                }
-            }
-            for (double[] row : bitStream2.getInputManager().getData()) {
-                if (row[0] != 0) {
-                    row[0] = new_ubar;
-                }
-            }
+            // double new_ubar = Double.parseDouble(input_tf.getText());
+            // for (double[] row : bitStream1.getInputManager().getData()) {
+            //     if (row[0] != 0) {
+            //         row[0] = new_ubar;
+            //     }
+            // }
+            // for (double[] row : bitStream2.getInputManager().getData()) {
+            //     if (row[0] != 0) {
+            //         row[0] = new_ubar;
+            //     }
+            // }
         });
     }
 
@@ -127,8 +127,8 @@ public class EdgeOfChaosBitStream extends Simulation {
         BinaryRule b = new BinaryRule(0, u_bar, .5);
         bitStreamInputs.setNeuronType(b);
         bitStreamInputs.setClamped(true);
-        bitStreamInputs.getInputManager().setData(new double[][]{{u_bar}, {0.0}, {0.0}, {0.0}, {0.0}, {u_bar}, {0.0}, {u_bar}, {u_bar}, {0.0}, {u_bar}, {u_bar}, {0.0}, {0.0}, {u_bar}});
-        bitStreamInputs.setInputMode(true);
+        // bitStreamInputs.getInputManager().setData(new double[][]{{u_bar}, {0.0}, {0.0}, {0.0}, {0.0}, {u_bar}, {0.0}, {u_bar}, {u_bar}, {0.0}, {u_bar}, {u_bar}, {0.0}, {0.0}, {u_bar}});
+        // bitStreamInputs.setInputMode(true);
         net.addNetworkModelAsync(bitStreamInputs);
         bitStreamInputs.setLocation(reservoir.getCenterX(), reservoir.getMaxY() + offset);
         return bitStreamInputs;
@@ -140,8 +140,8 @@ public class EdgeOfChaosBitStream extends Simulation {
         TimeSeriesModel.ScalarTimeSeries sts1 = ts.getModel().addScalarTimeSeries("Difference");
 
         sim.getWorkspace().addUpdateAction(UpdateActionKt.create("Update time series", () -> {
-            bitStream1.getInputManager().applyCurrentRow();
-            bitStream2.getInputManager().applyCurrentRow();
+            // bitStream1.getInputManager().applyCurrentRow();
+            // bitStream2.getInputManager().applyCurrentRow();
             int activationDiff = SimbrainMath.hamming(res1.getActivations(), res2.getActivations());
             ts.getModel().addData(0, sim.getWorkspace().getTime(), activationDiff);
         }));

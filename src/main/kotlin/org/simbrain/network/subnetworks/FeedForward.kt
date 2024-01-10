@@ -14,6 +14,7 @@
 package org.simbrain.network.subnetworks
 
 import org.simbrain.network.core.Network
+import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.core.randomizeBiases
 import org.simbrain.network.groups.Subnetwork
 import org.simbrain.network.matrix.NeuronArray
@@ -28,16 +29,7 @@ import java.awt.geom.Point2D
  *
  * @author Jeff Yoshimi
  */
-open class FeedForward(
-    network: Network,
-    /**
-     * Integers 1...n correspond to number of nodes in layers 1..n
-     */
-    nodesPerLayer: IntArray,
-    /**
-     * Center location for network.
-     */
-    initialPosition: Point2D?) : Subnetwork(network) {
+open class FeedForward : Subnetwork {
 
     var betweenLayerInterval = 250
 
@@ -48,15 +40,23 @@ open class FeedForward(
 
     val wmList: MutableList<WeightMatrix> = ArrayList()
 
-    var inputLayer: NeuronArray
+    lateinit var inputLayer: NeuronArray
         private set
 
-    var outputLayer: NeuronArray
+    lateinit var outputLayer: NeuronArray
         private set
 
-    init {
+    @XStreamConstructor
+    protected constructor(parentNetwork: Network) : super(parentNetwork)
+
+    /**
+     * @param parentNetwork Parent network
+     * @param nodesPerLayer Integers 1...n correspond to number of nodes in layers 1..n
+     * @param initialPosition Center location for network.
+     */
+    constructor(parentNetwork: Network, nodesPerLayer: IntArray, initialPosition: Point2D?): super(parentNetwork) {
         label = "Layered Network"
-        inputLayer = NeuronArray(network, nodesPerLayer[0])
+        inputLayer = NeuronArray(parentNetwork, nodesPerLayer[0])
         addModel(inputLayer)
         layerList.add(inputLayer)
 
@@ -65,7 +65,7 @@ open class FeedForward(
 
         // Make hidden layers and output layer
         for (i in 1 until nodesPerLayer.size) {
-            val hiddenLayer = NeuronArray(network, nodesPerLayer[i])
+            val hiddenLayer = NeuronArray(parentNetwork, nodesPerLayer[i])
             addModel(hiddenLayer)
             layerList.add(hiddenLayer)
             offsetNeuronGroup(

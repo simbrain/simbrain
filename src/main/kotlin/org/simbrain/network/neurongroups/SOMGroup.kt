@@ -20,6 +20,7 @@ package org.simbrain.network.neurongroups
 
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.groups.AbstractNeuronCollection
 import org.simbrain.network.util.SimnetUtils
 import org.simbrain.util.UserParameter
@@ -40,6 +41,9 @@ class SOMGroup @JvmOverloads constructor(
 ) : AbstractNeuronCollection(network) {
 
     constructor(network: Network, numNeurons: Int) : this(network, List(numNeurons) { Neuron(network) })
+
+    @XStreamConstructor
+    private constructor(parentNetwork: Network): this(parentNetwork, listOf())
 
     init {
         addNeurons(neurons)

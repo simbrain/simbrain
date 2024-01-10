@@ -5,13 +5,10 @@ import org.simbrain.network.events.NeuronCollectionEvents;
 import org.simbrain.network.events.NeuronEvents;
 import org.simbrain.network.groups.AbstractNeuronCollection;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.util.SFileChooser;
-import org.simbrain.util.Utils;
 import org.simbrain.util.piccolo.Outline;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
-import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -157,11 +154,6 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
             text = nc.getStateInfo();
         }
 
-        // Append "recording" to the
-        if (nc.getActivationRecorder().isRecording()) {
-            text += " -- RECORDING";
-        }
-
         // Update the text
         getInteractionBox().setText(text);
     }
@@ -174,27 +166,6 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
         public void actionPerformed(final ActionEvent event) {
             String newName = JOptionPane.showInputDialog("Name:", getModel().getLabel());
             getModel().setLabel(newName);
-        }
-    };
-
-    class RecordingAction extends AbstractAction {
-
-        public RecordingAction() {
-            super("" + (nc.getActivationRecorder().isRecording() ? "Stop" : "Start")
-                    + " Recording");
-        }
-
-        @Override
-        public void actionPerformed(final ActionEvent event) {
-                if (nc.getActivationRecorder().isRecording()) {
-                    nc.getActivationRecorder().stopRecording();
-                } else {
-                    SFileChooser chooser = new SFileChooser(".", "comma-separated-values (csv)", "csv");
-                        File theFile = chooser.showSaveDialog("Recording_" + Utils.getTimeString() + ".csv");
-                    if (theFile != null) {
-                        nc.getActivationRecorder().startRecording(theFile);
-                    }
-                }
         }
     };
 

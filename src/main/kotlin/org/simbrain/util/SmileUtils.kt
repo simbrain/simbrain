@@ -205,7 +205,7 @@ fun Matrix.setSpectralRadius(spectralRadius: Double): Matrix {
     return mul(spectralRadius/maxEigenvalue())
 }
 
-fun Matrix.appendRow(row: DoubleArray): Matrix {
+fun Matrix.appendRow(row: DoubleArray = DoubleArray(ncol()) { 0.0 }): Matrix {
     val newMatrix = Matrix(nrow() + 1, ncol())
     for (i in 0 until nrow()) {
         for (j in 0 until ncol()) {

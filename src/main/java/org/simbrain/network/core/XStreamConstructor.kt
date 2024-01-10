@@ -1,14 +1,12 @@
-package org.simbrain.network.core;
+package org.simbrain.network.core
 
-import com.thoughtworks.xstream.converters.reflection.ReflectionProvider;
-import com.thoughtworks.xstream.mapper.Mapper;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.util.List;
+import org.simbrain.util.createConstructorCallingConverter
 
 /**
- * Use this annotation to mark the constructor that should be used by {@link org.simbrain.util.XStreamUtils#createConstructorCallingConverter(Class, Mapper, ReflectionProvider, List)}}
+ * Use this annotation to mark the constructor that should be used by [createConstructorCallingConverter].
+ * If annotating a constructor that is not used except for serialization, that constructor should be private
+ * @param names parameter names in the order they appear in the constructor (In Java reflection, names are not
+ *              preserved, so this is necessary)
  */
-@Retention(RetentionPolicy.RUNTIME)
-public @interface XStreamConstructor {}
+@Target(AnnotationTarget.CONSTRUCTOR)
+annotation class XStreamConstructor(val names: Array<String> = [])

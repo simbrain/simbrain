@@ -18,10 +18,7 @@ import org.simbrain.util.projection.Projector
 import org.simbrain.util.propertyeditor.EditableObject
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
-import kotlin.reflect.full.hasAnnotation
-import kotlin.reflect.full.isSubclassOf
-import kotlin.reflect.full.memberProperties
-import kotlin.reflect.full.primaryConstructor
+import kotlin.reflect.full.*
 import kotlin.reflect.javaType
 import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaField
@@ -52,7 +49,9 @@ fun getSimbrainXStream(): XStream {
         registerConverter(MatrixConverter())
         registerConverter(
             createConstructorCallingConverter(
-                EditableObject::class.java,
+                listOf(
+                    EditableObject::class.java,
+                ),
                 mapper,
                 reflectionProvider,
                 excludedTypes = listOf(
@@ -76,8 +75,8 @@ fun getSimbrainXStream(): XStream {
  * @param clazz: the class we want to convert
  */
 @JvmOverloads
-fun <T : Any> createConstructorCallingConverter(
-    clazz: Class<T>,
+fun createConstructorCallingConverter(
+    classes: List<Class<*>>,
     mapper: Mapper,
     reflectionProvider: ReflectionProvider,
     excludedTypes: List<Class<*>> = listOf()
@@ -85,7 +84,9 @@ fun <T : Any> createConstructorCallingConverter(
     return object : ReflectionConverter(mapper, reflectionProvider) {
 
         override fun marshal(source: Any, writer: HierarchicalStreamWriter, context: MarshallingContext) {
-            source::class.memberProperties
+            (source::class.allSuperclasses + source::class)
+                .map { it.declaredMemberProperties }
+                .flatten()
                 .filter { it.javaField?.isTransient() == false }
                 .forEach { property ->
                     // Get the value of the property and write it into xml
@@ -113,25 +114,26 @@ fun <T : Any> createConstructorCallingConverter(
 
             // Get a class from an xml node
             @Suppress("UNCHECKED_CAST")
-            val cls: KClass<out T> = (try {
+            val cls: KClass<*> = (try {
                 Class.forName(reader.nodeName).kotlin
             } catch (e: ClassNotFoundException) {
                 Class.forName(reader.getAttribute("class")).kotlin
-            }) as KClass<out T>
+            })
 
             // Map from variable names to corresponding Kotlin properties.
             // Ex: activation -> Neuron::activation
-            val propertyMap =
-                cls.memberProperties
-                    .associateBy { it.name }
+            val propertyMap = (cls.allSuperclasses + cls)
+                .map { it.declaredMemberProperties }
+                .flatten()
+                .associateBy { it.name }
 
             // Map from names to values. Ex: activation -> 1.0
-            val propertyValueMap = HashMap<String, Any?>()
+            val propertyNameToDeserializedValueMap = HashMap<String, Any?>()
 
             fun read() {
                 val nodeName = reader.nodeName
                 propertyMap[nodeName]?.let {
-                    propertyValueMap[nodeName] = if (reader.getAttribute("class") != null) {
+                    propertyNameToDeserializedValueMap[nodeName] = if (reader.getAttribute("class") != null) {
                         context.convertAnother(reader.value, Class.forName(reader.getAttribute("class")))
                     } else {
                         context.convertAnother(reader.value, it.returnType.javaType as Class<*>)
@@ -157,14 +159,26 @@ fun <T : Any> createConstructorCallingConverter(
                 val constructor = cls.constructors
                     .firstOrNull { it.hasAnnotation<XStreamConstructor>() }
                     ?: cls.primaryConstructor
-                    ?: throw IllegalArgumentException("Class $cls does not have a primary constructor.")
-                val paramNames = constructor.parameters
-                val paramValues = paramNames.associateWith { param -> param.name?.let { propertyValueMap[it] } }
-                    .filterValues { it != null }
-                constructor.callBy(paramValues)
+                    ?: cls.constructors.firstOrNull { it.parameters.none { p -> !p.isOptional } } // no arg constructor
+                    ?: throw IllegalArgumentException("Class $cls does not have a primary constructor or a no arg constructor.")
+
+                val parameterNamesFromAnnotation = constructor.findAnnotation<XStreamConstructor>()?.names?.toList()
+
+                val paramNameToParamMap = if (!parameterNamesFromAnnotation.isNullOrEmpty()) {
+                    (parameterNamesFromAnnotation zip constructor.parameters).toMap()
+                } else {
+                    constructor.parameters.associateBy { it.name }
+                }
+
+                val paramToValueMap = paramNameToParamMap.entries
+                    .associate { (name, param) -> param to propertyNameToDeserializedValueMap[name] }
+
+                constructor.withTempPublicAccess {
+                    callBy(paramToValueMap)
+                }
             }
 
-            propertyValueMap.forEach { (name, value) ->
+            propertyNameToDeserializedValueMap.forEach { (name, value) ->
                 propertyMap[name]?.let { property ->
                     if (property is KMutableProperty<*>) {
                         // property is a var
@@ -188,10 +202,11 @@ fun <T : Any> createConstructorCallingConverter(
         }
 
         override fun canConvert(type: Class<*>?): Boolean {
+            if (classes.any { it.kotlin == type }) return true
             if (excludedTypes.contains(type)) return false
             if (type?.isKotlinClass() == false) return false
             return try {
-                type?.kotlin?.isSubclassOf(clazz.kotlin) == true
+                classes.any { clazz -> type?.kotlin?.isSubclassOf(clazz.kotlin) == true }
             } catch (e: Error) {
                 false
             }

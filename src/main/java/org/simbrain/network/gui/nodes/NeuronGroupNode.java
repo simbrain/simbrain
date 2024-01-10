@@ -202,10 +202,6 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
         //menu.addSeparator();
         //menu.add(testInputsAction);
 
-        // Recording action
-        menu.addSeparator();
-        menu.add(new RecordingAction());
-
         // Coupling menu
         menu.addSeparator();
         JMenu couplingMenu = createCouplingMenu(getNetworkPanel().getNetworkComponent(), neuronGroup);

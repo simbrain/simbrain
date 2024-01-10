@@ -122,9 +122,10 @@ public class NetworkTest {
         // TODO: getModels(BackpropNetwork.class) fails, because of how the
         //  NetworkModelList is created (see NetworkModel.add). But changing that
         //  breaks things and we don't yet have use cases for getmodels on specific subnets
-        assertEquals(1, net.getModels(BackpropNetwork.class).size());
+        assertEquals(2, net.getModels(Subnetwork.class).size());
         softmax.delete();
         bp.delete();
+        srn.delete();
         assertEquals(0, net.getModels(SoftmaxGroup.class).size());
         assertEquals(0, net.getModels(Subnetwork.class).size());
 
@@ -148,7 +149,7 @@ public class NetworkTest {
         assertNotNull(getModelByLabel(fromXml, NeuronGroup.class, "neuron_group_1"));
         assertNotNull(getModelByLabel(fromXml, NeuronGroup.class, "ng2"));
         assertNotNull(getModelByLabel(fromXml, SoftmaxGroup.class, "softmax"));
-        assertNotNull(getModelByLabel(fromXml, SOMGroup.class, "srn"));
+        assertNotNull(getModelByLabel(fromXml, SOMGroup.class, "som"));
         assertNotNull(getModelByLabel(fromXml, CompetitiveGroup.class, "competitive"));
         assertNotNull(getModelByLabel(fromXml, WinnerTakeAll.class, "wta"));
         assertNotNull(getModelByLabel(fromXml, BackpropNetwork.class, "backprop"));

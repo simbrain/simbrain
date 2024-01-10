@@ -53,7 +53,7 @@ abstract class IterableTrainer(val net: Trainable) : EditableObject {
 
     private var stoppingConditionReached = false
 
-    val events = TrainerEvents()
+    @Transient val events = TrainerEvents()
 
     suspend fun startTraining() {
         if (stoppingConditionReached) {

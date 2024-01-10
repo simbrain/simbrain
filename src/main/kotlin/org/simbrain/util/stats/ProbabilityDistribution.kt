@@ -69,7 +69,7 @@ abstract class ProbabilityDistribution() : CopyableObject {
 
         fun getXStream(): XStream {
             val xstream = getSimbrainXStream()
-            xstream.registerConverter(createConstructorCallingConverter(ProbabilityDistribution::class.java, xstream.mapper, xstream.reflectionProvider))
+            xstream.registerConverter(createConstructorCallingConverter(listOf(ProbabilityDistribution::class.java), xstream.mapper, xstream.reflectionProvider))
             return xstream
         }
     }

@@ -14,6 +14,7 @@
 package org.simbrain.network.subnetworks
 
 import org.simbrain.network.core.Network
+import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.neuron_update_rules.LinearRule
@@ -36,35 +37,36 @@ import java.awt.geom.Point2D
  *
  * @author Jeff Yoshimi
  */
-open class SRNNetwork(
-    network: Network,
-    numInputNodes: Int = 10,
-    numHiddenNodes: Int = 10,
-    numOutputNodes: Int = 10,
-    initialPosition: Point2D = point(0, 0)) : FeedForward(network,
-            intArrayOf(numInputNodes, numHiddenNodes, numOutputNodes),
-            initialPosition), Trainable {
+class SRNNetwork: FeedForward, Trainable {
 
-    var hiddenLayer: NeuronArray = layerList[1].also {
-        it.updateRule = SigmoidalRule()
-    }
+    lateinit var hiddenLayer: NeuronArray
 
-    var contextLayer: NeuronArray = NeuronArray(network, numHiddenNodes).apply {
-        updateRule = LinearRule()
-    }
+    lateinit var contextLayer: NeuronArray
 
-    val contextToHidden: WeightMatrix
+    lateinit var contextToHidden: WeightMatrix
 
-    override var trainingSet: MatrixDataset = createDiagonalDataset(numInputNodes, numOutputNodes, shiftAmount = 1)
+    override lateinit var trainingSet: MatrixDataset
 
-    override val trainer by lazy {
-        SRNTrainer(this)
-    }
-
-    init {
+    constructor(
+        network: Network,
+        numInputNodes: Int = 10,
+        numHiddenNodes: Int = 10,
+        numOutputNodes: Int = 10,
+        initialPosition: Point2D = point(0, 0)
+    ): super(
+        network,
+        intArrayOf(numInputNodes, numHiddenNodes, numOutputNodes),
+        initialPosition
+    ) {
         label = "SRN"
 
-        contextLayer = NeuronArray(network, numHiddenNodes)
+        hiddenLayer = layerList[1].also {
+            it.updateRule = SigmoidalRule()
+        }
+
+        contextLayer = NeuronArray(parentNetwork, numHiddenNodes).apply {
+            updateRule = LinearRule()
+        }
         contextLayer.fillActivations(.5)
         addModels(contextLayer)
 
@@ -84,8 +86,20 @@ open class SRNNetwork(
         contextToHidden.randomize()
         addModels(contextToHidden)
 
+        trainingSet = createDiagonalDataset(numInputNodes, numOutputNodes, shiftAmount = 1)
+
         setLocation(initialPosition.x, initialPosition.y)
     }
+
+
+    @XStreamConstructor
+    protected constructor(parentNetwork: Network) : super(parentNetwork)
+
+    @Transient
+    var _trainer: SRNTrainer? = null
+
+    override val trainer
+        get() = _trainer?: SRNTrainer(this).also { _trainer = it }
 
     override val name: String
         get() = "SRN"

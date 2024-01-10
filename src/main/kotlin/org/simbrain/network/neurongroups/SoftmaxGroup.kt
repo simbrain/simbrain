@@ -2,6 +2,7 @@ package org.simbrain.network.neurongroups
 
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.core.activations
 import org.simbrain.network.groups.AbstractNeuronCollection
 import org.simbrain.util.propertyeditor.CopyableObject
@@ -17,6 +18,9 @@ import kotlin.math.exp
 class SoftmaxGroup(net: Network, neurons: List<Neuron>): AbstractNeuronCollection(net), CopyableObject {
 
     constructor(net: Network, numNeurons: Int): this(net, List(numNeurons) { Neuron(net) })
+
+    @XStreamConstructor
+    private constructor(parentNetwork: Network): this(parentNetwork, listOf())
 
     init {
         label = "Softmax"

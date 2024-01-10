@@ -20,6 +20,7 @@ package org.simbrain.network.neurongroups
 
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.groups.AbstractNeuronCollection
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.GuiEditable
@@ -35,6 +36,9 @@ import org.simbrain.util.propertyeditor.GuiEditable
 open class CompetitiveGroup @JvmOverloads constructor(network: Network, neurons: List<Neuron>, val params: CompetitiveGroupParams = CompetitiveGroupParams()) : AbstractNeuronCollection(network) {
 
     constructor(network: Network, numNeurons: Int) : this(network, List(numNeurons) { Neuron(network) })
+
+    @XStreamConstructor
+    private constructor(parentNetwork: Network): this(parentNetwork, listOf())
 
     init {
         addNeurons(neurons)

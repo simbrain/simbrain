@@ -56,7 +56,8 @@ class SmellSource : EditableObject {
         order = 15
     )
 
-    constructor(distalstim: DoubleArray?) {
+    @JvmOverloads
+    constructor(distalstim: DoubleArray? = null) {
         stimulusVector = distalstim
     }
 

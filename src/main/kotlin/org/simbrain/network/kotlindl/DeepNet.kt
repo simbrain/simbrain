@@ -82,6 +82,7 @@ class DeepNet(
     /**
      * Events specific to training, as contrasted with [events] which are common to all [NetworkModel]s.
      */
+    @Transient
     val trainerEvents = TrainerEvents()
 
     /**

@@ -54,7 +54,7 @@ abstract class Layer : LocatableModel(), AttributeContainer {
     var inputData: Matrix
         get() {
             if (_inputData == null) {
-                _inputData = inputs
+                _inputData = inputs.transpose()
             }
             return _inputData!!
         }

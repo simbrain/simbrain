@@ -2,10 +2,7 @@ package org.simbrain.util
 
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
-import kotlin.reflect.KClass
-import kotlin.reflect.KMutableProperty1
-import kotlin.reflect.KProperty0
-import kotlin.reflect.KProperty1
+import kotlin.reflect.*
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaField
@@ -46,6 +43,14 @@ fun <T, U, R> KProperty1<T, U>.withTempPublicAccess(block: KProperty1<T, U>.() -
 }
 
 fun <U, R> KProperty0<U>.withTempPublicAccess(block: KProperty0<U>.() -> R): R {
+    val oldAccessible = isAccessible
+    isAccessible = true
+    val result = block()
+    isAccessible = oldAccessible
+    return result
+}
+
+fun <R> KFunction<R>.withTempPublicAccess(block: KFunction<R>.() -> R): R {
     val oldAccessible = isAccessible
     isAccessible = true
     val result = block()

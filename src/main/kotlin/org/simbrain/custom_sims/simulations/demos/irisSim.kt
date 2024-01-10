@@ -37,7 +37,6 @@ val irisClassifier = newSim {
 
     classifier.trainingData.featureVectors = iris.select(0,1,2,3).toArray()
     classifier.trainingData.targetLabels = iris.column(4).toStringArray()
-    inputNc.inputManager.data = classifier.trainingData.featureVectors
     val smileClassifier = SmileClassifier(network, classifier)
     smileClassifier.train()
 

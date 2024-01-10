@@ -89,7 +89,7 @@ public class OdorWorldComponent extends WorkspaceComponent {
         XStream xstream = XStreamUtils.getSimbrainXStream();
         xstream.processAnnotations(TileMap.class);
         xstream.registerConverter(new TiledDataConverter(xstream.getMapper(), xstream.getReflectionProvider()));
-        xstream.registerConverter(XStreamUtils.createConstructorCallingConverter(OdorWorldEntity.class, xstream.getMapper(), xstream.getReflectionProvider()));
+        xstream.registerConverter(XStreamUtils.createConstructorCallingConverter(List.of(OdorWorldEntity.class), xstream.getMapper(), xstream.getReflectionProvider()));
         return xstream;
     }
 

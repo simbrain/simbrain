@@ -146,9 +146,6 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
         menu.add(clampNeuronsAction);
         menu.add(unclampNeuronsAction);
 
-        // Recording action
-        menu.addSeparator();
-        menu.add(new RecordingAction());
 
         // Projection Plot Action
         menu.addSeparator();

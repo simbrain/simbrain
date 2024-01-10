@@ -7,9 +7,6 @@ import org.simbrain.network.events.NeuronCollectionEvents;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.layouts.LineLayout;
-import org.simbrain.network.util.ActivationInputManager;
-import org.simbrain.network.util.ActivationRecorder;
-import org.simbrain.network.util.SubsamplingManager;
 import org.simbrain.util.RectangleOutlines;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.UserParameter;
@@ -85,21 +82,6 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
      */
     protected final List<Neuron> neuronList = new CopyOnWriteArrayList<>();
 
-    /**
-     * Maintains a matrix of data that can be used to send inputs to this neuron collection.
-     */
-    protected ActivationInputManager inputManager;
-
-    /**
-     * Allows activations to be downsampled.
-     */
-    protected SubsamplingManager subsamplingManager;
-
-    /**
-     * Manage recording activation histories for a network
-     */
-    protected ActivationRecorder activationRecorder;
-
     @UserParameter(label = "Increment amount", increment = .1, order = 90)
     private double increment = .1;
 
@@ -130,9 +112,6 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
      */
     public AbstractNeuronCollection(Network net) {
         parentNetwork = net;
-        inputManager = new ActivationInputManager(this);
-        subsamplingManager = new SubsamplingManager(this);
-        activationRecorder = new ActivationRecorder(this);
     }
 
     @Override
@@ -285,7 +264,6 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
      */
     protected void addNeurons(Collection<Neuron> neurons) {
         neurons.forEach(this::addNeuron);
-        subsamplingManager.resetIndices();
     }
 
     /**
@@ -455,9 +433,6 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
 
     @Override
     public void update() {
-        if (activationRecorder.isRecording()) {
-            activationRecorder.writeActsToFile();
-        }
         invalidateCachedActivations();
     }
 
@@ -660,28 +635,6 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
         return neuronList.isEmpty();
     }
 
-    /**
-     * Sets whether or not this neuron group is in input mode. When in input
-     * mode the neuron group will draw activations from its {@link ActivationInputManager}
-     * instead of from any impinging synapses or its own neuron update
-     * functions. This function removes the neurons from the neuron set in
-     * ConcurrentBufferedUpdate, preventing it from updating the neurons in
-     * this group, and re-adds those neurons when input mode is turned off.
-     * Thus the update action associated with this neuron group MUST be added
-     * to the network update sequence even if ParallelBufferedUpdate is
-     * selected in order for input values to update the group properly.
-     *
-     * @param inputMode whether or not this group will run in input mode during
-     *                  network and workspace updates.
-     * @throws IllegalArgumentException if input mode is set to true, but there is no data
-     */
-    public void setInputMode(boolean inputMode) throws IllegalArgumentException {
-        if (inputManager.getData() == null && inputMode) {
-            throw new IllegalArgumentException("Cannot set input mode to true" + " if there is no input data stored in NeuronGroup field:" + " testData");
-        }
-        // this.inputMode = inputMode;
-        //fireLabelUpdated();
-    }
     public double getMinX() {
         return LocatableModelKt.getMinX(neuronList);
     }
@@ -696,30 +649,6 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
 
     public double getMaxY() {
         return LocatableModelKt.getMaxY(neuronList);
-    }
-
-    public ActivationInputManager getInputManager() {
-        return inputManager;
-    }
-
-    public SubsamplingManager getSubsamplingManager() {
-        return subsamplingManager;
-    }
-
-    public ActivationRecorder getActivationRecorder() {
-        return activationRecorder;
-    }
-
-    /**
-     * Returns a vector of subsampled activations to be used by some object external to the
-     * neuron group. If plotting activations of a thousand
-     * node network, a sample of 100 activations might be returned.
-     *
-     * @return the vector of external activations.
-     */
-    @Producible()
-    public double[] getSubsampledActivations() {
-        return subsamplingManager.getActivations();
     }
 
     public Network getParentNetwork() {
@@ -753,11 +682,6 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
 
         incomingSgs = new HashSet<>();
         outgoingSgs = new HashSet<>();
-
-        // TODO: Resave and remove
-        if (activationRecorder == null) {
-            activationRecorder = new ActivationRecorder(this);
-        }
     }
 
     public NeuronCollectionEvents getEvents() {

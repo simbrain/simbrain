@@ -64,7 +64,7 @@ public class Splasher {
         BLAS.engine.iamax(new float[]{1f, 2f, 3f});
 
         // Same hack as above, for deep net engine
-        if (!Utils.isM1Mac()) {
+        if (!Utils.isMacOSX() && !Utils.isLinux()) {
             var dummyDeepNet = Sequential.of(List.of(new Input(new long[]{1L},""), new Dense()),false);
         }
 

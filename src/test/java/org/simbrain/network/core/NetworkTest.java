@@ -7,8 +7,12 @@ import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.network.matrix.WeightMatrix;
+import org.simbrain.network.neurongroups.CompetitiveGroup;
+import org.simbrain.network.neurongroups.SOMGroup;
 import org.simbrain.network.neurongroups.SoftmaxGroup;
+import org.simbrain.network.neurongroups.WinnerTakeAll;
 import org.simbrain.network.subnetworks.BackpropNetwork;
+import org.simbrain.network.subnetworks.SRNNetwork;
 
 import java.util.List;
 
@@ -27,7 +31,14 @@ public class NetworkTest {
     WeightMatrix wm1;
     SynapseGroup sg1;
     SoftmaxGroup softmax;
+    SOMGroup som;
+    WinnerTakeAll wta;
+    CompetitiveGroup competitive;
+
+    // TODO: Other subneworks
     BackpropNetwork bp;
+    SRNNetwork srn;
+
 
     @BeforeEach
     public void setUpNetwork() {
@@ -62,12 +73,21 @@ public class NetworkTest {
         net.addNetworkModelsAsync(List.of(na1,na2, wm1));
 
         softmax = new SoftmaxGroup(net, 5);
-        net.addNetworkModelAsync(softmax);
         softmax.setLabel("softmax");
+        som = new SOMGroup(net, 5);
+        som.setLabel("som");
+        competitive = new CompetitiveGroup(net, 5);
+        competitive.setLabel("competitive");
+        wta = new WinnerTakeAll(net, 5);
+        wta.setLabel("wta");
+
+        net.addNetworkModelsAsync(softmax, som, competitive, wta);
 
         bp = new BackpropNetwork(net, new int[] {3,5,4}, point(0,0));
-        net.addNetworkModelAsync(bp);
         bp.setLabel("backprop");
+        srn = new SRNNetwork(net, 5,5,5, point(0,0));
+        srn.setLabel("srn");
+        net.addNetworkModelsAsync(bp, srn);
 
     }
 
@@ -127,8 +147,12 @@ public class NetworkTest {
         assertNotNull(getModelByLabel(fromXml, Neuron.class, "neuron2"));
         assertNotNull(getModelByLabel(fromXml, NeuronGroup.class, "neuron_group_1"));
         assertNotNull(getModelByLabel(fromXml, NeuronGroup.class, "ng2"));
-        // assertNotNull(getModelByLabel(fromXml, SoftmaxGroup.class, "softmax"));
+        assertNotNull(getModelByLabel(fromXml, SoftmaxGroup.class, "softmax"));
+        assertNotNull(getModelByLabel(fromXml, SOMGroup.class, "srn"));
+        assertNotNull(getModelByLabel(fromXml, CompetitiveGroup.class, "competitive"));
+        assertNotNull(getModelByLabel(fromXml, WinnerTakeAll.class, "wta"));
         assertNotNull(getModelByLabel(fromXml, BackpropNetwork.class, "backprop"));
+        assertNotNull(getModelByLabel(fromXml, SRNNetwork.class, "srn"));
     }
 
     @Test

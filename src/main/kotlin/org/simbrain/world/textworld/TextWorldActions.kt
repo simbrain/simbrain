@@ -2,6 +2,7 @@ package org.simbrain.world.textworld
 
 import org.simbrain.util.*
 import org.simbrain.util.table.SimbrainTablePanel
+import org.simbrain.util.table.exportCsv
 import org.simbrain.world.textworld.gui.TextWorldDesktopComponent
 import org.simbrain.world.textworld.gui.showComparisonDialog
 import java.util.*
@@ -37,6 +38,7 @@ val TextWorld.viewTokenEmbedding
     ) {
 
         val viewer = SimbrainTablePanel(tokenEmbedding.createTableModel())
+        viewer.addAction(viewer.table.exportCsv())
         viewer.displayInDialog().apply {
             title = "Embedding has ${tokenEmbedding.size} unique entries"
         }

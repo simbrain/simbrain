@@ -22,13 +22,16 @@ val srnElmanSentences = newSim {
     val numTrainingSentences = 1000 // 10,000 in Elman's paper
     val learningRate = .04
 
+    // Word embedding
+    val allWords = listOf(noun_hum, noun_anim, noun_inanim, noun_agress, noun_frag, noun_food, verb_intran, verb_tran, verb_agpat, verb_percept, verb_destroy, verb_eat)
+        .flatten().distinct().joinToString(" ")
+    val tokenEmbedding = TokenEmbeddingBuilder().apply {
+        embeddingType = EmbeddingType.ONE_HOT
+    }.build(allWords)
+
     // Text World for Inputs
     val textWorldInputs = addTextWorld("Text World (Inputs)").apply { updateOn = false }
     val text = makeElmanVector(numInputSentences)
-    val tokenEmbedding = TokenEmbeddingBuilder().apply {
-        embeddingType = EmbeddingType.ONE_HOT
-    }.build(text)
-
     textWorldInputs.world.text = text
     textWorldInputs.world.tokenEmbedding = tokenEmbedding
 
@@ -109,19 +112,20 @@ val srnElmanSentences = newSim {
 
 }
 
+val noun_hum = listOf("man", "woman")
+val noun_anim = listOf("cat", "mouse")
+val noun_inanim = listOf("book", "rock")
+val noun_agress = listOf("dragon", "monster")
+val noun_frag = listOf("glass", "plate")
+val noun_food = listOf("cookie", "bread")
+val verb_intran = listOf("think", "sleep")
+val verb_tran = listOf("see", "chase")
+val verb_agpat = listOf("move", "break")
+val verb_percept = listOf("see", "smell")
+val verb_destroy = listOf("break", "smash")
+val verb_eat = listOf("eat")
+
 fun makeElmanVector(numSentences: Int): String {
-    val noun_hum = listOf("man", "woman")
-    val noun_anim = listOf("cat", "mouse")
-    val noun_inanim = listOf("book", "rock")
-    val noun_agress = listOf("dragon", "monster")
-    val noun_frag = listOf("glass", "plate")
-    val noun_food = listOf("cookie", "bread")
-    val verb_intran = listOf("think", "sleep")
-    val verb_tran = listOf("see", "chase")
-    val verb_agpat = listOf("move", "break")
-    val verb_percept = listOf("see", "smell")
-    val verb_destroy = listOf("break", "smash")
-    val verb_eat = listOf("eat")
 
     val templates = listOf(
         listOf(noun_hum, verb_eat, noun_food),

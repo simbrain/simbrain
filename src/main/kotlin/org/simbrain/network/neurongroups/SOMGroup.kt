@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.neurongroups
 
+import org.simbrain.network.core.InfoText
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.XStreamConstructor
@@ -37,8 +38,15 @@ import kotlin.math.pow
 class SOMGroup @JvmOverloads constructor(
     network: Network,
     neurons: List<Neuron>,
-    val params: SOMParams = SOMParams()
+    params: SOMParams = SOMParams()
 ) : AbstractNeuronCollection(network) {
+
+    var params: SOMParams by GuiEditable(
+        label = "SOM Parameters",
+        description = "Parameters for the SOM",
+        initValue = params.apply { creationMode = false },
+        order = 50
+    )
 
     constructor(network: Network, numNeurons: Int) : this(network, List(numNeurons) { Neuron(network) })
 
@@ -51,12 +59,16 @@ class SOMGroup @JvmOverloads constructor(
 
     override fun copy() = SOMGroup(network, neuronList.map { it.deepCopy() }, params.copy())
 
-    var neighborhoodSize = params.initNeighborhoodSize
-    var learningRate = params.initialLearningRate
+    var neighborhoodSize by params::initNeighborhoodSize
+    var learningRate by params::initialLearningRate
     var winDistance = 0.0
     var distance = 0.0
     var value = 0.0
     var winner: Neuron? = null
+
+    val _customInfo = InfoText(network, getStateInfoText())
+
+    override fun getCustomInfo() = _customInfo
 
     //     this.layout = HexagonalGridLayout(50.0, 50.0, 5)
 
@@ -161,11 +173,14 @@ class SOMGroup @JvmOverloads constructor(
         }
 
         // For box
-        val stateInfo = "Learning rate (" + Utils.round(learningRate, 2) +
-                ") N-size (" + Utils.round(neighborhoodSize, 2) + ")"
-        setStateInfo(stateInfo)
-        events.labelChanged.fireAndForget("", stateInfo)
+        customInfo.text = getStateInfoText()
+        events.customInfoUpdated.fireAndBlock()
     }
+
+    fun getStateInfoText() = """
+        Learning rate (${Utils.round(learningRate, 2)})
+        N-size (${Utils.round(neighborhoodSize, 2)})
+    """.trimIndent()
 
     /**
      * Find the SOM neuron which is closest to the input vector.
@@ -234,11 +249,12 @@ class SOMParams : NeuronGroupParams() {
     )
 
     override fun create(net: Network): SOMGroup {
-        return SOMGroup(net, List(numNeurons) { Neuron(net) }, this)
+        return SOMGroup(net, List(numNeurons) { Neuron(net) }, this.copy())
     }
 
     override fun copy(): SOMParams {
         return SOMParams().also {
+            commonCopy(it)
             it.initNeighborhoodSize = initNeighborhoodSize
             it.initialLearningRate = initialLearningRate
             it.learningDecayRate = learningDecayRate

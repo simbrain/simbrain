@@ -134,6 +134,12 @@ class GuiEditable<O : EditableObject, T>(
 
     fun update(context: UpdateFunctionContext<O, T>) {
         with(context) {
+            if (conditionallyEnabledBy?.isWidget() == false) {
+                throw IllegalArgumentException("${conditionallyEnabledBy.name} must be a widget to use conditionallyEnabledBy")
+            }
+            if (conditionallyVisibleBy?.isWidget() == false) {
+                throw IllegalArgumentException("${conditionallyVisibleBy.name} must be a widget to use conditionallyVisibleBy")
+            }
             if (updateEventProperty == conditionallyEnabledBy) {
                 enableWidget(widgetValue(conditionallyEnabledBy))
             }
@@ -252,6 +258,10 @@ class UpdateFunctionContext<O : EditableObject, T>(
             editor.propertyNameWidgetMap[property.name]?.value as? WT
                 ?: throw IllegalArgumentException("Property $property is not a user parameter")
         }
+    }
+
+    fun KProperty<*>.isWidget(): Boolean {
+        return editor.propertyNameWidgetMap.containsKey(name)
     }
 
     fun enableWidget(enabled: Boolean) {

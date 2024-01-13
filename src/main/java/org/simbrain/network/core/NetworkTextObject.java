@@ -35,7 +35,7 @@ public class NetworkTextObject extends LocatableModel {
     /**
      * Reference to parent root network of this text object.
      */
-    private final Network parent;
+    private final Network network;
 
     /**
      * x-coordinate of this object in 2-space.
@@ -83,22 +83,22 @@ public class NetworkTextObject extends LocatableModel {
     /**
      * Construct the text object with initial text.
      *
-     * @param parent      root network
+     * @param network      root network
      * @param initialText text for the text object
      */
-    public NetworkTextObject(Network parent, String initialText) {
-        this.parent = parent;
+    public NetworkTextObject(Network network, String initialText) {
+        this.network = network;
         this.setText(initialText);
     }
 
     /**
      * Copy constructor.
      *
-     * @param parent parent network for this text object
+     * @param network parent network for this text object
      * @param text   text object to copy
      */
-    public NetworkTextObject(Network parent, NetworkTextObject text) {
-        this.parent = parent;
+    public NetworkTextObject(Network network, NetworkTextObject text) {
+        this.network = network;
         this.text = text.getText();
         this.x = text.x;
         this.y = text.y;

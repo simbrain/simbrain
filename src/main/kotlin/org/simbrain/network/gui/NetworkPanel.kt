@@ -278,6 +278,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             is SynapseGroup -> createNode(model)
             is Connector -> createNode(model)
             is Subnetwork -> createNode(model)
+            is InfoText -> createNode(model)
             is NetworkTextObject -> createNode(model)
             is ZoeLayer -> createNode(model)
             is DeepNet -> createNode(model)
@@ -312,8 +313,11 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         }
 
         val neuronNodes = neuronGroup.neuronList.map { neuron -> createNode(neuron).also { modelNodeMap[neuron] = it } }
-        // neuronGroup.applyLayout()
-        createNeuronGroupNode().apply { addNeuronNodes(neuronNodes) }
+        val customInfoNode = neuronGroup.customInfo?.let { createNode(it) }
+        createNeuronGroupNode().apply {
+            addNeuronNodes(neuronNodes)
+            customInfoNode?.let { setCustomInfoNode(it) }
+        }
     }
 
     fun createNode(neuronArray: NeuronArray) = addScreenElement { NeuronArrayNode(this, neuronArray) }
@@ -354,6 +358,10 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
     fun createNode(text: NetworkTextObject) = addScreenElement {
         TextNode(this, text)
+    }
+
+    fun createNode(infoText: InfoText) = addScreenElement {
+        TextInfoNode(this, infoText)
     }
 
     fun createNode(subnetwork: Subnetwork) = addScreenElement {

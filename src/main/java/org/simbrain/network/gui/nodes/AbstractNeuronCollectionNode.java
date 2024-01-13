@@ -1,5 +1,6 @@
 package org.simbrain.network.gui.nodes;
 
+import org.simbrain.network.LocatableModel;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.events.NeuronCollectionEvents;
 import org.simbrain.network.events.NeuronEvents;
@@ -37,6 +38,8 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
      */
     private Set<NeuronNode> neuronNodes = new HashSet<>();
 
+    private ScreenElement customInfo;
+
     /**
      * Reference to neuron group or collection.
      */
@@ -61,10 +64,7 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
             pullPositionFromModel();
             outlinedObjects.updateBounds();
         });
-
-        events.getRecordingStarted().on(this::updateText);
-        events.getRecordingStopped().on(this::updateText);
-
+        // events.getCustomInfoUpdated().on
     }
 
     /**
@@ -93,7 +93,7 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
         for (NeuronNode neuronNode : neuronNodes) {
             neuronNode.pullViewPositionFromModel();
         }
-        outlinedObjects.resetOutlinedNodes(neuronNodes);
+        updateOutline();
     }
 
     @Override
@@ -101,6 +101,7 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
         for (NeuronNode neuronNode : neuronNodes) {
             neuronNode.offset(dx, dy);
         }
+        customInfo.offset(dx, dy);
     }
 
     /**
@@ -113,16 +114,32 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
             NeuronEvents neuronEvents = neuronNode.getNeuron().getEvents();
             neuronEvents.getDeleted().on(getSwingDispatcher(), n -> {
                 this.neuronNodes.remove(neuronNode);
-                outlinedObjects.resetOutlinedNodes(this.neuronNodes);
+                updateOutline();
             });
-            neuronEvents.getLocationChanged().on(getSwingDispatcher(), () -> outlinedObjects.resetOutlinedNodes(this.neuronNodes));
-            neuronEvents.getLabelChanged().on(getSwingDispatcher(), (o,n) -> outlinedObjects.resetOutlinedNodes(this.neuronNodes));
+            neuronEvents.getLocationChanged().on(getSwingDispatcher(), this::updateOutline);
+            neuronEvents.getLabelChanged().on(getSwingDispatcher(), (o,n) -> updateOutline());
         }
-        outlinedObjects.resetOutlinedNodes(this.neuronNodes);
+        updateOutline();
     }
 
     public void removeNeuronNode(NeuronNode neuronNode) {
         neuronNodes.remove(neuronNode);
+    }
+
+    public void setCustomInfoNode(ScreenElement customInfo) {
+        this.customInfo = customInfo;
+        var bounds = getFullBoundsReference();
+        ((LocatableModel) customInfo.getModel()).setLocation(bounds.getX() + bounds.getWidth() / 2.0, bounds.getY() - 5);
+        nc.getEvents().getCustomInfoUpdated().on(getSwingDispatcher(), this::updateOutline);
+        updateOutline();
+    }
+
+    private void updateOutline() {
+        var nodes = new HashSet<ScreenElement>(neuronNodes);
+        if (customInfo != null) {
+            nodes.add(customInfo);
+        }
+        outlinedObjects.resetOutlinedNodes(nodes);
     }
 
     public abstract AbstractNeuronCollection getModel();
@@ -148,11 +165,6 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
     public void updateText() {
         // Set text to label by default
         String text = nc.getLabel();
-
-        // If there is state info, use that instead of a label
-        if (!nc.getStateInfo().isEmpty()) {
-            text = nc.getStateInfo();
-        }
 
         // Update the text
         getInteractionBox().setText(text);

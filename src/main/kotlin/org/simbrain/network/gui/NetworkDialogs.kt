@@ -8,7 +8,6 @@ import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.percentExcitatory
 import org.simbrain.network.groups.AbstractNeuronCollection
 import org.simbrain.network.gui.dialogs.*
-import org.simbrain.network.gui.dialogs.group.NeuronGroupDialog
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog
 import org.simbrain.network.gui.dialogs.text.TextDialog
@@ -77,12 +76,7 @@ val NetworkPanel.synapseDialog
     get() =
         SynapseDialog.createSynapseDialog(selectionManager.filterSelectedModels<Synapse>())
 
-fun NetworkPanel.createNeuronGroupDialog(neuronGroup: AbstractNeuronCollection) =
-    NeuronGroupDialog(this, neuronGroup).apply {
-        title = "Neuron Group Dialog"
-        setAsDoneDialog()
-        modalityType = Dialog.ModalityType.MODELESS
-    }
+fun NetworkPanel.createNeuronGroupDialog(neuronGroup: AbstractNeuronCollection) = neuronGroup.createEditorDialog()
 
 /**
  * Display the provided network in a dialog

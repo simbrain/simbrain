@@ -2,6 +2,7 @@ package org.simbrain.network.groups;
 
 import org.jetbrains.annotations.NotNull;
 import org.simbrain.network.LocatableModelKt;
+import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.*;
 import org.simbrain.network.events.NeuronCollectionEvents;
 import org.simbrain.network.layouts.GridLayout;
@@ -54,7 +55,7 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
      * Optional information about the current state of the group. For display in
      * GUI.
      */
-    private String stateInfo = "";
+    private NetworkModel stateInfo;
 
     /**
      * Support for property change events.
@@ -665,11 +666,11 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
         //todo
     }
 
-    public String getStateInfo() {
+    public NetworkModel getStateInfo() {
         return stateInfo;
     }
 
-    public void setStateInfo(String stateInfo) {
+    public void setStateInfo(NetworkModel stateInfo) {
         this.stateInfo = stateInfo;
     }
 
@@ -839,5 +840,9 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
 
     public void setLayout(Layout layout) {
         this.layout = layout;
+    }
+
+    public NetworkModel getCustomInfo() {
+        return null;
     }
 }

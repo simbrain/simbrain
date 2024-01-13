@@ -70,6 +70,7 @@ public class SOMNetwork extends Subnetwork {
         super(net);
         this.setLabel("SOM Network");
         som = new SOMGroup(net, numSOMNeurons);
+        som.setLabel("SOM Group");
         this.addModel(som);
         som.applyLayout();
 

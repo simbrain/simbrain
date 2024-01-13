@@ -90,7 +90,7 @@ public class Hopfield extends Subnetwork  {
         binary.setThreshold(0);
         binary.setCeiling(1);
         binary.setFloor(0);
-        neuronGroup.setNeuronType(binary);
+        neuronGroup.setUpdateRule(binary);
         neuronGroup.setIncrement(1);
 
         // Connect the neurons together

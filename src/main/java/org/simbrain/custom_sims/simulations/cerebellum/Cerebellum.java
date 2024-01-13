@@ -112,7 +112,7 @@ public class Cerebellum extends Simulation {
         // Cortex (assume it's at 0,0)
         NeuronGroup cortex = new NeuronGroup(network, 1);
         cortex.setLabel("Cerebral Cortex");
-        cortex.setNeuronType(generalRule);
+        cortex.setUpdateRule(generalRule);
         network.addNetworkModelAsync(cortex);
         cortex.setLocation(50, 0);
         cortex.setLowerBound(0);
@@ -120,7 +120,7 @@ public class Cerebellum extends Simulation {
         // Red Nucleus
         NeuronGroup redNucleus = new NeuronGroup(network, 2);
         redNucleus.setLabel("Red Nucleus");
-        redNucleus.setNeuronType(generalRule);
+        redNucleus.setUpdateRule(generalRule);
         redNucleus.setLowerBound(0);
         network.addNetworkModelAsync(redNucleus);
         redNucleus.setLocation(50, 200);
@@ -145,7 +145,7 @@ public class Cerebellum extends Simulation {
         // To Spinal Cord
         NeuronGroup toSpinalCord = new NeuronGroup(network, 2);
         toSpinalCord.setLabel("To Spinal Cord");
-        toSpinalCord.setNeuronType(generalRule);
+        toSpinalCord.setUpdateRule(generalRule);
         toSpinalCord.setLowerBound(0);
         network.addNetworkModelAsync(toSpinalCord);
         toSpinalCord.setLocation(-25, 275);
@@ -187,7 +187,7 @@ public class Cerebellum extends Simulation {
         // Cerebellum
         NeuronGroup cerebellum = new NeuronGroup(network, 5);
         cerebellum.setLabel("Cerebellum");
-        cerebellum.setNeuronType(generalRule);
+        cerebellum.setUpdateRule(generalRule);
         network.addNetworkModelAsync(cerebellum);
         cerebellum.setLocation(175, 125);
         cerebellum.getNeuronList().get(0).setLabel("Purkinje");
@@ -239,7 +239,7 @@ public class Cerebellum extends Simulation {
         NeuronGroup fromSpinalCord = new NeuronGroup(network, 2);
         fromSpinalCord.setLabel("From Spinal Cord");
         fromSpinalCord.setClamped(true);
-        fromSpinalCord.setNeuronType(generalRule);
+        fromSpinalCord.setUpdateRule(generalRule);
         fromSpinalCord.setLowerBound(0);
         network.addNetworkModelAsync(fromSpinalCord);
         fromSpinalCord.setLocation(275, 300);

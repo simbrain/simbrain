@@ -22,7 +22,7 @@ import org.simbrain.network.core.InfoText
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.XStreamConstructor
-import org.simbrain.network.groups.AbstractNeuronCollection
+import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.util.SimnetUtils
 import org.simbrain.util.UserParameter
 import org.simbrain.util.Utils
@@ -39,7 +39,7 @@ class SOMGroup @JvmOverloads constructor(
     network: Network,
     neurons: List<Neuron>,
     params: SOMParams = SOMParams()
-) : AbstractNeuronCollection(network) {
+) : NeuronGroup(network) {
 
     var params by GuiEditable(
         label = "SOM Parameters",
@@ -102,7 +102,6 @@ class SOMGroup @JvmOverloads constructor(
                 incoming.source.forceSetActivation(incoming.strength)
                 incomingNeurons.add(incoming.source)
             }
-            //            getParentNetwork().fireNeuronsUpdated(incomingNeurons); // TODO: [event]
         }
     }
 
@@ -112,6 +111,8 @@ class SOMGroup @JvmOverloads constructor(
     fun reset() {
         learningRate = params.initialLearningRate
         neighborhoodSize = params.initNeighborhoodSize
+        updateStateInfoText()
+        events.customInfoUpdated.fireAndBlock()
     }
 
     /**
@@ -182,9 +183,9 @@ class SOMGroup @JvmOverloads constructor(
         N-size (${Utils.round(neighborhoodSize, 2)})
     """.trimIndent()
 
-    override fun delete() {
-        super.delete()
-        neuronList.forEach(Neuron::delete)
+    fun updateStateInfoText() {
+        customInfo.text = getStateInfoText()
+        events.customInfoUpdated.fireAndBlock()
     }
 
     /**

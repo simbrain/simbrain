@@ -134,7 +134,7 @@ public class ModularOscillatoryNetwork extends Simulation {
     private NeuronGroup addBinaryModule(int x, int y, int numNeurons, String name) {
         NeuronGroup ng = addNeuronGroup(net, x, y, numNeurons);
         BinaryRule rule = new BinaryRule();
-        ng.setNeuronType(rule);
+        ng.setUpdateRule(rule);
         HexagonalGridLayout.layoutNeurons(ng.getNeuronList(), 40, 40);
         ng.setLocation(x, y);
         ng.setLabel(name);
@@ -146,7 +146,7 @@ public class ModularOscillatoryNetwork extends Simulation {
         //KuramotoRule rule = new KuramotoRule();
         //NakaRushtonRule rule = new NakaRushtonRule();
         //rule.setNaturalFrequency(.1);
-        ng.setNeuronType(rule);
+        ng.setUpdateRule(rule);
         for (Neuron neuron : ng.getNeuronList()) {
             if (Math.random() < .5) {
                 neuron.setPolarity(SimbrainConstants.Polarity.EXCITATORY);

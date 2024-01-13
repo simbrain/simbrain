@@ -120,8 +120,11 @@ public class KuramotoOscillators extends Simulation {
         inputNetwork = addNeuronGroup(net, 1, 1, 3);
         inputNetwork.setLowerBound(-100);
         inputNetwork.setUpperBound(100);
-        ((LinearRule)inputNetwork.getPrototypeRule()).setNoiseGenerator(new NormalDistribution(0.0, .1));
-        ((LinearRule)inputNetwork.getPrototypeRule()).setAddNoise(true);
+        inputNetwork.getNeuronList().stream().map(Neuron::getUpdateRule).forEach(r -> {
+            var linearRule = (LinearRule) r;
+            linearRule.setAddNoise(true);
+            linearRule.setNoiseGenerator(new NormalDistribution(0.0, .1));
+        });
         inputNetwork.setLabel("Sensory Neurons");
         inputNetwork.setLayout(new LineLayout());
         inputNetwork.applyLayout();

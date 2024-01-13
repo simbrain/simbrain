@@ -129,7 +129,7 @@ public class EdgeOfChaos extends Simulation {
         GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(numNeurons));
         NeuronGroup ng = new NeuronGroup(parentNet, numNeurons);
         BinaryRule thresholdUnit = new BinaryRule();
-        ng.setPrototypeRule(thresholdUnit);
+        ng.setUpdateRule(thresholdUnit);
         parentNet.addNetworkModelAsync(ng);
 
         ng.setLayout(layout);

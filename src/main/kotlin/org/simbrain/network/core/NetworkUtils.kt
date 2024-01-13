@@ -214,7 +214,7 @@ fun Network.addNeuronGroup(count: Int, location: Point2D? = null, template: Neur
 fun Network.addNeuronGroup(x: Double, y: Double, numNeurons: Int, rule: NeuronUpdateRule<*, *> = LinearRule()):
         NeuronGroup {
     val ng = NeuronGroup(this, numNeurons)
-    ng.setNeuronType(rule)
+    ng.setUpdateRule(rule)
     addNetworkModelAsync(ng)
     ng.setLocation(x, y)
     return ng

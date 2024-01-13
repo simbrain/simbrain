@@ -125,7 +125,7 @@ public class EdgeOfChaosBitStream extends Simulation {
         int offset = 200;
         bitStreamInputs = new NeuronGroup(net, 1);
         BinaryRule b = new BinaryRule(0, u_bar, .5);
-        bitStreamInputs.setNeuronType(b);
+        bitStreamInputs.setUpdateRule(b);
         bitStreamInputs.setClamped(true);
         // bitStreamInputs.getInputManager().setData(new double[][]{{u_bar}, {0.0}, {0.0}, {0.0}, {0.0}, {u_bar}, {0.0}, {u_bar}, {u_bar}, {0.0}, {u_bar}, {u_bar}, {0.0}, {0.0}, {u_bar}});
         // bitStreamInputs.setInputMode(true);

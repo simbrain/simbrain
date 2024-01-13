@@ -263,7 +263,7 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
     /**
      * Add a collection of neurons.
      */
-    protected void addNeurons(Collection<Neuron> neurons) {
+    protected final void addNeurons(Collection<Neuron> neurons) {
         neurons.forEach(this::addNeuron);
     }
 

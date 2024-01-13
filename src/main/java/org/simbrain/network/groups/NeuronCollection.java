@@ -24,7 +24,6 @@ import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.util.propertyeditor.CopyableObject;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -135,11 +134,6 @@ public class NeuronCollection extends AbstractNeuronCollection {
         // These neurons already have ids and listeners
         neuronList.add(neuron);
         addListener(neuron);
-    }
-
-    @Override
-    public void addNeurons(Collection<Neuron> neurons) {
-        super.addNeurons(neurons);
     }
 
     @Override

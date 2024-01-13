@@ -16,13 +16,13 @@ import org.simbrain.network.gui.UndoManager.UndoableAction
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.dialogs.group.ConnectorDialog
 import org.simbrain.network.gui.nodes.*
-import org.simbrain.network.gui.nodes.neuronGroupNodes.CompetitiveGroupNode
+import org.simbrain.network.gui.nodes.neuronGroupNodes.SOMGroupNode
 import org.simbrain.network.gui.nodes.subnetworkNodes.*
 import org.simbrain.network.kotlindl.DeepNet
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.matrix.ZoeLayer
-import org.simbrain.network.neurongroups.CompetitiveGroup
+import org.simbrain.network.neurongroups.SOMGroup
 import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.subnetworks.*
 import org.simbrain.network.trainers.WeightMatrixTree
@@ -308,7 +308,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     fun createNode(neuronGroup: AbstractNeuronCollection) = addScreenElement {
 
         fun createNeuronGroupNode() = when (neuronGroup) {
-            is CompetitiveGroup -> CompetitiveGroupNode(this, neuronGroup)
+            is SOMGroup -> SOMGroupNode(this, neuronGroup)
             else -> NeuronGroupNode(this, neuronGroup)
         }
 

@@ -519,6 +519,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     private fun addNeuronGroupAction() = networkPanel.createAction(
         name = "Add Neuron Group...",
         description = "Add a neuron group to network",
+        keyboardShortcut = 'G'
     ) {
         objectWrapper("Neuron Group Parameters", SoftmaxParams() as NeuronGroupParams).createEditorDialog {
             it.editingObject.create(network).also { group ->

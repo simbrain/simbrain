@@ -101,7 +101,9 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
         for (NeuronNode neuronNode : neuronNodes) {
             neuronNode.offset(dx, dy);
         }
-        customInfo.offset(dx, dy);
+        if (customInfo != null) {
+            customInfo.offset(dx, dy);
+        }
     }
 
     /**

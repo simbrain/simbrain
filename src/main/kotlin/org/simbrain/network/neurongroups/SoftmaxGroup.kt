@@ -47,6 +47,8 @@ class SoftmaxParams: NeuronGroupParams() {
     }
 
     override fun copy(): CopyableObject {
-        return SoftmaxParams().also { it.numNeurons = numNeurons }
+        return SoftmaxParams().also {
+            commonCopy(it)
+        }
     }
 }

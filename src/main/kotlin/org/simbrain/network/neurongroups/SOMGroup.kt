@@ -41,7 +41,7 @@ class SOMGroup @JvmOverloads constructor(
     params: SOMParams = SOMParams()
 ) : AbstractNeuronCollection(network) {
 
-    var params: SOMParams by GuiEditable(
+    var params by GuiEditable(
         label = "SOM Parameters",
         description = "Parameters for the SOM",
         initValue = params.apply { creationMode = false },
@@ -59,8 +59,8 @@ class SOMGroup @JvmOverloads constructor(
 
     override fun copy() = SOMGroup(network, neuronList.map { it.deepCopy() }, params.copy())
 
-    var neighborhoodSize by params::initNeighborhoodSize
-    var learningRate by params::initialLearningRate
+    var neighborhoodSize = params.initNeighborhoodSize
+    var learningRate = params.initialLearningRate
     var winDistance = 0.0
     var distance = 0.0
     var value = 0.0
@@ -70,7 +70,7 @@ class SOMGroup @JvmOverloads constructor(
 
     override fun getCustomInfo() = _customInfo
 
-    //     this.layout = HexagonalGridLayout(50.0, 50.0, 5)
+    // this.layout = HexagonalGridLayout(50.0, 50.0, 5)
 
     /**
      * Randomize all weights coming in to this network. The weights will be

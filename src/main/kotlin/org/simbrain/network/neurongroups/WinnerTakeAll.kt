@@ -34,8 +34,15 @@ import kotlin.random.Random
 class WinnerTakeAll @JvmOverloads constructor(
     network: Network,
     neurons: List<Neuron>,
-    val params: WinnerTakeAllParams = WinnerTakeAllParams()
+    params: WinnerTakeAllParams = WinnerTakeAllParams()
 ) : AbstractNeuronCollection(network) {
+
+    var params by GuiEditable(
+        label = "Winner Take All Parameters",
+        description = "Parameters for the WTA Group",
+        initValue = params.apply { creationMode = false },
+        order = 50
+    )
 
     constructor(network: Network, numNeurons: Int) : this(network, List(numNeurons) { Neuron(network) })
 
@@ -100,6 +107,7 @@ class WinnerTakeAllParams : NeuronGroupParams() {
 
     override fun copy(): WinnerTakeAllParams {
         return WinnerTakeAllParams().also {
+            commonCopy(it)
             it.winValue = winValue
             it.loseValue = loseValue
             it.isUseRandom = isUseRandom

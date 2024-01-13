@@ -33,8 +33,18 @@ import org.simbrain.util.propertyeditor.GuiEditable
  *
  * @author Jeff Yoshimi
  */
-open class CompetitiveGroup @JvmOverloads constructor(network: Network, neurons: List<Neuron>, val params: CompetitiveGroupParams = CompetitiveGroupParams()) : AbstractNeuronCollection(network) {
+open class CompetitiveGroup @JvmOverloads constructor(
+    network: Network,
+    neurons: List<Neuron>,
+    params: CompetitiveGroupParams = CompetitiveGroupParams()
+) : AbstractNeuronCollection(network) {
 
+    var params by GuiEditable(
+        label = "Competitive Group Parameters",
+        description = "Parameters for the Competitive Group",
+        initValue = params.apply { creationMode = false },
+        order = 50
+    )
     constructor(network: Network, numNeurons: Int) : this(network, List(numNeurons) { Neuron(network) })
 
     @XStreamConstructor
@@ -316,7 +326,7 @@ class CompetitiveGroupParams : NeuronGroupParams() {
 
     override fun copy(): CompetitiveGroupParams {
         return CompetitiveGroupParams().also {
-            it.numNeurons = numNeurons
+            commonCopy(it)
             it.updateMethod = updateMethod
             it.learningRate = learningRate
             it.winValue = winValue

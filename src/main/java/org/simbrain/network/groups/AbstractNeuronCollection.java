@@ -416,6 +416,10 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
         super.delete();
         outgoingSgs.forEach(SynapseGroup::delete);
         incomingSgs.forEach(SynapseGroup::delete);
+        var customInfo = getCustomInfo();
+        if (customInfo != null) {
+            customInfo.getEvents().getDeleted().fireAndBlock(customInfo);
+        }
     }
 
     @Override

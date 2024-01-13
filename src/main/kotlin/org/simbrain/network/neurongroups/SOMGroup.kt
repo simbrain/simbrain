@@ -182,6 +182,11 @@ class SOMGroup @JvmOverloads constructor(
         N-size (${Utils.round(neighborhoodSize, 2)})
     """.trimIndent()
 
+    override fun delete() {
+        super.delete()
+        neuronList.forEach(Neuron::delete)
+    }
+
     /**
      * Find the SOM neuron which is closest to the input vector.
      *

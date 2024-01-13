@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 
 import static org.simbrain.util.GeomKt.minus;
 import static org.simbrain.util.GeomKt.plus;
+import static org.simbrain.util.SwingUtilsKt.getSwingDispatcher;
 
 /**
  * An editable text element, which wraps a PStyledText object.
@@ -70,9 +71,9 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
         addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
 
         var events = text.getEvents();
-        events.getDeleted().on(n -> removeFromParent());
+        events.getDeleted().on(getSwingDispatcher(), n -> removeFromParent());
         events.getLocationChanged().on(this::pullViewPositionFromModel);
-        events.getTextUpdated().on(this::update);
+        events.getTextUpdated().on(getSwingDispatcher(), this::update);
 
         update();
         pushViewPositionToModel();

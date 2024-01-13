@@ -24,6 +24,7 @@ package org.simbrain.network.core
 class InfoText(network: Network, text: String) : NetworkTextObject(network, text) {
 
     override fun delete() {
-
+        // prevent the default delete behavior
+        // fire event directly if we want to delete
     }
 }

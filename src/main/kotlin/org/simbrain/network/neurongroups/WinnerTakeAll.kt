@@ -21,7 +21,7 @@ package org.simbrain.network.neurongroups
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.XStreamConstructor
-import org.simbrain.network.groups.AbstractNeuronCollection
+import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.GuiEditable
 import kotlin.random.Random
@@ -35,7 +35,7 @@ class WinnerTakeAll @JvmOverloads constructor(
     network: Network,
     neurons: List<Neuron>,
     params: WinnerTakeAllParams = WinnerTakeAllParams()
-) : AbstractNeuronCollection(network) {
+) : NeuronGroup(network) {
 
     var params by GuiEditable(
         label = "Winner Take All Parameters",

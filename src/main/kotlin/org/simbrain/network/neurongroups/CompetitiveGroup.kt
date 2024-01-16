@@ -21,7 +21,7 @@ package org.simbrain.network.neurongroups
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.XStreamConstructor
-import org.simbrain.network.groups.AbstractNeuronCollection
+import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.GuiEditable
 
@@ -37,7 +37,7 @@ open class CompetitiveGroup @JvmOverloads constructor(
     network: Network,
     neurons: List<Neuron>,
     params: CompetitiveGroupParams = CompetitiveGroupParams()
-) : AbstractNeuronCollection(network) {
+) : NeuronGroup(network) {
 
     var params by GuiEditable(
         label = "Competitive Group Parameters",
@@ -81,15 +81,10 @@ open class CompetitiveGroup @JvmOverloads constructor(
         }
     }
 
-
-    fun deepCopy(newParent: Network): CompetitiveGroup {
-        return CompetitiveGroup(newParent, neuronList.map { it.deepCopy() }, params.copy()).also {
-            it.max = max
-            it.activation = activation
-        }
+    override fun copy() = CompetitiveGroup(network, neuronList.map { it.deepCopy() }, params.copy()).also {
+        it.max = this.max
+        it.activation = this.activation
     }
-
-    override fun copy() = deepCopy(network)
 
     override fun update() {
 

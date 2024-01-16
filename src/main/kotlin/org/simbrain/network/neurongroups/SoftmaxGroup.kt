@@ -4,7 +4,7 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.core.activations
-import org.simbrain.network.groups.AbstractNeuronCollection
+import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.util.propertyeditor.CopyableObject
 import kotlin.math.exp
 
@@ -15,7 +15,7 @@ import kotlin.math.exp
  * This applies the activation rules of the underlying nodes before normalizing so be sure to check that it is
  * appropriate, e.g. that any min and max value is appropriate.
  */
-class SoftmaxGroup(net: Network, neurons: List<Neuron>): AbstractNeuronCollection(net), CopyableObject {
+class SoftmaxGroup(net: Network, neurons: List<Neuron>): NeuronGroup(net), CopyableObject {
 
     constructor(net: Network, numNeurons: Int): this(net, List(numNeurons) { Neuron(net) })
 
@@ -35,9 +35,7 @@ class SoftmaxGroup(net: Network, neurons: List<Neuron>): AbstractNeuronCollectio
         neuronList.forEachIndexed { i, n -> n.activation = exponentials[i]/total }
     }
 
-    override fun copy(): AbstractNeuronCollection {
-        return SoftmaxGroup(network, neuronList.map { it.deepCopy() })
-    }
+    override fun copy() = SoftmaxGroup(network, neuronList.map { it.deepCopy() })
 }
 
 class SoftmaxParams: NeuronGroupParams() {

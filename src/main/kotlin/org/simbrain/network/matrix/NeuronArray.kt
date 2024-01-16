@@ -111,7 +111,7 @@ class NeuronArray(parent: Network, inputSize: Int) : ArrayLayer(parent, inputSiz
      * @param newParent the new parent network
      * @return the deep copy
      */
-    fun deepCopy(newParent: Network): NeuronArray {
+    fun copyTo(newParent: Network): NeuronArray {
         val copy = NeuronArray(newParent, outputSize())
         copy.location = location
         copy.gridMode = gridMode

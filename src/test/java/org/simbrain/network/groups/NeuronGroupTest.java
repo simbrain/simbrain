@@ -22,7 +22,7 @@ public class NeuronGroupTest {
 
     @Test
     public void testDeepCopy() {
-        NeuronGroup ng2 = ng.deepCopy(net);
+        NeuronGroup ng2 = ng.copyTo(net);
         net.addNetworkModelAsync(ng2);
         assertEquals(2, ng2.getNeuronList().size());
         // Labels should not be copied

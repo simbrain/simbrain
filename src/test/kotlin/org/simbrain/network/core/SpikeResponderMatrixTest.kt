@@ -44,7 +44,7 @@ class SpikeResponderMatrixTest {
         val net2 = Network()
         val arr1 = NeuronArray(net, 4) // Input
         arr1.updateRule = IntegrateAndFireRule()
-        val arr2 = arr1.deepCopy(net2)
+        val arr2 = arr1.copyTo(net2)
         val wmArr1Arr2 = WeightMatrix(net2, arr1, arr2)
         wmArr1Arr2.setSpikeResponder(StepResponder())
         net2.addNetworkModelsAsync(arr1, arr2, wmArr1Arr2)

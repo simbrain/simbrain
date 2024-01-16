@@ -21,7 +21,13 @@ package org.simbrain.network.gui
 import kotlinx.coroutines.launch
 import org.simbrain.network.LocatableModel
 import org.simbrain.network.NetworkModel
-import org.simbrain.network.util.SimnetUtils
+import org.simbrain.network.core.Network
+import org.simbrain.network.core.NetworkTextObject
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.Synapse
+import org.simbrain.network.groups.NeuronGroup
+import org.simbrain.network.matrix.NeuronArray
+import java.util.*
 
 /**
  * Buffer which holds network objects for cutting and pasting.
@@ -70,8 +76,62 @@ object Clipboard {
             return
         }
 
+        fun createCopies(destinationNetwork: Network, sourceModels: List<NetworkModel>): MutableList<NetworkModel> {
+            val ret: MutableList<NetworkModel> = ArrayList()
+
+            // Match new to old neurons for synapse adding
+            val neuronMappings = Hashtable<Neuron, Neuron>()
+            val synapses = ArrayList<Synapse>()
+
+            fun Synapse.isStranded(): Boolean {
+                val allNeurons = sourceModels.filterIsInstance<Neuron>()
+                return !(allNeurons.contains(this.source) && (allNeurons.contains(this.target)))
+            }
+
+            for (item in sourceModels) {
+                when (item) {
+                    is Neuron -> {
+                        val newNeuron = Neuron(destinationNetwork, item)
+                        ret.add(newNeuron)
+                        neuronMappings[item] = newNeuron
+                    }
+                    is Synapse -> {
+                        if (!item.isStranded()) {
+                            synapses.add(item)
+                        }
+                    }
+                    is NetworkTextObject -> {
+                        val newText = NetworkTextObject(destinationNetwork, item)
+                        ret.add(newText)
+                    }
+                    is NeuronGroup -> {
+                        ret.add(item.copyTo(destinationNetwork))
+                    }
+                    is NeuronArray -> {
+                        val copy: LocatableModel = item.copyTo(destinationNetwork)
+                        ret.add(copy)
+                    }
+                }
+            }
+
+
+            // Copy synapses
+            for (synapse in synapses) {
+                val newSynapse = Synapse(
+                    destinationNetwork,
+                    neuronMappings[synapse.source],
+                    neuronMappings[synapse.target],
+                    synapse.learningRule.deepCopy(),
+                    synapse
+                )
+                ret.add(newSynapse)
+            }
+
+            return ret
+        }
+
         // Create a copy of the clipboard objects.
-        val copy = SimnetUtils.getCopy(net.network, copiedObjects)
+        val copy = createCopies(net.network, copiedObjects)
         copy.filterIsInstance<LocatableModel>()
             .forEach { it.shouldBePlaced = false }
 

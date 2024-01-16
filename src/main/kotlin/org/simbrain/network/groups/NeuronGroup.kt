@@ -46,8 +46,11 @@ open class NeuronGroup(net: Network?) : AbstractNeuronCollection(net) {
         neuronList.forEach { it.updateRule = base.copy() }
     }
 
-    fun deepCopy(newParent: Network): NeuronGroup {
-        return NeuronGroup(newParent).also { it.addNeurons(neuronList.map(Neuron::deepCopy)) }
+    fun copyTo(newParent: Network): NeuronGroup {
+        return NeuronGroup(newParent).also {
+            it.addNeurons(neuronList.map(Neuron::deepCopy))
+            it.label = label
+        }
     }
 
     override fun delete() {
@@ -68,7 +71,7 @@ open class NeuronGroup(net: Network?) : AbstractNeuronCollection(net) {
     }
 
     override fun copy(): NeuronGroup {
-        return deepCopy(this.parentNetwork)
+        return copyTo(parentNetwork)
     }
 
     override fun postOpenInit() {

@@ -14,14 +14,12 @@ import org.simbrain.network.core.*
 import org.simbrain.network.groups.*
 import org.simbrain.network.gui.UndoManager.UndoableAction
 import org.simbrain.network.gui.dialogs.NetworkPreferences
-import org.simbrain.network.gui.dialogs.group.ConnectorDialog
 import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.gui.nodes.neuronGroupNodes.SOMGroupNode
 import org.simbrain.network.gui.nodes.subnetworkNodes.*
 import org.simbrain.network.kotlindl.DeepNet
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
-import org.simbrain.network.matrix.ZoeLayer
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.neurongroups.SOMGroup
 import org.simbrain.network.smile.SmileClassifier
@@ -281,7 +279,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             is Subnetwork -> createNode(model)
             is InfoText -> createNode(model)
             is NetworkTextObject -> createNode(model)
-            is ZoeLayer -> createNode(model)
             is DeepNet -> createNode(model)
             else -> throw IllegalArgumentException()
         }.also { modelNodeMap[model] = it }
@@ -325,10 +322,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
     fun createNode(classifier: SmileClassifier) = addScreenElement {
         SmileClassifierNode(this, classifier)
-    }
-
-    fun createNode(layer: ZoeLayer) = addScreenElement {
-        ZoeLayerNode(this, layer)
     }
 
     fun createNode(dn: DeepNet) = addScreenElement {
@@ -613,39 +606,17 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
      *
      * @retrun false if the source and target selections did not have a [Layer]
      */
-    private fun NetworkSelectionManager.connectLayers(useDialog: Boolean = false): Boolean {
+    private fun NetworkSelectionManager.connectLayers(): Boolean {
         val sources = filterSelectedSourceModels(Layer::class.java)
         val targets = filterSelectedModels(Layer::class.java)
         if (sources.isNotEmpty() && targets.isNotEmpty()) {
-            if (useDialog) {
-                val dialog = ConnectorDialog(this.networkPanel, sources, targets)
-                dialog.setLocationRelativeTo(null)
-                dialog.pack()
-                dialog.isVisible = true
-            } else {
-                // TODO: Ability to set defaults for weight matrix that is added
-                sources.cartesianProduct(targets).mapNotNull { (s, t) ->
-                    network.addNetworkModelAsync(WeightMatrix(network, s, t))
-                }
+            // TODO: Ability to set defaults for weight matrix that is added
+            sources.cartesianProduct(targets).mapNotNull { (s, t) ->
+                network.addNetworkModelAsync(WeightMatrix(network, s, t))
             }
             return true
         }
         return false
-    }
-
-
-    /**
-     * Connect all selected [Layer]s with [WeightMatrix] objects.
-     */
-    fun NetworkPanel.createConnector() {
-        with(selectionManager) {
-            val sources = filterSelectedSourceModels<Layer>()
-            val targets = filterSelectedModels<Layer>()
-            val dialog = ConnectorDialog(this.networkPanel, sources, targets)
-            dialog.setLocationRelativeTo(null)
-            dialog.pack()
-            dialog.isVisible = true
-        }
     }
 
     /**

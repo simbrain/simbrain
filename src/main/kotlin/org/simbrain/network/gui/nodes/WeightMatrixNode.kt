@@ -10,7 +10,6 @@ import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.WeightMatrixArrow
 import org.simbrain.network.gui.createCouplingMenu
 import org.simbrain.network.matrix.WeightMatrix
-import org.simbrain.network.matrix.ZoeConnector
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.table.MatrixDataFrame
@@ -82,19 +81,11 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
     private fun renderMatrixToImage() {
         var img: BufferedImage? = null
         if (weightMatrix.isEnableRendering) {
-            img = if (weightMatrix is ZoeConnector) {
-                // TODO: Temp representation. If there is enough divergence can break into separate classes and update
-                //  NetworkPanel.kt accordingly
-                val tempArray = DoubleArray(100)
-                Arrays.fill(tempArray, .1)
-                tempArray.toSimbrainColorImage(10, 10)
-            } else {
-                val pixelArray = (weightMatrix as WeightMatrix).weights
-                pixelArray.toSimbrainColorImage(
-                    weightMatrix.weightMatrix.ncol(),
-                    weightMatrix.weightMatrix.nrow()
-                )
-            }
+            val pixelArray = (weightMatrix as WeightMatrix).weights
+            img = pixelArray.toSimbrainColorImage(
+                weightMatrix.weightMatrix.ncol(),
+                weightMatrix.weightMatrix.nrow()
+            )
         }
         imageBox.image = img
     }

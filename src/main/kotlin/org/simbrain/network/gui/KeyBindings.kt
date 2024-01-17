@@ -3,7 +3,6 @@ package org.simbrain.network.gui
 import org.simbrain.network.LocatableModel
 import org.simbrain.network.gui.nodes.NeuronNode
 import org.simbrain.network.matrix.WeightMatrix
-import org.simbrain.network.matrix.ZoeLayer
 import org.simbrain.util.*
 import java.awt.event.KeyEvent.*
 
@@ -41,7 +40,6 @@ fun NetworkPanel.addKeyBindings() {
     bind(Ctrl + 'P') {showPiccoloDebugger()}
     bind("S") { selectNeuronsInNeuronGroups() }
     bind(CmdOrCtrl + 'Y') { redo() }
-    bind(Shift + 'Z') { network.addNetworkModelAsync(ZoeLayer(network, 10)) } // TODO: Temp testing key command
     bind(CmdOrCtrl + 'Z') { undo() }
     bind(CmdOrCtrl + Shift + 'Z') { redo() }
 

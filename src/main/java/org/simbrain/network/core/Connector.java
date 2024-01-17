@@ -2,7 +2,6 @@ package org.simbrain.network.core;
 
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.events.ConnectorEvents;
-import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import smile.math.matrix.Matrix;
@@ -114,37 +113,5 @@ public abstract class Connector extends NetworkModel implements EditableObject, 
     public void setShowWeights(boolean showWeights) {
         this.showWeights = showWeights;
         events.getShowWeightsChanged().fireAndBlock();
-    }
-
-    /**
-     * Helper class for creating new Connectors.
-     */
-    public static class ConnectorCreator implements EditableObject {
-
-        @UserParameter(label = "Connector type", order = 30)
-        private Connector.ConnectorEnum connectorType = ConnectorEnum.DENSE;
-
-        @Override
-        public String getName() {
-            return "Connector";
-        }
-    }
-
-    /**
-     * Enum for creation dialog.
-     */
-    public enum ConnectorEnum {
-        DENSE {
-            @Override
-            public String toString() {
-                return "Dense matrix";
-            }
-        },
-        ZOE {
-            @Override
-            public String toString() {
-                return "Zoe's template";
-            }
-        };
     }
 }

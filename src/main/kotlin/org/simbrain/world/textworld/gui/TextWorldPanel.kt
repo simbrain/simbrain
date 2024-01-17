@@ -20,6 +20,7 @@ package org.simbrain.world.textworld.gui
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
+import org.simbrain.util.widgets.SimbrainTextArea
 import org.simbrain.world.textworld.*
 import java.awt.BorderLayout
 import java.awt.Color
@@ -46,7 +47,7 @@ class TextWorldPanel private constructor(
     /**
      * Text area for inputting text into networks.
      */
-    private val textArea = JTextArea()
+    val textArea = SimbrainTextArea()
 
     /**
      * The main scroll panel.

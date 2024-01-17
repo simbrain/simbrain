@@ -18,11 +18,11 @@
  */
 package org.simbrain.docviewer;
 
-import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
+import org.simbrain.util.widgets.SimbrainTextArea;
 import org.simbrain.workspace.gui.DesktopComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
@@ -69,7 +69,7 @@ public class DocViewerDesktopComponent extends DesktopComponent<DocViewerCompone
     /**
      * Main text area.
      */
-    private final RSyntaxTextArea htmlEditor = new RSyntaxTextArea();
+    private final SimbrainTextArea htmlEditor = new SimbrainTextArea();
 
     /**
      * Constructor the gui component.

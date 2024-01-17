@@ -63,6 +63,13 @@ val TextWorldDesktopComponent.loadTextAction
         }
     }
 
+fun TextWorldDesktopComponent.createShowFindAndReplaceAction() = createAction(
+    name = "Find / Replace...",
+    keyboardShortcut = CmdOrCtrl + 'F'
+) {
+    panel.textArea.showFindReplaceDialog()
+}
+
 val TextWorld.calculateCosineSimilarity
     get() = createAction(
         name = "Calculate similarity",

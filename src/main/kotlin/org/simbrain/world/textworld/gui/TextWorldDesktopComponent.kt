@@ -69,7 +69,7 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
     /**
      * The pane representing the text world.
      */
-    private val panel: TextWorldPanel
+    val panel: TextWorldPanel
 
     /**
      * The text world.
@@ -122,6 +122,8 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
 
         // Edit menu
         preferences.action = world.textWorldPrefs
+        edit.add(createShowFindAndReplaceAction())
+        edit.addSeparator()
         edit.add(preferences)
         menuBar.add(edit)
 

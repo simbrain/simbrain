@@ -19,6 +19,7 @@ sealed class NeuronGroupParams: CopyableObject {
 
     override fun getTypeList(): List<Class<out CopyableObject>>? = if (creationMode) {
         listOf(
+            BasicNeuronGroupParams::class.java,
             CompetitiveGroupParams::class.java,
             SoftmaxParams::class.java,
             SOMParams::class.java,

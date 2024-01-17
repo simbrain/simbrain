@@ -105,7 +105,6 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
     /**
      * The layout for the neurons in this group.
      */
-    @UserParameter(label = "Layout", tab = "Layout", order = 150)
     private Layout layout = DEFAULT_LAYOUT;
 
     /**

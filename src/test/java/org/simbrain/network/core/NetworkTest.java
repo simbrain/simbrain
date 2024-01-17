@@ -3,14 +3,10 @@ package org.simbrain.network.core;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.simbrain.network.groups.NeuronCollection;
-import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.network.matrix.WeightMatrix;
-import org.simbrain.network.neurongroups.CompetitiveGroup;
-import org.simbrain.network.neurongroups.SOMGroup;
-import org.simbrain.network.neurongroups.SoftmaxGroup;
-import org.simbrain.network.neurongroups.WinnerTakeAll;
+import org.simbrain.network.neurongroups.*;
 import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.subnetworks.SRNNetwork;
 

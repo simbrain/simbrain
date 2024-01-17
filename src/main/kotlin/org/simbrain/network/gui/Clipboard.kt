@@ -25,8 +25,8 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkTextObject
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.matrix.NeuronArray
+import org.simbrain.network.neurongroups.NeuronGroup
 import java.util.*
 
 /**

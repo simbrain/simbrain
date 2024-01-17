@@ -3,7 +3,7 @@ package org.simbrain.network.matrix;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.simbrain.network.core.Network;
-import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.neurongroups.NeuronGroup;
 
 import java.util.List;
 

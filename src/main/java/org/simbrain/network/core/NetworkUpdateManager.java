@@ -20,10 +20,10 @@ package org.simbrain.network.core;
 
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.groups.NeuronCollection;
-import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.matrix.NeuronArray;
 import org.simbrain.network.matrix.WeightMatrix;
+import org.simbrain.network.neurongroups.NeuronGroup;
 import org.simbrain.network.update_actions.BufferedUpdate;
 import org.simbrain.network.update_actions.PriorityUpdate;
 import org.simbrain.network.update_actions.UpdateNetworkModel;

@@ -3,9 +3,9 @@ package org.simbrain.network.gui
 import org.simbrain.network.*
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.groups.NeuronCollection
-import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.groups.Subnetwork
 import org.simbrain.network.matrix.NeuronArray
+import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.subnetworks.CompetitiveNetwork
 import org.simbrain.network.subnetworks.Hopfield
 import org.simbrain.util.plus

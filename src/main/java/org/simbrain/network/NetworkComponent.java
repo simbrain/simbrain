@@ -19,7 +19,7 @@ package org.simbrain.network;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.events.NetworkEvents;
-import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.neurongroups.NeuronGroup;
 import org.simbrain.util.XStreamUtils;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.WorkspaceComponent;

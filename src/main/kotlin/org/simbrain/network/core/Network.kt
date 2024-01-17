@@ -7,12 +7,12 @@ import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.events.NetworkEvents
 import org.simbrain.network.groups.NeuronCollection
-import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.groups.Subnetwork
 import org.simbrain.network.gui.PlacementManager
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.matrix.WeightMatrix
+import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.util.SimpleIdManager
 import org.simbrain.util.UserParameter
 import org.simbrain.util.math.SimbrainMath
@@ -249,13 +249,15 @@ class Network: CoroutineScope, EditableObject {
      */
     fun updateAllButNeurons() {
         // TODO: Temporary function until we create a generalized priority based update
-        listOf(NeuronGroup::class.java,
-        NeuronCollection::class.java,
-        NeuronArray::class.java,
-        Connector::class.java,
-        SynapseGroup::class.java,
-        Subnetwork::class.java,
-        Synapse::class.java)
+        listOf(
+            NeuronGroup::class.java,
+            NeuronCollection::class.java,
+            NeuronArray::class.java,
+            Connector::class.java,
+            SynapseGroup::class.java,
+            Subnetwork::class.java,
+            Synapse::class.java
+        )
             .flatMap { networkModels[it] }
             .forEach {nm ->
                 nm.updateInputs()

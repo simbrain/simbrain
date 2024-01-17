@@ -121,6 +121,9 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
         menu.add(renameAction);
         menu.add(removeAction);
 
+        menu.addSeparator();
+        menu.add(getNetworkPanel().getNetworkActions().showApplyLayoutDialogAction(neuronGroup));
+
         // Selection submenu
         menu.addSeparator();
         Action selectSynapses = new AbstractAction("Select Neurons") {

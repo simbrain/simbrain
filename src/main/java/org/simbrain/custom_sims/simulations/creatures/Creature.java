@@ -4,7 +4,7 @@ import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseUpdateRule;
-import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.neurongroups.NeuronGroup;
 import org.simbrain.util.SmellSource;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.Producer;

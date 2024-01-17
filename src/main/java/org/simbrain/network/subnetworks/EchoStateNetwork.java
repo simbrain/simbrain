@@ -24,7 +24,7 @@
 // import org.simbrain.network.core.Network.TimeType;
 // import org.simbrain.network.core.Neuron;
 // import org.simbrain.network.core.NeuronUpdateRule;
-// import org.simbrain.network.groups.NeuronGroup;
+// import org.simbrain.network.neurongroups.NeuronGroup;
 // import org.simbrain.network.groups.Subnetwork;
 // import org.simbrain.network.groups.SynapseGroup;
 // import org.simbrain.network.updaterules.SigmoidalRule;

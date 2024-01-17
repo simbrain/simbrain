@@ -21,7 +21,6 @@ package org.simbrain.network.neurongroups
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.XStreamConstructor
-import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.GuiEditable
 import kotlin.random.Random

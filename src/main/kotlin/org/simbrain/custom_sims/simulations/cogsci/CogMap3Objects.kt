@@ -3,9 +3,9 @@ package org.simbrain.custom_sims.simulations.patterns_of_activity
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.SynapseGroup
-import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.matrix.WeightMatrix
+import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.plot.projection.ProjectionComponent
 import org.simbrain.util.SmellSource
 import org.simbrain.util.place

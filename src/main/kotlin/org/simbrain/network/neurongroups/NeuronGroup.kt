@@ -15,12 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.groups
+package org.simbrain.network.neurongroups
 
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronUpdateRule
+import org.simbrain.network.groups.AbstractNeuronCollection
 import org.simbrain.network.topLeftLocation
+import org.simbrain.util.propertyeditor.CopyableObject
 import java.awt.geom.Point2D
 
 /**
@@ -82,5 +84,18 @@ open class NeuronGroup(net: Network?) : AbstractNeuronCollection(net) {
 
     override fun getTopLeftLocation(): Point2D.Double {
         return neuronList.topLeftLocation
+    }
+}
+
+class BasicNeuronGroupParams: NeuronGroupParams() {
+
+    override fun create(net: Network): NeuronGroup {
+        return NeuronGroup(net, List(numNeurons) { Neuron(net) })
+    }
+
+    override fun copy(): CopyableObject {
+        return BasicNeuronGroupParams().also {
+            commonCopy(it)
+        }
     }
 }

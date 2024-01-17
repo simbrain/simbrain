@@ -22,7 +22,6 @@ import org.simbrain.network.core.InfoText
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.XStreamConstructor
-import org.simbrain.network.groups.NeuronGroup
 import org.simbrain.network.util.SimnetUtils
 import org.simbrain.util.UserParameter
 import org.simbrain.util.Utils

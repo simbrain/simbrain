@@ -7,6 +7,7 @@ import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.groups.*
 import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.neuron_update_rules.LinearRule
+import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.*

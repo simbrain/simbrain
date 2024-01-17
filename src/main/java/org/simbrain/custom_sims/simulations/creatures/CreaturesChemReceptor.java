@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.creatures;
 
-import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.neurongroups.NeuronGroup;
 
 /**
  * Chemical receptors can either alter a particular characteristic of a brain

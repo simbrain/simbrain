@@ -1,8 +1,8 @@
 package org.simbrain.custom_sims.simulations.creatures;
 
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.neuron_update_rules.DecayRule;
+import org.simbrain.network.neurongroups.NeuronGroup;
 import org.simbrain.network.util.BiasedScalarData;
 
 /**

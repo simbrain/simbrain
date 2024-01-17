@@ -1,7 +1,7 @@
 package org.simbrain.network.update_actions;
 
 import org.simbrain.network.core.Network;
-import org.simbrain.network.groups.NeuronGroup;
+import org.simbrain.network.neurongroups.NeuronGroup;
 
 public class ConcurrentBufferedUpdateTest
 

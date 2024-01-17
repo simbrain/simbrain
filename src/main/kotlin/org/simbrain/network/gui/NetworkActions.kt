@@ -13,8 +13,8 @@ import org.simbrain.network.gui.dialogs.neuron.AddNeuronsDialog.createAddNeurons
 import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.matrix.NeuronArray
+import org.simbrain.network.neurongroups.BasicNeuronGroupParams
 import org.simbrain.network.neurongroups.NeuronGroupParams
-import org.simbrain.network.neurongroups.SoftmaxParams
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.propertyeditor.objectWrapper
@@ -521,13 +521,25 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         description = "Add a neuron group to network",
         keyboardShortcut = 'G'
     ) {
-        objectWrapper("Neuron Group Parameters", SoftmaxParams() as NeuronGroupParams).createEditorDialog {
+        objectWrapper("Neuron Group Parameters", BasicNeuronGroupParams() as NeuronGroupParams).createEditorDialog {
             it.editingObject.create(network).also { group ->
                 group.label = network.idManager.getProposedId(group::class.java)
                 group.applyLayout()
                 network.addNetworkModelAsync(group)
             }
         }.apply { title = "Add Neuron Group" }.display()
+    }
+
+    fun AbstractNeuronCollection.showApplyLayoutDialogAction() = networkPanel.createAction(
+        name = "Apply Layout...",
+        description = "Apply a layout to this neuron group",
+        keyboardShortcut = CmdOrCtrl + 'L'
+    ) {
+        val neuronCollection = this@showApplyLayoutDialogAction
+        objectWrapper("Layout", neuronCollection.layout).createEditorDialog {
+            neuronCollection.layout = it.editingObject
+            neuronCollection.applyLayout()
+        }.display()
     }
 
     val newNetworkActions

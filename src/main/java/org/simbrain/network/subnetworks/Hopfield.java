@@ -22,9 +22,9 @@ import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SynapseGroup;
-import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.neuron_update_rules.BinaryRule;
+import org.simbrain.network.neurongroups.NeuronGroup;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 

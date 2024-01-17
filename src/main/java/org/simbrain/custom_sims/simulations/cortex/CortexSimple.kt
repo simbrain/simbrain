@@ -7,7 +7,7 @@ import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.SynapseGroup
-import org.simbrain.network.groups.NeuronGroup
+import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.updaterules.IntegrateAndFireRule
 import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.math.SimbrainMath

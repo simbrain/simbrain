@@ -102,6 +102,9 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
         menu.add(renameAction);
         menu.add(removeAction);
 
+        menu.addSeparator();
+        menu.add(getNetworkPanel().getNetworkActions().showApplyLayoutDialogAction(neuronCollection));
+
         // Selection submenu
         menu.addSeparator();
         Action selectSynapses = new AbstractAction("Select Neurons") {

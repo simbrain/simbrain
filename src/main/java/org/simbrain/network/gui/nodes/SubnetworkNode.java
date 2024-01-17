@@ -32,6 +32,7 @@ import org.simbrain.util.piccolo.Outline;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -78,6 +79,8 @@ public class SubnetworkNode extends ScreenElement {
      */
     private final Set<ScreenElement> outlinedObjects = new LinkedHashSet<>();
 
+    private ScreenElement customInfo;
+
     /**
      * Create a subnetwork node.
      *
@@ -103,7 +106,7 @@ public class SubnetworkNode extends ScreenElement {
 
     @Override
     public void layoutChildren() {
-        outline.resetOutlinedNodes(outlinedObjects);
+        updateOutline();
         interactionBox.setOffset(outline.getFullBounds().getX()
                         + Outline.ARC_SIZE / 2,
                 outline.getFullBounds().getY() - interactionBox.getFullBounds().getHeight() + 1);
@@ -123,7 +126,7 @@ public class SubnetworkNode extends ScreenElement {
             ((LocatableModel)node.getModel()).getEvents().getLocationChanged().fireAndForget();
         }
 
-        outline.resetOutlinedNodes(outlinedObjects);
+        updateOutline();
     }
 
     /**
@@ -273,7 +276,26 @@ public class SubnetworkNode extends ScreenElement {
                 node.offset(dx, dy);
             }
         }
+        if (customInfo != null) {
+            customInfo.offset(dx, dy);
+        }
         outline.resetOutlinedNodes(outlinedObjects);
+    }
+
+    private void updateOutline() {
+        var nodes = new HashSet<ScreenElement>(outlinedObjects);
+        if (customInfo != null) {
+            nodes.add(customInfo);
+        }
+        outline.resetOutlinedNodes(nodes);
+    }
+
+    public void setCustomInfoNode(ScreenElement customInfo) {
+        this.customInfo = customInfo;
+        var bounds = getFullBoundsReference();
+        ((LocatableModel) customInfo.getModel()).setLocation(bounds.getX() + bounds.getWidth() / 2.0, bounds.getY() - 5);
+        subnetwork.getEvents().getCustomInfoUpdated().on(getSwingDispatcher(), this::updateOutline);
+        updateOutline();
     }
 
 

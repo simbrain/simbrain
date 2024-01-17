@@ -291,3 +291,7 @@ fun NeuronArray.randomizeBiases() {
 }
 
 fun List<Synapse>.percentExcitatory() = count { it.strength > 0.0 } / size.toDouble() * 100
+
+fun List<Neuron>.getEnergy() = (this cartesianProduct this)
+    .mapNotNull { (a, b) -> getSynapse(a, b) }
+    .sumOf { it.strength * it.source.activation * it.target.activation } * -0.5

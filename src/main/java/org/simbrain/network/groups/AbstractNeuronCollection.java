@@ -52,12 +52,6 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
     transient private HashSet<SynapseGroup> outgoingSgs = new HashSet<>();
 
     /**
-     * Optional information about the current state of the group. For display in
-     * GUI.
-     */
-    private NetworkModel stateInfo;
-
-    /**
      * Support for property change events.
      */
     protected transient NeuronCollectionEvents events = new NeuronCollectionEvents();
@@ -669,14 +663,6 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
         //todo
     }
 
-    public NetworkModel getStateInfo() {
-        return stateInfo;
-    }
-
-    public void setStateInfo(NetworkModel stateInfo) {
-        this.stateInfo = stateInfo;
-    }
-
     @Override
     public void postOpenInit() {
         super.postOpenInit();
@@ -845,6 +831,10 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
         this.layout = layout;
     }
 
+    /**
+     * Optional information about the current state of the group. For display in
+     * GUI.
+     */
     public NetworkModel getCustomInfo() {
         return null;
     }

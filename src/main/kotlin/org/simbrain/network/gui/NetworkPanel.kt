@@ -374,9 +374,11 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         val subnetworkNodes = subnetwork.modelList.allInReconstructionOrder.map {
             createNode(it)
         }
+        val customInfoNode = subnetwork.customInfo?.let { createNode(it) }
         createSubNetwork().apply {
             // Add "sub-nodes" to subnetwork node
             subnetworkNodes.forEach { addNode(it) }
+            customInfoNode?.let { setCustomInfoNode(it) }
         }
 
     }

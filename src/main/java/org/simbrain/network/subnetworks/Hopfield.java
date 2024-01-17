@@ -19,6 +19,7 @@
 package org.simbrain.network.subnetworks;
 
 import org.simbrain.network.NetworkModel;
+import org.simbrain.network.core.InfoText;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SynapseGroup;
@@ -32,6 +33,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import static org.simbrain.network.core.NetworkUtilsKt.getEnergy;
+import static org.simbrain.util.MathUtilsKt.format;
 
 /**
  * <b>Hopfield</b> is a basic implementation of a discrete Hopfield network.
@@ -57,6 +61,8 @@ public class Hopfield extends Subnetwork  {
      */
     @UserParameter(label = "Update function")
     private HopfieldUpdate updateFunc = DEFAULT_UPDATE;
+
+    private InfoText infoText;
 
     /**
      * Training set.
@@ -101,6 +107,9 @@ public class Hopfield extends Subnetwork  {
         // Symmetric randomization
         randomize();
 
+        // Create info text
+        infoText = new InfoText(getParentNetwork(), getStateInfoText());
+
     }
 
     @Override
@@ -108,9 +117,10 @@ public class Hopfield extends Subnetwork  {
         getSynapseGroup().randomizeSymmetric();
     }
 
-    // @Override
+    @Override
     public void update() {
         updateFunc.update(this);
+        updateStateInfoText();
     }
 
     // @Override
@@ -144,6 +154,20 @@ public class Hopfield extends Subnetwork  {
     // @Override
     public void initNetwork() {
         // No implementation
+    }
+
+    public String getStateInfoText() {
+        return "Energy: " + format(getEnergy(neuronGroup.getNeuronList()), 4);
+    }
+
+    public void updateStateInfoText() {
+        infoText.setText(getStateInfoText());
+        getEvents().getCustomInfoUpdated().fireAndBlock();
+    }
+
+    @Override
+    public NetworkModel getCustomInfo() {
+        return infoText;
     }
 
     /**

@@ -19,7 +19,7 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkModelList;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.events.LocationEvents;
+import org.simbrain.network.events.SubnetworkEvents;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 
@@ -51,7 +51,7 @@ public abstract class Subnetwork extends LocatableModel implements EditableObjec
     /**
      * Event support.
      */
-    protected transient LocationEvents events = new LocationEvents();
+    protected transient SubnetworkEvents events = new SubnetworkEvents();
 
     private final NetworkModelList modelList = new NetworkModelList();
 
@@ -159,7 +159,7 @@ public abstract class Subnetwork extends LocatableModel implements EditableObjec
     @Override
     public void postOpenInit() {
         if (events == null) {
-            events = new LocationEvents();
+            events = new SubnetworkEvents();
         }
         modelList.getAllInReconstructionOrder().forEach(NetworkModel::postOpenInit);
     }
@@ -186,7 +186,15 @@ public abstract class Subnetwork extends LocatableModel implements EditableObjec
 
     @NotNull
     @Override
-    public LocationEvents getEvents() {
+    public SubnetworkEvents getEvents() {
         return events;
+    }
+
+    /**
+     * Optional information about the current state of the group. For display in
+     * GUI.
+     */
+    public NetworkModel getCustomInfo() {
+        return null;
     }
 }

@@ -100,9 +100,6 @@ abstract class ConnectionStrategy : CopyableObject {
         addToNetwork: Boolean = true
     ): List<Synapse>
 
-    val stringDescription: String
-        get() = "" + this.javaClass.simpleName
-
     override fun getTypeList() = connectionTypes
 
 }
@@ -116,7 +113,6 @@ val connectionTypes = listOf(
     RadialProbabilistic::class.java,
     Sparse::class.java
 )
-
 
 fun main() {
     ConnectionStrategyPanel(Sparse()).displayInDialog()

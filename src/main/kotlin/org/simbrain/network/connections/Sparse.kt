@@ -52,7 +52,7 @@ class Sparse @JvmOverloads constructor(
         maximumValue = 1.0,
         increment = 0.01
     )
-    var connectionDensity: Double = 0.8,
+    var connectionDensity: Double = 0.1,
 
     /**
      * Whether or not each source neuron is given an equal number of efferent synapses. If true, every source neuron

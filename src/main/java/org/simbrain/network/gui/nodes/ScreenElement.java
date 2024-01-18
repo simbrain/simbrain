@@ -65,20 +65,12 @@ public abstract class ScreenElement extends PPath.Float {
     public abstract NetworkModel getModel();
 
     /**
-     * Return true if this screen element is selectable.
-     *
-     * Being selectable requires that this screen element is pickable as far as the Piccolo API is concerned, so if this
-     * method returns true, be sure that this class also returns true for PNode.getPickable
-     */
-    public abstract boolean isSelectable();
-
-    /**
      * Return true if this screen element accepts a source {@link NodeHandle}.
      */
     public boolean acceptsSourceHandle() {return false;}
 
     /**
-     * Return true if this screen element is draggable. Assumes {@link #isSelectable()} is also true.
+     * Return true if this screen element is draggable.
      */
     public abstract boolean isDraggable();
 

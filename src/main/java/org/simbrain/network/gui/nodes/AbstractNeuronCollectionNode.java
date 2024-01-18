@@ -187,11 +187,6 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
     }
 
     @Override
-    public boolean isSelectable() {
-        return false;
-    }
-
-    @Override
     public boolean isDraggable() {
         return true;
     }

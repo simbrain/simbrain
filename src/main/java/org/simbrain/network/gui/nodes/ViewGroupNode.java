@@ -70,11 +70,6 @@ public class ViewGroupNode extends ScreenElement implements PropertyChangeListen
     }
 
     @Override
-    public boolean isSelectable() {
-        return true;
-    }
-
-    @Override
     public boolean isDraggable() {
         return true;
     }

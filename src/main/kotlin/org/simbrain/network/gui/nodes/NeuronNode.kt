@@ -382,14 +382,6 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
         priorityText.setOffset(mainShape.bounds.centerX, mainShape.bounds.centerY + DIAMETER - 10)
     }
 
-    /**
-     * @return screen element selectable
-     * @see ScreenElement
-     */
-    override fun isSelectable(): Boolean {
-        return true
-    }
-
     override fun isDraggable(): Boolean {
         return true
     }

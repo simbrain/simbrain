@@ -119,10 +119,6 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         super.paint(paintContext)
     }
 
-    override fun isSelectable(): Boolean {
-        return true
-    }
-
     override fun isDraggable(): Boolean {
         return false
     }

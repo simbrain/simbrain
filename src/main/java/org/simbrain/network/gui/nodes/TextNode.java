@@ -80,11 +80,6 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
     }
 
     @Override
-    public boolean isSelectable() {
-        return true;
-    }
-
-    @Override
     public boolean isDraggable() {
         return true;
     }

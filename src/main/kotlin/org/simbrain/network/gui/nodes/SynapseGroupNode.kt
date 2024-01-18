@@ -143,10 +143,6 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
         interactionBox.setText(synapseGroup.label)
     }
 
-    override fun isSelectable(): Boolean {
-        return false
-    }
-
     override fun isDraggable(): Boolean {
         return false
     }

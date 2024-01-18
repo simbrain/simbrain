@@ -167,11 +167,6 @@ public class SubnetworkNode extends ScreenElement {
     }
 
     @Override
-    public boolean isSelectable() {
-        return true;
-    }
-
-    @Override
     public boolean isDraggable() {
         return true;
     }

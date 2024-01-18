@@ -125,11 +125,6 @@ public abstract class InteractionBox extends ScreenElement {
         return false;
     }
 
-    @Override
-    public boolean isSelectable() {
-        return true;
-    }
-
     public PropertyChangeListener getZoomListener() {
         return zoomListener;
     }

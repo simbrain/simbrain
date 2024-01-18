@@ -373,14 +373,6 @@ public final class SynapseNode extends ScreenElement {
      * @return
      * @see ScreenElement
      */
-    public boolean isSelectable() {
-        return true;
-    }
-
-    /**
-     * @return
-     * @see ScreenElement
-     */
     public boolean isDraggable() {
         return false;
     }

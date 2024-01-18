@@ -84,11 +84,6 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
         customMenuItems.add(item);
     }
 
-    @Override
-    public boolean isSelectable() {
-        return false;
-    }
-
     /**
      * Helper class to create the neuron group property dialog (since it is
      * needed in two places.).

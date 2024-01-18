@@ -100,8 +100,6 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
         layer.height = bounds.height
     }
 
-    override fun isSelectable() = true
-
     override fun acceptsSourceHandle() = true
 
     override fun isDraggable() = true

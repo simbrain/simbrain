@@ -22,6 +22,7 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.util.UserParameter
+import org.simbrain.util.propertyeditor.CustomTypeName
 import org.simbrain.util.propertyeditor.GuiEditable
 
 /**
@@ -270,6 +271,7 @@ open class CompetitiveGroup @JvmOverloads constructor(
 
 }
 
+@CustomTypeName("Competitive Group")
 class CompetitiveGroupParams : NeuronGroupParams() {
     val DEFAULT_LEARNING_RATE = .1
 

@@ -279,10 +279,11 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
 
 }
 
-class APEObjectWrapper<O : EditableObject>(val label: String, obj: O) : EditableObject {
+class APEObjectWrapper<O : EditableObject>(val label: String, obj: O, showLabeledBorder: Boolean = true) : EditableObject {
     var editingObject: O by GuiEditable(
         initValue = obj,
         label = label,
+        showLabeledBorder = showLabeledBorder,
     )
 }
 
@@ -290,7 +291,8 @@ class APEObjectWrapper<O : EditableObject>(val label: String, obj: O) : Editable
  * Wraps an [EditableObject] so that it can be used in an [org.simbrain.util.propertyeditor.AnnotatedPropertyEditor]
  * so that we can edit the object itself with a dropdown.
  */
-fun <O : EditableObject> objectWrapper(label: String, obj: O) = APEObjectWrapper(label, obj)
+@JvmOverloads
+fun <O : EditableObject> objectWrapper(label: String, obj: O, showLabeledBorder: Boolean = true) = APEObjectWrapper(label, obj, showLabeledBorder)
 
 /**
  * Returns the widget associated with the object being edited.
@@ -303,3 +305,8 @@ val <O : EditableObject> AnnotatedPropertyEditor<APEObjectWrapper<O>>.wrapperWid
  * Example: the probability distribution currently selected by [ObjectWidget]
  */
 val <O : EditableObject> AnnotatedPropertyEditor<APEObjectWrapper<O>>.wrapperWidgetValue get() = wrapperWidget.value as O
+
+/**
+ * Currently used with [ObjectWidget] to customize the name in the dropdown.
+ */
+annotation class CustomTypeName(val name: String)

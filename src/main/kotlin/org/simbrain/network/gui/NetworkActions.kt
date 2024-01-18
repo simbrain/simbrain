@@ -521,7 +521,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         description = "Add a neuron group to network",
         keyboardShortcut = 'G'
     ) {
-        objectWrapper("Neuron Group Parameters", BasicNeuronGroupParams() as NeuronGroupParams).createEditorDialog {
+        objectWrapper("Neuron Group Parameters", BasicNeuronGroupParams() as NeuronGroupParams, showLabeledBorder = false).createEditorDialog {
             it.editingObject.create(network).also { group ->
                 group.label = network.idManager.getProposedId(group::class.java)
                 group.applyLayout()

@@ -25,6 +25,7 @@ import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.util.SimnetUtils
 import org.simbrain.util.UserParameter
 import org.simbrain.util.Utils
+import org.simbrain.util.propertyeditor.CustomTypeName
 import org.simbrain.util.propertyeditor.GuiEditable
 import kotlin.math.pow
 
@@ -222,6 +223,7 @@ class SOMGroup @JvmOverloads constructor(
 
 }
 
+@CustomTypeName("SOM Group")
 class SOMParams : NeuronGroupParams() {
 
     var initialLearningRate: Double by GuiEditable(

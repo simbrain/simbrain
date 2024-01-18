@@ -25,7 +25,9 @@ import javax.swing.text.DefaultFormatterFactory
 import javax.swing.text.NumberFormatter
 import kotlin.math.min
 import kotlin.reflect.*
+import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.functions
+import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.jvm.jvmErasure
 
 /**
@@ -59,6 +61,7 @@ class GuiEditable<O : EditableObject, T>(
     val useCheckboxFrom: KMutableProperty1<O, Boolean>? = null,
     val typeMapProvider: KFunction<List<Class<out CopyableObject>>>? = null,
     val columnMode: Boolean = false,
+    val showLabeledBorder: Boolean = true,
     val getter: (GuiEditableGetterContext<O, T>.() -> T)? = null,
     val setter: (GuiEditableSetterContext<O, T>.(T) -> Unit)? = null,
     private val onUpdate: (UpdateFunctionContext<O, T>).() -> Unit = { }
@@ -799,7 +802,13 @@ class ObjectWidget<O : EditableObject, T : CopyableObject>(
         parameter.typeMapProvider.call(value).map { it.kotlin }
     } else {
         value.getTypeList()?.map { it.kotlin }
-    })?.associateBy { it.simpleName!! }
+    })?.associateBy {
+        if (it.hasAnnotation<CustomTypeName>()) {
+            it.findAnnotation<CustomTypeName>()!!.name
+        } else {
+            it.simpleName!!
+        }
+    }
 
     private val editorPanelContainer = JPanel()
 
@@ -842,8 +851,9 @@ class ObjectWidget<O : EditableObject, T : CopyableObject>(
 
     override val widget = JPanel().apply {
         this.add(Box.createRigidArea(Dimension(0, 5)))
-        val tb = BorderFactory.createTitledBorder(parameter.label)
-        border = tb
+        if (parameter.showLabeledBorder) {
+            border = BorderFactory.createTitledBorder(parameter.label)
+        }
         val detailTrianglePanel = DetailTrianglePanel(
             editorPanelContainer,
             defaultOpen = parameter.showDetails,

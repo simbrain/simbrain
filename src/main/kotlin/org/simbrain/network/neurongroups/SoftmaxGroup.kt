@@ -5,6 +5,7 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.core.activations
 import org.simbrain.util.propertyeditor.CopyableObject
+import org.simbrain.util.propertyeditor.CustomTypeName
 import kotlin.math.exp
 
 /**
@@ -37,6 +38,7 @@ class SoftmaxGroup(net: Network, neurons: List<Neuron>): NeuronGroup(net), Copya
     override fun copy() = SoftmaxGroup(network, neuronList.map { it.deepCopy() })
 }
 
+@CustomTypeName("Softmax")
 class SoftmaxParams: NeuronGroupParams() {
 
     override fun create(net: Network): SoftmaxGroup {

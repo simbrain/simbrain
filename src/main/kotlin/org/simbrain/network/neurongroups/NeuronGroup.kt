@@ -23,6 +23,7 @@ import org.simbrain.network.core.NeuronUpdateRule
 import org.simbrain.network.groups.AbstractNeuronCollection
 import org.simbrain.network.topLeftLocation
 import org.simbrain.util.propertyeditor.CopyableObject
+import org.simbrain.util.propertyeditor.CustomTypeName
 import java.awt.geom.Point2D
 
 /**
@@ -87,6 +88,7 @@ open class NeuronGroup(net: Network?) : AbstractNeuronCollection(net) {
     }
 }
 
+@CustomTypeName("Bare Neuron Group")
 class BasicNeuronGroupParams: NeuronGroupParams() {
 
     override fun create(net: Network): NeuronGroup {

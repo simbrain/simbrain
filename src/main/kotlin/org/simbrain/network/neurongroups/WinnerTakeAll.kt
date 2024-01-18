@@ -22,6 +22,7 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.util.UserParameter
+import org.simbrain.util.propertyeditor.CustomTypeName
 import org.simbrain.util.propertyeditor.GuiEditable
 import kotlin.random.Random
 
@@ -74,6 +75,7 @@ class WinnerTakeAll @JvmOverloads constructor(
 
 }
 
+@CustomTypeName("Winner Take All")
 class WinnerTakeAllParams : NeuronGroupParams() {
 
     @UserParameter(label = "Wining value", order = 50)

@@ -806,7 +806,7 @@ class ObjectWidget<O : EditableObject, T : CopyableObject>(
         if (it.hasAnnotation<CustomTypeName>()) {
             it.findAnnotation<CustomTypeName>()!!.name
         } else {
-            it.simpleName!!
+            it.simpleName!!.convertCamelCaseToSpaces()
         }
     }
 

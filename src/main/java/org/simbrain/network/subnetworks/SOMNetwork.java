@@ -30,8 +30,6 @@ import org.simbrain.network.util.Direction;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 
-import java.util.List;
-
 import static org.simbrain.network.util.NetworkLayoutManagerKt.offsetNeuronGroup;
 
 /**
@@ -52,11 +50,6 @@ public class SOMNetwork extends Subnetwork {
      * The input layer.
      */
     private final NeuronGroup inputLayer;
-
-    /**
-     * Training set.
-     */
-    // private final TrainingSet trainingSet = new TrainingSet();
 
     /**
      * Construct an SOM Network.
@@ -90,23 +83,8 @@ public class SOMNetwork extends Subnetwork {
         SynapseGroup sg = new SynapseGroup(inputLayer, som, new AllToAll());
         addModel(sg);
 
-        offsetNeuronGroup(inputLayer, som, Direction.NORTH, 250);
+        offsetNeuronGroup(inputLayer, som, Direction.NORTH, 450);
     }
-
-    // @Override
-    public List<Neuron> getInputNeurons() {
-        return inputLayer.getNeuronList();
-    }
-
-    // @Override
-    public List<Neuron> getOutputNeurons() {
-        return som.getNeuronList();
-    }
-
-    // @Override
-    // public TrainingSet getTrainingSet() {
-    //     return trainingSet;
-    // }
 
     // @Override
     public void initNetwork() {
@@ -121,7 +99,6 @@ public class SOMNetwork extends Subnetwork {
         return inputLayer;
     }
 
-    // @Override
     public NetworkModel getNetwork() {
         return this;
     }

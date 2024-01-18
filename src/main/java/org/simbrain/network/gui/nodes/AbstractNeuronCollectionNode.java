@@ -64,7 +64,6 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
             pullPositionFromModel();
             outlinedObjects.updateBounds();
         });
-        // events.getCustomInfoUpdated().on
     }
 
     /**

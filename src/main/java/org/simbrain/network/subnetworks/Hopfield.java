@@ -65,11 +65,6 @@ public class Hopfield extends Subnetwork  {
     private InfoText infoText;
 
     /**
-     * Training set.
-     */
-    // private final TrainingSet trainingSet = new TrainingSet();
-
-    /**
      * Creates a new Hopfield network.
      *
      * @param numNeurons Number of neurons in new network
@@ -123,7 +118,6 @@ public class Hopfield extends Subnetwork  {
         updateStateInfoText();
     }
 
-    // @Override
     public NetworkModel getNetwork() {
         return this;
     }
@@ -134,26 +128,6 @@ public class Hopfield extends Subnetwork  {
 
     public SynapseGroup getSynapseGroup() {
         return weights;
-    }
-
-    // @Override
-    public List<Neuron> getInputNeurons() {
-        return this.getFlatNeuronList();
-    }
-
-    // @Override
-    public List<Neuron> getOutputNeurons() {
-        return this.getFlatNeuronList();
-    }
-
-    // @Override
-    // public TrainingSet getTrainingSet() {
-    //     return trainingSet;
-    // }
-
-    // @Override
-    public void initNetwork() {
-        // No implementation
     }
 
     public String getStateInfoText() {

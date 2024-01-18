@@ -37,7 +37,8 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
      * PNode that represents an aggregate of visible "loose" [SynapseNode]s.
      * when [SynapseGroup.isDisplaySynapses] is true.
      */
-    private var expandedNode: SynapseGroupNodeExpanded? = null
+    var expandedNode: SynapseGroupNodeExpanded? = null
+        private set
 
     /**
      * PNode that represents a single one-directional green arrow from
@@ -76,9 +77,7 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
         val events = synapseGroup.events
         events.deleted.on(Dispatchers.Swing) { removeFromParent() }
         events.labelChanged.on { _: String, _: String -> updateText() }
-        events.visibilityChanged.on {
-            setVisibility()
-        }
+        events.visibilityChanged.on(Dispatchers.Swing) { setVisibility() }
         events.synapseAdded.on(dispatcher = Dispatchers.Swing) {
             this@SynapseGroupNode.networkPanel.createNode(it)
             refreshVisible()
@@ -133,7 +132,6 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
                 currentNode = directedNode
             }
         }
-        raiseToTop()
     }
 
     /**

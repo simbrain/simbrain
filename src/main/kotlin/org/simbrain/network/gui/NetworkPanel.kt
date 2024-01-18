@@ -31,11 +31,13 @@ import org.simbrain.util.ResourceManager
 import org.simbrain.util.cartesianProduct
 import org.simbrain.util.complement
 import org.simbrain.util.piccolo.unionOfGlobalFullBounds
+import org.simbrain.util.toSequence
 import java.awt.*
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.util.prefs.PreferenceChangeListener
 import javax.swing.*
+import kotlin.reflect.KClass
 
 /**
  * Main GUI representation of a [Network].
@@ -251,10 +253,46 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         canvas.layer.allNodes.filterIsInstance(clazz)
 
     /**
+     * Screenelements follow a standard pattern to be displayed properly.
+     * For example, Synapse nodes are always at the bottom, then SynapseGroupNodes right above them.
+     * Calls to lowerToBottom and raiseToTop should be avoided for top level screen elements in favor of using this function.
+     */
+    private fun addNodeOrdered(node: ScreenElement) {
+        fun addNodeToIndex(node: ScreenElement, index: Int) {
+            if (index > 0) {
+                canvas.layer.addChild(index, node)
+            } else {
+                canvas.layer.addChild(node)
+            }
+        }
+
+        fun findIndexOfType(type: KClass<out ScreenElement>): Int {
+            return canvas.layer.childrenIterator.toSequence().indexOfLast { it != null && it::class == type }
+        }
+
+        when (node) {
+            is SynapseNode -> {
+                canvas.layer.addChild(0, node)
+            }
+            is SynapseGroupNode -> {
+                val index = findIndexOfType(SynapseNode::class)
+                addNodeToIndex(node, index)
+            }
+            is WeightMatrixNode -> {
+                val index = findIndexOfType(SynapseGroupNode::class)
+                addNodeToIndex(node, index)
+            }
+            else -> {
+                canvas.layer.addChild(node)
+            }
+        }
+    }
+
+    /**
      * Add a screen element to the network panel and rezoom the page.
      */
     private inline fun <T : ScreenElement> addScreenElement(block: () -> T) = block().also { node ->
-        canvas.layer.addChild(node)
+        addNodeOrdered(node)
         node.model.events.selected.on {
             if (node is NeuronGroupNode) {
                 selectionManager.add(node.interactionBox)
@@ -301,7 +339,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         val source = modelNodeMap[synapse.source] as? NeuronNode ?: throw IllegalStateException("Neuron node does not exist")
         val target = modelNodeMap[synapse.target] as? NeuronNode ?: throw IllegalStateException("Neuron node does not exist")
         SynapseNode(this, source, target, synapse)
-    }.also { it.lowerToBottom() }
+    }
 
     fun createNode(neuronGroup: AbstractNeuronCollection) = addScreenElement {
 
@@ -343,11 +381,11 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
                 }
             }
         }
-        SynapseGroupNode(this, synapseGroup).also { SwingUtilities.invokeLater { it.lower() } }
+        SynapseGroupNode(this, synapseGroup)
     }
 
     fun createNode(weightMatrix: Connector) = addScreenElement {
-        WeightMatrixNode(this, weightMatrix).also { SwingUtilities.invokeLater { it.lowerToBottom() } }
+        WeightMatrixNode(this, weightMatrix)
     }
 
     fun createNode(text: NetworkTextObject) = addScreenElement {

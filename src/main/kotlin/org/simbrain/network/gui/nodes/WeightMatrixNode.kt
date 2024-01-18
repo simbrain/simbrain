@@ -93,7 +93,6 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
     private fun updateShowWeights() {
         networkPanel.selectionManager.remove(this)
         if (weightMatrix.isShowWeights) {
-            lowerToBottom()
             arrow.invalidateFullBounds()
             removeChild(interactionBox)
             addChild(arrow)
@@ -101,7 +100,6 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
             renderMatrixToImage()
             setBounds(imageBox.bounds)
         } else {
-            raiseToTop()
             updateInteractionBoxLocation()
             interactionBox.invalidateFullBounds()
             removeChild(arrow)

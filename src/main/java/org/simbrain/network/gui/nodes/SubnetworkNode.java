@@ -117,7 +117,6 @@ public class SubnetworkNode extends ScreenElement {
      */
     public void addNode(ScreenElement node) {
         outlinedObjects.add(node);
-        node.lowerToBottom();
         node.getModel().getEvents().getDeleted().on(sg -> {
             outlinedObjects.remove(node);
             outline.resetOutlinedNodes(outlinedObjects);

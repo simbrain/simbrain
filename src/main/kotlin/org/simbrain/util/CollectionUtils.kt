@@ -149,3 +149,9 @@ fun linspace(start: Double, stop: Double, numPoints: Int) = DoubleArray(numPoint
 
 fun Array<DoubleArray>.flatten() = flattenArray(this)
 fun Array<FloatArray>.flatten() = flattenArray(this)
+
+fun <T> ListIterator<T>.toSequence() = sequence {
+    while (hasNext()) {
+        yield(next())
+    }
+}

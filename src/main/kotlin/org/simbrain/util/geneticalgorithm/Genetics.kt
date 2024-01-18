@@ -128,7 +128,7 @@ suspend fun evaluator(
         populationSize = evaluatorParams.populationSize,
         eliminationRatio = evaluatorParams.eliminationRatio,
         stoppingFunction = {
-            evaluatorParams.stoppingCondition.shouldStop(nthPercentileFitness(evaluatorParams.percentile), evaluatorParams.targetMetric) || generation > evaluatorParams.maxGenerations
+            evaluatorParams.stoppingCondition.shouldStop(nthPercentileFitness(evaluatorParams.evalutationPercentile), evaluatorParams.targetMetric) || generation > evaluatorParams.maxGenerations
         },
         sortDescending = evaluatorParams.stoppingCondition == EvaluatorParams.StoppingCondition.Fitness,
         peek = {
@@ -159,12 +159,14 @@ class EvaluatorParams(
 
     var populationSize by GuiEditable(
         initValue = populationSize,
+        description = "Number of simulations spawned per generation",
         min = 0,
         order = 0
     )
 
     var eliminationRatio by GuiEditable(
         initValue = eliminationRatio,
+        description = "Percentage of the population eliminated each generation",
         min = 0.0,
         max = 1.0,
         order = 10
@@ -172,33 +174,43 @@ class EvaluatorParams(
 
     var iterationsPerRun by GuiEditable(
         initValue = iterationsPerRun,
+        description = "Each generation, the simulation is iterated this many times",
         min = 0,
         order = 20
     )
 
     var maxGenerations by GuiEditable(
         initValue = maxGenerations,
+        description = "After this many generations stop, regardless of ${stoppingCondition.name.lowercase()}",
         min = 0,
         order = 30
     )
 
-    var percentile by GuiEditable(
-        initValue = percentile,
-        min = 0,
-        max = 100,
-        order = 40
-    )
-
     var targetMetric by GuiEditable(
-        label = if (stoppingCondition == StoppingCondition.Error) "Target Error" else "Target Fitness",
+        label = "Target ${stoppingCondition.name.lowercase()}",
+        description = if (stoppingCondition == StoppingCondition.Error) {
+            "Once the error is below this amount, the simulation is stopped"
+        } else {
+            "Once the fitness is above this amount, the simulation is stopped"
+        },
         initValue = targetValue,
         min = 0.0,
         order = 50
     )
 
+    var evalutationPercentile by GuiEditable(
+        initValue = percentile,
+        label = "Evaluation percentile",
+        description = "When deciding whether to stop the simulation, consider current ${stoppingCondition.name.lowercase()} in this percentile of the population",
+        min = 0,
+        max = 100,
+        order = 60
+    )
+
     var seed by GuiEditable(
         initValue = seed,
-        order = 60
+        description = "Random seed that can be used for replicability",
+        order = 70
     )
 
     private var controlPanel: ControlPanelKt? = null
@@ -218,10 +230,11 @@ class EvaluatorParams(
         controlPanel!!
     }
 
-    private fun getProgressText(metricsString: String, generation: Int) = """
+    private fun getProgressText(metricsString: String, generation: Int) =
+        """
             <html>
                 Generation: $generation<br />
-                $percentile Percentile ${if (stoppingCondition == StoppingCondition.Error) "Error" else "Fitness"}: $metricsString
+                $evalutationPercentile Percentile ${stoppingCondition.name}: $metricsString
             </html>
         """.trimIndent()
 
@@ -242,7 +255,7 @@ class EvaluatorParams(
 
     fun updateProgressWindow(generationFitnessPair: GenerationFitnessPair) {
         progressWindow?.apply {
-            text = getProgressText(generationFitnessPair.nthPercentileFitness(percentile).format(3), generationFitnessPair.generation)
+            text = getProgressText(generationFitnessPair.nthPercentileFitness(evalutationPercentile).format(3), generationFitnessPair.generation)
             value = generationFitnessPair.generation
         }
     }
@@ -257,12 +270,16 @@ class EvaluatorParams(
     sealed class StoppingCondition {
         abstract fun shouldStop(actual: Double, target: Double): Boolean
 
+        abstract val name: String
+
         data object Error : StoppingCondition() {
             override fun shouldStop(actual: Double, target: Double) = actual < target
+            override val name = "Error"
         }
 
         data object Fitness : StoppingCondition() {
             override fun shouldStop(actual: Double, target: Double) = actual > target
+            override val name = "Fitness"
         }
     }
 }

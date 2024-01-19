@@ -8,16 +8,11 @@ import org.simbrain.custom_sims.simulations.behaviorism.SimpleOperant
 import org.simbrain.custom_sims.simulations.braitenberg.RandomizedPursuer
 import org.simbrain.custom_sims.simulations.cerebellum.Cerebellum
 import org.simbrain.custom_sims.simulations.cortex.CortexSimple
-import org.simbrain.custom_sims.simulations.cortex.CorticalBranching
-import org.simbrain.custom_sims.simulations.creatures.CreaturesSim
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaosBitStream
 import org.simbrain.custom_sims.simulations.hippocampus.Hippocampus
 import org.simbrain.custom_sims.simulations.patterns_of_activity.KuramotoOscillators
-import org.simbrain.custom_sims.simulations.patterns_of_activity.PatternsOfActivity
 import org.simbrain.custom_sims.simulations.patterns_of_activity.cogMap3Objects
-import org.simbrain.custom_sims.simulations.sorn.SORN
-import org.simbrain.custom_sims.simulations.test.ConvertSim
 import org.simbrain.custom_sims.simulations.test.lstmBlock
 import org.simbrain.util.dir
 
@@ -111,16 +106,16 @@ val simulations = dir<Any>("Simulations") {
     }
 
     dir("Testing") {
-        item("Test Sim") { testSim }
+        // item("Test Sim") { testSim }
         item("Linked Neuron List") { linkedNeuronList }
-        dir("Defunct?") {
-            item("ConvertSim") { ConvertSim() }
-            item("Creatures") { CreaturesSim() }
-            // item("MPFS") { MpfsSOM() }
-            item("PatternsOfActivity") { PatternsOfActivity() }
-            item("SORN") { SORN() }
-            item("Cortical Branching") { CorticalBranching() }
-        }
+        // dir("Defunct?") {
+        //     item("ConvertSim") { ConvertSim() }
+        //     item("Creatures") { CreaturesSim() }
+        //     item("MPFS") { MpfsSOM() }
+        //     item("PatternsOfActivity") { PatternsOfActivity() }
+        //     item("SORN") { SORN() }
+        //     item("Cortical Branching") { CorticalBranching() }
+        // }
     }
 
 }

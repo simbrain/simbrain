@@ -3,6 +3,7 @@ package org.simbrain.network.groups;
 import org.junit.jupiter.api.Test;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.matrix.WeightMatrix;
+import org.simbrain.network.neurongroups.NeuronGroup;
 import org.simbrain.network.neurongroups.SoftmaxGroup;
 
 import java.util.Arrays;

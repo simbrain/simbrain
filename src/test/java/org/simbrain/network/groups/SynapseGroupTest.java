@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.SynapseGroup;
+import org.simbrain.network.neurongroups.NeuronGroup;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

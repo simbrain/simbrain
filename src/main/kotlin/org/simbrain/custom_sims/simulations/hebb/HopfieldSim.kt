@@ -1,9 +1,11 @@
 package org.simbrain.custom_sims.simulations
 
-import org.simbrain.custom_sims.*
+import org.simbrain.custom_sims.addNetworkComponent
+import org.simbrain.custom_sims.createControlPanel
+import org.simbrain.custom_sims.newSim
+import org.simbrain.network.core.activations
 import org.simbrain.network.subnetworks.Hopfield
 import org.simbrain.util.place
-import org.simbrain.util.point
 
 /**
  * Demo for studying Hopfield networks,
@@ -20,33 +22,39 @@ val hopfieldSim = newSim {
     network.addNetworkModel(hopfield)
 
     withGui {
-        place(networkComponent) {
-            location = point(280, 10)
-            width = 400
-            height = 400
-        }
+        place(networkComponent, 139, 10, 868, 619)
         createControlPanel("Control Panel", 5, 10) {
 
-            addButton("Stub") {
+            addButton("Pattern 1") {
+                hopfield.neuronGroup.neuronList.activations =
+                    listOf(0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0)
             }
-            addTextField("Stub", "" + .01) {
+            addButton("Pattern 2") {
+                hopfield.neuronGroup.neuronList.activations =
+                    listOf(1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0)
+
             }
+            addButton("Train") {
+                hopfield.trainOnCurrentPattern()
+
+            }
+
         }
     }
 
-    // Location of the projection in the desktop
-    val projectionPlot = addProjectionPlot2("Activations")
-    withGui {
-        place(projectionPlot) {
-            location = point(667, 10)
-            width = 400
-            height = 400
-        }
-    }
-
-    // Couple the network to the projection plot
-    with(couplingManager) {
-        hopfield.neuronGroup couple projectionPlot
-    }
+    // // Location of the projection in the desktop
+    // val projectionPlot = addProjectionPlot2("Activations")
+    // withGui {
+    //     place(projectionPlot) {
+    //         location = point(667, 10)
+    //         width = 400
+    //         height = 400
+    //     }
+    // }
+    //
+    // // Couple the network to the projection plot
+    // with(couplingManager) {
+    //     hopfield.neuronGroup couple projectionPlot
+    // }
 
 }

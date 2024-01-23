@@ -50,14 +50,21 @@ open class Events: CoroutineScope {
 
         private var job: Job? = null
 
-        protected fun onSuspendHelper(dispatcher: CoroutineDispatcher?, wait: Boolean, run: suspend (new: Any?, old: Any?) -> Unit) {
+        protected fun onSuspendHelper(dispatcher: CoroutineDispatcher?, wait: Boolean, run: suspend (new: Any?, old: Any?) -> Unit): () -> Boolean? {
             val eventObjectHandler = EventObjectHandler(dispatcher, wait, run)
             eventMapping.getOrPut(this@EventObject) { ConcurrentLinkedQueue() }.add(eventObjectHandler)
+            return {
+                eventMapping[this@EventObject]?.remove(eventObjectHandler)
+            }
         }
 
-        protected fun onHelper(dispatcher: CoroutineDispatcher?, wait: Boolean, run: (new: Any?, old: Any?) -> Unit) {
+        protected fun onHelper(dispatcher: CoroutineDispatcher?, wait: Boolean, run: (new: Any?, old: Any?) -> Unit): () -> Boolean? {
             val eventObjectHandler = EventObjectHandler(dispatcher, wait, run)
             eventMapping.getOrPut(this@EventObject) { ConcurrentLinkedQueue() }.add(eventObjectHandler)
+            return {
+                eventMapping[this@EventObject]?.remove(eventObjectHandler)
+            }
+
         }
 
         private suspend inline fun runAllHandlers(crossinline run: suspend (suspend (new: Any?, old: Any?) -> Unit) -> Unit) = eventMapping[this@EventObject]

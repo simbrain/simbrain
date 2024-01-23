@@ -39,7 +39,7 @@ fun NetworkPanel.showDeepNetCreationDialog() {
     }
 
     dialog.setClosingCheck { layerList.checkValidLayers() }
-    dialog.addClosingTask {
+    dialog.addCommitTask {
         ape.commitChanges()
         layerList.commitChanges()
         val deepNet = creator.create(network, layerList.layers)
@@ -59,7 +59,7 @@ fun getDeepNetEditDialog(deepNet: DeepNet): StandardDialog {
     panel.add(layerEditor)
     val dialog = StandardDialog()
     dialog.contentPane = panel
-    dialog.addClosingTask {
+    dialog.addCommitTask {
         editor.commitChanges()
         layerEditor.commitChanges()
         // TODO: Rebuild deep net, but only if layer editor changed. Yulin.
@@ -241,7 +241,7 @@ fun showDeepNetTrainingDialog(deepNet: DeepNet) {
         add(inputPanel, "span 1, w 200:300:400, h 200!,")
         add(targetPanel, "span 1, w 150:250:300,h 200!, wrap")
 
-        dialog.addClosingTask {
+        dialog.addCommitTask {
             commitData()
         }
     }
@@ -276,7 +276,7 @@ fun testLayerList() {
     StandardDialog().apply {
         val layerEditor = LayerEditor(arrayListOf(TFInputLayer(), TFConv2DLayer(), TFFlattenLayer(), TFDenseLayer()))
         setClosingCheck { layerEditor.checkValidLayers() }
-        addClosingTask {
+        addCommitTask {
             println("Closing..")
             layerEditor.commitChanges()
             val dn = DeepNet(Network(), layerEditor.layers)

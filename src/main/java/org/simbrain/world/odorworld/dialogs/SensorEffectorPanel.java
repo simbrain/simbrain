@@ -263,7 +263,7 @@ public class SensorEffectorPanel extends JPanel {
         SwingUtilities.invokeLater(() -> {
             dialog.setLocation(parentWindow.getX() - dialog.getWidth(), parentWindow.getY());
         });
-        dialog.addClosingTask(() -> {
+        dialog.addCommitTask(() -> {
             attribute.getEvents().getPropertyChanged().fireAndForget();
         });
         SwingUtilsKt.display(dialog);

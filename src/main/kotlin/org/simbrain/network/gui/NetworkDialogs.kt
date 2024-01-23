@@ -140,6 +140,14 @@ fun SynapseGroupNode.getDialog(): StandardDialog {
         connectionStrategyPanel.percentExcitatoryPanel.setPercentExcitatory(synapseGroup.synapses.percentExcitatory())
     }
 
+    val unregister = synapseGroup.events.updated.on {
+        synapseAdjustmentPanel.fullUpdate()
+    }
+
+    dialog.addCloseTask {
+        unregister()
+    }
+
     val synapsesEditorApplyPanel = synapsesEditor.createApplyPanel {
         commitChanges()
         synapseAdjustmentPanel.fullUpdate()

@@ -49,7 +49,7 @@ fun SmileClassifier.getTrainingDialog(): StandardDialog {
             addAction(table.exportCsv())
             addAction(table.randomizeAction)
             preferredSize = Dimension(300, 300)
-            addClosingTask {
+            addCommitTask {
                 classifier.trainingData.featureVectors = this.model.get2DDoubleArray()
             }
         }
@@ -59,7 +59,7 @@ fun SmileClassifier.getTrainingDialog(): StandardDialog {
             addAction(table.exportCsv())
             addAction(table.randomizeColumnAction)
             preferredSize = Dimension(200, 300)
-            addClosingTask {
+            addCommitTask {
                 classifier.trainingData.targetLabels = this.model.getStringColumn(0)
             }
         }
@@ -104,7 +104,7 @@ fun SmileClassifier.getTrainingDialog(): StandardDialog {
 
         if (classfierProps.parameterWidgetMap.isNotEmpty()) {
             add(classfierProps, "wrap")
-            addClosingTask(classfierProps::commitChanges)
+            addCommitTask(classfierProps::commitChanges)
             add(JSeparator(), "growx, span, wrap")
         }
         contentPane.add(trainButton)

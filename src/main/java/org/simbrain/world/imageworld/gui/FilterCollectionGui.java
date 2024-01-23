@@ -78,13 +78,13 @@ public class FilterCollectionGui {
             Filter filter = filterCollection.getCurrentFilter();
             AnnotatedPropertyEditor topLevelFilterEditor = new AnnotatedPropertyEditor(filter);
             dialogPanel.add(topLevelFilterEditor);
-            filterEditorDialog.addClosingTask(topLevelFilterEditor::commitChanges);
+            filterEditorDialog.addCommitTask(topLevelFilterEditor::commitChanges);
 
             // If the filter is a filtered image source, edit it too
             ImageSource imageSource = filter.getSource();
             AnnotatedPropertyEditor filterEditor = new AnnotatedPropertyEditor((EditableObject) imageSource);
             dialogPanel.add(filterEditor);
-            filterEditorDialog.addClosingTask(() -> {
+            filterEditorDialog.addCommitTask(() -> {
                 filterEditor.commitChanges();
                 filter.refreshFilter();
                 filterComboBox.updateUI();

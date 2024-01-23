@@ -210,7 +210,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
             // Property Editor
             val ape: AnnotatedPropertyEditor<*> = AnnotatedPropertyEditor(weightMatrix)
             tabs.addTab("Properties", ape)
-            dialog.addClosingTask { ape.commitChanges() }
+            dialog.addCommitTask { ape.commitChanges() }
 
             // Weight matrix
             if (weightMatrix is WeightMatrix) {
@@ -219,7 +219,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
                 wmViewer.addSimpleDefaults()
                 tabs.addTab("Weight Matrix", wmViewer)
                 weightMatrix.events.updated.on { wmViewer.model.fireTableDataChanged() }
-                dialog.addClosingTask {
+                dialog.addCommitTask {
                     weightMatrix.setWeights(wm.get2DDoubleArray())
                     weightMatrix.events.updated.fireAndForget()
                 }

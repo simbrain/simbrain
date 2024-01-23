@@ -92,7 +92,7 @@ fun <T : JComponent> T.displayInDialog(block: T.() -> Unit = {}): StandardDialog
     val dialog = StandardDialog()
     dialog.contentPane = this
     dialog.makeVisible()
-    dialog.addClosingTask { block() }
+    dialog.addCommitTask { block() }
     return dialog
 }
 
@@ -219,7 +219,7 @@ fun <T : JComponent> T.createAction(
 fun <E : EditableObject> E.createEditorDialog(block: (E) -> Unit = {}): StandardDialog {
     val editor = AnnotatedPropertyEditor(listOf(this))
     return StandardDialog(editor).apply {
-        addClosingTask {
+        addCommitTask {
             editor.commitChanges()
             block(this@createEditorDialog)
         }

@@ -129,7 +129,7 @@ fun getPreferenceDialog(prefHolder: PreferenceHolder): StandardDialog {
                 }
             }
         })
-        addClosingTask {
+        addCommitTask {
             ape.commitChanges()
         }
     }

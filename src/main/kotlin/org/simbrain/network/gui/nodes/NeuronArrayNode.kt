@@ -353,7 +353,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                 val dialog = StandardDialog()
                 val arrayData = MatrixDataFrame(neuronArray.outputs)
                 dialog.contentPane = SimbrainTablePanel(arrayData)
-                dialog.addClosingTask {
+                dialog.addCommitTask {
                     neuronArray.update()
                 }
                 dialog.pack()

@@ -156,6 +156,7 @@ public class Hopfield extends Subnetwork  {
                 s.setStrength(s.getStrength() + deltaW);
             });
         });
+        getSynapseGroup().getEvents().getUpdated().fireAndForget();
         getEvents().getUpdated().fireAndForget();
     }
 

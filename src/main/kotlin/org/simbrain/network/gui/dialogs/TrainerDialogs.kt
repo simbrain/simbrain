@@ -68,7 +68,7 @@ fun Trainable.getTrainingDialog(): StandardDialog {
         runControls.add(addRemoveRows)
         (contentPane as JTabbedPane).addTab("Run Trainer", runControls)
 
-        addClosingTask {
+        addCommitTask {
             trainerProps.commitChanges()
             trainingSet = MatrixDataset((inputs.table.model as MatrixDataFrame).data, (targets.table.model as MatrixDataFrame).data)
         }

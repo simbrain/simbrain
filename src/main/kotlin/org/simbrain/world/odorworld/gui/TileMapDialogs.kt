@@ -95,7 +95,7 @@ fun List<TileSet>.tilePicker(currentGid: Int, block: (Int) -> Unit) = StandardDi
         }
     }
     contentPane = ScrollPane().apply { add(tabbedPane) }
-    addClosingTask { block(pickedTile) }
+    addCommitTask { block(pickedTile) }
 }
 
 /**
@@ -164,7 +164,7 @@ fun TileMap.editor(p: Point2D) = StandardDialog().apply {
         .map { (layer, tile) -> tilePanel(layer.name, tile) { layer.setTile(x, y, it) } }
         .onEach { mainPanel.add(it, gbc) }
 
-    addClosingTask { panels.forEach { it.onCommit() } }
+    addCommitTask { panels.forEach { it.onCommit() } }
 
     contentPane = JScrollPane(mainPanel)
 

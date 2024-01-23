@@ -98,6 +98,8 @@ public class StandardDialog extends GenericJDialog {
      * Tasks to execute whe closing with "Ok" (when cancel is pressed these
      * are _not_ invoked).
      */
+    private List<Runnable> invokeWhenCommitting = new ArrayList<>();
+
     private List<Runnable> invokeWhenClosing = new ArrayList<>();
 
     /**
@@ -205,6 +207,7 @@ public class StandardDialog extends GenericJDialog {
         // Process this event the same as the "Cancel" button.
         WindowAdapter windowAdapter = new WindowAdapter() {
             public void windowClosing(final WindowEvent windowEvent) {
+                invokeWhenClosing.forEach(Runnable::run);
                 myIsDialogCancelled = true;
                 closeDialogCancel();
             }
@@ -228,7 +231,11 @@ public class StandardDialog extends GenericJDialog {
      *
      * @param task a Runnable to execute when closing
      */
-    public void addClosingTask(Runnable task) {
+    public void addCommitTask(Runnable task) {
+        invokeWhenCommitting.add(task);
+    }
+
+    public void addCloseTask(Runnable task) {
         invokeWhenClosing.add(task);
     }
 
@@ -243,7 +250,7 @@ public class StandardDialog extends GenericJDialog {
         if (!closingCheck.get()) {
             return;
         }
-        for (Runnable task : invokeWhenClosing) {
+        for (Runnable task : invokeWhenCommitting) {
             task.run();
         }
         dispose();

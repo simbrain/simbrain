@@ -210,7 +210,7 @@ fun textEntryDialog(initialString: String, title: String = "Edit Text", columns:
     dialog.contentPane = scrollPane
 
     textArea.requestFocusInWindow()
-    dialog.addClosingTask {
+    dialog.addCommitTask {
         commitAction(textArea.text)
     }
 

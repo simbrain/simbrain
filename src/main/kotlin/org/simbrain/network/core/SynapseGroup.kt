@@ -102,6 +102,7 @@ class SynapseGroup @JvmOverloads constructor(
     fun randomizeSymmetric() {
         randomize()
         this.synapses.forEach { it.symmetricSynapse?.let { s -> it.forceSetStrength(s.strength) } }
+        events.updated.fireAndBlock()
     }
 
     override fun randomize() {
@@ -182,8 +183,9 @@ class SynapseGroup @JvmOverloads constructor(
         return Matrix.of(SimnetUtils.getWeights(source.neuronList, target.neuronList));
     }
 
-    fun hardClear() {
+    override fun clear() {
         synapses.forEach { it.hardClear() }
+        events.updated.fireAndBlock()
     }
 
 }

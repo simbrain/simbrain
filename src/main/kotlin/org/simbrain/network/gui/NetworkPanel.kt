@@ -197,7 +197,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
             // Don't show text when the canvas is sufficiently zoomed in
             camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM) {
-                launch(Dispatchers.Main) {
+                launch(Dispatchers.Swing) {
                     filterScreenElements<NeuronNode>().forEach {
                         it.updateTextVisibility()
                     }
@@ -698,7 +698,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
     private fun initEventHandlers() {
         network.events.apply {
-            modelAdded.on(Dispatchers.Swing) { list ->
+            modelAdded.on(Dispatchers.Swing, wait = true) { list ->
                 list.forEach { createNode(it) }
             }
             modelRemoved.on {
@@ -717,7 +717,12 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
                         filtered.getX() - 10, filtered.getY() - 10,
                         filtered.getWidth() + 20, filtered.getHeight() + 20
                     )
-                    canvas.camera.setViewBounds(adjustedFiltered)
+                    launch(Dispatchers.Swing) {
+                        canvas.camera.setViewBounds(adjustedFiltered)
+                    }
+                }
+                launch(Dispatchers.Swing) {
+                    canvas.repaint()
                 }
             }
             selected.on { list ->

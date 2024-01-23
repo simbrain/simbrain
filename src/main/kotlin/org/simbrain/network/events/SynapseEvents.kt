@@ -11,4 +11,5 @@ class SynapseEvents: NetworkModelEvents() {
     val learningRuleUpdated = ChangedEvent<SynapseUpdateRule<*,*>>()
     val visbilityChanged = ChangedEvent<Boolean>()
     val colorPreferencesChanged = NoArgEvent()
+    val locationChanged = NoArgEvent()
 }

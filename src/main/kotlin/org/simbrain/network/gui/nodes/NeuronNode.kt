@@ -37,8 +37,6 @@ import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Font
 import java.awt.geom.Point2D
-import java.beans.PropertyChangeEvent
-import java.beans.PropertyChangeListener
 import javax.swing.JDialog
 import javax.swing.JPopupMenu
 
@@ -46,7 +44,7 @@ import javax.swing.JPopupMenu
  * **NeuronNode** is a Piccolo PNode corresponding to a Neuron in the neural
  * network model.
  */
-class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), PropertyChangeListener {
+class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net) {
 
     private val mainShape: PPath
         get() = if (neuron.updateRule is ActivityGenerator) square else circle
@@ -70,11 +68,6 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
         DIAMETER.toFloat(),
         DIAMETER.toFloat()
     )
-
-    /**
-     * A list of SynapseNodes connected to this NeuronNode; used for updating.
-     */
-    private val connectedSynapses = HashSet<SynapseNode>()
 
     /**
      * Number text inside neuron.
@@ -128,7 +121,6 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
         updateClampStatus()
         pullViewPositionFromModel()
         pickable = true
-        addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this)
 
         // Handle events
         val events = neuron.events
@@ -426,10 +418,6 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
         return contextMenu
     }
 
-    override fun propertyChange(event: PropertyChangeEvent) {
-        updateSynapseNodePositions()
-    }
-
     override fun offset(dx: kotlin.Double, dy: kotlin.Double) {
         neuron.location += point(dx, dy)
         pullViewPositionFromModel()
@@ -446,22 +434,6 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net), P
         // canvas to repaint.  See PRoot#processInputs
         val p = neuron.location
         this.globalTranslation = p
-    }
-
-    /**
-     * @return Connected synapses.
-     */
-    fun getConnectedSynapses(): Set<SynapseNode> {
-        return connectedSynapses
-    }
-
-    /**
-     * Update connected synapse node positions.
-     */
-    fun updateSynapseNodePositions() {
-        for (synapseNode in connectedSynapses) {
-            synapseNode.updatePosition()
-        }
     }
 
     var xpos: kotlin.Double

@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations
 
+import kotlinx.coroutines.joinAll
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.RadialProbabilistic
 import org.simbrain.network.connections.Sparse
@@ -20,7 +21,6 @@ import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.sensors.Sensor
 import org.simbrain.world.odorworld.sensors.SmellSensor
-import javax.swing.JInternalFrame
 
 /**
  * Sample simulation showing how to do basic stuff.
@@ -204,11 +204,11 @@ val linkedNeuronList = newSim {
 
         val network = networkComponent.network
 
-        val neurons = (1..10000).map {
+        val neurons = (1..1000).map {
             Neuron(network)
         }
 
-        neurons.forEach { network.addNetworkModelAsync(it) }
+        neurons.mapNotNull { n -> network.addNetworkModelAsync(n) }.joinAll()
         val (first) = neurons
         first.activation = 1.0
 
@@ -220,14 +220,6 @@ val linkedNeuronList = newSim {
             }
         }
         HexagonalGridLayout.layoutNeurons(neurons, 40, 40)
-        withGui {
-            getDesktopComponent(networkComponent).apply {
-                parentFrame.let { frame ->
-                    if (frame is JInternalFrame) {
-                        frame.setIcon(true)
-                    }
-                }
-            }
-        }
+        network.events.zoomToFitPage.fire()
     }
 }

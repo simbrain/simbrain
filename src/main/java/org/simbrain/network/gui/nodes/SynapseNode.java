@@ -130,9 +130,6 @@ public final class SynapseNode extends ScreenElement {
         super(net);
         this.source = source;
         this.target = target;
-        target.getConnectedSynapses().add(this);
-        source.getConnectedSynapses().add(this);
-
         this.synapse = synapse;
 
         updatePosition();
@@ -166,6 +163,8 @@ public final class SynapseNode extends ScreenElement {
         events.getClampChanged().on(this::updateClampStatus);
         updateClampStatus();
 
+        events.getLocationChanged().on(getSwingDispatcher(), this::updatePosition);
+
         // Respond to spiking events
         source.getNeuron().getEvents().getSpiked().on(getSwingDispatcher(), s -> updateSpikeColor());
 
@@ -180,9 +179,9 @@ public final class SynapseNode extends ScreenElement {
 
         // Position the synapse
         if (isSelfConnection()) {
-            synapseCenter = globalToLocal(new Point2D.Double(target.getCenter().getX() + offset + 3, target.getCenter().getY() + offset + 3));
+            synapseCenter = globalToLocal(new Point2D.Double(target.getNeuron().getX() + offset + 3, target.getNeuron().getY() + offset + 3));
         } else {
-            synapseCenter = globalToLocal(calcCenter(source.getCenter(), target.getCenter()));
+            synapseCenter = globalToLocal(calcCenter(source.getNeuron().getLocation(), target.getNeuron().getLocation()));
         }
         this.offset(synapseCenter.getX() - offset, synapseCenter.getY() - offset);
 
@@ -204,8 +203,8 @@ public final class SynapseNode extends ScreenElement {
         // Update the line (unless it's a self connection)
         if (!isSelfConnection()) {
             line.reset();
-            line.append(new Line2D.Double(globalToLocal(source.getCenter()), synapseCenter), false);
-            lineBound.setLine(source.getCenter(), localToGlobal(synapseCenter));
+            line.append(new Line2D.Double(globalToLocal(source.getNeuron().getLocation()), synapseCenter), false);
+            lineBound.setLine(source.getNeuron().getLocation(), localToGlobal(synapseCenter));
         } else {
             arcBound =
                     new Arc2D.Float(

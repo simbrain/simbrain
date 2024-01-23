@@ -417,6 +417,8 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
                 newSource.addToFanOut(this);
                 newTarget.addToFanIn(this);
             }
+            this.source.getEvents().getLocationChanged().on(() -> events.getLocationChanged().fireAndBlock());
+            this.target.getEvents().getLocationChanged().on(() -> events.getLocationChanged().fireAndBlock());
         }
     }
 

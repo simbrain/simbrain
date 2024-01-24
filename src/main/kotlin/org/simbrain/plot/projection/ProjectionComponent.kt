@@ -7,6 +7,7 @@ import org.simbrain.util.projection.KDTreeConvertor
 import org.simbrain.util.projection.Projector
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
+import org.simbrain.workspace.Producible
 import org.simbrain.workspace.WorkspaceComponent
 import java.io.InputStream
 import java.io.OutputStream
@@ -21,6 +22,11 @@ class ProjectionComponent @JvmOverloads constructor(name: String, val projector:
 
     fun addPoint(newPoint: DataPoint) {
         projector.addDataPoint(newPoint)
+    }
+
+    @Producible
+    fun getCurrentPointActivation() = with(projector) {
+        dataset.currentPoint?.let { coloringManager.getActivation(it) } ?: 0.0
     }
 
     @Consumable

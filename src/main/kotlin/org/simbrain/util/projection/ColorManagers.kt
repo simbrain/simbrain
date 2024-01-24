@@ -21,6 +21,9 @@ abstract class ColoringManager: CopyableObject {
     context(Projector)
     abstract fun getColor(dataPoint: DataPoint): Color?
 
+    context(Projector)
+    abstract fun getActivation(dataPoint: DataPoint): Double
+
     /**
      * Sets this point as the "active" point, i.e the [Dataset.currentPoint].
      */
@@ -55,6 +58,8 @@ class NoOpColoringManager: ColoringManager() {
     override fun getColor(dataPoint: DataPoint): Color? {
         return null
     }
+
+    override fun getActivation(dataPoint: DataPoint): Double = 0.0
 
     override fun activate(dataPoint: DataPoint) {
     }
@@ -137,6 +142,8 @@ class DecayColoringManager: ColoringManager() {
         return valuesToColors[colorIndex]
     }
 
+    override fun getActivation(dataPoint: DataPoint) = TODO("not implemented")
+
     override fun updateAllColors() {
        pointsToValues.keys.forEach { dataPoint ->
            pointsToValues[dataPoint]?.let {
@@ -182,9 +189,12 @@ class FrequencyColoringManager: ColoringManager() {
     // TODO: Cache hotcolor and bascolor
     context(Projector)
     override fun getColor(dataPoint: DataPoint): Color {
-        val t = (visitCounts[dataPoint] ?: 0).toDouble() / maxCount
+        val t = getActivation(dataPoint)
         return HSBInterpolate(baseColor.toHSB(), highFrequencyColor.toHSB(), t)
     }
+
+    context(Projector)
+    override fun getActivation(dataPoint: DataPoint) = (visitCounts[dataPoint] ?: 0).toDouble() / maxCount
 
     override fun updateAllColors() {
     }
@@ -226,9 +236,14 @@ class MarkovColoringManager: ColoringManager() {
 
     context(Projector)
     override fun getColor(dataPoint: DataPoint): Color {
-        val currentPoint = dataset.currentPoint
-        val t = (transitionCounts[currentPoint]?.get(dataPoint) ?: 0).toDouble() / (maxCounts[currentPoint] ?: 1)
+        val t = getActivation(dataPoint)
         return HSBInterpolate(baseColor.toHSB(), highFrequencyColor.toHSB(), t)
+    }
+
+    context(Projector)
+    override fun getActivation(dataPoint: DataPoint): Double {
+        val currentPoint = dataset.currentPoint
+        return (transitionCounts[currentPoint]?.get(dataPoint) ?: 0).toDouble() / (maxCounts[currentPoint] ?: 1).coerceAtLeast(1)
     }
 
     override fun updateAllColors() {
@@ -274,12 +289,14 @@ class HaloColoringManager: ColoringManager() {
 
     context(Projector)
     override fun getColor(dataPoint: DataPoint): Color {
-        return center?.let { target ->
-            val distance = dataPoint.euclideanDistance(target)
-            val t = (distance / radius).coerceIn(0.0, 1.0)
-            HSBInterpolate(hotColor.toHSB(), baseColor.toHSB(), t)
-        } ?: baseColor
+        val t = getActivation(dataPoint)
+        return HSBInterpolate(hotColor.toHSB(), baseColor.toHSB(), t)
     }
+
+    override fun getActivation(dataPoint: DataPoint) = center?.let { target ->
+        val distance = dataPoint.euclideanDistance(target)
+        (distance / radius).coerceIn(0.0, 1.0)
+    } ?: 0.0
 
     override fun updateAllColors() {
     }

@@ -137,7 +137,7 @@ public class RandomizedPursuer extends Simulation {
         tsPlot.getModel().removeAllScalarTimeSeries();
         TimeSeriesModel.ScalarTimeSeries ts1 = tsPlot.getModel().addScalarTimeSeries("Current State Probability / Fulfillment");
 
-        Producer probability = sim.getProducer(projComp, "getCurrentStateProbability");
+        Producer probability = sim.getProducer(projComp, "getCurrentPointActivation");
         Consumer timeSeries = sim.getConsumer(ts1, "setValue");
         sim.couple(probability, timeSeries);
 

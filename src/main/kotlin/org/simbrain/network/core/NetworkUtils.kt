@@ -67,6 +67,13 @@ fun <T: NetworkModel> Network.getModelByLabel(clazz: Class<T>, label: String): T
 }
 
 /**
+ * Unlike other network models, neurons could be in a hierarchy, so we need to search the flattened list.
+ */
+fun Network.getNeuronByLabel(label: String): Neuron = flatNeuronList.first {
+    it.label.equals(label, ignoreCase = true)
+}
+
+/**
  * Returns a network model with a matching id.  If more than one
  * model has a matching id, the first found is returned.
  */

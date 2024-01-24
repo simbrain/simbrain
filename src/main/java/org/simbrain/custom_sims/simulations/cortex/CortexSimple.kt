@@ -175,9 +175,6 @@ class CortexSimple : Simulation {
             rule.resistance = resistance[0] + locR.nextDouble() * resistance[1]
             rule.backgroundCurrent = 0.0
             rule.resetPotential = restingPotential[0] + locR.nextDouble() * restingPotential[1]
-            neuron.updateRule = rule
-            neuron.lowerBound = rule.restingPotential - 10
-            neuron.upperBound = rule.threshold
             neurons.add(neuron)
         }
         val ng = NeuronGroup(net, neurons)

@@ -22,6 +22,7 @@ import java.awt.event.ActionListener;
 import java.util.List;
 
 import static org.simbrain.network.core.NetworkUtilsKt.getModelByLabel;
+import static org.simbrain.network.core.NetworkUtilsKt.getNeuronByLabel;
 
 /**
  * TODO.
@@ -299,12 +300,12 @@ public class Cerebellum extends Simulation {
     void loadCustomUpdater() {
 
         // References
-        Neuron dopamine = getModelByLabel(network, Neuron.class, "Basal Ganglia (GPi)");
-        Neuron output = getModelByLabel(network, Neuron.class, "Output");
-        Neuron target = getModelByLabel(network, Neuron.class, "Target");
-        Neuron purkinje = getModelByLabel(network, Neuron.class, "Purkinje");
+        Neuron dopamine = getNeuronByLabel(network,"Basal Ganglia (GPi)");
+        Neuron output = getNeuronByLabel(network, "Output");
+        Neuron target = getNeuronByLabel(network, "Target");
+        Neuron purkinje = getNeuronByLabel(network, "Purkinje");
         List<Synapse> p_fibers = purkinje.getFanIn();
-        Neuron i_olive = getModelByLabel(network, Neuron.class, "Inferior Olive");
+        Neuron i_olive = getNeuronByLabel(network, "Inferior Olive");
 
         var networkUpdateAction = UpdateActionKt.create("Update basal ganglia", () -> {
             if (toggleLearning) {

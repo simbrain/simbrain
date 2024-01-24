@@ -1,20 +1,20 @@
 package org.simbrain.custom_sims.simulations.cortex
 
-import kotlinx.coroutines.launch
-import org.simbrain.custom_sims.Simulation
-import org.simbrain.custom_sims.helper_classes.ControlPanel
+import org.simbrain.custom_sims.addNetworkComponent
+import org.simbrain.custom_sims.newSim
 import org.simbrain.network.connections.Sparse
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.SynapseGroup
+import org.simbrain.network.core.addNeuronGroup
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.updaterules.IntegrateAndFireRule
 import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.math.SimbrainMath
+import org.simbrain.util.place
+import org.simbrain.util.sample
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.LogNormalDistribution
-import org.simbrain.workspace.gui.SimbrainDesktop
 import java.util.concurrent.ThreadLocalRandom
+import kotlin.random.Random
 
 /**
  * Model of canonical cortex (Douglas and Martin, 2004) using rat barrel cortex
@@ -28,7 +28,7 @@ import java.util.concurrent.ThreadLocalRandom
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
-class CortexSimple : Simulation {
+val cortexSimple = newSim {
     // Simulation Parameters
     var NUM_NEURONS = 120
     var GRID_SPACE = 25
@@ -44,61 +44,103 @@ class CortexSimple : Simulation {
 
     // TODO: Membrane properties
     // TODO: Build using z coordinates
-    // References
-    var net: Network? = null
-    override fun run() {
 
-        // Clear workspace
-        sim.workspace.clearWorkspace()
+    // Clear workspace
+    workspace.clearWorkspace()
 
-        // Build network
-        val nc = sim.addNetwork(
-            10, 10, 550, 800,
-            "Cortical Simulation"
-        )
-        net = nc.network
-        sim.workspace.launch {
-            buildNetwork()
-        }
+    // Build network
+    val nc = addNetworkComponent(
+        "Cortical Simulation",
+    )
 
-        // Set up control panel
-        // controlPanel();
+    val net = nc.network
+
+    withGui {
+        place(nc, 10, 10, 550, 800)
     }
 
-    private fun controlPanel() {
-        val panel = ControlPanel.makePanel(sim, "Controller", 5, 10)
-        panel.addButton("Inject current") {}
+    fun buildLayer(
+        numNeurons: Int,
+        restingPotential: ClosedRange<Double>,
+        timeConstant: ClosedRange<Double>,
+        threshold: ClosedRange<Double>,
+        resistance: ClosedRange<Double>
+    ): NeuronGroup {
+        return with(Random) {
+            net.addNeuronGroup(numNeurons) {
+                updateRule = IntegrateAndFireRule().also {
+                    it.restingPotential = restingPotential.sample()
+                    it.timeConstant = timeConstant.sample()
+                    it.threshold = threshold.sample()
+                    it.resistance = resistance.sample()
+                    it.backgroundCurrent = 0.0
+                    it.resetPotential = restingPotential.sample()
+                }
+            }
+        }
+    }
+
+    fun connectLayers(
+        src: NeuronGroup, tar: NeuronGroup,
+        sparsity: Double
+    ): SynapseGroup {
+        val exRand: ProbabilityDistribution = LogNormalDistribution(exlocation, exscale, false)
+        val inRand: ProbabilityDistribution = LogNormalDistribution(exlocation, exscale, true)
+        val con = Sparse(sparsity, false, false)
+        con.connectionDensity = 0.65
+        val sg = SynapseGroup(src, tar, con)
+        // sg.setRandomizers(exRand, inRand);
+        sg.label = "Synapses"
+        sg.displaySynapses = false
+
+        // TODO
+        // sg.setUpperBound(200, Polarity.EXCITATORY);
+        // sg.setLowerBound(0, Polarity.EXCITATORY);
+        // sg.setLowerBound(-200, Polarity.INHIBITORY);
+        // sg.setUpperBound(0, Polarity.INHIBITORY);
+        //
+        // sg.setSpikeResponder(new UDF(), Polarity.BOTH);
+        net.addNetworkModelAsync(sg)
+        return sg
+    }
+
+    fun random3Position(data: DoubleArray, xlim: DoubleArray, ylim: DoubleArray, zlim: DoubleArray) {
+        data[0] = ThreadLocalRandom.current().nextDouble(xlim[0], xlim[1])
+        data[1] = ThreadLocalRandom.current().nextDouble(ylim[0], ylim[1])
+        data[2] = ThreadLocalRandom.current().nextDouble(zlim[0], zlim[1])
     }
 
     //    Group locations (503.25,-521.61). (-174.62,328.62). (481.16,1268.68).
     suspend fun buildNetwork() {
-        net!!.timeStep = 0.2
+        net.timeStep = 0.2
+
+        fun range(start: Double, delta: Double) = start..(start + delta)
 
         // Make the layers.  Params from Petersen, 2009.
         val btwnLayerSpacing = 150
         // resting potential, time constant, threshold, resistance
         val layer_23 = buildLayer(
             numNeuPerLay,
-            doubleArrayOf(-71.5, .35),
-            doubleArrayOf(29.0, 0.45),
-            doubleArrayOf(-38.4, 0.2),
-            doubleArrayOf(190.0, 4.0)
+            range(-71.5, .35),
+            range(29.0, 0.45),
+            range(-38.4, 0.2),
+            range(190.0, 4.0)
         )
         layer_23.label = "Layer 2/3"
         val layer_4 = buildLayer(
             numNeuPerLay,
-            doubleArrayOf(-66.0, 0.3),
-            doubleArrayOf(34.8, 0.5),
-            doubleArrayOf(-39.7, 0.2),
-            doubleArrayOf(302.0, 4.0)
+            range(-66.0, 0.3),
+            range(34.8, 0.5),
+            range(-39.7, 0.2),
+            range(302.0, 4.0)
         )
         layer_4.label = "Layer 4"
         val layer_56 = buildLayer(
             numNeuPerLay,
-            doubleArrayOf(-62.8, 0.2),
-            doubleArrayOf(31.7, 0.65),
-            doubleArrayOf(-40.0, 0.25),
-            doubleArrayOf(187.0, 4.0)
+            range(-62.8, 0.2),
+            range(31.7, 0.65),
+            range(-40.0, 0.25),
+            range(187.0, 4.0)
         )
         layer_56.label = "Layer 5/6"
         val tmp = DoubleArray(3)
@@ -137,99 +179,20 @@ class CortexSimple : Simulation {
         synGroups["L5/6 \u2192 L2/3"] = connectLayers(layer_56, layer_23, .03)
         for (sgn in synGroups.keys) {
             val sg = synGroups[sgn]
-            for (s in sg!!.synapses) {
-                s.delay = getDelay(
-                    s.source.position3D, s.target.position3D,
-                    Math.sqrt((2 * (600 * 600) + 2000 * 2000).toDouble()), 20.0
-                )
-            }
-            sg.label = sgn
+            // for (s in sg!!.synapses) {
+            //     s.delay = getDelay(
+            //         s.source.position3D, s.target.position3D,
+            //         Math.sqrt((2 * (600 * 600) + 2000 * 2000).toDouble()), 20.0
+            //     )
+            // }
+            sg!!.label = sgn
         }
-
-        // TODO
-        // layer_4.fireGroupUpdated();
-        // Todo; Add labels
-
-        // Use concurrent buffered update
-        // net.getUpdateManager().clear();
-        // net.getUpdateManager().addAction(ConcurrentBufferedUpdate
-        //     .createConcurrentBufferedUpdate(net));
-    }
-
-    private suspend fun buildLayer(
-        numNeurons: Int,
-        restingPotential: DoubleArray, timeConstant: DoubleArray, threshold: DoubleArray,
-        resistance: DoubleArray
-    ): NeuronGroup {
-
-        // GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE,
-        //    (int) Math.sqrt(numNeurons));
-        val neurons: MutableList<Neuron> = ArrayList(numNeurons)
-        val locR = ThreadLocalRandom.current()
-        for (i in 0 until numNeurons) {
-            val neuron = Neuron(net)
-            val rule = IntegrateAndFireRule()
-            rule.restingPotential = restingPotential[0] + locR.nextDouble() * restingPotential[1]
-            rule.timeConstant = timeConstant[0] + locR.nextDouble() * timeConstant[1]
-            rule.threshold = threshold[0] + locR.nextDouble() * threshold[1]
-            rule.resistance = resistance[0] + locR.nextDouble() * resistance[1]
-            rule.backgroundCurrent = 0.0
-            rule.resetPotential = restingPotential[0] + locR.nextDouble() * restingPotential[1]
-            neurons.add(neuron)
-        }
-        val ng = NeuronGroup(net, neurons)
-        net!!.addNetworkModel(ng)
-        // ng.setLayout(layout);
-        // ng.applyLayout();
-        return ng
-    }
-
-    private fun connectLayers(
-        src: NeuronGroup, tar: NeuronGroup,
-        sparsity: Double
-    ): SynapseGroup {
-        val exRand: ProbabilityDistribution = LogNormalDistribution(exlocation, exscale, false)
-        val inRand: ProbabilityDistribution = LogNormalDistribution(exlocation, exscale, true)
-        val con = Sparse(sparsity, false, false)
-        con.connectionDensity = 0.65
-        val sg = SynapseGroup(src, tar, con)
-        // sg.setRandomizers(exRand, inRand);
-        sg.label = "Synapses"
-        sg.displaySynapses = false
-
-        // TODO
-        // sg.setUpperBound(200, Polarity.EXCITATORY);
-        // sg.setLowerBound(0, Polarity.EXCITATORY);
-        // sg.setLowerBound(-200, Polarity.INHIBITORY);
-        // sg.setUpperBound(0, Polarity.INHIBITORY);
-        //
-        // sg.setSpikeResponder(new UDF(), Polarity.BOTH);
-        net!!.addNetworkModelAsync(sg)
-        return sg
-    }
-
-    private fun random3Position(data: DoubleArray, xlim: DoubleArray, ylim: DoubleArray, zlim: DoubleArray) {
-        data[0] = ThreadLocalRandom.current().nextDouble(xlim[0], xlim[1])
-        data[1] = ThreadLocalRandom.current().nextDouble(ylim[0], ylim[1])
-        data[2] = ThreadLocalRandom.current().nextDouble(zlim[0], zlim[1])
     }
 
     fun getDelay(xyz1: DoubleArray?, xyz2: DoubleArray?, maxDist: Double, maxDly: Double): Int {
         val dist = SimbrainMath.distance(xyz1, xyz2)
-        return (dist / maxDist * maxDly / net!!.timeStep).toInt()
+        return (dist / maxDist * maxDly / net.timeStep).toInt()
     }
 
-    constructor(desktop: SimbrainDesktop?) : super(desktop)
-    constructor() : super()
-
-    private val submenuName: String
-        private get() = "Brain"
-
-    override fun getName(): String {
-        return "Cortical circuit"
-    }
-
-    override fun instantiate(desktop: SimbrainDesktop): CortexSimple {
-        return CortexSimple(desktop)
-    }
+    buildNetwork()
 }

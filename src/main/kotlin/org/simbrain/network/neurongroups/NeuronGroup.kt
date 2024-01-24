@@ -64,6 +64,7 @@ open class NeuronGroup(net: Network?) : AbstractNeuronCollection(net) {
 
     override fun update() {
         neuronList.forEach { it.updateInputs() }
+        neuronList.forEach { it.update() }
         neuronList.forEach { it.clearInput() }
         super.update()
     }

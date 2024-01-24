@@ -3,6 +3,7 @@ package org.simbrain.util
 import org.simbrain.util.math.SimbrainMath
 import smile.math.matrix.Matrix
 import kotlin.math.sqrt
+import kotlin.random.Random
 
 /**
  * Numeric utilities in Kotlin. Comparable to [SimbrainMath].
@@ -234,3 +235,7 @@ fun computeDotProductMatrix(data: Array<DoubleArray>) = createMatrix(data.size, 
 }
 
 fun DoubleArray.outerProduct(other: DoubleArray) = toMatrix().mt(other.toMatrix())
+
+
+context(Random)
+fun ClosedRange<Double>.sample() = nextDouble(start, endInclusive)

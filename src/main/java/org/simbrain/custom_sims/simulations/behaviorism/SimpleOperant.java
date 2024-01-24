@@ -52,7 +52,7 @@ public class SimpleOperant extends Simulation {
         nc = sim.addNetwork(195, 9, 447, 296, "Behaviors");
         behaviorNet = addNeuronGroup(nc.getNetwork(), -9.25, 95.93, numNeurons);
         behaviorNet.setLabel("Behaviors");
-        ((LineLayout) behaviorNet.getLayout()).setSpacing(100);
+        behaviorNet.setLayout(new LineLayout(100, LineLayout.LineOrientation.HORIZONTAL));
         behaviorNet.applyLayout(-5, -85);
         behaviorNet.setClamped(true);
 

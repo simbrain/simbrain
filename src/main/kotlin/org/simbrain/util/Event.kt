@@ -50,6 +50,11 @@ open class Events: CoroutineScope {
 
         private var job: Job? = null
 
+        /**
+         * Helper function for registering suspending event handlers.
+         *
+         * @return A function that can be called to unregister the event handler.
+         */
         protected fun onSuspendHelper(dispatcher: CoroutineDispatcher?, wait: Boolean, run: suspend (new: Any?, old: Any?) -> Unit): () -> Boolean? {
             val eventObjectHandler = EventObjectHandler(dispatcher, wait, run)
             eventMapping.getOrPut(this@EventObject) { ConcurrentLinkedQueue() }.add(eventObjectHandler)
@@ -58,6 +63,11 @@ open class Events: CoroutineScope {
             }
         }
 
+        /**
+         * Helper function for registering non-suspending event handlers.
+         *
+         * @return A function that can be called to unregister the event handler.
+         */
         protected fun onHelper(dispatcher: CoroutineDispatcher?, wait: Boolean, run: (new: Any?, old: Any?) -> Unit): () -> Boolean? {
             val eventObjectHandler = EventObjectHandler(dispatcher, wait, run)
             eventMapping.getOrPut(this@EventObject) { ConcurrentLinkedQueue() }.add(eventObjectHandler)

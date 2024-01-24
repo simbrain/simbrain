@@ -171,7 +171,10 @@ fun createConstructorCallingConverter(
                 }
 
                 val paramToValueMap = paramNameToParamMap.entries
-                    .associate { (name, param) -> param to propertyNameToDeserializedValueMap[name] }
+                    .map { (name, param) -> param to propertyNameToDeserializedValueMap[name] }
+                    // if the parameter is optional, don't include the null value (to deal with properties that are transient)
+                    .filter { (param, value) -> !param.isOptional || value != null }
+                    .toMap()
 
                 constructor.withTempPublicAccess {
                     callBy(paramToValueMap)

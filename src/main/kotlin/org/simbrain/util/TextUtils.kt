@@ -218,8 +218,12 @@ fun textEntryDialog(initialString: String, title: String = "Edit Text", columns:
 }
 
 fun String.convertCamelCaseToSpaces(): String {
-    val regex = "(?<=\\w)([A-Z])".toRegex()
-    return regex.replace(this) { " ${it.value}" }
+    // This regex looks for places in the string where either:
+    // 1. A lowercase letter is followed by an uppercase letter, or
+    // 2. A sequence of uppercase letters is followed by a lowercase letter.
+    val regex = "(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])".toRegex()
+
+    return regex.replace(this) { " " }
         .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
         .trim()
 }

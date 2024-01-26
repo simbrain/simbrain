@@ -150,5 +150,23 @@ class TextUtilsTest {
         assertEquals("worldblahtest blah", inputString.removeWords(words))
     }
 
+    @Test
+    fun `convertCamelCaseToSpaces should work on UpperCamelCase`() {
+        val inputString = "ThisIsCamelCase"
+        assertEquals("This Is Camel Case", inputString.convertCamelCaseToSpaces())
+    }
+
+    @Test
+    fun `convertCamelCaseToSpaces should work on lowerCamelCase`() {
+        val inputString = "thisIsCamelCase"
+        assertEquals("This Is Camel Case", inputString.convertCamelCaseToSpaces())
+    }
+
+    @Test
+    fun `convertCamelCaseToSpaces should not break consecutive upper case letters`() {
+        val inputString = "ThisIsCamelCaseABC"
+        assertEquals("This Is Camel Case ABC", inputString.convertCamelCaseToSpaces())
+    }
+
 }
 

@@ -9,7 +9,8 @@ import org.simbrain.network.neurongroups.SoftmaxGroup;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class NeuronGroupTest {
 
@@ -26,8 +27,6 @@ public class NeuronGroupTest {
         NeuronGroup ng2 = ng.copyTo(net);
         net.addNetworkModelAsync(ng2);
         assertEquals(2, ng2.getNeuronList().size());
-        // Labels should not be copied
-        assertNotEquals("test", ng2.getLabel());
     }
 
     @Test

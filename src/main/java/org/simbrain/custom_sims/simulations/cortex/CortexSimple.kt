@@ -6,6 +6,7 @@ import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.addNeuronGroup
 import org.simbrain.network.neurongroups.NeuronGroup
+import org.simbrain.network.spikeresponders.UDF
 import org.simbrain.network.updaterules.IntegrateAndFireRule
 import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.math.SimbrainMath
@@ -89,7 +90,10 @@ val cortexSimple = newSim {
         val con = Sparse(sparsity, false, false)
         con.connectionDensity = 0.65
         val sg = SynapseGroup(src, tar, con)
-        // sg.setRandomizers(exRand, inRand);
+        sg.connectionStrategy.exRandomizer = exRand
+        sg.connectionStrategy.inRandomizer = inRand
+        sg.randomizeExcitatory()
+        sg.randomizeInhibitory()
         sg.label = "Synapses"
         sg.displaySynapses = false
 
@@ -100,6 +104,9 @@ val cortexSimple = newSim {
         // sg.setUpperBound(0, Polarity.INHIBITORY);
         //
         // sg.setSpikeResponder(new UDF(), Polarity.BOTH);
+        sg.synapses.forEach {
+            it.spikeResponder = UDF()
+        }
         net.addNetworkModelAsync(sg)
         return sg
     }

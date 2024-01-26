@@ -25,9 +25,7 @@ import javax.swing.text.DefaultFormatterFactory
 import javax.swing.text.NumberFormatter
 import kotlin.math.min
 import kotlin.reflect.*
-import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.functions
-import kotlin.reflect.full.hasAnnotation
 import kotlin.reflect.jvm.jvmErasure
 
 /**
@@ -802,13 +800,7 @@ class ObjectWidget<O : EditableObject, T : CopyableObject>(
         parameter.typeMapProvider.call(value).map { it.kotlin }
     } else {
         value.getTypeList()?.map { it.kotlin }
-    })?.associateBy {
-        if (it.hasAnnotation<CustomTypeName>()) {
-            it.findAnnotation<CustomTypeName>()!!.name
-        } else {
-            it.simpleName!!.convertCamelCaseToSpaces()
-        }
-    }
+    })?.associateBy { it.displayName }
 
     private val editorPanelContainer = JPanel()
 
@@ -823,7 +815,7 @@ class ObjectWidget<O : EditableObject, T : CopyableObject>(
             typeMap.keys.forEach {
                 addItem(it)
             }
-            selectedItem = value::class.simpleName
+            selectedItem = value::class.displayName
             addActionListener { e: ActionEvent? ->
 
                 // Create the prototype object and refresh editor panel

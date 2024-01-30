@@ -103,6 +103,7 @@ val simulations = dir<Any>("Simulations") {
         item("Mnist Images") { mnistSim }
         item("Image World") { imageWorldSim }
         item("LSTM") { lstmBlock() }
+        item("Competitive network") { competitiveSim }
     }
 
     dir("Testing") {

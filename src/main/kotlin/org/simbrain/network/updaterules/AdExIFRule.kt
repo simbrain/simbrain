@@ -26,6 +26,7 @@ import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
 import org.simbrain.network.util.*
 import org.simbrain.util.UserParameter
 import org.simbrain.util.math.SimbrainMath.clip
+import org.simbrain.util.propertyeditor.CustomTypeName
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 import org.simbrain.workspace.Producible
@@ -42,6 +43,7 @@ import org.simbrain.workspace.Producible
  *
  * @author Zoë Tosi
  */
+@CustomTypeName("AdEx Rule")
 open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), NoisyUpdateRule {
 
     /**

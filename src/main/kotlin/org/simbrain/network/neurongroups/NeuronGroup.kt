@@ -32,7 +32,6 @@ import java.awt.geom.Point2D
  * assemblage of potentially heterogeneous neurons that can be treated as a group, and a
  * [org.simbrain.network.matrix.NeuronArray] which is an array that can be updated using static update methods.
  *
- *
  * A primary abstraction for larger network structures. Layers in feed-forward networks are neuron
  * groups. Self-organizing-maps subclass this class. Etc. Since all update rules are the same groups can be characterized
  * as spiking vs. non-spiking.

@@ -546,7 +546,7 @@ object SimbrainDesktop {
                 super.internalFrameClosed(e)
             }
         }
-    } // End DesktopInternalFrame
+    }
 
     /**
      * Add internal frame.

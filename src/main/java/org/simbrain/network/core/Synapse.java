@@ -377,8 +377,8 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
 
         // Handle delays
         if (delay != 0) {
-            dlyVal = dequeu();
-            enqueu(psr);
+            dlyVal = dequeue();
+            enqueue(psr);
             psr = dlyVal;
         }
     }
@@ -645,7 +645,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
     /**
      * @return the deque.
      */
-    private double dequeu() {
+    private double dequeue() {
         if (dlyPtr == delay) {
             dlyPtr = 0;
         }
@@ -657,7 +657,7 @@ public class Synapse extends NetworkModel implements EditableObject, AttributeCo
      *
      * @param val Value to enqueu
      */
-    private void enqueu(final double val) {
+    private void enqueue(final double val) {
         if (dlyPtr == 0) {
             delayManager[delay - 1] = val;
         } else {

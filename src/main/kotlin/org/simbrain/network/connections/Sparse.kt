@@ -162,7 +162,7 @@ fun createSparseSynapses(
     if (sourceNeurons.isEmpty() || targetNeurons.isEmpty()) {
         return ConnectionsResult.Add(listOf())
     }
-    val existingSynapses = sourceNeurons.flatMap { it.fanOut.values.filter{it.target in targetNeurons} }
+    val existingSynapses = sourceNeurons.flatMap { it.fanOut.values.filter{ it.target in targetNeurons } }
     val possibleConnections = (sourceNeurons.asSequence() cartesianProduct targetNeurons.asSequence()).toSet().let {
         if (!selfConnectionAllowed) {
             it.filter { (source, target) -> source != target }

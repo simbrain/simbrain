@@ -16,81 +16,128 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.core;
+package org.simbrain.network.core
 
-import org.jetbrains.annotations.NotNull;
-import org.simbrain.network.LocatableModel;
-import org.simbrain.network.core.Network.TimeType;
-import org.simbrain.network.events.NeuronEvents;
-import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
-import org.simbrain.network.updaterules.interfaces.ClippedUpdateRule;
-import org.simbrain.network.util.ScalarDataHolder;
-import org.simbrain.network.util.SpikingScalarData;
-import org.simbrain.util.SimbrainConstants.Polarity;
-import org.simbrain.util.UserParameter;
-import org.simbrain.util.math.SimbrainMath;
-import org.simbrain.util.propertyeditor.EditableObject;
-import org.simbrain.workspace.AttributeContainer;
-import org.simbrain.workspace.Consumable;
-import org.simbrain.workspace.Producible;
-import org.simbrain.workspace.couplings.CouplingManagerKt;
-
-import java.awt.geom.Point2D;
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static org.simbrain.util.GeomKt.plus;
-import static org.simbrain.util.GeomKt.point;
+import org.simbrain.network.LocatableModel
+import org.simbrain.network.events.NeuronEvents
+import org.simbrain.network.neuron_update_rules.LinearRule
+import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
+import org.simbrain.network.updaterules.interfaces.ClippedUpdateRule
+import org.simbrain.network.util.ScalarDataHolder
+import org.simbrain.network.util.SpikingScalarData
+import org.simbrain.util.SimbrainConstants.Polarity
+import org.simbrain.util.UserParameter
+import org.simbrain.util.math.SimbrainMath
+import org.simbrain.util.plus
+import org.simbrain.util.point
+import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.workspace.AttributeContainer
+import org.simbrain.workspace.Consumable
+import org.simbrain.workspace.Producible
+import org.simbrain.workspace.couplings.HIGH_PRIORITY
+import org.simbrain.workspace.couplings.LOW_PRIORITY
+import java.awt.geom.Point2D
+import kotlin.reflect.jvm.javaField
 
 /**
- * <b>Neuron</b> represents a node in the neural network. Most of the "logic" of
+ * **Neuron** represents a node in the neural network. Most of the "logic" of
  * the neural network occurs here, in the update function. Subclasses must
  * override update and duplicate (for copy / paste) and cloning generally.
  *
  * @author Jeff Yoshimi
  * @author Zoë Tosi
  */
-public class Neuron extends LocatableModel implements EditableObject, AttributeContainer {
+class Neuron : LocatableModel, EditableObject, AttributeContainer {
+
+
+    constructor() {
+
+    }
+
+    @JvmOverloads
+    constructor(parent: Network, updateRule: NeuronUpdateRule<*, *> = LinearRule()) {
+        this.parent = parent
+        this.updateRule = updateRule
+    }
 
     /**
-     * The default neuron update rule. Neurons which are constructed without a
-     * specified update rule will default to the rule specified here: Linear
-     * with default parameters.
+     * Copy constructor.
      */
-    public static final NeuronUpdateRule DEFAULT_UPDATE_RULE = new LinearRule();
+    constructor(parent: Network, n: Neuron) {
+        if (::parent.isInitialized) {
+            this.parent = parent
+            updatePriority = n.updatePriority
+        }
+        updateRule = n.updateRule.deepCopy()
+        dataHolder = n.dataHolder.copy()
+        clamped = n.clamped
+        increment = n.increment
+        forceSetActivation(n.activation)
+        x = n.x
+        y = n.y
+        label = n.label
+    }
+
+    constructor(n: Neuron) {
+        updateRule = n.updateRule.deepCopy()
+        dataHolder = n.dataHolder.copy()
+        clamped = n.clamped
+        increment = n.increment
+        forceSetActivation(n.activation)
+        x = n.x
+        y = n.y
+        label = n.label
+    }
 
     /**
      * The update method of this neuron, which corresponds to what kind of
      * neuron it is.
-     * TODO: When moving to Kotlin implement conditional visibility
      */
-    @UserParameter(label = "Update Rule",
-            conditionalVisibilityMethod = "notInNeuronGroup", order = 100)
-    private NeuronUpdateRule updateRule = DEFAULT_UPDATE_RULE;
+    @UserParameter(label = "Update Rule", order = 100)
+    var updateRule: NeuronUpdateRule<*, *> = LinearRule()
+        set(value) {
+            val oldRule = field
+            field = value
+            dataHolder = value.createScalarData()
+            events.updateRuleChanged.fireAndForget(oldRule, value)
+        }
 
     /**
      * Activation value of the neuron. The main state variable.
      */
-    @UserParameter(label = "Activation", description = "Neuron activation. If you want a value greater" +
-            " than upper bound or less than lower bound you must set those first, and close this dialog.",
-            increment = .5, probDist = "Normal", order = 1)
-    private double activation;
-
-    /**
-     * The default increment of a neuron using this rule.
-     */
-    public static final double DEFAULT_INCREMENT = 0.1;
+    @UserParameter(
+        label = "Activation",
+        description = "Neuron activation. If you want a value greater" +
+                " than upper bound or less than lower bound you must set those first, and close this dialog.",
+        increment = .5,
+        probDist = "Normal",
+        order = 1
+    )
+    @get:Producible
+    @set:Consumable(defaultVisibility = false)
+    var activation = 0.0
+        set(value) {
+            lastActivation = field
+            if (clamped) {
+                return
+            } else {
+                field = value
+            }
+            events.activationChanged.fireAndForget(lastActivation, value)
+        }
 
     /**
      * Amount to increment/decrement activation when manually adjusted.
      */
     @UserParameter(
-            label = "Increment",
-            description = "Amount that a neuron is incremented / decremented when it is manually adjusted.",
-            increment = .5,
-            order = 6)
-    protected double increment = DEFAULT_INCREMENT;
+        label = "Increment",
+        description = "Amount that a neuron is incremented / decremented when it is manually adjusted.",
+        increment = .5,
+        order = 6
+    )
+    var increment: Double = 0.1
+
+    var networkTime = 0.0
 
     /**
      * Whether or not this neuron has spiked. Specifically if the result of
@@ -98,168 +145,141 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * potential at time t+1. True on t+1 in that case. Always false for
      * non-spiking neuron update rules.
      */
-    private boolean spike;
+    var isSpike: Boolean = false
+        set(spike) {
+            field = spike
+            if (dataHolder is SpikingScalarData) {
+                (dataHolder as SpikingScalarData).setHasSpiked(spike, networkTime)
+            }
+            events.spiked.fireAndForget(spike)
+        }
 
     /**
-     * Value of any external inputs to neuron. See description at
-     * {@link #addInputValue(double)}
+     * Returns "external input" to neuron, separate from any input from connected neurons.
      */
-    private double inputValue;
+    /**
+     * Value of any external inputs to neuron. See description at
+     * [.addInputValue]
+     */
+    var input: Double = 0.0
+        private set
 
     /**
      * Reference to network this neuron is part of.
      */
-    private final Network parent;
-
-    /**
-     * Pre-allocates the number of bins in this neuron's fanIn/Out for
-     * efficiency.
-     */
-    public static final int PRE_ALLOCATED_NUM_SYNAPSES = (int) Math.ceil(500 / 0.75);
+    private lateinit var parent: Network
 
     /**
      * Fan-out in the form of a map from target neurons to synapses.
      */
-    private transient Map<Neuron, Synapse> fanOut = new HashMap<>(PRE_ALLOCATED_NUM_SYNAPSES);
+    @Transient
+    var fanOut: MutableMap<Neuron, Synapse> = HashMap()
+        private set
 
     /**
      * List of synapses attaching to this neuron.
      */
-    private transient ArrayList<Synapse> fanIn = new ArrayList<>(PRE_ALLOCATED_NUM_SYNAPSES);
+    @Transient
+    var fanIn: ArrayList<Synapse> = ArrayList()
+        private set
 
     /**
      * Central x-coordinate of this neuron in 2-space.
      */
-    private double x = 0;
+    var x = 0.0
 
     /**
      * Central y-coordinate of this neuron in 2-space.
      */
-    private double y = 0;
+    var y = 0.0
 
     /**
      * z-coordinate of this neuron in 3-space. Currently no GUI implementation,
      * but fully useable for scripting. Like polarity this will get a full
      * implementation in the next development cycle... probably by 4.0.
      */
-    private double z;
+    var z = 0.0
 
     /**
      * If true then do not update this neuron.
      */
     @UserParameter(
-            label = "Clamped",
-            description = "In general, a clamped neuron will not change over time; it is \"clamped\" "
-                    + "to its current value.",
-            order = 3)
-    private boolean clamped;
+        label = "Clamped",
+        description = "In general, a clamped neuron will not change over time; it is \"clamped\" to its current value.",
+        order = 3
+    )
+    var clamped = false
+        set(value) {
+            field = value
+            events.clampChanged.fireAndForget()
+        }
 
     /**
      * The polarity of this neuron (excitatory, inhibitory, or none, which is
      * null). Used in synapse randomization, and in adding synapses.
      */
     @UserParameter(label = "Polarity", order = 10)
-    private Polarity polarity = Polarity.BOTH;
+    var polarity: Polarity = Polarity.BOTH
+        set(value) {
+            field = value
+            fanOut.values.filterNotNull().forEach { s -> s.strength = field.value(s.strength) }
+            events.colorChanged.fireAndForget()
+        }
 
     /**
      * Memory of last activation.
      */
-    private double lastActivation;
+    var lastActivation: Double = 0.0
+        private set
 
     /**
      * Sequence in which the update function should be called for this neuron.
      * By default, this is set to 0 for all the neurons. If you want a subset of
      * neurons to fire before other neurons, assign it a smaller priority value.
      */
-    @UserParameter(label = "Update Priority", description = "What order neurons should be updated" +
-            "in, starting with lower values. <br> Only used with priority-based network update",
-            order = 20)
-    private int updatePriority;
+    @UserParameter(
+        label = "Update Priority", description = "What order neurons should be updated" +
+                "in, starting with lower values. <br> Only used with priority-based network update", order = 20
+    )
+    var updatePriority: Int = 0
+        set(updatePriority) {
+            field = updatePriority
+            events.priorityChanged.fireAndBlock()
+        }
 
     /**
      * An auxiliary value associated with a neuron. Getting and setting these
      * values can be useful in scripts.
      */
-    private double auxValue;
+    var auxValue: Double = 0.0
 
     /**
      * Support for property change events.
      */
-    private transient NeuronEvents events = new NeuronEvents();
+    @Transient
+    override var events: NeuronEvents = NeuronEvents()
+        private set
 
     /**
      * Local data holder for neuron update rule.
      */
     @UserParameter(label = "State variables", order = 100)
-    private ScalarDataHolder dataHolder = updateRule.createScalarData();
+    var dataHolder: ScalarDataHolder = updateRule.createScalarData()
 
-    /**
-     * Construct a specific type of neuron.
-     *
-     * @param parent     The parent network. Be careful not to set this to root network
-     *                   if the root network is not the parent.
-     * @param updateRule the update method
-     */
-    public Neuron(final Network parent, final NeuronUpdateRule updateRule) {
-        this.parent = parent;
-        setUpdateRule(updateRule);
+    fun deepCopy(): Neuron {
+        return if (::parent.isInitialized) {
+            Neuron(parent, this)
+        } else {
+            Neuron(this)
+        }
     }
 
-    /**
-     * Construct a neuron with all default values in the specified network.
-     * Sometimes used as the basis for a template neuron which will be edited
-     * and then copied. Also used in scripts.
-     *
-     * @param parent The parent network of this neuron.
-     */
-    public Neuron(final Network parent) {
-        this(parent, DEFAULT_UPDATE_RULE.deepCopy());
-    }
-
-    /**
-     * Copy constructor.
-     *
-     * @param parent The parent network. Be careful not to set this to root network
-     *               if the root network is not the parent.
-     * @param n      Neuron
-     */
-    public Neuron(final Network parent, final Neuron n) {
-        this.parent = parent;
-        setUpdateRule(n.getUpdateRule().deepCopy());
-        setDataHolder(n.getDataHolder().copy());
-        setClamped(n.isClamped());
-        setIncrement(n.getIncrement());
-        forceSetActivation(n.getActivation());
-        x = n.x;
-        y = n.y;
-        setUpdatePriority(n.getUpdatePriority());
-        setLabel(n.getLabel());
-    }
-
-    public ScalarDataHolder getDataHolder() {
-        return dataHolder;
-    }
-
-    public void setDataHolder(ScalarDataHolder dataHolder) {
-        this.dataHolder = dataHolder;
-    }
-
-    /**
-     * Provides a deep copy of this neuron.
-     *
-     * @return a deep copy of this neuron.
-     */
-    public Neuron deepCopy() {
-        return new Neuron(parent, this);
-    }
-
-    @Override
-    public void postOpenInit() {
-        events = new NeuronEvents();
-        fanOut = new HashMap<>();
-        fanIn = new ArrayList<>();
+    override fun postOpenInit() {
+        events = NeuronEvents()
+        fanOut = HashMap()
+        fanIn = ArrayList()
         if (polarity == null) {
-            polarity = Polarity.BOTH;
+            polarity = Polarity.BOTH
         }
     }
 
@@ -268,94 +288,45 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      *
      * @return the time type.
      */
-    public TimeType getTimeType() {
-        return updateRule.getTimeType();
-    }
-
-    /**
-     * Returns the current update rule.
-     *
-     * @return the neuronUpdateRule
-     */
-    public NeuronUpdateRule getUpdateRule() {
-        return updateRule;
-    }
+    val timeType: Network.TimeType
+        get() = updateRule.timeType
 
     /**
      * Returns the current update rule's description (name).
      *
      * @return the neuronUpdateRule's description
      */
-    public String getUpdateRuleDescription() {
-        return updateRule.getName();
-    }
-
-    /**
-     * Set a new update rule. Essentially like changing the type of the network.
-     *
-     * @param updateRule the neuronUpdateRule to set
-     */
-    public void setUpdateRule(final NeuronUpdateRule<?,?> updateRule) {
-
-        NeuronUpdateRule oldRule = this.updateRule;
-        this.updateRule = updateRule;
-        dataHolder = updateRule.createScalarData();
-
-        if (getNetwork() != null) {
-            getNetwork().updateTimeType();
-            events.getUpdateRuleChanged().fireAndForget(oldRule, updateRule);
-        }
-    }
+    val updateRuleDescription: String
+        get() = updateRule.name
 
     /**
      * Change the current update rule but perform no other initialization.
      */
-    public void changeUpdateRule(final NeuronUpdateRule<?,?> updateRule, final ScalarDataHolder data) {
-        this.updateRule = updateRule;
-        this.dataHolder = data;
+    fun changeUpdateRule(updateRule: NeuronUpdateRule<*, *>, data: ScalarDataHolder) {
+        this.updateRule = updateRule
+        this.dataHolder = data
     }
 
-    public void clip() {
-        if (updateRule instanceof ClippedUpdateRule) {
-            activation = ((ClippedUpdateRule) updateRule).clip(activation);
+    fun clip() {
+        if (updateRule is ClippedUpdateRule) {
+            activation = (updateRule as ClippedUpdateRule).clip(activation)
         }
     }
 
-    @Override
-    public void updateInputs() {
-        fanIn.forEach(Synapse::updateOutput);
-        addInputValue(getWeightedInputs());
+    override fun updateInputs() {
+        fanIn.forEach { it.updateOutput() }
+        addInputValue(weightedInputs)
     }
 
-    @Override
-    public void update() {
-        if (isSpike()) {
-            setSpike(false);
+    override fun update() {
+        if (isSpike) {
+            isSpike = false
         }
-        if (isClamped()) {
-            return;
+        if (clamped) {
+            return
         }
-        updateRule.apply(this, dataHolder);
-        inputValue = 0.0;
-    }
-
-    /**
-     * Sets the activation of the neuron if it is not clamped. To unequivocally
-     * set the activation use {@link #forceSetActivation(double)
-     * forceSetActivation(double)}. Under normal circumstances model classes
-     * will use this method.
-     *
-     * @param act Activation
-     */
-    @Consumable(defaultVisibility = false)
-    public void setActivation(final double act) {
-        lastActivation = getActivation();
-        if (isClamped()) {
-            return;
-        } else {
-            activation = act;
-        }
-        events.getActivationChanged().fireAndForget(lastActivation, act);
+        updateRule.apply(this, dataHolder)
+        input = 0.0
     }
 
     /**
@@ -367,61 +338,41 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * @param act the new activation value
      */
     @Consumable(customPriorityMethod = "forceSetActivationCouplingPriority")
-    public void forceSetActivation(final double act) {
-        lastActivation = getActivation();
-        activation = act;
-        events.getActivationChanged().fireAndForget(lastActivation, act);
+    fun forceSetActivation(act: Double) {
+        lastActivation = activation
+        ::activation.javaField?.set(this, act)
+        events.activationChanged.fireAndForget(lastActivation, act)
     }
 
-    @Producible()
-    public double getActivation() {
-        return activation;
-    }
-
-    /**
-     * @return an unmodifiable version of the fanIn list.
-     */
-    public List<Synapse> getFanIn() {
-        return Collections.unmodifiableList(fanIn);
-    }
-
-    /**
-     * @return an unmodifiable version of the fanOut map.
-     */
-    public Map<Neuron, Synapse> getFanOut() {
-        return Collections.unmodifiableMap(fanOut);
-    }
 
     /**
      * @return the fan out map. Unsafe because the fan out map and the returned map are the same and thus modifications
      * to one will affect the other. Here for performance reasons.
      */
-    public Map<Neuron, Synapse> getFanOutUnsafe() {
-        return fanOut;
-    }
+    val fanOutUnsafe: Map<Neuron, Synapse?>?
+        get() = fanOut
 
     /**
      * @return the fan in list. Unsafe because the fan in list and the returned list are the same and thus modifications
      * to one will affect the other. Here for performance reasons.
      */
-    public List<Synapse> getFanInUnsafe() {
-        return fanIn;
-    }
+    val fanInUnsafe: List<Synapse>?
+        get() = fanIn
 
     /**
      * Adds an efferent (outgoing) synapse to this neuron, i.e. adds a synapse to
-     * {@link #fanOut}. Used when constructing synapses. Should not be called directly
+     * [.fanOut]. Used when constructing synapses. Should not be called directly
      *
-     * Does <b>NOT</b> add this synapse to the network or any
+     * Does **NOT** add this synapse to the network or any
      * intermediate bodies. If the connection is a duplicate connection the
      * original synapse connecting this neuron to a target neuron will be
-     * removed and replaced by <i>Synapse s</i>.
+     * removed and replaced by *Synapse s*.
      *
      * @param synapse the synapse for which this neuron is a source to add.
      */
-    public void addToFanOut(final Synapse synapse) {
+    fun addToFanOut(synapse: Synapse) {
         if (fanOut != null) {
-            fanOut.put(synapse.getTarget(), synapse);
+            fanOut[synapse.target] = synapse
         }
     }
 
@@ -429,21 +380,21 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * Remove an efferent (outgoing) weight from this neuron. Used by synapse but should not generally be called
      * directly.
      */
-    public void removeFromFanOut(final Synapse synapse) {
+    fun removeFromFanOut(synapse: Synapse) {
         if (fanOut != null) {
-            fanOut.remove(synapse.getTarget());
+            fanOut.remove(synapse.target)
         }
     }
 
     /**
      * Adds an afferent (incoming) synapse to this neuron, i.e. adds a synapse to
-     * {@link #fanIn}. Used when constructing synapses. Should not be called directly
+     * [.fanIn]. Used when constructing synapses. Should not be called directly
      *
-     * Does <b>NOT</b> add this synapse to the network or any intermediate bodies.
+     * Does **NOT** add this synapse to the network or any intermediate bodies.
      */
-    public void addToFanIn(final Synapse source) {
+    fun addToFanIn(source: Synapse) {
         if (fanIn != null) {
-            fanIn.add(source);
+            fanIn.add(source)
         }
     }
 
@@ -451,88 +402,62 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * Remove an afferent (incoming) weight from this neuron. Used by synapse but should not generally be called
      * directly.
      */
-    public void removeFromFanIn(final Synapse synapse) {
-        if (fanIn != null) {
-            fanIn.remove(synapse);
-        }
+    fun removeFromFanIn(synapse: Synapse) {
+        fanIn.remove(synapse)
     }
 
     /**
      * Sums the weighted inputs to this node, by summing the ouptut from incoming synapses,
      * which can either be connectionist (weight times source activation) or the output of a spike responder.
      */
-    public double getWeightedInputs() {
-        double wtdSum = 0;
-        for (Synapse synapse : fanIn) {
-            wtdSum += synapse.getPsr();
+    val weightedInputs: Double
+        get() {
+            var wtdSum = 0.0
+            for (synapse in fanIn) {
+                wtdSum += synapse.psr
+            }
+            return wtdSum
         }
-        return wtdSum;
-    }
 
     /**
      * Returns the sum of post-synaptic responses of all incoming neurons connected to this one by negative weights.
      * This automatically includes neurons whose polarity is excitatory, since they only produce positive outgoing
      * weights.
      */
-    public double getExcitatoryInputs() {
-         return fanIn.stream()
-                    .filter(s -> s.getStrength() > 0.0)
-                    .map(Synapse::getPsr)
-                    .reduce(Double::sum).orElse(0.0);
-    }
+    val excitatoryInputs: Double
+        get() = fanIn.stream()
+            .filter { s: Synapse -> s.strength > 0.0 }
+            .map { obj: Synapse -> obj.psr }
+            .reduce { a: Double, b: Double -> java.lang.Double.sum(a, b) }.orElse(0.0)
 
     /**
      * Returns the sum of post-synaptic responses of all incoming neurons connected to this one by negative weights.
      * This automatically includes neurons whose polarity is inhibitory, since they only produce negative outgoing
      * weights.
      */
-    public double getInhibitoryInputs() {
-        return fanIn.stream()
-                    .filter(s -> s.getStrength() < 0.0)
-                    .map(Synapse::getPsr)
-                    .reduce(Double::sum).orElse(0.0);
-    }
+    val inhibitoryInputs: Double
+        get() = fanIn.filter { it.strength < 0.0 }
+            .sumOf { it.psr }
 
-    /**
-     * Returns "external input" to neuron, separate from any input from connected neurons.
-     */
-    public double getInput() {
-        return inputValue;
-    }
-
-    @Override
-    public void randomize() {
-        forceSetActivation(this.getUpdateRule().getRandomValue());
+    override fun randomize() {
+        forceSetActivation(updateRule.randomValue)
     }
 
     /**
      * Sends relevant information about the network to standard output.
      */
-    public void debug() {
-        System.out.println("neuron " + getId());
-        System.out.println("fan in");
+    fun debug() {
+        println("neuron $id")
+        println("fan in")
 
-        for (int i = 0; i < fanIn.size(); i++) {
-            Synapse tempRef = fanIn.get(i);
-            System.out.println("fanIn [" + i + "]:" + tempRef);
-        }
+        fanIn.forEachIndexed { i, syn -> println("fanIn [$i]:$syn") }
 
-        System.out.println("fan out");
+        println("fan out")
 
-        for (int i = 0; i < fanOut.size(); i++) {
-            Synapse tempRef = fanOut.get(i);
-            System.out.println("fanOut [" + i + "]:" + tempRef);
-        }
+        fanOut.values.forEachIndexed { i, syn -> println("fanOut [$i]:$syn") }
     }
 
-    /**
-     * Returns the root network this neuron is embedded in.
-     *
-     * @return root network.
-     */
-    public Network getNetwork() {
-        return parent;
-    }
+    val network by ::parent
 
     /**
      * Add to the input value of the neuron. When external components (like input tables) send activation to the
@@ -540,58 +465,47 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * time step to a neuron. Inputs are cleared each time step.
      */
     @Consumable(description = "Add activation", customPriorityMethod = "addInputValueCouplingPriority")
-    public void addInputValue(double toAdd) {
-        inputValue += toAdd;
+    fun addInputValue(toAdd: Double) {
+        input += toAdd
     }
 
-    /**
-     * The name of the update rule of this neuron; it's "type". Used via
-     * reflection for consistency checking in the gui. (Open multiple neurons
-     * and if they are of the different types the dialog is different).
-     *
-     * @return the name of the class of this network.
-     */
-    public String getType() {
-        return updateRule.getClass().getSimpleName();
-    }
+    val type: String
+        /**
+         * The name of the update rule of this neuron; it's "type". Used via
+         * reflection for consistency checking in the gui. (Open multiple neurons
+         * and if they are of the different types the dialog is different).
+         *
+         * @return the name of the class of this network.
+         */
+        get() = updateRule.javaClass.simpleName
 
-    /**
-     * Returns the sum of the strengths of the weights attaching to this neuron.
-     *
-     * @return the sum of the incoming weights to this neuron.
-     */
-    public double getSummedIncomingWeights() {
-        double ret = 0;
+    val summedIncomingWeights: Double
+        /**
+         * Returns the sum of the strengths of the weights attaching to this neuron.
+         *
+         * @return the sum of the incoming weights to this neuron.
+         */
+        get() {
+            var ret = 0.0
 
-        for (int i = 0; i < fanIn.size(); i++) {
-            Synapse tempRef = fanIn.get(i);
-            ret += tempRef.getStrength();
+            for (i in fanIn.indices) {
+                val tempRef = fanIn[i]
+                ret += tempRef.strength
+            }
+
+            return ret
         }
-
-        return ret;
-    }
-
 
 
     /**
      * @return the average activation of neurons connecting to this neuron
      */
-    public double getAverageInput() {
-        return getTotalInput() / fanIn.size();
-    }
+    val averageInput: Double get() = totalInput / fanIn.size
 
     /**
      * @return the total activation of neurons connecting to this neuron
      */
-    public double getTotalInput() {
-        double ret = 0;
-
-        for (Synapse synapse : fanIn) {
-            ret += synapse.getSource().getActivation();
-        }
-
-        return ret;
-    }
+    val totalInput: Double get() = fanIn.sumOf { it.source.activation }
 
     /**
      * True if the synapse is connected to this neuron, false otherwise.
@@ -599,62 +513,27 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * @param s the synapse to check.
      * @return true if synapse is connected, false otherwise.
      */
-    public boolean isConnected(final Synapse s) {
-        return (fanIn.contains(s) || fanOut.get(s.getTarget()) != null);
+    fun isConnected(s: Synapse): Boolean {
+        return (fanIn.contains(s) || fanOut[s.target] != null)
     }
 
     /**
      * Delete connected synapses and remove them from the network and any other
      * structures.
      */
-    public void deleteConnectedSynapses() {
-        deleteFanIn();
-        deleteFanOut();
-    }
-
-    /**
-     * Used for deletion to avoid a ConcurrentModificationException as well as
-     * conform to the other processes involved in removing synapses from a
-     * network.
-     *
-     * @return an element by element shallow copy of the synapses in this
-     * neuron's fanIn map.
-     */
-    private List<Synapse> getFanInList() {
-        // Pre-allocating for speed
-        List<Synapse> syns = new ArrayList<Synapse>((int) (fanIn.size() / 0.75));
-        for (Synapse s : fanIn) {
-            syns.add(s);
-        }
-        return syns;
-    }
-
-    /**
-     * Used for deletion to avoid a ConcurrentModificationException as well as
-     * conform to the other processes inovlved in removing synapses from a
-     * network.
-     *
-     * @return an element by element shallow copy of the synapses in this
-     * neuron's fanOut map.
-     */
-    private List<Synapse> getFanOutList() {
-        // Pre-allocating for speed
-        List<Synapse> syns = new ArrayList<Synapse>((int) (fanOut.size() / 0.75));
-        for (Synapse s : fanOut.values()) {
-            syns.add(s);
-        }
-        return syns;
+    fun deleteConnectedSynapses() {
+        deleteFanIn()
+        deleteFanOut()
     }
 
     /**
      * Removes all synapses from fanOut and from the network or any intermediate
      * structures.
      */
-    private void deleteFanOut() {
-        List<Synapse> fanOutList = getFanOutList();
-        fanOut.clear();
-        for (Synapse s : fanOutList) {
-            s.delete();
+    private fun deleteFanOut() {
+        fanOut.toList().forEach { (target, synapse) ->
+            synapse?.delete()
+            fanOut.remove(target)
         }
     }
 
@@ -662,43 +541,37 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      * Removes all synapses from fanIn and from the network or any intermediate
      * structures.
      */
-    private void deleteFanIn() {
-        List<Synapse> fanInList = getFanInList();
-        fanIn.clear();
-        for (Synapse synapse : fanInList) {
-            synapse.delete();
+    private fun deleteFanIn() {
+        fanIn.toList().forEach { synapse ->
+            synapse.delete()
+            fanIn.remove(synapse)
         }
     }
 
-    @Override
-    public String toString() {
-        return getId() + ": " + getType() + " Activation = " + SimbrainMath.roundDouble(this.getActivation(), 3);
+    override fun toString(): String {
+        return "$id: $type Activation = ${SimbrainMath.roundDouble(activation, 3)}"
     }
 
-    @Override
-    public void clear() {
-        inputValue = 0.0;
-        setActivation(0.0);
-        updateRule.clear(this);
+    override fun clear() {
+        input = 0.0
+        activation = 0.0
+        updateRule.clear(this)
     }
 
-    public void clearInput() {
-        inputValue = 0.0;
+    fun clearInput() {
+        input = 0.0
     }
 
-    @Override
-    public void increment() {
-        updateRule.contextualIncrement(this);
+    override fun increment() {
+        updateRule.contextualIncrement(this)
     }
 
-    @Override
-    public void decrement() {
-        updateRule.contextualDecrement(this);
+    override fun decrement() {
+        updateRule.contextualDecrement(this)
     }
 
-    @Override
-    public void toggleClamping() {
-        setClamped(!clamped);
+    override fun toggleClamping() {
+        clamped = !clamped
     }
 
     /**
@@ -707,336 +580,174 @@ public class Neuron extends LocatableModel implements EditableObject, AttributeC
      *
      * @return tool tip text
      */
-    public String getToolTipText() {
-        return updateRule.getToolTipText(this);
-    }
+    val toolTipText: String? get() = updateRule.getToolTipText(this)
 
     /**
-     * @return updatePriority for the neuron
+     * Randomize all synapses that attach to this neuron.
      */
-    public int getUpdatePriority() {
-        return updatePriority;
-    }
-
-    /**
-     * @param updatePriority to set.
-     */
-    public void setUpdatePriority(final int updatePriority) {
-        this.updatePriority = updatePriority;
-        // Update the root network's priority tree map
-        if (this.getNetwork() != null) {
-            // Resort the neuron in the priority sorted list
-            getNetwork().resortPriorities();
+    fun randomizeFanIn() {
+        for (synapse in fanIn) {
+            synapse.randomize()
         }
-    }
-
-    public boolean isClamped() {
-        return clamped;
-    }
-
-    /**
-     * Toggles whether this neuron is clamped.
-     *
-     * @param clamped Whether this neuron is to be clamped.
-     */
-    public void setClamped(final boolean clamped) {
-        this.clamped = clamped;
-        getEvents().getClampChanged().fireAndForget();
     }
 
     /**
      * Randomize all synapses that attach to this neuron.
      */
-    public void randomizeFanIn() {
-        for (Synapse synapse : getFanIn()) {
-            synapse.randomize();
-        }
-
-    }
-
-    /**
-     * Randomize all synapses that attach to this neuron.
-     */
-    public void randomizeFanOut() {
-        for (Synapse synapse : getFanOut().values()) {
-            synapse.randomize();
+    fun randomizeFanOut() {
+        for (synapse in fanOut.values) {
+            synapse.randomize()
         }
     }
 
-    /**
-     * A method that returns a list of all the neuron update rules associated
-     * with a list of neurons.
-     *
-     * @param neuronList The list of neurons whose update rules we want to query.
-     * @return Returns a list of neuron update rules associated with a group of
-     * neurons
-     */
-    public static List<NeuronUpdateRule> getRuleList(List<Neuron> neuronList) {
-        return neuronList.stream().map(Neuron::getUpdateRule).collect(Collectors.toList());
-    }
-
-    /**
-     * Convenience method to set upper bound on the neuron's update rule, if it
-     * is a bounded update rule.
-     *
-     * @param upperBound upper bound to set.
-     */
-    public void setUpperBound(final double upperBound) {
-        if (updateRule instanceof BoundedUpdateRule) {
-            ((BoundedUpdateRule) updateRule).setUpperBound(upperBound);
+    var upperBound: Double
+        /**
+         * Return the upper bound for the underlying rule, if it is bounded.
+         * Else it simply returns a "graphical" upper bound. Used to color neuron
+         * activations.
+         *
+         * @return the upper bound, if applicable, and 1 otherwise.
+         */
+        get() = if (updateRule is BoundedUpdateRule) {
+            (updateRule as BoundedUpdateRule).upperBound
         } else {
-            throw new IllegalStateException("Cannot set upper bound on unbounded update rule.");
+            updateRule.graphicalUpperBound
         }
-    }
+        /**
+         * Convenience method to set upper bound on the neuron's update rule, if it
+         * is a bounded update rule.
+         *
+         * @param upperBound upper bound to set.
+         */
+        set(upperBound) {
+            if (updateRule is BoundedUpdateRule) {
+                (updateRule as BoundedUpdateRule).upperBound = upperBound
+            } else {
+                throw IllegalStateException("Cannot set upper bound on unbounded update rule.")
+            }
+        }
 
-    /**
-     * Convenience method to set lower bound on the neuron's update rule, if it
-     * is a bounded update rule.
-     *
-     * @param lowerBound lower bound to set.
-     */
-    public void setLowerBound(final double lowerBound) {
-        if (updateRule instanceof BoundedUpdateRule) {
-            ((BoundedUpdateRule) updateRule).setLowerBound(lowerBound);
+    var lowerBound: Double
+        /**
+         * Return the lower bound for the underlying rule, if it is bounded.
+         * Else it simply returns the "graphical" lower bound. Used to color neuron
+         * activations.
+         *
+         * @return the upper bound, if applicable, and -1 otherwise.
+         */
+        get() = if (updateRule is BoundedUpdateRule) {
+            (updateRule as BoundedUpdateRule).lowerBound
         } else {
-            throw new IllegalStateException("Cannot set lower bound on unbounded update rule.");
+            updateRule.graphicalLowerBound
         }
-    }
-
-    /**
-     * Return the upper bound for the underlying rule, if it is bounded.
-     * Else it simply returns a "graphical" upper bound. Used to color neuron
-     * activations.
-     *
-     * @return the upper bound, if applicable, and 1 otherwise.
-     */
-    public double getUpperBound() {
-        if (updateRule instanceof BoundedUpdateRule) {
-            return ((BoundedUpdateRule) updateRule).getUpperBound();
-        } else {
-            return updateRule.getGraphicalUpperBound();
+        /**
+         * Convenience method to set lower bound on the neuron's update rule, if it
+         * is a bounded update rule.
+         *
+         * @param lowerBound lower bound to set.
+         */
+        set(lowerBound) {
+            if (updateRule is BoundedUpdateRule) {
+                (updateRule as BoundedUpdateRule).lowerBound = lowerBound
+            } else {
+                throw IllegalStateException("Cannot set lower bound on unbounded update rule.")
+            }
         }
-    }
 
-    /**
-     * Return the lower bound for the underlying rule, if it is bounded.
-     * Else it simply returns the "graphical" lower bound. Used to color neuron
-     * activations.
-     *
-     * @return the upper bound, if applicable, and -1 otherwise.
-     */
-    public double getLowerBound() {
-        if (updateRule instanceof BoundedUpdateRule) {
-            return ((BoundedUpdateRule) updateRule).getLowerBound();
-        } else {
-            return updateRule.getGraphicalLowerBound();
+    val isPolarized: Boolean
+        /**
+         * If the neuron is polarized, it will be excitatory or inhibitory.
+         *
+         * @return whether this neuron is polarized.
+         */
+        get() = polarity != null && polarity !== Polarity.BOTH
+
+    val lastSpikeTime: Double
+        get() = (dataHolder as SpikingScalarData).lastSpikeTime
+
+    override var location: Point2D
+        get() = Point2D.Double(x, y)
+        set(position) {
+            setLocation(position, true)
         }
-    }
 
-    public double getIncrement() {
-        return increment;
-    }
-
-    public void setIncrement(double increment) {
-        this.increment = increment;
-    }
-
-    public double getAuxValue() {
-        return auxValue;
-    }
-
-    public void setAuxValue(double auxValue) {
-        this.auxValue = auxValue;
-    }
-
-    /**
-     * If the neuron is polarized, it will be excitatory or inhibitory.
-     *
-     * @return whether this neuron is polarized.
-     */
-    public boolean isPolarized() {
-        return polarity != null && polarity != Polarity.BOTH;
-    }
-
-    /**
-     * Polarity of this neuron (excitatory, inhibitory, or none = null).
-     *
-     * @return the current polarity
-     */
-    public Polarity getPolarity() {
-        return polarity;
-    }
-
-    /**
-     * Note that setting polarity updates fan-out synapses, e.g. inbhitory nodes ensures all fan-out
-     * synapses are negative. See {@link Polarity}
-     */
-    public void setPolarity(Polarity polarity) {
-        this.polarity = polarity;
-        fanOut.values().forEach(s -> s.setStrength(polarity.value(s.getStrength())));
-        events.getColorChanged().fireAndForget();
-    }
-
-    // TODO: Move these methods to SpikingScalarData?
-
-    public boolean isSpike() {
-        return spike;
-    }
-
-    public void setSpike(boolean spike) {
-        this.spike = spike;
-        if (dataHolder instanceof SpikingScalarData) {
-            ((SpikingScalarData) dataHolder).setHasSpiked(spike, parent.getTime());
-        }
-        events.getSpiked().fireAndForget(spike);
-    }
-
-    public Double getLastSpikeTime() {
-        return ((SpikingScalarData) dataHolder).getLastSpikeTime();
-    }
-
-    public double getLastActivation() {
-        return lastActivation;
-    }
-
-    @NotNull
-    @Override
-    public Point2D getLocation() {
-        return new Point2D.Double(x, y);
-    }
-
-    @Override
-    public void setLocation(@NotNull Point2D position) {
-        setLocation(position, true);
-    }
-
-    public void setLocation(Point2D position, boolean fireEvent) {
-        x = position.getX();
-        y = position.getY();
+    fun setLocation(position: Point2D, fireEvent: Boolean) {
+        x = position.x
+        y = position.y
         if (fireEvent) {
-            events.getLocationChanged().fireAndForget();
+            events.locationChanged.fireAndForget()
         }
     }
-    public void setLocation(final double x, final double y, boolean fireEvent) {
-        setLocation(point(x, y), fireEvent);
-    }
-    public double[] getPosition3D() {
-        return new double[]{x, y, z};
+
+    fun setLocation(x: Double, y: Double, fireEvent: Boolean) {
+        setLocation(point(x, y), fireEvent)
     }
 
-    /**
-     * Convenience method for setting the xyz coordinates from
-     * an array with (at least) 3 values. Elements beyond position
-     * 2 will be ignored.
-     *
-     * @param xyz - array of coordinate values {x, y, z}
-     */
-    public void setPosition3D(double[] xyz) {
-        setPosition3D(xyz[0], xyz[1], xyz[2]);
-    }
+    var position3D: DoubleArray
+        get() = doubleArrayOf(x, y, z)
+        /**
+         * Convenience method for setting the xyz coordinates from
+         * an array with (at least) 3 values. Elements beyond position
+         * 2 will be ignored.
+         *
+         * @param xyz - array of coordinate values {x, y, z}
+         */
+        set(xyz) {
+            setPosition3D(xyz[0], xyz[1], xyz[2])
+        }
 
     /**
      * Convenience method for setting location in 3D rather than just 2D
      * space.
      */
-    public void setPosition3D(double x, double y, double z) {
-        setX(x);
-        setY(y);
-        setZ(z);
-    }
-
-    public double getX() {
-        return x;
-    }
-
-    public double getY() {
-        return y;
-    }
-
-    public double getZ() {
-        return z;
-    }
-
-    public void setX(final double x, boolean fireEvent) {
-        this.x = x;
-        if (fireEvent) {
-            events.getLocationChanged().fireAndForget();
-        }
-    }
-
-    public void setX(final double x) {
-        setX(x, true);
-    }
-
-    public void setY(final double y, boolean fireEvent) {
-        this.y = y;
-        if (fireEvent) {
-            events.getLocationChanged().fireAndForget();
-        }
-    }
-
-    public void setY(final double y) {
-        setY(y, true);
-    }
-
-    public void setZ(final double z) {
-        this.z = z;
-        events.getLocationChanged().fireAndForget();
+    fun setPosition3D(x: Double, y: Double, z: Double) {
+        this.x = x
+        this.y = y
+        this.z = z
     }
 
     /**
      * Translate the neuron by a specified amount.
      *
-     * @param delta_x x amount to translate neuron
-     * @param delta_y y amount to translate neuron
+     * @param deltaX x amount to translate neuron
+     * @param deltaY y amount to translate neuron
      */
-    public void offset(final double delta_x, final double delta_y) {
-        offset(delta_x, delta_y, true);
+    @JvmOverloads
+    fun offset(deltaX: Double, deltaY: Double, fireEvent: Boolean = true) {
+        val delta = point(deltaX, deltaY)
+        setLocation(location.plus(delta), fireEvent)
     }
 
-    public void offset(final double delta_x, final double delta_y, boolean fireEvent) {
-        Point2D delta = point(delta_x, delta_y);
-        setLocation(plus(getLocation(), delta), fireEvent);
-    }
+    override val name: String
+        get() = id!!
 
-    @Override
-    public String getName() {
-        return getId();
-    }
-
-    public NeuronEvents getEvents() {
-        return events;
-    }
-
-    @Override
-    public void delete() {
-        getNetwork().updatePriorityList();
-        deleteConnectedSynapses();
-        events.getDeleted().fireAndBlock(this);
+    override fun delete() {
+        deleteConnectedSynapses()
+        events.deleted.fireAndBlock(this)
     }
 
     /**
      * When the neuron is not clamped, couplings should use add inputs.  Called by reflection using
-     * {@link Consumable#customPriorityMethod()}
+     * [Consumable.customPriorityMethod]
      */
-    public int addInputValueCouplingPriority() {
-        if (isClamped()) {
-            return CouplingManagerKt.LOW_PRIORITY;
+    fun addInputValueCouplingPriority(): Int {
+        return if (clamped) {
+            LOW_PRIORITY
         } else {
-            return CouplingManagerKt.HIGH_PRIORITY;
+            HIGH_PRIORITY
         }
     }
 
 
     /**
      * When the neuron is clamped, couplings should use force set activation.  Called by reflection using
-     * {@link Consumable#customPriorityMethod()}
+     * [Consumable.customPriorityMethod]
      */
-    public int forceSetActivationCouplingPriority() {
-        if (isClamped()) {
-            return CouplingManagerKt.HIGH_PRIORITY;
+    fun forceSetActivationCouplingPriority(): Int {
+        return if (clamped) {
+            HIGH_PRIORITY
         } else {
-            return CouplingManagerKt.LOW_PRIORITY;
+            LOW_PRIORITY
         }
     }
 

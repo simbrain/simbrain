@@ -173,7 +173,7 @@ class CouplingTest {
             neuron1.getProducer("getActivation") couple neuron2.getConsumer("forceSetActivation")
         }
         neuron1.activation = 1.0
-        neuron2.isClamped = true
+        neuron2.clamped = true
         workspace.simpleIterate()
         assertEquals(1.0, neuron2.activation, 0.01)
     }

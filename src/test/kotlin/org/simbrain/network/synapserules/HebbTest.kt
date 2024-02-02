@@ -31,8 +31,8 @@ class HebbTest {
             learningRate = 1.0
         }
         s12.strength = 0.0
-        n1.isClamped = true
-        n2.isClamped = true
+        n1.clamped = true
+        n2.clamped = true
         na1.isClamped = true
         na2.isClamped = true
         wm12.hardClear()

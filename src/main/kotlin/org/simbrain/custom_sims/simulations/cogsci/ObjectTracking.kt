@@ -343,8 +343,8 @@ class AllostaticUpdateRule: SpikingNeuronUpdateRule<AllostaticDataHolder, Spikin
         val n1 = Neuron(net)
         val n2 = Neuron(net)
         net.addNetworkModelsAsync(n1, n2)
-        n1.setClamped(true)
-        n2.setClamped(true)
+        n1.clamped = true
+        n2.clamped = true
         val n3 = Neuron(net)
         net.addNetworkModelAsync(n3)
         val s1 = Synapse(n1, n3)

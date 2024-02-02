@@ -99,11 +99,6 @@ annotation class UserParameter(
      */
     val displayOnly: Boolean = false,
     /**
-     * Name of a method whose value determines whether this component is visible or not. Only called once when the
-     * editor is opened.
-     */
-    val conditionalVisibilityMethod: String = "",
-    /**
      * Specify the name of a custom get type function when more than one is needed, beyond [CopyableObject.getTypeList]
      */
     val typeMapProvider: String = "",

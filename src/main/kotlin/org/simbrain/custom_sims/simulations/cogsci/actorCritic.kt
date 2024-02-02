@@ -79,7 +79,7 @@ val actorCritic = newSim {
     }
 
     val reward = network.addNeuron(300, 0).apply {
-        isClamped = true
+        clamped = true
         label = "Reward"
     }
     val value = network.addNeuron(350, 0).apply {

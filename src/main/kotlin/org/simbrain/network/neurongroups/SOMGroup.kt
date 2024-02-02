@@ -66,9 +66,7 @@ class SOMGroup @JvmOverloads constructor(
     var value = 0.0
     var winner: Neuron? = null
 
-    val _customInfo = InfoText(network, getStateInfoText())
-
-    override fun getCustomInfo() = _customInfo
+    override val customInfo = InfoText(network, getStateInfoText())
 
     // this.layout = HexagonalGridLayout(50.0, 50.0, 5)
 
@@ -77,7 +75,7 @@ class SOMGroup @JvmOverloads constructor(
      * between 0 and the upper bound of each synapse.
      */
     override fun randomizeIncomingWeights() {
-        for (n in getNeuronList()) {
+        for (n in neuronList) {
             for (s in n.fanIn) {
                 s.lowerBound = 0.0
                 s.strength = s.upperBound * Math.random()
@@ -91,7 +89,7 @@ class SOMGroup @JvmOverloads constructor(
     fun recall() {
         val maxActivation = Double.MIN_VALUE
         var mostActivatedNeuron: Neuron? = null
-        for (neuron in this.getNeuronList()) {
+        for (neuron in this.neuronList) {
             if (neuron.activation > maxActivation) {
                 mostActivatedNeuron = neuron
             }
@@ -138,8 +136,8 @@ class SOMGroup @JvmOverloads constructor(
         // distance between  its weight vector and the input neurons's weight
         // vector.
         winner = calculateWinner()
-        for (i in getNeuronList().indices) {
-            val n = getNeuronList()[i]
+        for (i in neuronList.indices) {
+            val n = neuronList[i]
             if (n === winner) {
                 n.activation = 1.0
             } else {
@@ -153,8 +151,8 @@ class SOMGroup @JvmOverloads constructor(
 
         // Update Synapses of the neurons within the radius of the winning
         // neuron.
-        for (i in getNeuronList().indices) {
-            val neuron = getNeuronList()[i]
+        for (i in neuronList.indices) {
+            val neuron = neuronList[i]
             physicalDistance = SimnetUtils.getEuclideanDist(neuron, winner)
             // The center of the neuron is within the update region.
             if (physicalDistance <= neighborhoodSize) {
@@ -195,8 +193,8 @@ class SOMGroup @JvmOverloads constructor(
      */
     private fun calculateWinner(): Neuron? {
         var winner: Neuron? = null
-        for (i in getNeuronList().indices) {
-            val n = getNeuronList()[i]
+        for (i in neuronList.indices) {
+            val n = neuronList[i]
             distance = findDistance(n)
             if (distance < winDistance) {
                 winDistance = distance

@@ -173,18 +173,18 @@ class RadialGaussian(
                 for (tar: Neuron in targColl) {
                     val randVal: Double = rand.sampleDouble()
                     var probability: Double
-                    if (src.getPolarity() === Polarity.EXCITATORY) {
-                        if (tar.getPolarity() === Polarity.EXCITATORY) {
+                    if (src.polarity === Polarity.EXCITATORY) {
+                        if (tar.polarity === Polarity.EXCITATORY) {
                             probability = calcConnectProb(src, tar, eeDistConst, lambda)
-                        } else if (tar.getPolarity() === Polarity.INHIBITORY) {
+                        } else if (tar.polarity === Polarity.INHIBITORY) {
                             probability = calcConnectProb(src, tar, eiDistConst, lambda)
                         } else {
                             probability = calcConnectProb(src, tar, distConst, lambda)
                         }
-                    } else if (src.getPolarity() === Polarity.INHIBITORY) {
-                        if (tar.getPolarity() === Polarity.EXCITATORY) {
+                    } else if (src.polarity === Polarity.INHIBITORY) {
+                        if (tar.polarity === Polarity.EXCITATORY) {
                             probability = calcConnectProb(src, tar, ieDistConst, lambda)
-                        } else if (tar.getPolarity() === Polarity.INHIBITORY) {
+                        } else if (tar.polarity === Polarity.INHIBITORY) {
                             probability = calcConnectProb(src, tar, iiDistConst, lambda)
                         } else {
                             probability = calcConnectProb(src, tar, distConst, lambda)
@@ -196,7 +196,7 @@ class RadialGaussian(
                         val s: Synapse = Synapse(src, tar)
                         synapses.add(s)
                         if (loose) {
-                            src.getNetwork().addNetworkModelAsync(s)
+                            src.network?.addNetworkModelAsync(s)
                         }
                     }
                 }
@@ -215,18 +215,18 @@ class RadialGaussian(
     //             for (tar: Neuron in synapseGroup!!.getTargetNeurons()) {
     //                 val randVal: Double = Math.random()
     //                 var probability: Double
-    //                 if (src.getPolarity() === Polarity.EXCITATORY) {
-    //                     if (tar.getPolarity() === Polarity.EXCITATORY) {
+    //                 if (src.polarity === Polarity.EXCITATORY) {
+    //                     if (tar.polarity === Polarity.EXCITATORY) {
     //                         probability = calcConnectProb(src, tar, eeDistConst, lambda)
-    //                     } else if (tar.getPolarity() === Polarity.INHIBITORY) {
+    //                     } else if (tar.polarity === Polarity.INHIBITORY) {
     //                         probability = calcConnectProb(src, tar, eiDistConst, lambda)
     //                     } else {
     //                         probability = calcConnectProb(src, tar, distConst, lambda)
     //                     }
-    //                 } else if (src.getPolarity() === Polarity.INHIBITORY) {
-    //                     if (tar.getPolarity() === Polarity.EXCITATORY) {
+    //                 } else if (src.polarity === Polarity.INHIBITORY) {
+    //                     if (tar.polarity === Polarity.EXCITATORY) {
     //                         probability = calcConnectProb(src, tar, ieDistConst, lambda)
-    //                     } else if (tar.getPolarity() === Polarity.INHIBITORY) {
+    //                     } else if (tar.polarity === Polarity.INHIBITORY) {
     //                         probability = calcConnectProb(src, tar, iiDistConst, lambda)
     //                     } else {
     //                         probability = calcConnectProb(src, tar, distConst, lambda)
@@ -273,18 +273,18 @@ fun createRadialPolarizedSynapses(
         for (tar: Neuron in target) {
             val randVal: Double = Math.random()
             var probability: Double
-            if (src.getPolarity() === Polarity.EXCITATORY) {
-                if (tar.getPolarity() === Polarity.EXCITATORY) {
+            if (src.polarity === Polarity.EXCITATORY) {
+                if (tar.polarity === Polarity.EXCITATORY) {
                     probability = calcConnectProb(src, tar, eeDistConst, lambda)
-                } else if (tar.getPolarity() === Polarity.INHIBITORY) {
+                } else if (tar.polarity === Polarity.INHIBITORY) {
                     probability = calcConnectProb(src, tar, eiDistConst, lambda)
                 } else {
                     probability = calcConnectProb(src, tar, distConst, lambda)
                 }
-            } else if (src.getPolarity() === Polarity.INHIBITORY) {
-                if (tar.getPolarity() === Polarity.EXCITATORY) {
+            } else if (src.polarity === Polarity.INHIBITORY) {
+                if (tar.polarity === Polarity.EXCITATORY) {
                     probability = calcConnectProb(src, tar, ieDistConst, lambda)
-                } else if (tar.getPolarity() === Polarity.INHIBITORY) {
+                } else if (tar.polarity === Polarity.INHIBITORY) {
                     probability = calcConnectProb(src, tar, iiDistConst, lambda)
                 } else {
                     probability = calcConnectProb(src, tar, distConst, lambda)
@@ -358,11 +358,11 @@ private fun calcConnectProb(src: Neuron, tar: Neuron, distConst: Double, lambda:
  * @return
  */
 private fun getRawDist(n1: Neuron, n2: Neuron): Double {
-    var x2: Double = (n1.getX() - n2.getX())
+    var x2: Double = (n1.x - n2.x)
     x2 *= x2
-    var y2: Double = (n1.getY() - n2.getY())
+    var y2: Double = (n1.y - n2.y)
     y2 *= y2
-    var z2: Double = (n1.getZ() - n2.getZ())
+    var z2: Double = (n1.z - n2.z)
     z2 *= z2
     return x2 + y2 + z2
 }

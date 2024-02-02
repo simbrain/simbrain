@@ -151,7 +151,7 @@ class Network: CoroutineScope, EditableObject {
      * Lower numbers updated first, as in first priority, second priority, etc.
      */
     @Transient
-    var prioritySortedNeuronList: ArrayList<Neuron> = ArrayList()
+    var prioritySortedNeuronList: MutableList<Neuron> = ArrayList()
         private set
 
     /**
@@ -213,21 +213,8 @@ class Network: CoroutineScope, EditableObject {
     /**
      * Update the priority list used for priority based update.
      */
-    fun updatePriorityList() {
-        // TODO: Uses flat neuron list, but does this make sense? NeuronGroups should handle their own update orders.
-        prioritySortedNeuronList = ArrayList(flatNeuronList)
-        resortPriorities()
-    }
-
-    /**
-     * Resort the neurons according to their update priorities.
-     */
-    fun resortPriorities() {
-        prioritySortedNeuronList.sortWith { neuron1, neuron2 ->
-            val priority1 = neuron1.updatePriority
-            val priority2 = neuron2.updatePriority
-            priority1.compareTo(priority2)
-        }
+    private fun updatePriorityList() {
+        prioritySortedNeuronList = flatNeuronList.sortedBy { it.updatePriority }.toMutableList()
     }
 
     /**
@@ -241,6 +228,7 @@ class Network: CoroutineScope, EditableObject {
             neuron.updateInputs()
             neuron.update()
         }
+        flatNeuronList.forEach { it.networkTime = time }
     }
 
     /**
@@ -271,6 +259,7 @@ class Network: CoroutineScope, EditableObject {
     fun bufferedUpdate() {
         networkModels.all.forEach { it.updateInputs() }
         networkModels.all.forEach { it.update() }
+        flatNeuronList.forEach { it.networkTime = time }
     }
 
     suspend fun asyncBufferedUpdate()  = coroutineScope {
@@ -278,6 +267,7 @@ class Network: CoroutineScope, EditableObject {
         networkModels.getNonAsyncModels().forEach { it.updateInputs() }
         networkModels.getAsyncModels().map { async { it.update() } }.awaitAll()
         networkModels.getNonAsyncModels().forEach { it.update() }
+        flatNeuronList.forEach { it.networkTime = time }
     }
 
     /**
@@ -365,9 +355,16 @@ class Network: CoroutineScope, EditableObject {
             model.events.deleted.on(wait = true) {
                 networkModels.remove(it)
                 events.modelRemoved.fire(it)
+                updatePriorityList()
             }
             val job = events.modelAdded.fire(model)
-            if (model is Neuron) updatePriorityList()
+            if (model is Neuron) {
+                model.events.priorityChanged.on {
+                    updatePriorityList()
+                }
+                model.events.updateRuleChanged.on { _, _ -> updateTimeType() }
+                updatePriorityList()
+            }
             return job
         }
         return null
@@ -444,12 +441,10 @@ class Network: CoroutineScope, EditableObject {
     /**
      * If there is a single continuous neuron in the network, consider this a continuous network.
      */
-    fun updateTimeType() {
+    private fun updateTimeType() {
         timeType = TimeType.DISCRETE
-        for (n in flatNeuronList) {
-            if (n.timeType == TimeType.CONTINUOUS) {
-                timeType = TimeType.CONTINUOUS
-            }
+        if (flatNeuronList.any { it.timeType == TimeType.CONTINUOUS }) {
+            timeType = TimeType.CONTINUOUS
         }
     }
 

@@ -19,9 +19,9 @@
 package org.simbrain.network.gui.dialogs.network;
 
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.layouts.Layout;
-import org.simbrain.network.neurongroups.SOMGroup;
 import org.simbrain.network.subnetworks.SOMNetwork;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
@@ -85,7 +85,7 @@ public class SOMCreationDialog extends StandardDialog {
         somPanel = new AnnotatedPropertyEditor(sc);
         tabLogic.add(somPanel);
         layoutPanel = new AnnotatedPropertyEditor(layout);
-        layout = SOMGroup.DEFAULT_LAYOUT;
+        layout = new GridLayout();
         tabLayout.add(layoutPanel);
         tabbedPane.addTab("Logic", tabLogic);
         tabbedPane.addTab("Layout", layoutPanel);

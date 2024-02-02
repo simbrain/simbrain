@@ -1,226 +1,192 @@
-package org.simbrain.network.groups;
+package org.simbrain.network.groups
 
-import org.jetbrains.annotations.NotNull;
-import org.simbrain.network.LocatableModelKt;
-import org.simbrain.network.NetworkModel;
-import org.simbrain.network.core.*;
-import org.simbrain.network.events.NeuronCollectionEvents;
-import org.simbrain.network.layouts.GridLayout;
-import org.simbrain.network.layouts.Layout;
-import org.simbrain.network.layouts.LineLayout;
-import org.simbrain.util.RectangleOutlines;
-import org.simbrain.util.SimbrainConstants;
-import org.simbrain.util.UserParameter;
-import org.simbrain.util.Utils;
-import org.simbrain.util.math.SimbrainMath;
-import org.simbrain.util.propertyeditor.CopyableObject;
-import org.simbrain.workspace.Consumable;
-import org.simbrain.workspace.Producible;
-import smile.math.matrix.Matrix;
-
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
-
-import static org.simbrain.network.LocatableModelKt.getCenterLocation;
-import static org.simbrain.util.GeomKt.minus;
+import org.simbrain.network.*
+import org.simbrain.network.core.*
+import org.simbrain.network.events.NeuronCollectionEvents
+import org.simbrain.network.layouts.GridLayout
+import org.simbrain.network.layouts.Layout
+import org.simbrain.network.layouts.LineLayout
+import org.simbrain.util.*
+import org.simbrain.util.SimbrainConstants.Polarity
+import org.simbrain.util.math.SimbrainMath
+import org.simbrain.util.propertyeditor.CopyableObject
+import org.simbrain.workspace.Consumable
+import org.simbrain.workspace.Producible
+import smile.math.matrix.Matrix
+import java.awt.geom.Point2D
+import java.awt.geom.Rectangle2D
+import java.util.*
+import java.util.function.Consumer
+import kotlin.math.min
 
 /**
  * Superclass for neuron collections (which are loose assemblages of neurons) and neuron groups (which enforce consistent
  * neuron update rules and track synapse polarity).
- * <br>
+ * <br></br>
  * Subclasses maintain lists of neurons and can copy their activations to matrices. To communicate with other
- * {@link Layer}s it can create output matrices and accept input matrices, but it wil only create and cache these if
- * relevant methods are called. Matrix based layers should subclass {@link ArrayLayer}
+ * [Layer]s it can create output matrices and accept input matrices, but it wil only create and cache these if
+ * relevant methods are called. Matrix based layers should subclass [ArrayLayer]
  */
-public abstract class AbstractNeuronCollection extends Layer implements CopyableObject {
+abstract class AbstractNeuronCollection(val parentNetwork: Network) : Layer(), CopyableObject {
+
+    @Transient
+    var incomingSgs: HashSet<SynapseGroup> = HashSet()
+        private set
+
+    @Transient
+    var outgoingSg: HashSet<SynapseGroup> = HashSet()
+        private set
+
+    @Transient
+    override val events: NeuronCollectionEvents = NeuronCollectionEvents()
 
     /**
-     * Reference to the network this group is a part of.
+     * Flag to mark whether [.activations] is "dirty", that is outdated and in need of updating.
      */
-    private final Network parentNetwork;
-
-    /**
-     * Set of incoming synapse groups.
-     */
-    transient private HashSet<SynapseGroup> incomingSgs = new HashSet<>();
-
-    /**
-     * Set of outgoing synapse groups.
-     */
-    transient private HashSet<SynapseGroup> outgoingSgs = new HashSet<>();
-
-    /**
-     * Support for property change events.
-     */
-    protected transient NeuronCollectionEvents events = new NeuronCollectionEvents();
+    private var cachedActivationsDirty = true
+    private var _cachedActivations = DoubleArray(0)
 
     /**
      * Cache of neuron activation values.
      */
-    private double[] activations;
+    @get:Producible(arrayDescriptionMethod = "getLabelArray")
+    @set:Consumable
+    var activations: DoubleArray
+        get() {
+            if (cachedActivationsDirty) {
+                _cachedActivations = neuronList
+                    .map { it.activation }
+                    .toDoubleArray()
+                cachedActivationsDirty = false
+            }
+            return _cachedActivations
+        }
+        set(activations) {
+            val size = min(activations.size, neuronList.size)
+            for (i in 0 until size) {
+                neuronList[i].activation = activations[i]
+            }
+            cachedActivationsDirty = true
+        }
 
-    /**
-     * Cache of input values.
-     */
-    private double[] inputs;
-
-    /**
-     * Flag to mark whether {@link #activations} is "dirty", that is outdated and in need of updating.
-     */
-    private boolean cachedActivationsDirty = true;
-    private boolean cachedInputsDirty = true;
+    override val inputs: Matrix get() = Matrix.column(inputActivations)
 
     /**
      * References to neurons in this collection
      */
-    protected final List<Neuron> neuronList = new CopyOnWriteArrayList<>();
+    val neuronList: MutableList<Neuron> = ArrayList()
 
     @UserParameter(label = "Increment amount", increment = .1, order = 90)
-    private double increment = .1;
+    private val increment = .1
 
     /**
      * Space between neurons within a layer.
      */
-    private int betweenNeuronInterval = 50;
+    var betweenNeuronInterval: Int = 50
 
     /**
      * In method setLayoutBasedOnSize, this is used as the threshold number of neurons in the group, above which to use
      * grid layout instead of line layout.
      */
-    private int gridThreshold = 9;
-
-    /**
-     * Default layout for neuron groups.
-     */
-    public static final Layout DEFAULT_LAYOUT = new GridLayout();
+    var gridThreshold: Int = 9
 
     /**
      * The layout for the neurons in this group.
      */
-    private Layout layout = DEFAULT_LAYOUT;
+    var layout: Layout = GridLayout()
 
-    /**
-     * Default constructor.
-     */
-    public AbstractNeuronCollection(Network net) {
-        parentNetwork = net;
-    }
+    override val outputs: Matrix
+        get() = // TODO: Performance drain? Consider caching this.
+            Matrix.column(activations)
 
-    @Override
-    public Matrix getOutputs() {
-        // TODO: Performance drain? Consider caching this.
-        return Matrix.column(getActivations());
-    }
-
-    @Override
-    public void addInputs(Matrix newInputs) {
-        addInputs(newInputs.col(0));
+    override fun addInputs(newInputs: Matrix) {
+        addInputs(newInputs.col(0))
     }
 
     /**
      * Set input values of neurons using an array of doubles. Assumes the order
      * of the items in the array matches the order of items in the neuronlist.
-     * <p>
+     *
+     *
      * Does not throw an exception if the provided input array and neuron list
      * do not match in size.
      */
     @Consumable
-    public void addInputs(double[] inputs) {
-        int size = Math.min(inputs.length, neuronList.size());
-        for (int i = 0; i < size; i++) {
-            neuronList.get(i).addInputValue(inputs[i]);
+    fun addInputs(inputs: DoubleArray) {
+        val size = min(inputs.size.toDouble(), neuronList.size.toDouble()).toInt()
+        for (i in 0 until size) {
+            neuronList[i].addInputValue(inputs[i])
         }
-        invalidateCachedInputs();
+        invalidateCachedInputs()
     }
+
+    private var cachedInputsDirty = true
+    private var _cachedInputs = DoubleArray(0)
 
     /**
      * Return inputs as a double array. Either create the array or return a cache of it.
      */
-    @Producible
-    public double[] getInputActivations() {
-        if (cachedInputsDirty) {
-            inputs = neuronList.stream()
-                    .map(Neuron::getInput)
-                    .mapToDouble(Double::doubleValue)
-                    .toArray();
+    @get:Producible
+    val inputActivations: DoubleArray
+        get() {
+            if (cachedInputsDirty) {
+                _cachedInputs = neuronList
+                    .map { it.input }
+                    .toDoubleArray()
+            }
+            return _cachedInputs
         }
-        return inputs;
-    }
-
-    @NotNull
-    @Override
-    public Matrix getInputs() {
-        return Matrix.column(getInputActivations());
-    }
 
     /**
      * Input and output size are the same for collections of neurons.
      */
-    public int size() {
-        return getActivations().length;
+    fun size(): Int {
+        return activations.size
     }
 
-    @Override
-    public int outputSize() {
-        return size();
+    override fun outputSize(): Int {
+        return size()
     }
 
-    @Override
-    public int inputSize() {
-        return size();
+    override fun inputSize(): Int {
+        return size()
     }
 
     /**
      * Get the central x coordinate of this group, based on the positions of the neurons that comprise it.
-     *
-     * @return the center x coordinate.
      */
-    public double getCenterX() {
-        return getCenterLocation(neuronList).x;
-    }
+    val centerX: Double
+        get() = neuronList.centerLocation.x
 
     /**
      * Get the central y coordinate of this group, based on the positions of the neurons that comprise it.
-     *
-     * @return the center y coordinate.
      */
-    public double getCenterY() {
-        return getCenterLocation(neuronList).y;
-    }
+    val centerY: Double
+        get() = neuronList.centerLocation.y
 
-    @NotNull
-    @Override
-    public Point2D getLocation() {
-        return getCenterLocation(neuronList);
-    }
+    override var location: Point2D
+        get() = neuronList.centerLocation
+        set(newLocation) {
+            val delta = newLocation - location
+            neuronList.forEach { it.offset(delta.x, delta.y) }
+            events.locationChanged.fireAndForget()
+        }
 
-    @Override
-    public void setLocation(@NotNull Point2D location) {
-        Point2D delta = minus(location, getLocation());
-        neuronList.forEach(n -> {
-            n.offset(delta.getX(), delta.getY());
-        });
-        events.getLocationChanged().fireAndForget();
-    }
+    override val bound: Rectangle2D
+        get() = neuronList.bound
 
-    @Override
-    @NotNull
-    public Rectangle2D getBound() { return LocatableModelKt.getBound(neuronList); }
-
-    public RectangleOutlines getOutlines() { return LocatableModelKt.getOutlines(neuronList); }
+    val outlines: RectangleOutlines
+        get() = neuronList.outlines
 
     /**
-     * @return the longest dimensions upon which neurons are laid out.
+     * the longest dimensions upon which neurons are laid out.
      */
-    public double getMaxDim() {
-        if (getWidth() > getHeight()) {
-            return getWidth();
+    val maxDim: Double
+        get() = if (width > height) {
+            width
         } else {
-            return getHeight();
+            height
         }
-    }
 
     /**
      * Translate all neurons (the only objects with position information).
@@ -228,11 +194,11 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
      * @param offsetX x offset for translation.
      * @param offsetY y offset for translation.
      */
-    public void offset(final double offsetX, final double offsetY) {
-        for (Neuron neuron : neuronList) {
-            neuron.offset(offsetX, offsetY, false);
+    open fun offset(offsetX: Double, offsetY: Double) {
+        for (neuron in neuronList) {
+            neuron.offset(offsetX, offsetY, false)
         }
-        events.getLocationChanged().fireAndForget();
+        events.locationChanged.fireAndForget()
     }
 
     /**
@@ -240,58 +206,50 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
      *
      * @param i index of the neuron in the neuron list
      */
-    public Neuron getNeuron(int i) {
-        return neuronList.get(i);
+    fun getNeuron(i: Int): Neuron? {
+        return neuronList[i]
     }
 
     /**
-     * Add a neuron to the collection. Exposed in {@link NeuronCollection} but not in {@link NeuronGroup}
+     * Add a neuron to the collection. Exposed in [NeuronCollection] but not in [NeuronGroup]
      */
-    protected void addNeuron(Neuron neuron) {
-        neuronList.add(neuron);
-        neuron.setId(getParentNetwork().getIdManager().getAndIncrementId(Neuron.class));
-        addListener(neuron);
+    protected open fun addNeuron(neuron: Neuron) {
+        neuronList.add(neuron)
+        neuron.id = parentNetwork.idManager.getAndIncrementId(Neuron::class.java)
+        addListener(neuron)
     }
 
     /**
      * Add a collection of neurons.
      */
-    protected final void addNeurons(Collection<Neuron> neurons) {
-        neurons.forEach(this::addNeuron);
+    protected fun addNeurons(neurons: Collection<Neuron>) {
+        neurons.forEach(Consumer { neuron: Neuron -> this.addNeuron(neuron) })
     }
 
     /**
      * Add listener to indicated neuron.
      */
-    protected void addListener(Neuron n) {
-        n.getEvents().getLocationChanged().on(() -> events.getLocationChanged().fireAndForget());
+    protected fun addListener(n: Neuron) {
+        n.events.locationChanged.on { events.locationChanged.fireAndForget() }
         // n.getEvents().onLocationChange(fireLocationChange); // TODO Reimplement when debounce is working
-        n.getEvents().getDeleted().on(neuronList::remove);
-        n.getEvents().getActivationChanged().on((aold,anew) -> {
-            invalidateCachedActivations();
-        });
-        n.getEvents().getDeleted().on(neuron-> {
-            neuronList.remove(neuron);
-            if (isEmpty()) {
-                delete();
+        n.events.deleted.on { neuronList.remove(it) }
+        n.events.activationChanged.on { _, _ ->
+            invalidateCachedActivations()
+        }
+        n.events.deleted.on { neuron ->
+            neuronList.remove(neuron)
+            if (isEmpty) {
+                delete()
             }
-        });
+        }
     }
 
-    /**
-     * Remove a neuron
-     *
-     * @param neuron the neuron to remove
-     */
-    public void removeNeuron(Neuron neuron) {
-        neuronList.remove(neuron);
+    fun removeNeuron(neuron: Neuron?) {
+        neuronList.remove(neuron)
     }
 
-    /**
-     * Remove all neurons.
-     */
-    public void removeAllNeurons() {
-        neuronList.clear();
+    fun removeAllNeurons() {
+        neuronList.clear()
     }
 
     /**
@@ -300,8 +258,8 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
      * @param n neuron to check for.
      * @return true if the group contains this neuron, false otherwise
      */
-    public boolean containsNeuron(final Neuron n) {
-        return neuronList.contains(n);
+    fun containsNeuron(n: Neuron?): Boolean {
+        return neuronList.contains(n)
     }
 
     /**
@@ -309,9 +267,9 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
      *
      * @param clamp true to clamp them, false otherwise
      */
-    public void setClamped(final boolean clamp) {
-        for (Neuron neuron : this.getNeuronList()) {
-            neuron.setClamped(clamp);
+    fun setClamped(clamp: Boolean) {
+        for (neuron in neuronList) {
+            neuron.clamped = clamp
         }
     }
 
@@ -321,169 +279,105 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
      * @param value the value to set the neurons to
      */
     @Consumable
-    public void forceSetActivationLevels(final double value) {
-        for (Neuron n : getNeuronList()) {
-            n.forceSetActivation(value);
+    fun forceSetActivationLevels(value: Double) {
+        for (n in neuronList) {
+            n.forceSetActivation(value)
         }
-        cachedActivationsDirty = true;
+        cachedActivationsDirty = true
     }
 
-    @Override
-    public void randomize() {
-        neuronList.forEach(Neuron::randomize);
-        invalidateCachedActivations();
+    override fun randomize() {
+        neuronList.forEach { it.randomize() }
+        invalidateCachedActivations()
     }
 
     /**
      * Randomize bias for all neurons in group.
      */
-    public void randomizeBiases() {
-        for (Neuron neuron : this.getNeuronList()) {
-            NetworkUtilsKt.randomizeBias(neuron);
+    fun randomizeBiases() {
+        for (neuron in neuronList) {
+            neuron.randomizeBias()
         }
-        invalidateCachedActivations();
+        invalidateCachedActivations()
     }
 
     /**
      * Return flat list of fanins for all neurons in group.
-     *
-     * @return incoming weights
      */
-    public List<Synapse> getIncomingWeights() {
-        List<Synapse> retList = new ArrayList<Synapse>();
-        for (Neuron neuron : this.getNeuronList()) {
-            retList.addAll(neuron.getFanIn());
-        }
-        return retList;
-    }
+    val incomingWeights: List<Synapse>
+        get() = neuronList.flatMap { it.fanIn }
 
     /**
      * Return flat list of fanouts for all neurons in group.
-     *
-     * @return outgoing weights
      */
-    public List<Synapse> getOutgoingWeights() {
-        List<Synapse> retList = new ArrayList<Synapse>();
-        for (Neuron neuron : this.getNeuronList()) {
-            retList.addAll(neuron.getFanOut().values());
-        }
-        return retList;
-    }
+    val outgoingWeights: List<Synapse>
+        get() = neuronList.flatMap { it.fanOut.values }
 
     /**
      * Randomize fan-in for all neurons in group.
      */
-    public void randomizeIncomingWeights() {
-        for (Neuron neuron : this.getNeuronList()) {
-            neuron.randomizeFanIn();
+    open fun randomizeIncomingWeights() {
+        for (neuron in neuronList) {
+            neuron.randomizeFanIn()
         }
     }
 
     /**
      * Randomize fan-out for all neurons in group.
      */
-    public void randomizeOutgoingWeights() {
-        for (Neuron neuron : this.getNeuronList()) {
-            neuron.randomizeFanOut();
+    fun randomizeOutgoingWeights() {
+        for (neuron in neuronList) {
+            neuron.randomizeFanOut()
         }
     }
 
-    public HashSet<SynapseGroup> getIncomingSgs() {
-        return incomingSgs;
+    fun removeIncomingSg(sg: SynapseGroup): Boolean {
+        return incomingSgs.remove(sg)
     }
 
-    public HashSet<SynapseGroup> getOutgoingSg() {
-        return outgoingSgs;
+    fun removeOutgoingSg(sg: SynapseGroup): Boolean {
+        return outgoingSg.remove(sg)
     }
 
-    public boolean removeIncomingSg(SynapseGroup sg) {
-        return incomingSgs.remove(sg);
+    override fun delete() {
+        super.delete()
+        outgoingSg.forEach(Consumer { obj: SynapseGroup -> obj.delete() })
+        incomingSgs.forEach(Consumer { obj: SynapseGroup -> obj.delete() })
+        val customInfo = customInfo
+        customInfo?.events?.deleted?.fireAndBlock(customInfo)
     }
 
-    public boolean removeOutgoingSg(SynapseGroup sg) {
-        return outgoingSgs.remove(sg);
-    }
-
-    @Override
-    public void delete() {
-        super.delete();
-        outgoingSgs.forEach(SynapseGroup::delete);
-        incomingSgs.forEach(SynapseGroup::delete);
-        var customInfo = getCustomInfo();
-        if (customInfo != null) {
-            customInfo.getEvents().getDeleted().fireAndBlock(customInfo);
-        }
-    }
-
-    @Override
-    public void updateInputs() {
+    override fun updateInputs() {
         // if (inputManager.getData() == null) {
         //     throw new NullPointerException("Test data variable is null," + " but neuron group " + getLabel() + " is in input" + " mode.");
         // }
         // inputManager.applyCurrentRow(); // TODO
 
-        double[] wtdInputs = new double[size()];
-        for (Connector c : getIncomingConnectors()) {
-            wtdInputs = SimbrainMath.addVector(wtdInputs, c.getOutput().col(0));
+        var wtdInputs = DoubleArray(size())
+        for (c in incomingConnectors) {
+            wtdInputs = SimbrainMath.addVector(wtdInputs, c.output.col(0))
         }
-        addInputs(wtdInputs);
+        addInputs(wtdInputs)
     }
 
-    @Override
-    public void update() {
-        invalidateCachedActivations();
+    override fun update() {
+        invalidateCachedActivations()
     }
 
-    @Producible(arrayDescriptionMethod = "getLabelArray")
-    public double[] getActivations() {
-        if (cachedActivationsDirty) {
-            activations = neuronList.stream()
-                    .map(Neuron::getActivation)
-                    .mapToDouble(Double::doubleValue)
-                    .toArray();
-            cachedActivationsDirty = false;
-        }
-        return activations;
-    }
+    val isAllClamped: Boolean
+        get() = neuronList.none { !it.clamped }
 
-    /**
-     * Returns true if all the neurons in this group are clamped.
-     *
-     * @return true if all neurons are clamped, false otherwise
-     */
-    public boolean isAllClamped() {
-        boolean ret = true;
-        for (Neuron n : getNeuronList()) {
-            if (!n.isClamped()) {
-                ret = false;
-            }
-        }
-        return ret;
-    }
-
-    /**
-     * Returns true if all the neurons in this group are unclamped.
-     *
-     * @return true if all neurons are unclamped, false otherwise
-     */
-    public boolean isAllUnclamped() {
-        boolean ret = true;
-        for (Neuron n : getNeuronList()) {
-            if (n.isClamped()) {
-                ret = false;
-            }
-        }
-        return ret;
-    }
+    val isAllUnclamped: Boolean
+        get() = neuronList.none { it.clamped }
 
     /**
      * Set the lower bound on all neurons in this group.
      *
      * @param lb the lower bound to set.
      */
-    public void setLowerBound(double lb) {
-        for (Neuron neuron : this.getNeuronList()) {
-            neuron.setLowerBound(lb);
+    fun setLowerBound(lb: Double) {
+        for (neuron in neuronList) {
+            neuron.lowerBound = lb
         }
     }
 
@@ -492,9 +386,9 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
      *
      * @param ub the upper bound to set.
      */
-    public void setUpperBound(double ub) {
-        for (Neuron neuron : this.getNeuronList()) {
-            neuron.setUpperBound(ub);
+    fun setUpperBound(ub: Double) {
+        for (neuron in neuronList) {
+            neuron.upperBound = ub
         }
     }
 
@@ -503,9 +397,9 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
      *
      * @param increment the increment to set.
      */
-    public void setIncrement(double increment) {
-        for (Neuron neuron : this.getNeuronList()) {
-            neuron.setIncrement(increment);
+    fun setIncrement(increment: Double) {
+        for (neuron in neuronList) {
+            neuron.increment = increment
         }
     }
 
@@ -516,40 +410,31 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
      * @param threshold threshold above which to consider a neuron "active"
      * @return the "active labels"
      */
-    public String getLabelsOfActiveNeurons(double threshold) {
-        StringBuilder strBuilder = new StringBuilder("");
-        for (Neuron neuron : neuronList) {
-            if ((neuron.getActivation() > threshold) && (!neuron.getLabel().isEmpty())) {
-                strBuilder.append(neuron.getLabel() + " ");
+    fun getLabelsOfActiveNeurons(threshold: Double): String {
+        val strBuilder = StringBuilder("")
+        for (neuron in neuronList) {
+            if ((neuron.activation > threshold) && (!neuron.label.isNullOrBlank())) {
+                strBuilder.append(neuron.label + " ")
             }
         }
-        return strBuilder.toString();
+        return strBuilder.toString()
     }
 
-    /**
-     * Returns the label of the most active neuron.
-     *
-     * @return the label of the most active neuron
-     */
-    public String getMostActiveNeuron() {
-        double min = Double.MIN_VALUE;
-        String result = "";
-        for (Neuron neuron : neuronList) {
-            if ((neuron.getActivation() > min) && (!neuron.getLabel().isEmpty())) {
-                result = neuron.getLabel();
-                min = neuron.getActivation();
-            }
+    val mostActiveNeuron: String
+        /**
+         * Returns the label of the most active neuron.
+         *
+         * @return the label of the most active neuron
+         */
+        get() {
+            return (neuronList.maxBy { it.activation }.label ?: "") + " "
         }
-        return result + " ";
-    }
 
     /**
      * Sets the polarities of every neuron in the group.
      */
-    public void setPolarity(SimbrainConstants.Polarity p) {
-        for (Neuron n : neuronList) {
-            n.setPolarity(p);
-        }
+    fun setPolarity(p: Polarity) {
+        neuronList.forEach { it.polarity = p }
     }
 
     /**
@@ -558,194 +443,115 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
      * @param label label to search for
      * @return the associated neuron
      */
-    public Neuron getNeuronByLabel(String label) {
-        return neuronList.stream()
-                .filter(n -> n.getLabel().equalsIgnoreCase(label))
-                .findFirst()
-                .orElse(null);
+    fun getNeuronByLabel(label: String?) = neuronList.firstOrNull { it.label.equals(label, ignoreCase = true) }
+
+    protected fun invalidateCachedActivations() {
+        cachedActivationsDirty = true
     }
 
-    /**
-     * Set activations of neurons using an array of doubles. Assumes the order
-     * of the items in the array matches the order of items in the neuronlist.
-     * <p>
-     * Does not throw an exception if the provided input array and neuron list
-     * do not match in size.
-     *
-     * @param activations the input vector as a double array.
-     */
-    @Consumable()
-    public void setActivations(double[] activations) {
-        int size = Math.min(activations.length, neuronList.size());
-        for (int i = 0; i < size; i++) {
-            neuronList.get(i).setActivation(activations[i]);
+    protected fun invalidateCachedInputs() {
+        cachedInputsDirty = true
+    }
+
+    @Consumable
+    fun forceSetActivations(activations: DoubleArray) {
+        val size = min(activations.size, neuronList.size)
+        for (i in 0 until size) {
+            neuronList[i].forceSetActivation(activations[i])
         }
-        cachedActivationsDirty = true;
+        cachedActivationsDirty = true
     }
-
-    protected void invalidateCachedActivations() {
-        cachedActivationsDirty = true;
-    }
-
-    protected void invalidateCachedInputs() {
-        cachedInputsDirty = true;
-    }
-
-    @Consumable()
-    public void forceSetActivations(double[] activations) {
-        int size = Math.min(activations.length, neuronList.size());
-        for (int i = 0; i < size; i++) {
-            neuronList.get(i).forceSetActivation(activations[i]);
-        }
-        cachedActivationsDirty = true;
-    }
-
 
     /**
      * Returns an array of labels, one for each neuron this group.
      * Called by reflection for some coupling related events.
-     *
-     * @return the label array
      */
-    public String[] getLabelArray() {
-        String[] retArray = new String[getNeuronList().size()];
-        int i = 0;
-        for(Neuron neuron : getNeuronList()) {
-            if (neuron.getLabel().isEmpty()) {
-                retArray[i++] = neuron.getId();
-            } else {
-                retArray[i++] = neuron.getLabel();
-            }
-        }
-        return retArray;
+    val labelArray: Array<String?>
+        get() = neuronList
+            .map { if (it.label.isNullOrEmpty()) it.id else it.label }
+            .toTypedArray()
+
+    override val network: Network
+        get() = parentNetwork
+
+    val isEmpty: Boolean
+        get() = neuronList.isEmpty()
+
+    val minX: Double
+        get() = neuronList.minX
+
+    val maxX: Double
+        get() = neuronList.maxX
+
+    val minY: Double
+        get() = neuronList.minY
+
+    val maxY: Double
+        get() = neuronList.maxY
+
+    override val name = "AbstractNeuronCollection"
+
+    override fun onCommit() {}
+
+    override fun postOpenInit() {
+        super.postOpenInit()
+
+        incomingSgs = HashSet()
+        outgoingSg = HashSet()
     }
 
-    @Override
-    public Network getNetwork() {
-        return getParentNetwork();
+    override fun toString(): String {
+        return "$id with ${activations.size} activations: ${Utils.getTruncatedArrayString(activations, 10)}"
     }
 
-    public List<Neuron> getNeuronList() {
-        return Collections.unmodifiableList(neuronList);
+    fun clearInputs() {
+        neuronList.forEach { it.clearInput() }
     }
 
-    public boolean isEmpty() {
-        return neuronList.isEmpty();
+    override fun clear() {
+        clearArray()
     }
 
-    public double getMinX() {
-        return LocatableModelKt.getMinX(neuronList);
+    override fun increment() {
+        incrementArray(increment)
     }
 
-    public double getMaxX() {
-        return LocatableModelKt.getMaxX(neuronList);
-    }
-
-    public double getMinY() {
-        return LocatableModelKt.getMinY(neuronList);
-    }
-
-    public double getMaxY() {
-        return LocatableModelKt.getMaxY(neuronList);
-    }
-
-    public Network getParentNetwork() {
-        return parentNetwork;
-    }
-
-    @Override
-    public String getName() {
-        return null; //TODO
-    }
-
-    @Override
-    public void onCommit() {
-        //todo
-    }
-
-    @Override
-    public void postOpenInit() {
-        super.postOpenInit();
-        if (events == null) {
-            events = new NeuronCollectionEvents();
-        }
-
-        incomingSgs = new HashSet<>();
-        outgoingSgs = new HashSet<>();
-    }
-
-    public NeuronCollectionEvents getEvents() {
-        return events;
-    }
-
-    @Override
-    public String toString() {
-        return getId() + " with " + getActivations().length + " activations: " +
-                Utils.getTruncatedArrayString(getActivations(), 10);
-    }
-
-    public void clearInputs() {
-        neuronList.forEach(n -> n.clearInput());
-    }
-
-    @Override
-    public void clear() {
-        clearArray();
-    }
-
-    @Override
-    public void increment() {
-        incrementArray(increment);
-    }
-
-    @Override
-    public void decrement() {
-        decrementArray(increment);
+    override fun decrement() {
+        decrementArray(increment)
     }
 
     /**
      * Add increment to every entry in weight matrix
      */
-    public void incrementArray(double amount) {
-        double[] newActivations = Arrays
-                .stream(getActivations())
-                .map(a -> a + amount)
-                .toArray();
-        setActivations(newActivations);
-        events.getUpdated().fireAndForget();
+    fun incrementArray(amount: Double) {
+        val newActivations = activations.map { it + amount }.toDoubleArray()
+        activations = newActivations
+        events.updated.fireAndForget()
     }
 
     /**
      * Subtract increment from every entry in the array
      */
-    public void decrementArray(double amount) {
-        double[] newActivations = Arrays
-                .stream(getActivations())
-                .map(a -> a - amount)
-                .toArray();
-        setActivations(newActivations);
-        events.getUpdated().fireAndForget();
+    fun decrementArray(amount: Double) {
+        val newActivations = Arrays
+            .stream(activations)
+            .map { a: Double -> a - amount }
+            .toArray()
+        activations = newActivations
+        events.updated.fireAndForget()
     }
 
     /**
      * Clear array values.
      */
-    public void clearArray() {
-        double[] newActivations = new double[getActivations().length];
-        setActivations(newActivations);
-        events.getUpdated().fireAndForget();
+    fun clearArray() {
+        val newActivations = DoubleArray(activations.size)
+        activations = newActivations
+        events.updated.fireAndForget()
     }
 
-    @Override
-    public void toggleClamping() {
-        neuronList.forEach(Neuron::toggleClamping);
-    }
-
-    /**
-     * If more than gridThreshold neurons use a grid layout, else a horizontal line layout.
-     */
-    public void setLayoutBasedOnSize() {
-        setLayoutBasedOnSize(new Point2D.Double(0, 0));
+    override fun toggleClamping() {
+        neuronList.forEach { it.toggleClamping() }
     }
 
     /**
@@ -753,33 +559,30 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
      *
      * @param initialPosition the initial Position for the layout
      */
-    public void setLayoutBasedOnSize(Point2D initialPosition) {
-        if (initialPosition == null) {
-            initialPosition = new Point2D.Double(0, 0);
-        }
-        LineLayout lineLayout = new LineLayout(betweenNeuronInterval, LineLayout.LineOrientation.HORIZONTAL);
-        GridLayout gridLayout = new GridLayout(betweenNeuronInterval, betweenNeuronInterval);
-        if (getNeuronList().size() < gridThreshold) {
-            lineLayout.setInitialLocation(initialPosition);
-            setLayout(lineLayout);
+    @JvmOverloads
+    fun setLayoutBasedOnSize(initialPosition: Point2D = point(0, 0)) {
+        val lineLayout = LineLayout(betweenNeuronInterval.toDouble(), LineLayout.LineOrientation.HORIZONTAL)
+        val gridLayout = GridLayout(betweenNeuronInterval.toDouble(), betweenNeuronInterval.toDouble())
+        if (neuronList.size < gridThreshold) {
+            lineLayout.setInitialLocation(initialPosition)
+            layout = lineLayout
         } else {
-            gridLayout.setInitialLocation(initialPosition);
-            setLayout(gridLayout);
+            gridLayout.setInitialLocation(initialPosition)
+            layout = gridLayout
         }
         // Used rather than apply layout to make sure initial position is used.
-        getLayout().layoutNeurons(getNeuronList());
+        layout.layoutNeurons(neuronList)
     }
 
-    public Point2D.Double getTopLeftLocation() {
-        return LocatableModelKt.getTopLeftLocation(neuronList);
-    }
+    open val topLeftLocation: Point2D.Double
+        get() = neuronList.topLeftLocation
 
     /**
      * Apply this group's layout to its neurons.
      */
-    public void applyLayout() {
-        layout.setInitialLocation(getTopLeftLocation());
-        layout.layoutNeurons(getNeuronList());
+    fun applyLayout() {
+        layout.setInitialLocation(this.topLeftLocation)
+        layout.layoutNeurons(neuronList)
     }
 
     /**
@@ -787,55 +590,30 @@ public abstract class AbstractNeuronCollection extends Layer implements Copyable
      *
      * @param initialPosition the position from which to begin the layout.
      */
-    public void applyLayout(Point2D initialPosition) {
-        layout.setInitialLocation(initialPosition);
-        layout.layoutNeurons(getNeuronList());
+    fun applyLayout(initialPosition: Point2D?) {
+        layout.setInitialLocation(initialPosition)
+        layout.layoutNeurons(neuronList)
     }
 
     /**
-     * Forwards to {@link #applyLayout(Point2D)}
+     * Forwards to [.applyLayout]
      */
-    public void applyLayout(int x, int y) {
-        applyLayout(new Point2D.Double(x,y));
+    fun applyLayout(x: Int, y: Int) {
+        applyLayout(Point2D.Double(x.toDouble(), y.toDouble()))
     }
 
     /**
      * Sets a new layout and applies it, using the groups' current location.
      */
-    public void applyLayout(Layout newLayout) {
-        layout = newLayout;
-        applyLayout(getLocation());
-    }
-
-    public int getBetweenNeuronInterval() {
-        return betweenNeuronInterval;
-    }
-
-    public void setBetweenNeuronInterval(int betweenNeuronInterval) {
-        this.betweenNeuronInterval = betweenNeuronInterval;
-    }
-
-    public int getGridThreshold() {
-        return gridThreshold;
-    }
-
-    public void setGridThreshold(int gridThreshold) {
-        this.gridThreshold = gridThreshold;
-    }
-
-    public Layout getLayout() {
-        return layout;
-    }
-
-    public void setLayout(Layout layout) {
-        this.layout = layout;
+    fun applyLayout(newLayout: Layout) {
+        layout = newLayout
+        applyLayout(location)
     }
 
     /**
      * Optional information about the current state of the group. For display in
      * GUI.
      */
-    public NetworkModel getCustomInfo() {
-        return null;
-    }
+    open val customInfo: NetworkModel?
+        get() = null
 }

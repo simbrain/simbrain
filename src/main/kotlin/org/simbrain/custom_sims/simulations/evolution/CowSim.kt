@@ -35,10 +35,10 @@ val evolveCow = newSim {
 
     class CowGenotype(seed: Long = Random.nextLong()) : Genotype {
         override val random: Random = Random(seed)
-        var inputChromosome = chromosome(3) { add(nodeGene { isClamped = true }) }
+        var inputChromosome = chromosome(3) { add(nodeGene { clamped = true }) }
         var hiddenChromosome = chromosome(2) { add(nodeGene()) }
         var outputChromosome = chromosome(3) { add(nodeGene { upperBound = 10.0; lowerBound = -10.0 }) }
-        var driveChromosome = chromosome(1) { add(nodeGene { activation = 10.0; upperBound = 10.0; isClamped = true
+        var driveChromosome = chromosome(1) { add(nodeGene { activation = 10.0; upperBound = 10.0; clamped = true
         }) }
         var connectionChromosome = chromosome(1) {
             repeat(3) {

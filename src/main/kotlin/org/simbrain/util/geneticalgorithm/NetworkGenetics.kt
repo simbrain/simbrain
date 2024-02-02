@@ -172,7 +172,7 @@ class SynapseRuleGene(override val template: SynapseRuleGeneWrapper) : TopLevelG
 
 }
 
-fun nodeGene(block: Neuron.() -> Unit = {}) = NodeGene(template = Neuron(null)).apply { template.block() }
+fun nodeGene(block: Neuron.() -> Unit = {}) = NodeGene(template = Neuron()).apply { template.block() }
 
 fun connectionGene(source: NodeGene, target: NodeGene, block: Synapse.() -> Unit = {}) = ConnectionGene(
     template = Synapse(null as Neuron?, null),

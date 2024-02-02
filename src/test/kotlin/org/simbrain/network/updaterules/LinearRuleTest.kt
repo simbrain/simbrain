@@ -23,10 +23,10 @@ class LinearRuleTest {
     init {
         net.addNetworkModelsAsync(input1, input2, output, w13, w23)
         input1.activation = 1.0
-        input1.isClamped = true
+        input1.clamped = true
 
         input2.activation = -1.0
-        input2.isClamped = true
+        input2.clamped = true
 
         w13.strength = .5
         w23.strength = -1.0

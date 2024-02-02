@@ -15,46 +15,41 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.groups;
+package org.simbrain.network.groups
 
-import org.jetbrains.annotations.NotNull;
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.layouts.Layout;
-import org.simbrain.util.propertyeditor.CopyableObject;
-
-import java.util.List;
+import org.simbrain.network.NetworkModel
+import org.simbrain.network.core.Network
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.NeuronUpdateRule
+import org.simbrain.network.layouts.Layout
+import org.simbrain.util.propertyeditor.CopyableObject
+import java.util.function.Consumer
 
 /**
- * A collection of free neurons (neurons in a {@link NeuronGroup} can be added to a collection). Allows them to be
+ * A collection of free neurons (neurons in a [NeuronGroup] can be added to a collection). Allows them to be
  * labelled, moved around as a unit, coupled to, etc. However no special processing occurs in neuron collections. They
  * are a convenience. NeuronCollections can overlap each other in the sense of having neurons in common.
  */
-public class NeuronCollection extends AbstractNeuronCollection {
+class NeuronCollection(parentNetwork: Network?) : AbstractNeuronCollection(
+    parentNetwork!!
+) {
 
-    /**
-     * Construct a new neuron group from a list of free neurons.
-     *
-     * Assumes the neurons have already been added to the root network.
-     */
-    public NeuronCollection(final Network net, final List<Neuron> neurons) {
-        super(net);
-        addNeurons(neurons);
+    constructor(parentNetwork: Network, neurons: List<Neuron>) : this(parentNetwork) {
+        addNeurons(neurons)
 
-        neurons.forEach(n -> {
-            n.getEvents().getLocationChanged().on(() -> events.getLocationChanged());
-            n.getEvents().getActivationChanged().on((aold, anew) -> {
-                invalidateCachedActivations();
-            });
-            n.getEvents().getDeleted().on(null, true, toDelete -> {
-                removeNeuron((Neuron) toDelete);
-                events.getLocationChanged().fireAndForget();
-                if (isEmpty()) {
-                    delete();
+        neurons.forEach { n: Neuron ->
+            n.events.locationChanged.on { events.locationChanged }
+            n.events.activationChanged.on { _, _ ->
+                invalidateCachedActivations()
+            }
+            n.events.deleted.on(null, true, Consumer { toDelete: NetworkModel? ->
+                removeNeuron(toDelete as Neuron?)
+                events.locationChanged.fireAndForget()
+                if (isEmpty) {
+                    delete()
                 }
-            });
-        });
+            })
+        }
     }
 
     /**
@@ -63,18 +58,18 @@ public class NeuronCollection extends AbstractNeuronCollection {
      * @param offsetX x offset for translation.
      * @param offsetY y offset for translation.
      */
-    public void offset(final double offsetX, final double offsetY) {
-        for (Neuron neuron : getNeuronList()) {
-            neuron.offset(offsetX, offsetY, false);
+    override fun offset(offsetX: Double, offsetY: Double) {
+        for (neuron in neuronList) {
+            neuron.offset(offsetX, offsetY, false)
         }
-        events.getLocationChanged().fireAndForget();
+        events.locationChanged.fireAndForget()
     }
 
     /**
      * Call after deleting neuron collection from parent network.
      */
-    public void delete() {
-        events.getDeleted().fireAndForget(this);
+    override fun delete() {
+        events.deleted.fireAndForget(this)
     }
 
     /**
@@ -82,8 +77,8 @@ public class NeuronCollection extends AbstractNeuronCollection {
      *
      * @param base the neuron update rule to set.
      */
-    public void setNeuronType(NeuronUpdateRule base) {
-        getNeuronList().forEach(n -> n.setUpdateRule(base.deepCopy()));
+    fun setNeuronType(base: NeuronUpdateRule<*, *>) {
+        neuronList.forEach(Consumer { n: Neuron -> n.updateRule = base.deepCopy() })
     }
 
     /**
@@ -91,67 +86,68 @@ public class NeuronCollection extends AbstractNeuronCollection {
      *
      * @param rule the neuron update rule to set.
      */
-    public void setNeuronType(String rule) {
+    fun setNeuronType(rule: String) {
         try {
-            NeuronUpdateRule newRule =
-                    (NeuronUpdateRule) Class.forName("org.simbrain.network.neuron_update_rules." + rule).newInstance();
-            setNeuronType(newRule);
-        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-            e.printStackTrace();
+            val newRule =
+                Class.forName("org.simbrain.network.neuron_update_rules.$rule").newInstance() as NeuronUpdateRule<*, *>
+            setNeuronType(newRule)
+        } catch (e: InstantiationException) {
+            e.printStackTrace()
+        } catch (e: IllegalAccessException) {
+            e.printStackTrace()
+        } catch (e: ClassNotFoundException) {
+            e.printStackTrace()
         }
     }
 
-    /**
-     * Returns the summed hash codes of contained neurons.  Used to prevent creation of neuron collections from
-     * identical sets of neurons.
-     *
-     * @return summed hash
-     */
-    public int getSummedNeuronHash() {
-        return getNeuronList().stream().mapToInt(Object::hashCode).sum();
-    }
+    val summedNeuronHash: Int
+        /**
+         * Returns the summed hash codes of contained neurons.  Used to prevent creation of neuron collections from
+         * identical sets of neurons.
+         *
+         * @return summed hash
+         */
+        get() = neuronList.stream().mapToInt { obj: Neuron -> obj.hashCode() }.sum()
 
-    @Override
-    public boolean shouldAdd() {
-        int hashCode = getSummedNeuronHash();
-        for (NeuronCollection other : getNetwork().getModels(NeuronCollection.class)) {
-            if (hashCode == other.getSummedNeuronHash()) {
-                return false;
+    override fun shouldAdd(): Boolean {
+        val hashCode = summedNeuronHash
+        for (other in network.getModels(NeuronCollection::class.java)) {
+            if (hashCode == other.summedNeuronHash) {
+                return false
             }
         }
-        return true;
+        return true
     }
 
-    @Override
-    public void clear() {
-        for (Neuron n : neuronList) {
-            n.clear();
+    override fun clear() {
+        for (n in neuronList) {
+            n.clear()
         }
     }
 
-    @Override
-    public void addNeuron(Neuron neuron) {
+    public override fun addNeuron(neuron: Neuron) {
         // These neurons already have ids and listeners
-        neuronList.add(neuron);
-        addListener(neuron);
+        neuronList.add(neuron)
+        addListener(neuron)
     }
 
-    @Override
-    public void postOpenInit() {
-        super.postOpenInit();
-        getNeuronList().forEach(this::addListener);
+    override fun postOpenInit() {
+        super.postOpenInit()
+        neuronList.forEach(Consumer { n: Neuron? ->
+            this.addListener(
+                n!!
+            )
+        })
     }
 
     /**
-     * Convenience method for applying a {@link Layout} to a neuron collection.
+     * Convenience method for applying a [Layout] to a neuron collection.
      */
-    public void layout(Layout layout) {
-        layout.layoutNeurons(neuronList);
+    fun layout(layout: Layout) {
+        layout.layoutNeurons(neuronList)
     }
 
-    @NotNull
-    @Override
-    public CopyableObject copy() {
-        return new NeuronCollection(getNetwork(), getNeuronList());
+    override fun copy(): CopyableObject {
+        return NeuronCollection(network, neuronList)
     }
 }

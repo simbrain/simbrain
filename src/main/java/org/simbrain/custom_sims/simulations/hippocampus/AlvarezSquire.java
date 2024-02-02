@@ -43,7 +43,7 @@ public class AlvarezSquire extends CompetitiveGroup {
 
         // For this simulation we can assume that if one neuron is clamped, they
         // all are
-        boolean clamped = getNeuronList().get(0).isClamped();
+        boolean clamped = getNeuronList().get(0).getClamped();
         Neuron winner = getWinner(getNeuronList(), clamped);
 
         // Update weights on winning neuron

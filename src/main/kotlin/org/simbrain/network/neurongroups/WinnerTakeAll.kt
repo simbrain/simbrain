@@ -24,6 +24,7 @@ import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.CustomTypeName
 import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.util.sampleOne
 import kotlin.random.Random
 
 /**
@@ -61,14 +62,14 @@ class WinnerTakeAll @JvmOverloads constructor(
         var winner = getWinner(neuronList, false)
         if (params.isUseRandom) {
             if (Random.nextDouble() < params.randomProb) {
-                winner = getNeuronList()[Random.nextInt(getNeuronList().size)]
+                winner = neuronList.sampleOne()
             }
         }
-        for (neuron in getNeuronList()) {
+        for (neuron in neuronList) {
             if (neuron === winner) {
-                neuron.setActivation(params.winValue)
+                neuron.activation = params.winValue
             } else {
-                neuron.setActivation(params.loseValue)
+                neuron.activation = params.loseValue
             }
         }
     }
@@ -133,8 +134,8 @@ fun getWinner(neuronList: List<Neuron>, useActivations: Boolean): Neuron? {
     var winner = neuronList[0]
     winners.add(winner)
     for (n in neuronList) {
-        val winnerVal = if (useActivations) winner.activation else winner.getWeightedInputs()
-        val value = if (useActivations) n.activation else n.getWeightedInputs()
+        val winnerVal = if (useActivations) winner.activation else winner.weightedInputs
+        val value = if (useActivations) n.activation else n.weightedInputs
         if (value == winnerVal) {
             winners.add(n)
         } else if (value > winnerVal) {

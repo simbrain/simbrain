@@ -113,8 +113,7 @@ abstract class Layer : LocatableModel(), AttributeContainer {
      * Event support.
      */
     @Transient
-    override var events = LocationEvents()
-        protected set
+    override val events: LocationEvents = LocationEvents()
 
     /**
      * Returns the output size for this layer.
@@ -150,9 +149,7 @@ abstract class Layer : LocatableModel(), AttributeContainer {
     }
 
     override fun postOpenInit() {
-        if (events == null) {
-            events = LocationEvents()
-        }
+
         incomingConnectors = ArrayList()
         outgoingConnectors = ArrayList()
     }
@@ -165,7 +162,6 @@ abstract class Layer : LocatableModel(), AttributeContainer {
      * See [org.simbrain.workspace.serialization.WorkspaceComponentDeserializer]
      */
     open fun readResolve(): Any? {
-        events = LocationEvents()
         return this
     }
 

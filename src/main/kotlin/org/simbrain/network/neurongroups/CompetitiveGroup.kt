@@ -95,8 +95,8 @@ open class CompetitiveGroup @JvmOverloads constructor(
         winner = 0
 
         // Determine Winner
-        for (i in getNeuronList().indices) {
-            val n = getNeuronList()[i]
+        for (i in neuronList.indices) {
+            val n = neuronList[i]
             if (n.activation > max) {
                 max = n.activation
                 winner = i
@@ -104,8 +104,8 @@ open class CompetitiveGroup @JvmOverloads constructor(
         }
 
         // Update weights on winning neuron
-        for (i in getNeuronList().indices) {
-            val neuron = getNeuronList()[i]
+        for (i in neuronList.indices) {
+            val neuron = neuronList[i]
             if (i == winner) {
                 neuron.activation = params.winValue
                 neuron.isSpike = neuron.isSpike
@@ -168,7 +168,7 @@ open class CompetitiveGroup @JvmOverloads constructor(
      * Decay attached synapses in accordance with Alvarez and Squire 1994, eq 3.
      */
     private fun decayAllSynapses() {
-        for (n in getNeuronList()) {
+        for (n in neuronList) {
             for (synapse in n.fanIn) {
                 synapse.decay(params.synpaseDecayPercent)
             }
@@ -197,7 +197,7 @@ open class CompetitiveGroup @JvmOverloads constructor(
      * Normalize weights coming in to this network, separately for each neuron.
      */
     fun normalizeIncomingWeights() {
-        for (n in getNeuronList()) {
+        for (n in neuronList) {
             val normFactor = n.summedIncomingWeights
             for (s in n.fanIn) {
                 s.strength = s.strength / normFactor
@@ -210,7 +210,7 @@ open class CompetitiveGroup @JvmOverloads constructor(
      */
     fun normalizeAllIncomingWeights() {
         val normFactor = summedIncomingWeights
-        for (n in getNeuronList()) {
+        for (n in neuronList) {
             for (s in n.fanIn) {
                 s.strength = s.strength / normFactor
             }
@@ -222,7 +222,7 @@ open class CompetitiveGroup @JvmOverloads constructor(
      * TODO: Add gaussian option...
      */
     override fun randomizeIncomingWeights() {
-        val i: Iterator<Neuron> = getNeuronList().iterator()
+        val i: Iterator<Neuron> = neuronList.iterator()
         while (i.hasNext()) {
             val n = i.next()
             for (s in n.fanIn) {
@@ -239,7 +239,7 @@ open class CompetitiveGroup @JvmOverloads constructor(
     private val summedIncomingWeights: Double
         private get() {
             var ret = 0.0
-            val i: Iterator<Neuron> = getNeuronList().iterator()
+            val i: Iterator<Neuron> = neuronList.iterator()
             while (i.hasNext()) {
                 val n = i.next()
                 ret += n.summedIncomingWeights

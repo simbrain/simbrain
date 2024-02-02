@@ -40,18 +40,18 @@ val braitenbergSim = newSim {
 
         val leftInput = network.addNeuron(0, 100).apply {
             label = "$entityType (L)"
-            isClamped = true
+            clamped = true
         }
 
         val rightInput = network.addNeuron(100, 100).apply {
             label = "$entityType (R)"
-            isClamped = true
+            clamped = true
         }
 
         val straight = network.addNeuron(50, 0).apply {
             label = "Speed"
             activation = 1.0
-            isClamped = true
+            clamped = true
         }
 
         val leftTurn = network.addNeuron(0, 0).apply {

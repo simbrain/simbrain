@@ -145,7 +145,7 @@ class EditableRandomizerPanel : JPanel {
     constructor(parent: Window?, dist: ProbabilityDistribution, enabled: Boolean = true) {
         randomizer = dist
         // Below used to set color of boundary, which we are ok without
-        // polarity = randomizer.getProbabilityDistribution().getPolarity();
+        // polarity = randomizer.getProbabilityDistribution().polarity;
         enableStatusTriangle = DropDownTriangle(UpDirection.LEFT, enabled, "Disabled", "Enabled")
         enableStatusTriangle.setUpLabelColor(Color(200, 0, 0))
         enableStatusTriangle.setDownLabelColor(Color(0, 160, 0))

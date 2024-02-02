@@ -200,7 +200,7 @@ public class SORN extends Simulation {
 
         // net.getUpdateManager().clear();
         // net.getUpdateManager().addAction(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(net));
-        net.updateTimeType();
+        // net.updateTimeType();
     }
 
     // TODO: Possibly move to NetworkUtils.kt as extension functions

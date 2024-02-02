@@ -95,7 +95,7 @@ var List<Neuron?>.activations: List<Double>
     get() = map { it?.activation ?: 0.0 }
     set(values) = values.forEachIndexed { index, value ->
         this[index]?.let { neuron ->
-            if (neuron.isClamped) {
+            if (neuron.clamped) {
                 neuron.forceSetActivation(value)
             } else {
                 neuron.activation = value
@@ -275,7 +275,7 @@ fun Collection<Synapse>.clamp(clamped: Boolean) {
 
 @JvmName("clampNeurons")
 fun Collection<Neuron>.clamp(clamped: Boolean) {
-    forEach { it.isClamped = clamped }
+    forEach { it.clamped = clamped }
 }
 
 fun Neuron.randomizeBias() {

@@ -44,7 +44,6 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
     /**
      * Provides the network level time step.
      */
-    @JvmField
     protected var timeStepSupplier: Supplier<Double>? = null
 
     /**
@@ -111,7 +110,7 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
      * @param n neuron
      */
     fun incrementActivation(n: Neuron) {
-        n.forceSetActivation(n.activation + n.getIncrement())
+        n.forceSetActivation(n.activation + n.increment)
     }
 
     /**
@@ -120,7 +119,7 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
      * @param n neuron
      */
     fun decrementActivation(n: Neuron) {
-        n.forceSetActivation(n.activation - n.getIncrement())
+        n.forceSetActivation(n.activation - n.increment)
     }
 
     /**

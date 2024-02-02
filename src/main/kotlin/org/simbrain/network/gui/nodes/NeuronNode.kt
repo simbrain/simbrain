@@ -161,7 +161,7 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net) {
         if (customStrokeColor) {
             return
         }
-        if (neuron.isClamped) {
+        if (neuron.clamped) {
             mainShape.stroke = CLAMPED_STROKE
         } else {
             mainShape.stroke = DEFAULT_STROKE

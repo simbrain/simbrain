@@ -21,7 +21,6 @@ package org.simbrain.network.gui.dialogs.network;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
-import org.simbrain.network.neurongroups.CompetitiveGroup;
 import org.simbrain.network.subnetworks.CompetitiveNetwork;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
@@ -88,7 +87,7 @@ public class CompetitiveCreationDialog extends StandardDialog {
         competitivePanel = new AnnotatedPropertyEditor(cc);
         tabLogic.add(competitivePanel);
         layoutPanel = new AnnotatedPropertyEditor(layout);
-        layout  = CompetitiveGroup.DEFAULT_LAYOUT;
+        layout = new GridLayout();
         tabLayout.add(layoutPanel);
         tabbedPane.addTab("Logic", tabLogic);
         tabbedPane.addTab("Layout", layoutPanel);

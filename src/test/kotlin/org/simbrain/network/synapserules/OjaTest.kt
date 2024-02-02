@@ -33,8 +33,8 @@ class OjaTest {
         weight.strength = 0.0
         weight.upperBound = 10.0
         weight.lowerBound = -10.0
-        input.isClamped = true
-        output.isClamped = true
+        input.clamped = true
+        output.clamped = true
 
         na1.isClamped = true
         na2.isClamped = true

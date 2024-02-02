@@ -19,8 +19,8 @@ class PfisterGerstner2006Test {
 
         }
         s12.strength = 0.0
-        n1.isClamped = true
-        n2.isClamped = true
+        n1.clamped = true
+        n2.clamped = true
     }
 
     @Test

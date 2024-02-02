@@ -61,11 +61,11 @@ val evolveResourcePursuer = newSim {
         override val random: Random = Random(seed)
 
         var inputChromosome = chromosome(3) {
-            add(nodeGene { isClamped = true })
+            add(nodeGene { clamped = true })
         }
         var driveChromosome = chromosome(1) {
-            add(nodeGene { isClamped = true; upperBound = 100.0; lowerBound = 0.0; label = "Thirst" })
-            add(nodeGene { isClamped = true; upperBound = 100.0; lowerBound = 0.0 })
+            add(nodeGene { clamped = true; upperBound = 100.0; lowerBound = 0.0; label = "Thirst" })
+            add(nodeGene { clamped = true; upperBound = 100.0; lowerBound = 0.0 })
         }
         var hiddenChromosome = chromosome(2) { add(nodeGene()) }
         var outputChromosome = chromosome(3) { add(nodeGene { upperBound = 10.0; lowerBound = -10.0 }) }

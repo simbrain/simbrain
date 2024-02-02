@@ -154,7 +154,7 @@ public class NakaRushtonRule extends NeuronUpdateRule implements ClippedUpdateRu
         rn.setAdaptationParameter(getAdaptationParameter());
         rn.setAdaptationTimeConstant(getAdaptationTimeConstant());
         rn.noiseGenerator = noiseGenerator.deepCopy();
-        rn.timeStepSupplier = timeStepSupplier;
+        rn.setTimeStepSupplier(getTimeStepSupplier());
         return rn;
     }
 

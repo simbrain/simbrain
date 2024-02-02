@@ -158,7 +158,7 @@ class SpikeResponderTest {
         s2.spikeResponder = cjd
         s2.strength = .5
         n1.activation = 1.0
-        n1.isClamped = true
+        n1.clamped = true
         net.update()
         net.update()
         assertEquals(.5, n3.activation)
@@ -168,7 +168,7 @@ class SpikeResponderTest {
         assertEquals(1.5, n3.activation)
         net.update()
         assertEquals(2.0, n3.activation)
-        n1.isClamped = false
+        n1.clamped = false
         cjd.baseLine = 0.2
         cjd.timeConstant = .1 // decay quick
         repeat(10) {

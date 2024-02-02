@@ -22,8 +22,8 @@ val hebbianFeedForward = newSim {
     val world = (workspace.getComponent("Stimuli") as OdorWorldComponent).world
 
     fun unclampOutputs() {
-        nice?.isClamped = false
-        yuck?.isClamped = false
+        nice?.clamped = false
+        yuck?.clamped = false
     }
     // withGui {
     //     createControlPanel("Control Panel", 5, 10) {

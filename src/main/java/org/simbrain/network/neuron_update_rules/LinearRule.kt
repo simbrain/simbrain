@@ -100,7 +100,7 @@ open class LinearRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>(), 
      */
     override var addNoise = false
     override fun apply(neuron: Neuron, data: BiasedScalarData) {
-        neuron!!.setActivation(linearRule(neuron.input, data.bias))
+        neuron.activation = linearRule(neuron.input, data.bias)
     }
 
 

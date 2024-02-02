@@ -136,7 +136,7 @@ public class SimpleOperant extends Simulation {
             totalMass += n.getAuxValue();
         }
         for(Neuron n : behaviorNet.getNeuronList()) {
-            n.setAuxValue(n.getAuxValue()/totalMass);
+            n.setAuxValue(n.getAuxValue() /totalMass);
         }
     }
 

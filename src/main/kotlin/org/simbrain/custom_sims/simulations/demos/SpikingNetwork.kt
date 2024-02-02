@@ -23,7 +23,7 @@ val spikingNetwork = newSim {
     val input = network.addNeuron {
         label = "Input"
         location = point(100, 100)
-        isClamped = true
+        clamped = true
     }
     val spiking = network.addNeuron {
         updateRule = SpikingThresholdRule()

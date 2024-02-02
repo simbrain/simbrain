@@ -67,6 +67,7 @@ public class CompetitiveNetwork extends Subnetwork {
         this.setLabel("Competitive Network");
 
         competitive = new CompetitiveGroup(net, numCompetitiveNeurons);
+        competitive.setLabel("Competitive Group");
         this.addModel(competitive);
         competitive.setLayoutBasedOnSize();
 

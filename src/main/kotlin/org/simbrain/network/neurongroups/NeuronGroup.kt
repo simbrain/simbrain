@@ -21,10 +21,8 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronUpdateRule
 import org.simbrain.network.groups.AbstractNeuronCollection
-import org.simbrain.network.topLeftLocation
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.CustomTypeName
-import java.awt.geom.Point2D
 
 /**
  * A group of neurons using a common [NeuronUpdateRule]. After creation the update rule may be changed but
@@ -36,13 +34,13 @@ import java.awt.geom.Point2D
  * groups. Self-organizing-maps subclass this class. Etc. Since all update rules are the same groups can be characterized
  * as spiking vs. non-spiking.
  */
-open class NeuronGroup(net: Network?) : AbstractNeuronCollection(net) {
+open class NeuronGroup(parentNetwork: Network) : AbstractNeuronCollection(parentNetwork) {
 
-    constructor(net: Network?, neurons: List<Neuron?>) : this(net) {
+    constructor(parentNetwork: Network, neurons: List<Neuron>) : this(parentNetwork) {
         addNeurons(neurons)
     }
 
-    constructor(net: Network?, numNeurons: Int) : this(net, List(numNeurons) { Neuron(net) })
+    constructor(parentNetwork: Network, numNeurons: Int) : this(parentNetwork, List(numNeurons) { Neuron(parentNetwork) })
 
     fun setUpdateRule(base: NeuronUpdateRule<*, *>) {
         neuronList.forEach { it.updateRule = base.copy() }
@@ -58,7 +56,7 @@ open class NeuronGroup(net: Network?) : AbstractNeuronCollection(net) {
     override fun delete() {
         super.delete()
         events.deleted.fireAndBlock(this)
-        neuronList.forEach { it.delete() }
+        neuronList.toList().forEach { it.delete() }
     }
 
     override fun update() {
@@ -79,12 +77,8 @@ open class NeuronGroup(net: Network?) : AbstractNeuronCollection(net) {
 
     override fun postOpenInit() {
         super.postOpenInit()
-        getNeuronList().forEach { it.postOpenInit() }
-        getNeuronList().forEach { addListener(it) }
-    }
-
-    override fun getTopLeftLocation(): Point2D.Double {
-        return neuronList.topLeftLocation
+        neuronList.forEach { it.postOpenInit() }
+        neuronList.forEach { addListener(it) }
     }
 }
 

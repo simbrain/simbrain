@@ -7,7 +7,7 @@ The default branch is currently Simbrain 4. To see code relating to Simbrain 3.0
 ## Install
 Go to the [downloads](https://simbrain.net/Downloads/downloads_main.html) page and follow the directions.
 
-To run from source see the instructions [here](https://github.com/simbrain/simbrain/wiki/Running-from-source).
+To run from source see the instructions [here](https://github.com/simbrain/simbrain/wiki/Getting-From-Source).
 
 ## Getting Started
 

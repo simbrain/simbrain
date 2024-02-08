@@ -8,7 +8,7 @@ import org.simbrain.network.subnetworks.CompetitiveNetwork
 import org.simbrain.util.place
 
 /**
- * Demo for studying Hopfield networks,
+ * Demo for studying Competitive networks,
  */
 val competitiveSim = newSim {
 
@@ -27,19 +27,31 @@ val competitiveSim = newSim {
 
             addButton("Pattern 1") {
                 competitive.inputLayer.neuronList.activations =
-                    listOf()
+                    listOf(1.0, 0.5, 0.0, 0.0, 1.0, 0.5, 0.5)
 
             }
 
             addButton("Pattern 2") {
                 competitive.inputLayer.neuronList.activations =
-                    listOf()
+                    listOf(0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5)
 
             }
 
             addButton("Pattern 3") {
                 competitive.inputLayer.neuronList.activations =
-                    listOf()
+                    listOf(1.0, 0.0, 0.5, 1.0, 1.0, 0.0, 0.0)
+
+            }
+
+            addButton("Pattern 4") {
+                competitive.inputLayer.neuronList.activations =
+                    listOf(1.0, 1.0, 0.5, 0.0, 0.0, 0.0, 0.5)
+
+            }
+
+            addButton("Pattern 5") {
+                competitive.inputLayer.neuronList.activations =
+                    listOf(0.5, 1.0, 0.0, 0.5, 0.0, 0.5, 0.0)
 
             }
 

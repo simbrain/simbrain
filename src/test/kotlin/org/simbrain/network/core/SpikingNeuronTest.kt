@@ -24,10 +24,12 @@ class SpikingNeuronTest {
         val rule = SpikingThresholdRule()
         rule.threshold = .5
         n2.updateRule = rule
-        net.update()
-        assertTrue(n2.isSpike)
-        net.update()
-        assertFalse(n2.isSpike)
+        with(net) {
+            update()
+            assertTrue(n2.isSpike)
+            update()
+            assertFalse(n2.isSpike)
+        }
     }
 
     @Test

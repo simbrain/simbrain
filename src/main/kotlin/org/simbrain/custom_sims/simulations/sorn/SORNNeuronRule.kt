@@ -68,6 +68,7 @@ class SORNNeuronRule : SpikingThresholdRule(), NoisyUpdateRule {
     /**
      * Homeostatic plasticity of the default SORN network. {@inheritDoc}
      */
+    context(Network)
     fun plasticUpdate(neuron: Neuron) {
         threshold = threshold + (etaIP * ((if (neuron.isSpike) 1 else 0) - hIP))
         //        if (getThreshold() > maxThreshold) {

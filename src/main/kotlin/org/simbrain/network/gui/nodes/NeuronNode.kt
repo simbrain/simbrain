@@ -266,7 +266,7 @@ class NeuronNode(net: NetworkPanel, val neuron: Neuron) : ScreenElement(net) {
      * Sets the color of this neuron based on its activation level.
      */
     private fun updateColor() {
-        if (neuron.isSpike) {
+        if (with(networkPanel.network) { neuron.isSpike }) {
             return
         }
         val activation = neuron.updateRule.getGraphicalValue(neuron)
@@ -308,13 +308,13 @@ class NeuronNode(net: NetworkPanel, val neuron: Neuron) : ScreenElement(net) {
      */
     private fun updateSpikeColor() {
         if (!customStrokeColor) {
-            if (neuron.isSpike) {
+            if (with(networkPanel.network) { neuron.isSpike }) {
                 mainShape.strokePaint = spikingColor
                 mainShape.paint = spikingColor
             } else {
                 // "Erase" the spike color
                 // TODO: Interaction with polarity based coloring not tested.
-                mainShape.strokePaint = SynapseNode.getLineColor()
+                mainShape.strokePaint = SynapseNode.lineColor
             }
         }
     }

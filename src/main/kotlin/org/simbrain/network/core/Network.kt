@@ -225,7 +225,6 @@ class Network: CoroutineScope, EditableObject {
             neuron.updateInputs()
             neuron.update()
         }
-        flatNeuronList.forEach { it.networkTime = time }
     }
 
     /**
@@ -256,7 +255,6 @@ class Network: CoroutineScope, EditableObject {
     fun bufferedUpdate() {
         networkModels.all.forEach { it.updateInputs() }
         networkModels.all.forEach { it.update() }
-        flatNeuronList.forEach { it.networkTime = time }
     }
 
     suspend fun asyncBufferedUpdate()  = coroutineScope {
@@ -264,7 +262,6 @@ class Network: CoroutineScope, EditableObject {
         networkModels.getNonAsyncModels().forEach { it.updateInputs() }
         networkModels.getAsyncModels().map { async { it.update() } }.awaitAll()
         networkModels.getNonAsyncModels().forEach { it.update() }
-        flatNeuronList.forEach { it.networkTime = time }
     }
 
     /**

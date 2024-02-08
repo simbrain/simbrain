@@ -30,6 +30,8 @@ import java.util.function.Consumer
  */
 class NeuronCollection : AbstractNeuronCollection {
 
+    constructor(): super()
+
     constructor(neurons: List<Neuron>): super() {
         addNeurons(neurons)
 
@@ -130,11 +132,7 @@ class NeuronCollection : AbstractNeuronCollection {
 
     override fun postOpenInit() {
         super.postOpenInit()
-        neuronList.forEach(Consumer { n: Neuron? ->
-            this.addListener(
-                n!!
-            )
-        })
+        neuronList.forEach { addListener(it) }
     }
 
     /**

@@ -213,7 +213,7 @@ public final class SynapseDialog extends StandardDialog {
      * @return the synapses contained within the selected synapse nodes
      */
     private static List<Synapse> getSynapses(final Collection<SynapseNode> selectedSynapses) {
-        return selectedSynapses.stream().map(SynapseNode::getSynapse).collect(Collectors.toList());
+        return selectedSynapses.stream().map(SynapseNode::getModel).collect(Collectors.toList());
     }
 
 }

@@ -68,7 +68,7 @@ class NeuronGroupTest {
             net.addNetworkModelsAsync(ng2, wm)
             net.update()
             // System.out.println(Arrays.toString(ng2.getActivations()));
-            Assertions.assertEquals(1.0, ng.activations.sum(), .01)
+            Assertions.assertEquals(1.0, ng2.activations.sum(), .01)
         }
     }
 }

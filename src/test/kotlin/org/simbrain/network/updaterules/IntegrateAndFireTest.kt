@@ -31,10 +31,12 @@ class IntegrateAndFireTest {
     @Test
     fun `large current triggers one spike followed by no spike because of refractory period`() {
         intFire.backgroundCurrent = 1000.0
-        net.update()
-        assertEquals(true, n.isSpike)
-        net.update()
-        assertEquals(false, n.isSpike)
+        with(net) {
+            update()
+            assertEquals(true, n.isSpike)
+            update()
+            assertEquals(false, n.isSpike)
+        }
     }
 
     @Test
@@ -60,13 +62,15 @@ class IntegrateAndFireTest {
         intFire.refractoryPeriod = 5.0
         intFire.backgroundCurrent = 1000.0
         net.timeStep = 1.0
-        repeat(100) {
-            net.update()
-            // println("t = $it: act=${n.activation}")
-            if (it % (intFire.refractoryPeriod + 1) == 0.0) {
-                assertEquals(true, n.isSpike)
-            } else {
-                assertEquals(false, n.isSpike)
+        with(net) {
+            repeat(100) {
+                update()
+                // println("t = $it: act=${n.activation}")
+                if (it % (intFire.refractoryPeriod + 1) == 0.0) {
+                    assertEquals(true, n.isSpike)
+                } else {
+                    assertEquals(false, n.isSpike)
+                }
             }
         }
     }

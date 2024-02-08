@@ -26,9 +26,11 @@ class AllostaticRuleTest {
     }
 
     fun printNeuronState() {
-        println("ResInput: ${reservoirInput.activation}, ${reservoirInput.isSpike}")
-        println("Neuron: ${n.activation}, ${n.isSpike}")
-        println("Weight: ${resWeight.strength}")
+        with(net) {
+            println("ResInput: ${reservoirInput.activation}, ${reservoirInput.isSpike}")
+            println("Neuron: ${n.activation}, ${n.isSpike}")
+            println("Weight: ${resWeight.strength}")
+        }
     }
 
     // TODO
@@ -50,7 +52,7 @@ class AllostaticRuleTest {
         // threshold is 2 so it should spike
         n.activation = 3.0
         net.update()
-        assertTrue(n.isSpike)
+        with(net) { assertTrue(n.isSpike) }
     }
 
     @Test

@@ -235,6 +235,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
      * @param source source neuron
      * @param target target neuron
      */
+    @XStreamConstructor
     constructor(source: Neuron, target: Neuron) {
         this.source = source
         this.target = target

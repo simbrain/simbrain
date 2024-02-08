@@ -16,106 +16,106 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.gui.nodes;
+package org.simbrain.network.gui.nodes
 
-import org.piccolo2d.nodes.PPath;
-import org.piccolo2d.util.PBounds;
-import org.simbrain.network.core.Synapse;
-import org.simbrain.network.events.SynapseEvents;
-import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.NetworkPreferences;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.geom.Arc2D;
-import java.awt.geom.Area;
-import java.awt.geom.Line2D;
-import java.awt.geom.Point2D;
-
-import static org.simbrain.network.gui.NetworkDialogsKt.getSynapseDialog;
-import static org.simbrain.network.gui.NetworkPanelMenusKt.getSynapseContextMenu;
-import static org.simbrain.util.SwingUtilsKt.getSwingDispatcher;
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
+import org.piccolo2d.nodes.PPath
+import org.piccolo2d.util.PBounds
+import org.simbrain.network.NetworkModel
+import org.simbrain.network.core.Synapse
+import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.network.gui.dialogs.NetworkPreferences
+import org.simbrain.network.gui.dialogs.NetworkPreferences.excitatorySynapseColor
+import org.simbrain.network.gui.dialogs.NetworkPreferences.inhibitorySynapseColor
+import org.simbrain.network.gui.dialogs.NetworkPreferences.lineColor
+import org.simbrain.network.gui.dialogs.NetworkPreferences.maxWeightSize
+import org.simbrain.network.gui.dialogs.NetworkPreferences.minWeightSize
+import org.simbrain.network.gui.dialogs.NetworkPreferences.zeroWeightColor
+import org.simbrain.network.gui.nodes.NeuronNode.Companion.spikingColor
+import org.simbrain.network.gui.synapseContextMenu
+import org.simbrain.network.gui.synapseDialog
+import java.awt.Color
+import java.awt.geom.Arc2D
+import java.awt.geom.Area
+import java.awt.geom.Line2D
+import java.awt.geom.Point2D
+import javax.swing.JDialog
+import javax.swing.JPopupMenu
+import kotlin.math.abs
+import kotlin.math.atan
+import kotlin.math.cos
+import kotlin.math.sin
 
 /**
- * <b>SynapseNode</b> is a Piccolo PNode corresponding to a Neuron in the neural
+ * **SynapseNode** is a Piccolo PNode corresponding to a Neuron in the neural
  * network model.
  */
-public final class SynapseNode extends ScreenElement {
-
+class SynapseNode(
+    net: NetworkPanel?,
+    /**
+     * Reference to source neuron.
+     */
+    var source: NeuronNode,
+    /**
+     * Reference to target neuron.
+     */
+    var target: NeuronNode,
     /**
      * The logical synapse this screen element represents.
      */
-    private Synapse synapse;
+    @JvmField var synapse: Synapse
+) : ScreenElement(net!!) {
+    /**
+     * @return Returns the synapse.
+     */
+    /**
+     * @param synapse The synapse to set.
+     */
 
     /**
      * Location of circle relative to target node.
      */
-    private final double offset = 7;
+    private val offset = 7.0
 
     /**
      * Main circle of synapse.
      */
-    private PPath circle;
+    private var circle: PPath? = null
 
+    /**
+     * @return the line
+     */
     /**
      * Line connecting nodes. More of a loop for self connections.
      */
-    private PPath.Float line;
+    var line: Float? = null
+        private set
 
     /**
      * The line for bound checking.
      */
-    private Line2D.Float lineBound = new Line2D.Float();
+    val lineBound: Line2D.Float = Line2D.Float()
 
     /**
      * The arc for bound checking when the synapse is a self connection.
      */
-    private Arc2D.Float arcBound = new Arc2D.Float();
+    var arcBound: Arc2D.Float = Arc2D.Float()
+        private set
 
     /**
-     * Reference to source neuron.
+     * @return Returns the source.
      */
-    private NeuronNode source;
+    /**
+     * @param source The source to set.
+     */
 
     /**
-     * Reference to target neuron.
+     * @return Returns the target.
      */
-    private NeuronNode target;
-
     /**
-     * Used to approximate zero to prevent divide-by-zero errors.
+     * @param target The target to set.
      */
-    private static final double ZERO_PROXY = .001;
-
-    /**
-     * Color of "excitatory" synapses, with positive values.
-     */
-    private static Color excitatoryColor = NetworkPreferences.INSTANCE.getExcitatorySynapseColor();
-
-    /**
-     * Color of "inhibitory" synapses, with negative values.
-     */
-    private static Color inhibitoryColor = NetworkPreferences.INSTANCE.getInhibitorySynapseColor();
-
-    /**
-     * Color of "zero" weights.
-     */
-    private static Color zeroWeightColor = NetworkPreferences.INSTANCE.getZeroWeightColor();
-
-    /**
-     * Maximum diameter of the circle representing the synapse.
-     */
-    private static int maxDiameter = NetworkPreferences.INSTANCE.getMaxWeightSize();
-
-    /**
-     * Minimum diameter of the circle representing the synapse.
-     */
-    private static int minDiameter = NetworkPreferences.INSTANCE.getMinWeightSize();
-
-    /**
-     * Color of lines in synapse representation. Also used for node representation.
-     */
-    private static Color lineColor = NetworkPreferences.INSTANCE.getLineColor();
 
     /**
      * Create a new synapse node connecting a source and target neuron.
@@ -125,119 +125,108 @@ public final class SynapseNode extends ScreenElement {
      * @param target  target neuronmode
      * @param synapse the model synapse this PNode represents
      */
-    public SynapseNode(final NetworkPanel net, final NeuronNode source, final NeuronNode target, final Synapse synapse) {
+    init {
+        updatePosition()
+        this.addChild(circle)
+        this.addChild(line)
+        line!!.strokePaint = lineColor
+        line!!.lowerToBottom()
+        line!!.paint = null
 
-        super(net);
-        this.source = source;
-        this.target = target;
-        this.synapse = synapse;
+        updateColor()
+        updateDiameter()
 
-        updatePosition();
-        this.addChild(circle);
-        this.addChild(line);
-        line.setStrokePaint(lineColor);
-        line.lowerToBottom();
-        line.setPaint(null);
+        pickable = true
+        circle!!.pickable = true
+        line!!.pickable = false
 
-        updateColor();
-        updateDiameter();
+        val events = synapse.events
 
-        setPickable(true);
-        circle.setPickable(true);
-        line.setPickable(false);
+        events.deleted.on(dispatcher = Dispatchers.Swing) { s: NetworkModel? -> removeFromParent() }
+        events.strengthUpdated.on(dispatcher = Dispatchers.Swing) {
+            updateColor()
+            updateDiameter()
+        }
+        events.colorPreferencesChanged.on(dispatcher = Dispatchers.Swing) {
+            updateColor()
+            updateDiameter()
+            updateSpikeColor()
+        }
+        events.visbilityChanged.on(dispatcher = Dispatchers.Swing) { _, newVisibility -> visible = newVisibility }
+        visible = synapse.isVisible
+        events.clampChanged.on { this.updateClampStatus() }
+        updateClampStatus()
 
-        SynapseEvents events = synapse.getEvents();
-
-        events.getDeleted().on(getSwingDispatcher(), s -> removeFromParent());
-        events.getStrengthUpdated().on(getSwingDispatcher(), () -> {
-            updateColor();
-            updateDiameter();
-        });
-        events.getColorPreferencesChanged().on(getSwingDispatcher(), () -> {
-            updateColor();
-            updateDiameter();
-            updateSpikeColor();
-        });
-        events.getVisbilityChanged().on(getSwingDispatcher(), (oldVisibility, newVisibility) -> setVisible(newVisibility));
-        setVisible(synapse.isVisible());
-        events.getClampChanged().on(this::updateClampStatus);
-        updateClampStatus();
-
-        events.getLocationChanged().on(getSwingDispatcher(), this::updatePosition);
+        events.locationChanged.on(dispatcher = Dispatchers.Swing) { this.updatePosition() }
 
         // Respond to spiking events
-        source.getNeuron().getEvents().getSpiked().on(getSwingDispatcher(), s -> updateSpikeColor());
-
+        source.neuron.events.spiked.on(dispatcher = Dispatchers.Swing) { updateSpikeColor() }
     }
 
     /**
      * Update position of synapse.
      */
-    public void updatePosition() {
-
-        Point2D synapseCenter;
-
+    fun updatePosition() {
         // Position the synapse
-        if (isSelfConnection()) {
-            synapseCenter = globalToLocal(new Point2D.Double(target.getNeuron().getX() + offset + 3, target.getNeuron().getY() + offset + 3));
+        val synapseCenter = if (isSelfConnection) {
+            globalToLocal(Point2D.Double(target.neuron.x + offset + 3, target.neuron.y + offset + 3))
         } else {
-            synapseCenter = globalToLocal(calcCenter(source.getNeuron().getLocation(), target.getNeuron().getLocation()));
+            globalToLocal(calcCenter(source.neuron.location, target.neuron.location))
         }
-        this.offset(synapseCenter.getX() - offset, synapseCenter.getY() - offset);
+        this.offset(synapseCenter.x - offset, synapseCenter.y - offset)
 
         // Create the circle
         if (circle == null) {
-            circle = PPath.createEllipse(0, 0, (float) offset * 2, (float) offset * 2);
-            ((PPath) circle).setStrokePaint(null);
+            circle = createEllipse(0f, 0f, offset.toFloat() * 2, offset.toFloat() * 2)
+            circle!!.strokePaint = null
         }
-        double ea = 1;
-        double ea2 = ea * 2;
-        PBounds tempBounds = circle.getFullBounds();
-        setBounds(tempBounds.x - ea, tempBounds.y - ea, tempBounds.width + ea2, tempBounds.height + ea2);
+        val ea = 1.0
+        val ea2 = ea * 2
+        val tempBounds = circle!!.fullBounds
+        setBounds(tempBounds.x - ea, tempBounds.y - ea, tempBounds.width + ea2, tempBounds.height + ea2)
 
         // Create the line
         if (line == null) {
-            line = createLine(globalToLocal(synapseCenter));
+            line = createLine(globalToLocal(synapseCenter))
         }
 
         // Update the line (unless it's a self connection)
-        if (!isSelfConnection()) {
-            line.reset();
-            line.append(new Line2D.Double(globalToLocal(source.getNeuron().getLocation()), synapseCenter), false);
-            lineBound.setLine(source.getNeuron().getLocation(), localToGlobal(synapseCenter));
+        if (!isSelfConnection) {
+            line!!.reset()
+            line!!.append(Line2D.Double(globalToLocal(source.neuron.location), synapseCenter), false)
+            lineBound.setLine(source.neuron.location, localToGlobal(synapseCenter))
         } else {
             arcBound =
-                    new Arc2D.Float(
-                            (float) getGlobalBounds().getX(),
-                            (float) getGlobalBounds().getY() - 7,
-                            22,
-                            15,
-                            1,
-                            355,
-                            Arc2D.OPEN
-                    );
+                Arc2D.Float(
+                    globalBounds.getX().toFloat(),
+                    globalBounds.getY().toFloat() - 7,
+                    22f,
+                    15f,
+                    1f,
+                    355f,
+                    Arc2D.OPEN
+                )
         }
     }
 
     /**
      * of a synapse based on whether it is clamped or not.
      */
-    public void updateClampStatus() {
-        if (synapse.getFrozen()) {
-            circle.setStrokePaint(Color.black);
+    fun updateClampStatus() {
+        if (synapse.frozen) {
+            circle!!.strokePaint = Color.black
         } else {
-            circle.setStrokePaint(null);
+            circle!!.strokePaint = null
         }
     }
 
-    /**
-     * Whether this synapse connects a neuron to itself or not.
-     *
-     * @return true if this synapse connects a neuron to itself.
-     */
-    public boolean isSelfConnection() {
-        return (source.getNeuron() == target.getNeuron());
-    }
+    val isSelfConnection: Boolean
+        /**
+         * Whether this synapse connects a neuron to itself or not.
+         *
+         * @return true if this synapse connects a neuron to itself.
+         */
+        get() = (source.neuron == target.neuron)
 
     /**
      * Create the line depending on whether this is self connected or not.
@@ -245,11 +234,11 @@ public final class SynapseNode extends ScreenElement {
      * @param center the center of the synapse
      * @return the line
      */
-    private PPath.Float createLine(final Point2D center) {
-        if (isSelfConnection()) {
-            return new PPath.Float(new Arc2D.Float((float) getX(), (float) getY() - 7, 22, 15, 1, 355, Arc2D.OPEN));
+    private fun createLine(center: Point2D): Float {
+        return if (isSelfConnection) {
+            Float(Arc2D.Float(x.toFloat(), y.toFloat() - 7, 22f, 15f, 1f, 355f, Arc2D.OPEN))
         } else {
-            return new PPath.Float(new Line2D.Float(globalToLocal(source.getCenter()), center));
+            Float(Line2D.Float(globalToLocal(source.center), center))
         }
     }
 
@@ -257,24 +246,24 @@ public final class SynapseNode extends ScreenElement {
      * Calculates the color for a weight, based on its current strength.
      * Positive values are (for example) red, negative values blue.
      */
-    public void updateColor() {
-        if (synapse.getStrength() < 0) {
-            circle.setPaint(inhibitoryColor);
-        } else if (synapse.getStrength() == 0) {
-            circle.setPaint(zeroWeightColor);
+    fun updateColor() {
+        if (synapse.strength < 0) {
+            circle!!.paint = inhibitoryColor
+        } else if (synapse.strength == 0.0) {
+            circle!!.paint = zeroWeightColor
         } else {
-            circle.setPaint(excitatoryColor);
+            circle!!.paint = excitatoryColor
         }
     }
 
     /**
      * When spiking change the color of the line.
      */
-    private void updateSpikeColor() {
-        if (source.getNeuron().isSpike()) {
-            line.setStrokePaint(NeuronNode.getSpikingColor());
+    private fun updateSpikeColor() {
+        if (with(networkPanel.network) { source.neuron.isSpike }) {
+            line!!.strokePaint = spikingColor
         } else {
-            line.setStrokePaint(lineColor);
+            line!!.strokePaint = lineColor
         }
     }
 
@@ -282,47 +271,49 @@ public final class SynapseNode extends ScreenElement {
      * Update the diameter of the drawn weight based on the logical weight's
      * strength.
      */
-    public void updateDiameter() {
-        double diameter;
+    fun updateDiameter() {
+        val diameter: kotlin.Double
 
-        double upperBound = synapse.getUpperBound();
-        double lowerBound = synapse.getLowerBound();
-        double strength = synapse.getStrength();
+        var upperBound = synapse.upperBound
+        var lowerBound = synapse.lowerBound
+        var strength = synapse.strength
 
         // If upper or lower bound are set to zero use a proxy to prevent
         // division errors
-        if (upperBound == 0) {
-            upperBound = ZERO_PROXY;
+        if (upperBound == 0.0) {
+            upperBound = ZERO_PROXY
         }
-        if (lowerBound == 0) {
-            lowerBound = ZERO_PROXY;
+        if (lowerBound == 0.0) {
+            lowerBound = ZERO_PROXY
         }
 
         // If strength is out of bounds (which is allowed in the model), set it
         // to those bounds for the
         // sake of the GUI representation
         if (strength < lowerBound) {
-            strength = lowerBound;
+            strength = lowerBound
         }
         if (strength > upperBound) {
-            strength = upperBound;
+            strength = upperBound
         }
 
-        if (synapse.getStrength() == 0) {
-            diameter = minDiameter;
-        } else if (synapse.getStrength() > 0) {
-            diameter = ((maxDiameter - minDiameter) * (strength / upperBound) + minDiameter);
+        diameter = if (synapse.strength == 0.0) {
+            minDiameter.toDouble()
+        } else if (synapse.strength > 0) {
+            (maxDiameter - minDiameter) * (strength / upperBound) + minDiameter
         } else {
-            diameter = (((maxDiameter - minDiameter) * (Math.abs(strength / lowerBound))) + minDiameter);
+            ((maxDiameter - minDiameter) * (abs(
+                strength / lowerBound
+            ))) + minDiameter
         }
 
-        double delta = (circle.getBounds().getWidth() - diameter) / 2;
+        val delta = (circle!!.bounds.getWidth() - diameter) / 2
 
-        circle.setWidth(diameter);
-        circle.setHeight(diameter);
+        circle!!.setWidth(diameter)
+        circle!!.setHeight(diameter)
         // offset properly moves circle, but this is not reflected in bounds
-        circle.offset(delta, delta);
-        setBounds(circle.getFullBounds());
+        circle!!.offset(delta, delta)
+        setBounds(circle!!.fullBounds)
     }
 
     /**
@@ -333,65 +324,59 @@ public final class SynapseNode extends ScreenElement {
      * @param tar Target NeuronNode
      * @return the appropriate position for the synapse circle
      */
-    public Point2D calcCenter(final Point2D src, final Point2D tar) {
-
-        double sourceX = src.getX();
-        double sourceY = src.getY();
-        double targetX = tar.getX();
-        double targetY = tar.getY();
+    fun calcCenter(src: Point2D, tar: Point2D): Point2D {
+        val sourceX = src.x
+        val sourceY = src.y
+        val targetX = tar.x
+        val targetY = tar.y
 
         if (sourceX == targetX && sourceY == targetY) {
-            return new Point2D.Double(0, 0);
+            return Point2D.Double(0.0, 0.0)
         }
 
-        double x = Math.abs(sourceX - targetX);
-        double y = Math.abs(sourceY - targetY);
-        double alpha = Math.atan(y / x);
+        val x = abs(sourceX - targetX)
+        val y = abs(sourceY - targetY)
+        val alpha = atan(y / x)
 
-        double weightX = 0;
-        double weightY = 0;
+        var weightX = 0.0
+        var weightY = 0.0
 
-        int neuronOffset = NeuronNode.DIAMETER / 2;
+        val neuronOffset = NeuronNode.DIAMETER / 2
 
-        if (sourceX < targetX) {
-            weightX = targetX - (neuronOffset * Math.cos(alpha));
+        weightX = if (sourceX < targetX) {
+            targetX - (neuronOffset * cos(alpha))
         } else {
-            weightX = targetX + (neuronOffset * Math.cos(alpha));
+            targetX + (neuronOffset * cos(alpha))
         }
 
-        if (sourceY < targetY) {
-            weightY = targetY - (neuronOffset * Math.sin(alpha));
+        weightY = if (sourceY < targetY) {
+            targetY - (neuronOffset * sin(alpha))
         } else {
-            weightY = targetY + (neuronOffset * Math.sin(alpha));
+            targetY + (neuronOffset * sin(alpha))
         }
 
-        return new Point2D.Double(weightX, weightY);
+        return Point2D.Double(weightX, weightY)
     }
+
+    override val isDraggable: Boolean
+        /**
+         * @return
+         * @see ScreenElement
+         */
+        get() = false
 
     /**
-     * @return
      * @see ScreenElement
      */
-    public boolean isDraggable() {
-        return false;
+    protected fun hasToolTipText(): Boolean {
+        return true
     }
 
-    /**
-     * @see ScreenElement
-     */
-    protected boolean hasToolTipText() {
-        return true;
-    }
+    override val toolTipText: String
+        get() = synapse.toolTipText.toString()
 
-    @Override
-    public String getToolTipText() {
-        return String.valueOf(synapse.getToolTipText());
-    }
-
-    @Override
-    public JPopupMenu getContextMenu() {
-
-        // JPopupMenu contextMenu = new JPopupMenu();
+    override val contextMenu: JPopupMenu
+        get() = // JPopupMenu contextMenu = new JPopupMenu();
         //
         // contextMenu.add(new CutAction(getNetworkPanel()));
         // contextMenu.add(new CopyAction(getNetworkPanel()));
@@ -412,181 +397,107 @@ public final class SynapseNode extends ScreenElement {
         //
         // contextMenu.add(new SetSynapsePropertiesAction(getNetworkPanel()));
         //
-        // return contextMenu;
-        return getSynapseContextMenu(getNetworkPanel());
-    }
+            // return contextMenu;
+            networkPanel.synapseContextMenu
 
-    @Override
-    public JDialog getPropertyDialog() {
-        return getSynapseDialog(getNetworkPanel());
-    }
+    override val propertyDialog: JDialog
+        get() = networkPanel.synapseDialog
 
     /**
      * Returns String representation of this NeuronNode.
      *
      * @return String representation of this node.
      */
-    public String toString() {
-        String ret = new String();
-        ret += "SynapseNode: (" + this.getGlobalFullBounds().x + ")(" + getGlobalFullBounds().y + ")\n";
-        return ret;
+    override fun toString(): String {
+        var ret = ""
+        ret += "SynapseNode: (" + this.globalFullBounds.x + ")(" + globalFullBounds.y + ")\n"
+        return ret
     }
 
-    /**
-     * @return Returns the synapse.
-     */
-    public Synapse getSynapse() {
-        return synapse;
-    }
-
-    /**
-     * @param synapse The synapse to set.
-     */
-    public void setSynapse(final Synapse synapse) {
-        this.synapse = synapse;
-    }
-
-    /**
-     * @return Returns the source.
-     */
-    public NeuronNode getSource() {
-        return source;
-    }
-
-    /**
-     * @return Returns the target.
-     */
-    public NeuronNode getTarget() {
-        return target;
-    }
-
-    /**
-     * @param source The source to set.
-     */
-    public void setSource(final NeuronNode source) {
-        this.source = source;
-    }
-
-    /**
-     * @param target The target to set.
-     */
-    public void setTarget(final NeuronNode target) {
-        this.target = target;
-    }
-
-    @Override
-    public Synapse getModel() {
-        return getSynapse();
-    }
-
-    /**
-     * @return the excitatoryColor
-     */
-    public static Color getExcitatoryColor() {
-        return excitatoryColor;
-    }
-
-    /**
-     * @param excitatoryColor the excitatoryColor to set
-     */
-    public static void setExcitatoryColor(Color excitatoryColor) {
-        SynapseNode.excitatoryColor = excitatoryColor;
-    }
-
-    /**
-     * @return the inhibitoryColor
-     */
-    public static Color getInhibitoryColor() {
-        return inhibitoryColor;
-    }
-
-    /**
-     * @param inhibitoryColor the inhibitoryColor to set
-     */
-    public static void setInhibitoryColor(Color inhibitoryColor) {
-        SynapseNode.inhibitoryColor = inhibitoryColor;
-    }
-
-    /**
-     * @return the zeroWeightColor
-     */
-    public static Color getZeroWeightColor() {
-        return zeroWeightColor;
-    }
-
-    /**
-     * @param zeroWeightColor the zeroWeightColor to set
-     */
-    public static void setZeroWeightColor(Color zeroWeightColor) {
-        SynapseNode.zeroWeightColor = zeroWeightColor;
-    }
-
-    /**
-     * @return the maxDiameter
-     */
-    public static int getMaxDiameter() {
-        return maxDiameter;
-    }
-
-    /**
-     * @param maxDiameter the maxDiameter to set
-     */
-    public static void setMaxDiameter(int maxDiameter) {
-        SynapseNode.maxDiameter = maxDiameter;
-    }
-
-    /**
-     * @return the minDiameter
-     */
-    public static int getMinDiameter() {
-        return minDiameter;
-    }
-
-    /**
-     * @param minDiameter the minDiameter to set
-     */
-    public static void setMinDiameter(int minDiameter) {
-        SynapseNode.minDiameter = minDiameter;
-    }
-
-    /**
-     * @return the lineColor
-     */
-    public static Color getLineColor() {
-        return lineColor;
-    }
-
-    /**
-     * @param lineColor the lineColor to set
-     */
-    public static void setLineColor(Color lineColor) {
-        SynapseNode.lineColor = lineColor;
-    }
-
-    /**
-     * @return the line
-     */
-    public PPath.Float getLine() {
-        return line;
-    }
-
-    public Arc2D.Float getArcBound() {
-        return arcBound;
-    }
+    override val model: Synapse
+        get() = synapse
 
 
-    public Line2D.Float getLineBound() {
-        return lineBound;
-    }
-
-    @Override
-    public boolean isIntersecting(PBounds bound) {
-        if (isSelfConnection()) {
-            final var boundArea = new Area(bound);
-            boundArea.intersect(new Area((arcBound)));
-            return !boundArea.isEmpty();
+    override fun isIntersecting(bound: PBounds?): Boolean {
+        if (isSelfConnection) {
+            val boundArea = Area(bound)
+            boundArea.intersect(Area((arcBound)))
+            return !boundArea.isEmpty
         } else {
-            return bound.intersectsLine(lineBound);
+            return bound!!.intersectsLine(lineBound)
         }
+    }
+
+    companion object {
+        /**
+         * Used to approximate zero to prevent divide-by-zero errors.
+         */
+        private const val ZERO_PROXY = .001
+
+        /**
+         * @return the excitatoryColor
+         */
+        /**
+         * @param excitatoryColor the excitatoryColor to set
+         */
+        /**
+         * Color of "excitatory" synapses, with positive values.
+         */
+        var excitatoryColor: Color = excitatorySynapseColor
+
+        /**
+         * @return the inhibitoryColor
+         */
+        /**
+         * @param inhibitoryColor the inhibitoryColor to set
+         */
+        /**
+         * Color of "inhibitory" synapses, with negative values.
+         */
+        var inhibitoryColor: Color = inhibitorySynapseColor
+
+        /**
+         * @return the zeroWeightColor
+         */
+        /**
+         * @param zeroWeightColor the zeroWeightColor to set
+         */
+        /**
+         * Color of "zero" weights.
+         */
+        var zeroWeightColor: Color = NetworkPreferences.zeroWeightColor
+
+        /**
+         * @return the maxDiameter
+         */
+        /**
+         * @param maxDiameter the maxDiameter to set
+         */
+        /**
+         * Maximum diameter of the circle representing the synapse.
+         */
+        var maxDiameter: Int = maxWeightSize
+
+        /**
+         * @return the minDiameter
+         */
+        /**
+         * @param minDiameter the minDiameter to set
+         */
+        /**
+         * Minimum diameter of the circle representing the synapse.
+         */
+        var minDiameter: Int = minWeightSize
+
+        /**
+         * @return the lineColor
+         */
+        /**
+         * @param lineColor the lineColor to set
+         */
+        /**
+         * Color of lines in synapse representation. Also used for node representation.
+         */
+        var lineColor: Color = NetworkPreferences.lineColor
     }
 }

@@ -234,15 +234,17 @@ val objectTrackingSim = newSim {
  */
 class PercentIncomingNeuronRule: LinearRule() {
     val maxVal = 10.0
-    override fun apply(n: Neuron, data: BiasedScalarData) {
-        n.activation = maxVal * n.fanIn.count { it.source.isSpike }
-            .toDouble() / n.fanIn.size
+    context(Network)
+    override fun apply(neuron: Neuron, data: BiasedScalarData) {
+        neuron.activation = maxVal * neuron.fanIn.count { it.source.isSpike }
+            .toDouble() / neuron.fanIn.size
     }
 }
 
 /**
  * See equation (1) in Falandays et. al. 2021
  */
+context(Network)
 fun Neuron.getAllostaticInput(): Double {
     // Treat linear inputs as sensors and do normal connectionist updating
     val sensorInputs = fanIn.filter { it.source.updateRule is LinearRule}.sumOf { it.source.activation * it.strength }
@@ -337,22 +339,23 @@ class AllostaticUpdateRule: SpikingNeuronUpdateRule<AllostaticDataHolder, Spikin
 
     // Test getSpikingInput
     fun main() {
-        val net = Network()
-        val n1 = Neuron()
-        val n2 = Neuron()
-        net.addNetworkModelsAsync(n1, n2)
-        n1.clamped = true
-        n2.clamped = true
-        val n3 = Neuron()
-        net.addNetworkModelAsync(n3)
-        val s1 = Synapse(n1, n3)
-        s1.strength = 1.0
-        val s2 = Synapse(n2, n3)
-        s2.strength = .5
-        net.addNetworkModelsAsync(s1, s2)
-        n1.isSpike = true
-        n2.isSpike = true
-        println(n3.getAllostaticInput())
+        with(Network()) {
+            val n1 = Neuron()
+            val n2 = Neuron()
+            addNetworkModelsAsync(n1, n2)
+            n1.clamped = true
+            n2.clamped = true
+            val n3 = Neuron()
+            addNetworkModelAsync(n3)
+            val s1 = Synapse(n1, n3)
+            s1.strength = 1.0
+            val s2 = Synapse(n2, n3)
+            s2.strength = .5
+            addNetworkModelsAsync(s1, s2)
+            n1.isSpike = true
+            n2.isSpike = true
+            println(n3.getAllostaticInput())
+        }
     }
 
 }

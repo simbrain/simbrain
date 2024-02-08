@@ -41,7 +41,7 @@ class AdExTest {
     fun `spike occurs when membrane potential is set to peak voltage`() {
         n.activation = adEx.v_Peak
         net.update()
-        assertEquals(true, n.isSpike)
+        with(net) { assertEquals(true, n.isSpike) }
     }
 
     /**

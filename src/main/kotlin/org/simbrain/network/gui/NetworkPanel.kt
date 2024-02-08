@@ -149,13 +149,13 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         NeuronNode.hotColor = NetworkPreferences.hotNodeColor
         NeuronNode.coolColor = NetworkPreferences.coolNodeColor
         NeuronNode.spikingColor = NetworkPreferences.spikingColor
-        SynapseNode.setLineColor(NetworkPreferences.lineColor)
-        SynapseNode.setExcitatoryColor(NetworkPreferences.excitatorySynapseColor)
-        SynapseNode.setInhibitoryColor(NetworkPreferences.inhibitorySynapseColor)
-        SynapseNode.setZeroWeightColor(NetworkPreferences.zeroWeightColor)
-        SynapseNode.setMinDiameter(NetworkPreferences.minWeightSize)
-        SynapseNode.setMaxDiameter(NetworkPreferences.maxWeightSize)
-        SynapseNode.setZeroWeightColor(NetworkPreferences.zeroWeightColor)
+        SynapseNode.lineColor = NetworkPreferences.lineColor
+        SynapseNode.excitatoryColor = NetworkPreferences.excitatorySynapseColor
+        SynapseNode.inhibitoryColor = NetworkPreferences.inhibitorySynapseColor
+        SynapseNode.zeroWeightColor = NetworkPreferences.zeroWeightColor
+        SynapseNode.minDiameter = NetworkPreferences.minWeightSize
+        SynapseNode.maxDiameter = NetworkPreferences.maxWeightSize
+        SynapseNode.zeroWeightColor = NetworkPreferences.zeroWeightColor
 
         network.flatNeuronList.forEach {
             it.events.colorChanged.fireAndBlock()

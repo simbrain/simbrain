@@ -119,7 +119,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
     )
     var increment: Double = 0.1
 
-    var networkTime = 0.0
+    private var _isSpike = false
 
     /**
      * Whether or not this neuron has spiked. Specifically if the result of
@@ -127,11 +127,13 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
      * potential at time t+1. True on t+1 in that case. Always false for
      * non-spiking neuron update rules.
      */
-    var isSpike: Boolean = false
+    context(Network)
+    var isSpike: Boolean
+        get() = _isSpike
         set(spike) {
-            field = spike
+            _isSpike = spike
             if (dataHolder is SpikingScalarData) {
-                (dataHolder as SpikingScalarData).setHasSpiked(spike, networkTime)
+                (dataHolder as SpikingScalarData).setHasSpiked(spike, time)
             }
             events.spiked.fireAndForget(spike)
         }

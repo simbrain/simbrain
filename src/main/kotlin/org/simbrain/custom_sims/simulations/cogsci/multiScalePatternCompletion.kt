@@ -179,9 +179,11 @@ val allostaticPatternCompletion = newSim {
             word = word?.dropLast(2)
         }
         inputs.forceSetActivations(inputEncodings[word] ?: zeroInput)
-        spikes = reservoir.neuronList.map {
-            if (it.isSpike) 1.0 else 0.0
-        }.toDoubleArray()
+        spikes = with(network) {
+            reservoir.neuronList.map {
+                if (it.isSpike) 1.0 else 0.0
+            }.toDoubleArray()
+        }
     })
 
     workspace.updater.updateManager.clear()

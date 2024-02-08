@@ -16,11 +16,11 @@ import org.simbrain.util.toMatrix
 class BackpropTests {
 
     val net = Network()
-    val na1 = NeuronArray(net, 2)
-    val na2 = NeuronArray(net, 3)
-    val na3 = NeuronArray(net, 2)
-    val wm1 = WeightMatrix(net, na1, na2)
-    val wm2 = WeightMatrix(net, na2, na3)
+    val na1 = NeuronArray(2)
+    val na2 = NeuronArray(3)
+    val na3 = NeuronArray(2)
+    val wm1 = WeightMatrix(na1, na2)
+    val wm2 = WeightMatrix(na2, na3)
 
     init {
         listOf(na1, na2, na3).forEach {
@@ -117,16 +117,18 @@ class BackpropTests {
 
     @Test
     fun `test four node layers`() {
-        val na4 = NeuronArray(net, 2)
-        val wm3 = WeightMatrix(net, na3, na4)
-        net.addNetworkModelsAsync(wm3, na4)
-        repeat(100) {
-            listOf(wm1, wm2, wm3).forwardPass(inputVector)
-            listOf(wm1, wm2, wm3).backpropError(targetVector, .1)
-            // println(targets.toDoubleArray() sse wm2.output.toDoubleArray())
+        with(net) {
+            val na4 = NeuronArray(2)
+            val wm3 = WeightMatrix(na3, na4)
+            net.addNetworkModelsAsync(wm3, na4)
+            repeat(100) {
+                listOf(wm1, wm2, wm3).forwardPass(inputVector)
+                listOf(wm1, wm2, wm3).backpropError(targetVector, .1)
+                // println(targets.toDoubleArray() sse wm2.output.toDoubleArray())
+            }
+            println("Outputs: ${na4.activations}, SSE = ${targetVector sse na4.activations}")
+            assertEquals(0.0, targetVector sse na4.activations, .01)
         }
-        println("Outputs: ${na4.activations}, SSE = ${targetVector sse na4.activations}")
-        assertEquals(0.0, targetVector sse na4.activations, .01)
     }
 
     @Test

@@ -3,7 +3,6 @@ package org.simbrain.network.kotlindl
 import org.jetbrains.kotlinx.dl.api.core.layer.convolutional.ConvPadding
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.simbrain.network.core.Network
 
 
 class DeepNetTest {
@@ -11,7 +10,6 @@ class DeepNetTest {
     @Test
     fun `test simple ff`() {
         val deepNet = DeepNet(
-            Network(),
             arrayListOf(TFInputLayer(2), TFDenseLayer(5), TFDenseLayer(7)),
             4
         )
@@ -24,7 +22,6 @@ class DeepNetTest {
     @Test
     fun `test conv net`() {
         val deepNet = DeepNet(
-            Network(),
             arrayListOf(
                 TFInputLayer(5, 5, 3),
                 TFConv2DLayer().apply {

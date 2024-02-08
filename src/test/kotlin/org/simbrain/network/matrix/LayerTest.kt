@@ -11,9 +11,9 @@ import smile.math.matrix.Matrix
 class LayerTest {
 
     var net = Network()
-    var na1 = NeuronArray(net, 2)
-    var na2 = NeuronArray(net, 2)
-    var wm = WeightMatrix(net, na1, na2)
+    var na1 = NeuronArray(2)
+    var na2 = NeuronArray(2)
+    var wm = WeightMatrix(na1, na2)
 
     @Test
     internal fun `getWeightedInputs returns correct values`() {

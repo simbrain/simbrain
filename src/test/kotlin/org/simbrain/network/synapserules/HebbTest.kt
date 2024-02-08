@@ -12,14 +12,14 @@ class HebbTest {
     var net = Network()
 
     // For scalar based tests
-    val n1 = Neuron(net)
-    val n2 = Neuron(net)
+    val n1 = Neuron()
+    val n2 = Neuron()
     var s12 = Synapse(n1,n2)
 
     // For array based tests
-    val na1 = NeuronArray(net, 2)
-    val na2 = NeuronArray(net, 2)
-    var wm12 = WeightMatrix(net, na1, na2)
+    val na1 = NeuronArray(2)
+    val na2 = NeuronArray(2)
+    var wm12 = WeightMatrix(na1, na2)
 
     init {
         net.addNetworkModelsAsync(n1, n2, s12, na1, na2, wm12)
@@ -111,8 +111,8 @@ class HebbTest {
     fun `test vectorized rule for 3-to-2 case`() {
         val inputs = doubleArrayOf(2.0, 0.0, -1.0).toMatrix()
         val outputs = doubleArrayOf(.5, -.5).toMatrix()
-        val na1_v2 = NeuronArray(net, 3)
-        val wm_v2 = WeightMatrix(net, na1_v2, na2).apply {
+        val na1_v2 = NeuronArray(3)
+        val wm_v2 = WeightMatrix(na1_v2, na2).apply {
             learningRule = HebbianRule().apply {
                 learningRate = 1.0
             }

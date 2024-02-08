@@ -16,10 +16,10 @@ class PlacementManagerTest {
     fun `test default placements`() {
 
         // Place two neurons. They should be offset by default amount
-        val n1 = Neuron(net)
+        val n1 = Neuron()
         net.addNetworkModelAsync(n1)
         pm.placeObject(n1)
-        val n2 = Neuron(net)
+        val n2 = Neuron()
         net.addNetworkModelAsync(n2)
         pm.placeObject(n2)
         val neuronOffset = pm.deltaDragMap.get(n2::class)

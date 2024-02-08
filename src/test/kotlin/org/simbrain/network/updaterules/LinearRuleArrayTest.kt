@@ -13,11 +13,11 @@ import org.simbrain.util.toMatrix
 class LinearRuleArrayTest {
 
     val net = Network()
-    var input1 = NeuronArray(net, 2)
-    var input2 = NeuronArray(net, 2)
-    val output = NeuronArray(net, 2)
-    var w13 = WeightMatrix(net, input1, output)
-    var w23 = WeightMatrix(net, input2, output)
+    var input1 = NeuronArray( 2)
+    var input2 = NeuronArray( 2)
+    val output = NeuronArray( 2)
+    var w13 = WeightMatrix(input1, output)
+    var w23 = WeightMatrix(input2, output)
 
     init {
         net.addNetworkModelsAsync(input1, input2, output, w13, w23)

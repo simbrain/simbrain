@@ -14,14 +14,14 @@
 package org.simbrain.network.subnetworks
 
 import org.simbrain.network.core.Network
+import org.simbrain.network.core.NeuronArray
+import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.core.XStreamConstructor
-import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.network.matrix.WeightMatrix
-import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SRNTrainer
 import org.simbrain.network.trainers.Trainable
 import org.simbrain.network.trainers.createDiagonalDataset
+import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.offsetNeuronGroup
@@ -48,13 +48,11 @@ class SRNNetwork: FeedForward, Trainable {
     override lateinit var trainingSet: MatrixDataset
 
     constructor(
-        network: Network,
         numInputNodes: Int = 10,
         numHiddenNodes: Int = 10,
         numOutputNodes: Int = 10,
         initialPosition: Point2D = point(0, 0)
     ): super(
-        network,
         intArrayOf(numInputNodes, numHiddenNodes, numOutputNodes),
         initialPosition
     ) {
@@ -64,7 +62,7 @@ class SRNNetwork: FeedForward, Trainable {
             it.updateRule = SigmoidalRule()
         }
 
-        contextLayer = NeuronArray(parentNetwork, numHiddenNodes).apply {
+        contextLayer = NeuronArray(numHiddenNodes).apply {
             updateRule = LinearRule()
         }
         contextLayer.fillActivations(.5)
@@ -82,7 +80,7 @@ class SRNNetwork: FeedForward, Trainable {
         offsetNeuronGroup(inputLayer, contextLayer, Direction.EAST,
             100.0, 100.0, 200.0 )
 
-        contextToHidden = WeightMatrix(parentNetwork, contextLayer, hiddenLayer)
+        contextToHidden = WeightMatrix(contextLayer, hiddenLayer)
         contextToHidden.randomize()
         addModels(contextToHidden)
 
@@ -93,7 +91,7 @@ class SRNNetwork: FeedForward, Trainable {
 
 
     @XStreamConstructor
-    protected constructor(parentNetwork: Network) : super(parentNetwork)
+    protected constructor() : super()
 
     @Transient
     var _trainer: SRNTrainer? = null
@@ -106,6 +104,7 @@ class SRNNetwork: FeedForward, Trainable {
 
     override fun onCommit() {}
 
+    context(Network)
     override fun update() {
         inputLayer.updateInputs()
         inputLayer.update()
@@ -132,6 +131,7 @@ class SRNNetwork: FeedForward, Trainable {
         inputLayer.addInputs(inputs)
     }
 
+    context(Network)
     override fun randomize() {
         super.randomize()
         contextToHidden.randomize()
@@ -158,8 +158,8 @@ class SRNNetwork: FeedForward, Trainable {
 
         override val name = "SRN Network"
 
-        fun create(net: Network): SRNNetwork {
-            return SRNNetwork(net, nin, nhidden, nout, initialPosition)
+        fun create(): SRNNetwork {
+            return SRNNetwork(nin, nhidden, nout, initialPosition)
         }
 
     }

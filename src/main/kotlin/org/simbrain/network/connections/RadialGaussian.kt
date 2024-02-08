@@ -17,14 +17,11 @@
  */
 package org.simbrain.network.connections
 
-import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
-import org.simbrain.util.stats.distributions.UniformRealDistribution
-import java.util.concurrent.Callable
 
 const val DEFAULT_DIST_CONST: Double = 0.25
 
@@ -134,16 +131,11 @@ class RadialGaussian(
     // based on distance, but a specific number of connections are guaranteed to be made.
 
     override fun connectNeurons(
-        network: Network,
         source: List<Neuron>,
-        target: List<Neuron>,
-        addToNetwork: Boolean
+        target: List<Neuron>
     ): List<Synapse> {
         val syns: List<Synapse> = createRadialPolarizedSynapses(source, target, eeDistConst, eiDistConst, ieDistConst, iiDistConst, distConst, lambda)
         polarizeSynapses(syns, percentExcitatory)
-        if (addToNetwork) {
-            network.addNetworkModelsAsync(syns)
-        }
         return syns
     }
 
@@ -156,54 +148,54 @@ class RadialGaussian(
             commonCopy(it)
         }
     }
-
-    private inner class ConnectorService constructor(
-        private val srcColl: Collection<Neuron>,
-        private val targColl: Collection<Neuron>?,
-        private val loose: Boolean,
-    ) : Callable<Collection<Synapse>> {
-        var rand: UniformRealDistribution = UniformRealDistribution(0.0, 1.0);
-        @Throws(Exception::class)
-        public override fun call(): Collection<Synapse> {
-            // Attempting to pre-allocate... assumes that connection density
-            // will be less than #src * #tar * 0.2 or 20% connectivity
-            val synapses: MutableList<Synapse> =
-                ArrayList(Math.ceil(srcColl.size * targColl!!.size * 0.2 * 0.75).toInt())
-            for (src: Neuron in srcColl) {
-                for (tar: Neuron in targColl) {
-                    val randVal: Double = rand.sampleDouble()
-                    var probability: Double
-                    if (src.polarity === Polarity.EXCITATORY) {
-                        if (tar.polarity === Polarity.EXCITATORY) {
-                            probability = calcConnectProb(src, tar, eeDistConst, lambda)
-                        } else if (tar.polarity === Polarity.INHIBITORY) {
-                            probability = calcConnectProb(src, tar, eiDistConst, lambda)
-                        } else {
-                            probability = calcConnectProb(src, tar, distConst, lambda)
-                        }
-                    } else if (src.polarity === Polarity.INHIBITORY) {
-                        if (tar.polarity === Polarity.EXCITATORY) {
-                            probability = calcConnectProb(src, tar, ieDistConst, lambda)
-                        } else if (tar.polarity === Polarity.INHIBITORY) {
-                            probability = calcConnectProb(src, tar, iiDistConst, lambda)
-                        } else {
-                            probability = calcConnectProb(src, tar, distConst, lambda)
-                        }
-                    } else {
-                        probability = calcConnectProb(src, tar, distConst, lambda)
-                    }
-                    if (randVal < probability) {
-                        val s: Synapse = Synapse(src, tar)
-                        synapses.add(s)
-                        if (loose) {
-                            src.network?.addNetworkModelAsync(s)
-                        }
-                    }
-                }
-            }
-            return synapses
-        }
-    }
+    //
+    // private inner class ConnectorService constructor(
+    //     private val srcColl: Collection<Neuron>,
+    //     private val targColl: Collection<Neuron>?,
+    //     private val loose: Boolean,
+    // ) : Callable<Collection<Synapse>> {
+    //     var rand: UniformRealDistribution = UniformRealDistribution(0.0, 1.0);
+    //     @Throws(Exception::class)
+    //     public override fun call(): Collection<Synapse> {
+    //         // Attempting to pre-allocate... assumes that connection density
+    //         // will be less than #src * #tar * 0.2 or 20% connectivity
+    //         val synapses: MutableList<Synapse> =
+    //             ArrayList(Math.ceil(srcColl.size * targColl!!.size * 0.2 * 0.75).toInt())
+    //         for (src: Neuron in srcColl) {
+    //             for (tar: Neuron in targColl) {
+    //                 val randVal: Double = rand.sampleDouble()
+    //                 var probability: Double
+    //                 if (src.polarity === Polarity.EXCITATORY) {
+    //                     if (tar.polarity === Polarity.EXCITATORY) {
+    //                         probability = calcConnectProb(src, tar, eeDistConst, lambda)
+    //                     } else if (tar.polarity === Polarity.INHIBITORY) {
+    //                         probability = calcConnectProb(src, tar, eiDistConst, lambda)
+    //                     } else {
+    //                         probability = calcConnectProb(src, tar, distConst, lambda)
+    //                     }
+    //                 } else if (src.polarity === Polarity.INHIBITORY) {
+    //                     if (tar.polarity === Polarity.EXCITATORY) {
+    //                         probability = calcConnectProb(src, tar, ieDistConst, lambda)
+    //                     } else if (tar.polarity === Polarity.INHIBITORY) {
+    //                         probability = calcConnectProb(src, tar, iiDistConst, lambda)
+    //                     } else {
+    //                         probability = calcConnectProb(src, tar, distConst, lambda)
+    //                     }
+    //                 } else {
+    //                     probability = calcConnectProb(src, tar, distConst, lambda)
+    //                 }
+    //                 if (randVal < probability) {
+    //                     val s: Synapse = Synapse(src, tar)
+    //                     synapses.add(s)
+    //                     if (loose) {
+    //                         src.network?.addNetworkModelAsync(s)
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //         return synapses
+    //     }
+    // }
 
     // inner class DensityEstimator constructor() : Runnable {
     //     var densityEsitmate: Double = 0.0

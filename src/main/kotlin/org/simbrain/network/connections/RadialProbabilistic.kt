@@ -17,7 +17,6 @@
  */
 package org.simbrain.network.connections
 
-import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.util.SimnetUtils
@@ -108,10 +107,8 @@ class RadialProbabilistic(
      * Connect neurons.
      */
     override fun connectNeurons(
-        network: Network,
         source: List<Neuron>,
-        target: List<Neuron>,
-        addToNetwork: Boolean
+        target: List<Neuron>
     ): List<Synapse> {
         val exc = createProbabilisticallySynapses(source, target, excitatoryProbability,
             excitatoryRadius, allowSelfConnections, NormalDistribution(1.0,.1)
@@ -120,9 +117,6 @@ class RadialProbabilistic(
             excitatoryRadius, allowSelfConnections, NormalDistribution(-1.0,0.1)
         )
         val syns = exc + inh
-        if (addToNetwork) {
-            network.addNetworkModelsAsync(syns)
-        }
         return syns
     }
 

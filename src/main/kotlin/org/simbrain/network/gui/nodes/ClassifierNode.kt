@@ -6,11 +6,8 @@ import org.simbrain.network.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.dialogs.getTrainingDialog
 import org.simbrain.network.smile.SmileClassifier
-import org.simbrain.util.StandardDialog
-import org.simbrain.util.Utils
+import org.simbrain.util.*
 import org.simbrain.util.piccolo.*
-import org.simbrain.util.toDoubleArray
-import org.simbrain.util.toSimbrainColorImage
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.SimbrainDesktop
 import javax.swing.JMenuItem
@@ -84,41 +81,41 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
      */
     private fun computeInfoText() = "Winning class: ${smileClassifier.winningLabel}"
 
-    override fun getModel(): NetworkModel {
-        return smileClassifier
-    }
+    override val model: NetworkModel
+        get() = smileClassifier
 
-    override fun getToolTipText(): String {
-        return  """ 
-                <html>
-                Output: (${Utils.doubleArrayToString(smileClassifier.outputs.toDoubleArray(), 2)})<br>
-                Input: (${Utils.doubleArrayToString(smileClassifier.inputs.toDoubleArray(), 2)})
-                </html>
-                """.trimIndent()
-    }
+    override val toolTipText: String
+        get() = """ 
+            <html>
+            Output: (${Utils.doubleArrayToString(smileClassifier.outputs.toDoubleArray(), 2)})<br>
+            Input: (${Utils.doubleArrayToString(smileClassifier.inputs.toDoubleArray(), 2)})
+            </html>
+            """.trimIndent()
 
-    override fun getContextMenu(): JPopupMenu? {
-        return JPopupMenu().apply {
-            add(JMenuItem("Set Properties / Train ...").apply { addActionListener {
-                propertyDialog.run { makeVisible() }
-            } })
+    override val contextMenu: JPopupMenu
+        get() = JPopupMenu().apply {
+            add(JMenuItem("Set Properties / Train ...").apply {
+                addActionListener {
+                    propertyDialog?.display()
+                }
+            })
             addSeparator()
-            add(SimbrainDesktop.actionManager.createCoupledProjectionPlotAction(
-                smileClassifier.getProducer(SmileClassifier::getInputActivations),
-                objectName = "${smileClassifier.id ?: "Smile Classifier"} Inputs"
+            add(
+                SimbrainDesktop.actionManager.createCoupledProjectionPlotAction(
+                    smileClassifier.getProducer(SmileClassifier::getInputActivations),
+                    objectName = "${smileClassifier.id ?: "Smile Classifier"} Inputs"
+                )
             )
-            )
-            add(SimbrainDesktop.actionManager.createCoupledProjectionPlotAction(
-                smileClassifier.getProducer(SmileClassifier::outputActivations),
-                objectName = "${smileClassifier.id ?: "Smile Classifier"} Outputs"
-            )
+            add(
+                SimbrainDesktop.actionManager.createCoupledProjectionPlotAction(
+                    smileClassifier.getProducer(SmileClassifier::outputActivations),
+                    objectName = "${smileClassifier.id ?: "Smile Classifier"} Outputs"
+                )
             )
         }
-    }
 
-    override fun getPropertyDialog(): StandardDialog {
-        return smileClassifier.getTrainingDialog()
-    }
+    override val propertyDialog: StandardDialog
+        get() = smileClassifier.getTrainingDialog()
 
 }
 

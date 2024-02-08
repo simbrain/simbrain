@@ -4,13 +4,13 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.synapse_update_rules.PfisterGerstner2006Rule
+import org.simbrain.network.learningrules.PfisterGerstner2006Rule
 
 class PfisterGerstner2006Test {
 
     var net = Network()
-    val n1 = Neuron(net)
-    val n2 = Neuron(net)
+    val n1 = Neuron()
+    val n2 = Neuron()
     var s12 = Synapse(n1,n2)
 
     init {

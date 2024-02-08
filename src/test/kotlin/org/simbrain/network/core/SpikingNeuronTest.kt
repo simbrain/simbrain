@@ -2,14 +2,14 @@ package org.simbrain.network.core
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import org.simbrain.network.neuron_update_rules.SpikingThresholdRule
+import org.simbrain.network.updaterules.SpikingThresholdRule
 
 class SpikingNeuronTest {
 
     var net = Network()
-    val n1 = Neuron(net);
-    val n2 = Neuron(net);
-    val n3 = Neuron(net);
+    val n1 = Neuron();
+    val n2 = Neuron();
+    val n3 = Neuron();
 
     init {
         net.addNetworkModelsAsync(listOf(n1, n2, n3))

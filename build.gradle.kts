@@ -6,7 +6,7 @@ plugins {
     `java-library`
     idea
     application
-    kotlin("jvm") version "1.9.10"
+    kotlin("jvm") version "1.9.22"
     id("ua.eshepelyuk.ManifestClasspath") version "1.0.0"
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
@@ -47,7 +47,7 @@ repositories {
 dependencies {
 
     // Kotlin
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.10")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.22")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.3")
 

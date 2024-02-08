@@ -24,9 +24,8 @@ import kotlin.reflect.full.primaryConstructor
  *
  */
 class SmileClassifier(
-    val net: Network,
     val classifier: ClassificationAlgorithm
-) : ArrayLayer(net, classifier.inputSize), EditableObject {
+) : ArrayLayer(classifier.inputSize), EditableObject {
 
     /**
      * Integer winner produced by the Smile classifier when predict is called.
@@ -47,14 +46,7 @@ class SmileClassifier(
 
     override val bound: Rectangle2D
         get() = Rectangle2D.Double(x - width / 2, y - height / 2, width, height)
-
-    /**
-     * Construct a classifier.
-     */
-    init {
-        label = net.idManager.getProposedId(this::class.java)
-    }
-
+    
     /**
      * Train the classifier using the current training data.
      */
@@ -125,7 +117,7 @@ class SmileClassifier(
                 val map = constructor.parameters.associateWith { p -> paramMap[p.name] }
                 constructor.callBy(map)
             }!!
-            return SmileClassifier(net, classifier)
+            return SmileClassifier(classifier)
         }
 
     }

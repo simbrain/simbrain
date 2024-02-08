@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.updaterules.ThreeValueRule;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -14,21 +15,21 @@ public class ThreeValueRuleTest {
         ThreeValueRule threeValRule = new ThreeValueRule();
 
         // Setup the input neuron
-        Neuron input1 =  new Neuron(net);
+        Neuron input1 =  new Neuron();
         input1.setActivation(-0.1);
         input1.setClamped(true);
         net.addNetworkModelAsync(input1);
 
         // Set up the rule
-        threeValRule.setLowerValue(-0.71);
-        threeValRule.setMiddleValue(0.1);
-        threeValRule.setUpperValue(0.92);
+        threeValRule.lowerValue = -0.71;
+        threeValRule.middleValue = 0.1;
+        threeValRule.upperValue = 0.92;
 
-        threeValRule.setLowerThreshold(0.3);
-        threeValRule.setUpperThreshold(0.65);
+        threeValRule.lowerThreshold = 0.3;
+        threeValRule.upperThreshold = 0.65;
 
         // Set up the output neuron
-        Neuron output = new Neuron(net, threeValRule);
+        Neuron output = new Neuron(threeValRule);
         output.setActivation(0.0);
         net.addNetworkModelAsync(output);
 
@@ -48,21 +49,21 @@ public class ThreeValueRuleTest {
         ThreeValueRule threeValRule = new ThreeValueRule();
 
         // Setup the input neuron
-        Neuron input1 =  new Neuron(net);
+        Neuron input1 =  new Neuron();
         input1.setActivation(0.4);
         input1.setClamped(true);
         net.addNetworkModelAsync(input1);
 
         // Set up the rule
-        threeValRule.setLowerValue(-0.71);
-        threeValRule.setMiddleValue(0.1);
-        threeValRule.setUpperValue(0.92);
+        threeValRule.lowerValue = -0.71;
+        threeValRule.middleValue = 0.1;
+        threeValRule.upperValue = 0.92;
 
-        threeValRule.setLowerThreshold(0.3);
-        threeValRule.setUpperThreshold(0.65);
+        threeValRule.lowerThreshold = 0.3;
+        threeValRule.upperThreshold = 0.65;
 
         // Set up the output neuron
-        Neuron output = new Neuron(net, threeValRule);
+        Neuron output = new Neuron(threeValRule);
         output.setActivation(0.0);
         net.addNetworkModelAsync(output);
 
@@ -82,21 +83,21 @@ public class ThreeValueRuleTest {
         ThreeValueRule threeValRule = new ThreeValueRule();
 
         // Setup the input neuron
-        Neuron input1 =  new Neuron(net);
+        Neuron input1 =  new Neuron();
         input1.setActivation(0.8);
         input1.setClamped(true);
         net.addNetworkModelAsync(input1);
 
         // Set up the rule
-        threeValRule.setLowerValue(-0.71);
-        threeValRule.setMiddleValue(0.1);
-        threeValRule.setUpperValue(0.92);
+        threeValRule.lowerValue = -0.71;
+        threeValRule.middleValue = 0.1;
+        threeValRule.upperValue = 0.92;
 
-        threeValRule.setLowerThreshold(0.3);
-        threeValRule.setUpperThreshold(0.65);
+        threeValRule.lowerThreshold = 0.3;
+        threeValRule.upperThreshold = 0.65;
 
         // Set up the output neuron
-        Neuron output = new Neuron(net, threeValRule);
+        Neuron output = new Neuron(threeValRule);
         output.setActivation(0.0);
         net.addNetworkModelAsync(output);
 

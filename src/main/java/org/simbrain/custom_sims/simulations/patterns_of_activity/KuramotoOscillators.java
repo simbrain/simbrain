@@ -9,9 +9,9 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SynapseGroup;
 import org.simbrain.network.layouts.HexagonalGridLayout;
 import org.simbrain.network.layouts.LineLayout;
-import org.simbrain.network.neuron_update_rules.KuramotoRule;
-import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neurongroups.NeuronGroup;
+import org.simbrain.network.updaterules.KuramotoRule;
+import org.simbrain.network.updaterules.LinearRule;
 import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.util.SimbrainConstants.Polarity;
 import org.simbrain.util.piccolo.TMXUtils;
@@ -86,7 +86,7 @@ public class KuramotoOscillators extends Simulation {
         // Main recurrent net
         List<Neuron> neuronList = new ArrayList<>();
         for (int ii = 0; ii < netSize; ++ii) {
-            Neuron n = new Neuron(net);
+            Neuron n = new Neuron();
             // Allostatic also works pretty nicely here
             n.setUpdateRule(new KuramotoRule());
             if (Math.random() < 0.5) {
@@ -99,7 +99,7 @@ public class KuramotoOscillators extends Simulation {
             //    .mean(0).standardDeviation(0.2).build());
             neuronList.add(n);
         }
-        reservoirNet = new NeuronGroup(net, neuronList);
+        reservoirNet = new NeuronGroup(neuronList);
         reservoirNet.setLayout(new HexagonalGridLayout(spacing, spacing, (int) Math.sqrt(neuronList.size())));
         net.addNetworkModelAsync(reservoirNet);
         reservoirNet.setLocation(185,50);

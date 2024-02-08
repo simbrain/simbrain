@@ -21,8 +21,7 @@ package org.simbrain.network.util;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.network.synapse_update_rules.StaticSynapseRule;
+import org.simbrain.network.learningrules.StaticSynapseRule;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -98,7 +97,7 @@ public final class CascadingNetworkBuilder {
      */
     public void buildNetwork() {
 
-        Neuron firstNeuron = new Neuron(network);
+        Neuron firstNeuron = new Neuron();
         List<Neuron> currentLayer = new ArrayList<Neuron>();
         firstNeuron.setLocation(initialPosition);
         currentLayer.add(firstNeuron);
@@ -124,12 +123,12 @@ public final class CascadingNetworkBuilder {
                 network.addNetworkModelAsync(baseNeuron);
                 double initialXOffset = branchWidth / 2;
                 for (int j = 0; j < numBrachesPerNeuron; j++) {
-                    Neuron targetNeuron = new Neuron(network, new LinearRule()); // TODO;
+                    Neuron targetNeuron = new Neuron(); // TODO;
                     targetNeuron.setLocation(baseNeuron.getX() - initialXOffset + (j * layerSpacing), initialPosition.y - (layerIndex * verticalSpacing));
                     tempList.add(targetNeuron);
                     network.addNetworkModelAsync(targetNeuron);
                     targetNeuron.setUpdatePriority(layerIndex);
-                    Synapse synapse = new Synapse(network, baseNeuron, targetNeuron, new StaticSynapseRule());
+                    Synapse synapse = new Synapse(baseNeuron, targetNeuron, new StaticSynapseRule());
                     network.addNetworkModelAsync(synapse);
                 }
             }

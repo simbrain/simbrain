@@ -16,8 +16,8 @@ import kotlin.reflect.full.declaredMemberProperties
 class AnnotatedPropertyEditorTest {
 
     var net = Network()
-    val n1 = Neuron(net)
-    val n2 = Neuron(net)
+    val n1 = Neuron()
+    val n2 = Neuron()
 
     // Todo
     //  Check each data type

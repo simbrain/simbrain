@@ -18,9 +18,9 @@
  */
 package org.simbrain.network.gui.nodes;
 
+import org.simbrain.network.core.AbstractNeuronCollection;
+import org.simbrain.network.core.NeuronCollection;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.groups.AbstractNeuronCollection;
-import org.simbrain.network.groups.NeuronCollection;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;

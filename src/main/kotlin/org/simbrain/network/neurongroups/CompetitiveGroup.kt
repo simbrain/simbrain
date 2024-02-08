@@ -34,10 +34,9 @@ import org.simbrain.util.propertyeditor.GuiEditable
  * @author Jeff Yoshimi
  */
 open class CompetitiveGroup @JvmOverloads constructor(
-    network: Network,
     neurons: List<Neuron>,
     params: CompetitiveGroupParams = CompetitiveGroupParams()
-) : NeuronGroup(network) {
+) : NeuronGroup() {
 
     var params by GuiEditable(
         label = "Competitive Group Parameters",
@@ -45,10 +44,10 @@ open class CompetitiveGroup @JvmOverloads constructor(
         initValue = params.apply { creationMode = false },
         order = 50
     )
-    constructor(network: Network, numNeurons: Int) : this(network, List(numNeurons) { Neuron(network) })
+    constructor(numNeurons: Int) : this(List(numNeurons) { Neuron() })
 
     @XStreamConstructor
-    private constructor(parentNetwork: Network): this(parentNetwork, listOf())
+    private constructor(): this(listOf())
 
     init {
         addNeurons(neurons)
@@ -81,11 +80,12 @@ open class CompetitiveGroup @JvmOverloads constructor(
         }
     }
 
-    override fun copy() = CompetitiveGroup(network, neuronList.map { it.deepCopy() }, params.copy()).also {
+    override fun copy() = CompetitiveGroup(neuronList.map { it.deepCopy() }, params.copy()).also {
         it.max = this.max
         it.activation = this.activation
     }
 
+    context(Network)
     override fun update() {
 
         neuronList.forEach { it.updateInputs() }
@@ -126,7 +126,7 @@ open class CompetitiveGroup @JvmOverloads constructor(
         // normalizeIncomingWeights();
     }
 
-    /**
+    /**F
      * Update winning neuron's weights in accordance with Alvarez and Squire
      * 1994, eq 2. TODO: rate is unused... in fact everything before
      * "double deltaw = learningRate" (line 200 at time of writing) cannot
@@ -221,6 +221,7 @@ open class CompetitiveGroup @JvmOverloads constructor(
      * Randomize all weights coming in to this network.
      * TODO: Add gaussian option...
      */
+    context(Network)
     override fun randomizeIncomingWeights() {
         val i: Iterator<Neuron> = neuronList.iterator()
         while (i.hasNext()) {
@@ -250,6 +251,7 @@ open class CompetitiveGroup @JvmOverloads constructor(
     /**
      * Randomize and normalize weights.
      */
+    context(Network)
     override fun randomize() {
         randomizeIncomingWeights()
         normalizeIncomingWeights()
@@ -316,8 +318,8 @@ class CompetitiveGroupParams : NeuronGroupParams() {
     @UserParameter(label = "Decay percent", description = "Percentage by which to decay synapses on each update for Alvarez-Squire update.", order = 100)
     var synpaseDecayPercent = DEFAULT_DECAY_PERCENT
 
-    override fun create(net: Network): CompetitiveGroup {
-        return CompetitiveGroup(net, List(numNeurons) { Neuron(net) }, this)
+    override fun create(): CompetitiveGroup {
+        return CompetitiveGroup(List(numNeurons) { Neuron() }, this)
     }
 
     override fun copy(): CompetitiveGroupParams {

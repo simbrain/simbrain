@@ -6,13 +6,10 @@ import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.events.NetworkEvents
-import org.simbrain.network.groups.NeuronCollection
-import org.simbrain.network.groups.Subnetwork
 import org.simbrain.network.gui.PlacementManager
 import org.simbrain.network.gui.dialogs.NetworkPreferences
-import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.neurongroups.NeuronGroup
+import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.util.SimpleIdManager
 import org.simbrain.util.UserParameter
 import org.simbrain.util.math.SimbrainMath

@@ -21,11 +21,7 @@ package org.simbrain.network.gui
 import kotlinx.coroutines.launch
 import org.simbrain.network.LocatableModel
 import org.simbrain.network.NetworkModel
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.NetworkTextObject
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.Synapse
-import org.simbrain.network.matrix.NeuronArray
+import org.simbrain.network.core.*
 import org.simbrain.network.neurongroups.NeuronGroup
 import java.util.*
 
@@ -91,7 +87,7 @@ object Clipboard {
             for (item in sourceModels) {
                 when (item) {
                     is Neuron -> {
-                        val newNeuron = Neuron(destinationNetwork, item)
+                        val newNeuron = Neuron(item)
                         ret.add(newNeuron)
                         neuronMappings[item] = newNeuron
                     }
@@ -101,14 +97,14 @@ object Clipboard {
                         }
                     }
                     is NetworkTextObject -> {
-                        val newText = NetworkTextObject(destinationNetwork, item)
+                        val newText = NetworkTextObject(item)
                         ret.add(newText)
                     }
                     is NeuronGroup -> {
-                        ret.add(item.copyTo(destinationNetwork))
+                        ret.add(item.copy())
                     }
                     is NeuronArray -> {
-                        val copy: LocatableModel = item.copyTo(destinationNetwork)
+                        val copy: LocatableModel = item.copy()
                         ret.add(copy)
                     }
                 }
@@ -118,10 +114,8 @@ object Clipboard {
             // Copy synapses
             for (synapse in synapses) {
                 val newSynapse = Synapse(
-                    destinationNetwork,
-                    neuronMappings[synapse.source],
-                    neuronMappings[synapse.target],
-                    synapse.learningRule.deepCopy(),
+                    neuronMappings[synapse.source]!!,
+                    neuronMappings[synapse.target]!!,
                     synapse
                 )
                 ret.add(newSynapse)

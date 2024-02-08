@@ -34,106 +34,111 @@ class SynapseGroupInteractionBox(
     val synapseGroupNode: SynapseGroupNode
 ) : InteractionBox(networkPanel) {
 
-    override fun getPropertyDialog(): JDialog {
-       return synapseGroupNode.getDialog()
-    }
+    override val propertyDialog: JDialog
+        get() = synapseGroupNode.getDialog()
 
-    override fun getModel(): SynapseGroup {
-        return synapseGroup
-    }
+    override val model: SynapseGroup
+        get() = synapseGroup
 
-    override fun isDraggable(): Boolean {
-        return false
-    }
+    override val isDraggable: Boolean = false
 
-    override fun getContextMenu(): JPopupMenu {
+    override val contextMenu: JPopupMenu
+        get() {
 
-        val menu = JPopupMenu()
+            val menu = JPopupMenu()
 
-        // Edit
-        menu.add(networkPanel.createAction(name = "Edit synapse group...") {
-            synapseGroupNode.getDialog().makeVisible()
-        })
-        menu.add(networkPanel.createAction(
-            iconPath = "menu_icons/RedX_small.png",
-            name = "Delete synapse group"
-        ) {
-            synapseGroup.delete()
-        })
-        menu.add(networkPanel.createAction(
-            name = "Rename synapse group..."
-        ) {
-            val newName = JOptionPane.showInputDialog("Name:", synapseGroup.label)
-            synapseGroup.label = newName
-        })
+            // Edit
+            menu.add(networkPanel.createAction(name = "Edit synapse group...") {
+                synapseGroupNode.getDialog().makeVisible()
+            })
+            menu.add(networkPanel.createAction(
+                iconPath = "menu_icons/RedX_small.png",
+                name = "Delete synapse group"
+            ) {
+                synapseGroup.delete()
+            })
+            menu.add(networkPanel.createAction(
+                name = "Rename synapse group..."
+            ) {
+                val newName = JOptionPane.showInputDialog("Name:", synapseGroup.label)
+                synapseGroup.label = newName
+            })
 
-        // Selection stuff
-        menu.addSeparator()
-        menu.add(networkPanel.createAction(name = "Select synapses") {
-            synapseGroup.synapses.forEach{it.select()}
-        })
-        menu.add(networkPanel.createAction(name = "Select incoming neurons") {
-            synapseGroup.source.neuronList.forEach{it.select()}
-        })
-        menu.add(networkPanel.createAction(name = "Select outgoing neurons") {
-            synapseGroup.target.neuronList.forEach{it.select()}
-        })
+            // Selection stuff
+            menu.addSeparator()
+            menu.add(networkPanel.createAction(name = "Select synapses") {
+                synapseGroup.synapses.forEach { it.select() }
+            })
+            menu.add(networkPanel.createAction(name = "Select incoming neurons") {
+                synapseGroup.source.neuronList.forEach { it.select() }
+            })
+            menu.add(networkPanel.createAction(name = "Select outgoing neurons") {
+                synapseGroup.target.neuronList.forEach { it.select() }
+            })
 
-        // Weight adjustment
-        menu.addSeparator()
-        menu.add(JMenuItem(networkPanel.createAction(
-            iconPath = "menu_icons/grid.png",
-            name = "Show weight matrix...",
-        ) {
-            WeightMatrixViewer(synapseGroup.source.neuronList, synapseGroup.target.neuronList).displayInDialog {
-                commitChanges()
-            }
-        }))
+            // Weight adjustment
+            menu.addSeparator()
+            menu.add(
+                JMenuItem(networkPanel.createAction(
+                    iconPath = "menu_icons/grid.png",
+                    name = "Show weight matrix...",
+                ) {
+                    WeightMatrixViewer(
+                        synapseGroup.source.neuronList,
+                        synapseGroup.target.neuronList
+                    ).displayInDialog {
+                        commitChanges()
+                    }
+                })
+            )
 
-        // Freezing actions
-        menu.addSeparator()
-        menu.add(networkPanel.createAction(
-            name = "Freeze synapses",
-            description = "Freeze all synapses in this group (prevent learning)")
-        {
-            synapseGroup.synapses.forEach{it.isFrozen = true}
-        })
-        menu.add(networkPanel.createAction(
-            name = "Unfreeze synapses",
-            description = "Unfreeze all synapses in this group (allow learning)")
-        {
-            synapseGroup.synapses.forEach{it.isFrozen = false}
-        })
+            // Freezing actions
+            menu.addSeparator()
+            menu.add(networkPanel.createAction(
+                name = "Freeze synapses",
+                description = "Freeze all synapses in this group (prevent learning)"
+            )
+            {
+                synapseGroup.synapses.forEach { it.frozen = true }
+            })
+            menu.add(networkPanel.createAction(
+                name = "Unfreeze synapses",
+                description = "Unfreeze all synapses in this group (allow learning)"
+            )
+            {
+                synapseGroup.synapses.forEach { it.frozen = false }
+            })
 
-        // Synapse Enabling actions
-        menu.addSeparator()
-        menu.add(networkPanel.createAction(
-            name = "Disable synapses",
-            description = "Enable all synapses in this group (allow activation to pass through synapses)")
-        {
-            synapseGroup.synapses.forEach{it.isEnabled = false}
-        })
-        menu.add(networkPanel.createAction(
-            name = "Enable synapses",
-            description = "Enable all synapses in this group (allow activation to pass through synapses)")
-        {
-            synapseGroup.synapses.forEach{it.isEnabled = true}
-        })
+            // Synapse Enabling actions
+            menu.addSeparator()
+            menu.add(networkPanel.createAction(
+                name = "Disable synapses",
+                description = "Enable all synapses in this group (allow activation to pass through synapses)"
+            )
+            {
+                synapseGroup.synapses.forEach { it.isEnabled = false }
+            })
+            menu.add(networkPanel.createAction(
+                name = "Enable synapses",
+                description = "Enable all synapses in this group (allow activation to pass through synapses)"
+            )
+            {
+                synapseGroup.synapses.forEach { it.isEnabled = true }
+            })
 
-        // Synapse Visibility
-        menu.addSeparator()
-        menu.add(networkPanel.networkActions.createSynapseGroupVisibilityAction())
+            // Synapse Visibility
+            menu.addSeparator()
+            menu.add(networkPanel.networkActions.createSynapseGroupVisibilityAction())
 
-        // Coupling menu
-        val couplingMenu: JMenu = networkPanel.networkComponent.createCouplingMenu(synapseGroup)
-        menu.addSeparator()
-        menu.add(couplingMenu)
-        return menu
-    }
+            // Coupling menu
+            val couplingMenu: JMenu = networkPanel.networkComponent.createCouplingMenu(synapseGroup)
+            menu.addSeparator()
+            menu.add(couplingMenu)
+            return menu
+        }
 
-    override fun getToolTipText(): String {
-        return "Synapses: " + synapseGroup.size() + " Density: " + synapseGroup.size()
+    override val toolTipText: String
+        get() = "Synapses: ${synapseGroup.size()} Density: " + synapseGroup.size()
             .toDouble() / (synapseGroup.source.size() * synapseGroup.target.size())
-    }
 
 }

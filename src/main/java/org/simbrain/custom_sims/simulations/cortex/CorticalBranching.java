@@ -9,8 +9,8 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseGroup;
 import org.simbrain.network.layouts.HexagonalGridLayout;
-import org.simbrain.network.neuron_update_rules.TimedAccumulatorRule;
 import org.simbrain.network.neurongroups.NeuronGroup;
+import org.simbrain.network.updaterules.TimedAccumulatorRule;
 import org.simbrain.util.SimbrainConstants;
 import org.simbrain.util.stats.ProbabilityDistribution;
 import org.simbrain.util.stats.distributions.NormalDistribution;
@@ -56,17 +56,17 @@ public class CorticalBranching extends Simulation {
         List<Neuron> neurons = new ArrayList<Neuron>(NUM_NEURONS);
         List<Neuron> outNeurons = new ArrayList<Neuron>(NUM_NEURONS);
         for (int i = 0; i < NUM_NEURONS; i++) {
-            Neuron neuron = new Neuron(net);
+            Neuron neuron = new Neuron();
             neuron.setPolarity(SimbrainConstants.Polarity.EXCITATORY);
             TimedAccumulatorRule tar = new TimedAccumulatorRule();
-            tar.setMaxState(REFRACTORY);
-            tar.setKappa(KAPPA);
-            tar.setB(B_VALUE);
-            tar.setBaseProb(SPONTANEOUS_ACT);
+            tar.maxState = REFRACTORY;
+            tar.kappa = KAPPA;
+            tar.b = B_VALUE;
+            tar.baseProb = SPONTANEOUS_ACT;
             neuron.setUpdateRule(tar);
             neurons.add(neuron);
         }
-        NeuronGroup ng1 = new NeuronGroup(net, neurons);
+        NeuronGroup ng1 = new NeuronGroup(neurons);
         ng1.setLabel("CorticalBranching");
         net.addNetworkModelAsync(ng1);
         ng1.setLayout(layout);

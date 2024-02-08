@@ -6,8 +6,8 @@ import org.simbrain.custom_sims.couplingManager
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.addNeuron
 import org.simbrain.network.core.addSynapse
-import org.simbrain.network.neuron_update_rules.SpikingThresholdRule
 import org.simbrain.network.spikeresponders.JumpAndDecay
+import org.simbrain.network.updaterules.SpikingThresholdRule
 import org.simbrain.util.place
 import org.simbrain.util.point
 

@@ -3,8 +3,8 @@ package org.simbrain.custom_sims.simulations.patterns_of_activity
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.SynapseGroup
+import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.layouts.LineLayout
-import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.plot.projection.ProjectionComponent
 import org.simbrain.util.SmellSource
@@ -33,19 +33,19 @@ val cogMap3Objects = newSim {
     place(networkComponent,0, 6, 480, 522)
 
     // Make reservoir
-    val recurrent = NeuronGroup(network, NUM_NEURONS).apply {
+    val recurrent = NeuronGroup(NUM_NEURONS).apply {
         // layout(GridLayout())
         label = "Recurrent"
         // setNeuronType(LinearRule())
         applyLayout()
     }
-    val weightMatrix = WeightMatrix(network, recurrent, recurrent)
+    val weightMatrix = WeightMatrix(recurrent, recurrent)
     weightMatrix.randomize()
     weightMatrix.weightMatrix.setSpectralRadius(spectralRadius)
     network.addNetworkModels(recurrent, weightMatrix)
 
     // Inputs to reservoir
-    val inputNetwork = NeuronGroup(network, 3)
+    val inputNetwork = NeuronGroup(3)
     inputNetwork.setLowerBound(-1.0)
     inputNetwork.setUpperBound(1.0)
     inputNetwork.label = "Sensory Neurons"

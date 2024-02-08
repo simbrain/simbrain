@@ -1,7 +1,6 @@
 package org.simbrain.network.neurongroups
 
-import org.simbrain.network.core.Network
-import org.simbrain.network.groups.AbstractNeuronCollection
+import org.simbrain.network.core.AbstractNeuronCollection
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 
@@ -15,7 +14,7 @@ sealed class NeuronGroupParams: CopyableObject {
         onUpdate = { enableWidget(creationMode) },
     )
 
-    abstract fun create(net: Network): AbstractNeuronCollection
+    abstract fun create(): AbstractNeuronCollection
 
     override fun getTypeList(): List<Class<out CopyableObject>>? = if (creationMode) {
         listOf(

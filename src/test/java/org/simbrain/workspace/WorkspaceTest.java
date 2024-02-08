@@ -34,11 +34,11 @@ public class WorkspaceTest {
         workspace.addWorkspaceComponent(new ProjectionComponent("projection"));
 
         // Add a neuron to network 1
-        n1 = new Neuron(net1);
+        n1 = new Neuron();
         net1.addNetworkModelAsync(n1);
 
         // Add a neuron to network 2
-        n2 = new Neuron(net2);
+        n2 = new Neuron();
         net2.addNetworkModelAsync(n2);
 
         // Couple them

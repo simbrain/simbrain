@@ -70,10 +70,10 @@ public class SORN extends Simulation {
         SORNNeuronRule sornRule = new SORNNeuronRule();
         //  sornRule.sethIP(400.0/numNeurons);
         for (int i = 0; i < numNeurons; i++) {
-            Neuron n = new Neuron(net);
+            Neuron n = new Neuron();
             // sornRule.setMaxThreshold(0.5);
             // sornRule.setThreshold(0.5 * Math.random() + 0.01);
-            sornRule.setRefractoryPeriod(1);
+            sornRule.refractoryPeriod = 1;
             sornRule.setAddNoise(true);
             n.setPolarity(Polarity.EXCITATORY);
             n.setUpdateRule(sornRule.deepCopy());
@@ -81,24 +81,24 @@ public class SORN extends Simulation {
         }
         SORNNeuronRule str = new SORNNeuronRule();
         for (int i = 0; i < (int) (numNeurons * 0.2); i++) {
-            Neuron n = new Neuron(net);
+            Neuron n = new Neuron();
             // str.setThreshold(0.8 * Math.random() + 0.01);
-            str.setEtaIP(0); // No Homeostatic Plasticity
-            str.setRefractoryPeriod(1);
+            str.etaIP = 0; // No Homeostatic Plasticity
+            str.refractoryPeriod = 1;
             str.setAddNoise(true);
             n.setPolarity(Polarity.INHIBITORY);
             n.setUpdateRule(str.deepCopy());
             inhibitoryNeurons.add(n);
         }
 
-        NeuronGroup ng = new NeuronGroup(net, neurons);
+        NeuronGroup ng = new NeuronGroup(neurons);
         GridLayout layout = new GridLayout(gridSpace, gridSpace, (int) Math.sqrt(numNeurons));
         ng.setLabel("Excitatory");
         net.addNetworkModelAsync(ng);
         ng.setLayout(layout);
         ng.applyLayout(new Point(10, 10));
 
-        NeuronGroup ngIn = new NeuronGroup(net, inhibitoryNeurons);
+        NeuronGroup ngIn = new NeuronGroup(inhibitoryNeurons);
         layout = new GridLayout(gridSpace*2, gridSpace*2, (int) Math.sqrt(0.2 * numNeurons));
         ngIn.setLabel("Inhibitory");
         net.addNetworkModelAsync(ngIn);
@@ -121,23 +121,23 @@ public class SORN extends Simulation {
         }
         // Set up plasticity between exc and exc neurons
         AddSTDPRule stdp = new AddSTDPRule();
-        stdp.setLearningRate(0.001);
+        stdp.learningRate = 0.001;
         // TODO
         // sg_ee.setLearningRule(stdp, SimbrainConstants.Polarity.BOTH);
 
         ArrayList<Neuron> inNeurons = new ArrayList<>();
         for (int i = 0; i < 200; i++) {
-            Neuron n = new Neuron(net);
+            Neuron n = new Neuron();
             //SpikingThresholdRule inRule = new SpikingThresholdRule();
             //inRule.setThreshold(0.96);
-            sornRule.setMaxThreshold(0.5);
-            sornRule.setThreshold(0.5 * Math.random() + 0.01);
+            sornRule.maxThreshold = 0.5;
+            sornRule.threshold = 0.5 * Math.random() + 0.01;
             n.setPolarity(Polarity.EXCITATORY);
             n.setUpdateRule(sornRule.deepCopy());
             inNeurons.add(n);
         }
 
-        NeuronGroup input = new NeuronGroup(net, inNeurons);
+        NeuronGroup input = new NeuronGroup(inNeurons);
         layout = new GridLayout(gridSpace, gridSpace, (int) Math.sqrt(0.4 * numNeurons));
         input.setLabel("Input");
         net.addNetworkModelAsync(input);

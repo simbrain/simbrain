@@ -9,7 +9,7 @@ class FitzhughNagumoTest {
 
     val net = Network()
     val fhRule = FitzhughNagumo()
-    val n = Neuron(net, fhRule)
+    val n = Neuron(fhRule)
     init {
         net.addNetworkModelAsync(n)
     }

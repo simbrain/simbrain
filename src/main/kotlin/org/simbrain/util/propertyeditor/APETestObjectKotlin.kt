@@ -1,7 +1,7 @@
 package org.simbrain.util.propertyeditor
 
-import org.simbrain.network.core.NeuronUpdateRule
-import org.simbrain.network.neuron_update_rules.LinearRule
+import org.simbrain.network.updaterules.LinearRule
+import org.simbrain.network.updaterules.NeuronUpdateRule
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.util.UserParameter

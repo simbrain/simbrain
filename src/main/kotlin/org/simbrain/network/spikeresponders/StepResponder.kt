@@ -18,11 +18,7 @@
  */
 package org.simbrain.network.spikeresponders
 
-import org.simbrain.network.core.Connector
-import org.simbrain.network.core.Synapse
-import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.network.matrix.WeightMatrix
-import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder
+import org.simbrain.network.core.*
 import org.simbrain.network.util.MatrixDataHolder
 import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.network.util.SpikingMatrixData
@@ -52,6 +48,7 @@ class StepResponder(
 
 ) : SpikeResponder() {
 
+    context(Network)
     override fun apply(conn: Connector, data: MatrixDataHolder) {
         val wm = conn.let { if (it is WeightMatrix) it else return }
         val na = conn.source.let { if (it is NeuronArray) it else return }
@@ -87,11 +84,12 @@ class StepResponder(
         return StepMatrixData(rows, cols)
     }
 
-    override fun apply(s: Synapse, responderData: ScalarDataHolder) {
+    context(Network)
+    override fun apply(synapse: Synapse, responderData: ScalarDataHolder) {
         val data = responderData as StepResponderData
-        if (s.source.isSpike) {
+        if (synapse.source.isSpike) {
             data.counter = responseDuration
-            s.psr = responseHeight * s.strength
+            synapse.psr = responseHeight * synapse.strength
         } else {
             data.counter = data.counter - 1
             if (data.counter < 0) {
@@ -99,7 +97,7 @@ class StepResponder(
             }
         }
         if (data.counter <= 0) {
-            s.psr = 0.0
+            synapse.psr = 0.0
         }
     }
 
@@ -114,9 +112,7 @@ class StepResponder(
         return st
     }
 
-    override fun getDescription(): String {
-        return "Step"
-    }
+    override val description: String = "Step"
 
     override val name: String
         get() = "Step"

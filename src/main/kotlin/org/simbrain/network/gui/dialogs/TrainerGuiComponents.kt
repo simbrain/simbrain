@@ -5,6 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
+import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.trainers.IterableTrainer
 import org.simbrain.plot.timeseries.TimeSeriesModel
 import org.simbrain.plot.timeseries.TimeSeriesPlotActions
@@ -24,7 +25,7 @@ import javax.swing.JPanel
 /**
  * Controls used by Supervised learning dialogs.
  */
-class TrainerControls(trainer: IterableTrainer) : JPanel(), CoroutineScope {
+class TrainerControls(trainer: IterableTrainer, networkPanel: NetworkPanel) : JPanel(), CoroutineScope {
 
     private val job = SupervisorJob()
 
@@ -37,7 +38,7 @@ class TrainerControls(trainer: IterableTrainer) : JPanel(), CoroutineScope {
         iconPath ="menu_icons/Play.png",
         description = "Iterate training until stop button is pressed",
     ) {
-        trainer.startTraining()
+        with(networkPanel.network) { trainer.startTraining() }
     }
 
     private val stopAction = createAction(
@@ -54,7 +55,7 @@ class TrainerControls(trainer: IterableTrainer) : JPanel(), CoroutineScope {
         iconPath =  "menu_icons/Step.png",
     ) {
         trainer.events.beginTraining.fire()
-        trainer.trainOnce()
+        with(networkPanel.network) { trainer.trainOnce() }
         trainer.events.endTraining.fire()
     }
 
@@ -63,7 +64,7 @@ class TrainerControls(trainer: IterableTrainer) : JPanel(), CoroutineScope {
         description = "Randomize network",
         iconPath = "menu_icons/Rand.png",
     ) {
-        trainer.randomize()
+        with(networkPanel.network) { trainer.randomize() }
     }
 
     init {

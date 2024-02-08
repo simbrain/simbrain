@@ -12,12 +12,12 @@ import org.simbrain.network.core.Synapse
 class AllostaticRuleTest {
 
     val net = Network()
-    val n = Neuron(net, AllostaticUpdateRule())
+    val n = Neuron(AllostaticUpdateRule())
     val data = n.dataHolder as AllostaticDataHolder
-    val externalInput = Neuron(net).apply{
+    val externalInput = Neuron().apply{
         upperBound = 10.0
     }
-    val reservoirInput = Neuron(net, AllostaticUpdateRule())
+    val reservoirInput = Neuron(AllostaticUpdateRule())
     val externalWeight = Synapse(externalInput, n)
     val resWeight = Synapse(reservoirInput, n)
 
@@ -83,54 +83,64 @@ class AllostaticRuleTest {
 
     @Test
     fun `if activation above threshold, spike and subtract threshold`() {
-        // Threshold is 2
-        n.activation = 3.0
-        // This becomes 2.25 after leak. Threshold is 2. So new activation should be 2.25 - 2
-        n.update()
-        assertTrue(n.isSpike)
-        assertEquals(.25, n.activation)
+        with(net) {
+            // Threshold is 2
+            n.activation = 3.0
+            // This becomes 2.25 after leak. Threshold is 2. So new activation should be 2.25 - 2
+            n.update()
+            assertTrue(n.isSpike)
+            assertEquals(.25, n.activation)
+        }
 
     }
 
     @Test
     fun `if activation enough above threshold, target increases`() {
-        // Threshold is 2
-        n.activation = 10.0
-        // This becomes 7.5 after leak. Threshold is 2. So new activation should be 5.5
-        n.update()
-        assertTrue(n.isSpike)
-        assertEquals(5.5, n.activation)
-        // This should make target increase above 1
-        assertTrue(data.target > 1.0)
+        with(net) {
+            // Threshold is 2
+            n.activation = 10.0
+            // This becomes 7.5 after leak. Threshold is 2. So new activation should be 5.5
+            n.update()
+            assertTrue(n.isSpike)
+            assertEquals(5.5, n.activation)
+            // This should make target increase above 1
+            assertTrue(data.target > 1.0)
+        }
     }
 
     @Test
     fun `when activation is above target, weights of active neighbors decreased`() {
-        // Spike the input
-        reservoirInput.activation = 3.0
-        reservoirInput.update()
-        n.activation = 3.0
-        n.update()
-        assertTrue(resWeight.strength < 1.0)
+        with(net) {
+            // Spike the input
+            reservoirInput.activation = 3.0
+            reservoirInput.update()
+            n.activation = 3.0
+            n.update()
+            assertTrue(resWeight.strength < 1.0)
+        }
     }
 
     @Test
     fun `when activation is below target, weights of active neighbors decreased`() {
-        // Spike the input
-        reservoirInput.activation = 3.0
-        reservoirInput.update()
-        n.activation = .5
-        n.update()
-        assertTrue(resWeight.strength < 1.0)
+        with(net) {
+            // Spike the input
+            reservoirInput.activation = 3.0
+            reservoirInput.update()
+            n.activation = .5
+            n.update()
+            assertTrue(resWeight.strength < 1.0)
+        }
     }
 
     @Test
     fun `res weight increases when input spikes and activation is above target`() {
-        reservoirInput.activation = 3.0
-        reservoirInput.update()
-        n.activation = 3.0
-        n.update()
-        assertTrue(resWeight.strength < 1.0)
+        with(net) {
+            reservoirInput.activation = 3.0
+            reservoirInput.update()
+            n.activation = 3.0
+            n.update()
+            assertTrue(resWeight.strength < 1.0)
+        }
     }
 
     // @Test

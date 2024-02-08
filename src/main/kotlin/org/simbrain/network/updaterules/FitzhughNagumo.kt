@@ -18,10 +18,7 @@
  */
 package org.simbrain.network.updaterules
 
-import org.simbrain.network.core.Layer
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.SpikingNeuronUpdateRule
-import org.simbrain.network.matrix.NeuronArray
+import org.simbrain.network.core.*
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.network.util.SpikingScalarData
@@ -114,25 +111,27 @@ class FitzhughNagumo : SpikingNeuronUpdateRule<FitzHughData, FitzHughMatrixData>
         return copy
     }
 
-    override fun apply(n: Neuron, data: FitzHughData) {
-        val (spiked, v, w) = fitzhughNagumoRule(n.activation, data.w, n.input, n.network.timeStep)
-        n.isSpike = spiked
-        n.activation = v
+    context(Network)
+    override fun apply(neuron: Neuron, data: FitzHughData) {
+        val (spiked, v, w) = fitzhughNagumoRule(neuron.activation, data.w, neuron.input, timeStep)
+        neuron.isSpike = spiked
+        neuron.activation = v
         data.w = w
     }
 
-    override fun apply(na: Layer, data: FitzHughMatrixData) {
-        if (na is NeuronArray) {
-            for (i in 0 until na.size()) {
+    context(Network)
+    override fun apply(layer: Layer, dataHolder: FitzHughMatrixData) {
+        if (layer is NeuronArray) {
+            for (i in 0 until layer.size()) {
                 val (spiked, v, w) = fitzhughNagumoRule(
-                    na.activations.get(i, 0),
-                    data.w.get(i),
-                    na.inputs.get(i, 0),
-                    na.network.timeStep
+                    layer.activations.get(i, 0),
+                    dataHolder.w[i],
+                    layer.inputs.get(i, 0),
+                    timeStep
                 )
-                data.setHasSpiked(i, spiked, na.network.time)
-                na.activations.set(i, 0, v)
-                data.w.set(i, w)
+                dataHolder.setHasSpiked(i, spiked, time)
+                layer.activations.set(i, 0, v)
+                dataHolder.w[i] = w
             }
         }
     }

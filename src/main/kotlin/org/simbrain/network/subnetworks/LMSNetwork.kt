@@ -13,14 +13,13 @@
  */
 package org.simbrain.network.subnetworks
 
-import org.simbrain.network.core.Network
+import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.core.XStreamConstructor
-import org.simbrain.network.matrix.WeightMatrix
-import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.trainers.LMSTrainer
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.Trainable
 import org.simbrain.network.trainers.createDiagonalDataset
+import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
 import java.awt.geom.Point2D
@@ -38,14 +37,14 @@ class LMSNetwork : FeedForward, Trainable {
         LMSTrainer(this)
     }
 
-    constructor(network: Network, nInputs: Int, nOutputs: Int, initialPosition: Point2D? = null): super(network, intArrayOf(nInputs, nOutputs), initialPosition) {
+    constructor(nInputs: Int, nOutputs: Int, initialPosition: Point2D? = null): super(intArrayOf(nInputs, nOutputs), initialPosition) {
         layerList.forEach { it.updateRule = LinearRule() }
         trainingSet = createDiagonalDataset(nInputs, nOutputs)
         label = "LMS"
     }
 
     @XStreamConstructor
-    private constructor(parentNetwork: Network) : super(parentNetwork)
+    private constructor() : super()
 
     val weightMatrix: WeightMatrix get() = inputLayer.outgoingConnectors.first() as WeightMatrix
 
@@ -73,8 +72,8 @@ class LMSNetwork : FeedForward, Trainable {
 
         override val name = "LMS Network"
 
-        fun create(net: Network): LMSNetwork {
-            return LMSNetwork(net, nin, nout, initialPosition)
+        fun create(): LMSNetwork {
+            return LMSNetwork(nin, nout, initialPosition)
         }
 
     }

@@ -13,8 +13,8 @@ public class SynapseGroupTest {
     @Test
     public void testCreation() {
         Network net = new Network();
-        NeuronGroup source = new NeuronGroup(net, 2);
-        NeuronGroup target = new NeuronGroup(net, 2);
+        NeuronGroup source = new NeuronGroup(2);
+        NeuronGroup target = new NeuronGroup(2);
         SynapseGroup sg = new SynapseGroup(source, target, new AllToAll());
         assertEquals(sg.size(), 4);
     }

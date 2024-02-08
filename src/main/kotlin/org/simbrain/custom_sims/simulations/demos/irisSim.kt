@@ -2,8 +2,8 @@ package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.newSim
+import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.core.addNeuronCollection
-import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.smile.classifiers.KNNClassifier
 import org.simbrain.util.place
@@ -37,10 +37,10 @@ val irisClassifier = newSim {
 
     classifier.trainingData.featureVectors = iris.select(0,1,2,3).toArray()
     classifier.trainingData.targetLabels = iris.column(4).toStringArray()
-    val smileClassifier = SmileClassifier(network, classifier)
+    val smileClassifier = SmileClassifier(classifier)
     smileClassifier.train()
 
-    val weightMatrix = WeightMatrix(network, inputNc, smileClassifier)
+    val weightMatrix = WeightMatrix(inputNc, smileClassifier)
     network.addNetworkModels(weightMatrix, smileClassifier)
     smileClassifier.location = point(0, -300)
 

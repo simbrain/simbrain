@@ -18,8 +18,8 @@
  */
 package org.simbrain.network.spikeresponders
 
+import org.simbrain.network.core.Network
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder
 import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.UserParameter
@@ -111,26 +111,28 @@ class UDF : SpikeResponder() {
         return UDF()
     }
 
-    override fun getDescription(): String {
-        return "UDF (Short-term Plasticity)"
-    }
+    override val description: String
+        get() {
+            return "UDF (Short-term Plasticity)"
+        }
 
-    override fun apply(s: Synapse, responderData: ScalarDataHolder) {
+    context(Network)
+    override fun apply(synapse: Synapse, responderData: ScalarDataHolder) {
         if (firstTime) {
-            init(s)
+            init(synapse)
             spikeDecay.timeConstant = tau
             firstTime = false
         }
         val A: Double
-        if (s.source.isSpike) {
-            val ISI = lastSpikeTime - s.network.time
+        if (synapse.source.isSpike) {
+            val ISI = lastSpikeTime - time
             u = U + u * (1 - U) * exp(ISI / F)
             R = 1 + (R - u * R - 1) * exp(ISI / D)
-            A = R * s.strength * u
-            lastSpikeTime = s.network.time
-            s.psr = spikeDecay.convolvedJumpAndDecay(s.source.isSpike, s.psr, s.strength, s.network.timeStep)
+            A = R * synapse.strength * u
+            lastSpikeTime = time
+            synapse.psr = spikeDecay.convolvedJumpAndDecay(synapse.source.isSpike, synapse.psr, synapse.strength, timeStep)
         } else {
-            spikeDecay.apply(s, responderData)
+            spikeDecay.apply(synapse, responderData)
         }
     }
 

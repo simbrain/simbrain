@@ -1,7 +1,6 @@
 package org.simbrain.network.gui.dialogs
 
 import net.miginfocom.swing.MigLayout
-import org.simbrain.network.core.Network
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.kotlindl.*
 import org.simbrain.util.StandardDialog
@@ -260,7 +259,6 @@ fun main() {
 
 fun testTrainingDialog() {
     val dn = DeepNet(
-        Network(),
         arrayListOf(TFInputLayer(2), TFDenseLayer(5), TFDenseLayer(1)),
         4
     )
@@ -279,7 +277,7 @@ fun testLayerList() {
         addCommitTask {
             println("Closing..")
             layerEditor.commitChanges()
-            val dn = DeepNet(Network(), layerEditor.layers)
+            val dn = DeepNet(layerEditor.layers)
             println(dn.tfLayers.map { it.getRank() }.joinToString(","))
             // println(dn.deepNetLayers.summary())
 

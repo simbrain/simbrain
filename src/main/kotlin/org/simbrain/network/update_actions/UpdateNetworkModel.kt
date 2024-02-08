@@ -1,6 +1,7 @@
 package org.simbrain.network.update_actions
 
 import org.simbrain.network.NetworkModel
+import org.simbrain.network.core.Network
 import org.simbrain.workspace.updater.UpdateAction
 
 /**
@@ -8,11 +9,11 @@ import org.simbrain.workspace.updater.UpdateAction
  *
  * @author jyoshimi
  */
-class UpdateNetworkModel(private val networkModel: NetworkModel) : UpdateAction(
+class UpdateNetworkModel(private val networkModel: NetworkModel, val network: Network) : UpdateAction(
     networkModel.label,
     "Update ${networkModel.label}"
 ) {
     override suspend fun run() {
-        networkModel.update()
+        with(network) { networkModel.update() }
     }
 }

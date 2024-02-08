@@ -3,10 +3,10 @@ package org.simbrain.network.trainers
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
+import org.simbrain.network.core.NeuronArray
+import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.core.randomizeBiases
-import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.network.matrix.WeightMatrix
-import org.simbrain.network.neuron_update_rules.LinearRule
+import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
 import org.simbrain.util.math.SigmoidFunctionEnum
@@ -80,35 +80,39 @@ class BackpropTests {
      * Tests for 3 node layer case
      */
     private fun testBackprop() {
-        wm1.randomize()
-        wm2.randomize()
-        na2.randomizeBiases()
-        na3.randomizeBiases()
-        repeat(100) {
-            listOf(wm1, wm2).forwardPass(inputVector)
-            listOf(wm1, wm2).backpropError(targetVector, .1)
-            // println(targets.toDoubleArray() sse wm2.output.toDoubleArray())
+        with(net) {
+            wm1.randomize()
+            wm2.randomize()
+            na2.randomizeBiases()
+            na3.randomizeBiases()
+            repeat(100) {
+                listOf(wm1, wm2).forwardPass(inputVector)
+                listOf(wm1, wm2).backpropError(targetVector, .1)
+                // println(targets.toDoubleArray() sse wm2.output.toDoubleArray())
+            }
+            println("Outputs: ${na3.activations}, SSE = ${targetVector sse na3.activations}")
+            assertEquals(0.0, targetVector sse na3.activations, .01)
         }
-        println("Outputs: ${na3.activations}, SSE = ${targetVector sse na3.activations}")
-        assertEquals(0.0, targetVector sse na3.activations, .01)
     }
 
     @Test
     fun `test two node layers`() {
-        inputVector = doubleArrayOf(0.0, 1.0).toMatrix()
-        targetVector = doubleArrayOf(1.0, 0.5, -1.0).toMatrix()
-        na2.updateRule = SigmoidalRule().apply {
-            type = SigmoidFunctionEnum.LOGISTIC
-            lowerBound = -1.0
+        with(net) {
+            inputVector = doubleArrayOf(0.0, 1.0).toMatrix()
+            targetVector = doubleArrayOf(1.0, 0.5, -1.0).toMatrix()
+            na2.updateRule = SigmoidalRule().apply {
+                type = SigmoidFunctionEnum.LOGISTIC
+                lowerBound = -1.0
+            }
+            wm1.randomize()
+            na2.randomizeBiases()
+            repeat(100) {
+                listOf(wm1).forwardPass(inputVector)
+                listOf(wm1).backpropError(targetVector, .1)
+            }
+            println("Outputs: ${na2.activations}, SSE = ${targetVector sse na2.activations}")
+            assertEquals(0.0, targetVector sse na2.activations, .01)
         }
-        wm1.randomize()
-        na2.randomizeBiases()
-        repeat(100) {
-            listOf(wm1).forwardPass(inputVector)
-            listOf(wm1).backpropError(targetVector, .1)
-        }
-        println("Outputs: ${na2.activations}, SSE = ${targetVector sse na2.activations}")
-        assertEquals(0.0, targetVector sse na2.activations, .01)
     }
 
     @Test
@@ -127,16 +131,18 @@ class BackpropTests {
 
     @Test
     fun `test backprop on weight matrix tree`() {
-        wm1.randomize()
-        wm2.randomize()
-        na2.randomizeBiases()
-        na3.randomizeBiases()
-        val wmTree = WeightMatrixTree(listOf(na1), na3)
-        repeat(100) {
-            wmTree.forwardPass(listOf(inputVector))
-            wmTree.backpropError(targetVector, .1)
+        with(net) {
+            wm1.randomize()
+            wm2.randomize()
+            na2.randomizeBiases()
+            na3.randomizeBiases()
+            val wmTree = WeightMatrixTree(listOf(na1), na3)
+            repeat(100) {
+                wmTree.forwardPass(listOf(inputVector))
+                wmTree.backpropError(targetVector, .1)
+            }
+            assertEquals(0.0, targetVector sse na3.activations, .01)
         }
-        assertEquals(0.0, targetVector sse na3.activations, .01)
 
     }
 

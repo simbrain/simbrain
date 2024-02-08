@@ -4,6 +4,7 @@ package org.simbrain.network.neuron_update_rules;
 import org.junit.jupiter.api.Test;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
+import org.simbrain.network.updaterules.BinaryRule;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -13,12 +14,12 @@ public class BinaryRuleTest {
     public void testUpdate() {
 
         Network net = new Network();
-        Neuron n = new Neuron(net,  new BinaryRule());
+        Neuron n = new Neuron(new BinaryRule());
         net.addNetworkModelAsync(n);
         BinaryRule br = (BinaryRule) n.getUpdateRule();
 
         // Set up rule
-        br.setThreshold(.5);
+        br.threshold = .5;
         br.setUpperBound(1);
         br.setLowerBound(0);
 
@@ -33,7 +34,7 @@ public class BinaryRuleTest {
         assertEquals(1 ,n.getActivation(),.001);
 
         // Test new Threshold
-        br.setThreshold(.2);
+        br.threshold = .2;
         // Below
         n.addInputValue(.19);
         net.bufferedUpdate();

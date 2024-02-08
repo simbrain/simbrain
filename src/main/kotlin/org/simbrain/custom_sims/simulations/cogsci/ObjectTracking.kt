@@ -6,9 +6,8 @@ import org.simbrain.custom_sims.newSim
 import org.simbrain.custom_sims.updateAction
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.*
-import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.layouts.GridLayout
-import org.simbrain.network.neuron_update_rules.LinearRule
+import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.network.util.SpikingScalarData
@@ -52,11 +51,11 @@ val objectTrackingSim = newSim {
     // Add a self-connected neuron array to the network
     val resNeurons = (0..numResNeurons).map {
         val rule = AllostaticUpdateRule()
-        val neuron = Neuron(network, AllostaticUpdateRule())
+        val neuron = Neuron(AllostaticUpdateRule())
         neuron
     }
     network.addNetworkModelsAsync(resNeurons)
-    val reservoir = NeuronCollection(network, resNeurons)
+    val reservoir = NeuronCollection(resNeurons)
     network.addNetworkModel(reservoir)
     reservoir.label = "Reservoir"
     reservoir.layout(GridLayout())
@@ -71,11 +70,11 @@ val objectTrackingSim = newSim {
     // Left inputs
     val leftInputNeurons = (0 until sensoryNeurons).map {
         val rule = LinearRule()
-        val neuron = Neuron(network, rule)
+        val neuron = Neuron(rule)
         neuron
     }
     network.addNetworkModelsAsync(leftInputNeurons)
-    val leftInputs = NeuronCollection(network, leftInputNeurons)
+    val leftInputs = NeuronCollection(leftInputNeurons)
     network.addNetworkModelAsync(leftInputs)
     leftInputs.label = "Left Inputs"
     leftInputs.layout(GridLayout())
@@ -84,11 +83,11 @@ val objectTrackingSim = newSim {
     // Right inputs
     val rightInputNeurons = (0 until sensoryNeurons).map {
         val rule = LinearRule()
-        val neuron = Neuron(network, rule)
+        val neuron = Neuron(rule)
         neuron
     }
     network.addNetworkModelsAsync(rightInputNeurons)
-    val rightInputs = NeuronCollection(network, rightInputNeurons)
+    val rightInputs = NeuronCollection(rightInputNeurons)
     network.addNetworkModelAsync(rightInputs)
     rightInputs.label = "Right Inputs"
     rightInputs.layout(GridLayout())
@@ -107,16 +106,16 @@ val objectTrackingSim = newSim {
     }
 
     // Output neurons
-    val leftTurnNeuron = Neuron(network, PercentIncomingNeuronRule())
-    val rightTurnNeuron = Neuron(network, PercentIncomingNeuronRule())
+    val leftTurnNeuron = Neuron(PercentIncomingNeuronRule())
+    val rightTurnNeuron = Neuron(PercentIncomingNeuronRule())
     network.addNetworkModelAsync(leftTurnNeuron)
     network.addNetworkModelAsync(rightTurnNeuron)
     leftTurnNeuron.upperBound = 100.0
     rightTurnNeuron.upperBound = 100.0
-    val leftTurnCollection = NeuronCollection(network, listOf(leftTurnNeuron))
+    val leftTurnCollection = NeuronCollection(listOf(leftTurnNeuron))
     leftTurnCollection.label = "Left Turn"
     network.addNetworkModelAsync(leftTurnCollection)
-    val rightTurnCollection = NeuronCollection(network, listOf(rightTurnNeuron))
+    val rightTurnCollection = NeuronCollection(listOf(rightTurnNeuron))
     rightTurnCollection.label = "Right Turn"
     network.addNetworkModelAsync(rightTurnCollection)
     leftTurnNeuron.location = point(546, -203)
@@ -288,30 +287,29 @@ class AllostaticUpdateRule: SpikingNeuronUpdateRule<AllostaticDataHolder, Spikin
 
     override fun createScalarData(): AllostaticDataHolder = AllostaticDataHolder()
 
-    override fun apply(n: Neuron, data: AllostaticDataHolder) {
-
-        data as AllostaticDataHolder
+    context(Network)
+    override fun apply(neuron: Neuron, data: AllostaticDataHolder) {
 
         // Equation 1
-        val newActivation = n.activation * leakRate + n.getAllostaticInput()
-        n.activation = max(0.0, newActivation ) // Prevent from going below 0
+        val newActivation = neuron.activation * leakRate + neuron.getAllostaticInput()
+        neuron.activation = max(0.0, newActivation ) // Prevent from going below 0
 
         // Only apply learning if neuron has just spiked
-        n.isSpike = false
+        neuron.isSpike = false
 
         // Equation 2
-        if (n.activation > data.threshold) {
-            n.isSpike = true
+        if (neuron.activation > data.threshold) {
+            neuron.isSpike = true
             // println("Spike!")
             // Equation 3
-            n.activation -= data.threshold
+            neuron.activation -= data.threshold
         }
 
-        val error = n.activation - data.target
+        val error = neuron.activation - data.target
 
         // Weights
-        val toTrain= n.fanIn
-            .filter { it.source.updateRule is SpikingNeuronUpdateRule}
+        val toTrain= neuron.fanIn
+            .filter { it.source.updateRule is SpikingNeuronUpdateRule<*, *> }
             .filter { it.source.isSpike}
 
         toTrain.forEach {  s ->
@@ -340,12 +338,12 @@ class AllostaticUpdateRule: SpikingNeuronUpdateRule<AllostaticDataHolder, Spikin
     // Test getSpikingInput
     fun main() {
         val net = Network()
-        val n1 = Neuron(net)
-        val n2 = Neuron(net)
+        val n1 = Neuron()
+        val n2 = Neuron()
         net.addNetworkModelsAsync(n1, n2)
         n1.clamped = true
         n2.clamped = true
-        val n3 = Neuron(net)
+        val n3 = Neuron()
         net.addNetworkModelAsync(n3)
         val s1 = Synapse(n1, n3)
         s1.strength = 1.0

@@ -4,12 +4,9 @@ import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.connections.RadialProbabilistic
 import org.simbrain.network.connections.Sparse
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.addNeurons
-import org.simbrain.network.groups.AbstractNeuronCollection
-import org.simbrain.network.groups.NeuronCollection
+import org.simbrain.network.core.*
 import org.simbrain.network.layouts.GridLayout
-import org.simbrain.network.neuron_update_rules.KuramotoRule
+import org.simbrain.network.updaterules.KuramotoRule
 import org.simbrain.util.place
 import org.simbrain.util.point
 import kotlin.math.abs
@@ -28,7 +25,7 @@ val cortexKuramoto = newSim {
     // Template for Kuramoto neuron
     fun Neuron.kuramotoTemplate() {
         updateRule = KuramotoRule().apply {
-            naturalFrequency = 100 * Math.random()
+            slope = 100 * Math.random()
         }
         upperBound = 5.0
     }
@@ -117,7 +114,7 @@ val cortexKuramoto = newSim {
     // Finally create neuron regions!
     for (i in 1..numNetworks) {
         val regionNeurons = network.addNeurons(numNodesListAdjusted[i - 1]) { kuramotoTemplate() }
-        val region = NeuronCollection(network, regionNeurons)
+        val region = NeuronCollection(regionNeurons)
 
         network.addNetworkModelAsync(region)
         neuronRegionList.add(region)
@@ -136,7 +133,7 @@ val cortexKuramoto = newSim {
         }
 
         //  Connect neurons within region
-        radial.connectNeurons(network, regionNeurons, regionNeurons)
+        radial.connectNeurons(regionNeurons, regionNeurons).addToNetwork(network)
 
         // Increment GUI column for next neuron region to be displayed (up to 3, per above)
         xCoordinateFactor += 1
@@ -151,7 +148,7 @@ val cortexKuramoto = newSim {
                 //val sg = SynapseGroup2(i, j, sparse)
                 //sg.displaySynapses = true
                 //network.addNetworkModel(sg)
-                sparse.connectNeurons(network, i.neuronList, j.neuronList)
+                sparse.connectNeurons(i.neuronList, j.neuronList).addToNetwork(network)
             }
         }
     }

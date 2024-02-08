@@ -23,7 +23,7 @@
 //package org.simbrain.network.gui.dialogs.neuron;
 //
 //import org.simbrain.network.core.Neuron;
-//import org.simbrain.network.core.NeuronUpdateRule;
+//import org.simbrain.network.updaterules.NeuronUpdateRule;
 //import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule;
 //import org.simbrain.network.updaterules.interfaces.ClippableUpdateRule;
 //import org.simbrain.util.SimbrainConstants;

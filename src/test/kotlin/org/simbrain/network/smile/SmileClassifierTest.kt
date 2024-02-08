@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
-import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.network.matrix.WeightMatrix
+import org.simbrain.network.core.NeuronArray
+import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.smile.classifiers.LogisticRegClassifier
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.util.Utils
@@ -42,7 +42,7 @@ class SmileClassifierTest {
         )
         this.trainingData.setIntegerTargets(intArrayOf(-1, 1, 1, -1))
     }
-    var xorSVM = SmileClassifier(net, svm)
+    var xorSVM = SmileClassifier(svm)
 
     @BeforeEach
     internal fun setUp() {
@@ -53,7 +53,7 @@ class SmileClassifierTest {
 
     @Test
     fun testInit() {
-        val classifier = SmileClassifier(net, SVMClassifier(4))
+        val classifier = SmileClassifier(SVMClassifier(4))
         net.addNetworkModelAsync(classifier)
         classifier.addInputs(Matrix.column(doubleArrayOf(1.0,2.0,3.0,4.0)))
         assertEquals(10.0, classifier.inputs.sum())
@@ -83,13 +83,13 @@ class SmileClassifierTest {
 
         // Set up
         // inputNa -> wm1 -> xorSVM -> wm2 -> outputNa
-        val inputNa = NeuronArray(net, 3)
+        val inputNa = NeuronArray(3)
         inputNa.clear() // neuron arrays are randomized by default
-        val wm1 = WeightMatrix(net, inputNa, xorSVM)
+        val wm1 = WeightMatrix(inputNa, xorSVM)
         wm1.diagonalize()
-        val outputNa = NeuronArray(net, 2)
+        val outputNa = NeuronArray(2)
         outputNa.clear()
-        val wm2 = WeightMatrix(net, xorSVM, outputNa)
+        val wm2 = WeightMatrix(xorSVM, outputNa)
         wm2.diagonalize()
         net.addNetworkModelsAsync(listOf(inputNa, wm1, xorSVM, wm2, outputNa))
 

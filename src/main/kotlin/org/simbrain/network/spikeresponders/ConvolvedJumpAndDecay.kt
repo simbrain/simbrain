@@ -1,10 +1,6 @@
 package org.simbrain.network.spikeresponders
 
-import org.simbrain.network.core.Connector
-import org.simbrain.network.core.Synapse
-import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.network.matrix.WeightMatrix
-import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder
+import org.simbrain.network.core.*
 import org.simbrain.network.util.MatrixDataHolder
 import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.network.util.SpikingMatrixData
@@ -43,9 +39,10 @@ class ConvolvedJumpAndDecay() : SpikeResponder() {
         return jad
     }
 
-    override fun apply(conn: Connector, responderData: MatrixDataHolder) {
-        val wm = conn.let { if (it is WeightMatrix) it else return }
-        val na = conn.source.let { if (it is NeuronArray) it else return }
+    context(Network)
+    override fun apply(connector: Connector, responderData: MatrixDataHolder) {
+        val wm = connector.let { if (it is WeightMatrix) it else return }
+        val na = connector.source.let { if (it is NeuronArray) it else return }
         val spikeData = na.dataHolder.let { if (it is SpikingMatrixData) it else return }
         if (na.updateRule.isSpikingRule) {
             for (i in 0 until wm.weightMatrix.nrow()) {
@@ -54,7 +51,7 @@ class ConvolvedJumpAndDecay() : SpikeResponder() {
                         spikeData.spikes[j],
                         wm.psrMatrix[i, j],
                         wm.weightMatrix[i, j],
-                        na.network.timeStep
+                        timeStep
                     )
                     wm.psrMatrix.set(i, j, psr)
                 }
@@ -63,8 +60,9 @@ class ConvolvedJumpAndDecay() : SpikeResponder() {
     }
 
 
-    override fun apply(s: Synapse, responderData: ScalarDataHolder) {
-        s.psr = convolvedJumpAndDecay(s.source.isSpike, s.psr, s.strength, s.network.timeStep)
+    context(Network)
+    override fun apply(synapse: Synapse, responderData: ScalarDataHolder) {
+        synapse.psr = convolvedJumpAndDecay(synapse.source.isSpike, synapse.psr, synapse.strength, timeStep)
     }
 
     fun convolvedJumpAndDecay(
@@ -81,10 +79,7 @@ class ConvolvedJumpAndDecay() : SpikeResponder() {
         return psr
     }
 
-    override fun getDescription(): String {
-        return "Convolved Jump and Decay"
-    }
+    override val description = "Convolved Jump and Decay"
 
-    override val name: String
-        get() = "Convolved Jump and Decay"
+    override val name = "Convolved Jump and Decay"
 }

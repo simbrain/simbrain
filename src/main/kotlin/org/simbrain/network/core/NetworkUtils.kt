@@ -4,10 +4,10 @@ import com.thoughtworks.xstream.XStream
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.ConnectionStrategy
-import org.simbrain.network.groups.*
-import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.neurongroups.NeuronGroup
+import org.simbrain.network.subnetworks.Subnetwork
+import org.simbrain.network.updaterules.LinearRule
+import org.simbrain.network.updaterules.NeuronUpdateRule
 import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.*
@@ -36,10 +36,11 @@ fun reconstructionOrder(obj: NetworkModel): Int = when (obj) {
  *
  * @param neuronList the list of neurons to be updated
  */
+context(Network)
 fun updateNeurons(neuronList: List<Neuron>) {
     // TODO: Update by priority if priority based update?
-    neuronList.forEach(Neuron::updateInputs)
-    neuronList.forEach(Neuron::update)
+    neuronList.forEach { it.updateInputs() }
+    neuronList.forEach { it.update() }
 }
 
 /**
@@ -138,49 +139,50 @@ fun networkUpdateAction(description: String, longDescription: String = descripti
         override fun getLongDescription(): String = longDescription
     }
 
+context(Network)
 @JvmOverloads
 fun connect(source: Neuron, target: Neuron, value: Double, lowerBound: Double = Synapse.DEFAULT_LOWER_BOUND, upperBound: Double = Synapse.DEFAULT_UPPER_BOUND): Synapse {
     val synapse = Synapse(source, target)
     synapse.forceSetStrength(value)
     synapse.lowerBound = lowerBound
     synapse.upperBound = upperBound
-    source.network.addNetworkModelAsync(synapse)
+    addNetworkModelAsync(synapse)
     return synapse
 }
 
 fun Network.connect(source: List<Neuron>, target: List<Neuron>, connectionStrategy: ConnectionStrategy): List<Synapse> {
-    return connectionStrategy.connectNeurons(this, source, target)
+    return connectionStrategy.connectNeurons(source, target).also { it.addToNetworkAsync() }
 }
 
 fun Network.connect(source: AbstractNeuronCollection, target: AbstractNeuronCollection, connector: ConnectionStrategy): List<Synapse?> {
-    return connector.connectNeurons(this, source.neuronList, target.neuronList)
+    return connector.connectNeurons(source.neuronList, target.neuronList).also { it.addToNetworkAsync() }
 }
 
 /**
  * Connect input nodes to target nodes with weights initialized to a value.
  */
-fun connectAllToAll(source: AbstractNeuronCollection, target: AbstractNeuronCollection, value: Double): List<Synapse> {
+fun Network.connectAllToAll(source: AbstractNeuronCollection, target: AbstractNeuronCollection, value: Double): List<Synapse> {
     val wts = connectAllToAll(source, target)
     wts.forEach{ it.forceSetStrength(value) }
     return wts
 }
 
-fun connectAllToAll(source: AbstractNeuronCollection, target: AbstractNeuronCollection): List<Synapse> {
-    return AllToAll().connectNeurons(source.network, source.neuronList, target.neuronList)
+fun Network.connectAllToAll(source: AbstractNeuronCollection, target: AbstractNeuronCollection): List<Synapse> {
+    return AllToAll().connectNeurons(source.neuronList, target.neuronList).also { it.addToNetworkAsync() }
 }
 
 /**
  * Connect a source neuron group to a single target neuron
  */
-fun connectAllToAll(inputs: AbstractNeuronCollection, target: Neuron): List<Synapse> {
+fun Network.connectAllToAll(inputs: AbstractNeuronCollection, target: Neuron): List<Synapse> {
     val connector = AllToAll()
-    return connector.connectNeurons(inputs.network, inputs.neuronList, listOf(target))
+    return connector.connectNeurons(inputs.neuronList, listOf(target)).also { it.addToNetworkAsync() }
 }
 
 /**
  * Connect input nodes to target node with weights initialized to a value.
  */
-fun connectAllToAll(source: AbstractNeuronCollection, target: Neuron, value: Double): List<Synapse> {
+fun Network.connectAllToAll(source: AbstractNeuronCollection, target: Neuron, value: Double): List<Synapse> {
     val wts = connectAllToAll(source, target)
     wts.forEach{ wt: Synapse -> wt.forceSetStrength(value) }
     return wts
@@ -188,13 +190,13 @@ fun connectAllToAll(source: AbstractNeuronCollection, target: Neuron, value: Dou
 
 fun Network.addNeurons(numNeurons: Int, template: Neuron.() -> Unit = {}): List<Neuron> {
     val neurons = (0 until numNeurons).map {
-        Neuron(this).apply(template)
+        Neuron().apply(template)
     }
     addNetworkModelsAsync(neurons)
     return neurons
 }
 
-fun Network.addNeuron(block: Neuron.() -> Unit = { }) = Neuron(this)
+fun Network.addNeuron(block: Neuron.() -> Unit = { }) = Neuron()
     .apply(this::addNetworkModelAsync)
     .also(block)
 
@@ -207,8 +209,8 @@ fun Network.addSynapse(source: Neuron, target: Neuron, block: Synapse.() -> Unit
     .also(this::addNetworkModelAsync)
 
 fun Network.addNeuronGroup(count: Int, location: Point2D? = null, template: Neuron.() -> Unit = { }): NeuronGroup {
-    return NeuronGroup(this, List(count) {
-        Neuron(this).apply(template)
+    return NeuronGroup(List(count) {
+        Neuron().apply(template)
     }).also {
         addNetworkModelAsync(it)
         if (location != null) {
@@ -221,7 +223,7 @@ fun Network.addNeuronGroup(count: Int, location: Point2D? = null, template: Neur
 @JvmOverloads
 fun Network.addNeuronGroup(x: Double, y: Double, numNeurons: Int, rule: NeuronUpdateRule<*, *> = LinearRule()):
         NeuronGroup {
-    val ng = NeuronGroup(this, numNeurons)
+    val ng = NeuronGroup(numNeurons)
     ng.setUpdateRule(rule)
     addNetworkModelAsync(ng)
     ng.setLocation(x, y)
@@ -229,13 +231,13 @@ fun Network.addNeuronGroup(x: Double, y: Double, numNeurons: Int, rule: NeuronUp
 }
 
 fun Network.addNeuronCollectionAsync(numNeurons: Int, template: Neuron.() -> Unit = {}) : NeuronCollection {
-    val nc = NeuronCollection(this, addNeurons(numNeurons, template))
+    val nc = NeuronCollection(addNeurons(numNeurons, template))
     addNetworkModelAsync(nc)
     return nc
 }
 
 suspend fun Network.addNeuronCollection(numNeurons: Int, template: Neuron.() -> Unit = {}) : NeuronCollection {
-    val nc = NeuronCollection(this, addNeurons(numNeurons, template))
+    val nc = NeuronCollection(addNeurons(numNeurons, template))
     addNetworkModel(nc)
     return nc
 }
@@ -270,7 +272,7 @@ fun Synapse.overlapsExistingSynapse(): Boolean {
 
 @JvmName("clampSynapses")
 fun Collection<Synapse>.clamp(clamped: Boolean) {
-    forEach { it.isFrozen = clamped }
+    forEach { it.frozen = clamped }
 }
 
 @JvmName("clampNeurons")
@@ -278,19 +280,21 @@ fun Collection<Neuron>.clamp(clamped: Boolean) {
     forEach { it.clamped = clamped }
 }
 
+context(Network)
 fun Neuron.randomizeBias() {
     dataHolder.let {
         if (it is BiasedScalarData) {
-            it.bias = network.biasesRandomizer.sampleDouble()
+            it.bias = biasesRandomizer.sampleDouble()
         }
     }
 }
 
+context(Network)
 fun NeuronArray.randomizeBiases() {
     dataHolder.let {
         if (it is BiasedMatrixData) {
             for (i in 0 until it.biases.nrow()) {
-                it.biases.set(i, 0, network.biasesRandomizer.sampleDouble())
+                it.biases.set(i, 0, biasesRandomizer.sampleDouble())
             }
             events.updated.fireAndBlock()
         }
@@ -302,3 +306,14 @@ fun List<Synapse>.percentExcitatory() = count { it.strength > 0.0 } / size.toDou
 fun List<Neuron>.getEnergy() = (this cartesianProduct this)
     .mapNotNull { (a, b) -> getSynapse(a, b) }
     .sumOf { it.strength * it.source.activation * it.target.activation } * -0.5
+
+
+suspend fun NetworkModel.addToNetwork(network: Network) = network.addNetworkModel(this)
+fun NetworkModel.addToNetworkAsync(network: Network) = network.addNetworkModelAsync(this)
+suspend fun List<NetworkModel>.addToNetwork(network: Network) = network.addNetworkModels(this)
+fun List<NetworkModel>.addToNetworkAsync(network: Network) = network.addNetworkModelsAsync(this)
+
+context(Network) suspend fun NetworkModel.addToNetwork() = addNetworkModel(this)
+context(Network) fun NetworkModel.addToNetworkAsync() = addNetworkModelAsync(this)
+context(Network) suspend fun List<NetworkModel>.addToNetwork() = addNetworkModels(this)
+context(Network) fun List<NetworkModel>.addToNetworkAsync() = addNetworkModelsAsync(this)

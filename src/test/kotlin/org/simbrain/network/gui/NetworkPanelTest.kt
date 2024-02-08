@@ -14,8 +14,8 @@ class NetworkPanelTest {
             val net = Network()
             val nc = NetworkComponent("Test", net)
             val np = NetworkPanel(nc)
-            val n1 = Neuron(net)
-            val n2 = Neuron(net)
+            val n1 = Neuron()
+            val n2 = Neuron()
             net.addNetworkModels(n1, n2)
             assertEquals(2, np.screenElements.size)
         }

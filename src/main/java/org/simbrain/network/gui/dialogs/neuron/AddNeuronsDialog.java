@@ -15,12 +15,12 @@ package org.simbrain.network.gui.dialogs.neuron;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
-import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.neurongroups.NeuronGroup;
+import org.simbrain.network.updaterules.LinearRule;
+import org.simbrain.network.updaterules.NeuronUpdateRule;
 import org.simbrain.util.DetailTrianglePanel;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
@@ -129,7 +129,7 @@ public class AddNeuronsDialog extends StandardDialog {
      */
     private AddNeuronsDialog(final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
-        baseNeuron = new Neuron(networkPanel.getNetwork(), DEFAULT_NEURON);
+        baseNeuron = new Neuron();
         networkPanel.getSelectionManager().clear();
     }
 
@@ -189,10 +189,10 @@ public class AddNeuronsDialog extends StandardDialog {
         if (!Double.isNaN(number)) {
             Network net = networkPanel.getNetwork();
             for (int i = 0; i < number; i++) {
-                addedNeurons.add(new Neuron(net, baseNeuron));
+                addedNeurons.add(new Neuron(baseNeuron));
             }
             if (inGroup) {
-                NeuronGroup ng = new NeuronGroup(networkPanel.getNetwork(), addedNeurons);
+                NeuronGroup ng = new NeuronGroup(addedNeurons);
                 ng.setLayout(layoutObject.getLayout());
                 networkPanel.getNetwork().addNetworkModelAsync(ng);
                 ng.applyLayout();

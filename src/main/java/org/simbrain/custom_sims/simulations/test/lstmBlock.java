@@ -6,8 +6,6 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.layouts.LineLayout;
-import org.simbrain.network.neuron_update_rules.LinearRule;
-import org.simbrain.network.neuron_update_rules.ProductRule;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 
@@ -61,7 +59,7 @@ public class lstmBlock extends Simulation {
         List gates= new ArrayList();
 
         for(int i=0;i< 4;++i){
-            Neuron neuron = new Neuron(network);
+            Neuron neuron = new Neuron();
             neuron.setIncrement(1);
             neuron.setClamped(true);
             network.addNetworkModelAsync(neuron);
@@ -72,25 +70,25 @@ public class lstmBlock extends Simulation {
 
         // Create the four units of the LSTM cell, three products (AND gates) and one sum (OR gate)
         // The load unit allows the info value to enter the store if the gate 1 is high
-        Neuron load=new Neuron(network,new ProductRule());
+        Neuron load=new Neuron();
         network.addNetworkModelAsync(load);
         load.setLabel("Load");
         load.setX(0);load.setY(-GRID_SPACE);
 
         // The maintain unit allows the store value to remain in the store if gate 2 is high
-        Neuron maintain=new Neuron(network,new ProductRule());
+        Neuron maintain=new Neuron();
         maintain.setLabel("Maintain");
         network.addNetworkModelAsync(maintain);
         maintain.setX(GRID_SPACE);maintain.setY(-GRID_SPACE);
 
         // The store unit takes the sum of the load and maintain signals
-        Neuron store=new Neuron(network,new LinearRule());
+        Neuron store=new Neuron();
         store.setLabel("Store");
         network.addNetworkModelAsync(store);
         store.setX(0);store.setY(-2*GRID_SPACE);
 
         // The out unit allows the store value to be read out of the cell if gate 3 is high
-        Neuron out=new Neuron(network,new ProductRule());
+        Neuron out=new Neuron();
         out.setLabel("Out");
         network.addNetworkModelAsync(out);
         out.setX(0);out.setY(-3*GRID_SPACE);

@@ -17,10 +17,10 @@
  */
 package org.simbrain.network.neurongroups
 
+import org.simbrain.network.core.AbstractNeuronCollection
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.NeuronUpdateRule
-import org.simbrain.network.groups.AbstractNeuronCollection
+import org.simbrain.network.updaterules.NeuronUpdateRule
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.CustomTypeName
 
@@ -34,23 +34,16 @@ import org.simbrain.util.propertyeditor.CustomTypeName
  * groups. Self-organizing-maps subclass this class. Etc. Since all update rules are the same groups can be characterized
  * as spiking vs. non-spiking.
  */
-open class NeuronGroup(parentNetwork: Network) : AbstractNeuronCollection(parentNetwork) {
+open class NeuronGroup() : AbstractNeuronCollection() {
 
-    constructor(parentNetwork: Network, neurons: List<Neuron>) : this(parentNetwork) {
+    constructor(neurons: List<Neuron>) : this() {
         addNeurons(neurons)
     }
 
-    constructor(parentNetwork: Network, numNeurons: Int) : this(parentNetwork, List(numNeurons) { Neuron(parentNetwork) })
+    constructor(numNeurons: Int) : this(List(numNeurons) { Neuron() })
 
     fun setUpdateRule(base: NeuronUpdateRule<*, *>) {
         neuronList.forEach { it.updateRule = base.copy() }
-    }
-
-    fun copyTo(newParent: Network): NeuronGroup {
-        return NeuronGroup(newParent).also {
-            it.addNeurons(neuronList.map(Neuron::deepCopy))
-            it.label = label
-        }
     }
 
     override fun delete() {
@@ -59,6 +52,7 @@ open class NeuronGroup(parentNetwork: Network) : AbstractNeuronCollection(parent
         neuronList.toList().forEach { it.delete() }
     }
 
+    context(Network)
     override fun update() {
         neuronList.forEach { it.updateInputs() }
         neuronList.forEach { it.update() }
@@ -71,8 +65,9 @@ open class NeuronGroup(parentNetwork: Network) : AbstractNeuronCollection(parent
         neuronList.forEach { it.clear() }
     }
 
-    override fun copy(): NeuronGroup {
-        return copyTo(parentNetwork)
+    override fun copy() = NeuronGroup().also {
+        it.addNeurons(neuronList.map(Neuron::deepCopy))
+        it.label = label
     }
 
     override fun postOpenInit() {
@@ -85,8 +80,8 @@ open class NeuronGroup(parentNetwork: Network) : AbstractNeuronCollection(parent
 @CustomTypeName("Bare Neuron Group")
 class BasicNeuronGroupParams: NeuronGroupParams() {
 
-    override fun create(net: Network): NeuronGroup {
-        return NeuronGroup(net, List(numNeurons) { Neuron(net) })
+    override fun create(): NeuronGroup {
+        return NeuronGroup(List(numNeurons) { Neuron() })
     }
 
     override fun copy(): CopyableObject {

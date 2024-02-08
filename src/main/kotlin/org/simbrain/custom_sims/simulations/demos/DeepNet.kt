@@ -42,7 +42,7 @@ val deepNetSim = newSim {
     val network = networkComponent.network
 
     // Add a self-connected neuron array to the network
-    val deepNet = DeepNet(network,
+    val deepNet = DeepNet(
         arrayListOf(
             TFInputLayer(28,28,1),
             TFConv2DLayer().apply {

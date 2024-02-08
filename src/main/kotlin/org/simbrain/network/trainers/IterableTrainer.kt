@@ -15,6 +15,7 @@ package org.simbrain.network.trainers
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.simbrain.network.core.Network
 import org.simbrain.network.events.TrainerEvents
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.subnetworks.LMSNetwork
@@ -55,6 +56,7 @@ abstract class IterableTrainer(val net: Trainable) : EditableObject {
 
     @Transient val events = TrainerEvents()
 
+    context(Network)
     suspend fun startTraining() {
         if (stoppingConditionReached) {
             stoppingConditionReached = false
@@ -79,12 +81,14 @@ abstract class IterableTrainer(val net: Trainable) : EditableObject {
         events.endTraining.fireAndForget()
     }
 
+    context(Network)
     suspend fun train(iterations: Int) {
         repeat(iterations) {
             trainOnce()
         }
     }
 
+    context(Network)
     suspend fun trainOnce() {
         iteration++
         with(updateType) {
@@ -111,13 +115,16 @@ abstract class IterableTrainer(val net: Trainable) : EditableObject {
         events.errorUpdated.fire(lossFunction)
     }
 
+    context(Network)
     abstract fun trainRow(rowNum: Int): Double
 
+    context(Network)
     open fun applyInputs(rowNum: Int) {
         net.inputLayer.activations = net.trainingSet.inputs.rowVectorTransposed(rowNum)
         net.update()
     }
 
+    context(Network)
     abstract fun randomize()
 
     sealed class UpdateMethod: CopyableObject {
@@ -245,6 +252,7 @@ abstract class IterableTrainer(val net: Trainable) : EditableObject {
 
 class LMSTrainer(val lmsNet: LMSNetwork) : IterableTrainer(lmsNet) {
 
+    context(Network)
     override fun trainRow(rowNum: Int): Double {
         if (rowNum !in 0 until lmsNet.trainingSet.inputs.nrow()) {
             throw IllegalArgumentException("Trying to train invalid row number $rowNum")
@@ -267,6 +275,7 @@ class LMSTrainer(val lmsNet: LMSNetwork) : IterableTrainer(lmsNet) {
 
 class BackpropTrainer(val bp: BackpropNetwork) : IterableTrainer(bp) {
 
+    context(Network)
     override fun trainRow(rowNum: Int): Double {
         bp.inputLayer.setActivations(bp.trainingSet.inputs.row(rowNum))
         val targetVec = bp.trainingSet.targets.rowVectorTransposed(rowNum)
@@ -274,6 +283,7 @@ class BackpropTrainer(val bp: BackpropNetwork) : IterableTrainer(bp) {
         return bp.wmList.backpropError(targetVec)
     }
 
+    context(Network)
     override fun randomize() {
         bp.randomize()
     }
@@ -289,6 +299,7 @@ class SRNTrainer(val srn: SRNNetwork) : IterableTrainer(srn) {
         typeMapProvider = UpdateMethod::srnTypeList
     )
 
+    context(Network)
     override fun trainRow(rowNum: Int): Double {
 
         val targetVec = srn.trainingSet.targets.rowVectorTransposed(rowNum)
@@ -299,6 +310,7 @@ class SRNTrainer(val srn: SRNNetwork) : IterableTrainer(srn) {
         return weightMatrixTree.backpropError(targetVec, epsilon = learningRate)
     }
 
+    context(Network)
     override fun randomize() {
         srn.randomize()
     }

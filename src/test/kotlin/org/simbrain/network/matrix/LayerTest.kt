@@ -3,6 +3,8 @@ package org.simbrain.network.matrix
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
+import org.simbrain.network.core.NeuronArray
+import org.simbrain.network.core.WeightMatrix
 import org.simbrain.util.toDoubleArray
 import smile.math.matrix.Matrix
 
@@ -15,8 +17,10 @@ class LayerTest {
 
     @Test
     internal fun `getWeightedInputs returns correct values`() {
-        na1.activations = Matrix.column(doubleArrayOf(1.0,-1.0))
-        wm.diagonalize()
-        assertArrayEquals(doubleArrayOf(1.0,-1.0), wm.output.toDoubleArray(), 0.0)
+        with(net) {
+            na1.activations = Matrix.column(doubleArrayOf(1.0,-1.0))
+            wm.diagonalize()
+            assertArrayEquals(doubleArrayOf(1.0,-1.0), wm.output.toDoubleArray(), 0.0)
+        }
     }
 }

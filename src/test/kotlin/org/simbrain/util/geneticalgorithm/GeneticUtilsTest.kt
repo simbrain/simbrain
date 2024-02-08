@@ -1,7 +1,7 @@
 package org.simbrain.util.geneticalgorithm
 
 import org.junit.jupiter.api.Test
-import org.simbrain.network.neuron_update_rules.BinaryRule
+import org.simbrain.network.updaterules.BinaryRule
 import kotlin.random.Random
 
 class GeneticUtilsTest {

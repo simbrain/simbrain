@@ -2,15 +2,15 @@ package org.simbrain.network.core
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.simbrain.network.neuron_update_rules.SpikingThresholdRule
 import org.simbrain.network.spikeresponders.*
+import org.simbrain.network.updaterules.SpikingThresholdRule
 
 class SpikeResponderTest {
 
     val net = Network()
-    val n1 = Neuron(net) // Input
-    val n2 = Neuron(net, SpikingThresholdRule()) // Spiking neuron
-    val n3 = Neuron(net).also { it.upperBound = 10.0 } // receive spike response
+    val n1 = Neuron() // Input
+    val n2 = Neuron(SpikingThresholdRule()) // Spiking neuron
+    val n3 = Neuron().also { it.upperBound = 10.0 } // receive spike response
     val s1 = Synapse(n1, n2)
     val s2 = Synapse(n2, n3) // This one has the spike responder
 

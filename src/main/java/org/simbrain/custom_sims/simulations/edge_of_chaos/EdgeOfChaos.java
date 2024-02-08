@@ -10,8 +10,8 @@ import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseGroup;
 import org.simbrain.network.layouts.GridLayout;
-import org.simbrain.network.neuron_update_rules.BinaryRule;
 import org.simbrain.network.neurongroups.NeuronGroup;
+import org.simbrain.network.updaterules.BinaryRule;
 import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.util.decayfunctions.StepDecayFunction;
 import org.simbrain.util.stats.ProbabilityDistribution;
@@ -111,7 +111,7 @@ public class EdgeOfChaos extends Simulation {
         int offset = 310;
 
         // Sensor nodes
-        sensorNodes = new NeuronGroup(net, 6);
+        sensorNodes = new NeuronGroup(6);
         sensorNodes.setLabel("Sensors");
         // sensorNodes.setClamped(true);
         net.addNetworkModelAsync(sensorNodes);
@@ -127,7 +127,7 @@ public class EdgeOfChaos extends Simulation {
 
     public static NeuronGroup createReservoir(Network parentNet, int x, int y, int numNeurons) {
         GridLayout layout = new GridLayout(GRID_SPACE, GRID_SPACE, (int) Math.sqrt(numNeurons));
-        NeuronGroup ng = new NeuronGroup(parentNet, numNeurons);
+        NeuronGroup ng = new NeuronGroup(numNeurons);
         BinaryRule thresholdUnit = new BinaryRule();
         ng.setUpdateRule(thresholdUnit);
         parentNet.addNetworkModelAsync(ng);

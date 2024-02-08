@@ -14,11 +14,9 @@
 package org.simbrain.network.subnetworks
 
 import org.simbrain.network.core.Network
-import org.simbrain.network.core.XStreamConstructor
+import org.simbrain.network.core.NeuronArray
+import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.core.randomizeBiases
-import org.simbrain.network.groups.Subnetwork
-import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.offsetNeuronGroup
 import org.simbrain.util.stats.distributions.UniformRealDistribution
@@ -46,17 +44,16 @@ open class FeedForward : Subnetwork {
     lateinit var outputLayer: NeuronArray
         private set
 
-    @XStreamConstructor
-    protected constructor(parentNetwork: Network) : super(parentNetwork)
+    constructor(): super()
 
     /**
      * @param parentNetwork Parent network
      * @param nodesPerLayer Integers 1...n correspond to number of nodes in layers 1..n
      * @param initialPosition Center location for network.
      */
-    constructor(parentNetwork: Network, nodesPerLayer: IntArray, initialPosition: Point2D?): super(parentNetwork) {
+    constructor(nodesPerLayer: IntArray, initialPosition: Point2D?): super() {
         label = "Layered Network"
-        inputLayer = NeuronArray(parentNetwork, nodesPerLayer[0])
+        inputLayer = NeuronArray(nodesPerLayer[0])
         addModel(inputLayer)
         layerList.add(inputLayer)
 
@@ -65,7 +62,7 @@ open class FeedForward : Subnetwork {
 
         // Make hidden layers and output layer
         for (i in 1 until nodesPerLayer.size) {
-            val hiddenLayer = NeuronArray(parentNetwork, nodesPerLayer[i])
+            val hiddenLayer = NeuronArray(nodesPerLayer[i])
             addModel(hiddenLayer)
             layerList.add(hiddenLayer)
             offsetNeuronGroup(
@@ -78,7 +75,7 @@ open class FeedForward : Subnetwork {
             )
 
             // Add weight matrix
-            val wm = WeightMatrix(parentNetwork, lastLayer, hiddenLayer)
+            val wm = WeightMatrix(lastLayer, hiddenLayer)
             wm.randomize()
             addModel(wm)
             wmList.add(wm)
@@ -99,11 +96,13 @@ open class FeedForward : Subnetwork {
 
     val randomizer = UniformRealDistribution(-1.0, 1.0)
 
+    context(Network)
     override fun randomize() {
         wmList.forEach { wm -> wm.randomize() }
         (layerList - inputLayer).forEach { it.randomizeBiases() }
     }
 
+    context(Network)
     override fun update() {
         inputLayer.updateInputs()
         inputLayer.update()

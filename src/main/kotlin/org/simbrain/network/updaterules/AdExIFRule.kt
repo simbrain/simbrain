@@ -18,10 +18,7 @@
  */
 package org.simbrain.network.updaterules
 
-import org.simbrain.network.core.Layer
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.SpikingNeuronUpdateRule
-import org.simbrain.network.matrix.NeuronArray
+import org.simbrain.network.core.*
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
 import org.simbrain.network.util.*
 import org.simbrain.util.UserParameter
@@ -269,23 +266,24 @@ open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), Noi
      */
     var refractoryPeriod = 1.0
 
-    override fun apply(na: Layer, data: AdexMatrixData) {
-        if (na is NeuronArray) {
-            for (i in 0 until na.size()) {
-                val excitInputs = na.excitatoryInputs
-                val inhibInputs = na.inhibitoryInputs
+    context(Network)
+    override fun apply(layer: Layer, dataHolder: AdexMatrixData) {
+        if (layer is NeuronArray) {
+            for (i in 0 until layer.size()) {
+                val excitInputs = layer.excitatoryInputs
+                val inhibInputs = layer.inhibitoryInputs
                 val (spiked, v, w) = adExRule(
-                    na.activations.get(i, 0),
-                    data.w.get(i),
+                    layer.activations.get(i, 0),
+                    dataHolder.w[i],
                     excitInputs[i],
                     inhibInputs[i],
-                    data.lastSpikeTimes[i],
-                    na.network.time,
-                    na.network.timeStep
+                    dataHolder.lastSpikeTimes[i],
+                    time,
+                    timeStep
                 )
-                data.setHasSpiked(i, spiked, na.network.time)
-                na.activations.set(i, 0, v)
-                data.w.set(i, w)
+                dataHolder.setHasSpiked(i, spiked, time)
+                layer.activations.set(i, 0, v)
+                dataHolder.w.set(i, w)
             }
         }
     }
@@ -294,13 +292,14 @@ open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), Noi
         return AdexMatrixData(size)
     }
 
-    override fun apply(n: Neuron, data: AdexData) {
+    context(Network)
+    override fun apply(neuron: Neuron, data: AdexData) {
         val (spiked, v, w) = adExRule(
-            n.activation, data.w, n.excitatoryInputs, n.inhibitoryInputs,
-            n.lastSpikeTime, n.network.time, n.network.timeStep
+            neuron.activation, data.w, neuron.excitatoryInputs, neuron.inhibitoryInputs,
+            neuron.lastSpikeTime, time, timeStep
         )
-        n.isSpike = spiked
-        n.activation = v
+        neuron.isSpike = spiked
+        neuron.activation = v
         data.w = w
 
     }

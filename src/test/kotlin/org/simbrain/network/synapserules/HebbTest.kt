@@ -3,12 +3,8 @@ package org.simbrain.network.synapserules
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.Synapse
-import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.network.matrix.WeightMatrix
-import org.simbrain.network.synapse_update_rules.HebbianRule
+import org.simbrain.network.core.*
+import org.simbrain.network.learningrules.HebbianRule
 import org.simbrain.util.toMatrix
 
 class HebbTest {

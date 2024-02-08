@@ -7,8 +7,8 @@ import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseGroup;
-import org.simbrain.network.neuron_update_rules.BinaryRule;
 import org.simbrain.network.neurongroups.NeuronGroup;
+import org.simbrain.network.updaterules.BinaryRule;
 import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.util.math.SimbrainMath;
@@ -113,8 +113,8 @@ public class EdgeOfChaosBitStream extends Simulation {
         bitStream2 = buildBitStream(res2);
         bitStream2.setLabel("Bit stream 2");
         AllToAll connector = new AllToAll();
-        connector.connectNeurons(net, bitStream1.getNeuronList(), res1.getNeuronList(), true);
-        connector.connectNeurons(net, bitStream2.getNeuronList(), res2.getNeuronList(), true);
+        net.addNetworkModelsAsync(connector.connectNeurons(bitStream1.getNeuronList(), res1.getNeuronList()));
+        net.addNetworkModelsAsync(connector.connectNeurons(bitStream2.getNeuronList(), res2.getNeuronList()));
 
     }
 
@@ -123,7 +123,7 @@ public class EdgeOfChaosBitStream extends Simulation {
     private NeuronGroup buildBitStream(NeuronGroup reservoir) {
         // Offset in pixels of input nodes to right of reservoir
         int offset = 200;
-        bitStreamInputs = new NeuronGroup(net, 1);
+        bitStreamInputs = new NeuronGroup(1);
         BinaryRule b = new BinaryRule(0, u_bar, .5);
         bitStreamInputs.setUpdateRule(b);
         bitStreamInputs.setClamped(true);

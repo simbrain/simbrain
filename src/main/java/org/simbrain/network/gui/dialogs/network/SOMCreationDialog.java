@@ -101,7 +101,7 @@ public class SOMCreationDialog extends StandardDialog {
     @Override
     protected void closeDialogOk() {
         somPanel.commitChanges();
-        SOMNetwork som = sc.create(networkPanel.getNetwork());
+        SOMNetwork som = sc.create();
         layoutPanel.commitChanges();
         som.getSom().setLayout(layout);
         som.getSom().applyLayout();

@@ -21,8 +21,7 @@ package org.simbrain.network.updaterules
 import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
-import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.network.neuron_update_rules.AbstractSigmoidalRule
+import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.add
@@ -37,21 +36,23 @@ class SigmoidalRule : AbstractSigmoidalRule() {
 
     override val timeType: Network.TimeType = Network.TimeType.DISCRETE
 
+    context(Network)
     override fun apply(neuron: Neuron, data: BiasedScalarData) {
         var weightedInput = neuron.input + data.bias
         if (addNoise) {
             weightedInput += noiseGenerator.sampleDouble()
         }
-        neuron.activation = sFunction.valueOf(weightedInput, upperBound, lowerBound, slope)
+        neuron.activation = type.valueOf(weightedInput, upperBound, lowerBound, slope)
     }
 
-    override fun apply(arr: Layer, data: BiasedMatrixData) {
-        val array = arr as NeuronArray
-        val weightedInputs = array.inputs.add(data.biases)
+    context(Network)
+    override fun apply(layer: Layer, dataHolder: BiasedMatrixData) {
+        val array = layer as NeuronArray
+        val weightedInputs = array.inputs.add(dataHolder.biases)
         if (addNoise) {
             weightedInputs.add(noiseGenerator.sampleDouble(array.size()))
         }
-        array.activations = sFunction.valueOf(weightedInputs, lowerBound, upperBound, slope)
+        array.activations = type.valueOf(weightedInputs, lowerBound, upperBound, slope)
     }
 
     override fun deepCopy(): SigmoidalRule {
@@ -61,7 +62,7 @@ class SigmoidalRule : AbstractSigmoidalRule() {
     }
 
     override fun getDerivative(input: Double): Double {
-        return sFunction.derivVal(input, upperBound, lowerBound, upperBound - lowerBound)
+        return type.derivVal(input, upperBound, lowerBound, upperBound - lowerBound)
     }
 
     override val name: String

@@ -11,9 +11,9 @@ import org.simbrain.util.math.SigmoidFunctionEnum
 class SigmoidDiscreteTest {
 
     val net = Network()
-    var input1 = Neuron(net)
-    var input2 = Neuron(net)
-    val output = Neuron(net).apply {
+    var input1 = Neuron()
+    var input2 = Neuron()
+    val output = Neuron().apply {
         updateRule = SigmoidalRule()
     }
 

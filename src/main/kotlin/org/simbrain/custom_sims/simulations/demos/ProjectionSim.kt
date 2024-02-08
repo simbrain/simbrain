@@ -4,8 +4,8 @@ import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addProjectionPlot2
 import org.simbrain.custom_sims.couplingManager
 import org.simbrain.custom_sims.newSim
-import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.network.matrix.WeightMatrix
+import org.simbrain.network.core.NeuronArray
+import org.simbrain.network.core.WeightMatrix
 import org.simbrain.util.place
 
 /**
@@ -19,8 +19,8 @@ val projectionSim = newSim {
     val network = networkComponent.network
 
     // Add a self-connected neuron array to the network
-    val neuronArray = NeuronArray(network, 25)
-    val weightMatrix = WeightMatrix(network, neuronArray, neuronArray)
+    val neuronArray = NeuronArray(25)
+    val weightMatrix = WeightMatrix(neuronArray, neuronArray)
     weightMatrix.randomize()
     network.addNetworkModelsAsync(listOf(neuronArray, weightMatrix))
 

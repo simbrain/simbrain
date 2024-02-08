@@ -38,7 +38,6 @@ val nlpSim_neuralNetworks = newSim {
     val networkComponent = addNetworkComponent("Network")
     val network = networkComponent.network
     val srn = SRNNetwork(
-        network,
         textWorld.world.tokenEmbedding.dimension,
         10,
         textWorld.world.tokenEmbedding.dimension,

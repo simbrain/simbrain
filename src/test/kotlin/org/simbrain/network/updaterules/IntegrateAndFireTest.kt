@@ -9,7 +9,7 @@ class IntegrateAndFireTest {
 
     val net = Network()
     val intFire = IntegrateAndFireRule()
-    val n = Neuron(net, intFire)
+    val n = Neuron(intFire)
     init {
         net.addNetworkModelAsync(n)
     }

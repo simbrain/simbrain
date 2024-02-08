@@ -4,18 +4,18 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.withTimeout
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.*
-import org.simbrain.network.core.*
+import org.simbrain.network.core.Network
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.Synapse
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.HexagonalGridLayout
 import org.simbrain.network.layouts.Layout
 import org.simbrain.network.layouts.LineLayout
+import org.simbrain.network.learningrules.HebbianRule
 import org.simbrain.network.learningrules.OjaRule
-import org.simbrain.network.neuron_update_rules.BinaryRule
-import org.simbrain.network.neuron_update_rules.DecayRule
-import org.simbrain.network.neuron_update_rules.LinearRule
-import org.simbrain.network.synapse_update_rules.HebbianRule
-import org.simbrain.network.synapse_update_rules.StaticSynapseRule
-import org.simbrain.network.updaterules.SigmoidalRule
+import org.simbrain.network.learningrules.StaticSynapseRule
+import org.simbrain.network.learningrules.SynapseUpdateRule
+import org.simbrain.network.updaterules.*
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
 import org.simbrain.util.cartesianProduct
@@ -39,7 +39,7 @@ class NodeGene(override val template: Neuron) : NetworkGene<Neuron>() {
         listeners.add(block)
     }
 
-    override suspend fun express(network: Network) = Neuron(network, template).also {
+    override suspend fun express(network: Network) = Neuron(template).also {
         network.addNetworkModelAsync(it)
         expressedNeuron.complete(it)
     }
@@ -68,11 +68,11 @@ class ConnectionGene(override val template: Synapse, val source: NodeGene, val t
     override suspend fun express(network: Network) =
         with(withTimeout(1000) { source.expressedNeuron.await() } to withTimeout(1000) { target.expressedNeuron.await() }) {
             val (source, target) = this
-            Synapse(network, source, target, template.learningRule, template).also { network.addNetworkModelAsync(it) }
+            Synapse(source, target, template).also { network.addNetworkModelAsync(it) }
         }
 
     override fun copy(): ConnectionGene {
-        return ConnectionGene(Synapse(template), copiedSource, copiedTarget)
+        return ConnectionGene(Synapse(source.template, target.template, template), copiedSource, copiedTarget)
     }
 }
 
@@ -175,7 +175,7 @@ class SynapseRuleGene(override val template: SynapseRuleGeneWrapper) : TopLevelG
 fun nodeGene(block: Neuron.() -> Unit = {}) = NodeGene(template = Neuron()).apply { template.block() }
 
 fun connectionGene(source: NodeGene, target: NodeGene, block: Synapse.() -> Unit = {}) = ConnectionGene(
-    template = Synapse(null as Neuron?, null),
+    template = Synapse(source.template, target.template),
     source, target
 ).apply { template.block() }
 

@@ -642,9 +642,9 @@ fun ProbabilityDistribution.useInhibitoryParams() {
 
 fun main() {
     val net = Network()
-    val neurons = List(20) { Neuron(net) }
+    val neurons = List(20) { Neuron() }
     // val neurons = mutableListOf<Neuron>() // To test empty list case
     val conn = RadialProbabilistic()
-    val syns = conn.connectNeurons(net, neurons, neurons)
+    val syns = conn.connectNeurons(neurons, neurons).also { net.addNetworkModelsAsync(it) }
     createSynapseAdjustmentPanel(syns)?.displayInDialog()
 }

@@ -63,57 +63,55 @@ class DeepNetNode(networkPanel: NetworkPanel, private val deepNet: DeepNet):
     //      """.trimIndent()
     // val (x,y,width,height) = infoText.bounds
 
-    override fun getModel(): NetworkModel {
-        return deepNet
-    }
+    override val model: NetworkModel
+        get() = deepNet
 
-    override fun getToolTipText(): String {
-        return deepNet.toString()
-    }
+    override val toolTipText: String
+        get() = deepNet.toString()
 
-    override fun getContextMenu(): JPopupMenu {
-        val contextMenu = JPopupMenu()
-        contextMenu.add(networkPanel.networkActions.cutAction)
-        contextMenu.add(networkPanel.networkActions.copyAction)
-        contextMenu.add(networkPanel.networkActions.pasteAction)
-        contextMenu.addSeparator()
+    override val contextMenu: JPopupMenu
+        get() {
+            val contextMenu = JPopupMenu()
+            contextMenu.add(networkPanel.networkActions.cutAction)
+            contextMenu.add(networkPanel.networkActions.copyAction)
+            contextMenu.add(networkPanel.networkActions.pasteAction)
+            contextMenu.addSeparator()
 
-        // Edit Submenu
-        val editNet: Action = object : AbstractAction("Edit...") {
-            override fun actionPerformed(event: ActionEvent) {
-                val dialog = propertyDialog as StandardDialog?
-                dialog!!.setLocationRelativeTo(null)
-                dialog.pack()
-                dialog.isVisible = true
+            // Edit Submenu
+            val editNet: Action = object : AbstractAction("Edit...") {
+                override fun actionPerformed(event: ActionEvent) {
+                    val dialog = propertyDialog as StandardDialog?
+                    dialog!!.setLocationRelativeTo(null)
+                    dialog.pack()
+                    dialog.isVisible = true
+                }
             }
-        }
-        contextMenu.add(editNet)
-        contextMenu.add(networkPanel.networkActions.deleteAction)
-        contextMenu.addSeparator()
+            contextMenu.add(editNet)
+            contextMenu.add(networkPanel.networkActions.deleteAction)
+            contextMenu.addSeparator()
 
-        // Train Submenu
-        val trainDeepNet = networkPanel.createAction(
-            name = "Train...",
-            keyboardShortcut = CmdOrCtrl + 'T'
-        ) {
-            // TODO: Commented out code prevents the dialog being opened for multiple
-            //  deep net nodes, but prevents it being called from right click node.
-            // if (selectionManager.isSelected(this@DeepNetNode)) {
+            // Train Submenu
+            val trainDeepNet = networkPanel.createAction(
+                name = "Train...",
+                keyboardShortcut = CmdOrCtrl + 'T'
+            ) {
+                // TODO: Commented out code prevents the dialog being opened for multiple
+                //  deep net nodes, but prevents it being called from right click node.
+                // if (selectionManager.isSelected(this@DeepNetNode)) {
                 showDeepNetTrainingDialog(deepNet)
-            // }
+                // }
+            }
+            contextMenu.add(trainDeepNet)
+
+            // Coupling menu
+            contextMenu.addSeparator()
+            contextMenu.add(CouplingMenu(networkPanel.networkComponent, deepNet))
+
+            return contextMenu
         }
-        contextMenu.add(trainDeepNet)
 
-        // Coupling menu
-        contextMenu.addSeparator()
-        contextMenu.add(CouplingMenu(networkPanel.networkComponent, deepNet))
-
-        return contextMenu
-    }
-
-    override fun getPropertyDialog(): JDialog {
-        return getDeepNetEditDialog(deepNet)
-    }
+    override val propertyDialog: JDialog
+        get() = getDeepNetEditDialog(deepNet)
 
     /**
      * Render all activations as pixel grids. Rank 1: Activations are lines. Rank 3. A series of matrices. Rank 2 is

@@ -5,16 +5,15 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.util.BiasedScalarData
 
 class LinearRuleTest {
 
     // Default update rule is linear
     val net = Network()
-    var input1 = Neuron(net)
-    var input2 = Neuron(net)
-    val output = Neuron(net)
+    var input1 = Neuron()
+    var input2 = Neuron()
+    val output = Neuron()
     var outputRule: LinearRule = output.updateRule as LinearRule
 
     var w13 = Synapse(input1, output)

@@ -17,11 +17,6 @@ import java.awt.geom.Point2D
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.component3
-import kotlin.collections.forEach
-import kotlin.collections.listOf
-import kotlin.collections.map
-import kotlin.collections.sum
-import kotlin.collections.zip
 import kotlin.math.sqrt
 
 val kAgentTrails = newSim {
@@ -65,8 +60,8 @@ val kAgentTrails = newSim {
         applyLayout(LineLayout())
     }
 
-    connectAllToAll(sensoryNet, predictionNet)
-    connectAllToAll(actionNet, predictionNet)
+    network.connectAllToAll(sensoryNet, predictionNet)
+    network.connectAllToAll(actionNet, predictionNet)
 
     val errorNeuron = network.addNeuron {
         label = "Error"

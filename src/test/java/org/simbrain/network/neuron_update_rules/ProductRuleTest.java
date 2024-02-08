@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
+import org.simbrain.network.updaterules.ProductRule;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -14,13 +15,13 @@ public class ProductRuleTest {
         ProductRule productRule = new ProductRule();
 
         // Setup the input neuron
-        Neuron input1 =  new Neuron(net);
+        Neuron input1 =  new Neuron();
         input1.setActivation(0.4);
         input1.setClamped(true);
         net.addNetworkModelAsync(input1);
 
         // Setup the input neuron
-        Neuron input2 =  new Neuron(net);
+        Neuron input2 =  new Neuron();
         input2.setActivation(0.8);
         input2.setClamped(true);
         net.addNetworkModelAsync(input2);
@@ -28,10 +29,10 @@ public class ProductRuleTest {
         // Set up the rule.
         productRule.setUpperBound(1);
         productRule.setLowerBound(-1);
-        productRule.setUseWeights(false);
+        productRule.useWeights = false;
 
         // Set up the output neuron
-        Neuron output = new Neuron(net, productRule);
+        Neuron output = new Neuron(productRule);
         output.setActivation(0.0);
         net.addNetworkModelAsync(output);
 
@@ -58,17 +59,17 @@ public class ProductRuleTest {
         ProductRule productRule = new ProductRule();
 
         // Setup the input neuron
-        Neuron input1 =  new Neuron(net);
+        Neuron input1 =  new Neuron();
         input1.setActivation(0.4);
         input1.setClamped(true);
         net.addNetworkModelAsync(input1);
 
-        Neuron input2 =  new Neuron(net);
+        Neuron input2 =  new Neuron();
         input2.setActivation(0.8);
         input2.setClamped(true);
         net.addNetworkModelAsync(input2);
 
-        Neuron input3 =  new Neuron(net);
+        Neuron input3 =  new Neuron();
         input3.setActivation(-0.5);
         input3.setClamped(true);
         net.addNetworkModelAsync(input3);
@@ -76,10 +77,10 @@ public class ProductRuleTest {
         // Set up the rule.
         productRule.setUpperBound(1);
         productRule.setLowerBound(-1);
-        productRule.setUseWeights(false);
+        productRule.useWeights = false;
 
         // Set up the output neuron
-        Neuron output = new Neuron(net, productRule);
+        Neuron output = new Neuron(productRule);
         output.setActivation(0.0);
         net.addNetworkModelAsync(output);
 

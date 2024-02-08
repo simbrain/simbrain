@@ -19,8 +19,8 @@
 package org.simbrain.network.gui.dialogs.neuron;
 
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.NeuronUpdateRule;
-import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator;
+import org.simbrain.network.updaterules.NeuronUpdateRule;
+import org.simbrain.network.updaterules.interfaces.ActivityGenerator;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;

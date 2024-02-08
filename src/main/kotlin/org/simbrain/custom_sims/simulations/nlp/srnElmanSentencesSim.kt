@@ -43,7 +43,6 @@ val srnElmanSentences = newSim {
     val networkComponent = addNetworkComponent("Network").apply { updateOn = false }
     val network = networkComponent.network
     val srn = SRNNetwork(
-        network,
         textWorldInputs.world.tokenEmbedding.dimension,
         150,
         textWorldInputs.world.tokenEmbedding.dimension,

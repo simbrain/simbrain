@@ -3,8 +3,8 @@ package org.simbrain.network.updaterules
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
-import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.network.matrix.WeightMatrix
+import org.simbrain.network.core.NeuronArray
+import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
 import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.util.get
@@ -14,14 +14,14 @@ import org.simbrain.util.toMatrix
 class SigmoidDiscreteArrayTest {
 
     val net = Network()
-    var input1 = NeuronArray(net, 2)
-    var input2 = NeuronArray(net, 2)
-    val output = NeuronArray(net, 2).apply {
+    var input1 = NeuronArray(2)
+    var input2 = NeuronArray(2)
+    val output = NeuronArray(2).apply {
         updateRule = SigmoidalRule()
     }
 
-    var w13 = WeightMatrix(net, input1, output)
-    var w23 = WeightMatrix(net, input2, output)
+    var w13 = WeightMatrix(input1, output)
+    var w23 = WeightMatrix(input2, output)
 
     init {
         net.addNetworkModelsAsync(input1, input2, output, w13, w23)

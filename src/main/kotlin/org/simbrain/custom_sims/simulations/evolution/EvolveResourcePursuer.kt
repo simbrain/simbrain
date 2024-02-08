@@ -4,12 +4,8 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.withContext
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.NetworkTextObject
-import org.simbrain.network.core.Synapse
-import org.simbrain.network.core.activations
-import org.simbrain.network.groups.NeuronCollection
-import org.simbrain.network.neuron_update_rules.DecayRule
+import org.simbrain.network.core.*
+import org.simbrain.network.updaterules.DecayRule
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.format
 import org.simbrain.util.geneticalgorithm.*
@@ -101,16 +97,16 @@ val evolveResourcePursuer = newSim {
         }
 
         suspend fun expressWith(network: Network): Phenotype {
-            val driveNeurons = NeuronCollection(network, network.express(driveChromosome)).also {
+            val driveNeurons = NeuronCollection(network.express(driveChromosome)).also {
                 network.addNetworkModelAsync(it); it.label = "drives"
             }
-            val inputNeurons = NeuronCollection(network, network.express(inputChromosome)).also {
+            val inputNeurons = NeuronCollection(network.express(inputChromosome)).also {
                 network.addNetworkModelAsync(it); it.label = "inputs"
             }
-            val hiddenNeurons = NeuronCollection(network, network.express(hiddenChromosome)).also {
+            val hiddenNeurons = NeuronCollection(network.express(hiddenChromosome)).also {
                 network.addNetworkModelAsync(it); it.label = "hidden"
             }
-            val outputNeurons = NeuronCollection(network, network.express(outputChromosome)).also {
+            val outputNeurons = NeuronCollection(network.express(outputChromosome)).also {
                 network.addNetworkModelAsync(it); it.label = "outputs"
             }
 
@@ -124,7 +120,10 @@ val evolveResourcePursuer = newSim {
             }
 
             val connectionStrategyWrapper = express(connectionStrategyChromosome).first()
-            connectionStrategyWrapper.connectionStrategy.connectNeurons(network, hiddenNeurons.neuronList, hiddenNeurons.neuronList)
+            connectionStrategyWrapper.connectionStrategy.connectNeurons(
+                hiddenNeurons.neuronList,
+                hiddenNeurons.neuronList
+            ).addToNetwork(network)
             hiddenNeurons.label = connectionStrategyWrapper.connectionStrategy.toString()
 
             val hiddenUpdateRules = express(hiddenUpdateRuleChromosome)
@@ -362,7 +361,7 @@ val evolveResourcePursuer = newSim {
                         hiddenNeurons.location = point(0, 60)
                         outputNeurons.location = point(0, -25)
                     }
-                    val energyText = NetworkTextObject(networkComponent.network, "Energy: ${calories.format(2)}")
+                    val energyText = NetworkTextObject("Energy: ${calories.format(2)}")
                     networkComponent.network.addNetworkModels(energyText)
                     workspace.addUpdateAction("update energy text") {
                         energyText.text = "Energy: ${calories.format(2)}"

@@ -141,13 +141,10 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
         interactionBox.setText(synapseGroup.label)
     }
 
-    override fun isDraggable(): Boolean {
-        return false
-    }
+    override val isDraggable: Boolean = false
 
-    override fun getModel(): SynapseGroup {
-        return synapseGroup
-    }
+    override val model: SynapseGroup
+        get() = synapseGroup
 
     /**
      * Interface for all PNodes used in as the main representation for a synapse group.

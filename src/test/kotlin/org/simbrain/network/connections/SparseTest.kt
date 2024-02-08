@@ -15,7 +15,7 @@ class SparseTest {
     @BeforeEach
     fun setUp() {
         sparse = Sparse()
-        net.addNetworkModelsAsync(List(10) { Neuron(net) })
+        net.addNetworkModelsAsync(List(10) { Neuron() })
     }
 
     // TODO: Check equalize efferents
@@ -25,8 +25,7 @@ class SparseTest {
     fun `check correct number of weights are created`() {
         sparse.connectionDensity = .1
         sparse.allowSelfConnection = true
-        val syns = sparse.connectNeurons(net, net.freeNeurons.toList()
-            , net.freeNeurons.toList())
+        val syns = sparse.connectNeurons(net.freeNeurons.toList(), net.freeNeurons.toList())
         assertEquals(10, syns.size)
     }
 
@@ -34,7 +33,7 @@ class SparseTest {
     fun `check for case of many to one`() {
         sparse.connectionDensity = .1
         sparse.allowSelfConnection = true
-        val syns = sparse.connectNeurons(net, net.freeNeurons.toList(), listOf(net.freeNeurons.first()))
+        val syns = sparse.connectNeurons(net.freeNeurons.toList(), listOf(net.freeNeurons.first()))
         assertEquals(1, syns.size)
     }
 
@@ -44,11 +43,11 @@ class SparseTest {
         // Add weights
         sparse.connectionDensity = .1
         sparse.allowSelfConnection = true
-        val syns1 = sparse.connectNeurons(net, net.freeNeurons.toList(), net.freeNeurons.toList(), true)
+        val syns1 = sparse.connectNeurons(net.freeNeurons.toList(), net.freeNeurons.toList()).also { net.addNetworkModelsAsync(it) }
 
         // Up sparsity to 20% and add more weights.
         sparse.connectionDensity = .2
-        val syns2 = sparse.connectNeurons(net, net.freeNeurons.toList(), net.freeNeurons.toList())
+        val syns2 = sparse.connectNeurons(net.freeNeurons.toList(), net.freeNeurons.toList()).also { net.addNetworkModelsAsync(it) }
         assertEquals(10, syns2.size) // Only the new synapses are return
         assertEquals(20, net.freeSynapses.size)
         // All the originally added synapses should still be there
@@ -56,7 +55,7 @@ class SparseTest {
 
         // Reduce sparsity to 5%
         sparse.connectionDensity = .05
-        sparse.connectNeurons(net, net.freeNeurons.toList(), net.freeNeurons.toList())
+        sparse.connectNeurons(net.freeNeurons.toList(), net.freeNeurons.toList()).also { net.addNetworkModelsAsync(it) }
         assertEquals(5, net.freeSynapses.size)
         // All the originally added synapses should still be there
         assertTrue(net.freeSynapses.all { (syns1 + syns2).contains(it) })
@@ -69,10 +68,10 @@ class SparseTest {
         // Add "recurrent" weights
         sparse.connectionDensity = .1
         sparse.allowSelfConnection = true
-        val syns1 = sparse.connectNeurons(net, net.freeNeurons.toList(), net.freeNeurons.toList())
+        val syns1 = sparse.connectNeurons(net.freeNeurons.toList(), net.freeNeurons.toList()).also { net.addNetworkModelsAsync(it) }
 
-        val newNeurons = listOf(Neuron(net))
-        val syns2 = sparse.connectNeurons(net, net.freeNeurons.toList(),newNeurons)
+        val newNeurons = listOf(Neuron())
+        val syns2 = sparse.connectNeurons(net.freeNeurons.toList(), newNeurons).also { net.addNetworkModelsAsync(it) }
 
         assertEquals(1, syns2.size)
 

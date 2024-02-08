@@ -2,26 +2,22 @@ package org.simbrain.network.synapserules
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.*
 import org.simbrain.network.learningrules.OjaRule
-import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.util.toMatrix
 
 class OjaTest {
 
     // 2->1 network
     var net = Network()
-    val input = Neuron(net)
-    val output = Neuron(net)
+    val input = Neuron()
+    val output = Neuron()
     var weight = Synapse(input,output)
 
     // For array based tests
-    val na1 = NeuronArray(net, 2)
-    val na2 = NeuronArray(net, 3)
-    var wm12 = WeightMatrix(net, na1, na2)
+    val na1 = NeuronArray(2)
+    val na2 = NeuronArray(3)
+    var wm12 = WeightMatrix(na1, na2)
 
 
     init {

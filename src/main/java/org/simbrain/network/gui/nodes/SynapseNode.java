@@ -223,7 +223,7 @@ public final class SynapseNode extends ScreenElement {
      * of a synapse based on whether it is clamped or not.
      */
     public void updateClampStatus() {
-        if (synapse.isFrozen()) {
+        if (synapse.getFrozen()) {
             circle.setStrokePaint(Color.black);
         } else {
             circle.setStrokePaint(null);

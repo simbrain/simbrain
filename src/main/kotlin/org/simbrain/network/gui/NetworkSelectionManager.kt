@@ -60,7 +60,7 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
     /**
      * Getter for selected models.
      */
-    val selectedModels get() = selection.map { it.model!! }
+    val selectedModels get() = selection.map { it.model }
 
     /**
      * Getter for source models.

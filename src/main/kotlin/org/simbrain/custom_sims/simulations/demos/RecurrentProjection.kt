@@ -33,11 +33,13 @@ val recurrentProjection = newSim {
     val recurrentNet = network.addNeuronCollection(numNeurons)
     recurrentNet.label = "Network"
     recurrentNet.layout(GridLayout())
-    recurrentNet.randomize()
-    network.addNetworkModel(recurrentNet)
-    network.connect(recurrentNet.neuronList, recurrentNet.neuronList, Sparse().apply {
-        connectionDensity = .25
-    })
+    with(network) {
+        recurrentNet.randomize()
+        addNetworkModel(recurrentNet)
+        connect(recurrentNet.neuronList, recurrentNet.neuronList, Sparse().apply {
+            connectionDensity = .25
+        })
+    }
 
     // Location of the network in the desktop
     withGui {

@@ -18,11 +18,8 @@
  */
 package org.simbrain.network.gui.dialogs
 
-import org.simbrain.network.core.Layer
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.activations
-import org.simbrain.network.groups.AbstractNeuronCollection
-import org.simbrain.network.matrix.NeuronArray
+import org.simbrain.network.core.*
+import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.util.createAction
 import org.simbrain.util.table.*
 import org.simbrain.util.toMatrix
@@ -35,15 +32,15 @@ import javax.swing.JLabel
 /**
  * Panel for sending inputs from a table to a [Layer].
  */
-fun createTestInputPanel(layer: Layer) = createTestInputPanel(layer.inputData) {
+fun NetworkPanel.createTestInputPanel(layer: Layer)= createTestInputPanel(layer.inputData) {
     if (layer is AbstractNeuronCollection && layer.isAllClamped) {
-        layer.neuronList.activations = table.model.getCurrentDoubleRow()
+        layer.neuronList.activations = this.table.model.getCurrentDoubleRow()
     } else if (layer is NeuronArray && layer.isClamped) {
-        layer.setActivations(table.model.getCurrentDoubleRow().toDoubleArray())
+        layer.setActivations(this.table.model.getCurrentDoubleRow().toDoubleArray())
     } else {
-        layer.addInputs(table.model.getCurrentDoubleRow().toDoubleArray().toMatrix())
+        layer.addInputs(this.table.model.getCurrentDoubleRow().toDoubleArray().toMatrix())
     }
-    layer.update()
+    with(network) { layer.update() }
 }
 
 /**

@@ -3,9 +3,8 @@ package org.simbrain.network.updaterules
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
-import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.network.matrix.WeightMatrix
-import org.simbrain.network.neuron_update_rules.LinearRule
+import org.simbrain.network.core.NeuronArray
+import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.util.linspace
 import org.simbrain.util.toDoubleArray

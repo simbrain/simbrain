@@ -16,7 +16,7 @@ class SOMTest {
 
     @Test
     fun `test som`() {
-        val som = SOMNetwork(net, 1, 2)
+        val som = SOMNetwork(1, 2)
         net.addNetworkModelAsync(som)
         assertEquals(0, net.freeNeurons.size)
         assertEquals(1, som.som.size())
@@ -29,7 +29,7 @@ class SOMTest {
     @Test
     fun `test som node creation`() {
         runBlocking {
-            val som = SOMNetwork(net, 1, 2)
+            val som = SOMNetwork(1, 2)
             val np = NetworkPanel(NetworkComponent("Test", net))
             net.addNetworkModel(som)
             assertEquals(3, np.filterScreenElements<NeuronNode>().size)

@@ -33,10 +33,9 @@ import kotlin.random.Random
  * is returned.
  */
 class WinnerTakeAll @JvmOverloads constructor(
-    network: Network,
     neurons: List<Neuron>,
     params: WinnerTakeAllParams = WinnerTakeAllParams()
-) : NeuronGroup(network) {
+) : NeuronGroup() {
 
     var params by GuiEditable(
         label = "Winner Take All Parameters",
@@ -45,17 +44,18 @@ class WinnerTakeAll @JvmOverloads constructor(
         order = 50
     )
 
-    constructor(network: Network, numNeurons: Int) : this(network, List(numNeurons) { Neuron(network) })
+    constructor(network: Network, numNeurons: Int) : this(List(numNeurons) { Neuron() })
 
     @XStreamConstructor
-    private constructor(parentNetwork: Network): this(parentNetwork, listOf())
+    private constructor(parentNetwork: Network): this(listOf())
 
     init {
         addNeurons(neurons)
     }
 
-    override fun copy() = WinnerTakeAll(network, neuronList.map { it.deepCopy() }, params.copy())
+    override fun copy() = WinnerTakeAll(neuronList.map { it.deepCopy() }, params.copy())
 
+    context(Network)
     override fun update() {
         neuronList.forEach { it.updateInputs() }
         neuronList.forEach { it.update() }
@@ -103,8 +103,8 @@ class WinnerTakeAllParams : NeuronGroupParams() {
         conditionallyEnabledBy = WinnerTakeAllParams::isUseRandom,
     )
 
-    override fun create(net: Network): WinnerTakeAll {
-        return WinnerTakeAll(net, List(numNeurons) { Neuron(net) }, this)
+    override fun create(): WinnerTakeAll {
+        return WinnerTakeAll(List(numNeurons) { Neuron() }, this)
     }
 
     override fun copy(): WinnerTakeAllParams {

@@ -3,17 +3,13 @@ package org.simbrain.network.gui
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.connections.Sparse
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.Synapse
-import org.simbrain.network.core.percentExcitatory
-import org.simbrain.network.groups.AbstractNeuronCollection
+import org.simbrain.network.core.*
 import org.simbrain.network.gui.dialogs.*
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog
 import org.simbrain.network.gui.dialogs.text.TextDialog
 import org.simbrain.network.gui.nodes.SynapseGroupNode
 import org.simbrain.network.gui.nodes.TextNode
-import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.SceneGraphBrowser
@@ -56,7 +52,7 @@ fun NetworkPanel.showSelectedSynapseProperties() {
 
 fun NetworkPanel.showNeuronArrayCreationDialog() {
     NeuronArray.CreationTemplate().createEditorDialog {
-        val neuronArray = it.create(network)
+        val neuronArray = it.create()
         network.addNetworkModelAsync(neuronArray)
     }.also {
         it.title = "Create Neuron Array"

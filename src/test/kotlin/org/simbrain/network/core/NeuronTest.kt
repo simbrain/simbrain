@@ -2,16 +2,16 @@ package org.simbrain.network.core
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import org.simbrain.network.neuron_update_rules.LinearRule
+import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.SimbrainConstants
 
 class NeuronTest {
 
     var net = Network()
-    val n1 = Neuron(net);
-    val n2 = Neuron(net);
-    val n3 = Neuron(net);
+    val n1 = Neuron();
+    val n2 = Neuron();
+    val n3 = Neuron();
     var s1: Synapse
     var s2: Synapse
 

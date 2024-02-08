@@ -18,7 +18,7 @@ val hopfieldSim = newSim {
     val network = networkComponent.network
 
     // Hopfield network
-    val hopfield = Hopfield(network, 64)
+    val hopfield = Hopfield(64)
     network.addNetworkModel(hopfield)
 
     withGui {

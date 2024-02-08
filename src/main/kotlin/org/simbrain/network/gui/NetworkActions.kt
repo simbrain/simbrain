@@ -3,8 +3,6 @@ package org.simbrain.network.gui
 import kotlinx.coroutines.launch
 import org.simbrain.network.connections.*
 import org.simbrain.network.core.*
-import org.simbrain.network.groups.AbstractNeuronCollection
-import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.gui.ConditionallyEnabledAction.EnablingCondition
 import org.simbrain.network.gui.dialogs.*
 import org.simbrain.network.gui.dialogs.layout.LayoutDialog
@@ -12,7 +10,6 @@ import org.simbrain.network.gui.dialogs.network.*
 import org.simbrain.network.gui.dialogs.neuron.AddNeuronsDialog.createAddNeuronsDialog
 import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.layouts.GridLayout
-import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.neurongroups.BasicNeuronGroupParams
 import org.simbrain.network.neurongroups.NeuronGroupParams
 import org.simbrain.util.*
@@ -118,8 +115,8 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     ) {
         val neuronList = selectionManager.filterSelectedModels<Neuron>()
         if (neuronList.isNotEmpty()) {
-            val nc = NeuronCollection(network, neuronList)
-            if (nc.shouldAdd()) {
+            val nc = NeuronCollection(neuronList)
+            if (with(network) { nc.shouldAdd() }) {
                 nc.label = network.idManager.getProposedId(nc::class.java)
                 network.addNetworkModelAsync(nc)
             }
@@ -131,7 +128,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         iconPath = "menu_icons/AddNeuron.png",
         keyboardShortcut = KeyCombination('P')
     ) {
-        val neuron = Neuron(network)
+        val neuron = Neuron()
         network.addNetworkModel(neuron)
         network.selectModels(listOf(neuron))
     }
@@ -141,7 +138,9 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         iconPath = "menu_icons/Rand.png",
         keyboardShortcut = KeyCombination('R')
     ) {
-        selectionManager.selectedModels.map { it.randomize() }
+        with(network) {
+            selectionManager.selectedModels.map { it.randomize() }
+        }
     }
     val randomizeBiasesAction = networkPanel.createAction(
         name = "Randomize Biases",
@@ -149,12 +148,14 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         iconPath = "menu_icons/Rand.png",
         keyboardShortcut = CmdOrCtrl + 'B'
     ) {
-        selectionManager.selectedModels
-            .filterIsInstance<Neuron>()
-            .map { it.randomizeBias() }
-        selectionManager.selectedModels
-            .filterIsInstance<NeuronArray>()
-            .map { it.randomizeBiases() }
+        with(network) {
+            selectionManager.selectedModels
+                .filterIsInstance<Neuron>()
+                .map { it.randomizeBias() }
+            selectionManager.selectedModels
+                .filterIsInstance<NeuronArray>()
+                .map { it.randomizeBiases() }
+        }
     }
     val selectAllAction = networkPanel.createAction(
         name = "Select All",
@@ -367,7 +368,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     ) {
         textEntryDialog("", "Enter text to add to the network") {
             if (it.isNotEmpty()) {
-                val textObject = NetworkTextObject(network, it)
+                val textObject = NetworkTextObject(it)
                 network.addNetworkModelAsync(textObject)
             }
         }.display()
@@ -522,7 +523,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         keyboardShortcut = 'G'
     ) {
         objectWrapper("Neuron Group Parameters", BasicNeuronGroupParams() as NeuronGroupParams, showLabeledBorder = false).createEditorDialog {
-            it.editingObject.create(network).also { group ->
+            it.editingObject.create().also { group ->
                 group.label = network.idManager.getProposedId(group::class.java)
                 group.applyLayout()
                 network.addNetworkModelAsync(group)
@@ -561,10 +562,9 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             ConnectionStrategyPanel(strategy).displayInDialog {
                 commitChanges()
                 connectionStrategy.connectNeurons(
-                    network,
                     selectionManager.filterSelectedSourceModels<Neuron>(),
                     selectionManager.filterSelectedModels<Neuron>()
-                )
+                ).addToNetworkAsync(network)
             }
         }
     }
@@ -650,9 +650,10 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         val sparse = Sparse().apply {
             connectionDensity = sparsity.toDouble()
         }
-        sparse.connectNeurons(network,
+        sparse.connectNeurons(
             selectionManager.filterSelectedSourceModels<Neuron>(),
-            selectionManager.filterSelectedModels<Neuron>())
+            selectionManager.filterSelectedModels<Neuron>()
+        ).addToNetworkAsync(network)
     }
 
     /**
@@ -689,7 +690,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val fast100 = networkPanel.createAction(
         name = "Add 100 nodes",
     ) {
-        List(100) { Neuron(network) }.apply {
+        List(100) { Neuron() }.apply {
             network.addNetworkModels(this)
             GridLayout().layoutNeurons(this)
         }.also { network.selectModels(it) }

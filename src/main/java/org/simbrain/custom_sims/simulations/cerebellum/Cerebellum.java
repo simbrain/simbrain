@@ -7,8 +7,8 @@ import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkTextObject;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.neuron_update_rules.DecayRule;
 import org.simbrain.network.neurongroups.NeuronGroup;
+import org.simbrain.network.updaterules.DecayRule;
 import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
@@ -95,23 +95,23 @@ public class Cerebellum extends Simulation {
         network = nc.getNetwork();
 
         DecayRule generalRule = new DecayRule();
-        generalRule.setDecayFraction(.25);
+        generalRule.decayFraction = .25;
 
         DecayRule DCNRule = new DecayRule();
-        DCNRule.setDecayFraction(.25);
-        DCNRule.setBaseLine(1);
+        DCNRule.decayFraction = .25;
+        DCNRule.baseLine = 1;
 
         DecayRule inferiorOliveRule = new DecayRule();
-        inferiorOliveRule.setDecayFraction(.25);
-        inferiorOliveRule.setBaseLine(.3);
+        inferiorOliveRule.decayFraction = .25;
+        inferiorOliveRule.baseLine = .3;
 
         DecayRule targetRule = new DecayRule();
-        targetRule.setDecayFraction(0);
-        targetRule.setDecayAmount(0);
-        targetRule.setBaseLine(0);
+        targetRule.decayFraction = 0;
+        targetRule.decayAmount = 0;
+        targetRule.baseLine = 0;
 
         // Cortex (assume it's at 0,0)
-        NeuronGroup cortex = new NeuronGroup(network, 1);
+        NeuronGroup cortex = new NeuronGroup(1);
         cortex.setLabel("Cerebral Cortex");
         cortex.setUpdateRule(generalRule);
         network.addNetworkModelAsync(cortex);
@@ -119,7 +119,7 @@ public class Cerebellum extends Simulation {
         cortex.setLowerBound(0);
 
         // Red Nucleus
-        NeuronGroup redNucleus = new NeuronGroup(network, 2);
+        NeuronGroup redNucleus = new NeuronGroup(2);
         redNucleus.setLabel("Red Nucleus");
         redNucleus.setUpdateRule(generalRule);
         redNucleus.setLowerBound(0);
@@ -131,7 +131,7 @@ public class Cerebellum extends Simulation {
             redNucleus.getNeuronList().get(0), 1));
 
         // Inferior Olive
-        Neuron inferiorOlive = new Neuron(network, new DecayRule());
+        Neuron inferiorOlive = new Neuron();
         inferiorOlive.setLabel("Inferior Olive");
         inferiorOlive.setUpdateRule(inferiorOliveRule);
         inferiorOlive.setLowerBound(0);
@@ -144,7 +144,7 @@ public class Cerebellum extends Simulation {
             inferiorOlive, 1));
 
         // To Spinal Cord
-        NeuronGroup toSpinalCord = new NeuronGroup(network, 2);
+        NeuronGroup toSpinalCord = new NeuronGroup(2);
         toSpinalCord.setLabel("To Spinal Cord");
         toSpinalCord.setUpdateRule(generalRule);
         toSpinalCord.setLowerBound(0);
@@ -160,7 +160,7 @@ public class Cerebellum extends Simulation {
             toSpinalCord.getNeuronList().get(1), 1));
 
         // Output
-        output = new Neuron(network, new DecayRule());
+        output = new Neuron();
         output.setLabel("Output");
         output.setUpdateRule(generalRule);
         output.setLowerBound(0);
@@ -174,7 +174,7 @@ public class Cerebellum extends Simulation {
             new Synapse(toSpinalCord.getNeuronList().get(1), output, 1));
 
         // Thalamus
-        Neuron thalamus = new Neuron(network);
+        Neuron thalamus = new Neuron();
         thalamus.setLabel("Thalamus");
         thalamus.setUpdateRule(generalRule);
         thalamus.setLowerBound(0);
@@ -186,7 +186,7 @@ public class Cerebellum extends Simulation {
             new Synapse(thalamus, cortex.getNeuronList().get(0), 1));
 
         // Cerebellum
-        NeuronGroup cerebellum = new NeuronGroup(network, 5);
+        NeuronGroup cerebellum = new NeuronGroup(5);
         cerebellum.setLabel("Cerebellum");
         cerebellum.setUpdateRule(generalRule);
         network.addNetworkModelAsync(cerebellum);
@@ -237,7 +237,7 @@ public class Cerebellum extends Simulation {
         // thalamus, 1));
 
         // From Spinal Cord
-        NeuronGroup fromSpinalCord = new NeuronGroup(network, 2);
+        NeuronGroup fromSpinalCord = new NeuronGroup(2);
         fromSpinalCord.setLabel("From Spinal Cord");
         fromSpinalCord.setClamped(true);
         fromSpinalCord.setUpdateRule(generalRule);
@@ -256,7 +256,7 @@ public class Cerebellum extends Simulation {
             cerebellum.getNeuronList().get(4), 1));
 
         // DA
-        dopamine = new Neuron(network);
+        dopamine = new Neuron();
         dopamine.setLabel("Basal Ganglia (GPi)");
         // dopamine.setLowerBound(0);
         network.addNetworkModelAsync(dopamine);
@@ -266,7 +266,7 @@ public class Cerebellum extends Simulation {
         network.addNetworkModelAsync(new Synapse(dopamine, thalamus, 1));
 
         // Target
-        Neuron target = new Neuron(network);
+        Neuron target = new Neuron();
         target.setLabel("Target");
         target.setClamped(true);
         // target.setUpdateRule(targetRule);
@@ -275,13 +275,13 @@ public class Cerebellum extends Simulation {
         target.setLocation(240, 50);
 
         // Labels
-        NetworkTextObject parallelFiberLabel = new NetworkTextObject(network, "Parallel Fibers");
+        NetworkTextObject parallelFiberLabel = new NetworkTextObject("Parallel Fibers");
         // network.addNetworkModel(parallelFiberLabel);
         parallelFiberLabel.setLocation(230.0, 150.0);
-        NetworkTextObject mossyFiberLabel = new NetworkTextObject(network, "Mossy Fibers");
+        NetworkTextObject mossyFiberLabel = new NetworkTextObject("Mossy Fibers");
         // network.addNetworkModel(mossyFiberLabel);
         parallelFiberLabel.setLocation(265.0, 240.0);
-        NetworkTextObject climbingFiberLabel = new NetworkTextObject(network, "CF");
+        NetworkTextObject climbingFiberLabel = new NetworkTextObject("CF");
         // network.addNetworkModel(climbingFiberLabel);
         parallelFiberLabel.setLocation(191.0, 160.0);
 

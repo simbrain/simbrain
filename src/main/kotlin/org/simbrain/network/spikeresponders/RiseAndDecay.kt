@@ -18,11 +18,7 @@
  */
 package org.simbrain.network.spikeresponders
 
-import org.simbrain.network.core.Connector
-import org.simbrain.network.core.Synapse
-import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.network.matrix.WeightMatrix
-import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder
+import org.simbrain.network.core.*
 import org.simbrain.network.util.MatrixDataHolder
 import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.network.util.SpikingMatrixData
@@ -63,10 +59,11 @@ class RiseAndDecay : SpikeResponder() {
         return rad
     }
 
-    override fun apply(conn: Connector, data: MatrixDataHolder) {
-        val wm = conn.let { if (it is WeightMatrix) it else return }
-        val na = conn.source.let { if (it is NeuronArray) it else return }
-        val responseData = data.let { if (it is RiseAndDecayMatrixData) it else return }
+    context(Network)
+    override fun apply(connector: Connector, responderData: MatrixDataHolder) {
+        val wm = connector.let { if (it is WeightMatrix) it else return }
+        val na = connector.source.let { if (it is NeuronArray) it else return }
+        val responseData = responderData.let { if (it is RiseAndDecayMatrixData) it else return }
         val spikeData = na.dataHolder.let { if (it is SpikingMatrixData) it else return }
         if (na.updateRule.isSpikingRule) {
             for (i in 0 until wm.weightMatrix.nrow()) {
@@ -76,7 +73,7 @@ class RiseAndDecay : SpikeResponder() {
                         wm.psrMatrix[i, j],
                         responseData.recoveryMatrix[i,j],
                         wm.weightMatrix[i, j],
-                        na.network.timeStep
+                        timeStep
                     )
                     wm.psrMatrix.set(i, j, psr)
                     responseData.recoveryMatrix.set(i,j, recovery)
@@ -89,15 +86,17 @@ class RiseAndDecay : SpikeResponder() {
         return RiseAndDecayMatrixData(rows, cols)
     }
 
-    override fun apply(s: Synapse, responderData: ScalarDataHolder) {
+    context(Network)
+    override fun apply(synapse: Synapse, responderData: ScalarDataHolder) {
         val data = responderData as RiseAndDecayData
         val (psr, recovery) = riseAndDecay(
-            s.source.isSpike,
-            s.psr,
+            synapse.source.isSpike,
+            synapse.psr,
             data.recovery,
-            s.strength,
-            s.parentNetwork.timeStep )
-        s.psr = psr
+            synapse.strength,
+            timeStep
+        )
+        synapse.psr = psr
         data.recovery = recovery
     }
 
@@ -122,9 +121,7 @@ class RiseAndDecay : SpikeResponder() {
         return RiseAndDecayData()
     }
 
-    override fun getDescription(): String {
-        return "Rise and Decay"
-    }
+    override val description: String = "Rise and Decay"
 
     override val name: String
         get() = "Rise and Decay"

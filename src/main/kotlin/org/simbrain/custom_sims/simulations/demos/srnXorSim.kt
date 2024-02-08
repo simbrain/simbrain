@@ -24,7 +24,7 @@ val srnXORSim = newSim {
     workspace.clearWorkspace()
     val networkComponent = addNetworkComponent("Network")
     val network = networkComponent.network
-    val srn = SRNNetwork(network, 1, 2, 1)
+    val srn = SRNNetwork(1, 2, 1)
     network.addNetworkModel(srn)
 
     // Load with xor data
@@ -33,10 +33,12 @@ val srnXORSim = newSim {
     srn.trainer.updateType = IterableTrainer.UpdateMethod.Stochastic()
 
     // Train
-    repeat(600) {
-        srn.trainer.trainOnce()
-        if (it % 10 == 0) {
-            println("iteration ${it}: ${srn.trainer.lossFunction.loss}")
+    with(network) {
+        repeat(600) {
+            srn.trainer.trainOnce()
+            if (it % 10 == 0) {
+                println("iteration ${it}: ${srn.trainer.lossFunction.loss}")
+            }
         }
     }
 

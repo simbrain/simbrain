@@ -2,14 +2,10 @@ package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.Sparse
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.SynapseGroup
-import org.simbrain.network.core.addNeuronCollectionAsync
-import org.simbrain.network.core.setLabels
-import org.simbrain.network.groups.NeuronCollection
+import org.simbrain.network.core.*
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.LineLayout
-import org.simbrain.network.neuron_update_rules.LinearRule
+import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.util.projection.PCAProjection
@@ -83,10 +79,10 @@ val allostaticPatternCompletion = newSim {
 
     // Reservoir
     val reservoir = List(numResNeurons) {
-        Neuron(network, AllostaticUpdateRule())
+        Neuron(AllostaticUpdateRule())
     }.let {
         network.addNetworkModelsAsync(it)
-        NeuronCollection(network, it)
+        NeuronCollection(it)
     }.apply {
         label = "Reservoir"
         location = point(0, 0)

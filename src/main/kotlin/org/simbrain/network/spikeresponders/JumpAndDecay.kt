@@ -18,11 +18,7 @@
  */
 package org.simbrain.network.spikeresponders
 
-import org.simbrain.network.core.Connector
-import org.simbrain.network.core.Synapse
-import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.network.matrix.WeightMatrix
-import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder
+import org.simbrain.network.core.*
 import org.simbrain.network.util.MatrixDataHolder
 import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.network.util.SpikingMatrixData
@@ -73,9 +69,10 @@ class JumpAndDecay : SpikeResponder() {
         return jad
     }
 
-    override fun apply(conn: Connector, responderData: MatrixDataHolder) {
-        val wm = conn.let { if (it is WeightMatrix) it else return }
-        val na = conn.source.let { if (it is NeuronArray) it else return }
+    context(Network)
+    override fun apply(connector: Connector, responderData: MatrixDataHolder) {
+        val wm = connector.let { if (it is WeightMatrix) it else return }
+        val na = connector.source.let { if (it is NeuronArray) it else return }
         val spikeData = na.dataHolder.let { if (it is SpikingMatrixData) it else return }
         if (na.updateRule.isSpikingRule) {
             for (i in 0 until wm.weightMatrix.nrow()) {
@@ -84,7 +81,7 @@ class JumpAndDecay : SpikeResponder() {
                             spikeData.spikes[j],
                             wm.psrMatrix[i, j],
                             wm.weightMatrix[i, j],
-                            na.network.timeStep
+                            timeStep
                         )
                     wm.psrMatrix.set(i, j, psr)
                 }
@@ -92,9 +89,10 @@ class JumpAndDecay : SpikeResponder() {
         }
     }
 
-    override fun apply(s: Synapse, data: ScalarDataHolder) {
-        s.psr = jumpAndDecay(
-            s.source.isSpike, s.psr, s.strength, s.network.timeStep
+    context(Network)
+    override fun apply(synapse: Synapse, responderData: ScalarDataHolder) {
+        synapse.psr = jumpAndDecay(
+            synapse.source.isSpike, synapse.psr, synapse.strength, timeStep
         )
     }
 
@@ -110,9 +108,7 @@ class JumpAndDecay : SpikeResponder() {
         }
     }
 
-    override fun getDescription(): String {
-        return "Jump and Decay"
-    }
+    override val description: String = "Jump and Decay"
 
     override val name: String
         get() = "Jump and Decay"

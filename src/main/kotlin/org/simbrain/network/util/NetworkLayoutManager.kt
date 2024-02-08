@@ -27,7 +27,7 @@
 package org.simbrain.network.util
 
 import org.simbrain.network.LocatableModel
-import org.simbrain.network.groups.AbstractNeuronCollection
+import org.simbrain.network.core.AbstractNeuronCollection
 import org.simbrain.util.minus
 import org.simbrain.util.plus
 import org.simbrain.util.point

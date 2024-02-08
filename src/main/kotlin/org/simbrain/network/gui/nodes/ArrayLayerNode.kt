@@ -102,7 +102,7 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
 
     override fun acceptsSourceHandle() = true
 
-    override fun isDraggable() = true
+    override val isDraggable = true
 
     /**
      * Forces sharp rendering.

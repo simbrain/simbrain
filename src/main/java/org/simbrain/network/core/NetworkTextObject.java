@@ -33,11 +33,6 @@ import java.awt.geom.Point2D;
 public class NetworkTextObject extends LocatableModel {
 
     /**
-     * Reference to parent root network of this text object.
-     */
-    private final Network network;
-
-    /**
      * x-coordinate of this object in 2-space.
      */
     private double x;
@@ -83,22 +78,18 @@ public class NetworkTextObject extends LocatableModel {
     /**
      * Construct the text object with initial text.
      *
-     * @param network      root network
      * @param initialText text for the text object
      */
-    public NetworkTextObject(Network network, String initialText) {
-        this.network = network;
+    public NetworkTextObject(String initialText) {
         this.setText(initialText);
     }
 
     /**
      * Copy constructor.
      *
-     * @param network parent network for this text object
-     * @param text   text object to copy
+     * @param text text object to copy
      */
-    public NetworkTextObject(Network network, NetworkTextObject text) {
-        this.network = network;
+    public NetworkTextObject(NetworkTextObject text) {
         this.text = text.getText();
         this.x = text.x;
         this.y = text.y;

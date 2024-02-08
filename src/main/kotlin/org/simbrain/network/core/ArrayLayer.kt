@@ -10,7 +10,6 @@ import smile.math.matrix.Matrix
  * Array based layers (based on Smile matrices) should extend this. Maintains an input vector for summing inputs.
  */
 abstract class ArrayLayer(
-    val parent: Network,
     val inputSize: Int
 ) : Layer() {
 
@@ -26,13 +25,11 @@ abstract class ArrayLayer(
 
     override val inputs: Matrix = Matrix(inputSize, 1)
 
-    override val network: Network
-        get() = parent
-
     override fun inputSize(): Int {
         return inputs.size().toInt()
     }
 
+    context(Network)
     override fun updateInputs() {
         val wtdInputs = Matrix(inputSize(), 1)
         for (c in incomingConnectors) {

@@ -20,42 +20,40 @@ class LMSNetworkNode(networkPanel: NetworkPanel, private val lmsNet: LMSNetwork)
         val events = lmsNet.events
     }
 
-    override fun getModel(): NetworkModel {
-        return lmsNet
-    }
+    override val model: NetworkModel
+        get() = lmsNet
 
-    override fun getToolTipText(): String {
-        return lmsNet.toString()
-    }
+    override val toolTipText: String
+        get() = lmsNet.toString()
 
-    override fun getContextMenu(): JPopupMenu {
-        val contextMenu = JPopupMenu()
-        contextMenu.add(networkPanel.networkActions.cutAction)
-        contextMenu.add(networkPanel.networkActions.copyAction)
-        contextMenu.add(networkPanel.networkActions.pasteAction)
-        contextMenu.addSeparator()
+    override val contextMenu: JPopupMenu
+        get() {
+            val contextMenu = JPopupMenu()
+            contextMenu.add(networkPanel.networkActions.cutAction)
+            contextMenu.add(networkPanel.networkActions.copyAction)
+            contextMenu.add(networkPanel.networkActions.pasteAction)
+            contextMenu.addSeparator()
 
-        // Edit Submenu
-        contextMenu.add(networkPanel.createAction(name = "Edit network") {
-            propertyDialog.display()
-        })
-        contextMenu.add(networkPanel.networkActions.deleteAction)
-        contextMenu.addSeparator()
+            // Edit Submenu
+            contextMenu.add(networkPanel.createAction(name = "Edit network") {
+                propertyDialog.display()
+            })
+            contextMenu.add(networkPanel.networkActions.deleteAction)
+            contextMenu.addSeparator()
 
-        // Train Submenu
-        contextMenu.add(networkPanel.createAction(name = "Train network") {
-            lmsNet.getTrainingDialog().display()
-        })
+            // Train Submenu
+            contextMenu.add(networkPanel.createAction(name = "Train network") {
+                lmsNet.getTrainingDialog().display()
+            })
 
-        // Coupling menu
-        contextMenu.addSeparator()
-        contextMenu.add(CouplingMenu(networkPanel.networkComponent, lmsNet))
+            // Coupling menu
+            contextMenu.addSeparator()
+            contextMenu.add(CouplingMenu(networkPanel.networkComponent, lmsNet))
 
-        return contextMenu
-    }
+            return contextMenu
+        }
 
-    override fun getPropertyDialog(): StandardDialog {
-        return lmsNet.getTrainingDialog()
-    }
+    override val propertyDialog: StandardDialog
+        get() = with(networkPanel) { lmsNet.getTrainingDialog() }
 
 }

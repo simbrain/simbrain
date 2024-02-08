@@ -120,9 +120,9 @@ val actorCritic = newSim {
     }
 
     // Set up connections
-    val wts: List<Synapse> = connectAllToAll(sensorNeurons, value, 0.0)
+    val wts: List<Synapse> = network.connectAllToAll(sensorNeurons, value, 0.0)
     wts.forEach(Consumer { w: Synapse -> w.lowerBound = 0.0 })
-    val wts2: List<Synapse> = connectAllToAll(sensorNeurons, outputs, 0.0)
+    val wts2: List<Synapse> = network.connectAllToAll(sensorNeurons, outputs, 0.0)
     wts2.forEach(Consumer { w: Synapse -> w.lowerBound = 0.0 })
 
     val gridCoupling = couplingManager.createCoupling(gridSensor, sensorNeurons)
@@ -144,10 +144,14 @@ val actorCritic = newSim {
     network.updateManager.clear()
     network.updateManager.addAction(updateAction("RL Update") {
 
-        sensorNeurons.update()
-        updateNeurons(listOf(value))
-        updateNeurons(listOf(reward))
-        outputs.update()
+        with(network) {
+            sensorNeurons.update()
+            with(network) {
+                updateNeurons(listOf(value))
+                updateNeurons(listOf(reward))
+            }
+            outputs.update()
+        }
 
         tdError.forceSetActivation((reward.activation + gamma * value.activation) - value.lastActivation)
 

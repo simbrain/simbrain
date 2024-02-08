@@ -11,7 +11,7 @@ package org.simbrain.custom_sims.simulations
 // import org.simbrain.network.core.Neuron
 // import org.simbrain.network.core.Synapse
 // import org.simbrain.network.core.activations
-// import org.simbrain.network.neuron_update_rules.BinaryRule
+// import org.simbrain.network.updaterules.BinaryRule
 // import org.simbrain.util.geneticalgorithms.*
 // import org.simbrain.util.point
 // import org.simbrain.workspace.Workspace

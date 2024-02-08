@@ -11,7 +11,7 @@ package org.simbrain.custom_sims.simulations
 // import org.simbrain.custom_sims.newSim
 // import org.simbrain.network.core.Synapse
 // import org.simbrain.network.core.activations
-// import org.simbrain.network.neuron_update_rules.LinearRule
+// import org.simbrain.network.updaterules.LinearRule
 // import org.simbrain.network.util.BiasedScalarData
 // import org.simbrain.util.format
 // import org.simbrain.util.geneticalgorithms.*

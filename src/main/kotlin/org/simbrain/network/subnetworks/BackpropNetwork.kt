@@ -13,13 +13,12 @@
  */
 package org.simbrain.network.subnetworks
 
-import org.simbrain.network.core.Network
 import org.simbrain.network.core.XStreamConstructor
-import org.simbrain.network.neuron_update_rules.LinearRule
 import org.simbrain.network.trainers.BackpropTrainer
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.Trainable
 import org.simbrain.network.trainers.createDiagonalDataset
+import org.simbrain.network.updaterules.LinearRule
 import java.awt.geom.Point2D
 import kotlin.math.min
 
@@ -30,7 +29,7 @@ import kotlin.math.min
  */
 open class BackpropNetwork : FeedForward, Trainable {
 
-    constructor(parentNetwork: Network, nodesPerLayer: IntArray, initialPosition: Point2D?): super(parentNetwork, nodesPerLayer, initialPosition) {
+    constructor(nodesPerLayer: IntArray, initialPosition: Point2D?): super(nodesPerLayer, initialPosition) {
         layerList.forEach { it.updateRule = LinearRule() }
         inputLayer.isClamped = true
         val nin = nodesPerLayer.first()
@@ -40,7 +39,7 @@ open class BackpropNetwork : FeedForward, Trainable {
     }
 
     @XStreamConstructor()
-    private constructor(parentNetwork: Network) : super(parentNetwork)
+    private constructor() : super()
 
     override lateinit var trainingSet: MatrixDataset
 
@@ -49,4 +48,5 @@ open class BackpropNetwork : FeedForward, Trainable {
 
     override val trainer: BackpropTrainer
         get() = _trainer?: BackpropTrainer(this).also { _trainer = it }
+
 }

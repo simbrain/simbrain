@@ -12,7 +12,6 @@
  */
 package org.simbrain.network.connections
 
-import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.util.OrientationComparator
@@ -43,16 +42,11 @@ class OneToOne(
 ) : ConnectionStrategy(), EditableObject {
 
     override fun connectNeurons(
-        network: Network,
         source: List<Neuron>,
-        target: List<Neuron>,
-        addToNetwork: Boolean
+        target: List<Neuron>
     ): List<Synapse> {
         val syns = createOneToOneSynapses(source, target, useBidirectionalConnections)
         polarizeSynapses(syns, percentExcitatory)
-        if (addToNetwork) {
-            network.addNetworkModelsAsync(syns)
-        }
         return syns
     }
 

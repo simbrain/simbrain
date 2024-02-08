@@ -8,10 +8,7 @@ import org.simbrain.network.subnetworks.LMSNetwork
 import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.Trainable
-import org.simbrain.util.ResizableTabbedPane
-import org.simbrain.util.StandardDialog
-import org.simbrain.util.createApplyPanel
-import org.simbrain.util.createEditorDialog
+import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.table.MatrixDataFrame
 import org.simbrain.util.table.createAdvanceRowAction
@@ -26,6 +23,7 @@ import javax.swing.JTabbedPane
 /**
  * Generic training dialog for supervised learning.
  */
+context(NetworkPanel)
 fun Trainable.getTrainingDialog(): StandardDialog {
     return StandardDialog().apply {
 
@@ -40,17 +38,17 @@ fun Trainable.getTrainingDialog(): StandardDialog {
         // Run training algorithm
         val runControls = JPanel()
         runControls.layout = MigLayout("gap 0px 0px, ins 0")
-        val trainerControls = TrainerControls(trainer)
+        val trainerControls = TrainerControls(trainer, this@NetworkPanel)
         val inputs = MatrixEditor(trainingSet.inputs)
         inputs.toolbar.addSeparator()
         inputs.toolbar.add(
             inputs.table.createApplyAction("Apply Inputs") { selectedRow ->
-                trainer.applyInputs(selectedRow)
+                with(network) { trainer.applyInputs(selectedRow) }
             }
         )
         inputs.toolbar.add(inputs.table.createAdvanceRowAction())
         inputs.toolbar.add(inputs.table.createApplyAndAdvanceAction {
-            trainer.applyInputs(inputs.table.selectedRow)
+            with(network) { trainer.applyInputs(inputs.table.selectedRow) }
         })
         val targets = MatrixEditor(trainingSet.targets)
         val addRemoveRows = AddRemoveRows(inputs.table, targets.table)
@@ -82,7 +80,7 @@ fun NetworkPanel.showSRNCreationDialog(): StandardDialog {
         network.placementManager.lastClickedLocation
     )
     return creator.createEditorDialog {
-        network.addNetworkModelAsync(creator.create(network))
+        network.addNetworkModelAsync(creator.create())
     }
 
 }
@@ -102,11 +100,11 @@ fun main() {
     val networkComponent = NetworkComponent("")
     val np = NetworkPanel(networkComponent)
     val result = with(networkComponent.network) {
-        val srnNetwork = SRNNetwork(this, 5, 5)
+        val srnNetwork = SRNNetwork(5, 5)
         addNetworkModelAsync(srnNetwork)
         srnNetwork
     }
-    SRNNode(np,result ).propertyDialog.run { makeVisible() }
+    SRNNode(np,result ).propertyDialog?.display()
 }
 
 
@@ -120,7 +118,7 @@ fun NetworkPanel.showLMSCreationDialog(): StandardDialog {
         network.placementManager.lastClickedLocation
     )
     return creator.createEditorDialog {
-        network.addNetworkModelAsync(creator.create(network))
+        network.addNetworkModelAsync(creator.create())
     }
 
 }

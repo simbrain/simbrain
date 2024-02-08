@@ -23,10 +23,9 @@ import java.util.*
  * parameters can be changed but the structure of the network (number of layers and type of layer) cannot be.
  */
 class DeepNet(
-    network: Network,
     val tfLayers: ArrayList<TFLayer<*>>,
     nsamples: Int = 10
-): ArrayLayer(network, (tfLayers[0] as TFInputLayer).numElements),
+): ArrayLayer((tfLayers[0] as TFInputLayer).numElements),
     AttributeContainer,
     EditableObject {
 
@@ -106,7 +105,6 @@ class DeepNet(
         get() = Rectangle2D.Double(x - width / 2, y - height / 2, width, height)
 
     init {
-        label = network.idManager.getProposedId(this.javaClass)
         buildNetwork()
         deepNetInputData = Array(nsamples) { FloatArray(inputSize()) }
         deepNetTargetData = FloatArray(nsamples)
@@ -257,7 +255,7 @@ class DeepNet(
         override val name = "Deep Network"
 
         fun create(net: Network, layers: ArrayList<TFLayer<*>>): DeepNet {
-            return DeepNet(net, layers)
+            return DeepNet(layers)
         }
     }
 

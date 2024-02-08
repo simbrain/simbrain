@@ -7,8 +7,7 @@ import com.thoughtworks.xstream.converters.UnmarshallingContext
 import com.thoughtworks.xstream.io.HierarchicalStreamReader
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter
 import org.simbrain.network.NetworkModel
-import org.simbrain.network.groups.AbstractNeuronCollection
-import org.simbrain.network.groups.Subnetwork
+import org.simbrain.network.subnetworks.Subnetwork
 
 /**
  * The main data structure for [NetworkModel]s. Wraps a map from classes to ordered sets of those objects.

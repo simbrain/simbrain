@@ -18,10 +18,7 @@
  */
 package org.simbrain.network.updaterules
 
-import org.simbrain.network.core.Layer
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.SpikingNeuronUpdateRule
-import org.simbrain.network.matrix.NeuronArray
+import org.simbrain.network.core.*
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.network.util.SpikingScalarData
@@ -136,25 +133,27 @@ open class IntegrateAndFireRule : SpikingNeuronUpdateRule<SpikingScalarData, Spi
         return ifn
     }
 
-    override fun apply(na: Layer, data: SpikingMatrixData) {
-        if (na is NeuronArray) {
-            for (i in 0 until na.size()) {
+    context(Network)
+    override fun apply(layer: Layer, dataHolder: SpikingMatrixData) {
+        if (layer is NeuronArray) {
+            for (i in 0 until layer.size()) {
                 val(spiked, V) = intFireRule(
-                    na.network.time,
-                    data.lastSpikeTimes[i],
-                    na.network.timeStep,
-                    na.inputs.get(i, 0),
-                    na.activations.get(i, 0))
-                data.setHasSpiked(i, spiked, na.network.time)
-                na.activations.set(i, 0, V)
+                    time,
+                    dataHolder.lastSpikeTimes[i],
+                    timeStep,
+                    layer.inputs.get(i, 0),
+                    layer.activations.get(i, 0))
+                dataHolder.setHasSpiked(i, spiked, time)
+                layer.activations.set(i, 0, V)
             }
         }
     }
 
-    override fun apply(n: Neuron, data: SpikingScalarData) {
-        val(spiked, V) = intFireRule(n.network.time, n.lastSpikeTime, n.network.timeStep, n.input, n.activation)
-        n.isSpike = spiked
-        n.activation = V
+    context(Network)
+    override fun apply(neuron: Neuron, data: SpikingScalarData) {
+        val (spiked, v) = intFireRule(time, neuron.lastSpikeTime, timeStep, neuron.input, neuron.activation)
+        neuron.isSpike = spiked
+        neuron.activation = v
     }
 
     /*

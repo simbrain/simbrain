@@ -18,12 +18,8 @@
  */
 package org.simbrain.network.learningrules
 
-import org.simbrain.network.core.Connector
-import org.simbrain.network.core.Synapse
-import org.simbrain.network.core.SynapseUpdateRule
+import org.simbrain.network.core.*
 import org.simbrain.network.gui.dialogs.NetworkPreferences.defaultLearningRate
-import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.EmptyScalarData
 import org.simbrain.util.UserParameter
@@ -58,6 +54,7 @@ class OjaRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>() {
         return os
     }
 
+    context(Network)
     override fun apply(synapse: Synapse, data: EmptyScalarData) {
         val input = synapse.source.activation
         val output = synapse.target.activation
@@ -66,11 +63,12 @@ class OjaRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>() {
         synapse.strength = synapse.clip(strength)
     }
 
+    context(Network)
     override fun apply(connector: Connector, dataHolder: EmptyMatrixData) {
         if (connector is WeightMatrix) {
             val wm = connector.weightMatrix
-            val input = (connector.getSource() as NeuronArray).activations
-            val output = (connector.getTarget() as NeuronArray).activations
+            val input = (connector.source as NeuronArray).activations
+            val output = (connector.target as NeuronArray).activations
             // delta    = rate * (input * output^T - input "broadcast multiplied by" weight matrix)
             //          = rate * (hebbTerm - weightDecayTerm)
             val hebbTerm = output.mt(input)

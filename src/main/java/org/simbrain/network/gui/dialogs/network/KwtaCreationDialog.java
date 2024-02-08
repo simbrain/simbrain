@@ -88,7 +88,7 @@ public class KwtaCreationDialog extends StandardDialog {
      * Called when dialog closes.
      */
     protected void closeDialogOk() {
-        KWTA kWTA = new KWTA(networkPanel.getNetwork(), Integer.parseInt(tfK.getText()));
+        KWTA kWTA = new KWTA(Integer.parseInt(tfK.getText()));
         layoutPanel.commitChanges();
         layout.layoutNeurons(kWTA.getNeuronList());
         networkPanel.getNetwork().addNetworkModelAsync(kWTA);

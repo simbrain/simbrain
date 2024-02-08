@@ -12,7 +12,6 @@
  */
 package org.simbrain.network.connections
 
-import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.gui.dialogs.NetworkPreferences
@@ -54,16 +53,11 @@ class AllToAll(
     }
 
     override fun connectNeurons(
-        network: Network,
         source: List<Neuron>,
-        target: List<Neuron>,
-        addToNetwork: Boolean
+        target: List<Neuron>
     ): List<Synapse> {
         val syns = createAllToAllSynapses(source, target, allowSelfConnection)
         polarizeSynapses(syns, percentExcitatory)
-        if (addToNetwork) {
-            network.addNetworkModelsAsync(syns)
-        }
         return syns
     }
 

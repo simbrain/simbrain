@@ -36,10 +36,9 @@ import kotlin.math.pow
  * @author Jeff Yoshimi
  */
 class SOMGroup @JvmOverloads constructor(
-    network: Network,
     neurons: List<Neuron>,
     params: SOMParams = SOMParams()
-) : NeuronGroup(network) {
+) : NeuronGroup() {
 
     var params by GuiEditable(
         label = "SOM Parameters",
@@ -48,16 +47,16 @@ class SOMGroup @JvmOverloads constructor(
         order = 50
     )
 
-    constructor(network: Network, numNeurons: Int) : this(network, List(numNeurons) { Neuron(network) })
+    constructor(numNeurons: Int) : this(List(numNeurons) { Neuron() })
 
     @XStreamConstructor
-    private constructor(parentNetwork: Network): this(parentNetwork, listOf())
+    private constructor() : this(listOf())
 
     init {
         addNeurons(neurons)
     }
 
-    override fun copy() = SOMGroup(network, neuronList.map { it.deepCopy() }, params.copy())
+    override fun copy() = SOMGroup(neuronList.map { it.deepCopy() }, params.copy())
 
     var neighborhoodSize = params.initNeighborhoodSize
     var learningRate = params.initialLearningRate
@@ -66,7 +65,7 @@ class SOMGroup @JvmOverloads constructor(
     var value = 0.0
     var winner: Neuron? = null
 
-    override val customInfo = InfoText(network, getStateInfoText())
+    override val customInfo = InfoText(getStateInfoText())
 
     // this.layout = HexagonalGridLayout(50.0, 50.0, 5)
 
@@ -74,6 +73,7 @@ class SOMGroup @JvmOverloads constructor(
      * Randomize all weights coming in to this network. The weights will be
      * between 0 and the upper bound of each synapse.
      */
+    context(Network)
     override fun randomizeIncomingWeights() {
         for (n in neuronList) {
             for (s in n.fanIn) {
@@ -253,8 +253,8 @@ class SOMParams : NeuronGroupParams() {
         order = 100
     )
 
-    override fun create(net: Network): SOMGroup {
-        return SOMGroup(net, List(numNeurons) { Neuron(net) }, this.copy())
+    override fun create(): SOMGroup {
+        return SOMGroup(List(numNeurons) { Neuron() }, this.copy())
     }
 
     override fun copy(): SOMParams {

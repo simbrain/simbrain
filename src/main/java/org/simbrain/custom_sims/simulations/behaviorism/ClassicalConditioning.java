@@ -6,7 +6,7 @@ import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.neuron_update_rules.BinaryRule;
+import org.simbrain.network.updaterules.BinaryRule;
 import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.workspace.gui.SimbrainDesktop;
@@ -57,22 +57,22 @@ public class ClassicalConditioning extends Simulation {
         net = nc.getNetwork();
 
         // Construct the network
-        Neuron bellDetectorNeuron = new Neuron(net);
+        Neuron bellDetectorNeuron = new Neuron();
         bellDetectorNeuron.setClamped(true);
         net.addNetworkModelAsync(bellDetectorNeuron);
         bellDetectorNeuron.setLocation(295, 194);
         bellDetectorNeuron.setLabel("Bell Detector");
 
-        Neuron cheeseDetectorNeuron = new Neuron(net);
+        Neuron cheeseDetectorNeuron = new Neuron();
         cheeseDetectorNeuron.setClamped(false);
         net.addNetworkModelAsync(cheeseDetectorNeuron);
         cheeseDetectorNeuron.setLocation(160, 194);
         cheeseDetectorNeuron.setLabel("Cheese Detector");
 
         BinaryRule responseRule = new BinaryRule();
-        responseRule.setThreshold(.5);
+        responseRule.threshold = .5;
         responseRule.setLowerBound(0);
-        Neuron salivationResponse = new Neuron(net, responseRule);
+        Neuron salivationResponse = new Neuron();
         net.addNetworkModelAsync(salivationResponse);
         salivationResponse.setLocation(160, 60);
         salivationResponse.setLabel("Salivation");

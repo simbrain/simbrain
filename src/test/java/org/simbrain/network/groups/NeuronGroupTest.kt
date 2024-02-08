@@ -1,75 +1,74 @@
-package org.simbrain.network.groups;
+package org.simbrain.network.groups
 
-import org.junit.jupiter.api.Test;
-import org.simbrain.network.core.Network;
-import org.simbrain.network.matrix.WeightMatrix;
-import org.simbrain.network.neurongroups.NeuronGroup;
-import org.simbrain.network.neurongroups.SoftmaxGroup;
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Test
+import org.simbrain.network.core.Network
+import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.neurongroups.NeuronGroup
+import org.simbrain.network.neurongroups.SoftmaxGroup
+import java.util.List
 
-import java.util.Arrays;
-import java.util.List;
+class NeuronGroupTest {
+    var net: Network = Network()
+    var ng: NeuronGroup = NeuronGroup(2)
 
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-public class NeuronGroupTest {
-
-    Network net = new Network();
-    NeuronGroup ng = new NeuronGroup(net, 2);
-    {
-        ng.setLabel("test");
-        net.addNetworkModelAsync(ng);
+    init {
+        ng.label = "test"
+        net.addNetworkModelAsync(ng)
     }
 
 
     @Test
-    public void testDeepCopy() {
-        NeuronGroup ng2 = ng.copyTo(net);
-        net.addNetworkModelAsync(ng2);
-        assertEquals(2, ng2.getNeuronList().size());
+    fun testDeepCopy() {
+        val ng2 = ng.copy()
+        net.addNetworkModelAsync(ng2)
+        Assertions.assertEquals(2, ng2.neuronList.size)
     }
 
     @Test
-    void propagateLooseActivations() {
-        ng.getNeuron(0).setActivation(1.0);
-        ng.getNeuron(1).setActivation(-1.0);
-        NeuronGroup ng2 = new NeuronGroup(net, 2);
-        WeightMatrix wm = new WeightMatrix(net, ng, ng2);
-        net.addNetworkModelsAsync(List.of(ng2, wm));
-        net.update();
-        assertArrayEquals(new double[]{1.0, -1.0}, ng2.getActivations());
+    fun propagateLooseActivations() {
+        ng.getNeuron(0).activation = 1.0
+        ng.getNeuron(1).activation = -1.0
+        val ng2 = NeuronGroup(2)
+        val wm = WeightMatrix(ng, ng2)
+        net.addNetworkModelsAsync(List.of(ng2, wm))
+        net.update()
+        Assertions.assertArrayEquals(doubleArrayOf(1.0, -1.0), ng2.activations)
     }
 
     @Test
-    void propagateGroupActivation() {
-        ng.setActivations(new double[]{1.0, -1.0});
-        NeuronGroup ng2 = new NeuronGroup(net, 2);
-        WeightMatrix wm = new WeightMatrix(net, ng, ng2);
-        net.addNetworkModelsAsync(List.of(ng2, wm));
-        net.update();
-        assertArrayEquals(new double[]{1.0, -1.0}, ng2.getActivations());
+    fun propagateGroupActivation() {
+        ng.activations = doubleArrayOf(1.0, -1.0)
+        val ng2 = NeuronGroup(2)
+        val wm = WeightMatrix(ng, ng2)
+        net.addNetworkModelsAsync(List.of(ng2, wm))
+        net.update()
+        Assertions.assertArrayEquals(doubleArrayOf(1.0, -1.0), ng2.activations)
     }
 
-    @Test
-    void getThenSetActivations() {
-        ng.getActivations(); // validates the cache. be sure propagation still works
-        ng.getNeuron(0).setActivation(1.0);
-        ng.getNeuron(1).setActivation(-1.0);
-        NeuronGroup ng2 = new NeuronGroup(net, 2);
-        WeightMatrix wm = new WeightMatrix(net, ng, ng2);
-        net.addNetworkModelsAsync(List.of(ng2, wm));
-        net.update();
-        assertArrayEquals(new double[]{1.0, -1.0}, ng2.getActivations());
-    }
 
     @Test
-    void testSoftmax() {
-        ng.randomize();
-        SoftmaxGroup ng2 = new SoftmaxGroup(net, 5);
-        WeightMatrix wm = new WeightMatrix(net, ng, ng2);
-        net.addNetworkModelsAsync(List.of(ng2, wm));
-        net.update();
-        // System.out.println(Arrays.toString(ng2.getActivations()));
-        assertEquals(1.0, Arrays.stream(ng2.getActivations()).sum(), .01);
+    fun getThenSetActivations() {
+            ng.activations // validates the cache. be sure propagation still works
+            ng.getNeuron(0).activation = 1.0
+            ng.getNeuron(1).activation = -1.0
+            val ng2 = NeuronGroup(2)
+            val wm = WeightMatrix(ng, ng2)
+            net.addNetworkModelsAsync(List.of(ng2, wm))
+            net.update()
+            Assertions.assertArrayEquals(doubleArrayOf(1.0, -1.0), ng2.activations)
+        }
+
+    @Test
+    fun testSoftmax() {
+        with(net) {
+            ng.randomize()
+            val ng2 = SoftmaxGroup(5)
+            val wm = WeightMatrix(ng, ng2)
+            net.addNetworkModelsAsync(ng2, wm)
+            net.update()
+            // System.out.println(Arrays.toString(ng2.getActivations()));
+            Assertions.assertEquals(1.0, ng.activations.sum(), .01)
+        }
     }
 }

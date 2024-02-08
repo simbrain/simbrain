@@ -13,12 +13,8 @@
  */
 package org.simbrain.network.trainers
 
-import org.simbrain.network.core.ArrayLayer
-import org.simbrain.network.core.Connector
-import org.simbrain.network.core.Layer
-import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.network.matrix.WeightMatrix
-import org.simbrain.network.neuron_update_rules.interfaces.DifferentiableUpdateRule
+import org.simbrain.network.core.*
+import org.simbrain.network.updaterules.interfaces.DifferentiableUpdateRule
 import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.util.plusAssign
 import org.simbrain.util.sse
@@ -60,6 +56,7 @@ fun WeightMatrix.applyLMS(outputError: Matrix, epsilon: Double = .1) {
  * Learn to produce current target activations (which might have been "force set") from current source activations.
  * Uses least-mean-squares.
  */
+context(Network)
 fun WeightMatrix.trainCurrentOutputLMS(epsilon: Double = .1) {
     val targets = target.outputs.clone()
     val actualOutputs = output
@@ -101,6 +98,7 @@ fun NeuronArray.updateBiases(error: Matrix, epsilon: Double = .1) {
 /**
  * Print debugging info for a list of weight matrices.
  */
+context(Network)
 fun List<WeightMatrix>.printActivationsAndWeights(showWeights: Boolean = false) {
     println(first().source)
     for (wm in this) {
@@ -118,6 +116,7 @@ fun List<WeightMatrix>.printActivationsAndWeights(showWeights: Boolean = false) 
 /**
  * Perform a "forward pass" through a list of weight matrices. Assumes they are all connected.
  */
+context(Network)
 fun List<WeightMatrix>.forwardPass(inputVector: Matrix) {
     inputVector.validateSameShape(first().src.inputs)
     first().src.activations = inputVector
@@ -149,6 +148,7 @@ fun List<WeightMatrix>.backpropError(targetValues: Matrix, epsilon: Double = .1)
     return error
 }
 
+context(Network)
 fun WeightMatrixTree.forwardPass(inputVectors: List<Matrix>) {
     if (inputVectors.size != inputWeightLayers.size) throw IllegalArgumentException("Must provide same number of input vectors as input layers")
     inputVectors.zip(inputWeightLayers).forEach { (a, b) -> a.validateSameShape(b.src.inputs) }

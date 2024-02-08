@@ -2,13 +2,10 @@ package org.simbrain.custom_sims.simulations.hippocampus;
 
 import org.simbrain.custom_sims.Simulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
+import org.simbrain.custom_sims.simulations.neuroscience.AlvarezSquire;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.AllToAll;
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.NetworkUtilsKt;
-import org.simbrain.network.core.Synapse;
-import org.simbrain.network.core.SynapseGroup;
-import org.simbrain.network.groups.AbstractNeuronCollection;
+import org.simbrain.network.core.*;
 import org.simbrain.network.layouts.LineLayout;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.stats.ProbabilityDistribution;

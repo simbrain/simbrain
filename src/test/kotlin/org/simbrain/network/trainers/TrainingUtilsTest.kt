@@ -3,8 +3,8 @@ package org.simbrain.network.trainers
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
-import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.network.matrix.WeightMatrix
+import org.simbrain.network.core.NeuronArray
+import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.subnetworks.LMSNetwork
 import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.util.rowVectorTransposed
@@ -15,12 +15,12 @@ import smile.math.matrix.Matrix
 class TrainingUtilsTest {
 
     val net = Network()
-    val na1 = NeuronArray(net, 2)
-    val na2 = NeuronArray(net, 3)
-    val na3 = NeuronArray(net, 2)
+    val na1 = NeuronArray(2)
+    val na2 = NeuronArray(3)
+    val na3 = NeuronArray(2)
     var na1DataHolder = (na1.dataHolder as BiasedMatrixData)
-    val wm1 = WeightMatrix(net, na1, na2)
-    val wm2 = WeightMatrix(net, na2, na3)
+    val wm1 = WeightMatrix(na1, na2)
+    val wm2 = WeightMatrix(na2, na3)
 
     init {
         listOf(na1, na2, na3).forEach {
@@ -68,8 +68,10 @@ class TrainingUtilsTest {
     @Test
     fun `test forward pass`() {
         val inputs = Matrix.column(doubleArrayOf(-1.0, 1.0))
-        listOf(wm1, wm2).forwardPass(inputs)
-        listOf(wm1, wm2).printActivationsAndWeights(true)
+        with(net) {
+            listOf(wm1, wm2).forwardPass(inputs)
+            listOf(wm1, wm2).printActivationsAndWeights(true)
+        }
         assertArrayEquals(inputs.toDoubleArray(), wm2.target.outputs.toDoubleArray())
     }
 
@@ -80,23 +82,25 @@ class TrainingUtilsTest {
         val target = doubleArrayOf(5.0, -1.0, .5)
         na2.setActivations(target)
         // println("Before: ${wm1.output}")
-        repeat(100) {
-            wm1.trainCurrentOutputLMS()
+        with(net) {
+            repeat(100) {
+                wm1.trainCurrentOutputLMS()
+            }
+            // println("Outputs: ${wm1.output}")
+            // println("Biases: ${wm1.tar.dataHolder as BiasedMatrixData}")
+            assertArrayEquals(target, wm1.output.toDoubleArray(), .01)
         }
-        // println("Outputs: ${wm1.output}")
-        // println("Biases: ${wm1.tar.dataHolder as BiasedMatrixData}")
-        assertArrayEquals(target, wm1.output.toDoubleArray(), .01)
     }
 
 
     @Test
     fun `test lms in a feed forward net`() {
-        val ff = LMSNetwork(net, 5, 5)
+        val ff = LMSNetwork(5, 5)
         val target =  ff.trainingSet.targets.rowVectorTransposed(1)
 
         ff.inputLayer.isClamped = true
         ff.inputLayer.setActivations(ff.trainingSet.inputs.row(1))
-        ff.update()
+        with(net) { ff.update() }
         val outputs = ff.outputLayer.activations
         val error = target.sub(outputs)
         // TODO: Make an actual test; this was just to recreate a crash
@@ -127,8 +131,8 @@ class TrainingUtilsTest {
     @Test
     fun `test weight matrix tree with a branch`() {
         // [[wm1, wm1_2],[wm2]]
-        val na1_2 = NeuronArray(net, 3)
-        val wm1_2 = WeightMatrix(net, na1_2, na2)
+        val na1_2 = NeuronArray(3)
+        val wm1_2 = WeightMatrix(na1_2, na2)
         net.addNetworkModelsAsync(na1_2, wm1_2)
         val wmTree = WeightMatrixTree(listOf(na1, na1_2), na3)
         assertEquals(2, wmTree.tree.size)

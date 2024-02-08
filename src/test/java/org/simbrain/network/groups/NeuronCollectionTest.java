@@ -4,7 +4,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.matrix.WeightMatrix;
+import org.simbrain.network.core.NeuronCollection;
+import org.simbrain.network.core.WeightMatrix;
 
 import java.util.List;
 
@@ -13,13 +14,13 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 class NeuronCollectionTest {
 
     Network net = new Network();
-    Neuron n1 = new Neuron(net);
-    Neuron n2 = new Neuron(net);
-    NeuronCollection nc1 = new NeuronCollection(net, List.of(n1,n2));
-    Neuron n3 = new Neuron(net);
-    Neuron n4 = new Neuron(net);
-    NeuronCollection nc2 = new NeuronCollection(net, List.of(n3,n4));
-    WeightMatrix wm = new WeightMatrix(net, nc1, nc2);
+    Neuron n1 = new Neuron();
+    Neuron n2 = new Neuron();
+    NeuronCollection nc1 = new NeuronCollection(List.of(n1,n2));
+    Neuron n3 = new Neuron();
+    Neuron n4 = new Neuron();
+    NeuronCollection nc2 = new NeuronCollection(List.of(n3,n4));
+    WeightMatrix wm = new WeightMatrix(nc1, nc2);
 
     {
         net.addNetworkModelsAsync(List.of(n1,n2,n3,n4,nc1,nc2,wm));

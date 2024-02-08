@@ -22,7 +22,6 @@ import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.core.SynapseGroup;
-import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.neurongroups.CompetitiveGroup;
 import org.simbrain.network.neurongroups.NeuronGroup;
 import org.simbrain.util.UserParameter;
@@ -57,21 +56,19 @@ public class CompetitiveNetwork extends Subnetwork {
     /**
      * Construct an SOM Network.
      *
-     * @param net                   parent network Set to null when this is used simply as a
-     *                              holder for param values.
      * @param numInputNeurons       number of neurons in the input layer
      * @param numCompetitiveNeurons number of neurons in the Competitive layer
      */
-    public CompetitiveNetwork(Network net, int numInputNeurons, int numCompetitiveNeurons) {
-        super(net);
+    public CompetitiveNetwork(int numInputNeurons, int numCompetitiveNeurons) {
+        super();
         this.setLabel("Competitive Network");
 
-        competitive = new CompetitiveGroup(net, numCompetitiveNeurons);
+        competitive = new CompetitiveGroup(numCompetitiveNeurons);
         competitive.setLabel("Competitive Group");
         this.addModel(competitive);
         competitive.setLayoutBasedOnSize();
 
-        inputLayer = new NeuronGroup(net, numInputNeurons);
+        inputLayer = new NeuronGroup(numInputNeurons);
         this.addModel(inputLayer);
         inputLayer.setLabel("Input layer");
         inputLayer.setClamped(true);
@@ -132,7 +129,7 @@ public class CompetitiveNetwork extends Subnetwork {
          * Create the competitive net
          */
         public CompetitiveNetwork create(Network network) {
-            return new CompetitiveNetwork(network,  numIn, numComp);
+            return new CompetitiveNetwork(numIn, numComp);
         }
 
     }

@@ -25,12 +25,12 @@ import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.NeuronUpdateRule
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.neuronContextMenu
 import org.simbrain.network.gui.neuronDialog
-import org.simbrain.network.neuron_update_rules.interfaces.ActivityGenerator
+import org.simbrain.network.updaterules.NeuronUpdateRule
+import org.simbrain.network.updaterules.interfaces.ActivityGenerator
 import org.simbrain.util.*
 import org.simbrain.util.math.SimbrainMath
 import java.awt.BasicStroke
@@ -44,7 +44,7 @@ import javax.swing.JPopupMenu
  * **NeuronNode** is a Piccolo PNode corresponding to a Neuron in the neural
  * network model.
  */
-class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net) {
+class NeuronNode(net: NetworkPanel, val neuron: Neuron) : ScreenElement(net) {
 
     private val mainShape: PPath
         get() = if (neuron.updateRule is ActivityGenerator) square else circle
@@ -374,15 +374,10 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net) {
         priorityText.setOffset(mainShape.bounds.centerX, mainShape.bounds.centerY + DIAMETER - 10)
     }
 
-    override fun isDraggable(): Boolean {
-        return true
-    }
+    override val isDraggable: Boolean = true
 
-    override fun getToolTipText(): String? {
-        var ret: String? = String()
-        ret += neuron.toolTipText
-        return ret
-    }
+    override val toolTipText: String?
+        get() = neuron.toolTipText
 
     /**
      * Return the center of this node (the circle or square) in global coordinates.
@@ -392,13 +387,11 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net) {
     val center: Point2D
         get() = mainShape.globalBounds.center2D
 
-    override fun getContextMenu(): JPopupMenu {
-        return networkPanel.neuronContextMenu
-    }
+    override val contextMenu: JPopupMenu
+        get() = networkPanel.neuronContextMenu
 
-    override fun getPropertyDialog(): JDialog? {
-        return networkPanel.neuronDialog
-    }
+    override val propertyDialog: JDialog?
+        get() = networkPanel.neuronDialog
 
     /**
      * Returns String representation of this NeuronNode.
@@ -452,9 +445,8 @@ class NeuronNode(net: NetworkPanel?, val neuron: Neuron) : ScreenElement(net) {
             this.setBounds(p.x, p.y, this.width, this.height)
         }
 
-    override fun getModel(): Neuron {
-        return neuron
-    }
+    override val model: Neuron
+        get() = neuron
 
     /**
      * Set a custom color for the circle stroke (not the fill).

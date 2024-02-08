@@ -17,7 +17,6 @@
  */
 package org.simbrain.network.connections
 
-import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.gui.dialogs.NetworkPreferences
@@ -82,25 +81,17 @@ class Sparse @JvmOverloads constructor(
 ) : ConnectionStrategy(), EditableObject {
 
     override fun connectNeurons(
-        network: Network,
         source: List<Neuron>,
-        target: List<Neuron>,
-        addToNetwork: Boolean
+        target: List<Neuron>
     ): List<Synapse> {
         val result = createSparseSynapses(source, target, connectionDensity, allowSelfConnection, equalizeEfferents)
         return when(result) {
             is ConnectionsResult.Add -> {
                 polarizeSynapses(result.connectionsToAdd, percentExcitatory)
-                if (addToNetwork) {
-                    network.addNetworkModelsAsync(result.connectionsToAdd)
-                }
                 result.connectionsToAdd
             }
             is ConnectionsResult.Reset -> {
                 polarizeSynapses(result.resultConnections, percentExcitatory)
-                if (addToNetwork) {
-                    network.addNetworkModelsAsync(result.resultConnections)
-                }
                 result.resultConnections
             }
             is ConnectionsResult.Remove -> {

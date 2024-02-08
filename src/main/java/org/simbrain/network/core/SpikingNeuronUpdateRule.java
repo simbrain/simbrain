@@ -19,6 +19,7 @@
 package org.simbrain.network.core;
 
 import org.simbrain.network.core.Network.TimeType;
+import org.simbrain.network.updaterules.NeuronUpdateRule;
 import org.simbrain.network.util.SpikingMatrixData;
 import org.simbrain.network.util.SpikingScalarData;
 

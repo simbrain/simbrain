@@ -24,7 +24,7 @@ class CouplingTest {
 
     @Test
     fun `ensure producers from multiple identical gets are equal`() {
-        val neuron = Neuron(network)
+        val neuron = Neuron()
         with(couplingManager) {
             val get1 = neuron.getProducer("getActivation")
             val get2 = neuron.getProducer("getActivation")
@@ -35,7 +35,7 @@ class CouplingTest {
 
     @Test
     fun `ensure consumers from multiple identical gets are equal`() {
-        val neuron = Neuron(network)
+        val neuron = Neuron()
         with(couplingManager) {
             val get1 = neuron.getConsumer("forceSetActivation")
             val get2 = neuron.getConsumer("forceSetActivation")
@@ -46,7 +46,7 @@ class CouplingTest {
 
     @Test
     fun `ensure couplings from multiple identical createCoupling calls are equal`() {
-        val neuron = Neuron(network)
+        val neuron = Neuron()
         with(couplingManager) {
             val producer = neuron.getProducer("getActivation")
             val consumer = neuron.getConsumer("addInputValue")
@@ -58,7 +58,7 @@ class CouplingTest {
 
     @Test
     fun `check if createCoupling successfully creates coupling`() {
-        val neuron = Neuron(network)
+        val neuron = Neuron()
         with(couplingManager) {
             val producer = neuron.getProducer("getActivation")
             val consumer = neuron.getConsumer("addInputValue")
@@ -69,7 +69,7 @@ class CouplingTest {
 
     @Test
     fun `ensure createCoupling does not create duplicate coupling`() {
-        val neuron = Neuron(network)
+        val neuron = Neuron()
         with(couplingManager) {
             val producer = neuron.getProducer("getActivation")
             val consumer = neuron.getConsumer("addInputValue")
@@ -81,7 +81,7 @@ class CouplingTest {
 
     @Test
     fun `check if removeCoupling successfully removes coupling`() {
-        val neuron = Neuron(network)
+        val neuron = Neuron()
         with(couplingManager) {
             val producer = neuron.getProducer("getActivation")
             val consumer = neuron.getConsumer("addInputValue")
@@ -93,9 +93,9 @@ class CouplingTest {
 
     @Test
     fun `check if removeCouplings successfully removes couplings`() {
-        val neuron1 = Neuron(network)
-        val neuron2 = Neuron(network)
-        val neuron3 = Neuron(network)
+        val neuron1 = Neuron()
+        val neuron2 = Neuron()
+        val neuron3 = Neuron()
         with(couplingManager) {
             fun neuronCoupling(source: Neuron, target: Neuron): Coupling {
                 val producer = source.getProducer("getActivation")
@@ -118,9 +118,9 @@ class CouplingTest {
 
     @Test
     fun `check if removeAttributeContainer successfully removes corresponding couplings`() {
-        val neuron1 = Neuron(network)
-        val neuron2 = Neuron(network)
-        val neuron3 = Neuron(network)
+        val neuron1 = Neuron()
+        val neuron2 = Neuron()
+        val neuron3 = Neuron()
         with(couplingManager) {
             fun neuronCoupling(source: Neuron, target: Neuron): Coupling {
                 val producer = source.getProducer("getActivation")
@@ -143,7 +143,7 @@ class CouplingTest {
 
     @Test
     fun `check if all producers are created on a neuron`() {
-        val neuron = Neuron(network)
+        val neuron = Neuron()
         network.addNetworkModelAsync(neuron)
         val expected = setOf("getLabel", "getActivation")
         val actual = with(couplingManager) { neuron.producers.map { it.method.name }.toSet() }
@@ -153,7 +153,7 @@ class CouplingTest {
 
     @Test
     fun `check if all consumers are created on a neuron`() {
-        val neuron = Neuron(network)
+        val neuron = Neuron()
         network.addNetworkModelAsync(neuron)
         val expected = setOf("setActivation", "forceSetActivation", "addInputValue", "addInputValue", "setLabel")
         val actual = with(couplingManager) { neuron.consumers.map { it.method.name }.toSet() }
@@ -163,8 +163,8 @@ class CouplingTest {
 
     @Test
     fun `check neuron getActivation coupling with neuron forceSetActivation`() {
-        val neuron1 = Neuron(network)
-        val neuron2 = Neuron(network)
+        val neuron1 = Neuron()
+        val neuron2 = Neuron()
         network.apply {
             addNetworkModelAsync(neuron1)
             addNetworkModelAsync(neuron2)
@@ -180,8 +180,8 @@ class CouplingTest {
 
     @Test
     fun `test many to one`() {
-        val neuron1 = Neuron(network)
-        val neuron2 = Neuron(network)
+        val neuron1 = Neuron()
+        val neuron2 = Neuron()
         network.addNetworkModelAsync(neuron1)
         network.addNetworkModelAsync(neuron2)
         neuron1.forceSetActivation(.5)
@@ -190,7 +190,7 @@ class CouplingTest {
         // Add a second network with a neuron
         val network2 = Network()
         workspace.addWorkspaceComponent(NetworkComponent("net2", network2))
-        val neuron3 = Neuron(network2)
+        val neuron3 = Neuron()
         network2.addNetworkModelAsync(neuron3)
 
         // Now couple them
@@ -212,15 +212,15 @@ class CouplingTest {
 
     @Test
     fun `test one to many`() {
-        val neuron1 = Neuron(network)
+        val neuron1 = Neuron()
         network.addNetworkModelAsync(neuron1)
         neuron1.forceSetActivation(.5)
 
         // Add a second network with a neuron
         val network2 = Network()
         workspace.addWorkspaceComponent(NetworkComponent("net2", network2))
-        val neuron2 = Neuron(network2)
-        val neuron3 = Neuron(network2)
+        val neuron2 = Neuron()
+        val neuron3 = Neuron()
         network2.addNetworkModelAsync(neuron2)
         network2.addNetworkModelAsync(neuron3)
 

@@ -2,10 +2,12 @@ package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.FixedDegree
+import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
-import org.simbrain.network.groups.NeuronCollection
+import org.simbrain.network.core.NeuronCollection
+import org.simbrain.network.core.addToNetwork
 import org.simbrain.network.layouts.GridLayout
-import org.simbrain.network.neuron_update_rules.BinaryRule
+import org.simbrain.network.updaterules.BinaryRule
 import org.simbrain.util.*
 import org.simbrain.util.Utils.FS
 import org.simbrain.util.stats.distributions.NormalDistribution
@@ -67,18 +69,18 @@ val binaryReservoir = newSim {
     val resNeurons = List(numNeurons) {
         val rule = BinaryRule()
         rule.threshold = .5
-        val neuron = Neuron(network, rule)
+        val neuron = Neuron(rule)
         neuron
     }
     network.addNetworkModelsAsync(resNeurons)
-    val reservoir = NeuronCollection(network, resNeurons)
+    val reservoir = NeuronCollection(resNeurons)
     network.addNetworkModelAsync(reservoir)
     reservoir.label = "Reservoir"
     reservoir.layout(GridLayout())
     reservoir.location = point(0, 0)
 
     val conn = FixedDegree(degree = k)
-    conn.connectNeurons(network, resNeurons, resNeurons)
+    conn.connectNeurons(resNeurons, resNeurons).addToNetwork(network)
 
     /**
      * Resets the variance by rescaling synapses. Assumes valid variance to begin with.
@@ -96,12 +98,12 @@ val binaryReservoir = newSim {
     }
     setVariance(variance)
 
-    fun perturbAndRunNetwork() {
+    fun perturbAndRunNetwork(network: Network) {
 
         println("Variance: ${variance}")
 
         // Clear the network and activations
-        reservoir.randomize()
+        with(network) { reservoir.randomize() }
         activations.clear()
 
         // Baseline window
@@ -136,7 +138,7 @@ val binaryReservoir = newSim {
                 setVariance(newVariance)
             }
             addButton("Run one trial") {
-                perturbAndRunNetwork()
+                perturbAndRunNetwork(network)
                 showSaveDialog("", "activations.csv") {
                     writeText(activations.toCsvString())
                 }
@@ -150,7 +152,7 @@ val binaryReservoir = newSim {
                             .takeWhile{it < 10}
                             .forEach {
                                 setVariance(it)
-                                perturbAndRunNetwork()
+                                perturbAndRunNetwork(network)
                                 // println("${variance}: ${activations}")
                                 File(path + FS + "activations${it}.csv").writeText(activations.toCsvString())
                         }

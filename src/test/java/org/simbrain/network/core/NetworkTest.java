@@ -2,13 +2,10 @@ package org.simbrain.network.core;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.simbrain.network.groups.NeuronCollection;
-import org.simbrain.network.groups.Subnetwork;
-import org.simbrain.network.matrix.NeuronArray;
-import org.simbrain.network.matrix.WeightMatrix;
 import org.simbrain.network.neurongroups.*;
 import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.subnetworks.SRNNetwork;
+import org.simbrain.network.subnetworks.Subnetwork;
 
 import java.util.List;
 
@@ -40,48 +37,48 @@ public class NetworkTest {
     public void setUpNetwork() {
         net = new Network();
 
-        n1 = new Neuron(net);
+        n1 = new Neuron();
         n1.setLabel("neuron1");
         net.addNetworkModelAsync(n1);
-        n2 = new Neuron(net);
+        n2 = new Neuron();
         n2.setLabel("neuron2");
         net.addNetworkModelAsync(n2);
 
         s1 = new Synapse(n1, n2);
         net.addNetworkModelAsync(s1);
 
-        nc1 = new NeuronCollection(net, List.of(n1, n2));
+        nc1 = new NeuronCollection(List.of(n1, n2));
         net.addNetworkModelAsync(nc1);
 
-        ng1 = new NeuronGroup(net, 10);
+        ng1 = new NeuronGroup(10);
         ng1.setLabel("neuron_group_1");
         net.addNetworkModelAsync(ng1);
-        ng2 = new NeuronGroup(net, 10);
+        ng2 = new NeuronGroup(10);
         ng2.setLabel("ng2");
         net.addNetworkModelAsync(ng2);
 
         sg1 = new SynapseGroup(ng1, ng2);
         net.addNetworkModelAsync(sg1);
 
-        na1 = new NeuronArray(net, 10);
-        na2 = new NeuronArray(net, 10);
-        wm1 = new WeightMatrix(net ,na1, na2);
+        na1 = new NeuronArray(10);
+        na2 = new NeuronArray(10);
+        wm1 = new WeightMatrix(na1, na2);
         net.addNetworkModelsAsync(List.of(na1,na2, wm1));
 
-        softmax = new SoftmaxGroup(net, 5);
+        softmax = new SoftmaxGroup(5);
         softmax.setLabel("softmax");
-        som = new SOMGroup(net, 5);
+        som = new SOMGroup(5);
         som.setLabel("som");
-        competitive = new CompetitiveGroup(net, 5);
+        competitive = new CompetitiveGroup(5);
         competitive.setLabel("competitive");
         wta = new WinnerTakeAll(net, 5);
         wta.setLabel("wta");
 
         net.addNetworkModelsAsync(softmax, som, competitive, wta);
 
-        bp = new BackpropNetwork(net, new int[] {3,5,4}, point(0,0));
+        bp = new BackpropNetwork(new int[] {3,5,4}, point(0,0));
         bp.setLabel("backprop");
-        srn = new SRNNetwork(net, 5,5,5, point(0,0));
+        srn = new SRNNetwork(5,5,5, point(0,0));
         srn.setLabel("srn");
         net.addNetworkModelsAsync(bp, srn);
 

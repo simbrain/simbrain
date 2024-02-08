@@ -5,9 +5,9 @@ import kotlinx.coroutines.Deferred
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
+import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.activations
-import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.geneticalgorithm.*
 import org.simbrain.util.place
@@ -53,9 +53,9 @@ val evolveXor = newSim {
 
         suspend fun expressWith(network: Network): Phenotype {
             return Phenotype(
-                NeuronCollection(network, network.express(inputLayerChromosome)).also { network.addNetworkModelAsync(it); it.label = "input" },
-                NeuronCollection(network, network.express(hiddenLayerChromosome)).also { network.addNetworkModelAsync(it); it.label = "hidden" },
-                NeuronCollection(network, network.express(outputLayerChromosome)).also { network.addNetworkModelAsync(it); it.label = "output" },
+                NeuronCollection(network.express(inputLayerChromosome)).also { network.addNetworkModelAsync(it); it.label = "input" },
+                NeuronCollection(network.express(hiddenLayerChromosome)).also { network.addNetworkModelAsync(it); it.label = "hidden" },
+                NeuronCollection(network.express(outputLayerChromosome)).also { network.addNetworkModelAsync(it); it.label = "output" },
                 network.express(connectionChromosome)
             )
         }

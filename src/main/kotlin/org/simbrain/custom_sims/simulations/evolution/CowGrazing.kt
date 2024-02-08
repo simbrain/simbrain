@@ -5,8 +5,8 @@ import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
+import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.groups.NeuronCollection
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.StepDecayFunction
@@ -68,13 +68,13 @@ val grazingCows = newSim { optionString ->
 
         suspend fun expressWith(network: Network): Phenotype {
             return Phenotype(
-                NeuronCollection(network, network.express(inputChromosome)).also {
+                NeuronCollection(network.express(inputChromosome)).also {
                     network.addNetworkModelAsync(it); it.label = "input"
                 },
-                NeuronCollection(network, network.express(hiddenChromosome)).also {
+                NeuronCollection(network.express(hiddenChromosome)).also {
                     network.addNetworkModelAsync(it); it.label = "hidden"
                 },
-                NeuronCollection(network, network.express(outputChromosome)).also {
+                NeuronCollection(network.express(outputChromosome)).also {
                     network.addNetworkModelAsync(it); it.label = "output"
                 },
                 network.express(connectionChromosome)

@@ -21,7 +21,7 @@ package org.simbrain.network.core
 /**
  * Use this to display info about the state of a network model.
  */
-class InfoText(network: Network, text: String) : NetworkTextObject(network, text) {
+class InfoText(text: String) : NetworkTextObject(text) {
 
     override fun delete() {
         // prevent the default delete behavior

@@ -2,14 +2,12 @@ package org.simbrain.network.core
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.network.matrix.WeightMatrix
-import org.simbrain.network.neuron_update_rules.SpikingThresholdRule
 import org.simbrain.network.spikeresponders.NonResponder
 import org.simbrain.network.spikeresponders.ProbabilisticResponder
 import org.simbrain.network.spikeresponders.StepMatrixData
 import org.simbrain.network.spikeresponders.StepResponder
 import org.simbrain.network.updaterules.IntegrateAndFireRule
+import org.simbrain.network.updaterules.SpikingThresholdRule
 import org.simbrain.network.util.SpikingMatrixData
 import smile.math.matrix.Matrix
 
@@ -19,11 +17,11 @@ import smile.math.matrix.Matrix
 class SpikeResponderMatrixTest {
 
     val net = Network()
-    val n1 = NeuronArray(net, 2) // Input
-    val n2 = NeuronArray(net, 2) // spiking neurons
-    val n3 = NeuronArray(net, 3) // receives spike response
-    val wm1 = WeightMatrix(net, n1, n2)
-    val wm2 = WeightMatrix(net, n2, n3) // This one has the spike responder
+    val n1 = NeuronArray(2) // Input
+    val n2 = NeuronArray(2) // spiking neurons
+    val n3 = NeuronArray(3) // receives spike response
+    val wm1 = WeightMatrix(n1, n2)
+    val wm2 = WeightMatrix(n2, n3) // This one has the spike responder
 
     init {
         wm2.setWeights(
@@ -42,10 +40,10 @@ class SpikeResponderMatrixTest {
     fun `neuron arrays and copies`() {
         // Change type of neuron array, copy, and create a spike responder
         val net2 = Network()
-        val arr1 = NeuronArray(net, 4) // Input
+        val arr1 = NeuronArray(4) // Input
         arr1.updateRule = IntegrateAndFireRule()
-        val arr2 = arr1.copyTo(net2)
-        val wmArr1Arr2 = WeightMatrix(net2, arr1, arr2)
+        val arr2 = arr1.copy()
+        val wmArr1Arr2 = WeightMatrix(arr1, arr2)
         wmArr1Arr2.setSpikeResponder(StepResponder())
         net2.addNetworkModelsAsync(arr1, arr2, wmArr1Arr2)
         net2.update() // Caused exceptions in earlier iterations.

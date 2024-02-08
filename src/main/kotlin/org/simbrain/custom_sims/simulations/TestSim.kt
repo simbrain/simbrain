@@ -4,13 +4,10 @@ import kotlinx.coroutines.joinAll
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.RadialProbabilistic
 import org.simbrain.network.connections.Sparse
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.addNeuronCollection
-import org.simbrain.network.core.addNeuronCollectionAsync
-import org.simbrain.network.core.addSynapse
+import org.simbrain.network.core.*
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.HexagonalGridLayout
-import org.simbrain.network.neuron_update_rules.DecayRule
+import org.simbrain.network.updaterules.DecayRule
 import org.simbrain.util.SmellSource
 import org.simbrain.util.piccolo.asGridCoordinate
 import org.simbrain.util.piccolo.makeLake
@@ -49,8 +46,7 @@ val testSim = newSim {
     val sparse = Sparse(connectionDensity = 0.3).apply {
         percentExcitatory = 10.0
     }
-    val syns = sparse.connectNeurons(network, region1.neuronList, region1.neuronList)
-    network.addNetworkModelsAsync(syns)
+    sparse.connectNeurons(region1.neuronList, region1.neuronList).addToNetwork(network)
     // Set up some references
     val straightNeuron = region1.neuronList[2]
     val leftNeuron = region1.neuronList[3]
@@ -66,16 +62,16 @@ val testSim = newSim {
         layout(GridLayout())
         location = point(500, -50)
     }
-    val region2weights = radial.connectNeurons(network, region2.neuronList, region2.neuronList)
-    network.addNetworkModelsAsync(region2weights)
+    radial.connectNeurons(region2.neuronList, region2.neuronList).addToNetwork(network)
 
     // Make connections between regions
-    val region1_to_2_weights = sparse.connectNeurons(network, region1.neuronList, region2.neuronList)
-    network.addNetworkModelsAsync(region1_to_2_weights)
+    sparse.connectNeurons(region1.neuronList, region2.neuronList).addToNetwork(network)
 
     // TODO: Temp because excitatory ratio not working
-    region1.randomizeIncomingWeights()
-    region2.randomizeIncomingWeights()
+    with(network) {
+        region1.randomizeIncomingWeights()
+        region2.randomizeIncomingWeights()
+    }
 
     // Location of the network in the desktop
     withGui {
@@ -205,7 +201,7 @@ val linkedNeuronList = newSim {
         val network = networkComponent.network
 
         val neurons = (1..1000).map {
-            Neuron(network)
+            Neuron()
         }
 
         neurons.mapNotNull { n -> network.addNetworkModelAsync(n) }.joinAll()

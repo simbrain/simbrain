@@ -118,7 +118,7 @@ public class UndoManager {
         UndoManager manager = new UndoManager();
         UndoableAction addNeuron = new UndoableAction() {
 
-            Neuron newNeuron = new Neuron(network);
+            Neuron newNeuron = new Neuron();
 
             @Override
             public void undo() {

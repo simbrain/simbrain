@@ -1,8 +1,8 @@
 package org.simbrain.network.gui
 
 import org.simbrain.network.LocatableModel
+import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.gui.nodes.NeuronNode
-import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.util.*
 import java.awt.event.KeyEvent.*
 

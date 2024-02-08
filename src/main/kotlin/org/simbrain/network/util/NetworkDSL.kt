@@ -7,7 +7,7 @@ import org.simbrain.network.core.Synapse
 import org.simbrain.workspace.Workspace
 
 fun neuron(config: Neuron.() -> Unit = { }) = fun(network: Network) =
-        Neuron(network).apply(config).also { network.addNetworkModelAsync(it) }
+        Neuron().apply(config).also { network.addNetworkModelAsync(it) }
 
 fun workspace(config: WorkspaceBuilder.() -> Unit = { }) = WorkspaceBuilder().apply(config).workspace
 
@@ -34,7 +34,7 @@ class WorkspaceBuilder {
 class NetworkBuilder {
     val network = Network()
 
-    fun neuron(config: Neuron.() -> Unit = { }) = Neuron(network).apply(config).also { network.addNetworkModelAsync(it) }
+    fun neuron(config: Neuron.() -> Unit = { }) = Neuron().apply(config).also { network.addNetworkModelAsync(it) }
 
     fun synapse(source: Neuron, target: Neuron, config: Synapse.() -> Unit = { }) = Synapse(source, target)
         .apply(config)

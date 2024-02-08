@@ -18,11 +18,11 @@
  */
 package org.simbrain.network.gui.dialogs.network;
 
-import org.simbrain.network.core.NeuronUpdateRule;
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.neuron_update_rules.LinearRule;
 import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.subnetworks.FeedForward;
+import org.simbrain.network.updaterules.LinearRule;
+import org.simbrain.network.updaterules.NeuronUpdateRule;
 import org.simbrain.network.updaterules.SigmoidalRule;
 import org.simbrain.network.util.MatrixDataHolder;
 import org.simbrain.network.util.ScalarDataHolder;
@@ -173,12 +173,9 @@ public class LayeredNetworkCreationPanel extends JPanel {
 
         // Create network
         FeedForward net = switch (type) {
-            case "Backprop" -> new BackpropNetwork(panel.getNetwork(), topology,
-                    panel.getNetwork().getPlacementManager().getLastClickedLocation());
-            case "FeedForward" -> new FeedForward(panel.getNetwork(), topology,
-                    panel.getNetwork().getPlacementManager().getLastClickedLocation());
-            default -> new FeedForward(panel.getNetwork(), topology,
-                    panel.getNetwork().getPlacementManager().getLastClickedLocation());
+            case "Backprop" -> new BackpropNetwork(topology, panel.getNetwork().getPlacementManager().getLastClickedLocation());
+            case "FeedForward" -> new FeedForward(topology, panel.getNetwork().getPlacementManager().getLastClickedLocation());
+            default -> new FeedForward(topology, panel.getNetwork().getPlacementManager().getLastClickedLocation());
         };
 
         // Set neuron types

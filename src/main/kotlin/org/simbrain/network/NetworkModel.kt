@@ -1,5 +1,6 @@
 package org.simbrain.network
 
+import org.simbrain.network.core.Network
 import org.simbrain.network.events.NetworkModelEvents
 import org.simbrain.util.UserParameter
 import org.simbrain.workspace.Consumable
@@ -35,11 +36,13 @@ abstract class NetworkModel {
     /**
      * First pass of updating. Generally a "weighted input".
      */
+    context(Network)
     open fun updateInputs() {}
 
     /**
      * Update the state of the model, based in part on weighted inputs set in [.updateInputs]
      */
+    context(Network)
     open fun update() {}
 
     /**
@@ -66,6 +69,7 @@ abstract class NetworkModel {
      * Override if there are cases where a model should not be added after creation, e.g. if it is a
      * duplicate of an existing model. Currently only used by [org.simbrain.network.groups.NeuronCollection]
      */
+    context(Network)
     open fun shouldAdd(): Boolean {
         return true
     }
@@ -79,6 +83,7 @@ abstract class NetworkModel {
     /**
      * Override to provide a means of randomizing a model.
      */
+    context(Network)
     open fun randomize() {}
 
     /**

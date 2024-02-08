@@ -11,15 +11,12 @@ import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.*
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.core.*
-import org.simbrain.network.groups.*
 import org.simbrain.network.gui.UndoManager.UndoableAction
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.gui.nodes.neuronGroupNodes.SOMGroupNode
 import org.simbrain.network.gui.nodes.subnetworkNodes.*
 import org.simbrain.network.kotlindl.DeepNet
-import org.simbrain.network.matrix.NeuronArray
-import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.neurongroups.SOMGroup
 import org.simbrain.network.smile.SmileClassifier
@@ -619,7 +616,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         with(selectionManager) {
             val sourceNeurons = filterSelectedSourceModels<Neuron>()
             val targetNeurons = filterSelectedModels<Neuron>()
-            network.connectionStrategy.connectNeurons(network, sourceNeurons, targetNeurons)
+            network.connectionStrategy.connectNeurons(sourceNeurons, targetNeurons).addToNetworkAsync(network)
         }
     }
 
@@ -636,7 +633,8 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             val targetNeurons = filterSelectedModels<Neuron>() +
                     filterSelectedModels<NeuronCollection>().flatMap { it.neuronList } +
                     filterSelectedModels<NeuronGroup>().flatMap { it.neuronList }
-            AllToAll().apply { percentExcitatory = 100.0 }.connectNeurons(network, sourceNeurons, targetNeurons)
+            AllToAll().apply { percentExcitatory = 100.0 }.connectNeurons(sourceNeurons, targetNeurons)
+                .addToNetworkAsync(network)
         }
 
     }
@@ -652,7 +650,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         if (sources.isNotEmpty() && targets.isNotEmpty()) {
             // TODO: Ability to set defaults for weight matrix that is added
             sources.cartesianProduct(targets).mapNotNull { (s, t) ->
-                network.addNetworkModelAsync(WeightMatrix(network, s, t))
+                network.addNetworkModelAsync(WeightMatrix(s, t))
             }
             return true
         }
@@ -805,7 +803,9 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
         val weightMatrixTree = WeightMatrixTree(sources, target)
         weightMatrixTree.tree.flatten().forEach { it.select() }
-        weightMatrixTree.forwardPass(sources.map { it.activations })
+        with(network) {
+            weightMatrixTree.forwardPass(sources.map { it.activations })
+        }
         weightMatrixTree.backpropError(target.targetValues!!, 0.0001)
     }
 

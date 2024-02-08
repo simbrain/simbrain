@@ -3,13 +3,13 @@ package org.simbrain.network.gui.nodes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.util.PPaintContext
+import org.simbrain.network.core.AbstractNeuronCollection
 import org.simbrain.network.core.Connector
-import org.simbrain.network.groups.AbstractNeuronCollection
+import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.gui.ImageBox
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.WeightMatrixArrow
 import org.simbrain.network.gui.createCouplingMenu
-import org.simbrain.network.matrix.WeightMatrix
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.table.MatrixDataFrame
@@ -117,92 +117,91 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         super.paint(paintContext)
     }
 
-    override fun isDraggable(): Boolean {
-        return false
-    }
+    override val isDraggable: Boolean = false
 
-    override fun getToolTipText(): String {
-        return weightMatrix.toString()
-    }
+    override val toolTipText: String
+        get() = weightMatrix.toString()
 
-    override fun getContextMenu(): JPopupMenu {
-        val contextMenu = JPopupMenu()
-        contextMenu.add(networkPanel.networkActions.cutAction)
-        contextMenu.add(networkPanel.networkActions.copyAction)
-        contextMenu.add(networkPanel.networkActions.pasteAction)
-        contextMenu.addSeparator()
-
-        // Edit Submenu
-        val editArray: Action = object : AbstractAction("Edit...") {
-            override fun actionPerformed(event: ActionEvent) {
-                val dialog: StandardDialog = matrixDialog
-                dialog.setVisible(true)
-            }
-        }
-        contextMenu.add(editArray)
-        contextMenu.add(getNetworkPanel().networkActions.deleteAction)
-        contextMenu.addSeparator()
-        val randomizeAction: Action = networkPanel.networkActions.randomizeObjectsAction
-        contextMenu.add(randomizeAction)
-        val diagAction: Action = object : AbstractAction("Diagonalize") {
-            init {
-                // putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/"));
-                putValue(SHORT_DESCRIPTION, "Diagonalize array")
-            }
-
-            override fun actionPerformed(event: ActionEvent) {
-                networkPanel.selectionManager
-                    .filterSelectedModels(WeightMatrix::class.java)
-                    .forEach(Consumer { obj: WeightMatrix -> obj.diagonalize() })
-            }
-        }
-        contextMenu.add(diagAction)
-        contextMenu.addSeparator()
-        if (weightMatrix is WeightMatrix) {
-            contextMenu.add(
-                actionManager
-                    .createCoupledPlotMenu(
-                        (weightMatrix).getProducer(WeightMatrix::getWeights),
-                        Objects.requireNonNull<String>(weightMatrix.id),
-                        "Plot Weight Matrix"
-                    )
-            )
-            contextMenu.add(
-                networkPanel.createAction(
-                    name = "Set Spectral Radius...",
-                    description = "Rescale matrix so that max eigenvalue is the specified value. < .9 decays; .9" +
-                            " churns; > 1 explodes."
-                ) {
-                    val radius = showNumericInputDialog("Set spectral Radius:", weightMatrix.weightMatrix.maxEigenvalue())
-                    if (radius != null) {
-                        weightMatrix.weightMatrix.setSpectralRadius(radius)
-                        weightMatrix.events.updated.fire()
-                    }
-                }
-            )
-        }
-
-        if (model.source is AbstractNeuronCollection) {
+    override val contextMenu: JPopupMenu
+        get() {
+            val contextMenu = JPopupMenu()
+            contextMenu.add(networkPanel.networkActions.cutAction)
+            contextMenu.add(networkPanel.networkActions.copyAction)
+            contextMenu.add(networkPanel.networkActions.pasteAction)
             contextMenu.addSeparator()
 
-            contextMenu.add(createAction("Toggle Show Weights") {
-                weightMatrix.isShowWeights = !weightMatrix.isShowWeights
-            })
+            // Edit Submenu
+            val editArray: Action = object : AbstractAction("Edit...") {
+                override fun actionPerformed(event: ActionEvent) {
+                    val dialog: StandardDialog = matrixDialog
+                    dialog.setVisible(true)
+                }
+            }
+            contextMenu.add(editArray)
+            contextMenu.add(networkPanel.networkActions.deleteAction)
+            contextMenu.addSeparator()
+            val randomizeAction: Action = networkPanel.networkActions.randomizeObjectsAction
+            contextMenu.add(randomizeAction)
+            val diagAction: Action = object : AbstractAction("Diagonalize") {
+                init {
+                    // putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/"));
+                    putValue(SHORT_DESCRIPTION, "Diagonalize array")
+                }
+
+                override fun actionPerformed(event: ActionEvent) {
+                    networkPanel.selectionManager
+                        .filterSelectedModels(WeightMatrix::class.java)
+                        .forEach(Consumer { obj: WeightMatrix -> obj.diagonalize() })
+                }
+            }
+            contextMenu.add(diagAction)
+            contextMenu.addSeparator()
+            if (weightMatrix is WeightMatrix) {
+                contextMenu.add(
+                    actionManager
+                        .createCoupledPlotMenu(
+                            (weightMatrix).getProducer(WeightMatrix::weights),
+                            Objects.requireNonNull<String>(weightMatrix.id),
+                            "Plot Weight Matrix"
+                        )
+                )
+                contextMenu.add(
+                    networkPanel.createAction(
+                        name = "Set Spectral Radius...",
+                        description = "Rescale matrix so that max eigenvalue is the specified value. < .9 decays; .9" +
+                                " churns; > 1 explodes."
+                    ) {
+                        val radius =
+                            showNumericInputDialog("Set spectral Radius:", weightMatrix.weightMatrix.maxEigenvalue())
+                        if (radius != null) {
+                            weightMatrix.weightMatrix.setSpectralRadius(radius)
+                            weightMatrix.events.updated.fire()
+                        }
+                    }
+                )
+            }
+
+            if (model.source is AbstractNeuronCollection) {
+                contextMenu.addSeparator()
+
+                contextMenu.add(networkPanel.createAction(name = "Toggle Show Weights") {
+                    weightMatrix.isShowWeights = !weightMatrix.isShowWeights
+                })
+            }
+
+            // Coupling menu
+            contextMenu.addSeparator()
+            val couplingMenu: JMenu = networkPanel.networkComponent.createCouplingMenu(weightMatrix)
+            contextMenu.add(couplingMenu)
+
+            return contextMenu
         }
 
-        // Coupling menu
-        contextMenu.addSeparator()
-        val couplingMenu: JMenu = networkPanel.networkComponent.createCouplingMenu(weightMatrix)
-        contextMenu.add(couplingMenu)
-
-        return contextMenu
-    }
-
+    /**
+     * Returns the dialog for editing this weight matrix
+     */
     private val matrixDialog: StandardDialog
-        /**
-         * Returns the dialog for editing this weight matrix
-         */
-        private get() {
+        get() {
             val dialog = StandardDialog()
             dialog.setTitle("Edit Weight Matrix")
             val tabs = JTabbedPane()
@@ -242,35 +241,26 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         invalidateFullBounds()
     }
 
-    override fun getPropertyDialog(): JDialog {
-        return matrixDialog
-    }
+    override val propertyDialog: StandardDialog
+        get() = matrixDialog
 
-    override fun getModel(): Connector {
-        return weightMatrix
-    }
+    override val model: Connector
+        get() = weightMatrix
 
     inner class WeightMatrixInteractionBox : InteractionBox(networkPanel) {
 
-        override fun getPropertyDialog(): JDialog {
-            return this@WeightMatrixNode.propertyDialog
-        }
+        override val propertyDialog: JDialog = this@WeightMatrixNode.propertyDialog
 
-        override fun getModel(): Connector {
-            return weightMatrix
-        }
+        override val model: Connector
+            get() = weightMatrix
 
-        override fun isDraggable(): Boolean {
-            return false
-        }
+        override val isDraggable: Boolean = false
 
-        override fun getContextMenu(): JPopupMenu {
-            return this@WeightMatrixNode.contextMenu
-        }
+        override val contextMenu: JPopupMenu
+            get() = this@WeightMatrixNode.contextMenu
 
-        override fun getToolTipText(): String {
-            return this@WeightMatrixNode.toolTipText
-        }
+        override val toolTipText: String
+            get() = this@WeightMatrixNode.toolTipText
 
     }
 }

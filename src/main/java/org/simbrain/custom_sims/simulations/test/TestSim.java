@@ -59,12 +59,12 @@ public class TestSim extends Simulation {
         sim.getDesktop().getDesktopComponent(networkComponent).parentFrame.setBounds(20, 20, 446, 337);
 
         Network network = networkComponent.getNetwork();
-        NeuronGroup ng = new NeuronGroup(network, numNeurons);
+        NeuronGroup ng = new NeuronGroup(numNeurons);
         ng.setLabel("Recurrent network");
         // ng.setNeuronType("DecayRule");
         ng.setUpperBound(10);
         network.addNetworkModelAsync(ng);
-        ng.randomize();
+        // ng.randomize();
 
         // LAYOUT NEURONS
         LineLayout layout = new LineLayout(10,10,50, LineLayout.LineOrientation.HORIZONTAL);

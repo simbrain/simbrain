@@ -15,18 +15,19 @@ import kotlin.math.exp
  * This applies the activation rules of the underlying nodes before normalizing so be sure to check that it is
  * appropriate, e.g. that any min and max value is appropriate.
  */
-class SoftmaxGroup(net: Network, neurons: List<Neuron>): NeuronGroup(net), CopyableObject {
+class SoftmaxGroup(neurons: List<Neuron>): NeuronGroup(), CopyableObject {
 
-    constructor(net: Network, numNeurons: Int): this(net, List(numNeurons) { Neuron(net) })
+    constructor(numNeurons: Int): this(List(numNeurons) { Neuron() })
 
     @XStreamConstructor
-    private constructor(parentNetwork: Network): this(parentNetwork, listOf())
+    private constructor() : this(listOf())
 
     init {
         label = "Softmax"
         addNeurons(neurons)
     }
 
+    context(Network)
     override fun update() {
         neuronList.forEach { it.updateInputs() }
         neuronList.forEach { it.update() }
@@ -35,14 +36,14 @@ class SoftmaxGroup(net: Network, neurons: List<Neuron>): NeuronGroup(net), Copya
         neuronList.forEachIndexed { i, n -> n.activation = exponentials[i]/total }
     }
 
-    override fun copy() = SoftmaxGroup(network, neuronList.map { it.deepCopy() })
+    override fun copy() = SoftmaxGroup(neuronList.map { it.deepCopy() })
 }
 
 @CustomTypeName("Softmax")
 class SoftmaxParams: NeuronGroupParams() {
 
-    override fun create(net: Network): SoftmaxGroup {
-        return SoftmaxGroup(net, List(numNeurons) { Neuron(net) })
+    override fun create(): SoftmaxGroup {
+        return SoftmaxGroup(List(numNeurons) { Neuron() })
     }
 
     override fun copy(): CopyableObject {

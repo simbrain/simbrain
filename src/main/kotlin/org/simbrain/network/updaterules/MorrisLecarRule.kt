@@ -1,5 +1,6 @@
 package org.simbrain.network.updaterules
 
+import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.SpikingNeuronUpdateRule
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
@@ -192,9 +193,11 @@ class MorrisLecarRule : SpikingNeuronUpdateRule<MorrisLecarData, SpikingMatrixDa
      * A source of noise (nA).
      */
     override var noiseGenerator: ProbabilityDistribution = NormalDistribution(0.0, 1.0)
+
+    context(Network)
     override fun apply(neuron: Neuron, dat: MorrisLecarData) {
         val data = dat as MorrisLecarData
-        val dt = neuron.network.timeStep
+        val dt = timeStep
         val i_syn = neuron.input
         // Under normal circumstances this will cause no change.
         var vMembrane = neuron.activation

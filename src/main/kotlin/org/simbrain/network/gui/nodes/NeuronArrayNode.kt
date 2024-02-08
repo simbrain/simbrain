@@ -23,13 +23,13 @@ import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PImage
 import org.piccolo2d.nodes.PText
+import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.randomizeBiases
 import org.simbrain.network.events.NeuronArrayEvents
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.alignMenu
 import org.simbrain.network.gui.createCouplingMenu
 import org.simbrain.network.gui.spaceMenu
-import org.simbrain.network.matrix.NeuronArray
 import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.util.*
@@ -241,187 +241,197 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         infoText.text = computeInfoText()
     }
 
-    override fun getToolTipText() = """
+    override val toolTipText
+        get() = """
         <html>
         ${neuronArray.toString().split("\n").joinToString("<br>")}
         </html>
     """.trimIndent()
 
-    override fun getContextMenu(): JPopupMenu {
-        val contextMenu = JPopupMenu()
+    override val contextMenu: JPopupMenu
+        get() {
+            val contextMenu = JPopupMenu()
 
-        // Edit Menu
-        contextMenu.add(networkPanel.networkActions.cutAction)
-        contextMenu.add(networkPanel.networkActions.copyAction)
-        contextMenu.add(networkPanel.networkActions.pasteAction)
-        contextMenu.addSeparator()
-        val editArray: Action = object : AbstractAction("Edit...") {
-            override fun actionPerformed(event: ActionEvent) {
-                propertyDialog.display()
-            }
-        }
-        contextMenu.add(editArray)
-        contextMenu.add(networkPanel.networkActions.deleteAction)
-        contextMenu.addSeparator()
-        contextMenu.add(networkPanel.networkActions.connectSelectedModels)
-        contextMenu.addSeparator()
-
-        // Choose style
-        val switchStyle: Action = networkPanel.createAction(
-            name = "Toggle line / grid",
-            iconPath = "menu_icons/grid.png",
-            description = "Toggle line / grid style"
-        ) {
-            networkPanel.selectionManager
-                .filterSelectedModels<NeuronArray>()
-                .forEach { it.gridMode = !it.gridMode }
-        }
-        contextMenu.add(switchStyle)
-        val toggleShowBias: Action = networkPanel.createAction(
-            name = "Toggle bias visibility",
-            description = "Toggle whether biases are visible"
-        ) {
-            networkPanel.selectionManager
-                .filterSelectedModels<NeuronArray>()
-                .forEach { it.isShowBias = !it.isShowBias }
-        }
-        contextMenu.add(toggleShowBias)
-        contextMenu.addSeparator()
-
-        val setTargetValues: Action = networkPanel.createAction(
-            name = "Set Target",
-            description = "Use current activation as target for immediate training",
-            keyboardShortcut = CmdOrCtrl + 'T'
-        ) {
-            neuronArray.targetValues = neuronArray.activations.clone()
-        }
-        contextMenu.add(setTargetValues)
-
-        val clearTargetValues: Action = networkPanel.createAction(
-            name = "Clear Target",
-            description = "Clear target values",
-            keyboardShortcut = Shift + CmdOrCtrl + 'T'
-        ) {
-            neuronArray.targetValues = null
-        }
-        contextMenu.add(clearTargetValues)
-
-        val applyLearning: Action = networkPanel.createAction(
-            name = "Apply Learning",
-            description = "Train source to target weights using backprop",
-            keyboardShortcut = 'L',
-            initBlock = {
-                fun updateAction() {
-                    isEnabled = networkPanel.selectionManager.selectedModels.contains(neuronArray)
-                            && neuronArray.targetValues != null
+            // Edit Menu
+            contextMenu.add(networkPanel.networkActions.cutAction)
+            contextMenu.add(networkPanel.networkActions.copyAction)
+            contextMenu.add(networkPanel.networkActions.pasteAction)
+            contextMenu.addSeparator()
+            val editArray: Action = object : AbstractAction("Edit...") {
+                override fun actionPerformed(event: ActionEvent) {
+                    propertyDialog?.display()
                 }
-                updateAction()
-                networkPanel.selectionManager.events.selection.on { _, _ -> updateAction() }
-                networkPanel.selectionManager.events.sourceSelection.on { _, _ -> updateAction() }
             }
-        ) {
-            networkPanel.applyImmediateLearning()
-        }
-        contextMenu.add(applyLearning)
-        contextMenu.addSeparator()
+            contextMenu.add(editArray)
+            contextMenu.add(networkPanel.networkActions.deleteAction)
+            contextMenu.addSeparator()
+            contextMenu.add(networkPanel.networkActions.connectSelectedModels)
+            contextMenu.addSeparator()
 
-        val applyInputs: Action = networkPanel.networkActions.createTestInputPanelAction(neuronArray)
-        contextMenu.add(applyInputs)
-        val addActivationToInput = networkPanel.networkActions.createAddActivationToInputAction(neuronArray)
-        contextMenu.add(addActivationToInput)
-        contextMenu.addSeparator()
-
-        // Randomize Action
-        val randomizeAction = networkPanel.networkActions.randomizeObjectsAction
-
-        contextMenu.add(randomizeAction)
-        if (neuronArray.dataHolder is BiasedMatrixData) {
-            val randomizeBiasesAction = networkPanel.createAction(
-                name = "Randomize Biases",
-                description = "Randomize the biases of this neuron array",
-                iconPath = "menu_icons/Rand.png"
+            // Choose style
+            val switchStyle: Action = networkPanel.createAction(
+                name = "Toggle line / grid",
+                iconPath = "menu_icons/grid.png",
+                description = "Toggle line / grid style"
             ) {
                 networkPanel.selectionManager
                     .filterSelectedModels<NeuronArray>()
-                    .forEach { it.randomizeBiases() }
+                    .forEach { it.gridMode = !it.gridMode }
             }
-            contextMenu.add(randomizeBiasesAction)
-        }
-        contextMenu.addSeparator()
-        val editComponents: Action = object : AbstractAction("Edit Components...") {
-            override fun actionPerformed(event: ActionEvent) {
-                val dialog = StandardDialog()
-                val arrayData = MatrixDataFrame(neuronArray.outputs)
-                dialog.contentPane = SimbrainTablePanel(arrayData)
-                dialog.addCommitTask {
-                    neuronArray.update()
+            contextMenu.add(switchStyle)
+            val toggleShowBias: Action = networkPanel.createAction(
+                name = "Toggle bias visibility",
+                description = "Toggle whether biases are visible"
+            ) {
+                networkPanel.selectionManager
+                    .filterSelectedModels<NeuronArray>()
+                    .forEach { it.isShowBias = !it.isShowBias }
+            }
+            contextMenu.add(toggleShowBias)
+            contextMenu.addSeparator()
+
+            val setTargetValues: Action = networkPanel.createAction(
+                name = "Set Target",
+                description = "Use current activation as target for immediate training",
+                keyboardShortcut = CmdOrCtrl + 'T'
+            ) {
+                neuronArray.targetValues = neuronArray.activations.clone()
+            }
+            contextMenu.add(setTargetValues)
+
+            val clearTargetValues: Action = networkPanel.createAction(
+                name = "Clear Target",
+                description = "Clear target values",
+                keyboardShortcut = Shift + CmdOrCtrl + 'T'
+            ) {
+                neuronArray.targetValues = null
+            }
+            contextMenu.add(clearTargetValues)
+
+            val applyLearning: Action = networkPanel.createAction(
+                name = "Apply Learning",
+                description = "Train source to target weights using backprop",
+                keyboardShortcut = 'L',
+                initBlock = {
+                    fun updateAction() {
+                        isEnabled = networkPanel.selectionManager.selectedModels.contains(neuronArray)
+                                && neuronArray.targetValues != null
+                    }
+                    updateAction()
+                    networkPanel.selectionManager.events.selection.on { _, _ -> updateAction() }
+                    networkPanel.selectionManager.events.sourceSelection.on { _, _ -> updateAction() }
                 }
-                dialog.pack()
-                dialog.setLocationRelativeTo(null)
-                dialog.isVisible = true
+            ) {
+                networkPanel.applyImmediateLearning()
             }
-        }
-        contextMenu.add(editComponents)
+            contextMenu.add(applyLearning)
+            contextMenu.addSeparator()
 
-        // Projection Plot Action
-        contextMenu.addSeparator()
-        contextMenu.add(actionManager.createCoupledPlotMenu(
-            neuronArray.getProducer(NeuronArray::activationArray),
-            objectName = "${neuronArray.id ?: "Neuron Array"} Activations",
-            menuTitle = "Plot Activation"
-        ))
-        neuronArray.dataHolder.let {
-            if (it is BiasedMatrixData) {
-                contextMenu.add(
-                    actionManager.createCoupledPlotMenu(
-                        it.getProducer(BiasedMatrixData::biasesArray),
-                        objectName = "${neuronArray.id ?: "Neuron Array"} Biases",
-                        menuTitle = "Plot Biases"
-                    )
+            val applyInputs: Action = networkPanel.networkActions.createTestInputPanelAction(neuronArray)
+            contextMenu.add(applyInputs)
+            val addActivationToInput = networkPanel.networkActions.createAddActivationToInputAction(neuronArray)
+            contextMenu.add(addActivationToInput)
+            contextMenu.addSeparator()
+
+            // Randomize Action
+            val randomizeAction = networkPanel.networkActions.randomizeObjectsAction
+
+            contextMenu.add(randomizeAction)
+            if (neuronArray.dataHolder is BiasedMatrixData) {
+                val randomizeBiasesAction = networkPanel.createAction(
+                    name = "Randomize Biases",
+                    description = "Randomize the biases of this neuron array",
+                    iconPath = "menu_icons/Rand.png"
+                ) {
+                    with(network) {
+                        networkPanel.selectionManager
+                            .filterSelectedModels<NeuronArray>()
+                            .forEach { it.randomizeBiases() }
+                    }
+                }
+                contextMenu.add(randomizeBiasesAction)
+            }
+            contextMenu.addSeparator()
+            val editComponents: Action = object : AbstractAction("Edit Components...") {
+                override fun actionPerformed(event: ActionEvent) {
+                    val dialog = StandardDialog()
+                    val arrayData = MatrixDataFrame(neuronArray.outputs)
+                    dialog.contentPane = SimbrainTablePanel(arrayData)
+                    dialog.addCommitTask {
+                        with(networkPanel.network) {
+                            neuronArray.update()
+                        }
+                    }
+                    dialog.pack()
+                    dialog.setLocationRelativeTo(null)
+                    dialog.isVisible = true
+                }
+            }
+            contextMenu.add(editComponents)
+
+            // Projection Plot Action
+            contextMenu.addSeparator()
+            contextMenu.add(
+                actionManager.createCoupledPlotMenu(
+                    neuronArray.getProducer(NeuronArray::activationArray),
+                    objectName = "${neuronArray.id ?: "Neuron Array"} Activations",
+                    menuTitle = "Plot Activation"
                 )
+            )
+            neuronArray.dataHolder.let {
+                if (it is BiasedMatrixData) {
+                    contextMenu.add(
+                        actionManager.createCoupledPlotMenu(
+                            it.getProducer(BiasedMatrixData::biasesArray),
+                            objectName = "${neuronArray.id ?: "Neuron Array"} Biases",
+                            menuTitle = "Plot Biases"
+                        )
+                    )
+                }
             }
-        }
-        contextMenu.add(actionManager.createImageInput(
-            neuronArray.getConsumer(NeuronArray::addInputsMismatched),
-            neuronArray.size(),
-            menuTitle = "Add coupled image world",
-            postActionBlock = { neuronArray.gridMode = true }
-        ))
-        contextMenu.add(actionManager.createCoupledDataWorldAction(
-            name = "Record Activations",
-            neuronArray.getProducer(NeuronArray::activationArray),
-            sourceName = "${neuronArray.id ?: "Neuron Array"} Activations",
-            neuronArray.size()
-        ))
-        neuronArray.dataHolder.let {
-            if (it is BiasedMatrixData) {
-                contextMenu.add(actionManager.createCoupledDataWorldAction(
-                    name = "Record Biases",
-                    it.getProducer(BiasedMatrixData::biasesArray),
-                    sourceName = "${neuronArray.id ?: "Neuron Array"} Biases",
+            contextMenu.add(actionManager.createImageInput(
+                neuronArray.getConsumer(NeuronArray::addInputsMismatched),
+                neuronArray.size(),
+                menuTitle = "Add coupled image world",
+                postActionBlock = { neuronArray.gridMode = true }
+            ))
+            contextMenu.add(
+                actionManager.createCoupledDataWorldAction(
+                    name = "Record Activations",
+                    neuronArray.getProducer(NeuronArray::activationArray),
+                    sourceName = "${neuronArray.id ?: "Neuron Array"} Activations",
                     neuronArray.size()
-                ))
+                )
+            )
+            neuronArray.dataHolder.let {
+                if (it is BiasedMatrixData) {
+                    contextMenu.add(
+                        actionManager.createCoupledDataWorldAction(
+                            name = "Record Biases",
+                            it.getProducer(BiasedMatrixData::biasesArray),
+                            sourceName = "${neuronArray.id ?: "Neuron Array"} Biases",
+                            neuronArray.size()
+                        )
+                    )
+                }
             }
+
+            contextMenu.addSeparator()
+            contextMenu.add(networkPanel.alignMenu)
+            contextMenu.add(networkPanel.spaceMenu)
+
+            // Coupling menu
+            contextMenu.addSeparator()
+            val couplingMenu: JMenu = networkPanel.networkComponent.createCouplingMenu(neuronArray)
+            contextMenu.add(couplingMenu)
+            return contextMenu
         }
 
-        contextMenu.addSeparator()
-        contextMenu.add(networkPanel.alignMenu)
-        contextMenu.add(networkPanel.spaceMenu)
+    override val propertyDialog: JDialog
+        get() = neuronArray.createEditorDialog { updateInfoText() }
 
-        // Coupling menu
-        contextMenu.addSeparator()
-        val couplingMenu: JMenu = networkPanel.networkComponent.createCouplingMenu(neuronArray)
-        contextMenu.add(couplingMenu)
-        return contextMenu
-    }
-
-    override fun getPropertyDialog(): JDialog {
-        return neuronArray.createEditorDialog { updateInfoText()}
-    }
-
-    override fun getModel(): NeuronArray {
-        return neuronArray
-    }
+    override val model: NeuronArray
+        get() = neuronArray
 
     /**
      * Update the text label.

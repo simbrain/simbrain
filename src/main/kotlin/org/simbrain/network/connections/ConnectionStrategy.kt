@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.connections
 
-import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.gui.ConnectionStrategyPanel
@@ -94,10 +93,8 @@ abstract class ConnectionStrategy : CopyableObject {
      * other operations
      */
     abstract fun connectNeurons(
-        network: Network,
         source: List<Neuron>,
-        target: List<Neuron>,
-        addToNetwork: Boolean = true
+        target: List<Neuron>
     ): List<Synapse>
 
     override fun getTypeList() = connectionTypes

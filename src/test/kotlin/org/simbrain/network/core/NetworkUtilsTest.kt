@@ -9,8 +9,8 @@ class NetworkUtilsTest {
 
     @Test
     fun `test energy function`() {
-        val neuron1 = Neuron(net)
-        val neuron2 = Neuron(net)
+        val neuron1 = Neuron()
+        val neuron2 = Neuron()
         val weight = Synapse(neuron1, neuron2)
         neuron1.activation = 1.0
         neuron2.activation = 1.0

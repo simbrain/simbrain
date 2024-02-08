@@ -1,6 +1,6 @@
 package org.simbrain.network.events
 
-import org.simbrain.network.core.NeuronUpdateRule
+import org.simbrain.network.updaterules.NeuronUpdateRule
 import org.simbrain.util.Events
 
 /**

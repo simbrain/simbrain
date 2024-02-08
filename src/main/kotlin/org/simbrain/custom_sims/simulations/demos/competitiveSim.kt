@@ -5,8 +5,6 @@ import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.activations
 import org.simbrain.network.subnetworks.CompetitiveNetwork
-import org.simbrain.network.subnetworks.Hopfield
-import org.simbrain.util.getOneHotArray
 import org.simbrain.util.place
 
 /**
@@ -20,7 +18,7 @@ val competitiveSim = newSim {
     val network = networkComponent.network
 
     // Competitive network
-    val competitive = CompetitiveNetwork(network, 7, 5)
+    val competitive = CompetitiveNetwork(7, 5)
     network.addNetworkModel(competitive)
 
     withGui {

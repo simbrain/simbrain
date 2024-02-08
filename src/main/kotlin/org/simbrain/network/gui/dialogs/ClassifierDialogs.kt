@@ -8,6 +8,7 @@ import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.util.ResourceManager
 import org.simbrain.util.StandardDialog
+import org.simbrain.util.display
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.showWarningDialog
 import org.simbrain.util.table.*
@@ -127,7 +128,7 @@ fun main() {
     val np = NetworkPanel(networkComponent)
     val classifier = with(networkComponent.network) {
         val svm = SVMClassifier(2)
-        val classifier = SmileClassifier(this, svm)
+        val classifier = SmileClassifier(svm)
         svm.trainingData.featureVectors = arrayOf(
             doubleArrayOf(0.0, 0.0),
             doubleArrayOf(1.0, 0.0),
@@ -138,5 +139,5 @@ fun main() {
         addNetworkModelAsync(classifier)
         classifier
     }
-    SmileClassifierNode(np, classifier).propertyDialog.run { makeVisible() }
+    SmileClassifierNode(np, classifier).propertyDialog?.display()
 }

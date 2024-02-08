@@ -23,9 +23,9 @@ import org.piccolo2d.PNode;
 import org.simbrain.network.LocatableModel;
 import org.simbrain.network.NetworkModel;
 import org.simbrain.network.events.LocationEvents;
-import org.simbrain.network.groups.Subnetwork;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.dialogs.network.SubnetworkPanel;
+import org.simbrain.network.subnetworks.Subnetwork;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.piccolo.Outline;
@@ -122,7 +122,7 @@ public class SubnetworkNode extends ScreenElement {
             outline.resetOutlinedNodes(outlinedObjects);
         });
         if (node.getModel() instanceof LocatableModel) {
-            ((LocatableModel)node.getModel()).getEvents().getLocationChanged().fireAndForget();
+            ((LocatableModel) node.getModel()).getEvents().getLocationChanged().fireAndForget();
         }
 
         updateOutline();
@@ -182,7 +182,7 @@ public class SubnetworkNode extends ScreenElement {
             private final SubnetworkPanel panel;
 
             {
-                panel = new SubnetworkPanel(getNetworkPanel(), SubnetworkNode.this.getSubnetwork(), this);
+                panel = new SubnetworkPanel(networkPanel, SubnetworkNode.this.getSubnetwork(), this);
                 setContentPane(panel);
             }
 

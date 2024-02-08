@@ -17,7 +17,6 @@
  */
 package org.simbrain.network.connections
 
-import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.util.UserParameter
@@ -79,10 +78,8 @@ class FixedDegree(
     )
 
     override fun connectNeurons(
-        network: Network,
         source: List<Neuron>,
-        target: List<Neuron>,
-        addToNetwork: Boolean
+        target: List<Neuron>
     ): List<Synapse> {
         val syns = if (useRadius) {
             createFixedDegreeInRadiusSynapses(source, target, degree, radius, direction, allowSelfConnections)
@@ -90,9 +87,6 @@ class FixedDegree(
             createFixedDegreeSynapses(source, target, degree, direction, allowSelfConnections)
         }
         polarizeSynapses(syns, percentExcitatory)
-        if (addToNetwork) {
-            network.addNetworkModelsAsync(syns)
-        }
         return syns
     }
 

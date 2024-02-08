@@ -16,8 +16,8 @@ public class SynapseTest {
     void setUp() {
 
         net = new Network();
-        n1 = new Neuron(net);
-        n2 = new Neuron(net);
+        n1 = new Neuron();
+        n2 = new Neuron();
         s1 = new Synapse(n1,n2);
 
         net.addNetworkModelAsync(n1);

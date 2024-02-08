@@ -21,7 +21,7 @@
 // package org.simbrain.network.gui.dialogs.synapse;
 //
 // import org.simbrain.network.core.Synapse;
-// import org.simbrain.network.synapse_update_rules.spikeresponders.*;
+// import org.simbrain.network.spikeresponders.*;
 // import org.simbrain.util.SimbrainConstants;
 // import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 // import org.simbrain.util.propertyeditor.EditableObject;

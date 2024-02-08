@@ -125,8 +125,6 @@ abstract class Layer : LocatableModel(), AttributeContainer {
      */
     abstract fun inputSize(): Int
 
-    abstract val network: Network
-
     /**
      * Needed so arrow can be set correctly
      */

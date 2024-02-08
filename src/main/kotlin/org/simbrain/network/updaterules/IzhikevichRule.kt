@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.updaterules
 
+import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.SpikingNeuronUpdateRule
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
@@ -106,8 +107,8 @@ class IzhikevichRule : SpikingNeuronUpdateRule<SpikingScalarData, SpikingMatrixD
         return ir
     }
 
+    context(Network)
     override fun apply(neuron: Neuron, data: SpikingScalarData) {
-        val timeStep = neuron.network.timeStep
         val activation = neuron.activation
         var inputs = neuron.input
         if (addNoise) {

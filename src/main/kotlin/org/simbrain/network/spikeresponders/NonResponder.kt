@@ -18,11 +18,9 @@
  */
 package org.simbrain.network.spikeresponders
 
-import org.simbrain.network.core.Connector
+import org.simbrain.network.core.Network
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.matrix.WeightMatrix
-import org.simbrain.network.synapse_update_rules.spikeresponders.SpikeResponder
-import org.simbrain.network.util.MatrixDataHolder
+import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.util.ScalarDataHolder
 
 /**
@@ -31,11 +29,8 @@ import org.simbrain.network.util.ScalarDataHolder
  */
 class NonResponder : SpikeResponder() {
 
-    override fun apply(conn: Connector, responderData: MatrixDataHolder) {
-        // No implementation. The responder is bypassed.
-    }
-
-    override fun apply(s: Synapse, responderData: ScalarDataHolder) {
+    context(Network)
+    override fun apply(synapse: Synapse, responderData: ScalarDataHolder) {
         // No implementation. The responder is bypassed.
     }
 
@@ -43,9 +38,7 @@ class NonResponder : SpikeResponder() {
         return NonResponder()
     }
 
-    override fun getDescription(): String {
-        return "None (No spike response)"
-    }
+    override val description: String = "None (No spike response)"
 
     override val name: String
         get() = "None"

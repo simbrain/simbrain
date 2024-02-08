@@ -9,8 +9,8 @@ import org.simbrain.util.point
 class LocatableModelKtTest {
 
     val net = Network()
-    val n1 = Neuron(net)
-    val n2 = Neuron(net)
+    val n1 = Neuron()
+    val n2 = Neuron()
 
     @Test
     fun `test location functions`() {

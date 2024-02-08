@@ -5,7 +5,7 @@ import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.network.core.connect
 import org.simbrain.network.layouts.GridLayout
-import org.simbrain.network.synapse_update_rules.HebbianRule
+import org.simbrain.network.learningrules.HebbianRule
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.util.projection.FrequencyColoringManager
@@ -43,13 +43,13 @@ val hebbianAssociator = newSim {
 
             addButton("Training Mode (clamped nodes)") {
                 recurrentNet.setClamped(true)
-                recurrentWeights.forEach { it.isFrozen = false }
+                recurrentWeights.forEach { it.frozen = false }
             }.apply {
                 toolTipText = "Clamps nodes and unclamps weights"
             }
             addButton("Test Mode (clamped weights)") {
                 recurrentNet.setClamped(false)
-                recurrentWeights.forEach { it.isFrozen = true }
+                recurrentWeights.forEach { it.frozen = true }
             }.apply {
                 toolTipText = "Clamps weights and unclamps nodes"
             }

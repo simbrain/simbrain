@@ -4,7 +4,6 @@ import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.events.SynapseGroupEvents
-import org.simbrain.network.groups.AbstractNeuronCollection
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.SynapseNode
 import org.simbrain.network.util.SimnetUtils
@@ -22,8 +21,7 @@ class SynapseGroup @JvmOverloads constructor(
     val source: AbstractNeuronCollection,
     val target: AbstractNeuronCollection,
     var connectionStrategy: ConnectionStrategy = AllToAll(),
-    val synapses: MutableList<Synapse> = connectionStrategy.connectNeurons(source.network, source.neuronList, target
-        .neuronList, false).toMutableList()
+    var synapses: MutableList<Synapse> = connectionStrategy.connectNeurons(source.neuronList, target.neuronList).toMutableList()
 ) : NetworkModel(), AttributeContainer {
 
     // TODO: When passing in synapses check all source are in source and all target are in target
@@ -56,7 +54,6 @@ class SynapseGroup @JvmOverloads constructor(
 
     init {
         initializeSynapseVisibility()
-        label = source.network.idManager.getProposedId(this.javaClass)
         source.outgoingSg.add(this)
         target.incomingSgs.add(this)
     }
@@ -93,6 +90,7 @@ class SynapseGroup @JvmOverloads constructor(
         return source == target
     }
 
+    context(Network)
     override fun update() {
         this.synapses.forEach { it.update() }
     }
@@ -157,21 +155,22 @@ class SynapseGroup @JvmOverloads constructor(
             .toMap()
 
         val syns = this.synapses.map{
-                Synapse(it.parentNetwork, mapping[it.source], mapping[it.target], it )
+                Synapse(mapping[it.source]!!, mapping[it.target]!!, it)
             }.toMutableList()
 
-        return SynapseGroup(src, tar, connectionStrategy, syns)
+        return SynapseGroup(src, tar, connectionStrategy).also {
+            it.synapses = syns
+        }
     }
 
     fun applyConnectionStrategy() {
         synapses.toList().forEach { removeSynapse(it) }
-        val syns = connectionStrategy.connectNeurons(
-            source.network,
+        connectionStrategy.connectNeurons(
             source.neuronList,
-            target.neuronList,
-            false
-        )
-        syns.forEach { addSynapse(it) }
+            target.neuronList
+        ).forEach {
+            addSynapse(it)
+        }
         events.synapseListChanged.fireAndForget()
     }
 

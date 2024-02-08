@@ -5,7 +5,7 @@ import org.simbrain.custom_sims.*
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.addNeuron
 import org.simbrain.network.core.connect
-import org.simbrain.network.neuron_update_rules.LinearRule
+import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.SmellSource
 import org.simbrain.util.decayfunctions.LinearDecayFunction
@@ -81,8 +81,10 @@ val isopodSim = newSim {
     }
 
     // Create the weights
-    connect(neuronLeftSensor, neuronLeftTurning, 10.0, 0.0, 50.0)
-    connect(neuronRightSensor, neuronRightTurning, 10.0, 0.0, 50.0)
+    with(network) {
+        connect(neuronLeftSensor, neuronLeftTurning, 10.0, 0.0, 50.0)
+        connect(neuronRightSensor, neuronRightTurning, 10.0, 0.0, 50.0)
+    }
     var leftSpeedWeight: Synapse? = null
     var rightSpeedWeight: Synapse? = null
 
@@ -278,8 +280,10 @@ val isopodSim = newSim {
 
             addButton("Speed inhibition") {
                 if (leftSpeedWeight == null) {
-                    leftSpeedWeight = connect(neuronLeftSensor, neuronStraight, -1.0, -50.0, 50.0)
-                    rightSpeedWeight = connect(neuronRightSensor, neuronStraight, -1.0, -50.0, 50.0)
+                    with(network) {
+                        leftSpeedWeight = connect(neuronLeftSensor, neuronStraight, -1.0, -50.0, 50.0)
+                        rightSpeedWeight = connect(neuronRightSensor, neuronStraight, -1.0, -50.0, 50.0)
+                    }
                 } else {
                     leftSpeedWeight?.delete()
                     leftSpeedWeight = null

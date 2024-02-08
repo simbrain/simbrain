@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
-import org.simbrain.network.matrix.NeuronArray
+import org.simbrain.network.core.NeuronArray
 import org.simbrain.util.point
 
 class PlacementManagerTest {
@@ -30,13 +30,13 @@ class PlacementManagerTest {
     fun `test initial location change`() {
 
         pm.lastClickedLocation = point(100.0, 0.0)
-        val n1 = Neuron(net)
+        val n1 = Neuron()
         net.addNetworkModelAsync(n1)
         pm.placeObject(n1)
         assertEquals(100.0, n1.x, .01 )
 
         // Subsequent should be offset from there by default amount
-        val n2 = Neuron(net)
+        val n2 = Neuron()
         net.addNetworkModelAsync(n2)
         pm.placeObject(n2)
         val neuronOffset =  pm.deltaDragMap.get(n2::class)
@@ -45,10 +45,10 @@ class PlacementManagerTest {
 
     @Test
     fun `test neuron array`() {
-        val na1 = NeuronArray(net, 20)
+        val na1 = NeuronArray(20)
         net.addNetworkModelAsync(na1)
         pm.placeObject(na1)
-        val na2 = NeuronArray(net, 20)
+        val na2 = NeuronArray(20)
         net.addNetworkModelAsync(na2)
         pm.placeObject(na2)
         val offset = pm.deltaDragMap.get(na2::class)

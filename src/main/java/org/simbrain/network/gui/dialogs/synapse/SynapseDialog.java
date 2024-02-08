@@ -19,8 +19,8 @@
 package org.simbrain.network.gui.dialogs.synapse;
 
 import org.simbrain.network.core.Synapse;
-import org.simbrain.network.core.SynapseUpdateRule;
 import org.simbrain.network.gui.nodes.SynapseNode;
+import org.simbrain.network.learningrules.SynapseUpdateRule;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;

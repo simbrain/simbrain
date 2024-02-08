@@ -19,6 +19,7 @@
 package org.simbrain.network.gui.nodes.subnetworkNodes;
 
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.nodes.ScreenElementActions;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
 import org.simbrain.network.subnetworks.Hopfield;
 import org.simbrain.util.StandardDialog;
@@ -78,11 +79,7 @@ public class HopfieldNode extends SubnetworkNode {
         };
         menu.add(trainNet);
         menu.addSeparator();
-        Action randomizeNet = new AbstractAction("Randomize synapses symmetrically") {
-            public void actionPerformed(final ActionEvent event) {
-                getSubnetwork().randomize();
-            }
-        };
+        Action randomizeNet = ScreenElementActions.createRandomNetAction(this);
         menu.add(randomizeNet);
         Action clearWeights = new AbstractAction("Set weights to zero") {
             public void actionPerformed(final ActionEvent event) {
@@ -96,7 +93,7 @@ public class HopfieldNode extends SubnetworkNode {
         Action couplingProjection =
                 sd.getActionManager().createCoupledProjectionPlotAction(
                         sd.getWorkspace().getCouplingManager().getProducer(
-                                hopfield.getNeuronGroup(), "getActivations"
+                                hopfield.neuronGroup, "getActivations"
                         ),
                         Objects.requireNonNull(hopfield.getId()),
                         "Projection");
@@ -104,9 +101,9 @@ public class HopfieldNode extends SubnetworkNode {
         Action imageInput =
                 sd.getActionManager().createImageInput(
                         sd.getWorkspace().getCouplingManager().getConsumer(
-                                hopfield.getNeuronGroup(), "addInputs"
+                                hopfield.neuronGroup, "addInputs"
                         ),
-                        hopfield.getNeuronGroup().getNeuronList().size());
+                        hopfield.neuronGroup.getNeuronList().size());
         menu.add(imageInput);
 
         setContextMenu(menu);

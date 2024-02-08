@@ -12,7 +12,7 @@ package org.simbrain.custom_sims.simulations
 // import org.simbrain.network.core.labels
 // import org.simbrain.network.layouts.GridLayout
 // import org.simbrain.network.layouts.LineLayout
-// import org.simbrain.network.neuron_update_rules.DecayRule
+// import org.simbrain.network.updaterules.DecayRule
 // import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
 // import org.simbrain.network.util.BiasedScalarData
 // import org.simbrain.util.*

@@ -17,7 +17,6 @@
  */
 package org.simbrain.network.connections
 
-import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.util.SimnetUtils.getEuclideanDist
@@ -41,16 +40,11 @@ class DistanceBased (
 ) : ConnectionStrategy(), EditableObject {
 
     override fun connectNeurons(
-        network: Network,
         source: List<Neuron>,
-        target: List<Neuron>,
-        addToNetwork: Boolean
+        target: List<Neuron>
     ): List<Synapse> {
         val syns = createRadialSynapses(source, target, decayFunction)
         polarizeSynapses(syns, percentExcitatory)
-        if (addToNetwork) {
-            network.addNetworkModelsAsync(syns)
-        }
         return syns
     }
 

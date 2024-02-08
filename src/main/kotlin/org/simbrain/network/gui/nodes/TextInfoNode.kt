@@ -25,9 +25,9 @@ import javax.swing.JPopupMenu
 
 class TextInfoNode(netPanel: NetworkPanel, text: InfoText) : TextNode(netPanel, text) {
 
-    override fun isDraggable() = false
+    override val isDraggable = false
 
-    override fun getPropertyDialog(): JDialog? = null
+    override val propertyDialog: JDialog? = null
 
-    override fun getContextMenu(): JPopupMenu? = null
+    override val contextMenu: JPopupMenu? = null
 }

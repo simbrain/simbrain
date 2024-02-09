@@ -16,121 +16,67 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.subnetworks;
+package org.simbrain.network.subnetworks
 
-import org.simbrain.network.NetworkModel;
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.SynapseGroup;
-import org.simbrain.network.neurongroups.CompetitiveGroup;
-import org.simbrain.network.neurongroups.NeuronGroup;
-import org.simbrain.util.UserParameter;
-import org.simbrain.util.propertyeditor.EditableObject;
-
-import java.util.List;
+import org.simbrain.network.core.Network
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.SynapseGroup
+import org.simbrain.network.neurongroups.CompetitiveGroup
+import org.simbrain.network.neurongroups.NeuronGroup
+import org.simbrain.util.UserParameter
+import org.simbrain.util.propertyeditor.EditableObject
+import java.util.function.Consumer
 
 /**
- * <b>CompetitiveNetwork</b> is a small network encompassing a Competitive
+ * **CompetitiveNetwork** is a small network encompassing a Competitive
  * group. An input layer and input data have been added so that the SOM can be
  * easily trained using existing Simbrain GUI tools
  *
  * @author Jeff Yoshimi
  */
-public class CompetitiveNetwork extends Subnetwork {
+public class CompetitiveNetwork(numInputNeurons: Int, numCompetitiveNeurons: Int) : Subnetwork() {
 
-    /**
-     * The competitive network.
-     */
-    private final CompetitiveGroup competitive;
+    val competitive: CompetitiveGroup
 
-    /**
-     * The input layer.
-     */
-    private final NeuronGroup inputLayer;
+    val inputLayer: NeuronGroup
 
-    /**
-     * Training set.
-     */
-    // private final TrainingSet trainingSet = new TrainingSet();
+    var weights: SynapseGroup
 
-    /**
-     * Construct an SOM Network.
-     *
-     * @param numInputNeurons       number of neurons in the input layer
-     * @param numCompetitiveNeurons number of neurons in the Competitive layer
-     */
-    public CompetitiveNetwork(int numInputNeurons, int numCompetitiveNeurons) {
-        super();
-        this.setLabel("Competitive Network");
+    init {
+        this.label = "Competitive Network"
 
-        competitive = new CompetitiveGroup(numCompetitiveNeurons);
-        competitive.setLabel("Competitive Group");
-        this.addModel(competitive);
-        competitive.setLayoutBasedOnSize();
+        competitive = CompetitiveGroup(numCompetitiveNeurons)
+        competitive.label = "Competitive Group"
+        this.addModel(competitive)
+        competitive.setLayoutBasedOnSize()
 
-        inputLayer = new NeuronGroup(numInputNeurons);
-        this.addModel(inputLayer);
-        inputLayer.setLabel("Input layer");
-        inputLayer.setClamped(true);
-        inputLayer.setLayoutBasedOnSize();
-        inputLayer.getNeuronList().forEach(n -> n.setLowerBound(0));
+        inputLayer = NeuronGroup(numInputNeurons)
+        this.addModel(inputLayer)
+        inputLayer.label = "Input layer"
+        inputLayer.setClamped(true)
+        inputLayer.setLayoutBasedOnSize()
+        inputLayer.neuronList.forEach(Consumer { n: Neuron -> n.lowerBound = 0.0 })
 
-        SynapseGroup sg = new SynapseGroup(inputLayer, competitive);
-        this.addModel(sg);
-        sg.getSynapses().forEach(s -> s.setLowerBound(0));
+        weights = SynapseGroup(inputLayer, competitive)
+        this.addModel(weights)
+        weights.synapses.forEach(Consumer { s: Synapse -> s.lowerBound = 0.0 })
 
-        inputLayer.offset(0, 400);
-
-    }
-
-    // @Override
-    public List<Neuron> getInputNeurons() {
-        return inputLayer.getNeuronList();
-    }
-
-    // @Override
-    public List<Neuron> getOutputNeurons() {
-        return competitive.getNeuronList();
-    }
-
-    // @Override
-    // public TrainingSet getTrainingSet() {
-    //     return trainingSet;
-    // }
-
-    /**
-     * @return the competitive network
-     */
-    public CompetitiveGroup getCompetitive() {
-        return competitive;
-    }
-
-    public NeuronGroup getInputLayer() {
-        return inputLayer;
-    }
-
-    // @Override
-    public NetworkModel getNetwork() {
-        return this;
+        inputLayer.offset(0.0, 400.0)
     }
 
     /**
-     * Helper class for creating new competitive nets using {@link org.simbrain.util.propertyeditor.AnnotatedPropertyEditor}.
+     * Helper class for creating new competitive nets using [org.simbrain.util.propertyeditor.AnnotatedPropertyEditor].
      */
-    public static class CompetitiveCreator implements EditableObject {
-
+    class CompetitiveCreator : EditableObject {
         @UserParameter(label = "Number of inputs")
-        int numIn = 20;
+        var numIn: Int = 20
 
         @UserParameter(label = "Number of competitive neurons")
-        int numComp = 20;
+        var numComp: Int = 20
 
-        /**
-         * Create the competitive net
-         */
-        public CompetitiveNetwork create(Network network) {
-            return new CompetitiveNetwork(numIn, numComp);
+        fun create(network: Network?): CompetitiveNetwork {
+            return CompetitiveNetwork(numIn, numComp)
         }
-
     }
 }

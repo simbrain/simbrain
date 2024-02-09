@@ -8,11 +8,6 @@ import org.simbrain.util.createAction
 import java.awt.event.ActionEvent
 import javax.swing.AbstractAction
 
-
-suspend fun meow() {
-
-}
-
 fun <T: ScreenElement> T.createScreenElementAction(
     name: String? = null,
     description: String? = null,

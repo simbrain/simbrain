@@ -6,6 +6,7 @@ import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.activations
 import org.simbrain.network.subnetworks.CompetitiveNetwork
 import org.simbrain.util.place
+import org.simbrain.util.stats.distributions.NormalDistribution
 
 /**
  * Demo for studying Competitive networks,
@@ -20,6 +21,8 @@ val competitiveSim = newSim {
     // Competitive network
     val competitive = CompetitiveNetwork(7, 5)
     network.addNetworkModel(competitive)
+    competitive.inputLayer.setUpperBound(1.0)
+    competitive.weights.randomize()
 
     withGui {
         place(networkComponent, 139, 10, 868, 619)
@@ -28,56 +31,34 @@ val competitiveSim = newSim {
             addButton("Pattern 1") {
                 competitive.inputLayer.neuronList.activations =
                     listOf(1.0, 0.5, 0.0, 0.0, 1.0, 0.5, 0.5)
-
             }
 
             addButton("Pattern 2") {
                 competitive.inputLayer.neuronList.activations =
                     listOf(0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5)
-
             }
 
             addButton("Pattern 3") {
                 competitive.inputLayer.neuronList.activations =
                     listOf(1.0, 0.0, 0.5, 1.0, 1.0, 0.0, 0.0)
-
             }
 
             addButton("Pattern 4") {
                 competitive.inputLayer.neuronList.activations =
                     listOf(1.0, 1.0, 0.5, 0.0, 0.0, 0.0, 0.5)
-
             }
 
             addButton("Pattern 5") {
                 competitive.inputLayer.neuronList.activations =
                     listOf(0.5, 1.0, 0.0, 0.5, 0.0, 0.5, 0.0)
-
             }
 
-            //var = getOneHotArray(4, 5).toList()
-
             addButton("Train") {
-               workspace.iterate()
-
+                competitive.inputLayer.activations += NormalDistribution().sampleDouble(competitive.inputLayer.activations.size)
+                workspace.iterate()
             }
 
         }
     }
-
-    // // Location of the projection in the desktop
-    // val projectionPlot = addProjectionPlot2("Activations")
-    // withGui {
-    //     place(projectionPlot) {
-    //         location = point(667, 10)
-    //         width = 400
-    //         height = 400
-    //     }
-    // }
-    //
-    // // Couple the network to the projection plot
-    // with(couplingManager) {
-    //     hopfield.neuronGroup couple projectionPlot
-    // }
 
 }

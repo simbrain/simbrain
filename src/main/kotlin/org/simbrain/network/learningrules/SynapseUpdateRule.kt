@@ -55,7 +55,6 @@ abstract class SynapseUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataH
      * Override to return an appropriate data holder for a given rule.
      */
     fun createScalarData(): DS {
-        println("meow")
         return DEFAULT_SCALAR_DATA as DS
     }
 

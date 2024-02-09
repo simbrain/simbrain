@@ -64,7 +64,6 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
      * Override to return an appropriate data holder for a given rule.
      */
     open fun createScalarData(): DS {
-        println("meow")
         return DEFAULT_SCALAR_DATA as DS
     }
 

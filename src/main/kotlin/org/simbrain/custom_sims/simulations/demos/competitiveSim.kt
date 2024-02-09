@@ -5,6 +5,7 @@ import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.activations
 import org.simbrain.network.subnetworks.CompetitiveNetwork
+import org.simbrain.util.add
 import org.simbrain.util.place
 import org.simbrain.util.stats.distributions.NormalDistribution
 
@@ -54,7 +55,7 @@ val competitiveSim = newSim {
             }
 
             addButton("Train") {
-                competitive.inputLayer.activations += NormalDistribution().sampleDouble(competitive.inputLayer.activations.size)
+                competitive.inputLayer.activations = competitive.inputLayer.activations.add(NormalDistribution().sampleDouble(competitive.inputLayer.activations.size))
                 workspace.iterate()
             }
 

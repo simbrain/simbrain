@@ -50,44 +50,44 @@ class OperantConditioning : Simulation {
 
         // Behavioral nodes
         behaviorNet = net.addNeuronGroup(-14.0, 73.0, numNeurons)
-        behaviorNet!!.layout = LineLayout(100.0, LineLayout.LineOrientation.HORIZONTAL)
-        behaviorNet!!.applyLayout()
-        behaviorNet!!.label = "Behaviors"
+        behaviorNet.layout = LineLayout(100.0, LineLayout.LineOrientation.HORIZONTAL)
+        behaviorNet.applyLayout()
+        behaviorNet.label = "Behaviors"
 
         // Stimulus nodes
         stimulusNet = net.addNeuronGroup(-9.8, 269.93, numNeurons)
-        stimulusNet!!.layout = LineLayout(100.0, LineLayout.LineOrientation.HORIZONTAL)
-        stimulusNet!!.applyLayout()
-        stimulusNet!!.setClamped(true)
-        stimulusNet!!.label = "Stimuli"
-        stimulusNet!!.setIncrement(1.0)
+        stimulusNet.layout = LineLayout(100.0, LineLayout.LineOrientation.HORIZONTAL)
+        stimulusNet.applyLayout()
+        stimulusNet.setClamped(true)
+        stimulusNet.label = "Stimuli"
+        stimulusNet.setIncrement(1.0)
 
         // Reward and punish nodes
         rewardNeuron = net.addNeuron(
-            stimulusNet!!.maxX.toInt() + 100,
-            stimulusNet!!.centerY.toInt()
+            stimulusNet.maxX.toInt() + 100,
+            stimulusNet.centerY.toInt()
         )
-        rewardNeuron!!.label = "Food Pellet"
+        rewardNeuron.label = "Food Pellet"
         punishNeuron = net.addNeuron(
-            rewardNeuron!!.x.toInt() + 100,
-            stimulusNet!!.centerY.toInt()
+            rewardNeuron.x.toInt() + 100,
+            stimulusNet.centerY.toInt()
         )
-        punishNeuron!!.label = "Shock"
+        punishNeuron.label = "Shock"
 
         // Set base text for behavior labels
-        nodeToLabel[behaviorNet!!.getNeuron(0)] = "Bar Press"
-        nodeToLabel[behaviorNet!!.getNeuron(1)] = "Jump"
-        nodeToLabel[behaviorNet!!.getNeuron(2)] = "Scratch Nose"
+        nodeToLabel[behaviorNet.getNeuron(0)] = "Bar Press"
+        nodeToLabel[behaviorNet.getNeuron(1)] = "Jump"
+        nodeToLabel[behaviorNet.getNeuron(2)] = "Scratch Nose"
 
         // Set stimulus labels
-        stimulusNet!!.getNeuron(0)!!.label = "Red Light"
-        stimulusNet!!.getNeuron(1)!!.label = "Green Light"
-        stimulusNet!!.getNeuron(2)!!.label = "Speaker"
+        stimulusNet.getNeuron(0).label = "Red Light"
+        stimulusNet.getNeuron(1).label = "Green Light"
+        stimulusNet.getNeuron(2).label = "Speaker"
 
         // Use aux values to store "intrinsict" firing probabilities for behaviors
-        behaviorNet!!.getNeuron(0)!!.auxValue = .33
-        behaviorNet!!.getNeuron(1)!!.auxValue = .33
-        behaviorNet!!.getNeuron(2)!!.auxValue = .34
+        behaviorNet.getNeuron(0).auxValue = .33
+        behaviorNet.getNeuron(1).auxValue = .33
+        behaviorNet.getNeuron(2).auxValue = .34
 
         // Initialize behaviorism labels
         updateNodeLabels()
@@ -110,9 +110,9 @@ class OperantConditioning : Simulation {
     private fun updateNetwork() {
         // Update firing probabilities
 
-        for (i in 0 until behaviorNet!!.size()) {
-            val n = behaviorNet!!.getNeuron(i)
-            firingProbabilities[i] = n!!.weightedInputs + n.auxValue
+        for (i in 0 until behaviorNet.size()) {
+            val n = behaviorNet.getNeuron(i)
+            firingProbabilities[i] = n.weightedInputs + n.auxValue
         }
 
         firingProbabilities = SimbrainMath.normalizeVec(firingProbabilities)
@@ -131,11 +131,11 @@ class OperantConditioning : Simulation {
     }
 
     private fun setWinningNode(nodeIndex: Int) {
-        for (i in 0 until behaviorNet!!.size()) {
+        for (i in 0 until behaviorNet.size()) {
             if (i == nodeIndex) {
-                behaviorNet!!.getNeuron(i)!!.forceSetActivation(1.0)
+                behaviorNet.getNeuron(i).forceSetActivation(1.0)
             } else {
-                behaviorNet!!.getNeuron(i)!!.forceSetActivation(0.0)
+                behaviorNet.getNeuron(i).forceSetActivation(0.0)
             }
         }
     }
@@ -145,21 +145,21 @@ class OperantConditioning : Simulation {
 
         panel.addButton("Reward", Runnable {
             learn(1.0)
-            rewardNeuron!!.addInputValue(1.0)
-            punishNeuron!!.forceSetActivation(0.0)
+            rewardNeuron.addInputValue(1.0)
+            punishNeuron.forceSetActivation(0.0)
             sim.iterate()
         })
 
         panel.addButton("Punish", Runnable {
             learn(-1.0)
-            rewardNeuron!!.forceSetActivation(0.0)
-            punishNeuron!!.addInputValue(1.0)
+            rewardNeuron.forceSetActivation(0.0)
+            punishNeuron.addInputValue(1.0)
             sim.iterate()
         })
 
         panel.addButton("Do nothing", Runnable {
-            rewardNeuron!!.forceSetActivation(0.0)
-            punishNeuron!!.addInputValue(0.0)
+            rewardNeuron.forceSetActivation(0.0)
+            punishNeuron.addInputValue(0.0)
             sim.iterate()
         })
     }
@@ -175,7 +175,7 @@ class OperantConditioning : Simulation {
             punishLearningRate
         }
 
-        for (tar in behaviorNet!!.neuronList) {
+        for (tar in behaviorNet.neuronList) {
             // The "winning" node
 
             if (tar.activation > 0) {
@@ -185,7 +185,7 @@ class OperantConditioning : Simulation {
                 tar.auxValue = max(p + valence * p, 0.0)
 
                 // Update weight on active node
-                for (src in stimulusNet!!.neuronList) {
+                for (src in stimulusNet.neuronList) {
                     if (src.activation > 0) {
                         val s = getSynapse(src, tar)
                         s!!.strength = max(s.strength + valence, 0.0)
@@ -200,16 +200,16 @@ class OperantConditioning : Simulation {
 
     private fun normIntrinsicProbabilities() {
         var totalMass = 0.0
-        for (n in behaviorNet!!.neuronList) {
+        for (n in behaviorNet.neuronList) {
             totalMass += n.auxValue
         }
-        for (n in behaviorNet!!.neuronList) {
+        for (n in behaviorNet.neuronList) {
             n.auxValue = n.auxValue / totalMass
         }
     }
 
     private fun updateNodeLabels() {
-        for (n in behaviorNet!!.neuronList) {
+        for (n in behaviorNet.neuronList) {
             n.label = (nodeToLabel[n] + ": "
                     + SimbrainMath.roundDouble(n.auxValue, 2))
         }

@@ -2,6 +2,7 @@ package org.simbrain.util
 
 import org.simbrain.util.math.SimbrainMath
 import smile.math.matrix.Matrix
+import kotlin.math.min
 import kotlin.math.sqrt
 import kotlin.random.Random
 
@@ -239,3 +240,18 @@ fun DoubleArray.outerProduct(other: DoubleArray) = toMatrix().mt(other.toMatrix(
 
 context(Random)
 fun ClosedRange<Double>.sample() = nextDouble(start, endInclusive)
+
+/**
+ * Add the entries of a double array to another double array and return the result as a new array.
+ */
+fun DoubleArray.add(other: DoubleArray) = (this zip other).map { (a, b) -> a + b }.toDoubleArray()
+
+/**
+ * Add the entries of a double array in-place to a double array.
+ */
+fun DoubleArray.addi(other: DoubleArray) {
+    val size = min(this.size, other.size)
+    for (i in 0 until size) {
+        this[i] += other[i]
+    }
+}

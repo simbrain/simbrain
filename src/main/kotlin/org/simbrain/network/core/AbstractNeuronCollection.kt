@@ -76,8 +76,6 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
      */
     val neuronList: MutableList<Neuron> = ArrayList()
 
-    @UserParameter(label = "Increment amount", increment = .1, order = 90)
-    private val increment = .1
 
     /**
      * Space between neurons within a layer.
@@ -221,7 +219,7 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
      * Add a collection of neurons.
      */
     protected fun addNeurons(neurons: Collection<Neuron>) {
-        neurons.forEach(Consumer { neuron: Neuron -> this.addNeuron(neuron) })
+        neurons.forEach { this.addNeuron(it) }
     }
 
     /**
@@ -510,45 +508,15 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
     }
 
     override fun clear() {
-        clearArray()
+        neuronList.forEach { it.clear() }
     }
 
     override fun increment() {
-        incrementArray(increment)
+        neuronList.forEach { it.increment() }
     }
 
     override fun decrement() {
-        decrementArray(increment)
-    }
-
-    /**
-     * Add increment to every entry in weight matrix
-     */
-    fun incrementArray(amount: Double) {
-        val newActivations = activations.map { it + amount }.toDoubleArray()
-        activations = newActivations
-        events.updated.fireAndForget()
-    }
-
-    /**
-     * Subtract increment from every entry in the array
-     */
-    fun decrementArray(amount: Double) {
-        val newActivations = Arrays
-            .stream(activations)
-            .map { a: Double -> a - amount }
-            .toArray()
-        activations = newActivations
-        events.updated.fireAndForget()
-    }
-
-    /**
-     * Clear array values.
-     */
-    fun clearArray() {
-        val newActivations = DoubleArray(activations.size)
-        activations = newActivations
-        events.updated.fireAndForget()
+        neuronList.forEach { it.decrement() }
     }
 
     override fun toggleClamping() {

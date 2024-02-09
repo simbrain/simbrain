@@ -32,6 +32,7 @@ import org.simbrain.util.toSequence
 import java.awt.*
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
+import java.util.*
 import java.util.prefs.PreferenceChangeListener
 import javax.swing.*
 import kotlin.reflect.KClass
@@ -217,11 +218,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         add("North", toolbars)
         add("Center", canvas)
         add("South", JToolBar().apply { add(timeLabel) })
-
-        // Register support for tool tips
-        // TODO: might be a memory leak, if not unregistered when the parent frame is removed
-        // TODO: copy from old code. Re-verify.
-        ToolTipManager.sharedInstance().registerComponent(this)
 
         addKeyBindings()
 

@@ -43,6 +43,11 @@ abstract class ScreenElement protected constructor(val networkPanel: NetworkPane
     init {
         addInputEventListener(ContextMenuEventHandler())
         addInputEventListener(PropertyDialogEventHandler())
+        addInputEventListener(object : ToolTipTextUpdater(networkPanel) {
+            override fun getToolTipText(): String? {
+                return this@ScreenElement.toolTipText
+            }
+        })
     }
 
     /**

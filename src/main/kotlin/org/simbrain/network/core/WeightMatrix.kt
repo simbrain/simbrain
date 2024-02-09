@@ -30,7 +30,7 @@ import kotlin.math.min
  */
 class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
     @UserParameter(label = "Increment amount", increment = .1, order = 20)
-    private val increment = .1
+    var increment = .1
 
     @UserParameter(label = "Learning Rule", order = 100)
     var learningRule: SynapseUpdateRule<*, *> = StaticSynapseRule()

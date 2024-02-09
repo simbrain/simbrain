@@ -336,12 +336,21 @@ class Network: CoroutineScope, EditableObject {
         addNetworkModelAsync(model)?.join()
     }
 
+    private fun assignId(model: NetworkModel) {
+        model.id = idManager.getAndIncrementId(model.javaClass)
+        when (model) {
+            is NeuronGroup -> model.neuronList.forEach { assignId(it) }
+            is SynapseGroup -> model.synapses.forEach { assignId(it) }
+            is Subnetwork -> model.modelList.all.forEach { assignId(it) }
+        }
+    }
+
     /**
      * Add a new [NetworkModel]. All network models MUST be added using this method.
      */
     fun addNetworkModelAsync(model: NetworkModel): Job? {
         if (model.shouldAdd()) {
-            model.id = idManager.getAndIncrementId(model.javaClass)
+            assignId(model)
             networkModels.add(model)
             if (model is LocatableModel && model.shouldBePlaced) {
                 placementManager.placeObject(model)

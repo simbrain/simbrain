@@ -228,9 +228,11 @@ public class SubnetworkNode extends ScreenElement {
     protected Action editAction = new AbstractAction("Edit...") {
         public void actionPerformed(final ActionEvent event) {
             StandardDialog dialog = getPropertyDialog();
-            dialog.pack();
-            dialog.setLocationRelativeTo(null);
-            dialog.setVisible(true);
+            if (dialog != null) {
+                dialog.pack();
+                dialog.setLocationRelativeTo(null);
+                dialog.setVisible(true);
+            }
         }
     };
 

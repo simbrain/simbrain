@@ -11,6 +11,7 @@ import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.full.allSuperclasses
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.isAccessible
+import kotlin.reflect.jvm.javaField
 
 /**
  * A panel that takes a set of objects either annotated with [UserParameter] or set to [GuiEditable] objects, and
@@ -78,8 +79,11 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
                 (it.annotations
                     .filterIsInstance<UserParameter>()
                     .firstOrNull()
-                    ?.toGuiEditable<O>(it.getter.call(obj)!!)
-                    ?.also { up -> up.getValue(obj, it) })
+                    ?.toGuiEditable<O>(try {
+                        it.getter.call(obj)!!
+                    } catch (e: Exception) {
+                        throw IllegalStateException("Could not access property ${it.javaField?.declaringClass?.kotlin?.simpleName}::${it.name} of object [${obj::class.simpleName}]($obj)", e)
+                    })?.also { up -> up.getValue(obj, it) })
             }
 
         (delegated + annotated)

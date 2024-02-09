@@ -107,7 +107,6 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
      * Set input values of neurons using an array of doubles. Assumes the order
      * of the items in the array matches the order of items in the neuronlist.
      *
-     *
      * Does not throw an exception if the provided input array and neuron list
      * do not match in size.
      */

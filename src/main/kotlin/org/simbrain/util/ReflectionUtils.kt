@@ -22,6 +22,7 @@ fun <T : Any> KClass<T>.callNoArgConstructor(): T = constructors.asSequence().ma
 fun Any.allPropertiesToString(separator: String = "\n") = this::class.declaredMemberProperties.joinToString(separator) {
     val name = it.name
     val valueString = when(val value = it.getter.call(this)) {
+        null -> "<null>"
         is String -> value
         is List<*> -> value.joinToString(", ")
         is Array<*> -> value.contentDeepToString()

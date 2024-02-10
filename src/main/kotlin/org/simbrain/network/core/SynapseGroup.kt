@@ -136,8 +136,6 @@ class SynapseGroup @JvmOverloads constructor(
         this.synapses.forEach { it.postOpenInit() }
     }
 
-    override var id: String? = super<NetworkModel>.id
-
     override fun toString(): String {
         return ("$id  with ${size()} synapse(s) from $source.id to $target.id")
     }

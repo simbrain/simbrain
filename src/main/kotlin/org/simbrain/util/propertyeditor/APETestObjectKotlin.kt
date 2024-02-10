@@ -25,6 +25,9 @@ class APETestObjectKotlin: EditableObject {
     @UserParameter(label = "Annotated Int", description = "Annotated Int Description", tab = "Test Tab", order = 10)
     var annotatedInt = 1
 
+    @UserParameter(label = "Annotated Nullable String", description = "Annotated Nullable String Description", tab = "Test Tab", order = 11)
+    var nullableString: String? = null
+
     var testString by GuiEditable(
         initValue = "test",
         tab = "Test Tab",
@@ -195,6 +198,7 @@ fun main() {
     val editor = AnnotatedPropertyEditor(editingObject).displayInDialog {
         commitChanges()
         println(editingObject)
+        println("is the thing null?: ${editingObject.first().nullableString == null}")
     }
 
     // AnnotatedPropertyEditor(objectWrapper<ProbabilityDistribution>("randomizer", UniformRealDistribution())).displayInDialog {

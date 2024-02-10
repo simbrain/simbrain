@@ -55,7 +55,7 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
         // Note the children pnodes to outlined objects are created in
         // networkpanel and added externally to outlined objects
         interactionBox = SynapseGroupInteractionBox(networkPanel, synapseGroup, this)
-        interactionBox.setText(synapseGroup.label)
+        interactionBox.setText(synapseGroup.label ?: synapseGroup.id)
         addChild(interactionBox)
         fun invalidateArrow() {
             when (currentNode) {
@@ -76,7 +76,7 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
         // Handle events
         val events = synapseGroup.events
         events.deleted.on(Dispatchers.Swing) { removeFromParent() }
-        events.labelChanged.on { _: String, _: String -> updateText() }
+        events.labelChanged.on { _, _ -> updateText() }
         events.visibilityChanged.on(Dispatchers.Swing) { setVisibility() }
         events.synapseAdded.on(dispatcher = Dispatchers.Swing) {
             this@SynapseGroupNode.networkPanel.createNode(it)

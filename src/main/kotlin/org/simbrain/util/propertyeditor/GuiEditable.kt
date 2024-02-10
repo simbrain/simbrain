@@ -26,6 +26,7 @@ import javax.swing.text.NumberFormatter
 import kotlin.math.min
 import kotlin.reflect.*
 import kotlin.reflect.full.functions
+import kotlin.reflect.jvm.javaField
 import kotlin.reflect.jvm.jvmErasure
 
 /**
@@ -171,27 +172,44 @@ class GuiEditableSetterContext<O : EditableObject, T> {
 /**
  * Converts [UserParameter] annotation to [GuiEditable].
  */
-fun <O : EditableObject> UserParameter.toGuiEditable(initValue: Any): GuiEditable<O, Any> {
+fun <O : EditableObject> UserParameter.toGuiEditable(obj: O, property: KProperty1<out Any, *>): GuiEditable<O, Any?> {
 
-    fun Any.matchDataTypeTo(match: Any): Any? {
+    fun Any?.toParameterDataType(): Any? {
         val thisNumber = this as Double
         if (thisNumber.isNaN()) return null
-        return when (match) {
-            is Int -> thisNumber.toInt()
-            is Short -> thisNumber.toInt().toShort()
-            is Long -> this.toLong()
-            is Float -> this.toFloat()
+        val type = property.returnType.classifier as KClass<*>
+        return when (type) {
+            Int::class -> (thisNumber).toInt()
+            Long::class -> (thisNumber).toLong()
+            Float::class -> (thisNumber).toFloat()
+            Double::class -> this
             else -> this
         }
     }
 
+    fun loadInitValue(): Any? {
+        return try {
+            property.getter.call(obj)
+        } catch (e: java.lang.IllegalStateException) {
+            throw IllegalStateException(
+                "Could not access property ${property.javaField?.declaringClass?.kotlin?.simpleName}::${property.name}",
+                e
+            )
+        } catch (e: Exception) {
+            throw IllegalStateException(
+                "Something went wrong when accessing ${property.javaField?.declaringClass?.kotlin?.simpleName}::${property.name}: [${e::class.simpleName}] ${e.message}",
+                e
+            )
+        }
+    }
+
     return GuiEditable(
-        initValue = initValue,
+        initValue = loadInitValue(),
         label = label,
         description = description.ifEmpty { null },
-        min = minimumValue.matchDataTypeTo(initValue),
-        max = maximumValue.matchDataTypeTo(initValue),
-        increment = increment.matchDataTypeTo(initValue),
+        min = minimumValue.toParameterDataType(),
+        max = maximumValue.toParameterDataType(),
+        increment = increment.toParameterDataType(),
         order = order,
         displayOnly = displayOnly,
         showDetails = showDetails,
@@ -199,7 +217,9 @@ fun <O : EditableObject> UserParameter.toGuiEditable(initValue: Any): GuiEditabl
         columnMode = columnMode,
         tab = tab,
         typeMapProvider = if (typeMapProvider.isNotEmpty()) {
-            initValue::class.functions.first { it.name == typeMapProvider } as KFunction<List<Class<out CopyableObject>>>
+            property.returnType
+                .jvmErasure.functions
+                .first { it.name == typeMapProvider } as KFunction<List<Class<out CopyableObject>>>
         } else {
            null
        },
@@ -552,9 +572,11 @@ class DisplayOnlyWidget<O : EditableObject, T>(
 
 class StringWidget<O : EditableObject>(
     val editor: AnnotatedPropertyEditor<O>,
-    parameter: GuiEditable<O, String>,
+    parameter: GuiEditable<O, String?>,
     isConsistent: Boolean
-) : ParameterWidget<O, String>(parameter, isConsistent) {
+) : ParameterWidget<O, String?>(parameter, isConsistent) {
+
+    private var changed = false
 
     override val widget by lazy {
         JTextField().also {
@@ -564,6 +586,7 @@ class StringWidget<O : EditableObject>(
                 fun update() {
                     events.valueChanged.fireAndBlock(parameter.property)
                     this@StringWidget.isConsistent = true
+                    changed = true
                 }
 
                 override fun insertUpdate(e: DocumentEvent) {
@@ -581,8 +604,8 @@ class StringWidget<O : EditableObject>(
         }
     }
 
-    override val value: String
-        get() = widget.text
+    override val value: String?
+        get() = if (changed) widget.text else parameter.value
 
     override fun refresh(property: KProperty<*>) {
         parameter.update(UpdateFunctionContext(

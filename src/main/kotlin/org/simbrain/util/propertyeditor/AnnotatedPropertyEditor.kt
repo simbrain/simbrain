@@ -11,7 +11,7 @@ import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.full.allSuperclasses
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.isAccessible
-import kotlin.reflect.jvm.javaField
+import kotlin.reflect.jvm.jvmErasure
 
 /**
  * A panel that takes a set of objects either annotated with [UserParameter] or set to [GuiEditable] objects, and
@@ -79,11 +79,8 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
                 (it.annotations
                     .filterIsInstance<UserParameter>()
                     .firstOrNull()
-                    ?.toGuiEditable<O>(try {
-                        it.getter.call(obj)!!
-                    } catch (e: Exception) {
-                        throw IllegalStateException("Could not access property ${it.javaField?.declaringClass?.kotlin?.simpleName}::${it.name} of object [${obj::class.simpleName}]($obj)", e)
-                    })?.also { up -> up.getValue(obj, it) })
+                    ?.toGuiEditable(obj, it)
+                    ?.also { up -> up.getValue(obj, it) })
             }
 
         (delegated + annotated)
@@ -176,9 +173,9 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
 
         return when (userParameter.value) {
 
-            is String -> StringWidget(
+            is String, is String? -> StringWidget(
                 this@AnnotatedPropertyEditor,
-                userParameter as GuiEditable<O, String>,
+                userParameter as GuiEditable<O, String?>,
                 isConsistent
             ) as ParameterWidget<O, T>
 
@@ -232,7 +229,7 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
                 isConsistent
             ) as ParameterWidget<O, T>
 
-            else -> throw IllegalArgumentException("Unsupported type: ${userParameter.value!!::class.simpleName}")
+            else -> throw IllegalArgumentException("Unsupported type: ${userParameter.property.returnType.jvmErasure.simpleName}")
         }
     }
 
@@ -283,7 +280,8 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
 
 }
 
-class APEObjectWrapper<O : EditableObject>(val label: String, obj: O, showLabeledBorder: Boolean = true) : EditableObject {
+class APEObjectWrapper<O : EditableObject>(val label: String, obj: O, showLabeledBorder: Boolean = true) :
+    EditableObject {
     var editingObject: O by GuiEditable(
         initValue = obj,
         label = label,
@@ -296,7 +294,8 @@ class APEObjectWrapper<O : EditableObject>(val label: String, obj: O, showLabele
  * so that we can edit the object itself with a dropdown.
  */
 @JvmOverloads
-fun <O : EditableObject> objectWrapper(label: String, obj: O, showLabeledBorder: Boolean = true) = APEObjectWrapper(label, obj, showLabeledBorder)
+fun <O : EditableObject> objectWrapper(label: String, obj: O, showLabeledBorder: Boolean = true) =
+    APEObjectWrapper(label, obj, showLabeledBorder)
 
 /**
  * Returns the widget associated with the object being edited.

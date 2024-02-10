@@ -10,7 +10,7 @@ open class NetworkModelEvents: Events() {
 
     val selected = AddedEvent<NetworkModel>()
     var deleted = RemovedEvent<NetworkModel>()
-    var labelChanged = ChangedEvent<String>()
+    var labelChanged = ChangedEvent<String?>()
     var clampChanged = NoArgEvent()
     var updated = NoArgEvent()
 

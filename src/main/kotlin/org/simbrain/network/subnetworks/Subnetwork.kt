@@ -50,15 +50,6 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
      */
     private val displayNeuronGroups = true
 
-    /**
-     * Create subnetwork group.
-     *
-     * @param net parent network.
-     */
-    init {
-        label = "Subnetwork"
-    }
-
     fun addModel(model: NetworkModel) {
         modelList.add(model)
         if (model is LocatableModel) {

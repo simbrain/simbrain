@@ -14,8 +14,7 @@ abstract class NetworkModel {
     /**
      * A unique id for this model.
      */
-    // TODO: Would be nice if this were final
-    open var id: String? = null
+    var id: String? = null
 
     /**
      * Optional string description of model object.
@@ -23,14 +22,14 @@ abstract class NetworkModel {
     @get:Producible(defaultVisibility = false)
     @set:Consumable(defaultVisibility = false)
     @UserParameter(label = "Label", description = "Optional string description", order = 2)
-    var label: String? = ""
+    var label: String? = null
         set(label) {
             val oldLabel = this.label
             field = label
             if (this.label == null) {
                 field = ""
             }
-            events.labelChanged.fireAndForget(oldLabel!!, this.label!!)
+            events.labelChanged.fireAndForget(oldLabel, this.label)
         }
 
     /**

@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.subnetworks
 
-import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.neurongroups.NeuronGroup
@@ -70,14 +69,6 @@ class SOMNetwork(numSOMNeurons: Int, numInputNeurons: Int) : Subnetwork() {
 
         offsetNeuronGroup(inputLayer, som, Direction.NORTH, 450.0)
     }
-
-
-    fun initNetwork() {
-        // No implementation
-    }
-
-    val network: NetworkModel
-        get() = this
 
     /**
      * Helper class for creating new Hopfield nets using [org.simbrain.util.propertyeditor.AnnotatedPropertyEditor].

@@ -33,7 +33,6 @@ val simulations = dir<Any>("Simulations") {
             item("1. Basic Hebb") { hebbianAssociatorSimple }
             item("2. Feed Forward Associator") { hebbianFeedForward }
             item("3. Recurrent Hebb") { hebbianAssociator }
-            item("4. Hopfield") { hopfieldSim }
         }
         dir("RL") {
             item("Actor Critic") { actorCritic }
@@ -94,7 +93,10 @@ val simulations = dir<Any>("Simulations") {
 
     // TODO: Disaggregate this into more meaningful submenus
     dir("Demos") {
+        item("Competitive network") { competitiveSim }
+        item("Restricted Boltzmann Machine") { rbmSim }
         item("Projection") { projectionSim }
+        item("Hopfield") { hopfieldSim }
         // item("SRN - Temporal XOR") { srnXORSim }
         item("Recurrent network") { recurrentProjection }
         item("Iris Classifier") { irisClassifier }
@@ -103,7 +105,6 @@ val simulations = dir<Any>("Simulations") {
         item("Mnist Images") { mnistSim }
         item("Image World") { imageWorldSim }
         item("LSTM") { lstmBlock() }
-        item("Competitive network") { competitiveSim }
     }
 
     dir("Testing") {

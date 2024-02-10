@@ -18,15 +18,11 @@
  */
 package org.simbrain.network.subnetworks
 
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.neurongroups.CompetitiveGroup
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
-import java.util.function.Consumer
 
 /**
  * **CompetitiveNetwork** is a small network encompassing a Competitive
@@ -56,11 +52,11 @@ public class CompetitiveNetwork(numInputNeurons: Int, numCompetitiveNeurons: Int
         inputLayer.label = "Input layer"
         inputLayer.setClamped(true)
         inputLayer.setLayoutBasedOnSize()
-        inputLayer.neuronList.forEach(Consumer { n: Neuron -> n.lowerBound = 0.0 })
+        inputLayer.neuronList.forEach { it.lowerBound = 0.0 }
 
         weights = SynapseGroup(inputLayer, competitive)
         this.addModel(weights)
-        weights.synapses.forEach(Consumer { s: Synapse -> s.lowerBound = 0.0 })
+        weights.synapses.forEach{it.lowerBound = 0.0}
 
         inputLayer.offset(0.0, 400.0)
     }
@@ -75,7 +71,7 @@ public class CompetitiveNetwork(numInputNeurons: Int, numCompetitiveNeurons: Int
         @UserParameter(label = "Number of competitive neurons")
         var numComp: Int = 20
 
-        fun create(network: Network?): CompetitiveNetwork {
+        fun create(): CompetitiveNetwork {
             return CompetitiveNetwork(numIn, numComp)
         }
     }

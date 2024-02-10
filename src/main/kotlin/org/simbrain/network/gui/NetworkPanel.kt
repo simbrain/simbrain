@@ -409,7 +409,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         createSubNetwork().apply {
             // Add "sub-nodes" to subnetwork node
             subnetworkNodes.forEach { addNode(it) }
-            customInfoNode?.let { setCustomInfoNode(it) }
+            customInfoNode?.let { setInfoTextNode(it) }
         }
 
     }

@@ -12,6 +12,7 @@ import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.neurongroups.BasicNeuronGroupParams
 import org.simbrain.network.neurongroups.NeuronGroupParams
+import org.simbrain.network.subnetworks.RestrictedBoltzmannMachine
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.propertyeditor.objectWrapper
@@ -550,6 +551,10 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             addSubnetAction("Feed Forward Network") { FeedForwardCreationDialog(networkPanel) },
             addSubnetAction("Hopfield") { HopfieldCreationDialog(networkPanel) },
             addSubnetAction("LMS (Least Mean Squares)") { networkPanel.showLMSCreationDialog() },
+            addSubnetAction("Restricted Boltzmann Machine") {
+                // TODO: As this pattern is reused add a util to NetworkDialogs.kt
+                RestrictedBoltzmannMachine.RBMCreator().createEditorDialog {
+                networkPanel.network.addNetworkModelAsync(it.create()) } },
             addSubnetAction("SOM Network") { SOMCreationDialog(networkPanel) },
             addSubnetAction("SRN (Simple Recurrent Network)") { networkPanel.showSRNCreationDialog() }
         )

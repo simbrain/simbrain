@@ -90,9 +90,6 @@ class Hopfield(numNeurons: Int) : Subnetwork() {
         updateStateInfoText()
     }
 
-    val network: NetworkModel
-        get() = this
-
     val stateInfoText: String
         get() = "Energy: " + neuronGroup.neuronList.getEnergy().format(4)
 

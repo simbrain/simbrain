@@ -79,7 +79,7 @@ public class SubnetworkNode extends ScreenElement {
      */
     private final Set<ScreenElement> outlinedObjects = new LinkedHashSet<>();
 
-    private ScreenElement customInfo;
+    private ScreenElement infoTextNode;
 
     /**
      * Create a subnetwork node.
@@ -272,24 +272,24 @@ public class SubnetworkNode extends ScreenElement {
                 node.offset(dx, dy);
             }
         }
-        if (customInfo != null) {
-            customInfo.offset(dx, dy);
+        if (infoTextNode != null) {
+            infoTextNode.offset(dx, dy);
         }
         outline.resetOutlinedNodes(outlinedObjects);
     }
 
     private void updateOutline() {
         var nodes = new HashSet<ScreenElement>(outlinedObjects);
-        if (customInfo != null) {
-            nodes.add(customInfo);
+        if (infoTextNode != null) {
+            nodes.add(infoTextNode);
         }
         outline.resetOutlinedNodes(nodes);
     }
 
-    public void setCustomInfoNode(ScreenElement customInfo) {
-        this.customInfo = customInfo;
+    public void setInfoTextNode(ScreenElement infoTextNode) {
+        this.infoTextNode = infoTextNode;
         var bounds = getFullBoundsReference();
-        ((LocatableModel) customInfo.getModel()).setLocation(bounds.getX() + bounds.getWidth() / 2.0, bounds.getY() - 5);
+        ((LocatableModel) infoTextNode.getModel()).setLocation(bounds.getX() + bounds.getWidth() / 2.0, bounds.getY() - 5);
         subnetwork.getEvents().getCustomInfoUpdated().on(getSwingDispatcher(), this::updateOutline);
         updateOutline();
     }

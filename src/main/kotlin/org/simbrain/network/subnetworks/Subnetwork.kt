@@ -25,7 +25,6 @@ import org.simbrain.util.plus
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.workspace.AttributeContainer
 import java.awt.geom.Point2D
-import java.util.stream.Collectors
 
 /**
  * A collection of [org.simbrain.network.NetworkModel] objects which functions as a subnetwork within the main
@@ -120,16 +119,13 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
     }
 
     private val locatableModels: List<LocatableModel>
-        get() = modelList.all.stream()
-            .filter { obj: NetworkModel? -> LocatableModel::class.java.isInstance(obj) }
-            .map { obj: NetworkModel? -> LocatableModel::class.java.cast(obj) }
-            .collect(Collectors.toList())
+        get() = modelList.all.filterIsInstance<LocatableModel>()
 
     override var location: Point2D
         get() = locatableModels.centerLocation
         set(newLocation) {
-            val delta = location - newLocation
-            locatableModels.forEach { lm: LocatableModel -> lm.location = lm.location.plus(delta) }
+            val delta = newLocation - location
+            locatableModels.forEach { it.location += delta }
         }
 
     /**

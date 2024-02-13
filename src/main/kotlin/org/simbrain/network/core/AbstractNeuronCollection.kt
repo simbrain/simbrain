@@ -165,7 +165,7 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
         get() = neuronList.centerLocation
         set(newLocation) {
             val delta = newLocation - location
-            neuronList.forEach { it.offset(delta.x, delta.y) }
+            neuronList.forEach { it.location += delta }
             events.locationChanged.fireAndForget()
         }
 

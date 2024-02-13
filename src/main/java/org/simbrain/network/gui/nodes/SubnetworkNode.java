@@ -121,8 +121,8 @@ public class SubnetworkNode extends ScreenElement {
             outlinedObjects.remove(node);
             outline.resetOutlinedNodes(outlinedObjects);
         });
-        if (node.getModel() instanceof LocatableModel) {
-            ((LocatableModel) node.getModel()).getEvents().getLocationChanged().fireAndForget();
+        if (node.getModel() instanceof LocatableModel locatableModel) {
+            locatableModel.getEvents().getLocationChanged().fireAndForget();
         }
 
         updateOutline();
@@ -287,8 +287,8 @@ public class SubnetworkNode extends ScreenElement {
     }
 
     public void setInfoTextNode(ScreenElement infoTextNode) {
+        var bounds = getFullBounds(); // get the bounds before the infoTextNode is added
         this.infoTextNode = infoTextNode;
-        var bounds = getFullBoundsReference();
         ((LocatableModel) infoTextNode.getModel()).setLocation(bounds.getX() + bounds.getWidth() / 2.0, bounds.getY() - 5);
         subnetwork.getEvents().getCustomInfoUpdated().on(getSwingDispatcher(), this::updateOutline);
         updateOutline();

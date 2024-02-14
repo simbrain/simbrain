@@ -25,6 +25,10 @@ import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.getEnergy
 import org.simbrain.network.neurongroups.CompetitiveGroup
 import org.simbrain.network.neurongroups.NeuronGroup
+import org.simbrain.network.util.Alignment.VERTICAL
+import org.simbrain.network.util.Direction.NORTH
+import org.simbrain.network.util.alignNetworkModels
+import org.simbrain.network.util.offsetNeuronCollections
 import org.simbrain.util.UserParameter
 import org.simbrain.util.format
 import org.simbrain.util.propertyeditor.EditableObject
@@ -72,7 +76,8 @@ public class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: In
         hiddenToVisible = SynapseGroup(hiddenLayer, visibleLayer)
         this.addModels(visibleToHidden, hiddenToVisible)
 
-        visibleLayer.offset(0.0, 400.0)
+        alignNetworkModels(visibleLayer, hiddenLayer, VERTICAL)
+        offsetNeuronCollections(visibleLayer, hiddenLayer, NORTH, 400.0)
 
         infoText = InfoText(stateInfoText)
 

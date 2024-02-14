@@ -26,11 +26,14 @@
  */
 package org.simbrain.network.util
 
-import org.simbrain.network.LocatableModel
+import org.simbrain.network.*
 import org.simbrain.network.core.AbstractNeuronCollection
-import org.simbrain.util.minus
-import org.simbrain.util.plus
-import org.simbrain.util.point
+import org.simbrain.util.*
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.component3
+import kotlin.collections.component4
+import kotlin.collections.listOf
 
 /**
  * Directions.
@@ -39,36 +42,65 @@ enum class Direction {
     NORTH, SOUTH, EAST, WEST
 }
 
+enum class Alignment {
+    VERTICAL, HORIZONTAL
+}
+
+fun alignNetworkModels(reference: LocatableModel, target: LocatableModel, alignment: Alignment) {
+    val (x1, y1) = reference.location
+    val (x2, y2) = target.location
+    when (alignment) {
+        Alignment.VERTICAL -> target.location = point(x1, y2)
+        Alignment.HORIZONTAL -> target.location = point(x2, y1)
+    }
+}
+
 /**
  * Group1 stays fixed. Group2 is moved with respect to group 1 and is
  * centered with respect to it in the relevant direction.
  *
- *
  * Must be used after all the subgroups have been added.
  *
- * @param group1    the reference group
- * @param group2    the group to offset
+ * @param reference    the reference group
+ * @param target    the group to offset
  * @param direction String indication of absolute direction. Must be one of "North", "South", "East", or "West".
  * @param amount    the amount by which to offset the second group
  */
-fun offsetNeuronGroup(group1: AbstractNeuronCollection, group2: AbstractNeuronCollection, direction: Direction, amount: Double) {
-    group2.location = when(direction) {
-        Direction.NORTH -> group1.location - point(0.0, group1.height / 2 + group2.height / 2 + amount)
-        Direction.SOUTH -> group1.location + point(0.0, group1.height / 2 + group2.height / 2 + amount)
-        Direction.EAST  -> group1.location + point(group1.width / 2 + group2.width / 2 + amount, 0.0)
-        Direction.WEST  -> group1.location - point(group1.width / 2 + group2.width / 2 + amount, 0.0)
+fun offsetNeuronCollections(
+    reference: AbstractNeuronCollection,
+    target: AbstractNeuronCollection,
+    direction: Direction,
+    amount: Double
+) {
+    val (refLeft, refTop, refRight, refBottom) = reference.neuronList.run { listOf(minX, minY, maxX, maxY) }
+    val (tarLeft, tarTop, tarRight, tarBottom) = target.neuronList.run { listOf(minX, minY, maxX, maxY) }
+    when (direction) {
+        Direction.NORTH -> target.locationY = refTop - amount - (tarBottom - tarTop) / 2
+        Direction.SOUTH -> target.locationY = refBottom + amount + (tarBottom - tarTop) / 2
+        Direction.EAST -> target.locationX = refRight + amount + (tarRight - tarLeft) / 2
+        Direction.WEST -> target.locationX = refLeft - amount - (tarRight - tarLeft) / 2
     }
 }
 
 /**
  * Same as above but specify height and width, which are assumed to be the same for both models.
  */
-fun offsetNeuronGroup(group1: LocatableModel, group2: LocatableModel, direction: Direction, amount: Double,
-    height: Double, width: Double) {
-    group2.location = when(direction) {
-        Direction.NORTH -> group1.location - point(0.0, height / 2 + height / 2 + amount)
-        Direction.SOUTH -> group1.location + point(0.0, height / 2 + height / 2 + amount)
-        Direction.EAST  -> group1.location + point(width / 2 + width / 2 + amount, 0.0)
-        Direction.WEST  -> group1.location - point(width / 2 + width / 2 + amount, 0.0)
+fun offsetNetworkModel(
+    reference: LocatableModel, target: LocatableModel, direction: Direction, amount: Double,
+    height: Double, width: Double
+) {
+    val (refLeft, refTop, refRight, refBottom) = reference.run {
+        listOf(
+            locationX - width / 2,
+            locationY - height / 2,
+            locationX + width / 2,
+            locationY + height / 2
+        )
+    }
+    when (direction) {
+        Direction.NORTH -> target.locationY = refTop - amount - height / 2
+        Direction.SOUTH -> target.locationY = refBottom + amount + height / 2
+        Direction.EAST -> target.locationX = refRight + amount + width / 2
+        Direction.WEST -> target.locationX = refLeft - amount - width / 2
     }
 }

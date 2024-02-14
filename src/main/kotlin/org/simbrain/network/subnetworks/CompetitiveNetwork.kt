@@ -21,6 +21,10 @@ package org.simbrain.network.subnetworks
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.neurongroups.CompetitiveGroup
 import org.simbrain.network.neurongroups.NeuronGroup
+import org.simbrain.network.util.Alignment
+import org.simbrain.network.util.Direction
+import org.simbrain.network.util.alignNetworkModels
+import org.simbrain.network.util.offsetNeuronCollections
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
 
@@ -58,7 +62,8 @@ public class CompetitiveNetwork(numInputNeurons: Int, numCompetitiveNeurons: Int
         this.addModel(weights)
         weights.synapses.forEach{it.lowerBound = 0.0}
 
-        inputLayer.offset(0.0, 400.0)
+        alignNetworkModels(inputLayer, competitive, Alignment.VERTICAL)
+        offsetNeuronCollections(inputLayer, competitive, Direction.NORTH, 200.0)
     }
 
     /**

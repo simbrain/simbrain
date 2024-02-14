@@ -18,7 +18,7 @@ import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.core.randomizeBiases
 import org.simbrain.network.util.Direction
-import org.simbrain.network.util.offsetNeuronGroup
+import org.simbrain.network.util.offsetNetworkModel
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 import java.awt.geom.Point2D
 
@@ -65,7 +65,7 @@ open class FeedForward : Subnetwork {
             val hiddenLayer = NeuronArray(nodesPerLayer[i])
             addModel(hiddenLayer)
             layerList.add(hiddenLayer)
-            offsetNeuronGroup(
+            offsetNetworkModel(
                 lastLayer,
                 hiddenLayer,
                 Direction.NORTH,

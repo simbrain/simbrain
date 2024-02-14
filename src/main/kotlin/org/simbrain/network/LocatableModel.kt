@@ -95,7 +95,7 @@ val Collection<LocatableModel>.vertices: RectangleVertices
 /**
  * The four sides of the bound.
  */
-val Collection<LocatableModel>.outlines get() = vertices.outlines
+val Collection<LocatableModel>.sides get() = vertices.sides
 
 /**
  * Return bounding box for a list of [LocatableModel] objects.

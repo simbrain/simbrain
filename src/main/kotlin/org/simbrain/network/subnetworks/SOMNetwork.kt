@@ -23,7 +23,7 @@ import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.neurongroups.SOMGroup
 import org.simbrain.network.util.Direction
-import org.simbrain.network.util.offsetNeuronGroup
+import org.simbrain.network.util.offsetNeuronCollections
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
 
@@ -67,7 +67,7 @@ class SOMNetwork(numSOMNeurons: Int, numInputNeurons: Int) : Subnetwork() {
         val sg = SynapseGroup(inputLayer, som, AllToAll())
         addModel(sg)
 
-        offsetNeuronGroup(inputLayer, som, Direction.NORTH, 450.0)
+        offsetNeuronCollections(inputLayer, som, Direction.NORTH, 450.0)
     }
 
     /**

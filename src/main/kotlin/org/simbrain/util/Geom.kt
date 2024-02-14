@@ -131,7 +131,7 @@ val Rectangle2D.vertices get() = RectangleVertices(
         point(x + width, y + height)
 )
 
-val Rectangle2D.outlines get() = vertices.outlines
+val Rectangle2D.outlines get() = vertices.sides
 
 fun Rectangle2D.expandBy(vector: Point2D): Rectangle2D {
     val (width, height) = width + vector.x to height + vector.y
@@ -149,11 +149,11 @@ data class RectangleVertices(
 
 fun RectangleVertices.toList() = listOf(topLeft, topRight, bottomRight, bottomLeft)
 
-data class RectangleOutlines(val top: Line2D, val right: Line2D, val bottom: Line2D, val left: Line2D) {
+data class RectangleSides(val top: Line2D, val right: Line2D, val bottom: Line2D, val left: Line2D) {
     fun toList() = listOf(top, right, bottom, left)
 }
 
-val RectangleVertices.outlines get() = RectangleOutlines(
+val RectangleVertices.sides get() = RectangleSides(
         line(topRight, topLeft),
         line(bottomRight, topRight),
         line(bottomLeft, bottomRight),

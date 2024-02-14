@@ -172,8 +172,8 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
     override val bound: Rectangle2D
         get() = neuronList.bound
 
-    val outlines: RectangleOutlines
-        get() = neuronList.outlines
+    val sides: RectangleSides
+        get() = neuronList.sides
 
     /**
      * the longest dimensions upon which neurons are laid out.

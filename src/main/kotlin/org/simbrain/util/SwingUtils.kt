@@ -1,9 +1,6 @@
 package org.simbrain.util
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
@@ -12,6 +9,7 @@ import java.awt.*
 import java.awt.event.*
 import java.io.File
 import javax.swing.*
+import kotlin.coroutines.CoroutineContext
 
 
 inline fun StandardDialog.onClosed(crossinline block: (WindowEvent?) -> Unit) = apply {
@@ -378,5 +376,20 @@ class ResizableTabbedPane : JTabbedPane() {
             // Resize and revalidate the parent container
             SwingUtilities.getWindowAncestor(this)?.pack()
         }
+    }
+}
+
+
+object Swing : CoroutineDispatcher() {
+    override fun dispatch(context: CoroutineContext, block: Runnable) {
+        SwingUtilities.invokeLater(block)
+    }
+}
+
+// Utility function to run suspend functions on the Swing EDT
+fun swingInvokeLater(block: suspend () -> Unit) {
+    // Launch a coroutine on the Swing context
+    CoroutineScope(Swing).launch {
+        block()
     }
 }

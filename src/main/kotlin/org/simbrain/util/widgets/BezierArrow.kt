@@ -50,7 +50,7 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
      *
      * @return the updated curve model
      */
-    fun layout(sourceOutlines: RectangleOutlines, targetOutlines: RectangleOutlines, bidirectional: Boolean) {
+    fun layout(sourceOutlines: RectangleSides, targetOutlines: RectangleSides, bidirectional: Boolean) {
 
         // 0. clear old arrow
         removeAllChildren()

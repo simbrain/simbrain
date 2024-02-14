@@ -40,6 +40,6 @@ class SynapseGroupNodeDirected(private val synapseGroupNode: SynapseGroupNode) :
 
     }.also { addChild(it) }
 
-    override fun layoutChildren() = arrow.layout(source.outlines, target.outlines, isBidirectional())
+    override fun layoutChildren() = arrow.layout(source.sides, target.sides, isBidirectional())
 
 }

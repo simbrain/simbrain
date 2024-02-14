@@ -23,8 +23,10 @@ import org.simbrain.network.trainers.Trainable
 import org.simbrain.network.trainers.createDiagonalDataset
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.SigmoidalRule
+import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.Direction
-import org.simbrain.network.util.offsetNeuronGroup
+import org.simbrain.network.util.alignNetworkModels
+import org.simbrain.network.util.offsetNetworkModel
 import org.simbrain.util.UserParameter
 import org.simbrain.util.point
 import org.simbrain.util.propertyeditor.EditableObject
@@ -73,12 +75,9 @@ class SRNNetwork: FeedForward, Trainable {
 
         outputLayer.updateRule = SigmoidalRule()
 
-        offsetNeuronGroup(inputLayer, hiddenLayer, Direction.NORTH,
-            (betweenLayerInterval / 2).toDouble(), 100.0, 200.0 )
-        offsetNeuronGroup(hiddenLayer, outputLayer, Direction.NORTH,
-            (betweenLayerInterval / 2).toDouble(), 100.0, 200.0 )
-        offsetNeuronGroup(inputLayer, contextLayer, Direction.EAST,
-            100.0, 100.0, 200.0 )
+        alignNetworkModels(inputLayer, contextLayer, Alignment.HORIZONTAL)
+        offsetNetworkModel(inputLayer, contextLayer, Direction.EAST,
+            100.0, 100.0, 200.0)
 
         contextToHidden = WeightMatrix(contextLayer, hiddenLayer)
         contextToHidden.randomize()

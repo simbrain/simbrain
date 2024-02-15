@@ -93,12 +93,13 @@ val simulations = dir<Any>("Simulations") {
 
     // TODO: Disaggregate this into more meaningful submenus
     dir("Demos") {
-        item("Competitive network") { competitiveSim }
+        item("Competitive Network") { competitiveSim }
         item("Restricted Boltzmann Machine") { rbmSim }
         item("Projection") { projectionSim }
         item("Hopfield") { hopfieldSim }
         // item("SRN - Temporal XOR") { srnXORSim }
         item("Recurrent network") { recurrentProjection }
+        item("SOM Network") { SOMSim }
         item("Iris Classifier") { irisClassifier }
         item("Deep Net - Mnist") { deepNetSim }
         item("Spiking Neuron") { spikingNetwork }

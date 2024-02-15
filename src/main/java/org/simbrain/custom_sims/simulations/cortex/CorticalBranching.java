@@ -59,10 +59,10 @@ public class CorticalBranching extends Simulation {
             Neuron neuron = new Neuron();
             neuron.setPolarity(SimbrainConstants.Polarity.EXCITATORY);
             TimedAccumulatorRule tar = new TimedAccumulatorRule();
-            tar.maxState = REFRACTORY;
-            tar.kappa = KAPPA;
-            tar.b = B_VALUE;
-            tar.baseProb = SPONTANEOUS_ACT;
+            tar.setMaxState(REFRACTORY);
+            tar.setKappa(KAPPA);
+            tar.setB(B_VALUE);
+            tar.setBaseProb(SPONTANEOUS_ACT);
             neuron.setUpdateRule(tar);
             neurons.add(neuron);
         }

@@ -70,7 +70,7 @@ public class ClassicalConditioning extends Simulation {
         cheeseDetectorNeuron.setLabel("Cheese Detector");
 
         BinaryRule responseRule = new BinaryRule();
-        responseRule.threshold = .5;
+        responseRule.setThreshold(.5);
         responseRule.setLowerBound(0);
         Neuron salivationResponse = new Neuron();
         net.addNetworkModelAsync(salivationResponse);

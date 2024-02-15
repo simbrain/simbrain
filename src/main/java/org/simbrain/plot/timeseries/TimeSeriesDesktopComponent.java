@@ -85,7 +85,7 @@ public class TimeSeriesDesktopComponent extends DesktopComponent<TimeSeriesPlotC
         bar.add(editMenu);
         bar.add(helpMenu);
 
-        parentFrame.setJMenuBar(bar);
+        getParentFrame().setJMenuBar(bar);
     }
 
 }

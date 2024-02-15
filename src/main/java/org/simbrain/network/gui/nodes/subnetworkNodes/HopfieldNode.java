@@ -93,7 +93,7 @@ public class HopfieldNode extends SubnetworkNode {
         Action couplingProjection =
                 sd.getActionManager().createCoupledProjectionPlotAction(
                         sd.getWorkspace().getCouplingManager().getProducer(
-                                hopfield.neuronGroup, "getActivations"
+                                hopfield.getNeuronGroup(), "getActivations"
                         ),
                         Objects.requireNonNull(hopfield.getId()),
                         "Projection");
@@ -101,9 +101,9 @@ public class HopfieldNode extends SubnetworkNode {
         Action imageInput =
                 sd.getActionManager().createImageInput(
                         sd.getWorkspace().getCouplingManager().getConsumer(
-                                hopfield.neuronGroup, "addInputs"
+                                hopfield.getNeuronGroup(), "addInputs"
                         ),
-                        hopfield.neuronGroup.getNeuronList().size());
+                        hopfield.getNeuronGroup().getNeuronList().size());
         menu.add(imageInput);
 
         setContextMenu(menu);

@@ -93,7 +93,7 @@ public class HistogramDesktopComponent extends DesktopComponent<HistogramCompone
         // bar.add(editMenu);
         bar.add(helpMenu);
 
-        parentFrame.setJMenuBar(bar);
+        getParentFrame().setJMenuBar(bar);
     }
 
     /**

@@ -22,7 +22,6 @@ class ThreeValueRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>() {
     /**
      * Lower threshold field.
      */
-    @JvmField
     @UserParameter(
         label = "Lower Threshold",
         description = "If the weighted input plus the bias is less than this value, the activation "
@@ -32,10 +31,6 @@ class ThreeValueRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>() {
     )
     var lowerThreshold: Double = 0.0
 
-    /**
-     * Upper threshold field.
-     */
-    @JvmField
     @UserParameter(
         label = "Upper Threshold",
         description = "If the weighted input plus the bias is greater than this value, the activation "
@@ -45,10 +40,6 @@ class ThreeValueRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>() {
     )
     var upperThreshold: Double = 1.0
 
-    /**
-     * Lower value field.
-     */
-    @JvmField
     @UserParameter(
         label = "Lower Value",
         description = "The activation is set to this value if the weighted input plus the bias exceeds "
@@ -58,10 +49,6 @@ class ThreeValueRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>() {
     )
     var lowerValue: Double = -1.0
 
-    /**
-     * Middle value field.
-     */
-    @JvmField
     @UserParameter(
         label = "Middle Value",
         description = "If the weighted input plus the bias does not exceed the Upper or Lower Thresholds, "
@@ -71,10 +58,6 @@ class ThreeValueRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>() {
     )
     var middleValue: Double = 0.0
 
-    /**
-     * Upper value field.
-     */
-    @JvmField
     @UserParameter(
         label = "Upper Value", description = "If the weighted input plus the bias is greater than the Upper Threshold, "
                 + "then the activation is set to this value.", increment = .1, order = 6

@@ -24,7 +24,6 @@ class TimedAccumulatorRule : SpikingThresholdRule() {
     /**
      * Refractory period
      */
-    @JvmField
     @UserParameter(
         label = "Ref. Period",
         description = "The amount of time it takes for this neuron to spike again.",
@@ -37,7 +36,6 @@ class TimedAccumulatorRule : SpikingThresholdRule() {
     /**
      * The probability that this neuron will spike spontaneously regardless of input.
      */
-    @JvmField
     @UserParameter(
         label = "Spike Prob.",
         description = "Probability that this neuron will fire spontaneously regardless of state or input.",
@@ -54,7 +52,6 @@ class TimedAccumulatorRule : SpikingThresholdRule() {
      * the probabilities corresponding to each weight converge to the same value. Negative values cause smaller numbers
      * to become larger probabilities and larger numbers to become smaller probabilities.
      */
-    @JvmField
     @UserParameter(
         label = "Shape Parameter",
         description = "Affects the nonlinearty of the softmax.\nStronger weights will become exponentially more likely to cause spikes.",
@@ -66,7 +63,6 @@ class TimedAccumulatorRule : SpikingThresholdRule() {
     /**
      * Makes all weights more likely to cause spikes in the post synaptic neuron.
      */
-    @JvmField
     @UserParameter(
         label = "Gain",
         description = "Raises or lowers the probability of spikes causing more spikes via weights.",

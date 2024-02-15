@@ -301,7 +301,7 @@ public class WorkspaceSerializer {
                         Rectangle bounds =
                                 (Rectangle) XStreamUtils.getSimbrainXStream().fromXML(new ByteArrayInputStream(byteArrays.get(archivedComponent.getDesktopComponent().getUri())));
                         DesktopComponent<?> desktopComponent = SimbrainDesktop.INSTANCE.getDesktopComponent(wc);
-                        desktopComponent.parentFrame.setBounds(bounds);
+                        desktopComponent.getParentFrame().setBounds(bounds);
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();

@@ -123,7 +123,7 @@ public class DocViewerDesktopComponent extends DesktopComponent<DocViewerCompone
         helpMenu.add(helpItem);
         menuBar.add(helpMenu);
 
-        parentFrame.setJMenuBar(menuBar);
+        getParentFrame().setJMenuBar(menuBar);
 
         textArea.setBorder(BorderFactory.createEmptyBorder(10, 5, 10, 5));
         textArea.setContentType("text/html");

@@ -151,7 +151,7 @@ public class BarChartDesktopComponent extends DesktopComponent<BarChartComponent
         bar.add(editMenu);
         bar.add(helpMenu);
 
-        parentFrame.setJMenuBar(bar);
+        getParentFrame().setJMenuBar(bar);
     }
 
     @Override

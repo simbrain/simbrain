@@ -111,7 +111,7 @@ public class SimulationUtils {
         String html = readSimulationFileContents(fileName);
         docViewer.setText(html);
         workspace.addWorkspaceComponent(docViewer);
-        SwingUtilities.invokeLater(() -> desktop.getDesktopComponent(docViewer).parentFrame.setBounds(x, y, width, height));
+        SwingUtilities.invokeLater(() -> desktop.getDesktopComponent(docViewer).getParentFrame().setBounds(x, y, width, height));
         return docViewer;
     }
 

@@ -53,10 +53,7 @@ import javax.swing.JPanel
  * @param <E> the type of the workspace component.
 </E> */
 abstract class DesktopComponent<E : WorkspaceComponent>(
-    /**
-     * Reference to parent frame.
-     */
-    @JvmField var parentFrame: GenericFrame, workspaceComponent: E
+var parentFrame: GenericFrame, workspaceComponent: E
 ) : JPanel() {
 
     /**
@@ -69,7 +66,6 @@ abstract class DesktopComponent<E : WorkspaceComponent>(
 
     private val chooser: SFileChooser
 
-    @JvmField
     var desktop: SimbrainDesktop? = null
 
     val exportAction = createAction(

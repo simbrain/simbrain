@@ -13,7 +13,6 @@ class ProductRule : LinearRule() {
     /**
      * Whether to use weights or not.
      */
-    @JvmField
     @UserParameter(
         label = "Use Weights", description = "If false, activation is a product of incoming activations. "
                 + "If true, activation is a product of incoming activation / weight products, or "

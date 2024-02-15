@@ -95,20 +95,20 @@ public class Cerebellum extends Simulation {
         network = nc.getNetwork();
 
         DecayRule generalRule = new DecayRule();
-        generalRule.decayFraction = .25;
+        generalRule.setDecayFraction(.25);
 
         DecayRule DCNRule = new DecayRule();
-        DCNRule.decayFraction = .25;
-        DCNRule.baseLine = 1;
+        DCNRule.setDecayFraction(.25);
+        DCNRule.setBaseLine(1);
 
         DecayRule inferiorOliveRule = new DecayRule();
-        inferiorOliveRule.decayFraction = .25;
-        inferiorOliveRule.baseLine = .3;
+        inferiorOliveRule.setDecayFraction(.25);
+        inferiorOliveRule.setBaseLine(.3);
 
         DecayRule targetRule = new DecayRule();
-        targetRule.decayFraction = 0;
-        targetRule.decayAmount = 0;
-        targetRule.baseLine = 0;
+        targetRule.setDecayFraction(0);
+        targetRule.setDecayAmount(0);
+        targetRule.setBaseLine(0);
 
         // Cortex (assume it's at 0,0)
         NeuronGroup cortex = new NeuronGroup(1);

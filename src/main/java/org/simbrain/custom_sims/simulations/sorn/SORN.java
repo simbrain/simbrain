@@ -73,7 +73,7 @@ public class SORN extends Simulation {
             Neuron n = new Neuron();
             // sornRule.setMaxThreshold(0.5);
             // sornRule.setThreshold(0.5 * Math.random() + 0.01);
-            sornRule.refractoryPeriod = 1;
+            sornRule.setRefractoryPeriod(1);
             sornRule.setAddNoise(true);
             n.setPolarity(Polarity.EXCITATORY);
             n.setUpdateRule(sornRule.deepCopy());
@@ -83,8 +83,8 @@ public class SORN extends Simulation {
         for (int i = 0; i < (int) (numNeurons * 0.2); i++) {
             Neuron n = new Neuron();
             // str.setThreshold(0.8 * Math.random() + 0.01);
-            str.etaIP = 0; // No Homeostatic Plasticity
-            str.refractoryPeriod = 1;
+            str.setEtaIP(0); // No Homeostatic Plasticity
+            str.setRefractoryPeriod(1);
             str.setAddNoise(true);
             n.setPolarity(Polarity.INHIBITORY);
             n.setUpdateRule(str.deepCopy());
@@ -121,7 +121,7 @@ public class SORN extends Simulation {
         }
         // Set up plasticity between exc and exc neurons
         AddSTDPRule stdp = new AddSTDPRule();
-        stdp.learningRate = 0.001;
+        stdp.setLearningRate(0.001);
         // TODO
         // sg_ee.setLearningRule(stdp, SimbrainConstants.Polarity.BOTH);
 
@@ -130,8 +130,8 @@ public class SORN extends Simulation {
             Neuron n = new Neuron();
             //SpikingThresholdRule inRule = new SpikingThresholdRule();
             //inRule.setThreshold(0.96);
-            sornRule.maxThreshold = 0.5;
-            sornRule.threshold = 0.5 * Math.random() + 0.01;
+            sornRule.setMaxThreshold(0.5);
+            sornRule.setThreshold(0.5 * Math.random() + 0.01);
             n.setPolarity(Polarity.EXCITATORY);
             n.setUpdateRule(sornRule.deepCopy());
             inNeurons.add(n);

@@ -32,15 +32,10 @@ import kotlin.math.pow
  * **OdorWorldPanel** represent the OdorWorld.
  */
 class OdorWorldPanel(
-    /**
-     * Reference to WorkspaceComponent.
-     */
     val odorWorldComponent: OdorWorldComponent,
-    /**
-     * Reference to model world.
-     */
-    @JvmField val world: OdorWorld
+    val world: OdorWorld
 ) : JPanel() {
+
     /**
      * The Piccolo PCanvas.
      */
@@ -79,7 +74,6 @@ class OdorWorldPanel(
      */
     private var layerImageList: List<PImage?>
 
-    @JvmField
     val odorWorldActions: OdorWorldActions = OdorWorldActions(this)
 
     /**

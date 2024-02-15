@@ -60,7 +60,6 @@ object SimbrainDesktop {
 
     val workspace = Workspace()
 
-    @JvmField
     val desktopPane: JDesktopPane = JDesktopPane()
 
     /**

@@ -23,7 +23,6 @@ open class DecayRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>(), C
         Relative, Absolute
     }
 
-    @JvmField
     @UserParameter(
         label = "Update Type",
         description = "Relative (percentage decay of current activation) vs. absolute (fixed decay amount)",
@@ -31,10 +30,6 @@ open class DecayRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>(), C
     )
     var updateType: UpdateType = UpdateType.Relative
 
-    /**
-     * Decay amount.
-     */
-    @JvmField
     @UserParameter(
         label = "Decay amount",
         description = "The amount by which the activation is changed each iteration if absolute decay is chosen.",
@@ -43,10 +38,6 @@ open class DecayRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>(), C
     )
     var decayAmount: Double = .1
 
-    /**
-     * Decay fraction.
-     */
-    @JvmField
     @UserParameter(
         label = "Decay fraction",
         description = "The proportion of the distance between the current value and the base-line value, "
@@ -56,10 +47,6 @@ open class DecayRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>(), C
     )
     var decayFraction: Double = .1
 
-    /**
-     * Base line.
-     */
-    @JvmField
     @UserParameter(label = "Base Line", description = "An option to add noise.", increment = .1, order = 2)
     var baseLine: Double = 0.0
 

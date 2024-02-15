@@ -32,7 +32,7 @@ import java.util.function.Consumer
  * **Hopfield** is a basic implementation of a discrete Hopfield network.
  */
 class Hopfield(numNeurons: Int) : Subnetwork() {
-    @JvmField
+
     val neuronGroup: NeuronGroup
 
     val synapseGroup: SynapseGroup

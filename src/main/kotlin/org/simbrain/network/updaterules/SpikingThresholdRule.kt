@@ -18,10 +18,7 @@ import java.util.*
  * TODO: Has no documentation.
  */
 open class SpikingThresholdRule : SpikingNeuronUpdateRule<SpikingScalarData, SpikingMatrixData>(), NoisyUpdateRule {
-    /**
-     * Threshold.
-     */
-    @JvmField
+
     @UserParameter(
         label = "Threshold",
         description = "Input value above which the neuron spikes.",

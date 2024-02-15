@@ -15,7 +15,6 @@ class BinaryRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData> {
     /**
      * Threshold for binary neurons.
      */
-    @JvmField
     @UserParameter(label = "Threshold", description = "Threshold for binary neurons.", increment = .1, order = 1)
     var threshold: Double = .5
 

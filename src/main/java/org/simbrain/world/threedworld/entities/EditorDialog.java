@@ -66,7 +66,7 @@ public class EditorDialog {
     public void showEditor(Editor editor) {
         if (dialog != null)
             return;
-        dialog = new JDialog(owner.desktop.getFrame());
+        dialog = new JDialog(owner.getDesktop().getFrame());
         dialog.setTitle("ThreeDWorld Editor");
         Container contentPane = dialog.getContentPane();
         contentPane.setLayout(new BorderLayout());

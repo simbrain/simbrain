@@ -45,7 +45,7 @@ public class ConsoleDesktopComponent extends DesktopComponent<ConsoleComponent> 
         add("Center", console);
 
         JMenuBar menu = new JMenuBar();
-        parentFrame.setJMenuBar(menu);
+        getParentFrame().setJMenuBar(menu);
         JMenu fileMenu = new JMenu("File");
         menu.add(fileMenu);
         fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createImportAction(this));

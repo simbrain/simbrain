@@ -64,7 +64,7 @@ class SynapseNode(
     /**
      * The logical synapse this screen element represents.
      */
-    @JvmField var synapse: Synapse
+    var synapse: Synapse
 ) : ScreenElement(net!!) {
     /**
      * @return Returns the synapse.

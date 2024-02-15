@@ -88,7 +88,7 @@ public class RasterPlotDesktopComponent extends DesktopComponent<RasterPlotCompo
         bar.add(editMenu);
         bar.add(helpMenu);
 
-        parentFrame.setJMenuBar(bar);
+        getParentFrame().setJMenuBar(bar);
     }
 
 }

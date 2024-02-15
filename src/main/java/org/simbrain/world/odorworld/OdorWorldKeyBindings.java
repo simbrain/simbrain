@@ -18,7 +18,7 @@ public class OdorWorldKeyBindings {
     public static void addBindings(OdorWorldPanel worldPanel) {
 
         PCanvas canvas = worldPanel.getCanvas();
-        OdorWorld world = worldPanel.world;
+        OdorWorld world = worldPanel.getWorld();
 
 
         canvas.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("B"), "tooltipTest");

@@ -25,14 +25,11 @@ class SORNNeuronRule : SpikingThresholdRule(), NoisyUpdateRule {
     private var hIP = 0.01
 
     /** The learning rate for homeostatic plasticity.  */
-    @JvmField
     var etaIP: Double = 0.001
 
     /** The maximum value the threshold is allowed to take on.  */
-    @JvmField
     var maxThreshold: Double = 1.0
 
-    @JvmField
     var refractoryPeriod: Double = 0.0
 
     override fun deepCopy(): SORNNeuronRule {

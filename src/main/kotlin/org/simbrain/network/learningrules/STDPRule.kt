@@ -42,14 +42,12 @@ open class STDPRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData> {
     /**
      * Time constant for LTD.
      */
-    @JvmField
     @UserParameter(label = "Tau minus", description = "Time constant " + "for LTD.", increment = .1, order = 0)
     var tau_minus: Double = 60.0
 
     /**
      * Time constant for LTP.
      */
-    @JvmField
     @UserParameter(label = "Tau plus", description = "Time constant " + "for LTP.", increment = .1, order = 1)
     var tau_plus: Double = 30.0
 
@@ -78,7 +76,6 @@ open class STDPRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData> {
     /**
      * General learning rate.
      */
-    @JvmField
     @UserParameter(label = "Learning rate", description = "General learning " + "rate.", increment = .1, order = 4)
     var learningRate: Double = 0.01
 

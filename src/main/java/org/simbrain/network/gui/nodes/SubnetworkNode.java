@@ -99,8 +99,8 @@ public class SubnetworkNode extends ScreenElement {
         setContextMenu(this.getDefaultContextMenu());
 
         LocationEvents events = subnetwork.getEvents();
-        events.getDeleted().on(n -> removeFromParent());
-        events.getLabelChanged().on((o, n) -> updateText());
+        events.getDeleted().on(getSwingDispatcher(), n -> removeFromParent());
+        events.getLabelChanged().on(getSwingDispatcher(), (o, n) -> updateText());
         events.getLocationChanged().on(getSwingDispatcher(), this::layoutChildren);
     }
 
@@ -117,7 +117,7 @@ public class SubnetworkNode extends ScreenElement {
      */
     public void addNode(ScreenElement node) {
         outlinedObjects.add(node);
-        node.getModel().getEvents().getDeleted().on(sg -> {
+        node.getModel().getEvents().getDeleted().on(getSwingDispatcher(), sg -> {
             outlinedObjects.remove(node);
             outline.resetOutlinedNodes(outlinedObjects);
         });

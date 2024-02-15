@@ -1,5 +1,7 @@
 package org.simbrain.network.gui.nodes
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PPaintContext
@@ -25,9 +27,9 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
 
     init {
         layer.events.apply {
-            deleted.on { removeFromParent() }
-            clampChanged.on { updateBorder() }
-            locationChanged.on { pullViewPositionFromModel() }
+            deleted.on(dispatcher = Dispatchers.Swing) { removeFromParent() }
+            clampChanged.on(dispatcher = Dispatchers.Swing) { updateBorder() }
+            locationChanged.on(dispatcher = Dispatchers.Swing) { pullViewPositionFromModel() }
         }
         pickable = true
 

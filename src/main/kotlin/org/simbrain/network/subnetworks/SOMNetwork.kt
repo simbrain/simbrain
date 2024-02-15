@@ -22,7 +22,9 @@ import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.neurongroups.SOMGroup
+import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.Direction
+import org.simbrain.network.util.alignNetworkModels
 import org.simbrain.network.util.offsetNeuronCollections
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
@@ -34,7 +36,7 @@ import org.simbrain.util.propertyeditor.EditableObject
  *
  * @author Jeff Yoshimi
  */
-class SOMNetwork(numSOMNeurons: Int, numInputNeurons: Int) : Subnetwork() {
+class SOMNetwork(numInputNeurons: Int, numSOMNeurons: Int) : Subnetwork() {
 
     val som: SOMGroup
 
@@ -67,18 +69,21 @@ class SOMNetwork(numSOMNeurons: Int, numInputNeurons: Int) : Subnetwork() {
         val sg = SynapseGroup(inputLayer, som, AllToAll())
         addModel(sg)
 
+        alignNetworkModels(inputLayer, som, Alignment.VERTICAL)
         offsetNeuronCollections(inputLayer, som, Direction.NORTH, 450.0)
+
     }
 
     /**
      * Helper class for creating new Hopfield nets using [org.simbrain.util.propertyeditor.AnnotatedPropertyEditor].
      */
     class SOMCreator : EditableObject {
-        @UserParameter(label = "Number of inputs")
-        var numIn: Int = 16
 
-        @UserParameter(label = "Number of som neurons")
+        @UserParameter(label = "Number of som neurons", order = 10)
         var numSom: Int = 20
+
+        @UserParameter(label = "Number of inputs", order = 20)
+        var numIn: Int = 16
 
         /**
          * Create the som net

@@ -19,8 +19,6 @@
 package org.simbrain.network.gui.dialogs.network;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.layouts.GridLayout;
-import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.subnetworks.CompetitiveNetwork;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
@@ -35,21 +33,6 @@ import javax.swing.*;
 public class CompetitiveCreationDialog extends StandardDialog {
 
     /**
-     * Tabbed pane.
-     */
-    private JTabbedPane tabbedPane = new JTabbedPane();
-
-    /**
-     * Logic tab panel.
-     */
-    private JPanel tabLogic = new JPanel();
-
-    /**
-     * Layout tab panel.
-     */
-    private JPanel tabLayout = new JPanel();
-
-    /**
      * Competitive properties panel.
      */
     private AnnotatedPropertyEditor competitivePanel;
@@ -60,52 +43,23 @@ public class CompetitiveCreationDialog extends StandardDialog {
     private CompetitiveNetwork.CompetitiveCreator
             cc = new  CompetitiveNetwork.CompetitiveCreator();
 
-    /**
-     * Layout object.
-     */
-    private Layout layout = new GridLayout();
-
-    /**
-     * Layout panel.
-     */
-    private AnnotatedPropertyEditor layoutPanel;
-
-    /**
-     * Network Panel.
-     */
     private NetworkPanel networkPanel;
 
-    /**
-     * This method is the default constructor.
-     *
-     * @param networkPanel Network panel
-     */
     public CompetitiveCreationDialog(final NetworkPanel networkPanel) {
-        this.networkPanel = networkPanel;
         this.networkPanel = networkPanel;
         setTitle("New Competitive Network");
         competitivePanel = new AnnotatedPropertyEditor(cc);
-        tabLogic.add(competitivePanel);
-        layoutPanel = new AnnotatedPropertyEditor(layout);
-        layout = new GridLayout();
-        tabLayout.add(layoutPanel);
-        tabbedPane.addTab("Logic", tabLogic);
-        tabbedPane.addTab("Layout", layoutPanel);
-        setContentPane(tabbedPane);
+        setContentPane(competitivePanel);
 
         Action helpAction = new ShowHelpAction("Pages/Network/network/competitive.html");
         addButton(new JButton(helpAction));
 
     }
 
-    /**
-     * Called when dialog closes.
-     */
     @Override
     protected void closeDialogOk() {
         competitivePanel.commitChanges();
         CompetitiveNetwork cn = cc.create();
-        layoutPanel.commitChanges();
         networkPanel.getNetwork().addNetworkModelAsync(cn);
         super.closeDialogOk();
     }

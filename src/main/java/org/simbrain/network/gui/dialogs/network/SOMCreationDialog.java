@@ -19,9 +19,6 @@
 package org.simbrain.network.gui.dialogs.network;
 
 import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.layouts.GridLayout;
-import org.simbrain.network.layouts.HexagonalGridLayout;
-import org.simbrain.network.layouts.Layout;
 import org.simbrain.network.subnetworks.SOMNetwork;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
@@ -34,77 +31,26 @@ import javax.swing.*;
  */
 public class SOMCreationDialog extends StandardDialog {
 
-    /**
-     * Tabbed pane.
-     */
-    private JTabbedPane tabbedPane = new JTabbedPane();
-
-    /**
-     * Logic tab panel.
-     */
-    private JPanel tabLogic = new JPanel();
-
-    /**
-     * Layout tab panel.
-     */
-    private JPanel tabLayout = new JPanel();
-
-    /**
-     * SOM properties panel.
-     */
     private AnnotatedPropertyEditor somPanel;
 
-    /**
-     * Creator object
-     */
     private SOMNetwork.SOMCreator sc = new  SOMNetwork.SOMCreator();
 
-    /**
-     * Layout object.
-     */
-    private Layout layout = new HexagonalGridLayout();
-
-    /**
-     * Layout panel.
-     */
-    private AnnotatedPropertyEditor layoutPanel;
-
-    /**
-     * Network Panel.
-     */
     private NetworkPanel networkPanel;
 
-    /**
-     * This method is the default constructor.
-     *
-     * @param networkPanel Network panel
-     */
     public SOMCreationDialog(final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
         setTitle("New SOM Network");
         somPanel = new AnnotatedPropertyEditor(sc);
-        tabLogic.add(somPanel);
-        layoutPanel = new AnnotatedPropertyEditor(layout);
-        layout = new GridLayout();
-        tabLayout.add(layoutPanel);
-        tabbedPane.addTab("Logic", tabLogic);
-        tabbedPane.addTab("Layout", layoutPanel);
-        setContentPane(tabbedPane);
+        setContentPane(somPanel);
 
         Action helpAction = new ShowHelpAction("Pages/Network/network/somnetwork.html");
         addButton(new JButton(helpAction));
     }
 
-    /**
-     * Called when dialog closes.
-     */
     @Override
     protected void closeDialogOk() {
         somPanel.commitChanges();
         SOMNetwork som = sc.create();
-        layoutPanel.commitChanges();
-        som.getSom().setLayout(layout);
-        som.getSom().applyLayout();
         networkPanel.getNetwork().addNetworkModelAsync(som);
         super.closeDialogOk();
     }

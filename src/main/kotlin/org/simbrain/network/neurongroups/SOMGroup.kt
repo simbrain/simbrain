@@ -22,12 +22,14 @@ import org.simbrain.network.core.InfoText
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.XStreamConstructor
+import org.simbrain.network.layouts.HexagonalGridLayout
 import org.simbrain.network.util.SimnetUtils
 import org.simbrain.util.UserParameter
 import org.simbrain.util.Utils
 import org.simbrain.util.propertyeditor.CustomTypeName
 import org.simbrain.util.propertyeditor.GuiEditable
 import kotlin.math.pow
+import kotlin.math.sqrt
 
 /**
  * Implements a Self-Organizing Map
@@ -54,6 +56,11 @@ class SOMGroup @JvmOverloads constructor(
 
     init {
         addNeurons(neurons)
+        neurons.forEach{n ->
+            n.upperBound = 1.0
+            n.lowerBound = -1.0
+        }
+        layout = HexagonalGridLayout(50.0, 50.0, sqrt(neurons.size.toDouble()).toInt())
     }
 
     override fun copy() = SOMGroup(neuronList.map { it.deepCopy() }, params.copy())
@@ -66,8 +73,6 @@ class SOMGroup @JvmOverloads constructor(
     var winner: Neuron? = null
 
     override val customInfo = InfoText(getStateInfoText())
-
-    // this.layout = HexagonalGridLayout(50.0, 50.0, 5)
 
     /**
      * Randomize all weights coming in to this network. The weights will be

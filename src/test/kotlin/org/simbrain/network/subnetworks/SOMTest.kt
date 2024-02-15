@@ -16,7 +16,7 @@ class SOMTest {
 
     @Test
     fun `test som`() {
-        val som = SOMNetwork(1, 2)
+        val som = SOMNetwork(2, 1)
         net.addNetworkModelAsync(som)
         assertEquals(0, net.freeNeurons.size)
         assertEquals(1, som.som.size())

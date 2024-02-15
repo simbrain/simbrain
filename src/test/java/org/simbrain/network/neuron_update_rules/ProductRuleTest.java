@@ -29,7 +29,7 @@ public class ProductRuleTest {
         // Set up the rule.
         productRule.setUpperBound(1);
         productRule.setLowerBound(-1);
-        productRule.useWeights = false;
+        productRule.setUseWeights(false);
 
         // Set up the output neuron
         Neuron output = new Neuron(productRule);
@@ -77,7 +77,7 @@ public class ProductRuleTest {
         // Set up the rule.
         productRule.setUpperBound(1);
         productRule.setLowerBound(-1);
-        productRule.useWeights = false;
+        productRule.setUseWeights(false);
 
         // Set up the output neuron
         Neuron output = new Neuron(productRule);

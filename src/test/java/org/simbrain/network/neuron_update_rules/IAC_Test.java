@@ -25,13 +25,13 @@ public class IAC_Test {
         net.addNetworkModelAsync(iacNeuron);
 
         // See if it decays to provided rest value
-        iacRule.rest = 0.1;
+        iacRule.setRest(0.1);
         IntStream.range(0, 100).forEach(v -> net.update());
         assertEquals(0.1, iacNeuron.getActivation(), 0.01);
 
         // Test decay from above
         iacNeuron.setActivation(1);
-        iacRule.decay = .05;
+        iacRule.setDecay(.05);
         // Upper Bound (u) = 1, lower bound (l) = -1, decay rate(λ) = 0.05, resting value (b) = 0.1,
         // weighted input (W) = 0
         // a = 1 - ((1 - 1)0 - 0.05 (1 - 0.1)) = .955, where w > 0

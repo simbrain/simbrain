@@ -22,7 +22,7 @@ public class SpikeThresholdTest {
         net.addNetworkModelAsync(input1);
 
         // Set up the rule
-        spRule.threshold = 0.4;
+        spRule.setThreshold(0.4);
 
         // Set up the output neuron
         Neuron output = new Neuron(spRule);

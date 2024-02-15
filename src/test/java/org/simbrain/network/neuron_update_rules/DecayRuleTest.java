@@ -20,11 +20,11 @@ public class DecayRuleTest {
 
         // Set decay method to absolute
         DecayRule dr = (DecayRule) n.getUpdateRule();
-        dr.updateType = DecayRule.UpdateType.Absolute;
+        dr.setUpdateType(DecayRule.UpdateType.Absolute);
 
         // Set to 1 and decay by .2
         n.setActivation(1);
-        dr.decayAmount = .2;
+        dr.setDecayAmount(.2);
         net.bufferedUpdate();
         assertEquals(.8, n.getActivation(), .01);
         net.bufferedUpdate();
@@ -48,7 +48,7 @@ public class DecayRuleTest {
         // Set to 1 and decay, with fraction of .1.  We are expecting
         //  1 -> .9 -> .81 -> .729 ->  .6561
         n.setActivation(1);
-        dr.decayFraction = .1;
+        dr.setDecayFraction(.1);
         net.bufferedUpdate();
         assertEquals(.9,n.getActivation(),.001);
         net.bufferedUpdate();
@@ -71,7 +71,7 @@ public class DecayRuleTest {
 
         // Try with different baseline
         n.setActivation(1);
-        dr.baseLine = .5;
+        dr.setBaseLine(.5);
         net.bufferedUpdate();
         assertEquals(.95,n.getActivation(),.001);
         

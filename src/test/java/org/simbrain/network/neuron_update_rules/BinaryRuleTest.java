@@ -19,7 +19,7 @@ public class BinaryRuleTest {
         BinaryRule br = (BinaryRule) n.getUpdateRule();
 
         // Set up rule
-        br.threshold = .5;
+        br.setThreshold(.5);
         br.setUpperBound(1);
         br.setLowerBound(0);
 
@@ -34,7 +34,7 @@ public class BinaryRuleTest {
         assertEquals(1 ,n.getActivation(),.001);
 
         // Test new Threshold
-        br.threshold = .2;
+        br.setThreshold(.2);
         // Below
         n.addInputValue(.19);
         net.bufferedUpdate();

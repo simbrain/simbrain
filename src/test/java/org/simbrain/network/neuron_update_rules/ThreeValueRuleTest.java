@@ -21,12 +21,12 @@ public class ThreeValueRuleTest {
         net.addNetworkModelAsync(input1);
 
         // Set up the rule
-        threeValRule.lowerValue = -0.71;
-        threeValRule.middleValue = 0.1;
-        threeValRule.upperValue = 0.92;
+        threeValRule.setLowerValue(-0.71);
+        threeValRule.setMiddleValue(0.1);
+        threeValRule.setUpperValue(0.92);
 
-        threeValRule.lowerThreshold = 0.3;
-        threeValRule.upperThreshold = 0.65;
+        threeValRule.setLowerThreshold(0.3);
+        threeValRule.setUpperThreshold(0.65);
 
         // Set up the output neuron
         Neuron output = new Neuron(threeValRule);
@@ -55,12 +55,12 @@ public class ThreeValueRuleTest {
         net.addNetworkModelAsync(input1);
 
         // Set up the rule
-        threeValRule.lowerValue = -0.71;
-        threeValRule.middleValue = 0.1;
-        threeValRule.upperValue = 0.92;
+        threeValRule.setLowerValue(-0.71);
+        threeValRule.setMiddleValue(0.1);
+        threeValRule.setUpperValue(0.92);
 
-        threeValRule.lowerThreshold = 0.3;
-        threeValRule.upperThreshold = 0.65;
+        threeValRule.setLowerThreshold(0.3);
+        threeValRule.setUpperThreshold(0.65);
 
         // Set up the output neuron
         Neuron output = new Neuron(threeValRule);
@@ -89,12 +89,12 @@ public class ThreeValueRuleTest {
         net.addNetworkModelAsync(input1);
 
         // Set up the rule
-        threeValRule.lowerValue = -0.71;
-        threeValRule.middleValue = 0.1;
-        threeValRule.upperValue = 0.92;
+        threeValRule.setLowerValue(-0.71);
+        threeValRule.setMiddleValue(0.1);
+        threeValRule.setUpperValue(0.92);
 
-        threeValRule.lowerThreshold = 0.3;
-        threeValRule.upperThreshold = 0.65;
+        threeValRule.setLowerThreshold(0.3);
+        threeValRule.setUpperThreshold(0.65);
 
         // Set up the output neuron
         Neuron output = new Neuron(threeValRule);

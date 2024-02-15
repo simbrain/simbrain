@@ -208,7 +208,7 @@ class OdorWorldEntity @JvmOverloads constructor(
     fun addEffector(effector: Effector) {
         effectors.add(effector)
         if (effector.id == null) {
-            effector.setId(world.effectorIDGenerator.andIncrement)
+            effector.setId(world.effectorIDGenerator.getAndIncrement())
         }
         events.effectorAdded.fireAndForget(effector)
     }
@@ -226,7 +226,7 @@ class OdorWorldEntity @JvmOverloads constructor(
     fun addSensor(sensor: Sensor) {
         sensors.add(sensor)
         if (sensor.id == null) {
-            sensor.id = world.sensorIDGenerator.andIncrement
+            sensor.id = world.sensorIDGenerator.getAndIncrement()
         }
         events.sensorAdded.fireAndForget(sensor)
     }

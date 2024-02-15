@@ -76,7 +76,6 @@ fun Trainable.getTrainingDialog(): StandardDialog {
 fun NetworkPanel.showSRNCreationDialog(): StandardDialog {
 
     val creator = SRNNetwork.SRNCreator(
-        network.idManager.getProposedId(SRNNetwork::class.java),
         network.placementManager.lastClickedLocation
     )
     return creator.createEditorDialog {
@@ -114,7 +113,6 @@ fun main() {
 fun NetworkPanel.showLMSCreationDialog(): StandardDialog {
 
     val creator = LMSNetwork.LMSCreator(
-        network.idManager.getProposedId(LMSNetwork::class.java),
         network.placementManager.lastClickedLocation
     )
     return creator.createEditorDialog {

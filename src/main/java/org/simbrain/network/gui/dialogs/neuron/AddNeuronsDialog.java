@@ -196,7 +196,10 @@ public class AddNeuronsDialog extends StandardDialog {
                 ng.setLayout(layoutObject.getLayout());
                 networkPanel.getNetwork().addNetworkModelAsync(ng);
                 ng.applyLayout();
-                ng.setLabel(groupPanel.tfGroupName.getText());
+                var label = groupPanel.tfGroupName.getText();
+                if (!label.isEmpty()) {
+                    ng.setLabel(label);
+                }
             } else {
                 addedNeurons.forEach(networkPanel.getNetwork()::addNetworkModelAsync);
                 layoutObject.getLayout().layoutNeurons(addedNeurons);
@@ -262,9 +265,6 @@ public class AddNeuronsDialog extends StandardDialog {
             groupPanel.add(Box.createHorizontalStrut(20));
             groupPanel.add(tfNameLabel);
             tfGroupName.setEnabled(addToGroup.isSelected());
-            String dName = networkPanel.getNetwork()
-                    .getIdManager().getProposedId(NeuronGroup.class);
-            tfGroupName.setText(dName);
             groupPanel.add(tfGroupName);
             groupPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
             this.add(groupPanel, BorderLayout.CENTER);
@@ -278,9 +278,6 @@ public class AddNeuronsDialog extends StandardDialog {
         private void addListeners() {
             addToGroup.addActionListener(evt -> {
                 tfGroupName.setEnabled(addToGroup.isSelected());
-                String dName = networkPanel.getNetwork()
-                        .getIdManager().getProposedId(NeuronGroup.class);
-                tfGroupName.setText(dName);
             });
         }
 

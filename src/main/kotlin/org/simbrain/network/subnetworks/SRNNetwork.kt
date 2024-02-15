@@ -139,10 +139,7 @@ class SRNNetwork: FeedForward, Trainable {
     /**
      * Helper class for creating SRN Networks.
      */
-    class SRNCreator(proposedLabel: String, val initialPosition: Point2D) : EditableObject {
-
-        @UserParameter(label = "Label", order = 5)
-        var label = proposedLabel
+    class SRNCreator(val initialPosition: Point2D) : EditableObject {
 
         @UserParameter(label = "Number of inputs", order = 10)
         var nin = 5

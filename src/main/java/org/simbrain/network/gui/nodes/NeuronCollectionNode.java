@@ -58,7 +58,7 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
         this.neuronCollection = nc;
 
         NeuronCollectionInteractionBox interactionBox = new NeuronCollectionInteractionBox(networkPanel);
-        interactionBox.setText(nc.getLabel());
+        interactionBox.setText(nc.getDisplayName());
         setInteractionBox(interactionBox);
     }
 

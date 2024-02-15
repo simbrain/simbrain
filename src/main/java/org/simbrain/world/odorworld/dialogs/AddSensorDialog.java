@@ -65,7 +65,7 @@ public class AddSensorDialog extends StandardDialog {
         ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/OdorWorld/sensors.html");
         addButton(new JButton(helpAction));
         sensorCreatorPanel = new AnnotatedPropertyEditor<>(AnnotatedPropertyEditorKt.objectWrapper("Add Sensor",
-                new SmellSensor(entity.getWorld().getSensorIDGenerator().getProposedId())));
+                new SmellSensor()));
         mainPanel.add(sensorCreatorPanel);
         setContentPane(mainPanel);
     }

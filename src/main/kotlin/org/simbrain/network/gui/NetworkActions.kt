@@ -118,7 +118,6 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         if (neuronList.isNotEmpty()) {
             val nc = NeuronCollection(neuronList)
             if (with(network) { nc.shouldAdd() }) {
-                nc.label = network.idManager.getProposedId(nc::class.java)
                 network.addNetworkModelAsync(nc)
             }
         }
@@ -525,7 +524,6 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     ) {
         objectWrapper("Neuron Group Parameters", BasicNeuronGroupParams() as NeuronGroupParams, showLabeledBorder = false).createEditorDialog {
             it.editingObject.create().also { group ->
-                group.label = network.idManager.getProposedId(group::class.java)
                 group.applyLayout()
                 network.addNetworkModelAsync(group)
             }

@@ -57,10 +57,7 @@ class LMSNetwork : FeedForward, Trainable {
     /**
      * Helper class for creating LMS Networks.
      */
-    class LMSCreator(proposedLabel: String, val initialPosition: Point2D?) : EditableObject {
-
-        @UserParameter(label = "Label", order = 5)
-        private val label = proposedLabel
+    class LMSCreator(val initialPosition: Point2D?) : EditableObject {
 
         @UserParameter(label = "Number of inputs", order = 10)
         var nin = 5

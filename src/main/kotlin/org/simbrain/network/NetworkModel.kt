@@ -104,4 +104,6 @@ abstract class NetworkModel {
      * Override to provide a means of clamping and unclamping a model.
      */
     open fun toggleClamping() {}
+
+    val displayName get() = label ?: id ?: "Uninitialized Network Model"
 }

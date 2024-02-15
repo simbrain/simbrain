@@ -23,20 +23,17 @@ import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Maintains a map from Classes to [SimpleId]'s, to easily manage ids for a set of classes.
- * Can also be used as a way to generate names for objects.
- *
- * See [org.simbrain.network.core.Network] for an example.
  */
 class SimpleIdManager @JvmOverloads constructor (
     /**
      * Associate classes with initial numbers. Like network.class -> networkList.size()
      */
-    var initIdFunction: (Class<*>) -> Int = {1},
+    var initIdFunction: (Class<*>) -> Int = { 1 },
 
     /**
      * Associate classes with id "root" name. Like "NetworkComponent" -> Network
      */
-    var baseNameGenerator: (Class<*>) -> String = { c -> c.simpleName},
+    var baseNameGenerator: (Class<*>) -> String = { c -> c.simpleName },
 
     /**
      * Network_1, Network_2, etc.
@@ -46,7 +43,7 @@ class SimpleIdManager @JvmOverloads constructor (
 
 
     /**
-     * E.g. String.class -> "Neuron_1".  The integer in neuron 1 keeps getting incremented as more neurons are added.
+     * E.g. Neuron.class -> "Neuron_1".  The integer in neuron 1 keeps getting incremented as more neurons are added.
      */
     private val idMap = HashMap<Class<*>, SimpleId>()
 
@@ -63,17 +60,7 @@ class SimpleIdManager @JvmOverloads constructor (
         if (!idMap.containsKey(clazz)) {
             putClassIdMapping(clazz)
         }
-        return idMap[clazz]!!.andIncrement
-    }
-
-    /**
-     * Get the [SimpleId.getProposedId] associated with a class.
-     */
-    fun getProposedId(clazz: Class<*>): String {
-        if (!idMap.containsKey(clazz)) {
-            putClassIdMapping(clazz)
-        }
-        return idMap[clazz]!!.proposedId
+        return idMap[clazz]!!.getAndIncrement()
     }
 
     /**
@@ -81,31 +68,16 @@ class SimpleIdManager @JvmOverloads constructor (
      */
     class SimpleId @JvmOverloads constructor(
         val rootName: String,
-        val initialIndex: Int,
+        initialIndex: Int,
         val delimeter: String = "_"
     ) {
 
-        /**
-         * The starting index.
-         */
-        private val index: AtomicInteger
-
-        init {
-            index = AtomicInteger(initialIndex)
-        }
+        private val index: AtomicInteger = AtomicInteger(initialIndex)
 
         /**
          * Returns a simple identifier and increments id index.
          */
-        val andIncrement: String
-            get() = rootName + delimeter + index.getAndIncrement()
+        fun getAndIncrement(): String = rootName + delimeter + index.getAndIncrement()
 
-        /**
-         * "Peek" ahead the next id that will be made if [.getAndIncrement] is called.
-         */
-        val proposedId: String
-            get() = rootName + delimeter + index
-        val currentIndex: Int
-            get() = index.get()
     }
 }

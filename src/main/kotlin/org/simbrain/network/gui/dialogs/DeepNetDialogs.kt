@@ -23,7 +23,7 @@ import javax.swing.*
  */
 fun NetworkPanel.showDeepNetCreationDialog() {
 
-    val creator = DeepNet.DeepNetCreator(network.idManager.getProposedId(DeepNet::class.java))
+    val creator = DeepNet.DeepNetCreator()
     val dialog = StandardDialog()
     val ape = AnnotatedPropertyEditor(creator)
 
@@ -41,7 +41,7 @@ fun NetworkPanel.showDeepNetCreationDialog() {
     dialog.addCommitTask {
         ape.commitChanges()
         layerList.commitChanges()
-        val deepNet = creator.create(network, layerList.layers)
+        val deepNet = creator.create(layerList.layers)
         network.addNetworkModelAsync(deepNet)
     }
     dialog.pack()

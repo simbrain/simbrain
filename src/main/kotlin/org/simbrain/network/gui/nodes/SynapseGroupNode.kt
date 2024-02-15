@@ -55,7 +55,7 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
         // Note the children pnodes to outlined objects are created in
         // networkpanel and added externally to outlined objects
         interactionBox = SynapseGroupInteractionBox(networkPanel, synapseGroup, this)
-        interactionBox.setText(synapseGroup.label ?: synapseGroup.id)
+        interactionBox.setText(synapseGroup.displayName)
         addChild(interactionBox)
         fun invalidateArrow() {
             when (currentNode) {
@@ -138,7 +138,7 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
      * Update the text in the interaction box.
      */
     fun updateText() {
-        interactionBox.setText(synapseGroup.label)
+        interactionBox.setText(synapseGroup.displayName)
     }
 
     override val isDraggable: Boolean = false

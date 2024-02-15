@@ -66,7 +66,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         }
         invalidateFullBounds()
         weightMatrix.events.showWeightsChanged.on { updateShowWeights() }
-        interactionBox.setText(weightMatrix.label)
+        interactionBox.setText(weightMatrix.displayName)
         addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this)
     }
 

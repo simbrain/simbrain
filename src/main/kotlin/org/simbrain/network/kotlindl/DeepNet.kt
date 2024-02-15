@@ -8,7 +8,6 @@ import org.jetbrains.kotlinx.dl.api.core.metric.Metrics
 import org.jetbrains.kotlinx.dl.dataset.Dataset
 import org.jetbrains.kotlinx.dl.dataset.OnHeapDataset
 import org.simbrain.network.core.ArrayLayer
-import org.simbrain.network.core.Network
 import org.simbrain.network.events.TrainerEvents
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
@@ -247,14 +246,11 @@ class DeepNet(
     /**
      * Helper class for creating new deep networks.
      */
-    class DeepNetCreator(proposedLabel: String) : EditableObject {
-
-        @UserParameter(label = "Label", order = 10)
-        private var label = proposedLabel
+    class DeepNetCreator : EditableObject {
 
         override val name = "Deep Network"
 
-        fun create(net: Network, layers: ArrayList<TFLayer<*>>): DeepNet {
+        fun create(layers: ArrayList<TFLayer<*>>): DeepNet {
             return DeepNet(layers)
         }
     }

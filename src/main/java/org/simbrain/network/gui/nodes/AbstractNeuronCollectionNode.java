@@ -164,11 +164,7 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
      * Default text update. Override for more specific behavior.
      */
     public void updateText() {
-        // Set text to label by default
-        String text = nc.getLabel();
-
-        // Update the text
-        getInteractionBox().setText(text);
+        getInteractionBox().setText(nc.getDisplayName());
     }
 
     /**

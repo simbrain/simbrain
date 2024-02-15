@@ -47,15 +47,6 @@ public class StraightMovement extends Effector {
             order = 4)
     private double scalingFactor = DEFAULT_SCALING_FACTOR;
 
-    /**
-     * Construct the straight movement effector.
-     *
-     * @param label  descriptive label
-     */
-    public StraightMovement(String label) {
-        super(label);
-    }
-
     public StraightMovement() {
         super();
     }

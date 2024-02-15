@@ -63,7 +63,7 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
         super(networkPanel, group);
         this.neuronGroup = group;
         setInteractionBox(new NeuronGroupInteractionBox(networkPanel));
-        getInteractionBox().setText(neuronGroup.getLabel());
+        getInteractionBox().setText(neuronGroup.getDisplayName());
     }
 
     /**

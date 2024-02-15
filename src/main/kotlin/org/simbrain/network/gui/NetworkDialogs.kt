@@ -183,7 +183,7 @@ fun SynapseGroupNode.getDialog(): StandardDialog {
  * Show dialog for Smile classifier creation
  */
 fun NetworkPanel.showClassifierCreationDialog() {
-    val creator = SmileClassifier.ClassifierCreator(network.idManager.getProposedId(SmileClassifier::class.java))
+    val creator = SmileClassifier.ClassifierCreator()
     AnnotatedPropertyEditor(creator).displayInDialog {
         commitChanges()
         network.addNetworkModelAsync(creator.create(network))

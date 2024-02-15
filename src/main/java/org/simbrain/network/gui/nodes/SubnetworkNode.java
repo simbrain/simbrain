@@ -92,7 +92,7 @@ public class SubnetworkNode extends ScreenElement {
         this.networkPanel = networkPanel;
         this.subnetwork = subnet;
         interactionBox = new SubnetworkNodeInteractionBox(networkPanel);
-        interactionBox.setText(subnetwork.getLabel());
+        interactionBox.setText(subnetwork.getDisplayName());
         addChild(outline);
         addChild(interactionBox);
 
@@ -144,7 +144,7 @@ public class SubnetworkNode extends ScreenElement {
      * Update the text in the interaction box.
      */
     public void updateText() {
-        interactionBox.setText(subnetwork.getLabel());
+        interactionBox.setText(subnetwork.getDisplayName());
     }
 
     @Override

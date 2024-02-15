@@ -160,7 +160,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val selectAllAction = networkPanel.createAction(
         name = "Select All",
         description = "Select all network items",
-        keyboardShortcut = KeyCombination('A')
+        keyboardShortcuts = listOf(KeyCombination('A'), CmdOrCtrl + 'A')
     ) {
         selectionManager.selectAll()
     }

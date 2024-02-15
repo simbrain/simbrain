@@ -252,6 +252,7 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
                             property.setter.call(eo, widget.value)
                         }
                     }
+                    eo.onCommit()
                 }
 
             }

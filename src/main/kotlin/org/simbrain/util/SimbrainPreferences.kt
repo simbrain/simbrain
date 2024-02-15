@@ -127,6 +127,8 @@ fun getPreferenceDialog(prefHolder: PreferenceHolder): StandardDialog {
                 if (result == JOptionPane.YES_OPTION) {
                     prefHolder.revertToDefault()
                 }
+                closeDialogCancel()
+                prefHolder.events.forEach { it.invoke() }
             }
         })
         addCommitTask {

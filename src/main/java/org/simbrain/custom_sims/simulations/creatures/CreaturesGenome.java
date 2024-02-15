@@ -120,7 +120,7 @@ public class CreaturesGenome {
      * @param gene The gene to duplicate
      */
     public void dupMutate(CreaturesGene gene) {
-        CreaturesGene dup = gene.deepCopy();
+        CreaturesGene dup = gene.copy();
         // addGene(dup);
     }
 

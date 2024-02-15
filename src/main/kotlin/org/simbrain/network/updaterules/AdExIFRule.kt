@@ -369,7 +369,7 @@ open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), Noi
         return AdexData()
     }
 
-    override fun deepCopy(): AdExIFRule {
+    override fun copy(): AdExIFRule {
         val cpy = AdExIFRule()
         cpy.a = a
         cpy.addNoise = addNoise
@@ -377,7 +377,7 @@ open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), Noi
         cpy.g_L = g_L
         cpy.leakReversal = leakReversal
         cpy.memCapacitance = memCapacitance
-        cpy.noiseGenerator = noiseGenerator.deepCopy()
+        cpy.noiseGenerator = noiseGenerator.copy()
         cpy.slopeFactor = slopeFactor
         cpy.tauW = tauW
         cpy.v_mem = v_mem

@@ -66,7 +66,7 @@ open class NeuronGroup() : AbstractNeuronCollection() {
     }
 
     override fun copy() = NeuronGroup().also {
-        it.addNeurons(neuronList.map(Neuron::deepCopy))
+        it.addNeurons(neuronList.map(Neuron::copy))
         it.label = label
     }
 

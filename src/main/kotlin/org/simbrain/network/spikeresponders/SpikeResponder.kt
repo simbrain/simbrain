@@ -72,7 +72,7 @@ abstract class SpikeResponder : CopyableObject {
     /**
      * @return Spike responder to duplicate.
      */
-    abstract fun deepCopy(): SpikeResponder
+    abstract override fun copy(): SpikeResponder
 
     /**
      * @return the name of the spike responder
@@ -85,9 +85,6 @@ abstract class SpikeResponder : CopyableObject {
          */
         get() = this.javaClass.name.substring(this.javaClass.name.lastIndexOf('.') + 1)
 
-    override fun copy(): SpikeResponder {
-        return deepCopy()
-    }
 }
 
 /**

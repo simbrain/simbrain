@@ -328,7 +328,7 @@ class AllostaticUpdateRule: SpikingNeuronUpdateRule<AllostaticDataHolder, Spikin
         // println("target = ${n.target}, threshold = ${n.threshold}, activation = ${n.activation}")
     }
 
-    override fun deepCopy(): AllostaticUpdateRule {
+    override fun copy(): AllostaticUpdateRule {
         val copy = AllostaticUpdateRule()
         copy.leakRate = leakRate
         copy.learningRate = learningRate

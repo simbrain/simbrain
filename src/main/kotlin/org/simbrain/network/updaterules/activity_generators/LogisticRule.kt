@@ -56,7 +56,7 @@ class LogisticRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>, Activit
     override val timeType: Network.TimeType
         get() = Network.TimeType.DISCRETE
 
-    override fun deepCopy(): LogisticRule {
+    override fun copy(): LogisticRule {
         val ln = LogisticRule()
         ln.growthRate = growthRate
         ln.upperBound = upperBound

@@ -37,7 +37,7 @@ class HebbianRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>() {
     override val name: String
         get() = "Hebbian"
 
-    override fun deepCopy(): SynapseUpdateRule<*, *> {
+    override fun copy(): SynapseUpdateRule<*, *> {
         val h = HebbianRule()
         h.learningRate = learningRate
         return h

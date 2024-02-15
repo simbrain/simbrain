@@ -99,7 +99,7 @@ public class CreaturesGene {
      *
      * @return
      */
-    public CreaturesGene deepCopy() {
+    public CreaturesGene copy() {
         CreaturesGene copy = new CreaturesGene(this.desc, this.duplicatable, this.mutable, this.cuttable, this.gender, this.geneType, this.lifeStage, this.allele);
         return copy;
     }

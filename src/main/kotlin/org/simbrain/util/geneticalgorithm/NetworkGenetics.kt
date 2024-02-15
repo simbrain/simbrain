@@ -45,7 +45,7 @@ class NodeGene(override val template: Neuron) : NetworkGene<Neuron>() {
     }
 
     override fun copy(): NodeGene {
-        return NodeGene(template.deepCopy()).also { listeners.forEach { l -> l(it) } }
+        return NodeGene(template.copy()).also { listeners.forEach { l -> l(it) } }
     }
 
 }

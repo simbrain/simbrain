@@ -63,7 +63,7 @@ class SOMGroup @JvmOverloads constructor(
         layout = HexagonalGridLayout(50.0, 50.0, sqrt(neurons.size.toDouble()).toInt())
     }
 
-    override fun copy() = SOMGroup(neuronList.map { it.deepCopy() }, params.copy())
+    override fun copy() = SOMGroup(neuronList.map { it.copy() }, params.copy())
 
     var neighborhoodSize = params.initNeighborhoodSize
     var learningRate = params.initialLearningRate

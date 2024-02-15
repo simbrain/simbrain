@@ -82,7 +82,7 @@ class ShortTermPlasticityRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixDa
     override val name: String
         get() = "Short Term Plasticity"
 
-    override fun deepCopy(): SynapseUpdateRule<*, *> {
+    override fun copy(): SynapseUpdateRule<*, *> {
         val stp = ShortTermPlasticityRule()
         stp.baseLineStrength = baseLineStrength
         stp.bumpRate = bumpRate

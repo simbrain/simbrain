@@ -32,7 +32,7 @@ class SORNNeuronRule : SpikingThresholdRule(), NoisyUpdateRule {
 
     var refractoryPeriod: Double = 0.0
 
-    override fun deepCopy(): SORNNeuronRule {
+    override fun copy(): SORNNeuronRule {
         val snr = SORNNeuronRule()
         snr.addNoise = addNoise
         snr.noiseGenerator = noiseGenerator

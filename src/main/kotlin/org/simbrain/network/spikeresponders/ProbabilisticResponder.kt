@@ -40,7 +40,7 @@ class ProbabilisticResponder : SpikeResponder() {
     )
     var activationProbability = .5
 
-    override fun deepCopy(): ProbabilisticResponder {
+    override fun copy(): ProbabilisticResponder {
         val pr = ProbabilisticResponder()
         pr.activationProbability = activationProbability
         return pr

@@ -87,7 +87,7 @@ class HebbianCPCARule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>() {
     override val name: String
         get() = "Hebbian CPCA"
 
-    override fun deepCopy(): SynapseUpdateRule<*, *> {
+    override fun copy(): SynapseUpdateRule<*, *> {
         val learningRule = HebbianCPCARule()
         learningRule.learningRate = learningRate
         learningRule.m = m

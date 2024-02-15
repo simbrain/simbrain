@@ -138,7 +138,7 @@ class TimedAccumulatorRule : SpikingThresholdRule() {
     //            s.setPsr(expVal); // Store the exp val of the weight for later use
     //        }
     //    }
-    override fun deepCopy(): TimedAccumulatorRule {
+    override fun copy(): TimedAccumulatorRule {
         val tar = TimedAccumulatorRule()
         tar.baseProb = baseProb
         tar.currentState = currentState

@@ -53,15 +53,11 @@ abstract class ProbabilityDistribution() : CopyableObject {
 
     abstract fun sampleInt(n: Int): IntArray
 
-    abstract fun deepCopy(): ProbabilityDistribution
+    abstract override fun copy(): ProbabilityDistribution
 
     abstract override val name: String
 
     override fun toString() = name
-
-    override fun copy(): ProbabilityDistribution {
-        return deepCopy()
-    }
 
     override fun getTypeList() = probDistTypes
 

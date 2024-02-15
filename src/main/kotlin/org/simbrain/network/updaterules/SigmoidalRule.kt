@@ -55,9 +55,9 @@ class SigmoidalRule : AbstractSigmoidalRule() {
         array.activations = type.valueOf(weightedInputs, lowerBound, upperBound, slope)
     }
 
-    override fun deepCopy(): SigmoidalRule {
+    override fun copy(): SigmoidalRule {
         var sr = SigmoidalRule()
-        sr = super.baseDeepCopy(sr) as SigmoidalRule
+        sr = super.copy(sr) as SigmoidalRule
         return sr
     }
 

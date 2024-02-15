@@ -95,7 +95,7 @@ class IzhikevichRule : SpikingNeuronUpdateRule<SpikingScalarData, SpikingMatrixD
 
     override var addNoise = false
 
-    override fun deepCopy(): IzhikevichRule {
+    override fun copy(): IzhikevichRule {
         val ir = IzhikevichRule()
         ir.a = a
         ir.b = b
@@ -103,7 +103,7 @@ class IzhikevichRule : SpikingNeuronUpdateRule<SpikingScalarData, SpikingMatrixD
         ir.d = d
         ir.setiBg(getiBg())
         ir.addNoise = addNoise
-        ir.noiseGenerator = noiseGenerator.deepCopy()
+        ir.noiseGenerator = noiseGenerator.copy()
         return ir
     }
 

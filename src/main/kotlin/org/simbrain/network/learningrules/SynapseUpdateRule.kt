@@ -89,7 +89,7 @@ abstract class SynapseUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataH
      *
      * @return Duplicated update rule
      */
-    abstract fun deepCopy(): SynapseUpdateRule<*, *>
+    abstract override fun copy(): SynapseUpdateRule<*, *>
 
     /**
      * Returns a name for this learning rule. Used in combo boxes in
@@ -108,10 +108,6 @@ abstract class SynapseUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataH
      */
     fun getToolTipText(synapse: Synapse): String {
         return "(" + synapse.id + ") Strength: " + Utils.round(synapse.strength, MAX_DIGITS)
-    }
-
-    override fun copy(): SynapseUpdateRule<*, *> {
-        return deepCopy()
     }
 
     companion object {

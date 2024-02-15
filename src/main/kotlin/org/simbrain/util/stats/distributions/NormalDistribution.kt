@@ -44,7 +44,7 @@ class NormalDistribution(mean: Double = 0.0, standardDeviation: Double = 1.0): P
 
     override val name = "Normal"
 
-    override fun deepCopy(): NormalDistribution {
+    override fun copy(): NormalDistribution {
         val copy = NormalDistribution()
         copy.randomSeed = randomSeed
         copy.mean = mean

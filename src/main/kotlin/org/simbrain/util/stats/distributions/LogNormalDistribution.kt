@@ -57,7 +57,7 @@ class LogNormalDistribution(location: Double = 1.0, scale: Double = .5, negate: 
 
     val variance get() = (exp(scale * scale) - 1) * exp(2 * location + scale * scale)
 
-    override fun deepCopy(): LogNormalDistribution {
+    override fun copy(): LogNormalDistribution {
         val copy = LogNormalDistribution()
         copy.randomSeed = randomSeed
         copy.location = location

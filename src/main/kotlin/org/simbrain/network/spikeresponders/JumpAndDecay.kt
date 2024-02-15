@@ -61,7 +61,7 @@ class JumpAndDecay : SpikeResponder() {
     )
     var timeConstant = 3.0
 
-    override fun deepCopy(): JumpAndDecay {
+    override fun copy(): JumpAndDecay {
         val jad = JumpAndDecay()
         jad.baseLine = baseLine
         jad.jumpHeight = jumpHeight

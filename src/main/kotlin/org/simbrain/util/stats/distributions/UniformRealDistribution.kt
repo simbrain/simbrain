@@ -47,7 +47,7 @@ class UniformRealDistribution(floor:Double = 0.0, ceil: Double = 1.0) : Probabil
 
     override val name = "Uniform (Real)"
 
-    override fun deepCopy(): UniformRealDistribution {
+    override fun copy(): UniformRealDistribution {
         val copy = UniformRealDistribution()
         copy.randomSeed = randomSeed
         copy.dist = org.apache.commons.math3.distribution.UniformRealDistribution(randomGenerator, floor, ceil)

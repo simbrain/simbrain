@@ -80,7 +80,7 @@ open class CompetitiveGroup @JvmOverloads constructor(
         }
     }
 
-    override fun copy() = CompetitiveGroup(neuronList.map { it.deepCopy() }, params.copy()).also {
+    override fun copy() = CompetitiveGroup(neuronList.map { it.copy() }, params.copy()).also {
         it.max = this.max
         it.activation = this.activation
     }

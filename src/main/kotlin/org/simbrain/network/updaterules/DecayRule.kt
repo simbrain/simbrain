@@ -132,7 +132,7 @@ open class DecayRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>(), C
     override val timeType: Network.TimeType
         get() = Network.TimeType.DISCRETE
 
-    override fun deepCopy(): DecayRule {
+    override fun copy(): DecayRule {
         val dn = DecayRule()
         dn.updateType = updateType
         dn.decayAmount = decayAmount
@@ -141,7 +141,7 @@ open class DecayRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>(), C
         dn.upperBound = upperBound
         dn.lowerBound = lowerBound
         dn.addNoise = addNoise
-        dn.noiseGenerator = noiseGenerator.deepCopy()
+        dn.noiseGenerator = noiseGenerator.copy()
         return dn
     }
 

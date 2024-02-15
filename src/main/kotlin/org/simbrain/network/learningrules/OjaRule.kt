@@ -47,7 +47,7 @@ class OjaRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>() {
     override val name: String
         get() = "Oja"
 
-    override fun deepCopy(): SynapseUpdateRule<*, *> {
+    override fun copy(): SynapseUpdateRule<*, *> {
         val os = OjaRule()
         os.normalizationFactor = normalizationFactor
         os.learningRate = learningRate

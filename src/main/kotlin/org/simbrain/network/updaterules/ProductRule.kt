@@ -20,7 +20,7 @@ class ProductRule : LinearRule() {
     )
     var useWeights: Boolean = DEFAULT_USE_WEIGHTS
 
-    override fun deepCopy(): ProductRule {
+    override fun copy(): ProductRule {
         val pr = ProductRule()
         pr.useWeights = useWeights
         pr.addNoise = addNoise

@@ -45,7 +45,7 @@ class ExponentialDistribution(lambda: Double = 1.0, negate: Boolean = false)
 
     val variance get() = 1/(lambda*lambda)
 
-    override fun deepCopy(): ProbabilityDistribution {
+    override fun copy(): ProbabilityDistribution {
         val copy = ExponentialDistribution()
         copy.randomSeed = randomSeed
         copy.lambda = lambda

@@ -115,7 +115,7 @@ class NakaRushtonRule : NeuronUpdateRule<NakaScalarData, NakaMatrixData>(), Clip
     override val timeType: Network.TimeType
         get() = Network.TimeType.CONTINUOUS
 
-    override fun deepCopy(): NakaRushtonRule {
+    override fun copy(): NakaRushtonRule {
         val rn = NakaRushtonRule()
         rn.steepness = steepness
         rn.semiSaturationConstant = semiSaturationConstant
@@ -124,7 +124,7 @@ class NakaRushtonRule : NeuronUpdateRule<NakaScalarData, NakaMatrixData>(), Clip
         rn.useAdaptation = useAdaptation
         rn.adaptationParameter = adaptationParameter
         rn.adaptationTimeConstant = adaptationTimeConstant
-        rn.noiseGenerator = noiseGenerator.deepCopy()
+        rn.noiseGenerator = noiseGenerator.copy()
         rn.timeStepSupplier = timeStepSupplier
         return rn
     }

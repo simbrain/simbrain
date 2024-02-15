@@ -40,7 +40,7 @@ class RunningAverageRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>() 
     /**
      * {@inheritDoc}
      */
-    override fun deepCopy(): RunningAverageRule {
+    override fun copy(): RunningAverageRule {
         val cn = RunningAverageRule()
         cn.rateConstant = rateConstant
         return cn

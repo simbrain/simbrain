@@ -33,7 +33,7 @@ class ConvolvedJumpAndDecay() : SpikeResponder() {
     )
     var timeConstant = 3.0
 
-    override fun deepCopy(): ConvolvedJumpAndDecay {
+    override fun copy(): ConvolvedJumpAndDecay {
         val jad = ConvolvedJumpAndDecay()
         jad.baseLine = baseLine
         return jad

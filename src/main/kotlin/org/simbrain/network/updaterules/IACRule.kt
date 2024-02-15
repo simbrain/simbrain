@@ -58,7 +58,7 @@ class IACRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), ClippedUpd
     override val timeType: Network.TimeType
         get() = Network.TimeType.DISCRETE
 
-    override fun deepCopy(): IACRule {
+    override fun copy(): IACRule {
         val iac = IACRule()
         iac.decay = decay
         iac.rest = rest
@@ -66,7 +66,7 @@ class IACRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), ClippedUpd
         iac.upperBound = upperBound
         iac.lowerBound = lowerBound
         iac.addNoise = addNoise
-        iac.noiseGenerator = noiseGenerator.deepCopy()
+        iac.noiseGenerator = noiseGenerator.copy()
         return iac
     }
 

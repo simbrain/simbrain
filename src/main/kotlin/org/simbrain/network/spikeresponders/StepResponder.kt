@@ -105,7 +105,7 @@ class StepResponder(
         return StepResponderData()
     }
 
-    override fun deepCopy(): StepResponder {
+    override fun copy(): StepResponder {
         val st = StepResponder()
         st.responseHeight = responseHeight
         st.responseDuration = responseDuration

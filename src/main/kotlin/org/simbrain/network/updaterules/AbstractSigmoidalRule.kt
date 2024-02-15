@@ -55,13 +55,13 @@ abstract class AbstractSigmoidalRule : NeuronUpdateRule<BiasedScalarData, Biased
      * @param sr the sigmoid rule to copy
      * @return the copy.
      */
-    protected fun baseDeepCopy(sr: AbstractSigmoidalRule): AbstractSigmoidalRule {
+    protected fun copy(sr: AbstractSigmoidalRule): AbstractSigmoidalRule {
         sr.type = type
         sr.slope = slope
         sr.addNoise = addNoise
         sr.lowerBound = lowerBound
         sr.upperBound = upperBound
-        sr.noiseGenerator = noiseGenerator.deepCopy()
+        sr.noiseGenerator = noiseGenerator.copy()
         return sr
     }
 

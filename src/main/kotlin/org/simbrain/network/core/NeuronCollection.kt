@@ -76,7 +76,7 @@ class NeuronCollection : AbstractNeuronCollection {
      * @param base the neuron update rule to set.
      */
     fun setNeuronType(base: NeuronUpdateRule<*, *>) {
-        neuronList.forEach(Consumer { n: Neuron -> n.updateRule = base.deepCopy() })
+        neuronList.forEach(Consumer { n: Neuron -> n.updateRule = base.copy() })
     }
 
     /**

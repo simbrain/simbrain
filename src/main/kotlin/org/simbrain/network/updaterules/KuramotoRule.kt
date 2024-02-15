@@ -89,14 +89,14 @@ class KuramotoRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Diffe
     override val timeType: Network.TimeType
         get() = Network.TimeType.DISCRETE
 
-    override fun deepCopy(): KuramotoRule {
+    override fun copy(): KuramotoRule {
         val kr = KuramotoRule()
         kr.slope = slope
         kr.isClipped = isClipped
         kr.addNoise = addNoise
         kr.upperBound = upperBound
         kr.lowerBound = lowerBound
-        kr.noiseGenerator = noiseGenerator.deepCopy()
+        kr.noiseGenerator = noiseGenerator.copy()
         return kr
     }
 

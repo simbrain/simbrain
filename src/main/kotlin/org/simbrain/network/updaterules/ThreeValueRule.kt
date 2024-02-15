@@ -70,7 +70,7 @@ class ThreeValueRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>() {
          */
         get() = Network.TimeType.DISCRETE
 
-    override fun deepCopy(): ThreeValueRule {
+    override fun copy(): ThreeValueRule {
         val tv = ThreeValueRule()
         tv.bias = bias
         tv.lowerThreshold = lowerThreshold

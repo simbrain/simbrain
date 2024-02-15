@@ -34,7 +34,7 @@ class NonResponder : SpikeResponder() {
         // No implementation. The responder is bypassed.
     }
 
-    override fun deepCopy(): SpikeResponder {
+    override fun copy(): SpikeResponder {
         return NonResponder()
     }
 

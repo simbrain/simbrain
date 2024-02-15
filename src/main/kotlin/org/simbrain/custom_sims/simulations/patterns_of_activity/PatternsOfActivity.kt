@@ -415,7 +415,7 @@ class PatternsOfActivity : Simulation {
 
         private val saturation = 3000.0
 
-        override fun deepCopy(): NormIFRule {
+        override fun copy(): NormIFRule {
             val ifn = NormIFRule(index)
             ifn.restingPotential = restingPotential
             ifn.resetPotential = resetPotential
@@ -424,7 +424,7 @@ class PatternsOfActivity : Simulation {
             ifn.timeConstant = timeConstant
             ifn.resistance = resistance
             ifn.addNoise = addNoise
-            ifn.noiseGenerator = noiseGenerator.deepCopy()
+            ifn.noiseGenerator = noiseGenerator.copy()
             return ifn
         }
 

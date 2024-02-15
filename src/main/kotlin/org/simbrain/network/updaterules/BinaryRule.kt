@@ -40,7 +40,7 @@ class BinaryRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData> {
         this.threshold = threshold
     }
 
-    override fun deepCopy(): BinaryRule {
+    override fun copy(): BinaryRule {
         val bn = BinaryRule()
         bn.threshold = threshold
         bn.setCeiling(upperBound)

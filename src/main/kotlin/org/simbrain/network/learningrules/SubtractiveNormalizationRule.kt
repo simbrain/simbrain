@@ -41,7 +41,7 @@ class SubtractiveNormalizationRule : SynapseUpdateRule<EmptyScalarData, EmptyMat
     override val name: String
         get() = "Subtractive Normalization"
 
-    override fun deepCopy(): SynapseUpdateRule<*, *> {
+    override fun copy(): SynapseUpdateRule<*, *> {
         val sns = SubtractiveNormalizationRule()
         sns.learningRate = learningRate
         return sns

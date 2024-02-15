@@ -270,7 +270,7 @@ class HodgkinHuxleyRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), 
         this.vClampValue = convertV(vClampValue)
     }
 
-    override fun deepCopy(): NeuronUpdateRule<*, *> {
+    override fun copy(): NeuronUpdateRule<*, *> {
         val hhr = HodgkinHuxleyRule()
         hhr.set_vClampValue(this.get_vClampValue())
         hhr.addNoise = this.addNoise

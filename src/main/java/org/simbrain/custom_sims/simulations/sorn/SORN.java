@@ -76,7 +76,7 @@ public class SORN extends Simulation {
             sornRule.setRefractoryPeriod(1);
             sornRule.setAddNoise(true);
             n.setPolarity(Polarity.EXCITATORY);
-            n.setUpdateRule(sornRule.deepCopy());
+            n.setUpdateRule(sornRule.copy());
             neurons.add(n);
         }
         SORNNeuronRule str = new SORNNeuronRule();
@@ -87,7 +87,7 @@ public class SORN extends Simulation {
             str.setRefractoryPeriod(1);
             str.setAddNoise(true);
             n.setPolarity(Polarity.INHIBITORY);
-            n.setUpdateRule(str.deepCopy());
+            n.setUpdateRule(str.copy());
             inhibitoryNeurons.add(n);
         }
 
@@ -133,7 +133,7 @@ public class SORN extends Simulation {
             sornRule.setMaxThreshold(0.5);
             sornRule.setThreshold(0.5 * Math.random() + 0.01);
             n.setPolarity(Polarity.EXCITATORY);
-            n.setUpdateRule(sornRule.deepCopy());
+            n.setUpdateRule(sornRule.copy());
             inNeurons.add(n);
         }
 

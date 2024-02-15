@@ -161,7 +161,7 @@ class PfisterGerstner2006Rule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixDa
     override val name: String
         get() = "Pfister and Gerstner, 2006"
 
-    override fun deepCopy(): SynapseUpdateRule<*, *> {
+    override fun copy(): SynapseUpdateRule<*, *> {
         // We're only using primitive fields so clone() works.
         try {
             return clone() as PfisterGerstner2006Rule

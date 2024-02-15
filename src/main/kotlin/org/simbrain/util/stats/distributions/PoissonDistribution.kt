@@ -44,7 +44,7 @@ class PoissonDistribution(p: Double = 1.0, negate: Boolean = false)
 
     override val name = "Poisson"
 
-    override fun deepCopy(): PoissonDistribution {
+    override fun copy(): PoissonDistribution {
         val copy = PoissonDistribution()
         copy.randomSeed = randomSeed
         copy.p = p

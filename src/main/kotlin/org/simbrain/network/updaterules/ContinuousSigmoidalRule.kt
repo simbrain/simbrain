@@ -61,9 +61,9 @@ class ContinuousSigmoidalRule : AbstractSigmoidalRule {
         this.type = sFunction
     }
 
-    override fun deepCopy(): ContinuousSigmoidalRule {
+    override fun copy(): ContinuousSigmoidalRule {
         var sn = ContinuousSigmoidalRule()
-        sn = (super.baseDeepCopy(sn) as ContinuousSigmoidalRule)
+        sn = (super.copy(sn) as ContinuousSigmoidalRule)
         sn.timeConstant = timeConstant
         sn.leakConstant = leakConstant
         return sn

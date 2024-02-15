@@ -36,7 +36,7 @@ class SoftmaxGroup(neurons: List<Neuron>): NeuronGroup(), CopyableObject {
         neuronList.forEachIndexed { i, n -> n.activation = exponentials[i]/total }
     }
 
-    override fun copy() = SoftmaxGroup(neuronList.map { it.deepCopy() })
+    override fun copy() = SoftmaxGroup(neuronList.map { it.copy() })
 }
 
 @CustomTypeName("Softmax")

@@ -49,7 +49,7 @@ class ParetoDistribution(shape: Double = 3.0, scale: Double = 1.0, negate: Boole
 
     override fun sampleInt(n: Int) = dist.sample(n).toIntArray().conditionalNegate()
 
-    override fun deepCopy(): ParetoDistribution {
+    override fun copy(): ParetoDistribution {
         val copy = ParetoDistribution()
         copy.randomSeed = randomSeed
         copy.shape = shape

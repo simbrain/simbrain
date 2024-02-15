@@ -234,7 +234,7 @@ class PointNeuronRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>() {
     override val timeType: Network.TimeType
         get() = Network.TimeType.DISCRETE
 
-    override fun deepCopy(): PointNeuronRule {
+    override fun copy(): PointNeuronRule {
         val cn = PointNeuronRule()
         // TODO
         return cn

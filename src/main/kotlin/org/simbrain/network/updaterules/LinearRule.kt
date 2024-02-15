@@ -116,14 +116,14 @@ open class LinearRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>(), 
     override val timeType: Network.TimeType
         get() = Network.TimeType.DISCRETE
 
-    override fun deepCopy(): LinearRule {
+    override fun copy(): LinearRule {
         val ln = LinearRule()
         ln.slope = slope
         ln.clippingType = clippingType
         ln.addNoise = addNoise
         ln.upperBound = upperBound
         ln.lowerBound = lowerBound
-        ln.noiseGenerator = noiseGenerator.deepCopy()
+        ln.noiseGenerator = noiseGenerator.copy()
         return ln
     }
 

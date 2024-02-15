@@ -84,12 +84,12 @@ class SinusoidalRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Act
     override val timeType: Network.TimeType
         get() = Network.TimeType.DISCRETE
 
-    override fun deepCopy(): SinusoidalRule {
+    override fun copy(): SinusoidalRule {
         val sn = SinusoidalRule()
         sn.phase = phase
         sn.frequency = frequency
         sn.addNoise = addNoise
-        sn.noiseGenerator = noiseGenerator.deepCopy()
+        sn.noiseGenerator = noiseGenerator.copy()
         return sn
     }
 

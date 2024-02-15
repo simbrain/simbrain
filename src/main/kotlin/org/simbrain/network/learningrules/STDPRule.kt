@@ -118,7 +118,7 @@ open class STDPRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData> {
         this.isContinuous = continuous
     }
 
-    override fun deepCopy(): SynapseUpdateRule<*, *> {
+    override fun copy(): SynapseUpdateRule<*, *> {
         val duplicateSynapse = STDPRule()
         duplicateSynapse.tau_minus = tau_minus
         duplicateSynapse.tau_plus = tau_plus

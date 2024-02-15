@@ -61,7 +61,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
      */
     constructor(n: Neuron) {
         updatePriority = n.updatePriority
-        updateRule = n.updateRule.deepCopy()
+        updateRule = n.updateRule.copy()
         dataHolder = n.dataHolder.copy()
         clamped = n.clamped
         increment = n.increment
@@ -245,7 +245,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
     @UserParameter(label = "State variables", order = 100)
     var dataHolder: ScalarDataHolder = updateRule.createScalarData()
 
-    fun deepCopy(): Neuron = Neuron(this)
+    fun copy(): Neuron = Neuron(this)
 
     override fun postOpenInit() {
         events = NeuronEvents()

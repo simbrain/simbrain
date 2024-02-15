@@ -17,7 +17,7 @@ class AddSTDPRule : STDPRule() {
     override val name: String
         get() = "STDP"
 
-    override fun deepCopy(): SynapseUpdateRule<*, *> {
+    override fun copy(): SynapseUpdateRule<*, *> {
         val duplicateSynapse = STDPRule()
         duplicateSynapse.tau_minus = this.tau_minus
         duplicateSynapse.tau_plus = this.tau_plus

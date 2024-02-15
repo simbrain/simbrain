@@ -243,7 +243,7 @@ class MorrisLecarRule : SpikingNeuronUpdateRule<MorrisLecarData, SpikingMatrixDa
         return Math.cosh((vMembrane - v_w1) / (2 * v_w2))
     }
 
-    override fun deepCopy(): MorrisLecarRule {
+    override fun copy(): MorrisLecarRule {
         val cpy = MorrisLecarRule()
         cpy.addNoise = addNoise
         cpy.g_Ca = g_Ca
@@ -260,7 +260,7 @@ class MorrisLecarRule : SpikingNeuronUpdateRule<MorrisLecarData, SpikingMatrixDa
         cpy.vRest_Ca = vRest_Ca
         cpy.vRest_k = vRest_k
         cpy.vRest_L = vRest_L
-        cpy.noiseGenerator = noiseGenerator.deepCopy()
+        cpy.noiseGenerator = noiseGenerator.copy()
         return cpy
     }
 

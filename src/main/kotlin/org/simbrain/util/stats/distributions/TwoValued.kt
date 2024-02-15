@@ -41,7 +41,7 @@ class TwoValued(
 
     val variance get() = .5 * (p * p + ((1-p) * (1-p))) * ((upperValue - lowerValue) * (upperValue - lowerValue))
 
-    override fun deepCopy(): TwoValued {
+    override fun copy(): TwoValued {
         val copy = TwoValued()
         copy.randomSeed = randomSeed
         copy.lowerValue = lowerValue

@@ -100,14 +100,14 @@ class FitzhughNagumo : SpikingNeuronUpdateRule<FitzHughData, FitzHughMatrixData>
         order = 3
     )
     var c = 0.8
-    override fun deepCopy(): FitzhughNagumo {
+    override fun copy(): FitzhughNagumo {
         val copy = FitzhughNagumo()
         copy.a = a
         copy.b = b
         copy.c = c
         copy.threshold = threshold
         copy.addNoise = addNoise
-        copy.noiseGenerator = noiseGenerator.deepCopy()
+        copy.noiseGenerator = noiseGenerator.copy()
         return copy
     }
 

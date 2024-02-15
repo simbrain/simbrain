@@ -49,7 +49,7 @@ class StochasticRule : SpikingNeuronUpdateRule<SpikingScalarData, SpikingMatrixD
     override val timeType: Network.TimeType
         get() = Network.TimeType.DISCRETE
 
-    override fun deepCopy(): StochasticRule {
+    override fun copy(): StochasticRule {
         val sn = StochasticRule()
         sn.firingProbability = firingProbability
         return sn

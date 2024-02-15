@@ -38,12 +38,12 @@ class AdditiveRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Noisy
     override val timeType: Network.TimeType
         get() = Network.TimeType.CONTINUOUS
 
-    override fun deepCopy(): AdditiveRule {
+    override fun copy(): AdditiveRule {
         val an = AdditiveRule()
         an.lambda = lambda
         an.resistance = resistance
         an.addNoise = addNoise
-        an.noiseGenerator = noiseGenerator.deepCopy()
+        an.noiseGenerator = noiseGenerator.copy()
         return an
     }
 

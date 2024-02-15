@@ -52,7 +52,7 @@ class RiseAndDecay : SpikeResponder() {
     )
     var timeConstant = 3.0
 
-    override fun deepCopy(): RiseAndDecay {
+    override fun copy(): RiseAndDecay {
         val rad = RiseAndDecay()
         rad.maximumResponse = maximumResponse
         rad.timeConstant = timeConstant

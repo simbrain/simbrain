@@ -219,14 +219,14 @@ class ProbabilityDistributionTest {
     fun `test deep copy`() {
         run {
             val dist1 = NormalDistribution(1.0, .5)
-            val dist2 = dist1.deepCopy()
+            val dist2 = dist1.copy()
             assertTrue((dist1.randomSeed == dist2.randomSeed))
             assertTrue((dist1.mean == dist2.mean))
             assertTrue((dist1.standardDeviation == dist2.standardDeviation))
         }
         run {
             val dist1 = TwoValued()
-            val dist2 = dist1.deepCopy()
+            val dist2 = dist1.copy()
             assertTrue((dist1.randomSeed == dist2.randomSeed))
             assertTrue((dist1.upperValue == dist2.upperValue))
             assertTrue((dist1.lowerValue == dist2.lowerValue))
@@ -276,7 +276,7 @@ class ProbabilityDistributionTest {
         run {
             val dist1: ProbabilityDistribution = UniformRealDistribution()
             dist1.randomSeed = 1
-            val dist2 = dist1.deepCopy()
+            val dist2 = dist1.copy()
             val xml1 = ProbabilityDistribution.getXStream().toXML(dist1)
             val xml2 = ProbabilityDistribution.getXStream().toXML(dist2)
             val deserialized1 = ProbabilityDistribution.getXStream().fromXML(xml1) as UniformRealDistribution
@@ -286,7 +286,7 @@ class ProbabilityDistributionTest {
         // No seed set, should get different results
         run {
             val dist1: ProbabilityDistribution = UniformRealDistribution()
-            val dist2 = dist1.deepCopy()
+            val dist2 = dist1.copy()
             val xml1 = ProbabilityDistribution.getXStream().toXML(dist1)
             val xml2 = ProbabilityDistribution.getXStream().toXML(dist2)
             val deserialized1 = ProbabilityDistribution.getXStream().fromXML(xml1) as UniformRealDistribution

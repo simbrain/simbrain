@@ -53,7 +53,7 @@ class WinnerTakeAll @JvmOverloads constructor(
         addNeurons(neurons)
     }
 
-    override fun copy() = WinnerTakeAll(neuronList.map { it.deepCopy() }, params.copy())
+    override fun copy() = WinnerTakeAll(neuronList.map { it.copy() }, params.copy())
 
     context(Network)
     override fun update() {

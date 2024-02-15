@@ -98,7 +98,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
     var learningRule = DEFAULT_LEARNING_RULE
         set(newLearningRule) {
             val oldRule = learningRule
-            field = newLearningRule.deepCopy()
+            field = newLearningRule.copy()
             // TODO: Needed for calls to SynapseGroup.postOpenInit, which calls
             // SynapseGroup.setAndComformToTemplate. Template synapses don't seem to have
             // change support initialized.
@@ -274,7 +274,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
         target: Neuron,
         templateSynapse: Synapse
     ) : this(source, target) {
-        learningRule = templateSynapse.learningRule.deepCopy()
+        learningRule = templateSynapse.learningRule.copy()
         forceSetStrength(templateSynapse.strength)
         upperBound = templateSynapse.upperBound
         lowerBound = templateSynapse.lowerBound

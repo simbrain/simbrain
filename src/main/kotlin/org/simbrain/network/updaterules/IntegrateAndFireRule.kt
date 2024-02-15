@@ -120,7 +120,7 @@ open class IntegrateAndFireRule : SpikingNeuronUpdateRule<SpikingScalarData, Spi
      */
     override var addNoise = false
 
-    override fun deepCopy(): IntegrateAndFireRule {
+    override fun copy(): IntegrateAndFireRule {
         val ifn = IntegrateAndFireRule()
         ifn.restingPotential = restingPotential
         ifn.resetPotential = resetPotential
@@ -129,7 +129,7 @@ open class IntegrateAndFireRule : SpikingNeuronUpdateRule<SpikingScalarData, Spi
         ifn.timeConstant = timeConstant
         ifn.resistance = resistance
         ifn.addNoise = addNoise
-        ifn.noiseGenerator = noiseGenerator.deepCopy()
+        ifn.noiseGenerator = noiseGenerator.copy()
         return ifn
     }
 

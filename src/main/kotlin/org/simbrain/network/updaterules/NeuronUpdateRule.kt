@@ -23,7 +23,6 @@ import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.SpikingNeuronUpdateRule
-import org.simbrain.network.updaterules.*
 import org.simbrain.network.updaterules.activity_generators.LogisticRule
 import org.simbrain.network.updaterules.activity_generators.RandomNeuronRule
 import org.simbrain.network.updaterules.activity_generators.SinusoidalRule
@@ -91,9 +90,6 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
      * @return the description.
      */
     abstract override val name: String
-    override fun copy(): NeuronUpdateRule<*, *> {
-        return deepCopy()
-    }
 
     /**
      * Returns the type of time update (discrete or continuous) associated with this neuron.
@@ -107,7 +103,7 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
      *
      * @return Duplicated update rule
      */
-    abstract fun deepCopy(): NeuronUpdateRule<*, *>
+    abstract override fun copy(): NeuronUpdateRule<*, *>
 
     /**
      * Increment a neuron by increment.

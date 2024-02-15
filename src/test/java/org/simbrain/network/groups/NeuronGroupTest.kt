@@ -19,7 +19,7 @@ class NeuronGroupTest {
 
 
     @Test
-    fun testDeepCopy() {
+    fun testCopy() {
         val ng2 = ng.copy()
         net.addNetworkModelAsync(ng2)
         Assertions.assertEquals(2, ng2.neuronList.size)

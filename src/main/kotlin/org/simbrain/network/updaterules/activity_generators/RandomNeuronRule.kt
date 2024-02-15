@@ -54,12 +54,12 @@ class RandomNeuronRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>, Act
     constructor() : super()
 
     constructor(rn: RandomNeuronRule, n: Neuron?) : super() {
-        noiseGenerator = rn.noiseGenerator.deepCopy()
+        noiseGenerator = rn.noiseGenerator.copy()
     }
 
-    override fun deepCopy(): RandomNeuronRule {
+    override fun copy(): RandomNeuronRule {
         val rn = RandomNeuronRule()
-        rn.noiseGenerator = noiseGenerator.deepCopy()
+        rn.noiseGenerator = noiseGenerator.copy()
         return rn
     }
 

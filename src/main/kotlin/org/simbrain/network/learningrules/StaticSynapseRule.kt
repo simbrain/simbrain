@@ -34,7 +34,7 @@ open class StaticSynapseRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixDat
         // TODO Auto-generated method stub
     }
 
-    override fun deepCopy(): SynapseUpdateRule<*, *> {
+    override fun copy(): SynapseUpdateRule<*, *> {
         val cs = StaticSynapseRule()
         return cs
     }

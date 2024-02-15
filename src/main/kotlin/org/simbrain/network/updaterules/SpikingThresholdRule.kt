@@ -37,7 +37,7 @@ open class SpikingThresholdRule : SpikingNeuronUpdateRule<SpikingScalarData, Spi
      */
     override var addNoise: Boolean = false
 
-    override fun deepCopy(): SpikingThresholdRule {
+    override fun copy(): SpikingThresholdRule {
         val neuron = SpikingThresholdRule()
         neuron.threshold = threshold
         return neuron

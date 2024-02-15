@@ -106,7 +106,7 @@ class UDF : SpikeResponder() {
      * drawn from a distribution, it simply gives a new UDF object which
      * proceeds to draw its parameters from the same distributions.
      */
-    override fun deepCopy(): UDF {
+    override fun copy(): UDF {
         // TODO
         return UDF()
     }

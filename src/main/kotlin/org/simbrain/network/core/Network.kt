@@ -79,46 +79,6 @@ class Network: CoroutineScope, EditableObject {
      */
     val updateManager = NetworkUpdateManager(this)
 
-    @UserParameter(
-        label = "Neuron Connector",
-        description = "Strategy for connecting free neurons.",
-        showDetails = false,
-        order = 0
-    )
-    var connectionStrategy: ConnectionStrategy = AllToAll()
-
-    @UserParameter(
-        label = "Weight Randomizer",
-        description = "Randomizer for all free weights, regardless of polarity. Applying it can change the polarity of a neuron.",
-        showDetails = false,
-        order = 10
-    )
-    var weightRandomizer: ProbabilityDistribution = UniformRealDistribution(-1.0, 1.0)
-
-    @UserParameter(
-        label = "Excitatory Randomizer",
-        description = "Randomizer for all weights from polarized excitatory neurons. Applying it will not change the polarity of a neuron.",
-        showDetails = false,
-        order = 20
-    )
-    var excitatoryRandomizer: ProbabilityDistribution = UniformRealDistribution(0.0, 1.0)
-
-    @UserParameter(
-        label = "Inhibitory Randomizer",
-        description = "Randomizer for all weights from polarized inhibitory neurons. Applying it will not change the polarity of a neuron.",
-        showDetails = false,
-        order = 30
-    )
-    var inhibitoryRandomizer: ProbabilityDistribution = UniformRealDistribution(-1.0, 0.0)
-
-    @UserParameter(
-        label = "Bias Randomizer",
-        description = "Randomizer for all biases.",
-        showDetails = false,
-        order = 40
-    )
-    var biasesRandomizer: ProbabilityDistribution = NormalDistribution(0.0, 0.01)
-
     /**
      * In iterations or msec.
      */
@@ -543,6 +503,56 @@ class Network: CoroutineScope, EditableObject {
 
     suspend fun selectModels(models: List<NetworkModel>) {
         events.selected.fire(models)
+    }
+
+    companion object Randomizers: EditableObject {
+        @UserParameter(
+            label = "Neuron Connector",
+            description = "Strategy for connecting free neurons.",
+            showDetails = false,
+            order = 0
+        )
+        var connectionStrategy: ConnectionStrategy = AllToAll()
+
+        @UserParameter(
+            label = "Weight Randomizer",
+            description = "Randomizer for all free weights, regardless of polarity. Applying it can change the polarity of a neuron.",
+            showDetails = false,
+            order = 10
+        )
+        var weightRandomizer: ProbabilityDistribution = UniformRealDistribution(-1.0, 1.0)
+
+        @UserParameter(
+            label = "Excitatory Randomizer",
+            description = "Randomizer for all weights from polarized excitatory neurons. Applying it will not change the polarity of a neuron.",
+            showDetails = false,
+            order = 20
+        )
+        var excitatoryRandomizer: ProbabilityDistribution = UniformRealDistribution(0.0, 1.0)
+
+        @UserParameter(
+            label = "Inhibitory Randomizer",
+            description = "Randomizer for all weights from polarized inhibitory neurons. Applying it will not change the polarity of a neuron.",
+            showDetails = false,
+            order = 30
+        )
+        var inhibitoryRandomizer: ProbabilityDistribution = UniformRealDistribution(-1.0, 0.0)
+
+        @UserParameter(
+            label = "Activation Randomizer",
+            description = "Randomizer for all biases.",
+            showDetails = false,
+            order = 40
+        )
+        var activationRandomizer: ProbabilityDistribution = NormalDistribution(0.0, 1.0)
+
+        @UserParameter(
+            label = "Bias Randomizer",
+            description = "Randomizer for all biases.",
+            showDetails = false,
+            order = 50
+        )
+        var biasesRandomizer: ProbabilityDistribution = NormalDistribution(0.0, 0.01)
     }
 
 }

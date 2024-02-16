@@ -5,6 +5,7 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.EmptyScalarData
 import org.simbrain.util.UserParameter
+import org.simbrain.util.stats.ProbabilityDistribution
 import java.util.*
 
 /**
@@ -95,18 +96,17 @@ class ThreeValueRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>() {
         }
     }
 
-    override val randomValue: Double
-        get() {
-            val rand = Random()
-            val d = rand.nextInt(3)
-            return if (d == 0) {
-                lowerValue
-            } else if (d == 1) {
-                middleValue
-            } else {
-                upperValue
-            }
+    override fun getRandomValue(randomizer: ProbabilityDistribution?): Double {
+        val rand = Random()
+        val d = rand.nextInt(3)
+        return if (d == 0) {
+            lowerValue
+        } else if (d == 1) {
+            middleValue
+        } else {
+            upperValue
         }
+    }
 
     override val name: String = "Three Value"
 

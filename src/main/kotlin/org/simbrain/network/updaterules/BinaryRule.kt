@@ -6,6 +6,7 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.UserParameter
+import org.simbrain.util.stats.ProbabilityDistribution
 import java.util.*
 
 /**
@@ -77,11 +78,10 @@ class BinaryRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData> {
         return BiasedScalarData()
     }
 
-    override val randomValue: Double
-        get() {
-            val rand = Random()
-            return if (rand.nextBoolean()) upperBound else lowerBound
-        }
+    override fun getRandomValue(randomizer: ProbabilityDistribution?): Double {
+        val rand = Random()
+        return if (rand.nextBoolean()) upperBound else lowerBound
+    }
 
     override val name: String
         get() = "Binary"

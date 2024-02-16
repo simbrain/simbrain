@@ -169,8 +169,7 @@ class FitzhughNagumo : SpikingNeuronUpdateRule<FitzHughData, FitzHughMatrixData>
         return FitzHughMatrixData(size)
     }
 
-    override val randomValue: Double
-        get() = 2 * (threshold - c) * Math.random() + c
+    override fun getRandomValue(randomizer: ProbabilityDistribution?): Double = 2 * (threshold - c) * Math.random() + c
 
     fun getiBg(): Double {
         return iBg

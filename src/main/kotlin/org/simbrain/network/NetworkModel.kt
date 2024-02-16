@@ -3,6 +3,7 @@ package org.simbrain.network
 import org.simbrain.network.core.Network
 import org.simbrain.network.events.NetworkModelEvents
 import org.simbrain.util.UserParameter
+import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
 
@@ -82,8 +83,7 @@ abstract class NetworkModel {
     /**
      * Override to provide a means of randomizing a model.
      */
-    context(Network)
-    open fun randomize() {}
+    open fun randomize(randomizer: ProbabilityDistribution? = null) {}
 
     /**
      * Override to provide a means of "clearing" a model.

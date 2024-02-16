@@ -6,6 +6,7 @@ import org.simbrain.network.core.Synapse
 import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.math.SimbrainMath
+import org.simbrain.util.stats.ProbabilityDistribution
 import java.util.*
 
 /**
@@ -313,22 +314,21 @@ class PointNeuronRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>() {
         return BiasedScalarData()
     }
 
-    override val randomValue: Double
-        get() {
-            val rand = Random()
-            return if (outputFunction === OutputFunction.DISCRETE_SPIKING) {
-                if (rand.nextBoolean()) 1.0 else 0.0
-            } else if (outputFunction === OutputFunction.RATE_CODE) {
-                rand.nextDouble()
-            } else if (outputFunction === OutputFunction.LINEAR) {
-                // TODO: better value for this?
-                gain * thresholdPotential * rand.nextDouble()
-            } else if (outputFunction === OutputFunction.NOISY_RATE_CODE) {
-                0.0 // TODO: COmplete implementation
-            } else {
-                rand.nextDouble() // TODO: Better value for this?
-            }
+    override fun getRandomValue(randomizer: ProbabilityDistribution?): Double {
+        val rand = Random()
+        return if (outputFunction === OutputFunction.DISCRETE_SPIKING) {
+            if (rand.nextBoolean()) 1.0 else 0.0
+        } else if (outputFunction === OutputFunction.RATE_CODE) {
+            rand.nextDouble()
+        } else if (outputFunction === OutputFunction.LINEAR) {
+            // TODO: better value for this?
+            gain * thresholdPotential * rand.nextDouble()
+        } else if (outputFunction === OutputFunction.NOISY_RATE_CODE) {
+            0.0 // TODO: COmplete implementation
+        } else {
+            rand.nextDouble() // TODO: Better value for this?
         }
+    }
 
     val inhibitoryThresholdConductance: Double
         /**

@@ -9,7 +9,6 @@ import org.piccolo2d.event.PMouseWheelZoomEventHandler
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.*
-import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.core.*
 import org.simbrain.network.gui.UndoManager.UndoableAction
 import org.simbrain.network.gui.dialogs.NetworkPreferences
@@ -612,12 +611,12 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         with(selectionManager) {
             val sourceNeurons = filterSelectedSourceModels<Neuron>()
             val targetNeurons = filterSelectedModels<Neuron>()
-            network.connectionStrategy.connectNeurons(sourceNeurons, targetNeurons).addToNetworkAsync(network)
+            Network.connectionStrategy.connectNeurons(sourceNeurons, targetNeurons).addToNetworkAsync(network)
         }
     }
 
     /**
-     * Connect free weights using all to all. An important default case.
+     * Connect free weights using the default connection strategy
      */
     fun connectFreeWeights() {
         // TODO: For large numbers of connections maybe pop up a warning and depending on button pressed make the
@@ -629,7 +628,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             val targetNeurons = filterSelectedModels<Neuron>() +
                     filterSelectedModels<NeuronCollection>().flatMap { it.neuronList } +
                     filterSelectedModels<NeuronGroup>().flatMap { it.neuronList }
-            AllToAll().apply { percentExcitatory = 100.0 }.connectNeurons(sourceNeurons, targetNeurons)
+            Network.connectionStrategy.apply { percentExcitatory = 100.0 }.connectNeurons(sourceNeurons, targetNeurons)
                 .addToNetworkAsync(network)
         }
 

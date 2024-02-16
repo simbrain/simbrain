@@ -27,6 +27,7 @@ import org.simbrain.network.util.alignNetworkModels
 import org.simbrain.network.util.offsetNeuronCollections
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.stats.distributions.UniformRealDistribution
 
 /**
  * **CompetitiveNetwork** is a small network encompassing a Competitive
@@ -56,11 +57,12 @@ public class CompetitiveNetwork(numInputNeurons: Int, numCompetitiveNeurons: Int
         inputLayer.label = "Input layer"
         inputLayer.setClamped(true)
         inputLayer.setLayoutBasedOnSize()
-        inputLayer.neuronList.forEach { it.lowerBound = 0.0 }
+        inputLayer.setLowerBound(0.0)
 
         weights = SynapseGroup(inputLayer, competitive)
+        weights.randomize(UniformRealDistribution(0.0, 1.0))
         this.addModel(weights)
-        weights.synapses.forEach{it.lowerBound = 0.0}
+        weights.synapses.forEach { it.lowerBound = 0.0 }
 
         alignNetworkModels(inputLayer, competitive, Alignment.VERTICAL)
         offsetNeuronCollections(inputLayer, competitive, Direction.NORTH, 200.0)

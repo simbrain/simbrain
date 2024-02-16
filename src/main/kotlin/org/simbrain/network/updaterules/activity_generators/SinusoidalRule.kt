@@ -111,10 +111,9 @@ class SinusoidalRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Act
     override val name: String
         get() = "Sinusoidal"
 
-    override val randomValue: Double
-        get() {
-            val rand = (2 * Math.PI) * Math.random()
-            val range = upperBound - lowerBound
-            return ((range / 2) * sin(frequency * rand + phase)) + ((upperBound + lowerBound) / 2)
-        }
+    override fun getRandomValue(randomizer: ProbabilityDistribution?): Double {
+        val rand = (2 * Math.PI) * Math.random()
+        val range = upperBound - lowerBound
+        return ((range / 2) * sin(frequency * rand + phase)) + ((upperBound + lowerBound) / 2)
+    }
 }

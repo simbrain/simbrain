@@ -71,8 +71,7 @@ class RandomNeuronRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>, Act
     override val name: String
         get() = "Random"
 
-    override val randomValue: Double
-        get() = noiseGenerator.sampleDouble()
+    override fun getRandomValue(randomizer: ProbabilityDistribution?): Double = noiseGenerator.sampleDouble()
 
     override var addNoise: Boolean
         get() = true

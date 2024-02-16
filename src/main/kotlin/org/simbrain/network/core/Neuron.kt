@@ -32,6 +32,7 @@ import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.plus
 import org.simbrain.util.point
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
@@ -414,8 +415,8 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
         get() = fanIn.filter { it.strength < 0.0 }
             .sumOf { it.psr }
 
-    override fun randomize() {
-        forceSetActivation(updateRule.randomValue)
+    override fun randomize(randomizer: ProbabilityDistribution?) {
+        forceSetActivation(updateRule.getRandomValue(randomizer))
     }
 
     /**
@@ -558,10 +559,9 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
     /**
      * Randomize all synapses that attach to this neuron.
      */
-    context(Network)
-    fun randomizeFanIn() {
+    fun randomizeFanIn(randomizer: ProbabilityDistribution?) {
         for (synapse in fanIn) {
-            synapse.randomize()
+            synapse.randomize(randomizer)
         }
     }
 

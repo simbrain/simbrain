@@ -21,6 +21,7 @@ package org.simbrain.network.updaterules
 import org.simbrain.custom_sims.simulations.AllostaticUpdateRule
 import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
+import org.simbrain.network.core.Network.Randomizers.activationRandomizer
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.SpikingNeuronUpdateRule
 import org.simbrain.network.updaterules.activity_generators.LogisticRule
@@ -34,6 +35,7 @@ import org.simbrain.network.util.MatrixDataHolder
 import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.util.Utils
 import org.simbrain.util.propertyeditor.CopyableObject
+import org.simbrain.util.stats.ProbabilityDistribution
 import java.util.*
 import java.util.function.Supplier
 
@@ -143,18 +145,8 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
         n.clip()
     }
 
-    open val randomValue: Double
-        /**
-         * Returns a random value between the upper and lower bounds of this neuron. Update rules that require special
-         * randomization should override this method.
-         *
-         * @return the random value.
-         */
-        get() = if (this is BoundedUpdateRule) {
-            ((this as BoundedUpdateRule).upperBound - (this as BoundedUpdateRule).lowerBound) * Math.random() + (this as BoundedUpdateRule).lowerBound
-        } else {
-            2 * Math.random() - 1
-        }
+    open fun getRandomValue(randomizer: ProbabilityDistribution? = null): Double = (randomizer ?: activationRandomizer).sampleDouble()
+
     open val graphicalLowerBound: Double
         /**
          * Returns a value for lower bound to be used in computing the saturation of neuron nodes. Override this to produce

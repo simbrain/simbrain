@@ -76,11 +76,10 @@ open class SpikingThresholdRule : SpikingNeuronUpdateRule<SpikingScalarData, Spi
         }
     }
 
-    override val randomValue: Double
-        get() {
-            val rand = Random()
-            return if (rand.nextBoolean()) 1.0 else 0.0
-        }
+    override fun getRandomValue(randomizer: ProbabilityDistribution?): Double {
+        val rand = Random()
+        return if (rand.nextBoolean()) 1.0 else 0.0
+    }
 
     override val name: String
         get() = "Spiking Threshold"

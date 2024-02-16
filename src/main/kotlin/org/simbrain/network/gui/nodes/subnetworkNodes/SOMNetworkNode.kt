@@ -70,9 +70,7 @@ class SOMNetworkNode(networkPanel: NetworkPanel?, group: SOMNetwork?) : Subnetwo
         val randomizeNet: Action = object : AbstractAction("Randomize synapses") {
             override fun actionPerformed(event: ActionEvent) {
                 val net = (subnetwork as SOMNetwork)
-                with(networkPanel.network) {
-                    net.som.randomizeIncomingWeights()
-                }
+                net.som.randomizeIncomingWeights()
             }
         }
         menu.add(randomizeNet)

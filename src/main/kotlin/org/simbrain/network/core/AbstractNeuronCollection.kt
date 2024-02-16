@@ -10,6 +10,7 @@ import org.simbrain.util.*
 import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.CopyableObject
+import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
 import smile.math.matrix.Matrix
@@ -282,9 +283,8 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
         cachedActivationsDirty = true
     }
 
-    context(Network)
-    override fun randomize() {
-        neuronList.forEach { it.randomize() }
+    override fun randomize(randomizer: ProbabilityDistribution?) {
+        neuronList.forEach { it.randomize(randomizer) }
         invalidateCachedActivations()
     }
 
@@ -314,10 +314,9 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
     /**
      * Randomize fan-in for all neurons in group.
      */
-    context(Network)
-    open fun randomizeIncomingWeights() {
+    open fun randomizeIncomingWeights(randomizer: ProbabilityDistribution? = null) {
         for (neuron in neuronList) {
-            neuron.randomizeFanIn()
+            neuron.randomizeFanIn(randomizer)
         }
     }
 

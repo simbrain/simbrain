@@ -68,10 +68,8 @@ val testSim = newSim {
     sparse.connectNeurons(region1.neuronList, region2.neuronList).addToNetwork(network)
 
     // TODO: Temp because excitatory ratio not working
-    with(network) {
-        region1.randomizeIncomingWeights()
-        region2.randomizeIncomingWeights()
-    }
+    region1.randomizeIncomingWeights()
+    region2.randomizeIncomingWeights()
 
     // Location of the network in the desktop
     withGui {

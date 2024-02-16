@@ -10,6 +10,7 @@ import org.simbrain.util.*
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
@@ -132,7 +133,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
             events.updated.fireAndBlock()
         }
 
-    override fun randomize() {
+    override fun randomize(randomizer: ProbabilityDistribution?) {
         activations = Matrix.rand(
             size(), 1,
             GaussianDistribution(0.0, 1.0)

@@ -97,18 +97,18 @@ class SynapseGroup @JvmOverloads constructor(
 
     fun size(): Int = this.synapses.size
 
-    fun randomizeSymmetric() {
-        randomize()
+    fun randomizeSymmetric(randomizer: ProbabilityDistribution?) {
+        randomize(randomizer)
         this.synapses.forEach { it.symmetricSynapse?.let { s -> it.forceSetStrength(s.strength) } }
         events.updated.fireAndBlock()
     }
 
-    override fun randomize() {
+    override fun randomize(randomizer: ProbabilityDistribution?) {
         this.synapses.forEach {
             when (it.target.polarity) {
                 SimbrainConstants.Polarity.EXCITATORY -> it.forceSetStrength(connectionStrategy.exRandomizer.sampleDouble())
                 SimbrainConstants.Polarity.INHIBITORY -> it.forceSetStrength(connectionStrategy.inRandomizer.sampleDouble())
-                SimbrainConstants.Polarity.BOTH -> it.forceSetStrength(weightRandomizer.sampleDouble())
+                SimbrainConstants.Polarity.BOTH -> it.forceSetStrength((randomizer ?: weightRandomizer).sampleDouble())
             }
         }
     }

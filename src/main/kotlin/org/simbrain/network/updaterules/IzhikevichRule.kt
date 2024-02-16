@@ -130,8 +130,7 @@ class IzhikevichRule : SpikingNeuronUpdateRule<SpikingScalarData, SpikingMatrixD
 
     // Equal chance of spiking or not spiking, taking on any value between
     // the resting potential and the threshold if not.
-    override val randomValue: Double
-        get() = 2 * (threshold - c) * Math.random() + c
+    override fun getRandomValue(randomizer: ProbabilityDistribution?): Double = 2 * (threshold - c) * Math.random() + c
 
     fun getiBg(): Double {
         return iBg

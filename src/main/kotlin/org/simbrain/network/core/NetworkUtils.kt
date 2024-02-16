@@ -4,6 +4,7 @@ import com.thoughtworks.xstream.XStream
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.ConnectionStrategy
+import org.simbrain.network.core.Network.Randomizers.biasesRandomizer
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.updaterules.LinearRule
@@ -12,6 +13,7 @@ import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
+import org.simbrain.util.stats.ProbabilityDistribution
 import java.awt.geom.Point2D
 
 /**
@@ -280,21 +282,19 @@ fun Collection<Neuron>.clamp(clamped: Boolean) {
     forEach { it.clamped = clamped }
 }
 
-context(Network)
-fun Neuron.randomizeBias() {
+fun Neuron.randomizeBias(randomizer: ProbabilityDistribution? = null) {
     dataHolder.let {
         if (it is BiasedScalarData) {
-            it.bias = biasesRandomizer.sampleDouble()
+            it.bias = (randomizer ?: biasesRandomizer).sampleDouble()
         }
     }
 }
 
-context(Network)
-fun NeuronArray.randomizeBiases() {
+fun NeuronArray.randomizeBiases(randomizer: ProbabilityDistribution? = null) {
     dataHolder.let {
         if (it is BiasedMatrixData) {
             for (i in 0 until it.biases.nrow()) {
-                it.biases.set(i, 0, biasesRandomizer.sampleDouble())
+                it.biases.set(i, 0, (randomizer ?: biasesRandomizer).sampleDouble())
             }
             events.updated.fireAndBlock()
         }

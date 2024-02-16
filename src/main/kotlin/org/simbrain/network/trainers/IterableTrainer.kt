@@ -124,7 +124,6 @@ abstract class IterableTrainer(val net: Trainable) : EditableObject {
         net.update()
     }
 
-    context(Network)
     abstract fun randomize()
 
     sealed class UpdateMethod: CopyableObject {
@@ -283,7 +282,6 @@ class BackpropTrainer(val bp: BackpropNetwork) : IterableTrainer(bp) {
         return bp.wmList.backpropError(targetVec)
     }
 
-    context(Network)
     override fun randomize() {
         bp.randomize()
     }
@@ -310,7 +308,6 @@ class SRNTrainer(val srn: SRNNetwork) : IterableTrainer(srn) {
         return weightMatrixTree.backpropError(targetVec, epsilon = learningRate)
     }
 
-    context(Network)
     override fun randomize() {
         srn.randomize()
     }

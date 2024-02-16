@@ -25,6 +25,7 @@ import org.simbrain.network.updaterules.BinaryRule
 import org.simbrain.util.UserParameter
 import org.simbrain.util.format
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.stats.ProbabilityDistribution
 import java.util.*
 import java.util.function.Consumer
 
@@ -79,9 +80,8 @@ class Hopfield(numNeurons: Int) : Subnetwork() {
         infoText = InfoText(stateInfoText)
     }
 
-    context(Network)
-    override fun randomize() {
-        synapseGroup.randomizeSymmetric()
+    override fun randomize(randomizer: ProbabilityDistribution?) {
+        synapseGroup.randomizeSymmetric(randomizer)
     }
 
     context(Network)

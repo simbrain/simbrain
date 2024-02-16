@@ -24,6 +24,7 @@ import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.CustomTypeName
 import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.util.stats.ProbabilityDistribution
 
 /**
  * Implements a simple competitive network.
@@ -221,8 +222,7 @@ open class CompetitiveGroup @JvmOverloads constructor(
      * Randomize all weights coming in to this network.
      * TODO: Add gaussian option...
      */
-    context(Network)
-    override fun randomizeIncomingWeights() {
+    override fun randomizeIncomingWeights(randomizer: ProbabilityDistribution?) {
         val i: Iterator<Neuron> = neuronList.iterator()
         while (i.hasNext()) {
             val n = i.next()
@@ -251,9 +251,8 @@ open class CompetitiveGroup @JvmOverloads constructor(
     /**
      * Randomize and normalize weights.
      */
-    context(Network)
-    override fun randomize() {
-        randomizeIncomingWeights()
+    override fun randomize(randomizer: ProbabilityDistribution?) {
+        randomizeIncomingWeights(randomizer)
         normalizeIncomingWeights()
     }
 

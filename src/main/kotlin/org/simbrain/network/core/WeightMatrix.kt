@@ -1,5 +1,6 @@
 package org.simbrain.network.core
 
+import org.simbrain.network.core.Network.Randomizers.weightRandomizer
 import org.simbrain.network.learningrules.StaticSynapseRule
 import org.simbrain.network.learningrules.SynapseUpdateRule
 import org.simbrain.network.spikeresponders.NonResponder
@@ -9,7 +10,7 @@ import org.simbrain.network.util.MatrixDataHolder
 import org.simbrain.util.UserParameter
 import org.simbrain.util.copyFrom
 import org.simbrain.util.flatten
-import org.simbrain.util.stats.distributions.UniformRealDistribution
+import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
 import smile.math.matrix.Matrix
@@ -236,10 +237,10 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
         }
 
 
-    override fun randomize() {
+    override fun randomize(randomizer: ProbabilityDistribution?) {
         for (i in 0 until weightMatrix.nrow()) {
             for (j in 0 until weightMatrix.ncol()) {
-                weightMatrix[i, j] = UniformRealDistribution().sampleDouble()
+                weightMatrix[i, j] = (randomizer ?: weightRandomizer).sampleDouble()
             }
         }
         events.updated.fireAndForget()

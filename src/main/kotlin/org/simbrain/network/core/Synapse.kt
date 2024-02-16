@@ -19,6 +19,9 @@
 package org.simbrain.network.core
 
 import org.simbrain.network.NetworkModel
+import org.simbrain.network.core.Network.Randomizers.excitatoryRandomizer
+import org.simbrain.network.core.Network.Randomizers.inhibitoryRandomizer
+import org.simbrain.network.core.Network.Randomizers.weightRandomizer
 import org.simbrain.network.events.SynapseEvents
 import org.simbrain.network.learningrules.StaticSynapseRule
 import org.simbrain.network.learningrules.SynapseUpdateRule
@@ -30,6 +33,7 @@ import org.simbrain.util.UserParameter
 import org.simbrain.util.Utils
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
@@ -401,12 +405,11 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
          */
         get() = target.fanOut[source]
 
-    context(Network)
-    override fun randomize() {
+    override fun randomize(randomizer: ProbabilityDistribution?) {
         when (source.polarity) {
             Polarity.EXCITATORY -> forceSetStrength(excitatoryRandomizer.sampleDouble())
             Polarity.INHIBITORY -> forceSetStrength(inhibitoryRandomizer.sampleDouble())
-            else -> forceSetStrength(weightRandomizer.sampleDouble())
+            else -> forceSetStrength((randomizer ?: weightRandomizer).sampleDouble())
         }
     }
 

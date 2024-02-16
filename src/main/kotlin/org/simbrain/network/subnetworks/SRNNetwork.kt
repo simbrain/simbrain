@@ -30,6 +30,7 @@ import org.simbrain.network.util.offsetNetworkModel
 import org.simbrain.util.UserParameter
 import org.simbrain.util.point
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
 import java.awt.geom.Point2D
@@ -130,10 +131,9 @@ class SRNNetwork: FeedForward, Trainable {
         inputLayer.addInputs(inputs)
     }
 
-    context(Network)
-    override fun randomize() {
-        super.randomize()
-        contextToHidden.randomize()
+    override fun randomize(randomizer: ProbabilityDistribution?) {
+        super.randomize(randomizer)
+        contextToHidden.randomize(randomizer)
     }
 
     /**

@@ -78,9 +78,7 @@ class SOMGroupNode(networkPanel: NetworkPanel?, group: SOMGroup?) : NeuronGroupN
         super.addCustomMenuItem(JMenuItem(object : AbstractAction("Randomize SOM Weights") {
             override fun actionPerformed(event: ActionEvent) {
                 val group = (neuronGroup as SOMGroup)
-                with(networkPanel.network) {
-                    group.randomizeIncomingWeights()
-                }
+                group.randomizeIncomingWeights()
             }
         }))
     }

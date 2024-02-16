@@ -23,7 +23,6 @@ val competitiveSim = newSim {
     val competitive = CompetitiveNetwork(7, 5)
     network.addNetworkModel(competitive)
     competitive.inputLayer.setUpperBound(1.0)
-    competitive.weights.randomize()
 
     withGui {
         place(networkComponent, 139, 10, 868, 619)

@@ -3,6 +3,9 @@ package org.simbrain.network.gui
 import kotlinx.coroutines.launch
 import org.simbrain.network.connections.*
 import org.simbrain.network.core.*
+import org.simbrain.network.core.Network.Randomizers.excitatoryRandomizer
+import org.simbrain.network.core.Network.Randomizers.inhibitoryRandomizer
+import org.simbrain.network.core.Network.Randomizers.weightRandomizer
 import org.simbrain.network.gui.ConditionallyEnabledAction.EnablingCondition
 import org.simbrain.network.gui.dialogs.*
 import org.simbrain.network.gui.dialogs.layout.LayoutDialog
@@ -399,6 +402,12 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         network.createEditorDialog().display()
     }
 
+    val showNetworkRandomizersAction = networkPanel.createAction(
+        name = "Network Randomizers..."
+    ) {
+        Network.createEditorDialog().display()
+    }
+
     val iterateNetworkAction = networkPanel.createAction(
         name = "Iterate network",
         description = "Step network update algorithm (\"spacebar\")",
@@ -496,9 +505,9 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     ) {
         createSynapseAdjustmentPanel(
             network.getModels<Synapse>().toList(),
-            network.weightRandomizer,
-            network.excitatoryRandomizer,
-            network.inhibitoryRandomizer
+            weightRandomizer,
+            excitatoryRandomizer,
+            inhibitoryRandomizer
         )?.displayInDialog()
     }
 
@@ -586,9 +595,9 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val editConnectionStrategy = networkPanel.createAction(
         name = "Edit connection strategy...",
     ) {
-        ConnectionStrategyPanel(network.connectionStrategy).displayInDialog {
+        ConnectionStrategyPanel(Network.connectionStrategy).displayInDialog {
             commitChanges()
-            network.connectionStrategy = this.connectionStrategy
+            Network.connectionStrategy = this.connectionStrategy
         }
     }
 

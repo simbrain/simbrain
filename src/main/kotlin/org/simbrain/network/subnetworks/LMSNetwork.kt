@@ -22,6 +22,7 @@ import org.simbrain.network.trainers.createDiagonalDataset
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.stats.ProbabilityDistribution
 import java.awt.geom.Point2D
 
 /**
@@ -48,8 +49,8 @@ class LMSNetwork : FeedForward, Trainable {
 
     val weightMatrix: WeightMatrix get() = inputLayer.outgoingConnectors.first() as WeightMatrix
 
-    override fun randomize() {
-        weightMatrix.randomize()
+    override fun randomize(randomizer: ProbabilityDistribution?) {
+        weightMatrix.randomize(randomizer)
         // TODO
         // outputLayer.randomizeBiases()
     }

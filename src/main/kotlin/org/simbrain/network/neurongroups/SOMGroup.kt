@@ -19,7 +19,7 @@
 package org.simbrain.network.neurongroups
 
 import org.simbrain.network.core.InfoText
-import org.simbrain.network.core.Network
+import org.simbrain.network.core.Network.Randomizers.weightRandomizer
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.layouts.HexagonalGridLayout
@@ -28,6 +28,7 @@ import org.simbrain.util.UserParameter
 import org.simbrain.util.Utils
 import org.simbrain.util.propertyeditor.CustomTypeName
 import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.util.stats.ProbabilityDistribution
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -78,12 +79,11 @@ class SOMGroup @JvmOverloads constructor(
      * Randomize all weights coming in to this network. The weights will be
      * between 0 and the upper bound of each synapse.
      */
-    context(Network)
-    override fun randomizeIncomingWeights() {
+    override fun randomizeIncomingWeights(randomizer: ProbabilityDistribution?) {
         for (n in neuronList) {
             for (s in n.fanIn) {
                 s.lowerBound = 0.0
-                s.strength = s.upperBound * Math.random()
+                s.strength = (randomizer ?: weightRandomizer).sampleDouble()
             }
         }
     }

@@ -1,12 +1,11 @@
-package org.simbrain.network.synapserules
+package org.simbrain.network.learningrules
 
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.learningrules.HebbianCPCARule
 
-class HebbCPATest {
+class PfisterGerstner2006Test {
 
     var net = Network()
     val n1 = Neuron()
@@ -15,16 +14,14 @@ class HebbCPATest {
 
     init {
         net.addNetworkModelsAsync(n1, n2, s12)
-        s12.learningRule = HebbianCPCARule().apply {
-            learningRate = 1.0
-            m = 0.0
-            theta = 0.0
-            lambda = 0.0
+        s12.learningRule = PfisterGerstner2006Rule().apply {
+
         }
         s12.strength = 0.0
         n1.clamped = true
         n2.clamped = true
     }
+
     @Test
     fun `test basic update`() {
         n1.forceSetActivation(1.0)

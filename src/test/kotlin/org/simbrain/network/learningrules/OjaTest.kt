@@ -1,9 +1,8 @@
-package org.simbrain.network.synapserules
+package org.simbrain.network.learningrules
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.*
-import org.simbrain.network.learningrules.OjaRule
 import org.simbrain.util.toMatrix
 
 class OjaTest {

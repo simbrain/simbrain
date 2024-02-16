@@ -1,12 +1,11 @@
-package org.simbrain.network.synapserules
+package org.simbrain.network.learningrules
 
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.learningrules.PfisterGerstner2006Rule
 
-class PfisterGerstner2006Test {
+class StaticSynapseTest {
 
     var net = Network()
     val n1 = Neuron()
@@ -15,9 +14,7 @@ class PfisterGerstner2006Test {
 
     init {
         net.addNetworkModelsAsync(n1, n2, s12)
-        s12.learningRule = PfisterGerstner2006Rule().apply {
-
-        }
+        s12.learningRule = StaticSynapseRule()
         s12.strength = 0.0
         n1.clamped = true
         n2.clamped = true

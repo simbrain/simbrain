@@ -1,10 +1,9 @@
-package org.simbrain.network.synapserules
+package org.simbrain.network.learningrules
 
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.learningrules.HebbianThresholdRule
 
 class HebbThresholdTest {
 

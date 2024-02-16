@@ -1,10 +1,9 @@
-package org.simbrain.network.synapserules
+package org.simbrain.network.learningrules
 
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.*
-import org.simbrain.network.learningrules.HebbianRule
 import org.simbrain.util.toMatrix
 
 class HebbTest {

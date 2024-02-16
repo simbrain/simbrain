@@ -21,7 +21,9 @@ import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.LinkedList;
 
+import static org.simbrain.util.ImageUtilsKt.fill;
 import static org.simbrain.util.SwingUtilsKt.getSwingDispatcher;
+import static org.simbrain.util.SwingUtilsKt.showWarningConfirmDialog;
 
 public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldComponent> {
 
@@ -287,6 +289,14 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
         Color colorList[] = {Color.white, Color.black, Color.red, Color.blue, Color.green, Color.yellow, Color.cyan, Color.magenta};
         String colorNames[] = {"White", "Black", "Red", "Blue", "Green", "Yellow", "Cyan", "Magenta", "Custom"};
         JComboBox cbColorChoice = new JComboBox(colorNames);
+        JButton fillCanvas = new JButton(ResourceManager.getSmallIcon("menu_icons/fill.png"));
+        fillCanvas.addActionListener(e -> {
+            var confirm = showWarningConfirmDialog("Are you sure you want to fill the canvas?");
+            if (confirm == JOptionPane.YES_OPTION) {
+                fill(imageWorld.getImageAlbum().getCurrentImage(), penColor);
+                imageWorld.getImageAlbum().fireImageUpdate();
+            }
+        });
 
         // Check box handling
         JCheckBox checkBoxDrawMode = new JCheckBox("Draw");
@@ -308,6 +318,7 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
 
         sourceToolbar.add(checkBoxDrawMode);
         sourceToolbar.add(cbColorChoice);
+        sourceToolbar.add(fillCanvas);
 
     }
 

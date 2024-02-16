@@ -202,6 +202,13 @@ fun BufferedImage.copy(): BufferedImage {
     }
 }
 
+fun BufferedImage.fill(color: Color) {
+    val g = graphics
+    g.color = color
+    g.fillRect(0, 0, width, height)
+    g.dispose()
+}
+
 fun Color.invert() = Color(255 - red, 255 - green, 255 - blue)
 
 /**

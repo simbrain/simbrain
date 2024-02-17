@@ -107,13 +107,13 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
 
         // Selection submenu
         menu.addSeparator();
-        Action selectSynapses = new AbstractAction("Select Neurons") {
+        Action selectNeurons = new AbstractAction("Select Neurons") {
             @Override
             public void actionPerformed(final ActionEvent event) {
                 selectNeurons();
             }
         };
-        menu.add(selectSynapses);
+        menu.add(selectNeurons);
         Action selectIncomingNodes = new AbstractAction("Select Incoming Synapses") {
             @Override
             public void actionPerformed(final ActionEvent event) {

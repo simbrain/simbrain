@@ -557,7 +557,9 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     }
 
     fun selectNeuronsInNeuronGroups() {
-        selectionManager.filterSelectedNodes<NeuronGroupNode>().forEach { it.selectNeurons() }
+        selectionManager.filterSelectedModels<AbstractNeuronCollection>()
+            .flatMap { it.neuronList }
+            .forEach { it.select() }
     }
 
     /**

@@ -6,6 +6,7 @@ import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.NeuronUpdateRule
 import org.simbrain.network.util.MatrixDataHolder
 import org.simbrain.network.util.ScalarDataHolder
+import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.util.*
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.EditableObject
@@ -61,6 +62,13 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
             field.copyFrom(newActivations)
             events.updated.fireAndForget()
         }
+
+    /**
+     * see [AbstractNeuronCollection.spikes]
+     */
+    @get:Producible
+    override val spikes: DoubleArray
+        get() = (dataHolder as? SpikingMatrixData)?.spikes?.map { if (it) 1.0 else 0.0 }?.toDoubleArray() ?: DoubleArray(size())
 
     @get:Producible
     override val outputs: Matrix get() = activations

@@ -79,6 +79,10 @@ abstract class Layer : LocatableModel(), AttributeContainer {
     val outputActivations: DoubleArray
         get() = outputs.toDoubleArray()
 
+    @get:Producible
+    open val spikes: DoubleArray
+        get() = DoubleArray(outputSize())
+
     /**
      * x coordinate of center of layer.
      */

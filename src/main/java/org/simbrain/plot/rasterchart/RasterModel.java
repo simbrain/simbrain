@@ -94,6 +94,9 @@ public class RasterModel implements EditableObject {
     @UserParameter(label = "Fixed width", order = 30)
     private boolean fixedWidth = true;
 
+    @UserParameter(label = "Spike Threshold", order = 40)
+    double spikeThreshold = 0.5;
+
     /**
      * Raster series model constructor.
      */
@@ -234,16 +237,27 @@ public class RasterModel implements EditableObject {
             this.index = index;
         }
 
+        /**
+         * Plot an array of values as a vertical bar in a raster plot. Each component of the array is associated with one row of the plot.
+         * Canonically used to display spiking data, represented with binary vectors. If real-values (e.g. activations) are sent in, then values above a threshold (default .5) are intereted as spikes
+         * <br>
+         * Example 1: [0, 1, 0, 0 , 1] would show 2 dots vertically at the 2nd and 5th position at the current time
+         * <br>
+         * Example 2: [0.0, 0.6, -0.3, 0.0, 1.0] would show 2 dots vertically at the 2nd and 5th position at the current time
+         */
         @Consumable()
         public void setValues(final double[] values) {
             try {
                 SwingUtilities.invokeAndWait(() -> {
-                    if (values.length == 0) {
-                        getDataset().getSeries(index).add(timeSupplier.get(), null);
-                        return;
-                    }
+                    var udpated = false;
                     for (int i = 0, n = values.length; i < n; i++) {
-                        getDataset().getSeries(index).add(timeSupplier.get(), (Double) values[i]);
+                        if (values[i] >= spikeThreshold) {
+                            getDataset().getSeries(index).add(timeSupplier.get(), Double.valueOf(i));
+                            udpated = true;
+                        }
+                    }
+                    if (!udpated) {
+                        getDataset().getSeries(index).add(timeSupplier.get(), null);
                     }
                 });
             } catch (InterruptedException | InvocationTargetException e) {

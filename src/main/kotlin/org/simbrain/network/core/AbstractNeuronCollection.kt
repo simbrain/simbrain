@@ -6,6 +6,7 @@ import org.simbrain.network.events.NeuronCollectionEvents
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.Layout
 import org.simbrain.network.layouts.LineLayout
+import org.simbrain.network.util.SpikingScalarData
 import org.simbrain.util.*
 import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.math.SimbrainMath
@@ -69,6 +70,16 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
             }
             cachedActivationsDirty = true
         }
+
+    /**
+     * Returns an array of binary values that represents the neurons in the neuron list.
+     * The value is 1 for spiking neurons that are spiking, and 0 otherwise (non-spiking neurons are always associated with 0s)
+     */
+    @get:Producible
+    override val spikes: DoubleArray
+        get() = neuronList.map {
+            if ((it.dataHolder as? SpikingScalarData)?.spiked == true) 1.0 else 0.0
+        }.toDoubleArray()
 
     override val inputs: Matrix get() = Matrix.column(inputActivations)
 

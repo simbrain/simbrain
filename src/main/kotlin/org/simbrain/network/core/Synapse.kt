@@ -498,6 +498,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
         if (delayManager != null) {
             Arrays.fill(delayManager, 0.0)
         }
+        events.strengthUpdated.fireAndBlock()
     }
 
     override fun toggleClamping() {

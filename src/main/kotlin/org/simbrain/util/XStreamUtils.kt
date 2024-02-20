@@ -122,10 +122,12 @@ fun createConstructorCallingConverter(
 
             // Map from variable names to corresponding Kotlin properties.
             // Ex: activation -> Neuron::activation
-            val propertyMap = (cls.allSuperclasses + cls)
+            val propertyMap = (listOf(cls) + cls.allSuperclasses)
                 .map { it.declaredMemberProperties }
                 .flatten()
-                .associateBy { it.name }
+                .groupBy { it.name }
+                .map { (name, properties) -> name to properties.first() }
+                .toMap()
 
             // Map from names to values. Ex: activation -> 1.0
             val propertyNameToDeserializedValueMap = HashMap<String, Any?>()
@@ -196,7 +198,7 @@ fun createConstructorCallingConverter(
                             field.isAccessible = true
                             field.set(convertedObject, value)
                             field.isAccessible = oldAccessible
-                        }
+                        } ?: throw IllegalArgumentException("Property $property for class ${cls.simpleName} does not have a backing field.")
                     }
                 }
             }

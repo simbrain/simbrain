@@ -126,6 +126,7 @@ fun createConstructorCallingConverter(
                 .map { it.declaredMemberProperties }
                 .flatten()
                 .groupBy { it.name }
+                // if there are multiple properties with the same name, take the one closest to the implementing class
                 .map { (name, properties) -> name to properties.first() }
                 .toMap()
 

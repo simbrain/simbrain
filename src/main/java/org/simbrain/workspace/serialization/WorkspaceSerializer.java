@@ -296,6 +296,7 @@ public class WorkspaceSerializer {
             for (ArchivedWorkspaceComponent archivedComponent : archive.getArchivedComponents()) {
                 try {
                     WorkspaceComponent wc = deserializer.deserializeWorkspaceComponent(archivedComponent, new ByteArrayInputStream(byteArrays.get(archivedComponent.getUri())));
+                    wc.postOpenInit(workspace);
                     workspace.addWorkspaceComponent(wc);
                     if (archivedComponent.getDesktopComponent() != null) {
                         Rectangle bounds =

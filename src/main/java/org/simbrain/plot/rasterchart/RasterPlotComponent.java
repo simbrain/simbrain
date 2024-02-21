@@ -19,6 +19,7 @@
 package org.simbrain.plot.rasterchart;
 
 import org.simbrain.workspace.AttributeContainer;
+import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 
 import java.io.InputStream;
@@ -62,11 +63,8 @@ public class RasterPlotComponent extends WorkspaceComponent {
         return model;
     }
 
-    /**
-     * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
-     */
-    private Object readResolve() {
-        return this;
+    public void postOpenInit(Workspace workspace) {
+        model.setTimeSupplier(workspace::getTime);
     }
 
     /**

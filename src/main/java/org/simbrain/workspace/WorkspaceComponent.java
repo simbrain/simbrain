@@ -344,4 +344,10 @@ public abstract class WorkspaceComponent {
      */
     public void stop() {
     }
+
+    /**
+     * Any “read resolve” type initialization of components or models that require workspace access post serialization should occur in an override of this function.
+     */
+    public void postOpenInit(Workspace workspace) {
+    }
 }

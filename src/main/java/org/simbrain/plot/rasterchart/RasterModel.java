@@ -222,6 +222,10 @@ public class RasterModel implements EditableObject {
         this.rangeLowerBound = lowerRangeBoundary;
     }
 
+    public void setTimeSupplier(Supplier<Integer> timeSupplier) {
+        this.timeSupplier = timeSupplier;
+    }
+
     /**
      *  Objects that represent separate sets of raster points, shown in a different color in the
      *      chart.

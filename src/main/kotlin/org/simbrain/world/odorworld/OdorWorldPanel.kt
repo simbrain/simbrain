@@ -10,9 +10,7 @@ import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.gui.CustomToolBar
 import org.simbrain.util.*
-import org.simbrain.util.piccolo.SceneGraphBrowser
-import org.simbrain.util.piccolo.Tile
-import org.simbrain.util.piccolo.setViewBoundsNoOverflow
+import org.simbrain.util.piccolo.*
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.gui.*
 import java.awt.*
@@ -306,10 +304,10 @@ class OdorWorldPanel(
         world.getEvents().worldStopped.on(null, true, Runnable {
             movementTimer = Timer().apply {
                 schedule(object : TimerTask() {
-                override fun run() {
-                    manualMovementUpdate()
-                }
-            }, 10, 10)
+                    override fun run() {
+                        manualMovementUpdate()
+                    }
+                }, 10, 10)
             }
             if (animationTimer != null) {
                 animationTimer?.cancel()
@@ -321,7 +319,7 @@ class OdorWorldPanel(
             override fun mouseWheelRotated(event: PInputEvent) {
                 val swingEvent = (event.sourceSwingEvent as MouseWheelEvent)
                 val newScale = 1.1.pow(swingEvent.preciseWheelRotation)
-                canvas.scale(1/newScale)
+                canvas.scale(1 / newScale)
             }
         })
 
@@ -363,12 +361,14 @@ class OdorWorldPanel(
         }
 
         if (selectedModelEntities.isNotEmpty()) {
-            canvas.setViewBounds(Rectangle2D.Double(
-                firstSelectedEntityModel!!.x - canvas.camera.viewBounds.width / 2,
-                firstSelectedEntityModel!!.y - canvas.camera.viewBounds.height / 2,
-                canvas.camera.viewBounds.width,
-                canvas.camera.viewBounds.height
-            ))
+            canvas.setViewBounds(
+                Rectangle2D.Double(
+                    firstSelectedEntityModel!!.x - canvas.camera.viewBounds.width / 2,
+                    firstSelectedEntityModel!!.y - canvas.camera.viewBounds.height / 2,
+                    canvas.camera.viewBounds.width,
+                    canvas.camera.viewBounds.height
+                )
+            )
             repaint()
         }
     }
@@ -463,6 +463,8 @@ class OdorWorldPanel(
         addSeparator()
         add(JMenuItem(odorWorldActions.addTileAction))
         add(JMenuItem(odorWorldActions.fillLayerAction))
+        add(odorWorldActions.createChooseLayerMenu(world))
+        add(odorWorldActions.editLayersAction)
         addSeparator()
         add(JMenuItem(odorWorldActions.showWorldPrefsAction()))
     }
@@ -545,3 +547,4 @@ class OdorWorldPanel(
         add(odorWorldActions.zoomOutAction())
     }
 }
+

@@ -1,11 +1,17 @@
 package org.simbrain.world.odorworld.gui
 
 import org.simbrain.util.*
+import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.OdorWorldPanel
 import org.simbrain.world.odorworld.dialogs.EntityDialog
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.showTilePicker
 import java.awt.event.KeyEvent
+import javax.swing.JMenu
+import javax.swing.JMenuItem
+import javax.swing.JScrollPane
+import javax.swing.JTable
+import javax.swing.table.DefaultTableModel
 
 class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
 
@@ -47,20 +53,76 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
         keyboardShortcut = CmdOrCtrl + 'E'
     ) {
         odorWorldPanel.selectedEntities.firstOrNull()?.let {
-            EntityDialog(it.entity).apply { title = "Edit ${it.entity.name}"  }.display()
+            EntityDialog(it.entity).apply { title = "Edit ${it.entity.name}" }.display()
         }
     }
 
     // TODO: Add images and to toolbar
-    val addTileAction = odorWorldPanel.createAction("Add Tile") {
-        world.addTile()
-    }
+    val addTileAction
+        get() = odorWorldPanel.createAction("Add Tile to ${odorWorldPanel.world.selectedLayer.name}") {
+            world.addTile()
+        }
 
-    val fillLayerAction = odorWorldPanel.createAction("Fill Layer...") {
-        showTilePicker(world.tileMap.tileSets) {
-            world.tileMap.fill(it)
+    val fillLayerAction
+        get() = odorWorldPanel.createAction("Fill Layer ${odorWorldPanel.world.selectedLayer.name}...") {
+            showTilePicker(world.tileMap.tileSets) {
+                world.tileMap.fill(it, world.selectedLayer)
+            }
+        }
+
+    fun createChooseLayerMenu(world: OdorWorld) = JMenu("Choose Layer").apply {
+        world.tileMap.layers.forEach { layer ->
+            add(JMenuItem(layer.name).apply {
+                addActionListener {
+                    world.selectedLayer = layer
+                }
+            })
         }
     }
+
+    val editLayersAction
+        get() = odorWorldPanel.createAction("Edit Layers...") {
+            val columnNames = arrayOf("Name", "Visible")
+
+            val data = odorWorldPanel.world.tileMap.layers.map { layer ->
+                arrayOf(layer.name, layer.visible)
+            }.toTypedArray()
+
+            val model = object : DefaultTableModel(data, columnNames) {
+                override fun getColumnClass(column: Int): Class<*> {
+                    return getValueAt(0, column).javaClass
+                }
+
+                override fun getValueAt(row: Int, column: Int): Any {
+                    return when (column) {
+                        0 -> world.tileMap.layers[row].name
+                        1 -> world.tileMap.layers[row].visible
+                        else -> throw IllegalArgumentException("Invalid column index")
+                    }
+                }
+
+                override fun setValueAt(aValue: Any?, row: Int, column: Int) {
+                    when (column) {
+                        0 -> world.tileMap.layers[row].name = aValue as String
+                        1 -> world.tileMap.layers[row].visible = aValue as Boolean
+                        else -> throw IllegalArgumentException("Invalid column index")
+                    }
+                }
+
+                override fun isCellEditable(row: Int, column: Int): Boolean {
+                    return true
+                }
+            }
+
+            val table = JTable(model)
+
+            val scrollPane = JScrollPane(table)
+
+            scrollPane.displayInDialog().apply {
+                title = "Edit Layers"
+                setSize(300, 400)
+            }
+        }
 
     val clearAllTrails = odorWorldPanel.createAction("Clear all trails") {
         world.entityList.map {

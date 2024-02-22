@@ -14,6 +14,7 @@ import com.thoughtworks.xstream.mapper.Mapper
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.util.piccolo.Tile
+import org.simbrain.util.piccolo.TileMapLayer
 import org.simbrain.util.projection.Projector
 import org.simbrain.util.propertyeditor.EditableObject
 import kotlin.reflect.KClass
@@ -57,6 +58,7 @@ fun getSimbrainXStream(): XStream {
                 excludedTypes = listOf(
                     Network::class.java,
                     Tile::class.java,
+                    TileMapLayer::class.java,
                     Projector::class.java
                 )
             )

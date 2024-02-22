@@ -208,6 +208,10 @@ public class OdorWorldFrameMenu extends JMenuBar {
 
         editMenu.addSeparator();
 
+        editMenu.add(odorWorldActions.getEditLayersAction());
+
+        editMenu.addSeparator();
+
         JMenuItem turnOnAllTrails = new JMenuItem("Turn on all trails");
         turnOnAllTrails.addActionListener(odorWorldActions.getTurnOnTrails());
         editMenu.add(turnOnAllTrails);
@@ -220,18 +224,6 @@ public class OdorWorldFrameMenu extends JMenuBar {
         clearAllTrails.addActionListener(odorWorldActions.getClearAllTrails());
         editMenu.add(clearAllTrails);
 
-        // JMenuItem loadVectors = new JMenuItem("Load stimulus vectors...");
-        // loadVectors.addActionListener(new ActionListener() {
-        //     public void actionPerformed(ActionEvent e) {
-        //         SFileChooser chooser = new SFileChooser(".", "Load vectors");
-        //         File theFile = chooser.showOpenDialog();
-        //         if (theFile != null) {
-        //             double[][] vecs = Utils.getDoubleMatrix(theFile);
-        //             world.loadStimulusVectors(vecs);
-        //         }
-        //     }
-        // });
-        // editMenu.add(loadVectors);
 
     }
 

@@ -25,6 +25,7 @@ import org.simbrain.util.UserParameter;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.util.piccolo.TMXUtils;
 import org.simbrain.util.piccolo.TileMap;
+import org.simbrain.util.piccolo.TileMapLayer;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.entities.Bounded;
@@ -110,6 +111,8 @@ public class OdorWorld implements EditableObject, Bounded {
      * Last clicked position.
      */
     private Point2D lastClickedPosition = new Point2D.Double(50,50);
+
+    private TileMapLayer selectedLayer = getTileMap().getLayers().get(0);
 
     /**
      * Default constructor.
@@ -224,7 +227,8 @@ public class OdorWorld implements EditableObject, Bounded {
         tileMap.setTile(
                 (int) lastClickedPosition.getX() / tileMap.getTileWidth(),
                 (int) lastClickedPosition.getY() / tileMap.getTileHeight(),
-                61
+                61,
+                selectedLayer
         );
     }
 
@@ -516,6 +520,7 @@ public class OdorWorld implements EditableObject, Bounded {
 
     public void setTileMap(TileMap tileMap) {
         this.tileMap = tileMap;
+        this.selectedLayer = tileMap.getLayers().get(0);
         getEvents().getTileMapChanged().fireAndForget();
     }
 
@@ -576,4 +581,11 @@ public class OdorWorld implements EditableObject, Bounded {
         return getLocation();
     }
 
+    public TileMapLayer getSelectedLayer() {
+        return selectedLayer;
+    }
+
+    public void setSelectedLayer(TileMapLayer selectedLayer) {
+        this.selectedLayer = selectedLayer;
+    }
 }

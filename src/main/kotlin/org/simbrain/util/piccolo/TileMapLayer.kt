@@ -13,6 +13,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamReader
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter
 import com.thoughtworks.xstream.mapper.Mapper
 import org.piccolo2d.nodes.PImage
+import org.simbrain.util.swingInvokeLater
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
@@ -24,10 +25,10 @@ import java.util.zip.InflaterInputStream
 
 @XStreamAlias("layer")
 class TileMapLayer(
-        @XStreamAsAttribute var name: String,
-        @XStreamAsAttribute private var width: Int,
-        @XStreamAsAttribute private var height: Int,
-        collision: Boolean
+    @XStreamAsAttribute var name: String,
+    @XStreamAsAttribute private var width: Int,
+    @XStreamAsAttribute private var height: Int,
+    collision: Boolean
 ) {
 
     /**
@@ -41,6 +42,21 @@ class TileMapLayer(
     )
     @XStreamAlias("properties")
     private var _properties: HashMap<String, String?>? = null
+
+    @XStreamAsAttribute
+    @XStreamAlias("visible")
+    private var _visible: Boolean? = null
+
+    var visible: Boolean
+        get() = _visible ?: true
+        set(value) {
+            _visible = value
+            layerImage?.let {
+                swingInvokeLater {
+                    it.visible = value
+                }
+            }
+        }
 
     val properties: HashMap<String, String?>
         get() = _properties ?: HashMap<String, String?>().also { _properties = it }
@@ -82,6 +98,7 @@ class TileMapLayer(
             }
             return PImage(layerImage).also {
                 it.pickable = false
+                it.visible = visible
                 this.layerImage = it
             }
         } else {

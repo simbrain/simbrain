@@ -149,12 +149,11 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
         menu.add(clampNeuronsAction);
         menu.add(unclampNeuronsAction);
 
-
         // Projection Plot Action
         menu.addSeparator();
         menu.add(SimbrainDesktop.INSTANCE.getActionManager().createCoupledPlotMenu(
                 SimbrainDesktop.INSTANCE.getWorkspace().getCouplingManager().getProducer(neuronCollection, "getActivations"),
-                neuronCollection.getLabel() + " Activations",
+                neuronCollection.getDisplayName() + " Activations",
                 "Plot Activations"
         ));
 

@@ -59,8 +59,11 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
 
     // TODO: Add images and to toolbar
     val addTileAction
-        get() = odorWorldPanel.createAction("Add Tile to ${odorWorldPanel.world.selectedLayer.name}") {
-            world.addTile()
+        get() = odorWorldPanel.createAction("Add Tile to ${odorWorldPanel.world.selectedLayer.name}...") {
+            showTilePicker(world.tileMap.tileSets) {
+                val (x,y) = world.tileMap.pixelToGridCoordinate(world.lastClickedPosition)
+                world.tileMap.setTile(x, y, it, world.selectedLayer)
+            }
         }
 
     val fillLayerAction

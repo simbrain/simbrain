@@ -128,8 +128,8 @@ class WorldMouseHandler(
                     // TODO: On right click, show sub-menu with layers, then show dialog below
 
                     val tileMap = odorWorldPanel.world.tileMap
-                    showTilePicker(tileMap.tileSets) { tileId: Int? ->
-                        val p = tileMap.pixelToGridCoordinate(world!!.lastClickedPosition)
+                    showTilePicker(tileMap.tileSets, event.getCurrentTileId()) { tileId: Int? ->
+                        val p = tileMap.pixelToGridCoordinate(world.lastClickedPosition)
                         odorWorldPanel.world.tileMap.setTile(p.x, p.y, tileId!!)
                     }
                 }
@@ -283,6 +283,16 @@ class WorldMouseHandler(
         val pickedNodeNull = (pickedNode == null)
         val cameraPicked = (pickedNode is PCamera)
         return (pickedNodeNull || cameraPicked)
+    }
+
+    fun PInputEvent.getCurrentTileId(): Int? {
+        if (isMouseEvent) {
+            val layer = odorWorldPanel.world.selectedLayer
+            val tileMap = odorWorldPanel.world.tileMap
+            val (x, y) = tileMap.pixelToGridCoordinate(position)
+            return layer[x, y]
+        }
+        return null
     }
 
     /**

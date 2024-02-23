@@ -30,11 +30,8 @@ public class WorldContextMenuEventHandler extends PBasicInputEventHandler {
         this.world = world;
     }
 
-    @Override
-    public void mousePressed(final PInputEvent mouseEvent) {
-        super.mousePressed(mouseEvent);
-
-        if(world == null) {
+    private void showContextMenu(final PInputEvent mouseEvent) {
+        if (world == null) {
             return;
         }
 
@@ -44,7 +41,8 @@ public class WorldContextMenuEventHandler extends PBasicInputEventHandler {
         PNode pickedNode = mouseEvent.getPath().getPickedNode();
 
         // Show context menu for right click
-        if (mouseEvent.isControlDown() || (mouseEvent.getButton() == MouseEvent.BUTTON3)) {
+        if (mouseEvent.isPopupTrigger()) {
+            mouseEvent.setHandled(true);
             if (pickedNode.getParent() instanceof EntityNode entity) {
                 JPopupMenu menu = entity.createContextMenu(odorWorldPanel);
                 menu.show(odorWorldPanel, (int) menuPosition.getX(), (int) menuPosition.getY());
@@ -54,4 +52,12 @@ public class WorldContextMenuEventHandler extends PBasicInputEventHandler {
             }
         }
     }
+
+
+    @Override
+    public void mousePressed(final PInputEvent mouseEvent) {
+        super.mousePressed(mouseEvent);
+        showContextMenu(mouseEvent);
+    }
+
 }

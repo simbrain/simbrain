@@ -2,22 +2,26 @@ package org.simbrain.world.odorworld
 
 import org.piccolo2d.PCanvas
 import org.piccolo2d.PLayer
+import org.piccolo2d.event.PDragSequenceEventHandler
+import org.piccolo2d.event.PInputEvent
+import org.piccolo2d.event.PInputEventListener
 import org.piccolo2d.nodes.PPath
-import org.simbrain.util.StandardDialog
-import org.simbrain.util.displayInDialog
-import org.simbrain.util.onDoubleClick
+import org.piccolo2d.util.PPaintContext
+import org.simbrain.util.*
 import org.simbrain.util.piccolo.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import java.awt.*
 import java.awt.event.MouseEvent
 import java.awt.geom.Point2D
+import java.awt.geom.Rectangle2D
 import java.util.function.Consumer
 import javax.swing.*
 import javax.swing.border.MatteBorder
 import javax.swing.border.TitledBorder
+import kotlin.math.min
 
-fun showTilePicker(tileSets: List<TileSet>, block: Consumer<Int>): StandardDialog {
-    return tileSets.tilePicker(1) {
+fun showTilePicker(tileSets: List<TileSet>, currentTileId: Int? = null, block: Consumer<Int>): StandardDialog {
+    return tileSets.tilePicker(currentTileId ?: 1) {
         block.accept(it)
     }.apply { makeVisible() }
 }
@@ -69,13 +73,60 @@ fun List<TileSet>.tilePicker(currentGid: Int, block: (Int) -> Unit) = StandardDi
         this@tilePicker.forEach { tileSet ->
             // Add a new tab for each tileset
             addTab(tileSet.name, PCanvas().apply {
+                setDefaultRenderQuality(PPaintContext.LOW_QUALITY_RENDERING)
+
+                // Remove default event handlers
+                val panEventHandler: PInputEventListener = panEventHandler
+                val zoomEventHandler: PInputEventListener = zoomEventHandler
+                removeInputEventListener(panEventHandler)
+                removeInputEventListener(zoomEventHandler)
+
+                fun setViewBounds(bounds: Rectangle2D) {
+                    val (x, y, w, h) = bounds
+                    val padding = 5.0
+                    val width = (tileSet.columns * tileSet.tilewidth).toDouble()
+                    val height = (tileSet.tilecount / tileSet.columns * tileSet.tileheight).toDouble()
+                    val newWidth = min(w, width + padding)
+                    val newHeight = min(h, height + padding)
+                    val newX = x.coerceIn(-padding, width - newWidth)
+                    val newY = y.coerceIn(-padding, height - newHeight)
+                    camera.setViewBoundsNoOverflow(
+                        Rectangle2D.Double(
+                            newX,
+                            newY,
+                            newWidth,
+                            newHeight
+                        )
+                    )
+                }
+
+                addInputEventListener(object : PDragSequenceEventHandler() {
+
+                    override fun drag(event: PInputEvent) {
+                        val (x, y, w, h) = event.camera.viewBounds
+                        val dx = event.delta.width
+                        val dy = event.delta.height
+                        setViewBounds(Rectangle2D.Double(x - dx, y - dy, w, h))
+                    }
+                })
+
                 layer.renderTileSet(tileSet)
 
                 // Select the tile that was initially clicked on
                 this.layer.allNodes.filterIsInstance<PTiledImage>().find { it.gid == pickedTile }?.let {
-                    it.select()
-                    // camera.centerBoundsOnPoint(it.bounds.centerX, it.bounds.centerY)
-                    // TODO: Figure out what to center on what.
+                    swingInvokeLater {
+                        it.select()
+                        val centerX = it.globalBounds.centerX
+                        val centerY = it.globalBounds.centerY
+                        setViewBounds(
+                            Rectangle2D.Double(
+                                centerX - camera.viewBounds.width / 2,
+                                centerY - camera.viewBounds.height / 2,
+                                camera.viewBounds.width,
+                                camera.viewBounds.height
+                            )
+                        )
+                    }
                 }
 
                 // Respond to clicks
@@ -89,13 +140,12 @@ fun List<TileSet>.tilePicker(currentGid: Int, block: (Int) -> Unit) = StandardDi
                         }
                     }
                 }
-            }.apply {
-                preferredSize = Dimension(300, 600)
             })
         }
     }
-    contentPane = ScrollPane().apply { add(tabbedPane) }
+    contentPane = tabbedPane
     addCommitTask { block(pickedTile) }
+    preferredSize = Dimension(600, 600)
 }
 
 /**

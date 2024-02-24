@@ -53,11 +53,11 @@ object NetworkPreferences: PreferenceHolder() {
     @UserParameter(label = "Default self connection allowed")
     var selfConnectionAllowed by BooleanPreference(false)
 
-    @UserParameter(label = "Default network time step", tab = "Model")
+    @UserParameter(label = "Default network time step", minimumValue = 0.0, increment = .1, tab = "Model")
     var defaultTimeStep by DoublePreference(.1)
 
     // Of course specific rules can have specific defaults
-    @UserParameter(label = "Default learning rate", tab = "Model")
+    @UserParameter(label = "Default learning rate", minimumValue = 0.0, increment = .1, tab = "Model")
     var defaultLearningRate by DoublePreference(.1)
 
 }

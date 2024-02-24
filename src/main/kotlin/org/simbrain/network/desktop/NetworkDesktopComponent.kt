@@ -44,7 +44,8 @@ class NetworkDesktopComponent(frame: GenericFrame, component: NetworkComponent) 
         fileMenu.add(actionManager.createExportAction(this))
         fileMenu.addSeparator()
         fileMenu.add(networkPanel.networkActions.showNetworkUpdaterDialog);
-        fileMenu.add(networkPanel.networkActions.showNetworkPreferencesAction);
+        fileMenu.add(networkPanel.networkActions.showNetworkDefaultsAction);
+        fileMenu.add(networkPanel.networkActions.showNetworkPropertiesAction);
         fileMenu.add(networkPanel.networkActions.showNetworkRandomizersAction);
         fileMenu.addSeparator()
         fileMenu.add(actionManager.createRenameAction(this))

@@ -385,10 +385,9 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         NetworkUpdateManagerPanel(networkPanel.network).displayInDialog()
     }
 
-    val showNetworkPreferencesAction = networkPanel.createAction(
-        name = "Network Preferences...",
-        description = "Show the network preference dialog. These properties apply to all networks in the Simbrain workspace.",
-        iconPath = "menu_icons/Prefs.png",
+    val showNetworkDefaultsAction = networkPanel.createAction(
+        name = "Network Defaults...",
+        description = "Set default properties that apply to all networks in the Simbrain workspace.",
         keyboardShortcut = CmdOrCtrl + ','
     ) {
         getPreferenceDialog(NetworkPreferences).display()
@@ -396,8 +395,8 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 
     val showNetworkPropertiesAction = networkPanel.createAction(
         name = "Network Properties...",
-        description = " These are properties that are different for each network in the Simbrain workspace.",
-        iconPath = "menu_icons/Properties.png"
+        description = "Properties that are different for each network in the Simbrain workspace.",
+        iconPath = "menu_icons/Prefs.png"
     ) {
         network.createEditorDialog().display()
     }

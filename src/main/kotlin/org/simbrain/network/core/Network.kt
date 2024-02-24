@@ -90,12 +90,15 @@ class Network: CoroutineScope, EditableObject {
     /**
      * Time step.
      */
+    @UserParameter("Time Step", order = 10)
     var timeStep = NetworkPreferences.defaultTimeStep
 
     /**
      * Whether this is a discrete or continuous time network.
      */
-    private var timeType = TimeType.DISCRETE
+    @UserParameter("Time Type", description = "Whether to display iterations or time (display property only; " +
+            "does not impact logical update)", order = 20)
+    var timeType = TimeType.DISCRETE
 
     /**
      * Whether network has been updated yet; used by thread.
@@ -424,19 +427,6 @@ class Network: CoroutineScope, EditableObject {
      */
     fun resetTime() {
         time = 0.0
-        // TODO: Earlier code from Zoë used to adjust last spike times on spiking neurons.
-        // Not a common use case so commented out for now. If put in a unit test needed.
-        // if (i < time) {
-        //     for (n in flatNeuronList) {
-        //         val nur = n.updateRule
-        //         if (nur.isSpikingNeuron) {
-        //             val snur = nur as SpikingNeuronUpdateRule
-        //             val diff: Double = i - (time - snur.lastSpikeTime)
-        //             snur.setLastSpikeTime(if (diff < 0) 0.0 else diff)
-        //         }
-        //     }
-        // }
-
     }
 
     /**

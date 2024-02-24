@@ -7,7 +7,7 @@ import java.util.concurrent.CopyOnWriteArraySet
 
 /**
  * Manges network selection. E.g. when you select a group of nodes it tracks which nodes were selected.
- * Keeps track of source vs. selected nodes.  When [#modifySelection] or [#modifySourceSelection] are  called an
+ * Keeps track of source vs. selected nodes. When [#modifySelection] or [#modifySourceSelection] are  called an
  * event is fired which is handled in [NetworkPanel] where the selection manager is set up.
  *
  * To get all selected nodes of a type, use filterSelectedModels.

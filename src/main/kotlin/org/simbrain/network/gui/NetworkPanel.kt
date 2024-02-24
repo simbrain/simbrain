@@ -23,11 +23,8 @@ import org.simbrain.network.subnetworks.*
 import org.simbrain.network.trainers.WeightMatrixTree
 import org.simbrain.network.trainers.backpropError
 import org.simbrain.network.trainers.forwardPass
-import org.simbrain.util.ResourceManager
-import org.simbrain.util.cartesianProduct
-import org.simbrain.util.complement
+import org.simbrain.util.*
 import org.simbrain.util.piccolo.unionOfGlobalFullBounds
-import org.simbrain.util.toSequence
 import java.awt.*
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
@@ -560,23 +557,17 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         selectionManager.filterSelectedModels<AbstractNeuronCollection>()
             .flatMap { it.neuronList }
             .forEach { it.select() }
+        selectionManager.filterSelectedNodes<InteractionBox>().forEach {selectionManager.remove(it) }
     }
 
     /**
      * Connect source and target model items using a default action.
      *
-     * For free weights, use "all to all"
-     *
-     * For neuron groups or arrays, use a weight matrix.
+     * For neuron groups or arrays, uses a weight matrix.
      */
     fun connectSelectedModelsDefault() {
 
         with(selectionManager) {
-
-            // Re-enable when new synapse groups are done
-            // if (connectNeuronGroups()) {
-            //     return
-            // }
 
             if (connectLayers()) {
                 return

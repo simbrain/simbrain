@@ -7,7 +7,7 @@ import org.simbrain.util.Events
  * See [Events].
  */
 class TileMapEvents: Events() {
-    val layerAdded = NoArgEvent()
+    val layersChanged = NoArgEvent()
     val layerImageChanged = ChangedEvent<PImage?>()
     val mapSizeChanged = NoArgEvent()
 }

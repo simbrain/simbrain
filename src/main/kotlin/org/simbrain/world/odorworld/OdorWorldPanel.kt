@@ -263,7 +263,7 @@ class OdorWorldPanel(
 
         // Full tile map update
         world.getEvents().tileMapChanged.on(swingDispatcher) {
-            world.tileMap.events.layerAdded.on(swingDispatcher) {
+            world.tileMap.events.layersChanged.on(swingDispatcher) {
                 renderAllLayers(world)
             }
             world.tileMap.events.mapSizeChanged.on(swingDispatcher) {

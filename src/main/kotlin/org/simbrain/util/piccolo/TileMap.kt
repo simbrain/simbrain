@@ -195,8 +195,13 @@ class TileMap(width: Int, height: Int) {
 
     fun addLayer(layer: TileMapLayer): TileMapLayer {
         _layers.add(layer)
-        events.layerAdded.fireAndForget()
+        events.layersChanged.fireAndForget()
         return layer
+    }
+
+    fun removeLayer(layer: TileMapLayer) {
+        _layers.remove(layer)
+        events.layersChanged.fireAndForget()
     }
 
     /**

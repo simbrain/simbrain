@@ -18,7 +18,9 @@ import java.util.function.Consumer
 import javax.swing.*
 import javax.swing.border.MatteBorder
 import javax.swing.border.TitledBorder
+import javax.swing.table.DefaultTableModel
 import kotlin.math.min
+
 
 fun showTilePicker(tileSets: List<TileSet>, currentTileId: Int? = null, block: Consumer<Int>): StandardDialog {
     return tileSets.tilePicker(currentTileId ?: 1) {
@@ -220,5 +222,71 @@ fun TileMap.editor(p: Point2D) = StandardDialog().apply {
 
     pack()
     setLocationRelativeTo(null)
+}
+
+fun OdorWorld.layerEditor() = StandardDialog().apply {
+
+    title = "Edit Layers"
+    setSize(300, 400)
+
+    val columnNames = arrayOf("Name", "Visible")
+    val data = tileMap.layers.map { layer ->
+        arrayOf(layer.name, layer.visible)
+    }.toTypedArray()
+
+    val model = object : DefaultTableModel(data, columnNames) {
+        override fun getColumnClass(column: Int): Class<*> {
+            return getValueAt(0, column).javaClass
+        }
+
+        override fun getValueAt(row: Int, column: Int): Any {
+            return when (column) {
+                0 -> tileMap.layers[row].name
+                1 -> tileMap.layers[row].visible
+                else -> throw IllegalArgumentException("Invalid column index")
+            }
+        }
+
+        override fun setValueAt(aValue: Any?, row: Int, column: Int) {
+            when (column) {
+                0 -> tileMap.layers[row].name = aValue as String
+                1 -> tileMap.layers[row].visible = aValue as Boolean
+                else -> throw IllegalArgumentException("Invalid column index")
+            }
+        }
+
+        override fun isCellEditable(row: Int, column: Int): Boolean {
+            return true
+        }
+    }
+
+    val table = JTable(model).apply {
+        setRowSelectionAllowed(true)
+        gridColor = Color.LIGHT_GRAY
+    }
+    val panel = JPanel(BorderLayout())
+    panel.add(BorderLayout.CENTER,JScrollPane(table))
+    panel.add(BorderLayout.SOUTH, JPanel().apply {
+        add(JButton("Add", ResourceManager.getImageIcon("menu_icons/plus.png")).apply {
+            addActionListener {
+                val newLayer = tileMap.createTileMapLayer("Layer ${tileMap.layers.size}")
+                tileMap.addLayer(newLayer)
+                model.addRow(arrayOf(newLayer.name, newLayer.visible))
+            }
+        })
+        add(JButton("Remove", ResourceManager.getImageIcon("menu_icons/minus.png")).apply {
+            addActionListener {
+                val selectedRowIndices = table.selectedRows.sortedDescending()
+                val selectedLayers = tileMap.layers.filterIndexed { idx, _ -> idx in selectedRowIndices }
+                selectedRowIndices.forEach { model.removeRow(it) }
+                selectedLayers.forEach { tileMap.removeLayer(it) }
+                model.fireTableDataChanged()
+            }
+        })
+    })
+
+    contentPane = panel
+
+
 }
 

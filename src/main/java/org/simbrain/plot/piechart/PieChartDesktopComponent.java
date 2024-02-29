@@ -22,6 +22,7 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.simbrain.plot.actions.PlotActionManager;
+import org.simbrain.util.SwingUtilsKt;
 import org.simbrain.util.genericframe.GenericFrame;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.gui.DesktopComponent;
@@ -29,40 +30,20 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * Display a PieChart.
  */
-public class PieChartDesktopComponent extends DesktopComponent<PieChartComponent> implements ActionListener {
+public class PieChartDesktopComponent extends DesktopComponent<PieChartComponent> {
 
-    /**
-     * Plot action manager.
-     */
     private PlotActionManager actionManager;
 
-    /**
-     * Chart Panel.
-     */
     private ChartPanel chartPanel = new ChartPanel(null);
 
-    /**
-     * Preferred frame size.
-     */
     private static final Dimension PREFERRED_SIZE = new Dimension(500, 400);
 
-    /**
-     * Chart gui.
-     */
     private JFreeChart chart;
 
-    /**
-     * Construct the GUI Pie Chart.
-     *
-     * @param frame     Generic Frame
-     * @param component Pie chart component
-     */
     public PieChartDesktopComponent(final GenericFrame frame, final PieChartComponent component) {
         super(frame, component);
         setPreferredSize(PREFERRED_SIZE);
@@ -77,9 +58,6 @@ public class PieChartDesktopComponent extends DesktopComponent<PieChartComponent
         chartPanel.setChart(chart);
     }
 
-    /**
-     * Creates the menu bar.
-     */
     private void createAttachMenuBar() {
         JMenuBar bar = new JMenuBar();
 
@@ -94,8 +72,9 @@ public class PieChartDesktopComponent extends DesktopComponent<PieChartComponent
 
         JMenu editMenu = new JMenu("Edit");
         JMenuItem preferences = new JMenuItem("Preferences...");
-        preferences.addActionListener(this);
-        preferences.setActionCommand("dialog");
+        preferences.addActionListener((e) -> {
+            SwingUtilsKt.display(SwingUtilsKt.createEditorDialog(getWorkspaceComponent().getModel()));
+        });
         editMenu.add(preferences);
 
         JMenu helpMenu = new JMenu("Help");
@@ -110,15 +89,4 @@ public class PieChartDesktopComponent extends DesktopComponent<PieChartComponent
         getParentFrame().setJMenuBar(bar);
     }
 
-    public void actionPerformed(ActionEvent e) {
-        // As of now, there are no properties to set
-        // if (e.getActionCommand().equalsIgnoreCase("dialog")) {
-        //     AnnotatedPropertyEditor editor = (new AnnotatedPropertyEditor(getWorkspaceComponent().getModel()));
-        //     JDialog dialog = editor.getDialog();
-        //     dialog.setModal(true);
-        //     dialog.pack();
-        //     dialog.setLocationRelativeTo(null);
-        //     dialog.setVisible(true);
-        // }
-    }
 }

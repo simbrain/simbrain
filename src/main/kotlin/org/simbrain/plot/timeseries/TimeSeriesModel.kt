@@ -22,12 +22,13 @@ import org.jfree.data.xy.XYSeries
 import org.jfree.data.xy.XYSeriesCollection
 import org.simbrain.plot.TimeSeriesEvents
 import org.simbrain.util.UserParameter
+import org.simbrain.util.WithXStreamPropertyConverter
+import org.simbrain.util.createXStreamPropertyConverter
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import java.lang.reflect.InvocationTargetException
-import java.util.function.Consumer
 import java.util.function.Supplier
 import javax.swing.SwingUtilities
 
@@ -37,12 +38,10 @@ import javax.swing.SwingUtilities
  * support currently for representing separate scalar values in a single time
  * series.
  */
-class TimeSeriesModel(
-    /**
-     * Lambda to supply time to the time series model.
-     */
-    @field:Transient private var timeSupplier: Supplier<Int>
-) : AttributeContainer, EditableObject {
+class TimeSeriesModel : AttributeContainer, EditableObject {
+
+    @Transient
+    lateinit var timeSupplier: Supplier<Int>
 
     /**
      * Time Series Data.
@@ -141,7 +140,6 @@ class TimeSeriesModel(
      * @param timeSupplier the supplier for the x-axis of the graph
      */
     init {
-        addScalarTimeSeries(3)
         fixedWidth = fixedWidth // Force update by triggering custom setter
     }
 
@@ -258,10 +256,6 @@ class TimeSeriesModel(
         }
     }
 
-    fun setTimeSupplier(timeSupplier: Supplier<Int>) {
-        this.timeSupplier = timeSupplier
-    }
-
     private fun revalidateUseFixedRangeWindow(maxValue: Double) {
         isUseFixedRangeWindow = fixedRangeThreshold != 0.0 && maxValue < fixedRangeThreshold
     }
@@ -278,12 +272,43 @@ class TimeSeriesModel(
     private fun readResolve(): Any {
         events = TimeSeriesEvents()
         dataset = XYSeriesCollection()
-        timeSeriesList.forEach(Consumer { ts: ScalarTimeSeries -> dataset.addSeries(ts.series) })
+        timeSeriesList.forEach { dataset.addSeries(it.series) }
         return this
     }
 
     override val id: String
         get() = "Time Series"
+
+    companion object: WithXStreamPropertyConverter {
+        override val xStreamPropertyConverter = createXStreamPropertyConverter<TimeSeriesModel>(
+            marshal = {
+                on(TimeSeriesModel::timeSeriesList) { writer, context ->
+                    writer.startNode("timeSeriesList")
+                    forEach {
+                        writer.startNode("timeSeries")
+                        context.convertAnother(it.series)
+                        writer.endNode()
+                    }
+                    writer.endNode()
+                }
+            }, unmarshal = {
+                on("timeSeriesList") { reader, context ->
+                    while (reader.hasMoreChildren()) {
+                        reader.moveDown()
+                        val series = context.convertAnother(reader.value, XYSeries::class.java) as XYSeries
+                        withConstructedObject {
+                            val sts = ScalarTimeSeries(series)
+                            timeSeriesList.add(sts)
+                            dataset.addSeries(sts.series)
+                            events.scalarTimeSeriesAdded.fireAndBlock(sts)
+                        }
+                        reader.moveUp()
+                    }
+                }
+
+            }
+        )
+    }
 
     /**
      * Encapsulates a single time series for scalar couplings to attach to.

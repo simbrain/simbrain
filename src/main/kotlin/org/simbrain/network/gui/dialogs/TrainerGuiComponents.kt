@@ -18,6 +18,7 @@ import org.simbrain.util.table.*
 import org.simbrain.util.widgets.ToggleButton
 import smile.math.matrix.Matrix
 import java.awt.Dimension
+import java.util.function.Supplier
 import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -114,7 +115,8 @@ class ErrorTimeSeries(trainer: IterableTrainer) : JPanel() {
         val mainPanel = JPanel()
 
         // TODO: Consider passing some of these values in
-        val model = TimeSeriesModel { trainer.iteration }
+        val model = TimeSeriesModel()
+        model.timeSupplier = Supplier { trainer.iteration }
         model.rangeLowerBound = 0.0
         model.rangeUpperBound = 5.0
         model.fixedWidth = true

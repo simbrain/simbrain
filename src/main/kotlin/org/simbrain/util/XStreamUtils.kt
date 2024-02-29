@@ -11,6 +11,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamReader
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter
 import com.thoughtworks.xstream.io.xml.DomDriver
 import com.thoughtworks.xstream.mapper.Mapper
+import kotlinx.coroutines.*
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.util.piccolo.Tile
@@ -19,10 +20,13 @@ import org.simbrain.util.projection.Projector
 import org.simbrain.util.propertyeditor.EditableObject
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
+import kotlin.reflect.KProperty1
 import kotlin.reflect.full.*
 import kotlin.reflect.javaType
 import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaField
+import kotlin.time.DurationUnit.SECONDS
+import kotlin.time.toDuration
 
 /**
  * Returns an XStream instance with default Simbrain settings, including backwards compatibility with earlier xml,
@@ -73,8 +77,6 @@ fun getSimbrainXStream(): XStream {
  * Must be used to properly serialize Kotlin classes that use delegation.
  *
  * Field names must match constructor param names.
- *
- * @param clazz: the class we want to convert
  */
 @JvmOverloads
 fun createConstructorCallingConverter(
@@ -86,26 +88,33 @@ fun createConstructorCallingConverter(
     return object : ReflectionConverter(mapper, reflectionProvider) {
 
         override fun marshal(source: Any, writer: HierarchicalStreamWriter, context: MarshallingContext) {
-            (source::class.allSuperclasses + source::class)
-                .map { it.declaredMemberProperties }
-                .flatten()
+            val customMarshaller = (source::class.companionObjectInstance as? WithXStreamPropertyConverter)
+                ?.xStreamPropertyConverter
+                ?.createMarshaller()
+
+            (listOf(source::class) +  source::class.allSuperclasses)
+                .flatMap { it.declaredMemberProperties }
                 .filter { it.javaField?.isTransient() == false }
                 .forEach { property ->
-                    // Get the value of the property and write it into xml
-                    property.withTempPublicAccess { getter.call(source) }?.let { value ->
-                        writer.startNode(property.name)
-                        if (!isXStreamBasicType(value)) {
-                            // xstream expects these class annotations
-                            writer.addAttribute("class", value::class.java.name)
+                    // invoke the custom marshaller if it exists
+                    val processedByCustomMarshaller = customMarshaller?.invoke(source, property, writer, context) == true
+                    if (!processedByCustomMarshaller) {
+                        // Get the value of the property and write it into xml
+                        property.withTempPublicAccess { getter.call(source) }?.let { value ->
+                            writer.startNode(property.name)
+                            if (!isXStreamBasicType(value)) {
+                                // xstream expects these class annotations
+                                writer.addAttribute("class", value::class.java.name)
+                            }
+                            context.convertAnother(value)
+                            writer.endNode()
                         }
-                        context.convertAnother(value)
-                        writer.endNode()
                     }
                 }
         }
 
         private fun isXStreamBasicType(value: Any): Boolean {
-            return when(value) {
+            return when (value) {
                 is Int, is Char, is Boolean, is Byte, is Short, is Long, is Float, is Double, is String, is Enum<*> -> true
                 else -> false
             }
@@ -135,9 +144,16 @@ fun createConstructorCallingConverter(
             // Map from names to values. Ex: activation -> 1.0
             val propertyNameToDeserializedValueMap = HashMap<String, Any?>()
 
+            val convertedObjectDeferred = CompletableDeferred<Any>()
+
+            val customUnmarshaller = (cls.companionObjectInstance as? WithXStreamPropertyConverter)
+                ?.xStreamPropertyConverter
+                ?.createUnmarshaller(convertedObjectDeferred)
+
             fun read() {
                 val nodeName = reader.nodeName
                 propertyMap[nodeName]?.let {
+                    if (customUnmarshaller?.invoke(reader, context) == true) return
                     propertyNameToDeserializedValueMap[nodeName] = if (reader.getAttribute("class") != null) {
                         context.convertAnother(reader.value, Class.forName(reader.getAttribute("class")))
                     } else {
@@ -201,10 +217,13 @@ fun createConstructorCallingConverter(
                             field.isAccessible = true
                             field.set(convertedObject, value)
                             field.isAccessible = oldAccessible
-                        } ?: throw IllegalArgumentException("Property $property for class ${cls.simpleName} does not have a backing field.")
+                        }
+                            ?: throw IllegalArgumentException("Property $property for class ${cls.simpleName} does not have a backing field.")
                     }
                 }
             }
+
+            convertedObjectDeferred.complete(convertedObject)
 
             return convertedObject
         }
@@ -220,4 +239,93 @@ fun createConstructorCallingConverter(
             }
         }
     }
+}
+
+
+/**
+ * Allows a subset of properties to be marshalled and unmarshalled by custom converters.
+ * Useful when the properties have references to an instance of this class that is not yet fully constructed.
+ *
+ * For example: ScalarTimeSeries has a reference to its parent TimeSeriesModel, which is not yet fully constructed when
+ * the ScalarTimeSeries list is being unmarshalled.
+ *
+ * Can only be used in classes using [createConstructorCallingConverter].
+ */
+interface WithXStreamPropertyConverter {
+    val xStreamPropertyConverter: XStreamPropertyConverter
+}
+
+class XStreamPropertyConverter(
+    private val marshaller: XStreamPropertyConverterMarshallingContext<*>.() -> Unit,
+    private val unmarshaller: XStreamPropertyConverterUnmarshallingContext<*>.() -> Any
+) {
+
+    /**
+     * Returns a function to be used by the XStream converter to marshal the properties of a class.
+     */
+    fun createMarshaller(): (source: Any, property: KProperty1<*, *>, writer: HierarchicalStreamWriter, context: MarshallingContext) -> Boolean {
+        val postprocessorContext = XStreamPropertyConverterMarshallingContext<Any>()
+        postprocessorContext.marshaller()
+        return { source, property, writer, context ->
+            postprocessorContext.propertyToActionMap[property]?.let { action ->
+                action(property.getter.call(source) as Any, writer, context)
+                true
+            } ?: false
+        }
+    }
+
+    /**
+     * Returns a function to be used by the XStream converter to unmarshal the properties of a class.
+     */
+    fun createUnmarshaller(constructedObject: Deferred<Any>): (reader: HierarchicalStreamReader, context: UnmarshallingContext) -> Boolean {
+        val postprocessorContext = XStreamPropertyConverterUnmarshallingContext(constructedObject)
+        postprocessorContext.unmarshaller()
+        return { reader, context ->
+            postprocessorContext.nodeNameToActionMap[reader.nodeName]?.let { action ->
+                action(
+                    reader,
+                    context
+                ); true
+            } ?: false
+        }
+    }
+}
+
+class XStreamPropertyConverterMarshallingContext<T> {
+
+    val propertyToActionMap = HashMap<KProperty1<T, *>, Any.(writer: HierarchicalStreamWriter, context: MarshallingContext) -> Unit>()
+
+    fun <P : Any> on(property: KProperty1<T, P>, block: P.(writer: HierarchicalStreamWriter, context: MarshallingContext) -> Unit) {
+        propertyToActionMap[property] = block as Any.(HierarchicalStreamWriter, MarshallingContext) -> Unit
+    }
+}
+
+class XStreamPropertyConverterUnmarshallingContext<T>(private val constructedObject: Deferred<T>) {
+
+    val nodeNameToActionMap = HashMap<String, (reader: HierarchicalStreamReader, context: UnmarshallingContext) -> Unit>()
+
+    fun on(
+        propertyNodeName: String,
+        block: (reader: HierarchicalStreamReader, context: UnmarshallingContext) -> Unit
+    ) {
+        nodeNameToActionMap[propertyNodeName] = block
+    }
+
+    fun withConstructedObject(block: T.() -> Unit) {
+        GlobalScope.launch {
+            withTimeout(10.toDuration(SECONDS)) {
+                constructedObject.await().block()
+            }
+        }
+    }
+}
+
+fun <T> createXStreamPropertyConverter(
+    marshal: XStreamPropertyConverterMarshallingContext<T>.() -> Unit,
+    unmarshal: XStreamPropertyConverterUnmarshallingContext<T>.() -> Unit
+): XStreamPropertyConverter {
+    return XStreamPropertyConverter(
+        { (this as XStreamPropertyConverterMarshallingContext<T>).marshal() },
+        { (this as XStreamPropertyConverterUnmarshallingContext<T>).unmarshal() }
+    )
 }

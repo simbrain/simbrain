@@ -20,6 +20,7 @@ package org.simbrain.plot.piechart;
 
 import com.thoughtworks.xstream.XStream;
 import org.jfree.data.general.DefaultPieDataset;
+import org.simbrain.util.UserParameter;
 import org.simbrain.util.XStreamUtils;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
@@ -37,29 +38,29 @@ public class PieChartModel implements AttributeContainer, EditableObject {
     /**
      * JFreeChart dataset for pie charts.
      */
-    private DefaultPieDataset dataset = new DefaultPieDataset();
+    final private DefaultPieDataset<String> dataset = new DefaultPieDataset<>();
+
+    @UserParameter(label = "Empty pie threshold", description = "If the total input to the chart is below this number it becomes empty")
+    private Double emptyPieThreshold = .0001;
+
+    private Boolean isUninitialized;
 
     /**
-     * Names for the "slices" in the barchart.  Set via coupling events
+     * Names for the "slices" in the barchart. Can bet via coupling events
      * in {@link PieChartComponent}.
      */
     private String[] sliceNames = {};
 
     /**
-     * Track how many slices there are.  If an array with a different number of
+     * Track how many slices there are. If an array with a different number of
      * components is sent to this component, numSlices is updated.
      */
     private int numSlices = 0;
 
-    /**
-     * Default constructor.
-     */
     public PieChartModel() {
+        emptyPie();
     }
 
-    /**
-     * @return the data set.
-     */
     public DefaultPieDataset getDataset() {
         return dataset;
     }
@@ -70,8 +71,7 @@ public class PieChartModel implements AttributeContainer, EditableObject {
      * @return the XStream object
      */
     public static XStream getXStream() {
-        XStream xstream = XStreamUtils.getSimbrainXStream();
-        return xstream;
+        return XStreamUtils.getSimbrainXStream();
     }
 
     /**
@@ -81,21 +81,48 @@ public class PieChartModel implements AttributeContainer, EditableObject {
         return this;
     }
 
+    private void updatePieStatus() {
+        if(isUninitialized) {
+            dataset.clear();
+            isUninitialized = false;
+        }
+    }
+
+    /**
+     * Show this when there is no data or effectively no data.
+     */
+    private void emptyPie() {
+        isUninitialized = true;
+        dataset.clear();
+        dataset.setValue("Empty pie", 1.0);
+    }
+
     /**
      * Called by coupling producers via reflection.
      */
     @Consumable()
     public void setValues(double[] vector) {
+        if (vector.length == 0) {
+            throw new IllegalArgumentException("Pie chart supplied with empty array");
+        }
         try {
             SwingUtilities.invokeAndWait(() -> {
+
+                updatePieStatus();
+
                 // Take care of size mismatches
                 if (vector.length != numSlices) {
                     dataset.clear();
                     numSlices = vector.length;
                 }
 
-                // Write the data
-                double total = DoubleStream.of(vector).sum() + .001;
+                double total = DoubleStream.of(vector).map(Math::abs).sum();
+
+                // For minimal activation case just show a single pie slice
+                if (total < emptyPieThreshold) {
+                    emptyPie();
+                    return;
+                }
                 for (int i = 0; i < vector.length; i++) {
                     if (i < sliceNames.length) {
                         dataset.setValue(sliceNames[i], Math.abs(vector[i] / total));

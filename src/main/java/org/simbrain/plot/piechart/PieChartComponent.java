@@ -33,16 +33,9 @@ import java.util.List;
  */
 public class PieChartComponent extends WorkspaceComponent {
 
-    /**
-     * Data model.
-     */
     private PieChartModel model;
 
-    /**
-     * Create new PieChart Component.
-     *
-     * @param name of chart
-     */
+
     public PieChartComponent(final String name) {
         super(name);
         model = new PieChartModel();

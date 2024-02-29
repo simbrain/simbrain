@@ -48,7 +48,9 @@ public class TimeSeriesPlotComponent extends WorkspaceComponent {
      */
     public TimeSeriesPlotComponent(String name) {
         super(name);
-        model = new TimeSeriesModel(() -> getWorkspace().getTime());
+        model = new TimeSeriesModel();
+        model.addScalarTimeSeries(3);
+        model.setTimeSupplier(() -> getWorkspace().getTime());
     }
 
     /**

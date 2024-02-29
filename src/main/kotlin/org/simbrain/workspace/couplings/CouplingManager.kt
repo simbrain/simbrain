@@ -190,11 +190,14 @@ class CouplingManager(val workspace: Workspace) {
      * @param consumer consumer part of the coupling
      * @return the newly creating coupling
      */
-    fun createCoupling(producer: Producer?, consumer: Consumer?) = Coupling.create(producer, consumer).also {
+    @JvmOverloads
+    fun createCoupling(producer: Producer?, consumer: Consumer?, fireEvents: Boolean = true) = Coupling.create(producer, consumer).also {
         _couplings.add(it)
         attributeContainerCouplings.getOrPut(it.producer.baseObject) { LinkedHashSet() }.add(it)
         attributeContainerCouplings.getOrPut(it.consumer.baseObject) { LinkedHashSet() }.add(it)
-        events.couplingAdded.fireAndForget(it)
+        if (fireEvents) {
+            events.couplingAdded.fireAndForget(it)
+        }
     }
 
     /**

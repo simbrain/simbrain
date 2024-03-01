@@ -35,24 +35,24 @@ class SinusoidalRuleTest {
     fun `Activation Stays Within the Bounds`() {
         repeat(10) {
             net.update()
+            assertTrue(n1.activation < 1.0)
+            assertTrue(n1.activation > -1.0)
         }
-        assertTrue(n1.activation < 1.0)
-        assertTrue(n1.activation > -1.0)
 
         net.resetTime()
         rule1.upperBound = 2.0
         repeat(10) {
             net.update()
+            assertTrue(n1.activation < 2.0)
         }
-        assertTrue(n1.activation < 2.0)
     }
 
     @Test
     fun `Activation of Equal Phases are Equal`() {
         repeat(10) {
             net.update()
+            assertEquals(n1.activation, n2.activation)
         }
-        assertEquals(n1.activation, n2.activation)
     }
 
     @Test
@@ -60,10 +60,11 @@ class SinusoidalRuleTest {
         rule1.phase = 0.0
         rule1.frequency = 1.0
         net.timeType = Network.TimeType.CONTINUOUS
-        net.timeStep = 1.57
+        net.timeStep = 1.57 // pi/2
         net.updateTime()
         net.update()
-        assertEquals(1.0, n1.activation, .01) // Should get same activation as phase = 1.57, which is true
+        // sin(pi/2) = 1
+        assertEquals(1.0, n1.activation, .01)
     }
 
     @Test

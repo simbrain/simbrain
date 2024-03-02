@@ -76,8 +76,8 @@ class GuiEditable<O : EditableObject, T>(
         }
 
     @Transient
-    private var _property: KMutableProperty1<O, T>? = null
-    val property: KMutableProperty1<O, T>
+    private var _property: KProperty1<O, T>? = null
+    val property: KProperty1<O, T>
         get() {
             if (_property == null) throw IllegalStateException("Property not initialized")
             return _property!!
@@ -122,12 +122,10 @@ class GuiEditable<O : EditableObject, T>(
             _baseObject = baseObject
         }
         if (_property == null) {
-            val kMutableProperty1 = try {
-                property as KMutableProperty1<O, T>
-            } catch (e: ClassCastException) {
-                throw ClassCastException("Failed to cast property ${property.name} to KMutableProperty1<O, T>. Is it not mutable?")
+            if (!displayOnly && property !is KMutableProperty<*>) {
+                throw IllegalArgumentException("Property $property is not mutable")
             }
-            _property = kMutableProperty1
+            _property = property as KProperty1<O, T>
         }
         if (_label == null) {
             _label = property.name.convertCamelCaseToSpaces()
@@ -305,7 +303,7 @@ class UpdateFunctionContext<O : EditableObject, T>(
  */
 class ParameterEvents<O : EditableObject, T> : Events() {
 
-    val valueChanged = AddedEvent<KMutableProperty1<O, T>>()
+    val valueChanged = AddedEvent<KProperty1<O, T>>()
 
 }
 

@@ -237,22 +237,23 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
         parameterWidgetMap.forEach { (parameter, widget) ->
             editingObjects.forEach { eo ->
                 if (widget.isConsistent) {
-                    val property = parameter.property
-                    if (widget is ObjectWidget<*, *>) {
-                        widget.objectTypeEditor.commitChanges()
-                        if (parameter.useLegacySetter) {
-                            property.invokeLegacySetter(eo, widget.value.copy())
+                    (parameter.property as? KMutableProperty1<O, Any>)?.let { property ->
+                        if (widget is ObjectWidget<*, *>) {
+                            widget.objectTypeEditor.commitChanges()
+                            if (parameter.useLegacySetter) {
+                                property.invokeLegacySetter(eo, widget.value.copy())
+                            } else {
+                                property.setter.call(eo, widget.value.copy())
+                            }
                         } else {
-                            property.setter.call(eo, widget.value.copy())
+                            if (parameter.useLegacySetter) {
+                                property.invokeLegacySetter(eo, widget.value)
+                            } else {
+                                property.setter.call(eo, widget.value)
+                            }
                         }
-                    } else {
-                        if (parameter.useLegacySetter) {
-                            property.invokeLegacySetter(eo, widget.value)
-                        } else {
-                            property.setter.call(eo, widget.value)
-                        }
+                        eo.onCommit()
                     }
-                    eo.onCommit()
                 }
 
             }

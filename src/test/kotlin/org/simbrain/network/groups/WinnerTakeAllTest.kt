@@ -20,7 +20,7 @@ class WinnerTakeAllTest {
             n1.clamped = true
             n2.clamped = true
             connect(n1, wta.getNeuron(0), 1.0)
-            connect(n2, wta.getNeuron(0), .5)
+            connect(n2, wta.getNeuron(1), 1.0)
         }
     }
 
@@ -46,7 +46,13 @@ class WinnerTakeAllTest {
 
     @Test
     fun `Check that if equal input a random node wins`() {
-        // TODO: Not sure how to do this yet
+        n1.forceSetActivation(1.0)
+        n2.forceSetActivation(1.0)
+        val result = (0..100).map {
+            net.update()
+            wta.getWinner()
+        }.toSet().size
+        assertEquals(2,result)
     }
 
     @Test

@@ -32,7 +32,7 @@ abstract class ProbabilityDistribution() : CopyableObject {
 
     /**
      * Use this to ensure two probability distributions return the same pseudo-random sequence of numbers.
-     * See ProbabilityDistributionTest.kt for exmamples.
+     * See ProbabilityDistributionTest.kt for examples.
      *
      * If null, then seed is random and so copies of this object produce different samples.
      *

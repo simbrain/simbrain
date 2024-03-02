@@ -55,6 +55,8 @@ class WinnerTakeAll @JvmOverloads constructor(
 
     override fun copy() = WinnerTakeAll(neuronList.map { it.copy() }, params.copy())
 
+    fun getWinner(): Neuron = getWinner(neuronList)
+
     context(Network)
     override fun update() {
         neuronList.forEach { it.updateInputs() }
@@ -126,9 +128,9 @@ class WinnerTakeAllParams : NeuronGroupParams() {
  * determine winner
  * @return the neuron with the highest net input
  */
-fun getWinner(neuronList: List<Neuron>, useActivations: Boolean): Neuron? {
+fun getWinner(neuronList: List<Neuron>, useActivations: Boolean = false): Neuron {
     if (neuronList.isEmpty()) {
-        return null
+        throw IllegalArgumentException("There are no winners in any empty neuron list")
     }
     val winners: MutableList<Neuron> = ArrayList()
     var winner = neuronList[0]

@@ -328,7 +328,7 @@ class Network: CoroutineScope, EditableObject {
                 model.events.priorityChanged.on {
                     updatePriorityList()
                 }
-                model.events.updateRuleChanged.on { _, _ -> updateTimeType() }
+                model.events.updateRuleChanged.on(wait = true) { _, _ -> updateTimeType() }
                 updatePriorityList()
             }
             return job

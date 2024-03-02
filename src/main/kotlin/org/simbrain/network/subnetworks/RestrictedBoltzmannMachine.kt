@@ -19,12 +19,9 @@
 package org.simbrain.network.subnetworks
 
 import org.simbrain.network.NetworkModel
-import org.simbrain.network.core.InfoText
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.SynapseGroup
-import org.simbrain.network.core.getEnergy
-import org.simbrain.network.neurongroups.CompetitiveGroup
+import org.simbrain.network.core.*
 import org.simbrain.network.neurongroups.NeuronGroup
+import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.util.Alignment.VERTICAL
 import org.simbrain.network.util.Direction.NORTH
 import org.simbrain.network.util.alignNetworkModels
@@ -43,37 +40,39 @@ import org.simbrain.util.propertyeditor.EditableObject
  */
 public class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: Int) : Subnetwork() {
 
-    val hiddenLayer: CompetitiveGroup
+    //  TODO: Neuron arrays?
+    val hiddenLayer: NeuronGroup
 
     val visibleLayer: NeuronGroup
 
-    val hiddenToVisible: SynapseGroup
+    val hiddenToVisible: WeightMatrix
 
-    val visibleToHidden: SynapseGroup
+    val visibleToHidden: WeightMatrix
 
     val infoText: InfoText
 
     init {
         this.label = "Restricted Boltzmann Machine"
 
-        visibleLayer = NeuronGroup(numVisibleNodes)
+        visibleLayer = NeuronGroup(numVisibleNodes).apply {
+            label = "Visible layer"
+            setUpperBound(1.0)
+            setLowerBound(0.0)
+            setClamped(true)
+            setLayoutBasedOnSize()
+        }
         this.addModel(visibleLayer)
-        visibleLayer.label = "Visible layer"
-        visibleLayer.setUpperBound(1.0)
-        visibleLayer.setLowerBound(0.0)
-        visibleLayer.setClamped(true)
-        visibleLayer.setLayoutBasedOnSize()
 
-        hiddenLayer = CompetitiveGroup(numHiddenNodes)
-        hiddenLayer.label = "Hidden Layer"
-        hiddenLayer.setUpperBound(1.0)
-        hiddenLayer.setLowerBound(0.0)
-
+        // Something like a softmax may be used? See 13.1
+        hiddenLayer = NeuronGroup(numHiddenNodes).apply {
+            label = "Hidden Layer"
+            setUpdateRule(SigmoidalRule())
+        }
         this.addModel(hiddenLayer)
         hiddenLayer.setLayoutBasedOnSize()
 
-        visibleToHidden = SynapseGroup(visibleLayer, hiddenLayer)
-        hiddenToVisible = SynapseGroup(hiddenLayer, visibleLayer)
+        visibleToHidden = WeightMatrix(visibleLayer, hiddenLayer)
+        hiddenToVisible = WeightMatrix(hiddenLayer, visibleLayer)
         this.addModels(visibleToHidden, hiddenToVisible)
 
         alignNetworkModels(visibleLayer, hiddenLayer, VERTICAL)
@@ -87,6 +86,7 @@ public class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: In
         get() = "Energy: " + (hiddenLayer.neuronList + visibleLayer.neuronList).getEnergy().format(4)
 
     fun updateStateInfoText() {
+        println("Here")
         infoText.text = stateInfoText
         events.customInfoUpdated.fireAndBlock()
     }
@@ -94,12 +94,42 @@ public class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: In
     override val customInfo: NetworkModel
         get() = infoText
 
+    // Todo: add proper traiing framework
+
+    fun trainOnCurrentPattern() {
+        // Contrastive divergence
+        // Set "k"
+    }
+
     context(Network)
     override fun update() {
-        super.update()
-        println("TODO: Custom update")
+
+        // "Positive phase"
+        hiddenLayer.updateInputs()
+        hiddenLayer.update()
+        updateWithSampling(hiddenLayer.neuronList)
+
+        // This is where training starts
+
+        // Negative phase / "reconstruction" of visible
+        visibleLayer.updateInputs()
+        visibleLayer.update()
+
+        // TODO: Positive gradient is outer product of visible and hidden states
+
+        // Now go BACK to hidden using reconstructed visible, this is reconstructed hidden
+        // negative gradient is outer product of reconstructed_visible, reconstructed_hidden_states
+
+        //  Weight update
+        // weights += learning_rate * (positive_gradient - negative_gradient)
+        // visible_bias += learning_rate * (visible - reconstructed_visible)
+        // hidden_bias += learning_rate * (hidden_states - reconstructed_hidden_states)
+
+
+        updateWithSampling(visibleLayer.neuronList)
         updateStateInfoText()
     }
+
 
     /**
      * Helper class for creating new RBM's nets using [org.simbrain.util.propertyeditor.AnnotatedPropertyEditor].
@@ -114,5 +144,23 @@ public class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: In
         fun create(): RestrictedBoltzmannMachine {
             return RestrictedBoltzmannMachine(numVisible, numHidden)
         }
+    }
+}
+
+fun updateWithSampling(neurons: List<Neuron>) {
+    neurons.forEach {n ->
+        n.activation = if (Math.random() < n.activation) 1.0 else 0.0
+    }
+}
+
+fun main() {
+    // val rbm = RestrictedBoltzmannMachine(2,2)
+    repeat(10) {
+        val n1 = Neuron().apply { activation = 0.0 }
+        val n2 = Neuron().apply { activation = 0.5 }
+        val n3 = Neuron().apply { activation = 1.0 }
+        // Expecting 0, ?, 1 each run
+        updateWithSampling(listOf(n1, n2, n3))
+        println("${n1.activation}, ${n2.activation}, ${n3.activation}")
     }
 }

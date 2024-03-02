@@ -60,12 +60,12 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
     /**
      * Getter for selected models.
      */
-    val selectedModels get() = selection.map { it.model }
+    val selectedModels get() = selection.map { it.model }.toSet().toList()
 
     /**
      * Getter for source models.
      */
-    val sourceModels get() = sourceSelection.map { it.model!! }
+    val sourceModels get() = sourceSelection.map { it.model!! }.toSet().toList()
 
     val isEmpty get() = selection.isEmpty()
     val isNotEmpty get() = !isEmpty

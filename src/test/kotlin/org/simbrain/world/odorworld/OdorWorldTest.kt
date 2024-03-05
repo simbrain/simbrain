@@ -19,8 +19,8 @@ class OdorWorldTest {
 
     @Test
     fun testSetCollisionProperty() {
-        world.tileMap.getLayer("Tile Layer 1").setProperty("collision", "true")
-        Assertions.assertTrue(world.tileMap.getLayer("Tile Layer 1").collision)
+        world.tileMap.getLayer("Tile Layer 1").setProperty("blocking", "true")
+        Assertions.assertTrue(world.tileMap.getLayer("Tile Layer 1").blocking)
     }
 
     @Test

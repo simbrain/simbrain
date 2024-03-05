@@ -5,7 +5,9 @@ import com.thoughtworks.xstream.annotations.XStreamAsAttribute
 import com.thoughtworks.xstream.annotations.XStreamConverter
 import com.thoughtworks.xstream.converters.extended.NamedMapConverter
 import org.simbrain.util.UserParameter
+import org.simbrain.util.point
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.world.odorworld.entities.Bounded
 
 /**
  * Simbrain wrapper for a [TileMap] tile.
@@ -22,6 +24,7 @@ class Tile(@XStreamAsAttribute @UserParameter(label = "ID", order = 0, displayOn
 
     /**
      * Human readable name associated to some tile ids. It's up to the person making the tmx file to provide these.
+     * Provides a more readable way to set tiles in scripts.
      */
     @Transient
     @UserParameter(label = "Tile label", description = "Name for tile", order = 30)
@@ -39,21 +42,26 @@ class Tile(@XStreamAsAttribute @UserParameter(label = "ID", order = 0, displayOn
     val properties = HashMap<String, String>()
 
     /**
-     * Type of this tile. Multiple tiles can be associated with the same type.
-     */
-    @Transient
-    @UserParameter(label = "Collision", description = "If true, objects will collide with tiles that have this id", order = 30)
-    var collision: Boolean = false
-
-    /**
      * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
      */
     private fun readResolve(): Any {
         type = properties["type"] ?: "$id"
         label = properties["label"]
-        collision = properties["collision"]?.toBoolean() ?: false
         return this
     }
 
     override val name = "$id"
+}
+
+/**
+ * A temporary data structure to associate a tile with location information during collision detection.
+ */
+context(TileMap)
+class TileInstance(val tile: Tile, val gridCoordinate: GridCoordinate): Bounded {
+    val pixelCoordinate = gridCoordinate.toPixelCoordinate()
+    override val x by pixelCoordinate::x
+    override val y by pixelCoordinate::y
+    override val location = point(x, y)
+    override val width = tileWidth.toDouble()
+    override val height = tileHeight.toDouble()
 }

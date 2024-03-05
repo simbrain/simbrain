@@ -491,6 +491,8 @@ public class OdorWorld implements EditableObject, Bounded {
     public List<Bounded> getCollidableObjects() {
         var bounds = new ArrayList<Bounded>();
 
+        bounds.addAll(tileMap.getCollisionBounds());
+
         if (isObjectsBlockMovement()) {
             bounds.addAll(entityList);
         }

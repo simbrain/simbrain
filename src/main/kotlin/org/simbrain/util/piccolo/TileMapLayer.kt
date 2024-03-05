@@ -14,6 +14,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter
 import com.thoughtworks.xstream.mapper.Mapper
 import org.piccolo2d.nodes.PImage
 import org.simbrain.util.swingInvokeLater
+import org.simbrain.world.odorworld.entities.Bounded
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
@@ -28,17 +29,17 @@ class TileMapLayer(
     @XStreamAsAttribute var name: String,
     @XStreamAsAttribute private var width: Int,
     @XStreamAsAttribute private var height: Int,
-    collision: Boolean
+    blocking: Boolean
 ) {
 
     /**
      * Custom properties defined in tmx.
      */
     @XStreamConverter(
-            value = NamedMapConverter::class,
-            strings = ["property", "name", "value"],
-            types = [String::class, String::class],
-            booleans = [true, true]
+        value = NamedMapConverter::class,
+        strings = ["property", "name", "value"],
+        types = [String::class, String::class],
+        booleans = [true, true]
     )
     @XStreamAlias("properties")
     private var _properties: HashMap<String, String?>? = null
@@ -57,6 +58,8 @@ class TileMapLayer(
                 }
             }
         }
+
+    var boundsNeedRecompute: Boolean? = null
 
     val properties: HashMap<String, String?>
         get() = _properties ?: HashMap<String, String?>().also { _properties = it }
@@ -111,8 +114,12 @@ class TileMapLayer(
      *
      * @return true if tiles are blocking
      */
-    val collision: Boolean
-        get() = properties["collision"] == "true"
+    var blocking: Boolean
+        get() = properties["blocking"] == "true"
+        set(value) {
+            properties["blocking"] = if (value) "true" else "false"
+            boundsNeedRecompute = true
+        }
 
     /**
      * Get the id of a tile at the given tile coordinate location.
@@ -137,6 +144,7 @@ class TileMapLayer(
      */
     operator fun set(x: Int, y: Int, tileID: Int) {
         data[x, y] = tileID
+        boundsNeedRecompute = true
     }
 
     /**
@@ -157,11 +165,28 @@ class TileMapLayer(
 
     fun setProperty(propertyName: String, propertyValue: String?) {
         properties[propertyName] = propertyValue
+        boundsNeedRecompute = true
+    }
+
+    context(TileMap)
+    fun getCollisionBounds(): List<Bounded> {
+        return buildList {
+            for (j in 0 until height) {
+                for (i in 0 until width) {
+                    val tileId = this@TileMapLayer[i, j]
+                    if (tileId != 0) {
+                        add(TileInstance(getTile(tileId), GridCoordinate(i, j)))
+                    }
+                }
+            }
+            boundsNeedRecompute = false
+        }
     }
 
     init {
-        properties["collision"] = if (collision) "true" else "false"
+        properties["block"] = if (blocking) "true" else "false"
         data = TileMapLayerData(width, height)
+        boundsNeedRecompute = true
     }
 
 }
@@ -172,6 +197,7 @@ class TileMapLayer(
 @XStreamAlias("data")
 class TileMapLayerData(val gidMatrix: MutableList<MutableList<Int>>) {
     constructor(width: Int, height: Int) : this(MutableList(height) { MutableList(width) { 0 } })
+
     operator fun get(x: Int, y: Int) = gidMatrix[y][x]
     operator fun set(x: Int, y: Int, tileId: Int) {
         gidMatrix[y][x] = tileId
@@ -214,18 +240,19 @@ class TiledDataConverter(mapper: Mapper, reflectionProvider: ReflectionProvider)
         fun ByteArray.decompressZlib() = InflaterInputStream(ByteArrayInputStream(this)).readAllBytes()!!
 
         fun ByteBuffer.asIntSequence() = sequence {
-            while(hasRemaining()) {
+            while (hasRemaining()) {
                 yield(int)
             }
         }
 
         return when (encoding) {
             "csv" -> decodeCSV()
-            "base64" -> when(compression) {
+            "base64" -> when (compression) {
                 "gzip" -> decodeBase64().map { it.decompressGzip() }
                 "zlib" -> decodeBase64().map { it.decompressZlib() }
                 else -> decodeBase64()
             }.map { ByteBuffer.wrap(it).apply { order(ByteOrder.LITTLE_ENDIAN) }.asIntSequence().toList() }
+
             else -> throw IllegalStateException("Unknown encoding $encoding")
         }
 

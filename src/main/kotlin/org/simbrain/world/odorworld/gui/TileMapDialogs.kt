@@ -229,9 +229,9 @@ fun OdorWorld.layerEditor() = StandardDialog().apply {
     title = "Edit Layers"
     setSize(300, 400)
 
-    val columnNames = arrayOf("Name", "Visible")
+    val columnNames = arrayOf("Name", "Visible", "Blocking")
     val data = tileMap.layers.map { layer ->
-        arrayOf(layer.name, layer.visible)
+        arrayOf(layer.name, layer.visible, layer.blocking)
     }.toTypedArray()
 
     val model = object : DefaultTableModel(data, columnNames) {
@@ -243,6 +243,7 @@ fun OdorWorld.layerEditor() = StandardDialog().apply {
             return when (column) {
                 0 -> tileMap.layers[row].name
                 1 -> tileMap.layers[row].visible
+                2 -> tileMap.layers[row].blocking
                 else -> throw IllegalArgumentException("Invalid column index")
             }
         }
@@ -251,6 +252,7 @@ fun OdorWorld.layerEditor() = StandardDialog().apply {
             when (column) {
                 0 -> tileMap.layers[row].name = aValue as String
                 1 -> tileMap.layers[row].visible = aValue as Boolean
+                2 -> tileMap.layers[row].blocking = aValue as Boolean
                 else -> throw IllegalArgumentException("Invalid column index")
             }
         }

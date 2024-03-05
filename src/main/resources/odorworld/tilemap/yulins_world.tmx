@@ -207,7 +207,7 @@
  </layer>
  <layer id="3" name="c_groundOverlay" width="15" height="15">
   <properties>
-   <property name="collision" type="bool" value="true"/>
+   <property name="blocking" type="bool" value="true"/>
   </properties>
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -229,7 +229,7 @@
  </layer>
  <layer id="4" name="c_object" width="15" height="15">
   <properties>
-   <property name="collision" type="bool" value="true"/>
+   <property name="blocking" type="bool" value="true"/>
   </properties>
   <data encoding="csv">
 0,0,0,0,0,0,0,641,641,641,641,641,641,641,641,

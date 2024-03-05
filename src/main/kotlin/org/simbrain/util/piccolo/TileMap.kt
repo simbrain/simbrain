@@ -4,6 +4,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute
 import com.thoughtworks.xstream.annotations.XStreamImplicit
 import org.piccolo2d.nodes.PImage
+import org.simbrain.world.odorworld.entities.Bounded
 import org.simbrain.world.odorworld.events.TileMapEvents
 import java.awt.Color
 import java.awt.geom.Point2D
@@ -105,6 +106,19 @@ class TileMap(width: Int, height: Int) {
     private val _layers = mutableListOf(TileMapLayer("Default Layer", width, height, true))
     val layers: List<TileMapLayer>
         get() = _layers
+
+    private var _collisionBoundsCache: List<Bounded>? = null
+
+    var collisionBounds: List<Bounded>
+        get() {
+            if (boundsNeedRecompute || _collisionBoundsCache == null) {
+                _collisionBoundsCache = computeCollisionBounds()
+            }
+            return _collisionBoundsCache!!
+        }
+        set(value) {
+            _collisionBoundsCache = value
+        }
 
     /**
      * The background color of the map. (optional, may include alpha value since 0.15 in the form #AARRGGBB)
@@ -238,16 +252,6 @@ class TileMap(width: Int, height: Int) {
     fun getTileStackAt(gridCoordinate: GridCoordinate) =
         getTileStackAt(gridCoordinate.x.toInt(), gridCoordinate.y.toInt())
 
-    /**
-     * Check if a given tile location contains any tiles or layers that with the collision property.
-     *
-     * @param x x in tile coordinate
-     * @param y y in tile coordinate
-     * @return true if the given location has a collision tile
-     */
-    fun collidingAt(x: Int, y: Int) =
-            layers.filter { it.collision }.map { getTile(it[x, y]) }.any { it.id != 0 } ||
-                    layers.map{ getTile(it[x,y]) }.any{ it.collision }
 
     /**
      * Get a Rectangle2D region of a given tile
@@ -313,6 +317,12 @@ class TileMap(width: Int, height: Int) {
             }
         }
         events.mapSizeChanged.fireAndBlock()
+    }
+
+    val boundsNeedRecompute get() = layers.any { it.boundsNeedRecompute != true }
+
+    fun computeCollisionBounds(): List<Bounded> {
+        return layers.filter { it.blocking }.flatMap { it.getCollisionBounds() }
     }
 
     /**

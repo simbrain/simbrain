@@ -19,7 +19,7 @@ class Tile(@XStreamAsAttribute @UserParameter(label = "ID", order = 0, displayOn
      * Type of this tile. This way multiple tiles can be associated with the same type.
      */
     @Transient
-    @UserParameter(label = "Type", description = "type", order = 20)
+    @UserParameter(label = "Type", description = "type", displayOnly = true, order = 20)
     var type: String = "Type $id"
 
     /**
@@ -27,7 +27,7 @@ class Tile(@XStreamAsAttribute @UserParameter(label = "ID", order = 0, displayOn
      * Provides a more readable way to set tiles in scripts.
      */
     @Transient
-    @UserParameter(label = "Tile label", description = "Name for tile", order = 30)
+    @UserParameter(label = "Tile label", description = "Name for tile", displayOnly = true, order = 30)
     var label: String? = null
 
     /**

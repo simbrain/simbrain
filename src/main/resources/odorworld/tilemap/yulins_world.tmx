@@ -167,11 +167,11 @@
    </properties>
   </tile>
  </tileset>
- <layer id="1" name="u_ground" width="15" height="15">
+ <layer id="1" name="ground" width="15" height="15">
   <data encoding="csv">
 63,63,63,6,6,6,6,6,6,6,6,63,63,63,63,
 63,63,63,63,6,63,63,63,6,6,6,6,6,6,6,
-6,6,63,6,63,6,63,63,2,2,6,6,63,6,6,
+6,6,63,6,63,6,63,63,6,6,6,6,63,6,6,
 6,6,6,6,6,63,6,6,6,6,63,6,63,63,6,
 63,6,6,63,6,6,63,63,6,6,63,6,6,6,6,
 63,6,6,6,63,6,6,63,6,6,6,6,63,6,6,
@@ -186,7 +186,7 @@
 6,6,6,6,63,63,63,63,63,63,6,63,63,6,63
 </data>
  </layer>
- <layer id="2" name="u_groundOverlay" width="15" height="15">
+ <layer id="2" name="path" width="15" height="15">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,407,466,466,466,408,0,0,0,0,0,0,0,0,0,
@@ -205,7 +205,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <layer id="3" name="c_groundOverlay" width="15" height="15">
+ <layer id="3" name="lake" width="15" height="15">
   <properties>
    <property name="blocking" type="bool" value="true"/>
   </properties>
@@ -227,7 +227,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <layer id="4" name="c_object" width="15" height="15">
+ <layer id="4" name="objects" width="15" height="15">
   <properties>
    <property name="blocking" type="bool" value="true"/>
   </properties>
@@ -249,7 +249,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <layer id="5" name="c_objectOverlay" width="15" height="15">
+ <layer id="5" name="objects2" width="15" height="15">
   <data encoding="csv">
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -268,7 +268,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <layer id="6" name="o_object" width="15" height="15">
+ <layer id="6" name="overlay" width="15" height="15">
   <data encoding="csv">
 0,0,0,0,0,0,0,584,584,584,584,584,584,584,584,
 0,0,0,0,0,0,0,584,0,0,0,0,584,584,584,

@@ -11,7 +11,6 @@ import com.thoughtworks.xstream.io.HierarchicalStreamReader
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter
 import com.thoughtworks.xstream.io.xml.DomDriver
 import com.thoughtworks.xstream.mapper.Mapper
-import kotlinx.coroutines.*
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.util.piccolo.Tile
@@ -25,8 +24,6 @@ import kotlin.reflect.full.*
 import kotlin.reflect.javaType
 import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaField
-import kotlin.time.DurationUnit.SECONDS
-import kotlin.time.toDuration
 
 /**
  * Returns an XStream instance with default Simbrain settings, including backwards compatibility with earlier xml,
@@ -144,11 +141,11 @@ fun createConstructorCallingConverter(
             // Map from names to values. Ex: activation -> 1.0
             val propertyNameToDeserializedValueMap = HashMap<String, Any?>()
 
-            val convertedObjectDeferred = CompletableDeferred<Any>()
+            val objectCompletedEvent = ConvertedObjectEvent()
 
             val customUnmarshaller = (cls.companionObjectInstance as? WithXStreamPropertyConverter)
                 ?.xStreamPropertyConverter
-                ?.createUnmarshaller(convertedObjectDeferred)
+                ?.createUnmarshaller(objectCompletedEvent)
 
             fun read() {
                 val nodeName = reader.nodeName
@@ -223,7 +220,7 @@ fun createConstructorCallingConverter(
                 }
             }
 
-            convertedObjectDeferred.complete(convertedObject)
+            objectCompletedEvent.objectCompleted.fireAndBlock(convertedObject)
 
             return convertedObject
         }
@@ -277,8 +274,8 @@ class XStreamPropertyConverter(
     /**
      * Returns a function to be used by the XStream converter to unmarshal the properties of a class.
      */
-    fun createUnmarshaller(constructedObject: Deferred<Any>): (reader: HierarchicalStreamReader, context: UnmarshallingContext) -> Boolean {
-        val postprocessorContext = XStreamPropertyConverterUnmarshallingContext(constructedObject)
+    fun createUnmarshaller(objectCompletedEvent: ConvertedObjectEvent): (reader: HierarchicalStreamReader, context: UnmarshallingContext) -> Boolean {
+        val postprocessorContext = XStreamPropertyConverterUnmarshallingContext<Any>(objectCompletedEvent)
         postprocessorContext.unmarshaller()
         return { reader, context ->
             postprocessorContext.nodeNameToActionMap[reader.nodeName]?.let { action ->
@@ -300,7 +297,7 @@ class XStreamPropertyConverterMarshallingContext<T> {
     }
 }
 
-class XStreamPropertyConverterUnmarshallingContext<T>(private val constructedObject: Deferred<T>) {
+class XStreamPropertyConverterUnmarshallingContext<T>(private val objectCompletedEvent: ConvertedObjectEvent) {
 
     val nodeNameToActionMap = HashMap<String, (reader: HierarchicalStreamReader, context: UnmarshallingContext) -> Unit>()
 
@@ -312,10 +309,8 @@ class XStreamPropertyConverterUnmarshallingContext<T>(private val constructedObj
     }
 
     fun withConstructedObject(block: T.() -> Unit) {
-        GlobalScope.launch {
-            withTimeout(10.toDuration(SECONDS)) {
-                constructedObject.await().block()
-            }
+        objectCompletedEvent.objectCompleted.on(wait = true) {
+            (it as T).block()
         }
     }
 }
@@ -328,4 +323,8 @@ fun <T> createXStreamPropertyConverter(
         { (this as XStreamPropertyConverterMarshallingContext<T>).marshal() },
         { (this as XStreamPropertyConverterUnmarshallingContext<T>).unmarshal() }
     )
+}
+
+class ConvertedObjectEvent: Events() {
+    val objectCompleted = AddedEvent<Any>()
 }

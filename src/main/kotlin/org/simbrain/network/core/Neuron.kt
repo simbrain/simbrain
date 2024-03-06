@@ -81,7 +81,9 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
         set(value) {
             val oldRule = field
             field = value
-            dataHolder = value.createScalarData()
+            if (oldRule::class != value::class) {
+                dataHolder = value.createScalarData()
+            }
             events.updateRuleChanged.fireAndForget(oldRule, value)
         }
 

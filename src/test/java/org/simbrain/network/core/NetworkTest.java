@@ -6,6 +6,7 @@ import org.simbrain.network.neurongroups.*;
 import org.simbrain.network.subnetworks.BackpropNetwork;
 import org.simbrain.network.subnetworks.SRNNetwork;
 import org.simbrain.network.subnetworks.Subnetwork;
+import org.simbrain.network.util.BiasedScalarData;
 
 import java.util.List;
 
@@ -39,6 +40,7 @@ public class NetworkTest {
 
         n1 = new Neuron();
         n1.setLabel("neuron1");
+        ((BiasedScalarData) n1.getDataHolder()).setBias(1.0);
         net.addNetworkModelAsync(n1);
         n2 = new Neuron();
         n2.setLabel("neuron2");
@@ -137,7 +139,9 @@ public class NetworkTest {
         String xmlRep = NetworkUtilsKt.getNetworkXStream().toXML(net);
         Network fromXml = (Network) NetworkUtilsKt.getNetworkXStream().fromXML(xmlRep);
 
-        assertNotNull(getModelByLabel(fromXml, Neuron.class, "neuron1"));
+        var n1 = getModelByLabel(fromXml, Neuron.class, "neuron1");
+        assertNotNull(n1);
+        assertEquals(1.0, ((BiasedScalarData) n1.getDataHolder()).getBias());
         assertNotNull(getModelByLabel(fromXml, Neuron.class, "neuron2"));
         assertNotNull(getModelByLabel(fromXml, NeuronGroup.class, "neuron_group_1"));
         assertNotNull(getModelByLabel(fromXml, NeuronGroup.class, "ng2"));

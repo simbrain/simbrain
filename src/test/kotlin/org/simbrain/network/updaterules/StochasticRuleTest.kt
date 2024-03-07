@@ -34,6 +34,7 @@ class StochasticRuleTest {
                 }
             }
             assertEquals(10, spikes)
+            assertEquals(1.0, n.activation)
         }
     }
 

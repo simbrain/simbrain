@@ -9,67 +9,57 @@ import org.simbrain.network.updaterules.activity_generators.StochasticRule
 
 class StochasticRuleTest {
 
-    // Default update rule is stochastic
     val net = Network()
     var rule = StochasticRule()
     var n = Neuron(rule)
 
     init {
         net.addNetworkModelsAsync(n)
-        n.activation = 0.0
-        rule.firingProbability = 0.05
-
     }
 
     @Test
-    fun `Run 10 Times at Firing Probability = 1 Should activate it 10 Times`() {
+    fun `Should always spike when firing probability is 1`() {
         with(net) {
             rule.firingProbability = 1.0
             var spikes = 0
-
             repeat(10) {
                 net.update()
-                if (n.activation == 1.0) {
+                if (n.isSpike) {
                     spikes += 1
                 }
             }
             assertEquals(10, spikes)
-            assertEquals(1.0, n.activation)
         }
     }
 
     @Test
-    fun `Run 10 Times at Firing Probability = 0 Should activate it 10 Times`() {
+    fun `Should never spike when firing probability is 0`() {
         with(net) {
             rule.firingProbability = 0.0
-            var nospikes = 0
-
+            var spikes = 0
             repeat(10) {
                 net.update()
-                if (n.activation == 0.0) {
-                    nospikes += 1
+                if (n.isSpike) {
+                    spikes += 1
                 }
             }
-            assertEquals(10, nospikes)
-            assertEquals(0.0, n.activation)
+            assertEquals(0, spikes)
         }
     }
 
     @Test
-    // More than 1 spikes (No clue on how to do it statistically)
-    fun `Firing Probability = 0_5 Should Activate approximately 50 percent of the time`() {
-        var spikes = 0
-        rule.firingProbability = 0.5
-
-        repeat(100) {
-            net.update()
-            if (n.activation == 1.0) {
+    fun `Spike at least once with firing probability of one half and enough iterations`() {
+        with(net) {
+            rule.firingProbability = 0.5
+            var spikes = 0
+            repeat(50) {
+                net.update()
+                if (n.isSpike) {
                     spikes += 1
+                }
             }
+            assertTrue(spikes > 0)
         }
-        // Need two "spikes > 1" because both need to be boolean.
-        assertEquals(spikes > 1, spikes > 1)
-        assertTrue(spikes > 0)
     }
 
 }

@@ -11,50 +11,42 @@ import org.simbrain.network.neurongroups.SoftmaxGroup
 class SoftMaxTest {
 
     var net = Network()
-    val sm = SoftmaxGroup(2)
+    val softmax = SoftmaxGroup(2)
     val n1 = Neuron()
     val n2 = Neuron()
 
     init {
         with(net) {
-            net.addNetworkModelsAsync(sm, n1, n2)
+            net.addNetworkModelsAsync(softmax, n1, n2)
             n1.clamped = true
             n2.clamped = true
-            connect(n1, sm.getNeuron(0), 1.0)
-            connect(n2, sm.getNeuron(1), 1.0)
+            connect(n1, softmax.getNeuron(0), 1.0)
+            connect(n2, softmax.getNeuron(1), 1.0)
         }
     }
 
     @Test
-    fun `Sum of SoftMaxGroup is equal to 1`(){
-        with(net) {
-                net.update()
-        }
-        assertEquals(1.0, sm.activations.sum(), 0.01)
+    fun `Softmax activations sum to 1`(){
+        net.update()
+        assertEquals(1.0, softmax.activations.sum(), 0.01)
     }
 
     @Test
-    fun `Neuron1 in sm is equal to Neuron2 in sm without activation from outside neurons`() {
+    fun `Equal inputs should produce equal outputs`() {
         with(net) {
-            n1.forceSetActivation(0.0)
-            n2.forceSetActivation(0.0)
+            n1.forceSetActivation(0.85)
+            n2.forceSetActivation(0.85)
             net.update()
         }
-        assertEquals(sm.activations.get(0), sm.activations.get(1))
-        assertEquals(1.0, sm.activations.sum(), 0.01)
+        assertEquals(softmax.activations[0], softmax.activations[1])
     }
 
     @Test
-    fun `Neuron1 in sm is greater than Neuron2 in sm with activation from outside neurons`() {
-        with(net) {
-            n1.forceSetActivation(1.0)
-            n2.forceSetActivation(0.5)
-            repeat(5) {
-                net.update()
-            }
-        }
-        assertTrue(sm.activations.get(0) > sm.activations.get(1))
-        assertEquals(1.0, sm.activations.sum(), 0.01)
+    fun `The node receiving the most input should have the highest value`() {
+        n1.forceSetActivation(1.0)
+        n2.forceSetActivation(0.5)
+        net.update()
+        assertTrue(softmax.activations[0] > softmax.activations[1])
     }
 }
 

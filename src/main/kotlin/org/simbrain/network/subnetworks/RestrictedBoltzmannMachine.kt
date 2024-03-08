@@ -20,14 +20,14 @@ package org.simbrain.network.subnetworks
 
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.core.*
-import org.simbrain.network.neurongroups.NeuronGroup
+import org.simbrain.network.trainers.UnsupervisedNetwork
+import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.util.Alignment.VERTICAL
 import org.simbrain.network.util.Direction.NORTH
 import org.simbrain.network.util.alignNetworkModels
-import org.simbrain.network.util.offsetNeuronCollections
+import org.simbrain.network.util.offsetNetworkModel
 import org.simbrain.util.UserParameter
-import org.simbrain.util.format
 import org.simbrain.util.propertyeditor.EditableObject
 import smile.math.matrix.Matrix
 
@@ -39,15 +39,19 @@ import smile.math.matrix.Matrix
  * @author Makenzy Gilbert
  * @author Jeff Yoshimi
  */
-public class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: Int) : Subnetwork() {
+class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: Int) : Subnetwork(), UnsupervisedNetwork {
 
     // Set of patterns for visible layer. Rows are inputs to visible layer.
     var trainingPatterns: Matrix
 
-    //  TODO: Neuron arrays?
-    val hiddenLayer: NeuronGroup
+    val hiddenLayer: NeuronArray
 
-    val visibleLayer: NeuronGroup
+    val visibleLayer: NeuronArray
+
+    override var inputData: Matrix = Matrix(10, numVisibleNodes)
+
+    override val inputLayer: NeuronArray
+        get() = visibleLayer
 
     val hiddenToVisible: WeightMatrix
 
@@ -61,36 +65,35 @@ public class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: In
         // TODO: numrows variable
         trainingPatterns = Matrix.rand(10, numVisibleNodes)
 
-        visibleLayer = NeuronGroup(numVisibleNodes).apply {
+        visibleLayer = NeuronArray(numVisibleNodes).apply {
             label = "Visible layer"
-            setUpperBound(1.0)
-            setLowerBound(0.0)
-            setClamped(true)
-            setLayoutBasedOnSize()
+            (updateRule as LinearRule).apply {
+                upperBound = 1.0
+                lowerBound = 0.0
+            }
         }
         this.addModel(visibleLayer)
 
         // Something like a softmax may be used? See 13.1
-        hiddenLayer = NeuronGroup(numHiddenNodes).apply {
+        hiddenLayer = NeuronArray(numHiddenNodes).apply {
             label = "Hidden Layer"
-            setUpdateRule(SigmoidalRule())
+            updateRule = SigmoidalRule()
         }
         this.addModel(hiddenLayer)
-        hiddenLayer.setLayoutBasedOnSize()
 
         visibleToHidden = WeightMatrix(visibleLayer, hiddenLayer)
         hiddenToVisible = WeightMatrix(hiddenLayer, visibleLayer)
         this.addModels(visibleToHidden, hiddenToVisible)
 
         alignNetworkModels(visibleLayer, hiddenLayer, VERTICAL)
-        offsetNeuronCollections(visibleLayer, hiddenLayer, NORTH, 400.0)
+        offsetNetworkModel(visibleLayer, hiddenLayer, NORTH, 400.0, 100.0, 100.0)
 
         infoText = InfoText(stateInfoText)
 
     }
 
     val stateInfoText: String
-        get() = "Energy: " + (hiddenLayer.neuronList + visibleLayer.neuronList).getEnergy().format(4)
+        get() = "Energy: "
 
     fun updateStateInfoText() {
         infoText.text = stateInfoText
@@ -111,7 +114,7 @@ public class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: In
         // "Positive phase"
         hiddenLayer.updateInputs()
         hiddenLayer.update()
-        updateWithSampling(hiddenLayer.neuronList)
+        // updateWithSampling(hiddenLayer.neuronList)
 
         // This is where training starts
 

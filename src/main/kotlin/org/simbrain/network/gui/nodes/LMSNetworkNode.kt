@@ -2,7 +2,7 @@ package org.simbrain.network.gui.nodes
 
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
-import org.simbrain.network.gui.dialogs.getTrainingDialog
+import org.simbrain.network.gui.dialogs.getSupervisedTrainingDialog
 import org.simbrain.network.subnetworks.LMSNetwork
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.createAction
@@ -43,7 +43,7 @@ class LMSNetworkNode(networkPanel: NetworkPanel, private val lmsNet: LMSNetwork)
 
             // Train Submenu
             contextMenu.add(networkPanel.createAction(name = "Train network") {
-                lmsNet.getTrainingDialog().display()
+                lmsNet.getSupervisedTrainingDialog().display()
             })
 
             // Coupling menu
@@ -54,6 +54,6 @@ class LMSNetworkNode(networkPanel: NetworkPanel, private val lmsNet: LMSNetwork)
         }
 
     override val propertyDialog: StandardDialog
-        get() = with(networkPanel) { lmsNet.getTrainingDialog() }
+        get() = with(networkPanel) { lmsNet.getSupervisedTrainingDialog() }
 
 }

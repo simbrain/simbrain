@@ -19,7 +19,7 @@ import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SRNTrainer
-import org.simbrain.network.trainers.Trainable
+import org.simbrain.network.trainers.SupervisedNetwork
 import org.simbrain.network.trainers.createDiagonalDataset
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.SigmoidalRule
@@ -40,7 +40,7 @@ import java.awt.geom.Point2D
  *
  * @author Jeff Yoshimi
  */
-class SRNNetwork: FeedForward, Trainable {
+class SRNNetwork: FeedForward, SupervisedNetwork {
 
     lateinit var hiddenLayer: NeuronArray
 

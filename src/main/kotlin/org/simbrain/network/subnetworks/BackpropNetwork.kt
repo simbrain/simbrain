@@ -16,7 +16,7 @@ package org.simbrain.network.subnetworks
 import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.trainers.BackpropTrainer
 import org.simbrain.network.trainers.MatrixDataset
-import org.simbrain.network.trainers.Trainable
+import org.simbrain.network.trainers.SupervisedNetwork
 import org.simbrain.network.trainers.createDiagonalDataset
 import org.simbrain.network.updaterules.LinearRule
 import java.awt.geom.Point2D
@@ -27,7 +27,7 @@ import kotlin.math.min
  *
  * @author Jeff Yoshimi
  */
-open class BackpropNetwork : FeedForward, Trainable {
+open class BackpropNetwork : FeedForward, SupervisedNetwork {
 
     constructor(nodesPerLayer: IntArray, initialPosition: Point2D?): super(nodesPerLayer, initialPosition) {
         layerList.forEach { it.updateRule = LinearRule() }

@@ -32,7 +32,7 @@ import kotlin.random.Random
 /**
  * Manage iteration based training algorithms and provides an object that can be edited in the GUI.
  */
-abstract class IterableTrainer(val net: Trainable) : EditableObject {
+abstract class IterableTrainer(val net: SupervisedNetwork) : EditableObject {
 
     @UserParameter(label = "Learning Rate", order = 1)
     var learningRate = .01

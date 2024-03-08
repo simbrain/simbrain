@@ -2,7 +2,7 @@ package org.simbrain.network.gui.nodes
 
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
-import org.simbrain.network.gui.dialogs.getTrainingDialog
+import org.simbrain.network.gui.dialogs.getSupervisedTrainingDialog
 import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.createAction
@@ -40,7 +40,7 @@ class SRNNode(networkPanel: NetworkPanel, private val srn: SRNNetwork):
 
             // Train Submenu
             contextMenu.add(networkPanel.createAction(name = "Train network") {
-                srn.getTrainingDialog().display()
+                srn.getSupervisedTrainingDialog().display()
             })
 
             // Coupling menu
@@ -51,6 +51,6 @@ class SRNNode(networkPanel: NetworkPanel, private val srn: SRNNetwork):
         }
 
     override val propertyDialog: StandardDialog
-        get() = with(networkPanel) { srn.getTrainingDialog() }
+        get() = with(networkPanel) { srn.getSupervisedTrainingDialog() }
 
 }

@@ -19,7 +19,7 @@
 package org.simbrain.network.gui.nodes.subnetworkNodes
 
 import org.simbrain.network.gui.NetworkPanel
-import org.simbrain.network.gui.dialogs.getTrainingDialog
+import org.simbrain.network.gui.dialogs.getSupervisedTrainingDialog
 import org.simbrain.network.gui.nodes.SubnetworkNode
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.util.StandardDialog
@@ -48,5 +48,5 @@ class BackpropNetworkNode(networkPanel: NetworkPanel, private val bp: BackpropNe
     }
 
     override val propertyDialog: StandardDialog
-        get() = with(networkPanel) { bp.getTrainingDialog() }
+        get() = with(networkPanel) { bp.getSupervisedTrainingDialog() }
 }

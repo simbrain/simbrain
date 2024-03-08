@@ -17,7 +17,7 @@ import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.trainers.LMSTrainer
 import org.simbrain.network.trainers.MatrixDataset
-import org.simbrain.network.trainers.Trainable
+import org.simbrain.network.trainers.SupervisedNetwork
 import org.simbrain.network.trainers.createDiagonalDataset
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.util.UserParameter
@@ -30,7 +30,7 @@ import java.awt.geom.Point2D
  *
  * @author Jeff Yoshimi
  */
-class LMSNetwork : FeedForward, Trainable {
+class LMSNetwork : FeedForward, SupervisedNetwork {
 
     override lateinit var trainingSet: MatrixDataset
 

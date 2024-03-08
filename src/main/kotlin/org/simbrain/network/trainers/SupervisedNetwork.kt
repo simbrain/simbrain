@@ -19,7 +19,7 @@ import org.simbrain.network.core.NeuronArray
 /**
  * Interface for networks that can be trained using standard supervised learning methods.
  */
-interface Trainable {
+interface SupervisedNetwork {
 
     val trainer: IterableTrainer
 

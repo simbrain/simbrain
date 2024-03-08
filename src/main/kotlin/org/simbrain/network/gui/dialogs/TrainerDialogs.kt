@@ -5,6 +5,7 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.nodes.SRNNode
 import org.simbrain.network.subnetworks.LMSNetwork
+import org.simbrain.network.subnetworks.RestrictedBoltzmannMachine
 import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.Trainable
@@ -69,6 +70,60 @@ fun Trainable.getTrainingDialog(): StandardDialog {
         addCommitTask {
             trainerProps.commitChanges()
             trainingSet = MatrixDataset((inputs.table.model as MatrixDataFrame).data, (targets.table.model as MatrixDataFrame).data)
+        }
+    }
+}
+
+// TODO: For now specific to RBM, but generalize to unsupervised
+context(NetworkPanel)
+fun getUnsupervisedTrainingPanel(rbm: RestrictedBoltzmannMachine): StandardDialog {
+    return StandardDialog().apply {
+
+        title = "Train Network"
+        contentPane = ResizableTabbedPane()
+
+        // Edit Trainer Properties
+        val trainerProps = AnnotatedPropertyEditor(rbm)
+        val trainerPropsPanel = trainerProps.createApplyPanel()
+        (contentPane as JTabbedPane).addTab("Trainer Properties", trainerPropsPanel)
+
+        // Run training algorithm
+        val runControls = JPanel()
+        runControls.layout = MigLayout("gap 0px 0px, ins 0")
+        // val trainerControls = TrainerControls(trainer, this@NetworkPanel)
+        val inputs = MatrixEditor(rbm.trainingPatterns)
+        inputs.toolbar.addSeparator()
+        inputs.toolbar.add(
+            //  TODO: Check
+            inputs.table.createApplyAction("Apply Inputs") { selectedRow ->
+                rbm.visibleLayer.activations = inputs.table.model.getCurrentDoubleRow().toDoubleArray()
+            }
+        )
+        inputs.toolbar.add(inputs.table.createAdvanceRowAction())
+        inputs.toolbar.add(inputs.table.createApplyAndAdvanceAction {
+            // with(network) { trainer.applyInputs(inputs.table.selectedRow) }
+            rbm.visibleLayer.activations = inputs.table.model.getCurrentDoubleRow().toDoubleArray()
+            with(network) {rbm.update()}
+        })
+        // val targets = MatrixEditor(trainingSet.targets)
+        // val addRemoveRows = AddRemoveRows(inputs.table)
+        // trainer.events.beginTraining.on {
+        //     trainingSet = MatrixDataset((inputs.table.model as MatrixDataFrame).data, (targets.table.model as MatrixDataFrame).data)
+        // }
+        runControls.add(JSeparator(), "span, growx, wrap")
+        // runControls.add(trainerControls, "span, growx, wrap")
+        runControls.add(JSeparator(), "span, growx, wrap")
+        runControls.add(JLabel("Inputs"))
+        // runControls.add(JLabel("Targets"), "wrap")
+        runControls.add(inputs)
+        // runControls.add(targets, "wrap")
+        // runControls.add(JLabel("Add / Remove rows:"), "split 2")
+        // runControls.add(addRemoveRows)
+        (contentPane as JTabbedPane).addTab("Run Trainer", runControls)
+
+        addCommitTask {
+            // trainerProps.commitChanges()
+            // trainingSet = MatrixDataset((inputs.table.model as MatrixDataFrame).data, (targets.table.model as MatrixDataFrame).data)
         }
     }
 }

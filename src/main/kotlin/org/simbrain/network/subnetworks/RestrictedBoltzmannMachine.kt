@@ -29,6 +29,7 @@ import org.simbrain.network.util.offsetNeuronCollections
 import org.simbrain.util.UserParameter
 import org.simbrain.util.format
 import org.simbrain.util.propertyeditor.EditableObject
+import smile.math.matrix.Matrix
 
 /**
  * RestrictedBoltzmannMachine implements restricted a Boltzman Machine
@@ -39,6 +40,9 @@ import org.simbrain.util.propertyeditor.EditableObject
  * @author Jeff Yoshimi
  */
 public class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: Int) : Subnetwork() {
+
+    // Set of patterns for visible layer. Rows are inputs to visible layer.
+    var trainingPatterns: Matrix
 
     //  TODO: Neuron arrays?
     val hiddenLayer: NeuronGroup
@@ -53,6 +57,9 @@ public class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: In
 
     init {
         this.label = "Restricted Boltzmann Machine"
+
+        // TODO: numrows variable
+        trainingPatterns = Matrix.rand(10, numVisibleNodes)
 
         visibleLayer = NeuronGroup(numVisibleNodes).apply {
             label = "Visible layer"
@@ -86,15 +93,12 @@ public class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: In
         get() = "Energy: " + (hiddenLayer.neuronList + visibleLayer.neuronList).getEnergy().format(4)
 
     fun updateStateInfoText() {
-        println("Here")
         infoText.text = stateInfoText
         events.customInfoUpdated.fireAndBlock()
     }
 
     override val customInfo: NetworkModel
         get() = infoText
-
-    // Todo: add proper traiing framework
 
     fun trainOnCurrentPattern() {
         // Contrastive divergence
@@ -112,8 +116,11 @@ public class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: In
         // This is where training starts
 
         // Negative phase / "reconstruction" of visible
-        visibleLayer.updateInputs()
-        visibleLayer.update()
+        // visibleLayer.updateInputs()
+        // visibleLayer.update()
+
+        // Sample code: visibleLayer.outputs.mm(hiddenLayer.outputs)
+        // visibleLayer.activations.outerProduct(hiddenLayer.activations)
 
         // TODO: Positive gradient is outer product of visible and hidden states
 
@@ -125,8 +132,7 @@ public class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: In
         // visible_bias += learning_rate * (visible - reconstructed_visible)
         // hidden_bias += learning_rate * (hidden_states - reconstructed_hidden_states)
 
-
-        updateWithSampling(visibleLayer.neuronList)
+        // updateWithSampling(visibleLayer.neuronList)
         updateStateInfoText()
     }
 
@@ -153,6 +159,7 @@ fun updateWithSampling(neurons: List<Neuron>) {
     }
 }
 
+// Todo: move to test
 fun main() {
     // val rbm = RestrictedBoltzmannMachine(2,2)
     repeat(10) {

@@ -135,7 +135,7 @@ public class Cerebellum extends Simulation {
         inferiorOlive.setLabel("Inferior Olive");
         inferiorOlive.setUpdateRule(inferiorOliveRule);
         inferiorOlive.setLowerBound(0);
-        inferiorOlive.forceSetActivation(0.3);
+        inferiorOlive.setActivation(0.3);
         network.addNetworkModelAsync(inferiorOlive);
         inferiorOlive.setLocation(200, 275);
 
@@ -193,7 +193,7 @@ public class Cerebellum extends Simulation {
         cerebellum.setLocation(175, 125);
         cerebellum.getNeuronList().get(0).setLabel("Purkinje");
         cerebellum.getNeuronList().get(0).offset(25, 0);
-        cerebellum.getNeuronList().get(0).forceSetActivation(0.4);
+        cerebellum.getNeuronList().get(0).setActivation(0.4);
         cerebellum.getNeuronList().get(1).setLabel("DCNe");
         cerebellum.getNeuronList().get(1).setUpdateRule(DCNRule);
         cerebellum.getNeuronList().get(1).offset(-50, 75);
@@ -370,44 +370,44 @@ public class Cerebellum extends Simulation {
         // Just give the input of each to the model, without giving it a target
         // (and hence no Dopamine)
         panel.addButton("No Dopamine", () -> {
-            inputs.getNeuronList().get(0).forceSetActivation(1);
-            inputs.getNeuronList().get(1).forceSetActivation(0);
+            inputs.getNeuronList().get(0).setActivation(1);
+            inputs.getNeuronList().get(1).setActivation(0);
             // Turn off dopamine!
-            dopamine.forceSetActivation(0);
+            dopamine.setActivation(0);
             dopamine.setClamped(true);
             // Turn off learning
             toggleLearning = false;
             sim.iterate(currentTrialLength / 2);
 
-            inputs.getNeuronList().get(0).forceSetActivation(0);
-            inputs.getNeuronList().get(1).forceSetActivation(1);
+            inputs.getNeuronList().get(0).setActivation(0);
+            inputs.getNeuronList().get(1).setActivation(1);
             sim.iterate(currentTrialLength / 2);
             dopamine.setClamped(false);
             toggleLearning = true;
         });
 
         panel.addButton("Test", () -> {
-            inputs.getNeuronList().get(0).forceSetActivation(1);
-            inputs.getNeuronList().get(1).forceSetActivation(0);
-            target.forceSetActivation(1);
+            inputs.getNeuronList().get(0).setActivation(1);
+            inputs.getNeuronList().get(1).setActivation(0);
+            target.setActivation(1);
             sim.iterate(currentTrialLength / 2);
 
-            inputs.getNeuronList().get(0).forceSetActivation(0);
-            inputs.getNeuronList().get(1).forceSetActivation(1);
-            target.forceSetActivation(0);
+            inputs.getNeuronList().get(0).setActivation(0);
+            inputs.getNeuronList().get(1).setActivation(1);
+            target.setActivation(0);
             sim.iterate(currentTrialLength / 2);
         });
 
         panel.addButton("10 Trials", () -> {
             for (int ii = 0; ii <= 10; ii++) {
-                inputs.getNeuronList().get(0).forceSetActivation(1);
-                inputs.getNeuronList().get(1).forceSetActivation(0);
-                target.forceSetActivation(1);
+                inputs.getNeuronList().get(0).setActivation(1);
+                inputs.getNeuronList().get(1).setActivation(0);
+                target.setActivation(1);
                 sim.iterate(currentTrialLength / 2);
 
-                inputs.getNeuronList().get(0).forceSetActivation(0);
-                inputs.getNeuronList().get(1).forceSetActivation(1);
-                target.forceSetActivation(0);
+                inputs.getNeuronList().get(0).setActivation(0);
+                inputs.getNeuronList().get(1).setActivation(1);
+                target.setActivation(0);
                 sim.iterate(currentTrialLength / 2);
             }
         });
@@ -416,9 +416,9 @@ public class Cerebellum extends Simulation {
          JButton button2 = new JButton("Train Pattern 1");
          button2.addActionListener(new ActionListener() {
          public void actionPerformed(ActionEvent arg0) {
-         inputs.getNeuronList().get(0).forceSetActivation(1);
-         inputs.getNeuronList().get(1).forceSetActivation(0);
-         target.forceSetActivation(1);
+         inputs.getNeuronList().get(0).setActivation(1);
+         inputs.getNeuronList().get(1).setActivation(0);
+         target.setActivation(1);
              sim.getWorkspace().iterate(currentTrialLength/2);
          }});
          //panel.addItem("Pattern 1", button2);
@@ -426,9 +426,9 @@ public class Cerebellum extends Simulation {
          JButton button3 = new JButton("Train Pattern 2");
          button3.addActionListener(new ActionListener() {
          public void actionPerformed(ActionEvent arg0) {
-         inputs.getNeuronList().get(0).forceSetActivation(0);
-         inputs.getNeuronList().get(1).forceSetActivation(1);
-         target.forceSetActivation(0);
+         inputs.getNeuronList().get(0).setActivation(0);
+         inputs.getNeuronList().get(1).setActivation(1);
+         target.setActivation(0);
              sim.getWorkspace().iterate(currentTrialLength/2);
          }});
          //panel.addItem("Pattern 2", button3);

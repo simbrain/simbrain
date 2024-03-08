@@ -113,7 +113,7 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
      * @param n neuron
      */
     fun incrementActivation(n: Neuron) {
-        n.forceSetActivation(n.activation + n.increment)
+        n.activation = n.activation + n.increment
     }
 
     /**
@@ -122,7 +122,7 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
      * @param n neuron
      */
     fun decrementActivation(n: Neuron) {
-        n.forceSetActivation(n.activation - n.increment)
+        n.activation = n.activation - n.increment
     }
 
     /**
@@ -179,7 +179,7 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
      * @param neuron reference to parent neuron
      */
     open fun clear(neuron: Neuron) {
-        neuron.forceSetActivation(0.0)
+        neuron.activation = 0.0
     }
 
     /**

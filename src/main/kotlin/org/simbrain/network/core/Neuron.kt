@@ -39,7 +39,6 @@ import org.simbrain.workspace.Producible
 import org.simbrain.workspace.couplings.HIGH_PRIORITY
 import org.simbrain.workspace.couplings.LOW_PRIORITY
 import java.awt.geom.Point2D
-import kotlin.reflect.jvm.javaField
 
 /**
  * **Neuron** represents a node in the neural network. Most of the "logic" of
@@ -66,7 +65,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
         dataHolder = n.dataHolder.copy()
         clamped = n.clamped
         increment = n.increment
-        forceSetActivation(n.activation)
+        activation = n.activation
         x = n.x
         y = n.y
         label = n.label
@@ -103,11 +102,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
     var activation = 0.0
         set(value) {
             lastActivation = field
-            if (clamped) {
-                return
-            } else {
-                field = value
-            }
+            field = value
             events.activationChanged.fireAndForget(lastActivation, value)
         }
 
@@ -307,21 +302,6 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
         input = 0.0
     }
 
-    /**
-     * Sets the activation of the neuron regardless of the state of the neuron.
-     * Overrides clamping and any intrinsic dynamics of the neuron, and forces
-     * the neuron's activation to take a specific value. Used primarily by the
-     * GUI (e.g. when externally setting the values of clamped input neurons).
-     *
-     * @param act the new activation value
-     */
-    @Consumable(customPriorityMethod = "forceSetActivationCouplingPriority")
-    fun forceSetActivation(act: Double) {
-        lastActivation = activation
-        ::activation.javaField?.set(this, act)
-        events.activationChanged.fireAndForget(lastActivation, act)
-    }
-
 
     /**
      * @return the fan out map. Unsafe because the fan out map and the returned map are the same and thus modifications
@@ -418,7 +398,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
             .sumOf { it.psr }
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
-        forceSetActivation(updateRule.getRandomValue(randomizer))
+        activation = updateRule.getRandomValue(randomizer)
     }
 
     /**

@@ -63,8 +63,8 @@ class AlvarezSquire(
     private fun alvarezSquireUpdate(neuron: Neuron) {
         // TODO: Use library for clipping
         val `val` = .7 * neuron.activation + neuron.weightedInputs + noiseGenerator.sampleDouble()
-        neuron.forceSetActivation(if ((`val` > 0)) `val` else 0.0)
-        neuron.forceSetActivation(if ((`val` < 1)) `val` else 1.0)
+        neuron.activation = if ((`val` > 0)) `val` else 0.0
+        neuron.activation = if ((`val` < 1)) `val` else 1.0
     }
 
     /**

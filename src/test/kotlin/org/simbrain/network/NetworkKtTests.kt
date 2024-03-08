@@ -12,7 +12,7 @@ class NetworkKtTests {
     val net = Network()
     val n1 = Neuron().apply {
         clamped = true
-        forceSetActivation(1.0)
+        activation = 1.0
     }
     val n2 = Neuron()
 

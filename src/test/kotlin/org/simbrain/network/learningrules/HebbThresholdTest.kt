@@ -28,8 +28,8 @@ class HebbThresholdTest {
 
     @Test
     fun `test basic update`() {
-        n1.forceSetActivation(0.5)
-        n2.forceSetActivation(0.0)
+        n1.activation = 0.5
+        n2.activation = 0.0
         net.update()
         //assertEquals(-0.5,s12.strength )
         println("Strength is ${s12.strength}")

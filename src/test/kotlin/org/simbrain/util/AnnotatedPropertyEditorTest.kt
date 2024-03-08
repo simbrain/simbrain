@@ -36,7 +36,7 @@ class AnnotatedPropertyEditorTest {
 
     @Test
     fun `test fill field value numeric widget`() {
-        n1.forceSetActivation(.75)
+        n1.activation = .75
         val ape = AnnotatedPropertyEditor(n1)
         val prop = Neuron::class.declaredMemberProperties.first { it.name == "activation" }
         val widgetVal = (ape.propertyNameWidgetMap[prop.name] as NumericWidget).widget.value
@@ -63,8 +63,8 @@ class AnnotatedPropertyEditorTest {
 
     @Test
     fun `test behavior two consistent values`() {
-        n1.forceSetActivation(.75)
-        n2.forceSetActivation(.75)
+        n1.activation = .75
+        n2.activation = .75
         val ape = AnnotatedPropertyEditor(n1, n2)
         val prop = Neuron::class.declaredMemberProperties.first { it.name == "activation" }
         assertEquals(true, (ape.propertyNameWidgetMap[prop.name] as NumericWidget).isConsistent)
@@ -76,8 +76,8 @@ class AnnotatedPropertyEditorTest {
 
     @Test
     fun `test behavior with inconsistent values`() {
-        n1.forceSetActivation(.75)
-        n2.forceSetActivation(.74)
+        n1.activation = .75
+        n2.activation = .74
         val ape = AnnotatedPropertyEditor(n1, n2)
         val prop = Neuron::class.declaredMemberProperties.first { it.name == "activation" }
         assertEquals(false, (ape.propertyNameWidgetMap[prop.name] as NumericWidget).isConsistent)

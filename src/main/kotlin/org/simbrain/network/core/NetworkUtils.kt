@@ -99,7 +99,7 @@ var List<Neuron?>.activations: List<Double>
     set(values) = values.forEachIndexed { index, value ->
         this[index]?.let { neuron ->
             if (neuron.clamped) {
-                neuron.forceSetActivation(value)
+                neuron.activation = value
             } else {
                 neuron.activation = value
             }

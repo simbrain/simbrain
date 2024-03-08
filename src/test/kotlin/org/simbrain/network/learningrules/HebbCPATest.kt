@@ -26,8 +26,8 @@ class HebbCPATest {
     }
     @Test
     fun `test basic update`() {
-        n1.forceSetActivation(1.0)
-        n2.forceSetActivation(1.0)
+        n1.activation = 1.0
+        n2.activation = 1.0
         net.update()
 //        assertEquals(1.0,s12.strength )
 //        net.update()

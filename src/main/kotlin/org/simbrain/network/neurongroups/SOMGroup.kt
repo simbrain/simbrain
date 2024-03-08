@@ -102,7 +102,7 @@ class SOMGroup @JvmOverloads constructor(
         if (mostActivatedNeuron != null) {
             val incomingNeurons: MutableList<Neuron> = ArrayList()
             for (incoming in mostActivatedNeuron.fanIn) {
-                incoming.source.forceSetActivation(incoming.strength)
+                incoming.source.activation = incoming.strength
                 incomingNeurons.add(incoming.source)
             }
         }

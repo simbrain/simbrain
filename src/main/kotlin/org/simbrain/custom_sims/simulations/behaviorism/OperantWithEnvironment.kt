@@ -211,21 +211,21 @@ class OperantWithEnvironment : Simulation {
 
         panel.addButton("Reward", Runnable {
             learn(1.0)
-            rewardNeuron.forceSetActivation(1.0)
-            punishNeuron.forceSetActivation(0.0)
+            rewardNeuron.activation = 1.0
+            punishNeuron.activation = 0.0
             sim.iterate()
         })
 
         panel.addButton("Punish", Runnable {
             learn(-1.0)
-            rewardNeuron.forceSetActivation(0.0)
-            punishNeuron.forceSetActivation(1.0)
+            rewardNeuron.activation = 0.0
+            punishNeuron.activation = 1.0
             sim.iterate()
         })
 
         panel.addButton("Do nothing", Runnable {
-            rewardNeuron.forceSetActivation(0.0)
-            punishNeuron.forceSetActivation(0.0)
+            rewardNeuron.activation = 0.0
+            punishNeuron.activation = 0.0
             sim.iterate()
         })
     }

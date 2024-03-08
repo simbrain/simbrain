@@ -43,7 +43,7 @@ class TrainPredictionNet(
         }
 
         // Update error neuron
-        sim.errorNeuron.forceSetActivation(Math.sqrt(sumError))
+        sim.errorNeuron.activation = Math.sqrt(sumError)
 
         // Update all synapses
         for (synapse in sim.predictionSg.synapses) {

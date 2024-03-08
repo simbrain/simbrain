@@ -58,7 +58,7 @@ package org.simbrain.custom_sims.simulations
 //                     nodeGene {
 //                         label = "Thirst"
 //                         isClamped = true
-//                         forceSetActivation(0.5)
+//                         activation = 0.5
 //                     }
 //                 )
 //
@@ -303,7 +303,7 @@ package org.simbrain.custom_sims.simulations
 //                             val distance = currentWaterLocation.toPixelCoordinate().distanceTo(entity.location)
 //                             if (distance < entity.width / 2) {
 //                                 good()
-//                                 thirstNeuron.forceSetActivation(0.0)
+//                                 thirstNeuron.activation = 0.0
 //
 //                                 setTile(currentWaterLocation, 0)
 //                                 waterLocations.remove(currentWaterLocation)
@@ -317,7 +317,7 @@ package org.simbrain.custom_sims.simulations
 //                 }
 //
 //                 addUpdateAction("update thirst") {
-//                     thirstNeuron.forceSetActivation(thirstNeuron.activation + 0.005)
+//                     thirstNeuron.activation = thirstNeuron.activation + 0.005
 //                     if (thirstNeuron.activation > thirstThreshold) {
 //                         bad(thirstNeuron.activation)
 //                     }

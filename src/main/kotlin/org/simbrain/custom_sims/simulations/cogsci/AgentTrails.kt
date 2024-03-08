@@ -173,9 +173,9 @@ val kAgentTrails = newSim {
                     val (x, y) = location
                     mouse.location = point(x, y + dispersion)
                     mouse.heading = 90.0
-                    straightNeuron.forceSetActivation(1.0)
+                    straightNeuron.activation = 1.0
                     workspace.iterateSuspend((2 * dispersion).toInt())
-                    straightNeuron.forceSetActivation(0.0)
+                    straightNeuron.activation = 0.0
                 }
             }
 
@@ -195,13 +195,13 @@ val kAgentTrails = newSim {
                     val (x, y) = cheeseLocation
                     mouse.location = point(x, y + dispersion)
                     mouse.heading = 90.0
-                    straightNeuron.forceSetActivation(1.0)
+                    straightNeuron.activation = 1.0
                     workspace.iterateSuspend((dispersion * .80).toInt())
-                    rightNeuron.forceSetActivation(1.5)
+                    rightNeuron.activation = 1.5
                     workspace.iterateSuspend(25)
-                    rightNeuron.forceSetActivation(0.0)
+                    rightNeuron.activation = 0.0
                     workspace.iterateSuspend((dispersion * 1.5).toInt())
-                    straightNeuron.forceSetActivation(0.0)
+                    straightNeuron.activation = 0.0
                 }
             }
             addButton("Cheese > Fish") {
@@ -211,13 +211,13 @@ val kAgentTrails = newSim {
                     val (x, y) = cheeseLocation
                     mouse.location = point(x, y + dispersion)
                     mouse.heading = 90.0
-                    straightNeuron.forceSetActivation(1.0)
+                    straightNeuron.activation = 1.0
                     workspace.iterateSuspend((dispersion * .80).toInt())
-                    leftNeuron.forceSetActivation(1.5)
+                    leftNeuron.activation = 1.5
                     workspace.iterateSuspend(25)
-                    leftNeuron.forceSetActivation(0.0)
+                    leftNeuron.activation = 0.0
                     workspace.iterateSuspend((dispersion * 1.5).toInt())
-                    straightNeuron.forceSetActivation(0.0)
+                    straightNeuron.activation = 0.0
                 }
             }
             addButton("Random motion") {
@@ -233,7 +233,7 @@ val kAgentTrails = newSim {
                     val (x, y) = cheeseLocation
                     mouse.location = point(odorWorld.width/2, odorWorld.height/2)
                     mouse.heading = 90.0
-                    straightNeuron.forceSetActivation(0.0)
+                    straightNeuron.activation = 0.0
                     workspace.iterateSuspend(200)
                     cheese.speed = 0.0
                     flower.speed = 0.0

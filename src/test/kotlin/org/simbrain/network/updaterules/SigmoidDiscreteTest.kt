@@ -97,11 +97,11 @@ class SigmoidDiscreteTest {
         // Reset bias
         (output.dataHolder as BiasedScalarData).bias = 0.0
 
-        input1.forceSetActivation(100.0)
+        input1.activation = 100.0
         net.update()
         assertEquals(output.upperBound, output.activation, 0.01, "High activation")
 
-        input1.forceSetActivation(-100.0)
+        input1.activation = -100.0
         net.update()
         assertEquals(output.lowerBound, output.activation, 0.01, "Low activation")
 

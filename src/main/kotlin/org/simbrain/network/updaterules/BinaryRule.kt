@@ -95,11 +95,11 @@ class BinaryRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData> {
     }
 
     override fun contextualIncrement(n: Neuron) {
-        n.forceSetActivation(upperBound)
+        n.activation = upperBound
     }
 
     override fun contextualDecrement(n: Neuron) {
-        n.forceSetActivation(lowerBound)
+        n.activation = lowerBound
     }
 
     override val graphicalLowerBound: Double

@@ -37,8 +37,8 @@ class CouplingTest {
     fun `ensure consumers from multiple identical gets are equal`() {
         val neuron = Neuron()
         with(couplingManager) {
-            val get1 = neuron.getConsumer("forceSetActivation")
-            val get2 = neuron.getConsumer("forceSetActivation")
+            val get1 = neuron.getConsumer("setActivation")
+            val get2 = neuron.getConsumer("setActivation")
             assert(get1 == get2)
             assertEquals(1, setOf(get1, get2).size)
         }
@@ -155,14 +155,14 @@ class CouplingTest {
     fun `check if all consumers are created on a neuron`() {
         val neuron = Neuron()
         network.addNetworkModelAsync(neuron)
-        val expected = setOf("setActivation", "forceSetActivation", "addInputValue", "addInputValue", "setLabel")
+        val expected = setOf("setActivation", "addInputValue", "addInputValue", "setLabel")
         val actual = with(couplingManager) { neuron.consumers.map { it.method.name }.toSet() }
         val diff = expected complement actual
         assertTrue(diff.isIdentical(),"$diff")
     }
 
     @Test
-    fun `check neuron getActivation coupling with neuron forceSetActivation`() {
+    fun `check neuron getActivation coupling with neuron setActivation`() {
         val neuron1 = Neuron()
         val neuron2 = Neuron()
         network.apply {
@@ -170,7 +170,7 @@ class CouplingTest {
             addNetworkModelAsync(neuron2)
         }
         with(couplingManager) {
-            neuron1.getProducer("getActivation") couple neuron2.getConsumer("forceSetActivation")
+            neuron1.getProducer("getActivation") couple neuron2.getConsumer("setActivation")
         }
         neuron1.activation = 1.0
         neuron2.clamped = true
@@ -184,8 +184,8 @@ class CouplingTest {
         val neuron2 = Neuron()
         network.addNetworkModelAsync(neuron1)
         network.addNetworkModelAsync(neuron2)
-        neuron1.forceSetActivation(.5)
-        neuron2.forceSetActivation(-.2)
+        neuron1.activation = .5
+        neuron2.activation = -.2
 
         // Add a second network with a neuron
         val network2 = Network()
@@ -214,7 +214,7 @@ class CouplingTest {
     fun `test one to many`() {
         val neuron1 = Neuron()
         network.addNetworkModelAsync(neuron1)
-        neuron1.forceSetActivation(.5)
+        neuron1.activation = .5
 
         // Add a second network with a neuron
         val network2 = Network()

@@ -153,7 +153,7 @@ val actorCritic = newSim {
             outputs.update()
         }
 
-        tdError.forceSetActivation((reward.activation + gamma * value.activation) - value.lastActivation)
+        tdError.activation = (reward.activation + gamma * value.activation) - value.lastActivation
 
         // Reinforce based on the source neuron's last activation (not its
         // current value), since that is what the current td error reflects.

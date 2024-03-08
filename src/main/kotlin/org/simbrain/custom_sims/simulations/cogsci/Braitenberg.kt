@@ -115,8 +115,8 @@ val braitenbergSim = newSim {
                 velocity = it
             }
             fun setVelocity() {
-                vehicle1.straight.forceSetActivation(velocity)
-                vehicle2.straight.forceSetActivation(velocity)
+                vehicle1.straight.activation = velocity
+                vehicle2.straight.activation = velocity
             }
             // Update neuron and weight bounds to reasonable values given weight values
             fun updateBounds(w1: Double, w2: Double) {

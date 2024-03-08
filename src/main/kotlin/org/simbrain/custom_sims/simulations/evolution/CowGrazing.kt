@@ -46,7 +46,7 @@ val grazingCows = newSim { optionString ->
                 add(nodeGene { clamped = true })
             }
             // Won't get coupled to. Serves as an initial "drive" neuron
-            add(nodeGene { clamped = true; forceSetActivation(1.0) })
+            add(nodeGene { clamped = true; activation = 1.0 })
         }
         var hiddenChromosome = chromosome(2) { add(nodeGene()) }
         var outputChromosome = chromosome(3) { add(nodeGene { upperBound = 10.0; lowerBound = -10.0 }) }

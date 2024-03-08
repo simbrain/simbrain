@@ -204,7 +204,7 @@ val evolveCow = newSim {
                         // Water found
                         if (sensor.currentValue > 0.5) {
                             // Reset thirst node
-                            thirstNeuron.forceSetActivation(0.0)
+                            thirstNeuron.activation = 0.0
                             // Relocate the lake
                             clear(lakeLayer)
                             val newLocation = randomTileCoordinate()
@@ -216,7 +216,7 @@ val evolveCow = newSim {
 
             // Update thirst and fitness
             workspace.addUpdateAction("update thirst") {
-                thirstNeuron.forceSetActivation(thirstNeuron.activation + 0.005)
+                thirstNeuron.activation = thirstNeuron.activation + 0.005
                 addFitness(-thirstNeuron.activation)
                 // if (thirstNeuron.activation > thirstThreshold) {
                 //     // Thirsty! Reduce fitness

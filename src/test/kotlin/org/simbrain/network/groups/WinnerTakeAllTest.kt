@@ -32,13 +32,13 @@ class WinnerTakeAllTest {
 
     @Test
     fun `Check that node with most input wins` () {
-        n1.forceSetActivation(1.0)
-        n2.forceSetActivation(.9)
+        n1.activation = 1.0
+        n2.activation = .9
         net.update()
         assertEquals(1.0, wta.getNeuron(0).activation)
         assertEquals(0.0, wta.getNeuron(1).activation)
-        n1.forceSetActivation(-1.0)
-        n2.forceSetActivation(0.2)
+        n1.activation = -1.0
+        n2.activation = 0.2
         net.update()
         assertEquals(0.0, wta.getNeuron(0).activation)
         assertEquals(1.0, wta.getNeuron(1).activation)
@@ -46,8 +46,8 @@ class WinnerTakeAllTest {
 
     @Test
     fun `Check that if equal input a random node wins`() {
-        n1.forceSetActivation(1.0)
-        n2.forceSetActivation(1.0)
+        n1.activation = 1.0
+        n2.activation = 1.0
         val result = (0..100).map {
             net.update()
             wta.getWinner()
@@ -59,8 +59,8 @@ class WinnerTakeAllTest {
     fun `Check that winning and losing value works` () {
         wta.params.winValue = 2.0
         wta.params.loseValue = -.5
-        n1.forceSetActivation(1.0)
-        n2.forceSetActivation(.9)
+        n1.activation = 1.0
+        n2.activation = .9
         net.update()
         assertEquals(2.0, wta.getNeuron(0).activation)
         assertEquals(-0.5, wta.getNeuron(1).activation)

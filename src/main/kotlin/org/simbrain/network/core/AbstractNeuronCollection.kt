@@ -289,7 +289,7 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
     @Consumable
     fun forceSetActivationLevels(value: Double) {
         for (n in neuronList) {
-            n.forceSetActivation(value)
+            n.activation = value
         }
         cachedActivationsDirty = true
     }
@@ -469,7 +469,7 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
     fun forceSetActivations(activations: DoubleArray) {
         val size = min(activations.size, neuronList.size)
         for (i in 0 until size) {
-            neuronList[i].forceSetActivation(activations[i])
+            neuronList[i].activation = activations[i]
         }
         cachedActivationsDirty = true
     }

@@ -133,9 +133,9 @@ class OperantConditioning : Simulation {
     private fun setWinningNode(nodeIndex: Int) {
         for (i in 0 until behaviorNet.size()) {
             if (i == nodeIndex) {
-                behaviorNet.getNeuron(i).forceSetActivation(1.0)
+                behaviorNet.getNeuron(i).activation = 1.0
             } else {
-                behaviorNet.getNeuron(i).forceSetActivation(0.0)
+                behaviorNet.getNeuron(i).activation = 0.0
             }
         }
     }
@@ -146,19 +146,19 @@ class OperantConditioning : Simulation {
         panel.addButton("Reward", Runnable {
             learn(1.0)
             rewardNeuron.addInputValue(1.0)
-            punishNeuron.forceSetActivation(0.0)
+            punishNeuron.activation = 0.0
             sim.iterate()
         })
 
         panel.addButton("Punish", Runnable {
             learn(-1.0)
-            rewardNeuron.forceSetActivation(0.0)
+            rewardNeuron.activation = 0.0
             punishNeuron.addInputValue(1.0)
             sim.iterate()
         })
 
         panel.addButton("Do nothing", Runnable {
-            rewardNeuron.forceSetActivation(0.0)
+            rewardNeuron.activation = 0.0
             punishNeuron.addInputValue(0.0)
             sim.iterate()
         })

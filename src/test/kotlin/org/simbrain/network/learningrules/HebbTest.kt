@@ -38,8 +38,8 @@ class HebbTest {
 
     @Test
     fun `test basic update`() {
-        n1.forceSetActivation(1.0)
-        n2.forceSetActivation(1.0)
+        n1.activation = 1.0
+        n2.activation = 1.0
         net.update()
         assertEquals(1.0,s12.strength )
         net.update()
@@ -49,8 +49,8 @@ class HebbTest {
 
     @Test
     fun `test different learning rates`() {
-        n1.forceSetActivation(1.0)
-        n2.forceSetActivation(1.0)
+        n1.activation = 1.0
+        n2.activation = 1.0
         (s12.learningRule as HebbianRule).learningRate = .25
         net.update()
         assertEquals(.25,s12.strength )
@@ -60,16 +60,16 @@ class HebbTest {
 
     @Test
     fun `test other activations`() {
-        n1.forceSetActivation(-1.0)
-        n2.forceSetActivation(1.0)
+        n1.activation = -1.0
+        n2.activation = 1.0
         net.update()
         assertEquals(-1.0,s12.strength )
     }
 
     @Test
     fun `test hitting the max`() {
-        n1.forceSetActivation(10.0)
-        n2.forceSetActivation(10.0)
+        n1.activation = 10.0
+        n2.activation = 10.0
         repeat(100) {
             net.update()
         }

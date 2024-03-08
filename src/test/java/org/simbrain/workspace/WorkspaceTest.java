@@ -56,7 +56,7 @@ public class WorkspaceTest {
     @Test
     public void testCouplings() {
         assertEquals(1, workspace.getCouplingManager().getCouplings().size());
-        n1.forceSetActivation(.8);
+        n1.setActivation(.8);
         workspace.simpleIterate();
         assertEquals(.8, n2.getActivation(), .0001);
 
@@ -89,7 +89,7 @@ public class WorkspaceTest {
         // Can't reuse n1 and n2 because it's been deserialized
         Neuron newN1 = (Neuron) ((NetworkComponent)workspace.getComponent("Net1")).getNetwork().getAllModels().get(0);
         Neuron newN2 = (Neuron) ((NetworkComponent)workspace.getComponent("Net2")).getNetwork().getAllModels().get(0);
-        newN1.forceSetActivation(.8);
+        newN1.setActivation(.8);
         workspace.simpleIterate();
         assertEquals(.8, newN2.getActivation(), .0001);
     }
@@ -107,7 +107,7 @@ public class WorkspaceTest {
         // Can't reuse n1 and n2 because it's been deserialized
         Neuron newN1 = (Neuron) ((NetworkComponent)workspace.getComponent("Net1")).getNetwork().getAllModels().get(0);
         Neuron newN2 = (Neuron) ((NetworkComponent)workspace.getComponent("Net2")).getNetwork().getAllModels().get(0);
-        newN1.forceSetActivation(.8);
+        newN1.setActivation(.8);
         workspace.simpleIterate();
         assertEquals(.8, newN2.getActivation(), .0001);
     }

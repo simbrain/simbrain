@@ -42,8 +42,8 @@ class OjaTest {
 
     @Test
     fun `test update for a single weight and clamped nodes`() {
-        input.forceSetActivation(1.0)
-        output.forceSetActivation(1.0)
+        input.activation = 1.0
+        output.activation = 1.0
         net.update()
 
         // delta-w  = rate (out(in - out * weight))
@@ -61,8 +61,8 @@ class OjaTest {
     @Test
     fun `test update with different source and target`() {
         // High learning rate leads to divergence in this case
-        input.forceSetActivation(1.0)
-        output.forceSetActivation(2.0)
+        input.activation = 1.0
+        output.activation = 2.0
         // delta-w  = rate (out(in - out * weight))
         //          = 1 (2(1 - 2*0)) = 2
         // Weight becomes 0 + 2 = 2
@@ -80,8 +80,8 @@ class OjaTest {
 
     @Test
     fun `test update with learning rate less than 1`() {
-        input.forceSetActivation(1.0)
-        output.forceSetActivation(1.0)
+        input.activation = 1.0
+        output.activation = 1.0
         (weight.learningRule as OjaRule).learningRate = .1
 
         // Should approach 1.
@@ -91,28 +91,28 @@ class OjaTest {
         assertEquals(1.0, weight.strength, .01)
 
         // Should approach -1
-        output.forceSetActivation(-1.0)
+        output.activation = -1.0
         repeat(100) {
             net.update()
         }
         assertEquals(-1.0, weight.strength, .01)
 
         // Should approach 1/2
-        output.forceSetActivation(2.0)
+        output.activation = 2.0
         repeat(100) {
             net.update()
         }
         assertEquals(.5, weight.strength, .01)
 
         // Should approach 1/3
-        output.forceSetActivation(3.0)
+        output.activation = 3.0
         repeat(100) {
             net.update()
         }
         assertEquals(.33, weight.strength, .01)
 
         // Should approach -1/3
-        output.forceSetActivation(-3.0)
+        output.activation = -3.0
         repeat(100) {
             net.update()
         }

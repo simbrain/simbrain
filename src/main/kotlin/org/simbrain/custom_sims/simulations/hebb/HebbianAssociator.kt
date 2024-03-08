@@ -54,7 +54,7 @@ val hebbianAssociator = newSim {
                 toolTipText = "Clamps weights and unclamps nodes"
             }
             addButton("All nodes to -1") {
-                recurrentNet.neuronList.forEach{n -> n.forceSetActivation(-1.0)}
+                recurrentNet.neuronList.forEach{n -> n.activation = -1.0}
             }.apply {
                 toolTipText = "Provides a `palette` for creating patterns"
             }

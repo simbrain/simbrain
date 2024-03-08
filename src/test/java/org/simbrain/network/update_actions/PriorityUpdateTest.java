@@ -25,7 +25,7 @@ class PriorityUpdateTest {
         n1 = new Neuron();
         n1.setUpdatePriority(1);
         n1.setClamped(true);
-        n1.forceSetActivation(.5);
+        n1.setActivation(.5);
 
         n2 = new Neuron();
         n2.setUpdatePriority(2);

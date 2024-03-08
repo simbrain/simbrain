@@ -279,7 +279,7 @@ val evolveResourcePursuer = newSim {
                     val activationPenalty = outputsActivations + allActivations
                     calories = max(0.0, calories - (activationPenalty + movementPenalty) * (1.0 / iterationsPerRun))
                     // println("movement penalty: $movementPenalty, activation penalty: $activationPenalty, calories: $calories")
-                    thirstNeuron.forceSetActivation(10.0 / iterationsPerRun + thirstNeuron.activation)
+                    thirstNeuron.activation = 10.0 / iterationsPerRun + thirstNeuron.activation
                 }
             }
 
@@ -291,7 +291,7 @@ val evolveResourcePursuer = newSim {
                         // Water found
                         if (sensor.currentValue > 0.5) {
                             // Reset thirst
-                            thirstNeuron.forceSetActivation(0.0)
+                            thirstNeuron.activation = 0.0
                             // Drink the sugar water
                             calories += 100.0
                             // Relocate the lake

@@ -13,17 +13,14 @@
  */
 package org.simbrain.network.trainers
 
-import org.simbrain.network.core.Network
 import org.simbrain.network.core.NeuronArray
+import org.simbrain.util.propertyeditor.EditableObject
 import smile.math.matrix.Matrix
 
-interface UnsupervisedNetwork {
+interface UnsupervisedNetwork: EditableObject {
 
     var inputData: Matrix
 
     val inputLayer: NeuronArray
-
-    context(Network)
-    fun update()
 
 }

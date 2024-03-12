@@ -91,7 +91,10 @@ fun NeuronArray.updateBiases(error: Matrix, epsilon: Double = .1) {
             val biasDelta = error.clone().mul(epsilon)
             it.biases += biasDelta
             events.updated.fireAndBlock()
+        } else {
+            throw IllegalStateException("Neuron array ${id} has no biases to update")
         }
+
     }
 }
 

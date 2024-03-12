@@ -20,6 +20,12 @@ val rbmSim = newSim {
     val rbm = RestrictedBoltzmannMachine(64, 25)
     network.addNetworkModel(rbm)
 
+    // TODO Repeat code ok?
+    // Open with one set of activations (Pattern 1)
+    rbm.visibleLayer.setActivations(
+        doubleArrayOf(1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0)
+    )
+
     withGui {
         place(networkComponent, 139, 10, 868, 619)
         createControlPanel("Control Panel", 5, 10) {

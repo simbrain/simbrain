@@ -16,6 +16,12 @@ fun Matrix.validateSameShape(target: Matrix) {
     }
 }
 
+fun Matrix.validateColumnVector() {
+    if (ncol() != 1) {
+        throw Error("Column vector expected, but vector of $shapeString found")
+    }
+}
+
 /**
  * Copy the entries of [toCopy] into the receiver matrix.
  *

@@ -19,16 +19,20 @@
 package org.simbrain.network.subnetworks
 
 import org.simbrain.network.NetworkModel
-import org.simbrain.network.core.*
+import org.simbrain.network.core.InfoText
+import org.simbrain.network.core.Network
+import org.simbrain.network.core.NeuronArray
+import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.trainers.UnsupervisedNetwork
-import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.SigmoidalRule
-import org.simbrain.network.util.Alignment.VERTICAL
-import org.simbrain.network.util.Direction.NORTH
+import org.simbrain.network.util.Alignment
+import org.simbrain.network.util.Direction
 import org.simbrain.network.util.alignNetworkModels
 import org.simbrain.network.util.offsetNetworkModel
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.shapeString
+import org.simbrain.util.validateColumnVector
 import smile.math.matrix.Matrix
 
 /**
@@ -41,52 +45,47 @@ import smile.math.matrix.Matrix
  */
 class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: Int) : Subnetwork(), UnsupervisedNetwork {
 
-    // Set of patterns for visible layer. Rows are inputs to visible layer.
-    var trainingPatterns: Matrix
-
     val hiddenLayer: NeuronArray
 
     val visibleLayer: NeuronArray
 
-    override var inputData: Matrix = Matrix(10, numVisibleNodes)
+    val defaultRowsInputData = 10
+
+    override var inputData: Matrix = Matrix.rand(defaultRowsInputData, numVisibleNodes)
 
     override val inputLayer: NeuronArray
         get() = visibleLayer
-
-    val hiddenToVisible: WeightMatrix
 
     val visibleToHidden: WeightMatrix
 
     val infoText: InfoText
 
+    @UserParameter("Learning Rate")
+    var learningRate = .01
+
     init {
         this.label = "Restricted Boltzmann Machine"
 
-        // TODO: numrows variable
-        trainingPatterns = Matrix.rand(10, numVisibleNodes)
-
         visibleLayer = NeuronArray(numVisibleNodes).apply {
             label = "Visible layer"
-            (updateRule as LinearRule).apply {
-                upperBound = 1.0
-                lowerBound = 0.0
-            }
+            gridMode = true
+            updateRule = SigmoidalRule()
         }
         this.addModel(visibleLayer)
 
         // Something like a softmax may be used? See 13.1
         hiddenLayer = NeuronArray(numHiddenNodes).apply {
             label = "Hidden Layer"
+            gridMode = true
             updateRule = SigmoidalRule()
         }
         this.addModel(hiddenLayer)
 
         visibleToHidden = WeightMatrix(visibleLayer, hiddenLayer)
-        hiddenToVisible = WeightMatrix(hiddenLayer, visibleLayer)
-        this.addModels(visibleToHidden, hiddenToVisible)
-
-        alignNetworkModels(visibleLayer, hiddenLayer, VERTICAL)
-        offsetNetworkModel(visibleLayer, hiddenLayer, NORTH, 400.0, 100.0, 100.0)
+        this.addModel(visibleToHidden)
+        visibleToHidden.randomize()
+        alignNetworkModels(visibleLayer, hiddenLayer, Alignment.HORIZONTAL)
+        offsetNetworkModel(visibleLayer, hiddenLayer, Direction.EAST, 200.0, 100.0, 100.0)
 
         infoText = InfoText(stateInfoText)
 
@@ -94,6 +93,8 @@ class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: Int) : Su
 
     val stateInfoText: String
         get() = "Energy: "
+        // get() = "Energy: " + hiddenLayer.neuronList.getEnergy().format(4)
+        // See eq 1 https://www.cs.toronto.edu/~hinton/absps/guideTR.pdf
 
     fun updateStateInfoText() {
         infoText.text = stateInfoText
@@ -103,42 +104,58 @@ class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: Int) : Su
     override val customInfo: NetworkModel
         get() = infoText
 
-    fun trainOnCurrentPattern() {
-        // Contrastive divergence
-        // Set "k"
+    context(Network)
+    override fun update() {
+
+        // "Positive phase": visible -> hidden
+        hiddenLayer.updateInputs()
+        hiddenLayer.update()
+        updateWithSampling(hiddenLayer)
+        
+        // Negative phase: hidden -> visible "backwards" through weights
+        // Make the hidden layer a row vector and left multiply with the matrix, the make the result back into a column vector
+        visibleLayer.activations = hiddenLayer.activations.transpose().mm(visibleToHidden.weightMatrix).transpose()
+
+        updateStateInfoText()
     }
 
     context(Network)
-    override fun update() {
+    fun trainOnCurrentPattern() {
 
         // "Positive phase"
         hiddenLayer.updateInputs()
         hiddenLayer.update()
-        // updateWithSampling(hiddenLayer.neuronList)
+        updateWithSampling(hiddenLayer)
 
-        // This is where training starts
+        // Get "reconstructed" activations
+        val reconstructedVisible = hiddenLayer.activations.transpose().mm(visibleToHidden.weightMatrix).transpose()
+        updateWithSampling(reconstructedVisible)
+        val reconstructedHidden = visibleToHidden.weightMatrix.mm(reconstructedVisible)
+        updateWithSampling(reconstructedHidden)
+        println("Reconstructed visible: ${reconstructedVisible.shapeString}, Reconstructed hidden: ${reconstructedHidden.shapeString})")
 
-        // Negative phase / "reconstruction" of visible
-        // visibleLayer.updateInputs()
-        // visibleLayer.update()
+        // Positive gradient: visible layer outer product hidden layer
+        val positiveGradient = hiddenLayer.activations.mm(visibleLayer.activations.transpose())
+        // println("Positive gradient: ${positiveGradient.shapeString}")
 
-        // Sample code: visibleLayer.outputs.mm(hiddenLayer.outputs)
-        // visibleLayer.activations.outerProduct(hiddenLayer.activations)
+        // Negative gradient: same as positive but use reconstructions
+        val negativeGradient = reconstructedHidden.mm(reconstructedVisible.transpose())
+        // println("Negative gradient: ${negativeGradient.shapeString}")
 
-        // TODO: Positive gradient is outer product of visible and hidden states
+        // println("Weights: ${visibleToHidden.weightMatrix.shapeString}")
 
-        // Now go BACK to hidden using reconstructed visible, this is reconstructed hidden
-        // negative gradient is outer product of reconstructed_visible, reconstructed_hidden_states
-
-        //  Weight update
-        // weights += learning_rate * (positive_gradient - negative_gradient)
+        // TODO: Operators for this / best way?
+        //  Weight updates
+        val newWeights = visibleToHidden.weightMatrix.add(positiveGradient.sub(negativeGradient).mul(learningRate))
+        visibleToHidden.setMatrixValues(newWeights)
+        // visibleLayer.updateBiases(visibleLayer.activations.sub(reconstructedVisible).mul(-1.0), learningRate)
+        // hiddenLayer.updateBiases(hiddenLayer.activations.sub(reconstructedHidden).mul(-1.0), learningRate)
         // visible_bias += learning_rate * (visible - reconstructed_visible)
         // hidden_bias += learning_rate * (hidden_states - reconstructed_hidden_states)
 
-        // updateWithSampling(visibleLayer.neuronList)
         updateStateInfoText()
-    }
 
+    }
 
     /**
      * Helper class for creating new RBM's nets using [org.simbrain.util.propertyeditor.AnnotatedPropertyEditor].
@@ -156,21 +173,22 @@ class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: Int) : Su
     }
 }
 
-fun updateWithSampling(neurons: List<Neuron>) {
-    neurons.forEach {n ->
-        n.activation = if (Math.random() < n.activation) 1.0 else 0.0
+/**
+ * Treat components of the array as probabilities and use those probabilities to replace with 0 or 1.
+ */
+fun updateWithSampling(array: Matrix) {
+    array.validateColumnVector()
+    (0 until array.nrow()).forEach { i ->
+        array.set(i, 0, if (Math.random() < array.get(i, 0)) 1.0 else 0.0)
     }
 }
 
-// Todo: move to test
-fun main() {
-    // val rbm = RestrictedBoltzmannMachine(2,2)
-    repeat(10) {
-        val n1 = Neuron().apply { activation = 0.0 }
-        val n2 = Neuron().apply { activation = 0.5 }
-        val n3 = Neuron().apply { activation = 1.0 }
-        // Expecting 0, ?, 1 each run
-        updateWithSampling(listOf(n1, n2, n3))
-        println("${n1.activation}, ${n2.activation}, ${n3.activation}")
+fun updateWithSampling(na: NeuronArray) {
+    na.activations.validateColumnVector()
+    (0 until na.activations.nrow()).forEach{ i ->
+        na.activations.set(i, 0, if (Math.random() < na.activations.get(i,0)) 1.0 else 0.0)
     }
 }
+
+
+

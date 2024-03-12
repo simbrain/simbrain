@@ -7,6 +7,7 @@ import org.simbrain.network.subnetworks.RestrictedBoltzmannMachine
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.createAction
 import org.simbrain.util.display
+import org.simbrain.util.showNumericInputDialog
 import org.simbrain.workspace.gui.CouplingMenu
 import javax.swing.JPopupMenu
 
@@ -35,8 +36,19 @@ class RBMNode(networkPanel: NetworkPanel, private val rbm: RestrictedBoltzmannMa
             contextMenu.addSeparator()
 
             // Train Submenu
-            contextMenu.add(networkPanel.createAction(name = "Train network") {
-                getUnsupervisedTrainingPanel(rbm).display()
+            contextMenu.add(networkPanel.createAction(name = "Training dialog...") {
+                getUnsupervisedTrainingPanel(rbm) { rbm.trainOnCurrentPattern() }.display()
+            })
+            // Train once
+            contextMenu.add(networkPanel.createAction(name = "Train once...") {
+                val iterations: Int? = showNumericInputDialog("Iterations: ", 10)?.toInt()
+                if (iterations != null) {
+                    with(networkPanel.network) {
+                        repeat(iterations) {
+                            rbm.trainOnCurrentPattern()
+                        }
+                    }
+                }
             })
 
             // Coupling menu

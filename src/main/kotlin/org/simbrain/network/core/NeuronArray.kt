@@ -54,7 +54,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
 
     /**
      * Array to hold activation values. These are also the outputs that are consumed by
-     * other network components via [Layer].
+     * other network components via [Layer]. A column vector.
      */
     @UserParameter(label = "Activations", description = "Neuron activations", order = 1)
     var activations: Matrix = Matrix(inputSize, 1)

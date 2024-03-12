@@ -2,6 +2,7 @@ package org.simbrain.network.gui.dialogs
 
 import net.miginfocom.swing.MigLayout
 import org.simbrain.network.NetworkComponent
+import org.simbrain.network.core.Network
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.nodes.SRNNode
 import org.simbrain.network.subnetworks.LMSNetwork
@@ -81,10 +82,17 @@ fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
 }
 
 context(NetworkPanel)
-fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork): StandardDialog {
+fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, trainAction: context(Network)() -> Unit = {}): StandardDialog {
     return StandardDialog().apply {
 
         title = "Train Network"
+
+        val mainPanel = JPanel().apply {
+            layout = MigLayout("gap 0px 0px, ins 0")
+        }
+        val trainerProps = AnnotatedPropertyEditor(unsupervisedNetwork)
+        val trainerPropsPanel = trainerProps.createApplyPanel()
+        mainPanel.add(trainerPropsPanel, "wrap")
 
         // Run training algorithm
         val runControls = JPanel()
@@ -99,13 +107,12 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork): Stan
         inputs.toolbar.add(inputs.table.createAdvanceRowAction())
         inputs.toolbar.add(inputs.table.createApplyAndAdvanceAction {
             unsupervisedNetwork.inputLayer.setActivations(inputs.table.model.getCurrentDoubleRow().toDoubleArray())
-            with(network) {
-                unsupervisedNetwork.update()
-            }
+            trainAction(network)
         })
         runControls.add(inputs)
+        mainPanel.add(runControls)
 
-        contentPane = runControls
+        contentPane = mainPanel
     }
 }
 

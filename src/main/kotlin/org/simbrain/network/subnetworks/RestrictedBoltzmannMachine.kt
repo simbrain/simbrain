@@ -29,10 +29,8 @@ import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.alignNetworkModels
 import org.simbrain.network.util.offsetNetworkModel
-import org.simbrain.util.UserParameter
+import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
-import org.simbrain.util.shapeString
-import org.simbrain.util.validateColumnVector
 import smile.math.matrix.Matrix
 
 /**
@@ -144,9 +142,8 @@ class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: Int) : Su
 
         // println("Weights: ${visibleToHidden.weightMatrix.shapeString}")
 
-        // TODO: Operators for this / best way?
         //  Weight updates
-        val newWeights = visibleToHidden.weightMatrix.add(positiveGradient.sub(negativeGradient).mul(learningRate))
+        val newWeights = visibleToHidden.weightMatrix + (positiveGradient - (negativeGradient * learningRate))
         visibleToHidden.setMatrixValues(newWeights)
         // visibleLayer.updateBiases(visibleLayer.activations.sub(reconstructedVisible).mul(-1.0), learningRate)
         // hiddenLayer.updateBiases(hiddenLayer.activations.sub(reconstructedHidden).mul(-1.0), learningRate)

@@ -37,7 +37,7 @@ class RBMNode(networkPanel: NetworkPanel, private val rbm: RestrictedBoltzmannMa
 
             // Train Submenu
             contextMenu.add(networkPanel.createAction(name = "Training dialog...") {
-                getUnsupervisedTrainingPanel(rbm) { rbm.trainOnCurrentPattern() }.display()
+                makeTrainerPanel().display()
             })
             // Train once
             contextMenu.add(networkPanel.createAction(name = "Train once...") {
@@ -58,7 +58,9 @@ class RBMNode(networkPanel: NetworkPanel, private val rbm: RestrictedBoltzmannMa
             return contextMenu
         }
 
+    private fun makeTrainerPanel() = with(networkPanel) { getUnsupervisedTrainingPanel(rbm) { rbm.trainOnCurrentPattern() } }
+
     override val propertyDialog: StandardDialog
-        get() = with(networkPanel) { getUnsupervisedTrainingPanel(rbm) }
+        get() = makeTrainerPanel()
 
 }

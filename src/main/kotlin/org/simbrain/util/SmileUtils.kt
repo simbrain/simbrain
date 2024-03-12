@@ -96,6 +96,12 @@ fun Matrix.add(toAdd: DoubleArray) {
     (0 until nrow()).forEach { i -> set(i,0, toAdd[i]) }
 }
 
+// All matrix operator mutates the original matrix
+operator fun Matrix.plus(toAdd: Matrix): Matrix = this.add(toAdd)
+operator fun Matrix.minus(toSubtract: Matrix): Matrix = this.sub(toSubtract)
+operator fun Matrix.times(scalar: Double): Matrix = this.mul(scalar)
+operator fun Double.times(matrix: Matrix): Matrix = matrix.mul(this)
+
 operator fun Matrix.plusAssign(toAdd: DoubleArray) = add(toAdd)
 
 operator fun Matrix.plusAssign(toAdd: Matrix) { add(toAdd) }

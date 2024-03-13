@@ -138,6 +138,13 @@ class TextWorld : AttributeContainer, EditableObject {
             updateMatcher()
         }
 
+    @UserParameter(
+        label = "Stop at end",
+        description = "If true, the workspace will stop at the end of the text area.",
+        order = 3
+    )
+    var stopAtEnd: Boolean = false
+
     /**
      * Regular expression pattern. By default search for whole words
      */
@@ -206,6 +213,9 @@ class TextWorld : AttributeContainer, EditableObject {
                     selectCurrentToken()
                 }
             }
+        }
+        if (atEnd()) {
+            events.atEnd.fireAndBlock()
         }
     }
 

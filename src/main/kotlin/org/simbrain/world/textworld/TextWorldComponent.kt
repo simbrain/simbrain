@@ -59,7 +59,11 @@ class TextWorldComponent : WorkspaceComponent {
      * Initialize attribute types.
      */
     private fun init() {
-        world = world
+        world.events.atEnd.on {
+            if (world.stopAtEnd) {
+                workspace.stop()
+            }
+        }
     }
 
     override fun save(output: OutputStream, format: String) {

@@ -11,5 +11,6 @@ class TextWorldEvents: Events() {
     val tokenVectorMapChanged = NoArgEvent()
     val currentTokenChanged = AddedEvent<TextWorld.TextItem?>()
     val cursorPositionChanged = NoArgEvent()
+    val atEnd = NoArgEvent()
 
 }

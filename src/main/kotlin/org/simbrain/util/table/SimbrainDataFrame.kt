@@ -319,19 +319,23 @@ class Column(
             override fun clazz(): Class<*> {
                 return Double::class.java
             }
+            override val defaultValue = 0.0
         },
         IntType {
             override fun clazz(): Class<*> {
                 return Int::class.java
             }
+            override val defaultValue = 0
         },
         StringType {
             override fun clazz(): Class<*> {
                 return String::class.java
             }
+            override val defaultValue = ""
         };
 
         abstract fun clazz(): Class<*>
+        abstract val defaultValue: Any
 
     }
 

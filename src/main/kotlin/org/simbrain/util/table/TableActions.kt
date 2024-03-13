@@ -203,7 +203,7 @@ val SimbrainJTable.importArff
 val SimbrainJTable.importCsv
     get() = importCSVAction()
 
-fun SimbrainJTable.importCSVAction(fixedColumns: Boolean = false) = createAction(
+fun SimbrainJTable.importCSVAction(fixedColumns: Boolean = true) = createAction(
     name ="Import csv...",
     description = "Import comma separated values file",
     iconPath= "menu_icons/import.png"
@@ -226,13 +226,13 @@ fun SimbrainJTable.importCSVAction(fixedColumns: Boolean = false) = createAction
         model.let {
             if (it is BasicDataFrame) {
                 val importedData = createFrom2DArray(Utils.getStringMatrix(csvFile))
-                if (checkColumns(importedData.columnCount)) {
+                if (!fixedColumns || checkColumns(importedData.columnCount)) {
                     it.data = importedData.data
                     it.fireTableStructureChanged()
                 }
             } else if (it is SmileDataFrame) {
                 val data = Read.csv(csvFile.absolutePath)
-                if (checkColumns(data.ncol())) {
+                if (!fixedColumns || checkColumns(data.ncol())) {
                     it.df = data
                     it.fireTableStructureChanged()
                 }

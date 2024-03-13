@@ -67,14 +67,21 @@ class DataWorldDesktopComponent(frame: GenericFrame, val component: DataWorldCom
         addMenuBar()
 
         // Main panel
-        tablePanel.addAction(tablePanel.table.importCsv)
-        tablePanel.addAction(tablePanel.table.exportCsv(component.name))
-        tablePanel.addAction(tablePanel.table.fillAction)
-        tablePanel.addAction(tablePanel.table.randomizeAction)
-        tablePanel.addAction(tablePanel.table.showBoxPlotAction)
-        tablePanel.addAction(tablePanel.table.showHistogramAction)
-        tablePanel.addAction(tablePanel.table.createShowMatrixPlotAction())
-        // TODO: Add more actions
+        tablePanel.apply {
+            addAction(table.importCSVAction(fixedColumns = false))
+            addAction(table.exportCsv(component.name))
+            addSeparator()
+            addAction(table.fillAction)
+            addAction(table.randomizeAction)
+            addAction(table.showBoxPlotAction)
+            addAction(table.showHistogramAction)
+            addAction(table.createShowMatrixPlotAction())
+            addSeparator()
+            addAction(table.insertRowAction)
+            addAction(table.deleteRowAction)
+            addAction(table.insertColumnAction)
+            addAction(table.deleteColumnAction)
+        }
         add(tablePanel)
         frame.pack()
 

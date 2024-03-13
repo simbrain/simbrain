@@ -33,10 +33,15 @@ class BasicDataFrame(
     ) {
         val newColIndex = if (colIndex == -1) columnCount else colIndex
         if (colIndex in -1 until columnCount) {
-            columns.add(newColIndex, Column(name, type))
-            data.forEach { row -> row.add(newColIndex, null) }
+            val newColumn = Column(name, type)
+            columns.add(newColIndex, newColumn)
+            data.forEach { row -> row.add(newColIndex, newColumn.type.defaultValue) }
             fireTableStructureChanged()
         }
+    }
+
+    override fun insertColumn(selectedColumn: Int) {
+        insertColumn(selectedColumn, "New Column")
     }
 
     override fun deleteColumn(colIndex: Int, fireEvent: Boolean) {
@@ -54,13 +59,7 @@ class BasicDataFrame(
     override fun insertRow(selectedRow: Int) {
         val newRowIndex = if (selectedRow == -1) rowCount else selectedRow
         if (selectedRow in -1..rowCount) {
-            data.add(newRowIndex, MutableList(columnCount) {
-                when (columns[it].type) {
-                    Column.DataType.DoubleType -> 0.0
-                    Column.DataType.IntType -> 0
-                    Column.DataType.StringType -> ""
-                }
-            })
+            data.add(newRowIndex, MutableList(columnCount) { columns[it].type.defaultValue })
             fireTableStructureChanged()
         }
     }

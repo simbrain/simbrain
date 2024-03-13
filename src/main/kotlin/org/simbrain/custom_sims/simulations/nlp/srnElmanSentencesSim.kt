@@ -81,7 +81,7 @@ val srnElmanSentences = newSim {
 
     workspace.addUpdateAction("Set Current Word as Input Activations") {
         val currentVector = textWorldInputs.world.currentVector
-        srn.inputLayer.forceSetActivations(currentVector)
+        srn.inputLayer.setActivations(currentVector)
     }
 
     workspace.addUpdateAction("Update Network") {

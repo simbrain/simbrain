@@ -282,12 +282,12 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
     }
 
     /**
-     * Force set all activations to a specified value.
+     * Set all activations to a specified value.
      *
      * @param value the value to set the neurons to
      */
     @Consumable
-    fun forceSetActivationLevels(value: Double) {
+    fun setActivationLevels(value: Double) {
         for (n in neuronList) {
             n.activation = value
         }
@@ -463,15 +463,6 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
 
     protected fun invalidateCachedInputs() {
         cachedInputsDirty = true
-    }
-
-    @Consumable
-    fun forceSetActivations(activations: DoubleArray) {
-        val size = min(activations.size, neuronList.size)
-        for (i in 0 until size) {
-            neuronList[i].activation = activations[i]
-        }
-        cachedActivationsDirty = true
     }
 
     /**

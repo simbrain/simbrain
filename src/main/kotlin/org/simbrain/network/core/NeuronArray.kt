@@ -208,6 +208,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         events.updated.fireAndForget()
     }
 
+    @Consumable
     fun setActivations(newActivations: DoubleArray) {
         activations = Matrix.column(newActivations)
     }
@@ -269,11 +270,6 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
     override fun readResolve(): Any? {
         events = NeuronArrayEvents()
         return this
-    }
-
-    @Consumable
-    fun forceSetActivations(activations: DoubleArray) {
-        this.activations = activations.toMatrix()
     }
 
     val excitatoryInputs: DoubleArray

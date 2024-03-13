@@ -1,6 +1,7 @@
 package org.simbrain.util.table
 
 import org.simbrain.util.sampleWithoutReplacement
+import org.simbrain.util.swingInvokeLater
 import org.simbrain.util.tryParsingDouble
 import org.simbrain.util.tryParsingInt
 import smile.math.matrix.Matrix
@@ -60,7 +61,9 @@ class BasicDataFrame(
         val newRowIndex = if (selectedRow == -1) rowCount else selectedRow
         if (selectedRow in -1..rowCount) {
             data.add(newRowIndex, MutableList(columnCount) { columns[it].type.defaultValue })
-            fireTableStructureChanged()
+            swingInvokeLater {
+                fireTableStructureChanged()
+            }
         }
     }
 

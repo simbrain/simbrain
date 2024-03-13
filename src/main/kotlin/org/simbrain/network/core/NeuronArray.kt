@@ -127,7 +127,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         return copy
     }
 
-    @get:Producible
+    @get:Producible(arrayDescriptionMethod = "getLabelArray")
     val activationArray: DoubleArray
         get() = activations.toDoubleArray()
 
@@ -285,4 +285,6 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
             .map { it.inhibitoryOutputs }
             .reduceOrNull { base, add -> SimbrainMath.addVector(base, add) }
             ?: DoubleArray(inputSize())
+
+    fun getLabelArray() = (0 until size()).map { it.toString() }.toTypedArray()
 }

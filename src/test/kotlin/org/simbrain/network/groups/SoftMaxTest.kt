@@ -26,18 +26,16 @@ class SoftMaxTest {
     }
 
     @Test
-    fun `Softmax activations sum to 1`(){
+    fun `Softmax activations sum to 1`() {
         net.update()
         assertEquals(1.0, softmax.activations.sum(), 0.01)
     }
 
     @Test
     fun `Equal inputs should produce equal outputs`() {
-        with(net) {
-            n1.activation = 0.85
-            n2.activation = 0.85
-            net.update()
-        }
+        n1.activation = 0.85
+        n2.activation = 0.85
+        net.update()
         assertEquals(softmax.activations[0], softmax.activations[1])
     }
 
@@ -47,6 +45,13 @@ class SoftMaxTest {
         n2.activation = 0.5
         net.update()
         assertTrue(softmax.activations[0] > softmax.activations[1])
+    }
+
+    @Test
+    fun `Test copy function`() {
+        val softmax2 = softmax.copy()
+        net.addNetworkModelsAsync(softmax2)
+        assertEquals(2, softmax2.neuronList.size)
     }
 }
 

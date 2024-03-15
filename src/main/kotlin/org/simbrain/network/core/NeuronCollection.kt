@@ -21,6 +21,7 @@ import org.simbrain.network.NetworkModel
 import org.simbrain.network.layouts.Layout
 import org.simbrain.network.updaterules.NeuronUpdateRule
 import org.simbrain.util.propertyeditor.CopyableObject
+import java.util.*
 import java.util.function.Consumer
 
 /**
@@ -33,7 +34,7 @@ class NeuronCollection : AbstractNeuronCollection {
     constructor(): super()
 
     constructor(neurons: List<Neuron>): super() {
-        addNeurons(neurons)
+        addNeurons(neurons.sortTopBottom())
 
         neurons.forEach { n: Neuron ->
             n.events.locationChanged.on { events.locationChanged }

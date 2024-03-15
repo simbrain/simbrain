@@ -1,6 +1,7 @@
 package org.simbrain.network.core
 
 import com.thoughtworks.xstream.XStream
+import org.simbrain.network.LocatableModel
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.ConnectionStrategy
@@ -307,6 +308,10 @@ fun List<Neuron>.getEnergy() = (this cartesianProduct this)
     .mapNotNull { (a, b) -> getSynapse(a, b) }
     .sumOf { it.strength * it.source.activation * it.target.activation } * -0.5
 
+/**
+ * Sort a list of models left to right and top to bottom
+ */
+fun<T: LocatableModel> List<T>.sortTopBottom() = sortedBy { it.locationY }.sortedBy{it.locationX}
 
 suspend fun NetworkModel.addToNetwork(network: Network) = network.addNetworkModel(this)
 fun NetworkModel.addToNetworkAsync(network: Network) = network.addNetworkModelAsync(this)

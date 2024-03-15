@@ -18,6 +18,8 @@
  */
 package org.simbrain.workspace.gui
 
+import org.simbrain.plot.barchart.BarChartComponent
+import org.simbrain.plot.barchart.BarChartModel
 import org.simbrain.plot.histogram.HistogramComponent
 import org.simbrain.plot.histogram.HistogramModel
 import org.simbrain.plot.piechart.PieChartComponent
@@ -342,6 +344,18 @@ class WorkspaceActions {
     )
 
     @JvmOverloads
+    fun createCoupledBarChartAction(producer: Producer, objectName: String, plotType: String = "Bar Chart") = createCoupledPlotAction(
+        producer = producer,
+        plotType = plotType,
+        objectName = objectName,
+        iconPath = "menu_icons/BarChart.png",
+        componentCreator = { name -> BarChartComponent(name) },
+        consumerProvider = {
+            it.model.getConsumer(BarChartModel::setBarValues)
+        }
+    )
+
+    @JvmOverloads
     fun createCoupledRasterPlotAction(producer: Producer, objectName: String, plotType: String = "Raster Plot") = createCoupledPlotAction(
         producer = producer,
         plotType = plotType,
@@ -382,12 +396,13 @@ class WorkspaceActions {
     @JvmOverloads
     fun createCoupledPlotMenu(producer: Producer, objectName: String, menuTitle: String = "Couple Plots"): JMenu {
         val menu = JMenu(menuTitle)
-        menu.add(createCoupledProjectionPlotAction(producer, objectName))
-        menu.add(createCoupledTimeSeriesPlotAction(producer, objectName))
-        menu.add(createCoupledHistogramPlotAction(producer, objectName))
+        menu.add(createCoupledBarChartAction(producer, objectName))
         menu.add(createCoupledPieChartAction(producer, objectName))
-        menu.add(createCoupledRasterPlotAction(producer, objectName))
         menu.add(createCoupledPixelPlotAction(producer, objectName))
+        menu.add(createCoupledProjectionPlotAction(producer, objectName))
+        menu.add(createCoupledHistogramPlotAction(producer, objectName))
+        menu.add(createCoupledRasterPlotAction(producer, objectName))
+        menu.add(createCoupledTimeSeriesPlotAction(producer, objectName))
         return menu
     }
 

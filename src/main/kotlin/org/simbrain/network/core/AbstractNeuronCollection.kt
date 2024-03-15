@@ -88,7 +88,6 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
      */
     val neuronList: MutableList<Neuron> = ArrayList()
 
-
     /**
      * Space between neurons within a layer.
      */

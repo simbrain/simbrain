@@ -25,6 +25,8 @@ import java.util.List;
 /**
  * Comparators for using in sorting various kinds of org.simbrain.network lists.
  *
+ * Also see NetworkUtils.sortTopBottom
+ *
  * @author Zoë Tosi
  * @author jyoshimi
  */

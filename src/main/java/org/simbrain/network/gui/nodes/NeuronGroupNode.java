@@ -23,6 +23,7 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Utils;
+import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -199,6 +200,14 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
         // Test Inputs action
         //menu.addSeparator();
         //menu.add(testInputsAction);
+
+        // Projection Plot Action
+        menu.addSeparator();
+        menu.add(SimbrainDesktop.INSTANCE.getActionManager().createCoupledPlotMenu(
+                SimbrainDesktop.INSTANCE.getWorkspace().getCouplingManager().getProducer(neuronGroup, "getActivations"),
+                neuronGroup.getDisplayName() + " Activations",
+                "Plot Activations"
+        ));
 
         // Coupling menu
         menu.addSeparator();

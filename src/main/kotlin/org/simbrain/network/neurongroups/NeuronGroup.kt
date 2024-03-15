@@ -20,9 +20,11 @@ package org.simbrain.network.neurongroups
 import org.simbrain.network.core.AbstractNeuronCollection
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.sortTopBottom
 import org.simbrain.network.updaterules.NeuronUpdateRule
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.CustomTypeName
+import java.util.*
 
 /**
  * A group of neurons using a common [NeuronUpdateRule]. After creation the update rule may be changed but
@@ -37,7 +39,7 @@ import org.simbrain.util.propertyeditor.CustomTypeName
 open class NeuronGroup() : AbstractNeuronCollection() {
 
     constructor(neurons: List<Neuron>) : this() {
-        addNeurons(neurons)
+        addNeurons(neurons.sortTopBottom())
     }
 
     constructor(numNeurons: Int) : this(List(numNeurons) { Neuron() })

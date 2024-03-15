@@ -46,7 +46,7 @@ public class PieChartModel implements AttributeContainer, EditableObject {
     private Boolean isUninitialized;
 
     /**
-     * Names for the "slices" in the barchart. Can bet via coupling events
+     * Names for the "slices" in the barchart. Can be set via coupling events
      * in {@link PieChartComponent}.
      */
     private String[] sliceNames = {};
@@ -140,9 +140,20 @@ public class PieChartModel implements AttributeContainer, EditableObject {
         this.sliceNames = names;
     }
 
+    public String[] getSliceNames() {
+        return sliceNames;
+    }
+
     @Override
     public String getId() {
         return "Pie Chart";
     }
 
+    public Double getEmptyPieThreshold() {
+        return emptyPieThreshold;
+    }
+
+    public void setEmptyPieThreshold(Double emptyPieThreshold) {
+        this.emptyPieThreshold = emptyPieThreshold;
+    }
 }

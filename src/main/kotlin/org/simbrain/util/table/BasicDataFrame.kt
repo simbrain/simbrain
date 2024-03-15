@@ -1,9 +1,7 @@
 package org.simbrain.util.table
 
-import org.simbrain.util.sampleWithoutReplacement
-import org.simbrain.util.swingInvokeLater
-import org.simbrain.util.tryParsingDouble
-import org.simbrain.util.tryParsingInt
+import org.simbrain.util.*
+import org.simbrain.util.propertyeditor.EditableObject
 import smile.math.matrix.Matrix
 
 /**
@@ -167,8 +165,36 @@ private fun inferColumns(names: List<String?>, data: MutableList<MutableList<Any
         createColumn(names.getOrNull(i) ?: "Column ${i + 1}", data.asSequence().map { it[i] }.firstNotNullOfOrNull { it })
     }.toMutableList()
 
-fun createFrom2DArray(data: Array<out Array<out Any?>>): BasicDataFrame {
-    return BasicDataFrame(data.map { it.toMutableList() }.toMutableList())
+fun createFrom2DArray(data: Array<out Array<out Any?>>, options: ImportExportOptions = ImportExportOptions()): BasicDataFrame {
+
+    val rawData = data.map { it.toMutableList() }.toMutableList()
+
+    val columnNames = if (options.includeColumnNames) {
+        rawData[0]
+            .run { if (options.includeRowNames) drop(1) else this }
+            .map { it.toString() }
+    } else {
+        null
+    }
+
+    val rowNames = if (options.includeRowNames) {
+        rawData.map { row -> row[0] }
+            .run { if (options.includeColumnNames) drop(1) else this }
+            .map { it.toString() }
+    } else {
+        null
+    }
+
+    fun List<List<Any?>>.dropColumnHeaders() = if (options.includeColumnNames) drop(1) else this
+
+    fun List<List<Any?>>.dropRowHeaders() = if (options.includeRowNames) map { row -> row.drop(1) } else this
+
+    val mainData = rawData.dropColumnHeaders().dropRowHeaders()
+
+    return BasicDataFrame(mainData.map { it.toMutableList() }.toMutableList()).apply {
+        columnNames?.let { this.columnNames = it.toMutableList() }
+        rowNames?.let { this.rowNames = it.toMutableList() }
+    }
 }
 
 fun createFromDoubleArray(data: Array<DoubleArray>): BasicDataFrame {
@@ -203,3 +229,11 @@ fun createBasicDataFrameFromColumn(data: Array<String>): BasicDataFrame {
     return BasicDataFrame(data.map { mutableListOf(it as Any?) }.toMutableList())
 }
 
+
+class ImportExportOptions : EditableObject {
+    @UserParameter(label = "Include column names", description = "Include column names in the exported file")
+    var includeColumnNames = false
+
+    @UserParameter(label = "Include row names", description = "Include row names in the exported file")
+    var includeRowNames = false
+}

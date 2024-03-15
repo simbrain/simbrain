@@ -21,8 +21,8 @@ class WeightMatrixViewer(val sources: List<Neuron>, val targets: List<Neuron>): 
             }.toMutableList()
         }.toMutableList()
     ).apply {
-        columnNames = targets.map { it.id }
-        rowNames = sources.map { it.id }
+        columnNames = targets.map { it.displayName }
+        rowNames = sources.map { it.displayName }
     }
 
     val dataViewer = SimbrainTablePanel(dataModel).also {

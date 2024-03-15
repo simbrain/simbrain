@@ -24,7 +24,7 @@ import javax.swing.*
  */
 private val TABLE_DIRECTORY = "." + Utils.FS + "simulations" + Utils.FS + "tables"
 
-fun SimbrainTablePanel.addSimpleDefaults()  {
+fun SimbrainTablePanel.addSimpleDefaults() {
     addAction(table.zeroFillAction)
     addAction(table.randomizeAction)
 }
@@ -157,18 +157,19 @@ val SimbrainJTable.showScatterPlotAction
         }
     }
 
-val SimbrainJTable.openProjectionAction get() = createAction(
-    iconPath = "menu_icons/ProjectionIcon.png",
-    description = "Open Projection"
-) {
-    withContext(Dispatchers.Default) {
-        val projectionComponent = ProjectionComponent("$name Projection")
-        projectionComponent.projector.useHotColor = false
-        SimbrainDesktop.workspace.addWorkspaceComponent(projectionComponent)
-        val points = model.get2DDoubleArray()
-        points.forEach { projectionComponent.addPoint(it) }
+val SimbrainJTable.openProjectionAction
+    get() = createAction(
+        iconPath = "menu_icons/ProjectionIcon.png",
+        description = "Open Projection"
+    ) {
+        withContext(Dispatchers.Default) {
+            val projectionComponent = ProjectionComponent("$name Projection")
+            projectionComponent.projector.useHotColor = false
+            SimbrainDesktop.workspace.addWorkspaceComponent(projectionComponent)
+            val points = model.get2DDoubleArray()
+            points.forEach { projectionComponent.addPoint(it) }
+        }
     }
-}
 
 val SimbrainJTable.importArff
     get() = createAction(
@@ -203,67 +204,89 @@ val SimbrainJTable.importArff
 val SimbrainJTable.importCsv
     get() = importCSVAction()
 
-fun SimbrainJTable.importCSVAction(fixedColumns: Boolean = true) = createAction(
-    name ="Import csv...",
+fun SimbrainJTable.importCSVAction(fixedColumns: Boolean = true, skipImportOptions: Boolean = false) = createAction(
+    name = "Import csv...",
     description = "Import comma separated values file",
-    iconPath= "menu_icons/import.png"
+    iconPath = "menu_icons/import.png"
 ) {
-    val chooser = SFileChooser(TABLE_DIRECTORY, "", "csv")
-    val csvFile = chooser.showOpenDialog()
-    fun checkColumns(numColumns: Int): Boolean {
-        if (numColumns != model.columnCount) {
-            JOptionPane.showOptionDialog(
-                null,
-                "Trying to import a table with the wrong number of columns ",
-                "Warning",
-                JOptionPane.DEFAULT_OPTION,
-                JOptionPane.WARNING_MESSAGE, null, null, null)
-            return false
+    fun import(options: ImportExportOptions = ImportExportOptions()) {
+        val chooser = SFileChooser(TABLE_DIRECTORY, "", "csv")
+        val csvFile = chooser.showOpenDialog()
+        fun checkColumns(numColumns: Int): Boolean {
+            if (numColumns != model.columnCount) {
+                JOptionPane.showOptionDialog(
+                    null,
+                    "Trying to import a table with the wrong number of columns ",
+                    "Warning",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.WARNING_MESSAGE, null, null, null
+                )
+                return false
+            }
+            return true
         }
-        return true
-    }
-    if (csvFile != null) {
-        model.let {
-            if (it is BasicDataFrame) {
-                val importedData = createFrom2DArray(Utils.getStringMatrix(csvFile))
-                if (!fixedColumns || checkColumns(importedData.columnCount)) {
-                    it.data = importedData.data
-                    it.fireTableStructureChanged()
-                }
-            } else if (it is SmileDataFrame) {
-                val data = Read.csv(csvFile.absolutePath)
-                if (!fixedColumns || checkColumns(data.ncol())) {
-                    it.df = data
-                    it.fireTableStructureChanged()
+        if (csvFile != null) {
+            model.let {
+                if (it is BasicDataFrame) {
+                    val rawData = Utils.getStringMatrix(csvFile)
+                    val importedData = createFrom2DArray(rawData, options)
+                    if (!fixedColumns || checkColumns(importedData.columnCount)) {
+                        it.data = importedData.data
+                        it.columnNames = importedData.columnNames
+                        it.rowNames = importedData.rowNames
+                        it.fireTableStructureChanged()
+                    }
+                } else if (it is SmileDataFrame) {
+                    val data = Read.csv(csvFile.absolutePath)
+                    if (!fixedColumns || checkColumns(data.ncol())) {
+                        it.df = data
+                        it.fireTableStructureChanged()
+                    }
                 }
             }
         }
     }
+    if (skipImportOptions) {
+        import()
+    } else {
+        val options = ImportExportOptions()
+        options.createEditorDialog {
+            import(it)
+        }.display()
+    }
 }
 
-fun SimbrainJTable.exportCsv(fileName: String = "") = createAction(
-        name = "Export csv...",
-        description = "Export comma separated values file",
-        iconPath = "menu_icons/export.png"
-    ) {
+fun SimbrainJTable.exportCsv(fileName: String = "", skipExportOptions: Boolean = false) = createAction(
+    name = "Export csv...",
+    description = "Export comma separated values file",
+    iconPath = "menu_icons/export.png"
+) {
+    fun export(options: ImportExportOptions = ImportExportOptions()) {
         val chooser = SFileChooser(TABLE_DIRECTORY, "", "csv")
         val csvFile = chooser.showSaveDialog(fileName)
         if (csvFile != null) {
             val writer = csvFile.bufferedWriter()
             val printer = CSVPrinter(writer)
-            (0 until model.rowCount).forEach { i ->
-                val row = (0 until model.columnCount).map { j ->
-                    model.getValueAt(i, j).toString()
-                }.toTypedArray()
-                printer.writeln(row)
-            }
+
+            model.toStringLists(options)
+                .forEach { printer.writeln(it.toTypedArray()) }
         }
     }
+
+    if (skipExportOptions) {
+        export()
+    } else {
+        val options = ImportExportOptions()
+        options.createEditorDialog {
+            export(it)
+        }.display()
+    }
+}
 
 val SimbrainJTable.editColumnAction
     get() = createAction(
         name = "Edit column...",
-        description =  "Edit column properties",
+        description = "Edit column properties",
         iconPath = "menu_icons/Prefs.png"
     ) {
         if (model is BasicDataFrame) {
@@ -274,7 +297,8 @@ val SimbrainJTable.editColumnAction
         }
     }
 
-fun SimbrainJTable.createApplyAction(name: String = "Apply", applyInputs: suspend (selectedRow: Int) -> Unit) = createAction(
+fun SimbrainJTable.createApplyAction(name: String = "Apply", applyInputs: suspend (selectedRow: Int) -> Unit) =
+    createAction(
         name = name,
         description = "Apply current row as input to network",
         iconPath = "menu_icons/Step.png",
@@ -284,22 +308,22 @@ fun SimbrainJTable.createApplyAction(name: String = "Apply", applyInputs: suspen
     }
 
 fun SimbrainJTable.createAdvanceRowAction() = createAction(
-        name = "Advance Row",
-        description = "Increment the current row",
-        iconPath = "menu_icons/plus.png",
-    ) {
-        incrementSelectedRow()
-    }
+    name = "Advance Row",
+    description = "Increment the current row",
+    iconPath = "menu_icons/plus.png",
+) {
+    incrementSelectedRow()
+}
 
 fun SimbrainJTable.createApplyAndAdvanceAction(applyInputs: suspend (selectedRow: Int) -> Unit) = createAction(
-        name = "Apply and Advance",
-        description = "Apply current row as input and increment selected row",
-        iconPath = "menu_icons/Step.png",
-    ) {
-        initRowSelection()
-        applyInputs(selectedRow)
-        incrementSelectedRow()
-    }
+    name = "Apply and Advance",
+    description = "Apply current row as input and increment selected row",
+    iconPath = "menu_icons/Step.png",
+) {
+    initRowSelection()
+    applyInputs(selectedRow)
+    incrementSelectedRow()
+}
 
 fun SimbrainJTable.createShowMatrixPlotAction() = createAction(
     name = "Show Matrix Plot",
@@ -307,7 +331,8 @@ fun SimbrainJTable.createShowMatrixPlotAction() = createAction(
     iconPath = "menu_icons/grid.png",
 ) {
 
-    val binaryOperations = arrayOf("Correlation", "Covariance", "Cosine Similarity", "Euclidean Distance", "Dot Product")
+    val binaryOperations =
+        arrayOf("Correlation", "Covariance", "Cosine Similarity", "Euclidean Distance", "Dot Product")
 
     val (data, rowNames) = if (selectedRows.size > 0) {
         getSelectedRowDoubleValues().toDoubleArray() to getSelectedRowNames()
@@ -344,7 +369,7 @@ fun SimbrainJTable.createShowMatrixPlotAction() = createAction(
         name = "Show preferences...",
         iconPath = "menu_icons/Prefs.png"
     ) {
-        matrixPlotPanel.properties.createEditorDialog{
+        matrixPlotPanel.properties.createEditorDialog {
             matrixPlotPanel.repaint()
         }.also {
             it.title = "Text World Preferences"

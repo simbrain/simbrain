@@ -241,7 +241,7 @@ abstract class SimbrainDataFrame : AbstractTableModel() {
     var rowNames = listOf<String?>()
         set(value) {
             field = value
-            fireTableDataChanged()
+            fireTableStructureChanged()
         }
 
     fun getRowName(row: Int): String {
@@ -250,12 +250,13 @@ abstract class SimbrainDataFrame : AbstractTableModel() {
 
     fun getAllRowNames() = (0 until rowCount).map { getRowName(it) }
 
-    var columnNames: List<String?>
+    var columnNames: List<String>
         get() = columns.map { it.name }
         set(value) {
             columns = columns.mapIndexed { i, col ->
                 Column(value.getOrNull(i) ?: "Column ${i + 1}", col.type)
             }.toMutableList()
+            fireTableDataChanged()
         }
 
     open fun insertRow(selectedRow: Int) {}
@@ -390,5 +391,25 @@ fun smileToSimbrainDataType(smileDataType: DataType): Column.DataType {
         DataType.ID.Double -> Column.DataType.DoubleType
         DataType.ID.Integer -> Column.DataType.IntType
         else -> Column.DataType.StringType
+    }
+}
+
+
+fun SimbrainDataFrame.toStringLists(options: ImportExportOptions) = buildList {
+    if (options.includeColumnNames) {
+        buildList {
+            if (options.includeRowNames) {
+                add("")
+            }
+            addAll(columnNames)
+        }.also { add(it) }
+    }
+    (0 until rowCount).forEach { i ->
+        buildList {
+            if (options.includeRowNames) {
+                add(getRowName(i))
+            }
+            addAll(getRow<String>(i))
+        }.also { add(it) }
     }
 }

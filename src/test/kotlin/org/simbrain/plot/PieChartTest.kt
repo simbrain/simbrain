@@ -11,18 +11,19 @@ import org.simbrain.workspace.Workspace
 
 class PieChartTest {
 
-    // TODO: Empty pie test, xml test
     val workspace = Workspace()
     val net = Network()
-    val pieChart = PieChartModel()
+    val nwc = NetworkComponent("Net", net)
     val ng = NeuronGroup(2).apply {
         setClamped(true)
     }
+    val pieChart = PieChartModel()
+    val pcc = PieChartComponent("Pie", pieChart)
 
     init {
         net.addNetworkModelsAsync(ng)
-        workspace.addWorkspaceComponent(NetworkComponent("Net", net))
-        workspace.addWorkspaceComponent(PieChartComponent("Pie", pieChart))
+        workspace.addWorkspaceComponent(pcc)
+        workspace.addWorkspaceComponent(nwc)
         workspace.couplingManager.createCoupling(ng, pieChart)
     }
 
@@ -74,18 +75,35 @@ class PieChartTest {
 
     @Test
     fun `test xml rep`() {
-        val pieChartComponent = PieChartComponent("test", pieChart)
         ng.activations = doubleArrayOf(.5, 1.0)
         workspace.simpleIterate()
-        val xml = pieChartComponent.xml
-
+        val xml = pcc.xml
         val deserializedPieChart = PieChartModel.getXStream().fromXML(xml) as PieChartModel
         assertEquals(2,deserializedPieChart.dataset.itemCount)
         assertEquals(ng.getNeuron(0).displayName, deserializedPieChart.sliceNames[0])
         assertEquals(ng.getNeuron(1).displayName, deserializedPieChart.sliceNames[1])
         assertEquals(.33, deserializedPieChart.dataset.getValue(0).toDouble(), .01)
         assertEquals(.66, deserializedPieChart.dataset.getValue(1).toDouble(), .01)
+    }
 
+    @Test
+    fun `test workspace couplings`() {
+        // Put pie chat in 50/50 state
+        ng.activations = doubleArrayOf(1.5, 1.5)
+        workspace.simpleIterate()
+
+        // Zip and create a new workspace
+        val zip = workspace.zipDataHeadless
+        val workspace2 = Workspace()
+
+        // Iterate the new workspace with new inputs and proportions should change accordingly
+        workspace2.openFromZipData(zip)
+        val savedNg = (workspace2.getComponent("Net") as NetworkComponent).network.getModels<NeuronGroup>().first()
+        savedNg.activations = doubleArrayOf(1.5, .5)
+        val savedPie = (workspace2.getComponent("Pie") as PieChartComponent).model as PieChartModel
+        workspace2.simpleIterate()
+        assertEquals(.75, savedPie.dataset.getValue(0).toDouble())
+        assertEquals(.25, savedPie.dataset.getValue(1).toDouble())
     }
 
 

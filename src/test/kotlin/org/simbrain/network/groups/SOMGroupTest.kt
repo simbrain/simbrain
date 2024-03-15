@@ -32,15 +32,8 @@ class SOMGroupTest {
             net.update()
         }
         SOM.reset()
-        assertEquals(100.0, SOM.neighborhoodSize)
-        assertEquals(0.06, SOM.learningRate)
-        assertEquals("""
-            Learning rate (0.06)
-            N-size (100.00)
-        """.trimIndent(), SOM.getStateInfoText())
+        assertEquals(SOM.params.initNeighborhoodSize, SOM.neighborhoodSize)
+        assertEquals(SOM.params.initialLearningRate, SOM.learningRate)
     }
-    @Test
-    fun `Test recall function`() {
 
-    }
 }

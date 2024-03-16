@@ -23,6 +23,7 @@ val imageWorldSim = newSim {
     val inputs = network.addNeuronCollection(100).apply {
         label = "Inputs"
         setClamped(true)
+        setUpperBound(1.0)
         layout(GridLayout(40.0, 40.0))
     }
     network.addNetworkModel(inputs)
@@ -64,8 +65,8 @@ val imageWorldSim = newSim {
     // Couple
     with(couplingManager) {
         createCoupling(
-            imageWorld.filterCollection.currentFilter.getProducer("getBrightness"),
-            inputs.getConsumer("forceSetActivations")
+            imageWorld.filterCollection.currentFilter.getProducer(imageWorld.filterCollection.currentFilter::getBrightness),
+            inputs.getConsumer(inputs::activations)
         )
     }
 

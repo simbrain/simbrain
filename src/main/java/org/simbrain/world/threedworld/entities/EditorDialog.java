@@ -1,5 +1,6 @@
 package org.simbrain.world.threedworld.entities;
 
+import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.threedworld.ThreeDDesktopComponent;
 
 import javax.swing.*;
@@ -66,7 +67,7 @@ public class EditorDialog {
     public void showEditor(Editor editor) {
         if (dialog != null)
             return;
-        dialog = new JDialog(owner.getDesktop().getFrame());
+        dialog = new JDialog(SimbrainDesktop.INSTANCE.getFrame());
         dialog.setTitle("ThreeDWorld Editor");
         Container contentPane = dialog.getContentPane();
         contentPane.setLayout(new BorderLayout());

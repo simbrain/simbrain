@@ -18,8 +18,13 @@
  */
 package org.simbrain.world.textworld.gui
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.widgets.ShowHelpAction
+import org.simbrain.workspace.WorkspaceComponent
+import org.simbrain.workspace.couplings.getProducer
+import org.simbrain.workspace.gui.CouplingMenu
 import org.simbrain.workspace.gui.DesktopComponent
 import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.world.textworld.*
@@ -121,10 +126,31 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
         file.add(SimbrainDesktop.actionManager.createCloseAction(this))
 
         // Edit menu
-        preferences.action = world.textWorldPrefs
-        edit.add(createShowFindAndReplaceAction())
-        edit.addSeparator()
-        edit.add(preferences)
+        fun createEditMenu() {
+            edit.removeAll()
+            preferences.action = world.textWorldPrefs
+            edit.add(createShowFindAndReplaceAction())
+            edit.addSeparator()
+            edit.add(
+                SimbrainDesktop.actionManager.createCoupledDataWorldAction(
+                    name = "Record Word Embeddings",
+                    world.getProducer(TextWorld::currentVector),
+                    sourceName = "${world.id} Word Embeddings",
+                    world.currentVector.size
+                )
+            )
+            edit.add(
+                SimbrainDesktop.actionManager.createCoupledPlotMenu(
+                    world.getProducer(TextWorld::currentVector),
+                    "${world.id} Word Embeddings",
+                )
+            )
+            edit.addSeparator()
+            edit.add(CouplingMenu(workspaceComponent, world))
+            edit.addSeparator()
+            edit.add(preferences)
+        }
+        createEditMenu()
         menuBar.add(edit)
 
         // Help Menu
@@ -132,6 +158,24 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
         val helpAction = ShowHelpAction("Pages/Worlds/TextWorld/TextWorld.html")
         helpItem.action = helpAction
         help.add(helpItem)
+
+        SimbrainDesktop.workspace.events.apply {
+            val componentEventUnregisteringHandlers = HashMap<WorkspaceComponent, MutableList<() -> Boolean?>> ()
+            componentAdded.on(Dispatchers.Swing) {
+                createEditMenu()
+                val callbackList = componentEventUnregisteringHandlers.getOrPut(it) { mutableListOf() }
+                callbackList.add(it.events.attributeContainerAdded.on(Dispatchers.Swing) {
+                    createEditMenu()
+                })
+                callbackList.add(it.events.attributeContainerRemoved.on(Dispatchers.Swing) {
+                    createEditMenu()
+                })
+            }
+            componentRemoved.on(Dispatchers.Swing) {
+                createEditMenu()
+                componentEventUnregisteringHandlers[it]?.forEach { it() }
+            }
+        }
 
         // Add menu
         parentFrame.jMenuBar = menuBar

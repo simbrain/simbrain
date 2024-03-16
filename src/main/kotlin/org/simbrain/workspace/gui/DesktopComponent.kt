@@ -66,8 +66,6 @@ var parentFrame: GenericFrame, workspaceComponent: E
 
     private val chooser: SFileChooser
 
-    var desktop: SimbrainDesktop? = null
-
     val exportAction = createAction(
         iconPath = "menu_icons/Save.png",
         name = "Export to xml...",

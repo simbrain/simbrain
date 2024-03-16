@@ -581,7 +581,6 @@ object SimbrainDesktop {
         workspaceComponent: WorkspaceComponent,
         desktopComponent: DesktopComponent<*>
     ) {
-        desktopComponent.desktop = this
         workspaceComponentDesktopComponentMap[workspaceComponent] = desktopComponent
     }
 

@@ -62,7 +62,7 @@ public class SigmoidFunctions {
      * @param x input argument
      * @return result of logistic
      */
-    private static double logistic(double x) {
+    public static double logistic(double x) {
         return 1 / (1 + Math.exp(-x));
     }
 

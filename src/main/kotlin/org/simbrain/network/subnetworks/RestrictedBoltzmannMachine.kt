@@ -19,17 +19,16 @@
 package org.simbrain.network.subnetworks
 
 import org.simbrain.network.NetworkModel
-import org.simbrain.network.core.InfoText
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.NeuronArray
-import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.core.*
 import org.simbrain.network.trainers.UnsupervisedNetwork
+import org.simbrain.network.trainers.updateBiases
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.alignNetworkModels
 import org.simbrain.network.util.offsetNetworkModel
 import org.simbrain.util.*
+import org.simbrain.util.math.SigmoidFunctions
 import org.simbrain.util.propertyeditor.EditableObject
 import smile.math.matrix.Matrix
 
@@ -67,6 +66,7 @@ class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: Int) : Su
         visibleLayer = NeuronArray(numVisibleNodes).apply {
             label = "Visible layer"
             gridMode = true
+            isShowBias = true
             updateRule = SigmoidalRule()
         }
         this.addModel(visibleLayer)
@@ -75,6 +75,7 @@ class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: Int) : Su
         hiddenLayer = NeuronArray(numHiddenNodes).apply {
             label = "Hidden Layer"
             gridMode = true
+            isShowBias = true
             updateRule = SigmoidalRule()
         }
         this.addModel(hiddenLayer)
@@ -89,10 +90,17 @@ class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: Int) : Su
 
     }
 
-    val stateInfoText: String
-        get() = "Energy: "
-        // get() = "Energy: " + hiddenLayer.neuronList.getEnergy().format(4)
-        // See eq 1 https://www.cs.toronto.edu/~hinton/absps/guideTR.pdf
+
+
+    // TODO: The calls mutate values. Also perhaps a cache?
+    // See eq 1 https://www.cs.toronto.edu/~hinton/absps/guideTR.pdf
+    val stateInfoText: String get() = "todo"
+        // get() {
+        //     val t1 = visibleLayer.activations.mul(visibleLayer.biases).sum()
+        //     val t2 = hiddenLayer.activations.mul(hiddenLayer.biases).sum()
+        //     val t3 = hiddenLayer.activations.mm(visibleLayer.activations.transpose()).mul(visibleToHidden.weightMatrix).sum()
+        //     return "Energy: ${t1 + t2 + t3}"
+        // }
 
     fun updateStateInfoText() {
         infoText.text = stateInfoText
@@ -111,12 +119,16 @@ class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: Int) : Su
         updateWithSampling(hiddenLayer)
         
         // Negative phase: hidden -> visible "backwards" through weights
+        // Note this is a "reconstructed visible" state, but for Simbrain we are setting the gui visible layer to the reconstructed values
         // Make the hidden layer a row vector and left multiply with the matrix, the make the result back into a column vector
-        visibleLayer.activations = hiddenLayer.activations.transpose().mm(visibleToHidden.weightMatrix).transpose()
+        visibleLayer.addInputs(hiddenLayer.activations.transpose().mm(visibleToHidden.weightMatrix).transpose())
+        visibleLayer.update()
+        updateWithSampling(visibleLayer)
 
         updateStateInfoText()
     }
 
+    // TODO: Redo below with non-mutating operators
     context(Network)
     fun trainOnCurrentPattern() {
 
@@ -126,29 +138,24 @@ class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: Int) : Su
         updateWithSampling(hiddenLayer)
 
         // Get "reconstructed" activations
-        val reconstructedVisible = hiddenLayer.activations.transpose().mm(visibleToHidden.weightMatrix).transpose()
+        var reconstructedVisible = hiddenLayer.activations.transpose().mm(visibleToHidden.weightMatrix).transpose()
+        reconstructedVisible += visibleLayer.biases
         updateWithSampling(reconstructedVisible)
-        val reconstructedHidden = visibleToHidden.weightMatrix.mm(reconstructedVisible)
+        var reconstructedHidden = visibleToHidden.weightMatrix.mm(reconstructedVisible)
+        reconstructedHidden += hiddenLayer.biases
         updateWithSampling(reconstructedHidden)
-        println("Reconstructed visible: ${reconstructedVisible.shapeString}, Reconstructed hidden: ${reconstructedHidden.shapeString})")
 
-        // Positive gradient: visible layer outer product hidden layer
+        // Positive gradient: hidden layer outer product visible layer
         val positiveGradient = hiddenLayer.activations.mm(visibleLayer.activations.transpose())
-        // println("Positive gradient: ${positiveGradient.shapeString}")
-
         // Negative gradient: same as positive but use reconstructions
         val negativeGradient = reconstructedHidden.mm(reconstructedVisible.transpose())
-        // println("Negative gradient: ${negativeGradient.shapeString}")
-
-        // println("Weights: ${visibleToHidden.weightMatrix.shapeString}")
 
         //  Weight updates
-        val newWeights = visibleToHidden.weightMatrix + (positiveGradient - (negativeGradient * learningRate))
-        visibleToHidden.setMatrixValues(newWeights)
-        // visibleLayer.updateBiases(visibleLayer.activations.sub(reconstructedVisible).mul(-1.0), learningRate)
-        // hiddenLayer.updateBiases(hiddenLayer.activations.sub(reconstructedHidden).mul(-1.0), learningRate)
-        // visible_bias += learning_rate * (visible - reconstructed_visible)
-        // hidden_bias += learning_rate * (hidden_states - reconstructed_hidden_states)
+        visibleToHidden.setMatrixValues(visibleToHidden.weightMatrix + (positiveGradient - negativeGradient) * learningRate)
+
+        //  Bias updates.
+        visibleLayer.updateBiases(visibleLayer.activations - reconstructedVisible, learningRate)
+        hiddenLayer.updateBiases(hiddenLayer.activations - reconstructedHidden, learningRate)
 
         updateStateInfoText()
 
@@ -171,16 +178,21 @@ class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: Int) : Su
 }
 
 /**
- * Treat components of the array as probabilities and use those probabilities to replace with 0 or 1.
+ * Apply logistic sigmoid to components, then treat the resulting values as probabilities and use those
+ * probabilities to replace with 0 or 1.
  */
-fun updateWithSampling(array: Matrix) {
+private fun updateWithSampling(array: Matrix) {
     array.validateColumnVector()
     (0 until array.nrow()).forEach { i ->
+        array.set(i, 0, SigmoidFunctions.logistic(array.get(i, 0)))
         array.set(i, 0, if (Math.random() < array.get(i, 0)) 1.0 else 0.0)
     }
 }
 
-fun updateWithSampling(na: NeuronArray) {
+/**
+ * Same as above but the NeuronArray is assumed to have been updated and sigmoidal which would apply the sigmoid.
+ */
+private fun updateWithSampling(na: NeuronArray) {
     na.activations.validateColumnVector()
     (0 until na.activations.nrow()).forEach{ i ->
         na.activations.set(i, 0, if (Math.random() < na.activations.get(i,0)) 1.0 else 0.0)

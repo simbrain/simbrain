@@ -15,6 +15,7 @@ import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.stats.ProbabilityDistribution
+import smile.math.matrix.Matrix
 import java.awt.geom.Point2D
 
 /**
@@ -290,6 +291,15 @@ fun Neuron.randomizeBias(randomizer: ProbabilityDistribution? = null) {
         }
     }
 }
+
+val NeuronArray.biases: Matrix get()   {
+    dataHolder.let {
+        if (it is BiasedMatrixData) {
+            return it.biases
+        }
+    }
+    throw Exception("Data holder for ${id} does not have bias")
+ }
 
 fun NeuronArray.randomizeBiases(randomizer: ProbabilityDistribution? = null) {
     dataHolder.let {

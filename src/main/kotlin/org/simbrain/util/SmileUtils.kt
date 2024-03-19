@@ -100,11 +100,11 @@ fun Matrix.add(toAdd: DoubleArray) {
 operator fun Matrix.plus(toAdd: Matrix): Matrix = this.add(toAdd)
 operator fun Matrix.minus(toSubtract: Matrix): Matrix = this.sub(toSubtract)
 operator fun Matrix.times(scalar: Double): Matrix = this.mul(scalar)
+//  Component-wise multiplication
+operator fun Matrix.times(toMultiply: Matrix): Matrix = this.mul(toMultiply)
 operator fun Double.times(matrix: Matrix): Matrix = matrix.mul(this)
 
 operator fun Matrix.plusAssign(toAdd: DoubleArray) = add(toAdd)
-
-operator fun Matrix.plusAssign(toAdd: Matrix) { add(toAdd) }
 
 operator fun Matrix.minusAssign(toSubtract: Matrix) { sub(toSubtract) }
 

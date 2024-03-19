@@ -40,13 +40,15 @@ class RBMNode(networkPanel: NetworkPanel, private val rbm: RestrictedBoltzmannMa
                 makeTrainerPanel().display()
             })
             // Train once
-            contextMenu.add(networkPanel.createAction(name = "Train once...") {
-                val iterations: Int? = showNumericInputDialog("Iterations: ", 10)?.toInt()
+            contextMenu.add(networkPanel.createAction(name = "Train on current pattern...") {
+                val iterations: Int? = showNumericInputDialog("Iterations: ", 100)?.toInt()
                 if (iterations != null) {
                     with(networkPanel.network) {
                         repeat(iterations) {
                             rbm.trainOnCurrentPattern()
                         }
+                        // TODO: Better affordance
+                        println("Done")
                     }
                 }
             })
@@ -58,7 +60,13 @@ class RBMNode(networkPanel: NetworkPanel, private val rbm: RestrictedBoltzmannMa
             return contextMenu
         }
 
-    private fun makeTrainerPanel() = with(networkPanel) { getUnsupervisedTrainingPanel(rbm) { rbm.trainOnCurrentPattern() } }
+    private fun makeTrainerPanel() = with(networkPanel) { getUnsupervisedTrainingPanel(rbm) {
+        rbm.trainOnCurrentPattern() }
+    }
+
+    override fun setInfoTextNode(infoTextNode: ScreenElement?) {
+        super.setInfoTextNode(infoTextNode)
+    }
 
     override val propertyDialog: StandardDialog
         get() = makeTrainerPanel()

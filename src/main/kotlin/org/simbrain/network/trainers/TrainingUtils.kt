@@ -16,7 +16,7 @@ package org.simbrain.network.trainers
 import org.simbrain.network.core.*
 import org.simbrain.network.updaterules.interfaces.DifferentiableUpdateRule
 import org.simbrain.network.util.BiasedMatrixData
-import org.simbrain.util.plusAssign
+import org.simbrain.util.plus
 import org.simbrain.util.sse
 import org.simbrain.util.validateSameShape
 import smile.math.matrix.Matrix

@@ -5,6 +5,8 @@ import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.subnetworks.RestrictedBoltzmannMachine
 import org.simbrain.util.place
+import org.simbrain.util.plus
+import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.toMatrix
 import smile.math.matrix.Matrix
 
@@ -59,11 +61,9 @@ val rbmSim = newSim {
                 rbm.visibleLayer.activations = input6.toMatrix()
             }
             addButton("Add noise") {
-                // TODO
-                // rbm.visibleLayer.activations += NormalDistribution(standardDeviation = .1).sampleDouble(rbm.visibleLayer.size())
-                //     .toMatrix()
-                // rbm.visibleLayer.events.updated.fire()
-
+                rbm.visibleLayer.activations += NormalDistribution(standardDeviation = .1)
+                    .sampleDouble(rbm.visibleLayer.size())
+                    .toMatrix()
             }
         }
 

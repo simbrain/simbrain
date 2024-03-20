@@ -135,10 +135,10 @@ class GuiEditable<O : EditableObject, T>(
     fun update(context: UpdateFunctionContext<O, T>) {
         with(context) {
             if (conditionallyEnabledBy?.isWidget() == false) {
-                throw IllegalArgumentException("${conditionallyEnabledBy.name} must be a widget to use conditionallyEnabledBy")
+                enableWidget(conditionallyEnabledBy.getter.call(baseObject))
             }
             if (conditionallyVisibleBy?.isWidget() == false) {
-                throw IllegalArgumentException("${conditionallyVisibleBy.name} must be a widget to use conditionallyVisibleBy")
+                showWidget(conditionallyVisibleBy.getter.call(baseObject))
             }
             if (updateEventProperty == conditionallyEnabledBy) {
                 enableWidget(widgetValue(conditionallyEnabledBy))

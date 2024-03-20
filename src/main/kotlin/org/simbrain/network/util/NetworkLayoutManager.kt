@@ -33,7 +33,6 @@ import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.component3
 import kotlin.collections.component4
-import kotlin.collections.listOf
 
 /**
  * Directions.
@@ -85,22 +84,23 @@ fun offsetNeuronCollections(
 /**
  * Same as above but specify height and width, which are assumed to be the same for both models.
  */
+@JvmOverloads
 fun offsetNetworkModel(
     reference: LocatableModel, target: LocatableModel, direction: Direction, amount: Double,
-    height: Double, width: Double
+    heightR: Double, widthR: Double, heightT: Double = heightR, widthT: Double = widthR
 ) {
     val (refLeft, refTop, refRight, refBottom) = reference.run {
         listOf(
-            locationX - width / 2,
-            locationY - height / 2,
-            locationX + width / 2,
-            locationY + height / 2
+            locationX - widthR / 2,
+            locationY - heightR / 2,
+            locationX + widthR / 2,
+            locationY + heightR / 2
         )
     }
     when (direction) {
-        Direction.NORTH -> target.locationY = refTop - amount - height / 2
-        Direction.SOUTH -> target.locationY = refBottom + amount + height / 2
-        Direction.EAST -> target.locationX = refRight + amount + width / 2
-        Direction.WEST -> target.locationX = refLeft - amount - width / 2
+        Direction.NORTH -> target.locationY = refTop - amount - heightT / 2
+        Direction.SOUTH -> target.locationY = refBottom + amount + heightT / 2
+        Direction.EAST -> target.locationX = refRight + amount + widthT / 2
+        Direction.WEST -> target.locationX = refLeft - amount - widthT / 2
     }
 }

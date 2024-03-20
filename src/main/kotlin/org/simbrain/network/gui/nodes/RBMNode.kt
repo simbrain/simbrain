@@ -64,10 +64,6 @@ class RBMNode(networkPanel: NetworkPanel, private val rbm: RestrictedBoltzmannMa
         rbm.trainOnCurrentPattern() }
     }
 
-    override fun setInfoTextNode(infoTextNode: ScreenElement?) {
-        super.setInfoTextNode(infoTextNode)
-    }
-
     override val propertyDialog: StandardDialog
         get() = makeTrainerPanel()
 

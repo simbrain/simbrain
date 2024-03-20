@@ -16,44 +16,34 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+package org.simbrain.network.gui.nodes
 
-package org.simbrain.network.gui.nodes;
-
-import kotlin.Unit;
-import org.jetbrains.annotations.Nullable;
-import org.piccolo2d.extras.nodes.PStyledText;
-import org.piccolo2d.util.PBounds;
-import org.simbrain.network.core.NetworkTextObject;
-import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.util.SwingUtilsKt;
-import org.simbrain.util.TextUtilsKt;
-
-import javax.swing.*;
-import javax.swing.text.*;
-import java.awt.event.ActionEvent;
-import java.awt.geom.Point2D;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
-import java.util.stream.Collectors;
-
-import static org.simbrain.util.GeomKt.minus;
-import static org.simbrain.util.GeomKt.plus;
-import static org.simbrain.util.SwingUtilsKt.getSwingDispatcher;
+import org.piccolo2d.extras.nodes.PStyledText
+import org.piccolo2d.util.PBounds
+import org.simbrain.network.core.NetworkTextObject
+import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.util.*
+import java.awt.event.ActionEvent
+import java.util.stream.Collectors
+import javax.swing.AbstractAction
+import javax.swing.JDialog
+import javax.swing.JPopupMenu
+import javax.swing.text.*
 
 /**
  * An editable text element, which wraps a PStyledText object.
  */
-public class TextNode extends ScreenElement implements PropertyChangeListener {
-
-    /**
-     * The text object.
-     */
-    private final PStyledText pStyledText;
-
+open class TextNode(
+    netPanel: NetworkPanel,
     /**
      * Underlying model text object.
      */
-    private final NetworkTextObject textObject;
+    val textObject: NetworkTextObject
+) : ScreenElement(netPanel) {
+    /**
+     * The text object.
+     */
+    val pStyledText: PStyledText = PStyledText()
 
     /**
      * Construct text object at specified location.
@@ -61,160 +51,118 @@ public class TextNode extends ScreenElement implements PropertyChangeListener {
      * @param netPanel reference to networkPanel
      * @param text     the network text object
      */
-    public TextNode(final NetworkPanel netPanel, final NetworkTextObject text) {
-        super(netPanel);
-        this.textObject = text;
-        pStyledText = new PStyledText();
-        pStyledText.setDocument(new DefaultStyledDocument());
-        this.addChild(pStyledText);
-        this.setBounds(pStyledText.getBounds());
-        addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this);
+    init {
+        pStyledText.document = DefaultStyledDocument()
+        this.addChild(pStyledText)
 
-        var events = text.getEvents();
-        events.getDeleted().on(getSwingDispatcher(), n -> removeFromParent());
-        events.getLocationChanged().on(this::pullViewPositionFromModel);
-        events.getTextUpdated().on(getSwingDispatcher(), this::update);
+        val events = textObject.events
+        events.deleted.on(swingDispatcher) { removeFromParent() }
+        events.locationChanged.on { this.recenterTextObject() }
+        events.textUpdated.on(swingDispatcher) { this.update() }
 
-        update();
-        pushViewPositionToModel();
+        update()
     }
 
-    @Override
-    public boolean isDraggable() {
-        return true;
-    }
+    override val isDraggable: Boolean
+        get() = true
 
-    @Override
-    public JPopupMenu getContextMenu() {
-        JPopupMenu contextMenu = new JPopupMenu();
+    override val contextMenu: JPopupMenu?
+        get() {
+            val contextMenu = JPopupMenu()
 
-        var actions = getNetworkPanel().getNetworkActions();
+            val actions = networkPanel.networkActions
 
-        contextMenu.add(actions.getCutAction());
-        contextMenu.add(actions.getCopyAction());
-        contextMenu.add(actions.getPasteAction());
-        contextMenu.addSeparator();
+            contextMenu.add(actions.cutAction)
+            contextMenu.add(actions.copyAction)
+            contextMenu.add(actions.pasteAction)
+            contextMenu.addSeparator()
 
-        final var textNodes = getNetworkPanel().getSelectionManager().getSelection().stream()
-                .filter(TextNode.class::isInstance)
-                .map(TextNode.class::cast)
-                .collect(Collectors.toSet());
-        textNodes.add(this);
+            val textNodes = networkPanel.selectionManager.selection.stream()
+                .filter { obj: ScreenElement? -> TextNode::class.java.isInstance(obj) }
+                .map { obj: ScreenElement? -> TextNode::class.java.cast(obj) }
+                .collect(Collectors.toSet())
+            textNodes.add(this)
 
-        if (textNodes.size() == 1) {
-            contextMenu.add(new AbstractAction() {
+            if (textNodes.size == 1) {
+                contextMenu.add(object : AbstractAction() {
+                    init {
+                        putValue(NAME, "Edit Text...")
+                    }
 
-                {
-                    putValue(Action.NAME, "Edit Text...");
-                }
+                    override fun actionPerformed(e: ActionEvent) {
+                        textEntryDialog(textObject.text, "Edit Text", 20, 5) {
+                            textObject.setText(it)
+                            update()
+                        }.display()
+                    }
+                })
+            }
 
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    SwingUtilsKt.display(TextUtilsKt.textEntryDialog(getTextObject().getText(), "Edit Text", 20, 5, (text) -> {
-                        getTextObject().setText(text);
-                        update();
-                        return Unit.INSTANCE;
-                    }));
-                }
-            });
+            contextMenu.add(networkPanel.networkActions.setTextPropertiesAction(textNodes))
+
+            contextMenu.addSeparator()
+            contextMenu.add(networkPanel.networkActions.deleteAction)
+
+            return contextMenu
         }
 
-        contextMenu.add(getNetworkPanel().getNetworkActions().setTextPropertiesAction(textNodes));
+    override val model: NetworkTextObject
+        get() = textObject
 
-        contextMenu.addSeparator();
-        contextMenu.add(getNetworkPanel().getNetworkActions().getDeleteAction());
-
-        return contextMenu;
-    }
-
-    @Override
-    public NetworkTextObject getModel() {
-        return getTextObject();
-    }
-
-    @Override
-    public void propertyChange(PropertyChangeEvent arg0) {
-        setBounds(pStyledText.getBounds());
-    }
-
-    public PStyledText getPStyledText() {
-        return pStyledText;
+    override fun getBounds(): PBounds {
+        return pStyledText.bounds
     }
 
     /**
      * Update the styled text object based on the model object.
      */
-    public void update() {
+    fun update() {
         try {
-            AttributeSet as = TextNode.createAttributeSet(textObject.getFontName(), textObject.getFontSize(), textObject.isItalic(), textObject.isBold());
-            pStyledText.getDocument().remove(0, pStyledText.getDocument().getLength());
-            pStyledText.getDocument().insertString(0, textObject.getText(), as);
-            pStyledText.syncWithDocument();
-            pullViewPositionFromModel();
-        } catch (BadLocationException e) {
-            e.printStackTrace();
+            val simpleAttributeSet = createAttributeSet(textObject.fontName, textObject.fontSize, textObject.isItalic, textObject.isBold)
+            pStyledText.document.remove(0, pStyledText.document.length)
+            pStyledText.document.insertString(0, textObject.text, simpleAttributeSet)
+            pStyledText.syncWithDocument()
+            recenterTextObject()
+        } catch (e: BadLocationException) {
+            e.printStackTrace()
         }
     }
 
-    public NetworkTextObject getTextObject() {
-        return textObject;
-    }
-
-    /**
-     * Update the position of the model text object based on the global
-     * coordinates of this pnode.
-     */
-    public void pushViewPositionToModel() {
-        var p = textObject.getLocation();
-        this.setGlobalTranslation(p);
-    }
-
-    @Override
-    public void offset(double dx, double dy) {
-        textObject.setLocation(plus(textObject.getLocation(), new Point2D.Double(dx, dy)));
-        pullViewPositionFromModel();
+    override fun offset(dx: kotlin.Double, dy: kotlin.Double) {
+        textObject.location += point(dx, dy)
+        recenterTextObject()
     }
 
     /**
      * Updates the position of the view text based on the position of the model
      * text object.
      */
-    private void pullViewPositionFromModel() {
-        PBounds bound = this.getFullBounds();
-        Point2D point = minus(
-                getTextObject().getLocation(),
-                new Point2D.Double(bound.getWidth() / 2, bound.getHeight() / 2)
-        );
-        this.setGlobalTranslation(point);
+    private fun recenterTextObject() {
+        globalTranslation = textObject.location
+        pStyledText.offset = -pStyledText.bounds.center2D
     }
 
-    /**
-     * Creates an attribute set of the specified kind.
-     *
-     * @param fontName name of font in attribute set
-     * @param fontSize size of font in attribute set
-     * @param italic   italic or not
-     * @param bold     bold or not
-     * @return the resulting attribute set
-     * @author Aaron Dixon
-     */
-    public static SimpleAttributeSet createAttributeSet(String fontName, int fontSize, boolean italic, boolean bold) {
-        SimpleAttributeSet as = new SimpleAttributeSet();
-        as.addAttribute(StyleConstants.CharacterConstants.FontFamily, fontName);
-        as.addAttribute(StyleConstants.CharacterConstants.FontSize, fontSize);
-        as.addAttribute(StyleConstants.CharacterConstants.Italic, italic);
-        as.addAttribute(StyleConstants.CharacterConstants.Bold, bold);
-        as.addAttribute(StyleConstants.ALIGN_RIGHT, true);
-        return as;
-    }
+    override val propertyDialog: JDialog?
+        get() = textEntryDialog(textObject.text, "Edit Text", 20, 5) { text: String? ->
+            textObject.text = text
+            update()
+        }
+}
 
-    @Nullable
-    @Override
-    public JDialog getPropertyDialog() {
-        return TextUtilsKt.textEntryDialog(getTextObject().getText(), "Edit Text", 20, 5, (text) -> {
-            getTextObject().setText(text);
-            update();
-            return Unit.INSTANCE;
-        });
-    }
+/**
+ * Creates an attribute set of the specified kind.
+ *
+ * @param fontName name of font in attribute set
+ * @param fontSize size of font in attribute set
+ * @param italic   italic or not
+ * @param bold     bold or not
+ * @return the resulting attribute set
+ * @author Aaron Dixon
+ */
+fun createAttributeSet(fontName: String?, fontSize: Int, italic: Boolean, bold: Boolean) = SimpleAttributeSet().apply {
+    addAttribute(StyleConstants.CharacterConstants.FontFamily, fontName)
+    addAttribute(StyleConstants.CharacterConstants.FontSize, fontSize)
+    addAttribute(StyleConstants.CharacterConstants.Italic, italic)
+    addAttribute(StyleConstants.CharacterConstants.Bold, bold)
+    addAttribute(StyleConstants.ALIGN_RIGHT, true)
 }

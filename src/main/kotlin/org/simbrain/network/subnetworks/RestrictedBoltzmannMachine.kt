@@ -84,9 +84,10 @@ class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: Int) : Su
         this.addModel(visibleToHidden)
         visibleToHidden.randomize()
         alignNetworkModels(visibleLayer, hiddenLayer, Alignment.HORIZONTAL)
-        offsetNetworkModel(visibleLayer, hiddenLayer, Direction.EAST, 200.0, 100.0, 100.0)
+        offsetNetworkModel(visibleLayer, hiddenLayer, Direction.EAST, 200.0, 258.0, 126.0)
 
         infoText = InfoText(stateInfoText)
+        infoText.location = point(0, -100)
 
     }
 

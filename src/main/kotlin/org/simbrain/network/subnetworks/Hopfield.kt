@@ -19,11 +19,17 @@
 package org.simbrain.network.subnetworks
 
 import org.simbrain.network.NetworkModel
+import org.simbrain.network.bound
 import org.simbrain.network.core.*
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.updaterules.BinaryRule
+import org.simbrain.network.util.Alignment
+import org.simbrain.network.util.Direction
+import org.simbrain.network.util.alignNetworkModels
+import org.simbrain.network.util.offsetNetworkModel
 import org.simbrain.util.UserParameter
 import org.simbrain.util.format
+import org.simbrain.util.point
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
 import java.util.*
@@ -58,6 +64,7 @@ class Hopfield(numNeurons: Int) : Subnetwork() {
         neuronGroup = NeuronGroup(numNeurons)
         neuronGroup.label = "The Neurons"
         neuronGroup.applyLayout()
+        neuronGroup.location = point(0.0, 0.0)
         addModel(neuronGroup)
 
         // Set neuron rule
@@ -78,6 +85,9 @@ class Hopfield(numNeurons: Int) : Subnetwork() {
 
         // Create info text
         infoText = InfoText(stateInfoText)
+        alignNetworkModels(neuronGroup, infoText, Alignment.HORIZONTAL)
+        val neuronGroupBound = neuronGroup.neuronList.bound
+        offsetNetworkModel(neuronGroup, infoText, Direction.NORTH, 20.0, neuronGroupBound.height, neuronGroupBound.width, 24.0, 0.0)
     }
 
     override fun randomize(randomizer: ProbabilityDistribution?) {

@@ -36,6 +36,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import static org.simbrain.util.GeomKt.plus;
 import static org.simbrain.util.SwingUtilsKt.getSwingDispatcher;
 
 /**
@@ -287,9 +288,11 @@ public class SubnetworkNode extends ScreenElement {
     }
 
     public void setInfoTextNode(ScreenElement infoTextNode) {
-        var bounds = getFullBounds(); // get the bounds before the infoTextNode is added
+        var offset = subnetwork.getLocation();
+        var infoTextInitLocation = ((LocatableModel) infoTextNode.getModel()).getLocation();
+        var finalLocation = plus(infoTextInitLocation, offset);
         this.infoTextNode = infoTextNode;
-        ((LocatableModel) infoTextNode.getModel()).setLocation(bounds.getX() + bounds.getWidth() / 2.0, bounds.getY() - 5);
+        ((LocatableModel) infoTextNode.getModel()).setLocation(finalLocation.getX(), finalLocation.getY());
         subnetwork.getEvents().getCustomInfoUpdated().on(getSwingDispatcher(), this::updateOutline);
         updateOutline();
     }

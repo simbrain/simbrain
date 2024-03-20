@@ -30,6 +30,7 @@ import org.simbrain.network.util.offsetNetworkModel
 import org.simbrain.util.*
 import org.simbrain.util.math.SigmoidFunctions
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.stats.ProbabilityDistribution
 import smile.math.matrix.Matrix
 
 /**
@@ -157,6 +158,12 @@ class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: Int) : Su
 
         updateStateInfoText()
 
+    }
+
+    override fun randomize(randomizer: ProbabilityDistribution?) {
+        visibleToHidden.randomize(Network.weightRandomizer)
+        visibleLayer.randomizeBiases(Network.biasesRandomizer)
+        hiddenLayer.randomizeBiases(Network.biasesRandomizer)
     }
 
     /**

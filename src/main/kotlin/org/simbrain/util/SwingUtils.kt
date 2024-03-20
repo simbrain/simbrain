@@ -5,11 +5,13 @@ import kotlinx.coroutines.swing.Swing
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.widgets.DropDownTriangle
+import org.simbrain.util.widgets.ProgressWindow
 import java.awt.*
 import java.awt.event.*
 import java.io.File
 import javax.swing.*
 import kotlin.coroutines.CoroutineContext
+import kotlin.math.min
 
 
 inline fun StandardDialog.onClosed(crossinline block: (WindowEvent?) -> Unit) = apply {
@@ -392,4 +394,27 @@ fun swingInvokeLater(block: suspend () -> Unit) {
     CoroutineScope(Swing).launch {
         block()
     }
+}
+
+fun runWithProgressWindow(maxIterations: Int, label: String = "Progress", batchSize: Int = 1, block: suspend (Int) -> Unit) {
+    val progressWindow = ProgressWindow(maxIterations, label).apply {
+        minimumSize = Dimension(300, 100)
+        setLocationRelativeTo(null)
+    }
+
+    CoroutineScope(Swing).launch {
+        var i = 0
+        while (i < maxIterations) {
+            progressWindow.value = i
+            progressWindow.text = "$label: $i / $maxIterations"
+            withContext(Dispatchers.Default) {
+                repeat(min(batchSize, maxIterations - i)) {
+                    block(i)
+                    i++
+                }
+            }
+        }
+        progressWindow.close()
+    }
+
 }

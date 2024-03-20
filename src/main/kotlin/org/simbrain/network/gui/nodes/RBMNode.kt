@@ -4,10 +4,7 @@ import org.simbrain.network.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.dialogs.getUnsupervisedTrainingPanel
 import org.simbrain.network.subnetworks.RestrictedBoltzmannMachine
-import org.simbrain.util.StandardDialog
-import org.simbrain.util.createAction
-import org.simbrain.util.display
-import org.simbrain.util.showNumericInputDialog
+import org.simbrain.util.*
 import org.simbrain.workspace.gui.CouplingMenu
 import javax.swing.JPopupMenu
 
@@ -44,11 +41,9 @@ class RBMNode(networkPanel: NetworkPanel, private val rbm: RestrictedBoltzmannMa
                 val iterations: Int? = showNumericInputDialog("Iterations: ", 100)?.toInt()
                 if (iterations != null) {
                     with(networkPanel.network) {
-                        repeat(iterations) {
+                        runWithProgressWindow(iterations, batchSize = 10) {
                             rbm.trainOnCurrentPattern()
                         }
-                        // TODO: Better affordance
-                        println("Done")
                     }
                 }
             })

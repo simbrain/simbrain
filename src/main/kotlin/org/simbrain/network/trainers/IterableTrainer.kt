@@ -50,6 +50,8 @@ abstract class IterableTrainer(val net: SupervisedNetwork) : EditableObject {
 
     var iteration = 0
 
+    var lastError = 0.0
+
     var isRunning = false
 
     private var stoppingConditionReached = false
@@ -60,7 +62,6 @@ abstract class IterableTrainer(val net: SupervisedNetwork) : EditableObject {
     suspend fun startTraining() {
         if (stoppingConditionReached) {
             stoppingConditionReached = false
-            iteration = 0
             events.iterationReset.fire()
         }
         isRunning = true
@@ -112,6 +113,7 @@ abstract class IterableTrainer(val net: SupervisedNetwork) : EditableObject {
                 }
             }
         }
+        lastError = lossFunction.loss
         events.errorUpdated.fire(lossFunction)
     }
 

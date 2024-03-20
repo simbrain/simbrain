@@ -14,6 +14,7 @@ import org.simbrain.util.LabelledItemPanel
 import org.simbrain.util.ResourceManager
 import org.simbrain.util.Utils.round
 import org.simbrain.util.createAction
+import org.simbrain.util.roundToString
 import org.simbrain.util.table.*
 import org.simbrain.util.widgets.ToggleButton
 import smile.math.matrix.Matrix
@@ -32,7 +33,7 @@ class TrainerControls(trainer: IterableTrainer, networkPanel: NetworkPanel) : JP
 
     override val coroutineContext = Dispatchers.Swing + job
 
-    val iterationsLabel = JLabel("--- ")
+    val iterationsLabel = JLabel(trainer.iteration.toString())
 
     private val runAction = createAction(
         name = "Run",
@@ -90,7 +91,7 @@ class TrainerControls(trainer: IterableTrainer, networkPanel: NetworkPanel) : JP
         runTools.add(JButton(TimeSeriesPlotActions.getPropertiesDialogAction(errorPlot.graphPanel)), "wrap")
         val labelPanel = LabelledItemPanel()
         labelPanel.addItem("Iterations:", iterationsLabel)
-        val errorValue = JLabel("0.0")
+        val errorValue = JLabel(trainer.lastError.roundToString(4))
         val errorLabel = labelPanel.addItem(trainer.lossFunction.name, errorValue)
         runTools.add(labelPanel)
 

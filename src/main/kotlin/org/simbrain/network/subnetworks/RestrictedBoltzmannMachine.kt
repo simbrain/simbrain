@@ -95,10 +95,10 @@ class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: Int) : Su
     // See eq 1 https://www.cs.toronto.edu/~hinton/absps/guideTR.pdf
     val stateInfoText: String
         get() {
-            val t1 = (visibleLayer.activations * visibleLayer.biases).sum()
-            val t2 = (hiddenLayer.activations * hiddenLayer.biases).sum()
-            val t3 = hiddenLayer.activations.mm(visibleLayer.activations.transpose()).mul(visibleToHidden.weightMatrix).sum()
-            return "Energy: ${(t1 + t2 + t3).roundToString(2)}"
+            val visE = (visibleLayer.activations * visibleLayer.biases).sum()
+            val hidE = (hiddenLayer.activations * hiddenLayer.biases).sum()
+            val wtsE = hiddenLayer.activations.mm(visibleLayer.activations.transpose()).mul(visibleToHidden.weightMatrix).sum()
+            return "Energy: ${(-visE - hidE - wtsE).roundToString(2)}"
         }
 
     fun updateStateInfoText() {

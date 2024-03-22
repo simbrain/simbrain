@@ -1,5 +1,7 @@
 package org.simbrain.network.gui.dialogs
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
@@ -16,10 +18,8 @@ import org.simbrain.util.table.MatrixDataFrame
 import org.simbrain.util.table.createAdvanceRowAction
 import org.simbrain.util.table.createApplyAction
 import org.simbrain.util.table.createApplyAndAdvanceAction
-import javax.swing.JLabel
-import javax.swing.JPanel
-import javax.swing.JSeparator
-import javax.swing.JTabbedPane
+import org.simbrain.util.widgets.ToggleButton
+import javax.swing.*
 
 
 /**
@@ -90,13 +90,83 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         val mainPanel = JPanel().apply {
             layout = MigLayout("gap 0px 0px, ins 0")
         }
-        val trainerProps = AnnotatedPropertyEditor(unsupervisedNetwork)
-        val trainerPropsPanel = trainerProps.createApplyPanel()
-        mainPanel.add(trainerPropsPanel, "wrap")
+
+        val trainer = unsupervisedNetwork.trainer
+
+        val runControls = JPanel().apply { layout = MigLayout("nogrid") }
+        val trainerPanel = AnnotatedPropertyEditor(trainer)
+        val trainerApplyPanel = trainerPanel.createApplyPanel()
+        mainPanel.add(trainerApplyPanel, "wrap")
+        val runAction = createAction(
+            name = "Run",
+            description = "Run training algorithm",
+            iconPath = "menu_icons/Play.png",
+        ) {
+            with(network) { trainer.startTraining(unsupervisedNetwork) }
+        }
+        val stopAction = createAction(
+            name = "Stop",
+            description = "Stop training algorithm",
+            iconPath = "menu_icons/Stop.png",
+        ) {
+            trainer.stopTraining()
+        }
+        runControls.add(ToggleButton(listOf(runAction, stopAction)).apply {
+            setAction("Run")
+            trainer.events.beginTraining.on {
+                setAction("Stop")
+            }
+            trainer.events.endTraining.on {
+                setAction("Run")
+            }
+        })
+
+        val stepAction = createAction(
+            name = "Step",
+            description = "Iterate training once",
+            iconPath = "menu_icons/Step.png",
+        ) {
+            with(network) {
+                trainer.events.beginTraining.fire()
+                trainer.trainOnce(unsupervisedNetwork)
+                trainer.events.endTraining.fire()
+            }
+        }
+
+        runControls.add(JButton(stepAction))
+
+        val resetAction = createAction(
+            name = "Reset",
+            description = "Reset iteration and randomize network",
+            iconPath = "menu_icons/Reset.png",
+        ) {
+            unsupervisedNetwork.randomize()
+            trainer.iteration = 0
+        }
+        val resetButton = JButton(resetAction)
+        resetButton.hideActionText = true
+        runControls.add(resetButton)
+
+        val labelPanel = LabelledItemPanel()
+        val iterationsLabel = JLabel(trainer.iteration.toString())
+        labelPanel.addItem("Iterations:", iterationsLabel)
+        runControls.add(labelPanel, "wrap")
+
+        trainer.events.progressUpdated.on(Dispatchers.Swing, wait = true) {
+            iterationsLabel.text = "" + trainer.iteration
+        }
+
+        runControls.layout = MigLayout("gap 0px 0px, ins 0")
+
+        val trainOnCurrentPatternButton = JButton(with(network) { unsupervisedNetwork.createTrainOnPatternAction()})
+        trainOnCurrentPatternButton.hideActionText = true
+        runControls.add(trainOnCurrentPatternButton)
+
+        mainPanel.add(runControls, "wrap")
 
         // Run training algorithm
-        val runControls = JPanel()
-        runControls.layout = MigLayout("gap 0px 0px, ins 0")
+        val inputData = JPanel()
+        inputData.layout = MigLayout("gap 0px 0px, ins 0")
         val inputs = MatrixEditor(unsupervisedNetwork.inputData)
         inputs.toolbar.addSeparator()
         inputs.toolbar.add(
@@ -107,10 +177,9 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         inputs.toolbar.add(inputs.table.createAdvanceRowAction())
         inputs.toolbar.add(inputs.table.createApplyAndAdvanceAction {
             unsupervisedNetwork.inputLayer.setActivations(inputs.table.model.getCurrentDoubleRow().toDoubleArray())
-            trainAction(network)
         })
-        runControls.add(inputs)
-        mainPanel.add(runControls)
+        inputData.add(inputs)
+        mainPanel.add(inputData)
 
         contentPane = mainPanel
     }
@@ -162,4 +231,18 @@ fun NetworkPanel.showLMSCreationDialog(): StandardDialog {
         network.addNetworkModelAsync(creator.create())
     }
 
+}
+
+context(Network)
+fun UnsupervisedNetwork.createTrainOnPatternAction() = createAction(
+    name = "Train on current pattern...",
+    description = "Train network on current pattern for specified number of iterations.",
+    iconPath = "menu_icons/BatchPlay.png"
+) {
+    val iterations: Int? = showNumericInputDialog("Iterations: ", 100)?.toInt()
+    if (iterations != null) {
+        runWithProgressWindow(iterations, batchSize = 10) {
+            trainOnCurrentPattern()
+        }
+    }
 }

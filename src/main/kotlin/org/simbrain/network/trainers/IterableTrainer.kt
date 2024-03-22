@@ -50,6 +50,9 @@ abstract class IterableTrainer(val net: SupervisedNetwork) : EditableObject {
 
     var iteration = 0
 
+    /**
+     * Used when reopening the trainer controls so user knows where things left off
+     */
     var lastError = 0.0
 
     var isRunning = false

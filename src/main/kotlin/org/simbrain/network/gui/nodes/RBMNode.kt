@@ -2,9 +2,12 @@ package org.simbrain.network.gui.nodes
 
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.network.gui.dialogs.createTrainOnPatternAction
 import org.simbrain.network.gui.dialogs.getUnsupervisedTrainingPanel
 import org.simbrain.network.subnetworks.RestrictedBoltzmannMachine
-import org.simbrain.util.*
+import org.simbrain.util.StandardDialog
+import org.simbrain.util.createAction
+import org.simbrain.util.display
 import org.simbrain.workspace.gui.CouplingMenu
 import javax.swing.JPopupMenu
 
@@ -37,16 +40,7 @@ class RBMNode(networkPanel: NetworkPanel, private val rbm: RestrictedBoltzmannMa
                 makeTrainerPanel().display()
             })
             // Train once
-            contextMenu.add(networkPanel.createAction(name = "Train on current pattern...") {
-                val iterations: Int? = showNumericInputDialog("Iterations: ", 100)?.toInt()
-                if (iterations != null) {
-                    with(networkPanel.network) {
-                        runWithProgressWindow(iterations, batchSize = 10) {
-                            rbm.trainOnCurrentPattern()
-                        }
-                    }
-                }
-            })
+            contextMenu.add(with(networkPanel.network) { rbm.createTrainOnPatternAction() })
 
             // Coupling menu
             contextMenu.addSeparator()

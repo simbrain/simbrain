@@ -21,6 +21,7 @@ package org.simbrain.network.subnetworks
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.core.*
 import org.simbrain.network.trainers.UnsupervisedNetwork
+import org.simbrain.network.trainers.UnsupervisedTrainer
 import org.simbrain.network.trainers.updateBiases
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.util.Alignment
@@ -58,8 +59,7 @@ class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: Int) : Su
 
     val infoText: InfoText
 
-    @UserParameter("Learning Rate")
-    var learningRate = .01
+    override val trainer = UnsupervisedTrainer()
 
     init {
         this.label = "Restricted Boltzmann Machine"
@@ -127,9 +127,18 @@ class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: Int) : Su
         updateStateInfoText()
     }
 
-    // TODO: Redo below with non-mutating operators
     context(Network)
-    fun trainOnCurrentPattern() {
+    override fun trainOnInputData() {
+        inputData.toArray().forEach { row ->
+            visibleLayer.activations = row.toMatrix()
+            trainOnCurrentPattern()
+        }
+    }
+
+    context(Network)
+    override fun trainOnCurrentPattern() {
+
+        val learningRate = trainer.learningRate
 
         // "Positive phase"
         hiddenLayer.updateInputs()

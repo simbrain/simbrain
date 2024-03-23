@@ -157,7 +157,7 @@ open class CompetitiveGroup @JvmOverloads constructor(
             // Normalize the input values
             if (params.normalizeInputs) {
                 if (sumOfInputs != 0.0) {
-                    activation = activation / sumOfInputs
+                    activation /= sumOfInputs
                 }
             }
             val deltaw = params.learningRate * (activation - synapse.strength)
@@ -201,7 +201,7 @@ open class CompetitiveGroup @JvmOverloads constructor(
         for (n in neuronList) {
             val normFactor = n.summedIncomingWeights
             for (s in n.fanIn) {
-                s.strength = s.strength / normFactor
+                s.strength /= normFactor
             }
         }
     }
@@ -213,7 +213,7 @@ open class CompetitiveGroup @JvmOverloads constructor(
         val normFactor = summedIncomingWeights
         for (n in neuronList) {
             for (s in n.fanIn) {
-                s.strength = s.strength / normFactor
+                s.strength /= normFactor
             }
         }
     }

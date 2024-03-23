@@ -49,7 +49,7 @@ val competitiveSim = newSim {
                     listOf(0.0, 0.0, 0.0, 0.0, 0.5, 1.0, 0.5)
             }
             addButton("Train") {
-                competitive.inputLayer.activations = competitive.inputLayer.activations.add(NormalDistribution().sampleDouble(competitive.inputLayer.activations.size))
+                competitive.inputLayer.activations = competitive.inputLayer.activations.add(NormalDistribution(standardDeviation = .01).sampleDouble(competitive.inputLayer.activations.size))
                 workspace.iterate()
             }
         }

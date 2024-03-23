@@ -122,7 +122,7 @@ class SOMGroup @JvmOverloads constructor(
      * Update the network. This method has the following structure: If all
      * weights are clamped, return. Determine the winner by finding which of the
      * SOM neurons is closest to the input vector. Update the winning neuron and
-     * it's neighborhood. The update algorithm accounts for all possible
+     * its neighborhood. The update algorithm accounts for all possible
      * arrangements of the SOM network. - When the neuron is outside of the
      * neighborhood. - When the neuron is within the the neighborhood. Including
      * the current vector, if the total number of vectors analyzed during the
@@ -209,6 +209,7 @@ class SOMGroup @JvmOverloads constructor(
         return winner
     }
 
+// TODO: Reuse our functions?
     /**
      * Calculates the Euclidian distance between the SOM neuron's weight vector
      * and the input vector.

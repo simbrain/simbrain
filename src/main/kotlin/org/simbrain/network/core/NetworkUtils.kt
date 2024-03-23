@@ -130,6 +130,15 @@ var List<Neuron>.auxValues: List<Double>
 val List<Synapse>.lengths: List<Double>
     get() = map { it.length }
 
+
+fun Neuron.totalFanInStrength(): Double {
+    return this.fanIn.sumOf { s -> s.strength }
+}
+
+fun List<Neuron>.totalFanInStrength(): Double {
+    return this.sumOf{n -> n.totalFanInStrength()}
+}
+
 fun getNetworkXStream(): XStream {
     val xstream = getSimbrainXStream()
     xstream.registerConverter(NetworkModelListConverter())

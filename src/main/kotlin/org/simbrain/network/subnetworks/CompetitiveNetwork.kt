@@ -28,7 +28,7 @@ import org.simbrain.network.util.alignNetworkModels
 import org.simbrain.network.util.offsetNeuronCollections
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
-import org.simbrain.util.stats.distributions.UniformRealDistribution
+import org.simbrain.util.stats.ProbabilityDistribution
 
 /**
  * **CompetitiveNetwork** is a small network encompassing a Competitive
@@ -61,9 +61,9 @@ class CompetitiveNetwork : Subnetwork {
         inputLayer.setLowerBound(0.0)
 
         weights = SynapseGroup(inputLayer, competitive)
-        weights.randomize(UniformRealDistribution(0.0, 1.0))
         this.addModel(weights)
         weights.synapses.forEach { it.lowerBound = 0.0 }
+        randomize()
 
         alignNetworkModels(inputLayer, competitive, Alignment.VERTICAL)
         offsetNeuronCollections(inputLayer, competitive, Direction.NORTH, 200.0)
@@ -71,6 +71,11 @@ class CompetitiveNetwork : Subnetwork {
 
     @XStreamConstructor
     constructor(): super()
+
+    override fun randomize(randomizer: ProbabilityDistribution?) {
+        weights.randomize(randomizer)
+        competitive.normalizeIncomingWeights()
+    }
 
     /**
      * Helper class for creating new competitive nets using [org.simbrain.util.propertyeditor.AnnotatedPropertyEditor].

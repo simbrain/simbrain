@@ -24,33 +24,45 @@ val competitiveSim = newSim {
     network.addNetworkModel(competitive)
     competitive.inputLayer.setUpperBound(1.0)
 
+    // Label for winner
+    var winningLabel = ""
+
     withGui {
         place(networkComponent, 139, 10, 868, 619)
         createControlPanel("Control Panel", 5, 10) {
 
             addButton("Pattern 1") {
                 competitive.inputLayer.neuronList.activations =
-                    listOf(0.5, 1.0, 0.5, 0.0, 0.0, 0.0, 0.0)
+                    listOf(1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0)
+                winningLabel = "P1"
             }
             addButton("Pattern 2") {
                 competitive.inputLayer.neuronList.activations =
-                    listOf(0.0, 0.5, 1.0, 0.5, 0.0, 0.0, 0.0)
+                    listOf(0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0)
+                winningLabel = "P2"
             }
             addButton("Pattern 3") {
                 competitive.inputLayer.neuronList.activations =
-                    listOf(0.0, 0.0, 0.5, 1.0, 0.5, 0.0, 0.0)
+                    listOf(0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0)
+                winningLabel = "P3"
             }
             addButton("Pattern 4") {
                 competitive.inputLayer.neuronList.activations =
-                    listOf(0.0, 0.0, 0.0, 0.5, 1.0, 0.5, 0.0)
+                    listOf(0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0)
+                winningLabel = "P4"
             }
             addButton("Pattern 5") {
                 competitive.inputLayer.neuronList.activations =
-                    listOf(0.0, 0.0, 0.0, 0.0, 0.5, 1.0, 0.5)
+                    listOf(0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
+                winningLabel = "P5"
+            }
+            addButton("Add Noise") {
+                competitive.inputLayer.activations = competitive.inputLayer.activations.add(NormalDistribution(standardDeviation = .01).sampleDouble(competitive.inputLayer.activations.size))
             }
             addButton("Train") {
-                competitive.inputLayer.activations = competitive.inputLayer.activations.add(NormalDistribution(standardDeviation = .01).sampleDouble(competitive.inputLayer.activations.size))
-                workspace.iterateAsync()
+                workspace.iterateSuspend()
+                val winner = competitive.competitive.neuronList[competitive.competitive.activations.indexOfFirst { it > 0.0 }]
+                winner.label = winningLabel
             }
         }
     }

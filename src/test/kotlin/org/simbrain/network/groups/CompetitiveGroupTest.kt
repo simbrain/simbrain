@@ -1,37 +1,36 @@
 package org.simbrain.network.groups
 
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
-import org.simbrain.network.core.clamp
+import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.connectAllToAll
+import org.simbrain.network.core.totalFanInStrength
 import org.simbrain.network.neurongroups.CompetitiveGroup
+import org.simbrain.network.neurongroups.NeuronGroup
 
 class CompetitiveGroupTest {
 
     var net = Network()
     val competitive = CompetitiveGroup(2)
-
-    init {
-        net.addNetworkModelsAsync(competitive)
+    lateinit var weights: List<Synapse>
+    val inputs = NeuronGroup(2).apply {
+        setClamped(true)
     }
 
-    @Test
-    fun `Test create function`() {
-        assertEquals(10, competitive.params.numNeurons)
-        assertEquals(competitive.params.DEFAULT_UPDATE_METHOD, competitive.params.updateMethod)
-        assertEquals(competitive.params.DEFAULT_LEARNING_RATE, competitive.params.learningRate)
-        assertEquals(competitive.params.DEFAULT_WIN_VALUE, competitive.params.winValue)
-        assertEquals(competitive.params.DEFAULT_LOSE_VALUE, competitive.params.loseValue)
-        assertEquals(competitive.params.DEFAULT_NORM_INPUTS, competitive.params.normalizeInputs)
-        assertEquals(competitive.params.DEFAULT_USE_LEAKY, competitive.params.useLeakyLearning)
-        assertEquals(competitive.params.DEFAULT_LEAKY_RATE, competitive.params.leakyLearningRate)
-        assertEquals(competitive.params.DEFAULT_DECAY_PERCENT, competitive.params.synpaseDecayPercent)
+    init {
+        with(net) {
+            net.addNetworkModelsAsync(inputs, competitive)
+            weights = connectAllToAll(inputs, competitive, 0.1)
+        }
     }
 
     @Test
     fun `Test copy function`() {
+        competitive.params.learningRate = .8
         val competitive2 = competitive.copy()
         net.addNetworkModelsAsync(competitive2)
+        assertEquals(2, competitive2.neuronList.size)
         assertEquals(competitive.params.updateMethod, competitive2.params.updateMethod)
         assertEquals(competitive.params.learningRate, competitive2.params.learningRate)
         assertEquals(competitive.params.winValue, competitive2.params.winValue)
@@ -43,17 +42,57 @@ class CompetitiveGroupTest {
     }
 
     @Test
-    fun `Test winner node`() {
-        val inputlayer = doubleArrayOf(1.0, 0.0)
-
-        //competitive.inputs = inputlayer
-        repeat(5) {
+    fun `one node wins and takes win value`() {
+        competitive.params.winValue = 2.0
+        competitive.params.loseValue = 0.0
+        inputs.activations = doubleArrayOf(1.0, 0.0)
+        repeat(2) {
             net.update()
         }
-        println(competitive.inputs)
-        println(competitive.outputs)
-        val competitive = CompetitiveGroup(2).apply {
-            competitive.outgoingWeights.clamp(true)
+        assertEquals(2.0, competitive.activations.sum())
+    }
+
+    @Test
+    fun `network learns two patterns`() {
+        // Pattern 1
+        inputs.activations = doubleArrayOf(1.0, 0.0)
+        repeat(2) {
+            net.update()
         }
+        // Pattern 2
+        inputs.activations = doubleArrayOf(0.0, 1.0)
+        repeat(2) {
+            net.update()
+        }
+
+        // Test retrieval
+        inputs.activations = doubleArrayOf(1.0, 0.0)
+        net.update()
+        val winner1 = competitive.neuronList[competitive.activations.indexOfFirst { it == 1.0 }]
+        inputs.activations = doubleArrayOf(0.0, 0.1)
+        net.update()
+        val winner2 = competitive.neuronList[competitive.activations.indexOfFirst { it == 1.0 }]
+        assertNotEquals(winner1, winner2)
+    }
+
+    @Test
+    fun `test normalize weights`() {
+        competitive.normalizeIncomingWeights()
+        assertEquals(1.0,  competitive.getNeuron(0).fanIn.sumOf { it.strength })
+        assertEquals(1.0,  competitive.getNeuron(1).fanIn.sumOf { it.strength })
+    }
+
+    @Test
+    fun `test leaky learning`() {
+        // Both winner and loser change in same direction
+        //  Since this is initial learning weights are getting larger and not "rebalanced"
+        competitive.params.useLeakyLearning = true
+        inputs.activations = doubleArrayOf(1.0, 0.0)
+        net.update()
+        val loser = competitive.neuronList[competitive.activations.indexOfFirst { it == 0.0 }]
+        val before = loser.totalFanInStrength()
+        net.update()
+        val after = loser.totalFanInStrength()
+        assertTrue(after > before)
     }
 }

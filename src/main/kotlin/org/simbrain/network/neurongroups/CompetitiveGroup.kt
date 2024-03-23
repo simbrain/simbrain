@@ -207,18 +207,6 @@ open class CompetitiveGroup @JvmOverloads constructor(
     }
 
     /**
-     * Normalize all weights coming in to this network.
-     */
-    fun normalizeAllIncomingWeights() {
-        val normFactor = summedIncomingWeights
-        for (n in neuronList) {
-            for (s in n.fanIn) {
-                s.strength /= normFactor
-            }
-        }
-    }
-
-    /**
      * Randomize all weights coming in to this network.
      * TODO: Add gaussian option...
      */

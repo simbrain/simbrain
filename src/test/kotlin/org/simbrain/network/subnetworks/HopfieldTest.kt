@@ -18,7 +18,7 @@ class HopfieldTest {
     }
 
     @Test
-    fun `test competitive network serialization`() {
+    fun `test hopfield network serialization`() {
         val xmlRep = getNetworkXStream().toXML(net)
         val fromXml = getNetworkXStream().fromXML(xmlRep) as Network
         Assertions.assertNotNull(fromXml.getModelByLabel(Hopfield::class.java, "Hopfield"))

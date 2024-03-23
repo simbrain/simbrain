@@ -43,10 +43,6 @@ open class BackpropNetwork : FeedForward, SupervisedNetwork {
 
     override lateinit var trainingSet: MatrixDataset
 
-    @Transient
-    var _trainer: BackpropTrainer? = null
-
-    override val trainer: BackpropTrainer
-        get() = _trainer?: BackpropTrainer(this).also { _trainer = it }
+    override var trainer: BackpropTrainer = BackpropTrainer()
 
 }

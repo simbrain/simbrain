@@ -32,7 +32,6 @@ class SOMTest {
 
     @Test
     fun `test som node creation`() {
-        // This is just a sandbox for now; real tests coming
         runBlocking {
             val np = NetworkPanel(NetworkComponent("Test", net))
             assertEquals(3, np.filterScreenElements<NeuronNode>().size)

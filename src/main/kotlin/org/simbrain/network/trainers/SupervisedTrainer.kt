@@ -32,7 +32,7 @@ import kotlin.random.Random
 /**
  * Manage iteration based training algorithms and provides an object that can be edited in the GUI.
  */
-abstract class IterableTrainer(val net: SupervisedNetwork) : EditableObject {
+abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
 
     @UserParameter(label = "Learning Rate", order = 1)
     var learningRate = .01
@@ -62,7 +62,7 @@ abstract class IterableTrainer(val net: SupervisedNetwork) : EditableObject {
     @Transient val events = TrainerEvents()
 
     context(Network)
-    suspend fun startTraining() {
+    suspend fun SN.startTraining() {
         if (stoppingConditionReached) {
             stoppingConditionReached = false
             events.iterationReset.fire()
@@ -86,28 +86,28 @@ abstract class IterableTrainer(val net: SupervisedNetwork) : EditableObject {
     }
 
     context(Network)
-    suspend fun train(iterations: Int) {
+    suspend fun SN.train(iterations: Int) {
         repeat(iterations) {
             trainOnce()
         }
     }
 
-    context(Network)
+    context(Network, SN)
     suspend fun trainOnce() {
         iteration++
         with(updateType) {
             lossFunction.reset()
             when (this) {
-                is UpdateMethod.Stochastic -> lossFunction.accumulateError(trainRow(Random.nextInt(net.trainingSet.inputs.nrow())))
+                is UpdateMethod.Stochastic -> lossFunction.accumulateError(trainRow(Random.nextInt(trainingSet.inputs.nrow())))
                 is UpdateMethod.Epoch -> {
-                    for (i in 0 until net.trainingSet.size) {
+                    for (i in 0 until trainingSet.size) {
                         val error = trainRow(i)
                         lossFunction.accumulateError(error)
                     }
                 }
                 is UpdateMethod.Batch -> {
                     var totalError = 0.0
-                    val startIndex = Random.nextInt(0, net.trainingSet.size - batchSize)
+                    val startIndex = Random.nextInt(0, trainingSet.size - batchSize)
                     val endIndex = startIndex + batchSize
                     for (i in (startIndex..endIndex)) {
                         val error = trainRow(i)
@@ -121,15 +121,7 @@ abstract class IterableTrainer(val net: SupervisedNetwork) : EditableObject {
     }
 
     context(Network)
-    abstract fun trainRow(rowNum: Int): Double
-
-    context(Network)
-    open fun applyInputs(rowNum: Int) {
-        net.inputLayer.activations = net.trainingSet.inputs.rowVectorTransposed(rowNum)
-        net.update()
-    }
-
-    abstract fun randomize()
+    abstract fun SN.trainRow(rowNum: Int): Double
 
     sealed class UpdateMethod: CopyableObject {
         class Stochastic : UpdateMethod() {
@@ -254,48 +246,38 @@ abstract class IterableTrainer(val net: SupervisedNetwork) : EditableObject {
 
 }
 
-class LMSTrainer(val lmsNet: LMSNetwork) : IterableTrainer(lmsNet) {
+class LMSTrainer : SupervisedTrainer<LMSNetwork>() {
 
     context(Network)
-    override fun trainRow(rowNum: Int): Double {
-        if (rowNum !in 0 until lmsNet.trainingSet.inputs.nrow()) {
+    override fun LMSNetwork.trainRow(rowNum: Int): Double {
+        if (rowNum !in 0 until trainingSet.inputs.nrow()) {
             throw IllegalArgumentException("Trying to train invalid row number $rowNum")
         }
-        val targetVec = lmsNet.trainingSet.targets.rowVectorTransposed(rowNum)
-        lmsNet.inputLayer.isClamped = true
-        lmsNet.inputLayer.setActivations(lmsNet.trainingSet.inputs.row(rowNum))
-        lmsNet.update()
-        val outputs = lmsNet.outputLayer.activations
+        val targetVec = trainingSet.targets.rowVectorTransposed(rowNum)
+        inputLayer.isClamped = true
+        inputLayer.setActivations(trainingSet.inputs.row(rowNum))
+        update()
+        val outputs = outputLayer.activations
         val rowError = targetVec.sub(outputs)
-        lmsNet.weightMatrix.applyLMS(rowError, learningRate)
+        weightMatrix.applyLMS(rowError, learningRate)
         return rowError.transpose().mm(rowError).sum()
     }
 
-    override fun randomize() {
-        lmsNet.randomize()
-    }
-
 }
 
-class BackpropTrainer(val bp: BackpropNetwork) : IterableTrainer(bp) {
+class BackpropTrainer : SupervisedTrainer<BackpropNetwork>() {
 
     context(Network)
-    override fun trainRow(rowNum: Int): Double {
-        bp.inputLayer.setActivations(bp.trainingSet.inputs.row(rowNum))
-        val targetVec = bp.trainingSet.targets.rowVectorTransposed(rowNum)
-        bp.wmList.forwardPass(bp.inputLayer.activations)
-        return bp.wmList.backpropError(targetVec)
-    }
-
-    override fun randomize() {
-        bp.randomize()
+    override fun BackpropNetwork.trainRow(rowNum: Int): Double {
+        inputLayer.setActivations(trainingSet.inputs.row(rowNum))
+        val targetVec = trainingSet.targets.rowVectorTransposed(rowNum)
+        wmList.forwardPass(inputLayer.activations)
+        return wmList.backpropError(targetVec)
     }
 
 }
 
-class SRNTrainer(val srn: SRNNetwork) : IterableTrainer(srn) {
-
-    val weightMatrixTree = WeightMatrixTree(listOf(srn.inputLayer, srn.contextLayer), srn.outputLayer)
+class SRNTrainer : SupervisedTrainer<SRNNetwork>() {
 
     override var updateType: UpdateMethod by GuiEditable(
         initValue = UpdateMethod.Epoch(),
@@ -303,18 +285,15 @@ class SRNTrainer(val srn: SRNNetwork) : IterableTrainer(srn) {
     )
 
     context(Network)
-    override fun trainRow(rowNum: Int): Double {
+    override fun SRNNetwork.trainRow(rowNum: Int): Double {
+        val weightMatrixTree = WeightMatrixTree(listOf(inputLayer, contextLayer), outputLayer)
 
-        val targetVec = srn.trainingSet.targets.rowVectorTransposed(rowNum)
-        val inputVec = srn.trainingSet.inputs.rowVectorTransposed(rowNum)
+        val targetVec = trainingSet.targets.rowVectorTransposed(rowNum)
+        val inputVec = trainingSet.inputs.rowVectorTransposed(rowNum)
 
-        srn.inputLayer.activations = inputVec
-        srn.update()
+        inputLayer.activations = inputVec
+        update()
         return weightMatrixTree.backpropError(targetVec, epsilon = learningRate)
-    }
-
-    override fun randomize() {
-        srn.randomize()
     }
 
 }

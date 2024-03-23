@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.subnetworks
 
-import org.simbrain.network.NetworkModel
 import org.simbrain.network.bound
 import org.simbrain.network.core.*
 import org.simbrain.network.neurongroups.NeuronGroup
@@ -32,17 +31,16 @@ import org.simbrain.util.format
 import org.simbrain.util.point
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
-import java.util.*
 import java.util.function.Consumer
 
 /**
  * **Hopfield** is a basic implementation of a discrete Hopfield network.
  */
-class Hopfield(numNeurons: Int) : Subnetwork() {
+class Hopfield : Subnetwork {
 
-    val neuronGroup: NeuronGroup
+    lateinit var neuronGroup: NeuronGroup
 
-    val synapseGroup: SynapseGroup
+    lateinit var synapseGroup: SynapseGroup
 
     /**
      * The update function used by this Hopfield network.
@@ -50,14 +48,14 @@ class Hopfield(numNeurons: Int) : Subnetwork() {
     @UserParameter(label = "Update function")
     private val updateFunc = DEFAULT_UPDATE
 
-    private val infoText: InfoText
+    override lateinit var customInfo: InfoText
 
     /**
      * Creates a new Hopfield network.
      *
      * @param numNeurons Number of neurons in new network
      */
-    init {
+    constructor(numNeurons: Int): super() {
         label = "Hopfield network"
 
         // Create main neuron group
@@ -84,11 +82,15 @@ class Hopfield(numNeurons: Int) : Subnetwork() {
         // randomize() TODO()
 
         // Create info text
-        infoText = InfoText(stateInfoText)
-        alignNetworkModels(neuronGroup, infoText, Alignment.HORIZONTAL)
+        customInfo = InfoText(stateInfoText)
+        alignNetworkModels(neuronGroup, customInfo, Alignment.HORIZONTAL)
         val neuronGroupBound = neuronGroup.neuronList.bound
-        offsetNetworkModel(neuronGroup, infoText, Direction.NORTH, 20.0, neuronGroupBound.height, neuronGroupBound.width, 24.0, 0.0)
+        offsetNetworkModel(neuronGroup,
+            customInfo, Direction.NORTH, 20.0, neuronGroupBound.height, neuronGroupBound.width, 24.0, 0.0)
     }
+
+    @XStreamConstructor
+    constructor(): super()
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
         synapseGroup.randomizeSymmetric(randomizer)
@@ -104,12 +106,9 @@ class Hopfield(numNeurons: Int) : Subnetwork() {
         get() = "Energy: " + neuronGroup.neuronList.getEnergy().format(4)
 
     fun updateStateInfoText() {
-        infoText.text = stateInfoText
+        customInfo.text = stateInfoText
         events.customInfoUpdated.fireAndBlock()
     }
-
-    override val customInfo: NetworkModel
-        get() = infoText
 
     /**
      * Apply the basic Hopfield rule to the current pattern. This is not the

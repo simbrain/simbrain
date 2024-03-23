@@ -19,6 +19,7 @@
 package org.simbrain.network.subnetworks
 
 import org.simbrain.network.core.SynapseGroup
+import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.neurongroups.CompetitiveGroup
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.util.Alignment
@@ -36,15 +37,15 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution
  *
  * @author Jeff Yoshimi
  */
-public class CompetitiveNetwork(numInputNeurons: Int, numCompetitiveNeurons: Int) : Subnetwork() {
+class CompetitiveNetwork : Subnetwork {
 
-    val competitive: CompetitiveGroup
+    lateinit var competitive: CompetitiveGroup
 
-    val inputLayer: NeuronGroup
+    lateinit var inputLayer: NeuronGroup
 
-    var weights: SynapseGroup
+    lateinit var weights: SynapseGroup
 
-    init {
+    constructor(numInputNeurons: Int, numCompetitiveNeurons: Int): super() {
         this.label = "Competitive Network"
 
         competitive = CompetitiveGroup(numCompetitiveNeurons)
@@ -67,6 +68,9 @@ public class CompetitiveNetwork(numInputNeurons: Int, numCompetitiveNeurons: Int
         alignNetworkModels(inputLayer, competitive, Alignment.VERTICAL)
         offsetNeuronCollections(inputLayer, competitive, Direction.NORTH, 200.0)
     }
+
+    @XStreamConstructor
+    constructor(): super()
 
     /**
      * Helper class for creating new competitive nets using [org.simbrain.util.propertyeditor.AnnotatedPropertyEditor].

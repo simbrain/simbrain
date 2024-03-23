@@ -20,6 +20,7 @@ package org.simbrain.network.subnetworks
 
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.core.SynapseGroup
+import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.neurongroups.SOMGroup
 import org.simbrain.network.util.Alignment
@@ -36,11 +37,11 @@ import org.simbrain.util.propertyeditor.EditableObject
  *
  * @author Jeff Yoshimi
  */
-class SOMNetwork(numInputNeurons: Int, numSOMNeurons: Int) : Subnetwork() {
+class SOMNetwork : Subnetwork {
 
-    val som: SOMGroup
+    lateinit var som: SOMGroup
 
-    val inputLayer: NeuronGroup
+    lateinit var inputLayer: NeuronGroup
 
     /**
      * Construct an SOM Network.
@@ -48,7 +49,7 @@ class SOMNetwork(numInputNeurons: Int, numSOMNeurons: Int) : Subnetwork() {
      * @param numSOMNeurons   number of neurons in the SOM layer
      * @param numInputNeurons number of neurons in the input layer
      */
-    init {
+    constructor(numInputNeurons: Int, numSOMNeurons: Int): super() {
         this.label = "SOM Network"
         som = SOMGroup(numSOMNeurons)
         som.label = "SOM Group"
@@ -71,8 +72,10 @@ class SOMNetwork(numInputNeurons: Int, numSOMNeurons: Int) : Subnetwork() {
 
         alignNetworkModels(inputLayer, som, Alignment.VERTICAL)
         offsetNeuronCollections(inputLayer, som, Direction.NORTH, 450.0)
-
     }
+
+    @XStreamConstructor
+    constructor(): super()
 
     /**
      * Helper class for creating new Hopfield nets using [org.simbrain.util.propertyeditor.AnnotatedPropertyEditor].

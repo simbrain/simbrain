@@ -21,7 +21,7 @@ import org.simbrain.network.core.NeuronArray
  */
 interface SupervisedNetwork {
 
-    val trainer: IterableTrainer
+    val trainer: SupervisedTrainer<*>
 
     var trainingSet: MatrixDataset
 

@@ -56,6 +56,7 @@ class UnsupervisedTrainer: EditableObject {
     @UserParameter("Learning Rate")
     var learningRate = .01
 
+    @Transient
     val events = TrainerEvents()
 
     context(Network)

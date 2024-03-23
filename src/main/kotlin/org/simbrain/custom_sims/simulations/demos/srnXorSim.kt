@@ -5,8 +5,8 @@ import org.simbrain.custom_sims.addTimeSeries
 import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.subnetworks.SRNNetwork
-import org.simbrain.network.trainers.IterableTrainer
 import org.simbrain.network.trainers.MatrixDataset
+import org.simbrain.network.trainers.SupervisedTrainer
 import org.simbrain.util.*
 import smile.math.matrix.Matrix
 import kotlin.math.floor
@@ -30,12 +30,12 @@ val srnXORSim = newSim {
     // Load with xor data
     val xorInputs = generateTemporalXORData(1000)
     srn.trainingSet = MatrixDataset(xorInputs, xorInputs.shiftUpAndPadEndWithZero())
-    srn.trainer.updateType = IterableTrainer.UpdateMethod.Stochastic()
+    srn.trainer.updateType = SupervisedTrainer.UpdateMethod.Stochastic()
 
     // Train
     with(network) {
         repeat(600) {
-            srn.trainer.trainOnce()
+            srn.run { trainer.trainOnce() }
             if (it % 10 == 0) {
                 println("iteration ${it}: ${srn.trainer.lossFunction.loss}")
             }

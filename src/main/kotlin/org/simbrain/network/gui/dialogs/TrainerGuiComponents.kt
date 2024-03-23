@@ -5,8 +5,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
+import org.simbrain.network.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
-import org.simbrain.network.trainers.IterableTrainer
+import org.simbrain.network.trainers.SupervisedNetwork
+import org.simbrain.network.trainers.SupervisedTrainer
 import org.simbrain.plot.timeseries.TimeSeriesModel
 import org.simbrain.plot.timeseries.TimeSeriesPlotActions
 import org.simbrain.plot.timeseries.TimeSeriesPlotPanel
@@ -27,7 +29,7 @@ import javax.swing.JPanel
 /**
  * Controls used by Supervised learning dialogs.
  */
-class TrainerControls(trainer: IterableTrainer, networkPanel: NetworkPanel) : JPanel(), CoroutineScope {
+class TrainerControls<SN>(trainer: SupervisedTrainer<SN>, supervisedNetwork: SN, networkPanel: NetworkPanel): JPanel(), CoroutineScope where SN: SupervisedNetwork, SN: NetworkModel {
 
     private val job = SupervisorJob()
 
@@ -40,7 +42,7 @@ class TrainerControls(trainer: IterableTrainer, networkPanel: NetworkPanel) : JP
         iconPath ="menu_icons/Play.png",
         description = "Iterate training until stop button is pressed",
     ) {
-        with(networkPanel.network) { trainer.startTraining() }
+        with(networkPanel.network) { trainer.run { supervisedNetwork.startTraining() } }
     }
 
     private val stopAction = createAction(
@@ -57,7 +59,7 @@ class TrainerControls(trainer: IterableTrainer, networkPanel: NetworkPanel) : JP
         iconPath =  "menu_icons/Step.png",
     ) {
         trainer.events.beginTraining.fire()
-        with(networkPanel.network) { trainer.trainOnce() }
+        with(networkPanel.network) { supervisedNetwork.run { trainer.trainOnce() } }
         trainer.events.endTraining.fire()
     }
 
@@ -66,7 +68,7 @@ class TrainerControls(trainer: IterableTrainer, networkPanel: NetworkPanel) : JP
         description = "Randomize network",
         iconPath = "menu_icons/Rand.png",
     ) {
-        with(networkPanel.network) { trainer.randomize() }
+        supervisedNetwork.randomize()
     }
 
     init {
@@ -108,7 +110,7 @@ class TrainerControls(trainer: IterableTrainer, networkPanel: NetworkPanel) : JP
 
 }
 
-class ErrorTimeSeries(trainer: IterableTrainer) : JPanel() {
+class ErrorTimeSeries(trainer: SupervisedTrainer<*>) : JPanel() {
 
     val graphPanel: TimeSeriesPlotPanel
 

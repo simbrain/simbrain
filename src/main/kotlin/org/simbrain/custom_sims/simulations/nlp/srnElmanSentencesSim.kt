@@ -4,8 +4,8 @@ import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addTextWorld
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.subnetworks.SRNNetwork
-import org.simbrain.network.trainers.IterableTrainer
 import org.simbrain.network.trainers.MatrixDataset
+import org.simbrain.network.trainers.SupervisedTrainer
 import org.simbrain.util.*
 import org.simbrain.world.textworld.EmbeddingType
 import org.simbrain.world.textworld.TokenEmbeddingBuilder
@@ -59,7 +59,7 @@ val srnElmanSentences = newSim {
 
     srn.trainingSet = MatrixDataset(trainingInputs, trainingTarget)
     srn.trainer.learningRate = learningRate
-    srn.trainer.lossFunction = IterableTrainer.LossFunction.RootMeanSquaredError()
+    srn.trainer.lossFunction = SupervisedTrainer.LossFunction.RootMeanSquaredError()
 
     // Comment this out to pretrain the network
     // From the original paper: "The training continued in this manner until the network had experienced 6 complete passes

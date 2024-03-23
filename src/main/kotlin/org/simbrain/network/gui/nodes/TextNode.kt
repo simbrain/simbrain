@@ -91,7 +91,7 @@ open class TextNode(
 
                     override fun actionPerformed(e: ActionEvent) {
                         textEntryDialog(textObject.text, "Edit Text", 20, 5) {
-                            textObject.setText(it)
+                            textObject.text = it
                             update()
                         }.display()
                     }
@@ -143,7 +143,7 @@ open class TextNode(
     }
 
     override val propertyDialog: JDialog?
-        get() = textEntryDialog(textObject.text, "Edit Text", 20, 5) { text: String? ->
+        get() = textEntryDialog(textObject.text, "Edit Text", 20, 5) { text ->
             textObject.text = text
             update()
         }

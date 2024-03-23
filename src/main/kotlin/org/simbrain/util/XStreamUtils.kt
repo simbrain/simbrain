@@ -11,6 +11,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamReader
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter
 import com.thoughtworks.xstream.io.xml.DomDriver
 import com.thoughtworks.xstream.mapper.Mapper
+import org.simbrain.network.NetworkModel
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.util.piccolo.Tile
@@ -53,6 +54,7 @@ fun getSimbrainXStream(): XStream {
             createConstructorCallingConverter(
                 listOf(
                     EditableObject::class.java,
+                    NetworkModel::class.java,
                 ),
                 mapper,
                 reflectionProvider,

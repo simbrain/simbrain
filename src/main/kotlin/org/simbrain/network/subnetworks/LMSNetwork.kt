@@ -34,9 +34,7 @@ class LMSNetwork : FeedForward, SupervisedNetwork {
 
     override lateinit var trainingSet: MatrixDataset
 
-    override val trainer by lazy {
-        LMSTrainer(this)
-    }
+    override val trainer = LMSTrainer()
 
     constructor(nInputs: Int, nOutputs: Int, initialPosition: Point2D? = null): super(intArrayOf(nInputs, nOutputs), initialPosition) {
         layerList.forEach { it.updateRule = LinearRule() }

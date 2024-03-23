@@ -93,11 +93,7 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
     @XStreamConstructor
     protected constructor() : super()
 
-    @Transient
-    var _trainer: SRNTrainer? = null
-
-    override val trainer
-        get() = _trainer?: SRNTrainer(this).also { _trainer = it }
+    override var trainer: SRNTrainer = SRNTrainer()
 
     override val name: String
         get() = "SRN"

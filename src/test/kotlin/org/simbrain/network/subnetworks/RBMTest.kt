@@ -9,12 +9,12 @@ import org.simbrain.network.core.getNetworkXStream
 class RBMTest {
 
     val net = Network()
-    val srn = RestrictedBoltzmannMachine(3, 2).apply {
+    val rbm = RestrictedBoltzmannMachine(3, 2).apply {
         label = "RBM"
     }
 
     init {
-        net.addNetworkModelsAsync(srn)
+        net.addNetworkModelsAsync(rbm)
     }
 
     @Test

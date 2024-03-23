@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.subnetworks
 
-import org.simbrain.network.NetworkModel
 import org.simbrain.network.core.*
 import org.simbrain.network.trainers.UnsupervisedNetwork
 import org.simbrain.network.trainers.UnsupervisedTrainer
@@ -42,28 +41,28 @@ import smile.math.matrix.Matrix
  * @author Makenzy Gilbert
  * @author Jeff Yoshimi
  */
-class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: Int) : Subnetwork(), UnsupervisedNetwork {
+class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
 
-    val hiddenLayer: NeuronArray
+    lateinit var hiddenLayer: NeuronArray
 
-    val visibleLayer: NeuronArray
+    lateinit var visibleLayer: NeuronArray
 
     val defaultRowsInputData = 10
 
-    override var inputData: Matrix = Matrix.rand(defaultRowsInputData, numVisibleNodes)
+    override lateinit var inputData: Matrix
 
     override val inputLayer: NeuronArray
         get() = visibleLayer
 
-    val visibleToHidden: WeightMatrix
+    lateinit var visibleToHidden: WeightMatrix
 
-    val infoText: InfoText
+    override lateinit var customInfo: InfoText
 
     override val trainer = UnsupervisedTrainer()
 
-    init {
+    constructor(numVisibleNodes: Int, numHiddenNodes: Int): super() {
         this.label = "Restricted Boltzmann Machine"
-
+        this.inputData = Matrix.rand(defaultRowsInputData, numVisibleNodes)
         visibleLayer = NeuronArray(numVisibleNodes).apply {
             label = "Visible layer"
             gridMode = true
@@ -87,10 +86,12 @@ class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: Int) : Su
         alignNetworkModels(visibleLayer, hiddenLayer, Alignment.HORIZONTAL)
         offsetNetworkModel(visibleLayer, hiddenLayer, Direction.EAST, 200.0, 258.0, 126.0)
 
-        infoText = InfoText(stateInfoText)
-        infoText.location = point(0, -100)
-
+        customInfo = InfoText(stateInfoText)
+        customInfo.location = point(0, -100)
     }
+
+    @XStreamConstructor()
+    constructor(): super()
 
     // See eq 1 https://www.cs.toronto.edu/~hinton/absps/guideTR.pdf
     val stateInfoText: String
@@ -102,12 +103,9 @@ class RestrictedBoltzmannMachine(numVisibleNodes: Int, numHiddenNodes: Int) : Su
         }
 
     fun updateStateInfoText() {
-        infoText.text = stateInfoText
+        customInfo.text = stateInfoText
         events.customInfoUpdated.fireAndBlock()
     }
-
-    override val customInfo: NetworkModel
-        get() = infoText
 
     context(Network)
     override fun update() {

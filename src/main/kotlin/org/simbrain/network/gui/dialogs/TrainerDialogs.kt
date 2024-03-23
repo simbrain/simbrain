@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
 import org.simbrain.network.NetworkComponent
+import org.simbrain.network.NetworkModel
 import org.simbrain.network.core.Network
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.nodes.SRNNode
@@ -11,6 +12,7 @@ import org.simbrain.network.subnetworks.LMSNetwork
 import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedNetwork
+import org.simbrain.network.trainers.SupervisedTrainer
 import org.simbrain.network.trainers.UnsupervisedNetwork
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
@@ -26,7 +28,7 @@ import javax.swing.*
  * Generic training dialog for supervised learning.
  */
 context(NetworkPanel)
-fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
+fun <SN> SN.getSupervisedTrainingDialog(): StandardDialog where SN: SupervisedNetwork, SN: NetworkModel {
     return StandardDialog().apply {
 
         title = "Train Network"
@@ -40,17 +42,23 @@ fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
         // Run training algorithm
         val runControls = JPanel()
         runControls.layout = MigLayout("gap 0px 0px, ins 0")
-        val trainerControls = TrainerControls(trainer, this@NetworkPanel)
+        val trainerControls = TrainerControls(trainer as SupervisedTrainer<SN>, this@getSupervisedTrainingDialog, this@NetworkPanel)
         val inputs = MatrixEditor(trainingSet.inputs)
         inputs.toolbar.addSeparator()
         inputs.toolbar.add(
             inputs.table.createApplyAction("Apply Inputs") { selectedRow ->
-                with(network) { trainer.applyInputs(selectedRow) }
+                with(network) {
+                    inputLayer.activations = trainingSet.inputs.rowVectorTransposed(selectedRow)
+                    this@SN.update()
+                }
             }
         )
         inputs.toolbar.add(inputs.table.createAdvanceRowAction())
         inputs.toolbar.add(inputs.table.createApplyAndAdvanceAction {
-            with(network) { trainer.applyInputs(inputs.table.selectedRow) }
+            with(network) {
+                inputLayer.activations = trainingSet.inputs.rowVectorTransposed(inputs.table.selectedRow)
+                this@SN.update()
+            }
         })
         val targets = MatrixEditor(trainingSet.targets)
         val addRemoveRows = AddRemoveRows(inputs.table, targets.table)

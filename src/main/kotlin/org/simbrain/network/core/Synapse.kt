@@ -508,6 +508,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
     val length: Double
         /**
          * Returns the length in pixels of the "axon" this synapse is at the end of.
+         * Basically the distance between the connected nodes in pixels.
          */
         get() = SimbrainMath.distance(source.location, target.location)
 

@@ -125,7 +125,7 @@ var List<Neuron>.auxValues: List<Double>
     }
 
 /**
- * Length in pixels of synapses. See Synapse.length.
+ * Length in pixels of synapses, i.e. distance in pixels between connected nodes. See [Synapse.length].
  */
 val List<Synapse>.lengths: List<Double>
     get() = map { it.length }

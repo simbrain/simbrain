@@ -40,6 +40,7 @@ val evolveNetwork = newSim {
         var useNumNodes = true
         var targetNumNodes by GuiEditable(
             initValue = 20,
+            description = "How many nodes the network should have",
             useCheckboxFrom = NetworkParameters::useNumNodes,
             order = 10
         )
@@ -47,6 +48,7 @@ val evolveNetwork = newSim {
         var useNumWeights = true
         var targetNumWeights by GuiEditable(
             initValue = 40,
+            description = "How many weights the network should have",
             useCheckboxFrom = NetworkParameters::useNumWeights,
             order = 20
         )
@@ -54,6 +56,7 @@ val evolveNetwork = newSim {
         var useTotalActivation = false
         var targetTotalActivation by GuiEditable(
             initValue = 10,
+            description = "What the sum of activations over all nodes should be",
             useCheckboxFrom = NetworkParameters::useTotalActivation,
             order = 30
         )
@@ -61,6 +64,7 @@ val evolveNetwork = newSim {
         var useAverageActivation = false
         var targetAverageActivation by GuiEditable(
             initValue = 2.0,
+            description = "What the average node activation should be",
             useCheckboxFrom = NetworkParameters::useAverageActivation,
             order = 40
         )
@@ -68,13 +72,16 @@ val evolveNetwork = newSim {
         var useAverageConnectionLength = false
         var targetAverageConnectionLength by GuiEditable(
             initValue = 250.0,
+            description = "What the average connection length (pixels between source and target neurons) should be",
             useCheckboxFrom = NetworkParameters::useAverageConnectionLength,
             order = 50
         )
 
+        // TODO: This is probably not the best measure of node dispersion. Replace it with something better.
         var useNodeArea = false
         var targetNodeArea by GuiEditable(
-            initValue = 10.0,
+            initValue = 100.0,
+            description = "Area spanned by nodes in units of 100s of pixels squared. Larger numbers mean more spread out.",
             useCheckboxFrom = NetworkParameters::useNodeArea,
             order = 60
         )
@@ -220,7 +227,6 @@ val evolveNetwork = newSim {
             }
 
             // "Area" spanned by nodes
-            //  TODO: Make this more interpretible
             if (networkParams.useNodeArea) {
                 val bounds = network.freeNeurons.bound
                 val scaledArea = (bounds.height * bounds.width) / 10_000

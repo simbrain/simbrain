@@ -186,9 +186,9 @@ class Workspace: CoroutineScope {
     }
 
     /**
-     * Update the workspace a single time.
+     * Iterate asynchronously.
      */
-    fun iterate() {
+    fun iterateAsync() {
         for (wc in componentList) {
             wc.start()
         }
@@ -199,22 +199,21 @@ class Workspace: CoroutineScope {
     }
 
     /**
-     * Iterate for a specified number of iterations. Block until all iterations are complete then
-     * run an optional finishing task.
-     *
-     * TODO: This is a temporary solution until suspend functions are used here
+     * Iterate asynchronously for a specified number of iterations.
      */
-    @JvmOverloads
-    fun iterate(numIterations: Int, finishingTask: () -> Unit = {}) {
+    fun iterateAsync(numIterations: Int) {
         for (wc in componentList) {
             wc.start()
         }
         launch {
-            updater.iterate(numIterations, finishingTask)
+            updater.iterate(numIterations)
         }
         stop()
     }
 
+    /**
+     * Iterate and suspend (wait without blocking). The preferred iteration method if the context allows it.
+     */
     suspend fun iterateSuspend(numIterations: Int = 1) {
         for (wc in componentList) {
             wc.start()
@@ -223,6 +222,9 @@ class Workspace: CoroutineScope {
         stop()
     }
 
+    /**
+     * Iterate until the provided predicate is true.
+     */
     suspend fun iterateWhile(predicate: () -> Boolean) {
         for (wc in componentList) {
             wc.start()
@@ -232,11 +234,19 @@ class Workspace: CoroutineScope {
     }
 
     /**
-     * Simple non-synchronized updater for non-GUI applications running
-     * in a single thread.
+     * Updates synchronously. Iterates and block, ensuring sequential execution.
      */
     fun simpleIterate() {
         updater.runBlocking()
+    }
+
+    /**
+     * Updates synchronously for specified number of iterations.
+     */
+    fun simpleIterate(iterations: Int) {
+        runBlocking {
+            iterateSuspend(iterations)
+        }
     }
 
     /**

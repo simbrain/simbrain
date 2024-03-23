@@ -419,7 +419,7 @@ public class Cerebellum extends Simulation {
          inputs.getNeuronList().get(0).setActivation(1);
          inputs.getNeuronList().get(1).setActivation(0);
          target.setActivation(1);
-             sim.getWorkspace().iterate(currentTrialLength/2);
+             sim.getWorkspace().iterateAsync(currentTrialLength/2);
          }});
          //panel.addItem("Pattern 1", button2);
 
@@ -429,7 +429,7 @@ public class Cerebellum extends Simulation {
          inputs.getNeuronList().get(0).setActivation(0);
          inputs.getNeuronList().get(1).setActivation(1);
          target.setActivation(0);
-             sim.getWorkspace().iterate(currentTrialLength/2);
+             sim.getWorkspace().iterateAsync(currentTrialLength/2);
          }});
          //panel.addItem("Pattern 2", button3);
 

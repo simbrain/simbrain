@@ -122,7 +122,7 @@ class WorkspaceUpdater(val workspace: Workspace) {
      *
      * Optional finishing task is run after main iteration finishes.
      *
-     * See [Workspace.iterate]
+     * See [Workspace.iterateAsync]
      *
      * @param numIterations the number of iterations to update
      */

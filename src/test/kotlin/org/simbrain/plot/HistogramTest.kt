@@ -29,17 +29,32 @@ class HistogramTest {
     }
 
     @Test
-    fun `Histogram is empty with no input`() {
-
-        // No input yet so histogram is empty
-        assertEquals(1, histogram.seriesData.size)
-
-        // With input, it is no longer empty
+    fun `test data is transferred properly`() {
         ng.activations = doubleArrayOf(1.0, 2.0)
         workspace.simpleIterate()
-
-        println(histogram.seriesData.size)
-        assertEquals(2, histogram.seriesData.size)
+        assertEquals(2, histogram.data[0].size)
+        assertEquals(1.0, histogram.data[0][0])
+        assertEquals(2.0, histogram.data[0][1])
     }
+
+    @Test
+    fun `test equal inputs produce one bin of height 2`() {
+        ng.activations = doubleArrayOf(2.0, 2.0)
+        workspace.simpleIterate()
+        assertEquals(1, histogram.seriesData.first().data.count{
+            it.count == 2
+        })
+    }
+
+    @Test
+    fun `test unequal inputs produce two bins of height 1`() {
+        ng.activations = doubleArrayOf(1.0, 2.0)
+        workspace.simpleIterate()
+        assertEquals(2, histogram.seriesData.first().data.count{
+            it.count == 1
+        })
+    }
+
 }
+
 

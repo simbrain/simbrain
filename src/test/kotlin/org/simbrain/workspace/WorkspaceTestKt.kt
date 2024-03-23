@@ -36,19 +36,4 @@ class WorkspaceTestKt {
         }
     }
 
-
-    @Test
-    fun `iterate(n)'s finishing task should be called after n iterations'`() {
-        var counter = 0
-        workspace.addUpdateAction("increment counter"){
-            println("Update action: $counter")
-            counter++
-        }
-        workspace.iterate(10) {
-            counter++
-        }
-        Thread.sleep(500)
-        assertEquals(11, counter)
-    }
-
 }

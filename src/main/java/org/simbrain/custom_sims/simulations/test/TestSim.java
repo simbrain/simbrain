@@ -89,7 +89,7 @@ public class TestSim extends Simulation {
                 "setBarValues");
         workspace.getCouplingManager().createCoupling(neuronProducer, barChartConsumer);
 
-        workspace.iterate();
+        workspace.iterateAsync();
 
     }
 

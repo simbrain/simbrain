@@ -99,12 +99,12 @@ val mnistSim = newSim {
             for (i in 0..9) {
                 addButton("Image $i") {
                     world.imageAlbum.setFrame(i)
-                    workspace.iterate()
+                    workspace.iterateAsync()
                 }
             }
 
             addButton("Update") {
-                workspace.iterate()
+                workspace.iterateAsync()
             }
         }
     }

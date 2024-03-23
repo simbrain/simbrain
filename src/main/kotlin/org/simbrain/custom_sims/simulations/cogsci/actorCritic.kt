@@ -248,7 +248,7 @@ val actorCritic = newSim {
                             if (reward.activation > 0 ) {
                                 goalAchieved = true
                             }
-                            workspace.iterate()
+                            workspace.iterateAsync()
                         }
                     }
 

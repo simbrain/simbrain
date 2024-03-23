@@ -51,7 +51,7 @@ class WorkspaceKeyAdapter extends KeyAdapter {
         int keycode = e.getKeyCode();
         switch (keycode) {
             case KeyEvent.VK_U:
-                workspace.iterate();
+                workspace.iterateAsync();
                 break;
             default:
                 break;

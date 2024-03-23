@@ -193,7 +193,7 @@ public class SimulationUtils {
      * @param iterations number of iterations
      */
     public void iterate(int iterations) {
-        workspace.iterate(iterations);
+        workspace.iterateAsync(iterations);
     }
 
     /**

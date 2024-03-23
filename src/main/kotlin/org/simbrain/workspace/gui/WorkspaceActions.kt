@@ -118,7 +118,7 @@ class WorkspaceActions {
         },
         coroutineScope = workspace
     ) {
-        workspace.iterate()
+        workspace.iterateAsync()
     }
 
     val runAction = SimbrainDesktop.desktopPane.createAction(

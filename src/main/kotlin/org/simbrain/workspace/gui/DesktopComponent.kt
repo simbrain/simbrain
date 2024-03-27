@@ -20,7 +20,9 @@ package org.simbrain.workspace.gui
 
 import com.thoughtworks.xstream.XStream
 import com.thoughtworks.xstream.io.xml.DomDriver
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import org.pmw.tinylog.Logger
 import org.simbrain.network.NetworkComponent
@@ -299,6 +301,30 @@ var parentFrame: GenericFrame, workspaceComponent: E
             }
             return simpleName
         }
+
+    /**
+     * Call the provided action when components are added or removed.
+     * Example: Used to ensure coupling menus are updated when we add or remove WorkspaceComponents.
+     */
+    fun onCouplingAttributesChanged(dispatcher: CoroutineDispatcher = Dispatchers.Swing, action: suspend () -> Unit) {
+        workspace.events.apply {
+            val componentEventUnregisteringHandlers = HashMap<WorkspaceComponent, MutableList<() -> Boolean?>> ()
+            componentAdded.on(dispatcher) {
+                action()
+                val callbackList = componentEventUnregisteringHandlers.getOrPut(it) { mutableListOf() }
+                callbackList.add(it.events.attributeContainerAdded.on(dispatcher) {
+                    action()
+                })
+                callbackList.add(it.events.attributeContainerRemoved.on(dispatcher) {
+                    action()
+                })
+            }
+            componentRemoved.on(dispatcher) {
+                action()
+                componentEventUnregisteringHandlers[it]?.forEach { it() }
+            }
+        }
+    }
 
     /**
      * Returns the default directory for specific component types.

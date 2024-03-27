@@ -18,11 +18,8 @@
  */
 package org.simbrain.world.textworld.gui
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.swing.Swing
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.widgets.ShowHelpAction
-import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.CouplingMenu
 import org.simbrain.workspace.gui.DesktopComponent
@@ -151,6 +148,7 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
             edit.add(preferences)
         }
         createEditMenu()
+        onCouplingAttributesChanged { createEditMenu() }
         menuBar.add(edit)
 
         // Help Menu
@@ -158,24 +156,6 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
         val helpAction = ShowHelpAction("Pages/Worlds/TextWorld/TextWorld.html")
         helpItem.action = helpAction
         help.add(helpItem)
-
-        SimbrainDesktop.workspace.events.apply {
-            val componentEventUnregisteringHandlers = HashMap<WorkspaceComponent, MutableList<() -> Boolean?>> ()
-            componentAdded.on(Dispatchers.Swing) {
-                createEditMenu()
-                val callbackList = componentEventUnregisteringHandlers.getOrPut(it) { mutableListOf() }
-                callbackList.add(it.events.attributeContainerAdded.on(Dispatchers.Swing) {
-                    createEditMenu()
-                })
-                callbackList.add(it.events.attributeContainerRemoved.on(Dispatchers.Swing) {
-                    createEditMenu()
-                })
-            }
-            componentRemoved.on(Dispatchers.Swing) {
-                createEditMenu()
-                componentEventUnregisteringHandlers[it]?.forEach { it() }
-            }
-        }
 
         // Add menu
         parentFrame.jMenuBar = menuBar

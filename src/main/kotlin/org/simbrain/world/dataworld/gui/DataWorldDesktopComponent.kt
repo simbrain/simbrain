@@ -18,19 +18,15 @@
  */
 package org.simbrain.world.dataworld.gui
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.swing.Swing
 import org.simbrain.util.createAction
 import org.simbrain.util.createEditorDialog
 import org.simbrain.util.display
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.table.*
 import org.simbrain.util.widgets.ShowHelpAction
-import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.CouplingMenu
 import org.simbrain.workspace.gui.DesktopComponent
-import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import org.simbrain.world.dataworld.DataWorld
 import org.simbrain.world.dataworld.DataWorldComponent
@@ -135,6 +131,7 @@ class DataWorldDesktopComponent(frame: GenericFrame, val component: DataWorldCom
             edit.add(preferences)
         }
         createEditMenu()
+        onCouplingAttributesChanged { createEditMenu() }
         menuBar.add(edit)
 
         // Help Menu
@@ -145,24 +142,6 @@ class DataWorldDesktopComponent(frame: GenericFrame, val component: DataWorldCom
 
         // Add menu
         parentFrame.jMenuBar = menuBar
-
-        SimbrainDesktop.workspace.events.apply {
-            val componentEventUnregisteringHandlers = HashMap<WorkspaceComponent, MutableList<() -> Boolean?>> ()
-            componentAdded.on(Dispatchers.Swing) {
-                createEditMenu()
-                val callbackList = componentEventUnregisteringHandlers.getOrPut(it) { mutableListOf() }
-                callbackList.add(it.events.attributeContainerAdded.on(Dispatchers.Swing) {
-                    createEditMenu()
-                })
-                callbackList.add(it.events.attributeContainerRemoved.on(Dispatchers.Swing) {
-                    createEditMenu()
-                })
-            }
-            componentRemoved.on(Dispatchers.Swing) {
-                createEditMenu()
-                componentEventUnregisteringHandlers[it]?.forEach { it() }
-            }
-        }
     }
 
 }

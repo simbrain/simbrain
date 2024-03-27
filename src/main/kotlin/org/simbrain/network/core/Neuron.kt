@@ -98,7 +98,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
         order = 1
     )
     @get:Producible
-    @set:Consumable(defaultVisibility = false)
+    @set:Consumable(defaultVisibility = false, customPriorityMethod = "setActivationCouplingPriority")
     var activation = 0.0
         set(value) {
             lastActivation = field
@@ -700,7 +700,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
      * When the neuron is clamped, couplings should use force set activation.  Called by reflection using
      * [Consumable.customPriorityMethod]
      */
-    fun forceSetActivationCouplingPriority(): Int {
+    fun setActivationCouplingPriority(): Int {
         return if (clamped) {
             HIGH_PRIORITY
         } else {

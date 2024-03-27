@@ -34,6 +34,7 @@ val mnistSim = newSim {
         label = "Retina"
         layout = GridLayout(50.0,50.0)
         setClamped(true)
+        setUpperBound(1.0)
     }
     pixelNet.applyLayout(-5, -85)
 
@@ -88,7 +89,7 @@ val mnistSim = newSim {
     with(couplingManager) {
         createCoupling(
             iwc.world.filterCollection.currentFilter.getProducer("getBrightness"),
-            pixelNet.getConsumer("forceSetActivations")
+            pixelNet.getConsumer("setActivations")
         )
         // iwc.world.filterCollection.currentFilter couple pixelNet
     }

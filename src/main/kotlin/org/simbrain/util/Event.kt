@@ -309,14 +309,14 @@ open class Events: CoroutineScope {
     inner class BatchChangedEvent<T>(override val interval: Int = 0, override var timingMode: TimingMode =  TimingMode.Debounce) : EventObject() {
 
         @Suppress("UNCHECKED_CAST")
-        fun on(dispatcher: CoroutineDispatcher? = null, wait: Boolean = false, handler: suspend (new: List<T>, old: List<T>) -> Unit) = onSuspendHelper(dispatcher, wait) {
-                new, old -> handler(new as List<T>, old as List<T>)
+        fun on(dispatcher: CoroutineDispatcher? = null, wait: Boolean = false, handler: suspend (new: ConcurrentLinkedQueue<T>, old: ConcurrentLinkedQueue<T>) -> Unit) = onSuspendHelper(dispatcher, wait) {
+                new, old -> handler(new as ConcurrentLinkedQueue<T>, old as ConcurrentLinkedQueue<T>)
         }
 
         @JvmOverloads
         @Suppress("UNCHECKED_CAST")
-        fun on(dispatcher: CoroutineDispatcher? = null, wait: Boolean = false, handler: BiConsumer<List<T>, List<T>>) = onHelper(dispatcher, wait) {
-                new, old -> handler.accept(new as List<T>, old as List<T>)
+        fun on(dispatcher: CoroutineDispatcher? = null, wait: Boolean = false, handler: BiConsumer<ConcurrentLinkedQueue<T>, ConcurrentLinkedQueue<T>>) = onHelper(dispatcher, wait) {
+                new, old -> handler.accept(new as ConcurrentLinkedQueue<T>, old as ConcurrentLinkedQueue<T>)
         }
 
         @Deprecated(message = "Blocking is now determinate by `on`", replaceWith = ReplaceWith("fireAndBlock(new, old)"))

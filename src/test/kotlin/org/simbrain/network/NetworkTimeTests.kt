@@ -1,5 +1,7 @@
 package org.simbrain.network
 
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -51,12 +53,15 @@ class NetworkTimeTests {
 
     @Test
     fun `test automatic change to continuous with continuous rule`() {
-        net.timeType = Network.TimeType.DISCRETE
-        assertTrue(net.timeType == Network.TimeType.DISCRETE)
-        n1.updateRule = IntegrateAndFireRule()
-        assertTrue(net.timeType == Network.TimeType.CONTINUOUS)
-        net.timeType = Network.TimeType.DISCRETE
-        assertTrue(net.timeType == Network.TimeType.DISCRETE)
+        runBlocking {
+            net.timeType = Network.TimeType.DISCRETE
+            assertTrue(net.timeType == Network.TimeType.DISCRETE)
+            n1.updateRule = IntegrateAndFireRule()
+            delay(10L)
+            assertTrue(net.timeType == Network.TimeType.CONTINUOUS)
+            net.timeType = Network.TimeType.DISCRETE
+            assertTrue(net.timeType == Network.TimeType.DISCRETE)
+        }
     }
 
 }

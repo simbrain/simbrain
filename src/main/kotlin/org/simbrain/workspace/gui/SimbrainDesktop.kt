@@ -747,6 +747,7 @@ object SimbrainDesktop {
         Thread.setDefaultUncaughtExceptionHandler { t, e ->
             val sw = StringWriter()
             e.printStackTrace(PrintWriter(sw))
+            e.printStackTrace()
             val stackTrace = sw.toString()
             val textArea = JTextArea("An error occurred: ${e.message}\n\n$stackTrace").apply {
                 isEditable = false

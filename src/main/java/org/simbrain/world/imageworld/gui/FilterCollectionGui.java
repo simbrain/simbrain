@@ -5,6 +5,7 @@ import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.world.imageworld.ImageSource;
+import org.simbrain.world.imageworld.ImageWorldDesktopComponent;
 import org.simbrain.world.imageworld.dialogs.CreateFilterDialog;
 import org.simbrain.world.imageworld.filters.Filter;
 import org.simbrain.world.imageworld.filters.FilterCollection;

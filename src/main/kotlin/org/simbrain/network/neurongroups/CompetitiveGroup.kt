@@ -127,7 +127,7 @@ open class CompetitiveGroup @JvmOverloads constructor(
         // normalizeIncomingWeights();
     }
 
-    /**F
+    /**
      * Update winning neuron's weights in accordance with Alvarez and Squire
      * 1994, eq 2. TODO: rate is unused... in fact everything before
      * "double deltaw = learningRate" (line 200 at time of writing) cannot
@@ -187,7 +187,7 @@ open class CompetitiveGroup @JvmOverloads constructor(
             activation = incoming.source.activation
             if (params.normalizeInputs) {
                 if (sumOfInputs != 0.0) {
-                    activation = activation / sumOfInputs
+                    activation /= sumOfInputs
                 }
             }
             incoming.strength = incoming.strength + params.leakyLearningRate * (activation - incoming.strength)
@@ -226,7 +226,7 @@ open class CompetitiveGroup @JvmOverloads constructor(
      * @return the sum of all incoming weights to this network.
      */
     private val summedIncomingWeights: Double
-        private get() {
+        get() {
             var ret = 0.0
             val i: Iterator<Neuron> = neuronList.iterator()
             while (i.hasNext()) {

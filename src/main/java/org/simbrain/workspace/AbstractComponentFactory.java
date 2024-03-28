@@ -25,7 +25,7 @@ import org.simbrain.workspace.gui.DesktopComponent;
 import org.simbrain.world.dataworld.DataWorldComponent;
 import org.simbrain.world.dataworld.gui.DataWorldDesktopComponent;
 import org.simbrain.world.imageworld.ImageWorldComponent;
-import org.simbrain.world.imageworld.gui.ImageWorldDesktopComponent;
+import org.simbrain.world.imageworld.ImageWorldDesktopComponent;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent;
 import org.simbrain.world.soundworld.SoundWorldComponent;

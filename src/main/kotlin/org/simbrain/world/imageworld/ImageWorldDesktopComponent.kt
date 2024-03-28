@@ -1,278 +1,225 @@
-package org.simbrain.world.imageworld.gui;
+package org.simbrain.world.imageworld
 
-import org.simbrain.util.ImageUtilsKt;
-import org.simbrain.util.ResourceManager;
-import org.simbrain.util.SFileChooser;
-import org.simbrain.util.genericframe.GenericFrame;
-import org.simbrain.util.widgets.ShowHelpAction;
-import org.simbrain.workspace.gui.CouplingMenu;
-import org.simbrain.workspace.gui.DesktopComponent;
-import org.simbrain.workspace.gui.SimbrainDesktop;
-import org.simbrain.world.imageworld.ImageClipboard;
-import org.simbrain.world.imageworld.ImageWorld;
-import org.simbrain.world.imageworld.ImageWorldComponent;
-import org.simbrain.world.imageworld.ImageWorldPreferences;
+import org.simbrain.util.*
+import org.simbrain.util.genericframe.GenericFrame
+import org.simbrain.util.widgets.ShowHelpAction
+import org.simbrain.workspace.gui.CouplingMenu
+import org.simbrain.workspace.gui.DesktopComponent
+import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
+import org.simbrain.world.imageworld.ImageWorldPreferences.imageDirectory
+import org.simbrain.world.imageworld.gui.FilterCollectionGui
+import java.awt.*
+import java.awt.event.*
+import java.util.*
+import java.util.function.Consumer
+import javax.swing.*
+import kotlin.math.min
 
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.io.File;
-import java.util.LinkedList;
+class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldComponent) :
+    DesktopComponent<ImageWorldComponent>(frame, component) {
 
-import static org.simbrain.util.ImageUtilsKt.fill;
-import static org.simbrain.util.SwingUtilsKt.getSwingDispatcher;
-import static org.simbrain.util.SwingUtilsKt.showWarningConfirmDialog;
-
-public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldComponent> {
-
-    /**
-     * Toolbars.
-     */
-    private JPanel toolbars = new JPanel(new FlowLayout(FlowLayout.LEFT));
-    private JToolBar sourceToolbar = new JToolBar();
-    private JToolBar imageAlbumToolbar = new JToolBar();
-    private JToolBar sensorToolbar = new JToolBar();
+    private val toolbars = JPanel(FlowLayout(FlowLayout.LEFT))
+    private val sourceToolbar = JToolBar()
+    private val imageAlbumToolbar = JToolBar()
+    private val sensorToolbar = JToolBar()
 
     /**
      * Custom file chooser for selecting image files.
      */
-    protected SFileChooser fileChooser;
+    protected var fileChooser: SFileChooser
 
-    /**
-     * Context menu.
-     */
-    private JPopupMenu contextMenu;
+    private var contextMenu: JPopupMenu? = null
 
     /**
      * Main model object.
      */
-    private ImageWorld imageWorld;
+    private val imageWorld: ImageWorld = component.world
 
     /**
      * If true, allow painting
      */
-    public boolean paintMode = true;
+    var paintMode: Boolean = true
 
-    private transient ImageClipboard clipboard;
+    @Transient
+    private val clipboard = ImageClipboard(imageWorld)
 
     /**
      * Current pen color when drawing on the current image.
      */
-    private Color penColor = Color.white;
+    private var penColor: Color = Color.white
 
     /**
      * Button to advance to the next images.
      */
-    private JButton nextImagesButton;
+    private var nextImagesButton: JButton? = null
 
     /**
      * Button to go to the previous images.
      */
-    private JButton previousImagesButton;
+    private var previousImagesButton: JButton? = null
 
-    private JButton takeSnapshotButton;
+    private var takeSnapshotButton: JButton? = null
 
-    private JLabel frameLabel = new JLabel();
-
-    /**
-     * Construct a new ImageDesktopComponent GUI.
-     *
-     * @param frame     The frame in which to place GUI elements.
-     * @param component The ImageWorldComponent to interact with.
-     */
-    public ImageWorldDesktopComponent(GenericFrame frame, ImageWorldComponent component) {
-
-        super(frame, component);
-        imageWorld = component.getWorld();
-        clipboard = new ImageClipboard(imageWorld);
-
-        setupMenuBar(frame);
-        setLayout(new BorderLayout());
-
-        // Main image
-        add(new ImagePanel(), BorderLayout.CENTER);
-        imageWorld.getImageAlbum().getEvents().getImageUpdate().on(getSwingDispatcher(), () -> {
-            updateToolbar();
-            repaint();
-        });
-        imageWorld.getFilterCollection().getEvents().getFilterChanged().on(getSwingDispatcher(), (o, n) -> this.repaint());
-
-        // Toolbars
-        add(toolbars, BorderLayout.NORTH);
-        toolbars.add(sourceToolbar);
-        toolbars.add(sensorToolbar);
-        var filterGui = new FilterCollectionGui(this, imageWorld.getFilterCollection());
-        toolbars.add(filterGui.getToolBar());
-
-        setupToolbars();
-
-        add(imageAlbumToolbar, BorderLayout.SOUTH);
-        updateToolbar();
-
-        // Set up the file chooser
-        fileChooser = new SFileChooser(ImageWorldPreferences.INSTANCE.getImageDirectory(), "");
-        // TODO: Below breaks the file chooser
-        //fileChooser.setUseImagePreview(true);
-        // String[] exts = ImageIO.getReaderFileSuffixes();
-        // String[] descriptions = ImageIO.getReaderFormatNames();
-        // for (int i = 0; i < exts.length; ++i) {
-        //    fileChooser.addExtension(descriptions[i], "." + exts[i]);
-        // }
-
-    }
+    private val frameLabel = JLabel()
 
     /**
      * Central panel to render the image.
      */
-    private class ImagePanel extends JPanel {
-
-        public ImagePanel() {
-            super();
-
+    private inner class ImagePanel : JPanel() {
+        init {
             // Ability to paint pixels black and white
-            MouseAdapter mouseAdapter = new MouseAdapter() {
-
-                @Override
-                public void mouseDragged(MouseEvent evt) {
-                    drawPixel(evt);
+            val mouseAdapter: MouseAdapter = object : MouseAdapter() {
+                override fun mouseDragged(evt: MouseEvent) {
+                    drawPixel(evt)
                 }
 
-                @Override
-                public void mousePressed(MouseEvent evt) {
-                    drawPixel(evt);
+                override fun mousePressed(evt: MouseEvent) {
+                    drawPixel(evt)
                 }
 
-                @Override
-                public void mouseClicked(MouseEvent evt) {
-                    super.mouseClicked(evt);
-                    if (evt.isControlDown() || (evt.getButton() == MouseEvent.BUTTON3)) {
-                        showContextMenu(evt);
+                override fun mouseClicked(evt: MouseEvent) {
+                    super.mouseClicked(evt)
+                    if (evt.isControlDown || (evt.button == MouseEvent.BUTTON3)) {
+                        showContextMenu(evt)
                     }
                 }
-            };
-            addMouseListener(mouseAdapter);
-            addMouseMotionListener(mouseAdapter);
+            }
+            addMouseListener(mouseAdapter)
+            addMouseMotionListener(mouseAdapter)
         }
 
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            imageWorld.getFilterCollection().getCurrentFilter().updateFilter();
-            g.drawImage(imageWorld.getFilterCollection().getCurrentFilter().getFilteredImage(),
-                    0, 0, getWidth(), getHeight(), this);
+        override fun paintComponent(g: Graphics) {
+            super.paintComponent(g)
+            imageWorld.filterCollection.currentFilter.updateFilter()
+            g.drawImage(
+                imageWorld.filterCollection.currentFilter.filteredImage,
+                0, 0, width, height, this
+            )
         }
 
         /**
          * Draw a pixel at the current point in the image panel.
          */
-        private void drawPixel(MouseEvent evt) {
-            if(!paintMode || evt.isControlDown() || (evt.getButton() == MouseEvent.BUTTON3) ) {
-                return;
+        private fun drawPixel(evt: MouseEvent) {
+            if (!paintMode || evt.isControlDown || (evt.button == MouseEvent.BUTTON3)) {
+                return
             }
-            var image = imageWorld.getImageAlbum().getCurrentImage();
-            var ratioX = 1.0 * getWidth() / image.getWidth();
-            var ratioY = 1.0 * getHeight() / image.getHeight();
-            var x = (int) (evt.getX() / ratioX);
-            var y = (int) (evt.getY() / ratioY);
-            if (x < 0 || x >= image.getWidth() || y < 0 || y >= image.getHeight()) {
-                return;
+            val image = imageWorld.imageAlbum.currentImage
+            val ratioX = 1.0 * width / image.width
+            val ratioY = 1.0 * height / image.height
+            val x = (evt.x / ratioX).toInt()
+            val y = (evt.y / ratioY).toInt()
+            if (x < 0 || x >= image.width || y < 0 || y >= image.height) {
+                return
             }
-            if (evt.isShiftDown()) {
-                image.setRGB(x, y, ImageUtilsKt.invert(penColor).getRGB());
+            if (evt.isShiftDown) {
+                image.setRGB(x, y, penColor.invert().rgb)
             } else {
-                image.setRGB(x, y, penColor.getRGB());
+                image.setRGB(x, y, penColor.rgb)
             }
-            imageWorld.getImageAlbum().fireImageUpdate();
+            imageWorld.imageAlbum.fireImageUpdate()
         }
     }
 
-    private void setupMenuBar(GenericFrame frame) {
-
-        JMenuBar menuBar = new JMenuBar();
-        JMenu fileMenu = new JMenu("File  ");
-        menuBar.add(fileMenu);
+    private fun setupMenuBar(frame: GenericFrame) {
+        val menuBar = JMenuBar()
+        val fileMenu = JMenu("File  ")
+        menuBar.add(fileMenu)
 
         // Add load images menu item if it's an image album world
-        JMenuItem loadImages = new JMenuItem("Load Images...");
-        loadImages.addActionListener((e) -> {
-            loadImages();
-        });
-        fileMenu.add(loadImages);
+        val loadImages = JMenuItem("Load Images...")
+        loadImages.addActionListener { e: ActionEvent? ->
+            loadImages()
+        }
+        fileMenu.add(loadImages)
 
-        JMenuItem saveImage = new JMenuItem("Save Image...");
-        saveImage.addActionListener(e -> {
-            saveImage();
-        });
+        val saveImage = JMenuItem("Save Image...")
+        saveImage.addActionListener { e: ActionEvent? ->
+            saveImage()
+        }
 
-        fileMenu.add(saveImage);
+        fileMenu.add(saveImage)
 
-        fileMenu.addSeparator();
-        fileMenu.add(copyAction);
-        fileMenu.add(pasteAction);
+        fileMenu.addSeparator()
+        fileMenu.add(copyAction)
+        fileMenu.add(pasteAction)
 
-        fileMenu.addSeparator();
-        fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createImportAction(this));
-        fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createExportAction(this));
-        fileMenu.addSeparator();
-        fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createRenameAction(this));
-        fileMenu.addSeparator();
-        fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createCloseAction(this));
+        fileMenu.addSeparator()
+        fileMenu.add(actionManager.createImportAction<ImageWorldComponent>(this))
+        fileMenu.add(actionManager.createExportAction<ImageWorldComponent>(this))
+        fileMenu.addSeparator()
+        fileMenu.add(actionManager.createRenameAction<ImageWorldComponent>(this))
+        fileMenu.addSeparator()
+        fileMenu.add(actionManager.createCloseAction<ImageWorldComponent>(this))
+
+        // Edit Menu
+        val editMenu = JMenu("Edit")
+        menuBar.add(editMenu)
+        fun createEditMenu() {
+            editMenu.removeAll()
+            editMenu.add(CouplingMenu(workspaceComponent,  imageWorld.filterCollection.currentFilter))
+        }
+        createEditMenu()
+        onCouplingAttributesChanged { createEditMenu() }
 
         // Help Menu
-        JMenu helpMenu = new JMenu("Help");
-        JMenuItem helpItem = new JMenuItem("World Help");
-        menuBar.add(helpMenu);
-        ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/ImageWorld/ImageWorld.html");
-        helpItem.setAction(helpAction);
-        helpMenu.add(helpItem);
+        val helpMenu = JMenu("Help")
+        val helpItem = JMenuItem("World Help")
+        menuBar.add(helpMenu)
+        val helpAction = ShowHelpAction("Pages/Worlds/ImageWorld/ImageWorld.html")
+        helpItem.action = helpAction
+        helpMenu.add(helpItem)
 
-        frame.setJMenuBar(menuBar);
+        frame.jMenuBar = menuBar
     }
 
     /**
      * Create and display the context menu.
      */
-    private void showContextMenu(MouseEvent evt) {
-        contextMenu = new JPopupMenu();
-        contextMenu.add(copyAction);
-        contextMenu.add(pasteAction);
-        contextMenu.addSeparator();
-        CouplingMenu filterMenu = new CouplingMenu(getWorkspaceComponent(),
-                imageWorld.getFilterCollection().getCurrentFilter());
-        contextMenu.add(filterMenu);
-        contextMenu.show(this, evt.getX(), evt.getY());
+    private fun showContextMenu(evt: MouseEvent) {
+        contextMenu = JPopupMenu()
+        contextMenu!!.add(copyAction)
+        contextMenu!!.add(pasteAction)
+        contextMenu!!.addSeparator()
+        val filterMenu = CouplingMenu(
+            workspaceComponent, imageWorld.filterCollection.currentFilter
+        )
+        contextMenu!!.add(filterMenu)
+        contextMenu!!.show(this, evt.x, evt.y)
     }
 
     /**
      * Set up toolbars depending on what type of world is being displayed
      */
-    private void setupToolbars() {
+    private fun setupToolbars() {
+        imageAlbumButtons.forEach(Consumer { comp: Component? -> imageAlbumToolbar.add(comp) })
 
-        getImageAlbumButtons().forEach(imageAlbumToolbar::add);
 
-
-        JButton createCanvas = new JButton();
-        createCanvas.setIcon(ResourceManager.getSmallIcon("menu_icons/PixelMatrix.png"));
-        createCanvas.setToolTipText("New canvas...");
-        createCanvas.addActionListener(e -> {
-            JTextField wInp = new JTextField(5);
-            JTextField hInp = new JTextField(5);
-            wInp.setText("20");
-            hInp.setText("20");
-            JPanel myPanel = new JPanel();
-            myPanel.add(new JLabel("Width:"));
-            myPanel.add(wInp);
-            myPanel.add(Box.createHorizontalStrut(15)); // a spacer
-            myPanel.add(new JLabel("Height:"));
-            myPanel.add(hInp);
-            int result = JOptionPane.showConfirmDialog(null, myPanel, "Create new canvas, enter dimensions.", JOptionPane.OK_CANCEL_OPTION);
+        val createCanvas = JButton()
+        createCanvas.icon = ResourceManager.getSmallIcon("menu_icons/PixelMatrix.png")
+        createCanvas.toolTipText = "New canvas..."
+        createCanvas.addActionListener { e: ActionEvent? ->
+            val wInp = JTextField(5)
+            val hInp = JTextField(5)
+            wInp.text = "20"
+            hInp.text = "20"
+            val myPanel = JPanel()
+            myPanel.add(JLabel("Width:"))
+            myPanel.add(wInp)
+            myPanel.add(Box.createHorizontalStrut(15)) // a spacer
+            myPanel.add(JLabel("Height:"))
+            myPanel.add(hInp)
+            val result = JOptionPane.showConfirmDialog(
+                null,
+                myPanel,
+                "Create new canvas, enter dimensions.",
+                JOptionPane.OK_CANCEL_OPTION
+            )
             if (result == JOptionPane.OK_OPTION) {
-                imageWorld.resetImageAlbum(Integer.parseInt(wInp.getText()), Integer.parseInt(hInp.getText()));
+                imageWorld.resetImageAlbum(wInp.text.toInt(), hInp.text.toInt())
             }
-        });
-        sourceToolbar.add(createCanvas);
+        }
+        sourceToolbar.add(createCanvas)
 
         //        // Add Color Picker
         //        JButton setColorButton = new JButton();
@@ -285,70 +232,118 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
         //            }
         //        });
         //        sourceToolbar.add(setColorButton);
-
-        Color colorList[] = {Color.white, Color.black, Color.red, Color.blue, Color.green, Color.yellow, Color.cyan, Color.magenta};
-        String colorNames[] = {"White", "Black", "Red", "Blue", "Green", "Yellow", "Cyan", "Magenta", "Custom"};
-        JComboBox cbColorChoice = new JComboBox(colorNames);
-        JButton fillCanvas = new JButton(ResourceManager.getSmallIcon("menu_icons/fill.png"));
-        fillCanvas.addActionListener(e -> {
-            var confirm = showWarningConfirmDialog("Are you sure you want to fill the canvas?");
+        val colorList = arrayOf(
+            Color.white,
+            Color.black,
+            Color.red,
+            Color.blue,
+            Color.green,
+            Color.yellow,
+            Color.cyan,
+            Color.magenta
+        )
+        val colorNames =
+            arrayOf<String?>("White", "Black", "Red", "Blue", "Green", "Yellow", "Cyan", "Magenta", "Custom")
+        val cbColorChoice: JComboBox<*> = JComboBox<Any?>(colorNames)
+        val fillCanvas = JButton(ResourceManager.getSmallIcon("menu_icons/fill.png"))
+        fillCanvas.addActionListener { e: ActionEvent? ->
+            val confirm = showWarningConfirmDialog("Are you sure you want to fill the canvas?")
             if (confirm == JOptionPane.YES_OPTION) {
-                fill(imageWorld.getImageAlbum().getCurrentImage(), penColor);
-                imageWorld.getImageAlbum().fireImageUpdate();
+                imageWorld.imageAlbum.currentImage.fill(penColor)
+                imageWorld.imageAlbum.fireImageUpdate()
             }
-        });
+        }
 
         // Check box handling
-        JCheckBox checkBoxDrawMode = new JCheckBox("Draw");
-        checkBoxDrawMode.setSelected(paintMode);
-        cbColorChoice.setEnabled(checkBoxDrawMode.isSelected());
-        checkBoxDrawMode.addItemListener(e -> {
-            paintMode = checkBoxDrawMode.isSelected();
-            cbColorChoice.setEnabled(checkBoxDrawMode.isSelected());
-        });
+        val checkBoxDrawMode = JCheckBox("Draw")
+        checkBoxDrawMode.isSelected = paintMode
+        cbColorChoice.isEnabled = checkBoxDrawMode.isSelected
+        checkBoxDrawMode.addItemListener { e: ItemEvent? ->
+            paintMode = checkBoxDrawMode.isSelected
+            cbColorChoice.setEnabled(checkBoxDrawMode.isSelected)
+        }
 
-        cbColorChoice.addActionListener(e -> {
-            int len = cbColorChoice.getItemCount();
-            if(((JComboBox)e.getSource()).getSelectedIndex() == len -1) {
-                System.out.println("Custom...");
+        cbColorChoice.addActionListener { e: ActionEvent ->
+            val len = cbColorChoice.itemCount
+            if ((e.source as JComboBox<*>).selectedIndex == len - 1) {
+                println("Custom...")
             } else {
-                this.penColor = colorList[cbColorChoice.getSelectedIndex()];
+                this.penColor = colorList[cbColorChoice.selectedIndex]
             }
-        });
+        }
 
-        sourceToolbar.add(checkBoxDrawMode);
-        sourceToolbar.add(cbColorChoice);
-        sourceToolbar.add(fillCanvas);
-
+        sourceToolbar.add(checkBoxDrawMode)
+        sourceToolbar.add(cbColorChoice)
+        sourceToolbar.add(fillCanvas)
     }
 
     /**
      * Copy image from current system clipboard.
      */
-    Action copyAction = new AbstractAction("Copy") {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            clipboard.copyImage();
+    var copyAction: Action = object : AbstractAction("Copy") {
+        override fun actionPerformed(e: ActionEvent) {
+            clipboard.copyImage()
         }
-    };
+    }
 
     /**
      * Paste image from current system clipboard.
      */
-    Action pasteAction = new AbstractAction("Paste") {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            clipboard.pasteImage();
+    var pasteAction: Action = object : AbstractAction("Paste") {
+        override fun actionPerformed(e: ActionEvent) {
+            clipboard.pasteImage()
         }
-    };
+    }
+
+    /**
+     * Construct a new ImageDesktopComponent GUI.
+     *
+     * @param frame     The frame in which to place GUI elements.
+     * @param component The ImageWorldComponent to interact with.
+     */
+    init {
+        setupMenuBar(frame)
+        layout = BorderLayout()
+
+        // Main image
+        add(ImagePanel(), BorderLayout.CENTER)
+        imageWorld.imageAlbum.events.imageUpdate.on(swingDispatcher) {
+            updateToolbar()
+            repaint()
+        }
+        imageWorld.filterCollection.events.filterChanged.on(swingDispatcher) { _, _ -> this.repaint() }
+
+        // Toolbars
+        add(toolbars, BorderLayout.NORTH)
+        toolbars.add(sourceToolbar)
+        toolbars.add(sensorToolbar)
+        val filterGui = FilterCollectionGui(this, imageWorld.filterCollection)
+        toolbars.add(filterGui.toolBar)
+
+        setupToolbars()
+
+        add(imageAlbumToolbar, BorderLayout.SOUTH)
+        updateToolbar()
+
+        // Set up the file chooser
+        fileChooser = SFileChooser(imageDirectory, "")
+
+        // TODO: Below breaks the file chooser
+        //fileChooser.setUseImagePreview(true);
+        // String[] exts = ImageIO.getReaderFileSuffixes();
+        // String[] descriptions = ImageIO.getReaderFormatNames();
+        // for (int i = 0; i < exts.length; ++i) {
+        //    fileChooser.addExtension(descriptions[i], "." + exts[i]);
+        // }
+    }
 
     /**
      * Save the current image.
      */
-    private void saveImage() {
-        fileChooser.setDescription("Save image");
-        fileChooser.setUseImagePreview(true);
-        File file = fileChooser.showSaveDialog(getWorkspaceComponent().getName() + ".png");
+    private fun saveImage() {
+        fileChooser.setDescription("Save image")
+        fileChooser.setUseImagePreview(true)
+        val file = fileChooser.showSaveDialog(workspaceComponent!!.name + ".png")
         //TODO
         // if (file != null) {
         //     try {
@@ -359,97 +354,97 @@ public class ImageWorldDesktopComponent extends DesktopComponent<ImageWorldCompo
         // }
     }
 
-    /**
-     * Toolbar buttons for image album.
-     *
-     * @return the list of buttons
-     */
-    public java.util.List<Component> getImageAlbumButtons() {
-        java.util.List<Component> returnList = new LinkedList<>();
+    val imageAlbumButtons: List<Component>
+        /**
+         * Toolbar buttons for image album.
+         *
+         * @return the list of buttons
+         */
+        get() {
+            val returnList: MutableList<Component> = LinkedList()
 
-        var deleteCurrentImage = new JButton();
-        deleteCurrentImage.setIcon(ResourceManager.getSmallIcon("menu_icons/RedX.png"));
-        deleteCurrentImage.setToolTipText("Delete Current Image");
-        deleteCurrentImage.addActionListener(e -> {
-            imageWorld.getImageAlbum().deleteCurrentImage();
-        });
-        returnList.add(deleteCurrentImage);
+            val deleteCurrentImage = JButton()
+            deleteCurrentImage.icon = ResourceManager.getSmallIcon("menu_icons/RedX.png")
+            deleteCurrentImage.toolTipText = "Delete Current Image"
+            deleteCurrentImage.addActionListener { e: ActionEvent? ->
+                imageWorld.imageAlbum.deleteCurrentImage()
+            }
+            returnList.add(deleteCurrentImage)
 
-        JButton loadImagesButton = new JButton();
-        loadImagesButton.setIcon(ResourceManager.getSmallIcon("menu_icons/photo.png"));
-        loadImagesButton.setToolTipText("Load Images");
-        loadImagesButton.addActionListener(e -> {
-            loadImages();
-        });
-        returnList.add(loadImagesButton);
+            val loadImagesButton = JButton()
+            loadImagesButton.icon = ResourceManager.getSmallIcon("menu_icons/photo.png")
+            loadImagesButton.toolTipText = "Load Images"
+            loadImagesButton.addActionListener { e: ActionEvent? ->
+                loadImages()
+            }
+            returnList.add(loadImagesButton)
 
-        previousImagesButton = new JButton();
-        previousImagesButton.setIcon(ResourceManager.getSmallIcon("menu_icons/TangoIcons-GoPrevious.png"));
-        previousImagesButton.setToolTipText("Previous Image");
-        previousImagesButton.addActionListener(e -> {
-            imageWorld.previousFrame();
-        });
-        returnList.add(previousImagesButton);
+            previousImagesButton = JButton()
+            previousImagesButton!!.icon = ResourceManager.getSmallIcon("menu_icons/TangoIcons-GoPrevious.png")
+            previousImagesButton!!.toolTipText = "Previous Image"
+            previousImagesButton!!.addActionListener { e: ActionEvent? ->
+                imageWorld.previousFrame()
+            }
+            returnList.add(previousImagesButton!!)
 
-        nextImagesButton = new JButton();
-        nextImagesButton.setIcon(ResourceManager.getSmallIcon("menu_icons/TangoIcons-GoNext.png"));
-        nextImagesButton.setToolTipText("Next Image");
-        nextImagesButton.addActionListener(e -> {
-            imageWorld.nextFrame();
-        });
-        returnList.add(nextImagesButton);
+            nextImagesButton = JButton()
+            nextImagesButton!!.icon = ResourceManager.getSmallIcon("menu_icons/TangoIcons-GoNext.png")
+            nextImagesButton!!.toolTipText = "Next Image"
+            nextImagesButton!!.addActionListener { e: ActionEvent? ->
+                imageWorld.nextFrame()
+            }
+            returnList.add(nextImagesButton!!)
 
-        takeSnapshotButton = new JButton();
-        takeSnapshotButton.setIcon(ResourceManager.getSmallIcon("menu_icons/camera.png"));
-        takeSnapshotButton.setToolTipText("Take Snapshot");
-        takeSnapshotButton.addActionListener(e -> {
-            imageWorld.getImageAlbum().takeSnapshot();
-        });
-        returnList.add(takeSnapshotButton);
-
-
-        returnList.add(frameLabel);
+            takeSnapshotButton = JButton()
+            takeSnapshotButton!!.icon = ResourceManager.getSmallIcon("menu_icons/camera.png")
+            takeSnapshotButton!!.toolTipText = "Take Snapshot"
+            takeSnapshotButton!!.addActionListener { e: ActionEvent? ->
+                imageWorld.imageAlbum.takeSnapshot()
+            }
+            returnList.add(takeSnapshotButton!!)
 
 
-        return returnList;
-    }
+            returnList.add(frameLabel)
+
+
+            return returnList
+        }
 
     /**
      * Load a set of images to be used as the "Album" in an image album.
      */
-    private void loadImages() {
-        fileChooser.setDescription("Select images to load");
-        File[] files = fileChooser.showMultiOpenDialogNative();
+    private fun loadImages() {
+        fileChooser.setDescription("Select images to load")
+        val files = fileChooser.showMultiOpenDialogNative()
         if (files != null) {
-
             // Load the images
-            imageWorld.loadImages(files);
+
+            imageWorld.loadImages(files)
 
             // Update status of buttons
-            updateToolbar();
+            updateToolbar()
 
             // Save preferences
-            ImageWorldPreferences.INSTANCE.setImageDirectory(fileChooser.getCurrentLocation());
+            imageDirectory = fileChooser.currentLocation
         }
     }
 
-    public void updateToolbar() {
+    fun updateToolbar() {
         // Disable next / previous buttons when there is less than two images
-        if (imageWorld.getNumImages() < 2) {
-            nextImagesButton.setEnabled(false);
-            previousImagesButton.setEnabled(false);
+        if (imageWorld.numImages < 2) {
+            nextImagesButton!!.isEnabled = false
+            previousImagesButton!!.isEnabled = false
         } else {
-            nextImagesButton.setEnabled(true);
-            previousImagesButton.setEnabled(true);
+            nextImagesButton!!.isEnabled = true
+            previousImagesButton!!.isEnabled = true
         }
-        var index = imageWorld.getImageAlbum().getFrameIndex();
-        var numFrames = imageWorld.getImageAlbum().getNumFrames();
-        var humanReadableFrameIndex = Math.min(index + 1, numFrames);
-        frameLabel.setText(humanReadableFrameIndex + "/" + numFrames);
+        val index = imageWorld.imageAlbum.frameIndex
+        val numFrames = imageWorld.imageAlbum.numFrames
+        val humanReadableFrameIndex = min((index + 1).toDouble(), numFrames.toDouble()).toInt()
+        frameLabel.text = "$humanReadableFrameIndex/$numFrames"
     }
 
-    @Override
-    public Dimension getPreferredSize() {
-        return new Dimension(650, 500);
+    override fun getPreferredSize(): Dimension {
+        return Dimension(650, 500)
     }
 }

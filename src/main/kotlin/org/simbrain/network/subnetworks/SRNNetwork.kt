@@ -47,7 +47,7 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
 
     override lateinit var trainingSet: MatrixDataset
 
-    val weightMatrixTree by lazy { WeightMatrixTree(listOf(inputLayer, contextLayer), outputLayer) }
+    lateinit var weightMatrixTree: WeightMatrixTree
 
     constructor(
         numInputNodes: Int = 10,
@@ -86,6 +86,8 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
         trainingSet = createDiagonalDataset(numInputNodes, numOutputNodes, shiftAmount = 1)
 
         setLocation(initialPosition.x, initialPosition.y)
+
+        weightMatrixTree = WeightMatrixTree(listOf(inputLayer, contextLayer), outputLayer)
     }
 
 

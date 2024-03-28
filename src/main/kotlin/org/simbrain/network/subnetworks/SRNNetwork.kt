@@ -17,10 +17,7 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.core.XStreamConstructor
-import org.simbrain.network.trainers.MatrixDataset
-import org.simbrain.network.trainers.SRNTrainer
-import org.simbrain.network.trainers.SupervisedNetwork
-import org.simbrain.network.trainers.createDiagonalDataset
+import org.simbrain.network.trainers.*
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.util.Alignment
@@ -49,6 +46,8 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
     lateinit var contextToHidden: WeightMatrix
 
     override lateinit var trainingSet: MatrixDataset
+
+    val weightMatrixTree by lazy { WeightMatrixTree(listOf(inputLayer, contextLayer), outputLayer) }
 
     constructor(
         numInputNodes: Int = 10,

@@ -286,8 +286,6 @@ class SRNTrainer : SupervisedTrainer<SRNNetwork>() {
 
     context(Network)
     override fun SRNNetwork.trainRow(rowNum: Int): Double {
-        val weightMatrixTree = WeightMatrixTree(listOf(inputLayer, contextLayer), outputLayer)
-
         val targetVec = trainingSet.targets.rowVectorTransposed(rowNum)
         val inputVec = trainingSet.inputs.rowVectorTransposed(rowNum)
 

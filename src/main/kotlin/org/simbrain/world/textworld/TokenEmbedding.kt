@@ -10,9 +10,14 @@ import org.simbrain.util.table.createFromDoubleArray
 import smile.math.matrix.Matrix
 
 /**
- * Associates string tokens with vector representations.
+ * Associates string tokens with vector representations. Each member of a list of String tokens is associated with
+ * a row of a Matrix of doubles.
  *
- * Also allows for reverse mappings from vectors back to tokens using a [KDTree].
+ * Allows for reverse mappings from vectors back to tokens using a [KDTree].
+ *
+ * All tokens are converted lowercase.
+ *
+ * Cannot currently be mutated after creation.
  */
 class TokenEmbedding(
     val tokens: List<String>,
@@ -28,7 +33,9 @@ class TokenEmbedding(
 ) {
 
     /**
-     * Assume indices of the token list correspond to rows of the cocMatrix
+     * Associates tokens with row indices of tokenVectorMatrix.
+     * All tokens are converted to lower case. This map is reused in creating the tokenVectorMatrix
+     * so all tokens are lower case.
      */
     var tokensMap: Map<String, Int> = tokens.mapIndexed{i, t -> t.lowercase() to i}.toMap()
 
@@ -38,13 +45,15 @@ class TokenEmbedding(
     val size = tokensMap.size
 
     /**
-     * The number of dimensions in the word embedding space. Tokens are associated with vectors with this many
-     * components.
-     *
+     * The number of dimensions in the word embedding space.
      */
-    var dimension = size
-        // Currently because the matrices are always square the dimension just corresponds to number of rows
-        get() = size
+    val dimension = tokenVectorMatrix.ncol()
+
+    init {
+        if (tokens.size != tokenVectorMatrix.nrow()) {
+            throw IllegalArgumentException("token list must be same length as token vector matrix has rows")
+        }
+    }
 
     /**
      * N-Tree (optimized to find vectors near a given vector) associating vectors with tokens.
@@ -52,12 +61,6 @@ class TokenEmbedding(
     private val treeMap = KDTree(dimension).apply {
         tokensMap.forEach { (token, i) ->
             insert(DataPoint(tokenVectorMatrix.row(i), label = token))
-        }
-    }
-
-    init {
-        if (tokens.size != tokenVectorMatrix.nrow()) {
-            throw IllegalArgumentException("token list must be same length as token vector matrix has rows")
         }
     }
 
@@ -84,8 +87,12 @@ class TokenEmbedding(
         return treeMap.findClosestPoint(DataPoint(key))?.label!!
     }
 
+    override fun toString(): String {
+        return tokens.mapIndexed{ i, t -> "$t -> ${tokenVectorMatrix.row(i).contentToString()}"  }.joinToString("\n")
+    }
+
     /**
-     * Creates a table model object for an embedding.  Column headings are the same as row headings for one-hot and
+     * Creates a table model object for an embedding. Column headings are the same as row headings for one-hot and
      * default co-occurrence matrices.
      */
     fun createTableModel(): BasicDataFrame {

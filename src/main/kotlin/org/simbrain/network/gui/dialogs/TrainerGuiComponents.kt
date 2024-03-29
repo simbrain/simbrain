@@ -154,7 +154,7 @@ class ErrorTimeSeries(trainer: SupervisedTrainer<*>) : JPanel() {
 /**
  * Default config for a matrix editor.
  */
-class MatrixEditor(matrix: Matrix) : SimbrainTablePanel(
+class MatrixEditor(matrix: Matrix, rowNames: List<String>? = null, columnNames: List<String>? = null) : SimbrainTablePanel(
     MatrixDataFrame(matrix), false
 ) {
     init {
@@ -164,6 +164,12 @@ class MatrixEditor(matrix: Matrix) : SimbrainTablePanel(
         addAction(table.showBoxPlotAction)
         addAction(table.showHistogramAction)
         preferredSize = Dimension(400, 250)
+        if (columnNames != null) {
+            model.columnNames = columnNames
+        }
+        if (rowNames != null) {
+            model.rowNames = rowNames
+        }
     }
 }
 

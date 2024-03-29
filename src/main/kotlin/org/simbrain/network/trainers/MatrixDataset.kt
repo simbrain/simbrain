@@ -4,7 +4,14 @@ import org.simbrain.util.shiftRight
 import smile.math.matrix.Matrix
 import kotlin.math.min
 
-class MatrixDataset(val inputs: Matrix, val targets: Matrix) {
+class MatrixDataset(
+    val inputs: Matrix,
+    val targets: Matrix,
+    val inputRowNames: List<String>? = null,
+    val targetRowNames: List<String>? = null,
+    val inputColumnNames: List<String>? = null,
+    val targetColumnNames: List<String>? = null
+) {
 
     init {
         if (inputs.nrow() != targets.nrow()) {

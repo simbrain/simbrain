@@ -40,7 +40,7 @@ open class SimbrainTablePanel @JvmOverloads constructor(
 
     val scrollPane = DataViewerScrollPane(table, useHeaders)
 
-    var model:SimbrainDataFrame
+    var model: SimbrainDataFrame
         get() = table.model
         set(value) {
             // TODO: Allow for structure changes
@@ -85,6 +85,9 @@ open class SimbrainTablePanel @JvmOverloads constructor(
 
         model.events.currentRowChanged.on(Dispatchers.Swing) {
             scrollToVisible(table.selectedRow)
+        }
+        model.events.rowNameChanged.on(Dispatchers.Swing) {
+            scrollPane.rowNames = model.getAllRowNames()
         }
 
         // Putting the toolbar in the top part of a border layout to avoid problems with horizontal scrollbars in the
@@ -205,6 +208,12 @@ class DataViewerScrollPane(val table: JTable, useHeaders: Boolean = true): JScro
             table.autoResizeMode = JTable.AUTO_RESIZE_OFF
         }
     }
+
+    var rowNames
+        get() = rowTable.rowNames
+        set(value) {
+            rowTable.rowNames = value
+        }
 
 }
 

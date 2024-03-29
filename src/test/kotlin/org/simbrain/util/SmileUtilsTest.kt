@@ -59,7 +59,8 @@ class SmileUtilsTest {
 
     @Test
     fun shiftUpAndPadEndWithZero() {
-        assertArrayEquals(doubleArrayOf(4.0, 7.0, 0.0), testMatrix.shiftUpAndPadEndWithZero().col(0) )
+        assertArrayEquals(doubleArrayOf(4.0, 5.0, 6.0), testMatrix.shiftUpAndPadEndWithZero().row(0))
+        assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0), testMatrix.shiftUpAndPadEndWithZero().row(testMatrix.nrow() - 1))
     }
 
     @Test

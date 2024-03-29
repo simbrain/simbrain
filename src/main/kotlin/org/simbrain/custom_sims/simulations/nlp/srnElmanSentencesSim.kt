@@ -49,15 +49,25 @@ val srnElmanSentences = newSim {
         point(0,0))
     network.addNetworkModel(srn)
 
-    val trainingInputs = makeElmanVector(numTrainingSentences)
+    val trainingInputsTokens = makeElmanVector(numTrainingSentences)
         .tokenizeWordsFromString()
+
+    val trainingInputs = trainingInputsTokens
         .map {
             tokenEmbedding.get(it)
         }.toTypedArray().toMatrix()
 
+    val trainingTargetTokens = trainingInputsTokens.drop(1)
     val trainingTarget = trainingInputs.shiftUpAndPadEndWithZero()
 
-    srn.trainingSet = MatrixDataset(trainingInputs, trainingTarget)
+    srn.trainingSet = MatrixDataset(
+        trainingInputs,
+        trainingTarget,
+        inputRowNames = trainingInputsTokens,
+        inputColumnNames = textWorldInputs.world.tokenEmbedding.tokens,
+        targetRowNames = trainingTargetTokens,
+        targetColumnNames = textWorldInputs.world.tokenEmbedding.tokens
+    )
     srn.trainer.learningRate = learningRate
     srn.trainer.lossFunction = SupervisedTrainer.LossFunction.RootMeanSquaredError()
 

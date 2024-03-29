@@ -166,7 +166,7 @@ fun Matrix.setCol(colIndex: Int, value: Double) {
 
 fun Matrix.shiftUpAndPadEndWithZero(): Matrix {
     val shifted = this.shiftUp()
-    shifted.setRow(ncol() - 1, 0.0)
+    shifted.setRow(nrow() - 1, 0.0)
     return shifted
 }
 

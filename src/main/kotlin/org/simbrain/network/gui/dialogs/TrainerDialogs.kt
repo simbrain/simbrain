@@ -43,7 +43,7 @@ fun <SN> SN.getSupervisedTrainingDialog(): StandardDialog where SN: SupervisedNe
         val runControls = JPanel()
         runControls.layout = MigLayout("gap 0px 0px, ins 0")
         val trainerControls = TrainerControls(trainer as SupervisedTrainer<SN>, this@getSupervisedTrainingDialog, this@NetworkPanel)
-        val inputs = MatrixEditor(trainingSet.inputs)
+        val inputs = MatrixEditor(trainingSet.inputs, trainingSet.inputRowNames, trainingSet.inputColumnNames)
         inputs.toolbar.addSeparator()
         inputs.toolbar.add(
             inputs.table.createApplyAction("Apply Inputs") { selectedRow ->
@@ -60,12 +60,16 @@ fun <SN> SN.getSupervisedTrainingDialog(): StandardDialog where SN: SupervisedNe
                 this@SN.update()
             }
         })
-        val targets = MatrixEditor(trainingSet.targets)
+        val targets = MatrixEditor(trainingSet.targets, trainingSet.targetRowNames, trainingSet.targetColumnNames)
         val addRemoveRows = AddRemoveRows(inputs.table, targets.table)
         trainer.events.beginTraining.on {
             trainingSet = MatrixDataset(
                 (inputs.table.model as MatrixDataFrame).data,
-                (targets.table.model as MatrixDataFrame).data
+                (targets.table.model as MatrixDataFrame).data,
+                trainingSet.inputRowNames,
+                trainingSet.targetRowNames,
+                trainingSet.inputColumnNames,
+                trainingSet.targetColumnNames
             )
         }
         runControls.add(JSeparator(), "span, growx, wrap")
@@ -83,7 +87,11 @@ fun <SN> SN.getSupervisedTrainingDialog(): StandardDialog where SN: SupervisedNe
             trainerProps.commitChanges()
             trainingSet = MatrixDataset(
                 (inputs.table.model as MatrixDataFrame).data,
-                (targets.table.model as MatrixDataFrame).data
+                (targets.table.model as MatrixDataFrame).data,
+                trainingSet.inputRowNames,
+                trainingSet.targetRowNames,
+                trainingSet.inputColumnNames,
+                trainingSet.targetColumnNames
             )
         }
     }

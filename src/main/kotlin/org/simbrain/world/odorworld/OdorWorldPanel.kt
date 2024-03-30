@@ -272,7 +272,7 @@ class OdorWorldPanel(
 
             // Single layer update
             world.tileMap.events.layerImageChanged.on(
-                swingDispatcher
+                wait = true, dispatcher = swingDispatcher
             ) { oldImage: PImage?, newImage: PImage? ->
                 val index = canvas.layer.indexOfChild(oldImage)
                 canvas.layer.removeChild(oldImage)

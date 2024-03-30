@@ -240,7 +240,7 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
         n.events.locationChanged.on { events.locationChanged.fireAndForget() }
         // n.getEvents().onLocationChange(fireLocationChange); // TODO Reimplement when debounce is working
         n.events.deleted.on { neuronList.remove(it) }
-        n.events.activationChanged.on { _, _ ->
+        n.events.activationChanged.on(wait = true) { _, _ ->
             invalidateCachedActivations()
         }
         n.events.deleted.on { neuron ->

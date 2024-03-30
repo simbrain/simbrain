@@ -38,7 +38,7 @@ class NeuronCollection : AbstractNeuronCollection {
 
         neurons.forEach { n: Neuron ->
             n.events.locationChanged.on { events.locationChanged }
-            n.events.activationChanged.on { _, _ ->
+            n.events.activationChanged.on(wait = true) { _, _ ->
                 invalidateCachedActivations()
             }
             n.events.deleted.on(null, true, Consumer { toDelete: NetworkModel? ->

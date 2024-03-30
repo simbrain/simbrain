@@ -221,6 +221,9 @@ val evolveResourcePursuer = newSim {
         val phenotypeDeferred = CompletableDeferred<EvolvePursuerGenotype.Phenotype>()
 
         var calories = 400.0
+        var totalActivation = 0.0
+        var movement = 0.0
+        val baseMetabolism = 10.0
 
         fun randomTileCoordinate() = with(odorWorld.tileMap) { random.nextGridCoordinate() }
         private val lakeSize
@@ -269,16 +272,18 @@ val evolveResourcePursuer = newSim {
             evolvedAgent.addDefaultEffectors()
             evolvedAgent.addSensor(centerLakeSensor)
 
+            fun computeCalories(): Double {
+               return max(0.0, calories - (totalActivation + movement + baseMetabolism) * (1.0 / iterationsPerRun))
+            }
             workspace.addUpdateAction("update energy") {
                 with(phenotypeDeferred.await()) {
                     val outputsActivations =
                         outputNeurons.activations.sumOf { 1.2.pow(if (it < 0) it * -2 else it) - 1 }
                     val allActivations =
                         (inputNeurons.neuronList + hiddenNeurons.neuronList).activations.sumOf { abs(it) } * 2
-                    val movementPenalty = abs(evolvedAgent.speed * 3) + abs(evolvedAgent.dtheta * 2)
-                    val activationPenalty = outputsActivations + allActivations
-                    calories = max(0.0, calories - (activationPenalty + movementPenalty) * (1.0 / iterationsPerRun))
-                    // println("movement penalty: $movementPenalty, activation penalty: $activationPenalty, calories: $calories")
+                    movement = abs(evolvedAgent.speed * 3) + abs(evolvedAgent.dtheta * 2)
+                    totalActivation = outputsActivations + allActivations
+                    calories = computeCalories()
                     thirstNeuron.activation = 10.0 / iterationsPerRun + thirstNeuron.activation
                 }
             }
@@ -361,12 +366,19 @@ val evolveResourcePursuer = newSim {
                         hiddenNeurons.location = point(0, 60)
                         outputNeurons.location = point(0, -25)
                     }
-                    val energyText = NetworkTextObject("Energy: ${calories.format(2)}")
-                    networkComponent.network.addNetworkModels(energyText)
+                    fun energyText():String =
+                        """
+                            Calories: ${calories.format(2)}
+                            Activation: ${totalActivation.format(2)}
+                            Movement: ${movement.format(2)}
+                        """.trimIndent()
+
+                    val energyTextObject = NetworkTextObject(energyText())
+                    networkComponent.network.addNetworkModels(energyTextObject)
                     workspace.addUpdateAction("update energy text") {
-                        energyText.text = "Energy: ${calories.format(2)}"
+                        energyTextObject.text = energyText()
                     }
-                    energyText.location = point(-160, -20)
+                    energyTextObject.location = point(-160, -20)
                     withGui {
                         place(networkComponent, 5, 375, 340, 430)
                         place(odorWorldComponent, 340, 10, 800, 900)

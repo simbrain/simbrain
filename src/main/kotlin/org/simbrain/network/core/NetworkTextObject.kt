@@ -26,7 +26,7 @@ import java.awt.geom.Point2D
 /**
  * **NetworkTextObject** is a string of text in a neural network, typically
  * used to label elements of a neural network simulation. Contains basic text
- * properties as well.
+ * properties as well. Multiple lines of text can be displayed.
  */
 open class NetworkTextObject : LocatableModel {
     /**

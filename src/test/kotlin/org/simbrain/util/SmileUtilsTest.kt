@@ -15,6 +15,13 @@ class SmileUtilsTest {
         doubleArrayOf(7.0, 8.0, 9.0)
     ))
 
+    val nonSquareMatrix = Matrix.of(arrayOf(
+        doubleArrayOf(1.0, 2.0, 3.0),
+        doubleArrayOf(4.0, 5.0, 6.0),
+        doubleArrayOf(7.0, 8.0, 9.0),
+        doubleArrayOf(10.0, 11.0, 12.0)
+    ))
+
     @Test
     fun `test validate shape`() {
         val a = Matrix(1, 2)
@@ -28,9 +35,10 @@ class SmileUtilsTest {
 
     @Test
     fun `test row matrix transposed`() {
-        val rmt = testMatrix.rowVectorTransposed(1)
+        val rmt = nonSquareMatrix.rowVectorTransposed(0)
         assertEquals(3, rmt.nrow())
         assertEquals(1, rmt.ncol())
+        assertArrayEquals(doubleArrayOf(1.0, 2.0, 3.0), rmt.toDoubleArray())
     }
 
     @Test
@@ -59,8 +67,8 @@ class SmileUtilsTest {
 
     @Test
     fun shiftUpAndPadEndWithZero() {
-        assertArrayEquals(doubleArrayOf(4.0, 5.0, 6.0), testMatrix.shiftUpAndPadEndWithZero().row(0))
-        assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0), testMatrix.shiftUpAndPadEndWithZero().row(testMatrix.nrow() - 1))
+        assertArrayEquals(doubleArrayOf(4.0, 5.0, 6.0), nonSquareMatrix.shiftUpAndPadEndWithZero().row(0))
+        assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0), nonSquareMatrix.shiftUpAndPadEndWithZero().row(nonSquareMatrix.nrow() - 1))
     }
 
     @Test
@@ -109,7 +117,6 @@ class SmileUtilsTest {
         val d = -2.0 * c
         assertArrayEquals(doubleArrayOf(-2.0, -4.0), d.row(0))
         assertArrayEquals(doubleArrayOf(-6.0, -8.0), d.row(1))
-
     }
 
 }

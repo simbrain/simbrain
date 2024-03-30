@@ -62,7 +62,7 @@ infix fun Matrix.mse(other: Matrix) = (this.toDoubleArray() mse other.toDoubleAr
 infix fun Matrix.rmse(other: Matrix) = sqrt(this mse other)
 
 /**
- * Returns the matrix at a row, transposed.
+ * Returns a specified row of a matrix, transposed so that it is a column vector.
  * A common requirement because Simbrain generally assumes column vectors.
  * A minor performance improvement, but originates in an effort to work around a bug with the MKL implementation.
  */

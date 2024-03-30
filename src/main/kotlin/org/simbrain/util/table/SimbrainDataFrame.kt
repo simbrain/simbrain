@@ -199,6 +199,13 @@ abstract class SimbrainDataFrame : AbstractTableModel() {
             .toTypedArray()
     }
 
+    override fun toString(): String {
+        val opts = ImportExportOptions().apply {
+            includeColumnNames = true
+            includeRowNames = true
+        }
+        return toStringLists(opts).joinToString("\n") { it.joinToString(" ") }
+    }
     /**
      * Returns a list of the provided type.
      * If columns do not have consistent types of class cast exception will be thrown.
@@ -413,4 +420,5 @@ fun SimbrainDataFrame.toStringLists(options: ImportExportOptions) = buildList {
             addAll(getRow<String>(i))
         }.also { add(it) }
     }
+
 }

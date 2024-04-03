@@ -31,7 +31,6 @@ import java.awt.event.ComponentEvent
 import javax.swing.JMenu
 import javax.swing.JMenuBar
 import javax.swing.JMenuItem
-import javax.swing.JToolBar
 
 /**
  * **ReaderComponentDesktopGui** is the gui view for the reader world.
@@ -86,10 +85,7 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
      */
     init {
         world = component.world
-        val openSaveToolBar = JToolBar()
-        openSaveToolBar.add(SimbrainDesktop.actionManager.createImportAction(this))
-        openSaveToolBar.add(SimbrainDesktop.actionManager.createExportAction(this))
-        panel = TextWorldPanel.createReaderPanel(world, openSaveToolBar)
+        panel = TextWorldPanel.createReaderPanel(world)
         this.preferredSize = Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT)
         addMenuBar()
         add(panel)
@@ -150,6 +146,11 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
         createEditMenu()
         onCouplingAttributesChanged { createEditMenu() }
         menuBar.add(edit)
+
+        // View Menu
+        val viewMenu = JMenu("View")
+        viewMenu.add(world.viewTokenEmbedding)
+        menuBar.add(viewMenu)
 
         // Help Menu
         menuBar.add(help)

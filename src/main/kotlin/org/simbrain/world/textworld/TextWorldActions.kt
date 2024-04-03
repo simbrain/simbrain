@@ -2,7 +2,6 @@ package org.simbrain.world.textworld
 
 import org.simbrain.util.*
 import org.simbrain.util.table.SimbrainTablePanel
-import org.simbrain.util.table.exportCsv
 import org.simbrain.world.textworld.gui.TextWorldDesktopComponent
 import org.simbrain.world.textworld.gui.showComparisonDialog
 import java.util.*
@@ -32,15 +31,14 @@ val TextWorld.extractEmbedding get() = createAction(
  */
 val TextWorld.viewTokenEmbedding
     get() = createAction(
-        name = "View embedding...",
+        name = "View / edit token embedding...",
         description = "View token embedding (mapping from tokens to vectors)...",
         iconPath = "menu_icons/Table.png"
     ) {
 
-        val viewer = SimbrainTablePanel(tokenEmbedding.createTableModel())
-        viewer.addAction(viewer.table.exportCsv())
+        val viewer = SimbrainTablePanel(tokenEmbedding.createTableModel(), useDefaultToolbarAndMenu = false)
         viewer.displayInDialog().apply {
-            title = "Embedding has ${tokenEmbedding.size} unique entries"
+            title = "Token Embedding Viewer / Editor"
         }
         // TODO: Use this when reintroducing editable embeddings
         // events.tokenVectorMapChanged.on {

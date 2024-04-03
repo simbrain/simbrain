@@ -69,20 +69,13 @@ class TextWorldPanel private constructor(
      */
     private val charButton = JRadioButton("Character")
 
-    /**
-     * Toolbar for opening and closing the world. Must be defined at component
-     * level.
-     */
-    private var openCloseToolBar: JToolBar? = null
 
     /**
      * Initialize the panel with an open / close toolbar.
      *
      * @param theWorld the reader world to display
-     * @param toolbar  the openClose toolbar.
      */
     init {
-        openCloseToolBar = toolbar
         this.layout = BorderLayout()
         border = BorderFactory.createEmptyBorder(0, 10, 0, 10)
         textArea.lineWrap = true
@@ -91,19 +84,6 @@ class TextWorldPanel private constructor(
             JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER)
         add(inputScrollPane)
 
-        // Add toolbars
-        val topToolbarPanel = JPanel()
-        topToolbarPanel.layout = FlowLayout(FlowLayout.LEFT)
-        // if (openCloseToolBar != null) {
-        //     topToolbarPanel.add(openCloseToolBar);
-        // }
-        val tokenEmbeddingToolbar = JToolBar()
-        tokenEmbeddingToolbar.add(world.viewTokenEmbedding)
-        tokenEmbeddingToolbar.add(world.textWorldPrefs)
-        tokenEmbeddingToolbar.add(world.extractEmbedding)
-        tokenEmbeddingToolbar.add(world.calculateCosineSimilarity)
-        topToolbarPanel.add(tokenEmbeddingToolbar)
-        add(topToolbarPanel, BorderLayout.NORTH)
         val bottomToolbarPanel = JPanel()
         bottomToolbarPanel.layout = FlowLayout(FlowLayout.LEFT)
         bottomToolbarPanel.add(toolbarModeSelect)

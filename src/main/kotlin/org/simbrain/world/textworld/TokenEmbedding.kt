@@ -15,12 +15,12 @@ import smile.math.matrix.Matrix
  *
  * Allows for reverse mappings from vectors back to tokens using a [KDTree].
  *
- * All tokens are converted lowercase.
+ * All tokens are converted to lower case.
  *
  * Cannot currently be mutated after creation.
  */
 class TokenEmbedding(
-    val tokens: List<String>,
+    rawTokenList: List<String>,
     /**
      * Matrix whose rows correspond to vector representations of corresponding tokens.
      */
@@ -36,12 +36,14 @@ class TokenEmbedding(
     var trainingDocument: String? = null
 ) {
 
+    val tokens = rawTokenList.map { it.lowercase() }
+
     /**
      * Associates tokens with row indices of tokenVectorMatrix.
      * All tokens are converted to lower case. This map is reused in creating the tokenVectorMatrix
      * so all tokens are lower case.
      */
-    var tokensMap: Map<String, Int> = tokens.mapIndexed{i, t -> t.lowercase() to i}.toMap()
+    var tokensMap: Map<String, Int> = tokens.mapIndexed { i, t -> t to i }.toMap()
 
     /**
      * Number of entries in the embedding, i.e. number of words that have associated embeddings.
@@ -54,7 +56,7 @@ class TokenEmbedding(
     val dimension = tokenVectorMatrix.ncol()
 
     init {
-        if (tokens.size != tokenVectorMatrix.nrow()) {
+        if (rawTokenList.size != tokenVectorMatrix.nrow()) {
             throw IllegalArgumentException("token list must be same length as token vector matrix has rows")
         }
     }

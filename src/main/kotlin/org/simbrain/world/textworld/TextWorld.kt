@@ -51,7 +51,7 @@ class TextWorld : AttributeContainer, EditableObject {
      * Associates string tokens with arrays of doubles and vice-versa
      */
     var tokenEmbedding = TokenEmbedding(
-        tokens = listOf("Dog", "Cat", "Hello", "how", "are", "you"),
+        rawTokenList = listOf("Dog", "Cat", "Hello", "how", "are", "you"),
         tokenVectorMatrix = Matrix.eye(6)
     )
         set(value) {
@@ -173,8 +173,7 @@ class TextWorld : AttributeContainer, EditableObject {
                 // Zero vector if no current item
                 DoubleArray(tokenEmbedding.dimension)
             } else {
-                // TODO: Not sure if this is the best place to call lowercase()
-                tokenEmbedding.get(it.text.lowercase())
+                tokenEmbedding.get(it.text)
             }
         }
 

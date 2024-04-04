@@ -1,7 +1,6 @@
 package org.simbrain.util
 
 import org.simbrain.util.Utils.FS
-import org.simbrain.world.textworld.EmbeddingType
 import org.simbrain.world.textworld.TokenEmbedding
 import smile.math.matrix.Matrix
 import smile.nlp.tokenizer.SimpleSentenceSplitter
@@ -182,7 +181,7 @@ fun generateCooccurrenceMatrix(
         cocMatrix = manualPPMI(cocMatrix, true)
     }
 
-    return TokenEmbedding(tokens, cocMatrix.replaceNaN(0.0), EmbeddingType.COC)
+    return TokenEmbedding(tokens, cocMatrix.replaceNaN(0.0))
 }
 
 /**

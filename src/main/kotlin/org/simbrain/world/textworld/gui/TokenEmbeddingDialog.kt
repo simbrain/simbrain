@@ -49,7 +49,6 @@ class TokenEmbeddingDialog(val initialTokenEmbedding: TokenEmbedding, updateToke
                 TokenEmbedding(
                     tablePanel.table.model.rowNames as List<String>,
                     tablePanel.table.model.get2DDoubleArray().toMatrix(),
-                    initialTokenEmbedding.embeddingType,
                     trainingDocument
                 )
             )

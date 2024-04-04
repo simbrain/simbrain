@@ -18,25 +18,18 @@ import smile.math.matrix.Matrix
  * All tokens are converted to lower case.
  *
  * Cannot currently be mutated after creation.
+ *
+ * @param inputTokenList tokens prior to conversion to lower case
+ * @param tokenVectorMatrix Matrix whose rows correspond to vector representations of corresponding tokens.
+ * @param trainingDocument Document, if any, used to train this embedding.
  */
 class TokenEmbedding(
-    rawTokenList: List<String>,
-    /**
-     * Matrix whose rows correspond to vector representations of corresponding tokens.
-     */
+    inputTokenList: List<String>,
     var tokenVectorMatrix: Matrix,
-    /**
-     * This is (currently) only used for generating a data frame for viewing the embedding (e.g. how row and column
-     * headings are displayed).
-     */
-    val embeddingType: EmbeddingType = EmbeddingType.CUSTOM,
-    /**
-     * Document, if any, used to train this embedding.
-     */
     var trainingDocument: String? = null
 ) {
 
-    val tokens = rawTokenList.map { it.lowercase() }
+    val tokens = inputTokenList.map { it.lowercase() }
 
     /**
      * Associates tokens with row indices of tokenVectorMatrix.
@@ -56,7 +49,7 @@ class TokenEmbedding(
     val dimension = tokenVectorMatrix.ncol()
 
     init {
-        if (rawTokenList.size != tokenVectorMatrix.nrow()) {
+        if (inputTokenList.size != tokenVectorMatrix.nrow()) {
             throw IllegalArgumentException("token list must be same length as token vector matrix has rows")
         }
     }
@@ -101,11 +94,11 @@ class TokenEmbedding(
      * Creates a table model object for an embedding. Column headings are the same as row headings for one-hot and
      * default co-occurrence matrices.
      */
-    fun createTableModel(): BasicDataFrame {
+    fun createTableModel(useColumnNames: Boolean = false): BasicDataFrame {
         val table = createFromDoubleArray(tokenVectorMatrix.replaceNaN(0.0).toArray())
         table.isMutable = false
         table.rowNames = tokensMap.keys.toList()
-        if (embeddingType == EmbeddingType.COC || embeddingType == EmbeddingType.ONE_HOT) {
+        if (useColumnNames) {
             table.columnNames = tokensMap.keys.toList()
         }
         return table
@@ -137,7 +130,7 @@ class TokenEmbeddingBuilder(): EditableObject {
     fun build(docString: String) = when (embeddingType) {
         EmbeddingType.ONE_HOT -> {
             val tokens = docString.tokenizeWordsFromString().uniqueTokensFromArray()
-            TokenEmbedding(tokens, Matrix.eye(tokens.size), EmbeddingType.ONE_HOT)
+            TokenEmbedding(tokens, Matrix.eye(tokens.size))
         }
         EmbeddingType.COC -> {
             generateCooccurrenceMatrix(docString, windowSize, bidirectional, usePPMI, removeStopWords)

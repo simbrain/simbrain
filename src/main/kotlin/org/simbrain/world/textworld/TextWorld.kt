@@ -51,7 +51,7 @@ class TextWorld : AttributeContainer, EditableObject {
      * Associates string tokens with arrays of doubles and vice-versa
      */
     var tokenEmbedding = TokenEmbedding(
-        rawTokenList = listOf("Dog", "Cat", "Hello", "how", "are", "you"),
+        inputTokenList = listOf("Dog", "Cat", "Hello", "how", "are", "you"),
         tokenVectorMatrix = Matrix.eye(6)
     )
         set(value) {

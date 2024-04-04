@@ -29,7 +29,11 @@ class TokenEmbedding(
      * This is (currently) only used for generating a data frame for viewing the embedding (e.g. how row and column
      * headings are displayed).
      */
-    val embeddingType: EmbeddingType = EmbeddingType.CUSTOM
+    val embeddingType: EmbeddingType = EmbeddingType.CUSTOM,
+    /**
+     * Document, if any, used to train this embedding.
+     */
+    var trainingDocument: String? = null
 ) {
 
     /**

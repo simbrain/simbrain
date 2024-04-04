@@ -7,6 +7,7 @@ import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import org.simbrain.plot.projection.ProjectionComponent
 import org.simbrain.util.*
+import org.simbrain.util.projection.DataPoint
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.objectWrapper
 import org.simbrain.util.widgets.MatrixPlot
@@ -18,6 +19,7 @@ import smile.plot.swing.PlotGrid
 import java.awt.BorderLayout
 import java.awt.Dimension
 import javax.swing.*
+import kotlin.reflect.KClass
 
 /**
  * Default directory where tables are stored.
@@ -157,16 +159,19 @@ val SimbrainJTable.showScatterPlotAction
         }
     }
 
-val SimbrainJTable.openProjectionAction
-    get() = createAction(
+/**
+ * @param useRowLabels If true, the row labels for this dataset are shown as labels in the corresponding points of the projection plot.
+ */
+fun SimbrainJTable.createOpenProjectionAction(useRowLabels: Boolean = false) = createAction(
         iconPath = "menu_icons/ProjectionIcon.png",
         description = "Open Projection"
     ) {
         withContext(Dispatchers.Default) {
             val projectionComponent = ProjectionComponent("$name Projection")
             projectionComponent.projector.useHotColor = false
+            projectionComponent.projector.showLabels = useRowLabels
             SimbrainDesktop.workspace.addWorkspaceComponent(projectionComponent)
-            val points = model.get2DDoubleArray()
+            val points = model.let { it.rowNames zip it.get2DDoubleArray() }.map { (name, data) -> DataPoint(data, label = name) }
             points.forEach { projectionComponent.addPoint(it) }
         }
     }
@@ -204,12 +209,15 @@ val SimbrainJTable.importArff
 val SimbrainJTable.importCsv
     get() = importCSVAction()
 
-fun SimbrainJTable.importCSVAction(fixedColumns: Boolean = true, skipImportOptions: Boolean = false) = createAction(
+/**
+ * @dataTypes The data types to use for all cells in the table. Defaults to String. TODO: provide support for per-column data types.
+ */
+fun SimbrainJTable.importCSVAction(fixedColumns: Boolean = true, skipImportOptions: Boolean = false, defaultOptions: ImportExportOptions = ImportExportOptions(), dataType: KClass<*>? = null) = createAction(
     name = "Import csv...",
     description = "Import comma separated values file",
     iconPath = "menu_icons/import.png"
 ) {
-    fun import(options: ImportExportOptions = ImportExportOptions()) {
+    fun import(options: ImportExportOptions = defaultOptions) {
         val chooser = SFileChooser(TABLE_DIRECTORY, "", "csv")
         val csvFile = chooser.showOpenDialog()
         fun checkColumns(numColumns: Int): Boolean {
@@ -229,7 +237,7 @@ fun SimbrainJTable.importCSVAction(fixedColumns: Boolean = true, skipImportOptio
             model.let {
                 if (it is BasicDataFrame) {
                     val rawData = Utils.getStringMatrix(csvFile)
-                    val importedData = createFrom2DArray(rawData, options)
+                    val importedData = createFrom2DArray(rawData, options, dataType)
                     if (!fixedColumns || checkColumns(importedData.columnCount)) {
                         it.data = importedData.data
                         it.columnNames = importedData.columnNames
@@ -256,12 +264,12 @@ fun SimbrainJTable.importCSVAction(fixedColumns: Boolean = true, skipImportOptio
     }
 }
 
-fun SimbrainJTable.exportCsv(fileName: String = "", skipExportOptions: Boolean = false) = createAction(
+fun SimbrainJTable.exportCsv(fileName: String = "", skipExportOptions: Boolean = false, defaultOptions: ImportExportOptions = ImportExportOptions()) = createAction(
     name = "Export csv...",
     description = "Export comma separated values file",
     iconPath = "menu_icons/export.png"
 ) {
-    fun export(options: ImportExportOptions = ImportExportOptions()) {
+    fun export(options: ImportExportOptions = defaultOptions) {
         val chooser = SFileChooser(TABLE_DIRECTORY, "", "csv")
         val csvFile = chooser.showSaveDialog(fileName)
         if (csvFile != null) {

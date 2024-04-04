@@ -140,7 +140,7 @@ open class SimbrainTablePanel @JvmOverloads constructor(
         if (model is SmileDataFrame) {
             addAction(table.showScatterPlotAction)
         }
-        addAction(table.openProjectionAction)
+        addAction(table.createOpenProjectionAction())
         addSeparator()
         addAction(table.showHistogramAction)
         addAction(table.showBoxPlotAction)

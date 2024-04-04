@@ -3,6 +3,7 @@ package org.simbrain.util.table
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
 import smile.math.matrix.Matrix
+import kotlin.reflect.KClass
 
 /**
  * Mutable table whose columns have arbitrary types.
@@ -165,7 +166,11 @@ private fun inferColumns(names: List<String?>, data: MutableList<MutableList<Any
         createColumn(names.getOrNull(i) ?: "Column ${i + 1}", data.asSequence().map { it[i] }.firstNotNullOfOrNull { it })
     }.toMutableList()
 
-fun createFrom2DArray(data: Array<out Array<out Any?>>, options: ImportExportOptions = ImportExportOptions()): BasicDataFrame {
+fun createFrom2DArray(
+    data: Array<out Array<out Any?>>,
+    options: ImportExportOptions = ImportExportOptions(),
+    dataType: KClass<*>? = null
+): BasicDataFrame {
 
     val rawData = data.map { it.toMutableList() }.toMutableList()
 
@@ -191,7 +196,14 @@ fun createFrom2DArray(data: Array<out Array<out Any?>>, options: ImportExportOpt
 
     val mainData = rawData.dropColumnHeaders().dropRowHeaders()
 
-    return BasicDataFrame(mainData.map { it.toMutableList() }.toMutableList()).apply {
+    val valueParser = when (dataType) {
+        Double::class -> { it: Any? -> (it as? String)?.toDouble() ?: it }
+        Int::class -> { it: Any? -> (it as? String)?.toInt() ?: it }
+        String::class -> { it: Any? -> it.toString() }
+        else -> { it: Any? -> it }
+    }
+
+    return BasicDataFrame(mainData.map { it.map { cellValue -> valueParser(cellValue) }.toMutableList() }.toMutableList()).apply {
         columnNames?.let { this.columnNames = it.toMutableList() }
         rowNames?.let { this.rowNames = it.toMutableList() }
     }
@@ -230,10 +242,9 @@ fun createBasicDataFrameFromColumn(data: Array<String>): BasicDataFrame {
 }
 
 
-class ImportExportOptions : EditableObject {
+class ImportExportOptions(
     @UserParameter(label = "Include column names", description = "Include column names in the exported file")
-    var includeColumnNames = false
-
+    var includeColumnNames: Boolean = false,
     @UserParameter(label = "Include row names", description = "Include row names in the exported file")
-    var includeRowNames = false
-}
+    var includeRowNames: Boolean = false
+) : EditableObject

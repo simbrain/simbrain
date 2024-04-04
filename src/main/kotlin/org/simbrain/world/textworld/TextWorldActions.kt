@@ -1,8 +1,8 @@
 package org.simbrain.world.textworld
 
 import org.simbrain.util.*
-import org.simbrain.util.table.SimbrainTablePanel
 import org.simbrain.world.textworld.gui.TextWorldDesktopComponent
+import org.simbrain.world.textworld.gui.TokenEmbeddingDialog
 import org.simbrain.world.textworld.gui.showComparisonDialog
 import java.util.*
 
@@ -26,6 +26,23 @@ val TextWorld.extractEmbedding get() = createAction(
     }
 }
 
+fun createTrainEmbeddingAction(block: (TokenEmbedding) -> Unit) = createAction(
+    name = "Train embedding...",
+    description = "Train embedding on text file...",
+    iconPath = "menu_icons/import.png"
+) {
+    val chooser = SFileChooser(tokenEmbeddingDirectory, "text file", "txt")
+    val trainingDocument = chooser.showOpenDialog()
+    if (trainingDocument != null) {
+        val tokenEmbeddingBuilder = TokenEmbeddingBuilder()
+        tokenEmbeddingBuilder.createEditorDialog {
+            val tokenEmbedding = tokenEmbeddingBuilder.build(Utils.readFileContents(trainingDocument))
+            tokenEmbedding.trainingDocument = Utils.readFileContents(trainingDocument)
+            block(tokenEmbedding)
+        }.display()
+    }
+}
+
 /**
  * Action for viewing and editing the embedding.
  */
@@ -35,15 +52,7 @@ val TextWorld.viewTokenEmbedding
         description = "View token embedding (mapping from tokens to vectors)...",
         iconPath = "menu_icons/Table.png"
     ) {
-
-        val viewer = SimbrainTablePanel(tokenEmbedding.createTableModel(), useDefaultToolbarAndMenu = false)
-        viewer.displayInDialog().apply {
-            title = "Token Embedding Viewer / Editor"
-        }
-        // TODO: Use this when reintroducing editable embeddings
-        // events.tokenVectorMapChanged.on {
-        //     viewer.model = tokenVectorMap.createTableModel(embeddingType)
-        // }
+        TokenEmbeddingDialog(tokenEmbedding) { tokenEmbedding = it }.display()
     }
 
 /**

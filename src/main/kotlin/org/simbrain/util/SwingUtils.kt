@@ -247,6 +247,20 @@ fun showInputDialog(message: String): String {
     return JOptionPane.showInputDialog(dialog, message)
 }
 
+fun showMessageDialog(message: String, title: String, rows: Int = 10, columns: Int = 50) {
+    val textArea = JTextArea(message).apply {
+        isEditable = false
+        this.rows = rows
+        this.columns = columns
+    }
+    val scrollPane = JScrollPane(textArea)
+    SwingUtilities.invokeLater {
+        val dialog = JDialog()
+        dialog.isAlwaysOnTop = true
+        JOptionPane.showMessageDialog(dialog, scrollPane, title, JOptionPane.PLAIN_MESSAGE)
+    }
+}
+
 /**
  * Create a dialog that takes an input in a text field and returns it as a number.
  * Returns null if user cancels the input.

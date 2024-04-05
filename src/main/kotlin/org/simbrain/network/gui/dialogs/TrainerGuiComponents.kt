@@ -20,6 +20,7 @@ import org.simbrain.util.roundToString
 import org.simbrain.util.table.*
 import org.simbrain.util.widgets.ToggleButton
 import smile.math.matrix.Matrix
+import java.awt.Cursor
 import java.awt.Dimension
 import java.util.function.Supplier
 import javax.swing.JButton
@@ -79,9 +80,11 @@ class TrainerControls<SN>(trainer: SupervisedTrainer<SN>, supervisedNetwork: SN,
         runTools.add(ToggleButton(listOf(runAction, stopAction)).apply {
             setAction("Run")
             trainer.events.beginTraining.on {
+                this@TrainerControls.cursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR)
                 setAction("Stop")
             }
             trainer.events.endTraining.on {
+                this@TrainerControls.cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)
                 setAction("Run")
             }
         })

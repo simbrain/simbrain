@@ -21,6 +21,7 @@ import org.simbrain.util.table.createAdvanceRowAction
 import org.simbrain.util.table.createApplyAction
 import org.simbrain.util.table.createApplyAndAdvanceAction
 import org.simbrain.util.widgets.ToggleButton
+import java.awt.Cursor
 import javax.swing.*
 
 
@@ -99,7 +100,7 @@ fun <SN> SN.getSupervisedTrainingDialog(): StandardDialog where SN: SupervisedNe
 
 context(NetworkPanel)
 fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, trainAction: context(Network)() -> Unit = {}): StandardDialog {
-    return StandardDialog().apply {
+    return StandardDialog().apply dialog@ {
 
         title = "Train Network"
 
@@ -130,9 +131,11 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         runControls.add(ToggleButton(listOf(runAction, stopAction)).apply {
             setAction("Run")
             trainer.events.beginTraining.on {
+                this@dialog.cursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR)
                 setAction("Stop")
             }
             trainer.events.endTraining.on {
+                this@dialog.cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)
                 setAction("Run")
             }
         })

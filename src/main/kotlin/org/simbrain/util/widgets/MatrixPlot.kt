@@ -8,6 +8,8 @@ import org.simbrain.util.toSimbrainColor
 import java.awt.Color
 import java.awt.Dimension
 import java.awt.Graphics
+import java.awt.GraphicsEnvironment
+import java.awt.image.BufferedImage
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 import kotlin.math.abs
@@ -29,6 +31,8 @@ class MatrixPlot(private val labels: List<String>, private val data: Array<Doubl
 
     var properties = MatrixPlotProperties()
 
+    private var buffer: BufferedImage? = null
+
     init {
         adjustCellSize()
     }
@@ -40,9 +44,17 @@ class MatrixPlot(private val labels: List<String>, private val data: Array<Doubl
         preferredSize = Dimension(totalSize, totalSize)
     }
 
-    override fun paintComponent(g: Graphics) {
-        super.paintComponent(g)
-        adjustCellSize()  // Adjust cell size dynamically based on the frame's current size
+    private fun rebuildBuffer() {
+        // Adjust cell size and other calculations as needed before rebuilding the buffer
+        adjustCellSize()
+
+        val transform = GraphicsEnvironment.getLocalGraphicsEnvironment().defaultScreenDevice.defaultConfiguration.defaultTransform
+        val widthScaled = (width * transform.scaleX).toInt()
+        val heightScaled = (height * transform.scaleY).toInt()
+
+        buffer = BufferedImage(widthScaled, heightScaled, BufferedImage.TYPE_INT_ARGB)
+        val g = buffer!!.createGraphics()
+        g.transform = transform
 
         // Drawing the matrix cells
         for (i in labels.indices) {
@@ -68,7 +80,28 @@ class MatrixPlot(private val labels: List<String>, private val data: Array<Doubl
             g.drawString(labels[i], i * currentCellSize + 10 + currentCellSize, currentCellSize - 10)
             g.drawString(labels[i], 10, i * currentCellSize + 30 + currentCellSize)
         }
+
+        g.dispose() // Dispose of the graphics context to release resources
     }
+
+    private fun shouldRebuildBuffer(): Boolean {
+        val transform = GraphicsEnvironment.getLocalGraphicsEnvironment().defaultScreenDevice.defaultConfiguration.defaultTransform
+        val widthScaled = (width * transform.scaleX).toInt()
+        val heightScaled = (height * transform.scaleY).toInt()
+        return buffer == null ||
+                buffer!!.width != widthScaled ||
+                buffer!!.height != heightScaled // Add other conditions as needed
+    }
+
+    override fun paintComponent(g: Graphics) {
+        super.paintComponent(g)
+        if (buffer == null || shouldRebuildBuffer()) { // Check if the buffer needs to be rebuilt
+            rebuildBuffer()
+        }
+
+        g.drawImage(buffer, 0, 0, width, height, this)
+    }
+
 }
 
 class MatrixPlotProperties: EditableObject {
@@ -91,9 +124,14 @@ class MatrixPlotProperties: EditableObject {
 }
 
 fun main() {
-    val labels = listOf("1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
-    val data = Array(labels.size) { DoubleArray(10) { Random.nextDouble(-1.0, 1.0) } }
-    JScrollPane(MatrixPlot(labels, data)).apply { border = null }.displayInDialog()
+    val size = 50
+    val labels = List(size) { "$it" }
+    val data = Array(labels.size) { DoubleArray(size) { Random.nextDouble(-1.0, 1.0) } }
+    JScrollPane(MatrixPlot(labels, data)).apply {
+        border = null
+        verticalScrollBar.unitIncrement = 10
+        horizontalScrollBar.unitIncrement = 10
+    }.displayInDialog()
 }
 
 // fun main() {

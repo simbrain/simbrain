@@ -385,7 +385,15 @@ fun SimbrainJTable.createShowMatrixPlotAction() = createAction(
     })
 
     panel.add(toolbar, BorderLayout.NORTH)
-    panel.add(JScrollPane(matrixPlotPanel).apply { border = null }, BorderLayout.CENTER)
+    panel.add(
+        JScrollPane(matrixPlotPanel).apply {
+            border = null
+            verticalScrollBar.unitIncrement = 10
+            horizontalScrollBar.unitIncrement = 10
+            minimumSize = Dimension(400, 400)
+        },
+        BorderLayout.CENTER
+    )
 
     panel.displayInDialog()
 

@@ -7,4 +7,5 @@ import org.simbrain.util.Events
  */
 class NeuronCollectionEvents: LocationEvents() {
     val customInfoUpdated = NoArgEvent()
+    val fanInUpdated = NoArgEvent()
 }

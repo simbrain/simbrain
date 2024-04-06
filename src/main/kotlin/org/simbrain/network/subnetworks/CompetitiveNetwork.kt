@@ -65,6 +65,10 @@ class CompetitiveNetwork : Subnetwork {
         weights.synapses.forEach { it.lowerBound = 0.0 }
         randomize()
 
+        competitive.events.fanInUpdated.on {
+            weights.events.updated.fire()
+        }
+
         alignNetworkModels(inputLayer, competitive, Alignment.VERTICAL)
         offsetNeuronCollections(inputLayer, competitive, Direction.NORTH, 200.0)
     }

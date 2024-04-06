@@ -1,5 +1,7 @@
 package org.simbrain.network.gui
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.connections.Sparse
@@ -136,7 +138,7 @@ fun SynapseGroupNode.getDialog(): StandardDialog {
         connectionStrategyPanel.percentExcitatoryPanel.setPercentExcitatory(synapseGroup.synapses.percentExcitatory())
     }
 
-    val unregister = synapseGroup.events.updated.on {
+    val unregister = synapseGroup.events.updated.on(dispatcher = Dispatchers.Swing) {
         synapseAdjustmentPanel.fullUpdate()
     }
 

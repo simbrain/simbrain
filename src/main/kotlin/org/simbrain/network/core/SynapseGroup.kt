@@ -93,6 +93,7 @@ class SynapseGroup @JvmOverloads constructor(
     context(Network)
     override fun update() {
         this.synapses.forEach { it.update() }
+        events.updated.fireAndBlock()
     }
 
     fun size(): Int = this.synapses.size

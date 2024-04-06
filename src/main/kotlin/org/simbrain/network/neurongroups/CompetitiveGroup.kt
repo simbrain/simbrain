@@ -141,6 +141,7 @@ open class CompetitiveGroup @JvmOverloads constructor(
                 params.learningRate * synapse.target.activation * (synapse.source.activation - synapse.target.averageInput)
             synapse.strength = synapse.clip(synapse.strength + deltaw)
         }
+        events.fanInUpdated.fireAndBlock()
     }
 
     /**
@@ -163,6 +164,7 @@ open class CompetitiveGroup @JvmOverloads constructor(
             val deltaw = params.learningRate * (activation - synapse.strength)
             synapse.strength = synapse.clip(synapse.strength + deltaw)
         }
+        events.fanInUpdated.fireAndBlock()
     }
 
     /**
@@ -174,6 +176,7 @@ open class CompetitiveGroup @JvmOverloads constructor(
                 synapse.decay(params.synpaseDecayPercent)
             }
         }
+        events.fanInUpdated.fireAndBlock()
     }
 
     /**
@@ -192,6 +195,7 @@ open class CompetitiveGroup @JvmOverloads constructor(
             }
             incoming.strength = incoming.strength + params.leakyLearningRate * (activation - incoming.strength)
         }
+        events.fanInUpdated.fireAndBlock()
     }
 
     /**
@@ -204,6 +208,7 @@ open class CompetitiveGroup @JvmOverloads constructor(
                 s.strength /= normFactor
             }
         }
+        events.fanInUpdated.fireAndBlock()
     }
 
     /**
@@ -218,6 +223,7 @@ open class CompetitiveGroup @JvmOverloads constructor(
                 s.randomize()
             }
         }
+        events.fanInUpdated.fireAndBlock()
     }
 
     /**

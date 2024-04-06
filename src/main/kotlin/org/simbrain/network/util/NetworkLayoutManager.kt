@@ -55,7 +55,7 @@ fun alignNetworkModels(reference: LocatableModel, target: LocatableModel, alignm
 }
 
 /**
- * Group1 stays fixed. Group2 is moved with respect to group 1 and is
+ * Reference stays fixed. Target is moved with respect to reference and is
  * centered with respect to it in the relevant direction.
  *
  * Must be used after all the subgroups have been added.
@@ -82,25 +82,36 @@ fun offsetNeuronCollections(
 }
 
 /**
- * Same as above but specify height and width, which are assumed to be the same for both models.
+ * Reference stays fixed. Target is moved with respect to reference and is centered with respect to it in the relevant
+ * direction.
+ *
+ * Must be used after all the subgroups have been added.
+ *
+ * Gap defaults to the distance between the center of the reference and target objects.
+ * If it should be the gap between the borders of the objects heights or widths of reference and target objects must be supplied
+ *
+ * @param reference  the reference model
+ * @param target     the model to offset
+ * @param direction  String indication of absolute direction. Must be one of "North", "South", "East", or "West".
+ * @param gap        the amount by which to offset the second group
  */
 @JvmOverloads
 fun offsetNetworkModel(
-    reference: LocatableModel, target: LocatableModel, direction: Direction, amount: Double,
-    heightR: Double, widthR: Double, heightT: Double = heightR, widthT: Double = widthR
+    reference: LocatableModel, target: LocatableModel, direction: Direction, gap: Double,
+    refHeight: Double = 0.0, refWidth: Double = 0.0, tarHeight: Double = refHeight, tarWidth: Double = refWidth
 ) {
     val (refLeft, refTop, refRight, refBottom) = reference.run {
         listOf(
-            locationX - widthR / 2,
-            locationY - heightR / 2,
-            locationX + widthR / 2,
-            locationY + heightR / 2
+            locationX - refWidth / 2,
+            locationY - refHeight / 2,
+            locationX + refWidth / 2,
+            locationY + refHeight / 2
         )
     }
     when (direction) {
-        Direction.NORTH -> target.locationY = refTop - amount - heightT / 2
-        Direction.SOUTH -> target.locationY = refBottom + amount + heightT / 2
-        Direction.EAST -> target.locationX = refRight + amount + widthT / 2
-        Direction.WEST -> target.locationX = refLeft - amount - widthT / 2
+        Direction.NORTH -> target.locationY = refTop - gap - tarHeight / 2
+        Direction.SOUTH -> target.locationY = refBottom + gap + tarHeight / 2
+        Direction.EAST -> target.locationX = refRight + gap + tarWidth / 2
+        Direction.WEST -> target.locationX = refLeft - gap - tarWidth / 2
     }
 }

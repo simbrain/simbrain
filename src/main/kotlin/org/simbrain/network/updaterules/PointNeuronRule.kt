@@ -5,9 +5,11 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.network.util.BiasedScalarData
+import org.simbrain.util.UserParameter
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.stats.ProbabilityDistribution
 import java.util.*
+import kotlin.math.abs
 
 /**
  * **PointNeuron** from O'Reilley and Munakata, Computational Explorations in
@@ -28,52 +30,102 @@ class PointNeuronRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>() {
     /**
      * Time average constant for updating the net current field. (p. 43-44)
      */
+    @UserParameter(
+        label = "Net Time Constant",
+        description = "Time average constant for updating the net current field",
+        minimumValue = 0.0
+    )
     var netTimeConstant: Double = 0.7
 
     /**
      * Max excitatory conductance field. Conductance if all channels are open.
      * (p. 49)
      */
+    @UserParameter(
+        label = "Max Excitatory Conductance",
+        description = "Max excitatory conductance field. Conductance if all channels are open.",
+        minimumValue = 0.0
+    )
     var excitatoryMaxConductance: Double = 0.4
 
     /**
      * Excitatory conductance field. Proportion of channels open.
      */
+    @UserParameter(
+        label = "Excitatory Conductance",
+        description = "Excitatory conductance field. Proportion of channels open.",
+        minimumValue = 0.0
+    )
     var excitatoryConductance: Double = 0.0
 
     /**
      * Current inhibitory conductance.
      */
+    @UserParameter(
+        label = "Inhibitory Conductance",
+        description = "Current inhibitory conductance.",
+        minimumValue = 0.0
+    )
     var inhibitoryConductance: Double = 0.0
 
     /**
      * Maximal inhibitory conductance.
      */
+    @UserParameter(
+        label = "Max Inhibitory Conductance",
+        description = "Maximal inhibitory conductance.",
+        minimumValue = 0.0
+    )
     var inhibitoryMaxConductance: Double = 1.0
 
     /**
      * Membrane potential field. (p. 45)
      */
+    @UserParameter(
+        label = "Membrane Potential",
+        description = "Membrane potential field.",
+        minimumValue = 0.0
+    )
     var membranePotential: Double = DEFAULT_MEMBRANE_POTENTIAL
 
     /**
      * Excitatory reversal potential field. (p. 45)
      */
+    @UserParameter(
+        label = "Excitatory Reversal",
+        description = "Excitatory reversal potential field.",
+        minimumValue = 0.0
+    )
     var excitatoryReversal: Double = 1.0
 
     /**
      * Leak reversal potential field. (p. 45)
      */
+    @UserParameter(
+        label = "Leak Reversal",
+        description = "Leak reversal potential field.",
+        minimumValue = 0.0
+    )
     var leakReversal: Double = 0.15
 
     /**
      * Max leak conductance field. Conductance if all channels are open. (p. 49)
      */
+    @UserParameter(
+        label = "Max Leak Conductance",
+        description = "Max leak conductance field. Conductance if all channels are open.",
+        minimumValue = 0.0
+    )
     var leakMaxConductance: Double = 2.8
 
     /**
      * Leak Conductance field. Proportion of channels open. (p. 49)
      */
+    @UserParameter(
+        label = "Leak Conductance",
+        description = "Leak Conductance field. Proportion of channels open.",
+        minimumValue = 0.0
+    )
     var leakConductance: Double = 1.0
 
     /**
@@ -85,6 +137,11 @@ class PointNeuronRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>() {
      * Time averaging constant for updating the membrane potential field. (p.
      * 37, Equation 2.7)
      */
+    @UserParameter(
+        label = "Potential Time Constant",
+        description = "Time averaging constant for updating the membrane potential field.",
+        minimumValue = 0.0
+    )
     var potentialTimeConstant: Double = 0.1
 
     /**
@@ -105,21 +162,40 @@ class PointNeuronRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>() {
     /**
      * Inhibitory reversal field.
      */
+    @UserParameter(
+        label = "Inhibitory Reversal",
+        description = "Inhibitory reversal field.",
+        minimumValue = 0.0
+    )
     var inhibitoryReversal: Double = 0.15
 
     /**
      * Current output function.
      */
-    var outputFunction: OutputFunction = OutputFunction.DISCRETE_SPIKING
+    @UserParameter(
+        label = "Output Function",
+        description = "Current output function."
+    )
+    var outputFunction: OutputFunction = OutputFunction.LINEAR
 
     /**
      * Gain factor for output function. (p. 46)
      */
+    @UserParameter(
+        label = "Gain",
+        description = "Gain factor for output function.",
+        minimumValue = 0.0
+    )
     var gain: Double = 600.0
 
     /**
      * Threshold of excitation field. (p. 45)
      */
+    @UserParameter(
+        label = "Threshold Potential",
+        description = "Threshold of excitation field.",
+        minimumValue = 0.0
+    )
     var thresholdPotential: Double = 0.25
 
     /**
@@ -237,7 +313,26 @@ class PointNeuronRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>() {
 
     override fun copy(): PointNeuronRule {
         val cn = PointNeuronRule()
-        // TODO
+        cn.netTimeConstant = netTimeConstant
+        cn.excitatoryMaxConductance = excitatoryMaxConductance
+        cn.excitatoryConductance = excitatoryConductance
+        cn.inhibitoryConductance = inhibitoryConductance
+        cn.membranePotential = membranePotential
+        cn.excitatoryReversal = excitatoryReversal
+        cn.leakReversal = leakReversal
+        cn.leakMaxConductance = leakMaxConductance
+        cn.leakConductance = leakConductance
+        cn.netCurrent = netCurrent
+        cn.potentialTimeConstant = potentialTimeConstant
+        cn.excitatoryCurrent = excitatoryCurrent
+        cn.leakCurrent = leakCurrent
+        cn.inhibitoryCurrent = inhibitoryCurrent
+        cn.inhibitoryReversal = inhibitoryReversal
+        cn.outputFunction = outputFunction
+        cn.gain = gain
+        cn.thresholdPotential = thresholdPotential
+        cn.duration = duration
+        cn.refractoryPotential = refractoryPotential
         return cn
     }
 
@@ -290,16 +385,16 @@ class PointNeuronRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>() {
                 neuron.activation = 0.0
             }
         } else if (outputFunction === OutputFunction.RATE_CODE) {
-            val `val` =
-                (gain * getPositiveComponent(membranePotential - thresholdPotential)) / (gain * getPositiveComponent(
+            val value =
+                (gain * abs(membranePotential - thresholdPotential)) / (gain * abs(
                     membranePotential - thresholdPotential
                 ) + 1)
             // TODO: Correct way to bias for this rule?
-            neuron.activation = `val` + data.bias
+            neuron.activation = value + data.bias
         } else if (outputFunction === OutputFunction.LINEAR) {
-            val `val` = gain * getPositiveComponent(membranePotential - thresholdPotential)
+            val value = gain * abs(membranePotential - thresholdPotential)
             // TODO: Correct way to bias for this rule?
-            neuron.activation = `val` + data.bias
+            neuron.activation = value + data.bias
         } else if (outputFunction === OutputFunction.NOISY_RATE_CODE) {
             neuron.activation = 1.0 // TODO: Complete this implementation
         } else if (outputFunction === OutputFunction.NONE) {
@@ -411,20 +506,6 @@ Leak current: ${SimbrainMath.roundDouble(leakCurrent, 2)}"""
             }
         }
         return retVal
-    }
-
-    /**
-     * Returns the positive component of a number.
-     *
-     * @param val value to consider
-     * @return positive component
-     */
-    private fun getPositiveComponent(`val`: Double): Double {
-        return if (`val` > 0) {
-            `val`
-        } else {
-            0.0
-        }
     }
 
     fun setExcitatoryInputs(excitatoryInputs: ArrayList<Synapse>) {

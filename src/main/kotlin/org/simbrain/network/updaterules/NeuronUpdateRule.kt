@@ -262,6 +262,7 @@ val allUpdateRules = listOf(
     LogisticRule::class.java,
     MorrisLecarRule::class.java,
     NakaRushtonRule::class.java,
+    PointNeuronRule::class.java,
     ProductRule::class.java,
     RandomNeuronRule::class.java,
     SigmoidalRule::class.java,

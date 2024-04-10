@@ -112,6 +112,7 @@ public class ImageAlbum extends ImageSource implements AttributeContainer, Edita
      */
     public void nextFrame() {
         if (frames != null) {
+            saveCurrentFrame();
             frameIndex = (frameIndex + 1) % frames.size();
             setCurrentImage(frames.get(frameIndex));
         }
@@ -122,6 +123,7 @@ public class ImageAlbum extends ImageSource implements AttributeContainer, Edita
      */
     public void previousFrame() {
         if (frames != null) {
+            saveCurrentFrame();
             frameIndex = (frameIndex + frames.size() - 1) % frames.size();
             setCurrentImage(frames.get(frameIndex));
         }
@@ -142,6 +144,7 @@ public class ImageAlbum extends ImageSource implements AttributeContainer, Edita
      */
     public void setFrame(int frameIndex) {
         if (frameIndex >= 0 && frameIndex < frames.size()) {
+            saveCurrentFrame();
             setCurrentImage(frames.get(frameIndex));
         }
     }
@@ -164,6 +167,11 @@ public class ImageAlbum extends ImageSource implements AttributeContainer, Edita
         addImage(snapshot);
     }
 
+    public void saveCurrentFrame() {
+        var snapshot = ImageUtilsKt.copy(getCurrentImage());
+        frames.get(frameIndex).setData(snapshot.getData());
+    }
+
     public void deleteCurrentImage() {
         if (frames.size() == 0) {
             return;
@@ -173,7 +181,8 @@ public class ImageAlbum extends ImageSource implements AttributeContainer, Edita
             return;
         }
         frames.remove(frameIndex);
-        previousFrame();
+        frameIndex = (frameIndex + frames.size() - 1) % frames.size();
+        setCurrentImage(frames.get(frameIndex));
     }
 
     @Nullable

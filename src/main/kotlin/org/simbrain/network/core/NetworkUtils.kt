@@ -6,12 +6,12 @@ import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.core.Network.Randomizers.biasesRandomizer
+import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.NeuronUpdateRule
-import org.simbrain.network.util.BiasedMatrixData
-import org.simbrain.network.util.BiasedScalarData
+import org.simbrain.network.util.*
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.stats.ProbabilityDistribution
@@ -341,3 +341,30 @@ context(Network) suspend fun NetworkModel.addToNetwork() = addNetworkModel(this)
 context(Network) fun NetworkModel.addToNetworkAsync() = addNetworkModelAsync(this)
 context(Network) suspend fun List<NetworkModel>.addToNetwork() = addNetworkModels(this)
 context(Network) fun List<NetworkModel>.addToNetworkAsync() = addNetworkModelsAsync(this)
+
+suspend fun Network.createLayeredFreeNeurons(topology: List<Int>, _layerNames: List<String>? = null, alignment: Alignment = Alignment.VERTICAL) {
+
+    val layerNames = _layerNames ?: topology.indices.map {
+        val hiddenName = if (topology.size > 3) "Hidden $it" else "Hidden"
+        if (it == 0) "Input" else if (it == topology.lastIndex) "Output" else hiddenName
+    }
+
+    val direction = if (alignment == Alignment.VERTICAL) Direction.NORTH else Direction.EAST
+    val layers = (topology zip layerNames).map { (size, name) ->
+        addNeuronCollection(size).apply {
+            label = name
+            if (alignment == Alignment.HORIZONTAL) {
+                layout = LineLayout(40.0, LineLayout.LineOrientation.VERTICAL)
+                applyLayout()
+            }
+        }
+    }
+    layers.zipWithNext().forEach { (source, target) ->
+        val synapseGroup = SynapseGroup(source, target)
+        addNetworkModel(synapseGroup)
+    }
+    layers.zipWithNext().forEach { (source, target) ->
+        alignNetworkModels(source, target, alignment)
+        offsetNeuronCollections(source, target, direction,150.0)
+    }
+}

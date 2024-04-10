@@ -16,6 +16,7 @@ import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.neurongroups.BasicNeuronGroupParams
 import org.simbrain.network.neurongroups.NeuronGroupParams
 import org.simbrain.network.subnetworks.RestrictedBoltzmannMachine
+import org.simbrain.network.util.Alignment
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.propertyeditor.objectWrapper
@@ -706,6 +707,20 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             GridLayout().layoutNeurons(this)
         }.also { network.selectModels(it) }
         network.events.zoomToFitPage.fire()
+    }
+
+
+    fun createLayeredFreeNeurons() = networkPanel.createAction(
+        name = "Add Layered Free Neurons...",
+        description = "Add a set of free neurons to the network",
+    ) {
+        val alignment = Alignment.VERTICAL
+
+        val topologyString = showInputDialog("Enter the number of neurons in each layer separated by commas", "5,3,5")
+
+        val topology = topologyString.split(",").map { it.toInt() }
+
+        network.createLayeredFreeNeurons(topology, alignment = alignment)
     }
 
     fun createTestInputPanelAction(layer: Layer) = networkPanel.createAction(

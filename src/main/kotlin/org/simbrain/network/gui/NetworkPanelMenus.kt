@@ -77,6 +77,7 @@ val NetworkPanel.actionMenu
         with(networkActions) {
             // Alphabetical by action name
             add(fast100)
+            add(createLayeredFreeNeurons())
             add(fastGridAction)
             add(fastSparseAction)
             add(decayWeightsAction)

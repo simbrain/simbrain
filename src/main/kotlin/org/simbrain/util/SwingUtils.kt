@@ -241,10 +241,10 @@ fun showWarningConfirmDialog(message: String): Int {
 /**
  * Create a dialog that takes an input in a text field and returns it as a string.
  */
-fun showInputDialog(message: String): String {
+fun showInputDialog(message: String, initValue: String = ""): String {
     val dialog = JDialog()
     dialog.isAlwaysOnTop = true
-    return JOptionPane.showInputDialog(dialog, message)
+    return JOptionPane.showInputDialog(dialog, message, initValue)
 }
 
 fun showMessageDialog(message: String, title: String, rows: Int = 10, columns: Int = 50) {

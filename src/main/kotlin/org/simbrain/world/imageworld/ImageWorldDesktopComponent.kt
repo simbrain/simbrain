@@ -371,14 +371,6 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
             }
             returnList.add(deleteCurrentImage)
 
-            val loadImagesButton = JButton()
-            loadImagesButton.icon = ResourceManager.getSmallIcon("menu_icons/photo.png")
-            loadImagesButton.toolTipText = "Load Images"
-            loadImagesButton.addActionListener { e: ActionEvent? ->
-                loadImages()
-            }
-            returnList.add(loadImagesButton)
-
             previousImagesButton = JButton()
             previousImagesButton!!.icon = ResourceManager.getSmallIcon("menu_icons/TangoIcons-GoPrevious.png")
             previousImagesButton!!.toolTipText = "Previous Image"

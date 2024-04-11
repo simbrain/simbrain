@@ -35,7 +35,9 @@ class DatasetTest {
 
     @Test
     fun `test distances`() {
+        assertEquals(0.0, p1.euclideanDistance(p1))
         assertEquals(.5, p1.euclideanDistance(p2))
+        assertEquals(.5, p2.euclideanDistance(p1))
         assertEquals(.5, p2.euclideanDistance(p3))
         assertEquals(1.0, p1.euclideanDistance(p3))
     }

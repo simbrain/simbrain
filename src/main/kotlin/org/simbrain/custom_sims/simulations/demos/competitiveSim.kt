@@ -10,7 +10,7 @@ import org.simbrain.util.place
 import org.simbrain.util.stats.distributions.NormalDistribution
 
 /**
- * Demo for studying Competitive networks,
+ * Demo for studying competitive networks,
  */
 val competitiveSim = newSim {
 

@@ -122,7 +122,9 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
     /**
      * Post synaptic response. The totality of the output of this synapse; the total contribution of this synapse to the
      * post-synaptic or target neuron. This is computed using a [SpikeResponder] in the case of a spiking
-     * pre-synaptic neuron. In the case of a non-spiking node this is the product of the source activation and the
+     * pre-synaptic neuron.
+     *
+     * In the case of a non-spiking node this is the product of the source activation and the
      * weight of a synapse, i.e. one term in a classical weighted input.
      */
     var psr: Double = 0.0

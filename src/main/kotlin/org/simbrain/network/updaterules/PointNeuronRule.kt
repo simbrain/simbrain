@@ -2,34 +2,22 @@ package org.simbrain.network.updaterules
 
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.Synapse
-import org.simbrain.network.util.BiasedMatrixData
-import org.simbrain.network.util.BiasedScalarData
+import org.simbrain.network.util.EmptyMatrixData
+import org.simbrain.network.util.PointNeuronScalarData
 import org.simbrain.util.UserParameter
-import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.stats.ProbabilityDistribution
 import java.util.*
 import kotlin.math.abs
 
 /**
- * **PointNeuron** from O'Reilley and Munakata, Computational Explorations in
- * Cognitive Neuroscience, chapter 2. All page references below are are to this
- * book.
+ * PointNeuron from O'Reilly and Munakata, Computational Explorations in
+ * Cognitive Neuroscience, chapter 2.
  */
-class PointNeuronRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>() {
-    /**
-     * Excitatory inputs for connected Synapses.
-     */
-    private var excitatoryInputs = ArrayList<Synapse>()
+class PointNeuronRule : NeuronUpdateRule<PointNeuronScalarData, EmptyMatrixData>() {
 
-    /**
-     * Inhibitory inputs for connected Synapses.
-     */
-    private val inhibitoryInputs = ArrayList<Synapse>()
+    // TODO: organize params into tabs
 
-    /**
-     * Time average constant for updating the net current field. (p. 43-44)
-     */
+    // TODO: Use simbrain time constant?
     @UserParameter(
         label = "Net Time Constant",
         description = "Time average constant for updating the net current field",
@@ -37,10 +25,6 @@ class PointNeuronRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>() {
     )
     var netTimeConstant: Double = 0.7
 
-    /**
-     * Max excitatory conductance field. Conductance if all channels are open.
-     * (p. 49)
-     */
     @UserParameter(
         label = "Max Excitatory Conductance",
         description = "Max excitatory conductance field. Conductance if all channels are open.",
@@ -48,29 +32,6 @@ class PointNeuronRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>() {
     )
     var excitatoryMaxConductance: Double = 0.4
 
-    /**
-     * Excitatory conductance field. Proportion of channels open.
-     */
-    @UserParameter(
-        label = "Excitatory Conductance",
-        description = "Excitatory conductance field. Proportion of channels open.",
-        minimumValue = 0.0
-    )
-    var excitatoryConductance: Double = 0.0
-
-    /**
-     * Current inhibitory conductance.
-     */
-    @UserParameter(
-        label = "Inhibitory Conductance",
-        description = "Current inhibitory conductance.",
-        minimumValue = 0.0
-    )
-    var inhibitoryConductance: Double = 0.0
-
-    /**
-     * Maximal inhibitory conductance.
-     */
     @UserParameter(
         label = "Max Inhibitory Conductance",
         description = "Maximal inhibitory conductance.",
@@ -78,19 +39,6 @@ class PointNeuronRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>() {
     )
     var inhibitoryMaxConductance: Double = 1.0
 
-    /**
-     * Membrane potential field. (p. 45)
-     */
-    @UserParameter(
-        label = "Membrane Potential",
-        description = "Membrane potential field.",
-        minimumValue = 0.0
-    )
-    var membranePotential: Double = DEFAULT_MEMBRANE_POTENTIAL
-
-    /**
-     * Excitatory reversal potential field. (p. 45)
-     */
     @UserParameter(
         label = "Excitatory Reversal",
         description = "Excitatory reversal potential field.",
@@ -98,9 +46,6 @@ class PointNeuronRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>() {
     )
     var excitatoryReversal: Double = 1.0
 
-    /**
-     * Leak reversal potential field. (p. 45)
-     */
     @UserParameter(
         label = "Leak Reversal",
         description = "Leak reversal potential field.",
@@ -108,9 +53,6 @@ class PointNeuronRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>() {
     )
     var leakReversal: Double = 0.15
 
-    /**
-     * Max leak conductance field. Conductance if all channels are open. (p. 49)
-     */
     @UserParameter(
         label = "Max Leak Conductance",
         description = "Max leak conductance field. Conductance if all channels are open.",
@@ -118,25 +60,6 @@ class PointNeuronRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>() {
     )
     var leakMaxConductance: Double = 2.8
 
-    /**
-     * Leak Conductance field. Proportion of channels open. (p. 49)
-     */
-    @UserParameter(
-        label = "Leak Conductance",
-        description = "Leak Conductance field. Proportion of channels open.",
-        minimumValue = 0.0
-    )
-    var leakConductance: Double = 1.0
-
-    /**
-     * Net current field. Sum of all currents.
-     */
-    private var netCurrent = 0.0
-
-    /**
-     * Time averaging constant for updating the membrane potential field. (p.
-     * 37, Equation 2.7)
-     */
     @UserParameter(
         label = "Potential Time Constant",
         description = "Time averaging constant for updating the membrane potential field.",
@@ -144,24 +67,6 @@ class PointNeuronRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>() {
     )
     var potentialTimeConstant: Double = 0.1
 
-    /**
-     * Excitatory current field.
-     */
-    var excitatoryCurrent: Double = 0.0
-
-    /**
-     * Leak current field.
-     */
-    private var leakCurrent = 0.0
-
-    /**
-     * Inhibitory current field.
-     */
-    private var inhibitoryCurrent = 0.0
-
-    /**
-     * Inhibitory reversal field.
-     */
     @UserParameter(
         label = "Inhibitory Reversal",
         description = "Inhibitory reversal field.",
@@ -169,28 +74,19 @@ class PointNeuronRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>() {
     )
     var inhibitoryReversal: Double = 0.15
 
-    /**
-     * Current output function.
-     */
     @UserParameter(
         label = "Output Function",
         description = "Current output function."
     )
     var outputFunction: OutputFunction = OutputFunction.LINEAR
 
-    /**
-     * Gain factor for output function. (p. 46)
-     */
     @UserParameter(
         label = "Gain",
         description = "Gain factor for output function.",
         minimumValue = 0.0
     )
-    var gain: Double = 600.0
+    var gain: Double = 1.0
 
-    /**
-     * Threshold of excitation field. (p. 45)
-     */
     @UserParameter(
         label = "Threshold Potential",
         description = "Threshold of excitation field.",
@@ -218,7 +114,6 @@ class PointNeuronRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>() {
          * The spikes themselves are the output.
          */
         DISCRETE_SPIKING {
-            /** {@inheritDoc}  */
             override fun toString(): String {
                 return "Discrete Spiking"
             }
@@ -264,48 +159,7 @@ class PointNeuronRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>() {
             }
         };
 
-        /**
-         * @return the name of the output function.
-         */
         abstract override fun toString(): String
-    }
-
-    fun init(neuron: Neuron) {
-        setInputLists(neuron)
-    }
-
-    /**
-     * Update the lists of excitatory and inhibitory currents based on synapse
-     * values.
-     *
-     * @param neuron the neuron to set the input list for
-     */
-    private fun setInputLists(neuron: Neuron) {
-        excitatoryInputs.clear()
-        inhibitoryInputs.clear()
-
-        for (synapse in neuron.fanIn) {
-            addSynapseToList(synapse)
-        }
-    }
-
-    /**
-     * Adds a synapse to the appropriate internal list.
-     *
-     * @param synapse synapse to add.
-     */
-    private fun addSynapseToList(synapse: Synapse) {
-        if (excitatoryInputs.contains(synapse)) {
-            excitatoryInputs.remove(synapse)
-        }
-        if (inhibitoryInputs.contains(synapse)) {
-            inhibitoryInputs.remove(synapse)
-        }
-        if (synapse.strength > 0) {
-            excitatoryInputs.add(synapse)
-        } else {
-            inhibitoryInputs.add(synapse)
-        }
     }
 
     override val timeType: Network.TimeType
@@ -315,18 +169,10 @@ class PointNeuronRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>() {
         val cn = PointNeuronRule()
         cn.netTimeConstant = netTimeConstant
         cn.excitatoryMaxConductance = excitatoryMaxConductance
-        cn.excitatoryConductance = excitatoryConductance
-        cn.inhibitoryConductance = inhibitoryConductance
-        cn.membranePotential = membranePotential
         cn.excitatoryReversal = excitatoryReversal
         cn.leakReversal = leakReversal
         cn.leakMaxConductance = leakMaxConductance
-        cn.leakConductance = leakConductance
-        cn.netCurrent = netCurrent
         cn.potentialTimeConstant = potentialTimeConstant
-        cn.excitatoryCurrent = excitatoryCurrent
-        cn.leakCurrent = leakCurrent
-        cn.inhibitoryCurrent = inhibitoryCurrent
         cn.inhibitoryReversal = inhibitoryReversal
         cn.outputFunction = outputFunction
         cn.gain = gain
@@ -337,76 +183,62 @@ class PointNeuronRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>() {
     }
 
     override fun clear(neuron: Neuron) {
-        membranePotential = DEFAULT_MEMBRANE_POTENTIAL
-        neuron.activation = 0.0
-        excitatoryConductance = 0.0
-        inhibitoryConductance = 0.0
-        leakConductance = 0.0
-        excitatoryCurrent = 0.0
-        leakCurrent = 0.0
-        inhibitoryCurrent = 0.0
-        netCurrent = 0.0
-        setInputLists(neuron) // Temporary hack to allow input lists to be
-        // updated by pressing "clear"
+        super.clear(neuron)
     }
 
     context(Network)
-    override fun apply(neuron: Neuron, data: BiasedScalarData) {
-        // Calculate the excitatory conductance (p. 44, eq. 2.16)
+    override fun apply(neuron: Neuron, data: PointNeuronScalarData) {
 
-        excitatoryConductance =
-            (1 - netTimeConstant) * excitatoryConductance + netTimeConstant * (getExcitatoryInputs())
+        // Calculate the excitatory conductance (p. 44, eq. 2.16)
+        data.excitatoryConductance =
+            (1 - netTimeConstant) * data.excitatoryConductance + netTimeConstant * (getExcitatoryInputs(neuron))
 
         // Calculate the excitatory current (p. 37 equation 2.5)
-        excitatoryCurrent = excitatoryConductance * excitatoryMaxConductance * (membranePotential - excitatoryReversal)
+        val excitatoryCurrent = data.excitatoryConductance * excitatoryMaxConductance * (data.membranePotential - excitatoryReversal)
 
         // Calculate the excitatory conductance using time averaging constant.
-        inhibitoryConductance =
-            (1 - netTimeConstant) * inhibitoryConductance + netTimeConstant * (getInhibitoryInputs())
+        data.inhibitoryConductance =
+            (1 - netTimeConstant) * data.inhibitoryConductance + netTimeConstant * (getInhibitoryInputs(neuron))
 
         // Calculate the inhibitory current.
-        inhibitoryCurrent = inhibitoryConductance * inhibitoryMaxConductance * (membranePotential - inhibitoryReversal)
+        val inhibitoryCurrent = data.inhibitoryConductance * inhibitoryMaxConductance * (data.membranePotential - inhibitoryReversal)
 
         // Calculate the leak current (p. 37 eq. 2.5)
-        leakCurrent = leakConductance * leakMaxConductance * (membranePotential - leakReversal)
+        val leakCurrent = data.leakConductance * leakMaxConductance * (data.membranePotential - leakReversal)
 
         // Calculate the net current (p. 37 eq. 2.6)
-        netCurrent = leakCurrent + excitatoryCurrent + inhibitoryCurrent
+        val netCurrent = leakCurrent + excitatoryCurrent + inhibitoryCurrent
 
         // Calculate the membrane potential given net current. (p.37 eq. 2.7)
-        membranePotential += -potentialTimeConstant * netCurrent
+        data.membranePotential += -potentialTimeConstant * netCurrent
 
         // Apply output function. (p. 45-48)
         if (outputFunction === OutputFunction.DISCRETE_SPIKING) {
-            if (membranePotential > thresholdPotential) {
+            if (data.membranePotential > thresholdPotential) {
                 neuron.activation = 1.0
-                membranePotential = refractoryPotential
+                data.membranePotential = refractoryPotential
             } else {
                 neuron.activation = 0.0
             }
         } else if (outputFunction === OutputFunction.RATE_CODE) {
-            val value =
-                (gain * abs(membranePotential - thresholdPotential)) / (gain * abs(
-                    membranePotential - thresholdPotential
+            neuron.activation =
+                (gain * abs(data.membranePotential - thresholdPotential)) / (gain * abs(
+                    data.membranePotential - thresholdPotential
                 ) + 1)
-            // TODO: Correct way to bias for this rule?
-            neuron.activation = value + data.bias
         } else if (outputFunction === OutputFunction.LINEAR) {
-            val value = gain * abs(membranePotential - thresholdPotential)
-            // TODO: Correct way to bias for this rule?
-            neuron.activation = value + data.bias
+            neuron.activation = gain * abs(data.membranePotential - thresholdPotential)
         } else if (outputFunction === OutputFunction.NOISY_RATE_CODE) {
             neuron.activation = 1.0 // TODO: Complete this implementation
         } else if (outputFunction === OutputFunction.NONE) {
-            neuron.activation = membranePotential
+            neuron.activation = data.membranePotential
         }
 
         // Display current values of variables for diagnostics.
         // printState(neuron);
     }
 
-    override fun createScalarData(): BiasedScalarData {
-        return BiasedScalarData()
+    override fun createScalarData(): PointNeuronScalarData {
+        return PointNeuronScalarData()
     }
 
     override fun getRandomValue(randomizer: ProbabilityDistribution?): Double {
@@ -419,103 +251,49 @@ class PointNeuronRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>() {
             // TODO: better value for this?
             gain * thresholdPotential * rand.nextDouble()
         } else if (outputFunction === OutputFunction.NOISY_RATE_CODE) {
-            0.0 // TODO: COmplete implementation
+            0.0 // TODO: Complete implementation
         } else {
             rand.nextDouble() // TODO: Better value for this?
         }
     }
 
-    val inhibitoryThresholdConductance: Double
-        /**
-         * Returns the inhibitory conductance that would set this point neuron's
-         * voltage at its threshold potential. See M/R p. 101, equation 3.2
-         *
-         * @return the value of that equation
-         */
-        get() {
-            val excitatoryTerm =
-                excitatoryConductance * excitatoryMaxConductance * (excitatoryReversal - thresholdPotential)
-            val leakTerm = leakConductance * leakMaxConductance * (leakReversal - thresholdPotential)
+    // val inhibitoryThresholdConductance: Double
+    //     /**
+    //      * Returns the inhibitory conductance that would set this point neuron's
+    //      * voltage at its threshold potential. See M/R p. 101, equation 3.2
+    //      *
+    //      * @return the value of that equation
+    //      */
+    //     get() {
+    //         val excitatoryTerm =
+    //             excitatoryConductance * excitatoryMaxConductance * (excitatoryReversal - thresholdPotential)
+    //         val leakTerm = leakConductance * leakMaxConductance * (leakReversal - thresholdPotential)
+    //
+    //         return (excitatoryTerm + leakTerm) / (thresholdPotential - inhibitoryReversal)
+    //     }
 
-            return (excitatoryTerm + leakTerm) / (thresholdPotential - inhibitoryReversal)
-        }
 
-    override fun getToolTipText(neuron: Neuron): String? {
-        return """Activation: ${neuron.activation}
-
-Membrane Potential: ${SimbrainMath.roundDouble(membranePotential, 2)}
-
-Net Current: ${SimbrainMath.roundDouble(netCurrent, 2)}
-
-Excitatory current:  ${SimbrainMath.roundDouble(excitatoryCurrent, 2)}
- 
-Leak current: ${SimbrainMath.roundDouble(leakCurrent, 2)}"""
-    }
-
-    // TODO: Never Used Locally: Schedule for removal?
-    // /**
-    // * Print debugging information.
-    // */
-    // private void printState(Neuron neuron) {
-    // // System.out.println("\nNeuron: " + this.getId());
-    // System.out.println("excitatoryConductance:"
-    // + SimbrainMath.roundDouble(excitatoryConductance, 2));
-    // System.out.println("excitatoryCurrent:"
-    // + SimbrainMath.roundDouble(excitatoryCurrent, 2));
-    // System.out.println("inhibitoryCurrent:"
-    // + SimbrainMath.roundDouble(inhibitoryCurrent, 2));
-    // System.out.println("leakCurrent:"
-    // + SimbrainMath.roundDouble(leakCurrent, 2));
-    // System.out.println("netCurrent:"
-    // + SimbrainMath.roundDouble(netCurrent, 2));
-    // System.out.println("membranePotential:"
-    // + SimbrainMath.roundDouble(membranePotential, 2));
-    // System.out.println("output:" + neuron.getActivation());
+    //  TODO: Store text during update
+    // override fun getToolTipText(neuron: Neuron): String? {
+    //     return """
+    //         Activation: ${neuron.activation}
+    //         Membrane Potential: ${SimbrainMath.roundDouble(membranePotential, 2)}
+    //         Excitatory current:  ${SimbrainMath.roundDouble(excitatoryCurrent, 2)}
+    //         Leak current: ${SimbrainMath.roundDouble(leakCurrent, 2)}
+    //         """
     // }
-    /**
-     * Returns net input to this neuron (source activations times weights), from
-     * excitatory sources only.
-     *
-     * @return net input
-     */
-    private fun getExcitatoryInputs(): Double {
-        var retVal = 0.0
-        if (excitatoryInputs.size > 0) {
-            for (synapse in excitatoryInputs) {
-                val source = synapse.source
-                // Will not work with spiking, or negative activations?
-                retVal += source.activation * synapse.strength
-            }
-        }
-        return retVal
+
+    private fun getExcitatoryInputs(neuron: Neuron): Double {
+        return neuron.fanIn.filter { it.strength > 0.0 }.sumOf { it.psr }
     }
 
-    /**
-     * Returns net input to this neuron (source activations times weights), from
-     * inhibitory sources only.
-     *
-     * @return net input
-     */
-    private fun getInhibitoryInputs(): Double {
-        var retVal = 0.0
-        if (inhibitoryInputs.size > 0) {
-            for (synapse in inhibitoryInputs) {
-                val source = synapse.source
-                // Will not work with spiking, or negative activations?
-                retVal += source.activation * synapse.strength
-            }
-        }
-        return retVal
+    private fun getInhibitoryInputs(neuron: Neuron): Double {
+        return neuron.fanIn.filter { it.strength < 0.0 }.sumOf { it.psr }
     }
-
-    fun setExcitatoryInputs(excitatoryInputs: ArrayList<Synapse>) {
-        this.excitatoryInputs = excitatoryInputs
-    }
-
 
     override val name: String
-        // TODO
-        get() = "Point Neuron" //
+        get() = "Point Neuron"
+
     //    @Override
     //    public double getUpperBound() {
     //        if (outputFunction == OutputFunction.DISCRETE_SPIKING) {
@@ -525,7 +303,7 @@ Leak current: ${SimbrainMath.roundDouble(leakCurrent, 2)}"""
     //        } else if (outputFunction == OutputFunction.LINEAR) {
     //            return gain; // TODO: better value for this?
     //        } else if (outputFunction == OutputFunction.NOISY_RATE_CODE) {
-    //            return 0; // TODO: COmplete implementation
+    //            return 0; // TODO: Complete implementation
     //        } else {
     //            return 1.0;
     //        }
@@ -536,10 +314,5 @@ Leak current: ${SimbrainMath.roundDouble(leakCurrent, 2)}"""
     //        return 0;
     //    }
 
-    companion object {
-        /**
-         * Default value for membrane potential.
-         */
-        private const val DEFAULT_MEMBRANE_POTENTIAL = .15
-    }
+
 }

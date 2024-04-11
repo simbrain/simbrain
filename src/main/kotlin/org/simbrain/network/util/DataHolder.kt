@@ -98,6 +98,41 @@ class BiasedScalarData(
     }
 }
 
+class PointNeuronScalarData(
+
+    @UserParameter(
+        label = "Membrane potential",
+        minimumValue = 0.0
+    )
+    var membranePotential: Double = .15,
+
+    @UserParameter(
+        label = "Excitatory Conductance",
+        description = "Current excitatory conductance.Proportion of channels open",
+        minimumValue = 0.0
+    )
+    var excitatoryConductance: Double = 0.0,
+
+    @UserParameter(
+        label = "Inhibitory Conductance",
+        description = "Current inhibitory conductance. Proportion of channels open",
+        minimumValue = 0.0
+    )
+    var inhibitoryConductance: Double = 0.0,
+
+    @UserParameter(
+        label = "Leak Conductance",
+        description = "Leak conductance. Proportion of channels open",
+        minimumValue = 0.0
+    )
+    var leakConductance: Double = 1.0
+
+) : ScalarDataHolder {
+    override fun copy(): PointNeuronScalarData {
+        return PointNeuronScalarData(membranePotential, excitatoryConductance, inhibitoryConductance, leakConductance)
+    }
+}
+
 open class SpikingScalarData(
     /**
      * Set to true at end of iteration when spike occurs, then set to false.

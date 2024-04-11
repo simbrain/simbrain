@@ -137,11 +137,11 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
         }
 
     /**
-     * Returns "external input" to neuron, separate from any input from connected neurons.
-     */
-    /**
-     * Value of any external inputs to neuron. See description at
-     * [.addInputValue]
+     * Aggregates all inputs (from other nodes, couplings, or scripts) to this node.
+     *
+     * See description at [addInputValue].
+     *
+     * Note that when [updateInputs] is called, [weightedInputs] are added to input.
      */
     var input: Double = 0.0
         private set

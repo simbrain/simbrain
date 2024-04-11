@@ -109,8 +109,15 @@ public class HopfieldCreationDialog extends StandardDialog {
         hopPropertiesPanel.commitChanges();
         Hopfield hopfield = hc.create();
         layoutPanel.commitChanges();
-        hopfield.getNeuronGroup().setLayout(layoutEditor.getLayout());
-        hopfield.getNeuronGroup().applyLayout(-5, -85);
+        if (hopfield.neuronGroup.size() == 2) {
+            var neuron1 = hopfield.neuronGroup.getNeuron(0);
+            var neuron2 = hopfield.neuronGroup.getNeuron(1);
+            neuron2.setLocation(neuron1.getX() + 100, neuron1.getY());
+        } else {
+            hopfield.getNeuronGroup().setLayout(layoutEditor.getLayout());
+            hopfield.getNeuronGroup().applyLayout();
+        }
+        hopfield.reapplyOffsets();
         networkPanel.getNetwork().addNetworkModelAsync(hopfield);
         networkPanel.repaint();
         super.closeDialogOk();

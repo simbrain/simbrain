@@ -75,7 +75,7 @@ class Hopfield : Subnetwork {
 
         // Connect the neurons together
         synapseGroup = SynapseGroup(neuronGroup, neuronGroup)
-        synapseGroup.displaySynapses = false
+        synapseGroup.label = "weights"
         addModel(synapseGroup)
 
         // Symmetric randomization
@@ -83,10 +83,7 @@ class Hopfield : Subnetwork {
 
         // Create info text
         customInfo = InfoText(stateInfoText)
-        alignNetworkModels(neuronGroup, customInfo, Alignment.HORIZONTAL)
-        val neuronGroupBound = neuronGroup.neuronList.bound
-        offsetNetworkModel(neuronGroup,
-            customInfo, Direction.NORTH, 20.0, neuronGroupBound.height, neuronGroupBound.width, 24.0, 0.0)
+        reapplyOffsets()
     }
 
     @XStreamConstructor
@@ -125,6 +122,13 @@ class Hopfield : Subnetwork {
         })
         synapseGroup.events.updated.fireAndForget()
         events.updated.fireAndForget()
+    }
+
+    fun reapplyOffsets() {
+        alignNetworkModels(neuronGroup, customInfo, Alignment.HORIZONTAL)
+        val neuronGroupBound = neuronGroup.neuronList.bound
+        offsetNetworkModel(neuronGroup,
+            customInfo, Direction.NORTH, 40.0, neuronGroupBound.height, neuronGroupBound.width, 24.0, 0.0)
     }
 
     /**

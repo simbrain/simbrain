@@ -23,7 +23,10 @@ class NetworkModelList {
     @XStreamImplicit
     private val networkModels: MutableMap<Class<out NetworkModel>, LinkedHashSet<NetworkModel>?> = HashMap()
 
-    private val shouldAsync: HashMap<Boolean, LinkedHashSet<NetworkModel>> = HashMap()
+    private val modelsByShouldAsync: Map<Boolean, LinkedHashSet<NetworkModel>> = mapOf(
+        true to LinkedHashSet(),
+        false to LinkedHashSet()
+    )
 
     @Suppress("UNCHECKED_CAST")
     fun <T : NetworkModel> put(modelClass: Class<T>, model: T) {
@@ -34,11 +37,7 @@ class NetworkModelList {
             newSet.add(model)
             networkModels[modelClass] = newSet as LinkedHashSet<NetworkModel>
         }
-        if (model is ArrayLayer || model is AbstractNeuronCollection) {
-            shouldAsync.getOrPut(true) { LinkedHashSet() }
-        } else {
-            shouldAsync.getOrPut(false) { LinkedHashSet() }
-        }.add(model)
+        modelsByShouldAsync[shouldAsync(model)]!!.add(model)
     }
 
     /**
@@ -53,11 +52,7 @@ class NetworkModelList {
             newSet.add(model)
             networkModels[modelClass] = newSet
         }
-        if (model is ArrayLayer || model is AbstractNeuronCollection) {
-            shouldAsync.getOrPut(true) { LinkedHashSet() }
-        } else {
-            shouldAsync.getOrPut(false) { LinkedHashSet() }
-        }.add(model)
+        modelsByShouldAsync[shouldAsync(model)]!!.add(model)
     }
 
     /**
@@ -119,13 +114,19 @@ class NetworkModelList {
         if (model is Subnetwork) {
             // Forces all subclasses of subnetwork to be grouped with the subnetwork class
             networkModels[Subnetwork::class.java]?.remove(model)
+            modelsByShouldAsync[true]?.remove(model)
+            modelsByShouldAsync[false]?.remove(model)
         } else {
             networkModels[model.javaClass]?.remove(model)
+            modelsByShouldAsync[true]?.remove(model)
+            modelsByShouldAsync[false]?.remove(model)
         }
     }
 
-    fun getAsyncModels() = shouldAsync[true] ?: LinkedHashSet()
-    fun getNonAsyncModels() = shouldAsync[false] ?: LinkedHashSet()
+    private fun shouldAsync(model: NetworkModel) = model is ArrayLayer || model is AbstractNeuronCollection
+
+    fun getAsyncModels() = modelsByShouldAsync[true]!!
+    fun getNonAsyncModels() = modelsByShouldAsync[false]!!
 
     override fun toString(): String =  all.joinToString("\n") { "$it" }
 

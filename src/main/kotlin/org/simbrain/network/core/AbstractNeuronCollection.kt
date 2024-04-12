@@ -43,32 +43,19 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
     override val events: NeuronCollectionEvents = NeuronCollectionEvents()
 
     /**
-     * Flag to mark whether [.activations] is "dirty", that is outdated and in need of updating.
-     */
-    private var cachedActivationsDirty = true
-    private var _cachedActivations = DoubleArray(0)
-
-    /**
      * Cache of neuron activation values.
      */
     @get:Producible(arrayDescriptionMethod = "getLabelArray")
     @set:Consumable
     var activations: DoubleArray
-        get() {
-            if (cachedActivationsDirty) {
-                _cachedActivations = neuronList
-                    .map { it.activation }
-                    .toDoubleArray()
-                cachedActivationsDirty = false
-            }
-            return _cachedActivations
-        }
+        get() = neuronList
+            .map { it.activation }
+            .toDoubleArray()
         set(activations) {
             val size = min(activations.size, neuronList.size)
             for (i in 0 until size) {
                 neuronList[i].activation = activations[i]
             }
-            cachedActivationsDirty = true
         }
 
     /**
@@ -240,9 +227,6 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
         n.events.locationChanged.on { events.locationChanged.fireAndForget() }
         // n.getEvents().onLocationChange(fireLocationChange); // TODO Reimplement when debounce is working
         n.events.deleted.on { neuronList.remove(it) }
-        n.events.activationChanged.on(wait = true) { _, _ ->
-            invalidateCachedActivations()
-        }
         n.events.deleted.on { neuron ->
             neuronList.remove(neuron)
             if (isEmpty) {
@@ -290,12 +274,10 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
         for (n in neuronList) {
             n.activation = value
         }
-        cachedActivationsDirty = true
     }
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
         neuronList.forEach { it.randomize(randomizer) }
-        invalidateCachedActivations()
     }
 
     /**
@@ -306,7 +288,6 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
         for (neuron in neuronList) {
             neuron.randomizeBias()
         }
-        invalidateCachedActivations()
     }
 
     /**
@@ -368,11 +349,6 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
             wtdInputs = SimbrainMath.addVector(wtdInputs, c.output.col(0))
         }
         addInputs(wtdInputs)
-    }
-
-    context(Network)
-    override fun update() {
-        invalidateCachedActivations()
     }
 
     val isAllClamped: Boolean
@@ -455,10 +431,6 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
      * @return the associated neuron
      */
     fun getNeuronByLabel(label: String?) = neuronList.firstOrNull { it.label.equals(label, ignoreCase = true) }
-
-    protected fun invalidateCachedActivations() {
-        cachedActivationsDirty = true
-    }
 
     protected fun invalidateCachedInputs() {
         cachedInputsDirty = true

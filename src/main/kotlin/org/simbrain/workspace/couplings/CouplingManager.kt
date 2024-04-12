@@ -1,8 +1,5 @@
 package org.simbrain.workspace.couplings
 
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
 import org.simbrain.util.cartesianProduct
 import org.simbrain.workspace.*
 import org.simbrain.workspace.gui.SimbrainDesktop
@@ -292,10 +289,8 @@ class CouplingManager(val workspace: Workspace) {
     /**
      * Update all couplings by setting the consumers to take the values of their producers.
      */
-    suspend fun updateCouplings() {
-        coroutineScope {
-            couplings.map { async { it.update() } }.awaitAll()
-        }
+    fun updateCouplings() {
+        couplings.forEach { it.update() }
     }
 
     /**

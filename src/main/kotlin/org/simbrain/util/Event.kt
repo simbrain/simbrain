@@ -7,6 +7,8 @@ import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.function.BiConsumer
 import java.util.function.Consumer
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 /**
  * Event objects corresponding to no-arg, adding, removing, and changing objects. Each object has a set of functions
@@ -22,7 +24,7 @@ import java.util.function.Consumer
  *
  * For examples see [TrainerEvents2]
  */
-open class Events: CoroutineScope {
+open class Events(val timeout: Duration = 60.seconds): CoroutineScope {
 
     private val job = SupervisorJob()
 
@@ -81,9 +83,9 @@ open class Events: CoroutineScope {
             ?.map { (dispatcher, wait, handler, stackTrace) ->
                 try {
                     if (dispatcher != null) {
-                        launch(dispatcher) { run(handler) }.let { if (wait) withTimeout(60*1000) { it.join() } else it }
+                        launch(dispatcher) { run(handler) }.let { if (wait) withTimeout(timeout) { it.join() } else it }
                     } else {
-                        launch { run(handler) }.let { if (wait) withTimeout(60*1000) { it.join() } else it }
+                        launch { run(handler) }.let { if (wait) withTimeout(timeout) { it.join() } else it }
                     }
                 } catch (e: TimeoutCancellationException) {
                     throw IllegalStateException("Event time out on dispatcher $dispatcher. Event handler created by ${stackTrace.contentDeepToString()}")

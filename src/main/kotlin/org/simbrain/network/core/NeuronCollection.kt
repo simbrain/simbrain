@@ -17,7 +17,6 @@
  */
 package org.simbrain.network.core
 
-import org.simbrain.network.NetworkModel
 import org.simbrain.network.layouts.Layout
 import org.simbrain.network.updaterules.NeuronUpdateRule
 import org.simbrain.util.propertyeditor.CopyableObject
@@ -38,16 +37,13 @@ class NeuronCollection : AbstractNeuronCollection {
 
         neurons.forEach { n: Neuron ->
             n.events.locationChanged.on { events.locationChanged }
-            n.events.activationChanged.on(wait = true) { _, _ ->
-                invalidateCachedActivations()
-            }
-            n.events.deleted.on(null, true, Consumer { toDelete: NetworkModel? ->
+            n.events.deleted.on(wait = true) { toDelete ->
                 removeNeuron(toDelete as Neuron?)
                 events.locationChanged.fireAndForget()
                 if (isEmpty) {
                     delete()
                 }
-            })
+            }
         }
     }
 

@@ -96,6 +96,9 @@ fun FloatArray.toGrayScaleImage(width: Int, height: Int): BufferedImage {
     return image
 }
 
+fun DoubleArray.toGrayScaleImage(width: Int, height: Int) = toFloatArray().toGrayScaleImage(width, height)
+fun List<Double>.toGrayScaleImage(width: Int, height: Int) = toDoubleArray().toGrayScaleImage(width, height)
+
 private val cache = HashMap<Pair<Int, Int>, BufferedImage>()
 
 /**

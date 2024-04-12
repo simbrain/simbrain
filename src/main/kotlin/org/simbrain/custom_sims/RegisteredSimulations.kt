@@ -94,7 +94,8 @@ val simulations = dir<Any>("Simulations") {
     // TODO: Disaggregate this into more meaningful submenus
     dir("Demos") {
         item("Competitive Image Network") { competitiveImageSim }
-        item("Competitive Network") { competitiveSim }
+        item("Competitive Grid Network") { competitiveGridSim }
+        item("Competitive Network (Simple)") { competitiveSim }
         item("Restricted Boltzmann Machine") { rbmSim }
         item("Projection") { projectionSim }
         item("Hopfield") { hopfieldSim }

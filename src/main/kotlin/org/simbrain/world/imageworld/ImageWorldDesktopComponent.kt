@@ -154,9 +154,37 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
 
         // Edit Menu
         val editMenu = JMenu("Edit")
+
+        val resetCanvasAction = org.simbrain.util.createAction(
+            "Reset canvas...",
+            description = "Remove all images and replace with an empty canvas",
+            iconPath =  "menu_icons/Reset.png"
+        ) {
+            val wInp = JTextField(5)
+            val hInp = JTextField(5)
+            wInp.text = imageWorld.currentImage.width.toString()
+            hInp.text = imageWorld.currentImage.width.toString()
+            val myPanel = JPanel()
+            myPanel.add(JLabel("Width:"))
+            myPanel.add(wInp)
+            myPanel.add(Box.createHorizontalStrut(15)) // a spacer
+            myPanel.add(JLabel("Height:"))
+            myPanel.add(hInp)
+            val result = JOptionPane.showConfirmDialog(
+                null,
+                myPanel,
+                "Create new canvas, enter dimensions.",
+                JOptionPane.OK_CANCEL_OPTION
+            )
+            if (result == JOptionPane.OK_OPTION) {
+                imageWorld.resetImageAlbum(wInp.text.toInt(), hInp.text.toInt())
+            }
+        }
         menuBar.add(editMenu)
         fun createEditMenu() {
             editMenu.removeAll()
+            editMenu.add(resetCanvasAction)
+            editMenu.addSeparator()
             editMenu.add(CouplingMenu(workspaceComponent,  imageWorld.filterCollection.currentFilter))
         }
         createEditMenu()
@@ -194,33 +222,6 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
     private fun setupToolbars() {
         imageAlbumButtons.forEach(Consumer { comp: Component? -> imageAlbumToolbar.add(comp) })
 
-
-        val createCanvas = JButton()
-        createCanvas.icon = ResourceManager.getSmallIcon("menu_icons/PixelMatrix.png")
-        createCanvas.toolTipText = "New canvas..."
-        createCanvas.addActionListener { e: ActionEvent? ->
-            val wInp = JTextField(5)
-            val hInp = JTextField(5)
-            wInp.text = "20"
-            hInp.text = "20"
-            val myPanel = JPanel()
-            myPanel.add(JLabel("Width:"))
-            myPanel.add(wInp)
-            myPanel.add(Box.createHorizontalStrut(15)) // a spacer
-            myPanel.add(JLabel("Height:"))
-            myPanel.add(hInp)
-            val result = JOptionPane.showConfirmDialog(
-                null,
-                myPanel,
-                "Create new canvas, enter dimensions.",
-                JOptionPane.OK_CANCEL_OPTION
-            )
-            if (result == JOptionPane.OK_OPTION) {
-                imageWorld.resetImageAlbum(wInp.text.toInt(), hInp.text.toInt())
-            }
-        }
-        sourceToolbar.add(createCanvas)
-
         //        // Add Color Picker
         //        JButton setColorButton = new JButton();
         //        setColorButton.setIcon(ResourceManager.getSmallIcon("menu_icons/PaintView.png"));
@@ -245,14 +246,6 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
         val colorNames =
             arrayOf<String?>("White", "Black", "Red", "Blue", "Green", "Yellow", "Cyan", "Magenta", "Custom")
         val cbColorChoice: JComboBox<*> = JComboBox<Any?>(colorNames)
-        val fillCanvas = JButton(ResourceManager.getSmallIcon("menu_icons/fill.png"))
-        fillCanvas.addActionListener { e: ActionEvent? ->
-            val confirm = showWarningConfirmDialog("Are you sure you want to fill the canvas?")
-            if (confirm == JOptionPane.YES_OPTION) {
-                imageWorld.imageAlbum.currentImage.fill(penColor)
-                imageWorld.imageAlbum.fireImageUpdate()
-            }
-        }
 
         // Check box handling
         val checkBoxDrawMode = JCheckBox("Draw")
@@ -272,9 +265,33 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
             }
         }
 
+        val fillCanvasAction = org.simbrain.util.createAction(
+            "Fill",
+            description = "Fill canvas using current color",
+            iconPath =  "menu_icons/fill.png"
+        ) {
+            val confirm = showWarningConfirmDialog("Are you sure you want to fill the canvas?")
+            if (confirm == JOptionPane.YES_OPTION) {
+                imageWorld.imageAlbum.currentImage.fill(penColor)
+                imageWorld.imageAlbum.fireImageUpdate()
+            }
+        }
+        val clearCanvasAction = org.simbrain.util.createAction(
+            "Clear",
+            description = "Clear canvas (with black pixels)",
+            iconPath =  "menu_icons/Eraser.png"
+        ) {
+            val confirm = showWarningConfirmDialog("Are you sure you want to clear the canvas?")
+            if (confirm == JOptionPane.YES_OPTION) {
+                imageWorld.imageAlbum.currentImage.fill(Color.black)
+                imageWorld.imageAlbum.fireImageUpdate()
+            }
+        }
+
         sourceToolbar.add(checkBoxDrawMode)
         sourceToolbar.add(cbColorChoice)
-        sourceToolbar.add(fillCanvas)
+        sourceToolbar.add(fillCanvasAction)
+        sourceToolbar.add(clearCanvasAction)
     }
 
     /**

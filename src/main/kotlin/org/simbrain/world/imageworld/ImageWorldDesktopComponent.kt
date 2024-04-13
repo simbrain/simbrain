@@ -11,7 +11,6 @@ import org.simbrain.world.imageworld.gui.FilterCollectionGui
 import java.awt.*
 import java.awt.event.*
 import java.util.*
-import java.util.function.Consumer
 import javax.swing.*
 import kotlin.math.min
 
@@ -26,7 +25,7 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
     /**
      * Custom file chooser for selecting image files.
      */
-    protected var fileChooser: SFileChooser
+    private var fileChooser: SFileChooser
 
     private var contextMenu: JPopupMenu? = null
 
@@ -48,19 +47,40 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
      */
     private var penColor: Color = Color.white
 
-    /**
-     * Button to advance to the next images.
-     */
-    private var nextImagesButton: JButton? = null
-
-    /**
-     * Button to go to the previous images.
-     */
-    private var previousImagesButton: JButton? = null
-
-    private var takeSnapshotButton: JButton? = null
-
     private val frameLabel = JLabel()
+
+    private val deleteImageAction = createAction(
+        "Delete image",
+        description = "Delete current image",
+        iconPath =  "menu_icons/RedX.png"
+    ) {
+        imageWorld.imageAlbum.deleteCurrentImage()
+    }
+
+    private val previousImageAction = createAction(
+        "Previous image",
+        description = "Move the to previous image in the image album ('A')",
+        iconPath =  "menu_icons/TangoIcons-GoPrevious.png",
+        keyboardShortcut = KeyCombination('A')
+    ) {
+        imageWorld.previousFrame()
+    }
+    private val nextImageAction = createAction(
+        "Next image",
+        description = "Move the to next image in the image album ('D')",
+        iconPath =  "menu_icons/TangoIcons-GoNext.png",
+        keyboardShortcut = KeyCombination('D')
+    ) {
+        imageWorld.nextFrame()
+    }
+    private val takeSnapshotAction = createAction(
+        "Take snapshot",
+        description = "Add the current image to the photo album ('S')",
+        iconPath =  "menu_icons/camera.png",
+        keyboardShortcut = KeyCombination('S')
+    ) {
+        imageWorld.imageAlbum.takeSnapshot()
+    }
 
     /**
      * Central panel to render the image.
@@ -128,16 +148,11 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
 
         // Add load images menu item if it's an image album world
         val loadImages = JMenuItem("Load Images...")
-        loadImages.addActionListener { e: ActionEvent? ->
-            loadImages()
-        }
+        loadImages.addActionListener { loadImages() }
         fileMenu.add(loadImages)
 
         val saveImage = JMenuItem("Save Image...")
-        saveImage.addActionListener { e: ActionEvent? ->
-            saveImage()
-        }
-
+        saveImage.addActionListener { saveImage() }
         fileMenu.add(saveImage)
 
         fileMenu.addSeparator()
@@ -145,12 +160,12 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
         fileMenu.add(pasteAction)
 
         fileMenu.addSeparator()
-        fileMenu.add(actionManager.createImportAction<ImageWorldComponent>(this))
-        fileMenu.add(actionManager.createExportAction<ImageWorldComponent>(this))
+        fileMenu.add(actionManager.createImportAction(this))
+        fileMenu.add(actionManager.createExportAction(this))
         fileMenu.addSeparator()
-        fileMenu.add(actionManager.createRenameAction<ImageWorldComponent>(this))
+        fileMenu.add(actionManager.createRenameAction(this))
         fileMenu.addSeparator()
-        fileMenu.add(actionManager.createCloseAction<ImageWorldComponent>(this))
+        fileMenu.add(actionManager.createCloseAction(this))
 
         // Edit Menu
         val editMenu = JMenu("Edit")
@@ -220,7 +235,12 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
      * Set up toolbars depending on what type of world is being displayed
      */
     private fun setupToolbars() {
-        imageAlbumButtons.forEach(Consumer { comp: Component? -> imageAlbumToolbar.add(comp) })
+
+        imageAlbumToolbar.add(frameLabel)
+        imageAlbumToolbar.add(deleteImageAction)
+        imageAlbumToolbar.add(previousImageAction)
+        imageAlbumToolbar.add(nextImageAction)
+        imageAlbumToolbar.add(takeSnapshotAction)
 
         //        // Add Color Picker
         //        JButton setColorButton = new JButton();
@@ -371,53 +391,6 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
         // }
     }
 
-    val imageAlbumButtons: List<Component>
-        /**
-         * Toolbar buttons for image album.
-         *
-         * @return the list of buttons
-         */
-        get() {
-            val returnList: MutableList<Component> = LinkedList()
-
-            val deleteCurrentImage = JButton()
-            deleteCurrentImage.icon = ResourceManager.getSmallIcon("menu_icons/RedX.png")
-            deleteCurrentImage.toolTipText = "Delete Current Image"
-            deleteCurrentImage.addActionListener { e: ActionEvent? ->
-                imageWorld.imageAlbum.deleteCurrentImage()
-            }
-            returnList.add(deleteCurrentImage)
-
-            previousImagesButton = JButton()
-            previousImagesButton!!.icon = ResourceManager.getSmallIcon("menu_icons/TangoIcons-GoPrevious.png")
-            previousImagesButton!!.toolTipText = "Previous Image"
-            previousImagesButton!!.addActionListener { e: ActionEvent? ->
-                imageWorld.previousFrame()
-            }
-            returnList.add(previousImagesButton!!)
-
-            nextImagesButton = JButton()
-            nextImagesButton!!.icon = ResourceManager.getSmallIcon("menu_icons/TangoIcons-GoNext.png")
-            nextImagesButton!!.toolTipText = "Next Image"
-            nextImagesButton!!.addActionListener { e: ActionEvent? ->
-                imageWorld.nextFrame()
-            }
-            returnList.add(nextImagesButton!!)
-
-            takeSnapshotButton = JButton()
-            takeSnapshotButton!!.icon = ResourceManager.getSmallIcon("menu_icons/camera.png")
-            takeSnapshotButton!!.toolTipText = "Take Snapshot"
-            takeSnapshotButton!!.addActionListener { e: ActionEvent? ->
-                imageWorld.imageAlbum.takeSnapshot()
-            }
-            returnList.add(takeSnapshotButton!!)
-
-
-            returnList.add(frameLabel)
-
-
-            return returnList
-        }
 
     /**
      * Load a set of images to be used as the "Album" in an image album.
@@ -441,11 +414,11 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
     fun updateToolbar() {
         // Disable next / previous buttons when there is less than two images
         if (imageWorld.numImages < 2) {
-            nextImagesButton!!.isEnabled = false
-            previousImagesButton!!.isEnabled = false
+            nextImageAction.isEnabled = false
+            previousImageAction.isEnabled = false
         } else {
-            nextImagesButton!!.isEnabled = true
-            previousImagesButton!!.isEnabled = true
+            nextImageAction.isEnabled = true
+            previousImageAction.isEnabled = true
         }
         val index = imageWorld.imageAlbum.frameIndex
         val numFrames = imageWorld.imageAlbum.numFrames

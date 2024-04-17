@@ -30,7 +30,7 @@ val roomSchemaSim = newSim {
     val nc = network.addNeuronCollection(40)
 
     //Connecting Neuron Collection to Competitive Input Layer
-    connect(nc, rbm.visibleLayer)
+    //connect(nc, rbm.visibleLayer) I do not know why this is not working
 
     // Labeling the neuron collection
     nc.neuronList[0].label = "ceiling"

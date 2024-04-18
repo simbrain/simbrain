@@ -97,6 +97,7 @@ val simulations = dir<Any>("Simulations") {
         item("Competitive Grid Network") { competitiveGridSim }
         item("Competitive Network (Simple)") { competitiveSim }
         item("Restricted Boltzmann Machine") { rbmSim }
+        item("Room Schema") { roomSchemaSim }
         item("Projection") { projectionSim }
         item("Hopfield") { hopfieldSim }
         // item("SRN - Temporal XOR") { srnXORSim }

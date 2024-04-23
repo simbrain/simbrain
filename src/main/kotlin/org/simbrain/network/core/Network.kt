@@ -389,8 +389,6 @@ class Network: CoroutineScope, EditableObject {
         updatePriorityList();
 
         // Initialize update manager
-        updateManager.postOpenInit()
-        networkModels.allInReconstructionOrder.forEach { it.postOpenInit() }
         networkModels.allInReconstructionOrder.forEach { model ->
             model.events.deleted.on(wait = true) {
                 networkModels.remove(it)

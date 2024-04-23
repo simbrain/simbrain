@@ -464,13 +464,6 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
 
     override fun onCommit() {}
 
-    override fun postOpenInit() {
-        super.postOpenInit()
-
-        incomingSgs = HashSet()
-        outgoingSg = HashSet()
-    }
-
     override fun toString(): String {
         return "$id with ${activations.size} activations: ${Utils.getTruncatedArrayString(activations, 10)}"
     }

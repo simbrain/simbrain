@@ -127,11 +127,6 @@ class NeuronCollection : AbstractNeuronCollection {
         addListener(neuron)
     }
 
-    override fun postOpenInit() {
-        super.postOpenInit()
-        neuronList.forEach { addListener(it) }
-    }
-
     /**
      * Convenience method for applying a [Layout] to a neuron collection.
      */

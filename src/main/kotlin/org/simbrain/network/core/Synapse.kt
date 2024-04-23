@@ -59,7 +59,6 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
         probDist = "Normal",
         probParam1 = .1,
         probParam2 = .5,
-        useLegacySetter = true,
         order = 1
     )
     @get:Producible(defaultVisibility = false)
@@ -482,11 +481,6 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
     fun decay(decayPercent: Double) {
         val decayAmount = decayPercent * strength
         strength -= decayAmount
-    }
-
-    override fun postOpenInit() {
-        target.addToFanIn(this)
-        source.addToFanOut(this)
     }
 
     //  TODO: Without any indication in the GUI this might be unclear to users.

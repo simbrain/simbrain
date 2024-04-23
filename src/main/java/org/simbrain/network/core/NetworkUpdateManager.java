@@ -64,29 +64,6 @@ public class NetworkUpdateManager {
 
     }
 
-    /**
-     * Perform any initialization required after opening a network from xml.
-     * UpdateManager will have been created from a default no argument
-     * constructor ands its fields populated using xstream.
-     */
-    public void postOpenInit() {
-        // Iterator<NetworkUpdateAction> actions = actionList.iterator();
-        // // TODO: Hack-y solution. Revisit this.
-        // while (actions.hasNext()) {
-        //     NetworkUpdateAction action = actions.next();
-        //     if (action instanceof ConcurrentBufferedUpdate) {
-        //         actions.remove();
-        //         actionList.add(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(network));
-        //         break;
-        //     }
-        // }
-        //
-        // for (NetworkUpdateAction action : getActionList()) {
-        //     if (action instanceof CustomUpdate) {
-        //         ((CustomUpdate) action).init();
-        //     }
-        // }
-    }
 
     /**
      * This is the list of actions that are available to be added manually.

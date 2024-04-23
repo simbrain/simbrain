@@ -75,12 +75,6 @@ abstract class NetworkModel {
     }
 
     /**
-     * Override if custom unmarashalling is needed after the parent network is added. Often an event object is needed.
-     * See overrides for examples.
-     */
-    open fun postOpenInit() {}
-
-    /**
      * Override to provide a means of randomizing a model.
      */
     open fun randomize(randomizer: ProbabilityDistribution? = null) {}

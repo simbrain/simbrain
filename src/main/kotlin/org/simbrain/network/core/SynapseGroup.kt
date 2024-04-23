@@ -130,13 +130,6 @@ class SynapseGroup @JvmOverloads constructor(
         this.synapses.forEach { it.toggleClamping() }
     }
 
-    override fun postOpenInit() {
-        if (events == null) {
-            events = SynapseGroupEvents()
-        }
-        this.synapses.forEach { it.postOpenInit() }
-    }
-
     override fun toString(): String {
         return ("$id  with ${size()} synapse(s) from $source.id to $target.id")
     }

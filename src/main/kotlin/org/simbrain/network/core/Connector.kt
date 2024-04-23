@@ -48,12 +48,6 @@ abstract class Connector(var source: Layer, var target: Layer) : NetworkModel(),
         target.events.deleted.on(wait = true) { delete() }
     }
 
-    override fun postOpenInit() {
-        initEvents()
-        source.addOutgoingConnector(this)
-        target.addIncomingConnector(this)
-    }
-
     override fun delete() {
         source.removeOutgoingConnector(this)
         target.removeIncomingConnector(this)

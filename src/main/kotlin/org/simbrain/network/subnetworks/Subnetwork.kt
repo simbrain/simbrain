@@ -115,10 +115,6 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
         modelList.allInReconstructionOrder.forEach { it.update() }
     }
 
-    override fun postOpenInit() {
-        modelList.allInReconstructionOrder.forEach { it.postOpenInit() }
-    }
-
     private val locatableModels: List<LocatableModel>
         get() = modelList.all.filterIsInstance<LocatableModel>()
 

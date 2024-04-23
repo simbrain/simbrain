@@ -150,12 +150,6 @@ abstract class Layer : LocatableModel(), AttributeContainer {
         outgoingConnectors.remove(connector)
     }
 
-    override fun postOpenInit() {
-
-        incomingConnectors = ArrayList()
-        outgoingConnectors = ArrayList()
-    }
-
     override fun delete() {
         events.deleted.fireAndBlock(this)
     }

@@ -71,12 +71,6 @@ open class NeuronGroup() : AbstractNeuronCollection() {
         it.addNeurons(neuronList.map(Neuron::copy))
         it.label = label
     }
-
-    override fun postOpenInit() {
-        super.postOpenInit()
-        neuronList.forEach { it.postOpenInit() }
-        neuronList.forEach { addListener(it) }
-    }
 }
 
 @CustomTypeName("Bare Neuron Group")

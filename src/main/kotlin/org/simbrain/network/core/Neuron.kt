@@ -246,15 +246,6 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
 
     fun copy(): Neuron = Neuron(this)
 
-    override fun postOpenInit() {
-        events = NeuronEvents()
-        fanOut = HashMap()
-        fanIn = ArrayList()
-        if (polarity == null) {
-            polarity = Polarity.BOTH
-        }
-    }
-
     /**
      * Returns the time type of this neuron's update rule.
      *

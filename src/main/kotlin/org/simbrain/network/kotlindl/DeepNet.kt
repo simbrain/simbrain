@@ -148,13 +148,13 @@ class DeepNet(
             callback = object: Callback() {
                 override fun onTrainBegin() {
                     println("Training begin")
-                    trainerEvents.beginTraining.fireAndForget();
+                    trainerEvents.beginTraining.fire();
                 }
 
                 override fun onTrainEnd(logs: TrainingHistory) {
                     println("Training end:")
                     lossValue = logs.lastBatchEvent().lossValue
-                    trainerEvents.endTraining.fireAndForget()
+                    trainerEvents.endTraining.fire()
                 }
             }
 
@@ -197,7 +197,7 @@ class DeepNet(
         } else {
             outputs = Matrix(outputSize(), 1)
         }
-        events.updated.fireAndForget()
+        events.updated.fire()
         inputs.mul(0.0) // clear inputs
     }
 

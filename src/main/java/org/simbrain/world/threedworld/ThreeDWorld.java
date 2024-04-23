@@ -177,7 +177,7 @@ public class ThreeDWorld implements AppState {
         agentController.registerInput();
         scene.load(engine);
         initialized = true;
-        events.getInitialized().fireAndForget();
+        events.getInitialized().fire();
         engine.queueState(ThreeDEngine.State.RenderOnly, false);
     }
 
@@ -204,7 +204,7 @@ public class ThreeDWorld implements AppState {
             for (Entity entity : getEntities()) {
                 entity.update(tpf);
             }
-            events.getUpdated().fireAndForget();
+            events.getUpdated().fire();
         }
     }
 
@@ -225,7 +225,7 @@ public class ThreeDWorld implements AppState {
         } catch (Exception ex) {
             // Ignore exceptions during shutdown
         }
-        events.getClosed().fireAndForget();
+        events.getClosed().fire();
     }
 
     /**
@@ -241,7 +241,7 @@ public class ThreeDWorld implements AppState {
 
     public void addAgent(Agent agent) {
         entities.add(agent);
-        events.getAgentAdded().fireAndForget(agent);
+        events.getAgentAdded().fire(agent);
     }
 
     // TODO: Add agent removed

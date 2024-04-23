@@ -134,7 +134,7 @@ val actorCritic = newSim {
         model.rangeUpperBound = 2.0
         model.rangeLowerBound = -1.0
         model.removeAllScalarTimeSeries()
-        events.componentMinimized.fireAndForget(true)
+        events.componentMinimized.fire(true)
     }
     val rewardPlot = couplingManager.createCoupling(reward,  plot.model.addScalarTimeSeries("Reward"))
     val valuePlot = couplingManager.createCoupling(value,  plot.model.addScalarTimeSeries("TD Error"))
@@ -199,7 +199,7 @@ val actorCritic = newSim {
 
     // Doc viewer
     val docViewer = addDocViewer( "Information", "ActorCritic.html")
-    docViewer.events.componentMinimized.fireAndForget(true)
+    docViewer.events.componentMinimized.fire(true)
 
     // Lay everything out
     withGui {

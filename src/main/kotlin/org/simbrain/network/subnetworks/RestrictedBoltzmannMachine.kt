@@ -104,7 +104,7 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
 
     fun updateStateInfoText() {
         customInfo.text = stateInfoText
-        events.customInfoUpdated.fireAndBlock()
+        events.customInfoUpdated.fire()
     }
 
     context(Network)

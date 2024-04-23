@@ -174,7 +174,7 @@ public class EmitterMatrix implements AttributeContainer {
                 }
             }
         }
-        events.getImageUpdate().fireAndForget();
+        events.getImageUpdate().fire();
     }
 
     public BufferedImage getImage() {

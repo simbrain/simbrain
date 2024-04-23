@@ -10,6 +10,7 @@ gradlew*
 *.classpath
 *.project
 /.idea/*
+!/.idea/inspectionProfiles
 ./bin/
 *.iml
 out/*

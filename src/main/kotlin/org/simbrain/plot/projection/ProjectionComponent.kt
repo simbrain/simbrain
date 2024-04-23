@@ -34,15 +34,11 @@ class ProjectionComponent @JvmOverloads constructor(name: String, val projector:
         projector.dataset.currentPoint?.label = label
     }
 
-    override fun getAttributeContainers(): List<AttributeContainer> {
-        val container: MutableList<AttributeContainer> = ArrayList()
-        container.add(this)
-        return container
-    }
+    override val attributeContainers: List<AttributeContainer>
+        get() = listOf(this)
 
-    override fun getXML(): String {
-        return getProjectorXStream().toXML(projector)
-    }
+    override val xml: String
+        get() = getProjectorXStream().toXML(projector)
 
     init {
         projector.events.pointUpdated.on(wait = true) {
@@ -59,14 +55,13 @@ class ProjectionComponent @JvmOverloads constructor(name: String, val projector:
             return xstream
         }
 
-        @JvmStatic
         fun open(input: InputStream?, name: String, format: String?): ProjectionComponent {
             val proj = getProjectorXStream().fromXML(input) as Projector
             return ProjectionComponent(name, proj)
         }
     }
 
-    override fun save(output: OutputStream?, format: String?) {
+    override fun save(output: OutputStream, format: String?) {
         getProjectorXStream().toXML(projector, output)
     }
 

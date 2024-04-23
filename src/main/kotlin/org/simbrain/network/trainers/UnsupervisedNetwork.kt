@@ -65,7 +65,7 @@ class UnsupervisedTrainer: EditableObject {
             events.iterationReset.fire()
         }
         isRunning = true
-        events.beginTraining.fireAndForget()
+        events.beginTraining.fire()
         withContext(Dispatchers.Default) {
             while (isRunning) {
                 trainOnce(network)
@@ -86,7 +86,7 @@ class UnsupervisedTrainer: EditableObject {
         iteration++
         withContext(Dispatchers.Default) {
             network.trainOnInputData()
-            events.progressUpdated.fire("Iteration" to iteration)
+            events.progressUpdated.fire("Iteration" to iteration).await()
         }
     }
 }

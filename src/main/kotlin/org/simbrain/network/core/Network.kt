@@ -148,14 +148,9 @@ class Network: CoroutineScope, EditableObject {
      */
     val modelsInReconstructionOrder get() = networkModels.allInReconstructionOrder
 
-    /**
-     * The core update function of the neural network. Calls the current update function on each neuron, decays all the
-     * neurons, and checks their bounds.
-     */
-    @JvmOverloads
+    private var shouldUpdateTimeType = true
 
-    fun update(name: String = "") {
-
+    private fun updateInternal(name: String) {
         // Main update
         updateManager.actionList.forEach {
             runBlocking {
@@ -165,9 +160,28 @@ class Network: CoroutineScope, EditableObject {
             }
         }
 
+        if (shouldUpdateTimeType) {
+            updateTimeType()
+            shouldUpdateTimeType = false
+        }
+
         updateTime()
         setUpdateCompleted(true)
+    }
+
+    /**
+     * The core update function of the neural network. Calls the current update function on each neuron, decays all the
+     * neurons, and checks their bounds.
+     */
+    @JvmOverloads
+    fun update(name: String = "") {
+        updateInternal(name)
         events.updated.fireAndBlock()
+    }
+
+    suspend fun updateSuspend(name: String = "") {
+        updateInternal(name)
+        events.updated.fire().await()
     }
 
     /**
@@ -320,15 +334,15 @@ class Network: CoroutineScope, EditableObject {
             }
             model.events.deleted.on(wait = true) {
                 networkModels.remove(it)
-                events.modelRemoved.fire(it)
+                events.modelRemoved.fire(it).join()
                 updatePriorityList()
             }
             val job = events.modelAdded.fire(model)
             if (model is Neuron) {
-                model.events.priorityChanged.on {
+                model.events.priorityChanged.on { _, _ ->
                     updatePriorityList()
                 }
-                model.events.updateRuleChanged.on(wait = true) { _, _ -> updateTimeType() }
+                model.events.updateRuleChanged.on { _, _ -> shouldUpdateTimeType = true }
                 updatePriorityList()
             }
             return job

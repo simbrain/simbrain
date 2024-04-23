@@ -364,7 +364,7 @@ class EnumWidget<O : EditableObject, T : Enum<*>>(
                 it.selectedItem = parameter.value
             }
             it.addActionListener { _ ->
-                events.valueChanged.fireAndBlock(parameter.property)
+                events.valueChanged.fire(parameter.property)
                 this@EnumWidget.isConsistent = true
                 it.removeNull()
             }
@@ -406,7 +406,7 @@ class BooleanWidget<O : EditableObject>(
             }
         }.also {
             it.addActionListener { _ ->
-                events.valueChanged.fireAndBlock(parameter.property)
+                events.valueChanged.fire(parameter.property)
                 this@BooleanWidget.isConsistent = true
                 it.removeNull()
             }
@@ -515,7 +515,7 @@ class NumericWidget<O : EditableObject, T>(
             })
         }.also {
             it.addChangeListener {
-                events.valueChanged.fireAndBlock(parameter.property)
+                events.valueChanged.fire(parameter.property)
                 this@NumericWidget.isConsistent = true
             }
         }
@@ -582,7 +582,7 @@ class StringWidget<O : EditableObject>(
         }.also {
             it.document.addDocumentListener(object : DocumentListener {
                 fun update() {
-                    events.valueChanged.fireAndBlock(parameter.property)
+                    events.valueChanged.fire(parameter.property)
                     this@StringWidget.isConsistent = true
                     changed = true
                 }
@@ -851,7 +851,7 @@ class ObjectWidget<O : EditableObject, T : CopyableObject>(
                         this@ObjectWidget.isConsistent = true
                         removeItem(NULL_STRING)
                         revalidate()
-                        events.valueChanged.fireAndBlock(parameter.property)
+                        events.valueChanged.fire(parameter.property)
                         SwingUtilities.getWindowAncestor(this)?.pack()
                     }
                 } catch (exception: Exception) {

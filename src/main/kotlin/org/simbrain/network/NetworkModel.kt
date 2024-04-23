@@ -30,7 +30,7 @@ abstract class NetworkModel {
             if (this.label == null) {
                 field = ""
             }
-            events.labelChanged.fireAndForget(oldLabel, this.label)
+            events.labelChanged.fire(oldLabel, this.label)
         }
 
     /**
@@ -54,7 +54,7 @@ abstract class NetworkModel {
      * Select this network model.
      */
     fun select() {
-        events.selected.fireAndForget(this)
+        events.selected.fire(this)
     }
 
     /**

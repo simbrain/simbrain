@@ -164,7 +164,7 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
         set(newLocation) {
             val delta = newLocation - location
             neuronList.forEach { it.location += delta }
-            events.locationChanged.fireAndForget()
+            events.locationChanged.fire()
         }
 
     override val bound: Rectangle2D
@@ -193,7 +193,7 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
         for (neuron in neuronList) {
             neuron.offset(offsetX, offsetY, false)
         }
-        events.locationChanged.fireAndForget()
+        events.locationChanged.fire()
     }
 
     /**
@@ -224,7 +224,7 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
      * Add listener to indicated neuron.
      */
     protected fun addListener(n: Neuron) {
-        n.events.locationChanged.on { events.locationChanged.fireAndForget() }
+        n.events.locationChanged.on { events.locationChanged.fire() }
         // n.getEvents().onLocationChange(fireLocationChange); // TODO Reimplement when debounce is working
         n.events.deleted.on { neuronList.remove(it) }
         n.events.deleted.on { neuron ->
@@ -334,7 +334,7 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
         outgoingSg.forEach(Consumer { obj: SynapseGroup -> obj.delete() })
         incomingSgs.forEach(Consumer { obj: SynapseGroup -> obj.delete() })
         val customInfo = customInfo
-        customInfo?.events?.deleted?.fireAndBlock(customInfo)
+        customInfo?.events?.deleted?.fire(customInfo)
     }
 
     context(Network)

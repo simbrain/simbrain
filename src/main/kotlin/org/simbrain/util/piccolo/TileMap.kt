@@ -203,19 +203,19 @@ class TileMap(width: Int, height: Int) {
         if (guiEnabled) {
             val oldRenderedImage = layerImage
             val newRenderedImage = renderImage(tileSets, true)
-            events.layerImageChanged.fireAndForget(oldRenderedImage, newRenderedImage)
+            events.layerImageChanged.fire(oldRenderedImage, newRenderedImage)
         }
     }
 
     fun addLayer(layer: TileMapLayer): TileMapLayer {
         _layers.add(layer)
-        events.layersChanged.fireAndForget()
+        events.layersChanged.fire()
         return layer
     }
 
     fun removeLayer(layer: TileMapLayer) {
         _layers.remove(layer)
-        events.layersChanged.fireAndForget()
+        events.layersChanged.fire()
     }
 
     /**
@@ -316,7 +316,7 @@ class TileMap(width: Int, height: Int) {
                 it.renderImage(tileSets, true)
             }
         }
-        events.mapSizeChanged.fireAndBlock()
+        events.mapSizeChanged.fire()
     }
 
     val boundsNeedRecompute get() = layers.any { it.boundsNeedRecompute != true }

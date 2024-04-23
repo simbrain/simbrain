@@ -18,6 +18,7 @@
  */
 package org.simbrain.docviewer;
 
+import org.jetbrains.annotations.NotNull;
 import org.simbrain.workspace.WorkspaceComponent;
 
 import java.io.*;
@@ -102,7 +103,7 @@ public class DocViewerComponent extends WorkspaceComponent {
     }
 
     @Override
-    public List<? extends String> getFormats() {
+    public @NotNull List<String> getFormats() {
         return Collections.singletonList("html");
     }
 }

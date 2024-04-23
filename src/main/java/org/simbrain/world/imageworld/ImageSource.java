@@ -39,7 +39,7 @@ public abstract class ImageSource  {
      */
     public ImageSource() {
         currentImage = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
-        getEvents().getImageUpdate().fireAndForget();
+        getEvents().getImageUpdate().fire();
     }
 
     /**
@@ -72,7 +72,7 @@ public abstract class ImageSource  {
      */
     public void fireImageUpdate() {
         if (isEnabled()) {
-            events.getImageUpdate().fireAndForget();
+            events.getImageUpdate().fire();
         }
     }
 
@@ -88,7 +88,7 @@ public abstract class ImageSource  {
         currentImage = image;
         if (fireEvents) {
             if (resized && isEnabled()) {
-                events.getResize().fireAndForget();
+                events.getResize().fire();
             }
             fireImageUpdate();
         }

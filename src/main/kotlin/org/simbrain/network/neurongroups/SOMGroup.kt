@@ -115,7 +115,7 @@ class SOMGroup @JvmOverloads constructor(
         learningRate = params.initialLearningRate
         neighborhoodSize = params.initNeighborhoodSize
         updateStateInfoText()
-        events.customInfoUpdated.fireAndBlock()
+        events.customInfoUpdated.fire()
     }
 
     /**
@@ -178,7 +178,7 @@ class SOMGroup @JvmOverloads constructor(
 
         // For box
         customInfo.text = getStateInfoText()
-        events.customInfoUpdated.fireAndBlock()
+        events.customInfoUpdated.fire()
     }
 
     fun getStateInfoText() = """
@@ -188,7 +188,7 @@ class SOMGroup @JvmOverloads constructor(
 
     fun updateStateInfoText() {
         customInfo.text = getStateInfoText()
-        events.customInfoUpdated.fireAndBlock()
+        events.customInfoUpdated.fire()
     }
 
     /**

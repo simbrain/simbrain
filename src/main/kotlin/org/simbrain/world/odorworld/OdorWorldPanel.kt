@@ -267,7 +267,7 @@ class OdorWorldPanel(
                 renderAllLayers(world)
             }
             world.tileMap.events.mapSizeChanged.on(swingDispatcher) {
-                world.events.tileMapChanged.fireAndBlock()
+                world.events.tileMapChanged.fire()
             }
 
             // Single layer update
@@ -294,7 +294,7 @@ class OdorWorldPanel(
                 animationTimer = Timer().apply {
                     schedule(object : TimerTask() {
                         override fun run() {
-                            world.getEvents().frameAdvanced.fireAndForget()
+                            world.getEvents().frameAdvanced.fire()
                         }
                     }, 50, 50)
                 }
@@ -331,7 +331,7 @@ class OdorWorldPanel(
             }, 10, 10)
         }
 
-        world.getEvents().tileMapChanged.fireAndForget()
+        world.getEvents().tileMapChanged.fire()
 
         canvas.setViewBounds(Rectangle2D.Double(0.0, 0.0, world.width, world.height))
 

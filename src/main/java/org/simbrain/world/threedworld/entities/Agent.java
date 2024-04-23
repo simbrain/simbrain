@@ -34,12 +34,12 @@ public class Agent implements Entity {
 
     public void addSensor(Sensor sensor) {
         sensors.add(sensor);
-        events.getSensorAdded().fireAndForget(sensor);
+        events.getSensorAdded().fire(sensor);
     }
 
     public void removeSensor(Sensor sensor) {
         sensors.remove(sensor);
-        events.getSensorDeleted().fireAndForget(sensor);
+        events.getSensorDeleted().fire(sensor);
     }
 
     /**
@@ -74,12 +74,12 @@ public class Agent implements Entity {
 
     public void addEffector(Effector effector) {
         effectors.add(effector);
-        events.getEffectorAdded().fireAndForget(effector);
+        events.getEffectorAdded().fire(effector);
     }
 
     public void removeEffector(Effector effector) {
         effectors.remove(effector);
-        events.getEffectorAdded().fireAndForget(effector);
+        events.getEffectorAdded().fire(effector);
     }
 
     /**

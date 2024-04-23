@@ -64,7 +64,7 @@ class OperantWithEnvironment : Simulation {
 
         sim.workspace.clearWorkspace()
         nc = sim.addNetwork(155, 9, 575, 500, "Brain")
-        net = nc.getNetwork()
+        net = nc.network
 
         // Behavioral nodes
         behaviorNet = net.addNeuronGroup(-9.25, 95.93, numNeurons)
@@ -123,15 +123,15 @@ class OperantWithEnvironment : Simulation {
 
         // Create the odor world
         oc = sim.addOdorWorld(730, 7, 315, 383, "Three Objects")
-        oc.getWorld().isObjectsBlockMovement = false
-        oc.getWorld().isUseCameraCentering = false
-        mouse = oc.getWorld().addEntity(120, 245, EntityType.MOUSE)
+        oc.world.isObjectsBlockMovement = false
+        oc.world.isUseCameraCentering = false
+        mouse = oc.world.addEntity(120, 245, EntityType.MOUSE)
         mouse.heading = 90.0
 
         // Set up world
-        cheese = oc.getWorld().addEntity(27, 20, EntityType.CANDLE)
-        flower = oc.getWorld().addEntity(79, 20, EntityType.PANSY)
-        fish = oc.getWorld().addEntity(125, 20, EntityType.FISH)
+        cheese = oc.world.addEntity(27, 20, EntityType.CANDLE)
+        flower = oc.world.addEntity(79, 20, EntityType.PANSY)
+        fish = oc.world.addEntity(125, 20, EntityType.FISH)
 
 
         // Set up object sensors

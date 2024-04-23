@@ -63,7 +63,7 @@ class ModularOscillatoryNetwork : Simulation {
             9, 8, 581, 297,
             "Patterns of Activity"
         )
-        net = nc.getNetwork()
+        net = nc.network
 
         // Sensory network
         sensory = addModule(-115, 10, 49, "Sensory", DecayRule())

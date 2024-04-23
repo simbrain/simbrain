@@ -61,7 +61,7 @@ abstract class SensorWithRelativeLocation(
     var isShowLabel = false
         set(value) {
             field = value
-            events.propertyChanged.fireAndForget()
+            events.propertyChanged.fire()
         }
 
     /**

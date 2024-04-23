@@ -8,15 +8,13 @@ import java.io.OutputStream
 
 class DataWorldComponent @JvmOverloads constructor(name: String, val dataWorld: DataWorld = DataWorld()): WorkspaceComponent(name) {
 
-    override fun getAttributeContainers(): List<AttributeContainer> {
-        return listOf(dataWorld)
-    }
+    override val attributeContainers: List<AttributeContainer> get() = listOf(dataWorld)
 
-    override fun save(output: OutputStream?, format: String?) {
+    override fun save(output: OutputStream, format: String?) {
         getSimbrainXStream().toXML(dataWorld, output)
     }
 
-    override fun update() {
+    override suspend fun update() {
         dataWorld.update()
     }
 

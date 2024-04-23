@@ -693,7 +693,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         enablingCondition = EnablingCondition.NEURONS
     ) {
         GridLayout().layoutNeurons(selectionManager.filterSelectedModels<Neuron>())
-        network.events.zoomToFitPage.fireAndForget()
+        network.events.zoomToFitPage.fire()
     }
 
     /**

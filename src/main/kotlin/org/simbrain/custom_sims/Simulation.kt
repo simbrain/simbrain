@@ -102,19 +102,19 @@ suspend fun SimulationScope.addProjectionPlot2(name: String): ProjectionComponen
     return projectionComponent
 }
 
-fun SimulationScope.addImageWorld(name: String?): ImageWorldComponent {
+fun SimulationScope.addImageWorld(name: String): ImageWorldComponent {
     val imageWorldComponent = ImageWorldComponent(name)
     workspace.addWorkspaceComponent(imageWorldComponent)
     return imageWorldComponent
 }
 
-fun SimulationScope.addTextWorld(name: String?): TextWorldComponent {
+fun SimulationScope.addTextWorld(name: String): TextWorldComponent {
     val textWorldComponent = TextWorldComponent(name)
     workspace.addWorkspaceComponent(textWorldComponent)
     return textWorldComponent
 }
 
-fun SimulationScope.addTimeSeries(name: String?): TimeSeriesPlotComponent {
+fun SimulationScope.addTimeSeries(name: String): TimeSeriesPlotComponent {
     val timeSeriesPlotComponent = TimeSeriesPlotComponent(name)
     workspace.addWorkspaceComponent(timeSeriesPlotComponent)
     return timeSeriesPlotComponent

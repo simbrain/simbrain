@@ -56,7 +56,7 @@ class TextWorld : AttributeContainer, EditableObject {
     )
         set(value) {
             field = value
-            events.tokenVectorMapChanged.fireAndForget()
+            events.tokenVectorMapChanged.fire()
         }
 
     /**
@@ -71,7 +71,7 @@ class TextWorld : AttributeContainer, EditableObject {
         get() = _text
         set(value) {
             _text = value
-            events.textChanged.fireAndForget()
+            events.textChanged.fire()
         }
 
     /**
@@ -87,7 +87,7 @@ class TextWorld : AttributeContainer, EditableObject {
     var currentItem: TextItem? = null
         set(value) {
             field = value
-            events.currentTokenChanged.fireAndForget(value)
+            events.currentTokenChanged.fire(value)
         }
 
     /**
@@ -214,7 +214,7 @@ class TextWorld : AttributeContainer, EditableObject {
             }
         }
         if (atEnd()) {
-            events.atEnd.fireAndBlock()
+            events.atEnd.fire()
         }
     }
 
@@ -296,7 +296,7 @@ class TextWorld : AttributeContainer, EditableObject {
     @Consumable
     fun addTextAtCursor(newText: String) {
         text = StringBuilder(text).insert(position, " $newText ").toString()
-        events.textChanged.fireAndForget()
+        events.textChanged.fire()
     }
 
     /**
@@ -307,7 +307,7 @@ class TextWorld : AttributeContainer, EditableObject {
         position = text.length
         text += "$spacing$newText"
         position = text.length
-        events.textChanged.fireAndForget()
+        events.textChanged.fire()
     }
 
     /**
@@ -325,7 +325,7 @@ class TextWorld : AttributeContainer, EditableObject {
             lastPosition = position
             position = newPosition
             if (fireEvent) {
-                events.cursorPositionChanged.fireAndForget()
+                events.cursorPositionChanged.fire()
             }
         } else {
             System.err.println("Invalid position:$newPosition")

@@ -83,7 +83,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
             if (oldRule::class != value::class) {
                 dataHolder = value.createScalarData()
             }
-            events.updateRuleChanged.fireAndForget(oldRule, value)
+            events.updateRuleChanged.fire(oldRule, value)
         }
 
     /**
@@ -103,7 +103,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
         set(value) {
             lastActivation = field
             field = value
-            events.activationChanged.fireAndForget(lastActivation, value)
+            events.activationChanged.fire(lastActivation, value)
         }
 
     /**
@@ -133,7 +133,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
             if (dataHolder is SpikingScalarData) {
                 (dataHolder as SpikingScalarData).setHasSpiked(spike, time)
             }
-            events.spiked.fireAndForget(spike)
+            events.spiked.fire(spike)
         }
 
     /**
@@ -188,7 +188,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
     var clamped = false
         set(value) {
             field = value
-            events.clampChanged.fireAndForget()
+            events.clampChanged.fire()
         }
 
     /**
@@ -200,7 +200,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
         set(value) {
             field = value
             fanOut.values.filterNotNull().forEach { s -> s.strength = field.value(s.strength) }
-            events.colorChanged.fireAndForget()
+            events.colorChanged.fire()
         }
 
     /**
@@ -220,8 +220,9 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
     )
     var updatePriority: Int = 0
         set(updatePriority) {
+            val old = field
             field = updatePriority
-            events.priorityChanged.fireAndBlock()
+            events.priorityChanged.fire(updatePriority, old)
         }
 
     /**
@@ -632,7 +633,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
         x = position.x
         y = position.y
         if (fireEvent) {
-            events.locationChanged.fireAndForget()
+            events.locationChanged.fire()
         }
     }
 

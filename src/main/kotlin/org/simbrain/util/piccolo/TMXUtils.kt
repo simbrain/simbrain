@@ -6,10 +6,9 @@ import org.piccolo2d.nodes.PImage
 import org.simbrain.util.*
 import org.simbrain.world.odorworld.OdorWorldComponent
 import org.simbrain.world.odorworld.OdorWorldResourceManager
-import java.awt.*
+import java.awt.Image
 import java.awt.geom.Point2D
 import java.io.File
-import javax.swing.*
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.min
@@ -37,7 +36,7 @@ fun transparentTexture(width: Int, height: Int) = transparentImage(width, height
  * @return the tilemap object from the given file
  */
 fun loadTileMap(file: File?): TileMap {
-    return OdorWorldComponent.getOdorWorldXStream().fromXML(file) as TileMap
+    return OdorWorldComponent.odorWorldXStream.fromXML(file) as TileMap
 }
 
 /**
@@ -48,7 +47,7 @@ fun loadTileMap(file: File?): TileMap {
  * @return the tilemap object from the given file
  */
 fun loadTileMap(filename: String): TileMap {
-    return OdorWorldComponent.getOdorWorldXStream().fromXML(
+    return OdorWorldComponent.odorWorldXStream.fromXML(
         OdorWorldResourceManager.getFileURL("tilemap" + File.separator + filename)
     ) as TileMap
 }

@@ -111,9 +111,9 @@ public final class NeuronDialog extends StandardDialog {
         neuronPropertiesPanel.commitChanges();
 
         neuronList.forEach(n ->{
-            n.getEvents().getLabelChanged().fireAndForget("", n.getLabel());
-            n.getEvents().getColorChanged().fireAndForget();
-            n.getEvents().getClampChanged().fireAndForget();
+            n.getEvents().getLabelChanged().fire("", n.getLabel());
+            n.getEvents().getColorChanged().fire();
+            n.getEvents().getClampChanged().fire();
         });
 
     }

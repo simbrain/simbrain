@@ -50,7 +50,7 @@ open class NeuronGroup() : AbstractNeuronCollection() {
 
     override fun delete() {
         super.delete()
-        events.deleted.fireAndBlock(this)
+        events.deleted.fire(this)
         neuronList.toList().forEach { it.delete() }
     }
 

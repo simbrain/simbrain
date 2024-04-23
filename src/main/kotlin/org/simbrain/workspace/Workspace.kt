@@ -126,9 +126,7 @@ class Workspace: CoroutineScope {
             component.name = idManager.getAndIncrementId(component.javaClass)
         }
 
-        runBlocking {
-            events.componentAdded.fire(component)
-        }
+        events.componentAdded.fireAndBlock(component)
         component.events.attributeContainerRemoved.on { attributeContainer: AttributeContainer? ->
             couplingManager.removeAttributeContainer(
                 attributeContainer!!
@@ -148,7 +146,7 @@ class Workspace: CoroutineScope {
         // this.getCouplingManager().removeCouplings(component);
         _componentList.remove(component)
         setWorkspaceChanged(true)
-        events.componentRemoved.fireAndForget(component)
+        events.componentRemoved.fire(component)
     }
 
     /**
@@ -259,7 +257,7 @@ class Workspace: CoroutineScope {
         setWorkspaceChanged(false)
         currentFile = null
         couplingManager = CouplingManager(this)
-        events.workspaceCleared.fireAndForget()
+        events.workspaceCleared.fire()
         updater.updateManager.setDefaultUpdateActions()
     }
 
@@ -396,7 +394,7 @@ class Workspace: CoroutineScope {
                 serializer.deserialize(FileInputStream(theFile))
                 currentFile = theFile
                 setWorkspaceChanged(false)
-                events.workspaceOpened.fireAndForget()
+                events.workspaceOpened.fire()
             }
         } catch (e: IOException) {
             e.printStackTrace()

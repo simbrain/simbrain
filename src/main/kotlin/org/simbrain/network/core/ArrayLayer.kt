@@ -21,7 +21,7 @@ abstract class ArrayLayer(
     var isClamped = false
         set(clamped) {
             field = clamped
-            events.clampChanged.fireAndForget()
+            events.clampChanged.fire()
         }
 
     override val inputs: Matrix = Matrix(inputSize, 1)
@@ -59,22 +59,22 @@ abstract class ArrayLayer(
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
         inputs.randomize(randomizer ?: activationRandomizer)
-        events.updated.fireAndForget()
+        events.updated.fire()
     }
 
     override fun clear() {
         inputs.mul(0.0)
-        events.updated.fireAndForget()
+        events.updated.fire()
     }
 
     override fun increment() {
         inputs.add(increment)
-        events.updated.fireAndForget()
+        events.updated.fire()
     }
 
     override fun decrement() {
         inputs.sub(increment)
-        events.updated.fireAndForget()
+        events.updated.fire()
     }
 
     override fun toggleClamping() {

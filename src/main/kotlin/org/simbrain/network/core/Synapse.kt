@@ -70,7 +70,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
             if (!frozen) {
                 _strength = clip(source.polarity.clip(wt))
             }
-            events.strengthUpdated.fireAndBlock()
+            events.strengthUpdated.fire()
         }
 
     override val name: String
@@ -91,7 +91,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
      */
     var isVisible: Boolean = true
         set(newVisibility) {
-            events.visbilityChanged.fireAndForget(field, newVisibility)
+            events.visbilityChanged.fire(field, newVisibility)
             field = newVisibility
         }
 
@@ -106,7 +106,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
             // TODO: Needed for calls to SynapseGroup.postOpenInit, which calls
             // SynapseGroup.setAndComformToTemplate. Template synapses don't seem to have
             // change support initialized.
-            events.learningRuleUpdated.fireAndForget(oldRule, learningRule)
+            events.learningRuleUpdated.fire(oldRule, learningRule)
         }
 
     /**
@@ -142,7 +142,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
     var upperBound = DEFAULT_UPPER_BOUND
         set(value) {
             field = value
-            events.strengthUpdated.fireAndForget() // to force a graphics update
+            events.strengthUpdated.fire() // to force a graphics update
         }
 
     /**
@@ -152,7 +152,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
     var lowerBound = DEFAULT_LOWER_BOUND
         set(value) {
             field = value
-            events.strengthUpdated.fireAndForget() // to force a graphics update
+            events.strengthUpdated.fire() // to force a graphics update
         }
 
     /**
@@ -198,7 +198,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
     var frozen = false
         set(value) {
             field = value
-            events.clampChanged.fireAndForget()
+            events.clampChanged.fire()
         }
 
     /**
@@ -249,8 +249,8 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
             source.addToFanOut(this)
             target.addToFanIn(this)
         }
-        source.events.locationChanged.on { events.locationChanged.fireAndBlock() }
-        target.events.locationChanged.on { events.locationChanged.fireAndBlock() }
+        source.events.locationChanged.on { events.locationChanged.fire() }
+        target.events.locationChanged.on { events.locationChanged.fire() }
     }
 
     /**
@@ -343,7 +343,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
 
     fun forceSetStrength(wt: Double) {
         _strength = wt
-        events.strengthUpdated.fireAndBlock()
+        events.strengthUpdated.fire()
     }
 
     /**
@@ -500,7 +500,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
         if (delayManager != null) {
             Arrays.fill(delayManager, 0.0)
         }
-        events.strengthUpdated.fireAndBlock()
+        events.strengthUpdated.fire()
     }
 
     override fun toggleClamping() {

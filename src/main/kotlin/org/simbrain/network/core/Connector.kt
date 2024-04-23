@@ -26,7 +26,7 @@ abstract class Connector(var source: Layer, var target: Layer) : NetworkModel(),
     var isShowWeights: Boolean = true
         set(showWeights) {
             field = showWeights
-            events.showWeightsChanged.fireAndBlock()
+            events.showWeightsChanged.fire()
         }
 
     /**
@@ -57,6 +57,6 @@ abstract class Connector(var source: Layer, var target: Layer) : NetworkModel(),
     override fun delete() {
         source.removeOutgoingConnector(this)
         target.removeIncomingConnector(this)
-        events.deleted.fireAndForget(this)
+        events.deleted.fireAndBlock(this)
     }
 }

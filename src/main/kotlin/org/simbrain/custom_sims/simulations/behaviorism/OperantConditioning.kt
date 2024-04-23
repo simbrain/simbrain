@@ -46,7 +46,7 @@ class OperantConditioning : Simulation {
 
         sim.workspace.clearWorkspace()
         nc = sim.addNetwork(226, 9, 624, 500, "Simulation")
-        net = nc.getNetwork()
+        net = nc.network
 
         // Behavioral nodes
         behaviorNet = net.addNeuronGroup(-14.0, 73.0, numNeurons)

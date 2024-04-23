@@ -249,7 +249,7 @@ abstract class SimbrainDataFrame : AbstractTableModel() {
         set(value) {
             field = value
             fireTableStructureChanged()
-            events.rowNameChanged.fireAndBlock()
+            events.rowNameChanged.fire()
         }
 
     fun getRowName(row: Int): String {

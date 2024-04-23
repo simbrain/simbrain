@@ -133,7 +133,7 @@ public class ComponentPanel extends JPanel {
         public Object getValueAt(int row, int col) {
             switch (col) {
                 case 0:
-                    return data.get(row).getName();
+                    return data.get(row).name;
                 case 1:
                     return data.get(row).getSimpleName();
                 case 2:

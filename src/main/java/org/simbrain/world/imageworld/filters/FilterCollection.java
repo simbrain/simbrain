@@ -103,7 +103,7 @@ public class FilterCollection {
      */
     public void addFilter(Filter filter) {
         filters.add(filter);
-        events.getFilterAdded().fireAndForget(filter);
+        events.getFilterAdded().fire(filter);
     }
 
     /**
@@ -117,7 +117,7 @@ public class FilterCollection {
             return;
         }
         filters.remove(filter);
-        getEvents().getFilterRemoved().fireAndForget(filter);
+        getEvents().getFilterRemoved().fire(filter);
     }
 
     public ImageSource getImageSource() {
@@ -134,7 +134,7 @@ public class FilterCollection {
 
 
     public void setCurrentFilter(Filter currentFilter) {
-        events.getFilterChanged().fireAndForget(this.currentFilter, currentFilter);
+        events.getFilterChanged().fire(this.currentFilter, currentFilter);
         this.currentFilter = currentFilter;
     }
 

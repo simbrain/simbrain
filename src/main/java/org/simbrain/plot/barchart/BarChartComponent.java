@@ -18,6 +18,7 @@
  */
 package org.simbrain.plot.barchart;
 
+import org.jetbrains.annotations.NotNull;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
@@ -60,7 +61,7 @@ public class BarChartComponent extends WorkspaceComponent {
     }
 
     @Override
-    public void setWorkspace(Workspace workspace) {
+    public void setWorkspace(@NotNull Workspace workspace) {
 
         // This is a bit of a hack because the workspace is not available in the constructor.
         super.setWorkspace(workspace);
@@ -102,7 +103,7 @@ public class BarChartComponent extends WorkspaceComponent {
     }
 
     @Override
-    public String getXML() {
+    public String getXml() {
         return BarChartModel.getXStream().toXML(model);
     }
 

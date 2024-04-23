@@ -23,7 +23,6 @@ import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.WorkspaceComponent
 import java.io.InputStream
 import java.io.OutputStream
-import java.util.*
 
 /**
  * ReaderComponent is the container for the readerworld, which adds
@@ -39,7 +38,7 @@ class TextWorldComponent : WorkspaceComponent {
      *
      * @param name name of this component
      */
-    constructor(name: String?) : super(name) {
+    constructor(name: String) : super(name) {
         world = TextWorld()
         init()
     }
@@ -50,7 +49,7 @@ class TextWorldComponent : WorkspaceComponent {
      * @param name     name of component
      * @param newWorld provided world
      */
-    constructor(name: String?, newWorld: TextWorld) : super(name) {
+    constructor(name: String, newWorld: TextWorld) : super(name) {
         world = newWorld
         init()
     }
@@ -66,20 +65,19 @@ class TextWorldComponent : WorkspaceComponent {
         }
     }
 
-    override fun save(output: OutputStream, format: String) {
+    override fun save(output: OutputStream, format: String?) {
         getSimbrainXStream().toXML(world, output)
     }
 
-    override fun update() {
+    override suspend fun update() {
         world.update()
     }
 
-    override fun getAttributeContainers(): List<AttributeContainer> {
-        return Arrays.asList<AttributeContainer>(world)
-    }
+    override val attributeContainers: List<AttributeContainer>
+        get() = listOf<AttributeContainer>(world)
 
     companion object {
-        fun open(input: InputStream?, name: String?, format: String?): TextWorldComponent {
+        fun open(input: InputStream, name: String, format: String): TextWorldComponent {
             val newWorld = getSimbrainXStream().fromXML(input) as TextWorld
             return TextWorldComponent(name, newWorld)
         }

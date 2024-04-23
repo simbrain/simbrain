@@ -65,7 +65,7 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
             val oldValue = isUseFixedRangeWindow
             field = disableAutoRange
             if (oldValue != disableAutoRange) {
-                events.propertyChanged.fireAndBlock()
+                events.propertyChanged.fire()
             }
         }
 
@@ -200,7 +200,7 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
     fun addScalarTimeSeries(description: String): ScalarTimeSeries {
         val sts = ScalarTimeSeries(addXYSeries(description))
         timeSeriesList.add(sts)
-        events.scalarTimeSeriesAdded.fireAndBlock(sts)
+        events.scalarTimeSeriesAdded.fire(sts)
         return sts
     }
 
@@ -231,7 +231,7 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
     fun removeAllScalarTimeSeries() {
         for (ts in timeSeriesList) {
             dataset.removeSeries(ts.series)
-            events.scalarTimeSeriesRemoved.fireAndBlock(ts)
+            events.scalarTimeSeriesRemoved.fire(ts)
         }
         timeSeriesList.clear()
     }
@@ -244,7 +244,7 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
     private fun removeTimeSeries(ts: ScalarTimeSeries) {
         dataset.removeSeries(ts.series)
         timeSeriesList.remove(ts)
-        events.scalarTimeSeriesRemoved.fireAndBlock(ts)
+        events.scalarTimeSeriesRemoved.fire(ts)
     }
 
     /**
@@ -300,7 +300,7 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
                             val sts = ScalarTimeSeries(series)
                             timeSeriesList.add(sts)
                             dataset.addSeries(sts.series)
-                            events.scalarTimeSeriesAdded.fireAndBlock(sts)
+                            events.scalarTimeSeriesAdded.fire(sts)
                         }
                         reader.moveUp()
                     }

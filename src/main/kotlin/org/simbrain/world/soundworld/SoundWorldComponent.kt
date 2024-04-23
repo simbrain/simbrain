@@ -8,11 +8,10 @@ import java.io.OutputStream
 
 class SoundWorldComponent @JvmOverloads constructor(name: String, val soundWorld: SoundWorld = SoundWorld()): WorkspaceComponent(name) {
 
-    override fun getAttributeContainers(): List<AttributeContainer> {
-        return listOf(soundWorld.generator)
-    }
+    override val attributeContainers: List<AttributeContainer>
+        get() = listOf(soundWorld.generator)
 
-    override fun save(output: OutputStream?, format: String?) {
+    override fun save(output: OutputStream, format: String?) {
         getSimbrainXStream().toXML(soundWorld, output)
     }
 

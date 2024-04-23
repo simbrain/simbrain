@@ -45,7 +45,7 @@ open class NetworkTextObject : LocatableModel {
     var text = ""
         set(value) {
             field = value
-            events.textUpdated.fireAndBlock()
+            events.textUpdated.fire()
         }
 
     /**
@@ -112,7 +112,7 @@ open class NetworkTextObject : LocatableModel {
     }
 
     override fun delete() {
-        events.deleted.fireAndForget(this)
+        events.deleted.fire(this)
     }
 
     override var location: Point2D
@@ -120,6 +120,6 @@ open class NetworkTextObject : LocatableModel {
         set(location) {
             x = location.x
             y = location.y
-            events.locationChanged.fireAndForget()
+            events.locationChanged.fire()
         }
 }

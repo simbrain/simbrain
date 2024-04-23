@@ -3,12 +3,39 @@
 package org.simbrain.util
 
 import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import java.time.Instant
+import java.time.ZonedDateTime
 import java.util.*
 import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.atomic.AtomicLong
 import java.util.function.BiConsumer
 import java.util.function.Consumer
+import kotlin.system.measureNanoTime
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.nanoseconds
 import kotlin.time.Duration.Companion.seconds
+
+data class DebugInfo(val timeStamp: Long, val duration: Duration, val initiator: String?, val dispatcher: CoroutineDispatcher?, val wait: Boolean) {
+
+    val timeStampString: String get() {
+        val time = ZonedDateTime.ofInstant(Instant.ofEpochMilli(timeStamp), TimeZone.getDefault().toZoneId())
+        val formatter = java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss.SSS")
+        return time.format(formatter)
+    }
+
+    override fun toString(): String {
+        return "DebugInfo(timeStamp=${timeStampString}, duration=$duration, initiator='$initiator', dispatcher=$dispatcher, wait=$wait)"
+    }
+}
+
+/**
+ * Use when [useEventDebug] is true to collect debug information about events.
+ */
+val debugChannel by lazy { Channel<DebugInfo>(Channel.UNLIMITED) }
 
 /**
  * Event objects corresponding to no-arg, adding, removing, and changing objects. Each object has a set of functions
@@ -24,7 +51,7 @@ import kotlin.time.Duration.Companion.seconds
  *
  * For examples see [TrainerEvents2]
  */
-open class Events(val timeout: Duration = 60.seconds): CoroutineScope {
+open class Events(val timeout: Duration = 5.seconds): CoroutineScope {
 
     private val job = SupervisorJob()
 
@@ -50,7 +77,10 @@ open class Events(val timeout: Duration = 60.seconds): CoroutineScope {
         private val batchNew = ConcurrentLinkedQueue<Any?>()
         private val batchOld = ConcurrentLinkedQueue<Any?>()
 
-        private var job: Job? = null
+        private var debounceCounter: AtomicLong = AtomicLong(0L)
+        private val mutex = Mutex()
+
+        private var shouldClearQueue: Boolean = false
 
         /**
          * Helper function for registering suspending event handlers.
@@ -79,72 +109,131 @@ open class Events(val timeout: Duration = 60.seconds): CoroutineScope {
 
         }
 
-        private suspend inline fun runAllHandlers(crossinline run: suspend (suspend (new: Any?, old: Any?) -> Unit) -> Unit) = eventMapping[this@EventObject]
+        private suspend fun runAllHandlers(run: suspend (suspend (new: Any?, old: Any?) -> Unit) -> Unit) = eventMapping[this@EventObject]
             ?.map { (dispatcher, wait, handler, stackTrace) ->
                 try {
-                    if (dispatcher != null) {
+                    suspend fun runAll() = if (dispatcher != null) {
                         launch(dispatcher) { run(handler) }.let { if (wait) withTimeout(timeout) { it.join() } else it }
                     } else {
                         launch { run(handler) }.let { if (wait) withTimeout(timeout) { it.join() } else it }
+                    }
+                    if (!useEventDebug) {
+                        runAll()
+                    } else {
+                        var result: Any? = null
+                        val nanoTime = measureNanoTime {
+                            result = runAll()
+                        }
+                        debugChannel.send(DebugInfo(
+                            System.currentTimeMillis(),
+                            nanoTime.nanoseconds,
+                            stackTrace?.dropWhile { it.className.contains("java.lang.Thread") }?.dropWhile { it.className.contains("util.Event") }?.firstOrNull().toString(),
+                            dispatcher,
+                            wait
+                        ))
+                        result
                     }
                 } catch (e: TimeoutCancellationException) {
                     throw IllegalStateException("Event time out on dispatcher $dispatcher. Event handler created by ${stackTrace.contentDeepToString()}")
                 }
             }?.filterIsInstance<Job>()
 
-        protected suspend fun fireAndSuspendHelper(run: suspend (suspend (new: Any?, old: Any?) -> Unit) -> Unit) {
+        protected fun fireAllHelper(run: suspend (suspend (new: Any?, old: Any?) -> Unit) -> Unit): Deferred<Boolean> {
             val now = System.currentTimeMillis()
             if (interval == 0) {
-                runAllHandlers(run)
-                return
+                return async {
+                    runAllHandlers(run)?.joinAll()
+                    true
+                }
             }
-            when (timingMode) {
-                TimingMode.Throttle -> {
-                    if (now >= intervalEndTime) {
-                        intervalEndTime = now + interval
-                        runAllHandlers(run)
+            return when (timingMode) {
+                TimingMode.Throttle -> async {
+                    mutex.withLock {
+                        if (now >= intervalEndTime) {
+                            intervalEndTime = now + interval
+                            runAllHandlers(run)
+                            true
+                        } else {
+                            false
+                        }
                     }
                 }
-                TimingMode.Debounce -> {
-                    job?.cancel()
-                    job = launch {
-                        delay(interval.toLong())
-                        runAllHandlers(run)
+                TimingMode.Debounce -> async {
+                    val seq = debounceCounter.incrementAndGet()
+                    delay(interval.toLong())
+                    mutex.withLock {
+                        val seqNow = debounceCounter.get()
+                        if (seq == seqNow) {
+                            runAllHandlers(run)
+                            true
+                        } else {
+                            false
+                        }
                     }
                 }
             }
         }
 
-        protected fun batchFireAndSuspendHelper(new: Any?, old: Any?): Job {
+        protected fun batchFireAllHelper(new: Any?, old: Any?): Deferred<Boolean> = async {
             val now = System.currentTimeMillis()
+            mutex.withLock {
+                if (shouldClearQueue) {
+                    batchNew.clear()
+                    batchOld.clear()
+                    shouldClearQueue = false
+                }
+            }
             new?.let { batchNew.add(it) }
             old?.let { batchOld.add(it) }
             if (interval == 0) {
-                return launch {
+                mutex.withLock {
                     runAllHandlers { handler -> handler(batchNew, batchOld) }?.joinAll()
-                    batchNew.clear()
-                    batchOld.clear()
+                    shouldClearQueue = true
+                    true
+                }
+            } else {
+                when (timingMode) {
+                    TimingMode.Throttle -> {
+                        mutex.withLock {
+                            if (now >= intervalEndTime) {
+                                intervalEndTime = now + interval
+                                runAllHandlers { handler -> handler(batchNew, batchOld) }?.joinAll()
+                                shouldClearQueue = true
+                                true
+                            } else {
+                                false
+                            }
+                        }
+                    }
+                    TimingMode.Debounce -> {
+                        val seq = debounceCounter.incrementAndGet()
+                        delay(interval.toLong())
+                        mutex.withLock {
+                            val seqNow = debounceCounter.get()
+                            if (seq == seqNow) {
+                                runAllHandlers { handler -> handler(batchNew, batchOld) }?.joinAll()
+                                shouldClearQueue = true
+                                true
+                            } else {
+                                false
+                            }
+                        }
+                    }
                 }
             }
-            return when (timingMode) {
-                TimingMode.Throttle -> launch {
-                    if (now >= intervalEndTime) {
-                        intervalEndTime = now + interval
-                        runAllHandlers { handler -> handler(batchNew, batchOld) }?.joinAll()
-                        batchNew.clear()
-                        batchOld.clear()
-                    }
+
+        }
+
+        suspend inline fun <T> printTiming(block: suspend () -> T): T {
+            if (useEventDebug) {
+                var result: T? = null
+                val timing = measureNanoTime {
+                    result = block()
                 }
-                TimingMode.Debounce -> launch {
-                    job?.cancel()
-                    job = launch {
-                        delay(interval.toLong())
-                        runAllHandlers { handler -> handler(batchNew, batchOld) }?.joinAll()
-                        batchNew.clear()
-                        batchOld.clear()
-                    }
-                    job?.join()
-                }
+                println("Event ${this@Events::class.simpleName} from ${Thread.getAllStackTraces()[Thread.currentThread()]?.dropWhile { it.className.contains("java.lang.Thread") }?.dropWhile { it.className.contains("util.Event") }?.firstOrNull().toString()} took ${timing.nanoseconds} to complete.")
+                return result!!
+            } else {
+                return block()
             }
         }
     }
@@ -170,23 +259,15 @@ open class Events(val timeout: Duration = 60.seconds): CoroutineScope {
         }
 
         /**
-         * Kotlin "fire". By itself it's like "fireAndForget".
-         */
-        @Deprecated(message = "Blocking is now determinate by `on`", replaceWith = ReplaceWith("fireAndBlock()"))
-        fun fireAndForget() = fireAndBlock()
-
-        /**
          * Like java fireAndBlock() but suspends rather than blocking, so that the GUI remains responsive.
          */
-        suspend fun fire() = fireAndSuspendHelper { handler -> handler(null, null) }
+        fun fire() = fireAllHelper { handler -> handler(null, null) }
 
         /**
          * Java fire and block. Fire event and wait for it to terminate before continuing.
          */
-        fun fireAndBlock() {
-            runBlocking {
-                fire()
-            }
+        fun fireAndBlock() = runBlocking {
+            printTiming { fire().await() }
         }
 
     }
@@ -208,41 +289,37 @@ open class Events(val timeout: Duration = 60.seconds): CoroutineScope {
                 new, _ -> handler.accept(new as T)
         }
 
-        @Deprecated(message = "Blocking is now determinate by `on`", replaceWith = ReplaceWith("fireAndBlock(new)"))
-        fun fireAndForget(new: T) = fireAndBlock(new)
+        fun fire(new: T) = fireAllHelper { handler -> handler(new, null) }
 
-        suspend fun fire(new: T) = fireAndSuspendHelper { handler -> handler(new, null) }
-
-        fun fireAndBlock(new: T) {
-            runBlocking {
-                fire(new)
-            }
+        fun fireAndBlock(new: T) = runBlocking {
+            printTiming { fire(new).await() }
         }
 
     }
 
     inner class BatchAddedEvent<T>(override val interval: Int, override var timingMode: TimingMode =  TimingMode.Debounce) : EventObject() {
 
+        /**
+         * Note: batch events are handled in arbitrary order
+         */
         @Suppress("UNCHECKED_CAST")
-        fun on(dispatcher: CoroutineDispatcher? = null, wait: Boolean = false, handler: suspend (new: Collection<T>) -> Unit) = onSuspendHelper(dispatcher, wait) {
-                new, _ -> handler(new as Collection<T>)
+        fun on(dispatcher: CoroutineDispatcher? = null, wait: Boolean = false, handler: suspend (new: ConcurrentLinkedQueue<T>) -> Unit) = onSuspendHelper(dispatcher, wait) {
+                new, _ -> handler(new as ConcurrentLinkedQueue<T>)
         }
 
+        /**
+         * Note: batch events are handled in arbitrary order
+         */
         @JvmOverloads
         @Suppress("UNCHECKED_CAST")
-        fun on(dispatcher: CoroutineDispatcher? = null, wait: Boolean = false, handler: Consumer<Collection<T>>) = onHelper(dispatcher, wait) {
-                new, _ -> handler.accept(new as Collection<T>)
+        fun on(dispatcher: CoroutineDispatcher? = null, wait: Boolean = false, handler: Consumer<ConcurrentLinkedQueue<T>>) = onHelper(dispatcher, wait) {
+                new, _ -> handler.accept(new as ConcurrentLinkedQueue<T>)
         }
 
-        @Deprecated(message = "Blocking is now determinate by `on`", replaceWith = ReplaceWith("fireAndBlock(new)"))
-        fun fireAndForget(new: T) = fireAndBlock(new)
+        fun fire(new: T) = batchFireAllHelper(new, null)
 
-        fun fire(new: T) = batchFireAndSuspendHelper(new, null)
-
-        fun fireAndBlock(new: T) {
-            runBlocking {
-                fire(new).join()
-            }
+        fun fireAndBlock(new: T) = runBlocking {
+            printTiming { fire(new).await() }
         }
     }
 
@@ -264,15 +341,10 @@ open class Events(val timeout: Duration = 60.seconds): CoroutineScope {
                 _, old -> handler.accept(old as T)
         }
 
-        @Deprecated(message = "Blocking is now determinate by `on`", replaceWith = ReplaceWith("fireAndBlock(old)"))
-        fun fireAndForget(old: T) = fireAndBlock(old)
+        fun fire(old: T) = fireAllHelper { handler -> handler(null, old) }
 
-        suspend fun fire(old: T) = fireAndSuspendHelper { handler -> handler(null, old) }
-
-        fun fireAndBlock(old: T) {
-            runBlocking {
-                fire(old)
-            }
+        fun fireAndBlock(old: T) = runBlocking {
+            printTiming { fire(old).await() }
         }
 
     }
@@ -295,41 +367,37 @@ open class Events(val timeout: Duration = 60.seconds): CoroutineScope {
                 new, old -> handler.accept(new as T, old as T)
         }
 
-        @Deprecated(message = "Blocking is now determinate by `on`", replaceWith = ReplaceWith("fireAndBlock(new, old)"))
-        fun fireAndForget(new: T, old: T) = fireAndBlock(new, old)
+        fun fire(new: T, old: T) = fireAllHelper { handler -> if (new != old) handler(new, old) }
 
-        suspend fun fire(new: T, old: T) = fireAndSuspendHelper { handler -> if (new != old) handler(new, old) }
-
-        fun fireAndBlock(new: T, old: T) {
-            runBlocking {
-                fire(new, old)
-            }
+        fun fireAndBlock(new: T, old: T) = runBlocking {
+            printTiming { fire(new, old).await() }
         }
 
     }
 
     inner class BatchChangedEvent<T>(override val interval: Int = 0, override var timingMode: TimingMode =  TimingMode.Debounce) : EventObject() {
 
+        /**
+         * Note: batch events are handled in arbitrary order
+         */
         @Suppress("UNCHECKED_CAST")
         fun on(dispatcher: CoroutineDispatcher? = null, wait: Boolean = false, handler: suspend (new: ConcurrentLinkedQueue<T>, old: ConcurrentLinkedQueue<T>) -> Unit) = onSuspendHelper(dispatcher, wait) {
                 new, old -> handler(new as ConcurrentLinkedQueue<T>, old as ConcurrentLinkedQueue<T>)
         }
 
+        /**
+         * Note: batch events are handled in arbitrary order
+         */
         @JvmOverloads
         @Suppress("UNCHECKED_CAST")
         fun on(dispatcher: CoroutineDispatcher? = null, wait: Boolean = false, handler: BiConsumer<ConcurrentLinkedQueue<T>, ConcurrentLinkedQueue<T>>) = onHelper(dispatcher, wait) {
                 new, old -> handler.accept(new as ConcurrentLinkedQueue<T>, old as ConcurrentLinkedQueue<T>)
         }
 
-        @Deprecated(message = "Blocking is now determinate by `on`", replaceWith = ReplaceWith("fireAndBlock(new, old)"))
-        fun fireAndForget(new: T, old: T) = fireAndBlock(new, old)
+        fun fire(new: T, old: T) = batchFireAllHelper(new, old)
 
-        suspend fun fire(new: T, old: T) = batchFireAndSuspendHelper(new, old)
-
-        fun fireAndBlock(new: T, old: T) {
-            runBlocking {
-                fire(new, old)
-            }
+        fun fireAndBlock(new: T, old: T) = runBlocking {
+            printTiming { fire(new, old).await() }
         }
     }
 
@@ -367,6 +435,69 @@ data class EventObjectHandler(
  */
 val useEventDebug = false.also {
     if (it) {
-        println("Event Debug Mode is on. It could have performance impacts, especially in evolutions.")
+        println("Event Debug Mode is on. It could have performance impacts, especially in evolution.")
+        GlobalScope.launch {
+            debugChannel.consumeEach { message ->
+                println(message)
+            }
+        }
     }
 }
+
+// class BadThing {
+//     var thing = false
+//         set(value) {
+//             if (field == value) println("bad thing happened")
+//             field = value
+//         }
+// }
+//
+// suspend fun main() {
+//     val seqSupplier = AtomicLong(0)
+//     val badThing = BadThing()
+//
+//     val mutex = Mutex()
+//
+//     suspend fun doStuff(): Boolean {
+//         val seq = seqSupplier.incrementAndGet()
+//         delay(10L)
+//         val seqNow = seqSupplier.get()
+//         return mutex.withLock {
+//             if (seq == seqNow) {
+//                 val currentBadThing = badThing.thing
+//                 badThing.thing = !currentBadThing
+//                 true
+//             } else {
+//                 false
+//             }
+//         }
+//     }
+//
+//     var intervalEndTime = System.currentTimeMillis()
+//
+//     suspend fun doThrottleStuff(): Boolean {
+//         val now = System.currentTimeMillis()
+//         return mutex.withLock {
+//             if (now >= intervalEndTime) {
+//                 intervalEndTime = now + 10L
+//                 val currentBadThing = badThing.thing
+//                 badThing.thing = !currentBadThing
+//                 true
+//             } else {
+//                 false
+//             }
+//         }
+//     }
+//
+//     val count = 1000000
+//
+//     val timing = measureNanoTime {
+//         (0 until count).map {
+//             GlobalScope.async {
+//                 doThrottleStuff()
+//             }
+//         }.awaitAll().count { it }.let { println(it) }
+//     }
+//
+//     println(timing.nanoseconds / count)
+// }

@@ -15,40 +15,36 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network;
+package org.simbrain.network
 
-import org.simbrain.network.core.Network;
-import org.simbrain.network.events.NetworkEvents;
-import org.simbrain.network.neurongroups.NeuronGroup;
-import org.simbrain.util.XStreamUtils;
-import org.simbrain.workspace.AttributeContainer;
-import org.simbrain.workspace.WorkspaceComponent;
-
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.simbrain.network.core.NetworkUtilsKt.getNetworkXStream;
+import org.simbrain.network.core.Network
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.getNetworkXStream
+import org.simbrain.network.neurongroups.NeuronGroup
+import org.simbrain.util.getSimbrainXStream
+import org.simbrain.workspace.AttributeContainer
+import org.simbrain.workspace.WorkspaceComponent
+import java.io.InputStream
+import java.io.OutputStream
+import java.util.function.Consumer
 
 /**
  * Network component.
  */
-public final class NetworkComponent extends WorkspaceComponent {
-
+class NetworkComponent : WorkspaceComponent {
     /**
      * Reference to root network, the main model network.
      */
-    private Network network = new Network();
+    var network: Network = Network()
+        private set
 
     /**
      * Create a new network component.
      *
      * @param name name
      */
-    public NetworkComponent(final String name) {
-        super(name);
-        init();
+    constructor(name: String?) : super(name!!) {
+        init()
     }
 
     /**
@@ -57,66 +53,60 @@ public final class NetworkComponent extends WorkspaceComponent {
      * @param name    name of network
      * @param network the network being created
      */
-    public NetworkComponent(final String name, final Network network) {
-        super(name);
-        this.network = network;
-        init();
+    constructor(name: String?, network: Network) : super(name!!) {
+        this.network = network
+        init()
     }
 
     /**
      * Initialize attribute types and listeners.
      */
-    private void init() {
+    private fun init() {
+        val event = network.events
 
-        NetworkEvents event = network.getEvents();
-
-        event.getModelAdded().on(null, true, list -> {
-            list.forEach(m -> {
-                setChangedSinceLastSave(true);
-                if (m instanceof AttributeContainer) {
-                    fireAttributeContainerAdded((AttributeContainer) m);
+        event.modelAdded.on(wait = true) { list ->
+            list.forEach { m ->
+                setChangedSinceLastSave(true)
+                if (m is AttributeContainer) {
+                    fireAttributeContainerAdded(m as AttributeContainer?)
                 }
-                if (m instanceof NeuronGroup) {
-                    ((NeuronGroup)m).getNeuronList().forEach(this::fireAttributeContainerAdded);
+                if (m is NeuronGroup) {
+                    m.neuronList.forEach(Consumer { addedContainer: Neuron? ->
+                        this.fireAttributeContainerAdded(
+                            addedContainer
+                        )
+                    })
                 }
-            });
-        });
-
-        event.getModelRemoved().on(m -> {
-            setChangedSinceLastSave(true);
-            if (m instanceof AttributeContainer) {
-                fireAttributeContainerRemoved((AttributeContainer) m);
             }
-            if (m instanceof NeuronGroup) {
-                ((NeuronGroup)m).getNeuronList().forEach(this::fireAttributeContainerRemoved);
+        }
+
+        event.modelRemoved.on { m: NetworkModel? ->
+            setChangedSinceLastSave(true)
+            if (m is AttributeContainer) {
+                fireAttributeContainerRemoved(m as AttributeContainer?)
             }
-        });
+            if (m is NeuronGroup) {
+                m.neuronList.forEach(Consumer { removedContainer: Neuron? ->
+                    this.fireAttributeContainerRemoved(
+                        removedContainer
+                    )
+                })
+            }
+        }
 
-//        event.onNeuronsUpdated(l -> setChangedSinceLastSave(true));
-//
-//        event.onTextAdded(t -> setChangedSinceLastSave(true));
-//
-//        event.onTextRemoved(t -> setChangedSinceLastSave(true));
 
-
+        //        event.onNeuronsUpdated(l -> setChangedSinceLastSave(true));
+        //
+        //        event.onTextAdded(t -> setChangedSinceLastSave(true));
+        //
+        //        event.onTextRemoved(t -> setChangedSinceLastSave(true));
     }
 
-    @Override
-    public List<AttributeContainer> getAttributeContainers() {
-        return network.getAllModels().stream()
-                .filter(m -> (m instanceof AttributeContainer))
-                .map(m -> (AttributeContainer) m )
-                .collect(Collectors.toList());
-    }
+    override val attributeContainers: List<AttributeContainer>
+        get() = network.allModels.filterIsInstance<AttributeContainer>()
 
-    public static NetworkComponent open(final InputStream input, final String name, final String format) {
-        Network newNetwork = (Network) getNetworkXStream().fromXML(input);
-        return new NetworkComponent(name, newNetwork);
-    }
-
-    @Override
-    public void save(final OutputStream output, final String format) {
-        getNetworkXStream().toXML(network, output);
+    override fun save(output: OutputStream, format: String?) {
+        getNetworkXStream().toXML(network, output)
     }
 
     /**
@@ -124,23 +114,23 @@ public final class NetworkComponent extends WorkspaceComponent {
      *
      * @return the new network component
      */
-    public NetworkComponent copy() {
-        NetworkComponent ret = new NetworkComponent("Copy of " + getName(), network.copy());
-        return ret;
+    fun copy(): NetworkComponent {
+        val ret = NetworkComponent("Copy of $name", network.copy())
+        return ret
     }
 
-    public Network getNetwork() {
-        return network;
+    override suspend fun update() {
+        network.updateSuspend(name)
     }
 
-    @Override
-    public void update() {
-        network.update(getName());
-    }
+    override val xml: String
+        get() = getSimbrainXStream().toXML(network)
 
-    @Override
-    public String getXML() {
-        return XStreamUtils.getSimbrainXStream().toXML(network);
+    companion object {
+        @JvmStatic
+        fun open(input: InputStream?, name: String?, format: String?): NetworkComponent {
+            val newNetwork = getNetworkXStream().fromXML(input) as Network
+            return NetworkComponent(name, newNetwork)
+        }
     }
-
 }

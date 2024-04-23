@@ -54,7 +54,7 @@ class SmileClassifier(
         classifier.apply {
             fit(trainingData.featureVectors, trainingData.getIntegerTargets())
         }
-        events.updated.fireAndForget()
+        events.updated.fire()
     }
 
     /**
@@ -73,7 +73,7 @@ class SmileClassifier(
                 }
             }
         }
-        events.updated.fireAndForget()
+        events.updated.fire()
         inputs.mul(0.0) // clear inputs
     }
 

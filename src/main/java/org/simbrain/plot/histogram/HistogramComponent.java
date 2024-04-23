@@ -94,7 +94,7 @@ public class HistogramComponent extends WorkspaceComponent {
     }
 
     @Override
-    public String getXML() {
+    public String getXml() {
         return XStreamUtils.getSimbrainXStream().toXML(model);
     }
 

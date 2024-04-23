@@ -16,87 +16,126 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.workspace;
+package org.simbrain.workspace
 
-import org.pmw.tinylog.Logger;
-import org.simbrain.workspace.couplings.CouplingManager;
-import org.simbrain.workspace.events.WorkspaceComponentEvents;
-import org.simbrain.workspace.gui.ComponentPanel;
-import org.simbrain.workspace.gui.DesktopComponent;
-
-import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import org.pmw.tinylog.Logger
+import org.simbrain.workspace.couplings.CouplingManager
+import org.simbrain.workspace.events.WorkspaceComponentEvents
+import java.io.File
+import java.io.OutputStream
+import java.util.function.Consumer
 
 /**
- * Represents a component in a Simbrain {@link Workspace}. Extend this class to create your own component type.
- * <p>
+ * Represents a component in a Simbrain [Workspace]. Extend this class to create your own component type.
+ *
+ *
  * For deserialization sublclasses must have a static "open" method, that is called using reflection by
- * {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}. See
- * {@link org.simbrain.network.NetworkComponent#open(InputStream, String,
- * String)} for an example.
+ * [org.simbrain.workspace.serialization.WorkspaceComponentDeserializer]. See
+ * [org.simbrain.network.NetworkComponent.open] for an example.
  */
-public abstract class WorkspaceComponent {
-
+abstract class WorkspaceComponent(name: String) {
+    /**
+     * Returns the workspace associated with this component.
+     */
+    /**
+     * Sets the workspace for this component. Called by the workspace right
+     * after this component is created.
+     *
+     * @param workspace The workspace for this component.
+     */
     /**
      * The workspace that 'owns' this component.
      */
-    private Workspace workspace;
+    open lateinit var workspace: Workspace
 
-    transient private WorkspaceComponentEvents events = new WorkspaceComponentEvents();
+    @JvmField
+    @Transient
+    val events: WorkspaceComponentEvents = WorkspaceComponentEvents()
 
     /**
      * Whether this component has changed since last save.
      */
-    private boolean changedSinceLastSave = false;
+    private var changedSinceLastSave = false
 
     /**
      * Whether to display the GUI for this component (obviously only relevant
      * when Simbrain is run as a GUI). TODO: This should really be a property of
      * the GUI only, since we can imagine the gui is on or off for different
      * views of the component. This design is kind of hack, based on the fact
-     * that {@link ComponentPanel} has no easy access to {@link DesktopComponent}.
+     * that [ComponentPanel] has no easy access to [DesktopComponent].
      */
-    private boolean guiOn = true;
+    var isGuiOn: Boolean = true
+        set(guiOn) {
+            field = guiOn
+            events.guiToggled.fire()
+        }
 
     /**
      * Whether to update this component when updated from the workspace.
      */
-    private boolean updateOn = true;
+    var updateOn: Boolean = true
+        /**
+         * @param updateOn the updateOn to set
+         */
+        set(updateOn) {
+            field = updateOn
+            events.guiToggled.fire()
+        }
 
+    /**
+     * @return if this component is marked as running
+     */
+    /**
+     * Sets whether or not this component is marked as currently running...
+     * meant to be false if only doing a one-off update
+     *
+     * @param running
+     */
     /**
      * Whether or not this component is being iterated more than just one time.
      */
-    private boolean isRunning = false;
+    var isRunning: Boolean = false
 
+    /**
+     * Returns the name of this component.
+     */
     /**
      * The name of this component. Used in the title, in saving, etc.
      */
-    private String name = "";
+    @JvmField
+    var name: String = ""
 
     /**
      * Current file. Used when "saving" a component. Subclasses can provide a
      * default value using User Preferences.
      */
-    private File currentFile;
+    @JvmField
+    var currentFile: File? = null
 
+    /**
+     * Return the serializePriority
+     */
+    /**
+     * @param serializePriority the serializePriority to set
+     */
     /**
      * If set to true, serialize this component before others. Possibly replace
      * with priority system later.
      */
-    private int serializePriority = 0;
+    var serializePriority: Int = 0
+        /**
+         * @param serializePriority the serializePriority to set
+         */
+        protected set
 
     /**
      * Construct a workspace component.
      *
      * @param name The name of the component.
      */
-    public WorkspaceComponent(final String name) {
-        this.name = name;
-        Logger.trace(getClass().getCanonicalName() + ": " + name + " created");
+    init {
+        this.name = name
+        Logger.trace(javaClass.canonicalName + ": " + name + " created")
     }
 
     /**
@@ -106,7 +145,7 @@ public abstract class WorkspaceComponent {
      * @param output the stream of data to write the data to.
      * @param format a key used to define the requested format.
      */
-    public abstract void save(OutputStream output, String format);
+    abstract fun save(output: OutputStream, format: String?)
 
     /**
      * Returns a list of the formats that this component supports. The default
@@ -114,219 +153,126 @@ public abstract class WorkspaceComponent {
      *
      * @return a list of the formats that this component supports.
      */
-    public List<? extends String> getFormats() {
-        return Collections.singletonList(getDefaultFormat());
-    }
+    open val formats: List<String?>
+        get() = listOf(defaultFormat)
 
     /**
      * Fires an event which leads any linked gui components to close, which
      * calls the haschanged dialog.
      */
-    public void tryClosing() {
-        events.getComponentClosing().fireAndForget();
-        //TODO: If there is no Gui then close must be called directly
+    fun tryClosing() {
+        events.componentClosing.fire()
+        // TODO: If there is no Gui then close must be called directly
     }
 
     /**
      * Closes the WorkspaceComponent.
      */
-    public void close() {
-        getAttributeContainers().forEach(this::fireAttributeContainerRemoved);
-        workspace.removeWorkspaceComponent(this);
+    open fun close() {
+        attributeContainers.forEach(Consumer { removedContainer: AttributeContainer? ->
+            this.fireAttributeContainerRemoved(
+                removedContainer
+            )
+        })
+        workspace.removeWorkspaceComponent(this)
     }
 
     /**
      * Called by Workspace to update the state of the component.
      */
-    public void update() {
+    open suspend fun update() {
     }
 
     /**
-     * Override to return a collection of all {@link AttributeContainer}'s currently managed by this
+     * Override to return a collection of all [AttributeContainer]'s currently managed by this
      * component.
      */
-    public List<AttributeContainer> getAttributeContainers() {
-        return new ArrayList<>();
-    }
+    open val attributeContainers: List<AttributeContainer>
+        get() = ArrayList()
 
-    public CouplingManager getCouplingManager() {
-        return workspace.getCouplingManager();
-    }
+    val couplingManager: CouplingManager
+        get() = workspace.couplingManager
 
     /**
      * Called by Workspace to notify that updates have stopped.
      */
-    protected void stopped() {
+    protected fun stopped() {
     }
 
     /**
-     * Notify listeners that an {@link AttributeContainer} has been added to the component.
+     * Notify listeners that an [AttributeContainer] has been added to the component.
      */
-    public void fireAttributeContainerAdded(AttributeContainer addedContainer) {
-        events.getAttributeContainerAdded().fireAndForget(addedContainer);
+    fun fireAttributeContainerAdded(addedContainer: AttributeContainer?) {
+        events.attributeContainerAdded.fire(addedContainer!!)
     }
 
     /**
-     * Notify listeners that an {@link AttributeContainer}  has been removed from the
+     * Notify listeners that an [AttributeContainer]  has been removed from the
      * component.
      */
-    public void fireAttributeContainerRemoved(AttributeContainer removedContainer) {
-        events.getAttributeContainerRemoved().fireAndForget(removedContainer);
+    fun fireAttributeContainerRemoved(removedContainer: AttributeContainer?) {
+        events.attributeContainerRemoved.fire(removedContainer!!)
     }
 
     /**
      * Called after a global update ends.
      */
-    void doStopped() {
-        stopped();
+    fun doStopped() {
+        stopped()
     }
 
-    /**
-     * Returns the name of this component.
-     */
-    public String getName() {
-        return name;
+    override fun toString(): String {
+        return name
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String toString() {
-        return name;
-    }
-
-    /**
-     * Retrieves a simple version of a component name from its class, e.g.
-     * "Network" from "org.simbrain.network.NetworkComponent".
-     *
-     * @return the simple name.
-     */
-    public String getSimpleName() {
-        String simpleName = getClass().getSimpleName();
-        if (simpleName.endsWith("Component")) {
-            simpleName = simpleName.replaceFirst("Component", "");
+    val simpleName: String
+        /**
+         * Retrieves a simple version of a component name from its class, e.g.
+         * "Network" from "org.simbrain.network.NetworkComponent".
+         *
+         * @return the simple name.
+         */
+        get() {
+            var simpleName = javaClass.simpleName
+            if (simpleName.endsWith("Component")) {
+                simpleName = simpleName.replaceFirst("Component".toRegex(), "")
+            }
+            return simpleName
         }
-        return simpleName;
-    }
 
-    /**
-     * Override for use with open service.
-     *
-     * @return xml string representing stored file.
-     */
-    public String getXML() {
-        return null;
-    }
+    open val xml: String?
+        /**
+         * Override for use with open service.
+         *
+         * @return xml string representing stored file.
+         */
+        get() = null
 
-    /**
-     * Returns the workspace associated with this component.
-     */
-    public Workspace getWorkspace() {
-        return workspace;
-    }
-
-    /**
-     * Sets the workspace for this component. Called by the workspace right
-     * after this component is created.
-     *
-     * @param workspace The workspace for this component.
-     */
-    public void setWorkspace(Workspace workspace) {
-        this.workspace = workspace;
-    }
-
-    /**
-     * The file extension for a component type, e.g. By default, "xml".
-     *
-     * @return the file extension
-     */
-    public String getDefaultFormat() {
-        return "xml";
-    }
+    val defaultFormat: String
+        /**
+         * The file extension for a component type, e.g. By default, "xml".
+         *
+         * @return the file extension
+         */
+        get() = "xml"
 
     /**
      * Set to true when a component changes, set to false after a component is
      * saved.
      *
      * @param changedSinceLastSave whether this component has changed since the
-     *                             last save.
+     * last save.
      */
-    public void setChangedSinceLastSave(boolean changedSinceLastSave) {
-        Logger.debug("component changed");
-        this.changedSinceLastSave = changedSinceLastSave;
+    fun setChangedSinceLastSave(changedSinceLastSave: Boolean) {
+        Logger.debug("component changed")
+        this.changedSinceLastSave = changedSinceLastSave
     }
 
     /**
      * Returns true if it's changed since the last save.
      */
-    public boolean hasChangedSinceLastSave() {
-        return changedSinceLastSave;
-    }
-
-    public File getCurrentFile() {
-        return currentFile;
-    }
-
-    public void setCurrentFile(File currentFile) {
-        this.currentFile = currentFile;
-    }
-
-    public boolean isGuiOn() {
-        return guiOn;
-    }
-
-    public void setGuiOn(boolean guiOn) {
-        this.guiOn = guiOn;
-        events.getGuiToggled().fireAndForget();
-    }
-
-    public boolean getUpdateOn() {
-        return updateOn;
-    }
-
-    /**
-     * @param updateOn the updateOn to set
-     */
-    public void setUpdateOn(boolean updateOn) {
-        this.updateOn = updateOn;
-        events.getGuiToggled().fireAndForget();
-    }
-
-    /**
-     * Sets whether or not this component is marked as currently running...
-     * meant to be false if only doing a one-off update
-     *
-     * @param running
-     */
-    public void setRunning(boolean running) {
-        this.isRunning = running;
-    }
-
-    /**
-     * @return if this component is marked as running
-     */
-    public boolean isRunning() {
-        return isRunning;
-    }
-
-    /**
-     * Return the serializePriority
-     */
-    public int getSerializePriority() {
-        return serializePriority;
-    }
-
-    /**
-     * @param serializePriority the serializePriority to set
-     */
-    protected void setSerializePriority(int serializePriority) {
-        this.serializePriority = serializePriority;
-    }
-
-    public WorkspaceComponentEvents getEvents() {
-        return events;
+    open fun hasChangedSinceLastSave(): Boolean {
+        return changedSinceLastSave
     }
 
     /**
@@ -334,7 +280,7 @@ public abstract class WorkspaceComponent {
      * Subclasses should override this if special events need to occur at the
      * start of a simulation.
      */
-    public void start() {
+    open fun start() {
     }
 
     /**
@@ -342,12 +288,12 @@ public abstract class WorkspaceComponent {
      * Subclasses should override this if special events need to occur at the
      * start of a simulation.
      */
-    public void stop() {
+    open fun stop() {
     }
 
     /**
      * Any “read resolve” type initialization of components or models that require workspace access post serialization should occur in an override of this function.
      */
-    public void postOpenInit(Workspace workspace) {
+    open fun postOpenInit(workspace: Workspace?) {
     }
 }

@@ -53,10 +53,10 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
         modelList.add(model)
         if (model is LocatableModel) {
             model.events.locationChanged.on {
-                events.locationChanged.fireAndForget()
+                events.locationChanged.fire()
             }
         }
-        events.locationChanged.fireAndForget()
+        events.locationChanged.fire()
         model.events.deleted.on(wait = true) {
             modelList.remove(it)
             if (modelList.size == 0) {
@@ -83,8 +83,8 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
             modelList.remove(it)
             it.delete()
         }
-        customInfo?.let { it.events.deleted.fireAndBlock(it) }
-        events.deleted.fireAndForget(this)
+        customInfo?.let { it.events.deleted.fire(it) }
+        events.deleted.fire(this)
     }
 
     /**

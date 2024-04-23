@@ -49,7 +49,7 @@ class SynapseGroup @JvmOverloads constructor(
         set(value) {
             field = value
             this.synapses.forEach { it.isVisible = value }
-            events.visibilityChanged.fireAndForget()
+            events.visibilityChanged.fire()
         }
 
     init {
@@ -72,18 +72,18 @@ class SynapseGroup @JvmOverloads constructor(
         this.synapses.forEach { it.delete() }
         target.removeIncomingSg(this)
         source.removeOutgoingSg(this)
-        events.deleted.fireAndForget(this)
+        events.deleted.fireAndBlock(this)
     }
 
     fun addSynapse(syn: Synapse) {
         syn.isVisible = displaySynapses
         this.synapses.add(syn)
-        events.synapseAdded.fireAndForget(syn)
+        events.synapseAdded.fire(syn)
     }
 
     fun removeSynapse(syn: Synapse) {
         this.synapses.remove(syn)
-        events.synapseRemoved.fireAndForget(syn)
+        events.synapseRemoved.fire(syn)
     }
 
     fun isRecurrent(): Boolean {
@@ -93,7 +93,7 @@ class SynapseGroup @JvmOverloads constructor(
     context(Network)
     override fun update() {
         this.synapses.forEach { it.update() }
-        events.updated.fireAndBlock()
+        events.updated.fire()
     }
 
     fun size(): Int = this.synapses.size
@@ -101,7 +101,7 @@ class SynapseGroup @JvmOverloads constructor(
     fun randomizeSymmetric(randomizer: ProbabilityDistribution?) {
         randomize(randomizer)
         this.synapses.forEach { it.symmetricSynapse?.let { s -> it.forceSetStrength(s.strength) } }
-        events.updated.fireAndBlock()
+        events.updated.fire()
     }
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
@@ -170,7 +170,7 @@ class SynapseGroup @JvmOverloads constructor(
         ).forEach {
             addSynapse(it)
         }
-        events.synapseListChanged.fireAndForget()
+        events.synapseListChanged.fire()
     }
 
     fun getWeightMatrixArray(): Array<DoubleArray> {
@@ -183,7 +183,7 @@ class SynapseGroup @JvmOverloads constructor(
 
     override fun clear() {
         synapses.forEach { it.hardClear() }
-        events.updated.fireAndBlock()
+        events.updated.fire()
     }
 
 }

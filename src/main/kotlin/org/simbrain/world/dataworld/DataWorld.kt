@@ -39,7 +39,7 @@ class DataWorld(val rows: Int = 30, val cols: Int = 5): AttributeContainer, Edit
 
     fun update() {
         dataModel.currentRowIndex = (dataModel.currentRowIndex + 1) % dataModel.rowCount
-        dataModel.events.currentRowChanged.fireAndBlock()
+        dataModel.events.currentRowChanged.fire()
     }
 
     override val id: String = "Data World"

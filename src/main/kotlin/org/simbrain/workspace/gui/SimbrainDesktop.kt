@@ -472,7 +472,7 @@ object SimbrainDesktop {
      * @return component guicomponent
      */
     fun getDesktopComponent(component: WorkspaceComponent): DesktopComponent<*> {
-        return workspaceComponentDesktopComponentMap[component]!!
+        return workspaceComponentDesktopComponentMap[component] ?: throw IllegalStateException("Cannot find component ${component.name} in ${workspaceComponentDesktopComponentMap.keys.map { it.name }}")
     }
 
     /**

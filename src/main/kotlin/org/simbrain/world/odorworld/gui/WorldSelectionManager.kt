@@ -48,7 +48,7 @@ class WorldSelectionManager {
             isAdjusting = false
 
             if (rv || elements.isEmpty()) {
-                events.selection.fireAndBlock(oldSelection, _selection)
+                events.selection.fire(oldSelection, _selection)
             }
         }
 
@@ -73,7 +73,7 @@ class WorldSelectionManager {
         if (!isEmpty) {
             val oldSelection = HashSet(_selection)
             _selection.clear()
-            events.selection.fireAndBlock(oldSelection, _selection)
+            events.selection.fire(oldSelection, _selection)
         }
     }
 
@@ -94,7 +94,7 @@ class WorldSelectionManager {
         val oldSelection = HashSet(_selection)
         val rv = _selection.add(element)
         if (rv) {
-            events.selection.fireAndBlock(oldSelection, _selection)
+            events.selection.fire(oldSelection, _selection)
         }
     }
 
@@ -110,7 +110,7 @@ class WorldSelectionManager {
         isAdjusting = false
 
         if (rv) {
-            events.selection.fireAndBlock(oldSelection, _selection)
+            events.selection.fire(oldSelection, _selection)
         }
     }
 
@@ -123,7 +123,7 @@ class WorldSelectionManager {
         val oldSelection = HashSet(_selection)
         val rv = _selection.remove(element)
         if (rv) {
-            events.selection.fireAndBlock(oldSelection, _selection)
+            events.selection.fire(oldSelection, _selection)
         }
     }
 
@@ -139,7 +139,7 @@ class WorldSelectionManager {
         isAdjusting = false
 
         if (rv) {
-            events.selection.fireAndBlock(oldSelection, _selection)
+            events.selection.fire(oldSelection, _selection)
         }
     }
 

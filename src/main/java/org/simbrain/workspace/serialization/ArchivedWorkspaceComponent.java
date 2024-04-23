@@ -10,7 +10,7 @@ import org.simbrain.workspace.gui.DesktopComponent;
  * @author Matt Watson
  */
 @XStreamAlias("ArchivedWorkspaceComponent")
-final class ArchivedWorkspaceComponent {
+public final class ArchivedWorkspaceComponent {
 
     /**
      * The name of the class for the component.
@@ -53,7 +53,7 @@ final class ArchivedWorkspaceComponent {
     ArchivedWorkspaceComponent(final WorkspaceComponentSerializer serializer, final WorkspaceComponent component) {
         this.className = component.getClass().getCanonicalName();
         this.id = serializer.getId(component);
-        this.name = component.getName();
+        this.name = component.name;
         this.format = component.getDefaultFormat();
         this.uri = "components/" + id + '_' + name.replaceAll("\\s", "_") + '.' + format;
     }

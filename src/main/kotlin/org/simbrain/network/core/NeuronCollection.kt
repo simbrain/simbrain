@@ -39,7 +39,7 @@ class NeuronCollection : AbstractNeuronCollection {
             n.events.locationChanged.on { events.locationChanged }
             n.events.deleted.on(wait = true) { toDelete ->
                 removeNeuron(toDelete as Neuron?)
-                events.locationChanged.fireAndForget()
+                events.locationChanged.fire()
                 if (isEmpty) {
                     delete()
                 }
@@ -57,14 +57,14 @@ class NeuronCollection : AbstractNeuronCollection {
         for (neuron in neuronList) {
             neuron.offset(offsetX, offsetY, false)
         }
-        events.locationChanged.fireAndForget()
+        events.locationChanged.fire()
     }
 
     /**
      * Call after deleting neuron collection from parent network.
      */
     override fun delete() {
-        events.deleted.fireAndForget(this)
+        events.deleted.fireAndBlock(this)
     }
 
     /**

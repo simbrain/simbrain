@@ -66,22 +66,22 @@ class RandomizedPursuer : Simulation {
 
     private fun createOdorWorld() {
         oc = sim.addOdorWorld(440, 8, 378, 297, "World")
-        oc.getWorld().isObjectsBlockMovement = false
+        oc.world.isObjectsBlockMovement = false
 
-        mouse = oc.getWorld().addEntity(0, 0, EntityType.MOUSE)
+        mouse = oc.world.addEntity(0, 0, EntityType.MOUSE)
         mouse.heading = 90.0
         mouse.setLocationRelativeToCenter(0, 70)
         mouse.addLeftRightSensors(EntityType.SWISS, 200.0)
         mouse.addDefaultEffectors()
 
-        cheese = oc.getWorld().addEntity(0, 0, EntityType.SWISS, doubleArrayOf(1.0, 0.0, 0.0))
+        cheese = oc.world.addEntity(0, 0, EntityType.SWISS, doubleArrayOf(1.0, 0.0, 0.0))
         cheese.setLocationRelativeToCenter(0, -30)
-        oc.getWorld().update()
+        oc.world.update()
     }
 
     private fun buildNetwork() {
         nc = sim.addNetwork(10, 8, 447, 296, "Pursuer")
-        val net = nc.getNetwork()
+        val net = nc.network
         val pursuer = Vehicle(sim, net)
         with(net) {
             vehicleNetwork = pursuer.addPursuer(

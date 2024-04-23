@@ -95,12 +95,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
 
         psrMatrix = Matrix(target.inputSize(), source.outputSize())
 
-        events.updated.on(null, true, Runnable {
-            updateExcitatoryMask()
-            updateInhibitoryMask()
-        })
-        updateExcitatoryMask()
-        updateInhibitoryMask()
+        updateMasks()
     }
 
     @get:Producible
@@ -124,13 +119,15 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
         for (i in 0 until len) {
             weightMatrix[i / weightMatrix.ncol(), i % weightMatrix.ncol()] = newWeights[i]
         }
-        events.updated.fireAndForget()
+        updateMasks()
+        events.updated.fire()
     }
 
     @Consumable
     fun setMatrixValues(otherWeightMatrix: Matrix?) {
         weightMatrix.copyFrom(otherWeightMatrix!!)
-        events.updated.fireAndForget()
+        updateMasks()
+        events.updated.fire()
     }
 
     /**
@@ -140,7 +137,8 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
         clear()
         val diag = Matrix.eye(target.inputSize(), source.outputSize())
         weightMatrix.copyFrom(diag)
-        events.updated.fireAndForget()
+        updateMasks()
+        events.updated.fire()
     }
 
     context(Network)
@@ -149,7 +147,8 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
 
         if (learningRule !is StaticSynapseRule) {
             learningRule.apply(this, dataHolder)
-            events.updated.fireAndForget()
+            updateMasks()
+            events.updated.fire()
         }
     }
 
@@ -243,17 +242,20 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
                 weightMatrix[i, j] = (randomizer ?: weightRandomizer).sampleDouble()
             }
         }
-        events.updated.fireAndForget()
+        updateMasks()
+        events.updated.fire()
     }
 
     override fun increment() {
         weightMatrix.add(increment)
-        events.updated.fireAndForget()
+        updateMasks()
+        events.updated.fire()
     }
 
     override fun decrement() {
         weightMatrix.sub(increment)
-        events.updated.fireAndForget()
+        updateMasks()
+        events.updated.fire()
     }
 
     /**
@@ -261,7 +263,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
      */
     fun hardClear() {
         weightMatrix.copyFrom(Matrix(weightMatrix.nrow(), weightMatrix.ncol()))
-        events.updated.fireAndForget()
+        events.updated.fire()
     }
 
     override fun toString(): String {
@@ -273,5 +275,10 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
     fun setSpikeResponder(spikeResponder: SpikeResponder) {
         this.spikeResponder = spikeResponder
         spikeResponseData = spikeResponder.createMatrixData(weightMatrix.nrow(), weightMatrix.ncol())
+    }
+
+    fun updateMasks() {
+        updateExcitatoryMask()
+        updateInhibitoryMask()
     }
 }

@@ -104,7 +104,7 @@ public class ImageAlbum extends ImageSource implements AttributeContainer, Edita
         graphics.drawImage(imageIcon.getImage(), 0, 0, null);
         graphics.dispose();
         setCurrentImage(image);
-        getEvents().getImageUpdate().fireAndForget();
+        getEvents().getImageUpdate().fire();
     }
 
     /**

@@ -109,7 +109,7 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
             if (phrase.equalsIgnoreCase(heardPhrase)) {
                 if (!activated) {
                     activated = true;
-                    getEvents().getUpdated().fireAndForget();
+                    getEvents().getUpdated().fire();
                 }
                 time = lingerTime;
             }
@@ -118,7 +118,7 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
         if (!(time > 0)) {
             if (activated) {
                 activated = false;
-                getEvents().getUpdated().fireAndForget();
+                getEvents().getUpdated().fire();
             }
         }
     }
@@ -130,7 +130,7 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
     @Consumable(customDescriptionMethod = "getAttributeDescription")
     public void setPhrase(String phrase) {
         this.phrase = phrase;
-        getEvents().getPropertyChanged().fireAndForget();
+        getEvents().getPropertyChanged().fire();
     }
 
     public boolean isActivated() {

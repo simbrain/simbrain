@@ -180,7 +180,7 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
     private fun modifySourceSelection(block: CopyOnWriteArraySet<ScreenElement>.() -> Unit) {
         val old = HashSet(sourceSelection)
         (sourceSelection as CopyOnWriteArraySet).block()
-        events.sourceSelection.fireAndForget(old, sourceSelection)
+        events.sourceSelection.fire(old, sourceSelection)
     }
 
     /**
@@ -190,7 +190,7 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
         val old = HashSet(selection)
         // Invoke provided action
         (selection as CopyOnWriteArraySet).action()
-        events.selection.fireAndForget(old, selection)
+        events.selection.fire(old, selection)
     }
 
 

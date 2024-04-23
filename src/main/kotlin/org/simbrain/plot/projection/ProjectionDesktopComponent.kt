@@ -88,7 +88,7 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
         iconPath = "menu_icons/Rand.png"
     ) {
         projector.dataset.randomizeDownstairs()
-        projector.events.datasetChanged.fireAndForget()
+        projector.events.datasetChanged.fire()
     }
 
     val clearDataAction = createAction(
@@ -98,8 +98,8 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
     ) {
         synchronized(projector.dataset) {
             projector.dataset.kdTree.clear()
-            projector.events.datasetChanged.fireAndForget()
-            projector.events.datasetCleared.fireAndForget()
+            projector.events.datasetChanged.fire()
+            projector.events.datasetCleared.fire()
         }
     }
 
@@ -259,7 +259,7 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
         projector.events.methodChanged.on { o, n ->
             projectionSelector.selectedItem = projectionMethods[n.javaClass]
             running = false
-            projector.events.stopIterating.fireAndBlock()
+            projector.events.stopIterating.fire()
             if (n is IterableProjectionMethod) {
                 topPanel.add(runToolbar)
                 bottomPanel.add(errorLabel)

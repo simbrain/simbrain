@@ -49,7 +49,7 @@ fun WeightMatrix.applyLMS(outputError: Matrix, epsilon: Double = .1) {
         .mul(epsilon)
     weightMatrix.add(weightDeltas)
     tar.updateBiases(outputError, epsilon)
-    events.updated.fireAndForget()
+    events.updated.fire()
 }
 
 /**
@@ -76,7 +76,7 @@ fun WeightMatrix.backpropError(layerError: Matrix, epsilon: Double = .1): Matrix
 
     // Update weights
     weightMatrix.add(weightDeltas.mul(epsilon))
-    events.updated.fireAndBlock()
+    events.updated.fire()
 
     return backropagatedError
 }
@@ -90,7 +90,7 @@ fun NeuronArray.updateBiases(error: Matrix, epsilon: Double = .1) {
         if (it is BiasedMatrixData) {
             val biasDelta = error.clone().mul(epsilon)
             it.biases += biasDelta
-            events.updated.fireAndBlock()
+            events.updated.fire()
         } else {
             throw IllegalStateException("Neuron array ${id} has no biases to update")
         }

@@ -34,7 +34,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
             if (typeChanged) {
                 dataHolder = updateRule.createMatrixData(size())
             }
-            events.updated.fireAndForget()
+            events.updated.fire()
         }
     )
 
@@ -60,7 +60,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
     var activations: Matrix = Matrix(inputSize, 1)
         set(newActivations) {
             field.copyFrom(newActivations)
-            events.updated.fireAndForget()
+            events.updated.fire()
         }
 
     /**
@@ -88,14 +88,14 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
     var gridMode = false
         set(value) {
             field = value
-            (events as NeuronArrayEvents).visualPropertiesChanged.fireAndBlock()
+            (events as NeuronArrayEvents).visualPropertiesChanged.fire()
         }
 
     @UserParameter(label = "Biases Visible", description = "If true, show biases.", order = 11)
     var isShowBias = false
         set(showBias) {
             field = showBias
-            (events as NeuronArrayEvents).visualPropertiesChanged.fireAndBlock()
+            (events as NeuronArrayEvents).visualPropertiesChanged.fire()
         }
 
     @Transient
@@ -138,7 +138,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
                 outputs.validateSameShape(targets)
             }
             this.targets = targets
-            events.updated.fireAndBlock()
+            events.updated.fire()
         }
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
@@ -146,7 +146,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
             size(), 1,
             GaussianDistribution(0.0, 1.0)
         )
-        events.updated.fireAndForget()
+        events.updated.fire()
     }
 
     override val bound: Rectangle2D
@@ -156,7 +156,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         )
 
     override fun onCommit() {
-        events.labelChanged.fireAndForget("", label!!)
+        events.labelChanged.fire("", label!!)
     }
 
     override val name: String
@@ -170,7 +170,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
      */
     fun offset(offsetX: Double, offsetY: Double) {
         setLocation(x + offsetX, y + offsetY)
-        events.updated.fireAndForget()
+        events.updated.fire()
     }
 
     /**
@@ -205,7 +205,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         }
         updateRule.apply(this, dataHolder)
         inputs.mul(0.0) // clear inputs
-        events.updated.fireAndForget()
+        events.updated.fire()
     }
 
     @Consumable
@@ -222,7 +222,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
 
 
     fun fireLocationChange() {
-        events.locationChanged.fireAndForget()
+        events.locationChanged.fire()
     }
 
     /**
@@ -250,17 +250,17 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
 
     override fun clear() {
         outputs.mul(0.0)
-        events.updated.fireAndForget()
+        events.updated.fire()
     }
 
     override fun increment() {
         outputs.add(increment)
-        events.updated.fireAndForget()
+        events.updated.fire()
     }
 
     override fun decrement() {
         outputs.sub(increment)
-        events.updated.fireAndForget()
+        events.updated.fire()
     }
 
 

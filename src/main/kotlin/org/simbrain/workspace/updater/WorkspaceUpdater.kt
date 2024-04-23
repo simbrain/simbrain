@@ -69,7 +69,7 @@ class WorkspaceUpdater(val workspace: Workspace) {
         for (wc in workspace.componentList) {
             wc.isRunning = true
         }
-        events.runStarted.fireAndForget()
+        events.runStarted.fire().await()
         withContext(workspace.coroutineContext) {
             while (isRunning) {
                 doUpdate()
@@ -79,7 +79,7 @@ class WorkspaceUpdater(val workspace: Workspace) {
         for (component in workspace.componentList) {
             component.isRunning = false
         }
-        events.runFinished.fireAndForget()
+        events.runFinished.fire().await()
     }
 
     /**
@@ -90,11 +90,11 @@ class WorkspaceUpdater(val workspace: Workspace) {
         for (wc in workspace.componentList) {
             wc.isRunning = true
         }
-        events.runStarted.fireAndForget()
+        events.runStarted.fire().await()
         withContext(workspace.coroutineContext) {
             doUpdate()
         }
-        events.runFinished.fireAndForget()
+        events.runFinished.fire().await()
         isRunning = false
         for (component in workspace.componentList) {
             component.isRunning = false
@@ -107,9 +107,9 @@ class WorkspaceUpdater(val workspace: Workspace) {
             wc.isRunning = true
         }
         runBlocking {
-            events.runStarted.fireAndForget()
+            events.runStarted.fire().await()
             doUpdate()
-            events.runFinished.fireAndForget()
+            events.runFinished.fire().await()
         }
         isRunning = false
         for (component in workspace.componentList) {
@@ -131,7 +131,7 @@ class WorkspaceUpdater(val workspace: Workspace) {
         for (wc in workspace.componentList) {
             wc.isRunning = true
         }
-        events.runStarted.fireAndForget()
+        events.runStarted.fire().await()
         repeat(numIterations) {
             doUpdate()
         }
@@ -140,7 +140,7 @@ class WorkspaceUpdater(val workspace: Workspace) {
         for (component in workspace.componentList) {
             component.isRunning = false
         }
-        events.runFinished.fireAndForget()
+        events.runFinished.fire().await()
     }
 
     suspend fun iterateWhile(predicate: () -> Boolean) {
@@ -172,7 +172,7 @@ class WorkspaceUpdater(val workspace: Workspace) {
                 }
             }
         }
-        events.workspaceUpdated.fireAndForget()
+        events.workspaceUpdated.fire()
         Logger.trace("done: $time")
     }
 

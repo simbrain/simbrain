@@ -316,7 +316,7 @@ fun NeuronArray.randomizeBiases(randomizer: ProbabilityDistribution? = null) {
             for (i in 0 until it.biases.nrow()) {
                 it.biases.set(i, 0, (randomizer ?: biasesRandomizer).sampleDouble())
             }
-            events.updated.fireAndBlock()
+            events.updated.fire()
         }
     }
 }

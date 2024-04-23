@@ -101,7 +101,7 @@ abstract class Layer : LocatableModel(), AttributeContainer {
     open var width = 0.0
         set(width) {
             field = width
-            events.locationChanged.fireAndForget()
+            events.locationChanged.fire()
         }
 
     /**
@@ -110,7 +110,7 @@ abstract class Layer : LocatableModel(), AttributeContainer {
     open var height = 0.0
         set(height) {
             field = height
-            events.locationChanged.fireAndForget()
+            events.locationChanged.fire()
         }
 
     /**
@@ -157,7 +157,7 @@ abstract class Layer : LocatableModel(), AttributeContainer {
     }
 
     override fun delete() {
-        events.deleted.fireAndForget(this)
+        events.deleted.fireAndBlock(this)
     }
 
     /**
@@ -172,6 +172,6 @@ abstract class Layer : LocatableModel(), AttributeContainer {
         set(location) {
             x = location.x
             y = location.y
-            events.locationChanged.fireAndForget()
+            events.locationChanged.fire()
         }
 }

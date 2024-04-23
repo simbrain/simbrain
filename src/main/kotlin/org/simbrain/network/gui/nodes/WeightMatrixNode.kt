@@ -220,7 +220,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
                 weightMatrix.events.updated.on { wmViewer.model.fireTableDataChanged() }
                 dialog.addCommitTask {
                     weightMatrix.setWeights(wm.get2DDoubleArray())
-                    weightMatrix.events.updated.fireAndForget()
+                    weightMatrix.events.updated.fire()
                 }
             }
             dialog.setContentPane(tabs)

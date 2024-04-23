@@ -123,7 +123,7 @@ public class SubnetworkNode extends ScreenElement {
             outline.resetOutlinedNodes(outlinedObjects);
         });
         if (node.getModel() instanceof LocatableModel locatableModel) {
-            locatableModel.getEvents().getLocationChanged().fireAndForget();
+            locatableModel.getEvents().getLocationChanged().fire();
         }
 
         updateOutline();

@@ -193,7 +193,7 @@ class CouplingManager(val workspace: Workspace) {
         attributeContainerCouplings.getOrPut(it.producer.baseObject) { LinkedHashSet() }.add(it)
         attributeContainerCouplings.getOrPut(it.consumer.baseObject) { LinkedHashSet() }.add(it)
         if (fireEvents) {
-            events.couplingAdded.fireAndForget(it)
+            events.couplingAdded.fire(it)
         }
     }
 
@@ -265,7 +265,7 @@ class CouplingManager(val workspace: Workspace) {
         couplings.forEach { coupling ->
             removeCouplingWithoutFiringEvent(coupling)
         }
-        events.couplingsRemoved.fireAndForget(couplings)
+        events.couplingsRemoved.fire(couplings)
     }
 
     /**
@@ -300,7 +300,7 @@ class CouplingManager(val workspace: Workspace) {
      */
     fun removeCoupling(coupling: Coupling) {
         removeCouplingWithoutFiringEvent(coupling)
-        events.couplingRemoved.fireAndForget(coupling)
+        events.couplingRemoved.fire(coupling)
     }
 
     private fun removeCouplingWithoutFiringEvent(coupling: Coupling) {
@@ -330,7 +330,7 @@ class CouplingManager(val workspace: Workspace) {
                     attributeContainerCouplings[coupling.producer.baseObject]?.remove(coupling)
                 }
             }
-            events.couplingsRemoved.fireAndForget(it.toList())
+            events.couplingsRemoved.fire(it.toList())
         }
         attributeContainerCouplings.remove(attributeContainer)
     }

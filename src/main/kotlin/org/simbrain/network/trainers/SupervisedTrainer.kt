@@ -68,7 +68,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
             events.iterationReset.fire()
         }
         isRunning = true
-        events.beginTraining.fireAndForget()
+        events.beginTraining.fire()
         withContext(Dispatchers.Default) {
             while (isRunning) {
                 trainOnce()
@@ -82,7 +82,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
 
     suspend fun stopTraining() {
         isRunning = false
-        events.endTraining.fireAndForget()
+        events.endTraining.fire()
     }
 
     context(Network)
@@ -117,7 +117,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
             }
         }
         lastError = lossFunction.loss
-        events.errorUpdated.fire(lossFunction)
+        events.errorUpdated.fire(lossFunction).await()
     }
 
     context(Network)

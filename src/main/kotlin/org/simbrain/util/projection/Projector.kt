@@ -42,7 +42,7 @@ class Projector(initialDimension: Int = 25) : EditableObject, CoroutineScope {
             val oldMethod = field
             field = value
             init()
-            events.methodChanged.fireAndForget(oldMethod, value)
+            events.methodChanged.fire(oldMethod, value)
         }
 
     @UserParameter(label = "Tolerance", minimumValue = 0.0, increment = .1, order =  1)
@@ -79,9 +79,9 @@ class Projector(initialDimension: Int = 25) : EditableObject, CoroutineScope {
                 dataset.kdTree.insert(newPoint)
                 dataset.currentPoint = newPoint
                 projectionMethod.addPoint(dataset, newPoint)
-                events.datasetChanged.fireAndBlock()
+                events.datasetChanged.fire()
             }
-            events.pointUpdated.fireAndBlock(newPoint)
+            events.pointUpdated.fire(newPoint)
         }
     }
 

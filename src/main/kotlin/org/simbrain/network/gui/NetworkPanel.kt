@@ -76,7 +76,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     var autoZoom = true
         set(value) {
             field = value
-            network.events.zoomToFitPage.fireAndForget()
+            network.events.zoomToFitPage.fire()
         }
 
     var editMode: EditMode = EditMode.SELECTION
@@ -124,7 +124,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         set(value) {
             field = value
             network.freeSynapses.forEach { it.isVisible = value }
-            network.events.freeWeightVisibilityChanged.fireAndForget(value)
+            network.events.freeWeightVisibilityChanged.fire(value)
         }
 
     /**
@@ -132,7 +132,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
      */
     var guiOn = true
 
-    private val forceZoomToFitPage = PreferenceChangeListener { network.events.zoomToFitPage.fireAndBlock() }
+    private val forceZoomToFitPage = PreferenceChangeListener { network.events.zoomToFitPage.fire() }
 
     /**
      * Called when preferences are updated.
@@ -154,11 +154,11 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         SynapseNode.maxDiameter = NetworkPreferences.maxWeightSize
         SynapseNode.zeroWeightColor = NetworkPreferences.zeroWeightColor
 
-        network.flatNeuronList.forEach {
-            it.events.colorChanged.fireAndBlock()
+        network.flatNeuronList.map {
+            it.events.colorChanged.fire()
         }
         network.flatSynapseList.forEach {
-            it.events.colorPreferencesChanged.fireAndBlock()
+            it.events.colorPreferencesChanged.fire()
         }
 
     }
@@ -220,7 +220,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         // Repaint whenever window is opened or changed.
         addComponentListener(object : ComponentAdapter() {
             override fun componentResized(arg0: ComponentEvent) {
-                network.events.zoomToFitPage.fireAndForget()
+                network.events.zoomToFitPage.fire()
             }
         })
 
@@ -289,7 +289,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
                 selectionManager.add(node)
             }
         }
-        network.events.zoomToFitPage.fireAndForget()
+        network.events.zoomToFitPage.fire()
     }
 
     private fun createNode(model: NetworkModel): ScreenElement {
@@ -443,7 +443,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
         selectionManager.selection.forEach { delete(it) }
 
-        network.events.zoomToFitPage.fireAndForget()
+        network.events.zoomToFitPage.fire()
     }
 
     private fun createEditToolBar() = CustomToolBar().apply {
@@ -689,7 +689,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
                 list.forEach { createNode(it) }
             }
             modelRemoved.on {
-                zoomToFitPage.fireAndForget()
+                zoomToFitPage.fire()
                 modelNodeMap.remove(it)
             }
             updateActionsChanged.on(Dispatchers.Swing) { timeLabel.update() }

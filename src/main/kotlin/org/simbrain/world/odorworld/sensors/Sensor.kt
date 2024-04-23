@@ -61,7 +61,7 @@ abstract class Sensor : PeripheralAttribute {
 
     override fun setLabel(label: String) {
         this.label = label
-        getEvents().propertyChanged.fireAndForget()
+        getEvents().propertyChanged.fire()
     }
 
     abstract override fun copy(): Sensor

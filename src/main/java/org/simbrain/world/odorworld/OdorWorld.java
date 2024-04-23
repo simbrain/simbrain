@@ -125,15 +125,15 @@ public class OdorWorld implements EditableObject, Bounded {
      */
     public void update() {
         entityList.forEach(OdorWorldEntity::update);
-        events.getUpdated().fireAndForget();
+        events.getUpdated().fire();
     }
 
     /**
      * Stop animation.
      */
     public void stopAnimation() {
-        events.getAnimationStopped().fireAndForget();
-        events.getWorldStopped().fireAndForget();
+        events.getAnimationStopped().fire();
+        events.getWorldStopped().fire();
     }
 
     /**
@@ -154,7 +154,7 @@ public class OdorWorld implements EditableObject, Bounded {
         // Add entity to the map
         entityList.add(entity);
 
-        events.getEntityAdded().fireAndForget(entity);
+        events.getEntityAdded().fire(entity);
 
         // Recompute max stimulus length
         recomputeMaxVectorNorm();
@@ -347,13 +347,13 @@ public class OdorWorld implements EditableObject, Bounded {
             entityList.remove(entity);
             entity.delete();
             for (Sensor sensor : entity.getSensors()) {
-                entity.getEvents().getSensorRemoved().fireAndForget(sensor);
+                entity.getEvents().getSensorRemoved().fire(sensor);
             }
             for (Effector effector : entity.getEffectors()) {
-                entity.getEvents().getEffectorRemoved().fireAndForget(effector);
+                entity.getEvents().getEffectorRemoved().fire(effector);
             }
             recomputeMaxVectorNorm();
-            events.getEntityRemoved().fireAndForget(entity);
+            events.getEntityRemoved().fire(entity);
         }
 
     }
@@ -523,11 +523,11 @@ public class OdorWorld implements EditableObject, Bounded {
     public void setTileMap(TileMap tileMap) {
         this.tileMap = tileMap;
         this.selectedLayer = tileMap.getLayers().get(0);
-        getEvents().getTileMapChanged().fireAndForget();
+        getEvents().getTileMapChanged().fire();
     }
 
     public void start() {
-        events.getWorldStarted().fireAndForget();
+        events.getWorldStarted().fire();
     }
 
     public Point2D getLastClickedPosition() {

@@ -104,7 +104,7 @@ class Hopfield : Subnetwork {
 
     fun updateStateInfoText() {
         customInfo.text = stateInfoText
-        events.customInfoUpdated.fireAndBlock()
+        events.customInfoUpdated.fire()
     }
 
     /**
@@ -120,8 +120,8 @@ class Hopfield : Subnetwork {
                     s.strength = s.strength + deltaW
                 })
         })
-        synapseGroup.events.updated.fireAndForget()
-        events.updated.fireAndForget()
+        synapseGroup.events.updated.fire()
+        events.updated.fire()
     }
 
     fun reapplyOffsets() {

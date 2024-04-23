@@ -40,7 +40,7 @@ class OdorWorldEntity @JvmOverloads constructor(
     override var x = 0.0
         set(value) {
             field = value
-            events.moved.fireAndForget()
+            events.moved.fire()
             locationPointDirty = true
         }
 
@@ -48,7 +48,7 @@ class OdorWorldEntity @JvmOverloads constructor(
     override var y = 0.0
         set(value) {
             field = value
-            events.moved.fireAndForget()
+            events.moved.fire()
             locationPointDirty = true
         }
 
@@ -71,7 +71,7 @@ class OdorWorldEntity @JvmOverloads constructor(
     override var heading = 0.0
         set(value) {
             field = ((value % 360.0) + 360.0) % 360.0
-            events.moved.fireAndForget()
+            events.moved.fire()
         }
 
     override val width: Double = entityType.imageWidth
@@ -99,7 +99,7 @@ class OdorWorldEntity @JvmOverloads constructor(
         set(value) {
             val oldValue = field
             field = value
-            events.trailVisibilityChanged.fireAndBlock(value, oldValue)
+            events.trailVisibilityChanged.fire(value, oldValue)
         }
 
     /**
@@ -161,7 +161,7 @@ class OdorWorldEntity @JvmOverloads constructor(
             .associateWith { moveInX.intersect(it) }
             .filter { it.value.intersect }
             .minByOrNull { it.value.dx }
-            ?.apply { events.collided.fireAndForget(key) }?.value?.dx ?: 0.0
+            ?.apply { events.collided.fire(key) }?.value?.dx ?: 0.0
 
         val moveInY = Bound(x + (dx - distanceXShortenBy * directionX), y + dy, width, height)
 
@@ -169,7 +169,7 @@ class OdorWorldEntity @JvmOverloads constructor(
             .associateWith { moveInY.intersect(it) }
             .filter { it.value.intersect }
             .minByOrNull { it.value.dy }
-            ?.apply { events.collided.fireAndForget(key) }?.value?.dy ?: 0.0
+            ?.apply { events.collided.fire(key) }?.value?.dy ?: 0.0
 
         val newX = x + (dx - distanceXShortenBy * directionX)
         val newY = y + (dy - distanceYShortenBy * directionY)
@@ -210,17 +210,17 @@ class OdorWorldEntity @JvmOverloads constructor(
         if (effector.id == null) {
             effector.setId(world.effectorIDGenerator.getAndIncrement())
         }
-        events.effectorAdded.fireAndForget(effector)
+        events.effectorAdded.fire(effector)
     }
 
     fun removeAllEffectors() {
-        effectors.forEach { events.effectorRemoved.fireAndForget(it) }
+        effectors.forEach { events.effectorRemoved.fire(it) }
         effectors.clear()
     }
 
     fun removeEffector(effector: Effector) {
         effectors.remove(effector)
-        events.effectorRemoved.fireAndForget(effector)
+        events.effectorRemoved.fire(effector)
     }
 
     fun addSensor(sensor: Sensor) {
@@ -228,7 +228,7 @@ class OdorWorldEntity @JvmOverloads constructor(
         if (sensor.id == null) {
             sensor.id = world.sensorIDGenerator.getAndIncrement()
         }
-        events.sensorAdded.fireAndForget(sensor)
+        events.sensorAdded.fire(sensor)
     }
 
     fun addDefaultSensorsEffectors() {
@@ -251,13 +251,13 @@ class OdorWorldEntity @JvmOverloads constructor(
     }
 
     fun removeAllSensors() {
-        sensors.forEach { events.sensorRemoved.fireAndForget(it) }
+        sensors.forEach { events.sensorRemoved.fire(it) }
         sensors.clear()
     }
 
     fun removeSensor(sensor: Sensor) {
         sensors.remove(sensor)
-        events.sensorRemoved.fireAndForget(sensor)
+        events.sensorRemoved.fire(sensor)
     }
 
     fun delete() {
@@ -369,7 +369,7 @@ class OdorWorldEntity @JvmOverloads constructor(
     }
 
     fun clearTrail() {
-        events.trailCleared.fireAndBlock()
+        events.trailCleared.fire()
     }
 
     override val childrenContainers: List<AttributeContainer>

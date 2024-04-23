@@ -120,16 +120,9 @@ class PointNeuronScalarData(
     )
     var inhibitoryConductance: Double = 0.0,
 
-    @UserParameter(
-        label = "Leak Conductance",
-        description = "Leak conductance. Proportion of channels open",
-        minimumValue = 0.0
-    )
-    var leakConductance: Double = 1.0
-
 ) : ScalarDataHolder {
     override fun copy(): PointNeuronScalarData {
-        return PointNeuronScalarData(membranePotential, excitatoryConductance, inhibitoryConductance, leakConductance)
+        return PointNeuronScalarData(membranePotential, excitatoryConductance, inhibitoryConductance)
     }
 }
 

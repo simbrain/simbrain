@@ -1,16 +1,11 @@
 package org.simbrain.custom_sims.simulations
-
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
+import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.core.addNeuronCollection
-import org.simbrain.network.core.connect
 import org.simbrain.network.subnetworks.RestrictedBoltzmannMachine
 import org.simbrain.util.place
-import org.simbrain.util.plus
-import org.simbrain.util.stats.distributions.NormalDistribution
-import org.simbrain.util.toMatrix
-import smile.math.matrix.Matrix
 
 /**
  * Demo for studying Room Schema From PDP Chapter 14.
@@ -26,11 +21,19 @@ val roomSchemaSim = newSim {
     val rbm = RestrictedBoltzmannMachine(64, 25)
     network.addNetworkModel(rbm)
 
-    // Neuron Collection
-    val nc = network.addNeuronCollection(40)
+    // Neuron Collection and Its Configurations
+    val nc = network.addNeuronCollection(40).apply {
+        setUpperBound(1.0)
+        setLowerBound(0.0)
+        setClamped(true)
+        applyLayout(5, 8)
+        locationX = -550.0
+        locationY = 0.0
+    }
 
     //Connecting Neuron Collection to Competitive Input Layer
-    //connect(nc, rbm.visibleLayer) I do not know why this is not working
+    val wm = WeightMatrix(nc, rbm.visibleLayer)
+    network.addNetworkModels(wm)
 
     // Labeling the neuron collection
     nc.neuronList[0].label = "ceiling"
@@ -74,57 +77,29 @@ val roomSchemaSim = newSim {
     nc.neuronList[38].label = "bathtub"
     nc.neuronList[39].label = "clothes-hanger"
 
-    // Layout
-    nc.applyLayout(8, 5)
-
-    // Moving nc below or to the side of the RBM sim
-    nc.locationX = -150.0
-    nc.locationY = 400.0
-
-
-
-    // Inputs
-    val input1 = doubleArrayOf(1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0 )
-    val input2 = doubleArrayOf(1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0 )
-    val input3 = doubleArrayOf(1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0 )
-    val input4 = doubleArrayOf(0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0 )
-    val input5 = doubleArrayOf(1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0 )
-    val input6 = doubleArrayOf(0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0)
-
-    // Open with one set of activations (Pattern 1)
-    // Open with one set of activations (Pattern 1)
-    rbm.visibleLayer.setActivations(input1)
-
-    // Set training set of rbm to these inputs
-    rbm.inputData = Matrix.of(arrayOf(input1, input2, input3, input4, input5, input6))
-
     withGui {
         place(networkComponent, 139, 10, 1600, 900)
         createControlPanel("Control Panel", 5, 10) {
-            addButton("Pattern 1") {
-                rbm.visibleLayer.activations = input1.toMatrix()
+            addButton("Kitchen") {
+                nc.getNeuronByLabel("ceiling")?.activation = 1.0
+                nc.getNeuronByLabel("oven")?.activation = 1.0
             }
-            addButton("Pattern 2") {
-                rbm.visibleLayer.activations = input2.toMatrix()
+            addButton("Office") {
+                nc.getNeuronByLabel("ceiling")?.activation = 1.0
+                nc.getNeuronByLabel("desk")?.activation = 1.0
             }
-            addButton("Pattern 3") {
-                rbm.visibleLayer.activations = input3.toMatrix()
+            addButton("Bathroom") {
+                nc.getNeuronByLabel("ceiling")?.activation = 1.0
+                nc.getNeuronByLabel("bathtub")?.activation = 1.0
             }
-            addButton("Pattern 4") {
-                rbm.visibleLayer.activations = input4.toMatrix()
+            addButton("Living Room") {
+                nc.getNeuronByLabel("ceiling")?.activation = 1.0
+                nc.getNeuronByLabel("sofa")?.activation = 1.0
             }
-            addButton("Pattern 5") {
-                rbm.visibleLayer.activations = input5.toMatrix()
-            }
-            addButton("Pattern 6") {
-                rbm.visibleLayer.activations = input6.toMatrix()
-            }
-            addButton("Add noise") {
-                rbm.visibleLayer.activations += NormalDistribution(standardDeviation = .1)
-                    .sampleDouble(rbm.visibleLayer.size())
-                    .toMatrix()
+            addButton("Bedroom") {
+                nc.getNeuronByLabel("ceiling")?.activation = 1.0
+                nc.getNeuronByLabel("bed")?.activation = 1.0
             }
         }
-
     }
 }

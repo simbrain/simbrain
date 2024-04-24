@@ -19,37 +19,34 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.nanoseconds
 import kotlin.time.Duration.Companion.seconds
 
-data class DebugInfo(val timeStamp: Long, val duration: Duration, val initiator: String?, val dispatcher: CoroutineDispatcher?, val wait: Boolean) {
-
-    val timeStampString: String get() {
-        val time = ZonedDateTime.ofInstant(Instant.ofEpochMilli(timeStamp), TimeZone.getDefault().toZoneId())
-        val formatter = java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss.SSS")
-        return time.format(formatter)
-    }
-
-    override fun toString(): String {
-        return "DebugInfo(timeStamp=${timeStampString}, duration=$duration, initiator='$initiator', dispatcher=$dispatcher, wait=$wait)"
-    }
-}
-
 /**
- * Use when [useEventDebug] is true to collect debug information about events.
- */
-val debugChannel by lazy { Channel<DebugInfo>(Channel.UNLIMITED) }
-
-/**
- * Event objects corresponding to no-arg, adding, removing, and changing objects. Each object has a set of functions
- * on it that allow for firing them and waiting (via blocking in java or suspending in kotlin), and firing and
- * "forgetting".
+ * Event objects are fired with `fireX()` functions and handled with `on()` functions.
  *
- * Event handling is via "on" functions, which can be associated with a dispatcher within which that block is executed.
- *   For GUI stuff that must be single-threaded, the Swing dispatch thread should be used, as opposed to events
- *   between models.
+ * No-arg, one-arg, and two-arg event objects are provided. The change events are only handled if `before` and `after`
+ * actually changed.
  *
- *   A wait option on handlers can be used if the fire function that triggers it, should block, i.e. wait for the
- *   event handling to finish before continuing execution.
+ * Events are launched in a coroutine context and return a [Deferred] object. If `await()` is called on this object,
+ * execution will wait until all event handlers for which `wait = true` have finished executing. For example
+ * ```
+ *     event.on(wait = true) {delay(1000); print("event1 ")}
+ *     event.on() {delay(2000); print("event2 ")}
+ *     event.fire().await()
+ *     print("done ")
+ * ```
+ * This prints `event1 done event2`. If `await()` is not called the result is `done event1 event2`
  *
- * For examples see [TrainerEvents2]
+ * `fireAndBlock()` is an adapter which allows events to be fired outside of suspend functions.
+ *
+ * When handling a large number of events (for example, updating a thousand synapses, each of which triggers
+ * a screen refresh), throttling and debouncing can be enabled. For this set `interval` to a value greater than 0.
+ * See [here](https://css-tricks.com/debouncing-throttling-explained-examples/). If (as in the synapse -> screen refresh case), not
+ * all events must be handled, regular events can be used. If all events must be handled, BatchEvents can be used.
+ * All batched events are handled in arbitrary order between throttle and debounce intervals.
+ *
+ * Events can be logged by seeing [useEventDebug] to true.
+ *
+ * For a sense of how events work see [EventTesting]
+ *
  */
 open class Events(val timeout: Duration = 5.seconds): CoroutineScope {
 
@@ -109,6 +106,9 @@ open class Events(val timeout: Duration = 5.seconds): CoroutineScope {
 
         }
 
+        /**
+         * The main event handling code is here. All other fire functions should route through this one.
+         */
         private suspend fun runAllHandlers(run: suspend (suspend (new: Any?, old: Any?) -> Unit) -> Unit) = eventMapping[this@EventObject]
             ?.map { (dispatcher, wait, handler, stackTrace) ->
                 try {
@@ -429,6 +429,24 @@ data class EventObjectHandler(
         return result
     }
 }
+
+data class DebugInfo(val timeStamp: Long, val duration: Duration, val initiator: String?, val dispatcher: CoroutineDispatcher?, val wait: Boolean) {
+
+    val timeStampString: String get() {
+        val time = ZonedDateTime.ofInstant(Instant.ofEpochMilli(timeStamp), TimeZone.getDefault().toZoneId())
+        val formatter = java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss.SSS")
+        return time.format(formatter)
+    }
+
+    override fun toString(): String {
+        return "DebugInfo(timeStamp=${timeStampString}, duration=$duration, initiator='$initiator', dispatcher=$dispatcher, wait=$wait)"
+    }
+}
+
+/**
+ * Use when [useEventDebug] is true to collect debug information about events.
+ */
+val debugChannel by lazy { Channel<DebugInfo>(Channel.UNLIMITED) }
 
 /**
  * If set to true stack traces are printed out on event timeouts.

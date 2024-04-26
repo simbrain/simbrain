@@ -8,8 +8,8 @@ import org.simbrain.util.Events
  */
 open class NetworkModelEvents: Events() {
 
-    val selected = AddedEvent<NetworkModel>()
-    var deleted = RemovedEvent<NetworkModel>()
+    val selected = OneArgEvent<NetworkModel>()
+    var deleted = OneArgEvent<NetworkModel>()
     var labelChanged = ChangedEvent<String?>()
     var clampChanged = NoArgEvent()
     var updated = NoArgEvent()

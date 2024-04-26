@@ -9,6 +9,6 @@ import org.simbrain.workspace.WorkspaceComponent
 class WorkspaceEvents: Events() {
     val workspaceCleared = NoArgEvent()
     val workspaceOpened = NoArgEvent()
-    val componentAdded = AddedEvent<WorkspaceComponent>()
-    val componentRemoved = RemovedEvent<WorkspaceComponent>()
+    val componentAdded = OneArgEvent<WorkspaceComponent>()
+    val componentRemoved = OneArgEvent<WorkspaceComponent>()
 }

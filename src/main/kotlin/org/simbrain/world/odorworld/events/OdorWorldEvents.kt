@@ -12,7 +12,7 @@ class OdorWorldEvents: Events() {
     val worldStarted = NoArgEvent()
     val worldStopped = NoArgEvent()
     val animationStopped = NoArgEvent()
-    val entityAdded = AddedEvent<OdorWorldEntity>()
-    val entityRemoved = RemovedEvent<OdorWorldEntity>()
+    val entityAdded = OneArgEvent<OdorWorldEntity>()
+    val entityRemoved = OneArgEvent<OdorWorldEntity>()
     val tileMapChanged = NoArgEvent()
 }

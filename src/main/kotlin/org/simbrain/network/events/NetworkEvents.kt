@@ -9,9 +9,9 @@ import org.simbrain.util.Events
 class NetworkEvents: Events() {
     val zoomToFitPage = NoArgEvent(interval = 20)
     val updated = NoArgEvent()
-    val modelAdded = AddedEvent<NetworkModel>()
-    val modelRemoved = RemovedEvent<NetworkModel>()
+    val modelAdded = OneArgEvent<NetworkModel>()
+    val modelRemoved = OneArgEvent<NetworkModel>()
     val updateActionsChanged = NoArgEvent()
-    val freeWeightVisibilityChanged = AddedEvent<Boolean>()
-    val selected = AddedEvent<List<NetworkModel>>()
+    val freeWeightVisibilityChanged = OneArgEvent<Boolean>()
+    val selected = OneArgEvent<List<NetworkModel>>()
 }

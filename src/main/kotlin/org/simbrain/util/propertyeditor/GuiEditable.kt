@@ -303,7 +303,7 @@ class UpdateFunctionContext<O : EditableObject, T>(
  */
 class ParameterEvents<O : EditableObject, T> : Events() {
 
-    val valueChanged = AddedEvent<KProperty1<O, T>>()
+    val valueChanged = OneArgEvent<KProperty1<O, T>>()
 
 }
 

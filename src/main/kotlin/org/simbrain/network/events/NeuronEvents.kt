@@ -9,7 +9,7 @@ import org.simbrain.util.Events
 class NeuronEvents: LocationEvents() {
 
     val activationChanged = ChangedEvent<Double>()
-    val spiked = AddedEvent<Boolean>()
+    val spiked = OneArgEvent<Boolean>()
     val colorChanged = NoArgEvent()
     val updateRuleChanged = ChangedEvent<NeuronUpdateRule<*, *>>()
     val priorityChanged = ChangedEvent<Int>()

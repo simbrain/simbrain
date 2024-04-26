@@ -9,7 +9,7 @@ import org.simbrain.util.Events
 class TrainerEvents: Events() {
     val beginTraining = NoArgEvent()
     val endTraining = NoArgEvent()
-    val errorUpdated = AddedEvent<SupervisedTrainer.LossFunction>()
-    val progressUpdated = AddedEvent<Pair<String, Int>>()
+    val errorUpdated = OneArgEvent<SupervisedTrainer.LossFunction>()
+    val progressUpdated = OneArgEvent<Pair<String, Int>>()
     val iterationReset = NoArgEvent()
 }

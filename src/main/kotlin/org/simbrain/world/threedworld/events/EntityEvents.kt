@@ -9,10 +9,10 @@ import org.simbrain.world.threedworld.entities.Sensor
  * See [Events].
  */
 class EntityEvents: Events() {
-    val entityDeleted = RemovedEvent<Entity>()
-    val entityAdded = AddedEvent<Entity>()
-    val sensorDeleted = RemovedEvent<Sensor>()
-    val sensorAdded = AddedEvent<Sensor>()
-    val effectorDeleted = RemovedEvent<Effector>()
-    val effectorAdded = AddedEvent<Effector>()
+    val entityDeleted = OneArgEvent<Entity>()
+    val entityAdded = OneArgEvent<Entity>()
+    val sensorDeleted = OneArgEvent<Sensor>()
+    val sensorAdded = OneArgEvent<Sensor>()
+    val effectorDeleted = OneArgEvent<Effector>()
+    val effectorAdded = OneArgEvent<Effector>()
 }

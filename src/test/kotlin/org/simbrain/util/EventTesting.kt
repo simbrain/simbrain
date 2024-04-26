@@ -12,12 +12,12 @@ import kotlin.time.Duration.Companion.nanoseconds
 class TestEvents : Events() {
     val throttlingEvent = NoArgEvent(interval = 100, timingMode = TimingMode.Throttle)
     val debouncingEvent = NoArgEvent(interval = 100, timingMode = TimingMode.Debounce)
-    val debounceAddedEvent = AddedEvent<String>(interval = 100, timingMode = TimingMode.Debounce)
+    val debounceAddedEvent = OneArgEvent<String>(interval = 100, timingMode = TimingMode.Debounce)
     val longEvent = NoArgEvent()
     val blockingEvent = NoArgEvent()
     val longFireAndForgetEvent = NoArgEvent()
     val changedEvent = ChangedEvent<String>()
-    val batchedAddedEvent = BatchAddedEvent<String>(interval = 100)
+    val batchedAddedEvent = BatchOneArgEvent<String>(interval = 100)
 }
 
 class EventTesting {

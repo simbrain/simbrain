@@ -328,5 +328,5 @@ fun <T> createXStreamPropertyConverter(
 }
 
 class ConvertedObjectEvent: Events() {
-    val objectCompleted = AddedEvent<Any>()
+    val objectCompleted = OneArgEvent<Any>()
 }

@@ -276,7 +276,7 @@ open class Events(val timeout: Duration = 5.seconds): CoroutineScope {
      * Add events, e.g. neuronAdded.fire(newNeuron), neuronAdded.on{ newNeuron -> ...}.
      * Functions are the same as in the no-arg case.
      */
-    inner class AddedEvent<T>(override val interval: Int = 0, override var timingMode: TimingMode =  TimingMode.Debounce) : EventObject() {
+    inner class OneArgEvent<T>(override val interval: Int = 0, override var timingMode: TimingMode =  TimingMode.Debounce) : EventObject() {
 
         @Suppress("UNCHECKED_CAST")
         fun on(dispatcher: CoroutineDispatcher? = null, wait: Boolean = false, handler: suspend (new: T) -> Unit) = onSuspendHelper(dispatcher, wait) {
@@ -297,7 +297,7 @@ open class Events(val timeout: Duration = 5.seconds): CoroutineScope {
 
     }
 
-    inner class BatchAddedEvent<T>(override val interval: Int, override var timingMode: TimingMode =  TimingMode.Debounce) : EventObject() {
+    inner class BatchOneArgEvent<T>(override val interval: Int, override var timingMode: TimingMode =  TimingMode.Debounce) : EventObject() {
 
         /**
          * Note: batch events are handled in arbitrary order
@@ -321,32 +321,6 @@ open class Events(val timeout: Duration = 5.seconds): CoroutineScope {
         fun fireAndBlock(new: T) = runBlocking {
             printTiming { fire(new).await() }
         }
-    }
-
-    /**
-     * Removed events, e.g. neuronRemoved.fire(oldNeuron), neuronRemoved.on{ oldNeuron -> ...}. If no handling needed
-     * just use no-arg.
-     * Functions are the same as in the no-arg case.
-     */
-    inner class RemovedEvent<T>(override val interval: Int = 0, override var timingMode: TimingMode =  TimingMode.Debounce) : EventObject() {
-
-        @Suppress("UNCHECKED_CAST")
-        fun on(dispatcher: CoroutineDispatcher? = null, wait: Boolean = false, handler: suspend (old: T) -> Unit) = onSuspendHelper(dispatcher, wait) {
-                _, old -> handler(old as T)
-        }
-
-        @JvmOverloads
-        @Suppress("UNCHECKED_CAST")
-        fun on(dispatcher: CoroutineDispatcher? = null, wait: Boolean = false, handler: Consumer<T>) = onHelper(dispatcher, wait) {
-                _, old -> handler.accept(old as T)
-        }
-
-        fun fire(old: T) = fireAllHelper { handler -> handler(null, old) }
-
-        fun fireAndBlock(old: T) = runBlocking {
-            printTiming { fire(old).await() }
-        }
-
     }
 
     /**

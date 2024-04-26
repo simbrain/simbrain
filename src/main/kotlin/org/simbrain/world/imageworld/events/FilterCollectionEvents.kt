@@ -8,8 +8,8 @@ import org.simbrain.world.imageworld.filters.Filter
  */
 class FilterCollectionEvents: Events() {
 
-    val filterAdded = AddedEvent<Filter>()
-    val filterRemoved = RemovedEvent<Filter>()
+    val filterAdded = OneArgEvent<Filter>()
+    val filterRemoved = OneArgEvent<Filter>()
     val filterChanged = ChangedEvent<Filter>()
 
 }

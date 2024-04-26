@@ -7,8 +7,8 @@ import org.simbrain.util.Events
  */
 class CouplingEvents: Events() {
 
-    val couplingAdded = AddedEvent<Coupling>()
-    val couplingRemoved = RemovedEvent<Coupling>()
-    val couplingsRemoved = RemovedEvent<Iterable<Coupling>>()
+    val couplingAdded = OneArgEvent<Coupling>()
+    val couplingRemoved = OneArgEvent<Coupling>()
+    val couplingsRemoved = OneArgEvent<Iterable<Coupling>>()
 
 }

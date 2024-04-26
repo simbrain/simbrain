@@ -10,6 +10,6 @@ class ThreeDWorldEvents: Events() {
     val initialized = NoArgEvent()
     val closed = NoArgEvent()
     val updated = NoArgEvent()
-    val agentAdded = AddedEvent<Agent>()
-    val agentRemoved = RemovedEvent<Agent>()
+    val agentAdded = OneArgEvent<Agent>()
+    val agentRemoved = OneArgEvent<Agent>()
 }

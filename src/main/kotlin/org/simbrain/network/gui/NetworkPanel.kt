@@ -199,8 +199,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             }
         }
 
-        initEventHandlers()
-
         toolbars.apply {
 
             cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)
@@ -227,6 +225,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         // Add all network elements (important for de-serializing)
         network.modelsInReconstructionOrder.forEach { createNode(it) }
 
+        initEventHandlers()
     }
 
     /**
@@ -318,7 +317,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             }
 
             override fun redo() {
-                network.addNetworkModelAsync(neuron)
+                network.addNetworkModel(neuron)
             }
         })
         NeuronNode(this, neuron)
@@ -428,7 +427,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
                     undoManager.addUndoableAction(object : UndoableAction {
                         override fun undo() {
-                            network.addNetworkModelAsync(screenElement.model)
+                            network.addNetworkModel(screenElement.model)
                         }
 
                         override fun redo() {
@@ -639,7 +638,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         if (sources.isNotEmpty() && targets.isNotEmpty()) {
             // TODO: Ability to set defaults for weight matrix that is added
             sources.cartesianProduct(targets).mapNotNull { (s, t) ->
-                network.addNetworkModelAsync(WeightMatrix(s, t))
+                network.addNetworkModel(WeightMatrix(s, t))
             }
             return true
         }
@@ -655,7 +654,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         val src = filterSelectedSourceModels(AbstractNeuronCollection::class.java)
         val tar = filterSelectedModels(AbstractNeuronCollection::class.java)
         if (src.isNotEmpty() && tar.isNotEmpty()) {
-            network.addNetworkModelAsync(SynapseGroup(src.first(), tar.first()))
+            network.addNetworkModel(SynapseGroup(src.first(), tar.first()))
             return true;
         }
         return false
@@ -685,8 +684,8 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
     private fun initEventHandlers() {
         network.events.apply {
-            modelAdded.on(Dispatchers.Swing, wait = true) { list ->
-                list.forEach { createNode(it) }
+            modelAdded.on(Dispatchers.Swing, wait = true) {
+                createNode(it)
             }
             modelRemoved.on {
                 zoomToFitPage.fire()

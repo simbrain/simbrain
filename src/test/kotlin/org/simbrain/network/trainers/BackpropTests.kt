@@ -28,7 +28,7 @@ class BackpropTests {
         }
         (na3.updateRule as BoundedUpdateRule).upperBound = 1.0
         (na3.updateRule as BoundedUpdateRule).lowerBound = -1.0
-        net.addNetworkModelsAsync(na1, na2, na3, wm1, wm2)
+        net.addNetworkModels(na1, na2, na3, wm1, wm2)
     }
 
     var inputVector = doubleArrayOf(0.0, 1.0).toMatrix()
@@ -120,7 +120,7 @@ class BackpropTests {
         with(net) {
             val na4 = NeuronArray(2)
             val wm3 = WeightMatrix(na3, na4)
-            net.addNetworkModelsAsync(wm3, na4)
+            net.addNetworkModels(wm3, na4)
             repeat(100) {
                 listOf(wm1, wm2, wm3).forwardPass(inputVector)
                 listOf(wm1, wm2, wm3).backpropError(targetVector, .1)

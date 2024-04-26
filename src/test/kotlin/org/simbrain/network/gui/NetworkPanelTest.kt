@@ -1,5 +1,6 @@
 package org.simbrain.network.gui
 
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -16,7 +17,7 @@ class NetworkPanelTest {
             val np = NetworkPanel(nc)
             val n1 = Neuron()
             val n2 = Neuron()
-            net.addNetworkModels(n1, n2)
+            net.addNetworkModels(n1, n2).awaitAll()
             assertEquals(2, np.screenElements.size)
         }
     }

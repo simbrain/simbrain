@@ -96,7 +96,7 @@ class RandomizedPursuer : Simulation {
         val sensor2 = net.getModelByLabel(Neuron::class.java, "Swiss (R)")
         sensorNodes = NeuronCollection(Arrays.asList(sensor1, sensor2))
         sensorNodes.label = "Sensor Nodes"
-        net.addNetworkModelAsync(sensorNodes)
+        net.addNetworkModel(sensorNodes)
     }
 
     private fun setUpPlots() {

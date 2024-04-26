@@ -8,7 +8,9 @@ import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.world.threedworld.ThreeDWorldComponent
 import org.simbrain.world.threedworld.engine.ThreeDEngine
 import org.simbrain.world.threedworld.engine.ThreeDEngineConverter
-import org.simbrain.world.threedworld.entities.*
+import org.simbrain.world.threedworld.entities.Agent
+import org.simbrain.world.threedworld.entities.BoxEntityXmlConverter
+import org.simbrain.world.threedworld.entities.ModelEntityXmlConverter
 import java.io.InputStream
 import java.io.OutputStream
 
@@ -31,30 +33,14 @@ class ThreeDWorldComponent : WorkspaceComponent {
     constructor(name: String?) : super(name!!) {
         world = ThreeDWorld()
         world.events.closed.on { this.close() }
-        world.events.agentAdded.on { addedContainer: Agent? -> this.fireAttributeContainerAdded(addedContainer) }
+        world.events.agentAdded.on(handler = this::fireAttributeContainerAdded)
         world.events.agentAdded.on { agent: Agent ->
             fireAttributeContainerAdded(agent)
             setChangedSinceLastSave(true)
-            agent.events.sensorAdded.on { addedContainer: Sensor? ->
-                this.fireAttributeContainerAdded(
-                    addedContainer
-                )
-            }
-            agent.events.effectorAdded.on { addedContainer: Effector? ->
-                this.fireAttributeContainerAdded(
-                    addedContainer
-                )
-            }
-            agent.events.sensorDeleted.on { removedContainer: Sensor? ->
-                this.fireAttributeContainerRemoved(
-                    removedContainer
-                )
-            }
-            agent.events.effectorDeleted.on { removedContainer: Effector? ->
-                this.fireAttributeContainerRemoved(
-                    removedContainer
-                )
-            }
+            agent.events.sensorAdded.on(handler = this::fireAttributeContainerAdded)
+            agent.events.effectorAdded.on(handler = this::fireAttributeContainerAdded)
+            agent.events.sensorDeleted.on(handler = this::fireAttributeContainerRemoved)
+            agent.events.effectorDeleted.on(handler = this::fireAttributeContainerRemoved)
             setChangedSinceLastSave(true)
         }
         // TODO: Removed (see odorworldcomponent)

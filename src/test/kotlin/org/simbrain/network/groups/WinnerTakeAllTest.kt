@@ -16,7 +16,7 @@ class WinnerTakeAllTest {
 
     init {
         with(net) {
-            net.addNetworkModelsAsync(wta, n1, n2)
+            net.addNetworkModels(wta, n1, n2)
             n1.clamped = true
             n2.clamped = true
             connect(n1, wta.getNeuron(0), 1.0)

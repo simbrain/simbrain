@@ -23,7 +23,6 @@ import org.simbrain.workspace.couplings.CouplingManager
 import org.simbrain.workspace.events.WorkspaceComponentEvents
 import java.io.File
 import java.io.OutputStream
-import java.util.function.Consumer
 
 /**
  * Represents a component in a Simbrain [Workspace]. Extend this class to create your own component type.
@@ -169,11 +168,11 @@ abstract class WorkspaceComponent(name: String) {
      * Closes the WorkspaceComponent.
      */
     open fun close() {
-        attributeContainers.forEach(Consumer { removedContainer: AttributeContainer? ->
+        attributeContainers.forEach { removedContainer ->
             this.fireAttributeContainerRemoved(
                 removedContainer
             )
-        })
+        }
         workspace.removeWorkspaceComponent(this)
     }
 
@@ -202,17 +201,13 @@ abstract class WorkspaceComponent(name: String) {
     /**
      * Notify listeners that an [AttributeContainer] has been added to the component.
      */
-    fun fireAttributeContainerAdded(addedContainer: AttributeContainer?) {
-        events.attributeContainerAdded.fire(addedContainer!!)
-    }
+    fun fireAttributeContainerAdded(addedContainer: AttributeContainer) = events.attributeContainerAdded.fire(addedContainer)
 
     /**
      * Notify listeners that an [AttributeContainer]  has been removed from the
      * component.
      */
-    fun fireAttributeContainerRemoved(removedContainer: AttributeContainer?) {
-        events.attributeContainerRemoved.fire(removedContainer!!)
-    }
+    fun fireAttributeContainerRemoved(removedContainer: AttributeContainer) = events.attributeContainerRemoved.fire(removedContainer)
 
     /**
      * Called after a global update ends.

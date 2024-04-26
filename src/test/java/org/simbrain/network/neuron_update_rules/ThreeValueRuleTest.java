@@ -18,7 +18,7 @@ public class ThreeValueRuleTest {
         Neuron input1 =  new Neuron();
         input1.setActivation(-0.1);
         input1.setClamped(true);
-        net.addNetworkModelAsync(input1);
+        net.addNetworkModel(input1);
 
         // Set up the rule
         threeValRule.setLowerValue(-0.71);
@@ -31,11 +31,11 @@ public class ThreeValueRuleTest {
         // Set up the output neuron
         Neuron output = new Neuron(threeValRule);
         output.setActivation(0.0);
-        net.addNetworkModelAsync(output);
+        net.addNetworkModel(output);
 
         // Connect the input to the output
         Synapse w12 = new Synapse(input1, output, 1);
-        net.addNetworkModelAsync(w12);
+        net.addNetworkModel(w12);
 
         // Lower value = -0.71, middle vaue = 0.1, upper value = 0.92
         // activation value = 0.4
@@ -52,7 +52,7 @@ public class ThreeValueRuleTest {
         Neuron input1 =  new Neuron();
         input1.setActivation(0.4);
         input1.setClamped(true);
-        net.addNetworkModelAsync(input1);
+        net.addNetworkModel(input1);
 
         // Set up the rule
         threeValRule.setLowerValue(-0.71);
@@ -65,11 +65,11 @@ public class ThreeValueRuleTest {
         // Set up the output neuron
         Neuron output = new Neuron(threeValRule);
         output.setActivation(0.0);
-        net.addNetworkModelAsync(output);
+        net.addNetworkModel(output);
 
         // Connect the input to the output
         Synapse w12 = new Synapse(input1, output, 1);
-        net.addNetworkModelAsync(w12);
+        net.addNetworkModel(w12);
 
         // Lower value = -0.71, middle vaue = 0.1, upper value = 0.92
         // activation value = 0.1
@@ -86,7 +86,7 @@ public class ThreeValueRuleTest {
         Neuron input1 =  new Neuron();
         input1.setActivation(0.8);
         input1.setClamped(true);
-        net.addNetworkModelAsync(input1);
+        net.addNetworkModel(input1);
 
         // Set up the rule
         threeValRule.setLowerValue(-0.71);
@@ -99,11 +99,11 @@ public class ThreeValueRuleTest {
         // Set up the output neuron
         Neuron output = new Neuron(threeValRule);
         output.setActivation(0.0);
-        net.addNetworkModelAsync(output);
+        net.addNetworkModel(output);
 
         // Connect the input to the output
         Synapse w12 = new Synapse(input1, output, 1);
-        net.addNetworkModelAsync(w12);
+        net.addNetworkModel(w12);
 
         // Lower value = -0.71, middle vaue = 0.1, upper value = 0.92
         // activation value = 0.1

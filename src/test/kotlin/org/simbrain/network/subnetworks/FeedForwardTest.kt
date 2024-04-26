@@ -14,7 +14,7 @@ class FeedForwardTest {
     }
 
     init {
-        net.addNetworkModelsAsync(ff)
+        net.addNetworkModels(ff)
     }
 
     @Test

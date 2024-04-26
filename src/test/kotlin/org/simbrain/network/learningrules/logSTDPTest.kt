@@ -13,7 +13,7 @@ class logSTDPTest {
     var s12 = Synapse(n1,n2)
 
     init {
-        net.addNetworkModelsAsync(n1, n2, s12)
+        net.addNetworkModels(n1, n2, s12)
         s12.learningRule = LogSTDPRule().apply {
             learningRate = 1.0
             tau_minus = 60.0

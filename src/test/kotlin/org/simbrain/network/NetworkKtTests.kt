@@ -17,7 +17,7 @@ class NetworkKtTests {
     val n2 = Neuron()
 
     init {
-        net.addNetworkModelsAsync(n1, n2)
+        net.addNetworkModels(n1, n2)
     }
 
     @Test

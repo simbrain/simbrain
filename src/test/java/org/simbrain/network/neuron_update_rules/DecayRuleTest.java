@@ -16,7 +16,7 @@ public class DecayRuleTest {
 
         Network net = new Network();
         Neuron n = new Neuron(new DecayRule());
-        net.addNetworkModelAsync(n);
+        net.addNetworkModel(n);
 
         // Set decay method to absolute
         DecayRule dr = (DecayRule) n.getUpdateRule();
@@ -42,7 +42,7 @@ public class DecayRuleTest {
     public void testRelativeDecay() {
         Network net = new Network();
         Neuron n = new Neuron(new DecayRule());
-        net.addNetworkModelAsync(n);
+        net.addNetworkModel(n);
         DecayRule dr = (DecayRule) n.getUpdateRule();
 
         // Set to 1 and decay, with fraction of .1.  We are expecting

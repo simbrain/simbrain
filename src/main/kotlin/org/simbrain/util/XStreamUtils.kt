@@ -222,7 +222,7 @@ fun createConstructorCallingConverter(
                 }
             }
 
-            objectCompletedEvent.objectCompleted.fire(convertedObject)
+            objectCompletedEvent.objectCompleted.fireAndBlock(convertedObject)
 
             return convertedObject
         }

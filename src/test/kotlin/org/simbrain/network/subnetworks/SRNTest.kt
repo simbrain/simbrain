@@ -15,7 +15,7 @@ class SRNTest {
     }
 
     init {
-        net.addNetworkModelsAsync(srn)
+        net.addNetworkModels(srn)
     }
 
     @Test

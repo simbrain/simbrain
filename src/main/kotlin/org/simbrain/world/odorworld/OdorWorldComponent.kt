@@ -25,9 +25,7 @@ import org.simbrain.util.piccolo.TileMap
 import org.simbrain.util.piccolo.TiledDataConverter
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.WorkspaceComponent
-import org.simbrain.world.odorworld.effectors.Effector
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
-import org.simbrain.world.odorworld.sensors.Sensor
 import java.io.InputStream
 import java.io.OutputStream
 
@@ -67,41 +65,17 @@ class OdorWorldComponent : WorkspaceComponent {
         world.getEvents().entityAdded.on { entity: OdorWorldEntity ->
             fireAttributeContainerAdded(entity)
             setChangedSinceLastSave(true)
-            entity.events.sensorAdded.on { addedContainer: Sensor? ->
-                this.fireAttributeContainerAdded(
-                    addedContainer
-                )
-            }
-            entity.events.effectorAdded.on { addedContainer: Effector? ->
-                this.fireAttributeContainerAdded(
-                    addedContainer
-                )
-            }
-            entity.events.sensorRemoved.on { removedContainer: Sensor? ->
-                this.fireAttributeContainerRemoved(
-                    removedContainer
-                )
-            }
-            entity.events.effectorRemoved.on { removedContainer: Effector? ->
-                this.fireAttributeContainerRemoved(
-                    removedContainer
-                )
-            }
+            entity.events.sensorAdded.on(handler = ::fireAttributeContainerAdded)
+            entity.events.effectorAdded.on(handler = ::fireAttributeContainerAdded)
+            entity.events.sensorRemoved.on(handler = ::fireAttributeContainerRemoved)
+            entity.events.effectorRemoved.on(handler = ::fireAttributeContainerRemoved)
             setChangedSinceLastSave(true)
         }
 
         world.getEvents().entityRemoved.on { e: OdorWorldEntity ->
             fireAttributeContainerRemoved(e)
-            e.sensors.forEach { removedContainer: Sensor? ->
-                this.fireAttributeContainerRemoved(
-                    removedContainer
-                )
-            }
-            e.effectors.forEach { removedContainer: Effector? ->
-                this.fireAttributeContainerRemoved(
-                    removedContainer
-                )
-            }
+            e.sensors.forEach(this::fireAttributeContainerRemoved)
+            e.effectors.forEach(this::fireAttributeContainerRemoved)
             setChangedSinceLastSave(true)
         }
     }
@@ -144,7 +118,7 @@ class OdorWorldComponent : WorkspaceComponent {
                 xstream.registerConverter(TiledDataConverter(xstream.mapper, xstream.reflectionProvider))
                 xstream.registerConverter(
                     createConstructorCallingConverter(
-                        java.util.List.of(
+                        listOf(
                             OdorWorldEntity::class.java
                         ), xstream.mapper, xstream.reflectionProvider
                     )

@@ -68,7 +68,7 @@ public class TextEventHandler extends PStyledTextEventHandler implements ActionL
              // Make a new text object and then edit it
              NetworkTextObject text = new NetworkTextObject("New Text");
              text.setInputEvent(inputEvent);
-             networkPanel.getNetwork().addNetworkModelAsync(text);
+             networkPanel.getNetwork().addNetworkModel(text);
              text.setLocation(inputEvent.getPosition().getX(), inputEvent.getPosition().getY());
         }
     }

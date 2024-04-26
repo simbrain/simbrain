@@ -17,7 +17,7 @@ class SinusoidalRuleTest {
     val n2 = Neuron(rule2)
 
     init {
-        net.addNetworkModelsAsync(n1, n2)
+        net.addNetworkModels(n1, n2)
         n1.activation = 0.0
         rule1.upperBound = 1.0
         rule1.lowerBound = -1.0

@@ -14,14 +14,14 @@ class NeuronGroupTest {
 
     init {
         ng.label = "test"
-        net.addNetworkModelAsync(ng)
+        net.addNetworkModel(ng)
     }
 
 
     @Test
     fun testCopy() {
         val ng2 = ng.copy()
-        net.addNetworkModelAsync(ng2)
+        net.addNetworkModel(ng2)
         Assertions.assertEquals(2, ng2.neuronList.size)
     }
 
@@ -31,7 +31,7 @@ class NeuronGroupTest {
         ng.getNeuron(1).activation = -1.0
         val ng2 = NeuronGroup(2)
         val wm = WeightMatrix(ng, ng2)
-        net.addNetworkModelsAsync(List.of(ng2, wm))
+        net.addNetworkModels(List.of(ng2, wm))
         net.update()
         Assertions.assertArrayEquals(doubleArrayOf(1.0, -1.0), ng2.activations)
     }
@@ -41,7 +41,7 @@ class NeuronGroupTest {
         ng.activations = doubleArrayOf(1.0, -1.0)
         val ng2 = NeuronGroup(2)
         val wm = WeightMatrix(ng, ng2)
-        net.addNetworkModelsAsync(List.of(ng2, wm))
+        net.addNetworkModels(List.of(ng2, wm))
         net.update()
         Assertions.assertArrayEquals(doubleArrayOf(1.0, -1.0), ng2.activations)
     }
@@ -54,7 +54,7 @@ class NeuronGroupTest {
             ng.getNeuron(1).activation = -1.0
             val ng2 = NeuronGroup(2)
             val wm = WeightMatrix(ng, ng2)
-            net.addNetworkModelsAsync(List.of(ng2, wm))
+            net.addNetworkModels(List.of(ng2, wm))
             net.update()
             Assertions.assertArrayEquals(doubleArrayOf(1.0, -1.0), ng2.activations)
         }
@@ -65,7 +65,7 @@ class NeuronGroupTest {
             ng.randomize()
             val ng2 = SoftmaxGroup(5)
             val wm = WeightMatrix(ng, ng2)
-            net.addNetworkModelsAsync(ng2, wm)
+            net.addNetworkModels(ng2, wm)
             net.update()
             // System.out.println(Arrays.toString(ng2.getActivations()));
             Assertions.assertEquals(1.0, ng2.activations.sum(), .01)

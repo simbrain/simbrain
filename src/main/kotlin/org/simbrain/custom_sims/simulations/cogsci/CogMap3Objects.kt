@@ -62,7 +62,7 @@ val cogMap3Objects = newSim {
     inputToRes.displaySynapses = false
     inputToRes.label = "Sparse Excitatory"
     inputToRes.randomizeExcitatory()
-    network.addNetworkModelAsync(inputToRes)
+    network.addNetworkModel(inputToRes)
 
     // World
     val dispersion = 100.0

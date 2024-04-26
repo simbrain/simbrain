@@ -20,7 +20,7 @@ class LinearRuleArrayTest {
     var w23 = WeightMatrix(input2, output)
 
     init {
-        net.addNetworkModelsAsync(input1, input2, output, w13, w23)
+        net.addNetworkModels(input1, input2, output, w13, w23)
         input1.activations = doubleArrayOf(1.0, -1.0).toMatrix()
         input1.isClamped = true
         input2.activations = doubleArrayOf(-1.0, 1.0).toMatrix()

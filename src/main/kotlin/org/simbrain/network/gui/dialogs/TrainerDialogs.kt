@@ -210,7 +210,7 @@ fun NetworkPanel.showSRNCreationDialog(): StandardDialog {
         network.placementManager.lastClickedLocation
     )
     return creator.createEditorDialog {
-        network.addNetworkModelAsync(creator.create())
+        network.addNetworkModel(creator.create())
     }
 
 }
@@ -231,7 +231,7 @@ fun main() {
     val np = NetworkPanel(networkComponent)
     val result = with(networkComponent.network) {
         val srnNetwork = SRNNetwork(5, 5)
-        addNetworkModelAsync(srnNetwork)
+        addNetworkModel(srnNetwork)
         srnNetwork
     }
     SRNNode(np, result).propertyDialog?.display()
@@ -247,7 +247,7 @@ fun NetworkPanel.showLMSCreationDialog(): StandardDialog {
         network.placementManager.lastClickedLocation
     )
     return creator.createEditorDialog {
-        network.addNetworkModelAsync(creator.create())
+        network.addNetworkModel(creator.create())
     }
 
 }

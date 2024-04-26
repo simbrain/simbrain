@@ -13,7 +13,7 @@ class HebbThresholdTest {
     var s12 = Synapse(n1,n2)
 
     init {
-        net.addNetworkModelsAsync(n1, n2, s12)
+        net.addNetworkModels(n1, n2, s12)
         s12.learningRule = HebbianThresholdRule().apply {
             learningRate = 1.0
             outputThreshold = 0.5

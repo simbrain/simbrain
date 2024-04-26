@@ -12,7 +12,7 @@ class SpikingNeuronTest {
     val n3 = Neuron();
 
     init {
-        net.addNetworkModelsAsync(listOf(n1, n2, n3))
+        net.addNetworkModels(listOf(n1, n2, n3))
         net.addSynapse(n1, n2)
         net.addSynapse(n2, n3)
     }

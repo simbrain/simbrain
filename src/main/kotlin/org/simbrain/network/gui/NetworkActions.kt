@@ -122,7 +122,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         if (neuronList.isNotEmpty()) {
             val nc = NeuronCollection(neuronList)
             if (with(network) { nc.shouldAdd() }) {
-                network.addNetworkModelAsync(nc)
+                network.addNetworkModel(nc)
             }
         }
     }
@@ -373,7 +373,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         textEntryDialog("", "Enter text to add to the network") {
             if (it.isNotEmpty()) {
                 val textObject = NetworkTextObject(it)
-                network.addNetworkModelAsync(textObject)
+                network.addNetworkModel(textObject)
             }
         }.display()
     }
@@ -534,7 +534,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         objectWrapper("Neuron Group Parameters", BasicNeuronGroupParams() as NeuronGroupParams, showLabeledBorder = false).createEditorDialog {
             it.editingObject.create().also { group ->
                 group.applyLayout()
-                network.addNetworkModelAsync(group)
+                network.addNetworkModel(group)
             }
         }.apply { title = "Add Neuron Group" }.display()
     }
@@ -561,7 +561,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             addSubnetAction("Restricted Boltzmann Machine") {
                 // TODO: As this pattern is reused add a util to NetworkDialogs.kt
                 RestrictedBoltzmannMachine.RBMCreator().createEditorDialog {
-                networkPanel.network.addNetworkModelAsync(it.create()) } },
+                networkPanel.network.addNetworkModel(it.create()) } },
             addSubnetAction("SOM Network") { SOMCreationDialog(networkPanel) },
             addSubnetAction("SRN (Simple Recurrent Network)") { networkPanel.showSRNCreationDialog() }
         )

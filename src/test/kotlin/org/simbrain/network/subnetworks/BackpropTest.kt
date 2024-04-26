@@ -14,7 +14,7 @@ class BackpropTest {
     }
 
     init {
-        net.addNetworkModelsAsync(bp)
+        net.addNetworkModels(bp)
     }
 
     @Test

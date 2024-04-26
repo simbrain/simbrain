@@ -114,7 +114,7 @@ public class Cerebellum extends Simulation {
         NeuronGroup cortex = new NeuronGroup(1);
         cortex.setLabel("Cerebral Cortex");
         cortex.setUpdateRule(generalRule);
-        network.addNetworkModelAsync(cortex);
+        network.addNetworkModel(cortex);
         cortex.setLocation(50, 0);
         cortex.setLowerBound(0);
 
@@ -123,11 +123,11 @@ public class Cerebellum extends Simulation {
         redNucleus.setLabel("Red Nucleus");
         redNucleus.setUpdateRule(generalRule);
         redNucleus.setLowerBound(0);
-        network.addNetworkModelAsync(redNucleus);
+        network.addNetworkModel(redNucleus);
         redNucleus.setLocation(50, 200);
 
         // Cortex to Red Nucleus
-        network.addNetworkModelAsync(new Synapse(cortex.getNeuronList().get(0),
+        network.addNetworkModel(new Synapse(cortex.getNeuronList().get(0),
             redNucleus.getNeuronList().get(0), 1));
 
         // Inferior Olive
@@ -136,11 +136,11 @@ public class Cerebellum extends Simulation {
         inferiorOlive.setUpdateRule(inferiorOliveRule);
         inferiorOlive.setLowerBound(0);
         inferiorOlive.setActivation(0.3);
-        network.addNetworkModelAsync(inferiorOlive);
+        network.addNetworkModel(inferiorOlive);
         inferiorOlive.setLocation(200, 275);
 
         // Red Nucleus to Inf. Olive
-        network.addNetworkModelAsync(new Synapse(redNucleus.getNeuronList().get(0),
+        network.addNetworkModel(new Synapse(redNucleus.getNeuronList().get(0),
             inferiorOlive, 1));
 
         // To Spinal Cord
@@ -148,15 +148,15 @@ public class Cerebellum extends Simulation {
         toSpinalCord.setLabel("To Spinal Cord");
         toSpinalCord.setUpdateRule(generalRule);
         toSpinalCord.setLowerBound(0);
-        network.addNetworkModelAsync(toSpinalCord);
+        network.addNetworkModel(toSpinalCord);
         toSpinalCord.setLocation(-25, 275);
 
         // Cortex to Spinal Cord
-        network.addNetworkModelAsync(new Synapse(cortex.getNeuronList().get(0),
+        network.addNetworkModel(new Synapse(cortex.getNeuronList().get(0),
             toSpinalCord.getNeuronList().get(0), 1));
 
         // Red Nucleus to Spinal Cord
-        network.addNetworkModelAsync(new Synapse(redNucleus.getNeuronList().get(1),
+        network.addNetworkModel(new Synapse(redNucleus.getNeuronList().get(1),
             toSpinalCord.getNeuronList().get(1), 1));
 
         // Output
@@ -164,13 +164,13 @@ public class Cerebellum extends Simulation {
         output.setLabel("Output");
         output.setUpdateRule(generalRule);
         output.setLowerBound(0);
-        network.addNetworkModelAsync(output);
+        network.addNetworkModel(output);
         output.setLocation(0, 325);
 
         // Spinal Cord to Output
-        network.addNetworkModelAsync(
+        network.addNetworkModel(
             new Synapse(toSpinalCord.getNeuronList().get(0), output, 1));
-        network.addNetworkModelAsync(
+        network.addNetworkModel(
             new Synapse(toSpinalCord.getNeuronList().get(1), output, 1));
 
         // Thalamus
@@ -178,18 +178,18 @@ public class Cerebellum extends Simulation {
         thalamus.setLabel("Thalamus");
         thalamus.setUpdateRule(generalRule);
         thalamus.setLowerBound(0);
-        network.addNetworkModelAsync(thalamus);
+        network.addNetworkModel(thalamus);
         thalamus.setLocation(100, 100);
 
         // Thalamus to Cortex
-        network.addNetworkModelAsync(
+        network.addNetworkModel(
             new Synapse(thalamus, cortex.getNeuronList().get(0), 1));
 
         // Cerebellum
         NeuronGroup cerebellum = new NeuronGroup(5);
         cerebellum.setLabel("Cerebellum");
         cerebellum.setUpdateRule(generalRule);
-        network.addNetworkModelAsync(cerebellum);
+        network.addNetworkModel(cerebellum);
         cerebellum.setLocation(175, 125);
         cerebellum.getNeuronList().get(0).setLabel("Purkinje");
         cerebellum.getNeuronList().get(0).offset(25, 0);
@@ -207,29 +207,29 @@ public class Cerebellum extends Simulation {
         cerebellum.setLowerBound(0);
 
         // Purkinje to DCN and Granule to Purkinje
-        network.addNetworkModelAsync(new Synapse(cerebellum.getNeuronList().get(0),
+        network.addNetworkModel(new Synapse(cerebellum.getNeuronList().get(0),
             cerebellum.getNeuronList().get(1), -2));
-        network.addNetworkModelAsync(new Synapse(cerebellum.getNeuronList().get(0),
+        network.addNetworkModel(new Synapse(cerebellum.getNeuronList().get(0),
             cerebellum.getNeuronList().get(2), -2));
-        network.addNetworkModelAsync(new Synapse(cerebellum.getNeuronList().get(3),
+        network.addNetworkModel(new Synapse(cerebellum.getNeuronList().get(3),
             cerebellum.getNeuronList().get(0), 0.02));
-        network.addNetworkModelAsync(new Synapse(cerebellum.getNeuronList().get(4),
+        network.addNetworkModel(new Synapse(cerebellum.getNeuronList().get(4),
             cerebellum.getNeuronList().get(0), 0.02));
 
         // DCNe to RedNucleus
-        network.addNetworkModelAsync(new Synapse(cerebellum.getNeuronList().get(1),
+        network.addNetworkModel(new Synapse(cerebellum.getNeuronList().get(1),
             redNucleus.getNeuronList().get(1), 1));
 
         // DCNi to inferior Olive
-        network.addNetworkModelAsync(new Synapse(cerebellum.getNeuronList().get(2),
+        network.addNetworkModel(new Synapse(cerebellum.getNeuronList().get(2),
             inferiorOlive, -1));
 
         // Inferior Olive to DCN, Pukinje
-        network.addNetworkModelAsync(new Synapse(inferiorOlive,
+        network.addNetworkModel(new Synapse(inferiorOlive,
             cerebellum.getNeuronList().get(0), 0.3));
-        network.addNetworkModelAsync(new Synapse(inferiorOlive,
+        network.addNetworkModel(new Synapse(inferiorOlive,
             cerebellum.getNeuronList().get(1), 1));
-        network.addNetworkModelAsync(new Synapse(inferiorOlive,
+        network.addNetworkModel(new Synapse(inferiorOlive,
             cerebellum.getNeuronList().get(2), 1));
 
         // // DCNe to Thalamus
@@ -242,28 +242,28 @@ public class Cerebellum extends Simulation {
         fromSpinalCord.setClamped(true);
         fromSpinalCord.setUpdateRule(generalRule);
         fromSpinalCord.setLowerBound(0);
-        network.addNetworkModelAsync(fromSpinalCord);
+        network.addNetworkModel(fromSpinalCord);
         fromSpinalCord.setLocation(275, 300);
         fromSpinalCord.getNeuronList().get(0).setLabel("Go");
         fromSpinalCord.getNeuronList().get(1).setLabel("No Go");
 
         // From Spinal Cord to Granules
-        network.addNetworkModelAsync(new Synapse(fromSpinalCord.getNeuronList().get(0), cerebellum.getNeuronList().get(3), 1));
-        network.addNetworkModelAsync(new Synapse(fromSpinalCord.getNeuronList().get(1), cerebellum.getNeuronList().get(4), 1));
-        network.addNetworkModelAsync(new Synapse(fromSpinalCord.getNeuronList().get(0),
+        network.addNetworkModel(new Synapse(fromSpinalCord.getNeuronList().get(0), cerebellum.getNeuronList().get(3), 1));
+        network.addNetworkModel(new Synapse(fromSpinalCord.getNeuronList().get(1), cerebellum.getNeuronList().get(4), 1));
+        network.addNetworkModel(new Synapse(fromSpinalCord.getNeuronList().get(0),
             cerebellum.getNeuronList().get(3), 1));
-        network.addNetworkModelAsync(new Synapse(fromSpinalCord.getNeuronList().get(1),
+        network.addNetworkModel(new Synapse(fromSpinalCord.getNeuronList().get(1),
             cerebellum.getNeuronList().get(4), 1));
 
         // DA
         dopamine = new Neuron();
         dopamine.setLabel("Basal Ganglia (GPi)");
         // dopamine.setLowerBound(0);
-        network.addNetworkModelAsync(dopamine);
+        network.addNetworkModel(dopamine);
         dopamine.setLocation(150, 50);
 
         // DA to Thalamus
-        network.addNetworkModelAsync(new Synapse(dopamine, thalamus, 1));
+        network.addNetworkModel(new Synapse(dopamine, thalamus, 1));
 
         // Target
         Neuron target = new Neuron();
@@ -271,7 +271,7 @@ public class Cerebellum extends Simulation {
         target.setClamped(true);
         // target.setUpdateRule(targetRule);
         // target.setLowerBound(0);
-        network.addNetworkModelAsync(target);
+        network.addNetworkModel(target);
         target.setLocation(240, 50);
 
         // Labels

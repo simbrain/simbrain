@@ -23,7 +23,7 @@ class NeuronCollectionTest {
     WeightMatrix wm = new WeightMatrix(nc1, nc2);
 
     {
-        net.addNetworkModelsAsync(List.of(n1,n2,n3,n4,nc1,nc2,wm));
+        net.addNetworkModels(List.of(n1,n2,n3,n4,nc1,nc2,wm));
     }
 
     @BeforeEach

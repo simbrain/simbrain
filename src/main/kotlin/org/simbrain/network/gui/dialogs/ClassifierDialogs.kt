@@ -136,7 +136,7 @@ fun main() {
             doubleArrayOf(1.0, 1.0)
         )
         svm.trainingData.targetLabels = arrayOf("F", "T", "T", "F")
-        addNetworkModelAsync(classifier)
+        addNetworkModel(classifier)
         classifier
     }
     SmileClassifierNode(np, classifier).propertyDialog?.display()

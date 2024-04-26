@@ -184,7 +184,7 @@ public class LayeredNetworkCreationPanel extends JPanel {
         }
 
         // Add the new network
-        panel.getNetwork().addNetworkModelAsync(net);
+        panel.getNetwork().addNetworkModel(net);
         panel.repaint();
     }
 

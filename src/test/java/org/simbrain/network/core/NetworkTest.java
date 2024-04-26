@@ -41,31 +41,31 @@ public class NetworkTest {
         n1 = new Neuron();
         n1.setLabel("neuron1");
         ((BiasedScalarData) n1.getDataHolder()).setBias(1.0);
-        net.addNetworkModelAsync(n1);
+        net.addNetworkModel(n1);
         n2 = new Neuron();
         n2.setLabel("neuron2");
-        net.addNetworkModelAsync(n2);
+        net.addNetworkModel(n2);
 
         s1 = new Synapse(n1, n2);
-        net.addNetworkModelAsync(s1);
+        net.addNetworkModel(s1);
 
         nc1 = new NeuronCollection(List.of(n1, n2));
-        net.addNetworkModelAsync(nc1);
+        net.addNetworkModel(nc1);
 
         ng1 = new NeuronGroup(10);
         ng1.setLabel("neuron_group_1");
-        net.addNetworkModelAsync(ng1);
+        net.addNetworkModel(ng1);
         ng2 = new NeuronGroup(10);
         ng2.setLabel("ng2");
-        net.addNetworkModelAsync(ng2);
+        net.addNetworkModel(ng2);
 
         sg1 = new SynapseGroup(ng1, ng2);
-        net.addNetworkModelAsync(sg1);
+        net.addNetworkModel(sg1);
 
         na1 = new NeuronArray(10);
         na2 = new NeuronArray(10);
         wm1 = new WeightMatrix(na1, na2);
-        net.addNetworkModelsAsync(List.of(na1,na2, wm1));
+        net.addNetworkModels(List.of(na1,na2, wm1));
 
         softmax = new SoftmaxGroup(5);
         softmax.setLabel("softmax");
@@ -76,13 +76,13 @@ public class NetworkTest {
         wta = new WinnerTakeAll(net, 5);
         wta.setLabel("wta");
 
-        net.addNetworkModelsAsync(softmax, som, competitive, wta);
+        net.addNetworkModels(softmax, som, competitive, wta);
 
         bp = new BackpropNetwork(new int[] {3,5,4}, point(0,0));
         bp.setLabel("backprop");
         srn = new SRNNetwork(5,5,5, point(0,0));
         srn.setLabel("srn");
-        net.addNetworkModelsAsync(bp, srn);
+        net.addNetworkModels(bp, srn);
 
     }
 

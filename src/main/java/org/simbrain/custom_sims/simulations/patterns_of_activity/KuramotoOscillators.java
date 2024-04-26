@@ -101,7 +101,7 @@ public class KuramotoOscillators extends Simulation {
         }
         reservoirNet = new NeuronGroup(neuronList);
         reservoirNet.setLayout(new HexagonalGridLayout(spacing, spacing, (int) Math.sqrt(neuronList.size())));
-        net.addNetworkModelAsync(reservoirNet);
+        net.addNetworkModel(reservoirNet);
         reservoirNet.setLocation(185,50);
         reservoirNet.applyLayout(-5, -85);
         reservoirNet.setLabel("Reservoir");
@@ -128,7 +128,7 @@ public class KuramotoOscillators extends Simulation {
         inputNetwork.setLabel("Sensory Neurons");
         inputNetwork.setLayout(new LineLayout());
         inputNetwork.applyLayout();
-        net.addNetworkModelAsync(inputNetwork);
+        net.addNetworkModel(inputNetwork);
 
         // Inputs to reservoir
         var sparseExcitatory = new Sparse(0.7, true, false);
@@ -137,7 +137,7 @@ public class KuramotoOscillators extends Simulation {
 
         inputToRes.getConnectionStrategy().setExRandomizer(new NormalDistribution(10.0, 1.0));
         inputToRes.setDisplaySynapses(false);
-        net.addNetworkModelAsync(inputToRes);
+        net.addNetworkModel(inputToRes);
         inputToRes.randomizeExcitatory();
 
         inputNetwork.setLocation(130, 660);

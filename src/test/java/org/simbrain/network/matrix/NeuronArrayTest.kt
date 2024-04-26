@@ -14,7 +14,7 @@ class NeuronArrayTest {
 
     @BeforeEach
     fun setUp() {
-        net.addNetworkModelAsync(na)
+        net.addNetworkModel(na)
     }
 
     @Test
@@ -46,7 +46,7 @@ class NeuronArrayTest {
         val naTarget = NeuronArray(3)
         val wm1 = WeightMatrix(na1, naTarget)
         wm1.setWeights(doubleArrayOf(5.0, -1.0, 1.0, 1.0, -1.0, -1.0))
-        net.addNetworkModelsAsync(na1, naTarget, wm1)
+        net.addNetworkModels(na1, naTarget, wm1)
         // Expecting 5 for first row, 2 for second row, and 0 for the last row
         Assertions.assertArrayEquals(doubleArrayOf(5.0, 2.0, 0.0), naTarget.excitatoryInputs)
 
@@ -55,7 +55,7 @@ class NeuronArrayTest {
         na2.setActivations(doubleArrayOf(1.0, 1.0))
         val wm2 = WeightMatrix(na2, naTarget)
         wm2.setWeights(doubleArrayOf(1.0, 0.0, -1.0, -1.0, 1.0, 1.0))
-        net.addNetworkModelsAsync(na2, wm2)
+        net.addNetworkModels(na2, wm2)
         // Now expecting 6, 2, 2
         Assertions.assertArrayEquals(doubleArrayOf(6.0, 2.0, 2.0), naTarget.excitatoryInputs)
     }
@@ -67,7 +67,7 @@ class NeuronArrayTest {
         val naTarget = NeuronArray(3)
         val wm1 = WeightMatrix(na1, naTarget)
         wm1.setWeights(doubleArrayOf(5.0, -1.0, 1.0, 1.0, -1.0, -1.0))
-        net.addNetworkModelsAsync(na1, naTarget, wm1)
+        net.addNetworkModels(na1, naTarget, wm1)
         // Expecting -1 for first row, 0 for second row, and -2 for the last row
         Assertions.assertArrayEquals(doubleArrayOf(-1.0, 0.0, -2.0), naTarget.inhibitoryInputs)
 
@@ -76,7 +76,7 @@ class NeuronArrayTest {
         na2.setActivations(doubleArrayOf(1.0, 1.0))
         val wm2 = WeightMatrix(na2, naTarget)
         wm2.setWeights(doubleArrayOf(1.0, 0.0, -1.0, -1.0, 1.0, 1.0))
-        net.addNetworkModelsAsync(na2, wm2)
+        net.addNetworkModels(na2, wm2)
         // Now expecting -1, -2, -2
         Assertions.assertArrayEquals(doubleArrayOf(-1.0, -2.0, -2.0), naTarget.inhibitoryInputs)
     }

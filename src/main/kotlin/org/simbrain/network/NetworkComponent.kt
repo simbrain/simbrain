@@ -18,7 +18,6 @@
 package org.simbrain.network
 
 import org.simbrain.network.core.Network
-import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.getNetworkXStream
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.util.getSimbrainXStream
@@ -26,7 +25,6 @@ import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.WorkspaceComponent
 import java.io.InputStream
 import java.io.OutputStream
-import java.util.function.Consumer
 
 /**
  * Network component.
@@ -64,33 +62,31 @@ class NetworkComponent : WorkspaceComponent {
     private fun init() {
         val event = network.events
 
-        event.modelAdded.on(wait = true) { list ->
-            list.forEach { m ->
-                setChangedSinceLastSave(true)
-                if (m is AttributeContainer) {
-                    fireAttributeContainerAdded(m as AttributeContainer?)
-                }
-                if (m is NeuronGroup) {
-                    m.neuronList.forEach(Consumer { addedContainer: Neuron? ->
-                        this.fireAttributeContainerAdded(
-                            addedContainer
-                        )
-                    })
+        event.modelAdded.on { m ->
+            setChangedSinceLastSave(true)
+            if (m is AttributeContainer) {
+                fireAttributeContainerAdded(m)
+            }
+            if (m is NeuronGroup) {
+                m.neuronList.map { addedContainer ->
+                    this.fireAttributeContainerAdded(
+                        addedContainer
+                    )
                 }
             }
         }
 
-        event.modelRemoved.on { m: NetworkModel? ->
+        event.modelRemoved.on { m ->
             setChangedSinceLastSave(true)
             if (m is AttributeContainer) {
-                fireAttributeContainerRemoved(m as AttributeContainer?)
+                fireAttributeContainerRemoved(m)
             }
             if (m is NeuronGroup) {
-                m.neuronList.forEach(Consumer { removedContainer: Neuron? ->
+                m.neuronList.forEach { removedContainer ->
                     this.fireAttributeContainerRemoved(
                         removedContainer
                     )
-                })
+                }
             }
         }
 

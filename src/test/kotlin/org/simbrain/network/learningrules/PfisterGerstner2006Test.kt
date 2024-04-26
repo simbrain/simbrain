@@ -13,7 +13,7 @@ class PfisterGerstner2006Test {
     var s12 = Synapse(n1,n2)
 
     init {
-        net.addNetworkModelsAsync(n1, n2, s12)
+        net.addNetworkModels(n1, n2, s12)
         s12.learningRule = PfisterGerstner2006Rule().apply {
 
         }

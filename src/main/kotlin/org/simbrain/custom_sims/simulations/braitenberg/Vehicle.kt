@@ -102,7 +102,7 @@ class Vehicle
         setNodeDefaults(straight)
         setNodeDefaults(rightTurn)
         setNodeDefaults(leftTurn)
-        net.addNetworkModelAsync(vehicle)
+        net.addNetworkModel(vehicle)
 
         // Set weights here
         if (vehicleType == VehicleType.PURSUER) {

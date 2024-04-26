@@ -94,14 +94,14 @@ public class SORN extends Simulation {
         NeuronGroup ng = new NeuronGroup(neurons);
         GridLayout layout = new GridLayout(gridSpace, gridSpace, (int) Math.sqrt(numNeurons));
         ng.setLabel("Excitatory");
-        net.addNetworkModelAsync(ng);
+        net.addNetworkModel(ng);
         ng.setLayout(layout);
         ng.applyLayout(new Point(10, 10));
 
         NeuronGroup ngIn = new NeuronGroup(inhibitoryNeurons);
         layout = new GridLayout(gridSpace*2, gridSpace*2, (int) Math.sqrt(0.2 * numNeurons));
         ngIn.setLabel("Inhibitory");
-        net.addNetworkModelAsync(ngIn);
+        net.addNetworkModel(ngIn);
         ngIn.setLayout(layout);
         System.out.println(ngIn.size());
         int x_loc = (int) (Math.sqrt(numNeurons) * gridSpace + 300);
@@ -140,7 +140,7 @@ public class SORN extends Simulation {
         NeuronGroup input = new NeuronGroup(inNeurons);
         layout = new GridLayout(gridSpace, gridSpace, (int) Math.sqrt(0.4 * numNeurons));
         input.setLabel("Input");
-        net.addNetworkModelAsync(input);
+        net.addNetworkModel(input);
         input.setLayout(layout);
         // Todo; get current location of ng above
         int y_loc = (int) (Math.sqrt(numNeurons) * gridSpace + 200);
@@ -155,7 +155,7 @@ public class SORN extends Simulation {
         // TODO
         // input_ee.setLearningRule(stdp, Polarity.BOTH);
         // input_ee.setSpikeResponder(new Step(), Polarity.BOTH);
-        net.addNetworkModelAsync(input_ee);
+        net.addNetworkModel(input_ee);
 
 //        Sparse ee_input_con = new Sparse(0.01, false, false);
 //        SynapseGroup ee_input = new SynapseGroup2(ng, input, ee_input_con, 1.0, exRand, inRand);
@@ -173,7 +173,7 @@ public class SORN extends Simulation {
         // TODO
         // input_ie.setSpikeResponder(new Step(), Polarity.BOTH);
 
-        net.addNetworkModelAsync(input_ie);
+        net.addNetworkModel(input_ie);
 
 //        Sparse ie_input_con = new Sparse(0.01, true, false);
 //        SynapseGroup ie_input = new SynapseGroup2(ngIn, input, input_ie_con, 1.0, exRand, inRand);
@@ -267,7 +267,7 @@ public class SORN extends Simulation {
         // TODO
         // sg.setSpikeResponder(new Step(),
         //         SimbrainConstants.Polarity.BOTH);
-        network.addNetworkModelAsync(sg);
+        network.addNetworkModel(sg);
         return sg;
     }
 

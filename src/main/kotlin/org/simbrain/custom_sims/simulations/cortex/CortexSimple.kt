@@ -107,7 +107,7 @@ val cortexSimple = newSim {
         sg.synapses.forEach {
             it.spikeResponder = UDF()
         }
-        net.addNetworkModelAsync(sg)
+        net.addNetworkModel(sg)
         return sg
     }
 

@@ -20,9 +20,9 @@ public class SynapseTest {
         n2 = new Neuron();
         s1 = new Synapse(n1,n2);
 
-        net.addNetworkModelAsync(n1);
-        net.addNetworkModelAsync(n2);
-        net.addNetworkModelAsync(s1);
+        net.addNetworkModel(n1);
+        net.addNetworkModel(n2);
+        net.addNetworkModel(s1);
     }
 
     @Test
@@ -37,7 +37,7 @@ public class SynapseTest {
 
         // A second synapse with the same source and target should not be added
         Synapse s2_redundant = new Synapse(n1, n2);
-        net.addNetworkModelAsync(s2_redundant);
+        net.addNetworkModel(s2_redundant);
         assertEquals(1, net.getModels(Synapse.class).size(), 0.0);
 
     }

@@ -11,7 +11,7 @@ class IntegrateAndFireTest {
     val intFire = IntegrateAndFireRule()
     val n = Neuron(intFire)
     init {
-        net.addNetworkModelAsync(n)
+        net.addNetworkModel(n)
     }
 
     // TODO: Test threshold, time constant, resistance

@@ -17,7 +17,7 @@ class SOMTest {
     }
 
     init {
-        net.addNetworkModelAsync(som)
+        net.addNetworkModel(som)
     }
 
     @Test

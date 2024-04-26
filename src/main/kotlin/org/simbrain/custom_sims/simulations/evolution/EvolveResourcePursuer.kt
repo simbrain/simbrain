@@ -98,16 +98,16 @@ val evolveResourcePursuer = newSim {
 
         suspend fun expressWith(network: Network): Phenotype {
             val driveNeurons = NeuronCollection(network.express(driveChromosome)).also {
-                network.addNetworkModelAsync(it); it.label = "drives"
+                network.addNetworkModel(it); it.label = "drives"
             }
             val inputNeurons = NeuronCollection(network.express(inputChromosome)).also {
-                network.addNetworkModelAsync(it); it.label = "inputs"
+                network.addNetworkModel(it); it.label = "inputs"
             }
             val hiddenNeurons = NeuronCollection(network.express(hiddenChromosome)).also {
-                network.addNetworkModelAsync(it); it.label = "hidden"
+                network.addNetworkModel(it); it.label = "hidden"
             }
             val outputNeurons = NeuronCollection(network.express(outputChromosome)).also {
-                network.addNetworkModelAsync(it); it.label = "outputs"
+                network.addNetworkModel(it); it.label = "outputs"
             }
 
             val connections = network.express(connectionChromosome)

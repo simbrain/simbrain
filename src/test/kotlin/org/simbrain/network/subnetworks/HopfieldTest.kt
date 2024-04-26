@@ -14,7 +14,7 @@ class HopfieldTest {
     }
 
     init {
-        net.addNetworkModelsAsync(hopfield)
+        net.addNetworkModels(hopfield)
     }
 
     @Test

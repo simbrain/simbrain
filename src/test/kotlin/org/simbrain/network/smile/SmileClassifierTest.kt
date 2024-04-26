@@ -54,7 +54,7 @@ class SmileClassifierTest {
     @Test
     fun testInit() {
         val classifier = SmileClassifier(SVMClassifier(4))
-        net.addNetworkModelAsync(classifier)
+        net.addNetworkModel(classifier)
         classifier.addInputs(Matrix.column(doubleArrayOf(1.0,2.0,3.0,4.0)))
         assertEquals(10.0, classifier.inputs.sum())
         net.update()
@@ -63,7 +63,7 @@ class SmileClassifierTest {
 
     @Test
     fun `test SVM XOR`() {
-        net.addNetworkModelAsync(xorSVM)
+        net.addNetworkModel(xorSVM)
         xorSVM.addInputs(Matrix.column(doubleArrayOf(0.0, 0.0, 0.0)))
         net.update()
         assertArrayEquals(doubleArrayOf(1.0, 0.0), xorSVM.outputs.toDoubleArray())
@@ -91,7 +91,7 @@ class SmileClassifierTest {
         outputNa.clear()
         val wm2 = WeightMatrix(xorSVM, outputNa)
         wm2.diagonalize()
-        net.addNetworkModelsAsync(listOf(inputNa, wm1, xorSVM, wm2, outputNa))
+        net.addNetworkModels(listOf(inputNa, wm1, xorSVM, wm2, outputNa))
 
         // Set inputs
         inputNa.addInputs(Matrix.column(doubleArrayOf(0.0, 1.0, 0.0)))

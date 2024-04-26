@@ -81,7 +81,7 @@ val allostaticPatternCompletion = newSim {
     val reservoir = List(numResNeurons) {
         Neuron(AllostaticUpdateRule())
     }.let {
-        network.addNetworkModelsAsync(it)
+        network.addNetworkModels(it)
         NeuronCollection(it)
     }.apply {
         label = "Reservoir"
@@ -96,12 +96,12 @@ val allostaticPatternCompletion = newSim {
     reservoirSynapseGroup.synapses.forEach { s ->
         s.strength = dist.sampleDouble()
     }
-    network.addNetworkModelAsync(reservoirSynapseGroup)
+    network.addNetworkModel(reservoirSynapseGroup)
 
     // Input nodes
     val inputs = network.addNeuronCollectionAsync(5) {
         updateRule = LinearRule()
-        network.addNetworkModelAsync(this)
+        network.addNetworkModel(this)
     }.apply {
         label = "Inputs"
         setLabels(listOf("man", "dog", "walks", "bites", "END"))
@@ -113,7 +113,7 @@ val allostaticPatternCompletion = newSim {
     // Connect input nodes to reservoir
     val inputsToRes = SynapseGroup(inputs, reservoir, sparse)
     inputsToRes.label = "Inputs to Res"
-    network.addNetworkModelAsync(inputsToRes)
+    network.addNetworkModel(inputsToRes)
     inputsToRes.synapses.forEach { s ->
         s.strength = 5.0
     }

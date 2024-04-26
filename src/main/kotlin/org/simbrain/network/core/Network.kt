@@ -34,7 +34,7 @@ private val LOG_10 = ln(10.0)
  * data structure is a [NetworkModelList] that associates classes of [NetworkModel] with linked hash sets of
  * instances of those types.
  *
- * To add models, use [Network.addNetworkModelAsync] and friends.
+ * To add models, use [Network.addNetworkModel] and friends.
  *
  * To remove models use [Network.getModels] and call .delete() on the resulting models. Get models can be called with
  * an argument to filter by model type, e.g getModels(Neuron.class)
@@ -309,10 +309,6 @@ class Network: CoroutineScope, EditableObject {
             yieldAll(networkModels.get<Subnetwork>().flatMap { it.modelList.get() })
         }.toList()
 
-    suspend fun addNetworkModel(model: NetworkModel) {
-        addNetworkModelAsync(model)?.join()
-    }
-
     private fun assignId(model: NetworkModel) {
         model.id = idManager.getAndIncrementId(model.javaClass)
         when (model) {
@@ -325,7 +321,7 @@ class Network: CoroutineScope, EditableObject {
     /**
      * Add a new [NetworkModel]. All network models MUST be added using this method.
      */
-    fun addNetworkModelAsync(model: NetworkModel): Job? {
+    fun addNetworkModel(model: NetworkModel): Deferred<Boolean>? {
         if (model.shouldAdd()) {
             assignId(model)
             networkModels.add(model)
@@ -337,7 +333,7 @@ class Network: CoroutineScope, EditableObject {
                 events.modelRemoved.fire(it).join()
                 updatePriorityList()
             }
-            val job = events.modelAdded.fire(model)
+            val deferred = events.modelAdded.fire(model)
             if (model is Neuron) {
                 model.events.priorityChanged.on { _, _ ->
                     updatePriorityList()
@@ -345,7 +341,7 @@ class Network: CoroutineScope, EditableObject {
                 model.events.updateRuleChanged.on { _, _ -> shouldUpdateTimeType = true }
                 updatePriorityList()
             }
-            return job
+            return deferred
         }
         return null
     }
@@ -476,34 +472,22 @@ class Network: CoroutineScope, EditableObject {
         updateManager.removeAction(action)
     }
 
-    suspend fun addNetworkModels(toAdd: List<NetworkModel>) {
-        addNetworkModelsAsync(toAdd).join()
-    }
 
     /**
      * Adds a list of network elements to this network. Used in copy / paste.
      *
      * @param toAdd list of objects to add.
      */
-    fun addNetworkModelsAsync(toAdd: List<NetworkModel>): Job {
-        val jobs = toAdd.mapNotNull { addNetworkModelAsync(it) }
-        return launch { jobs.joinAll() }
-    }
-
-    suspend fun addNetworkModels(vararg toAdd: NetworkModel) {
-        toAdd.mapNotNull { addNetworkModelAsync(it) }.joinAll()
-    }
+    fun addNetworkModels(toAdd: List<NetworkModel>) = toAdd.mapNotNull { addNetworkModel(it) }
 
     /**
      * Var arg version of addNetworkModels.
      *
      * Ex: addNetworkModels(synapse1, synapse2, neuron1, neuron2, ...)
      */
-    fun addNetworkModelsAsync(vararg toAdd: NetworkModel) {
-        toAdd.forEach { addNetworkModelAsync(it) }
-    }
+    fun addNetworkModels(vararg toAdd: NetworkModel) = toAdd.mapNotNull { addNetworkModel(it) }
 
-    suspend fun selectModels(models: List<NetworkModel>) {
+    fun selectModels(models: List<NetworkModel>) {
         events.selected.fire(models)
     }
 

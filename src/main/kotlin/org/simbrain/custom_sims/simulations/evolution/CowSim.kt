@@ -59,16 +59,16 @@ val evolveCow = newSim {
         suspend fun expressWith(network: Network): Phenotype {
             return Phenotype(
                 NeuronCollection(network.express(inputChromosome)).also {
-                    network.addNetworkModelAsync(it); it.label = "input"
+                    network.addNetworkModel(it); it.label = "input"
                 },
                 NeuronCollection(network.express(hiddenChromosome)).also {
-                    network.addNetworkModelAsync(it); it.label = "hidden"
+                    network.addNetworkModel(it); it.label = "hidden"
                 },
                 NeuronCollection(network.express(outputChromosome)).also {
-                    network.addNetworkModelAsync(it); it.label = "output"
+                    network.addNetworkModel(it); it.label = "output"
                 },
                 NeuronCollection(network.express(driveChromosome)).also {
-                    network.addNetworkModelAsync(it); it.label = "drives"
+                    network.addNetworkModel(it); it.label = "drives"
                 },
                 network.express(connectionChromosome)
             )

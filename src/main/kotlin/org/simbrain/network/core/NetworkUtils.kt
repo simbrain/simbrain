@@ -159,7 +159,7 @@ fun connect(source: Neuron, target: Neuron, value: Double, lowerBound: Double = 
     synapse.forceSetStrength(value)
     synapse.lowerBound = lowerBound
     synapse.upperBound = upperBound
-    addNetworkModelAsync(synapse)
+    addNetworkModel(synapse)
     return synapse
 }
 
@@ -205,12 +205,12 @@ fun Network.addNeurons(numNeurons: Int, template: Neuron.() -> Unit = {}): List<
     val neurons = (0 until numNeurons).map {
         Neuron().apply(template)
     }
-    addNetworkModelsAsync(neurons)
+    addNetworkModels(neurons)
     return neurons
 }
 
 fun Network.addNeuron(block: Neuron.() -> Unit = { }) = Neuron()
-    .apply(this::addNetworkModelAsync)
+    .apply(this::addNetworkModel)
     .also(block)
 
 @JvmOverloads
@@ -219,13 +219,13 @@ fun Network.addNeuron(x: Int, y: Int, block: Neuron.() -> Unit = { }) = addNeuro
 
 fun Network.addSynapse(source: Neuron, target: Neuron, block: Synapse.() -> Unit = { }) = Synapse(source, target)
     .apply(block)
-    .also(this::addNetworkModelAsync)
+    .also(this::addNetworkModel)
 
 fun Network.addNeuronGroup(count: Int, location: Point2D? = null, template: Neuron.() -> Unit = { }): NeuronGroup {
     return NeuronGroup(List(count) {
         Neuron().apply(template)
     }).also {
-        addNetworkModelAsync(it)
+        addNetworkModel(it)
         if (location != null) {
             val (x, y) = location
             it.setLocation(x, y)
@@ -238,14 +238,14 @@ fun Network.addNeuronGroup(x: Double, y: Double, numNeurons: Int, rule: NeuronUp
         NeuronGroup {
     val ng = NeuronGroup(numNeurons)
     ng.setUpdateRule(rule)
-    addNetworkModelAsync(ng)
+    addNetworkModel(ng)
     ng.setLocation(x, y)
     return ng
 }
 
 fun Network.addNeuronCollectionAsync(numNeurons: Int, template: Neuron.() -> Unit = {}) : NeuronCollection {
     val nc = NeuronCollection(addNeurons(numNeurons, template))
-    addNetworkModelAsync(nc)
+    addNetworkModel(nc)
     return nc
 }
 
@@ -262,7 +262,7 @@ suspend fun Network.addNeuronCollection(numNeurons: Int, template: Neuron.() -> 
  */
 fun Network.addSynapseGroup(source: NeuronGroup, target: NeuronGroup): SynapseGroup {
     val sg = SynapseGroup(source, target)
-    addNetworkModelAsync(sg)
+    addNetworkModel(sg)
     return sg
 }
 
@@ -334,14 +334,14 @@ fun List<Neuron>.getEnergy() = ((this cartesianProduct this)
 fun<T: LocatableModel> List<T>.sortTopBottom() = sortedBy { it.locationY }.sortedBy{it.locationX}
 
 suspend fun NetworkModel.addToNetwork(network: Network) = network.addNetworkModel(this)
-fun NetworkModel.addToNetworkAsync(network: Network) = network.addNetworkModelAsync(this)
+fun NetworkModel.addToNetworkAsync(network: Network) = network.addNetworkModel(this)
 suspend fun List<NetworkModel>.addToNetwork(network: Network) = network.addNetworkModels(this)
-fun List<NetworkModel>.addToNetworkAsync(network: Network) = network.addNetworkModelsAsync(this)
+fun List<NetworkModel>.addToNetworkAsync(network: Network) = network.addNetworkModels(this)
 
 context(Network) suspend fun NetworkModel.addToNetwork() = addNetworkModel(this)
-context(Network) fun NetworkModel.addToNetworkAsync() = addNetworkModelAsync(this)
+context(Network) fun NetworkModel.addToNetworkAsync() = addNetworkModel(this)
 context(Network) suspend fun List<NetworkModel>.addToNetwork() = addNetworkModels(this)
-context(Network) fun List<NetworkModel>.addToNetworkAsync() = addNetworkModelsAsync(this)
+context(Network) fun List<NetworkModel>.addToNetworkAsync() = addNetworkModels(this)
 
 suspend fun Network.createLayeredFreeNeurons(topology: List<Int>, _layerNames: List<String>? = null, alignment: Alignment = Alignment.VERTICAL) {
 

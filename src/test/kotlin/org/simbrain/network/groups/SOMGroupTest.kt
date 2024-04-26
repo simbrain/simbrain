@@ -11,7 +11,7 @@ class SOMGroupTest {
     val SOM = SOMGroup(10)
 
     init {
-        net.addNetworkModelsAsync(SOM)
+        net.addNetworkModels(SOM)
     }
     @Test
     fun `Test create function`() {
@@ -27,7 +27,7 @@ class SOMGroupTest {
     @Test
     fun `Test copy function`() {
         val SOM2 = SOM.copy()
-        net.addNetworkModelsAsync(SOM2)
+        net.addNetworkModels(SOM2)
         // SOMGroup Components
         assertEquals(SOM.params.numNeurons, SOM2.params.numNeurons)
         assertEquals(SOM.neighborhoodSize, SOM2.neighborhoodSize)

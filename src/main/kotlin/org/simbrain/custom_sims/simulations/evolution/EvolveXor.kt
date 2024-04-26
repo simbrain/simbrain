@@ -53,9 +53,9 @@ val evolveXor = newSim {
 
         suspend fun expressWith(network: Network): Phenotype {
             return Phenotype(
-                NeuronCollection(network.express(inputLayerChromosome)).also { network.addNetworkModelAsync(it); it.label = "input" },
-                NeuronCollection(network.express(hiddenLayerChromosome)).also { network.addNetworkModelAsync(it); it.label = "hidden" },
-                NeuronCollection(network.express(outputLayerChromosome)).also { network.addNetworkModelAsync(it); it.label = "output" },
+                NeuronCollection(network.express(inputLayerChromosome)).also { network.addNetworkModel(it); it.label = "input" },
+                NeuronCollection(network.express(hiddenLayerChromosome)).also { network.addNetworkModel(it); it.label = "hidden" },
+                NeuronCollection(network.express(outputLayerChromosome)).also { network.addNetworkModel(it); it.label = "output" },
                 network.express(connectionChromosome)
             )
         }

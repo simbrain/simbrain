@@ -105,7 +105,7 @@ public class EdgeOfChaosBitStream extends Simulation {
         sgRes1 = EdgeOfChaos.connectReservoir(net, res1, variance, 4);
         sgRes2 = sgRes1.copy(res2, res2);
         sgRes2.setLabel("Recurrent Synapses");
-        net.addNetworkModelAsync(sgRes2);
+        net.addNetworkModel(sgRes2);
 
         // Set up "bit-stream" inputs
         bitStream1 = buildBitStream(res1);
@@ -113,8 +113,8 @@ public class EdgeOfChaosBitStream extends Simulation {
         bitStream2 = buildBitStream(res2);
         bitStream2.setLabel("Bit stream 2");
         AllToAll connector = new AllToAll();
-        net.addNetworkModelsAsync(connector.connectNeurons(bitStream1.getNeuronList(), res1.getNeuronList()));
-        net.addNetworkModelsAsync(connector.connectNeurons(bitStream2.getNeuronList(), res2.getNeuronList()));
+        net.addNetworkModels(connector.connectNeurons(bitStream1.getNeuronList(), res1.getNeuronList()));
+        net.addNetworkModels(connector.connectNeurons(bitStream2.getNeuronList(), res2.getNeuronList()));
 
     }
 
@@ -129,7 +129,7 @@ public class EdgeOfChaosBitStream extends Simulation {
         bitStreamInputs.setClamped(true);
         // bitStreamInputs.getInputManager().setData(new double[][]{{u_bar}, {0.0}, {0.0}, {0.0}, {0.0}, {u_bar}, {0.0}, {u_bar}, {u_bar}, {0.0}, {u_bar}, {u_bar}, {0.0}, {0.0}, {u_bar}});
         // bitStreamInputs.setInputMode(true);
-        net.addNetworkModelAsync(bitStreamInputs);
+        net.addNetworkModel(bitStreamInputs);
         bitStreamInputs.setLocation(reservoir.getCenterX(), reservoir.getMaxY() + offset);
         return bitStreamInputs;
     }

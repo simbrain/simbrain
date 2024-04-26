@@ -72,9 +72,9 @@ val binaryReservoir = newSim {
         val neuron = Neuron(rule)
         neuron
     }
-    network.addNetworkModelsAsync(resNeurons)
+    network.addNetworkModels(resNeurons)
     val reservoir = NeuronCollection(resNeurons)
-    network.addNetworkModelAsync(reservoir)
+    network.addNetworkModel(reservoir)
     reservoir.label = "Reservoir"
     reservoir.layout(GridLayout())
     reservoir.location = point(0, 0)

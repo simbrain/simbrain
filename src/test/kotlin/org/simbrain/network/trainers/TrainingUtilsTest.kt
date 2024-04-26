@@ -26,7 +26,7 @@ class TrainingUtilsTest {
         listOf(na1, na2, na3).forEach {
             it.clear()
         }
-        net.addNetworkModelsAsync(na1, na2, na3, wm1, wm2)
+        net.addNetworkModels(na1, na2, na3, wm1, wm2)
     }
 
     @Test
@@ -133,7 +133,7 @@ class TrainingUtilsTest {
         // [[wm1, wm1_2],[wm2]]
         val na1_2 = NeuronArray(3)
         val wm1_2 = WeightMatrix(na1_2, na2)
-        net.addNetworkModelsAsync(na1_2, wm1_2)
+        net.addNetworkModels(na1_2, wm1_2)
         val wmTree = WeightMatrixTree(listOf(na1, na1_2), na3)
         assertEquals(2, wmTree.tree.size)
         assertEquals(2, wmTree.tree[0].size)

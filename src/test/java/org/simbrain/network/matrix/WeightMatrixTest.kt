@@ -21,7 +21,7 @@ class WeightMatrixTest {
         na1 = NeuronArray(2)
         na2 = NeuronArray(2)
         wm = WeightMatrix(na1, na2)
-        net.addNetworkModelsAsync(na1, na2, wm)
+        net.addNetworkModels(na1, na2, wm)
     }
 
     @Test
@@ -116,7 +116,7 @@ class WeightMatrixTest {
         val ng = NeuronGroup(2)
         val wm2 = WeightMatrix(na1, ng)
         wm2.diagonalize()
-        net.addNetworkModelsAsync(List.of(ng, wm2))
+        net.addNetworkModels(List.of(ng, wm2))
         net.update()
         Assertions.assertArrayEquals(doubleArrayOf(.5, -.5), ng.activations, 0.0)
         net.update() // All should be cleared on second update

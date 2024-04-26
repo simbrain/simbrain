@@ -144,7 +144,7 @@ class CouplingTest {
     @Test
     fun `check if all producers are created on a neuron`() {
         val neuron = Neuron()
-        network.addNetworkModelAsync(neuron)
+        network.addNetworkModel(neuron)
         val expected = setOf("getLabel", "getActivation")
         val actual = with(couplingManager) { neuron.producers.map { it.method.name }.toSet() }
         val diff = expected complement actual // For error message if test fails
@@ -154,7 +154,7 @@ class CouplingTest {
     @Test
     fun `check if all consumers are created on a neuron`() {
         val neuron = Neuron()
-        network.addNetworkModelAsync(neuron)
+        network.addNetworkModel(neuron)
         val expected = setOf("setActivation", "addInputValue", "addInputValue", "setLabel")
         val actual = with(couplingManager) { neuron.consumers.map { it.method.name }.toSet() }
         val diff = expected complement actual
@@ -166,8 +166,8 @@ class CouplingTest {
         val neuron1 = Neuron()
         val neuron2 = Neuron()
         network.apply {
-            addNetworkModelAsync(neuron1)
-            addNetworkModelAsync(neuron2)
+            addNetworkModel(neuron1)
+            addNetworkModel(neuron2)
         }
         with(couplingManager) {
             neuron1.getProducer("getActivation") couple neuron2.getConsumer("setActivation")
@@ -182,8 +182,8 @@ class CouplingTest {
     fun `test many to one`() {
         val neuron1 = Neuron()
         val neuron2 = Neuron()
-        network.addNetworkModelAsync(neuron1)
-        network.addNetworkModelAsync(neuron2)
+        network.addNetworkModel(neuron1)
+        network.addNetworkModel(neuron2)
         neuron1.activation = .5
         neuron2.activation = -.2
 
@@ -191,7 +191,7 @@ class CouplingTest {
         val network2 = Network()
         workspace.addWorkspaceComponent(NetworkComponent("net2", network2))
         val neuron3 = Neuron()
-        network2.addNetworkModelAsync(neuron3)
+        network2.addNetworkModel(neuron3)
 
         // Now couple them
         with(couplingManager) {
@@ -213,7 +213,7 @@ class CouplingTest {
     @Test
     fun `test one to many`() {
         val neuron1 = Neuron()
-        network.addNetworkModelAsync(neuron1)
+        network.addNetworkModel(neuron1)
         neuron1.activation = .5
 
         // Add a second network with a neuron
@@ -221,8 +221,8 @@ class CouplingTest {
         workspace.addWorkspaceComponent(NetworkComponent("net2", network2))
         val neuron2 = Neuron()
         val neuron3 = Neuron()
-        network2.addNetworkModelAsync(neuron2)
-        network2.addNetworkModelAsync(neuron3)
+        network2.addNetworkModel(neuron2)
+        network2.addNetworkModel(neuron3)
 
         // Now couple them
         with(couplingManager) {

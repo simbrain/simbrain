@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations
 
+import kotlinx.coroutines.awaitAll
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.couplingManager
 import org.simbrain.custom_sims.newSim
@@ -54,14 +55,14 @@ val objectTrackingSim = newSim {
         val neuron = Neuron(AllostaticUpdateRule())
         neuron
     }
-    network.addNetworkModelsAsync(resNeurons)
+    network.addNetworkModels(resNeurons)
     val reservoir = NeuronCollection(resNeurons)
     network.addNetworkModel(reservoir)
     reservoir.label = "Reservoir"
     reservoir.layout(GridLayout())
     reservoir.location = point(0, 0)
     val reservoirSynapseGroup = SynapseGroup(reservoir, reservoir, sparse)
-    network.addNetworkModelAsync(reservoirSynapseGroup)
+    network.addNetworkModel(reservoirSynapseGroup)
     val dist = NormalDistribution(1.0, .1)
     reservoirSynapseGroup.synapses.forEach { s ->
         s.strength = dist.sampleDouble()
@@ -73,9 +74,9 @@ val objectTrackingSim = newSim {
         val neuron = Neuron(rule)
         neuron
     }
-    network.addNetworkModelsAsync(leftInputNeurons)
+    network.addNetworkModels(leftInputNeurons).awaitAll()
     val leftInputs = NeuronCollection(leftInputNeurons)
-    network.addNetworkModelAsync(leftInputs)
+    network.addNetworkModel(leftInputs)
     leftInputs.label = "Left Inputs"
     leftInputs.layout(GridLayout())
     leftInputs.location = point(-616, -195)
@@ -86,21 +87,21 @@ val objectTrackingSim = newSim {
         val neuron = Neuron(rule)
         neuron
     }
-    network.addNetworkModelsAsync(rightInputNeurons)
+    network.addNetworkModels(rightInputNeurons).awaitAll()
     val rightInputs = NeuronCollection(rightInputNeurons)
-    network.addNetworkModelAsync(rightInputs)
+    network.addNetworkModel(rightInputs)
     rightInputs.label = "Right Inputs"
     rightInputs.layout(GridLayout())
     rightInputs.location = point(-616, 225)
 
     // Connect input nodes to reservoir
     val leftInputsToRes = SynapseGroup(leftInputs, reservoir, sparse)
-    network.addNetworkModelAsync(leftInputsToRes)
+    network.addNetworkModel(leftInputsToRes)
     leftInputsToRes.synapses.forEach { s ->
         s.strength = 0.75
     }
     val rightInputsToRes = SynapseGroup(rightInputs, reservoir, sparse)
-    network.addNetworkModelAsync(rightInputsToRes)
+    network.addNetworkModel(rightInputsToRes)
     rightInputsToRes.synapses.forEach { s ->
         s.strength = 0.75
     }
@@ -108,22 +109,22 @@ val objectTrackingSim = newSim {
     // Output neurons
     val leftTurnNeuron = Neuron(PercentIncomingNeuronRule())
     val rightTurnNeuron = Neuron(PercentIncomingNeuronRule())
-    network.addNetworkModelAsync(leftTurnNeuron)
-    network.addNetworkModelAsync(rightTurnNeuron)
+    network.addNetworkModel(leftTurnNeuron)?.await()
+    network.addNetworkModel(rightTurnNeuron)?.await()
     leftTurnNeuron.upperBound = 100.0
     rightTurnNeuron.upperBound = 100.0
     val leftTurnCollection = NeuronCollection(listOf(leftTurnNeuron))
     leftTurnCollection.label = "Left Turn"
-    network.addNetworkModelAsync(leftTurnCollection)
+    network.addNetworkModel(leftTurnCollection)
     val rightTurnCollection = NeuronCollection(listOf(rightTurnNeuron))
     rightTurnCollection.label = "Right Turn"
-    network.addNetworkModelAsync(rightTurnCollection)
+    network.addNetworkModel(rightTurnCollection)
     leftTurnNeuron.location = point(546, -203)
     rightTurnNeuron.location = point(573, 323)
     val resToLeftTurn = SynapseGroup(reservoir, leftTurnCollection, sparse)
-    network.addNetworkModelAsync(resToLeftTurn)
+    network.addNetworkModel(resToLeftTurn)
     val resToRightTurn = SynapseGroup(reservoir, rightTurnCollection, sparse)
-    network.addNetworkModelAsync(resToRightTurn)
+    network.addNetworkModel(resToRightTurn)
 
     // Location of the network in the desktop
     withGui {
@@ -342,16 +343,16 @@ class AllostaticUpdateRule: SpikingNeuronUpdateRule<AllostaticDataHolder, Spikin
         with(Network()) {
             val n1 = Neuron()
             val n2 = Neuron()
-            addNetworkModelsAsync(n1, n2)
+            addNetworkModels(n1, n2)
             n1.clamped = true
             n2.clamped = true
             val n3 = Neuron()
-            addNetworkModelAsync(n3)
+            addNetworkModel(n3)
             val s1 = Synapse(n1, n3)
             s1.strength = 1.0
             val s2 = Synapse(n2, n3)
             s2.strength = .5
-            addNetworkModelsAsync(s1, s2)
+            addNetworkModels(s1, s2)
             n1.isSpike = true
             n2.isSpike = true
             println(n3.getAllostaticInput())

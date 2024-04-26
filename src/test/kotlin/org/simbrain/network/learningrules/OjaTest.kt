@@ -20,7 +20,7 @@ class OjaTest {
 
 
     init {
-        net.addNetworkModelsAsync(input, output, weight, na1, na2, wm12)
+        net.addNetworkModels(input, output, weight, na1, na2, wm12)
         weight.learningRule = OjaRule().apply {
             learningRate = 1.0
             normalizationFactor = 1.0

@@ -10,6 +10,7 @@ import org.simbrain.world.imageworld.ImageWorldPreferences.imageDirectory
 import org.simbrain.world.imageworld.gui.FilterCollectionGui
 import java.awt.*
 import java.awt.event.*
+import java.io.File
 import java.util.*
 import javax.swing.*
 import kotlin.math.min
@@ -25,9 +26,7 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
     /**
      * Custom file chooser for selecting image files.
      */
-    private var fileChooser: SFileChooser
-
-    private var contextMenu: JPopupMenu? = null
+    private var fileChooser = SFileChooser(imageDirectory, "")
 
     /**
      * Main model object.
@@ -151,9 +150,10 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
         loadImages.addActionListener { loadImages() }
         fileMenu.add(loadImages)
 
-        val saveImage = JMenuItem("Save Image...")
-        saveImage.addActionListener { saveImage() }
-        fileMenu.add(saveImage)
+        fileMenu.add(saveImageAction)
+
+        val saveAllImages = JMenuItem(saveImageAllAction)
+        fileMenu.add(saveAllImages)
 
         fileMenu.addSeparator()
         fileMenu.add(copyAction)
@@ -220,15 +220,18 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
      * Create and display the context menu.
      */
     private fun showContextMenu(evt: MouseEvent) {
-        contextMenu = JPopupMenu()
-        contextMenu!!.add(copyAction)
-        contextMenu!!.add(pasteAction)
-        contextMenu!!.addSeparator()
+        val contextMenu = JPopupMenu()
+        contextMenu.add(copyAction)
+        contextMenu.add(pasteAction)
+        contextMenu.addSeparator()
+        contextMenu.add(saveImageAction)
+        contextMenu.add(saveImageAllAction)
+        contextMenu.addSeparator()
         val filterMenu = CouplingMenu(
             workspaceComponent, imageWorld.filterCollection.currentFilter
         )
-        contextMenu!!.add(filterMenu)
-        contextMenu!!.show(this, evt.x, evt.y)
+        contextMenu.add(filterMenu)
+        contextMenu.show(this, evt.x, evt.y)
     }
 
     /**
@@ -332,6 +335,18 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
         }
     }
 
+    val saveImageAction = createAction(
+        "Save Current Image...",
+        description = "Save the current image to a file",
+        iconPath =  "menu_icons/Save.png"
+    ) {
+        saveImage()
+    }
+
+    val saveImageAllAction = createAction("Save All Images...") {
+        saveAllImages()
+    }
+
     /**
      * Construct a new ImageDesktopComponent GUI.
      *
@@ -362,9 +377,6 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
         add(imageAlbumToolbar, BorderLayout.SOUTH)
         updateToolbar()
 
-        // Set up the file chooser
-        fileChooser = SFileChooser(imageDirectory, "")
-
         // TODO: Below breaks the file chooser
         //fileChooser.setUseImagePreview(true);
         // String[] exts = ImageIO.getReaderFileSuffixes();
@@ -378,17 +390,22 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
      * Save the current image.
      */
     private fun saveImage() {
-        fileChooser.setDescription("Save image")
+        fileChooser.setDescription("Save current image")
         fileChooser.setUseImagePreview(true)
-        val file = fileChooser.showSaveDialog(workspaceComponent!!.name + ".png")
-        //TODO
-        // if (file != null) {
-        //     try {
-        //         pixelProducer.saveImage(file.toString());
-        //     } catch (IOException ex) {
-        //         JOptionPane.showMessageDialog(null, "Unable to save file: " + file.toString());
-        //     }
-        // }
+        fileChooser.showSaveDialog("${workspaceComponent.name}.png")?.let { file ->
+            imageWorld.imageAlbum.writeCurrentImageToFile(file)
+        }
+    }
+
+    private fun saveAllImages() {
+        JOptionPane.showInputDialog("Enter a prefix for the image files")?.let { fileNamePrefix ->
+            fileChooser.setDescription("Save images")
+            showDirectorySelectionDialog()?.let { File(it) }?.let { dir ->
+                imageWorld.imageAlbum.writeAllImagesToFile(dir, fileNamePrefix)
+            }
+
+        }
+
     }
 
 

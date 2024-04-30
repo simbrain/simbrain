@@ -1,47 +1,39 @@
-package org.simbrain.world.imageworld;
+package org.simbrain.world.imageworld
 
-import org.jetbrains.annotations.Nullable;
-import org.simbrain.util.ImageUtilsKt;
-import org.simbrain.util.propertyeditor.EditableObject;
-import org.simbrain.workspace.AttributeContainer;
-import org.simbrain.workspace.Consumable;
-
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import org.simbrain.util.copy
+import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.workspace.AttributeContainer
+import org.simbrain.workspace.Consumable
+import java.awt.image.BufferedImage
+import java.io.File
+import java.io.IOException
+import javax.imageio.ImageIO
+import javax.swing.ImageIcon
+import javax.swing.JOptionPane
 
 /**
  * ImageAlbum stores a list of static images and lets you load, advance through them etc.
  *
  * @author Tim Shea
  */
-public class ImageAlbum extends ImageSource implements AttributeContainer, EditableObject {
-
+class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
     /**
      * A list of buffered images that can be stepped through.
      */
-    private List<BufferedImage> frames = new ArrayList<>();
+    private val frames: MutableList<BufferedImage> = ArrayList()
 
     /**
      * Current frame being shown.
      */
-    private int frameIndex = 0;
+    var frameIndex: Int = 0
+        private set
 
     /**
      * Construct a new StaticImageSource.
      */
-    public ImageAlbum() {
-        super();
-    }
+    constructor() : super()
 
-    public ImageAlbum(String filename, BufferedImage currentImage) {
-        super(currentImage);
-    }
+    constructor(filename: String, currentImage: BufferedImage) : super(currentImage)
 
     /**
      * Load an image from a file and update the current image.
@@ -50,13 +42,13 @@ public class ImageAlbum extends ImageSource implements AttributeContainer, Edita
      * @throws IOException upon failure to read the requested file
      */
     @Consumable
-    public void loadImage(String filename) throws IOException {
-        frames = null;
-        if (filename == null || filename.isEmpty()) {
-            setCurrentImage(new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB));
+    fun loadImage(filename: String) {
+        frames.clear()
+        if (filename.isEmpty()) {
+            currentImage = BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB)
         } else {
-            BufferedImage image = ImageIO.read(new File(filename));
-            setCurrentImage(image);
+            val image = ImageIO.read(File(filename))
+            currentImage = image
         }
     }
 
@@ -65,32 +57,44 @@ public class ImageAlbum extends ImageSource implements AttributeContainer, Edita
      *
      * @param files the images to load
      */
-    public void loadImages(File[] files) {
-        List<BufferedImage> list = new ArrayList<>();
-        for (File file : files) {
+    fun loadImages(files: Array<File>) {
+        val list: MutableList<BufferedImage> = ArrayList()
+        for (file in files) {
             try {
-                BufferedImage read = ImageIO.read(file);
+                val read = ImageIO.read(file)
                 if (read != null) {
-                    list.add(read);
+                    list.add(read)
                 } else {
-                    JOptionPane.showMessageDialog(null, String.format("Could not parse %s", file.getName()));
-                    System.err.printf("Could not parse %s", file.getName());
+                    JOptionPane.showMessageDialog(null, String.format("Could not parse %s", file.name))
+                    System.err.printf("Could not parse %s", file.name)
                 }
-            } catch (IOException e) {
-                e.printStackTrace();
+            } catch (e: IOException) {
+                e.printStackTrace()
             }
         }
-        frames = list;
-        setCurrentImage(frames.get(0));
+        frames.clear()
+        frames.addAll(list)
+        currentImage = frames[0]
+    }
+
+    fun writeCurrentImageToFile(destination: File) {
+        ImageIO.write(currentImage, "png", destination)
+    }
+
+    fun writeAllImagesToFile(destination: File, fileNamePrefix: String) {
+        assert(destination.isDirectory) { "Destination must be a directory" }
+        for (i in frames.indices) {
+            ImageIO.write(frames[i], "png", File(destination, "${fileNamePrefix}$i.png"))
+        }
     }
 
     /**
      * Add a new image to the album and set the current frame to it.
      */
-    public void addImage(BufferedImage image) {
-        frames.add(image);
-        frameIndex = frames.size() - 1;
-        setCurrentImage(image);
+    fun addImage(image: BufferedImage) {
+        frames.add(image)
+        frameIndex = frames.size - 1
+        currentImage = image
     }
 
     /**
@@ -98,96 +102,81 @@ public class ImageAlbum extends ImageSource implements AttributeContainer, Edita
      *
      * @param imageIcon the image icon
      */
-    public void loadImage(ImageIcon imageIcon) {
-        BufferedImage image = new BufferedImage(imageIcon.getIconWidth(), imageIcon.getIconHeight(), BufferedImage.TYPE_INT_RGB);
-        Graphics2D graphics = image.createGraphics();
-        graphics.drawImage(imageIcon.getImage(), 0, 0, null);
-        graphics.dispose();
-        setCurrentImage(image);
-        getEvents().getImageUpdate().fire();
+    fun loadImage(imageIcon: ImageIcon) {
+        val image = BufferedImage(imageIcon.iconWidth, imageIcon.iconHeight, BufferedImage.TYPE_INT_RGB)
+        val graphics = image.createGraphics()
+        graphics.drawImage(imageIcon.image, 0, 0, null)
+        graphics.dispose()
+        currentImage = image
+        events.imageUpdate.fire()
     }
 
     /**
      * Update the current image to the next image in the frame list.
      */
-    public void nextFrame() {
-        if (frames != null) {
-            saveCurrentFrame();
-            frameIndex = (frameIndex + 1) % frames.size();
-            setCurrentImage(frames.get(frameIndex));
-        }
+    fun nextFrame() {
+        saveCurrentFrame()
+        frameIndex = (frameIndex + 1) % frames.size
+        currentImage = frames[frameIndex]
     }
 
     /**
      * Update the current image to the previous image in the frame list.
      */
-    public void previousFrame() {
-        if (frames != null) {
-            saveCurrentFrame();
-            frameIndex = (frameIndex + frames.size() - 1) % frames.size();
-            setCurrentImage(frames.get(frameIndex));
-        }
+    fun previousFrame() {
+        saveCurrentFrame()
+        frameIndex = (frameIndex + frames.size - 1) % frames.size
+        currentImage = frames[frameIndex]
     }
 
     /**
      * Returns number of frames in the album
      */
-    public int getNumFrames() {
-        if (frames == null) {
-            return 0;
-        }
-        return frames.size();
-    }
+    val numFrames: Int
+        get() = frames.size
 
     /**
      * Set album to frame aat provided index.
      */
-    public void setFrame(int frameIndex) {
-        if (frameIndex >= 0 && frameIndex < frames.size()) {
-            saveCurrentFrame();
-            setCurrentImage(frames.get(frameIndex));
+    fun setFrame(frameIndex: Int) {
+        if (frameIndex >= 0 && frameIndex < frames.size) {
+            saveCurrentFrame()
+            currentImage = frames[frameIndex]
         }
     }
 
-    public int getFrameIndex() {
-        return frameIndex;
-    }
-
-    public void reset(int width, int height) {
-        frames.clear();
-        frameIndex = 0;
-        setCurrentImage(new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB), true);
+    fun reset(width: Int, height: Int) {
+        frames.clear()
+        frameIndex = 0
+        setCurrentImage(BufferedImage(width, height, BufferedImage.TYPE_INT_RGB), true)
     }
 
     /**
      * Add the current image world image to the album.
      */
-    public void takeSnapshot() {
-        var snapshot = ImageUtilsKt.copy(getCurrentImage());
-        addImage(snapshot);
+    fun takeSnapshot() {
+        val snapshot = currentImage.copy()
+        addImage(snapshot)
     }
 
-    public void saveCurrentFrame() {
-        var snapshot = ImageUtilsKt.copy(getCurrentImage());
-        frames.get(frameIndex).setData(snapshot.getData());
+    fun saveCurrentFrame() {
+        val snapshot = currentImage.copy()
+        frames[frameIndex].data = snapshot.data
     }
 
-    public void deleteCurrentImage() {
-        if (frames.size() == 0) {
-            return;
+    fun deleteCurrentImage() {
+        if (frames.size == 0) {
+            return
         }
-        if (frames.size() == 1) {
-            reset(getCurrentImage().getWidth(), getCurrentImage().getHeight());
-            return;
+        if (frames.size == 1) {
+            reset(currentImage.width, currentImage.height)
+            return
         }
-        frames.remove(frameIndex);
-        frameIndex = (frameIndex + frames.size() - 1) % frames.size();
-        setCurrentImage(frames.get(frameIndex));
+        frames.removeAt(frameIndex)
+        frameIndex = (frameIndex + frames.size - 1) % frames.size
+        currentImage = frames[frameIndex]
     }
 
-    @Nullable
-    @Override
-    public String getId() {
-        return "Image album";
-    }
+    override val id: String
+        get() = "Image album"
 }

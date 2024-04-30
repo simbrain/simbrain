@@ -4,7 +4,7 @@ import org.simbrain.network.NetworkModel
 import org.simbrain.util.Events
 
 /**
- * All Network events are defined here. Main docs at [Event].
+ * All Network events are defined here. Main docs at [Events].
  */
 class NetworkEvents: Events() {
     val zoomToFitPage = NoArgEvent(interval = 20)

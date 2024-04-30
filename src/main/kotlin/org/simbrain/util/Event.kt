@@ -273,8 +273,7 @@ open class Events(val timeout: Duration = 5.seconds): CoroutineScope {
     }
 
     /**
-     * Add events, e.g. neuronAdded.fire(newNeuron), neuronAdded.on{ newNeuron -> ...}.
-     * Functions are the same as in the no-arg case.
+     * Events that take one argument, e.g. neuronAdded.fire(newNeuron), neuronAdded.on{ newNeuron -> ...}.
      */
     inner class OneArgEvent<T>(override val interval: Int = 0, override var timingMode: TimingMode =  TimingMode.Debounce) : EventObject() {
 

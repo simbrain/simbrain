@@ -10,6 +10,7 @@ import org.simbrain.util.place
 /**
  * Demo for studying Room Schema From PDP Chapter 14.
  */
+
 val roomSchemaSim = newSim {
 
     // Basic setup
@@ -18,7 +19,7 @@ val roomSchemaSim = newSim {
     val network = networkComponent.network
 
     // Competitive network
-    val rbm = RestrictedBoltzmannMachine(64, 25)
+    val rbm = RestrictedBoltzmannMachine(40, 25)
     network.addNetworkModel(rbm)
 
     // Neuron Collection and Its Configurations
@@ -81,25 +82,97 @@ val roomSchemaSim = newSim {
         place(networkComponent, 139, 10, 1600, 900)
         createControlPanel("Control Panel", 5, 10) {
             addButton("Kitchen") {
-                nc.getNeuronByLabel("ceiling")?.activation = 1.0
+                nc.clear()
+                rbm.visibleLayer.clear()
                 nc.getNeuronByLabel("oven")?.activation = 1.0
+                nc.getNeuronByLabel("coffee-pot")?.activation = 1.0
+                nc.getNeuronByLabel("cupboard")?.activation = 1.0
+                nc.getNeuronByLabel("toaster")?.activation = 1.0
+                nc.getNeuronByLabel("refrigerator")?.activation = 1.0
+                nc.getNeuronByLabel("sink")?.activation = 1.0
+                nc.getNeuronByLabel("stove")?.activation = 1.0
+                nc.getNeuronByLabel("drapes")?.activation = 1.0
+                nc.getNeuronByLabel("coffee-cup")?.activation = 1.0
+                nc.getNeuronByLabel("clock")?.activation = 1.0
+                nc.getNeuronByLabel("telephone")?.activation = 1.0
+                nc.getNeuronByLabel("small")?.activation = 1.0
+                nc.getNeuronByLabel("window")?.activation = 1.0
+                nc.getNeuronByLabel("walls")?.activation = 1.0
+                nc.getNeuronByLabel("ceiling")?.activation = 1.0
             }
             addButton("Office") {
-                nc.getNeuronByLabel("ceiling")?.activation = 1.0
+                nc.clear()
+                rbm.visibleLayer.clear()
+                nc.getNeuronByLabel("computer")?.activation = 1.0
+                nc.getNeuronByLabel("ash-tray")?.activation = 1.0
+                nc.getNeuronByLabel("coffee-cup")?.activation = 1.0
+                nc.getNeuronByLabel("picture")?.activation = 1.0
+                nc.getNeuronByLabel("desk-chair")?.activation = 1.0
+                nc.getNeuronByLabel("books")?.activation = 1.0
+                nc.getNeuronByLabel("carpet")?.activation = 1.0
+                nc.getNeuronByLabel("bookshelf")?.activation = 1.0
+                nc.getNeuronByLabel("typewriter")?.activation = 1.0
+                nc.getNeuronByLabel("telephone")?.activation = 1.0
                 nc.getNeuronByLabel("desk")?.activation = 1.0
+                nc.getNeuronByLabel("large")?.activation = 1.0
+                nc.getNeuronByLabel("door")?.activation = 1.0
+                nc.getNeuronByLabel("walls")?.activation = 1.0
+                nc.getNeuronByLabel("ceiling")?.activation = 1.0
             }
             addButton("Bathroom") {
-                nc.getNeuronByLabel("ceiling")?.activation = 1.0
+                nc.clear()
+                rbm.visibleLayer.clear()
+                nc.getNeuronByLabel("scale")?.activation = 1.0
+                nc.getNeuronByLabel("toilet")?.activation = 1.0
                 nc.getNeuronByLabel("bathtub")?.activation = 1.0
+                nc.getNeuronByLabel("cupboard")?.activation = 1.0
+                nc.getNeuronByLabel("sink")?.activation = 1.0
+                nc.getNeuronByLabel("very-small")?.activation = 1.0
+                nc.getNeuronByLabel("door")?.activation = 1.0
+                nc.getNeuronByLabel("walls")?.activation = 1.0
+                nc.getNeuronByLabel("ceiling")?.activation = 1.0
             }
             addButton("Living Room") {
-                nc.getNeuronByLabel("ceiling")?.activation = 1.0
+                nc.clear()
+                rbm.visibleLayer.clear()
+                nc.getNeuronByLabel("television")?.activation = 1.0
+                nc.getNeuronByLabel("drapes")?.activation = 1.0
+                nc.getNeuronByLabel("fire-place")?.activation = 1.0
+                nc.getNeuronByLabel("easy-chair")?.activation = 1.0
                 nc.getNeuronByLabel("sofa")?.activation = 1.0
+                nc.getNeuronByLabel("floor-lamp")?.activation = 1.0
+                nc.getNeuronByLabel("picture")?.activation = 1.0
+                nc.getNeuronByLabel("clock")?.activation = 1.0
+                nc.getNeuronByLabel("books")?.activation = 1.0
+                nc.getNeuronByLabel("carpet")?.activation = 1.0
+                nc.getNeuronByLabel("bookshelf")?.activation = 1.0
+                nc.getNeuronByLabel("telephone")?.activation = 1.0
+                nc.getNeuronByLabel("very-large")?.activation = 1.0
+                nc.getNeuronByLabel("window")?.activation = 1.0
+                nc.getNeuronByLabel("door")?.activation = 1.0
+                nc.getNeuronByLabel("walls")?.activation = 1.0
+                nc.getNeuronByLabel("ceiling")?.activation = 1.0
             }
             addButton("Bedroom") {
-                nc.getNeuronByLabel("ceiling")?.activation = 1.0
+                nc.clear()
+                rbm.visibleLayer.clear()
+                nc.getNeuronByLabel("coat-hanger")?.activation = 1.0
+                nc.getNeuronByLabel("television")?.activation = 1.0
+                nc.getNeuronByLabel("dresser")?.activation = 1.0
+                nc.getNeuronByLabel("drapes")?.activation = 1.0
+                nc.getNeuronByLabel("picture")?.activation = 1.0
+                nc.getNeuronByLabel("clock")?.activation = 1.0
+                nc.getNeuronByLabel("books")?.activation = 1.0
+                nc.getNeuronByLabel("carpet")?.activation = 1.0
+                nc.getNeuronByLabel("bookshelf")?.activation = 1.0
                 nc.getNeuronByLabel("bed")?.activation = 1.0
+                nc.getNeuronByLabel("medium")?.activation = 1.0
+                nc.getNeuronByLabel("window")?.activation = 1.0
+                nc.getNeuronByLabel("door")?.activation = 1.0
+                nc.getNeuronByLabel("walls")?.activation = 1.0
+                nc.getNeuronByLabel("ceiling")?.activation = 1.0
             }
         }
     }
+
 }

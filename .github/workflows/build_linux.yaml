@@ -1,0 +1,33 @@
+name: build_linux
+
+on:
+  push:
+    branches:
+      - Simbrain4
+
+jobs:
+  build:
+    if: contains(github.event.head_commit.message, '[push]')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v3
+      - name: Build with Gradle
+        run: ./gradlew createZip
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli
+
+      - name: Configure AWS CLI for Cloudflare R2
+        run: |
+          aws configure set aws_access_key_id ${{ secrets.R2_ACCESS_KEY }}
+          aws configure set aws_secret_access_key ${{ secrets.R2_SECRET_KEY }}
+          aws configure set default.region none
+
+      - name: Upload to Cloudflare R2
+        run: |
+          aws s3 cp build/distributions/Simbrain*.zip s3://${{ secrets.CLOUDFLARE_R2_BUCKET }}/ --endpoint-url=https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
+

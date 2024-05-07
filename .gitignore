@@ -2,8 +2,6 @@
 /build/*
 /dist
 .gradle
-gradlew*
-/gradle/*
 /scripts/scriptmenu/archives
 *.sublime-project
 *.sublime-workspace

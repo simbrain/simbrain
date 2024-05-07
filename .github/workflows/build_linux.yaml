@@ -30,4 +30,3 @@ jobs:
       - name: Upload to Cloudflare R2
         run: |
           aws s3 cp build/distributions/Simbrain*.zip s3://${{ secrets.CLOUDFLARE_R2_BUCKET }}/ --endpoint-url=https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
-

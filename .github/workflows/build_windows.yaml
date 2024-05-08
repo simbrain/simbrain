@@ -19,9 +19,11 @@ jobs:
           java-version: '17'
       - name: Install Windows SDK
         run: choco install windows-sdk-10
-      - name: Install Certificate to Store
+      - name: Install Certificate to Store and Clean Up
         run: |
-          [System.Convert]::FromBase64String("${{ secrets.CERTIFICATE_ENCODED }}") | Set-Content -Path "simbrain.p12" -Encoding Byte
+          $base64EncodedCert = "${{ secrets.CERTIFICATE_ENCODED }}"
+          $certBytes = [System.Convert]::FromBase64String($base64EncodedCert)
+          [System.IO.File]::WriteAllBytes("simbrain.p12", $certBytes)
           Import-PfxCertificate -FilePath "simbrain.p12" -CertStoreLocation Cert:\LocalMachine\My
           Remove-Item -Path "simbrain.p12" -Force
       - name: Setup Gradle

@@ -33,7 +33,7 @@ jobs:
         run: |
           aws configure set aws_access_key_id $R2_ACCESS_KEY
           aws configure set aws_secret_access_key $R2_SECRET_KEY
-          aws configure set default.region none
+          aws configure set default.region auto
 
       - name: Upload to Cloudflare R2
         env:

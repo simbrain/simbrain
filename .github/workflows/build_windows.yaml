@@ -24,7 +24,8 @@ jobs:
           $base64EncodedCert = "${{ secrets.CERTIFICATE_ENCODED }}"
           $certBytes = [System.Convert]::FromBase64String($base64EncodedCert)
           [System.IO.File]::WriteAllBytes("simbrain.p12", $certBytes)
-          Import-PfxCertificate -FilePath "simbrain.p12" -CertStoreLocation Cert:\LocalMachine\My
+          $pfxPassword = ConvertTo-SecureString -String "${{ secrets.CERTIFICATE_PASSWORD }}" -AsPlainText -Force
+          Import-PfxCertificate -FilePath "simbrain.p12" -CertStoreLocation Cert:\LocalMachine\My -Password $pfxPassword
           Remove-Item -Path "simbrain.p12" -Force
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3

@@ -17,10 +17,17 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: '17'
+      - name: Install Windows SDK
+        run: choco install windows-sdk-10
+      - name: Install Certificate to Store
+        run: |
+          [System.Convert]::FromBase64String("${{ secrets.CERTIFICATE_ENCODED }}") | Set-Content -Path "simbrain.p12" -Encoding Byte
+          Import-PfxCertificate -FilePath "simbrain.p12" -CertStoreLocation Cert:\LocalMachine\My
+          Remove-Item -Path "simbrain.p12" -Force
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
       - name: Build with Gradle
-        run: ./gradlew jpackageWindows
+        run: ./gradlew signWindowsApp
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:

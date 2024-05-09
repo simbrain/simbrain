@@ -479,13 +479,22 @@ fun findWindowsSignTool(): String {
         throw GradleException("No SDK version found in Windows Kits folder")
     }
 
-    // Sort SDK versions in descending order and find the highest version
     val highestSdkVersion = sdkVersions.sortedByDescending { it.name }.first()
-    val signToolPath = File(highestSdkVersion, "x64/SignTool.exe")
+    val signToolFiles = findSignToolRecursive(File(highestSdkVersion, "x64"))
 
-    if (!signToolPath.exists()) {
+    if (signToolFiles.isEmpty()) {
         throw GradleException("SignTool.exe not found in the highest SDK version folder")
     }
 
-    return signToolPath.absolutePath
+    return signToolFiles.first().absolutePath
+}
+
+fun findSignToolRecursive(directory: File): List<File> {
+    val foundFiles = mutableListOf<File>()
+    directory.walk().forEach {
+        if (it.isFile && it.name.equals("signtool.exe", ignoreCase = true)) {
+            foundFiles.add(it)
+        }
+    }
+    return foundFiles
 }

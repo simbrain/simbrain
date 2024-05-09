@@ -1,0 +1,68 @@
+name: build_macos
+
+on:
+  push:
+    branches:
+      - Simbrain4
+
+jobs:
+  build:
+    if: contains(github.event.head_commit.message, '[push macos]')
+    runs-on: macos-latest
+    environment: macos
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v1
+        with:
+          java-version: '17'
+      - name: Install Apple Certificate
+        env:
+          CERTIFICATE_BASE64: ${{ secrets.MAC_CERTIFICATE }}
+        run: |
+          echo $CERTIFICATE_BASE64 | base64 --decode > certificate.p12
+          security create-keychain -p "" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          security import certificate.p12 -k build.keychain -T /usr/bin/codesign
+          security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
+          security list-keychains -s build.keychain
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+      - name: Build with Gradle
+        run: ./gradlew createMacDmg
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: Simbrain-Windows
+          path: build/dist/Simbrain*.dmg
+  push:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: cloudflare
+    steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: Simbrain-Windows
+      - name: Install AWS CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y awscli
+
+      - name: Configure AWS CLI for Cloudflare R2
+        env:
+          R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
+          R2_SECRET_KEY: ${{ secrets.R2_SECRET_KEY }}
+        run: |
+          aws configure set aws_access_key_id $R2_ACCESS_KEY
+          aws configure set aws_secret_access_key $R2_SECRET_KEY
+          aws configure set default.region auto
+
+      - name: Upload to Cloudflare R2
+        env:
+          CLOUDFLARE_R2_BUCKET: ${{ secrets.CLOUDFLARE_R2_BUCKET }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          aws s3 cp Simbrain*.dmg s3://$CLOUDFLARE_R2_BUCKET/ --endpoint-url=https://$CLOUDFLARE_ACCOUNT_ID.r2.cloudflarestorage.com

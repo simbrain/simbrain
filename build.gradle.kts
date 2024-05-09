@@ -483,6 +483,8 @@ fun findWindowsSignTool(): String {
     val signToolFiles = findSignToolRecursive(File(highestSdkVersion, "x64"))
 
     if (signToolFiles.isEmpty()) {
+        println("Dumping directory structure for debugging:")
+        dumpDirectoryTree(windowsKitsFolder)
         throw GradleException("SignTool.exe not found in the highest SDK version folder")
     }
 
@@ -497,4 +499,14 @@ fun findSignToolRecursive(directory: File): List<File> {
         }
     }
     return foundFiles
+}
+fun dumpDirectoryTree(directory: File, prefix: String = "") {
+    directory.listFiles()?.forEach {
+        if (it.isDirectory) {
+            println("$prefix${it.name}/")
+            dumpDirectoryTree(it, "$prefix${it.name}/")
+        } else {
+            println("$prefix${it.name}")
+        }
+    }
 }

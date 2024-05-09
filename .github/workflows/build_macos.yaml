@@ -20,12 +20,13 @@ jobs:
       - name: Install Apple Certificate
         env:
           CERTIFICATE_BASE64: ${{ secrets.MAC_CERTIFICATE }}
+          CERTIFICATE_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
         run: |
           echo $CERTIFICATE_BASE64 | base64 --decode > certificate.p12
           security create-keychain -p "" build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p "" build.keychain
-          security import certificate.p12 -k build.keychain -T /usr/bin/codesign
+          security import certificate.p12 -k build.keychain -P $CERTIFICATE_PASSWORD -T /usr/bin/codesign
           security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
           security list-keychains -s build.keychain
       - name: Setup Gradle

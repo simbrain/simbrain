@@ -362,7 +362,18 @@ if (OperatingSystem.current().isWindows) {
             }
 
             executable(signtool)
-            args("sign", "/a", "/fd", "SHA256", appPath)
+            args(
+                "sign",
+                "/v",
+                "/sm",
+                "/s",
+                "My",
+                "/sha1",
+                System.getenv("CERTIFICATE_SHA1"),
+                "/fd",
+                "SHA256",
+                appPath
+            )
         }
     }
 

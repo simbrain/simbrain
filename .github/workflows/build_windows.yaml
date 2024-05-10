@@ -19,19 +19,6 @@ jobs:
           java-version: '17'
       - name: Install Windows SDK
         run: choco install windows-sdk-10
-      - name: Set SignTool Path
-        run: |
-          $sdkPath = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\" -Directory | Sort-Object Name -Descending | Select-Object -First 1
-          $signToolPath = Join-Path $sdkPath.FullName "x64\signtool.exe"
-          if (Test-Path $signToolPath) {
-            echo "SIGNGTOOL_PATH=${signToolPath}" | Out-File -Append -FilePath $env:GITHUB_ENV
-          } else {
-            Write-Error "SignTool not found"
-            exit 1
-          }
-      - name: Check SignTool Availability
-        run: |
-          Write-Host "Using SignTool from: $env:SIGNGTOOL_PATH"
       - name: Install Certificate to Store and Clean Up
         run: |
           $base64EncodedCert = "${{ secrets.CERTIFICATE_ENCODED }}"
@@ -39,15 +26,10 @@ jobs:
           [System.IO.File]::WriteAllBytes("simbrain.p12", $certBytes)
           $pfxPassword = ConvertTo-SecureString -String "${{ secrets.CERTIFICATE_PASSWORD }}" -AsPlainText -Force
           Import-PfxCertificate -FilePath "simbrain.p12" -CertStoreLocation Cert:\LocalMachine\My -Password $pfxPassword
-          Remove-Item -Path "simbrain.p12" -Force
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
       - name: Build with Gradle
-        run: ./gradlew jpackageWindows
-      - name: Sign Executable
-        run: |
-          $cert = Get-ChildItem -Path Cert:\LocalMachine\My | Where-Object { $_.Subject -like "*CN=University*" }
-          SignTool sign /fd SHA256 /a /f $cert.PSPath build/dist/Simbrain*.exe
+        run: ./gradlew signWindowsApp
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:

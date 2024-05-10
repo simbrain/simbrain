@@ -19,6 +19,19 @@ jobs:
           java-version: '17'
       - name: Install Windows SDK
         run: choco install windows-sdk-10
+      - name: Set SignTool Path
+        run: |
+          $sdkPath = Get-ChildItem "C:\Program Files (x86)\Windows Kits\10\bin\" -Directory | Sort-Object Name -Descending | Select-Object -First 1
+          $signToolPath = Join-Path $sdkPath.FullName "x64\signtool.exe"
+          if (Test-Path $signToolPath) {
+            echo "SIGNGTOOL_PATH=${signToolPath}" | Out-File -Append -FilePath $env:GITHUB_ENV
+          } else {
+            Write-Error "SignTool not found"
+            exit 1
+          }
+      - name: Check SignTool Availability
+        run: |
+          Write-Host "Using SignTool from: $env:SIGNGTOOL_PATH"
       - name: Install Certificate to Store and Clean Up
         run: |
           $base64EncodedCert = "${{ secrets.CERTIFICATE_ENCODED }}"

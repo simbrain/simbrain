@@ -3,7 +3,7 @@ name: build_windows
 on:
   push:
     branches:
-      - ci-test
+      - Simbrain4
 
 jobs:
   build:

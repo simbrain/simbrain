@@ -3,7 +3,7 @@ name: build_macos
 on:
   push:
     branches:
-      - Simbrain4
+      - build_macos
 
 jobs:
   build:

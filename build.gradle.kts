@@ -220,7 +220,9 @@ if (OperatingSystem.current().isMacOsX) {
 
             // Set up the jpackage command and its arguments
             executable(jpackagePath)
-            args("--input", buildMain,
+            args(
+                "--verbose",
+                "--input", buildMain,
                 "--main-jar", "Simbrain.jar",
                 "--dest", dist,
                 "--name", "Simbrain",

@@ -385,6 +385,8 @@ if (OperatingSystem.current().isWindows) {
                 val success = oldFile.renameTo(newFile)
                 if (!success) {
                     throw GradleException("Failed to rename file from ${oldFile.name} to ${newFile.name}.")
+                } else {
+                    println("Signed executable is available at ${newFile.absolutePath}")
                 }
             } else {
                 throw GradleException("File ${oldFile.name} does not exist.")

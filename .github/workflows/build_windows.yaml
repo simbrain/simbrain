@@ -45,11 +45,12 @@ jobs:
       - name: Upload to Cloudflare R2
         shell: pwsh
         run: |
-          $files = Get-ChildItem -Path . -Filter 'Simbrain*.exe'
+          $path = '.\build\dist'
+          $files = Get-ChildItem -Path $path -Filter 'Simbrain*.exe'
           if ($files.Count -eq 1) {
             aws s3 cp $files[0].FullName s3://${{ secrets.CLOUDFLARE_R2_BUCKET }}/ --endpoint-url=https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
           } elseif ($files.Count -eq 0) {
-            Write-Error "No files found matching the pattern 'Simbrain*.exe'"
+            Write-Error "No files found matching the pattern 'Simbrain*.exe' in $path"
           } else {
-            Write-Error "Multiple files found matching the pattern 'Simbrain*.exe'. Only one file is expected."
+            Write-Error "Multiple files found matching the pattern 'Simbrain*.exe' in $path. Only one file is expected."
           }

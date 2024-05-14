@@ -32,24 +32,9 @@ jobs:
         run: ./gradlew signWindowsApp
         env:
           CERTIFICATE_SHA1: ${{ vars.CERTIFICATE_SHA1 }}
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: Simbrain-Windows
-          path: build/dist/Simbrain*.exe
-  push:
-    needs: build
-    runs-on: ubuntu-latest
-    environment: cloudflare
-    steps:
-      - name: Download Artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: Simbrain-Windows
       - name: Install AWS CLI
         run: |
-          sudo apt-get update
-          sudo apt-get install -y awscli
+          choco install awscli -y
 
       - name: Configure AWS CLI for Cloudflare R2
         env:

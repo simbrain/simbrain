@@ -1,6 +1,7 @@
 import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.ByteArrayOutputStream
+import java.time.Duration
 
 plugins {
     `java-library`
@@ -234,6 +235,12 @@ if (OperatingSystem.current().isMacOsX) {
                 "--type", "app-image"
             )
         }
+
+        // Timeout after 10 minutes if hanging
+        timeout.set(Duration.ofMinutes(10L))
+        // Redirect output and error streams to help with debugging
+        standardOutput = System.out
+        errorOutput = System.err
     }
 
     open class NotarizeMacApp: DefaultTask() {

@@ -21,7 +21,6 @@ jobs:
         env:
           CERTIFICATE_BASE64: ${{ secrets.MAC_CERTIFICATE }}
           CERTIFICATE_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
-          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
         run: |
           echo $CERTIFICATE_BASE64 | base64 --decode > certificate.p12
           security import certificate.p12 -k login.keychain -P $CERTIFICATE_PASSWORD -T /usr/bin/codesign

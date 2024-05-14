@@ -37,25 +37,10 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
       - name: Build with Gradle
         run: ./gradlew createMacDmg
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: Simbrain-Windows
-          path: build/dist/Simbrain*.dmg
-  push:
-    needs: build
-    runs-on: ubuntu-latest
-    environment: cloudflare
-    steps:
-      - name: Download Artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: Simbrain-Windows
       - name: Install AWS CLI
         run: |
-          sudo apt-get update
-          sudo apt-get install -y awscli
-
+          brew update
+          brew install awscli
       - name: Configure AWS CLI for Cloudflare R2
         env:
           R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}

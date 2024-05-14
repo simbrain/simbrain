@@ -243,6 +243,11 @@ if (OperatingSystem.current().isMacOsX) {
         errorOutput = System.err
     }
 
+    tasks.named("jpackageMacOS").configure {
+        logging.captureStandardOutput(LogLevel.INFO)
+        logging.captureStandardError(LogLevel.ERROR)
+    }
+
     open class NotarizeMacApp: DefaultTask() {
 
         @Input

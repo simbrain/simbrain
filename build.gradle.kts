@@ -227,6 +227,8 @@ if (OperatingSystem.current().isMacOsX) {
                 "--dest", dist,
                 "--name", "Simbrain",
                 "--app-version", project.version,
+                "--mac-sign",
+                "--mac-signing-key-user-name", "Regents of the University of CA, Merced (W8BB6W47ZR)",
                 "--icon", iconFile,
                 "--java-options", jvmArgs,
                 "--type", "app-image"

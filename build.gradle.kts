@@ -375,6 +375,21 @@ if (OperatingSystem.current().isWindows) {
                 appPath
             )
         }
+
+        doLast {
+            val distDir = file(dist)
+            val oldFile = File(distDir, "Simbrain-${project.version}.exe")
+            val newFile = File(distDir, "Simbrain${versionName}.exe")
+
+            if (oldFile.exists()) {
+                val success = oldFile.renameTo(newFile)
+                if (!success) {
+                    throw GradleException("Failed to rename file from ${oldFile.name} to ${newFile.name}.")
+                }
+            } else {
+                throw GradleException("File ${oldFile.name} does not exist.")
+            }
+        }
     }
 
     tasks.register<Exec>("pushWindowsInstaller") {

@@ -21,38 +21,26 @@ jobs:
         env:
           CERTIFICATE_BASE64: ${{ secrets.MAC_CERTIFICATE }}
           CERTIFICATE_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
         run: |
           echo $CERTIFICATE_BASE64 | base64 --decode > certificate.p12
-          security create-keychain -p "" build.keychain
+          security create-keychain -p "${KEYCHAIN_PASSWORD}" build.keychain
           security default-keychain -s build.keychain
-          security unlock-keychain -p "" build.keychain
+          security unlock-keychain -p "${KEYCHAIN_PASSWORD}" build.keychain
           security import certificate.p12 -k build.keychain -P $CERTIFICATE_PASSWORD -T /usr/bin/codesign
-          security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "${KEYCHAIN_PASSWORD}" build.keychain 
           security list-keychains -s build.keychain
           rm -f certificate.p12
+      - name: Verify Certificate
+        run: security find-identity -p codesigning -v
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
       - name: Build with Gradle
         run: ./gradlew createMacDmg
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: Simbrain-Windows
-          path: build/dist/Simbrain*.dmg
-  push:
-    needs: build
-    runs-on: ubuntu-latest
-    environment: cloudflare
-    steps:
-      - name: Download Artifact
-        uses: actions/download-artifact@v2
-        with:
-          name: Simbrain-Windows
       - name: Install AWS CLI
         run: |
-          sudo apt-get update
-          sudo apt-get install -y awscli
-
+          brew update
+          brew install awscli
       - name: Configure AWS CLI for Cloudflare R2
         env:
           R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
@@ -67,4 +55,4 @@ jobs:
           CLOUDFLARE_R2_BUCKET: ${{ secrets.CLOUDFLARE_R2_BUCKET }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          aws s3 cp Simbrain*.dmg s3://$CLOUDFLARE_R2_BUCKET/ --endpoint-url=https://$CLOUDFLARE_ACCOUNT_ID.r2.cloudflarestorage.com
+          aws s3 cp build/dist/Simbrain*.dmg s3://$CLOUDFLARE_R2_BUCKET/ --endpoint-url=https://$CLOUDFLARE_ACCOUNT_ID.r2.cloudflarestorage.com

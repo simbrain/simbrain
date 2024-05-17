@@ -1,6 +1,7 @@
 import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.ByteArrayOutputStream
+import java.time.Duration
 
 plugins {
     `java-library`
@@ -220,7 +221,9 @@ if (OperatingSystem.current().isMacOsX) {
 
             // Set up the jpackage command and its arguments
             executable(jpackagePath)
-            args("--input", buildMain,
+            args(
+                "--verbose",
+                "--input", buildMain,
                 "--main-jar", "Simbrain.jar",
                 "--dest", dist,
                 "--name", "Simbrain",
@@ -232,6 +235,17 @@ if (OperatingSystem.current().isMacOsX) {
                 "--type", "app-image"
             )
         }
+
+        // Timeout after 10 minutes if hanging
+        timeout.set(Duration.ofMinutes(10L))
+        // Redirect output and error streams to help with debugging
+        standardOutput = System.out
+        errorOutput = System.err
+    }
+
+    tasks.named("jpackageMacOS").configure {
+        logging.captureStandardOutput(LogLevel.INFO)
+        logging.captureStandardError(LogLevel.ERROR)
     }
 
     open class NotarizeMacApp: DefaultTask() {

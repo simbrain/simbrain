@@ -17,7 +17,6 @@ val version = "4.0.0"
 val docs = "docs"
 val dist = "${buildDir}/dist"
 val buildMain = "${buildDir}/main"
-val pushDest = System.getenv("DEST") ?: ""
 
 project.version = version
 
@@ -314,12 +313,6 @@ if (OperatingSystem.current().isMacOsX) {
             args("create", "-volname", "Simbrain", "-srcfolder", appPath, "-ov", "-format", "UDZO", dmgPath)
         }
     }
-
-    tasks.register<Exec>("pushMacInstaller") {
-        onlyIf { OperatingSystem.current().isMacOsX && pushDest.isNotEmpty() }
-        val dmgPath = "${dist}/Simbrain${versionName}.dmg"
-        commandLine("rsync", dmgPath, "-avzP", "-e", "ssh", pushDest)
-    }
 }
 
 if (OperatingSystem.current().isWindows) {
@@ -407,24 +400,6 @@ if (OperatingSystem.current().isWindows) {
             }
         }
     }
-
-    tasks.register<Exec>("pushWindowsInstaller") {
-
-        onlyIf { OperatingSystem.current().isWindows && pushDest.isNotEmpty() }
-
-        dependsOn("signWindowsApp")
-
-        doFirst {
-            copy {
-                from(dist)
-                into(dist)
-                include("Simbrain-${project.version}.exe")
-                rename("Simbrain-${project.version}.exe", "Simbrain${versionName}.exe")
-            }
-        }
-        val exePath = "${dist}/Simbrain${versionName}.exe"
-        commandLine("rsync", exePath, "-avzP", "-e", "ssh", pushDest)
-    }
 }
 
 /**
@@ -499,15 +474,6 @@ tasks.register<Zip>("createZip") {
         into(dir)
         rename { "run.sh" }
     }
-}
-
-tasks.register<Exec>("pushZip") {
-    onlyIf { pushDest.isNotEmpty() }
-    dependsOn("createZip")
-
-    val zipPath = "${dist}/Simbrain${versionName}.zip"
-
-    commandLine("rsync", zipPath, "-avzP", "-e", "ssh", pushDest)
 }
 
 fun findWindowsSignTool(): String {

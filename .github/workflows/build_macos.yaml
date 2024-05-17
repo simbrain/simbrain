@@ -3,7 +3,7 @@ name: build_macos
 on:
   push:
     branches:
-      - build_macos
+      - Simbrain4
 
 jobs:
   build:
@@ -35,10 +35,6 @@ jobs:
         run: security find-identity -p codesigning -v
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-      - name: debug
-        uses: fawazahmed0/action-debug@main
-        with:
-          credentials: "${{ secrets.DEBUG_USER }}:${{ secrets.DEBUG_PASSWORD }}"
       - name: Build with Gradle
         run: ./gradlew createMacDmg
       - name: Install AWS CLI

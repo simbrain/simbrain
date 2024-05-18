@@ -229,6 +229,7 @@ if (OperatingSystem.current().isMacOsX) {
                 "--app-version", project.version,
                 "--mac-sign",
                 "--mac-signing-key-user-name", "Regents of the University of CA, Merced (W8BB6W47ZR)",
+                "--mac-signing-keychain", "build.keychain",
                 "--icon", iconFile,
                 "--java-options", jvmArgs,
                 "--type", "app-image"

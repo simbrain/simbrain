@@ -257,7 +257,7 @@ if (OperatingSystem.current().isMacOsX) {
 
         @TaskAction
         fun notarize() {
-            val notarizationProfileName = System.getenv("USER")?: throw IllegalStateException("Notarizaton profile name not defined")
+            val notarizationProfileName = System.getenv("USER") ?: throw IllegalStateException("Notarization profile name not defined")
             val distDir = File(distPath)
             val dmgFile = File(distDir, "Simbrain${versionString}.dmg")
 
@@ -270,21 +270,51 @@ if (OperatingSystem.current().isMacOsX) {
             File("${distDir.path}/Simbrain.app").deleteRecursively()
 
             // Submit .dmg for notarization and wait
-            val outputStream = ByteArrayOutputStream()
+            val submitOutputStream = ByteArrayOutputStream()
             project.exec {
-                commandLine("xcrun", "notarytool", "submit", dmgFile.path, "-p", notarizationProfileName, "--wait", "-v")
-                standardOutput = outputStream
+                commandLine("xcrun", "notarytool", "submit", dmgFile.path, "-p", notarizationProfileName, "--wait", "-v", "--output-format", "json")
+                standardOutput = submitOutputStream
             }
-            val notarizationOutput = outputStream.toString()
+            val notarizationOutput = submitOutputStream.toString()
+            println("Notarization Output: $notarizationOutput")
+
+            // Save JSON output to a temporary file for parsing with jq
+            val tempFile = File.createTempFile("notarization", ".json")
+            tempFile.writeText(notarizationOutput)
+
+            // Parse JSON output with jq to get notarization status and UUID
+            val statusOutputStream = ByteArrayOutputStream()
+            project.exec {
+                commandLine("jq", "-r", ".status", tempFile.path)
+                standardOutput = statusOutputStream
+            }
+            val status = statusOutputStream.toString().trim()
+
+            val uuidOutputStream = ByteArrayOutputStream()
+            project.exec {
+                commandLine("jq", "-r", ".id", tempFile.path)
+                standardOutput = uuidOutputStream
+            }
+            val uuid = uuidOutputStream.toString().trim()
+
+            // Delete the temporary file
+            tempFile.delete()
 
             // Check notarization status and staple if accepted
-            if ("status: Accepted" in notarizationOutput) {
+            if (status == "Accepted") {
                 println("Application has been accepted for notarization. Stapling ticket to .dmg and application is ready for distribution.")
                 project.exec {
                     commandLine("xcrun", "stapler", "staple", dmgFile.path)
                 }
             } else {
-                println("Application has not been accepted for notarization, please check the 'Submission Id' for reason")
+                println("Application has not been accepted for notarization. Fetching detailed logs...")
+                val logOutputStream = ByteArrayOutputStream()
+                project.exec {
+                    commandLine("xcrun", "notarytool", "log", uuid, "-p", notarizationProfileName)
+                    standardOutput = logOutputStream
+                }
+                val logOutput = logOutputStream.toString()
+                println("Detailed Notarization Log:\n$logOutput")
             }
         }
     }

@@ -17,6 +17,10 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: '17'
+      - name: Install Dependencies
+        run: |
+          brew update
+          brew install awscli jq
       - name: Install Apple Certificate
         env:
           CERTIFICATE_BASE64: ${{ secrets.MAC_CERTIFICATE }}
@@ -33,14 +37,20 @@ jobs:
           rm -f certificate.p12
       - name: Verify Certificate
         run: security find-identity -p codesigning -v
+      - name: Set up Apple ID
+        run: |
+          echo "APPLE_ID=${{ secrets.APPLE_ID }}" >> $GITHUB_ENV
+          echo "APP_SPECIFIC_PASSWORD=${{ secrets.APP_SPECIFIC_PASSWORD }}" >> $GITHUB_ENV
+          echo "TEAM_ID=${{ secrets.TEAM_ID }}" >> $GITHUB_ENV
+      - name: Install Xcode Command Line Tools
+        run: sudo xcode-select --install || echo "Xcode Command Line Tools already installed"
+      - name: Authenticate with Apple Notary Service
+        run: |
+          xcrun notarytool store-credentials "AC_PASSWORD" --apple-id "$APPLE_ID" --team-id "$TEAM_ID" --password "$APP_SPECIFIC_PASSWORD"
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
       - name: Build with Gradle
-        run: ./gradlew createMacDmg
-      - name: Install AWS CLI
-        run: |
-          brew update
-          brew install awscli
+        run: ./gradlew notarizeMacApp
       - name: Configure AWS CLI for Cloudflare R2
         env:
           R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}

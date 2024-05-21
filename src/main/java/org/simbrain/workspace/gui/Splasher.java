@@ -18,14 +18,9 @@
  */
 package org.simbrain.workspace.gui;
 
-import org.jetbrains.kotlinx.dl.api.core.Sequential;
-import org.jetbrains.kotlinx.dl.api.core.layer.core.Dense;
-import org.jetbrains.kotlinx.dl.api.core.layer.core.Input;
 import org.simbrain.util.ResourceManager;
-import org.simbrain.util.Utils;
 import smile.math.blas.BLAS;
 
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -64,9 +59,9 @@ public class Splasher {
         BLAS.engine.iamax(new float[]{1f, 2f, 3f});
 
         // Same hack as above, for deep net engine
-        if (!Utils.isMacOSX() && !Utils.isLinux()) {
-            var dummyDeepNet = Sequential.of(List.of(new Input(new long[]{1L},""), new Dense()),false);
-        }
+        // if (!Utils.isMacOSX() && !Utils.isLinux()) {
+        //     var dummyDeepNet = Sequential.of(List.of(new Input(new long[]{1L},""), new Dense()),false);
+        // }
 
         SplashWindow.splash(ResourceManager.getImage("simbrain-logo.gif"));
         SplashWindow.invokeMain("org.simbrain.workspace.gui.SimbrainDesktop", args);

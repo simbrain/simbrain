@@ -51,11 +51,6 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.3")
 
-    // Kotlin DL
-    implementation("org.jetbrains.kotlinx:kotlin-deeplearning-tensorflow:0.5.2")
-    implementation("org.jetbrains.kotlinx:kotlin-deeplearning-dataset:0.5.2")
-    implementation("org.jetbrains.kotlinx:kotlin-deeplearning-dataset-jvm:0.5.2")
-
     // Smile
     implementation(group = "com.github.haifengl", name = "smile-core", version = "3.0.1")
     implementation("com.github.haifengl:smile-kotlin:3.0.1")

@@ -104,9 +104,9 @@ val simulations = dir<Any>("Simulations") {
         item("Recurrent network") { recurrentProjection }
         item("SOM Network") { SOMSim }
         item("Iris Classifier") { irisClassifier }
-        item("Deep Net - Mnist") { deepNetSim }
+        // item("Deep Net - Mnist") { deepNetSim }
         item("Spiking Neuron") { spikingNetwork }
-        item("Mnist Images") { mnistSim }
+        // item("Mnist Images") { mnistSim }
         item("Image World") { imageWorldSim }
         item("LSTM") { lstmBlock() }
     }

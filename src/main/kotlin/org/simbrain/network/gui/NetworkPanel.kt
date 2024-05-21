@@ -15,7 +15,6 @@ import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.gui.nodes.neuronGroupNodes.SOMGroupNode
 import org.simbrain.network.gui.nodes.subnetworkNodes.*
-import org.simbrain.network.kotlindl.DeepNet
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.neurongroups.SOMGroup
 import org.simbrain.network.smile.SmileClassifier
@@ -305,7 +304,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             is Subnetwork -> createNode(model)
             is InfoText -> createNode(model)
             is NetworkTextObject -> createNode(model)
-            is DeepNet -> createNode(model)
+            // is DeepNet -> createNode(model)
             else -> throw IllegalArgumentException()
         }.also { modelNodeMap[model] = it }
     }
@@ -350,9 +349,9 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         SmileClassifierNode(this, classifier)
     }
 
-    fun createNode(dn: DeepNet) = addScreenElement {
-        DeepNetNode(this, dn)
-    }
+    // fun createNode(dn: DeepNet) = addScreenElement {
+    //     DeepNetNode(this, dn)
+    // }
 
     fun createNode(neuronCollection: NeuronCollection) = addScreenElement {
         val neuronNodes = neuronCollection.neuronList.map {

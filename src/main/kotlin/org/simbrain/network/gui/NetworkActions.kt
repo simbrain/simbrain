@@ -417,26 +417,26 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         networkPanel.network.update()
     }
 
-    val addDeepNetAction = if (Utils.isM1Mac()) {
-        networkPanel.createAction(
-            name = "Add Deep Network...",
-            description = "Deep Network is not currently supported on M1 Macs",
-            keyboardShortcut = CmdOrCtrl + Shift + 'D'
-        ) {
-            JOptionPane.showConfirmDialog(
-                null,
-                "Deep Network / TensorFlow for Java is not currently supported on M1 Macs."
-            )
-        }.also { it.isEnabled = false }
-    } else {
-        networkPanel.createAction(
-            name = "Add Deep Network...",
-            description = "Create a new deep network",
-            keyboardShortcut = CmdOrCtrl + Shift + 'D'
-        ) {
-            showDeepNetCreationDialog()
-        }
-    }
+    // val addDeepNetAction = if (Utils.isM1Mac()) {
+    //     networkPanel.createAction(
+    //         name = "Add Deep Network...",
+    //         description = "Deep Network is not currently supported on M1 Macs",
+    //         keyboardShortcut = CmdOrCtrl + Shift + 'D'
+    //     ) {
+    //         JOptionPane.showConfirmDialog(
+    //             null,
+    //             "Deep Network / TensorFlow for Java is not currently supported on M1 Macs."
+    //         )
+    //     }.also { it.isEnabled = false }
+    // } else {
+    //     networkPanel.createAction(
+    //         name = "Add Deep Network...",
+    //         description = "Create a new deep network",
+    //         keyboardShortcut = CmdOrCtrl + Shift + 'D'
+    //     ) {
+    //         showDeepNetCreationDialog()
+    //     }
+    // }
 
     /**
      * Should be called from a combo box menu item

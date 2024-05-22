@@ -261,10 +261,10 @@ if (OperatingSystem.current().isMacOsX) {
                 "--app-version", project.version,
                 "--mac-sign",
                 "--mac-signing-key-user-name", "Regents of the University of CA, Merced (W8BB6W47ZR)",
-                "--mac-signing-keychain", "build.keychain",
+                "--mac-signing-keychain", "~/Library/Keychains/build.keychain",
                 "--icon", iconFile,
                 "--java-options", jvmArgs,
-                "--type", "app-image"
+                "--type", "dmg"
             )
         }
 
@@ -293,14 +293,6 @@ if (OperatingSystem.current().isMacOsX) {
             val notarizationProfileName = System.getenv("USER") ?: throw IllegalStateException("Notarization profile name not defined")
             val distDir = File(distPath)
             val dmgFile = File(distDir, "Simbrain${versionString}.dmg")
-
-            // Create .dmg file
-            project.exec {
-                commandLine("hdiutil", "create", "-volname", versionString, "-srcfolder", "${distDir.path}/Simbrain.app", "-ov", "-format", "UDZO", dmgFile.path)
-            }
-
-            // Delete Simbrain.app
-            File("${distDir.path}/Simbrain.app").deleteRecursively()
 
             // Submit .dmg for notarization and wait
             val submitOutputStream = ByteArrayOutputStream()

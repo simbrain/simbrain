@@ -46,6 +46,13 @@ repositories {
 
 val openBlasVersion =  "0.3.26-1.5.10"
 val javacppVersion = "1.5.10"
+val arpackVersion = "3.9.1-1.5.10"
+
+val excludeNatives: Action<ExternalModuleDependency> = Action {
+    exclude(group = "org.bytedeco", module = "openblas")
+    exclude(group = "org.bytedeco", module = "javacpp")
+    exclude(group = "org.bytedeco", module = "arpack-ng")
+}
 
 dependencies {
 
@@ -55,40 +62,34 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.3")
 
     // Smile
-    implementation(group = "com.github.haifengl", name = "smile-core", version = "3.1.0") {
-        exclude(group = "org.bytedeco", module = "openblas")
-        exclude(group = "org.bytedeco", module = "javacpp")
-    }
-    implementation("com.github.haifengl:smile-kotlin:3.1.0") {
-        exclude(group = "org.bytedeco", module = "openblas")
-        exclude(group = "org.bytedeco", module = "javacpp")
-    }
-    implementation("com.github.haifengl:smile-plot:3.1.0") {
-        exclude(group = "org.bytedeco", module = "openblas")
-        exclude(group = "org.bytedeco", module = "javacpp")
-    }
-    implementation("com.github.haifengl:smile-nlp:3.1.0") {
-        exclude(group = "org.bytedeco", module = "openblas")
-        exclude(group = "org.bytedeco", module = "javacpp")
-    }
+    implementation(group = "com.github.haifengl", name = "smile-core", version = "3.1.0", dependencyConfiguration = excludeNatives)
+    implementation("com.github.haifengl:smile-kotlin:3.1.0", dependencyConfiguration = excludeNatives)
+    implementation("com.github.haifengl:smile-plot:3.1.0", dependencyConfiguration = excludeNatives)
+    implementation("com.github.haifengl:smile-nlp:3.1.0", dependencyConfiguration = excludeNatives)
+
     implementation("org.bytedeco:openblas:${openBlasVersion}")
     implementation("org.bytedeco:javacpp:${javacppVersion}")
+    implementation("org.bytedeco:arpack-ng:${arpackVersion}")
     when {
         OperatingSystem.current().isMacOsX -> {
             implementation("org.bytedeco:openblas:${openBlasVersion}:macosx-arm64")
             implementation("org.bytedeco:openblas:${openBlasVersion}:macosx-x86_64")
             implementation("org.bytedeco:javacpp:${javacppVersion}:macosx-arm64")
             implementation("org.bytedeco:javacpp:${javacppVersion}:macosx-x86_64")
+            implementation("org.bytedeco:arpack-ng:${arpackVersion}:macosx-x86_64")
         }
         OperatingSystem.current().isLinux -> {
             implementation("org.bytedeco:openblas:${openBlasVersion}:linux-arm64")
             implementation("org.bytedeco:openblas:${openBlasVersion}:linux-x86_64")
             implementation("org.bytedeco:javacpp:${javacppVersion}:linux-arm64")
             implementation("org.bytedeco:javacpp:${javacppVersion}:linux-x86_64")
+            implementation("org.bytedeco:arpack-ng:${arpackVersion}:linux-arm64")
+            implementation("org.bytedeco:arpack-ng:${arpackVersion}:linux-x86_64")
         }
         OperatingSystem.current().isWindows -> {
             implementation("org.bytedeco:openblas:${openBlasVersion}:windows-x86_64")
             implementation("org.bytedeco:javacpp:${javacppVersion}:windows-x86_64")
+            implementation("org.bytedeco:arpack-ng:${arpackVersion}:windows-x86_64")
         }
     }
 

@@ -203,7 +203,7 @@ class TileMap(width: Int, height: Int) {
         if (guiEnabled) {
             val oldRenderedImage = layerImage
             val newRenderedImage = renderImage(tileSets, true)
-            events.layerImageChanged.fire(oldRenderedImage, newRenderedImage)
+            events.layerImageChanged.fireAndBlock(oldRenderedImage, newRenderedImage)
         }
     }
 

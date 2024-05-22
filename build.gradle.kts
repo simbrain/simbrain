@@ -261,7 +261,7 @@ if (OperatingSystem.current().isMacOsX) {
                 "--app-version", project.version,
                 "--mac-sign",
                 "--mac-signing-key-user-name", "Regents of the University of CA, Merced (W8BB6W47ZR)",
-                "--mac-signing-keychain", "~/Library/Keychains/build.keychain",
+                "--mac-signing-keychain", "~/Library/Keychains/build.keychain-db",
                 "--icon", iconFile,
                 "--java-options", jvmArgs,
                 "--type", "dmg"
@@ -349,24 +349,6 @@ if (OperatingSystem.current().isMacOsX) {
         dependsOn("jpackageMacOS")
         distPath = dist
         versionString = versionName
-    }
-
-    /**
-     * For testing dmg separate from notarization.
-     */
-    tasks.register<Exec>("createMacDmg") {
-        onlyIf { OperatingSystem.current().isMacOsX }
-
-        dependsOn("jpackageMacOS")
-
-        val appPath = "${dist}/Simbrain.app"
-        val dmgPath = "${dist}/Simbrain${versionName}.dmg"
-
-        doFirst {
-            // Set up the hdiutil command and its arguments
-            executable("hdiutil")
-            args("create", "-volname", "Simbrain", "-srcfolder", appPath, "-ov", "-format", "UDZO", dmgPath)
-        }
     }
 }
 

@@ -30,6 +30,7 @@ jobs:
           echo $CERTIFICATE_BASE64 | base64 --decode > certificate.p12
           security create-keychain -p "${KEYCHAIN_PASSWORD}" build.keychain
           KEYCHAIN_FULL_PATH="$HOME/Library/Keychains/build.keychain-db"
+          security set-keychain-settings -t 900 -u KEYCHAIN_FULL_PATH
           security default-keychain -d user -s "${KEYCHAIN_FULL_PATH}"
           security unlock-keychain -p "${KEYCHAIN_PASSWORD}" "${KEYCHAIN_FULL_PATH}"
           security import certificate.p12 -k "${KEYCHAIN_FULL_PATH}" -P "${CERTIFICATE_PASSWORD}" -T /usr/bin/codesign

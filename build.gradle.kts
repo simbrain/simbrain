@@ -304,7 +304,7 @@ if (OperatingSystem.current().isMacOsX) {
 
         @TaskAction
         fun notarize() {
-            val notarizationProfileName = System.getenv("USER") ?: throw IllegalStateException("Notarization profile name not defined")
+            val notarizationProfileName = "AC_PASSWORD"
             val distDir = File(distPath)
             val dmgFile = File(distDir, "Simbrain${versionString}.dmg")
 

@@ -31,9 +31,11 @@ jobs:
           security create-keychain -p "${KEYCHAIN_PASSWORD}" build.keychain
           KEYCHAIN_FULL_PATH="$HOME/Library/Keychains/build.keychain-db"
           security default-keychain -d user -s "${KEYCHAIN_FULL_PATH}"
+          security unlock-keychain -p "${KEYCHAIN_PASSWORD}" "${KEYCHAIN_FULL_PATH}"
           security import certificate.p12 -k "${KEYCHAIN_FULL_PATH}" -P "${CERTIFICATE_PASSWORD}" -T /usr/bin/codesign
           security set-key-partition-list -S "apple-tool:,apple:,codesign:" -s -k "${KEYCHAIN_PASSWORD}" "${KEYCHAIN_FULL_PATH}"
           security list-keychains -s "${KEYCHAIN_FULL_PATH}"
+          rm -f certificate.p12
       - name: Verify Certificate
         run: security find-identity -p codesigning -v
       - name: Set up Apple ID

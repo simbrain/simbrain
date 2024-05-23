@@ -261,7 +261,6 @@ if (OperatingSystem.current().isMacOsX) {
                 "--app-version", project.version,
                 "--mac-sign",
                 "--mac-signing-key-user-name", "Regents of the University of CA, Merced (W8BB6W47ZR)",
-                "--mac-signing-keychain", "~/Library/Keychains/build.keychain-db",
                 "--icon", iconFile,
                 "--java-options", jvmArgs,
                 "--type", "dmg"
@@ -273,6 +272,21 @@ if (OperatingSystem.current().isMacOsX) {
         // Redirect output and error streams to help with debugging
         standardOutput = System.out
         errorOutput = System.err
+
+        doLast {
+            val distDir = file(dist)
+            val oldFile = File(distDir, "Simbrain-${project.version}.dmg")
+            val newFile = File(distDir, "Simbrain${versionName}.dmg")
+
+            if (oldFile.exists()) {
+                val success = oldFile.renameTo(newFile)
+                if (!success) {
+                    throw GradleException("Failed to rename file from ${oldFile.name} to ${newFile.name}.")
+                }
+            } else {
+                throw GradleException("File ${oldFile.name} does not exist.")
+            }
+        }
     }
 
     tasks.named("jpackageMacOS").configure {

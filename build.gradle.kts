@@ -44,7 +44,7 @@ repositories {
     mavenCentral()
 }
 
-val openBlasVersion =  "0.3.26-1.5.10"
+val openBlasVersion = "0.3.26-1.5.10"
 val javacppVersion = "1.5.10"
 val arpackVersion = "3.9.1-1.5.10"
 
@@ -62,7 +62,12 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.3")
 
     // Smile
-    implementation(group = "com.github.haifengl", name = "smile-core", version = "3.1.0", dependencyConfiguration = excludeNatives)
+    implementation(
+        group = "com.github.haifengl",
+        name = "smile-core",
+        version = "3.1.0",
+        dependencyConfiguration = excludeNatives
+    )
     implementation("com.github.haifengl:smile-kotlin:3.1.0", dependencyConfiguration = excludeNatives)
     implementation("com.github.haifengl:smile-plot:3.1.0", dependencyConfiguration = excludeNatives)
     implementation("com.github.haifengl:smile-nlp:3.1.0", dependencyConfiguration = excludeNatives)
@@ -78,6 +83,7 @@ dependencies {
             implementation("org.bytedeco:javacpp:${javacppVersion}:macosx-x86_64")
             implementation("org.bytedeco:arpack-ng:${arpackVersion}:macosx-x86_64")
         }
+
         OperatingSystem.current().isLinux -> {
             implementation("org.bytedeco:openblas:${openBlasVersion}:linux-arm64")
             implementation("org.bytedeco:openblas:${openBlasVersion}:linux-x86_64")
@@ -86,13 +92,13 @@ dependencies {
             implementation("org.bytedeco:arpack-ng:${arpackVersion}:linux-arm64")
             implementation("org.bytedeco:arpack-ng:${arpackVersion}:linux-x86_64")
         }
+
         OperatingSystem.current().isWindows -> {
             implementation("org.bytedeco:openblas:${openBlasVersion}:windows-x86_64")
             implementation("org.bytedeco:javacpp:${javacppVersion}:windows-x86_64")
             implementation("org.bytedeco:arpack-ng:${arpackVersion}:windows-x86_64")
         }
     }
-
 
 
     // JUnit
@@ -106,7 +112,7 @@ dependencies {
     // jsoup HTML parser library @ https://jsoup.org/
     implementation("org.jsoup:jsoup:1.15.4")
 
-    //https://mvnrepository.com/artifact/org.ostermiller/utils
+    // https://mvnrepository.com/artifact/org.ostermiller/utils
     implementation(group = "org.ostermiller", name = "utils", version = "1.07.00")
 
     // https://mvnrepository.com/artifact/org.tinylog/tinylog/1.3.6
@@ -228,6 +234,45 @@ tasks.register("cleanDistribution") {
 }
 
 if (OperatingSystem.current().isMacOsX) {
+
+    val findBinaries = tasks.register("findBinaries") {
+        group = "signing"
+        description = "Finds all binaries in the application bundle"
+
+        doLast {
+            val appDir = file("$dist/Simbrain.app")
+            val binaries = appDir.walkTopDown().filter {
+                it.isFile && it.extension in listOf("dylib")
+            }.toList()
+
+            val binariesFile = file("binaries.txt")
+            binariesFile.writeText(binaries.joinToString("\n") { it.absolutePath })
+        }
+    }
+
+    val signBinaries = tasks.register<Exec>("signBinaries") {
+        group = "signing"
+        description = "Signs third-party binaries"
+        dependsOn(findBinaries)
+
+        doFirst {
+            val binariesFile = file("binaries.txt")
+            if (!binariesFile.exists()) {
+                throw GradleException("Binaries file not found. Run the findBinaries task first.")
+            }
+
+            val binaries = binariesFile.readLines()
+
+            commandLine = listOf(
+                "sh",
+                "-c",
+                binaries.joinToString(" && ") { binary ->
+                    "codesign --timestamp --options runtime --sign \"Developer ID Application: Regents of the University of CA, Merced (W8BB6W47ZR)\" $binary"
+                }
+            )
+        }
+    }
+
     tasks.register<Exec>("jpackageMacOS") {
         onlyIf { OperatingSystem.current().isMacOsX }
 
@@ -263,7 +308,7 @@ if (OperatingSystem.current().isMacOsX) {
                 "--mac-signing-key-user-name", "Regents of the University of CA, Merced (W8BB6W47ZR)",
                 "--icon", iconFile,
                 "--java-options", jvmArgs,
-                "--type", "dmg"
+                "--type", "app-image",
             )
         }
 
@@ -294,7 +339,7 @@ if (OperatingSystem.current().isMacOsX) {
         logging.captureStandardError(LogLevel.ERROR)
     }
 
-    open class NotarizeMacApp: DefaultTask() {
+    open class NotarizeMacApp : DefaultTask() {
 
         @Input
         var distPath: String = ""
@@ -308,10 +353,27 @@ if (OperatingSystem.current().isMacOsX) {
             val distDir = File(distPath)
             val dmgFile = File(distDir, "Simbrain${versionString}.dmg")
 
+            // Create .dmg file
+            project.exec {
+                commandLine("hdiutil", "create", "-volname", versionString, "-srcfolder", "${distDir.path}/Simbrain.app", "-ov", "-format", "UDZO", dmgFile.path)
+            }
+
+            // Delete Simbrain.app
+            File("${distDir.path}/Simbrain.app").deleteRecursively()
+
             // Submit .dmg for notarization and wait
             val submitOutputStream = ByteArrayOutputStream()
             project.exec {
-                commandLine("xcrun", "notarytool", "submit", dmgFile.path, "-p", notarizationProfileName, "--wait", "-v", "--output-format", "json")
+                commandLine(
+                    "xcrun",
+                    "notarytool",
+                    "submit",
+                    dmgFile.path,
+                    "-p", notarizationProfileName,
+                    "--wait",
+                    "-v",
+                    "--output-format", "json"
+                )
                 standardOutput = submitOutputStream
             }
             val notarizationOutput = submitOutputStream.toString()
@@ -361,6 +423,7 @@ if (OperatingSystem.current().isMacOsX) {
     tasks.register<NotarizeMacApp>("notarizeMacApp") {
         onlyIf { OperatingSystem.current().isMacOsX }
         dependsOn("jpackageMacOS")
+        dependsOn(signBinaries)
         distPath = dist
         versionString = versionName
     }
@@ -391,7 +454,8 @@ if (OperatingSystem.current().isWindows) {
 
             // Set up the jpackage command and its arguments
             executable(jpackagePath)
-            args("--input", buildMain,
+            args(
+                "--input", buildMain,
                 "--main-jar", "Simbrain.jar",
                 "--dest", dist,
                 "--name", "Simbrain",
@@ -458,7 +522,8 @@ if (OperatingSystem.current().isWindows) {
  */
 val runScriptFile = File.createTempFile("run", ".sh").apply {
     val dollar = "$"
-    writeText("""
+    writeText(
+        """
         #!/bin/bash
 
         # Check if Java is installed and if the version is 17 or higher
@@ -507,7 +572,8 @@ val runScriptFile = File.createTempFile("run", ".sh").apply {
 
         # Run the jar using the appropriate Java version
         ${dollar}java_path -jar Simbrain.jar
-    """.trimIndent())
+    """.trimIndent()
+    )
     setExecutable(true)
     deleteOnExit()
 }

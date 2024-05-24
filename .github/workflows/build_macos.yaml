@@ -51,7 +51,11 @@ jobs:
           xcrun notarytool store-credentials "AC_PASSWORD" --apple-id "$APPLE_ID" --team-id "$TEAM_ID" --password "$APP_SPECIFIC_PASSWORD"
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-      - name: Build with Gradle
+      - name: Run jpackageMacOS
+        run: ./gradlew jpackageMacOS
+      - name: Run Sign Binaries
+        run: ./gradlew signBinaries
+      - name: Notarize App
         run: ./gradlew notarizeMacApp
       - name: Configure AWS CLI for Cloudflare R2
         env:

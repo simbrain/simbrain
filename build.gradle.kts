@@ -18,6 +18,8 @@ val docs = "docs"
 val dist = "${buildDir}/dist"
 val buildMain = "${buildDir}/main"
 
+val includeAllPlatforms = project.findProperty("includeAllPlatforms")?.toString()?.toBoolean() ?: false
+
 project.version = version
 
 val simbrainJvmArgs = listOf(
@@ -75,28 +77,40 @@ dependencies {
     implementation("org.bytedeco:openblas:${openBlasVersion}")
     implementation("org.bytedeco:javacpp:${javacppVersion}")
     implementation("org.bytedeco:arpack-ng:${arpackVersion}")
-    when {
-        OperatingSystem.current().isMacOsX -> {
-            implementation("org.bytedeco:openblas:${openBlasVersion}:macosx-arm64")
-            implementation("org.bytedeco:openblas:${openBlasVersion}:macosx-x86_64")
-            implementation("org.bytedeco:javacpp:${javacppVersion}:macosx-arm64")
-            implementation("org.bytedeco:javacpp:${javacppVersion}:macosx-x86_64")
-            implementation("org.bytedeco:arpack-ng:${arpackVersion}:macosx-x86_64")
-        }
 
-        OperatingSystem.current().isLinux -> {
-            implementation("org.bytedeco:openblas:${openBlasVersion}:linux-arm64")
-            implementation("org.bytedeco:openblas:${openBlasVersion}:linux-x86_64")
-            implementation("org.bytedeco:javacpp:${javacppVersion}:linux-arm64")
-            implementation("org.bytedeco:javacpp:${javacppVersion}:linux-x86_64")
-            implementation("org.bytedeco:arpack-ng:${arpackVersion}:linux-arm64")
-            implementation("org.bytedeco:arpack-ng:${arpackVersion}:linux-x86_64")
-        }
+    val platformSpecificDependencies = mapOf(
+        "macosx" to listOf(
+            "org.bytedeco:openblas:${openBlasVersion}:macosx-arm64",
+            "org.bytedeco:openblas:${openBlasVersion}:macosx-x86_64",
+            "org.bytedeco:javacpp:${javacppVersion}:macosx-arm64",
+            "org.bytedeco:javacpp:${javacppVersion}:macosx-x86_64",
+            "org.bytedeco:arpack-ng:${arpackVersion}:macosx-x86_64"
+        ),
+        "linux" to listOf(
+            "org.bytedeco:openblas:${openBlasVersion}:linux-arm64",
+            "org.bytedeco:openblas:${openBlasVersion}:linux-x86_64",
+            "org.bytedeco:javacpp:${javacppVersion}:linux-arm64",
+            "org.bytedeco:javacpp:${javacppVersion}:linux-x86_64",
+            "org.bytedeco:arpack-ng:${arpackVersion}:linux-arm64",
+            "org.bytedeco:arpack-ng:${arpackVersion}:linux-x86_64"
+        ),
+        "windows" to listOf(
+            "org.bytedeco:openblas:${openBlasVersion}:windows-x86_64",
+            "org.bytedeco:javacpp:${javacppVersion}:windows-x86_64",
+            "org.bytedeco:arpack-ng:${arpackVersion}:windows-x86_64"
+        )
+    )
 
-        OperatingSystem.current().isWindows -> {
-            implementation("org.bytedeco:openblas:${openBlasVersion}:windows-x86_64")
-            implementation("org.bytedeco:javacpp:${javacppVersion}:windows-x86_64")
-            implementation("org.bytedeco:arpack-ng:${arpackVersion}:windows-x86_64")
+    if (includeAllPlatforms) {
+        platformSpecificDependencies.values.flatten().forEach(::implementation)
+    } else {
+        when {
+            OperatingSystem.current().isMacOsX -> "macosx"
+            OperatingSystem.current().isLinux -> "linux"
+            OperatingSystem.current().isWindows -> "windows"
+            else -> throw GradleException("Unsupported platform: ${OperatingSystem.current().name}")
+        }.let {
+            platformSpecificDependencies[it]!!.forEach(::implementation)
         }
     }
 
@@ -317,21 +331,6 @@ if (OperatingSystem.current().isMacOsX) {
         // Redirect output and error streams to help with debugging
         standardOutput = System.out
         errorOutput = System.err
-
-        doLast {
-            val distDir = file(dist)
-            val oldFile = File(distDir, "Simbrain-${project.version}.dmg")
-            val newFile = File(distDir, "Simbrain${versionName}.dmg")
-
-            if (oldFile.exists()) {
-                val success = oldFile.renameTo(newFile)
-                if (!success) {
-                    throw GradleException("Failed to rename file from ${oldFile.name} to ${newFile.name}.")
-                }
-            } else {
-                throw GradleException("File ${oldFile.name} does not exist.")
-            }
-        }
     }
 
     tasks.named("jpackageMacOS").configure {
@@ -355,7 +354,18 @@ if (OperatingSystem.current().isMacOsX) {
 
             // Create .dmg file
             project.exec {
-                commandLine("hdiutil", "create", "-volname", versionString, "-srcfolder", "${distDir.path}/Simbrain.app", "-ov", "-format", "UDZO", dmgFile.path)
+                commandLine(
+                    "hdiutil",
+                    "create",
+                    "-volname",
+                    versionString,
+                    "-srcfolder",
+                    "${distDir.path}/Simbrain.app",
+                    "-ov",
+                    "-format",
+                    "UDZO",
+                    dmgFile.path
+                )
             }
 
             // Delete Simbrain.app

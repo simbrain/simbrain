@@ -158,11 +158,6 @@ dependencies {
     // https://mvnrepository.com/artifact/org.beanshell/bsh
     implementation(group = "org.beanshell", name = "bsh", version = "2.0b5")
 
-    // JMonkeyEngine
-    implementation("org.jmonkeyengine:jme3-core:3.6.1-stable")
-    implementation("org.jmonkeyengine:jme3-jbullet:3.6.1-stable")
-    implementation("org.jmonkeyengine:jme3-desktop:3.6.1-stable")
-    implementation("org.jmonkeyengine:jme3-lwjgl:3.6.1-stable")
 }
 
 tasks.test {

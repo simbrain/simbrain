@@ -14,7 +14,7 @@ developer_application_id="Developer ID Application: $DEVELOPER_ID"
 # Function to sign a file
 sign_file() {
     local file_path="$1"
-    codesign --sign "$developer_application_id" --timestamp "$file_path"
+    codesign --sign -f "$developer_application_id" --timestamp "$file_path"
 }
 
 # Function to sign all binaries within a directory

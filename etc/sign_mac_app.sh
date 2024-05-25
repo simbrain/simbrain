@@ -30,6 +30,10 @@ sign_binaries_in_dir() {
 echo "Signing all binaries in the app bundle..."
 sign_binaries_in_dir "$APP_PATH"
 
+# Sign jswpanhelper binary
+echo "Signing jswpanhelper binary..."
+codesign -f --options=runtime --sign "$developer_application_id" --timestamp  "$APP_PATH/Contents/runtime/Contents/Home/lib/jspawnhelper"
+
 # Sign all binaries within JAR files
 echo "Extracting and signing binaries within JAR files..."
 find "$JAR_DIR" -name "*.jar" | while read -r jar; do

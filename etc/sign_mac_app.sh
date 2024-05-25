@@ -14,7 +14,7 @@ developer_application_id="Developer ID Application: $DEVELOPER_ID"
 # Function to sign a file
 sign_file() {
     local file_path="$1"
-    codesign --sign "$developer_application_id" --timestamp "$file_path"
+    codesign --sign "$developer_application_id" --timestamp=http://timestamp.apple.com/ts01 "$file_path"
 }
 
 # Function to sign all binaries within a directory
@@ -40,7 +40,7 @@ done
 
 # Re-sign the main app after modifying JAR files
 echo "Re-signing the main app..."
-codesign -f --sign "$developer_application_id" --timestamp "$APP_PATH"
+codesign --deep -f --sign "$developer_application_id" --timestamp=http://timestamp.apple.com/ts01 "$APP_PATH"
 
 # Verify the signature
 echo "Verifying the signature..."

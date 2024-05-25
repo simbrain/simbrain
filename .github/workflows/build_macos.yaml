@@ -53,12 +53,10 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
       - name: Run jpackageMacOS
         run: ./gradlew jpackageMacOS
-      - name: Run Sign Binaries
-        run: ./gradlew signBinaries
-      - name: debug
-        uses: fawazahmed0/action-debug@main
-        with:
-          credentials: "${{ secrets.DEBUG_USER }}:${{ secrets.DEBUG_PASSWORD }}"
+      - name: Sign Binaries
+        env:
+          DEVELOPER_ID: ${{ secrets.DEVELOPER_ID }}
+        run: ./etc/sign_mac_app.sh
       - name: Notarize App
         run: ./gradlew notarizeMacApp
       - name: Configure AWS CLI for Cloudflare R2

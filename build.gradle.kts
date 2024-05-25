@@ -249,47 +249,6 @@ tasks.register("cleanDistribution") {
 
 if (OperatingSystem.current().isMacOsX) {
 
-    val findBinaries = tasks.register("findBinaries") {
-        group = "signing"
-        description = "Finds all binaries in the application bundle"
-        dependsOn("jpackageMacOS")
-
-        doLast {
-            val appDir = file("$dist/Simbrain.app")
-            val binaries = appDir.walkTopDown().filter {
-                it.isFile && it.extension in listOf("dylib")
-            }.toList()
-
-            println("Found binaries: \n${binaries.joinToString("\n") { it.absolutePath }}")
-
-            val binariesFile = file("binaries.txt")
-            binariesFile.writeText(binaries.joinToString("\n") { it.absolutePath })
-        }
-    }
-
-    val signBinaries = tasks.register<Exec>("signBinaries") {
-        group = "signing"
-        description = "Signs third-party binaries"
-        dependsOn(findBinaries)
-
-        doFirst {
-            val binariesFile = file("binaries.txt")
-            if (!binariesFile.exists()) {
-                throw GradleException("Binaries file not found. Run the findBinaries task first.")
-            }
-
-            val binaries = binariesFile.readLines()
-
-            commandLine = listOf(
-                "sh",
-                "-c",
-                binaries.joinToString(" && ") { binary ->
-                    "echo \"signing $binary\\n\" && codesign --timestamp --options runtime --sign \"Developer ID Application: Regents of the University of CA, Merced (W8BB6W47ZR)\" $binary"
-                }
-            )
-        }
-    }
-
     tasks.register<Exec>("jpackageMacOS") {
         onlyIf { OperatingSystem.current().isMacOsX }
 
@@ -321,8 +280,6 @@ if (OperatingSystem.current().isMacOsX) {
                 "--dest", dist,
                 "--name", "Simbrain",
                 "--app-version", project.version,
-                "--mac-sign",
-                "--mac-signing-key-user-name", "Regents of the University of CA, Merced (W8BB6W47ZR)",
                 "--icon", iconFile,
                 "--java-options", jvmArgs,
                 "--type", "app-image",
@@ -435,8 +392,6 @@ if (OperatingSystem.current().isMacOsX) {
 
     tasks.register<NotarizeMacApp>("notarizeMacApp") {
         onlyIf { OperatingSystem.current().isMacOsX }
-        dependsOn("jpackageMacOS")
-        dependsOn(signBinaries)
         distPath = dist
         versionString = versionName
     }

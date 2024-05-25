@@ -68,7 +68,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     /**
      * Associates network models with screen elements
      */
-    private val modelNodeMap = HashMap<NetworkModel, ScreenElement>()
+    private val modelNodeMap = CompletableDeferredHashMap<NetworkModel, ScreenElement>()
 
     val timeLabel = TimeLabel(this).apply { update() }
 
@@ -222,7 +222,9 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         })
 
         // Add all network elements (important for de-serializing)
-        network.modelsInReconstructionOrder.forEach { createNode(it) }
+        runBlocking {
+            network.modelsInReconstructionOrder.forEach { createNode(it) }
+        }
 
         initEventHandlers()
     }
@@ -290,7 +292,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         network.events.zoomToFitPage.fire()
     }
 
-    private fun createNode(model: NetworkModel): ScreenElement {
+    private suspend fun createNode(model: NetworkModel): ScreenElement {
         return when (model) {
             is Neuron -> createNode(model)
             is Synapse -> createNode(model)
@@ -309,7 +311,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         }.also { modelNodeMap[model] = it }
     }
 
-    fun createNode(neuron: Neuron) = addScreenElement {
+    suspend fun createNode(neuron: Neuron) = addScreenElement {
         undoManager.addUndoableAction(object : UndoableAction {
             override fun undo() {
                 neuron.delete()
@@ -322,13 +324,13 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         NeuronNode(this, neuron)
     }
 
-    fun createNode(synapse: Synapse) = addScreenElement {
-        val source = modelNodeMap[synapse.source] as? NeuronNode ?: throw IllegalStateException("Neuron node does not exist")
-        val target = modelNodeMap[synapse.target] as? NeuronNode ?: throw IllegalStateException("Neuron node does not exist")
+    suspend fun createNode(synapse: Synapse) = addScreenElement {
+        val source = modelNodeMap.get<NeuronNode>(synapse.source)
+        val target = modelNodeMap.get<NeuronNode>(synapse.target)
         SynapseNode(this, source, target, synapse)
     }
 
-    fun createNode(neuronGroup: AbstractNeuronCollection) = addScreenElement {
+    suspend fun createNode(neuronGroup: AbstractNeuronCollection) = addScreenElement {
 
         fun createNeuronGroupNode() = when (neuronGroup) {
             is SOMGroup -> SOMGroupNode(this, neuronGroup)
@@ -343,24 +345,24 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         }
     }
 
-    fun createNode(neuronArray: NeuronArray) = addScreenElement { NeuronArrayNode(this, neuronArray) }
+    suspend fun createNode(neuronArray: NeuronArray) = addScreenElement { NeuronArrayNode(this, neuronArray) }
 
-    fun createNode(classifier: SmileClassifier) = addScreenElement {
+    suspend fun createNode(classifier: SmileClassifier) = addScreenElement {
         SmileClassifierNode(this, classifier)
     }
 
-    // fun createNode(dn: DeepNet) = addScreenElement {
+    // suspend fun createNode(dn: DeepNet) = addScreenElement {
     //     DeepNetNode(this, dn)
     // }
 
-    fun createNode(neuronCollection: NeuronCollection) = addScreenElement {
+    suspend fun createNode(neuronCollection: NeuronCollection) = addScreenElement {
         val neuronNodes = neuronCollection.neuronList.map {
-            modelNodeMap[it] as? NeuronNode ?: throw IllegalStateException("Neuron node does not exist")
+            modelNodeMap.get<NeuronNode>(it)
         }
         NeuronCollectionNode(this, neuronCollection).apply { addNeuronNodes(neuronNodes) }
     }
 
-    fun createNode(synapseGroup: SynapseGroup) = addScreenElement {
+    suspend fun createNode(synapseGroup: SynapseGroup) = addScreenElement {
         with(synapseGroup.synapses) {
             if (size < NetworkPreferences.synapseVisibilityThreshold) {
                 forEach {
@@ -371,19 +373,19 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         SynapseGroupNode(this, synapseGroup)
     }
 
-    fun createNode(weightMatrix: Connector) = addScreenElement {
+    suspend fun createNode(weightMatrix: Connector) = addScreenElement {
         WeightMatrixNode(this, weightMatrix)
     }
 
-    fun createNode(text: NetworkTextObject) = addScreenElement {
+    suspend fun createNode(text: NetworkTextObject) = addScreenElement {
         TextNode(this, text)
     }
 
-    fun createNode(infoText: InfoText) = addScreenElement {
+    suspend fun createNode(infoText: InfoText) = addScreenElement {
         TextInfoNode(this, infoText)
     }
 
-    fun createNode(subnetwork: Subnetwork) = addScreenElement {
+    suspend fun createNode(subnetwork: Subnetwork) = addScreenElement {
 
         fun createSubNetwork() = when (subnetwork) {
             is Hopfield -> HopfieldNode(this, subnetwork)
@@ -711,7 +713,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
                 }
             }
             selected.on { list ->
-                selectionManager.set(list.mapNotNull { modelNodeMap[it] })
+                selectionManager.set(list.map { modelNodeMap.get(it) })
             }
         }
 
@@ -770,7 +772,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         undoManager.redo()
     }
 
-    fun getNode(model: NetworkModel) = modelNodeMap[model]
+    fun getNode(model: NetworkModel) = runBlocking { modelNodeMap.get<ScreenElement>(model) }
 
 
     /**

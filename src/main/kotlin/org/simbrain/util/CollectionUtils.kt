@@ -1,6 +1,9 @@
 package org.simbrain.util
 
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.withTimeout
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Consider sets A and B.  "Left complement" is in A but not B.  "Right complement" is in B but not A.
@@ -153,5 +156,30 @@ fun Array<FloatArray>.flatten() = flattenArray(this)
 fun <T> ListIterator<T>.toSequence() = sequence {
     while (hasNext()) {
         yield(next())
+    }
+}
+
+class CompletableDeferredHashMap<K, V : Any>(private val timeoutMillis: Long = 1000) {
+    val map = ConcurrentHashMap<K, CompletableDeferred<V>>()
+
+    suspend fun <T: V> get(key: K): T {
+        @Suppress("UNCHECKED_CAST")
+        return withTimeout(timeoutMillis) { map.getOrPut(key) { CompletableDeferred() }.await() as T }
+    }
+
+    operator fun set(key: K, value: V): CompletableDeferred<V> {
+        if (map.containsKey(key)) {
+            return map[key]!!.apply {
+                complete(value)
+            }
+        }
+        val deferred = CompletableDeferred<V>()
+        deferred.complete(value)
+        map[key] = deferred
+        return deferred
+    }
+
+    fun remove(key: K) {
+        map.remove(key)
     }
 }

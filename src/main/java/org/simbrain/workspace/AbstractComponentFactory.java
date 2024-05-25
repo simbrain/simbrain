@@ -32,8 +32,6 @@ import org.simbrain.world.soundworld.SoundWorldComponent;
 import org.simbrain.world.soundworld.gui.SoundWorldDesktopComponent;
 import org.simbrain.world.textworld.TextWorldComponent;
 import org.simbrain.world.textworld.gui.TextWorldDesktopComponent;
-import org.simbrain.world.threedworld.ThreeDDesktopComponent;
-import org.simbrain.world.threedworld.ThreeDWorldComponent;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -59,9 +57,6 @@ public class AbstractComponentFactory {
 
         putWorkspaceComponentFactory("Network", () -> new NetworkComponent(""));
         putGuiComponentFactory(NetworkComponent.class, NetworkDesktopComponent::new);
-
-        putWorkspaceComponentFactory("3D World", () -> ThreeDWorldComponent.create(workspace, ""));
-        putGuiComponentFactory(ThreeDWorldComponent.class, ThreeDDesktopComponent::new);
 
         putWorkspaceComponentFactory("Odor World", () -> new OdorWorldComponent(""));
         putGuiComponentFactory(OdorWorldComponent.class, OdorWorldDesktopComponent::new);

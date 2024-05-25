@@ -14,14 +14,16 @@ developer_application_id="Developer ID Application: $DEVELOPER_ID"
 # Function to sign a file
 sign_file() {
     local file_path="$1"
+    echo "Signing binary: $binary"
     codesign -f --sign "$developer_application_id" --timestamp "$file_path"
+    echo "Verifying binary: $binary"
+    codesign --verify --deep --strict --verbose=2 "$file_path"
 }
 
 # Function to sign all binaries within a directory
 sign_binaries_in_dir() {
     local dir_path="$1"
     find "$dir_path" -type f -name "*.dylib" -or -name "*.jnilib" | while read -r binary; do
-        echo "Signing binary: $binary"
         sign_file "$binary"
     done
 }

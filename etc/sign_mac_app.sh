@@ -14,17 +14,21 @@ developer_application_id="Developer ID Application: $DEVELOPER_ID"
 # Function to sign a file
 sign_file() {
     local file_path="$1"
-    codesign --sign "$developer_application_id" --timestamp=http://timestamp.apple.com/ts01 "$file_path"
+    codesign --sign "$developer_application_id" --timestamp "$file_path"
 }
 
 # Function to sign all binaries within a directory
 sign_binaries_in_dir() {
     local dir_path="$1"
-    find "$dir_path" -type f -name "*.dylib" -or -name "*.so" -or -name "*.bin" | while read -r binary; do
+    find "$dir_path" -type f -name "*.dylib" -or -name "*.jnilib" | while read -r binary; do
         echo "Signing binary: $binary"
         sign_file "$binary"
     done
 }
+
+# Sign all binaries in the entire app bundle
+echo "Signing all binaries in the app bundle..."
+sign_binaries_in_dir "$APP_PATH"
 
 # Sign all binaries within JAR files
 echo "Extracting and signing binaries within JAR files..."
@@ -40,7 +44,7 @@ done
 
 # Re-sign the main app after modifying JAR files
 echo "Re-signing the main app..."
-codesign --deep -f --sign "$developer_application_id" --timestamp=http://timestamp.apple.com/ts01 "$APP_PATH"
+codesign --options=runtime -f --sign "$developer_application_id" --timestamp "$APP_PATH"
 
 # Verify the signature
 echo "Verifying the signature..."

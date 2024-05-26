@@ -52,12 +52,14 @@ jobs:
           xcrun notarytool store-credentials "AC_PASSWORD" --apple-id "$APPLE_ID" --team-id "$TEAM_ID" --password "$APP_SPECIFIC_PASSWORD"
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-      - name: Run jpackageMacOS
-        run: ./gradlew jpackageMacOS
-      - name: Sign Binaries
+      - name: Run shadowJar
+        run: ./gradlew shadowJar
+      - name: Sign Jar
         env:
           DEVELOPER_ID: ${{ secrets.DEVELOPER_ID }}
-        run: ./etc/sign_mac_app.sh
+        run: ./etc/sign_mac_jar.sh
+      - name: Run jpackageMacOS
+        run: ./gradlew jpackageMacOS
       - name: Notarize App
         run: ./gradlew notarizeMacApp
       - name: Configure AWS CLI for Cloudflare R2

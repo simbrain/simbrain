@@ -6,7 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR" || exit 1
 
 # Variables
-JAR_DIR="${SCRIPT_DIR}/../build/lib"
+JAR_DIR="${SCRIPT_DIR}/../build/libs"
 
 developer_application_id="Developer ID Application: $DEVELOPER_ID"
 

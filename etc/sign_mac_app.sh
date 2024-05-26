@@ -17,7 +17,7 @@ sign_file() {
     echo "Signing binary: $binary"
     codesign -f --sign "$developer_application_id" --timestamp "$file_path"
     echo "Verifying binary: $binary"
-    codesign --verify --deep --strict --verbose=2 "$file_path"
+    codesign -vvv --deep --strict "$file_path"
 }
 
 # Function to sign all binaries within a directory

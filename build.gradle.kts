@@ -208,11 +208,7 @@ tasks.register<Copy>("buildDistribution") {
     dependsOn("shadowJar")
 
     doFirst {
-        // Get the path to the JAR file created by the shadowJar task
-        val shadowJarFile: File = tasks.shadowJar.get().archiveFile.get().asFile
-
-        // Set the source for the copy operation
-        from(shadowJarFile)
+        from("${buildDir}/libs/Simbrain.jar")
     }
 
     // Copy docs
@@ -247,8 +243,6 @@ if (OperatingSystem.current().isMacOsX) {
     tasks.register<Exec>("jpackageMacOS") {
         onlyIf { OperatingSystem.current().isMacOsX }
 
-        dependsOn("cleanDistribution")
-        dependsOn("shadowJar")
         dependsOn("buildDistribution")
 
         val iconFile = "etc/simbrain.icns"

@@ -243,6 +243,10 @@ if (OperatingSystem.current().isMacOsX) {
     tasks.register<Exec>("jpackageMacOS") {
         onlyIf { OperatingSystem.current().isMacOsX }
 
+        if (!File(buildMain).exists()) {
+            throw GradleException("Build directory does not exist. Run the 'buildDistribution' task first.")
+        }
+
         val iconFile = "etc/simbrain.icns"
 
         val javaHome = System.getProperty("java.home")
@@ -261,7 +265,6 @@ if (OperatingSystem.current().isMacOsX) {
             // Set up the jpackage command and its arguments
             executable(jpackagePath)
             args(
-                "--verbose",
                 "--input", buildMain,
                 "--main-jar", "Simbrain.jar",
                 "--dest", dist,
@@ -436,9 +439,6 @@ if (OperatingSystem.current().isWindows) {
         val signtool = findWindowsSignTool()
 
         doFirst {
-            if (signtool == null) {
-                throw GradleException("Windows signtool not found.")
-            }
 
             executable(signtool)
             args(

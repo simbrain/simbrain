@@ -120,7 +120,7 @@ val NetworkPanel.selectionMenu
 
 val NetworkPanel.helpMenu
     get() = JMenu("Help").apply {
-        add(ShowHelpAction("Pages/Network.html"))
+        add(ShowHelpAction("https://docs.simbrain.net/docs/network/network.html"))
     }
 
 fun NetworkPanel.creatContextMenu() = JPopupMenu().apply {

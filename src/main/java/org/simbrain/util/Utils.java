@@ -436,16 +436,6 @@ public class Utils {
     }
 
     /**
-     * Display a documentation page under {simbrainhome}/docs/...
-     *
-     * @param helpPage Help page
-     */
-    public static void showHelpPage(final String helpPage) {
-        String url = System.getProperty("user.dir") + FS + "docs" + FS + helpPage;
-        displayLocalHtmlInBrowser(url);
-    }
-
-    /**
      * Launch an .html page using the system's default browser.
      *
      * @param url the url to display. Assumes it is in the local file system.

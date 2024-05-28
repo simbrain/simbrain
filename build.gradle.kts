@@ -3,6 +3,14 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.ByteArrayOutputStream
 import java.time.Duration
 
+/**
+ * Main Simbrain build. Many of these functions are called by platform-specific workflow actions in ./github/workflows
+ *
+ * To build add relevant bracketed command to commit message (see tops of the .yaml files).  E.g "[push macos]"
+ *
+ * To build all just use all of them: "[push macos][push windows][push linux]"
+ */
+
 plugins {
     `java-library`
     idea
@@ -29,8 +37,6 @@ val simbrainJvmArgs = listOf(
     "--add-opens", "java.base/java.util.concurrent=ALL-UNNAMED",
     "--add-opens", "java.base/java.util.concurrent.atomic=ALL-UNNAMED",
     "--add-opens", "java.base/java.lang=ALL-UNNAMED"
-    // "-Djava.library.path", "/opt/homebrew/opt/openblas/lib/",
-    // "-Dorg.bytedeco.openblas.load", "blas"
 )
 
 application {
@@ -113,7 +119,6 @@ dependencies {
             platformSpecificDependencies[it]!!.forEach(::implementation)
         }
     }
-
 
     // JUnit
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.0")

@@ -3,7 +3,7 @@ name: build_macos
 on:
   push:
     branches:
-      - macos_build
+      - Simbrain4
 
 jobs:
   build:
@@ -54,11 +54,12 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
       - name: Run shadowJar
         run: ./gradlew shadowJar
-      - name: Sign Jar
+      - name: Sign All Binaries in the Jar
         env:
           DEVELOPER_ID: ${{ secrets.DEVELOPER_ID }}
         run: ./etc/sign_mac_jar.sh
-      - name: Prepare Distribution Files
+      # we need to skip the gradle buildDistribution because it rebuilds the jar and wipes out the signatures
+      - name: Copy Distribution Files
         run: |
           mkdir -p build/main
           cp build/libs/Simbrain.jar build/main/Simbrain.jar

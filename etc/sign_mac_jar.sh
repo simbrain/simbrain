@@ -36,7 +36,7 @@ find "$JAR_DIR" -name "*.jar" | while read -r jar; do
     unzip -q "$jar" -d "$jar_dir"
     sign_binaries_in_dir "$jar_dir"
     echo "Repackaging JAR file: $jar"
-    (cd "$jar_dir" && zip -r "$jar" *)
+    (cd "$jar_dir" && zip -qr "$jar" *)
     rm -rf "$jar_dir"
 done
 

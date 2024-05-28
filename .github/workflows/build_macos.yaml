@@ -58,6 +58,14 @@ jobs:
         env:
           DEVELOPER_ID: ${{ secrets.DEVELOPER_ID }}
         run: ./etc/sign_mac_jar.sh
+      - name: Prepare Distribution Files
+        run: |
+          mkdir -p build/main
+          cp build/libs/Simbrain.jar build/main/Simbrain.jar
+          cp -r docs build/main/docs
+          cp -r simulations build/main/simulations
+          cp -r scripts build/main/scripts
+          cp etc/License.txt build/main/License.txt
       - name: Run jpackageMacOS
         run: ./gradlew jpackageMacOS
       - name: Notarize App

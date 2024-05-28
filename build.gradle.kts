@@ -243,8 +243,6 @@ if (OperatingSystem.current().isMacOsX) {
     tasks.register<Exec>("jpackageMacOS") {
         onlyIf { OperatingSystem.current().isMacOsX }
 
-        dependsOn("buildDistribution")
-
         val iconFile = "etc/simbrain.icns"
 
         val javaHome = System.getProperty("java.home")

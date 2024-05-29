@@ -216,11 +216,6 @@ tasks.register<Copy>("buildDistribution") {
         from("${buildDir}/libs/Simbrain.jar")
     }
 
-    // Copy docs
-    from(docs) {
-        into("docs")
-    }
-
     // Copy simulations
     from("simulations") {
         exclude("**/archives/**")

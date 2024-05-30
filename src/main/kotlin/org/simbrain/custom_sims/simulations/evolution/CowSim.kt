@@ -28,6 +28,9 @@ import java.awt.Dimension
 import kotlin.random.Random
 
 
+// See CowGrazing.kt
+
+
 val evolveCow = newSim {
 
     val maxGenerations = 50

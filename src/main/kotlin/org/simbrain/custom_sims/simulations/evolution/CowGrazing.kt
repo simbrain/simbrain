@@ -27,6 +27,11 @@ import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.random.Random
 
+/**
+ * To run from command line, use:
+ * `gradle runSim -PsimName="Evolve Grazing Cows" -PoptionString="2:20:1000:100:0.5:true"`
+ * The resulting zip file must be loaded using the `load file` button in this sim
+ */
 val grazingCows = newSim { optionString ->
 
     var numCows = 2

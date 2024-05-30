@@ -21,6 +21,9 @@ import org.simbrain.world.odorworld.OdorWorldComponent
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.sensors.TileSensor
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.pow
@@ -34,8 +37,13 @@ import kotlin.random.Random
  * provides calories but decays as its digested
  *
  * Goal: Compare the model with various levels of energy constraint and see the differences
+ *
+ * Can run headless using:
+ *  `gradle runSim -PsimName="Evolve Resource Pursuer" -PoptionString="20:1000:100:0.5"`
+ *  Format is maxGenerations:iterationsPerRun:populationSize:eliminationRatio
+ *  The resulting zip file must be loaded using the `load file` button in this sim
  */
-val evolveResourcePursuer = newSim {
+val evolveResourcePursuer = newSim { optionString ->
 
     val evaluatorParams = EvaluatorParams(
         populationSize = 100,
@@ -45,12 +53,6 @@ val evolveResourcePursuer = newSim {
         targetValue = 1000.0,
         seed = 42
     )
-
-    /**
-     * Iterations to run for each simulation. If < 3000 success is usually by luck.
-     * A bit like its lifespan.
-     */
-    var iterationsPerRun by evaluatorParams::iterationsPerRun
 
     class EvolvePursuerGenotype(seed: Long = Random.nextLong()) : Genotype {
 
@@ -273,7 +275,7 @@ val evolveResourcePursuer = newSim {
             evolvedAgent.addSensor(centerLakeSensor)
 
             fun computeCalories(): Double {
-               return max(0.0, calories - (totalActivation + movement + baseMetabolism) * (1.0 / iterationsPerRun))
+               return max(0.0, calories - (totalActivation + movement + baseMetabolism) * (1.0 / evaluatorParams.iterationsPerRun))
             }
             workspace.addUpdateAction("update energy") {
                 with(phenotypeDeferred.await()) {
@@ -284,7 +286,7 @@ val evolveResourcePursuer = newSim {
                     movement = abs(evolvedAgent.speed * 3) + abs(evolvedAgent.dtheta * 2)
                     totalActivation = outputsActivations + allActivations
                     calories = computeCalories()
-                    thirstNeuron.activation = 10.0 / iterationsPerRun + thirstNeuron.activation
+                    thirstNeuron.activation = 10.0 / evaluatorParams.iterationsPerRun + thirstNeuron.activation
                 }
             }
 
@@ -343,7 +345,7 @@ val evolveResourcePursuer = newSim {
             val phenotype = phenotypeDeferred.await()
 
             // Iterate the sim
-            workspace.iterateSuspend(iterationsPerRun)
+            workspace.iterateSuspend(evaluatorParams.iterationsPerRun)
 
             return calories - phenotype.thirstNeuron.activation * 4
         }
@@ -383,6 +385,9 @@ val evolveResourcePursuer = newSim {
                         place(networkComponent, 5, 375, 340, 430)
                         place(odorWorldComponent, 340, 10, 800, 900)
                     }
+                    if (desktop == null) {
+                        workspace.save(File("evolved_${SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(Date())}.zip"), headless = true)
+                    }
                 }
             }
         }
@@ -397,6 +402,15 @@ val evolveResourcePursuer = newSim {
             evaluatorParams.addProgressWindow()
             runSim()
         }
+    }
+
+    if (optionString?.isNotEmpty() == true) {
+        val options = optionString.split(":")
+        evaluatorParams.maxGenerations = options[0].toInt()
+        evaluatorParams.iterationsPerRun = options[1].toInt()
+        evaluatorParams.populationSize = options[2].toInt()
+        evaluatorParams.eliminationRatio = options[3].toDouble()
+        runSim()
     }
 
 }

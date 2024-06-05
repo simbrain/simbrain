@@ -107,8 +107,12 @@ val simulations = dir<Any>("Simulations") {
         // item("Deep Net - Mnist") { deepNetSim }
         item("Spiking Neuron") { spikingNetwork }
         // item("Mnist Images") { mnistSim }
-        item("Image World") { imageWorldSim }
         item("LSTM") { lstmBlock() }
+    }
+
+    dir("Image World") {
+        item("1. Simple drawings (10 x 10)") { simpleImageWorld }
+        item("2. Photo album (100 x 100)") { photoAlbumExample }
     }
 
     dir("Testing") {

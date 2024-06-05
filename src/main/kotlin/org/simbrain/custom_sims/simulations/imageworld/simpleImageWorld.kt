@@ -1,18 +1,15 @@
 package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.*
-import org.simbrain.network.connections.Sparse
-import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.addNeuronCollection
-import org.simbrain.network.core.connect
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.util.place
 import org.simbrain.util.point
 
 /**
- * Create with a recurrent neuron collection and a projection with a control panel to
+ * Images can be drawn in a 10x10 array and sent to a 10x10 network.
  */
-val imageWorldSim = newSim {
+val simpleImageWorld = newSim {
 
     // Basic setup
     workspace.clearWorkspace()
@@ -28,23 +25,23 @@ val imageWorldSim = newSim {
     }
     network.addNetworkModel(inputs)
 
-    // Recurrent net
-    val recurrentNet = network.addNeuronCollection(25).apply {
-        label = "Process"
-        layout(GridLayout())
-        location = point (200, -400)
-    }
-    network.addNetworkModel(recurrentNet)
-    network.connect(recurrentNet.neuronList, recurrentNet.neuronList, Sparse().apply {
-        connectionDensity = .15
-    })
+    // // Recurrent net
+    // val recurrentNet = network.addNeuronCollection(25).apply {
+    //     label = "Process"
+    //     layout(GridLayout())
+    //     location = point (200, -400)
+    // }
+    // network.addNetworkModel(recurrentNet)
+    // network.connect(recurrentNet.neuronList, recurrentNet.neuronList, Sparse().apply {
+    //     connectionDensity = .15
+    // })
 
-    // Input to recurrent
-    SynapseGroup(inputs, recurrentNet, Sparse().apply {
-        connectionDensity = .25
-    }).also {
-        network.addNetworkModel(it)
-    }
+    // // Input to recurrent
+    // SynapseGroup(inputs, recurrentNet, Sparse().apply {
+    //     connectionDensity = .25
+    // }).also {
+    //     network.addNetworkModel(it)
+    // }
 
     // Place network in the desktop
     withGui {

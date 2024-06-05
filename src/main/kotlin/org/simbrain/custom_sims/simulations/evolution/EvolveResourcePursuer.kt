@@ -1,22 +1,21 @@
 package org.simbrain.custom_sims.simulations
 
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.withContext
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.*
 import org.simbrain.network.updaterules.DecayRule
 import org.simbrain.network.util.BiasedScalarData
-import org.simbrain.util.format
+import org.simbrain.util.*
 import org.simbrain.util.geneticalgorithm.*
 import org.simbrain.util.piccolo.createTileMapLayer
 import org.simbrain.util.piccolo.loadTileMap
 import org.simbrain.util.piccolo.makeLake
 import org.simbrain.util.piccolo.nextGridCoordinate
-import org.simbrain.util.place
-import org.simbrain.util.point
-import org.simbrain.util.sampleOne
 import org.simbrain.workspace.Workspace
+import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.OdorWorldComponent
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
@@ -28,6 +27,7 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.pow
 import kotlin.random.Random
+import kotlin.random.nextInt
 
 /**
  * Initial work with Luis getting back to evo algorithms.
@@ -53,6 +53,16 @@ val evolveResourcePursuer = newSim { optionString ->
         targetValue = 1000.0,
         seed = 42
     )
+
+    class EvolvePursuerPhenotype(
+        val driveNeurons: NeuronCollection,
+        val inputNeurons: NeuronCollection,
+        val hiddenNeurons: NeuronCollection,
+        val outputNeurons: NeuronCollection,
+        val connections: List<Synapse>
+    ) {
+        val thirstNeuron get() = driveNeurons.neuronList.first()
+    }
 
     class EvolvePursuerGenotype(seed: Long = Random.nextLong()) : Genotype {
 
@@ -88,17 +98,7 @@ val evolveResourcePursuer = newSim { optionString ->
             add(neuronRuleGene(DecayRule()))
         }
 
-        inner class Phenotype(
-            val driveNeurons: NeuronCollection,
-            val inputNeurons: NeuronCollection,
-            val hiddenNeurons: NeuronCollection,
-            val outputNeurons: NeuronCollection,
-            val connections: List<Synapse>
-        ) {
-            val thirstNeuron get() = driveNeurons.neuronList.first()
-        }
-
-        suspend fun expressWith(network: Network): Phenotype {
+        suspend fun expressWith(network: Network): EvolvePursuerPhenotype {
             val driveNeurons = NeuronCollection(network.express(driveChromosome)).also {
                 network.addNetworkModel(it); it.label = "drives"
             }
@@ -106,7 +106,7 @@ val evolveResourcePursuer = newSim { optionString ->
                 network.addNetworkModel(it); it.label = "inputs"
             }
             val hiddenNeurons = NeuronCollection(network.express(hiddenChromosome)).also {
-                network.addNetworkModel(it); it.label = "hidden"
+                network.addNetworkModel(it);
             }
             val outputNeurons = NeuronCollection(network.express(outputChromosome)).also {
                 network.addNetworkModel(it); it.label = "outputs"
@@ -126,14 +126,14 @@ val evolveResourcePursuer = newSim { optionString ->
                 hiddenNeurons.neuronList,
                 hiddenNeurons.neuronList
             ).addToNetwork(network)
-            hiddenNeurons.label = connectionStrategyWrapper.connectionStrategy.toString()
+            hiddenNeurons.label = "Layout: ${connectionStrategyWrapper.connectionStrategy}"
 
             val hiddenUpdateRules = express(hiddenUpdateRuleChromosome)
             hiddenNeurons.neuronList.zip(hiddenUpdateRules).forEach { (neuron, rule) ->
                 neuron.updateRule = rule.updateRule
             }
 
-            return Phenotype(driveNeurons, inputNeurons, hiddenNeurons, outputNeurons, connections)
+            return EvolvePursuerPhenotype(driveNeurons, inputNeurons, hiddenNeurons, outputNeurons, connections)
         }
 
         fun copy() = EvolvePursuerGenotype(random.nextLong()).apply {
@@ -207,29 +207,91 @@ val evolveResourcePursuer = newSim { optionString ->
 
     }
 
+    data class SimState(
+        var calories: Double = 400.0,
+        var totalActivation: Double = 0.0,
+        var movement: Double = 0.0,
+        val baseMetabolism: Double = 10.0,
+        val seed: Long = Random.nextLong(),
+        val random: Random = Random(seed)
+    ) {
+        fun computeCalories() = max(0.0, calories - (totalActivation + movement + baseMetabolism) * (1.0 / evaluatorParams.iterationsPerRun))
+        fun OdorWorld.randomTileCoordinate() = with(tileMap) { random.nextGridCoordinate() }
+        fun OdorWorld.makeRandomLake(size: IntRange = 2..8) = with(tileMap) {
+            makeLake(randomTileCoordinate(), random.nextInt(size), random.nextInt(size), getLayer("Lake Layer"))
+        }
+        fun generateEnergyText() = """
+                            Calories: ${calories.format(2)}
+                            Activation: ${totalActivation.format(2)}
+                            Movement: ${movement.format(2)}
+                        """.trimIndent()
+    }
+
+
+    fun addActions(workspace: Workspace, phenotype: Deferred<EvolvePursuerPhenotype>, evolvedAgent: OdorWorldEntity, simState: SimState) {
+
+        var calories by simState::calories
+        var totalActivation by simState::totalActivation
+        var movement by simState::movement
+
+        workspace.addUpdateAction("update energy") {
+            with(phenotype.await()) {
+                val outputsActivations =
+                    outputNeurons.activations.sumOf { 1.2.pow(if (it < 0) it * -2 else it) - 1 }
+                val allActivations =
+                    (inputNeurons.neuronList + hiddenNeurons.neuronList).activations.sumOf { abs(it) } * 2
+                movement = abs(evolvedAgent.speed * 3) + abs(evolvedAgent.dtheta * 2)
+                totalActivation = outputsActivations + allActivations
+                calories = simState.computeCalories()
+                thirstNeuron.activation = 10.0 / evaluatorParams.iterationsPerRun + thirstNeuron.activation
+            }
+        }
+
+
+        // What to do when a cow finds water
+        workspace.addUpdateAction("water found") {
+            val thirstNeuron = phenotype.await().thirstNeuron
+            val odorWorld = (workspace.componentList.first { it is OdorWorldComponent } as OdorWorldComponent).world
+            with(odorWorld) {
+                val centerLakeSensor = evolvedAgent.sensors.first { it is TileSensor && it.label == "Center Lake Sensor" } as TileSensor
+                val lakeLayer = tileMap.getLayer("Lake Layer")
+                centerLakeSensor.let { sensor ->
+                    // Water found
+                    if (sensor.currentValue > 0.5) {
+                        // Reset thirst
+                        thirstNeuron.activation = 0.0
+                        // Drink the sugar water
+                        calories += 100.0
+                        // Relocate the lake
+                        tileMap.clear(lakeLayer)
+                        with(simState) {
+                            makeRandomLake(2..8)
+                        }
+                    }
+                }
+            }
+
+        }
+    }
+
     class EvolveResourcePursuerSim(
         val evolvePursuerGenotype: EvolvePursuerGenotype = EvolvePursuerGenotype(),
         val workspace: Workspace = Workspace(),
         seed: Long = Random.nextLong(),
     ) : EvoSim {
 
-        val random = Random(seed)
+        val simState = SimState(
+            seed = seed
+        )
+
+        var calories by simState::calories
 
         val networkComponent = NetworkComponent("Network")
             .also { workspace.addWorkspaceComponent(it) }
 
         val network = networkComponent.network
 
-        val phenotypeDeferred = CompletableDeferred<EvolvePursuerGenotype.Phenotype>()
-
-        var calories = 400.0
-        var totalActivation = 0.0
-        var movement = 0.0
-        val baseMetabolism = 10.0
-
-        fun randomTileCoordinate() = with(odorWorld.tileMap) { random.nextGridCoordinate() }
-        private val lakeSize
-            get() = random.nextInt(2, 8)
+        val phenotypeDeferred = CompletableDeferred<EvolvePursuerPhenotype>()
 
         val odorWorldComponent = OdorWorldComponent("Odor World").also {
             workspace.addWorkspaceComponent(it)
@@ -262,54 +324,18 @@ val evolveResourcePursuer = newSim { optionString ->
         // Central water sensor to determine when water is actually found.
         val centerLakeSensor = TileSensor("water", radius = 0.0).apply {
             decayFunction.dispersion = EntityType.LION.imageWidth / 1.4
+            label = "Center Lake Sensor"
         }.also { evolvedAgent.addSensor(it) }
 
         init {
-            List(1) { randomTileCoordinate() }.forEach {
-                with(odorWorld.tileMap) {
-                    makeLake(it, lakeSize, lakeSize, lakeLayer)
-                }
+            with(simState) {
+                odorWorld.makeRandomLake()
             }
 
             evolvedAgent.addDefaultEffectors()
             evolvedAgent.addSensor(centerLakeSensor)
 
-            fun computeCalories(): Double {
-               return max(0.0, calories - (totalActivation + movement + baseMetabolism) * (1.0 / evaluatorParams.iterationsPerRun))
-            }
-            workspace.addUpdateAction("update energy") {
-                with(phenotypeDeferred.await()) {
-                    val outputsActivations =
-                        outputNeurons.activations.sumOf { 1.2.pow(if (it < 0) it * -2 else it) - 1 }
-                    val allActivations =
-                        (inputNeurons.neuronList + hiddenNeurons.neuronList).activations.sumOf { abs(it) } * 2
-                    movement = abs(evolvedAgent.speed * 3) + abs(evolvedAgent.dtheta * 2)
-                    totalActivation = outputsActivations + allActivations
-                    calories = computeCalories()
-                    thirstNeuron.activation = 10.0 / evaluatorParams.iterationsPerRun + thirstNeuron.activation
-                }
-            }
-
-            // What to do when a cow finds water
-            workspace.addUpdateAction("water found") {
-                val thirstNeuron = phenotypeDeferred.await().thirstNeuron
-                with(odorWorld.tileMap) {
-                    centerLakeSensor.let { sensor ->
-                        // Water found
-                        if (sensor.currentValue > 0.5) {
-                            // Reset thirst
-                            thirstNeuron.activation = 0.0
-                            // Drink the sugar water
-                            calories += 100.0
-                            // Relocate the lake
-                            clear(lakeLayer)
-                            val newLocation = randomTileCoordinate()
-                            makeLake(newLocation, lakeSize, lakeSize, lakeLayer)
-                        }
-                    }
-                }
-
-            }
+            addActions(workspace, phenotypeDeferred, evolvedAgent, simState)
         }
 
         override fun mutate() {
@@ -368,17 +394,11 @@ val evolveResourcePursuer = newSim { optionString ->
                         hiddenNeurons.location = point(0, 60)
                         outputNeurons.location = point(0, -25)
                     }
-                    fun energyText():String =
-                        """
-                            Calories: ${calories.format(2)}
-                            Activation: ${totalActivation.format(2)}
-                            Movement: ${movement.format(2)}
-                        """.trimIndent()
 
-                    val energyTextObject = NetworkTextObject(energyText())
+                    val energyTextObject = NetworkTextObject(simState.generateEnergyText())
                     networkComponent.network.addNetworkModels(energyTextObject)
                     workspace.addUpdateAction("update energy text") {
-                        energyTextObject.text = energyText()
+                        energyTextObject.text = simState.generateEnergyText()
                     }
                     energyTextObject.location = point(-160, -20)
                     withGui {
@@ -396,11 +416,53 @@ val evolveResourcePursuer = newSim { optionString ->
 
     withGui {
         workspace.clearWorkspace()
-        evaluatorParams.createControlPanel("Control Panel", 5, 10)
+        val controlPanel = evaluatorParams.createControlPanel("Control Panel", 5, 10)
         evaluatorParams.addControlPanelButton("Evolve") {
             workspace.removeAllComponents()
             evaluatorParams.addProgressWindow()
             runSim()
+        }
+        controlPanel.addButton("Load Workspace") {
+            val loadOk = loadWorkspaceZipFromFileChooser()
+            if (loadOk) {
+
+                val simState = SimState()
+
+                val networkComponent = workspace.componentList
+                    .filterIsInstance<NetworkComponent>()
+                    .first()
+
+                val network = networkComponent.network
+
+                val driveNeurons = network.getModelByLabel<NeuronCollection>("drives")
+                val inputNeurons = network.getModelByLabel<NeuronCollection>("inputs")
+                val hiddenNeurons = network.getModels<NeuronCollection>().first { it.label?.startsWith("Layout") == true }
+                val outputNeurons = network.getModelByLabel<NeuronCollection>("outputs")
+                val connections = network.getModels<Synapse>().toList()
+
+                val energyTextObject = network.getModels<NetworkTextObject>().first()
+
+                val phenotype = CompletableDeferred(EvolvePursuerPhenotype(driveNeurons, inputNeurons, hiddenNeurons, outputNeurons, connections))
+
+                val odorWorldComponent = workspace.componentList
+                    .filterIsInstance<OdorWorldComponent>()
+                    .first()
+
+                val odorWorld = odorWorldComponent.world
+
+                val evolvedAgent = odorWorld.entityList.first { it.entityType == EntityType.LION }
+
+                addActions(workspace, phenotype, evolvedAgent, simState)
+
+                workspace.addUpdateAction("update energy text") {
+                    energyTextObject.text = simState.generateEnergyText()
+                }
+
+                withGui {
+                    place(networkComponent, 5, 375, 340, 430)
+                    place(odorWorldComponent, 340, 10, 800, 900)
+                }
+            }
         }
     }
 

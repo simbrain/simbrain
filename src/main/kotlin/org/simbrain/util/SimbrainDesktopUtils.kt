@@ -6,12 +6,14 @@ import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.gui.SimbrainDesktop
+import org.simbrain.workspace.serialization.WorkspaceSerializer
 import java.awt.BorderLayout
 import java.awt.Point
 import java.awt.Rectangle
 import java.awt.event.ActionEvent
 import java.awt.event.FocusAdapter
 import java.awt.event.FocusEvent
+import java.io.FileInputStream
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import javax.swing.*
@@ -180,4 +182,19 @@ class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, tru
         mainPanel.addItem(editor)
     }
 
+}
+
+suspend fun SimbrainDesktop.loadWorkspaceZipFromFileChooser(): Boolean {
+    val simulationChooser = SFileChooser(workspace.currentDirectory, "Zip Archive", "zip")
+    val simFile = simulationChooser.showOpenDialog()
+    val serializer = WorkspaceSerializer(workspace)
+    if (simFile != null) {
+        workspace.removeAllComponents()
+        workspace.updater.updateManager.reset()
+        withContext(Dispatchers.IO) {
+            serializer.deserialize(FileInputStream(simFile))
+        }
+        return true
+    }
+    return false
 }

@@ -80,7 +80,7 @@ open class NetworkTextObject : LocatableModel {
 
     @XStreamConstructor
     constructor(): super() {
-        println("here")
+
     }
 
     /**

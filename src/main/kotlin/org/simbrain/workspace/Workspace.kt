@@ -335,24 +335,6 @@ class Workspace: CoroutineScope {
     }
 
     /**
-     * Returns all components of the specified type, e.g. all
-     * WorkspaceComponents of type NetworkComponent.class.
-     *
-     * @param componentType the type of the component, in the sense of its
-     * class
-     * @return list of components
-     */
-    fun getComponentList(componentType: Class<*>): Collection<WorkspaceComponent> {
-        val returnList: MutableList<WorkspaceComponent> = ArrayList()
-        for (component in componentList) {
-            if (component.javaClass == componentType) {
-                returnList.add(component)
-            }
-        }
-        return returnList
-    }
-
-    /**
      * Returns global time.
      *
      * @return the time

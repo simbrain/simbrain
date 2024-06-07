@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PPath
+import org.piccolo2d.util.PBounds
 import org.simbrain.util.distanceTo
 import org.simbrain.util.magnitude
 import org.simbrain.util.minus
@@ -37,7 +38,7 @@ class EntityNode(
     /**
      * Sprite representing this entity.
      */
-    var sprite: Sprite? = null
+    lateinit var sprite: Sprite
 
     /**
      * Represents path taken by the agent, if [OdorWorldEntity.isShowTrail] is turned on
@@ -204,7 +205,9 @@ class EntityNode(
      * Initialize the image associated with the object. Only called when changing the image.
      */
     private fun updateImage() {
-        removeChild(sprite)
+        if (::sprite.isInitialized) {
+            removeChild(sprite)
+        }
         when (entity.entityType) {
             EntityType.SWISS, EntityType.GOUDA, EntityType.POISON, EntityType.BELL, EntityType.FLOWER, EntityType.TULIP, EntityType.PANSY, EntityType.FLAX, EntityType.FISH -> sprite =
                 Sprite(
@@ -274,7 +277,7 @@ class EntityNode(
         frameCounter += entity.speed / 5
         var i = 0
         while (i < frameCounter) {
-            sprite!!.advance()
+            sprite.advance()
             i++
         }
         frameCounter -= i.toDouble()
@@ -284,7 +287,7 @@ class EntityNode(
      * Set the sprite to frame where the entity is standing still.
      */
     fun resetToStaticFrame() {
-        sprite!!.resetToStaticFrame()
+        sprite.resetToStaticFrame()
     }
 
     fun createContextMenu(odorWorldPanel: OdorWorldPanel) = JPopupMenu().apply {
@@ -303,5 +306,9 @@ class EntityNode(
         val couplingMenu = CouplingMenu(odorWorldPanel.odorWorldComponent, entity)
         couplingMenu.setCustomName("Create couplings")
         add(couplingMenu)
+    }
+
+    override fun getBounds(): PBounds {
+        return sprite.bounds
     }
 }

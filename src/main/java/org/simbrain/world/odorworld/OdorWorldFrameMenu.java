@@ -69,12 +69,6 @@ public class OdorWorldFrameMenu extends JMenuBar {
      * Paste menu item.
      */
     private JMenuItem pasteItem = new JMenuItem("Paste");
-
-    /**
-     * Clear all menu item.
-     */
-    private JMenuItem clearAllItems = new JMenuItem("Clear all entities");
-
     /**
      * Help menu.
      */
@@ -182,13 +176,6 @@ public class OdorWorldFrameMenu extends JMenuBar {
         //editMenu.add(copyItem);
         //editMenu.add(pasteItem);
         //editMenu.addSeparator();
-        clearAllItems.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                world.deleteAllEntities();
-            }
-        });
-        editMenu.add(clearAllItems);
-        editMenu.addSeparator();
 
         // TODO: Factor the code for placing new entities out of network, to utils, and reuse here.
         JMenuItem addEntity = new JMenuItem("Add Entity");

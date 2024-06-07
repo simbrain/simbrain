@@ -42,7 +42,7 @@ class OdorWorldPanel(
     /**
      * Selection model.
      */
-    private val selectionManager = WorldSelectionManager()
+    val selectionManager = WorldSelectionManager()
 
     /**
      * Provisional interface for selecting tiles.
@@ -341,6 +341,8 @@ class OdorWorldPanel(
                 scalingFactor = scalingFactor // force invoke setter
             }
         })
+
+        odorWorldActions.createSelectAllAction()
     }
 
     private fun renderAllLayers(world: OdorWorld) {
@@ -360,7 +362,7 @@ class OdorWorldPanel(
             return
         }
 
-        if (selectedModelEntities.isNotEmpty()) {
+        if (selectedEntityModels.isNotEmpty()) {
             canvas.setViewBounds(
                 Rectangle2D.Double(
                     firstSelectedEntityModel!!.x - canvas.camera.viewBounds.width / 2,
@@ -415,24 +417,27 @@ class OdorWorldPanel(
     }
 
 
-    val selectedEntities: List<EntityNode>
-        get() = // Assumes selected pnodes parents are entitynodes
+    val selectedEntityNodes: List<EntityNode>
+        get() =
             selection
-                .map { it.parent }
+                .map {
+                    if (it is EntityNode) {
+                        it
+                    } else {
+                        it.parent
+                    }
+                }
                 .filterIsInstance<EntityNode>()
 
-    val selectedModelEntities: List<OdorWorldEntity?>
-        get() = selection
-            .map { it.parent }
-            .filterIsInstance<EntityNode>()
+    val selectedEntityModels: List<OdorWorldEntity>
+        get() = selectedEntityNodes
             .map { it.entity }
 
     val firstSelectedEntityNode: EntityNode?
-        get() = selectedEntities.firstOrNull()
+        get() = selectedEntityNodes.firstOrNull()
 
     val firstSelectedRotatingEntity: OdorWorldEntity?
-        get() = selectedModelEntities.stream().filter { e: OdorWorldEntity? -> e!!.entityType.isRotating }.findFirst()
-            .orElse(null)
+        get() = selectedEntityModels.firstOrNull { it.entityType.isRotating }
 
     val firstSelectedEntityModel: OdorWorldEntity?
         get() {
@@ -446,9 +451,7 @@ class OdorWorldPanel(
      * Delete all current selected entities.
      */
     fun deleteSelectedEntities() {
-        for (e in selectedModelEntities) {
-            e!!.delete()
-        }
+        selectedEntityModels.forEach { it.delete() }
     }
 
     /**

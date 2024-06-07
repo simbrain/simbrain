@@ -240,7 +240,7 @@ class WorldMouseHandler(
         // System.out.println("Drag:" + pickedNode);
 
         // Continue to drag nodes that have already been selected
-        for (node in odorWorldPanel.selectedEntities) {
+        for (node in odorWorldPanel.selectedEntityNodes) {
             // TODO: networkpanel has a draggable flag here
             // TODO: Only update model at end of drag.
             // TODO: This getparent business...

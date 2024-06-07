@@ -140,7 +140,7 @@ var parentFrame: GenericFrame, workspaceComponent: E
         for (format in workspaceComponent.formats) {
             chooser.addExtension(format)
         }
-        val file = chooser.showOpenDialog()
+        val file = chooser.showOpenDialog() ?: return
         val dir = file.parentFile.absolutePath
         val name = file.name
         val ext = SFileChooser.getExtension(file)

@@ -359,15 +359,6 @@ public class OdorWorld implements EditableObject, Bounded {
     }
 
     /**
-     * Delete all entities.
-     */
-    public void deleteAllEntities() {
-        for (OdorWorldEntity entity : entityList) {
-            deleteEntity(entity);
-        }
-    }
-
-    /**
      * Caches the maximum vector norm, which is used for scaling the color smell sensors.
      */
     private void recomputeMaxVectorNorm() {

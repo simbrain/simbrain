@@ -13,6 +13,13 @@ import javax.swing.JMenuItem
 
 class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
 
+    fun createSelectAllAction() = odorWorldPanel.createAction(
+        name = "Select All",
+        keyboardShortcut = CmdOrCtrl + 'A'
+    ) {
+        odorWorldPanel.selectionManager.addAll(odorWorldPanel.canvas.layer.allNodes.filterIsInstance<EntityNode>().toMutableSet())
+    }
+
     fun addAgentAction() = odorWorldPanel.createAction(
         name = "Add agent",
         iconPath = "odorworld/rotating/mouse/Mouse_225.gif",
@@ -50,7 +57,7 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
         iconPath = "menu_icons/Properties.png",
         keyboardShortcut = CmdOrCtrl + 'E'
     ) {
-        odorWorldPanel.selectedEntities.firstOrNull()?.let {
+        odorWorldPanel.selectedEntityNodes.firstOrNull()?.let {
             EntityDialog(it.entity).apply { title = "Edit ${it.entity.name}" }.display()
         }
     }

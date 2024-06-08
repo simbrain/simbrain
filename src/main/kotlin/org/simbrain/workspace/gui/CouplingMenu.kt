@@ -3,6 +3,7 @@ package org.simbrain.workspace.gui
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
+import org.simbrain.util.swingInvokeLater
 import org.simbrain.workspace.Attribute
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Producer
@@ -112,17 +113,19 @@ class CouplingMenu(
     }
 
     private fun Sequence<CouplingMenuItem>.createSubmenu(description: String) {
-        val submenu = JMenu(description)
-        // TODO: "..." menu has no action
-        if (firstOrNull() != null) {
-            take(maxVisibleMenuItems).let { items ->
-                items.map { it.create() }.forEach { submenu.add(it) }
-                if (items.count() > 35) {
-                    submenu.add(JSeparator())
-                    submenu.add(JMenuItem("... and more items"))
+        swingInvokeLater {
+            val submenu = JMenu(description)
+            // TODO: "..." menu has no action
+            if (firstOrNull() != null) {
+                take(maxVisibleMenuItems).let { items ->
+                    items.map { it.create() }.forEach { submenu.add(it) }
+                    if (items.count() > maxVisibleMenuItems-1) {
+                        submenu.add(JSeparator())
+                        submenu.add(JMenuItem("... and more items"))
+                    }
                 }
             }
+            add(submenu)
         }
-        add(submenu)
     }
 }

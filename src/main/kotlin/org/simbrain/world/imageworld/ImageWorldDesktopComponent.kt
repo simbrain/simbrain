@@ -202,8 +202,10 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
             editMenu.addSeparator()
             editMenu.add(CouplingMenu(workspaceComponent,  imageWorld.filterCollection.currentFilter))
         }
-        createEditMenu()
-        onCouplingAttributesChanged { createEditMenu() }
+        swingInvokeLater {
+            createEditMenu()
+            onCouplingAttributesChanged { createEditMenu() }
+        }
 
         // Help Menu
         val helpMenu = JMenu("Help")

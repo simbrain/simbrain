@@ -8,6 +8,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamReader
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter
 import org.simbrain.network.NetworkModel
 import org.simbrain.network.subnetworks.Subnetwork
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * The main data structure for [NetworkModel]s. Wraps a map from classes to ordered sets of those objects.
@@ -21,7 +22,7 @@ class NetworkModelList {
      * Backing for the collection: a map from model types to linked hash sets.
      */
     @XStreamImplicit
-    private val networkModels: MutableMap<Class<out NetworkModel>, LinkedHashSet<NetworkModel>?> = HashMap()
+    private val networkModels: MutableMap<Class<out NetworkModel>, LinkedHashSet<NetworkModel>?> = ConcurrentHashMap()
 
     private val modelsByShouldAsync: Map<Boolean, LinkedHashSet<NetworkModel>> = mapOf(
         true to LinkedHashSet(),

@@ -171,10 +171,15 @@ public class Filter implements AttributeContainer, EditableObject {
         return image;
     }
 
-    void initScaleOp() {
+    private float computeScalingFactor(int source, int target) {
+        if (source == target) { return 1f; }
         // Subtract 0.1 from width and height to avoid exceeding the specified dimension due to floating point error.
-        float scaleX = (width - 0.1f) / source.getWidth();
-        float scaleY = (height - 0.1f) / source.getHeight();
+        return (target - 0.1f) / source;
+    }
+
+    void initScaleOp() {
+        float scaleX = computeScalingFactor(source.getWidth(), width);
+        float scaleY = computeScalingFactor(source.getHeight(), height);
         scaleOp = FilterUtils.createScaleOp(scaleX, scaleY, true);
     }
 

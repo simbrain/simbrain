@@ -1,5 +1,8 @@
 package org.simbrain.workspace.gui
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.swing.Swing
 import org.simbrain.workspace.Attribute
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Producer
@@ -38,11 +41,13 @@ class CouplingMenu(
             }
         }
         with(sourceComponent.couplingManager) {
-            sources.flatMap { it.visibleProducers }.forEach { createProducerSubmenu(it) }
-            // TODO: possibly check to make sure that itemcount is not empty before adding this, though that is not
-            //  usually the case and the affordance of the lone separator might not be so bad
-            addSeparator()
-            sources.flatMap { it.visibleConsumers }.forEach { createConsumerSubmenu(it) }
+            sourceComponent.workspace.launch(Dispatchers.Swing) {
+                sources.flatMap { it.visibleProducers }.forEach { createProducerSubmenu(it) }
+                // TODO: possibly check to make sure that itemcount is not empty before adding this, though that is not
+                //  usually the case and the affordance of the lone separator might not be so bad
+                addSeparator()
+                sources.flatMap { it.visibleConsumers }.forEach { createConsumerSubmenu(it) }
+            }
         }
     }
 

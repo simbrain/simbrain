@@ -124,11 +124,12 @@ public class OdorWorldFrameMenu extends JMenuBar {
         JMenuItem loadTileMapItem = new JMenuItem(new AbstractAction("Load Tile Map...") {
             @Override
             public void actionPerformed(ActionEvent e) {
-                SFileChooser chooser = new SFileChooser(OdorWorldPreferences.INSTANCE.getDirectory(), "Load TMX Tilemap");
+                SFileChooser chooser = new SFileChooser(OdorWorldPreferences.INSTANCE.getTileMapDirectory(), "Load TMX Tilemap");
+                chooser.addExtension("tmx");
                 File theFile = chooser.showOpenDialog();
                 if (theFile != null) {
                     world.setTileMap(TMXUtils.loadTileMap(theFile));
-                    OdorWorldPreferences.INSTANCE.setDirectory(chooser.getCurrentLocation());
+                    OdorWorldPreferences.INSTANCE.setTileMapDirectory(chooser.getCurrentLocation());
                 }
             }
         });

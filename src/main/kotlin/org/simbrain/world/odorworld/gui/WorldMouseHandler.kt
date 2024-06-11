@@ -26,10 +26,7 @@ import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.event.PInputEventFilter
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PNodeFilter
-import org.simbrain.util.component1
-import org.simbrain.util.component2
-import org.simbrain.util.component3
-import org.simbrain.util.component4
+import org.simbrain.util.*
 import org.simbrain.util.piccolo.SelectionMarquee
 import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.OdorWorldPanel
@@ -241,15 +238,7 @@ class WorldMouseHandler(
 
         // Continue to drag nodes that have already been selected
         for (node in odorWorldPanel.selectedEntityNodes) {
-            // TODO: networkpanel has a draggable flag here
-            // TODO: Only update model at end of drag.
-            // TODO: This getparent business...
-            node.localToParent(delta)
-            node.offset(delta.getWidth(), delta.getHeight())
-            // Below needed for proper continuous updating of couplings
-            if (node is EntityNode) {
-                node.pushViewPositionToModel()
-            }
+            node.entity.location += delta
         }
     }
 

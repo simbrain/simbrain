@@ -3,6 +3,7 @@ package org.simbrain.util
 /**
  * Kotlin utility classes for 2d geometry.
  */
+import org.piccolo2d.util.PDimension
 import java.awt.Point
 import java.awt.Polygon
 import java.awt.geom.CubicCurve2D
@@ -37,6 +38,8 @@ operator fun Point2D.unaryMinus() = point(-x, -y)
 
 operator fun Point2D.plus(vector: Point2D) = point(this.x + vector.x, this.y + vector.y)
 operator fun Point2D.minus(other: Point2D) = point(this.x - other.x, this.y - other.y)
+operator fun Point2D.plus(vector: PDimension) = point(this.x + vector.width, this.y + vector.height)
+operator fun Point2D.minus(vector: PDimension) = point(this.x - vector.width, this.y - vector.height)
 
 operator fun Point2D.times(vector: Point2D) = point(x * vector.x, y * vector.y)
 

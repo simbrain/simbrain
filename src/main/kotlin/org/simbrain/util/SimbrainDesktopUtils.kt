@@ -1,6 +1,7 @@
 package org.simbrain.util
 
 import kotlinx.coroutines.*
+import kotlinx.coroutines.swing.Swing
 import org.simbrain.custom_sims.SimulationScope
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
@@ -82,23 +83,27 @@ class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, tru
     }
 
     fun addComponent(component: JComponent) {
-        mainPanel.addItem(component, 1)
+        launch(Dispatchers.Swing) { mainPanel.addItem(component, 1) }
     }
 
     fun addSeparator() {
-        mainPanel.addItem(JSeparator(SwingConstants.HORIZONTAL))
+        launch(Dispatchers.Swing) { mainPanel.addItem(JSeparator(SwingConstants.HORIZONTAL)) }
     }
 
     fun addLabelledText(label: String, text: String) = JLabel(text).also {
-        mainPanel.addItem(label, it)
+        launch(Dispatchers.Swing) {
+            mainPanel.addItem(label, it)
+        }
     }
 
-    fun addButton(label: String, context: CoroutineContext = EmptyCoroutineContext, task: suspend (ActionEvent) -> Unit) = JButton(label).apply {
-        addActionListener {
+    fun addButton(label: String, context: CoroutineContext = EmptyCoroutineContext, task: suspend (ActionEvent) -> Unit) = JButton(label).also { button ->
+        button.addActionListener {
             launch(context) { task(it) }
         }
-        mainPanel.addItem(this)
-        pack()
+        launch(Dispatchers.Swing) {
+            mainPanel.addItem(button)
+            pack()
+        }
     }
 
     /**
@@ -106,19 +111,21 @@ class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, tru
      * If an onChange block is provided and the values are converted to numbers, [addFormattedNumericTextField]
      * should be used instead.
      */
-    fun addTextField(label: String, initValue: String, onChange: (String) -> Unit = {}) = JTextField(initValue).apply {
-        document.addDocumentListener(object : DocumentListener {
+    fun addTextField(label: String, initValue: String, onChange: (String) -> Unit = {}) = JTextField(initValue).also { textField ->
+        textField.document.addDocumentListener(object : DocumentListener {
             override fun insertUpdate(e: DocumentEvent?) {
-                onChange(text)
+                onChange(textField.text)
             }
             override fun removeUpdate(e: DocumentEvent?) {
-                onChange(text)
+                onChange(textField.text)
             }
             override fun changedUpdate(e: DocumentEvent?) {
-                onChange(text)
+                onChange(textField.text)
             }
         })
-        mainPanel.addItem(label, this)
+        launch(Dispatchers.Swing) {
+            mainPanel.addItem(label, textField)
+        }
     }
 
     /**
@@ -133,53 +140,57 @@ class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, tru
         columns: Int = 8,
         maximumFractionDigits: Int = 12,
         crossinline onChange: (T) -> Unit
-    ) = JFormattedTextField(initValue).apply {
-        val format = if (T::class == Int::class || T::class == Long::class || T::class == Short::class) {
-            NumberFormat.getIntegerInstance(getLocale())
-        } else {
-            NumberFormat.getNumberInstance(getLocale()).apply { this.maximumFractionDigits = maximumFractionDigits }
-        } as DecimalFormat
-        val formatterEditor = NumberFormatter(format)
-        formatterEditor.valueClass = T::class.java
-        val factory = DefaultFormatterFactory(formatterEditor)
-        setFocusLostBehavior(JFormattedTextField.PERSIST)
-        this.columns = columns
-        isEditable = true
-        setFormatterFactory(factory)
-        addFocusListener(object : FocusAdapter() {
-            override fun focusLost(e: FocusEvent) {
-                if (isValid) {
-                    commitEdit()
-                }
-            }
-        })
-        document.addDocumentListener(object : DocumentListener {
+    ) = JFormattedTextField(initValue).also { textField ->
+        textField.document.addDocumentListener(object : DocumentListener {
             override fun insertUpdate(e: DocumentEvent?) {
-                onChange(value as T)
+                onChange(textField.value as T)
             }
             override fun removeUpdate(e: DocumentEvent?) {
-                onChange(value as T)
+                onChange(textField.value as T)
             }
             override fun changedUpdate(e: DocumentEvent?) {
-                onChange(value as T)
+                onChange(textField.value as T)
             }
         })
-        mainPanel.addItem(label, this)
+        launch(Dispatchers.Swing) {
+            val format = if (T::class == Int::class || T::class == Long::class || T::class == Short::class) {
+                NumberFormat.getIntegerInstance(textField.getLocale())
+            } else {
+                NumberFormat.getNumberInstance(textField.getLocale()).apply { this.maximumFractionDigits = maximumFractionDigits }
+            } as DecimalFormat
+            val formatterEditor = NumberFormatter(format)
+            formatterEditor.valueClass = T::class.java
+            val factory = DefaultFormatterFactory(formatterEditor)
+            textField.setFocusLostBehavior(JFormattedTextField.PERSIST)
+            textField.columns = columns
+            textField.isEditable = true
+            textField.setFormatterFactory(factory)
+            textField.addFocusListener(object : FocusAdapter() {
+                override fun focusLost(e: FocusEvent) {
+                    if (textField.isValid) {
+                        textField.commitEdit()
+                    }
+                }
+            })
+            mainPanel.addItem(label, textField)
+        }
     }
 
-    fun addCheckBox(label: String, checked: Boolean, onChange: suspend (Boolean) -> Unit = {}) = JCheckBox().apply {
-        isSelected = checked
-        mainPanel.addItem(label, this)
-        addActionListener {
+    fun addCheckBox(label: String, checked: Boolean, onChange: suspend (Boolean) -> Unit = {}) = JCheckBox().also { checkBox ->
+        checkBox.addActionListener {
             launch {
-                onChange(isSelected)
+                onChange(checkBox.isSelected)
             }
         }
-        pack()
+        launch(Dispatchers.Swing) {
+            checkBox.isSelected = checked
+            mainPanel.addItem(label, checkBox)
+            pack()
+        }
     }
 
     fun <O: EditableObject> addAnnotatedPropertyEditor(editor: AnnotatedPropertyEditor<O>) {
-        mainPanel.addItem(editor)
+        launch(Dispatchers.Swing) { mainPanel.addItem(editor) }
     }
 
 }

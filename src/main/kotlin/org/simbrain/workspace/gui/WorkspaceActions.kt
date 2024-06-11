@@ -223,7 +223,6 @@ class WorkspaceActions {
     val newWorldActions = listOf(
         createComponentFactoryAction("Data Table", "menu_icons/Table.png"),
         createComponentFactoryAction("Odor World", "menu_icons/SwissIcon.png"),
-        createComponentFactoryAction("3D World", "menu_icons/World.png"),
         createComponentFactoryAction("Image World", "menu_icons/photo.png"),
         createComponentFactoryAction("Text World", "menu_icons/Text.png"),
         createComponentFactoryAction("Sound World", "menu_icons/speaker.png")

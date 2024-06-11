@@ -265,13 +265,15 @@ class WorkspaceActions {
             description = "Rename this component",
             coroutineScope = workspace
         ) {
-            val newTitle: String = JOptionPane.showInputDialog(
+            val newTitle: String? = JOptionPane.showInputDialog(
                 null,
                 "Rename component",
                 desktopComponent.title
             )
-            desktopComponent.title = newTitle
-            workspaceComponent.name = newTitle
+            if (newTitle != null) {
+                desktopComponent.title = newTitle
+                workspaceComponent.name = newTitle
+            }
         }
 
     private fun <T: WorkspaceComponent> createCoupledPlotAction(

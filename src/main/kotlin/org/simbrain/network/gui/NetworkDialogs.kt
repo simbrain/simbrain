@@ -113,7 +113,7 @@ fun NetworkPanel.showPiccoloDebugger() {
 /**
  * Shows a dialog that allows the user to send inputs from a [SimbrainDataTable] to the provided neurons.
  */
-fun NetworkPanel.showInputPanel(neurons: List<Neuron>) {
+fun showInputPanel(neurons: List<Neuron>) {
     createTestInputPanel(neurons).displayInDialog()
 }
 

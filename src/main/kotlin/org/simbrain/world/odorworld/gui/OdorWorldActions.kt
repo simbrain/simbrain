@@ -3,7 +3,6 @@ package org.simbrain.world.odorworld.gui
 import org.simbrain.util.*
 import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.OdorWorldPanel
-import org.simbrain.world.odorworld.dialogs.EntityDialog
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.layerEditor
 import org.simbrain.world.odorworld.showTilePicker
@@ -53,13 +52,11 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
     }
 
     val showPropertyDialogAction = odorWorldPanel.createAction(
-        name = "Edit..",
+        name = "Edit...",
         iconPath = "menu_icons/Properties.png",
         keyboardShortcut = CmdOrCtrl + 'E'
     ) {
-        odorWorldPanel.selectedEntityNodes.firstOrNull()?.let {
-            EntityDialog(it.entity).apply { title = "Edit ${it.entity.name}" }.display()
-        }
+        odorWorldPanel.editSelectedEntities()
     }
 
     // TODO: Add images and to toolbar

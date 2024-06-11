@@ -30,7 +30,6 @@ import org.simbrain.util.*
 import org.simbrain.util.piccolo.SelectionMarquee
 import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.OdorWorldPanel
-import org.simbrain.world.odorworld.dialogs.EntityDialog
 import org.simbrain.world.odorworld.showTilePicker
 import java.awt.event.InputEvent
 import java.awt.geom.Point2D
@@ -117,13 +116,9 @@ class WorldMouseHandler(
         if (event.clickCount != 1) {
             (node.parent as? EntityNode).let {
                 if (it != null) {
-                    val dialog = EntityDialog(it.entity)
-                    dialog.pack()
-                    dialog.setLocationRelativeTo(null)
-                    dialog.isVisible = true
+                    odorWorldPanel.editSelectedEntities()
                 } else {
                     // TODO: On right click, show sub-menu with layers, then show dialog below
-
                     val tileMap = odorWorldPanel.world.tileMap
                     showTilePicker(tileMap.tileSets, event.getCurrentTileId()) { tileId: Int? ->
                         val p = tileMap.pixelToGridCoordinate(world.lastClickedPosition)

@@ -11,6 +11,7 @@ import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.gui.CustomToolBar
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.*
+import org.simbrain.world.odorworld.dialogs.EntityDialog
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.gui.*
 import java.awt.*
@@ -548,6 +549,12 @@ class OdorWorldPanel(
         add(odorWorldActions.resetZoomAction())
         add(odorWorldActions.zoomInAction())
         add(odorWorldActions.zoomOutAction())
+    }
+
+    fun editSelectedEntities() {
+        selectedEntityNodes.firstOrNull()?.let {
+            EntityDialog(it.entity).apply { title = "Edit ${it.entity.name}" }.display()
+        }
     }
 }
 

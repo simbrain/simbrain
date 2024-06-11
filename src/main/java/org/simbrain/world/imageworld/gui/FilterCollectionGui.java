@@ -83,6 +83,7 @@ public class FilterCollectionGui {
 
             // If the filter is a filtered image source, edit it too
             ImageSource imageSource = filter.getSource();
+            filterEditorDialog.setTitle("Edit " + filter.getName());
             AnnotatedPropertyEditor filterEditor = new AnnotatedPropertyEditor((EditableObject) imageSource);
             dialogPanel.add(filterEditor);
             filterEditorDialog.addCommitTask(() -> {

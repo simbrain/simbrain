@@ -39,7 +39,11 @@ class OdorWorldEntity @JvmOverloads constructor(
     @UserParameter(label = "X", description = "X Position", order = 3)
     override var x = 0.0
         set(value) {
-            field = value.coerceIn(0.0, world.width)
+            field = if (world.tileMap == null) {
+                value
+            } else {
+                value.coerceIn(0.0, world.width)
+            }
             events.moved.fire()
             locationPointDirty = true
         }
@@ -47,7 +51,11 @@ class OdorWorldEntity @JvmOverloads constructor(
     @UserParameter(label = "Y", description = "Y Position", order = 3)
     override var y = 0.0
         set(value) {
-            field = value.coerceIn(0.0, world.height)
+            field = if (world.tileMap == null) {
+                value
+            } else {
+                value.coerceIn(0.0, world.height)
+            }
             events.moved.fire()
             locationPointDirty = true
         }

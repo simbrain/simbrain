@@ -76,7 +76,6 @@ class RandomizedPursuer : Simulation {
 
         cheese = oc.world.addEntity(0, 0, EntityType.SWISS, doubleArrayOf(1.0, 0.0, 0.0))
         cheese.setLocationRelativeToCenter(0, -30)
-        oc.world.update()
     }
 
     private fun buildNetwork() {

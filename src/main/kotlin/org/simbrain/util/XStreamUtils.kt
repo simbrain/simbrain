@@ -18,6 +18,7 @@ import org.simbrain.util.piccolo.Tile
 import org.simbrain.util.piccolo.TileMapLayer
 import org.simbrain.util.projection.Projector
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.world.odorworld.OdorWorld
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KProperty1
@@ -60,6 +61,7 @@ fun getSimbrainXStream(): XStream {
                 reflectionProvider,
                 excludedTypes = listOf(
                     Network::class.java,
+                    OdorWorld::class.java,
                     Tile::class.java,
                     TileMapLayer::class.java,
                     Projector::class.java

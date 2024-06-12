@@ -230,14 +230,14 @@ class OdorWorldPanel(
         canvas.addInputEventListener(WorldMouseHandler(this, world))
         canvas.addInputEventListener(WorldContextMenuEventHandler(this, world))
 
-        world.getEvents().entityAdded.on(swingDispatcher) { e: OdorWorldEntity? ->
+        world.events.entityAdded.on(swingDispatcher) { e: OdorWorldEntity? ->
             val node = EntityNode(e!!)
             canvas.layer.addChild(node)
             selectionManager.clear()
             selectionManager.add(node)
             repaint()
         }
-        world.getEvents().entityRemoved.on(swingDispatcher) { e ->
+        world.events.entityRemoved.on(swingDispatcher) { e ->
             val entityNode = canvas.layer.allNodes
                 .filterIsInstance<EntityNode>().firstOrNull { it.entity == e }
             if (entityNode != null) {
@@ -245,14 +245,14 @@ class OdorWorldPanel(
                 repaint()
             }
         }
-        world.getEvents().updated.on(swingDispatcher, wait = true) { this.centerCameraToSelectedEntity() }
-        world.getEvents().frameAdvanced.on(swingDispatcher) {
+        world.events.updated.on(swingDispatcher, wait = true) { this.centerCameraToSelectedEntity() }
+        world.events.frameAdvanced.on(swingDispatcher) {
             canvas.layer.childrenReference
                 .filterIsInstance<EntityNode>()
                 .forEach { it.advance() }
             repaint()
         }
-        world.getEvents().animationStopped.on(swingDispatcher) {
+        world.events.animationStopped.on(swingDispatcher) {
             // When movement is stopped use the "static" animation so we don't show entities in strange
             // intermediate states
             canvas.layer.childrenReference
@@ -262,7 +262,7 @@ class OdorWorldPanel(
         }
 
         // Full tile map update
-        world.getEvents().tileMapChanged.on(swingDispatcher) {
+        world.events.tileMapChanged.on(swingDispatcher) {
             world.tileMap.events.layersChanged.on(swingDispatcher) {
                 renderAllLayers(world)
             }
@@ -285,7 +285,7 @@ class OdorWorldPanel(
             renderAllLayers(world)
         }
 
-        world.getEvents().worldStarted.on(null, true) {
+        world.events.worldStarted.on(null, true) {
             if (movementTimer != null) {
                 movementTimer?.cancel()
                 movementTimer = null
@@ -294,14 +294,14 @@ class OdorWorldPanel(
                 animationTimer = Timer().apply {
                     schedule(object : TimerTask() {
                         override fun run() {
-                            world.getEvents().frameAdvanced.fire()
+                            world.events.frameAdvanced.fire()
                         }
                     }, 50, 50)
                 }
             }
         }
 
-        world.getEvents().worldStopped.on(null, true, Runnable {
+        world.events.worldStopped.on(null, true, Runnable {
             movementTimer = Timer().apply {
                 schedule(object : TimerTask() {
                     override fun run() {
@@ -331,7 +331,7 @@ class OdorWorldPanel(
             }, 10, 10)
         }
 
-        world.getEvents().tileMapChanged.fire()
+        world.events.tileMapChanged.fire()
 
         canvas.setViewBounds(Rectangle2D.Double(0.0, 0.0, world.width, world.height))
 

@@ -16,124 +16,134 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.world.odorworld;
+package org.simbrain.world.odorworld
 
-import org.jetbrains.annotations.NotNull;
-import org.simbrain.util.SimpleIdManager;
-import org.simbrain.util.SmellSource;
-import org.simbrain.util.UserParameter;
-import org.simbrain.util.math.SimbrainMath;
-import org.simbrain.util.piccolo.TMXUtils;
-import org.simbrain.util.piccolo.TileMap;
-import org.simbrain.util.piccolo.TileMapLayer;
-import org.simbrain.util.propertyeditor.EditableObject;
-import org.simbrain.world.odorworld.effectors.Effector;
-import org.simbrain.world.odorworld.entities.Bounded;
-import org.simbrain.world.odorworld.entities.EntityType;
-import org.simbrain.world.odorworld.entities.OdorWorldEntity;
-import org.simbrain.world.odorworld.events.OdorWorldEvents;
-import org.simbrain.world.odorworld.sensors.Sensor;
-
-import java.awt.geom.Point2D;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import org.simbrain.util.SimpleIdManager.SimpleId
+import org.simbrain.util.SmellSource
+import org.simbrain.util.UserParameter
+import org.simbrain.util.math.SimbrainMath
+import org.simbrain.util.piccolo.TileMap
+import org.simbrain.util.piccolo.TileMapLayer
+import org.simbrain.util.piccolo.loadTileMap
+import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.world.odorworld.effectors.Effector
+import org.simbrain.world.odorworld.entities.Bounded
+import org.simbrain.world.odorworld.entities.EntityType
+import org.simbrain.world.odorworld.entities.OdorWorldEntity
+import org.simbrain.world.odorworld.events.OdorWorldEvents
+import org.simbrain.world.odorworld.sensors.Sensor
+import java.awt.geom.Point2D
+import java.util.*
+import java.util.function.Consumer
 
 /**
- * A 2d environment. Contains a list of {@link OdorWorldEntity}s, which can either be agents or static objects.
+ * A 2d environment. Contains a list of [OdorWorldEntity]s, which can either be agents or static objects.
  *
  * Agents have sensors for detecting objects, and effectors for moving.
  *
- * Contains a {@link TileMap} which is a grid of tiles. This tilemap determines the size of the world.
+ * Contains a [TileMap] which is a grid of tiles. This tilemap determines the size of the world.
  * The world's size cannot be set directly.
  */
-public class OdorWorld implements EditableObject, Bounded {
+class OdorWorld : EditableObject, Bounded {
 
     /**
      * List of odor world entities.
      */
-    private List<OdorWorldEntity> entityList = new ArrayList<>();
+    val entityList: MutableList<OdorWorldEntity> = ArrayList()
 
     /**
      * Basic tilemap that determines the size and basic features of the world.
      */
-    private TileMap tileMap = TMXUtils.loadTileMap("empty.tmx");
+    var tileMap = loadTileMap("empty.tmx")
+        set(value) {
+            field = value
+            this.selectedLayer = value.layers[0]
+            events.tileMapChanged.fire()
+        }
 
     /**
      * Sum of lengths of smell vectors for all smelly objects in the world.
      */
-    private transient double maxVectorNorm;
+    @Transient
+    var maxVectorNorm: Double = 0.0
+        private set
 
     /**
      * Whether or not sprites wrap around or are halted at the borders
      */
-    @UserParameter(label = "Map boundary wraps around", description = "Whether or not entities wrap around or are halted at the borders of the map", order = 6)
-    private boolean wrapAround = true;
+    @UserParameter(
+        label = "Map boundary wraps around",
+        description = "Whether or not entities wrap around or are halted at the borders of the map",
+        order = 6
+    )
+    var wrapAround: Boolean = true
 
     /**
      * If true, then objects block movements; otherwise agents can walk through
      * objects.
      */
-    @UserParameter(label = "Objects block movement", description = "If true, then objects block movements; otherwise agents can walk through objects", order = 10)
-    private boolean objectsBlockMovement = true;
+    @UserParameter(
+        label = "Objects block movement",
+        description = "If true, then objects block movements; otherwise agents can walk through objects",
+        order = 10
+    )
+    var isObjectsBlockMovement: Boolean = true
 
-    @UserParameter(label = "Use camera centering", description = "For large worlds centers the camera on the current " +
-            "agent. Turn off in particular when not using tilemaps.",
-            order = 20)
-    private boolean useCameraCentering = true;
+    @UserParameter(
+        label = "Use camera centering", description = "For large worlds centers the camera on the current " +
+                "agent. Turn off in particular when not using tilemaps.", order = 20
+    )
+    var isUseCameraCentering: Boolean = true
 
     /**
      * Entity Id generator.
      */
-    private SimpleIdManager.SimpleId entityIDGenerator = new SimpleIdManager.SimpleId("Entity", 1);
+    private val entityIDGenerator = SimpleId("Entity", 1)
 
     /**
      * Sensor Id generator.
      */
-    private SimpleIdManager.SimpleId sensorIDGenerator = new SimpleIdManager.SimpleId("Sensor", 1);
+    val sensorIDGenerator: SimpleId = SimpleId("Sensor", 1)
 
     /**
      * Effector Id generator.
      */
-    private SimpleIdManager.SimpleId effectorIDGenerator = new SimpleIdManager.SimpleId("Effector", 1);
+    val effectorIDGenerator: SimpleId = SimpleId("Effector", 1)
 
     /**
      * Agent Name generator.
      */
-    private SimpleIdManager.SimpleId agentIdGenerator = new SimpleIdManager.SimpleId("Agent", 1);
+    private val agentIdGenerator = SimpleId("Agent", 1)
 
     /**
      * Event support
      */
-    protected transient OdorWorldEvents events = new OdorWorldEvents();
+    @Transient
+    var events: OdorWorldEvents = OdorWorldEvents()
+        protected set
 
     /**
      * Last clicked position.
      */
-    private Point2D lastClickedPosition = new Point2D.Double(50,50);
+    @JvmField
+    var lastClickedPosition: Point2D = Point2D.Double(50.0, 50.0)
 
-    private TileMapLayer selectedLayer = getTileMap().getLayers().get(0);
-
-    /**
-     * Default constructor.
-     */
-    public OdorWorld() {
-    }
+    var selectedLayer: TileMapLayer = tileMap.layers[0]
 
     /**
      * Update world.
      */
-    public void update() {
-        entityList.forEach(OdorWorldEntity::update);
-        events.getUpdated().fire();
+    suspend fun update() {
+        entityList.forEach(Consumer { obj: OdorWorldEntity -> obj.update() })
+        events.updated.fire().await()
     }
 
     /**
      * Stop animation.
      */
-    public void stopAnimation() {
-        events.getAnimationStopped().fire();
-        events.getWorldStopped().fire();
+    fun stopAnimation() {
+        events.animationStopped.fire()
+        events.worldStopped.fire()
     }
 
     /**
@@ -141,105 +151,93 @@ public class OdorWorld implements EditableObject, Bounded {
      *
      * @param entity the entity to add
      */
-    public void addEntity(final OdorWorldEntity entity) {
-
-        if(entityList.contains(entity)) {
-            return;
+    fun addEntity(entity: OdorWorldEntity) {
+        if (entityList.contains(entity)) {
+            return
         }
 
         // Set the entity's id
-        entity.setId(entityIDGenerator.getAndIncrement());
-        entity.setName(entity.getId());
+        entity.id = entityIDGenerator.getAndIncrement()
+        entity.name = entity.id!!
 
         // Add entity to the map
-        entityList.add(entity);
+        entityList.add(entity)
 
-        events.getEntityAdded().fire(entity);
+        events.entityAdded.fire(entity)
 
         // Recompute max stimulus length
-        recomputeMaxVectorNorm();
+        recomputeMaxVectorNorm()
     }
 
     /**
      * Add new entity at last clicked position with default properties.
      */
-    public OdorWorldEntity addEntity() {
-        OdorWorldEntity entity = new OdorWorldEntity(this);
-        entity.setLocation(new Point2D.Double(lastClickedPosition.getX(), lastClickedPosition.getY()));
-        addEntity(entity);
-        return entity;
+    fun addEntity(): OdorWorldEntity {
+        val entity = OdorWorldEntity(this)
+        entity.location = Point2D.Double(lastClickedPosition.x, lastClickedPosition.y)
+        addEntity(entity)
+        return entity
     }
 
     /**
      * Add entity of a specified type.
      */
-    public OdorWorldEntity addEntity(EntityType type) {
-        final var entity = new OdorWorldEntity(this, type);
-        addEntity(entity);
-        return entity;
+    fun addEntity(type: EntityType?): OdorWorldEntity {
+        val entity = OdorWorldEntity(this, type!!)
+        addEntity(entity)
+        return entity
     }
 
     /**
      * Add entity with a stimulus value.
      */
-    public OdorWorldEntity addEntity(int x, int y, EntityType type, double[] stimulus) {
-        OdorWorldEntity entity = addEntity(x,y,type);
-        entity.setSmellSource(new SmellSource(stimulus));
-        addEntity(entity);
-        return entity;
+    fun addEntity(x: Int, y: Int, type: EntityType?, stimulus: DoubleArray?): OdorWorldEntity {
+        val entity = addEntity(x, y, type)
+        entity.smellSource = SmellSource(stimulus)
+        addEntity(entity)
+        return entity
     }
 
-    public OdorWorldEntity addEntity(int x, int y, EntityType type) {
-        OdorWorldEntity entity = new OdorWorldEntity(this, type);
-        entity.setLocation(x, y);
-        entity.setSmellSource(new SmellSource(6));
-        entity.setEntityType(type);
-        addEntity(entity);
-        return entity;
+    fun addEntity(x: Int, y: Int, type: EntityType?): OdorWorldEntity {
+        val entity = OdorWorldEntity(this, type!!)
+        entity.setLocation(x, y)
+        entity.smellSource = SmellSource(6)
+        entity.entityType = type
+        addEntity(entity)
+        return entity
     }
 
-    public OdorWorldEntity addEntity(double x, double y, EntityType type) {
-        return addEntity((int) x, (int) y, type);
+    fun addEntity(x: Double, y: Double, type: EntityType?): OdorWorldEntity {
+        return addEntity(x.toInt(), y.toInt(), type)
     }
 
     /**
      * Add new "agent" (rotating with some default) sensors and effectors at last clicked position.
      */
-    public OdorWorldEntity addAgent() {
-
-        OdorWorldEntity entity = new OdorWorldEntity(this, EntityType.MOUSE);
-        addEntity(entity);
-        entity.setEntityType(EntityType.MOUSE);
-        double x = lastClickedPosition.getX();
-        if (x > tileMap.getMapWidth() - EntityType.MOUSE.getImageWidth()) {
-            x = tileMap.getMapWidth() - EntityType.MOUSE.getImageWidth();
+    fun addAgent(): OdorWorldEntity {
+        val entity = OdorWorldEntity(this, EntityType.MOUSE)
+        addEntity(entity)
+        entity.entityType = EntityType.MOUSE
+        var x = lastClickedPosition.x
+        if (x > tileMap.mapWidth - EntityType.MOUSE.imageWidth) {
+            x = tileMap.mapWidth - EntityType.MOUSE.imageWidth
         }
-        double y = lastClickedPosition.getY();
-        if (y > tileMap.getMapHeight() - EntityType.MOUSE.getImageHeight()) {
-            y = tileMap.getMapHeight() - EntityType.MOUSE.getImageHeight();
+        var y = lastClickedPosition.y
+        if (y > tileMap.mapHeight - EntityType.MOUSE.imageHeight) {
+            y = tileMap.mapHeight - EntityType.MOUSE.imageHeight
         }
-        entity.setLocation(x, y);
-        entity.addDefaultSensorsEffectors();
-        return entity;
+        entity.setLocation(x, y)
+        entity.addDefaultSensorsEffectors()
+        return entity
     }
 
-    public void addTile() {
+    fun addTile() {
         tileMap.setTile(
-                (int) lastClickedPosition.getX() / tileMap.getTileWidth(),
-                (int) lastClickedPosition.getY() / tileMap.getTileHeight(),
-                61,
-                selectedLayer
-        );
-    }
-
-    /**
-     * Does the world contain this entity?
-     *
-     * @param entity the entity to check for
-     * @return whether it is in this world or not.
-     */
-    public boolean containsEntity(final OdorWorldEntity entity) {
-        return entityList.contains(entity);
+            lastClickedPosition.x.toInt() / tileMap.tileWidth,
+            lastClickedPosition.y.toInt() / tileMap.tileHeight,
+            61,
+            selectedLayer
+        )
     }
 
     /**
@@ -249,49 +247,49 @@ public class OdorWorld implements EditableObject, Bounded {
      * @param id name of entity
      * @return matching entity, if any
      */
-    public OdorWorldEntity getEntity(final String id) {
+    fun getEntity(id: String?): OdorWorldEntity? {
         // Search by id
-        for (OdorWorldEntity entity : entityList) {
-            if (entity.getId().equalsIgnoreCase(id)) {
-                return entity;
+        for (entity in entityList) {
+            if (entity.id.equals(id, ignoreCase = true)) {
+                return entity
             }
         }
         // Search for label if no matching id found
-        for (OdorWorldEntity entity : entityList) {
-            if (entity.getName().equalsIgnoreCase(id)) {
-                return entity;
+        for (entity in entityList) {
+            if (entity.name.equals(id, ignoreCase = true)) {
+                return entity
             }
         }
         // Matching entity not found
-        return null;
+        return null
     }
 
     /**
      * Return sensor with matching id or null if none found.
      */
-    public Sensor getSensor(String id) {
-        for (OdorWorldEntity entity : entityList) {
-            for (Sensor sensor : entity.getSensors()) {
-                if (sensor.getId().equalsIgnoreCase(id)) {
-                    return sensor;
+    fun getSensor(id: String?): Sensor? {
+        for (entity in entityList) {
+            for (sensor in entity.sensors) {
+                if (sensor.id.equals(id, ignoreCase = true)) {
+                    return sensor
                 }
             }
         }
-        return null;
+        return null
     }
 
     /**
      * Return effector with matching id or null if none found.
      */
-    public Effector getEffector(String id) {
-        for (OdorWorldEntity entity : entityList) {
-            for (Effector effector : entity.getEffectors()) {
-                if (effector.getId().equalsIgnoreCase(id)) {
-                    return effector;
+    fun getEffector(id: String?): Effector? {
+        for (entity in entityList) {
+            for (effector in entity.effectors) {
+                if (effector.id.equals(id, ignoreCase = true)) {
+                    return effector
                 }
             }
         }
-        return null;
+        return null
     }
 
     /**
@@ -301,17 +299,14 @@ public class OdorWorld implements EditableObject, Bounded {
      * @param sensorId sensor id
      * @return sensor if found
      */
-    public Sensor getSensor(final String entityId, final String sensorId) {
-        OdorWorldEntity entity = getEntity(entityId);
-        if (entity == null) {
-            return null;
-        }
-        for (Sensor sensor : entity.getSensors()) {
-            if (sensor.getId().equalsIgnoreCase(sensorId)) {
-                return sensor;
+    fun getSensor(entityId: String?, sensorId: String?): Sensor? {
+        val entity = getEntity(entityId) ?: return null
+        for (sensor in entity.sensors) {
+            if (sensor.id.equals(sensorId, ignoreCase = true)) {
+                return sensor
             }
         }
-        return null;
+        return null
     }
 
     /**
@@ -321,19 +316,17 @@ public class OdorWorld implements EditableObject, Bounded {
      * @param effectorId sensor id
      * @return effector if found
      */
-    public Effector getEffector(final String entityId,
-                                final String effectorId) {
-        OdorWorldEntity entity = getEntity(entityId);
-        if (entity == null) {
-            return null;
-        }
-        for (Effector effector : entity.getEffectors()) {
-            if (effector.getId().equalsIgnoreCase(effectorId)) {
-                return effector;
+    fun getEffector(
+        entityId: String?,
+        effectorId: String?
+    ): Effector? {
+        val entity = getEntity(entityId) ?: return null
+        for (effector in entity.effectors) {
+            if (effector.id.equals(effectorId, ignoreCase = true)) {
+                return effector
             }
         }
-        return null;
-
+        return null
     }
 
     /**
@@ -341,244 +334,94 @@ public class OdorWorld implements EditableObject, Bounded {
      *
      * @param entity the entity to delete
      */
-    public void deleteEntity(OdorWorldEntity entity) {
+    fun deleteEntity(entity: OdorWorldEntity) {
         // map.removeSprite(entity);
         if (entityList.contains(entity)) {
-            entityList.remove(entity);
-            entity.delete();
-            for (Sensor sensor : entity.getSensors()) {
-                entity.getEvents().getSensorRemoved().fire(sensor);
+            entityList.remove(entity)
+            entity.delete()
+            for (sensor in entity.sensors) {
+                entity.events.sensorRemoved.fire(sensor)
             }
-            for (Effector effector : entity.getEffectors()) {
-                entity.getEvents().getEffectorRemoved().fire(effector);
+            for (effector in entity.effectors) {
+                entity.events.effectorRemoved.fire(effector)
             }
-            recomputeMaxVectorNorm();
-            events.getEntityRemoved().fire(entity);
+            recomputeMaxVectorNorm()
+            events.entityRemoved.fire(entity)
         }
-
     }
 
     /**
      * Caches the maximum vector norm, which is used for scaling the color smell sensors.
      */
-    private void recomputeMaxVectorNorm() {
+    private fun recomputeMaxVectorNorm() {
         maxVectorNorm = entityList.stream()
-                .filter(Objects::nonNull)
-                .map(e -> SimbrainMath.getVectorNorm(e.getSmellSource().getStimulusVector()))
-                .max(Double::compareTo)
-                .orElse(0.0);
+            .filter { obj: OdorWorldEntity? -> Objects.nonNull(obj) }
+            .map { e: OdorWorldEntity -> SimbrainMath.getVectorNorm(e.smellSource.stimulusVector) }
+            .max { obj: Double, anotherDouble: Double? -> obj.compareTo(anotherDouble!!) }
+            .orElse(0.0)
     }
 
     /**
-     * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
+     * See [org.simbrain.workspace.serialization.WorkspaceComponentDeserializer]
      */
-    private Object readResolve() {
+    private fun readResolve(): Any {
+        events = OdorWorldEvents()
 
-        events = new OdorWorldEvents();
-
-        for (OdorWorldEntity entity : entityList) {
-//            entity.postSerializationInit();
+        for (entity in entityList) {
+            //            entity.postSerializationInit();
         }
-        recomputeMaxVectorNorm();
-        return this;
+        recomputeMaxVectorNorm()
+        return this
     }
 
-    /**
-     * Handle collisions in x directions.
-     *
-     * @param entityToCheck
-     * @param xCheck        position to check
-     * @return whether or not a collision occurred.
-     */
-    private boolean xCollission(OdorWorldEntity entityToCheck, float xCheck) {
+    @get:UserParameter(label = "Width", displayOnly = true)
+    override val width: Double
+        get() = tileMap.mapWidth.toDouble()
 
-        // Hit a wall
-        // if ((entityToCheck.getX() < 0) || (entityToCheck.getX() >
-        // getWidth())) {
-        // return true;
-        // }
+    @get:UserParameter(label = "Height", displayOnly = true)
+    override val height: Double
+        get() = tileMap.mapHeight.toDouble()
 
-        // Check for collisions with sprites
-        for (OdorWorldEntity entity : entityList) {
-            if (entity == entityToCheck) {
-                continue;
-            }
-            //if ((entityToCheck.getX() > entity.getX()) && (entityToCheck.getX() < (entity.getX() + entity.getWidth()))) {
-            //    return true;
-            //}
-        }
-        return false;
-    }
+    val collidableObjects: List<Bounded>
+        get() {
+            val bounds = ArrayList<Bounded>()
 
-    /**
-     * Handle collisions in y directions.
-     *
-     * @param entityToCheck
-     * @param yCheck        position to check
-     * @return whether or not a collision occurred.
-     */
-    private boolean yCollission(OdorWorldEntity entityToCheck, float yCheck) {
-        // Hit a wall
-        // if ((entityToCheck.getY() < 0) || (entityToCheck.getY() >
-        // getHeight())) {
-        // return true;
-        // }
+            bounds.addAll(tileMap.collisionBounds)
 
-        // Check for collisions with sprites
-        for (OdorWorldEntity sprite : entityList) {
-
-            if (sprite == entityToCheck) {
-                continue;
+            if (isObjectsBlockMovement) {
+                bounds.addAll(entityList)
             }
 
-            //if ((entityToCheck.getY() > sprite.getY()) && (entityToCheck.getY() < (sprite.getY() + sprite.getHeight()))) {
-            //    return true;
-            //}
-        }
-        return false;
-    }
+            if (!wrapAround) {
+                bounds.add(this)
+            }
 
-    /**
-     * Returns the list of entities.
-     *
-     * @return the entity list
-     */
-    public List<OdorWorldEntity> getEntityList() {
-        return entityList;
-    }
-
-    public boolean getWrapAround() {
-        return wrapAround;
-    }
-
-    public void setWrapAround(boolean wrapAround) {
-        this.wrapAround = wrapAround;
-    }
-
-    /**
-     * Returns width of world in pixels.
-     */
-    @UserParameter(label = "Width", displayOnly = true)
-    public double getWidth() {
-        return tileMap.getMapWidth();
-    }
-
-    /**
-     * Returns height of world in pixels.
-     */
-    @UserParameter(label = "Height", displayOnly = true)
-    public double getHeight() {
-        return tileMap.getMapHeight();
-    }
-
-    public boolean isObjectsBlockMovement() {
-        return objectsBlockMovement;
-    }
-
-    public void setObjectsBlockMovement(boolean objectsBlockMovement) {
-        this.objectsBlockMovement = objectsBlockMovement;
-    }
-
-    public List<Bounded> getCollidableObjects() {
-        var bounds = new ArrayList<Bounded>();
-
-        bounds.addAll(tileMap.getCollisionBounds());
-
-        if (isObjectsBlockMovement()) {
-            bounds.addAll(entityList);
+            return bounds
         }
 
-        if (!wrapAround) {
-            bounds.add(this);
-        }
-
-        return bounds;
+    fun start() {
+        events.worldStarted.fire()
     }
 
-    public double getMaxVectorNorm() {
-        return maxVectorNorm;
-    }
+    override val name: String
+        get() = "Odor World"
 
-    public SimpleIdManager.SimpleId getSensorIDGenerator() {
-        return sensorIDGenerator;
-    }
-
-    public SimpleIdManager.SimpleId getEffectorIDGenerator() {
-        return effectorIDGenerator;
-    }
-
-    public TileMap getTileMap() {
-        return tileMap;
-    }
-
-    public void setTileMap(TileMap tileMap) {
-        this.tileMap = tileMap;
-        this.selectedLayer = tileMap.getLayers().get(0);
-        getEvents().getTileMapChanged().fire();
-    }
-
-    public void start() {
-        events.getWorldStarted().fire();
-    }
-
-    public Point2D getLastClickedPosition() {
-        return lastClickedPosition;
-    }
-
-    public void setLastClickedPosition(Point2D position) {
-        lastClickedPosition = position;
-    }
-
-    @Override
-    public String getName() {
-        return "Odor World";
-    }
-
-    public OdorWorldEvents getEvents() {
-        return events;
-    }
-
-    public void setUseCameraCentering(boolean useCameraCentering) {
-        this.useCameraCentering = useCameraCentering;
-    }
-
-    public boolean isUseCameraCentering() {
-        return useCameraCentering;
-    }
-
-    @Override
-    public double getX() {
-        return getWidth() / 2;
-    }
+    override val x: Double
+        get() = width / 2
 
 
-    @Override
-    public double getY() {
-        return getHeight() / 2;
-    }
+    override val y: Double
+        get() = height / 2
 
-    /**
-     * Center location by default.
-     */
-    @NotNull
-    @Override
-    public Point2D getLocation() {
-        return new Point2D.Double(getX(), getY());
-    }
+    override val location: Point2D
+        /**
+         * Center location by default.
+         */
+        get() = Point2D.Double(x, y)
 
-    /**
-     * Forwards to [getLocation] but makes clear that location is centerlocation.
-     */
-    @NotNull
-    public Point2D getCenterLocation() {
-        return getLocation();
-    }
-
-    public TileMapLayer getSelectedLayer() {
-        return selectedLayer;
-    }
-
-    public void setSelectedLayer(TileMapLayer selectedLayer) {
-        this.selectedLayer = selectedLayer;
-    }
+    val centerLocation: Point2D
+        /**
+         * Forwards to [getLocation] but makes clear that location is centerlocation.
+         */
+        get() = location
 }

@@ -39,6 +39,7 @@ class OdorWorldEntity @JvmOverloads constructor(
     @UserParameter(label = "X", description = "X Position", order = 3)
     override var x = 0.0
         set(value) {
+            // can't access width and height during deserialization.  our check for deserialization is that tilemap is null.
             field = if (world.tileMap == null) {
                 value
             } else {
@@ -51,6 +52,7 @@ class OdorWorldEntity @JvmOverloads constructor(
     @UserParameter(label = "Y", description = "Y Position", order = 3)
     override var y = 0.0
         set(value) {
+            // can't access width and height during deserialization.  our check for deserialization is that tilemap is null.
             field = if (world.tileMap == null) {
                 value
             } else {

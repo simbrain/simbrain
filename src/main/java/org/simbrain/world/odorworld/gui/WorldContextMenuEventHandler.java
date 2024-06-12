@@ -56,7 +56,7 @@ public class WorldContextMenuEventHandler extends PBasicInputEventHandler {
     @Override
     public void mousePressed(final PInputEvent mouseEvent) {
         super.mousePressed(mouseEvent);
-        world.setLastClickedPosition(mouseEvent.getPosition());
+        world.lastClickedPosition = mouseEvent.getPosition();
         showContextMenu(mouseEvent);
     }
 

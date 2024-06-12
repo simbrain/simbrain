@@ -193,11 +193,10 @@ public class OdorWorldFrameMenu extends JMenuBar {
             }
         });
         editMenu.add(addAgent);
-
         editMenu.addSeparator();
-
+        editMenu.add(odorWorldActions.deleteSelectedAction());
+        editMenu.addSeparator();
         editMenu.add(odorWorldActions.getEditLayersAction());
-
         editMenu.addSeparator();
 
         JMenuItem turnOnAllTrails = new JMenuItem("Turn on all trails");

@@ -456,10 +456,7 @@ class OdorWorldPanel(
     }
 
     /**
-     * Create a popup menu based on location of mouse `click`.
-     *
-     * @param entity the entity for which to build the menu
-     * @return the popup menu
+     * Popup menu when not clicking on entity. On an entity see [EntityNode.createContextMenu]
      */
     fun getContextMenu() = JPopupMenu().apply {
         add(JMenuItem(odorWorldActions.addAgentAction()))
@@ -544,7 +541,6 @@ class OdorWorldPanel(
     private fun createMainToolBar() = CustomToolBar().apply {
         add(odorWorldActions.addAgentAction())
         add(odorWorldActions.addEntityAction())
-        add(odorWorldActions.deleteSelectedAction())
         addSeparator()
         add(odorWorldActions.resetZoomAction())
         add(odorWorldActions.zoomInAction())

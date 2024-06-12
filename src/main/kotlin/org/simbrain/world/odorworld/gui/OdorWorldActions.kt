@@ -37,7 +37,6 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
 
     fun deleteSelectedAction() = odorWorldPanel.createAction(
         name = "Delete selected entities",
-        iconPath = "menu_icons/Eraser.png",
         keyboardShortcuts = listOf(KeyCombination(KeyEvent.VK_DELETE), KeyCombination(KeyEvent.VK_BACK_SPACE))
     ) {
         odorWorldPanel.deleteSelectedEntities()
@@ -52,7 +51,7 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
     }
 
     val showPropertyDialogAction = odorWorldPanel.createAction(
-        name = "Edit...",
+        name = "Edit entity...",
         iconPath = "menu_icons/Properties.png",
         keyboardShortcut = CmdOrCtrl + 'E'
     ) {

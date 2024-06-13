@@ -271,7 +271,7 @@ class OdorWorldEntity @JvmOverloads constructor(
     }
 
     fun delete() {
-        world.deleteEntity(this)
+        events.deleted.fire(this)
     }
 
     fun getEffector(label: String) = effectors.first { it.label == label }

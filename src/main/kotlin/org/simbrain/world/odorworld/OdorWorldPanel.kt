@@ -236,15 +236,6 @@ class OdorWorldPanel(
             canvas.layer.addChild(node)
             selectionManager.clear()
             selectionManager.add(node)
-            repaint()
-        }
-        world.events.entityRemoved.on(swingDispatcher) { e ->
-            val entityNode = canvas.layer.allNodes
-                .filterIsInstance<EntityNode>().firstOrNull { it.entity == e }
-            if (entityNode != null) {
-                canvas.layer.removeChild(entityNode)
-                repaint()
-            }
         }
         world.events.updated.on(swingDispatcher, wait = true) { this.centerCameraToSelectedEntity() }
         world.events.frameAdvanced.on(swingDispatcher) {

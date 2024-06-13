@@ -65,10 +65,10 @@ class EntityNode(
         updateImage()
         updateEntityAttributeModel()
         setOffset(entity.x, entity.y)
-        entity.events.deleted.on { e: OdorWorldEntity? -> removeFromParent() }
-        entity.events.moved.on(Dispatchers.Swing) { update() }
-        entity.events.typeChanged.on { o: EntityType?, n: EntityType? -> updateImage() }
-        entity.events.trailVisibilityChanged.on { new, _ ->
+        entity.events.deleted.on(dispatcher = Dispatchers.Swing) { removeFromParent() }
+        entity.events.moved.on(dispatcher = Dispatchers.Swing) { update() }
+        entity.events.typeChanged.on(dispatcher = Dispatchers.Swing) { _, _ -> updateImage() }
+        entity.events.trailVisibilityChanged.on(dispatcher = Dispatchers.Swing) { new, _ ->
             if (new) {
                 trail = PPath.createPolyline(arrayOf(Point2D.Float(entity.x.toFloat(),entity.y.toFloat()))).apply {
                     paint = null
@@ -78,7 +78,7 @@ class EntityNode(
                 removeChild(trail)
             }
         }
-        entity.events.trailCleared.on {
+        entity.events.trailCleared.on(dispatcher = Dispatchers.Swing) {
             removeChild(trail)
             trail = PPath.createPolyline(arrayOf(Point2D.Float(entity.x.toFloat(),entity.y.toFloat()))).apply {
                 paint = null
@@ -91,40 +91,40 @@ class EntityNode(
         }
 
         updateSensorsEffectorsVisibility()
-        entity.events.propertyChanged.on {
+        entity.events.propertyChanged.on(dispatcher = Dispatchers.Swing) {
             updateSensorsEffectorsVisibility()
         }
 
-        entity.events.updated.on(Dispatchers.Swing) { update() }
-        entity.events.sensorAdded.on { s: Sensor? ->
+        entity.events.updated.on(dispatcher = Dispatchers.Swing) { update() }
+        entity.events.sensorAdded.on(dispatcher = Dispatchers.Swing) { s: Sensor? ->
             if (s is VisualizableEntityAttribute) {
                 val toAdd = s as VisualizableEntityAttribute
                 addAttribute(toAdd)
             }
         }
-        entity.events.effectorAdded.on { e: Effector? ->
+        entity.events.effectorAdded.on(dispatcher = Dispatchers.Swing) { e: Effector? ->
             if (e is VisualizableEntityAttribute) {
                 val toAdd = e as VisualizableEntityAttribute
                 addAttribute(toAdd)
             }
         }
-        entity.events.sensorRemoved.on { s: Sensor? ->
+        entity.events.sensorRemoved.on(dispatcher = Dispatchers.Swing) { s: Sensor? ->
             if (s is VisualizableEntityAttribute) {
                 val toRemove = s as VisualizableEntityAttribute
                 removeAttribute(toRemove)
             }
         }
-        entity.events.effectorRemoved.on { e: Effector? ->
+        entity.events.effectorRemoved.on(dispatcher = Dispatchers.Swing) { e: Effector? ->
             if (e is VisualizableEntityAttribute) {
                 val toRemove = e as VisualizableEntityAttribute
                 removeAttribute(toRemove)
             }
         }
-        entity.world.events.worldStarted.on {
+        entity.world.events.worldStarted.on(dispatcher = Dispatchers.Swing) {
             trail.moveTo(entity.x, entity.y)
         }
         drawDispersionCircleAround(this)
-        entity.events.propertyChanged.on {
+        entity.events.propertyChanged.on(dispatcher = Dispatchers.Swing) {
             drawDispersionCircleAround(this)
         }
 

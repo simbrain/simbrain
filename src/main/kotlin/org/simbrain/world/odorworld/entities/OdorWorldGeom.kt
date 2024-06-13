@@ -89,6 +89,16 @@ class Size(override val width: Double, override val height: Double) : WithSize
 interface Bounded : StaticallyLocatable, WithSize {
     val topLeftLocation: Point2D
         get() = point(x - width / 2, y - height / 2)
+
+    /**
+     * given a point return a point bounded in these bounds. if bounds are 100,100 and 150,150 is given it returns 100,100
+     */
+    fun bounded(point: Point2D) = point(point.x.coerceIn(x, width), point.y.coerceIn(y, height))
+
+    /**
+     * given a point return a point wrapped around these bounds. if bounds are 100,100 and 150,150 is given it returns 50,50
+     */
+    fun wrapAround(point: Point2D) = point(point.x % width, point.y % height)
 }
 
 class Bound(

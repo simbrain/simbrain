@@ -25,6 +25,8 @@ import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.piccolo.TileMap
 import org.simbrain.util.piccolo.TileMapLayer
 import org.simbrain.util.piccolo.loadTileMap
+import org.simbrain.util.plus
+import org.simbrain.util.point
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.world.odorworld.effectors.Effector
 import org.simbrain.world.odorworld.entities.Bounded
@@ -34,6 +36,7 @@ import org.simbrain.world.odorworld.events.OdorWorldEvents
 import org.simbrain.world.odorworld.sensors.Sensor
 import java.awt.geom.Point2D
 import java.util.*
+import java.util.concurrent.CopyOnWriteArrayList
 import java.util.function.Consumer
 
 /**
@@ -49,7 +52,7 @@ class OdorWorld : EditableObject, Bounded {
     /**
      * List of odor world entities.
      */
-    val entityList: MutableList<OdorWorldEntity> = ArrayList()
+    val entityList = CopyOnWriteArrayList<OdorWorldEntity>()
 
     /**
      * Basic tilemap that determines the size and basic features of the world.
@@ -164,17 +167,31 @@ class OdorWorld : EditableObject, Bounded {
         entityList.add(entity)
 
         events.entityAdded.fire(entity)
+        entity.events.deleted.on { handleEntityDelete(it) }
 
         // Recompute max stimulus length
         recomputeMaxVectorNorm()
     }
 
     /**
+     * return the initial location unless it is occupied by an entity in which case it offsets the location so the two entities don't coincide
+     * it will try for maxtry times to find an unoccupied location it just returns the last one it tried
+     */
+    private fun findPlacementLocation(initialLocation: Point2D, offset: Point2D = point(20, 20), maxTry: Int = 100) = sequence {
+        var location = wrapAround(initialLocation)
+        yield(location)
+        while (entityList.any { it.location == location }) {
+            location = wrapAround(location + offset)
+            yield(location)
+        }
+    }.take(maxTry).last()
+
+    /**
      * Add new entity at last clicked position with default properties.
      */
     fun addEntity(): OdorWorldEntity {
         val entity = OdorWorldEntity(this)
-        entity.location = Point2D.Double(lastClickedPosition.x, lastClickedPosition.y)
+        entity.location = findPlacementLocation(lastClickedPosition)
         addEntity(entity)
         return entity
     }
@@ -217,16 +234,7 @@ class OdorWorld : EditableObject, Bounded {
     fun addAgent(): OdorWorldEntity {
         val entity = OdorWorldEntity(this, EntityType.MOUSE)
         addEntity(entity)
-        entity.entityType = EntityType.MOUSE
-        var x = lastClickedPosition.x
-        if (x > tileMap.mapWidth - EntityType.MOUSE.imageWidth) {
-            x = tileMap.mapWidth - EntityType.MOUSE.imageWidth
-        }
-        var y = lastClickedPosition.y
-        if (y > tileMap.mapHeight - EntityType.MOUSE.imageHeight) {
-            y = tileMap.mapHeight - EntityType.MOUSE.imageHeight
-        }
-        entity.setLocation(x, y)
+        entity.location = findPlacementLocation(lastClickedPosition)
         entity.addDefaultSensorsEffectors()
         return entity
     }
@@ -329,16 +337,9 @@ class OdorWorld : EditableObject, Bounded {
         return null
     }
 
-    /**
-     * Delete entity.
-     *
-     * @param entity the entity to delete
-     */
-    fun deleteEntity(entity: OdorWorldEntity) {
-        // map.removeSprite(entity);
+    private fun handleEntityDelete(entity: OdorWorldEntity) {
         if (entityList.contains(entity)) {
             entityList.remove(entity)
-            entity.delete()
             for (sensor in entity.sensors) {
                 entity.events.sensorRemoved.fire(sensor)
             }
@@ -354,11 +355,8 @@ class OdorWorld : EditableObject, Bounded {
      * Caches the maximum vector norm, which is used for scaling the color smell sensors.
      */
     private fun recomputeMaxVectorNorm() {
-        maxVectorNorm = entityList.stream()
-            .filter { obj: OdorWorldEntity? -> Objects.nonNull(obj) }
-            .map { e: OdorWorldEntity -> SimbrainMath.getVectorNorm(e.smellSource.stimulusVector) }
-            .max { obj: Double, anotherDouble: Double? -> obj.compareTo(anotherDouble!!) }
-            .orElse(0.0)
+        maxVectorNorm = entityList
+            .maxOfOrNull { SimbrainMath.getVectorNorm(it.smellSource.stimulusVector) } ?: 0.0
     }
 
     /**
@@ -367,8 +365,8 @@ class OdorWorld : EditableObject, Bounded {
     private fun readResolve(): Any {
         events = OdorWorldEvents()
 
-        for (entity in entityList) {
-            //            entity.postSerializationInit();
+        entityList.forEach { entity ->
+            entity.events.deleted.on { handleEntityDelete(it) }
         }
         recomputeMaxVectorNorm()
         return this

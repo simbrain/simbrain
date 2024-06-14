@@ -29,6 +29,13 @@ interface AttributeContainer {
      */
     val id: String?
 
+    /**
+     * Name of the parent containers. Used for display only.
+     */
+    var containerName: String?
+        get() = null
+        set(value) {}
+
     val childrenContainers: List<AttributeContainer>?
         get() = null
 }

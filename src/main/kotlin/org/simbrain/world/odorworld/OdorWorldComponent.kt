@@ -96,8 +96,8 @@ class OdorWorldComponent : WorkspaceComponent {
             val models: MutableList<AttributeContainer> = ArrayList()
             for (entity in world.entityList) {
                 models.add(entity)
-                models.addAll(entity.sensors)
-                models.addAll(entity.effectors)
+                models.addAll(entity.sensors.onEach { it.containerName = entity.name })
+                models.addAll(entity.effectors.onEach { it.containerName = entity.name })
             }
             return models
         }

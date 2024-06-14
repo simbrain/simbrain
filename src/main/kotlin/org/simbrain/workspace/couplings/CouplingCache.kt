@@ -165,11 +165,16 @@ class CouplingCache(val couplingManager: CouplingManager) {
             val methods = getProducibleMethods(clazz).filter { getVisibility(it) }
             containers.forEach { container ->
                 methods.forEach { method ->
-                    if (method.isProducible()) {
-                        yield(container.getProducer(method))
-                    }
+                    yield(container.getProducer(method))
                 }
             }
+        }
+    }
+
+    fun getVisibleProducerTree(workspaceComponent: WorkspaceComponent): Sequence<Consumer> = sequence {
+        workspaceComponent.attributeContainers.map { container ->
+            val producers = getVisibleProducers(container)
+            container.childrenContainers
         }
     }
 

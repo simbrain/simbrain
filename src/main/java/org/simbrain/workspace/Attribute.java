@@ -115,15 +115,17 @@ public abstract class Attribute {
      */
     public String getSimpleDescription() {
 
+        var containerName = baseObject.getContainerName() == null ? "" : (baseObject.getContainerName() + ":");
+
         // Description is based on a custom method
         String customDesc = getCustomDescription();
         if (customDesc != null) {
-            return customDesc;
+            return containerName + customDesc;
         }
 
         // Description is based on id + a provided description
         if (!description.isEmpty()) {
-            return getId() + ":" + description;
+            return containerName + getId() + ":" + description;
         }
 
         // Description is based on id and a simplified version of the method name
@@ -136,7 +138,7 @@ public abstract class Attribute {
         }
         simpleMethodName = Utils.splitCamelCase(simpleMethodName);
         simpleMethodName = Utils.upperCaseFirstLetter(simpleMethodName.toLowerCase());
-        return getId() + ":" + simpleMethodName;
+        return containerName + getId() + ":" + simpleMethodName;
     }
 
     private String getCustomDescription() {

@@ -16,6 +16,14 @@ abstract class Sensor : PeripheralAttribute {
     // @UserParameter(label = "Sensor ID", description = "A unique id for this sensor", order = 0, displayOnly = true)
     override var id: String? = null
 
+    private var _containerName: String? = null
+
+    override var containerName: String?
+        get() = _containerName
+        set(value) {
+            _containerName = value
+        }
+
     /**
      * Public label of this sensor.
      */

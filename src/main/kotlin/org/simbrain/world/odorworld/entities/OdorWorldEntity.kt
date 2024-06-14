@@ -218,7 +218,7 @@ class OdorWorldEntity @JvmOverloads constructor(
     fun addEffector(effector: Effector) {
         effectors.add(effector)
         if (effector.id == null) {
-            effector.setId(world.effectorIDGenerator.getAndIncrement())
+            effector.id = world.effectorIDGenerator.getAndIncrement()
         }
         events.effectorAdded.fire(effector)
     }

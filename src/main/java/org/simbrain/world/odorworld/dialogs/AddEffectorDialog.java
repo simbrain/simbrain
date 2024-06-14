@@ -38,11 +38,6 @@ public class AddEffectorDialog extends StandardDialog {
     private OdorWorldEntity entity;
 
     /**
-     * The editable object APE is going to edit.
-     */
-    private Effector.EffectorCreator effectorCreator;
-
-    /**
      * Main editing panel.
      */
     private AnnotatedPropertyEditor<APEObjectWrapper<Effector>> effectorCreatorPanel;

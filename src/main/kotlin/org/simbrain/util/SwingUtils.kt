@@ -8,6 +8,7 @@ import org.simbrain.util.widgets.DropDownTriangle
 import org.simbrain.util.widgets.ProgressWindow
 import java.awt.*
 import java.awt.event.*
+import java.beans.PropertyChangeEvent
 import java.io.File
 import javax.swing.*
 import kotlin.coroutines.CoroutineContext
@@ -432,4 +433,22 @@ fun runWithProgressWindow(maxIterations: Int, label: String = "Progress", batchS
         progressWindow.close()
     }
 
+}
+
+/**
+ * Invoke the provided block when the parent frame is closed.
+ */
+fun Container.onWindowClose(block: (evt: PropertyChangeEvent) -> Unit) {
+    // Add property change listener to detect when the panel is disposed
+    swingInvokeLater {
+        addPropertyChangeListener("ancestor") { evt ->
+            if (evt.newValue == null) {
+                block(evt)
+            }
+        }
+    }
+}
+
+fun Container.onWindowClose(block: Runnable) = onWindowClose {
+    block.run()
 }

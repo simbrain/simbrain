@@ -33,35 +33,31 @@ class CouplingCache(val couplingManager: CouplingManager) {
      * Get all the [Producible] or [Consumable] methods from an [AttributeContainer] and put them in the main cache.
      */
     fun getMethods(container: AttributeContainer): List<Method> {
-        return attributeMethods.getOrPut(container.javaClass) {
-            container.javaClass.methods
-                    .filter { it.annotations.any { annotation -> annotation is Producible || annotation is Consumable } }
-                    .sortedBy { it.name }
-        }
+        return getMethods(container.javaClass)
     }
 
     fun getMethods(containerClass: Class<AttributeContainer>): List<Method> {
         return attributeMethods.getOrPut(containerClass) {
             containerClass.methods
-                    .filter { it.annotations.any { annotation -> annotation is Producible || annotation is Consumable } }
+                    .filter { it.isProducible() || it.isConsumable() }
                     .sortedBy { it.name }
         }
     }
 
     fun getProducibleMethods(container: AttributeContainer): List<Method> {
-        return getMethods(container).filter { it.annotations.any { annotation -> annotation is Producible } }
+        return getMethods(container).filter { it.isProducible() }
     }
 
     fun getProducibleMethods(containerClass: Class<AttributeContainer>): List<Method> {
-        return getMethods(containerClass).filter { it.annotations.any { annotation -> annotation is Producible } }
+        return getMethods(containerClass).filter { it.isProducible() }
     }
 
     fun getConsumableMethods(container: AttributeContainer): List<Method> {
-        return getMethods(container).filter { it.annotations.any { annotation -> annotation is Consumable } }
+        return getMethods(container).filter { it.isConsumable() }
     }
 
     fun getConsumableMethods(containerClass: Class<AttributeContainer>): List<Method> {
-        return getMethods(containerClass).filter { it.annotations.any { annotation -> annotation is Consumable } }
+        return getMethods(containerClass).filter { it.isConsumable() }
     }
 
     fun getVisibility(method: Method) = couplingManager.methodVisibilities.getOrElse(method) {
@@ -169,7 +165,9 @@ class CouplingCache(val couplingManager: CouplingManager) {
             val methods = getProducibleMethods(clazz).filter { getVisibility(it) }
             containers.forEach { container ->
                 methods.forEach { method ->
-                    yield(container.getProducer(method))
+                    if (method.isProducible()) {
+                        yield(container.getProducer(method))
+                    }
                 }
             }
         }
@@ -180,7 +178,9 @@ class CouplingCache(val couplingManager: CouplingManager) {
             val methods = getConsumableMethods(clazz).filter { getVisibility(it) }
             containers.forEach { container ->
                 methods.forEach { method ->
-                    yield(container.getConsumer(method))
+                    if (method.isConsumable()) {
+                        yield(container.getConsumer(method))
+                    }
                 }
             }
         }
@@ -220,11 +220,10 @@ class CouplingCache(val couplingManager: CouplingManager) {
 
     private fun Class<AttributeContainer>.findMethod(name: String): Method? = methods.find { it.name == name }
 
-    private fun Class<AttributeContainer>.findConsumableMethod(name: String): Method? = methods.filter { it
-        .isAnnotationPresent(Consumable::class.java) }.first{it.name == name}
+    private fun Class<AttributeContainer>.findConsumableMethod(name: String): Method? = methods
+        .first{ it.isConsumable() && it.name == name }
 
-    private fun Class<AttributeContainer>.findProducibleMethod(name: String): Method? = methods.filter { it
-        .isAnnotationPresent(Producible::class.java) }
-        .first{(it.name == name) && (it.parameterCount == 0)}
+    private fun Class<AttributeContainer>.findProducibleMethod(name: String): Method? = methods
+        .first{ it.isProducible() && it.name == name }
 
 }

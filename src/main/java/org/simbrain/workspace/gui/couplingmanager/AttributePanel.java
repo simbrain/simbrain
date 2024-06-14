@@ -18,6 +18,7 @@
  */
 package org.simbrain.workspace.gui.couplingmanager;
 
+import org.simbrain.util.SwingUtilsKt;
 import org.simbrain.workspace.*;
 import org.simbrain.workspace.events.WorkspaceComponentEvents;
 import org.simbrain.workspace.events.WorkspaceEvents;
@@ -35,11 +36,6 @@ import static org.simbrain.util.SwingUtilsKt.getSwingDispatcher;
  * and a JList of attributes for that component.
  */
 public class AttributePanel extends JPanel implements ActionListener, MouseListener {
-
-    /**
-     * Parent frame.
-     */
-    private JFrame parentFrame = new JFrame();
 
     /**
      * Drop down box for workspace components.
@@ -113,7 +109,7 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
 
     private void showAttributeTypePanel() {
         if (attributeTypePanel != null) {
-            JDialog dialog = new JDialog(parentFrame);
+            JDialog dialog = new JDialog();
             dialog.setModal(true);
             dialog.setContentPane(attributeTypePanel);
             dialog.pack();
@@ -139,16 +135,22 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
 
         WorkspaceComponentEvents events = component.events;
 
-        events.getAttributeContainerAdded().on(getSwingDispatcher(), ac -> {
+        var attributeContainerAddedCleanupHandler = events.getAttributeContainerAdded().on(getSwingDispatcher(), ac -> {
             if (isSelectedComponent(component)) {
                 refresh(component);
             }
         });
 
-        events.getAttributeContainerRemoved().on(getSwingDispatcher(), ac -> {
+        var attributeContainerRemovedCleanupHandler = events.getAttributeContainerRemoved().on(getSwingDispatcher(), ac -> {
             if (isSelectedComponent(component)) {
                 refresh(component);
             }
+        });
+
+        // Add property change listener to detect when the panel is disposed
+        SwingUtilsKt.onWindowClose(this, () -> {
+            attributeContainerAddedCleanupHandler.invoke();
+            attributeContainerRemovedCleanupHandler.invoke();
         });
 
     }

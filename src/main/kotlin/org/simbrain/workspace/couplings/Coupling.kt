@@ -86,11 +86,11 @@ class Coupling private constructor(val producer: Producer, val consumer: Consume
 }
 
 /**
- * Return whether the specified method is producible.
+ * Return whether the specified method is producible. Ignore versions of the function that take arguments.
  */
-fun Method.isProducible() = isAnnotationPresent(Producible::class.java)
+fun Method.isProducible() = isAnnotationPresent(Producible::class.java) && parameters.isEmpty()
 
 /**
  * Return whether the specified method is consumable.
  */
-fun Method.isConsumable() = isAnnotationPresent(Consumable::class.java)
+fun Method.isConsumable() = isAnnotationPresent(Consumable::class.java) && parameters.size == 1

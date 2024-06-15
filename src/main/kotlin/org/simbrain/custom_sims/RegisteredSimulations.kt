@@ -14,6 +14,7 @@ import org.simbrain.custom_sims.simulations.hippocampus.Hippocampus
 import org.simbrain.custom_sims.simulations.patterns_of_activity.KuramotoOscillators
 import org.simbrain.custom_sims.simulations.patterns_of_activity.cogMap3Objects
 import org.simbrain.custom_sims.simulations.test.lstmBlock
+import org.simbrain.util.StructureDir
 import org.simbrain.util.dir
 
 /**
@@ -22,11 +23,13 @@ import org.simbrain.util.dir
  * `dir` is a JMenu
  * `item` is a JMenuItem.
  *
+ * Note that items in a dir appear in the order given unless `alphabetize` is set to true. See [StructureDir].
+ *
  * The label given is used both as the Menu Item name, and in the command line as the name to
  * use to call them using "run sim" (see build.gradle#runSim). If duplicate labels are used the first one encountered
  * will be run from the command line.
  */
-val simulations = dir<Any>("Simulations") {
+val simulations = dir("Simulations") {
 
     dir("Cognitive Science") {
         dir("Hebbian") {

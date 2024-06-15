@@ -43,7 +43,6 @@ class BackpropNetworkNode(networkPanel: NetworkPanel, private val bp: BackpropNe
         menu.add(editAction)
         menu.add(renameAction)
         menu.add(removeAction)
-        menu.addSeparator()
         setContextMenu(menu)
     }
 

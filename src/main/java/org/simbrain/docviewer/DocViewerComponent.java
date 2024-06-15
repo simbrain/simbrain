@@ -34,7 +34,21 @@ public class DocViewerComponent extends WorkspaceComponent {
     /**
      * Default string.
      */
-    private String text = "<html>\n<body>\nUse this text to explain how a simulation works,\n" + "and save it with the workspace so that\n" + "when it is re-opened other users will know how to use it.\n<br><br>\n" + "Uses simple html for formatting, e.g. <b>bold text</b>.\n Click on the " + "Edit tab to edit the html \n or import from pre-edited html " + "using the File menu.<br><br>" + "Example of a local image: <img src = \"file:docs/Images/simbrainlogo.gif\"><br><br>\n" + "Example of a local link: <a href = \"file:docs/SimbrainDocs.html\">docs</a>\n" + " \n</body>\n</html>\n";
+    private String text = """
+            <html>
+            <body>
+            Use this text to explain how a simulation works,
+            and save it with the workspace so that
+            when it is re-opened other users will know how to use it.
+            <br><br>
+            Uses simple html for formatting, e.g. <b>bold text</b>.
+            Click on the Edit tab to edit the html\s
+            or import from pre-edited html using the File menu.<br><br>Example of a local image: <img src = "file:simulations/images/Caltech101Sample/image_0036.jpg"><br><br>
+            Example of a link: <a href = "https://google.com">google</a>
+            \s
+            </body>
+            </html>
+            """;
 
     /**
      * Construct a new document viewer component.

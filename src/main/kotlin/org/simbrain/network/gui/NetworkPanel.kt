@@ -5,7 +5,8 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PCamera
 import org.piccolo2d.PCanvas
-import org.piccolo2d.event.PMouseWheelZoomEventHandler
+import org.piccolo2d.event.PBasicInputEventHandler
+import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.*
@@ -23,13 +24,18 @@ import org.simbrain.network.trainers.WeightMatrixTree
 import org.simbrain.network.trainers.backpropError
 import org.simbrain.network.trainers.forwardPass
 import org.simbrain.util.*
+import org.simbrain.util.piccolo.setViewBoundsNoOverflow
 import org.simbrain.util.piccolo.unionOfGlobalFullBounds
 import java.awt.*
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
+import java.awt.event.MouseWheelEvent
+import java.awt.geom.Point2D
+import java.awt.geom.Rectangle2D
 import java.util.*
 import java.util.prefs.PreferenceChangeListener
 import javax.swing.*
+import kotlin.math.pow
 import kotlin.reflect.KClass
 
 /**
@@ -42,7 +48,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
      *
      * @see https://github.com/piccolo2d/piccolo2d.java
      */
-    val canvas = PCanvas()
+    val canvas = NetworkCanvas()
 
     /**
      * Reference to the model network
@@ -76,6 +82,22 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         set(value) {
             field = value
             network.events.zoomToFitPage.fire()
+        }
+
+    /**
+     * The current zoom level of the canvas.
+     *
+     * For example:
+     * 0.5 means the canvas is rendered (zoomed out) at 0.5 of its normal size, and 2 means it is rendered (zoomed in) to twice its size
+     *
+     * The setter rescales the canvas.
+     */
+    var scalingFactor: Double
+        get() = canvas.camera.viewScale
+        set(scalingFactor) {
+            val currentScalingFactor = canvas.camera.viewScale
+            val scalingFactorRatio = scalingFactor / currentScalingFactor
+            canvas.scale(scalingFactorRatio)
         }
 
     var editMode: EditMode = EditMode.SELECTION
@@ -169,42 +191,17 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     init {
         super.setLayout(BorderLayout())
 
-        canvas.apply {
-            // Always render in high quality
-            setDefaultRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING)
-            animatingRenderQuality = PPaintContext.HIGH_QUALITY_RENDERING
-            interactingRenderQuality = PPaintContext.HIGH_QUALITY_RENDERING
 
-            NetworkPreferences.registerChangeListener(preferenceLoader)
-            preferenceLoader()
-
-            // Remove default event listeners
-            removeInputEventListener(panEventHandler)
-            removeInputEventListener(zoomEventHandler)
-
-            // Event listeners
-            addInputEventListener(MouseEventHandler(this@NetworkPanel))
-            addInputEventListener(ContextMenuEventHandler(this@NetworkPanel))
-            addInputEventListener(PMouseWheelZoomEventHandler().apply { zoomAboutMouse() })
-            addInputEventListener(WandEventHandler(this@NetworkPanel));
-
-            // Don't show text when the canvas is sufficiently zoomed in
-            camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM) {
-                launch(Dispatchers.Swing) {
-                    filterScreenElements<NeuronNode>().forEach {
-                        it.updateTextVisibility()
-                    }
-                }
-            }
-        }
+        NetworkPreferences.registerChangeListener(preferenceLoader)
+        preferenceLoader()
 
         toolbars.apply {
 
             cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)
             val flowLayout = FlowLayout(FlowLayout.LEFT).apply { hgap = 0; vgap = 0 }
             add("Center", JPanel(flowLayout).apply {
-                add(mainToolBar)
                 add(editToolBar)
+                add(mainToolBar)
             })
         }
 
@@ -680,6 +677,9 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
                     updateButton()
                 }
             })
+            add(networkActions.resetZoomAction())
+            add(networkActions.zoomInAction())
+            add(networkActions.zoomOutAction())
         }
     }
 
@@ -796,6 +796,57 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             weightMatrixTree.forwardPass(sources.map { it.activations })
         }
         weightMatrixTree.backpropError(target.targetValues!!, 0.0001)
+    }
+
+    inner class NetworkCanvas : PCanvas() {
+        init {
+            // Always render in high quality
+            setDefaultRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING)
+            animatingRenderQuality = PPaintContext.HIGH_QUALITY_RENDERING
+            interactingRenderQuality = PPaintContext.HIGH_QUALITY_RENDERING
+
+            // Remove default event listeners
+            removeInputEventListener(panEventHandler)
+            removeInputEventListener(zoomEventHandler)
+
+            // Event listeners
+            addInputEventListener(MouseEventHandler(this@NetworkPanel))
+            addInputEventListener(ContextMenuEventHandler(this@NetworkPanel))
+            addInputEventListener(object : PBasicInputEventHandler() {
+                override fun mouseWheelRotated(event: PInputEvent) {
+                    val swingEvent = (event.sourceSwingEvent as MouseWheelEvent)
+                    val newScale = 1.1.pow(swingEvent.preciseWheelRotation)
+                    scale(1 / newScale)
+                }
+            })
+            addInputEventListener(WandEventHandler(this@NetworkPanel));
+
+            // Don't show text when the canvas is sufficiently zoomed in
+            camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM) {
+                launch(Dispatchers.Swing) {
+                    filterScreenElements<NeuronNode>().forEach {
+                        it.updateTextVisibility()
+                    }
+                }
+            }
+        }
+
+        /**
+         * Change the current zoom level up or down by the scaling factor.
+         *
+         * For example:
+         * 1.1 zooms in by ~10%
+         * 0.9 zooms out by ~10%
+         */
+        fun scale(scalingFactor: Double) {
+            val canvasCenter: Point2D = camera.bounds.center
+            val (x, y) = camera.localToView(canvasCenter)
+            val newWidth = camera.viewBounds.width / scalingFactor
+            val newHeight = camera.viewBounds.height / scalingFactor
+            val newX = x - newWidth / 2
+            val newY = y - newHeight / 2
+            camera.setViewBoundsNoOverflow(Rectangle2D.Double(newX, newY, newWidth, newHeight))
+        }
     }
 
 }

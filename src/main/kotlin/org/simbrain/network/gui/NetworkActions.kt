@@ -752,4 +752,28 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     ) {
         networkPanel.showTextPropertyDialog(textNodes)
     }
+
+    fun resetZoomAction() = networkPanel.createAction(
+        "Reset Zoom",
+        iconPath = "menu_icons/ZoomFitPage.png",
+        keyboardShortcut = CmdOrCtrl + KeyEvent.VK_0
+    ) {
+        scalingFactor = 1.0
+    }
+
+    fun zoomInAction() = networkPanel.createAction(
+        "Zoom In",
+        iconPath = "menu_icons/ZoomIn.png",
+        keyboardShortcuts = listOf(CmdOrCtrl + KeyEvent.VK_ADD, CmdOrCtrl + KeyEvent.VK_EQUALS)
+    ) {
+        scalingFactor *= 1.1
+    }
+
+    fun zoomOutAction() = networkPanel.createAction(
+        "Zoom Out",
+        iconPath = "menu_icons/ZoomOut.png",
+        keyboardShortcuts = listOf(CmdOrCtrl + KeyEvent.VK_SUBTRACT, CmdOrCtrl + KeyEvent.VK_MINUS)
+    ) {
+        scalingFactor /= 1.1
+    }
 }

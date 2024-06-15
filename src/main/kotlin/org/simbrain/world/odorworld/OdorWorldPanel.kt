@@ -135,7 +135,7 @@ class OdorWorldPanel(
         }
 
         override fun getToolTipText(event: MouseEvent): String {
-            val allNode = ArrayList((canvas.layer.allNodes as Collection<PNode?>).stream().toList())
+            val allNode = ArrayList((layer.allNodes as Collection<PNode?>).stream().toList())
             allNode.reverse()
 
             val firstNode = allNode.stream()
@@ -180,7 +180,7 @@ class OdorWorldPanel(
             val newHeight = camera.viewBounds.height / scalingFactor
             val newX = x - newWidth / 2
             val newY = y - newHeight / 2
-            canvas.setViewBounds(Rectangle2D.Double(newX, newY, newWidth, newHeight))
+            setViewBounds(Rectangle2D.Double(newX, newY, newWidth, newHeight))
         }
 
         fun setViewBounds(bounds: Rectangle2D) {
@@ -189,7 +189,7 @@ class OdorWorldPanel(
             val newHeight = min(h, world.height)
             val newX = x.coerceIn(0.0, world.width - newWidth)
             val newY = y.coerceIn(0.0, world.height - newHeight)
-            canvas.camera.setViewBoundsNoOverflow(
+            camera.setViewBoundsNoOverflow(
                 Rectangle2D.Double(
                     newX,
                     newY,

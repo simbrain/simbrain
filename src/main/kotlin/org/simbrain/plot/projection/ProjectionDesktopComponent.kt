@@ -8,6 +8,7 @@ import kotlinx.coroutines.withContext
 import org.jfree.chart.ChartFactory
 import org.jfree.chart.ChartPanel
 import org.jfree.chart.JFreeChart
+import org.jfree.chart.axis.NumberAxis
 import org.jfree.chart.labels.CustomXYToolTipGenerator
 import org.jfree.chart.labels.StandardXYItemLabelGenerator
 import org.jfree.chart.labels.XYItemLabelGenerator
@@ -179,8 +180,16 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
         xyPlot.backgroundPaint = Color.white
         xyPlot.domainGridlinePaint = Color.gray
         xyPlot.rangeGridlinePaint = Color.gray
-        xyPlot.domainAxis.isAutoRange = true
-        xyPlot.rangeAxis.isAutoRange = true
+        val rangeAxis = xyPlot.rangeAxis as NumberAxis
+        val domainAxis = xyPlot.domainAxis as NumberAxis
+        rangeAxis.upperMargin = 0.1
+        rangeAxis.lowerMargin = 0.1
+        domainAxis.upperMargin = 0.1
+        domainAxis.lowerMargin = 0.1
+        rangeAxis.autoRangeStickyZero = false
+        domainAxis.autoRangeStickyZero = false
+        domainAxis.isAutoRange = true
+        rangeAxis.isAutoRange = true
         xyPlot.foregroundAlpha = .5f // TODO: Make this settable
         xyPlot.renderer = renderer
     }

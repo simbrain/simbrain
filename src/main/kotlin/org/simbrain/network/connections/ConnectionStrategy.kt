@@ -83,9 +83,9 @@ abstract class ConnectionStrategy : CopyableObject {
     abstract override fun copy(): ConnectionStrategy
 
     /**
-     * Apply connection to a set of loose neurons.
+     * Apply connection to a set of free neurons.
      *
-     * @param network parent network loose neuron
+     * @param network parent network free neuron
      * @param source  source neurons
      * @param target  target neurons
      * @param addToNetwork if true, add the synapses to the network

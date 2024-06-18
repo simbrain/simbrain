@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.core;
 
-import org.simbrain.network.NetworkModel;
 import org.simbrain.network.neurongroups.NeuronGroup;
 import org.simbrain.network.subnetworks.Subnetwork;
 import org.simbrain.network.update_actions.BufferedUpdate;

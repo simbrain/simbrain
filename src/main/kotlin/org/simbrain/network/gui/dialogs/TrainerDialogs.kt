@@ -4,8 +4,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
 import org.simbrain.network.NetworkComponent
-import org.simbrain.network.NetworkModel
 import org.simbrain.network.core.Network
+import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.nodes.SRNNode
 import org.simbrain.network.subnetworks.LMSNetwork

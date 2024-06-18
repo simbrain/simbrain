@@ -4,7 +4,6 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
-import org.simbrain.network.bound
 import org.simbrain.network.core.*
 import org.simbrain.network.layouts.Layout
 import org.simbrain.network.util.BiasedScalarData

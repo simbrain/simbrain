@@ -19,8 +19,6 @@
 package org.simbrain.network.gui
 
 import kotlinx.coroutines.launch
-import org.simbrain.network.LocatableModel
-import org.simbrain.network.NetworkModel
 import org.simbrain.network.core.*
 import org.simbrain.network.neurongroups.NeuronGroup
 import java.util.*

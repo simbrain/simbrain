@@ -26,8 +26,7 @@
  */
 package org.simbrain.network.util
 
-import org.simbrain.network.*
-import org.simbrain.network.core.AbstractNeuronCollection
+import org.simbrain.network.core.*
 import org.simbrain.util.*
 import kotlin.collections.component1
 import kotlin.collections.component2

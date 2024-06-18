@@ -19,7 +19,6 @@
 package org.simbrain.network.core
 
 import org.piccolo2d.event.PInputEvent
-import org.simbrain.network.LocatableModel
 import org.simbrain.network.events.TextObjectEvents
 import java.awt.geom.Point2D
 

@@ -2,8 +2,8 @@ package org.simbrain.network.groups
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.simbrain.network.NetworkModel
 import org.simbrain.network.core.Network
+import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.subnetworks.FeedForward
 import java.awt.geom.Point2D

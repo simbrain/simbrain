@@ -1,6 +1,6 @@
 package org.simbrain.network.gui
 
-import org.simbrain.network.NetworkModel
+import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.events.NetworkSelectionEvent
 import org.simbrain.network.gui.nodes.ScreenElement
 import java.util.concurrent.CopyOnWriteArraySet

@@ -12,13 +12,8 @@
  */
 package org.simbrain.network.subnetworks
 
-import org.simbrain.network.LocatableModel
-import org.simbrain.network.NetworkModel
-import org.simbrain.network.centerLocation
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.NetworkModelList
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.*
+import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.events.SubnetworkEvents
 import org.simbrain.util.minus
 import org.simbrain.util.plus

@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.subnetworks
 
-import org.simbrain.network.bound
 import org.simbrain.network.core.*
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.updaterules.BinaryRule

@@ -1,6 +1,6 @@
 package org.simbrain.network.gui
 
-import org.simbrain.network.LocatableModel
+import org.simbrain.network.core.LocatableModel
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.gui.nodes.NeuronNode
 import org.simbrain.util.*

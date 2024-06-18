@@ -1,6 +1,5 @@
-package org.simbrain.network
+package org.simbrain.network.core
 
-import org.simbrain.network.core.Network
 import org.simbrain.network.events.NetworkModelEvents
 import org.simbrain.util.UserParameter
 import org.simbrain.util.stats.ProbabilityDistribution

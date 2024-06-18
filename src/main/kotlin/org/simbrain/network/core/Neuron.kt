@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.core
 
-import org.simbrain.network.LocatableModel
 import org.simbrain.network.events.NeuronEvents
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.NeuronUpdateRule

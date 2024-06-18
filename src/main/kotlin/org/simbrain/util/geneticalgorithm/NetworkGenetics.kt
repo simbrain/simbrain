@@ -2,9 +2,9 @@ package org.simbrain.util.geneticalgorithm
 
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.withTimeout
-import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.*
 import org.simbrain.network.core.Network
+import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.layouts.GridLayout

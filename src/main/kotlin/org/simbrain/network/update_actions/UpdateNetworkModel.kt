@@ -1,7 +1,7 @@
 package org.simbrain.network.update_actions
 
-import org.simbrain.network.NetworkModel
 import org.simbrain.network.core.Network
+import org.simbrain.network.core.NetworkModel
 import org.simbrain.workspace.updater.UpdateAction
 
 /**

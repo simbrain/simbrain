@@ -23,7 +23,7 @@ import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.event.PInputEventFilter
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PBounds
-import org.simbrain.network.NetworkModel
+import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.util.display
 import java.awt.event.InputEvent

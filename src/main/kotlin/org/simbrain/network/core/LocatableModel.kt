@@ -1,4 +1,4 @@
-package org.simbrain.network
+package org.simbrain.network.core
 
 import org.simbrain.network.events.LocationEvents
 import org.simbrain.util.*

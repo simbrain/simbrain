@@ -2,7 +2,7 @@ package org.simbrain.network.gui.nodes
 
 import org.piccolo2d.nodes.PImage
 import org.piccolo2d.nodes.PText
-import org.simbrain.network.NetworkModel
+import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.dialogs.getTrainingDialog
 import org.simbrain.network.smile.SmileClassifier

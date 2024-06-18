@@ -19,7 +19,7 @@ import org.simbrain.network.layouts.Layout;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 
-import static org.simbrain.network.LocatableModelKt.getCenterLocation;
+import static org.simbrain.network.core.LocatableModelKt.getCenterLocation;
 
 /**
  * <b>LayoutPanel</b> allows the user to define the layout of a network.

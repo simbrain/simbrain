@@ -6,7 +6,6 @@ import com.thoughtworks.xstream.converters.MarshallingContext
 import com.thoughtworks.xstream.converters.UnmarshallingContext
 import com.thoughtworks.xstream.io.HierarchicalStreamReader
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter
-import org.simbrain.network.NetworkModel
 import org.simbrain.network.subnetworks.Subnetwork
 import java.util.concurrent.ConcurrentHashMap
 

@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.core
 
-import org.simbrain.network.NetworkModel
 import org.simbrain.network.core.Network.Randomizers.excitatoryRandomizer
 import org.simbrain.network.core.Network.Randomizers.inhibitoryRandomizer
 import org.simbrain.network.core.Network.Randomizers.weightRandomizer

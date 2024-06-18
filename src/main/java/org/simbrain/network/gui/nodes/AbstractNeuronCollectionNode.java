@@ -1,8 +1,8 @@
 package org.simbrain.network.gui.nodes;
 
-import org.simbrain.network.LocatableModel;
-import org.simbrain.network.NetworkModel;
 import org.simbrain.network.core.AbstractNeuronCollection;
+import org.simbrain.network.core.LocatableModel;
+import org.simbrain.network.core.NetworkModel;
 import org.simbrain.network.events.NeuronCollectionEvents;
 import org.simbrain.network.events.NeuronEvents;
 import org.simbrain.network.gui.NetworkPanel;

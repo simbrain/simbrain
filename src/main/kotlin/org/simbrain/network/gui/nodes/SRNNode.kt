@@ -1,6 +1,6 @@
 package org.simbrain.network.gui.nodes
 
-import org.simbrain.network.NetworkModel
+import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.dialogs.getSupervisedTrainingDialog
 import org.simbrain.network.subnetworks.SRNNetwork

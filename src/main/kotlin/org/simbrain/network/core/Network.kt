@@ -1,8 +1,6 @@
 package org.simbrain.network.core
 
 import kotlinx.coroutines.*
-import org.simbrain.network.LocatableModel
-import org.simbrain.network.NetworkModel
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.events.NetworkEvents

@@ -1,7 +1,7 @@
 package org.simbrain.util.geneticalgorithm
 
-import org.simbrain.network.NetworkModel
 import org.simbrain.network.core.Network
+import org.simbrain.network.core.NetworkModel
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.sampleWithReplacement

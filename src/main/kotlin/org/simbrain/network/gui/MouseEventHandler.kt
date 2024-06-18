@@ -27,9 +27,9 @@ import org.piccolo2d.event.PInputEventFilter
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PNodeFilter
-import org.simbrain.network.LocatableModel
+import org.simbrain.network.core.LocatableModel
+import org.simbrain.network.core.topLeftLocation
 import org.simbrain.network.gui.nodes.ScreenElement
-import org.simbrain.network.topLeftLocation
 import org.simbrain.util.Utils
 import org.simbrain.util.minus
 import org.simbrain.util.piccolo.SelectionMarquee

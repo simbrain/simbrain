@@ -1,6 +1,5 @@
 package org.simbrain.network.core
 
-import org.simbrain.network.NetworkModel
 import org.simbrain.network.events.ConnectorEvents
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.workspace.AttributeContainer

@@ -1,6 +1,5 @@
 package org.simbrain.network.core
 
-import org.simbrain.network.LocatableModel
 import org.simbrain.network.events.LocationEvents
 import org.simbrain.util.toDoubleArray
 import org.simbrain.workspace.AttributeContainer

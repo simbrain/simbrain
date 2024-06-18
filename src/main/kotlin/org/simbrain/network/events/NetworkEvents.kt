@@ -1,6 +1,6 @@
 package org.simbrain.network.events
 
-import org.simbrain.network.NetworkModel
+import org.simbrain.network.core.NetworkModel
 import org.simbrain.util.Events
 
 /**

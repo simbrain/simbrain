@@ -3,7 +3,7 @@
 // import org.piccolo2d.nodes.PImage
 // import org.piccolo2d.nodes.PPath
 // import org.piccolo2d.nodes.PText
-// import org.simbrain.network.NetworkModel
+// import org.simbrain.network.core.NetworkModel
 // import org.simbrain.network.gui.NetworkPanel
 // import org.simbrain.network.gui.dialogs.getDeepNetEditDialog
 // import org.simbrain.network.gui.dialogs.showDeepNetTrainingDialog

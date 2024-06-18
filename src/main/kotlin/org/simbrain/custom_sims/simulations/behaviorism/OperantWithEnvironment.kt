@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations.behaviorism
 
+import kotlinx.coroutines.runBlocking
 import org.simbrain.custom_sims.Simulation
 import org.simbrain.custom_sims.helper_classes.ControlPanel
 import org.simbrain.network.NetworkComponent
@@ -203,7 +204,9 @@ class OperantWithEnvironment : Simulation {
             winningNode = 2
         }
 
-        net.bufferedUpdate()
+        runBlocking {
+            net.bufferedUpdate()
+        }
     }
 
     private fun setUpControlPanel() {

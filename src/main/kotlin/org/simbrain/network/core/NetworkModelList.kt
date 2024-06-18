@@ -11,7 +11,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 /**
  * The main data structure for [NetworkModel]s. Wraps a map from classes to ordered sets of those objects.
- * Backed by a linked hash set.  Hash set deals with duplication; linked provides an iterator.
+ * Backed by a linked hash set. Hash set deals with duplication; linked provides an iterator.
  *
  * Used both by [Network] and by [Subnetwork].
  */
@@ -23,11 +23,6 @@ class NetworkModelList {
     @XStreamImplicit
     private val networkModels: MutableMap<Class<out NetworkModel>, LinkedHashSet<NetworkModel>?> = ConcurrentHashMap()
 
-    private val modelsByShouldAsync: Map<Boolean, LinkedHashSet<NetworkModel>> = mapOf(
-        true to LinkedHashSet(),
-        false to LinkedHashSet()
-    )
-
     @Suppress("UNCHECKED_CAST")
     fun <T : NetworkModel> put(modelClass: Class<T>, model: T) {
         if (modelClass in networkModels) {
@@ -37,7 +32,6 @@ class NetworkModelList {
             newSet.add(model)
             networkModels[modelClass] = newSet as LinkedHashSet<NetworkModel>
         }
-        modelsByShouldAsync[shouldAsync(model)]!!.add(model)
     }
 
     /**
@@ -52,7 +46,6 @@ class NetworkModelList {
             newSet.add(model)
             networkModels[modelClass] = newSet
         }
-        modelsByShouldAsync[shouldAsync(model)]!!.add(model)
     }
 
     /**
@@ -114,19 +107,11 @@ class NetworkModelList {
         if (model is Subnetwork) {
             // Forces all subclasses of subnetwork to be grouped with the subnetwork class
             networkModels[Subnetwork::class.java]?.remove(model)
-            modelsByShouldAsync[true]?.remove(model)
-            modelsByShouldAsync[false]?.remove(model)
         } else {
             networkModels[model.javaClass]?.remove(model)
-            modelsByShouldAsync[true]?.remove(model)
-            modelsByShouldAsync[false]?.remove(model)
         }
     }
 
-    private fun shouldAsync(model: NetworkModel) = model is ArrayLayer || model is AbstractNeuronCollection
-
-    fun getAsyncModels() = modelsByShouldAsync[true]!!
-    fun getNonAsyncModels() = modelsByShouldAsync[false]!!
 
     override fun toString(): String =  all.joinToString("\n") { "$it" }
 

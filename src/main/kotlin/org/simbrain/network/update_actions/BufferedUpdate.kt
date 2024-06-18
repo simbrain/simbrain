@@ -11,6 +11,6 @@ import org.simbrain.workspace.updater.UpdateAction
  */
 class BufferedUpdate(private val network: Network) : UpdateAction("Buffered update", "Buffered update of all top-level network models") {
     override suspend fun run() {
-        network.asyncBufferedUpdate()
+        network.bufferedUpdate()
     }
 }

@@ -227,16 +227,9 @@ class Network: CoroutineScope, EditableObject {
     /**
      * Default asynchronous update method called by [org.simbrain.network.update_actions.BufferedUpdate].
      */
-    fun bufferedUpdate() {
+    suspend fun bufferedUpdate()  = coroutineScope {
         networkModels.all.forEach { it.updateInputs() }
         networkModels.all.forEach { it.update() }
-    }
-
-    suspend fun asyncBufferedUpdate()  = coroutineScope {
-        networkModels.getAsyncModels().map { async { it.updateInputs() } }.awaitAll()
-        networkModels.getNonAsyncModels().forEach { it.updateInputs() }
-        networkModels.getAsyncModels().map { async { it.update() } }.awaitAll()
-        networkModels.getNonAsyncModels().forEach { it.update() }
     }
 
     /**

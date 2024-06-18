@@ -25,11 +25,11 @@ public class DecayRuleTest {
         // Set to 1 and decay by .2
         n.setActivation(1);
         dr.setDecayAmount(.2);
-        net.bufferedUpdate();
+        net.update();
         assertEquals(.8, n.getActivation(), .01);
-        net.bufferedUpdate();
+        net.update();
         assertEquals(.6, n.getActivation(), .01);
-        IntStream.range(0, 10).forEach(i-> net.bufferedUpdate());
+        IntStream.range(0, 10).forEach(i-> net.update());
 
         // Should decay to 0 by this point
         assertEquals(0, n.getActivation(), .01);
@@ -49,30 +49,30 @@ public class DecayRuleTest {
         //  1 -> .9 -> .81 -> .729 ->  .6561
         n.setActivation(1);
         dr.setDecayFraction(.1);
-        net.bufferedUpdate();
+        net.update();
         assertEquals(.9,n.getActivation(),.001);
-        net.bufferedUpdate();
+        net.update();
         assertEquals(.81,n.getActivation(),.001);
-        net.bufferedUpdate();
+        net.update();
         assertEquals(.729,n.getActivation(),.001);
-        net.bufferedUpdate();
+        net.update();
         assertEquals(.6561,n.getActivation(),.001);
 
         // Try with larger number
         n.setUpperBound(10);
         n.setActivation(10);
-        net.bufferedUpdate();
+        net.update();
         assertEquals(9,n.getActivation(),.001);
 
         // Try with negative number
         n.setActivation(-1);
-        net.bufferedUpdate();
+        net.update();
         assertEquals(-.9,n.getActivation(),.001);
 
         // Try with different baseline
         n.setActivation(1);
         dr.setBaseLine(.5);
-        net.bufferedUpdate();
+        net.update();
         assertEquals(.95,n.getActivation(),.001);
         
     }

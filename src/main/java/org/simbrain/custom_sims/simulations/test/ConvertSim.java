@@ -26,9 +26,9 @@ public class ConvertSim extends Simulation {
         for (WorkspaceComponent component : workspace.getComponentList()) {
             if (component instanceof NetworkComponent) {
                 System.out.println("Workspace workspace = sim.getWorkspace();\n");
-                String netCompName = new String("netComp_" + component.name);
+                String netCompName = new String("netComp_" + component.getName());
                 Network network = ((NetworkComponent)component).getNetwork();
-                String netName = new String("net_" + component.name);
+                String netName = new String("net_" + component.getName());
                 System.out.println("NetworkComponent " + netCompName + " = new NetworkComponent(\"" + netCompName + "\");");
                 System.out.println("workspace.addWorkspaceComponent(" + netCompName + ");");
                 System.out.println("");

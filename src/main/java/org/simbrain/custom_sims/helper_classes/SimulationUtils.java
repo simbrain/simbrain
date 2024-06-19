@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.helper_classes;
 
+import org.simbrain.docviewer.DocViewer;
 import org.simbrain.docviewer.DocViewerComponent;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.desktop.NetworkDesktopComponent;
@@ -107,9 +108,9 @@ public class SimulationUtils {
      * @param fileName name of the html file, e.g. "ActorCritic.html", assumed to be in resource > custom_sims.
      */
     public DocViewerComponent addDocViewer(int x, int y, int width, int height, String title, String fileName) {
-        DocViewerComponent docViewer = new DocViewerComponent(title);
+        DocViewerComponent docViewer = new DocViewerComponent(new DocViewer(), title);
         String html = readSimulationFileContents(fileName);
-        docViewer.setText(html);
+        docViewer.getDocViewer().setText(html);
         workspace.addWorkspaceComponent(docViewer);
         SwingUtilities.invokeLater(() -> desktop.getDesktopComponent(docViewer).getParentFrame().setBounds(x, y, width, height));
         return docViewer;

@@ -16,108 +16,26 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.docviewer;
+package org.simbrain.docviewer
 
-import org.jetbrains.annotations.NotNull;
-import org.simbrain.workspace.WorkspaceComponent;
-
-import java.io.*;
-import java.nio.charset.Charset;
-import java.util.Collections;
-import java.util.List;
+import org.simbrain.util.getSimbrainXStream
+import org.simbrain.workspace.WorkspaceComponent
+import java.io.InputStream
+import java.io.OutputStream
 
 /**
  * Component corresponding to a Document Viewer.
  */
-public class DocViewerComponent extends WorkspaceComponent {
+class DocViewerComponent(val docViewer: DocViewer = DocViewer(), name: String = "") : WorkspaceComponent(name) {
 
-    /**
-     * Default string.
-     */
-    private String text = """
-            <html>
-            <body>
-            Use this text to explain how a simulation works,
-            and save it with the workspace so that
-            when it is re-opened other users will know how to use it.
-            <br><br>
-            Uses simple html for formatting, e.g. <b>bold text</b>.
-            Click on the Edit tab to edit the html\s
-            or import from pre-edited html using the File menu.<br><br>Example of a local image: <img src = "file:simulations/images/Caltech101Sample/image_0036.jpg"><br><br>
-            Example of a link: <a href = "https://google.com">google</a>
-            \s
-            </body>
-            </html>
-            """;
-
-    /**
-     * Construct a new document viewer component.
-     */
-    public DocViewerComponent() {
-        super("");
+    override fun save(output: OutputStream, format: String?) {
+        getSimbrainXStream().toXML(docViewer)
     }
 
-    /**
-     * Construct a new document viewer component with a specified title.
-     *
-     * @param name title for frame this is displayed in
-     */
-    public DocViewerComponent(String name) {
-        super(name);
-    }
-
-    /**
-     * Opens a saved component. There isn't much to do here since currently
-     * there is nothing to persist with a console. This just ensures that a
-     * component is created and (in the gui) presented.
-     *
-     * @param input  stream
-     * @param name   name of file
-     * @param format format
-     * @return component to be opened
-     */
-    public static DocViewerComponent open(InputStream input, final String name, final String format) {
-        DocViewerComponent comp = new DocViewerComponent(name);
-        BufferedReader br;
-        br = new BufferedReader(new InputStreamReader(input, Charset.forName("UTF-8")));
-        String line;
-        String text = new String();
-        try {
-            while ((line = br.readLine()) != null) {
-                text = text.concat(line + "\n");
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
+    companion object {
+        fun open(input: InputStream, name: String, format: String?): DocViewerComponent {
+            val docViewer = getSimbrainXStream().fromXML(input) as DocViewer
+            return DocViewerComponent(docViewer, name)
         }
-        comp.setText(text);
-        return comp;
-    }
-
-    @Override
-    public void save(OutputStream output, final String format) {
-        try {
-            output.write(getText().getBytes(Charset.forName("UTF-8")));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * @return the text
-     */
-    public String getText() {
-        return text;
-    }
-
-    /**
-     * @param text the text to set
-     */
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    @Override
-    public @NotNull List<String> getFormats() {
-        return Collections.singletonList("html");
     }
 }

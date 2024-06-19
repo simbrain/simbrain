@@ -133,7 +133,7 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
      */
     private void addAttributeListener(WorkspaceComponent component) {
 
-        WorkspaceComponentEvents events = component.events;
+        WorkspaceComponentEvents events = component.getEvents();
 
         var attributeContainerAddedCleanupHandler = events.getAttributeContainerAdded().on(getSwingDispatcher(), ac -> {
             if (isSelectedComponent(component)) {

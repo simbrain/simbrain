@@ -47,7 +47,6 @@ abstract class WorkspaceComponent(name: String) {
      */
     open lateinit var workspace: Workspace
 
-    @JvmField
     @Transient
     val events: WorkspaceComponentEvents = WorkspaceComponentEvents()
 
@@ -101,14 +100,12 @@ abstract class WorkspaceComponent(name: String) {
     /**
      * The name of this component. Used in the title, in saving, etc.
      */
-    @JvmField
     var name: String = ""
 
     /**
      * Current file. Used when "saving" a component. Subclasses can provide a
      * default value using User Preferences.
      */
-    @JvmField
     var currentFile: File? = null
 
     /**

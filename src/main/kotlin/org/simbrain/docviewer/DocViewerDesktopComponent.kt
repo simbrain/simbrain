@@ -16,176 +16,166 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.docviewer;
+package org.simbrain.docviewer
 
-import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
-import org.fife.ui.rtextarea.RTextScrollPane;
-import org.simbrain.util.genericframe.GenericFrame;
-import org.simbrain.util.widgets.ShowHelpAction;
-import org.simbrain.util.widgets.SimbrainTextArea;
-import org.simbrain.workspace.gui.DesktopComponent;
-import org.simbrain.workspace.gui.SimbrainDesktop;
-
-import javax.swing.*;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-import javax.swing.event.HyperlinkEvent;
-import javax.swing.event.HyperlinkListener;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.*;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.charset.Charset;
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
+import org.fife.ui.rsyntaxtextarea.SyntaxConstants
+import org.fife.ui.rtextarea.RTextScrollPane
+import org.simbrain.util.genericframe.GenericFrame
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
+import org.simbrain.util.widgets.ShowHelpAction
+import org.simbrain.util.widgets.SimbrainTextArea
+import org.simbrain.workspace.gui.DesktopComponent
+import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
+import java.awt.BorderLayout
+import java.awt.Desktop
+import java.awt.Dimension
+import java.io.*
+import java.net.URI
+import java.net.URISyntaxException
+import java.net.URL
+import java.nio.charset.Charset
+import javax.swing.*
+import javax.swing.event.ChangeListener
+import javax.swing.event.HyperlinkEvent
+import javax.swing.event.HyperlinkListener
 
 /**
  * A very simple component which displays html and allows it to be edited. Uses
  * a JEditorPane to display html and an RSSyntaxTextArea to edit it.
- * <p>
+ *
+ *
  * Examples of html code for local links and images:
- * <p>
- * <img src = "file:docs/Images/World.gif" alt="world">
- * <a href = "file:docs/SimbrainDocs.html">Local link</a>.
+ *
+ *
+ * <img src = "file:docs/Images/World.gif" alt="world"></img>
+ * [Local link](file:docs/SimbrainDocs.html).
  */
-public class DocViewerDesktopComponent extends DesktopComponent<DocViewerComponent> {
+class DocViewerDesktopComponent(frame: GenericFrame, component: DocViewerComponent)
+    : DesktopComponent<DocViewerComponent>(frame, component) {
 
-    /**
-     * Main text area.
-     */
-    private final JEditorPane textArea = new JEditorPane();
+    private val textArea = JEditorPane()
 
-    /**
-     * Menu Bar.
-     */
-    private JMenuBar menuBar = new JMenuBar();
+    private val menuBar = JMenuBar()
 
-    /**
-     * File menu for saving and opening world files.
-     */
-    private JMenu file = new JMenu("File");
+    private val file = JMenu("File")
 
-    /**
-     * Main text area.
-     */
-    private final SimbrainTextArea htmlEditor = new SimbrainTextArea();
+    private val htmlEditor = SimbrainTextArea()
+    
+    val docViewer = component.docViewer
 
-    /**
-     * Constructor the gui component.
-     *
-     * @param frame     frame of doc viewer
-     * @param component workspace component
-     */
-    public DocViewerDesktopComponent(GenericFrame frame, DocViewerComponent component) {
-        super(frame, component);
-        setPreferredSize(new Dimension(500, 400));
-        setLayout(new BorderLayout());
+    val modeSelector = AnnotatedPropertyEditor(docViewer)
+
+    init {
+        preferredSize = Dimension(500, 400)
+        layout = BorderLayout()
 
         // File Menu
-        menuBar.add(file);
-        file.add(SimbrainDesktop.INSTANCE.getActionManager().createImportAction(this));
-        file.add(SimbrainDesktop.INSTANCE.getActionManager().createExportAction(this));
-        file.addSeparator();
-        file.add(SimbrainDesktop.INSTANCE.getActionManager().createRenameAction(this));
-        file.addSeparator();
-        JMenuItem item = new JMenuItem("Import html...");
-        item.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                final JFileChooser _fileChooser = new JFileChooser();
-                int retval = _fileChooser.showOpenDialog(textArea);
-                if (retval == JFileChooser.APPROVE_OPTION) {
-                    File f = _fileChooser.getSelectedFile();
-                    try {
-                        InputStream fis;
-                        BufferedReader br;
-                        fis = new FileInputStream(f);
-                        br = new BufferedReader(new InputStreamReader(fis, Charset.forName("UTF-8")));
-                        htmlEditor.read(br, null);
-                        textArea.setText(htmlEditor.getText());
-                        DocViewerDesktopComponent.this.getWorkspaceComponent().setText(htmlEditor.getText());
-                        htmlEditor.setCaretPosition(0);
-                    } catch (IOException ioex) {
-                        System.out.println(e);
-                    }
+        menuBar.add(file)
+        file.add(actionManager.createImportAction(this))
+        file.add(actionManager.createExportAction(this))
+        file.addSeparator()
+        file.add(actionManager.createRenameAction(this))
+        file.addSeparator()
+        val item = JMenuItem("Import html...")
+        item.addActionListener { e ->
+            val _fileChooser = JFileChooser()
+            val retval = _fileChooser.showOpenDialog(textArea)
+            if (retval == JFileChooser.APPROVE_OPTION) {
+                val f = _fileChooser.selectedFile
+                try {
+                    val br: BufferedReader
+                    val fis: InputStream = FileInputStream(f)
+                    br = BufferedReader(InputStreamReader(fis, Charset.forName("UTF-8")))
+                    htmlEditor.read(br, null)
+                    textArea.text = htmlEditor.text
+                    docViewer.text = htmlEditor.text
+                    htmlEditor.caretPosition = 0
+                } catch (ioex: IOException) {
+                    println(e)
                 }
             }
-        });
-        file.add(item);
-        file.addSeparator();
-        file.add(SimbrainDesktop.INSTANCE.getActionManager().createCloseAction(this));
+        }
+        file.add(item)
+        file.addSeparator()
+        file.add(actionManager.createCloseAction(this))
 
-        JMenu helpMenu = new JMenu("Help");
-        JMenuItem helpItem = new JMenuItem("Help");
-        Action helpAction = new ShowHelpAction("Pages/DocEditor.html");
-        helpItem.setAction(helpAction);
-        helpMenu.add(helpItem);
-        menuBar.add(helpMenu);
+        val helpMenu = JMenu("Help")
+        val helpItem = JMenuItem("Help")
+        val helpAction: Action = ShowHelpAction("Pages/DocEditor.html")
+        helpItem.action = helpAction
+        helpMenu.add(helpItem)
+        menuBar.add(helpMenu)
 
-        getParentFrame().setJMenuBar(menuBar);
+        parentFrame.jMenuBar = menuBar
 
-        textArea.setBorder(BorderFactory.createEmptyBorder(10, 5, 10, 5));
-        textArea.setContentType("text/html");
-        textArea.setEditable(false);
-        textArea.setText(((DocViewerComponent) this.getWorkspaceComponent()).getText());
+        textArea.border = BorderFactory.createEmptyBorder(10, 5, 10, 5)
+        textArea.contentType = "text/html"
+        textArea.isEditable = false
+        textArea.text = docViewer.renderedText
 
-        final JScrollPane sp = new JScrollPane(textArea);
+        val sp = JScrollPane(textArea)
 
-        JTabbedPane tabs = new JTabbedPane();
-        htmlEditor.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_HTML);
-        htmlEditor.setCodeFoldingEnabled(true);
-        htmlEditor.setAntiAliasingEnabled(true);
-        final RTextScrollPane sp2 = new RTextScrollPane(htmlEditor);
-        sp2.setFoldIndicatorEnabled(true);
-        add(sp2);
+        val tabs = JTabbedPane()
+        modeSelector.getWidgetEventsByLabel("Mode").valueChanged.on(Dispatchers.Swing) {
+            updateSyntaxHighlighting(modeSelector.getWidgetValueByLabel("Mode") as DocViewer.Mode)
+        }
+        updateSyntaxHighlighting(docViewer.mode)
+        htmlEditor.isCodeFoldingEnabled = true
+        htmlEditor.antiAliasingEnabled = true
+        val sp2 = JPanel().apply {
+            layout = BorderLayout()
+            add("North", modeSelector)
+            add("Center", RTextScrollPane(htmlEditor).apply {
+                isFoldIndicatorEnabled = true
+            })
+        }
+        add(sp2)
 
-        tabs.addTab("View", sp);
-        tabs.addTab("Edit", sp2);
+        tabs.addTab("View", sp)
+        tabs.addTab("Edit", sp2)
 
-        add("Center", tabs);
+        add("Center", tabs)
 
         // Listen for tab changed events. Synchronize the editor and the
         // display tabs on these events.
         // TODO: listen for changes in the editor and only update the display
         // when changes occur
-        ChangeListener changeListener = new ChangeListener() {
-            public void stateChanged(ChangeEvent changeEvent) {
-                JTabbedPane sourceTabbedPane = (JTabbedPane) changeEvent.getSource();
-                int index = sourceTabbedPane.getSelectedIndex();
-                // Assumes index of view tab is 0
-                if (index == 0) {
-                    textArea.setText(htmlEditor.getText());
-                    DocViewerDesktopComponent.this.getWorkspaceComponent().setText(htmlEditor.getText());
-                }
+        val changeListener = ChangeListener { changeEvent ->
+            val sourceTabbedPane = changeEvent.source as JTabbedPane
+            val index = sourceTabbedPane.selectedIndex
+            // Assumes index of view tab is 0
+            if (index == 0) {
+                modeSelector.commitChanges()
+
+                docViewer.text = htmlEditor.text
+                docViewer.render()
+                textArea.text = docViewer.renderedText
             }
-        };
-        tabs.addChangeListener(changeListener);
+            docViewer.render()
+        }
+        tabs.addChangeListener(changeListener)
 
         // Respond to clicks on hyper-links by opening a web page in the default
         // browser
-        HyperlinkListener l = new HyperlinkListener() {
-            @Override
-            public void hyperlinkUpdate(HyperlinkEvent e) {
-                if (HyperlinkEvent.EventType.ACTIVATED == e.getEventType()) {
-                    try {
-                        if (e.getURL() != null) {
-                            //System.out.println(e.getURL().toURI());
-                            Desktop.getDesktop().browse(processLocalFiles(e.getURL().toURI()));
-                        }
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    } catch (URISyntaxException e1) {
-                        e1.printStackTrace();
+        val l = HyperlinkListener { e ->
+            if (HyperlinkEvent.EventType.ACTIVATED == e.eventType) {
+                try {
+                    if (e.url != null) {
+                        // System.out.println(e.getURL().toURI());
+                        Desktop.getDesktop().browse(processLocalFiles(e.url.toURI()))
                     }
+                } catch (e1: IOException) {
+                    e1.printStackTrace()
+                } catch (e1: URISyntaxException) {
+                    e1.printStackTrace()
                 }
-
             }
-
-        };
-        textArea.addHyperlinkListener(l);
-        htmlEditor.setText(this.getWorkspaceComponent().getText());
-        textArea.setCaretPosition(0);
+        }
+        textArea.addHyperlinkListener(l)
+        htmlEditor.text = docViewer.text
+        textArea.caretPosition = 0
     }
 
     /**
@@ -195,19 +185,26 @@ public class DocViewerDesktopComponent extends DesktopComponent<DocViewerCompone
      * @param uri the uri to process
      * @return an update uri if it is a file link
      */
-    private URI processLocalFiles(URI uri) {
-        String uriStr = uri.toString();
-        if (uriStr.startsWith("file:")) {
-            uriStr = "file:" + System.getProperty("user.dir") + "/" + uriStr.substring(5);
-            URL url;
+    private fun processLocalFiles(uri: URI): URI {
+        var uriStr = uri.toString()
+        if (uriStr.startsWith("//localfiles/")) {
+            uriStr = "file:" + System.getProperty("user.dir") + "/" + uriStr.substring(5)
+            val url: URL
             try {
-                url = new URL(uriStr);
-                return url.toURI();
-            } catch (Exception e) {
-                e.printStackTrace();
+                url = URL(uriStr)
+                return url.toURI()
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
-        return uri;
+        return uri
+    }
+
+    private fun updateSyntaxHighlighting(mode: DocViewer.Mode) {
+        htmlEditor.syntaxEditingStyle = when(mode) {
+            DocViewer.Mode.HTML -> SyntaxConstants.SYNTAX_STYLE_HTML
+            DocViewer.Mode.MARKDOWN -> SyntaxConstants.SYNTAX_STYLE_MARKDOWN
+        }
     }
 
 }

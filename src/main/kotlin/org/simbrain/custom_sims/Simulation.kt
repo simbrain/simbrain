@@ -144,15 +144,15 @@ fun SimulationScope.readSimulationFileContents(fileName: String): String {
  * @param fileName name of the html file, e.g. "ActorCritic.html"
  * @return the component
  */
-fun SimulationScope.addDocViewer(title: String?, fileName: String): DocViewerComponent {
+fun SimulationScope.addDocViewer(title: String, fileName: String): DocViewerComponent {
 
-    val docViewer = DocViewerComponent(title)
+    val docViewerComponent = DocViewerComponent(name = title)
     val html = ResourceManager.readFileContents(
         "custom_sims" + Utils.FS + fileName
     )
-    docViewer.text = html
-    workspace.addWorkspaceComponent(docViewer)
-    return docViewer
+    docViewerComponent.docViewer.text = html
+    workspace.addWorkspaceComponent(docViewerComponent)
+    return docViewerComponent
 }
 
 val SimulationScope.couplingManager get() = workspace.couplingManager

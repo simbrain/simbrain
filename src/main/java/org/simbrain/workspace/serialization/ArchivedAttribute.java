@@ -35,7 +35,7 @@ public final class ArchivedAttribute {
      * @param attribute The attribute.
      */
     ArchivedAttribute(WorkspaceComponent component, Attribute attribute) {
-        componentId = component.name;
+        componentId = component.getName();
         attributeId = attribute.getId();
         methodName = attribute.getMethod().getName();
     }

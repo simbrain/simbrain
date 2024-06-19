@@ -163,6 +163,8 @@ dependencies {
     // https://mvnrepository.com/artifact/org.beanshell/bsh
     implementation(group = "org.beanshell", name = "bsh", version = "2.0b5")
 
+    implementation(group = "org.jetbrains", name = "markdown", version = "0.7.3")
+
 }
 
 tasks.test {

@@ -53,7 +53,7 @@ public final class ArchivedWorkspaceComponent {
     ArchivedWorkspaceComponent(final WorkspaceComponentSerializer serializer, final WorkspaceComponent component) {
         this.className = component.getClass().getCanonicalName();
         this.id = serializer.getId(component);
-        this.name = component.name;
+        this.name = component.getName();
         this.format = component.getDefaultFormat();
         this.uri = "components/" + id + '_' + name.replaceAll("\\s", "_") + '.' + format;
     }

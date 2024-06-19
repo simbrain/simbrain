@@ -94,7 +94,7 @@ public class AbstractComponentFactory {
         putWorkspaceComponentFactory("Raster Plot", () -> new RasterPlotComponent(""));
         putGuiComponentFactory(RasterPlotComponent.class, RasterPlotDesktopComponent::new);
 
-        putWorkspaceComponentFactory("Document Viewer", () -> new DocViewerComponent(""));
+        putWorkspaceComponentFactory("Document Viewer", DocViewerComponent::new);
         putGuiComponentFactory(DocViewerComponent.class, DocViewerDesktopComponent::new);
 
         putWorkspaceComponentFactory("Console", () -> new ConsoleComponent(""));

@@ -119,7 +119,24 @@ class DocViewerDesktopComponent(frame: GenericFrame, component: DocViewerCompone
 
         val tabs = JTabbedPane()
         modeSelector.getWidgetEventsByLabel("Mode").valueChanged.on(Dispatchers.Swing) {
-            updateSyntaxHighlighting(modeSelector.getWidgetValueByLabel("Mode") as DocViewer.Mode)
+            val mode = modeSelector.getWidgetValueByLabel("Mode") as DocViewer.Mode
+            updateSyntaxHighlighting(mode)
+            if (mode == DocViewer.Mode.HTML) {
+                val option = JOptionPane.showOptionDialog(
+                    null,
+                    "Do you want to convert the current text content from markdown to HTML?",
+                    "Convert to HTML?",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    arrayOf("Convert to HTML", "Keep text the same"),
+                    null
+                )
+                if (option == JOptionPane.YES_OPTION) {
+                    docViewer.text = docViewer.renderedText
+                    htmlEditor.text = docViewer.text
+                }
+            }
         }
         updateSyntaxHighlighting(docViewer.mode)
         htmlEditor.isCodeFoldingEnabled = true

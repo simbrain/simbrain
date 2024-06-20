@@ -145,9 +145,9 @@ fun getNetworkXStream(): XStream {
 
 fun networkUpdateAction(description: String, longDescription: String = description, action: () -> Unit) =
     object : NetworkUpdateAction {
+        override val description = description
+        override val longDescription = longDescription
         override fun invoke() = action()
-        override fun getDescription(): String = description
-        override fun getLongDescription(): String = longDescription
     }
 
 context(Network)

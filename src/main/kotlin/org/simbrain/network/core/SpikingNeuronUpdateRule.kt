@@ -16,15 +16,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.core;
+package org.simbrain.network.core
 
-import org.simbrain.network.core.Network.TimeType;
-import org.simbrain.network.updaterules.NeuronUpdateRule;
-import org.simbrain.network.util.SpikingMatrixData;
-import org.simbrain.network.util.SpikingScalarData;
+import org.simbrain.network.updaterules.NeuronUpdateRule
+import org.simbrain.network.util.SpikingMatrixData
+import org.simbrain.network.util.SpikingScalarData
 
 /**
- * <b>SpikingNeuron</b> is the superclass for spiking neuron types (e.g.
+ * **SpikingNeuron** is the superclass for spiking neuron types (e.g.
  * integrate and fire) with functions common to spiking neurons. For example a
  * boolean hasSpiked field is used in the gui to indicate that this neuron has
  * spiked.
@@ -32,18 +31,14 @@ import org.simbrain.network.util.SpikingScalarData;
  * @author Jeff Yoshimi
  * @author Zoë Tosi
  */
-public abstract class SpikingNeuronUpdateRule<DS extends SpikingScalarData, DM extends SpikingMatrixData> extends NeuronUpdateRule<DS, DM> {
-
-    @Override
-    public void clear(Neuron neuron) {
-        super.clear(neuron);
-        neuron.getFanIn().forEach(Synapse::clear);
+abstract class SpikingNeuronUpdateRule<DS : SpikingScalarData, DM : SpikingMatrixData> : NeuronUpdateRule<DS, DM>() {
+    override fun clear(neuron: Neuron) {
+        super.clear(neuron)
+        neuron.fanIn.forEach { it.clear() }
     }
 
-    @Override
-    public TimeType getTimeType() {
-        return TimeType.CONTINUOUS;
-    }
+    override val timeType: Network.TimeType
+        get() = Network.TimeType.CONTINUOUS
 
     /**
      * A helper method which identifies this and all subclasses as variations of
@@ -55,24 +50,19 @@ public abstract class SpikingNeuronUpdateRule<DS extends SpikingScalarData, DM e
      * @return TRUE: Any subclass of SpikingNeuronUpdate rule, must by
      * definition be a spiking neuron.
      */
-    @Override
-    public final boolean isSpikingRule() {
-        return true;
-    }
+    override val isSpikingRule: Boolean = true
 
     /**
      * Override to provide subclasses of SpikingMatrixData if needed.
      */
-    @Override
-    public DM createMatrixData(int size) {
-        return (DM) new SpikingMatrixData(size);
+    override fun createMatrixData(size: Int): DM {
+        return SpikingMatrixData(size) as DM
     }
 
     /**
      * Override to provide subclasses of SpikingScalarData if needed.
      */
-    @Override
-    public DS createScalarData() {
-        return (DS) new SpikingScalarData();
+    override fun createScalarData(): DS {
+        return SpikingScalarData() as DS
     }
 }

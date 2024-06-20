@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.core;
+package org.simbrain.network.core
 
 /**
  * Classes that implement this interface describe individual actions that
@@ -24,25 +24,23 @@ package org.simbrain.network.core;
  *
  * @author jyoshimi
  */
-public interface NetworkUpdateAction {
-
+interface NetworkUpdateAction {
     /**
      * Invoke this action.
      */
-    public void invoke();
+    fun invoke()
 
     /**
      * Provide a String description of this update method.
      *
      * @return the update description
      */
-    public String getDescription();
+    val description: String?
 
     /**
      * Provide a longer description for tooltips, etc.
      *
      * @return the update description
      */
-    public String getLongDescription();
-
+    val longDescription: String?
 }

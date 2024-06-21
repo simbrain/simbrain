@@ -32,6 +32,10 @@ class DocViewerComponent(val docViewer: DocViewer = DocViewer(), name: String = 
         getSimbrainXStream().toXML(docViewer)
     }
 
+    override val xml: String
+        get() = getSimbrainXStream().toXML(docViewer)
+
+
     companion object {
         fun open(input: InputStream, name: String, format: String?): DocViewerComponent {
             val docViewer = getSimbrainXStream().fromXML(input) as DocViewer

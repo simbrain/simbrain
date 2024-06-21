@@ -18,7 +18,6 @@ import kotlin.math.max
  */
 val braitenbergSim = newSim {
 
-
     workspace.clearWorkspace()
 
     val oc = addOdorWorldComponent {

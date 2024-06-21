@@ -18,12 +18,9 @@
  */
 package org.simbrain.docviewer
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.swing.Swing
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants
 import org.fife.ui.rtextarea.RTextScrollPane
 import org.simbrain.util.genericframe.GenericFrame
-import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.widgets.ShowHelpAction
 import org.simbrain.util.widgets.SimbrainTextArea
 import org.simbrain.workspace.gui.DesktopComponent
@@ -31,41 +28,31 @@ import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import java.awt.BorderLayout
 import java.awt.Desktop
 import java.awt.Dimension
-import java.io.*
+import java.io.IOException
 import java.net.URI
 import java.net.URISyntaxException
 import java.net.URL
-import java.nio.charset.Charset
 import javax.swing.*
 import javax.swing.event.ChangeListener
 import javax.swing.event.HyperlinkEvent
 import javax.swing.event.HyperlinkListener
 
 /**
- * A very simple component which displays html and allows it to be edited. Uses
- * a JEditorPane to display html and an RSSyntaxTextArea to edit it.
- *
- *
- * Examples of html code for local links and images:
- *
- *
- * <img src = "file:docs/Images/World.gif" alt="world"></img>
- * [Local link](file:docs/SimbrainDocs.html).
+ * Component for editing documents in markdown and rendering them in html.
+ * Used to document Simbrain sims.
  */
 class DocViewerDesktopComponent(frame: GenericFrame, component: DocViewerComponent)
     : DesktopComponent<DocViewerComponent>(frame, component) {
 
-    private val textArea = JEditorPane()
+    private val renderedText = JEditorPane()
 
     private val menuBar = JMenuBar()
 
     private val file = JMenu("File")
 
-    private val htmlEditor = SimbrainTextArea()
+    private val codeEditor = SimbrainTextArea()
     
-    val docViewer = component.docViewer
-
-    val modeSelector = AnnotatedPropertyEditor(docViewer)
+    private val docViewer = component.docViewer
 
     init {
         preferredSize = Dimension(500, 400)
@@ -78,27 +65,6 @@ class DocViewerDesktopComponent(frame: GenericFrame, component: DocViewerCompone
         file.addSeparator()
         file.add(actionManager.createRenameAction(this))
         file.addSeparator()
-        val item = JMenuItem("Import html...")
-        item.addActionListener { e ->
-            val _fileChooser = JFileChooser()
-            val retval = _fileChooser.showOpenDialog(textArea)
-            if (retval == JFileChooser.APPROVE_OPTION) {
-                val f = _fileChooser.selectedFile
-                try {
-                    val br: BufferedReader
-                    val fis: InputStream = FileInputStream(f)
-                    br = BufferedReader(InputStreamReader(fis, Charset.forName("UTF-8")))
-                    htmlEditor.read(br, null)
-                    textArea.text = htmlEditor.text
-                    docViewer.text = htmlEditor.text
-                    htmlEditor.caretPosition = 0
-                } catch (ioex: IOException) {
-                    println(e)
-                }
-            }
-        }
-        file.add(item)
-        file.addSeparator()
         file.add(actionManager.createCloseAction(this))
 
         val helpMenu = JMenu("Help")
@@ -110,72 +76,46 @@ class DocViewerDesktopComponent(frame: GenericFrame, component: DocViewerCompone
 
         parentFrame.jMenuBar = menuBar
 
-        textArea.border = BorderFactory.createEmptyBorder(10, 5, 10, 5)
-        textArea.contentType = "text/html"
-        textArea.isEditable = false
-        textArea.text = docViewer.renderedText
+        renderedText.border = BorderFactory.createEmptyBorder(10, 5, 10, 5)
+        renderedText.contentType = "text/html"
+        renderedText.isEditable = false
+        renderedText.text = docViewer.renderedText
 
-        val sp = JScrollPane(textArea)
+        val viewPanel = JScrollPane(renderedText)
 
         val tabs = JTabbedPane()
-        modeSelector.getWidgetEventsByLabel("Mode").valueChanged.on(Dispatchers.Swing) {
-            val mode = modeSelector.getWidgetValueByLabel("Mode") as DocViewer.Mode
-            updateSyntaxHighlighting(mode)
-            if (mode == DocViewer.Mode.HTML) {
-                val option = JOptionPane.showOptionDialog(
-                    null,
-                    "Do you want to convert the current text content from markdown to HTML?",
-                    "Convert to HTML?",
-                    JOptionPane.YES_NO_OPTION,
-                    JOptionPane.QUESTION_MESSAGE,
-                    null,
-                    arrayOf("Convert to HTML", "Keep text the same"),
-                    null
-                )
-                if (option == JOptionPane.YES_OPTION) {
-                    docViewer.text = docViewer.renderedText
-                    htmlEditor.text = docViewer.text
-                }
-            }
-        }
-        updateSyntaxHighlighting(docViewer.mode)
-        htmlEditor.isCodeFoldingEnabled = true
-        htmlEditor.antiAliasingEnabled = true
-        val sp2 = JPanel().apply {
+
+        codeEditor.syntaxEditingStyle = SyntaxConstants.SYNTAX_STYLE_MARKDOWN
+        val editPanel = JPanel().apply {
             layout = BorderLayout()
-            add("North", modeSelector)
-            add("Center", RTextScrollPane(htmlEditor).apply {
+            codeEditor.lineWrap = true
+            add("Center", RTextScrollPane(codeEditor).apply {
                 isFoldIndicatorEnabled = true
             })
         }
-        add(sp2)
+        add(editPanel)
 
-        tabs.addTab("View", sp)
-        tabs.addTab("Edit", sp2)
+        tabs.addTab("View", viewPanel)
+        tabs.addTab("Edit", editPanel)
 
         add("Center", tabs)
 
-        // Listen for tab changed events. Synchronize the editor and the
-        // display tabs on these events.
-        // TODO: listen for changes in the editor and only update the display
-        // when changes occur
+        // Tab changed events
         val changeListener = ChangeListener { changeEvent ->
             val sourceTabbedPane = changeEvent.source as JTabbedPane
             val index = sourceTabbedPane.selectedIndex
             // Assumes index of view tab is 0
             if (index == 0) {
-                modeSelector.commitChanges()
-
-                docViewer.text = htmlEditor.text
+                docViewer.text = codeEditor.text
                 docViewer.render()
-                textArea.text = docViewer.renderedText
+                renderedText.text = docViewer.renderedText
             }
             docViewer.render()
+            renderedText.caretPosition = 0
+            codeEditor.caretPosition = 0
         }
         tabs.addChangeListener(changeListener)
 
-        // Respond to clicks on hyper-links by opening a web page in the default
-        // browser
         val l = HyperlinkListener { e ->
             if (HyperlinkEvent.EventType.ACTIVATED == e.eventType) {
                 try {
@@ -190,17 +130,14 @@ class DocViewerDesktopComponent(frame: GenericFrame, component: DocViewerCompone
                 }
             }
         }
-        textArea.addHyperlinkListener(l)
-        htmlEditor.text = docViewer.text
-        textArea.caretPosition = 0
+        renderedText.addHyperlinkListener(l)
+        codeEditor.text = docViewer.text
+        renderedText.caretPosition = 0
     }
 
     /**
      * Convert local paths into absolute paths for links based on the local file
      * system.
-     *
-     * @param uri the uri to process
-     * @return an update uri if it is a file link
      */
     private fun processLocalFiles(uri: URI): URI {
         var uriStr = uri.toString()
@@ -215,13 +152,6 @@ class DocViewerDesktopComponent(frame: GenericFrame, component: DocViewerCompone
             }
         }
         return uri
-    }
-
-    private fun updateSyntaxHighlighting(mode: DocViewer.Mode) {
-        htmlEditor.syntaxEditingStyle = when(mode) {
-            DocViewer.Mode.HTML -> SyntaxConstants.SYNTAX_STYLE_HTML
-            DocViewer.Mode.MARKDOWN -> SyntaxConstants.SYNTAX_STYLE_MARKDOWN
-        }
     }
 
 }

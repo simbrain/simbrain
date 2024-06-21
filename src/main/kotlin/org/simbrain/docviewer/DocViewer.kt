@@ -1,48 +1,43 @@
 package org.simbrain.docviewer
 
-import org.intellij.markdown.flavours.commonmark.CommonMarkFlavourDescriptor
+import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
 import org.intellij.markdown.html.HtmlGenerator
 import org.intellij.markdown.parser.MarkdownParser
 import org.simbrain.util.propertyeditor.EditableObject
-import org.simbrain.util.propertyeditor.GuiEditable
 
 class DocViewer: EditableObject {
 
-    enum class Mode {
-        HTML, MARKDOWN
-    }
-
-    var mode: Mode by GuiEditable(
-        initValue = Mode.MARKDOWN
-    )
-
+    // When calling this manually call render() after
     var text: String = """
-            Use this text to explain how a simulation works,
-            and save it with the workspace so that
-            when it is re-opened other users will know how to use it.
+        # Doc Viewer
+        Use markdown to create documentation to go explain simulations. Simple html is supported in markdown 
+        so simple html is supported as well, but markdown is suggested. 
+        
+        A [markdown cheat sheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet).
+        
+        # Some Basic commands
+        1. First item 
+          - Unordered item with *italics* in one style
+          - Unordered sub-item with _italics_ in another style
+        2. Second item 
+          - Unordered item with **bold** in one style
+          - Unordered item with __bold__ in one style
+        
+        # A local image     
+        
+        ![Flower](//localfiles/simulations/images/Caltech101Sample/image_0036.jpg)
+        """.trimIndent()
 
-
-            Uses simple html for formatting, e.g. **bold text**.
-            Click on the Edit tab to edit the html 
-            or import from pre-edited html using the File menu. Example of a local image: ![Flower](//localfiles/simulations/images/Caltech101Sample/image_0036.jpg)
-            
-            Example of a link: [google](https://google.com)
-            """.trimIndent()
-
+    @Transient
     var renderedText = ""
         private set
 
     fun render() {
-        renderedText = when (mode) {
-            Mode.MARKDOWN -> {
-                val flavour = CommonMarkFlavourDescriptor()
-                val parsedTree = MarkdownParser(flavour).buildMarkdownTreeFromString(text)
-                HtmlGenerator(text, parsedTree, flavour).generateHtml()
-            }
-            Mode.HTML -> {
-                text
-            }
-        }.replace("//localfiles/", "file:")
+        val flavour = GFMFlavourDescriptor()
+        val parsedTree = MarkdownParser(flavour).buildMarkdownTreeFromString(text)
+        renderedText = HtmlGenerator(text, parsedTree, flavour)
+            .generateHtml()
+            .replace("//localfiles/", "file:")
     }
 
     init {

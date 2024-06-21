@@ -111,6 +111,7 @@ public class SimulationUtils {
         DocViewerComponent docViewer = new DocViewerComponent(new DocViewer(), title);
         String html = readSimulationFileContents(fileName);
         docViewer.getDocViewer().setText(html);
+        docViewer.getDocViewer().render();
         workspace.addWorkspaceComponent(docViewer);
         SwingUtilities.invokeLater(() -> desktop.getDesktopComponent(docViewer).getParentFrame().setBounds(x, y, width, height));
         return docViewer;

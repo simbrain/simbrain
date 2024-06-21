@@ -217,13 +217,13 @@ abstract class WorkspaceComponent(name: String) {
         return name
     }
 
+    /**
+     * Retrieves a simple version of a component name from its class, e.g.
+     * "Network" from "org.simbrain.network.NetworkComponent".
+     *
+     * @return the simple name.
+     */
     val simpleName: String
-        /**
-         * Retrieves a simple version of a component name from its class, e.g.
-         * "Network" from "org.simbrain.network.NetworkComponent".
-         *
-         * @return the simple name.
-         */
         get() {
             var simpleName = javaClass.simpleName
             if (simpleName.endsWith("Component")) {
@@ -233,19 +233,14 @@ abstract class WorkspaceComponent(name: String) {
         }
 
     open val xml: String?
-        /**
-         * Override for use with open service.
-         *
-         * @return xml string representing stored file.
-         */
         get() = null
 
+    /**
+     * The file extension for a component type, e.g. By default, "xml".
+     *
+     * @return the file extension
+     */
     val defaultFormat: String
-        /**
-         * The file extension for a component type, e.g. By default, "xml".
-         *
-         * @return the file extension
-         */
         get() = "xml"
 
     /**

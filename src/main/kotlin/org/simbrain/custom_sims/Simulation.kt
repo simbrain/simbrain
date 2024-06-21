@@ -151,6 +151,7 @@ fun SimulationScope.addDocViewer(title: String, fileName: String): DocViewerComp
         "custom_sims" + Utils.FS + fileName
     )
     docViewerComponent.docViewer.text = html
+    docViewerComponent.docViewer.render()
     workspace.addWorkspaceComponent(docViewerComponent)
     return docViewerComponent
 }

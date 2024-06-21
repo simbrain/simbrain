@@ -3,7 +3,6 @@ package org.simbrain.util.table
 import com.Ostermiller.util.CSVPrinter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import org.simbrain.plot.projection.ProjectionComponent
 import org.simbrain.util.*
@@ -126,8 +125,9 @@ val SimbrainJTable.showHistogramAction
         name = "Histogram",
         description = "Create histograms for data in selected column"
     ) {
-        launch(Dispatchers.Swing) {
-            val canvas = Histogram.of(model.getDoubleColumn(selectedColumn)).canvas();
+        // canvas.window() uses invokeAndWait, so this actually has to be invoked from a non-swing thread
+        launch(Dispatchers.Default) {
+            val canvas = Histogram.of(model.getDoubleColumn(selectedColumn)).canvas()
             canvas.window()
         }
     }

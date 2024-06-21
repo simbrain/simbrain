@@ -32,11 +32,11 @@ import org.simbrain.util.dir
 val simulations = dir("Simulations") {
 
     dir("Cognitive Science") {
-        dir("Hebbian") {
-            item("1. Basic Hebb") { hebbianAssociatorSimple }
-            item("2. Feed Forward Associator") { hebbianFeedForward }
-            item("3. Recurrent Hebb") { hebbianAssociator }
-        }
+        // dir("Hebbian") {
+        //     item("1. Basic Hebb") { hebbianAssociatorSimple }
+        //     item("2. Feed Forward Associator") { hebbianFeedForward }
+        //     item("3. Recurrent Hebb") { hebbianAssociator }
+        // }
         dir("RL") {
             item("Actor Critic") { actorCritic }
         }

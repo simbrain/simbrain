@@ -249,7 +249,7 @@ fun Network.addNeuronCollectionAsync(numNeurons: Int, template: Neuron.() -> Uni
 
 suspend fun Network.addNeuronCollection(numNeurons: Int, template: Neuron.() -> Unit = {}) : NeuronCollection {
     val nc = NeuronCollection(addNeurons(numNeurons, template))
-    addNetworkModel(nc)
+    addNetworkModel(nc)?.await()
     return nc
 }
 

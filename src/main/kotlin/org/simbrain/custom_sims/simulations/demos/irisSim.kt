@@ -8,6 +8,7 @@ import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.smile.classifiers.KNNClassifier
 import org.simbrain.util.place
 import org.simbrain.util.point
+import org.simbrain.util.toMatrix
 import smile.io.Read
 
 /**
@@ -39,6 +40,9 @@ val irisClassifier = newSim {
     classifier.trainingData.targetLabels = iris.column(4).toStringArray()
     val smileClassifier = SmileClassifier(classifier)
     smileClassifier.train()
+
+    // Set input data for iris to training data
+    inputNc.inputData = classifier.trainingData.featureVectors.toMatrix()
 
     val weightMatrix = WeightMatrix(inputNc, smileClassifier)
     network.addNetworkModels(weightMatrix, smileClassifier)

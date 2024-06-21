@@ -49,8 +49,6 @@ class DataWorldDesktopComponent(frame: GenericFrame, val component: DataWorldCom
 
     private val edit = JMenu("Edit")
 
-    private val preferences = JMenuItem("Preferences")
-
     private val help = JMenu("Help")
 
     private val helpItem = JMenuItem("Reader Help")
@@ -127,8 +125,6 @@ class DataWorldDesktopComponent(frame: GenericFrame, val component: DataWorldCom
             )
             edit.addSeparator()
             edit.add(CouplingMenu(workspaceComponent, dataWorld))
-            edit.addSeparator()
-            edit.add(preferences)
         }
         createEditMenu()
         onCouplingAttributesChanged { createEditMenu() }

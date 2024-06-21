@@ -44,6 +44,9 @@ class DataWorld(val rows: Int = 30, val cols: Int = 5): AttributeContainer, Edit
 
     override val id: String = "Data World"
 
+    override val name: String
+        get() = id
+
     enum class DataEntryMode {
         LOOP, APPEND
     }

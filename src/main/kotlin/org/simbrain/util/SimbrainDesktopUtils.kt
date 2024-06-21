@@ -96,9 +96,9 @@ class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, tru
         }
     }
 
-    fun addButton(label: String, context: CoroutineContext = EmptyCoroutineContext, task: suspend (ActionEvent) -> Unit) = JButton(label).also { button ->
+    fun addButton(label: String, context: CoroutineContext = EmptyCoroutineContext, task: suspend JButton.(ActionEvent) -> Unit) = JButton(label).also { button ->
         button.addActionListener {
-            launch(context) { task(it) }
+            launch(context) { button.task(it) }
         }
         launch(Dispatchers.Swing) {
             mainPanel.addItem(button)

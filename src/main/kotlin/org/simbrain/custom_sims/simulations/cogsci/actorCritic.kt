@@ -70,7 +70,7 @@ val actorCritic = newSim {
         mouse.heading = 90.0
     }
 
-    val cheeseSensor = ObjectSensor().apply{
+    val cheeseSensor = ObjectSensor().apply {
         label = "Cheese sensor"
         decayFunction = StepDecayFunction()
         decayFunction.dispersion = tileSize / 2.0
@@ -92,7 +92,8 @@ val actorCritic = newSim {
         lowerBound = -100.0
     }
 
-    val gridSensor = GridSensor(0, 0, (world.width / numTilesInADimension).toInt(), (world.height / numTilesInADimension).toInt())
+    val gridSensor =
+        GridSensor(0, 0, (world.width / numTilesInADimension).toInt(), (world.height / numTilesInADimension).toInt())
     mouse.addSensor(gridSensor)
 
     val sensorNeurons = network.addNeuronGroup(
@@ -104,7 +105,7 @@ val actorCritic = newSim {
     }
 
     // Outputs
-    val outputs = WinnerTakeAll(network, 4).apply{
+    val outputs = WinnerTakeAll(network, 4).apply {
         network.addNetworkModel(this)
         params.isUseRandom = true
         params.randomProb = epsilon
@@ -136,9 +137,9 @@ val actorCritic = newSim {
         model.removeAllScalarTimeSeries()
         events.componentMinimized.fire(true)
     }
-    val rewardPlot = couplingManager.createCoupling(reward,  plot.model.addScalarTimeSeries("Reward"))
-    val valuePlot = couplingManager.createCoupling(value,  plot.model.addScalarTimeSeries("TD Error"))
-    val errorPlot = couplingManager.createCoupling(tdError,  plot.model.addScalarTimeSeries("Value"))
+    val rewardPlot = couplingManager.createCoupling(reward, plot.model.addScalarTimeSeries("Reward"))
+    val valuePlot = couplingManager.createCoupling(value, plot.model.addScalarTimeSeries("TD Error"))
+    val errorPlot = couplingManager.createCoupling(tdError, plot.model.addScalarTimeSeries("Value"))
 
     // Network Update
     network.updateManager.clear()
@@ -178,15 +179,15 @@ val actorCritic = newSim {
     workspace.updater.updateManager.clear()
     workspace.updater.updateManager.addAction(updateAction("Net -> Movement") {
         mouse.movement.speed = 0.0
-        outputs.neuronList.firstOrNull{it.activation > 0.0}?.let{
-                when (it.label) {
-                    "North" -> mouse.heading = 90.0
-                    "South" -> mouse.heading = -90.0
-                    "East" -> mouse.heading = 0.0
-                    "West" -> mouse.heading = 180.0
-                    else -> {}
-                }
+        outputs.neuronList.firstOrNull { it.activation > 0.0 }?.let {
+            when (it.label) {
+                "North" -> mouse.heading = 90.0
+                "South" -> mouse.heading = -90.0
+                "East" -> mouse.heading = 0.0
+                "West" -> mouse.heading = 180.0
+                else -> {}
             }
+        }
         mouse.movement.speed = tileSize
     })
     workspace.updater.updateManager.addAction(UpdateComponent(odorWorldComponent))
@@ -198,7 +199,7 @@ val actorCritic = newSim {
     workspace.updater.updateManager.addAction(UpdateCoupling(errorPlot))
 
     // Doc viewer
-    val docViewer = addDocViewer( "Information", "ActorCritic.html")
+    val docViewer = addDocViewer("Information", "ActorCritic.html")
     docViewer.events.componentMinimized.fire(true)
 
     // Lay everything out
@@ -210,10 +211,10 @@ val actorCritic = newSim {
             height = 595
         }
         place(odorWorldComponent) {
-            location = point(728,11)
+            location = point(728, 11)
         }
         place(docViewer) {
-            location = point(0,0)
+            location = point(0, 0)
         }
 
         // Control panel
@@ -232,28 +233,34 @@ val actorCritic = newSim {
                     epsilon = tfEpsilon.text.toDouble()
                     outputs.params.randomProb = epsilon
 
-                    stop = false
+                    this@addButton.isEnabled = false
+                    try {
 
-                    // Run the trials
-                    for (i in 1..numTrials) {
-                        if (stop) {
-                            break
-                        }
-                        tfTrials.text = "" + i
-                        goalAchieved = false
-                        network.clearActivations()
-                        resetMouse()
+                        stop = false
 
-                        while (!goalAchieved) {
-                            if (reward.activation > 0 ) {
-                                goalAchieved = true
+                        // Run the trials
+                        for (i in 1..numTrials) {
+                            if (stop) {
+                                break
                             }
-                            workspace.iterateAsync()
-                        }
-                    }
+                            tfTrials.text = "" + i
+                            goalAchieved = false
+                            network.clearActivations()
+                            resetMouse()
 
-                    // Reset the text in the trial field
-                    tfTrials.text = "" + numTrials
+                            workspace.iterateWhile {
+                                if (reward.activation > 0) {
+                                    goalAchieved = true
+                                }
+                                !goalAchieved
+                            }
+                        }
+
+                        // Reset the text in the trial field
+                        tfTrials.text = "" + numTrials
+                    } finally {
+                        this@addButton.isEnabled = true
+                    }
                 }
 
             }

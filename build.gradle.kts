@@ -158,7 +158,7 @@ dependencies {
     implementation(group = "com.miglayout", name = "miglayout-swing", version = "11.0")
 
     // https://mvnrepository.com/artifact/com.fifesoft/rsyntaxtextarea
-    implementation(group = "com.fifesoft", name = "rsyntaxtextarea", version = "3.3.1")
+    implementation(group = "com.fifesoft", name = "rsyntaxtextarea", version = "3.4.0")
 
     // https://mvnrepository.com/artifact/org.beanshell/bsh
     implementation(group = "org.beanshell", name = "bsh", version = "2.0b5")

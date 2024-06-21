@@ -51,18 +51,16 @@ val objectTrackingSim = newSim {
 
     // Add a self-connected neuron array to the network
     val resNeurons = (0..numResNeurons).map {
-        val rule = AllostaticUpdateRule()
-        val neuron = Neuron(AllostaticUpdateRule())
-        neuron
+        Neuron(AllostaticUpdateRule())
     }
-    network.addNetworkModels(resNeurons)
+    network.addNetworkModels(resNeurons).awaitAll()
     val reservoir = NeuronCollection(resNeurons)
-    network.addNetworkModel(reservoir)
+    network.addNetworkModel(reservoir)?.await()
     reservoir.label = "Reservoir"
     reservoir.layout(GridLayout())
     reservoir.location = point(0, 0)
     val reservoirSynapseGroup = SynapseGroup(reservoir, reservoir, sparse)
-    network.addNetworkModel(reservoirSynapseGroup)
+    network.addNetworkModel(reservoirSynapseGroup)?.await()
     val dist = NormalDistribution(1.0, .1)
     reservoirSynapseGroup.synapses.forEach { s ->
         s.strength = dist.sampleDouble()
@@ -76,7 +74,7 @@ val objectTrackingSim = newSim {
     }
     network.addNetworkModels(leftInputNeurons).awaitAll()
     val leftInputs = NeuronCollection(leftInputNeurons)
-    network.addNetworkModel(leftInputs)
+    network.addNetworkModel(leftInputs)?.await()
     leftInputs.label = "Left Inputs"
     leftInputs.layout(GridLayout())
     leftInputs.location = point(-616, -195)
@@ -89,19 +87,19 @@ val objectTrackingSim = newSim {
     }
     network.addNetworkModels(rightInputNeurons).awaitAll()
     val rightInputs = NeuronCollection(rightInputNeurons)
-    network.addNetworkModel(rightInputs)
+    network.addNetworkModel(rightInputs)?.await()
     rightInputs.label = "Right Inputs"
     rightInputs.layout(GridLayout())
     rightInputs.location = point(-616, 225)
 
     // Connect input nodes to reservoir
     val leftInputsToRes = SynapseGroup(leftInputs, reservoir, sparse)
-    network.addNetworkModel(leftInputsToRes)
+    network.addNetworkModel(leftInputsToRes)?.await()
     leftInputsToRes.synapses.forEach { s ->
         s.strength = 0.75
     }
     val rightInputsToRes = SynapseGroup(rightInputs, reservoir, sparse)
-    network.addNetworkModel(rightInputsToRes)
+    network.addNetworkModel(rightInputsToRes)?.await()
     rightInputsToRes.synapses.forEach { s ->
         s.strength = 0.75
     }
@@ -122,9 +120,9 @@ val objectTrackingSim = newSim {
     leftTurnNeuron.location = point(546, -203)
     rightTurnNeuron.location = point(573, 323)
     val resToLeftTurn = SynapseGroup(reservoir, leftTurnCollection, sparse)
-    network.addNetworkModel(resToLeftTurn)
+    network.addNetworkModel(resToLeftTurn)?.await()
     val resToRightTurn = SynapseGroup(reservoir, rightTurnCollection, sparse)
-    network.addNetworkModel(resToRightTurn)
+    network.addNetworkModel(resToRightTurn)?.await()
 
     // Location of the network in the desktop
     withGui {
@@ -195,7 +193,7 @@ val objectTrackingSim = newSim {
     }
 
     fun updateCheeseLocation() {
-        val (agentx,agenty) = agent.location
+        val (agentx, agenty) = agent.location
 
         // Change direction every 2 rotations
         counter += 1
@@ -233,7 +231,7 @@ val objectTrackingSim = newSim {
 /**
  * Activation set = to number of positive inputs / total number of inputs.
  */
-class PercentIncomingNeuronRule: LinearRule() {
+class PercentIncomingNeuronRule : LinearRule() {
     val maxVal = 10.0
     context(Network)
     override fun apply(neuron: Neuron, data: BiasedScalarData) {
@@ -248,9 +246,9 @@ class PercentIncomingNeuronRule: LinearRule() {
 context(Network)
 fun Neuron.getAllostaticInput(): Double {
     // Treat linear inputs as sensors and do normal connectionist updating
-    val sensorInputs = fanIn.filter { it.source.updateRule is LinearRule}.sumOf { it.source.activation * it.strength }
+    val sensorInputs = fanIn.filter { it.source.updateRule is LinearRule }.sumOf { it.source.activation * it.strength }
     // For spiking inputs sum weight strengths for pre-synaptic nodes that fired
-    val weightsOfSpikingNodes = fanIn.filter { it.source.isSpike}.sumOf { it.strength }
+    val weightsOfSpikingNodes = fanIn.filter { it.source.isSpike }.sumOf { it.strength }
     return sensorInputs + weightsOfSpikingNodes
 }
 
@@ -280,7 +278,7 @@ class AllostaticDataHolder(
  * (3) a variable target activation level, initialized at Tn = 1;
  * (4) and a variable spiking threshold T’n, which was = always equal to 2Tn
  */
-class AllostaticUpdateRule: SpikingNeuronUpdateRule<AllostaticDataHolder, SpikingMatrixData>() {
+class AllostaticUpdateRule : SpikingNeuronUpdateRule<AllostaticDataHolder, SpikingMatrixData>() {
 
     @UserParameter(label = "leakRate")
     var leakRate = .75
@@ -295,7 +293,7 @@ class AllostaticUpdateRule: SpikingNeuronUpdateRule<AllostaticDataHolder, Spikin
 
         // Equation 1
         val newActivation = neuron.activation * leakRate + neuron.getAllostaticInput()
-        neuron.activation = max(0.0, newActivation ) // Prevent from going below 0
+        neuron.activation = max(0.0, newActivation) // Prevent from going below 0
 
         // Only apply learning if neuron has just spiked
         neuron.isSpike = false
@@ -311,20 +309,20 @@ class AllostaticUpdateRule: SpikingNeuronUpdateRule<AllostaticDataHolder, Spikin
         val error = neuron.activation - data.target
 
         // Weights
-        val toTrain= neuron.fanIn
+        val toTrain = neuron.fanIn
             .filter { it.source.updateRule is SpikingNeuronUpdateRule<*, *> }
-            .filter { it.source.isSpike}
+            .filter { it.source.isSpike }
 
-        toTrain.forEach {  s ->
+        toTrain.forEach { s ->
             if (toTrain.isNotEmpty()) {
-                s.strength -= error/toTrain.size
+                s.strength -= error / toTrain.size
             }
         }
 
         data.target += error * learningRate
         // Minimum target is 1
         data.target = max(data.target, 1.0)
-        data.threshold = 2*data.target
+        data.threshold = 2 * data.target
 
         // println("target = ${n.target}, threshold = ${n.threshold}, activation = ${n.activation}")
     }

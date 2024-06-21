@@ -66,8 +66,12 @@ val SimbrainJTable.fillAction
         description = "Fill selected cells",
         iconPath = "menu_icons/fill.png"
     ) {
-        val fillVal = JOptionPane.showInputDialog(this, "Value:", "0").toDouble()
-        fillSelectedCells(fillVal)
+        JOptionPane.showInputDialog(this, "Value:", "0")
+            ?.toDouble()
+            ?.let { fillVal ->
+                fillSelectedCells(fillVal)
+            }
+
     }
 
 val SimbrainJTable.editRandomizerAction

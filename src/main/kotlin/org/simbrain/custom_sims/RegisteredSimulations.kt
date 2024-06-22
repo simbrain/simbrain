@@ -55,10 +55,10 @@ val simulations = dir("Simulations") {
 
 
     dir("Behaviorism") {
-        item("Operant With Environment") { OperantWithEnvironment() }
+        item("Simple Operant") { SimpleOperant() }
         item("Classical Conditioning") { ClassicalConditioning() }
         item("Operant Conditioning") { OperantConditioning() }
-        item("Simple Operant") { SimpleOperant() }
+        item("Operant With Environment") { OperantWithEnvironment() }
     }
 
     dir("Cognitive Maps") {

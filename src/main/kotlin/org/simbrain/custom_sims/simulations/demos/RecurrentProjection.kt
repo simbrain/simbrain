@@ -35,7 +35,7 @@ val recurrentProjection = newSim {
     recurrentNet.layout(GridLayout())
     with(network) {
         recurrentNet.randomize()
-        addNetworkModel(recurrentNet)
+        addNetworkModel(recurrentNet)?.await()
         connect(recurrentNet.neuronList, recurrentNet.neuronList, Sparse().apply {
             connectionDensity = .25
         })

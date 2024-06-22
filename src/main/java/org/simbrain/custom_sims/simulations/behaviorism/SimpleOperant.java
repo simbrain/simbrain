@@ -101,7 +101,7 @@ public class SimpleOperant extends Simulation {
 
     private void setUpControlPanel() {
 
-        panel = ControlPanel.makePanel(sim, "Control Panel", 5,9,190,109);
+        panel = ControlPanel.makePanel(sim, "Control Panel", 5,9,190,150);
 
         panel.addButton("Reward Agent", () -> {
 

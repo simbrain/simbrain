@@ -310,7 +310,8 @@ class Network: CoroutineScope, EditableObject {
     }
 
     /**
-     * Add a new [NetworkModel]. All network models MUST be added using this method.
+     * Add a new [NetworkModel]. All network models must be added using this method.
+     * For best results call with `?.await()` when possible.
      */
     fun addNetworkModel(model: NetworkModel): Deferred<Boolean>? {
         if (model.shouldAdd()) {

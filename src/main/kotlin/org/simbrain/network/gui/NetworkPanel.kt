@@ -191,12 +191,10 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     init {
         super.setLayout(BorderLayout())
 
-
         NetworkPreferences.registerChangeListener(preferenceLoader)
         preferenceLoader()
 
         toolbars.apply {
-
             cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)
             val flowLayout = FlowLayout(FlowLayout.LEFT).apply { hgap = 0; vgap = 0 }
             add("Center", JPanel(flowLayout).apply {

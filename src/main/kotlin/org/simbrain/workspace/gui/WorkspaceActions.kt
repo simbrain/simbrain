@@ -24,7 +24,7 @@ import org.simbrain.plot.histogram.HistogramComponent
 import org.simbrain.plot.histogram.HistogramModel
 import org.simbrain.plot.piechart.PieChartComponent
 import org.simbrain.plot.piechart.PieChartModel
-import org.simbrain.plot.pixelplot.EmitterMatrix
+import org.simbrain.plot.pixelplot.PixelPlot
 import org.simbrain.plot.pixelplot.PixelPlotComponent
 import org.simbrain.plot.projection.ProjectionComponent
 import org.simbrain.plot.rasterchart.RasterModel
@@ -376,7 +376,7 @@ class WorkspaceActions {
         iconPath = "menu_icons/grid.png",
         componentCreator = { name -> PixelPlotComponent(name) },
         consumerProvider = {
-            it.emitter.getConsumer(EmitterMatrix::setBrightness)
+            it.pixelPlot.getConsumer(PixelPlot::setBrightness)
         }
     )
 

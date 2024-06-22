@@ -1,6 +1,7 @@
 package org.simbrain.plot.pixelplot;
 
 import org.simbrain.util.UserParameter;
+import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.world.imageworld.events.ImageEvents;
@@ -15,14 +16,14 @@ import java.util.Arrays;
  * values are stored in two arrays, one for rgb colors and
  * another with separate channels for brightness, red, green, and blue.
  * <br>
- * An emitter matrix is a kind of countepart to a {@link Filter}. Rather
+ * An pixel plot is a kind of countepart to a {@link Filter}. Rather
  * than sensing visual locations emitters are like pixels that an "organism" can emit
  * cf. a squid's iridiphores.
  *
  * @author Tim Shea
  * @author Jeff Yoshimi
  */
-public class EmitterMatrix implements AttributeContainer {
+public class PixelPlot implements AttributeContainer, EditableObject {
 
     /**
      * Image rendered from provided values;
@@ -31,6 +32,9 @@ public class EmitterMatrix implements AttributeContainer {
 
     @UserParameter(label = "Use RGB Colors", description = "Sets whether to couple integer array of RGB colors or" + "separate red, green, and blue channels.")
     private boolean usingRGBColor = false;
+
+    @UserParameter(label = "Invert brightness", description = "If true, 0 is mapped to white and 1 to white.", useLegacySetter = true)
+    private boolean invertBrightness = true;
 
     /**
      * The values this matrix produces for floating point channel couplings.
@@ -52,33 +56,35 @@ public class EmitterMatrix implements AttributeContainer {
     private transient ImageEvents events = new ImageEvents();
 
     /**
-     * Construct an empty emitter matrix.
+     * Construct an empty pixel plot.
      */
-    public EmitterMatrix() {
+    public PixelPlot() {
         image =  new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
         channels = new double[3][image.getWidth() * image.getHeight()];
         rgbColors = new int[image.getWidth() * image.getHeight()];
+        clear();
     }
 
     /**
-     * Construct an emitter matrix from an image.
+     * Construct an pixel plot from an image.
      *
      * @param currentImage
      */
-    public EmitterMatrix(BufferedImage currentImage) {
+    public PixelPlot(BufferedImage currentImage) {
         channels = new double[3][image.getWidth() * image.getHeight()];
         rgbColors = new int[image.getWidth() * image.getHeight()];
+        clear();
     }
 
     /**
-     * Returns whether the emitter matrix should use int RGB colors or double channels.
+     * Returns whether the pixel plot should use int RGB colors or double channels.
      */
     public boolean isUsingRGBColor() {
         return usingRGBColor;
     }
 
     /**
-     * Set whether the emitter matrix should use int RGB color values (true) or double channel values (false).
+     * Set whether the pixel plot should use int RGB color values (true) or double channel values (false).
      * Note that the set brightness coupling requires useColor = false.
      */
     public void setUsingRGBColor(boolean value) {
@@ -144,30 +150,30 @@ public class EmitterMatrix implements AttributeContainer {
     }
 
     /**
-     * Update the emitter matrix image from the couplable arrays.
+     * Update the pixel plot image from the couplable arrays.
      * <p>
-     * If the emitter matrix is using color ints, then the new image will simply copy the coupled integer array
+     * If the pixel plot is using color ints, then the new image will simply copy the coupled integer array
      * to the current image.
      * <p>
-     * If the emitter matrix is using double channels, then each channel of values (0.0 to 1.0) will be translated
+     * If the pixel plot is using double channels, then each channel of values (0.0 to 1.0) will be translated
      * to integers (0 to 255) and assigned to the corresponding pixels.
      */
     public void emitImage() {
         if (usingRGBColor) {
             for (int y = 0; y < image.getHeight(); ++y) {
                 for (int x = 0; x < image.getWidth(); ++x) {
-                    int rgb = rgbColors[y * image.getWidth() + x];
+                    int rgb = rgbColors[x * image.getWidth() + y];
                     image.setRGB(x, y, rgb);
                 }
             }
         } else {
             for (int y = 0; y < image.getHeight(); ++y) {
                 for (int x = 0; x < image.getWidth(); ++x) {
-                    int red = (int) (channels[0][y * image.getWidth() + x] * 255.0);
+                    int red = getChannelValue(0, x, y);
                     red = Math.max(Math.min(red, 255), 0) << 16;
-                    int blue = (int) (channels[1][y * image.getWidth() + x] * 255.0);
+                    int blue = getChannelValue(1, x, y);
                     blue = Math.max(Math.min(blue, 255), 0) << 8;
-                    int green = (int) (channels[2][y * image.getWidth() + x] * 255.0);
+                    int green = getChannelValue(2, x, y);
                     green = Math.max(Math.min(green, 255), 0);
                     int color = red + blue + green;
                     image.setRGB(x, y, color);
@@ -177,18 +183,27 @@ public class EmitterMatrix implements AttributeContainer {
         events.getImageUpdate().fire();
     }
 
+    private int getChannelValue(int channelIndex, int x, int y) {
+        if (invertBrightness) {
+            return (int)((1 - channels[channelIndex][x * image.getWidth() + y]) * 255.0);
+        } else {
+            return (int) (channels[channelIndex][x * image.getWidth() + y] * 255.0);
+        }
+    }
+
+
     public BufferedImage getImage() {
         return image;
     }
 
     @Override
     public String toString() {
-        return "EmitterMatrix";
+        return "PixelPlot";
     }
 
     @Override
     public String getId() {
-        return "Emitter Matrix";
+        return "Pixel Plot";
     }
 
     public ImageEvents getEvents() {
@@ -201,5 +216,13 @@ public class EmitterMatrix implements AttributeContainer {
     public Object readResolve() {
         events = new ImageEvents();
         return this;
+    }
+
+    /**
+     * Property editor calls this by reflection to re-render the plot when inversion is changed
+     */
+    public void setInvertBrightness(boolean invertBrightness) {
+        this.invertBrightness = invertBrightness;
+        emitImage();
     }
 }

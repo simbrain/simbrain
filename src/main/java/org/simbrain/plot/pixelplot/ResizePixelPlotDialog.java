@@ -7,30 +7,30 @@ import org.simbrain.util.widgets.ShowHelpAction;
 import javax.swing.*;
 import java.text.NumberFormat;
 
-public class ResizeEmitterMatrixDialog extends StandardDialog {
+public class ResizePixelPlotDialog extends StandardDialog {
     private static final long serialVersionUID = 1L;
 
-    private EmitterMatrix world;
+    private PixelPlot world;
     private Box mainPanel = Box.createVerticalBox();
-    private LabelledItemPanel emitterMatrixPanel = new LabelledItemPanel();
+    private LabelledItemPanel pixelPlotPanel = new LabelledItemPanel();
     // private JCheckBox useColorCheckBox = new JCheckBox();
     private JFormattedTextField widthField = new JFormattedTextField(NumberFormat.getIntegerInstance());
     private JFormattedTextField heightField = new JFormattedTextField(NumberFormat.getIntegerInstance());
 
     /**
-     * Construct a new ResizeEmitterMatrixDialog.
+     * Construct a new ResizePixelPlotDialog.
      *
-     * @param world The ImageWorld which holds the EmitterMatrix.
+     * @param world The ImageWorld which holds the PixelPlot.
      */
-    public ResizeEmitterMatrixDialog(EmitterMatrix world) {
+    public ResizePixelPlotDialog(PixelPlot world) {
         this.world = world;
-        setTitle("Emitter Matrix Settings");
-        ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/ImageWorld/emitterMatrix.html");
+        setTitle("Pixel Plot Settings");
+        ShowHelpAction helpAction = new ShowHelpAction("Pages/Worlds/ImageWorld/pixelPlot.html");
         addButton(new JButton(helpAction));
-        mainPanel.add(emitterMatrixPanel);
-        // emitterMatrixPanel.addItem("Use Color", useColorCheckBox);
-        emitterMatrixPanel.addItem("Width", widthField);
-        emitterMatrixPanel.addItem("Height", heightField);
+        mainPanel.add(pixelPlotPanel);
+        // pixelPlotPanel.addItem("Use Color", useColorCheckBox);
+        pixelPlotPanel.addItem("Width", widthField);
+        pixelPlotPanel.addItem("Height", heightField);
         fillFieldValues();
         setContentPane(mainPanel);
         pack();

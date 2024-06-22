@@ -21,7 +21,7 @@ public class PixelPlotComponent extends WorkspaceComponent {
     /**
      * The image world this component displays.
      */
-    private EmitterMatrix emitter = new EmitterMatrix();
+    private PixelPlot pixelPlot = new PixelPlot();
 
     /**
      * Create an Image World Component from a Image World.
@@ -33,7 +33,7 @@ public class PixelPlotComponent extends WorkspaceComponent {
     /**
      * Deserialize an ImageAlbumComponent.
      */
-    public PixelPlotComponent(String name, EmitterMatrix matrix) {
+    public PixelPlotComponent(String name, PixelPlot matrix) {
         super(name);
     }
 
@@ -46,14 +46,14 @@ public class PixelPlotComponent extends WorkspaceComponent {
      * @return A deserialized ImageWorldComponent.
      */
     public static PixelPlotComponent open(InputStream input, String name, String format) {
-        EmitterMatrix matrix = (EmitterMatrix) getXStream().fromXML(input);
+        PixelPlot matrix = (PixelPlot) getXStream().fromXML(input);
         return new PixelPlotComponent(name, matrix);
     }
 
     @Override
     public List<AttributeContainer> getAttributeContainers() {
         List<AttributeContainer> containers = new ArrayList<>();
-        containers.add(emitter);
+        containers.add(pixelPlot);
         return containers;
     }
 
@@ -69,10 +69,10 @@ public class PixelPlotComponent extends WorkspaceComponent {
 
     @Override
     public void save(OutputStream output, String format) {
-        getXStream().toXML(emitter, output);
+        getXStream().toXML(pixelPlot, output);
     }
 
-    public EmitterMatrix getEmitter() {
-        return emitter;
+    public PixelPlot getPixelPlot() {
+        return pixelPlot;
     }
 }

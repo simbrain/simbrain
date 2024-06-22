@@ -114,8 +114,8 @@ val simulations = dir("Simulations") {
     }
 
     dir("Image World") {
-        item("1. Simple drawings (10 x 10)") { simpleImageWorld }
-        item("2. Photo album (100 x 100)") { photoAlbumExample }
+        item("Simple drawings (10 x 10)") { simpleImageWorld }
+        item("Photo album (100 x 100)") { photoAlbumExample }
     }
 
     dir("Testing") {

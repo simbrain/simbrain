@@ -30,17 +30,17 @@ import kotlin.random.Random
 import kotlin.random.nextInt
 
 /**
- * Initial work with Luis getting back to evo algorithms.
+ *  A model of resource pursuit, in which fitness was defined by ability to efficiently find food sources. Food sources
+ *  are changed randomly, and fitness is penalized by energy expenditure.
  *
- * Cangelosi and a better energy model, including cost of having neuron. A real physical model of kcals involved in
- * moving, supporting each neuron (or maybe even every spike). A model of eating and digestion. You get food, and it
- * provides calories but decays as its digested
+ *  Optimal agents should be able to develop circuits for finding food sources but spend as little energy as possible
+ *  in doing so
  *
- * Goal: Compare the model with various levels of energy constraint and see the differences
+ * Run headless using:
+ *  `gradle runSim -PsimName="Evolve Resource Pursuer" -PoptionString="20:2000:1000:100:0.5"`
  *
- * Can run headless using:
- *  `gradle runSim -PsimName="Evolve Resource Pursuer" -PoptionString="20:1000:100:0.5"`
- *  Format is maxGenerations:iterationsPerRun:populationSize:eliminationRatio
+ *   Format is maxGenerations:targetFitness::iterationsPerRun:populationSize:eliminationRatio
+ *
  *  The resulting zip file must be loaded using the `load file` button in this sim
  */
 val evolveResourcePursuer = newSim { optionString ->
@@ -211,6 +211,7 @@ val evolveResourcePursuer = newSim { optionString ->
         var calories: Double = 400.0,
         var totalActivation: Double = 0.0,
         var movement: Double = 0.0,
+        var fitness: Double = 0.0,
         val baseMetabolism: Double = 10.0,
         val seed: Long = Random.nextLong(),
         val random: Random = Random(seed)
@@ -224,6 +225,7 @@ val evolveResourcePursuer = newSim { optionString ->
                             Calories: ${calories.format(2)}
                             Activation: ${totalActivation.format(2)}
                             Movement: ${movement.format(2)}
+                            Fitness: ${fitness.format(2)}
                         """.trimIndent()
     }
 
@@ -233,6 +235,7 @@ val evolveResourcePursuer = newSim { optionString ->
         var calories by simState::calories
         var totalActivation by simState::totalActivation
         var movement by simState::movement
+        var fitness by simState::fitness
 
         workspace.addUpdateAction("update energy") {
             with(phenotype.await()) {
@@ -243,7 +246,8 @@ val evolveResourcePursuer = newSim { optionString ->
                 movement = abs(evolvedAgent.speed * 3) + abs(evolvedAgent.dtheta * 2)
                 totalActivation = outputsActivations + allActivations
                 calories = simState.computeCalories()
-                thirstNeuron.activation = 10.0 / evaluatorParams.iterationsPerRun + thirstNeuron.activation
+                thirstNeuron.activation += 10.0 / evaluatorParams.iterationsPerRun
+                fitness = calories - thirstNeuron.activation * 4
             }
         }
 
@@ -283,8 +287,6 @@ val evolveResourcePursuer = newSim { optionString ->
         val simState = SimState(
             seed = seed
         )
-
-        var calories by simState::calories
 
         val networkComponent = NetworkComponent("Network")
             .also { workspace.addWorkspaceComponent(it) }
@@ -364,16 +366,9 @@ val evolveResourcePursuer = newSim { optionString ->
         }
 
         override suspend fun eval(): Double {
-
-            // Build the sim then wait.
             build()
-
-            val phenotype = phenotypeDeferred.await()
-
-            // Iterate the sim
             workspace.iterateSuspend(evaluatorParams.iterationsPerRun)
-
-            return calories - phenotype.thirstNeuron.activation * 4
+            return simState.fitness
         }
 
     }
@@ -391,8 +386,8 @@ val evolveResourcePursuer = newSim { optionString ->
                     phenotype.apply {
                         driveNeurons.location = point(-150, 150)
                         inputNeurons.location = point(0, 150)
-                        hiddenNeurons.location = point(0, 60)
-                        outputNeurons.location = point(0, -25)
+                        hiddenNeurons.location = point(0, 90)
+                        outputNeurons.location = point(0, -70)
                     }
 
                     val energyTextObject = NetworkTextObject(simState.generateEnergyText())
@@ -469,9 +464,10 @@ val evolveResourcePursuer = newSim { optionString ->
     if (optionString?.isNotEmpty() == true) {
         val options = optionString.split(":")
         evaluatorParams.maxGenerations = options[0].toInt()
-        evaluatorParams.iterationsPerRun = options[1].toInt()
-        evaluatorParams.populationSize = options[2].toInt()
-        evaluatorParams.eliminationRatio = options[3].toDouble()
+        evaluatorParams.targetMetric = options[1].toDouble()
+        evaluatorParams.iterationsPerRun = options[2].toInt()
+        evaluatorParams.populationSize = options[3].toInt()
+        evaluatorParams.eliminationRatio = options[4].toDouble()
         runSim()
     }
 

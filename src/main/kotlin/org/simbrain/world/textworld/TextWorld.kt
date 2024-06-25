@@ -154,6 +154,7 @@ class TextWorld : AttributeContainer, EditableObject {
     /**
      * Pattern matcher.
      */
+    @Transient
     private var matcher: Matcher = pattern.matcher(text)
 
     @Transient

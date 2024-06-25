@@ -127,8 +127,12 @@ val SimbrainJTable.showHistogramAction
     ) {
         // canvas.window() uses invokeAndWait, so this actually has to be invoked from a non-swing thread
         launch(Dispatchers.Default) {
-            val canvas = Histogram.of(model.getDoubleColumn(selectedColumn)).canvas()
-            canvas.window()
+            if (selectedColumn < 0) {
+                showWarningDialog("No column selected")
+            } else {
+                val canvas = Histogram.of(model.getDoubleColumn(selectedColumn)).canvas()
+                canvas.window()
+            }
         }
     }
 

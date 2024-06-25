@@ -6,11 +6,9 @@ import org.simbrain.custom_sims.simulations.behaviorism.OperantConditioning
 import org.simbrain.custom_sims.simulations.behaviorism.OperantWithEnvironment
 import org.simbrain.custom_sims.simulations.behaviorism.SimpleOperant
 import org.simbrain.custom_sims.simulations.braitenberg.RandomizedPursuer
-import org.simbrain.custom_sims.simulations.cerebellum.Cerebellum
 import org.simbrain.custom_sims.simulations.cortex.cortexSimple
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaosBitStream
-import org.simbrain.custom_sims.simulations.hippocampus.Hippocampus
 import org.simbrain.custom_sims.simulations.patterns_of_activity.KuramotoOscillators
 import org.simbrain.custom_sims.simulations.patterns_of_activity.cogMap3Objects
 import org.simbrain.custom_sims.simulations.test.lstmBlock
@@ -76,8 +74,8 @@ val simulations = dir("Simulations") {
 
     dir("Neuroscience") {
         item("Cortex (Kuramoto)") { cortexKuramoto }
-        item("Hippocampus") { Hippocampus() }
-        item("Cerebellum") { Cerebellum() }
+        // item("Hippocampus") { Hippocampus() }
+        // item("Cerebellum") { Cerebellum() }
         item("Cortex Simple") { cortexSimple }
     }
 

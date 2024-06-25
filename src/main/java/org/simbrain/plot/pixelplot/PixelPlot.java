@@ -185,9 +185,9 @@ public class PixelPlot implements AttributeContainer, EditableObject {
 
     private int getChannelValue(int channelIndex, int x, int y) {
         if (invertBrightness) {
-            return (int)((1 - channels[channelIndex][x * image.getWidth() + y]) * 255.0);
+            return (int)((1 - channels[channelIndex][x + y * image.getWidth()]) * 255.0);
         } else {
-            return (int) (channels[channelIndex][x * image.getWidth() + y] * 255.0);
+            return (int) (channels[channelIndex][x + y * image.getWidth()] * 255.0);
         }
     }
 

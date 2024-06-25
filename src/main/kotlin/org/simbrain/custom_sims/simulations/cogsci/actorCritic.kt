@@ -199,7 +199,7 @@ val actorCritic = newSim {
     workspace.updater.updateManager.addAction(UpdateCoupling(errorPlot))
 
     // Doc viewer
-    val docViewer = addDocViewer("Information", "ActorCritic.html")
+    val docViewer = addDocViewerFromFile("Information", "ActorCritic.html")
     docViewer.events.componentMinimized.fire(true)
 
     // Lay everything out

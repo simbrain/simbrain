@@ -1,9 +1,6 @@
 package org.simbrain.custom_sims.simulations
 
-import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.addProjectionPlot2
-import org.simbrain.custom_sims.couplingManager
-import org.simbrain.custom_sims.newSim
+import org.simbrain.custom_sims.*
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.util.place
@@ -30,14 +27,30 @@ val projectionSim = newSim {
     }
 
     // Location of the projection in the desktop
-    val projectionPlot = addProjectionPlot2("Activations")
+    val projectionPlot = addProjectionPlot2("Projection Plot")
     withGui {
-        place(projectionPlot, 405, 0, 400, 400)
+        place(projectionPlot, 393, 5, 400, 400)
     }
 
     // Couple the neuron array to the projection plot
     with(couplingManager) {
         neuronArray couple projectionPlot
+    }
+
+    // Adding a docviewer
+    val docViewer = addDocViewer(
+        "Information",
+        """
+            # Projection demo
+            In this demo simply run the simulations and observe how the network activations are projected. 
+            Some things you can try:
+            - Randomize the weight matrix by clicking on it and pressing "r" to randomize
+            - Changing the type of projection, for example changing it to `Sammon` and pressing `play` to see an alternative way of projecting data
+            - At any time you can press the `clear` button (the eraser) in the projection plot to start over with your plot        
+        """.trimIndent()
+    )
+    withGui {
+        place(docViewer, 784, 3, 400, 400)
     }
 
 }

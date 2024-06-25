@@ -51,7 +51,6 @@ val simulations = dir("Simulations") {
         }
     }
 
-
     dir("Behaviorism") {
         item("Simple Operant") { SimpleOperant() }
         item("Classical Conditioning") { ClassicalConditioning() }

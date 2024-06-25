@@ -141,10 +141,9 @@ fun SimulationScope.readSimulationFileContents(fileName: String): String {
  * Add a doc viewer component.
  *
  * @param title    title to display at top of panel
- * @param fileName name of the html file, e.g. "ActorCritic.html"
- * @return the component
+ * @param fileName name of the markdown or html file, e.g. "ActorCritic.html"
  */
-fun SimulationScope.addDocViewer(title: String, fileName: String): DocViewerComponent {
+fun SimulationScope.addDocViewerFromFile(title: String, fileName: String): DocViewerComponent {
 
     val docViewerComponent = DocViewerComponent(name = title)
     val html = ResourceManager.readFileContents(
@@ -155,6 +154,18 @@ fun SimulationScope.addDocViewer(title: String, fileName: String): DocViewerComp
     workspace.addWorkspaceComponent(docViewerComponent)
     return docViewerComponent
 }
+
+/**
+ * Add a doc viewer component with inlined markdown text
+ */
+fun SimulationScope.addDocViewer(title: String, markdownText: String): DocViewerComponent {
+    val docViewerComponent = DocViewerComponent(name = title)
+    docViewerComponent.docViewer.text = markdownText
+    docViewerComponent.docViewer.render()
+    workspace.addWorkspaceComponent(docViewerComponent)
+    return docViewerComponent
+}
+
 
 val SimulationScope.couplingManager get() = workspace.couplingManager
 

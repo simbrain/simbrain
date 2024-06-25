@@ -89,7 +89,7 @@ val braitenbergSim = newSim {
     val vehicle1 = Vehicle("Vehicle 1", EntityType.CIRCLE, Point2D.Double(120.0, 245.0))
     val vehicle2 = Vehicle("Vehicle 2", EntityType.CIRCLE, Point2D.Double(320.0, 245.0))
 
-    val docViewer = addDocViewer("Information", "Braitenberg.html")
+    val docViewer = addDocViewerFromFile("Information", "Braitenberg.html")
 
     withGui {
         place(vehicle1.networkComponent, 251, 1, 359, 327)

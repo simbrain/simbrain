@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations
 
+import kotlinx.coroutines.awaitAll
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.*
@@ -81,13 +82,13 @@ val allostaticPatternCompletion = newSim {
     val reservoir = List(numResNeurons) {
         Neuron(AllostaticUpdateRule())
     }.let {
-        network.addNetworkModels(it)
+        network.addNetworkModels(it).awaitAll()
         NeuronCollection(it)
     }.apply {
         label = "Reservoir"
         location = point(0, 0)
     }
-    network.addNetworkModel(reservoir)
+    network.addNetworkModel(reservoir)?.await()
     reservoir.layout(GridLayout())
     val sparse = Sparse()
     sparse.connectionDensity = .1
@@ -96,12 +97,11 @@ val allostaticPatternCompletion = newSim {
     reservoirSynapseGroup.synapses.forEach { s ->
         s.strength = dist.sampleDouble()
     }
-    network.addNetworkModel(reservoirSynapseGroup)
+    network.addNetworkModel(reservoirSynapseGroup)?.await()
 
     // Input nodes
-    val inputs = network.addNeuronCollectionAsync(5) {
+    val inputs = network.addNeuronCollection(5) {
         updateRule = LinearRule()
-        network.addNetworkModel(this)
     }.apply {
         label = "Inputs"
         setLabels(listOf("man", "dog", "walks", "bites", "END"))
@@ -113,7 +113,7 @@ val allostaticPatternCompletion = newSim {
     // Connect input nodes to reservoir
     val inputsToRes = SynapseGroup(inputs, reservoir, sparse)
     inputsToRes.label = "Inputs to Res"
-    network.addNetworkModel(inputsToRes)
+    network.addNetworkModel(inputsToRes)?.await()
     inputsToRes.synapses.forEach { s ->
         s.strength = 5.0
     }

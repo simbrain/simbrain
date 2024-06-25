@@ -4,7 +4,10 @@ import kotlinx.coroutines.joinAll
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.RadialProbabilistic
 import org.simbrain.network.connections.Sparse
-import org.simbrain.network.core.*
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.addNeuronCollection
+import org.simbrain.network.core.addSynapse
+import org.simbrain.network.core.addToNetwork
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.HexagonalGridLayout
 import org.simbrain.network.updaterules.DecayRule
@@ -53,7 +56,7 @@ val testSim = newSim {
     val rightNeuron =  region1.neuronList[4]
 
     // Subnetwork 2
-    val region2 = network.addNeuronCollectionAsync(20) {
+    val region2 = network.addNeuronCollection(20) {
         updateRule = DecayRule().apply {
             decayFraction = .2
         }

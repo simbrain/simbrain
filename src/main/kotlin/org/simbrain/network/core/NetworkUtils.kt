@@ -1,6 +1,7 @@
 package org.simbrain.network.core
 
 import com.thoughtworks.xstream.XStream
+import kotlinx.coroutines.awaitAll
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.core.Network.Randomizers.biasesRandomizer
@@ -199,11 +200,11 @@ fun Network.connectAllToAll(source: AbstractNeuronCollection, target: Neuron, va
     return wts
 }
 
-fun Network.addNeurons(numNeurons: Int, template: Neuron.() -> Unit = {}): List<Neuron> {
+suspend fun Network.addNeurons(numNeurons: Int, template: suspend Neuron.() -> Unit = {}): List<Neuron> {
     val neurons = (0 until numNeurons).map {
-        Neuron().apply(template)
+        Neuron().apply { template() }
     }
-    addNetworkModels(neurons)
+    addNetworkModels(neurons).awaitAll()
     return neurons
 }
 
@@ -219,11 +220,11 @@ fun Network.addSynapse(source: Neuron, target: Neuron, block: Synapse.() -> Unit
     .apply(block)
     .also(this::addNetworkModel)
 
-fun Network.addNeuronGroup(count: Int, location: Point2D? = null, template: Neuron.() -> Unit = { }): NeuronGroup {
+suspend fun Network.addNeuronGroup(count: Int, location: Point2D? = null, template: Neuron.() -> Unit = { }): NeuronGroup {
     return NeuronGroup(List(count) {
         Neuron().apply(template)
     }).also {
-        addNetworkModel(it)
+        addNetworkModel(it)?.await()
         if (location != null) {
             val (x, y) = location
             it.setLocation(x, y)
@@ -241,13 +242,7 @@ fun Network.addNeuronGroup(x: Double, y: Double, numNeurons: Int, rule: NeuronUp
     return ng
 }
 
-fun Network.addNeuronCollectionAsync(numNeurons: Int, template: Neuron.() -> Unit = {}) : NeuronCollection {
-    val nc = NeuronCollection(addNeurons(numNeurons, template))
-    addNetworkModel(nc)
-    return nc
-}
-
-suspend fun Network.addNeuronCollection(numNeurons: Int, template: Neuron.() -> Unit = {}) : NeuronCollection {
+suspend fun Network.addNeuronCollection(numNeurons: Int, template: suspend Neuron.() -> Unit = {}) : NeuronCollection {
     val nc = NeuronCollection(addNeurons(numNeurons, template))
     addNetworkModel(nc)?.await()
     return nc

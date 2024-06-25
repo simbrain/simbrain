@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations
 
+import kotlinx.coroutines.awaitAll
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.connections.RadialProbabilistic
@@ -116,7 +117,7 @@ val cortexKuramoto = newSim {
         val regionNeurons = network.addNeurons(numNodesListAdjusted[i - 1]) { kuramotoTemplate() }
         val region = NeuronCollection(regionNeurons)
 
-        network.addNetworkModel(region)
+        network.addNetworkModel(region)?.await()
         neuronRegionList.add(region)
 
         // Increment GUI row after 3 neuron regions have been displayed
@@ -133,7 +134,7 @@ val cortexKuramoto = newSim {
         }
 
         //  Connect neurons within region
-        radial.connectNeurons(regionNeurons, regionNeurons).addToNetwork(network)
+        radial.connectNeurons(regionNeurons, regionNeurons).addToNetwork(network).awaitAll()
 
         // Increment GUI column for next neuron region to be displayed (up to 3, per above)
         xCoordinateFactor += 1
@@ -148,7 +149,7 @@ val cortexKuramoto = newSim {
                 //val sg = SynapseGroup2(i, j, sparse)
                 //sg.displaySynapses = true
                 //network.addNetworkModel(sg)
-                sparse.connectNeurons(i.neuronList, j.neuronList).addToNetwork(network)
+                sparse.connectNeurons(i.neuronList, j.neuronList).addToNetwork(network).awaitAll()
             }
         }
     }

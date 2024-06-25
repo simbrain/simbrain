@@ -60,7 +60,7 @@ val cortexSimple = newSim {
         place(nc, 10, 10, 550, 800)
     }
 
-    fun buildLayer(
+    suspend fun buildLayer(
         numNeurons: Int,
         restingPotential: ClosedRange<Double>,
         timeConstant: ClosedRange<Double>,
@@ -81,7 +81,7 @@ val cortexSimple = newSim {
         }
     }
 
-    fun connectLayers(
+    suspend fun connectLayers(
         src: NeuronGroup, tar: NeuronGroup,
         sparsity: Double
     ): SynapseGroup {
@@ -107,7 +107,7 @@ val cortexSimple = newSim {
         sg.synapses.forEach {
             it.spikeResponder = UDF()
         }
-        net.addNetworkModel(sg)
+        net.addNetworkModel(sg)?.await()
         return sg
     }
 

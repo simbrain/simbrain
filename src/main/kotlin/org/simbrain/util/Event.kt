@@ -75,7 +75,7 @@ open class Events(val timeout: Duration = 5.seconds): CoroutineScope {
         private val batchOld = ConcurrentLinkedQueue<Any?>()
 
         private var debounceCounter: AtomicLong = AtomicLong(0L)
-        private val mutex = Mutex()
+        private val mutex by lazy {Mutex()}
 
         private var shouldClearQueue: Boolean = false
 

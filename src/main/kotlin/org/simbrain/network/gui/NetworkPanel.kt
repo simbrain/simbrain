@@ -320,6 +320,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     }
 
     suspend fun createNode(synapse: Synapse) = addScreenElement {
+        synapse.isVisible = freeWeightsVisible
         val source = modelNodeMap.get<NeuronNode>(synapse.source)
         val target = modelNodeMap.get<NeuronNode>(synapse.target)
         SynapseNode(this, source, target, synapse)

@@ -30,9 +30,6 @@ public class PixelPlot implements AttributeContainer, EditableObject {
      */
     private BufferedImage image;
 
-    @UserParameter(label = "Use RGB Colors", description = "Sets whether to couple integer array of RGB colors or" + "separate red, green, and blue channels.")
-    private boolean usingRGBColor = false;
-
     @UserParameter(label = "Invert brightness", description = "If true, 0 is mapped to white and 1 to white.", useLegacySetter = true)
     private boolean invertBrightness = true;
 
@@ -45,12 +42,6 @@ public class PixelPlot implements AttributeContainer, EditableObject {
     private double[][] channels;
 
     /**
-     * Array of ints representing rgb colors. See
-     * {@link BufferedImage#getRGB(int, int)}
-     */
-    private int[] rgbColors;
-
-    /**
      * Handle Image source Events.
      */
     private transient ImageEvents events = new ImageEvents();
@@ -61,72 +52,43 @@ public class PixelPlot implements AttributeContainer, EditableObject {
     public PixelPlot() {
         image =  new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
         channels = new double[3][image.getWidth() * image.getHeight()];
-        rgbColors = new int[image.getWidth() * image.getHeight()];
         clear();
     }
 
-    /**
-     * Construct an pixel plot from an image.
-     *
-     * @param currentImage
-     */
-    public PixelPlot(BufferedImage currentImage) {
-        channels = new double[3][image.getWidth() * image.getHeight()];
-        rgbColors = new int[image.getWidth() * image.getHeight()];
-        clear();
-    }
-
-    /**
-     * Returns whether the pixel plot should use int RGB colors or double channels.
-     */
-    public boolean isUsingRGBColor() {
-        return usingRGBColor;
-    }
-
-    /**
-     * Set whether the pixel plot should use int RGB color values (true) or double channel values (false).
-     * Note that the set brightness coupling requires useColor = false.
-     */
-    public void setUsingRGBColor(boolean value) {
-        usingRGBColor = value;
-    }
-
-    @Consumable
-    public void setBrightness(double[] values) {
+    private int resizeToFit(double[] values) {
         int length = (int) Math.ceil(Math.sqrt(values.length));
         if (image.getWidth() != length || image.getHeight() != length) {
             setSize(length, length);
         }
+        return length;
+    }
+
+    @Consumable
+    public void setBrightness(double[] values) {
+        resizeToFit(values);
         System.arraycopy(values, 0, channels[0], 0, values.length);
         System.arraycopy(values, 0, channels[1], 0, values.length);
         System.arraycopy(values, 0, channels[2], 0, values.length);
         emitImage();
     }
 
-    @Consumable
-    public void setRGBColor(int[] values) {
-        int length = Math.min(values.length, image.getWidth() * image.getHeight());
-        System.arraycopy(values, 0, rgbColors, 0, length);
-        emitImage();
-    }
-
-    @Consumable(defaultVisibility = false)
+    @Consumable()
     public void setRed(double[] values) {
-        int length = Math.min(values.length, image.getWidth() * image.getHeight());
+        int length = resizeToFit(values);
         System.arraycopy(values, 0, channels[0], 0, length);
         emitImage();
     }
 
-    @Consumable(defaultVisibility = false)
+    @Consumable()
     public void setGreen(double[] values) {
-        int length = Math.min(values.length, image.getWidth() * image.getHeight());
+        int length = resizeToFit(values);
         System.arraycopy(values, 0, channels[1], 0, length);
         emitImage();
     }
 
-    @Consumable(defaultVisibility = false)
+    @Consumable()
     public void setBlue(double[] values) {
-        int length = Math.min(values.length, image.getWidth() * image.getHeight());
+        int length = resizeToFit(values);
         System.arraycopy(values, 0, channels[2], 0, length);
         emitImage();
     }
@@ -134,7 +96,6 @@ public class PixelPlot implements AttributeContainer, EditableObject {
     public void setSize(int width, int height) {
         image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         channels = new double[3][image.getWidth() * image.getHeight()];
-        rgbColors = new int[image.getWidth() * image.getHeight()];
         emitImage();
     }
 
@@ -145,7 +106,6 @@ public class PixelPlot implements AttributeContainer, EditableObject {
         Arrays.fill(channels[0], 0.0);
         Arrays.fill(channels[1], 0.0);
         Arrays.fill(channels[2], 0.0);
-        Arrays.fill(rgbColors, 0);
         emitImage();
     }
 
@@ -159,25 +119,16 @@ public class PixelPlot implements AttributeContainer, EditableObject {
      * to integers (0 to 255) and assigned to the corresponding pixels.
      */
     public void emitImage() {
-        if (usingRGBColor) {
-            for (int y = 0; y < image.getHeight(); ++y) {
-                for (int x = 0; x < image.getWidth(); ++x) {
-                    int rgb = rgbColors[x * image.getWidth() + y];
-                    image.setRGB(x, y, rgb);
-                }
-            }
-        } else {
-            for (int y = 0; y < image.getHeight(); ++y) {
-                for (int x = 0; x < image.getWidth(); ++x) {
-                    int red = getChannelValue(0, x, y);
-                    red = Math.max(Math.min(red, 255), 0) << 16;
-                    int blue = getChannelValue(1, x, y);
-                    blue = Math.max(Math.min(blue, 255), 0) << 8;
-                    int green = getChannelValue(2, x, y);
-                    green = Math.max(Math.min(green, 255), 0);
-                    int color = red + blue + green;
-                    image.setRGB(x, y, color);
-                }
+        for (int y = 0; y < image.getHeight(); ++y) {
+            for (int x = 0; x < image.getWidth(); ++x) {
+                int red = getChannelValue(0, x, y);
+                red = Math.max(Math.min(red, 255), 0) << 16;
+                int blue = getChannelValue(1, x, y);
+                blue = Math.max(Math.min(blue, 255), 0) << 8;
+                int green = getChannelValue(2, x, y);
+                green = Math.max(Math.min(green, 255), 0);
+                int color = red + blue + green;
+                image.setRGB(x, y, color);
             }
         }
         events.getImageUpdate().fire();

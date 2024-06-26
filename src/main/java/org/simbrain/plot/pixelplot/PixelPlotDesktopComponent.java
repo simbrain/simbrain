@@ -60,13 +60,6 @@ public class PixelPlotDesktopComponent extends DesktopComponent<PixelPlotCompone
             SwingUtilsKt.display(SwingUtilsKt.createEditorDialog(getWorkspaceComponent().getPixelPlot()));
         });
         editMenu.add(preferences);
-        JMenuItem resizePixelMatrix = new JMenuItem("Resize pixel matrix...");
-        resizePixelMatrix.addActionListener(e -> {
-            ResizePixelPlotDialog dialog = new ResizePixelPlotDialog(getWorkspaceComponent().getPixelPlot());
-            dialog.setVisible(true);
-        });
-        editMenu.add(resizePixelMatrix);
-
 
         JMenu helpMenu = new JMenu("Help");
         ShowHelpAction helpAction = new ShowHelpAction("Pages/Plot/bar_chart.html");

@@ -39,9 +39,10 @@ class DocViewer: EditableObject {
     fun render() {
         val flavour = GFMFlavourDescriptor()
         val parsedTree = MarkdownParser(flavour).buildMarkdownTreeFromString(text)
+        val userDir = System.getProperty("user.dir").replace("\\\\".toRegex(), "\\\\\\\\")
         renderedText = HtmlGenerator(text, parsedTree, flavour)
             .generateHtml()
-            .replace("//localfiles/", "file:")
+            .replace("//localfiles/", "file:${userDir}/")
     }
 
     init {

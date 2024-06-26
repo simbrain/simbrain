@@ -10,7 +10,7 @@ class DocViewer: EditableObject {
     // When calling this manually call render() after
     var text: String = """
         # Doc Viewer
-        Use markdown to create documentation to go explain simulations. Simple html is supported in markdown 
+        Use markdown to create documentation and to explain simulations. Simple html is supported in markdown 
         so simple html is supported as well, but markdown is suggested. 
         
         A [markdown cheat sheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet).
@@ -23,9 +23,13 @@ class DocViewer: EditableObject {
           - Unordered item with **bold** in one style
           - Unordered item with __bold__ in one style
         
-        # A local image     
+        # Local image     
         
         ![Flower](//localfiles/simulations/images/Caltech101Sample/image_0036.jpg)
+
+        # Remote image     
+        
+        ![Bobcat Drawing](https://upload.wikimedia.org/wikipedia/commons/3/37/Ernest_Ingersoll_-_lynx_rufus_%26_lynx_canadensis.png)
         """.trimIndent()
 
     @Transient

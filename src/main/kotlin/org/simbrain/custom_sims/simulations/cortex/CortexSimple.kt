@@ -95,7 +95,6 @@ val cortexSimple = newSim {
         sg.randomizeExcitatory()
         sg.randomizeInhibitory()
         sg.label = "Synapses"
-        sg.displaySynapses = false
 
         // TODO
         // sg.setUpperBound(200, Polarity.EXCITATORY);

@@ -139,6 +139,7 @@ open class Events(val timeout: Duration = 5.seconds): CoroutineScope {
             }?.filterIsInstance<Job>()
 
         protected fun fireAllHelper(run: suspend (suspend (new: Any?, old: Any?) -> Unit) -> Unit): Deferred<Boolean> {
+            if (eventMapping[this@EventObject].isNullOrEmpty()) return CompletableDeferred(true)
             val now = System.currentTimeMillis()
             if (interval == 0) {
                 return async {

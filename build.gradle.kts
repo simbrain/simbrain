@@ -165,6 +165,9 @@ dependencies {
 
     implementation(group = "org.jetbrains", name = "markdown", version = "0.7.3")
 
+    // https://mvnrepository.com/artifact/org.json/json
+    implementation("org.json:json:20240303")
+
 }
 
 tasks.test {

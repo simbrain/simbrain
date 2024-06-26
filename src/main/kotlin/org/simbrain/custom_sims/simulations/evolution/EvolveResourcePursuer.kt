@@ -14,6 +14,9 @@ import org.simbrain.util.piccolo.createTileMapLayer
 import org.simbrain.util.piccolo.loadTileMap
 import org.simbrain.util.piccolo.makeLake
 import org.simbrain.util.piccolo.nextGridCoordinate
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
+import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.workspace.Workspace
 import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.OdorWorldComponent
@@ -53,6 +56,36 @@ val evolveResourcePursuer = newSim { optionString ->
         targetValue = 1000.0,
         seed = 42
     )
+
+    class EvolutionParameters: EditableObject {
+
+        var useConnectionStrategyGene by GuiEditable(
+            initValue = true,
+            description = "Whether to use the connection gene",
+            order = 20
+        )
+
+        var useLearningRuleGenes by GuiEditable(
+            initValue = true,
+            description = "Whether to use the local learning rule gene",
+            order = 30
+        )
+
+        var useHiddenLayerUpdateRuleGene by GuiEditable(
+            initValue = true,
+            description = "Whether to use the hidden layer activation function gene",
+            order = 40
+        )
+
+
+        var useLayoutGene by GuiEditable(
+            initValue = true,
+            description = "Whether to use the layout gene",
+            order = 50
+        )
+
+    }
+    val evaluationParams = EvolutionParameters()
 
     class EvolvePursuerPhenotype(
         val driveNeurons: NeuronCollection,
@@ -126,7 +159,7 @@ val evolveResourcePursuer = newSim { optionString ->
                 hiddenNeurons.neuronList,
                 hiddenNeurons.neuronList
             ).addToNetwork(network)
-            hiddenNeurons.label = "Layout: ${connectionStrategyWrapper.connectionStrategy}"
+            hiddenNeurons.label = "${connectionStrategyWrapper.connectionStrategy}"
 
             val hiddenUpdateRules = express(hiddenUpdateRuleChromosome)
             hiddenNeurons.neuronList.zip(hiddenUpdateRules).forEach { (neuron, rule) ->
@@ -153,6 +186,7 @@ val evolveResourcePursuer = newSim { optionString ->
 
         fun mutate() {
 
+            // Mutate bias
             hiddenChromosome.forEach {
                 it.mutate {
                     with(dataHolder as BiasedScalarData) {
@@ -161,17 +195,15 @@ val evolveResourcePursuer = newSim { optionString ->
                 }
             }
 
-            connectionChromosome.forEach {
-                it.mutate {
-                    strength += random.nextDouble(-1.0, 1.0)
+            // Mutate learning rule
+            if (evaluationParams.useLearningRuleGenes) {
+                synapseRuleChromosome.forEach {
+                    it.mutateParam()
+                    it.mutateType()
                 }
             }
 
-            synapseRuleChromosome.forEach {
-                it.mutateParam()
-                it.mutateType()
-            }
-
+            // Add new connections
             val newConnectionGene = withProbability(0.25) {
                 connectionChromosome.createGene(
                     inputChromosome + driveChromosome to hiddenChromosome,
@@ -183,24 +215,33 @@ val evolveResourcePursuer = newSim { optionString ->
             }
 
             // Add a new hidden unit
-            if (random.nextDouble() < 0.8) {
+            if (random.nextDouble() < 0.5) {
                 hiddenChromosome.add(nodeGene())
                 hiddenUpdateRuleChromosome.add(neuronRuleGene(DecayRule()))
             }
 
-            layoutChromosome.forEach {
-                it.mutateParam()
-                it.mutateType()
+            // Mutate layout of hidden layer
+            if (evaluationParams.useLayoutGene) {
+                layoutChromosome.forEach {
+                    it.mutateParam()
+                    it.mutateType()
+                }
             }
 
-            connectionStrategyChromosome.forEach {
-                it.mutateParam()
-                it.mutateType()
+            // Mutate connection strategy
+            if (evaluationParams.useConnectionStrategyGene) {
+                connectionStrategyChromosome.forEach {
+                    it.mutateParam()
+                    it.mutateType()
+                }
             }
 
-            hiddenUpdateRuleChromosome.forEach {
-                it.mutateParam(mutateBounds = false)
-                it.mutateStandardTypes()
+            // Mutate update rule
+            if (evaluationParams.useHiddenLayerUpdateRuleGene) {
+                hiddenUpdateRuleChromosome.forEach {
+                    it.mutateParam(mutateBounds = false)
+                    it.mutateStandardTypes()
+                }
             }
 
         }
@@ -412,6 +453,9 @@ val evolveResourcePursuer = newSim { optionString ->
     withGui {
         workspace.clearWorkspace()
         val controlPanel = evaluatorParams.createControlPanel("Control Panel", 5, 10)
+        controlPanel.addSeparator()
+        val propertyEditor = AnnotatedPropertyEditor(evaluationParams)
+        controlPanel.addAnnotatedPropertyEditor(propertyEditor)
         evaluatorParams.addControlPanelButton("Evolve") {
             workspace.removeAllComponents()
             evaluatorParams.addProgressWindow()
@@ -472,3 +516,21 @@ val evolveResourcePursuer = newSim { optionString ->
     }
 
 }
+
+// In prep for json parsing of option strings
+// fun main() {
+//     val jsonString = """
+//     {
+//         "name": "John",
+//         "age": 30,
+//         "city": "New York"
+//     }
+//     """
+//     val jsonObject = JSONObject(jsonString)
+//     val name = jsonObject.getString("name")
+//     val age = jsonObject.getInt("age")
+//     val city = jsonObject.getString("city")
+//     println("Name: $name")
+//     println("Age: $age")
+//     println("City: $city")
+// }

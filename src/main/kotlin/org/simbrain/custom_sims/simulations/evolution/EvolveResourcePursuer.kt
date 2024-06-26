@@ -3,6 +3,7 @@ package org.simbrain.custom_sims.simulations
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.withContext
+import org.json.JSONObject
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.*
@@ -40,9 +41,9 @@ import kotlin.random.nextInt
  *  in doing so
  *
  * Run headless using:
- *  `gradle runSim -PsimName="Evolve Resource Pursuer" -PoptionString="20:2000:1000:100:0.5"`
+ *  `gradle runSim -PsimName="Evolve Resource Pursuer" -PoptionString='{"maxGenerations": 15, "targetValue": 5000, "useLayoutGene": false}'`
  *
- *   Format is maxGenerations:targetFitness::iterationsPerRun:populationSize:eliminationRatio
+ *  for a full list of options, search for optionString in this file
  *
  *  The resulting zip file must be loaded using the `load file` button in this sim
  */
@@ -506,31 +507,17 @@ val evolveResourcePursuer = newSim { optionString ->
     }
 
     if (optionString?.isNotEmpty() == true) {
-        val options = optionString.split(":")
-        evaluatorParams.maxGenerations = options[0].toInt()
-        evaluatorParams.targetMetric = options[1].toDouble()
-        evaluatorParams.iterationsPerRun = options[2].toInt()
-        evaluatorParams.populationSize = options[3].toInt()
-        evaluatorParams.eliminationRatio = options[4].toDouble()
+        val options = JSONObject(optionString)
+        evaluatorParams.maxGenerations = options.optInt("maxGenerations", evaluatorParams.maxGenerations)
+        evaluatorParams.targetMetric = options.optDouble("targetMetric", evaluatorParams.targetMetric)
+        evaluatorParams.iterationsPerRun = options.optInt("iterationsPerRun", evaluatorParams.iterationsPerRun)
+        evaluatorParams.populationSize = options.optInt("populationSize", evaluatorParams.populationSize)
+        evaluatorParams.eliminationRatio = options.optDouble("eliminationRatio", evaluatorParams.eliminationRatio)
+        evaluationParams.useLayoutGene = options.optBoolean("useLayoutGene", evaluationParams.useLayoutGene)
+        evaluationParams.useLearningRuleGenes = options.optBoolean("useLearningRuleGenes", evaluationParams.useLearningRuleGenes)
+        evaluationParams.useConnectionStrategyGene = options.optBoolean("useConnectionStrategyGene", evaluationParams.useConnectionStrategyGene)
+        evaluationParams.useHiddenLayerUpdateRuleGene = options.optBoolean("useHiddenLayerUpdateRuleGene", evaluationParams.useHiddenLayerUpdateRuleGene)
         runSim()
     }
 
 }
-
-// In prep for json parsing of option strings
-// fun main() {
-//     val jsonString = """
-//     {
-//         "name": "John",
-//         "age": 30,
-//         "city": "New York"
-//     }
-//     """
-//     val jsonObject = JSONObject(jsonString)
-//     val name = jsonObject.getString("name")
-//     val age = jsonObject.getInt("age")
-//     val city = jsonObject.getString("city")
-//     println("Name: $name")
-//     println("Age: $age")
-//     println("City: $city")
-// }

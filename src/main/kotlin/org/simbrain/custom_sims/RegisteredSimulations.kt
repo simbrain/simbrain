@@ -27,7 +27,7 @@ import org.simbrain.util.dir
  * use to call them using "run sim" (see build.gradle#runSim). If duplicate labels are used the first one encountered
  * will be run from the command line.
  */
-val simulations = dir("Simulations") {
+val simulations = dir("Simulations", alphabetical = true ) {
 
     dir("Cognitive Science") {
         // dir("Hebbian") {
@@ -72,10 +72,10 @@ val simulations = dir("Simulations") {
     }
 
     dir("Neuroscience") {
-        item("Cortex (Kuramoto)") { cortexKuramoto }
+        item("Cortical areas") { cortexKuramoto }
         // item("Hippocampus") { Hippocampus() }
         // item("Cerebellum") { Cerebellum() }
-        item("Cortex Simple") { cortexSimple }
+        item("Cortical layers") { cortexSimple }
     }
 
     dir("Evolution") {

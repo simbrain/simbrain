@@ -79,7 +79,7 @@ class StructureDir<R>(val name: String, private val alphabetical: Boolean, priva
 
 fun <R> dir(
     name: String,
-    alphabetical: Boolean = true,
+    alphabetical: Boolean = false,
     divAtTop: Boolean = true,
     block: StructureDir<R>.() -> Unit
 ): StructureDir<R> {

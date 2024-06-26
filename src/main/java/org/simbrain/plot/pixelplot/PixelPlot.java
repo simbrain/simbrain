@@ -66,6 +66,11 @@ public class PixelPlot implements AttributeContainer, EditableObject {
     @Consumable
     public void setBrightness(double[] values) {
         resizeToFit(values);
+        if (invertBrightness) {
+            for (int i = 0; i < values.length; i++) {
+                values[i] = 1 - values[i];
+            }
+        }
         System.arraycopy(values, 0, channels[0], 0, values.length);
         System.arraycopy(values, 0, channels[1], 0, values.length);
         System.arraycopy(values, 0, channels[2], 0, values.length);
@@ -74,22 +79,22 @@ public class PixelPlot implements AttributeContainer, EditableObject {
 
     @Consumable()
     public void setRed(double[] values) {
-        int length = resizeToFit(values);
-        System.arraycopy(values, 0, channels[0], 0, length);
+        resizeToFit(values);
+        System.arraycopy(values, 0, channels[0], 0, values.length);
         emitImage();
     }
 
     @Consumable()
     public void setGreen(double[] values) {
-        int length = resizeToFit(values);
-        System.arraycopy(values, 0, channels[1], 0, length);
+        resizeToFit(values);
+        System.arraycopy(values, 0, channels[1], 0, values.length);
         emitImage();
     }
 
     @Consumable()
     public void setBlue(double[] values) {
-        int length = resizeToFit(values);
-        System.arraycopy(values, 0, channels[2], 0, length);
+        resizeToFit(values);
+        System.arraycopy(values, 0, channels[2], 0, values.length);
         emitImage();
     }
 
@@ -103,10 +108,14 @@ public class PixelPlot implements AttributeContainer, EditableObject {
      * Clears the image and sets it to black.
      */
     public void clear() {
+        clearData();
+        emitImage();
+    }
+
+    public void clearData() {
         Arrays.fill(channels[0], 0.0);
         Arrays.fill(channels[1], 0.0);
         Arrays.fill(channels[2], 0.0);
-        emitImage();
     }
 
     /**
@@ -135,11 +144,7 @@ public class PixelPlot implements AttributeContainer, EditableObject {
     }
 
     private int getChannelValue(int channelIndex, int x, int y) {
-        if (invertBrightness) {
-            return (int)((1 - channels[channelIndex][x + y * image.getWidth()]) * 255.0);
-        } else {
-            return (int) (channels[channelIndex][x + y * image.getWidth()] * 255.0);
-        }
+        return (int) (channels[channelIndex][x + y * image.getWidth()] * 255.0);
     }
 
 

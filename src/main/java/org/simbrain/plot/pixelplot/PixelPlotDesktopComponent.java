@@ -35,7 +35,7 @@ public class PixelPlotDesktopComponent extends DesktopComponent<PixelPlotCompone
         super(frame, component);
         setLayout(new BorderLayout());
         add(BorderLayout.CENTER, pixelPlotPanel);
-        getWorkspaceComponent().getPixelPlot().getEvents().getImageUpdate().on(this::repaint);
+        getWorkspaceComponent().pixelPlot.getEvents().getImageUpdate().on(this::repaint);
 
         actionManager = new PlotActionManager(this);
 
@@ -57,7 +57,7 @@ public class PixelPlotDesktopComponent extends DesktopComponent<PixelPlotCompone
         JMenu editMenu = new JMenu("Edit");
         JMenuItem preferences = new JMenuItem("Preferences...");
         preferences.addActionListener(e -> {
-            SwingUtilsKt.display(SwingUtilsKt.createEditorDialog(getWorkspaceComponent().getPixelPlot()));
+            SwingUtilsKt.display(SwingUtilsKt.createEditorDialog(getWorkspaceComponent().pixelPlot));
         });
         editMenu.add(preferences);
 
@@ -77,7 +77,7 @@ public class PixelPlotDesktopComponent extends DesktopComponent<PixelPlotCompone
         @Override
         protected void paintComponent(Graphics graphics) {
             super.paintComponent(graphics);
-            BufferedImage currentImage = getWorkspaceComponent().getPixelPlot().getImage();
+            BufferedImage currentImage = getWorkspaceComponent().pixelPlot.getImage();
             if (currentImage == null) {
                 return;
             }

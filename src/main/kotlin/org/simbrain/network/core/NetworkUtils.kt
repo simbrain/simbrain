@@ -324,7 +324,7 @@ fun List<Neuron>.getEnergy() = ((this cartesianProduct this)
 /**
  * Sort a list of models left to right and top to bottom
  */
-fun<T: LocatableModel> List<T>.sortTopBottom() = sortedBy { it.locationY }.sortedBy{it.locationX}
+fun <T : LocatableModel> List<T>.sortTopBottom() = sortedBy { it.location.x }.sortedBy { it.location.y }
 
 suspend fun NetworkModel.addToNetwork(network: Network) = network.addNetworkModel(this)
 fun NetworkModel.addToNetworkAsync(network: Network) = network.addNetworkModel(this)

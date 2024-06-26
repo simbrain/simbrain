@@ -144,13 +144,11 @@ public class GridLayout extends Layout {
             }
         }
 
-        int rowNum = -1;
         for (int i = 0; i < neurons.size(); i++) {
             Neuron neuron = neurons.get(i);
-            if (i % numCols == 0) {
-                rowNum++;
-            }
-            neuron.setLocation(initialX + (i % numCols) * hSpacing, initialY + rowNum * vSpacing);
+            var x = i % numCols;
+            var y = i / numCols;
+            neuron.setLocation(initialX + x * hSpacing, initialY + y * vSpacing);
         }
     }
 

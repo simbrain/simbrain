@@ -81,14 +81,13 @@ class TextWorld : AttributeContainer, EditableObject {
         _text = newText
     }
 
-    /**
-     * The current item of text (letter, word, etc.)
-     */
     var currentItem: TextItem? = null
-        set(value) {
-            field = value
-            events.currentTokenChanged.fire(value)
-        }
+        private set
+
+    suspend fun setCurrentItem(textItem: TextItem?) {
+        currentItem = textItem
+        events.currentTokenChanged.fire(textItem).await()
+    }
 
     /**
      * What the current "cursor" position in the text is.
@@ -190,12 +189,12 @@ class TextWorld : AttributeContainer, EditableObject {
     /**
      * Advance the position in the text, and update the current item.
      */
-    fun update() {
+    suspend fun update() {
         if (parseStyle == ParseStyle.CHARACTER) {
             wrapText()
             val begin = position
             val end = position + 1
-            currentItem = TextItem(begin, end, text.substring(begin, end))
+            setCurrentItem(TextItem(begin, end, text.substring(begin, end)))
             position = end
         } else if (parseStyle == ParseStyle.WORD) {
             wrapText()
@@ -253,8 +252,8 @@ class TextWorld : AttributeContainer, EditableObject {
     /**
      * Select the current token.
      */
-    private fun selectCurrentToken() {
-        currentItem = currentTextItem
+    private suspend fun selectCurrentToken() {
+        setCurrentItem(currentTextItem)
         position = currentTextItem!!.endPosition
     }
 

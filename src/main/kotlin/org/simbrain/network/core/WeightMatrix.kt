@@ -61,10 +61,9 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
     val weightMatrix: Matrix
 
     /**
-     * A matrix with the same size as the weight matrix. Holds values from post synaptic responses.
-     * Only used with spike responders.
+     * A matrix with the same size as the weight matrix. Only used with spike responders.
      */
-    val psrMatrix: Matrix
+    val spikeResponseMatrix: Matrix
 
     /**
      * A binary matrix with 1s corresponding to entries of the weight matrix that are greater than 1 and thus
@@ -93,7 +92,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
         weightMatrix = Matrix(target.inputSize(), source.outputSize())
         diagonalize()
 
-        psrMatrix = Matrix(target.inputSize(), source.outputSize())
+        spikeResponseMatrix = Matrix(target.inputSize(), source.outputSize())
 
         updateMasks()
     }
@@ -152,23 +151,17 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
         }
     }
 
-    /**
-     * Returns the product of this matrix its source activations, or psr if source array's rule is spiking.
-     *
-     * @see Synapse.updateOutput
-     */
     context(Network)
-    override val output: Matrix
+    override val psrMatrix: Matrix
         get() {
             // TODO: Do frozen, clamping, or enabling make sense here
-
             if (spikeResponder is NonResponder) {
                 // For "connectionist" case. PSR Matrix not needed in this case
                 return weightMatrix.mm(source.outputs)
             } else {
-                // Updates the psrMatrix in the spiking case
+                // Updates the spikeResponseMatrix in the spiking case
                 spikeResponder.apply(this, spikeResponseData)
-                return Matrix.column(psrMatrix.rowSums())
+                return Matrix.column(spikeResponseMatrix.rowSums())
             }
         }
 
@@ -185,7 +178,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
             for (i in 0 until weightMatrix.nrow()) {
                 for (j in 0 until weightMatrix.ncol()) {
                     val newVal = weightMatrix[i, j] * output[j, 0]
-                    psrMatrix[i, j] = newVal
+                    spikeResponseMatrix[i, j] = newVal
                 }
             }
         }
@@ -220,7 +213,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
             if (excitatoryMask == null) {
                 updateExcitatoryMask()
             }
-            return excitatoryMask!!.clone().mul(psrMatrix).rowSums()
+            return excitatoryMask!!.clone().mul(spikeResponseMatrix).rowSums()
         }
 
     val inhibitoryOutputs: DoubleArray
@@ -232,7 +225,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
             if (inhibitoryMask == null) {
                 updateInhibitoryMask()
             }
-            return inhibitoryMask!!.clone().mul(psrMatrix).rowSums()
+            return inhibitoryMask!!.clone().mul(spikeResponseMatrix).rowSums()
         }
 
 

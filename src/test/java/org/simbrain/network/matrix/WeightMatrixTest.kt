@@ -60,7 +60,7 @@ class WeightMatrixTest {
         with(net) {
             na1.setActivations(doubleArrayOf(1.0, 2.0))
             wm.setWeights(doubleArrayOf(1.0, 2.0, 3.0, 4.0))
-            Assertions.assertArrayEquals(doubleArrayOf(5.0, 11.0), wm.output.col(0), 0.0)
+            Assertions.assertArrayEquals(doubleArrayOf(5.0, 11.0), wm.psrMatrix.col(0), 0.0)
         }
     }
 

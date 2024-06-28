@@ -59,7 +59,7 @@ fun WeightMatrix.applyLMS(outputError: Matrix, epsilon: Double = .1) {
 context(Network)
 fun WeightMatrix.trainCurrentOutputLMS(epsilon: Double = .1) {
     val targets = target.outputs.clone()
-    val actualOutputs = output
+    val actualOutputs = psrMatrix
     applyLMS(targets.sub(actualOutputs), epsilon)
 }
 

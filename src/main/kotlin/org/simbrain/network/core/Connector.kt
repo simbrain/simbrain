@@ -36,10 +36,10 @@ abstract class Connector(var source: Layer, var target: Layer) : NetworkModel(),
     }
 
     /**
-     * Returns the output of this connector
+     * Returns a matrix of post-synaptic responses. See [Synapse.psr].
      */
     context(Network)
-    abstract val output: Matrix
+    abstract val psrMatrix: Matrix
 
     private fun initEvents() {
         // When the parents of the matrix are deleted, delete the matrix

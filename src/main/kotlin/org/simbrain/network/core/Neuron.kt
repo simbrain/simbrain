@@ -277,7 +277,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
 
     context(Network)
     override fun updateInputs() {
-        fanIn.forEach { it.updateOutput() }
+        fanIn.forEach { it.updatePSR() }
         addInputValue(weightedInputs)
     }
 

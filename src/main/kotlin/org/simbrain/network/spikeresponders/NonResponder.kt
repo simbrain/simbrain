@@ -25,7 +25,7 @@ import org.simbrain.network.util.ScalarDataHolder
 
 /**
  * A "null" spike responder which produces "connectionist" dynamics where the post-synaptic response is the weight
- * times the source activation. See [Synapse.updateOutput] and [WeightMatrix.getOutput]
+ * times the source activation. See [Synapse.updatePSR] and [WeightMatrix.getOutput]
  */
 class NonResponder : SpikeResponder() {
 

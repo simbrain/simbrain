@@ -79,11 +79,11 @@ class JumpAndDecay : SpikeResponder() {
                 for (j in 0 until wm.weightMatrix.ncol()) {
                     val psr = jumpAndDecay(
                             spikeData.spikes[j],
-                            wm.psrMatrix[i, j],
+                            wm.spikeResponseMatrix[i, j],
                             wm.weightMatrix[i, j],
                             timeStep
                         )
-                    wm.psrMatrix.set(i, j, psr)
+                    wm.spikeResponseMatrix.set(i, j, psr)
                 }
             }
         }

@@ -20,7 +20,7 @@ class LayerTest {
         with(net) {
             na1.activations = Matrix.column(doubleArrayOf(1.0,-1.0))
             wm.diagonalize()
-            assertArrayEquals(doubleArrayOf(1.0,-1.0), wm.output.toDoubleArray(), 0.0)
+            assertArrayEquals(doubleArrayOf(1.0,-1.0), wm.psrMatrix.toDoubleArray(), 0.0)
         }
     }
 }

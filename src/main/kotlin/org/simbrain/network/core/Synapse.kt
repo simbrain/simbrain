@@ -303,12 +303,12 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
     }
 
     /**
-     * Update output of this synapse. If there is no spike responder then "psr" is just weighted input
+     * Update the post-synaptic response or "output" of this synapse. If there is no spike responder then "psr" is just weighted input
      * ("connectionist style"). If there is a [SpikeResponder] it is applied to update the post-synaptic response
      * (psr) and psr is used as the output.
      */
     context(Network)
-    fun updateOutput() {
+    fun updatePSR() {
         if (!isEnabled) {
             return
         }

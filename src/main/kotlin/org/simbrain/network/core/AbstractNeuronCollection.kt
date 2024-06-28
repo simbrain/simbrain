@@ -346,7 +346,7 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
 
         var wtdInputs = DoubleArray(size())
         for (c in incomingConnectors) {
-            wtdInputs = SimbrainMath.addVector(wtdInputs, c.output.col(0))
+            wtdInputs = SimbrainMath.addVector(wtdInputs, c.psrMatrix.col(0))
         }
         addInputs(wtdInputs)
     }

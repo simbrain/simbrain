@@ -59,7 +59,7 @@ class StepResponder(
                 if (spiked) {
                     for (row in 0 until stepResponseData.counterMatrix.nrow()) {
                         stepResponseData.counterMatrix.set(row, col, responseDuration.toDouble())
-                        wm.psrMatrix.set(row, col, responseHeight * wm.weightMatrix.get(row, col))
+                        wm.spikeResponseMatrix.set(row, col, responseHeight * wm.weightMatrix.get(row, col))
                     }
                 } else {
                     for (row in 0 until stepResponseData.counterMatrix.nrow()) {
@@ -72,7 +72,7 @@ class StepResponder(
                 for (i in 0 until stepResponseData.counterMatrix.nrow())
                     for (j in 0 until stepResponseData.counterMatrix.ncol()) {
                         if (stepResponseData.counterMatrix.get(i, j) <= 0) {
-                            wm.psrMatrix.set(i, j, 0.0)
+                            wm.spikeResponseMatrix.set(i, j, 0.0)
                         }
                     }
             }

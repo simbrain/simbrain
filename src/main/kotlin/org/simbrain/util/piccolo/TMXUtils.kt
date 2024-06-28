@@ -247,3 +247,10 @@ fun TileMap.makeLake(topLeftLocation: GridCoordinate, width: Int, height: Int, l
     }
 
 }
+
+fun TileMap.fillRect(tileId: Int, topLeftLocation: GridCoordinate, width: Int, height: Int, layer: TileMapLayer = layers.first()) {
+    getCoordinates(topLeftLocation, width, height).forEach {
+        val (x, y) = it.int
+        setTile(x, y, tileId, layer)
+    }
+}

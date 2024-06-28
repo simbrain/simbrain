@@ -120,6 +120,12 @@
     <property name="type" value="dirtRoad"/>
    </properties>
   </tile>
+  <tile id="544">
+   <properties>
+    <property name="label" value="DaisySingle"/>
+    <property name="type" value="flower"/>
+   </properties>
+  </tile>
   <tile id="573">
    <properties>
     <property name="label" value="DaisyCenter"/>

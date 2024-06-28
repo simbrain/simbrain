@@ -12,8 +12,8 @@ import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.*
 import org.simbrain.util.geneticalgorithm.*
 import org.simbrain.util.piccolo.createTileMapLayer
+import org.simbrain.util.piccolo.fillRect
 import org.simbrain.util.piccolo.loadTileMap
-import org.simbrain.util.piccolo.makeLake
 import org.simbrain.util.piccolo.nextGridCoordinate
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
@@ -48,6 +48,9 @@ import kotlin.random.nextInt
  *  The resulting zip file must be loaded using the `load file` button in this sim
  */
 val evolveResourcePursuer = newSim { optionString ->
+
+    val foodTileId = 574
+    val foodTileType = "flower"
 
     val evaluatorParams = EvaluatorParams(
         populationSize = 100,
@@ -95,7 +98,7 @@ val evolveResourcePursuer = newSim { optionString ->
         val outputNeurons: NeuronCollection,
         val connections: List<Synapse>
     ) {
-        val thirstNeuron get() = driveNeurons.neuronList.first()
+        val hungerNeuron get() = driveNeurons.neuronList.first()
     }
 
     class EvolvePursuerGenotype(seed: Long = Random.nextLong()) : Genotype {
@@ -106,7 +109,7 @@ val evolveResourcePursuer = newSim { optionString ->
             add(nodeGene { clamped = true })
         }
         var driveChromosome = chromosome(1) {
-            add(nodeGene { clamped = true; upperBound = 100.0; lowerBound = 0.0; label = "Thirst" })
+            add(nodeGene { clamped = true; upperBound = 100.0; lowerBound = 0.0; label = "Hunger" })
             add(nodeGene { clamped = true; upperBound = 100.0; lowerBound = 0.0 })
         }
         var hiddenChromosome = chromosome(2) { add(nodeGene()) }
@@ -116,8 +119,8 @@ val evolveResourcePursuer = newSim { optionString ->
                 add(connectionGene(inputChromosome.sampleOne(), hiddenChromosome.sampleOne()))
                 add(connectionGene(hiddenChromosome.sampleOne(), outputChromosome.sampleOne()))
             }
-            val thirstGene = driveChromosome.first()
-            add(connectionGene(thirstGene, hiddenChromosome.sampleOne()))
+            val hungerGene = driveChromosome.first()
+            add(connectionGene(hungerGene, hiddenChromosome.sampleOne()))
         }
         var synapseRuleChromosome = chromosome(connectionChromosome.size) {
             add(synapseRuleGene())
@@ -260,8 +263,8 @@ val evolveResourcePursuer = newSim { optionString ->
     ) {
         fun computeCalories() = max(0.0, calories - (totalActivation + movement + baseMetabolism) * (1.0 / evaluatorParams.iterationsPerRun))
         fun OdorWorld.randomTileCoordinate() = with(tileMap) { random.nextGridCoordinate() }
-        fun OdorWorld.makeRandomLake(size: IntRange = 2..8) = with(tileMap) {
-            makeLake(randomTileCoordinate(), random.nextInt(size), random.nextInt(size), getLayer("Lake Layer"))
+        fun OdorWorld.makeFoodPatch(size: IntRange = 2..8) = with(tileMap) {
+            fillRect(foodTileId, randomTileCoordinate(), random.nextInt(size), random.nextInt(size), getLayer("Food Layer"))
         }
         fun generateEnergyText() = """
                             Calories: ${calories.format(2)}
@@ -288,30 +291,30 @@ val evolveResourcePursuer = newSim { optionString ->
                 movement = abs(evolvedAgent.speed * 3) + abs(evolvedAgent.dtheta * 2)
                 totalActivation = outputsActivations + allActivations
                 calories = simState.computeCalories()
-                thirstNeuron.activation += 10.0 / evaluatorParams.iterationsPerRun
-                fitness = calories - thirstNeuron.activation * 4
+                hungerNeuron.activation += 10.0 / evaluatorParams.iterationsPerRun
+                fitness = calories - hungerNeuron.activation * 4
             }
         }
 
 
-        // What to do when a cow finds water
-        workspace.addUpdateAction("water found") {
-            val thirstNeuron = phenotype.await().thirstNeuron
+        // What to do when a cow finds food
+        workspace.addUpdateAction("food $foodTileType found") {
+            val hungerNeuron = phenotype.await().hungerNeuron
             val odorWorld = (workspace.componentList.first { it is OdorWorldComponent } as OdorWorldComponent).world
             with(odorWorld) {
-                val centerLakeSensor = evolvedAgent.sensors.first { it is TileSensor && it.label == "Center Lake Sensor" } as TileSensor
-                val lakeLayer = tileMap.getLayer("Lake Layer")
+                val centerLakeSensor = evolvedAgent.sensors.first { it is TileSensor && it.label == "Center Food Sensor" } as TileSensor
+                val lakeLayer = tileMap.getLayer("Food Layer")
                 centerLakeSensor.let { sensor ->
-                    // Water found
+                    // Food found
                     if (sensor.currentValue > 0.5) {
-                        // Reset thirst
-                        thirstNeuron.activation = 0.0
-                        // Drink the sugar water
+                        // Reset hunger
+                        hungerNeuron.activation = 0.0
+                        // Eat the food
                         calories += 100.0
                         // Relocate the lake
                         tileMap.clear(lakeLayer)
                         with(simState) {
-                            makeRandomLake(2..8)
+                            makeFoodPatch(2..8)
                         }
                     }
                 }
@@ -347,8 +350,8 @@ val evolveResourcePursuer = newSim { optionString ->
                 fill("Grass1")
             }
         }
-        val lakeLayer = odorWorld.tileMap.run {
-            addLayer(createTileMapLayer("Lake Layer"))
+        val foodLayer = odorWorld.tileMap.run {
+            addLayer(createTileMapLayer("Food Layer"))
         }
 
         val evolvedAgent = OdorWorldEntity(odorWorld, EntityType.LION).also {
@@ -356,24 +359,24 @@ val evolveResourcePursuer = newSim { optionString ->
             it.location = point(100, 100)
         }
 
-        // Water sensors that can guide the agent
+        // Food sensors that can guide the agent
         val sensors = List(3) { index ->
-            TileSensor("water", radius = 60.0, angle = (index * 120.0)).apply {
+            TileSensor(foodTileType, radius = 60.0, angle = (index * 120.0)).apply {
                 decayFunction.dispersion = 250.0
             }.also {
                 evolvedAgent.addSensor(it)
             }
         }
 
-        // Central water sensor to determine when water is actually found.
-        val centerLakeSensor = TileSensor("water", radius = 0.0).apply {
+        // Central food sensor to determine when food is actually found.
+        val centerLakeSensor = TileSensor(foodTileType, radius = 0.0).apply {
             decayFunction.dispersion = EntityType.LION.imageWidth / 1.4
-            label = "Center Lake Sensor"
+            label = "Center Food Sensor"
         }.also { evolvedAgent.addSensor(it) }
 
         init {
             with(simState) {
-                odorWorld.makeRandomLake()
+                odorWorld.makeFoodPatch()
             }
 
             evolvedAgent.addDefaultEffectors()

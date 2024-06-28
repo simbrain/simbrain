@@ -1,7 +1,7 @@
 package org.simbrain.util
 
-import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.CustomTypeName
+import org.simbrain.util.propertyeditor.EditableObject
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 import kotlin.reflect.*
@@ -85,7 +85,7 @@ fun <O, T> KMutableProperty1<O, T>.invokeLegacySetter(receiver: O, value: Any?) 
     legacySetter.invoke(receiver, value)
 }
 
-val KClass<out CopyableObject>.displayName: String
+val KClass<out EditableObject>.displayName: String
     get() = if (hasAnnotation<CustomTypeName>()) {
         findAnnotation<CustomTypeName>()!!.name
     } else {

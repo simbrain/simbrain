@@ -98,6 +98,7 @@ class Projector(initialDimension: Int = 25) : EditableObject, CoroutineScope {
         return this
     }
 
+    override val name = "Projector"
 }
 
 fun main() {

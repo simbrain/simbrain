@@ -4,6 +4,7 @@ import org.simbrain.util.HSBInterpolate
 import org.simbrain.util.UserParameter
 import org.simbrain.util.math.SimbrainMath.max
 import org.simbrain.util.propertyeditor.CopyableObject
+import org.simbrain.util.propertyeditor.CustomTypeName
 import org.simbrain.util.toHSB
 import java.awt.Color
 import kotlin.math.min
@@ -51,6 +52,7 @@ val coloringManagerTypes = listOf(
 /**
  * "Null" coloring manager for when we don't use colors.
  */
+@CustomTypeName("None")
 class NoOpColoringManager: ColoringManager() {
 
 
@@ -74,14 +76,13 @@ class NoOpColoringManager: ColoringManager() {
         return NoOpColoringManager()
     }
 
-    override val name = "None"
-
 }
 
 
 /**
  * When activated a color goes to [Projector.hotColor] then decays to [Projector.baseColor] in a set number of steps.
  */
+@CustomTypeName("Decay")
 class DecayColoringManager: ColoringManager() {
 
     @UserParameter(label = "Steps", description = "Steps to base color", minimumValue = 0.0)
@@ -164,13 +165,12 @@ class DecayColoringManager: ColoringManager() {
         }
     }
 
-    override val name = "DecayColoringManager"
-
 }
 
 /**
  * Colors points so that more frequently visited points are colored hotter.
  */
+@CustomTypeName("Frequency")
 class FrequencyColoringManager: ColoringManager() {
 
     @UserParameter(label = "High frequency color", order = 10)
@@ -206,11 +206,9 @@ class FrequencyColoringManager: ColoringManager() {
 
     override fun copy() = FrequencyColoringManager()
 
-    override val name = "FrequencyColoringManager"
-
 }
 
-
+@CustomTypeName("Markov")
 class MarkovColoringManager: ColoringManager() {
 
     @UserParameter(label = "High frequency color", order = 10)
@@ -257,10 +255,9 @@ class MarkovColoringManager: ColoringManager() {
 
     override fun copy() = MarkovColoringManager()
 
-    override val name = "MarkovColoringManager"
-
 }
 
+@CustomTypeName("Halo")
 class HaloColoringManager: ColoringManager() {
 
     @UserParameter(label = "Radius", description = "Radius of the halo", minimumValue = 0.0)
@@ -310,7 +307,5 @@ class HaloColoringManager: ColoringManager() {
             it.radius = radius
         }
     }
-
-    override val name = "HaloColoringManager"
 
 }

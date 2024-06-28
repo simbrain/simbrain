@@ -313,5 +313,7 @@ val <O : EditableObject> AnnotatedPropertyEditor<APEObjectWrapper<O>>.wrapperWid
 
 /**
  * Currently used with [ObjectWidget] to customize the name in the dropdown.
+ *
+ * Use [EditableObject.name] if object based name is possible. Use this if class based access is required.
  */
 annotation class CustomTypeName(val name: String)

@@ -26,6 +26,10 @@ package org.simbrain.util.propertyeditor
  */
 interface EditableObject {
 
+    /**
+     * Name of this editable object (used in editor title bar and other locations)
+     * Use [CustomTypeName] if class based access is required.
+     */
     val name: String
         get() = "No-name (be sure getName() is overridden)"
 

@@ -92,10 +92,14 @@ val simulations = dir("Simulations", alphabetical = true ) {
     }
 
     dir("Competitive") {
-        item("Competitive Image Network") { competitiveImageSim }
-        item("Competitive Grid Network") { competitiveGridSim }
         item("Competitive Network (Simple)") { competitiveSim }
+        item("Competitive Grid Network") { competitiveGridSim }
+        item("Competitive Image Network") { competitiveImageSim }
         item("SOM Network") { SOMSim }
+    }
+
+    dir("Leabra") {
+        item("Point neuron") { pointNeuronSim }
     }
 
     dir("Hopfield and Boltzmann") {

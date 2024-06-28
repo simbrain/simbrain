@@ -287,7 +287,7 @@ class CompetitiveGroupParams : NeuronGroupParams() {
     @UserParameter(label = "Update method", order = 30)
     var updateMethod = DEFAULT_UPDATE_METHOD
 
-    @UserParameter(label = "Learning rate", order = 40)
+    @UserParameter(label = "Learning rate", order = 40, increment = .1)
     var learningRate = DEFAULT_LEARNING_RATE
 
     @UserParameter(label = "Winner Value", order = 50)

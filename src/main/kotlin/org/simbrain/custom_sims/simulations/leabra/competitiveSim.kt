@@ -27,14 +27,18 @@ val pointNeuronSim = newSim {
     }
     val inputNeuron2 = Neuron().apply {
         clamped = true
-        location = point(100, 40)
+        location = point(0, 40)
     }
     val pointNeuron = Neuron(PointNeuronRule()).apply{
-        location = point(50, 100)
+        location = point(50, 0)
     }
-    val weight1 = Synapse(inputNeuron1, pointNeuron)
-    val weight2 = Synapse(inputNeuron2, pointNeuron)
-    network.addNetworkModels(inputNeuron1, inputNeuron2, pointNeuron, weight1, weight2)
+    val weight1 = Synapse(inputNeuron1, pointNeuron).apply {
+        strength = 1.0
+    }
+    val weight2 = Synapse(inputNeuron2, pointNeuron).apply {
+        strength = -1.0
+    }
+    network.addNetworkModels(inputNeuron1, inputNeuron2, pointNeuron, weight1, weight2, usePlacementManager = false)
 
     // TODO: Time Series
 
@@ -43,11 +47,15 @@ val pointNeuronSim = newSim {
         place(networkComponent, 139, 10, 868, 619)
         createControlPanel("Control Panel", 5, 10) {
 
-            addButton("Pattern 1") {
-                print("Hello!")
+            addButton("Excitatory Input") {
+                inputNeuron1.activation = 1.0
+                inputNeuron2.activation = 0.0
+                workspace.iterateSuspend(10)
             }
-            addButton("Pattern 2") {
-                print("Hello 2")
+            addButton("Inhibitory Input") {
+                inputNeuron1.activation = 0.0
+                inputNeuron2.activation = 1.0
+                workspace.iterateSuspend(10)
             }
         }
     }

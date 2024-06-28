@@ -151,9 +151,9 @@ class EvaluatorParams(
     eliminationRatio: Double = 0.5,
     iterationsPerRun: Int = 100,
     maxGenerations: Int = 500,
-    percentile: Int = 5,
+    evaluationPercentile: Int = 5,
     var stoppingCondition: StoppingCondition = StoppingCondition.Fitness,
-    targetValue: Double,
+    targetMetric: Double,
     seed: Int = Random.nextInt()
 ): EditableObject {
 
@@ -193,13 +193,13 @@ class EvaluatorParams(
         } else {
             "Once the fitness is above this amount, the simulation is stopped"
         },
-        initValue = targetValue,
+        initValue = targetMetric,
         min = 0.0,
         order = 50
     )
 
     var evalutationPercentile by GuiEditable(
-        initValue = percentile,
+        initValue = evaluationPercentile,
         label = "Evaluation percentile",
         description = "When deciding whether to stop the simulation, consider current ${stoppingCondition.name.lowercase()} in this percentile of the population",
         min = 0,

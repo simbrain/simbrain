@@ -57,39 +57,39 @@ val evolveResourcePursuer = newSim { optionString ->
         eliminationRatio = 0.25,
         maxGenerations = 15,
         iterationsPerRun = 1000,
-        targetValue = 1000.0,
+        targetMetric = 1000.0,
+        evaluationPercentile = 5,
         seed = 42
     )
 
     class EvolutionParameters: EditableObject {
 
         var useConnectionStrategyGene by GuiEditable(
-            initValue = true,
+            initValue = false,
             description = "Whether to use the connection gene",
             order = 20
         )
 
         var useLearningRuleGenes by GuiEditable(
-            initValue = true,
+            initValue = false,
             description = "Whether to use the local learning rule gene",
             order = 30
         )
 
         var useHiddenLayerUpdateRuleGene by GuiEditable(
-            initValue = true,
+            initValue = false,
             description = "Whether to use the hidden layer activation function gene",
             order = 40
         )
 
-
         var useLayoutGene by GuiEditable(
-            initValue = true,
+            initValue = false,
             description = "Whether to use the layout gene",
             order = 50
         )
 
     }
-    val evaluationParams = EvolutionParameters()
+    val evolutionParams = EvolutionParameters()
 
     class EvolvePursuerPhenotype(
         val driveNeurons: NeuronCollection,
@@ -194,13 +194,20 @@ val evolveResourcePursuer = newSim { optionString ->
             hiddenChromosome.forEach {
                 it.mutate {
                     with(dataHolder as BiasedScalarData) {
-                        bias += random.nextDouble(-1.0, 1.0)
+                        bias += random.nextDouble(-.1, .1)
                     }
                 }
             }
 
+            // Mutate weights
+            connectionChromosome.forEach {
+                it.mutate {
+                    strength +=  random.nextDouble(-.1, .1)
+                }
+            }
+
             // Mutate learning rule
-            if (evaluationParams.useLearningRuleGenes) {
+            if (evolutionParams.useLearningRuleGenes) {
                 synapseRuleChromosome.forEach {
                     it.mutateParam()
                     it.mutateType()
@@ -225,26 +232,32 @@ val evolveResourcePursuer = newSim { optionString ->
             }
 
             // Mutate layout of hidden layer
-            if (evaluationParams.useLayoutGene) {
-                layoutChromosome.forEach {
-                    it.mutateParam()
-                    it.mutateType()
+            if (evolutionParams.useLayoutGene) {
+                if (random.nextDouble() < 0.1) {
+                    layoutChromosome.forEach {
+                        it.mutateParam()
+                        it.mutateType()
+                    }
                 }
             }
 
             // Mutate connection strategy
-            if (evaluationParams.useConnectionStrategyGene) {
-                connectionStrategyChromosome.forEach {
-                    it.mutateParam()
-                    it.mutateType()
+            if (evolutionParams.useConnectionStrategyGene) {
+                if (random.nextDouble() < 0.1) {
+                    connectionStrategyChromosome.forEach {
+                        it.mutateParam()
+                        it.mutateType()
+                    }
                 }
             }
 
             // Mutate update rule
-            if (evaluationParams.useHiddenLayerUpdateRuleGene) {
-                hiddenUpdateRuleChromosome.forEach {
-                    it.mutateParam(mutateBounds = false)
-                    it.mutateStandardTypes()
+            if (evolutionParams.useHiddenLayerUpdateRuleGene) {
+                if (random.nextDouble() < 0.1) {
+                    hiddenUpdateRuleChromosome.forEach {
+                        it.mutateParam(mutateBounds = false)
+                        it.mutateStandardTypes()
+                    }
                 }
             }
 
@@ -458,7 +471,7 @@ val evolveResourcePursuer = newSim { optionString ->
         workspace.clearWorkspace()
         val controlPanel = evaluatorParams.createControlPanel("Control Panel", 5, 10)
         controlPanel.addSeparator()
-        val propertyEditor = AnnotatedPropertyEditor(evaluationParams)
+        val propertyEditor = AnnotatedPropertyEditor(evolutionParams)
         controlPanel.addAnnotatedPropertyEditor(propertyEditor)
         evaluatorParams.addControlPanelButton("Evolve") {
             workspace.removeAllComponents()
@@ -522,10 +535,11 @@ val evolveResourcePursuer = newSim { optionString ->
         evaluatorParams.iterationsPerRun = options.optInt("iterationsPerRun", evaluatorParams.iterationsPerRun)
         evaluatorParams.populationSize = options.optInt("populationSize", evaluatorParams.populationSize)
         evaluatorParams.eliminationRatio = options.optDouble("eliminationRatio", evaluatorParams.eliminationRatio)
-        evaluationParams.useLayoutGene = options.optBoolean("useLayoutGene", evaluationParams.useLayoutGene)
-        evaluationParams.useLearningRuleGenes = options.optBoolean("useLearningRuleGenes", evaluationParams.useLearningRuleGenes)
-        evaluationParams.useConnectionStrategyGene = options.optBoolean("useConnectionStrategyGene", evaluationParams.useConnectionStrategyGene)
-        evaluationParams.useHiddenLayerUpdateRuleGene = options.optBoolean("useHiddenLayerUpdateRuleGene", evaluationParams.useHiddenLayerUpdateRuleGene)
+        evaluatorParams.evalutationPercentile = options.optInt("evaluationPercentile", evaluatorParams.evalutationPercentile)
+        evolutionParams.useLayoutGene = options.optBoolean("useLayoutGene", evolutionParams.useLayoutGene)
+        evolutionParams.useLearningRuleGenes = options.optBoolean("useLearningRuleGenes", evolutionParams.useLearningRuleGenes)
+        evolutionParams.useConnectionStrategyGene = options.optBoolean("useConnectionStrategyGene", evolutionParams.useConnectionStrategyGene)
+        evolutionParams.useHiddenLayerUpdateRuleGene = options.optBoolean("useHiddenLayerUpdateRuleGene", evolutionParams.useHiddenLayerUpdateRuleGene)
         runSim()
     }
 

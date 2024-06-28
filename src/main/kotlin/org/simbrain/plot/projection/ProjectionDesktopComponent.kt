@@ -33,7 +33,7 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
     val projector = component.projector
     override var coroutineContext = projector.coroutineContext
 
-    var running = false
+    private var running = false
 
     /**
      * Ordered list of [DataPoint] points so that the renderer can access points by index.
@@ -71,8 +71,7 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
         name = "Stop",
         description = "Stop"
     ) {
-        running = false
-        projector.events.stopIterating.fire()
+        stopIterating()
     }
 
     val prefsAction = createAction(
@@ -98,6 +97,7 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
         iconPath = "menu_icons/Eraser.png"
     ) {
         synchronized(projector.dataset) {
+            stopIterating()
             projector.dataset.kdTree.clear()
             projector.events.datasetChanged.fire()
             projector.events.datasetCleared.fire()
@@ -267,8 +267,7 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
         }
         projector.events.methodChanged.on { o, n ->
             projectionSelector.selectedItem = projectionMethods[n.javaClass]
-            running = false
-            projector.events.stopIterating.fire()
+            stopIterating()
             if (n is IterableProjectionMethod) {
                 topPanel.add(runToolbar)
                 bottomPanel.add(errorLabel)
@@ -288,6 +287,11 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
         launch {
             redrawAllPoints()
         }
+    }
+
+    private fun stopIterating() {
+        running = false
+        projector.events.stopIterating.fire()
     }
 
 }

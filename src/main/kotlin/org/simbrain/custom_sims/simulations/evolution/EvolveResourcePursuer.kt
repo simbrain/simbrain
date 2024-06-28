@@ -476,8 +476,14 @@ val evolveResourcePursuer = newSim { optionString ->
 
                 val driveNeurons = network.getModelByLabel<NeuronCollection>("drives")
                 val inputNeurons = network.getModelByLabel<NeuronCollection>("inputs")
-                val hiddenNeurons = network.getModels<NeuronCollection>().first { it.label?.startsWith("Layout") == true }
                 val outputNeurons = network.getModelByLabel<NeuronCollection>("outputs")
+                val hiddenNeurons = (network.getModels<NeuronCollection>() - setOf(driveNeurons, inputNeurons, outputNeurons))
+                    .also {
+                        if (it.size != 1) {
+                            throw Error("Expected exactly one neuron collection that is not 'drives', 'inputs' or 'outputs', but got ${it.size}: ${it.map(NeuronCollection::name)}")
+                        }
+                    }
+                    .first()
                 val connections = network.getModels<Synapse>().toList()
 
                 val energyTextObject = network.getModels<NetworkTextObject>().first()

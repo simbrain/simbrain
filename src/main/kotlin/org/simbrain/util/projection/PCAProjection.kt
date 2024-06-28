@@ -31,7 +31,7 @@ class PCAProjection: ProjectionMethod() {
             initialProjectionMethod.addPoint(dataset, point)
             return
         }
-        if (!freeze) {
+        if (!freeze || pca == null) {
             reFitPCA(dataset)
         }
         // Project the new point onto PCA components

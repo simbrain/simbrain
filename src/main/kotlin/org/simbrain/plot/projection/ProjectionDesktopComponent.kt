@@ -107,13 +107,41 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
     // Top stuff
     val projectionMethods = projectionTypes
         .associateWith { it.kotlin.primaryConstructor!!.call() }
-    val projectionSelector = JComboBox<ProjectionMethod>().apply {
+
+    private val freezingToggleButton = JToggleButton().apply {
+        icon = ResourceManager.getImageIcon("menu_icons/Clamp.png")
+        fun updateButton() {
+            val pcaProjection = projector.projectionMethod as? PCAProjection ?: return
+            val frozen = pcaProjection.freeze
+            isSelected = frozen
+            border = if (frozen) BorderFactory.createLoweredBevelBorder() else BorderFactory.createEmptyBorder()
+            val frozenText = if (frozen) "on" else "off"
+            toolTipText = "PCA 'freezing' is $frozenText"
+        }
+        updateButton()
+        addActionListener { e ->
+            (projector.projectionMethod as? PCAProjection)?.let { pcaProjection ->
+                val button = e.source as JToggleButton
+                pcaProjection.freeze = button.isSelected
+                updateButton()
+            }
+        }
+    }
+
+    private val projectionSelector: JComboBox<ProjectionMethod> = JComboBox<ProjectionMethod>().apply {
         maximumSize = Dimension(200, 100)
         projectionMethods.values.forEach {
             addItem(it)
         }.also {
             addActionListener {
-                projector.projectionMethod = (selectedItem as ProjectionMethod)
+                swingInvokeLater {
+                    projector.projectionMethod = (selectedItem as ProjectionMethod)
+                    if (projector.projectionMethod is PCAProjection) {
+                        mainToolbar.add(freezingToggleButton)
+                    } else {
+                        mainToolbar.remove(freezingToggleButton)
+                    }
+                }
             }
         }
         selectedItem = projectionMethods[projector.projectionMethod.javaClass]

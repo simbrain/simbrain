@@ -12,6 +12,7 @@ sealed class NeuronGroupParams: CopyableObject {
         initValue = 10,
         label = "Number of Neurons",
         onUpdate = { enableWidget(creationMode) },
+        conditionallyVisibleBy = NeuronGroupParams::creationMode
     )
 
     abstract fun create(): AbstractNeuronCollection

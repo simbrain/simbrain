@@ -308,8 +308,15 @@ class CompetitiveGroupParams : NeuronGroupParams() {
         order = 90
     )
 
-    @UserParameter(label = "Decay percent", description = "Percentage by which to decay synapses on each update for Alvarez-Squire update.", order = 100)
-    var synpaseDecayPercent = DEFAULT_DECAY_PERCENT
+    var synpaseDecayPercent by GuiEditable(
+        initValue = DEFAULT_DECAY_PERCENT,
+        label = "Decay percent",
+        description = "Percentage by which to decay synapses on each update for Alvarez-Squire update.",
+        onUpdate = {
+            enableWidget(widgetValue(::updateMethod) == CompetitiveGroup.UpdateMethod.ALVAREZ_SQUIRE)
+        },
+        order = 100
+    )
 
     override fun create(): CompetitiveGroup {
         return CompetitiveGroup(List(numNeurons) { Neuron() }, this)

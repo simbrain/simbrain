@@ -15,11 +15,6 @@ abstract class Connector(var source: Layer, var target: Layer) : NetworkModel(),
     override val events: ConnectorEvents = ConnectorEvents()
 
     /**
-     * Whether to render an image of this entity.
-     */
-    var isEnableRendering: Boolean = true
-
-    /**
      * If true render an image showing all weight strengths as pixels
      */
     var isShowWeights: Boolean = true

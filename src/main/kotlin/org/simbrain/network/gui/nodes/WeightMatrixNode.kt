@@ -19,7 +19,6 @@ import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import java.awt.RenderingHints
 import java.awt.event.ActionEvent
-import java.awt.image.BufferedImage
 import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
 import java.util.*
@@ -79,14 +78,11 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
      * Render the weight matrix to the [.imageBox].
      */
     private fun renderMatrixToImage() {
-        var img: BufferedImage? = null
-        if (weightMatrix.isEnableRendering) {
-            val pixelArray = (weightMatrix as WeightMatrix).weights
-            img = pixelArray.toSimbrainColorImage(
-                weightMatrix.weightMatrix.ncol(),
-                weightMatrix.weightMatrix.nrow()
-            )
-        }
+        val pixelArray = (weightMatrix as WeightMatrix).weights
+        val img = pixelArray.toSimbrainColorImage(
+            weightMatrix.weightMatrix.ncol(),
+            weightMatrix.weightMatrix.nrow()
+        )
         imageBox.image = img
     }
 

@@ -11,7 +11,6 @@ import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaosBitStream
 import org.simbrain.custom_sims.simulations.patterns_of_activity.KuramotoOscillators
 import org.simbrain.custom_sims.simulations.patterns_of_activity.cogMap3Objects
-import org.simbrain.custom_sims.simulations.test.lstmBlock
 import org.simbrain.util.StructureDir
 import org.simbrain.util.dir
 
@@ -72,6 +71,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
     }
 
     dir("Neuroscience") {
+        item("Spiking Neuron") { spikingNetwork }
         item("Cortical areas") { cortexKuramoto }
         // item("Hippocampus") { Hippocampus() }
         // item("Cerebellum") { Cerebellum() }
@@ -91,23 +91,33 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Evolve XOR") { evolveXor }
     }
 
-    // TODO: Disaggregate this into more meaningful submenus
-    dir("Demos") {
+    dir("Competitive") {
         item("Competitive Image Network") { competitiveImageSim }
         item("Competitive Grid Network") { competitiveGridSim }
         item("Competitive Network (Simple)") { competitiveSim }
+        item("SOM Network") { SOMSim }
+    }
+
+    dir("Hopfield and Boltzmann") {
+        item("Hopfield") { hopfieldSim }
         item("Restricted Boltzmann Machine") { rbmSim }
         item("Room Schema") { roomSchemaSim }
-        item("Projection") { projectionSim }
-        item("Hopfield") { hopfieldSim }
-        // item("SRN - Temporal XOR") { srnXORSim }
-        item("Recurrent network") { recurrentProjection }
-        item("SOM Network") { SOMSim }
+    }
+
+    dir("Machine Learning") {
         item("Iris Classifier") { irisClassifier }
+    }
+
+    dir("Projection") {
+        item("PCA Projection") { projectionSim }
+    }
+
+    dir("Other Demos") {
+        item("Recurrent network") { recurrentProjection }
+        // item("SRN - Temporal XOR") { srnXORSim }
         // item("Deep Net - Mnist") { deepNetSim }
-        item("Spiking Neuron") { spikingNetwork }
         // item("Mnist Images") { mnistSim }
-        item("LSTM") { lstmBlock() }
+        // item("LSTM") { lstmBlock() }
     }
 
     dir("Image World") {

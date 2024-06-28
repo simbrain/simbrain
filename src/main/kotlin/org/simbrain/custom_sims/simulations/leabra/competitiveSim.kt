@@ -23,11 +23,11 @@ val pointNeuronSim = newSim {
 
     val inputNeuron1 = Neuron().apply {
         clamped = true
-        location = point(0, 0)
+        location = point(0, -40)
     }
     val inputNeuron2 = Neuron().apply {
         clamped = true
-        location = point(100, 0)
+        location = point(100, 40)
     }
     val pointNeuron = Neuron(PointNeuronRule()).apply{
         location = point(50, 100)

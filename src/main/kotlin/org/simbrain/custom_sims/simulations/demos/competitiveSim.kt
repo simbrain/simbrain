@@ -1,4 +1,4 @@
-package org.simbrain.custom_sims.simulations
+package org.simbrain.custom_sims.simulations.demos
 
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.createControlPanel

@@ -21,10 +21,10 @@ import kotlin.math.sqrt
 
 val kAgentTrails = newSim {
 
-    val dispersion = 100.0
-    val mouseLocation = point(204.0, 343.0)
-    val cheeseLocation = point(200.0, 250.0)
-    val flowerLocation = point(330.0, 100.0)
+    val dispersion = 70.0
+    val mouseLocation = point(120.0, 245.0)
+    val cheeseLocation = point(120.0, 180.0)
+    val flowerLocation = point(200.0, 100.0)
     val fishLocation = point(50.0, 100.0)
 
     workspace.clearWorkspace()
@@ -89,9 +89,7 @@ val kAgentTrails = newSim {
     val odorWorldComponent = addOdorWorldComponent()
 
     withGui {
-        place(odorWorldComponent) {
-            location = point(629, 9)
-        }
+        place(odorWorldComponent,629, 9, 291, 315)
     }
 
     val odorWorld = odorWorldComponent.world.apply {

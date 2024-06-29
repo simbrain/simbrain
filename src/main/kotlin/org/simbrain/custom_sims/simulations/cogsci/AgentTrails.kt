@@ -89,7 +89,7 @@ val kAgentTrails = newSim {
     val odorWorldComponent = addOdorWorldComponent()
 
     withGui {
-        place(odorWorldComponent,629, 9, 291, 315)
+        place(odorWorldComponent,629, 9, 315, 383)
     }
 
     val odorWorld = odorWorldComponent.world.apply {

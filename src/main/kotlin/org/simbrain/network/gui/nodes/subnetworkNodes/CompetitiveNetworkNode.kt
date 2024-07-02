@@ -19,6 +19,8 @@
 package org.simbrain.network.gui.nodes.subnetworkNodes
 
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.network.gui.dialogs.createTrainOnPatternAction
+import org.simbrain.network.gui.dialogs.getUnsupervisedTrainingPanel
 import org.simbrain.network.gui.nodes.SubnetworkNode
 import org.simbrain.network.subnetworks.CompetitiveNetwork
 import org.simbrain.util.StandardDialog
@@ -32,8 +34,8 @@ import javax.swing.JPopupMenu
  *
  * @author Jeff Yoshimi
  */
-class CompetitiveNetworkNode(networkPanel: NetworkPanel?, group: CompetitiveNetwork?) :
-    SubnetworkNode(networkPanel, group) {
+class CompetitiveNetworkNode(networkPanel: NetworkPanel?, val competitiveNetwork: CompetitiveNetwork) :
+    SubnetworkNode(networkPanel, competitiveNetwork) {
     /**
      * Create a competitive Network PNode.
      *
@@ -43,11 +45,6 @@ class CompetitiveNetworkNode(networkPanel: NetworkPanel?, group: CompetitiveNetw
     init {
         setContextMenu()
     }
-
-    override val propertyDialog: StandardDialog?
-        get() = null
-    // return new CompetitiveTrainingDialog(getNetworkPanel(),
-    //         (CompetitiveNetwork) getSubnetwork());
 
     /**
      * Sets custom menu for Competitive Network node.
@@ -59,24 +56,23 @@ class CompetitiveNetworkNode(networkPanel: NetworkPanel?, group: CompetitiveNetw
         menu.add(renameAction)
         menu.add(removeAction)
         menu.addSeparator()
-        // menu.add(addInputRowAction);
-        // Action trainNet = new AbstractAction("Train on current pattern") {
-        //     public void actionPerformed(final ActionEvent event) {
-        //         CompetitiveNetwork net = ((CompetitiveNetwork) getSubnetwork());
-        //         net.update();
-        //     }
-        // };
-        // menu.add(trainNet);
+        menu.add(with(networkPanel.network) { competitiveNetwork.createTrainOnPatternAction() })
         menu.addSeparator()
         val randomizeNet: Action = object : AbstractAction("Randomize synapses") {
             override fun actionPerformed(event: ActionEvent) {
-                val net = (subnetwork as CompetitiveNetwork)
-                with(networkPanel.network) {
-                    net.competitive.randomize()
-                }
+                competitiveNetwork.randomize()
             }
         }
         menu.add(randomizeNet)
         setContextMenu(menu)
     }
+
+    private fun makeTrainerPanel() = with(networkPanel) {
+        getUnsupervisedTrainingPanel(competitiveNetwork) {
+            competitiveNetwork.trainOnCurrentPattern()
+        }
+    }
+
+    override val propertyDialog: StandardDialog
+        get() = makeTrainerPanel()
 }

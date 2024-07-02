@@ -15,8 +15,8 @@ package org.simbrain.network.trainers
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
-import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.events.TrainerEvents
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
@@ -28,7 +28,7 @@ interface UnsupervisedNetwork: EditableObject {
 
     var inputData: Matrix
 
-    val inputLayer: NeuronArray
+    val inputLayer: Layer
 
     val trainer: UnsupervisedTrainer
 

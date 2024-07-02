@@ -46,7 +46,6 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
      * Cache of neuron activation values.
      */
     @get:Producible(arrayDescriptionMethod = "getLabelArray")
-    @set:Consumable
     var activations: DoubleArray
         get() = neuronList
             .map { it.activation }
@@ -95,8 +94,13 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
         get() = // TODO: Performance drain? Consider caching this.
             Matrix.column(activations)
 
-    override fun addInputs(newInputs: Matrix) {
-        addInputs(newInputs.col(0))
+    override fun addInputs(inputs: Matrix) {
+        addInputs(inputs.col(0))
+    }
+
+    @Consumable
+    override fun applyActivations(activations: DoubleArray) {
+        this.activations = activations
     }
 
     /**

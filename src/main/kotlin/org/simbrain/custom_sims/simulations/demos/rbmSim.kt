@@ -34,7 +34,7 @@ val rbmSim = newSim {
 
     // Open with one set of activations (Pattern 1)
     // Open with one set of activations (Pattern 1)
-    rbm.visibleLayer.setActivations(input1)
+    rbm.visibleLayer.applyActivations(input1)
 
     // Set training set of rbm to these inputs
     rbm.inputData = Matrix.of(arrayOf(input1, input2, input3, input4, input5, input6))

@@ -18,10 +18,13 @@
  */
 package org.simbrain.network.subnetworks
 
+import org.simbrain.network.core.Network
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.neurongroups.CompetitiveGroup
 import org.simbrain.network.neurongroups.NeuronGroup
+import org.simbrain.network.trainers.UnsupervisedNetwork
+import org.simbrain.network.trainers.UnsupervisedTrainer
 import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.alignNetworkModels
@@ -29,6 +32,7 @@ import org.simbrain.network.util.offsetNeuronCollections
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
+import smile.math.matrix.Matrix
 
 /**
  * **CompetitiveNetwork** is a small network encompassing a Competitive
@@ -37,16 +41,24 @@ import org.simbrain.util.stats.ProbabilityDistribution
  *
  * @author Jeff Yoshimi
  */
-class CompetitiveNetwork : Subnetwork {
+class CompetitiveNetwork : Subnetwork, UnsupervisedNetwork {
 
     lateinit var competitive: CompetitiveGroup
 
-    lateinit var inputLayer: NeuronGroup
+    override lateinit var inputData: Matrix
+
+    val defaultRowsInputData = 10
+
+    override lateinit var inputLayer: NeuronGroup
+
+    override val trainer = UnsupervisedTrainer()
 
     lateinit var weights: SynapseGroup
 
     constructor(numInputNeurons: Int, numCompetitiveNeurons: Int): super() {
         this.label = "Competitive Network"
+
+        this.inputData = Matrix.rand(defaultRowsInputData, numInputNeurons)
 
         competitive = CompetitiveGroup(numCompetitiveNeurons)
         competitive.label = "Competitive Group"
@@ -71,6 +83,17 @@ class CompetitiveNetwork : Subnetwork {
 
         alignNetworkModels(inputLayer, competitive, Alignment.VERTICAL)
         offsetNeuronCollections(inputLayer, competitive, Direction.NORTH, 200.0)
+    }
+
+    context(Network) override fun trainOnInputData() {
+        inputData.toArray().forEach { row ->
+            inputLayer.activations = row
+            trainOnCurrentPattern()
+        }
+    }
+
+    context(Network) override fun trainOnCurrentPattern() {
+        this.update()
     }
 
     @XStreamConstructor

@@ -255,7 +255,7 @@ class LMSTrainer : SupervisedTrainer<LMSNetwork>() {
         }
         val targetVec = trainingSet.targets.rowVectorTransposed(rowNum)
         inputLayer.isClamped = true
-        inputLayer.setActivations(trainingSet.inputs.row(rowNum))
+        inputLayer.applyActivations(trainingSet.inputs.row(rowNum))
         update()
         val outputs = outputLayer.activations
         val rowError = targetVec.sub(outputs)
@@ -269,7 +269,7 @@ class BackpropTrainer : SupervisedTrainer<BackpropNetwork>() {
 
     context(Network)
     override fun BackpropNetwork.trainRow(rowNum: Int): Double {
-        inputLayer.setActivations(trainingSet.inputs.row(rowNum))
+        inputLayer.applyActivations(trainingSet.inputs.row(rowNum))
         val targetVec = trainingSet.targets.rowVectorTransposed(rowNum)
         wmList.forwardPass(inputLayer.activations)
         return wmList.backpropError(targetVec)

@@ -36,7 +36,7 @@ fun NetworkPanel.createTestInputPanel(layer: Layer)= createTestInputPanel(layer.
     if (layer is AbstractNeuronCollection && layer.isAllClamped) {
         layer.neuronList.activations = this.table.model.getCurrentDoubleRow()
     } else if (layer is NeuronArray && layer.isClamped) {
-        layer.setActivations(this.table.model.getCurrentDoubleRow().toDoubleArray())
+        layer.applyActivations(this.table.model.getCurrentDoubleRow().toDoubleArray())
     } else {
         layer.addInputs(this.table.model.getCurrentDoubleRow().toDoubleArray().toMatrix())
     }

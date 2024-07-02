@@ -28,7 +28,7 @@ class SRNTest {
             runBlocking {
                 srn.trainer.run { srn.train(5000) }
             }
-            srn.inputLayer.setActivations(DoubleArray(3) { 0.0 }.also { it[0] = 1.0 })
+            srn.inputLayer.applyActivations(DoubleArray(3) { 0.0 }.also { it[0] = 1.0 })
             srn.update()
             // Expecting 0,1,0
             // Assertions.assertArrayEquals()

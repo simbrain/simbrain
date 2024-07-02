@@ -68,6 +68,10 @@ abstract class Layer : LocatableModel(), AttributeContainer {
      */
     abstract fun addInputs(inputs: Matrix)
 
+    open fun applyActivations(activations: DoubleArray) {
+        throw RuntimeException("applyActivations not implemented")
+    }
+
     /**
      * A column vector of output values. For "single-layer" layers this is activations. For multi-layer cases it is the
      * output layer.

@@ -50,7 +50,7 @@ class NeuronCollectionTest {
 
     @Test
     void propagateCollectionActivations() {
-        nc1.setActivations(new double[]{1.0,-1.0});
+        nc1.applyActivations(new double[]{1.0,-1.0});
         net.update();
         assertArrayEquals(new double[]{1.0, -1.0}, nc2.getActivations());
     }

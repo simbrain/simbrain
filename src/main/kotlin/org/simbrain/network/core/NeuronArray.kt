@@ -209,8 +209,8 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
     }
 
     @Consumable
-    fun setActivations(newActivations: DoubleArray) {
-        activations = Matrix.column(newActivations)
+    override fun applyActivations(activations: DoubleArray) {
+        this.activations = Matrix.column(activations)
     }
 
     /**

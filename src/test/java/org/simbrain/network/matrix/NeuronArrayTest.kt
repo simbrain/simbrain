@@ -42,7 +42,7 @@ class NeuronArrayTest {
     @Test
     fun testExcitatoryInputs() {
         val na1 = NeuronArray(2)
-        na1.setActivations(doubleArrayOf(1.0, 1.0))
+        na1.applyActivations(doubleArrayOf(1.0, 1.0))
         val naTarget = NeuronArray(3)
         val wm1 = WeightMatrix(na1, naTarget)
         wm1.setWeights(doubleArrayOf(5.0, -1.0, 1.0, 1.0, -1.0, -1.0))
@@ -52,7 +52,7 @@ class NeuronArrayTest {
 
         // Add a second input array
         val na2 = NeuronArray(2)
-        na2.setActivations(doubleArrayOf(1.0, 1.0))
+        na2.applyActivations(doubleArrayOf(1.0, 1.0))
         val wm2 = WeightMatrix(na2, naTarget)
         wm2.setWeights(doubleArrayOf(1.0, 0.0, -1.0, -1.0, 1.0, 1.0))
         net.addNetworkModels(na2, wm2)
@@ -63,7 +63,7 @@ class NeuronArrayTest {
     @Test
     fun testInhibitoryInputs() {
         val na1 = NeuronArray(2)
-        na1.setActivations(doubleArrayOf(1.0, 1.0))
+        na1.applyActivations(doubleArrayOf(1.0, 1.0))
         val naTarget = NeuronArray(3)
         val wm1 = WeightMatrix(na1, naTarget)
         wm1.setWeights(doubleArrayOf(5.0, -1.0, 1.0, 1.0, -1.0, -1.0))
@@ -73,7 +73,7 @@ class NeuronArrayTest {
 
         // Add a second input array
         val na2 = NeuronArray(2)
-        na2.setActivations(doubleArrayOf(1.0, 1.0))
+        na2.applyActivations(doubleArrayOf(1.0, 1.0))
         val wm2 = WeightMatrix(na2, naTarget)
         wm2.setWeights(doubleArrayOf(1.0, 0.0, -1.0, -1.0, 1.0, 1.0))
         net.addNetworkModels(na2, wm2)

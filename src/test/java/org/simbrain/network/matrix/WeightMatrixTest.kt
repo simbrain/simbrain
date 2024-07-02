@@ -58,7 +58,7 @@ class WeightMatrixTest {
     @Test
     fun testMatrixProduct() {
         with(net) {
-            na1.setActivations(doubleArrayOf(1.0, 2.0))
+            na1.applyActivations(doubleArrayOf(1.0, 2.0))
             wm.setWeights(doubleArrayOf(1.0, 2.0, 3.0, 4.0))
             Assertions.assertArrayEquals(doubleArrayOf(5.0, 11.0), wm.psrMatrix.col(0), 0.0)
         }
@@ -67,7 +67,7 @@ class WeightMatrixTest {
 
     @Test
     fun testArrayToArray() {
-        na1.setActivations(doubleArrayOf(.5, -.5))
+        na1.applyActivations(doubleArrayOf(.5, -.5))
         wm.diagonalize()
         net.update() // input should be cleared and second array updated. This is buffered update.
         Assertions.assertArrayEquals(doubleArrayOf(0.0, 0.0), na1.activations.col(0), 0.0)
@@ -92,7 +92,7 @@ class WeightMatrixTest {
 
     @Test
     fun testExcitatoryOutputs() {
-        na1.setActivations(doubleArrayOf(1.0, 1.0))
+        na1.applyActivations(doubleArrayOf(1.0, 1.0))
         val na3 = NeuronArray(3)
         val wm2 = WeightMatrix(na1, na3)
         wm2.setWeights(doubleArrayOf(5.0, -1.0, 1.0, 1.0, -1.0, -1.0))
@@ -102,7 +102,7 @@ class WeightMatrixTest {
 
     @Test
     fun testInhibitoryOutputs() {
-        na1.setActivations(doubleArrayOf(1.0, 1.0))
+        na1.applyActivations(doubleArrayOf(1.0, 1.0))
         val na3 = NeuronArray(3)
         val wm2 = WeightMatrix(na1, na3)
         wm2.setWeights(doubleArrayOf(1.0, -2.0, 1.0, 1.0, -1.0, -1.0))
@@ -112,7 +112,7 @@ class WeightMatrixTest {
 
     @Test
     fun testArrayToNeuronGroup() {
-        na1.setActivations(doubleArrayOf(.5, -.5))
+        na1.applyActivations(doubleArrayOf(.5, -.5))
         val ng = NeuronGroup(2)
         val wm2 = WeightMatrix(na1, ng)
         wm2.diagonalize()

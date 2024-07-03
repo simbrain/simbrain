@@ -27,7 +27,6 @@ class PointNeuronRule : NeuronUpdateRule<PointNeuronScalarData, EmptyMatrixData>
     // TODO: Keep time varying conductances between 0 and 1, how to compute these
     // TODO: separate value for exponential decay or decays
     // TODO: How to clear data
-    // TODO: Why does main diffeq have minus sign
     // TOOD: Conditional enablings below
 
     @UserParameter(
@@ -51,6 +50,7 @@ class PointNeuronRule : NeuronUpdateRule<PointNeuronScalarData, EmptyMatrixData>
         label = "Excitatory Reversal",
         description = "Excitatory reversal potential field.",
         minimumValue = 0.0,
+        increment = 0.1,
         order = 10,
     )
     var excitatoryReversal: Double = 1.0
@@ -59,6 +59,7 @@ class PointNeuronRule : NeuronUpdateRule<PointNeuronScalarData, EmptyMatrixData>
         label = "Leak Reversal",
         description = "Determines the resting membrane potential.",
         minimumValue = 0.0,
+        increment = 0.1,
         order = 20,
     )
     var leakReversal: Double = 0.15
@@ -76,6 +77,7 @@ class PointNeuronRule : NeuronUpdateRule<PointNeuronScalarData, EmptyMatrixData>
         label = "Inhibitory Reversal",
         description = "Inhibitory reversal field.",
         minimumValue = 0.0,
+        increment = 0.1,
         order = 25
     )
     var inhibitoryReversal: Double = 0.15
@@ -192,29 +194,30 @@ class PointNeuronRule : NeuronUpdateRule<PointNeuronScalarData, EmptyMatrixData>
         data.excitatoryConductance =
             (1 - timeStep) * data.excitatoryConductance + timeStep * (getExcitatoryInputs(neuron))
 
-        // Calculate the excitatory current (p. 37 equation 2.5)
-        val excitatoryCurrent = data.excitatoryConductance * excitatoryMaxConductance * (data.membranePotential - excitatoryReversal)
+        // Calculate the excitatory current (p. 37 equation 2.5)v
+        val excitatoryCurrent = (data.excitatoryConductance * excitatoryMaxConductance) * (excitatoryReversal - data.membranePotential )
 
-        // Calculate the excitatory conductance using time averaging constant.
+        // Calculate the inhibitory conductance using time averaging constant.
         data.inhibitoryConductance =  (1 - timeStep) * data.inhibitoryConductance + timeStep * (getInhibitoryInputs(neuron))
 
         // Calculate the inhibitory current.
-        val inhibitoryCurrent = data.inhibitoryConductance * inhibitoryMaxConductance * (data.membranePotential - inhibitoryReversal)
+        val inhibitoryCurrent = (data.inhibitoryConductance * inhibitoryMaxConductance) * (inhibitoryReversal - data.membranePotential )
 
         // Calculate the leak current (p. 37 eq. 2.5)
-        val leakCurrent = leakConductance * (data.membranePotential - leakReversal)
+        val leakCurrent = leakConductance * (leakReversal - data.membranePotential )
 
         // Calculate the net current (p. 37 eq. 2.6)
         val netCurrent = leakCurrent + excitatoryCurrent + inhibitoryCurrent
 
         // Calculate the membrane potential given net current. (p.37 eq. 2.7)
-        data.membranePotential += timeStep * -netCurrent
+        data.membranePotential += timeStep * netCurrent
 
         statusString = """
             -----
             membrane potential ${data.membranePotential.roundToString(2)}
             excitatory conductance ${data.excitatoryConductance.roundToString(2)}
             inhibitory conductance ${data.inhibitoryConductance.roundToString(2)}
+            leak current ${leakCurrent.roundToString(2)}
         """.trimIndent()
 
         println(statusString)

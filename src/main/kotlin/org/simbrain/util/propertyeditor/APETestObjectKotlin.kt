@@ -10,6 +10,7 @@ import org.simbrain.util.displayInDialog
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 
+@APETabOder( "Main", "Test Tab")
 class APETestObjectKotlin: EditableObject {
 
     override var name by GuiEditable(

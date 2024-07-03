@@ -914,3 +914,6 @@ class ObjectWidget<O : EditableObject, T : CopyableObject>(
     }
 
 }
+
+@Target(AnnotationTarget.CLASS)
+annotation class APETabOder(vararg val tabs: String)

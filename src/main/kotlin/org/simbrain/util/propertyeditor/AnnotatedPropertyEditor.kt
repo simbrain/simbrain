@@ -10,6 +10,7 @@ import javax.swing.JTabbedPane
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.full.allSuperclasses
 import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.jvmErasure
 
@@ -144,8 +145,21 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
         labelledItemPanelsByTab.values.first()
     } else {
         JTabbedPane().also {
+
+            val tabs = editingObjects.first().let {
+                it::class.allSuperclasses + it::class
+            }.firstNotNullOfOrNull { it.findAnnotation<APETabOder>() }?.tabs?.toList() ?: listOf()
+
+            tabs.forEach { tab ->
+                labelledItemPanelsByTab[tab]?.let { panel ->
+                    it.addTab(tab, panel)
+                }
+            }
+
             labelledItemPanelsByTab.forEach { (tab, panel) ->
-                it.addTab(tab, panel)
+                if (tab !in tabs) {
+                    it.addTab(tab, panel)
+                }
             }
         }
     }.also { add(it) }

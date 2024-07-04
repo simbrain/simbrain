@@ -14,6 +14,7 @@ import org.simbrain.util.point
 import org.simbrain.util.showSaveDialog
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
+import org.simbrain.workspace.updater.updateAction
 import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.effectors.Effector
 import org.simbrain.world.odorworld.entities.EntityType

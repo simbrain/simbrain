@@ -4,7 +4,6 @@ import kotlinx.coroutines.awaitAll
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.couplingManager
 import org.simbrain.custom_sims.newSim
-import org.simbrain.custom_sims.updateAction
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.*
 import org.simbrain.network.layouts.GridLayout
@@ -15,6 +14,7 @@ import org.simbrain.network.util.SpikingScalarData
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.StepDecayFunction
 import org.simbrain.util.stats.distributions.NormalDistribution
+import org.simbrain.workspace.updater.updateAction
 import org.simbrain.world.odorworld.OdorWorldComponent
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.sensors.ObjectSensor

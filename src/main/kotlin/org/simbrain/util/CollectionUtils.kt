@@ -159,6 +159,18 @@ fun <T> ListIterator<T>.toSequence() = sequence {
     }
 }
 
+fun Collection<Double>.minMaxNormalize(): List<Double> {
+    val min = minOrNull() ?: 0.0
+    val max = maxOrNull() ?: 1.0
+    val range = max - min
+    return map { (it - min) / range }
+}
+
+fun Collection<Double>.normalize(): List<Double> {
+    val sum = sum()
+    return map { it / sum }
+}
+
 class CompletableDeferredHashMap<K, V : Any>(private val timeoutMillis: Long = 1000) {
     val map = ConcurrentHashMap<K, CompletableDeferred<V>>()
 

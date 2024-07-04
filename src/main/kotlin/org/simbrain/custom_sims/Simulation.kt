@@ -13,7 +13,6 @@ import org.simbrain.util.piccolo.loadTileMap
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.gui.SimbrainDesktop
-import org.simbrain.workspace.updater.UpdateAction
 import org.simbrain.world.imageworld.ImageWorldComponent
 import org.simbrain.world.odorworld.OdorWorldComponent
 import org.simbrain.world.textworld.TextWorldComponent
@@ -178,12 +177,5 @@ fun SimbrainDesktop.createControlPanel(name: String, x: Int, y: Int, config: Con
             it.pack()
             it.isVisible = true
         }
-}
-
-fun updateAction(description: String, longDescription: String = description, action: () -> Unit)
-        = object : UpdateAction(description, longDescription) {
-    override suspend fun run() {
-        action()
-    }
 }
 

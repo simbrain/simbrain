@@ -1,12 +1,16 @@
 package org.simbrain.custom_sims.simulations
 
-import org.simbrain.custom_sims.*
+import org.simbrain.custom_sims.addProjectionPlot2
+import org.simbrain.custom_sims.addTextWorld
+import org.simbrain.custom_sims.newSim
+import org.simbrain.custom_sims.readSimulationFileContents
 import org.simbrain.util.div
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.util.projection.DataPoint
 import org.simbrain.util.projection.HaloColoringManager
 import org.simbrain.util.projection.PCAProjection
+import org.simbrain.workspace.updater.updateAction
 import org.simbrain.world.textworld.EmbeddingType
 import org.simbrain.world.textworld.TokenEmbeddingBuilder
 

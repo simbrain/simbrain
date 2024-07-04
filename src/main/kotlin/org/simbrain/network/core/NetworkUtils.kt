@@ -204,12 +204,11 @@ suspend fun Network.addNeurons(numNeurons: Int, template: suspend Neuron.() -> U
     return neurons
 }
 
-fun Network.addNeuron(block: Neuron.() -> Unit = { }) = Neuron()
-    .apply(this::addNetworkModel)
+suspend fun Network.addNeuron(usePlacementManager: Boolean = false, block: Neuron.() -> Unit = { }) = Neuron()
     .also(block)
+    .also { addNetworkModel(it, usePlacementManager)?.await() }
 
-@JvmOverloads
-fun Network.addNeuron(x: Int, y: Int, block: Neuron.() -> Unit = { }) = addNeuron(block)
+suspend fun Network.addNeuron(x: Int, y: Int, usePlacementManager: Boolean = false, block: Neuron.() -> Unit = { }) = addNeuron(usePlacementManager, block)
     .also{ it.location = point(x,y) }
 
 fun Network.addSynapse(source: Neuron, target: Neuron, block: Synapse.() -> Unit = { }) = Synapse(source, target)
@@ -220,10 +219,10 @@ suspend fun Network.addNeuronGroup(count: Int, location: Point2D? = null, templa
     return NeuronGroup(List(count) {
         Neuron().apply(template)
     }).also {
-        addNetworkModel(it)?.await()
+        addNetworkModel(it, usePlacementManager = false)?.await()
         if (location != null) {
             val (x, y) = location
-            it.setLocation(x, y)
+            it.location = point(x, y)
         }
     }
 }

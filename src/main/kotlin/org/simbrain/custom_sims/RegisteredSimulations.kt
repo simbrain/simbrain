@@ -3,8 +3,8 @@ package org.simbrain.custom_sims
 import org.simbrain.custom_sims.simulations.*
 import org.simbrain.custom_sims.simulations.behaviorism.ClassicalConditioning
 import org.simbrain.custom_sims.simulations.behaviorism.OperantConditioning
-import org.simbrain.custom_sims.simulations.behaviorism.OperantWithEnvironment
 import org.simbrain.custom_sims.simulations.behaviorism.SimpleOperant
+import org.simbrain.custom_sims.simulations.behaviorism.operantWithEnvironment
 import org.simbrain.custom_sims.simulations.braitenberg.RandomizedPursuer
 import org.simbrain.custom_sims.simulations.cortex.cortexSimple
 import org.simbrain.custom_sims.simulations.demos.competitiveSim
@@ -55,7 +55,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Simple Operant") { SimpleOperant() }
         item("Classical Conditioning") { ClassicalConditioning() }
         item("Operant Conditioning") { OperantConditioning() }
-        item("Operant With Environment") { OperantWithEnvironment() }
+        item("Operant With Environment") { operantWithEnvironment }
     }
 
     dir("Cognitive Maps") {

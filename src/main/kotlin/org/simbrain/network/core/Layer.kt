@@ -87,18 +87,6 @@ abstract class Layer : LocatableModel(), AttributeContainer {
         get() = DoubleArray(outputSize())
 
     /**
-     * x coordinate of center of layer.
-     */
-    var x = 0.0
-        private set
-
-    /**
-     * y coordinate of center of layer.
-     */
-    var y = 0.0
-        private set
-
-    /**
      * Width of layer. Mainly used by graphica arrows drawn to represent [Connector]s.
      */
     open var width = 0.0
@@ -164,11 +152,9 @@ abstract class Layer : LocatableModel(), AttributeContainer {
         return this
     }
 
-    override var location: Point2D
-        get() = Point2D.Double(x, y)
+    override var location: Point2D = Point2D.Double()
         set(location) {
-            x = location.x
-            y = location.y
+            field.setLocation(location)
             events.locationChanged.fire()
         }
 }

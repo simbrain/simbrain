@@ -13,6 +13,7 @@ import org.simbrain.util.projection.PCAProjection
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.workspace.updater.UpdateComponent
 import org.simbrain.workspace.updater.UpdateCoupling
+import org.simbrain.workspace.updater.updateAction
 import java.util.*
 
 /**

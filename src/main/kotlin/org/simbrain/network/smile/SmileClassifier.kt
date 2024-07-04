@@ -45,7 +45,7 @@ class SmileClassifier(
     override var outputs = Matrix(classifier.outputSize, 1)
 
     override val bound: Rectangle2D
-        get() = Rectangle2D.Double(x - width / 2, y - height / 2, width, height)
+        get() = Rectangle2D.Double(locationX - width / 2, locationY - height / 2, width, height)
     
     /**
      * Train the classifier using the current training data.

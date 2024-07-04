@@ -151,7 +151,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
 
     override val bound: Rectangle2D
         get() = Rectangle2D.Double(
-            x - width / 2, y - height / 2,
+            locationX - width / 2, locationY - height / 2,
             width, height
         )
 
@@ -169,7 +169,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
      * @param offsetY y offset for translation.
      */
     fun offset(offsetX: Double, offsetY: Double) {
-        setLocation(x + offsetX, y + offsetY)
+        setLocation(locationX + offsetX, locationY + offsetY)
         events.updated.fire()
     }
 

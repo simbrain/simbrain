@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations
 
+import kotlinx.coroutines.runBlocking
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.addNeuron
@@ -37,33 +38,43 @@ val braitenbergSim = newSim {
             addDefaultEffectors()
         }
 
-        val leftInput = network.addNeuron(0, 100).apply {
-            label = "$entityType (L)"
-            clamped = true
+        val leftInput = runBlocking {
+            network.addNeuron(0, 100).apply {
+                label = "$entityType (L)"
+                clamped = true
+            }
         }
 
-        val rightInput = network.addNeuron(100, 100).apply {
-            label = "$entityType (R)"
-            clamped = true
+        val rightInput = runBlocking {
+            network.addNeuron(100, 100).apply {
+                label = "$entityType (R)"
+                clamped = true
+            }
         }
 
-        val straight = network.addNeuron(50, 0).apply {
-            label = "Speed"
-            activation = 1.0
-            clamped = true
+        val straight = runBlocking {
+            network.addNeuron(50, 0).apply {
+                label = "Speed"
+                activation = 1.0
+                clamped = true
+            }
         }
 
-        val leftTurn = network.addNeuron(0, 0).apply {
-            label = "Left"
-            lowerBound = -200.0
-            upperBound = 200.0
+        val leftTurn = runBlocking {
+            network.addNeuron(0, 0).apply {
+                label = "Left"
+                lowerBound = -200.0
+                upperBound = 200.0
+            }
         }
-        val rightTurn: Neuron = network.addNeuron(100, 0).apply {
-            label = "Right"
-            lowerBound = -200.0
-            upperBound = 200.0
-        }
+        val rightTurn: Neuron = runBlocking {
+            network.addNeuron(100, 0).apply {
+                label = "Right"
+                lowerBound = -200.0
+                upperBound = 200.0
+            }
 
+        }
         val leftSynapse = network.addSynapse(leftInput, leftTurn)
 
         val rightSynapse = network.addSynapse(rightInput, rightTurn)

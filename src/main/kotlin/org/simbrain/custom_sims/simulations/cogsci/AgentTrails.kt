@@ -11,6 +11,7 @@ import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.util.projection.DataPoint
 import org.simbrain.util.projection.HaloColoringManager
+import org.simbrain.workspace.updater.updateAction
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.sensors.SmellSensor
 import java.awt.geom.Point2D

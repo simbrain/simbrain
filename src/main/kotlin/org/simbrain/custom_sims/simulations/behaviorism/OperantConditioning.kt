@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations.behaviorism
 
+import kotlinx.coroutines.runBlocking
 import org.simbrain.custom_sims.Simulation
 import org.simbrain.custom_sims.helper_classes.ControlPanel
 import org.simbrain.network.NetworkComponent
@@ -63,15 +64,19 @@ class OperantConditioning : Simulation {
         stimulusNet.setIncrement(1.0)
 
         // Reward and punish nodes
-        rewardNeuron = net.addNeuron(
-            stimulusNet.maxX.toInt() + 100,
-            stimulusNet.centerY.toInt()
-        )
+        rewardNeuron = runBlocking {
+            net.addNeuron(
+                stimulusNet.maxX.toInt() + 100,
+                stimulusNet.centerY.toInt()
+            )
+        }
         rewardNeuron.label = "Food Pellet"
-        punishNeuron = net.addNeuron(
-            rewardNeuron.x.toInt() + 100,
-            stimulusNet.centerY.toInt()
-        )
+        punishNeuron = runBlocking {
+            net.addNeuron(
+                rewardNeuron.x.toInt() + 100,
+                stimulusNet.centerY.toInt()
+            )
+        }
         punishNeuron.label = "Shock"
 
         // Set base text for behavior labels

@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations.braitenberg
 
+import kotlinx.coroutines.runBlocking
 import org.simbrain.custom_sims.helper_classes.SimulationUtils
 import org.simbrain.network.core.*
 import org.simbrain.world.odorworld.effectors.StraightMovement
@@ -72,27 +73,27 @@ class Vehicle
 
         // These have to be updated first to update properly
         // unless priority is used
-        val leftInput = net.addNeuron(x, y + 100)
+        val leftInput = runBlocking { net.addNeuron(x, y + 100) }
         leftInput.label = "$objectType (L)"
         leftInput.clamped = true
         neurons.add(leftInput)
 
-        val rightInput = net.addNeuron(x + 100, y + 100)
+        val rightInput = runBlocking { net.addNeuron(x + 100, y + 100) }
         rightInput.label = "$objectType (R)"
         rightInput.clamped = true
         neurons.add(rightInput)
 
-        val leftTurn = net.addNeuron(x, y)
+        val leftTurn = runBlocking { net.addNeuron(x, y) }
         leftTurn.label = "Left"
         neurons.add(leftTurn)
 
-        val straight = net.addNeuron(x + 50, y)
+        val straight = runBlocking { net.addNeuron(x + 50, y) }
         straight.label = "Speed"
         straight.activation = 3.0
         straight.clamped = true
         neurons.add(straight)
 
-        val rightTurn = net.addNeuron(x + 100, y)
+        val rightTurn = runBlocking { net.addNeuron(x + 100, y) }
         rightTurn.label = "Right"
         neurons.add(rightTurn)
 

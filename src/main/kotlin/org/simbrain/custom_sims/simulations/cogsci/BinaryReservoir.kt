@@ -13,6 +13,7 @@ import org.simbrain.util.*
 import org.simbrain.util.Utils.FS
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.stats.distributions.TwoValued
+import org.simbrain.workspace.updater.updateAction
 import java.io.File
 import java.lang.Math.sqrt
 import javax.swing.JTextField

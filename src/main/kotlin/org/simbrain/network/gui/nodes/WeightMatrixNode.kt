@@ -245,7 +245,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
 
     inner class WeightMatrixInteractionBox : InteractionBox(networkPanel) {
 
-        override val propertyDialog: JDialog = this@WeightMatrixNode.propertyDialog
+        override val propertyDialog: StandardDialog = this@WeightMatrixNode.propertyDialog
 
         override val model: Connector
             get() = weightMatrix

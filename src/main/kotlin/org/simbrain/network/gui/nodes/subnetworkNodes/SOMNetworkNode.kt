@@ -22,9 +22,7 @@ import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.nodes.SubnetworkNode
 import org.simbrain.network.subnetworks.SOMNetwork
 import org.simbrain.util.StandardDialog
-import java.awt.event.ActionEvent
-import javax.swing.AbstractAction
-import javax.swing.Action
+import org.simbrain.util.createAction
 import javax.swing.JPopupMenu
 
 /**
@@ -32,48 +30,24 @@ import javax.swing.JPopupMenu
  *
  * @author jyoshimi
  */
-class SOMNetworkNode(networkPanel: NetworkPanel?, group: SOMNetwork?) : SubnetworkNode(networkPanel, group) {
-    /**
-     * Create a SOM Network PNode.
-     *
-     * @param networkPanel parent panel
-     * @param group        the SOM network
-     */
-    init {
-        setContextMenu()
-    }
+class SOMNetworkNode(networkPanel: NetworkPanel, group: SOMNetwork) : SubnetworkNode(networkPanel, group) {
 
     override val propertyDialog: StandardDialog?
         get() = null
     // return new SOMTrainingDialog(getNetworkPanel(),
     //                 (SOMNetwork) getSubnetwork());
 
-    /**
-     * Sets custom menu for SOM Network node.
-     */
-    private fun setContextMenu() {
-        val menu = JPopupMenu()
-        editAction.putValue("Name", "Edit / Train SOM...")
-        menu.add(editAction)
-        menu.add(renameAction)
-        menu.add(removeAction)
-        menu.addSeparator()
-        // menu.add(addInputRowAction);
-        // Action trainNet = new AbstractAction("Train on current pattern") {
-        //     public void actionPerformed(final ActionEvent event) {
-        //         SOMNetwork net = ((SOMNetwork) getSubnetwork());
-        //         net.update();
-        //     }
-        // };
-        // menu.add(trainNet);
-        menu.addSeparator()
-        val randomizeNet: Action = object : AbstractAction("Randomize synapses") {
-            override fun actionPerformed(event: ActionEvent) {
-                val net = (subnetwork as SOMNetwork)
-                net.som.randomizeIncomingWeights()
-            }
+    override val contextMenu: JPopupMenu
+        get() = JPopupMenu().apply {
+            add(createEditAction("Edit / Train SOM..."))
+            applyDefaultActions()
+            addSeparator()
+            add(createAction("Train on current pattern") {
+                (subnetwork as SOMNetwork).som.update()
+            })
+            addSeparator()
+            add(createAction("Randomize synapses") {
+                (subnetwork as SOMNetwork).som.randomizeIncomingWeights()
+            })
         }
-        menu.add(randomizeNet)
-        setContextMenu(menu)
-    }
 }

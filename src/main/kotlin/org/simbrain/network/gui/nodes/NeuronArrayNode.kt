@@ -427,7 +427,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             return contextMenu
         }
 
-    override val propertyDialog: JDialog
+    override val propertyDialog: StandardDialog
         get() = neuronArray.createEditorDialog { updateInfoText() }
 
     override val model: NeuronArray

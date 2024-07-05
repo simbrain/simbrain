@@ -24,9 +24,7 @@ import org.simbrain.network.gui.dialogs.getUnsupervisedTrainingPanel
 import org.simbrain.network.gui.nodes.SubnetworkNode
 import org.simbrain.network.subnetworks.CompetitiveNetwork
 import org.simbrain.util.StandardDialog
-import java.awt.event.ActionEvent
-import javax.swing.AbstractAction
-import javax.swing.Action
+import org.simbrain.util.createAction
 import javax.swing.JPopupMenu
 
 /**
@@ -34,38 +32,20 @@ import javax.swing.JPopupMenu
  *
  * @author Jeff Yoshimi
  */
-class CompetitiveNetworkNode(networkPanel: NetworkPanel?, val competitiveNetwork: CompetitiveNetwork) :
-    SubnetworkNode(networkPanel, competitiveNetwork) {
-    /**
-     * Create a competitive Network PNode.
-     *
-     * @param networkPanel parent panel
-     * @param group        the competitive network
-     */
-    init {
-        setContextMenu()
-    }
+class CompetitiveNetworkNode(networkPanel: NetworkPanel, val competitiveNetwork: CompetitiveNetwork)
+    : SubnetworkNode(networkPanel, competitiveNetwork) {
 
-    /**
-     * Sets custom menu for Competitive Network node.
-     */
-    private fun setContextMenu() {
-        val menu = JPopupMenu()
-        editAction.putValue("Name", "Edit / Train Competitive...")
-        menu.add(editAction)
-        menu.add(renameAction)
-        menu.add(removeAction)
-        menu.addSeparator()
-        menu.add(with(networkPanel.network) { competitiveNetwork.createTrainOnPatternAction() })
-        menu.addSeparator()
-        val randomizeNet: Action = object : AbstractAction("Randomize synapses") {
-            override fun actionPerformed(event: ActionEvent) {
+    override val contextMenu: JPopupMenu
+        get() = JPopupMenu().apply {
+            add(createEditAction("Edit / Train Competitive..."))
+            applyDefaultActions()
+            addSeparator()
+            add(with(networkPanel.network) { competitiveNetwork.createTrainOnPatternAction() })
+            addSeparator()
+            add(createAction("Randomize synapses") {
                 competitiveNetwork.randomize()
-            }
+            })
         }
-        menu.add(randomizeNet)
-        setContextMenu(menu)
-    }
 
     private fun makeTrainerPanel() = with(networkPanel) {
         getUnsupervisedTrainingPanel(competitiveNetwork) {

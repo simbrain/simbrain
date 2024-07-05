@@ -30,21 +30,12 @@ import javax.swing.JPopupMenu
  */
 class BackpropNetworkNode(networkPanel: NetworkPanel, private val bp: BackpropNetwork):
     SubnetworkNode(networkPanel, bp) {
-    init {
-        setContextMenu()
-    }
 
-    /**
-     * Sets custom menu.
-     */
-    private fun setContextMenu() {
-        val menu = JPopupMenu()
-        editAction.putValue("Name", "Edit / Train Backprop...")
-        menu.add(editAction)
-        menu.add(renameAction)
-        menu.add(removeAction)
-        setContextMenu(menu)
-    }
+    override val contextMenu: JPopupMenu
+        get() = JPopupMenu().apply {
+            add(createEditAction("Edit / Train Backprop..."))
+            applyDefaultActions()
+        }
 
     override val propertyDialog: StandardDialog
         get() = with(networkPanel) { bp.getSupervisedTrainingDialog() }

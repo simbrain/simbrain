@@ -25,9 +25,10 @@ import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PBounds
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.util.StandardDialog
 import org.simbrain.util.display
+import org.simbrain.util.int
 import java.awt.event.InputEvent
-import javax.swing.JDialog
 import javax.swing.JPopupMenu
 import javax.swing.SwingUtilities
 
@@ -83,7 +84,7 @@ abstract class ScreenElement protected constructor(val networkPanel: NetworkPane
     /**
      * Return a property dialog for this screen element, or null if it does not have one.
      */
-    open val propertyDialog: JDialog?
+    open val propertyDialog: StandardDialog?
         get() = null
 
     /**
@@ -95,11 +96,8 @@ abstract class ScreenElement protected constructor(val networkPanel: NetworkPane
          */
         private fun showContextMenu(event: PInputEvent) {
             event.isHandled = true
-            if (contextMenu != null) {
-                val canvasPosition = event.canvasPosition
-                // networkPanel.getPlacementManager().setLastClickedPosition(canvasPosition);
-                contextMenu?.show(networkPanel.canvas, canvasPosition.x.toInt(), canvasPosition.y.toInt())
-            }
+            val (x, y) = event.canvasPosition.int
+            contextMenu?.show(networkPanel.canvas, x, y)
         }
 
         override fun mousePressed(event: PInputEvent) {

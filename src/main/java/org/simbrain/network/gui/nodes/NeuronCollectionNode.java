@@ -191,7 +191,7 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
         }
 
         @Override
-        public JDialog getPropertyDialog() {
+        public StandardDialog getPropertyDialog() {
             return NeuronCollectionNode.this.getPropertyDialog();
         }
 

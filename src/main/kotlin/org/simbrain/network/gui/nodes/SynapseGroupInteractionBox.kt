@@ -23,9 +23,13 @@ import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.WeightMatrixViewer
 import org.simbrain.network.gui.createCouplingMenu
 import org.simbrain.network.gui.getDialog
+import org.simbrain.util.StandardDialog
 import org.simbrain.util.createAction
 import org.simbrain.util.displayInDialog
-import javax.swing.*
+import javax.swing.JMenu
+import javax.swing.JMenuItem
+import javax.swing.JOptionPane
+import javax.swing.JPopupMenu
 
 
 class SynapseGroupInteractionBox(
@@ -34,7 +38,7 @@ class SynapseGroupInteractionBox(
     val synapseGroupNode: SynapseGroupNode
 ) : InteractionBox(networkPanel) {
 
-    override val propertyDialog: JDialog
+    override val propertyDialog: StandardDialog
         get() = synapseGroupNode.getDialog()
 
     override val model: SynapseGroup

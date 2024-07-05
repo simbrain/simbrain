@@ -37,7 +37,6 @@ import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Font
 import java.awt.geom.Point2D
-import javax.swing.JDialog
 import javax.swing.JPopupMenu
 
 /**
@@ -390,7 +389,7 @@ class NeuronNode(net: NetworkPanel, val neuron: Neuron) : ScreenElement(net) {
     override val contextMenu: JPopupMenu
         get() = networkPanel.neuronContextMenu
 
-    override val propertyDialog: JDialog?
+    override val propertyDialog: StandardDialog?
         get() = networkPanel.neuronDialog
 
     /**

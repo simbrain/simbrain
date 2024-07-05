@@ -26,7 +26,6 @@ import org.simbrain.util.*
 import java.awt.event.ActionEvent
 import java.util.stream.Collectors
 import javax.swing.AbstractAction
-import javax.swing.JDialog
 import javax.swing.JPopupMenu
 import javax.swing.text.*
 
@@ -142,7 +141,7 @@ open class TextNode(
         pStyledText.offset = -pStyledText.bounds.center2D
     }
 
-    override val propertyDialog: JDialog?
+    override val propertyDialog: StandardDialog?
         get() = textEntryDialog(textObject.text, "Edit Text", 20, 5) { text ->
             textObject.text = text
             update()

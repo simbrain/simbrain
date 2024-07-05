@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.nodes.subnetworkNodes;
 
+import org.jetbrains.annotations.Nullable;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.gui.nodes.ScreenElementActions;
 import org.simbrain.network.gui.nodes.SubnetworkNode;
@@ -51,7 +52,6 @@ public class HopfieldNode extends SubnetworkNode {
         super(networkPanel, group);
         hopfield = group;
         // setStrokePaint(Color.green);
-        setContextMenu();
         // setOutlinePadding(15f);
     }
 
@@ -61,15 +61,12 @@ public class HopfieldNode extends SubnetworkNode {
         // return new HopfieldEditTrainDialog(getNetworkPanel(), (Hopfield) getSubnetwork());
     }
 
-    /**
-     * Sets custom menu for Hopfield node.
-     */
-    private void setContextMenu() {
+    @Nullable
+    @Override
+    public JPopupMenu getContextMenu() {
         JPopupMenu menu = new JPopupMenu();
-        editAction.putValue("Name", "Edit / Train Hopfield...");
-        menu.add(editAction);
-        menu.add(renameAction);
-        menu.add(removeAction);
+        menu.add(createEditAction("Edit / Train Hopfield..."));
+        applyDefaultActions(menu);
         menu.addSeparator();
         // menu.add(addInputRowAction);
         Action trainNet = new AbstractAction("Train on current pattern") {
@@ -106,7 +103,7 @@ public class HopfieldNode extends SubnetworkNode {
                         hopfield.getNeuronGroup().getNeuronList().size());
         menu.add(imageInput);
 
-        setContextMenu(menu);
+        return menu;
     }
 
 }

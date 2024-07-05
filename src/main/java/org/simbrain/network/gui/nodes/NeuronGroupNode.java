@@ -240,7 +240,7 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
         }
 
         @Override
-        public JDialog getPropertyDialog() {
+        public StandardDialog getPropertyDialog() {
             return NeuronGroupNode.this.getPropertyDialog();
         }
 

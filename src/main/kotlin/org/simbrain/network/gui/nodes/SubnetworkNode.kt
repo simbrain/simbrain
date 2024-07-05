@@ -16,117 +16,66 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.gui.nodes;
+package org.simbrain.network.gui.nodes
 
-import org.jetbrains.annotations.Nullable;
-import org.piccolo2d.PNode;
-import org.simbrain.network.core.LocatableModel;
-import org.simbrain.network.core.NetworkModel;
-import org.simbrain.network.events.LocationEvents;
-import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.network.gui.dialogs.network.SubnetworkPanel;
-import org.simbrain.network.subnetworks.Subnetwork;
-import org.simbrain.util.ResourceManager;
-import org.simbrain.util.StandardDialog;
-import org.simbrain.util.piccolo.Outline;
-
-import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Set;
-
-import static org.simbrain.util.GeomKt.plus;
-import static org.simbrain.util.SwingUtilsKt.getSwingDispatcher;
+import org.simbrain.network.core.LocatableModel
+import org.simbrain.network.core.NetworkModel
+import org.simbrain.network.events.LocationEvents
+import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.network.subnetworks.Subnetwork
+import org.simbrain.util.*
+import org.simbrain.util.piccolo.Outline
+import javax.swing.*
 
 /**
  * PNode representation of a subnetwork. This class contains an interaction box
- * an {@link Outline} node (containing neuron groups and synapse groups)
+ * an [Outline] node (containing neuron groups and synapse groups)
  * as children. The outlinedobjects node draws the boundary around the contained
  * nodes. The interaction box is the point of contact. Layout happens in the
  * overridden layoutchildren method.
  *
  * @author Jeff Yoshimi
  */
-public class SubnetworkNode extends ScreenElement {
-
-    /**
-     * Parent network panel.
-     */
-    private final NetworkPanel networkPanel;
-
-    /**
-     * Reference to the subnet being represented.
-     */
-    private final Subnetwork subnetwork;
+open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork) : ScreenElement(networkPanel) {
 
     /**
      * The interaction box for this neuron group.
      */
-    private SubnetworkNodeInteractionBox interactionBox;
+    private var interactionBox: SubnetworkNodeInteractionBox
 
     /**
      * The outlined objects (neuron and synapse groups) for this node.
      */
-    private final Outline outline = new Outline();
-
-    /**
-     * Custom context menu for subnetwork.
-     */
-    private JPopupMenu contextMenu;
+    val outline: Outline = Outline()
 
     /**
      * The outlined objects
      */
-    private final Set<ScreenElement> outlinedObjects = new LinkedHashSet<>();
+    private val outlinedObjects: MutableSet<ScreenElement> = LinkedHashSet()
 
-    private ScreenElement infoTextNode;
+    private var infoTextNode: ScreenElement? = null
 
-    /**
-     * Create a subnetwork node.
-     *
-     * @param networkPanel parent panel
-     * @param subnet       the layered network
-     */
-    public SubnetworkNode(NetworkPanel networkPanel, Subnetwork subnet) {
-        super(networkPanel);
-        this.networkPanel = networkPanel;
-        this.subnetwork = subnet;
-        interactionBox = new SubnetworkNodeInteractionBox(networkPanel);
-        interactionBox.setText(subnetwork.getDisplayName());
-        addChild(outline);
-        addChild(interactionBox);
-
-        setContextMenu(this.getDefaultContextMenu());
-
-        LocationEvents events = subnetwork.getEvents();
-        events.getDeleted().on(getSwingDispatcher(), n -> removeFromParent());
-        events.getLabelChanged().on(getSwingDispatcher(), (o, n) -> updateText());
-        events.getLocationChanged().on(getSwingDispatcher(), this::layoutChildren);
-    }
-
-    @Override
-    public void layoutChildren() {
-        updateOutline();
-        interactionBox.setOffset(outline.getFullBounds().getX()
-                        + Outline.ARC_SIZE / 2,
-                outline.getFullBounds().getY() - interactionBox.getFullBounds().getHeight() + 1);
+    public override fun layoutChildren() {
+        updateOutline()
+        interactionBox.setOffset(
+            outline.fullBounds.getX()
+                    + Outline.ARC_SIZE / 2,
+            outline.fullBounds.getY() - interactionBox.fullBounds.getHeight() + 1
+        )
     }
 
     /**
      * Need to maintain a list of nodes which are outlined
      */
-    public void addNode(ScreenElement node) {
-        outlinedObjects.add(node);
-        node.getModel().getEvents().getDeleted().on(getSwingDispatcher(), sg -> {
-            outlinedObjects.remove(node);
-            outline.resetOutlinedNodes(outlinedObjects);
-        });
-        if (node.getModel() instanceof LocatableModel locatableModel) {
-            locatableModel.getEvents().getLocationChanged().fire();
+    fun addNode(node: ScreenElement) {
+        outlinedObjects.add(node)
+        node.model.events.deleted.on(swingDispatcher) {
+            outlinedObjects.remove(node)
+            outline.resetOutlinedNodes(outlinedObjects)
         }
+        (node.model as? LocatableModel)?.events?.locationChanged?.fire()
 
-        updateOutline();
+        updateOutline()
     }
 
     /**
@@ -134,167 +83,124 @@ public class SubnetworkNode extends ScreenElement {
      *
      * @param newBox the newBox to set.
      */
-    protected void setInteractionBox(SubnetworkNodeInteractionBox newBox) {
-        this.removeChild(interactionBox);
-        this.interactionBox = newBox;
-        this.addChild(interactionBox);
-        updateText();
+    protected fun setInteractionBox(newBox: SubnetworkNodeInteractionBox) {
+        this.removeChild(interactionBox)
+        this.interactionBox = newBox
+        this.addChild(interactionBox)
+        updateText()
     }
 
     /**
      * Update the text in the interaction box.
      */
-    public void updateText() {
-        interactionBox.setText(subnetwork.getDisplayName());
+    fun updateText() {
+        interactionBox.setText(subnetwork.displayName)
     }
 
-    @Override
-    public NetworkModel getModel() {
-        return subnetwork;
+    override val model: NetworkModel
+        get() = subnetwork
+
+    override val isDraggable: Boolean
+        get() = true
+
+    override val contextMenu: JPopupMenu?
+        get() = defaultContextMenu
+
+    protected val defaultContextMenu: JPopupMenu = JPopupMenu().applyDefaultActions()
+
+    protected fun JPopupMenu.applyDefaultActions(): JPopupMenu = apply {
+        add(renameAction)
+        add(removeAction)
     }
 
-    /**
-     * Get reference to model subnetwork.
-     *
-     * @return the subnetwork represented here.
-     */
-    public Subnetwork getSubnetwork() {
-        return subnetwork;
+    protected fun JPopupMenu.applyBasicActions() = apply {
+        add(networkPanel.networkActions.cutAction)
+        add(networkPanel.networkActions.copyAction)
+        add(networkPanel.networkActions.pasteAction)
+        addSeparator()
+
+        // Edit Submenu
+        add(networkPanel.createAction(name = "Edit network") {
+            propertyDialog?.display()
+        })
+        add(networkPanel.networkActions.deleteAction)
+        addSeparator()
     }
 
-    public Outline getOutline() {
-        return outline;
-    }
-
-    @Override
-    public boolean isDraggable() {
-        return true;
-    }
-
-    /**
-     * Helper class to create the subnetwork dialog. Subclasses override this
-     * class to create custom property dialogs.
-     *
-     * @return the neuron group property dialog.
-     */
-    public StandardDialog getPropertyDialog() {
-
-        StandardDialog dialog = new StandardDialog() {
-            private final SubnetworkPanel panel;
-
-            {
-                panel = new SubnetworkPanel(networkPanel, SubnetworkNode.this.getSubnetwork(), this);
-                setContentPane(panel);
-            }
-
-            @Override
-            protected void closeDialogOk() {
-                super.closeDialogOk();
-            }
-        };
-        return dialog;
-    }
-
-    @Nullable
-    @Override
-    public JPopupMenu getContextMenu() {
-        return contextMenu;
-    }
-
-    /**
-     * Set a custom context menu for the interaction box.
-     *
-     * @param menu the menu to set
-     */
-    public void setContextMenu(final JPopupMenu menu) {
-        contextMenu = menu;
-    }
-
-    /**
-     * Creates default actions for all model group nodes.
-     *
-     * @return context menu populated with default actions.
-     */
-    protected JPopupMenu getDefaultContextMenu() {
-        JPopupMenu ret = new JPopupMenu();
-
-        ret.add(renameAction);
-        ret.add(removeAction);
-        return ret;
-    }
-
-    /**
-     * Action for invoking the default edit and properties menu.
-     */
-    protected Action editAction = new AbstractAction("Edit...") {
-        public void actionPerformed(final ActionEvent event) {
-            StandardDialog dialog = getPropertyDialog();
-            if (dialog != null) {
-                dialog.pack();
-                dialog.setLocationRelativeTo(null);
-                dialog.setVisible(true);
-            }
+    protected fun createEditAction(name: String) = createAction(name = name) {
+        propertyDialog?.run {
+            pack()
+            setLocationRelativeTo(null)
+            isVisible = true
         }
-    };
+    }
 
     /**
      * Action for editing the group name.
      */
-    protected Action renameAction = new AbstractAction("Rename...") {
-        public void actionPerformed(final ActionEvent event) {
-            String newName = JOptionPane.showInputDialog("Name:", subnetwork.getLabel());
-            subnetwork.setLabel(newName);
-        }
-    };
+    protected val <T: JComponent> T.renameAction get() = createAction(
+        name = "Rename..."
+    ) {
+        val newName = JOptionPane.showInputDialog("Name:", subnetwork.label)
+        subnetwork.label = newName
+    }
+
+    protected val <T: JComponent> T.removeAction get() = createAction(
+        name = "Remove Network...",
+        iconPath = "menu_icons/RedX_small.png",
+        description = "Remove this subnetwork..."
+    ) {
+        subnetwork.delete()
+    }
 
     /**
-     * Action for removing this group
+     * Create a subnetwork node.
+     *
+     * @param networkPanel parent panel
+     * @param subnet       the layered network
      */
-    protected Action removeAction = new AbstractAction() {
+    init {
+        interactionBox = SubnetworkNodeInteractionBox(networkPanel)
+        interactionBox.setText(subnetwork.displayName)
+        addChild(outline)
+        addChild(interactionBox)
 
-        {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/RedX_small.png"));
-            putValue(NAME, "Remove Network...");
-            putValue(SHORT_DESCRIPTION, "Remove this subnetwork...");
-        }
+        val events: LocationEvents = subnetwork.events
+        events.deleted.on(swingDispatcher) { removeFromParent() }
+        events.labelChanged.on(swingDispatcher) { _, _ -> updateText() }
+        events.locationChanged.on(swingDispatcher) { this.layoutChildren() }
+    }
 
-        @Override
-        public void actionPerformed(ActionEvent arg0) {
-            subnetwork.delete();
-        }
-    };
-
-    @Override
-    public void offset(double dx, double dy) {
-        for (PNode node : outlinedObjects) {
-            if (node instanceof NeuronGroupNode) {
-                node.offset(dx, dy);
-            } else if (node instanceof NeuronArrayNode) {
-                node.offset(dx, dy);
+    override fun offset(dx: kotlin.Double, dy: kotlin.Double) {
+        for (node in outlinedObjects) {
+            if (node is NeuronGroupNode) {
+                node.offset(dx, dy)
+            } else if (node is NeuronArrayNode) {
+                node.offset(dx, dy)
             }
         }
         if (infoTextNode != null) {
-            infoTextNode.offset(dx, dy);
+            infoTextNode!!.offset(dx, dy)
         }
-        outline.resetOutlinedNodes(outlinedObjects);
+        outline.resetOutlinedNodes(outlinedObjects)
     }
 
-    private void updateOutline() {
-        var nodes = new HashSet<ScreenElement>(outlinedObjects);
+    private fun updateOutline() {
+        val nodes = HashSet(outlinedObjects)
         if (infoTextNode != null) {
-            nodes.add(infoTextNode);
+            nodes.add(infoTextNode!!)
         }
-        outline.resetOutlinedNodes(nodes);
+        outline.resetOutlinedNodes(nodes)
     }
 
-    public void setInfoTextNode(ScreenElement infoTextNode) {
-        var offset = subnetwork.getLocation();
-        var infoTextInitLocation = ((LocatableModel) infoTextNode.getModel()).getLocation();
-        var finalLocation = plus(infoTextInitLocation, offset);
-        this.infoTextNode = infoTextNode;
-        ((LocatableModel) infoTextNode.getModel()).setLocation(finalLocation.getX(), finalLocation.getY());
-        subnetwork.getEvents().getCustomInfoUpdated().on(getSwingDispatcher(), this::updateOutline);
-        updateOutline();
+    fun setInfoTextNode(infoTextNode: ScreenElement) {
+        val offset = subnetwork.location
+        val infoTextInitLocation = (infoTextNode.model as LocatableModel).location
+        val finalLocation = infoTextInitLocation.plus(offset)
+        this.infoTextNode = infoTextNode
+        (infoTextNode.model as LocatableModel).setLocation(finalLocation.x, finalLocation.y)
+        subnetwork.events.customInfoUpdated.on(swingDispatcher) { this.updateOutline() }
+        updateOutline()
     }
 
 
@@ -302,28 +208,15 @@ public class SubnetworkNode extends ScreenElement {
      * Basic interaction box for subnetwork nodes. Ensures a property dialog
      * appears when the box is double-clicked.
      */
-    public class SubnetworkNodeInteractionBox extends InteractionBox {
+    inner class SubnetworkNodeInteractionBox(net: NetworkPanel?) : InteractionBox(net) {
 
-        public SubnetworkNodeInteractionBox(NetworkPanel net) {
-            super(net);
-        }
+        override val contextMenu: JPopupMenu?
+            get() = this@SubnetworkNode.contextMenu
 
-        @Override
-        public JDialog getPropertyDialog() {
-            return SubnetworkNode.this.getPropertyDialog();
-        }
+        override val propertyDialog: StandardDialog?
+            get() = this@SubnetworkNode.propertyDialog
 
-        @Override
-        public JPopupMenu getContextMenu() {
-            return SubnetworkNode.this.getContextMenu();
-        }
-
-        @Override
-        public Subnetwork getModel() {
-            return SubnetworkNode.this.getSubnetwork();
-        }
-
+        override val model: NetworkModel
+            get() = this@SubnetworkNode.subnetwork
     }
-
-
 }

@@ -35,12 +35,12 @@ import org.simbrain.network.gui.dialogs.NetworkPreferences.zeroWeightColor
 import org.simbrain.network.gui.nodes.NeuronNode.Companion.spikingColor
 import org.simbrain.network.gui.synapseContextMenu
 import org.simbrain.network.gui.synapseDialog
+import org.simbrain.util.StandardDialog
 import java.awt.Color
 import java.awt.geom.Arc2D
 import java.awt.geom.Area
 import java.awt.geom.Line2D
 import java.awt.geom.Point2D
-import javax.swing.JDialog
 import javax.swing.JPopupMenu
 import kotlin.math.abs
 import kotlin.math.atan
@@ -400,7 +400,7 @@ class SynapseNode(
             // return contextMenu;
             networkPanel.synapseContextMenu
 
-    override val propertyDialog: JDialog
+    override val propertyDialog: StandardDialog
         get() = networkPanel.synapseDialog
 
     /**

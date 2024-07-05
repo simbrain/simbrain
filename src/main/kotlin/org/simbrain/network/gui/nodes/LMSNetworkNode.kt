@@ -27,30 +27,18 @@ class LMSNetworkNode(networkPanel: NetworkPanel, private val lmsNet: LMSNetwork)
         get() = lmsNet.toString()
 
     override val contextMenu: JPopupMenu
-        get() {
-            val contextMenu = JPopupMenu()
-            contextMenu.add(networkPanel.networkActions.cutAction)
-            contextMenu.add(networkPanel.networkActions.copyAction)
-            contextMenu.add(networkPanel.networkActions.pasteAction)
-            contextMenu.addSeparator()
-
-            // Edit Submenu
-            contextMenu.add(networkPanel.createAction(name = "Edit network") {
-                propertyDialog.display()
-            })
-            contextMenu.add(networkPanel.networkActions.deleteAction)
-            contextMenu.addSeparator()
+        get() = JPopupMenu().apply {
+            applyBasicActions()
 
             // Train Submenu
-            contextMenu.add(networkPanel.createAction(name = "Train network") {
+            add(networkPanel.createAction(name = "Train network") {
                 lmsNet.getSupervisedTrainingDialog().display()
             })
 
             // Coupling menu
-            contextMenu.addSeparator()
-            contextMenu.add(CouplingMenu(networkPanel.networkComponent, lmsNet))
+            addSeparator()
+            add(CouplingMenu(networkPanel.networkComponent, lmsNet))
 
-            return contextMenu
         }
 
     override val propertyDialog: StandardDialog

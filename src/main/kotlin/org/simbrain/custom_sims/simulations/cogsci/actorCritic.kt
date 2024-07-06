@@ -57,7 +57,7 @@ val actorCritic = newSim {
     val odorWorldComponent = addOdorWorldComponent("World")
     val world = odorWorldComponent.world.apply {
         isObjectsBlockMovement = false
-        wrapAround = true
+        wrapAround = false
     }
 
     val tileSize = world.height / numTilesInADimension
@@ -139,8 +139,8 @@ val actorCritic = newSim {
         events.componentMinimized.fire(true)
     }
     val rewardPlot = couplingManager.createCoupling(reward, plot.model.addScalarTimeSeries("Reward"))
-    val valuePlot = couplingManager.createCoupling(value, plot.model.addScalarTimeSeries("TD Error"))
-    val errorPlot = couplingManager.createCoupling(tdError, plot.model.addScalarTimeSeries("Value"))
+    val valuePlot = couplingManager.createCoupling(value, plot.model.addScalarTimeSeries("Value"))
+    val errorPlot = couplingManager.createCoupling(tdError, plot.model.addScalarTimeSeries("TD Error"))
 
     // Network Update
     network.updateManager.clear()
@@ -155,25 +155,32 @@ val actorCritic = newSim {
             outputs.update()
         }
 
-        tdError.activation = (reward.activation + gamma * value.activation) - value.lastActivation
+        // aux values are used to store the last activation of the neuron
+        tdError.activation = (reward.activation + gamma * value.activation) - value.auxValue
 
         // Reinforce based on the source neuron's last activation (not its
         // current value), since that is what the current td error reflects.
         value.fanIn.forEach { syn ->
-            syn.strength += alpha * tdError.activation * syn.source.lastActivation
+            syn.strength += alpha * tdError.activation * syn.source.auxValue
             syn.strength = syn.clip(syn.strength)
         }
 
         // Update all actor neurons. Reinforce input > output connection that
         // were active at the last time-step.
         outputs.neuronList
-            .filter { it.lastActivation > 0 }
+            .filter { it.auxValue > 0 }
             .flatMap { it.fanIn }
-            .filter { it.source.lastActivation > 0 }
+            .filter { it.source.auxValue > 0 }
             .forEach { syn ->
-                syn.strength += alpha * tdError.activation * syn.source.lastActivation
+                syn.strength += alpha * tdError.activation * syn.source.auxValue
                 syn.strength = syn.clip(syn.strength)
             }
+
+        // set aux values to last activations
+        tdError.auxValue = tdError.activation
+        value.auxValue = value.activation
+        outputs.neuronList.forEach { it.auxValue = it.activation }
+        sensorNeurons.neuronList.forEach { it.auxValue = it.activation }
     })
 
     // Workspace update

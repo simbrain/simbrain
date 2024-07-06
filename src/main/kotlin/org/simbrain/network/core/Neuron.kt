@@ -100,7 +100,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
     @set:Consumable(defaultVisibility = false, customPriorityMethod = "setActivationCouplingPriority")
     var activation = 0.0
         set(value) {
-            lastActivation = field
+            val lastActivation = field
             field = value
             events.activationChanged.fire(lastActivation, value)
         }
@@ -201,12 +201,6 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
             fanOut.values.filterNotNull().forEach { s -> s.strength = field.value(s.strength) }
             events.colorChanged.fire()
         }
-
-    /**
-     * Memory of last activation.
-     */
-    var lastActivation: Double = 0.0
-        private set
 
     /**
      * Sequence in which the update function should be called for this neuron.

@@ -18,11 +18,11 @@ import javax.swing.JOptionPane
  */
 val recurrentProjection = newSim {
 
-    val numNeurons: Int = JOptionPane.showInputDialog(
+    val numNeurons: Int = (JOptionPane.showInputDialog(
         null,
         "Number of Neurons:",
         "25"
-    ).toInt()
+    ) ?: "25").toInt()
 
     // Basic setup
     workspace.clearWorkspace()

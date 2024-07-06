@@ -127,6 +127,16 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
     private boolean gridVisibility = true;
 
     /**
+     * Whether to draw the sensor grid in GridSensorNode.
+     */
+    @UserParameter(
+            label = "Highlighter Visibility",
+            description = "Show sensor grid high lighter when this is set to true, hide when set to false false",
+            order = 13
+    )
+    private boolean highlighterVisibility = true;
+
+    /**
      * Construct a tile sensor.
      *
      * @param x      upper left
@@ -255,6 +265,10 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
 
     public boolean getGridVisibility() {
         return gridVisibility;
+    }
+
+    public boolean getHighlighterVisibility() {
+        return highlighterVisibility;
     }
 
     @Override

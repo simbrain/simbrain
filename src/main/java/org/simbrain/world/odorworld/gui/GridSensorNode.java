@@ -22,29 +22,34 @@ public class GridSensorNode extends EntityAttributeNode {
     private GridSensor sensor;
 
     /**
-     * A cached grid width for comparision to see if the graphics need to be updated.
+     * A cached grid width for comparison to see if the graphics need to be updated.
      */
     private double gridWidth;
 
     /**
-     * A cached grid height for comparision to see if the graphics need to be updated.
+     * A cached grid height for comparison to see if the graphics need to be updated.
      */
     private double gridHeight;
 
     /**
-     * A cached grid column count for comparision to see if the graphics need to be updated.
+     * A cached grid column count for comparison to see if the graphics need to be updated.
      */
     private int gridColumns;
 
     /**
-     * A cached grid row count for comparision to see if the graphics need to be updated.
+     * A cached grid row count for comparison to see if the graphics need to be updated.
      */
     private int gridRows;
 
     /**
-     * A cached visibility value for comparision to see if the graphics need to be updated.
+     * A cached visibility value for comparison to see if the graphics need to be updated.
      */
     private boolean gridVisibility;
+
+    /**
+     * A cached visibility value for comparison to see if the graphics need to be updated.
+     */
+    private boolean highlighterVisibility;
 
     /**
      * The shape of this node
@@ -82,6 +87,7 @@ public class GridSensorNode extends EntityAttributeNode {
         this.gridColumns = sensor.getColumns();
         this.gridRows = sensor.getRows();
         this.gridVisibility = sensor.getGridVisibility();
+        this.highlighterVisibility = sensor.getHighlighterVisibility();
     }
 
     /**
@@ -94,7 +100,8 @@ public class GridSensorNode extends EntityAttributeNode {
             && this.gridHeight == sensor.getHeight()
             && this.gridColumns == sensor.getColumns()
             && this.gridRows == sensor.getRows()
-            && this.gridVisibility == sensor.getGridVisibility();
+            && this.gridVisibility == sensor.getGridVisibility()
+            && this.highlighterVisibility == sensor.getHighlighterVisibility();
     }
 
     /**
@@ -108,6 +115,7 @@ public class GridSensorNode extends EntityAttributeNode {
                 double x = (i % sensor.getColumns()) * sensor.getWidth();
                 double y = (i / sensor.getRows()) * sensor.getHeight();
                 PPath newGrid = PPath.createRectangle(x, y, sensor.getWidth(), sensor.getHeight());
+                newGrid.setPaint(new Color(0, 0, 0, 0));
                 highlightedGrids.add(newGrid);
                 addChild(newGrid);
                 newGrid.setPickable(false);
@@ -117,7 +125,7 @@ public class GridSensorNode extends EntityAttributeNode {
     }
 
     private void updateGrid() {
-        if (sensor.getGridVisibility()) {
+        if (sensor.getHighlighterVisibility()) {
             double dx = sensor.getX();
             double dy = sensor.getY();
             // double dx = sensor.getX() - sensor.getParent().getX();

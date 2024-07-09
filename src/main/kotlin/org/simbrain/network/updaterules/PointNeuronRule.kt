@@ -5,6 +5,7 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.PointNeuronScalarData
 import org.simbrain.util.UserParameter
+import org.simbrain.util.propertyeditor.APETabOder
 import org.simbrain.util.roundToString
 import org.simbrain.util.stats.ProbabilityDistribution
 import java.util.*
@@ -21,9 +22,9 @@ import kotlin.math.abs
  * should be the leak reversal.
  * 
  */
+@APETabOder( "Main", "Conductances")
 class PointNeuronRule : NeuronUpdateRule<PointNeuronScalarData, EmptyMatrixData>() {
 
-    // TODO: main tab first
     // TODO: Keep time varying conductances between 0 and 1, how to compute these
     // TODO: separate value for exponential decay or decays
     // TODO: How to clear data

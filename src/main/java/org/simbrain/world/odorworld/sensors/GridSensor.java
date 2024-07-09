@@ -267,6 +267,10 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
         return gridVisibility;
     }
 
+    public void setHighlighterVisibility(boolean highlighterVisibility) {
+        this.highlighterVisibility = highlighterVisibility;
+    }
+
     public boolean getHighlighterVisibility() {
         return highlighterVisibility;
     }

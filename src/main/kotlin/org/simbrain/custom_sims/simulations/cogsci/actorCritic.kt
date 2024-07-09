@@ -94,7 +94,10 @@ val actorCritic = newSim {
     }
 
     val gridSensor =
-        GridSensor(0, 0, (world.width / numTilesInADimension).toInt(), (world.height / numTilesInADimension).toInt())
+        GridSensor(0, 0,
+            (world.width / numTilesInADimension).toInt(),
+            (world.height / numTilesInADimension).toInt())
+    gridSensor.highlighterVisibility = false
     mouse.addSensor(gridSensor)
 
     val sensorNeurons = network.addNeuronGroup(

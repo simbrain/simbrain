@@ -11,6 +11,7 @@ import org.simbrain.network.layouts.GridLayout
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.util.projection.PCAProjection
+import org.simbrain.util.showNumericInputDialog
 import javax.swing.JOptionPane
 
 /**
@@ -18,11 +19,7 @@ import javax.swing.JOptionPane
  */
 val recurrentProjection = newSim {
 
-    val numNeurons: Int = (JOptionPane.showInputDialog(
-        null,
-        "Number of Neurons:",
-        "25"
-    ) ?: "25").toInt()
+    val numNeurons = showNumericInputDialog("Number of Neurons:", 25)?:return@newSim
 
     // Basic setup
     workspace.clearWorkspace()

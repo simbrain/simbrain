@@ -335,6 +335,10 @@ class CouplingManager(val workspace: Workspace) {
         attributeContainerCouplings.remove(attributeContainer)
     }
 
+    fun clear() {
+        removeCouplings(_couplings.toList())
+    }
+
 }
 
 

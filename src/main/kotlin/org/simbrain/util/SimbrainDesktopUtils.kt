@@ -199,9 +199,12 @@ suspend fun SimbrainDesktop.loadWorkspaceZipFromFileChooser(): Boolean {
     val simulationChooser = SFileChooser(workspace.currentDirectory, "Zip Archive", "zip")
     val simFile = simulationChooser.showOpenDialog()
     val serializer = WorkspaceSerializer(workspace)
+
+    // not calling clearWorkspace because control panels created by simulations should be left in place
     if (simFile != null) {
         workspace.removeAllComponents()
         workspace.updater.updateManager.reset()
+        workspace.couplingManager.clear()
         withContext(Dispatchers.IO) {
             serializer.deserialize(FileInputStream(simFile))
         }

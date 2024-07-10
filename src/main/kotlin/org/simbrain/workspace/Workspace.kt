@@ -99,8 +99,7 @@ class Workspace: CoroutineScope {
     var updateDelay = 0
 
     @Transient
-    var couplingManager = CouplingManager(this)
-        private set
+    val couplingManager = CouplingManager(this)
 
     @Transient
     val updater = WorkspaceUpdater(this)
@@ -256,7 +255,7 @@ class Workspace: CoroutineScope {
         resetTime()
         setWorkspaceChanged(false)
         currentFile = null
-        couplingManager = CouplingManager(this)
+        couplingManager.clear()
         events.workspaceCleared.fire()
         updater.updateManager.setDefaultUpdateActions()
     }

@@ -8,7 +8,7 @@ import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.*
 import org.simbrain.network.updaterules.DecayRule
-import org.simbrain.network.util.BiasedScalarData
+import org.simbrain.network.util.*
 import org.simbrain.util.*
 import org.simbrain.util.geneticalgorithm.*
 import org.simbrain.util.piccolo.createTileMapLayer
@@ -21,6 +21,7 @@ import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.workspace.Workspace
 import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.OdorWorldComponent
+import org.simbrain.world.odorworld.OdorWorldDesktopComponent
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.sensors.TileSensor
@@ -142,12 +143,15 @@ val evolveResourcePursuer = newSim { optionString ->
             val inputNeurons = NeuronCollection(network.express(inputChromosome)).also {
                 network.addNetworkModel(it); it.label = "inputs"
             }
+            inputNeurons.neuronList.labels = listOf("Left", "Center", "Right")
+
             val hiddenNeurons = NeuronCollection(network.express(hiddenChromosome)).also {
                 network.addNetworkModel(it);
             }
             val outputNeurons = NeuronCollection(network.express(outputChromosome)).also {
                 network.addNetworkModel(it); it.label = "outputs"
             }
+            outputNeurons.neuronList.labels = listOf("Straight", "Left", "Right")
 
             val connections = network.express(connectionChromosome)
             val layout = express(layoutChromosome).first().express()
@@ -367,7 +371,7 @@ val evolveResourcePursuer = newSim { optionString ->
             addLayer(createTileMapLayer("Food Layer"))
         }
 
-        val evolvedAgent = OdorWorldEntity(odorWorld, EntityType.LION).also {
+        val evolvedAgent = OdorWorldEntity(odorWorld, EntityType.COW).also {
             odorWorld.addEntity(it)
             it.location = point(100, 100)
         }
@@ -444,8 +448,12 @@ val evolveResourcePursuer = newSim { optionString ->
                     phenotype.apply {
                         driveNeurons.location = point(-150, 150)
                         inputNeurons.location = point(0, 150)
-                        hiddenNeurons.location = point(0, 90)
-                        outputNeurons.location = point(0, -70)
+
+                        offsetNeuronCollections(inputNeurons, hiddenNeurons, Direction.NORTH, 100.0)
+                        offsetNeuronCollections(hiddenNeurons, outputNeurons, Direction.NORTH, 100.0)
+
+                        alignNetworkModels(inputNeurons, hiddenNeurons, Alignment.VERTICAL)
+                        alignNetworkModels(hiddenNeurons, outputNeurons, Alignment.VERTICAL)
                     }
 
                     val energyTextObject = NetworkTextObject(simState.generateEnergyText())
@@ -512,7 +520,7 @@ val evolveResourcePursuer = newSim { optionString ->
 
                 val odorWorld = odorWorldComponent.world
 
-                val evolvedAgent = odorWorld.entityList.first { it.entityType == EntityType.LION }
+                val evolvedAgent = odorWorld.entityList.first { it.entityType == EntityType.COW }
 
                 addActions(workspace, phenotype, evolvedAgent, simState)
 
@@ -521,8 +529,9 @@ val evolveResourcePursuer = newSim { optionString ->
                 }
 
                 withGui {
-                    place(networkComponent, 5, 375, 340, 430)
-                    place(odorWorldComponent, 340, 10, 800, 900)
+                    place(networkComponent, 390, 10, 380, 600)
+                    place(odorWorldComponent, 770, 10, 620, 600)
+                    (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).worldPanel.scalingFactor = 0.5
                 }
             }
         }

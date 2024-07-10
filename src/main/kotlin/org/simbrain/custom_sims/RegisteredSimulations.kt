@@ -29,26 +29,25 @@ import org.simbrain.util.dir
  */
 val simulations = dir("Simulations", alphabetical = true ) {
 
-    dir("Cognitive Science") {
-        // dir("Hebbian") {
-        //     item("1. Basic Hebb") { hebbianAssociatorSimple }
-        //     item("2. Feed Forward Associator") { hebbianFeedForward }
-        //     item("3. Recurrent Hebb") { hebbianAssociator }
-        // }
-        dir("RL") {
-            item("Actor Critic") { actorCritic }
-        }
-        dir("Braitenberg") {
-            item("Isopod Simulation") { isopodSim }
-            item("Braitenberg") { braitenbergSim }
-        }
-        dir("Reservoir") {
-            item("Binary Reservoir") { binaryReservoir }
-            item("Edge Of Chaos") { EdgeOfChaos() }
-            item("Edge Of Chaos Bit Stream") { EdgeOfChaosBitStream() }
-            item("Pattern Completion") { allostaticPatternCompletion }
-            item("Object Tracking") { objectTrackingSim }
-        }
+    // dir("Hebbian") {
+    //     item("1. Basic Hebb") { hebbianAssociatorSimple }
+    //     item("2. Feed Forward Associator") { hebbianFeedForward }
+    //     item("3. Recurrent Hebb") { hebbianAssociator }
+    // }
+
+    dir("RL") {
+        item("Actor Critic") { actorCritic }
+    }
+    dir("Braitenberg") {
+        item("Isopod Simulation") { isopodSim }
+        item("Braitenberg") { braitenbergSim }
+    }
+    dir("Reservoir") {
+        item("Binary Reservoir") { binaryReservoir }
+        item("Edge Of Chaos") { EdgeOfChaos() }
+        item("Edge Of Chaos Bit Stream") { EdgeOfChaosBitStream() }
+        item("Pattern Completion") { allostaticPatternCompletion }
+        item("Object Tracking") { objectTrackingSim }
     }
 
     dir("Behaviorism") {
@@ -117,13 +116,16 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("PCA Projection") { projectionSim }
     }
 
-    dir("Other Demos") {
-        item("Recurrent network") { recurrentProjection }
-        // item("SRN - Temporal XOR") { srnXORSim }
-        // item("Deep Net - Mnist") { deepNetSim }
-        // item("Mnist Images") { mnistSim }
-        // item("LSTM") { lstmBlock() }
+    dir("Recurrent Networks") {
+        item("Basic recurrent net") { recurrentProjection }
     }
+
+    // dir("Other Demos") {
+    //     item("SRN - Temporal XOR") { srnXORSim }
+    //     item("Deep Net - Mnist") { deepNetSim }
+    //     item("Mnist Images") { mnistSim }
+    //     item("LSTM") { lstmBlock() }
+    // }
 
     dir("Image World") {
         item("Simple drawings (10 x 10)") { simpleImageWorld }

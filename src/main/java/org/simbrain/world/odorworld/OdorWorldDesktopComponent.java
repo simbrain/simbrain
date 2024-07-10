@@ -85,6 +85,13 @@ public class OdorWorldDesktopComponent extends DesktopComponent<OdorWorldCompone
         getParentFrame().pack();
     }
 
+    public void setFrameSizeOnCanvasSize(int width, int height) {
+        int widthOffset = getParentFrame().getSize().width - worldPanel.getCanvas().getWidth();
+        int heightOffset = getParentFrame().getSize().height - worldPanel.getCanvas().getHeight();
+        ((JInternalFrame) getParentFrame()).setSize(width + widthOffset, height + heightOffset);
+        SwingUtilities.invokeLater(() -> worldPanel.getCanvas().scale(0.01)); // zoom out all the way
+    }
+
     /**
      * Return the odor world.
      *

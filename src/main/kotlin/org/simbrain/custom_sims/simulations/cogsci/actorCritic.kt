@@ -16,6 +16,7 @@ import org.simbrain.util.toRadian
 import org.simbrain.workspace.updater.UpdateComponent
 import org.simbrain.workspace.updater.UpdateCoupling
 import org.simbrain.workspace.updater.updateAction
+import org.simbrain.world.odorworld.OdorWorldDesktopComponent
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.sensors.GridSensor
@@ -264,6 +265,7 @@ val actorCritic = newSim {
         place(odorWorldComponent) {
             location = point(728, 11)
         }
+        (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).setFrameSizeOnCanvasSize(500, 500)
         place(docViewer) {
             location = point(0, 0)
         }

@@ -106,9 +106,9 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
     override val contextMenu: JPopupMenu?
         get() = defaultContextMenu
 
-    protected val defaultContextMenu: JPopupMenu = JPopupMenu().applyDefaultActions()
+    protected val defaultContextMenu: JPopupMenu = JPopupMenu().addDefaultSubnetActions()
 
-    protected fun JPopupMenu.applyDefaultActions(): JPopupMenu = apply {
+    protected fun JPopupMenu.addDefaultSubnetActions(): JPopupMenu = apply {
         add(renameAction)
         add(removeAction)
     }

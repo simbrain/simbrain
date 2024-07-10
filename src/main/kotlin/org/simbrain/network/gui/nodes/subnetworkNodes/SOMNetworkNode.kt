@@ -40,7 +40,7 @@ class SOMNetworkNode(networkPanel: NetworkPanel, group: SOMNetwork) : Subnetwork
     override val contextMenu: JPopupMenu
         get() = JPopupMenu().apply {
             add(createEditAction("Edit / Train SOM..."))
-            applyDefaultActions()
+            addDefaultSubnetActions()
             addSeparator()
             add(createAction("Train on current pattern") {
                 (subnetwork as SOMNetwork).som.update()

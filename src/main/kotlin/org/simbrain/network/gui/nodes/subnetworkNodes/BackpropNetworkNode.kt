@@ -34,7 +34,7 @@ class BackpropNetworkNode(networkPanel: NetworkPanel, private val bp: BackpropNe
     override val contextMenu: JPopupMenu
         get() = JPopupMenu().apply {
             add(createEditAction("Edit / Train Backprop..."))
-            applyDefaultActions()
+            addDefaultSubnetActions()
         }
 
     override val propertyDialog: StandardDialog

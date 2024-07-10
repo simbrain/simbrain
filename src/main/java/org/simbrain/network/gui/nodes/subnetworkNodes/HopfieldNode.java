@@ -66,7 +66,7 @@ public class HopfieldNode extends SubnetworkNode {
     public JPopupMenu getContextMenu() {
         JPopupMenu menu = new JPopupMenu();
         menu.add(createEditAction("Edit / Train Hopfield..."));
-        applyDefaultActions(menu);
+        addDefaultSubnetActions(menu);
         menu.addSeparator();
         // menu.add(addInputRowAction);
         Action trainNet = new AbstractAction("Train on current pattern") {

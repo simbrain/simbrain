@@ -38,7 +38,7 @@ class CompetitiveNetworkNode(networkPanel: NetworkPanel, val competitiveNetwork:
     override val contextMenu: JPopupMenu
         get() = JPopupMenu().apply {
             add(createEditAction("Edit / Train Competitive..."))
-            applyDefaultActions()
+            addDefaultSubnetActions()
             addSeparator()
             add(with(networkPanel.network) { competitiveNetwork.createTrainOnPatternAction() })
             addSeparator()

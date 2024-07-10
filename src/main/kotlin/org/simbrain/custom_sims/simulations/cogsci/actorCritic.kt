@@ -8,15 +8,21 @@ import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.neurongroups.WinnerTakeAll
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
 import org.simbrain.util.decayfunctions.StepDecayFunction
+import org.simbrain.util.piccolo.TileMap
 import org.simbrain.util.place
 import org.simbrain.util.point
+import org.simbrain.util.showNumericInputDialog
+import org.simbrain.util.toRadian
 import org.simbrain.workspace.updater.UpdateComponent
 import org.simbrain.workspace.updater.UpdateCoupling
 import org.simbrain.workspace.updater.updateAction
 import org.simbrain.world.odorworld.entities.EntityType
+import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.sensors.GridSensor
 import org.simbrain.world.odorworld.sensors.ObjectSensor
 import java.util.function.Consumer
+import kotlin.math.cos
+import kotlin.math.sin
 
 val actorCritic = newSim {
 
@@ -48,23 +54,30 @@ val actorCritic = newSim {
     var stop = false
     var goalAchieved = false
 
-    val numTilesInADimension = 5 // Number of rows / cols in grid sensor
+    val numTilesInADimension = showNumericInputDialog("Num Tiles In a Dimension", 5) ?: return@newSim
 
     workspace.clearWorkspace()
     val networkComponent = addNetworkComponent("Network")
     val network = networkComponent.network
 
     val odorWorldComponent = addOdorWorldComponent("World")
+
+    val tileGridRatio = 2
+
     val world = odorWorldComponent.world.apply {
+        tileMap = TileMap(numTilesInADimension * tileGridRatio, numTilesInADimension * tileGridRatio)
         isObjectsBlockMovement = false
         wrapAround = false
     }
 
-    val tileSize = world.height / numTilesInADimension
-    val mouseHomeLocation = tileSize * (numTilesInADimension - 1) - tileSize / 2
+    val tileSize = world.tileMap.tileWidth
+    val gridSize = tileSize * tileGridRatio
+    val mouseHomeLocation = gridSize * numTilesInADimension - gridSize / 2
 
-    val mouse = world.addEntity(mouseHomeLocation, mouseHomeLocation, EntityType.MOUSE)
-    val cheese = world.addEntity(tileSize / 2, tileSize / 2, EntityType.SWISS)
+    val mouse = world.addEntity(mouseHomeLocation, mouseHomeLocation, EntityType.MOUSE).apply {
+        heading = 90.0
+    }
+    val cheese = world.addEntity(gridSize / 2, gridSize / 2, EntityType.SWISS)
 
     fun resetMouse() {
         mouse.setLocation(mouseHomeLocation, mouseHomeLocation)
@@ -74,7 +87,7 @@ val actorCritic = newSim {
     val cheeseSensor = ObjectSensor().apply {
         label = "Cheese sensor"
         decayFunction = StepDecayFunction()
-        decayFunction.dispersion = tileSize / 2.0
+        decayFunction.dispersion = gridSize / 2.0
         // showDispersion = true
         mouse.addSensor(this)
     }
@@ -93,11 +106,17 @@ val actorCritic = newSim {
         lowerBound = -100.0
     }
 
-    val gridSensor =
-        GridSensor(0, 0,
-            (world.width / numTilesInADimension).toInt(),
-            (world.height / numTilesInADimension).toInt())
-    gridSensor.highlighterVisibility = false
+    val gridSensor = GridSensor(
+        0,
+        0,
+        (world.width / numTilesInADimension).toInt(),
+        (world.height / numTilesInADimension).toInt()
+    ).apply {
+        highlighterVisibility = false
+        columns = numTilesInADimension
+        rows = numTilesInADimension
+    }
+
     mouse.addSensor(gridSensor)
 
     val sensorNeurons = network.addNeuronGroup(
@@ -113,7 +132,6 @@ val actorCritic = newSim {
         network.addNetworkModel(this)
         params.isUseRandom = true
         params.randomProb = epsilon
-        params.winValue = tileSize
         // Add a little extra spacing between neurons to accommodate labels
         layout = LineLayout(80.0, LineLayout.LineOrientation.HORIZONTAL)
         applyLayout(-5, -85)
@@ -189,8 +207,29 @@ val actorCritic = newSim {
     // Workspace update
     workspace.updater.updateManager.clear()
     workspace.updater.updateManager.addAction(updateAction("Net -> Movement") {
-        mouse.movement.speed = 0.0
         outputs.neuronList.firstOrNull { it.activation > 0.0 }?.let {
+
+            fun OdorWorldEntity.applyGridMovement() {
+                val dx = cos(heading.toRadian()) * gridSize
+                val dy = -sin(heading.toRadian()) * gridSize
+
+                val newX = x + dx
+                val newY = y + dy
+
+                location = if (world.wrapAround) {
+                    val maxXLocation = world.width
+                    val maxYLocation = world.height
+                    point((newX + maxXLocation) % maxXLocation, (newY + maxYLocation) % maxYLocation)
+                } else {
+                    val newLocation = point(newX, newY)
+                    if (world.contains(newLocation)) {
+                        newLocation
+                    } else {
+                        point(x, y)
+                    }
+                }
+            }
+
             when (it.label) {
                 "North" -> mouse.heading = 90.0
                 "South" -> mouse.heading = -90.0
@@ -198,8 +237,9 @@ val actorCritic = newSim {
                 "West" -> mouse.heading = 180.0
                 else -> {}
             }
+
+            mouse.applyGridMovement()
         }
-        mouse.movement.speed = tileSize
     })
     workspace.updater.updateManager.addAction(UpdateComponent(odorWorldComponent))
     workspace.updater.updateManager.addAction(UpdateCoupling(gridCoupling))

@@ -99,6 +99,10 @@ interface Bounded : StaticallyLocatable, WithSize {
      * given a point return a point wrapped around these bounds. if bounds are 100,100 and 150,150 is given it returns 50,50
      */
     fun wrapAround(point: Point2D) = point(point.x % width, point.y % height)
+
+    fun contains(point: Point2D) = topLeftLocation.let { tl ->
+        point.x in tl.x..tl.x + width && point.y in tl.y..tl.y + height
+    }
 }
 
 class Bound(

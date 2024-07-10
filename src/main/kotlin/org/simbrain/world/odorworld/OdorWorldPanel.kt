@@ -8,7 +8,6 @@ import org.piccolo2d.event.PInputEventListener
 import org.piccolo2d.nodes.PImage
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PPaintContext
-import org.simbrain.network.gui.CustomToolBar
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.*
 import org.simbrain.world.odorworld.dialogs.EntityDialog
@@ -529,7 +528,7 @@ class OdorWorldPanel(
     private val isManualMovementMode: Boolean
         get() = manualMovementKeyState > 0
 
-    private fun createMainToolBar() = CustomToolBar().apply {
+    private fun createMainToolBar() = JToolBar().apply {
         add(odorWorldActions.addAgentAction())
         add(odorWorldActions.addEntityAction())
         addSeparator()

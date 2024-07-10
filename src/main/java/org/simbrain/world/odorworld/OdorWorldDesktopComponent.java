@@ -58,28 +58,29 @@ public class OdorWorldDesktopComponent extends DesktopComponent<OdorWorldCompone
         menu.setUpMenus();
         getParentFrame().setJMenuBar(menu); // TODO: Move menu creation to this
 
-        worldPanel.getWorld().getEvents().getTileMapChanged().on(this::setGuiSizeToWorldSize);
+        worldPanel.getWorld().getEvents().getTileMapChanged().on(this::initializeFrameSize);
 
         // component.setCurrentDirectory(OdorWorldPreferences.getCurrentDirectory());
 
         menu = new OdorWorldFrameMenu(this, worldPanel.getWorld());
         menu.setUpMenus();
         getParentFrame().setJMenuBar(menu);
-        SwingUtilities.invokeLater(this::setGuiSizeToWorldSize);
+        SwingUtilities.invokeLater(this::initializeFrameSize);
     }
 
     /**
-     * Sets the size of the window based on the size of the underlying world / tilemap.
-     * Ignore the default panel preferences.
+     * Set frame size to fit the world size. If the world size is too large constrain it to a defaultMaxSize
      */
-    public void setGuiSizeToWorldSize() {
-        int widthOffset = getParentFrame().getSize().width - worldPanel.getWidth();
-        int heightOffset = getParentFrame().getSize().height - worldPanel.getHeight();
-        getParentFrame().setPreferredSize(new Dimension(Math.min((int) (worldPanel.getWorld().getWidth() + widthOffset), 800),
-                Math.min((int) (worldPanel.getWorld().getHeight() + heightOffset), 800)));
-        getParentFrame().setMaximumSize(
-                new Dimension((int) (worldPanel.getWorld().getWidth() + widthOffset),
-                        (int) (worldPanel.getWorld().getHeight() + heightOffset)));
+    public void initializeFrameSize() {
+        int defaultMaxSize = 800;
+        int widthOffset = getParentFrame().getSize().width - worldPanel.getCanvas().getWidth();
+        int heightOffset = getParentFrame().getSize().height - worldPanel.getCanvas().getHeight();
+        getParentFrame().setPreferredSize(
+                new Dimension(
+                    Math.min(worldPanel.getCanvas().getWidth() + widthOffset, defaultMaxSize),
+                    Math.min(worldPanel.getCanvas().getHeight() + heightOffset, defaultMaxSize)
+                )
+        );
         SwingUtilities.invokeLater(() -> worldPanel.getCanvas().scale(1));
         getParentFrame().pack();
     }

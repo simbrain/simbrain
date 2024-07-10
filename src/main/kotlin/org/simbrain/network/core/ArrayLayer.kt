@@ -1,10 +1,12 @@
 package org.simbrain.network.core
 
 import org.simbrain.network.core.Network.Randomizers.activationRandomizer
-import org.simbrain.util.*
+import org.simbrain.util.UserParameter
+import org.simbrain.util.randomize
+import org.simbrain.util.reshape
 import org.simbrain.util.stats.ProbabilityDistribution
+import org.simbrain.util.toMatrix
 import org.simbrain.workspace.Consumable
-import org.simbrain.workspace.Producible
 import smile.math.matrix.Matrix
 
 /**
@@ -80,7 +82,4 @@ abstract class ArrayLayer(
     override fun toggleClamping() {
         isClamped = !isClamped
     }
-
-    @Producible
-    fun getInputActivations() = inputs.toDoubleArray()
 }

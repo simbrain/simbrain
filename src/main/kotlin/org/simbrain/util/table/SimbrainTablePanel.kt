@@ -299,6 +299,7 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
         val nextRow = (model.currentRowIndex + 1) % model.rowCount
         model.currentRowIndex = nextRow
         selectedRow = nextRow
+        (dataModel as? SimbrainDataFrame)?.events?.currentRowChanged?.fire()
     }
 
     override fun isCellEditable(row: Int, column: Int): Boolean {

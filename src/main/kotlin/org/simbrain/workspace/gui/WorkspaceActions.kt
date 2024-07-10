@@ -284,7 +284,7 @@ class WorkspaceActions {
         componentCreator: (componentName: String) -> T,
         consumerProvider: CouplingManager.(T) -> Consumer
     ) = SimbrainDesktop.desktopPane.createAction(
-        name = plotType,
+        name = "$plotType of $objectName",
         iconPath = iconPath,
         description = description,
         coroutineScope = workspace

@@ -61,7 +61,7 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
     private fun updateActivationImages() {
         // TODO: Magic Numbers
         inputImage.apply {
-            image = smileClassifier.inputs.toDoubleArray().toSimbrainColorImage(smileClassifier.inputSize(), 1)
+            image = smileClassifier.inputActivations.toDoubleArray().toSimbrainColorImage(smileClassifier.inputSize(), 1)
             val (x, y, w, h) = bounds
             setBounds(x, y, 100.0, 20.0)
         }
@@ -102,7 +102,7 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
             addSeparator()
             add(
                 SimbrainDesktop.actionManager.createCoupledProjectionPlotAction(
-                    smileClassifier.getProducer(SmileClassifier::getInputActivations),
+                    smileClassifier.getProducer(SmileClassifier::getInputActivationArray),
                     objectName = "${smileClassifier.id ?: "Smile Classifier"} Inputs"
                 )
             )

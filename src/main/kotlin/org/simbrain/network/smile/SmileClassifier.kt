@@ -4,6 +4,7 @@ import org.simbrain.network.core.ArrayLayer
 import org.simbrain.network.core.Network
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.util.UserParameter
+import org.simbrain.util.copyFrom
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.toDoubleArray
@@ -39,6 +40,11 @@ class SmileClassifier(
         @Producible
         get() = classifier.trainingData.labelTargetMap.getInverse(winner) ?: ""
 
+    val inputActivations = Matrix(inputSize, 1)
+
+    @Producible
+    fun getInputActivationArray() = inputActivations.toDoubleArray()
+
     /**
      * Output matrix.
      */
@@ -62,7 +68,8 @@ class SmileClassifier(
      */
     override fun update() {
         if (classifier.model != null) {
-            winner = classifier.predict(inputs.toDoubleArray())
+            inputActivations.copyFrom(inputs)
+            winner = classifier.predict(inputActivations.toDoubleArray())
             // println("Prediction of ${this.id} is: $winner")
             if (classifier.model != null) {
                 outputs = try {

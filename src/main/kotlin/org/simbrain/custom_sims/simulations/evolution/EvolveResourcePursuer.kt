@@ -463,8 +463,9 @@ val evolveResourcePursuer = newSim { optionString ->
                     }
                     energyTextObject.location = point(-160, -20)
                     withGui {
-                        place(networkComponent, 5, 375, 340, 430)
-                        place(odorWorldComponent, 340, 10, 800, 900)
+                        place(networkComponent, 390, 10, 380, 600)
+                        place(odorWorldComponent, 770, 10, 620, 600)
+                        (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).worldPanel.scalingFactor = 0.5
                     }
                     if (desktop == null) {
                         workspace.save(File("evolved_${SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(Date())}.zip"), headless = true)

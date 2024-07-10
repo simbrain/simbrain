@@ -148,7 +148,8 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
     protected val <T: JComponent> T.removeAction get() = createAction(
         name = "Remove Network...",
         iconPath = "menu_icons/RedX_small.png",
-        description = "Remove this subnetwork..."
+        description = "Remove this subnetwork...",
+        coroutineScope = networkPanel.network
     ) {
         subnetwork.delete()
     }

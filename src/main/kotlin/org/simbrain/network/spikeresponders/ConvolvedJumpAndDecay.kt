@@ -67,16 +67,14 @@ class ConvolvedJumpAndDecay() : SpikeResponder() {
 
     fun convolvedJumpAndDecay(
         spiked: Boolean,
-        initPsr: Double,
+        psr: Double,
         jump: Double,
         timeStep: Double): Double {
-        var psr = initPsr
-        if (spiked) {
-            psr += jump
+        return if (spiked) {
+            psr + jump
         } else {
-            psr += timeStep * (baseLine - psr) / timeConstant
+            psr + timeStep * (baseLine - psr) / timeConstant
         }
-        return psr
     }
 
     override val description = "Convolved Jump and Decay"

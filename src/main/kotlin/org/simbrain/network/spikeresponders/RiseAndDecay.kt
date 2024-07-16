@@ -101,20 +101,18 @@ class RiseAndDecay : SpikeResponder() {
     }
 
     private fun riseAndDecay(spiked: Boolean,
-                             initPsr: Double,
-                             initRecovery: Double,
+                             psr: Double,
+                             recovery: Double,
                              strength: Double,
                              timeStep: Double): Pair<Double, Double> {
-        var recovery = initRecovery
-        var psr = initPsr
-        if (spiked) {
-            recovery = 1.0
-        }
-        recovery += timeStep / timeConstant * -recovery
-        psr += (timeStep / timeConstant
-                * (Math.E * maximumResponse * recovery * (1 - psr) - psr))
-        psr *= strength
-        return Pair(psr, recovery)
+        return Pair(
+            (psr + ((timeStep / timeConstant) * (Math.E * maximumResponse * recovery * (1 - psr) - psr))) * strength,
+            if (spiked) {
+                1.0
+            } else {
+                recovery + timeStep / timeConstant * -recovery
+            }
+        )
     }
 
     override fun createResponderData(): ScalarDataHolder {

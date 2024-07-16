@@ -98,13 +98,13 @@ class JumpAndDecay : SpikeResponder() {
 
     private fun jumpAndDecay(
         spiked: Boolean,
-        initPsr: Double,
+        psr: Double,
         jumpHeight: Double,
         timeStep: Double): Double {
         return if (spiked) {
             this.jumpHeight * jumpHeight
         } else {
-            initPsr + timeStep * ((baseLine - initPsr) / timeConstant)
+            psr + timeStep * ((baseLine - psr) / timeConstant)
         }
     }
 

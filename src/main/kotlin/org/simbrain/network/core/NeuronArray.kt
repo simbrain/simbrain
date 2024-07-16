@@ -155,10 +155,6 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
             width, height
         )
 
-    override fun onCommit() {
-        events.labelChanged.fire("", label!!)
-    }
-
     override val name: String
         get() = "Neuron Array"
 

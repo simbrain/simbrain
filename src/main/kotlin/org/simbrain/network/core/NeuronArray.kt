@@ -272,17 +272,25 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         return this
     }
 
+    /**
+     * For each incoming psr matrix, filter out entries that correspond to excitatory synapses and return the sum of those for
+     * each row (i.e. a vector of excitatory inputs; summed PSRs for each “dendrite”).
+     */
     val excitatoryInputs: DoubleArray
         get() = incomingConnectors
             .filterIsInstance<WeightMatrix>()
-            .map { it.excitatoryOutputs }
+            .map { it.psrMatrix.clone().mul(it.excitatoryMask).rowSums() }
             .reduceOrNull { base, add -> SimbrainMath.addVector(base, add) }
             ?: DoubleArray(inputSize())
 
+    /**
+     * For each incoming psr matrix, filter out entries that correspond to inhibitory synapses and return the sum of those for
+     * each row (i.e. a vector of inhibitory inputs; summed PSRs for each “dendrite”).
+     */
     val inhibitoryInputs: DoubleArray
         get() = incomingConnectors
             .filterIsInstance<WeightMatrix>()
-            .map { it.inhibitoryOutputs }
+            .map { it.psrMatrix.clone().mul(it.inhibitoryMask).rowSums() }
             .reduceOrNull { base, add -> SimbrainMath.addVector(base, add) }
             ?: DoubleArray(inputSize())
 

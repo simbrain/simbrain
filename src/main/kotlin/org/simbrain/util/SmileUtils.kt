@@ -93,7 +93,7 @@ fun Matrix.add(toAdd: DoubleArray) {
         throw IllegalArgumentException("Trying to add a double array of length ${toAdd.size} to a matrix with ${nrow
             ()} rows")
     }
-    (0 until nrow()).forEach { i -> set(i,0, toAdd[i]) }
+    (0 until nrow()).forEach { i -> set(i,0, get(i, 0) + toAdd[i]) }
 }
 
 // All matrix operator mutates the original matrix
@@ -179,14 +179,13 @@ fun Matrix.broadcastMultiply(vector: Matrix): Matrix {
     if (vector.ncol() != 1) {
         throw IllegalArgumentException("Vector is ${vector.shapeString}, but it must be a column vector")
     }
-    if (nrow() != vector.nrow()) {
-        throw IllegalArgumentException("Matrix and vector must have the same number of rows. Matrix has ${nrow()} " +
-                "rows, vector has ${vector.nrow()} rows .")
+    if (ncol() != vector.nrow()) {
+        throw IllegalArgumentException("Size mismatched. Number of left matrix columns should match number of right vector rows: ${ncol()} columns, vector has ${vector.nrow()} rows.")
     }
     val result = Matrix(nrow(), ncol())
     for (i in 0 until nrow()) {
         for (j in 0 until ncol()) {
-            result[i, j] = this[i, j] * vector[i, 0]
+            result[i, j] = this[i, j] * vector[j, 0]
         }
     }
     return result

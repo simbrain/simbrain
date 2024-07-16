@@ -8,6 +8,7 @@ import org.simbrain.network.spikeresponders.SpikeResponder
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.MatrixDataHolder
 import org.simbrain.util.UserParameter
+import org.simbrain.util.broadcastMultiply
 import org.simbrain.util.copyFrom
 import org.simbrain.util.flatten
 import org.simbrain.util.stats.ProbabilityDistribution
@@ -60,24 +61,21 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
     @get:Producible
     val weightMatrix: Matrix
 
-    /**
-     * A matrix with the same size as the weight matrix. Only used with spike responders.
-     */
-    val spikeResponseMatrix: Matrix
+    override val psrMatrix: Matrix
 
     /**
      * A binary matrix with 1s corresponding to entries of the weight matrix that are greater than 1 and thus
      * excitatory, and 0s otherwise. Used by [.getExcitatoryOutputs]
      */
     @Transient
-    private var excitatoryMask: Matrix? = null
+    val excitatoryMask: Matrix
 
     /**
      * A binary matrix with 1s corresponding to entries of the weight matrix that are less than 1 and thus
      * inhibitory, and 0s otherwise. Used by [.getInhibitoryOutputs] }
      */
     @Transient
-    private var inhibitoryMask: Matrix? = null
+    val inhibitoryMask: Matrix
 
     /**
      * Construct the matrix.
@@ -90,11 +88,15 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
         target.addIncomingConnector(this)
 
         weightMatrix = Matrix(target.inputSize(), source.outputSize())
+
+        excitatoryMask = Matrix(target.inputSize(), source.outputSize())
+        inhibitoryMask = Matrix(target.inputSize(), source.outputSize())
+
         diagonalize()
-
-        spikeResponseMatrix = Matrix(target.inputSize(), source.outputSize())
-
         updateMasks()
+
+        psrMatrix = Matrix(target.inputSize(), source.outputSize())
+
     }
 
     @get:Producible
@@ -143,7 +145,6 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
     context(Network)
     override fun update() {
         // TODO: Check for clamping and enabling
-
         if (learningRule !is StaticSynapseRule) {
             learningRule.apply(this, dataHolder)
             updateMasks()
@@ -151,83 +152,39 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
         }
     }
 
-    context(Network)
-    override val psrMatrix: Matrix
-        get() {
-            // TODO: Do frozen, clamping, or enabling make sense here
-            if (spikeResponder is NonResponder) {
-                // For "connectionist" case. PSR Matrix not needed in this case
-                return weightMatrix.mm(source.outputs)
-            } else {
-                // Updates the spikeResponseMatrix in the spiking case
-                spikeResponder.apply(this, spikeResponseData)
-                return Matrix.column(spikeResponseMatrix.rowSums())
-            }
-        }
-
     /**
      * Update the psr matrix in the connectionist case.
      */
-    private fun updateConnectionistPSR() {
+    context(Network)
+    override fun updatePSR() {
         if (spikeResponder is NonResponder) {
             // For "connectionist" case. Unusual to need this, but could happen with excitatory inputs and no spike
             // responder, for example.
             // Populate each row of the psrMatrix with the element-wise product of the pre-synaptic output vector and
             // that row of the matrix
-            val output = source.outputs
-            for (i in 0 until weightMatrix.nrow()) {
-                for (j in 0 until weightMatrix.ncol()) {
-                    val newVal = weightMatrix[i, j] * output[j, 0]
-                    spikeResponseMatrix[i, j] = newVal
-                }
-            }
+            psrMatrix.copyFrom(weightMatrix.broadcastMultiply(source.outputs))
+        } else {
+            spikeResponder.apply(this, spikeResponseData)
         }
     }
 
     private fun updateExcitatoryMask() {
-        excitatoryMask = weightMatrix.clone()
-        for (i in 0 until excitatoryMask!!.nrow()) {
-            for (j in 0 until excitatoryMask!!.ncol()) {
-                val newVal = if ((excitatoryMask!![i, j] > 0)) 1 else 0
-                excitatoryMask!![i, j] = newVal.toDouble()
+        for (i in 0 until weightMatrix.nrow()) {
+            for (j in 0 until weightMatrix.ncol()) {
+                val newVal = if ((weightMatrix[i, j] > 0)) 1 else 0
+                excitatoryMask[i, j] = newVal.toDouble()
             }
         }
     }
 
     private fun updateInhibitoryMask() {
-        inhibitoryMask = weightMatrix.clone()
-        for (i in 0 until inhibitoryMask!!.nrow()) {
-            for (j in 0 until inhibitoryMask!!.ncol()) {
-                val newVal = if ((inhibitoryMask!![i, j] < 0)) 1 else 0
-                inhibitoryMask!![i, j] = newVal.toDouble()
+        for (i in 0 until weightMatrix.nrow()) {
+            for (j in 0 until weightMatrix.ncol()) {
+                val newVal = if ((weightMatrix[i, j] < 0)) 1 else 0
+                inhibitoryMask[i, j] = newVal.toDouble()
             }
         }
     }
-
-    val excitatoryOutputs: DoubleArray
-        /**
-         * Returns an array representing the sum of the psr's for all excitatory (> 0) pre-synaptic weights
-         */
-        get() {
-            updateConnectionistPSR()
-            if (excitatoryMask == null) {
-                updateExcitatoryMask()
-            }
-            return excitatoryMask!!.clone().mul(spikeResponseMatrix).rowSums()
-        }
-
-    val inhibitoryOutputs: DoubleArray
-        /**
-         * Returns an array representing the sum of the psr's for all inhibitory (< 0) pre-synaptic weights
-         */
-        get() {
-            updateConnectionistPSR()
-            if (inhibitoryMask == null) {
-                updateInhibitoryMask()
-            }
-            return inhibitoryMask!!.clone().mul(spikeResponseMatrix).rowSums()
-        }
-
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
         for (i in 0 until weightMatrix.nrow()) {

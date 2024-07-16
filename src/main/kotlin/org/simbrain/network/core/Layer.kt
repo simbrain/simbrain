@@ -68,6 +68,10 @@ abstract class Layer : LocatableModel(), AttributeContainer {
      */
     abstract fun addInputs(inputs: Matrix)
 
+    context(Network) override fun updateInputs() {
+        incomingConnectors.forEach { it.updatePSR() }
+    }
+
     open fun applyActivations(activations: DoubleArray) {
         throw RuntimeException("applyActivations not implemented")
     }

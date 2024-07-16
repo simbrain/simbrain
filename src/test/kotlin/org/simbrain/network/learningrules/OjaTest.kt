@@ -1,5 +1,6 @@
 package org.simbrain.network.learningrules
 
+import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.*
@@ -128,10 +129,9 @@ class OjaTest {
         na2.activations = outputs
         net.update()
         // Only uses Hebbian part
-        // Expecting [[1, -1],[2,-2],[-1,1]]
-        print(wm12.weightMatrix)
-        // Assertions.assertArrayEquals(doubleArrayOf(1.0, 0.0, -.5), wm_v2.weightMatrix.row(0), .01)
-        // Assertions.assertArrayEquals(doubleArrayOf(-1.0, 0.0, .5), wm_v2.weightMatrix.row(1), .01)
+        assertArrayEquals(doubleArrayOf(1.0, -1.0), wm12.weightMatrix.row(0))
+        assertArrayEquals(doubleArrayOf(2.0, -2.0), wm12.weightMatrix.row(1))
+        assertArrayEquals(doubleArrayOf(-1.0, 1.0), wm12.weightMatrix.row(2))
     }
 
 }

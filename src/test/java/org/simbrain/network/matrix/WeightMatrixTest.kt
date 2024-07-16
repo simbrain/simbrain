@@ -57,11 +57,10 @@ class WeightMatrixTest {
 
     @Test
     fun testMatrixProduct() {
-        with(net) {
-            na1.applyActivations(doubleArrayOf(1.0, 2.0))
-            wm.setWeights(doubleArrayOf(1.0, 2.0, 3.0, 4.0))
-            Assertions.assertArrayEquals(doubleArrayOf(5.0, 11.0), wm.psrMatrix.col(0), 0.0)
-        }
+        na1.applyActivations(doubleArrayOf(1.0, 2.0))
+        wm.setWeights(doubleArrayOf(1.0, 2.0, 3.0, 4.0))
+        net.update()
+        Assertions.assertArrayEquals(doubleArrayOf(5.0, 11.0), wm.getSummedPSRs(), 0.0)
     }
 
 
@@ -88,26 +87,6 @@ class WeightMatrixTest {
         net.update() // Second update propagates
         Assertions.assertArrayEquals(doubleArrayOf(0.0, 0.0), na1.activations.col(0), 0.0)
         Assertions.assertArrayEquals(doubleArrayOf(.5, -.5), na2.activations.col(0), 0.0)
-    }
-
-    @Test
-    fun testExcitatoryOutputs() {
-        na1.applyActivations(doubleArrayOf(1.0, 1.0))
-        val na3 = NeuronArray(3)
-        val wm2 = WeightMatrix(na1, na3)
-        wm2.setWeights(doubleArrayOf(5.0, -1.0, 1.0, 1.0, -1.0, -1.0))
-        // Expecting 5 for first row, 2 for second row, and 0 for the last row
-        Assertions.assertArrayEquals(doubleArrayOf(5.0, 2.0, 0.0), wm2.excitatoryOutputs)
-    }
-
-    @Test
-    fun testInhibitoryOutputs() {
-        na1.applyActivations(doubleArrayOf(1.0, 1.0))
-        val na3 = NeuronArray(3)
-        val wm2 = WeightMatrix(na1, na3)
-        wm2.setWeights(doubleArrayOf(1.0, -2.0, 1.0, 1.0, -1.0, -1.0))
-        Assertions.assertArrayEquals(doubleArrayOf(-2.0, 0.0, -2.0), wm2.inhibitoryOutputs)
-        // TODO: Test with spike responders so that we can check for positive inhib outputs, the more standard case
     }
 
     @Test

@@ -31,10 +31,21 @@ abstract class Connector(var source: Layer, var target: Layer) : NetworkModel(),
     }
 
     /**
-     * Returns a matrix of post-synaptic responses. See [Synapse.psr].
+     * A matrix of PSRs (pre-synaptic responses) for each connection.
      */
-    context(Network)
     abstract val psrMatrix: Matrix
+
+    /**
+     * Returns the row sums of the psr matrix, which correspond in the connectionist case to the standard produce of an
+     * input vector and a weight matrix, and in the spiking case corresponds to the sum of post-synaptic responses along
+     * the dendrite of each output neuron.
+     */
+    fun getSummedPSRs(): DoubleArray {
+        return psrMatrix.rowSums()
+    }
+
+    context(Network)
+    abstract fun updatePSR()
 
     private fun initEvents() {
         // When the parents of the matrix are deleted, delete the matrix

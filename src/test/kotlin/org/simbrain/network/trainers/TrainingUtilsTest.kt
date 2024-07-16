@@ -88,7 +88,7 @@ class TrainingUtilsTest {
             }
             // println("Outputs: ${wm1.output}")
             // println("Biases: ${wm1.tar.dataHolder as BiasedMatrixData}")
-            assertArrayEquals(target, wm1.psrMatrix.toDoubleArray(), .01)
+            assertArrayEquals(target, wm1.getSummedPSRs(), .01)
         }
     }
 

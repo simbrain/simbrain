@@ -9,7 +9,6 @@ import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.util.SpikingScalarData
 import org.simbrain.util.*
 import org.simbrain.util.SimbrainConstants.Polarity
-import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.workspace.Consumable
@@ -347,10 +346,10 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
         //     throw new NullPointerException("Test data variable is null," + " but neuron group " + getLabel() + " is in input" + " mode.");
         // }
         // inputManager.applyCurrentRow(); // TODO
-
-        var wtdInputs = DoubleArray(size())
+        super.updateInputs()
+        val wtdInputs = DoubleArray(size())
         for (c in incomingConnectors) {
-            wtdInputs = SimbrainMath.addVector(wtdInputs, c.psrMatrix.col(0))
+            wtdInputs.addi(c.getSummedPSRs())
         }
         addInputs(wtdInputs)
     }

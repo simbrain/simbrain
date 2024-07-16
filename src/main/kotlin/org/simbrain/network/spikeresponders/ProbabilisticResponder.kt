@@ -55,7 +55,7 @@ class ProbabilisticResponder : SpikeResponder() {
             for (i in 0 until wm.weightMatrix.nrow()) {
                 for (j in 0 until wm.weightMatrix.ncol()) {
                     val psr = probResponder(spikeData.spikes[j]) * wm.weightMatrix[i,j]
-                    wm.spikeResponseMatrix.set(i,j,psr)
+                    wm.psrMatrix.set(i,j,psr)
                 }
             }
         }

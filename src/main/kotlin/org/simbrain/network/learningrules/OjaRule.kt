@@ -72,7 +72,7 @@ class OjaRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>() {
             // delta    = rate * (input * output^T - input "broadcast multiplied by" weight matrix)
             //          = rate * (hebbTerm - weightDecayTerm)
             val hebbTerm = output.mt(input)
-            val weightDecayTerm = wm.broadcastMultiply(output)
+            val weightDecayTerm = wm.broadcastMultiply(input)
             wm.add(hebbTerm.sub(weightDecayTerm).mul(learningRate))
         }
     }

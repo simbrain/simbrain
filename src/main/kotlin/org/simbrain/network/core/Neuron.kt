@@ -31,6 +31,7 @@ import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.plus
 import org.simbrain.util.point
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
@@ -234,8 +235,17 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
     /**
      * Local data holder for neuron update rule.
      */
-    @UserParameter(label = "State variables", order = 100)
-    var dataHolder: ScalarDataHolder = updateRule.createScalarData()
+    var dataHolder: ScalarDataHolder by GuiEditable(
+        initValue = updateRule.createScalarData(),
+        label = "State variables",
+        order = 100,
+        onUpdate = {
+            val proposedDataHolder = widgetValue(::updateRule).createScalarData()
+            if (widgetValue(::dataHolder)::class != proposedDataHolder::class) {
+                refreshValue(proposedDataHolder)
+            }
+        }
+    )
 
     fun copy(): Neuron = Neuron(this)
 

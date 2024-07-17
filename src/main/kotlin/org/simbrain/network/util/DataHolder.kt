@@ -45,10 +45,12 @@ class BiasedMatrixData(var size: Int) : MatrixDataHolder, AttributeContainer {
         get() = "Biases"
 }
 
-open class SpikingMatrixData(var size: Int) : MatrixDataHolder {
+open class SpikingMatrixData(val size: Int) : MatrixDataHolder {
+    @UserParameter(label = "Spikes", description = "Spikes for each neuron")
     var spikes = BooleanArray(size) // TODO: Possibly use int Smile array of binary ints for perf
         private set
-    var lastSpikeTimes = DoubleArray(size)
+    @UserParameter(label = "Last Spike Times", description = "Time of last spike for each neuron")
+    var lastSpikeTimes = DoubleArray(size) { Double.NEGATIVE_INFINITY }
     override fun copy() = SpikingMatrixData(size).also {
         it.spikes = spikes.copyOf()
         it.lastSpikeTimes = lastSpikeTimes.copyOf()
@@ -65,13 +67,6 @@ open class SpikingMatrixData(var size: Int) : MatrixDataHolder {
             lastSpikeTimes[i] = networkTime
         }
 
-    }
-}
-
-class NakaMatrixData(var size: Int) : MatrixDataHolder {
-    var a = Matrix(size, 1)
-    override fun copy() = NakaMatrixData(size).also {
-        it.a = a.clone()
     }
 }
 
@@ -95,34 +90,6 @@ class BiasedScalarData(
 ) : ScalarDataHolder {
     override fun copy(): BiasedScalarData {
         return BiasedScalarData(bias)
-    }
-}
-
-class PointNeuronScalarData(
-
-    @UserParameter(
-        label = "Membrane potential",
-        minimumValue = 0.0
-    )
-    var membranePotential: Double = .15,
-
-    @UserParameter(
-        label = "Excitatory Conductance",
-        description = "Current excitatory conductance.Proportion of channels open",
-        minimumValue = 0.0
-    )
-    var excitatoryConductance: Double = 0.0,
-
-    @UserParameter(
-        label = "Inhibitory Conductance",
-        description = "Current inhibitory conductance. Proportion of channels open",
-        minimumValue = 0.0
-    )
-    var inhibitoryConductance: Double = 0.0,
-
-) : ScalarDataHolder {
-    override fun copy(): PointNeuronScalarData {
-        return PointNeuronScalarData(membranePotential, excitatoryConductance, inhibitoryConductance)
     }
 }
 
@@ -154,12 +121,3 @@ open class SpikingScalarData(
         return SpikingScalarData(spiked, lastSpikeTime)
     }
 }
-
-// In java they can't be stored in the same file as the update rule
-class NakaScalarData(@UserParameter(label = "a") var a: Double = 0.0) : ScalarDataHolder {
-    override fun copy(): NakaScalarData {
-        return NakaScalarData(a)
-    }
-}
-
-

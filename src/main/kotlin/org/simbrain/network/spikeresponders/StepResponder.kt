@@ -23,7 +23,6 @@ import org.simbrain.network.util.MatrixDataHolder
 import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.util.UserParameter
-import smile.math.matrix.Matrix
 
 /**
  * Responds to a spike with a step response for a set number of iterations.
@@ -43,67 +42,35 @@ class StepResponder(
     /**
      * Response duration (ms).
      */
-    @UserParameter(label = "Response time", description = "Response duration (ms)", increment = .1, order = 1)
+    @UserParameter(label = "Response time", description = "Response duration (ms)", increment = 1.0, order = 1)
     var responseDuration: Int = 1
 
 ) : SpikeResponder() {
 
     context(Network)
-    override fun apply(conn: Connector, data: MatrixDataHolder) {
-        val wm = conn.let { if (it is WeightMatrix) it else return }
-        val na = conn.source.let { if (it is NeuronArray) it else return }
-        val stepResponseData = data.let { if (it is StepMatrixData) it else return }
-        val spikeData = na.dataHolder.let { if (it is SpikingMatrixData) it else return }
-        if (na.updateRule.isSpikingRule) {
-            spikeData.spikes.forEachIndexed { col, spiked ->
-                if (spiked) {
-                    for (row in 0 until stepResponseData.counterMatrix.nrow()) {
-                        stepResponseData.counterMatrix.set(row, col, responseDuration.toDouble())
-                        wm.psrMatrix.set(row, col, responseHeight * wm.weightMatrix.get(row, col))
-                    }
+    override fun apply(connector: Connector, responderData: MatrixDataHolder) {
+        val weightMatrix = connector as WeightMatrix
+        val lastSpikeTimes = ((weightMatrix.source as NeuronArray).dataHolder as SpikingMatrixData).lastSpikeTimes
+        for (i in 0 until connector.psrMatrix.ncol()) {
+            for (j in 0 until connector.psrMatrix.nrow()) {
+                if (lastSpikeTimes[i] + responseDuration * timeStep >= time) {
+                    connector.psrMatrix[j, i] = responseHeight * connector.weightMatrix[j, i]
                 } else {
-                    for (row in 0 until stepResponseData.counterMatrix.nrow()) {
-                        stepResponseData.counterMatrix.set(row, col, stepResponseData.counterMatrix.get(row, col) - 1)
-                        if (stepResponseData.counterMatrix.get(row, col) < 0) {
-                            stepResponseData.counterMatrix.set(row, col, 0.0)
-                        }
-                    }
+                    connector.psrMatrix[j, i] = 0.0
                 }
-                for (i in 0 until stepResponseData.counterMatrix.nrow())
-                    for (j in 0 until stepResponseData.counterMatrix.ncol()) {
-                        if (stepResponseData.counterMatrix.get(i, j) <= 0) {
-                            wm.psrMatrix.set(i, j, 0.0)
-                        }
-                    }
             }
         }
-
-    }
-
-    override fun createMatrixData(rows: Int, cols: Int): MatrixDataHolder {
-        return StepMatrixData(rows, cols)
     }
 
     context(Network)
     override fun apply(synapse: Synapse, responderData: ScalarDataHolder) {
-        val data = responderData as StepResponderData
-        if (synapse.source.isSpike) {
-            data.counter = responseDuration
+        if (synapse.source.lastSpikeTime + responseDuration * timeStep >= time) {
             synapse.psr = responseHeight * synapse.strength
         } else {
-            data.counter = data.counter - 1
-            if (data.counter < 0) {
-                data.counter = 0
-            }
-        }
-        if (data.counter <= 0) {
             synapse.psr = 0.0
         }
     }
 
-    override fun createResponderData(): ScalarDataHolder {
-        return StepResponderData()
-    }
 
     override fun copy(): StepResponder {
         val st = StepResponder()
@@ -116,23 +83,4 @@ class StepResponder(
 
     override val name: String
         get() = "Step"
-}
-
-class StepResponderData(
-    @UserParameter(
-        label = "Counter", description = "Used to count down the step function. Each iteration is as long as whatever" +
-                "the network time step"
-    )
-    var counter: Int = 0,
-) : ScalarDataHolder {
-    override fun copy(): StepResponderData {
-        return StepResponderData(counter)
-    }
-}
-
-class StepMatrixData(val rows: Int, val cols: Int) : MatrixDataHolder {
-    var counterMatrix = Matrix(rows, cols)
-    override fun copy() = StepMatrixData(rows, cols).also {
-        it.counterMatrix = counterMatrix.clone()
-    }
 }

@@ -34,7 +34,7 @@ abstract class ArrayLayer(
         super.updateInputs()
         val wtdInputs = Matrix(inputSize(), 1)
         for (c in incomingConnectors) {
-            wtdInputs.add(c.getSummedPSRs())
+            wtdInputs.addi(c.getSummedPSRs())
         }
         addInputs(wtdInputs)
     }

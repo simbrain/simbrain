@@ -3,7 +3,7 @@ package org.simbrain.network.updaterules
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.util.EmptyMatrixData
-import org.simbrain.network.util.PointNeuronScalarData
+import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.APETabOder
 import org.simbrain.util.roundToString
@@ -318,4 +318,32 @@ class PointNeuronRule : NeuronUpdateRule<PointNeuronScalarData, EmptyMatrixData>
     //    }
 
 
+}
+
+class PointNeuronScalarData(
+
+    @UserParameter(
+        label = "Membrane potential",
+        minimumValue = 0.0
+    )
+    var membranePotential: Double = .15,
+
+    @UserParameter(
+        label = "Excitatory Conductance",
+        description = "Current excitatory conductance.Proportion of channels open",
+        minimumValue = 0.0
+    )
+    var excitatoryConductance: Double = 0.0,
+
+    @UserParameter(
+        label = "Inhibitory Conductance",
+        description = "Current inhibitory conductance. Proportion of channels open",
+        minimumValue = 0.0
+    )
+    var inhibitoryConductance: Double = 0.0,
+
+    ) : ScalarDataHolder {
+    override fun copy(): PointNeuronScalarData {
+        return PointNeuronScalarData(membranePotential, excitatoryConductance, inhibitoryConductance)
+    }
 }

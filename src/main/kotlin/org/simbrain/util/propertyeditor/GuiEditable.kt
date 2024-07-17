@@ -750,6 +750,55 @@ class IntArrayWidget<O : EditableObject>(
     }
 }
 
+class BooleanArrayWidget<O : EditableObject>(
+    val editor: AnnotatedPropertyEditor<O>,
+    parameter: GuiEditable<O, BooleanArray>,
+    isConsistent: Boolean
+) : ParameterWidget<O, BooleanArray>(parameter, isConsistent) {
+
+    private var model = if (parameter.columnMode) {
+        createBasicDataFrameFromColumn(parameter.value.map { if (it) 1 else 0 }.toIntArray())
+    } else {
+        createFrom2DArray(arrayOf(parameter.value.map { if (it) 1 else 0 }.toTypedArray()))
+    }
+
+    override val widget by lazy {
+        JPanel().apply {
+            layout = BorderLayout()
+            SimbrainTablePanel(
+                model, useDefaultToolbarAndMenu = false, useHeaders = false,
+                usePadding = false
+            ).also {
+                it.table.tableHeader = null
+                add(it)
+                minimumSize = Dimension(200, min((model.rowCount + 1) * 17 + 2, 100))
+                preferredSize = Dimension(200, min((model.rowCount + 1) * 17 + 2, 100))
+            }
+        }
+    }
+
+    override val value: BooleanArray
+        get() = if (parameter.columnMode) {
+            model.getBooleanColumn(0)
+        } else {
+            model.getRow<Boolean>(0).toBooleanArray()
+        }
+
+    override fun refresh(property: KProperty<*>) {
+        parameter.update(UpdateFunctionContext(
+            editor,
+            parameter,
+            property,
+            enableWidgetProvider = { enabled ->
+                widget.isEnabled = enabled
+            },
+            widgetVisibilityProvider = { visible ->
+                widget.isVisible = visible
+            }
+        ))
+    }
+}
+
 class MatrixWidget<O : EditableObject>(
     val editor: AnnotatedPropertyEditor<O>,
     parameter: GuiEditable<O, Matrix>,

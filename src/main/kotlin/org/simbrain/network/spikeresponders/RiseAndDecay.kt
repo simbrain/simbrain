@@ -61,10 +61,10 @@ class RiseAndDecay : SpikeResponder() {
 
     context(Network)
     override fun apply(connector: Connector, responderData: MatrixDataHolder) {
-        val wm = connector.let { if (it is WeightMatrix) it else return }
-        val na = connector.source.let { if (it is NeuronArray) it else return }
-        val responseData = responderData.let { if (it is RiseAndDecayMatrixData) it else return }
-        val spikeData = na.dataHolder.let { if (it is SpikingMatrixData) it else return }
+        val wm = connector as WeightMatrix
+        val na = connector.source as NeuronArray
+        val responseData = responderData as RiseAndDecayMatrixData
+        val spikeData = na.dataHolder as SpikingMatrixData
         if (na.updateRule.isSpikingRule) {
             for (i in 0 until wm.weightMatrix.nrow()) {
                 for (j in 0 until wm.weightMatrix.ncol()) {

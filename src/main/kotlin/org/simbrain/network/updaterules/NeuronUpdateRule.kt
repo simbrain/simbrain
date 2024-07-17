@@ -278,6 +278,7 @@ val neuronArrayUpdateRules = listOf(
     DecayRule::class.java,
     FitzhughNagumo::class.java,
     IntegrateAndFireRule::class.java,
+    IzhikevichRule::class.java,
     LinearRule::class.java,
     NakaRushtonRule::class.java,
     SigmoidalRule::class.java,

@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.spikeresponders.NonResponder
 import org.simbrain.network.spikeresponders.ProbabilisticResponder
-import org.simbrain.network.spikeresponders.StepMatrixData
 import org.simbrain.network.spikeresponders.StepResponder
 import org.simbrain.network.updaterules.IntegrateAndFireRule
 import org.simbrain.network.updaterules.SpikingThresholdRule
@@ -44,7 +43,7 @@ class SpikeResponderMatrixTest {
         arr1.updateRule = IntegrateAndFireRule()
         val arr2 = arr1.copy()
         val wmArr1Arr2 = WeightMatrix(arr1, arr2)
-        wmArr1Arr2.setSpikeResponder(StepResponder())
+        wmArr1Arr2.spikeResponder = StepResponder()
         net2.addNetworkModels(arr1, arr2, wmArr1Arr2)
         net2.update() // Caused exceptions in earlier iterations.
         assertEquals(4, arr2.size())
@@ -55,7 +54,7 @@ class SpikeResponderMatrixTest {
     fun `non-responder results in weight matrix times input vector`() {
 
         val nr = NonResponder()
-        wm2.setSpikeResponder(nr)
+        wm2.spikeResponder = nr
 
         n2.activations = Matrix.column(doubleArrayOf(1.0, 1.0))
         net.update()
@@ -67,7 +66,7 @@ class SpikeResponderMatrixTest {
 
         val pr = ProbabilisticResponder()
         pr.activationProbability = 1.0
-        wm2.setSpikeResponder(pr)
+        wm2.spikeResponder = pr
         n1.activations = Matrix.column(doubleArrayOf(1.0, 1.0))
         net.update()
         net.update() // extra update to propagate from layer 1 to 2
@@ -85,7 +84,7 @@ class SpikeResponderMatrixTest {
     fun `test step responder values before during and after its duration `() {
 
         val step = StepResponder()
-        wm2.setSpikeResponder(step)
+        wm2.spikeResponder = step
 
         step.responseHeight = .5
         step.responseDuration = 3
@@ -97,18 +96,12 @@ class SpikeResponderMatrixTest {
         assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0), n3.activationArray, .001)
         net.update()
         assertArrayEquals(doubleArrayOf(0.0, 0.0), n2.activationArray, .001)
-        assertArrayEquals(doubleArrayOf(3.0,3.0,3.0), (wm2.spikeResponseData as StepMatrixData).counterMatrix.col(0))
-        assertArrayEquals(doubleArrayOf(0.0,0.0,0.0), (wm2.spikeResponseData as StepMatrixData).counterMatrix.col(1))
         assertArrayEquals(doubleArrayOf(0.5, 0.0, 0.25), n3.activationArray, .001)
         net.update()
         assertArrayEquals(doubleArrayOf(0.0, 0.0), n2.activationArray, .001)
-        assertArrayEquals(doubleArrayOf(2.0,2.0,2.0), (wm2.spikeResponseData as StepMatrixData).counterMatrix.col(0))
-        assertArrayEquals(doubleArrayOf(0.0,0.0,0.0), (wm2.spikeResponseData as StepMatrixData).counterMatrix.col(1))
         assertArrayEquals(doubleArrayOf(0.5, 0.0, 0.25), n3.activationArray, .001)
         net.update()
         assertArrayEquals(doubleArrayOf(0.0, 0.0), n2.activationArray, .001)
-        assertArrayEquals(doubleArrayOf(1.0,1.0,1.0), (wm2.spikeResponseData as StepMatrixData).counterMatrix.col(0))
-        assertArrayEquals(doubleArrayOf(0.0,0.0,0.0), (wm2.spikeResponseData as StepMatrixData).counterMatrix.col(1))
         assertArrayEquals(doubleArrayOf(0.5, 0.0, 0.25), n3.activationArray, .001)
         net.update() // Step response ends
         assertArrayEquals(doubleArrayOf(0.0, 0.0), n2.activationArray, .001)
@@ -120,7 +113,7 @@ class SpikeResponderMatrixTest {
     fun `test step responder values with both nodes spiking`() {
 
         val step = StepResponder()
-        wm2.setSpikeResponder(step)
+        wm2.spikeResponder = step
 
         step.responseHeight = 1.0
         step.responseDuration = 2
@@ -128,13 +121,9 @@ class SpikeResponderMatrixTest {
         n1.activations = Matrix.column(doubleArrayOf(1.0, 1.0))
         net.update()
         net.update()
-        assertArrayEquals(doubleArrayOf(2.0,2.0,2.0), (wm2.spikeResponseData as StepMatrixData).counterMatrix.col(0))
-        assertArrayEquals(doubleArrayOf(2.0,2.0,2.0), (wm2.spikeResponseData as StepMatrixData).counterMatrix.col(1))
         assertArrayEquals(doubleArrayOf(1.0,-1.0, 1.0), wm2.getSummedPSRs())
         assertArrayEquals(doubleArrayOf(1.0,-1.0, 1.0), n3.activationArray, .001)
         net.update()
-        assertArrayEquals(doubleArrayOf(1.0,1.0,1.0), (wm2.spikeResponseData as StepMatrixData).counterMatrix.col(0))
-        assertArrayEquals(doubleArrayOf(1.0,1.0,1.0), (wm2.spikeResponseData as StepMatrixData).counterMatrix.col(1))
         assertArrayEquals(doubleArrayOf(1.0,-1.0, 1.0), wm2.getSummedPSRs())
         assertArrayEquals(doubleArrayOf(1.0,-1.0, 1.0), n3.activationArray, .001)
         net.update()

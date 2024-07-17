@@ -5,11 +5,12 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.updaterules.interfaces.ClippedUpdateRule
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
-import org.simbrain.network.util.NakaMatrixData
-import org.simbrain.network.util.NakaScalarData
+import org.simbrain.network.util.MatrixDataHolder
+import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.util.UserParameter
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
+import smile.math.matrix.Matrix
 import kotlin.math.pow
 
 /**
@@ -196,5 +197,18 @@ class NakaRushtonRule : NeuronUpdateRule<NakaScalarData, NakaMatrixData>(), Clip
          * The default activation ceiling.
          */
         const val DEFAULT_UPPER_BOUND: Int = 100
+    }
+}
+
+class NakaScalarData(@UserParameter(label = "a") var a: Double = 0.0) : ScalarDataHolder {
+    override fun copy(): NakaScalarData {
+        return NakaScalarData(a)
+    }
+}
+
+class NakaMatrixData(var size: Int) : MatrixDataHolder {
+    var a = Matrix(size, 1)
+    override fun copy() = NakaMatrixData(size).also {
+        it.a = a.clone()
     }
 }

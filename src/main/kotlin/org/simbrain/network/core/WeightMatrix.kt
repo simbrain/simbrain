@@ -11,6 +11,7 @@ import org.simbrain.util.UserParameter
 import org.simbrain.util.broadcastMultiply
 import org.simbrain.util.copyFrom
 import org.simbrain.util.flatten
+import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
@@ -41,18 +42,38 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
      * Only used if source connector's rule is spiking.
      */
     @UserParameter(label = "Spike Responder", showDetails = false, order = 200)
-    private var spikeResponder: SpikeResponder = NonResponder()
+    var spikeResponder: SpikeResponder = NonResponder()
+        set(value) {
+            field = value
+            spikeResponseData = value.createMatrixData(weightMatrix.nrow(), weightMatrix.ncol())
+        }
 
     // TODO: Conditionally enable based on type of source array rule?
     /**
      * Holds data for prototype rule.
      */
-    private val dataHolder: MatrixDataHolder = EmptyMatrixData
+    var dataHolder: MatrixDataHolder by GuiEditable(
+        initValue = EmptyMatrixData,
+        order = 210,
+        label = "Learning Rule Data",
+        tab = "Data"
+    )
 
     /**
      * Holds data for spike responder.
      */
-    var spikeResponseData: MatrixDataHolder = EmptyMatrixData
+    var spikeResponseData: MatrixDataHolder by GuiEditable(
+        initValue = EmptyMatrixData,
+        order = 220,
+        label = "Spike Responder Data",
+        tab = "Data",
+        onUpdate = {
+            val proposedDataHolder = widgetValue(::spikeResponder).createMatrixData(weightMatrix.nrow(), weightMatrix.ncol())
+            if (widgetValue(::spikeResponseData)::class != proposedDataHolder::class) {
+                refreshValue(proposedDataHolder)
+            }
+        }
+    )
 
     /**
      * The weight matrix object. Overwriting this causes unexpected behavior in GUI elements so best practice is to
@@ -61,7 +82,8 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
     @get:Producible
     val weightMatrix: Matrix
 
-    override val psrMatrix: Matrix
+    @UserParameter(label = "PSR Matrix", order = 300, tab = "Data")
+    override var psrMatrix: Matrix
 
     /**
      * A binary matrix with 1s corresponding to entries of the weight matrix that are greater than 1 and thus
@@ -220,11 +242,6 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
         return (id
                 + " (" + weightMatrix.nrow() + "x" + weightMatrix.ncol() + ") "
                 + "connecting " + source.id + " to " + target.id)
-    }
-
-    fun setSpikeResponder(spikeResponder: SpikeResponder) {
-        this.spikeResponder = spikeResponder
-        spikeResponseData = spikeResponder.createMatrixData(weightMatrix.nrow(), weightMatrix.ncol())
     }
 
     fun updateMasks() {

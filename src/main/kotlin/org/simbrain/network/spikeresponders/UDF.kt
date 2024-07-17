@@ -71,7 +71,7 @@ class UDF : SpikeResponder() {
      * Psr decay time constant
      */
     @UserParameter(label = "PSR Decay Constant", description = "Time constant for facilitating effects.", order = 1)
-    private val tau = 3.0
+    private var tau = 3.0
 
     /**
      * The time of the last spike (recorded here since
@@ -107,8 +107,14 @@ class UDF : SpikeResponder() {
      * proceeds to draw its parameters from the same distributions.
      */
     override fun copy(): UDF {
-        // TODO
-        return UDF()
+        val copy = UDF()
+        copy.U = U
+        copy.D = D
+        copy.F = F
+        copy.tau = tau
+        copy.u = u
+        copy.R = R
+        return copy
     }
 
     override val description: String

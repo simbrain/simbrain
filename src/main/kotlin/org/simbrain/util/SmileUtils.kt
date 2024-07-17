@@ -88,7 +88,7 @@ fun Array<DoubleArray>.toMatrix(): Matrix = Matrix.of(this)
  * Add the entries of a double array in-place to a Smile matrix / column vector. Assumes the matrix has as many rows
  * as the array has entries.
  */
-fun Matrix.add(toAdd: DoubleArray) {
+fun Matrix.addi(toAdd: DoubleArray) {
     if (this.nrow() != toAdd.size) {
         throw IllegalArgumentException("Trying to add a double array of length ${toAdd.size} to a matrix with ${nrow
             ()} rows")

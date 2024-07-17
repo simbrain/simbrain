@@ -24,7 +24,7 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.network.util.BiasedScalarData
-import org.simbrain.util.add
+import org.simbrain.util.addi
 
 /**
  * Discrete sigmoidal provides various implementations of a standard sigmoidal neuron.
@@ -50,7 +50,7 @@ class SigmoidalRule : AbstractSigmoidalRule() {
         val array = layer as NeuronArray
         val weightedInputs = array.inputs.add(dataHolder.biases)
         if (addNoise) {
-            weightedInputs.add(noiseGenerator.sampleDouble(array.size()))
+            weightedInputs.addi(noiseGenerator.sampleDouble(array.size()))
         }
         array.activations = type.valueOf(weightedInputs, lowerBound, upperBound, slope)
     }

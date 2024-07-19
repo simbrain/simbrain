@@ -115,7 +115,7 @@ class OperantConditioning : Simulation {
     private fun updateNetwork() {
         // Update firing probabilities
 
-        for (i in 0 until behaviorNet.size()) {
+        for (i in 0 until behaviorNet.size) {
             val n = behaviorNet.getNeuron(i)
             firingProbabilities[i] = n.weightedInputs + n.auxValue
         }
@@ -136,7 +136,7 @@ class OperantConditioning : Simulation {
     }
 
     private fun setWinningNode(nodeIndex: Int) {
-        for (i in 0 until behaviorNet.size()) {
+        for (i in 0 until behaviorNet.size) {
             if (i == nodeIndex) {
                 behaviorNet.getNeuron(i).activation = 1.0
             } else {

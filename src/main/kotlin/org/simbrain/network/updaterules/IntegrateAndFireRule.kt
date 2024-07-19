@@ -136,7 +136,7 @@ open class IntegrateAndFireRule : SpikingNeuronUpdateRule<SpikingScalarData, Spi
     context(Network)
     override fun apply(layer: Layer, dataHolder: SpikingMatrixData) {
         if (layer is NeuronArray) {
-            for (i in 0 until layer.size()) {
+            for (i in 0 until layer.size) {
                 val(spiked, V) = intFireRule(
                     time,
                     dataHolder.lastSpikeTimes[i],

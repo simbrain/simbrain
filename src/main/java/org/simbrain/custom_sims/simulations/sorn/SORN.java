@@ -103,7 +103,7 @@ public class SORN extends Simulation {
         ngIn.setLabel("Inhibitory");
         net.addNetworkModel(ngIn);
         ngIn.setLayout(layout);
-        System.out.println(ngIn.size());
+        System.out.println(ngIn.getSize());
         int x_loc = (int) (Math.sqrt(numNeurons) * gridSpace + 300);
         ngIn.applyLayout(new Point(1810, 141));
 

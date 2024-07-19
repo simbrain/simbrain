@@ -90,7 +90,7 @@ public class SimpleOperant extends Simulation {
     }
 
     private void setWinningNode(int nodeIndex) {
-        for (int i = 0; i < behaviorNet.size(); i++) {
+        for (int i = 0; i < behaviorNet.getSize(); i++) {
             if (i == nodeIndex) {
                 behaviorNet.getNeuron(i).setActivation(1);
             } else {

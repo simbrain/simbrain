@@ -53,7 +53,7 @@ abstract class Layer : LocatableModel(), AttributeContainer {
     var inputData: Matrix
         get() {
             if (_inputData == null) {
-                _inputData = Matrix(10, inputSize())
+                _inputData = Matrix(10, this.size)
             }
             return _inputData!!
         }
@@ -72,23 +72,27 @@ abstract class Layer : LocatableModel(), AttributeContainer {
         incomingConnectors.forEach { it.updatePSR() }
     }
 
-    open fun applyActivations(activations: DoubleArray) {
+    open fun setActivations(activations: DoubleArray) {
         throw RuntimeException("applyActivations not implemented")
     }
 
     /**
-     * A column vector of output values. For "single-layer" layers this is activations. For multi-layer cases it is the
-     * output layer.
+     * A column vector of activation values. Computations are performed on this matrix.
      */
-    abstract val outputs: Matrix
+    abstract val activations: Matrix
+
+    /**
+     * Double array of neuron activation values. A convenience property for accessing the activation matrix as a double array.
+     */
+    abstract val activationArray: DoubleArray
 
     @get:Producible
-    val outputActivations: DoubleArray
-        get() = outputs.toDoubleArray()
+    val outputArray: DoubleArray
+        get() = activations.toDoubleArray()
 
     @get:Producible
     open val spikes: DoubleArray
-        get() = DoubleArray(outputSize())
+        get() = DoubleArray(this.size)
 
     /**
      * Width of layer. Mainly used by graphica arrows drawn to represent [Connector]s.
@@ -115,14 +119,9 @@ abstract class Layer : LocatableModel(), AttributeContainer {
     override val events: LocationEvents = LocationEvents()
 
     /**
-     * Returns the output size for this layer.
+     * Returns the size of the activation array / input array for this layer.
      */
-    abstract fun outputSize(): Int
-
-    /**
-     * Returns the input size for this layer.
-     */
-    abstract fun inputSize(): Int
+    abstract val size: Int
 
     /**
      * Needed so arrow can be set correctly

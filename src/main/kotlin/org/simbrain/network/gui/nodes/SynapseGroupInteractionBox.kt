@@ -143,6 +143,6 @@ class SynapseGroupInteractionBox(
 
     override val toolTipText: String
         get() = "Synapses: ${synapseGroup.size()} Density: " + synapseGroup.size()
-            .toDouble() / (synapseGroup.source.size() * synapseGroup.target.size())
+            .toDouble() / (synapseGroup.source.size * synapseGroup.target.size)
 
 }

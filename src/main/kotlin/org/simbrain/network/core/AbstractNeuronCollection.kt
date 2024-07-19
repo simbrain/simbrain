@@ -41,11 +41,8 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
     @Transient
     override val events: NeuronCollectionEvents = NeuronCollectionEvents()
 
-    /**
-     * Cache of neuron activation values.
-     */
     @get:Producible(arrayDescriptionMethod = "getLabelArray")
-    var activations: DoubleArray
+    override var activationArray: DoubleArray
         get() = neuronList
             .map { it.activation }
             .toDoubleArray()
@@ -66,7 +63,7 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
             if ((it.dataHolder as? SpikingScalarData)?.spiked == true) 1.0 else 0.0
         }.toDoubleArray()
 
-    override val inputs: Matrix get() = Matrix.column(inputActivations)
+    override val inputs: Matrix get() = Matrix.column(inputArray)
 
     /**
      * References to neurons in this collection
@@ -89,17 +86,17 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
      */
     var layout: Layout = GridLayout()
 
-    override val outputs: Matrix
+    override val activations: Matrix
         get() = // TODO: Performance drain? Consider caching this.
-            Matrix.column(activations)
+            Matrix.column(this.activationArray)
 
     override fun addInputs(inputs: Matrix) {
         addInputs(inputs.col(0))
     }
 
     @Consumable
-    override fun applyActivations(activations: DoubleArray) {
-        this.activations = activations
+    override fun setActivations(activations: DoubleArray) {
+        this.activationArray = activations
     }
 
     /**
@@ -125,7 +122,7 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
      * Return inputs as a double array. Either create the array or return a cache of it.
      */
     @get:Producible
-    val inputActivations: DoubleArray
+    val inputArray: DoubleArray
         get() {
             if (cachedInputsDirty) {
                 _cachedInputs = neuronList
@@ -135,20 +132,7 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
             return _cachedInputs
         }
 
-    /**
-     * Input and output size are the same for collections of neurons.
-     */
-    fun size(): Int {
-        return activations.size
-    }
-
-    override fun outputSize(): Int {
-        return size()
-    }
-
-    override fun inputSize(): Int {
-        return size()
-    }
+    override val size: Int get() = activationArray.size
 
     /**
      * Get the central x coordinate of this group, based on the positions of the neurons that comprise it.
@@ -347,7 +331,7 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
         // }
         // inputManager.applyCurrentRow(); // TODO
         super.accumulateInputs()
-        val wtdInputs = DoubleArray(size())
+        val wtdInputs = DoubleArray(size)
         for (c in incomingConnectors) {
             wtdInputs.addi(c.getSummedPSRs())
         }
@@ -468,7 +452,8 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
     override fun onCommit() {}
 
     override fun toString(): String {
-        return "$id with ${activations.size} activations: ${Utils.getTruncatedArrayString(activations, 10)}"
+        return "$id with ${this.activationArray.size} activations: ${Utils.getTruncatedArrayString(
+            this.activationArray, 10)}"
     }
 
     fun clearInputs() {

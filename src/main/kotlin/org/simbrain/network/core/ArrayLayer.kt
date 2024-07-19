@@ -25,14 +25,12 @@ abstract class ArrayLayer(
 
     override val inputs: Matrix = Matrix(inputSize, 1)
 
-    override fun inputSize(): Int {
-        return inputs.size().toInt()
-    }
+    override val size: Int get() = inputs.size().toInt()
 
     context(Network)
     override fun accumulateInputs() {
         super.accumulateInputs()
-        val wtdInputs = Matrix(inputSize(), 1)
+        val wtdInputs = Matrix(size, 1)
         for (c in incomingConnectors) {
             wtdInputs.addi(c.getSummedPSRs())
         }

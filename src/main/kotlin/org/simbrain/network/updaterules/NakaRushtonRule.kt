@@ -132,10 +132,10 @@ class NakaRushtonRule : NeuronUpdateRule<NakaScalarData, NakaMatrixData>(), Clip
 
     context(Network)
     override fun apply(layer: Layer, dataHolder: NakaMatrixData) {
-        for (i in 0 until layer.outputSize()) {
-            layer.outputs[i, 0] = nakaRushtonRule(
+        for (i in 0 until layer.size) {
+            layer.activations[i, 0] = nakaRushtonRule(
                 layer.inputs[i, 0],
-                layer.outputs[i, 0],
+                layer.activations[i, 0],
                 timeStep,
                 dataHolder.a[i, 0]
             )

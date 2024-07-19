@@ -23,8 +23,8 @@ class SOMTest {
     @Test
     fun `test som`() {
         assertEquals(0, net.freeNeurons.size)
-        assertEquals(1, som.som.size())
-        assertEquals(2, som.inputLayer.size())
+        assertEquals(1, som.som.size)
+        assertEquals(2, som.inputLayer.size)
         assertEquals(0, net.freeSynapses.size)
         assertEquals(0, som.modelList.get<Synapse>().size)
         assertEquals(2, som.modelList.get<SynapseGroup>().first().size())

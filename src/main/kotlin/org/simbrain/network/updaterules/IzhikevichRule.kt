@@ -134,13 +134,13 @@ class IzhikevichRule : SpikingNeuronUpdateRule<IzhikevichScalarData, IzhikevichM
             val inputs = layer.inputs
 
             if (addNoise) {
-                inputs.addi(noiseGenerator.sampleDouble(layer.size()))
+                inputs.addi(noiseGenerator.sampleDouble(layer.size))
             }
 
             inputs.add(iBg)
 
             val result = buildList {
-                for (i in 0 until layer.size()) {
+                for (i in 0 until layer.size) {
                     val activation = layer.activations.get(i, 0)
                     val input = layer.inputs.get(i, 0)
                     add(izhikevichRule(timeStep, input, activation, dataHolder.recoveryMatrix[i, 0]))

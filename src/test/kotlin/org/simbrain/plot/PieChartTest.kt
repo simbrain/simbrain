@@ -35,12 +35,12 @@ class PieChartTest {
 
         // With input below threshold it remains empty
         pieChart.emptyPieThreshold = .2
-        ng.activations = doubleArrayOf(.1, .0)
+        ng.activationArray = doubleArrayOf(.1, .0)
         workspace.simpleIterate()
         assertEquals(1,pieChart.dataset.itemCount)
 
         // With input above threshold it is no longer empty
-        ng.activations = doubleArrayOf(.1, .3)
+        ng.activationArray = doubleArrayOf(.1, .3)
         workspace.simpleIterate()
         assertEquals(2,pieChart.dataset.itemCount)
 
@@ -48,7 +48,7 @@ class PieChartTest {
 
     @Test
     fun `pie chart is initialized correctly`() {
-        ng.activations = doubleArrayOf(.5, .5)
+        ng.activationArray = doubleArrayOf(.5, .5)
         workspace.simpleIterate()
         // There should be two "slices" of the pie
         assertEquals(2,pieChart.dataset.itemCount)
@@ -60,14 +60,14 @@ class PieChartTest {
 
     @Test
     fun `equal values should lead to equal pie slices`() {
-        ng.activations = doubleArrayOf(1.5, 1.5)
+        ng.activationArray = doubleArrayOf(1.5, 1.5)
         workspace.simpleIterate()
         assertEquals(pieChart.dataset.getValue(0).toDouble(), pieChart.dataset.getValue(1).toDouble())
     }
 
     @Test
     fun `pie slices have correct proportions`() {
-        ng.activations = doubleArrayOf(.5, 1.0)
+        ng.activationArray = doubleArrayOf(.5, 1.0)
         workspace.simpleIterate()
         assertEquals(.33, pieChart.dataset.getValue(0).toDouble(), .01)
         assertEquals(.66, pieChart.dataset.getValue(1).toDouble(), .01)
@@ -75,7 +75,7 @@ class PieChartTest {
 
     @Test
     fun `test xml rep`() {
-        ng.activations = doubleArrayOf(.5, 1.0)
+        ng.activationArray = doubleArrayOf(.5, 1.0)
         workspace.simpleIterate()
         val xml = pcc.xml
         val deserializedPieChart = PieChartModel.getXStream().fromXML(xml) as PieChartModel
@@ -89,7 +89,7 @@ class PieChartTest {
     @Test
     fun `test workspace couplings`() {
         // Put pie chat in 50/50 state
-        ng.activations = doubleArrayOf(1.5, 1.5)
+        ng.activationArray = doubleArrayOf(1.5, 1.5)
         workspace.simpleIterate()
 
         // Zip and create a new workspace
@@ -99,7 +99,7 @@ class PieChartTest {
         // Iterate the new workspace with new inputs and proportions should change accordingly
         workspace2.openFromZipData(zip)
         val savedNg = (workspace2.getComponent("Net") as NetworkComponent).network.getModels<NeuronGroup>().first()
-        savedNg.activations = doubleArrayOf(1.5, .5)
+        savedNg.activationArray = doubleArrayOf(1.5, .5)
         val savedPie = (workspace2.getComponent("Pie") as PieChartComponent).model as PieChartModel
         workspace2.simpleIterate()
         assertEquals(.75, savedPie.dataset.getValue(0).toDouble())

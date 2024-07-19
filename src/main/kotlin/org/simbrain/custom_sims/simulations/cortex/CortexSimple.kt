@@ -150,10 +150,10 @@ val cortexSimple = newSim {
         )
         layer_56.label = "Layer 5/6"
         val tmp = DoubleArray(3)
-        val defMax = (layer_4.size() * 2).toDouble()
+        val defMax = (layer_4.size * 2).toDouble()
         val xlim = doubleArrayOf(0.0, defMax)
         val zlim = doubleArrayOf(0.0, defMax)
-        for (ii in 0 until layer_4.size()) {
+        for (ii in 0 until layer_4.size) {
             val pol = if (Math.random() < 0.2) Polarity.INHIBITORY else Polarity.EXCITATORY
             var ylim = doubleArrayOf(0.0, defMax)
             random3Position(tmp, xlim, ylim, zlim)

@@ -50,7 +50,7 @@ class SigmoidalRule : AbstractSigmoidalRule() {
         val array = layer as NeuronArray
         val weightedInputs = array.inputs.add(dataHolder.biases)
         if (addNoise) {
-            weightedInputs.addi(noiseGenerator.sampleDouble(array.size()))
+            weightedInputs.addi(noiseGenerator.sampleDouble(array.size))
         }
         array.activations = type.valueOf(weightedInputs, lowerBound, upperBound, slope)
     }

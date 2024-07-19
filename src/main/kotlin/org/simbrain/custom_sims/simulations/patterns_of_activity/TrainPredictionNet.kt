@@ -19,7 +19,7 @@ class TrainPredictionNet(
      * Construct the updater.
      */
     init {
-        lastPrediction = sim.predictionRes.activations
+        lastPrediction = sim.predictionRes.activationArray
     }
     override suspend fun run() {
         mainUpdateMethod()
@@ -51,6 +51,6 @@ class TrainPredictionNet(
             synapse.strength = newStrength
             // System.out.println(newStrength);
         }
-        lastPrediction = sim.predictionRes.activations
+        lastPrediction = sim.predictionRes.activationArray
     }
 }

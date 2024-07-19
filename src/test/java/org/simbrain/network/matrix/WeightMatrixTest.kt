@@ -57,7 +57,7 @@ class WeightMatrixTest {
 
     @Test
     fun testMatrixProduct() {
-        na1.applyActivations(doubleArrayOf(1.0, 2.0))
+        na1.setActivations(doubleArrayOf(1.0, 2.0))
         wm.setWeights(doubleArrayOf(1.0, 2.0, 3.0, 4.0))
         net.update()
         Assertions.assertArrayEquals(doubleArrayOf(5.0, 11.0), wm.getSummedPSRs(), 0.0)
@@ -66,7 +66,7 @@ class WeightMatrixTest {
 
     @Test
     fun testArrayToArray() {
-        na1.applyActivations(doubleArrayOf(.5, -.5))
+        na1.setActivations(doubleArrayOf(.5, -.5))
         wm.diagonalize()
         net.update() // input should be cleared and second array updated. This is buffered update.
         Assertions.assertArrayEquals(doubleArrayOf(0.0, 0.0), na1.activations.col(0), 0.0)
@@ -91,15 +91,15 @@ class WeightMatrixTest {
 
     @Test
     fun testArrayToNeuronGroup() {
-        na1.applyActivations(doubleArrayOf(.5, -.5))
+        na1.setActivations(doubleArrayOf(.5, -.5))
         val ng = NeuronGroup(2)
         val wm2 = WeightMatrix(na1, ng)
         wm2.diagonalize()
         net.addNetworkModels(List.of(ng, wm2))
         net.update()
-        Assertions.assertArrayEquals(doubleArrayOf(.5, -.5), ng.activations, 0.0)
+        Assertions.assertArrayEquals(doubleArrayOf(.5, -.5), ng.activationArray, 0.0)
         net.update() // All should be cleared on second update
-        Assertions.assertArrayEquals(doubleArrayOf(0.0, 0.0), ng.activations, 0.0)
+        Assertions.assertArrayEquals(doubleArrayOf(0.0, 0.0), ng.activationArray, 0.0)
     }
 
     // @Test

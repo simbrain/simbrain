@@ -114,12 +114,12 @@ val competitiveGridSim = newSim {
             }
 
                 addButton("Add Noise") {
-                    competitive.inputLayer.activations = competitive.inputLayer.activations.add(NormalDistribution(standardDeviation = .01).sampleDouble(competitive.inputLayer.activations.size))
+                    competitive.inputLayer.activationArray = competitive.inputLayer.activationArray.add(NormalDistribution(standardDeviation = .01).sampleDouble(competitive.inputLayer.activationArray.size))
                 }
 
             addButton("Train") {
                 workspace.iterateSuspend()
-                val winner = competitive.competitive.neuronList[competitive.competitive.activations.indexOfFirst { it > 0.0 }]
+                val winner = competitive.competitive.neuronList[competitive.competitive.activationArray.indexOfFirst { it > 0.0 }]
                 winner.label = winningLabel
             }
         }

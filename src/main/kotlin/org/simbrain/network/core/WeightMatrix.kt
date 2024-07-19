@@ -108,15 +108,15 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
         source.addOutgoingConnector(this)
         target.addIncomingConnector(this)
 
-        weightMatrix = Matrix(target.inputSize(), source.outputSize())
+        weightMatrix = Matrix(target.size, source.size)
 
-        excitatoryMask = Matrix(target.inputSize(), source.outputSize())
-        inhibitoryMask = Matrix(target.inputSize(), source.outputSize())
+        excitatoryMask = Matrix(target.size, source.size)
+        inhibitoryMask = Matrix(target.size, source.size)
 
         diagonalize()
         updateMasks()
 
-        psrMatrix = Matrix(target.inputSize(), source.outputSize())
+        psrMatrix = Matrix(target.size, source.size)
 
     }
 
@@ -157,7 +157,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
      */
     fun diagonalize() {
         clear()
-        val diag = Matrix.eye(target.inputSize(), source.outputSize())
+        val diag = Matrix.eye(target.size, source.size)
         weightMatrix.copyFrom(diag)
         updateMasks()
         events.updated.fire()
@@ -183,7 +183,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
             // responder, for example.
             // Populate each row of the psrMatrix with the element-wise product of the pre-synaptic output vector and
             // that row of the matrix
-            psrMatrix.copyFrom(weightMatrix.broadcastMultiply(source.outputs))
+            psrMatrix.copyFrom(weightMatrix.broadcastMultiply(source.activations))
         } else {
             spikeResponder.apply(this, spikeResponseData)
         }

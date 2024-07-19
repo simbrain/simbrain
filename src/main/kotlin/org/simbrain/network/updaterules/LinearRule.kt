@@ -88,8 +88,8 @@ open class LinearRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>(), 
 
     context(Network)
     override fun apply(layer: Layer, dataHolder: BiasedMatrixData) {
-        for (i in 0 until layer.outputs.nrow()) {
-            layer.outputs[i, 0] = linearRule(layer.inputs[i, 0], dataHolder.biases[i, 0])
+        for (i in 0 until layer.activations.nrow()) {
+            layer.activations[i, 0] = linearRule(layer.inputs[i, 0], dataHolder.biases[i, 0])
         }
     }
 

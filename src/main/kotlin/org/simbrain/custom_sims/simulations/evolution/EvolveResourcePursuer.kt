@@ -302,7 +302,7 @@ val evolveResourcePursuer = newSim { optionString ->
         workspace.addUpdateAction("update energy") {
             with(phenotype.await()) {
                 val outputsActivations =
-                    outputNeurons.activations.sumOf { 1.2.pow(if (it < 0) it * -2 else it) - 1 }
+                    outputNeurons.activationArray.sumOf { 1.2.pow(if (it < 0) it * -2 else it) - 1 }
                 val allActivations =
                     (inputNeurons.neuronList + hiddenNeurons.neuronList).activations.sumOf { abs(it) } * 2
                 movement = abs(evolvedAgent.speed * 3) + abs(evolvedAgent.dtheta * 2)

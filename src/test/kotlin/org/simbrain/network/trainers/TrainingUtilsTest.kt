@@ -31,7 +31,7 @@ class TrainingUtilsTest {
 
     @Test
     fun `test neuron array error`() {
-        na1.applyActivations(doubleArrayOf(-1.0, 1.0))
+        na1.setActivations(doubleArrayOf(-1.0, 1.0))
         val error = na1.getError(doubleArrayOf(1.0, 1.0).toMatrix())
         assertArrayEquals(doubleArrayOf(2.0, 0.0), error.toDoubleArray())
     }
@@ -55,7 +55,7 @@ class TrainingUtilsTest {
     @Test
     fun `test weight lms weight updates`() {
         val outputError = Matrix(3,1, 2.0)
-        na1.applyActivations(doubleArrayOf(-1.0, 1.0))
+        na1.setActivations(doubleArrayOf(-1.0, 1.0))
         // outputError * na1.activations + wm2.weights
         wm1.applyLMS(outputError, 1.0)
         // Col 1 = -1, -2, -2
@@ -72,15 +72,15 @@ class TrainingUtilsTest {
             listOf(wm1, wm2).forwardPass(inputs)
             listOf(wm1, wm2).printActivationsAndWeights(true)
         }
-        assertArrayEquals(inputs.toDoubleArray(), wm2.target.outputs.toDoubleArray())
+        assertArrayEquals(inputs.toDoubleArray(), wm2.target.activations.toDoubleArray())
     }
 
 
     @Test
     fun `test lms`() {
-        na1.applyActivations(doubleArrayOf(-1.0, 1.0))
+        na1.setActivations(doubleArrayOf(-1.0, 1.0))
         val target = doubleArrayOf(5.0, -1.0, .5)
-        na2.applyActivations(target)
+        na2.setActivations(target)
         // println("Before: ${wm1.output}")
         with(net) {
             repeat(100) {
@@ -99,7 +99,7 @@ class TrainingUtilsTest {
         val target =  ff.trainingSet.targets.rowVectorTransposed(1)
 
         ff.inputLayer.isClamped = true
-        ff.inputLayer.applyActivations(ff.trainingSet.inputs.row(1))
+        ff.inputLayer.setActivations(ff.trainingSet.inputs.row(1))
         with(net) { ff.update() }
         val outputs = ff.outputLayer.activations
         val error = target.sub(outputs)

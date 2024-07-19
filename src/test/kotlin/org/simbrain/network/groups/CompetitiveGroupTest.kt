@@ -45,7 +45,7 @@ class CompetitiveGroupTest {
     fun `one node wins and takes win value`() {
         competitive.params.winValue = 2.0
         competitive.params.loseValue = 0.0
-        inputs.activations = doubleArrayOf(1.0, 0.0)
+        inputs.activationArray = doubleArrayOf(1.0, 0.0)
         repeat(2) {
             net.update()
         }
@@ -55,23 +55,23 @@ class CompetitiveGroupTest {
     @Test
     fun `network learns two patterns`() {
         // Pattern 1
-        inputs.activations = doubleArrayOf(1.0, 0.0)
+        inputs.activationArray = doubleArrayOf(1.0, 0.0)
         repeat(2) {
             net.update()
         }
         // Pattern 2
-        inputs.activations = doubleArrayOf(0.0, 1.0)
+        inputs.activationArray = doubleArrayOf(0.0, 1.0)
         repeat(2) {
             net.update()
         }
 
         // Test retrieval
-        inputs.activations = doubleArrayOf(1.0, 0.0)
+        inputs.activationArray = doubleArrayOf(1.0, 0.0)
         net.update()
-        val winner1 = competitive.neuronList[competitive.activations.indexOfFirst { it == 1.0 }]
-        inputs.activations = doubleArrayOf(0.0, 0.1)
+        val winner1 = competitive.neuronList[competitive.activationArray.indexOfFirst { it == 1.0 }]
+        inputs.activationArray = doubleArrayOf(0.0, 0.1)
         net.update()
-        val winner2 = competitive.neuronList[competitive.activations.indexOfFirst { it == 1.0 }]
+        val winner2 = competitive.neuronList[competitive.activationArray.indexOfFirst { it == 1.0 }]
         assertNotEquals(winner1, winner2)
     }
 
@@ -87,9 +87,9 @@ class CompetitiveGroupTest {
         // Both winner and loser change in same direction
         //  Since this is initial learning weights are getting larger and not "rebalanced"
         competitive.params.useLeakyLearning = true
-        inputs.activations = doubleArrayOf(1.0, 0.0)
+        inputs.activationArray = doubleArrayOf(1.0, 0.0)
         net.update()
-        val loser = competitive.neuronList[competitive.activations.indexOfFirst { it == 0.0 }]
+        val loser = competitive.neuronList[competitive.activationArray.indexOfFirst { it == 0.0 }]
         val before = loser.totalFanInStrength()
         net.update()
         val after = loser.totalFanInStrength()

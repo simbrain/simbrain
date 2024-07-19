@@ -36,7 +36,7 @@ class SoftMaxTest {
         n1.activation = 0.85
         n2.activation = 0.85
         net.update()
-        assertEquals(softmax.activations[0], softmax.activations[1])
+        assertEquals(softmax.activationArray[0], softmax.activationArray[1])
     }
 
     @Test
@@ -44,7 +44,7 @@ class SoftMaxTest {
         n1.activation = 1.0
         n2.activation = 0.5
         net.update()
-        assertTrue(softmax.activations[0] > softmax.activations[1])
+        assertTrue(softmax.activationArray[0] > softmax.activationArray[1])
     }
 
     @Test

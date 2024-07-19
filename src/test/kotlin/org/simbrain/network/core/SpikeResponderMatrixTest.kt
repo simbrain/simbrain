@@ -46,7 +46,7 @@ class SpikeResponderMatrixTest {
         wmArr1Arr2.spikeResponder = StepResponder()
         net2.addNetworkModels(arr1, arr2, wmArr1Arr2)
         net2.update() // Caused exceptions in earlier iterations.
-        assertEquals(4, arr2.size())
+        assertEquals(4, arr2.size)
         assertTrue(arr2.updateRule is IntegrateAndFireRule)
     }
 

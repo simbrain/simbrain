@@ -190,12 +190,12 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         inputs.toolbar.addSeparator()
         inputs.toolbar.add(
             inputs.table.createApplyAction("Apply Inputs") { selectedRow ->
-                unsupervisedNetwork.inputLayer.applyActivations(inputs.table.model.getCurrentDoubleRow().toDoubleArray())
+                unsupervisedNetwork.inputLayer.setActivations(inputs.table.model.getCurrentDoubleRow().toDoubleArray())
             }
         )
         inputs.toolbar.add(inputs.table.createAdvanceRowAction())
         inputs.toolbar.add(inputs.table.createApplyAndAdvanceAction {
-            unsupervisedNetwork.inputLayer.applyActivations(inputs.table.model.getCurrentDoubleRow().toDoubleArray())
+            unsupervisedNetwork.inputLayer.setActivations(inputs.table.model.getCurrentDoubleRow().toDoubleArray())
         })
         inputData.add(inputs)
         mainPanel.add(inputData)

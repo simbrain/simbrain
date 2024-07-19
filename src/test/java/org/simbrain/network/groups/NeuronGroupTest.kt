@@ -33,17 +33,17 @@ class NeuronGroupTest {
         val wm = WeightMatrix(ng, ng2)
         net.addNetworkModels(List.of(ng2, wm))
         net.update()
-        Assertions.assertArrayEquals(doubleArrayOf(1.0, -1.0), ng2.activations)
+        Assertions.assertArrayEquals(doubleArrayOf(1.0, -1.0), ng2.activationArray)
     }
 
     @Test
     fun propagateGroupActivation() {
-        ng.activations = doubleArrayOf(1.0, -1.0)
+        ng.activationArray = doubleArrayOf(1.0, -1.0)
         val ng2 = NeuronGroup(2)
         val wm = WeightMatrix(ng, ng2)
         net.addNetworkModels(List.of(ng2, wm))
         net.update()
-        Assertions.assertArrayEquals(doubleArrayOf(1.0, -1.0), ng2.activations)
+        Assertions.assertArrayEquals(doubleArrayOf(1.0, -1.0), ng2.activationArray)
     }
 
 
@@ -56,7 +56,7 @@ class NeuronGroupTest {
             val wm = WeightMatrix(ng, ng2)
             net.addNetworkModels(List.of(ng2, wm))
             net.update()
-            Assertions.assertArrayEquals(doubleArrayOf(1.0, -1.0), ng2.activations)
+            Assertions.assertArrayEquals(doubleArrayOf(1.0, -1.0), ng2.activationArray)
         }
 
     @Test

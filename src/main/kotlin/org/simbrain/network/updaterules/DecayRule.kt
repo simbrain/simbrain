@@ -77,14 +77,14 @@ open class DecayRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>(), C
 
     context(Network)
     override fun apply(layer: Layer, dataHolder: BiasedMatrixData) {
-        for (i in 0 until layer.outputs.nrow()) {
-            layer.outputs[i, 0] = decayRule(
+        for (i in 0 until layer.activations.nrow()) {
+            layer.activations[i, 0] = decayRule(
                 layer.inputs[i, 0],
-                layer.outputs[i, 0],
+                layer.activations[i, 0],
                 dataHolder.biases[i, 0]
             )
         }
-        clip(layer.outputs)
+        clip(layer.activations)
     }
 
     context(Network)

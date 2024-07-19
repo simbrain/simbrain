@@ -30,7 +30,7 @@ class HistogramTest {
 
     @Test
     fun `test data is transferred properly`() {
-        ng.activations = doubleArrayOf(1.0, 2.0)
+        ng.activationArray = doubleArrayOf(1.0, 2.0)
         workspace.simpleIterate()
         assertEquals(2, histogram.data[0].size)
         assertEquals(1.0, histogram.data[0][0])
@@ -39,7 +39,7 @@ class HistogramTest {
 
     @Test
     fun `test equal inputs produce one bin of height 2`() {
-        ng.activations = doubleArrayOf(2.0, 2.0)
+        ng.activationArray = doubleArrayOf(2.0, 2.0)
         workspace.simpleIterate()
         assertEquals(1, histogram.seriesData.first().data.count{
             it.count == 2
@@ -48,7 +48,7 @@ class HistogramTest {
 
     @Test
     fun `test unequal inputs produce two bins of height 1`() {
-        ng.activations = doubleArrayOf(1.0, 2.0)
+        ng.activationArray = doubleArrayOf(1.0, 2.0)
         workspace.simpleIterate()
         assertEquals(2, histogram.seriesData.first().data.count{
             it.count == 1

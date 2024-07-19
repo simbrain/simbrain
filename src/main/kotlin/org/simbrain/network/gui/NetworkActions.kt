@@ -736,13 +736,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         description = "Add the current activation of this layer to the input data table",
         iconPath = "menu_icons/TestInput.png"
     ) {
-        layer.inputData = layer.inputData.appendRow(
-            when (layer) {
-                is NeuronArray -> layer.activations.toDoubleArray()
-                is AbstractNeuronCollection -> layer.activations
-                else -> throw IllegalArgumentException("Cannot add activation to input for layer of type ${layer::class.simpleName}")
-            }
-        )
+        layer.inputData = layer.inputData.appendRow(layer.activationArray)
     }
 
     fun setTextPropertiesAction(textNodes: Collection<TextNode>) = networkPanel.createAction(

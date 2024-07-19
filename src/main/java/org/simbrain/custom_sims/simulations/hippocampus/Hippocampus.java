@@ -277,7 +277,7 @@ public class Hippocampus extends Simulation {
                 }
                 net.clearActivations();
                 hippocampus.setClamped(true);
-                hippocampus.applyActivations(activations);
+                hippocampus.setActivations(activations);
                 sim.iterate(Integer.parseInt(conslidationField.getText()));
                 hippocampus.setClamped(false);
             });
@@ -333,11 +333,11 @@ public class Hippocampus extends Simulation {
         LC2.setClamped(true);
         RC1.setClamped(true);
         RC2.setClamped(true);
-        LC1.applyActivations(activations);
-        LC2.applyActivations(activations);
-        RC1.applyActivations(activations);
-        RC2.applyActivations(activations);
-        hippocampus.applyActivations(new double[] {0, 0, 0, 0});
+        LC1.setActivations(activations);
+        LC2.setActivations(activations);
+        RC1.setActivations(activations);
+        RC2.setActivations(activations);
+        hippocampus.setActivations(new double[] {0, 0, 0, 0});
 
         // Iterate 3 times
         sim.iterate(3);
@@ -366,8 +366,8 @@ public class Hippocampus extends Simulation {
         // Clamp nodes and set activations
         LC1.setClamped(true);
         LC2.setClamped(true);
-        LC1.applyActivations(activations);
-        LC2.applyActivations(activations);
+        LC1.setActivations(activations);
+        LC2.setActivations(activations);
 
         // Iterate 3 times
         sim.iterate(3);

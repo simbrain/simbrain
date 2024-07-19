@@ -32,7 +32,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
             val typeChanged = field::class != it::class
             field = it
             if (typeChanged) {
-                dataHolder = updateRule.createMatrixData(size())
+                dataHolder = updateRule.createMatrixData(size)
             }
             events.updated.fire()
         }
@@ -45,7 +45,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         initValue = updateRule.createMatrixData(inputSize),
         order = 99,
         onUpdate = {
-            val proposedDataHolder = widgetValue(::updateRule).createMatrixData(size())
+            val proposedDataHolder = widgetValue(::updateRule).createMatrixData(size)
             if (widgetValue(::dataHolder)::class != proposedDataHolder::class) {
                 refreshValue(proposedDataHolder)
             }
@@ -57,7 +57,8 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
      * other network components via [Layer]. A column vector.
      */
     @UserParameter(label = "Activations", description = "Neuron activations", order = 1)
-    var activations: Matrix = Matrix(inputSize, 1)
+    @get:Producible
+    override var activations: Matrix = Matrix(inputSize, 1)
         set(newActivations) {
             field.copyFrom(newActivations)
             events.updated.fire()
@@ -68,10 +69,9 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
      */
     @get:Producible
     override val spikes: DoubleArray
-        get() = (dataHolder as? SpikingMatrixData)?.spikes?.map { if (it) 1.0 else 0.0 }?.toDoubleArray() ?: DoubleArray(size())
-
-    @get:Producible
-    override val outputs: Matrix get() = activations
+        get() = (dataHolder as? SpikingMatrixData)?.spikes?.map { if (it) 1.0 else 0.0 }?.toDoubleArray() ?: DoubleArray(
+            size
+        )
 
     private var targets: Matrix? = null
 
@@ -118,24 +118,24 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
      * @return the deep copy
      */
     fun copy(): NeuronArray {
-        val copy = NeuronArray(outputSize())
+        val copy = NeuronArray(size)
         copy.location = location
         copy.gridMode = gridMode
         copy.activations.copyFrom(activations)
         copy.updateRule = updateRule
-        copy.dataHolder = dataHolder!!.copy()
+        copy.dataHolder = dataHolder.copy()
         return copy
     }
 
     @get:Producible(arrayDescriptionMethod = "getLabelArray")
-    val activationArray: DoubleArray
+    override val activationArray: DoubleArray
         get() = activations.toDoubleArray()
 
     var targetValues: Matrix?
         get() = targets
         set(targets) {
             if (targets != null) {
-                outputs.validateSameShape(targets)
+                activations.validateSameShape(targets)
             }
             this.targets = targets
             events.updated.fire()
@@ -143,7 +143,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
         activations = Matrix.rand(
-            size(), 1,
+            size, 1,
             GaussianDistribution(0.0, 1.0)
         )
         events.updated.fire()
@@ -205,7 +205,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
     }
 
     @Consumable
-    override fun applyActivations(activations: DoubleArray) {
+    override fun setActivations(activations: DoubleArray) {
         this.activations = Matrix.column(activations)
     }
 
@@ -213,7 +213,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
      * Set all activations in the array to the specified value.
      */
     fun fillActivations(value: Double) {
-        activations.setCol(0, value)
+        this.activations.setCol(0, value)
     }
 
 
@@ -221,41 +221,26 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         events.locationChanged.fire()
     }
 
-    /**
-     * Input and output size are the same for neuron arrays.
-     */
-    fun size(): Int {
-        return outputs.size().toInt()
-    }
-
-    override fun inputSize(): Int {
-        return size()
-    }
-
-    override fun outputSize(): Int {
-        return outputs.size().toInt()
-    }
-
     override fun toString(): String {
         return """
-            $id with ${outputs.size()} components.
+            $id with ${this.activations.size()} components.
             Activations: ${Utils.getTruncatedArrayString(activationArray, 10)}
             $dataHolder
         """.trimIndent()
     }
 
     override fun clear() {
-        outputs.mul(0.0)
+        activations.mul(0.0)
         events.updated.fire()
     }
 
     override fun increment() {
-        outputs.add(increment)
+        activations.add(increment)
         events.updated.fire()
     }
 
     override fun decrement() {
-        outputs.sub(increment)
+        activations.sub(increment)
         events.updated.fire()
     }
 
@@ -277,7 +262,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
             .filterIsInstance<WeightMatrix>()
             .map { it.psrMatrix.clone().mul(it.excitatoryMask).rowSums() }
             .reduceOrNull { base, add -> SimbrainMath.addVector(base, add) }
-            ?: DoubleArray(inputSize())
+            ?: DoubleArray(size)
 
     /**
      * For each incoming psr matrix, filter out entries that correspond to inhibitory synapses and return the sum of those for
@@ -288,7 +273,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
             .filterIsInstance<WeightMatrix>()
             .map { it.psrMatrix.clone().mul(it.inhibitoryMask).rowSums() }
             .reduceOrNull { base, add -> SimbrainMath.addVector(base, add) }
-            ?: DoubleArray(inputSize())
+            ?: DoubleArray(size)
 
-    fun getLabelArray() = (0 until size()).map { it.toString() }.toTypedArray()
+    fun getLabelArray() = (0 until size).map { it.toString() }.toTypedArray()
 }

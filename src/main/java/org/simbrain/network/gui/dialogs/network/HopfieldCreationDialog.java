@@ -109,7 +109,7 @@ public class HopfieldCreationDialog extends StandardDialog {
         hopPropertiesPanel.commitChanges();
         Hopfield hopfield = hc.create();
         layoutPanel.commitChanges();
-        if (hopfield.neuronGroup.size() == 2) {
+        if (hopfield.neuronGroup.getSize() == 2) {
             var neuron1 = hopfield.neuronGroup.getNeuron(0);
             var neuron2 = hopfield.neuronGroup.getNeuron(1);
             neuron2.setLocation(neuron1.getX() + 100, neuron1.getY());

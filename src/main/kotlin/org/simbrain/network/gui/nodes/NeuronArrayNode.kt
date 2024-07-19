@@ -169,7 +169,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         activationImage.removeAllChildren()
         spikeImage.removeAllChildren()
         biasImage.removeAllChildren()
-        val activations = neuronArray.outputs.toDoubleArray()
+        val activations = neuronArray.activations.toDoubleArray()
         if (gridMode) {
             // "Grid" case
             val len = ceil(sqrt(activations.size.toDouble())).toInt()
@@ -230,7 +230,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
     }
 
     private fun computeInfoText() = """
-            ${neuronArray.id}    Nodes: ${neuronArray.size()} ${if (neuronArray.targetValues != null) "T" else ""}
+            ${neuronArray.id}    Nodes: ${neuronArray.size} ${if (neuronArray.targetValues != null) "T" else ""}
             Mean activation: ${neuronArray.activations.toDoubleArray().average().format(4)}
             """.trimIndent()
 
@@ -355,7 +355,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             val editComponents: Action = object : AbstractAction("Edit Components...") {
                 override fun actionPerformed(event: ActionEvent) {
                     val dialog = StandardDialog()
-                    val arrayData = MatrixDataFrame(neuronArray.outputs)
+                    val arrayData = MatrixDataFrame(neuronArray.activations)
                     dialog.contentPane = SimbrainTablePanel(arrayData)
                     dialog.addCommitTask {
                         with(networkPanel.network) {
@@ -391,7 +391,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             }
             contextMenu.add(actionManager.createImageInput(
                 neuronArray.getConsumer(NeuronArray::addInputsMismatched),
-                neuronArray.size(),
+                neuronArray.size,
                 menuTitle = "Add coupled image world",
                 postActionBlock = { neuronArray.gridMode = true }
             ))
@@ -400,7 +400,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                     name = "Record Activations",
                     neuronArray.getProducer(NeuronArray::activationArray),
                     sourceName = "${neuronArray.id ?: "Neuron Array"} Activations",
-                    neuronArray.size()
+                    neuronArray.size
                 )
             )
             neuronArray.dataHolder.let {
@@ -410,7 +410,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                             name = "Record Biases",
                             it.getProducer(BiasedMatrixData::biasesArray),
                             sourceName = "${neuronArray.id ?: "Neuron Array"} Biases",
-                            neuronArray.size()
+                            neuronArray.size
                         )
                     )
                 }

@@ -64,7 +64,7 @@ class SynapseGroup @JvmOverloads constructor(
      */
     fun initializeSynapseVisibility() {
         val threshold = NetworkPreferences.synapseVisibilityThreshold
-        displaySynapses = source.size() * target.size() <= threshold
+        displaySynapses = source.size * target.size <= threshold
     }
 
     override fun delete() {
@@ -138,7 +138,7 @@ class SynapseGroup @JvmOverloads constructor(
      */
     fun copy(src: AbstractNeuronCollection, tar: AbstractNeuronCollection): SynapseGroup {
         
-        require(!(source.size() != src.size() || target.size() != tar.size())) { "Size of source and " +
+        require(!(source.size != src.size || target.size != tar.size)) { "Size of source and " +
                 "target of this synapse group do not match." }
 
         val mapping = (source.neuronList + target.neuronList)

@@ -142,7 +142,7 @@ public class EdgeOfChaosBitStream extends Simulation {
         sim.getWorkspace().addUpdateAction(UpdateActionKt.create("Update time series", () -> {
             // bitStream1.getInputManager().applyCurrentRow();
             // bitStream2.getInputManager().applyCurrentRow();
-            int activationDiff = SimbrainMath.hamming(res1.getActivations(), res2.getActivations());
+            int activationDiff = SimbrainMath.hamming(res1.getActivationArray(), res2.getActivationArray());
             ts.getModel().addData(0, sim.getWorkspace().getTime(), activationDiff);
         }));
     }

@@ -246,7 +246,7 @@ val kAgentTrails = newSim {
         plot.projector.coloringManager = haloColoringManager
 
         workspace.addUpdateAction(updateAction("Color projection points") {
-            val predictedState = predictionNet.activations
+            val predictedState = predictionNet.activationArray
             haloColoringManager.customCenter = DataPoint(predictedState)
             haloColoringManager.radius = errorNeuron.activation + 0.2
         })

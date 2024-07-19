@@ -30,8 +30,8 @@ val WeightMatrix.tar get() = target as NeuronArray
  * Return the difference between the provided vector and the current activations in this layer.
  */
 fun ArrayLayer.getError(targets: Matrix): Matrix {
-    outputs.validateSameShape(targets)
-    return targets.clone().sub(outputs)
+    activations.validateSameShape(targets)
+    return targets.clone().sub(activations)
 }
 
 /**
@@ -40,12 +40,12 @@ fun ArrayLayer.getError(targets: Matrix): Matrix {
  */
 fun WeightMatrix.applyLMS(outputError: Matrix, epsilon: Double = .1) {
 
-    outputError.validateSameShape(target.outputs)
+    outputError.validateSameShape(target.activations)
 
     // TODO: Can this be replaced by backprop with linear, since derivative is then just source activations
     val deriv = (tar.updateRule as DifferentiableUpdateRule).getDerivative(tar.inputs)
     val weightDeltas = outputError.mul(deriv)
-        .mm(source.outputs.transpose())
+        .mm(source.activations.transpose())
         .mul(epsilon)
     weightMatrix.add(weightDeltas)
     tar.updateBiases(outputError, epsilon)
@@ -58,7 +58,7 @@ fun WeightMatrix.applyLMS(outputError: Matrix, epsilon: Double = .1) {
  */
 context(Network)
 fun WeightMatrix.trainCurrentOutputLMS(epsilon: Double = .1) {
-    val targets = target.outputs.clone()
+    val targets = target.activations.clone()
     updatePSR()
     val actualOutputs = Matrix.column(getSummedPSRs())
     applyLMS(targets.sub(actualOutputs), epsilon)
@@ -68,8 +68,8 @@ fun WeightMatrix.trainCurrentOutputLMS(epsilon: Double = .1) {
  * Backpropagate the provided errors through this weight matrix, and return the new error.
  */
 fun WeightMatrix.backpropError(layerError: Matrix, epsilon: Double = .1): Matrix {
-    layerError.validateSameShape(target.outputs)
-    val weightDeltas = layerError.mm(source.outputs.transpose())
+    layerError.validateSameShape(target.activations)
+    val weightDeltas = layerError.mm(source.activations.transpose())
 
     // Backpropagate the layer error through the weights to get new error
     //  Prefer this to layerError.T.mm(wm).T because that requies an extra transpose
@@ -86,7 +86,7 @@ fun WeightMatrix.backpropError(layerError: Matrix, epsilon: Double = .1): Matrix
  * Change to bias is error vector times epsilon. Compute this and add it to biases.
  */
 fun NeuronArray.updateBiases(error: Matrix, epsilon: Double = .1) {
-    activations.validateSameShape(error)
+    this.activations.validateSameShape(error)
     dataHolder.let {
         if (it is BiasedMatrixData) {
             val biasDelta = error.clone().mul(epsilon)
@@ -136,9 +136,9 @@ fun List<WeightMatrix>.forwardPass(inputVector: Matrix) {
  */
 fun List<WeightMatrix>.backpropError(targetValues: Matrix, epsilon: Double = .1): Double {
 
-    targetValues.validateSameShape(last().tar.outputs)
+    targetValues.validateSameShape(last().tar.activations)
 
-    val error = last().tar.outputs sse targetValues
+    val error = last().tar.activations sse targetValues
 
     // printActivationsAndWeights()
     var errorVector: Matrix = last().tar.getError(targetValues)
@@ -174,9 +174,9 @@ fun WeightMatrixTree.forwardPass(inputVectors: List<Matrix>) {
  */
 fun WeightMatrixTree.backpropError(targetValues: Matrix, epsilon: Double = .0001): Double {
 
-    targetValues.validateSameShape(outputWeightLayer.tar.outputs)
+    targetValues.validateSameShape(outputWeightLayer.tar.activations)
 
-    val error = outputWeightLayer.tar.outputs sse targetValues
+    val error = outputWeightLayer.tar.activations sse targetValues
     var errorVectors: Map<NeuronArray, Matrix> =
         mapOf(outputWeightLayer.tar to outputWeightLayer.tar.getError(targetValues))
     // TODO: Creating a map every iteration is a potential performance drain.

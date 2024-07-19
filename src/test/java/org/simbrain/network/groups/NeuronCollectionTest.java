@@ -36,7 +36,7 @@ class NeuronCollectionTest {
         n1.setActivation(1.0);
         n2.setActivation(-1.0);
         net.update();
-        assertArrayEquals(new double[]{1.0, -1.0}, nc2.getActivations());
+        assertArrayEquals(new double[]{1.0, -1.0}, nc2.getActivationArray());
     }
 
     @Test
@@ -45,13 +45,13 @@ class NeuronCollectionTest {
         n2.addInputValue(-1.0);
         net.update(); // This iteration moves inputs to activations
         net.update(); //This one actually propagates from one layer to the next
-        assertArrayEquals(new double[]{1.0, -1.0}, nc2.getActivations());
+        assertArrayEquals(new double[]{1.0, -1.0}, nc2.getActivationArray());
     }
 
     @Test
     void propagateCollectionActivations() {
-        nc1.applyActivations(new double[]{1.0,-1.0});
+        nc1.setActivations(new double[]{1.0,-1.0});
         net.update();
-        assertArrayEquals(new double[]{1.0, -1.0}, nc2.getActivations());
+        assertArrayEquals(new double[]{1.0, -1.0}, nc2.getActivationArray());
     }
 }

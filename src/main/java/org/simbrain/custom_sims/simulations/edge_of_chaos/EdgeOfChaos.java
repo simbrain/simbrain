@@ -195,7 +195,7 @@ public class EdgeOfChaos extends Simulation {
 
         SynapseGroup src2Res = new SynapseGroup(src, tar);
         List<Neuron> tarNList = tar.getNeuronList();
-        for (int ii = 0; ii < tar.size(); ++ii) {
+        for (int ii = 0; ii < tar.getSize(); ++ii) {
             double x = tarNList.get(ii).getX();
             double y = tarNList.get(ii).getY();
             if ((y >= yStart) && (y < yEnd)) {

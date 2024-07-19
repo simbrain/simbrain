@@ -122,7 +122,7 @@ class FitzhughNagumo : SpikingNeuronUpdateRule<FitzHughData, FitzHughMatrixData>
     context(Network)
     override fun apply(layer: Layer, dataHolder: FitzHughMatrixData) {
         if (layer is NeuronArray) {
-            for (i in 0 until layer.size()) {
+            for (i in 0 until layer.size) {
                 val (spiked, v, w) = fitzhughNagumoRule(
                     layer.activations.get(i, 0),
                     dataHolder.w[i],

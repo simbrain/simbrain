@@ -40,15 +40,17 @@ class SmileClassifier(
         @Producible
         get() = classifier.trainingData.labelTargetMap.getInverse(winner) ?: ""
 
+    /**
+     * For display and coupling purposes.
+     */
     val inputActivations = Matrix(inputSize, 1)
 
     @Producible
     fun getInputActivationArray() = inputActivations.toDoubleArray()
 
-    /**
-     * Output matrix.
-     */
-    override var outputs = Matrix(classifier.outputSize, 1)
+    override var activations = Matrix(classifier.outputSize, 1)
+
+    override val activationArray: DoubleArray get() = activations.toDoubleArray()
 
     override val bound: Rectangle2D
         get() = Rectangle2D.Double(locationX - width / 2, locationY - height / 2, width, height)
@@ -72,11 +74,11 @@ class SmileClassifier(
             winner = classifier.predict(inputActivations.toDoubleArray())
             // println("Prediction of ${this.id} is: $winner")
             if (classifier.model != null) {
-                outputs = try {
+                activations = try {
                     classifier.getOutputVector(winner)
                 } catch (e: IllegalArgumentException) {
                     System.err.println(e.message)
-                    Matrix(outputSize(), 1)
+                    Matrix(size, 1)
                 }
             }
         }
@@ -85,12 +87,12 @@ class SmileClassifier(
     }
 
     override fun toString(): String {
-        return "${label} (${classifier.name}): $classifier.inputSize -> ${outputSize()}"
+        return "${label} (${classifier.name}): $classifier.inputSize -> ${size}"
     }
 
-    override fun outputSize(): Int {
-        return classifier.outputSize
-    }
+    override val size: Int get() = classifier.inputSize
+
+    val outputSize: Int get() = classifier.outputSize
 
     /**
      * Helper class for creating classifiers.

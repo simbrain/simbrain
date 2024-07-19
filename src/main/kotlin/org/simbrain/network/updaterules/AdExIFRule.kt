@@ -269,7 +269,7 @@ open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), Noi
     context(Network)
     override fun apply(layer: Layer, dataHolder: AdexMatrixData) {
         if (layer is NeuronArray) {
-            for (i in 0 until layer.size()) {
+            for (i in 0 until layer.size) {
                 val excitInputs = layer.excitatoryInputs
                 val inhibInputs = layer.inhibitoryInputs
                 val (spiked, v, w) = adExRule(

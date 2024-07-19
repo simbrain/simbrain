@@ -87,7 +87,7 @@ class CompetitiveNetwork : Subnetwork, UnsupervisedNetwork {
 
     context(Network) override fun trainOnInputData() {
         inputData.toArray().forEach { row ->
-            inputLayer.activations = row
+            inputLayer.activationArray = row
             trainOnCurrentPattern()
         }
     }

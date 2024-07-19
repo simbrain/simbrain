@@ -395,7 +395,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             else -> SubnetworkNode(this, subnetwork)
         }
 
-        val subnetworkNodes = subnetwork.modelList.allInReconstructionOrder.map {
+        val subnetworkNodes = subnetwork.modelList.allInUpdatingOrder.map {
             createNode(it)
         }
         val customInfoNode = subnetwork.customInfo?.let { createNode(it) }

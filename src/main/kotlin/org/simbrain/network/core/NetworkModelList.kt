@@ -7,6 +7,7 @@ import com.thoughtworks.xstream.converters.UnmarshallingContext
 import com.thoughtworks.xstream.io.HierarchicalStreamReader
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter
 import org.simbrain.network.subnetworks.Subnetwork
+import org.simbrain.util.CachedObject
 import java.util.concurrent.ConcurrentHashMap
 
 /**
@@ -25,6 +26,7 @@ class NetworkModelList {
 
     @Suppress("UNCHECKED_CAST")
     fun <T : NetworkModel> put(modelClass: Class<T>, model: T) {
+        allInUpdatingOrderCache.invalidate()
         if (modelClass in networkModels) {
             networkModels[modelClass]!!.add(model)
         } else {
@@ -39,6 +41,7 @@ class NetworkModelList {
      * use with caution.
      */
     fun putUnsafe(modelClass: Class<out NetworkModel>, model: NetworkModel) {
+        allInUpdatingOrderCache.invalidate()
         if (modelClass in networkModels) {
             networkModels[modelClass]!!.add(model)
         } else {
@@ -59,6 +62,7 @@ class NetworkModelList {
      * Add a network model to the map.
      */
     fun add(model: NetworkModel) {
+        allInUpdatingOrderCache.invalidate()
         if (model is Subnetwork) {
             put(Subnetwork::class.java, model)
         } else {
@@ -96,14 +100,16 @@ class NetworkModelList {
     val all: List<NetworkModel>
         get() = networkModels.values.flatMap { it?.map { item -> item } ?: listOf() }
 
+    private val allInUpdatingOrderCache = CachedObject { all.sortedBy { updatingOrder(it) } }
+
     /**
-     * Returns a list of network models in the order required for proper reconstruction of all network models.
+     * Returns a list of network models in the order required for proper updating and reconstruction of all network models.
      * For example, neurons must be recreated before synapses since the synapses refer to neurons.
      */
-    val allInReconstructionOrder: List<NetworkModel>
-        get() = all.sortedBy { reconstructionOrder(it) }
+    val allInUpdatingOrder by allInUpdatingOrderCache::value
 
     fun remove(model: NetworkModel) {
+        allInUpdatingOrderCache.invalidate()
         if (model is Subnetwork) {
             // Forces all subclasses of subnetwork to be grouped with the subnetwork class
             networkModels[Subnetwork::class.java]?.remove(model)
@@ -129,7 +135,7 @@ class NetworkModelListConverter : Converter {
 
     override fun marshal(source: Any?, writer: HierarchicalStreamWriter, context: MarshallingContext) {
         val modelList = source as NetworkModelList
-        modelList.allInReconstructionOrder.forEach { model ->
+        modelList.allInUpdatingOrder.forEach { model ->
             writer.startNode(model::class.java.name)
             context.convertAnother(model)
             writer.endNode()

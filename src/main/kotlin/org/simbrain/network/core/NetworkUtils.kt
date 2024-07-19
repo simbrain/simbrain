@@ -18,10 +18,10 @@ import smile.math.matrix.Matrix
 import java.awt.geom.Point2D
 
 /**
- * Provides an ordering on [NetworkModels] so that the networks are rebuilt in a proper order, for example with
- * neurons created before synapses (which refer to neurons).
+ * Provides an ordering on [NetworkModels] so that the networks are updated and rebuilt in a proper order, for example
+ * with neurons created before synapses (which refer to neurons).
  */
-fun reconstructionOrder(obj: NetworkModel): Int = when (obj) {
+fun updatingOrder(obj: NetworkModel): Int = when (obj) {
     is Neuron -> 10
     is NeuronGroup -> 20
     is NeuronCollection -> 30
@@ -42,7 +42,7 @@ fun reconstructionOrder(obj: NetworkModel): Int = when (obj) {
 context(Network)
 fun updateNeurons(neuronList: List<Neuron>) {
     // TODO: Update by priority if priority based update?
-    neuronList.forEach { it.updateInputs() }
+    neuronList.forEach { it.accumulateInputs() }
     neuronList.forEach { it.update() }
 }
 

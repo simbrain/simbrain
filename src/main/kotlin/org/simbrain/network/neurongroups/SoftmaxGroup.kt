@@ -29,7 +29,7 @@ class SoftmaxGroup(neurons: List<Neuron>): NeuronGroup(), CopyableObject {
 
     context(Network)
     override fun update() {
-        neuronList.forEach { it.updateInputs() }
+        neuronList.forEach { it.accumulateInputs() }
         neuronList.forEach { it.update() }
         val exponentials = neuronList.activations.map { exp(it) }
         val total = exponentials.sum()

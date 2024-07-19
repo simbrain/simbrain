@@ -141,7 +141,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
      *
      * See description at [addInputValue].
      *
-     * Note that when [updateInputs] is called, [weightedInputs] are added to input.
+     * Note that when [accumulateInputs] is called, [weightedInputs] are added to input.
      */
     var input: Double = 0.0
         private set
@@ -280,7 +280,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
     }
 
     context(Network)
-    override fun updateInputs() {
+    override fun accumulateInputs() {
         fanIn.forEach { it.updatePSR() }
         addInputValue(weightedInputs)
     }

@@ -103,12 +103,12 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
 
     context(Network)
     override fun update() {
-        inputLayer.updateInputs()
+        inputLayer.accumulateInputs()
         inputLayer.update()
-        hiddenLayer.updateInputs()
+        hiddenLayer.accumulateInputs()
         hiddenLayer.update()
         contextLayer.activations = hiddenLayer.activations.clone()
-        outputLayer.updateInputs()
+        outputLayer.accumulateInputs()
         outputLayer.update()
         // Since it's expected, updating weight matrices in case learning rules have been added. In the normal case
         // there is no such rule and these calls are bypassed.

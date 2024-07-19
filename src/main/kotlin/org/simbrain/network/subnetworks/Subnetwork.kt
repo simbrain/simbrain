@@ -107,7 +107,7 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
      */
     context(Network)
     override fun update() {
-        modelList.allInReconstructionOrder.forEach { it.update() }
+        modelList.allInUpdatingOrder.forEach { it.update() }
     }
 
     private val locatableModels: List<LocatableModel>

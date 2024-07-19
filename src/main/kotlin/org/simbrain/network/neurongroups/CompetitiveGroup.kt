@@ -89,7 +89,7 @@ open class CompetitiveGroup @JvmOverloads constructor(
     context(Network)
     override fun update() {
 
-        neuronList.forEach { it.updateInputs() }
+        neuronList.forEach { it.accumulateInputs() }
         neuronList.forEach { it.update() }
 
         max = Double.MIN_VALUE

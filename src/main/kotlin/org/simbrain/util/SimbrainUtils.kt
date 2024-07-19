@@ -40,3 +40,26 @@ class LazyVarImpl<O, T>(val initializer: () -> T) : ReadWriteProperty<O, T>, Laz
 
     override fun toString(): String = if (isInitialized()) value.toString() else "Lazy value not initialized yet."
 }
+
+class CachedObject<T>(private val init: () -> T) {
+
+    private var isDirty = true
+    private var _value: T? = null
+
+    var value: T
+        get() = if (isDirty) {
+            _value = init()
+            isDirty = false
+            _value!!
+        } else {
+            _value!!
+        }
+        set(value) {
+            _value = value
+            isDirty = false
+        }
+
+    fun invalidate() {
+        isDirty = true
+    }
+}

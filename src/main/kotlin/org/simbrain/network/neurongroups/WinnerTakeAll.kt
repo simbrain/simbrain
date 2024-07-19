@@ -59,7 +59,7 @@ class WinnerTakeAll @JvmOverloads constructor(
 
     context(Network)
     override fun update() {
-        neuronList.forEach { it.updateInputs() }
+        neuronList.forEach { it.accumulateInputs() }
         neuronList.forEach { it.update() }
         var winner = getWinner(neuronList, false)
         if (params.isUseRandom) {

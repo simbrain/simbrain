@@ -111,7 +111,7 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
     override fun update() {
 
         // "Positive phase": visible -> hidden
-        hiddenLayer.updateInputs()
+        hiddenLayer.accumulateInputs()
         hiddenLayer.update()
         updateWithSampling(hiddenLayer)
         
@@ -139,7 +139,7 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
         val learningRate = trainer.learningRate
 
         // "Positive phase"
-        hiddenLayer.updateInputs()
+        hiddenLayer.accumulateInputs()
         hiddenLayer.update()
         updateWithSampling(hiddenLayer)
 

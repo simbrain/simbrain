@@ -36,7 +36,7 @@ abstract class NetworkModel {
      * First pass of updating. Generally a "weighted input".
      */
     context(Network)
-    open fun updateInputs() {}
+    open fun accumulateInputs() {}
 
     /**
      * Update the state of the model, based in part on weighted inputs set in [.updateInputs]

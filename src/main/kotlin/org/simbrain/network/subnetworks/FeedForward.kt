@@ -104,13 +104,13 @@ open class FeedForward : Subnetwork {
 
     context(Network)
     override fun update() {
-        inputLayer.updateInputs()
+        inputLayer.accumulateInputs()
         inputLayer.update()
         for (i in 1 until layerList.size - 1) {
-            layerList[i].updateInputs()
+            layerList[i].accumulateInputs()
             layerList[i].update()
         }
-        outputLayer.updateInputs()
+        outputLayer.accumulateInputs()
         outputLayer.update()
     }
 }

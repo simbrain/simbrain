@@ -68,7 +68,7 @@ abstract class Layer : LocatableModel(), AttributeContainer {
      */
     abstract fun addInputs(inputs: Matrix)
 
-    context(Network) override fun updateInputs() {
+    context(Network) override fun accumulateInputs() {
         incomingConnectors.forEach { it.updatePSR() }
     }
 

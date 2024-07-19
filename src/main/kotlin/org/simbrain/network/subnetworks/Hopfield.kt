@@ -142,7 +142,7 @@ class Hopfield : Subnetwork {
             override fun update(hop: Hopfield) {
                 val copy = hop.neuronGroup.neuronList.shuffled()
                 copy.forEach {
-                    it.updateInputs()
+                    it.accumulateInputs()
                     it.update()
                 }
             }
@@ -161,7 +161,7 @@ class Hopfield : Subnetwork {
                 hop.neuronGroup.neuronList
                     .sortedBy { it.updatePriority }
                     .forEach {
-                        it.updateInputs()
+                        it.accumulateInputs()
                         it.update()
                     }
             }
@@ -174,7 +174,7 @@ class Hopfield : Subnetwork {
         SYNC {
             context(Network)
             override fun update(hop: Hopfield) {
-                hop.neuronGroup.neuronList.forEach { it.updateInputs() }
+                hop.neuronGroup.neuronList.forEach { it.accumulateInputs() }
                 hop.neuronGroup.neuronList.forEach { it.update() }
             }
 

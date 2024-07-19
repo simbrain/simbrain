@@ -106,7 +106,7 @@ context(Network)
 fun List<WeightMatrix>.printActivationsAndWeights(showWeights: Boolean = false) {
     println(first().source)
     for (wm in this) {
-        wm.target.updateInputs()
+        wm.target.accumulateInputs()
         wm.target.update()
         println(wm)
         if (showWeights) {
@@ -125,7 +125,7 @@ fun List<WeightMatrix>.forwardPass(inputVector: Matrix) {
     inputVector.validateSameShape(first().src.inputs)
     first().src.activations = inputVector
     for (wm in this) {
-        wm.target.updateInputs()
+        wm.target.accumulateInputs()
         wm.target.update()
     }
 }
@@ -161,7 +161,7 @@ fun WeightMatrixTree.forwardPass(inputVectors: List<Matrix>) {
     val allNeuronArrays = LinkedHashSet(tree.flatMap { it.map { it.target } })
 
     allNeuronArrays.forEach {
-        it.updateInputs()
+        it.accumulateInputs()
         it.update()
     }
 }

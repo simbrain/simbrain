@@ -144,7 +144,7 @@ class Network: CoroutineScope, EditableObject {
      * Returns a list of network models in the order needed to reconstruct a network properly. Example: nodes must be
      * added before synapses which refer to them.
      */
-    val modelsInReconstructionOrder get() = networkModels.allInReconstructionOrder
+    val modelsInReconstructionOrder get() = networkModels.allInUpdatingOrder
 
     private var shouldUpdateTimeType = true
 
@@ -197,7 +197,7 @@ class Network: CoroutineScope, EditableObject {
      */
     fun updateNeuronsByPriority() {
         for (neuron in prioritySortedNeuronList) {
-            neuron.updateInputs()
+            neuron.accumulateInputs()
             neuron.update()
         }
     }
@@ -219,7 +219,7 @@ class Network: CoroutineScope, EditableObject {
         )
             .flatMap { networkModels[it] }
             .forEach {nm ->
-                nm.updateInputs()
+                nm.accumulateInputs()
                 nm.update()
             }
     }
@@ -228,7 +228,7 @@ class Network: CoroutineScope, EditableObject {
      * Default asynchronous update method called by [org.simbrain.network.update_actions.BufferedUpdate].
      */
     suspend fun bufferedUpdate()  = coroutineScope {
-        networkModels.all.forEach { it.updateInputs() }
+        networkModels.all.forEach { it.accumulateInputs() }
         networkModels.all.forEach { it.update() }
     }
 
@@ -378,7 +378,7 @@ class Network: CoroutineScope, EditableObject {
         updatePriorityList();
 
         // Initialize update manager
-        networkModels.allInReconstructionOrder.forEach { model ->
+        networkModels.allInUpdatingOrder.forEach { model ->
             model.events.deleted.on(wait = true) {
                 networkModels.remove(it)
                 events.modelRemoved.fire(it)

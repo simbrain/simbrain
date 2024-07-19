@@ -341,12 +341,12 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
     }
 
     context(Network)
-    override fun updateInputs() {
+    override fun accumulateInputs() {
         // if (inputManager.getData() == null) {
         //     throw new NullPointerException("Test data variable is null," + " but neuron group " + getLabel() + " is in input" + " mode.");
         // }
         // inputManager.applyCurrentRow(); // TODO
-        super.updateInputs()
+        super.accumulateInputs()
         val wtdInputs = DoubleArray(size())
         for (c in incomingConnectors) {
             wtdInputs.addi(c.getSummedPSRs())

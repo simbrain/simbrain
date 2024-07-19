@@ -48,11 +48,10 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
             spikeResponseData = value.createMatrixData(weightMatrix.nrow(), weightMatrix.ncol())
         }
 
-    // TODO: Conditionally enable based on type of source array rule?
     /**
-     * Holds data for prototype rule.
+     * Holds data for learning rule.
      */
-    var dataHolder: MatrixDataHolder by GuiEditable(
+    var learningRuleData: MatrixDataHolder by GuiEditable(
         initValue = EmptyMatrixData,
         order = 210,
         label = "Learning Rule Data",
@@ -168,7 +167,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
     override fun update() {
         // TODO: Check for clamping and enabling
         if (learningRule !is StaticSynapseRule) {
-            learningRule.apply(this, dataHolder)
+            learningRule.apply(this, learningRuleData)
             updateMasks()
             events.updated.fire()
         }

@@ -215,10 +215,10 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
     private var dlyVal = 0.0
 
     /**
-     * Data holder for synapse
+     * Data holder for learning rule
      */
     @UserParameter(label = "Learning data", order = 100)
-    var dataHolder: ScalarDataHolder = learningRule.createScalarData()
+    var learningRuleData: ScalarDataHolder = learningRule.createScalarData()
 
     /**
      * Data holder for spiker responder.
@@ -298,7 +298,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
 
         // Update synapse strengths for non-static synapses
         if (learningRule !is StaticSynapseRule) {
-            learningRule.apply(this, dataHolder)
+            learningRule.apply(this, learningRuleData)
         }
     }
 

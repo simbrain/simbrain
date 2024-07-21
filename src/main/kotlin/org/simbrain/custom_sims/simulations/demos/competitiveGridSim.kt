@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations
 
+import org.simbrain.custom_sims.addDocViewer
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
@@ -28,9 +29,19 @@ val competitiveGridSim = newSim {
     // Label for winner
     var winningLabel = ""
 
+    val docViewer = addDocViewer(
+        "Information",
+        """ This is like the competitive simple network, but the inputs form a grid here.  As with the simple network, you can get this simulation to learn a set of patterns.     
+        
+        """.trimIndent()
+    )
     withGui {
-        place(networkComponent, 139, 10, 868, 619)
-        createControlPanel("Control Panel", 5, 10) {
+        place(docViewer, 0, 0, 400, 200)
+    }
+
+    withGui {
+        place(networkComponent, 515, 0, 386, 619)
+        createControlPanel("Control Panel", 399, 0) {
 
             addButton("Pattern 1") {
                 competitive.inputLayer.neuronList.activations =

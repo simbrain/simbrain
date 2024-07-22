@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations.demos
 
+import org.simbrain.custom_sims.addDocViewer
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
@@ -27,9 +28,28 @@ val competitiveSim = newSim {
     // Label for winner
     var winningLabel = ""
 
+    val docViewer = addDocViewer(
+        "Information",
+        """
+            A simple competitive network is an unsupervised neural network trained to classify input patterns into output neurons. It learns to detect clusters in the input group, with the output responding to these clusters of patterns.
+            The competitive group is initialized with randomized weights. 
+            The user selects different patterns using the buttons on the control panel. Each time a pattern is chosen and the network is iterated (stepped), the network trains a neuron to respond to the selected pattern. With each iteration the training algorithm is applied, strengthening the current response to the input.
+            Some patterns have overlapping output neurons, making them more challenging to separately train. The pattern that activates the output neuron most will be the label of this output neuron, and the connection between the weight and neurons is strengthened. Over time, the output neurons improve their ability to classify the clusters in the input space. 
+            The user repeats this process until the trained network responds to each pattern with a different output neuron. The network relies on the statistical properties of the inputs provided during training. 
+
+            # What to Do: 
+        
+            One way to get familiar with this simulation is to treat it as a game. Try to train the network so that each input pattern triggers a distinct output neuron, associating each input to a distinct output.  This is not easy, since overlapping inputs often get mapped to the same output. So it requires using different inputs early on, and training just once per different input.  Overtraining an input can cause it to be over-represented.
+
+        """.trimIndent()
+    )
     withGui {
-        place(networkComponent, 139, 10, 868, 619)
-        createControlPanel("Control Panel", 5, 10) {
+        place(docViewer, 0, 0, 516, 594)
+    }
+
+    withGui {
+        place(networkComponent, 631, 0, 674, 619)
+        createControlPanel("Control Panel", 515, 0) {
 
             addButton("Pattern 1") {
                 competitive.inputLayer.neuronList.activations =

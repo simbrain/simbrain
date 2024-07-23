@@ -6,7 +6,7 @@ import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.addNeuronGroup
 import org.simbrain.network.neurongroups.NeuronGroup
-import org.simbrain.network.spikeresponders.UDF
+import org.simbrain.network.spikeresponders.ConvolvedJumpAndDecay
 import org.simbrain.network.updaterules.IntegrateAndFireRule
 import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.math.SimbrainMath
@@ -14,7 +14,7 @@ import org.simbrain.util.place
 import org.simbrain.util.sample
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.LogNormalDistribution
-import java.util.concurrent.ThreadLocalRandom
+import kotlin.math.sqrt
 import kotlin.random.Random
 
 /**
@@ -96,24 +96,31 @@ val cortexSimple = newSim {
         sg.randomizeInhibitory()
         sg.label = "Synapses"
 
-        // TODO
-        // sg.setUpperBound(200, Polarity.EXCITATORY);
-        // sg.setLowerBound(0, Polarity.EXCITATORY);
-        // sg.setLowerBound(-200, Polarity.INHIBITORY);
-        // sg.setUpperBound(0, Polarity.INHIBITORY);
-        //
-        // sg.setSpikeResponder(new UDF(), Polarity.BOTH);
+        sg.synapses.filter { it.source.polarity == Polarity.EXCITATORY }.forEach {
+            it.upperBound = 200.0
+            it.lowerBound = 0.0
+        }
+        sg.synapses.filter { it.source.polarity == Polarity.INHIBITORY }.forEach {
+            it.upperBound = 0.0
+            it.lowerBound = -200.0
+        }
+
         sg.synapses.forEach {
-            it.spikeResponder = UDF()
+            it.spikeResponder = ConvolvedJumpAndDecay() // TODO: this should use UDF
         }
         net.addNetworkModel(sg)?.await()
         return sg
     }
 
     fun random3Position(data: DoubleArray, xlim: DoubleArray, ylim: DoubleArray, zlim: DoubleArray) {
-        data[0] = ThreadLocalRandom.current().nextDouble(xlim[0], xlim[1])
-        data[1] = ThreadLocalRandom.current().nextDouble(ylim[0], ylim[1])
-        data[2] = ThreadLocalRandom.current().nextDouble(zlim[0], zlim[1])
+        data[0] = Random.nextDouble(xlim[0], xlim[1])
+        data[1] = Random.nextDouble(ylim[0], ylim[1])
+        data[2] = Random.nextDouble(zlim[0], zlim[1])
+    }
+
+    fun getDelay(xyz1: DoubleArray?, xyz2: DoubleArray?, maxDist: Double, maxDly: Double): Int {
+        val dist = SimbrainMath.distance(xyz1, xyz2)
+        return (dist / maxDist * maxDly / net.timeStep).toInt()
     }
 
     //    Group locations (503.25,-521.61). (-174.62,328.62). (481.16,1268.68).
@@ -185,19 +192,14 @@ val cortexSimple = newSim {
         synGroups["L5/6 \u2192 L2/3"] = connectLayers(layer_56, layer_23, .03)
         for (sgn in synGroups.keys) {
             val sg = synGroups[sgn]
-            // for (s in sg!!.synapses) {
-            //     s.delay = getDelay(
-            //         s.source.position3D, s.target.position3D,
-            //         Math.sqrt((2 * (600 * 600) + 2000 * 2000).toDouble()), 20.0
-            //     )
-            // }
-            sg!!.label = sgn
+            for (s in sg!!.synapses) {
+                s.delay = getDelay(
+                    s.source.position3D, s.target.position3D,
+                    sqrt((2 * (600 * 600) + 2000 * 2000).toDouble()), 20.0
+                )
+            }
+            sg.label = sgn
         }
-    }
-
-    fun getDelay(xyz1: DoubleArray?, xyz2: DoubleArray?, maxDist: Double, maxDly: Double): Int {
-        val dist = SimbrainMath.distance(xyz1, xyz2)
-        return (dist / maxDist * maxDly / net.timeStep).toInt()
     }
 
     buildNetwork()

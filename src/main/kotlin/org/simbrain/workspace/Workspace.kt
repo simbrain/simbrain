@@ -456,8 +456,8 @@ class Workspace: CoroutineScope {
         updater.updateManager.addAction(action)
     }
 
-    fun addUpdateAction(description: String, longDescription: String = description, action: suspend () -> Unit) {
-        updater.updateManager.addAction(updateAction(description, longDescription, action))
+    fun addUpdateAction(description: String, longDescription: String = description, position: Int = updater.updateManager.actionList.size, action: suspend () -> Unit) {
+        updater.updateManager.addAction(updateAction(description, longDescription, action), position)
     }
 
     fun addNonRemovableAction(description: String, longDescription: String = description, action: suspend () -> Unit) {

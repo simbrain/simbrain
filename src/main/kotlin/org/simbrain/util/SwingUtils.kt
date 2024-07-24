@@ -249,6 +249,26 @@ fun showInputDialog(message: String, initValue: String = ""): String {
     return JOptionPane.showInputDialog(dialog, message, initValue)
 }
 
+fun showOptionDialog(
+    message: String,
+    title: String,
+    options: Array<String>,
+    defaultOption: Int? = null
+): Int {
+    val dialog = JDialog()
+    dialog.isAlwaysOnTop = true
+    return JOptionPane.showOptionDialog(
+        dialog,
+        message,
+        title,
+        JOptionPane.DEFAULT_OPTION,
+        JOptionPane.QUESTION_MESSAGE,
+        null,
+        options,
+        defaultOption?.let { options[it] }
+    )
+}
+
 fun showMessageDialog(message: String, title: String, rows: Int = 10, columns: Int = 50) {
     val textArea = JTextArea(message).apply {
         isEditable = false

@@ -19,6 +19,7 @@
 package org.simbrain.network.subnetworks
 
 import org.simbrain.network.connections.AllToAll
+import org.simbrain.network.core.Network
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.neurongroups.NeuronGroup
@@ -76,6 +77,17 @@ class SOMNetwork : Subnetwork {
 
     @XStreamConstructor
     constructor(): super()
+
+    context(Network)
+    override fun accumulateInputs() {
+        inputLayer.accumulateInputs()
+    }
+
+    context(Network) override fun update() {
+        inputLayer.update()
+        // SOM does not need to accumulate inputs because it computes weighted inputs directly
+        som.update()
+    }
 
     /**
      * Helper class for creating new Hopfield nets using [org.simbrain.util.propertyeditor.AnnotatedPropertyEditor].

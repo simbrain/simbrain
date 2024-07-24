@@ -226,9 +226,9 @@ class CouplingCache(val couplingManager: CouplingManager) {
     private fun Class<AttributeContainer>.findMethod(name: String): Method? = methods.find { it.name == name }
 
     private fun Class<AttributeContainer>.findConsumableMethod(name: String): Method? = methods
-        .first{ it.isConsumable() && it.name == name }
+        .firstOrNull { it.isConsumable() && it.name == name }
 
     private fun Class<AttributeContainer>.findProducibleMethod(name: String): Method? = methods
-        .first{ it.isProducible() && it.name == name }
+        .firstOrNull { it.isProducible() && it.name == name }
 
 }

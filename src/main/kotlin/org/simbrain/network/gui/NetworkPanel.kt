@@ -291,7 +291,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         return when (model) {
             is Neuron -> createNode(model)
             is Synapse -> createNode(model)
-            is SmileClassifier -> createNode(model)
             is NeuronArray -> createNode(model)
             is NeuronCollection -> createNode(model)
             is NeuronGroup -> createNode(model)
@@ -392,6 +391,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             is RestrictedBoltzmannMachine -> RBMNode(this, subnetwork)
             is BackpropNetwork -> BackpropNetworkNode(this, subnetwork)
             is LMSNetwork -> LMSNetworkNode(this, subnetwork)
+            is SmileClassifier -> SmileClassifierNode(this, subnetwork)
             else -> SubnetworkNode(this, subnetwork)
         }
 

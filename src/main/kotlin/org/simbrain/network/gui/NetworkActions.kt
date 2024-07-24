@@ -455,14 +455,6 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         }
     }
 
-    val addSmileClassifier = networkPanel.createAction(
-        name = "Add Smile Classifier...",
-        description = "Create a new Smile classifier",
-        keyboardShortcut = CmdOrCtrl + Shift + 'S'
-    ) {
-        showClassifierCreationDialog()
-    }
-
     val connectSelectedModels = networkPanel.createAction(
         name = "Connect selected objects...",
         description = "Creates synapse, weight matrix, etc. between selected source and target entities",
@@ -554,6 +546,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val newNetworkActions
         get() = listOf(
             addSubnetAction("Backprop") { BackpropCreationDialog(networkPanel) },
+            createAction("Classifier") { networkPanel.showClassifierCreationDialog() },
             addSubnetAction("Competitive Network") { CompetitiveCreationDialog(networkPanel) },
             addSubnetAction("Feed Forward Network") { FeedForwardCreationDialog(networkPanel) },
             addSubnetAction("Hopfield") { HopfieldCreationDialog(networkPanel) },

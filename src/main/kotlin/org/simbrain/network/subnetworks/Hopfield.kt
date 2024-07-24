@@ -93,6 +93,11 @@ class Hopfield : Subnetwork {
     }
 
     context(Network)
+    override fun accumulateInputs() {
+        neuronGroup.accumulateInputs()
+    }
+
+    context(Network)
     override fun update() {
         updateFunc.update(this)
         updateStateInfoText()

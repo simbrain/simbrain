@@ -4,7 +4,6 @@ import org.simbrain.network.smile.ClassificationAlgorithm
 import org.simbrain.util.UserParameter
 import smile.classification.Classifier
 import smile.classification.LogisticRegression
-import smile.math.matrix.Matrix
 import smile.validation.metric.Accuracy
 
 /**
@@ -42,12 +41,12 @@ class LogisticRegClassifier @JvmOverloads constructor(inputSize: Int = 4, output
         return ret
     }
 
-    override fun getOutputVector(winner: Int): Matrix {
+    override fun getOutputArray(winner: Int): DoubleArray {
         assertValidWinnerIndex(winner)
-        if (showProbabilities) {
-            return Matrix.column(outputProbabilities)
+        return if (showProbabilities) {
+            outputProbabilities
         } else {
-            return super.getOutputVector(winner)
+            super.getOutputArray(winner)
         }
     }
 

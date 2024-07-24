@@ -190,7 +190,7 @@ fun NetworkPanel.showClassifierCreationDialog() {
         commitChanges()
         network.addNetworkModel(creator.create(network))
     }.also {
-        it.title = "Create Smile Classifier"
+        it.title = "Create Classifier"
     }
 }
 

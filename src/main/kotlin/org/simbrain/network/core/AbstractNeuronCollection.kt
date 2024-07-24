@@ -245,6 +245,7 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
      *
      * @param clamp true to clamp them, false otherwise
      */
+    @Deprecated("Use isAllClamped instead")
     fun setClamped(clamp: Boolean) {
         for (neuron in neuronList) {
             neuron.clamped = clamp
@@ -338,9 +339,15 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
         addInputs(wtdInputs)
     }
 
-    val isAllClamped: Boolean
+    var isAllClamped: Boolean
         get() = neuronList.none { !it.clamped }
+        set(value) {
+            neuronList.forEach { it.clamped = value }
+        }
 
+    /**
+     * Here to support APE where the conditional can only support one single expression.
+     */
     val isAllUnclamped: Boolean
         get() = neuronList.none { it.clamped }
 

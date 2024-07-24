@@ -96,6 +96,18 @@ class CompetitiveNetwork : Subnetwork, UnsupervisedNetwork {
         this.update()
     }
 
+    context(Network)
+    override fun accumulateInputs() {
+        inputLayer.accumulateInputs()
+    }
+
+    context(Network)
+    override fun update() {
+        inputLayer.update()
+        // competitive group does not need to accumulate inputs because it computes weighted inputs directly
+        competitive.update()
+    }
+
     @XStreamConstructor
     constructor(): super()
 

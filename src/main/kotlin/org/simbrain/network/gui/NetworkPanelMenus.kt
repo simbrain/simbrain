@@ -59,7 +59,6 @@ val NetworkPanel.insertMenu
             add(addGroupAction)
             add(addNeuronArrayAction)
             // add(addDeepNetAction)
-            add(addSmileClassifier)
             add(newNetworkMenu)
             addSeparator()
             add(testInputAction)
@@ -87,7 +86,7 @@ val NetworkPanel.actionMenu
     }
 
 val NetworkPanel.newNetworkMenu
-    get() = JMenu("Add Network").apply {
+    get() = JMenu("Add Subnetwork").apply {
         networkActions.newNetworkActions.forEach { add(it) }
     }
 
@@ -132,7 +131,6 @@ fun NetworkPanel.creatContextMenu() = JPopupMenu().apply {
         addSeparator()
         add(addNeuronArrayAction)
         // add(addDeepNetAction)
-        add(addSmileClassifier)
         add(newNetworkMenu)
         addSeparator()
         add(addTextAction)

@@ -5,6 +5,10 @@ import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.network.core.labels
 import org.simbrain.network.subnetworks.RestrictedBoltzmannMachine
+import org.simbrain.network.util.Alignment
+import org.simbrain.network.util.Direction
+import org.simbrain.network.util.alignNetworkModels
+import org.simbrain.network.util.offsetNetworkModel
 import org.simbrain.util.place
 import org.simbrain.util.runWithProgressWindow
 import org.simbrain.util.toDoubleArray
@@ -21,18 +25,19 @@ val roomSchemaSim = newSim {
     val network = networkComponent.network
 
     // Competitive network
-    val rbm = RestrictedBoltzmannMachine(40, 25)
+    val rbm = RestrictedBoltzmannMachine(42, 64)
     network.addNetworkModel(rbm)?.await()
 
     // Neuron Collection and Its Configurations
-    val nc = network.addNeuronCollection(40).apply {
+    val nc = network.addNeuronCollection(42).apply {
         setUpperBound(1.0)
         setLowerBound(0.0)
-        setClamped(true)
+        isAllClamped = true
         applyLayout(5, 8)
-        locationX = -550.0
-        locationY = 0.0
     }
+
+    offsetNetworkModel(rbm, nc, Direction.NORTH, 370.0)
+    alignNetworkModels(rbm, nc, Alignment.VERTICAL)
 
     nc.neuronList.labels = listOf(
         "ceiling", "large", "telephone", "books", "sofa", "drapes",
@@ -56,9 +61,8 @@ val roomSchemaSim = newSim {
         syncRBMToNeuronCollection()
     }
 
-
     withGui {
-        place(networkComponent, 139, 10, 1600, 900)
+        place(networkComponent, 236, 10, 600, 800)
         createControlPanel("Control Panel", 5, 10) {
             addButton("Kitchen") {
                 nc.clear()

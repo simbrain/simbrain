@@ -1,9 +1,12 @@
-package org.simbrain.network.core
+package org.simbrain.network.spikeresponders
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.simbrain.network.spikeresponders.*
+import org.simbrain.network.core.Network
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.Synapse
 import org.simbrain.network.updaterules.SpikingThresholdRule
+import org.simbrain.util.getSimbrainXStream
 
 class SpikeResponderTest {
 
@@ -177,7 +180,6 @@ class SpikeResponderTest {
         assertEquals(0.2, n3.activation)
     }
 
-
     @Test
     fun `test UDF`() {
         val udf = UDF()
@@ -201,4 +203,25 @@ class SpikeResponderTest {
         println(n3)
     }
 
+    @Test
+    fun `test udf xml representation`() {
+        val udf = UDF().apply {
+            U = 0.5
+            D = 1100.0
+            F = 50.0
+        }
+        s2.spikeResponder = udf
+        n1.activation = 1.0
+        net.update()
+
+        val xml = getSimbrainXStream().toXML(s2)
+
+        val synapse = getSimbrainXStream().fromXML(xml) as Synapse
+        val deserializedUdf = synapse.spikeResponder as UDF
+
+        assertEquals(udf.U, deserializedUdf.U)
+        assertEquals(udf.D, deserializedUdf.D)
+        assertEquals(udf.F, deserializedUdf.F)
+
+    }
 }

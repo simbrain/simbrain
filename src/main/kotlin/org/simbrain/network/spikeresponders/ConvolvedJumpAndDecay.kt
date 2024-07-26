@@ -68,10 +68,10 @@ class ConvolvedJumpAndDecay() : SpikeResponder() {
     fun convolvedJumpAndDecay(
         spiked: Boolean,
         psr: Double,
-        jump: Double,
+        jumpHeight: Double,
         timeStep: Double): Double {
         return if (spiked) {
-            psr + jump
+            psr + jumpHeight
         } else {
             psr + timeStep * (baseLine - psr) / timeConstant
         }

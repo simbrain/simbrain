@@ -45,9 +45,9 @@ class UDF : SpikeResponder() {
         description = "Baseline use and strength of facilitation.",
         minimumValue = 0.0,
         increment = .1,
-        order = 1
+        order = 10
     )
-    private var U = 0.5
+    var U = 0.5
 
     /**
      * Depression constant.
@@ -57,49 +57,18 @@ class UDF : SpikeResponder() {
         description = "Time constant for neurotransmitter depression.",
         minimumValue = 0.0,
         increment = .1,
-        order = 1
+        order = 20
     )
-    private var D = 1100.0
+    var D = 1100.0
 
     /**
      * Facilitation constant.
      */
-    @UserParameter(label = "Mean Facilitation ", description = "Time constant for facilitating effects.", order = 1)
-    private var F = 50.0
+    @UserParameter(label = "Mean Facilitation ", description = "Time constant for facilitating effects.", order = 30)
+    var F = 50.0
 
-    /**
-     * Psr decay time constant
-     */
-    @UserParameter(label = "PSR Decay Constant", description = "Time constant for facilitating effects.", order = 1)
-    private var tau = 3.0
-
-    /**
-     * The time of the last spike (recorded here since
-     * SpikingNeuronUpdateRule writes over its own copy).
-     */
-    private var lastSpikeTime = 0.0
-
-    /**
-     * Use/Facilitation variable
-     */
-    private var u = 0.0
-
-    /**
-     * Depression variable.
-     */
-    private var R = 1.0
-
-    /**
-     * The actual spike responder for the post synaptic response for UDF.
-     */
-    private val spikeDecay = ConvolvedJumpAndDecay()
-
-    /**
-     * Whether or not this is the first time this is being updated. If so it
-     * initializes the variables.
-     */
-    private var firstTime = true
-    var rand = NormalDistribution()
+    @UserParameter(label = "Spike Responder", description = "Short term plasticity sets the max response of this responder", order = 50)
+    var spikeResponderLocal: SpikeResponder = ConvolvedJumpAndDecay()
 
     /**
      * Does not actually copy this UDF object. Since UDF has values always
@@ -111,9 +80,6 @@ class UDF : SpikeResponder() {
         copy.U = U
         copy.D = D
         copy.F = F
-        copy.tau = tau
-        copy.u = u
-        copy.R = R
         return copy
     }
 
@@ -124,29 +90,35 @@ class UDF : SpikeResponder() {
 
     context(Network)
     override fun apply(synapse: Synapse, responderData: ScalarDataHolder) {
-        if (firstTime) {
-            init(synapse)
-            spikeDecay.timeConstant = tau
-            firstTime = false
-        }
-        val A: Double
+        val udfData = responderData as UDFScalarDataHolder
+        var u by udfData::u
+        var R by udfData::R
         if (synapse.source.isSpike) {
-            val ISI = lastSpikeTime - time
+            val ISI = synapse.source.lastSpikeTime - time
             u = U + u * (1 - U) * exp(ISI / F)
             R = 1 + (R - u * R - 1) * exp(ISI / D)
-            A = R * synapse.strength * u
-            lastSpikeTime = time
-            synapse.psr = spikeDecay.convolvedJumpAndDecay(synapse.source.isSpike, synapse.psr, synapse.strength, timeStep)
+            val jumpHeight = R * synapse.strength * u
+            synapse.psr = when (val sr = spikeResponderLocal) {
+                is ConvolvedJumpAndDecay -> sr.convolvedJumpAndDecay(true, synapse.psr, jumpHeight, timeStep)
+                else -> throw IllegalStateException("UDF can only be used with ConvolvedJumpAndDecay")
+            }
         } else {
-            spikeDecay.apply(synapse, responderData)
+            spikeResponderLocal.apply(synapse, responderData)
         }
     }
 
+    override fun createResponderData(): UDFScalarDataHolder {
+        return UDFScalarDataHolder(U, 1.0)
+    }
 
     override val name: String
         get() = "STP (UDF)"
 
     /**
+     *
+     * An intelligent randomization strategy for the responder’s parameters based on a source synapse.
+     * Currently, there is no obvious way to integrate this into the GUI.
+     *
      * Initializes this UDF object based on the synapse it governs. UDF draws
      * its values from different distributions based on the polarity of the
      * source and target neurons.
@@ -155,70 +127,47 @@ class UDF : SpikeResponder() {
      * neurons the synapse connects and draw values based on that.
      */
     fun init(s: Synapse) {
-        if (s.source.polarity === Polarity.EXCITATORY
-            && s.target.polarity === Polarity.EXCITATORY
-        ) {
-            rand.mean = 0.5
-            rand.standardDeviation = 0.25
-            U = rand.sampleDouble()
-            rand.mean = 1100.0
-            rand.standardDeviation = 550.0
-            D = rand.sampleDouble()
-            rand.mean = 50.0
-            rand.standardDeviation = 25.0
-            F = rand.sampleDouble()
-            spikeDecay.timeConstant = 3.0
-        } else if (s.source.polarity === Polarity.EXCITATORY
-            && s.target.polarity === Polarity.INHIBITORY
-        ) {
-            rand.mean = 0.05
-            rand.standardDeviation = 0.025
-            U = rand.sampleDouble()
-            rand.mean = 125.0
-            rand.standardDeviation = 62.5
-            D = rand.sampleDouble()
-            rand.mean = 120.0
-            rand.standardDeviation = 60.0
-            F = rand.sampleDouble()
-            spikeDecay.timeConstant = 3.0
-        } else if (s.source.polarity === Polarity.INHIBITORY
-            && s.target.polarity === Polarity.EXCITATORY
-        ) {
-            rand.mean = 0.25
-            rand.standardDeviation = 0.125
-            U = rand.sampleDouble()
-            rand.mean = 700.0
-            rand.standardDeviation = 350.0
-            D = rand.sampleDouble()
-            rand.mean = 20.0
-            rand.standardDeviation = 10.0
-            F = rand.sampleDouble()
-            spikeDecay.timeConstant = 6.0
-        } else if (s.source.polarity === Polarity.INHIBITORY
-            && s.target.polarity === Polarity.EXCITATORY
-        ) {
-            rand.mean = 0.32
-            rand.standardDeviation = 0.16
-            U = rand.sampleDouble()
-            rand.mean = 144.0
-            rand.standardDeviation = 72.0
-            D = rand.sampleDouble()
-            rand.mean = 60.0
-            rand.standardDeviation = 30.0
-            F = rand.sampleDouble()
-            spikeDecay.timeConstant = 6.0
-        } else {
-            rand.mean = 0.5
-            rand.standardDeviation = 0.25
-            U = rand.sampleDouble()
-            rand.mean = 1100.0
-            rand.standardDeviation = 550.0
-            D = rand.sampleDouble()
-            rand.mean = 50.0
-            rand.standardDeviation = 25.0
-            F = rand.sampleDouble()
-            spikeDecay.timeConstant = 3.0
+        when {
+            s.source.polarity === Polarity.EXCITATORY
+                    && s.target.polarity === Polarity.EXCITATORY -> {
+                U = NormalDistribution(mean = 0.5, standardDeviation = 0.25).sampleDouble()
+                D = NormalDistribution(mean = 1100.0, standardDeviation = 550.0).sampleDouble()
+                F = NormalDistribution(mean = 50.0, standardDeviation = 25.0).sampleDouble()
+            }
+            s.source.polarity === Polarity.EXCITATORY
+                    && s.target.polarity === Polarity.INHIBITORY -> {
+                U = NormalDistribution(mean = 0.5, standardDeviation = 0.25).sampleDouble()
+                D = NormalDistribution(mean = 125.0, standardDeviation = 62.5).sampleDouble()
+                F = NormalDistribution(mean = 120.0, standardDeviation = 60.0).sampleDouble()
+            }
+            s.source.polarity === Polarity.INHIBITORY
+                    && s.target.polarity === Polarity.EXCITATORY -> {
+                U = NormalDistribution(mean = 0.5, standardDeviation = 0.25).sampleDouble()
+                D = NormalDistribution(mean = 700.0, standardDeviation = 350.0).sampleDouble()
+                F = NormalDistribution(mean = 20.0, standardDeviation = 10.0).sampleDouble()
+            }
+            s.source.polarity === Polarity.INHIBITORY
+                    && s.target.polarity === Polarity.EXCITATORY -> {
+                U = NormalDistribution(mean = 0.32, standardDeviation = 0.16).sampleDouble()
+                D = NormalDistribution(mean = 144.0, standardDeviation = 72.0).sampleDouble()
+                F = NormalDistribution(mean = 60.0, standardDeviation = 30.0).sampleDouble()
+            }
+            else -> {
+                U = NormalDistribution(mean = 0.5, standardDeviation = 0.25).sampleDouble()
+                D = NormalDistribution(mean = 1100.0, standardDeviation = 550.0).sampleDouble()
+                F = NormalDistribution(mean = 50.0, standardDeviation = 25.0).sampleDouble()
+            }
         }
-        u = U
+    }
+}
+
+class UDFScalarDataHolder(
+    @UserParameter(label = "U", description = "Use/Facilitation variable", order = 1)
+    var u: Double,
+    @UserParameter(label = "R", description = "Depression variable", order = 2)
+    var R: Double
+) : ScalarDataHolder {
+    override fun copy(): UDFScalarDataHolder {
+        return UDFScalarDataHolder(u, R)
     }
 }

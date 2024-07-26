@@ -32,6 +32,7 @@ import org.simbrain.util.UserParameter
 import org.simbrain.util.Utils
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
@@ -218,13 +219,32 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
      * Data holder for learning rule
      */
     @UserParameter(label = "Learning data", order = 100)
-    var learningRuleData: ScalarDataHolder = learningRule.createScalarData()
+    var learningRuleData: ScalarDataHolder by GuiEditable(
+        initValue = learningRule.createScalarData(),
+        label = "Learning data",
+        order = 100,
+        onUpdate = {
+            val proposedDataHolder = widgetValue(::learningRule).createScalarData()
+            if (widgetValue(::learningRuleData)::class != proposedDataHolder::class) {
+                refreshValue(proposedDataHolder)
+            }
+        }
+    )
 
     /**
      * Data holder for spiker responder.
      */
-    @UserParameter(label = "Spike data", order = 110)
-    private var spikeResponderData = spikeResponder.createResponderData()
+    var spikeResponderData: ScalarDataHolder by GuiEditable(
+        initValue = spikeResponder.createResponderData(),
+        label = "Spike data",
+        order = 110,
+        onUpdate = {
+            val proposedDataHolder = widgetValue(::spikeResponder).createResponderData()
+            if (widgetValue(::spikeResponderData)::class != proposedDataHolder::class) {
+                refreshValue(proposedDataHolder)
+            }
+        }
+    )
 
     /**
      * Support for property change events.
@@ -283,7 +303,8 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
         upperBound = templateSynapse.upperBound
         lowerBound = templateSynapse.lowerBound
         increment = templateSynapse.increment
-        spikeResponder = templateSynapse.spikeResponder
+        spikeResponder = templateSynapse.spikeResponder.copy()
+        spikeResponderData = templateSynapse.spikeResponderData.copy()
         isEnabled = templateSynapse.isEnabled
         delay = templateSynapse.delay
         frozen = templateSynapse.frozen

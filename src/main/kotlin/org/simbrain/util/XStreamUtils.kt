@@ -153,6 +153,15 @@ fun createConstructorCallingConverter(
 
             fun read() {
                 val nodeName = reader.nodeName
+                // originally designed to improve backward compatibility when a property was removed from a class
+                // while the xml still contained it.
+                // but there is a bug in the stepIn function that reads the same node twice, and this prevents the
+                // second read from being processed, since it would not be in the propertyMap of the inner object,
+                // unless the inner object has a same property name as the outer object. for example:
+                // synapse
+                //   spikeResponder (UDF)
+                //     spikeResponder (ConvolvedJumpAndDecay)
+                // this would cause the stepIn to keep reading the UDF node and cause a stack overflow.
                 propertyMap[nodeName]?.let {
                     if (customUnmarshaller?.invoke(reader, context) == true) return
                     propertyNameToDeserializedValueMap[nodeName] = if (reader.getAttribute("class") != null) {

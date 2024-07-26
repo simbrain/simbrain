@@ -1,10 +1,10 @@
-package org.simbrain.network.core
+package org.simbrain.network.spikeresponders
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import org.simbrain.network.spikeresponders.NonResponder
-import org.simbrain.network.spikeresponders.ProbabilisticResponder
-import org.simbrain.network.spikeresponders.StepResponder
+import org.simbrain.network.core.Network
+import org.simbrain.network.core.NeuronArray
+import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.updaterules.IntegrateAndFireRule
 import org.simbrain.network.updaterules.SpikingThresholdRule
 import org.simbrain.network.util.SpikingMatrixData

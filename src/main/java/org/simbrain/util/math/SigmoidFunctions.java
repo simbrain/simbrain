@@ -56,7 +56,7 @@ public class SigmoidFunctions {
     }
 
     /**
-     * Returns the standard logistic. Helper method so that the full logistic
+     * Returns the standard logistic (result between 0 and 1). Helper method so that the full logistic
      * function doesn't have to be written out every time it's invoked.
      *
      * @param x input argument

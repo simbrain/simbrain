@@ -25,8 +25,8 @@ import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.util.UserParameter
 
 /**
- * Probabilistic spike responders produces a response with some probability. If a response is produced it is set
- * equal to the pre-synaptic weight.
+ * Probabilistic spike responders produces a response with some probability when a spike occurs. If a response is produced it is set
+ * equal to the synapse's weight.
  */
 class ProbabilisticResponder : SpikeResponder() {
 

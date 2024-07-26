@@ -31,16 +31,6 @@ import smile.math.matrix.Matrix
 class RiseAndDecay : SpikeResponder() {
 
     /**
-     * Maximum response value.
-     */
-    @UserParameter(
-        label = "Maximum Response",
-        description = "Maximum response value.",
-        increment = .1,
-        order = 1)
-    var maximumResponse = 1.0
-
-    /**
      * The time constant of decay and recovery (ms).
      */
     @UserParameter(
@@ -54,7 +44,6 @@ class RiseAndDecay : SpikeResponder() {
 
     override fun copy(): RiseAndDecay {
         val rad = RiseAndDecay()
-        rad.maximumResponse = maximumResponse
         rad.timeConstant = timeConstant
         return rad
     }
@@ -106,7 +95,7 @@ class RiseAndDecay : SpikeResponder() {
                              strength: Double,
                              timeStep: Double): Pair<Double, Double> {
         return Pair(
-            (psr + ((timeStep / timeConstant) * (Math.E * maximumResponse * recovery * (1 - psr) - psr))) * strength,
+            (psr + ((timeStep / timeConstant) * (Math.E * strength * recovery * (1 - psr) - psr))),
             if (spiked) {
                 1.0
             } else {

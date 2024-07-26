@@ -1,4 +1,4 @@
-package org.simbrain.custom_sims.simulations.cortex
+package org.simbrain.custom_sims.simulations.neuroscience
 
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.newSim

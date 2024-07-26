@@ -6,7 +6,7 @@ import org.simbrain.custom_sims.simulations.behaviorism.OperantConditioning
 import org.simbrain.custom_sims.simulations.behaviorism.SimpleOperant
 import org.simbrain.custom_sims.simulations.behaviorism.operantWithEnvironment
 import org.simbrain.custom_sims.simulations.braitenberg.RandomizedPursuer
-import org.simbrain.custom_sims.simulations.cortex.cortexSimple
+import org.simbrain.custom_sims.simulations.neuroscience.cortexSimple
 import org.simbrain.custom_sims.simulations.demos.competitiveSim
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaosBitStream
@@ -72,6 +72,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
 
     dir("Neuroscience") {
         item("Spiking Neuron") { spikingNetwork }
+        item("Spike Responders") { spikeResponderSim }
         item("Cortical areas") { cortexKuramoto }
         // item("Hippocampus") { Hippocampus() }
         // item("Cerebellum") { Cerebellum() }

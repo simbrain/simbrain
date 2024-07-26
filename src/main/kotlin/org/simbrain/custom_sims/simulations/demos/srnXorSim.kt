@@ -1,7 +1,7 @@
 package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.addTimeSeries
+import org.simbrain.custom_sims.addTimeSeriesComponent
 import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.subnetworks.SRNNetwork
@@ -55,7 +55,7 @@ val srnXORSim = newSim {
             height = 550
         }
 
-        val timeSeries = addTimeSeries("Errors")
+        val timeSeries = addTimeSeriesComponent("Errors", seriesNames = listOf("error"))
 
         place(timeSeries) {
             location = point(700, 10)

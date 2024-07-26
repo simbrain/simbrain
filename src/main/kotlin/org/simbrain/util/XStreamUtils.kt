@@ -256,8 +256,8 @@ fun createConstructorCallingConverter(
  * Allows a subset of properties to be marshalled and unmarshalled by custom converters.
  * Useful when the properties have references to an instance of this class that is not yet fully constructed.
  *
- * For example: ScalarTimeSeries has a reference to its parent TimeSeriesModel, which is not yet fully constructed when
- * the ScalarTimeSeries list is being unmarshalled.
+ * For example: TimeSeries has a reference to its parent TimeSeriesModel, which is not yet fully constructed when
+ * the TimeSeries list is being unmarshalled.
  *
  * Can only be used in classes using [createConstructorCallingConverter].
  */

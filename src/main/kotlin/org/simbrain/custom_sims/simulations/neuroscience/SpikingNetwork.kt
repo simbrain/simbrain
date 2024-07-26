@@ -1,7 +1,7 @@
 package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.addTimeSeries
+import org.simbrain.custom_sims.addTimeSeriesComponent
 import org.simbrain.custom_sims.couplingManager
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.addNeuron
@@ -48,7 +48,7 @@ val spikingNetwork = newSim {
         }
     }
 
-    val timeSeriesComponent = addTimeSeries("Spikes")
+    val timeSeriesComponent = addTimeSeriesComponent("Spikes", seriesNames = listOf("Spiking", "Post-Spiking"))
 
     withGui {
         place(timeSeriesComponent) {

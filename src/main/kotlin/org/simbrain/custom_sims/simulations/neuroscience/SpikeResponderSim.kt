@@ -76,10 +76,8 @@ val spikeResponderSim = newSim {
         }
     }
 
-    val spikePlot = addTimeSeries("Spikes")
-    val spikeResponderPlot = addTimeSeries("Spike Responders").apply {
-        model.addScalarTimeSeries()
-    }
+    val (spikePlot, izhikevichSeries) = addTimeSeries("Spikes", seriesNames = listOf("Izhikevich"))
+    val (spikeResponderPlot, stepSeries, jumpSeries, riseSeries, probSeries) = addTimeSeries("Spike Responders", seriesNames = listOf("Step", "Jump and Decay", "Rise and Decay", "Probabilistic"))
 
     withGui {
         placeComponent(spikePlot, 410, 0, 400, 400)
@@ -87,11 +85,11 @@ val spikeResponderSim = newSim {
     }
 
     with(couplingManager) {
-        spiking couple spikePlot.model.timeSeriesList[0]
-        stepResponder couple spikeResponderPlot.model.timeSeriesList[0]
-        jumpAndDecay couple spikeResponderPlot.model.timeSeriesList[1]
-        riseAndDecay couple spikeResponderPlot.model.timeSeriesList[2]
-        probabilisticResponder couple spikeResponderPlot.model.timeSeriesList[3]
+        spiking couple izhikevichSeries
+        stepResponder couple stepSeries
+        jumpAndDecay couple jumpSeries
+        riseAndDecay couple riseSeries
+        probabilisticResponder couple probSeries
     }
 
 }

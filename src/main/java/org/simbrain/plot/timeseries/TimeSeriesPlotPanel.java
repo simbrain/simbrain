@@ -120,12 +120,7 @@ public class TimeSeriesPlotPanel extends JPanel {
         model.setFixedWidth(model.getFixedWidth());
 
         if (model.isAutoRange()) {
-            if (model.isUseFixedRangeWindow()) {
-                chart.getXYPlot().getRangeAxis().setAutoRange(false);
-                chart.getXYPlot().getRangeAxis().setRange(model.getRangeLowerBound(), model.getFixedRangeThreshold());
-            } else {
-                chart.getXYPlot().getRangeAxis().setAutoRange(true);
-            }
+            chart.getXYPlot().getRangeAxis().setAutoRange(true);
         } else {
             chart.getXYPlot().getRangeAxis().setAutoRange(false);
             chart.getXYPlot().getRangeAxis().setRange(model.getRangeLowerBound(), model.getRangeUpperBound());
@@ -149,7 +144,7 @@ public class TimeSeriesPlotPanel extends JPanel {
     }
 
     /**
-     * Add buttons for adding and deleting {@link TimeSeriesModel.ScalarTimeSeries} objects.
+     * Add buttons for adding and deleting {@link TimeSeriesModel.TimeSeries} objects.
      */
     public void addAddDeleteButtons() {
         deleteButton = new JButton("Delete");

@@ -87,7 +87,7 @@ public class TimeSeriesPlotActions {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                timeSeriesPanel.getTimeSeriesModel().addScalarTimeSeries();
+                timeSeriesPanel.getTimeSeriesModel().addTimeSeries();
             }
         };
     }
@@ -110,7 +110,7 @@ public class TimeSeriesPlotActions {
 
             @Override
             public void actionPerformed(ActionEvent arg0) {
-                timeSeriesPanel.getTimeSeriesModel().removeLastScalarTimeSeries();
+                timeSeriesPanel.getTimeSeriesModel().removeLastTimeSeries();
             }
 
         };

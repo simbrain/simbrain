@@ -111,11 +111,10 @@ public class ClassicalConditioning extends Simulation {
 
         // Create a time series plot
         plot = sim.addTimeSeries(728,13,406,444, "Association Strength");
-        plot.getModel().removeAllScalarTimeSeries();
         plot.getModel().setAutoRange(false);
         plot.getModel().setFixedWidth(true);
         plot.getModel().setWindowSize(1500);
-        TimeSeriesModel.ScalarTimeSeries ts1 = plot.getModel().addScalarTimeSeries("Association Strength");
+        TimeSeriesModel.TimeSeries ts1 = plot.getModel().addTimeSeries("Association Strength");
         sim.couple(association, ts1);
 
         // Add custom network update action

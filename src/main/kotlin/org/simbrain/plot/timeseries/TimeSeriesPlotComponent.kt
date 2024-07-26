@@ -16,128 +16,106 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.plot.timeseries;
+package org.simbrain.plot.timeseries
 
-import com.thoughtworks.xstream.XStream;
-import org.simbrain.plot.XYSeriesConverter;
-import org.simbrain.util.DoubleArrayConverter;
-import org.simbrain.util.XStreamUtils;
-import org.simbrain.workspace.AttributeContainer;
-import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.WorkspaceComponent;
-
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
+import com.thoughtworks.xstream.XStream
+import org.simbrain.plot.XYSeriesConverter
+import org.simbrain.plot.timeseries.TimeSeriesModel.TimeSeries
+import org.simbrain.util.DoubleArrayConverter
+import org.simbrain.util.getSimbrainXStream
+import org.simbrain.workspace.AttributeContainer
+import org.simbrain.workspace.Workspace
+import org.simbrain.workspace.WorkspaceComponent
+import org.simbrain.workspace.couplings.Coupling
+import java.io.InputStream
+import java.io.OutputStream
 
 /**
  * Represents time series data.
  */
-public class TimeSeriesPlotComponent extends WorkspaceComponent {
 
-    /**
-     * The data model.
-     */
-    private final TimeSeriesModel model;
+class TimeSeriesPlotComponent @JvmOverloads constructor(name: String, val model: TimeSeriesModel = TimeSeriesModel()) : WorkspaceComponent(name) {
 
-    /**
-     * Create new time series plot component.
-     *
-     * @param name name
-     */
-    public TimeSeriesPlotComponent(String name) {
-        super(name);
-        model = new TimeSeriesModel();
-        model.addScalarTimeSeries(3);
-        model.setTimeSupplier(() -> getWorkspace().getTime());
-    }
+    override var workspace: Workspace
+        get() = super.workspace
+        set(workspace) {
+            // Workspace object is not available in the constructor.
+            super.workspace = workspace
 
-    /**
-     * Creates a new time series component from a specified model. Used in
-     * deserializing.
-     *
-     * @param name  chart name
-     * @param model chart model
-     */
-    public TimeSeriesPlotComponent(String name, TimeSeriesModel model) {
-        super(name);
-        this.model = model;
-        model.setTimeSupplier(() -> getWorkspace().getTime());
-    }
-
-    @Override
-    public void setWorkspace(Workspace workspace) {
-        // Workspace object is not available in the constructor.
-        super.setWorkspace(workspace);
-
-        getWorkspace().getCouplingManager().getEvents().getCouplingAdded().on(c -> {
-            // A new array coupling is being added to this time series
-            if (c.getConsumer().getBaseObject() == model) {
-                // Initialize series with provided names, e.g neuron labels
-                var labels = c.getProducer().getLabelArray();
-                if (labels != null) {
-                    model.removeAllScalarTimeSeries();
-                    for (int i = 0; i < labels.length; i++) {
-                        model.addScalarTimeSeries(labels[i]);
+            workspace.couplingManager.events.couplingAdded.on { c: Coupling ->
+                // A new array coupling is being added to this time series
+                if (c.consumer.baseObject === model) {
+                    // Initialize series with provided names, e.g neuron labels
+                    val labels = c.producer.labelArray
+                    if (labels != null) {
+                        model.removeAllTimeSeries()
+                        for (i in labels.indices) {
+                            model.addTimeSeries(labels[i])
+                        }
                     }
                 }
             }
-        });
 
-        // A new scalar time series has been added
-        model.getEvents().getScalarTimeSeriesAdded().on(this::fireAttributeContainerAdded);
+            // A new scalar time series has been added
+            model.events.timeSeriesAdded.on { addedContainer: TimeSeries? ->
+                this.fireAttributeContainerAdded(
+                    addedContainer!!
+                )
+            }
 
-        // A scalar time series has been removed
-        model.getEvents().getScalarTimeSeriesRemoved().on(this::fireAttributeContainerRemoved);
+            // A scalar time series has been removed
+            model.events.timeSeriesRemoved.on { removedContainer: TimeSeries? ->
+                this.fireAttributeContainerRemoved(
+                    removedContainer!!
+                )
+            }
+        }
+
+    override val attributeContainers: List<AttributeContainer>
+        get() {
+            val containers: MutableList<AttributeContainer> = ArrayList()
+            containers.add(model)
+            containers.addAll(model.timeSeriesList)
+            return containers
+        }
+
+    fun addTimeSeries(name: String) = model.addTimeSeries(name)
+
+    override fun save(output: OutputStream, format: String?) {
+        timeSeriesXStream.toXML(model, output)
     }
 
-    @Override
-    public List<AttributeContainer> getAttributeContainers() {
-        List<AttributeContainer> containers = new ArrayList<>();
-        containers.add(model);
-        containers.addAll(model.getTimeSeriesList());
-        return containers;
+    override fun hasChangedSinceLastSave(): Boolean {
+        return false
     }
 
-    public TimeSeriesModel getModel() {
-        return model;
+    override val xml: String
+        get() = timeSeriesXStream.toXML(model)
+
+    init {
+        model.timeSupplier = { workspace.time }
     }
 
-    /**
-     * Opens a saved time series plot.
-     *
-     * @param input  stream
-     * @param name   name of file
-     * @param format format
-     * @return bar chart component to be opened
-     */
-    public static TimeSeriesPlotComponent open(final InputStream input, final String name, final String format) {
-        TimeSeriesModel dataModel = (TimeSeriesModel) getTimeSeriesXStream().fromXML(input);
-        return new TimeSeriesPlotComponent(name, dataModel);
+    companion object {
+        /**
+         * Opens a saved time series plot.
+         *
+         * @param input  stream
+         * @param name   name of file
+         * @param format format
+         * @return bar chart component to be opened
+         */
+        fun open(input: InputStream, name: String, format: String?): TimeSeriesPlotComponent {
+            val dataModel = timeSeriesXStream.fromXML(input) as TimeSeriesModel
+            return TimeSeriesPlotComponent(name, dataModel)
+        }
+
+        val timeSeriesXStream: XStream
+            get() {
+                val xstream = getSimbrainXStream()
+                xstream.registerConverter(DoubleArrayConverter())
+                xstream.registerConverter(XYSeriesConverter())
+                return xstream
+            }
     }
-
-    @Override
-    public void save(final OutputStream output, final String format) {
-        getTimeSeriesXStream().toXML(model, output);
-    }
-
-    @Override
-    public boolean hasChangedSinceLastSave() {
-        return false;
-    }
-
-    @Override
-    public String getXml() {
-        return getTimeSeriesXStream().toXML(model);
-    }
-
-    public static XStream getTimeSeriesXStream() {
-        var xstream = XStreamUtils.getSimbrainXStream();
-        xstream.registerConverter(new DoubleArrayConverter());
-        xstream.registerConverter(new XYSeriesConverter());
-        return xstream;
-    }
-
-
 }

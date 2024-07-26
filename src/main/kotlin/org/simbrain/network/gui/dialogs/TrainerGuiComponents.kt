@@ -22,7 +22,6 @@ import org.simbrain.util.widgets.ToggleButton
 import smile.math.matrix.Matrix
 import java.awt.Cursor
 import java.awt.Dimension
-import java.util.function.Supplier
 import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -122,12 +121,11 @@ class ErrorTimeSeries(trainer: SupervisedTrainer<*>) : JPanel() {
 
         // TODO: Consider passing some of these values in
         val model = TimeSeriesModel()
-        model.timeSupplier = Supplier { trainer.iteration }
+        model.timeSupplier = { trainer.iteration }
         model.rangeLowerBound = 0.0
         model.rangeUpperBound = 5.0
         model.fixedWidth = true
         model.isAutoRange = true
-        model.fixedRangeThreshold = 5.0
         graphPanel = TimeSeriesPlotPanel(model)
         graphPanel.chartPanel.chart.setTitle("")
         graphPanel.chartPanel.chart.xyPlot.domainAxis.label = "Iterations"
@@ -142,7 +140,7 @@ class ErrorTimeSeries(trainer: SupervisedTrainer<*>) : JPanel() {
         mainPanel.add(graphPanel)
         add(mainPanel)
 
-        model.addScalarTimeSeries(trainer.lossFunction.name)
+        model.addTimeSeries(trainer.lossFunction.name)
         trainer.events.errorUpdated.on(Dispatchers.Swing, wait = true) {
             model.addData(0, trainer.iteration.toDouble(), it.loss)
             graphPanel.chartPanel.chart.xyPlot.rangeAxis.label = trainer.lossFunction.name

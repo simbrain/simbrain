@@ -120,8 +120,7 @@ class RandomizedPursuer : Simulation {
         tsPlot.model.rangeUpperBound = 1.1
         tsPlot.model.rangeLowerBound = -.1
 
-        tsPlot.model.removeAllScalarTimeSeries()
-        val ts1 = tsPlot.model.addScalarTimeSeries("Current State Probability / Fulfillment")
+        val ts1 = tsPlot.model.addTimeSeries("Current State Probability / Fulfillment")
 
         val probability = sim.getProducer(projComp, "getCurrentPointActivation")
         val timeSeries = sim.getConsumer(ts1, "setValue")

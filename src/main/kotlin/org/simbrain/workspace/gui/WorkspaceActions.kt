@@ -218,7 +218,7 @@ class WorkspaceActions {
         createComponentFactoryAction("Pixel Plot", "menu_icons/grid.png"),
         createComponentFactoryAction("Projection Plot", "menu_icons/ProjectionIcon.png"),
         createComponentFactoryAction("Raster Plot", "menu_icons/ScatterIcon.png"),
-        createComponentFactoryAction("Time Series", "menu_icons/CurveChart.png")
+        createComponentFactoryAction("Time Series", "menu_icons/TimeSeries.png")
     )
     val newWorldActions = listOf(
         createComponentFactoryAction("Data Table", "menu_icons/Table.png"),
@@ -313,7 +313,7 @@ class WorkspaceActions {
         producer = producer,
         plotType = plotType,
         objectName = objectName,
-        iconPath = "menu_icons/CurveChart.png",
+        iconPath = "menu_icons/TimeSeries.png",
         componentCreator = { name -> TimeSeriesPlotComponent(name) },
         consumerProvider = {
             it.model.getConsumer(TimeSeriesModel::setValues)

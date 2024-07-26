@@ -81,7 +81,6 @@ public class SimulationUtils {
     public TimeSeriesPlotComponent addTimeSeries(int x, int y, int width, int height,
                                                  String name) {
         TimeSeriesPlotComponent timeSeriesComponent = new TimeSeriesPlotComponent(name);
-        timeSeriesComponent.getModel().removeAllScalarTimeSeries();
         addComponent(timeSeriesComponent, x, y, width, height);
         return timeSeriesComponent;
     }

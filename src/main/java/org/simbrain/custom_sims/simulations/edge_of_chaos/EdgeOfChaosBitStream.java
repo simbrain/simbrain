@@ -137,7 +137,7 @@ public class EdgeOfChaosBitStream extends Simulation {
     private void setUpTimeSeries() {
         // Set up the plot
         TimeSeriesPlotComponent ts = sim.addTimeSeries(681,15,363,285, "Time Series");
-        TimeSeriesModel.ScalarTimeSeries sts1 = ts.getModel().addScalarTimeSeries("Difference");
+        TimeSeriesModel.TimeSeries sts1 = ts.getModel().addTimeSeries("Difference");
 
         sim.getWorkspace().addUpdateAction(UpdateActionKt.create("Update time series", () -> {
             // bitStream1.getInputManager().applyCurrentRow();

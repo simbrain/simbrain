@@ -237,7 +237,6 @@ fun main() {
     SRNNode(np, result).propertyDialog?.display()
 }
 
-
 /**
  * Creation dialog for [LMSNetwork]
  */
@@ -258,8 +257,9 @@ fun UnsupervisedNetwork.createTrainOnPatternAction() = createAction(
     description = "Train network on current pattern for specified number of iterations.",
     iconPath = "menu_icons/BatchPlay.png"
 ) {
-    val iterations: Int? = showNumericInputDialog("Iterations: ", 100)?.toInt()
+    val iterations: Int? = showNumericInputDialog("Iterations: ", NetworkPreferences.numberOfIterations)?.toInt()
     if (iterations != null) {
+        NetworkPreferences.numberOfIterations = iterations
         runWithProgressWindow(iterations, batchSize = 10) {
             trainOnCurrentPattern()
         }

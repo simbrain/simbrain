@@ -5,11 +5,14 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.util.UserParameter
+import org.simbrain.util.math.SigmoidFunctions.logistic
 import org.simbrain.util.propertyeditor.APETabOder
 import org.simbrain.util.roundToString
 import org.simbrain.util.stats.ProbabilityDistribution
 import java.util.*
 import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * PointNeuron from O'Reilly and Munakata, Computational Explorations in
@@ -34,6 +37,7 @@ class PointNeuronRule : NeuronUpdateRule<PointNeuronScalarData, EmptyMatrixData>
         label = "Max Excitatory Conductance",
         description = "Max excitatory conductance field. Conductance if all channels are open.",
         minimumValue = 0.0,
+        increment = .1,
         order = 10,
         tab = "Conductances"
     )
@@ -43,6 +47,8 @@ class PointNeuronRule : NeuronUpdateRule<PointNeuronScalarData, EmptyMatrixData>
         label = "Max Inhibitory Conductance",
         description = "Maximal inhibitory conductance.",
         order = 20,
+        increment = .1,
+        minimumValue = 0.0,
         tab = "Conductances"
     )
     var inhibitoryMaxConductance: Double = 1.0
@@ -69,6 +75,7 @@ class PointNeuronRule : NeuronUpdateRule<PointNeuronScalarData, EmptyMatrixData>
         label = "Leak Conductance",
         description = "Leak conductance, which remains constant. Determines how quickly it returns to resting.",
         minimumValue = 0.0,
+        increment = .1,
         order = 30,
         tab = "Conductances"
     )
@@ -184,7 +191,6 @@ class PointNeuronRule : NeuronUpdateRule<PointNeuronScalarData, EmptyMatrixData>
     }
 
     override fun clear(neuron: Neuron) {
-        super.clear(neuron)
     }
 
     context(Network)
@@ -267,27 +273,12 @@ class PointNeuronRule : NeuronUpdateRule<PointNeuronScalarData, EmptyMatrixData>
         }
     }
 
-    // val inhibitoryThresholdConductance: Double
-    //     /**
-    //      * Returns the inhibitory conductance that would set this point neuron's
-    //      * voltage at its threshold potential. See M/R p. 101, equation 3.2
-    //      *
-    //      * @return the value of that equation
-    //      */
-    //     get() {
-    //         val excitatoryTerm =
-    //             excitatoryConductance * excitatoryMaxConductance * (excitatoryReversal - thresholdPotential)
-    //         val leakTerm = leakConductance * leakMaxConductance * (leakReversal - thresholdPotential)
-    //
-    //         return (excitatoryTerm + leakTerm) / (thresholdPotential - inhibitoryReversal)
-    //     }
-
     private fun getExcitatoryInputs(neuron: Neuron): Double {
-        return neuron.fanIn.filter { it.strength > 0.0 }.sumOf { it.psr }
+        return max(0.0, neuron.fanIn.filter { it.strength > 0.0 }.sumOf { it.psr })
     }
 
     private fun getInhibitoryInputs(neuron: Neuron): Double {
-        return neuron.fanIn.filter { it.strength < 0.0 }.sumOf { it.psr }
+        return min(0.0, neuron.fanIn.filter { it.strength < 0.0 }.sumOf { it.psr })
     }
 
     override fun getToolTipText(neuron: Neuron): String? {

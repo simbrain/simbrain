@@ -238,6 +238,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
     var dataHolder: ScalarDataHolder by GuiEditable(
         initValue = updateRule.createScalarData(),
         label = "State variables",
+        showDetails = false,
         order = 100,
         onUpdate = {
             val proposedDataHolder = widgetValue(::updateRule).createScalarData()

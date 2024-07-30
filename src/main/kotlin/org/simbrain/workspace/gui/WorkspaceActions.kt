@@ -320,6 +320,22 @@ class WorkspaceActions {
         }
     )
 
+    fun createCoupledTimeSeriesPlotAction(producers: List<Producer>) = SimbrainDesktop.desktopPane.createAction(
+        name = "Time Series Plot of ${producers.size} ${producers.map { it.baseObject::class.simpleName }.toSet().joinToString(", ")}${if (producers.size > 1) "s" else ""}",
+        iconPath = "menu_icons/TimeSeries.png",
+        description = "Create Coupled Time Series Plot",
+        coroutineScope = workspace
+    ) {
+        val component = TimeSeriesPlotComponent("Time Series Plot of ${producers.size} ${producers.map { it.baseObject::class.simpleName }.toSet().joinToString(", ")}${if (producers.size > 1) "s" else ""}")
+        workspace.addWorkspaceComponent(component)
+        producers.forEach { producer ->
+            with(workspace.couplingManager) {
+                val timeSeries = component.addTimeSeries(producer.simpleDescription)
+                producer couple timeSeries.getConsumer(TimeSeriesModel.TimeSeries::setValue)
+            }
+        }
+    }
+
     @JvmOverloads
     fun createCoupledHistogramPlotAction(producer: Producer, objectName: String, plotType: String = "Histogram Plot") = createCoupledPlotAction(
         producer = producer,

@@ -1,6 +1,8 @@
 package org.simbrain.network.gui
 
 import org.simbrain.network.NetworkComponent
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.Synapse
 import org.simbrain.network.gui.nodes.NeuronNode
 import org.simbrain.util.widgets.ShowHelpAction
 import org.simbrain.workspace.AttributeContainer
@@ -177,54 +179,63 @@ val NetworkPanel.connectionMenu
         }
     }
 
-val NetworkPanel.neuronContextMenu
-    get() = with(networkActions) {
-        JPopupMenu().apply {
-            add(cutAction)
-            add(copyAction)
-            add(pasteAction)
-            add(deleteAction)
+fun NetworkPanel.createNeuronContextMenu() = with(networkActions) {
+    val selectedNeuronList = selectionManager.filterSelectedModels<Neuron>()
+    JPopupMenu().apply {
+        add(cutAction)
+        add(copyAction)
+        add(pasteAction)
+        add(deleteAction)
+        addSeparator()
+        add(clearSourceNeurons)
+        add(setSourceNeurons)
+        add(connectionMenu)
+        addSeparator()
+        add(showLayoutDialogAction)
+        addSeparator()
+        add(showNetworkDefaultsAction)
+        add(showNetworkPropertiesAction)
+        add(showNetworkRandomizersAction)
+        addSeparator()
+        if (selectedNeuronList.size > 1) {
+            add(alignMenu)
+            add(spaceMenu)
             addSeparator()
-            add(clearSourceNeurons)
-            add(setSourceNeurons)
-            add(connectionMenu)
+        }
+        add(setNeuronPropertiesAction)
+        addSeparator()
+        add(JMenu("Select").apply {
+            add(selectIncomingWeightsAction)
+            add(selectOutgoingWeightsAction)
+        })
+        if (selectedNeuronList.isNotEmpty()) {
             addSeparator()
-            add(showLayoutDialogAction)
+            add(selectedNeuronList.createCoupleActivationToTimeSeriesAction())
+        }
+        addSeparator()
+        add(testInputAction)
+        add(showWeightMatrixAction)
+        if (selectionManager.filterSelectedNodes<NeuronNode>().size == 1) {
+            val node = selectionManager.filterSelectedNodes<NeuronNode>()[0]
             addSeparator()
-            add(showNetworkDefaultsAction)
-            add(showNetworkPropertiesAction)
-            add(showNetworkRandomizersAction)
-            addSeparator()
-            if (selectionManager.filterSelectedNodes<NeuronNode>().size > 1) {
-                add(alignMenu)
-                add(spaceMenu)
-                addSeparator()
-            }
-            add(setNeuronPropertiesAction)
-            addSeparator()
-            add(JMenu("Select").apply {
-                add(selectIncomingWeightsAction)
-                add(selectOutgoingWeightsAction)
-            })
-            addSeparator()
-            add(testInputAction)
-            add(showWeightMatrixAction)
-            if (selectionManager.filterSelectedNodes<NeuronNode>().size == 1) {
-                val node = selectionManager.filterSelectedNodes<NeuronNode>()[0]
-                addSeparator()
-                add(CouplingMenu(node.networkPanel.networkComponent, node.neuron))
-            }
+            add(CouplingMenu(node.networkPanel.networkComponent, node.neuron))
         }
     }
+}
 
 val NetworkPanel.synapseContextMenu
     get() = with(networkActions) {
+        val selectedSynapses = selectionManager.filterSelectedModels<Synapse>()
         JPopupMenu().apply {
             add(cutAction)
             add(copyAction)
             add(pasteAction)
             addSeparator()
             add(deleteAction)
+            if (selectedSynapses.isNotEmpty()) {
+                addSeparator()
+                add(selectedSynapses.createCoupleWeightToTimeSeriesAction())
+            }
             addSeparator()
             add(setSynapsePropertiesAction)
         }

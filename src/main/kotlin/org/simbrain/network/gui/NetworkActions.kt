@@ -22,6 +22,8 @@ import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.propertyeditor.objectWrapper
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
+import org.simbrain.workspace.couplings.getProducer
+import org.simbrain.workspace.gui.SimbrainDesktop
 import java.awt.event.KeyEvent
 import javax.swing.AbstractAction
 import javax.swing.Action
@@ -337,6 +339,14 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     ) {
         spaceVertical()
     }
+
+    fun List<Neuron>.createCoupleActivationToTimeSeriesAction() = SimbrainDesktop.actionManager.createCoupledTimeSeriesPlotAction(
+        producers = map { it.getProducer(Neuron::activation) },
+    )
+
+    fun List<Synapse>.createCoupleWeightToTimeSeriesAction() = SimbrainDesktop.actionManager.createCoupledTimeSeriesPlotAction(
+        producers = map { it.getProducer(Synapse::strength) },
+    )
 
     val testInputAction = networkPanel.createConditionallyEnabledAction(
         name = "Create Input Table...",

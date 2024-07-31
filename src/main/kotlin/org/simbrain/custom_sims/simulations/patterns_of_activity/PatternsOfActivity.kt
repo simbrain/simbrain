@@ -518,7 +518,7 @@ class PatternsOfActivity : Simulation {
         // Create projection component
 
         val pc = sim.addProjectionPlot(x, y, 362, 320, toPlot!!.label)
-        pc.projector.init()
+        pc.projector.initProjector()
         pc.projector.tolerance = tolerance
         pc.projector.coloringManager = MarkovColoringManager()
 

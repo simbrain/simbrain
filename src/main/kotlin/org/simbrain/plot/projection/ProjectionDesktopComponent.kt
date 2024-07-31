@@ -239,9 +239,8 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
 
     fun showPrefDialog() {
         projector.createEditorDialog {
-            it.init()
+            it.initProjector()
             launch {
-                it.events.settingsChanged.fire()
                 redrawAllPoints()
             }
         }.display()
@@ -293,6 +292,7 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
         projector.events.settingsChanged.on {
             renderer.setSeriesLinesVisible(0, projector.connectPoints)
         }
+        renderer.setSeriesLinesVisible(0, projector.connectPoints)
         projector.events.methodChanged.on { o, n ->
             projectionSelector.selectedItem = projectionMethods[n.javaClass]
             stopIterating()
@@ -338,7 +338,7 @@ fun main() {
             addDataPoint(point)
         }
         dataset.randomizeDownstairs()
-        init()
+        initProjector()
     }
     StandardDialog().apply{
         val desktopComponent = ProjectionDesktopComponent(

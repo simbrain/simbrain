@@ -942,8 +942,7 @@ class ObjectWidget<O : EditableObject, T : CopyableObject>(
         }
     }
 
-    override val widget = JPanel().apply {
-        this.add(Box.createRigidArea(Dimension(0, 5)))
+    override val widget = JPanel(BorderLayout()).apply {
         if (parameter.showLabeledBorder) {
             border = BorderFactory.createTitledBorder(parameter.label)
         }
@@ -952,7 +951,7 @@ class ObjectWidget<O : EditableObject, T : CopyableObject>(
             defaultOpen = parameter.showDetails,
             topPanelComponent = dropDown
         )
-        add(detailTrianglePanel)
+        add(detailTrianglePanel, BorderLayout.CENTER)
         if (!isConsistent) {
             dropDown?.apply {
                 addItem(NULL_STRING)

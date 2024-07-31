@@ -90,7 +90,7 @@ public class HopfieldNode extends SubnetworkNode {
         Action couplingProjection =
                 sd.getActionManager().createCoupledProjectionPlotAction(
                         sd.getWorkspace().getCouplingManager().getProducer(
-                                hopfield.getNeuronGroup(), "getActivations"
+                                hopfield.getNeuronGroup(), "getActivationArray"
                         ),
                         Objects.requireNonNull(hopfield.getId()),
                         "Projection");

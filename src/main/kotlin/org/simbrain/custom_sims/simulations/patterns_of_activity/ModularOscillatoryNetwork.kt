@@ -206,7 +206,7 @@ class ModularOscillatoryNetwork : Simulation {
         // plot.getProjector().useColorManager = false;
 
         // Coupling
-        val inputProducer = sim.getProducer(toPlot, "getActivations")
+        val inputProducer = sim.getProducer(toPlot, "getActivationArray")
         val plotConsumer = sim.getConsumer(pc, "addPoint")
         sim.couple(inputProducer, plotConsumer)
 

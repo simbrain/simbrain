@@ -119,9 +119,9 @@ class PatternsOfActivity : Simulation {
         buildNetwork(sensoryNetL, sensoryNetR, mouse)
 
         // Set up plots
-        addProjection(sensoryNetL, 8, 562, 1.0, "getActivations")
+        addProjection(sensoryNetL, 8, 562, 1.0, "getActivationArray")
         addProjection(recurrentNetwork, 368, 562, 24.0, "getSubsampledActivations")
-        addProjection(outputNeurons, 723, 562, .1, "getActivations")
+        addProjection(outputNeurons, 723, 562, .1, "getActivationArray")
     }
 
     private fun buildWorld(): OdorWorldEntity {

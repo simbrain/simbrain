@@ -452,35 +452,35 @@ class NumericWidget<O : EditableObject, T>(
         val step = parameter.increment ?: defaultStepSize as T
 
         val model = when (type) {
-            Int::class -> SpinnerNumberModel(
+            Int::class -> CustomSpinnerNumberModel(
                 parameter.value as Int,
                 parameter.min as Int?,
                 parameter.max as Int?,
                 step as Int
             )
 
-            Short::class -> SpinnerNumberModel(
+            Short::class -> CustomSpinnerNumberModel(
                 parameter.value as Short,
                 parameter.min as Short?,
                 parameter.max as Short?,
                 step as Short
             )
 
-            Long::class -> SpinnerNumberModel(
+            Long::class -> CustomSpinnerNumberModel(
                 parameter.value as Long,
                 parameter.min as Long?,
                 parameter.max as Long?,
                 step as Long
             )
 
-            Float::class -> SpinnerNumberModel(
+            Float::class -> CustomSpinnerNumberModel(
                 parameter.value as Float,
                 parameter.min as Float?,
                 parameter.max as Float?,
                 step as Float
             )
 
-            Double::class -> SpinnerNumberModel(
+            Double::class -> CustomSpinnerNumberModel(
                 parameter.value as Double,
                 parameter.min as Double?,
                 parameter.max as Double?,
@@ -536,6 +536,37 @@ class NumericWidget<O : EditableObject, T>(
                 widget.isVisible = visible
             }
         ))
+    }
+
+    class CustomSpinnerNumberModel<T>(number: T, minimum: T?, maximum: T?, stepSize: T) : SpinnerNumberModel(number, minimum, maximum, stepSize) where T : Number, T : Comparable<T>{
+        override fun getNextValue(): T {
+            return incrValue(1)
+        }
+
+        override fun getPreviousValue(): T {
+            return incrValue(-1)
+        }
+
+        private fun incrValue(dir: Int): T {
+            val newValue = (value as Number).toDouble() + dir * stepSize.toDouble()
+
+            maximum?.let {
+                if (newValue > (it as Number).toDouble()) {
+                    @Suppress("UNCHECKED_CAST")
+                    return it as T
+                }
+            }
+
+            minimum?.let {
+                if (newValue < (it as Number).toDouble()) {
+                    @Suppress("UNCHECKED_CAST")
+                    return it as T
+                }
+            }
+
+            @Suppress("UNCHECKED_CAST")
+            return newValue as T
+        }
     }
 
 }

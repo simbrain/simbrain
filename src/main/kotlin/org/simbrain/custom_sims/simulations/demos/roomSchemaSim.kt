@@ -12,6 +12,7 @@ import org.simbrain.network.util.offsetNetworkModel
 import org.simbrain.util.place
 import org.simbrain.util.runWithProgressWindow
 import org.simbrain.util.toDoubleArray
+import kotlin.random.Random
 
 /**
  * Demo for studying Room Schema From PDP Chapter 14.
@@ -59,6 +60,11 @@ val roomSchemaSim = newSim {
 
     workspace.addUpdateAction("Sync RBM to Neuron Collection") {
         syncRBMToNeuronCollection()
+    }
+
+
+    fun flipBitWithChance(bit: Int, chance: Double): Int {
+        return if (Random.nextDouble() < chance) 1 - bit else bit
     }
 
     withGui {
@@ -127,6 +133,9 @@ val roomSchemaSim = newSim {
                 syncNeuronCollectionToRBM()
                 workspace.iterateSuspend(10)
                 syncRBMToNeuronCollection()
+            }
+            addButton("Permute Current Pattern") {
+                nc.neuronList.forEach{ it.activation = flipBitWithChance(it.activation.toInt(), .1).toDouble()  }
             }
         }
     }

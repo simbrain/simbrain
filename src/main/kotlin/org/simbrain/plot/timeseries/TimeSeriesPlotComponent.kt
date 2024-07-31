@@ -56,18 +56,12 @@ class TimeSeriesPlotComponent @JvmOverloads constructor(name: String, val model:
                 }
             }
 
-            // A new scalar time series has been added
-            model.events.timeSeriesAdded.on { addedContainer: TimeSeries? ->
-                this.fireAttributeContainerAdded(
-                    addedContainer!!
-                )
+            model.events.timeSeriesAdded.on { addedContainer: TimeSeries ->
+                this.fireAttributeContainerAdded(addedContainer)
             }
 
-            // A scalar time series has been removed
-            model.events.timeSeriesRemoved.on { removedContainer: TimeSeries? ->
-                this.fireAttributeContainerRemoved(
-                    removedContainer!!
-                )
+            model.events.timeSeriesRemoved.on { removedContainer: TimeSeries ->
+                this.fireAttributeContainerRemoved(removedContainer)
             }
         }
 

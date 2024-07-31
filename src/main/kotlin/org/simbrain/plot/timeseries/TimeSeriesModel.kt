@@ -183,6 +183,9 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
 
     @Consumable
     fun setValues(array: DoubleArray) {
+        if (timeSeriesList.isEmpty()) {
+            addTimeSeries(array.size)
+        }
         var i = 0
         while (i < array.size && i < timeSeriesList.size) {
             timeSeriesList[i].setValue(array[i])
@@ -293,10 +296,11 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
     ) : AttributeContainer {
 
         /**
-         * Get the description.
+         * Label for the series
          */
-        val description: String
+        var description: String
             get() = series.description
+            set(value) {series.description = value}
 
         @Consumable
         fun setValue(value: Double) {

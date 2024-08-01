@@ -68,7 +68,7 @@ class UDF : SpikeResponder() {
     var F = 50.0
 
     @UserParameter(label = "Spike Responder", description = "Short term plasticity sets the max response of this responder", order = 50)
-    var spikeResponderLocal: SpikeResponder = ConvolvedJumpAndDecay()
+    var spikeResponderLocal: SpikeResponder = JumpAndDecay().apply { useConvolution = true }
 
     /**
      * Does not actually copy this UDF object. Since UDF has values always
@@ -99,8 +99,8 @@ class UDF : SpikeResponder() {
             R = 1 + (R - u * R - 1) * exp(ISI / D)
             val jumpHeight = R * synapse.strength * u
             synapse.psr = when (val sr = spikeResponderLocal) {
-                is ConvolvedJumpAndDecay -> sr.convolvedJumpAndDecay(true, synapse.psr, jumpHeight, timeStep)
-                else -> throw IllegalStateException("UDF can only be used with ConvolvedJumpAndDecay")
+                is JumpAndDecay -> sr.jumpAndDecay(true, synapse.psr, jumpHeight, timeStep)
+                else -> throw IllegalStateException("UDF can only be used with JumpAndDecay")
             }
         } else {
             spikeResponderLocal.apply(synapse, responderData)

@@ -90,13 +90,13 @@ class RiseAndDecay : SpikeResponder() {
     }
 
     context(Network)
-    private fun riseAndDecay(spiked: Boolean,
+    fun riseAndDecay(spiked: Boolean,
                              psr: Double,
                              recovery: Double,
-                             strength: Double,
+                             jumpHeight: Double,
                              timeStep: Double): Pair<Double, Double> {
         return Pair(
-            (psr + ((timeStep / timeConstant) * (Math.E * strength * recovery * (1 - psr) - psr))),
+            (psr + ((timeStep / timeConstant) * (Math.E * jumpHeight * recovery * (1 - psr) - psr))),
             if (spiked && probabilisticSpikeCheck()) {
                 1.0
             } else {

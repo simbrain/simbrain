@@ -26,7 +26,6 @@ class SpikeResponderTest {
         val step = StepResponder()
         val newResponder: StepResponder = step.copy() as StepResponder
         assertEquals(step.responseDuration, newResponder.responseDuration)
-        assertEquals(step.responseHeight, newResponder.responseHeight)
     }
 
     @Test
@@ -48,7 +47,7 @@ class SpikeResponderTest {
     fun `step responder produces correct height and duration `() {
 
         val step = StepResponder()
-        step.responseHeight = .75
+        s2.strength = .75
         step.responseDuration = 3
         s2.spikeResponder = step
 
@@ -57,14 +56,14 @@ class SpikeResponderTest {
         assertEquals(0.0, s2.psr)
         assertEquals(0.0, n3.activation)
         net.update()
-        assertEquals(step.responseHeight, s2.psr)
-        assertEquals(step.responseHeight, n3.activation)
+        assertEquals(s2.strength, s2.psr)
+        assertEquals(s2.strength, n3.activation)
         net.update()
-        assertEquals(step.responseHeight, s2.psr)
-        assertEquals(step.responseHeight, n3.activation)
+        assertEquals(s2.strength, s2.psr)
+        assertEquals(s2.strength, n3.activation)
         net.update()
-        assertEquals(step.responseHeight, s2.psr)
-        assertEquals(step.responseHeight, n3.activation)
+        assertEquals(s2.strength, s2.psr)
+        assertEquals(s2.strength, n3.activation)
         net.update()
         assertEquals(0.0, s2.psr)
         assertEquals(0.0, n3.activation)
@@ -73,7 +72,7 @@ class SpikeResponderTest {
     @Test
     fun `test jump and decay`() {
         val jd = JumpAndDecay()
-        jd.jumpHeight = 4.0
+        s2.strength = 4.0
         jd.baseLine = 2.0
         jd.timeConstant = .15
         s2.spikeResponder = jd
@@ -158,7 +157,9 @@ class SpikeResponderTest {
 
     @Test
     fun `test convolved jump and decay`() {
-        val cjd = ConvolvedJumpAndDecay()
+        val cjd = JumpAndDecay().apply {
+            useConvolution = true
+        }
         s2.spikeResponder = cjd
         s2.strength = .5
         n1.activation = 1.0

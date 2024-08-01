@@ -6,7 +6,7 @@ import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.addNeuronGroup
 import org.simbrain.network.neurongroups.NeuronGroup
-import org.simbrain.network.spikeresponders.ConvolvedJumpAndDecay
+import org.simbrain.network.spikeresponders.UDF
 import org.simbrain.network.updaterules.IntegrateAndFireRule
 import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.math.SimbrainMath
@@ -106,7 +106,7 @@ val cortexSimple = newSim {
         }
 
         sg.synapses.forEach {
-            it.spikeResponder = ConvolvedJumpAndDecay() // TODO: this should use UDF
+            it.spikeResponder = UDF()
         }
         net.addNetworkModel(sg)?.await()
         return sg

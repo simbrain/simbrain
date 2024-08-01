@@ -28,16 +28,6 @@ import org.simbrain.util.UserParameter
  * Responds to a spike with a step response for a set number of iterations.
  */
 class StepResponder(
-    /**
-     * Response height: The value by which the strength of the synapse is scaled
-     * to determine the post synaptic response.
-     */
-    @UserParameter(
-        label = "Response height", description = "This value is multiplied by"
-                + " the strength to determine the total instantaneous rise in a post-synaptic"
-                + " response to an action potential or spike.", increment = .1, order = 1
-    )
-    var responseHeight: Double = 1.0,
 
     /**
      * Response duration (ms).
@@ -54,7 +44,7 @@ class StepResponder(
         for (i in 0 until connector.psrMatrix.ncol()) {
             for (j in 0 until connector.psrMatrix.nrow()) {
                 if (lastSpikeTimes[i] + responseDuration * timeStep >= time && probabilisticSpikeCheck()) {
-                    connector.psrMatrix[j, i] = responseHeight * connector.weightMatrix[j, i]
+                    connector.psrMatrix[j, i] = connector.weightMatrix[j, i]
                 } else {
                     connector.psrMatrix[j, i] = 0.0
                 }
@@ -65,7 +55,7 @@ class StepResponder(
     context(Network)
     override fun apply(synapse: Synapse, responderData: ScalarDataHolder) {
         if (synapse.source.lastSpikeTime + responseDuration * timeStep >= time && probabilisticSpikeCheck()) {
-            synapse.psr = responseHeight * synapse.strength
+            synapse.psr = synapse.strength
         } else {
             synapse.psr = 0.0
         }
@@ -74,7 +64,6 @@ class StepResponder(
 
     override fun copy(): StepResponder {
         val st = StepResponder()
-        st.responseHeight = responseHeight
         st.responseDuration = responseDuration
         return st
     }

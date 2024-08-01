@@ -4,7 +4,6 @@ import org.simbrain.custom_sims.*
 import org.simbrain.network.core.addNeuron
 import org.simbrain.network.core.addSynapse
 import org.simbrain.network.spikeresponders.JumpAndDecay
-import org.simbrain.network.spikeresponders.ProbabilisticResponder
 import org.simbrain.network.spikeresponders.RiseAndDecay
 import org.simbrain.network.spikeresponders.StepResponder
 import org.simbrain.network.updaterules.IzhikevichRule
@@ -60,14 +59,6 @@ val spikeResponderSim = newSim {
         spikeResponder = RiseAndDecay()
     }
 
-    val probabilisticResponder = network.addNeuron {
-        label = "Probabilistic Responder"
-        location = point(290, 200)
-    }
-    network.addSynapse(spiking, probabilisticResponder).apply {
-        spikeResponder = ProbabilisticResponder()
-    }
-
     withGui {
         place(networkComponent) {
             location = point(0, 0)
@@ -77,7 +68,7 @@ val spikeResponderSim = newSim {
     }
 
     val (spikePlot, izhikevichSeries) = addTimeSeries("Spikes", seriesNames = listOf("Izhikevich"))
-    val (spikeResponderPlot, stepSeries, jumpSeries, riseSeries, probSeries) = addTimeSeries("Spike Responders", seriesNames = listOf("Step", "Jump and Decay", "Rise and Decay", "Probabilistic"))
+    val (spikeResponderPlot, stepSeries, jumpSeries, riseSeries) = addTimeSeries("Spike Responders", seriesNames = listOf("Step", "Jump and Decay", "Rise and Decay"))
 
     withGui {
         placeComponent(spikePlot, 410, 0, 400, 400)
@@ -89,7 +80,6 @@ val spikeResponderSim = newSim {
         stepResponder couple stepSeries
         jumpAndDecay couple jumpSeries
         riseAndDecay couple riseSeries
-        probabilisticResponder couple probSeries
     }
 
 }

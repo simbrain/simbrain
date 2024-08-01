@@ -89,6 +89,7 @@ class RiseAndDecay : SpikeResponder() {
         data.recovery = recovery
     }
 
+    context(Network)
     private fun riseAndDecay(spiked: Boolean,
                              psr: Double,
                              recovery: Double,
@@ -96,7 +97,7 @@ class RiseAndDecay : SpikeResponder() {
                              timeStep: Double): Pair<Double, Double> {
         return Pair(
             (psr + ((timeStep / timeConstant) * (Math.E * strength * recovery * (1 - psr) - psr))),
-            if (spiked) {
+            if (spiked && probabilisticSpikeCheck()) {
                 1.0
             } else {
                 recovery + timeStep / timeConstant * -recovery

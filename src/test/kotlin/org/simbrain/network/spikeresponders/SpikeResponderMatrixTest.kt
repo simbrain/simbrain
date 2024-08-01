@@ -62,17 +62,18 @@ class SpikeResponderMatrixTest {
     }
 
     @Test
-    fun `test probabilistic responder`() {
+    fun `test probabilistic response`() {
 
-        val pr = ProbabilisticResponder()
-        pr.activationProbability = 1.0
+        val pr = StepResponder()
+        pr.responseDuration = 1
+        pr.spikeProbability = 1.0
         wm2.spikeResponder = pr
         n1.activations = Matrix.column(doubleArrayOf(1.0, 1.0))
         net.update()
         net.update() // extra update to propagate from layer 1 to 2
         assertArrayEquals(doubleArrayOf(1.0, -1.0, 1.0), n3.activationArray)
 
-        pr.activationProbability = 0.0
+        pr.spikeProbability = 0.0
         n1.activations = Matrix.column(doubleArrayOf(1.0, 1.0))
         net.update()
         net.update()

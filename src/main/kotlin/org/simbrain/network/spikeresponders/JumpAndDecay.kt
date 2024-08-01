@@ -96,12 +96,13 @@ class JumpAndDecay : SpikeResponder() {
         )
     }
 
+    context(Network)
     private fun jumpAndDecay(
         spiked: Boolean,
         psr: Double,
         jumpHeight: Double,
         timeStep: Double): Double {
-        return if (spiked) {
+        return if (spiked && probabilisticSpikeCheck()) {
             this.jumpHeight * jumpHeight
         } else {
             psr + timeStep * ((baseLine - psr) / timeConstant)

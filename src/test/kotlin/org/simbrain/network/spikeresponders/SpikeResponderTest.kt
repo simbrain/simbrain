@@ -104,16 +104,17 @@ class SpikeResponderTest {
     }
 
     @Test
-    fun `test probabalistic responder`() {
-        val pr = ProbabilisticResponder()
-        pr.activationProbability = 1.0
+    fun `test probabilistic response`() {
+        val pr = StepResponder()
+        pr.responseDuration = 1
+        pr.spikeProbability = 1.0
         s2.spikeResponder = pr
         s2.strength = .5
         n1.activation = 1.0
         net.update()
         net.update()
         assertEquals(.5, n3.activation)
-        pr.activationProbability = 0.0
+        pr.spikeProbability = 0.0
         n1.activation = 1.0
         net.update()
         net.update()
@@ -122,8 +123,8 @@ class SpikeResponderTest {
 
     @Test
     fun `test probabalistic responder with negative weight`() {
-        val pr = ProbabilisticResponder()
-        pr.activationProbability = 1.0
+        val pr = JumpAndDecay()
+        pr.spikeProbability = 1.0
         s2.spikeResponder = pr
         s2.strength = -.5
         n1.activation = 1.0

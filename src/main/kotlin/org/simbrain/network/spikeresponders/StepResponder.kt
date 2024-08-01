@@ -53,7 +53,7 @@ class StepResponder(
         val lastSpikeTimes = ((weightMatrix.source as NeuronArray).dataHolder as SpikingMatrixData).lastSpikeTimes
         for (i in 0 until connector.psrMatrix.ncol()) {
             for (j in 0 until connector.psrMatrix.nrow()) {
-                if (lastSpikeTimes[i] + responseDuration * timeStep >= time) {
+                if (lastSpikeTimes[i] + responseDuration * timeStep >= time && probabilisticSpikeCheck()) {
                     connector.psrMatrix[j, i] = responseHeight * connector.weightMatrix[j, i]
                 } else {
                     connector.psrMatrix[j, i] = 0.0
@@ -64,7 +64,7 @@ class StepResponder(
 
     context(Network)
     override fun apply(synapse: Synapse, responderData: ScalarDataHolder) {
-        if (synapse.source.lastSpikeTime + responseDuration * timeStep >= time) {
+        if (synapse.source.lastSpikeTime + responseDuration * timeStep >= time && probabilisticSpikeCheck()) {
             synapse.psr = responseHeight * synapse.strength
         } else {
             synapse.psr = 0.0

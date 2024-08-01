@@ -65,12 +65,13 @@ class ConvolvedJumpAndDecay() : SpikeResponder() {
         synapse.psr = convolvedJumpAndDecay(synapse.source.isSpike, synapse.psr, synapse.strength, timeStep)
     }
 
+    context(Network)
     fun convolvedJumpAndDecay(
         spiked: Boolean,
         psr: Double,
         jumpHeight: Double,
         timeStep: Double): Double {
-        return if (spiked) {
+        return if (spiked && probabilisticSpikeCheck()) {
             psr + jumpHeight
         } else {
             psr + timeStep * (baseLine - psr) / timeConstant

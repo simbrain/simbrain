@@ -93,7 +93,7 @@ class UDF : SpikeResponder() {
         val udfData = responderData as UDFScalarDataHolder
         var u by udfData::u
         var R by udfData::R
-        if (synapse.source.isSpike) {
+        if (synapse.source.isSpike && probabilisticSpikeCheck()) {
             val ISI = synapse.source.lastSpikeTime - time
             u = U + u * (1 - U) * exp(ISI / F)
             R = 1 + (R - u * R - 1) * exp(ISI / D)

@@ -120,7 +120,7 @@ val cogMap3Objects = newSim {
     // Plot
     val projectionPlot = addProjectionPlot2("Cognitive Map")
     projectionPlot.projector.tolerance = .9
-    projectionPlot.projector.connectPoints = true
+    projectionPlot.projector.connectPoints = false
     projectionPlot.projector.baseColor = Color.GRAY.brighter()
     projectionPlot.projector.coloringManager = HaloColoringManager().also{
         it.radius = 50.0

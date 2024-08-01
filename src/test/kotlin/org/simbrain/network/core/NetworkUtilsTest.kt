@@ -25,4 +25,16 @@ class NetworkUtilsTest {
         assertEquals(0.0, listOf(neuron1, neuron2).getEnergy(), .01)
     }
 
+    @Test
+    fun `test clamp neurons`() {
+        val neuron1 = Neuron()
+        val neuron2 = Neuron()
+        listOf(neuron1, neuron2).clamp(true)
+        assertEquals(true, neuron1.clamped)
+        assertEquals(true, neuron2.clamped)
+        listOf(neuron1, neuron2).clamp(false)
+        assertEquals(false, neuron1.clamped)
+        assertEquals(false, neuron2.clamped)
+    }
+
 }

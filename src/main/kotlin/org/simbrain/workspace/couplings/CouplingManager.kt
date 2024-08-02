@@ -149,7 +149,7 @@ class CouplingManager(val workspace: Workspace) {
     /**
      * getConsumer but using property reference which is preferable to using strings
      */
-    fun <T> AttributeContainer.getConsumer(kProperty0: KMutableProperty0<T>): Consumer = getConsumer(kProperty0.setter.javaMethod!!.name)
+    fun <T> AttributeContainer.getConsumer(kProperty0: KMutableProperty0<T>): Consumer = getConsumer(kProperty0.setter.javaMethod!!)
 
     /**
      * Find the first [Producer] in an [AttributeContainer] which has the given method name

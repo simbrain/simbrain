@@ -18,6 +18,7 @@ import java.awt.event.FocusAdapter
 import java.awt.event.FocusEvent
 import java.text.DecimalFormat
 import java.text.NumberFormat
+import java.text.ParseException
 import javax.swing.*
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
@@ -509,7 +510,11 @@ class NumericWidget<O : EditableObject, T>(
             ftf.addFocusListener(object : FocusAdapter() {
                 override fun focusLost(e: FocusEvent) {
                     if (ftf.isValid) {
-                        ftf.commitEdit()
+                        try {
+                            ftf.commitEdit()
+                        } catch (e: ParseException) {
+                            System.err.println("Invalid value: ${ftf.text}")
+                        }
                     }
                 }
             })

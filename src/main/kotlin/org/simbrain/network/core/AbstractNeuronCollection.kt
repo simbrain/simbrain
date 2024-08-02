@@ -42,6 +42,7 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
     override val events: NeuronCollectionEvents = NeuronCollectionEvents()
 
     @get:Producible(arrayDescriptionMethod = "getLabelArray")
+    @set:Consumable
     override var activationArray: DoubleArray
         get() = neuronList
             .map { it.activation }

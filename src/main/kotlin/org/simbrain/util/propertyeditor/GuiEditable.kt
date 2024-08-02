@@ -18,7 +18,6 @@ import java.awt.event.FocusAdapter
 import java.awt.event.FocusEvent
 import java.text.DecimalFormat
 import java.text.NumberFormat
-import java.text.ParseException
 import javax.swing.*
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
@@ -497,6 +496,8 @@ class NumericWidget<O : EditableObject, T>(
                 NumberFormat.getNumberInstance(it.getLocale()).apply { maximumFractionDigits = 12 }
             } as DecimalFormat
             val formatterEditor = NumberFormatter(format)
+            formatterEditor.minimum = parameter.min as Comparable<T>?
+            formatterEditor.maximum = parameter.max as Comparable<T>?
             formatterEditor.valueClass = type.javaObjectType
             val factory = DefaultFormatterFactory(formatterEditor)
             val ftf: JFormattedTextField = (it.editor as JSpinner.DefaultEditor).textField
@@ -507,15 +508,22 @@ class NumericWidget<O : EditableObject, T>(
             if (!isConsistent) {
                 (it.editor as JSpinner.DefaultEditor).textField?.text = NULL_STRING
             }
+            (it.editor as JSpinner.DefaultEditor).textField?.text = parameter.value.toString()
             ftf.addFocusListener(object : FocusAdapter() {
+                val defaultBorder = ftf.border
                 override fun focusLost(e: FocusEvent) {
-                    if (ftf.isValid) {
-                        try {
-                            ftf.commitEdit()
-                        } catch (e: ParseException) {
-                            System.err.println("Invalid value: ${ftf.text}")
-                        }
+                    super.focusLost(e)
+                    if (ftf.isEditValid) {
+                        ftf.border = defaultBorder
+                        ftf.commitEdit()
+                    } else {
+                        ftf.border = BorderFactory.createEtchedBorder(Color.WHITE, Color.RED)
                     }
+                }
+
+                override fun focusGained(e: FocusEvent?) {
+                    super.focusGained(e)
+                    ftf.border = defaultBorder
                 }
             })
         }.also {
@@ -543,7 +551,7 @@ class NumericWidget<O : EditableObject, T>(
         ))
     }
 
-    class CustomSpinnerNumberModel<T>(number: T, minimum: T?, maximum: T?, stepSize: T) : SpinnerNumberModel(number, minimum, maximum, stepSize) where T : Number, T : Comparable<T>{
+    class CustomSpinnerNumberModel<T>(number: T, minimum: T?, maximum: T?, stepSize: T) : SpinnerNumberModel(number.coerceIn(minimum, maximum), minimum, maximum, stepSize) where T : Number, T : Comparable<T>{
         override fun getNextValue(): T {
             return incrValue(1)
         }

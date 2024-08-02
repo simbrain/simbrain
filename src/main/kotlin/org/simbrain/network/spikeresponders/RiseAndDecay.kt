@@ -44,6 +44,7 @@ class RiseAndDecay : SpikeResponder() {
 
     override fun copy(): RiseAndDecay {
         val rad = RiseAndDecay()
+        rad.spikeProbability = spikeProbability
         rad.timeConstant = timeConstant
         return rad
     }

@@ -64,6 +64,7 @@ class StepResponder(
 
     override fun copy(): StepResponder {
         val st = StepResponder()
+        st.spikeProbability = spikeProbability
         st.responseDuration = responseDuration
         return st
     }

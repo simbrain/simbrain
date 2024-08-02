@@ -59,6 +59,8 @@ class JumpAndDecay : SpikeResponder() {
 
     override fun copy(): JumpAndDecay {
         val jad = JumpAndDecay()
+        jad.useConvolution = useConvolution
+        jad.spikeProbability = spikeProbability
         jad.baseLine = baseLine
         jad.timeConstant = timeConstant
         return jad

@@ -77,6 +77,7 @@ class UDF : SpikeResponder() {
      */
     override fun copy(): UDF {
         val copy = UDF()
+        copy.spikeProbability = spikeProbability
         copy.U = U
         copy.D = D
         copy.F = F

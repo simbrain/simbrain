@@ -238,6 +238,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
         initValue = spikeResponder.createResponderData(),
         label = "Spike data",
         order = 110,
+        showDetails = false,
         onUpdate = {
             val proposedDataHolder = widgetValue(::spikeResponder).createResponderData()
             if (widgetValue(::spikeResponderData)::class != proposedDataHolder::class) {

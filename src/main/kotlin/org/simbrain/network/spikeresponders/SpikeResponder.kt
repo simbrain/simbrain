@@ -121,5 +121,5 @@ abstract class SpikeResponder : CopyableObject {
  */
 var responderList: List<Class<out CopyableObject?>> = listOf<Class<out CopyableObject?>>(
     NonResponder::class.java, JumpAndDecay::class.java,
-    RiseAndDecay::class.java, StepResponder::class.java, UDF::class.java
+    RiseAndDecay::class.java, StepResponder::class.java, ShortTermPlasticity::class.java
 )

@@ -3,9 +3,8 @@ package org.simbrain.network.core
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.simbrain.network.core.Synapse
 import org.simbrain.network.neurongroups.*
-import org.simbrain.network.spikeresponders.UDF
+import org.simbrain.network.spikeresponders.ShortTermPlasticity
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.network.subnetworks.Subnetwork
@@ -51,7 +50,7 @@ class NetworkTest {
         net.addNetworkModel(n2)
 
         s1 = Synapse(n1, n2).apply {
-            spikeResponder = UDF()
+            spikeResponder = ShortTermPlasticity()
         }
         net.addNetworkModel(s1)
 

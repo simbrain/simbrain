@@ -183,9 +183,9 @@ class SpikeResponderTest {
     }
 
     @Test
-    fun `test UDF`() {
-        val udf = UDF()
-        s2.spikeResponder = udf
+    fun `test ShortTermPlasticity`() {
+        val shortTermPlasticity = ShortTermPlasticity()
+        s2.spikeResponder = shortTermPlasticity
         n1.activation = 1.0
         net.update()
         net.update()
@@ -206,24 +206,24 @@ class SpikeResponderTest {
     }
 
     @Test
-    fun `test udf xml representation`() {
-        val udf = UDF().apply {
+    fun `test short term plasticity xml representation`() {
+        val shortTermPlasticity = ShortTermPlasticity().apply {
             U = 0.5
             D = 1100.0
             F = 50.0
         }
-        s2.spikeResponder = udf
+        s2.spikeResponder = shortTermPlasticity
         n1.activation = 1.0
         net.update()
 
         val xml = getSimbrainXStream().toXML(s2)
 
         val synapse = getSimbrainXStream().fromXML(xml) as Synapse
-        val deserializedUdf = synapse.spikeResponder as UDF
+        val deserializedShortTermPlasticity = synapse.spikeResponder as ShortTermPlasticity
 
-        assertEquals(udf.U, deserializedUdf.U)
-        assertEquals(udf.D, deserializedUdf.D)
-        assertEquals(udf.F, deserializedUdf.F)
+        assertEquals(shortTermPlasticity.U, deserializedShortTermPlasticity.U)
+        assertEquals(shortTermPlasticity.D, deserializedShortTermPlasticity.D)
+        assertEquals(shortTermPlasticity.F, deserializedShortTermPlasticity.F)
 
     }
 }

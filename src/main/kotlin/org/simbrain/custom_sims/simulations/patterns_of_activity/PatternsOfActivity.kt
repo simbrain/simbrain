@@ -7,7 +7,7 @@ import org.simbrain.network.layouts.HexagonalGridLayout
 import org.simbrain.network.learningrules.STDPRule
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.spikeresponders.SpikeResponder
-import org.simbrain.network.spikeresponders.UDF
+import org.simbrain.network.spikeresponders.ShortTermPlasticity
 import org.simbrain.network.updaterules.IntegrateAndFireRule
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.util.SpikingScalarData
@@ -67,7 +67,7 @@ class PatternsOfActivity : Simulation {
         2.5, -2.5, 40.0, 40.0, 0.001,
         true
     )
-    private val spkR: SpikeResponder = UDF()
+    private val spkR: SpikeResponder = ShortTermPlasticity()
     private val quadrantDensity = 0.5
 
     private val rtQuad: MutableList<Neuron> = ArrayList()

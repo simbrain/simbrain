@@ -126,6 +126,10 @@ class RiseAndDecayData(
     override fun copy(): RiseAndDecayData {
         return RiseAndDecayData(recovery)
     }
+
+    override fun clear() {
+        recovery = 0.0
+    }
 }
 
 
@@ -133,5 +137,9 @@ class RiseAndDecayMatrixData(val rows: Int, val cols: Int) : MatrixDataHolder {
     var recoveryMatrix = Matrix(rows, cols)
     override fun copy() = RiseAndDecayMatrixData(rows, cols).also {
         it.recoveryMatrix = recoveryMatrix.clone()
+    }
+
+    override fun clear() {
+        recoveryMatrix.mul(0.0)
     }
 }

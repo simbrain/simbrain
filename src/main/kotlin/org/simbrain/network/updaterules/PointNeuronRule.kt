@@ -5,7 +5,6 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.util.UserParameter
-import org.simbrain.util.math.SigmoidFunctions.logistic
 import org.simbrain.util.propertyeditor.APETabOder
 import org.simbrain.util.roundToString
 import org.simbrain.util.stats.ProbabilityDistribution
@@ -29,13 +28,11 @@ import kotlin.math.min
 class PointNeuronRule : NeuronUpdateRule<PointNeuronScalarData, EmptyMatrixData>() {
 
     // TODO: Keep time varying conductances between 0 and 1, how to compute these
-    // TODO: separate value for exponential decay or decays
-    // TODO: How to clear data
     // TOOD: Conditional enablings below
 
     @UserParameter(
         label = "Max Excitatory Conductance",
-        description = "Max excitatory conductance field. Conductance if all channels are open.",
+        description = "Higher values -> faster approach to excitatory reversal.",
         minimumValue = 0.0,
         increment = .1,
         order = 10,
@@ -45,7 +42,7 @@ class PointNeuronRule : NeuronUpdateRule<PointNeuronScalarData, EmptyMatrixData>
 
     @UserParameter(
         label = "Max Inhibitory Conductance",
-        description = "Maximal inhibitory conductance.",
+        description = "Higher values -> faster approach to inhibitory reversal.",
         order = 20,
         increment = .1,
         minimumValue = 0.0,
@@ -54,26 +51,8 @@ class PointNeuronRule : NeuronUpdateRule<PointNeuronScalarData, EmptyMatrixData>
     var inhibitoryMaxConductance: Double = 1.0
 
     @UserParameter(
-        label = "Excitatory Reversal",
-        description = "Excitatory reversal potential field.",
-        minimumValue = 0.0,
-        increment = 0.1,
-        order = 10,
-    )
-    var excitatoryReversal: Double = 1.0
-
-    @UserParameter(
-        label = "Leak Reversal",
-        description = "Determines the resting membrane potential.",
-        minimumValue = 0.0,
-        increment = 0.1,
-        order = 20,
-    )
-    var leakReversal: Double = 0.15
-
-    @UserParameter(
         label = "Leak Conductance",
-        description = "Leak conductance, which remains constant. Determines how quickly it returns to resting.",
+        description = "Higher values -> approaches leak reversal quicker.",
         minimumValue = 0.0,
         increment = .1,
         order = 30,
@@ -82,13 +61,32 @@ class PointNeuronRule : NeuronUpdateRule<PointNeuronScalarData, EmptyMatrixData>
     var leakConductance: Double = 2.8
 
     @UserParameter(
+        label = "Excitatory Reversal",
+        description = "Equilibrium potential for excitatory currents.",
+        minimumValue = 0.0,
+        increment = 0.1,
+        order = 10,
+    )
+    var excitatoryReversal: Double = 1.0
+
+    @UserParameter(
         label = "Inhibitory Reversal",
         description = "Inhibitory reversal field.",
         minimumValue = 0.0,
         increment = 0.1,
-        order = 25
+        order = 20
     )
     var inhibitoryReversal: Double = 0.15
+
+    @UserParameter(
+        label = "Leak Reversal",
+        description = "Equilibrium resting potential. With no inputs the voltage will approaches this.",
+        minimumValue = 0.0,
+        increment = 0.1,
+        order = 25,
+    )
+    var leakReversal: Double = 0.15
+
 
     @UserParameter(
         label = "Output Function",
@@ -115,8 +113,7 @@ class PointNeuronRule : NeuronUpdateRule<PointNeuronScalarData, EmptyMatrixData>
     )
     var thresholdPotential: Double = 0.25
 
-    // TODO: Status for tooltip
-    var statusString = ""
+    var toolTipString = ""
 
     /**
      * Output functions. (p. 45-48)
@@ -180,6 +177,7 @@ class PointNeuronRule : NeuronUpdateRule<PointNeuronScalarData, EmptyMatrixData>
     override fun copy(): PointNeuronRule {
         val cn = PointNeuronRule()
         cn.excitatoryMaxConductance = excitatoryMaxConductance
+        cn.inhibitoryMaxConductance = inhibitoryMaxConductance
         cn.excitatoryReversal = excitatoryReversal
         cn.leakReversal = leakReversal
         cn.leakConductance = leakConductance
@@ -188,9 +186,6 @@ class PointNeuronRule : NeuronUpdateRule<PointNeuronScalarData, EmptyMatrixData>
         cn.gain = gain
         cn.thresholdPotential = thresholdPotential
         return cn
-    }
-
-    override fun clear(neuron: Neuron) {
     }
 
     context(Network)
@@ -219,15 +214,14 @@ class PointNeuronRule : NeuronUpdateRule<PointNeuronScalarData, EmptyMatrixData>
         // Calculate the membrane potential given net current. (p.37 eq. 2.7)
         data.membranePotential += timeStep * netCurrent
 
-        statusString = """
-            -----
-            membrane potential ${data.membranePotential.roundToString(2)}
-            excitatory conductance ${data.excitatoryConductance.roundToString(2)}
-            inhibitory conductance ${data.inhibitoryConductance.roundToString(2)}
+        toolTipString = """
+            membrane potential ${data.membranePotential.roundToString(2)}<br>
+            excitatory conductance ${data.excitatoryConductance.roundToString(2)}<br>
+            inhibitory conductance ${data.inhibitoryConductance.roundToString(2)}<br>
             leak current ${leakCurrent.roundToString(2)}
         """.trimIndent()
 
-        println(statusString)
+        println(toolTipString)
 
         // Apply output function. (p. 45-48)
         if (outputFunction === OutputFunction.DISCRETE_SPIKING) {
@@ -282,7 +276,7 @@ class PointNeuronRule : NeuronUpdateRule<PointNeuronScalarData, EmptyMatrixData>
     }
 
     override fun getToolTipText(neuron: Neuron): String? {
-        return statusString
+        return toolTipString
     }
 
     override val name: String
@@ -336,5 +330,11 @@ class PointNeuronScalarData(
     ) : ScalarDataHolder {
     override fun copy(): PointNeuronScalarData {
         return PointNeuronScalarData(membranePotential, excitatoryConductance, inhibitoryConductance)
+    }
+
+    override fun clear() {
+        membranePotential = 0.0
+        excitatoryConductance = 0.0
+        inhibitoryConductance = 0.0
     }
 }

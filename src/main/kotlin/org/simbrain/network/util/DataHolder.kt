@@ -15,6 +15,7 @@ import java.util.*
  */
 interface MatrixDataHolder : CopyableObject {
     override fun copy(): MatrixDataHolder
+    fun clear() {}
 }
 
 object EmptyMatrixData : MatrixDataHolder {
@@ -75,12 +76,16 @@ open class SpikingMatrixData(val size: Int) : MatrixDataHolder {
  */
 interface ScalarDataHolder : CopyableObject {
     override fun copy(): ScalarDataHolder
+    fun clear() {}
 }
 
 object EmptyScalarData : ScalarDataHolder {
     override fun copy(): EmptyScalarData {
         return this
     }
+
+    override fun clear() {}
+
     override fun toString(): String = ""
 }
 
@@ -120,4 +125,5 @@ open class SpikingScalarData(
     override fun copy(): SpikingScalarData {
         return SpikingScalarData(spiked, lastSpikeTime)
     }
+
 }

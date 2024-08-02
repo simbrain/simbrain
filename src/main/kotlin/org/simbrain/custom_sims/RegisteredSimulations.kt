@@ -35,7 +35,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
     //     item("3. Recurrent Hebb") { hebbianAssociator }
     // }
 
-    dir("RL") {
+    dir("Reinforcement Learning") {
         item("Actor Critic") { actorCritic }
     }
     dir("Braitenberg") {

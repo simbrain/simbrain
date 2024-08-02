@@ -177,9 +177,7 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
      *
      * @param neuron reference to parent neuron
      */
-    open fun clear(neuron: Neuron) {
-        neuron.activation = 0.0
-    }
+    open fun clear(neuron: Neuron) {}
 
     /**
      * Returns string for tool tip or short description. Override to provide custom information.

@@ -171,4 +171,9 @@ class UDFScalarDataHolder(
     override fun copy(): UDFScalarDataHolder {
         return UDFScalarDataHolder(u, R)
     }
+
+    override fun clear() {
+        u = 0.0
+        R = 0.0
+    }
 }

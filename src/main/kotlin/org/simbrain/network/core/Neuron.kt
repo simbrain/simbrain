@@ -507,7 +507,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
     override fun clear() {
         input = 0.0
         activation = 0.0
-        updateRule.clear(this)
+        dataHolder.clear()
     }
 
     fun clearInput() {

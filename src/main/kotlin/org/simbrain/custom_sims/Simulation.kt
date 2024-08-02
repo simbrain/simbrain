@@ -114,6 +114,8 @@ fun SimulationScope.addTextWorld(name: String): TextWorldComponent {
     return textWorldComponent
 }
 
+fun SimulationScope.addTimeSeriesComponent(name: String, seriesName: String) = addTimeSeriesComponent(name, listOf(seriesName))
+
 fun SimulationScope.addTimeSeriesComponent(name: String, seriesNames: List<String>): TimeSeriesPlotComponent {
     val timeSeriesPlotComponent = TimeSeriesPlotComponent(name)
     seriesNames.forEach { timeSeriesPlotComponent.addTimeSeries(it) }

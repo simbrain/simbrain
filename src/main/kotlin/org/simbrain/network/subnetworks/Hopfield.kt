@@ -117,12 +117,11 @@ class Hopfield : Subnetwork {
      */
     fun trainOnCurrentPattern() {
         neuronGroup.neuronList.forEach(Consumer { src: Neuron ->
-            src.fanIn.forEach(
-                Consumer { s: Synapse ->
-                    val tar = s.source
-                    val deltaW = bipolar(src.activation) * bipolar(tar.activation)
-                    s.strength = s.strength + deltaW
-                })
+            src.fanIn.forEach { s: Synapse ->
+                val tar = s.source
+                val deltaW = bipolar(src.activation) * bipolar(tar.activation)
+                s.strength += deltaW
+            }
         })
         synapseGroup.events.updated.fire()
         events.updated.fire()

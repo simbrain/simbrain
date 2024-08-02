@@ -134,6 +134,7 @@ class RiseAndDecayData(
 
 
 class RiseAndDecayMatrixData(val rows: Int, val cols: Int) : MatrixDataHolder {
+    @UserParameter("Recovery matrix")
     var recoveryMatrix = Matrix(rows, cols)
     override fun copy() = RiseAndDecayMatrixData(rows, cols).also {
         it.recoveryMatrix = recoveryMatrix.clone()

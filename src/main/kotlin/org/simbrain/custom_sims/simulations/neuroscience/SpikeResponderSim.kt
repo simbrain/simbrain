@@ -68,7 +68,6 @@ val spikeResponderSim = newSim {
         spikeResponder = ShortTermPlasticity()
     }
 
-
     withGui {
         place(networkComponent) {
             location = point(0, 0)

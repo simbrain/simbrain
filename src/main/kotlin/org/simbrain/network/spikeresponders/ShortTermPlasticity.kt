@@ -18,12 +18,14 @@
  */
 package org.simbrain.network.spikeresponders
 
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.*
+import org.simbrain.network.util.MatrixDataHolder
 import org.simbrain.network.util.ScalarDataHolder
+import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.UserParameter
 import org.simbrain.util.stats.distributions.NormalDistribution
+import smile.math.matrix.Matrix
 import kotlin.math.exp
 
 /**
@@ -100,7 +102,7 @@ class ShortTermPlasticity : SpikeResponder() {
 
     context(Network)
     override fun apply(synapse: Synapse, responderData: ScalarDataHolder) {
-        val udfData = responderData as STPScalarDataHolder
+        val udfData = responderData as STPScalarData
         var u by udfData::u
         var R by udfData::R
         if (synapse.source.isSpike && probabilisticSpikeCheck()) {
@@ -117,8 +119,32 @@ class ShortTermPlasticity : SpikeResponder() {
         }
     }
 
-    override fun createResponderData(): STPScalarDataHolder {
-        return STPScalarDataHolder(U, 1.0)
+//    // TODO: ADAPT (This is from rise and decay)
+//    context(Network)
+//    override fun apply(connector: Connector, responderData: MatrixDataHolder) {
+//        val wm = connector as WeightMatrix
+//        val na = connector.source as NeuronArray
+//        val responseData = responderData as RiseAndDecayMatrixData
+//        val spikeData = na.dataHolder as SpikingMatrixData
+//        if (na.updateRule.isSpikingRule) {
+//            for (i in 0 until wm.weightMatrix.nrow()) {
+//                for (j in 0 until wm.weightMatrix.ncol()) {
+//                    val (psr, recovery) = riseAndDecay(
+//                        spikeData.spikes[j],
+//                        wm.psrMatrix[i, j],
+//                        responseData.recoveryMatrix[i,j],
+//                        wm.weightMatrix[i, j],
+//                        timeStep
+//                    )
+//                    wm.psrMatrix.set(i, j, psr)
+//                    responseData.recoveryMatrix.set(i,j, recovery)
+//                }
+//            }
+//        }
+//    }
+
+    override fun createResponderData(): STPScalarData {
+        return STPScalarData(U, 1.0)
     }
 
     override val name: String
@@ -171,18 +197,35 @@ class ShortTermPlasticity : SpikeResponder() {
     }
 }
 
-class STPScalarDataHolder(
+class STPScalarData(
     @UserParameter(label = "U", description = "Use/Facilitation variable", order = 1)
     var u: Double,
     @UserParameter(label = "R", description = "Depression variable", order = 2)
     var R: Double
 ) : ScalarDataHolder {
-    override fun copy(): STPScalarDataHolder {
-        return STPScalarDataHolder(u, R)
+    override fun copy(): STPScalarData {
+        return STPScalarData(u, R)
     }
 
     override fun clear() {
         u = 0.0
         R = 0.0
+    }
+}
+
+class STPMatrixData(val rows: Int, val cols: Int): MatrixDataHolder  {
+    @UserParameter(label = "U", description = "Use/Facilitation variable", order = 1)
+    var u = Matrix(rows, cols)
+    @UserParameter(label = "R", description = "Depression variable", order = 2)
+    var R = Matrix(rows, cols)
+
+    override fun copy() = STPMatrixData(rows, cols).also {
+        it.u = u.clone()
+        it.R = R.clone()
+    }
+
+    override fun clear() {
+        u.mul(0.0)
+        R.mul(0.0)
     }
 }

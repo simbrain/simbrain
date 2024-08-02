@@ -33,7 +33,7 @@ class StepResponder(
      * Response duration (ms).
      */
     @UserParameter(label = "Response time", description = "Response duration (ms)", increment = 1.0, order = 1)
-    var responseDuration: Int = 1
+    var responseDuration: Int = 3
 
 ) : SpikeResponder() {
 

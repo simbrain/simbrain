@@ -1,9 +1,11 @@
 package org.simbrain.workspace.couplings
 
+import org.simbrain.util.CachedObject
 import org.simbrain.util.cartesianProduct
 import org.simbrain.workspace.*
 import org.simbrain.workspace.gui.SimbrainDesktop
 import java.lang.reflect.Method
+import java.util.*
 import kotlin.reflect.*
 import kotlin.reflect.jvm.javaMethod
 
@@ -33,10 +35,14 @@ class CouplingManager(val workspace: Workspace) {
      */
     private val _couplings = LinkedHashSet<Coupling>()
 
+    private val cachedCouplingList = CachedObject {
+        Collections.unmodifiableList(_couplings.toList())
+    }
+
     /**
      * Returns all couplings
      */
-    val couplings: Set<Coupling> = _couplings
+    val couplings: List<Coupling> by cachedCouplingList::value
 
     /**
      * Couplings associated with an [AttributeContainer]. For faster lookup.
@@ -189,11 +195,14 @@ class CouplingManager(val workspace: Workspace) {
      */
     @JvmOverloads
     fun createCoupling(producer: Producer?, consumer: Consumer?, fireEvents: Boolean = true) = Coupling.create(producer, consumer).also {
-        _couplings.add(it)
-        attributeContainerCouplings.getOrPut(it.producer.baseObject) { LinkedHashSet() }.add(it)
-        attributeContainerCouplings.getOrPut(it.consumer.baseObject) { LinkedHashSet() }.add(it)
-        if (fireEvents) {
-            events.couplingAdded.fire(it)
+        synchronized(_couplings) {
+            _couplings.add(it)
+            cachedCouplingList.invalidate()
+            attributeContainerCouplings.getOrPut(it.producer.baseObject) { LinkedHashSet() }.add(it)
+            attributeContainerCouplings.getOrPut(it.consumer.baseObject) { LinkedHashSet() }.add(it)
+            if (fireEvents) {
+                events.couplingAdded.fire(it)
+            }
         }
     }
 
@@ -278,19 +287,12 @@ class CouplingManager(val workspace: Workspace) {
     }
 
     /**
-     * Convenience method for updating a set of couplings.
-     *
-     * @param couplingList the list of couplings to be updated
-     */
-    fun updateCouplings(couplingList: List<Coupling>) {
-        couplingList.forEach { it.update() }
-    }
-
-    /**
      * Update all couplings by setting the consumers to take the values of their producers.
      */
     fun updateCouplings() {
-        couplings.forEach { it.update() }
+        synchronized(_couplings) {
+            couplings.forEach { it.update() }
+        }
     }
 
     /**
@@ -304,17 +306,20 @@ class CouplingManager(val workspace: Workspace) {
     }
 
     private fun removeCouplingWithoutFiringEvent(coupling: Coupling) {
-        _couplings.remove(coupling)
-        attributeContainerCouplings[coupling.producer.baseObject]?.let {
-            it.remove(coupling)
-            if (it.isEmpty()) {
-                attributeContainerCouplings.remove(coupling.producer.baseObject)
+        synchronized(_couplings) {
+            _couplings.remove(coupling)
+            cachedCouplingList.invalidate()
+            attributeContainerCouplings[coupling.producer.baseObject]?.let {
+                it.remove(coupling)
+                if (it.isEmpty()) {
+                    attributeContainerCouplings.remove(coupling.producer.baseObject)
+                }
             }
-        }
-        attributeContainerCouplings[coupling.consumer.baseObject]?.let {
-            it.remove(coupling)
-            if (it.isEmpty()) {
-                attributeContainerCouplings.remove(coupling.consumer.baseObject)
+            attributeContainerCouplings[coupling.consumer.baseObject]?.let {
+                it.remove(coupling)
+                if (it.isEmpty()) {
+                    attributeContainerCouplings.remove(coupling.consumer.baseObject)
+                }
             }
         }
     }
@@ -323,6 +328,7 @@ class CouplingManager(val workspace: Workspace) {
         attributeContainerCouplings[attributeContainer]?.let {
             it.forEach { coupling ->
                 _couplings.remove(coupling)
+                cachedCouplingList.invalidate()
                 if (coupling.consumer.baseObject !== attributeContainer) {
                     attributeContainerCouplings[coupling.consumer.baseObject]?.remove(coupling)
                 }

@@ -110,7 +110,7 @@ class CouplingTest {
             removeCouplings(listOf(coupling1, coupling2))
 
             val expected = setOf(coupling3)
-            val diff = expected complement couplings
+            val diff = expected complement couplings.toSet()
 
             assert(diff.isIdentical()) { "Diff: $diff" }
         }
@@ -135,7 +135,7 @@ class CouplingTest {
             removeAttributeContainer(neuron1)
 
             val expected = setOf(coupling2)
-            val diff = expected complement couplings
+            val diff = expected complement couplings.toSet()
 
             assert(diff.isIdentical()) { "Diff: $diff" }
         }

@@ -467,7 +467,7 @@ class Workspace: CoroutineScope {
     /**
      * Convenience method which gets the couplings the coupling manager stores.
      */
-    val couplings: Collection<Coupling>
+    val couplings: List<Coupling>
         get() = couplingManager.couplings
 
     fun initIdManager() {

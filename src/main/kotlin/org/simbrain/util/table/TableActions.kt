@@ -334,7 +334,7 @@ fun SimbrainJTable.createAdvanceRowAction() = createAction(
 fun SimbrainJTable.createApplyAndAdvanceAction(applyInputs: suspend (selectedRow: Int) -> Unit) = createAction(
     name = "Apply and Advance",
     description = "Apply current row as input and increment selected row",
-    iconPath = "menu_icons/Step.png",
+    iconPath = "menu_icons/StepReturn.png",
 ) {
     initRowSelection()
     applyInputs(selectedRow)

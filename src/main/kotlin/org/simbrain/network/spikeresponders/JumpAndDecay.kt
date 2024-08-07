@@ -46,6 +46,7 @@ class JumpAndDecay : SpikeResponder() {
         description = "Time constant of decay (ms). Roughly the time it takes to decay to\n" +
                 "near-baseline. Larger time constants produce slower decay.",
         increment = .1,
+        minimumValue = 0.0,
         order = 3
     )
     var timeConstant = 3.0

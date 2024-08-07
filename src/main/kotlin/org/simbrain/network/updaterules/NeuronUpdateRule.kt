@@ -225,7 +225,6 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
          * Currently this is set to be between upper and lower bounds.  In the future more
          * options could be added and this could become an enum.
          *
-         *
          * Add an update type to this list if a neuron should use a custom zero point
          */
         private val usesCustomZeroPoint = HashSet<Class<*>>(

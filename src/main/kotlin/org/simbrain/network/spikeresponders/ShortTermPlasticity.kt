@@ -33,8 +33,8 @@ import kotlin.math.exp
  * Can model both short term depression (STD) and short term facilitation (STF)
  * Sometimes referred to as "UDF"
  *
- * Params for STD: A=1, U=0.45, τs=20ms, τd=750ms, and τf=50ms.
- * Params for STF: U=0.15, τf=750ms, and τd=50ms.
+ * Params for STD: A=1, U=0.45, D=750ms, F=50ms, responder decay = 20ms
+ * Params for STF: U=0.15, F=750ms, and D=50ms.
  *
  * See http://www.scholarpedia.org/article/Short-term_synaptic_plasticity
  *
@@ -48,7 +48,7 @@ class ShortTermPlasticity : SpikeResponder() {
         description = "Fraction (0 to 1) of available resources consumed to produce the post-synaptic current.",
         minimumValue = 0.0,
         maximumValue = 1.0,
-        increment = .1,
+        increment = .15,
         order = 10
     )
     var U = 0.5
@@ -63,7 +63,7 @@ class ShortTermPlasticity : SpikeResponder() {
         increment = 10.0,
         order = 20
     )
-    var D = 1100.0
+    var D = 50.0
 
     /**
      * Facilitation constant.
@@ -75,11 +75,19 @@ class ShortTermPlasticity : SpikeResponder() {
         increment = 10.0,
         order = 30
     )
-    var F = 50.0
+    var F = 750.0
 
-    // Disabling for now since only jump and decay implemented and this clutters the interface
-    // @UserParameter(label = "Spike Responder", description = "Short term plasticity sets the max response of this responder", order = 50)
-    var spikeResponderLocal: SpikeResponder = JumpAndDecay().apply { useConvolution = true }
+    // TODO: Restrict options to jump and decay using typeMapProvider
+    @UserParameter(
+        label = "Spike Responder",
+        description = "Short term plasticity sets the max response of this responder",
+        showDetails = false,
+        order = 50
+    )
+    var spikeResponderLocal: SpikeResponder = JumpAndDecay().apply {
+        useConvolution = true
+        timeConstant = 20.0
+    }
 
     /**
      * Does not actually copy this UDF object. Since UDF has values always
@@ -105,18 +113,16 @@ class ShortTermPlasticity : SpikeResponder() {
         val udfData = responderData as STPScalarData
         var u by udfData::u
         var R by udfData::R
-        if (synapse.source.isSpike && probabilisticSpikeCheck()) {
-            val (newU, newR) = shortTermPlasticity(synapse.source.lastSpikeTime, u, R)
-            u = newU
-            R = newR
-            val jumpHeight = R * synapse.strength * u
-            synapse.psr = when (val sr = spikeResponderLocal) {
-                is JumpAndDecay -> sr.jumpAndDecay(true, synapse.psr, jumpHeight, timeStep)
-                else -> throw IllegalStateException("STP can only be used with JumpAndDecay")
-            }
-        } else {
-            spikeResponderLocal.apply(synapse, responderData)
+        val (newU, newR) = shortTermPlasticity(synapse.source.lastSpikeTime, u, R)
+        u = newU
+        R = newR
+        val jumpHeight = R * synapse.strength * u
+        val spiked = synapse.source.isSpike && probabilisticSpikeCheck()
+        synapse.psr = when (val sr = spikeResponderLocal) {
+            is JumpAndDecay -> sr.jumpAndDecay(spiked, synapse.psr, jumpHeight, timeStep)
+            else -> throw IllegalStateException("STP can only be used with JumpAndDecay")
         }
+
     }
 
     context(Network)
@@ -136,17 +142,19 @@ class ShortTermPlasticity : SpikeResponder() {
                     stpData.u.set(i, j, u)
                     stpData.R.set(i, j, R)
                     val jumpHeight = R * wm.weightMatrix[i, j] * u
-                    wm.psrMatrix.set(i, j, when (val sr = spikeResponderLocal) {
-                        is JumpAndDecay -> sr.jumpAndDecay(true, wm.psrMatrix[i, j], jumpHeight, timeStep)
-                        else -> throw IllegalStateException("STP can only be used with JumpAndDecay")
-                    })
+                    val spiked = spikeData.spikes[j] && probabilisticSpikeCheck()
+                    wm.psrMatrix.set(
+                        i, j, when (val sr = spikeResponderLocal) {
+                            is JumpAndDecay -> sr.jumpAndDecay(spiked, wm.psrMatrix[i, j], jumpHeight, timeStep)
+                            else -> throw IllegalStateException("STP can only be used with JumpAndDecay")
+                        })
                 }
             }
         }
     }
 
     context(Network)
-    fun shortTermPlasticity(
+    private fun shortTermPlasticity(
         lastSpikeTime: Double,
         u: Double,
         R: Double,

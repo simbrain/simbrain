@@ -1,0 +1,77 @@
+name: build_macos
+
+on:
+  push:
+    branches:
+      - Simbrain3
+
+jobs:
+  build:
+    if: contains(github.event.head_commit.message, '[push macos]')
+    runs-on: macos-latest
+    environment: macos
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+      - name: Install Dependencies
+        run: |
+          brew update
+          brew install awscli jq
+      - name: Install Apple Certificate
+        env:
+          CERTIFICATE_BASE64: ${{ secrets.MAC_CERTIFICATE }}
+          CERTIFICATE_PASSWORD: ${{ secrets.MAC_CERTIFICATE_PASSWORD }}
+          KEYCHAIN_PASSWORD: ${{ secrets.KEYCHAIN_PASSWORD }}
+        run: |
+          echo $CERTIFICATE_BASE64 | base64 --decode > certificate.p12
+          security create-keychain -p "${KEYCHAIN_PASSWORD}" build.keychain
+          KEYCHAIN_FULL_PATH="$HOME/Library/Keychains/build.keychain-db"
+          security set-keychain-settings -u "${KEYCHAIN_FULL_PATH}"
+          security default-keychain -d user -s "${KEYCHAIN_FULL_PATH}"
+          security unlock-keychain -p "${KEYCHAIN_PASSWORD}" "${KEYCHAIN_FULL_PATH}"
+          security import certificate.p12 -k "${KEYCHAIN_FULL_PATH}" -P "${CERTIFICATE_PASSWORD}" -T /usr/bin/codesign
+          security set-key-partition-list -S "apple-tool:,apple:,codesign:" -s -k "${KEYCHAIN_PASSWORD}" "${KEYCHAIN_FULL_PATH}"
+          security list-keychains -s "${KEYCHAIN_FULL_PATH}"
+          rm -f certificate.p12
+      - name: Verify Certificate
+        run: security find-identity -p codesigning -v
+      - name: Set up Apple ID
+        run: |
+          echo "APPLE_ID=${{ secrets.APPLE_ID }}" >> $GITHUB_ENV
+          echo "APP_SPECIFIC_PASSWORD=${{ secrets.APP_SPECIFIC_PASSWORD }}" >> $GITHUB_ENV
+          echo "TEAM_ID=${{ secrets.TEAM_ID }}" >> $GITHUB_ENV
+      - name: Install Xcode Command Line Tools
+        run: sudo xcode-select --install || echo "Xcode Command Line Tools already installed"
+      - name: Authenticate with Apple Notary Service
+        run: |
+          xcrun notarytool store-credentials "AC_PASSWORD" --apple-id "$APPLE_ID" --team-id "$TEAM_ID" --password "$APP_SPECIFIC_PASSWORD"
+      - name: Run ant build
+        run: ant -f build.xml jar
+      - name: Sign All Binaries in the Jar
+        env:
+          DEVELOPER_ID: ${{ secrets.DEVELOPER_ID }}
+        run: ./etc/sign_mac_jar.sh
+      - name: Build Mac App
+        run: ./etc/make_app.sh
+      - name: Notarize App
+        run: ./etc/notarize_app.sh
+      - name: Configure AWS CLI for Cloudflare R2
+        env:
+          R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
+          R2_SECRET_KEY: ${{ secrets.R2_SECRET_KEY }}
+        run: |
+          aws configure set aws_access_key_id $R2_ACCESS_KEY
+          aws configure set aws_secret_access_key $R2_SECRET_KEY
+          aws configure set default.region auto
+
+      - name: Upload to Cloudflare R2
+        env:
+          CLOUDFLARE_R2_BUCKET: ${{ secrets.CLOUDFLARE_R2_BUCKET }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          aws s3 cp build/dist/Simbrain*.dmg s3://$CLOUDFLARE_R2_BUCKET/ --endpoint-url=https://$CLOUDFLARE_ACCOUNT_ID.r2.cloudflarestorage.com

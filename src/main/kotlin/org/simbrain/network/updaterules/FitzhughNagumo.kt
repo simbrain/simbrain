@@ -129,7 +129,7 @@ class FitzhughNagumo : SpikingNeuronUpdateRule<FitzHughData, FitzHughMatrixData>
                     layer.inputs.get(i, 0),
                     timeStep
                 )
-                dataHolder.setHasSpiked(i, spiked, time)
+                dataHolder.setHasSpiked(i, spiked)
                 layer.activations.set(i, 0, v)
                 dataHolder.w[i] = w
             }

@@ -152,7 +152,7 @@ class IzhikevichRule : SpikingNeuronUpdateRule<IzhikevichScalarData, IzhikevichM
             val recovery = Matrix.column(result.map { it.recovery }.toDoubleArray())
 
             layer.activations = activations
-            spikes.copyInto(dataHolder.spikes)
+            dataHolder.setHasSpiked(spikes)
             dataHolder.recoveryMatrix.copyFrom(recovery)
         }
     }

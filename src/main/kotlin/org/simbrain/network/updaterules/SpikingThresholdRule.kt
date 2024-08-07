@@ -47,10 +47,10 @@ open class SpikingThresholdRule : SpikingNeuronUpdateRule<SpikingScalarData, Spi
     override fun apply(layer: Layer, dataHolder: SpikingMatrixData) {
         for (i in 0 until layer.size) {
             if (spikingThresholdRule(layer.inputs[i, 0])) {
-                dataHolder.setHasSpiked(i, true, time)
+                dataHolder.setHasSpiked(i, true)
                 layer.activations[i, 0] = 1.0
             } else {
-                dataHolder.setHasSpiked(i, false, time)
+                dataHolder.setHasSpiked(i, false)
                 layer.activations[i, 0] = 0.0
             }
         }

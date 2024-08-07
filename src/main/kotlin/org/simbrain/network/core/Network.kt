@@ -82,9 +82,7 @@ class Network: CoroutineScope, EditableObject {
      * In iterations or msec.
      */
     var time = 0.0
-        private set(i) {
-            field = i
-        }
+        private set
 
     /**
      * Time step.

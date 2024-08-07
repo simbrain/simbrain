@@ -143,7 +143,7 @@ open class IntegrateAndFireRule : SpikingNeuronUpdateRule<SpikingScalarData, Spi
                     timeStep,
                     layer.inputs.get(i, 0),
                     layer.activations.get(i, 0))
-                dataHolder.setHasSpiked(i, spiked, time)
+                dataHolder.setHasSpiked(i, spiked)
                 layer.activations.set(i, 0, V)
             }
         }

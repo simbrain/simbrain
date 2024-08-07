@@ -106,9 +106,9 @@ class ShortTermPlasticity : SpikeResponder() {
         var u by udfData::u
         var R by udfData::R
         if (synapse.source.isSpike && probabilisticSpikeCheck()) {
-            val ISI = synapse.source.lastSpikeTime - time
-            u = U + u * (1 - U) * exp(ISI / F)
-            R = 1 + (R - u * R - 1) * exp(ISI / D)
+            val (newU, newR) = shortTermPlasticity(synapse.source.lastSpikeTime, u, R)
+            u = newU
+            R = newR
             val jumpHeight = R * synapse.strength * u
             synapse.psr = when (val sr = spikeResponderLocal) {
                 is JumpAndDecay -> sr.jumpAndDecay(true, synapse.psr, jumpHeight, timeStep)
@@ -119,32 +119,50 @@ class ShortTermPlasticity : SpikeResponder() {
         }
     }
 
-//    // TODO: ADAPT (This is from rise and decay)
-//    context(Network)
-//    override fun apply(connector: Connector, responderData: MatrixDataHolder) {
-//        val wm = connector as WeightMatrix
-//        val na = connector.source as NeuronArray
-//        val responseData = responderData as RiseAndDecayMatrixData
-//        val spikeData = na.dataHolder as SpikingMatrixData
-//        if (na.updateRule.isSpikingRule) {
-//            for (i in 0 until wm.weightMatrix.nrow()) {
-//                for (j in 0 until wm.weightMatrix.ncol()) {
-//                    val (psr, recovery) = riseAndDecay(
-//                        spikeData.spikes[j],
-//                        wm.psrMatrix[i, j],
-//                        responseData.recoveryMatrix[i,j],
-//                        wm.weightMatrix[i, j],
-//                        timeStep
-//                    )
-//                    wm.psrMatrix.set(i, j, psr)
-//                    responseData.recoveryMatrix.set(i,j, recovery)
-//                }
-//            }
-//        }
-//    }
+    context(Network)
+    override fun apply(connector: Connector, responderData: MatrixDataHolder) {
+        val wm = connector as WeightMatrix
+        val na = connector.source as NeuronArray
+        val stpData = responderData as STPMatrixData
+        val spikeData = na.dataHolder as SpikingMatrixData
+        if (na.updateRule.isSpikingRule) {
+            for (i in 0 until wm.weightMatrix.nrow()) {
+                for (j in 0 until wm.weightMatrix.ncol()) {
+                    val (u, R) = shortTermPlasticity(
+                        spikeData.lastSpikeTimes[j],
+                        stpData.u[i,j],
+                        stpData.R[i,j],
+                    )
+                    stpData.u.set(i, j, u)
+                    stpData.R.set(i, j, R)
+                    val jumpHeight = R * wm.weightMatrix[i, j] * u
+                    wm.psrMatrix.set(i, j, when (val sr = spikeResponderLocal) {
+                        is JumpAndDecay -> sr.jumpAndDecay(true, wm.psrMatrix[i, j], jumpHeight, timeStep)
+                        else -> throw IllegalStateException("STP can only be used with JumpAndDecay")
+                    })
+                }
+            }
+        }
+    }
+
+    context(Network)
+    fun shortTermPlasticity(
+        lastSpikeTime: Double,
+        u: Double,
+        R: Double,
+    ): Pair<Double, Double> {
+        val ISI = lastSpikeTime - time
+        val newU = U + u * (1 - U) * exp(ISI / F)
+        val newR = 1 + (R - u * R - 1) * exp(ISI / D)
+        return Pair(newU, newR)
+    }
 
     override fun createResponderData(): STPScalarData {
         return STPScalarData(U, 1.0)
+    }
+
+    override fun createMatrixData(rows: Int, cols: Int): MatrixDataHolder {
+        return STPMatrixData(rows, cols)
     }
 
     override val name: String

@@ -55,7 +55,10 @@ object Clipboard {
      * @param objects objects to add
      */
     fun add(objects: List<NetworkModel>) {
-        copiedObjects = objects
+
+        // when copying neuron collections/neuron groups, we don't want to copy the neurons again
+        val collectionNeurons = objects.filterIsInstance<AbstractNeuronCollection>().flatMap { it.neuronList }.toSet()
+        copiedObjects = objects.filter { (it as? Neuron) !in collectionNeurons }
         // System.out.println("add-->"+ Arrays.asList(objects));
         fireClipboardChanged()
     }

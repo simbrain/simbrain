@@ -103,7 +103,7 @@ val SimbrainJTable.deleteColumnAction
 val SimbrainJTable.insertRowAction
     get() = createAction(
         name = "Insert row",
-        description = "Insert row to above the selected row, or as the bottom row if none is selected.",
+        description = "Insert row above the selected row, or as the bottom row if none is selected.",
         iconPath = "menu_icons/AddTableRow.png"
     ) {
         insertRow()

@@ -19,33 +19,31 @@
 package org.simbrain.network.gui.nodes.subnetworkNodes
 
 import org.simbrain.network.gui.NetworkPanel
-import org.simbrain.network.gui.dialogs.createTrainOnPatternAction
-import org.simbrain.network.gui.dialogs.getUnsupervisedTrainingPanel
 import org.simbrain.network.gui.dialogs.makeTrainerPanel
 import org.simbrain.network.gui.nodes.SubnetworkNode
-import org.simbrain.network.subnetworks.CompetitiveNetwork
+import org.simbrain.network.subnetworks.Hopfield
 import org.simbrain.util.StandardDialog
-import org.simbrain.util.createAction
 import org.simbrain.workspace.gui.CouplingMenu
 import javax.swing.JPopupMenu
 
 /**
- * PNode representation of competitive network.
+ * PNode representation of Hopfield Network.
  *
- * @author Jeff Yoshimi
+ * @author jyoshimi
  */
-class CompetitiveNetworkNode(networkPanel: NetworkPanel, val competitiveNet: CompetitiveNetwork)
-    : SubnetworkNode(networkPanel, competitiveNet) {
+class HopfieldNode(networkPanel: NetworkPanel, val hopfieldNet: Hopfield)
+    : SubnetworkNode(networkPanel, hopfieldNet) {
 
     override val contextMenu: JPopupMenu
         get() = JPopupMenu().apply {
             with(networkPanel) {
-                applyUnsupervisedActions(competitiveNet)
+                applyUnsupervisedActions(hopfieldNet)
             }
             addSeparator()
-            add(CouplingMenu(networkPanel.networkComponent, competitiveNet))
+            add(CouplingMenu(networkPanel.networkComponent, hopfieldNet))
         }
 
     override val propertyDialog: StandardDialog
-        get() = with(networkPanel) {competitiveNet.makeTrainerPanel()}
+        get() = with(networkPanel) {hopfieldNet.makeTrainerPanel()}
+
 }

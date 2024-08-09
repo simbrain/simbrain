@@ -22,7 +22,10 @@ import org.simbrain.network.core.LocatableModel
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.events.LocationEvents
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.network.gui.dialogs.createTrainOnPatternAction
+import org.simbrain.network.gui.dialogs.getUnsupervisedTrainingPanel
 import org.simbrain.network.subnetworks.Subnetwork
+import org.simbrain.network.trainers.UnsupervisedNetwork
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.Outline
 import javax.swing.*
@@ -116,15 +119,31 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
     protected fun JPopupMenu.applyBasicActions() = apply {
         add(networkPanel.networkActions.cutAction)
         add(networkPanel.networkActions.copyAction)
-        add(networkPanel.networkActions.pasteAction)
+        add(renameAction)
+        add(removeAction)
         addSeparator()
 
         // Edit Submenu
-        add(networkPanel.createAction(name = "Edit network") {
-            propertyDialog?.display()
+        // TODO: Add check
+        add(networkPanel.createAction(name = "Edit...") {
+            subnetwork.createEditorDialog().display()
         })
-        add(networkPanel.networkActions.deleteAction)
         addSeparator()
+    }
+
+    context(NetworkPanel)
+    protected fun JPopupMenu.applyUnsupervisedActions(net: UnsupervisedNetwork) = apply {
+        applyBasicActions()
+        add(createAction("Train...") {
+            getUnsupervisedTrainingPanel(net) {
+                net.trainOnCurrentPattern()
+            }
+        })
+        add(with(networkPanel.network) { net.createTrainOnPatternAction() })
+        addSeparator()
+        add(createAction("Randomize") {
+            net.randomize()
+        })
     }
 
     protected fun createEditAction(name: String) = createAction(name = name) {

@@ -1,6 +1,7 @@
 package org.simbrain.util
 
 import org.simbrain.util.math.SimbrainMath
+import org.simbrain.util.stats.distributions.TwoValued
 import smile.math.matrix.Matrix
 import kotlin.math.min
 import kotlin.math.sqrt
@@ -254,4 +255,17 @@ fun DoubleArray.addi(other: DoubleArray) {
     for (i in 0 until size) {
         this[i] += other[i]
     }
+}
+
+fun Matrix.twoValueRandomize(lower: Double, upper: Double): Matrix = apply { randomize(TwoValued(lower, upper)) }
+
+fun Matrix.binaryRandomize() = apply { twoValueRandomize(0.0, 1.0) }
+
+fun Matrix.bipolarRandomize() = apply { twoValueRandomize(-1.0, 1.0) }
+
+// TODO: Use for unit tests
+fun main() {
+    print(Matrix(10,10).binaryRandomize())
+    print(Matrix(10,10).bipolarRandomize())
+    print(Matrix(10,10).twoValueRandomize(-4.0, 4.0))
 }

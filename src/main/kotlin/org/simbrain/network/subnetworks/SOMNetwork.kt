@@ -24,32 +24,34 @@ import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.neurongroups.SOMGroup
+import org.simbrain.network.trainers.UnsupervisedNetwork
+import org.simbrain.network.trainers.UnsupervisedTrainer
 import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.alignNetworkModels
 import org.simbrain.network.util.offsetNeuronCollections
 import org.simbrain.util.UserParameter
+import org.simbrain.util.binaryRandomize
 import org.simbrain.util.propertyeditor.EditableObject
+import smile.math.matrix.Matrix
 
 /**
- * **SOMNetwork** is a small network encompassing an SOM group. An input
+ * SOMNetwork is a  network encompassing an [SomGroup]. An input
  * layer and input data have been added so that the SOM can be easily trained
  * using existing Simbrain GUI tools
  *
  * @author Jeff Yoshimi
  */
-class SOMNetwork : Subnetwork {
+class SOMNetwork : Subnetwork, UnsupervisedNetwork {
 
     lateinit var som: SOMGroup
 
-    lateinit var inputLayer: NeuronGroup
+    override lateinit var inputLayer: NeuronGroup
 
-    /**
-     * Construct an SOM Network.
-     *
-     * @param numSOMNeurons   number of neurons in the SOM layer
-     * @param numInputNeurons number of neurons in the input layer
-     */
+    override val trainer = UnsupervisedTrainer()
+
+    override lateinit var inputData: Matrix
+
     constructor(numInputNeurons: Int, numSOMNeurons: Int): super() {
         this.label = "SOM Network"
         som = SOMGroup(numSOMNeurons)
@@ -66,13 +68,14 @@ class SOMNetwork : Subnetwork {
         inputLayer.label = "Input layer"
         inputLayer.setClamped(true)
 
+        this.inputData = Matrix(10, numInputNeurons).binaryRandomize()
 
         // Connect layers
         val sg = SynapseGroup(inputLayer, som, AllToAll())
         addModel(sg)
 
         alignNetworkModels(inputLayer, som, Alignment.VERTICAL)
-        offsetNeuronCollections(inputLayer, som, Direction.NORTH, 450.0)
+        offsetNeuronCollections(inputLayer, som, Direction.NORTH, 300.0)
     }
 
     @XStreamConstructor
@@ -89,8 +92,19 @@ class SOMNetwork : Subnetwork {
         som.update()
     }
 
+    context(Network) override fun trainOnInputData() {
+        inputData.toArray().forEach { row ->
+            inputLayer.activationArray = row
+            trainOnCurrentPattern()
+        }
+    }
+
+    context(Network) override fun trainOnCurrentPattern() {
+        this.update()
+    }
+
     /**
-     * Helper class for creating new Hopfield nets using [org.simbrain.util.propertyeditor.AnnotatedPropertyEditor].
+     * Helper class for creating new SOM nets using [org.simbrain.util.propertyeditor.AnnotatedPropertyEditor].
      */
     class SOMCreator : EditableObject {
 
@@ -100,9 +114,6 @@ class SOMNetwork : Subnetwork {
         @UserParameter(label = "Number of inputs", order = 20)
         var numIn: Int = 16
 
-        /**
-         * Create the som net
-         */
         fun create(): SOMNetwork {
             return SOMNetwork(numIn, numSom)
         }

@@ -19,35 +19,32 @@
 package org.simbrain.network.gui.nodes.subnetworkNodes
 
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.network.gui.dialogs.createTrainOnPatternAction
+import org.simbrain.network.gui.dialogs.getUnsupervisedTrainingPanel
+import org.simbrain.network.gui.dialogs.makeTrainerPanel
 import org.simbrain.network.gui.nodes.SubnetworkNode
 import org.simbrain.network.subnetworks.SOMNetwork
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.createAction
+import org.simbrain.workspace.gui.CouplingMenu
 import javax.swing.JPopupMenu
 
 /**
  * PNode representation of SOM Network.
- *
- * @author jyoshimi
  */
-class SOMNetworkNode(networkPanel: NetworkPanel, group: SOMNetwork) : SubnetworkNode(networkPanel, group) {
-
-    override val propertyDialog: StandardDialog?
-        get() = null
-    // return new SOMTrainingDialog(getNetworkPanel(),
-    //                 (SOMNetwork) getSubnetwork());
+class SOMNetworkNode(networkPanel: NetworkPanel, val somNet: SOMNetwork):
+    SubnetworkNode(networkPanel, somNet) {
 
     override val contextMenu: JPopupMenu
         get() = JPopupMenu().apply {
-            add(createEditAction("Edit / Train SOM..."))
-            addDefaultSubnetActions()
+            with(networkPanel) {
+                applyUnsupervisedActions(somNet)
+            }
             addSeparator()
-            add(createAction("Train on current pattern") {
-                (subnetwork as SOMNetwork).som.update()
-            })
-            addSeparator()
-            add(createAction("Randomize synapses") {
-                (subnetwork as SOMNetwork).som.randomizeIncomingWeights()
-            })
+            add(CouplingMenu(networkPanel.networkComponent, somNet))
         }
+
+    override val propertyDialog: StandardDialog
+        get() = with(networkPanel) {somNet.makeTrainerPanel()}
+
 }

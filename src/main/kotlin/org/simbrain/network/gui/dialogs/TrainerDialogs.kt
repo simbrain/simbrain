@@ -204,6 +204,12 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
     }
 }
 
+
+context(NetworkPanel)
+fun UnsupervisedNetwork.makeTrainerPanel(): StandardDialog = getUnsupervisedTrainingPanel(this) {
+    this.trainOnCurrentPattern()
+}
+
 fun NetworkPanel.showSRNCreationDialog(): StandardDialog {
 
     val creator = SRNNetwork.SRNCreator(
@@ -214,17 +220,6 @@ fun NetworkPanel.showSRNCreationDialog(): StandardDialog {
     }
 
 }
-
-// fun main() {
-//     val networkComponent = NetworkComponent("")
-//     val np = NetworkPanel(networkComponent)
-//     val result = with(networkComponent.network) {
-//         val lmsNet = LMSNetwork(this, 5, 5)
-//         addNetworkModelAsync(lmsNet)
-//         lmsNet
-//     }
-//     LMSNetworkNode(np,result ).propertyDialog.run { makeVisible() }
-// }
 
 fun main() {
     val networkComponent = NetworkComponent("")

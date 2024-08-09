@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-DIST_PATH="../dist"
+DIST_PATH="dist"
 VERSION_STRING="3.07"
 NOTARIZATION_PROFILE_NAME="AC_PASSWORD"
 

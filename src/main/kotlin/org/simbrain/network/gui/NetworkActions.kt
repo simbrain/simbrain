@@ -749,9 +749,11 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         networkPanel.showTextPropertyDialog(textNodes)
     }
 
+    // Note that zoom to fit page is handled in NetworkPanel.createMainToolBar()
+
     fun resetZoomAction() = networkPanel.createAction(
         "Reset Zoom",
-        iconPath = "menu_icons/ZoomFitPage.png",
+        iconPath = "menu_icons/ZoomReset.png",
         keyboardShortcut = CmdOrCtrl + KeyEvent.VK_0
     ) {
         scalingFactor = 1.0

@@ -659,8 +659,11 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         with(networkActions) {
             networkModeActions.forEach { add(it) }
             addSeparator()
+            add(networkActions.zoomInAction())
+            add(networkActions.zoomOutAction())
+            addSeparator()
             add(JToggleButton().apply {
-                icon = ResourceManager.getImageIcon("menu_icons/ZoomFitPage.png")
+                icon = ResourceManager.getSmallIcon("menu_icons/ZoomFitPage.png")
                 fun updateButton() {
                     isSelected = autoZoom
                     border = if (autoZoom) BorderFactory.createLoweredBevelBorder() else BorderFactory.createEmptyBorder()
@@ -675,8 +678,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
                 }
             })
             add(networkActions.resetZoomAction())
-            add(networkActions.zoomInAction())
-            add(networkActions.zoomOutAction())
         }
     }
 

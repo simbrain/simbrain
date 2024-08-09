@@ -4,7 +4,6 @@
 # Script for building Simbrain.app
 #
 # Assumes "ant build" has been called and that the proper certificate is in the keychain on the computer from which this is run
-#
 
 # See https://github.com/x-stream/xstream/issues/262
 JVM_ARGS="-Duser.dir=\$APPDIR "

@@ -560,7 +560,6 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             addSubnetAction("Competitive Network") { CompetitiveCreationDialog(networkPanel) },
             addSubnetAction("Feed Forward Network") { FeedForwardCreationDialog(networkPanel) },
             addSubnetAction("Hopfield") { HopfieldCreationDialog(networkPanel) },
-            addSubnetAction("LMS (Least Mean Squares)") { networkPanel.showLMSCreationDialog() },
             addSubnetAction("Restricted Boltzmann Machine") {
                 // TODO: As this pattern is reused add a util to NetworkDialogs.kt
                 RestrictedBoltzmannMachine.RBMCreator().createEditorDialog {

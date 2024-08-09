@@ -18,7 +18,6 @@ import kotlinx.coroutines.withContext
 import org.simbrain.network.core.Network
 import org.simbrain.network.events.TrainerEvents
 import org.simbrain.network.subnetworks.BackpropNetwork
-import org.simbrain.network.subnetworks.LMSNetwork
 import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.CopyableObject
@@ -242,25 +241,6 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
         fun validate(iterations: Int, error: Double): Boolean {
             return iterations >= maxIterations || (useErrorThreshold && error < errorThreshold)
         }
-    }
-
-}
-
-class LMSTrainer : SupervisedTrainer<LMSNetwork>() {
-
-    context(Network)
-    override fun LMSNetwork.trainRow(rowNum: Int): Double {
-        if (rowNum !in 0 until trainingSet.inputs.nrow()) {
-            throw IllegalArgumentException("Trying to train invalid row number $rowNum")
-        }
-        val targetVec = trainingSet.targets.rowVectorTransposed(rowNum)
-        inputLayer.isClamped = true
-        inputLayer.setActivations(trainingSet.inputs.row(rowNum))
-        update()
-        val outputs = outputLayer.activations
-        val rowError = targetVec.sub(outputs)
-        weightMatrix.applyLMS(rowError, learningRate)
-        return rowError.transpose().mm(rowError).sum()
     }
 
 }

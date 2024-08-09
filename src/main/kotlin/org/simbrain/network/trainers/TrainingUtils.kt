@@ -35,36 +35,6 @@ fun ArrayLayer.getError(targets: Matrix): Matrix {
 }
 
 /**
- * Apply LMS to the weight matrix using the provided error vector, which must have the same shape as this weight
- * matrix's output
- */
-fun WeightMatrix.applyLMS(outputError: Matrix, epsilon: Double = .1) {
-
-    outputError.validateSameShape(target.activations)
-
-    // TODO: Can this be replaced by backprop with linear, since derivative is then just source activations
-    val deriv = (tar.updateRule as DifferentiableUpdateRule).getDerivative(tar.inputs)
-    val weightDeltas = outputError.mul(deriv)
-        .mm(source.activations.transpose())
-        .mul(epsilon)
-    weightMatrix.add(weightDeltas)
-    tar.updateBiases(outputError, epsilon)
-    events.updated.fire()
-}
-
-/**
- * Learn to produce current target activations (which might have been "force set") from current source activations.
- * Uses least-mean-squares.
- */
-context(Network)
-fun WeightMatrix.trainCurrentOutputLMS(epsilon: Double = .1) {
-    val targets = target.activations.clone()
-    updatePSR()
-    val actualOutputs = Matrix.column(getSummedPSRs())
-    applyLMS(targets.sub(actualOutputs), epsilon)
-}
-
-/**
  * Backpropagate the provided errors through this weight matrix, and return the new error.
  */
 fun WeightMatrix.backpropError(layerError: Matrix, epsilon: Double = .1): Matrix {

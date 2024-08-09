@@ -386,11 +386,9 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             is Hopfield -> HopfieldNode(this, subnetwork)
             is CompetitiveNetwork -> CompetitiveNetworkNode(this, subnetwork)
             is SOMNetwork -> SOMNetworkNode(this, subnetwork)
-            // is EchoStateNetwork -> ESNNetworkNode(this, subnetwork)
             is SRNNetwork -> SRNNode(this, subnetwork)
             is RestrictedBoltzmannMachine -> RBMNode(this, subnetwork)
             is BackpropNetwork -> BackpropNetworkNode(this, subnetwork)
-            is LMSNetwork -> LMSNetworkNode(this, subnetwork)
             is SmileClassifier -> SmileClassifierNode(this, subnetwork)
             else -> SubnetworkNode(this, subnetwork)
         }
@@ -744,16 +742,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             }
         }
     }
-
-    // fun showLMS() {
-    //     val sources = selectionManager.filterSelectedSourceModels<Neuron>()
-    //     val targets = selectionManager.filterSelectedModels<Neuron>()
-    //     val sourceActivations = arrayOf(sources.activations.toDoubleArray())
-    //     val targetActivations = arrayOf(targets.activations.toDoubleArray())
-    //     val ts = TrainingSet(sourceActivations, targetActivations)
-    //     val lms = LMSIterative(sources, targets, ts)
-    //     showLMSDialog(lms)
-    // }
 
     /**
      * TODO: Work in progress.

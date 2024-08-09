@@ -13,6 +13,6 @@ JVM_ARGS+="--add-opens=java.base/java.util.concurrent=ALL-UNNAMED "
 
 jpackage --input build/main --main-jar Simbrain.jar --dest dist --name "Simbrain" \
 	 --app-version 3.07 --icon etc/simbrain.icns \
-  	 --mac-sign --mac-signing-key-user-name "Regents of the University of CA, Merced (W8BB6W47ZR)" \
+   --mac-sign --mac-signing-key-user-name "Regents of the University of CA, Merced (W8BB6W47ZR)" \
 	 --java-options "$JVM_ARGS" --type app-image \
 	 --verbose

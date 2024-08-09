@@ -51,7 +51,7 @@ jobs:
         run: |
           xcrun notarytool store-credentials "AC_PASSWORD" --apple-id "$APPLE_ID" --team-id "$TEAM_ID" --password "$APP_SPECIFIC_PASSWORD"
       - name: Run ant build
-        run: ant -f build.xml jar
+        run: ant build
       - name: Sign All Binaries in the Jar
         env:
           DEVELOPER_ID: ${{ secrets.DEVELOPER_ID }}

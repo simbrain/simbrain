@@ -74,4 +74,4 @@ jobs:
           CLOUDFLARE_R2_BUCKET: ${{ secrets.CLOUDFLARE_R2_BUCKET }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          aws s3 cp build/dist/Simbrain*.dmg s3://$CLOUDFLARE_R2_BUCKET/ --endpoint-url=https://$CLOUDFLARE_ACCOUNT_ID.r2.cloudflarestorage.com
+          aws s3 cp dist/Simbrain*.dmg s3://$CLOUDFLARE_R2_BUCKET/ --endpoint-url=https://$CLOUDFLARE_ACCOUNT_ID.r2.cloudflarestorage.com

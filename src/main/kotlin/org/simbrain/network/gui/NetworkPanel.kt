@@ -450,8 +450,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
     fun copy() {
         if (selectionManager.isEmpty) return
-        network.placementManager.anchorPoint =
-            selectionManager.filterSelectedModels<LocatableModel>().topLeftLocation
+        network.placementManager.lastSelectedModel = selectionManager.filterSelectedModels<LocatableModel>().sortTopBottom().first()
         Clipboard.clear()
         Clipboard.add(selectionManager.selectedModels)
     }
@@ -461,14 +460,15 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         deleteSelectedObjects()
     }
 
-    fun paste() {
+    suspend fun paste() {
         Clipboard.paste(this)
     }
 
-    fun duplicate() {
-        if (selectionManager.isEmpty) return
+    suspend fun duplicate() {
+        if (selectionManager.isNotEmpty) {
+            copy()
+        }
 
-        copy()
         paste()
     }
 

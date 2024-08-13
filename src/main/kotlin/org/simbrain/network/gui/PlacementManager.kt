@@ -1,11 +1,11 @@
 package org.simbrain.network.gui
 
-import org.simbrain.network.*
 import org.simbrain.network.core.*
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.subnetworks.CompetitiveNetwork
 import org.simbrain.network.subnetworks.Hopfield
 import org.simbrain.network.subnetworks.Subnetwork
+import org.simbrain.util.format
 import org.simbrain.util.plus
 import org.simbrain.util.point
 import java.awt.geom.Point2D
@@ -14,41 +14,39 @@ import kotlin.reflect.KClass
 /**
  * Manage intelligent placement of new model elements in a [org.simbrain.network.gui.NetworkPanel].
  *
- * Placement is managed using two concepts. First, an anchor point. Second, a delta between the current anchor point and
- * previous anchor point. There are cases to keep in mind:
+ * The system works via two modes:
  *
- *   1. The anchor point is reset when you click on the screen, to the point you clicked on.
- *   2. Repeatedly adding an object (using new Neuron, etc.) adds them at a fixed offset from the anchor point using
- *   [DefaultOffsets]. With each addition, the current and previous anchor points are updated. See [placeObject].
- *   3. Adding an object using copy-paste or duplicate, adds them using the delta between the current anchor point and
- *   the previous anchor point. This allows custom "paste trails" to be created.
+ * 1. Click mode. Base case is last clicked location. When clicking on the screen there is a click the next object is
+ * placed there.
+ *
+ * 2. Offset mode. Any additional objects added without clicking on the screen (paste, duplicate, add object) is offset
+ * from the last placed object by a default amount, depending on what type of object it is. This allows "paste trails"
+ * to be created
  *
  * @author Yulin Li
  * @author Jeff Yoshimi
  */
 class PlacementManager() {
 
-    /**
-     * Location of the most recently placed object.
-     */
-    var anchorPoint = point(0.0, 0.0)
+    var lastSelectedModel: LocatableModel? = null
 
     /**
-     * Last anchor point, which is used to compute [deltaDrag]
+     * Origination point when setting a custom offset
      */
-    var previousAnchorPoint = point(0.0, 0.0)
+    var customOffsetAnchor: LocatableModel? = null
 
     /**
      * For each object type, the offset to use between pastes, to sue when  repeatedly adding objects, which is
      * convenient for creating "paste trails". Initialized to defaults for each object type.
      */
-    var deltaDragMap = mutableMapOf<KClass<out LocatableModel>, Point2D> (
+    var offsetMap = mutableMapOf<KClass<out LocatableModel>, Point2D> (
         Neuron::class to point(45, 0),
         NeuronGroup::class to point(400, 0),
         NeuronArray::class to point(300,0),
         Hopfield::class to point(300,0),
         CompetitiveNetwork::class to point(300,0),
-        Subnetwork::class to point(220,0))
+        Subnetwork::class to point(220,0)
+    )
 
     /**
      * Set last location clicked on screen.
@@ -72,10 +70,11 @@ class PlacementManager() {
     }
 
     /**
-     * Paste a list of objects using the delta between the current anchor point and the
-     * previous anchor point.
+     * Paste a list of objects at some offset from the last placed object.
      */
     fun placeObjects(initModels: List<LocatableModel>) {
+
+        customOffsetAnchor = lastSelectedModel
 
         // NeuronCollections should not be placed.
         val models = initModels.filter { it !is NeuronCollection }
@@ -83,33 +82,20 @@ class PlacementManager() {
             return
         }
 
-        models.moveToOrigin()
-
         if (useLastClickedLocation) {
-            // Reset the anchor to wherever was last clicked and put objects there
-            anchorPoint = lastClickedLocation
             useLastClickedLocation = false
-            offsetFromAnchor(models, point(0.0,0.0))
+            models.moveTo(lastClickedLocation)
         } else {
-            val offset = deltaDragMap.getOrDefault(models.first()::class, point(45,0))
-            offsetFromAnchor(models, offset)
+            models.moveTo((lastSelectedModel?.location ?: point(0, 0)) + offsetMap[models.first()::class]!!)
         }
+
+        lastSelectedModel = models.sortTopBottom().first()
     }
 
-    /**
-     * Translate models by the anchor point + delta.
-     */
-    private fun offsetFromAnchor(models: List<LocatableModel>, offset: Point2D) {
+    private fun pointToString(point: Point2D?) = if (point != null) "(${point.x.format(2)}, ${point.y.format(2)})" else "null"
 
-        // println("\tanchor = $anchorPoint\n\toffset = $offset")
-
-        // Move the objects
-        models.translate(anchorPoint + offset)
-
-        previousAnchorPoint = anchorPoint
-
-        // Reset anchor point to wherever objects were just placed
-        anchorPoint = models.topLeftLocation
+    private fun printState() {
+        println("lastPlacedModel = ${pointToString(lastSelectedModel?.location)}, lastClickedLocation = ${pointToString(lastClickedLocation)}, useLastClickedLocation = $useLastClickedLocation")
     }
 
 }

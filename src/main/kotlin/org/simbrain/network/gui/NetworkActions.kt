@@ -7,10 +7,13 @@ import org.simbrain.network.core.Network.Randomizers.excitatoryRandomizer
 import org.simbrain.network.core.Network.Randomizers.inhibitoryRandomizer
 import org.simbrain.network.core.Network.Randomizers.weightRandomizer
 import org.simbrain.network.gui.ConditionallyEnabledAction.EnablingCondition
-import org.simbrain.network.gui.dialogs.*
+import org.simbrain.network.gui.dialogs.NetworkPreferences
+import org.simbrain.network.gui.dialogs.createSynapseAdjustmentPanel
+import org.simbrain.network.gui.dialogs.createTestInputPanel
 import org.simbrain.network.gui.dialogs.layout.LayoutDialog
 import org.simbrain.network.gui.dialogs.network.*
 import org.simbrain.network.gui.dialogs.neuron.AddNeuronsDialog.createAddNeuronsDialog
+import org.simbrain.network.gui.dialogs.showSRNCreationDialog
 import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.neurongroups.BasicNeuronGroupParams
@@ -96,6 +99,14 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         iconPath = "menu_icons/Paste.png"
     ) {
         paste()
+    }
+    val duplicateAction = networkPanel.createAction(
+        name = "Duplicate",
+        description = "Duplicate selected neurons, (connected) synapses, and neuron groups",
+        keyboardShortcut = CmdOrCtrl + 'D',
+        iconPath = "menu_icons/Duplicate.png"
+    ) {
+        duplicate()
     }
     val addNeuronArrayAction = networkPanel.createAction(
         name = "Add Neuron Array...",
@@ -488,7 +499,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val addGroupAction = addNeuronGroupAction()
 
     val clipboardActions
-        get() = listOf(copyAction, cutAction, pasteAction)
+        get() = listOf(copyAction, cutAction, pasteAction, duplicateAction)
 
     val networkEditingActions
         get() = listOf(newNeuronAction, deleteAction)

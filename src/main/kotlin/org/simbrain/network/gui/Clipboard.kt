@@ -18,7 +18,7 @@
  */
 package org.simbrain.network.gui
 
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.awaitAll
 import org.simbrain.network.core.*
 import org.simbrain.network.neurongroups.NeuronGroup
 import java.util.*
@@ -68,7 +68,7 @@ object Clipboard {
      *
      * @param net the network to paste into
      */
-    fun paste(net: NetworkPanel) {
+    suspend fun paste(net: NetworkPanel) {
         if (isEmpty) {
             return
         }
@@ -130,22 +130,20 @@ object Clipboard {
         copy.filterIsInstance<LocatableModel>()
             .forEach { it.shouldBePlaced = false }
 
-        net.launch {
-            // Add the copied object
-            net.network.addNetworkModels(copy)
+        // Add the copied object
+        net.network.addNetworkModels(copy).awaitAll()
 
-            // Unselect "old" copied objects
-            net.selectionManager.clear()
+        // Unselect "old" copied objects
+        net.selectionManager.clear()
 
-            // Paste objects intelligently using placement manager
-            net.network.placementManager.placeObjects(
-                copy.filterIsInstance<LocatableModel>()
-                    .onEach { it.shouldBePlaced = true }
-            )
+        // Paste objects intelligently using placement manager
+        net.network.placementManager.placeObjects(
+            copy.filterIsInstance<LocatableModel>()
+                .onEach { it.shouldBePlaced = true }
+        )
 
-            // Select copied objects after pasting them
-            copy.forEach { it.select() }
-        }
+        // Select copied objects after pasting them
+        copy.forEach { it.select() }
     }
 
     @JvmStatic

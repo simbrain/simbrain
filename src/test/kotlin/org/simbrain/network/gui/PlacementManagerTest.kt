@@ -22,7 +22,7 @@ class PlacementManagerTest {
         val n2 = Neuron()
         net.addNetworkModel(n2)
         pm.placeObject(n2)
-        val neuronOffset = pm.deltaDragMap.get(n2::class)
+        val neuronOffset = pm.offsetMap.get(n2::class)
         assertEquals(neuronOffset!!.x, n2.x, .01)
     }
 
@@ -39,7 +39,7 @@ class PlacementManagerTest {
         val n2 = Neuron()
         net.addNetworkModel(n2)
         pm.placeObject(n2)
-        val neuronOffset =  pm.deltaDragMap.get(n2::class)
+        val neuronOffset =  pm.offsetMap.get(n2::class)
         assertEquals(100 + neuronOffset!!.x, n2.x, .01)
     }
 
@@ -51,7 +51,7 @@ class PlacementManagerTest {
         val na2 = NeuronArray(20)
         net.addNetworkModel(na2)
         pm.placeObject(na2)
-        val offset = pm.deltaDragMap.get(na2::class)
+        val offset = pm.offsetMap.get(na2::class)
         assertEquals(offset!!.y, na2.location.y, .01 )
     }
 

@@ -23,7 +23,6 @@ fun NetworkPanel.addKeyBindings() {
     bind(Shift + 'C') { hardClearSelectedObjects() }
     bind(Alt + 'D') { println(network) } // Print debug information
     bind(Shift + 'F') { toggleClamping() }
-    bind(CmdOrCtrl + 'D') { duplicate() }
     bind(CmdOrCtrl + 'E') {
         selectionManager.selection.firstNotNullOfOrNull { it.propertyDialog }?.display()
     }

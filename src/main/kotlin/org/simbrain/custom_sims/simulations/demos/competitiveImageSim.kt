@@ -30,11 +30,11 @@ val competitiveImageSim = newSim {
         """.trimIndent()
     )
     withGui {
-        place(docViewer, 0, 0, 400, 681)
+        place(docViewer, 0, 0, 349, 729)
     }
 
     val networkComponent = addNetworkComponent("Network")
-    placeComponent(networkComponent,399, 0, 399, 669)
+    placeComponent(networkComponent,413, 0, 391, 675)
     val network = networkComponent.network
 
     // Competitive network
@@ -45,7 +45,7 @@ val competitiveImageSim = newSim {
 
     // Image world
     val component = addImageWorld("Image World")
-    placeComponent(component,797, 0, 571, 669)
+    placeComponent(component,856, 0, 503, 603)
     val w = 10
     val h = 10
     val imageWorld = component.world.apply {

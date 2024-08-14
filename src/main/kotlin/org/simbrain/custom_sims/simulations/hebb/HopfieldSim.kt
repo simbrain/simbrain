@@ -10,6 +10,9 @@ import org.simbrain.util.place
 
 /**
  * Demo for studying Hopfield networks,
+ * Console 5 (0, 0, 418, 622)
+ * Control Panel (469, -2, 113, 275)
+ * Network (624, 0, 591, 667)
  */
 val hopfieldSim = newSim {
 

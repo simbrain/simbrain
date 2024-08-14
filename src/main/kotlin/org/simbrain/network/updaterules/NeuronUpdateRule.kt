@@ -201,7 +201,7 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
 
     fun getNeuronArrayTypeMap() = neuronArrayUpdateRules
 
-    override fun getTypeList(): List<Class<out CopyableObject>> = allUpdateRules
+    override fun getTypeList(): List<Class<out CopyableObject>> = scalarUpdateRules
 
     companion object {
 
@@ -242,7 +242,7 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
     }
 }
 
-val allUpdateRules = listOf(
+val scalarUpdateRules = listOf(
     AdditiveRule::class.java,
     AdExIFRule::class.java,
     AllostaticUpdateRule::class.java,
@@ -279,4 +279,5 @@ val neuronArrayUpdateRules = listOf(
     LinearRule::class.java,
     NakaRushtonRule::class.java,
     SigmoidalRule::class.java,
+    SoftmaxRule::class.java,
 )

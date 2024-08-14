@@ -19,6 +19,7 @@ import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedNetwork
 import org.simbrain.network.trainers.createDiagonalDataset
 import org.simbrain.network.updaterules.LinearRule
+import org.simbrain.util.point
 import java.awt.geom.Point2D
 import kotlin.math.min
 
@@ -29,7 +30,7 @@ import kotlin.math.min
  */
 open class BackpropNetwork : FeedForward, SupervisedNetwork {
 
-    constructor(nodesPerLayer: IntArray, initialPosition: Point2D?): super(nodesPerLayer, initialPosition) {
+    constructor(nodesPerLayer: IntArray, initialPosition: Point2D? = point(0,0)): super(nodesPerLayer, initialPosition) {
         layerList.forEach { it.updateRule = LinearRule() }
         inputLayer.isClamped = true
         val nin = nodesPerLayer.first()

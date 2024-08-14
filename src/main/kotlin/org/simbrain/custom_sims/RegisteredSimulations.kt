@@ -38,10 +38,17 @@ val simulations = dir("Simulations", alphabetical = true ) {
     dir("Reinforcement Learning") {
         item("Actor Critic") { actorCritic }
     }
+
+    dir("Backprop") {
+        item("Three Layer") { backpropSim }
+        item("Softmax") { softmaxSim }
+    }
+
     dir("Braitenberg") {
         item("Isopod Simulation") { isopodSim }
         item("Braitenberg") { braitenbergSim }
     }
+
     dir("Reservoir") {
         item("Binary Reservoir") { binaryReservoir }
         item("Edge Of Chaos") { EdgeOfChaos() }

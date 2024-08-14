@@ -117,4 +117,6 @@ open class FeedForward : Subnetwork {
         outputLayer.accumulateInputs()
         outputLayer.update()
     }
+
+    fun hiddenLayers() = layerList.drop(1).take(layerList.size-2)
 }

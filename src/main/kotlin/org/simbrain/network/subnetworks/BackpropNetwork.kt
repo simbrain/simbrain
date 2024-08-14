@@ -33,6 +33,7 @@ open class BackpropNetwork : FeedForward, SupervisedNetwork {
     constructor(nodesPerLayer: IntArray, initialPosition: Point2D? = point(0,0)): super(nodesPerLayer, initialPosition) {
         layerList.forEach { it.updateRule = LinearRule() }
         inputLayer.isClamped = true
+        hiddenLayers().forEach{(it.updateRule as LinearRule).clippingType = LinearRule.ClippingType.Relu}
         val nin = nodesPerLayer.first()
         val nout = nodesPerLayer.last()
         trainingSet = createDiagonalDataset(nin, nout, min(nin,nout))

@@ -36,12 +36,12 @@ val competitiveGridSim = newSim {
         """.trimIndent()
     )
     withGui {
-        place(docViewer, 0, 0, 400, 200)
+        place(docViewer, 0, 0, 366, 200)
     }
 
     withGui {
-        place(networkComponent, 515, 0, 386, 619)
-        createControlPanel("Control Panel", 399, 0) {
+        place(networkComponent, 585, 0, 386, 619)
+        createControlPanel("Control Panel", 417, 0) {
 
             addButton("Pattern 1") {
                 competitive.inputLayer.neuronList.activations =

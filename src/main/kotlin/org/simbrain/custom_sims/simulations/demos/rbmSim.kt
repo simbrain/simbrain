@@ -12,6 +12,9 @@ import smile.math.matrix.Matrix
 
 /**
  * Demo for studying restricted Boltzmann machines.
+ * Console 6 (0, 0, 365, 691)
+ * Control Panel (404, 1, 115, 275)
+ * Network (548, 0, 815, 619)
  */
 val rbmSim = newSim {
 

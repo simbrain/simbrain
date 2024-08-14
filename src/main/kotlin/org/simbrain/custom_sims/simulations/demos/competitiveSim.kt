@@ -44,12 +44,12 @@ val competitiveSim = newSim {
         """.trimIndent()
     )
     withGui {
-        place(docViewer, 0, 0, 516, 594)
+        place(docViewer, 0, 0,  464, 622)
     }
 
     withGui {
-        place(networkComponent, 631, 0, 674, 619)
-        createControlPanel("Control Panel", 515, 0) {
+        place(networkComponent, 661, 0, 674, 619)
+        createControlPanel("Control Panel", 510, 0) {
 
             addButton("Pattern 1") {
                 competitive.inputLayer.neuronList.activations =

@@ -104,7 +104,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Duplicate",
         description = "Duplicate selected neurons, (connected) synapses, and neuron groups",
         keyboardShortcut = CmdOrCtrl + 'D',
-        iconPath = "menu_icons/Duplicate.png"
+        iconPath = "menu_icons/Copy.png"
     ) {
         duplicate()
     }

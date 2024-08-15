@@ -78,7 +78,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
     }
 
     dir("Neuroscience") {
-        item("Spiking Neuron") { spikingNetwork }
+        item("Spiking Neuron") { spikingNeuron }
         item("Spike Responders") { spikeResponderSim }
         item("Spike Responders (Array)") { spikeResponderSimArray }
         item("Cortical areas") { cortexKuramoto }

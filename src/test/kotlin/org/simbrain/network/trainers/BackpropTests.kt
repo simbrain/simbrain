@@ -8,7 +8,9 @@ import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.core.randomizeBiases
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.SigmoidalRule
+import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
+import org.simbrain.util.crossEntropy
 import org.simbrain.util.math.SigmoidFunctionEnum
 import org.simbrain.util.sse
 import org.simbrain.util.toMatrix
@@ -148,5 +150,28 @@ class BackpropTests {
 
     }
 
+
+    @Test
+    fun `test softmax with cross entropy`() {
+        with(net) {
+            val inputs = doubleArrayOf(1.0, 2.0, 3.0).toMatrix()
+            val targets = doubleArrayOf(0.0, 1.0, 0.0).toMatrix()
+            val inputLayer = NeuronArray(3)
+            val outputLayer = NeuronArray(3).apply {
+                updateRule = SoftmaxRule()
+            }
+            val wm = WeightMatrix(inputLayer, outputLayer)
+            wm.randomize()
+            addNetworkModels(inputLayer, outputLayer, wm)
+            repeat(10000) {
+                listOf(wm).forwardPass(inputs)
+                listOf(wm).backpropError(targets, .1, lossFunction = ::crossEntropy)
+                // println(targets.toDoubleArray() sse wm2.output.toDoubleArray())
+            }
+            println("Outputs: ${outputLayer.activations}, Cross Entropy = ${crossEntropy(outputLayer.activations, targets)}")
+            assertEquals(0.0, crossEntropy(outputLayer.activations, targets), .01)
+        }
+
+    }
 
 }

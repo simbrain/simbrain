@@ -24,6 +24,8 @@ import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.rowVectorTransposed
+import org.simbrain.util.sse
+import smile.math.matrix.Matrix
 import kotlin.math.sqrt
 import kotlin.random.Random
 
@@ -64,6 +66,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
     suspend fun SN.startTraining() {
         if (stoppingConditionReached) {
             stoppingConditionReached = false
+            iteration = 0
             events.iterationReset.fire()
         }
         isRunning = true
@@ -252,7 +255,7 @@ class BackpropTrainer : SupervisedTrainer<BackpropNetwork>() {
         inputLayer.setActivations(trainingSet.inputs.row(rowNum))
         val targetVec = trainingSet.targets.rowVectorTransposed(rowNum)
         wmList.forwardPass(inputLayer.activations)
-        return wmList.backpropError(targetVec)
+        return wmList.backpropError(targetVec, lossFunction = Matrix::sse)
     }
 
 }

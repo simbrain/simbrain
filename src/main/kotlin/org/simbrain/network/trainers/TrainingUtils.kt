@@ -104,11 +104,11 @@ fun List<WeightMatrix>.forwardPass(inputVector: Matrix) {
  * Apply backprop algorithm to this list of matrices, for the provided input/target pair. Assumes weight matrices are
  * stored in a sequence from input to output layers
  */
-fun List<WeightMatrix>.backpropError(targetValues: Matrix, epsilon: Double = .1): Double {
+fun List<WeightMatrix>.backpropError(targetValues: Matrix, epsilon: Double = .1, lossFunction: (actual: Matrix, target: Matrix) -> Double = { actual, target -> actual sse target }): Double {
 
     targetValues.validateSameShape(last().tar.activations)
 
-    val error = last().tar.activations sse targetValues
+    val error = lossFunction(last().tar.activations, targetValues)
 
     // printActivationsAndWeights()
     var errorVector: Matrix = last().tar.getError(targetValues)

@@ -72,6 +72,16 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
         order = 30
     )
 
+    var useAutoRangeMinimumSize = false
+
+    var autoRangeMinimumSize by GuiEditable(
+        initValue = 1.0,
+        label = "Auto Range Minimum Size",
+        description = "Minimum size of the range when auto range is used",
+        useCheckboxFrom = TimeSeriesModel::useAutoRangeMinimumSize,
+        order = 40
+    )
+
     @UserParameter(
         label = "Fixed Width", description = "If true, the time series window never extends beyond a fixed with",
         order = 60

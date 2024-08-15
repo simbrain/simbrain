@@ -16,114 +16,117 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.plot.timeseries;
+package org.simbrain.plot.timeseries
 
-import kotlin.Unit;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.PlotOrientation;
-import org.simbrain.util.SwingUtilsKt;
-
-import javax.swing.*;
-import java.awt.*;
+import org.jfree.chart.ChartFactory
+import org.jfree.chart.ChartPanel
+import org.jfree.chart.JFreeChart
+import org.jfree.chart.axis.ValueAxis.DEFAULT_AUTO_RANGE_MINIMUM_SIZE
+import org.jfree.chart.plot.PlotOrientation
+import org.simbrain.util.createEditorDialog
+import org.simbrain.util.display
+import java.awt.BorderLayout
+import java.awt.Dimension
+import javax.swing.JButton
+import javax.swing.JComboBox
+import javax.swing.JPanel
 
 /**
  * Display a TimeSeriesPlot. This component can be used independently of the
  * time series workspace component.
  */
-public class TimeSeriesPlotPanel extends JPanel {
-
+class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
     /**
      * Chart un-initialized instance.
      */
-    private JFreeChart chart;
-
-    /**
-     * Initial size.
-     */
-    private static final Dimension PREFERRED_SIZE = new Dimension(500, 400);
+    private val chart: JFreeChart
 
     /**
      * Panel for chart.
      */
-    private ChartPanel chartPanel = new ChartPanel(null);
+    val chartPanel: ChartPanel = ChartPanel(null)
 
     /**
-     * Data model.
+     * Return button panel in case user would like to add custom buttons.
      */
-    private TimeSeriesModel model;
-
     /**
      * Button panel.
      */
-    private JPanel buttonPanel = new JPanel();
+    val buttonPanel: JPanel = JPanel()
 
     /**
      * Combo box to select coupling mode (array or scalar).
      */
-    private JComboBox couplingModeComboBox;
+    private val couplingModeComboBox: JComboBox<*>? = null
 
     /**
      * Button to delete scalar time series.
      */
-    private JButton deleteButton;
+    private var deleteButton: JButton? = null
 
     /**
      * Button to add scalar time series
      */
-    private JButton addButton;
+    private var addButton: JButton? = null
 
     /**
      * Construct a time series panel.
      *
      * @param timeSeriesModel model underlying model
      */
-    public TimeSeriesPlotPanel(TimeSeriesModel timeSeriesModel) {
-        model = timeSeriesModel;
-        setPreferredSize(PREFERRED_SIZE);
-        setLayout(new BorderLayout());
+    init {
+        preferredSize = PREFERRED_SIZE
+        layout = BorderLayout()
 
-        addClearGraphDataButton();
-        addPreferencesButton();
-        addAddDeleteButtons();
+        addClearGraphDataButton()
+        addPreferencesButton()
+        addAddDeleteButtons()
 
-        add("Center", chartPanel);
-        add("South", buttonPanel);
+        add("Center", chartPanel)
+        add("South", buttonPanel)
 
-        model.getEvents().getPropertyChanged().on(this::updateChartSettings);
+        timeSeriesModel.events.propertyChanged.on { this.updateChartSettings() }
 
-        init();
+        val title = ""
+        val xLabel = "Time"
+        val yLabel = "Value"
+        val showLegend = true
+        val useTooltips = true
+        val generateUrls = false
+        chart = ChartFactory.createXYLineChart(
+            title,
+            xLabel,
+            yLabel,
+            timeSeriesModel.dataset,
+            PlotOrientation.VERTICAL,
+            true,
+            true,
+            false
+        )
+        chartPanel.chart = chart
+        chart.backgroundPaint = null
 
-        updateChartSettings();
+        updateChartSettings()
     }
 
-    /**
-     * Initialize Chart Panel.
-     */
-    public void init() {
-        String title = "";
-        String xLabel = "Time";
-        String yLabel = "Value";
-        boolean showLegend = true;
-        boolean useTooltips = true;
-        boolean generateUrls = false;
-        chart = ChartFactory.createXYLineChart(title, xLabel, yLabel, model.getDataset(), PlotOrientation.VERTICAL, true, true, false);
-        chartPanel.setChart(chart);
-        chart.setBackgroundPaint(null);
-
-    }
-
-    public void updateChartSettings() {
-
+    fun updateChartSettings() {
         // No idea why this is needed, but it makes the width get updated upon closing the settings dialog
-        model.setFixedWidth(model.getFixedWidth());
 
-        if (model.isAutoRange()) {
-            chart.getXYPlot().getRangeAxis().setAutoRange(true);
+        timeSeriesModel.fixedWidth = timeSeriesModel.fixedWidth
+
+
+        if (timeSeriesModel.isAutoRange) {
+
+            chart.xyPlot.rangeAxis.isAutoRange = true
+            chart.xyPlot.rangeAxis.autoRangeMinimumSize = if (timeSeriesModel.useAutoRangeMinimumSize) {
+                timeSeriesModel.autoRangeMinimumSize
+            } else {
+                DEFAULT_AUTO_RANGE_MINIMUM_SIZE
+            }
+
         } else {
-            chart.getXYPlot().getRangeAxis().setAutoRange(false);
-            chart.getXYPlot().getRangeAxis().setRange(model.getRangeLowerBound(), model.getRangeUpperBound());
+            chart.xyPlot.rangeAxis.isAutoRange = false
+            chart.xyPlot.rangeAxis.setRange(timeSeriesModel.rangeLowerBound, timeSeriesModel.rangeUpperBound)
         }
     }
 
@@ -132,64 +135,56 @@ public class TimeSeriesPlotPanel extends JPanel {
      * Remove all buttons from the button panel; used when customzing the
      * buttons on this panel.
      */
-    public void removeAllButtonsFromToolBar() {
-        buttonPanel.removeAll();
+    fun removeAllButtonsFromToolBar() {
+        buttonPanel.removeAll()
     }
 
     /**
-     * Return button panel in case user would like to add custom buttons.
+     * Add buttons for adding and deleting [TimeSeriesModel.TimeSeries] objects.
      */
-    public JPanel getButtonPanel() {
-        return buttonPanel;
-    }
-
-    /**
-     * Add buttons for adding and deleting {@link TimeSeriesModel.TimeSeries} objects.
-     */
-    public void addAddDeleteButtons() {
-        deleteButton = new JButton("Delete");
-        deleteButton.setAction(TimeSeriesPlotActions.getRemoveSourceAction(this));
-        addButton = new JButton("Add");
-        addButton.setAction(TimeSeriesPlotActions.getAddSourceAction(this));
-        buttonPanel.add(deleteButton);
-        buttonPanel.add(addButton);
+    fun addAddDeleteButtons() {
+        deleteButton = JButton("Delete")
+        deleteButton!!.action = TimeSeriesPlotActions.getRemoveSourceAction(this)
+        addButton = JButton("Add")
+        addButton!!.action = TimeSeriesPlotActions.getAddSourceAction(this)
+        buttonPanel.add(deleteButton)
+        buttonPanel.add(addButton)
     }
 
     /**
      * Add button for clearing graph data.
      */
-    public void addClearGraphDataButton() {
-        JButton clearButton = new JButton("Clear");
-        clearButton.setAction(TimeSeriesPlotActions.getClearGraphAction(this));
-        buttonPanel.add(clearButton);
+    fun addClearGraphDataButton() {
+        val clearButton = JButton("Clear")
+        clearButton.action = TimeSeriesPlotActions.getClearGraphAction(this)
+        buttonPanel.add(clearButton)
     }
 
     /**
      * Add button for showing preferences.
      */
-    public void addPreferencesButton() {
-        JButton prefsButton = new JButton("Prefs");
-        prefsButton.setHideActionText(true);
-        prefsButton.setAction(TimeSeriesPlotActions.getPropertiesDialogAction(this));
-        buttonPanel.add(prefsButton);
+    fun addPreferencesButton() {
+        val prefsButton = JButton("Prefs")
+        prefsButton.hideActionText = true
+        prefsButton.action = TimeSeriesPlotActions.getPropertiesDialogAction(this)
+        buttonPanel.add(prefsButton)
     }
 
     /**
      * Show properties dialog.
      */
-    public void showPropertiesDialog() {
-        var dialog = SwingUtilsKt.createEditorDialog(model, (e) -> {
-            updateChartSettings();
-            return Unit.INSTANCE;
-        });
-        SwingUtilsKt.display(dialog);
+    fun showPropertiesDialog() {
+        val dialog = timeSeriesModel.createEditorDialog { e: TimeSeriesModel? ->
+            updateChartSettings()
+            Unit
+        }
+        dialog.display()
     }
 
-    public ChartPanel getChartPanel() {
-        return chartPanel;
-    }
-
-    public TimeSeriesModel getTimeSeriesModel() {
-        return model;
+    companion object {
+        /**
+         * Initial size.
+         */
+        private val PREFERRED_SIZE = Dimension(500, 400)
     }
 }

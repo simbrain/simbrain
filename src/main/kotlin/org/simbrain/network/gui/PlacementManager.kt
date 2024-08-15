@@ -86,7 +86,7 @@ class PlacementManager() {
             useLastClickedLocation = false
             models.moveTo(lastClickedLocation)
         } else {
-            models.moveTo((lastSelectedModel?.location ?: point(0, 0)) + offsetMap[models.first()::class]!!)
+            models.moveTo((lastSelectedModel?.location ?: point(0, 0)) + offsetMap.getOrDefault(models.first()::class, point(45, 0)))
         }
 
         lastSelectedModel = models.sortTopBottom().first()

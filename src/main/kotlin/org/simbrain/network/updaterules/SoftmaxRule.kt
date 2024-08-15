@@ -3,6 +3,7 @@ package org.simbrain.network.updaterules
 import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
+import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
 import org.simbrain.network.updaterules.interfaces.DifferentiableUpdateRule
 import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.network.util.EmptyScalarData
@@ -12,18 +13,18 @@ import org.simbrain.util.toMatrix
 import smile.math.matrix.Matrix
 import kotlin.math.exp
 
-class SoftmaxRule: NeuronUpdateRule<EmptyScalarData, BiasedMatrixData>(), DifferentiableUpdateRule {
-
+class SoftmaxRule: NeuronUpdateRule<EmptyScalarData, BiasedMatrixData>(), DifferentiableUpdateRule, BoundedUpdateRule {
 
     @UserParameter(
         label = "Temperature",
-        description = """1 is default. 0 to 1 is a flatter distribution. Above 1 is a sharper distribution.""",
+        description = """Above 1 is a "hotter", more chaotic, and thus flatter distribution. 0 to 1 is a "cooler", more predictable, sharper distribution.""",
         minimumValue = 0.0,
         increment = .1,
         order = 10)
     var temperature = 1.0
 
     private fun softmax(input: Matrix, temperature: Double, bias: Matrix = Matrix(input.nrow(), 1)): DoubleArray {
+        // These are often called "logits", that is, a set of unnormalized values
         val exponentials = (input.toDoubleArray() zip bias.toDoubleArray()).map { (i, b) -> exp((i + b)/temperature) }
         val total = exponentials.sum()
         return exponentials.map { it/total }.toDoubleArray()
@@ -48,7 +49,7 @@ class SoftmaxRule: NeuronUpdateRule<EmptyScalarData, BiasedMatrixData>(), Differ
         it.temperature = temperature
     }
 
-    override fun getDerivative(`val`: Double): Double {
+    override fun getDerivative(value: Double): Double {
         throw UnsupportedOperationException("SoftmaxRule does not support scalar data")
     }
 
@@ -61,4 +62,12 @@ class SoftmaxRule: NeuronUpdateRule<EmptyScalarData, BiasedMatrixData>(), Differ
 
         return derivatives.toMatrix()
     }
+
+    override var upperBound: Double
+        get() = 1.0
+        set(value) {}
+
+    override var lowerBound: Double
+        get() = 0.0
+        set(value) {}
 }

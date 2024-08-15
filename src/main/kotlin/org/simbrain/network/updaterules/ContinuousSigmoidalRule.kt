@@ -140,11 +140,11 @@ class ContinuousSigmoidalRule : AbstractSigmoidalRule {
     override val timeType: Network.TimeType
         get() = Network.TimeType.CONTINUOUS
 
-    override fun getDerivative(`val`: Double): Double {
+    override fun getDerivative(value: Double): Double {
         val up = upperBound
         val lw = lowerBound
         val diff = up - lw
-        return type.derivVal(`val`, up, lw, diff)
+        return type.derivVal(value, up, lw, diff)
     }
 
     override fun clear(neuron: Neuron) {

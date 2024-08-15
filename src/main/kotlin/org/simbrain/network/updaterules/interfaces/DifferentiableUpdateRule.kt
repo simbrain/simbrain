@@ -25,11 +25,11 @@ interface DifferentiableUpdateRule {
     /**
      * The derivative of the activation function.
      *
-     * @param val the value being sent through the neuron's derivative
+     * @param value the value being sent through the neuron's derivative
      * @return the derivative of the neuron's activation function with respect
      * to val.
      */
-    fun getDerivative(`val`: Double): Double
+    fun getDerivative(value: Double): Double
 
     /**
      * Array based derivative. By default forwards to scalar derivative.

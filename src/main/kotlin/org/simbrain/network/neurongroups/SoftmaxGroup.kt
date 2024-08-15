@@ -29,7 +29,7 @@ class SoftmaxGroup @JvmOverloads constructor(
         order = 50
     )
 
-    constructor(numNeurons: Int): this(List(numNeurons) { Neuron() })
+    constructor(numNeurons: Int) : this(List(numNeurons) { Neuron() })
 
     @XStreamConstructor
     private constructor() : this(listOf())
@@ -43,27 +43,34 @@ class SoftmaxGroup @JvmOverloads constructor(
     override fun update() {
         neuronList.forEach { it.accumulateInputs() }
         neuronList.forEach { it.update() }
-        val exponentials = neuronList.activations.map { exp(it/params.T) }
+        // These are often called "logits", that is, a set of unnormalized values
+        val exponentials = neuronList.activations.map { exp(it / params.T) }
         val total = exponentials.sum()
-        neuronList.forEachIndexed { i, n -> n.activation = (exponentials[i])/total }
+        neuronList.forEachIndexed { i, n -> n.activation = (exponentials[i]) / total }
     }
 
     override fun copy() = SoftmaxGroup(neuronList.map { it.copy() }, params.copy())
 }
 
 @CustomTypeName("Softmax")
-class SoftmaxParams: NeuronGroupParams() {
+class SoftmaxParams : NeuronGroupParams() {
 
     @UserParameter(
         label = "Temperature",
-        description = """1 is default. 0 to 1 is a flatter distribution. Above 1 is a sharper distribution.""",
+        description = """Above 1 is a "hotter", more chaotic, and thus flatter distribution. 0 to 1 is a "cooler", more predictable, sharper distribution.""",
         minimumValue = 0.0,
         increment = .1,
-        order = 10)
+        order = 10
+    )
     var T = 1.0
 
     override fun create(): SoftmaxGroup {
-        return SoftmaxGroup(List(numNeurons) { Neuron() }, this)
+        return SoftmaxGroup(List(numNeurons) {
+            Neuron().apply {
+                upperBound = 1.0
+                lowerBound = 0.0
+            }
+        }, this)
     }
 
     override fun copy(): SoftmaxParams {

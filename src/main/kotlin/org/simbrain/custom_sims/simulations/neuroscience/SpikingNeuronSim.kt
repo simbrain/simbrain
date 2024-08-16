@@ -20,10 +20,13 @@ val spikingNeuron = newSim {
     val input = network.addNeuron {
         label = "Input"
         location = point(100, 100)
+        increment = 2.0
         clamped = true
     }
     val spiking = network.addNeuron {
-        updateRule = IzhikevichRule()
+        updateRule = IzhikevichRule().apply {
+            backgroundCurrent = 0.0
+        }
         label = "Spiking"
         location = point(200, 100)
     }

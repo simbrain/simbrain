@@ -85,7 +85,7 @@ class IzhikevichRule : SpikingNeuronUpdateRule<IzhikevichScalarData, IzhikevichM
      * Constant background current.
      */
     @UserParameter(label = "I bkgd", description = "Constant background current.", increment = .1, order = 5)
-    private var iBg = 14.0
+    var backgroundCurrent = 14.0
 
     @UserParameter(label = "Threshold", description = "Threshold value to signal a spike", increment = .1, order = 10)
     var threshold = 30.0
@@ -121,7 +121,7 @@ class IzhikevichRule : SpikingNeuronUpdateRule<IzhikevichScalarData, IzhikevichM
         if (addNoise) {
             inputs += noiseGenerator.sampleDouble()
         }
-        inputs += iBg
+        inputs += backgroundCurrent
         val (newActivation, spiked, newRecovery) = izhikevichRule(timeStep, inputs, activation, data.recovery)
         neuron.activation = newActivation
         neuron.isSpike = spiked
@@ -137,7 +137,7 @@ class IzhikevichRule : SpikingNeuronUpdateRule<IzhikevichScalarData, IzhikevichM
                 inputs.addi(noiseGenerator.sampleDouble(layer.size))
             }
 
-            inputs.add(iBg)
+            inputs.add(backgroundCurrent)
 
             val result = buildList {
                 for (i in 0 until layer.size) {
@@ -178,11 +178,11 @@ class IzhikevichRule : SpikingNeuronUpdateRule<IzhikevichScalarData, IzhikevichM
     override fun getRandomValue(randomizer: ProbabilityDistribution?): Double = 2 * (threshold - c) * Math.random() + c
 
     fun getiBg(): Double {
-        return iBg
+        return backgroundCurrent
     }
 
     fun setiBg(iBg: Double) {
-        this.iBg = iBg
+        this.backgroundCurrent = iBg
     }
 
     override val name: String

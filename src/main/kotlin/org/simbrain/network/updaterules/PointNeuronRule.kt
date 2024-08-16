@@ -2,10 +2,16 @@ package org.simbrain.network.updaterules
 
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.SpikingNeuronUpdateRule
+import org.simbrain.network.updaterules.LinearRule.ClippingType
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.ScalarDataHolder
+import org.simbrain.network.util.SpikingMatrixData
+import org.simbrain.network.util.SpikingScalarData
 import org.simbrain.util.UserParameter
+import org.simbrain.util.clip
 import org.simbrain.util.propertyeditor.APETabOder
+import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.roundToString
 import org.simbrain.util.stats.ProbabilityDistribution
 import java.util.*
@@ -16,29 +22,27 @@ import kotlin.math.min
 /**
  * PointNeuron from O'Reilly and Munakata, Computational Explorations in
  * Cognitive Neuroscience, chapter 2.
- * 
- * For conductances, there is a max conductance, and then a time varying 
- * conductance which should be between 0 and 1, a proportion of open channels.
- * 
+ *
+ * Leabra assumes values between 0 and 1 both for weights and activations. Nothing has been done to ensure this
+ * is done in Simbrain beyond clipping, so it is up to the user to ensure this constraint is met.
+ *
  * Reversal potential are equilibrium potentials. The steady state with no inputs 
  * should be the leak reversal.
  * 
  */
 @APETabOder( "Main", "Conductances")
-class PointNeuronRule : NeuronUpdateRule<PointNeuronScalarData, EmptyMatrixData>() {
-
-    // TODO: Keep time varying conductances between 0 and 1, how to compute these
-    // TOOD: Conditional enablings below
+class PointNeuronRule : SpikingNeuronUpdateRule<PointNeuronScalarData, SpikingMatrixData>() {
 
     @UserParameter(
         label = "Max Excitatory Conductance",
         description = "Higher values -> faster approach to excitatory reversal.",
         minimumValue = 0.0,
+        maximumValue = 1.0,
         increment = .1,
         order = 10,
         tab = "Conductances"
     )
-    var excitatoryMaxConductance: Double = 0.4
+    var excitatoryMaxConductance: Double = 1.0
 
     @UserParameter(
         label = "Max Inhibitory Conductance",
@@ -46,6 +50,7 @@ class PointNeuronRule : NeuronUpdateRule<PointNeuronScalarData, EmptyMatrixData>
         order = 20,
         increment = .1,
         minimumValue = 0.0,
+        maximumValue = 1.0,
         tab = "Conductances"
     )
     var inhibitoryMaxConductance: Double = 1.0
@@ -58,12 +63,13 @@ class PointNeuronRule : NeuronUpdateRule<PointNeuronScalarData, EmptyMatrixData>
         order = 30,
         tab = "Conductances"
     )
-    var leakConductance: Double = 2.8
+    var leakConductance: Double = .1
 
     @UserParameter(
         label = "Excitatory Reversal",
         description = "Equilibrium potential for excitatory currents.",
         minimumValue = 0.0,
+        maximumValue = 1.0,
         increment = 0.1,
         order = 10,
     )
@@ -73,45 +79,60 @@ class PointNeuronRule : NeuronUpdateRule<PointNeuronScalarData, EmptyMatrixData>
         label = "Inhibitory Reversal",
         description = "Inhibitory reversal field.",
         minimumValue = 0.0,
+        maximumValue = 1.0,
         increment = 0.1,
         order = 20
     )
-    var inhibitoryReversal: Double = 0.15
+    var inhibitoryReversal: Double = 0.25
 
     @UserParameter(
         label = "Leak Reversal",
         description = "Equilibrium resting potential. With no inputs the voltage will approaches this.",
         minimumValue = 0.0,
+        maximumValue = 1.0,
         increment = 0.1,
         order = 25,
     )
-    var leakReversal: Double = 0.15
+    var leakReversal: Double = 0.3
 
+    @UserParameter(
+        label = "Reset potential",
+        description = "Membrane potential to reset to after a spike",
+        minimumValue = 0.0,
+        maximumValue = 1.0,
+        increment = 0.1,
+        order = 30,
+    )
+    var resetPotential: Double = 0.1
 
     @UserParameter(
         label = "Output Function",
         description = "Current output function.",
         order = 100
     )
-    var outputFunction: OutputFunction = OutputFunction.NONE
+    var outputFunction: OutputFunction = OutputFunction.RATE_CODE
 
-    // TODO: Conditionally enable
-    @UserParameter(
+    var gain: Double by GuiEditable(
+        initValue = 1.0,
         label = "Gain",
         description = "Gain factor for output function.",
-        minimumValue = 0.0,
-        order = 90
+        min = 0.0,
+        max = 1.0,
+        order = 90,
+        onUpdate = {
+            enableWidget(widgetValue(::outputFunction) == OutputFunction.RATE_CODE)
+        }
     )
-    var gain: Double = 1.0
 
-    //  TODO: Conditionally enable
-    @UserParameter(
+    var thresholdPotential by GuiEditable(
+        initValue = .5,
         label = "Threshold Potential",
         description = "Threshold of excitation field.",
-        minimumValue = 0.0,
+        increment = .1,
+        min = 0.0,
+        max = 1.0,
         order = 80
     )
-    var thresholdPotential: Double = 0.25
 
     var toolTipString = ""
 
@@ -119,25 +140,6 @@ class PointNeuronRule : NeuronUpdateRule<PointNeuronScalarData, EmptyMatrixData>
      * Output functions. (p. 45-48)
      */
     enum class OutputFunction {
-        /**
-         * The spikes themselves are the output.
-         */
-        DISCRETE_SPIKING {
-            override fun toString(): String {
-                return "Discrete Spiking"
-            }
-        },
-
-        /**
-         * The number of spikes over a given time is translated into a
-         * continuous rate value without being passed through any other
-         * function.
-         */
-        LINEAR {
-            override fun toString(): String {
-                return "Linear"
-            }
-        },
 
         /**
          * The number of spikes over a given time is translated into a
@@ -151,20 +153,11 @@ class PointNeuronRule : NeuronUpdateRule<PointNeuronScalarData, EmptyMatrixData>
         },
 
         /**
-         * TODO: No implementation.
+         * Spiking with membrane potential as activation
          */
-        NOISY_RATE_CODE {
+        SPIKING {
             override fun toString(): String {
-                return "Noisy Rate Code"
-            }
-        },
-
-        /**
-         * The membrane potential is the output.
-         */
-        NONE {
-            override fun toString(): String {
-                return "None (Membrane Potential)"
+                return "Spiking"
             }
         };
 
@@ -185,12 +178,12 @@ class PointNeuronRule : NeuronUpdateRule<PointNeuronScalarData, EmptyMatrixData>
         cn.outputFunction = outputFunction
         cn.gain = gain
         cn.thresholdPotential = thresholdPotential
+        cn.resetPotential = resetPotential
         return cn
     }
 
     context(Network)
     override fun apply(neuron: Neuron, data: PointNeuronScalarData) {
-
 
         // Calculate the excitatory conductance (p. 44, eq. 2.16)
         data.excitatoryConductance =
@@ -221,29 +214,26 @@ class PointNeuronRule : NeuronUpdateRule<PointNeuronScalarData, EmptyMatrixData>
             leak current ${leakCurrent.roundToString(2)}
         """.trimIndent()
 
-        println(toolTipString)
+//        println(toolTipString)
 
-        // Apply output function. (p. 45-48)
-        if (outputFunction === OutputFunction.DISCRETE_SPIKING) {
-            if (data.membranePotential > thresholdPotential) {
-                neuron.activation = 1.0
-                // data.membranePotential = refractoryPotential
+        if (outputFunction === OutputFunction.RATE_CODE) {
+            // "XX1" or "X over X+1" activation function
+            val inhibTheta = (data.inhibitoryConductance * inhibitoryMaxConductance) * (inhibitoryReversal - thresholdPotential )
+            val leakTheta = leakConductance * (leakReversal - thresholdPotential)
+            val gETheta =  (inhibTheta + leakTheta) /(thresholdPotential - excitatoryReversal)
+            val x = gain * abs(excitatoryCurrent - gETheta)
+            neuron.activation = x/(x+1)
+        } else if (outputFunction === OutputFunction.SPIKING) {
+            if(data.membranePotential > thresholdPotential) {
+                neuron.isSpike = true
+                data.membranePotential = resetPotential
             } else {
-                neuron.activation = 0.0
+                neuron.isSpike= false
             }
-        } else if (outputFunction === OutputFunction.RATE_CODE) {
-            neuron.activation =
-                (gain * abs(data.membranePotential - thresholdPotential)) / (gain * abs(
-                    data.membranePotential - thresholdPotential
-                ) + 1)
-        } else if (outputFunction === OutputFunction.LINEAR) {
-            neuron.activation = gain * abs(data.membranePotential - thresholdPotential)
-        } else if (outputFunction === OutputFunction.NOISY_RATE_CODE) {
-            neuron.activation = 1.0 // TODO: Complete this implementation
-        } else if (outputFunction === OutputFunction.NONE) {
+            neuron.activation = data.membranePotential
+        } else  {
             neuron.activation = data.membranePotential
         }
-
 
     }
 
@@ -252,27 +242,27 @@ class PointNeuronRule : NeuronUpdateRule<PointNeuronScalarData, EmptyMatrixData>
     }
 
     override fun getRandomValue(randomizer: ProbabilityDistribution?): Double {
-        val rand = Random()
-        return if (outputFunction === OutputFunction.DISCRETE_SPIKING) {
-            if (rand.nextBoolean()) 1.0 else 0.0
-        } else if (outputFunction === OutputFunction.RATE_CODE) {
-            rand.nextDouble()
-        } else if (outputFunction === OutputFunction.LINEAR) {
-            // TODO: better value for this?
-            gain * thresholdPotential * rand.nextDouble()
-        } else if (outputFunction === OutputFunction.NOISY_RATE_CODE) {
-            0.0 // TODO: Complete implementation
-        } else {
-            rand.nextDouble() // TODO: Better value for this?
-        }
+        return Random().nextDouble()
     }
 
+
+    /**
+     * Excitatory inputs correspond to weights with strengths above 0. More notes at [#getInhibitoryInputs]
+     */
     private fun getExcitatoryInputs(neuron: Neuron): Double {
-        return max(0.0, neuron.fanIn.filter { it.strength > 0.0 }.sumOf { it.psr })
+        return neuron.fanIn.filter { it.strength > 0.0 }.sumOf { it.psr }.clip(0.0..1.0)
     }
 
+    /**
+     * Negative weights are assumed to correspond to inhibitory inputs. Absolute value of psr is used to be consistent with Leabra framework.
+     * Example: source node is .5, weight is -1, then psr is normally -.5 in Simbrain but treated as .5 here, which is
+     * interpreted as percentage of open inhibitory channels. g_l.
+     *
+     * Leabra assumes values between 0 and 1 so inputs are clipped.
+     *
+     */
     private fun getInhibitoryInputs(neuron: Neuron): Double {
-        return min(0.0, neuron.fanIn.filter { it.strength < 0.0 }.sumOf { it.psr })
+        return neuron.fanIn.filter { it.strength < 0.0 }.sumOf { abs(it.psr) }.clip(0.0..1.0)
     }
 
     override fun getToolTipText(neuron: Neuron): String? {
@@ -327,7 +317,7 @@ class PointNeuronScalarData(
     )
     var inhibitoryConductance: Double = 0.0,
 
-    ) : ScalarDataHolder {
+    ) : SpikingScalarData() {
     override fun copy(): PointNeuronScalarData {
         return PointNeuronScalarData(membranePotential, excitatoryConductance, inhibitoryConductance)
     }

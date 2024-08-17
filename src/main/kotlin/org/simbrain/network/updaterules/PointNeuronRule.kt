@@ -152,6 +152,12 @@ class PointNeuronRule : SpikingNeuronUpdateRule<PointNeuronScalarData, SpikingMa
             }
         },
 
+        MEMBRANE_POTENTIAL {
+            override fun toString(): String {
+                return "Membrane potential"
+            }
+        },
+
         /**
          * Spiking with membrane potential as activation
          */
@@ -232,6 +238,7 @@ class PointNeuronRule : SpikingNeuronUpdateRule<PointNeuronScalarData, SpikingMa
             }
             neuron.activation = data.membranePotential
         } else  {
+            // Membrane potential mode
             neuron.activation = data.membranePotential
         }
 
@@ -271,27 +278,6 @@ class PointNeuronRule : SpikingNeuronUpdateRule<PointNeuronScalarData, SpikingMa
 
     override val name: String
         get() = "Point Neuron"
-
-    //    @Override
-    //    public double getUpperBound() {
-    //        if (outputFunction == OutputFunction.DISCRETE_SPIKING) {
-    //            return 1.0;
-    //        } else if (outputFunction == OutputFunction.RATE_CODE) {
-    //            return 1.0;
-    //        } else if (outputFunction == OutputFunction.LINEAR) {
-    //            return gain; // TODO: better value for this?
-    //        } else if (outputFunction == OutputFunction.NOISY_RATE_CODE) {
-    //            return 0; // TODO: Complete implementation
-    //        } else {
-    //            return 1.0;
-    //        }
-    //    }
-    //
-    //    @Override
-    //    public double getLowerBound() {
-    //        return 0;
-    //    }
-
 
 }
 

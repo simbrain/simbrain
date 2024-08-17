@@ -43,23 +43,22 @@ val pointNeuronSim = newSim {
         pointNeuron couple voltageSeries
     }
 
-    // Control Panel
     withGui {
         place(networkComponent, 181, 15, 405, 400)
         place(neuronPlot, 580, 15, 400, 400)
-        createControlPanel("Control Panel", 5, 10) {
-
-            addButton("Excitatory Input") {
-                inputNeuron1.activation = 1.0
-                inputNeuron2.activation = 0.0
-                workspace.iterateSuspend(10)
-            }
-            addButton("Inhibitory Input") {
-                inputNeuron1.activation = 0.0
-                inputNeuron2.activation = 1.0
-                workspace.iterateSuspend(10)
-            }
-        }
+        //createControlPanel("Control Panel", 5, 10) {
+        //
+        //    addButton("Excitatory Input") {
+        //        inputNeuron1.activation = 1.0
+        //        inputNeuron2.activation = 0.0
+        //        workspace.iterateSuspend(10)
+        //    }
+        //    addButton("Inhibitory Input") {
+        //        inputNeuron1.activation = 0.0
+        //        inputNeuron2.activation = 1.0
+        //        workspace.iterateSuspend(10)
+        //    }
+        //}
 
     }
 }

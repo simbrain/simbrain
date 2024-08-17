@@ -34,36 +34,11 @@ import kotlin.math.min
 class PointNeuronRule : SpikingNeuronUpdateRule<PointNeuronScalarData, SpikingMatrixData>() {
 
     @UserParameter(
-        label = "Max Excitatory Conductance",
-        description = "Higher values -> faster approach to excitatory reversal.",
-        minimumValue = 0.0,
-        maximumValue = 1.0,
-        increment = .1,
-        order = 10,
-        tab = "Conductances"
+        label = "Output Function",
+        description = "Current output function.",
+        order = 5
     )
-    var excitatoryMaxConductance: Double = 1.0
-
-    @UserParameter(
-        label = "Max Inhibitory Conductance",
-        description = "Higher values -> faster approach to inhibitory reversal.",
-        order = 20,
-        increment = .1,
-        minimumValue = 0.0,
-        maximumValue = 1.0,
-        tab = "Conductances"
-    )
-    var inhibitoryMaxConductance: Double = 1.0
-
-    @UserParameter(
-        label = "Leak Conductance",
-        description = "Higher values -> approaches leak reversal quicker.",
-        minimumValue = 0.0,
-        increment = .1,
-        order = 30,
-        tab = "Conductances"
-    )
-    var leakConductance: Double = .1
+    var outputFunction: OutputFunction = OutputFunction.RATE_CODE
 
     @UserParameter(
         label = "Excitatory Reversal",
@@ -105,13 +80,6 @@ class PointNeuronRule : SpikingNeuronUpdateRule<PointNeuronScalarData, SpikingMa
     )
     var resetPotential: Double = 0.1
 
-    @UserParameter(
-        label = "Output Function",
-        description = "Current output function.",
-        order = 100
-    )
-    var outputFunction: OutputFunction = OutputFunction.RATE_CODE
-
     var gain: Double by GuiEditable(
         initValue = 1.0,
         label = "Gain",
@@ -133,6 +101,39 @@ class PointNeuronRule : SpikingNeuronUpdateRule<PointNeuronScalarData, SpikingMa
         max = 1.0,
         order = 80
     )
+
+
+    @UserParameter(
+        label = "Max Excitatory Conductance",
+        description = "Higher values -> faster approach to excitatory reversal.",
+        minimumValue = 0.0,
+        maximumValue = 1.0,
+        increment = .1,
+        order = 10,
+        tab = "Conductances"
+    )
+    var excitatoryMaxConductance: Double = 1.0
+
+    @UserParameter(
+        label = "Max Inhibitory Conductance",
+        description = "Higher values -> faster approach to inhibitory reversal.",
+        order = 20,
+        increment = .1,
+        minimumValue = 0.0,
+        tab = "Conductances"
+    )
+    var inhibitoryMaxConductance: Double = 1.0
+
+    @UserParameter(
+        label = "Leak Conductance",
+        description = "Higher values -> approaches leak reversal quicker.",
+        minimumValue = 0.0,
+        increment = .1,
+        order = 30,
+        tab = "Conductances"
+    )
+    var leakConductance: Double = .1
+
 
     var toolTipString = ""
 
@@ -237,7 +238,7 @@ class PointNeuronRule : SpikingNeuronUpdateRule<PointNeuronScalarData, SpikingMa
                 neuron.isSpike= false
             }
             neuron.activation = data.membranePotential
-        } else  {
+        } else if (outputFunction === OutputFunction.MEMBRANE_POTENTIAL)  {
             // Membrane potential mode
             neuron.activation = data.membranePotential
         }

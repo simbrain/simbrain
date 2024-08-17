@@ -255,7 +255,7 @@ class BackpropTrainer : SupervisedTrainer<BackpropNetwork>() {
         inputLayer.setActivations(trainingSet.inputs.row(rowNum))
         val targetVec = trainingSet.targets.rowVectorTransposed(rowNum)
         wmList.forwardPass(inputLayer.activations)
-        return wmList.backpropError(targetVec, lossFunction = Matrix::sse)
+        return wmList.backpropError(targetVec, epsilon = learningRate, lossFunction = Matrix::sse)
     }
 
 }

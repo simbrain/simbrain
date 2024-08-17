@@ -20,7 +20,6 @@ import org.simbrain.network.core.randomizeBiases
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.offsetNetworkModel
 import org.simbrain.util.stats.ProbabilityDistribution
-import org.simbrain.util.stats.distributions.UniformRealDistribution
 import java.awt.geom.Point2D
 
 /**
@@ -94,8 +93,6 @@ open class FeedForward : Subnetwork {
         get() = "Feedforward"
 
     override fun onCommit() {}
-
-    val randomizer = UniformRealDistribution(-1.0, 1.0)
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
         wmList.forEach { wm -> wm.randomize(randomizer) }

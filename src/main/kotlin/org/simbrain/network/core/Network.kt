@@ -509,7 +509,7 @@ class Network: CoroutineScope, EditableObject {
             showDetails = false,
             order = 10
         )
-        var weightRandomizer: ProbabilityDistribution = UniformRealDistribution(-1.0, 1.0)
+        var weightRandomizer: ProbabilityDistribution = NormalDistribution(0.0, 0.1)
 
         @UserParameter(
             label = "Excitatory Randomizer",

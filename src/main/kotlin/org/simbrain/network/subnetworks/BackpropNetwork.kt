@@ -19,6 +19,8 @@ import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedNetwork
 import org.simbrain.network.trainers.createDiagonalDataset
 import org.simbrain.network.updaterules.LinearRule
+import org.simbrain.network.updaterules.SigmoidalRule
+import org.simbrain.util.math.SigmoidFunctionEnum
 import org.simbrain.util.point
 import java.awt.geom.Point2D
 import kotlin.math.min
@@ -33,7 +35,15 @@ open class BackpropNetwork : FeedForward, SupervisedNetwork {
     constructor(nodesPerLayer: IntArray, initialPosition: Point2D? = point(0,0)): super(nodesPerLayer, initialPosition) {
         layerList.forEach { it.updateRule = LinearRule() }
         inputLayer.isClamped = true
-        hiddenLayers().forEach{(it.updateRule as LinearRule).clippingType = LinearRule.ClippingType.Relu}
+        // hiddenLayers().forEach{(it.updateRule as LinearRule).clippingType = LinearRule.ClippingType.Relu}
+        hiddenLayers().forEach {
+            it.updateRule = SigmoidalRule().apply {
+                type = SigmoidFunctionEnum.LOGISTIC
+            }
+        }
+        outputLayer.updateRule = LinearRule().apply {
+            clippingType = LinearRule.ClippingType.NoClipping
+        }
         val nin = nodesPerLayer.first()
         val nout = nodesPerLayer.last()
         trainingSet = createDiagonalDataset(nin, nout, min(nin,nout))

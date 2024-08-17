@@ -16,11 +16,10 @@ package org.simbrain.network.trainers
 import org.simbrain.network.core.*
 import org.simbrain.network.updaterules.interfaces.DifferentiableUpdateRule
 import org.simbrain.network.util.BiasedMatrixData
-import org.simbrain.util.plus
-import org.simbrain.util.sse
-import org.simbrain.util.validateSameShape
+import org.simbrain.util.*
 import smile.math.matrix.Matrix
 import java.util.*
+import kotlin.sequences.toList
 
 // TODO: Need a way to generalize across NeuronArrays and NeuronCollections
 val WeightMatrix.src get() = source as NeuronArray
@@ -104,6 +103,7 @@ fun List<WeightMatrix>.forwardPass(inputVector: Matrix) {
  * Apply backprop algorithm to this list of matrices, for the provided input/target pair. Assumes weight matrices are
  * stored in a sequence from input to output layers
  */
+context(Network)
 fun List<WeightMatrix>.backpropError(targetValues: Matrix, epsilon: Double = .1, lossFunction: (actual: Matrix, target: Matrix) -> Double = { actual, target -> actual sse target }): Double {
 
     targetValues.validateSameShape(last().tar.activations)
@@ -111,13 +111,13 @@ fun List<WeightMatrix>.backpropError(targetValues: Matrix, epsilon: Double = .1,
     val error = lossFunction(last().tar.activations, targetValues)
 
     // printActivationsAndWeights()
-    var errorVector: Matrix = last().tar.getError(targetValues)
+    var layerError: Matrix = last().tar.getError(targetValues)
 
     for (wm in this.reversed()) {
         val deriv = (wm.tar.updateRule as DifferentiableUpdateRule).getDerivative(wm.tar.inputs)
-        errorVector.mul(deriv)
-        wm.tar.updateBiases(errorVector, epsilon)
-        errorVector = wm.backpropError(errorVector, epsilon)
+        layerError.mul(deriv)
+        wm.tar.updateBiases(layerError, epsilon)
+        layerError = wm.backpropError(layerError, epsilon)
     }
     return error
 }

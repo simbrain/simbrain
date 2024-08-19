@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations
 
+import org.simbrain.custom_sims.addDocViewer
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
@@ -9,10 +10,8 @@ import org.simbrain.util.place
 
 /**
  * Demo for studying Hopfield networks,
- * Console 5 (0, 0, 418, 622)
- * Control Panel (469, -2, 113, 275)
- * Network (624, 0, 591, 667)
  */
+
 val hopfieldSim = newSim {
 
     // Basic setup
@@ -24,9 +23,28 @@ val hopfieldSim = newSim {
     val hopfield = Hopfield(64)
     network.addNetworkModel(hopfield)
 
+    val docViewer = addDocViewer(
+        "Information",
+        """ 
+            # Hopfield Simulation Overview:
+            
+            The Hopfield simulation is a recurrent neural network with a synaptic connection pattern for pattern recognition and memory retrieval. 
+
+            # What to do:
+            
+            Select an input pattern and click the train button on the Control panel to train the network on the selected pattern.
+            The model learns the pattern and “remembers” it. When randomizing the network (by clicking “N” [Neuron], “R” [Randomize], and “Space” [Iterate], or using “I” [Wand Mode] over the nodes), the network adjusts the nodes on each iteration to reconfigure the inputted pattern. 
+            The Network remembers the pattern and the antipattern, and when iterating (“Space”), it iterates to recreate the pattern with the most similar nodes. 
+            You can get the pattern to memorize all the different patterns and antipatterns by training each one, randomizing and iterating to see if it is remembered, and training that pattern again if it needs to be learned. 
+
+        
+        """.trimIndent()
+    )
+
     withGui {
-        place(networkComponent, 139, 10, 868, 619)
-        createControlPanel("Control Panel", 5, 10) {
+        place(docViewer, 0, 0, 450, 483)
+        place(networkComponent, 604, 0, 509, 619)
+        createControlPanel("Control Panel", 470, 0) {
 
             addButton("Pattern 1") {
                 hopfield.neuronGroup.neuronList.activations =

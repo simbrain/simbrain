@@ -39,7 +39,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
     var learningRate = .01
 
     @UserParameter(label = "Update type", order = 2)
-    open var updateType: UpdateMethod = UpdateMethod.Stochastic()
+    open var updateType: UpdateMethod = UpdateMethod.Epoch()
 
     @UserParameter(label = "Loss Function", order = 3, showDetails = false)
     var lossFunction: LossFunction = LossFunction.SumSquaredError()
@@ -220,7 +220,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
 
     class StoppingCondition: CopyableObject {
         var maxIterations by GuiEditable(
-            initValue = 1000,
+            initValue = 10_000,
             order = 1
         )
         var useErrorThreshold by GuiEditable(
@@ -255,7 +255,7 @@ class BackpropTrainer : SupervisedTrainer<BackpropNetwork>() {
         inputLayer.setActivations(trainingSet.inputs.row(rowNum))
         val targetVec = trainingSet.targets.rowVectorTransposed(rowNum)
         wmList.forwardPass(inputLayer.activations)
-        return wmList.backpropError(targetVec, epsilon = learningRate, lossFunction = Matrix::sse)
+        return wmList.updateWeights(targetVec, epsilon = learningRate, lossFunction = Matrix::sse)
     }
 
 }
@@ -274,7 +274,7 @@ class SRNTrainer : SupervisedTrainer<SRNNetwork>() {
 
         inputLayer.activations = inputVec
         update()
-        return weightMatrixTree.backpropError(targetVec, epsilon = learningRate)
+        return weightMatrixTree.applyBackprop(targetVec, epsilon = learningRate)
     }
 
 }

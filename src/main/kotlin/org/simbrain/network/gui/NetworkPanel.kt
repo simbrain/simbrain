@@ -21,7 +21,7 @@ import org.simbrain.network.neurongroups.SOMGroup
 import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.subnetworks.*
 import org.simbrain.network.trainers.WeightMatrixTree
-import org.simbrain.network.trainers.backpropError
+import org.simbrain.network.trainers.applyBackprop
 import org.simbrain.network.trainers.forwardPass
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.setViewBoundsNoOverflow
@@ -783,7 +783,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         with(network) {
             weightMatrixTree.forwardPass(sources.map { it.activations })
         }
-        weightMatrixTree.backpropError(target.targetValues!!, 0.0001)
+        weightMatrixTree.applyBackprop(target.targetValues!!, 0.0001)
     }
 
     inner class NetworkCanvas : PCanvas() {

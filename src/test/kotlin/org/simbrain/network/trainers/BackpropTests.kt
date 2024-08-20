@@ -95,7 +95,7 @@ class BackpropTests {
             na3.randomizeBiases()
             repeat(100) {
                 listOf(wm1, wm2).forwardPass(inputVector)
-                listOf(wm1, wm2).backpropError(targetVector, .1)
+                listOf(wm1, wm2).updateWeights(targetVector, .1)
                 // println(targets.toDoubleArray() sse wm2.output.toDoubleArray())
             }
             println("Outputs: ${na3.activations}, SSE = ${targetVector sse na3.activations}")
@@ -115,7 +115,7 @@ class BackpropTests {
             na2.randomizeBiases()
             repeat(100) {
                 listOf(wm1).forwardPass(commonInputs)
-                listOf(wm1).backpropError(targetVector, .2)
+                listOf(wm1).updateWeights(targetVector, .2)
             }
             println("Outputs: ${na2.activations}, SSE = ${targetVector sse na2.activations}")
             assertEquals(0.0, targetVector sse na2.activations, .01)
@@ -133,7 +133,7 @@ class BackpropTests {
             net.addNetworkModels(wm3, na4)
             repeat(100) {
                 listOf(wm1, wm2, wm3).forwardPass(commonInputs)
-                listOf(wm1, wm2, wm3).backpropError(targetVector, .1)
+                listOf(wm1, wm2, wm3).updateWeights(targetVector, .1)
                 // println(targets.toDoubleArray() sse wm2.output.toDoubleArray())
             }
             println("Outputs: ${na4.activations}, SSE = ${targetVector sse na4.activations}")
@@ -151,7 +151,7 @@ class BackpropTests {
             val wmTree = WeightMatrixTree(listOf(na1), na3)
             repeat(100) {
                 wmTree.forwardPass(listOf(commonInputs))
-                wmTree.backpropError(commonTargets, .1)
+                wmTree.applyBackprop(commonTargets, .1)
             }
             assertEquals(0.0, commonTargets sse na3.activations, .01)
         }
@@ -173,7 +173,7 @@ class BackpropTests {
             addNetworkModels(inputLayer, outputLayer, wm)
             repeat(10000) {
                 listOf(wm).forwardPass(inputs)
-                listOf(wm).backpropError(targets, .1, lossFunction = ::crossEntropy)
+                listOf(wm).updateWeights(targets, .1, lossFunction = ::crossEntropy)
                 // println(targets.toDoubleArray() sse wm2.output.toDoubleArray())
             }
             println("Outputs: ${outputLayer.activations}, Cross Entropy = ${crossEntropy(outputLayer.activations, targets)}")

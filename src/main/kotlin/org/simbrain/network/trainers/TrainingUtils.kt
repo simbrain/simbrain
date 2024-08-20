@@ -34,21 +34,35 @@ fun ArrayLayer.getError(targets: Matrix): Matrix {
 }
 
 /**
+ * Perform a "forward pass" through a list of weight matrices. Assumes they are all connected.
+ */
+context(Network)
+fun List<WeightMatrix>.forwardPass(inputVector: Matrix) {
+    inputVector.validateSameShape(first().src.inputs)
+    first().src.activations = inputVector
+    for (wm in this) {
+        wm.target.accumulateInputs()
+        wm.target.update()
+    }
+}
+
+
+/**
  * Backpropagate the provided errors through this weight matrix, and return the new error.
  */
-fun WeightMatrix.backpropError(layerError: Matrix, epsilon: Double = .1): Matrix {
+fun WeightMatrix.updateWeights(layerError: Matrix, epsilon: Double = .1): Matrix {
     layerError.validateSameShape(target.activations)
     val weightDeltas = layerError.mm(source.activations.transpose())
 
-    // Backpropagate the layer error through the weights to get new error
+    // Backpropagate the layer error through the weights to get a new error vector
     //  Prefer this to layerError.T.mm(wm).T because that requies an extra transpose
-    val backropagatedError = weightMatrix.transpose().mm(layerError)
+    val backropagatedErrors = weightMatrix.transpose().mm(layerError)
 
     // Update weights
     weightMatrix.add(weightDeltas.mul(epsilon))
     events.updated.fire()
 
-    return backropagatedError
+    return backropagatedErrors
 }
 
 /**
@@ -69,42 +83,11 @@ fun NeuronArray.updateBiases(error: Matrix, epsilon: Double = .1) {
 }
 
 /**
- * Print debugging info for a list of weight matrices.
- */
-context(Network)
-fun List<WeightMatrix>.printActivationsAndWeights(showWeights: Boolean = false) {
-    println(first().source)
-    for (wm in this) {
-        wm.target.accumulateInputs()
-        wm.target.update()
-        println(wm)
-        if (showWeights) {
-            println(wm.weightMatrix)
-        }
-        println(wm.target)
-    }
-
-}
-
-/**
- * Perform a "forward pass" through a list of weight matrices. Assumes they are all connected.
- */
-context(Network)
-fun List<WeightMatrix>.forwardPass(inputVector: Matrix) {
-    inputVector.validateSameShape(first().src.inputs)
-    first().src.activations = inputVector
-    for (wm in this) {
-        wm.target.accumulateInputs()
-        wm.target.update()
-    }
-}
-
-/**
  * Apply backprop algorithm to this list of matrices, for the provided input/target pair. Assumes weight matrices are
  * stored in a sequence from input to output layers
  */
 context(Network)
-fun List<WeightMatrix>.backpropError(targetValues: Matrix, epsilon: Double = .1, lossFunction: (actual: Matrix, target: Matrix) -> Double = { actual, target -> actual sse target }): Double {
+fun List<WeightMatrix>.updateWeights(targetValues: Matrix, epsilon: Double = .1, lossFunction: (actual: Matrix, target: Matrix) -> Double = { actual, target -> actual sse target }): Double {
 
     targetValues.validateSameShape(last().tar.activations)
 
@@ -117,7 +100,7 @@ fun List<WeightMatrix>.backpropError(targetValues: Matrix, epsilon: Double = .1,
         val deriv = (wm.tar.updateRule as DifferentiableUpdateRule).getDerivative(wm.tar.inputs)
         layerError.mul(deriv)
         wm.tar.updateBiases(layerError, epsilon)
-        layerError = wm.backpropError(layerError, epsilon)
+        layerError = wm.updateWeights(layerError, epsilon)
     }
     return error
 }
@@ -142,7 +125,7 @@ fun WeightMatrixTree.forwardPass(inputVectors: List<Matrix>) {
  *
  * Weight matrices are updated one “weight layer” at a time. See [WeightMatrixTree] for more information.
  */
-fun WeightMatrixTree.backpropError(targetValues: Matrix, epsilon: Double = .0001): Double {
+fun WeightMatrixTree.applyBackprop(targetValues: Matrix, epsilon: Double = .0001): Double {
 
     targetValues.validateSameShape(outputWeightLayer.tar.activations)
 
@@ -157,7 +140,7 @@ fun WeightMatrixTree.backpropError(targetValues: Matrix, epsilon: Double = .0001
             val deriv = (wm.tar.updateRule as DifferentiableUpdateRule).getDerivative(wm.tar.inputs)
             errorVector.mul(deriv)
             wm.tar.updateBiases(errorVector, epsilon)
-            wm.src to wm.backpropError(errorVector, epsilon)
+            wm.src to wm.updateWeights(errorVector, epsilon)
         }
 
     }
@@ -255,5 +238,24 @@ class WeightMatrixTree(start: List<Layer>, end: Layer) {
         .intersect(tree.flatten().toSet())
         .toList()
     val outputWeightLayer: WeightMatrix = tree.last().first()
+
+}
+
+
+/**
+ * Print debugging info for a list of weight matrices.
+ */
+context(Network)
+fun List<WeightMatrix>.printActivationsAndWeights(showWeights: Boolean = false) {
+    println(first().source)
+    for (wm in this) {
+        wm.target.accumulateInputs()
+        wm.target.update()
+        println(wm)
+        if (showWeights) {
+            println(wm.weightMatrix)
+        }
+        println(wm.target)
+    }
 
 }

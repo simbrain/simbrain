@@ -3,11 +3,10 @@ package org.simbrain.network.smile.classifiers
 import org.simbrain.network.smile.ClassificationAlgorithm
 import org.simbrain.network.trainers.ClassificationDataset
 import org.simbrain.util.UserParameter
-import org.simbrain.util.getOneHot
+import org.simbrain.util.getOneHotArray
 import smile.classification.Classifier
 import smile.classification.SVM
 import smile.math.kernel.PolynomialKernel
-import smile.math.matrix.Matrix
 import smile.validation.metric.Accuracy
 
 /**
@@ -56,14 +55,14 @@ class SVMClassifier @JvmOverloads constructor(inputSize: Int = 4):
         return model?.predict(input) ?: -1
     }
 
-    override fun getOutputVector(winner: Int): Matrix {
+    override fun getOutputArray(winner: Int): DoubleArray {
         assertValidWinnerIndex(winner)
         // -1 is assumed to come from a bipolar -1/1 encoding, and is thus mapped to a the first entry of one-hot
         // vector
-        if (winner == -1) {
-            return getOneHot(0, outputSize)
+        return if (winner == -1) {
+            getOneHotArray(0, outputSize)
         } else {
-            return getOneHot(1, outputSize)
+            getOneHotArray(1, outputSize)
         }
     }
 

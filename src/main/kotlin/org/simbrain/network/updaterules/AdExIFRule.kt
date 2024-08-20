@@ -281,9 +281,9 @@ open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), Noi
                     time,
                     timeStep
                 )
-                dataHolder.setHasSpiked(i, spiked, time)
+                dataHolder.setHasSpiked(i, spiked)
                 layer.activations.set(i, 0, v)
-                dataHolder.w.set(i, w)
+                dataHolder.w[i] = w
             }
         }
     }

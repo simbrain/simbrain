@@ -5,10 +5,9 @@ import org.simbrain.network.smile.classifiers.LogisticRegClassifier
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.network.trainers.ClassificationDataset
 import org.simbrain.util.Utils
-import org.simbrain.util.getOneHot
+import org.simbrain.util.getOneHotArray
 import org.simbrain.util.propertyeditor.CopyableObject
 import smile.classification.Classifier
-import smile.math.matrix.Matrix
 
 /**
  * Superclass for wrappers of Smile classifier objects.
@@ -52,9 +51,9 @@ abstract class ClassificationAlgorithm(
     /**
      * Convert this model's integer prediction to an output vector.
      */
-    open fun getOutputVector(winner: Int): Matrix {
+    open fun getOutputArray(winner: Int): DoubleArray {
         assertValidWinnerIndex(winner)
-        return getOneHot(winner, outputSize)
+        return getOneHotArray(winner, outputSize)
     }
 
     fun setAccuracyLabel(accuracy: Double) {

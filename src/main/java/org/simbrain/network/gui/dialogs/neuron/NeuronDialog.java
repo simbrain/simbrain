@@ -20,7 +20,6 @@ package org.simbrain.network.gui.dialogs.neuron;
 
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.updaterules.NeuronUpdateRule;
-import org.simbrain.network.updaterules.interfaces.ActivityGenerator;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
@@ -86,19 +85,12 @@ public final class NeuronDialog extends StandardDialog {
     private void updateHelp(NeuronUpdateRule<?, ?> updateRule) {
 
         if (updateRule == null) {
-            helpAction = new ShowHelpAction("Pages/Network/neuron.html");
+            helpAction = new ShowHelpAction("https://docs.simbrain.net/docs/network/neurons/");
         } else if (updateRule instanceof NeuronUpdateRule<?,?>) {
-            String name = updateRule.getName();
-            // Docs are in different places for activity generators and neurons
-            String docFolder = "";
-            if (updateRule instanceof ActivityGenerator) {
-                docFolder = "activity_generator";
-            } else {
-                docFolder = "neuron";
-            }
+            String name = updateRule.getName().toLowerCase();
 
             // Create the help action
-            helpAction = new ShowHelpAction("Pages/Network/" + docFolder + "/" + name + ".html");
+            helpAction = new ShowHelpAction("https://docs.simbrain.net/docs/network/neurons/" + name + ".html");
         }
         helpButton.setAction(helpAction);
     }

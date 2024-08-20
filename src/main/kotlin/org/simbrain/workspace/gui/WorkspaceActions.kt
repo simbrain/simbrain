@@ -218,7 +218,7 @@ class WorkspaceActions {
         createComponentFactoryAction("Pixel Plot", "menu_icons/grid.png"),
         createComponentFactoryAction("Projection Plot", "menu_icons/ProjectionIcon.png"),
         createComponentFactoryAction("Raster Plot", "menu_icons/ScatterIcon.png"),
-        createComponentFactoryAction("Time Series", "menu_icons/CurveChart.png")
+        createComponentFactoryAction("Time Series", "menu_icons/TimeSeries.png")
     )
     val newWorldActions = listOf(
         createComponentFactoryAction("Data Table", "menu_icons/Table.png"),
@@ -313,12 +313,28 @@ class WorkspaceActions {
         producer = producer,
         plotType = plotType,
         objectName = objectName,
-        iconPath = "menu_icons/CurveChart.png",
+        iconPath = "menu_icons/TimeSeries.png",
         componentCreator = { name -> TimeSeriesPlotComponent(name) },
         consumerProvider = {
             it.model.getConsumer(TimeSeriesModel::setValues)
         }
     )
+
+    fun createCoupledTimeSeriesPlotAction(producers: List<Producer>) = SimbrainDesktop.desktopPane.createAction(
+        name = "Time Series Plot of ${producers.size} ${producers.map { it.baseObject::class.simpleName }.toSet().joinToString(", ")}${if (producers.size > 1) "s" else ""}",
+        iconPath = "menu_icons/TimeSeries.png",
+        description = "Create Coupled Time Series Plot",
+        coroutineScope = workspace
+    ) {
+        val component = TimeSeriesPlotComponent("Time Series Plot of ${producers.size} ${producers.map { it.baseObject::class.simpleName }.toSet().joinToString(", ")}${if (producers.size > 1) "s" else ""}")
+        workspace.addWorkspaceComponent(component)
+        producers.forEach { producer ->
+            with(workspace.couplingManager) {
+                val timeSeries = component.addTimeSeries(producer.simpleDescription)
+                producer couple timeSeries.getConsumer(TimeSeriesModel.TimeSeries::setValue)
+            }
+        }
+    }
 
     @JvmOverloads
     fun createCoupledHistogramPlotAction(producer: Producer, objectName: String, plotType: String = "Histogram Plot") = createCoupledPlotAction(

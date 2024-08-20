@@ -21,7 +21,7 @@ import org.simbrain.network.neurongroups.SOMGroup
 import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.subnetworks.*
 import org.simbrain.network.trainers.WeightMatrixTree
-import org.simbrain.network.trainers.backpropError
+import org.simbrain.network.trainers.applyBackprop
 import org.simbrain.network.trainers.forwardPass
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.setViewBoundsNoOverflow
@@ -291,7 +291,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         return when (model) {
             is Neuron -> createNode(model)
             is Synapse -> createNode(model)
-            is SmileClassifier -> createNode(model)
             is NeuronArray -> createNode(model)
             is NeuronCollection -> createNode(model)
             is NeuronGroup -> createNode(model)
@@ -387,11 +386,10 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             is Hopfield -> HopfieldNode(this, subnetwork)
             is CompetitiveNetwork -> CompetitiveNetworkNode(this, subnetwork)
             is SOMNetwork -> SOMNetworkNode(this, subnetwork)
-            // is EchoStateNetwork -> ESNNetworkNode(this, subnetwork)
             is SRNNetwork -> SRNNode(this, subnetwork)
             is RestrictedBoltzmannMachine -> RBMNode(this, subnetwork)
             is BackpropNetwork -> BackpropNetworkNode(this, subnetwork)
-            is LMSNetwork -> LMSNetworkNode(this, subnetwork)
+            is SmileClassifier -> SmileClassifierNode(this, subnetwork)
             else -> SubnetworkNode(this, subnetwork)
         }
 
@@ -452,8 +450,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
     fun copy() {
         if (selectionManager.isEmpty) return
-        network.placementManager.anchorPoint =
-            selectionManager.filterSelectedModels<LocatableModel>().topLeftLocation
+        network.placementManager.lastSelectedModel = selectionManager.filterSelectedModels<LocatableModel>().sortTopBottom().first()
         Clipboard.clear()
         Clipboard.add(selectionManager.selectedModels)
     }
@@ -463,14 +460,15 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         deleteSelectedObjects()
     }
 
-    fun paste() {
+    suspend fun paste() {
         Clipboard.paste(this)
     }
 
-    fun duplicate() {
-        if (selectionManager.isEmpty) return
+    suspend fun duplicate() {
+        if (selectionManager.isNotEmpty) {
+            copy()
+        }
 
-        copy()
         paste()
     }
 
@@ -661,8 +659,11 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         with(networkActions) {
             networkModeActions.forEach { add(it) }
             addSeparator()
+            add(networkActions.zoomInAction())
+            add(networkActions.zoomOutAction())
+            addSeparator()
             add(JToggleButton().apply {
-                icon = ResourceManager.getImageIcon("menu_icons/ZoomFitPage.png")
+                icon = ResourceManager.getSmallIcon("menu_icons/ZoomFitPage.png")
                 fun updateButton() {
                     isSelected = autoZoom
                     border = if (autoZoom) BorderFactory.createLoweredBevelBorder() else BorderFactory.createEmptyBorder()
@@ -677,8 +678,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
                 }
             })
             add(networkActions.resetZoomAction())
-            add(networkActions.zoomInAction())
-            add(networkActions.zoomOutAction())
         }
     }
 
@@ -745,16 +744,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         }
     }
 
-    // fun showLMS() {
-    //     val sources = selectionManager.filterSelectedSourceModels<Neuron>()
-    //     val targets = selectionManager.filterSelectedModels<Neuron>()
-    //     val sourceActivations = arrayOf(sources.activations.toDoubleArray())
-    //     val targetActivations = arrayOf(targets.activations.toDoubleArray())
-    //     val ts = TrainingSet(sourceActivations, targetActivations)
-    //     val lms = LMSIterative(sources, targets, ts)
-    //     showLMSDialog(lms)
-    // }
-
     /**
      * TODO: Work in progress.
      */
@@ -794,7 +783,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         with(network) {
             weightMatrixTree.forwardPass(sources.map { it.activations })
         }
-        weightMatrixTree.backpropError(target.targetValues!!, 0.0001)
+        weightMatrixTree.applyBackprop(target.targetValues!!, 0.0001)
     }
 
     inner class NetworkCanvas : PCanvas() {

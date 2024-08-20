@@ -197,14 +197,17 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
             }
         }
 
-        // Test Inputs action
-        //menu.addSeparator();
-        //menu.add(testInputsAction);
+        // Test Input Panel
+        menu.addSeparator();
+        Action testInputs = getNetworkPanel().getNetworkActions().createTestInputPanelAction(neuronGroup);
+        menu.add(testInputs);
+        Action addActivationToInput = getNetworkPanel().getNetworkActions().createAddActivationToInputAction(neuronGroup);
+        menu.add(addActivationToInput);
 
         // Projection Plot Action
         menu.addSeparator();
         menu.add(SimbrainDesktop.INSTANCE.getActionManager().createCoupledPlotMenu(
-                SimbrainDesktop.INSTANCE.getWorkspace().getCouplingManager().getProducer(neuronGroup, "getActivations"),
+                SimbrainDesktop.INSTANCE.getWorkspace().getCouplingManager().getProducer(neuronGroup, "getActivationArray"),
                 neuronGroup.getDisplayName() + " Activations",
                 "Plot Activations"
         ));

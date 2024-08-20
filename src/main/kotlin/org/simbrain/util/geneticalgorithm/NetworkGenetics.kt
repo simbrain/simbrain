@@ -306,7 +306,7 @@ fun NeuronRuleGene.mutateParam(
  */
 context(Genotype)
 fun NeuronRuleGene.mutateType(
-    allowedTypes: List<Pair<Number, KClass<out NeuronUpdateRule<*, *>>>> = allUpdateRules.map { 1 to it.kotlin },
+    allowedTypes: List<Pair<Number, KClass<out NeuronUpdateRule<*, *>>>> = scalarUpdateRules.map { 1 to it.kotlin },
     probabilityOfChange: Double = .9
 ) = mutate {
     val nonMutatingWeight: Double = (1 - probabilityOfChange).toProbabilityWeight() * allowedTypes.size

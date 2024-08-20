@@ -20,42 +20,45 @@ package org.simbrain.network.subnetworks
 
 import org.simbrain.network.core.*
 import org.simbrain.network.neurongroups.NeuronGroup
+import org.simbrain.network.trainers.UnsupervisedNetwork
+import org.simbrain.network.trainers.UnsupervisedTrainer
 import org.simbrain.network.updaterules.BinaryRule
-import org.simbrain.network.util.Alignment
-import org.simbrain.network.util.Direction
-import org.simbrain.network.util.alignNetworkModels
-import org.simbrain.network.util.offsetNetworkModel
+import org.simbrain.network.util.*
 import org.simbrain.util.UserParameter
+import org.simbrain.util.binaryRandomize
 import org.simbrain.util.format
 import org.simbrain.util.point
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
+import smile.math.matrix.Matrix
 import java.util.function.Consumer
+import kotlin.math.sqrt
 
 /**
- * **Hopfield** is a basic implementation of a discrete Hopfield network.
+ * A discrete Hopfield network.
  */
-class Hopfield : Subnetwork {
+class Hopfield : Subnetwork, UnsupervisedNetwork {
 
     lateinit var neuronGroup: NeuronGroup
 
+    override val inputLayer
+        get() = neuronGroup
+
     lateinit var synapseGroup: SynapseGroup
 
-    /**
-     * The update function used by this Hopfield network.
-     */
+    override val trainer = UnsupervisedTrainer()
+
+    override lateinit var inputData: Matrix
+
     @UserParameter(label = "Update function")
-    private val updateFunc = DEFAULT_UPDATE
+    var updateFunc = HopfieldUpdate.RAND
 
     override lateinit var customInfo: InfoText
 
-    /**
-     * Creates a new Hopfield network.
-     *
-     * @param numNeurons Number of neurons in new network
-     */
     constructor(numNeurons: Int): super() {
         label = "Hopfield network"
+
+        this.inputData = Matrix(10, numNeurons).binaryRandomize()
 
         // Create main neuron group
         neuronGroup = NeuronGroup(numNeurons)
@@ -88,8 +91,20 @@ class Hopfield : Subnetwork {
     @XStreamConstructor
     constructor(): super()
 
+    context(Network) override fun trainOnInputData() {
+        inputData.toArray().forEach { row ->
+            inputLayer.activationArray = row
+            trainOnCurrentPattern()
+        }
+    }
+
     override fun randomize(randomizer: ProbabilityDistribution?) {
         synapseGroup.randomizeSymmetric(randomizer)
+    }
+
+    context(Network)
+    override fun accumulateInputs() {
+        neuronGroup.accumulateInputs()
     }
 
     context(Network)
@@ -110,14 +125,13 @@ class Hopfield : Subnetwork {
      * Apply the basic Hopfield rule to the current pattern. This is not the
      * main training algorithm, which directly makes use of the input data.
      */
-    fun trainOnCurrentPattern() {
+    override fun trainOnCurrentPattern() {
         neuronGroup.neuronList.forEach(Consumer { src: Neuron ->
-            src.fanIn.forEach(
-                Consumer { s: Synapse ->
-                    val tar = s.source
-                    val deltaW = bipolar(src.activation) * bipolar(tar.activation)
-                    s.strength = s.strength + deltaW
-                })
+            src.fanIn.forEach { s: Synapse ->
+                val tar = s.source
+                val deltaW = bipolar(src.activation) * bipolar(tar.activation)
+                s.strength += deltaW
+            }
         })
         synapseGroup.events.updated.fire()
         events.updated.fire()
@@ -191,6 +205,12 @@ class Hopfield : Subnetwork {
      * Helper class for creating new Hopfield nets using [org.simbrain.util.propertyeditor.AnnotatedPropertyEditor].
      */
     class HopfieldCreator : EditableObject {
+
+        /**
+         * Default number of neurons.
+         */
+        val DEFAULT_NUM_UNITS: Int = 36
+
         @UserParameter(
             label = "Number of neurons",
             description = "How many neurons this Hofield net should have",
@@ -198,34 +218,19 @@ class Hopfield : Subnetwork {
         )
         var numNeurons: Int = DEFAULT_NUM_UNITS
 
-        /**
-         * Create the hopfield net
-         */
         fun create(): Hopfield {
             return Hopfield(numNeurons)
         }
     }
 
-    companion object {
-        /**
-         * Custom update rule for Hopfield.
-         */
-        val DEFAULT_UPDATE: HopfieldUpdate = HopfieldUpdate.SYNC
-
-        /**
-         * Default number of neurons.
-         */
-        const val DEFAULT_NUM_UNITS: Int = 36
-
-        /**
-         * Convenience method to convert binary values (1,0) to bipolar
-         * values(1,-1).
-         *
-         * @param in number to convert
-         * @return converted number
-         */
-        fun bipolar(`in`: Double): Double {
-            return if (`in` == 0.0) -1.0 else `in`
-        }
+    /**
+     * Convenience method to convert binary values (1,0) to bipolar
+     * values(1,-1).
+     *
+     * @param in number to convert
+     * @return converted number
+     */
+    fun bipolar(inputVal: Double): Double {
+        return if (inputVal == 0.0) -1.0 else inputVal
     }
 }

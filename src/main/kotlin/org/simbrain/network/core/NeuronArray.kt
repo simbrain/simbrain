@@ -200,7 +200,6 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
             return
         }
         updateRule.apply(this, dataHolder)
-        inputs.mul(0.0) // clear inputs
         events.updated.fire()
     }
 

@@ -22,7 +22,7 @@ val rbmSim = newSim {
     val network = networkComponent.network
 
     // Competitive network
-    val rbm = RestrictedBoltzmannMachine(64, 25)
+    val rbm = RestrictedBoltzmannMachine(64, 81)
     network.addNetworkModel(rbm)
 
     // Inputs

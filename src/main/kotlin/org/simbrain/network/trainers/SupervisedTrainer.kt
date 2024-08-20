@@ -18,13 +18,14 @@ import kotlinx.coroutines.withContext
 import org.simbrain.network.core.Network
 import org.simbrain.network.events.TrainerEvents
 import org.simbrain.network.subnetworks.BackpropNetwork
-import org.simbrain.network.subnetworks.LMSNetwork
 import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.rowVectorTransposed
+import org.simbrain.util.sse
+import smile.math.matrix.Matrix
 import kotlin.math.sqrt
 import kotlin.random.Random
 
@@ -38,7 +39,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
     var learningRate = .01
 
     @UserParameter(label = "Update type", order = 2)
-    open var updateType: UpdateMethod = UpdateMethod.Stochastic()
+    open var updateType: UpdateMethod = UpdateMethod.Epoch()
 
     @UserParameter(label = "Loss Function", order = 3, showDetails = false)
     var lossFunction: LossFunction = LossFunction.SumSquaredError()
@@ -65,6 +66,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
     suspend fun SN.startTraining() {
         if (stoppingConditionReached) {
             stoppingConditionReached = false
+            iteration = 0
             events.iterationReset.fire()
         }
         isRunning = true
@@ -218,7 +220,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
 
     class StoppingCondition: CopyableObject {
         var maxIterations by GuiEditable(
-            initValue = 1000,
+            initValue = 10_000,
             order = 1
         )
         var useErrorThreshold by GuiEditable(
@@ -246,25 +248,6 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
 
 }
 
-class LMSTrainer : SupervisedTrainer<LMSNetwork>() {
-
-    context(Network)
-    override fun LMSNetwork.trainRow(rowNum: Int): Double {
-        if (rowNum !in 0 until trainingSet.inputs.nrow()) {
-            throw IllegalArgumentException("Trying to train invalid row number $rowNum")
-        }
-        val targetVec = trainingSet.targets.rowVectorTransposed(rowNum)
-        inputLayer.isClamped = true
-        inputLayer.setActivations(trainingSet.inputs.row(rowNum))
-        update()
-        val outputs = outputLayer.activations
-        val rowError = targetVec.sub(outputs)
-        weightMatrix.applyLMS(rowError, learningRate)
-        return rowError.transpose().mm(rowError).sum()
-    }
-
-}
-
 class BackpropTrainer : SupervisedTrainer<BackpropNetwork>() {
 
     context(Network)
@@ -272,7 +255,7 @@ class BackpropTrainer : SupervisedTrainer<BackpropNetwork>() {
         inputLayer.setActivations(trainingSet.inputs.row(rowNum))
         val targetVec = trainingSet.targets.rowVectorTransposed(rowNum)
         wmList.forwardPass(inputLayer.activations)
-        return wmList.backpropError(targetVec)
+        return wmList.updateWeights(targetVec, epsilon = learningRate, lossFunction = Matrix::sse)
     }
 
 }
@@ -291,7 +274,7 @@ class SRNTrainer : SupervisedTrainer<SRNNetwork>() {
 
         inputLayer.activations = inputVec
         update()
-        return weightMatrixTree.backpropError(targetVec, epsilon = learningRate)
+        return weightMatrixTree.applyBackprop(targetVec, epsilon = learningRate)
     }
 
 }

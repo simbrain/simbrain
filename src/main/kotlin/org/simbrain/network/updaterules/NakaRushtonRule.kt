@@ -133,47 +133,51 @@ class NakaRushtonRule : NeuronUpdateRule<NakaScalarData, NakaMatrixData>(), Clip
     context(Network)
     override fun apply(layer: Layer, dataHolder: NakaMatrixData) {
         for (i in 0 until layer.size) {
-            layer.activations[i, 0] = nakaRushtonRule(
+            val result = nakaRushtonRule(
                 layer.inputs[i, 0],
                 layer.activations[i, 0],
                 timeStep,
                 dataHolder.a[i, 0]
             )
+            layer.activations[i, 0] = result.first
+            dataHolder.a[i, 0] = result.second
         }
     }
 
     context(Network)
     override fun apply(neuron: Neuron, data: NakaScalarData) {
-        neuron.activation = nakaRushtonRule(
+        val result = nakaRushtonRule(
             neuron.input, neuron.activation,
             timeStep, data.a
         )
+        neuron.activation = result.first
+        data.a = result.second
     }
 
-    fun nakaRushtonRule(input: Double, activation: Double, timeStep: Double, a: Double): Double {
-        var a = a
-        var `val` = activation
+    fun nakaRushtonRule(input: Double, activation: Double, timeStep: Double, a: Double): Pair<Double, Double> {
+        var newActivation = activation
+        var newA = a
 
         // Update adaptation term; see Spike, p. 81
         if (useAdaptation) {
-            a += (timeStep / adaptationTimeConstant) * (adaptationParameter * `val` - a)
+            newA += (timeStep / adaptationTimeConstant) * (adaptationParameter * newActivation - a)
         } else {
-            a = 0.0
+            newA = 0.0
         }
         val s = if (input > 0) {
             ((upperBound * input.pow(steepness))
-                    / ((semiSaturationConstant + a).pow(steepness) + input.pow(steepness)))
+                    / ((semiSaturationConstant + newA).pow(steepness) + input.pow(steepness)))
         } else {
             0.0
         }
 
-        `val` += if (addNoise) {
-            timeStep * (((1 / timeConstant) * (-`val` + s)) + noiseGenerator.sampleDouble())
+        newActivation += if (addNoise) {
+            timeStep * (((1 / timeConstant) * (-newActivation + s)) + noiseGenerator.sampleDouble())
         } else {
-            timeStep * ((1 / timeConstant) * (-`val` + s))
+            timeStep * ((1 / timeConstant) * (-newActivation + s))
         }
 
-        return `val`
+        return Pair(newActivation, newA)
     }
 
     override fun createMatrixData(size: Int): NakaMatrixData {
@@ -204,11 +208,20 @@ class NakaScalarData(@UserParameter(label = "a") var a: Double = 0.0) : ScalarDa
     override fun copy(): NakaScalarData {
         return NakaScalarData(a)
     }
+
+    override fun clear() {
+        a = 0.0
+    }
 }
 
 class NakaMatrixData(var size: Int) : MatrixDataHolder {
+    @UserParameter("a")
     var a = Matrix(size, 1)
     override fun copy() = NakaMatrixData(size).also {
         it.a = a.clone()
+    }
+
+    override fun clear() {
+        a.mul(0.0)
     }
 }

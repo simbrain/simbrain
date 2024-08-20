@@ -532,9 +532,10 @@ class OdorWorldPanel(
         add(odorWorldActions.addAgentAction())
         add(odorWorldActions.addEntityAction())
         addSeparator()
-        add(odorWorldActions.resetZoomAction())
         add(odorWorldActions.zoomInAction())
         add(odorWorldActions.zoomOutAction())
+        addSeparator()
+        add(odorWorldActions.resetZoomAction())
     }
 
     fun editSelectedEntities() {

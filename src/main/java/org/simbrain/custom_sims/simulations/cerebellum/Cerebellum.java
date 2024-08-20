@@ -458,9 +458,9 @@ public class Cerebellum extends Simulation {
             "Time Series");
         ts.getModel().setFixedWidth(true);
         ts.getModel().setWindowSize(1000);
-        TimeSeriesModel.ScalarTimeSeries sts1 = ts.getModel().addScalarTimeSeries("Dopamine");
+        TimeSeriesModel.TimeSeries sts1 = ts.getModel().addTimeSeries("Dopamine");
         sim.couple(dopamine, sts1);
-        TimeSeriesModel.ScalarTimeSeries sts2 = ts.getModel().addScalarTimeSeries("Output");
+        TimeSeriesModel.TimeSeries sts2 = ts.getModel().addTimeSeries("Output");
         sim.couple(output, sts2);
     }
 

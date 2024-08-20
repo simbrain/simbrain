@@ -8,6 +8,6 @@ open class PlotEvents: Events() {
 }
 
 class TimeSeriesEvents: PlotEvents() {
-    val scalarTimeSeriesAdded = OneArgEvent<TimeSeriesModel.ScalarTimeSeries>()
-    val scalarTimeSeriesRemoved = OneArgEvent<TimeSeriesModel.ScalarTimeSeries>()
+    val timeSeriesAdded = OneArgEvent<TimeSeriesModel.TimeSeries>()
+    val timeSeriesRemoved = OneArgEvent<TimeSeriesModel.TimeSeries>()
 }

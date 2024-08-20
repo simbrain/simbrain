@@ -7,7 +7,7 @@ import org.simbrain.network.layouts.HexagonalGridLayout
 import org.simbrain.network.learningrules.STDPRule
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.spikeresponders.SpikeResponder
-import org.simbrain.network.spikeresponders.UDF
+import org.simbrain.network.spikeresponders.ShortTermPlasticity
 import org.simbrain.network.updaterules.IntegrateAndFireRule
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.util.SpikingScalarData
@@ -67,7 +67,7 @@ class PatternsOfActivity : Simulation {
         2.5, -2.5, 40.0, 40.0, 0.001,
         true
     )
-    private val spkR: SpikeResponder = UDF()
+    private val spkR: SpikeResponder = ShortTermPlasticity()
     private val quadrantDensity = 0.5
 
     private val rtQuad: MutableList<Neuron> = ArrayList()
@@ -119,9 +119,9 @@ class PatternsOfActivity : Simulation {
         buildNetwork(sensoryNetL, sensoryNetR, mouse)
 
         // Set up plots
-        addProjection(sensoryNetL, 8, 562, 1.0, "getActivations")
+        addProjection(sensoryNetL, 8, 562, 1.0, "getActivationArray")
         addProjection(recurrentNetwork, 368, 562, 24.0, "getSubsampledActivations")
-        addProjection(outputNeurons, 723, 562, .1, "getActivations")
+        addProjection(outputNeurons, 723, 562, .1, "getActivationArray")
     }
 
     private fun buildWorld(): OdorWorldEntity {
@@ -518,7 +518,7 @@ class PatternsOfActivity : Simulation {
         // Create projection component
 
         val pc = sim.addProjectionPlot(x, y, 362, 320, toPlot!!.label)
-        pc.projector.init()
+        pc.projector.initProjector()
         pc.projector.tolerance = tolerance
         pc.projector.coloringManager = MarkovColoringManager()
 

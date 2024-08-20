@@ -28,17 +28,6 @@ import org.simbrain.util.UserParameter
  * When a spike occurs the jump to a max value (the synaptic strength) and then decay to baseline value..
  */
 class JumpAndDecay : SpikeResponder() {
-    /**
-     * Jump height value.
-     */
-    @UserParameter(
-        label = "Jump Height",
-        description = "This value is multiplied by the strength to determine the total instantaneous rise in a"
-                + " post-synaptic response to an action potential or spike.",
-        increment = .1,
-        order = 1
-    )
-    var jumpHeight = 1.0
 
     /**
      * Base line value.
@@ -57,14 +46,23 @@ class JumpAndDecay : SpikeResponder() {
         description = "Time constant of decay (ms). Roughly the time it takes to decay to\n" +
                 "near-baseline. Larger time constants produce slower decay.",
         increment = .1,
+        minimumValue = 0.0,
         order = 3
     )
     var timeConstant = 3.0
 
+    @UserParameter(
+        label = "Use Convolution",
+        description = "If true the current spike response adds the psr from the previous iteration, which smoothes out the response.",
+        order = 4
+    )
+    var useConvolution = false
+
     override fun copy(): JumpAndDecay {
         val jad = JumpAndDecay()
+        jad.useConvolution = useConvolution
+        jad.spikeProbability = spikeProbability
         jad.baseLine = baseLine
-        jad.jumpHeight = jumpHeight
         jad.timeConstant = timeConstant
         return jad
     }
@@ -96,13 +94,14 @@ class JumpAndDecay : SpikeResponder() {
         )
     }
 
-    private fun jumpAndDecay(
+    context(Network)
+    fun jumpAndDecay(
         spiked: Boolean,
         psr: Double,
         jumpHeight: Double,
         timeStep: Double): Double {
-        return if (spiked) {
-            this.jumpHeight * jumpHeight
+        return if (spiked && probabilisticSpikeCheck()) {
+            jumpHeight + (if (useConvolution) psr else 0.0)
         } else {
             psr + timeStep * ((baseLine - psr) / timeConstant)
         }

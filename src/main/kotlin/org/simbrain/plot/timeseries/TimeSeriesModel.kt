@@ -28,8 +28,8 @@ import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
+import org.simbrain.workspace.Workspace
 import java.lang.reflect.InvocationTargetException
-import java.util.function.Supplier
 import javax.swing.SwingUtilities
 
 /**
@@ -41,7 +41,7 @@ import javax.swing.SwingUtilities
 class TimeSeriesModel : AttributeContainer, EditableObject {
 
     @Transient
-    lateinit var timeSupplier: Supplier<Int>
+    lateinit var timeSupplier: () -> Int
 
     /**
      * Time Series Data.
@@ -56,41 +56,29 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
     )
     var isAutoRange = true
 
-    /**
-     * When this is true the chart uses a fixed range, even though auto-range is on
-     * (this is true when the time series max value < fixedRangeThreshold)
-     */
-    var isUseFixedRangeWindow = false
-        private set(disableAutoRange) {
-            val oldValue = isUseFixedRangeWindow
-            field = disableAutoRange
-            if (oldValue != disableAutoRange) {
-                events.propertyChanged.fire()
-            }
-        }
-
-    var fixedRangeThreshold by GuiEditable(
-        initValue = 0.0,
-        label = "Fixed range threshold",
-        description = "When the time series values fall below this threshold a fixed range is used." +
-                " (use 0 to effectively disable this)",
-        conditionallyEnabledBy = TimeSeriesModel::isAutoRange,
-        order = 20
-    )
-
     var rangeUpperBound by GuiEditable(
         initValue = 1.0,
         label = "Range upper bound",
         description = "Range upper bound in fixed range mode (auto-range turned off)",
-        conditionallyEnabledBy = TimeSeriesModel::isUseFixedRangeWindow,
-        order = 30
+        onUpdate = { enableWidget(!widgetValue(TimeSeriesModel::isAutoRange)) },
+        order = 20
     )
 
     var rangeLowerBound by GuiEditable(
         initValue = 0.0,
         label = "Range lower bound",
         description = "Range lower bound in fixed range mode (auto-range turned off)",
-        conditionallyEnabledBy = TimeSeriesModel::isUseFixedRangeWindow,
+        onUpdate = { enableWidget(!widgetValue(TimeSeriesModel::isAutoRange)) },
+        order = 30
+    )
+
+    var useAutoRangeMinimumSize = false
+
+    var autoRangeMinimumSize by GuiEditable(
+        initValue = 1.0,
+        label = "Auto Range Minimum Size",
+        description = "Minimum size of the range when auto range is used",
+        useCheckboxFrom = TimeSeriesModel::useAutoRangeMinimumSize,
         order = 40
     )
 
@@ -117,7 +105,7 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
         label = "Window size",
         description = "Size of window when fixed width is used.",
         conditionallyEnabledBy = TimeSeriesModel::fixedWidth,
-        order = 40
+        order = 70
     )
 
     /**
@@ -128,7 +116,7 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
     /**
      * List of time series objects which can be coupled to.
      */
-    val timeSeriesList: MutableList<ScalarTimeSeries> = ArrayList()
+    val timeSeriesList: MutableList<TimeSeries> = ArrayList()
 
     @Transient
     var events = TimeSeriesEvents()
@@ -148,9 +136,9 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
      *
      * @param numSeries number of data sources to add to the plot.
      */
-    fun addScalarTimeSeries(numSeries: Int) {
+    fun addTimeSeries(numSeries: Int) {
         for (i in 0 until numSeries) {
-            addScalarTimeSeries()
+            addTimeSeries()
         }
     }
 
@@ -178,40 +166,41 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
         if (seriesIndex < dataset.seriesCount) {
             val currentSeries = dataset.getSeries(seriesIndex)
             currentSeries.add(time, value)
-            revalidateUseFixedRangeWindow(currentSeries.maxY)
         }
     }
 
     /**
-     * Adds a [ScalarTimeSeries] with a default description.
+     * Adds a [TimeSeries] with a default description.
      */
-    fun addScalarTimeSeries() {
+    fun addTimeSeries() {
         val description = "Series " + (timeSeriesList.size + 1)
-        addScalarTimeSeries(description)
+        addTimeSeries(description)
     }
 
     /**
-     * Adds a [ScalarTimeSeries] to the chart with a specified
+     * Adds a [TimeSeries] to the chart with a specified
      * description.
      *
      * @param description description for the time series
      * @return a reference to the series, or null if the model is in scalar mode
      */
-    fun addScalarTimeSeries(description: String): ScalarTimeSeries {
-        val sts = ScalarTimeSeries(addXYSeries(description))
+    fun addTimeSeries(description: String): TimeSeries {
+        val sts = TimeSeries(addXYSeries(description))
         timeSeriesList.add(sts)
-        events.scalarTimeSeriesAdded.fire(sts)
+        events.timeSeriesAdded.fire(sts)
         return sts
     }
 
     @Consumable
     fun setValues(array: DoubleArray) {
+        if (timeSeriesList.isEmpty()) {
+            addTimeSeries(array.size)
+        }
         var i = 0
         while (i < array.size && i < timeSeriesList.size) {
             timeSeriesList[i].setValue(array[i])
             i++
         }
-        revalidateUseFixedRangeWindow(dataset.getRangeUpperBound(false))
     }
 
     /**
@@ -226,12 +215,12 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
     }
 
     /**
-     * Remove all [ScalarTimeSeries] objects.
+     * Remove all [TimeSeries] objects.
      */
-    fun removeAllScalarTimeSeries() {
+    fun removeAllTimeSeries() {
         for (ts in timeSeriesList) {
             dataset.removeSeries(ts.series)
-            events.scalarTimeSeriesRemoved.fire(ts)
+            events.timeSeriesRemoved.fire(ts)
         }
         timeSeriesList.clear()
     }
@@ -241,23 +230,19 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
      *
      * @param ts the time series to remove.
      */
-    private fun removeTimeSeries(ts: ScalarTimeSeries) {
+    private fun removeTimeSeries(ts: TimeSeries) {
         dataset.removeSeries(ts.series)
         timeSeriesList.remove(ts)
-        events.scalarTimeSeriesRemoved.fire(ts)
+        events.timeSeriesRemoved.fire(ts)
     }
 
     /**
      * Removes the last data source from the chart.
      */
-    fun removeLastScalarTimeSeries() {
+    fun removeLastTimeSeries() {
         if (timeSeriesList.size > 0) {
             removeTimeSeries(timeSeriesList[timeSeriesList.size - 1])
         }
-    }
-
-    private fun revalidateUseFixedRangeWindow(maxValue: Double) {
-        isUseFixedRangeWindow = fixedRangeThreshold != 0.0 && maxValue < fixedRangeThreshold
     }
 
     /**
@@ -297,10 +282,10 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
                         reader.moveDown()
                         val series = context.convertAnother(reader.value, XYSeries::class.java) as XYSeries
                         withConstructedObject {
-                            val sts = ScalarTimeSeries(series)
+                            val sts = TimeSeries(series)
                             timeSeriesList.add(sts)
                             dataset.addSeries(sts.series)
-                            events.scalarTimeSeriesAdded.fire(sts)
+                            events.timeSeriesAdded.fire(sts)
                         }
                         reader.moveUp()
                     }
@@ -313,7 +298,7 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
     /**
      * Encapsulates a single time series for scalar couplings to attach to.
      */
-    inner class ScalarTimeSeries(
+    inner class TimeSeries(
         /**
          * The represented time series
          */
@@ -321,17 +306,17 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
     ) : AttributeContainer {
 
         /**
-         * Get the description.
+         * Label for the series
          */
-        val description: String
+        var description: String
             get() = series.description
+            set(value) {series.description = value}
 
         @Consumable
         fun setValue(value: Double) {
             try {
                 SwingUtilities.invokeAndWait {
-                    series.add(timeSupplier.get(), value as Number)
-                    revalidateUseFixedRangeWindow(series.maxY)
+                    series.add(timeSupplier(), value as Number)
                 }
             } catch (e: InterruptedException) {
                 e.printStackTrace()
@@ -344,4 +329,8 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
             get() = description
 
     }
+}
+
+fun Workspace.createTimeSeriesModel(): TimeSeriesModel {
+    return TimeSeriesModel()
 }

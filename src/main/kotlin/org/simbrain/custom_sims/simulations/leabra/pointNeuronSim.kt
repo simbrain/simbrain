@@ -1,8 +1,6 @@
 package org.simbrain.custom_sims.simulations
 
-import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.createControlPanel
-import org.simbrain.custom_sims.newSim
+import org.simbrain.custom_sims.*
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.updaterules.PointNeuronRule
@@ -40,23 +38,27 @@ val pointNeuronSim = newSim {
     }
     network.addNetworkModels(inputNeuron1, inputNeuron2, pointNeuron, weight1, weight2, usePlacementManager = false)
 
-    // TODO: Time Series
+    val (neuronPlot, voltageSeries) = addTimeSeries("Neuron plot", seriesNames = listOf("Voltage"))
+    with(couplingManager) {
+        pointNeuron couple voltageSeries
+    }
 
-    // Control Panel
     withGui {
-        place(networkComponent, 139, 10, 868, 619)
-        createControlPanel("Control Panel", 5, 10) {
+        place(networkComponent, 181, 15, 405, 400)
+        place(neuronPlot, 580, 15, 400, 400)
+        //createControlPanel("Control Panel", 5, 10) {
+        //
+        //    addButton("Excitatory Input") {
+        //        inputNeuron1.activation = 1.0
+        //        inputNeuron2.activation = 0.0
+        //        workspace.iterateSuspend(10)
+        //    }
+        //    addButton("Inhibitory Input") {
+        //        inputNeuron1.activation = 0.0
+        //        inputNeuron2.activation = 1.0
+        //        workspace.iterateSuspend(10)
+        //    }
+        //}
 
-            addButton("Excitatory Input") {
-                inputNeuron1.activation = 1.0
-                inputNeuron2.activation = 0.0
-                workspace.iterateSuspend(10)
-            }
-            addButton("Inhibitory Input") {
-                inputNeuron1.activation = 0.0
-                inputNeuron2.activation = 1.0
-                workspace.iterateSuspend(10)
-            }
-        }
     }
 }

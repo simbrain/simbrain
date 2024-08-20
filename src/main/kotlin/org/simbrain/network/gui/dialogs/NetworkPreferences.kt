@@ -60,4 +60,8 @@ object NetworkPreferences: PreferenceHolder() {
     @UserParameter(label = "Default learning rate", minimumValue = 0.0, increment = .1, tab = "Model")
     var defaultLearningRate by DoublePreference(.1)
 
+    // Not currently exposing this with a user parameter since it's more of a convenience to remember between uses
+    // of certain iteration dialogs.
+    var numberOfIterations by IntegerPreference(10)
+
 }

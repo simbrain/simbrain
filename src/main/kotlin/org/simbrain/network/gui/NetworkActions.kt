@@ -7,10 +7,13 @@ import org.simbrain.network.core.Network.Randomizers.excitatoryRandomizer
 import org.simbrain.network.core.Network.Randomizers.inhibitoryRandomizer
 import org.simbrain.network.core.Network.Randomizers.weightRandomizer
 import org.simbrain.network.gui.ConditionallyEnabledAction.EnablingCondition
-import org.simbrain.network.gui.dialogs.*
+import org.simbrain.network.gui.dialogs.NetworkPreferences
+import org.simbrain.network.gui.dialogs.createSynapseAdjustmentPanel
+import org.simbrain.network.gui.dialogs.createTestInputPanel
 import org.simbrain.network.gui.dialogs.layout.LayoutDialog
 import org.simbrain.network.gui.dialogs.network.*
 import org.simbrain.network.gui.dialogs.neuron.AddNeuronsDialog.createAddNeuronsDialog
+import org.simbrain.network.gui.dialogs.showSRNCreationDialog
 import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.neurongroups.BasicNeuronGroupParams
@@ -22,6 +25,8 @@ import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.propertyeditor.objectWrapper
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
+import org.simbrain.workspace.couplings.getProducer
+import org.simbrain.workspace.gui.SimbrainDesktop
 import java.awt.event.KeyEvent
 import javax.swing.AbstractAction
 import javax.swing.Action
@@ -94,6 +99,14 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         iconPath = "menu_icons/Paste.png"
     ) {
         paste()
+    }
+    val duplicateAction = networkPanel.createAction(
+        name = "Duplicate",
+        description = "Duplicate selected neurons, (connected) synapses, and neuron groups",
+        keyboardShortcut = CmdOrCtrl + 'D',
+        iconPath = "menu_icons/Copy.png"
+    ) {
+        duplicate()
     }
     val addNeuronArrayAction = networkPanel.createAction(
         name = "Add Neuron Array...",
@@ -338,6 +351,14 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         spaceVertical()
     }
 
+    fun List<Neuron>.createCoupleActivationToTimeSeriesAction() = SimbrainDesktop.actionManager.createCoupledTimeSeriesPlotAction(
+        producers = map { it.getProducer(Neuron::activation) },
+    )
+
+    fun List<Synapse>.createCoupleWeightToTimeSeriesAction() = SimbrainDesktop.actionManager.createCoupledTimeSeriesPlotAction(
+        producers = map { it.getProducer(Synapse::strength) },
+    )
+
     val testInputAction = networkPanel.createConditionallyEnabledAction(
         name = "Create Input Table...",
         description = "Create a table whose rows provide input to selected neurons",
@@ -455,14 +476,6 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         }
     }
 
-    val addSmileClassifier = networkPanel.createAction(
-        name = "Add Smile Classifier...",
-        description = "Create a new Smile classifier",
-        keyboardShortcut = CmdOrCtrl + Shift + 'S'
-    ) {
-        showClassifierCreationDialog()
-    }
-
     val connectSelectedModels = networkPanel.createAction(
         name = "Connect selected objects...",
         description = "Creates synapse, weight matrix, etc. between selected source and target entities",
@@ -486,7 +499,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val addGroupAction = addNeuronGroupAction()
 
     val clipboardActions
-        get() = listOf(copyAction, cutAction, pasteAction)
+        get() = listOf(copyAction, cutAction, pasteAction, duplicateAction)
 
     val networkEditingActions
         get() = listOf(newNeuronAction, deleteAction)
@@ -554,10 +567,10 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val newNetworkActions
         get() = listOf(
             addSubnetAction("Backprop") { BackpropCreationDialog(networkPanel) },
+            createAction("Classifier") { networkPanel.showClassifierCreationDialog() },
             addSubnetAction("Competitive Network") { CompetitiveCreationDialog(networkPanel) },
             addSubnetAction("Feed Forward Network") { FeedForwardCreationDialog(networkPanel) },
             addSubnetAction("Hopfield") { HopfieldCreationDialog(networkPanel) },
-            addSubnetAction("LMS (Least Mean Squares)") { networkPanel.showLMSCreationDialog() },
             addSubnetAction("Restricted Boltzmann Machine") {
                 // TODO: As this pattern is reused add a util to NetworkDialogs.kt
                 RestrictedBoltzmannMachine.RBMCreator().createEditorDialog {
@@ -747,9 +760,11 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         networkPanel.showTextPropertyDialog(textNodes)
     }
 
+    // Note that zoom to fit page is handled in NetworkPanel.createMainToolBar()
+
     fun resetZoomAction() = networkPanel.createAction(
         "Reset Zoom",
-        iconPath = "menu_icons/ZoomFitPage.png",
+        iconPath = "menu_icons/ZoomReset.png",
         keyboardShortcut = CmdOrCtrl + KeyEvent.VK_0
     ) {
         scalingFactor = 1.0

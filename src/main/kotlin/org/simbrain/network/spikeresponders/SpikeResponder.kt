@@ -27,6 +27,7 @@ import org.simbrain.network.util.EmptyScalarData
 import org.simbrain.network.util.MatrixDataHolder
 import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.util.propertyeditor.CopyableObject
+import org.simbrain.util.propertyeditor.GuiEditable
 import java.util.*
 
 /**
@@ -34,6 +35,27 @@ import java.util.*
  * as input to the post-synaptic neuron.
  */
 abstract class SpikeResponder : CopyableObject {
+
+
+    /**
+     * If true, only spike with some probability specified by [spikeProbability]
+     */
+    var useSpikeProbability = false
+
+    var spikeProbability by GuiEditable(
+        initValue = 1.0,
+        description = "Probability of spiking; must be between 0 and 1.",
+        min = 0.0,
+        max = 1.0,
+        increment = 0.1,
+        order = 1,
+        useCheckboxFrom = SpikeResponder::useSpikeProbability,
+        setter = { value ->
+            useSpikeProbability = value != 1.0
+            field = value.coerceIn(0.0, 1.0)
+        }
+    )
+
     override fun getTypeList(): List<Class<out CopyableObject?>>? {
         return responderList
     }
@@ -54,6 +76,11 @@ abstract class SpikeResponder : CopyableObject {
      */
     context(Network)
     open fun apply(connector: Connector, responderData: MatrixDataHolder) {}
+
+    context(Network)
+    fun probabilisticSpikeCheck(): Boolean {
+        return !useSpikeProbability || random.nextDouble() < spikeProbability
+    }
 
     /**
      * Override to return an appropriate data holder for a given responder.
@@ -94,6 +121,5 @@ abstract class SpikeResponder : CopyableObject {
  */
 var responderList: List<Class<out CopyableObject?>> = listOf<Class<out CopyableObject?>>(
     NonResponder::class.java, JumpAndDecay::class.java,
-    ConvolvedJumpAndDecay::class.java, ProbabilisticResponder::class.java,
-    RiseAndDecay::class.java, StepResponder::class.java, UDF::class.java
+    RiseAndDecay::class.java, StepResponder::class.java, ShortTermPlasticity::class.java
 )

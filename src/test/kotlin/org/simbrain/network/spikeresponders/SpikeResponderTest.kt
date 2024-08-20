@@ -1,9 +1,12 @@
-package org.simbrain.network.core
+package org.simbrain.network.spikeresponders
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.simbrain.network.spikeresponders.*
+import org.simbrain.network.core.Network
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.Synapse
 import org.simbrain.network.updaterules.SpikingThresholdRule
+import org.simbrain.util.getSimbrainXStream
 
 class SpikeResponderTest {
 
@@ -23,7 +26,6 @@ class SpikeResponderTest {
         val step = StepResponder()
         val newResponder: StepResponder = step.copy() as StepResponder
         assertEquals(step.responseDuration, newResponder.responseDuration)
-        assertEquals(step.responseHeight, newResponder.responseHeight)
     }
 
     @Test
@@ -45,7 +47,7 @@ class SpikeResponderTest {
     fun `step responder produces correct height and duration `() {
 
         val step = StepResponder()
-        step.responseHeight = .75
+        s2.strength = .75
         step.responseDuration = 3
         s2.spikeResponder = step
 
@@ -54,14 +56,14 @@ class SpikeResponderTest {
         assertEquals(0.0, s2.psr)
         assertEquals(0.0, n3.activation)
         net.update()
-        assertEquals(step.responseHeight, s2.psr)
-        assertEquals(step.responseHeight, n3.activation)
+        assertEquals(s2.strength, s2.psr)
+        assertEquals(s2.strength, n3.activation)
         net.update()
-        assertEquals(step.responseHeight, s2.psr)
-        assertEquals(step.responseHeight, n3.activation)
+        assertEquals(s2.strength, s2.psr)
+        assertEquals(s2.strength, n3.activation)
         net.update()
-        assertEquals(step.responseHeight, s2.psr)
-        assertEquals(step.responseHeight, n3.activation)
+        assertEquals(s2.strength, s2.psr)
+        assertEquals(s2.strength, n3.activation)
         net.update()
         assertEquals(0.0, s2.psr)
         assertEquals(0.0, n3.activation)
@@ -70,7 +72,7 @@ class SpikeResponderTest {
     @Test
     fun `test jump and decay`() {
         val jd = JumpAndDecay()
-        jd.jumpHeight = 4.0
+        s2.strength = 4.0
         jd.baseLine = 2.0
         jd.timeConstant = .15
         s2.spikeResponder = jd
@@ -101,16 +103,17 @@ class SpikeResponderTest {
     }
 
     @Test
-    fun `test probabalistic responder`() {
-        val pr = ProbabilisticResponder()
-        pr.activationProbability = 1.0
+    fun `test probabilistic response`() {
+        val pr = StepResponder()
+        pr.responseDuration = 1
+        pr.spikeProbability = 1.0
         s2.spikeResponder = pr
         s2.strength = .5
         n1.activation = 1.0
         net.update()
         net.update()
         assertEquals(.5, n3.activation)
-        pr.activationProbability = 0.0
+        pr.spikeProbability = 0.0
         n1.activation = 1.0
         net.update()
         net.update()
@@ -119,8 +122,8 @@ class SpikeResponderTest {
 
     @Test
     fun `test probabalistic responder with negative weight`() {
-        val pr = ProbabilisticResponder()
-        pr.activationProbability = 1.0
+        val pr = JumpAndDecay()
+        pr.spikeProbability = 1.0
         s2.spikeResponder = pr
         s2.strength = -.5
         n1.activation = 1.0
@@ -154,7 +157,9 @@ class SpikeResponderTest {
 
     @Test
     fun `test convolved jump and decay`() {
-        val cjd = ConvolvedJumpAndDecay()
+        val cjd = JumpAndDecay().apply {
+            useConvolution = true
+        }
         s2.spikeResponder = cjd
         s2.strength = .5
         n1.activation = 1.0
@@ -177,11 +182,10 @@ class SpikeResponderTest {
         assertEquals(0.2, n3.activation)
     }
 
-
     @Test
-    fun `test UDF`() {
-        val udf = UDF()
-        s2.spikeResponder = udf
+    fun `test ShortTermPlasticity`() {
+        val shortTermPlasticity = ShortTermPlasticity()
+        s2.spikeResponder = shortTermPlasticity
         n1.activation = 1.0
         net.update()
         net.update()
@@ -201,4 +205,25 @@ class SpikeResponderTest {
         println(n3)
     }
 
+    @Test
+    fun `test short term plasticity xml representation`() {
+        val shortTermPlasticity = ShortTermPlasticity().apply {
+            U = 0.5
+            D = 1100.0
+            F = 50.0
+        }
+        s2.spikeResponder = shortTermPlasticity
+        n1.activation = 1.0
+        net.update()
+
+        val xml = getSimbrainXStream().toXML(s2)
+
+        val synapse = getSimbrainXStream().fromXML(xml) as Synapse
+        val deserializedShortTermPlasticity = synapse.spikeResponder as ShortTermPlasticity
+
+        assertEquals(shortTermPlasticity.U, deserializedShortTermPlasticity.U)
+        assertEquals(shortTermPlasticity.D, deserializedShortTermPlasticity.D)
+        assertEquals(shortTermPlasticity.F, deserializedShortTermPlasticity.F)
+
+    }
 }

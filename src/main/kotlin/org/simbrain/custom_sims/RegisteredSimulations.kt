@@ -6,7 +6,7 @@ import org.simbrain.custom_sims.simulations.behaviorism.OperantConditioning
 import org.simbrain.custom_sims.simulations.behaviorism.SimpleOperant
 import org.simbrain.custom_sims.simulations.behaviorism.operantWithEnvironment
 import org.simbrain.custom_sims.simulations.braitenberg.RandomizedPursuer
-import org.simbrain.custom_sims.simulations.cortex.cortexSimple
+import org.simbrain.custom_sims.simulations.neuroscience.cortexSimple
 import org.simbrain.custom_sims.simulations.demos.competitiveSim
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaosBitStream
@@ -35,13 +35,20 @@ val simulations = dir("Simulations", alphabetical = true ) {
     //     item("3. Recurrent Hebb") { hebbianAssociator }
     // }
 
-    dir("RL") {
+    dir("Reinforcement Learning") {
         item("Actor Critic") { actorCritic }
     }
+
+    dir("Backprop") {
+        item("Three Layer") { backpropSim }
+        item("Softmax") { softmaxSim }
+    }
+
     dir("Braitenberg") {
         item("Isopod Simulation") { isopodSim }
         item("Braitenberg") { braitenbergSim }
     }
+
     dir("Reservoir") {
         item("Binary Reservoir") { binaryReservoir }
         item("Edge Of Chaos") { EdgeOfChaos() }
@@ -71,7 +78,9 @@ val simulations = dir("Simulations", alphabetical = true ) {
     }
 
     dir("Neuroscience") {
-        item("Spiking Neuron") { spikingNetwork }
+        item("Spiking Neuron") { spikingNeuron }
+        item("Spike Responders") { spikeResponderSim }
+        item("Spike Responders (Array)") { spikeResponderSimArray }
         item("Cortical areas") { cortexKuramoto }
         // item("Hippocampus") { Hippocampus() }
         // item("Cerebellum") { Cerebellum() }

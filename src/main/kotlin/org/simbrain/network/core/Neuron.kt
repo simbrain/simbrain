@@ -117,8 +117,6 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
     )
     var increment: Double = 0.1
 
-    private var _isSpike = false
-
     /**
      * Whether or not this neuron has spiked. Specifically if the result of
      * integration of a spiking neuron update rule at time t, produced an action
@@ -127,12 +125,9 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
      */
     context(Network)
     var isSpike: Boolean
-        get() = _isSpike
+        get() = (dataHolder as? SpikingScalarData)?.spiked ?: false
         set(spike) {
-            _isSpike = spike
-            if (dataHolder is SpikingScalarData) {
-                (dataHolder as SpikingScalarData).setHasSpiked(spike, time)
-            }
+            (dataHolder as? SpikingScalarData)?.setHasSpiked(spike)
             events.spiked.fire(spike)
         }
 
@@ -238,6 +233,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
     var dataHolder: ScalarDataHolder by GuiEditable(
         initValue = updateRule.createScalarData(),
         label = "State variables",
+        showDetails = false,
         order = 100,
         onUpdate = {
             val proposedDataHolder = widgetValue(::updateRule).createScalarData()
@@ -506,7 +502,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
     override fun clear() {
         input = 0.0
         activation = 0.0
-        updateRule.clear(this)
+        dataHolder.clear()
     }
 
     fun clearInput() {

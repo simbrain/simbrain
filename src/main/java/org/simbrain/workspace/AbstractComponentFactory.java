@@ -88,7 +88,13 @@ public class AbstractComponentFactory {
         putWorkspaceComponentFactory("Projection Plot", () -> new ProjectionComponent(""));
         putGuiComponentFactory(ProjectionComponent.class, ProjectionDesktopComponent::new);
 
-        putWorkspaceComponentFactory("Time Series", () -> new TimeSeriesPlotComponent(""));
+        putWorkspaceComponentFactory("Time Series", () -> {
+            var plot = new TimeSeriesPlotComponent("");
+            for (int i = 0; i < 3; i++) {
+                plot.getModel().addTimeSeries();
+            }
+            return plot;
+        });
         putGuiComponentFactory(TimeSeriesPlotComponent.class, TimeSeriesDesktopComponent::new);
 
         putWorkspaceComponentFactory("Raster Plot", () -> new RasterPlotComponent(""));

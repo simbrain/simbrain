@@ -1,10 +1,10 @@
-package org.simbrain.network.core
+package org.simbrain.network.spikeresponders
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import org.simbrain.network.spikeresponders.NonResponder
-import org.simbrain.network.spikeresponders.ProbabilisticResponder
-import org.simbrain.network.spikeresponders.StepResponder
+import org.simbrain.network.core.Network
+import org.simbrain.network.core.NeuronArray
+import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.updaterules.IntegrateAndFireRule
 import org.simbrain.network.updaterules.SpikingThresholdRule
 import org.simbrain.network.util.SpikingMatrixData
@@ -62,17 +62,18 @@ class SpikeResponderMatrixTest {
     }
 
     @Test
-    fun `test probabilistic responder`() {
+    fun `test probabilistic response`() {
 
-        val pr = ProbabilisticResponder()
-        pr.activationProbability = 1.0
+        val pr = StepResponder()
+        pr.responseDuration = 1
+        pr.spikeProbability = 1.0
         wm2.spikeResponder = pr
         n1.activations = Matrix.column(doubleArrayOf(1.0, 1.0))
         net.update()
         net.update() // extra update to propagate from layer 1 to 2
         assertArrayEquals(doubleArrayOf(1.0, -1.0, 1.0), n3.activationArray)
 
-        pr.activationProbability = 0.0
+        pr.spikeProbability = 0.0
         n1.activations = Matrix.column(doubleArrayOf(1.0, 1.0))
         net.update()
         net.update()
@@ -86,7 +87,7 @@ class SpikeResponderMatrixTest {
         val step = StepResponder()
         wm2.spikeResponder = step
 
-        step.responseHeight = .5
+        wm2.weightMatrix.mul(0.5)
         step.responseDuration = 3
 
         n1.activations = Matrix.column(doubleArrayOf(1.0, 0.0))
@@ -115,7 +116,6 @@ class SpikeResponderMatrixTest {
         val step = StepResponder()
         wm2.spikeResponder = step
 
-        step.responseHeight = 1.0
         step.responseDuration = 2
 
         n1.activations = Matrix.column(doubleArrayOf(1.0, 1.0))

@@ -90,6 +90,35 @@ val hopfieldSim = newSim {
         }
     }
 
+    val docViewer = addDocViewer(
+        "Hopfield Network",
+        """ 
+            # Introduction
+            
+            [Hopfield networks](https://en.wikipedia.org/wiki/Hopfield_network) are recurent networks often used for pattern recognition and to model memory retrieval. In this simulation you can test the network's ability to store patterns
+            
+            # Training on One pattern
+            
+            - Select one of the six training patterns on the button panel. 
+            - Press the train button to train the network on that pattern. Each time you press "train" it will "burn in" the pattern further.
+            - Note that it will learn both the pattern and its anti-pattern.
+            - To confirm the pattern is remembered, try randomzing the network with `N -> R` and then iterating by pressing space to see if the pattern is recreated.
+            - You can also manually create part of the pattern you trained the network and see if it can recreate it.
+            
+            # Training on Multiple patterns
+            
+            - Hopfield networks have a memory capacity of about 14% of the number of nodes. In this case about 8 memories. However those memories need to be sufficiently distinct.  So the network should be able to learn all 6 patterns, but you must very carefully train it on them, clickin the pattern, and then pressing train a certain number of times.
+            
+            # Other things to observe
+            
+            When you iterate the network it tends to go to lower energy states.      
+        
+        """.trimIndent()
+    )
+    withGui {
+        place(docViewer, 812, 10, 542, 627)
+    }
+
     // // Location of the projection in the desktop
     // val projectionPlot = addProjectionPlot2("Activations")
     // withGui {

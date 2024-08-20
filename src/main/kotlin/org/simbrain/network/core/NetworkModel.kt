@@ -26,9 +26,6 @@ abstract class NetworkModel {
         set(label) {
             val oldLabel = this.label
             field = label
-            if (this.label == null) {
-                field = ""
-            }
             events.labelChanged.fire(oldLabel, this.label)
         }
 

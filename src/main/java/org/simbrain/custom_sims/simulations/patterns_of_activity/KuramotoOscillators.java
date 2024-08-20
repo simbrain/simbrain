@@ -196,7 +196,7 @@ public class KuramotoOscillators extends Simulation {
         plot = sim.addProjectionPlot2(858, 12, 460, 437,"Cognitive Map");
         plot.getProjector().setTolerance(20);
         //plot.getProjector().setUseColorManager(false);
-        Producer inputProducer = sim.getProducer(reservoirNet, "getActivations");
+        Producer inputProducer = sim.getProducer(reservoirNet, "getActivationArray");
         Consumer plotConsumer = sim.getConsumer(plot, "addPoint");
         sim.couple(inputProducer, plotConsumer);
 

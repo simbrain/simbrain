@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
-import org.simbrain.network.subnetworks.LMSNetwork
 import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.util.rowVectorTransposed
 import org.simbrain.util.toDoubleArray
@@ -53,19 +52,6 @@ class TrainingUtilsTest {
     }
 
     @Test
-    fun `test weight lms weight updates`() {
-        val outputError = Matrix(3,1, 2.0)
-        na1.setActivations(doubleArrayOf(-1.0, 1.0))
-        // outputError * na1.activations + wm2.weights
-        wm1.applyLMS(outputError, 1.0)
-        // Col 1 = -1, -2, -2
-        // Col 2 = 2, 3, 2
-        // println(wm1.weightMatrix)
-        assertArrayEquals(doubleArrayOf(-1.0, -2.0, -2.0), wm1.weightMatrix.col(0) )
-        assertArrayEquals(doubleArrayOf(2.0, 3.0, 2.0), wm1.weightMatrix.col(1) )
-    }
-
-    @Test
     fun `test forward pass`() {
         val inputs = Matrix.column(doubleArrayOf(-1.0, 1.0))
         with(net) {
@@ -73,38 +59,6 @@ class TrainingUtilsTest {
             listOf(wm1, wm2).printActivationsAndWeights(true)
         }
         assertArrayEquals(inputs.toDoubleArray(), wm2.target.activations.toDoubleArray())
-    }
-
-
-    @Test
-    fun `test lms`() {
-        na1.setActivations(doubleArrayOf(-1.0, 1.0))
-        val target = doubleArrayOf(5.0, -1.0, .5)
-        na2.setActivations(target)
-        // println("Before: ${wm1.output}")
-        with(net) {
-            repeat(100) {
-                wm1.trainCurrentOutputLMS()
-            }
-            // println("Outputs: ${wm1.output}")
-            // println("Biases: ${wm1.tar.dataHolder as BiasedMatrixData}")
-            assertArrayEquals(target, wm1.getSummedPSRs(), .01)
-        }
-    }
-
-
-    @Test
-    fun `test lms in a feed forward net`() {
-        val ff = LMSNetwork(5, 5)
-        val target =  ff.trainingSet.targets.rowVectorTransposed(1)
-
-        ff.inputLayer.isClamped = true
-        ff.inputLayer.setActivations(ff.trainingSet.inputs.row(1))
-        with(net) { ff.update() }
-        val outputs = ff.outputLayer.activations
-        val error = target.sub(outputs)
-        // TODO: Make an actual test; this was just to recreate a crash
-        ff.weightMatrix.applyLMS(error, .1)
     }
 
     @Test

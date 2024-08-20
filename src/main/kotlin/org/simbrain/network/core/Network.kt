@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.ln
+import kotlin.random.Random
 
 /**
  * Constant value for Math.log(10); used to approximate log 10.
@@ -81,9 +82,7 @@ class Network: CoroutineScope, EditableObject {
      * In iterations or msec.
      */
     var time = 0.0
-        private set(i) {
-            field = i
-        }
+        private set
 
     /**
      * Time step.
@@ -145,6 +144,16 @@ class Network: CoroutineScope, EditableObject {
      * added before synapses which refer to them.
      */
     val modelsInReconstructionOrder get() = networkModels.allInUpdatingOrder
+
+    var randomSeed = Random.nextLong()
+        set(value) {
+            field = value
+            random = Random(value)
+        }
+
+    @Transient
+    var random = Random(randomSeed)
+        private set
 
     private var shouldUpdateTimeType = true
 
@@ -500,7 +509,7 @@ class Network: CoroutineScope, EditableObject {
             showDetails = false,
             order = 10
         )
-        var weightRandomizer: ProbabilityDistribution = UniformRealDistribution(-1.0, 1.0)
+        var weightRandomizer: ProbabilityDistribution = NormalDistribution(0.0, 0.1)
 
         @UserParameter(
             label = "Excitatory Randomizer",

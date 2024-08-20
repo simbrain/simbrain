@@ -23,7 +23,7 @@ class APETestObjectKotlin: EditableObject {
         tab = "Test Tab"
     )
 
-    @UserParameter(label = "Annotated Int", description = "Annotated Int Description", tab = "Test Tab", order = 10)
+    @UserParameter(label = "Annotated Int", description = "Annotated Int Description", minimumValue = -2.0, maximumValue = 3.0, tab = "Test Tab", order = 10)
     var annotatedInt = 1
 
     @UserParameter(label = "Annotated Nullable String", description = "Annotated Nullable String Description", tab = "Test Tab", order = 11)
@@ -75,6 +75,8 @@ class APETestObjectKotlin: EditableObject {
 
     var testDouble by GuiEditable(
         initValue = 1.3,
+        min = -3.1415926535,
+        max = 3.1415926535,
         order = 50
     )
 

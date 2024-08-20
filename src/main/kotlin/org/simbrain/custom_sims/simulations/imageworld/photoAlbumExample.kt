@@ -35,7 +35,7 @@ val photoAlbumExample = newSim {
     with(couplingManager) {
         createCoupling(
             imageWorld.filterCollection.currentFilter.getProducer(imageWorld.filterCollection.currentFilter::getBrightness),
-            inputArray.getConsumer(inputArray::activations)
+            inputArray.getConsumer(inputArray::setActivations)
         )
     }
 

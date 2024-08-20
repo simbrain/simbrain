@@ -21,10 +21,12 @@ package org.simbrain.network.gui.nodes.subnetworkNodes
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.dialogs.createTrainOnPatternAction
 import org.simbrain.network.gui.dialogs.getUnsupervisedTrainingPanel
+import org.simbrain.network.gui.dialogs.makeTrainerPanel
 import org.simbrain.network.gui.nodes.SubnetworkNode
 import org.simbrain.network.subnetworks.CompetitiveNetwork
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.createAction
+import org.simbrain.workspace.gui.CouplingMenu
 import javax.swing.JPopupMenu
 
 /**
@@ -32,27 +34,18 @@ import javax.swing.JPopupMenu
  *
  * @author Jeff Yoshimi
  */
-class CompetitiveNetworkNode(networkPanel: NetworkPanel, val competitiveNetwork: CompetitiveNetwork)
-    : SubnetworkNode(networkPanel, competitiveNetwork) {
+class CompetitiveNetworkNode(networkPanel: NetworkPanel, val competitiveNet: CompetitiveNetwork)
+    : SubnetworkNode(networkPanel, competitiveNet) {
 
     override val contextMenu: JPopupMenu
         get() = JPopupMenu().apply {
-            add(createEditAction("Edit / Train Competitive..."))
-            addDefaultSubnetActions()
+            with(networkPanel) {
+                applyUnsupervisedActions(competitiveNet)
+            }
             addSeparator()
-            add(with(networkPanel.network) { competitiveNetwork.createTrainOnPatternAction() })
-            addSeparator()
-            add(createAction("Randomize synapses") {
-                competitiveNetwork.randomize()
-            })
+            add(CouplingMenu(networkPanel.networkComponent, competitiveNet))
         }
-
-    private fun makeTrainerPanel() = with(networkPanel) {
-        getUnsupervisedTrainingPanel(competitiveNetwork) {
-            competitiveNetwork.trainOnCurrentPattern()
-        }
-    }
 
     override val propertyDialog: StandardDialog
-        get() = makeTrainerPanel()
+        get() = with(networkPanel) {competitiveNet.makeTrainerPanel()}
 }

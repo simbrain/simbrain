@@ -1,10 +1,8 @@
 package org.simbrain.network.util
 
-import org.simbrain.util.UserParameter
-import org.simbrain.util.Utils
-import org.simbrain.util.copyFrom
+import org.simbrain.network.core.Network
+import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.CopyableObject
-import org.simbrain.util.toDoubleArray
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Producible
 import smile.math.matrix.Matrix
@@ -15,6 +13,7 @@ import java.util.*
  */
 interface MatrixDataHolder : CopyableObject {
     override fun copy(): MatrixDataHolder
+    fun clear() {}
 }
 
 object EmptyMatrixData : MatrixDataHolder {
@@ -46,27 +45,33 @@ class BiasedMatrixData(var size: Int) : MatrixDataHolder, AttributeContainer {
 }
 
 open class SpikingMatrixData(val size: Int) : MatrixDataHolder {
+
     @UserParameter(label = "Spikes", description = "Spikes for each neuron")
-    var spikes = BooleanArray(size) // TODO: Possibly use int Smile array of binary ints for perf
-        private set
+    var spikes = BooleanArray(size) { false }
+
     @UserParameter(label = "Last Spike Times", description = "Time of last spike for each neuron")
     var lastSpikeTimes = DoubleArray(size) { Double.NEGATIVE_INFINITY }
+
     override fun copy() = SpikingMatrixData(size).also {
-        it.spikes = spikes.copyOf()
-        it.lastSpikeTimes = lastSpikeTimes.copyOf()
+        commonCopy(it)
     }
 
     fun commonCopy(toCopy: SpikingMatrixData) {
-        toCopy.spikes = spikes.copyOf()
-        toCopy.lastSpikeTimes = lastSpikeTimes.copyOf()
+        spikes.copyInto(toCopy.spikes)
+        lastSpikeTimes.copyInto(toCopy.lastSpikeTimes)
     }
 
-    fun setHasSpiked(i: Int, hasSpiked: Boolean, networkTime: Double) {
+    context(Network)
+    fun setHasSpiked(i: Int, hasSpiked: Boolean) {
         spikes[i] = hasSpiked
         if (hasSpiked) {
-            lastSpikeTimes[i] = networkTime
+            lastSpikeTimes[i] = time
         }
+    }
 
+    context(Network)
+    fun setHasSpiked(spikes: BooleanArray) {
+        spikes.forEachIndexed { index, hasSpiked -> setHasSpiked(index, hasSpiked) }
     }
 }
 
@@ -75,12 +80,16 @@ open class SpikingMatrixData(val size: Int) : MatrixDataHolder {
  */
 interface ScalarDataHolder : CopyableObject {
     override fun copy(): ScalarDataHolder
+    fun clear() {}
 }
 
 object EmptyScalarData : ScalarDataHolder {
     override fun copy(): EmptyScalarData {
         return this
     }
+
+    override fun clear() {}
+
     override fun toString(): String = ""
 }
 
@@ -110,14 +119,16 @@ open class SpikingScalarData(
     /**
      * Indicate a spike occurred, and if it has, set the last spike time.
      */
-    fun setHasSpiked(hasSpiked: Boolean, networkTime: Double) {
+    context(Network)
+    fun setHasSpiked(hasSpiked: Boolean) {
         spiked = hasSpiked
         if (spiked) {
-            lastSpikeTime = networkTime
+            lastSpikeTime = time
         }
     }
 
     override fun copy(): SpikingScalarData {
         return SpikingScalarData(spiked, lastSpikeTime)
     }
+
 }

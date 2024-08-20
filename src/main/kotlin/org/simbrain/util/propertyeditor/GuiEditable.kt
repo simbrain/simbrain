@@ -452,35 +452,35 @@ class NumericWidget<O : EditableObject, T>(
         val step = parameter.increment ?: defaultStepSize as T
 
         val model = when (type) {
-            Int::class -> SpinnerNumberModel(
+            Int::class -> CustomSpinnerNumberModel(
                 parameter.value as Int,
                 parameter.min as Int?,
                 parameter.max as Int?,
                 step as Int
             )
 
-            Short::class -> SpinnerNumberModel(
+            Short::class -> CustomSpinnerNumberModel(
                 parameter.value as Short,
                 parameter.min as Short?,
                 parameter.max as Short?,
                 step as Short
             )
 
-            Long::class -> SpinnerNumberModel(
+            Long::class -> CustomSpinnerNumberModel(
                 parameter.value as Long,
                 parameter.min as Long?,
                 parameter.max as Long?,
                 step as Long
             )
 
-            Float::class -> SpinnerNumberModel(
+            Float::class -> CustomSpinnerNumberModel(
                 parameter.value as Float,
                 parameter.min as Float?,
                 parameter.max as Float?,
                 step as Float
             )
 
-            Double::class -> SpinnerNumberModel(
+            Double::class -> CustomSpinnerNumberModel(
                 parameter.value as Double,
                 parameter.min as Double?,
                 parameter.max as Double?,
@@ -496,6 +496,8 @@ class NumericWidget<O : EditableObject, T>(
                 NumberFormat.getNumberInstance(it.getLocale()).apply { maximumFractionDigits = 12 }
             } as DecimalFormat
             val formatterEditor = NumberFormatter(format)
+            formatterEditor.minimum = parameter.min as Comparable<T>?
+            formatterEditor.maximum = parameter.max as Comparable<T>?
             formatterEditor.valueClass = type.javaObjectType
             val factory = DefaultFormatterFactory(formatterEditor)
             val ftf: JFormattedTextField = (it.editor as JSpinner.DefaultEditor).textField
@@ -506,11 +508,22 @@ class NumericWidget<O : EditableObject, T>(
             if (!isConsistent) {
                 (it.editor as JSpinner.DefaultEditor).textField?.text = NULL_STRING
             }
+            (it.editor as JSpinner.DefaultEditor).textField?.text = parameter.value.toString()
             ftf.addFocusListener(object : FocusAdapter() {
+                val defaultBorder = ftf.border
                 override fun focusLost(e: FocusEvent) {
-                    if (ftf.isValid) {
+                    super.focusLost(e)
+                    if (ftf.isEditValid) {
+                        ftf.border = defaultBorder
                         ftf.commitEdit()
+                    } else {
+                        ftf.border = BorderFactory.createEtchedBorder(Color.WHITE, Color.RED)
                     }
+                }
+
+                override fun focusGained(e: FocusEvent?) {
+                    super.focusGained(e)
+                    ftf.border = defaultBorder
                 }
             })
         }.also {
@@ -536,6 +549,37 @@ class NumericWidget<O : EditableObject, T>(
                 widget.isVisible = visible
             }
         ))
+    }
+
+    class CustomSpinnerNumberModel<T>(number: T, minimum: T?, maximum: T?, stepSize: T) : SpinnerNumberModel(number.coerceIn(minimum, maximum), minimum, maximum, stepSize) where T : Number, T : Comparable<T>{
+        override fun getNextValue(): T {
+            return incrValue(1)
+        }
+
+        override fun getPreviousValue(): T {
+            return incrValue(-1)
+        }
+
+        private fun incrValue(dir: Int): T {
+            val newValue = (value as Number).toDouble() + dir * stepSize.toDouble()
+
+            maximum?.let {
+                if (newValue > (it as Number).toDouble()) {
+                    @Suppress("UNCHECKED_CAST")
+                    return it as T
+                }
+            }
+
+            minimum?.let {
+                if (newValue < (it as Number).toDouble()) {
+                    @Suppress("UNCHECKED_CAST")
+                    return it as T
+                }
+            }
+
+            @Suppress("UNCHECKED_CAST")
+            return newValue as T
+        }
     }
 
 }
@@ -911,8 +955,7 @@ class ObjectWidget<O : EditableObject, T : CopyableObject>(
         }
     }
 
-    override val widget = JPanel().apply {
-        this.add(Box.createRigidArea(Dimension(0, 5)))
+    override val widget = JPanel(BorderLayout()).apply {
         if (parameter.showLabeledBorder) {
             border = BorderFactory.createTitledBorder(parameter.label)
         }
@@ -921,7 +964,7 @@ class ObjectWidget<O : EditableObject, T : CopyableObject>(
             defaultOpen = parameter.showDetails,
             topPanelComponent = dropDown
         )
-        add(detailTrianglePanel)
+        add(detailTrianglePanel, BorderLayout.CENTER)
         if (!isConsistent) {
             dropDown?.apply {
                 addItem(NULL_STRING)

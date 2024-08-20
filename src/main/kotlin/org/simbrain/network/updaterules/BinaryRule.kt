@@ -3,6 +3,7 @@ package org.simbrain.network.updaterules
 import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
+import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
 import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.UserParameter
@@ -10,22 +11,16 @@ import org.simbrain.util.stats.ProbabilityDistribution
 import java.util.*
 
 /**
- * **BinaryNeuron** takes one of two values.
+ * BinaryNeuron takes one of two values based on a threshold.
  */
-class BinaryRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData> {
-    /**
-     * Threshold for binary neurons.
-     */
+class BinaryRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>, BoundedUpdateRule {
+
     @UserParameter(label = "Threshold", description = "Threshold for binary neurons.", increment = .1, order = 1)
     var threshold: Double = .5
 
-    // TODO: Get rid of redundant wording.   Have not cleaned it up yet
-    // for fear of xstream problems.
-    @UserParameter(label = "On Value", description = "The value that turns on neuron.", increment = .1, order = 2)
-    var upperBound: Double = DEFAULT_CEILING
+    override var upperBound: Double = 1.0
 
-    @UserParameter(label = "Off Value", description = "The value that turns off neuron.", increment = .1, order = 3)
-    var lowerBound: Double = DEFAULT_FLOOR
+    override var lowerBound: Double = 0.0
 
     /**
      * Bias for binary neurons.
@@ -61,8 +56,8 @@ class BinaryRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData> {
         neuron.activation = binaryRule(neuron.input, data.bias)
     }
 
-    fun binaryRule(`in`: Double, bias: Double): Double {
-        val wtdInput = `in` + bias
+    fun binaryRule(inputVal: Double, bias: Double): Double {
+        val wtdInput = inputVal + bias
         return if (wtdInput > threshold) {
             upperBound
         } else {
@@ -111,9 +106,4 @@ class BinaryRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData> {
     override val timeType: Network.TimeType
         get() = Network.TimeType.DISCRETE
 
-    companion object {
-        private const val DEFAULT_CEILING = 1.0
-
-        private const val DEFAULT_FLOOR = -1.0
-    }
 }

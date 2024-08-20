@@ -6,7 +6,6 @@ import org.simbrain.network.core.*
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.neurongroups.WinnerTakeAll
-import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
 import org.simbrain.util.decayfunctions.StepDecayFunction
 import org.simbrain.util.piccolo.TileMap
 import org.simbrain.util.place
@@ -153,16 +152,16 @@ val actorCritic = newSim {
     val rewardCoupling = couplingManager.createCoupling(mouse.getSensor("Cheese sensor"), reward)
 
     // Time Series
-    val plot: TimeSeriesPlotComponent = addTimeSeries("Reward, TD Error").apply {
+    val (plot, rewardSeries, valueSeries, tdErrorSeries) = addTimeSeries("Reward, TD Error", seriesNames = listOf("Reward", "Value", "TD Error"))
+    plot.apply {
         model.isAutoRange = false
         model.rangeUpperBound = 2.0
         model.rangeLowerBound = -1.0
-        model.removeAllScalarTimeSeries()
         events.componentMinimized.fire(true)
     }
-    val rewardPlot = couplingManager.createCoupling(reward, plot.model.addScalarTimeSeries("Reward"))
-    val valuePlot = couplingManager.createCoupling(value, plot.model.addScalarTimeSeries("Value"))
-    val errorPlot = couplingManager.createCoupling(tdError, plot.model.addScalarTimeSeries("TD Error"))
+    val rewardPlot = couplingManager.createCoupling(reward, rewardSeries)
+    val valuePlot = couplingManager.createCoupling(value, valueSeries)
+    val errorPlot = couplingManager.createCoupling(tdError, tdErrorSeries)
 
     // Network Update
     network.updateManager.clear()

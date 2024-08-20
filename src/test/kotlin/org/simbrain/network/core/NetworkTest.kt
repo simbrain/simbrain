@@ -3,11 +3,12 @@ package org.simbrain.network.core
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.simbrain.network.core.Synapse
 import org.simbrain.network.neurongroups.*
+import org.simbrain.network.spikeresponders.ShortTermPlasticity
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.network.subnetworks.Subnetwork
+import org.simbrain.network.updaterules.IzhikevichRule
 import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.point
 import java.util.List
@@ -42,11 +43,15 @@ class NetworkTest {
         n1.label = "neuron1"
         (n1.dataHolder as BiasedScalarData).bias = 1.0
         net.addNetworkModel(n1)
-        n2 = Neuron()
+        n2 = Neuron().apply {
+            updateRule = IzhikevichRule()
+        }
         n2.label = "neuron2"
         net.addNetworkModel(n2)
 
-        s1 = Synapse(n1, n2)
+        s1 = Synapse(n1, n2).apply {
+            spikeResponder = ShortTermPlasticity()
+        }
         net.addNetworkModel(s1)
 
         nc1 = NeuronCollection(List.of(n1, n2))
@@ -135,6 +140,7 @@ class NetworkTest {
     @Test
     fun testXML() {
         val xmlRep = getNetworkXStream().toXML(net)
+
         val fromXml = getNetworkXStream().fromXML(xmlRep) as Network
 
         val n1 = fromXml.getModelByLabel(Neuron::class.java, "neuron1")

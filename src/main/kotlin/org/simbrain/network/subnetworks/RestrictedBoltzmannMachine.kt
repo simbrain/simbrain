@@ -107,6 +107,10 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
         events.customInfoUpdated.fire()
     }
 
+    context(Network) override fun accumulateInputs() {
+        visibleLayer.accumulateInputs()
+    }
+
     context(Network)
     override fun update() {
 

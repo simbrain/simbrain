@@ -8,7 +8,6 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.nodes.SRNNode
-import org.simbrain.network.subnetworks.LMSNetwork
 import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedNetwork
@@ -204,6 +203,12 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
     }
 }
 
+
+context(NetworkPanel)
+fun UnsupervisedNetwork.makeTrainerPanel(): StandardDialog = getUnsupervisedTrainingPanel(this) {
+    this.trainOnCurrentPattern()
+}
+
 fun NetworkPanel.showSRNCreationDialog(): StandardDialog {
 
     val creator = SRNNetwork.SRNCreator(
@@ -214,17 +219,6 @@ fun NetworkPanel.showSRNCreationDialog(): StandardDialog {
     }
 
 }
-
-// fun main() {
-//     val networkComponent = NetworkComponent("")
-//     val np = NetworkPanel(networkComponent)
-//     val result = with(networkComponent.network) {
-//         val lmsNet = LMSNetwork(this, 5, 5)
-//         addNetworkModelAsync(lmsNet)
-//         lmsNet
-//     }
-//     LMSNetworkNode(np,result ).propertyDialog.run { makeVisible() }
-// }
 
 fun main() {
     val networkComponent = NetworkComponent("")
@@ -237,29 +231,15 @@ fun main() {
     SRNNode(np, result).propertyDialog?.display()
 }
 
-
-/**
- * Creation dialog for [LMSNetwork]
- */
-fun NetworkPanel.showLMSCreationDialog(): StandardDialog {
-
-    val creator = LMSNetwork.LMSCreator(
-        network.placementManager.lastClickedLocation
-    )
-    return creator.createEditorDialog {
-        network.addNetworkModel(creator.create())
-    }
-
-}
-
 context(Network)
 fun UnsupervisedNetwork.createTrainOnPatternAction() = createAction(
     name = "Train on current pattern...",
     description = "Train network on current pattern for specified number of iterations.",
     iconPath = "menu_icons/BatchPlay.png"
 ) {
-    val iterations: Int? = showNumericInputDialog("Iterations: ", 100)?.toInt()
+    val iterations: Int? = showNumericInputDialog("Iterations: ", NetworkPreferences.numberOfIterations)?.toInt()
     if (iterations != null) {
+        NetworkPreferences.numberOfIterations = iterations
         runWithProgressWindow(iterations, batchSize = 10) {
             trainOnCurrentPattern()
         }

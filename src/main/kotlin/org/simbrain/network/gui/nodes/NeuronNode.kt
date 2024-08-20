@@ -26,8 +26,8 @@ import org.piccolo2d.nodes.PText
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.network.gui.createNeuronContextMenu
 import org.simbrain.network.gui.dialogs.NetworkPreferences
-import org.simbrain.network.gui.neuronContextMenu
 import org.simbrain.network.gui.neuronDialog
 import org.simbrain.network.updaterules.NeuronUpdateRule
 import org.simbrain.network.updaterules.interfaces.ActivityGenerator
@@ -387,7 +387,7 @@ class NeuronNode(net: NetworkPanel, val neuron: Neuron) : ScreenElement(net) {
         get() = mainShape.globalBounds.center2D
 
     override val contextMenu: JPopupMenu
-        get() = networkPanel.neuronContextMenu
+        get() = networkPanel.createNeuronContextMenu()
 
     override val propertyDialog: StandardDialog?
         get() = networkPanel.neuronDialog

@@ -200,13 +200,13 @@ class ModularOscillatoryNetwork : Simulation {
         // Create projection component
 
         val pc = sim.addProjectionPlot(x, y, 362, 320, toPlot!!.label)
-        pc.projector.init()
+        pc.projector.initProjector()
         pc.projector.tolerance = tolerance
 
         // plot.getProjector().useColorManager = false;
 
         // Coupling
-        val inputProducer = sim.getProducer(toPlot, "getActivations")
+        val inputProducer = sim.getProducer(toPlot, "getActivationArray")
         val plotConsumer = sim.getConsumer(pc, "addPoint")
         sim.couple(inputProducer, plotConsumer)
 

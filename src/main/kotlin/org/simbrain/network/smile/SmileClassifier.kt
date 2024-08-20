@@ -1,16 +1,19 @@
 package org.simbrain.network.smile
 
-import org.simbrain.network.core.ArrayLayer
 import org.simbrain.network.core.Network
+import org.simbrain.network.core.activations
+import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.smile.classifiers.SVMClassifier
+import org.simbrain.network.subnetworks.Subnetwork
+import org.simbrain.network.trainers.ClassificationDataset
+import org.simbrain.network.util.Alignment
+import org.simbrain.network.util.Direction
+import org.simbrain.network.util.alignNetworkModels
+import org.simbrain.network.util.offsetNeuronCollections
 import org.simbrain.util.UserParameter
-import org.simbrain.util.copyFrom
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
-import org.simbrain.util.toDoubleArray
 import org.simbrain.workspace.Producible
-import smile.math.matrix.Matrix
-import java.awt.geom.Rectangle2D
 import kotlin.reflect.full.primaryConstructor
 
 /**
@@ -26,7 +29,7 @@ import kotlin.reflect.full.primaryConstructor
  */
 class SmileClassifier(
     val classifier: ClassificationAlgorithm
-) : ArrayLayer(classifier.inputSize), EditableObject {
+) : Subnetwork(), EditableObject {
 
     /**
      * Integer winner produced by the Smile classifier when predict is called.
@@ -40,20 +43,32 @@ class SmileClassifier(
         @Producible
         get() = classifier.trainingData.labelTargetMap.getInverse(winner) ?: ""
 
-    /**
-     * For display and coupling purposes.
-     */
-    val inputActivations = Matrix(inputSize, 1)
+    val inputNeuronGroup = NeuronGroup(classifier.inputSize).apply {
+        label = "Input Layer"
+        setLayoutBasedOnSize()
+    }.also { modelList.add(it) }
 
-    @Producible
-    fun getInputActivationArray() = inputActivations.toDoubleArray()
+    val outputNeuronGroup = NeuronGroup(classifier.outputSize).apply {
+        label = "Output Layer"
+        setLayoutBasedOnSize()
+    }.also { modelList.add(it) }
 
-    override var activations = Matrix(classifier.outputSize, 1)
-
-    override val activationArray: DoubleArray get() = activations.toDoubleArray()
-
-    override val bound: Rectangle2D
-        get() = Rectangle2D.Double(locationX - width / 2, locationY - height / 2, width, height)
+    init {
+        label = classifier.name
+        alignNetworkModels(inputNeuronGroup, outputNeuronGroup, Alignment.VERTICAL)
+        offsetNeuronCollections(inputNeuronGroup, outputNeuronGroup, Direction.NORTH, 150.0)
+        when (classifier.trainingData.labelEncoding) {
+            ClassificationDataset.LabelEncoding.Bipolar -> {
+                outputNeuronGroup.neuronList[0].label = "Off"
+                outputNeuronGroup.neuronList[1].label = "On"
+            }
+            ClassificationDataset.LabelEncoding.Integer -> {
+                classifier.trainingData.labelTargetMap.entries.forEach { (label, index) ->
+                    outputNeuronGroup.neuronList.getOrNull(index)?.label = label
+                }
+            }
+        }
+    }
     
     /**
      * Train the classifier using the current training data.
@@ -65,34 +80,39 @@ class SmileClassifier(
         events.updated.fire()
     }
 
+    context(Network)
+    override fun accumulateInputs() {
+        inputNeuronGroup.accumulateInputs()
+    }
+
     /**
      * Update the classifier by apply it to inputs and caching the result as output.
      */
+    context(Network)
     override fun update() {
+        inputNeuronGroup.update()
         if (classifier.model != null) {
-            inputActivations.copyFrom(inputs)
-            winner = classifier.predict(inputActivations.toDoubleArray())
+            winner = classifier.predict(inputNeuronGroup.activationArray)
             // println("Prediction of ${this.id} is: $winner")
             if (classifier.model != null) {
-                activations = try {
-                    classifier.getOutputVector(winner)
+                outputNeuronGroup.neuronList.activations = try {
+                    classifier.getOutputArray(winner)
                 } catch (e: IllegalArgumentException) {
                     System.err.println(e.message)
-                    Matrix(size, 1)
-                }
+                    DoubleArray(classifier.outputSize) { 0.0 }
+                }.toList()
             }
         }
         events.updated.fire()
-        inputs.mul(0.0) // clear inputs
     }
 
     override fun toString(): String {
-        return "${label} (${classifier.name}): $classifier.inputSize -> ${size}"
+        return "${label} (${classifier.name}): ${classifier.inputSize} -> $outputSize"
     }
 
-    override val size: Int get() = classifier.inputSize
+    val inputSize get() = classifier.inputSize
 
-    val outputSize: Int get() = classifier.outputSize
+    val outputSize get() = classifier.outputSize
 
     /**
      * Helper class for creating classifiers.

@@ -20,7 +20,7 @@ import org.simbrain.network.core.randomizeBiases
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.offsetNetworkModel
 import org.simbrain.util.stats.ProbabilityDistribution
-import org.simbrain.util.stats.distributions.UniformRealDistribution
+import org.simbrain.util.stats.distributions.NormalDistribution
 import java.awt.geom.Point2D
 
 /**
@@ -95,16 +95,18 @@ open class FeedForward : Subnetwork {
 
     override fun onCommit() {}
 
-    val randomizer = UniformRealDistribution(-1.0, 1.0)
-
     override fun randomize(randomizer: ProbabilityDistribution?) {
-        wmList.forEach { wm -> wm.randomize(randomizer) }
-        (layerList - inputLayer).forEach { it.randomizeBiases() }
+        wmList.forEach { wm -> wm.randomize(NormalDistribution(0.0, .1)) }
+        (layerList - inputLayer).forEach { it.randomizeBiases(NormalDistribution(0.0, .01)) }
+    }
+
+    context(Network)
+    override fun accumulateInputs() {
+        inputLayer.accumulateInputs()
     }
 
     context(Network)
     override fun update() {
-        inputLayer.accumulateInputs()
         inputLayer.update()
         for (i in 1 until layerList.size - 1) {
             layerList[i].accumulateInputs()
@@ -113,4 +115,6 @@ open class FeedForward : Subnetwork {
         outputLayer.accumulateInputs()
         outputLayer.update()
     }
+
+    fun hiddenLayers() = layerList.drop(1).take(layerList.size-2)
 }

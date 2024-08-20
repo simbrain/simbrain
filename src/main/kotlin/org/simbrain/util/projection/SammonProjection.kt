@@ -8,7 +8,7 @@ class SammonProjection: ProjectionMethod(), IterableProjectionMethod {
     val downstairsInitializationMethod = CoordinateProjection()
     val downstairsInitializationMethod2 = TriangulateProjection()
 
-    @UserParameter(label = "Epsilon", minimumValue = 0.0, increment = .1)
+    @UserParameter(label = "Epsilon", minimumValue = 0.0, increment = 1.0)
     var epsilon = 100.0
 
     override fun init(dataset: Dataset) {

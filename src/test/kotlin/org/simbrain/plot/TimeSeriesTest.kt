@@ -4,7 +4,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.addTimeSeries
+import org.simbrain.custom_sims.addTimeSeriesComponent
 import org.simbrain.custom_sims.couplingManager
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.addNeurons
@@ -23,7 +23,7 @@ class TimeSeriesTest {
 
             (neuron1.dataHolder as BiasedScalarData).bias = 0.5
 
-            val timeSeriesComponent = addTimeSeries("TimeSeries")
+            val timeSeriesComponent = addTimeSeriesComponent("TimeSeries", listOf("one", "two"))
             with(couplingManager) {
                 neuron1 couple timeSeriesComponent.model.timeSeriesList[0]
                 neuron2 couple timeSeriesComponent.model.timeSeriesList[1]

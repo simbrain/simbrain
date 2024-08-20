@@ -7,6 +7,7 @@ import org.simbrain.docviewer.DocViewerComponent
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.plot.projection.ProjectionComponent
+import org.simbrain.plot.timeseries.TimeSeriesModel
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.loadTileMap
@@ -113,10 +114,29 @@ fun SimulationScope.addTextWorld(name: String): TextWorldComponent {
     return textWorldComponent
 }
 
-fun SimulationScope.addTimeSeries(name: String): TimeSeriesPlotComponent {
+fun SimulationScope.addTimeSeriesComponent(name: String, seriesName: String) = addTimeSeriesComponent(name, listOf(seriesName))
+
+fun SimulationScope.addTimeSeriesComponent(name: String, seriesNames: List<String>): TimeSeriesPlotComponent {
     val timeSeriesPlotComponent = TimeSeriesPlotComponent(name)
+    seriesNames.forEach { timeSeriesPlotComponent.addTimeSeries(it) }
     workspace.addWorkspaceComponent(timeSeriesPlotComponent)
     return timeSeriesPlotComponent
+}
+
+class TimeSeriesPlotComponentSeriesData(val plotComponent: TimeSeriesPlotComponent, val series: List<TimeSeriesModel.TimeSeries>) {
+    operator fun component1() = plotComponent
+    operator fun component2() = series.component1()
+    operator fun component3() = series.component2()
+    operator fun component4() = series.component3()
+    operator fun component5() = series.component4()
+    operator fun component6() = series.component5()
+}
+
+fun SimulationScope.addTimeSeries(name: String, seriesNames: List<String>): TimeSeriesPlotComponentSeriesData {
+    val timeSeriesPlotComponent = TimeSeriesPlotComponent(name)
+    val series = seriesNames.map { timeSeriesPlotComponent.addTimeSeries(it) }
+    workspace.addWorkspaceComponent(timeSeriesPlotComponent)
+    return TimeSeriesPlotComponentSeriesData(timeSeriesPlotComponent, series)
 }
 
 suspend fun SimulationScope.placeComponent(component: WorkspaceComponent, x: Int, y: Int, width: Int, height: Int) {

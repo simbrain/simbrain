@@ -114,7 +114,7 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
 
     fun resetZoomAction() = odorWorldPanel.createAction(
         "Reset Zoom",
-        iconPath = "menu_icons/ZoomFitPage.png",
+        iconPath = "menu_icons/ZoomReset.png",
         keyboardShortcut = CmdOrCtrl + KeyEvent.VK_0
     ) {
         scalingFactor = 1.0

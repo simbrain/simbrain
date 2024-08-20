@@ -249,6 +249,26 @@ fun showInputDialog(message: String, initValue: String = ""): String {
     return JOptionPane.showInputDialog(dialog, message, initValue)
 }
 
+fun showOptionDialog(
+    message: String,
+    title: String,
+    options: Array<String>,
+    defaultOption: Int? = null
+): Int {
+    val dialog = JDialog()
+    dialog.isAlwaysOnTop = true
+    return JOptionPane.showOptionDialog(
+        dialog,
+        message,
+        title,
+        JOptionPane.DEFAULT_OPTION,
+        JOptionPane.QUESTION_MESSAGE,
+        null,
+        options,
+        defaultOption?.let { options[it] }
+    )
+}
+
 fun showMessageDialog(message: String, title: String, rows: Int = 10, columns: Int = 50) {
     val textArea = JTextArea(message).apply {
         isEditable = false
@@ -308,10 +328,10 @@ class DetailTrianglePanel @JvmOverloads constructor(
     upLabel: String = "Settings",
     downLabel: String = upLabel,
     val topPanelComponent: JComponent? = null,
-): JPanel() {
+): JPanel(BorderLayout()) {
 
-    val topPanel = JPanel().apply {
-        val padding = BorderFactory.createEmptyBorder(5, 5, 5, 5)
+    val topPanel = JPanel(BorderLayout()).apply {
+        val padding = BorderFactory.createEmptyBorder(5, 5, 10, 5)
         layout = BoxLayout(this, BoxLayout.X_AXIS)
         alignmentX = CENTER_ALIGNMENT
         border = padding
@@ -323,7 +343,7 @@ class DetailTrianglePanel @JvmOverloads constructor(
         add(Box.createHorizontalStrut(30))
         add(Box.createHorizontalGlue())
     }.also {
-        add(it)
+        add(it, BorderLayout.NORTH)
     }
 
     val detailTriangle = DropDownTriangle(
@@ -343,9 +363,8 @@ class DetailTrianglePanel @JvmOverloads constructor(
     }
 
     init {
-        layout = BoxLayout(this, BoxLayout.Y_AXIS)
         contentPanel.isVisible = detailTriangle.isDown
-        add(contentPanel)
+        add(contentPanel, BorderLayout.CENTER)
     }
 
 }

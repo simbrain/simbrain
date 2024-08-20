@@ -101,9 +101,12 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
 
     override fun onCommit() {}
 
+    context(Network) override fun accumulateInputs() {
+        inputLayer.accumulateInputs()
+    }
+
     context(Network)
     override fun update() {
-        inputLayer.accumulateInputs()
         inputLayer.update()
         hiddenLayer.accumulateInputs()
         hiddenLayer.update()

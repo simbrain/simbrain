@@ -3,6 +3,7 @@ package org.simbrain.util
 import org.simbrain.plot.histogram.HistogramModel
 import org.simbrain.plot.histogram.HistogramPanel
 import smile.math.matrix.Matrix
+import kotlin.math.ln
 import kotlin.math.min
 import kotlin.math.sqrt
 
@@ -60,6 +61,14 @@ infix fun Matrix.sse(other: Matrix) = (this.toDoubleArray() sse other.toDoubleAr
 infix fun Matrix.mse(other: Matrix) = (this.toDoubleArray() mse other.toDoubleArray())
 
 infix fun Matrix.rmse(other: Matrix) = sqrt(this mse other)
+
+fun crossEntropy(predictions: Matrix, targets: Matrix): Double {
+    var loss = 0.0
+    for (i in 0 until targets.nrow()) {
+        loss += targets[i, 0] * ln(predictions.get(i, 0))
+    }
+    return -loss
+}
 
 /**
  * Returns a specified row of a matrix, transposed so that it is a column vector.

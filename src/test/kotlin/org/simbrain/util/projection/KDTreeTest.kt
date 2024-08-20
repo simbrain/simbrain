@@ -40,7 +40,7 @@ class KDTreeTest {
     @Test
     fun `findClosestPoints finds closest points`() {
         val projector = Projector(4)
-        projector.init()
+        projector.initProjector()
         println(projector.dataset)
         projector.addDataPoint(doubleArrayOf(1.0, 2.0, 3.0, 4.0, 5.0))
         projector.addDataPoint(doubleArrayOf(2.0, 3.0, 4.0, 5.0, 6.0))

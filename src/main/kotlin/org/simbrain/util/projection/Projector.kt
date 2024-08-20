@@ -41,15 +41,19 @@ class Projector(initialDimension: Int = 25) : EditableObject, CoroutineScope {
         set(value) {
             val oldMethod = field
             field = value
-            init()
+            initProjector()
             events.methodChanged.fire(oldMethod, value)
         }
 
-    @UserParameter(label = "Tolerance", minimumValue = 0.0, increment = .1, order =  1)
+    @UserParameter(label = "Tolerance", description = "Only add new points if they are more than this distance from any existing point", minimumValue = 0.0, increment = .1, order =  1)
     var tolerance: Double = 0.1
 
-    @UserParameter(label = "Connect points", order = 10)
+    @UserParameter(label = "Connect points", description = "Draw lines between points in plot", order = 10)
     var connectPoints = false
+        set(value) {
+            field = value
+            events.settingsChanged.fire()
+        }
 
     @UserParameter(label = "Hot color", order = 20)
     var hotColor = Color.red
@@ -85,7 +89,7 @@ class Projector(initialDimension: Int = 25) : EditableObject, CoroutineScope {
         }
     }
 
-    fun init() {
+    fun initProjector() {
         projectionMethod.init(dataset)
     }
 
@@ -103,7 +107,7 @@ class Projector(initialDimension: Int = 25) : EditableObject, CoroutineScope {
 
 fun main() {
     val projector = Projector(4)
-    projector.init()
+    projector.initProjector()
     println(projector.dataset)
     projector.addDataPoint(doubleArrayOf(1.0, 2.0, 3.0, 4.0, 5.0))
     projector.addDataPoint(doubleArrayOf(2.0, 3.0, 4.0, 5.0, 6.0))
@@ -111,7 +115,7 @@ fun main() {
     projector.addDataPoint(doubleArrayOf(4.0, 5.0, 6.0, 7.0, 8.0))
     projector.addDataPoint(doubleArrayOf(5.0, 6.0, 7.0, 8.0, 9.0))
     println(projector.dataset)
-    projector.init()
+    projector.initProjector()
     println(projector.dataset)
     projector.createEditorDialog {
 

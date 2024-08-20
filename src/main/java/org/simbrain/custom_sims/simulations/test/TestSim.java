@@ -84,7 +84,7 @@ public class TestSim extends Simulation {
         sim.getDesktop().getDesktopComponent(barChart).getParentFrame().setBounds(500,20,537,345);
 
         // COUPLING NETWORK TO BARCHART
-        Producer neuronProducer = workspace.getCouplingManager().getProducer(ng, "getActivations");
+        Producer neuronProducer = workspace.getCouplingManager().getProducer(ng, "getActivationArray");
         Consumer barChartConsumer =  workspace.getCouplingManager().getConsumer(barChart.getModel(),
                 "setBarValues");
         workspace.getCouplingManager().createCoupling(neuronProducer, barChartConsumer);

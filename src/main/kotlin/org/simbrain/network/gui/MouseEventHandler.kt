@@ -35,6 +35,7 @@ import org.simbrain.util.minus
 import org.simbrain.util.piccolo.SelectionMarquee
 import org.simbrain.util.piccolo.firstScreenElement
 import org.simbrain.util.piccolo.screenElements
+import org.simbrain.util.point
 import org.simbrain.util.rectangle
 import java.awt.Color
 import java.awt.event.InputEvent
@@ -70,7 +71,9 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
     override fun mouseClicked(event: PInputEvent?) {
         super.mouseClicked(event)
         event?.position?.let {
-            networkPanel.network.placementManager.lastClickedLocation = it
+            if (event.pickedNode.firstScreenElement == null) {
+                networkPanel.network.placementManager.lastClickedLocation = it
+            }
         }
     }
 
@@ -146,13 +149,12 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
             // Reset the anchor point in the placement manager
             val topLeft = networkPanel.selectionManager.filterSelectedModels<LocatableModel>().topLeftLocation
             val pm = networkPanel.network.placementManager
-            pm.anchorPoint = topLeft
 
             // Only reset the delta if alt/option key is down
             if (event.pickedNode != null && event.isAltDown) {
                 event.pickedNode.firstScreenElement?.model.let {
                     if (it is LocatableModel) {
-                        pm.deltaDragMap[it.javaClass.kotlin] = topLeft - pm.previousAnchorPoint
+                        pm.offsetMap[it.javaClass.kotlin] = topLeft - (pm.customOffsetAnchor?.location ?: point(0, 0))
                     }
                 }
             }
@@ -209,10 +211,12 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
             val topLeft = networkPanel.selectionManager.filterSelectedModels<LocatableModel>().topLeftLocation
             val pm = networkPanel.network.placementManager
             networkPanel.canvas.layer.removeChild(placementManagerDelta)
+            val customOffsetAnchor = pm.customOffsetAnchor
             placementManagerDelta = PPath.createLine(
-                topLeft.x, topLeft.y,
-                pm.previousAnchorPoint.x,
-                pm.previousAnchorPoint.y
+                topLeft.x,
+                topLeft.y,
+                customOffsetAnchor?.location?.x ?: 0.0,
+                customOffsetAnchor?.location?.y ?: 0.0
             ).apply {
                 this.stroke = PPath.DEFAULT_STROKE
                 this.strokePaint = Color.red

@@ -177,9 +177,7 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
      *
      * @param neuron reference to parent neuron
      */
-    open fun clear(neuron: Neuron) {
-        neuron.activation = 0.0
-    }
+    open fun clear(neuron: Neuron) {}
 
     /**
      * Returns string for tool tip or short description. Override to provide custom information.
@@ -203,7 +201,7 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
 
     fun getNeuronArrayTypeMap() = neuronArrayUpdateRules
 
-    override fun getTypeList(): List<Class<out CopyableObject>> = allUpdateRules
+    override fun getTypeList(): List<Class<out CopyableObject>> = scalarUpdateRules
 
     companion object {
 
@@ -227,7 +225,6 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
          * Currently this is set to be between upper and lower bounds.  In the future more
          * options could be added and this could become an enum.
          *
-         *
          * Add an update type to this list if a neuron should use a custom zero point
          */
         private val usesCustomZeroPoint = HashSet<Class<*>>(
@@ -245,7 +242,7 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
     }
 }
 
-val allUpdateRules = listOf(
+val scalarUpdateRules = listOf(
     AdditiveRule::class.java,
     AdExIFRule::class.java,
     AllostaticUpdateRule::class.java,
@@ -282,4 +279,5 @@ val neuronArrayUpdateRules = listOf(
     LinearRule::class.java,
     NakaRushtonRule::class.java,
     SigmoidalRule::class.java,
+    SoftmaxRule::class.java,
 )

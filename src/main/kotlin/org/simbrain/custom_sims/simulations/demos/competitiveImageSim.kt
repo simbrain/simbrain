@@ -16,21 +16,21 @@ val competitiveImageSim = newSim {
     val docViewer = addDocViewer(
         "Information",
         """
+            # Competitive Image Simulation Overview:
             
             This is like the competitive grid network, but the simulation is made up of two windows, the Network window, and the Image World window. In the Network window, the input layer is arranged into a grid of neurons, and the competitive group is initialized with randomized weights. The Image World window is made of colored images that act as the patterns for this simulation’s input neurons to the mirror. 
-
+            
+            # What to Do:
+            
             The user selects different image patterns using the buttons at the bottom of the Image World window. Each time an image is chosen and the network is run, the network trains a neuron to respond to the selected pattern. 
-
             The images have overlapping pixels in the patterns, resulting in overlapping output neurons. This makes it challenging for users to train each output neuron in the competitive group to a different image. The image pattern that activates the output neuron most will be the label of this output neuron, and the connection between the weight and neurons is strengthened. Over time, the output neurons improve their ability to classify the clusters in the input space. 
-
             The user repeats this process until the trained network responds to each pattern with a different output neuron. The network relies on the statistical properties of the inputs provided during training. 
-
             The objective is to train the network so that each input pattern triggers a distinct output neuron, classifying each input into a unique output. 
         
         """.trimIndent()
     )
     withGui {
-        place(docViewer, 0, 0, 349, 729)
+        place(docViewer, 0, 0, 369, 766)
     }
 
     val networkComponent = addNetworkComponent("Network")

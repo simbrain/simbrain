@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations
 
+import org.simbrain.custom_sims.addDocViewer
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
@@ -12,9 +13,6 @@ import smile.math.matrix.Matrix
 
 /**
  * Demo for studying restricted Boltzmann machines.
- * Console 6 (0, 0, 365, 691)
- * Control Panel (404, 1, 115, 275)
- * Network (548, 0, 815, 619)
  */
 val rbmSim = newSim {
 
@@ -42,9 +40,28 @@ val rbmSim = newSim {
     // Set training set of rbm to these inputs
     rbm.inputData = Matrix.of(arrayOf(input1, input2, input3, input4, input5, input6))
 
+    val docViewer = addDocViewer(
+        "Information",
+        """ 
+            # Restricted Boltzmann Machine Simulation Overview:
+            
+            The Hopfield simulation is a recurrent neural network with a synaptic connection pattern for pattern recognition and memory retrieval. 
+
+            # What to do:
+            
+            Select an input pattern and click the train button on the Control panel to train the network on the selected pattern.
+            The model learns the pattern and “remembers” it. When randomizing the network (by clicking “N” [Neuron], “R” [Randomize], and “Space” [Iterate], or using “I” [Wand Mode] over the nodes), the network adjusts the nodes on each iteration to reconfigure the inputted pattern. 
+            The Network remembers the pattern and the antipattern, and when iterating (“Space”), it iterates to recreate the pattern with the most similar nodes. 
+            You can get the pattern to memorize all the different patterns and antipatterns by training each one, randomizing and iterating to see if it is remembered, and training that pattern again if it needs to be learned. 
+
+        
+        """.trimIndent()
+    )
+
     withGui {
-        place(networkComponent, 139, 10, 868, 619)
-        createControlPanel("Control Panel", 5, 10) {
+        place(docViewer, 0, 0, 464, 686)
+        place(networkComponent, 548, 0, 815, 619)
+        createControlPanel("Control Panel", 404, 0) {
             addButton("Pattern 1") {
                 rbm.visibleLayer.activations = input1.toMatrix()
             }

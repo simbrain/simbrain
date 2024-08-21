@@ -6,10 +6,9 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.util.BiasedMatrixData
-import org.simbrain.util.rowVectorTransposed
-import org.simbrain.util.toDoubleArray
-import org.simbrain.util.toMatrix
+import org.simbrain.util.*
 import smile.math.matrix.Matrix
+import kotlin.math.exp
 
 class TrainingUtilsTest {
 
@@ -56,7 +55,7 @@ class TrainingUtilsTest {
         val inputs = Matrix.column(doubleArrayOf(-1.0, 1.0))
         with(net) {
             listOf(wm1, wm2).forwardPass(inputs)
-            listOf(wm1, wm2).printActivationsAndWeights(true)
+            //listOf(wm1, wm2).printActivationsAndWeights(true)
         }
         assertArrayEquals(inputs.toDoubleArray(), wm2.target.activations.toDoubleArray())
     }
@@ -96,5 +95,58 @@ class TrainingUtilsTest {
         assertTrue(wmTree.tree[0].contains(wm1_2))
         assertTrue(wmTree.tree[1].first() == wm2)
     }
+
+    @Test
+    fun `test weight update with specific values`() {
+        val na1 = NeuronArray(2)
+        val na2 = NeuronArray(3)
+        val wm = WeightMatrix(na1, na2).apply {
+            weightMatrix.copyFrom(Matrix.of(arrayOf(
+                doubleArrayOf(1.0, 2.0),
+                doubleArrayOf(3.0, 4.0),
+                doubleArrayOf(5.0, 6.0)
+        )))
+        }
+        na1.setActivations(doubleArrayOf(1.0, 2.0))
+        val layerError = Matrix.column(doubleArrayOf(.5, -.5, .5))
+
+        val initialWeights = wm.weightMatrix.clone()
+        wm.updateWeights(layerError, epsilon = 1.0)
+        // Expected weight deltas: layerError * source.activations.T
+        val expectedDeltas = layerError.mm(na1.activations.transpose())
+        val expectedWeights = initialWeights.add(expectedDeltas)
+
+        //println(expectedDeltas)
+        //println(expectedWeights)
+        //println(wm.weightMatrix)
+        assertArrayEquals(expectedWeights.flatten(), wm.weights)
+
+    }
+
+    @Test
+    fun `test backpropagated error with specific values`() {
+        val na1 = NeuronArray(2)
+        val na2 = NeuronArray(3)
+        val wm = WeightMatrix(na1, na2)
+
+        na1.setActivations(doubleArrayOf(1.0, 2.0))
+        wm.weightMatrix.copyFrom(Matrix.of(arrayOf(
+            doubleArrayOf(5.0, 8.0),
+            doubleArrayOf(1.0, -1.0),
+            doubleArrayOf(2.0, -2.0)
+        )))
+
+        val layerError = Matrix.column(doubleArrayOf(0.0, 1.0, 0.5))
+
+        // Expected backpropagated error: weightMatrix.T * layerError
+        // Expect 2, -2
+        val expectedBackpropagatedErrors = layerError.transpose().mm(wm.weightMatrix).transpose()
+
+        val backpropagatedErrors = wm.updateWeights(layerError)
+        for (i in 0 until backpropagatedErrors.nrow()) {
+            assertEquals(expectedBackpropagatedErrors[i, 0], backpropagatedErrors[i, 0], 1e-6)
+        }
+    }
+
 
 }

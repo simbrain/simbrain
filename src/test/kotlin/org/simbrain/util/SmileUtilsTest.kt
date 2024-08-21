@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import smile.math.matrix.Matrix
+import kotlin.math.ln
 
 class SmileUtilsTest {
 
@@ -128,5 +129,14 @@ class SmileUtilsTest {
         assertArrayEquals(doubleArrayOf(-2.0, -4.0), d.row(0))
         assertArrayEquals(doubleArrayOf(-6.0, -8.0), d.row(1))
     }
+
+    @Test
+    fun `test cross entropy loss`() {
+        val t1 =  doubleArrayOf(0.0, 1.0, 0.0).toMatrix()
+        val a1 =  doubleArrayOf(0.2, .7, 0.1).toMatrix()
+        assertEquals(0.0, crossEntropy(t1, t1), 0.001)
+        assertEquals(-ln(.7), crossEntropy(a1, t1))
+    }
+
 
 }

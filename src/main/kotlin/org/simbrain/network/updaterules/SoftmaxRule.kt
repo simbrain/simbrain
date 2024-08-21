@@ -10,6 +10,7 @@ import org.simbrain.network.util.EmptyScalarData
 import org.simbrain.util.UserParameter
 import org.simbrain.util.toDoubleArray
 import org.simbrain.util.toMatrix
+import org.simbrain.util.validateColumnVector
 import smile.math.matrix.Matrix
 import kotlin.math.exp
 
@@ -54,12 +55,12 @@ class SoftmaxRule: NeuronUpdateRule<EmptyScalarData, BiasedMatrixData>(), Differ
     }
 
     override fun getDerivative(input: Matrix): Matrix {
+        input.validateColumnVector()
         val softmaxValues = softmax(input, temperature)
         val size = input.size().toInt()
         val derivatives = DoubleArray(size) { i ->
             softmaxValues[i] * (1.0 - softmaxValues[i])
         }
-
         return derivatives.toMatrix()
     }
 

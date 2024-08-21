@@ -63,9 +63,11 @@ infix fun Matrix.mse(other: Matrix) = (this.toDoubleArray() mse other.toDoubleAr
 infix fun Matrix.rmse(other: Matrix) = sqrt(this mse other)
 
 fun crossEntropy(predictions: Matrix, targets: Matrix): Double {
+    targets.validateColumnVector()
+    predictions.validateColumnVector()
     var loss = 0.0
     for (i in 0 until targets.nrow()) {
-        loss += targets[i, 0] * ln(predictions.get(i, 0))
+        loss += targets[i, 0] * ln(predictions.get(i, 0).coerceAtLeast(1e-15))
     }
     return -loss
 }

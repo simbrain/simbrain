@@ -87,7 +87,7 @@ class Network: CoroutineScope, EditableObject {
     /**
      * Time step.
      */
-    @UserParameter("Time Step", order = 10)
+    @UserParameter("Time Step", increment = .1, minimumValue = 0.0, order = 10)
     var timeStep = NetworkPreferences.defaultTimeStep
 
     /**

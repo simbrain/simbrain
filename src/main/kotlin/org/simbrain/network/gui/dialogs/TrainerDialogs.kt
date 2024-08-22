@@ -21,7 +21,10 @@ import org.simbrain.util.table.createApplyAction
 import org.simbrain.util.table.createApplyAndAdvanceAction
 import org.simbrain.util.widgets.ToggleButton
 import java.awt.Cursor
-import javax.swing.*
+import javax.swing.JButton
+import javax.swing.JLabel
+import javax.swing.JPanel
+import javax.swing.JSeparator
 
 
 /**
@@ -32,12 +35,6 @@ fun <SN> SN.getSupervisedTrainingDialog(): StandardDialog where SN: SupervisedNe
     return StandardDialog().apply {
 
         title = "Train Network"
-        contentPane = ResizableTabbedPane()
-
-        // Edit Trainer Properties
-        val trainerProps = AnnotatedPropertyEditor(trainer)
-        val trainerPropsPanel = trainerProps.createApplyPanel()
-        (contentPane as JTabbedPane).addTab("Trainer Properties", trainerPropsPanel)
 
         // Run training algorithm
         val runControls = JPanel()
@@ -81,10 +78,8 @@ fun <SN> SN.getSupervisedTrainingDialog(): StandardDialog where SN: SupervisedNe
         runControls.add(targets, "wrap")
         runControls.add(JLabel("Add / Remove rows:"), "split 2")
         runControls.add(addRemoveRows)
-        (contentPane as JTabbedPane).addTab("Run Trainer", runControls)
 
         addCommitTask {
-            trainerProps.commitChanges()
             trainingSet = MatrixDataset(
                 (inputs.table.model as MatrixDataFrame).data,
                 (targets.table.model as MatrixDataFrame).data,
@@ -94,6 +89,9 @@ fun <SN> SN.getSupervisedTrainingDialog(): StandardDialog where SN: SupervisedNe
                 trainingSet.targetColumnNames
             )
         }
+
+
+        contentPane = runControls
     }
 }
 

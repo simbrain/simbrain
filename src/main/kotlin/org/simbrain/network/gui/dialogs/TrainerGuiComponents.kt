@@ -12,16 +12,14 @@ import org.simbrain.network.trainers.SupervisedTrainer
 import org.simbrain.plot.timeseries.TimeSeriesModel
 import org.simbrain.plot.timeseries.TimeSeriesPlotActions
 import org.simbrain.plot.timeseries.TimeSeriesPlotPanel
-import org.simbrain.util.LabelledItemPanel
-import org.simbrain.util.ResourceManager
+import org.simbrain.util.*
 import org.simbrain.util.Utils.round
-import org.simbrain.util.createAction
-import org.simbrain.util.roundToString
 import org.simbrain.util.table.*
 import org.simbrain.util.widgets.ToggleButton
 import smile.math.matrix.Matrix
 import java.awt.Cursor
 import java.awt.Dimension
+import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -71,9 +69,25 @@ class TrainerControls<SN>(trainer: SupervisedTrainer<SN>, supervisedNetwork: SN,
         supervisedNetwork.randomize()
     }
 
+    private val trainerPropsAction = createAction(
+        name = "Trainer Properties",
+        description = "Edit trainer properties",
+        iconPath = "menu_icons/Prefs.png",
+    ) {
+        trainer.createEditorDialog().display()
+    }
+
     init {
 
-        val errorPlot = ErrorTimeSeries(trainer)
+        val errorPlotPanel = JPanel().apply {
+            layout = BoxLayout(this, BoxLayout.Y_AXIS)
+            val errorPlot = ErrorTimeSeries(trainer)
+            add(errorPlot)
+            JPanel().apply {
+                add(JButton(TimeSeriesPlotActions.getClearGraphAction(errorPlot.graphPanel)))
+                add(JButton(TimeSeriesPlotActions.getPropertiesDialogAction(errorPlot.graphPanel)))
+            }.also { add(it) }
+        }
 
         val runTools = JPanel().apply { layout = MigLayout("nogrid ") }
         runTools.add(ToggleButton(listOf(runAction, stopAction)).apply {
@@ -91,8 +105,7 @@ class TrainerControls<SN>(trainer: SupervisedTrainer<SN>, supervisedNetwork: SN,
         val randomizeButton = JButton(randomizeAction)
         randomizeButton.hideActionText = true
         runTools.add(randomizeButton)
-        runTools.add(JButton(TimeSeriesPlotActions.getClearGraphAction(errorPlot.graphPanel)))
-        runTools.add(JButton(TimeSeriesPlotActions.getPropertiesDialogAction(errorPlot.graphPanel)), "wrap")
+        runTools.add(JButton(trainerPropsAction), "wrap")
         val labelPanel = LabelledItemPanel()
         labelPanel.addItem("Iterations:", iterationsLabel)
         val errorValue = JLabel(trainer.lastError.roundToString(4))
@@ -107,7 +120,7 @@ class TrainerControls<SN>(trainer: SupervisedTrainer<SN>, supervisedNetwork: SN,
 
         layout = MigLayout("ins 0, gap 0px 0px")
         add(runTools)
-        add(errorPlot, "grow")
+        add(errorPlotPanel, "grow")
     }
 
 }

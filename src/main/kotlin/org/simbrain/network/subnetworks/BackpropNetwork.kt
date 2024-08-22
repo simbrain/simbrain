@@ -30,7 +30,7 @@ import kotlin.math.min
  *
  * @author Jeff Yoshimi
  */
-open class BackpropNetwork : FeedForward, SupervisedNetwork {
+class BackpropNetwork : FeedForward, SupervisedNetwork {
 
     constructor(nodesPerLayer: IntArray, initialPosition: Point2D? = point(0,0)): super(nodesPerLayer, initialPosition) {
         layerList.forEach { it.updateRule = LinearRule() }

@@ -87,7 +87,12 @@ fun NeuronArray.updateBiases(error: Matrix, epsilon: Double = .1) {
  * stored in a sequence from input to output layers
  */
 context(Network)
-fun List<WeightMatrix>.updateWeights(targetValues: Matrix, epsilon: Double = .1, lossFunction: (actual: Matrix, target: Matrix) -> Double = { actual, target -> actual sse target }): Double {
+fun List<WeightMatrix>.updateWeights(
+    targetValues: Matrix,
+    epsilon: Double = .1,
+    lossFunction: (actual: Matrix, target: Matrix) -> Double = { actual, target -> actual sse target },
+    debug: (index: Int, layerError: List<Double>) -> Unit = { _, _ -> }
+): Double {
 
     targetValues.validateSameShape(last().tar.activations)
 
@@ -96,12 +101,14 @@ fun List<WeightMatrix>.updateWeights(targetValues: Matrix, epsilon: Double = .1,
     // printActivationsAndWeights()
     var layerError: Matrix = last().tar.getError(targetValues)
 
-    for (wm in this.reversed()) {
+    this.reversed().forEachIndexed { index, wm ->
+        debug(index, layerError.flatten().toList())
         val deriv = (wm.tar.updateRule as DifferentiableUpdateRule).getDerivative(wm.tar.inputs)
         layerError.mul(deriv)
         wm.tar.updateBiases(layerError, epsilon)
         layerError = wm.updateWeights(layerError, epsilon)
     }
+
     return error
 }
 

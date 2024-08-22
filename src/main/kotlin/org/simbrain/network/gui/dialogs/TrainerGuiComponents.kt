@@ -58,7 +58,7 @@ class TrainerControls<SN>(trainer: SupervisedTrainer<SN>, supervisedNetwork: SN,
         description = "Iterate training once",
         iconPath =  "menu_icons/Step.png",
     ) {
-        trainer.events.beginTraining.fire()
+        trainer.events.beginTraining.fire().await()
         with(networkPanel.network) { supervisedNetwork.run { trainer.trainOnce() } }
         trainer.events.endTraining.fire()
     }

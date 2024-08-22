@@ -70,7 +70,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
             events.iterationReset.fire()
         }
         isRunning = true
-        events.beginTraining.fire()
+        events.beginTraining.fire().await()
         withContext(Dispatchers.Default) {
             while (isRunning) {
                 trainOnce()
@@ -108,10 +108,9 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
                     }
                 }
                 is UpdateMethod.Batch -> {
-                    var totalError = 0.0
-                    val startIndex = Random.nextInt(0, trainingSet.size - batchSize)
+                    val startIndex = Random.nextInt(0, trainingSet.size - batchSize + 1)
                     val endIndex = startIndex + batchSize
-                    for (i in (startIndex..endIndex)) {
+                    for (i in (startIndex until endIndex)) {
                         val error = trainRow(i)
                         lossFunction.accumulateError(error)
                     }

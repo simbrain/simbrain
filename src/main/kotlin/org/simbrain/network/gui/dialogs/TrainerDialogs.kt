@@ -62,7 +62,7 @@ fun <SN> SN.getSupervisedTrainingDialog(): StandardDialog where SN: SupervisedNe
         })
         val targets = MatrixEditor(trainingSet.targets, trainingSet.targetRowNames, trainingSet.targetColumnNames)
         val addRemoveRows = AddRemoveRows(inputs.table, targets.table)
-        trainer.events.beginTraining.on {
+        trainer.events.beginTraining.on(Dispatchers.Default) {
             trainingSet = MatrixDataset(
                 (inputs.table.model as MatrixDataFrame).data,
                 (targets.table.model as MatrixDataFrame).data,
@@ -145,7 +145,7 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
             iconPath = "menu_icons/Step.png",
         ) {
             with(network) {
-                trainer.events.beginTraining.fire()
+                trainer.events.beginTraining.fire().await()
                 trainer.trainOnce(unsupervisedNetwork)
                 trainer.events.endTraining.fire()
             }

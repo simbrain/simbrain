@@ -70,7 +70,7 @@ class TrainerControls<SN>(trainer: SupervisedTrainer<SN>, supervisedNetwork: SN,
     }
 
     private val trainerPropsAction = createAction(
-        name = "Trainer Properties",
+        name = "Trainer properties",
         description = "Edit trainer properties",
         iconPath = "menu_icons/Prefs.png",
     ) {
@@ -109,7 +109,7 @@ class TrainerControls<SN>(trainer: SupervisedTrainer<SN>, supervisedNetwork: SN,
         val labelPanel = LabelledItemPanel()
         labelPanel.addItem("Iterations:", iterationsLabel)
         val errorValue = JLabel(trainer.lastError.roundToString(4))
-        val errorLabel = labelPanel.addItem(trainer.lossFunction.name, errorValue)
+        val errorLabel = labelPanel.addItem(trainer.aggregationFunction.name, errorValue)
         runTools.add(labelPanel)
 
         trainer.events.errorUpdated.on(Dispatchers.Swing, wait = true) {
@@ -138,13 +138,14 @@ class ErrorTimeSeries(trainer: SupervisedTrainer<*>) : JPanel() {
         model.rangeLowerBound = 0.0
         model.rangeUpperBound = 5.0
         model.fixedWidth = true
+        model.windowSize = 1000
         model.isAutoRange = true
         model.useAutoRangeMinimumUpperBound = true
         model.autoRangeMinimumUpperBound = 5.0
         graphPanel = TimeSeriesPlotPanel(model)
         graphPanel.chartPanel.chart.setTitle("")
         graphPanel.chartPanel.chart.xyPlot.domainAxis.label = "Iterations"
-        graphPanel.chartPanel.chart.xyPlot.rangeAxis.label = trainer.lossFunction.name
+        graphPanel.chartPanel.chart.xyPlot.rangeAxis.label = trainer.aggregationFunction.name
         graphPanel.chartPanel.chart.removeLegend()
         graphPanel.preferredSize = Dimension(graphPanel.preferredSize.width, 200)
 
@@ -155,10 +156,10 @@ class ErrorTimeSeries(trainer: SupervisedTrainer<*>) : JPanel() {
         mainPanel.add(graphPanel)
         add(mainPanel)
 
-        model.addTimeSeries(trainer.lossFunction.name)
+        model.addTimeSeries(trainer.aggregationFunction.name)
         trainer.events.errorUpdated.on(Dispatchers.Swing, wait = true) {
             model.addData(0, trainer.iteration.toDouble(), it.loss)
-            graphPanel.chartPanel.chart.xyPlot.rangeAxis.label = trainer.lossFunction.name
+            graphPanel.chartPanel.chart.xyPlot.rangeAxis.label = trainer.aggregationFunction.name
         }
         trainer.events.iterationReset.on(Dispatchers.Swing, wait = true) {
             model.clearData()

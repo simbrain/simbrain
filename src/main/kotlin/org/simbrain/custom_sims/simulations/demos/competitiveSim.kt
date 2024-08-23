@@ -31,16 +31,20 @@ val competitiveSim = newSim {
     val docViewer = addDocViewer(
         "Information",
         """
-            # Competitive Network (Simple) Overview: 
+            # Introduction
             
             A simple competitive network is an unsupervised neural network trained to classify input patterns into output neurons. It learns to detect clusters in the input group, with the output responding to these clusters of patterns.
             The competitive group is initialized with randomized weights. 
 
-            # What to Do: 
+            # What to Do
         
-            The user selects different patterns using the buttons on the control panel. Each time a pattern is chosen and the network is iterated (stepped), the network trains a neuron to respond to the selected pattern. With each iteration the training algorithm is applied, strengthening the current response to the input.
-            Some patterns have overlapping output neurons, making them more challenging to separately train. The pattern that activates the output neuron most will be the label of this output neuron, and the connection between the weight and neurons is strengthened. Over time, the output neurons improve their ability to classify the clusters in the input space. 
-            The user repeats this process until the trained network responds to each pattern with a different output neuron. The network relies on the statistical properties of the inputs provided during training. 
+            - The user selects different patterns using the buttons on the control panel. 
+            - Each time a pattern is chosen and the network is iterated (stepped), the network trains a neuron to respond to the selected pattern. 
+            - With each iteration the training algorithm is applied, strengthening the current response to the input.
+            - Some patterns have overlapping output neurons, making them more challenging to separately train. 
+            - The pattern that activates the output neuron most will be the label of this output neuron, and the connection between the weight and neurons is strengthened. 
+        
+            Over time, the output neurons improve their ability to classify the clusters in the input space. The user repeats this process until the trained network responds to each pattern with a different output neuron. The network relies on the statistical properties of the inputs provided during training. 
             
             One way to get familiar with this simulation is to treat it as a game. Try to train the network so that each input pattern triggers a distinct output neuron, associating each input to a distinct output.  This is not easy, since overlapping inputs often get mapped to the same output. So it requires using different inputs early on, and training just once per different input.  Overtraining an input can cause it to be over-represented.
             
@@ -48,9 +52,9 @@ val competitiveSim = newSim {
     )
 
     withGui {
-        place(docViewer, 0, 0,  464, 674)
-        place(networkComponent, 661, 0, 674, 619)
-        createControlPanel("Control Panel", 510, 0) {
+        place(docViewer, 0, 0,  400, 615)
+        place(networkComponent, 661, 0, 674, 615)
+        createControlPanel("Control Panel", 417, 0) {
 
             addButton("Pattern 1") {
                 competitive.inputLayer.neuronList.activations =

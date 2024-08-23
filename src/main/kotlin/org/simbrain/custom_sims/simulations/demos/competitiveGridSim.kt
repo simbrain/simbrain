@@ -32,15 +32,19 @@ val competitiveGridSim = newSim {
     val docViewer = addDocViewer(
         "Information",
         """ 
-            # Competitive Grid Simulation Overview:
+            # Introduction
             
-            This is like the competitive simple network, but the inputs form a grid here.  As with the simple network, you can get this simulation to learn a set of patterns.     
+            This is like the competitive simple network, but the inputs form a grid here.  
+            
+            # What to Do
+            
+            As with the simple network, you can get this simulation to learn a set of patterns.     
         
         """.trimIndent()
     )
 
     withGui {
-        place(docViewer, 0, 0, 366, 266)
+        place(docViewer, 0, 0, 366, 275)
         place(networkComponent, 585, 0, 386, 619)
         createControlPanel("Control Panel", 417, 0) {
 

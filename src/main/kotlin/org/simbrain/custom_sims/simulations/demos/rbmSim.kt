@@ -43,15 +43,17 @@ val rbmSim = newSim {
     val docViewer = addDocViewer(
         "Information",
         """ 
-            # Restricted Boltzmann Machine Simulation Overview:
+            # Introduction
             
             The Hopfield simulation is a recurrent neural network with a synaptic connection pattern for pattern recognition and memory retrieval. 
 
-            # What to do:
+            # What to do
             
-            Select an input pattern and click the train button on the Control panel to train the network on the selected pattern.
-            The model learns the pattern and “remembers” it. When randomizing the network (by clicking “N” [Neuron], “R” [Randomize], and “Space” [Iterate], or using “I” [Wand Mode] over the nodes), the network adjusts the nodes on each iteration to reconfigure the inputted pattern. 
-            The Network remembers the pattern and the antipattern, and when iterating (“Space”), it iterates to recreate the pattern with the most similar nodes. 
+            - Select an input pattern and click the train button on the Control panel to train the network on the selected pattern. 
+            - The model learns the pattern and “remembers” it.
+            - When randomizing the network (by clicking “N” [Neuron], “R” [Randomize], and “Space” [Iterate], or using “I” [Wand Mode] over the nodes), the network adjusts the nodes on each iteration to reconfigure the inputted pattern. 
+            - The Network remembers the pattern and the antipattern, and when iterating (“Space”), it iterates to recreate the pattern with the most similar nodes. 
+            
             You can get the pattern to memorize all the different patterns and antipatterns by training each one, randomizing and iterating to see if it is remembered, and training that pattern again if it needs to be learned. 
 
         
@@ -59,7 +61,7 @@ val rbmSim = newSim {
     )
 
     withGui {
-        place(docViewer, 0, 0, 464, 686)
+        place(docViewer, 0, 0, 464, 619)
         place(networkComponent, 548, 0, 815, 619)
         createControlPanel("Control Panel", 404, 0) {
             addButton("Pattern 1") {

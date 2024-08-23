@@ -114,7 +114,7 @@ class TrainerControls<SN>(trainer: SupervisedTrainer<SN>, supervisedNetwork: SN,
 
         trainer.events.errorUpdated.on(Dispatchers.Swing, wait = true) {
             iterationsLabel.text = "" + trainer.iteration
-            errorValue.text = "" + round(it.loss, 4)
+            errorValue.text = "" + round(it.aggregatedError, 4)
             errorLabel.text = it.name
         }
 
@@ -158,7 +158,7 @@ class ErrorTimeSeries(trainer: SupervisedTrainer<*>) : JPanel() {
 
         model.addTimeSeries(trainer.aggregationFunction.name)
         trainer.events.errorUpdated.on(Dispatchers.Swing, wait = true) {
-            model.addData(0, trainer.iteration.toDouble(), it.loss)
+            model.addData(0, trainer.iteration.toDouble(), it.aggregatedError)
             graphPanel.chartPanel.chart.xyPlot.rangeAxis.label = trainer.aggregationFunction.name
         }
         trainer.events.iterationReset.on(Dispatchers.Swing, wait = true) {

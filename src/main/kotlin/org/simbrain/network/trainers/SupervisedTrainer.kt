@@ -46,7 +46,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
         description = "How to aggregate error and present it",
         order = 3,
         showDetails = false)
-    var aggregationFunction: AggregationFunction = AggregationFunction.SumSquaredError()
+    var aggregationFunction: AggregationFunction = AggregationFunction.Sum()
 
     var stoppingCondition by GuiEditable(
         initValue = StoppingCondition(),
@@ -78,7 +78,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
         withContext(Dispatchers.Default) {
             while (isRunning) {
                 trainOnce()
-                if (stoppingCondition.validate(iteration, aggregationFunction.loss)) {
+                if (stoppingCondition.validate(iteration, aggregationFunction.aggregatedError)) {
                     stoppingConditionReached = true
                     stopTraining()
                 }
@@ -121,7 +121,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
                 }
             }
         }
-        lastError = aggregationFunction.loss
+        lastError = aggregationFunction.aggregatedError
         events.errorUpdated.fire(aggregationFunction).await()
     }
 
@@ -156,7 +156,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
     }
 
     /**
-     * How to aggregate a trainer's scalar error into what is displayed.
+     * How to aggregate a trainer's scalar error into what is displayed. Others call this a reduction function.
      */
     sealed class AggregationFunction: CopyableObject {
 
@@ -164,7 +164,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
 
         protected var runningCount = 0
 
-        abstract val loss: Double
+        abstract val aggregatedError: Double
 
         abstract fun accumulateError(error: Double)
 
@@ -173,53 +173,53 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
             runningCount = 0
         }
 
-        class MeanSquaredError : AggregationFunction() {
+        class Mean : AggregationFunction() {
             override fun accumulateError(error: Double) {
-                runningError += error * error
+                runningError += error
                 runningCount++
             }
 
-            override val loss: Double
+            override val aggregatedError: Double
                 get() = runningError / runningCount
 
-            override fun copy() = MeanSquaredError()
+            override fun copy() = Mean()
 
             override val name: String = "Mean Squared Error"
         }
 
-        class SumSquaredError : AggregationFunction() {
+        class Sum : AggregationFunction() {
             override fun accumulateError(error: Double) {
-                runningError += error * error
+                runningError += error
                 runningCount++
             }
 
-            override val loss: Double
+            override val aggregatedError: Double
                 get() = runningError
 
-            override fun copy() = SumSquaredError()
+            override fun copy() = Sum()
 
             override val name: String = "Sum Squared Error"
         }
 
-        class RootMeanSquaredError : AggregationFunction() {
+        class RootMean : AggregationFunction() {
             override fun accumulateError(error: Double) {
-                runningError += error * error
+                runningError += error
                 runningCount++
             }
 
-            override val loss: Double
+            override val aggregatedError: Double
                 get() = sqrt(runningError / runningCount)
 
-            override fun copy() = RootMeanSquaredError()
+            override fun copy() = RootMean()
 
             override val name: String = "Root Mean Squared Error"
         }
 
         override fun getTypeList(): List<Class<out CopyableObject>>? {
             return listOf(
-                MeanSquaredError::class.java,
-                SumSquaredError::class.java,
-                RootMeanSquaredError::class.java
+                Mean::class.java,
+                Sum::class.java,
+                RootMean::class.java
             )
         }
     }

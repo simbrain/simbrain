@@ -35,14 +35,18 @@ import kotlin.random.Random
  */
 abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
 
-    @UserParameter(label = "Learning Rate", order = 1)
+    @UserParameter(label = "Learning Rate", increment = .01, minimumValue = 0.0, order = 1)
     var learningRate = .01
 
     @UserParameter(label = "Update type", order = 2)
     open var updateType: UpdateMethod = UpdateMethod.Epoch()
 
-    @UserParameter(label = "Loss Function", order = 3, showDetails = false)
-    var lossFunction: LossFunction = LossFunction.SumSquaredError()
+    @UserParameter(
+        label = "Aggregation Function",
+        description = "How to aggregate error and present it",
+        order = 3,
+        showDetails = false)
+    var aggregationFunction: AggregationFunction = AggregationFunction.SumSquaredError()
 
     var stoppingCondition by GuiEditable(
         initValue = StoppingCondition(),
@@ -74,7 +78,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
         withContext(Dispatchers.Default) {
             while (isRunning) {
                 trainOnce()
-                if (stoppingCondition.validate(iteration, lossFunction.loss)) {
+                if (stoppingCondition.validate(iteration, aggregationFunction.loss)) {
                     stoppingConditionReached = true
                     stopTraining()
                 }
@@ -98,13 +102,13 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
     suspend fun trainOnce() {
         iteration++
         with(updateType) {
-            lossFunction.reset()
+            aggregationFunction.reset()
             when (this) {
-                is UpdateMethod.Stochastic -> lossFunction.accumulateError(trainRow(Random.nextInt(trainingSet.inputs.nrow())))
+                is UpdateMethod.Stochastic -> aggregationFunction.accumulateError(trainRow(Random.nextInt(trainingSet.inputs.nrow())))
                 is UpdateMethod.Epoch -> {
                     for (i in 0 until trainingSet.size) {
                         val error = trainRow(i)
-                        lossFunction.accumulateError(error)
+                        aggregationFunction.accumulateError(error)
                     }
                 }
                 is UpdateMethod.Batch -> {
@@ -112,13 +116,13 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
                     val endIndex = startIndex + batchSize
                     for (i in (startIndex until endIndex)) {
                         val error = trainRow(i)
-                        lossFunction.accumulateError(error)
+                        aggregationFunction.accumulateError(error)
                     }
                 }
             }
         }
-        lastError = lossFunction.loss
-        events.errorUpdated.fire(lossFunction).await()
+        lastError = aggregationFunction.loss
+        events.errorUpdated.fire(aggregationFunction).await()
     }
 
     context(Network)
@@ -151,7 +155,10 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
         fun srnTypeList() = listOf(Epoch::class.java)
     }
 
-    sealed class LossFunction: CopyableObject {
+    /**
+     * How to aggregate a trainer's scalar error into what is displayed.
+     */
+    sealed class AggregationFunction: CopyableObject {
 
         protected var runningError = 0.0
 
@@ -166,7 +173,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
             runningCount = 0
         }
 
-        class MeanSquaredError : LossFunction() {
+        class MeanSquaredError : AggregationFunction() {
             override fun accumulateError(error: Double) {
                 runningError += error * error
                 runningCount++
@@ -180,7 +187,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
             override val name: String = "Mean Squared Error"
         }
 
-        class SumSquaredError : LossFunction() {
+        class SumSquaredError : AggregationFunction() {
             override fun accumulateError(error: Double) {
                 runningError += error * error
                 runningCount++
@@ -194,7 +201,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
             override val name: String = "Sum Squared Error"
         }
 
-        class RootMeanSquaredError : LossFunction() {
+        class RootMeanSquaredError : AggregationFunction() {
             override fun accumulateError(error: Double) {
                 runningError += error * error
                 runningCount++

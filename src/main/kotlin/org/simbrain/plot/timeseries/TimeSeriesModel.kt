@@ -72,14 +72,24 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
         order = 30
     )
 
-    var useAutoRangeMinimumSize = false
+    var useAutoRangeMinimumUpperBound = false
 
-    var autoRangeMinimumSize by GuiEditable(
+    var autoRangeMinimumUpperBound by GuiEditable(
         initValue = 1.0,
-        label = "Auto Range Minimum Size",
-        description = "Minimum size of the range when auto range is used",
-        useCheckboxFrom = TimeSeriesModel::useAutoRangeMinimumSize,
+        label = "Auto Range Minimum Upper Bound",
+        description = "When auto range is on, if the range is less than this value, the range will be set to this value",
+        useCheckboxFrom = TimeSeriesModel::useAutoRangeMinimumUpperBound,
         order = 40
+    )
+
+    var useAutoRangeMaximumLowerBound = false
+
+    var autoRangeMaximumLowerBound by GuiEditable(
+        initValue = 0.0,
+        label = "Auto Range Maximum Lower Bound",
+        description = "When auto range is on, if the range is greater than this value, the range will be set to this value",
+        useCheckboxFrom = TimeSeriesModel::useAutoRangeMaximumLowerBound,
+        order = 50
     )
 
     @UserParameter(

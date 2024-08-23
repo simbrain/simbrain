@@ -21,7 +21,7 @@ package org.simbrain.plot.timeseries
 import org.jfree.chart.ChartFactory
 import org.jfree.chart.ChartPanel
 import org.jfree.chart.JFreeChart
-import org.jfree.chart.axis.ValueAxis.DEFAULT_AUTO_RANGE_MINIMUM_SIZE
+import org.jfree.chart.axis.ValueAxis.*
 import org.jfree.chart.plot.PlotOrientation
 import org.simbrain.util.createEditorDialog
 import org.simbrain.util.display
@@ -30,6 +30,8 @@ import java.awt.Dimension
 import javax.swing.JButton
 import javax.swing.JComboBox
 import javax.swing.JPanel
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * Display a TimeSeriesPlot. This component can be used independently of the
@@ -107,6 +109,10 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
         chart.backgroundPaint = null
 
         updateChartSettings()
+
+        chart.addProgressListener {
+            updateChartSettings()
+        }
     }
 
     fun updateChartSettings() {
@@ -117,12 +123,25 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
 
         if (timeSeriesModel.isAutoRange) {
 
-            chart.xyPlot.rangeAxis.isAutoRange = true
-            chart.xyPlot.rangeAxis.autoRangeMinimumSize = if (timeSeriesModel.useAutoRangeMinimumSize) {
-                timeSeriesModel.autoRangeMinimumSize
-            } else {
-                DEFAULT_AUTO_RANGE_MINIMUM_SIZE
-            }
+            val min = timeSeriesModel.timeSeriesList.minOfOrNull { it.series.minY } ?: 0.0
+            val max = timeSeriesModel.timeSeriesList.maxOfOrNull { it.series.maxY } ?: 0.0
+
+            val (lower, upper) = listOf(
+                if (timeSeriesModel.useAutoRangeMaximumLowerBound) {
+                    min(min, timeSeriesModel.autoRangeMaximumLowerBound)
+                } else {
+                    min
+                },
+                if (timeSeriesModel.useAutoRangeMinimumUpperBound) {
+                    max(max, timeSeriesModel.autoRangeMinimumUpperBound)
+                } else {
+                    max
+                }
+            ).sorted()
+
+            val delta = max(upper - lower, DEFAULT_AUTO_RANGE_MINIMUM_SIZE)
+
+            chart.xyPlot.rangeAxis.setRange(lower - DEFAULT_LOWER_MARGIN * delta, upper + DEFAULT_UPPER_MARGIN * delta)
 
         } else {
             chart.xyPlot.rangeAxis.isAutoRange = false

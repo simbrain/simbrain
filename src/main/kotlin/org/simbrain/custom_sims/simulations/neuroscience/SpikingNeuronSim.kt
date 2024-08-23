@@ -55,32 +55,30 @@ val spikingNeuron = newSim {
     val docViewer = addDocViewer(
         "Spiking Neuron",
         """ 
-           # Introduction
+            # Introduction
+             
+            This is a[spiking neuron model](https://docs.simbrain.net/docs/network/spikingneurons.html) using the [Izhekevich neuron](https://docs.simbrain.net/docs/network/neurons/izhikevich.html) model neuron and a [bump and decay](https://docs.simbrain.net/docs/network/spikeresponders/jumpdecay.html) spike responder to show how biologically realistic models can be used in Simbrain.
             
-            This is a **[spiking neuron model](https://docs.simbrain.net/docs/network/spikingneurons.html)** using the Izhekevich neuron model to model the firing events of real neurons. In this spiking neuron simulation, you can explore different
-             dynamical systems of neural firing through different parameter settings.
+            # What to do
             
-            # Spiking Neuron
+            For a quick sense of how this simulations works, press `run` in the desktop toolbar, select the input neuron, and press the up and down arrows to adjust the input neuron's activation. Then observe how the spike rate of the spiking neuron changes as a result. You can also observe how the neuron downstrea from the spiking neuron reacts. Dealing with spike responses is complicated, and requires the use of [spike responders](https://docs.simbrain.net/docs/network/spikeresponders/).
             
-            To explore the neuron model, double click on the **spiking neuron** and change its parameters. To get a feel of the parameters, the online doc for **[Izhekevich neuron](https://docs.simbrain.net/docs/network/neurons/izhikevich.html)** 
-            describes many parameter settings that produce different, yet interesting dynamical systems that is expressed in the top-right time series. This online doc can be accessed through the link attached before 
-            or, through the **help icon** after double clicking on the spiking neuron.
+            Some things you can do with this situation include changing the parameters of the neuron, changing the  type of spiking neuron, changing the parameters of the spike responder, and changing the type of spike responder
             
-            # Post-Synaptic Response Neuron
+            # Izhekevich Neuron
             
-            To change the post-synaptic response, double click on the weight from the spiking neuron to the post-synaptic response neuron. This post-synaptic response is expressed in the bottom-right time series. To see a comparison between 
-            different types of post-synaptic responses, open the **Spike Responders** simulation, a simulation showing different post-synaptic responses in one time series.
+            The [Izhekevich neuron](https://docs.simbrain.net/docs/network/neurons/izhikevich.html) neuron is notable for having four parameters, `A`, `B`, `C`, and `D` that can be used to produce different types of neural behavior. See the table at the bottom of the help page for Izhekevich neurons linked above.
+             
+            # Post-Synaptic Response 
+             
+            To change the post-synaptic response, double click on the weight from the `Spiking` to the  `Post-Synaptic Response` neuron. This can be tricky but you can lasso over the line and then use `Command/Ctrl-E` to open the editor dialog. Then you can either change to a different node or edit that one.
             
+            To see a comparison between different types of post-synaptic responses, open the `Spike Responders` simulation, a simulation showing different post-synaptic responses in one time series.
+             
             # Other Spiking Neuron Models
-            
-            To explore different spiking neuron models, double click on the spiking neuron and change its update rule to another rule. An example spiking neuron update rule would be the
-            **[Integrate And Fire Rule](https://docs.simbrain.net/docs/network/neurons/integrateAndFire.html)**. The Integrate and Fire model is an easier, interpretable spiking neuron in comparison to the
-            Izhekevich neuron model, an alternative model. To look at other spiking neuron models, the link attached in the _Introduction_ section mentions about other examples of spiking neuron models.
-            
-            # Other Things To Change and Observe
-            
-            An additional option is to increase or decrease the activation of the **input neuron** to influence the spike rate of the spiking neuron, and observe the resulting changes in the post-synaptic response in the time series.
-            
+             
+             To explore different spiking neuron models, double click on the spiking neuron and change its update rule to another rule. An example spiking neuron update rule would be the [Integrate And Fire Rule](https://docs.simbrain.net/docs/network/neurons/integrateAndFire.html). The Integrate and Fire model is a more easily interpretable spiking.  Other spiking neuron models are listed [here](https://docs.simbrain.net/docs/network/spikingneurons.html).
+                        
         """.trimIndent()
     )
 
@@ -90,5 +88,8 @@ val spikingNeuron = newSim {
         place(spikeResponses, 410, 410, 400,400)
         place(docViewer, 0, 410, 400,400)
     }
+
+    network.events.zoomToFitPage.fire()
+
 
 }

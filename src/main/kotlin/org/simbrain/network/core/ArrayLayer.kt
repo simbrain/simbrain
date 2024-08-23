@@ -29,7 +29,6 @@ abstract class ArrayLayer(
 
     context(Network)
     override fun accumulateInputs() {
-        inputs.mul(0.0)
         super.accumulateInputs()
         val wtdInputs = Matrix(size, 1)
         for (c in incomingConnectors) {

@@ -16,10 +16,41 @@ package org.simbrain.network.trainers
 import org.simbrain.network.core.*
 import org.simbrain.network.updaterules.interfaces.DifferentiableUpdateRule
 import org.simbrain.network.util.BiasedMatrixData
-import org.simbrain.util.*
+import org.simbrain.util.flatten
+import org.simbrain.util.plus
+import org.simbrain.util.sse
+import org.simbrain.util.validateSameShape
 import smile.math.matrix.Matrix
 import java.util.*
-import kotlin.sequences.toList
+import kotlin.collections.LinkedHashSet
+import kotlin.collections.List
+import kotlin.collections.Map
+import kotlin.collections.associate
+import kotlin.collections.contains
+import kotlin.collections.emptyList
+import kotlin.collections.filter
+import kotlin.collections.filterIsInstance
+import kotlin.collections.first
+import kotlin.collections.flatMap
+import kotlin.collections.flatten
+import kotlin.collections.forEach
+import kotlin.collections.forEachIndexed
+import kotlin.collections.intersect
+import kotlin.collections.isNotEmpty
+import kotlin.collections.last
+import kotlin.collections.listOf
+import kotlin.collections.map
+import kotlin.collections.mapOf
+import kotlin.collections.mutableListOf
+import kotlin.collections.mutableMapOf
+import kotlin.collections.mutableSetOf
+import kotlin.collections.reverse
+import kotlin.collections.reversed
+import kotlin.collections.set
+import kotlin.collections.toList
+import kotlin.collections.toMutableSet
+import kotlin.collections.toSet
+import kotlin.collections.zip
 
 // TODO: Need a way to generalize across NeuronArrays and NeuronCollections
 val WeightMatrix.src get() = source as NeuronArray
@@ -40,9 +71,16 @@ context(Network)
 fun List<WeightMatrix>.forwardPass(inputVector: Matrix) {
     inputVector.validateSameShape(first().src.inputs)
     first().src.activations = inputVector
+
+    fun NeuronArray.updateWithoutClearingInputs() {
+        updateRule.apply(this, dataHolder)
+        events.updated.fire()
+    }
+
     for (wm in this) {
+        wm.target.inputs.mul(0.0)
         wm.target.accumulateInputs()
-        wm.target.update()
+        (wm.target as NeuronArray).updateWithoutClearingInputs()
     }
 }
 
@@ -87,7 +125,7 @@ fun NeuronArray.updateBiases(error: Matrix, epsilon: Double = .1) {
  * stored in a sequence from input to output layers
  */
 context(Network)
-fun List<WeightMatrix>.updateWeights(
+fun List<WeightMatrix>.applyBackprop(
     targetValues: Matrix,
     epsilon: Double = .1,
     lossFunction: (actual: Matrix, target: Matrix) -> Double = { actual, target -> actual sse target },

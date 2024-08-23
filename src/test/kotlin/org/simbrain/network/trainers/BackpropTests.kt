@@ -96,7 +96,7 @@ class BackpropTests {
             na3.randomizeBiases()
             repeat(100) {
                 listOf(wm1, wm2).forwardPass(inputVector)
-                listOf(wm1, wm2).updateWeights(targetVector, .1)
+                listOf(wm1, wm2).applyBackprop(targetVector, .1)
                 // println(targets.toDoubleArray() sse wm2.output.toDoubleArray())
             }
             println("Outputs: ${na3.activations}, SSE = ${targetVector sse na3.activations}")
@@ -116,7 +116,7 @@ class BackpropTests {
             na2.randomizeBiases()
             repeat(100) {
                 listOf(wm1).forwardPass(commonInputs)
-                listOf(wm1).updateWeights(targetVector, .2)
+                listOf(wm1).applyBackprop(targetVector, .2)
             }
             println("Outputs: ${na2.activations}, SSE = ${targetVector sse na2.activations}")
             assertEquals(0.0, targetVector sse na2.activations, .01)
@@ -134,7 +134,7 @@ class BackpropTests {
             net.addNetworkModels(wm3, na4)
             repeat(100) {
                 listOf(wm1, wm2, wm3).forwardPass(commonInputs)
-                listOf(wm1, wm2, wm3).updateWeights(targetVector, .1)
+                listOf(wm1, wm2, wm3).applyBackprop(targetVector, .1)
                 // println(targets.toDoubleArray() sse wm2.output.toDoubleArray())
             }
             println("Outputs: ${na4.activations}, SSE = ${targetVector sse na4.activations}")
@@ -174,7 +174,7 @@ class BackpropTests {
             addNetworkModels(inputLayer, outputLayer, wm)
             repeat(10000) {
                 listOf(wm).forwardPass(inputs)
-                listOf(wm).updateWeights(targets, .1, lossFunction = ::crossEntropy)
+                listOf(wm).applyBackprop(targets, .1, lossFunction = ::crossEntropy)
                 // println(targets.toDoubleArray() sse wm2.output.toDoubleArray())
             }
             println("Outputs: ${outputLayer.activations}, Cross Entropy = ${crossEntropy(outputLayer.activations, targets)}")
@@ -203,7 +203,7 @@ class BackpropTests {
                     summedError = 0.0
                 }
                 bp.wmList.forwardPass(Matrix.column(inputs.row(i % inputs.nrow())))
-                summedError += bp.wmList.updateWeights(
+                summedError += bp.wmList.applyBackprop(
                     Matrix.column(inputs.row(i % inputs.nrow())),
                     .1,
                     debug = { index, layerError ->

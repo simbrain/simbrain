@@ -29,10 +29,9 @@ val hopfieldSim = newSim {
     // The Network remembers the pattern and the antipattern, and when iterating (“Space”), it iterates to recreate the pattern with the most similar nodes.
     // You can get the pattern to memorize all the different patterns and antipatterns by training each one, randomizing and iterating to see if it is remembered, and training that pattern again if it needs to be learned.
     val docViewer = addDocViewer(
-        "Hopfield Network",
+        "Information",
         """ 
             # Introduction
-            
             
             [Hopfield networks](https://en.wikipedia.org/wiki/Hopfield_network) are recurent networks often used for pattern recognition and to model memory retrieval. 
             In this simulation you can test the network's ability to store and retrieve memories in the form of activation patterns.
@@ -55,12 +54,9 @@ val hopfieldSim = newSim {
         
         """.trimIndent()
     )
-    withGui {
-        place(docViewer, 812, 10, 542, 627)
-    }
 
     withGui {
-        place(docViewer, 0, 0, 450, 483)
+        place(docViewer, 0, 0, 450, 619)
         place(networkComponent, 604, 0, 509, 619)
         createControlPanel("Control Panel", 470, 0) {
 

@@ -14,7 +14,6 @@ import org.simbrain.network.trainers.SupervisedNetwork
 import org.simbrain.network.trainers.SupervisedTrainer
 import org.simbrain.network.trainers.UnsupervisedNetwork
 import org.simbrain.util.*
-import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.table.MatrixDataFrame
 import org.simbrain.util.table.createAdvanceRowAction
 import org.simbrain.util.table.createApplyAction
@@ -108,9 +107,6 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         val trainer = unsupervisedNetwork.trainer
 
         val runControls = JPanel().apply { layout = MigLayout("nogrid") }
-        val trainerPanel = AnnotatedPropertyEditor(trainer)
-        val trainerApplyPanel = trainerPanel.createApplyPanel()
-        mainPanel.add(trainerApplyPanel, "wrap")
         val runAction = createAction(
             name = "Run",
             description = "Run training algorithm",
@@ -177,6 +173,15 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         val trainOnCurrentPatternButton = JButton(with(network) { unsupervisedNetwork.createTrainOnPatternAction()})
         trainOnCurrentPatternButton.hideActionText = true
         runControls.add(trainOnCurrentPatternButton)
+
+        val preferencesButton = JButton(createAction(
+            name = "Preferences",
+            description = "Edit trainer preferences",
+            iconPath = "menu_icons/Prefs.png",
+        ) {
+            trainer.createEditorDialog().display()
+        })
+        runControls.add(preferencesButton)
 
         mainPanel.add(runControls, "wrap")
 

@@ -278,6 +278,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             contextMenu.add(switchStyle)
             val toggleShowBias: Action = networkPanel.createAction(
                 name = "Toggle bias visibility",
+                keyboardShortcut = 'B',
                 description = "Toggle whether biases are visible"
             ) {
                 networkPanel.selectionManager

@@ -141,7 +141,7 @@ class ErrorTimeSeries(trainer: SupervisedTrainer<*>) : JPanel() {
         model.windowSize = 1000
         model.isAutoRange = true
         model.useAutoRangeMinimumUpperBound = true
-        model.autoRangeMinimumUpperBound = 5.0
+        model.autoRangeMinimumUpperBound = 1.0
         graphPanel = TimeSeriesPlotPanel(model)
         graphPanel.chartPanel.chart.setTitle("")
         graphPanel.chartPanel.chart.xyPlot.domainAxis.label = "Iterations"

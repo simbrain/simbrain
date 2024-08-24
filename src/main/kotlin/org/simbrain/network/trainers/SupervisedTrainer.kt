@@ -16,6 +16,9 @@ package org.simbrain.network.trainers
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.simbrain.network.core.Network
+import org.simbrain.network.core.NeuronArray
+import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.core.biases
 import org.simbrain.network.events.TrainerEvents
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.subnetworks.SRNNetwork
@@ -105,19 +108,13 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
             aggregationFunction.reset()
             when (this) {
                 is UpdateMethod.Stochastic -> aggregationFunction.accumulateError(trainRow(Random.nextInt(trainingSet.inputs.nrow())))
-                is UpdateMethod.Epoch -> {
-                    for (i in 0 until trainingSet.size) {
-                        val error = trainRow(i)
-                        aggregationFunction.accumulateError(error)
-                    }
-                }
+                is UpdateMethod.Epoch -> aggregationFunction.accumulateError(
+                    trainBatch(0 until trainingSet.size)
+                )
                 is UpdateMethod.Batch -> {
                     val startIndex = Random.nextInt(0, trainingSet.size - batchSize + 1)
                     val endIndex = startIndex + batchSize
-                    for (i in (startIndex until endIndex)) {
-                        val error = trainRow(i)
-                        aggregationFunction.accumulateError(error)
-                    }
+                    aggregationFunction.accumulateError(trainBatch(startIndex until  endIndex))
                 }
             }
         }
@@ -127,6 +124,15 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
 
     context(Network)
     abstract fun SN.trainRow(rowNum: Int): Double
+
+    context(Network)
+    open fun SN.trainBatch(rowRange: IntRange): Double {
+        var error = 0.0
+        for (i in rowRange) {
+            error += trainRow(i)
+        }
+        return error
+    }
 
     sealed class UpdateMethod: CopyableObject {
         class Stochastic : UpdateMethod() {
@@ -262,6 +268,32 @@ class BackpropTrainer : SupervisedTrainer<BackpropNetwork>() {
         val targetVec = trainingSet.targets.rowVectorTransposed(rowNum)
         wmList.forwardPass(inputLayer.activations)
         return wmList.applyBackprop(targetVec, epsilon = learningRate, lossFunction = Matrix::sse)
+    }
+
+    context(Network)
+    override fun BackpropNetwork.trainBatch(rowRange: IntRange): Double {
+
+        val weightAccumulator: HashMap<WeightMatrix, Matrix> = HashMap()
+        val biasesAccumulator: HashMap<NeuronArray, Matrix> = HashMap()
+
+        var error = 0.0
+
+        for (i in rowRange) {
+            inputLayer.setActivations(trainingSet.inputs.row(i))
+            val targetVec = trainingSet.targets.rowVectorTransposed(i)
+            wmList.forwardPass(inputLayer.activations)
+            error += wmList.accumulateBackprop(targetVec, weightAccumulator, biasesAccumulator, lossFunction = Matrix::sse)
+        }
+
+        weightAccumulator.forEach { (wm, delta) ->
+            wm.weightMatrix.add(delta.mul(trainer.learningRate))
+        }
+
+        biasesAccumulator.forEach { (na, delta) ->
+            na.biases.add(delta.mul(trainer.learningRate))
+        }
+
+        return error
     }
 
 }

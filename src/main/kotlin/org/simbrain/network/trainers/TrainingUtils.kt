@@ -22,6 +22,7 @@ import org.simbrain.util.sse
 import org.simbrain.util.validateSameShape
 import smile.math.matrix.Matrix
 import java.util.*
+import kotlin.collections.HashMap
 import kotlin.collections.LinkedHashSet
 import kotlin.collections.List
 import kotlin.collections.Map
@@ -35,6 +36,7 @@ import kotlin.collections.flatMap
 import kotlin.collections.flatten
 import kotlin.collections.forEach
 import kotlin.collections.forEachIndexed
+import kotlin.collections.getOrPut
 import kotlin.collections.intersect
 import kotlin.collections.isNotEmpty
 import kotlin.collections.last
@@ -103,6 +105,17 @@ fun WeightMatrix.updateWeights(layerError: Matrix, epsilon: Double = .1): Matrix
     return backropagatedErrors
 }
 
+fun WeightMatrix.computeDelta(layerError: Matrix): Pair<Matrix, Matrix> {
+    layerError.validateSameShape(target.activations)
+    val weightDeltas = layerError.mm(source.activations.transpose())
+
+    // Backpropagate the layer error through the weights to get a new error vector
+    //  Prefer this to layerError.T.mm(wm).T because that requies an extra transpose
+    val backropagatedErrors = weightMatrix.transpose().mm(layerError)
+
+    return Pair(weightDeltas, backropagatedErrors)
+}
+
 /**
  * Change to bias is error vector times epsilon. Compute this and add it to biases.
  */
@@ -145,6 +158,37 @@ fun List<WeightMatrix>.applyBackprop(
         layerError.mul(deriv)
         wm.tar.updateBiases(layerError, epsilon)
         layerError = wm.updateWeights(layerError, epsilon)
+    }
+
+    return error
+}
+
+context(Network)
+fun List<WeightMatrix>.accumulateBackprop(
+    targetValues: Matrix,
+    weightAccumulator: HashMap<WeightMatrix, Matrix>,
+    biasesAccumulator: HashMap<NeuronArray, Matrix>,
+    lossFunction: (actual: Matrix, target: Matrix) -> Double = { actual, target -> actual sse target }
+): Double {
+
+    targetValues.validateSameShape(last().tar.activations)
+
+    val error = lossFunction(last().tar.activations, targetValues)
+
+    // printActivationsAndWeights()
+    var layerError: Matrix = last().tar.getError(targetValues)
+
+    this.reversed().forEach { wm ->
+        val deriv = (wm.tar.updateRule as DifferentiableUpdateRule).getDerivative(wm.tar.inputs)
+        layerError.mul(deriv)
+        biasesAccumulator.getOrPut(wm.tar) {
+            Matrix(wm.tar.size, 1)
+        }.add(layerError)
+        val (delta, errors) = wm.computeDelta(layerError)
+        layerError = errors
+        weightAccumulator.getOrPut(wm) {
+            Matrix(wm.weightMatrix.nrow(), wm.weightMatrix.ncol())
+        }.add(delta)
     }
 
     return error

@@ -15,7 +15,6 @@ package org.simbrain.network.trainers
 
 import org.simbrain.network.core.*
 import org.simbrain.network.updaterules.interfaces.DifferentiableUpdateRule
-import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.util.flatten
 import org.simbrain.util.plus
 import org.simbrain.util.sse
@@ -121,16 +120,9 @@ fun WeightMatrix.computeDelta(layerError: Matrix): Pair<Matrix, Matrix> {
  */
 fun NeuronArray.updateBiases(error: Matrix, epsilon: Double = .1) {
     this.activations.validateSameShape(error)
-    dataHolder.let {
-        if (it is BiasedMatrixData) {
-            val biasDelta = error.clone().mul(epsilon)
-            it.biases += biasDelta
-            events.updated.fire()
-        } else {
-            throw IllegalStateException("Neuron array ${id} has no biases to update")
-        }
-
-    }
+    val biasDelta = error.clone().mul(epsilon)
+    biases += biasDelta
+    events.updated.fire()
 }
 
 /**

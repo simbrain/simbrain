@@ -3,9 +3,6 @@ package org.simbrain.network.util
 import org.simbrain.network.core.Network
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.CopyableObject
-import org.simbrain.workspace.AttributeContainer
-import org.simbrain.workspace.Producible
-import smile.math.matrix.Matrix
 import java.util.*
 
 /**
@@ -19,29 +16,6 @@ interface MatrixDataHolder : CopyableObject {
 object EmptyMatrixData : MatrixDataHolder {
     override fun copy() = this
     override fun toString(): String = ""
-}
-
-class BiasedMatrixData(var size: Int) : MatrixDataHolder, AttributeContainer {
-    @UserParameter(label = "Biases", description = "Biases for each neuron")
-    var biases = Matrix(size, 1)
-        set(value) {
-            field.copyFrom(value)
-        }
-
-    @get:Producible
-    val biasesArray: DoubleArray
-        get() = biases.toDoubleArray()
-
-    override fun copy() = BiasedMatrixData(size).also {
-        it.biases = biases.clone()
-    }
-
-    override fun toString(): String {
-        return "Biases: ${Utils.getTruncatedArrayString(biases.toDoubleArray(), 10)}"
-    }
-
-    override val id: String
-        get() = "Biases"
 }
 
 open class SpikingMatrixData(val size: Int) : MatrixDataHolder {

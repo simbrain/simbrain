@@ -5,10 +5,11 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
-import org.simbrain.network.util.BiasedMatrixData
-import org.simbrain.util.*
+import org.simbrain.util.copyFrom
+import org.simbrain.util.flatten
+import org.simbrain.util.toDoubleArray
+import org.simbrain.util.toMatrix
 import smile.math.matrix.Matrix
-import kotlin.math.exp
 
 class TrainingUtilsTest {
 
@@ -16,7 +17,6 @@ class TrainingUtilsTest {
     val na1 = NeuronArray(2)
     val na2 = NeuronArray(3)
     val na3 = NeuronArray(2)
-    var na1DataHolder = (na1.dataHolder as BiasedMatrixData)
     val wm1 = WeightMatrix(na1, na2)
     val wm2 = WeightMatrix(na2, na3)
 
@@ -36,18 +36,18 @@ class TrainingUtilsTest {
 
     @Test
     fun `test bias update`() {
-        na1DataHolder.biases = doubleArrayOf(1.0, 1.0).toMatrix()
+        na1.biases = doubleArrayOf(1.0, 1.0).toMatrix()
         val error = na1.getError(doubleArrayOf(0.0, 1.0).toMatrix())
         // Change to bias is 0,1, so biases should become 1,2
         na1.updateBiases(error, 1.0)
-        assertArrayEquals(doubleArrayOf(1.0, 2.0 ), na1DataHolder.biases.toDoubleArray())
+        assertArrayEquals(doubleArrayOf(1.0, 2.0 ), na1.biases.toDoubleArray())
         na1.updateBiases(error, 1.0)
-        assertArrayEquals(doubleArrayOf(1.0, 3.0 ), na1DataHolder.biases.toDoubleArray())
+        assertArrayEquals(doubleArrayOf(1.0, 3.0 ), na1.biases.toDoubleArray())
         na1.updateBiases(error, .1)
-        assertArrayEquals(doubleArrayOf(1.0, 3.1 ), na1DataHolder.biases.toDoubleArray())
+        assertArrayEquals(doubleArrayOf(1.0, 3.1 ), na1.biases.toDoubleArray())
         error.mul(-1.0)
         na1.updateBiases(error, 1.0)
-        assertArrayEquals(doubleArrayOf(1.0, 2.1 ), na1DataHolder.biases.toDoubleArray())
+        assertArrayEquals(doubleArrayOf(1.0, 2.1 ), na1.biases.toDoubleArray())
     }
 
     @Test

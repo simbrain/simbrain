@@ -86,6 +86,10 @@ abstract class Layer : LocatableModel(), AttributeContainer {
      */
     abstract val activationArray: DoubleArray
 
+    abstract val biases: Matrix
+
+    abstract val biasArray: DoubleArray
+
     @get:Producible
     val outputArray: DoubleArray
         get() = activations.toDoubleArray()

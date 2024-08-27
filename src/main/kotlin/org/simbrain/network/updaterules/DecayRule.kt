@@ -5,8 +5,8 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.updaterules.interfaces.ClippedUpdateRule
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
-import org.simbrain.network.util.BiasedMatrixData
-import org.simbrain.network.util.BiasedScalarData
+import org.simbrain.network.util.EmptyMatrixData
+import org.simbrain.network.util.EmptyScalarData
 import org.simbrain.util.UserParameter
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
@@ -15,7 +15,7 @@ import kotlin.math.abs
 /**
  * **DecayNeuron** implements various forms of standard decay.
  */
-open class DecayRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>(), ClippedUpdateRule, NoisyUpdateRule {
+open class DecayRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), ClippedUpdateRule, NoisyUpdateRule {
     /**
      * Update type.
      */
@@ -76,28 +76,27 @@ open class DecayRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>(), C
     override var lowerBound: Double = DEFAULT_FLOOR
 
     context(Network)
-    override fun apply(layer: Layer, dataHolder: BiasedMatrixData) {
+    override fun apply(layer: Layer, dataHolder: EmptyMatrixData) {
         for (i in 0 until layer.activations.nrow()) {
             layer.activations[i, 0] = decayRule(
                 layer.inputs[i, 0],
-                layer.activations[i, 0],
-                dataHolder.biases[i, 0]
+                layer.activations[i, 0]
             )
         }
         clip(layer.activations)
     }
 
     context(Network)
-    override fun apply(neuron: Neuron, data: BiasedScalarData) {
+    override fun apply(neuron: Neuron, data: EmptyScalarData) {
         neuron.activation = decayRule(
             neuron.input,
-            neuron.activation, data.bias
+            neuron.activation
         )
         neuron.clip()
     }
 
-    fun decayRule(`in`: Double, activation: Double, bias: Double): Double {
-        var `val` = `in` + activation + bias
+    fun decayRule(`in`: Double, activation: Double): Double {
+        var `val` = `in` + activation
         var decayVal = 0.0
         decayVal = if (updateType == UpdateType.Relative) {
             decayFraction * abs(`val` - baseLine)
@@ -121,12 +120,12 @@ open class DecayRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>(), C
         return `val`
     }
 
-    override fun createMatrixData(size: Int): BiasedMatrixData {
-        return BiasedMatrixData(size)
+    override fun createMatrixData(size: Int): EmptyMatrixData {
+        return EmptyMatrixData
     }
 
-    override fun createScalarData(): BiasedScalarData {
-        return BiasedScalarData()
+    override fun createScalarData(): EmptyScalarData {
+        return EmptyScalarData
     }
 
     override val timeType: Network.TimeType

@@ -54,6 +54,20 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
             }
         }
 
+    override var biasArray: DoubleArray
+        get() = neuronList
+            .map { it.bias }
+            .toDoubleArray()
+        set(biases) {
+            val size = min(biases.size, neuronList.size)
+            for (i in 0 until size) {
+                neuronList[i].bias = biases[i]
+            }
+        }
+
+    override val biases: Matrix
+        get() = Matrix.column(biasArray)
+
     /**
      * Returns an array of binary values that represents the neurons in the neuron list.
      * The value is 1 for spiking neurons that are spiking, and 0 otherwise (non-spiking neurons are always associated with 0s)
@@ -338,6 +352,7 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
             wtdInputs.addi(c.getSummedPSRs())
         }
         addInputs(wtdInputs)
+        addInputs(biasArray)
     }
 
     var isAllClamped: Boolean

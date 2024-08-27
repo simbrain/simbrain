@@ -8,7 +8,6 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.cartesianProduct
 import org.simbrain.util.format
 import org.simbrain.util.geneticalgorithm.*
@@ -90,9 +89,7 @@ val evolveCow = newSim {
         fun mutate() {
             hiddenChromosome.forEach {
                 it.mutate {
-                    with(dataHolder as BiasedScalarData) {
-                        bias += random.nextDouble(-1.0, 1.0)
-                    }
+                    bias += random.nextDouble(-1.0, 1.0)
                 }
             }
             connectionChromosome.forEach {

@@ -5,7 +5,7 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
 import org.simbrain.network.updaterules.interfaces.DifferentiableUpdateRule
-import org.simbrain.network.util.BiasedMatrixData
+import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.EmptyScalarData
 import org.simbrain.util.UserParameter
 import org.simbrain.util.toDoubleArray
@@ -14,7 +14,7 @@ import org.simbrain.util.validateColumnVector
 import smile.math.matrix.Matrix
 import kotlin.math.exp
 
-class SoftmaxRule: NeuronUpdateRule<EmptyScalarData, BiasedMatrixData>(), DifferentiableUpdateRule, BoundedUpdateRule {
+class SoftmaxRule: NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), DifferentiableUpdateRule, BoundedUpdateRule {
 
     @UserParameter(
         label = "Temperature",
@@ -31,8 +31,8 @@ class SoftmaxRule: NeuronUpdateRule<EmptyScalarData, BiasedMatrixData>(), Differ
         return exponentials.map { it/total }.toDoubleArray()
     }
 
-    context(Network) override fun apply(layer: Layer, dataHolder: BiasedMatrixData) {
-        layer.setActivations(softmax(layer.activations, temperature, dataHolder.biases))
+    context(Network) override fun apply(layer: Layer, dataHolder: EmptyMatrixData) {
+        layer.setActivations(softmax(layer.activations, temperature, layer.biases))
     }
 
     context(Network) override fun apply(neuron: Neuron, data: EmptyScalarData) {
@@ -42,8 +42,8 @@ class SoftmaxRule: NeuronUpdateRule<EmptyScalarData, BiasedMatrixData>(), Differ
     override val name = "Softmax"
     override val timeType = Network.TimeType.DISCRETE
 
-    override fun createMatrixData(size: Int): BiasedMatrixData {
-        return BiasedMatrixData(size)
+    override fun createMatrixData(size: Int): EmptyMatrixData {
+        return EmptyMatrixData
     }
 
     override fun copy() = SoftmaxRule().also {

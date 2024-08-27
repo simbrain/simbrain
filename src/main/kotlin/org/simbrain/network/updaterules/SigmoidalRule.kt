@@ -22,8 +22,8 @@ import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronArray
-import org.simbrain.network.util.BiasedMatrixData
-import org.simbrain.network.util.BiasedScalarData
+import org.simbrain.network.util.EmptyMatrixData
+import org.simbrain.network.util.EmptyScalarData
 import org.simbrain.util.addi
 
 /**
@@ -37,8 +37,8 @@ class SigmoidalRule : AbstractSigmoidalRule() {
     override val timeType: Network.TimeType = Network.TimeType.DISCRETE
 
     context(Network)
-    override fun apply(neuron: Neuron, data: BiasedScalarData) {
-        var weightedInput = neuron.input + data.bias
+    override fun apply(neuron: Neuron, data: EmptyScalarData) {
+        var weightedInput = neuron.input
         if (addNoise) {
             weightedInput += noiseGenerator.sampleDouble()
         }
@@ -46,9 +46,9 @@ class SigmoidalRule : AbstractSigmoidalRule() {
     }
 
     context(Network)
-    override fun apply(layer: Layer, dataHolder: BiasedMatrixData) {
+    override fun apply(layer: Layer, dataHolder: EmptyMatrixData) {
         val array = layer as NeuronArray
-        val weightedInputs = array.inputs.add(dataHolder.biases)
+        val weightedInputs = array.inputs.clone()
         if (addNoise) {
             weightedInputs.addi(noiseGenerator.sampleDouble(array.size))
         }

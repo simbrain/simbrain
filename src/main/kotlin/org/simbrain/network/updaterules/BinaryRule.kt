@@ -4,8 +4,8 @@ import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
-import org.simbrain.network.util.BiasedMatrixData
-import org.simbrain.network.util.BiasedScalarData
+import org.simbrain.network.util.EmptyMatrixData
+import org.simbrain.network.util.EmptyScalarData
 import org.simbrain.util.UserParameter
 import org.simbrain.util.stats.ProbabilityDistribution
 import java.util.*
@@ -13,7 +13,7 @@ import java.util.*
 /**
  * BinaryNeuron takes one of two values based on a threshold.
  */
-class BinaryRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>, BoundedUpdateRule {
+class BinaryRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>, BoundedUpdateRule {
 
     @UserParameter(label = "Threshold", description = "Threshold for binary neurons.", increment = .1, order = 1)
     var threshold: Double = .5
@@ -45,32 +45,31 @@ class BinaryRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>, Bounded
     }
 
     context(Network)
-    override fun apply(layer: Layer, dataHolder: BiasedMatrixData) {
+    override fun apply(layer: Layer, dataHolder: EmptyMatrixData) {
         for (i in 0 until layer.activations.nrow()) {
-            layer.activations[i, 0] = binaryRule(layer.inputs[i, 0], dataHolder.biases[i, 0])
+            layer.activations[i, 0] = binaryRule(layer.inputs[i, 0])
         }
     }
 
     context(Network)
-    override fun apply(neuron: Neuron, data: BiasedScalarData) {
-        neuron.activation = binaryRule(neuron.input, data.bias)
+    override fun apply(neuron: Neuron, data: EmptyScalarData) {
+        neuron.activation = binaryRule(neuron.input)
     }
 
-    fun binaryRule(inputVal: Double, bias: Double): Double {
-        val wtdInput = inputVal + bias
-        return if (wtdInput > threshold) {
+    fun binaryRule(inputVal: Double): Double {
+        return if (inputVal > threshold) {
             upperBound
         } else {
             lowerBound
         }
     }
 
-    override fun createMatrixData(size: Int): BiasedMatrixData {
-        return BiasedMatrixData(size)
+    override fun createMatrixData(size: Int): EmptyMatrixData {
+        return EmptyMatrixData
     }
 
-    override fun createScalarData(): BiasedScalarData {
-        return BiasedScalarData()
+    override fun createScalarData(): EmptyScalarData {
+        return EmptyScalarData
     }
 
     override fun getRandomValue(randomizer: ProbabilityDistribution?): Double {

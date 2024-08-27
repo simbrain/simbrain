@@ -3,8 +3,8 @@ package org.simbrain.network.updaterules
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
 import org.simbrain.network.updaterules.interfaces.DifferentiableUpdateRule
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
-import org.simbrain.network.util.BiasedMatrixData
-import org.simbrain.network.util.BiasedScalarData
+import org.simbrain.network.util.EmptyMatrixData
+import org.simbrain.network.util.EmptyScalarData
 import org.simbrain.util.UserParameter
 import org.simbrain.util.math.SigmoidFunctionEnum
 import org.simbrain.util.stats.ProbabilityDistribution
@@ -16,7 +16,7 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution
  *
  * @author Zoë Tosi
  */
-abstract class AbstractSigmoidalRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>(),
+abstract class AbstractSigmoidalRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(),
     DifferentiableUpdateRule, NoisyUpdateRule, BoundedUpdateRule {
 
     @UserParameter(label = "Implementation", order = 10)
@@ -41,12 +41,12 @@ abstract class AbstractSigmoidalRule : NeuronUpdateRule<BiasedScalarData, Biased
 
     override var addNoise: Boolean = false
 
-    override fun createScalarData(): BiasedScalarData {
-        return BiasedScalarData()
+    override fun createScalarData(): EmptyScalarData {
+        return EmptyScalarData
     }
 
-    override fun createMatrixData(size: Int): BiasedMatrixData {
-        return BiasedMatrixData(size)
+    override fun createMatrixData(size: Int): EmptyMatrixData {
+        return EmptyMatrixData
     }
 
     /**

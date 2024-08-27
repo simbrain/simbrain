@@ -6,7 +6,6 @@ import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.*
 import org.simbrain.network.layouts.Layout
-import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.allPropertiesToString
 import org.simbrain.util.geneticalgorithm.*
 import org.simbrain.util.place
@@ -136,9 +135,7 @@ val evolveNetwork = newSim {
             // Mutate biases
             nodeChromosome.forEach {
                 it.mutate {
-                    with(dataHolder as BiasedScalarData) {
-                        bias += random.nextDouble(-1.0, 1.0)
-                    }
+                    bias += random.nextDouble(-1.0, 1.0)
                 }
             }
 

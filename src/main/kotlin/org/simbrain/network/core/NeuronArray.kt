@@ -64,6 +64,17 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
             events.updated.fire()
         }
 
+    @get:Producible
+    override var biases: Matrix = Matrix(inputSize, 1)
+        set(newBiases) {
+            field.copyFrom(newBiases)
+            events.updated.fire()
+        }
+
+    @get:Producible
+    override val biasArray: DoubleArray
+        get() = biases.toDoubleArray()
+
     /**
      * see [AbstractNeuronCollection.spikes]
      */
@@ -122,6 +133,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         copy.location = location
         copy.gridMode = gridMode
         copy.activations.copyFrom(activations)
+        copy.biases.copyFrom(biases)
         copy.updateRule = updateRule
         copy.dataHolder = dataHolder.copy()
         return copy

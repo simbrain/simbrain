@@ -145,7 +145,7 @@ class CouplingTest {
     fun `check if all producers are created on a neuron`() {
         val neuron = Neuron()
         network.addNetworkModel(neuron)
-        val expected = setOf("getLabel", "getActivation")
+        val expected = setOf("getLabel", "getActivation", "getBias")
         val actual = with(couplingManager) { neuron.producers.map { it.method.name }.toSet() }
         val diff = expected complement actual // For error message if test fails
         assertTrue(diff.isIdentical(),"$diff")
@@ -155,7 +155,7 @@ class CouplingTest {
     fun `check if all consumers are created on a neuron`() {
         val neuron = Neuron()
         network.addNetworkModel(neuron)
-        val expected = setOf("setActivation", "addInputValue", "addInputValue", "setLabel")
+        val expected = setOf("setActivation", "addInputValue", "addInputValue", "setLabel", "setBias")
         val actual = with(couplingManager) { neuron.consumers.map { it.method.name }.toSet() }
         val diff = expected complement actual
         assertTrue(diff.isIdentical(),"$diff")

@@ -6,7 +6,6 @@ import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.addNeuron
 import org.simbrain.network.core.connect
 import org.simbrain.network.updaterules.LinearRule
-import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.SmellSource
 import org.simbrain.util.decayfunctions.LinearDecayFunction
 import org.simbrain.util.place
@@ -78,7 +77,7 @@ val isopodSim = newSim {
         lowerBound = 0.0
         upperBound = 10.0
         label = "Straight"
-        (dataHolder as BiasedScalarData).bias = 5.0
+        bias = 5.0
     }
 
     // Create the weights

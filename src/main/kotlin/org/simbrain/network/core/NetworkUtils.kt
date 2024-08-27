@@ -14,7 +14,6 @@ import org.simbrain.network.util.*
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.stats.ProbabilityDistribution
-import smile.math.matrix.Matrix
 import java.awt.geom.Point2D
 
 /**
@@ -282,31 +281,14 @@ fun Collection<Neuron>.clamp(clamped: Boolean) {
 }
 
 fun Neuron.randomizeBias(randomizer: ProbabilityDistribution? = null) {
-    dataHolder.let {
-        if (it is BiasedScalarData) {
-            it.bias = (randomizer ?: biasesRandomizer).sampleDouble()
-        }
-    }
+    bias = (randomizer ?: biasesRandomizer).sampleDouble()
 }
 
-val NeuronArray.biases: Matrix get()   {
-    dataHolder.let {
-        if (it is BiasedMatrixData) {
-            return it.biases
-        }
-    }
-    throw Exception("Data holder for ${id} does not have bias")
- }
-
 fun NeuronArray.randomizeBiases(randomizer: ProbabilityDistribution? = null) {
-    dataHolder.let {
-        if (it is BiasedMatrixData) {
-            for (i in 0 until it.biases.nrow()) {
-                it.biases.set(i, 0, (randomizer ?: biasesRandomizer).sampleDouble())
-            }
-            events.updated.fire()
-        }
+    for (i in 0 until biases.nrow()) {
+        biases.set(i, 0, (randomizer ?: biasesRandomizer).sampleDouble())
     }
+    events.updated.fire()
 }
 
 fun List<Synapse>.percentExcitatory() = count { it.strength > 0.0 } / size.toDouble() * 100

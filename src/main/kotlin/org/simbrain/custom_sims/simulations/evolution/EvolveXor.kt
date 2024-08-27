@@ -8,7 +8,6 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.activations
-import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.geneticalgorithm.*
 import org.simbrain.util.place
 import org.simbrain.util.point
@@ -73,9 +72,7 @@ val evolveXor = newSim {
         fun mutate() {
             hiddenLayerChromosome.forEach {
                 it.mutate {
-                    with(dataHolder as BiasedScalarData) {
-                        bias += random.nextDouble(-1.0, 1.0)
-                    }
+                    bias += random.nextDouble(-1.0, 1.0)
                 }
             }
 

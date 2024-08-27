@@ -30,7 +30,6 @@ import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.alignMenu
 import org.simbrain.network.gui.createCouplingMenu
 import org.simbrain.network.gui.spaceMenu
-import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.addBorder
@@ -189,9 +188,8 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                 )
                 spikeImage.addBorder()
             }
-            if (showBias && neuronArray.dataHolder is BiasedMatrixData) {
-                val biases = (neuronArray.dataHolder as BiasedMatrixData).biases
-                biasImage.image = biases.toDoubleArray().toSimbrainColorImage(len, len)
+            if (showBias) {
+                biasImage.image = neuronArray.biases.toDoubleArray().toSimbrainColorImage(len, len)
                 biasImage.setBounds(
                     0.0, infoText.width + infoText.height + margin,
                     infoText.width, infoText.width
@@ -216,9 +214,8 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                 )
                 spikeImage.addBorder()
             }
-            if (showBias && neuronArray.dataHolder is BiasedMatrixData) {
-                val biases = (neuronArray.dataHolder as BiasedMatrixData).biases
-                biasImage.image = biases.toDoubleArray().toSimbrainColorImage(activations.size, 1)
+            if (showBias) {
+                biasImage.image = neuronArray.biases.toDoubleArray().toSimbrainColorImage(activations.size, 1)
                 biasImage.setBounds(
                     0.0, flatPixelArrayHeight.toDouble() + infoText.height + margin,
                     infoText.width, flatPixelArrayHeight.toDouble()
@@ -337,20 +334,18 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             val randomizeAction = networkPanel.networkActions.randomizeObjectsAction
 
             contextMenu.add(randomizeAction)
-            if (neuronArray.dataHolder is BiasedMatrixData) {
-                val randomizeBiasesAction = networkPanel.createAction(
-                    name = "Randomize Biases",
-                    description = "Randomize the biases of this neuron array",
-                    iconPath = "menu_icons/Rand.png"
-                ) {
-                    with(network) {
-                        networkPanel.selectionManager
-                            .filterSelectedModels<NeuronArray>()
-                            .forEach { it.randomizeBiases() }
-                    }
+            val randomizeBiasesAction = networkPanel.createAction(
+                name = "Randomize Biases",
+                description = "Randomize the biases of this neuron array",
+                iconPath = "menu_icons/Rand.png"
+            ) {
+                with(network) {
+                    networkPanel.selectionManager
+                        .filterSelectedModels<NeuronArray>()
+                        .forEach { it.randomizeBiases() }
                 }
-                contextMenu.add(randomizeBiasesAction)
             }
+            contextMenu.add(randomizeBiasesAction)
             contextMenu.addSeparator()
             val editComponents: Action = object : AbstractAction("Edit Components...") {
                 override fun actionPerformed(event: ActionEvent) {
@@ -378,17 +373,13 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                     menuTitle = "Plot Activation"
                 )
             )
-            neuronArray.dataHolder.let {
-                if (it is BiasedMatrixData) {
-                    contextMenu.add(
-                        actionManager.createCoupledPlotMenu(
-                            it.getProducer(BiasedMatrixData::biasesArray),
-                            objectName = "${neuronArray.id ?: "Neuron Array"} Biases",
-                            menuTitle = "Plot Biases"
-                        )
-                    )
-                }
-            }
+            contextMenu.add(
+                actionManager.createCoupledPlotMenu(
+                    neuronArray.getProducer(NeuronArray::biasArray),
+                    objectName = "${neuronArray.id ?: "Neuron Array"} Biases",
+                    menuTitle = "Plot Biases"
+                )
+            )
             contextMenu.add(actionManager.createImageInput(
                 neuronArray.getConsumer(NeuronArray::addInputsMismatched),
                 neuronArray.size,
@@ -403,18 +394,14 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                     neuronArray.size
                 )
             )
-            neuronArray.dataHolder.let {
-                if (it is BiasedMatrixData) {
-                    contextMenu.add(
-                        actionManager.createCoupledDataWorldAction(
-                            name = "Record Biases",
-                            it.getProducer(BiasedMatrixData::biasesArray),
-                            sourceName = "${neuronArray.id ?: "Neuron Array"} Biases",
-                            neuronArray.size
-                        )
-                    )
-                }
-            }
+            contextMenu.add(
+                actionManager.createCoupledDataWorldAction(
+                    name = "Record Biases",
+                    neuronArray.getProducer(NeuronArray::biasArray),
+                    sourceName = "${neuronArray.id ?: "Neuron Array"} Biases",
+                    neuronArray.size
+                )
+            )
 
             contextMenu.addSeparator()
             contextMenu.add(networkPanel.alignMenu)

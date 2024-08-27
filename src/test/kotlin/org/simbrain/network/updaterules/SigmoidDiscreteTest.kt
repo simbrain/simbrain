@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.math.SigmoidFunctionEnum
 
 class SigmoidDiscreteTest {
@@ -86,16 +85,16 @@ class SigmoidDiscreteTest {
         net.update()
         assertEquals(midpoint, output.activation, 0.01, "Zero Input")
 
-        (output.dataHolder as BiasedScalarData).bias = 100.0
+        output.bias = 100.0
         net.update()
         assertEquals(output.upperBound, output.activation, 0.01, "High bias")
 
-        (output.dataHolder as BiasedScalarData).bias = -100.0
+        output.bias = -100.0
         net.update()
         assertEquals(output.lowerBound, output.activation, 0.01, "Low bias")
 
         // Reset bias
-        (output.dataHolder as BiasedScalarData).bias = 0.0
+        output.bias = 0.0
 
         input1.activation = 100.0
         net.update()

@@ -8,7 +8,10 @@ import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.*
 import org.simbrain.network.updaterules.DecayRule
-import org.simbrain.network.util.*
+import org.simbrain.network.util.Alignment
+import org.simbrain.network.util.Direction
+import org.simbrain.network.util.alignNetworkModels
+import org.simbrain.network.util.offsetNeuronCollections
 import org.simbrain.util.*
 import org.simbrain.util.geneticalgorithm.*
 import org.simbrain.util.piccolo.createTileMapLayer
@@ -197,9 +200,7 @@ val evolveResourcePursuer = newSim { optionString ->
             // Mutate bias
             hiddenChromosome.forEach {
                 it.mutate {
-                    with(dataHolder as BiasedScalarData) {
-                        bias += random.nextDouble(-.1, .1)
-                    }
+                    bias += random.nextDouble(-.1, .1)
                 }
             }
 

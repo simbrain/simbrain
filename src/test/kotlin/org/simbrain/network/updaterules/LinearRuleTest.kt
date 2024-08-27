@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.util.BiasedScalarData
 
 class LinearRuleTest {
 
@@ -89,7 +88,7 @@ class LinearRuleTest {
 
     @Test
     fun `test bias`() {
-        (output.dataHolder as BiasedScalarData).bias = .2
+        output.bias = .2
         w13.strength = 0.0
         w23.strength = 0.0
         net.update()

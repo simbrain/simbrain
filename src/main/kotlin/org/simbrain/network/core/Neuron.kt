@@ -106,6 +106,10 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
             events.activationChanged.fire(lastActivation, value)
         }
 
+    @get:Producible(defaultVisibility = false)
+    @set:Consumable(defaultVisibility = false)
+    var bias = 0.0
+
     /**
      * Amount to increment/decrement activation when manually adjusted.
      */
@@ -279,6 +283,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
     override fun accumulateInputs() {
         fanIn.forEach { it.updatePSR() }
         addInputValue(weightedInputs)
+        addInputValue(bias)
     }
 
     context(Network)

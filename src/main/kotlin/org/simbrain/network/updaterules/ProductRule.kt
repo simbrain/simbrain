@@ -2,7 +2,7 @@ package org.simbrain.network.updaterules
 
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
-import org.simbrain.network.util.BiasedScalarData
+import org.simbrain.network.util.EmptyScalarData
 import org.simbrain.util.UserParameter
 
 /**
@@ -31,7 +31,7 @@ class ProductRule : LinearRule() {
     }
 
     context(Network)
-    override fun apply(neuron: Neuron, data: BiasedScalarData) {
+    override fun apply(neuron: Neuron, data: EmptyScalarData) {
         var `val` = 1.0
         if (useWeights) {
             for (s in neuron.fanIn) {

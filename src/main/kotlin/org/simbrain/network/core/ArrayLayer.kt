@@ -35,6 +35,7 @@ abstract class ArrayLayer(
             wtdInputs.addi(c.getSummedPSRs())
         }
         addInputs(wtdInputs)
+        addInputs(biases)
     }
 
     @Consumable

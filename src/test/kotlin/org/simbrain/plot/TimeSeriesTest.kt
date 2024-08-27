@@ -8,7 +8,6 @@ import org.simbrain.custom_sims.addTimeSeriesComponent
 import org.simbrain.custom_sims.couplingManager
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.addNeurons
-import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
 
 class TimeSeriesTest {
@@ -21,7 +20,7 @@ class TimeSeriesTest {
             val network = networkComponent.network
             val (neuron1, neuron2) = network.addNeurons(2)
 
-            (neuron1.dataHolder as BiasedScalarData).bias = 0.5
+            neuron1.bias = 0.5
 
             val timeSeriesComponent = addTimeSeriesComponent("TimeSeries", listOf("one", "two"))
             with(couplingManager) {

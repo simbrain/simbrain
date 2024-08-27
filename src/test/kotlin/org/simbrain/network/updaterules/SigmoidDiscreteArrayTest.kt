@@ -6,7 +6,6 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
-import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.util.get
 import org.simbrain.util.math.SigmoidFunctionEnum
 import org.simbrain.util.toMatrix
@@ -88,18 +87,18 @@ class SigmoidDiscreteArrayTest {
         assertEquals(midpoint, output.activations[0], 0.01, "Zero Input")
         assertEquals(midpoint, output.activations[1], 0.01, "Zero Input")
 
-        (output.dataHolder as BiasedMatrixData).biases = doubleArrayOf(100.0, 100.0).toMatrix()
+        output.biases = doubleArrayOf(100.0, 100.0).toMatrix()
         net.update()
         assertEquals(upperBound, output.activations[0], 0.01, "High bias")
         assertEquals(upperBound, output.activations[1], 0.01, "High bias")
 
-        (output.dataHolder as BiasedMatrixData).biases = doubleArrayOf(-100.0, -100.0).toMatrix()
+        output.biases = doubleArrayOf(-100.0, -100.0).toMatrix()
         net.update()
         assertEquals(lowerBound, output.activations[0], 0.01, "Low bias")
         assertEquals(lowerBound, output.activations[1], 0.01, "Low bias")
 
         // Reset bias
-        (output.dataHolder as BiasedMatrixData).biases = doubleArrayOf(0.0, 0.0).toMatrix()
+        output.biases = doubleArrayOf(0.0, 0.0).toMatrix()
 
         input1.activations = doubleArrayOf(100.0, 100.0).toMatrix()
         net.update()

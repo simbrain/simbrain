@@ -9,7 +9,6 @@ import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.updaterules.IzhikevichRule
-import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.util.point
 import java.util.List
 
@@ -41,7 +40,7 @@ class NetworkTest {
 
         n1 = Neuron()
         n1.label = "neuron1"
-        (n1.dataHolder as BiasedScalarData).bias = 1.0
+        n1.bias = 1.0
         net.addNetworkModel(n1)
         n2 = Neuron().apply {
             updateRule = IzhikevichRule()
@@ -145,7 +144,7 @@ class NetworkTest {
 
         val n1 = fromXml.getModelByLabel(Neuron::class.java, "neuron1")
         Assertions.assertNotNull(n1)
-        Assertions.assertEquals(1.0, (n1.dataHolder as BiasedScalarData).bias)
+        Assertions.assertEquals(1.0, n1.bias)
         Assertions.assertNotNull(fromXml.getModelByLabel(Neuron::class.java, "neuron2"))
         Assertions.assertNotNull(fromXml.getModelByLabel(NeuronGroup::class.java, "neuron_group_1"))
         Assertions.assertNotNull(fromXml.getModelByLabel(NeuronGroup::class.java, "ng2"))

@@ -8,7 +8,7 @@ import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.*
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.updaterules.LinearRule
-import org.simbrain.network.util.BiasedScalarData
+import org.simbrain.network.util.EmptyScalarData
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.network.util.SpikingScalarData
 import org.simbrain.util.*
@@ -234,7 +234,7 @@ val objectTrackingSim = newSim {
 class PercentIncomingNeuronRule : LinearRule() {
     val maxVal = 10.0
     context(Network)
-    override fun apply(neuron: Neuron, data: BiasedScalarData) {
+    override fun apply(neuron: Neuron, data: EmptyScalarData) {
         neuron.activation = maxVal * neuron.fanIn.count { it.source.isSpike }
             .toDouble() / neuron.fanIn.size
     }

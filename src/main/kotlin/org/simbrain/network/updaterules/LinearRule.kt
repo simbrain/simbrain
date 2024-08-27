@@ -6,8 +6,8 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
 import org.simbrain.network.updaterules.interfaces.DifferentiableUpdateRule
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
-import org.simbrain.network.util.BiasedMatrixData
-import org.simbrain.network.util.BiasedScalarData
+import org.simbrain.network.util.EmptyMatrixData
+import org.simbrain.network.util.EmptyScalarData
 import org.simbrain.util.UserParameter
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.GuiEditable
@@ -18,7 +18,7 @@ import kotlin.math.max
 /**
  * **LinearNeuron** is a standard linear neuron.
  */
-open class LinearRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>(), DifferentiableUpdateRule,
+open class LinearRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), DifferentiableUpdateRule,
     NoisyUpdateRule, BoundedUpdateRule {
     override var upperBound by GuiEditable(
         initValue = DEFAULT_UPPER_BOUND,
@@ -82,19 +82,19 @@ open class LinearRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>(), 
     override var addNoise = false
 
     context(Network)
-    override fun apply(neuron: Neuron, data: BiasedScalarData) {
-        neuron.activation = linearRule(neuron.input, data.bias)
+    override fun apply(neuron: Neuron, data: EmptyScalarData) {
+        neuron.activation = linearRule(neuron.input)
     }
 
     context(Network)
-    override fun apply(layer: Layer, dataHolder: BiasedMatrixData) {
+    override fun apply(layer: Layer, dataHolder: EmptyMatrixData) {
         for (i in 0 until layer.activations.nrow()) {
-            layer.activations[i, 0] = linearRule(layer.inputs[i, 0], dataHolder.biases[i, 0])
+            layer.activations[i, 0] = linearRule(layer.inputs[i, 0])
         }
     }
 
-    fun linearRule(input: Double, bias: Double): Double {
-        var ret = input * slope + bias
+    fun linearRule(input: Double): Double {
+        var ret = input * slope
         if (addNoise) {
             ret += noiseGenerator.sampleDouble()
         }
@@ -105,12 +105,12 @@ open class LinearRule : NeuronUpdateRule<BiasedScalarData, BiasedMatrixData>(), 
         }
     }
 
-    override fun createMatrixData(size: Int): BiasedMatrixData {
-        return BiasedMatrixData(size)
+    override fun createMatrixData(size: Int): EmptyMatrixData {
+        return EmptyMatrixData
     }
 
-    override fun createScalarData(): BiasedScalarData {
-        return BiasedScalarData()
+    override fun createScalarData(): EmptyScalarData {
+        return EmptyScalarData
     }
 
     override val timeType: Network.TimeType

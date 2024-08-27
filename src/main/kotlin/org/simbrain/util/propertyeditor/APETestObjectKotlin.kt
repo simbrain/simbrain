@@ -2,8 +2,8 @@ package org.simbrain.util.propertyeditor
 
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.NeuronUpdateRule
-import org.simbrain.network.util.BiasedScalarData
 import org.simbrain.network.util.ScalarDataHolder
+import org.simbrain.network.util.SpikingScalarData
 import org.simbrain.util.UserParameter
 import org.simbrain.util.allPropertiesToString
 import org.simbrain.util.displayInDialog
@@ -104,7 +104,7 @@ class APETestObjectKotlin: EditableObject {
     )
 
     var dataHolder: ScalarDataHolder by GuiEditable(
-        initValue = BiasedScalarData(1.0),
+        initValue = SpikingScalarData(false),
         onUpdate = {
             refreshValue(widgetValue(::neuronUpdateRule).createScalarData())
         },

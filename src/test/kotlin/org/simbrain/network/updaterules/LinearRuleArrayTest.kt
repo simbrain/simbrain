@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
-import org.simbrain.network.util.BiasedMatrixData
 import org.simbrain.util.linspace
 import org.simbrain.util.toDoubleArray
 import org.simbrain.util.toMatrix
@@ -83,7 +82,7 @@ class LinearRuleArrayTest {
 
     @Test
     fun `test bias`() {
-        (output.dataHolder as BiasedMatrixData).biases = doubleArrayOf(1.0, -1.0).toMatrix()
+        output.biases = doubleArrayOf(1.0, -1.0).toMatrix()
         net.update()
         assertArrayEquals(doubleArrayOf(1.0, -1.0), output.activationArray, 0.0)
     }

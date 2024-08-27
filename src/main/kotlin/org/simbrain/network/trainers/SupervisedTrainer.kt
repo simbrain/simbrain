@@ -18,7 +18,6 @@ import kotlinx.coroutines.withContext
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
-import org.simbrain.network.core.biases
 import org.simbrain.network.events.TrainerEvents
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.subnetworks.SRNNetwork

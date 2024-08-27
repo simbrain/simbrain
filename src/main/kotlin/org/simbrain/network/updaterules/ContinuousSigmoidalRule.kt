@@ -2,7 +2,7 @@ package org.simbrain.network.updaterules
 
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
-import org.simbrain.network.util.BiasedScalarData
+import org.simbrain.network.util.EmptyScalarData
 import org.simbrain.util.UserParameter
 import org.simbrain.util.math.SigmoidFunctionEnum
 
@@ -90,13 +90,13 @@ class ContinuousSigmoidalRule : AbstractSigmoidalRule {
      * **x_i(t + dt) = x_i(t) * (1 - a*dt/c) + (dt/c) * sum(w_ij * r_j(t))**
      */
     context(Network)
-    override fun apply(neuron: Neuron, data: BiasedScalarData) {
+    override fun apply(neuron: Neuron, data: EmptyScalarData) {
         val dt: Double = timeStep
 
         inputTerm = if (addNoise) {
-            dt / timeConstant * (neuron.input + data.bias + noiseGenerator.sampleDouble())
+            dt / timeConstant * (neuron.input + noiseGenerator.sampleDouble())
         } else {
-            dt / timeConstant * (neuron.input + data.bias)
+            dt / timeConstant * (neuron.input)
         }
 
         netActivation = netActivation * (1 - (leakConstant * dt / timeConstant)) + inputTerm

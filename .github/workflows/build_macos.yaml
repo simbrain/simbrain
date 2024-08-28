@@ -18,6 +18,7 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '17'
+          architecture: 'aarch64'
       - name: Install Dependencies
         run: |
           brew update

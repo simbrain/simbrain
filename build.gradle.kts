@@ -27,7 +27,7 @@ val dist = "${buildDir}/dist"
 val buildMain = "${buildDir}/main"
 
 val includeAllPlatforms = project.findProperty("includeAllPlatforms")?.toString()?.toBoolean() ?: false
-val versionSuffix = project.findProperty("versionSuffix")?.toString() ?: ""
+val versionSuffixString = project.findProperty("versionSuffix")?.toString() ?: ""
 
 project.version = version
 
@@ -395,7 +395,7 @@ if (OperatingSystem.current().isMacOsX) {
         onlyIf { OperatingSystem.current().isMacOsX }
         distPath = dist
         versionString = versionName
-        versionSuffix = versionSuffix
+        versionSuffix = versionSuffixString
     }
 }
 

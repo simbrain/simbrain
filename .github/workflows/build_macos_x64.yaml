@@ -1,4 +1,4 @@
-name: build_macos
+name: build_macos_x64
 
 on:
   push:

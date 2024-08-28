@@ -304,6 +304,9 @@ if (OperatingSystem.current().isMacOsX) {
         @Input
         var versionString: String = ""
 
+        @Input
+        var versionSuffix: String = ""
+
         @TaskAction
         fun notarize() {
             val notarizationProfileName = "AC_PASSWORD"
@@ -392,6 +395,7 @@ if (OperatingSystem.current().isMacOsX) {
         onlyIf { OperatingSystem.current().isMacOsX }
         distPath = dist
         versionString = versionName
+        versionSuffix = versionSuffix
     }
 }
 

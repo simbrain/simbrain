@@ -547,7 +547,7 @@ val runScriptFile = File.createTempFile("run", ".sh").apply {
 
 tasks.register<Zip>("createZip") {
     dependsOn("buildDistribution")
-    archiveFileName.set("Simbrain${versionName}.zip")
+    archiveFileName.set("Simbrain${versionName}${versionSuffixString}.zip")
     destinationDirectory.set(file(dist))
     // Include the run.sh file
     val dir = "Simbrain${versionName}"

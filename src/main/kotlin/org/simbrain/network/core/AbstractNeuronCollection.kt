@@ -54,6 +54,7 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
             }
         }
 
+    @UserParameter("Bias Array", "Biases", order = 10)
     override var biasArray: DoubleArray
         get() = neuronList
             .map { it.bias }

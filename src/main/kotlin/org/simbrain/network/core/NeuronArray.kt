@@ -65,6 +65,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         }
 
     @get:Producible
+    @UserParameter("Bias Array", "Biases", order = 10)
     override var biases: Matrix = Matrix(inputSize, 1)
         set(newBiases) {
             field.copyFrom(newBiases)

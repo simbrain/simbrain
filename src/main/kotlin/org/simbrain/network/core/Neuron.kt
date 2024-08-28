@@ -108,6 +108,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
 
     @get:Producible(defaultVisibility = false)
     @set:Consumable(defaultVisibility = false)
+    @UserParameter("Bias", "Constant value added to weighted input", order = 10)
     var bias = 0.0
 
     /**

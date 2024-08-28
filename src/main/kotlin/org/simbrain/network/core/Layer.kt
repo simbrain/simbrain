@@ -1,6 +1,7 @@
 package org.simbrain.network.core
 
 import org.simbrain.network.events.LocationEvents
+import org.simbrain.util.UserParameter
 import org.simbrain.util.toDoubleArray
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Producible
@@ -77,12 +78,13 @@ abstract class Layer : LocatableModel(), AttributeContainer {
     }
 
     /**
-     * A column vector of activation values. Computations are performed on this matrix.
+     * In subclasses under [NeuronArray] the matrices are basic and computations are performed on those.
+     * In subclasses under [AbstractNeuronCollection], [activationArray] is basic and computations are performed on those.
      */
     abstract val activations: Matrix
 
     /**
-     * Double array of neuron activation values. A convenience property for accessing the activation matrix as a double array.
+     * See [activations].
      */
     abstract val activationArray: DoubleArray
 

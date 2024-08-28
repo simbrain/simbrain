@@ -27,6 +27,7 @@ val dist = "${buildDir}/dist"
 val buildMain = "${buildDir}/main"
 
 val includeAllPlatforms = project.findProperty("includeAllPlatforms")?.toString()?.toBoolean() ?: false
+val versionSuffix = project.findProperty("versionSuffix")?.toString() ?: ""
 
 project.version = version
 
@@ -307,7 +308,7 @@ if (OperatingSystem.current().isMacOsX) {
         fun notarize() {
             val notarizationProfileName = "AC_PASSWORD"
             val distDir = File(distPath)
-            val dmgFile = File(distDir, "Simbrain${versionString}.dmg")
+            val dmgFile = File(distDir, "Simbrain${versionString}${versionSuffix}.dmg")
 
             // Create .dmg file
             project.exec {

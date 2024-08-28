@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    if: contains(github.event.head_commit.message, '[push macos]') || contains(github.event.head_commit.message, '[push macos arm64]')
+    if: contains(github.event.head_commit.message, '[push macos]') || contains(github.event.head_commit.message, '[push macos x64]')
     runs-on: macos-latest
     environment: macos
     steps:
@@ -18,7 +18,7 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: '17'
-          architecture: 'aarch64'
+          architecture: 'x64'
       - name: Install Dependencies
         run: |
           brew update
@@ -70,7 +70,7 @@ jobs:
       - name: Run jpackageMacOS
         run: ./gradlew jpackageMacOS
       - name: Notarize App
-        run: ./gradlew notarizeMacApp
+        run: ./gradlew notarizeMacApp -PversionSuffix="_x64"
       - name: Configure AWS CLI for Cloudflare R2
         env:
           R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}

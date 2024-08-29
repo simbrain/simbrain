@@ -40,6 +40,7 @@ class BackpropNetwork : FeedForward, SupervisedNetwork {
                 type = SigmoidFunctionEnum.LOGISTIC
             }
         }
+        // Good default for regression tasks
         outputLayer.updateRule = LinearRule().apply {
             clippingType = LinearRule.ClippingType.NoClipping
         }

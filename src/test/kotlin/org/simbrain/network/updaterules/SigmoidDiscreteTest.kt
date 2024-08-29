@@ -48,6 +48,14 @@ class SigmoidDiscreteTest {
      }
 
     @Test
+    fun `test logistic lower bound -2 upper bound 3`() {
+        (output.updateRule as SigmoidalRule).type = SigmoidFunctionEnum.LOGISTIC
+        (output.updateRule as SigmoidalRule).lowerBound = -2.0
+        (output.updateRule as SigmoidalRule).upperBound = 3.0
+        sigmoidTests()
+    }
+
+    @Test
     fun `test atan lower bound 0 `() {
         (output.updateRule as SigmoidalRule).type = SigmoidFunctionEnum.ARCTAN
         (output.updateRule as SigmoidalRule).lowerBound = 0.0

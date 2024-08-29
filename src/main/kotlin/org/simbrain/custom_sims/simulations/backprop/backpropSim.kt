@@ -5,7 +5,9 @@ import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.trainers.MatrixDataset
+import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.updaterules.SoftmaxRule
+import org.simbrain.util.math.SigmoidFunctionEnum
 import org.simbrain.util.place
 import smile.math.matrix.Matrix
 
@@ -16,7 +18,12 @@ val backpropSim = newSim {
     val networkComponent = addNetworkComponent("Backprop")
     val net = networkComponent.network
 
-    val bp = BackpropNetwork(intArrayOf(10, 7, 10))
+    val bp = BackpropNetwork(intArrayOf(10, 7, 10)).apply {
+        outputLayer.updateRule = SigmoidalRule().apply {
+            type = SigmoidFunctionEnum.LOGISTIC
+        }
+        trainer.learningRate = .1
+    }
     net.addNetworkModels(bp)
 
     bp.trainingSet = MatrixDataset(

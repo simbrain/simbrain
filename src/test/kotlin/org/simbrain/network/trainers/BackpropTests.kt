@@ -1,6 +1,8 @@
 package org.simbrain.network.trainers
 
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NeuronArray
@@ -159,7 +161,6 @@ class BackpropTests {
 
     }
 
-
     @Test
     fun `test softmax with cross entropy`() {
         with(net) {
@@ -184,42 +185,30 @@ class BackpropTests {
     }
 
     @Test
-    fun `manually train 10-7-10 auto-encoder`() {
+    fun `train 10-7-10 auto-encoder`() {
         val inputs = Matrix.eye(10)
         val bp = BackpropNetwork(intArrayOf(10, 7, 10), null).apply {
-            label = "backprop"
+            outputLayer.updateRule = SigmoidalRule().apply {
+                type = SigmoidFunctionEnum.LOGISTIC
+            }
+            trainer.learningRate = .1
             trainingSet = MatrixDataset(
                 inputs = inputs,
                 targets = inputs
             )
         }
         net.addNetworkModels(bp)
-        val error = HashMap<Int, List<Double>>()
-        var summedError = 0.0
         with(net) {
-            repeat(1000) { i ->
-                if (i % 10 == 0) {
-                    error.clear()
-                    summedError = 0.0
-                }
-                bp.wmList.forwardPass(Matrix.column(inputs.row(i % inputs.nrow())))
-                summedError += bp.wmList.applyBackprop(
-                    Matrix.column(inputs.row(i % inputs.nrow())),
-                    .1,
-                    debug = { index, layerError ->
-                        error[index] = error.getOrDefault(index, List(10) { 0.0 }).zip(layerError).map { it.first + it.second }
-                    }
-                )
-
-                if (i % 10 == 9) {
-                    println("Summed Error at Iteration $i = $summedError")
-                    error.forEach { (index, layerError) ->
-                        println("Layer $index: ${layerError.joinToString { "%.2f".format(it) }}")
+            with(bp) {
+                runBlocking {
+                    repeat(1000) {
+                        bp.trainer.trainOnce()
                     }
                 }
             }
         }
-
+        // Does not get that low after 1K
+        assertEquals(0.0, bp.trainer.lastError, .1)
     }
 
     fun makeMockInputs(size: Int): Matrix {

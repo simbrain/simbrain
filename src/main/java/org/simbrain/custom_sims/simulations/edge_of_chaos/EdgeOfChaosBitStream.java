@@ -23,6 +23,8 @@ import javax.swing.*;
  * Bertschinger, Nils, and Thomas Natschläger. "Real-time computation at the
  * edge of chaos in recurrent neural networks." Neural computation 16.7 (2004):
  * 1413-1436.
+ *
+ * Video of this in action: https://x.com/JeffYoshimi/status/1529126714948743168
  */
 public class EdgeOfChaosBitStream extends Simulation {
 

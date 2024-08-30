@@ -13,6 +13,8 @@
  */
 package org.simbrain.network.trainers
 
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.simbrain.network.core.Network
@@ -80,7 +82,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
         withContext(Dispatchers.Default) {
             while (isRunning) {
                 trainOnce()
-                if (stoppingCondition.validate(iteration, aggregationFunction.aggregatedError)) {
+                if (stoppingCondition.validate(iteration, aggregationFunction.aggregatedError.await())) {
                     stoppingConditionReached = true
                     stopTraining()
                 }
@@ -116,9 +118,10 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
                     aggregationFunction.accumulateError(trainBatch(startIndex until  endIndex))
                 }
             }
+            aggregationFunction.complete()
         }
-        lastError = aggregationFunction.aggregatedError
-        events.errorUpdated.fire(aggregationFunction).await()
+        lastError = aggregationFunction.aggregatedError.await()
+        events.errorUpdated.fire(aggregationFunction)
     }
 
     context(Network)
@@ -169,14 +172,21 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
 
         protected var runningCount = 0
 
-        abstract val aggregatedError: Double
+        abstract var aggregatedError: Deferred<Double>
 
         abstract fun accumulateError(error: Double)
 
+        protected fun completeWithResult(result: Double) {
+            (aggregatedError as CompletableDeferred<Double>).complete(result)
+        }
+
         fun reset() {
+            aggregatedError = CompletableDeferred()
             runningError = 0.0
             runningCount = 0
         }
+
+        abstract fun complete()
 
         class Mean : AggregationFunction() {
             override fun accumulateError(error: Double) {
@@ -184,10 +194,13 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
                 runningCount++
             }
 
-            override val aggregatedError: Double
-                get() = runningError / runningCount
+            override var aggregatedError: Deferred<Double> = CompletableDeferred()
 
             override fun copy() = Mean()
+
+            override fun complete() {
+                completeWithResult(runningError / runningCount)
+            }
 
             override val name: String = "Mean Squared Error"
         }
@@ -198,10 +211,13 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
                 runningCount++
             }
 
-            override val aggregatedError: Double
-                get() = runningError
+            override var aggregatedError: Deferred<Double> = CompletableDeferred()
 
             override fun copy() = Sum()
+
+            override fun complete() {
+                completeWithResult(runningError)
+            }
 
             override val name: String = "Sum Squared Error"
         }
@@ -212,10 +228,13 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
                 runningCount++
             }
 
-            override val aggregatedError: Double
-                get() = sqrt(runningError / runningCount)
+            override var aggregatedError: Deferred<Double> = CompletableDeferred()
 
             override fun copy() = RootMean()
+
+            override fun complete() {
+                completeWithResult(sqrt(runningError / runningCount))
+            }
 
             override val name: String = "Root Mean Squared Error"
         }

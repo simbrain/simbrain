@@ -1,12 +1,11 @@
 package org.simbrain.custom_sims.simulations
 
-import org.simbrain.custom_sims.*
-import org.simbrain.network.core.NeuronArray
-import org.simbrain.network.core.WeightMatrix
+import org.simbrain.custom_sims.addDocViewer
+import org.simbrain.custom_sims.addNetworkComponent
+import org.simbrain.custom_sims.newSim
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.updaterules.SigmoidalRule
-import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.util.math.SigmoidFunctionEnum
 import org.simbrain.util.place
 import smile.math.matrix.Matrix
@@ -18,7 +17,10 @@ val backpropSim = newSim {
     val networkComponent = addNetworkComponent("Backprop")
     val net = networkComponent.network
 
-    val bp = BackpropNetwork(intArrayOf(10, 7, 10)).apply {
+    val inputSize = 10
+    val latentSize = 4
+
+    val bp = BackpropNetwork(intArrayOf(inputSize, latentSize, inputSize)).apply {
         outputLayer.updateRule = SigmoidalRule().apply {
             type = SigmoidFunctionEnum.LOGISTIC
         }
@@ -27,8 +29,8 @@ val backpropSim = newSim {
     net.addNetworkModels(bp)
 
     bp.trainingSet = MatrixDataset(
-        inputs = Matrix.eye(10),
-        targets = Matrix.eye(10)
+        inputs = Matrix.eye(inputSize),
+        targets = Matrix.eye(inputSize)
     )
 
     val docViewer = addDocViewer(

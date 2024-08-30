@@ -13,7 +13,6 @@ import org.simbrain.plot.timeseries.TimeSeriesModel
 import org.simbrain.plot.timeseries.TimeSeriesPlotActions
 import org.simbrain.plot.timeseries.TimeSeriesPlotPanel
 import org.simbrain.util.*
-import org.simbrain.util.Utils.round
 import org.simbrain.util.table.*
 import org.simbrain.util.widgets.ToggleButton
 import smile.math.matrix.Matrix
@@ -38,7 +37,7 @@ class TrainerControls<SN>(trainer: SupervisedTrainer<SN>, supervisedNetwork: SN,
     private val runAction = createAction(
         name = "Run",
         iconPath ="menu_icons/Play.png",
-        description = "Iterate training until stop button is pressed",
+        description = "Iterate training until stop button is pressed"
     ) {
         with(networkPanel.network) { trainer.run { supervisedNetwork.startTraining() } }
     }
@@ -112,9 +111,9 @@ class TrainerControls<SN>(trainer: SupervisedTrainer<SN>, supervisedNetwork: SN,
         val errorLabel = labelPanel.addItem(trainer.aggregationFunction.name, errorValue)
         runTools.add(labelPanel)
 
-        trainer.events.errorUpdated.on(Dispatchers.Swing, wait = true) {
+        trainer.events.errorUpdated.on(Dispatchers.Swing) {
             iterationsLabel.text = "" + trainer.iteration
-            errorValue.text = "" + round(it.aggregatedError, 4)
+            errorValue.text = "" + it.aggregatedError.await().format(4)
             errorLabel.text = it.name
         }
 
@@ -157,8 +156,8 @@ class ErrorTimeSeries(trainer: SupervisedTrainer<*>) : JPanel() {
         add(mainPanel)
 
         model.addTimeSeries(trainer.aggregationFunction.name)
-        trainer.events.errorUpdated.on(Dispatchers.Swing, wait = true) {
-            model.addData(0, trainer.iteration.toDouble(), it.aggregatedError)
+        trainer.events.errorUpdated.on(Dispatchers.Swing) {
+            model.addData(0, trainer.iteration.toDouble(), it.aggregatedError.await())
             graphPanel.chartPanel.chart.xyPlot.rangeAxis.label = trainer.aggregationFunction.name
         }
         trainer.events.iterationReset.on(Dispatchers.Swing, wait = true) {

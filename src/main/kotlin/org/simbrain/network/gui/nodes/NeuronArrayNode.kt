@@ -144,7 +144,11 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         events.labelChanged.on(Dispatchers.Swing) { o, n -> updateTextLabel() }
         updateTextLabel()
 
-        events.updated.on(Dispatchers.Swing) {
+        events.updated.on {
+            events.updateGraphics.fire()
+        }
+
+        events.updateGraphics.on(Dispatchers.Swing) {
             updateActivationImage()
             updateInfoText()
         }

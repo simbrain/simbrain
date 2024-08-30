@@ -13,5 +13,6 @@ open class NetworkModelEvents: Events() {
     var labelChanged = ChangedEvent<String?>()
     var clampChanged = NoArgEvent()
     var updated = NoArgEvent()
+    val updateGraphics = NoArgEvent(interval = 10, timingMode = TimingMode.Throttle)
 
 }

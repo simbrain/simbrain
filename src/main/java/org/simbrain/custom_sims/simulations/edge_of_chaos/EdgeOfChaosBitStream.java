@@ -11,6 +11,7 @@ import org.simbrain.network.neurongroups.NeuronGroup;
 import org.simbrain.network.updaterules.BinaryRule;
 import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
+import org.simbrain.util.SmileUtilsKt;
 import org.simbrain.util.math.SimbrainMath;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.updater.UpdateActionKt;
@@ -31,16 +32,17 @@ public class EdgeOfChaosBitStream extends Simulation {
     int NUM_NEURONS = 120;
     static int GRID_SPACE = 25;
 
-    // For 120 neurons.   .5 ordered.  1.9 or so edge.
+    // For 120 neurons. Adjust weight stdev to study.  .5 ordered.  1.9 or so is the edgeof chaos
 
     // Since mean is 0, lower variance means lower average weight strength
     private static double variance = .5;
-    private double u_bar = .5; // I want to try defaulting to 1 so "bits" are obvious
+    private double u_bar = 1.0;
 
     // References
     Network net;
     SynapseGroup sgRes1, sgRes2;
     NeuronGroup res1, res2, bitStream1, bitStream2;
+    int currentRow = 0;
 
     @Override
     public void run() {
@@ -77,18 +79,18 @@ public class EdgeOfChaosBitStream extends Simulation {
             variance = new_variance;
 
             // Update strength of bitstream signals
-            // TODO: Complain if input strength set to 0.
-            // double new_ubar = Double.parseDouble(input_tf.getText());
-            // for (double[] row : bitStream1.getInputManager().getData()) {
-            //     if (row[0] != 0) {
-            //         row[0] = new_ubar;
-            //     }
-            // }
-            // for (double[] row : bitStream2.getInputManager().getData()) {
-            //     if (row[0] != 0) {
-            //         row[0] = new_ubar;
-            //     }
-            // }
+            // TODO: Complain if input strength set to 0.0
+             double new_ubar = Double.parseDouble(input_tf.getText());
+             for (double[] row : bitStream1.getInputData().toArray()) {
+                 if (row[0] != 0) {
+                     row[0] = new_ubar;
+                 }
+             }
+             for (double[] row : bitStream2.getInputData().toArray()) {
+                 if (row[0] != 0) {
+                     row[0] = new_ubar;
+                 }
+             }
         });
     }
 
@@ -124,11 +126,11 @@ public class EdgeOfChaosBitStream extends Simulation {
         // Offset in pixels of input nodes to right of reservoir
         int offset = 200;
         bitStreamInputs = new NeuronGroup(1);
-        BinaryRule b = new BinaryRule(0, u_bar, .5);
+        BinaryRule b = new BinaryRule(0, u_bar, .49);
         bitStreamInputs.setUpdateRule(b);
         bitStreamInputs.setClamped(true);
-        // bitStreamInputs.getInputManager().setData(new double[][]{{u_bar}, {0.0}, {0.0}, {0.0}, {0.0}, {u_bar}, {0.0}, {u_bar}, {u_bar}, {0.0}, {u_bar}, {u_bar}, {0.0}, {0.0}, {u_bar}});
-        // bitStreamInputs.setInputMode(true);
+        var bitStream = new double[][]{{u_bar}, {0.0}, {0.0}, {0.0}, {0.0}, {u_bar}, {0.0}, {u_bar}, {u_bar}, {0.0}, {u_bar}, {u_bar}, {0.0}, {0.0}, {u_bar}};
+        bitStreamInputs.setInputData(SmileUtilsKt.toMatrix(bitStream));
         net.addNetworkModel(bitStreamInputs);
         bitStreamInputs.setLocation(reservoir.getCenterX(), reservoir.getMaxY() + offset);
         return bitStreamInputs;
@@ -139,9 +141,13 @@ public class EdgeOfChaosBitStream extends Simulation {
         TimeSeriesPlotComponent ts = sim.addTimeSeries(681,15,363,285, "Time Series");
         TimeSeriesModel.TimeSeries sts1 = ts.getModel().addTimeSeries("Difference");
 
+        sim.getWorkspace().getUpdater().getUpdateManager().addAction(UpdateActionKt.create("Update inputs", () -> {
+            bitStream1.setActivations(bitStream1.getInputData().row(currentRow));
+            bitStream2.setActivations(bitStream1.getInputData().row(currentRow));
+            currentRow = (currentRow + 1) % bitStream1.getInputData().nrow();
+        }), 0);
+
         sim.getWorkspace().addUpdateAction(UpdateActionKt.create("Update time series", () -> {
-            // bitStream1.getInputManager().applyCurrentRow();
-            // bitStream2.getInputManager().applyCurrentRow();
             int activationDiff = SimbrainMath.hamming(res1.getActivationArray(), res2.getActivationArray());
             ts.getModel().addData(0, sim.getWorkspace().getTime(), activationDiff);
         }));

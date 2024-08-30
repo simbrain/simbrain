@@ -99,10 +99,6 @@ public class EdgeOfChaos extends Simulation {
 
         // Set up sensor nodes
         buildSensorNodes();
-
-        // // Use concurrent buffered update
-        // net.getUpdateManager().clear();
-        // net.getUpdateManager().addAction(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(net));
     }
 
     private void buildSensorNodes() {

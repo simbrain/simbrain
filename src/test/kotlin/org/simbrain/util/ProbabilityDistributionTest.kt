@@ -253,7 +253,7 @@ class ProbabilityDistributionTest {
             assertTrue(deserialized.lowerValue == -2.0)
             assertTrue(deserialized.upperValue == 2.0)
             assertTrue(deserialized.p == .7)
-            assertTrue(deserialized.randomSeed == 1)
+            assertTrue(deserialized.randomSeed == 1L)
         }
 
         // Test randomizer serializes properly

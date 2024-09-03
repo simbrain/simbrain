@@ -14,8 +14,6 @@ import org.simbrain.network.neurongroups.NeuronGroup;
 import org.simbrain.network.updaterules.BinaryRule;
 import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.util.decayfunctions.StepDecayFunction;
-import org.simbrain.util.stats.ProbabilityDistribution;
-import org.simbrain.util.stats.distributions.NormalDistribution;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.entities.EntityType;
@@ -43,6 +41,8 @@ public class EdgeOfChaos extends Simulation {
     //  For 120 neurons: .01,.1, and > .4
     private double variance = .1;
     private int K = 4; // in-degree (num connections to each neuron)
+
+    private long seed = 42L;
 
     // References
     Network net;
@@ -95,7 +95,7 @@ public class EdgeOfChaos extends Simulation {
         reservoir.setLabel("Reservoir");
 
         // Connect reservoir
-        sgReservoir = connectReservoir(net, reservoir, variance, K);
+        sgReservoir = connectReservoir(net, reservoir, variance, K, seed);
 
         // Set up sensor nodes
         buildSensorNodes();
@@ -133,25 +133,14 @@ public class EdgeOfChaos extends Simulation {
         return ng;
     }
 
-    public static SynapseGroup connectReservoir(Network parentNet, NeuronGroup res, double variance, int k) {
+    public static SynapseGroup connectReservoir(Network parentNet, NeuronGroup res, double variance, int k, long seed) {
 
-        ProbabilityDistribution exRand = new NormalDistribution(0.0, Math.sqrt(variance));
-        ProbabilityDistribution inRand =  new NormalDistribution(0.0, Math.sqrt(variance));
-
-        FixedDegree con = new FixedDegree();
-        con.setDegree(k);
-        con.setDirection(Direction.IN);
+        FixedDegree con = new FixedDegree(k, Direction.IN, false, 20.0, false, seed);
 
         SynapseGroup reservoir = new SynapseGroup(res, res, con);
         // TODO:  0.5, exRand, inRand);
         reservoir.setLabel("Recurrent Synapses");
         parentNet.addNetworkModel(reservoir);
-
-        // TODO
-        // reservoir.setUpperBound(200, Polarity.EXCITATORY);
-        // reservoir.setLowerBound(0, Polarity.EXCITATORY);
-        // reservoir.setLowerBound(-200, Polarity.INHIBITORY);
-        // reservoir.setUpperBound(0, Polarity.INHIBITORY);
 
         return reservoir;
     }

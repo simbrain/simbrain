@@ -17,6 +17,7 @@ import org.simbrain.network.core.Synapse
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.UserParameter
 import org.simbrain.util.cartesianProduct
+import kotlin.random.Random
 
 /**
  * Connect every source neuron to every target neuron.
@@ -24,7 +25,7 @@ import org.simbrain.util.cartesianProduct
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
-class AllToAll(
+class AllToAll @JvmOverloads constructor(
 
     /**
      * Whether or not connections where the source and target are the same
@@ -36,9 +37,11 @@ class AllToAll(
         description = "Can there exist synapses whose source and target are the same?",
         order = 1
     )
-    var allowSelfConnection: Boolean = NetworkPreferences.selfConnectionAllowed
+    var allowSelfConnection: Boolean = NetworkPreferences.selfConnectionAllowed,
 
-) : ConnectionStrategy() {
+    seed: Long = Random.nextLong()
+
+) : ConnectionStrategy(seed) {
 
     override val name: String = "All to All"
 
@@ -57,7 +60,7 @@ class AllToAll(
         target: List<Neuron>
     ): List<Synapse> {
         val syns = createAllToAllSynapses(source, target, allowSelfConnection)
-        polarizeSynapses(syns, percentExcitatory)
+        polarizeSynapses(syns, percentExcitatory, random)
         return syns
     }
 

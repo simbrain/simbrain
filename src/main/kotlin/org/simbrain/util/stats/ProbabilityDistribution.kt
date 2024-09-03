@@ -37,7 +37,7 @@ abstract class ProbabilityDistribution() : CopyableObject {
      * If null, then seed is random and so copies of this object produce different samples.
      *
      */
-    var randomSeed: Int? = null
+    var randomSeed: Long? = null
         set(value) {
             field = value
             if (value != null) {
@@ -117,7 +117,7 @@ class ProbabilityDistributionConverter(mapper: Mapper, reflectionProvider: Refle
 
         val paramMap = paramValueMapping.associate { (param, value) -> param to typeMapping(value, param) }
         val probDist = constructor.callBy(paramMap) as ProbabilityDistribution
-        vars["randomSeed"]?.toInt()?.let{
+        vars["randomSeed"]?.toLong()?.let{
             probDist.randomSeed = it
         }
         return probDist

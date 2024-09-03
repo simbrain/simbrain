@@ -37,7 +37,7 @@ public class EdgeOfChaosBitStream extends Simulation {
     // For 120 neurons. Adjust weight stdev to study.  .5 ordered.  1.9 or so is the edgeof chaos
 
     // Since mean is 0, lower variance means lower average weight strength
-    private static double variance = .5;
+    private double variance = .5;
     private double u_bar = 1.0;
 
     // References
@@ -45,6 +45,9 @@ public class EdgeOfChaosBitStream extends Simulation {
     SynapseGroup sgRes1, sgRes2;
     NeuronGroup res1, res2, bitStream1, bitStream2;
     int currentRow = 0;
+
+    private long seed = 42L;
+
 
     @Override
     public void run() {
@@ -66,7 +69,6 @@ public class EdgeOfChaosBitStream extends Simulation {
 
     private void controlPanel() {
         ControlPanel panel = ControlPanel.makePanel(sim, "Controller", 5,10,205,180);
-        JTextField input_tf = panel.addTextField("Input strength", "" + u_bar);
         JTextField tf_stdev = panel.addTextField("Weight stdev", "" + variance);
         panel.addButton("Update", () -> {
 
@@ -81,18 +83,18 @@ public class EdgeOfChaosBitStream extends Simulation {
             variance = new_variance;
 
             // Update strength of bitstream signals
-            // TODO: Complain if input strength set to 0.0
-             double new_ubar = Double.parseDouble(input_tf.getText());
-             for (double[] row : bitStream1.getInputData().toArray()) {
-                 if (row[0] != 0) {
-                     row[0] = new_ubar;
-                 }
-             }
-             for (double[] row : bitStream2.getInputData().toArray()) {
-                 if (row[0] != 0) {
-                     row[0] = new_ubar;
-                 }
-             }
+            // // TODO: Complain if input strength set to 0.0
+            //  double new_ubar = Double.parseDouble(input_tf.getText());
+            //  for (double[] row : bitStream1.getInputData().toArray()) {
+            //      if (row[0] != 0) {
+            //          row[0] = new_ubar;
+            //      }
+            //  }
+            //  for (double[] row : bitStream2.getInputData().toArray()) {
+            //      if (row[0] != 0) {
+            //          row[0] = new_ubar;
+            //      }
+            //  }
         });
     }
 
@@ -106,8 +108,8 @@ public class EdgeOfChaosBitStream extends Simulation {
         res2.setLabel("Reservoir 2");
 
         // Connect reservoirs
-        sgRes1 = EdgeOfChaos.connectReservoir(net, res1, variance, 4);
-        sgRes2 = sgRes1.copy(res2, res2);
+        sgRes1 = EdgeOfChaos.connectReservoir(net, res1, variance, 4, seed);
+        sgRes2 = EdgeOfChaos.connectReservoir(net, res2, variance, 4, seed);
         sgRes2.setLabel("Recurrent Synapses");
         net.addNetworkModel(sgRes2);
 
@@ -116,10 +118,12 @@ public class EdgeOfChaosBitStream extends Simulation {
         bitStream1.setLabel("Bit stream 1");
         bitStream2 = buildBitStream(res2);
         bitStream2.setLabel("Bit stream 2");
-        AllToAll connector = new AllToAll();
-        net.addNetworkModels(connector.connectNeurons(bitStream1.getNeuronList(), res1.getNeuronList()));
-        net.addNetworkModels(connector.connectNeurons(bitStream2.getNeuronList(), res2.getNeuronList()));
-
+        AllToAll connector1 = new AllToAll(false, seed);
+        AllToAll connector2 = new AllToAll(false, seed);
+        var thing1 = connector1.connectNeurons(bitStream1.getNeuronList(), res1.getNeuronList());
+        var thing2 = connector2.connectNeurons(bitStream2.getNeuronList(), res2.getNeuronList());
+        net.addNetworkModels(thing1);
+        net.addNetworkModels(thing2);
     }
 
     NeuronGroup bitStreamInputs;
@@ -130,7 +134,6 @@ public class EdgeOfChaosBitStream extends Simulation {
         bitStreamInputs = new NeuronGroup(1);
         BinaryRule b = new BinaryRule(0, u_bar, .49);
         bitStreamInputs.setUpdateRule(b);
-        bitStreamInputs.setClamped(true);
         var bitStream = new double[][]{{u_bar}, {0.0}, {0.0}, {0.0}, {0.0}, {u_bar}, {0.0}, {u_bar}, {u_bar}, {0.0}, {u_bar}, {u_bar}, {0.0}, {0.0}, {u_bar}};
         bitStreamInputs.setInputData(SmileUtilsKt.toMatrix(bitStream));
         net.addNetworkModel(bitStreamInputs);
@@ -144,8 +147,8 @@ public class EdgeOfChaosBitStream extends Simulation {
         TimeSeriesModel.TimeSeries sts1 = ts.getModel().addTimeSeries("Difference");
 
         sim.getWorkspace().getUpdater().getUpdateManager().addAction(UpdateActionKt.create("Update inputs", () -> {
-            bitStream1.setActivations(bitStream1.getInputData().row(currentRow));
-            bitStream2.setActivations(bitStream1.getInputData().row(currentRow));
+            bitStream1.addInputs(bitStream1.getInputData().row(currentRow));
+            bitStream2.addInputs(bitStream2.getInputData().row(currentRow));
             currentRow = (currentRow + 1) % bitStream1.getInputData().nrow();
         }), 0);
 

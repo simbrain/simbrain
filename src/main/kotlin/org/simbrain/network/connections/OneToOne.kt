@@ -18,6 +18,7 @@ import org.simbrain.network.util.OrientationComparator
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
 import java.util.*
+import kotlin.random.Random
 
 /**
  * Connect each source neuron to a single target.
@@ -37,16 +38,18 @@ class OneToOne(
      * Orientation of how to connect neurons.
      */
     @UserParameter(label = "Orientation", order = 1)
-    var connectOrientation: OrientationComparator = OrientationComparator.X_ORDER
+    var connectOrientation: OrientationComparator = OrientationComparator.X_ORDER,
 
-) : ConnectionStrategy(), EditableObject {
+    seed: Long = Random.nextLong()
+
+) : ConnectionStrategy(seed), EditableObject {
 
     override fun connectNeurons(
         source: List<Neuron>,
         target: List<Neuron>
     ): List<Synapse> {
         val syns = createOneToOneSynapses(source, target, useBidirectionalConnections)
-        polarizeSynapses(syns, percentExcitatory)
+        polarizeSynapses(syns, percentExcitatory, random)
         return syns
     }
 

@@ -25,6 +25,7 @@ import org.simbrain.util.displayInDialog
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.NormalDistribution
+import kotlin.random.Random
 
 /**
  * Maintains a specific strategy for creating connections between two groups of neurons. Subclasses correspond to
@@ -39,7 +40,7 @@ import org.simbrain.util.stats.distributions.NormalDistribution
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
-abstract class ConnectionStrategy : CopyableObject {
+abstract class ConnectionStrategy(seed: Long = Random.nextLong()) : CopyableObject {
 
     /**
      * Whether excitatory connection should be randomized.
@@ -54,12 +55,12 @@ abstract class ConnectionStrategy : CopyableObject {
     /**
      * The randomizer for excitatory synapses.
      */
-    var exRandomizer: ProbabilityDistribution = NormalDistribution();
+    var exRandomizer: ProbabilityDistribution = NormalDistribution().apply { randomSeed = seed }
 
     /**
      * The randomizer for inhibitory synapses.
      */
-    var inRandomizer: ProbabilityDistribution = NormalDistribution();
+    var inRandomizer: ProbabilityDistribution = NormalDistribution().apply { randomSeed = seed }
 
     /**
      * If true, then separately store [percentExcitatory]. If false, the connection strategy itself determines how
@@ -71,6 +72,11 @@ abstract class ConnectionStrategy : CopyableObject {
      * If uses polarity, store the percent excitatory. Otherwise ignore.
      */
     var percentExcitatory: Double = 50.0
+
+    /**
+     * A random object that uses the strategy’s [seed] that can be passed to different functions (such as shuffle) to ensure deterministic results
+     */
+    var random = Random(seed)
 
     fun commonCopy(toCopy: ConnectionStrategy) {
         toCopy.exRandomizer = exRandomizer.copy()

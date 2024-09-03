@@ -25,6 +25,7 @@ import org.simbrain.util.cartesianProduct
 import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.decayfunctions.GaussianDecayFunction
 import org.simbrain.util.propertyeditor.EditableObject
+import kotlin.random.Random
 
 class DistanceBased (
 
@@ -35,16 +36,18 @@ class DistanceBased (
         label = "Distance Function",
         description = "Decay function for connectionprobability",
         order = 1)
-    var decayFunction: DecayFunction = GaussianDecayFunction()
+    var decayFunction: DecayFunction = GaussianDecayFunction(),
 
-) : ConnectionStrategy(), EditableObject {
+    seed: Long = Random.nextLong()
+
+) : ConnectionStrategy(seed), EditableObject {
 
     override fun connectNeurons(
         source: List<Neuron>,
         target: List<Neuron>
     ): List<Synapse> {
-        val syns = createRadialSynapses(source, target, decayFunction)
-        polarizeSynapses(syns, percentExcitatory)
+        val syns = createRadialSynapses(source, target, decayFunction, random)
+        polarizeSynapses(syns, percentExcitatory, random)
         return syns
     }
 
@@ -65,13 +68,14 @@ class DistanceBased (
 fun createRadialSynapses (
     source: List<Neuron>,
     target: List<Neuron>,
-    decay: DecayFunction
+    decay: DecayFunction,
+    random: Random = Random
 ): List<Synapse> {
     val syns = ArrayList<Synapse>()
     (source cartesianProduct target).forEach{ (src, tar) ->
         if (src != tar) {
             val p = decay.getScalingFactor(getEuclideanDist(src, tar))
-            if (Math.random() < p) {
+            if (random.nextDouble() < p) {
                 syns.add(Synapse(src, tar))
             }
         }

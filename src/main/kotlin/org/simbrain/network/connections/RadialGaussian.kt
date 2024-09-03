@@ -22,6 +22,7 @@ import org.simbrain.network.core.Synapse
 import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
+import kotlin.random.Random
 
 const val DEFAULT_DIST_CONST: Double = 0.25
 
@@ -123,9 +124,11 @@ class RadialGaussian(
         increment = 5.0,
         minimumValue = 0.01,
         order = 1)
-    var lambda: Double = DEFAULT_LAMBDA
+    var lambda: Double = DEFAULT_LAMBDA,
 
-) : ConnectionStrategy(), EditableObject {
+    seed: Long = Random.nextLong()
+
+) : ConnectionStrategy(seed), EditableObject {
 
     // TODO: Add a sparsity constraint, such that connections are still chosen stochastically
     // based on distance, but a specific number of connections are guaranteed to be made.
@@ -135,7 +138,7 @@ class RadialGaussian(
         target: List<Neuron>
     ): List<Synapse> {
         val syns: List<Synapse> = createRadialPolarizedSynapses(source, target, eeDistConst, eiDistConst, ieDistConst, iiDistConst, distConst, lambda)
-        polarizeSynapses(syns, percentExcitatory)
+        polarizeSynapses(syns, percentExcitatory, random)
         return syns
     }
 

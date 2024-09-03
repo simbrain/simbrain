@@ -24,6 +24,7 @@ import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.NormalDistribution
+import kotlin.random.Random
 
 /**
  * For each neuron, consider every neuron in a radius and make excitatory and inhibitory synapses with them according to
@@ -93,9 +94,11 @@ class RadialProbabilistic(
         description = "Allow synapses from neurons to themselves",
         order = 50
     )
-    var allowSelfConnections: Boolean = false
+    var allowSelfConnections: Boolean = false,
 
-    ) : ConnectionStrategy(), EditableObject {
+    seed: Long = Random.nextLong()
+
+) : ConnectionStrategy(seed), EditableObject {
 
     /**
      * Radial simple sets the polarity implicitly.
@@ -110,11 +113,17 @@ class RadialProbabilistic(
         source: List<Neuron>,
         target: List<Neuron>
     ): List<Synapse> {
-        val exc = createProbabilisticallySynapses(source, target, excitatoryProbability,
-            excitatoryRadius, allowSelfConnections, NormalDistribution(1.0,.1)
+        val exc = createProbabilisticallySynapses(
+            source, target, excitatoryProbability,
+            excitatoryRadius, allowSelfConnections,
+            exRandomizer,
+            random
         )
-        val inh = createProbabilisticallySynapses(source, target, excitatoryProbability,
-            excitatoryRadius, allowSelfConnections, NormalDistribution(-1.0,0.1)
+        val inh = createProbabilisticallySynapses(
+            source, target, excitatoryProbability,
+            excitatoryRadius, allowSelfConnections,
+            inRandomizer,
+            random
         )
         val syns = exc + inh
         return syns
@@ -143,11 +152,12 @@ fun createProbabilisticallySynapses(
     prob: Double,
     radius: Double,
     allowSelfConnection: Boolean = false,
-    randomizer: ProbabilityDistribution = NormalDistribution(0.0, 1.0)
+    weightRandomizer: ProbabilityDistribution = NormalDistribution(0.0, 1.0),
+    random: Random = Random
 ): List<Synapse> {
-    val syns = ArrayList<Synapse>()
-    src.forEach { n -> syns.addAll(n.createProbabilisticallySynapses(tar, prob, radius)) }
-    return syns
+    return src.flatMap { n ->
+        n.createProbabilisticallySynapses(tar, prob, radius, allowSelfConnection, weightRandomizer, random)
+    }
 }
 
 /**
@@ -158,15 +168,16 @@ fun Neuron.createProbabilisticallySynapses(
     prob: Double,
     radius: Double,
     allowSelfConnection: Boolean = false,
-    randomizer: ProbabilityDistribution = NormalDistribution(0.0, 1.0)
+    weightRandomizer: ProbabilityDistribution = NormalDistribution(0.0, 1.0),
+    random: Random = Random
 ): List<Synapse> {
     return getNeuronsInRadius(pool, radius)
         .filter { otherNeuron ->
             if (!allowSelfConnection) this != otherNeuron else true
         }
-        .filter { Math.random() < prob }
+        .filter { random.nextDouble() < prob }
         .map { otherNeuron ->
-            Synapse(this, otherNeuron, otherNeuron.polarity.value(randomizer.sampleDouble()))
+            Synapse(this, otherNeuron, otherNeuron.polarity.value(weightRandomizer.sampleDouble()))
         }
 }
 

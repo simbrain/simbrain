@@ -24,6 +24,7 @@ import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.NormalDistribution
+import kotlin.random.Random
 
 /**
  * For each source neuron, create a fixed number of connections to or from target neurons (fixed indegree vs. fixed
@@ -66,9 +67,11 @@ class FixedDegree(
         description = "Allow synapses from neurons to themselves",
         order = 50
     )
-    var allowSelfConnections: Boolean = false
+    var allowSelfConnections: Boolean = false,
 
-    ) : ConnectionStrategy(), EditableObject {
+    seed: Long = Random.nextLong(),
+
+    ) : ConnectionStrategy(seed), EditableObject {
 
     var radius by GuiEditable(
         description = "Radius within which to make connections",
@@ -82,11 +85,11 @@ class FixedDegree(
         target: List<Neuron>
     ): List<Synapse> {
         val syns = if (useRadius) {
-            createFixedDegreeInRadiusSynapses(source, target, degree, radius, direction, allowSelfConnections)
+            createFixedDegreeInRadiusSynapses(source, target, degree, radius, direction, allowSelfConnections, exRandomizer, random)
         } else {
-            createFixedDegreeSynapses(source, target, degree, direction, allowSelfConnections)
+            createFixedDegreeSynapses(source, target, degree, direction, allowSelfConnections, exRandomizer, random)
         }
-        polarizeSynapses(syns, percentExcitatory)
+        polarizeSynapses(syns, percentExcitatory, random)
         return syns
     }
 
@@ -113,10 +116,12 @@ fun createFixedDegreeSynapses(
     tar: List<Neuron>,
     degree: Int,
     direction: Direction = Direction.IN,
-    allowSelfConnection: Boolean = false
+    allowSelfConnection: Boolean = false,
+    weightRandomizer: ProbabilityDistribution,
+    random: Random
 ): List<Synapse> {
     val syns = ArrayList<Synapse>()
-    src.forEach { n -> syns.addAll(n.createToNSynapses(tar, degree, direction, allowSelfConnection)) }
+    src.forEach { n -> syns.addAll(n.createToNSynapses(tar, degree, direction, allowSelfConnection, weightRandomizer, random)) }
     return syns
 }
 
@@ -129,12 +134,20 @@ fun createFixedDegreeInRadiusSynapses(
     degree: Int,
     radius: Double,
     direction: Direction = Direction.IN,
-    allowSelfConnection: Boolean = false
+    allowSelfConnection: Boolean = false,
+    weightRandomizer: ProbabilityDistribution = NormalDistribution(0.0, 1.0),
+    random: Random = Random
 ): List<Synapse> {
     val syns = ArrayList<Synapse>()
-    src.forEach { n -> syns.addAll(n.createToNSynapses(n.getNeuronsInRadius(tar, radius),
-        degree, direction,
-        allowSelfConnection)) }
+    src.forEach { n -> syns.addAll(
+            n.createToNSynapses(
+                n.getNeuronsInRadius(tar, radius),
+                degree, direction, allowSelfConnection,
+                weightRandomizer = weightRandomizer,
+                random = random
+            )
+        )
+    }
     return syns
 }
 
@@ -146,18 +159,19 @@ fun Neuron.createToNSynapses(
     N: Int,
     direction: Direction = Direction.IN,
     allowSelfConnection: Boolean = false,
-    randomizer: ProbabilityDistribution = NormalDistribution(0.0, 1.0)
+    weightRandomizer: ProbabilityDistribution = NormalDistribution(0.0, 1.0),
+    random: Random = Random
 ): List<Synapse> {
-    return pool.shuffled()
+    return pool.shuffled(random)
         .filter { otherNeuron ->
             if (!allowSelfConnection) this != otherNeuron else true
         }
         .take(N)
         .map { otherNeuron ->
             if (direction == Direction.IN) {
-                Synapse(otherNeuron, this, otherNeuron.polarity.value(randomizer.sampleDouble()))
+                Synapse(otherNeuron, this, otherNeuron.polarity.value(weightRandomizer.sampleDouble()))
             } else {
-                Synapse(this, otherNeuron, this.polarity.value(randomizer.sampleDouble()))
+                Synapse(this, otherNeuron, this.polarity.value(weightRandomizer.sampleDouble()))
             }
         }
 }

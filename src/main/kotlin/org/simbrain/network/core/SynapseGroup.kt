@@ -141,11 +141,11 @@ class SynapseGroup @JvmOverloads constructor(
         require(!(source.size != src.size || target.size != tar.size)) { "Size of source and " +
                 "target of this synapse group do not match." }
 
-        val mapping = (source.neuronList + target.neuronList)
-            .zip(src.neuronList + tar.neuronList)
+        val mapping = (source.neuronList.sortTopBottom() + target.neuronList.sortTopBottom())
+            .zip(src.neuronList.sortTopBottom() + tar.neuronList.sortTopBottom())
             .toMap()
 
-        val syns = this.synapses.map{
+        val syns = this.synapses.map {
                 Synapse(mapping[it.source]!!, mapping[it.target]!!, it)
             }.toMutableList()
 

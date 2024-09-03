@@ -20,6 +20,7 @@ package org.simbrain.network.connections
 
 import org.simbrain.network.core.Synapse
 import org.simbrain.util.SimbrainConstants.Polarity
+import kotlin.random.Random
 
 /**
  * Utility functions/interfaces/etc for manipulating synapses.
@@ -47,54 +48,29 @@ const val DEFAULT_INHIBITORY_STRENGTH = -1.0
  * @param synapses the synapses to polarize
  * @param percentExcitatory the percent of the synapses to make excitatory
  */
-fun polarizeSynapses(synapses: Collection<Synapse>, percentExcitatory: Double) {
+@JvmOverloads
+fun polarizeSynapses(synapses: Collection<Synapse>, percentExcitatory: Double, random: Random = Random) {
     // Computations are done using ratios
-    var excitatoryRatio = percentExcitatory / 100
+    val excitatoryRatio = percentExcitatory / 100
     if (excitatoryRatio > 1 || excitatoryRatio < 0) {
         throw IllegalArgumentException("Randomization had failed." + " The ratio of excitatory synapses " + " cannot be greater than 1 or less than 0.")
-    } else {
-        var exciteCount = (excitatoryRatio * synapses.size).toInt()
-        var inhibCount = synapses.size - exciteCount
-        var remaining = synapses.size
-        var excitatory = false
-        for (s in synapses) {
-            excitatory = shouldBeExcitatory(excitatoryRatio, exciteCount, inhibCount, s)
-            // Set the strength based on the polarity.
-            if (excitatory) {
-                s.strength = DEFAULT_EXCITATORY_STRENGTH
-                exciteCount--
-                // Change the excitatoryRatio to maintain balance
-                excitatoryRatio = exciteCount / remaining.toDouble()
-            } else {
-                s.strength = DEFAULT_INHIBITORY_STRENGTH
-                inhibCount--
-                // Change the excitatoryRatio to maintain balance.
-                excitatoryRatio = (remaining - inhibCount) / remaining.toDouble()
-            }
-            remaining--
-        }
     }
-}
+    val synapsesByPolarity = synapses.groupBy { it.source.polarity }
+    val excitatory = synapsesByPolarity[Polarity.EXCITATORY] ?: emptyList()
+    val inhibitory = synapsesByPolarity[Polarity.INHIBITORY] ?: emptyList()
+    val both = synapsesByPolarity[Polarity.BOTH] ?: emptyList()
+    val excitatoryNeed = (synapses.size * excitatoryRatio).toInt() - excitatory.size
+    val inhibitoryNeed = (synapses.size * (1 - excitatoryRatio)).toInt() - inhibitory.size
 
-/**
- * Should the provided synapse be excitatory.
- */
-private fun shouldBeExcitatory(excitatoryRatio: Double, exciteCount: Int, inhibCount: Int, s: Synapse): Boolean {
-    var excitatory = false
-    if (s.source.isPolarized) {
-        excitatory = Polarity.EXCITATORY === s.source.polarity
-    } else {
-        if (exciteCount <= 0 || inhibCount <= 0) {
-            if (exciteCount <= 0) {
-                excitatory = false
-            }
-            if (inhibCount <= 0) {
-                excitatory = true
-            }
-        } else {
-            val exciteOrInhib = Math.random()
-            excitatory = exciteOrInhib < excitatoryRatio
-        }
+    if (excitatoryNeed < 0 || inhibitoryNeed < 0) {
+        throw IllegalArgumentException("Insufficient free synapses to meet the requested excitatory ratio.")
     }
-    return excitatory
+
+    val (toExcite, toInhibit) = both.shuffled(random).let {
+        it.take(excitatoryNeed) + excitatory to it.drop(excitatoryNeed) + inhibitory
+    }
+
+    toExcite.forEach { it.strength = DEFAULT_EXCITATORY_STRENGTH }
+    toInhibit.forEach { it.strength = DEFAULT_INHIBITORY_STRENGTH }
+
 }

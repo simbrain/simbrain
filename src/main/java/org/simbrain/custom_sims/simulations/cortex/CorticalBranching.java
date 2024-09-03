@@ -101,10 +101,6 @@ public class CorticalBranching extends Simulation {
         super();
     }
 
-    private String getSubmenuName() {
-        return "Brain";
-    }
-
     @Override
     public String getName() {
         return "Cortical Branching";

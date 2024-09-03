@@ -147,10 +147,6 @@ public class SimpleOperant extends Simulation {
         }
     }
 
-    private String getSubmenuName() {
-        return "Behaviorism";
-    }
-
     @Override
     public String getName() {
         return "Simple Operant Conditioning";

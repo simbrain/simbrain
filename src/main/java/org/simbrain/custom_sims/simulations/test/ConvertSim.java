@@ -57,10 +57,6 @@ public class ConvertSim extends Simulation {
         super(desktop);
     }
 
-    private String getSubmenuName() {
-        return "Utils";
-    }
-
     @Override
     public String getName() {
         return "Convert Sim";

@@ -276,7 +276,4 @@ public class SORN extends Simulation {
         return "Self-Organizing Recurrent Network";
     }
 
-    private String getSubmenuName() {
-        return "Brain";
-    }
 }

@@ -464,10 +464,6 @@ public class Cerebellum extends Simulation {
         sim.couple(output, sts2);
     }
 
-    private String getSubmenuName() {
-        return "Brain";
-    }
-
     @Override
     public String getName() {
         return "Cerebellum";

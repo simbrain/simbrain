@@ -93,9 +93,6 @@ public class TestSim extends Simulation {
 
     }
 
-    private String getSubmenuName() {
-        return "Test";
-    }
 
     @Override
     public String getName() {

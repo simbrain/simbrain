@@ -133,27 +133,6 @@ class SynapseGroup @JvmOverloads constructor(
         return ("$id  with ${size()} synapse(s) from $source.id to $target.id")
     }
 
-    /**
-     * Copy this synapse group onto another neurongroup source/target pair.
-     */
-    fun copy(src: AbstractNeuronCollection, tar: AbstractNeuronCollection): SynapseGroup {
-        
-        require(!(source.size != src.size || target.size != tar.size)) { "Size of source and " +
-                "target of this synapse group do not match." }
-
-        val mapping = (source.neuronList.sortTopBottom() + target.neuronList.sortTopBottom())
-            .zip(src.neuronList.sortTopBottom() + tar.neuronList.sortTopBottom())
-            .toMap()
-
-        val syns = this.synapses.map {
-                Synapse(mapping[it.source]!!, mapping[it.target]!!, it)
-            }.toMutableList()
-
-        return SynapseGroup(src, tar, connectionStrategy).also {
-            it.synapses = syns
-        }
-    }
-
     fun applyConnectionStrategy() {
         synapses.toList().forEach { removeSynapse(it) }
         connectionStrategy.connectNeurons(

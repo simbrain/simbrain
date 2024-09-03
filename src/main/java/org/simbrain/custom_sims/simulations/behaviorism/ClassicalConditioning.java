@@ -132,10 +132,6 @@ public class ClassicalConditioning extends Simulation {
 
     }
 
-    private String getSubmenuName() {
-        return "Behaviorism";
-    }
-
     @Override
     public String getName() {
         return "Classical Conditioning";

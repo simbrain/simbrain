@@ -218,10 +218,6 @@ public class KuramotoOscillators extends Simulation {
         super();
     }
 
-    private String getSubmenuName() {
-        return "Cognitive Maps";
-    }
-
     @Override
     public String getName() {
         return "Kuramoto Oscillators";

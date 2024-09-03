@@ -194,7 +194,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
                 runningCount++
             }
 
-            override var aggregatedError: Deferred<Double> = CompletableDeferred()
+            @Transient override var aggregatedError: Deferred<Double> = CompletableDeferred()
 
             override fun copy() = Mean()
 
@@ -211,7 +211,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
                 runningCount++
             }
 
-            override var aggregatedError: Deferred<Double> = CompletableDeferred()
+            @Transient override var aggregatedError: Deferred<Double> = CompletableDeferred()
 
             override fun copy() = Sum()
 
@@ -228,7 +228,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
                 runningCount++
             }
 
-            override var aggregatedError: Deferred<Double> = CompletableDeferred()
+            @Transient override var aggregatedError: Deferred<Double> = CompletableDeferred()
 
             override fun copy() = RootMean()
 

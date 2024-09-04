@@ -59,11 +59,21 @@ fun polarizeSynapses(synapses: Collection<Synapse>, percentExcitatory: Double, r
     val excitatory = synapsesByPolarity[Polarity.EXCITATORY] ?: emptyList()
     val inhibitory = synapsesByPolarity[Polarity.INHIBITORY] ?: emptyList()
     val both = synapsesByPolarity[Polarity.BOTH] ?: emptyList()
+
+    if (both.isEmpty()) return // Skip if there are no synapses to polarize
+
     val excitatoryNeed = (synapses.size * excitatoryRatio).toInt() - excitatory.size
     val inhibitoryNeed = (synapses.size * (1 - excitatoryRatio)).toInt() - inhibitory.size
 
     if (excitatoryNeed < 0 || inhibitoryNeed < 0) {
-        throw IllegalArgumentException("Insufficient free synapses to meet the requested excitatory ratio.")
+        throw IllegalArgumentException("""
+            Insufficient free synapses to meet the requested excitatory ratio.
+            Existing excitatory synapses: ${excitatory.size}
+            Existing inhibitory synapses: ${inhibitory.size}
+            Existing both synapses: ${both.size}
+            Requested excitatory size: $excitatoryNeed
+            Requested inhibitory size: $inhibitoryNeed
+        """.trimIndent())
     }
 
     val (toExcite, toInhibit) = both.shuffled(random).let {

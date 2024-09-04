@@ -26,6 +26,7 @@ import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import static org.simbrain.network.core.NetworkUtilsKt.addNeuronGroup;
 
@@ -50,9 +51,6 @@ public class KuramotoOscillators extends Simulation {
     private int netSize = 50;
     private int spacing = 40;
     private int dispersion = 140;
-
-    private long seed = 42L;
-
 
     @Override
     public void run() {
@@ -110,7 +108,7 @@ public class KuramotoOscillators extends Simulation {
         reservoirNet.setLabel("Reservoir");
 
         // Set up recurrent synapses
-        var recurrentSyns = EdgeOfChaos.connectReservoir(net, reservoirNet, .1, 4, seed);
+        var recurrentSyns = EdgeOfChaos.connectReservoir(net, reservoirNet, .1, 4, (new Random()).nextLong());
         recurrentSyns.setLabel("Synapses");
 
         // ConnectionStrategy recConnection = new RadialGaussian(DEFAULT_EE_CONST * 1, DEFAULT_EI_CONST * 3,

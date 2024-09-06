@@ -1,11 +1,13 @@
 package org.simbrain.network.connections
 
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.addNeuronCollection
 
 class SparseTest {
 
@@ -75,6 +77,56 @@ class SparseTest {
 
         assertEquals(1, syns2.size)
 
+    }
+
+    @Test
+    fun `equalizeEfferents matches connections with the correct density`() {
+        runBlocking {
+            with(net) {
+                (0..10).map { it / 10.0 }.forEach { checkEqualFanouts(it) }
+            }
+        }
+    }
+
+    private suspend fun Network.checkEqualFanouts(density: Double) {
+        val sparse = Sparse(connectionDensity = density, equalizeEfferents = true, allowSelfConnection = true)
+        val neurons = addNeuronCollection(10).neuronList
+        val syns = sparse.connectNeurons(neurons, neurons)
+        val expectedSize = (neurons.size * density).toInt()
+        assert(neurons.all { it.fanOut.size == expectedSize }) {
+            "Expected $expectedSize synapses for each source neuron, but got ${neurons.map { it.fanOut.size }}"
+        }
+    }
+
+    @Test
+    fun `strategy created with the same seed should produce the same same pattern`() {
+        assertStrategiesPatterns(
+            net,
+            Sparse(seed = 42L),
+            Sparse(seed = 42L)
+        )
+    }
+
+
+    @Test
+    fun `strategy created with different seeds should produce different patterns`() {
+        assertStrategiesPatterns(
+            net,
+            Sparse(seed = 42L),
+            Sparse(seed = 43L),
+            expectIdentical = false
+        )
+    }
+
+    @Test
+    fun `calling connectNeurons on the same strategy object should produce different patterns each time`() {
+        val sparse = Sparse(seed = 42L)
+        assertStrategiesPatterns(
+            net,
+            sparse,
+            sparse,
+            expectIdentical = false
+        )
     }
 
 }

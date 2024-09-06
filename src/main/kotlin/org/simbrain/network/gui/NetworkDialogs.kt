@@ -4,7 +4,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connections.ConnectionStrategy
-import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.*
 import org.simbrain.network.gui.dialogs.*
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog
@@ -200,7 +199,6 @@ class ConnectionStrategyPanel(connectionStrategy: ConnectionStrategy) : JPanel()
     val connectionStrategy get() = strategySelector.editingObject
     val editor = AnnotatedPropertyEditor(strategySelector)
     val percentExcitatoryPanel = PercentExcitatoryPanel(connectionStrategy.percentExcitatory)
-    var sparsePanel: SparsePanel? = null
 
     init {
         add(editor)
@@ -213,17 +211,6 @@ class ConnectionStrategyPanel(connectionStrategy: ConnectionStrategy) : JPanel()
                     itemPanel.addItem(percentExcitatoryPanel)
                 } else {
                     itemPanel.remove(percentExcitatoryPanel)
-                }
-                // Custom Sparse Panel
-                if (value is Sparse) {
-                    sparsePanel?.let { itemPanel.remove(it) }
-                    sparsePanel = SparsePanel(value)
-                    itemPanel.addItem(sparsePanel)
-                    // TODO: Put it in the panel itself?
-                    // comp.editorPanel.addItem(sparsePanel)
-                } else {
-                    sparsePanel?.let { itemPanel.remove(it) }
-                    // comp.editorPanel.removeItem(sparsePanel)
                 }
             }
         }
@@ -239,11 +226,6 @@ class ConnectionStrategyPanel(connectionStrategy: ConnectionStrategy) : JPanel()
     fun commitChanges(): Boolean {
         editor.commitChanges()
         connectionStrategy.percentExcitatory = percentExcitatoryPanel.getPercentAsProbability() * 100
-        connectionStrategy.let {
-            if (it is Sparse) {
-                sparsePanel?.applyChanges(it)
-            }
-        }
         return true
     }
 

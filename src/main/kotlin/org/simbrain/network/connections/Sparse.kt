@@ -129,23 +129,16 @@ fun createEqualizedSynapses(
         return ConnectionsResult.Reset(listOf())
     }
 
-    val connectionCount = sourceNeurons.size * targetNeurons.size * connectionDensity
+    val connectionCount = (targetNeurons.size * connectionDensity).toInt()
 
-    val sources = sourceNeurons.sampleWithoutReplacement(random = random, restartIfExhausted = true)
-        .take(connectionCount.roundToInt())
-
-    val targets = targetNeurons.sampleWithoutReplacement(random = random, restartIfExhausted = true)
-        .take(connectionCount.roundToInt())
-
-    val connections = (sources zip targets).let {
-        if (selfConnectionAllowed) {
-            it
-        } else {
-            it.filter { (source, target) -> source != target }
-        }
+    val connections = sourceNeurons.flatMap { source ->
+        (targetNeurons - if (selfConnectionAllowed) emptySet() else setOf(source))
+            .sampleWithoutReplacement(random = random)
+            .take(connectionCount)
+            .map { target -> Synapse(source, target) }
     }
 
-    return ConnectionsResult.Reset(connections.map { (source, target) -> Synapse(source, target) }.toList())
+    return ConnectionsResult.Reset(connections)
 }
 
 fun createSparseSynapses(

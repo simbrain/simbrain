@@ -14,10 +14,10 @@ package org.simbrain.network.connections
 
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.bound
 import org.simbrain.network.util.OrientationComparator
-import org.simbrain.util.UserParameter
+import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
-import java.util.*
 import kotlin.random.Random
 
 /**
@@ -68,16 +68,6 @@ class OneToOne(
 }
 
 /**
- * Returns a sorted list of neurons, given a comparator.
- */
-private fun getSortedNeuronList(neuronList: List<Neuron>, comparator: OrientationComparator): List<Neuron> {
-    val list = ArrayList<Neuron>()
-    list.addAll(neuronList)
-    Collections.sort(list, comparator)
-    return list
-}
-
-/**
  * Connect neurons 1-1
  */
 fun createOneToOneSynapses(
@@ -85,63 +75,28 @@ fun createOneToOneSynapses(
     targetNeurons: List<Neuron>,
     useBidirectionalConnections: Boolean = false
 ): List<Synapse> {
-    val srcWidth = OrientationComparator.findMaxX(sourceNeurons) - OrientationComparator.findMinX(sourceNeurons)
-    val srcHeight =
-        OrientationComparator.findMaxY(sourceNeurons) - OrientationComparator.findMinY(sourceNeurons)
-    val tarWidth = OrientationComparator.findMaxX(targetNeurons) - OrientationComparator.findMinX(targetNeurons)
-    val tarHeight =
-        OrientationComparator.findMaxY(targetNeurons) - OrientationComparator.findMinY(targetNeurons)
+    val sourceBounds = sourceNeurons.bound
+    val targetBounds = targetNeurons.bound
+    val sourceCenter = sourceBounds.center
+    val targetCenter = targetBounds.center
+    val (_, _, sw, sh) = sourceBounds
+    val (_, _, tw, th) = targetBounds
 
-    // Sort by axis of maximal variance
-    val srcSortX = srcWidth > srcHeight
-    val tarSortX = tarWidth > tarHeight
-    val srcComparator: OrientationComparator
-    val tarComparator: OrientationComparator
+    val isSourceVertical = sw < sh
+    val isTargetVertical = tw < th
 
-    // srcSortX XOR tarSortX means that one should be sorted vertically
-    // and the other horizonally.
-    if (srcSortX != tarSortX) {
-        val midpointXSrc = OrientationComparator.findMidpointX(sourceNeurons)
-        val midpointXTar = OrientationComparator.findMidpointX(targetNeurons)
-        val midpointYSrc = OrientationComparator.findMidpointY(sourceNeurons)
-        val midpointYTar = OrientationComparator.findMidpointY(targetNeurons)
-        if (srcSortX) { // source is horizontal
-            // Go over source in regular or reverse order based on the
-            // relative positions of the source and target midpoints.
-            srcComparator =
-                if (midpointXSrc > midpointXTar) OrientationComparator.X_REVERSE else OrientationComparator.X_ORDER
-            // Go over target in regular or reverse order based on the
-            // relative positions of the source and target midpoints.
-            tarComparator =
-                if (midpointYSrc > midpointYTar) OrientationComparator.Y_ORDER else OrientationComparator.Y_REVERSE
-        } else { // source is vertical
-            srcComparator =
-                if (midpointYSrc > midpointYTar) OrientationComparator.Y_REVERSE else OrientationComparator.Y_ORDER
-            tarComparator =
-                if (midpointXSrc > midpointXTar) OrientationComparator.X_ORDER else OrientationComparator.X_REVERSE
-        }
-    } else {
-        // Either we are sorting both vertically or both horizontally...
-        srcComparator = if (srcSortX) OrientationComparator.X_ORDER else OrientationComparator.Y_ORDER
-        tarComparator = if (tarSortX) OrientationComparator.X_ORDER else OrientationComparator.Y_ORDER
-    }
-    val syns = ArrayList<Synapse>()
-    val targets = getSortedNeuronList(targetNeurons, tarComparator).iterator()
-    val sources = getSortedNeuronList(sourceNeurons, srcComparator).iterator()
-    while (sources.hasNext()) {
-        val source = sources.next()
-        if (targets.hasNext()) {
-            val target = targets.next()
-            val synapse = Synapse(source, target)
-            syns.add(synapse)
-            // Allow neurons to be connected back to source.
-            if (useBidirectionalConnections) {
-                val espanys = Synapse(target, source)
-                syns.add(espanys)
+    val isReversedTarget = isSourceVertical != isTargetVertical &&
+            (targetCenter - sourceCenter).let { (x, y) -> (x > 0 && y > 0) || (x < 0 && y < 0) }
+
+    return sourceNeurons.sortedBy { if (isSourceVertical) it.y else it.x }
+        .zip(targetNeurons.sortedBy { if (isTargetVertical) it.y else it.x }.let { if (isReversedTarget) it.reversed() else it })
+        .flatMap { (source, target) ->
+            buildList {
+                add(Synapse(source, target))
+                if (useBidirectionalConnections) {
+                    add(Synapse(target, source))
+                }
             }
-        } else {
-            break
         }
-    }
-    return syns
+
 }

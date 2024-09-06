@@ -14,7 +14,7 @@ import kotlin.math.pow
  * The standard normalizing factor that makes a Gaussian integrate to 1 has been removed so that [getScalingFactor]
  * returns a 1 at [peakDistance], as expected.
  */
-class GaussianDecayFunction @JvmOverloads constructor(dispersion: Double = 70.0): DecayFunction() {
+class GaussianDecayFunction @JvmOverloads constructor(dispersion: Double = 70.0): DecayFunction(dispersion) {
 
     override fun getScalingFactor(distance: Double): Double {
         val mean = peakDistance

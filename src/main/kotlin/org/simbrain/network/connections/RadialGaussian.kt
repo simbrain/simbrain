@@ -137,7 +137,7 @@ class RadialGaussian(
         source: List<Neuron>,
         target: List<Neuron>
     ): List<Synapse> {
-        val syns: List<Synapse> = createRadialPolarizedSynapses(source, target, eeDistConst, eiDistConst, ieDistConst, iiDistConst, distConst, lambda)
+        val syns: List<Synapse> = createRadialPolarizedSynapses(source, target, eeDistConst, eiDistConst, ieDistConst, iiDistConst, distConst, lambda, random)
         polarizeSynapses(syns, percentExcitatory, random)
         return syns
     }
@@ -258,7 +258,8 @@ fun createRadialPolarizedSynapses(
     ieDistConst: Double = DEFAULT_IE_CONST,
     iiDistConst: Double = DEFAULT_II_CONST,
     distConst: Double = DEFAULT_DIST_CONST,
-    lambda: Double = DEFAULT_LAMBDA
+    lambda: Double = DEFAULT_LAMBDA,
+    random: Random = Random
 ): List<Synapse> {
     // Pre-allocating assuming that if one is using this as a connector
     // then they are probably not going to have greater than 25%
@@ -266,7 +267,7 @@ fun createRadialPolarizedSynapses(
     val synapses: MutableList<Synapse> = ArrayList(source!!.size * target!!.size / 4)
     for (src: Neuron in source) {
         for (tar: Neuron in target) {
-            val randVal: Double = Math.random()
+            val randVal = random.nextDouble()
             var probability: Double
             if (src.polarity === Polarity.EXCITATORY) {
                 if (tar.polarity === Polarity.EXCITATORY) {

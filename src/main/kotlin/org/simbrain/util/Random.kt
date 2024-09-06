@@ -32,15 +32,15 @@ fun <T> List<T>.sampleWithReplacement(
     }
 }
 
-fun <T> List<T>.sampleOne(random: Random = Random(Random.nextLong())) = this[random.nextInt(size)]
+fun <T> List<T>.sampleOne(random: Random = Random) = this[random.nextInt(size)]
 
 fun <T> List<T>.sampleWithoutReplacement(
-    random: Random = Random(Random.nextLong()),
+    random: Random = Random,
     restartIfExhausted: Boolean = false
 ) = this.asSequence().sampleWithoutReplacement(random, restartIfExhausted)
 
 fun <T> Sequence<T>.sampleWithoutReplacement(
-    random: Random = Random(Random.nextLong()),
+    random: Random = Random,
     restartIfExhausted: Boolean = false
 ) = sequence {
     do {

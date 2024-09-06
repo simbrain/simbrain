@@ -24,6 +24,7 @@ import org.simbrain.world.odorworld.entities.EntityType;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -137,8 +138,8 @@ public class KuramotoOscillators extends Simulation {
         SynapseGroup inputToRes = new SynapseGroup(inputNetwork, reservoirNet, sparseExcitatory);
 
         inputToRes.getConnectionStrategy().setExRandomizer(new NormalDistribution(10.0, 1.0));
-        inputToRes.setDisplaySynapses(false);
         net.addNetworkModel(inputToRes);
+        SwingUtilities.invokeLater(() -> inputToRes.setDisplaySynapses(false));
         inputToRes.randomizeExcitatory();
 
         inputNetwork.setLocation(130, 660);

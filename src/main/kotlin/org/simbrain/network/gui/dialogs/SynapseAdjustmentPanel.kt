@@ -26,6 +26,7 @@ import org.simbrain.plot.histogram.HistogramModel
 import org.simbrain.plot.histogram.HistogramPanel
 import org.simbrain.util.LabelledItemPanel
 import org.simbrain.util.complement
+import org.simbrain.util.createApplyPanel
 import org.simbrain.util.displayInDialog
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
@@ -171,6 +172,7 @@ class SynapseAdjustmentPanel(
         val perturbTab = JPanel()
         val prunerTab = JPanel()
         val scalerTab = JPanel()
+        val polarizerTab = JPanel()
         randTab.layout = GridBagLayout()
         perturbTab.layout = GridBagLayout()
         val c = GridBagConstraints().apply {
@@ -199,11 +201,24 @@ class SynapseAdjustmentPanel(
         }
         randTab.add(randomizeButton, c)
         perturbTab.add(perturbButton, c)
+
+        polarizerTab.add(
+            PercentExcitatoryPanel(synapses.count { it.strength > 0 } / synapses.size.toDouble() * 100)
+                .createApplyPanel {
+                    val excitatoryCount = (getPercentAsProbability() * synapses.size).toInt()
+                    val shuffledSynapses = synapses.shuffled()
+                    shuffledSynapses.take(excitatoryCount).forEach { it.strength = excitatoryRandomizer.sampleDouble() }
+                    shuffledSynapses.drop(excitatoryCount).forEach { it.strength = inhibitoryRandomizer.sampleDouble() }
+                    fullUpdate()
+                }
+        )
+
         bottomPanel.apply {
             addTab("Randomizer", randTab)
             addTab("Perturber", perturbTab)
             addTab("Pruner", prunerTab)
             addTab("Scaler", scalerTab)
+            addTab("Polarizer", polarizerTab)
         }
         this.add(bottomPanel, gbc)
 

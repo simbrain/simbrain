@@ -19,6 +19,7 @@
 package org.simbrain.network.gui.dialogs
 
 import org.simbrain.network.connections.RadialProbabilistic
+import org.simbrain.network.connections.polarizeSynapses
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
@@ -205,10 +206,7 @@ class SynapseAdjustmentPanel(
         polarizerTab.add(
             PercentExcitatoryPanel(synapses.count { it.strength > 0 } / synapses.size.toDouble() * 100)
                 .createApplyPanel {
-                    val excitatoryCount = (getPercentAsProbability() * synapses.size).toInt()
-                    val shuffledSynapses = synapses.shuffled()
-                    shuffledSynapses.take(excitatoryCount).forEach { it.strength = excitatoryRandomizer.sampleDouble() }
-                    shuffledSynapses.drop(excitatoryCount).forEach { it.strength = inhibitoryRandomizer.sampleDouble() }
+                    polarizeSynapses(synapses, getPercentAsProbability() * 100)
                     fullUpdate()
                 }
         )

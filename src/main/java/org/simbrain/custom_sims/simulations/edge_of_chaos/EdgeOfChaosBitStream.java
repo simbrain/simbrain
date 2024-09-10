@@ -65,6 +65,12 @@ public class EdgeOfChaosBitStream extends Simulation {
 
         // Set up control panel
         controlPanel();
+
+        sim.addDocViewerWithText(10, 10, 300, 300, "Temp",
+                """
+                # Heading
+                Sample text
+                """);
     }
 
     private void controlPanel() {

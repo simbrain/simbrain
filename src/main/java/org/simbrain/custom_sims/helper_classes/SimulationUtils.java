@@ -117,6 +117,18 @@ public class SimulationUtils {
     }
 
     /**
+     * Add docviewer directly with markdown text
+     */
+    public DocViewerComponent addDocViewerWithText(int x, int y, int width, int height, String title, String markdownText) {
+        DocViewerComponent docViewer = new DocViewerComponent(new DocViewer(), title);
+        docViewer.getDocViewer().setText(markdownText);
+        docViewer.getDocViewer().render();
+        workspace.addWorkspaceComponent(docViewer);
+        SwingUtilities.invokeLater(() -> desktop.getDesktopComponent(docViewer).getParentFrame().setBounds(x, y, width, height));
+        return docViewer;
+    }
+
+    /**
      * Returns the contents of a file in the custom_sim directory as a string.
      */
     public String readSimulationFileContents(String fileName) {

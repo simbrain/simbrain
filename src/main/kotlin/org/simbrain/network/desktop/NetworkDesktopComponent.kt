@@ -42,13 +42,13 @@ class NetworkDesktopComponent(frame: GenericFrame, component: NetworkComponent) 
         val fileMenu = JMenu("File")
         fileMenu.add(actionManager.createImportAction(this))
         fileMenu.add(actionManager.createExportAction(this))
+        fileMenu.add(actionManager.createRenameAction(this))
         fileMenu.addSeparator()
         fileMenu.add(networkPanel.networkActions.showNetworkUpdaterDialog);
         fileMenu.addSeparator()
         fileMenu.add(networkPanel.networkActions.showNetworkDefaultsAction);
-        fileMenu.add(networkPanel.networkActions.showNetworkPropertiesAction);
         fileMenu.addSeparator()
-        fileMenu.add(actionManager.createRenameAction(this))
+        fileMenu.add(networkPanel.networkActions.showNetworkPropertiesAction);
         fileMenu.addSeparator()
         fileMenu.add(actionManager.createCloseAction(this))
         return fileMenu

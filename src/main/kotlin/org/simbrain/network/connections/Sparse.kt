@@ -19,7 +19,6 @@ package org.simbrain.network.connections
 
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.UserParameter
 import org.simbrain.util.cartesianProduct
 import org.simbrain.util.propertyeditor.EditableObject
@@ -78,7 +77,7 @@ class Sparse @JvmOverloads constructor(
         description = "Whether or not connections where the source and target are the same neuron are allowed.",
         order = 30
     )
-    var allowSelfConnection: Boolean = NetworkPreferences.selfConnectionAllowed,
+    var allowSelfConnection: Boolean = false,
 
     seed: Long = Random.nextLong()
 

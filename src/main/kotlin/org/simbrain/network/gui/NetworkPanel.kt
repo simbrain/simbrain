@@ -599,7 +599,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         with(selectionManager) {
             val sourceNeurons = filterSelectedSourceModels<Neuron>()
             val targetNeurons = filterSelectedModels<Neuron>()
-            Network.connectionStrategy.connectNeurons(sourceNeurons, targetNeurons).addToNetworkAsync(network)
+            NetworkPreferences.connectionStrategy.connectNeurons(sourceNeurons, targetNeurons).addToNetworkAsync(network)
         }
     }
 
@@ -616,7 +616,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             val targetNeurons = filterSelectedModels<Neuron>() +
                     filterSelectedModels<NeuronCollection>().flatMap { it.neuronList } +
                     filterSelectedModels<NeuronGroup>().flatMap { it.neuronList }
-            Network.connectionStrategy.apply { percentExcitatory = 100.0 }.connectNeurons(sourceNeurons, targetNeurons)
+            NetworkPreferences.connectionStrategy.copy().apply { percentExcitatory = 100.0 }.connectNeurons(sourceNeurons, targetNeurons)
                 .addToNetworkAsync(network)
         }
 

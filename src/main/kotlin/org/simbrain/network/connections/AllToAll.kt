@@ -14,7 +14,6 @@ package org.simbrain.network.connections
 
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.UserParameter
 import org.simbrain.util.cartesianProduct
 import kotlin.random.Random
@@ -37,7 +36,7 @@ class AllToAll @JvmOverloads constructor(
         description = "Can there exist synapses whose source and target are the same?",
         order = 1
     )
-    var allowSelfConnection: Boolean = NetworkPreferences.selfConnectionAllowed,
+    var allowSelfConnection: Boolean = false,
 
     seed: Long = Random.nextLong()
 

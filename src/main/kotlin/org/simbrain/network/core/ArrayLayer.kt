@@ -1,6 +1,6 @@
 package org.simbrain.network.core
 
-import org.simbrain.network.core.Network.Randomizers.activationRandomizer
+import org.simbrain.network.gui.dialogs.NetworkPreferences.activationRandomizer
 import org.simbrain.util.*
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.workspace.Consumable

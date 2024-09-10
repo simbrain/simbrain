@@ -21,8 +21,8 @@ package org.simbrain.network.updaterules
 import org.simbrain.custom_sims.simulations.AllostaticUpdateRule
 import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
-import org.simbrain.network.core.Network.Randomizers.activationRandomizer
 import org.simbrain.network.core.Neuron
+import org.simbrain.network.gui.dialogs.NetworkPreferences.activationRandomizer
 import org.simbrain.network.updaterules.activity_generators.LogisticRule
 import org.simbrain.network.updaterules.activity_generators.RandomNeuronRule
 import org.simbrain.network.updaterules.activity_generators.SinusoidalRule

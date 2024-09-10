@@ -4,7 +4,7 @@ import com.thoughtworks.xstream.XStream
 import kotlinx.coroutines.awaitAll
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.ConnectionStrategy
-import org.simbrain.network.core.Network.Randomizers.biasesRandomizer
+import org.simbrain.network.gui.dialogs.NetworkPreferences.biasesRandomizer
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.subnetworks.Subnetwork

@@ -1,6 +1,9 @@
 package org.simbrain.network.gui.dialogs
 
+import org.simbrain.network.connections.AllToAll
 import org.simbrain.util.*
+import org.simbrain.util.stats.distributions.NormalDistribution
+import org.simbrain.util.stats.distributions.UniformRealDistribution
 import java.awt.Color
 
 object NetworkPreferences: PreferenceHolder() {
@@ -50,15 +53,60 @@ object NetworkPreferences: PreferenceHolder() {
     @UserParameter(label = "Wand radius", tab = "GUI")
     var wandRadius by IntegerPreference(40)
 
-    @UserParameter(label = "Default self connection allowed")
-    var selfConnectionAllowed by BooleanPreference(false)
-
     @UserParameter(label = "Default network time step", minimumValue = 0.0, increment = .1, tab = "Model")
     var defaultTimeStep by DoublePreference(.1)
 
     // Of course specific rules can have specific defaults
     @UserParameter(label = "Default learning rate", minimumValue = 0.0, increment = .1, tab = "Model")
     var defaultLearningRate by DoublePreference(.1)
+
+    @UserParameter(label = "Default connection strategy", tab = "Connections")
+    var connectionStrategy by ConnectionStrategyPreference(AllToAll())
+
+    @UserParameter(
+        label = "Weight Randomizer",
+        description = "Randomizer for all free weights, regardless of polarity. Applying it can change the polarity of a neuron.",
+        showDetails = false,
+        order = 10,
+        tab = "Randomizers"
+    )
+    var weightRandomizer by ProbabilityDistributionPreference(NormalDistribution(0.0, 0.1))
+
+    @UserParameter(
+        label = "Excitatory Randomizer",
+        description = "Randomizer for all weights from polarized excitatory neurons. Applying it will not change the polarity of a neuron.",
+        showDetails = false,
+        order = 20,
+        tab = "Randomizers"
+    )
+    var excitatoryRandomizer by ProbabilityDistributionPreference(UniformRealDistribution(0.0, 1.0))
+
+    @UserParameter(
+        label = "Inhibitory Randomizer",
+        description = "Randomizer for all weights from polarized inhibitory neurons. Applying it will not change the polarity of a neuron.",
+        showDetails = false,
+        order = 30,
+        tab = "Randomizers"
+    )
+    var inhibitoryRandomizer by ProbabilityDistributionPreference(UniformRealDistribution(-1.0, 0.0))
+
+    @UserParameter(
+        label = "Activation Randomizer",
+        description = "Randomizer for all biases.",
+        showDetails = false,
+        order = 40,
+        tab = "Randomizers"
+    )
+    var activationRandomizer by ProbabilityDistributionPreference(NormalDistribution(0.0, 1.0))
+
+    @UserParameter(
+        label = "Bias Randomizer",
+        description = "Randomizer for all biases.",
+        showDetails = false,
+        order = 50,
+        tab = "Randomizers"
+    )
+    var biasesRandomizer by ProbabilityDistributionPreference(NormalDistribution(0.0, 0.01))
 
     // Not currently exposing this with a user parameter since it's more of a convenience to remember between uses
     // of certain iteration dialogs.

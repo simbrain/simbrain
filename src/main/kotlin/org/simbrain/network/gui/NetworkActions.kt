@@ -3,11 +3,11 @@ package org.simbrain.network.gui
 import kotlinx.coroutines.launch
 import org.simbrain.network.connections.*
 import org.simbrain.network.core.*
-import org.simbrain.network.core.Network.Randomizers.excitatoryRandomizer
-import org.simbrain.network.core.Network.Randomizers.inhibitoryRandomizer
-import org.simbrain.network.core.Network.Randomizers.weightRandomizer
 import org.simbrain.network.gui.ConditionallyEnabledAction.EnablingCondition
 import org.simbrain.network.gui.dialogs.NetworkPreferences
+import org.simbrain.network.gui.dialogs.NetworkPreferences.excitatoryRandomizer
+import org.simbrain.network.gui.dialogs.NetworkPreferences.inhibitoryRandomizer
+import org.simbrain.network.gui.dialogs.NetworkPreferences.weightRandomizer
 import org.simbrain.network.gui.dialogs.createSynapseAdjustmentPanel
 import org.simbrain.network.gui.dialogs.createTestInputPanel
 import org.simbrain.network.gui.dialogs.layout.LayoutDialog
@@ -423,12 +423,6 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         network.createEditorDialog().display()
     }
 
-    val showNetworkRandomizersAction = networkPanel.createAction(
-        name = "Network Randomizers..."
-    ) {
-        Network.createEditorDialog().display()
-    }
-
     val iterateNetworkAction = networkPanel.createAction(
         name = "Iterate network",
         description = "Step network update algorithm (\"spacebar\")",
@@ -604,15 +598,6 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             applyConnectionAction(RadialProbabilistic()),
             applyConnectionAction(Sparse())
         )
-
-    val editConnectionStrategy = networkPanel.createAction(
-        name = "Edit connection strategy...",
-    ) {
-        ConnectionStrategyPanel(Network.connectionStrategy).displayInDialog {
-            commitChanges()
-            Network.connectionStrategy = this.connectionStrategy
-        }
-    }
 
     fun createSynapseGroupVisibilityAction() = networkPanel.createAction(
         name = "Toggle visibility of selected synapse groups",

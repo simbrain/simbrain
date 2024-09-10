@@ -19,6 +19,7 @@
 package org.simbrain.network.subnetworks
 
 import org.simbrain.network.core.*
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.trainers.UnsupervisedNetwork
 import org.simbrain.network.trainers.UnsupervisedTrainer
 import org.simbrain.network.trainers.updateBiases
@@ -172,9 +173,9 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
     }
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
-        visibleToHidden.randomize(Network.weightRandomizer)
-        visibleLayer.randomizeBiases(Network.biasesRandomizer)
-        hiddenLayer.randomizeBiases(Network.biasesRandomizer)
+        visibleToHidden.randomize(NetworkPreferences.weightRandomizer)
+        visibleLayer.randomizeBiases(NetworkPreferences.biasesRandomizer)
+        hiddenLayer.randomizeBiases(NetworkPreferences.biasesRandomizer)
     }
 
     /**

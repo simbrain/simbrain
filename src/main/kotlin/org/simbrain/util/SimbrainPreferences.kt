@@ -1,7 +1,9 @@
 package org.simbrain.util
 
+import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.stats.ProbabilityDistribution
 import java.awt.Color
 import java.util.prefs.Preferences
 import javax.swing.JButton
@@ -115,6 +117,26 @@ class StringPreference(defaultPath: String): Preference<String>(defaultPath) {
 class ColorPreference(defaultColor: Color): Preference<Color>(defaultColor) {
     override fun deserialize(value: String) = Color(value.toInt())
     override fun serialize(value: Color) = value.rgb.toString()
+}
+
+class ConnectionStrategyPreference(connectionStrategy: ConnectionStrategy): Preference<ConnectionStrategy>(connectionStrategy) {
+    override fun deserialize(value: String): ConnectionStrategy {
+        return getSimbrainXStream().fromXML(value) as ConnectionStrategy
+    }
+
+    override fun serialize(value: ConnectionStrategy): String {
+        return getSimbrainXStream().toXML(value)
+    }
+}
+
+class ProbabilityDistributionPreference(probabilityDistribution: ProbabilityDistribution): Preference<ProbabilityDistribution>(probabilityDistribution) {
+    override fun deserialize(value: String): ProbabilityDistribution {
+        return getSimbrainXStream().fromXML(value) as ProbabilityDistribution
+    }
+
+    override fun serialize(value: ProbabilityDistribution): String {
+        return getSimbrainXStream().toXML(value)
+    }
 }
 
 fun getPreferenceDialog(prefHolder: PreferenceHolder): StandardDialog {

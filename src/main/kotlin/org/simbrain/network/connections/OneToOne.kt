@@ -15,7 +15,6 @@ package org.simbrain.network.connections
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.bound
-import org.simbrain.network.util.OrientationComparator
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
 import kotlin.random.Random
@@ -33,12 +32,6 @@ class OneToOne(
      */
     @UserParameter(label = "Bi-directional", order = 2)
     var useBidirectionalConnections: Boolean = false,
-
-    /**
-     * Orientation of how to connect neurons.
-     */
-    @UserParameter(label = "Orientation", order = 1)
-    var connectOrientation: OrientationComparator = OrientationComparator.X_ORDER,
 
     seed: Long = Random.nextLong()
 
@@ -60,7 +53,7 @@ class OneToOne(
     }
 
     override fun copy(): OneToOne {
-        return OneToOne(useBidirectionalConnections, connectOrientation).also {
+        return OneToOne(useBidirectionalConnections).also {
             commonCopy(it)
         }
     }

@@ -1,6 +1,6 @@
 package org.simbrain.network.core
 
-import org.simbrain.network.core.Network.Randomizers.weightRandomizer
+import org.simbrain.network.gui.dialogs.NetworkPreferences.weightRandomizer
 import org.simbrain.network.learningrules.StaticSynapseRule
 import org.simbrain.network.learningrules.SynapseUpdateRule
 import org.simbrain.network.spikeresponders.NonResponder

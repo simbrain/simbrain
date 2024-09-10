@@ -24,7 +24,6 @@ val NetworkPanel.editMenu
             add(setSourceNeurons)
             addSeparator()
             add(connectionMenu)
-            add(editConnectionStrategy)
             addSeparator()
             add(randomizeObjectsAction)
             add(showSynapseAdjustmentPanel)
@@ -150,7 +149,6 @@ fun NetworkPanel.creatContextMenu() = JPopupMenu().apply {
         // Preferences
         add(showNetworkDefaultsAction)
         add(showNetworkPropertiesAction)
-        add(showNetworkRandomizersAction)
     }
 }
 
@@ -195,7 +193,6 @@ fun NetworkPanel.createNeuronContextMenu() = with(networkActions) {
         addSeparator()
         add(showNetworkDefaultsAction)
         add(showNetworkPropertiesAction)
-        add(showNetworkRandomizersAction)
         addSeparator()
         if (selectedNeuronList.size > 1) {
             add(alignMenu)

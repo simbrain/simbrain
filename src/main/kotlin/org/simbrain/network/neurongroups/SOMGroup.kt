@@ -19,9 +19,9 @@
 package org.simbrain.network.neurongroups
 
 import org.simbrain.network.core.InfoText
-import org.simbrain.network.core.Network.Randomizers.weightRandomizer
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.XStreamConstructor
+import org.simbrain.network.gui.dialogs.NetworkPreferences.weightRandomizer
 import org.simbrain.network.layouts.HexagonalGridLayout
 import org.simbrain.network.util.SimnetUtils
 import org.simbrain.util.UserParameter

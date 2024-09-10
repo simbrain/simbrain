@@ -416,7 +416,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     }
 
     val showNetworkPropertiesAction = networkPanel.createAction(
-        name = "Network Properties...",
+        name = "${networkPanel.networkComponent.name} Properties...",
         description = "Properties that are different for each network in the Simbrain workspace.",
         iconPath = "menu_icons/Prefs.png"
     ) {

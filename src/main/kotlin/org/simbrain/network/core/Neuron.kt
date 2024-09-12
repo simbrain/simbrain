@@ -608,14 +608,6 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
             }
         }
 
-    val isPolarized: Boolean
-        /**
-         * If the neuron is polarized, it will be excitatory or inhibitory.
-         *
-         * @return whether this neuron is polarized.
-         */
-        get() = polarity != null && polarity !== Polarity.BOTH
-
     val lastSpikeTime: Double
         get() = (dataHolder as SpikingScalarData).lastSpikeTime
 

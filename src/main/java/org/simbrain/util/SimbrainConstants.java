@@ -54,11 +54,6 @@ public class SimbrainConstants {
             public String title() {
                 return "Excitatory";
             }
-
-            @Override
-            public double clip(double val) {
-                return val < 0 ? 0 : val;
-            }
         }, INHIBITORY {
             @Override
             public double value(double val) {
@@ -70,10 +65,6 @@ public class SimbrainConstants {
                 return "Inhibitory";
             }
 
-            @Override
-            public double clip(double val) {
-                return val > 0 ? 0 : val;
-            }
         }, BOTH {
             @Override
             public double value(double val) {
@@ -84,11 +75,6 @@ public class SimbrainConstants {
             public String title() {
                 return "None";
             }
-
-            @Override
-            public double clip(double val) {
-                return val;
-            }
         };
 
         /**
@@ -98,15 +84,6 @@ public class SimbrainConstants {
          * @return the appropriate value
          */
         public abstract double value(double val);
-
-        /**
-         * Clips any value appropriately, e.g. excitatory for -0.1 is 0.
-         * Used to constrain the action of synaptic plasticity mechanisms.
-         *
-         * @param val the value to check
-         * @return a value in a range appropriate to the polarity.
-         */
-        public abstract double clip(double val);
 
         /**
          * The appropriate name for the enum member, for use in the GUI.

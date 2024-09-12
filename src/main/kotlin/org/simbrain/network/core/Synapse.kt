@@ -30,6 +30,7 @@ import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.UserParameter
 import org.simbrain.util.Utils
+import org.simbrain.util.clip
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
@@ -67,7 +68,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
         get() = _strength
         set(wt) {
             if (!frozen) {
-                _strength = clip(source.polarity.clip(wt))
+                _strength = clip(source.polarity.value(wt))
             }
             events.strengthUpdated.fire()
         }
@@ -362,7 +363,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
         get() = learningRule.javaClass.simpleName
 
     fun forceSetStrength(wt: Double) {
-        _strength = wt
+        _strength = source.polarity.value(wt)
         events.strengthUpdated.fire()
     }
 
@@ -456,15 +457,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
      * @return Evaluated value
      */
     fun clip(value: Double): Double {
-        var `val` = value
-        if (`val` > upperBound) {
-            `val` = upperBound
-        } else {
-            if (`val` < lowerBound) {
-                `val` = lowerBound
-            }
-        }
-        return `val`
+        return value.coerceIn(lowerBound, upperBound)
     }
 
     /**

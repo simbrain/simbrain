@@ -119,8 +119,7 @@ class ShortTermPlasticityRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixDa
         } else {
             strength -= (decayRate * (strength - baseLineStrength))
         }
-
-        synapse.strength = synapse.clip(strength)
+        synapse.strength = strength
     }
 
     companion object {

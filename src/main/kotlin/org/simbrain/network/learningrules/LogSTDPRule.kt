@@ -126,7 +126,7 @@ class LogSTDPRule : STDPRule() {
                 0.0
             }
         }
-        s.strength = s.clip(s.strength - delta_w)
+        s.strength -= delta_w
     }
 
 

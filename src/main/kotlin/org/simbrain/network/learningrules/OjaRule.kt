@@ -58,9 +58,8 @@ class OjaRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>() {
     override fun apply(synapse: Synapse, data: EmptyScalarData) {
         val input = synapse.source.activation
         val output = synapse.target.activation
-        val strength = synapse.strength + learningRate * (input * output - (output * output * synapse.strength
+        synapse.strength += learningRate * (input * output - (output * output * synapse.strength
                 / normalizationFactor))
-        synapse.strength = synapse.clip(strength)
     }
 
     context(Network)

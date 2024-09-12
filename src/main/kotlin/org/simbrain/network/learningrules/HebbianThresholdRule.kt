@@ -95,7 +95,6 @@ class HebbianThresholdRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>
         if (useSlidingOutputThreshold) {
             outputThreshold += (outputThresholdMomentum * ((output * output) - outputThreshold))
         }
-        val strength = synapse.strength + (learningRate * input * output * (output - outputThreshold))
-        synapse.strength = synapse.clip(strength)
+        synapse.strength += learningRate * input * output * (output - outputThreshold)
     }
 }

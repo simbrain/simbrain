@@ -183,7 +183,6 @@ val actorCritic = newSim {
         // current value), since that is what the current td error reflects.
         value.fanIn.forEach { syn ->
             syn.strength += alpha * tdError.activation * syn.source.auxValue
-            syn.strength = syn.clip(syn.strength)
         }
 
         // Update all actor neurons. Reinforce input > output connection that
@@ -194,7 +193,6 @@ val actorCritic = newSim {
             .filter { it.source.auxValue > 0 }
             .forEach { syn ->
                 syn.strength += alpha * tdError.activation * syn.source.auxValue
-                syn.strength = syn.clip(syn.strength)
             }
 
         // set aux values to last activations

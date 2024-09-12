@@ -58,7 +58,6 @@ class HebbianRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>() {
     override fun apply(synapse: Synapse, data: EmptyScalarData) {
         val input = synapse.source.activation
         val output = synapse.target.activation
-        val strength = synapse.clip(synapse.strength + (learningRate * input * output))
-        synapse.strength = strength
+        synapse.strength += (learningRate * input * output)
     }
 }

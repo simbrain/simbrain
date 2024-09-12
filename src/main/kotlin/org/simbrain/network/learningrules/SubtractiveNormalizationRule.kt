@@ -52,7 +52,6 @@ class SubtractiveNormalizationRule : SynapseUpdateRule<EmptyScalarData, EmptyMat
         val input = synapse.source.activation
         val output = synapse.target.activation
         val averageInput = synapse.target.averageInput
-        val strength = synapse.strength + ((learningRate * output * input) - (learningRate * output * averageInput))
-        synapse.strength = synapse.clip(strength)
+        synapse.strength += (learningRate * output * input) - (learningRate * output * averageInput)
     }
 }

@@ -68,7 +68,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
         get() = _strength
         set(wt) {
             if (!frozen) {
-                _strength = clip(source.polarity.value(wt))
+                _strength = source.polarity.value(wt).coerceIn(lowerBound, upperBound)
             }
             events.strengthUpdated.fire()
         }

@@ -137,9 +137,8 @@ open class CompetitiveGroup @JvmOverloads constructor(
      */
     private fun squireAlvarezWeightUpdate(neuron: Neuron) {
         for (synapse in neuron.fanIn) {
-            val deltaw =
+            synapse.strength +=
                 params.learningRate * synapse.target.activation * (synapse.source.activation - synapse.target.averageInput)
-            synapse.strength = synapse.clip(synapse.strength + deltaw)
         }
         events.fanInUpdated.fire()
     }
@@ -161,8 +160,7 @@ open class CompetitiveGroup @JvmOverloads constructor(
                     activation /= sumOfInputs
                 }
             }
-            val deltaw = params.learningRate * (activation - synapse.strength)
-            synapse.strength = synapse.clip(synapse.strength + deltaw)
+            synapse.strength += params.learningRate * (activation - synapse.strength)
         }
         events.fanInUpdated.fire()
     }

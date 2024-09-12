@@ -31,11 +31,7 @@ class AddSTDPRule : STDPRule() {
     override fun apply(synapse: Synapse, data: EmptyScalarData) {
         val ss = synapse.source.isSpike
         val st = synapse.target.isSpike
-
-        var str = synapse.strength
-
-        str += learningRate * ((if (srcSpk && st) 1 else 0) - (if (tarSpk && ss) 1 else 0))
-        synapse.strength = synapse.clip(str)
+        synapse.strength += learningRate * ((if (srcSpk && st) 1 else 0) - (if (tarSpk && ss) 1 else 0))
         srcSpk = ss
         tarSpk = st
     }

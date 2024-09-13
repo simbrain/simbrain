@@ -76,18 +76,10 @@ class IACRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), ClippedUpd
         // Notation and algorithm from McClelland 1981, Proceedings of the third
         // annual cog-sci meeting
 
-        var netInput = neuron.input
-        for (w in neuron.fanIn) {
-            if (w.source.activation > 0) {
-                netInput += (w.strength * w.source.activation)
-            }
-        }
-
-        var effect = 0.0
-        effect = if (netInput >= 0) {
-            (upperBound - neuron.activation) * netInput
+        val effect = if (neuron.input >= 0) {
+            (upperBound - neuron.activation) * neuron.input
         } else {
-            (neuron.activation - lowerBound) * netInput
+            (neuron.activation - lowerBound) * neuron.input
         }
 
         // Update activation using Euler integration of main ODE

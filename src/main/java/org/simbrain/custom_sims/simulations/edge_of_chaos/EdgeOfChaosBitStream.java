@@ -66,10 +66,27 @@ public class EdgeOfChaosBitStream extends Simulation {
         // Set up control panel
         controlPanel();
 
-        sim.addDocViewerWithText(10, 10, 300, 300, "Temp",
+        sim.addDocViewerWithText(1055, 11, 471, 291, "Edge Of Chaos Bitstream",
                 """
-                # Heading
-                Sample text
+                # Introduction
+                This simulation is a simulation of two reservoirs, or two recurrent networks, running concurrently where the difference between the two reservoirs are recorded in a time series. From their difference, we can infer the three different states of computation: `ordered`, `edge of chaos`, and `chaos`. The goal of this
+                simulation is to understand the differences in the three different states and get a view of each state.
+                                
+                # Background
+                [Reservoir computing](https://en.wikipedia.org/wiki/Reservoir_computing) is a general theory of the computational properties of neural networks that attempts to grasp at the types of computation a neural network in the brain requires (i.e., constantly cycling recurrent activity in response to varying stimuli/inputs).
+                                
+                From this theory emerges two key concepts to keep in mind: the _fading memory property_ and the _separation property_. The fading memory property builds upon the idea that different "memory" states are stored within recurrent networks as activation patterns and how recurrent networks can remember past inputs, or past memory states. However, the property also states that past inputs should fade over time with the influx of new inputs. 
+                The separation property builds upon the idea of the fading memory property, stating that with two different inputs, the network will produce two different activation states. However, we would not want an excess amount of separation if we are provided two similar inputs (i.e., two types of flowers, we would still want to know that it is a flower).
+                                
+                Tying these properties to the three different states, an ordered state will have a weakened fading memory and separation property where it will lean into an attractor. A chaotic state will have both properties however, with an excess amount of separation. The edge of chaos state is the state that our brains have been theorized to be within, where there is just the right amount of separation and fading memory.
+                                
+                # Finding The Three Different States
+                In this simulation, the only configuration to the simulation is the `weight stdev`. Change the `weight stdev` and press the `update` button to tweak the reservoirs' responses to activation inputs. After, you start the simulation, click on the `magic wand` (the sparkly stick icon next to the `pointer` icon), and increase the activation in one of the reservoirs. This will make the two bitstreams different from one another, which is illustrated in the time series. To `reset` the simulation, press `k`.
+                                
+                For low weight stdev, the difference in the two reservoirs dies off quickly (i.e., `ordered` state); whereas for high weight stdev, the difference persists for a long period of time (i.e., `chaotic` state). The goal of this simulation is to continue tuning the weight stdev to find the `edge of chaos` (where the difference fluctuates for a short period of time, and then goes away).
+                                
+                (Include link to Edge of Chaos twitter post)
+                                
                 """);
     }
 

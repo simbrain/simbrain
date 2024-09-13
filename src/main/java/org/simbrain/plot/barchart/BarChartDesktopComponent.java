@@ -157,7 +157,10 @@ public class BarChartDesktopComponent extends DesktopComponent<BarChartComponent
     @Override
     public void actionPerformed(final ActionEvent arg0) {
         if (arg0.getActionCommand().equalsIgnoreCase("dialog")) {
-            var dialog = SwingUtilsKt.createEditorDialog(getWorkspaceComponent().getModel(), (e) -> {
+            var dialog = SwingUtilsKt.createEditorDialog(
+                    getWorkspaceComponent().getModel(),
+                    getWorkspaceComponent().getModel().getName(),
+                    (e) -> {
                 chart.getCategoryPlot()
                         .getRenderer()
                         .setSeriesPaint(0, getWorkspaceComponent().getModel().getBarColor());

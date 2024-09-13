@@ -31,7 +31,7 @@ private val LOG_10 = ln(10.0)
  * To add models, use [Network.addNetworkModel] and friends.
  *
  * To remove models use [Network.getModels] and call .delete() on the resulting models. Get models can be called with
- * an argument to filter by model type, e.g getModels(Neuron.class)
+ * an argument to filter by model type, e.g. getModels(Neuron.class)
  */
 class Network: CoroutineScope, EditableObject {
 

@@ -302,13 +302,15 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
 
 }
 
-class APEObjectWrapper<O : EditableObject>(val label: String, obj: O, showLabeledBorder: Boolean = true) :
-    EditableObject {
+class APEObjectWrapper<O : EditableObject>(val label: String, obj: O, showLabeledBorder: Boolean = true)
+    : EditableObject {
     var editingObject: O by GuiEditable(
         initValue = obj,
         label = label,
         showLabeledBorder = showLabeledBorder,
     )
+    override val name: String
+        get() = label
 }
 
 /**

@@ -213,14 +213,20 @@ fun <T : JComponent> T.createAction(
 }
 
 /**
- * Shows a dialog for setting an editable object in an [AnnotatedPropertyEditor]. The provided block is executed when
- * closing the dialog. Add [display] after this call to create and display the dialog.
+ * Shows a dialog for setting an editable object in an [AnnotatedPropertyEditor].
+ *
+ * The provided block is executed when closing the dialog.
+ *
+ * Add [display] after this call to create and display the dialog.
  */
 @JvmOverloads
-fun <E : EditableObject> E.createEditorDialog(block: (E) -> Unit = {}): StandardDialog {
+fun <E : EditableObject> E.createEditorDialog(
+    titleName: String = name.convertCamelCaseToSpaces(),
+    block: (E) -> Unit = {}
+): StandardDialog {
     val editor = AnnotatedPropertyEditor(listOf(this))
     return StandardDialog(editor).apply {
-        title = "Edit ${this@createEditorDialog.name.convertCamelCaseToSpaces()}"
+        title = "Edit $titleName"
         addCommitTask {
             editor.commitChanges()
             block(this@createEditorDialog)

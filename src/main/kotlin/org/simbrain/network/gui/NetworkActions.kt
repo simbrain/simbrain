@@ -419,7 +419,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "${networkPanel.networkComponent.name} Properties...",
         description = "Properties that are different for each network in the Simbrain workspace."
     ) {
-        network.createEditorDialog().display()
+        network.createEditorDialog(networkPanel.networkComponent.name).display()
     }
 
     val iterateNetworkAction = networkPanel.createAction(

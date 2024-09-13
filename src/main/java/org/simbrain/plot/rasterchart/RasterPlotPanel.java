@@ -189,7 +189,7 @@ public class RasterPlotPanel extends JPanel {
      * Show properties dialog.
      */
     public void showPropertiesDialog() {
-        var dialog = SwingUtilsKt.createEditorDialog(model, (e) -> {
+        var dialog = SwingUtilsKt.createEditorDialog(model, model.getName(), (e) -> {
             updateChartSettings();
             return Unit.INSTANCE;
         });

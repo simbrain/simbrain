@@ -299,7 +299,6 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
         input = 0.0
     }
 
-
     /**
      * @return the fan out map. Unsafe because the fan out map and the returned map are the same and thus modifications
      * to one will affect the other. Here for performance reasons.
@@ -509,6 +508,8 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
         input = 0.0
         activation = 0.0
         dataHolder.clear()
+        // Clears any delayed psr's
+        fanIn.forEach { s -> s.clear() }
     }
 
     fun clearInput() {

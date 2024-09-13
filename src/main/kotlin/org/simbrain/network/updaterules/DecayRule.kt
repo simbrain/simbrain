@@ -8,6 +8,7 @@ import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.EmptyScalarData
 import org.simbrain.util.UserParameter
+import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 import kotlin.math.abs
@@ -16,9 +17,7 @@ import kotlin.math.abs
  * **DecayNeuron** implements various forms of standard decay.
  */
 open class DecayRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), ClippedUpdateRule, NoisyUpdateRule {
-    /**
-     * Update type.
-     */
+
     enum class UpdateType {
         Relative, Absolute
     }
@@ -26,28 +25,32 @@ open class DecayRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Cli
     @UserParameter(
         label = "Update Type",
         description = "Relative (percentage decay of current activation) vs. absolute (fixed decay amount)",
-        order = 1
+        order = 10
     )
     var updateType: UpdateType = UpdateType.Relative
 
-    @UserParameter(
+    var decayAmount by GuiEditable(
+        initValue = .1,
         label = "Decay amount",
-        description = "The amount by which the activation is changed each iteration if absolute decay is chosen.",
-        increment = .1,
-        order = 3
+        description = "The amount by which the activation is changed each iteration if absolute decay is used.",
+        onUpdate = { enableWidget(widgetValue(DecayRule::updateType) == UpdateType.Absolute) },
+        order = 20
     )
-    var decayAmount: Double = .1
 
-    @UserParameter(
+    var decayFraction by GuiEditable(
+        initValue = .1,
         label = "Decay fraction",
         description = "The proportion of the distance between the current value and the base-line value, "
                 + "by which the activation is changed each iteration if relative decay is chosen.",
-        increment = .1,
-        order = 4
+        onUpdate = { enableWidget(widgetValue(DecayRule::updateType) == UpdateType.Relative) },
+        order = 30
     )
-    var decayFraction: Double = .1
 
-    @UserParameter(label = "Base Line", description = "An option to add noise.", increment = .1, order = 2)
+    @UserParameter(
+        label = "Base Line",
+        description = "An option to add noise.",
+        increment = .1,
+        order = 40)
     var baseLine: Double = 0.0
 
     /**
@@ -95,29 +98,29 @@ open class DecayRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Cli
         neuron.clip()
     }
 
-    fun decayRule(`in`: Double, activation: Double): Double {
-        var `val` = `in` + activation
+    private fun decayRule(input: Double, activation: Double): Double {
+        var retVal = input + activation
         var decayVal = 0.0
         decayVal = if (updateType == UpdateType.Relative) {
-            decayFraction * abs(`val` - baseLine)
+            decayFraction * abs(retVal - baseLine)
         } else {
             decayAmount
         }
-        if (`val` < baseLine) {
-            `val` += decayVal
-            if (`val` > baseLine) {
-                `val` = baseLine
+        if (retVal < baseLine) {
+            retVal += decayVal
+            if (retVal > baseLine) {
+                retVal = baseLine
             }
-        } else if (`val` > baseLine) {
-            `val` -= decayVal
-            if (`val` < baseLine) {
-                `val` = baseLine
+        } else if (retVal > baseLine) {
+            retVal -= decayVal
+            if (retVal < baseLine) {
+                retVal = baseLine
             }
         }
         if (addNoise) {
-            `val` += noiseGenerator.sampleDouble()
+            retVal += noiseGenerator.sampleDouble()
         }
-        return `val`
+        return retVal
     }
 
     override fun createMatrixData(size: Int): EmptyMatrixData {

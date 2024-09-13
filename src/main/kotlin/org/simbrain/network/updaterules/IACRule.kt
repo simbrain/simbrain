@@ -72,10 +72,9 @@ class IACRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), ClippedUpd
 
     context(Network)
     override fun apply(neuron: Neuron, data: EmptyScalarData) {
+
         // Notation and algorithm from McClelland 1981, Proceedings of the third
         // annual cog-sci meeting
-
-        // Sum of the "active excitors" and "active inhibitors"
 
         var netInput = neuron.input
         for (w in neuron.fanIn) {

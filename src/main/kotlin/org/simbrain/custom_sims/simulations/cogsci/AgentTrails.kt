@@ -32,9 +32,44 @@ val kAgentTrails = newSim {
 
     val networkComponent = addNetworkComponent("Simple Predicter")
 
+//Sensory States + Predictions (861, 327, 441, 308)
+//Simple Predicter (856, 0, 439, 296)
+//empty.tmx (532, 248, 315, 388)
+//Control Panel (533, 0, 151, 242)
+//Information (0, 0, 516, 632)
+//>
+
+val docViewer = addDocViewer(
+    "Information",
+    """ 
+        # Introduction
+        - In this simulation, the network consists of neurons, which, when activated, make the agent move towards it
+        - The prediction network predicts the next state of the sensory network based on the current activations of the sensory and motor neurons. 
+        - Based on what the agent senses and how it moves, it predicts what it will sense next via linear scaling function of the distance between the sensor and that object. 
+        - The points on the plots are colored according to the predictions of the network, with the states that were predicted to occur next colored red with varying degrees of saturation. The red predicted next states moves with the current point up to the end. After the agent has passed the 3 objects, its state in the predictor window can be called a "bouquet of three arcs", each arc corresponding to one of the objects. After the agent has passed 5 excursions, it creates a "spandrelled bouquet", corresponding the flower and fish to the cheese. 
+        - After it has done 5 excursions, it correctly predict the path that it will take. 
+        - For example, after 5 excursions, it can correctly predict that it will take the mixed cheese/flower state based on what it senses in its sensory nodes and the actions it is taking.  
+        
+        # What to Do
+        In this simulation, the mouse is the agent with 3 objects, the cheese, fish, and flower. The mouse has 5 excursions it can take: to the cheese, to the fish, to the flower, to the cheese then flower, and to the cheese then fish. The sensory states and predictions show each excursion. The red corresponds to the path that the mouse is currently travelling, and the gray shows all the possible paths that the mouse can take. 
+        1. Select an object from the "Control Panel", and the mouse will be activated and move towards the object you selected on the "Simple Predictor" window. 
+            a. For example, if the cheese-sensing neuron is on top of the cheese, the it is maximally activated.
+            b. As the agent moves away from the cheese, the neuron's activation diminishes to 0.
+        2. In the "Sensory States + Predictions" window, the trail that the mouse walks is plotted in gray, and the predicted path of the mouse is red. 
+        3. Repeat this until all 5 paths are taken 
+        4. After all 5 Paths, Select any object again from the "Control Panel", and the predictor will be able to crrectly predict where the mouse travels
+        
+        # Also see
+        https://escholarship.org/content/qt5x72z7j1/qt5x72z7j1_noSplash_5dcf27b77bcad405b825e567de21a037.pdf
+        
+    """.trimIndent()
+)
+
+
     withGui {
+        place(docViewer, 0, 0, 516, 632)
         place(networkComponent) {
-            location = point(190,10)
+            location = point(856, 0)
             width = 439
             height = 296
         }
@@ -90,7 +125,7 @@ val kAgentTrails = newSim {
     val odorWorldComponent = addOdorWorldComponent()
 
     withGui {
-        place(odorWorldComponent,629, 9, 315, 383)
+        place(odorWorldComponent,532, 248, 315, 388)
     }
 
     val odorWorld = odorWorldComponent.world.apply {
@@ -144,14 +179,14 @@ val kAgentTrails = newSim {
             projector.tolerance = .001
         }
         place(plot) {
-            location = point(190,306)
+            location = point(861, 327)
             width = 441
             height = 308
         }
 
         couplingManager.createCoupling(sensoryNet, plot)
 
-        createControlPanel("Control Panel", 5, 10) {
+        createControlPanel("Control Panel", 533, 0) {
 
 
             fun resetObjects() {

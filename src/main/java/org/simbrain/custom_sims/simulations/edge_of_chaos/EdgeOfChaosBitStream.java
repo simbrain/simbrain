@@ -56,7 +56,7 @@ public class EdgeOfChaosBitStream extends Simulation {
         sim.getWorkspace().clearWorkspace();
 
         // Build network
-        NetworkComponent nc = sim.addNetwork(201,10,480,590, "Edge of Chaos");
+        NetworkComponent nc = sim.addNetwork(494, 10, 480, 590, "Edge of Chaos");
         net = nc.getNetwork();
         buildNetwork();
 
@@ -66,32 +66,79 @@ public class EdgeOfChaosBitStream extends Simulation {
         // Set up control panel
         controlPanel();
 
-        sim.addDocViewerWithText(1055, 11, 471, 291, "Edge Of Chaos Bitstream",
-                """
-                # Introduction
-                This simulation is a simulation of two reservoirs, or two recurrent networks, running concurrently where the difference between the two reservoirs are recorded in a time series. From their difference, we can infer the three different states of computation: `ordered`, `edge of chaos`, and `chaos`. The goal of this
-                simulation is to understand the differences in the three different states and get a view of each state.
-                                
-                # Background
-                [Reservoir computing](https://en.wikipedia.org/wiki/Reservoir_computing) is a general theory of the computational properties of neural networks that attempts to grasp at the types of computation a neural network in the brain requires (i.e., constantly cycling recurrent activity in response to varying stimuli/inputs).
-                                
-                From this theory emerges two key concepts to keep in mind: the _fading memory property_ and the _separation property_. The fading memory property builds upon the idea that different "memory" states are stored within recurrent networks as activation patterns and how recurrent networks can remember past inputs, or past memory states. However, the property also states that past inputs should fade over time with the influx of new inputs. 
-                The separation property builds upon the idea of the fading memory property, stating that with two different inputs, the network will produce two different activation states. However, we would not want an excess amount of separation if we are provided two similar inputs (i.e., two types of flowers, we would still want to know that it is a flower).
-                                
-                Tying these properties to the three different states, an ordered state will have a weakened fading memory and separation property where it will lean into an attractor. A chaotic state will have both properties however, with an excess amount of separation. The edge of chaos state is the state that our brains have been theorized to be within, where there is just the right amount of separation and fading memory.
-                                
-                # Finding The Three Different States
-                In this simulation, the only configuration to the simulation is the `weight stdev`. Change the `weight stdev` and press the `update` button to tweak the reservoirs' responses to activation inputs. After, you start the simulation, click on the `magic wand` (the sparkly stick icon next to the `pointer` icon), and increase the activation in one of the reservoirs. This will make the two bitstreams different from one another, which is illustrated in the time series. To `reset` the simulation, press `k`.
-                                
-                For low weight stdev, the difference in the two reservoirs dies off quickly (i.e., `ordered` state); whereas for high weight stdev, the difference persists for a long period of time (i.e., `chaotic` state). The goal of this simulation is to continue tuning the weight stdev to find the `edge of chaos` (where the difference fluctuates for a short period of time, and then goes away).
-                                
-                (Include link to Edge of Chaos twitter post)
-                                
+        sim.addDocViewerWithText(15, 11, 471, 590, "Edge Of Chaos Information",
+"""
+        # Introduction
+                        
+        This simulation is a simulation of two reservoirs, or two recurrent networks, running concurrently where the difference between the two reservoirs are recorded in a time 
+        series. From their difference, we can infer the three different states of computation: `ordered`, `edge of chaos`, and `chaos`. The **goal** of this simulation is to 
+        **continuously change the simulation's configuration** until you have reached the **edge of chaos**, and get an understanding of each state.
+        
+        # Background
+                        
+        [Reservoir computing](https://en.wikipedia.org/wiki/Reservoir_computing) is a general theory of the computational properties that exists in neural networks and attempts 
+        to grasp at the types of computation that a neural network in the brain requires to function properly (i.e., the constant cycling of recurrent activity in response to 
+        varying stimuli/inputs). From this theory emerges two key concepts to keep in mind: the **fading memory property** and the **separation property**.
+        
+        1) The fading memory property states that **recurrent networks** can **store different memory states** as activation patterns and **recall** past memory states.
+        However, the property also states that past activation patterns should **fade over time** with the **influx of new activation inputs**. However, we would not want an
+        excess amount, or lack thereof, of the fading of memory, we want just the right amount. Too little, and the network cannot store new information; too much, and 
+        the network cannot collect and store new information.
+                        
+        2) The separation property builds upon the concept of the fading memory property, stating that with **the influx of new activation inputs**, a network will **produce 
+        different memory states**. However, we would not want an excess amount of separation. Like for instance, if a neural network receives the activation patterns of two 
+        types of flowers, the network should still know that it is a flower with a minor distinction in activation but, not too large of a distinction where it differentiates
+        the two flowers (an example of this can be tested in the `Embodied EdgeOfChaos` simulation).
+        
+        Tying these properties to the three different states, an `ordered state` will have a **weakened fading and weakened separation of memory states** where its activation 
+        patterns will be pulled into a cyclic cycle of activation patterns. In this state, its difference will quickly die off. A `chaotic state` will have both properties however, 
+        with an **excess amount of separation** where its difference will continuously fluctuate. The `edge of chaos state` is the state that our brains have been theorized to 
+        be within, where there is just the **right balance of the separation and fading of memory**. In this state, the difference will fluctuate for a period of time, and 
+        then die off.
+        
+        # What To Do
+        
+        To test these concepts, this simulation will utilize two reservoirs as memory states to illustrate the three types of computational states that the neural networks can
+        be in. They will begin with the same activation patterns, and through the addition of new activation inputs, they will produce a difference in activation. This difference 
+        will tell us which computational state we are in.
+                        
+        ## Finding The Three Different States
+        
+        In this simulation, the only configuration to the simulation is the `weight stdev`. To find each state, follow the steps below.
+        
+        1) Change the `weight stdev` value and press the `update` button to change the reservoirs' responses to new activation inputs, which will be shown in the time series.
+                        
+        2) Start the simulation by clicking on the `play` button in the top-left corner.
+        
+        3) Then, click on the `magic wand` (the icon next to the `pointer` icon), and increase the activation in one of the reservoirs by holding left-click 
+        and moving around in either or both reservoirs.
+        
+        4) Now, observe the changes in the time series and determine its current computational state.   
+        
+        5) To `reset` the simulation, stop the simulation by clicking the `play` button again and press `k`.
+        
+        6) Afterwards, click back on the `pointer` icon, and left-click outside of the reservoirs to unselect all neurons.
+        
+        ### Experimentation with The Ordered State
+        
+        An experiment to better understand the **ordered state** is to set `weight stdev` to a very low value, like `0.01`, and look at the two reservoirs' activation patterns. 
+        Afterwards, experiment with adding in new activation with the `magic wand` and see how the differences between the two reservoirs are changing.
+        
+        ### Find The Edge Of Chaos
+        
+        To find the **edge of chaos** state, find the state where there is just the right amount of orderliness and chaos, where the difference remains a short period of time,
+        and then disappears. To start, try a `weight stdev` of 3.0, and slowly move down, repeating the steps above until the `edge of chaos`.
+                        
+        ### Foot-note
+        
+        If you want a quick look at how the different types of states are exhibited in the time series, click on this 
+        [link](https://x.com/JeffYoshimi/status/1529126714948743168).
+
                 """);
     }
 
     private void controlPanel() {
-        ControlPanel panel = ControlPanel.makePanel(sim, "Controller", 5,10,205,180);
+        ControlPanel panel = ControlPanel.makePanel(sim, "Controller", 984, 10, 205, 180);
         JTextField tf_stdev = panel.addTextField("Weight stdev", "" + variance);
         panel.addButton("Update", () -> {
 
@@ -166,7 +213,7 @@ public class EdgeOfChaosBitStream extends Simulation {
 
     private void setUpTimeSeries() {
         // Set up the plot
-        TimeSeriesPlotComponent ts = sim.addTimeSeries(681,15,363,285, "Time Series");
+        TimeSeriesPlotComponent ts = sim.addTimeSeries(984, 200, 425, 399, "Time Series");
         TimeSeriesModel.TimeSeries sts1 = ts.getModel().addTimeSeries("Difference");
 
         sim.getWorkspace().getUpdater().getUpdateManager().addAction(UpdateActionKt.create("Update inputs", () -> {

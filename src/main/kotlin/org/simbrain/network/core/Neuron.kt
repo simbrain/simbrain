@@ -473,7 +473,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
      * Delete connected synapses and remove them from the network and any other
      * structures.
      */
-    fun deleteConnectedSynapses() {
+    private suspend fun deleteConnectedSynapses() {
         deleteFanIn()
         deleteFanOut()
     }
@@ -482,9 +482,9 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
      * Removes all synapses from fanOut and from the network or any intermediate
      * structures.
      */
-    private fun deleteFanOut() {
+    private suspend fun deleteFanOut() {
         fanOut.toList().forEach { (target, synapse) ->
-            synapse?.delete()
+            synapse.delete()
             fanOut.remove(target)
         }
     }
@@ -493,7 +493,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
      * Removes all synapses from fanIn and from the network or any intermediate
      * structures.
      */
-    private fun deleteFanIn() {
+    private suspend fun deleteFanIn() {
         fanIn.toList().forEach { synapse ->
             synapse.delete()
             fanIn.remove(synapse)
@@ -668,9 +668,9 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
     override val name: String
         get() = id!!
 
-    override fun delete() {
+    override suspend fun delete() {
         deleteConnectedSynapses()
-        events.deleted.fireAndBlock(this)
+        events.deleted.fire(this).await()
     }
 
     /**

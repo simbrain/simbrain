@@ -186,7 +186,6 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
         addChild(interactionBox)
 
         val events: LocationEvents = subnetwork.events
-        events.deleted.on(swingDispatcher) { removeFromParent() }
         events.labelChanged.on(swingDispatcher) { _, _ -> updateText() }
         events.locationChanged.on(swingDispatcher) { this.layoutChildren() }
     }

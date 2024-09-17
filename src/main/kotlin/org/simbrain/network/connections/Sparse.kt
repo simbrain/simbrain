@@ -98,7 +98,7 @@ class Sparse @JvmOverloads constructor(
                 result.resultConnections
             }
             is ConnectionsResult.Remove -> {
-                result.connectionsToRemove.forEach { it.delete() }
+                result.connectionsToRemove.forEach { it.deleteBlocking() }
                 listOf()
             }
         }

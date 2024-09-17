@@ -61,13 +61,6 @@ class NeuronCollection : AbstractNeuronCollection {
     }
 
     /**
-     * Call after deleting neuron collection from parent network.
-     */
-    override fun delete() {
-        events.deleted.fireAndBlock(this)
-    }
-
-    /**
      * Set the update rule for the neurons in this group.
      *
      * @param base the neuron update rule to set.

@@ -67,11 +67,11 @@ class SynapseGroup @JvmOverloads constructor(
         displaySynapses = source.size * target.size <= threshold
     }
 
-    override fun delete() {
+    override suspend fun delete() {
         this.synapses.forEach { it.delete() }
         target.removeIncomingSg(this)
         source.removeOutgoingSg(this)
-        events.deleted.fireAndBlock(this)
+        events.deleted.fire(this).await()
     }
 
     fun addSynapse(syn: Synapse) {

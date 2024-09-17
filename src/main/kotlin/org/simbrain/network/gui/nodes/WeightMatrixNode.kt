@@ -52,7 +52,6 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         updateShowWeights()
         pickable = true
         val events = weightMatrix.events
-        events.deleted.on(Dispatchers.Swing) { removeFromParent() }
         events.updated.on { events.updateGraphics.fire() }
         events.updateGraphics.on(Dispatchers.Swing) { renderMatrixToImage() }
         events.labelChanged.on(Dispatchers.Swing) { _, newLabel -> interactionBox.setText(newLabel) }

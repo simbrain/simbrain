@@ -1,5 +1,6 @@
 package org.simbrain.network.core
 
+import kotlinx.coroutines.runBlocking
 import org.simbrain.network.events.NetworkModelEvents
 import org.simbrain.util.UserParameter
 import org.simbrain.util.stats.ProbabilityDistribution
@@ -56,9 +57,16 @@ abstract class NetworkModel {
     /**
      * Main public entry point for object deletion.
      */
-    open fun delete() {
+    open suspend fun delete() {
         // Do NOT create any public deletion methods in network, subnetwork, neurongroup, etc.
         // Deleting the object should fire an event and all cleanup should occur in response to those events.
+    }
+
+    /**
+     * For backward compatibility since suspend function cannot be called from Java
+     */
+    fun deleteBlocking() {
+        runBlocking { delete() }
     }
 
     /**

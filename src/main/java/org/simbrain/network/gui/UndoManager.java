@@ -122,7 +122,7 @@ public class UndoManager {
 
             @Override
             public void undo() {
-                newNeuron.delete();
+                newNeuron.deleteBlocking();
             }
 
             @Override

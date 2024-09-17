@@ -568,7 +568,7 @@ class SynapseAdjustmentPanel(
                 fullUpdate()
 
                 // Delete from the network itself
-                toDelete.forEach { it.delete() }
+                toDelete.forEach { it.deleteBlocking() }
             }
         }
     }

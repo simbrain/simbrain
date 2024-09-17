@@ -284,7 +284,12 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
                 selectionManager.add(node)
             }
         }
+        node.model.events.deleted.on {
+            network.events.batchNodeRemoval.fire(it)
+        }
         network.events.zoomToFitPage.fire()
+
+        modelNodeMap[node.model] = node
     }
 
     private suspend fun createNode(model: NetworkModel): ScreenElement {
@@ -302,13 +307,13 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             is NetworkTextObject -> createNode(model)
             // is DeepNet -> createNode(model)
             else -> throw IllegalArgumentException()
-        }.also { modelNodeMap[model] = it }
+        }
     }
 
     suspend fun createNode(neuron: Neuron) = addScreenElement {
         undoManager.addUndoableAction(object : UndoableAction {
             override fun undo() {
-                neuron.delete()
+                neuron.deleteBlocking()
             }
 
             override fun redo() {
@@ -405,9 +410,9 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
     }
 
-    fun deleteSelectedObjects() {
+    suspend fun deleteSelectedObjects() {
 
-        fun deleteGroup(interactionBox: InteractionBox) {
+        suspend fun deleteGroup(interactionBox: InteractionBox) {
             interactionBox.parent.let { groupNode ->
                 if (groupNode is ScreenElement) {
                     groupNode.model.delete()
@@ -415,7 +420,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             }
         }
 
-        fun delete(screenElement: ScreenElement) {
+        suspend fun delete(screenElement: ScreenElement) {
             when (screenElement) {
                 is NeuronNode -> {
                     screenElement.model.delete()
@@ -426,7 +431,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
                         }
 
                         override fun redo() {
-                            screenElement.model.delete()
+                            screenElement.model.deleteBlocking()
                         }
                     })
                 }
@@ -436,6 +441,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         }
 
         selectionManager.selection.forEach { delete(it) }
+        selectionManager.clear()
 
         network.events.zoomToFitPage.fire()
     }
@@ -455,7 +461,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         Clipboard.add(selectionManager.selectedModels)
     }
 
-    fun cut() {
+    suspend fun cut() {
         copy()
         deleteSelectedObjects()
     }
@@ -688,7 +694,14 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             }
             modelRemoved.on {
                 zoomToFitPage.fire()
-                modelNodeMap.remove(it)
+            }
+            batchNodeRemoval.on { models ->
+                val modelsUniq = models.toSet()
+                val nodes = modelsUniq.map {
+                    modelNodeMap.getImmediately<ScreenElement>(it)
+                }
+                withContext(Swing) { canvas.layer.removeChildren(nodes) }
+                modelsUniq.forEach { modelNodeMap.remove(it) }
             }
             updateActionsChanged.on(Dispatchers.Swing) { timeLabel.update() }
             updated.on(Dispatchers.Swing, wait = true) {

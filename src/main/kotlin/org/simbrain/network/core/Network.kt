@@ -6,6 +6,7 @@ import org.simbrain.network.gui.PlacementManager
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.subnetworks.Subnetwork
+import org.simbrain.util.CachedObject
 import org.simbrain.util.SimpleIdManager
 import org.simbrain.util.UserParameter
 import org.simbrain.util.math.SimbrainMath
@@ -103,8 +104,9 @@ class Network: CoroutineScope, EditableObject {
      * Lower numbers updated first, as in first priority, second priority, etc.
      */
     @Transient
-    var prioritySortedNeuronList: MutableList<Neuron> = ArrayList()
-        private set
+    private var prioritySortedNeuronList = CachedObject {
+        flatNeuronList.sortedBy { it.updatePriority }.toMutableList()
+    }
 
     /**
      * Manage ids for all network elements.
@@ -190,7 +192,7 @@ class Network: CoroutineScope, EditableObject {
      * Update the priority list used for priority based update.
      */
     private fun updatePriorityList() {
-        prioritySortedNeuronList = flatNeuronList.sortedBy { it.updatePriority }.toMutableList()
+        prioritySortedNeuronList.invalidate()
     }
 
     /**
@@ -200,7 +202,7 @@ class Network: CoroutineScope, EditableObject {
      * value elements.
      */
     fun updateNeuronsByPriority() {
-        for (neuron in prioritySortedNeuronList) {
+        for (neuron in prioritySortedNeuronList.value) {
             neuron.accumulateInputs()
             neuron.update()
         }
@@ -325,7 +327,7 @@ class Network: CoroutineScope, EditableObject {
             if (usePlacementManager && model is LocatableModel && model.shouldBePlaced) {
                 placementManager.placeObject(model)
             }
-            model.events.deleted.on(wait = true) {
+            model.events.deleted.on {
                 networkModels.remove(it)
                 events.modelRemoved.fire(it).join()
                 updatePriorityList()
@@ -379,7 +381,9 @@ class Network: CoroutineScope, EditableObject {
 
         events = NetworkEvents()
         updateCompleted = AtomicBoolean(false)
-        updatePriorityList();
+        prioritySortedNeuronList = CachedObject {
+            flatNeuronList.sortedBy { it.updatePriority }.toMutableList()
+        }
 
         // Initialize update manager
         networkModels.allInUpdatingOrder.forEach { model ->

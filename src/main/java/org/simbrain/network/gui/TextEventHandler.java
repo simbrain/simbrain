@@ -82,7 +82,7 @@ public class TextEventHandler extends PStyledTextEventHandler implements ActionL
             editedText.getDocument().removeDocumentListener(docListener);
             editedText.setEditing(false);
             if (editedText.getDocument().getLength() == 0) {
-                node.getTextObject().delete();
+                node.getTextObject().deleteBlocking();
                 editedText.removeFromParent();
             } else {
                 try {

@@ -226,7 +226,7 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
 
         @Override
         public void actionPerformed(ActionEvent arg0) {
-            neuronCollection.delete();
+            neuronCollection.deleteBlocking();
         }
     };
 

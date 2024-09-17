@@ -73,13 +73,13 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
     /**
      * Delete this subnetwork and its children.
      */
-    override fun delete() {
+    override suspend fun delete() {
         modelList.all.toList().forEach {
             modelList.remove(it)
             it.delete()
         }
         customInfo?.let { it.events.deleted.fire(it) }
-        events.deleted.fire(this)
+        events.deleted.fire(this).await()
     }
 
     /**

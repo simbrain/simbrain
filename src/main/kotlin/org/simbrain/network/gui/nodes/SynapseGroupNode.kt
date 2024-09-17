@@ -75,7 +75,6 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
 
         // Handle events
         val events = synapseGroup.events
-        events.deleted.on(Dispatchers.Swing) { removeFromParent() }
         events.labelChanged.on { _, _ -> updateText() }
         events.visibilityChanged.on(Dispatchers.Swing) { setVisibility() }
         events.synapseAdded.on(dispatcher = Dispatchers.Swing) {

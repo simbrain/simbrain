@@ -27,7 +27,6 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
 
     init {
         layer.events.apply {
-            deleted.on(dispatcher = Dispatchers.Swing) { removeFromParent() }
             clampChanged.on(dispatcher = Dispatchers.Swing) { updateBorder() }
             locationChanged.on(dispatcher = Dispatchers.Swing) { pullViewPositionFromModel() }
         }

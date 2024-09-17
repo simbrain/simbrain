@@ -48,10 +48,9 @@ open class NeuronGroup() : AbstractNeuronCollection() {
         neuronList.forEach { it.updateRule = base.copy() }
     }
 
-    override fun delete() {
-        super.delete()
-        events.deleted.fire(this)
+    override suspend fun delete() {
         neuronList.toList().forEach { it.delete() }
+        super.delete()
     }
 
     context(Network)

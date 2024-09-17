@@ -17,7 +17,6 @@ import smile.math.matrix.Matrix
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
 import java.util.*
-import java.util.function.Consumer
 import kotlin.math.min
 
 /**
@@ -228,9 +227,7 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
      */
     protected fun addListener(n: Neuron) {
         n.events.locationChanged.on { events.locationChanged.fire() }
-        // n.getEvents().onLocationChange(fireLocationChange); // TODO Reimplement when debounce is working
-        n.events.deleted.on { neuronList.remove(it) }
-        n.events.deleted.on { neuron ->
+        n.events.deleted.on(wait = true) { neuron ->
             neuronList.remove(neuron)
             if (isEmpty) {
                 delete()
@@ -333,12 +330,12 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
         return outgoingSg.remove(sg)
     }
 
-    override fun delete() {
-        super.delete()
-        outgoingSg.forEach(Consumer { obj: SynapseGroup -> obj.delete() })
-        incomingSgs.forEach(Consumer { obj: SynapseGroup -> obj.delete() })
+    override suspend fun delete() {
+        outgoingSg.forEach { it.delete() }
+        incomingSgs.forEach { it.delete() }
         val customInfo = customInfo
-        customInfo?.events?.deleted?.fire(customInfo)
+        customInfo?.events?.deleted?.fire(customInfo)?.await()
+        super.delete()
     }
 
     context(Network)

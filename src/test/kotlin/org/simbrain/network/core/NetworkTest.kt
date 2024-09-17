@@ -1,5 +1,6 @@
 package org.simbrain.network.core
 
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -90,7 +91,7 @@ class NetworkTest {
     }
 
     @Test
-    fun testDeleteObjects() {
+    fun testDeleteObjects() = runBlocking {
         // Neurons and Synapses
 
         n1.delete()

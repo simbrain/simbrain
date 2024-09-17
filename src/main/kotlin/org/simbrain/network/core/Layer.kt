@@ -1,7 +1,6 @@
 package org.simbrain.network.core
 
 import org.simbrain.network.events.LocationEvents
-import org.simbrain.util.UserParameter
 import org.simbrain.util.toDoubleArray
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Producible
@@ -150,8 +149,8 @@ abstract class Layer : LocatableModel(), AttributeContainer {
         outgoingConnectors.remove(connector)
     }
 
-    override fun delete() {
-        events.deleted.fireAndBlock(this)
+    override suspend fun delete() {
+        events.deleted.fire(this).await()
     }
 
     /**

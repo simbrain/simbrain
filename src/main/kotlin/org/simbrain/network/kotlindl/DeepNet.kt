@@ -201,7 +201,7 @@
 //         inputs.mul(0.0) // clear inputs
 //     }
 //
-//     override fun delete() {
+//     override suspend fun delete() {
 //         deepNetLayers.close()
 //         super.delete()
 //     }

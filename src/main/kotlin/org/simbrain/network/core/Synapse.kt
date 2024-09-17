@@ -30,7 +30,6 @@ import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.UserParameter
 import org.simbrain.util.Utils
-import org.simbrain.util.clip
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
@@ -522,11 +521,11 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
          */
         get() = SimbrainMath.distance(source.location, target.location)
 
-    override fun delete() {
+    override suspend fun delete() {
         // Remove references to this synapse from parent neurons
         source.removeFromFanOut(this)
         target.removeFromFanIn(this)
-        events.deleted.fireAndBlock(this)
+        events.deleted.fire(this).await()
     }
 
     fun hardClear() {

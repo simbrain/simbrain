@@ -1,9 +1,9 @@
 package org.simbrain.network.groups
 
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
-import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.subnetworks.FeedForward
 import java.awt.geom.Point2D
@@ -19,7 +19,7 @@ class SubnetworkTest {
     }
 
     @Test
-    fun `ff layer deletion` () {
+    fun `ff layer deletion` () = runBlocking {
         val ff = FeedForward(intArrayOf(2,2,2),  Point2D.Double(0.0,0.0))
         val firstLayer = ff.modelList.get<NeuronArray>().first()
         firstLayer.delete() // This should get rid of a weight matrix
@@ -27,10 +27,10 @@ class SubnetworkTest {
     }
 
     @Test
-    fun `subnet deleted when empty` () {
+    fun `subnet deleted when empty` () = runBlocking {
         val ff = FeedForward(intArrayOf(2,2,2),  Point2D.Double(0.0,0.0))
         net.addNetworkModel(ff);
-        ff.modelList.all.forEach(NetworkModel::delete)
+        ff.modelList.all.forEach { it.delete() }
         assertEquals(0, net.allModels.size)
     }
 }

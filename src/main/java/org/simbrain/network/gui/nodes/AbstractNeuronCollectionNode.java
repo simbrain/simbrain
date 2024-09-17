@@ -54,9 +54,6 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
         addChild(outlinedObjects);
 
         NeuronCollectionEvents events = nc.getEvents();
-        events.getDeleted().on(getSwingDispatcher(), n ->  {
-            removeFromParent();
-        });
         events.getLabelChanged().on(getSwingDispatcher(), (o,n) -> {
             updateText();
         });
@@ -64,6 +61,7 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
             pullPositionFromModel();
             outlinedObjects.updateBounds();
         });
+        events.getShouldUpdateOutline().on(getSwingDispatcher(), this::updateOutline);
     }
 
     /**
@@ -92,7 +90,7 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
         for (NeuronNode neuronNode : neuronNodes) {
             neuronNode.pullViewPositionFromModel();
         }
-        updateOutline();
+        fireUpdateOutline();
     }
 
     @Override
@@ -113,14 +111,14 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
         for (NeuronNode neuronNode : neuronNodes) {
             // Listen directly to neuron nodes for property change events
             NeuronEvents neuronEvents = neuronNode.getNeuron().getEvents();
-            neuronEvents.getDeleted().on(getSwingDispatcher(), n -> {
+            neuronEvents.getDeleted().on(n -> {
                 this.neuronNodes.remove(neuronNode);
-                updateOutline();
+                fireUpdateOutline();
             });
-            neuronEvents.getLocationChanged().on(getSwingDispatcher(), this::updateOutline);
-            neuronEvents.getLabelChanged().on(getSwingDispatcher(), (o,n) -> updateOutline());
+            neuronEvents.getLocationChanged().on(this::fireUpdateOutline);
+            neuronEvents.getLabelChanged().on((o,n) -> fireUpdateOutline());
         }
-        updateOutline();
+        fireUpdateOutline();
     }
 
     public void removeNeuronNode(NeuronNode neuronNode) {
@@ -131,8 +129,8 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
         this.customInfo = customInfo;
         var bounds = getFullBoundsReference();
         ((LocatableModel) customInfo.getModel()).setLocation(bounds.getX() + bounds.getWidth() / 2.0, bounds.getY() - 5);
-        nc.getEvents().getCustomInfoUpdated().on(getSwingDispatcher(), this::updateOutline);
-        updateOutline();
+        nc.getEvents().getCustomInfoUpdated().on(getSwingDispatcher(), this::fireUpdateOutline);
+        fireUpdateOutline();
     }
 
     private void updateOutline() {
@@ -141,6 +139,10 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
             nodes.add(customInfo);
         }
         outlinedObjects.resetOutlinedNodes(nodes);
+    }
+
+    private void fireUpdateOutline() {
+        nc.getEvents().getShouldUpdateOutline().fire();
     }
 
     public abstract AbstractNeuronCollection getModel();

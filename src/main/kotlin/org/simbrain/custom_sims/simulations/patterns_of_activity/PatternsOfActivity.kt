@@ -6,8 +6,8 @@ import org.simbrain.network.core.*
 import org.simbrain.network.layouts.HexagonalGridLayout
 import org.simbrain.network.learningrules.STDPRule
 import org.simbrain.network.neurongroups.NeuronGroup
-import org.simbrain.network.spikeresponders.SpikeResponder
 import org.simbrain.network.spikeresponders.ShortTermPlasticity
+import org.simbrain.network.spikeresponders.SpikeResponder
 import org.simbrain.network.updaterules.IntegrateAndFireRule
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.util.SpikingScalarData
@@ -467,7 +467,7 @@ class PatternsOfActivity : Simulation {
                 println()
             }
             for (s in toR) {
-                s.delete()
+                s.deleteBlocking()
             }
             for (jj in n.fanIn.indices) {
                 val s = n.fanIn[jj]

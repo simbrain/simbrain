@@ -17,6 +17,7 @@ import org.simbrain.world.odorworld.sensors.ObjectSensor
 import org.simbrain.world.odorworld.sensors.Sensor
 import org.simbrain.world.odorworld.sensors.WithDispersion
 import java.awt.geom.Point2D
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -118,9 +119,9 @@ class OdorWorldEntity @JvmOverloads constructor(
      */
     var smellSource = SmellSource(10)
 
-    val sensors = ArrayList<Sensor>()
+    val sensors = CopyOnWriteArrayList<Sensor>()
 
-    val effectors = ArrayList<Effector>()
+    val effectors = CopyOnWriteArrayList<Effector>()
 
     /**
      * Whatever phrases the entity can currently "hear".

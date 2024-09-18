@@ -9,6 +9,7 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter
 import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.util.CachedObject
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.CopyOnWriteArraySet
 
 /**
  * The main data structure for [NetworkModel]s. Wraps a map from classes to ordered sets of those objects.
@@ -22,7 +23,7 @@ class NetworkModelList {
      * Backing for the collection: a map from model types to linked hash sets.
      */
     @XStreamImplicit
-    private val networkModels: MutableMap<Class<out NetworkModel>, LinkedHashSet<NetworkModel>?> = ConcurrentHashMap()
+    private val networkModels: MutableMap<Class<out NetworkModel>, CopyOnWriteArraySet<NetworkModel>?> = ConcurrentHashMap()
 
     @Suppress("UNCHECKED_CAST")
     fun <T : NetworkModel> put(modelClass: Class<T>, model: T) {
@@ -30,9 +31,9 @@ class NetworkModelList {
         if (modelClass in networkModels) {
             networkModels[modelClass]!!.add(model)
         } else {
-            val newSet = LinkedHashSet<T>()
+            val newSet = CopyOnWriteArraySet<T>()
             newSet.add(model)
-            networkModels[modelClass] = newSet as LinkedHashSet<NetworkModel>
+            networkModels[modelClass] = newSet as CopyOnWriteArraySet<NetworkModel>
         }
     }
 
@@ -45,7 +46,7 @@ class NetworkModelList {
         if (modelClass in networkModels) {
             networkModels[modelClass]!!.add(model)
         } else {
-            val newSet = LinkedHashSet<NetworkModel>()
+            val newSet = CopyOnWriteArraySet<NetworkModel>()
             newSet.add(model)
             networkModels[modelClass] = newSet
         }
@@ -74,11 +75,11 @@ class NetworkModelList {
      * Returns an ordered set of network models of a specific type.
      */
     @Suppress("UNCHECKED_CAST")
-    operator fun <T : NetworkModel> get(modelClass: Class<T>): LinkedHashSet<T> {
+    operator fun <T : NetworkModel> get(modelClass: Class<T>): CopyOnWriteArraySet<T> {
         return if (networkModels.containsKey(modelClass)) {
-            networkModels[modelClass] as LinkedHashSet<T>
+            networkModels[modelClass] as CopyOnWriteArraySet<T>
         } else {
-            LinkedHashSet()
+            CopyOnWriteArraySet()
         }
     }
 
@@ -89,11 +90,11 @@ class NetworkModelList {
      * Returns a set corresponding to the provided network model type.
      * Does not guarantee that the returned set contains models of that type.
      */
-    fun getRawModelSet(modelClass: Class<*>?): LinkedHashSet<*> {
+    fun getRawModelSet(modelClass: Class<*>?): CopyOnWriteArraySet<*> {
         return if (networkModels.containsKey(modelClass)) {
             networkModels[modelClass]!!
         } else {
-            LinkedHashSet<NetworkModel>()
+            CopyOnWriteArraySet<NetworkModel>()
         }
     }
 

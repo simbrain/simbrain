@@ -13,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 import static org.simbrain.util.SwingUtilsKt.getSwingDispatcher;
 
@@ -36,7 +37,7 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
     /**
      * Constituent neuron nodes.
      */
-    private Set<NeuronNode> neuronNodes = new HashSet<>();
+    private Set<NeuronNode> neuronNodes = new CopyOnWriteArraySet<>();
 
     private ScreenElement customInfo;
 

@@ -17,6 +17,7 @@ import smile.math.matrix.Matrix
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
 import java.util.*
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.math.min
 
 /**
@@ -83,7 +84,7 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
     /**
      * References to neurons in this collection
      */
-    val neuronList: MutableList<Neuron> = ArrayList()
+    val neuronList: CopyOnWriteArrayList<Neuron> = CopyOnWriteArrayList()
 
     /**
      * Space between neurons within a layer.

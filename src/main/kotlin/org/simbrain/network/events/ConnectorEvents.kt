@@ -12,5 +12,6 @@ class ConnectorEvents: NetworkModelEvents() {
      * Fire if the 'show weights' option changes (i.e. weights are visible in GUI).
      */
     val showWeightsChanged = NoArgEvent()
-    val lineUpdated = NoArgEvent()
+
+    val colorPreferencesChanged = NoArgEvent()
 }

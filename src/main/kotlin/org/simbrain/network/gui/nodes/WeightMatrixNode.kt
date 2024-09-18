@@ -10,6 +10,7 @@ import org.simbrain.network.gui.ImageBox
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.WeightMatrixArrow
 import org.simbrain.network.gui.createCouplingMenu
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.table.MatrixDataFrame
@@ -17,6 +18,7 @@ import org.simbrain.util.table.SimbrainTablePanel
 import org.simbrain.util.table.addSimpleDefaults
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
+import java.awt.BasicStroke
 import java.awt.RenderingHints
 import java.awt.event.ActionEvent
 import java.beans.PropertyChangeEvent
@@ -39,10 +41,12 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
      */
     private val imageHeight = 90
 
+    private val boxThickness = 2f
+
     /**
      * A box around the [imageBox]
      */
-    val imageBox = ImageBox(imageWidth, imageHeight, 4f)
+    val imageBox = ImageBox(imageWidth, imageHeight, boxThickness)
 
     private val arrow = WeightMatrixArrow(this)
 
@@ -65,6 +69,9 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         }
         invalidateFullBounds()
         weightMatrix.events.showWeightsChanged.on { updateShowWeights() }
+        weightMatrix.events.colorPreferencesChanged.on {
+            imageBox.box.strokePaint = NetworkPreferences.weightMatrixBoundaryColor
+        }
         interactionBox.setText(weightMatrix.displayName)
         addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this)
     }

@@ -181,6 +181,9 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         network.flatSynapseList.forEach {
             it.events.colorPreferencesChanged.fire()
         }
+        network.getModels<WeightMatrix>().forEach {
+            it.events.colorPreferencesChanged.fire()
+        }
 
     }
 

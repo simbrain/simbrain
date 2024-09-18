@@ -154,9 +154,10 @@ val actorCritic = newSim {
     // Time Series
     val (plot, rewardSeries, valueSeries, tdErrorSeries) = addTimeSeries("Reward, TD Error", seriesNames = listOf("Reward", "Value", "TD Error"))
     plot.apply {
-        model.isAutoRange = false
-        model.rangeUpperBound = 2.0
-        model.rangeLowerBound = -1.0
+        model.isAutoRange = true
+        //model.rangeUpperBound = 2.0
+        //model.rangeLowerBound = -1.0
+        model.fixedWidth = true
         events.componentMinimized.fire(true)
     }
     val rewardPlot = couplingManager.createCoupling(reward, rewardSeries)
@@ -254,14 +255,9 @@ val actorCritic = newSim {
     // Lay everything out
     withGui {
 
-        place(networkComponent) {
-            location = point(210, 10)
-            width = 522
-            height = 595
-        }
-        place(odorWorldComponent) {
-            location = point(728, 11)
-        }
+        place(networkComponent,210, 10, 522, 595)
+        place(odorWorldComponent, 728, 11, 500, 500)
+        place(plot, 729, 599, 519, 293)
         (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).setFrameSizeOnCanvasSize(500, 500)
         place(docViewer) {
             location = point(0, 0)

@@ -1,5 +1,7 @@
 package org.simbrain.custom_sims.simulations
 
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addTextWorld
 import org.simbrain.custom_sims.newSim
@@ -47,7 +49,7 @@ val srnElmanSentences = newSim {
         150,
         textWorldInputs.world.tokenEmbedding.dimension,
         point(0,0))
-    network.addNetworkModel(srn)
+    network.addNetworkModel(srn)?.await()
 
     val trainingInputsTokens = makeElmanVector(numTrainingSentences)
         .tokenizeWordsFromString()
@@ -117,7 +119,10 @@ val srnElmanSentences = newSim {
         )
     }
 
-    workspace.simpleIterate()
+    workspace.launch {
+        delay(10L)
+        workspace.iterateSuspend(1)
+    }
 
 }
 

@@ -3,7 +3,7 @@ name: build_linux
 on:
   push:
     branches:
-      - Simbrain4
+      - deployment
 
 jobs:
   build:

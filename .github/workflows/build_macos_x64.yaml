@@ -3,7 +3,7 @@ name: build_macos_x64
 on:
   push:
     branches:
-      - Simbrain4
+      - deployment
 
 jobs:
   build:

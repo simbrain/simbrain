@@ -308,9 +308,15 @@ fun NetworkModel.addToNetworkAsync(network: Network) = network.addNetworkModel(t
 suspend fun List<NetworkModel>.addToNetwork(network: Network) = network.addNetworkModels(this)
 fun List<NetworkModel>.addToNetworkAsync(network: Network) = network.addNetworkModels(this)
 
-context(Network) suspend fun NetworkModel.addToNetwork() = addNetworkModel(this)
+context(Network) suspend fun <T: NetworkModel> T.addToNetwork(): T {
+    addNetworkModel(this)?.await()
+    return this
+}
 context(Network) fun NetworkModel.addToNetworkAsync() = addNetworkModel(this)
-context(Network) suspend fun List<NetworkModel>.addToNetwork() = addNetworkModels(this)
+context(Network) suspend fun <T: NetworkModel> List<T>.addToNetwork(): List<T> {
+    addNetworkModels(this).awaitAll()
+    return this
+}
 context(Network) fun List<NetworkModel>.addToNetworkAsync() = addNetworkModels(this)
 
 suspend fun Network.createLayeredFreeNeurons(topology: List<Int>, _layerNames: List<String>? = null, alignment: Alignment = Alignment.VERTICAL) {

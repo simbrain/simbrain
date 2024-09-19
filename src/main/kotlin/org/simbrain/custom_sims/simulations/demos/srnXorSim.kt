@@ -37,7 +37,7 @@ val srnXORSim = newSim {
         repeat(600) {
             srn.run { trainer.trainOnce() }
             if (it % 10 == 0) {
-                println("iteration ${it}: ${srn.trainer.aggregationFunction.aggregatedError}")
+                println("iteration ${it}: ${srn.trainer.lastError}")
             }
         }
     }

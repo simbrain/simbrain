@@ -1,6 +1,5 @@
 package org.simbrain.network.events
 
-import org.simbrain.network.trainers.SupervisedTrainer
 import org.simbrain.util.Events
 
 /**
@@ -9,7 +8,7 @@ import org.simbrain.util.Events
 class TrainerEvents: Events() {
     val beginTraining = NoArgEvent()
     val endTraining = NoArgEvent()
-    val errorUpdated = OneArgEvent<SupervisedTrainer.AggregationFunction>()
+    val errorUpdated = OneArgEvent<Double>()
     val progressUpdated = OneArgEvent<Pair<String, Int>>()
     val iterationReset = NoArgEvent()
 }

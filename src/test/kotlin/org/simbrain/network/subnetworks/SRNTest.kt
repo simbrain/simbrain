@@ -10,7 +10,7 @@ import org.simbrain.network.core.getNetworkXStream
 class SRNTest {
 
     val net = Network()
-    val srn = SRNNetwork(3, 5, 3).apply {
+    val srn = SRNNetwork(10, 5, 10).apply {
         label = "SRN"
     }
 
@@ -23,16 +23,12 @@ class SRNTest {
         with(net) {
             srn.randomize()
             srn.update()
-            print(srn.outputLayer.activations)
             srn.trainer.learningRate = 0.01
             runBlocking {
-                srn.trainer.run { srn.train(5000) }
+                srn.trainer.run { srn.train(10000) }
             }
-            srn.inputLayer.setActivations(DoubleArray(3) { 0.0 }.also { it[0] = 1.0 })
-            srn.update()
-            // Expecting 0,1,0
-            // Assertions.assertArrayEquals()
-            print(srn.outputLayer.activations)
+            // print(srn.trainer.lastError)
+            assert(srn.trainer.lastError < 0.1) { "Error too high: ${srn.trainer.lastError}" }
         }
     }
 

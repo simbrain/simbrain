@@ -13,8 +13,6 @@
  */
 package org.simbrain.network.trainers
 
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.simbrain.network.core.Network
@@ -30,7 +28,6 @@ import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.rowVectorTransposed
 import org.simbrain.util.sse
 import smile.math.matrix.Matrix
-import kotlin.math.sqrt
 import kotlin.random.Random
 
 
@@ -44,13 +41,6 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
 
     @UserParameter(label = "Update type", order = 2)
     open var updateType: UpdateMethod = UpdateMethod.Epoch()
-
-    @UserParameter(
-        label = "Aggregation Function",
-        description = "How to aggregate error and present it",
-        order = 3,
-        showDetails = false)
-    var aggregationFunction: AggregationFunction = AggregationFunction.Sum()
 
     var stoppingCondition by GuiEditable(
         initValue = StoppingCondition(),
@@ -82,7 +72,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
         withContext(Dispatchers.Default) {
             while (isRunning) {
                 trainOnce()
-                if (stoppingCondition.validate(iteration, aggregationFunction.aggregatedError.await())) {
+                if (stoppingCondition.validate(iteration, lastError)) {
                     stoppingConditionReached = true
                     stopTraining()
                 }
@@ -106,34 +96,32 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
     suspend fun trainOnce() {
         iteration++
         with(updateType) {
-            aggregationFunction.reset()
-            when (this) {
-                is UpdateMethod.Stochastic -> aggregationFunction.accumulateError(trainRow(Random.nextInt(trainingSet.inputs.nrow())))
-                is UpdateMethod.Epoch -> aggregationFunction.accumulateError(
-                    trainBatch(0 until trainingSet.size)
-                )
+            lastError = when (this) {
+                is UpdateMethod.Stochastic -> trainRow(Random.nextInt(trainingSet.inputs.nrow()))
+                is UpdateMethod.Epoch -> trainBatch(0 until trainingSet.size)
                 is UpdateMethod.Batch -> {
                     val startIndex = Random.nextInt(0, trainingSet.size - batchSize + 1)
                     val endIndex = startIndex + batchSize
-                    aggregationFunction.accumulateError(trainBatch(startIndex until  endIndex))
+                    trainBatch(startIndex until  endIndex)
                 }
             }
-            aggregationFunction.complete()
         }
-        lastError = aggregationFunction.aggregatedError.await()
-        events.errorUpdated.fire(aggregationFunction)
+        events.errorUpdated.fire(lastError).await()
     }
 
     context(Network)
     abstract fun SN.trainRow(rowNum: Int): Double
 
+    /**
+     * @return the mean error for the batch
+     */
     context(Network)
     open fun SN.trainBatch(rowRange: IntRange): Double {
-        var error = 0.0
+        var batchError = 0.0
         for (i in rowRange) {
-            error += trainRow(i)
+            batchError += trainRow(i)
         }
-        return error
+        return batchError / rowRange.count()
     }
 
     sealed class UpdateMethod: CopyableObject {
@@ -161,91 +149,6 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
          * Given the temporal nature of the rule, only Epoch should be used with SRN
          */
         fun srnTypeList() = listOf(Epoch::class.java)
-    }
-
-    /**
-     * How to aggregate a trainer's scalar error into what is displayed. Others call this a reduction function.
-     */
-    sealed class AggregationFunction: CopyableObject {
-
-        protected var runningError = 0.0
-
-        protected var runningCount = 0
-
-        abstract var aggregatedError: Deferred<Double>
-
-        abstract fun accumulateError(error: Double)
-
-        protected fun completeWithResult(result: Double) {
-            (aggregatedError as CompletableDeferred<Double>).complete(result)
-        }
-
-        fun reset() {
-            aggregatedError = CompletableDeferred()
-            runningError = 0.0
-            runningCount = 0
-        }
-
-        abstract fun complete()
-
-        class Mean : AggregationFunction() {
-            override fun accumulateError(error: Double) {
-                runningError += error
-                runningCount++
-            }
-
-            @Transient override var aggregatedError: Deferred<Double> = CompletableDeferred()
-
-            override fun copy() = Mean()
-
-            override fun complete() {
-                completeWithResult(runningError / runningCount)
-            }
-
-            override val name: String = "Mean Squared Error"
-        }
-
-        class Sum : AggregationFunction() {
-            override fun accumulateError(error: Double) {
-                runningError += error
-                runningCount++
-            }
-
-            @Transient override var aggregatedError: Deferred<Double> = CompletableDeferred()
-
-            override fun copy() = Sum()
-
-            override fun complete() {
-                completeWithResult(runningError)
-            }
-
-            override val name: String = "Sum Squared Error"
-        }
-
-        class RootMean : AggregationFunction() {
-            override fun accumulateError(error: Double) {
-                runningError += error
-                runningCount++
-            }
-
-            @Transient override var aggregatedError: Deferred<Double> = CompletableDeferred()
-
-            override fun copy() = RootMean()
-
-            override fun complete() {
-                completeWithResult(sqrt(runningError / runningCount))
-            }
-
-            override val name: String = "Root Mean Squared Error"
-        }
-
-        override fun getTypeList(): List<Class<out CopyableObject>>? {
-            return listOf(
-                Mean::class.java,
-                Sum::class.java,
-                RootMean::class.java
-            )
-        }
     }
 
     class StoppingCondition: CopyableObject {
@@ -320,7 +223,8 @@ class SRNTrainer : SupervisedTrainer<SRNNetwork>() {
 
     override var updateType: UpdateMethod by GuiEditable(
         initValue = UpdateMethod.Epoch(),
-        typeMapProvider = UpdateMethod::srnTypeList
+        typeMapProvider = UpdateMethod::srnTypeList, // Only allow epoch for SRN
+        order = 2
     )
 
     context(Network)

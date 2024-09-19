@@ -2,12 +2,8 @@ package org.simbrain.network.trainers
 
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.NeuronArray
-import org.simbrain.network.core.WeightMatrix
-import org.simbrain.network.core.randomizeBiases
+import org.simbrain.network.core.*
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.SigmoidalRule
@@ -145,15 +141,17 @@ class BackpropTests {
     }
 
     @Test
-    fun `test backprop on weight matrix tree`() {
+    fun `test backprop on weight matrix tree`() = runBlocking {
         with(net) {
             wm1.randomize()
             wm2.randomize()
+            val na1copy = na1.copy().addToNetwork()
+            val wm1copy = WeightMatrix(na1copy, na2).addToNetwork()
             na2.randomizeBiases()
             na3.randomizeBiases()
-            val wmTree = WeightMatrixTree(listOf(na1), na3)
+            val wmTree = WeightMatrixTree(listOf(na1, na1copy), na3)
             repeat(100) {
-                wmTree.forwardPass(listOf(commonInputs))
+                wmTree.forwardPass(listOf(commonInputs, commonInputs))
                 wmTree.applyBackprop(commonTargets, .1)
             }
             assertEquals(0.0, commonTargets sse na3.activations, .01)

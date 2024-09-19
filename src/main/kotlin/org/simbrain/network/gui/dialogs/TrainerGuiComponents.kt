@@ -108,13 +108,12 @@ class TrainerControls<SN>(trainer: SupervisedTrainer<SN>, supervisedNetwork: SN,
         val labelPanel = LabelledItemPanel()
         labelPanel.addItem("Iterations:", iterationsLabel)
         val errorValue = JLabel(trainer.lastError.roundToString(4))
-        val errorLabel = labelPanel.addItem(trainer.aggregationFunction.name, errorValue)
+        val errorLabel = labelPanel.addItem("Mean Batch Error", errorValue)
         runTools.add(labelPanel)
 
-        trainer.events.errorUpdated.on(Dispatchers.Swing) {
+        trainer.events.errorUpdated.on(Dispatchers.Swing) { error ->
             iterationsLabel.text = "" + trainer.iteration
-            errorValue.text = "" + it.aggregatedError.await().format(4)
-            errorLabel.text = it.name
+            errorValue.text = "" + error.format(4)
         }
 
         layout = MigLayout("ins 0, gap 0px 0px")
@@ -144,7 +143,7 @@ class ErrorTimeSeries(trainer: SupervisedTrainer<*>) : JPanel() {
         graphPanel = TimeSeriesPlotPanel(model)
         graphPanel.chartPanel.chart.setTitle("")
         graphPanel.chartPanel.chart.xyPlot.domainAxis.label = "Iterations"
-        graphPanel.chartPanel.chart.xyPlot.rangeAxis.label = trainer.aggregationFunction.name
+        graphPanel.chartPanel.chart.xyPlot.rangeAxis.label = "Error"
         graphPanel.chartPanel.chart.removeLegend()
         graphPanel.preferredSize = Dimension(graphPanel.preferredSize.width, 200)
 
@@ -155,10 +154,9 @@ class ErrorTimeSeries(trainer: SupervisedTrainer<*>) : JPanel() {
         mainPanel.add(graphPanel)
         add(mainPanel)
 
-        model.addTimeSeries(trainer.aggregationFunction.name)
+        model.addTimeSeries("Error")
         trainer.events.errorUpdated.on(Dispatchers.Swing) {
-            model.addData(0, trainer.iteration.toDouble(), it.aggregatedError.await())
-            graphPanel.chartPanel.chart.xyPlot.rangeAxis.label = trainer.aggregationFunction.name
+            model.addData(0, trainer.iteration.toDouble(), it)
         }
         trainer.events.iterationReset.on(Dispatchers.Swing, wait = true) {
             model.clearData()

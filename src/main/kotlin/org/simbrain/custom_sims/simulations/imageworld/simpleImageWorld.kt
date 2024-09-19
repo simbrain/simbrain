@@ -45,16 +45,12 @@ val simpleImageWorld = newSim {
 
     // Place network in the desktop
     withGui {
-        place(networkComponent) {
-            location = point(0, 0)
-            width = 400
-            height = 400
-        }
+        place(networkComponent, 0, 5, 563, 530)
     }
 
     // Image world
     val component = addImageWorld("Image World")
-    placeComponent(component,390,9,500,405)
+    placeComponent(component,555, 5, 659, 531)
     val imageWorld = component.world
     imageWorld.resetImageAlbum(10, 10)
     imageWorld.setCurrentFilter("Threshold 10x10")

@@ -50,12 +50,12 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Braitenberg") { braitenbergSim }
     }
 
-    dir("Reservoir") {
-        item("Binary Reservoir") { binaryReservoir }
-        item("Edge Of Chaos") { EdgeOfChaos() }
+    dir("Reservoir Networks") {
         item("Edge Of Chaos Bit Stream") { EdgeOfChaosBitStream() }
-        item("Pattern Completion") { allostaticPatternCompletion }
-        item("Object Tracking") { objectTrackingSim }
+        item("Edge Of Chaos Embodied") { EdgeOfChaos() }
+        item("Binary Reservoir") { binaryReservoir }
+        // item("Pattern Completion") { allostaticPatternCompletion }
+        item("Object Tracking Reservoir") { objectTrackingSim }
     }
 
     dir("Behaviorism") {
@@ -67,13 +67,13 @@ val simulations = dir("Simulations", alphabetical = true ) {
 
     dir("Cognitive Maps") {
         item("Agent Trails") { kAgentTrails }
-        item("RandomizedPursuer") { RandomizedPursuer() }
+        //item("RandomizedPursuer") { RandomizedPursuer() }
         item("Generic 3 objects") { cogMap3Objects }
         // item("ModularOscillatoryNetwork") {ModularOscillatoryNetwork()}
-        item("KuramotoOscillators") { KuramotoOscillators() }
+        //item("KuramotoOscillators") { KuramotoOscillators() }
     }
 
-    dir("NLP") {
+    dir("Language Models") {
         item("Basic Word Embeddings") { nlpSimBasic }
         item("Next-Word Prediction") { srnElmanSentences }
         item("Tiny Language Model") { tinyLanguageModel }
@@ -143,18 +143,18 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Photo album (100 x 100)") { photoAlbumExample }
     }
 
-    dir("Testing") {
-        // item("Test Sim") { testSim }
-        item("Linked Neuron List") { linkedNeuronList }
-        // dir("Defunct?") {
-        //     item("ConvertSim") { ConvertSim() }
-        //     item("Creatures") { CreaturesSim() }
-        //     item("MPFS") { MpfsSOM() }
-        //     item("PatternsOfActivity") { PatternsOfActivity() }
-        //     item("SORN") { SORN() }
-        //     item("Cortical Branching") { CorticalBranching() }
-        // }
-    }
+    //dir("Testing") {
+    //    // item("Test Sim") { testSim }
+    //    //item("Linked Neuron List") { linkedNeuronList }
+    //    // dir("Defunct?") {
+    //    //     item("ConvertSim") { ConvertSim() }
+    //    //     item("Creatures") { CreaturesSim() }
+    //    //     item("MPFS") { MpfsSOM() }
+    //    //     item("PatternsOfActivity") { PatternsOfActivity() }
+    //    //     item("SORN") { SORN() }
+    //    //     item("Cortical Branching") { CorticalBranching() }
+    //    // }
+    //}
 
 }
 

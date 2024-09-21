@@ -4,8 +4,8 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.core.activations
+import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.util.UserParameter
-import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.CustomTypeName
 import org.simbrain.util.propertyeditor.GuiEditable
 import kotlin.math.exp
@@ -36,7 +36,7 @@ class SoftmaxGroup @JvmOverloads constructor(
 
     init {
         label = "Softmax"
-        addNeurons(neurons)
+        addNeurons(neurons.onEach { (it.updateRule as? LinearRule)?.clippingType = LinearRule.ClippingType.NoClipping })
     }
 
     context(Network)

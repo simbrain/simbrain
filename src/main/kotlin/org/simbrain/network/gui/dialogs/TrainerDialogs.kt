@@ -68,7 +68,6 @@ fun <SN> SN.getSupervisedTrainingDialog(): StandardDialog where SN: SupervisedNe
                 trainingSet.targetColumnNames
             )
         }
-        runControls.add(JSeparator(), "span, growx, wrap")
         runControls.add(trainerControls, "span, growx, wrap")
         runControls.add(JSeparator(), "span, growx, wrap")
         runControls.add(JLabel("Inputs"))

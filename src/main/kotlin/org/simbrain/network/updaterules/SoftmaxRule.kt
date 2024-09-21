@@ -4,17 +4,14 @@ import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
-import org.simbrain.network.updaterules.interfaces.DifferentiableUpdateRule
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.EmptyScalarData
 import org.simbrain.util.UserParameter
 import org.simbrain.util.toDoubleArray
-import org.simbrain.util.toMatrix
-import org.simbrain.util.validateColumnVector
 import smile.math.matrix.Matrix
 import kotlin.math.exp
 
-class SoftmaxRule: NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), DifferentiableUpdateRule, BoundedUpdateRule {
+class SoftmaxRule: NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), BoundedUpdateRule {
 
     @UserParameter(
         label = "Temperature",
@@ -32,7 +29,7 @@ class SoftmaxRule: NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Differe
     }
 
     context(Network) override fun apply(layer: Layer, dataHolder: EmptyMatrixData) {
-        layer.setActivations(softmax(layer.activations, temperature, layer.biases))
+        layer.setActivations(softmax(layer.inputs, temperature, layer.biases))
     }
 
     context(Network) override fun apply(neuron: Neuron, data: EmptyScalarData) {
@@ -48,20 +45,6 @@ class SoftmaxRule: NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Differe
 
     override fun copy() = SoftmaxRule().also {
         it.temperature = temperature
-    }
-
-    override fun getDerivative(value: Double): Double {
-        throw UnsupportedOperationException("SoftmaxRule does not support scalar data")
-    }
-
-    override fun getDerivative(input: Matrix): Matrix {
-        input.validateColumnVector()
-        val softmaxValues = softmax(input, temperature)
-        val size = input.size().toInt()
-        val derivatives = DoubleArray(size) { i ->
-            softmaxValues[i] * (1.0 - softmaxValues[i])
-        }
-        return derivatives.toMatrix()
     }
 
     override var upperBound: Double

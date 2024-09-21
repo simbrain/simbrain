@@ -41,8 +41,8 @@ class BackpropNetwork : FeedForward, SupervisedNetwork {
             }
         }
         // Good default for regression tasks
-        outputLayer.updateRule = LinearRule().apply {
-            clippingType = LinearRule.ClippingType.NoClipping
+        outputLayer.updateRule = SigmoidalRule().apply {
+            type = SigmoidFunctionEnum.LOGISTIC
         }
         val nin = nodesPerLayer.first()
         val nout = nodesPerLayer.last()

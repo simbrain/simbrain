@@ -14,11 +14,9 @@
 package org.simbrain.network.trainers
 
 import org.simbrain.network.core.*
+import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.network.updaterules.interfaces.DifferentiableUpdateRule
-import org.simbrain.util.flatten
-import org.simbrain.util.plus
-import org.simbrain.util.sse
-import org.simbrain.util.validateSameShape
+import org.simbrain.util.*
 import smile.math.matrix.Matrix
 import java.util.*
 import kotlin.collections.HashMap
@@ -56,14 +54,6 @@ import kotlin.collections.zip
 // TODO: Need a way to generalize across NeuronArrays and NeuronCollections
 val WeightMatrix.src get() = source as NeuronArray
 val WeightMatrix.tar get() = target as NeuronArray
-
-/**
- * Return the difference between the provided vector and the current activations in this layer.
- */
-fun ArrayLayer.getError(targets: Matrix): Matrix {
-    activations.validateSameShape(targets)
-    return targets.clone().sub(activations)
-}
 
 /**
  * Perform a "forward pass" through a list of weight matrices. Assumes they are all connected.
@@ -125,6 +115,91 @@ fun NeuronArray.updateBiases(error: Matrix, epsilon: Double = .1) {
     events.updated.fire()
 }
 
+enum class BackpropLossFunction {
+
+    SSE {
+        override fun scalarLoss(actual: Matrix, target: Matrix) = actual sse target
+
+        override fun outputError(actual: Matrix, target: Matrix): Matrix {
+            actual.validateSameShape(target)
+            return target.clone().sub(actual).mul(2.0)
+        }
+
+        override fun canUse(layer: NeuronArray) = layer.updateRule !is SoftmaxRule
+
+        override val shortName = "SSE"
+
+        override val description = "Sum Squared Error"
+    },
+
+    MSE {
+        override fun scalarLoss(actual: Matrix, target: Matrix) = actual mse target
+
+        override fun outputError(actual: Matrix, target: Matrix): Matrix {
+            actual.validateSameShape(target)
+            return target.clone().sub(actual).mul(2.0).div(actual.size().toDouble())
+        }
+
+        override fun canUse(layer: NeuronArray) = layer.updateRule !is SoftmaxRule
+
+        override val shortName = "MSE"
+
+        override val description = "Mean Squared Error"
+
+    },
+
+    RMSE {
+        override fun scalarLoss(actual: Matrix, target: Matrix) = actual rmse target
+
+        override fun outputError(actual: Matrix, target: Matrix): Matrix {
+            actual.validateSameShape(target)
+            return target.clone().sub(actual).div(actual.size() * scalarLoss(actual, target))
+        }
+
+        override fun canUse(layer: NeuronArray) = layer.updateRule !is SoftmaxRule
+
+        override val shortName = "RMSE"
+
+        override val description = "Root Mean Squared Error"
+
+    },
+
+    CrossEntropy {
+        override fun scalarLoss(actual: Matrix, target: Matrix) = crossEntropy(actual, target)
+
+        override fun outputError(actual: Matrix, target: Matrix): Matrix {
+            actual.validateSameShape(target)
+            return actual.clone().sub(target).mul(-1.0) // assume softmax output
+        }
+
+        override fun canUse(layer: NeuronArray) = layer.updateRule is SoftmaxRule
+
+        override val shortName = "CrossEntropy"
+
+        override val description = "Cross Entropy"
+
+    };
+
+
+    abstract fun scalarLoss(actual: Matrix, target: Matrix): Double
+
+    abstract fun outputError(actual: Matrix, target: Matrix): Matrix
+
+    abstract fun canUse(layer: NeuronArray): Boolean
+
+    abstract val shortName: String
+
+    abstract val description: String
+
+    override fun toString() = description
+
+    fun validateLayer(layer: NeuronArray) {
+        if (!canUse(layer)) {
+            throw IllegalArgumentException("Layer $layer cannot use loss function $this")
+        }
+    }
+}
+
 /**
  * Apply backprop algorithm to this list of matrices, for the provided input/target pair. Assumes weight matrices are
  * stored in a sequence from input to output layers
@@ -133,21 +208,23 @@ context(Network)
 fun List<WeightMatrix>.applyBackprop(
     targetValues: Matrix,
     epsilon: Double = .1,
-    lossFunction: (actual: Matrix, target: Matrix) -> Double = { actual, target -> actual sse target },
+    lossFunction: BackpropLossFunction = BackpropLossFunction.SSE,
     debug: (index: Int, layerError: List<Double>) -> Unit = { _, _ -> }
 ): Double {
 
     targetValues.validateSameShape(last().tar.activations)
+    lossFunction.validateLayer(last().tar)
 
-    val error = lossFunction(last().tar.activations, targetValues)
+    val error = lossFunction.scalarLoss(last().tar.activations, targetValues)
 
     // printActivationsAndWeights()
-    var layerError: Matrix = last().tar.getError(targetValues)
+    var layerError: Matrix = lossFunction.outputError(last().tar.activations, targetValues)
 
     this.reversed().forEachIndexed { index, wm ->
         debug(index, layerError.flatten().toList())
-        val deriv = (wm.tar.updateRule as DifferentiableUpdateRule).getDerivative(wm.tar.inputs)
-        layerError.mul(deriv)
+        (wm.tar.updateRule as? DifferentiableUpdateRule)?.getDerivative(wm.tar.inputs)?.let { deriv ->
+            layerError.mul(deriv)
+        }
         wm.tar.updateBiases(layerError, epsilon)
         layerError = wm.updateWeights(layerError, epsilon)
     }
@@ -160,19 +237,21 @@ fun List<WeightMatrix>.accumulateBackprop(
     targetValues: Matrix,
     weightAccumulator: HashMap<WeightMatrix, Matrix>,
     biasesAccumulator: HashMap<NeuronArray, Matrix>,
-    lossFunction: (actual: Matrix, target: Matrix) -> Double = { actual, target -> actual sse target }
+    lossFunction: BackpropLossFunction = BackpropLossFunction.SSE
 ): Double {
 
     targetValues.validateSameShape(last().tar.activations)
+    lossFunction.validateLayer(last().tar)
 
-    val error = lossFunction(last().tar.activations, targetValues)
+    val error = lossFunction.scalarLoss(last().tar.activations, targetValues)
 
     // printActivationsAndWeights()
-    var layerError: Matrix = last().tar.getError(targetValues)
+    var layerError: Matrix = lossFunction.outputError(last().tar.activations, targetValues)
 
     this.reversed().forEach { wm ->
-        val deriv = (wm.tar.updateRule as DifferentiableUpdateRule).getDerivative(wm.tar.inputs)
-        layerError.mul(deriv)
+        (wm.tar.updateRule as? DifferentiableUpdateRule)?.getDerivative(wm.tar.inputs)?.let {
+            deriv -> layerError.mul(deriv)
+        }
         biasesAccumulator.getOrPut(wm.tar) {
             Matrix(wm.tar.size, 1)
         }.add(layerError)
@@ -206,13 +285,14 @@ fun WeightMatrixTree.forwardPass(inputVectors: List<Matrix>) {
  *
  * Weight matrices are updated one “weight layer” at a time. See [WeightMatrixTree] for more information.
  */
-fun WeightMatrixTree.applyBackprop(targetValues: Matrix, epsilon: Double = .0001): Double {
+fun WeightMatrixTree.applyBackprop(targetValues: Matrix, lossFunction: BackpropLossFunction = BackpropLossFunction.SSE, epsilon: Double = .0001): Double {
 
     targetValues.validateSameShape(outputWeightLayer.tar.activations)
+    lossFunction.validateLayer(outputWeightLayer.tar)
 
-    val error = outputWeightLayer.tar.activations sse targetValues
+    val error = lossFunction.scalarLoss(outputWeightLayer.tar.activations, targetValues)
     var errorVectors: Map<NeuronArray, Matrix> =
-        mapOf(outputWeightLayer.tar to outputWeightLayer.tar.getError(targetValues))
+        mapOf(outputWeightLayer.tar to lossFunction.outputError(outputWeightLayer.tar.activations, targetValues))
     // TODO: Creating a map every iteration is a potential performance drain.
     tree.reversed().forEach { wms ->
         errorVectors = wms.associate { wm ->

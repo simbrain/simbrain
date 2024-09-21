@@ -1,9 +1,9 @@
 package org.simbrain.custom_sims.simulations
 
-import org.simbrain.custom_sims.*
-import org.simbrain.network.core.NeuronArray
-import org.simbrain.network.core.WeightMatrix
+import org.simbrain.custom_sims.addNetworkComponent
+import org.simbrain.custom_sims.newSim
 import org.simbrain.network.subnetworks.BackpropNetwork
+import org.simbrain.network.trainers.BackpropLossFunction
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.util.place
@@ -24,6 +24,8 @@ val softmaxSim = newSim {
         inputs = Matrix.eye(10),
         targets = Matrix.eye(10)
     )
+
+    bp.trainer.lossFunction = BackpropLossFunction.CrossEntropy
 
     // Location of the network in the desktop
     withGui {

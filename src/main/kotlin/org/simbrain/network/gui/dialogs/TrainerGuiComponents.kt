@@ -108,12 +108,13 @@ class TrainerControls<SN>(trainer: SupervisedTrainer<SN>, supervisedNetwork: SN,
         val labelPanel = LabelledItemPanel()
         labelPanel.addItem("Iterations:", iterationsLabel)
         val errorValue = JLabel(trainer.lastError.roundToString(4))
-        val errorLabel = labelPanel.addItem("Mean Batch Error", errorValue)
+        val errorLabel = labelPanel.addItem("Mean Batch Error (${trainer.lossFunction.shortName})", errorValue)
         runTools.add(labelPanel)
 
         trainer.events.errorUpdated.on(Dispatchers.Swing) { error ->
             iterationsLabel.text = "" + trainer.iteration
             errorValue.text = "" + error.format(4)
+            errorLabel.text = "Mean Batch Error (${trainer.lossFunction.shortName})"
         }
 
         layout = MigLayout("ins 0, gap 0px 0px")

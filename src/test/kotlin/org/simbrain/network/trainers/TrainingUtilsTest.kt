@@ -30,14 +30,14 @@ class TrainingUtilsTest {
     @Test
     fun `test neuron array error`() {
         na1.setActivations(doubleArrayOf(-1.0, 1.0))
-        val error = na1.getError(doubleArrayOf(1.0, 1.0).toMatrix())
+        val error = BackpropLossFunction.SSE.outputError(na1.activations, doubleArrayOf(1.0, 1.0).toMatrix())
         assertArrayEquals(doubleArrayOf(2.0, 0.0), error.toDoubleArray())
     }
 
     @Test
     fun `test bias update`() {
         na1.biases = doubleArrayOf(1.0, 1.0).toMatrix()
-        val error = na1.getError(doubleArrayOf(0.0, 1.0).toMatrix())
+        val error = BackpropLossFunction.SSE.outputError(na1.activations, doubleArrayOf(0.0, 1.0).toMatrix())
         // Change to bias is 0,1, so biases should become 1,2
         na1.updateBiases(error, 1.0)
         assertArrayEquals(doubleArrayOf(1.0, 2.0 ), na1.biases.toDoubleArray())

@@ -26,7 +26,6 @@ import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.rowVectorTransposed
-import org.simbrain.util.sse
 import smile.math.matrix.Matrix
 import kotlin.random.Random
 
@@ -39,8 +38,11 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
     @UserParameter(label = "Learning Rate", increment = .01, minimumValue = 0.0, order = 1)
     var learningRate = .01
 
-    @UserParameter(label = "Update type", order = 2)
+    @UserParameter(label = "Update type", order = 3)
     open var updateType: UpdateMethod = UpdateMethod.Epoch()
+
+    @UserParameter(label = "Loss Function", order = 2)
+    var lossFunction = BackpropLossFunction.SSE
 
     var stoppingCondition by GuiEditable(
         initValue = StoppingCondition(),
@@ -179,6 +181,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
         }
     }
 
+    override val name = "Supervised Trainer"
 }
 
 class BackpropTrainer : SupervisedTrainer<BackpropNetwork>() {
@@ -188,7 +191,7 @@ class BackpropTrainer : SupervisedTrainer<BackpropNetwork>() {
         inputLayer.setActivations(trainingSet.inputs.row(rowNum))
         val targetVec = trainingSet.targets.rowVectorTransposed(rowNum)
         wmList.forwardPass(inputLayer.activations)
-        return wmList.applyBackprop(targetVec, epsilon = learningRate, lossFunction = Matrix::sse)
+        return wmList.applyBackprop(targetVec, epsilon = learningRate, lossFunction = lossFunction)
     }
 
     context(Network)
@@ -203,15 +206,17 @@ class BackpropTrainer : SupervisedTrainer<BackpropNetwork>() {
             inputLayer.setActivations(trainingSet.inputs.row(i))
             val targetVec = trainingSet.targets.rowVectorTransposed(i)
             wmList.forwardPass(inputLayer.activations)
-            error += wmList.accumulateBackprop(targetVec, weightAccumulator, biasesAccumulator, lossFunction = Matrix::sse)
+            error += wmList.accumulateBackprop(targetVec, weightAccumulator, biasesAccumulator, lossFunction = lossFunction)
         }
 
         weightAccumulator.forEach { (wm, delta) ->
             wm.weightMatrix.add(delta.mul(trainer.learningRate))
+            wm.events.updated.fire()
         }
 
         biasesAccumulator.forEach { (na, delta) ->
             na.biases.add(delta.mul(trainer.learningRate))
+            na.events.updated.fire()
         }
 
         return error
@@ -224,7 +229,7 @@ class SRNTrainer : SupervisedTrainer<SRNNetwork>() {
     override var updateType: UpdateMethod by GuiEditable(
         initValue = UpdateMethod.Epoch(),
         typeMapProvider = UpdateMethod::srnTypeList, // Only allow epoch for SRN
-        order = 2
+        order = 3
     )
 
     context(Network)
@@ -234,7 +239,7 @@ class SRNTrainer : SupervisedTrainer<SRNNetwork>() {
 
         inputLayer.activations = inputVec
         update()
-        return weightMatrixTree.applyBackprop(targetVec, epsilon = learningRate)
+        return weightMatrixTree.applyBackprop(targetVec, lossFunction = lossFunction, epsilon = learningRate)
     }
 
 }

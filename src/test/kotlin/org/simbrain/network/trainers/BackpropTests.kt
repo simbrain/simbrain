@@ -152,7 +152,7 @@ class BackpropTests {
             val wmTree = WeightMatrixTree(listOf(na1, na1copy), na3)
             repeat(100) {
                 wmTree.forwardPass(listOf(commonInputs, commonInputs))
-                wmTree.applyBackprop(commonTargets, .1)
+                wmTree.applyBackprop(commonTargets, epsilon = .1)
             }
             assertEquals(0.0, commonTargets sse na3.activations, .01)
         }
@@ -173,7 +173,7 @@ class BackpropTests {
             addNetworkModels(inputLayer, outputLayer, wm)
             repeat(10000) {
                 listOf(wm).forwardPass(inputs)
-                listOf(wm).applyBackprop(targets, .1, lossFunction = ::crossEntropy)
+                listOf(wm).applyBackprop(targets, .1, lossFunction = BackpropLossFunction.CrossEntropy)
                 // println(targets.toDoubleArray() sse wm2.output.toDoubleArray())
             }
             println("Outputs: ${outputLayer.activations}, Cross Entropy = ${crossEntropy(outputLayer.activations, targets)}")

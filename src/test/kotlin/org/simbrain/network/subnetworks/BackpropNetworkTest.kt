@@ -8,6 +8,9 @@ import org.simbrain.network.core.getModelByLabel
 import org.simbrain.network.core.getNetworkXStream
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedTrainer.UpdateMethod
+import org.simbrain.network.updaterules.SigmoidalRule
+import org.simbrain.network.updaterules.SoftmaxRule
+import org.simbrain.util.math.SigmoidFunctionEnum
 import smile.math.matrix.Matrix
 
 class BackpropNetworkTest {
@@ -19,6 +22,9 @@ class BackpropNetworkTest {
             inputs = Matrix.eye(10),
             targets = Matrix.eye(10)
         )
+        outputLayer.updateRule = SigmoidalRule().apply {
+            type = SigmoidFunctionEnum.LOGISTIC
+        }
     }
 
     init {
@@ -28,6 +34,25 @@ class BackpropNetworkTest {
     @Test
     fun `test backprop learning`() {
         bp.trainer.updateType = UpdateMethod.Epoch()
+        bp.trainer.learningRate = 0.04
+        with(net) {
+            with(bp) {
+                runBlocking {
+                    repeat(1000) {
+                        trainer.trainOnce()
+                    }
+                }
+            }
+        }
+
+        assert(bp.trainer.lastError < 0.1) { "Error: ${bp.trainer.lastError}" }
+
+    }
+
+    @Test
+    fun `test softmax backprop learning`() {
+        bp.outputLayer.updateRule = SoftmaxRule()
+        bp.trainer.lossFunction = org.simbrain.network.trainers.BackpropLossFunction.CrossEntropy
         bp.trainer.learningRate = 0.1
         with(net) {
             with(bp) {
@@ -39,6 +64,8 @@ class BackpropNetworkTest {
                 }
             }
         }
+
+        assert(bp.trainer.lastError < 0.1) { "Error: ${bp.trainer.lastError}" }
 
     }
 

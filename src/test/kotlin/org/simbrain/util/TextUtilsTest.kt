@@ -1,7 +1,6 @@
 package org.simbrain.util
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import smile.math.matrix.Matrix
 
@@ -166,6 +165,30 @@ class TextUtilsTest {
     fun `convertCamelCaseToSpaces should not break consecutive upper case letters`() {
         val inputString = "ThisIsCamelCaseABC"
         assertEquals("This Is Camel Case ABC", inputString.convertCamelCaseToSpaces())
+    }
+
+
+    @Test
+    fun `build corpus list`() {
+        val context = "The quick brown fox jumps over the lazy dog".split(" ")
+        val corpus = generateAutoregressivePairs(context)
+        val expected = listOf(
+            "The" to "quick",
+            "The quick" to "brown",
+            "The quick brown" to "fox",
+            "The quick brown fox" to "jumps",
+            "The quick brown fox jumps" to "over",
+            "The quick brown fox jumps over" to "the",
+            "The quick brown fox jumps over the" to "lazy",
+            "The quick brown fox jumps over the lazy" to "dog"
+        ).map { (a, b) -> a.split(" ") to b }
+        assert(corpus.size == expected.size)
+        (corpus zip expected).forEach { (c, e) ->
+            val (expectedContext, expectedTarget) = e
+            val (corpusContext, corpusTarget) = c
+            assertArrayEquals(expectedContext.toTypedArray(), corpusContext.toTypedArray())
+            assertEquals(expectedTarget, corpusTarget)
+        }
     }
 
 }

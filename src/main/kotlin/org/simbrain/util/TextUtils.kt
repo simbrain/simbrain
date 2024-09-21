@@ -227,6 +227,16 @@ fun String.convertCamelCaseToSpaces(): String {
         .trim()
 }
 
+/**
+ * Generates input-target pairs in an autoregressive manner from a given string.
+ * Each pair consists of a prefix of tokens as input and the next token as the target.
+ */
+fun generateAutoregressivePairs(context: List<String>): List<Pair<List<String>, String>> = buildList {
+    for (i in 0 until context.size - 1) {
+        add(context.subList(0, i + 1) to context[i + 1])
+    }
+}
+
 // Test main
 fun main() {
     val chooser = SFileChooser(".", "Text import", "txt")

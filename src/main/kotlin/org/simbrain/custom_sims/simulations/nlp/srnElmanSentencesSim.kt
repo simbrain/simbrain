@@ -137,6 +137,21 @@ val verb_percept = listOf("see", "smell")
 val verb_destroy = listOf("break", "smash")
 val verb_eat = listOf("eat")
 
+val allWords = listOf(
+    noun_hum,
+    noun_anim,
+    noun_inanim,
+    noun_agress,
+    noun_frag,
+    noun_food,
+    verb_intran,
+    verb_tran,
+    verb_agpat,
+    verb_percept,
+    verb_destroy,
+    verb_eat
+).flatten()
+
 fun makeElmanVector(numSentences: Int): String {
 
     val templates = listOf(

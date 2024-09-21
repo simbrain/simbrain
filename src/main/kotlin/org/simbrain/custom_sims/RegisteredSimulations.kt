@@ -6,10 +6,11 @@ import org.simbrain.custom_sims.simulations.behaviorism.OperantConditioning
 import org.simbrain.custom_sims.simulations.behaviorism.SimpleOperant
 import org.simbrain.custom_sims.simulations.behaviorism.operantWithEnvironment
 import org.simbrain.custom_sims.simulations.braitenberg.RandomizedPursuer
-import org.simbrain.custom_sims.simulations.neuroscience.cortexSimple
 import org.simbrain.custom_sims.simulations.demos.competitiveSim
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaosBitStream
+import org.simbrain.custom_sims.simulations.neuroscience.cortexSimple
+import org.simbrain.custom_sims.simulations.nlp.tinyLanguageModel
 import org.simbrain.custom_sims.simulations.patterns_of_activity.KuramotoOscillators
 import org.simbrain.custom_sims.simulations.patterns_of_activity.cogMap3Objects
 import org.simbrain.util.StructureDir
@@ -75,6 +76,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
     dir("NLP") {
         item("Basic Word Embeddings") { nlpSimBasic }
         item("Next-Word Prediction") { srnElmanSentences }
+        item("Tiny Language Model") { tinyLanguageModel }
     }
 
     dir("Neuroscience") {

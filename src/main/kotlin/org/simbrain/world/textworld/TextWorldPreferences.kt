@@ -8,4 +8,6 @@ object TextWorldPreferences: PreferenceHolder() {
 
     var tokenEmbeddingDirectory by StringPreference("." + Utils.FS +"simulations" + Utils.FS + "texts")
 
+    var sampleTextsDirectory by StringPreference("." + Utils.FS +"simulations" + Utils.FS + "texts")
+
 }

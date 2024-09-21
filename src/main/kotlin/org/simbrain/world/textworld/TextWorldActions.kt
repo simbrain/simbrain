@@ -63,7 +63,7 @@ val TextWorldDesktopComponent.loadTextAction
         name = "Load text...",
         iconPath = "menu_icons/Import.png"
     ) {
-        val chooser = SFileChooser(".", "Text import", "txt")
+        val chooser = SFileChooser(TextWorldPreferences.sampleTextsDirectory,"Text import", "txt")
         val theFile = chooser.showOpenDialog()
         if (theFile != null) {
             workspaceComponent.world.text = Utils.readFileContents(theFile)

@@ -40,8 +40,8 @@ import javax.swing.text.JTextComponent
  *
  * @author jyoshimi
  */
-class TextWorldPanel private constructor(
-    val world: TextWorld, toolbar: JToolBar?
+class TextWorldPanel constructor(
+    val world: TextWorld,
 ) : JPanel() {
 
     /**
@@ -76,6 +76,7 @@ class TextWorldPanel private constructor(
      * @param theWorld the reader world to display
      */
     init {
+
         this.layout = BorderLayout()
         border = BorderFactory.createEmptyBorder(0, 10, 0, 10)
         textArea.lineWrap = true
@@ -84,8 +85,25 @@ class TextWorldPanel private constructor(
             JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER)
         add(inputScrollPane)
 
+        // Top toolbar
+        val topToolBar = JToolBar()
+        topToolBar.add(world.viewTokenEmbedding)
+        topToolBar.add(world.extractEmbedding)
+        topToolBar.addSeparator()
+        topToolBar.add(world.textWorldPrefs)
+        add(topToolBar,  BorderLayout.NORTH)
+
+        // Bottom toolbar
         val bottomToolbarPanel = JPanel()
         bottomToolbarPanel.layout = FlowLayout(FlowLayout.LEFT)
+        val toolbarModeSelect = JToolBar()
+        parseStyle.add(wordButton)
+        parseStyle.add(charButton)
+        wordButton.isSelected = true
+        toolbarModeSelect.add(wordButton)
+        toolbarModeSelect.add(charButton)
+        wordButton.addActionListener { world.parseStyle = TextWorld.ParseStyle.WORD }
+        charButton.addActionListener { world.parseStyle = TextWorld.ParseStyle.CHARACTER }
         bottomToolbarPanel.add(toolbarModeSelect)
         add(bottomToolbarPanel, BorderLayout.SOUTH)
 
@@ -95,13 +113,6 @@ class TextWorldPanel private constructor(
         } else if (world.parseStyle === TextWorld.ParseStyle.WORD) {
             wordButton.isSelected = true
         }
-
-    }
-
-    /**
-     * Init the listeners, called by factor method, outside the constructor.
-     */
-    private fun initListeners() {
 
         // Reset text position when user clicks in text area
         textArea.addMouseListener(object : MouseAdapter() {
@@ -133,13 +144,11 @@ class TextWorldPanel private constructor(
         // Force component to fill up parent panel
         addComponentListener(object : ComponentAdapter() {
             override fun componentResized(e: ComponentEvent) {
-                // textArea.setPreferredSize(ReaderPanel.this.getPreferredSize());
                 inputScrollPane.preferredSize =
                     Dimension(
                         this@TextWorldPanel.preferredSize.width - 25,
                         this@TextWorldPanel.preferredSize.height - 25
                     )
-                // inputScrollPane.revalidate();
             }
         })
         world.events.textChanged.on(Dispatchers.Swing) {
@@ -162,23 +171,10 @@ class TextWorldPanel private constructor(
             textArea.caretPosition = world.position
         }
 
-        //     override fun preferencesChanged() {
-        //         if (world.parseStyle === TextWorld.ParseStyle.CHARACTER) {
-        //             charButton.isSelected = true
-        //         } else if (world.parseStyle === TextWorld.ParseStyle.WORD) {
-        //             wordButton.isSelected = true
-        //         }
-        //     }
-        // })
     }
 
-    /**
-     * Highlight word beginning at `begin` nd ending at
-     * `end`.
-     *
-     * @param begin offset of beginning of highlight
-     * @param end   offset of end of highlight
-     */
+    internal inner class MyHighlightPainter(color: Color?) : DefaultHighlightPainter(color)
+
     fun highlight(begin: Int, end: Int) {
         // An instance of the private subclass of the default highlight painter
         val myHighlightPainter: Highlighter.HighlightPainter = MyHighlightPainter(world.highlightColor)
@@ -191,11 +187,7 @@ class TextWorldPanel private constructor(
         }
     }
 
-    /**
-     * Removes highlights from specified component.
-     *
-     * @param textComp text component to remove highlights from.
-     */
+
     fun removeHighlights(textComp: JTextComponent) {
         val hilite = textComp.highlighter
         val hilites = hilite.highlights
@@ -206,67 +198,5 @@ class TextWorldPanel private constructor(
         }
     }
 
-    /**
-     * A private subclass of the default highlight painter.
-     */
-    internal inner class MyHighlightPainter
-    /**
-     * Sets the color of highlighter.
-     *
-     * @param color Color of highlight
-     */
-        (color: Color?) :
-        DefaultHighlightPainter(color)// add action listener for switching between char and word buttons:
-        // wordButton.addActionListener(a);
 
-    /**
-     * Return a toolbar with buttons for switching between word and character
-     * mode.
-     *
-     * @return the mode selection toolbar
-     */
-    val toolbarModeSelect: JToolBar
-        get() {
-            val toolbar = JToolBar()
-            parseStyle.add(wordButton)
-            parseStyle.add(charButton)
-            wordButton.isSelected = true
-            toolbar.add(wordButton)
-            toolbar.add(charButton)
-            wordButton.addActionListener { world.parseStyle = TextWorld.ParseStyle.WORD }
-            charButton.addActionListener { world.parseStyle = TextWorld.ParseStyle.CHARACTER }
-
-            // add action listener for switching between char and word buttons:
-            // wordButton.addActionListener(a);
-            return toolbar
-        }
-
-    companion object {
-        /**
-         * Factory method for panel (so that listeners are not created in
-         * constructor).
-         *
-         * @param theWorld the world
-         * @param toolbar  pass in open / close toolbar
-         * @return the constructed panel
-         */
-        fun createReaderPanel(theWorld: TextWorld, toolbar: JToolBar?): TextWorldPanel {
-            val panel = TextWorldPanel(theWorld, toolbar)
-            panel.initListeners()
-            return panel
-        }
-
-        /**
-         * Factory method for panel (so that listeners are not created in
-         * constructor).
-         *
-         * @param theWorld the world
-         * @return the constructed panel
-         */
-        fun createReaderPanel(theWorld: TextWorld): TextWorldPanel {
-            val panel = TextWorldPanel(theWorld, null)
-            panel.initListeners()
-            return panel
-        }
-    }
 }

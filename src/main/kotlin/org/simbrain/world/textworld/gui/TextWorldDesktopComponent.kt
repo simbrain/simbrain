@@ -85,7 +85,7 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
      */
     init {
         world = component.world
-        panel = TextWorldPanel.createReaderPanel(world)
+        panel = TextWorldPanel(world)
         this.preferredSize = Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT)
         addMenuBar()
         add(panel)

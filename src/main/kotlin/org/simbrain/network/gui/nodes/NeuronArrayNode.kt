@@ -273,6 +273,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             val switchStyle: Action = networkPanel.createAction(
                 name = "Toggle line / grid",
                 iconPath = "menu_icons/grid.png",
+                keyboardShortcut = 'G',
                 description = "Toggle line / grid style"
             ) {
                 networkPanel.selectionManager

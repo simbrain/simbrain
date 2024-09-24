@@ -125,11 +125,23 @@ class TokenEmbeddingBuilder(): EditableObject {
     var removeStopWords = false
 
     /**
+     * 
+     */
+    @UserParameter(label = "If true, keep punctuations and add them as tokens", order = 70 )
+    var tokenizePunctuations = false
+
+    /**
      * Extract a token embedding from the provided string.
      */
     fun build(docString: String) = when (embeddingType) {
         EmbeddingType.ONE_HOT -> {
-            val tokens = docString.tokenizeWordsFromString().uniqueTokensFromArray()
+            val tokens = docString.let { doc ->
+                if (tokenizePunctuations) {
+                    doc.tokenizeWordsAndPunctuationFromString()
+                } else {
+                    doc.tokenizeWordsFromString()
+                }
+            }.uniqueTokensFromArray()
             TokenEmbedding(tokens, Matrix.eye(tokens.size))
         }
         EmbeddingType.COC -> {

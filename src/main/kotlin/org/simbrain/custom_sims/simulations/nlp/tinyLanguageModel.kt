@@ -3,50 +3,43 @@ package org.simbrain.custom_sims.simulations.nlp
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addTextWorld
 import org.simbrain.custom_sims.newSim
-import org.simbrain.custom_sims.simulations.allWords
-import org.simbrain.custom_sims.simulations.makeElmanVector
+import org.simbrain.custom_sims.readSimulationFileContents
 import org.simbrain.network.core.addToNetwork
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.trainers.BackpropLossFunction
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.updaterules.SoftmaxRule
-import org.simbrain.util.generateAutoregressivePairs
-import org.simbrain.util.place
-import org.simbrain.util.toMatrix
+import org.simbrain.util.*
 import org.simbrain.world.textworld.EmbeddingType
 import org.simbrain.world.textworld.TokenEmbeddingBuilder
+import kotlin.math.min
 
 val tinyLanguageModel = newSim {
 
     workspace.clearWorkspace()
 
-    val numInputSentences = 100
-
-    val contextSize = 10 // in tokens
+    val contextSize = 24 // in tokens
 
     val hiddenLayerSize = 100
 
+    val trainingText = readSimulationFileContents("texts" / "corpus_artificial_similarity.txt")
 
-    // Word embedding
-    val allWords = allWords.distinct().joinToString(" ")
     val tokenEmbedding = TokenEmbeddingBuilder().apply {
         embeddingType = EmbeddingType.ONE_HOT
-    }.build(allWords)
-
-    val trainingText = makeElmanVector(numInputSentences)
+        tokenizePunctuations = true
+    }.build(trainingText)
 
     // Text World for Inputs
-    val textWorldComponent = addTextWorld("Text World (Inputs)").apply { updateOn = false }
+    val textWorldComponent = addTextWorld("Text World (Inputs)")
     textWorldComponent.world.text = trainingText.split("\n").first()
     textWorldComponent.world.tokenEmbedding = tokenEmbedding
 
     // Network
-    val networkComponent = addNetworkComponent("Network").apply { updateOn = false }
+    val networkComponent = addNetworkComponent("Network")
     val network = networkComponent.network
 
-    val corpus = trainingText.split("\n").flatMap { line ->
-        generateAutoregressivePairs(line.split(" "))
-    }
+    val words = trainingText.tokenizeWordsAndPunctuationFromString()
+    val corpus = words.windowed(min(words.size, contextSize)).flatMap { window -> generateAutoregressivePairs(window)}
 
     val tokenizedCorpus = corpus.map { (context, target) ->
         context.map { tokenEmbedding.get(it) } to tokenEmbedding.get(target)
@@ -82,8 +75,6 @@ val tinyLanguageModel = newSim {
 
     backpropNetwork.trainer.lossFunction = BackpropLossFunction.CrossEntropy
 
-    workspace.updater.updateManager.clear()
-
     workspace.addUpdateAction("Encode Context Window") {
         val encodedContext = textWorldComponent.world.text
             .split(" ")
@@ -95,13 +86,11 @@ val tinyLanguageModel = newSim {
         backpropNetwork.inputLayer.setActivations(inputVector)
     }
 
-    // workspace.updater.updateManager.swapElements(0, 1)
-    workspace.addUpdateAction("Update Network") {
-        networkComponent.update()
-    }
+    workspace.updater.updateManager.swapElements(0, 1)
 
     workspace.addUpdateAction("Predict Next Word") {
         val nextWord = tokenEmbedding.getClosestWord(backpropNetwork.outputLayer.activationArray)
+        // update text with predicted word and remove first word so that the context window maintains its size
         textWorldComponent.world.text = (textWorldComponent.world.text.split(" ") + nextWord)
             .takeLast(contextSize)
             .joinToString(" ")

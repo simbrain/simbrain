@@ -49,6 +49,11 @@ fun String.tokenizeWordsFromString(): List<String> {
     return this.lowercase().removeSpecialCharacters().removePunctuation().split(" ")
 }
 
+fun String.tokenizeWordsAndPunctuationFromString(): List<String> {
+    val regex = """\w+|\n|[^\w\s]+""".toRegex()
+    return regex.findAll(this).map { it.value }.map { it.lowercase() }.toList()
+}
+
 /**
  * Unique tokens: all unique tokens (contexts)
  * Converts to lowercase

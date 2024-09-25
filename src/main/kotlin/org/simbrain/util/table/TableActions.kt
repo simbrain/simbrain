@@ -275,7 +275,7 @@ fun SimbrainJTable.importCSVAction(fixedColumns: Boolean = true, skipImportOptio
         import()
     } else {
         val options = ImportExportOptions()
-        options.createEditorDialog {
+        options.createEditorDialog("Import CSV") {
             import(it)
         }.display()
     }
@@ -302,7 +302,7 @@ fun SimbrainJTable.exportCsv(fileName: String = "", skipExportOptions: Boolean =
         export()
     } else {
         val options = ImportExportOptions()
-        options.createEditorDialog {
+        options.createEditorDialog("Export CSV") {
             export(it)
         }.display()
     }

@@ -221,12 +221,12 @@ fun <T : JComponent> T.createAction(
  */
 @JvmOverloads
 fun <E : EditableObject> E.createEditorDialog(
-    titleName: String = name.convertCamelCaseToSpaces(),
+    titleName: String = "Edit " + name.convertCamelCaseToSpaces(),
     block: (E) -> Unit = {}
 ): StandardDialog {
     val editor = AnnotatedPropertyEditor(listOf(this))
     return StandardDialog(editor).apply {
-        title = "Edit $titleName"
+        title = "$titleName"
         addCommitTask {
             editor.commitChanges()
             block(this@createEditorDialog)

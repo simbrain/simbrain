@@ -252,6 +252,15 @@ fun SimbrainJTable.importCSVAction(fixedColumns: Boolean = true, skipImportOptio
                         it.rowNames = importedData.rowNames
                         it.fireTableStructureChanged()
                     }
+                } else if (it is MatrixDataFrame) {
+                    val rawData = Utils.getDoubleMatrix(csvFile).map { l -> l.toTypedArray() }.toTypedArray()
+                    val importedData = createFrom2DArray(rawData, options, dataType)
+                    if (!fixedColumns || checkColumns(importedData.columnCount)) {
+                        it.data = importedData.data.map { l -> l.map { e -> e as Double }.toDoubleArray() }.toTypedArray().toMatrix()
+                        it.columnNames = importedData.columnNames
+                        it.rowNames = importedData.rowNames
+                        it.fireTableStructureChanged()
+                    }
                 } else if (it is SmileDataFrame) {
                     val data = Read.csv(csvFile.absolutePath)
                     if (!fixedColumns || checkColumns(data.ncol())) {

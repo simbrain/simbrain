@@ -9,6 +9,7 @@ import org.simbrain.util.table.createFrom2DArray
 import org.simbrain.util.widgets.ChoicesWithNull
 import org.simbrain.util.widgets.ColorSelector
 import org.simbrain.util.widgets.YesNoNull
+import org.simbrain.workspace.WorkspacePreferences
 import smile.math.matrix.Matrix
 import java.awt.BorderLayout
 import java.awt.Color
@@ -16,6 +17,7 @@ import java.awt.Dimension
 import java.awt.event.ActionEvent
 import java.awt.event.FocusAdapter
 import java.awt.event.FocusEvent
+import java.io.File
 import java.text.DecimalFormat
 import java.text.NumberFormat
 import javax.swing.*
@@ -63,6 +65,7 @@ class GuiEditable<O : EditableObject, T>(
     val showLabeledBorder: Boolean = true,
     val getter: (GuiEditableGetterContext<O, T>.() -> T)? = null,
     val setter: (GuiEditableSetterContext<O, T>.(T) -> Unit)? = null,
+    val useFileChooser: Boolean = false,
     private val onUpdate: (UpdateFunctionContext<O, T>).() -> Unit = { }
 ) {
 
@@ -213,6 +216,7 @@ fun <O : EditableObject> UserParameter.toGuiEditable(obj: O, property: KProperty
         showDetails = showDetails,
         useLegacySetter = useLegacySetter,
         columnMode = columnMode,
+        useFileChooser = useFileChooser,
         tab = tab,
         typeMapProvider = if (typeMapProvider.isNotEmpty()) {
             property.returnType
@@ -620,9 +624,10 @@ class StringWidget<O : EditableObject>(
 
     private var changed = false
 
-    override val widget by lazy {
+    val textField by lazy {
         JTextField().also {
             it.text = if (this@StringWidget.isConsistent) parameter.value else NULL_STRING
+            it.columns = 20
         }.also {
             it.document.addDocumentListener(object : DocumentListener {
                 fun update() {
@@ -646,8 +651,38 @@ class StringWidget<O : EditableObject>(
         }
     }
 
+    val fileChooserButton by lazy {
+        JButton("...").also {
+            it.addActionListener { e: ActionEvent ->
+                val dir = parameter.value?.let { parameterValue ->
+                    File(parameterValue).let { file ->
+                        if (file.exists()) {
+                            if (file.isDirectory) file else file.parentFile
+                        } else {
+                            null
+                        }
+                    }?.absolutePath
+                } ?: WorkspacePreferences.simulationDirectory
+                SFileChooser(dir, "Open...").showOpenDialog()?.let { file ->
+                    textField.text = file.absolutePath
+                    changed = true
+                }
+            }
+        }
+    }
+
+    override val widget by lazy {
+        JPanel().also {
+            it.layout = BoxLayout(it, BoxLayout.X_AXIS)
+            it.add(textField)
+            if (parameter.useFileChooser) {
+                it.add(fileChooserButton)
+            }
+        }
+    }
+
     override val value: String?
-        get() = if (changed) widget.text else parameter.value
+        get() = if (changed) textField.text else parameter.value
 
     override fun refresh(property: KProperty<*>) {
         parameter.update(UpdateFunctionContext(

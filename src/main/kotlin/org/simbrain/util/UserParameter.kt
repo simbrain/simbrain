@@ -106,4 +106,6 @@ annotation class UserParameter(
     val useLegacySetter: Boolean = false,
 
     val columnMode: Boolean = false,
+
+    val useFileChooser: Boolean = false,
 )

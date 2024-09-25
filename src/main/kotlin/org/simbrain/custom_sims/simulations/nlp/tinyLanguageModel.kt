@@ -1,45 +1,60 @@
 package org.simbrain.custom_sims.simulations.nlp
 
-import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.addTextWorld
-import org.simbrain.custom_sims.newSim
-import org.simbrain.custom_sims.readSimulationFileContents
+import org.simbrain.custom_sims.*
 import org.simbrain.network.core.addToNetwork
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.trainers.BackpropLossFunction
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.util.*
+import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.world.textworld.EmbeddingType
 import org.simbrain.world.textworld.TokenEmbeddingBuilder
+import java.io.File
 import kotlin.math.min
+
+class TinyLanguageModelOptions: EditableObject {
+    var contextSize by GuiEditable(
+        initValue = 24,
+        order = 1,
+    )
+
+    var trainerTextPath by GuiEditable(
+        initValue = simulationsPath / "texts" / "corpus_artificial_similarity.txt",
+        order = 2,
+        useFileChooser = true,
+    )
+}
 
 val tinyLanguageModel = newSim {
 
+    val options = showAPEOptionDialog("Tiny Language Model", TinyLanguageModelOptions())
+
     workspace.clearWorkspace()
 
-    val contextSize = 24 // in tokens
+    val contextSize = options.contextSize
 
     val hiddenLayerSize = 100
 
-    val trainingText = readSimulationFileContents("texts" / "corpus_artificial_similarity.txt")
+    val trainingText = File(options.trainerTextPath).readText()
 
     val tokenEmbedding = TokenEmbeddingBuilder().apply {
         embeddingType = EmbeddingType.ONE_HOT
         tokenizePunctuations = true
     }.build(trainingText)
 
-    // Text World for Inputs
-    val textWorldComponent = addTextWorld("Text World (Inputs)")
-    textWorldComponent.world.text = trainingText.split("\n").first()
-    textWorldComponent.world.tokenEmbedding = tokenEmbedding
-
     // Network
     val networkComponent = addNetworkComponent("Network")
     val network = networkComponent.network
 
-    val words = trainingText.tokenizeWordsAndPunctuationFromString()
-    val corpus = words.windowed(min(words.size, contextSize)).flatMap { window -> generateAutoregressivePairs(window)}
+    val tokenizedTrainingText = trainingText.tokenizeWordsAndPunctuationFromString()
+    val corpus = tokenizedTrainingText.windowed(min(tokenizedTrainingText.size, contextSize)).flatMap { window -> generateAutoregressivePairs(window) }
+
+    // Text World for Inputs
+    val textWorldComponent = addTextWorld("Text World (Inputs)")
+    textWorldComponent.world.text = tokenizedTrainingText.take(contextSize).joinToString(" ")
+    textWorldComponent.world.tokenEmbedding = tokenEmbedding
 
     val tokenizedCorpus = corpus.map { (context, target) ->
         context.map { tokenEmbedding.get(it) } to tokenEmbedding.get(target)
@@ -73,7 +88,10 @@ val tinyLanguageModel = newSim {
         }.addToNetwork()
     }
 
-    backpropNetwork.trainer.lossFunction = BackpropLossFunction.CrossEntropy
+    backpropNetwork.trainer.apply {
+        lossFunction = BackpropLossFunction.CrossEntropy
+        learningRate = 0.0001
+    }
 
     workspace.addUpdateAction("Encode Context Window") {
         val encodedContext = textWorldComponent.world.text

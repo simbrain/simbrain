@@ -88,7 +88,7 @@ public class EdgeOfChaosBitStream extends Simulation {
         2) The separation property builds upon the concept of the fading memory property, stating that with **the influx of new activation inputs**, a network will **produce 
         different memory states**. However, we would not want an excess amount of separation. Like for instance, if a neural network receives the activation patterns of two 
         types of flowers, the network should still know that it is a flower with a minor distinction in activation but, not too large of a distinction where it differentiates
-        the two flowers (an example of this can be tested in the `Embodied EdgeOfChaos` simulation).
+        the two flowers (an example of this can be tested in the `Edge Of Chaos Embodied` simulation).
         
         Tying these properties to the three different states, an `ordered state` will have a **weakened fading and weakened separation of memory states** where its activation 
         patterns will be pulled into a cyclic cycle of activation patterns. In this state, its difference will quickly die off. A `chaotic state` will have both properties however, 

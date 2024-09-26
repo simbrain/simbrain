@@ -49,8 +49,12 @@ fun String.tokenizeWordsFromString(): List<String> {
     return this.lowercase().removeSpecialCharacters().removePunctuation().split(" ")
 }
 
-fun String.tokenizeWordsAndPunctuationFromString(): List<String> {
-    val regex = """\w+|\n|[^\w\s]+""".toRegex()
+fun String.simpleTokenizer(useSpaces: Boolean = false, usePunctuation: Boolean = false): List<String> {
+    val regex = listOf(
+        """\w+""", // Words
+        if (useSpaces) """\s+""" else null,
+        if (usePunctuation) """[^\w\s]+""" else null
+    ).filterNotNull().joinToString("|").toRegex()
     return regex.findAll(this).map { it.value }.map { it.lowercase() }.toList()
 }
 

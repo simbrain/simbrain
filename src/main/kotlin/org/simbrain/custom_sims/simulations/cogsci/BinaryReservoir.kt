@@ -126,12 +126,12 @@ val binaryReservoir = newSim {
 
     withGui {
         place(networkComponent) {
-            location = point(249, 10)
-            width = 400
-            height = 400
+            location = point(487, 0)
+            width = 567
+            height = 617
         }
 
-        createControlPanel("Control Panel", 5, 10) {
+        createControlPanel("Control Panel", 1055, 0) {
             val tf_stdev: JTextField = addTextField("Weight stdev", "" + variance)
             addComponent(tf_stdev)
             addButton("Apply Variance") {
@@ -169,10 +169,65 @@ val binaryReservoir = newSim {
     val projectionPlot = addProjectionPlot("Activations")
     withGui {
         place(projectionPlot) {
-            location = point(630, 10)
-            width = 400
-            height = 400
+            location = point(1055, 197)
+            width = 452
+            height = 420
         }
+    }
+
+    // Location of the Docviewer
+    val docViewer = addDocViewer("Information",
+        """
+        # Introduction
+        This simulation shows how research can be done in Simbrain and in coordination with other programming environments. Though this simulation can be 
+        used directly in any way as desired, pressing the buttons can configure parameters, run simulations, and save data that is outputted to a `.csv` file 
+        which can then be analyzed in other programming environments like Python. For more information on the `Binary Reservoir` simulation and its usage, 
+        feel free to contact `jponcedeleon@ucmerced.edu`.
+
+        ## General Information About The Simulation
+
+        In this simulation, each trial resets the node connection parameters, and after `400` baseline iterations, it models a **perturbation** to the network by adding 
+        an additional input signal to `10%` of the nodes, and continues to update activations for an additional `300` iterations to show the reservoir's response to new input
+        (these and other parameters can be configured in the [simulation code](https://docs.simbrain.net/docs/simulations/)). This perturbation allows for the calculation of a 
+        measure called the [**perturbational complexity index (PCI)**](https://pubmed.ncbi.nlm.nih.gov/31133480/), which is associated with **consciousness** in humans and 
+        other animals. In this simulation, the relationship between **PCI** and **edge-of-chaos activation dynamics** is studied in a binary reservoir network.
+
+        The `run one trial` button produces one file for the specified `weight stdev`. You can also see the set variance and the actual variance in your programming environment
+        after you apply the `weight stdev`. Whereas, the `run one trial per parameter` button will produce a set of files, one for each mean weight variance of a geometric 
+        progression (from `0.1` to `10`). This makes it possible to study how PCI varies with **weight variance**, which is known to be a control parameter for putting networks 
+        into different dynamical regimes, from **ordered** to **chaotic** and in between **edge of chaos**. For an in-depth description and illustration of the different dynamical 
+        regimes, refer to the `Edge of Chaos Bit Stream` simulation.
+        
+        # What to Do
+        
+        In this simulation, similarly to the other reservoir network simulations, the only configuration to the simulation is the `weight stdev`. Below are two different ways
+        that you can utilize this simulation.
+        
+        ## Observations on the Edge of Chaos
+        
+        1) Change the `weight stdev` value and press the `Apply Variance` button to change the reservoir's weight distribution.
+                        
+        2) Start the simulation by clicking on the `play` button in the top-left corner.
+        
+        3) Now, observe the changes in the PCA projection plot and in its activation patterns to determine its current dynamical state.   
+        
+        5) To `reset` the simulation, stop the simulation by clicking the `play` button again and press `k`. Afterwards, press the `eraser` button in the `Activations` GUI, or
+        the `PCA` projection plot to clear the points.
+        
+        6) Afterwards, click back on the `pointer` icon, and left-click outside of the reservoir to unselect all neurons.
+
+        ## Conducting Research on the Relationship between PCI and Dynamical Regimes
+        
+        1) Change the `weight stdev` value and press the `Apply Variance` button to change the reservoir's weight distribution.
+        
+        2) Click the `run one trial` button or, the `run one trial per parameter` button.
+        
+        3) Save it to your device after the simulation finishes.
+        
+        """.trimIndent()
+    )
+    withGui {
+        place(docViewer,10, 0, 477, 617)
     }
 
     // Couple the neuron array to the projection plot

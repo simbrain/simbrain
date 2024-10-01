@@ -11,7 +11,7 @@ import org.simbrain.util.place
 import smile.math.matrix.Matrix
 
 
-val backpropSim = newSim {
+val backpropAutoEncoder = newSim {
 
     workspace.clearWorkspace()
     val networkComponent = addNetworkComponent("Backprop")

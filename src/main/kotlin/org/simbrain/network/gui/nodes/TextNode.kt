@@ -131,6 +131,9 @@ open class TextNode(
         recenterTextObject()
     }
 
+    override val toolTipText: String?
+        get() = "Location: (" + textObject.locationX.toInt() + "," + textObject.locationY.toInt() + ")"
+
     /**
      * Updates the position of the view text based on the position of the model
      * text object.

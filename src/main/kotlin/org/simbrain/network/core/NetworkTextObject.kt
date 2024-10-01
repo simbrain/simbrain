@@ -107,7 +107,7 @@ open class NetworkTextObject : LocatableModel {
     }
 
     override fun toString(): String {
-        return "(" + Math.round(x) + "," + Math.round(y) + "):" + text
+        return "(${Math.round(x)},${Math.round(y)})"
     }
 
     override suspend fun delete() {
@@ -121,4 +121,6 @@ open class NetworkTextObject : LocatableModel {
             y = location.y
             events.locationChanged.fire()
         }
+
+
 }

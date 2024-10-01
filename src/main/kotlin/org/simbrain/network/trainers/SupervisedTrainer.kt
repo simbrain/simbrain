@@ -129,14 +129,17 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
     sealed class UpdateMethod: CopyableObject {
         class Stochastic : UpdateMethod() {
             override fun copy() = this
+            override fun toString() = "Batch = 1"
         }
 
         class Epoch : UpdateMethod() {
             override fun copy() = this
+            override fun toString() = "Epoch"
         }
 
         class Batch(@UserParameter(label = "Batch Size", order = 1) var batchSize: Int = 5) : UpdateMethod() {
             override fun copy() = Batch(batchSize)
+            override fun toString() = "Batch = $batchSize"
         }
 
         override fun getTypeList(): List<Class<out CopyableObject>>? {
@@ -194,6 +197,9 @@ class BackpropTrainer : SupervisedTrainer<BackpropNetwork>() {
         return wmList.applyBackprop(targetVec, epsilon = learningRate, lossFunction = lossFunction)
     }
 
+    /**
+     * Backprop trains using error accumulation.
+     */
     context(Network)
     override fun BackpropNetwork.trainBatch(rowRange: IntRange): Double {
 
@@ -219,7 +225,7 @@ class BackpropTrainer : SupervisedTrainer<BackpropNetwork>() {
             na.events.updated.fire()
         }
 
-        return error
+        return error / rowRange.count()
     }
 
 }

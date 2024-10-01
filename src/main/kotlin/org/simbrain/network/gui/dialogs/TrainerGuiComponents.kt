@@ -73,7 +73,7 @@ class TrainerControls<SN>(trainer: SupervisedTrainer<SN>, supervisedNetwork: SN,
         description = "Edit trainer properties",
         iconPath = "menu_icons/Prefs.png",
     ) {
-        trainer.createEditorDialog().display()
+        trainer.createEditorDialog{ trainer.events.errorUpdated.fire(trainer.lastError) }.display()
     }
 
     init {
@@ -108,13 +108,14 @@ class TrainerControls<SN>(trainer: SupervisedTrainer<SN>, supervisedNetwork: SN,
         val labelPanel = LabelledItemPanel()
         labelPanel.addItem("Iterations:", iterationsLabel)
         val errorValue = JLabel(trainer.lastError.roundToString(4))
-        val errorLabel = labelPanel.addItem("Mean Batch Error (${trainer.lossFunction.shortName})", errorValue)
+        fun errorDescriptionString() = "Mean Error (${trainer.updateType}; ${trainer.lossFunction.shortName})"
+        val errorLabel = labelPanel.addItem(errorDescriptionString(), errorValue)
         runTools.add(labelPanel)
 
         trainer.events.errorUpdated.on(Dispatchers.Swing) { error ->
             iterationsLabel.text = "" + trainer.iteration
             errorValue.text = "" + error.format(4)
-            errorLabel.text = "Mean Batch Error (${trainer.lossFunction.shortName})"
+            errorLabel.text = errorDescriptionString()
         }
 
         layout = MigLayout("ins 0, gap 0px 0px")

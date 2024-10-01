@@ -275,4 +275,43 @@ fun Line2D.intersectionPoint(other: Line2D): Intersection {
 typealias Degree = Double
 typealias Radian = Double
 
+fun computeIntersection(rect1: Rectangle2D, rect2: Rectangle2D): Rectangle2D? {
+    val x = max(rect1.x, rect2.x)
+    val y = max(rect1.y, rect2.y)
+    val width = min(rect1.x + rect1.width, rect2.x + rect2.width) - x
+    val height = min(rect1.y + rect1.height, rect2.y + rect2.height) - y
+    return if (width > 0 && height > 0) {
+        Rectangle2D.Double(x, y, width, height)
+    } else {
+        null
+    }
+}
+
+infix fun Rectangle2D.intersects(other: Rectangle2D) = computeIntersection(this, other)
+
+/**
+ * Given a source and target rectangle return a function that takes any point in the source rectangle and returns the
+ * appropriate transformed point in the target rectangle
+ */
+fun getTransformationFunction(source: Rectangle2D, target: Rectangle2D): (Point2D) -> Point2D {
+    val (sx, sy, sw, sh) = source
+    val (tx, ty, tw, th) = target
+    val scaleX = tw / sw
+    val scaleY = th / sh
+    val offsetX = tx - sx * scaleX
+    val offsetY = ty - sy * scaleY
+    return { point(it.x * scaleX + offsetX, it.y * scaleY + offsetY) }
+}
+
+/**
+ * For each pixel in the rectangle, apply the given action
+ */
+fun Rectangle2D.forEachPixel(action: (x: Int, y: Int) -> Unit) {
+    for (x in this.x.toInt() until this.x.toInt() + this.width.toInt()) {
+        for (y in this.y.toInt() until this.y.toInt() + this.height.toInt()) {
+            action(x, y)
+        }
+    }
+}
+
 val sin60deg = sin(Math.toRadians(60.0))

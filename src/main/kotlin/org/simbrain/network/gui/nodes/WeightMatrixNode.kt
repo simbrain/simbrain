@@ -18,14 +18,16 @@ import org.simbrain.util.table.SimbrainTablePanel
 import org.simbrain.util.table.addSimpleDefaults
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
-import java.awt.BasicStroke
+import java.awt.GraphicsEnvironment
 import java.awt.RenderingHints
 import java.awt.event.ActionEvent
+import java.awt.geom.Rectangle2D
 import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
 import java.util.*
 import java.util.function.Consumer
 import javax.swing.*
+import kotlin.math.max
 
 /**
  * A visual representation of a weight matrix
@@ -42,6 +44,8 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
     private val imageHeight = 90
 
     private val boxThickness = 2f
+
+    private var networkPanelScalingFactor = networkPanel.scalingFactor
 
     /**
      * A box around the [imageBox]
@@ -83,13 +87,34 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
 
     /**
      * Render the weight matrix to the [.imageBox].
+     *
+     * Render the weight matrix into an image using Simbrain Color Scheme. If the image is bigger than 1000x1000, it will
+     * be scaled down to 1000x1000 using nearest neighbor interpolation.
      */
     private fun renderMatrixToImage() {
         val pixelArray = (weightMatrix as WeightMatrix).weights
-        val img = pixelArray.toSimbrainColorImage(
-            weightMatrix.weightMatrix.ncol(),
-            weightMatrix.weightMatrix.nrow()
-        )
+        val transform = GraphicsEnvironment.getLocalGraphicsEnvironment().defaultScreenDevice.defaultConfiguration.defaultTransform!! // scaling factor on the screen (> 1 for high DPI screens)
+        val screenScalingFactor = transform.scaleX
+        networkPanelScalingFactor = networkPanel.scalingFactor
+        val scale = networkPanel.scalingFactor * screenScalingFactor
+        val width = (imageWidth * scale).coerceAtMost(weightMatrix.weightMatrix.ncol().toDouble())
+        val height = (imageHeight * scale).coerceAtMost(weightMatrix.weightMatrix.nrow().toDouble())
+        val imageSize = max(width, height).coerceAtMost(1000.0).toInt()
+
+        val imageBound = Rectangle2D.Double(0.0, 0.0, imageSize.toDouble(), imageSize.toDouble())
+        val matrixBound = Rectangle2D.Double(0.0, 0.0, weightMatrix.weightMatrix.ncol().toDouble(), weightMatrix.weightMatrix.nrow().toDouble())
+
+        val imageToMatrixMapping = getTransformationFunction(imageBound, matrixBound)
+
+        // Create the image data from the weight matrix using nearest neighbor interpolation
+        val imageData = DoubleArray(imageSize * imageSize).also { data ->
+            imageBound.forEachPixel { x, y ->
+                val (mx, my) = imageToMatrixMapping(point(x, y))
+                data[x + y * imageSize] = pixelArray[mx.toInt() + my.toInt() * weightMatrix.weightMatrix.ncol()]
+            }
+        }
+
+        val img = imageData.toSimbrainColorImage(imageSize, imageSize)
         imageBox.image = img
     }
 
@@ -113,6 +138,9 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
     }
 
     override fun paint(paintContext: PPaintContext) {
+        if (networkPanelScalingFactor != networkPanel.scalingFactor) {
+            renderMatrixToImage()
+        }
         paintContext.graphics.setRenderingHint(
             RenderingHints.KEY_INTERPOLATION,
             RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR

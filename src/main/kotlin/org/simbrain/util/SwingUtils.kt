@@ -234,6 +234,17 @@ fun <E : EditableObject> E.createEditorDialog(
     }
 }
 
+/**
+ * Creates an editor dialog that blocks until the user commits or cancels the dialog.
+ */
+suspend fun <T: EditableObject> T.showAPEOptionDialog(title: String) = let {
+    val deferred = CompletableDeferred<T?>()
+    it.createEditorDialog(title) { obj -> deferred.complete(obj) }
+        .apply { addCloseTask { deferred.complete(null) } }
+        .display()
+    deferred
+}.await()
+
 fun showWarningDialog(message: String) {
     val dialog = JDialog()
     dialog.isAlwaysOnTop = true

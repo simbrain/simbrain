@@ -1,6 +1,9 @@
 package org.simbrain.custom_sims.simulations.nlp
 
-import org.simbrain.custom_sims.*
+import org.simbrain.custom_sims.addNetworkComponent
+import org.simbrain.custom_sims.addTextWorld
+import org.simbrain.custom_sims.newSim
+import org.simbrain.custom_sims.simulationsPath
 import org.simbrain.network.core.addToNetwork
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.trainers.BackpropLossFunction
@@ -55,7 +58,7 @@ class TinyLanguageModelOptions: EditableObject {
 
 val tinyLanguageModel = newSim {
 
-    val options = showAPEOptionDialog("Tiny Language Model", TinyLanguageModelOptions())
+    val options = TinyLanguageModelOptions().showAPEOptionDialog("Tiny Language Model") ?: return@newSim
 
     workspace.clearWorkspace()
 

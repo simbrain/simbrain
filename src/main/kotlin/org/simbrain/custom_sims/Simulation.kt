@@ -1,6 +1,5 @@
 package org.simbrain.custom_sims
 
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -12,7 +11,6 @@ import org.simbrain.plot.timeseries.TimeSeriesModel
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.loadTileMap
-import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.gui.SimbrainDesktop
@@ -159,12 +157,6 @@ fun SimulationScope.readSimulationFileContents(fileName: String): String {
 }
 
 val simulationsPath = File(Utils.USER_DIR / "simulations").absolutePath
-
-suspend fun <T: EditableObject> showAPEOptionDialog(title: String, apeObject: T) = apeObject.let {
-    val deferred = CompletableDeferred<T>()
-    it.createEditorDialog(title) { obj -> deferred.complete(obj) }.display()
-    deferred
-}.await()
 
 /**
  * Add a doc viewer component.

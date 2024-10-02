@@ -47,7 +47,7 @@ class AnnotatedPropertyEditorTest {
     fun `test commit string widget`() {
         val ape = AnnotatedPropertyEditor(n1)
         val prop = NetworkModel::class.declaredMemberProperties.first { it.name == "label" }
-        (ape.propertyNameWidgetMap[prop.name] as StringWidget).widget.text = "test"
+        (ape.propertyNameWidgetMap[prop.name] as StringWidget).textField.text = "test"
         ape.commitChanges()
         assertEquals("test", n1.label)
     }
@@ -57,7 +57,7 @@ class AnnotatedPropertyEditorTest {
         n1.label = "test"
         val ape = AnnotatedPropertyEditor(n1)
         val prop = NetworkModel::class.declaredMemberProperties.first { it.name == "label" }
-        val widgetVal = (ape.propertyNameWidgetMap[prop.name] as StringWidget).widget.text
+        val widgetVal = (ape.propertyNameWidgetMap[prop.name] as StringWidget).textField.text
         assertEquals("test", widgetVal)
     }
 

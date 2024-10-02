@@ -199,7 +199,7 @@ class BackpropTests {
         with(net) {
             with(bp) {
                 runBlocking {
-                    repeat(1000) {
+                    repeat(10000) {
                         bp.trainer.trainOnce()
                     }
                 }

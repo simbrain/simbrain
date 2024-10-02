@@ -5,10 +5,7 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
-import org.simbrain.util.copyFrom
-import org.simbrain.util.flatten
-import org.simbrain.util.toDoubleArray
-import org.simbrain.util.toMatrix
+import org.simbrain.util.*
 import smile.math.matrix.Matrix
 
 class TrainingUtilsTest {
@@ -31,22 +28,22 @@ class TrainingUtilsTest {
     fun `test neuron array error`() {
         na1.setActivations(doubleArrayOf(-1.0, 1.0))
         val error = BackpropLossFunction.SSE.outputError(na1.activations, doubleArrayOf(1.0, 1.0).toMatrix())
-        assertArrayEquals(doubleArrayOf(2.0, 0.0), error.toDoubleArray())
+        assertArrayEquals(doubleArrayOf(4.0, 0.0), error.toDoubleArray())
     }
 
     @Test
     fun `test bias update`() {
         na1.biases = doubleArrayOf(1.0, 1.0).toMatrix()
-        val error = BackpropLossFunction.SSE.outputError(na1.activations, doubleArrayOf(0.0, 1.0).toMatrix())
+        val errors = doubleArrayOf(0.0, 1.0).toMatrix() - na1.activations
         // Change to bias is 0,1, so biases should become 1,2
-        na1.updateBiases(error, 1.0)
+        na1.updateBiases(errors, 1.0)
         assertArrayEquals(doubleArrayOf(1.0, 2.0 ), na1.biases.toDoubleArray())
-        na1.updateBiases(error, 1.0)
+        na1.updateBiases(errors, 1.0)
         assertArrayEquals(doubleArrayOf(1.0, 3.0 ), na1.biases.toDoubleArray())
-        na1.updateBiases(error, .1)
+        na1.updateBiases(errors, .1)
         assertArrayEquals(doubleArrayOf(1.0, 3.1 ), na1.biases.toDoubleArray())
-        error.mul(-1.0)
-        na1.updateBiases(error, 1.0)
+        errors.mul(-1.0)
+        na1.updateBiases(errors, 1.0)
         assertArrayEquals(doubleArrayOf(1.0, 2.1 ), na1.biases.toDoubleArray())
     }
 

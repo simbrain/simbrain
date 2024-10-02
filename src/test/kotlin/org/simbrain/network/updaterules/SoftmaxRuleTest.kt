@@ -4,10 +4,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
-import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronArray
-import org.simbrain.network.updaterules.activity_generators.StochasticRule
-import org.simbrain.util.toMatrix
 
 class SoftmaxRuleTest {
 
@@ -38,6 +35,7 @@ class SoftmaxRuleTest {
     @Test
     fun `The component receiving the most input should have the highest value`() {
         na.setActivations(doubleArrayOf(1.0, 0.5))
+        na.isClamped = true
         net.update()
         assertTrue(na.activationArray[0] > na.activationArray[1])
     }

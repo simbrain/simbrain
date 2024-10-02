@@ -32,7 +32,6 @@ val tinyMNIST = newSim {
     bp.hiddenLayers().forEach{layer ->
         layer.updateRule = LinearRule().apply{clippingType = LinearRule.ClippingType.Relu}}
     bp.outputLayer.updateRule = SoftmaxRule()
-    net.addNetworkModels(bp).awaitAll()
 
     val trainInputsCSV = fetchDataFromUrl("https://downloads.simbrain.net/simbraindata/tiny_mnist_train_inputs.csv")?:return@newSim
     val trainLabelsCSV = fetchDataFromUrl("https://downloads.simbrain.net/simbraindata/tiny_mnist_train_labels.csv")?:return@newSim
@@ -47,8 +46,11 @@ val tinyMNIST = newSim {
     bp.trainer.updateType = SupervisedTrainer.UpdateMethod.Batch(35)
 
     bp.inputLayer.gridMode = true
-    bp.inputLayer.location += point(0, 100)
+    bp.inputLayer.offset(-300.0, -250.0)
     bp.inputLayer.inputData = csvToDouble2DArray(testInputsCSV).toMatrix()
+    bp.outputLayer.offset(-300.0, 230.0)
+
+    net.addNetworkModels(bp).awaitAll()
 
     // Location of the network in the desktop
     withGui {
@@ -60,7 +62,7 @@ val tinyMNIST = newSim {
         fontSize = 18
     }
     net.addNetworkModel(outputClassLabel)?.await()
-    outputClassLabel.location = point(134, -389)
+    outputClassLabel.location = point(-77, -175)
 
     // Update the text label
     net.addUpdateAction(updateAction("Update class label") {

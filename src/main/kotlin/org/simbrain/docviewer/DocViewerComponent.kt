@@ -29,7 +29,7 @@ import java.io.OutputStream
 class DocViewerComponent(val docViewer: DocViewer = DocViewer(), name: String = "") : WorkspaceComponent(name) {
 
     override fun save(output: OutputStream, format: String?) {
-        getSimbrainXStream().toXML(docViewer)
+        getSimbrainXStream().toXML(docViewer, output)
     }
 
     override val xml: String
@@ -39,6 +39,7 @@ class DocViewerComponent(val docViewer: DocViewer = DocViewer(), name: String = 
     companion object {
         fun open(input: InputStream, name: String, format: String?): DocViewerComponent {
             val docViewer = getSimbrainXStream().fromXML(input) as DocViewer
+            docViewer.render()
             return DocViewerComponent(docViewer, name)
         }
     }

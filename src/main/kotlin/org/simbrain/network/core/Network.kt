@@ -72,6 +72,7 @@ class Network: CoroutineScope, EditableObject {
     /**
      * The update manager for this network.
      */
+    @Transient
     val updateManager = NetworkUpdateManager(this)
 
     /**

@@ -17,7 +17,10 @@ import org.simbrain.workspace.updater.updateAction
 import kotlin.math.sqrt
 
 /**
- * Props to Melissa
+ * A small implementation of MNIst
+ *
+ * @author Melissa Almeida
+ * @author Jeff Yoshimi
  */
 val tinyMNIST = newSim {
 

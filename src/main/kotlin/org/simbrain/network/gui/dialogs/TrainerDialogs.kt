@@ -88,7 +88,6 @@ fun <SN> SN.getSupervisedTrainingDialog(): StandardDialog where SN: SupervisedNe
             )
         }
 
-
         contentPane = runControls
     }
 }

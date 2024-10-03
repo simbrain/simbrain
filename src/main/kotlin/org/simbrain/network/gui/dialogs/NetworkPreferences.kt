@@ -56,6 +56,15 @@ object NetworkPreferences: PreferenceHolder() {
     @UserParameter(label = "Wand radius", tab = "GUI")
     var wandRadius by IntegerPreference(40)
 
+    @UserParameter(
+        label = "Matrix image max width/height",
+        description = "Maximum size of the weight matrix image in pixels in either dimension (i.e. width or height).",
+        minimumValue = 1.0,
+        maximumValue = 46340.0,
+        tab = "GUI"
+    )
+    var weightMatrixImageMaxSize by IntegerPreference(1000)
+
     @UserParameter(label = "Default network time step", minimumValue = 0.0, increment = .1, tab = "Model")
     var defaultTimeStep by DoublePreference(.1)
 

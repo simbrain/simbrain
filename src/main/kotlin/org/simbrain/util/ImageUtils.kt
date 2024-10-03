@@ -1,8 +1,12 @@
 package org.simbrain.util
 
+import org.simbrain.network.gui.dialogs.NetworkPreferences.weightMatrixImageMaxSize
 import org.simbrain.util.math.SimbrainMath
+import smile.math.matrix.Matrix
 import java.awt.Color
+import java.awt.GraphicsEnvironment
 import java.awt.geom.AffineTransform
+import java.awt.geom.Rectangle2D
 import java.awt.image.*
 import javax.swing.ImageIcon
 import javax.swing.JLabel
@@ -224,6 +228,39 @@ fun graphicalUpperBound(value: Double): Double {
         value < 10000 -> floor(value / 1000) * 1000 + 1000
         else -> floor(value / 10000) * 10000 + 10000
     }
+}
+
+fun DoubleArray.nearestNeighborInterpolation(sourceBounds: Rectangle2D, targetBounds: Rectangle2D): DoubleArray {
+    val transformation = getTransformationFunction(targetBounds, sourceBounds)
+    return DoubleArray(targetBounds.width.toInt() * targetBounds.height.toInt()).also { data ->
+        targetBounds.forEachPixel { x, y ->
+            val (mx, my) = transformation(point(x, y))
+            data[x + y * targetBounds.width.toInt()] = this[mx.toInt() + my.toInt() * sourceBounds.width.toInt()]
+        }
+    }
+}
+
+fun getScreenScalingFactor(): Double {
+    val transform = GraphicsEnvironment.getLocalGraphicsEnvironment().defaultScreenDevice.defaultConfiguration.defaultTransform!! // scaling factor on the screen (> 1 for high DPI screens)
+    return transform.scaleX
+}
+
+class ImageData(val data: DoubleArray, val width: Int, val height: Int) {
+    fun toSimbrainColorImage() = data.toSimbrainColorImage(width, height)
+}
+
+fun Matrix.toScaledImageData(imageWidth: Int, imageHeight: Int, scale: Double): ImageData {
+    return flatten().toScaledImageData(imageWidth, imageHeight, ncol(), nrow(), scale)
+}
+
+fun DoubleArray.toScaledImageData(imageWidth: Int, imageHeight: Int, arrayWidth: Int, arrayHeight: Int, scale: Double): ImageData {
+    val width = (imageWidth * scale).coerceIn(1.0, min(arrayWidth, weightMatrixImageMaxSize).toDouble()).toInt()
+    val height = (imageHeight * scale).coerceIn(1.0, min(arrayHeight, weightMatrixImageMaxSize).toDouble()).toInt()
+
+    val imageBound = Rectangle2D.Double(0.0, 0.0, width.toDouble(), height.toDouble())
+    val matrixBound = Rectangle2D.Double(0.0, 0.0, arrayWidth.toDouble(), arrayHeight.toDouble())
+
+    return ImageData(nearestNeighborInterpolation(matrixBound, imageBound), width, height)
 }
 
 

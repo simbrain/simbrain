@@ -121,6 +121,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Iris Classifier") { irisClassifier }
     }
 
+
     dir("Projection") {
         item("PCA Projection") { projectionSim }
     }
@@ -139,6 +140,10 @@ val simulations = dir("Simulations", alphabetical = true ) {
     dir("Image World") {
         item("Simple drawings (10 x 10)") { simpleImageWorld }
         item("Photo album (100 x 100)") { photoAlbumExample }
+    }
+
+    dir("Temp") {
+        item("Spivey Net") { spiveyNet }
     }
 
     //dir("Testing") {

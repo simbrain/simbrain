@@ -2,6 +2,7 @@ package org.simbrain.util.projection
 
 import org.simbrain.util.UserParameter
 
+// TODO: Auto-find feature from 3. But if used, do NOT use it on 2d data
 class CoordinateProjection: ProjectionMethod() {
 
     @UserParameter(label = "dim1", minimumValue = 0.0)

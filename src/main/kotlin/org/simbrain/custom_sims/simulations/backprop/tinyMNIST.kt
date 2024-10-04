@@ -11,7 +11,6 @@ import org.simbrain.network.trainers.SupervisedTrainer
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.util.*
-import org.simbrain.workspace.updater.updateAction
 
 /**
  * A small implementation of MNIst
@@ -62,10 +61,10 @@ val tinyMNIST = newSim {
     outputClassLabel.location = point(-77, -175)
 
     // Update the text label
-    net.addUpdateAction(updateAction("Update class label") {
+    bp.outputLayer.events.updateGraphics.on(dispatcher = Swing) {
         outputClassLabel.text = "Classification: ${bp.outputLayer
             .activationArray.withIndex().maxByOrNull {it.value}?.index}"
-    })
+    }
 
     // Iterate trainer and network once to get it to display a number in the input
     with(net) { with(bp) {

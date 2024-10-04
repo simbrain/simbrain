@@ -73,7 +73,15 @@ class TrainerControls<SN>(trainer: SupervisedTrainer<SN>, supervisedNetwork: SN,
         description = "Edit trainer properties",
         iconPath = "menu_icons/Prefs.png",
     ) {
-        trainer.createEditorDialog{ trainer.events.errorUpdated.fire(trainer.lastError) }.display()
+        trainer.createEditorDialog {
+            (it.updateType as? SupervisedTrainer.UpdateMethod.Batch)?.let { batchUpdate ->
+                if (batchUpdate.batchSize !in 1..supervisedNetwork.trainingSet.size) {
+                    batchUpdate.batchSize = batchUpdate.batchSize.coerceIn(1, supervisedNetwork.trainingSet.size)
+                    showWarningDialog("Batch size exceeds training set size; setting to ${batchUpdate.batchSize}")
+                }
+            }
+            trainer.events.errorUpdated.fire(trainer.lastError)
+        }.display()
     }
 
     init {

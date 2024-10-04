@@ -137,7 +137,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
             override fun toString() = "Epoch"
         }
 
-        class Batch(@UserParameter(label = "Batch Size", order = 1) var batchSize: Int = 5) : UpdateMethod() {
+        class Batch(@UserParameter(label = "Batch Size", minimumValue = 1.0, order = 1) var batchSize: Int = 5) : UpdateMethod() {
             override fun copy() = Batch(batchSize)
             override fun toString() = "Batch = $batchSize"
         }

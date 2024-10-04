@@ -243,7 +243,8 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
     }
 
     override fun clear() {
-        activations.mul(0.0)
+        activations.setCol(0, 0.0)
+        inputs.setCol(0, 0.0)
         events.updated.fire()
     }
 

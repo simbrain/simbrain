@@ -97,7 +97,10 @@ open class FeedForward : Subnetwork {
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
         wmList.forEach { wm -> wm.randomize(NormalDistribution(0.0, .1)) }
-        (layerList - inputLayer).forEach { it.randomizeBiases(NormalDistribution(0.0, .01)) }
+        (layerList - inputLayer).forEach {
+            it.clear()
+            it.randomizeBiases(NormalDistribution(0.0, .01))
+        }
     }
 
     context(Network)

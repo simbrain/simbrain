@@ -22,3 +22,5 @@ out/*
 *.iws
 .DS_Store
 *.so
+
+.cache

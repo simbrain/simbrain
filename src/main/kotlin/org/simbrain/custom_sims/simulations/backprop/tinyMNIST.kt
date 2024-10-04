@@ -4,8 +4,6 @@ import kotlinx.coroutines.awaitAll
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.NetworkTextObject
-import org.simbrain.network.core.activations
-import org.simbrain.network.core.auxValues
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.trainers.BackpropLossFunction
 import org.simbrain.network.trainers.MatrixDataset
@@ -14,7 +12,6 @@ import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.util.*
 import org.simbrain.workspace.updater.updateAction
-import kotlin.math.sqrt
 
 /**
  * A small implementation of MNIst
@@ -33,9 +30,9 @@ val tinyMNIST = newSim {
         layer.updateRule = LinearRule().apply{clippingType = LinearRule.ClippingType.Relu}}
     bp.outputLayer.updateRule = SoftmaxRule()
 
-    val trainInputsCSV = fetchDataFromUrl("https://downloads.simbrain.net/simbraindata/tiny_mnist_train_inputs.csv")?:return@newSim
-    val trainLabelsCSV = fetchDataFromUrl("https://downloads.simbrain.net/simbraindata/tiny_mnist_train_labels.csv")?:return@newSim
-    val testInputsCSV = fetchDataFromUrl("https://downloads.simbrain.net/simbraindata/tiny_mnist_test_inputs.csv")?:return@newSim
+    val trainInputsCSV = fetchDataWithCache("https://downloads.simbrain.net/simbraindata/tiny_mnist_train_inputs.csv")?:return@newSim
+    val trainLabelsCSV = fetchDataWithCache("https://downloads.simbrain.net/simbraindata/tiny_mnist_train_labels.csv")?:return@newSim
+    val testInputsCSV = fetchDataWithCache("https://downloads.simbrain.net/simbraindata/tiny_mnist_test_inputs.csv")?:return@newSim
 
     bp.trainingSet = MatrixDataset(
         inputs = csvToDouble2DArray(trainInputsCSV).toMatrix(),

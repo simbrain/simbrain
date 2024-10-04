@@ -1,14 +1,15 @@
 package org.simbrain.util
 
 import com.Ostermiller.util.CSVParser
+import org.simbrain.util.Utils.USER_DIR
 import org.simbrain.util.widgets.ProgressWindow
 import java.io.BufferedInputStream
 import java.io.File
+import java.io.IOException
 import java.io.StringReader
-import java.net.URL
 import java.net.HttpURLConnection
-import javax.swing.JDialog
-import javax.swing.JOptionPane
+import java.net.URI
+import java.net.URL
 
 /**
  * Root is `src/main/resources`
@@ -104,7 +105,61 @@ fun csvToDouble2DArray(csvString: String): Array<DoubleArray> {
     }
 }
 
+// Helper to get the cache file based on the URL and cache directory
+fun getCacheFile(urlString: String, cacheDir: String): File {
 
+    // Create the cache directory if it doesn't exist
+    File(cacheDir).mkdirs()
+
+    val url = URI(urlString).toURL()
+
+    val fileName = url.path.substringAfterLast('/')
+
+    if (fileName.isEmpty()) throw IllegalArgumentException("Invalid URL: $urlString")
+
+    return File(cacheDir, fileName)
+}
+
+// Function to check if the cache file is valid
+fun isCacheValid(file: File): Boolean {
+    // Example: you could add time-based cache expiration here if desired
+    return file.exists() && file.length() > 0
+}
+
+// Function to read data from cache
+fun readFromCache(file: File): String? {
+    return try {
+        file.readText()
+    } catch (e: IOException) {
+        null
+    }
+}
+
+// Function to save downloaded data to the cache
+fun saveToCache(file: File, data: String) {
+    try {
+        file.writeText(data)
+    } catch (e: IOException) {
+        showWarningDialog("Failed to save cache: ${e.message}")
+    }
+}
+
+// Function to handle fetching data with caching
+fun fetchDataWithCache(urlString: String): String? {
+    val cacheFile = getCacheFile(urlString, USER_DIR / ".cache")
+
+    // Check if cached file exists and is valid
+    if (cacheFile.exists() && isCacheValid(cacheFile)) {
+        return readFromCache(cacheFile)
+    } else {
+        // Download the data and cache it
+        val data = fetchDataFromUrl(urlString)
+        if (data != null) {
+            saveToCache(cacheFile, data)
+        }
+        return data
+    }
+}
 
 // TODO: Move to unit test
 fun main() {

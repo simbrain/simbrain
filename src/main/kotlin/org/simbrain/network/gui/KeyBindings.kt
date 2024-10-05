@@ -1,6 +1,7 @@
 package org.simbrain.network.gui
 
 import org.simbrain.network.core.LocatableModel
+import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.gui.nodes.NeuronNode
 import org.simbrain.util.*
@@ -41,6 +42,17 @@ fun NetworkPanel.addKeyBindings() {
     bind(CmdOrCtrl + 'Y') { redo() }
     bind(CmdOrCtrl + 'Z') { undo() }
     bind(CmdOrCtrl + Shift + 'Z') { redo() }
+
+    bind(Alt + 'R') {
+        selectionManager.selectedModels.forEach {
+            if (it is WeightMatrix) {
+                it.transposeGraphics = !it.transposeGraphics
+            }
+            if (it is NeuronArray) {
+                it.verticalLayout = !it.verticalLayout
+            }
+        }
+    }
 
     bind("1") { selectionManager.convertSelectedNodesToSourceNodes() }
     bind("2") { connectSelectedModelsDefault() }

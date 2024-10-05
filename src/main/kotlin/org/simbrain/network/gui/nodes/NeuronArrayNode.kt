@@ -281,6 +281,17 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                     .forEach { it.gridMode = !it.gridMode }
             }
             contextMenu.add(switchStyle)
+
+            val switchOrientation: Action = networkPanel.createAction(
+                name = "Switch to ${if (neuronArray.verticalLayout) "Horizontal" else "Vertical"} Layout",
+                description = "Toggle horizontal / vertical layout"
+            ) {
+                networkPanel.selectionManager
+                    .filterSelectedModels<NeuronArray>()
+                    .forEach { it.verticalLayout = !it.verticalLayout }
+            }
+            contextMenu.add(switchOrientation)
+
             val toggleShowBias: Action = networkPanel.createAction(
                 name = "Toggle bias visibility",
                 keyboardShortcut = 'B',

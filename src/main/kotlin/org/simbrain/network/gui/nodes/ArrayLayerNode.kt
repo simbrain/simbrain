@@ -6,6 +6,8 @@ import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.core.ArrayLayer
+import org.simbrain.network.core.LocatableModel
+import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.util.*
 import java.awt.BasicStroke
@@ -24,16 +26,6 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
      * Margin around main box in pixels. Override to specify further.
      */
     protected open val margin = 10.0
-
-    init {
-        layer.events.apply {
-            clampChanged.on(dispatcher = Dispatchers.Swing) { updateBorder() }
-            locationChanged.on(dispatcher = Dispatchers.Swing) { pullViewPositionFromModel() }
-        }
-        pickable = true
-
-        pullViewPositionFromModel()
-    }
 
     /**
      * All children should be added to this so that bound computations are correct.
@@ -55,6 +47,32 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
             field = value
         }
 
+    fun rotateNode() {
+        (layer as? NeuronArray)?.let { neuronArray ->
+            val centerLocation = point(layer.width / 2, layer.height / 2) - point(x, y)
+            if (neuronArray.verticalLayout && rotation != -Math.PI / 2) {
+                mainNode.rotateAboutPoint(Math.toRadians(-90.0), centerLocation)
+            }
+            if (!neuronArray.verticalLayout && rotation != 0.0) {
+                mainNode.rotateAboutPoint(Math.toRadians(90.0), centerLocation)
+            }
+        }
+        pushBoundsToModel()
+    }
+
+    init {
+        layer.events.apply {
+            clampChanged.on(dispatcher = Dispatchers.Swing) { updateBorder() }
+            locationChanged.on(dispatcher = Dispatchers.Swing) { pullViewPositionFromModel() }
+        }
+        (layer as? NeuronArray)?.events?.visualPropertiesChanged?.on(dispatcher = Dispatchers.Swing) { rotateNode() }
+        rotateNode()
+
+        pickable = true
+
+        pullViewPositionFromModel()
+    }
+
     private fun pullViewPositionFromModel() {
         // Top left of bounds in local coordinates
         // Note that we cannot use fullbounds here because they include the node handle
@@ -63,19 +81,9 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
         this.globalTranslation = layer.location - point(layer.width / 2, layer.height / 2) - point(x, y)
     }
 
-    /**
-     * Update the position of the model neuron based on the global coordinates
-     * of this pnode.
-     */
-    private fun pushViewPositionToModel() {
-        // Networkmodels use the center location
-        val centerLocation = borderBox.globalFullBounds.center2D
-        layer.location = centerLocation
-    }
-
     override fun offset(dx: kotlin.Double, dy: kotlin.Double) {
-        super.offset(dx, dy)
-        pushViewPositionToModel()
+        (model as LocatableModel).location += point(dx, dy)
+        pullViewPositionFromModel()
     }
 
     private fun createBorder(): PPath {

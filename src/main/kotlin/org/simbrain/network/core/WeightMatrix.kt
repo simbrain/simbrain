@@ -98,6 +98,13 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
     @Transient
     val inhibitoryMask: Matrix
 
+    @UserParameter(label = "Transpose Graphics", order = 10)
+    var transposeGraphics = false
+        set(value) {
+            field = value
+            events.updated.fire()
+        }
+
     /**
      * Construct the matrix.
      *

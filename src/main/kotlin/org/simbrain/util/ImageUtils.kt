@@ -150,6 +150,16 @@ fun BufferedImage.scale(w: Int, h: Int) = BufferedImage(w, h, BufferedImage.TYPE
             AffineTransformOp.TYPE_NEAREST_NEIGHBOR).filter(this, it)!!
 }
 
+fun BufferedImage.transposed(): BufferedImage {
+    val transposedImage = BufferedImage(height, width, this.type)
+    for (x in 0 until width) {
+        for (y in 0 until height) {
+            transposedImage.setRGB(y, x, this.getRGB(x, y))
+        }
+    }
+    return transposedImage
+}
+
 fun Int.toColor(): Color {
     return Color(this)
 }

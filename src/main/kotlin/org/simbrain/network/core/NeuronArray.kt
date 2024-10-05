@@ -1,6 +1,5 @@
 package org.simbrain.network.core
 
-import org.simbrain.network.events.LocationEvents
 import org.simbrain.network.events.NeuronArrayEvents
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.NeuronUpdateRule
@@ -103,15 +102,26 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
             (events as NeuronArrayEvents).visualPropertiesChanged.fire()
         }
 
-    @UserParameter(label = "Biases Visible", description = "If true, show biases.", order = 11)
-    var isShowBias = false
-        set(showBias) {
-            field = showBias
+    @UserParameter(
+        label = "Vertical Layout",
+        description = "If true, orient the array vertically, otherwise horizontally",
+        order = 11
+    )
+    var verticalLayout = false
+        set(value) {
+            field = value
             (events as NeuronArrayEvents).visualPropertiesChanged.fire()
         }
 
+    @UserParameter(label = "Biases Visible", description = "If true, show biases.", order = 12)
+    var isShowBias = false
+        set(showBias) {
+            field = showBias
+            events.visualPropertiesChanged.fire()
+        }
+
     @Transient
-    override var events: LocationEvents = NeuronArrayEvents()
+    override var events: NeuronArrayEvents = NeuronArrayEvents()
 
     /**
      * Construct a neuron array.

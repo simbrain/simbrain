@@ -17,6 +17,7 @@ import java.awt.event.FocusEvent
 import java.io.FileInputStream
 import java.text.DecimalFormat
 import java.text.NumberFormat
+import java.util.*
 import javax.swing.*
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
@@ -175,6 +176,47 @@ class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, tru
             mainPanel.addItem(label, textField)
         }
     }
+
+    fun addSlider(
+        label: String,
+        minValue: Double,
+        maxValue: Double,
+        initValue: Double,
+        increment: Double = 0.1,
+        onChange: suspend (Double) -> Unit = {}
+    ) = JSlider(
+        (minValue / increment).toInt(),
+        (maxValue / increment).toInt(),
+        (initValue / increment).toInt()
+    ).also { slider ->
+        slider.paintTicks = true
+        slider.paintLabels = true
+
+        // Set specific labels for min, max, and mid values
+        val labelTable = Hashtable<Int, JLabel>()
+        val minLabelValue = (minValue / increment).toInt()
+        val midLabelValue = ((minValue + maxValue) / (2 * increment)).toInt() // Midpoint
+        val maxLabelValue = (maxValue / increment).toInt()
+
+        labelTable[minLabelValue] = JLabel(String.format("%.1f", minValue))
+        labelTable[midLabelValue] = JLabel(String.format("%.1f", (minValue + maxValue) / 2))
+        labelTable[maxLabelValue] = JLabel(String.format("%.1f", maxValue))
+
+        slider.labelTable = labelTable
+        slider.snapToTicks = true
+
+        slider.addChangeListener {
+            launch {
+                onChange(slider.value * increment)
+            }
+        }
+
+        launch(Dispatchers.Swing) {
+            mainPanel.addItem(label, slider)
+            pack()
+        }
+    }
+
 
     fun addCheckBox(label: String, checked: Boolean, onChange: suspend (Boolean) -> Unit = {}) = JCheckBox().also { checkBox ->
         checkBox.addActionListener {

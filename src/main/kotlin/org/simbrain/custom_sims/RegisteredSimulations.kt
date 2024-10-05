@@ -45,7 +45,8 @@ val simulations = dir("Simulations", alphabetical = true ) {
 
     dir("Braitenberg") {
         item("Isopod Simulation") { isopodSim }
-        item("Braitenberg") { braitenbergSim }
+        item("Two Braitenberg Vehicles") { braitenbergSim }
+        item("Braitenberg Game") { braitenbergGame }
     }
 
     dir("Reservoir Networks") {

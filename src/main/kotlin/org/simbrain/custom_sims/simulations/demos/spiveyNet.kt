@@ -1,12 +1,10 @@
 package org.simbrain.custom_sims.simulations
 
 import kotlinx.coroutines.awaitAll
-import org.simbrain.custom_sims.addDocViewer
-import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.createControlPanel
-import org.simbrain.custom_sims.newSim
+import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.OneToOne
 import org.simbrain.network.layouts.LineLayout
+import org.simbrain.network.neurongroups.NormalizationGroup
 import org.simbrain.network.neurongroups.SoftmaxGroup
 import org.simbrain.network.subnetworks.RestrictedBoltzmannMachine
 import org.simbrain.util.place
@@ -14,23 +12,28 @@ import org.simbrain.util.plus
 import org.simbrain.util.point
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.toMatrix
+import org.simbrain.world.odorworld.entities.EntityType
+import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import smile.math.matrix.Matrix
+import java.awt.Dimension
+import javax.swing.JButton
 
 /**
  * Based on Spivey's 2024 paper
  */
 val spiveyNet = newSim {
 
-    // Basic setup
     workspace.clearWorkspace()
+
+    // Network
     val networkComponent = addNetworkComponent("Spivey Net")
     val net = networkComponent.network
 
-    val group1 = SoftmaxGroup(4).apply {
+    val group1 = NormalizationGroup(4).apply {
         layout = LineLayout()
         applyLayout()
     }
-    val group2 = SoftmaxGroup(4).apply {
+    val group2 = NormalizationGroup(4).apply {
         layout = LineLayout()
         applyLayout()
     }
@@ -44,14 +47,28 @@ val spiveyNet = newSim {
     }
     net.addNetworkModels(connector.connectNeurons(group1.neuronList, group2.neuronList))
 
+    // World
+    val oc = addOdorWorldComponent()
+    oc.world.isUseCameraCentering = false
+    desktop?.getDesktopComponent(oc)?.title = "Mouse Trace"
+    oc.world.addEntity(157, 271, EntityType.MOUSE).apply {
+        heading = 90.0
+        isShowTrail = true
+    }
+    oc.world.addEntity(38, 49, EntityType.CANDLE)
+    oc.world.addEntity(287, 44, EntityType.BELL)
 
     withGui {
         //place(docViewer, 0, 0, 464, 619)
-        place(networkComponent, 548, 0, 815, 619)
-        createControlPanel("Control Panel", 404, 0) {
+        place(networkComponent, 222, 15, 400, 400)
+        place(oc, 613, 15, 391, 455)
+        createControlPanel("Control Panel", 15, 15) {
             addButton("Pattern 1") {
                 group1.setActivations(doubleArrayOf(1.0,1.0,1.0,1.0))
                 group2.setActivations(doubleArrayOf(1.0,1.0,1.0,1.0))
+            }.apply {
+                // Hack to make the panel wider
+                preferredSize = Dimension(170, 30)
             }
             addButton("Pattern 2") {
                 group1.setActivations(doubleArrayOf(-1.0,1.0,-1.0,1.0))

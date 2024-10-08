@@ -143,6 +143,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         val copy = NeuronArray(size)
         copy.location = location
         copy.gridMode = gridMode
+        copy.verticalLayout = verticalLayout
         copy.activations.copyFrom(activations)
         copy.biases.copyFrom(biases)
         copy.updateRule = updateRule

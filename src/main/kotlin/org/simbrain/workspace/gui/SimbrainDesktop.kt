@@ -435,11 +435,10 @@ object SimbrainDesktop {
      */
     private fun createHelpMenu(): JMenu {
         val helpMenu = JMenu("Help")
-        helpMenu.add(ShowHelpAction("Main Help", "SimbrainDocs.html"))
+        helpMenu.add(ShowHelpAction("Main Help", "https://docs.simbrain.net/"))
         helpMenu.addSeparator()
-        helpMenu.add(ShowHelpAction("Quick start", "Pages/QuickStart.html"))
-        helpMenu.add(ShowHelpAction("Keyboard Shortcuts", "KeyboardShortcuts.html"))
-        helpMenu.add(ShowHelpAction("Credits", "SimbrainCredits.html"))
+        helpMenu.add(ShowHelpAction("Quick start and shortcuts", "https://docs.simbrain.net/docs/quickstart.html"))
+        helpMenu.add(ShowHelpAction("Credits", "https://simbrain.net/SimbrainCredits.html"))
         return helpMenu
     }
 

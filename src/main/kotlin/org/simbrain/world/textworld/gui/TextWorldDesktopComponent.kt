@@ -154,7 +154,7 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
 
         // Help Menu
         menuBar.add(help)
-        val helpAction = ShowHelpAction("Pages/Worlds/TextWorld/TextWorld.html")
+        val helpAction = ShowHelpAction("https://docs.simbrain.net/docs/worlds/textworld.html")
         helpItem.action = helpAction
         help.add(helpItem)
 

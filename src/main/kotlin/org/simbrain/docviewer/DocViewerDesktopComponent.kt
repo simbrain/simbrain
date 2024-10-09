@@ -69,7 +69,7 @@ class DocViewerDesktopComponent(frame: GenericFrame, component: DocViewerCompone
 
         val helpMenu = JMenu("Help")
         val helpItem = JMenuItem("Help")
-        val helpAction: Action = ShowHelpAction("Pages/DocEditor.html")
+        val helpAction: Action = ShowHelpAction("https://docs.simbrain.net/docs/utilities/docviewer.html")
         helpItem.action = helpAction
         helpMenu.add(helpItem)
         menuBar.add(helpMenu)

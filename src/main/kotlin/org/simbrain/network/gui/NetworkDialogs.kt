@@ -60,6 +60,24 @@ fun NetworkPanel.showNeuronArrayCreationDialog() {
     }.display()
 }
 
+fun NetworkPanel.showActivationStackCreationDialog() {
+    ActivationStack.CreationTemplate().createEditorDialog {
+        val activationStack = it.create()
+        network.addNetworkModel(activationStack)
+    }.also {
+        it.title = "Create Activation Stack"
+    }.display()
+}
+
+fun NetworkPanel.showTransformerBlockCreationDialog() {
+    TransformerBlock.CreationTemplate().createEditorDialog {
+        val transformerBlock = it.create()
+        network.addNetworkModel(transformerBlock)
+    }.also {
+        it.title = "Create Transformer Block"
+    }.display()
+}
+
 val NetworkPanel.neuronDialog
     get() = selectionManager.filterSelectedModels<Neuron>().let { neurons ->
         if (neurons.isEmpty()) {

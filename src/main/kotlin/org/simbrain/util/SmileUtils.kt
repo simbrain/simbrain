@@ -4,6 +4,7 @@ import org.simbrain.plot.histogram.HistogramModel
 import org.simbrain.plot.histogram.HistogramPanel
 import smile.math.matrix.Matrix
 import kotlin.math.ln
+import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sqrt
 
@@ -160,16 +161,25 @@ fun Matrix.shiftUp(shiftAmount: Int = 1): Matrix {
 /**
  * Set all elements of indicated row to the same provided value
  */
-fun Matrix.setRow(rowIndex: Int, value: Double) {
+fun Matrix.setRowConstant(rowIndex: Int, value: Double) {
     for (i in 0 until ncol()) {
         this[rowIndex, i] = value
+    }
+}
+
+fun Matrix.setRow(rowIndex: Int, values: DoubleArray) {
+    if (values.size != ncol()) {
+        throw IllegalArgumentException("Values array has ${values.size} elements, but matrix has ${ncol()} columns")
+    }
+    for (i in 0 until ncol()) {
+        this[rowIndex, i] = values[i]
     }
 }
 
 /**
  * Set all elements of indicated column to the same provided value
  */
-fun Matrix.setCol(colIndex: Int, value: Double) {
+fun Matrix.setColConstant(colIndex: Int, value: Double) {
     for (i in 0 until nrow()) {
         this[i, colIndex] = value
     }
@@ -177,7 +187,7 @@ fun Matrix.setCol(colIndex: Int, value: Double) {
 
 fun Matrix.shiftUpAndPadEndWithZero(): Matrix {
     val shifted = this.shiftUp()
-    shifted.setRow(nrow() - 1, 0.0)
+    shifted.setRowConstant(nrow() - 1, 0.0)
     return shifted
 }
 
@@ -234,4 +244,27 @@ fun Matrix.appendRow(row: DoubleArray = DoubleArray(ncol()) { 0.0 }): Matrix {
         newMatrix[nrow(),j] = row[j]
     }
     return newMatrix
+}
+
+fun Matrix.layerNorm(epsilon: Double = 1e-5): Matrix {
+    val normalized = Matrix(nrow(), ncol())
+    for (i in 0 until nrow()) {
+        val row = row(i)
+        val mean = row.average()
+        val variance = row.map { (it - mean) * (it - mean) }.average()
+        val std = sqrt(variance + epsilon)
+        val normRow = row.map { (it - mean) / std }.toDoubleArray()
+        normalized.setRow(i, normRow)
+    }
+    return normalized
+}
+
+fun Matrix.relu(): Matrix {
+    val activated = Matrix(nrow(), ncol())
+    for (i in 0 until nrow()) {
+        for (j in 0 until ncol()) {
+            activated[i,j] = max(0.0, get(i,j))
+        }
+    }
+    return activated
 }

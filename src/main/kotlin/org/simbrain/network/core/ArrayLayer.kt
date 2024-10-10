@@ -1,8 +1,9 @@
 package org.simbrain.network.core
 
-import org.simbrain.network.gui.dialogs.NetworkPreferences.activationRandomizer
-import org.simbrain.util.*
-import org.simbrain.util.stats.ProbabilityDistribution
+import org.simbrain.util.UserParameter
+import org.simbrain.util.addi
+import org.simbrain.util.reshape
+import org.simbrain.util.toMatrix
 import org.simbrain.workspace.Consumable
 import smile.math.matrix.Matrix
 
@@ -54,11 +55,6 @@ abstract class ArrayLayer(
     @Consumable
     fun addInputsMismatched(inputs: DoubleArray) {
         addInputs(inputs.toMatrix().reshape(this.inputs.nrow(), this.inputs.ncol()))
-    }
-
-    override fun randomize(randomizer: ProbabilityDistribution?) {
-        inputs.randomize(randomizer ?: activationRandomizer)
-        events.updated.fire()
     }
 
     override fun clear() {

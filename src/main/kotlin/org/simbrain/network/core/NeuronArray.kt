@@ -237,7 +237,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
      * Set all activations in the array to the specified value.
      */
     fun fillActivations(value: Double) {
-        this.activations.setCol(0, value)
+        this.activations.setColConstant(0, value)
     }
 
 
@@ -254,8 +254,8 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
     }
 
     override fun clear() {
-        activations.setCol(0, 0.0)
-        inputs.setCol(0, 0.0)
+        activations.setColConstant(0, 0.0)
+        inputs.setColConstant(0, 0.0)
         events.updated.fire()
     }
 

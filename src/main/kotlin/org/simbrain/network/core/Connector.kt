@@ -31,7 +31,7 @@ abstract class Connector(var source: Layer, var target: Layer) : NetworkModel(),
     }
 
     /**
-     * A matrix of PSRs (pre-synaptic responses) for each connection.
+     * A matrix of PSRs (post-synaptic responses) for each connection.
      */
     abstract val psrMatrix: Matrix
 

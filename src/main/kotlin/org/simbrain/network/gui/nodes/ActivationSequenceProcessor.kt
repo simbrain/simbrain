@@ -2,6 +2,6 @@ package org.simbrain.network.gui.nodes
 
 import smile.math.matrix.Matrix
 
-interface StackProcessor {
+interface ActivationSequenceProcessor {
     val activations: Matrix
 }

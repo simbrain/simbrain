@@ -23,7 +23,7 @@ import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PImage
 import org.piccolo2d.nodes.PText
-import org.simbrain.network.core.ActivationStack
+import org.simbrain.network.core.ActivationActivationSequence
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.randomizeBiases
 import org.simbrain.network.gui.NetworkPanel
@@ -43,8 +43,8 @@ import javax.swing.*
  * The current pnode representation for all [Layer] objects. May be broken out into subtypes for different
  * subclasses of Layer.
  */
-class ActivationStackNode(networkPanel: NetworkPanel, val activationStack: ActivationStack) :
-    ArrayLayerNode(networkPanel, activationStack) {
+class ActivationStackNode(networkPanel: NetworkPanel, val activationSequence: ActivationActivationSequence) :
+    ArrayLayerNode(networkPanel, activationSequence) {
 
     /**
      * Main pixel image for activations.
@@ -96,7 +96,7 @@ class ActivationStackNode(networkPanel: NetworkPanel, val activationStack: Activ
      */
     init {
 
-        val events = activationStack.events
+        val events = activationSequence.events
 
         // TODO: Link to network preferences
         labelBackground.paint = Color.white
@@ -130,7 +130,7 @@ class ActivationStackNode(networkPanel: NetworkPanel, val activationStack: Activ
         activationImage.removeAllChildren()
         spikeImage.removeAllChildren()
         biasImage.removeAllChildren()
-        val activations = activationStack.activations
+        val activations = activationSequence.activations
 
         val img = activations.flatten().toSimbrainColorImage(activations.ncol(), activations.nrow())
         activationImage.image = img
@@ -143,8 +143,8 @@ class ActivationStackNode(networkPanel: NetworkPanel, val activationStack: Activ
     }
 
     private fun computeInfoText() = """
-            ${activationStack.id}    Rows: ${activationStack.activations.nrow()} Cols: ${activationStack.activations.ncol()}
-            Mean activation: ${activationStack.activations.flatten().average().format(4)}
+            ${activationSequence.id}    Rows: ${activationSequence.activations.nrow()} Cols: ${activationSequence.activations.ncol()}
+            Mean activation: ${activationSequence.activations.flatten().average().format(4)}
             """.trimIndent()
 
     /**
@@ -157,7 +157,7 @@ class ActivationStackNode(networkPanel: NetworkPanel, val activationStack: Activ
     override val toolTipText
         get() = """
         <html>
-        ${activationStack.toString().split("\n").joinToString("<br>")}
+        ${activationSequence.toString().split("\n").joinToString("<br>")}
         </html>
     """.trimIndent()
 
@@ -181,9 +181,9 @@ class ActivationStackNode(networkPanel: NetworkPanel, val activationStack: Activ
             contextMenu.add(networkPanel.networkActions.connectSelectedModels)
             contextMenu.addSeparator()
 
-            val applyInputs: Action = networkPanel.networkActions.createTestInputPanelAction(activationStack)
+            val applyInputs: Action = networkPanel.networkActions.createTestInputPanelAction(activationSequence)
             contextMenu.add(applyInputs)
-            val addActivationToInput = networkPanel.networkActions.createAddActivationToInputAction(activationStack)
+            val addActivationToInput = networkPanel.networkActions.createAddActivationToInputAction(activationSequence)
             contextMenu.add(addActivationToInput)
             contextMenu.addSeparator()
 
@@ -207,11 +207,11 @@ class ActivationStackNode(networkPanel: NetworkPanel, val activationStack: Activ
             val editComponents: Action = object : AbstractAction("Edit Components...") {
                 override fun actionPerformed(event: ActionEvent) {
                     val dialog = StandardDialog()
-                    val arrayData = MatrixDataFrame(activationStack.activations)
+                    val arrayData = MatrixDataFrame(activationSequence.activations)
                     dialog.contentPane = SimbrainTablePanel(arrayData)
                     dialog.addCommitTask {
                         with(networkPanel.network) {
-                            activationStack.update()
+                            activationSequence.update()
                         }
                     }
                     dialog.pack()
@@ -227,24 +227,24 @@ class ActivationStackNode(networkPanel: NetworkPanel, val activationStack: Activ
 
             // Coupling menu
             contextMenu.addSeparator()
-            val couplingMenu: JMenu = networkPanel.networkComponent.createCouplingMenu(activationStack)
+            val couplingMenu: JMenu = networkPanel.networkComponent.createCouplingMenu(activationSequence)
             contextMenu.add(couplingMenu)
             return contextMenu
         }
 
     override val propertyDialog: StandardDialog
-        get() = activationStack.createEditorDialog { updateInfoText() }
+        get() = activationSequence.createEditorDialog { updateInfoText() }
 
-    override val model: ActivationStack
-        get() = activationStack
+    override val model: ActivationActivationSequence
+        get() = activationSequence
 
     /**
      * Update the text label.
      */
     fun updateTextLabel() {
-        if (!activationStack.label.isNullOrEmpty()) {
+        if (!activationSequence.label.isNullOrEmpty()) {
             labelText.font = NeuronNode.NEURON_FONT
-            labelText.text = "" + activationStack.label
+            labelText.text = "" + activationSequence.label
             labelText.setOffset(
                 activationImage.x - labelText.width / 2 + activationImage.width / 2,
                 activationImage.y - labelText.height - 17

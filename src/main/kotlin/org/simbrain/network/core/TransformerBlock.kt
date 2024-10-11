@@ -1,6 +1,6 @@
 package org.simbrain.network.core
 
-import org.simbrain.network.gui.nodes.StackProcessor
+import org.simbrain.network.gui.nodes.ActivationSequenceProcessor
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
@@ -9,12 +9,12 @@ import smile.stat.distribution.GaussianDistribution
 import kotlin.math.exp
 import kotlin.math.sqrt
 
-class TransformerBlock(val stackSize: Int, inputSize: Int, val hiddenSize: Int): ArrayLayer(inputSize), EditableObject, StackProcessor {
+class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: Int): ArrayLayer(inputSize), EditableObject, ActivationSequenceProcessor {
 
-    override val inputs: Matrix = Matrix(stackSize, inputSize)
+    override val inputs: Matrix = Matrix(sequenceSize, inputSize)
 
-    @UserParameter(label = "Activations", description = "Activations in the stack", order = 1)
-    override var activations: Matrix = Matrix(stackSize, inputSize)
+    @UserParameter(label = "Activations", description = "Activations in the sequence", order = 1)
+    override var activations: Matrix = Matrix(sequenceSize, inputSize)
 
     override val activationArray: DoubleArray
         get() = activations.flatten()
@@ -23,22 +23,22 @@ class TransformerBlock(val stackSize: Int, inputSize: Int, val hiddenSize: Int):
     val Q = Matrix(inputSize, inputSize)
     val V = Matrix(inputSize, inputSize)
 
-    val kStack = Matrix(stackSize, inputSize)
-    val qStack = Matrix(stackSize, inputSize)
-    val vStack = Matrix(stackSize, inputSize)
+    val kStack = Matrix(sequenceSize, inputSize)
+    val qStack = Matrix(sequenceSize, inputSize)
+    val vStack = Matrix(sequenceSize, inputSize)
 
-    val selfAttention = Matrix(stackSize, stackSize)
+    val selfAttention = Matrix(sequenceSize, sequenceSize)
 
 
     // Feedforward network parameters
     val W1 = Matrix(inputSize, hiddenSize)
-    val b1 = Matrix(stackSize, hiddenSize)
+    val b1 = Matrix(sequenceSize, hiddenSize)
     val W2 = Matrix(hiddenSize, inputSize)
-    val b2 = Matrix(stackSize, inputSize)
+    val b2 = Matrix(sequenceSize, inputSize)
 
-    val feedForwardInput = Matrix(stackSize, inputSize)
+    val feedForwardInput = Matrix(sequenceSize, inputSize)
 
-    val feedForwardHidden = Matrix(stackSize, hiddenSize)
+    val feedForwardHidden = Matrix(sequenceSize, hiddenSize)
 
     override val biases: Matrix get() = throw UnsupportedOperationException("Not applicable to Transformer")
 
@@ -50,7 +50,7 @@ class TransformerBlock(val stackSize: Int, inputSize: Int, val hiddenSize: Int):
 
     context(Network) override fun accumulateInputs() {
         val matrix = (incomingConnectors.firstOrNull() as? WeightMatrix)?.weightMatrix
-        (incomingConnectors.firstOrNull()?.source as? StackProcessor)?.let { source ->
+        (incomingConnectors.firstOrNull()?.source as? ActivationSequenceProcessor)?.let { source ->
             inputs.add(source.activations.mm(matrix?.transpose()))
         }
     }
@@ -122,7 +122,7 @@ class TransformerBlock(val stackSize: Int, inputSize: Int, val hiddenSize: Int):
         events.updated.fire()
     }
 
-    fun copy() = TransformerBlock(stackSize, inputSize, hiddenSize).also {
+    fun copy() = TransformerBlock(sequenceSize, inputSize, hiddenSize).also {
         it.activations.copyFrom(activations)
         it.K.copyFrom(K)
         it.Q.copyFrom(Q)
@@ -142,8 +142,8 @@ class TransformerBlock(val stackSize: Int, inputSize: Int, val hiddenSize: Int):
 
     class CreationTemplate : EditableObject {
 
-        @UserParameter(label = "Stack Size", description = "Number of activation vectors in the stack", order = 1)
-        var stackSize = 7
+        @UserParameter(label = "Stack Size", description = "Number of activation vectors in the sequence", order = 1)
+        var sequenceSize = 7
 
         @UserParameter(label = "Input Size", description = "Number of inputs to each activation", order = 2)
         var inputSize = 4
@@ -152,35 +152,10 @@ class TransformerBlock(val stackSize: Int, inputSize: Int, val hiddenSize: Int):
         var hiddenSize = 16
 
         fun create(): TransformerBlock {
-            return TransformerBlock(stackSize, inputSize, hiddenSize)
+            return TransformerBlock(sequenceSize, inputSize, hiddenSize)
         }
 
-        override val name = "Activation Stack"
+        override val name = "Transformer Block"
 
     }
-}
-
-fun main() {
-    val source = ActivationStack(7, 4)
-    val target = ActivationStack(7, 6)
-
-    source.activations[0, 0] = 1.0
-    source.activations[1, 1] = 1.0
-    source.activations[2, 2] = 1.0
-    source.activations[3, 3] = 1.0
-
-    val wm = WeightMatrix(source, target)
-
-    wm.randomize()
-
-    val net = Network()
-    net.addNetworkModels(source, target, wm)
-
-    println(target.activations)
-
-    net.update()
-
-    println(target.activations)
-
-
 }

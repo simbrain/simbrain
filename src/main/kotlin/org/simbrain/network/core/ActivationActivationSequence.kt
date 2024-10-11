@@ -1,6 +1,6 @@
 package org.simbrain.network.core
 
-import org.simbrain.network.gui.nodes.StackProcessor
+import org.simbrain.network.gui.nodes.ActivationSequenceProcessor
 import org.simbrain.util.UserParameter
 import org.simbrain.util.copyFrom
 import org.simbrain.util.flatten
@@ -10,12 +10,12 @@ import org.simbrain.util.toDoubleArray
 import smile.math.matrix.Matrix
 import smile.stat.distribution.GaussianDistribution
 
-class ActivationStack(val stackSize: Int, inputSize: Int): ArrayLayer(inputSize), EditableObject, StackProcessor {
+class ActivationActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inputSize), EditableObject, ActivationSequenceProcessor {
 
-    override val inputs: Matrix = Matrix(stackSize, inputSize)
+    override val inputs: Matrix = Matrix(sequenceSize, inputSize)
 
-    @UserParameter(label = "Activations", description = "Activations in the stack", order = 1)
-    override var activations: Matrix = Matrix(stackSize, inputSize)
+    @UserParameter(label = "Activations", description = "Activations in the sequence", order = 1)
+    override var activations: Matrix = Matrix(sequenceSize, inputSize)
 
     override val activationArray: DoubleArray
         get() = activations.flatten()
@@ -30,14 +30,14 @@ class ActivationStack(val stackSize: Int, inputSize: Int): ArrayLayer(inputSize)
 
     context(Network) override fun accumulateInputs() {
         val matrix = (incomingConnectors.firstOrNull() as? WeightMatrix)?.weightMatrix
-        (incomingConnectors.firstOrNull()?.source as? StackProcessor)?.let { source ->
+        (incomingConnectors.firstOrNull()?.source as? ActivationSequenceProcessor)?.let { source ->
             inputs.add(source.activations.mm(matrix?.transpose()))
         }
     }
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
         activations.copyFrom(Matrix.rand(
-            stackSize, inputSize,
+            sequenceSize, inputSize,
             GaussianDistribution(0.0, 1.0)
         ))
         events.updated.fire()
@@ -52,31 +52,31 @@ class ActivationStack(val stackSize: Int, inputSize: Int): ArrayLayer(inputSize)
         events.updated.fire()
     }
 
-    fun copy() = ActivationStack(stackSize, inputSize).also {
+    fun copy() = ActivationActivationSequence(sequenceSize, inputSize).also {
         it.activations.copyFrom(activations)
     }
 
 
     class CreationTemplate : EditableObject {
 
-        @UserParameter(label = "Stack Size", description = "Number of activation vectors in the stack", order = 1)
-        var stackSize = 7
+        @UserParameter(label = "Sequence Size", description = "Number of activation vectors in the sequence", order = 1)
+        var sequenceSize = 7
 
-        @UserParameter(label = "Input Size", description = "Number of inputs to each activation", order = 2)
+        @UserParameter(label = "Input Size", description = "Length of each activation vector", order = 2)
         var inputSize = 4
 
-        fun create(): ActivationStack {
-            return ActivationStack(stackSize, inputSize)
+        fun create(): ActivationActivationSequence {
+            return ActivationActivationSequence(sequenceSize, inputSize)
         }
 
-        override val name = "Activation Stack"
+        override val name = "Activation Sequence"
 
     }
 }
 
 fun main() {
-    val source = ActivationStack(7, 4)
-    val target = ActivationStack(7, 6)
+    val source = ActivationActivationSequence(7, 4)
+    val target = ActivationActivationSequence(7, 6)
 
     source.activations[0, 0] = 1.0
     source.activations[1, 1] = 1.0

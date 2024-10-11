@@ -131,7 +131,11 @@ abstract class Layer : LocatableModel(), AttributeContainer {
     /**
      * Needed so arrow can be set correctly
      */
-    abstract val bound: Rectangle2D
+    open val bound: Rectangle2D
+        get() = Rectangle2D.Double(
+            locationX - width / 2, locationY - height / 2,
+            width, height
+        )
 
     fun addIncomingConnector(connector: Connector) {
         incomingConnectors.add(connector)

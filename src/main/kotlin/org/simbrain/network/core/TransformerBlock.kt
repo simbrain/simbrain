@@ -1,15 +1,15 @@
 package org.simbrain.network.core
 
+import org.simbrain.network.gui.nodes.StackProcessor
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
 import smile.math.matrix.Matrix
 import smile.stat.distribution.GaussianDistribution
-import java.awt.geom.Rectangle2D
 import kotlin.math.exp
 import kotlin.math.sqrt
 
-class TransformerBlock(val stackSize: Int, inputSize: Int, val hiddenSize: Int): ArrayLayer(inputSize), EditableObject {
+class TransformerBlock(val stackSize: Int, inputSize: Int, val hiddenSize: Int): ArrayLayer(inputSize), EditableObject, StackProcessor {
 
     override val inputs: Matrix = Matrix(stackSize, inputSize)
 
@@ -48,11 +48,9 @@ class TransformerBlock(val stackSize: Int, inputSize: Int, val hiddenSize: Int):
 
     override val size: Int = inputSize
 
-    override val bound: Rectangle2D = Rectangle2D.Double()
-
     context(Network) override fun accumulateInputs() {
         val matrix = (incomingConnectors.firstOrNull() as? WeightMatrix)?.weightMatrix
-        (incomingConnectors.firstOrNull()?.source as? ActivationStack)?.let { source ->
+        (incomingConnectors.firstOrNull()?.source as? StackProcessor)?.let { source ->
             inputs.add(source.activations.mm(matrix?.transpose()))
         }
     }
@@ -122,6 +120,23 @@ class TransformerBlock(val stackSize: Int, inputSize: Int, val hiddenSize: Int):
 
         inputs.mul(0.0)
         events.updated.fire()
+    }
+
+    fun copy() = TransformerBlock(stackSize, inputSize, hiddenSize).also {
+        it.activations.copyFrom(activations)
+        it.K.copyFrom(K)
+        it.Q.copyFrom(Q)
+        it.V.copyFrom(V)
+        it.W1.copyFrom(W1)
+        it.b1.copyFrom(b1)
+        it.W2.copyFrom(W2)
+        it.b2.copyFrom(b2)
+        it.kStack.copyFrom(kStack)
+        it.qStack.copyFrom(qStack)
+        it.vStack.copyFrom(vStack)
+        it.selfAttention.copyFrom(selfAttention)
+        it.feedForwardInput.copyFrom(feedForwardInput)
+        it.feedForwardHidden.copyFrom(feedForwardHidden)
     }
 
 

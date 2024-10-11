@@ -1,5 +1,6 @@
 package org.simbrain.network.core
 
+import org.simbrain.network.gui.nodes.StackProcessor
 import org.simbrain.util.UserParameter
 import org.simbrain.util.copyFrom
 import org.simbrain.util.flatten
@@ -8,9 +9,8 @@ import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.toDoubleArray
 import smile.math.matrix.Matrix
 import smile.stat.distribution.GaussianDistribution
-import java.awt.geom.Rectangle2D
 
-class ActivationStack(val stackSize: Int, inputSize: Int): ArrayLayer(inputSize), EditableObject {
+class ActivationStack(val stackSize: Int, inputSize: Int): ArrayLayer(inputSize), EditableObject, StackProcessor {
 
     override val inputs: Matrix = Matrix(stackSize, inputSize)
 
@@ -28,14 +28,9 @@ class ActivationStack(val stackSize: Int, inputSize: Int): ArrayLayer(inputSize)
 
     override val size: Int = inputSize
 
-    override val bound: Rectangle2D = Rectangle2D.Double()
-
     context(Network) override fun accumulateInputs() {
         val matrix = (incomingConnectors.firstOrNull() as? WeightMatrix)?.weightMatrix
-        (incomingConnectors.firstOrNull()?.source as? ActivationStack)?.let { source ->
-            inputs.add(source.activations.mm(matrix?.transpose()))
-        }
-        (incomingConnectors.firstOrNull()?.source as? TransformerBlock)?.let { source ->
+        (incomingConnectors.firstOrNull()?.source as? StackProcessor)?.let { source ->
             inputs.add(source.activations.mm(matrix?.transpose()))
         }
     }
@@ -55,6 +50,10 @@ class ActivationStack(val stackSize: Int, inputSize: Int): ArrayLayer(inputSize)
         activations.copyFrom(inputs)
         inputs.mul(0.0)
         events.updated.fire()
+    }
+
+    fun copy() = ActivationStack(stackSize, inputSize).also {
+        it.activations.copyFrom(activations)
     }
 
 

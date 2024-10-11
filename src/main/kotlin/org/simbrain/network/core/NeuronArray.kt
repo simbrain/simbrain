@@ -16,7 +16,6 @@ import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
 import smile.math.matrix.Matrix
 import smile.stat.distribution.GaussianDistribution
-import java.awt.geom.Rectangle2D
 
 /**
  * A "neuron array" backed by a Smile Matrix. Stored as a column vector.
@@ -172,12 +171,6 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         )
         events.updated.fire()
     }
-
-    override val bound: Rectangle2D
-        get() = Rectangle2D.Double(
-            locationX - width / 2, locationY - height / 2,
-            width, height
-        )
 
     override val name: String
         get() = "Neuron Array"

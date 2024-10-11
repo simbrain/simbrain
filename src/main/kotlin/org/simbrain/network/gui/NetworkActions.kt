@@ -118,14 +118,12 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val addActivationStackAction = networkPanel.createAction(
         name = "Add Activation Stack...",
         description = "Add an activation stack to the network",
-        keyboardShortcut = KeyCombination('S')
     ) {
         showActivationStackCreationDialog()
     }
     val addTransformerBlockAction = networkPanel.createAction(
         name = "Add Transformer Block...",
         description = "Add a transformer block to the network",
-        keyboardShortcut = Shift + 'T'
     ) {
         showTransformerBlockCreationDialog()
     }

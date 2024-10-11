@@ -115,11 +115,11 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     ) {
         showNeuronArrayCreationDialog()
     }
-    val addActivationStackAction = networkPanel.createAction(
-        name = "Add Activation Stack...",
-        description = "Add an activation stack to the network",
+    val addActivationSequenceAction = networkPanel.createAction(
+        name = "Add Activation Sequence...",
+        description = "Add an activation sequence to the network",
     ) {
-        showActivationStackCreationDialog()
+        showActivationSequenceCreationDialog()
     }
     val addTransformerBlockAction = networkPanel.createAction(
         name = "Add Transformer Block...",

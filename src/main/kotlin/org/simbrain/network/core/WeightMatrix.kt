@@ -1,16 +1,14 @@
 package org.simbrain.network.core
 
 import org.simbrain.network.gui.dialogs.NetworkPreferences.weightRandomizer
+import org.simbrain.network.gui.nodes.ActivationSequenceProcessor
 import org.simbrain.network.learningrules.StaticSynapseRule
 import org.simbrain.network.learningrules.SynapseUpdateRule
 import org.simbrain.network.spikeresponders.NonResponder
 import org.simbrain.network.spikeresponders.SpikeResponder
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.MatrixDataHolder
-import org.simbrain.util.UserParameter
-import org.simbrain.util.broadcastMultiply
-import org.simbrain.util.copyFrom
-import org.simbrain.util.flatten
+import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.workspace.Consumable
@@ -190,7 +188,11 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
             // responder, for example.
             // Populate each row of the psrMatrix with the element-wise product of the pre-synaptic output vector and
             // that row of the matrix
-            psrMatrix.copyFrom(weightMatrix.broadcastMultiply(source.activations))
+            if (source is ActivationSequenceProcessor) {
+                psrMatrix.copyFrom(weightMatrix.broadcastMultiply(source.activations.row(source.activations.nrow() - 1).toMatrix()))
+            } else {
+                psrMatrix.copyFrom(weightMatrix.broadcastMultiply(source.activations))
+            }
         } else {
             spikeResponder.apply(this, spikeResponseData)
         }

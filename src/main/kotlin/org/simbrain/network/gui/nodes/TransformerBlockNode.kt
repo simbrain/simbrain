@@ -43,24 +43,89 @@ import javax.swing.*
 class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: TransformerBlock) :
     ArrayLayerNode(networkPanel, transformerBlock) {
 
-    /**
-     * Main pixel image for activations.
-     */
-    protected val selfAttentionImage = PImage().apply {
+    val selfAttentionImage = PImage().apply {
+        mainNode.addChild(this)
+    }
+
+    val selfAttentionLabel = mainNode.addLabel("Self Attention")
+
+    val sequenceGroup = PNode().apply {
+        mainNode.addChild(this)
+    }
+
+    val qSequenceImage = PImage().apply {
+        sequenceGroup.addChild(this)
+    }
+
+    val qSequenceLabel = sequenceGroup.addLabel("q sequence")
+
+    val kSequenceImage = PImage().apply {
+        sequenceGroup.addChild(this)
+    }
+
+    val kSequenceLabel = sequenceGroup.addLabel("k sequence")
+
+    val vSequenceImage = PImage().apply {
+        sequenceGroup.addChild(this)
+    }
+
+    val vSequenceLabel = sequenceGroup.addLabel("v sequence")
+
+    val matrixGroup = PNode().apply {
+        mainNode.addChild(this)
+    }
+
+    val qMatrixImage = PImage().apply {
+        matrixGroup.addChild(this)
+    }
+
+    val qMatrixLabel = matrixGroup.addLabel("Q matrix")
+
+    val kMatrixImage = PImage().apply {
+        matrixGroup.addChild(this)
+    }
+
+    val kMatrixLabel = matrixGroup.addLabel("K matrix")
+
+    val vMatrixImage = PImage().apply {
+        matrixGroup.addChild(this)
+    }
+
+    val vMatrixLabel = matrixGroup.addLabel("V matrix")
+
+    val feedForwardGroup = PNode().apply {
         mainNode.addChild(this)
     }
 
     val feedForwardInputImage = PImage().apply {
-        mainNode.addChild(this)
+        feedForwardGroup.addChild(this)
     }
+
+    val feedForwardInputLabel = feedForwardGroup.addLabel("FF Input")
 
     val feedForwardHiddenImage = PImage().apply {
-        mainNode.addChild(this)
+        feedForwardGroup.addChild(this)
     }
 
+    val feedForwardHiddenLabel = feedForwardGroup.addLabel("FF Hidden")
+
     val feedForwardOutputImage = PImage().apply {
-        mainNode.addChild(this)
+        feedForwardGroup.addChild(this)
     }
+
+    val feedForwardOutputLabel = feedForwardGroup.addLabel("FF Output")
+
+    val feedForwardW1Image = PImage().apply {
+        feedForwardGroup.addChild(this)
+    }
+
+    val feedForwardW1Label = feedForwardGroup.addLabel("Input -> Hidden")
+
+    val feedForwardW2Image = PImage().apply {
+        feedForwardGroup.addChild(this)
+    }
+
+    val feedForwardW2Label = feedForwardGroup.addLabel("Hidden -> Output")
 
     /**
      * Text corresponding to neuron's (optional) label.
@@ -98,8 +163,8 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
         labelBackground.setBounds(labelText.bounds)
         labelBackground.addChild(labelText)
         addChild(labelBackground)
-        events.labelChanged.on(Dispatchers.Swing) { o, n -> updateTextLabel() }
-        updateTextLabel()
+        events.labelChanged.on(Dispatchers.Swing) { o, n -> updateTextLabels() }
+        updateTextLabels()
 
         events.updated.on {
             events.updateGraphics.fire()
@@ -111,8 +176,6 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
         }
 
         updateImages()
-        this.selfAttentionImage.offset(0.0, infoText.offset.y + infoText.height + 5)
-        this.selfAttentionImage.addBorder()
         updateBorder()
 
         // call once to make sure all the actions are registered
@@ -120,35 +183,48 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
 
     }
 
-    private fun updateFeedForwardImage(image: PImage, matrix: Matrix, location: Point2D) {
+    private fun updateImage(image: PImage, matrix: Matrix, location: Point2D, width: kotlin.Double, height: kotlin.Double, strokeWidth: kotlin.Float = 1f) {
         image.removeAllChildren()
         val img = matrix.flatten().toSimbrainColorImage(matrix.ncol(), matrix.nrow())
         image.image = img
         image.setBounds(
             location.x, location.y,
-            60.0, 60.0
+            width, height
         )
-        image.addBorder()
-        updateTextLabel()
+        image.addBorder(strokeWidth = strokeWidth)
+        updateTextLabels()
     }
 
     private fun updateImages() {
-        this.selfAttentionImage.removeAllChildren()
-        val matrix = transformerBlock.selfAttention
+        updateImage(selfAttentionImage, transformerBlock.selfAttention, point(0.0, infoText.y + infoText.height + 5.0), 200.0, 200.0)
 
-        val img = matrix.flatten().toSimbrainColorImage(matrix.ncol(), matrix.nrow())
-        this.selfAttentionImage.image = img
-        this.selfAttentionImage.setBounds(
-            0.0, 0.0,
-            200.0, 200.0
+        matrixGroup.setOffset(
+            - 120.0 - 10.0 - 10.0,
+            selfAttentionImage.y
         )
-        this.selfAttentionImage.addBorder()
+        updateImage(qMatrixImage, transformerBlock.Q, point(0.0, 0.0), 60.0, 60.0, strokeWidth = 2f)
+        updateImage(kMatrixImage, transformerBlock.K, point(0.0, qMatrixImage.y + 70.0), 60.0, 60.0, strokeWidth = 2f)
+        updateImage(vMatrixImage, transformerBlock.V, point(0.0, kMatrixImage.y + 70.0), 60.0, 60.0, strokeWidth = 2f)
 
-        updateFeedForwardImage(feedForwardInputImage, transformerBlock.feedForwardInput, point(210.0, infoText.y + infoText.height + 5.0))
-        updateFeedForwardImage(feedForwardHiddenImage, transformerBlock.feedForwardHidden, point(210.0, feedForwardInputImage.y + 70.0))
-        updateFeedForwardImage(feedForwardOutputImage, transformerBlock.activations, point(210.0, feedForwardHiddenImage.y + 70.0))
+        sequenceGroup.setOffset(
+            - 60.0 - 10.0,
+            selfAttentionImage.y
+        )
+        updateImage(qSequenceImage, transformerBlock.qStack, point(0.0, 0.0), 60.0, 60.0)
+        updateImage(kSequenceImage, transformerBlock.kStack, point(0.0, qSequenceImage.y + 70.0), 60.0, 60.0)
+        updateImage(vSequenceImage, transformerBlock.vStack, point(0.0, kSequenceImage.y + 70.0), 60.0, 60.0)
 
-        updateTextLabel()
+        feedForwardGroup.setOffset(
+            selfAttentionImage.x + selfAttentionImage.width + 10.0,
+            selfAttentionImage.y
+        )
+        updateImage(feedForwardW1Image, transformerBlock.W1, point(0.0, 30.0), 60.0, 60.0, strokeWidth = 2f)
+        updateImage(feedForwardW2Image, transformerBlock.W2, point(0.0, feedForwardW1Image.y + 70.0), 60.0, 60.0, strokeWidth = 2f)
+        updateImage(feedForwardOutputImage, transformerBlock.activations, point(70.0, 0.0), 60.0, 60.0)
+        updateImage(feedForwardHiddenImage, transformerBlock.feedForwardHidden, point(70.0, feedForwardOutputImage.y + 70.0), 60.0, 60.0)
+        updateImage(feedForwardInputImage, transformerBlock.feedForwardInput,point(70.0, feedForwardHiddenImage.y + 70.0), 60.0, 60.0)
+
+        updateTextLabels()
     }
 
     private fun computeInfoText() = """
@@ -246,7 +322,7 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
     /**
      * Update the text label.
      */
-    fun updateTextLabel() {
+    fun updateTextLabels() {
         if (!transformerBlock.label.isNullOrEmpty()) {
             labelText.font = NeuronNode.NEURON_FONT
             labelText.text = "" + transformerBlock.label
@@ -256,5 +332,39 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
             )
             labelBackground.setBounds(labelText.fullBounds)
         }
+
+        fun PText.centerBelow(image: PImage, padding: kotlin.Double = 0.0) {
+            setBounds(
+                image.x + image.width / 2 - width / 2,
+                image.y + image.height + padding,
+                width,
+                height
+            )
+        }
+
+        qSequenceLabel.centerBelow(qSequenceImage)
+        kSequenceLabel.centerBelow(kSequenceImage)
+        vSequenceLabel.centerBelow(vSequenceImage)
+
+        qMatrixLabel.centerBelow(qMatrixImage)
+        kMatrixLabel.centerBelow(kMatrixImage)
+        vMatrixLabel.centerBelow(vMatrixImage)
+
+        selfAttentionLabel.centerBelow(selfAttentionImage)
+
+        feedForwardInputLabel.centerBelow(feedForwardInputImage)
+        feedForwardHiddenLabel.centerBelow(feedForwardHiddenImage)
+        feedForwardOutputLabel.centerBelow(feedForwardOutputImage)
+        feedForwardW1Label.centerBelow(feedForwardW1Image)
+        feedForwardW2Label.centerBelow(feedForwardW2Image)
+    }
+
+    fun PNode.addLabel(text: String): PText {
+        val label = PText().apply {
+            this.text = text
+            font = INFO_FONT
+        }
+        addChild(label)
+        return label
     }
 }

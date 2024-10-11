@@ -10,7 +10,7 @@ import org.simbrain.util.toDoubleArray
 import smile.math.matrix.Matrix
 import smile.stat.distribution.GaussianDistribution
 
-class ActivationActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inputSize), EditableObject, ActivationSequenceProcessor {
+class ActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inputSize), EditableObject, ActivationSequenceProcessor {
 
     override val inputs: Matrix = Matrix(sequenceSize, inputSize)
 
@@ -52,7 +52,7 @@ class ActivationActivationSequence(val sequenceSize: Int, inputSize: Int): Array
         events.updated.fire()
     }
 
-    fun copy() = ActivationActivationSequence(sequenceSize, inputSize).also {
+    fun copy() = ActivationSequence(sequenceSize, inputSize).also {
         it.activations.copyFrom(activations)
     }
 
@@ -65,8 +65,8 @@ class ActivationActivationSequence(val sequenceSize: Int, inputSize: Int): Array
         @UserParameter(label = "Input Size", description = "Length of each activation vector", order = 2)
         var inputSize = 4
 
-        fun create(): ActivationActivationSequence {
-            return ActivationActivationSequence(sequenceSize, inputSize)
+        fun create(): ActivationSequence {
+            return ActivationSequence(sequenceSize, inputSize)
         }
 
         override val name = "Activation Sequence"
@@ -75,8 +75,8 @@ class ActivationActivationSequence(val sequenceSize: Int, inputSize: Int): Array
 }
 
 fun main() {
-    val source = ActivationActivationSequence(7, 4)
-    val target = ActivationActivationSequence(7, 6)
+    val source = ActivationSequence(7, 4)
+    val target = ActivationSequence(7, 6)
 
     source.activations[0, 0] = 1.0
     source.activations[1, 1] = 1.0

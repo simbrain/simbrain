@@ -9,6 +9,7 @@ import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PAffineTransform
 import org.piccolo2d.util.PBounds
 import org.simbrain.network.gui.nodes.ScreenElement
+import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.event.MouseEvent
 import java.awt.geom.Rectangle2D
@@ -34,10 +35,11 @@ fun Collection<PNode>.unionOfGlobalFullBounds() = map { it.globalFullBounds }.fo
 /**
  * Add a black border around a PImage. Must be called after the image's bounds have been set.
  */
-fun PImage.addBorder(): PNode {
+fun PImage.addBorder(strokeWidth: Float = 1f): PNode {
     val (x, y, w, h) = bounds
     val box = PPath.createRectangle(x, y, w, h)
     box.strokePaint = Color.BLACK
+    box.stroke = BasicStroke(strokeWidth)
     box.paint = null
     addChild(box)
     return box

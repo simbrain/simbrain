@@ -60,12 +60,12 @@ fun NetworkPanel.showNeuronArrayCreationDialog() {
     }.display()
 }
 
-fun NetworkPanel.showActivationStackCreationDialog() {
-    ActivationActivationSequence.CreationTemplate().createEditorDialog {
-        val activationStack = it.create()
-        network.addNetworkModel(activationStack)
+fun NetworkPanel.showActivationSequenceCreationDialog() {
+    ActivationSequence.CreationTemplate().createEditorDialog {
+        val activationSequence = it.create()
+        network.addNetworkModel(activationSequence)
     }.also {
-        it.title = "Create Activation Stack"
+        it.title = "Create Activation Sequence"
     }.display()
 }
 

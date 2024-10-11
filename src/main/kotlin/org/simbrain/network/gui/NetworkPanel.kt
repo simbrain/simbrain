@@ -300,7 +300,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             is Neuron -> createNode(model)
             is Synapse -> createNode(model)
             is NeuronArray -> createNode(model)
-            is ActivationActivationSequence -> createNode(model)
+            is ActivationSequence -> createNode(model)
             is TransformerBlock -> createNode(model)
             is NeuronCollection -> createNode(model)
             is NeuronGroup -> createNode(model)
@@ -352,7 +352,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
     suspend fun createNode(neuronArray: NeuronArray) = addScreenElement { NeuronArrayNode(this, neuronArray) }
 
-    suspend fun createNode(activationSequence: ActivationActivationSequence) = addScreenElement { ActivationStackNode(this, activationSequence) }
+    suspend fun createNode(activationSequence: ActivationSequence) = addScreenElement { ActivationStackNode(this, activationSequence) }
 
     suspend fun createNode(transformerBlock: TransformerBlock) = addScreenElement { TransformerBlockNode(this, transformerBlock) }
 

@@ -23,7 +23,7 @@ import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PImage
 import org.piccolo2d.nodes.PText
-import org.simbrain.network.core.ActivationActivationSequence
+import org.simbrain.network.core.ActivationSequence
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.randomizeBiases
 import org.simbrain.network.gui.NetworkPanel
@@ -43,7 +43,7 @@ import javax.swing.*
  * The current pnode representation for all [Layer] objects. May be broken out into subtypes for different
  * subclasses of Layer.
  */
-class ActivationStackNode(networkPanel: NetworkPanel, val activationSequence: ActivationActivationSequence) :
+class ActivationStackNode(networkPanel: NetworkPanel, val activationSequence: ActivationSequence) :
     ArrayLayerNode(networkPanel, activationSequence) {
 
     /**
@@ -235,7 +235,7 @@ class ActivationStackNode(networkPanel: NetworkPanel, val activationSequence: Ac
     override val propertyDialog: StandardDialog
         get() = activationSequence.createEditorDialog { updateInfoText() }
 
-    override val model: ActivationActivationSequence
+    override val model: ActivationSequence
         get() = activationSequence
 
     /**

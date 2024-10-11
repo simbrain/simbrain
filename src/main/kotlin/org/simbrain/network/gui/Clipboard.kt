@@ -108,7 +108,7 @@ object Clipboard {
                         val copy: LocatableModel = item.copy()
                         ret.add(copy)
                     }
-                    is ActivationActivationSequence -> {
+                    is ActivationSequence -> {
                         val copy: LocatableModel = item.copy()
                         ret.add(copy)
                     }

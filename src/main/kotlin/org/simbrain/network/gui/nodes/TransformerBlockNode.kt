@@ -50,7 +50,9 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
     val selfAttentionLabel = mainNode.addLabel("Self Attention")
 
     val sequenceGroup = PNode().apply {
-        mainNode.addChild(this)
+        if (transformerBlock.sequenceVisibility) {
+            mainNode.addChild(this)
+        }
     }
 
     val qSequenceImage = PImage().apply {
@@ -72,7 +74,9 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
     val vSequenceLabel = sequenceGroup.addLabel("v sequence")
 
     val matrixGroup = PNode().apply {
-        mainNode.addChild(this)
+        if (transformerBlock.matrixVisibility) {
+            mainNode.addChild(this)
+        }
     }
 
     val qMatrixImage = PImage().apply {
@@ -94,7 +98,9 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
     val vMatrixLabel = matrixGroup.addLabel("V matrix")
 
     val feedForwardGroup = PNode().apply {
-        mainNode.addChild(this)
+        if (transformerBlock.feedForwardVisibility) {
+            mainNode.addChild(this)
+        }
     }
 
     val feedForwardInputImage = PImage().apply {
@@ -198,31 +204,52 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
     private fun updateImages() {
         updateImage(selfAttentionImage, transformerBlock.selfAttention, point(0.0, infoText.y + infoText.height + 5.0), 200.0, 200.0)
 
-        matrixGroup.setOffset(
-            - 120.0 - 10.0 - 10.0,
-            selfAttentionImage.y
-        )
-        updateImage(qMatrixImage, transformerBlock.Q, point(0.0, 0.0), 60.0, 60.0, strokeWidth = 2f)
-        updateImage(kMatrixImage, transformerBlock.K, point(0.0, qMatrixImage.y + 70.0), 60.0, 60.0, strokeWidth = 2f)
-        updateImage(vMatrixImage, transformerBlock.V, point(0.0, kMatrixImage.y + 70.0), 60.0, 60.0, strokeWidth = 2f)
+        if (transformerBlock.matrixVisibility) {
+            if (indexOfChild(matrixGroup) == -1) {
+                mainNode.addChild(matrixGroup)
+            }
+            matrixGroup.setOffset(
+                -60.0 - 10.0 - (if (transformerBlock.sequenceVisibility) (60.0 + 10.0) else 0.0),
+                selfAttentionImage.y
+            )
+            updateImage(qMatrixImage, transformerBlock.Q, point(0.0, 0.0), 60.0, 60.0, strokeWidth = 2f)
+            updateImage(kMatrixImage, transformerBlock.K, point(0.0, qMatrixImage.y + 70.0), 60.0, 60.0, strokeWidth = 2f)
+            updateImage(vMatrixImage, transformerBlock.V, point(0.0, kMatrixImage.y + 70.0), 60.0, 60.0, strokeWidth = 2f)
+        } else {
+            matrixGroup.removeFromParent()
+        }
 
-        sequenceGroup.setOffset(
-            - 60.0 - 10.0,
-            selfAttentionImage.y
-        )
-        updateImage(qSequenceImage, transformerBlock.qStack, point(0.0, 0.0), 60.0, 60.0)
-        updateImage(kSequenceImage, transformerBlock.kStack, point(0.0, qSequenceImage.y + 70.0), 60.0, 60.0)
-        updateImage(vSequenceImage, transformerBlock.vStack, point(0.0, kSequenceImage.y + 70.0), 60.0, 60.0)
+        if (transformerBlock.sequenceVisibility) {
+            if (indexOfChild(sequenceGroup) == -1) {
+                mainNode.addChild(sequenceGroup)
+            }
+            sequenceGroup.setOffset(
+                - 60.0 - 10.0,
+                selfAttentionImage.y
+            )
+            updateImage(qSequenceImage, transformerBlock.qStack, point(0.0, 0.0), 60.0, 60.0)
+            updateImage(kSequenceImage, transformerBlock.kStack, point(0.0, qSequenceImage.y + 70.0), 60.0, 60.0)
+            updateImage(vSequenceImage, transformerBlock.vStack, point(0.0, kSequenceImage.y + 70.0), 60.0, 60.0)
+        } else {
+            sequenceGroup.removeFromParent()
+        }
 
-        feedForwardGroup.setOffset(
-            selfAttentionImage.x + selfAttentionImage.width + 10.0,
-            selfAttentionImage.y
-        )
-        updateImage(feedForwardW1Image, transformerBlock.W1, point(0.0, 30.0), 60.0, 60.0, strokeWidth = 2f)
-        updateImage(feedForwardW2Image, transformerBlock.W2, point(0.0, feedForwardW1Image.y + 70.0), 60.0, 60.0, strokeWidth = 2f)
-        updateImage(feedForwardOutputImage, transformerBlock.activations, point(70.0, 0.0), 60.0, 60.0)
-        updateImage(feedForwardHiddenImage, transformerBlock.feedForwardHidden, point(70.0, feedForwardOutputImage.y + 70.0), 60.0, 60.0)
-        updateImage(feedForwardInputImage, transformerBlock.feedForwardInput,point(70.0, feedForwardHiddenImage.y + 70.0), 60.0, 60.0)
+        if (transformerBlock.feedForwardVisibility) {
+            if (indexOfChild(feedForwardGroup) == -1) {
+                mainNode.addChild(feedForwardGroup)
+            }
+            feedForwardGroup.setOffset(
+                selfAttentionImage.x + selfAttentionImage.width + 10.0,
+                selfAttentionImage.y
+            )
+            updateImage(feedForwardW1Image, transformerBlock.W1, point(0.0, 30.0), 60.0, 60.0, strokeWidth = 2f)
+            updateImage(feedForwardW2Image, transformerBlock.W2, point(0.0, feedForwardW1Image.y + 70.0), 60.0, 60.0, strokeWidth = 2f)
+            updateImage(feedForwardOutputImage, transformerBlock.activations, point(70.0, 0.0), 60.0, 60.0)
+            updateImage(feedForwardHiddenImage, transformerBlock.feedForwardHidden, point(70.0, feedForwardOutputImage.y + 70.0), 60.0, 60.0)
+            updateImage(feedForwardInputImage, transformerBlock.feedForwardInput,point(70.0, feedForwardHiddenImage.y + 70.0), 60.0, 60.0)
+        } else {
+            feedForwardGroup.removeFromParent()
+        }
 
         updateTextLabels()
     }

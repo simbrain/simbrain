@@ -1,11 +1,11 @@
 package org.simbrain.network.core
 
+import org.simbrain.network.gui.dialogs.NetworkPreferences.weightRandomizer
 import org.simbrain.network.gui.nodes.ActivationSequenceProcessor
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
 import smile.math.matrix.Matrix
-import smile.stat.distribution.GaussianDistribution
 import kotlin.math.exp
 import kotlin.math.sqrt
 
@@ -15,6 +15,27 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
 
     @UserParameter(label = "Activations", description = "Activations in the sequence", order = 1)
     override var activations: Matrix = Matrix(sequenceSize, inputSize)
+
+    @UserParameter(label = "Matrix Visibility", description = "Show the QKV matrices", order = 10)
+    var matrixVisibility = false
+        set(value) {
+            field = value
+            events.updateGraphics.fire()
+        }
+
+    @UserParameter(label = "Sequence Visibility", description = "Show the qkv sequences", order = 11)
+    var sequenceVisibility = false
+        set(value) {
+            field = value
+            events.updateGraphics.fire()
+        }
+
+    @UserParameter(label = "Feedforward Visibility", description = "Show the feedforward network", order = 12)
+    var feedForwardVisibility = false
+        set(value) {
+            field = value
+            events.updateGraphics.fire()
+        }
 
     override val activationArray: DoubleArray
         get() = activations.flatten()
@@ -56,26 +77,10 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
     }
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
-        Q.copyFrom(Matrix.rand(
-            inputSize, inputSize,
-            GaussianDistribution(0.0, 1.0)
-        ))
-        K.copyFrom(Matrix.rand(
-            inputSize, inputSize,
-            GaussianDistribution(0.0, 1.0)
-        ))
-        V.copyFrom(Matrix.rand(
-            inputSize, inputSize,
-            GaussianDistribution(0.0, 1.0)
-        ))
-        W1.copyFrom(Matrix.rand(
-            inputSize, hiddenSize,
-            GaussianDistribution(0.0, 1.0)
-        ))
-        W2.copyFrom(Matrix.rand(
-            hiddenSize, inputSize,
-            GaussianDistribution(0.0, 1.0)
-        ))
+        fun Matrix.applyRandomizer() {
+            randomize((randomizer ?: weightRandomizer))
+        }
+        listOf(K, Q, V, W1, b1, W2, b2).forEach { it.applyRandomizer() }
         events.updated.fire()
     }
 

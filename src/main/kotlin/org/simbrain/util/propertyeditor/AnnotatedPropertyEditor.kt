@@ -235,6 +235,11 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
                 isConsistent
             ) as ParameterWidget<O, T>
 
+            is Array<*> -> StringArrayWidget(
+                this@AnnotatedPropertyEditor,
+                userParameter as GuiEditable<O, Array<String>>,
+                isConsistent
+            ) as ParameterWidget<O, T>
 
             is Matrix -> MatrixWidget(
                 this@AnnotatedPropertyEditor,

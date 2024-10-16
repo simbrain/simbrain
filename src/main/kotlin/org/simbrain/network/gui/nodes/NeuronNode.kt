@@ -473,7 +473,7 @@ class NeuronNode(net: NetworkPanel, val neuron: Neuron) : ScreenElement(net) {
         /**
          * Default text visibility threshold.
          */
-        private const val TEXT_VISIBILITY_THRESHOLD = 0.5
+        const val TEXT_VISIBILITY_THRESHOLD = 0.5
 
         /**
          * Diameter of neuron.

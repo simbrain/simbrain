@@ -2,10 +2,7 @@ package org.simbrain.util.propertyeditor
 
 import org.simbrain.util.*
 import org.simbrain.util.SimbrainConstants.NULL_STRING
-import org.simbrain.util.table.MatrixDataFrame
-import org.simbrain.util.table.SimbrainTablePanel
-import org.simbrain.util.table.createBasicDataFrameFromColumn
-import org.simbrain.util.table.createFrom2DArray
+import org.simbrain.util.table.*
 import org.simbrain.util.widgets.ChoicesWithNull
 import org.simbrain.util.widgets.ColorSelector
 import org.simbrain.util.widgets.YesNoNull
@@ -861,6 +858,65 @@ class BooleanArrayWidget<O : EditableObject>(
             model.getBooleanColumn(0)
         } else {
             model.getRow<Boolean>(0).toBooleanArray()
+        }
+
+    override fun refresh(property: KProperty<*>) {
+        parameter.update(UpdateFunctionContext(
+            editor,
+            parameter,
+            property,
+            enableWidgetProvider = { enabled ->
+                widget.isEnabled = enabled
+            },
+            widgetVisibilityProvider = { visible ->
+                widget.isVisible = visible
+            }
+        ))
+    }
+}
+
+class StringArrayWidget<O : EditableObject>(
+    val editor: AnnotatedPropertyEditor<O>,
+    parameter: GuiEditable<O, Array<String>>,
+    isConsistent: Boolean
+) : ParameterWidget<O, Array<String>>(parameter, isConsistent) {
+
+    private var model = if (parameter.columnMode) {
+        parameter.value.let { data ->
+            BasicDataFrame(
+                data.map { mutableListOf(it as Any?) }.toMutableList(),
+                columns = mutableListOf(Column("Column 1", Column.DataType.StringType))
+            )
+        }
+    } else {
+        parameter.value.let { data ->
+            BasicDataFrame(
+                mutableListOf(data.toMutableList()),
+                columns = data.mapIndexed { index, s -> Column("Column ${index + 1}", Column.DataType.StringType) }.toMutableList()
+            )
+        }
+    }
+
+    override val widget by lazy {
+        JPanel().apply {
+            layout = BorderLayout()
+            SimbrainTablePanel(
+                model, useDefaultToolbarAndMenu = false, useHeaders = false,
+                usePadding = false
+            ).also {
+                it.table.tableHeader = null
+                add(it)
+                minimumSize = Dimension(200, min((model.rowCount + 1) * 17 + 2, 100))
+                preferredSize = Dimension(200, min((model.rowCount + 1) * 17 + 2, 100))
+            }
+        }
+    }
+
+    override val value: Array<String>
+        get() = if (parameter.columnMode) {
+            model.getStringColumn(0)
+        } else {
+            model.getRow<String>(0).toTypedArray()
         }
 
     override fun refresh(property: KProperty<*>) {

@@ -62,6 +62,9 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
             events.updated.fire()
         }
 
+    @UserParameter(label = "Labels", description = "Labels for each neuron", order = 2)
+    var labelArray: Array<String> = Array(inputSize) { "" }
+
     @get:Producible
     @UserParameter("Bias Array", "Biases", order = 10)
     override var biases: Matrix = Matrix(inputSize, 1)
@@ -102,9 +105,20 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         }
 
     @UserParameter(
+        label = "Circle Mode",
+        description = "If true, show activations as neuron circles, ",
+        order = 11
+    )
+    var circleMode = false
+        set(value) {
+            field = value
+            (events as NeuronArrayEvents).visualPropertiesChanged.fire()
+        }
+
+    @UserParameter(
         label = "Vertical Layout",
         description = "If true, orient the array vertically, otherwise horizontally",
-        order = 11
+        order = 20
     )
     var verticalLayout = false
         set(value) {
@@ -112,7 +126,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
             (events as NeuronArrayEvents).visualPropertiesChanged.fire()
         }
 
-    @UserParameter(label = "Biases Visible", description = "If true, show biases.", order = 12)
+    @UserParameter(label = "Biases Visible", description = "If true, show biases.", order = 30)
     var isShowBias = false
         set(showBias) {
             field = showBias
@@ -293,5 +307,4 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
             .reduceOrNull { base, add -> SimbrainMath.addVector(base, add) }
             ?: DoubleArray(size)
 
-    fun getLabelArray() = (0 until size).map { it.toString() }.toTypedArray()
 }

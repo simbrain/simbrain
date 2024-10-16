@@ -22,13 +22,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PImage
+import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
+import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.randomizeBiases
 import org.simbrain.network.events.NeuronArrayEvents
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.alignMenu
 import org.simbrain.network.gui.createCouplingMenu
+import org.simbrain.network.gui.nodes.NeuronNode.Companion.DIAMETER
+import org.simbrain.network.gui.nodes.NeuronNode.Companion.TEXT_VISIBILITY_THRESHOLD
 import org.simbrain.network.gui.spaceMenu
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.util.*
@@ -38,11 +42,13 @@ import org.simbrain.util.table.SimbrainTablePanel
 import org.simbrain.workspace.couplings.getConsumer
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
+import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.event.ActionEvent
 import java.util.*
 import javax.swing.*
 import kotlin.math.ceil
+import kotlin.math.min
 import kotlin.math.sqrt
 
 /**
@@ -52,18 +58,58 @@ import kotlin.math.sqrt
 class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) :
     ArrayLayerNode(networkPanel, neuronArray) {
 
+    val imageNodeGroup = PNode().apply {
+        if (!neuronArray.circleMode) {
+            mainNode.addChild(this)
+        }
+    }
+
+    val neuronCircleGroup = PNode().apply {
+        if (neuronArray.circleMode) {
+            mainNode.addChild(this)
+        }
+    }
+
+    val neuronCircles by lazy {
+        neuronArray.activationArray.map { activation ->
+            NeuronCircleNode().also { circle ->
+                circle.activation = activation
+            }
+        }.onEach {
+            neuronCircleGroup.addChild(it)
+        }
+    }
+
+    private fun layoutNeuronCircles() {
+        if (!neuronArray.circleMode) return
+        val ncol = if (neuronArray.gridMode) {
+            ceil(sqrt(neuronArray.size.toDouble())).toInt()
+        } else {
+            neuronArray.size
+        }
+        val offset = 50.0
+        neuronCircles.forEachIndexed { i, circle ->
+            val row = i / ncol
+            val col = i % ncol
+            circle.setOffset(
+                col * offset,
+                row * offset
+            )
+        }
+    }
+
     /**
      * Main pixel image for activations.
      */
     protected val activationImage = PImage().apply {
-        mainNode.addChild(this)
+        imageNodeGroup.addChild(this)
     }
 
     /**
      * Image with spikes and transparent background overlaid on the activation image for spiking neuron arrays.
      */
     private val spikeImage = PImage().apply {
-        mainNode.addChild(this)
+        imageNodeGroup.addChild(this)
     }
 
     protected val biasImage = PImage()
@@ -86,15 +132,16 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             field = value
             updateActivationImage()
             updateBorder()
+            layoutNeuronCircles()
         }
 
     private var showBias = false
         set(value) {
             if (value != field) {
                 if (value) {
-                    mainNode.addChild(biasImage)
+                    imageNodeGroup.addChild(biasImage)
                 } else {
-                    mainNode.removeChild(biasImage)
+                    imageNodeGroup.removeChild(biasImage)
                 }
             }
             field = value
@@ -157,6 +204,9 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                 mainNode.removeChild(spikeImage)
             }
         }
+        events.clampChanged.on(Dispatchers.Swing) {
+            updateActivationImage()
+        }
         updateActivationImage()
         activationImage.offset(0.0, infoText.offset.y + infoText.height + 5)
         spikeImage.offset(0.0, infoText.offset.y + infoText.height + 5)
@@ -173,8 +223,8 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         spikeImage.removeAllChildren()
         biasImage.removeAllChildren()
         val activations = neuronArray.activations.toDoubleArray()
-        if (gridMode) {
-            // "Grid" case
+
+        fun renderGridImages() {
             val len = ceil(sqrt(activations.size.toDouble())).toInt()
             val img = activations.toSimbrainColorImage(len, len)
             activationImage.image = img
@@ -200,8 +250,9 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                 )
                 biasImage.addBorder()
             }
-        } else {
-            // "Flat" case
+        }
+
+        fun renderFlatImages() {
             val img = activations.toSimbrainColorImage(activations.size, 1)
             activationImage.image = img
             activationImage.setBounds(
@@ -225,6 +276,33 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                     infoText.width, flatPixelArrayHeight.toDouble()
                 )
                 biasImage.addBorder()
+            }
+        }
+
+        fun renderNeuronCircles() {
+            neuronCircles.forEachIndexed { i, circle ->
+                circle.activation = activations[i]
+                circle.setClamped(neuronArray.isClamped)
+                circle.setLabel(neuronArray.labelArray[i])
+            }
+        }
+
+        if (neuronArray.circleMode) {
+            if (mainNode.indexOfChild(neuronCircleGroup) == -1) {
+                mainNode.addChild(neuronCircleGroup)
+                neuronCircleGroup.setOffset(DIAMETER / 2.0, DIAMETER / 2.0 + 20.0 + infoText.height)
+            }
+            mainNode.removeChild(imageNodeGroup)
+            renderNeuronCircles()
+        } else {
+            if (mainNode.indexOfChild(imageNodeGroup) == -1) {
+                mainNode.addChild(imageNodeGroup)
+            }
+            mainNode.removeChild(neuronCircleGroup)
+            if (gridMode) {
+                renderGridImages()
+            } else {
+                renderFlatImages()
             }
         }
         updateTextLabel()
@@ -450,5 +528,82 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             )
             labelBackground.setBounds(labelText.fullBounds)
         }
+    }
+
+    inner class NeuronCircleNode: PPath.Double() {
+        val circle = createEllipse(
+            (0 - DIAMETER / 2).toFloat(),
+            (0 - DIAMETER / 2).toFloat(),
+            DIAMETER.toFloat(),
+            DIAMETER.toFloat()
+        ).also { addChild(it) }
+
+        val activationText = PText().also {
+            it.font = NeuronNode.NEURON_FONT_BOLD
+            addChild(it)
+        }
+
+        val labelText = PText().also {
+            it.font = NeuronNode.NEURON_FONT
+            addChild(it)
+        }
+
+        private var isTextVisible = networkPanel.scalingFactor > TEXT_VISIBILITY_THRESHOLD
+            set(value) {
+                if (field != value) {
+                    field = value
+                    if (value) {
+                        drawActivation()
+                        addChild(activationText)
+                        addChild(labelText)
+                    } else {
+                        removeChild(activationText)
+                        removeChild(labelText)
+                    }
+                }
+            }
+
+        var activation: kotlin.Double = 0.0
+            set(value) {
+                field = value
+                drawActivation()
+            }
+
+        private fun drawActivation() {
+            circle.paint = activation.toSimbrainColor(neuronArray.updateRule.let {
+                it.graphicalLowerBound..it.graphicalUpperBound
+            }).toColor()
+
+            if (isTextVisible) {
+                activationText.text = if (activation > -0.95 && activation < 0.95) {
+                    activation.format(1).replace("0.", ".").replace(Regex("^-?.0$"), "0")
+                } else {
+                    activation.format(0)
+                }
+
+                val targetWidth = min(DIAMETER.toDouble() * 0.8, activationText.width)
+                activationText.scale = targetWidth / activationText.width
+                activationText.centerBoundsOnPoint(circle.bounds.x + circle.bounds.width / 2, circle.bounds.y + circle.bounds.height / 2)
+            }
+        }
+
+        fun setLabel(label: String) {
+            labelText.text = label
+            labelText.centerBoundsOnPoint(circle.bounds.x + circle.bounds.width / 2, circle.bounds.y - 8.0)
+        }
+
+        fun setClamped(clamped: Boolean) {
+            if (clamped) {
+                circle.stroke = BasicStroke(2.0f)
+            } else {
+                circle.stroke = BasicStroke(1.0f)
+            }
+        }
+
+        override fun paint(paintContext: PPaintContext?) {
+            isTextVisible = networkPanel.scalingFactor > TEXT_VISIBILITY_THRESHOLD
+            super.paint(paintContext)
+        }
+
     }
 }

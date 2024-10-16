@@ -156,7 +156,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     private val forceZoomToFitPage = PreferenceChangeListener { network.events.zoomToFitPage.fire() }
 
     /**
-     * Called when preferences are updated.
+     * Called when preferences are updated. Ensures preference changes are applied immediately.
      */
     val preferenceLoader = {
 

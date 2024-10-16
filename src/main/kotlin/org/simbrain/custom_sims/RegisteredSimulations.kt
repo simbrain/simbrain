@@ -68,7 +68,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
     dir("Cognitive Maps") {
         item("Agent Trails") { kAgentTrails }
         //item("RandomizedPursuer") { RandomizedPursuer() }
-        item("Generic 3 objects") { cogMap3Objects }
+        item("Three object recurrent") { cogMap3Objects }
         // item("ModularOscillatoryNetwork") {ModularOscillatoryNetwork()}
         //item("KuramotoOscillators") { KuramotoOscillators() }
     }

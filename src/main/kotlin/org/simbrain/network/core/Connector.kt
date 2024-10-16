@@ -36,7 +36,7 @@ abstract class Connector(var source: Layer, var target: Layer) : NetworkModel(),
     abstract val psrMatrix: Matrix
 
     /**
-     * Returns the row sums of the psr matrix, which correspond in the connectionist case to the standard produce of an
+     * Returns the row sums of the psr matrix, which correspond in the connectionist case to the standard product of an
      * input vector and a weight matrix, and in the spiking case corresponds to the sum of post-synaptic responses along
      * the dendrite of each output neuron.
      */

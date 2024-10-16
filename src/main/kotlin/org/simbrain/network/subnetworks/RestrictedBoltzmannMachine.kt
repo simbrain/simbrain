@@ -67,7 +67,7 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
         visibleLayer = NeuronArray(numVisibleNodes).apply {
             label = "Visible layer"
             gridMode = true
-            isShowBias = true
+            isShowBias = false
             updateRule = SigmoidalRule()
         }
         this.addModel(visibleLayer)

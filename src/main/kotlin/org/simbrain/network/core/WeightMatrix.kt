@@ -184,8 +184,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
     context(Network)
     override fun updatePSR() {
         if (spikeResponder is NonResponder) {
-            // For "connectionist" case. Unusual to need this, but could happen with excitatory inputs and no spike
-            // responder, for example.
+            // For "connectionist" case. One "half" of a matrix product.
             // Populate each row of the psrMatrix with the element-wise product of the pre-synaptic output vector and
             // that row of the matrix
             if (source is ActivationSequenceProcessor) {

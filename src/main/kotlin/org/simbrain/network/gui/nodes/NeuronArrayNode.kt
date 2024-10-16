@@ -283,7 +283,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             contextMenu.add(switchStyle)
 
             val switchOrientation: Action = networkPanel.createAction(
-                name = "Switch to ${if (neuronArray.verticalLayout) "Horizontal" else "Vertical"} Layout",
+                name = "Switch to ${if (neuronArray.verticalLayout) "horizontal" else "vertical"} layout",
                 description = "Toggle horizontal / vertical layout"
             ) {
                 networkPanel.selectionManager

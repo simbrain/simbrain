@@ -179,6 +179,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         events.visualPropertiesChanged.on(Dispatchers.Swing) {
             gridMode = neuronArray.gridMode
             showBias = neuronArray.isShowBias
+            networkPanel.network.events.zoomToFitPage.fire()
         }
         gridMode = neuronArray.gridMode
         showBias = neuronArray.isShowBias
@@ -208,6 +209,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             updateActivationImage()
         }
         updateActivationImage()
+        neuronCircleGroup.setOffset(DIAMETER / 2.0, DIAMETER / 2.0 + 20.0 + infoText.height)
         activationImage.offset(0.0, infoText.offset.y + infoText.height + 5)
         spikeImage.offset(0.0, infoText.offset.y + infoText.height + 5)
         activationImage.addBorder()
@@ -290,7 +292,6 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         if (neuronArray.circleMode) {
             if (mainNode.indexOfChild(neuronCircleGroup) == -1) {
                 mainNode.addChild(neuronCircleGroup)
-                neuronCircleGroup.setOffset(DIAMETER / 2.0, DIAMETER / 2.0 + 20.0 + infoText.height)
             }
             mainNode.removeChild(imageNodeGroup)
             renderNeuronCircles()
@@ -369,6 +370,16 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                     .forEach { it.verticalLayout = !it.verticalLayout }
             }
             contextMenu.add(switchOrientation)
+
+            val toggleCircleMode: Action = networkPanel.createAction(
+                name = "Toggle circle mode",
+                description = "Toggle activation rendering mode between circle and image",
+            ) {
+                networkPanel.selectionManager
+                    .filterSelectedModels<NeuronArray>()
+                    .forEach { it.circleMode = !it.circleMode }
+            }
+            contextMenu.add(toggleCircleMode)
 
             val toggleShowBias: Action = networkPanel.createAction(
                 name = "Toggle bias visibility",

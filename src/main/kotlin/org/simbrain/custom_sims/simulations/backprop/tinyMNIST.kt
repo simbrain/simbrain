@@ -42,9 +42,12 @@ val tinyMNIST = newSim {
     bp.trainer.updateType = SupervisedTrainer.UpdateMethod.Batch(35)
 
     bp.inputLayer.gridMode = true
-    bp.inputLayer.offset(-300.0, -250.0)
+    bp.inputLayer.offset(-350.0, -225.0)
     bp.inputLayer.inputData = csvToDouble2DArray(testInputsCSV).toMatrix()
-    bp.outputLayer.offset(-300.0, 230.0)
+    bp.outputLayer.offset(-350.0, 225.0)
+    bp.outputLayer.circleMode = true
+    bp.outputLayer.gridMode = true
+    bp.outputLayer.labelArray = Array(10) {"$it"}
 
     net.addNetworkModels(bp).awaitAll()
 
@@ -53,26 +56,11 @@ val tinyMNIST = newSim {
         place(networkComponent, 0, 0, 700, 700)
     }
 
-    // Label
-    val outputClassLabel = NetworkTextObject().apply {
-        fontSize = 18
-    }
-    net.addNetworkModel(outputClassLabel)?.await()
-    outputClassLabel.location = point(-77, -175)
-
-    // Update the text label
-    bp.outputLayer.events.updateGraphics.on(dispatcher = Swing) {
-        outputClassLabel.text = "Classification: ${bp.outputLayer
-            .activationArray.withIndex().maxByOrNull {it.value}?.index}"
-    }
-
     // Iterate trainer and network once to get it to display a number in the input
     with(net) { with(bp) {
         bp.trainer.trainOnce()
         net.update()
     } }
-
-
 
 //    // Adding a docviewer
 //    val docViewer = addDocViewer(

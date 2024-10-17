@@ -44,6 +44,9 @@ fun DoubleArray.toSimbrainColor() = map { it.toSimbrainColor() }.toIntArray()
  * Width * height must be less than the array size.
  */
 fun DoubleArray.toSimbrainColorImage(width: Int, height: Int) = IntArray(width * height).let {
+    if (this.size < it.size) {
+        it.fill(Color.lightGray.rgb, this.size, it.size)
+    }
     System.arraycopy(toSimbrainColor(), 0, it, 0, min(size, width * height))
     val colorModel: ColorModel = DirectColorModel(24, 0xff0000, 0x00ff00, 0x0000ff)
     val sampleModel = colorModel.createCompatibleSampleModel(width, height)

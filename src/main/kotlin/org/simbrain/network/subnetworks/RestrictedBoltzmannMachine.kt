@@ -76,7 +76,7 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
         hiddenLayer = NeuronArray(numHiddenNodes).apply {
             label = "Hidden Layer"
             gridMode = true
-            isShowBias = true
+            isShowBias = false
             updateRule = SigmoidalRule()
         }
         this.addModel(hiddenLayer)

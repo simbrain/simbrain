@@ -28,6 +28,8 @@ val roomSchemaSim = newSim {
     // Competitive network
     val rbm = RestrictedBoltzmannMachine(42, 64)
     network.addNetworkModel(rbm)?.await()
+    rbm.visibleLayer.circleMode = true
+    rbm.visibleLayer.offset(-100.0, 0.0)
 
     // Neuron Collection and Its Configurations
     val nc = network.addNeuronCollection(42).apply {
@@ -36,9 +38,7 @@ val roomSchemaSim = newSim {
         isAllClamped = true
         applyLayout(5, 8)
     }
-
-    offsetNetworkModel(rbm, nc, Direction.NORTH, 370.0)
-    alignNetworkModels(rbm, nc, Alignment.VERTICAL)
+    nc.offset(-400.0, -580.0)
 
     nc.neuronList.labels = listOf(
         "ceiling", "large", "telephone", "books", "sofa", "drapes",

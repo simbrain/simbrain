@@ -73,7 +73,7 @@ class Network: CoroutineScope, EditableObject {
      * The update manager for this network.
      */
     @Transient
-    val updateManager = NetworkUpdateManager(this)
+    var updateManager = NetworkUpdateManager(this)
 
     /**
      * In iterations or msec.
@@ -378,9 +378,12 @@ class Network: CoroutineScope, EditableObject {
 
         coroutineContext = Dispatchers.Default + job
 
+        events = NetworkEvents()
+
+        updateManager = NetworkUpdateManager(this)
+
         placementManager = PlacementManager()
 
-        events = NetworkEvents()
         updateCompleted = AtomicBoolean(false)
         prioritySortedNeuronList = CachedObject {
             flatNeuronList.sortedBy { it.updatePriority }.toMutableList()

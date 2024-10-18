@@ -208,7 +208,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
         add("North", toolbars)
         add("Center", canvas)
-        add("South", JToolBar().apply { add(timeLabel) })
+        add("South", JPanel().apply { add(timeLabel) })
 
         addKeyBindings()
 

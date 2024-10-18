@@ -30,7 +30,6 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.*;
 import java.lang.reflect.Array;
-import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.text.ParseException;
@@ -424,14 +423,7 @@ public class Utils {
      * @return string representation of rounded decimal
      */
     public static String round(final double num, final int precision) {
-        if (Double.isInfinite(num) || Double.isNaN(num)) {
-            return Double.toString(num);
-        }
-        if (num == 0) {
-            return "0";
-        }
-        BigDecimal bd = new BigDecimal(num);
-        return bd.setScale(precision, BigDecimal.ROUND_HALF_UP).toString();
+        return MathUtilsKt.roundToString(num, precision);
     }
 
     /**

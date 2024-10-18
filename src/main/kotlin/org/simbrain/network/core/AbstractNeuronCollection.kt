@@ -43,6 +43,7 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
 
     @get:Producible(arrayDescriptionMethod = "getLabelArray")
     @set:Consumable
+    @UserParameter("Activation Array", "Activations", order = 10)
     override var activationArray: DoubleArray
         get() = neuronList
             .map { it.activation }
@@ -54,7 +55,7 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
             }
         }
 
-    @UserParameter("Bias Array", "Biases", order = 10)
+    @UserParameter("Bias Array", "Biases", order = 20)
     override var biasArray: DoubleArray
         get() = neuronList
             .map { it.bias }

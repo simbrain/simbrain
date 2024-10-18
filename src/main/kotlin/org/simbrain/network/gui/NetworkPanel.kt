@@ -805,7 +805,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         with(network) {
             weightMatrixTree.forwardPass(sources.map { it.activations })
         }
-        weightMatrixTree.applyBackprop(target.targetValues!!, epsilon = 0.0001)
+        weightMatrixTree.applyBackprop(target.targetValues!!, epsilon = NetworkPreferences.defaultLearningRate)
     }
 
     inner class NetworkCanvas : PCanvas() {

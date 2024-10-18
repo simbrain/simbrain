@@ -28,8 +28,10 @@ import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PNodeFilter
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.SelectionMarquee
+import org.simbrain.util.piccolo.parents
 import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.OdorWorldPanel
+import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.showTilePicker
 import java.awt.event.InputEvent
 import java.awt.geom.Point2D
@@ -78,6 +80,8 @@ class WorldMouseHandler(
      * Prior selection, if any. Required for shift-lasso selection.
      */
     private val priorSelection = LinkedHashSet<PNode>()
+
+    private val selectedEntityLocations = HashMap<OdorWorldEntity, Point2D>()
 
 
     /**
@@ -180,6 +184,10 @@ class WorldMouseHandler(
                 odorWorldPanel.selection = mutableSetOf(pickedNode)
             }
         }
+
+        odorWorldPanel.selectedEntityNodes.forEach {
+            selectedEntityLocations[it.entity] = it.entity.location
+        }
     }
 
     override fun drag(event: PInputEvent) {
@@ -227,13 +235,30 @@ class WorldMouseHandler(
         }
 
         // Where is the drag in relation to the initially clicked on object
-        val delta = event.getDeltaRelativeTo(pickedNode)
+        val pickedNodeLocation = (pickedNode?.parents?.firstOrNull { it is EntityNode } as? EntityNode)?.entity?.location ?: return
 
-        // System.out.println("Drag:" + pickedNode);
+        val delta = event.position - pickedNodeLocation
+
+        val newLocations = selectedEntityLocations.map { (entity, location) ->
+            entity to location + delta
+        }
+
+        val canMoveInX = newLocations.all { (entity, location) -> world.isInXBounds(location) }
+        val canMoveInY = newLocations.all { (entity, location) -> world.isInYBounds(location) }
+
+        newLocations.forEach { (entity, location) ->
+            if (canMoveInX) {
+                selectedEntityLocations[entity]?.let { it.setLocation(location.x, it.y) }
+            }
+            if (canMoveInY) {
+                selectedEntityLocations[entity]?.let { it.setLocation(it.x, location.y) }
+            }
+        }
+
 
         // Continue to drag nodes that have already been selected
         for (node in odorWorldPanel.selectedEntityNodes) {
-            node.entity.location += delta
+            node.entity.location = selectedEntityLocations[node.entity]!!
         }
     }
 
@@ -252,6 +277,7 @@ class WorldMouseHandler(
         // End drag selected node(s)
         pickedNode = null
 
+        selectedEntityLocations.clear()
         priorSelection.clear()
         odorWorldPanel.repaint()
     }

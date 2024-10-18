@@ -103,6 +103,15 @@ interface Bounded : StaticallyLocatable, WithSize {
     fun contains(point: Point2D) = topLeftLocation.let { tl ->
         point.x in tl.x..tl.x + width && point.y in tl.y..tl.y + height
     }
+
+    fun isInXBounds(point: Point2D) = topLeftLocation.let { tl ->
+        point.x in tl.x..tl.x + width
+    }
+
+    fun isInYBounds(point: Point2D) = topLeftLocation.let { tl ->
+        point.y in tl.y..tl.y + height
+    }
+
 }
 
 class Bound(

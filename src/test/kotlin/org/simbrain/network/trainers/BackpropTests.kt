@@ -12,6 +12,8 @@ import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
 import org.simbrain.util.crossEntropy
 import org.simbrain.util.math.SigmoidFunctionEnum
 import org.simbrain.util.sse
+import org.simbrain.util.stats.ProbabilityDistribution
+import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.toMatrix
 import smile.math.matrix.Matrix
 import kotlin.random.Random
@@ -88,10 +90,10 @@ class BackpropTests {
      */
     private fun testBackprop(inputVector: Matrix, targetVector: Matrix) {
         with(net) {
-            wm1.randomize()
-            wm2.randomize()
-            na2.randomizeBiases()
-            na3.randomizeBiases()
+            wm1.randomize(NormalDistribution(0.0, .1))
+            wm2.randomize(NormalDistribution(0.0, .1))
+            na2.randomizeBiases(NormalDistribution(0.0, .01))
+            na3.randomizeBiases(NormalDistribution(0.0, .01))
             repeat(100) {
                 listOf(wm1, wm2).forwardPass(inputVector)
                 listOf(wm1, wm2).applyBackprop(targetVector, .1)

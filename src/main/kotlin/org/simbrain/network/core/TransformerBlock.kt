@@ -17,21 +17,21 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
     override var activations: Matrix = Matrix(sequenceSize, inputSize)
 
     @UserParameter(label = "Matrix Visibility", description = "Show the QKV matrices", order = 10)
-    var matrixVisibility = false
+    var matrixVisibility = true
         set(value) {
             field = value
             events.updateGraphics.fire()
         }
 
     @UserParameter(label = "Sequence Visibility", description = "Show the qkv sequences", order = 11)
-    var sequenceVisibility = false
+    var sequenceVisibility = true
         set(value) {
             field = value
             events.updateGraphics.fire()
         }
 
     @UserParameter(label = "Feedforward Visibility", description = "Show the feedforward network", order = 12)
-    var feedForwardVisibility = false
+    var feedForwardVisibility = true
         set(value) {
             field = value
             events.updateGraphics.fire()

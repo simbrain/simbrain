@@ -351,7 +351,7 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
      */
     fun updateTextLabels() {
         if (!transformerBlock.label.isNullOrEmpty()) {
-            labelText.font = NeuronNode.NEURON_FONT
+            labelText.font = NEURON_FONT
             labelText.text = "" + transformerBlock.label
             labelText.setOffset(
                 this.selfAttentionImage.x - labelText.width / 2 + this.selfAttentionImage.width / 2,

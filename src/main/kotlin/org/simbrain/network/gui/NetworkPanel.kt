@@ -3,7 +3,6 @@ package org.simbrain.network.gui
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
-import org.piccolo2d.PCamera
 import org.piccolo2d.PCanvas
 import org.piccolo2d.event.PBasicInputEventHandler
 import org.piccolo2d.event.PInputEvent
@@ -164,9 +163,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         nudgeAmount = NetworkPreferences.nudgeAmount
         editMode.resetWandCursor()
 
-        NeuronNode.hotColor = NetworkPreferences.hotNodeColor
-        NeuronNode.coolColor = NetworkPreferences.coolNodeColor
-        NeuronNode.spikingColor = NetworkPreferences.spikingColor
         SynapseNode.lineColor = NetworkPreferences.lineColor
         SynapseNode.excitatoryColor = NetworkPreferences.excitatorySynapseColor
         SynapseNode.inhibitoryColor = NetworkPreferences.inhibitorySynapseColor
@@ -830,15 +826,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
                 }
             })
             addInputEventListener(WandEventHandler(this@NetworkPanel));
-
-            // Don't show text when the canvas is sufficiently zoomed in
-            camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM) {
-                launch(Dispatchers.Swing) {
-                    filterScreenElements<NeuronNode>().forEach {
-                        it.updateTextVisibility()
-                    }
-                }
-            }
         }
 
         /**

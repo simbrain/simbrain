@@ -243,7 +243,7 @@ class ActivationStackNode(networkPanel: NetworkPanel, val activationSequence: Ac
      */
     fun updateTextLabel() {
         if (!activationSequence.label.isNullOrEmpty()) {
-            labelText.font = NeuronNode.NEURON_FONT
+            labelText.font = NEURON_FONT
             labelText.text = "" + activationSequence.label
             labelText.setOffset(
                 activationImage.x - labelText.width / 2 + activationImage.width / 2,

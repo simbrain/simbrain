@@ -22,17 +22,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PImage
-import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
-import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.randomizeBiases
 import org.simbrain.network.events.NeuronArrayEvents
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.alignMenu
 import org.simbrain.network.gui.createCouplingMenu
-import org.simbrain.network.gui.nodes.NeuronNode.Companion.DIAMETER
-import org.simbrain.network.gui.nodes.NeuronNode.Companion.TEXT_VISIBILITY_THRESHOLD
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.spaceMenu
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.util.*
@@ -42,13 +39,11 @@ import org.simbrain.util.table.SimbrainTablePanel
 import org.simbrain.workspace.couplings.getConsumer
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
-import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.event.ActionEvent
 import java.util.*
 import javax.swing.*
 import kotlin.math.ceil
-import kotlin.math.min
 import kotlin.math.sqrt
 
 /**
@@ -72,8 +67,8 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
 
     val neuronCircles by lazy {
         neuronArray.activationArray.map { activation ->
-            NeuronCircleNode().also { circle ->
-                circle.activation = activation
+            NeuronCircleNode(networkPanel).also { circle ->
+                circle.drawActivation(activation, neuronArray.updateRule.graphicalBounds)
             }
         }.onEach {
             neuronCircleGroup.addChild(it)
@@ -209,7 +204,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             updateActivationImage()
         }
         updateActivationImage()
-        neuronCircleGroup.setOffset(DIAMETER / 2.0, DIAMETER / 2.0 + 20.0 + infoText.height)
+        neuronCircleGroup.setOffset(NEURON_DIAMETER / 2.0, NEURON_DIAMETER / 2.0 + 20.0 + infoText.height)
         activationImage.offset(0.0, infoText.offset.y + infoText.height + 5)
         spikeImage.offset(0.0, infoText.offset.y + infoText.height + 5)
         activationImage.addBorder()
@@ -237,7 +232,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             activationImage.addBorder()
             if (neuronArray.updateRule.isSpikingRule) {
                 val spikes = (neuronArray.dataHolder as SpikingMatrixData).spikes
-                spikeImage.image = spikes.toOverlay(len, len, NeuronNode.spikingColor)
+                spikeImage.image = spikes.toOverlay(len, len, NetworkPreferences.spikingColor)
                 spikeImage.setBounds(
                     0.0, 0.0,
                     infoText.width, infoText.width
@@ -264,7 +259,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             activationImage.addBorder()
             if (neuronArray.updateRule.isSpikingRule) {
                 val spikes = (neuronArray.dataHolder as SpikingMatrixData).spikes
-                spikeImage.image = spikes.toOverlay(activations.size, 1, NeuronNode.spikingColor)
+                spikeImage.image = spikes.toOverlay(activations.size, 1, NetworkPreferences.spikingColor)
                 spikeImage.setBounds(
                     0.0, 0.0,
                     infoText.width, flatPixelArrayHeight.toDouble()
@@ -283,7 +278,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
 
         fun renderNeuronCircles() {
             neuronCircles.forEachIndexed { i, circle ->
-                circle.activation = activations[i]
+                circle.drawActivation(activations[i], neuronArray.updateRule.graphicalBounds)
                 circle.setClamped(neuronArray.isClamped)
                 circle.setLabel(neuronArray.labelArray[i])
             }
@@ -531,7 +526,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
      */
     fun updateTextLabel() {
         if (!neuronArray.label.isNullOrEmpty()) {
-            labelText.font = NeuronNode.NEURON_FONT
+            labelText.font = NEURON_FONT
             labelText.text = "" + neuronArray.label
             labelText.setOffset(
                 activationImage.x - labelText.width / 2 + activationImage.width / 2,
@@ -541,80 +536,4 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         }
     }
 
-    inner class NeuronCircleNode: PPath.Double() {
-        val circle = createEllipse(
-            (0 - DIAMETER / 2).toFloat(),
-            (0 - DIAMETER / 2).toFloat(),
-            DIAMETER.toFloat(),
-            DIAMETER.toFloat()
-        ).also { addChild(it) }
-
-        val activationText = PText().also {
-            it.font = NeuronNode.NEURON_FONT_BOLD
-            addChild(it)
-        }
-
-        val labelText = PText().also {
-            it.font = NeuronNode.NEURON_FONT
-            addChild(it)
-        }
-
-        private var isTextVisible = networkPanel.scalingFactor > TEXT_VISIBILITY_THRESHOLD
-            set(value) {
-                if (field != value) {
-                    field = value
-                    if (value) {
-                        drawActivation()
-                        addChild(activationText)
-                        addChild(labelText)
-                    } else {
-                        removeChild(activationText)
-                        removeChild(labelText)
-                    }
-                }
-            }
-
-        var activation: kotlin.Double = 0.0
-            set(value) {
-                field = value
-                drawActivation()
-            }
-
-        private fun drawActivation() {
-            circle.paint = activation.toSimbrainColor(neuronArray.updateRule.let {
-                it.graphicalLowerBound..it.graphicalUpperBound
-            }).toColor()
-
-            if (isTextVisible) {
-                activationText.text = if (activation > -0.95 && activation < 0.95) {
-                    activation.format(1).replace("0.", ".").replace(Regex("^-?.0$"), "0")
-                } else {
-                    activation.format(0)
-                }
-
-                val targetWidth = min(DIAMETER.toDouble() * 0.8, activationText.width)
-                activationText.scale = targetWidth / activationText.width
-                activationText.centerBoundsOnPoint(circle.bounds.x + circle.bounds.width / 2, circle.bounds.y + circle.bounds.height / 2)
-            }
-        }
-
-        fun setLabel(label: String) {
-            labelText.text = label
-            labelText.centerBoundsOnPoint(circle.bounds.x + circle.bounds.width / 2, circle.bounds.y - 8.0)
-        }
-
-        fun setClamped(clamped: Boolean) {
-            if (clamped) {
-                circle.stroke = BasicStroke(2.0f)
-            } else {
-                circle.stroke = BasicStroke(1.0f)
-            }
-        }
-
-        override fun paint(paintContext: PPaintContext?) {
-            isTextVisible = networkPanel.scalingFactor > TEXT_VISIBILITY_THRESHOLD
-            super.paint(paintContext)
-        }
-
-    }
 }

@@ -30,8 +30,8 @@ import org.simbrain.network.gui.dialogs.NetworkPreferences.inhibitorySynapseColo
 import org.simbrain.network.gui.dialogs.NetworkPreferences.lineColor
 import org.simbrain.network.gui.dialogs.NetworkPreferences.maxWeightSize
 import org.simbrain.network.gui.dialogs.NetworkPreferences.minWeightSize
+import org.simbrain.network.gui.dialogs.NetworkPreferences.spikingColor
 import org.simbrain.network.gui.dialogs.NetworkPreferences.zeroWeightColor
-import org.simbrain.network.gui.nodes.NeuronNode.Companion.spikingColor
 import org.simbrain.network.gui.synapseContextMenu
 import org.simbrain.network.gui.synapseDialog
 import org.simbrain.util.StandardDialog
@@ -339,7 +339,7 @@ class SynapseNode(
         var weightX = 0.0
         var weightY = 0.0
 
-        val neuronOffset = NeuronNode.DIAMETER / 2
+        val neuronOffset = NEURON_DIAMETER / 2
 
         weightX = if (sourceX < targetX) {
             targetX - (neuronOffset * cos(alpha))

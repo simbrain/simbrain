@@ -171,6 +171,8 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
             1.0
         }
 
+    open val graphicalBounds get() = graphicalLowerBound..graphicalUpperBound
+
     /**
      * Set activation to 0; override for other "clearing" behavior (e.g. setting other variables to 0. Called in Gui
      * when "clear" button pressed.

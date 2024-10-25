@@ -136,12 +136,13 @@ open class SimbrainTablePanel @JvmOverloads constructor(
             addSeparator()
             addAction(table.randomizeColumnAction)
             addAction(table.editColumnAction)
+            addSeparator()
+            addAction(table.createShowEigenValuesAction())
         }
         if (model is SmileDataFrame) {
             addAction(table.showScatterPlotAction)
         }
         addAction(table.createOpenProjectionAction())
-        table.popUpMenu.add(table.createShowEigenValuesAction())
         addSeparator()
         addAction(table.showHistogramAction)
         addAction(table.showBoxPlotAction)

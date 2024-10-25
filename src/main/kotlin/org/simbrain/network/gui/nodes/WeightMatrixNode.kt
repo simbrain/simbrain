@@ -16,6 +16,7 @@ import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.table.MatrixDataFrame
 import org.simbrain.util.table.SimbrainTablePanel
 import org.simbrain.util.table.addSimpleDefaults
+import org.simbrain.util.table.createShowEigenValuesAction
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import java.awt.RenderingHints
@@ -174,7 +175,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
             if (weightMatrix is WeightMatrix) {
                 contextMenu.add(
                     networkPanel.createAction(
-                        name = "Transpose Weight Matrix Image (Currently ${if (weightMatrix.transposeGraphics) "Source -> Target" else "Target -> Source"})",
+                        name = "Transpose weight matrix image (Currently ${if (weightMatrix.transposeGraphics) "Source -> Target" else "Target -> Source"})",
                         description = "Transpose the weight matrix image",
                     ) {
                         weightMatrix.transposeGraphics = !weightMatrix.transposeGraphics
@@ -188,11 +189,36 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
                             "Plot Weight Matrix"
                         )
                 )
+                contextMenu.addSeparator()
                 contextMenu.add(
                     networkPanel.createAction(
-                        name = "Set Spectral Radius...",
+                        name = "Show eigenvalues...",
+                        description = "Show eigenvalues for this matrix if it is square",
+                        initBlock = {
+                            val canShowEigenValues = try {
+                                weightMatrix.weightMatrix.eigen()
+                                true
+                            } catch (e: Exception) {
+                                println("Error: ${e.message}")
+                                false
+                            }
+                            isEnabled = canShowEigenValues
+                        }) {
+                        val eigenValues = weightMatrix.weightMatrix.eigenValuesString()
+                        JOptionPane.showMessageDialog(
+                            this,
+                            "[${eigenValues.joinToString(", ")}]",
+                            "Eigenvalues",
+                            JOptionPane.INFORMATION_MESSAGE
+                        )
+                    }
+                )
+                contextMenu.add(
+                    networkPanel.createAction(
+                        name = "Set spectral radius...",
                         description = "Rescale matrix so that max eigenvalue is the specified value. < .9 decays; .9" +
-                                " churns; > 1 explodes."
+                                " churns; > 1 explodes.",
+                        iconPath = "menu_icons/lambda.png"
                     ) {
                         val radius =
                             showNumericInputDialog("Set spectral Radius:", weightMatrix.weightMatrix.maxEigenvalue())
@@ -206,8 +232,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
 
             if (model.source is AbstractNeuronCollection) {
                 contextMenu.addSeparator()
-
-                contextMenu.add(networkPanel.createAction(name = "Toggle Show Weights") {
+                contextMenu.add(networkPanel.createAction(name = "Toggle show weights") {
                     weightMatrix.isShowWeights = !weightMatrix.isShowWeights
                 })
             }
@@ -239,6 +264,8 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
                 val wm = MatrixDataFrame(weightMatrix.weightMatrix)
                 val wmViewer = SimbrainTablePanel(wm, false)
                 wmViewer.addSimpleDefaults()
+                wmViewer.addSeparator()
+                wmViewer.addAction(wmViewer.table.createShowEigenValuesAction())
                 tabs.addTab("Weight Matrix", wmViewer)
                 weightMatrix.events.updated.on { wmViewer.model.fireTableDataChanged() }
                 dialog.addCommitTask {

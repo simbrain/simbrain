@@ -170,6 +170,7 @@ val SimbrainJTable.showScatterPlotAction
 fun SimbrainJTable.createShowEigenValuesAction() = createAction(
     name = "Show Eigenvalues",
     description = "Show the eigenvalues of the matrix",
+    iconPath = "menu_icons/lambda.png",
     initBlock = {
         val canShowEigenValues = try {
             model.get2DDoubleArray(replaceInvalid = 0.0).toMatrix().eigen()

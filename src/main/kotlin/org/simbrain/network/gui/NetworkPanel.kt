@@ -19,9 +19,7 @@ import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.neurongroups.SOMGroup
 import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.network.subnetworks.*
-import org.simbrain.network.trainers.WeightMatrixTree
-import org.simbrain.network.trainers.applyBackprop
-import org.simbrain.network.trainers.forwardPass
+import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.setViewBoundsNoOverflow
 import org.simbrain.util.piccolo.unionOfGlobalFullBounds
@@ -304,6 +302,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             is SynapseGroup -> createNode(model)
             is Connector -> createNode(model)
             is Subnetwork -> createNode(model)
+            is SupervisedModel -> createNode(model)
             is InfoText -> createNode(model)
             is NetworkTextObject -> createNode(model)
             // is DeepNet -> createNode(model)
@@ -380,6 +379,15 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
     suspend fun createNode(weightMatrix: Connector) = addScreenElement {
         WeightMatrixNode(this, weightMatrix)
+    }
+
+    suspend fun createNode(supervisedModel: SupervisedModel) = addScreenElement {
+        val arrayNodes = supervisedModel.layers.map { modelNodeMap.get<NeuronArrayNode>(it) }
+        val weightMatrixNodes = supervisedModel.weightMatrixTree.tree.flatten().map { modelNodeMap.get<WeightMatrixNode>(it) }
+        SupervisedModelNode(this, supervisedModel).apply {
+            arrayNodes.forEach { addNode(it) }
+            weightMatrixNodes.forEach { addNode(it) }
+        }
     }
 
     suspend fun createNode(text: NetworkTextObject) = addScreenElement {
@@ -779,30 +787,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     }
 
     fun getNode(model: NetworkModel) = runBlocking { modelNodeMap.get<ScreenElement>(model) }
-
-
-    /**
-     * Apply one iteration of backprop to selected arrays, for a kind of live training with current inputs.
-     * Current activations are used for input and the target values on the output can be se using a drop down menu.      */
-    fun applyImmediateLearning() {
-        val sources = selectionManager.filterSelectedSourceModels<NeuronArray>()
-        val target = selectionManager.filterSelectedModels<NeuronArray>().firstOrNull()
-
-        if (sources.isEmpty() || target == null) {
-            return
-        }
-
-        if (target.targetValues == null) {
-            target.targetValues = target.activations.clone()
-        }
-
-        val weightMatrixTree = WeightMatrixTree(sources, target)
-        weightMatrixTree.tree.flatten().forEach { it.select() }
-        with(network) {
-            weightMatrixTree.forwardPass(sources.map { it.activations })
-        }
-        weightMatrixTree.applyBackprop(target.targetValues!!, epsilon = NetworkPreferences.defaultLearningRate)
-    }
 
     inner class NetworkCanvas : PCanvas() {
         init {

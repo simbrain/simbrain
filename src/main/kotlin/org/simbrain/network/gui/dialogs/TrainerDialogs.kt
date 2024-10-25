@@ -45,7 +45,7 @@ fun <SN> SN.getSupervisedTrainingDialog(): StandardDialog where SN: SupervisedNe
             inputs.table.createApplyAction("Apply Inputs") { selectedRow ->
                 with(network) {
                     inputLayer.activations = trainingSet.inputs.rowVectorTransposed(selectedRow)
-                    this@SN.update()
+                    this@SN.forwardPass()
                 }
             }
         )
@@ -53,7 +53,7 @@ fun <SN> SN.getSupervisedTrainingDialog(): StandardDialog where SN: SupervisedNe
         inputs.toolbar.add(inputs.table.createApplyAndAdvanceAction {
             with(network) {
                 inputLayer.activations = trainingSet.inputs.rowVectorTransposed(inputs.table.selectedRow)
-                this@SN.update()
+                this@SN.forwardPass()
             }
         })
         val targets = MatrixEditor(trainingSet.targets, trainingSet.targetRowNames, trainingSet.targetColumnNames)

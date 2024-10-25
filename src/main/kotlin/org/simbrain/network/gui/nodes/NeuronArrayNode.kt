@@ -31,6 +31,8 @@ import org.simbrain.network.gui.alignMenu
 import org.simbrain.network.gui.createCouplingMenu
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.spaceMenu
+import org.simbrain.network.trainers.SupervisedModel
+import org.simbrain.network.trainers.getConnectorChain
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.addBorder
@@ -388,42 +390,47 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             contextMenu.add(toggleShowBias)
             contextMenu.addSeparator()
 
-            val setTargetValues: Action = networkPanel.createAction(
-                name = "Set Target",
-                description = "Use current activation as target for immediate training",
-                keyboardShortcut = CmdOrCtrl + 'T'
-            ) {
-                neuronArray.targetValues = neuronArray.activations.clone()
-            }
-            contextMenu.add(setTargetValues)
-
-            val clearTargetValues: Action = networkPanel.createAction(
-                name = "Clear Target",
-                description = "Clear target values",
-                keyboardShortcut = Shift + CmdOrCtrl + 'T'
-            ) {
-                neuronArray.targetValues = null
-            }
-            contextMenu.add(clearTargetValues)
-
-            val applyLearning: Action = networkPanel.createAction(
-                name = "Apply Learning",
-                description = "Train source to target weights using backprop",
-                keyboardShortcut = 'L',
-                initBlock = {
-                    fun updateAction() {
-                        isEnabled = networkPanel.selectionManager.selectedModels.contains(neuronArray)
-                                && neuronArray.targetValues != null
-                    }
-                    updateAction()
-                    networkPanel.selectionManager.events.selection.on { _, _ -> updateAction() }
-                    networkPanel.selectionManager.events.sourceSelection.on { _, _ -> updateAction() }
+            fun canCreateSupervisedModel(): Pair<Boolean, String> {
+                val reasons = mutableListOf<String>()
+                val source = networkPanel.selectionManager.filterSelectedSourceModels<NeuronArray>().firstOrNull()
+                val target = networkPanel.selectionManager.filterSelectedModels<NeuronArray>().firstOrNull()
+                if (source == null) {
+                    reasons.add("No source model selected")
                 }
-            ) {
-                networkPanel.applyImmediateLearning()
+                if (target == null) {
+                    reasons.add("No target model selected")
+                }
+                if (source != null && target != null && getConnectorChain(source, target).isEmpty()) {
+                    reasons.add("No connection between source and target")
+                }
+                return reasons.isEmpty() to reasons.joinToString(", ")
             }
-            contextMenu.add(applyLearning)
-            contextMenu.addSeparator()
+
+            val (canCreateSupervisedModel, cannotCreateSupervisedModelReason) = canCreateSupervisedModel()
+
+            val createSupervisedModelAction: Action = networkPanel.createAction(
+                name = "Create Supervised Model",
+                initBlock = {
+                    isEnabled = canCreateSupervisedModel
+                },
+                keyboardShortcut = CmdOrCtrl + 'T',
+                description = "Create supervised model with using the current activation as target for immediate training" + if (!canCreateSupervisedModel) " (Disabled: $cannotCreateSupervisedModelReason)" else ""
+            ) {
+
+                val (canCreate) = canCreateSupervisedModel()
+
+                if (canCreate) {
+                    val input = selectionManager.sourceModels.firstOrNull() as? NeuronArray
+                    val output = selectionManager.selectedModels.firstOrNull() as? NeuronArray
+
+                    if (input != null && output != null) {
+                        val supervisedModel = SupervisedModel(input, output)
+                        network.addNetworkModel(supervisedModel)
+                    }
+                }
+
+            }
+            contextMenu.add(createSupervisedModelAction)
 
             val applyInputs: Action = networkPanel.networkActions.createTestInputPanelAction(neuronArray)
             contextMenu.add(applyInputs)

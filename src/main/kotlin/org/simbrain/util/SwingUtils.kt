@@ -153,6 +153,7 @@ fun <T : JComponent> T.createAction(
 
 /**
  * The [createAction] with one or no keyboard shortcut.
+ * @param initBlock called when creating the action. useful for conditional enabling.
  */
 fun <T : JComponent> T.createAction(
     name: String? = null,

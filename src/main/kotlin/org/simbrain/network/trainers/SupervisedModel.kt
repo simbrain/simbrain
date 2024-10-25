@@ -5,6 +5,7 @@ import org.simbrain.network.events.LocationEvents
 import org.simbrain.util.minus
 import org.simbrain.util.plus
 import org.simbrain.util.rowVectorTransposed
+import org.simbrain.util.stats.ProbabilityDistribution
 import java.awt.geom.Point2D
 
 class SupervisedModel(
@@ -22,8 +23,8 @@ class SupervisedModel(
     override val trainer = SupervisedModelTrainer()
 
     override var trainingSet: MatrixDataset = MatrixDataset(
-        inputLayer.activations.transpose(),
-        outputLayer.activations.transpose()
+        inputLayer.activations.transpose().clone(),
+        outputLayer.activations.transpose().clone()
     )
 
     override var location: Point2D
@@ -39,6 +40,11 @@ class SupervisedModel(
                 delete()
             }
         }
+    }
+
+    override fun randomize(randomizer: ProbabilityDistribution?) {
+        initWeights()
+        initBiases()
     }
 
     override fun initWeights() {

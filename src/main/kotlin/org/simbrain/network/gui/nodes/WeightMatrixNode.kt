@@ -194,6 +194,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
                     networkPanel.createAction(
                         name = "Show eigenvalues...",
                         description = "Show eigenvalues for this matrix if it is square",
+                        iconPath = "menu_icons/lambda.png",
                         initBlock = {
                             val canShowEigenValues = try {
                                 weightMatrix.weightMatrix.eigen()
@@ -218,7 +219,6 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
                         name = "Set spectral radius...",
                         description = "Rescale matrix so that max eigenvalue is the specified value. < .9 decays; .9" +
                                 " churns; > 1 explodes.",
-                        iconPath = "menu_icons/lambda.png"
                     ) {
                         val radius =
                             showNumericInputDialog("Set spectral Radius:", weightMatrix.weightMatrix.maxEigenvalue())

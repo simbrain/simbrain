@@ -13,6 +13,7 @@ import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
+import smile.math.matrix.Matrix
 import kotlin.math.max
 
 /**
@@ -127,14 +128,13 @@ open class LinearRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Di
         return ln
     }
 
-    override fun getDerivative(`val`: Double): Double {
+    override fun getDerivative(input: Double): Double {
         return when (clippingType) {
             ClippingType.NoClipping -> slope
-            ClippingType.Relu -> if (`val` <= 0) 0.0 else slope
-            ClippingType.PiecewiseLinear -> if (`val` <= lowerBound || `val` >= upperBound) 0.0 else slope
+            ClippingType.Relu -> if (input <= 0) 0.0 else slope
+            ClippingType.PiecewiseLinear -> if (input <= lowerBound || input >= upperBound) 0.0 else slope
         }
     }
-
 
     override val name: String
         get() = "Linear"

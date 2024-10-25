@@ -91,6 +91,7 @@ open class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: 
             add(removeAction)
             addSeparator()
             add(createStepTrainerAction())
+            add(createSetTrainingExampleAction())
         }
 
     override val propertyDialog: StandardDialog
@@ -104,9 +105,6 @@ open class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: 
         }
     }
 
-    /**
-     * Action for editing the group name.
-     */
     private val <T: JComponent> T.renameAction get() = createAction(
         name = "Rename..."
     ) {
@@ -135,14 +133,19 @@ open class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: 
                 }
             }
         }
+    };
+
+    private fun createSetTrainingExampleAction() = networkPanel.createAction(
+        name = "Set input-target pair",
+        description = "Set current values to input and target",
+        keyboardShortcut = CmdOrCtrl + 'T'
+    ) {
+        networkPanel.selectionManager.filterSelectedModels<SupervisedModel>().forEach { sm ->
+            sm.trainingSet.inputs.setRow(0, sm.inputLayer.activationArray)
+            sm.trainingSet.targets.setRow(0, sm.outputLayer.activationArray)
+        }
     }
 
-    /**
-     * Create a supervisedModel node.
-     *
-     * @param networkPanel parent panel
-     * @param subnet       the layered network
-     */
     init {
         interactionBox.setText(supervisedModel.displayName)
         addChild(outline)

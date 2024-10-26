@@ -2,6 +2,7 @@ package org.simbrain.network.trainers
 
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.*
 import org.simbrain.network.subnetworks.BackpropNetwork
@@ -14,6 +15,7 @@ import org.simbrain.util.math.SigmoidFunctionEnum
 import org.simbrain.util.sse
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.NormalDistribution
+import org.simbrain.util.stats.distributions.UniformRealDistribution
 import org.simbrain.util.toMatrix
 import smile.math.matrix.Matrix
 import kotlin.random.Random
@@ -31,6 +33,8 @@ class BackpropTests {
     val wm1 = WeightMatrix(na1, na2)
     val wm2 = WeightMatrix(na2, na3)
 
+    val weightInit = Xavier()
+
     val commonInputs = makeMockInputs(na1.size)
     val commonTargets = makeMockTargets(na3.size)
 
@@ -41,6 +45,8 @@ class BackpropTests {
         (na3.updateRule as BoundedUpdateRule).upperBound = 1.0
         (na3.updateRule as BoundedUpdateRule).lowerBound = -1.0
         net.addNetworkModels(na1, na2, na3, wm1, wm2)
+        weightInit.initializeWeights(wm1)
+        weightInit.initializeWeights(wm2)
     }
 
     @Test
@@ -90,16 +96,16 @@ class BackpropTests {
      */
     private fun testBackprop(inputVector: Matrix, targetVector: Matrix) {
         with(net) {
-            wm1.randomize(NormalDistribution(0.0, .1))
-            wm2.randomize(NormalDistribution(0.0, .1))
+            weightInit.initializeWeights(wm1)
+            weightInit.initializeWeights(wm2)
             na2.randomizeBiases(NormalDistribution(0.0, .01))
             na3.randomizeBiases(NormalDistribution(0.0, .01))
             repeat(100) {
                 listOf(wm1, wm2).forwardPass(inputVector)
-                listOf(wm1, wm2).applyBackprop(targetVector, .1)
+                listOf(wm1, wm2).applyBackprop(targetVector, .01)
                 // println(targets.toDoubleArray() sse wm2.output.toDoubleArray())
             }
-            println("Outputs: ${na3.activations}, SSE = ${targetVector sse na3.activations}")
+            //println("Outputs: ${na3.activations}, SSE = ${targetVector sse na3.activations}")
             assertEquals(0.0, targetVector sse na3.activations, .01)
         }
     }
@@ -112,13 +118,13 @@ class BackpropTests {
                 type = SigmoidFunctionEnum.LOGISTIC
                 lowerBound = 0.0
             }
-            wm1.randomize()
-            na2.randomizeBiases()
+            weightInit.initializeWeights(wm1)
+            na2.randomizeBiases(NormalDistribution(0.0, 0.01))
             repeat(100) {
                 listOf(wm1).forwardPass(commonInputs)
                 listOf(wm1).applyBackprop(targetVector, .2)
             }
-            println("Outputs: ${na2.activations}, SSE = ${targetVector sse na2.activations}")
+            //println("Outputs: ${na2.activations}, SSE = ${targetVector sse na2.activations}")
             assertEquals(0.0, targetVector sse na2.activations, .01)
         }
     }
@@ -134,10 +140,10 @@ class BackpropTests {
             net.addNetworkModels(wm3, na4)
             repeat(100) {
                 listOf(wm1, wm2, wm3).forwardPass(commonInputs)
-                listOf(wm1, wm2, wm3).applyBackprop(targetVector, .1)
+                listOf(wm1, wm2, wm3).applyBackprop(targetVector, .01)
                 // println(targets.toDoubleArray() sse wm2.output.toDoubleArray())
             }
-            println("Outputs: ${na4.activations}, SSE = ${targetVector sse na4.activations}")
+            //println("Outputs: ${na4.activations}, SSE = ${targetVector sse na4.activations}")
             assertEquals(0.0, targetVector sse na4.activations, .01)
         }
     }
@@ -145,16 +151,16 @@ class BackpropTests {
     @Test
     fun `test backprop on weight matrix tree`() = runBlocking {
         with(net) {
-            wm1.randomize()
-            wm2.randomize()
+            weightInit.initializeWeights(wm1)
+            weightInit.initializeWeights(wm2)
             val na1copy = na1.copy().addToNetwork()
             val wm1copy = WeightMatrix(na1copy, na2).addToNetwork()
-            na2.randomizeBiases()
-            na3.randomizeBiases()
+            na2.randomizeBiases(NormalDistribution(0.0, 0.01))
+            na3.randomizeBiases(NormalDistribution(0.0, 0.01))
             val wmTree = WeightMatrixTree(listOf(na1, na1copy), na3)
             repeat(100) {
                 wmTree.forwardPass(listOf(commonInputs, commonInputs))
-                wmTree.applyBackprop(commonTargets, epsilon = .1)
+                wmTree.applyBackprop(commonTargets, epsilon = .01)
             }
             assertEquals(0.0, commonTargets sse na3.activations, .01)
         }
@@ -171,14 +177,14 @@ class BackpropTests {
                 updateRule = SoftmaxRule()
             }
             val wm = WeightMatrix(inputLayer, outputLayer)
-            wm.randomize()
+            weightInit.initializeWeights(wm)
             addNetworkModels(inputLayer, outputLayer, wm)
             repeat(10000) {
                 listOf(wm).forwardPass(inputs)
-                listOf(wm).applyBackprop(targets, .1, lossFunction = BackpropLossFunction.CrossEntropy)
+                listOf(wm).applyBackprop(targets, .01, lossFunction = BackpropLossFunction.CrossEntropy)
                 // println(targets.toDoubleArray() sse wm2.output.toDoubleArray())
             }
-            println("Outputs: ${outputLayer.activations}, Cross Entropy = ${crossEntropy(outputLayer.activations, targets)}")
+            //println("Outputs: ${outputLayer.activations}, Cross Entropy = ${crossEntropy(outputLayer.activations, targets)}")
             assertEquals(0.0, crossEntropy(outputLayer.activations, targets), .01)
         }
 
@@ -188,10 +194,12 @@ class BackpropTests {
     fun `train 10-7-10 auto-encoder`() {
         val inputs = Matrix.eye(10)
         val bp = BackpropNetwork(intArrayOf(10, 7, 10), null).apply {
-            outputLayer.updateRule = SigmoidalRule().apply {
-                type = SigmoidFunctionEnum.LOGISTIC
-            }
-            trainer.learningRate = .1
+            //outputLayer.updateRule = SigmoidalRule().apply {
+            //    type = SigmoidFunctionEnum.LOGISTIC
+            //}
+            initWeights()
+            initBiases()
+            trainer.learningRate = .01
             trainingSet = MatrixDataset(
                 inputs = inputs,
                 targets = inputs
@@ -201,14 +209,15 @@ class BackpropTests {
         with(net) {
             with(bp) {
                 runBlocking {
-                    repeat(10000) {
+                    repeat(2000) {
                         bp.trainer.trainOnce()
                     }
                 }
             }
         }
         // Does not get that low after 1K
-        assertEquals(0.0, bp.trainer.lastError, .1)
+        print(bp.trainer.lastError)
+        assertTrue(bp.trainer.lastError < .01)
     }
 
     fun makeMockInputs(size: Int): Matrix {

@@ -236,7 +236,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         }
         updateRule.apply(this, dataHolder)
         if (useLayerNorm) {
-            activations = activations.layerNorm()
+            activations = activations.layerNormByColumn()
         }
         inputs.mul(0.0) // clear inputs
         events.updated.fire()

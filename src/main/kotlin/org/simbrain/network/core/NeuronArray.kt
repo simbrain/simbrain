@@ -66,12 +66,15 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
     var labelArray: Array<String> = Array(inputSize) { "" }
 
     @get:Producible
-    @UserParameter("Bias Array", "Biases", order = 10)
+    @UserParameter("Bias Array", "Biases", order = 3)
     override var biases: Matrix = Matrix(inputSize, 1)
         set(newBiases) {
             field.copyFrom(newBiases)
             events.updated.fire()
         }
+
+    @UserParameter(label = "Use Layer Norm", description = "Whether to use layer normalization", order = 4)
+    var useLayerNorm = false
 
     @get:Producible
     override val biasArray: DoubleArray
@@ -232,6 +235,9 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
             return
         }
         updateRule.apply(this, dataHolder)
+        if (useLayerNorm) {
+            activations = activations.layerNorm()
+        }
         inputs.mul(0.0) // clear inputs
         events.updated.fire()
     }

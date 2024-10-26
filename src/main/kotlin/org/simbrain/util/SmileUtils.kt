@@ -182,6 +182,15 @@ fun Matrix.setColConstant(colIndex: Int, value: Double) {
     }
 }
 
+fun Matrix.setCol(colIndex: Int, values: DoubleArray) {
+    if (values.size != nrow()) {
+        throw IllegalArgumentException("Values array has ${values.size} elements, but matrix has ${nrow()} rows")
+    }
+    for (i in 0 until nrow()) {
+        this[i, colIndex] = values[i]
+    }
+}
+
 fun Matrix.shiftUpAndPadEndWithZero(): Matrix {
     val shifted = this.shiftUp()
     shifted.setRowConstant(nrow() - 1, 0.0)
@@ -243,7 +252,7 @@ fun Matrix.appendRow(row: DoubleArray = DoubleArray(ncol()) { 0.0 }): Matrix {
     return newMatrix
 }
 
-fun Matrix.layerNorm(epsilon: Double = 1e-5): Matrix {
+fun Matrix.layerNormByRow(epsilon: Double = 1e-5): Matrix {
     val normalized = Matrix(nrow(), ncol())
     for (i in 0 until nrow()) {
         val row = row(i)
@@ -252,6 +261,19 @@ fun Matrix.layerNorm(epsilon: Double = 1e-5): Matrix {
         val std = sqrt(variance + epsilon)
         val normRow = row.map { (it - mean) / std }.toDoubleArray()
         normalized.setRow(i, normRow)
+    }
+    return normalized
+}
+
+fun Matrix.layerNormByColumn(epsilon: Double = 1e-5): Matrix {
+    val normalized = Matrix(nrow(), ncol())
+    for (j in 0 until ncol()) {
+        val column = col(j)
+        val mean = column.average()
+        val variance = column.map { (it - mean) * (it - mean) }.average()
+        val std = sqrt(variance + epsilon)
+        val normColumn = column.map { (it - mean) / std }.toDoubleArray()
+        normalized.setCol(j, normColumn)
     }
     return normalized
 }

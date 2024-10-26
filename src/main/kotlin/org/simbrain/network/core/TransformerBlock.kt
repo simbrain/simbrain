@@ -117,11 +117,11 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
 
         val attentionOutput = selfAttention.mm(vStack)
 
-        feedForwardInput.copyFrom(inputs.clone().add(attentionOutput).layerNorm())
+        feedForwardInput.copyFrom(inputs.clone().add(attentionOutput).layerNormByRow())
 
         feedForwardHidden.copyFrom(feedForwardInput.mm(W1).add(b1).relu())
 
-        activations.copyFrom(feedForwardInput.add(feedForwardHidden.mm(W2).add(b2)).layerNorm())
+        activations.copyFrom(feedForwardInput.add(feedForwardHidden.mm(W2).add(b2)).layerNormByRow())
 
         inputs.mul(0.0)
         events.updated.fire()

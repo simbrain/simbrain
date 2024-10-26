@@ -383,7 +383,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
     suspend fun createNode(supervisedModel: SupervisedModel) = addScreenElement {
         val arrayNodes = supervisedModel.layers.map { modelNodeMap.get<NeuronArrayNode>(it) }
-        val weightMatrixNodes = supervisedModel.weightMatrixTree.tree.flatten().map { modelNodeMap.get<WeightMatrixNode>(it) }
+        val weightMatrixNodes = supervisedModel.weightMatrices.map { modelNodeMap.get<WeightMatrixNode>(it) }
         SupervisedModelNode(this, supervisedModel).apply {
             arrayNodes.forEach { addNode(it) }
             weightMatrixNodes.forEach { addNode(it) }

@@ -308,6 +308,91 @@ fun WeightMatrixTree.applyBackprop(targetValues: Matrix, lossFunction: BackpropL
     return error
 }
 
+fun computeUpdateOrderList(end: Layer): LinkedHashSet<Layer> {
+    val visited = LinkedHashSet<Layer>()
+    val queue = ArrayDeque<Layer>()
+
+    queue.add(end)
+
+    while (queue.isNotEmpty()) {
+        val currentLayer = queue.removeFirst()
+
+        if (currentLayer in visited) {
+            continue
+        }
+
+        visited.add(currentLayer)
+        for (neighbor in currentLayer.incomingConnectors) {
+            if (neighbor.source !in visited) {
+                queue.add(neighbor.source)
+            }
+        }
+    }
+
+    return LinkedHashSet(visited.reversed())
+}
+
+context(Network)
+fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: List<Layer>) {
+
+    if (inputValues.size != inputLayers.size) throw IllegalArgumentException("Must provide same number of input vectors as input layers")
+    inputValues.zip(inputLayers).forEach { (a, b) -> a.validateSameShape(b.activations) }
+
+    val allLayers = this
+
+    inputLayers.zip(inputValues).forEach { (layer, value) -> (layer as NeuronArray).activations = value }
+
+    allLayers.forEach {
+        it.accumulateInputs()
+        it.update()
+    }
+
+}
+
+context(Network)
+fun LinkedHashSet<Layer>.accumulateBackprop(
+    targetValues: Matrix,
+    outputLayer: Layer,
+    weightAccumulator: HashMap<WeightMatrix, Matrix>,
+    biasesAccumulator: HashMap<NeuronArray, Matrix>,
+    lossFunction: BackpropLossFunction = BackpropLossFunction.SSE
+): Double {
+
+    val reversedLayers = reversed()
+
+    targetValues.validateSameShape(outputLayer.activations)
+    lossFunction.validateLayer(outputLayer as NeuronArray)
+
+    val error = lossFunction.scalarLoss(outputLayer.activations, targetValues)
+
+    // printActivationsAndWeights()
+    var layerError: Matrix = lossFunction.outputError(outputLayer.activations, targetValues)
+
+    reversedLayers.forEach { layer ->
+        val neuronArray: NeuronArray = layer as NeuronArray
+        (neuronArray.updateRule as? DifferentiableUpdateRule)?.getDerivative(neuronArray.inputs)?.let {
+                deriv -> layerError.mul(deriv)
+        }
+        biasesAccumulator.getOrPut(neuronArray) {
+            Matrix(neuronArray.size, 1)
+        }.add(layerError)
+
+        val localError = Matrix(layerError.nrow(), layerError.ncol())
+
+        neuronArray.incomingConnectors.forEach { connector ->
+            val wm = connector as WeightMatrix
+            val (delta, errors) = wm.computeDelta(layerError)
+            localError.add(errors)
+            weightAccumulator.getOrPut(wm) {
+                Matrix(wm.weightMatrix.nrow(), wm.weightMatrix.ncol())
+            }.add(delta)
+        }
+        layerError = localError
+    }
+
+    return error
+}
+
 /**
  * Returns a list or chain of connectors from input (start) to output (end).
  */

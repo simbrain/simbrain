@@ -6,6 +6,7 @@ import org.simbrain.util.minus
 import org.simbrain.util.plus
 import org.simbrain.util.rowVectorTransposed
 import org.simbrain.util.stats.ProbabilityDistribution
+import smile.math.matrix.Matrix
 import java.awt.geom.Point2D
 
 class SupervisedModel(
@@ -13,9 +14,9 @@ class SupervisedModel(
     override val outputLayer: NeuronArray
 ): LocatableModel(), SupervisedNetwork {
 
-    val weightMatrixTree: WeightMatrixTree = WeightMatrixTree(listOf(inputLayer), outputLayer)
+    val layers = computeUpdateOrderList(outputLayer)
 
-    val layers = weightMatrixTree.tree.flatten().flatMap { listOf(it.tar, it.src) }.distinct()
+    val weightMatrices = layers.flatMap { it.outgoingConnectors }
 
     @Transient
     override val events = LocationEvents()
@@ -48,19 +49,19 @@ class SupervisedModel(
     }
 
     override fun initWeights() {
-        weightMatrixTree.tree.flatten().forEach { trainer.weightInitializationStrategy.initializeWeights(it) }
+        weightMatrices.forEach { trainer.weightInitializationStrategy.initializeWeights(it as WeightMatrix) }
     }
 
     override fun initBiases() {
-        weightMatrixTree.tree.flatten().map { it.tar }.distinct().forEach {
+        layers.forEach {
             it.clear()
-            it.randomizeBiases()
+            (it as? NeuronArray)?.randomizeBiases()
         }
     }
 
     context(Network)
     override fun forwardPass() {
-        weightMatrixTree.forwardPass(listOf(inputLayer.activations))
+        layers.forwardPass(listOf(inputLayer.activations), inputLayers = listOf(inputLayer))
     }
 
     override suspend fun delete() {
@@ -72,10 +73,25 @@ class SupervisedModelTrainer: SupervisedTrainer<SupervisedModel>() {
 
     context(Network)
     override fun SupervisedModel.trainRow(rowNum: Int): Double {
+        val weightAccumulator: HashMap<WeightMatrix, Matrix> = HashMap()
+        val biasesAccumulator: HashMap<NeuronArray, Matrix> = HashMap()
+
         inputLayer.setActivations(trainingSet.inputs.row(rowNum))
         val targetVec = trainingSet.targets.rowVectorTransposed(rowNum)
-        weightMatrixTree.forwardPass(listOf(inputLayer.activations))
-        return weightMatrixTree.applyBackprop(targetVec, epsilon = learningRate, lossFunction = lossFunction)
+        layers.forwardPass(listOf(inputLayer.activations), inputLayers = listOf(inputLayer))
+        val error = layers.accumulateBackprop(targetVec, outputLayer, weightAccumulator, biasesAccumulator, lossFunction = lossFunction)
+
+        weightAccumulator.forEach { (wm, delta) ->
+            wm.weightMatrix.add(delta.mul(trainer.learningRate))
+            wm.events.updated.fire()
+        }
+
+        biasesAccumulator.forEach { (na, delta) ->
+            na.biases.add(delta.mul(trainer.learningRate))
+            na.events.updated.fire()
+        }
+
+        return error
     }
 
 }

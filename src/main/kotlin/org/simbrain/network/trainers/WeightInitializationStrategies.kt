@@ -6,7 +6,10 @@ import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 import kotlin.math.sqrt
 
-sealed class WeightInitializationStrategy(val seed: Long? = null): CopyableObject {
+enum class Distribution {
+    UNIFORM, NORMAL
+}
+sealed class WeightInitializationStrategy(val seed: Long? = null, val distribution: Distribution = Distribution.UNIFORM): CopyableObject {
     abstract fun initializeWeights(weightMatrix: WeightMatrix)
 
     override fun getTypeList(): List<Class<out CopyableObject>> = listOf(
@@ -16,12 +19,15 @@ sealed class WeightInitializationStrategy(val seed: Long? = null): CopyableObjec
     )
 }
 
-class Xavier(seed: Long? = null): WeightInitializationStrategy(seed) {
+class Xavier(seed: Long? = null, distribution: Distribution = Distribution.UNIFORM): WeightInitializationStrategy(seed) {
 
     override fun initializeWeights(weightMatrix: WeightMatrix) {
         val numInputs = weightMatrix.src.size
         val numOutputs = weightMatrix.tar.size
-        val randomizer = UniformRealDistribution(-sqrt(6.0 / (numInputs + numOutputs)), sqrt(6.0 / (numInputs + numOutputs))).apply { randomSeed = seed }
+        val randomizer = when (distribution){
+            Distribution.UNIFORM -> UniformRealDistribution(-sqrt(6.0 / (numInputs + numOutputs)), sqrt(6.0 / (numInputs + numOutputs)))
+            Distribution.NORMAL -> NormalDistribution(0.0, sqrt(2.0/ (numInputs+ numOutputs)))
+        }.apply {randomSeed = seed}
         weightMatrix.randomize(randomizer)
     }
 
@@ -30,12 +36,15 @@ class Xavier(seed: Long? = null): WeightInitializationStrategy(seed) {
     }
 }
 
-class He(seed: Long? = null): WeightInitializationStrategy(seed) {
+class He(seed: Long? = null, distribution: Distribution = Distribution.UNIFORM): WeightInitializationStrategy(seed) {
 
 
     override fun initializeWeights(weightMatrix: WeightMatrix) {
         val numInputs = weightMatrix.src.size
-        val randomizer = UniformRealDistribution(-sqrt(6.0 / numInputs), sqrt(6.0 / numInputs)).apply { randomSeed = seed }
+        val randomizer = when (distribution){
+            Distribution.UNIFORM -> UniformRealDistribution(-sqrt(6.0 / numInputs), sqrt(6.0 / numInputs))
+            Distribution.NORMAL -> NormalDistribution(0.0, sqrt(2.0/ numInputs))
+        }.apply {randomSeed = seed}
         weightMatrix.randomize(randomizer)
     }
 
@@ -44,16 +53,34 @@ class He(seed: Long? = null): WeightInitializationStrategy(seed) {
     }
 }
 
-class LeCun(seed: Long? = null): WeightInitializationStrategy(seed) {
+class LeCun(seed: Long? = null, distribution: Distribution = Distribution.UNIFORM): WeightInitializationStrategy(seed) {
 
     override fun initializeWeights(weightMatrix: WeightMatrix) {
         val numInputs = weightMatrix.src.size
-        val randomizer = NormalDistribution(0.0, 1.0 / numInputs).apply { randomSeed = seed }
+        val randomizer = when (distribution){
+            Distribution.UNIFORM -> UniformRealDistribution(-sqrt(3.0 / numInputs), sqrt(3.0 / numInputs))
+            Distribution.NORMAL -> NormalDistribution(0.0, sqrt(1.0/ numInputs))
+        }.apply {randomSeed = seed}
         weightMatrix.randomize(randomizer)
     }
 
     override fun copy(): CopyableObject {
         return LeCun(seed)
+    }
+}
+
+class Direct(seed: Long? = null, distribution: Distribution = Distribution.UNIFORM, val mean: Double = 0.0, val stddev: Double = 0.05): WeightInitializationStrategy(seed) {
+    override fun initializeWeights(weightMatrix: WeightMatrix) {
+        val numInputs = weightMatrix.src.size
+        val randomizer = when (distribution){
+            Distribution.UNIFORM -> UniformRealDistribution(-stddev, stddev)
+            Distribution.NORMAL -> NormalDistribution(mean, stddev)
+        }.apply {randomSeed = seed}
+        weightMatrix.randomize(randomizer)
+    }
+
+    override fun copy(): CopyableObject {
+        return Direct(seed)
     }
 }
 

@@ -37,10 +37,7 @@ open class LinearRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Di
         description = "Lower bound that determines the minimum level of activity of a node.",
         order = -10,
         onUpdate = {
-            enableWidget(
-                widgetValue(::clippingType) == ClippingType.PiecewiseLinear ||
-                        widgetValue(::clippingType) == ClippingType.Relu
-            )
+            enableWidget(widgetValue(::clippingType) == ClippingType.PiecewiseLinear)
         }
     )
 

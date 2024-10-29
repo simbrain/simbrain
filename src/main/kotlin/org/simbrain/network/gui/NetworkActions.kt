@@ -330,7 +330,8 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Display / Edit Weight Matrix...",
         description = "Show a weight matrix connecting source neurons (adorned with red squares) and target neurons (regular green selection)",
         iconPath = "menu_icons/grid.png",
-        enablingCondition = EnablingCondition.SOURCE_AND_TARGET_NEURONS
+        enablingCondition = EnablingCondition.SOURCE_AND_TARGET_NEURONS,
+        keyboardShortcuts = Ctrl + 'M'
     ) {
         val sources = selectionManager.filterSelectedSourceModels<Neuron>()
         val targets = selectionManager.filterSelectedModels<Neuron>()

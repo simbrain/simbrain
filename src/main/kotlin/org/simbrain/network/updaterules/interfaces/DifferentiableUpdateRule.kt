@@ -13,6 +13,7 @@
  */
 package org.simbrain.network.updaterules.interfaces
 
+import org.simbrain.util.applyFunction
 import smile.math.matrix.Matrix
 
 /**
@@ -35,10 +36,6 @@ interface DifferentiableUpdateRule {
      * Array based derivative. By default forwards to scalar derivative.
      */
     fun getDerivative(input: Matrix): Matrix {
-        val derivatives = Matrix(input.nrow(), 1)
-        for (i in 0 until derivatives.nrow()) {
-            derivatives[i, 0] = getDerivative(input[i, 0])
-        }
-        return derivatives
+        return input.applyFunction(::getDerivative)
     }
 }

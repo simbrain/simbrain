@@ -23,6 +23,7 @@ import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PImage
 import org.piccolo2d.nodes.PText
+import org.simbrain.network.core.ArrayLayer
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.randomizeBiases
 import org.simbrain.network.events.NeuronArrayEvents
@@ -32,7 +33,7 @@ import org.simbrain.network.gui.createCouplingMenu
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.spaceMenu
 import org.simbrain.network.trainers.SupervisedModel
-import org.simbrain.network.trainers.getConnectorChain
+import org.simbrain.network.trainers.computeUpdateOrderList
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.addBorder
@@ -400,7 +401,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                 if (target == null) {
                     reasons.add("No target model selected")
                 }
-                if (source != null && target != null && getConnectorChain(source, target).isEmpty()) {
+                if (source != null && target != null && computeUpdateOrderList(target).isEmpty()) {
                     reasons.add("No connection between source and target")
                 }
                 return reasons.isEmpty() to reasons.joinToString(", ")
@@ -420,8 +421,8 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                 val (canCreate) = canCreateSupervisedModel()
 
                 if (canCreate) {
-                    val input = selectionManager.sourceModels.firstOrNull() as? NeuronArray
-                    val output = selectionManager.selectedModels.firstOrNull() as? NeuronArray
+                    val input = selectionManager.sourceModels.firstOrNull() as? ArrayLayer
+                    val output = selectionManager.selectedModels.firstOrNull() as? ArrayLayer
 
                     if (input != null && output != null) {
                         val supervisedModel = SupervisedModel(input, output)

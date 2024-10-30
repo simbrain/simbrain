@@ -10,8 +10,8 @@ import smile.math.matrix.Matrix
 import java.awt.geom.Point2D
 
 class SupervisedModel(
-    override val inputLayer: NeuronArray,
-    override val outputLayer: NeuronArray
+    override val inputLayer: ArrayLayer,
+    override val outputLayer: ArrayLayer
 ): LocatableModel(), SupervisedNetwork {
 
     val layers = computeUpdateOrderList(outputLayer)
@@ -74,7 +74,7 @@ class SupervisedModelTrainer: SupervisedTrainer<SupervisedModel>() {
     context(Network)
     override fun SupervisedModel.trainRow(rowNum: Int): Double {
         val weightAccumulator: HashMap<WeightMatrix, Matrix> = HashMap()
-        val biasesAccumulator: HashMap<NeuronArray, Matrix> = HashMap()
+        val biasesAccumulator: HashMap<ArrayLayer, Matrix> = HashMap()
 
         inputLayer.setActivations(trainingSet.inputs.row(rowNum))
         val targetVec = trainingSet.targets.rowVectorTransposed(rowNum)

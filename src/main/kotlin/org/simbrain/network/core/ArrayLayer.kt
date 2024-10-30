@@ -24,6 +24,8 @@ abstract class ArrayLayer(
             events.clampChanged.fire()
         }
 
+    abstract override var activations: Matrix
+
     override val inputs: Matrix = Matrix(inputSize, 1)
 
     override val size: Int get() = inputs.size().toInt()

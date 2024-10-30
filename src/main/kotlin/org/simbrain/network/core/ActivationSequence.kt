@@ -1,10 +1,15 @@
 package org.simbrain.network.core
 
 import org.simbrain.network.gui.nodes.ActivationSequenceProcessor
+import org.simbrain.network.updaterules.LinearRule
+import org.simbrain.network.updaterules.NeuronUpdateRule
+import org.simbrain.network.util.MatrixDataHolder
+import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.util.UserParameter
 import org.simbrain.util.copyFrom
 import org.simbrain.util.flatten
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.toDoubleArray
 import smile.math.matrix.Matrix
@@ -12,10 +17,42 @@ import smile.stat.distribution.GaussianDistribution
 
 class ActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inputSize), EditableObject, ActivationSequenceProcessor {
 
+    var updateRule: NeuronUpdateRule<ScalarDataHolder, MatrixDataHolder> by GuiEditable(
+        initValue = LinearRule(),
+        order = 100,
+        typeMapProvider = NeuronUpdateRule<*, *>::getNeuronArrayTypeMap,
+        setter = {
+            val typeChanged = field::class != it::class
+            field = it
+            if (typeChanged) {
+                dataHolder = updateRule.createMatrixData(size)
+            }
+            events.updated.fire()
+        }
+    )
+
+    /**
+     * Holds data for prototype rule.
+     */
+    var dataHolder: MatrixDataHolder by GuiEditable(
+        initValue = updateRule.createMatrixData(inputSize),
+        order = 99,
+        onUpdate = {
+            val proposedDataHolder = widgetValue(::updateRule).createMatrixData(size)
+            if (widgetValue(::dataHolder)::class != proposedDataHolder::class) {
+                refreshValue(proposedDataHolder)
+            }
+        }
+    )
+
     override val inputs: Matrix = Matrix(sequenceSize, inputSize)
 
     @UserParameter(label = "Activations", description = "Activations in the sequence", order = 1)
     override var activations: Matrix = Matrix(sequenceSize, inputSize)
+        set(value) {
+            field.copyFrom(value)
+            events.updated.fire()
+        }
 
     override val activationArray: DoubleArray
         get() = activations.flatten()
@@ -47,7 +84,7 @@ class ActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inpu
         if (isClamped) {
             return
         }
-        activations.copyFrom(inputs)
+        updateRule.apply(this, dataHolder)
         inputs.mul(0.0)
         events.updated.fire()
     }

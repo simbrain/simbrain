@@ -9,11 +9,12 @@ import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.EmptyScalarData
 import org.simbrain.util.UserParameter
+import org.simbrain.util.applyFunction
+import org.simbrain.util.copyFrom
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
-import smile.math.matrix.Matrix
 import kotlin.math.max
 
 /**
@@ -86,9 +87,7 @@ open class LinearRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Di
 
     context(Network)
     override fun apply(layer: Layer, dataHolder: EmptyMatrixData) {
-        for (i in 0 until layer.activations.nrow()) {
-            layer.activations[i, 0] = linearRule(layer.inputs[i, 0])
-        }
+        layer.activations.copyFrom(layer.inputs.applyFunction(::linearRule))
     }
 
     fun linearRule(input: Double): Double {

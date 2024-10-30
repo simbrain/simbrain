@@ -13,8 +13,8 @@
  */
 package org.simbrain.network.trainers
 
+import org.simbrain.network.core.ArrayLayer
 import org.simbrain.network.core.Network
-import org.simbrain.network.core.NeuronArray
 
 /**
  * Interface for networks that can be trained using standard supervised learning methods.
@@ -25,9 +25,9 @@ interface SupervisedNetwork {
 
     var trainingSet: MatrixDataset
 
-    val inputLayer: NeuronArray
+    val inputLayer: ArrayLayer
 
-    val outputLayer: NeuronArray
+    val outputLayer: ArrayLayer
 
     context(Network)
     fun update()

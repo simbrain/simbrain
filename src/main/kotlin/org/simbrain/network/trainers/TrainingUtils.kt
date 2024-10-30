@@ -340,7 +340,9 @@ fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: Lis
 
     val allLayers = this
 
-    inputLayers.zip(inputValues).forEach { (layer, value) -> (layer as NeuronArray).activations = value }
+    inputLayers.zip(inputValues).forEach { (layer, value) ->
+        (layer as? ArrayLayer)?.activations = value
+    }
 
     allLayers.forEach {
         it.accumulateInputs()
@@ -354,7 +356,7 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
     targetValues: Matrix,
     outputLayer: Layer,
     weightAccumulator: HashMap<WeightMatrix, Matrix>,
-    biasesAccumulator: HashMap<NeuronArray, Matrix>,
+    biasesAccumulator: HashMap<ArrayLayer, Matrix>,
     lossFunction: BackpropLossFunction = BackpropLossFunction.SSE
 ): Double {
 

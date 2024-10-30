@@ -310,3 +310,22 @@ fun Matrix.eigenValuesString(precision: Int = 2) = eigen().sort().let {
             }
         }
 }
+
+fun Matrix.applyFunction(fn: (Double) -> Double): Matrix {
+    val result = Matrix(nrow(), ncol())
+    for (i in 0 until nrow()) {
+        for (j in 0 until ncol()) {
+            result[i,j] = fn(get(i,j))
+        }
+    }
+    return result
+}
+
+fun Matrix.applyFunctionInPlace(fn: (Double) -> Double): Matrix {
+    for (i in 0 until nrow()) {
+        for (j in 0 until ncol()) {
+            set(i, j, fn(get(i, j)))
+        }
+    }
+    return this
+}

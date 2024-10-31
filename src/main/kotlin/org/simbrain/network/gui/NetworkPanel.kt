@@ -563,6 +563,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     fun hardClearSelectedObjects() {
         clearSelectedObjects();
         selectionManager.filterSelectedModels<Synapse>().forEach { it.hardClear() }
+        selectionManager.filterSelectedModels<NeuronArray>().forEach { it.hardClear() }
         selectionManager.filterSelectedModels<WeightMatrix>().forEach { it.hardClear() }
         selectionManager.filterSelectedModels<SynapseGroup>().forEach { it.clear() }
     }

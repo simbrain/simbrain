@@ -273,6 +273,11 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         events.updated.fire()
     }
 
+    fun hardClear() {
+        clear()
+        biases.setColConstant(0,0.0)
+    }
+
     override fun increment() {
         activations.add(increment)
         events.updated.fire()

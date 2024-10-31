@@ -288,7 +288,7 @@ fun Matrix.relu(): Matrix {
     return activated
 }
 
-fun Matrix.eigenValuesString(precision: Int = 2) = eigen().sort().let {
+fun Matrix.eigenValuesString(precision: Int = 2, uniqueEigenvaluesOnly: Boolean = false) = eigen().sort().let {
     val realParts = it.wr
     val imaginaryParts = it.wi
     fun format(r: Double, i: Double, isPair: Boolean) = if (i == 0.0) {
@@ -299,9 +299,15 @@ fun Matrix.eigenValuesString(precision: Int = 2) = eigen().sort().let {
         .replace("+-", "-")
 
     (realParts zip imaginaryParts)
-        .groupBy { (r, i) -> r.roundTo(3) to abs(i.roundTo(3)) }
-        .map { (_, values) ->
-            if (values.distinctBy { (_, i) -> i }.count() > 1) {
+        .let { parts ->
+            if (uniqueEigenvaluesOnly) {
+                parts.groupBy { (r, i) -> r.roundTo(3) to abs(i.roundTo(3)) }.values
+            } else {
+                parts.map { part -> listOf(part) }
+            }
+        }
+        .map { values ->
+            if (uniqueEigenvaluesOnly && values.distinctBy { (_, i) -> i }.count() > 1) {
                 val (r, i) = values.first()
                 format(r, i, isPair = true)
             } else {

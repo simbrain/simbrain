@@ -200,7 +200,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
                                 weightMatrix.weightMatrix.eigen()
                                 true
                             } catch (e: Exception) {
-                                println("Error: ${e.message}")
+                                // println("Error: ${e.message}")
                                 false
                             }
                             isEnabled = canShowEigenValues

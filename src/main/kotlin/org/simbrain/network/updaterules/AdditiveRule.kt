@@ -5,6 +5,7 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.EmptyScalarData
+import org.simbrain.util.propertyeditor.CustomTypeName
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 import kotlin.math.atan
@@ -13,6 +14,7 @@ import kotlin.math.atan
  * **AdditiveNeuron** See Haykin (2002), section 14.5. Used with continuous
  * Hopfield networks.
  */
+@CustomTypeName("Additive (Continuous Hopfield)")
 class AdditiveRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), NoisyUpdateRule {
     // TODO: May need clipping and bounds.
     /**
@@ -83,4 +85,5 @@ class AdditiveRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Noisy
 
     override val name: String
         get() = "Additive (Continuous Hopfield)"
+
 }

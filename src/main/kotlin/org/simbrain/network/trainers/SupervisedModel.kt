@@ -11,7 +11,8 @@ import java.awt.geom.Point2D
 
 class SupervisedModel(
     override val inputLayer: ArrayLayer,
-    override val outputLayer: ArrayLayer
+    override val outputLayer: ArrayLayer,
+    private val useImmediateLearning: Boolean = true
 ): LocatableModel(), SupervisedNetwork {
 
     val layers = computeUpdateOrderList(outputLayer)
@@ -23,10 +24,16 @@ class SupervisedModel(
 
     override val trainer = SupervisedModelTrainer()
 
-    override var trainingSet: MatrixDataset = MatrixDataset(
+    override var trainingSet: MatrixDataset = if(useImmediateLearning) { MatrixDataset(
         inputLayer.activations.transpose().clone(),
         outputLayer.activations.transpose().clone()
-    )
+    )} else {
+        // TODO: Temp so it runs
+        MatrixDataset(
+            inputs = Matrix(10,inputLayer.size * (inputLayer as ActivationSequence).sequenceSize),
+            targets = Matrix(10, outputLayer.size)
+        )
+    }
 
     override var location: Point2D
         get() = layers.centerLocation

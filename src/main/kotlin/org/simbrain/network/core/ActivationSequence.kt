@@ -5,13 +5,10 @@ import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.NeuronUpdateRule
 import org.simbrain.network.util.MatrixDataHolder
 import org.simbrain.network.util.ScalarDataHolder
-import org.simbrain.util.UserParameter
-import org.simbrain.util.copyFrom
-import org.simbrain.util.flatten
+import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.stats.ProbabilityDistribution
-import org.simbrain.util.toDoubleArray
 import smile.math.matrix.Matrix
 import smile.stat.distribution.GaussianDistribution
 
@@ -87,6 +84,11 @@ class ActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inpu
         updateRule.apply(this, dataHolder)
         inputs.mul(0.0)
         events.updated.fire()
+    }
+
+    override fun setActivations(activations: DoubleArray) {
+        // TODO: This might not be the best long term solution
+        this.activations = activations.toMatrix().reshape(sequenceSize, inputSize)
     }
 
     fun copy() = ActivationSequence(sequenceSize, inputSize).also {

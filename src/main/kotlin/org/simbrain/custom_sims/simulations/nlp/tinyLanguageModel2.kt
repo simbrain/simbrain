@@ -9,6 +9,8 @@ import org.simbrain.network.core.ActivationSequence
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.TransformerBlock
 import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.gui.dialogs.NetworkPreferences
+import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
@@ -149,6 +151,10 @@ val tinyLanguageModel2 = newSim {
     with(network) {
         addNetworkModels(inputs, embeddings, transformerBlock, softMaxLayer).awaitAll()
         addNetworkModels(weightMatrices).awaitAll()
+        val model = SupervisedModel(inputs, softMaxLayer, false)
+        model.trainingSet.inputs.randomize(NetworkPreferences.weightRandomizer)
+        model.trainingSet.targets.randomize(NetworkPreferences.weightRandomizer)
+        addNetworkModels(model).awaitAll()
     }
 
     workspace.addUpdateAction("Encode Context Window") {
@@ -174,14 +180,14 @@ val tinyLanguageModel2 = newSim {
             .joinToString(if (options.useSpaces) "" else " ")
     }
 
-    inputs.location = point(-300, 200)
+    inputs.location = point(-700, -50)
     embeddings.location = point(-300, -200)
     transformerBlock.location = point(200, -200)
-    softMaxLayer.location = point(200, 200)
+    softMaxLayer.location = point(400, -500)
 
     withGui {
         place(textWorldComponent, 10, 10, 450, 350)
-        place(networkComponent, 460, 10, 500, 550)
+        place(networkComponent, 460, 10, 1000, 800)
     }
 
 }

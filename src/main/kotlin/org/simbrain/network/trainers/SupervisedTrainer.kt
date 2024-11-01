@@ -249,7 +249,7 @@ class SRNTrainer : SupervisedTrainer<SRNNetwork>() {
         val inputVec = trainingSet.inputs.rowVectorTransposed(rowNum)
 
         inputLayer.activations = inputVec
-        update()
+        update() // This sets the context layer so that backprop on the tree can be applied
         return weightMatrixTree.applyBackprop(targetVec, lossFunction = lossFunction, epsilon = learningRate)
     }
 

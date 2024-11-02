@@ -139,6 +139,9 @@ val tinyLanguageModel2 = newSim {
 
     val softMaxLayer = NeuronArray(tokenEmbedding.dimension).apply {
         updateRule = SoftmaxRule()
+        circleMode = true
+        gridMode = true
+        labelArray = tokenEmbedding.tokens.toTypedArray()
     }
 
     val weightMatrices = listOf(
@@ -171,7 +174,7 @@ val tinyLanguageModel2 = newSim {
         encodedContext.take(contextSize).forEachIndexed { i, vector ->
             contextMatrix.setRow(i, vector)
         }
-        inputs.inputs.copyFrom(contextMatrix)
+        inputs.activations = contextMatrix
     }
 
     workspace.updater.updateManager.swapElements(0, 1)

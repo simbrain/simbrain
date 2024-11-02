@@ -1,6 +1,8 @@
 package org.simbrain.custom_sims.simulations.patterns_of_activity
 
 import org.simbrain.custom_sims.*
+import org.simbrain.custom_sims.addDocViewer
+import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.WeightMatrix
@@ -21,16 +23,44 @@ import java.awt.Color
 /**
  * Generic 3 object -> recurrent net example using neuron array
  */
+
 val cogMap3Objects = newSim {
+
+    workspace.clearWorkspace()
+
+    val docViewer = addDocViewer(
+        "Information",
+        """ 
+        # Introduction
+        
+        The Generic 3 Objects Simulation consists of a central recurrent network, where sparse input from the distributed olfactor inputs into the network. The inputs function similarly to the Agent Trails, as the objects sensed by the agent's receptors are plotted into the graph, modelling the reponse of the agent to its world.  
+        
+        Objects in this network are each associated with "smell vectors", which have a stronger impact the closer they are to the agent. Because there are multiple objects in this environment, the agent is presented with multiple overlapping patterns of activation. The total pattern of inputs into the agent's olfactory receptors is a sum of scaled smell vectors. 
+        
+        This simulation models distance based interactions between the agent and objects, showing how networks develop cognitive maps of their environment. 
+        
+        # What to Do
+        1. Run the simulation with the "Run workspace" button in the toolbar. 
+        2. In the "World" window, drag the mouse (the agent) towards the cheese, flower, and fish objects.
+        3. Observe how the elements in the "Network" window and map "Cognitive Map" windows develop when moving the agent
+            - The "Cognitive Map" creates a graph of where the agent senses the objects it interacts with. 
+            - When the agent is directly on top of an object, it labels the point with the corresponding object. 
+        4. The map showcases how an agent develops a sense of an environment. 
+        5. If the map development slows down, restart the "Cognitive Map" window with the "Eraser" button in the tool bar
+            - You can run the simulation again to start mapping again. 
+    """.trimIndent()
+    )
+//    place(docViewer, 0, 0, 516, 632)
 
     val NUM_NEURONS = 120
     val spectralRadius = .9
 
-    workspace.clearWorkspace()
+    //workspace.clearWorkspace()
     val networkComponent = addNetworkComponent("Network")
     val network = networkComponent.network
 
-    place(networkComponent,0, 6, 480, 522)
+    //Network Place
+    //place(networkComponent,899, 449, 480, 427)
 
     // Make reservoir
     val recurrent = NeuronGroup(NUM_NEURONS).apply {
@@ -73,7 +103,8 @@ val cogMap3Objects = newSim {
 
     val odorWorldComponent = addOdorWorldComponent("World")
 
-    place(odorWorldComponent,469, 4, 472, 516)
+    //World Place
+    //place(odorWorldComponent,423, 1, 472, 516)
 
     val odorWorld = odorWorldComponent.world.apply {
         isObjectsBlockMovement = false
@@ -126,12 +157,19 @@ val cogMap3Objects = newSim {
         it.radius = 50.0
     }
 
-    place(projectionPlot,930, 0, 518, 520)
+    //Cognitive Map Place
+    //place(projectionPlot,896, 1, 478, 448)
     with(couplingManager) {
         recurrent couple projectionPlot
         mouse.getProducer(OdorWorldEntity::getNearbyObjectName) couple
                 projectionPlot.getConsumer(ProjectionComponent::setLabel)
     }
 
-}
+    withGui{
+        place(docViewer, 0, 0, 424, 594)
+        place(networkComponent,896, 449, 483, 427)
+        place(odorWorldComponent,425, 1, 470, 593)
+        place(projectionPlot,896, 1, 478, 448)
+    }
 
+}

@@ -346,3 +346,18 @@ fun Matrix.applyFunctionInPlace(fn: (Double) -> Double): Matrix {
     }
     return this
 }
+
+fun Matrix.addToEachRow(columnVector: Matrix): Matrix {
+    if (columnVector.ncol() != 1) {
+        throw IllegalArgumentException("Column vector expected, but matrix has ${columnVector.ncol()} columns")
+    }
+    if (columnVector.nrow() != ncol()) {
+        throw IllegalArgumentException("Column vector has ${columnVector.nrow()} rows, but matrix has ${ncol()} columns")
+    }
+    for (i in 0 until nrow()) {
+        for (j in 0 until ncol()) {
+            set(i, j, get(i, j) + columnVector[j, 0])
+        }
+    }
+    return this
+}

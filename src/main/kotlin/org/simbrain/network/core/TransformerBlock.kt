@@ -11,10 +11,12 @@ import kotlin.math.sqrt
 
 class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: Int): ArrayLayer(inputSize), EditableObject, ActivationSequenceProcessor {
 
-    override val inputs: Matrix = Matrix(sequenceSize, inputSize)
+    override val size: Int = inputSize
+
+    override val inputs: Matrix = Matrix(sequenceSize, size)
 
     @UserParameter(label = "Activations", description = "Activations in the sequence", order = 1)
-    override var activations: Matrix = Matrix(sequenceSize, inputSize)
+    override var activations: Matrix = Matrix(sequenceSize, size)
 
     @UserParameter(label = "Matrix Visibility", description = "Show the QKV matrices", order = 10)
     var matrixVisibility = true
@@ -40,24 +42,24 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
     override val activationArray: DoubleArray
         get() = activations.flatten()
 
-    val K = Matrix(inputSize, inputSize)
-    val Q = Matrix(inputSize, inputSize)
-    val V = Matrix(inputSize, inputSize)
+    val K = Matrix(size, size)
+    val Q = Matrix(size, size)
+    val V = Matrix(size, size)
 
-    val kStack = Matrix(sequenceSize, inputSize)
-    val qStack = Matrix(sequenceSize, inputSize)
-    val vStack = Matrix(sequenceSize, inputSize)
+    val kStack = Matrix(sequenceSize, size)
+    val qStack = Matrix(sequenceSize, size)
+    val vStack = Matrix(sequenceSize, size)
 
     val selfAttention = Matrix(sequenceSize, sequenceSize)
 
 
     // Feedforward network parameters
-    val W1 = Matrix(inputSize, hiddenSize)
-    val b1 = Matrix(sequenceSize, hiddenSize)
-    val W2 = Matrix(hiddenSize, inputSize)
-    val b2 = Matrix(sequenceSize, inputSize)
+    val W1 = Matrix(hiddenSize, size)
+    val b1 = Matrix(hiddenSize, 1)
+    val W2 = Matrix(size, hiddenSize)
+    val b2 = Matrix(size, 1)
 
-    val feedForwardInput = Matrix(sequenceSize, inputSize)
+    val feedForwardInput = Matrix(sequenceSize, size)
 
     val feedForwardHidden = Matrix(sequenceSize, hiddenSize)
 
@@ -65,9 +67,6 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
 
     override val biasArray: DoubleArray
         get() = throw UnsupportedOperationException("Not applicable to Transformer")
-
-
-    override val size: Int = inputSize
 
     context(Network) override fun accumulateInputs() {
         val matrix = (incomingConnectors.firstOrNull() as? WeightMatrix)?.weightMatrix
@@ -97,7 +96,7 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
             return
         }
 
-        val scale = sqrt(inputSize.toDouble())
+        val scale = sqrt(size.toDouble())
 
         kStack.copyFrom(inputs.mm(K))
         qStack.copyFrom(inputs.mm(Q))
@@ -119,9 +118,9 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
 
         feedForwardInput.copyFrom(inputs.clone().add(attentionOutput).layerNormByRow())
 
-        feedForwardHidden.copyFrom(feedForwardInput.mm(W1).add(b1).relu())
+        feedForwardHidden.copyFrom(feedForwardInput.mm(W1.transpose()).addToEachRow(b1).relu())
 
-        activations.copyFrom(feedForwardInput.add(feedForwardHidden.mm(W2).add(b2)).layerNormByRow())
+        activations.copyFrom(feedForwardInput.add(feedForwardHidden.mm(W2.transpose()).addToEachRow(b2)).layerNormByRow())
 
         inputs.mul(0.0)
         events.updated.fire()

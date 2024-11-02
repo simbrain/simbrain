@@ -9,13 +9,31 @@ import smile.math.matrix.Matrix
 import kotlin.math.exp
 import kotlin.math.sqrt
 
+/**
+ * A simplified Transformer block with no attention heads, inspired by the architecture introduced in Vaswani et al. (2017).
+ *
+ * The current design allows [ActivationSequence] to be connected to a transformer block with a weight matrix
+ * and a [NeuronArray] assumed to be softmax connected on the output side. Only the last vector in the output
+ * activation sequence is sent to the neuron array.
+ *
+ * Multiple transformer blocks connected together is not yet supported but should not be hard.
+ *
+ * @see <a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a>
+ */
 class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: Int): ArrayLayer(inputSize), EditableObject, ActivationSequenceProcessor {
 
+    /**
+     * Size of inputs is same as outputs in a transformer block
+     */
     override val size: Int = inputSize
 
     override val inputs: Matrix = Matrix(sequenceSize, size)
 
-    @UserParameter(label = "Activations", description = "Activations in the sequence", order = 1)
+    /**
+     * Activations here are the output layer of the feed forward network. Activations by convention in Simbrain are
+     * the "output" of a layer, which for example weight matrices read from.
+     */
+    @UserParameter(label = "Activations", description = "Output activations", order = 1)
     override var activations: Matrix = Matrix(sequenceSize, size)
 
     @UserParameter(label = "Matrix Visibility", description = "Show the QKV matrices", order = 10)
@@ -39,6 +57,9 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
             events.updateGraphics.fire()
         }
 
+    /**
+     * Output activations as double array
+     */
     override val activationArray: DoubleArray
         get() = activations.flatten()
 
@@ -52,7 +73,6 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
 
     val selfAttention = Matrix(sequenceSize, sequenceSize)
 
-
     // Feedforward network parameters
     val W1 = Matrix(hiddenSize, size)
     val b1 = Matrix(hiddenSize, 1)
@@ -60,7 +80,6 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
     val b2 = Matrix(size, 1)
 
     val feedForwardInput = Matrix(sequenceSize, size)
-
     val feedForwardHidden = Matrix(sequenceSize, hiddenSize)
 
     override val biases: Matrix get() = throw UnsupportedOperationException("Not applicable to Transformer")
@@ -89,7 +108,6 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
         val sumExp = expValues.sum()
         return expValues.map { it / sumExp }.toDoubleArray()
     }
-
 
     context(Network) override fun update() {
         if (isClamped) {
@@ -143,13 +161,12 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
         it.feedForwardHidden.copyFrom(feedForwardHidden)
     }
 
-
     class CreationTemplate : EditableObject {
 
         @UserParameter(label = "Stack Size", description = "Number of activation vectors in the sequence", order = 1)
         var sequenceSize = 7
 
-        @UserParameter(label = "Input Size", description = "Number of inputs to each activation", order = 2)
+        @UserParameter(label = "Input Size", description = "Number of inputs to the layer", order = 2)
         var inputSize = 4
 
         @UserParameter(label = "Hidden Size", description = "Size of the hidden layer in the feedforward network", order = 3)

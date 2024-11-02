@@ -17,7 +17,6 @@ class SpikingNeuronTest {
         net.addSynapse(n2, n3)
     }
 
-
     @Test
     fun `test a spike occurs and stops`() {
         n1.activation = 1.0

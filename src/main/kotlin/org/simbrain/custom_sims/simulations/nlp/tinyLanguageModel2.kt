@@ -54,7 +54,7 @@ class TinyLanguageModelOptions2: EditableObject {
 
     var numberOfSentences by GuiEditable(
         description = "If splitSentences is true, the number of sentences to use at a time.",
-        initValue = 1,
+        initValue = 3,
         conditionallyEnabledBy = TinyLanguageModelOptions2::splitSentences,
         order = 6,
     )
@@ -142,6 +142,8 @@ val tinyLanguageModel2 = newSim {
         circleMode = true
         gridMode = true
         labelArray = tokenEmbedding.tokens.toTypedArray()
+        // Spaces are a hack for label issue in circle mode
+        label = "                                 Predicted Next Token"
     }
 
     val weightMatrices = listOf(
@@ -188,10 +190,10 @@ val tinyLanguageModel2 = newSim {
             .joinToString(if (options.useSpaces) "" else " ")
     }
 
-    inputs.location = point(-700, -50)
-    embeddings.location = point(-300, -200)
-    transformerBlock.location = point(200, -200)
-    softMaxLayer.location = point(400, -500)
+    inputs.location = point(-1000, -200)
+    embeddings.location = point(-200, -200)
+    transformerBlock.location = point(-300, -600)
+    softMaxLayer.location = point(-1000, -600)
 
     withGui {
         place(textWorldComponent, 10, 10, 450, 350)

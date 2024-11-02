@@ -77,10 +77,10 @@ fun List<WeightMatrix>.forwardPass(inputVector: Matrix) {
     }
 }
 
-
 /**
  * Backpropagate the provided errors through this weight matrix, and return the new error.
  */
+ @Deprecated("Migrating towards LinkedHashSet<Layer>.accumulateBackprop")
 fun WeightMatrix.updateWeights(layerError: Matrix, epsilon: Double = .1): Matrix {
     layerError.validateSameShape(target.activations)
     val weightDeltas = layerError.mm(source.activations.transpose())
@@ -100,7 +100,6 @@ fun WeightMatrix.computeWeightDeltas(layerError: Matrix): Matrix {
 
     val sourceIsActivationSequenceProcessor = source is ActivationSequenceProcessor
     val targetIsActivationSequenceProcessor = target is ActivationSequenceProcessor
-
 
     // source is batch and target is vector
     if (sourceIsActivationSequenceProcessor && !targetIsActivationSequenceProcessor) {
@@ -233,6 +232,7 @@ enum class BackpropLossFunction {
  * stored in a sequence from input to output layers
  */
 context(Network)
+@Deprecated("Migrating towards LinkedHashSet<Layer>.accumulateBackprop")
 fun List<WeightMatrix>.applyBackprop(
     targetValues: Matrix,
     epsilon: Double = .1,
@@ -261,6 +261,7 @@ fun List<WeightMatrix>.applyBackprop(
 }
 
 context(Network)
+@Deprecated("Migrating towards LinkedHashSet<Layer>.accumulateBackprop")
 fun List<WeightMatrix>.accumulateBackprop(
     targetValues: Matrix,
     weightAccumulator: HashMap<WeightMatrix, Matrix>,
@@ -313,6 +314,7 @@ fun WeightMatrixTree.forwardPass(inputVectors: List<Matrix>) {
  *
  * Weight matrices are updated one “weight layer” at a time. See [WeightMatrixTree] for more information.
  */
+@Deprecated("Migrating towards LinkedHashSet<Layer>.accumulateBackprop")
 fun WeightMatrixTree.applyBackprop(targetValues: Matrix, lossFunction: BackpropLossFunction = BackpropLossFunction.SSE, epsilon: Double = .0001): Double {
 
     targetValues.validateSameShape(outputWeightLayer.tar.activations)
@@ -379,6 +381,10 @@ fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: Lis
 
 }
 
+/**
+ * Main backprop algorithm implementation, which supports skip connections and accumulates parameter updates
+ * so that the calling function here can handle the addition of accumulated values and apply them to the model parameters.
+ */
 context(Network)
 fun LinkedHashSet<Layer>.accumulateBackprop(
     targetValues: Matrix,
@@ -398,13 +404,18 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
     // printActivationsAndWeights()
     var layerError: Matrix = lossFunction.outputError(outputLayer.activations, targetValues)
 
+    // Go through layers from output to input
     reversedLayers.forEach { layer ->
+
+        // Error is processed by a layer and a new error is produced
         println("Processing ${layer.displayName}")
         when (layer) {
             is NeuronArray -> {
+                // Element-wise product of the layer error with the derivative applied to the weighted inputs
                 (layer.updateRule as? DifferentiableUpdateRule)?.getDerivative(layer.inputs)?.let {
                         deriv -> layerError.mul(deriv)
                 }
+                // The scaled layer error is used for bias update
                 biasesAccumulator.getOrPut(layer) {
                     Matrix(layer.size, 1)
                 }.add(layerError)
@@ -416,17 +427,24 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
             }
         }
 
+        // Process weight matrices feeding into the current layer.
+        // For each one we:
+        //  1. compute a weight delta using source activations
+        //  2. "backpropagate" the errors by multiplying them by the weight matrix to get a new error
         var accumulatedLayerError: Matrix? = null
-
         layer.incomingConnectors.forEach { connector ->
             val wm = connector as WeightMatrix
             val weightDeltas = wm.computeWeightDeltas(layerError)
-            val errors = wm.backpropagateError(layerError)
-            accumulatedLayerError = accumulatedLayerError?.add(errors) ?: errors
             weightAccumulator.getOrPut(wm) {
                 Matrix(wm.weightMatrix.nrow(), wm.weightMatrix.ncol())
             }.add(weightDeltas)
+            // Note that the source of the weight matrix may be the same across multiple passes through this code,
+            // supporting skip connections. In such cases, the backpropagated errors from these connections
+            // are added together to form the accumulated error.
+            val errors = wm.backpropagateError(layerError)
+            accumulatedLayerError = accumulatedLayerError?.add(errors) ?: errors
         }
+        // The new error which will get pushed further back until the last layers are reached
         accumulatedLayerError?.let { layerError = it } // null on the last layer
     }
 

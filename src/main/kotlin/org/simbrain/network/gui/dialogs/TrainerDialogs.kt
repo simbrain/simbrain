@@ -44,7 +44,7 @@ fun <SN> SN.getSupervisedTrainingDialog(): StandardDialog where SN: SupervisedNe
         inputs.toolbar.add(
             inputs.table.createApplyAction("Apply Inputs") { selectedRow ->
                 with(network) {
-                    inputLayer.activations = trainingSet.inputs.rowVectorTransposed(selectedRow)
+                    inputLayer.setActivations(trainingSet.inputs.row(selectedRow))
                     this@SN.forwardPass()
                 }
             }
@@ -52,7 +52,7 @@ fun <SN> SN.getSupervisedTrainingDialog(): StandardDialog where SN: SupervisedNe
         inputs.toolbar.add(inputs.table.createAdvanceRowAction())
         inputs.toolbar.add(inputs.table.createApplyAndAdvanceAction {
             with(network) {
-                inputLayer.activations = trainingSet.inputs.rowVectorTransposed(inputs.table.selectedRow)
+                inputLayer.setActivations(trainingSet.inputs.row(inputs.table.selectedRow))
                 this@SN.forwardPass()
             }
         })

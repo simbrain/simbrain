@@ -41,6 +41,17 @@ fun Matrix.copyFrom(toCopy: Matrix, allowShapeMismatch: Boolean = false) {
     }
 }
 
+fun Matrix.copyFrom(array: DoubleArray) {
+    if (array.size != nrow() * ncol()) {
+        throw IllegalArgumentException("Array of size ${array.size} does not match matrix of size ${nrow()} x ${ncol()}")
+    }
+    for (i in 0 until nrow()) {
+        for (j in 0 until ncol()) {
+            set(i, j, array[i * ncol() + j])
+        }
+    }
+}
+
 /**
  * Returns a matrix reshaped to an indicated size, trimming or padding as needed.
  */

@@ -9,7 +9,8 @@ import org.simbrain.network.core.ActivationSequence
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.TransformerBlock
 import org.simbrain.network.core.WeightMatrix
-import org.simbrain.network.gui.dialogs.NetworkPreferences
+import org.simbrain.network.trainers.BackpropLossFunction
+import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.util.*
@@ -127,6 +128,7 @@ val tinyLanguageModel2 = newSim {
 
     val inputs = ActivationSequence(contextSize, tokenEmbedding.dimension).apply {
         label = "Inputs"
+        isClamped = true
     }
 
     val embeddings = ActivationSequence(contextSize, options.vectorSize).apply {
@@ -152,8 +154,11 @@ val tinyLanguageModel2 = newSim {
         addNetworkModels(inputs, embeddings, transformerBlock, softMaxLayer).awaitAll()
         addNetworkModels(weightMatrices).awaitAll()
         val model = SupervisedModel(inputs, softMaxLayer, false)
-        model.trainingSet.inputs.randomize(NetworkPreferences.weightRandomizer)
-        model.trainingSet.targets.randomize(NetworkPreferences.weightRandomizer)
+        model.trainingSet = MatrixDataset(
+            inputs = inputMatrix,
+            targets = targetMatrix
+        )
+        model.trainer.lossFunction = BackpropLossFunction.CrossEntropy
         addNetworkModels(model).awaitAll()
     }
 

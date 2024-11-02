@@ -86,9 +86,12 @@ class ActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inpu
         events.updated.fire()
     }
 
+    /**
+     * Reshapes flattened activations into a stack of input vectors.
+     */
     override fun setActivations(activations: DoubleArray) {
-        // TODO: This might not be the best long term solution
-        this.activations = activations.toMatrix().reshape(sequenceSize, inputSize)
+        this.activations.copyFrom(activations)
+        events.updated.fire()
     }
 
     fun copy() = ActivationSequence(sequenceSize, inputSize).also {

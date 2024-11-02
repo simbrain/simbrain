@@ -14,6 +14,7 @@
 package org.simbrain.network.trainers
 
 import org.simbrain.network.core.*
+import org.simbrain.network.gui.nodes.ActivationSequenceProcessor
 import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.network.updaterules.interfaces.DifferentiableUpdateRule
 import org.simbrain.util.*
@@ -36,6 +37,7 @@ import kotlin.collections.forEachIndexed
 import kotlin.collections.getOrPut
 import kotlin.collections.intersect
 import kotlin.collections.isNotEmpty
+import kotlin.collections.joinToString
 import kotlin.collections.last
 import kotlin.collections.listOf
 import kotlin.collections.map
@@ -94,15 +96,41 @@ fun WeightMatrix.updateWeights(layerError: Matrix, epsilon: Double = .1): Matrix
     return backropagatedErrors
 }
 
-fun WeightMatrix.computeDelta(layerError: Matrix): Pair<Matrix, Matrix> {
-    layerError.validateSameShape(target.activations)
-    val weightDeltas = layerError.mm(source.activations.transpose())
+fun WeightMatrix.computeWeightDeltas(layerError: Matrix): Matrix {
 
+    val sourceIsActivationSequenceProcessor = source is ActivationSequenceProcessor
+    val targetIsActivationSequenceProcessor = target is ActivationSequenceProcessor
+
+
+    // source is batch and target is vector
+    if (sourceIsActivationSequenceProcessor && !targetIsActivationSequenceProcessor) {
+        return layerError.mm(source.activations.row(source.activations.nrow() - 1).toMatrix().transpose())
+    }
+
+    // source and target are vectors
+    if (!sourceIsActivationSequenceProcessor && !targetIsActivationSequenceProcessor) {
+        return layerError.mm(source.activations.transpose())
+    }
+
+    // source and target are batches
+    if (sourceIsActivationSequenceProcessor && targetIsActivationSequenceProcessor) {
+        return layerError.transpose().mm(source.activations)
+    }
+
+    throw IllegalArgumentException("Invalid source and target types: ${source::class.simpleName} and ${target::class.simpleName}")
+}
+
+fun WeightMatrix.backpropagateError(layerError: Matrix): Matrix {
     // Backpropagate the layer error through the weights to get a new error vector
-    //  Prefer this to layerError.T.mm(wm).T because that requies an extra transpose
-    val backropagatedErrors = weightMatrix.transpose().mm(layerError)
-
-    return Pair(weightDeltas, backropagatedErrors)
+    println("Propagating errors through ${source.displayName} [${layerError.flatten().joinToString(", ") { it.format(2) }}]")
+    return if (target is ActivationSequenceProcessor) {
+        // batch of errors * wm
+        layerError.mm(weightMatrix)
+    } else {
+        // error vector * wm
+        // Prefer this to layerError.T.mm(wm).T because that requies an extra transpose
+        weightMatrix.transpose().mm(layerError)
+    }
 }
 
 /**
@@ -255,11 +283,11 @@ fun List<WeightMatrix>.accumulateBackprop(
         biasesAccumulator.getOrPut(wm.tar) {
             Matrix(wm.tar.size, 1)
         }.add(layerError)
-        val (delta, errors) = wm.computeDelta(layerError)
-        layerError = errors
+        val weightDeltas = wm.computeWeightDeltas(layerError)
+        layerError = wm.backpropagateError(layerError)
         weightAccumulator.getOrPut(wm) {
             Matrix(wm.weightMatrix.nrow(), wm.weightMatrix.ncol())
-        }.add(delta)
+        }.add(weightDeltas)
     }
 
     return error
@@ -371,25 +399,35 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
     var layerError: Matrix = lossFunction.outputError(outputLayer.activations, targetValues)
 
     reversedLayers.forEach { layer ->
-        val neuronArray: NeuronArray = layer as NeuronArray
-        (neuronArray.updateRule as? DifferentiableUpdateRule)?.getDerivative(neuronArray.inputs)?.let {
-                deriv -> layerError.mul(deriv)
+        println("Processing ${layer.displayName}")
+        when (layer) {
+            is NeuronArray -> {
+                (layer.updateRule as? DifferentiableUpdateRule)?.getDerivative(layer.inputs)?.let {
+                        deriv -> layerError.mul(deriv)
+                }
+                biasesAccumulator.getOrPut(layer) {
+                    Matrix(layer.size, 1)
+                }.add(layerError)
+            }
+            is ActivationSequenceProcessor -> {
+                // temporary until we determine how to implement this
+                val newError = Matrix(layer.activations.nrow(), layer.activations.ncol())
+                layerError = newError
+            }
         }
-        biasesAccumulator.getOrPut(neuronArray) {
-            Matrix(neuronArray.size, 1)
-        }.add(layerError)
 
-        val localError = Matrix(layerError.nrow(), layerError.ncol())
+        var accumulatedLayerError: Matrix? = null
 
-        neuronArray.incomingConnectors.forEach { connector ->
+        layer.incomingConnectors.forEach { connector ->
             val wm = connector as WeightMatrix
-            val (delta, errors) = wm.computeDelta(layerError)
-            localError.add(errors)
+            val weightDeltas = wm.computeWeightDeltas(layerError)
+            val errors = wm.backpropagateError(layerError)
+            accumulatedLayerError = accumulatedLayerError?.add(errors) ?: errors
             weightAccumulator.getOrPut(wm) {
                 Matrix(wm.weightMatrix.nrow(), wm.weightMatrix.ncol())
-            }.add(delta)
+            }.add(weightDeltas)
         }
-        layerError = localError
+        accumulatedLayerError?.let { layerError = it } // null on the last layer
     }
 
     return error

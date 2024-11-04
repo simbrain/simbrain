@@ -29,6 +29,8 @@ class BackpropNetworkTest {
 
     init {
         net.addNetworkModels(bp)
+        bp.initBiases()
+        bp.initWeights()
     }
 
     @Test
@@ -59,12 +61,12 @@ class BackpropNetworkTest {
                 runBlocking {
                     repeat(1000) {
                         trainer.trainOnce()
-                        println(trainer.lastError)
                     }
                 }
             }
         }
 
+        println("Bacprop error ${bp.trainer.lastError}")
         assert(bp.trainer.lastError < 0.1) { "Error: ${bp.trainer.lastError}" }
 
     }

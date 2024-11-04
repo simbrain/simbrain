@@ -121,7 +121,7 @@ fun WeightMatrix.computeWeightDeltas(layerError: Matrix): Matrix {
 
 fun WeightMatrix.backpropagateError(layerError: Matrix): Matrix {
     // Backpropagate the layer error through the weights to get a new error vector
-    println("Propagating errors through ${source.displayName} [${layerError.flatten().joinToString(", ") { it.format(2) }}]")
+    //println("Propagating errors through ${source.displayName} [${layerError.flatten().joinToString(", ") { it.format(2) }}]")
     return if (target is ActivationSequenceProcessor) {
         // batch of errors * wm
         layerError.mm(weightMatrix)

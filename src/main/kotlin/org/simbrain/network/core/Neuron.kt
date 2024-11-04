@@ -363,6 +363,9 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
     /**
      * Sums the weighted inputs to this node, by summing the ouptut from incoming synapses,
      * which can either be connectionist (weight times source activation) or the output of a spike responder.
+     *
+     * Does not incorporate bias, though that is often in the definition of weighted inputs.
+     * That occurs at [accumulateInputs]
      */
     val weightedInputs: Double
         get() {

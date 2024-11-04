@@ -272,7 +272,7 @@ fun Synapse.overlapsExistingSynapse(): Boolean {
 
 @JvmName("clampSynapses")
 fun Collection<Synapse>.clamp(clamped: Boolean) {
-    forEach { it.frozen = clamped }
+    forEach { it.clamped = clamped }
 }
 
 @JvmName("clampNeurons")

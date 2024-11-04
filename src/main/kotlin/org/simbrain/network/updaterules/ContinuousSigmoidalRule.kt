@@ -14,7 +14,8 @@ import org.simbrain.util.math.SigmoidFunctionEnum
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
-class ContinuousSigmoidalRule : AbstractSigmoidalRule {
+class ContinuousSigmoidalRule() : AbstractSigmoidalRule() {
+
     /**
      * The **time constant** of these neurons. If **timeConstant *
      * leakConstant == network time-step** (or vice versa), behavior is
@@ -27,7 +28,7 @@ class ContinuousSigmoidalRule : AbstractSigmoidalRule {
         increment = .1,
         order = 1
     )
-    var timeConstant: Double = DEFAULT_TIME_CONSTANT
+    var timeConstant: Double = 10.0
 
     /**
      * The leak constant: how strongly the neuron will be attracted to its base
@@ -35,7 +36,7 @@ class ContinuousSigmoidalRule : AbstractSigmoidalRule {
      * (or vice versa), behavior is equivalent to discrete sigmoid.
      */
     @UserParameter(label = "Leak Constant", description = "An option to add noise.", increment = .1, order = 2)
-    var leakConstant: Double = DEFAULT_LEAK_CONSTANT
+    var leakConstant: Double = 1.0
 
     /**
      * The net value of this neuron. This is the value that is integrated over
@@ -47,19 +48,6 @@ class ContinuousSigmoidalRule : AbstractSigmoidalRule {
     private var netActivation = 0.0
 
     private var inputTerm = 0.0
-
-    /**
-     * Default sigmoidal.
-     */
-    constructor() : super()
-
-    /**
-     * Construct a sigmoid update with a specified implementation.
-     *
-     */
-    constructor(sFunction: SigmoidFunctionEnum) : super() {
-        this.type = sFunction
-    }
 
     override fun copy(): ContinuousSigmoidalRule {
         var sn = ContinuousSigmoidalRule()
@@ -74,20 +62,15 @@ class ContinuousSigmoidalRule : AbstractSigmoidalRule {
      * output activation after being put through a sigmoid squashing function at
      * time t, a is the leak constant, and c is the time constant:
      *
-     *
-     * **c * dx_i/dt = -ax_i(t) + sum(w_ij * r_j(t)**
-     *
+     * c * dx_i/dt = -ax_i(t) + sum(w_ij * r_j(t)
      *
      * Discretizing using euler integration:
      *
+     * x_i(t + dt) = x_i(t) - (ax_i(t) * dt/c) + (dt/c)*sum(w_ij * r_j(t))
      *
-     * **x_i(t + dt) = x_i(t) - (ax_i(t) * dt/c) + (dt/c)*sum(w_ij * r_j(t))**
+     * Factorting out x_i(t)
      *
-     *
-     * Factorting out x_i(t):
-     *
-     *
-     * **x_i(t + dt) = x_i(t) * (1 - a*dt/c) + (dt/c) * sum(w_ij * r_j(t))**
+     * x_i(t + dt) = x_i(t) * (1 - a*dt/c) + (dt/c) * sum(w_ij * r_j(t))
      */
     context(Network)
     override fun apply(neuron: Neuron, data: EmptyScalarData) {
@@ -104,38 +87,6 @@ class ContinuousSigmoidalRule : AbstractSigmoidalRule {
         neuron.activation = type.valueOf(netActivation, upperBound, lowerBound, this.slope)
     }
 
-    val noBytes: Int
-        get() = // bump to interface...
-            // [ buff | netInp | netAct | leak | tau | UB | LB | slope ]
-            56 + 8 // Do some reflection here... 8 is for buffer
-
-    private var offset = 0
-
-    fun update(offset: Int, arr: DoubleArray) {
-        arr[offset] = arr[offset + 2] * (1 - arr[offset + 3] * arr[offset + 4]) + arr[offset + 4] * arr[offset + 1]
-        // arr[offset] = sFunction.valueOf(arr[offset], arr[offset + 5], arr[offset + 6], arr[offset + 7]);
-    }
-
-    fun writeToArr(net: Network, arr: DoubleArray, _offset: Int): Int {
-        offset = _offset
-        arr[_offset + 1] = inputTerm
-        arr[_offset + 2] = netActivation
-        arr[_offset + 3] = leakConstant
-        arr[_offset + 4] = net.timeStep / timeConstant
-        arr[_offset + 5] = upperBound
-        arr[_offset + 6] = lowerBound
-        arr[_offset + 7] = this.slope
-        return _offset + 8 // padding
-    }
-
-    context(Network)
-    fun writeFromArr(neu: Neuron, arr: DoubleArray) {
-        neu.activation = arr[offset]
-        netActivation = arr[offset + 2]
-        leakConstant = arr[offset + 3]
-        timeConstant = 1 / arr[offset + 4] * timeStep
-        inputTerm = arr[offset + 1]
-    }
 
     override val timeType: Network.TimeType
         get() = Network.TimeType.CONTINUOUS
@@ -155,15 +106,4 @@ class ContinuousSigmoidalRule : AbstractSigmoidalRule {
     override val name: String
         get() = "Sigmoidal (Continuous)"
 
-    companion object {
-        /**
-         * Default time constant (ms).
-         */
-        const val DEFAULT_TIME_CONSTANT: Double = 10.0
-
-        /**
-         * Default leak constant [.leak].
-         */
-        const val DEFAULT_LEAK_CONSTANT: Double = 1.0
-    }
 }

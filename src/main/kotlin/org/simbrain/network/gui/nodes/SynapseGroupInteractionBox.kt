@@ -103,14 +103,14 @@ class SynapseGroupInteractionBox(
                 description = "Freeze all synapses in this group (prevent learning)"
             )
             {
-                synapseGroup.synapses.forEach { it.frozen = true }
+                synapseGroup.synapses.forEach { it.clamped = true }
             })
             menu.add(networkPanel.createAction(
                 name = "Unfreeze synapses",
                 description = "Unfreeze all synapses in this group (allow learning)"
             )
             {
-                synapseGroup.synapses.forEach { it.frozen = false }
+                synapseGroup.synapses.forEach { it.clamped = false }
             })
 
             // Synapse Enabling actions

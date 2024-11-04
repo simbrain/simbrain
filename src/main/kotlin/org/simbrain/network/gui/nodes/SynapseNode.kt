@@ -211,7 +211,7 @@ class SynapseNode(
      * of a synapse based on whether it is clamped or not.
      */
     fun updateClampStatus() {
-        if (synapse.frozen) {
+        if (synapse.clamped) {
             circle!!.strokePaint = Color.black
         } else {
             circle!!.strokePaint = null

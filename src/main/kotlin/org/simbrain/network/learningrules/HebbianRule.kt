@@ -47,8 +47,8 @@ class HebbianRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>() {
     override fun apply(connector: Connector, data: EmptyMatrixData) {
         if (connector is WeightMatrix) {
             val wm = connector.weightMatrix
-            val input = (connector.source as NeuronArray).activations
-            val output = (connector.target as NeuronArray).activations
+            val input = connector.source.activations
+            val output = connector.target.activations
             // delta = rate * (input * output^T)
             wm.add(output.mt(input).mul(learningRate))
         }

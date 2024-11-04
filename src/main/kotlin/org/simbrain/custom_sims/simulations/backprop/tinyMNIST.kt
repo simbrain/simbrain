@@ -40,6 +40,8 @@ val tinyMNIST = newSim {
     bp.trainer.lossFunction = BackpropLossFunction.CrossEntropy
     bp.trainer.learningRate = .001
     bp.trainer.updateType = SupervisedTrainer.UpdateMethod.Batch(35)
+    bp.initBiases()
+    bp.initWeights()
 
     bp.inputLayer.gridMode = true
     bp.inputLayer.offset(-350.0, -225.0)

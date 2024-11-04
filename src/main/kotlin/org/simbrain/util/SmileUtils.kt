@@ -2,6 +2,7 @@ package org.simbrain.util
 
 import org.simbrain.plot.histogram.HistogramModel
 import org.simbrain.plot.histogram.HistogramPanel
+import org.simbrain.util.stats.ProbabilityDistribution
 import smile.math.matrix.Matrix
 import kotlin.math.*
 
@@ -221,9 +222,9 @@ fun Matrix.shiftUpAndPadEndWithZero(): Matrix {
 }
 
 /**
- * Element-wise multiplication that broadcasts across columns.
+ * The column vector is elementwise multiplied by each row of the matrix.
  *
- * Assumes vector is a column vector and that it has as many rows as the matrix.
+ * Assumes vector is a column vector and that it has as many rows as the matrix has columns.
  */
 fun Matrix.broadcastMultiply(vector: Matrix): Matrix {
     if (vector.ncol() != 1) {
@@ -369,6 +370,17 @@ fun Matrix.addToEachRow(columnVector: Matrix): Matrix {
     for (i in 0 until nrow()) {
         for (j in 0 until ncol()) {
             set(i, j, get(i, j) + columnVector[j, 0])
+        }
+    }
+    return this
+}
+
+fun Matrix.randomizeSymmetric(randomizer: ProbabilityDistribution): Matrix {
+    for (i in 0 until nrow()) {
+        for (j in i until ncol()) {
+            val randomValue = randomizer.sampleDouble()
+            this[i, j] = randomValue
+            this[j, i] = randomValue // Ensure symmetry
         }
     }
     return this

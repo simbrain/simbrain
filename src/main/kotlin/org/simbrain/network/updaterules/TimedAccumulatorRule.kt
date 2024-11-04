@@ -109,7 +109,7 @@ class TimedAccumulatorRule : SpikingThresholdRule() {
         }
         expSum = 0.0
         for (ii in 0 until fanInSize) {
-            if (!neuron.fanInUnsafe!![ii].frozen) expSum += exp(b * neuron.fanInUnsafe!![ii].strength)
+            if (!neuron.fanInUnsafe!![ii].clamped) expSum += exp(b * neuron.fanInUnsafe!![ii].strength)
         }
         for (ii in 0 until fanInSize) {
             // Skip if pre-synaptic node is off...

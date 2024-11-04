@@ -1,5 +1,6 @@
 package org.simbrain.network.updaterules
 
+import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
@@ -11,12 +12,12 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution
 import kotlin.math.atan
 
 /**
- * **AdditiveNeuron** See Haykin (2002), section 14.5. Used with continuous
- * Hopfield networks.
+ * Decay-type neuron used with continuous Hopfield networks.
+ * See Haykin (2002), section 14.5 and the original Hopfield PNAS article.
  */
 @CustomTypeName("Additive (Continuous Hopfield)")
 class AdditiveRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), NoisyUpdateRule {
-    // TODO: May need clipping and bounds.
+
     /**
      * Lambda.
      */
@@ -51,33 +52,31 @@ class AdditiveRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Noisy
 
     context(Network)
     override fun apply(neuron: Neuron, data: EmptyScalarData) {
-        // Update buffer of additive neuron using Euler's method.
 
-        var wtdSum = 0.0
+        // Need to manually compute weighted input to use g
+        var customWeightedInput = 0.0
         if (neuron.fanIn.size > 0) {
             for (j in neuron.fanIn.indices) {
                 val w = neuron.fanIn[j]
                 val source = w.source
-                wtdSum += (w.strength * g(source.activation))
+                customWeightedInput += (w.strength * g(source.activation))
             }
         }
+        // Hacky way to make sure external inputs are included, by subtracting default weighted
+        // inputs out from our custom weighted inputs. If more use cases requiring custom
+        // weighted input emerge a better solution will needed
+        customWeightedInput += neuron.input - neuron.weightedInputs
 
-        var `val`: Double =
-            neuron.activation + timeStep * (-neuron.activation / resistance + wtdSum)
+        neuron.activation += timeStep * (-neuron.activation / resistance + customWeightedInput)
 
         if (addNoise) {
-            `val` += noiseGenerator.sampleDouble()
+            neuron.activation += noiseGenerator.sampleDouble()
         }
 
-        neuron.activation = `val`
-        neuron.addInputValue(0.0)
     }
 
     /**
      * Implements a Hopfield type sigmoidal function.
-     *
-     * @param x input to function
-     * @return output of function
      */
     private fun g(x: Double): Double {
         return 2 / Math.PI * atan((Math.PI * lambda * x) / 2)

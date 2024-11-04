@@ -8,6 +8,9 @@ import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.EmptyScalarData
 import org.simbrain.util.UserParameter
+import org.simbrain.util.applyFunction
+import org.simbrain.util.applyFunctionInPlace
+import org.simbrain.util.copyFrom
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
@@ -80,26 +83,20 @@ open class DecayRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Cli
 
     context(Network)
     override fun apply(layer: Layer, dataHolder: EmptyMatrixData) {
-        for (i in 0 until layer.activations.nrow()) {
-            layer.activations[i, 0] = decayRule(
-                layer.inputs[i, 0],
-                layer.activations[i, 0]
-            )
-        }
+        layer.activations.add(layer.inputs)
+        layer.activations.applyFunctionInPlace(::decayRule)
         clip(layer.activations)
     }
 
     context(Network)
     override fun apply(neuron: Neuron, data: EmptyScalarData) {
-        neuron.activation = decayRule(
-            neuron.input,
-            neuron.activation
-        )
+        neuron.activation += neuron.input
+        neuron.activation = decayRule(neuron.activation)
         neuron.clip()
     }
 
-    private fun decayRule(input: Double, activation: Double): Double {
-        var retVal = input + activation
+    private fun decayRule(input: Double): Double {
+        var retVal = input
         var decayVal = 0.0
         decayVal = if (updateType == UpdateType.Relative) {
             decayFraction * abs(retVal - baseLine)

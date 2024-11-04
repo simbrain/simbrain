@@ -19,6 +19,8 @@ import org.simbrain.util.table.addSimpleDefaults
 import org.simbrain.util.table.createShowEigenValuesAction
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
+import java.awt.BasicStroke
+import java.awt.Color
 import java.awt.RenderingHints
 import java.awt.event.ActionEvent
 import java.beans.PropertyChangeEvent
@@ -59,6 +61,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         pickable = true
         val events = weightMatrix.events
         events.updated.on { events.updateGraphics.fire() }
+        events.clampChanged.on { setClamped((weightMatrix as WeightMatrix).clamped) }
         events.updateGraphics.on(Dispatchers.Swing) { renderMatrixToImage() }
         events.labelChanged.on(Dispatchers.Swing) { _, newLabel -> interactionBox.setText(newLabel) }
         weightMatrix.source.events.locationChanged.on(Dispatchers.Swing) {
@@ -75,6 +78,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
             imageBox.box.strokePaint = NetworkPreferences.weightMatrixBoundaryColor
         }
         interactionBox.setText(weightMatrix.displayName)
+        setClamped((weightMatrix as WeightMatrix).clamped)
         addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this)
     }
 
@@ -228,6 +232,15 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
                         }
                     }
                 )
+                contextMenu.add(
+                    networkPanel.createAction(
+                        name = "Randomize symmetric",
+                        description = "Use network weight randomizer to randomize the matrix symmetrically ",
+                    ) {
+                            weightMatrix.weightMatrix.randomizeSymmetric(NetworkPreferences.weightRandomizer)
+                            weightMatrix.events.updated.fire()
+                    }
+                )
             }
 
             if (model.source is AbstractNeuronCollection) {
@@ -290,6 +303,18 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         }
         invalidateFullBounds()
     }
+
+    fun setClamped(clamped: Boolean) {
+        if (clamped) {
+            imageBox.box.stroke = BasicStroke(4.0f)
+            imageBox.box.strokePaint = Color.BLACK
+        } else {
+            imageBox.box.stroke = BasicStroke(1.0f)
+            imageBox.box.strokePaint = NetworkPreferences.weightMatrixBoundaryColor
+
+        }
+    }
+
 
     override val propertyDialog: StandardDialog
         get() = matrixDialog

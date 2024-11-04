@@ -30,8 +30,22 @@ import kotlin.math.min
  *
  */
 class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
+
     @UserParameter(label = "Increment amount", increment = .1, order = 20)
     var increment = .1
+
+    /**
+     * Whether weights can be changed by learning rules or not (they can still be manually updated).
+     */
+    @UserParameter(
+        label = "Clamped",
+        description = "If the weight matrix is clamped, local learning rules won't be applied",
+        order = 30)
+    public var clamped = false
+        set(value) {
+            field = value
+            events.clampChanged.fire()
+        }
 
     @UserParameter(label = "Learning Rule", order = 100)
     var learningRule: SynapseUpdateRule<*, *> = StaticSynapseRule()
@@ -170,12 +184,19 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
 
     context(Network)
     override fun update() {
-        // TODO: Check for clamping and enabling
+        if (clamped) {
+            return
+        }
         if (learningRule !is StaticSynapseRule) {
             learningRule.apply(this, learningRuleData)
             updateMasks()
             events.updated.fire()
         }
+    }
+
+
+    override fun toggleClamping() {
+        clamped = !clamped
     }
 
     /**

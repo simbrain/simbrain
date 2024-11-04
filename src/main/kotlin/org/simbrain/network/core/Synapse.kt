@@ -66,7 +66,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
     var strength: Double
         get() = _strength
         set(wt) {
-            if (!frozen) {
+            if (!clamped) {
                 _strength = source.polarity.value(wt).coerceIn(lowerBound, upperBound)
             }
             events.strengthUpdated.fire()
@@ -193,8 +193,8 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
      * Whether or not this synapse's strength can be changed by any means other than direct
      * user intervention.
      */
-    @UserParameter(label = "Frozen", description = "Synapse is frozen (no learning) or not", order = 6)
-    var frozen = false
+    @UserParameter(label = "Clamped", description = "Synapse is clamped (no learning) or not", order = 6)
+    var clamped = false
         set(value) {
             field = value
             events.clampChanged.fire()
@@ -308,7 +308,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
         spikeResponderData = templateSynapse.spikeResponderData.copy()
         isEnabled = templateSynapse.isEnabled
         delay = templateSynapse.delay
-        frozen = templateSynapse.frozen
+        clamped = templateSynapse.clamped
     }
 
     /**
@@ -316,7 +316,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
      */
     context(Network)
     override fun update() {
-        if (frozen) return
+        if (clamped) return
 
         // Update synapse strengths for non-static synapses
         if (learningRule !is StaticSynapseRule) {
@@ -511,7 +511,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
     }
 
     override fun toggleClamping() {
-        frozen = !frozen
+        clamped = !clamped
     }
 
     val length: Double

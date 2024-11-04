@@ -170,12 +170,18 @@ fun Matrix.shiftUp(shiftAmount: Int = 1): Matrix {
  * Set all elements of indicated row to the same provided value
  */
 fun Matrix.setRowConstant(rowIndex: Int, value: Double) {
+    if (rowIndex >= nrow()){
+        throw ArrayIndexOutOfBoundsException()
+    }
     for (i in 0 until ncol()) {
         this[rowIndex, i] = value
     }
 }
 
 fun Matrix.setRow(rowIndex: Int, values: DoubleArray) {
+    if (rowIndex >= nrow()){
+        throw ArrayIndexOutOfBoundsException()
+    }
     if (values.size != ncol()) {
         throw IllegalArgumentException("Values array has ${values.size} elements, but matrix has ${ncol()} columns")
     }
@@ -188,12 +194,18 @@ fun Matrix.setRow(rowIndex: Int, values: DoubleArray) {
  * Set all elements of indicated column to the same provided value
  */
 fun Matrix.setColConstant(colIndex: Int, value: Double) {
+    if(colIndex >= ncol()){
+        throw ArrayIndexOutOfBoundsException()
+    }
     for (i in 0 until nrow()) {
         this[i, colIndex] = value
     }
 }
 
 fun Matrix.setCol(colIndex: Int, values: DoubleArray) {
+    if(colIndex >= ncol()){
+        throw ArrayIndexOutOfBoundsException()
+    }
     if (values.size != nrow()) {
         throw IllegalArgumentException("Values array has ${values.size} elements, but matrix has ${nrow()} rows")
     }

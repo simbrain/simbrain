@@ -32,7 +32,6 @@ import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
 import smile.math.matrix.Matrix
 import java.util.function.Consumer
-import kotlin.math.sqrt
 
 /**
  * A discrete Hopfield network.
@@ -51,7 +50,7 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
     override lateinit var inputData: Matrix
 
     @UserParameter(label = "Update function")
-    var updateFunc = HopfieldUpdate.RAND
+    var updateFunc = HopfieldUpdate.STOCHASTIC
 
     override lateinit var customInfo: InfoText
 
@@ -121,6 +120,13 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
     }
 
     /**
+     * Convert 0 to -1 in order to convert binary vectors like (0,1) to bipolar vectors like (-1,1)
+     */
+    fun bipolar(inputVal: Double): Double {
+        return if (inputVal == 0.0) -1.0 else inputVal
+    }
+
+    /**
      * Apply the basic Hopfield rule to the current pattern. This is not the
      * main training algorithm, which directly makes use of the input data.
      */
@@ -147,21 +153,19 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
      * Main forms of Hopfield update rule.
      */
     enum class HopfieldUpdate {
-        RAND {
+        STOCHASTIC {
             /**
-             * Update neurons in random order
+             * Update a single randomly chosen neuron
              */
             context(Network)
             override fun update(hop: Hopfield) {
-                val copy = hop.neuronGroup.neuronList.shuffled()
-                copy.forEach {
-                    it.accumulateInputs()
-                    it.update()
-                }
+                val randomNeuron = hop.neuronGroup.neuronList.random()
+                randomNeuron.accumulateInputs()
+                randomNeuron.update()
             }
 
             override fun toString(): String {
-                return "Random"
+                return "Stochastic"
             }
         },
         SEQ {
@@ -222,14 +226,5 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
         }
     }
 
-    /**
-     * Convenience method to convert binary values (1,0) to bipolar
-     * values(1,-1).
-     *
-     * @param in number to convert
-     * @return converted number
-     */
-    fun bipolar(inputVal: Double): Double {
-        return if (inputVal == 0.0) -1.0 else inputVal
-    }
+
 }

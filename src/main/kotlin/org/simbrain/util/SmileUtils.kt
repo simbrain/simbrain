@@ -363,10 +363,10 @@ fun Matrix.addToEachRow(columnVector: Matrix): Matrix {
     return this
 }
 
-fun Matrix.randomizeSymmetric(randomizer: ProbabilityDistribution): Matrix {
+fun Matrix.randomizeSymmetric(randomizer: ProbabilityDistribution, zeroDiagonal: Boolean = true): Matrix {
     for (i in 0 until nrow()) {
         for (j in i until ncol()) {
-            val randomValue = randomizer.sampleDouble()
+            val randomValue = if (zeroDiagonal && i == j) 0.0 else randomizer.sampleDouble()
             this[i, j] = randomValue
             this[j, i] = randomValue // Ensure symmetry
         }

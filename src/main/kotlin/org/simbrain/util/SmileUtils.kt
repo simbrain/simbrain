@@ -145,7 +145,9 @@ else sequence {
 }
 
 /**
- * Returns a new matrix whose entries are shifted to the right by the indicated amount.
+ * Returns a new matrix whose entries are shifted by a rightward circular shift, which wraps around so that entries "pushed" past the end of a row reappear at the beginning.
+ *
+ * Use negative shiftamount to shiftleft
  */
 fun Matrix.shiftRight(shiftAmount: Int = 1): Matrix {
     val shiftedMatrix = Matrix(nrow(), ncol())
@@ -157,6 +159,12 @@ fun Matrix.shiftRight(shiftAmount: Int = 1): Matrix {
     return shiftedMatrix
 }
 
+/**
+ * Returns a new matrix whose entries are shifted by an upward circular shift,
+ * which wraps around so that entries "pushed" past the top of a column reappear at the bottom.
+ *
+ * Use negative shiftamount to shiftdown
+ */
 fun Matrix.shiftUp(shiftAmount: Int = 1): Matrix {
     val shiftedMatrix = Matrix(nrow(), ncol())
     for (i in 0 until nrow()) {

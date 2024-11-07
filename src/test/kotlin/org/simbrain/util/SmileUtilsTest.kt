@@ -146,7 +146,7 @@ class SmileUtilsTest {
     }
 
     @Test
-    fun `test copy`(){
+    fun `test copy matrix`(){
         val a = Matrix(3, 3)
         a.copyFrom(testMatrix)
         assertArrayEquals(doubleArrayOf(2.0, 5.0, 8.0), a.col(1))
@@ -156,19 +156,22 @@ class SmileUtilsTest {
     }
 
     @Test
-    fun `test reshape`(){
-        val a = Matrix(2,3)
-        a.copyFrom(testMatrix.reshape(2,3))
+    fun `test reshape matrix`(){
+        val a = testMatrix.reshape(2,3)
+        assertArrayEquals(doubleArrayOf(1.0,2.0,3.0), a.row(0))
+        assertArrayEquals(doubleArrayOf(4.0,5.0,6.0), a.row(1))
+        assertEquals(2, a.nrow())
+        assertEquals(3, a.ncol())
         assertThrows<IllegalArgumentException>{a.validateSameShape(testMatrix)}
-        val b = Matrix(3, 3)
-        b.copyFrom(a.reshape(3,3))
+        val b = a.reshape(3,3)
         assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0), b.row(2))
+        val c = testMatrix.reshape(4,2)
     }
 
     @Test
     fun `test shapeString`(){
-        assertEquals(testMatrix.shapeString, "(3,3)")
-        assertEquals(nonSquareMatrix.shapeString, "(4,3)")
+        assertEquals("(3,3)", testMatrix.shapeString)
+        assertEquals("(4,3)", nonSquareMatrix.shapeString)
     }
 
     @Test
@@ -184,33 +187,40 @@ class SmileUtilsTest {
     fun `test shifting`() {
         assertArrayEquals(doubleArrayOf(3.0, 1.0, 2.0), testMatrix.shiftRight().row(0))
         assertArrayEquals(doubleArrayOf(5.0, 6.0, 4.0), testMatrix.shiftRight(2).row(1))
-        assertArrayEquals(doubleArrayOf(4.0, 7.0, 1.0), testMatrix.shiftUp().col(0))
-        assertArrayEquals(doubleArrayOf(8.0, 2.0, 5.0), testMatrix.shiftUp(2).col(1))
+        assertArrayEquals(doubleArrayOf(4.0, 5.0, 6.0), testMatrix.shiftUp().row(0))
+        assertArrayEquals(doubleArrayOf(7.0, 8.0, 9.0), testMatrix.shiftUp(-1).row(0))
+        assertArrayEquals(doubleArrayOf(7.0, 8.0, 9.0), testMatrix.shiftUp(2).row(0))
     }
 
     @Test
-    fun `test set`(){
+    fun `test setrow and setrowconstant`(){
         val a = Matrix(3,3)
         a.copyFrom(testMatrix)
         a.setRowConstant(0, 10.0)
-        a.setRow(1, doubleArrayOf(11.0, 12.0, 13.0))
         assertArrayEquals(doubleArrayOf(10.0,10.0,10.0), a.row(0))
+        a.setRow(1, doubleArrayOf(11.0, 12.0, 13.0))
+        assertArrayEquals(doubleArrayOf(11.0, 12.0, 13.0), a.row(1))
         assertThrows<ArrayIndexOutOfBoundsException>{a.setRowConstant(3, 10.0)}
-        assertArrayEquals(doubleArrayOf(10.0, 12.0, 8.0), a.col(1))
+        assertThrows<ArrayIndexOutOfBoundsException>{a.setRow(3, doubleArrayOf(0.0,0.0,0.0))}
     }
 
     @Test
-    fun `test flatten`(){
-        val a = Matrix(1,9)
-        val b = Matrix(3, 3)
-        assertDoesNotThrow{a.validateSameShape(b.flatten().toMatrix())}
+    fun `test flatten matrix`(){
+        assertEquals(9, testMatrix.flatten().size)
+    }
+
+    @Test
+    fun `test double array to matrix`(){
+        val colVector =  testMatrix.flatten().toMatrix()
+        assertEquals(9, colVector.nrow())
+        assertEquals(1, colVector.ncol())
     }
 
     @Test
     fun `test appendRow`(){
-        val a = Matrix(4,3)
-        a.copyFrom(testMatrix.appendRow(doubleArrayOf(10.0, 11.0, 12.0)))
-        assertEquals(a, nonSquareMatrix)
+        val a = testMatrix.appendRow(doubleArrayOf(10.0, 11.0, 12.0))
+        assertEquals(4, a.nrow())
+        assertArrayEquals(doubleArrayOf(10.0, 11.0, 12.0), a.row(3))
     }
 
 }

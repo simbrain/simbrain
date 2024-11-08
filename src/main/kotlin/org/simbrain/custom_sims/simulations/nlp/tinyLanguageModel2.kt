@@ -143,7 +143,7 @@ val tinyLanguageModel2 = newSim {
         gridMode = true
         labelArray = tokenEmbedding.tokens.toTypedArray()
         // Spaces are a hack for label issue in circle mode
-        label = "                                 Predicted Next Token"
+        label = "Predicted Next Token"
     }
 
     val weightMatrices = listOf(

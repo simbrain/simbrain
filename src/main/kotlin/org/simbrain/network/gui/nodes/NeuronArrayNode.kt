@@ -537,8 +537,8 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             labelText.font = NEURON_FONT
             labelText.text = "" + neuronArray.label
             labelText.setOffset(
-                activationImage.x - labelText.width / 2 + activationImage.width / 2,
-                activationImage.y - labelText.height - 17
+                infoText.x,
+                infoText.y - labelText.height - 17
             )
             labelBackground.setBounds(labelText.fullBounds)
         }

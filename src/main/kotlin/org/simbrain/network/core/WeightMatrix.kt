@@ -28,6 +28,14 @@ import kotlin.math.min
  * the rows of the weight matrix being dotted one at a time with the rows of the source layer, to
  * generate the target.
  *
+ *A next good one might be Generic 3 objects.
+ * In that one the central network is recurrent network and there is sparse input from the distributed olfactor inputs to the network.
+ * The inputs work like agent trails, so you can say that. The simulations shows how networks develop cognitive maps of their environment.
+ * Then in the “what to do” section you can tell them to run the sim, drag the mouse around the three objects and observe how a map develops in the map window.
+ * When you get right on top of an object it labels the point with the corresponding object.
+ * So you get a feel for how an agent develops a sense of an enviornment.
+ * If it slows down you can press the eraser button in the map window to start mapping again.
+ *
  */
 class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
 

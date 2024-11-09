@@ -1,6 +1,7 @@
 package org.simbrain.custom_sims.simulations
 
 import kotlinx.coroutines.awaitAll
+import org.simbrain.custom_sims.addDocViewer
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.NetworkTextObject
@@ -53,9 +54,35 @@ val tinyMNIST = newSim {
 
     net.addNetworkModels(bp).awaitAll()
 
+    val docViewer = addDocViewer(
+        "Information",
+        """ 
+        # Introduction
+        MNIST (Modified National Institute of Standards and Technology) data base is a large dataset of 70,000 28x28 pixel grayscale images of handwritten digits 0-9. It consists of 60,000 training images and 10,000 testing images,  used in machine learning and image processing. It provides a reliable benchmark for developing and testing models, like neural networks, in classification. 
+        
+        The Tint MNIST simulation trains the network to recognize digits. This simulation takes an image of the network as input, and learns to recognize and identify what digit between 0 and 9 it is. 
+        
+        For more information, read more [here] (https://en.wikipedia.org/wiki/MNIST_database).
+        
+        # What to Do
+        1. Enter the "Train Network" window by right-clicking the "BackpropNetwork_1" network (under the "Tiny Mnist" window) and selecting "Edit/ Tain Backprop...".
+        2. Train the simulation by clicking the Play button.
+            This button should display "Iterate training until stop button is pressed" when hovered over.
+        3. Train this simulation until the "Mean Error" reaches below 0.1.
+            Ideally, the error should hover near 0.02.
+        4. Under the "Inputs" toolbar, select the Next button. 
+            This button should display "Apply current row as input to network" when hovered 
+        5. Click "Ok" to exit the "Train Network" window and return to the "Tiny Mnist" network.
+        6.  Observe how it classifies written digits
+            The values of the output layer correspond to the probability it assigns the input to a digit 0-9. 
+        
+    """.trimIndent()
+    )
+
     // Location of the network in the desktop
     withGui {
-        place(networkComponent, 0, 0, 700, 700)
+        place(networkComponent, 515, 0, 700, 700)
+        place(docViewer, 0, 0, 516, 700)
     }
 
     // Iterate trainer and network once to get it to display a number in the input

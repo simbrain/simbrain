@@ -1,5 +1,6 @@
 package org.simbrain.network.core
 
+import kotlinx.coroutines.runBlocking
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.events.SynapseGroupEvents
@@ -34,7 +35,6 @@ class SynapseGroup @JvmOverloads constructor(
     @Transient
     var weightRandomizer: ProbabilityDistribution = UniformRealDistribution(-1.0, 1.0)
 
-
     @Transient
     override var events = SynapseGroupEvents()
 
@@ -67,8 +67,17 @@ class SynapseGroup @JvmOverloads constructor(
         displaySynapses = source.size * target.size <= threshold
     }
 
-    override suspend fun delete() {
+    fun removeAllSyapsesBlocking() {
+        runBlocking {
+            removeAllSynapses()
+        }
+    }
+    suspend fun removeAllSynapses() {
         this.synapses.forEach { it.delete() }
+    }
+
+    override suspend fun delete() {
+        removeAllSynapses()
         target.removeIncomingSg(this)
         source.removeOutgoingSg(this)
         events.deleted.fire(this).await()

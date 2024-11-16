@@ -32,12 +32,9 @@ import java.util.List;
  */
 public class EdgeOfChaos extends Simulation {
 
-    // TODO: Add more objects
-
     // Simulation Parameters
     int NUM_NEURONS = 120;
     static int GRID_SPACE = 25;
-    // Since mean is 0, lower variance means lower average weight strength
     //  For 120 neurons: .01,.1, and > .4
     private double variance = .1;
     private int K = 4; // in-degree (num connections to each neuron)
@@ -103,9 +100,6 @@ public class EdgeOfChaos extends Simulation {
 
     private void buildSensorNodes() {
 
-        // Offset in pixels of input nodes to right of reservoir
-        int offset = 310;
-
         // Sensor nodes
         sensorNodes = new NeuronGroup(6);
         sensorNodes.setLabel("Sensors");
@@ -115,10 +109,11 @@ public class EdgeOfChaos extends Simulation {
         // Make custom connections from sensor nodes to upper-left and
         // lower-right quadrants of the reservoir network to ensure visually
         // distinct patterns.
-        cheeseToRes = sensorConnections(sensorNodes, reservoir, new int[] {0, 1, 2}, .8, 1);
+        cheeseToRes = createSensorConnections(sensorNodes, reservoir, new int[] {0, 1, 2}, .6, 1);
         net.addNetworkModel(cheeseToRes);
-        flowersToRes = sensorConnections(sensorNodes, reservoir, new int[] {3, 4, 5}, .8, 3);
+        flowersToRes = createSensorConnections(sensorNodes, reservoir, new int[] {3, 4, 5}, .6, 3);
         net.addNetworkModel(flowersToRes);
+        sensorNodes.applyLayout();
     }
 
     public static NeuronGroup createReservoir(Network parentNet, int x, int y, int numNeurons) {
@@ -138,7 +133,6 @@ public class EdgeOfChaos extends Simulation {
         FixedDegree con = new FixedDegree(k, Direction.IN, false, 20.0, false, seed);
 
         SynapseGroup reservoir = new SynapseGroup(res, res, con);
-        // TODO:  0.5, exRand, inRand);
         reservoir.setLabel("Recurrent Synapses");
         parentNet.addNetworkModel(reservoir);
 
@@ -148,56 +142,68 @@ public class EdgeOfChaos extends Simulation {
     // Possibly export this to a utility class
 
     /**
-     * Connect a set of source neurons to a quadrant of the reservoir.
+     * Creates connections between a specified set of source neurons and a designated quadrant
+     * of the target neuron group (reservoir). The connections are created with a specified
+     * sparsity level, and only neurons within the given quadrant are considered as targets.
      *
-     * @param src            inputs
-     * @param tar            reservoir
-     * @param srcNodeIndices which input nodes to connect
-     * @param sparsity       sparsity
-     * @param quadrantNumber 1,2,3 or 4 from upper-left clockwise
-     * @return the resulting synapse group
+     * @param sourceGroup the group of source neurons to connect from
+     * @param targetGroup the group of target neurons (reservoir) to connect to
+     * @param sourceNodeIndices an array of indices specifying which neurons in the source group to connect
+     * @param sparsity the probability of creating a connection between a source neuron and a target neuron (0.0 to 1.0)
+     * @param quadrant the target quadrant of the reservoir (1: upper-left, 2: upper-right, 3: lower-right, 4: lower-left)
+     * @return a {@link SynapseGroup} representing the newly created connections
      */
-    private SynapseGroup sensorConnections(NeuronGroup src, NeuronGroup tar, int[] srcNodeIndices, double sparsity,
-                                           int quadrantNumber) {
 
-        double xStart, yStart, xEnd, yEnd;
+    private SynapseGroup createSensorConnections(
+            NeuronGroup sourceGroup, NeuronGroup targetGroup, int[] sourceNodeIndices,
+            double sparsity, int quadrant) {
 
-        if (quadrantNumber < 3) {
-            yStart = tar.getMinY();
-            yEnd = tar.getCenterY();
-        } else {
-            yStart = tar.getCenterY();
-            yEnd = tar.getMaxY();
+        // Define quadrant boundaries
+        double xStart, xEnd, yStart, yEnd;
+
+        if (quadrant < 3) { // Top quadrants
+            yStart = targetGroup.getMinY();
+            yEnd = targetGroup.getCenterY();
+        } else { // Bottom quadrants
+            yStart = targetGroup.getCenterY();
+            yEnd = targetGroup.getMaxY();
         }
 
-        if ((quadrantNumber == 1) || (quadrantNumber == 4)) {
-            xStart = tar.getMinX();
-            xEnd = tar.getCenterX();
-        } else {
-            xStart = tar.getCenterX();
-            xEnd = tar.getMaxX();
+        if (quadrant == 1 || quadrant == 4) { // Left quadrants
+            xStart = targetGroup.getMinX();
+            xEnd = targetGroup.getCenterX();
+        } else { // Right quadrants
+            xStart = targetGroup.getCenterX();
+            xEnd = targetGroup.getMaxX();
         }
 
-        SynapseGroup src2Res = new SynapseGroup(src, tar);
-        List<Neuron> tarNList = tar.getNeuronList();
-        for (int ii = 0; ii < tar.getSize(); ++ii) {
-            double x = tarNList.get(ii).getX();
-            double y = tarNList.get(ii).getY();
-            if ((y >= yStart) && (y < yEnd)) {
-                if ((x >= xStart) && (x < xEnd)) {
-                    for (int j = 0; j < srcNodeIndices.length; j++) {
-                        if (Math.random() < sparsity) {
-                            Synapse syn = new Synapse(src.getNeuronList().get(srcNodeIndices[j]), tarNList.get(ii));
-                            syn.setStrength(1);
-                            src2Res.addSynapse(syn);
-                        }
+        // Create a new SynapseGroup
+        SynapseGroup synapseGroup = new SynapseGroup(sourceGroup, targetGroup);
+
+        synapseGroup.removeAllSyapsesBlocking();
+
+        // Iterate over neurons in the target group
+        List<Neuron> targetNeurons = targetGroup.getNeuronList();
+        for (Neuron targetNeuron : targetNeurons) {
+            double x = targetNeuron.getX();
+            double y = targetNeuron.getY();
+
+            // Check if the neuron lies within the specified quadrant
+            if (x >= xStart && x < xEnd && y >= yStart && y < yEnd) {
+                // Connect the source neurons to this target neuron
+                for (int sourceIndex : sourceNodeIndices) {
+                    if (Math.random() < sparsity) {
+                        Neuron sourceNeuron = sourceGroup.getNeuronList().get(sourceIndex);
+                        Synapse synapse = new Synapse(sourceNeuron, targetNeuron);
+                        synapse.setStrength(1.0); // Default strength
+                        synapseGroup.addSynapse(synapse);
                     }
                 }
             }
         }
-        return src2Res;
-    }
 
+        return synapseGroup;
+    }
     private void buildOdorWorld() {
 
         // Create the odor world
@@ -211,11 +217,10 @@ public class EdgeOfChaos extends Simulation {
         double dispersion = 65;
         OdorWorldEntity cheese1 = oc.getWorld().addEntity(40, 40,EntityType.SWISS, new double[] {1, 0, 0, 0, 0, 0});
         OdorWorldEntity cheese2 = oc.getWorld().addEntity(60, 40,EntityType.GOUDA, new double[] {0, 1, 0, 0, 0, 0});
-        OdorWorldEntity cheese3 = oc.getWorld().addEntity(80, 40, EntityType.BLUECHEESE, new double[] {1, 0, 1, 0, 0,
-                0});
+        OdorWorldEntity cheese3 = oc.getWorld().addEntity(80, 40, EntityType.BLUECHEESE, new double[] {0, 0, 1, 0, 0, 0});
         OdorWorldEntity flower1 = oc.getWorld().addEntity(290, 40,EntityType.PANSY, new double[] {0, 0, 0, 0, 0, 1});
-        OdorWorldEntity flower2 = oc.getWorld().addEntity(310, 40,EntityType.FLAX, new double[] {0, 0, 0, 0, 0, 1});
-        OdorWorldEntity flower3 = oc.getWorld().addEntity(330, 40,EntityType.TULIP, new double[] {0, 0, 0, 0, 0, 1});
+        OdorWorldEntity flower2 = oc.getWorld().addEntity(310, 40,EntityType.FLAX, new double[] {0, 0, 0, 0, 1, 0});
+        OdorWorldEntity flower3 = oc.getWorld().addEntity(330, 40,EntityType.TULIP, new double[] {0, 0, 0, 1, 0, 0});
         cheese1.getSmellSource().setDispersion(dispersion);
         cheese2.getSmellSource().setDispersion(dispersion);
         cheese3.getSmellSource().setDispersion(dispersion);

@@ -3,6 +3,7 @@ package org.simbrain.custom_sims.simulations
 import kotlinx.coroutines.awaitAll
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.couplingManager
+import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.*
@@ -12,13 +13,16 @@ import org.simbrain.network.util.EmptyScalarData
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.network.util.SpikingScalarData
 import org.simbrain.util.*
+import org.simbrain.util.Utils.FS
 import org.simbrain.util.decayfunctions.StepDecayFunction
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.workspace.updater.updateAction
 import org.simbrain.world.odorworld.OdorWorldComponent
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.sensors.ObjectSensor
+import java.io.File
 import java.lang.Double.max
+import javax.swing.JTextField
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.component3
@@ -39,6 +43,11 @@ val objectTrackingSim = newSim {
     // Varaables to make cheese change direction once in a while
     var counter = 0
     var direction = 1 // 1 for counterclockwise -1 for clockwise
+    var isRecording = false
+    var recordSpikes = false
+
+    // Record direction variables followed by reservoir activations
+    val data = mutableListOf<List<Double>>()
 
     // Basic setup
     workspace.clearWorkspace()
@@ -133,6 +142,18 @@ val objectTrackingSim = newSim {
         }
     }
 
+    network.addUpdateAction(updateAction("Record activations") {
+        if (isRecording) {
+            if(recordSpikes) {
+                with(network) {
+                    data.add(listOf(direction.toDouble()) + resNeurons.map { n -> if (n.isSpike) 1.0 else 0.0 })
+                }
+            } else {
+                data.add(listOf(direction.toDouble()) + resNeurons.map { n -> n.activation })
+            }
+        }
+    })
+
     // network.addUpdateAction(updateAction("Allostatic Learning Rule") {
     //     println("Custom update....")
     // })
@@ -224,6 +245,22 @@ val objectTrackingSim = newSim {
     with(couplingManager) {
         leftTurnNeuron couple turnLeftEffector
         rightTurnNeuron couple turnRightEffector
+    }
+
+    withGui {
+        createControlPanel("Control Panel", 50, 400) {
+            val tfNumIterations: JTextField = addTextField("Number of iterations", "1000")
+            val cbRecordSpikes = addCheckBox("Record spikes", recordSpikes)
+            addButton("Run trial") {
+                isRecording = true
+                recordSpikes = cbRecordSpikes.isSelected
+                workspace.simpleIterate(tfNumIterations.text.toInt())
+                isRecording = false
+                showSaveDialog("", "reservoirdata.csv") {
+                    writeText(data.toCsvString())
+                }
+            }
+        }
     }
 
 }

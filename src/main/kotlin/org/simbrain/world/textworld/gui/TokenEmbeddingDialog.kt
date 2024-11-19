@@ -30,7 +30,8 @@ class TokenEmbeddingDialog(val initialTokenEmbedding: TokenEmbedding, updateToke
             table.model.fireTableStructureChanged()
         })
         addAction(createAction(
-            name = "View Training Document",
+            name = "View Embedding Source",
+            description = "View embedding source",
             iconPath = "menu_icons/Open.png",
         ) {
             (trainingDocument ?: initialTokenEmbedding.trainingDocument)?.let { document ->

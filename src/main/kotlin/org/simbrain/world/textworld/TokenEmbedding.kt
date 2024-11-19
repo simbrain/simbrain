@@ -105,7 +105,15 @@ class TokenEmbedding(
     }
 }
 
-enum class EmbeddingType {ONE_HOT, COC, CUSTOM}
+enum class EmbeddingType(private val description: String) {
+    ONE_HOT("One-Hot encoding"),
+    COC("Co-occurrence encoding"),
+    CUSTOM("Custom encoding");
+
+    override fun toString(): String {
+        return description
+    }
+}
 
 class TokenEmbeddingBuilder(): EditableObject {
 
@@ -126,6 +134,9 @@ class TokenEmbeddingBuilder(): EditableObject {
 
     @UserParameter(label = "If true, keep punctuation marks and add them as tokens", order = 70 )
     var tokenizePunctuation = false
+
+    override val name: String
+        get() = "Token Embedding Builder"
 
     /**
      * Extract a token embedding from the provided string.

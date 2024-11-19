@@ -13,7 +13,7 @@ import java.util.*
  */
 val TextWorld.extractEmbedding get() = createAction(
     name = "Extract embedding...",
-    description = "Extract embedding from text file...",
+    description = "Extract embedding...",
     iconPath = "menu_icons/import.png"
 ) {
     val chooser = SFileChooser(tokenEmbeddingDirectory, "text file", "txt")
@@ -27,8 +27,8 @@ val TextWorld.extractEmbedding get() = createAction(
 }
 
 fun createTrainEmbeddingAction(block: (TokenEmbedding) -> Unit) = createAction(
-    name = "Train embedding...",
-    description = "Train embedding on text file...",
+    name = "Extract embedding...",
+    description = "Extract embedding...",
     iconPath = "menu_icons/import.png"
 ) {
     val chooser = SFileChooser(tokenEmbeddingDirectory, "text file", "txt")

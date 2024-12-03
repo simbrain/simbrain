@@ -35,6 +35,7 @@ import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.util.Utils
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.stats.ProbabilityDistribution
+import smile.math.matrix.Matrix
 import java.util.*
 import java.util.function.Supplier
 
@@ -241,6 +242,18 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
         fun usesCustomZeroPoint(rule: NeuronUpdateRule<*, *>): Boolean {
             return usesCustomZeroPoint.contains(rule.javaClass)
         }
+    }
+
+    /**
+     * Apply provided function to the input to the synapse (that is, the activation of the source neuron, before it is
+     * multiplied by the synaptic weight, etc)
+     */
+    open fun synapticInputModifier(input: Double): Double {
+        return input
+    }
+
+    open fun synapticInputModifier(input: Matrix): Matrix {
+        return input
     }
 }
 

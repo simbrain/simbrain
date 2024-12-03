@@ -216,11 +216,19 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
             // For "connectionist" case. One "half" of a matrix product.
             // Populate each row of the psrMatrix with the element-wise product of the pre-synaptic output vector and
             // that row of the matrix
-            if (source is ActivationSequenceProcessor) {
-                psrMatrix.copyFrom(weightMatrix.broadcastMultiply(source.activations.row(source.activations.nrow() - 1).toMatrix()))
+
+            val sourceActivations = if (source is ActivationSequenceProcessor) {
+                source.activations.row(- 1).toMatrix()
             } else {
-                psrMatrix.copyFrom(weightMatrix.broadcastMultiply(source.activations))
+                source.activations
+            }.let { activations ->
+                (target as? AbstractNeuronCollection)?.neuronList?.first() // assume all neurons in the collection have the same update rule
+                    ?.updateRule?.synapticInputModifier(activations)
+                ?: activations
             }
+
+            psrMatrix.copyFrom(weightMatrix.broadcastMultiply(sourceActivations))
+
         } else {
             spikeResponder.apply(this, spikeResponseData)
         }

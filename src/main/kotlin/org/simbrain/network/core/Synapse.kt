@@ -338,7 +338,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
         // Update the output of this synapse
         if (spikeResponder is NonResponder) {
             // For "connectionist" case
-            psr = source.activation * _strength
+            psr = target.updateRule.synapticInputModifier(source.activation) * _strength
         } else {
             // Updates psr for spiking source neurons
             spikeResponder.apply(this, spikeResponderData)

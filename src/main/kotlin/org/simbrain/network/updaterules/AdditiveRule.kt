@@ -1,14 +1,15 @@
 package org.simbrain.network.updaterules
 
-import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.EmptyScalarData
+import org.simbrain.util.applyFunction
 import org.simbrain.util.propertyeditor.CustomTypeName
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
+import smile.math.matrix.Matrix
 import kotlin.math.atan
 
 /**
@@ -53,21 +54,7 @@ class AdditiveRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Noisy
     context(Network)
     override fun apply(neuron: Neuron, data: EmptyScalarData) {
 
-        // Need to manually compute weighted input to use g
-        var customWeightedInput = 0.0
-        if (neuron.fanIn.size > 0) {
-            for (j in neuron.fanIn.indices) {
-                val w = neuron.fanIn[j]
-                val source = w.source
-                customWeightedInput += (w.strength * g(source.activation))
-            }
-        }
-        // Hacky way to make sure external inputs are included, by subtracting default weighted
-        // inputs out from our custom weighted inputs. If more use cases requiring custom
-        // weighted input emerge a better solution will needed
-        customWeightedInput += neuron.input - neuron.weightedInputs
-
-        neuron.activation += timeStep * (-neuron.activation / resistance + customWeightedInput)
+        neuron.activation += timeStep * (-neuron.activation / resistance + neuron.input)
 
         if (addNoise) {
             neuron.activation += noiseGenerator.sampleDouble()
@@ -78,8 +65,12 @@ class AdditiveRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Noisy
     /**
      * Implements a Hopfield type sigmoidal function.
      */
-    private fun g(x: Double): Double {
-        return 2 / Math.PI * atan((Math.PI * lambda * x) / 2)
+    override fun synapticInputModifier(input: Double): Double {
+        return 2 / Math.PI * atan((Math.PI * lambda * input) / 2)
+    }
+
+    override fun synapticInputModifier(input: Matrix): Matrix {
+        return input.applyFunction(::synapticInputModifier)
     }
 
     override val name: String

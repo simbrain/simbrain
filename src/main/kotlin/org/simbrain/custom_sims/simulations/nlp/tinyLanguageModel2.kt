@@ -25,11 +25,13 @@ import kotlin.math.min
 class TinyLanguageModelOptions2: EditableObject {
     var contextSize by GuiEditable(
         initValue = 24,
+        description = "Number of tokens in a context window",
         order = 1,
     )
 
     var trainerTextPath by GuiEditable(
         initValue = simulationsPath / "texts" / "corpus_artificial_similarity.txt",
+        description = "Text used to train the model",
         order = 2,
         useFileChooser = true,
     )

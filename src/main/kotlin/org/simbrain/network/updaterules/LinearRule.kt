@@ -73,6 +73,7 @@ open class LinearRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Di
 
     @UserParameter(label = "Slope", description = "Slope of linear rule", increment = .1, order = 20)
     var slope = 1.0
+
     override var noiseGenerator: ProbabilityDistribution = UniformRealDistribution()
 
     /**

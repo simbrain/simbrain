@@ -5,6 +5,7 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.EmptyScalarData
+import org.simbrain.util.UserParameter
 import org.simbrain.util.applyFunction
 import org.simbrain.util.propertyeditor.CustomTypeName
 import org.simbrain.util.stats.ProbabilityDistribution
@@ -19,24 +20,24 @@ import kotlin.math.atan
 @CustomTypeName("Additive (Continuous Hopfield)")
 class AdditiveRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), NoisyUpdateRule {
 
-    /**
-     * Lambda.
-     */
+    @UserParameter(
+        label = "Lambda",
+        description = "A gain parameter that controls the steepness of the sigmoid curve. Higher lambda makes the function more like a step function; lower lambda produces a gentler slope",
+        minimumValue = 0.0,
+        increment = .1,
+        order = 10)
     var lambda: Double = 1.4
 
-    /**
-     * Resistance.
-     */
+    @UserParameter(
+        label = "Resistance",
+        description = "Controls the rate of activation decay; higher resistance slows decay, lower resistance causes the activation to decay more quickly",
+        minimumValue = 0.0,
+        increment = .1,
+        order = 20)
     var resistance: Double = 1.0
 
-    /**
-     * Noise generator.
-     */
     override var noiseGenerator: ProbabilityDistribution = UniformRealDistribution()
 
-    /**
-     * For adding noise to the neuron.
-     */
     override var addNoise: Boolean = false
 
     override val timeType: Network.TimeType

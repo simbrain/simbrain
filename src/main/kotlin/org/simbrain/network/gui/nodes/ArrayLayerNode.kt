@@ -37,7 +37,7 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
     /**
      * Box drawn around the [mainNode] together with the [margin].
      */
-    private var borderBox = createBorder()
+    var borderBox = createBorder()
         set(value) {
             removeChild(field)
             addChild(value)

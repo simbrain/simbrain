@@ -536,11 +536,13 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         if (!neuronArray.label.isNullOrEmpty()) {
             labelText.font = NEURON_FONT
             labelText.text = "" + neuronArray.label
-            labelText.setOffset(
-                infoText.x,
-                infoText.y - labelText.height - 17
-            )
-            labelBackground.setBounds(labelText.fullBounds)
+            swingInvokeLater {
+                labelText.setOffset(
+                    borderBox.x + borderBox.width / 2 - labelText.width / 2,
+                    borderBox.y - labelText.height - 17
+                )
+                labelBackground.setBounds(labelText.fullBounds)
+            }
         }
     }
 

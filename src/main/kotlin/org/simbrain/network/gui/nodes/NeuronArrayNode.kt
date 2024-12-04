@@ -539,7 +539,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             swingInvokeLater {
                 labelText.setOffset(
                     borderBox.x + borderBox.width / 2 - labelText.width / 2,
-                    borderBox.y - labelText.height - 17
+                    borderBox.y - labelText.height - 5
                 )
                 labelBackground.setBounds(labelText.fullBounds)
             }

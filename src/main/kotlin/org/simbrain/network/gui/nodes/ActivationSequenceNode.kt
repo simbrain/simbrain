@@ -43,7 +43,7 @@ import javax.swing.*
  * The current pnode representation for all [Layer] objects. May be broken out into subtypes for different
  * subclasses of Layer.
  */
-class ActivationStackNode(networkPanel: NetworkPanel, val activationSequence: ActivationSequence) :
+class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence: ActivationSequence) :
     ArrayLayerNode(networkPanel, activationSequence) {
 
     /**

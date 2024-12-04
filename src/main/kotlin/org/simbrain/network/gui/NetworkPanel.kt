@@ -347,7 +347,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
     suspend fun createNode(neuronArray: NeuronArray) = addScreenElement { NeuronArrayNode(this, neuronArray) }
 
-    suspend fun createNode(activationSequence: ActivationSequence) = addScreenElement { ActivationStackNode(this, activationSequence) }
+    suspend fun createNode(activationSequence: ActivationSequence) = addScreenElement { ActivationSequenceNode(this, activationSequence) }
 
     suspend fun createNode(transformerBlock: TransformerBlock) = addScreenElement { TransformerBlockNode(this, transformerBlock) }
 

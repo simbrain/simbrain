@@ -21,6 +21,7 @@ package org.simbrain.workspace.gui
 import bsh.Interpreter
 import bsh.util.JConsole
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
 import org.pmw.tinylog.Logger
@@ -37,7 +38,6 @@ import org.simbrain.util.widgets.ToggleButton
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.WorkspacePreferences
-import org.simbrain.workspace.updater.PerformanceMonitor.enabled
 import java.awt.*
 import java.awt.event.*
 import java.beans.PropertyVetoException
@@ -121,6 +121,24 @@ object SimbrainDesktop {
      */
     private var wsToolBar = JToolBar()
 
+    val screenSize = Toolkit.getDefaultToolkit().screenSize
+
+    val sideDock = JPanel().apply {
+        add(JScrollPane(JTextArea("Info Dock Content...")))
+    }
+
+    val sideDockSplitter = JSplitPane(JSplitPane.HORIZONTAL_SPLIT).apply {
+        leftComponent = sideDock
+        rightComponent = desktopPane
+    }
+
+    val sideDockManager = DockManager(
+        dock = sideDock,
+        splitter = sideDockSplitter,
+        defaultSize = (screenSize.width * .1).toInt()
+
+    )
+
     val bottomDock = JTabbedPane().apply {
         addTab("Components", null, ComponentPanel(this@SimbrainDesktop), "Show workspace components")
         addTab("Terminal", null, terminalPanel, "Simbrain terminal")
@@ -135,27 +153,9 @@ object SimbrainDesktop {
     val bottomDockManager = DockManager(
         dock = bottomDock,
         splitter = bottomDockSplitter,
-        defaultSize = 200
+        defaultSize = (screenSize.height * .6).toInt()
     )
 
-    val sideDock = JTabbedPane().apply {
-        addTab("Info", JScrollPane(JTextArea("Side Dock Content...")))
-    }
-
-    val sideDockSplitter = JSplitPane(JSplitPane.HORIZONTAL_SPLIT).apply {
-        leftComponent = sideDock
-        rightComponent = desktopPane
-    }
-
-    val sideDockManager = DockManager(
-        dock = sideDock,
-        splitter = sideDockSplitter,
-        defaultSize = 200
-    )
-
-    /**
-     * Boundary of workspace.
-     */
     private val workspaceBounds: Rectangle
 
     /**
@@ -233,8 +233,6 @@ object SimbrainDesktop {
 
     /**
      * Default constructor.
-     *
-     * @param workspace The workspace for this desktop.
      */
     init {
         frame.iconImages = Arrays.asList(
@@ -275,7 +273,6 @@ object SimbrainDesktop {
         workspace.updater.events.workspaceUpdated.on { updateTimeLabel() }
         workspace.updater.events.runStarted.on { StandardDialog.setSimulationRunning(true) }
         workspace.updater.events.runFinished.on { StandardDialog.setSimulationRunning(false) }
-        val screenSize = Toolkit.getDefaultToolkit().screenSize
         workspaceBounds = Rectangle(
             WORKSPACE_INSET,
             WORKSPACE_INSET,
@@ -296,14 +293,13 @@ object SimbrainDesktop {
         // Main panel
         val mainPanel = JPanel(BorderLayout()).apply {
             add(wsToolBar, BorderLayout.NORTH)
-            // TODO: This should be bottomDockSplitter but that's not working so checking this in for now
-            add(sideDockSplitter, BorderLayout.CENTER)
+            add(bottomDockSplitter, BorderLayout.CENTER)
         }
         frame.contentPane = mainPanel
 
         // Initialize docks
-        bottomDock.isVisible = false
-        sideDock.isVisible = false
+        bottomDockManager.toggleDock()
+        sideDockManager.toggleDock()
 
         // Configure frame
         frame.bounds = workspaceBounds
@@ -983,12 +979,6 @@ object SimbrainDesktop {
         timeLabel.text = text
         runningLabel.isVisible = workspace.updater.isRunning
     }
-
-    /**
-     * Helper method for determining where the bottom tab should be placed.
-     */
-    private val dividerLocation: Int
-        get() = (3 * (workspaceBounds.getHeight() / 4)).toInt()
 
     /**
      * Returns the width of the visible portion of the desktop.

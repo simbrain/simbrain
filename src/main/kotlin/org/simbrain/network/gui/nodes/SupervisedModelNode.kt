@@ -26,9 +26,11 @@ import org.simbrain.network.gui.dialogs.getSupervisedTrainingDialog
 import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.Outline
-import javax.swing.*
+import javax.swing.JComponent
+import javax.swing.JOptionPane
+import javax.swing.JPopupMenu
 
-open class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: SupervisedModel) : ScreenElement(networkPanel) {
+class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: SupervisedModel) : ScreenElement(networkPanel) {
 
     private var interactionBox: SupervisedModelNodeInteractionBox = SupervisedModelNodeInteractionBox(networkPanel)
 
@@ -159,13 +161,7 @@ open class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: 
     }
 
     override fun offset(dx: kotlin.Double, dy: kotlin.Double) {
-        for (node in outlinedObjects) {
-            if (node is NeuronGroupNode) {
-                node.offset(dx, dy)
-            } else if (node is NeuronArrayNode) {
-                node.offset(dx, dy)
-            }
-        }
+        outlinedObjects.filter { it.model is LocatableModel }.forEach { it.offset(dx, dy) }
         outline.resetOutlinedNodes(outlinedObjects)
     }
 

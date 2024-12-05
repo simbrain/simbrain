@@ -23,8 +23,6 @@ import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.RenderingHints
 import java.awt.event.ActionEvent
-import java.beans.PropertyChangeEvent
-import java.beans.PropertyChangeListener
 import java.util.*
 import java.util.function.Consumer
 import javax.swing.*
@@ -32,7 +30,7 @@ import javax.swing.*
 /**
  * A visual representation of a weight matrix
  */
-class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) : ScreenElement(networkPanel), PropertyChangeListener {
+class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) : ScreenElement(networkPanel) {
     /**
      * Width of the [imageBox]
      */
@@ -64,13 +62,15 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         events.clampChanged.on { setClamped((weightMatrix as WeightMatrix).clamped) }
         events.updateGraphics.on(Dispatchers.Swing) { renderMatrixToImage() }
         events.labelChanged.on(Dispatchers.Swing) { _, newLabel -> interactionBox.setText(newLabel) }
-        weightMatrix.source.events.locationChanged.on(Dispatchers.Swing) {
+        fun updateLocations() {
             arrow.invalidateFullBounds()
             updateInteractionBoxLocation()
         }
+        weightMatrix.source.events.locationChanged.on(Dispatchers.Swing) {
+            updateLocations()
+        }
         weightMatrix.target.events.locationChanged.on(Dispatchers.Swing) {
-            arrow.invalidateFullBounds()
-            updateInteractionBoxLocation()
+            updateLocations()
         }
         invalidateFullBounds()
         weightMatrix.events.showWeightsChanged.on { updateShowWeights() }
@@ -79,7 +79,6 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         }
         interactionBox.setText(weightMatrix.displayName)
         setClamped((weightMatrix as WeightMatrix).clamped)
-        addPropertyChangeListener(PROPERTY_FULL_BOUNDS, this)
     }
 
     private fun updateInteractionBoxLocation() {
@@ -115,14 +114,12 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
             addChild(arrow)
             addChild(imageBox)
             renderMatrixToImage()
-            setBounds(imageBox.bounds)
         } else {
             updateInteractionBoxLocation()
             interactionBox.invalidateFullBounds()
             removeChild(arrow)
             removeChild(imageBox)
             addChild(interactionBox)
-            setBounds(interactionBox.bounds)
         }
     }
 
@@ -301,18 +298,6 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
             return dialog
         }
 
-    /**
-     * Without this the node can't be selected.
-     */
-    override fun propertyChange(arg0: PropertyChangeEvent) {
-        if (model.isShowWeights) {
-            setBounds(imageBox.fullBounds)
-        } else {
-            setBounds(interactionBox.fullBounds)
-        }
-        invalidateFullBounds()
-    }
-
     fun setClamped(clamped: Boolean) {
         if (clamped) {
             imageBox.box.stroke = BasicStroke(4.0f)
@@ -320,7 +305,6 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         } else {
             imageBox.box.stroke = BasicStroke(1.0f)
             imageBox.box.strokePaint = NetworkPreferences.weightMatrixBoundaryColor
-
         }
     }
 

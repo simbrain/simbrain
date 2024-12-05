@@ -748,10 +748,12 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         events.apply {
             selection.on(Dispatchers.Swing) { old, new ->
                 val (removed, added) = old complement new
-                removed.forEach { NodeHandle.removeSelectionHandleFrom(it) }
+                removed.forEach { NodeHandle.removeSelectionHandleFrom(if (it is WeightMatrixNode) it.imageBox else it) }
                 added.forEach {
                     if (it is InteractionBox) {
                         NodeHandle.addSelectionHandleTo(it, NodeHandle.INTERACTION_BOX_SELECTION_STYLE)
+                    } else if (it is WeightMatrixNode) {
+                        NodeHandle.addSelectionHandleTo(it.imageBox)
                     } else {
                         NodeHandle.addSelectionHandleTo(it)
                     }

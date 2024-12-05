@@ -62,6 +62,23 @@ class WorkspaceActions {
     val newConsoleAction = createComponentFactoryAction("Console", "menu_icons/Terminal2.png")
     val newDocViewerAction = createComponentFactoryAction("Document Viewer", "menu_icons/Copy.png")
 
+    val toggleBottomDock = createAction(
+        name = "Bottom Dock",
+        description = "Show/Hide bottom panels",
+        iconPath = "menu_icons/systemMonitor.png"
+    ) {
+        SimbrainDesktop.bottomDockManager.toggleDock()
+    }
+
+    val toggleInfoDock = createAction(
+        name = "Info Panel",
+        description = "Show/Hide info panel",
+        iconPath = "menu_icons/Info.png"
+    ) {
+        SimbrainDesktop.sideDockManager.toggleDock()
+
+    }
+
     val clearWorkspaceAction = SimbrainDesktop.desktopPane.createAction(
         name = "Clear desktop",
         description = "Remove all windows from the desktop",
@@ -155,15 +172,6 @@ class WorkspaceActions {
         coroutineScope = workspace
     ) {
         CouplingListPanel(SimbrainDesktop, SimbrainDesktop.workspace.couplings).displayInDialog {  }
-    }
-
-    val propertyTabAction = SimbrainDesktop.desktopPane.createAction(
-        iconPath = "menu_icons/systemMonitor.png",
-        name = "Show / hide dock",
-        description = "Toggle dock visibility.",
-        coroutineScope = workspace
-    ) {
-        SimbrainDesktop.toggleDock()
     }
 
     val showUpdaterDialog = SimbrainDesktop.desktopPane.createAction(

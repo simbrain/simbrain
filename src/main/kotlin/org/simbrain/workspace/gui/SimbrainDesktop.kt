@@ -68,13 +68,17 @@ object SimbrainDesktop {
     private const val FRAME_TITLE = "Simbrain 4 Beta"
 
     /**
+     * The frame that will hold the workspace.
+     */
+    val frame: JFrame = JFrame(FRAME_TITLE)
+
+    /**
      * Associates workspace components with their corresponding desktop components.
      */
     private val workspaceComponentDesktopComponentMap: MutableMap<WorkspaceComponent, DesktopComponent<*>> = LinkedHashMap()
 
     val desktopComponents: Collection<DesktopComponent<*>>
         get() = workspaceComponentDesktopComponentMap.values
-
 
     /**
      * Reference to the last internal frames that were focused, so that they can get the focus when the next one is
@@ -113,29 +117,41 @@ object SimbrainDesktop {
     private var contextMenu: JPopupMenu? = null
 
     /**
-     * Workspace tool bar.
+     * Workspace toolbar.
      */
     private var wsToolBar = JToolBar()
 
-    /**
-     * Whether the bottom dock is visible.
-     */
-    private var dockVisible = true
+    val bottomDock = JTabbedPane().apply {
+        addTab("Components", null, ComponentPanel(this@SimbrainDesktop), "Show workspace components")
+        addTab("Terminal", null, terminalPanel, "Simbrain terminal")
+        addTab("Performance", null, PerformanceMonitorPanel(this@SimbrainDesktop.workspace), "Performance monitoring")
+    }
 
-    /**
-     * The frame that will hold the workspace.
-     */
-    val frame: JFrame = JFrame(FRAME_TITLE)
+    val bottomDockSplitter = JSplitPane(JSplitPane.VERTICAL_SPLIT).apply {
+        topComponent = sideDockSplitter
+        bottomComponent = bottomDock
+    }
 
-    /**
-     * The bottom dock.
-     */
-    private val bottomDock: JTabbedPane
+    val bottomDockManager = DockManager(
+        dock = bottomDock,
+        splitter = bottomDockSplitter,
+        defaultSize = 200
+    )
 
-    /**
-     * Pane splitter for bottom dock.
-     */
-    private val horizontalSplitter: JSplitPane
+    val sideDock = JTabbedPane().apply {
+        addTab("Info", JScrollPane(JTextArea("Side Dock Content...")))
+    }
+
+    val sideDockSplitter = JSplitPane(JSplitPane.HORIZONTAL_SPLIT).apply {
+        leftComponent = sideDock
+        rightComponent = desktopPane
+    }
+
+    val sideDockManager = DockManager(
+        dock = sideDock,
+        splitter = sideDockSplitter,
+        defaultSize = 200
+    )
 
     /**
      * Boundary of workspace.
@@ -176,6 +192,148 @@ object SimbrainDesktop {
      * Timestep at the last update rate calculation.
      */
     private var lastTimestep = 0
+
+    private val mouseListener: MouseListener = object : MouseAdapter() {
+        override fun mousePressed(mouseEvent: MouseEvent) {
+            val lastClickedPoint = mouseEvent.point
+            if (mouseEvent.isControlDown || mouseEvent.button == MouseEvent.BUTTON3) {
+                contextMenu!!.show(
+                    frame,
+                    lastClickedPoint.getX().toInt() + MENU_X_OFFSET,
+                    lastClickedPoint.getY().toInt() + MENU_Y_OFFSET
+                )
+            }
+        }
+    }
+
+    private val windowListener: WindowListener = object : WindowAdapter() {
+        override fun windowClosing(arg0: WindowEvent) {
+            quit(false)
+        }
+    }
+
+    /**
+     * Listens to menu events for setting save enabled.
+     */
+    private val menuListener: MenuListener = object : MenuListener {
+        override fun menuSelected(arg0: MenuEvent) {
+            if (workspace.changesExist()) {
+                actionManager.saveWorkspaceAction.isEnabled = true
+            } else {
+                actionManager.saveWorkspaceAction.isEnabled = false
+            }
+        }
+
+        override fun menuDeselected(arg0: MenuEvent) {
+        }
+
+        override fun menuCanceled(arg0: MenuEvent) {
+        }
+    }
+
+    /**
+     * Default constructor.
+     *
+     * @param workspace The workspace for this desktop.
+     */
+    init {
+        frame.iconImages = Arrays.asList(
+            ResourceManager.getImage("simbrain_iconset/icon_20x20.png"),
+            ResourceManager.getImage("simbrain_iconset/icon_32x32.png"),
+            ResourceManager.getImage("simbrain_iconset/icon_40x40.png"),
+            ResourceManager.getImage("simbrain_iconset/icon_64x64.png"),
+            ResourceManager.getImage("simbrain_iconset/icon_128x128.png"),
+            ResourceManager.getImage("simbrain_iconset/icon_512x512.png")
+        )
+        createAndAttachMenus()
+        wsToolBar = createToolBar()
+        createContextMenu()
+        val events = workspace.events
+        events.workspaceCleared.on {
+            workspaceComponentDesktopComponentMap.clear()
+            desktopPane.removeAll()
+            desktopPane.repaint()
+            frame.title = FRAME_TITLE
+            lastTimestep = 0
+            updateTimeLabel()
+        }
+        events.componentAdded.on(Dispatchers.Swing, wait = true) { addDesktopComponent(it) }
+        events.componentRemoved.on(Dispatchers.Swing) { wc  ->
+            val component = workspaceComponentDesktopComponentMap[wc] ?: return@on
+            workspaceComponentDesktopComponentMap.remove(wc)
+            component.parentFrame.dispose()
+            if (!lastFocusedStack.isEmpty()) {
+                lastFocusedStack.remove(component)
+            }
+            moveLastFocusedComponentToFront()
+        }
+        events.workspaceOpened.on(Dispatchers.Swing) {
+            frame.title = workspace.currentFile!!.name
+            lastTimestep = 0
+            updateTimeLabel()
+        }
+        workspace.updater.events.workspaceUpdated.on { updateTimeLabel() }
+        workspace.updater.events.runStarted.on { StandardDialog.setSimulationRunning(true) }
+        workspace.updater.events.runFinished.on { StandardDialog.setSimulationRunning(false) }
+        val screenSize = Toolkit.getDefaultToolkit().screenSize
+        workspaceBounds = Rectangle(
+            WORKSPACE_INSET,
+            WORKSPACE_INSET,
+            screenSize.width - WORKSPACE_INSET * 2,
+            screenSize.height - WORKSPACE_INSET * 2
+        )
+
+        // Set up Desktop
+        if (System.getProperty("os.name").lowercase(Locale.getDefault()).contains("windows")) {
+            desktopPane.background = Color.WHITE
+            desktopPane.border = BorderFactory.createLoweredBevelBorder()
+        }
+        desktopPane.addMouseListener(mouseListener)
+        desktopPane.addKeyListener(WorkspaceKeyAdapter(workspace))
+        desktopPane.preferredSize =
+            Dimension(screenSize.width - WORKSPACE_INSET * 2, screenSize.height - WORKSPACE_INSET * 3)
+
+        // Main panel
+        val mainPanel = JPanel(BorderLayout()).apply {
+            add(wsToolBar, BorderLayout.NORTH)
+            // TODO: This should be bottomDockSplitter but that's not working so checking this in for now
+            add(sideDockSplitter, BorderLayout.CENTER)
+        }
+        frame.contentPane = mainPanel
+
+        // Initialize docks
+        bottomDock.isVisible = false
+        sideDock.isVisible = false
+
+        // Configure frame
+        frame.bounds = workspaceBounds
+        frame.pack()
+        frame.addWindowListener(windowListener)
+        frame.addKeyListener(WorkspaceKeyAdapter(workspace))
+        frame.isVisible = true
+
+        // Set initial desktopPane bounds
+        desktopPane.bounds = Rectangle(200, 0, frame.width - 200, frame.height)
+        frame.isVisible = true
+
+        // Set up Frame
+        frame.bounds = workspaceBounds
+        frame.contentPane = mainPanel
+        frame.pack()
+        frame.addWindowListener(windowListener)
+        frame.addKeyListener(WorkspaceKeyAdapter(workspace))
+
+        // Set the "dock" image.
+        if (Taskbar.isTaskbarSupported() && Taskbar.getTaskbar().isSupported(Taskbar.Feature.ICON_IMAGE)) {
+            Taskbar.getTaskbar().iconImage = ResourceManager.getImage("simbrain_iconset/icon_128x128.png")
+        }
+
+        // Start terminal
+        Thread(interpreter).start()
+
+        // Make dragging a little faster but perhaps uglier.
+        // desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
+    }
 
     /**
      * Listener for swing component changes.
@@ -249,9 +407,7 @@ object SimbrainDesktop {
     }
 
     /**
-     * Creates the workspace tool bar.
-     *
-     * @return JToolBar tool bar created
+     * Creates the workspace toolbar.
      */
     private fun createToolBar(): JToolBar {
         val bar = JToolBar()
@@ -273,7 +429,6 @@ object SimbrainDesktop {
         bar.addSeparator()
         bar.add(actionManager.newNetworkAction)
 
-        /* World menu button. */
         var button = JButton()
         button.icon = ResourceManager.getImageIcon("menu_icons/World.png")
         val worldMenu = JPopupMenu()
@@ -287,7 +442,7 @@ object SimbrainDesktop {
         button.componentPopupMenu = worldMenu
         bar.add(button)
 
-        /* Chart menu button. */button = JButton()
+        button = JButton()
         button.icon = ResourceManager.getImageIcon("menu_icons/BarChart.png")
         val gaugeMenu = JPopupMenu()
         for (action in actionManager.plotActions) {
@@ -300,6 +455,11 @@ object SimbrainDesktop {
         button.componentPopupMenu = gaugeMenu
         bar.add(button)
         bar.add(actionManager.newConsoleAction)
+
+        // Toggle docks
+        bar.addSeparator()
+        bar.add(actionManager.toggleBottomDock)
+        bar.add(actionManager.toggleInfoDock)
 
         // Initialize time label
         timeLabel.border = BorderFactory.createEmptyBorder(0, 10, 0, 10)
@@ -383,8 +543,6 @@ object SimbrainDesktop {
      */
     private fun createViewMenu(): JMenu {
         val viewMenu = JMenu("View")
-        viewMenu.add(actionManager.propertyTabAction)
-        viewMenu.addSeparator()
         viewMenu.add(JMenuItem(actionManager.resizeAllWindowsAction))
         viewMenu.add(JMenuItem(actionManager.repositionAllWindowsAction))
         return viewMenu
@@ -495,20 +653,13 @@ object SimbrainDesktop {
          * @param workspaceComponent workspace component.
          */
         init {
-            init()
-            this.workspaceComponent = workspaceComponent
-        }
-
-        /**
-         * Initialize the frame.
-         */
-        private fun init() {
             isResizable = true
             isMaximizable = true
             isIconifiable = true
             isClosable = true
             defaultCloseOperation = DO_NOTHING_ON_CLOSE
             addInternalFrameListener(WindowFrameListener())
+            this.workspaceComponent = workspaceComponent
         }
 
         /**
@@ -742,7 +893,8 @@ object SimbrainDesktop {
      * Create the GUI and show it. For thread safety, this method should be invoked from the event-dispatching thread.
      */
     private fun createAndShowGUI() {
-        // any time an exception occurs, present a dialog box with the error to the user
+
+        // Any time an exception occurs, present a dialog box with the error to the user
         Thread.setDefaultUncaughtExceptionHandler { t, e ->
             val sw = StringWriter()
             e.printStackTrace(PrintWriter(sw))
@@ -758,16 +910,18 @@ object SimbrainDesktop {
                 JOptionPane.showMessageDialog(null, scrollPane, "Uncaught Exception", JOptionPane.ERROR_MESSAGE)
             }
         }
+
         /*
          * Make sure we have nice window decorations.
          * JFrame.setDefaultLookAndFeelDecorated(true); Create and set up the
          * window.
          */
         frame.defaultCloseOperation = JFrame.DO_NOTHING_ON_CLOSE
+
         /** Open a default workspace  */
         // openWorkspace(workspace.getCurrentFile());
 
-        /* Display the window. */frame.isVisible = true
+        frame.isVisible = true
     }
 
     /**
@@ -815,201 +969,6 @@ object SimbrainDesktop {
     }
 
     /**
-     * Listener for mouse presses.
-     */
-    private val mouseListener: MouseListener = object : MouseAdapter() {
-        /**
-         * Responds to mouse events.
-         *
-         * @param mouseEvent Mouse Event
-         */
-        override fun mousePressed(mouseEvent: MouseEvent) {
-            val lastClickedPoint = mouseEvent.point
-            // System.out.println("desktop-->" + lastClickedPoint); //TODO: Make
-            // this visible somehow
-            if (mouseEvent.isControlDown || mouseEvent.button == MouseEvent.BUTTON3) {
-                contextMenu!!.show(
-                    frame,
-                    lastClickedPoint.getX().toInt() + MENU_X_OFFSET,
-                    lastClickedPoint.getY().toInt() + MENU_Y_OFFSET
-                )
-            }
-        }
-    }
-
-    /**
-     * listener for window closing events.
-     */
-    private val windowListener: WindowListener = object : WindowAdapter() {
-        /**
-         * Responds to window closing events.
-         *
-         * @param arg0 Window event
-         */
-        override fun windowClosing(arg0: WindowEvent) {
-            quit(false)
-        }
-    }
-
-    /**
-     * listens to menu events for setting save enabled.
-     */
-    private val menuListener: MenuListener = object : MenuListener {
-        /**
-         * Responds to menu selected events.
-         *
-         * @param arg0 Menu event
-         */
-        override fun menuSelected(arg0: MenuEvent) {
-            if (workspace.changesExist()) {
-                actionManager.saveWorkspaceAction.isEnabled = true
-            } else {
-                actionManager.saveWorkspaceAction.isEnabled = false
-            }
-        }
-
-        /**
-         * Responds to menu deslected events.
-         *
-         * @param arg0 Menu event
-         */
-        override fun menuDeselected(arg0: MenuEvent) {
-            /* no implementation */
-        }
-
-        /**
-         * Responds to menu canceled events.
-         *
-         * @param arg0 Menu event
-         */
-        override fun menuCanceled(arg0: MenuEvent) {
-            /* no implementation */
-        }
-    }
-
-    /**
-     * Default constructor.
-     *
-     * @param workspace The workspace for this desktop.
-     */
-    init {
-        frame.iconImages = Arrays.asList(
-            ResourceManager.getImage("simbrain_iconset/icon_20x20.png"),
-            ResourceManager.getImage("simbrain_iconset/icon_32x32.png"),
-            ResourceManager.getImage("simbrain_iconset/icon_40x40.png"),
-            ResourceManager.getImage("simbrain_iconset/icon_64x64.png"),
-            ResourceManager.getImage("simbrain_iconset/icon_128x128.png"),
-            ResourceManager.getImage("simbrain_iconset/icon_512x512.png")
-        )
-        createAndAttachMenus()
-        wsToolBar = createToolBar()
-        createContextMenu()
-        val events = workspace.events
-        events.workspaceCleared.on {
-            workspaceComponentDesktopComponentMap.clear()
-            desktopPane.removeAll()
-            desktopPane.repaint()
-            frame.title = FRAME_TITLE
-            lastTimestep = 0
-            updateTimeLabel()
-        }
-        events.componentAdded.on(Dispatchers.Swing, wait = true) { addDesktopComponent(it) }
-        events.componentRemoved.on(Dispatchers.Swing) { wc  ->
-            val component = workspaceComponentDesktopComponentMap[wc] ?: return@on
-            workspaceComponentDesktopComponentMap.remove(wc)
-            component.parentFrame.dispose()
-            if (!lastFocusedStack.isEmpty()) {
-                lastFocusedStack.remove(component)
-            }
-            moveLastFocusedComponentToFront()
-        }
-        events.workspaceOpened.on(Dispatchers.Swing) {
-            frame.title = workspace.currentFile!!.name
-            lastTimestep = 0
-            updateTimeLabel()
-        }
-        workspace.updater.events.workspaceUpdated.on { updateTimeLabel() }
-        workspace.updater.events.runStarted.on { StandardDialog.setSimulationRunning(true) }
-        workspace.updater.events.runFinished.on { StandardDialog.setSimulationRunning(false) }
-        val screenSize = Toolkit.getDefaultToolkit().screenSize
-        workspaceBounds = Rectangle(
-            WORKSPACE_INSET,
-            WORKSPACE_INSET,
-            screenSize.width - WORKSPACE_INSET * 2,
-            screenSize.height - WORKSPACE_INSET * 2
-        )
-
-        dockVisible = false
-
-        // Set up Desktop
-        if (System.getProperty("os.name").lowercase(Locale.getDefault()).contains("windows")) {
-            desktopPane.background = Color.WHITE
-            desktopPane.border = BorderFactory.createLoweredBevelBorder()
-        }
-        desktopPane.addMouseListener(mouseListener)
-        desktopPane.addKeyListener(WorkspaceKeyAdapter(workspace))
-        desktopPane.preferredSize =
-            Dimension(screenSize.width - WORKSPACE_INSET * 2, screenSize.height - WORKSPACE_INSET * 3)
-
-        // Create the Tabbed Pane for bottom of the desktop
-        bottomDock = JTabbedPane()
-        bottomDock.addTab("Components", null, ComponentPanel(this), "Show workspace components")
-        bottomDock.addTab("Terminal", null, terminalPanel, "Simbrain terminal")
-        bottomDock.addTab(
-            "Performance",
-            null,
-            PerformanceMonitorPanel(this.workspace),
-            "Performance and thread monitoring"
-        )
-
-        // Set up the main panel
-        horizontalSplitter = JSplitPane(JSplitPane.VERTICAL_SPLIT)
-        horizontalSplitter.dividerLocation = dividerLocation
-        horizontalSplitter.topComponent = desktopPane
-        horizontalSplitter.bottomComponent = bottomDock
-        val mainPanel = JPanel(BorderLayout())
-        mainPanel.add(wsToolBar, "North")
-        mainPanel.add(horizontalSplitter, "Center")
-        if (!dockVisible) {
-            horizontalSplitter.bottomComponent.isVisible = false
-        }
-
-        // Set up Frame
-        frame.bounds = workspaceBounds
-        frame.contentPane = mainPanel
-        frame.pack()
-        frame.addWindowListener(windowListener)
-        frame.addKeyListener(WorkspaceKeyAdapter(workspace))
-
-        // Set the "dock" image.
-        if (Taskbar.isTaskbarSupported() && Taskbar.getTaskbar().isSupported(Taskbar.Feature.ICON_IMAGE)) {
-            Taskbar.getTaskbar().iconImage = ResourceManager.getImage("simbrain_iconset/icon_128x128.png")
-        }
-
-        // Start terminal
-        Thread(interpreter).start()
-
-        // Make dragging a little faster but perhaps uglier.
-        // desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
-    }
-
-    /**
-     * Provisional Code for toggling tab dock's visibility.
-     */
-    fun toggleDock() {
-        if (dockVisible) {
-            dockVisible = false
-            horizontalSplitter.bottomComponent.isVisible = false
-            enabled = false
-        } else {
-            dockVisible = true
-            horizontalSplitter.bottomComponent.isVisible = true
-            enabled = true
-            horizontalSplitter.dividerLocation = dividerLocation
-        }
-    }
-
-    /**
      * Update time label.
      */
     fun updateTimeLabel() {
@@ -1025,37 +984,29 @@ object SimbrainDesktop {
         runningLabel.isVisible = workspace.updater.isRunning
     }
 
+    /**
+     * Helper method for determining where the bottom tab should be placed.
+     */
     private val dividerLocation: Int
-        /**
-         * Helper method for determining where the bottom tab should be placed.
-         *
-         * @return the location
-         */
-        private get() = (3 * (workspaceBounds.getHeight() / 4)).toInt()
+        get() = (3 * (workspaceBounds.getHeight() / 4)).toInt()
+
+    /**
+     * Returns the width of the visible portion of the desktop.
+     */
     val width: Double
-        /**
-         * Returns the width of the visible portion of the desktop.
-         *
-         * @return visible width.
-         */
         get() = desktopPane.visibleRect.getWidth()
+
+    /**
+     * Returns the height of the visible portion of the desktop.
+     */
     val height: Double
-        /**
-         * Returns the height of the visible portion of the desktop.
-         *
-         * @return the visible height
-         */
         get() = desktopPane.visibleRect.getHeight()
 
     /**
      * Position a component given an index. Lays out components in a pattern moving diagonally and downward across the
      * desktop.
      *
-     *
      * Note that this is overridden when individual components are opened.
-     *
-     * @param positionIndex
-     * @param desktopComponent
      */
     fun positionComponent(
         positionIndex: Int,

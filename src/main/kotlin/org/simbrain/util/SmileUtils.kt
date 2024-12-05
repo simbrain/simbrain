@@ -393,3 +393,9 @@ fun Matrix.randomizeSymmetric(randomizer: ProbabilityDistribution, zeroDiagonal:
     }
     return this
 }
+
+fun Matrix.zeroDiagonalInPlace() {
+    for (i in 0 until min(nrow(), ncol())) {
+        this[i, i] = 0.0
+    }
+}

@@ -241,6 +241,15 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
                             weightMatrix.events.updated.fire()
                     }
                 )
+                contextMenu.add(
+                    networkPanel.createAction(
+                        name = "Zero diagonal",
+                        description = "Effectively removes self-connections (in the recurrent case)",
+                    ) {
+                        weightMatrix.weightMatrix.zeroDiagonalInPlace()
+                        weightMatrix.events.updated.fire()
+                    }
+                )
             }
 
             if (model.source is AbstractNeuronCollection) {

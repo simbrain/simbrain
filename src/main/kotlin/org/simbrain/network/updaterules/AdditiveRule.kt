@@ -22,7 +22,7 @@ class AdditiveRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Noisy
 
     @UserParameter(
         label = "Lambda",
-        description = "A gain parameter that controls the steepness of the sigmoid curve. Higher lambda makes the function more like a step function; lower lambda produces a gentler slope",
+        description = "A gain parameter that controls the steepness of the sigmoid curve. Higher lambda makes the function more like a step function; lower lambda produces a gentler slope.",
         minimumValue = 0.0,
         increment = .1,
         order = 10)
@@ -30,7 +30,7 @@ class AdditiveRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Noisy
 
     @UserParameter(
         label = "Resistance",
-        description = "Controls the rate of activation decay; higher resistance slows decay, lower resistance causes the activation to decay more quickly",
+        description = "Controls the rate of activation decay; higher resistance slows decay, lower resistance speeds decay.",
         minimumValue = 0.0,
         increment = .1,
         order = 20)

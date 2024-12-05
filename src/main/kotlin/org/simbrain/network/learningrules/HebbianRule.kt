@@ -25,10 +25,11 @@ import org.simbrain.network.util.EmptyScalarData
 import org.simbrain.util.UserParameter
 
 /**
- * **Hebbian** implements a standard Hebbian learning rule.
+ * Standard Hebbian learning rule.
  */
 class HebbianRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>() {
-    @UserParameter(label = "Learning rate", description = "Learning rate for Hebb rule", increment = .1, order = 1)
+
+    @UserParameter(label = "Learning rate", description = "Learning rate for Hebb rule", increment = .1, minimumValue = 0.0, order = 10)
     var learningRate: Double = defaultLearningRate
 
     override fun init(synapse: Synapse) {

@@ -7,6 +7,8 @@ import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.updater.*
 import java.awt.BorderLayout
 import java.awt.Font
+import java.awt.event.FocusEvent
+import java.awt.event.FocusListener
 import java.lang.Long.max
 import java.lang.Long.min
 import java.util.*

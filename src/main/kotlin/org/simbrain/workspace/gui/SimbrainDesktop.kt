@@ -38,6 +38,7 @@ import org.simbrain.util.widgets.ToggleButton
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.WorkspacePreferences
+import org.simbrain.workspace.updater.PerformanceMonitor
 import java.awt.*
 import java.awt.event.*
 import java.beans.PropertyVetoException
@@ -136,13 +137,19 @@ object SimbrainDesktop {
         dock = sideDock,
         splitter = sideDockSplitter,
         defaultSize = (screenSize.width * .1).toInt()
-
     )
 
     val bottomDock = JTabbedPane().apply {
         addTab("Components", null, ComponentPanel(this@SimbrainDesktop), "Show workspace components")
         addTab("Terminal", null, terminalPanel, "Simbrain terminal")
         addTab("Performance", null, PerformanceMonitorPanel(this@SimbrainDesktop.workspace), "Performance monitoring")
+        addChangeListener {
+            if (selectedIndex == 2) {
+                PerformanceMonitor.enabled = true
+            } else {
+                PerformanceMonitor.enabled = false
+            }
+        }
     }
 
     val bottomDockSplitter = JSplitPane(JSplitPane.VERTICAL_SPLIT).apply {

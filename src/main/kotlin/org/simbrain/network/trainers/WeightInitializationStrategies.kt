@@ -7,7 +7,6 @@ import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 import kotlin.math.sqrt
-import kotlin.random.Random
 
 
 sealed class WeightInitializationStrategy(val seed: Long? = null): CopyableObject {
@@ -31,8 +30,8 @@ class Xavier(seed: Long? = null): WeightInitializationStrategy(seed) {
     var distribution = Distribution.UNIFORM
 
     override fun initializeWeights(weightMatrix: WeightMatrix) {
-        val numInputs = weightMatrix.src.size
-        val numOutputs = weightMatrix.tar.size
+        val numInputs = weightMatrix.source.size
+        val numOutputs = weightMatrix.target.size
         val randomizer = when (distribution){
             Distribution.UNIFORM -> UniformRealDistribution(-sqrt(6.0 / (numInputs + numOutputs)), sqrt(6.0 / (numInputs + numOutputs)))
             Distribution.NORMAL -> NormalDistribution(0.0, sqrt(2.0/ (numInputs+ numOutputs)))
@@ -57,7 +56,7 @@ class He(seed: Long? = null): WeightInitializationStrategy(seed) {
     var distribution = Distribution.UNIFORM
 
     override fun initializeWeights(weightMatrix: WeightMatrix) {
-        val numInputs = weightMatrix.src.size
+        val numInputs = weightMatrix.source.size
         val randomizer = when (distribution){
             Distribution.UNIFORM -> UniformRealDistribution(-sqrt(6.0 / numInputs), sqrt(6.0 / numInputs))
             Distribution.NORMAL -> NormalDistribution(0.0, sqrt(2.0/ numInputs))
@@ -82,7 +81,7 @@ class LeCun(seed: Long? = null): WeightInitializationStrategy(seed) {
     var distribution = Distribution.UNIFORM
 
     override fun initializeWeights(weightMatrix: WeightMatrix) {
-        val numInputs = weightMatrix.src.size
+        val numInputs = weightMatrix.source.size
         val randomizer = when (distribution){
             Distribution.UNIFORM -> UniformRealDistribution(-sqrt(3.0 / numInputs), sqrt(3.0 / numInputs))
             Distribution.NORMAL -> NormalDistribution(0.0, sqrt(1.0/ numInputs))

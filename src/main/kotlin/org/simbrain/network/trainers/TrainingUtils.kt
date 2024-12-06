@@ -37,7 +37,6 @@ import kotlin.collections.forEachIndexed
 import kotlin.collections.getOrPut
 import kotlin.collections.intersect
 import kotlin.collections.isNotEmpty
-import kotlin.collections.joinToString
 import kotlin.collections.last
 import kotlin.collections.listOf
 import kotlin.collections.map
@@ -53,17 +52,16 @@ import kotlin.collections.toMutableSet
 import kotlin.collections.toSet
 import kotlin.collections.zip
 
-// TODO: Need a way to generalize across NeuronArrays and NeuronCollections
-val WeightMatrix.src get() = source as NeuronArray
-val WeightMatrix.tar get() = target as NeuronArray
+private val WeightMatrix.sourceNeuronArray get() = source as NeuronArray
+private val WeightMatrix.targetNeuronArray get() = target as NeuronArray
 
 /**
  * Perform a "forward pass" through a list of weight matrices. Assumes they are all connected.
  */
 context(Network)
 fun List<WeightMatrix>.forwardPass(inputVector: Matrix) {
-    inputVector.validateSameShape(first().src.inputs)
-    first().src.activations = inputVector
+    inputVector.validateSameShape(first().sourceNeuronArray.inputs)
+    first().sourceNeuronArray.activations = inputVector
 
     fun NeuronArray.updateWithoutClearingInputs() {
         updateRule.apply(this, dataHolder)
@@ -240,20 +238,20 @@ fun List<WeightMatrix>.applyBackprop(
     debug: (index: Int, layerError: List<Double>) -> Unit = { _, _ -> }
 ): Double {
 
-    targetValues.validateSameShape(last().tar.activations)
-    lossFunction.validateLayer(last().tar)
+    targetValues.validateSameShape(last().targetNeuronArray.activations)
+    lossFunction.validateLayer(last().targetNeuronArray)
 
-    val error = lossFunction.scalarLoss(last().tar.activations, targetValues)
+    val error = lossFunction.scalarLoss(last().targetNeuronArray.activations, targetValues)
 
     // printActivationsAndWeights()
-    var layerError: Matrix = lossFunction.outputError(last().tar.activations, targetValues)
+    var layerError: Matrix = lossFunction.outputError(last().targetNeuronArray.activations, targetValues)
 
     this.reversed().forEachIndexed { index, wm ->
         debug(index, layerError.flatten().toList())
-        (wm.tar.updateRule as? DifferentiableUpdateRule)?.getDerivative(wm.tar.inputs)?.let { deriv ->
+        (wm.targetNeuronArray.updateRule as? DifferentiableUpdateRule)?.getDerivative(wm.targetNeuronArray.inputs)?.let { deriv ->
             layerError.mul(deriv)
         }
-        wm.tar.updateBiases(layerError, epsilon)
+        wm.targetNeuronArray.updateBiases(layerError, epsilon)
         layerError = wm.updateWeights(layerError, epsilon)
     }
 
@@ -269,20 +267,20 @@ fun List<WeightMatrix>.accumulateBackprop(
     lossFunction: BackpropLossFunction = BackpropLossFunction.SSE
 ): Double {
 
-    targetValues.validateSameShape(last().tar.activations)
-    lossFunction.validateLayer(last().tar)
+    targetValues.validateSameShape(last().targetNeuronArray.activations)
+    lossFunction.validateLayer(last().targetNeuronArray)
 
-    val error = lossFunction.scalarLoss(last().tar.activations, targetValues)
+    val error = lossFunction.scalarLoss(last().targetNeuronArray.activations, targetValues)
 
     // printActivationsAndWeights()
-    var layerError: Matrix = lossFunction.outputError(last().tar.activations, targetValues)
+    var layerError: Matrix = lossFunction.outputError(last().targetNeuronArray.activations, targetValues)
 
     this.reversed().forEach { wm ->
-        (wm.tar.updateRule as? DifferentiableUpdateRule)?.getDerivative(wm.tar.inputs)?.let {
+        (wm.targetNeuronArray.updateRule as? DifferentiableUpdateRule)?.getDerivative(wm.targetNeuronArray.inputs)?.let {
             deriv -> layerError.mul(deriv)
         }
-        biasesAccumulator.getOrPut(wm.tar) {
-            Matrix(wm.tar.size, 1)
+        biasesAccumulator.getOrPut(wm.targetNeuronArray) {
+            Matrix(wm.targetNeuronArray.size, 1)
         }.add(layerError)
         val weightDeltas = wm.computeWeightDeltas(layerError)
         layerError = wm.backpropagateError(layerError)
@@ -297,9 +295,9 @@ fun List<WeightMatrix>.accumulateBackprop(
 context(Network)
 fun WeightMatrixTree.forwardPass(inputVectors: List<Matrix>) {
     if (inputVectors.size != inputWeightLayers.size) throw IllegalArgumentException("Must provide same number of input vectors as input layers")
-    inputVectors.zip(inputWeightLayers).forEach { (a, b) -> a.validateSameShape(b.src.inputs) }
+    inputVectors.zip(inputWeightLayers).forEach { (a, b) -> a.validateSameShape(b.sourceNeuronArray.inputs) }
 
-    inputWeightLayers.zip(inputVectors).forEach { (wm, iv) -> wm.src.activations = iv }
+    inputWeightLayers.zip(inputVectors).forEach { (wm, iv) -> wm.sourceNeuronArray.activations = iv }
     val allNeuronArrays = LinkedHashSet(tree.flatMap { it.map { it.target } })
 
     allNeuronArrays.forEach {
@@ -317,21 +315,21 @@ fun WeightMatrixTree.forwardPass(inputVectors: List<Matrix>) {
 @Deprecated("Migrating towards LinkedHashSet<Layer>.accumulateBackprop")
 fun WeightMatrixTree.applyBackprop(targetValues: Matrix, lossFunction: BackpropLossFunction = BackpropLossFunction.SSE, epsilon: Double = .0001): Double {
 
-    targetValues.validateSameShape(outputWeightLayer.tar.activations)
-    lossFunction.validateLayer(outputWeightLayer.tar)
+    targetValues.validateSameShape(outputWeightLayer.targetNeuronArray.activations)
+    lossFunction.validateLayer(outputWeightLayer.targetNeuronArray)
 
-    val error = lossFunction.scalarLoss(outputWeightLayer.tar.activations, targetValues)
+    val error = lossFunction.scalarLoss(outputWeightLayer.targetNeuronArray.activations, targetValues)
     var errorVectors: Map<NeuronArray, Matrix> =
-        mapOf(outputWeightLayer.tar to lossFunction.outputError(outputWeightLayer.tar.activations, targetValues))
+        mapOf(outputWeightLayer.targetNeuronArray to lossFunction.outputError(outputWeightLayer.targetNeuronArray.activations, targetValues))
     // TODO: Creating a map every iteration is a potential performance drain.
     tree.reversed().forEach { wms ->
         errorVectors = wms.associate { wm ->
-            val tar = wm.tar
+            val tar = wm.targetNeuronArray
             val errorVector = errorVectors[tar]!!
-            val deriv = (wm.tar.updateRule as DifferentiableUpdateRule).getDerivative(wm.tar.inputs)
+            val deriv = (wm.targetNeuronArray.updateRule as DifferentiableUpdateRule).getDerivative(wm.targetNeuronArray.inputs)
             errorVector.mul(deriv)
-            wm.tar.updateBiases(errorVector, epsilon)
-            wm.src to wm.updateWeights(errorVector, epsilon)
+            wm.targetNeuronArray.updateBiases(errorVector, epsilon)
+            wm.sourceNeuronArray to wm.updateWeights(errorVector, epsilon)
         }
 
     }

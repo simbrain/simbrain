@@ -40,8 +40,7 @@ import java.util.*
 import javax.swing.*
 
 /**
- * The current pnode representation for all [Layer] objects. May be broken out into subtypes for different
- * subclasses of Layer.
+ * PNode representation for [ActivationSequence]
  */
 class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence: ActivationSequence) :
     ArrayLayerNode(networkPanel, activationSequence) {
@@ -147,9 +146,6 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
             Mean activation: ${activationSequence.activations.flatten().average().format(4)}
             """.trimIndent()
 
-    /**
-     * Update status text.
-     */
     private fun updateInfoText() {
         infoText.text = computeInfoText()
     }
@@ -238,9 +234,6 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
     override val model: ActivationSequence
         get() = activationSequence
 
-    /**
-     * Update the text label.
-     */
     fun updateTextLabel() {
         if (!activationSequence.label.isNullOrEmpty()) {
             labelText.font = NEURON_FONT

@@ -941,10 +941,15 @@ class MatrixWidget<O : EditableObject>(
 ) : ParameterWidget<O, Matrix>(parameter, isConsistent) {
 
     private var model = MatrixDataFrame(
-        if (parameter.columnMode) {
-            parameter.value
+        // Column display mode only applies to column vectors
+        if (parameter.value.ncol() == 1) {
+            if (parameter.columnMode) {
+                parameter.value
+            } else {
+                parameter.value.transpose()
+            }
         } else {
-            parameter.value.transpose()
+            parameter.value
         }
     )
 

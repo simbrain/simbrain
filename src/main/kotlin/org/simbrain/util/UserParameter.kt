@@ -105,6 +105,9 @@ annotation class UserParameter(
 
     val useLegacySetter: Boolean = false,
 
+    /**
+     * Display vectors as columns rather than rows
+     */
     val columnMode: Boolean = false,
 
     val useFileChooser: Boolean = false,

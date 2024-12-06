@@ -44,7 +44,10 @@ class ActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inpu
 
     override val inputs: Matrix = Matrix(sequenceSize, inputSize)
 
-    @UserParameter(label = "Activations", description = "Activations in the sequence", order = 1)
+    @UserParameter(
+        label = "Activations",
+        description = "Activations in the sequence",
+        order = 1)
     override var activations: Matrix = Matrix(sequenceSize, inputSize)
         set(value) {
             field.copyFrom(value)
@@ -98,6 +101,8 @@ class ActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inpu
         it.activations.copyFrom(activations)
     }
 
+    override val name: String
+        get() = displayName
 
     class CreationTemplate : EditableObject {
 

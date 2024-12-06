@@ -23,48 +23,54 @@ import java.io.File
 import kotlin.math.min
 
 class TinyLanguageModelOptions2: EditableObject {
+
     var contextSize by GuiEditable(
         initValue = 24,
         description = "Number of tokens in a context window",
-        order = 1,
+        order = 10,
+    )
+
+    var embeddingDimension by GuiEditable(
+        description = "Dimensions of the vector embedding. Each token is associated with a vector with this many components.",
+        initValue = 20,
+        order = 20,
     )
 
     var trainerTextPath by GuiEditable(
         initValue = simulationsPath / "texts" / "corpus_artificial_similarity.txt",
         description = "Text used to train the model",
-        order = 2,
+        tab = "Text Parsing",
+        order = 10,
         useFileChooser = true,
     )
 
     var useSpaces by GuiEditable(
         description = "Use spaces, tabs, and newlines as distinct tokens",
         initValue = false,
-        order = 3,
+        tab = "Text Parsing",
+        order = 20
     )
 
     var usePunctuation by GuiEditable(
         description = "Use punctuation as distinct tokens",
         initValue = false,
-        order = 4,
+        tab = "Text Parsing",
+        order = 30,
     )
 
     var splitSentences by GuiEditable(
         description = "If true, only train on sentence fragments. If false, allow sequences across sentences.",
-        initValue = true,
-        order = 5,
+        initValue = false,
+        tab = "Text Parsing",
+        order = 40,
     )
 
     var numberOfSentences by GuiEditable(
         description = "If splitSentences is true, the number of sentences to use at a time.",
         initValue = 3,
         conditionallyEnabledBy = TinyLanguageModelOptions2::splitSentences,
-        order = 6,
-    )
-
-    var vectorSize by GuiEditable(
-        description = "The size of the each vector in the activation sequences",
-        initValue = 20,
-        order = 7,
+        tab = "Text Parsing",
+        order = 50,
     )
 }
 
@@ -133,15 +139,15 @@ val tinyLanguageModel2 = newSim {
         isClamped = true
     }
 
-    val embeddings = ActivationSequence(contextSize, options.vectorSize).apply {
+    val embeddings = ActivationSequence(contextSize, options.embeddingDimension).apply {
         label = "Embeddings"
     }
 
-    val transformerBlock = TransformerBlock(contextSize, options.vectorSize, options.vectorSize)
+    val transformerBlock = TransformerBlock(contextSize, options.embeddingDimension, options.embeddingDimension)
 
     val softMaxLayer = NeuronArray(tokenEmbedding.dimension).apply {
         updateRule = SoftmaxRule()
-        circleMode = true
+        circleMode = size < 50
         gridMode = true
         labelArray = tokenEmbedding.tokens.toTypedArray()
         // Spaces are a hack for label issue in circle mode

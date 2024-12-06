@@ -59,11 +59,10 @@ fun String.simpleTokenizer(useSpaces: Boolean = false, usePunctuation: Boolean =
 }
 
 /**
- * Unique tokens: all unique tokens (contexts)
- * Converts to lowercase
+ * Returns a sorted list of unique tokens in a list of tokens, converted to lowercase.
  */
 fun List<String>.uniqueTokensFromArray(): List<String> {
-    return distinctBy { it.lowercase() }
+    return distinctBy { it.lowercase() }.sorted()
 }
 
 /**

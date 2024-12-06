@@ -25,6 +25,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
     var updateRule: NeuronUpdateRule<ScalarDataHolder, MatrixDataHolder> by GuiEditable(
         initValue = LinearRule(),
         order = 100,
+        tab = "Update Rule",
         typeMapProvider = NeuronUpdateRule<*, *>::getNeuronArrayTypeMap,
         setter = {
             val typeChanged = field::class != it::class
@@ -94,12 +95,18 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
     /**
      * Render an image showing each activation when true.
      */
-    @UserParameter(label = "Show activations", description = "Whether to show activations as a pixel image", order = 4)
+    @UserParameter(
+        label = "Show activations",
+        description = "Whether to show activations as a pixel image",
+        tab = "GUI",
+        order = 4)
     var isRenderActivations = true
 
     @UserParameter(
-        label = "Grid Mode", description = "If true, show activations as a grid, " +
-                "otherwise show them as a line", order = 10
+        label = "Grid Mode",
+        description = "If true, show activations as a grid, otherwise show them as a line",
+        tab = "GUI",
+        order = 10
     )
     var gridMode = false
         set(value) {
@@ -109,7 +116,8 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
 
     @UserParameter(
         label = "Circle Mode",
-        description = "If true, show activations as neuron circles, ",
+        description = "If true, show activations as neuron circles",
+        tab = "GUI",
         order = 11
     )
     var circleMode = false
@@ -121,6 +129,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
     @UserParameter(
         label = "Vertical Layout",
         description = "If true, orient the array vertically, otherwise horizontally",
+        tab = "GUI",
         order = 20
     )
     var verticalLayout = false
@@ -129,7 +138,11 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
             (events as NeuronArrayEvents).visualPropertiesChanged.fire()
         }
 
-    @UserParameter(label = "Biases Visible", description = "If true, show biases.", order = 30)
+    @UserParameter(
+        label = "Biases Visible",
+        description = "If true, show biases.",
+        tab = "GUI",
+        order = 30)
     var isShowBias = false
         set(showBias) {
             field = showBias
@@ -139,21 +152,12 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
     @Transient
     override var events: NeuronArrayEvents = NeuronArrayEvents()
 
-    /**
-     * Construct a neuron array.
-     *
-     * @param net  parent net
-     * @param size number of components in the array
-     */
     init {
         randomize()
     }
 
     /**
      * Make a deep copy of this array.
-     *
-     * @param newParent the new parent network
-     * @return the deep copy
      */
     fun copy(): NeuronArray {
         val copy = NeuronArray(size)

@@ -440,17 +440,25 @@ class NumericWidget<O : EditableObject, T>(
 
     val type = parameter.property.returnType.classifier as KClass<*>
 
+    private fun cast(value: Any): T {
+        return when (type) {
+            Int::class -> (value as Number).toInt() as T
+            Short::class -> (value as Number).toShort() as T
+            Long::class -> (value as Number).toLong() as T
+            Float::class -> (value as Number).toFloat() as T
+            Double::class -> (value as Number).toDouble() as T
+            else -> throw IllegalArgumentException("Unsupported type $type")
+        }
+    }
+
     override val widget by lazy {
         val defaultStepSize = when (type) {
-            Int::class -> 1
-            Short::class -> 1
-            Long::class -> 1
-            Float::class -> 0.1f
-            Double::class -> 0.1
+            Int::class, Short::class, Long::class -> 1
+            Float::class, Double::class -> 0.1
             else -> throw IllegalArgumentException("Unsupported type $type")
         }
 
-        val step = parameter.increment ?: defaultStepSize as T
+        val step = cast(parameter.increment ?: defaultStepSize)
 
         val model = when (type) {
             Int::class -> CustomSpinnerNumberModel(

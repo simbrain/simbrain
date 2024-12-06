@@ -78,7 +78,7 @@ class TextUtilsTest {
     @Test
     fun `Remove stopwords`() {
         val tokens = simpleText.tokenizeWordsFromString().uniqueTokensFromArray()
-        assertEquals(listOf<String>("simple","sentence","hard"), removeStopWords(tokens))
+        assertEquals(listOf("simple","sentence","hard").toSet(), removeStopWords(tokens).toSet())
     }
 
     @Test

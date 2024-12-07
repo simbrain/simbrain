@@ -31,10 +31,20 @@ class DocViewer: EditableObject {
         
         ![Bobcat Drawing](https://upload.wikimedia.org/wikipedia/commons/3/37/Ernest_Ingersoll_-_lynx_rufus_%26_lynx_canadensis.png)
         """.trimIndent()
+        set(value) {
+            field = value
+            events.textChanged.fire(value)
+        }
 
     @Transient
     var renderedText = ""
-        private set
+        private set(value) {
+            field = value
+            events.renderedTextChanged.fire(value)
+        }
+
+    @Transient
+    val events = DocViewerEvents()
 
     fun render() {
         val flavour = GFMFlavourDescriptor()

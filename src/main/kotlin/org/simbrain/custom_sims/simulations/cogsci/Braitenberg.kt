@@ -100,13 +100,12 @@ val braitenbergSim = newSim {
     val vehicle1 = Vehicle("Vehicle 1", EntityType.CIRCLE, Point2D.Double(120.0, 245.0))
     val vehicle2 = Vehicle("Vehicle 2", EntityType.CIRCLE, Point2D.Double(320.0, 245.0))
 
-    val docViewer = addDocViewerFromFile("Information", "Braitenberg.html")
+    addSidebarInfoFromFile("Information", "Braitenberg.html")
 
     withGui {
         place(vehicle1.networkComponent, 251, 1, 359, 327)
         place(vehicle2.networkComponent, 249, 329, 361, 319)
         place(oc, 610, 3, 496, 646)
-        place(docViewer, 0, 0, 253, 313)
     }
 
     var leftWeight = 100.0
@@ -114,7 +113,7 @@ val braitenbergSim = newSim {
     var velocity = 1.0
 
     withGui {
-        createControlPanel("Control Panel", 5, 320) {
+        createControlPanel("Control Panel", 5, 5) {
             addFormattedNumericTextField("Left weight", initValue = 100.0) {
                 leftWeight = it
             }

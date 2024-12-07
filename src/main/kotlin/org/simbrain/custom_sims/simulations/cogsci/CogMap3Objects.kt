@@ -132,9 +132,7 @@ val cogMap3Objects = newSim {
                 projectionPlot.getConsumer(ProjectionComponent::setLabel)
     }
 
-
-    val docViewer = addDocViewer(
-        "Information",
+    addSidebarInfo(
         """ 
         # Introduction
         
@@ -153,11 +151,10 @@ val cogMap3Objects = newSim {
         4. The map showcases how an agent develops a sense of an environment. 
         5. If the map development slows down, restart the "Cognitive Map" window with the "Eraser" button in the tool bar
             - You can run the simulation again to start mapping again. 
-    """.trimIndent()
+        """.trimIndent(),
     )
 
     withGui{
-        place(docViewer, 0, 0, 424, 594)
         place(networkComponent,896, 449, 483, 427)
         place(odorWorldComponent,425, 1, 470, 593)
         place(projectionPlot,896, 1, 478, 448)

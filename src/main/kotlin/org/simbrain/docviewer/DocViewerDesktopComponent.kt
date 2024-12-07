@@ -44,8 +44,6 @@ import javax.swing.event.HyperlinkListener
 class DocViewerDesktopComponent(frame: GenericFrame, component: DocViewerComponent)
     : DesktopComponent<DocViewerComponent>(frame, component) {
 
-    private val renderedText = JEditorPane()
-
     private val menuBar = JMenuBar()
 
     private val file = JMenu("File")
@@ -76,12 +74,10 @@ class DocViewerDesktopComponent(frame: GenericFrame, component: DocViewerCompone
 
         parentFrame.jMenuBar = menuBar
 
-        renderedText.border = BorderFactory.createEmptyBorder(10, 5, 10, 5)
-        renderedText.contentType = "text/html"
-        renderedText.isEditable = false
-        renderedText.text = docViewer.renderedText
-
-        val viewPanel = JScrollPane(renderedText)
+        val viewPanel = DocViewerViewPanel().apply {
+            docViewer.render()
+            text = docViewer.renderedText
+        }
 
         val tabs = JTabbedPane()
 
@@ -108,50 +104,16 @@ class DocViewerDesktopComponent(frame: GenericFrame, component: DocViewerCompone
             if (index == 0) {
                 docViewer.text = codeEditor.text
                 docViewer.render()
-                renderedText.text = docViewer.renderedText
+                viewPanel.text = docViewer.renderedText
             }
             docViewer.render()
-            renderedText.caretPosition = 0
+            viewPanel.renderedTextPanel.caretPosition = 0
             codeEditor.caretPosition = 0
         }
         tabs.addChangeListener(changeListener)
 
-        val l = HyperlinkListener { e ->
-            if (HyperlinkEvent.EventType.ACTIVATED == e.eventType) {
-                try {
-                    if (e.url != null) {
-                        // System.out.println(e.getURL().toURI());
-                        Desktop.getDesktop().browse(processLocalFiles(e.url.toURI()))
-                    }
-                } catch (e1: IOException) {
-                    e1.printStackTrace()
-                } catch (e1: URISyntaxException) {
-                    e1.printStackTrace()
-                }
-            }
-        }
-        renderedText.addHyperlinkListener(l)
         codeEditor.text = docViewer.text
-        renderedText.caretPosition = 0
-    }
-
-    /**
-     * Convert local paths into absolute paths for links based on the local file
-     * system.
-     */
-    private fun processLocalFiles(uri: URI): URI {
-        var uriStr = uri.toString()
-        if (uriStr.startsWith("//localfiles/")) {
-            uriStr = "file:" + System.getProperty("user.dir") + "/" + uriStr.substring(5)
-            val url: URL
-            try {
-                url = URL(uriStr)
-                return url.toURI()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-        return uri
+        viewPanel.renderedTextPanel.caretPosition = 0
     }
 
 }

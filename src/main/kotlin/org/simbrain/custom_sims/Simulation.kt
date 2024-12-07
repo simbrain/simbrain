@@ -176,6 +176,20 @@ fun SimulationScope.addDocViewerFromFile(title: String, fileName: String): DocVi
     return docViewerComponent
 }
 
+suspend fun SimulationScope.addSidebarInfoFromFile(markdownText: String, fileName: String, initiallyOpened: Boolean = true) {
+    workspace.infoDoc.text =  ResourceManager.readFileContents(
+        "custom_sims" + Utils.FS + fileName
+    )
+    workspace.infoDoc.render()
+    withGui {
+        if (initiallyOpened) {
+            sideDockSplitter.showDock()
+        } else {
+            sideDockSplitter.hideDock()
+        }
+    }
+}
+
 /**
  * Add a doc viewer component with inlined markdown text
  */
@@ -185,6 +199,18 @@ fun SimulationScope.addDocViewer(title: String, markdownText: String): DocViewer
     docViewerComponent.docViewer.render()
     workspace.addWorkspaceComponent(docViewerComponent)
     return docViewerComponent
+}
+
+suspend fun SimulationScope.addSidebarInfo(markdownText: String, width: Int? = null, initiallyOpened: Boolean = true) {
+    workspace.infoDoc.text = markdownText
+    workspace.infoDoc.render()
+    withGui {
+        if (initiallyOpened) {
+            sideDockSplitter.showDock(width)
+        } else {
+            sideDockSplitter.hideDock()
+        }
+    }
 }
 
 

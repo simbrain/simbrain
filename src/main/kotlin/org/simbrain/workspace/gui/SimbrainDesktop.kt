@@ -21,7 +21,6 @@ package org.simbrain.workspace.gui
 import bsh.Interpreter
 import bsh.util.JConsole
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
 import org.pmw.tinylog.Logger
@@ -29,6 +28,7 @@ import org.simbrain.console.ConsoleDesktopComponent
 import org.simbrain.custom_sims.NewSimulation
 import org.simbrain.custom_sims.Simulation
 import org.simbrain.custom_sims.simulations
+import org.simbrain.docviewer.DocViewerViewPanel
 import org.simbrain.util.*
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.genericframe.GenericJFrame
@@ -124,42 +124,33 @@ object SimbrainDesktop {
 
     val screenSize = Toolkit.getDefaultToolkit().screenSize
 
-    val sideDock = JPanel().apply {
-        add(JScrollPane(JTextArea("Info Dock Content...")))
-    }
-
-    val sideDockSplitter = JSplitPane(JSplitPane.HORIZONTAL_SPLIT).apply {
-        leftComponent = sideDock
-        rightComponent = desktopPane
-    }
-
-    val sideDockManager = DockManager(
-        dock = sideDock,
-        splitter = sideDockSplitter,
-        defaultSize = (screenSize.width * .1).toInt()
+    val sideDockSplitter = SimbrainDesktopDock(
+        mainComponent = desktopPane,
+        dockComponent = DocViewerViewPanel().apply {
+            workspace.infoDoc.events.renderedTextChanged.on(Dispatchers.Swing) {
+                text = it
+                renderedTextPanel.caretPosition = 0
+            }
+        },
+        orientation = JSplitPane.HORIZONTAL_SPLIT,
+        defaultSize = (screenSize.width * .2).toInt()
     )
 
-    val bottomDock = JTabbedPane().apply {
-        addTab("Components", null, ComponentPanel(this@SimbrainDesktop), "Show workspace components")
-        addTab("Terminal", null, terminalPanel, "Simbrain terminal")
-        addTab("Performance", null, PerformanceMonitorPanel(this@SimbrainDesktop.workspace), "Performance monitoring")
-        addChangeListener {
-            if (selectedIndex == 2) {
-                PerformanceMonitor.enabled = true
-            } else {
-                PerformanceMonitor.enabled = false
+    val bottomDockSplitter = SimbrainDesktopDock(
+        mainComponent = sideDockSplitter,
+        dockComponent = JTabbedPane().apply {
+            addTab("Components", null, ComponentPanel(this@SimbrainDesktop), "Show workspace components")
+            addTab("Terminal", null, terminalPanel, "Simbrain terminal")
+            addTab("Performance", null, PerformanceMonitorPanel(this@SimbrainDesktop.workspace), "Performance monitoring")
+            addChangeListener {
+                if (selectedIndex == 2) {
+                    PerformanceMonitor.enabled = true
+                } else {
+                    PerformanceMonitor.enabled = false
+                }
             }
-        }
-    }
-
-    val bottomDockSplitter = JSplitPane(JSplitPane.VERTICAL_SPLIT).apply {
-        topComponent = sideDockSplitter
-        bottomComponent = bottomDock
-    }
-
-    val bottomDockManager = DockManager(
-        dock = bottomDock,
-        splitter = bottomDockSplitter,
+        },
+        orientation = JSplitPane.VERTICAL_SPLIT,
         defaultSize = (screenSize.height * .6).toInt()
     )
 
@@ -303,10 +294,6 @@ object SimbrainDesktop {
             add(bottomDockSplitter, BorderLayout.CENTER)
         }
         frame.contentPane = mainPanel
-
-        // Initialize docks
-        bottomDockManager.toggleDock()
-        sideDockManager.toggleDock()
 
         // Configure frame
         frame.bounds = workspaceBounds

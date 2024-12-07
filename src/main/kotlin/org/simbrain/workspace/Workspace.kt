@@ -2,6 +2,7 @@ package org.simbrain.workspace
 
 import kotlinx.coroutines.*
 import org.pmw.tinylog.Logger
+import org.simbrain.docviewer.DocViewer
 import org.simbrain.util.SimpleIdManager
 import org.simbrain.util.Utils
 import org.simbrain.workspace.couplings.Coupling
@@ -103,6 +104,8 @@ class Workspace: CoroutineScope {
 
     @Transient
     val updater = WorkspaceUpdater(this)
+
+    val infoDoc = DocViewer()
 
     init {
         initIdManager()
@@ -258,6 +261,7 @@ class Workspace: CoroutineScope {
         couplingManager.clear()
         events.workspaceCleared.fire()
         updater.updateManager.setDefaultUpdateActions()
+        infoDoc.text = ""
     }
 
     /**

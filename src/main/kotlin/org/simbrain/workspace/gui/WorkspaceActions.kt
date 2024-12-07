@@ -67,16 +67,24 @@ class WorkspaceActions {
         description = "Show/Hide bottom panels",
         iconPath = "menu_icons/systemMonitor.png"
     ) {
-        SimbrainDesktop.bottomDockManager.toggleDock()
+        SimbrainDesktop.bottomDockSplitter.toggleDock()
     }
 
-    val toggleInfoDock = createAction(
+    val toggleInfoDock = SimbrainDesktop.desktopPane.createAction(
         name = "Info Panel",
         description = "Show/Hide info panel",
-        iconPath = "menu_icons/Info.png"
+        iconPath = "menu_icons/Info.png",
+        initBlock = {
+            isEnabled = false
+            SimbrainDesktop.workspace.infoDoc.events.textChanged.on {
+                isEnabled = it.isNotEmpty()
+                if (it.isEmpty()) {
+                    SimbrainDesktop.sideDockSplitter.hideDock()
+                }
+            }
+        },
     ) {
-        SimbrainDesktop.sideDockManager.toggleDock()
-
+        SimbrainDesktop.sideDockSplitter.toggleDock()
     }
 
     val clearWorkspaceAction = SimbrainDesktop.desktopPane.createAction(

@@ -1,10 +1,8 @@
 package org.simbrain.util
 
-import org.intellij.lang.annotations.MagicConstant
 import javax.swing.BorderFactory
 import javax.swing.JComponent
 import javax.swing.JSplitPane
-import javax.swing.border.EmptyBorder
 
 class SimbrainDesktopDock(
     val mainComponent: JComponent,
@@ -24,13 +22,13 @@ class SimbrainDesktopDock(
     fun showDock(width: Int? = null) {
         dockComponent.isVisible = true
         isVisible = true
-        dividerSize = 8
+        setDividerSize(8)
         dividerLocation = width ?: defaultSize
     }
 
     fun hideDock() {
         dockComponent.isVisible = false
-        dividerSize = 0
+        setDividerSize(0)
         dividerLocation = 0
     }
 

@@ -23,7 +23,9 @@ import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.util.math.SigmoidFunctionEnum
 import org.simbrain.util.point
+import smile.math.matrix.Matrix
 import java.awt.geom.Point2D
+import kotlin.math.ceil
 import kotlin.math.min
 
 /**
@@ -48,12 +50,18 @@ class BackpropNetwork : FeedForward, SupervisedNetwork {
         val nin = nodesPerLayer.first()
         val nout = nodesPerLayer.last()
         trainingSet = createDiagonalDataset(nin, nout, min(nin,nout))
+        testingSet = MatrixDataset(
+            inputs = Matrix(ceil(trainingSet.inputs.nrow() * 0.2).toInt(), trainingSet.inputs.ncol()),
+            targets = Matrix(ceil(trainingSet.targets.nrow() * 0.2).toInt(), trainingSet.targets.ncol())
+        )
     }
 
     @XStreamConstructor()
     private constructor() : super()
 
     override lateinit var trainingSet: MatrixDataset
+
+    override lateinit var testingSet: MatrixDataset
 
     override var trainer: BackpropTrainer = BackpropTrainer()
 

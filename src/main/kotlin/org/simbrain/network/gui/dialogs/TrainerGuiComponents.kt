@@ -81,7 +81,7 @@ class TrainerControls<SN>(trainer: SupervisedTrainer<SN>, supervisedNetwork: SN,
                     showWarningDialog("Batch size exceeds training set size; setting to ${batchUpdate.batchSize}")
                 }
             }
-            trainer.events.errorUpdated.fire(trainer.lastError)
+            trainer.events.errorUpdated.fire(trainer.lastTrainingError to null)
         }.display()
     }
 
@@ -116,12 +116,12 @@ class TrainerControls<SN>(trainer: SupervisedTrainer<SN>, supervisedNetwork: SN,
         runTools.add(JButton(trainerPropsAction), "wrap")
         val labelPanel = LabelledItemPanel()
         labelPanel.addItem("Iterations:", iterationsLabel)
-        val errorValue = JLabel(trainer.lastError.roundToString(4))
+        val errorValue = JLabel(trainer.lastTrainingError.roundToString(4))
         fun errorDescriptionString() = "Mean Error (${trainer.updateType}; ${trainer.lossFunction.shortName})"
         val errorLabel = labelPanel.addItem(errorDescriptionString(), errorValue)
         runTools.add(labelPanel)
 
-        trainer.events.errorUpdated.on(Dispatchers.Swing) { error ->
+        trainer.events.errorUpdated.on(Dispatchers.Swing) { (error, ) ->
             iterationsLabel.text = "" + trainer.iteration
             errorValue.text = "" + error.format(4)
             errorLabel.text = errorDescriptionString()
@@ -155,7 +155,6 @@ class ErrorTimeSeries(trainer: SupervisedTrainer<*>) : JPanel() {
         graphPanel.chartPanel.chart.setTitle("")
         graphPanel.chartPanel.chart.xyPlot.domainAxis.label = "Iterations"
         graphPanel.chartPanel.chart.xyPlot.rangeAxis.label = "Error"
-        graphPanel.chartPanel.chart.removeLegend()
         graphPanel.preferredSize = Dimension(graphPanel.preferredSize.width, 200)
 
         graphPanel.removeAllButtonsFromToolBar()
@@ -166,8 +165,14 @@ class ErrorTimeSeries(trainer: SupervisedTrainer<*>) : JPanel() {
         add(mainPanel)
 
         model.addTimeSeries("Error")
-        trainer.events.errorUpdated.on(Dispatchers.Swing) {
-            model.addData(0, trainer.iteration.toDouble(), it)
+        trainer.events.errorUpdated.on(Dispatchers.Swing) { (trainingError, testingError) ->
+            model.addData(0, trainer.iteration.toDouble(), trainingError)
+            testingError?.let {
+                if (model.timeSeriesList.size == 1) {
+                    model.addTimeSeries("Testing Error")
+                }
+                model.addData(1, trainer.iteration.toDouble(), it)
+            }
         }
         trainer.events.iterationReset.on(Dispatchers.Swing, wait = true) {
             model.clearData()

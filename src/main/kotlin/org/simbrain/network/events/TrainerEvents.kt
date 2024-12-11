@@ -8,7 +8,7 @@ import org.simbrain.util.Events
 class TrainerEvents: Events() {
     val beginTraining = NoArgEvent()
     val endTraining = NoArgEvent()
-    val errorUpdated = OneArgEvent<Double>()
+    val errorUpdated = OneArgEvent<Pair<Double, Double?>>()
     val progressUpdated = OneArgEvent<Pair<String, Int>>()
     val iterationReset = NoArgEvent()
 }

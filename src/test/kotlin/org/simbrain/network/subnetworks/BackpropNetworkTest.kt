@@ -47,7 +47,7 @@ class BackpropNetworkTest {
             }
         }
 
-        assert(bp.trainer.lastError < 0.1) { "Error: ${bp.trainer.lastError}" }
+        assert(bp.trainer.lastTrainingError < 0.1) { "Error: ${bp.trainer.lastTrainingError}" }
 
     }
 
@@ -66,8 +66,8 @@ class BackpropNetworkTest {
             }
         }
 
-        println("Bacprop error ${bp.trainer.lastError}")
-        assert(bp.trainer.lastError < 0.1) { "Error: ${bp.trainer.lastError}" }
+        println("Bacprop error ${bp.trainer.lastTrainingError}")
+        assert(bp.trainer.lastTrainingError < 0.1) { "Error: ${bp.trainer.lastTrainingError}" }
 
     }
 

@@ -7,7 +7,8 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
-import org.simbrain.network.gui.nodes.SRNNode
+import org.simbrain.network.gui.nodes.subnetworkNodes.BackpropNetworkNode
+import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedNetwork
@@ -20,10 +21,49 @@ import org.simbrain.util.table.createApplyAction
 import org.simbrain.util.table.createApplyAndAdvanceAction
 import org.simbrain.util.widgets.ToggleButton
 import java.awt.Cursor
-import javax.swing.JButton
-import javax.swing.JLabel
-import javax.swing.JPanel
-import javax.swing.JSeparator
+import javax.swing.*
+
+class DataSetPanel(val dataSet: MatrixDataset, applyAction: suspend DataSetPanel.(selectedRow: Int) -> Unit, applyAndAdvanceAction: suspend DataSetPanel.(selectedRow: Int) -> Unit): JPanel() {
+
+    val rowErrorJLabel = JLabel("")
+
+    val inputs = MatrixEditor(dataSet.inputs, dataSet.inputRowNames, dataSet.inputColumnNames).apply {
+        toolbar.addSeparator()
+        toolbar.add(
+            table.createApplyAction("Apply Inputs") { applyAction(it) }
+        )
+        toolbar.add(table.createAdvanceRowAction())
+        toolbar.add(table.createApplyAndAdvanceAction { applyAndAdvanceAction(it) })
+        toolbar.addSeparator()
+        toolbar.add(rowErrorJLabel)
+    }
+
+
+    val targets = MatrixEditor(dataSet.targets, dataSet.targetRowNames, dataSet.targetColumnNames)
+
+    val addRemoveRows = AddRemoveRows(inputs.table, targets.table)
+
+    init {
+        layout = MigLayout("gap 0px 0px, ins 0")
+        add(JSeparator(), "span, growx, wrap")
+        add(JLabel("Inputs"))
+        add(JLabel("Targets"), "wrap")
+        add(inputs)
+        add(targets, "wrap")
+        add(JLabel("Add / Remove rows:"), "split 2")
+        add(addRemoveRows)
+    }
+
+    fun exportMatrixDataSet() = MatrixDataset(
+        (inputs.table.model as MatrixDataFrame).data,
+        (targets.table.model as MatrixDataFrame).data,
+        dataSet.inputRowNames,
+        dataSet.targetRowNames,
+        dataSet.inputColumnNames,
+        dataSet.targetColumnNames
+    )
+
+}
 
 
 /**
@@ -39,53 +79,43 @@ fun <SN> SN.getSupervisedTrainingDialog(): StandardDialog where SN: SupervisedNe
         val runControls = JPanel()
         runControls.layout = MigLayout("gap 0px 0px, ins 0")
         val trainerControls = TrainerControls(trainer as SupervisedTrainer<SN>, this@getSupervisedTrainingDialog, this@NetworkPanel)
-        val inputs = MatrixEditor(trainingSet.inputs, trainingSet.inputRowNames, trainingSet.inputColumnNames)
-        inputs.toolbar.addSeparator()
-        inputs.toolbar.add(
-            inputs.table.createApplyAction("Apply Inputs") { selectedRow ->
-                with(network) {
-                    inputLayer.setActivations(trainingSet.inputs.row(selectedRow))
-                    this@SN.forwardPass()
-                }
-            }
-        )
-        inputs.toolbar.add(inputs.table.createAdvanceRowAction())
-        inputs.toolbar.add(inputs.table.createApplyAndAdvanceAction {
+
+        fun DataSetPanel.commonApplyAction(selectedRow: Int) {
             with(network) {
-                inputLayer.setActivations(trainingSet.inputs.row(inputs.table.selectedRow))
+                inputLayer.setActivations(dataSet.inputs.row(selectedRow))
                 this@SN.forwardPass()
+                trainer.lossFunction.scalarLoss(
+                    outputLayer.activations,
+                    dataSet.targets.row(selectedRow).toMatrix()
+                ).also { rowErrorJLabel.text = "${trainer.lossFunction.shortName}: ${it.format(4)}" }
             }
-        })
-        val targets = MatrixEditor(trainingSet.targets, trainingSet.targetRowNames, trainingSet.targetColumnNames)
-        val addRemoveRows = AddRemoveRows(inputs.table, targets.table)
+        }
+
+        fun createDataSetPanel(dataSet: MatrixDataset) = DataSetPanel(
+            dataSet,
+            applyAction = { selectedRow -> commonApplyAction(selectedRow) },
+            applyAndAdvanceAction = { selectedRow -> commonApplyAction(selectedRow) }
+        )
+
+        val trainingDataSetPanel = createDataSetPanel(trainingSet)
+        val testingDataSetPanel = createDataSetPanel(testingSet)
+
+        val dataSetTabPane = JTabbedPane().apply {
+            addTab("Training Set", trainingDataSetPanel)
+            addTab("Testing Set", testingDataSetPanel)
+        }
+
         trainer.events.beginTraining.on(Dispatchers.Default) {
-            trainingSet = MatrixDataset(
-                (inputs.table.model as MatrixDataFrame).data,
-                (targets.table.model as MatrixDataFrame).data,
-                trainingSet.inputRowNames,
-                trainingSet.targetRowNames,
-                trainingSet.inputColumnNames,
-                trainingSet.targetColumnNames
-            )
+            trainingSet = trainingDataSetPanel.exportMatrixDataSet()
+            testingSet = testingDataSetPanel.exportMatrixDataSet()
         }
         runControls.add(trainerControls, "span, growx, wrap")
         runControls.add(JSeparator(), "span, growx, wrap")
-        runControls.add(JLabel("Inputs"))
-        runControls.add(JLabel("Targets"), "wrap")
-        runControls.add(inputs)
-        runControls.add(targets, "wrap")
-        runControls.add(JLabel("Add / Remove rows:"), "split 2")
-        runControls.add(addRemoveRows)
+        runControls.add(dataSetTabPane, "wrap")
 
         addCommitTask {
-            trainingSet = MatrixDataset(
-                (inputs.table.model as MatrixDataFrame).data,
-                (targets.table.model as MatrixDataFrame).data,
-                trainingSet.inputRowNames,
-                trainingSet.targetRowNames,
-                trainingSet.inputColumnNames,
-                trainingSet.targetColumnNames
-            )
+            trainingSet = trainingDataSetPanel.exportMatrixDataSet()
+            testingSet = testingDataSetPanel.exportMatrixDataSet()
         }
 
         contentPane = runControls
@@ -225,11 +255,11 @@ fun main() {
     val networkComponent = NetworkComponent("")
     val np = NetworkPanel(networkComponent)
     val result = with(networkComponent.network) {
-        val srnNetwork = SRNNetwork(5, 5)
-        addNetworkModel(srnNetwork)
-        srnNetwork
+        val backpropNetwork = BackpropNetwork(intArrayOf(50, 20, 50))
+        addNetworkModel(backpropNetwork)
+        backpropNetwork
     }
-    SRNNode(np, result).propertyDialog?.display()
+    BackpropNetworkNode(np, result).propertyDialog?.display()
 }
 
 context(Network)

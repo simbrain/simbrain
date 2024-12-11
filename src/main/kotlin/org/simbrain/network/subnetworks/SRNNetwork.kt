@@ -27,7 +27,9 @@ import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
+import smile.math.matrix.Matrix
 import java.awt.geom.Point2D
+import kotlin.math.ceil
 
 /**
  *  Implements a simple recurrent network (See, e.g, Elman 1991).
@@ -43,6 +45,8 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
     lateinit var contextToHidden: WeightMatrix
 
     override lateinit var trainingSet: MatrixDataset
+
+    override lateinit var testingSet: MatrixDataset
 
     lateinit var weightMatrixTree: WeightMatrixTree
 
@@ -80,6 +84,10 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
         addModels(contextToHidden)
 
         trainingSet = createDiagonalDataset(numInputNodes, numOutputNodes, shiftAmount = 1)
+        testingSet = MatrixDataset(
+            inputs = Matrix(ceil(trainingSet.inputs.nrow() * 0.2).toInt(), trainingSet.inputs.ncol()),
+            targets = Matrix(ceil(trainingSet.targets.nrow() * 0.2).toInt(), trainingSet.targets.ncol())
+        )
 
         setLocation(initialPosition.x, initialPosition.y)
 

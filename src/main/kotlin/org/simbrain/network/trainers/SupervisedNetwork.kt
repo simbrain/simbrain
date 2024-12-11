@@ -25,6 +25,8 @@ interface SupervisedNetwork {
 
     var trainingSet: MatrixDataset
 
+    var testingSet: MatrixDataset
+
     val inputLayer: ArrayLayer
 
     val outputLayer: ArrayLayer

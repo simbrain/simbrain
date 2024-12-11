@@ -2,7 +2,6 @@ package org.simbrain.network.trainers
 
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.*
 import org.simbrain.network.subnetworks.BackpropNetwork
@@ -13,9 +12,7 @@ import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
 import org.simbrain.util.crossEntropy
 import org.simbrain.util.math.SigmoidFunctionEnum
 import org.simbrain.util.sse
-import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.NormalDistribution
-import org.simbrain.util.stats.distributions.UniformRealDistribution
 import org.simbrain.util.toMatrix
 import smile.math.matrix.Matrix
 import kotlin.random.Random
@@ -219,8 +216,8 @@ class BackpropTests {
             }
         }
         // TODO: Often fails to get near 0. Why? Notice the huge delta
-        print(bp.trainer.lastError)
-        assertEquals(0.0, bp.trainer.lastError , .15)
+        print(bp.trainer.lastTrainingError)
+        assertEquals(0.0, bp.trainer.lastTrainingError , .15)
     }
 
     fun makeMockInputs(size: Int): Matrix {

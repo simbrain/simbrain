@@ -38,7 +38,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
     @UserParameter(label = "Learning Rate", increment = .01, minimumValue = 0.0, order = 1)
     var learningRate = .01
 
-    @UserParameter(label = "Update type", order = 3)
+    @UserParameter(label = "Update type", showDetails = false, order = 3)
     open var updateType: UpdateMethod = UpdateMethod.Epoch()
 
     @UserParameter(label = "Loss Function", order = 2)
@@ -46,12 +46,20 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
 
     var weightInitializationStrategy: WeightInitializationStrategy by GuiEditable(
         initValue = Xavier(),
+        showDetails = false,
         order = 4
     )
 
     var stoppingCondition by GuiEditable(
         initValue = StoppingCondition(),
+        showDetails = false,
         order = 5
+    )
+
+    var testConfiguration by GuiEditable(
+        initValue = TestConfiguration(),
+        showDetails = false,
+        order = 6
     )
 
     var iteration = 0
@@ -59,7 +67,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
     /**
      * Used when reopening the trainer controls so user knows where things left off
      */
-    var lastError = 0.0
+    var lastTrainingError = 0.0
 
     var isRunning = false
 
@@ -79,7 +87,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
         withContext(Dispatchers.Default) {
             while (isRunning) {
                 trainOnce()
-                if (stoppingCondition.validate(iteration, lastError)) {
+                if (stoppingCondition.validate(iteration, lastTrainingError)) {
                     stoppingConditionReached = true
                     stopTraining()
                 }
@@ -103,7 +111,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
     suspend fun trainOnce() {
         iteration++
         with(updateType) {
-            lastError = when (this) {
+            lastTrainingError = when (this) {
                 is UpdateMethod.Stochastic -> trainRow(Random.nextInt(trainingSet.inputs.nrow()))
                 is UpdateMethod.Epoch -> trainBatch(0 until trainingSet.size)
                 is UpdateMethod.Batch -> {
@@ -113,7 +121,12 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
                 }
             }
         }
-        events.errorUpdated.fire(lastError).await()
+        val testError = if (trainer.testConfiguration.enabled && iteration % trainer.testConfiguration.testFrequency == 0) {
+            test()
+        } else {
+            null
+        }
+        events.errorUpdated.fire(lastTrainingError to testError).await()
     }
 
     context(Network)
@@ -129,6 +142,16 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
             batchError += trainRow(i)
         }
         return batchError / rowRange.count()
+    }
+
+    context(Network)
+    open fun SN.test(): Double {
+        return testingSet.sumOf { (input, target) ->
+            inputLayer.activations = input
+            forwardPass()
+            val output = outputLayer.activations
+            trainer.lossFunction.scalarLoss(output, target)
+        } / testingSet.size
     }
 
     sealed class UpdateMethod: CopyableObject {
@@ -186,6 +209,26 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
 
         fun validate(iterations: Int, error: Double): Boolean {
             return iterations >= maxIterations || (useErrorThreshold && error < errorThreshold)
+        }
+    }
+
+    class TestConfiguration: CopyableObject {
+        var enabled by GuiEditable(
+            initValue = true,
+            order = 1
+        )
+
+        var testFrequency by GuiEditable(
+            initValue = 10,
+            order = 2,
+            conditionallyEnabledBy = TestConfiguration::enabled
+        )
+
+        override fun copy(): CopyableObject {
+            return TestConfiguration().also {
+                it.enabled = enabled
+                it.testFrequency = testFrequency
+            }
         }
     }
 

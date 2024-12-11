@@ -28,7 +28,7 @@ class SRNTest {
                 srn.trainer.run { srn.train(10000) }
             }
             // print(srn.trainer.lastError)
-            assert(srn.trainer.lastError < 0.1) { "Error too high: ${srn.trainer.lastError}" }
+            assert(srn.trainer.lastTrainingError < 0.1) { "Error too high: ${srn.trainer.lastTrainingError}" }
         }
     }
 

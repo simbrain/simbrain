@@ -35,6 +35,11 @@ class SupervisedModel(
         )
     }
 
+    override var testingSet: MatrixDataset = MatrixDataset(
+        inputs = Matrix(10,inputLayer.size * (inputLayer as ActivationSequence).sequenceSize),
+        targets = Matrix(10, outputLayer.size)
+    )
+
     override var location: Point2D
         get() = layers.centerLocation
         set(newLocation) {

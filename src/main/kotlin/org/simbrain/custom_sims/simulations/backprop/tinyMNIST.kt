@@ -4,14 +4,16 @@ import kotlinx.coroutines.awaitAll
 import org.simbrain.custom_sims.addDocViewer
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.newSim
-import org.simbrain.network.core.NetworkTextObject
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.trainers.BackpropLossFunction
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedTrainer
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.SoftmaxRule
-import org.simbrain.util.*
+import org.simbrain.util.csvToDouble2DArray
+import org.simbrain.util.fetchDataWithCache
+import org.simbrain.util.place
+import org.simbrain.util.toMatrix
 
 /**
  * A small implementation of MNIst
@@ -33,10 +35,15 @@ val tinyMNIST = newSim {
     val trainInputsCSV = fetchDataWithCache("https://downloads.simbrain.net/simbraindata/tiny_mnist_train_inputs.csv")?:return@newSim
     val trainLabelsCSV = fetchDataWithCache("https://downloads.simbrain.net/simbraindata/tiny_mnist_train_labels.csv")?:return@newSim
     val testInputsCSV = fetchDataWithCache("https://downloads.simbrain.net/simbraindata/tiny_mnist_test_inputs.csv")?:return@newSim
+    val testLabelsCSV = fetchDataWithCache("https://downloads.simbrain.net/simbraindata/tiny_mnist_test_labels.csv")?:return@newSim
 
     bp.trainingSet = MatrixDataset(
         inputs = csvToDouble2DArray(trainInputsCSV).toMatrix(),
         targets = csvToDouble2DArray(trainLabelsCSV).toMatrix(),
+    )
+    bp.testingSet = MatrixDataset(
+        inputs = csvToDouble2DArray(testInputsCSV).toMatrix(),
+        targets = csvToDouble2DArray(testLabelsCSV).toMatrix(),
     )
     bp.trainer.lossFunction = BackpropLossFunction.CrossEntropy
     bp.trainer.learningRate = .001

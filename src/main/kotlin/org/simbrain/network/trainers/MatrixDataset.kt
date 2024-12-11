@@ -1,6 +1,7 @@
 package org.simbrain.network.trainers
 
 import org.simbrain.util.shiftRight
+import org.simbrain.util.toMatrix
 import smile.math.matrix.Matrix
 import kotlin.math.min
 
@@ -11,7 +12,7 @@ class MatrixDataset(
     val targetRowNames: List<String>? = null,
     val inputColumnNames: List<String>? = null,
     val targetColumnNames: List<String>? = null
-) {
+): Iterable<Pair<Matrix, Matrix>> {
 
     init {
         if (inputs.nrow() != targets.nrow()) {
@@ -23,6 +24,16 @@ class MatrixDataset(
     }
 
     val size get() = inputs.nrow()
+
+    override fun iterator(): Iterator<Pair<Matrix, Matrix>> = object : Iterator<Pair<Matrix, Matrix>> {
+        private var index = 0
+        override fun hasNext() = index < size
+        override fun next(): Pair<Matrix, Matrix> {
+            if (!hasNext()) throw NoSuchElementException()
+            return (inputs.row(index).toMatrix() to targets.row(index).toMatrix()).also { index++ }
+        }
+    }
+
 
 }
 

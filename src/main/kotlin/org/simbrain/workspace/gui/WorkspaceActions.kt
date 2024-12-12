@@ -64,7 +64,7 @@ class WorkspaceActions {
 
     val toggleBottomDock = createAction(
         name = "Bottom Dock",
-        description = "Show/Hide bottom panels",
+        description = "Show/hide bottom panels",
         iconPath = "menu_icons/systemMonitor.png"
     ) {
         SimbrainDesktop.bottomDockSplitter.toggleDock()
@@ -72,7 +72,7 @@ class WorkspaceActions {
 
     val toggleInfoDock = SimbrainDesktop.desktopPane.createAction(
         name = "Info Panel",
-        description = "Show/Hide info panel",
+        description = "Show/hide info panel",
         iconPath = "menu_icons/Info.png",
         initBlock = {
             isEnabled = false

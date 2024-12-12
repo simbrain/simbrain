@@ -14,7 +14,11 @@ abstract class ArrayLayer(
     val inputSize: Int
 ) : Layer() {
 
-    @UserParameter(label = "Increment amount", increment = .1, order = 20)
+    @UserParameter(
+        label = "Increment Amount",
+        description = "Amount to increment components when pressing up and down arrows",
+        increment = .1,
+        order = 20)
     var increment = .1
 
     @UserParameter(label = "Clamped", description = "Clamping", order = 3)

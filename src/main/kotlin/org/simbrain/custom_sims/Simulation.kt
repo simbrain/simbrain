@@ -176,7 +176,7 @@ fun SimulationScope.addDocViewerFromFile(title: String, fileName: String): DocVi
     return docViewerComponent
 }
 
-suspend fun SimulationScope.addSidebarInfoFromFile(markdownText: String, fileName: String, initiallyOpened: Boolean = true) {
+suspend fun SimulationScope.addSidebarInfoFromFile(fileName: String, initiallyOpened: Boolean = true) {
     workspace.infoDoc.text =  ResourceManager.readFileContents(
         "custom_sims" + Utils.FS + fileName
     )

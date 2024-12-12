@@ -23,7 +23,7 @@ import kotlin.reflect.KClass
 /**
  * Default directory where tables are stored.
  */
-private val TABLE_DIRECTORY = "." + Utils.FS + "simulations" + Utils.FS + "tables"
+private val TABLE_DIRECTORY = "." + Utils.FS + "simulations" + Utils.FS + "wordembeddings"
 
 fun SimbrainTablePanel.addSimpleDefaults() {
     addAction(table.zeroFillAction)
@@ -191,16 +191,16 @@ fun SimbrainJTable.createShowEigenValuesAction() = createAction(
     )
 }
 
-
 /**
  * @param useRowLabels If true, the row labels for this dataset are shown as labels in the corresponding points of the projection plot.
  */
 fun SimbrainJTable.createOpenProjectionAction(useRowLabels: Boolean = false) = createAction(
+        name = "Plot word embedding",
+        description = "PCA plot of word embedding",
         iconPath = "menu_icons/ProjectionIcon.png",
-        description = "Open Projection"
     ) {
         withContext(Dispatchers.Default) {
-            val projectionComponent = ProjectionComponent("$name Projection")
+            val projectionComponent = ProjectionComponent("Projection of table data")
             projectionComponent.projector.useHotColor = false
             projectionComponent.projector.showLabels = useRowLabels
             SimbrainDesktop.workspace.addWorkspaceComponent(projectionComponent)
@@ -376,7 +376,7 @@ fun SimbrainJTable.createApplyAndAdvanceAction(applyInputs: suspend (selectedRow
 }
 
 fun SimbrainJTable.createShowMatrixPlotAction() = createAction(
-    name = "Show Matrix Plot",
+    name = "Show matrix plot",
     description = "Show plots (like correlation plot) that display pairwise relation between row vectors in this table.",
     iconPath = "menu_icons/grid.png",
 ) {

@@ -30,7 +30,6 @@ class TokenEmbeddingDialog(val initialTokenEmbedding: TokenEmbedding, updateToke
     }
 
     val tablePanel = SimbrainTablePanel(initialTokenEmbedding.createTableModel(), useDefaultToolbarAndMenu = false).apply {
-        addSeparator()
         addAction(createExtractEmbeddingAction {
             (table.model as BasicDataFrame).data = it.createTableModel().data
             table.model.rowNames = it.tokens

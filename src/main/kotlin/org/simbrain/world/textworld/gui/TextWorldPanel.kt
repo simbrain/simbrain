@@ -88,7 +88,6 @@ class TextWorldPanel constructor(
         // Top toolbar
         val topToolBar = JToolBar()
         topToolBar.add(world.viewTokenEmbedding)
-        topToolBar.add(world.extractEmbedding)
         topToolBar.addSeparator()
         topToolBar.add(world.textWorldPrefs)
         add(topToolBar,  BorderLayout.NORTH)

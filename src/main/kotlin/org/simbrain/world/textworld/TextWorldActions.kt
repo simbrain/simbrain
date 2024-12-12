@@ -11,31 +11,16 @@ import java.util.*
  * punctuation mark in a text file. TODO: Add more flexibility in terms of
  * parsing the loaded file.
  */
-val TextWorld.extractEmbedding get() = createAction(
+fun createExtractEmbeddingAction(block: (TokenEmbedding) -> Unit) = createAction(
     name = "Extract embedding...",
     description = "Extract embedding...",
-    iconPath = "menu_icons/import.png"
-) {
-    val chooser = SFileChooser(tokenEmbeddingDirectory, "text file", "txt")
-    val theFile = chooser.showOpenDialog()
-    if (theFile != null) {
-        val tokenEmbeddingBuilder = TokenEmbeddingBuilder()
-        tokenEmbeddingBuilder.createEditorDialog {
-            tokenEmbedding = tokenEmbeddingBuilder.build(Utils.readFileContents(theFile))
-        }.display()
-    }
-}
-
-fun createTrainEmbeddingAction(block: (TokenEmbedding) -> Unit) = createAction(
-    name = "Extract embedding...",
-    description = "Extract embedding...",
-    iconPath = "menu_icons/import.png"
+    iconPath = "menu_icons/ExtractDoc.png"
 ) {
     val chooser = SFileChooser(tokenEmbeddingDirectory, "text file", "txt")
     val trainingDocument = chooser.showOpenDialog()
     if (trainingDocument != null) {
         val tokenEmbeddingBuilder = TokenEmbeddingBuilder()
-        tokenEmbeddingBuilder.createEditorDialog {
+        tokenEmbeddingBuilder.createEditorDialog(titleName = "Generate Word Embedding From Document") {
             val tokenEmbedding = tokenEmbeddingBuilder.build(Utils.readFileContents(trainingDocument))
             tokenEmbedding.trainingDocument = Utils.readFileContents(trainingDocument)
             block(tokenEmbedding)
@@ -48,9 +33,9 @@ fun createTrainEmbeddingAction(block: (TokenEmbedding) -> Unit) = createAction(
  */
 val TextWorld.viewTokenEmbedding
     get() = createAction(
-        name = "View / edit token embedding...",
-        description = "View token embedding (mapping from tokens to vectors)...",
-        iconPath = "menu_icons/Table.png"
+        name = "Word embedding editor...",
+        description = "View word embedding editor",
+        iconPath = "menu_icons/TableBold.png"
     ) {
         TokenEmbeddingDialog(tokenEmbedding) { tokenEmbedding = it }.display()
     }

@@ -38,6 +38,7 @@ import org.simbrain.util.displayInDialog
 import org.simbrain.workspace.Consumer
 import org.simbrain.workspace.Producer
 import org.simbrain.workspace.WorkspaceComponent
+import org.simbrain.workspace.WorkspacePreferences
 import org.simbrain.workspace.couplings.CouplingManager
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager
@@ -67,7 +68,7 @@ class WorkspaceActions {
         description = "Show/hide bottom panels",
         iconPath = "menu_icons/systemMonitor.png"
     ) {
-        SimbrainDesktop.bottomDockSplitter.toggleDock()
+        SimbrainDesktop.bottomDockSplitter.toggleDock(WorkspacePreferences.bottomDockSize)
     }
 
     val toggleInfoDock = SimbrainDesktop.desktopPane.createAction(

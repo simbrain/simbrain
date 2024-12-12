@@ -1,13 +1,12 @@
 package org.simbrain.workspace
 
-import org.simbrain.util.PreferenceHolder
-import org.simbrain.util.StringPreference
-import org.simbrain.util.UserParameter
-import org.simbrain.util.Utils
+import org.simbrain.util.*
 
 object WorkspacePreferences: PreferenceHolder() {
 
     @UserParameter(label = "Sim directory")
-    var simulationDirectory by StringPreference("." + Utils.FS +"simulations" + Utils.FS + "workspaces");
+    var simulationDirectory by StringPreference("." + Utils.FS +"simulations" + Utils.FS + "workspaces")
+
+    var bottomDockSize by IntegerPreference(800)
 
 }

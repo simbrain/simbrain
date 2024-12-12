@@ -4,13 +4,10 @@ import java.awt.Desktop
 import java.io.IOException
 import java.net.URI
 import java.net.URISyntaxException
-import java.net.URL
 import java.nio.file.Paths
-import javax.swing.BorderFactory
 import javax.swing.JEditorPane
 import javax.swing.JScrollPane
 import javax.swing.event.HyperlinkEvent
-import javax.swing.event.HyperlinkListener
 
 class DocViewerViewPanel: JScrollPane() {
 
@@ -21,7 +18,6 @@ class DocViewerViewPanel: JScrollPane() {
         }
 
     val renderedTextPanel = JEditorPane().apply {
-        border = BorderFactory.createEmptyBorder(10, 5, 10, 5)
         contentType = "text/html"
         isEditable = false
         addHyperlinkListener { e ->

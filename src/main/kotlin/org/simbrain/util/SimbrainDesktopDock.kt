@@ -32,11 +32,11 @@ class SimbrainDesktopDock(
         dividerLocation = 0
     }
 
-    fun toggleDock() {
+    fun toggleDock(width: Int? = null) {
         if (dockComponent.isVisible) {
             hideDock()
         } else {
-            showDock()
+            showDock(width)
         }
     }
 }

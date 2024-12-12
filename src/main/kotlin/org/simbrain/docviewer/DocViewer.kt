@@ -1,5 +1,6 @@
 package org.simbrain.docviewer
 
+import org.intellij.lang.annotations.Language
 import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
 import org.intellij.markdown.html.HtmlGenerator
 import org.intellij.markdown.parser.MarkdownParser
@@ -50,9 +51,24 @@ class DocViewer: EditableObject {
         val flavour = GFMFlavourDescriptor()
         val parsedTree = MarkdownParser(flavour).buildMarkdownTreeFromString(text)
         val userDir = System.getProperty("user.dir").replace("\\\\".toRegex(), "\\\\\\\\")
-        renderedText = HtmlGenerator(text, parsedTree, flavour)
+        @Language("HTML")
+        val head = """
+            <head>
+                <style>
+                    body {
+                        margin-left: 12px;
+                        margin-right: 12px;
+                    }
+                    ul, ol {
+                        margin-left: 16px;
+                    }
+                </style>
+            </head>
+        """.trimIndent()
+        val body = HtmlGenerator(text, parsedTree, flavour)
             .generateHtml()
             .replace("//localfiles/", "file:${userDir}/")
+        renderedText = "<html>${head}<body>${body}</body></html>"
     }
 
     init {

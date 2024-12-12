@@ -47,6 +47,7 @@ import java.io.PrintWriter
 import java.io.StringWriter
 import java.util.*
 import javax.swing.*
+import javax.swing.JSplitPane.DIVIDER_LOCATION_PROPERTY
 import javax.swing.event.*
 
 /**
@@ -151,8 +152,14 @@ object SimbrainDesktop {
             }
         },
         orientation = JSplitPane.VERTICAL_SPLIT,
-        defaultSize = (screenSize.height * .6).toInt()
-    )
+        defaultSize = WorkspacePreferences.bottomDockSize
+    ).apply {
+        addPropertyChangeListener(DIVIDER_LOCATION_PROPERTY) {
+            if (dockComponent.isVisible) {
+                WorkspacePreferences.bottomDockSize = dividerLocation
+            }
+        }
+    }
 
     private val workspaceBounds: Rectangle
 

@@ -22,7 +22,7 @@ import smile.math.matrix.Matrix
 import java.io.File
 import kotlin.math.min
 
-class TinyLanguageModelOptions2: EditableObject {
+class TinyLanguageModelOptions: EditableObject {
 
     var contextSize by GuiEditable(
         initValue = 24,
@@ -57,26 +57,11 @@ class TinyLanguageModelOptions2: EditableObject {
         tab = "Text Parsing",
         order = 30,
     )
-
-    var splitSentences by GuiEditable(
-        description = "If true, only train on sentence fragments. If false, allow sequences across sentences.",
-        initValue = false,
-        tab = "Text Parsing",
-        order = 40,
-    )
-
-    var numberOfSentences by GuiEditable(
-        description = "If splitSentences is true, the number of sentences to use at a time.",
-        initValue = 3,
-        conditionallyEnabledBy = TinyLanguageModelOptions2::splitSentences,
-        tab = "Text Parsing",
-        order = 50,
-    )
 }
 
 val tinyLanguageModel2 = newSim {
 
-    val options = TinyLanguageModelOptions2().showAPEOptionDialog("Tiny Language Model") ?: return@newSim
+    val options = TinyLanguageModelOptions().showAPEOptionDialog("Tiny Language Model") ?: return@newSim
 
     workspace.clearWorkspace()
 
@@ -93,27 +78,15 @@ val tinyLanguageModel2 = newSim {
     val networkComponent = addNetworkComponent("Network")
     val network = networkComponent.network
 
-    val tokenizedTrainingText = if (options.splitSentences) {
-            trainingText.split("""[!?.]""".toRegex())
-        } else {
-            listOf(trainingText)
-        }.map { it.simpleTokenizer(options.useSpaces, options.usePunctuation) }
-        .filter { it.isNotEmpty() }
-    val corpus = tokenizedTrainingText
-        .windowed(if (options.splitSentences) options.numberOfSentences else tokenizedTrainingText.size)
-        .flatMap { group -> // group of sentences or the entire text if splitSentences is false
-            group.flatten().let { tokens ->
-                generateAutoregressivePairs(tokens.take(min(tokens.size, contextSize)))
-                // tokens.windowed(min(tokens.size, contextSize)).flatMap { window ->
-                //     // window along the tokens if the context size is not big enough to cover the entire token list
-                //     generateAutoregressivePairs(window)
-                // }
-            }
-        }
+    val tokenizedTrainingText = trainingText.simpleTokenizer(options.useSpaces, options.usePunctuation)
+    val corpus = tokenizedTrainingText.windowed(min(tokenizedTrainingText.size, contextSize)).flatMap { window ->
+        // window along the tokens if the context size is not big enough to cover the entire token list
+        generateAutoregressivePairs(window)
+    }
 
     // Text World for Inputs
     val textWorldComponent = addTextWorld("Text World (Inputs)")
-    textWorldComponent.world.text = tokenizedTrainingText.first().take(contextSize).joinToString(if (options.useSpaces) "" else " ")
+    textWorldComponent.world.text = tokenizedTrainingText.take(contextSize).joinToString(if (options.useSpaces) "" else " ")
     textWorldComponent.world.tokenEmbedding = tokenEmbedding
 
     val tokenizedCorpus = corpus.map { (context, target) ->

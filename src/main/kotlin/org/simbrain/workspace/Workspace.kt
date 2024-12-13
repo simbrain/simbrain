@@ -105,6 +105,7 @@ class Workspace: CoroutineScope {
     @Transient
     val updater = WorkspaceUpdater(this)
 
+    @Transient
     val infoDoc = DocViewer()
 
     init {

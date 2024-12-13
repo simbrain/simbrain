@@ -77,7 +77,7 @@ class TextWorldComponent : WorkspaceComponent {
         get() = listOf<AttributeContainer>(world)
 
     companion object {
-        fun open(input: InputStream, name: String, format: String): TextWorldComponent {
+        fun open(input: InputStream, name: String, format: String?): TextWorldComponent {
             val newWorld = getSimbrainXStream().fromXML(input) as TextWorld
             return TextWorldComponent(name, newWorld)
         }

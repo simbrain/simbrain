@@ -81,6 +81,7 @@ class TextWorld : AttributeContainer, EditableObject {
         _text = newText
     }
 
+    @Transient
     var currentItem: TextItem? = null
         private set
 
@@ -107,6 +108,7 @@ class TextWorld : AttributeContainer, EditableObject {
     /**
      * The current text item.
      */
+    @Transient
     private var currentTextItem: TextItem? = null
 
     /**

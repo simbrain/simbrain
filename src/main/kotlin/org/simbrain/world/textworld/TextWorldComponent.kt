@@ -19,6 +19,7 @@
 package org.simbrain.world.textworld
 
 import org.simbrain.util.getSimbrainXStream
+import org.simbrain.util.projection.KDTreeConvertor
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.WorkspaceComponent
 import java.io.InputStream
@@ -66,7 +67,7 @@ class TextWorldComponent : WorkspaceComponent {
     }
 
     override fun save(output: OutputStream, format: String?) {
-        getSimbrainXStream().toXML(world, output)
+        getTextWorldXStream().toXML(world, output)
     }
 
     override suspend fun update() {
@@ -78,8 +79,12 @@ class TextWorldComponent : WorkspaceComponent {
 
     companion object {
         fun open(input: InputStream, name: String, format: String?): TextWorldComponent {
-            val newWorld = getSimbrainXStream().fromXML(input) as TextWorld
+            val newWorld = getTextWorldXStream().fromXML(input) as TextWorld
             return TextWorldComponent(name, newWorld)
         }
     }
+}
+
+fun getTextWorldXStream() = getSimbrainXStream().apply {
+    registerConverter(KDTreeConvertor())
 }

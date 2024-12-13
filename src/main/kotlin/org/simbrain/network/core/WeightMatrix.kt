@@ -208,28 +208,36 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
     }
 
     /**
-     * Update the psr matrix in the connectionist case.
+     * Prepare the PSR Matrix for consumption by target layers.
+     *
+     * Most targets use the updated PSRMatrix by calling [getSummedPSRs].
+     * Some targets like [ActivationSequence] bypass the PSRMatrix and compute a matrix product directly.
      */
     context(Network)
     override fun updatePSR() {
         if (spikeResponder is NonResponder) {
-            // For "connectionist" case. One "half" of a matrix product.
-            // Populate each row of the psrMatrix with the element-wise product of the pre-synaptic output vector and
-            // that row of the matrix
 
+            // Connectionist case
+
+            // For activation sequence case, just use last activation vector
             val sourceActivations = if (source is ActivationSequenceProcessor) {
                 source.activations.row(- 1).toMatrix()
             } else {
                 source.activations
             }.let { activations ->
-                (target as? AbstractNeuronCollection)?.neuronList?.first() // assume all neurons in the collection have the same update rule
+                // Some update rules apply a rule to source activations before they are multiplied by weights
+                // If the target is a neuron collection we assume all neurons in the collection have the same update rule
+                (target as? AbstractNeuronCollection)?.neuronList?.first()
                     ?.updateRule?.synapticInputModifier(activations)
                 ?: activations
             }
 
+
+            // One "half" of a matrix product. Source activations are element-wise multiplied by rows of matrix
             psrMatrix.copyFrom(weightMatrix.broadcastMultiply(sourceActivations))
 
         } else {
+            // Spiking case
             spikeResponder.apply(this, spikeResponseData)
         }
     }

@@ -36,7 +36,7 @@ val tinyLanguageModel = newSim {
     val networkComponent = addNetworkComponent("Network")
     val network = networkComponent.network
 
-    val tokenizedTrainingText = trainingText.simpleTokenizer(options.useSpaces, options.usePunctuation)
+    val tokenizedTrainingText = trainingText.simpleTokenizer(options.useSpaces, options.tokenizePunctuation)
     val corpus = tokenizedTrainingText.windowed(min(tokenizedTrainingText.size, contextSize)).flatMap { window ->
         // window along the tokens if the context size is not big enough to cover the entire token list
         generateAutoregressivePairs(window)
@@ -65,7 +65,6 @@ val tinyLanguageModel = newSim {
 
     val targetMatrix = tokenizedCorpus.map { (_, target) -> target }.toTypedArray().toMatrix()
 
-
     val backpropNetwork = with(network) {
         BackpropNetwork(
             intArrayOf(contextSize * tokenEmbedding.dimension, hiddenLayerSize, tokenEmbedding.dimension),
@@ -87,6 +86,7 @@ val tinyLanguageModel = newSim {
     backpropNetwork.trainer.apply {
         lossFunction = BackpropLossFunction.CrossEntropy
         learningRate = 0.0001
+        testConfiguration.enabled = false
     }
 
     workspace.addUpdateAction("Encode Context Window") {
@@ -105,7 +105,7 @@ val tinyLanguageModel = newSim {
     workspace.addUpdateAction("Predict Next Word") {
         val nextWord = tokenEmbedding.getClosestWord(backpropNetwork.outputLayer.activationArray)
         // update text with predicted word and remove first word so that the context window maintains its size
-        textWorldComponent.world.text = textWorldComponent.world.text.simpleTokenizer(useSpaces = options.useSpaces, usePunctuation = options.usePunctuation)
+        textWorldComponent.world.text = textWorldComponent.world.text.simpleTokenizer(useSpaces = options.useSpaces, usePunctuation = options.tokenizePunctuation)
             .plus(nextWord)
             .takeLast(contextSize)
             .joinToString(if (options.useSpaces) "" else " ")

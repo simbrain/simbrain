@@ -51,7 +51,7 @@ class TinyLanguageModelOptions: EditableObject {
         order = 20
     )
 
-    var usePunctuation by GuiEditable(
+    var tokenizePunctuation by GuiEditable(
         description = "Use punctuation as distinct tokens",
         initValue = false,
         tab = "Text Parsing",
@@ -78,7 +78,7 @@ val tinyLanguageModel2 = newSim {
     val networkComponent = addNetworkComponent("Network")
     val network = networkComponent.network
 
-    val tokenizedTrainingText = trainingText.simpleTokenizer(options.useSpaces, options.usePunctuation)
+    val tokenizedTrainingText = trainingText.simpleTokenizer(options.useSpaces, options.tokenizePunctuation)
     val corpus = tokenizedTrainingText.windowed(min(tokenizedTrainingText.size, contextSize)).flatMap { window ->
         // window along the tokens if the context size is not big enough to cover the entire token list
         generateAutoregressivePairs(window)
@@ -145,12 +145,13 @@ val tinyLanguageModel2 = newSim {
             targets = targetMatrix
         )
         model.trainer.lossFunction = BackpropLossFunction.CrossEntropy
+        model.trainer.testConfiguration.enabled = false
         addNetworkModels(model).awaitAll()
     }
 
     workspace.addUpdateAction("Encode Context Window") {
         val encodedContext = textWorldComponent.world.text
-            .simpleTokenizer(useSpaces = options.useSpaces, usePunctuation = options.usePunctuation)
+            .simpleTokenizer(useSpaces = options.useSpaces, usePunctuation = options.tokenizePunctuation)
             .map { tokenEmbedding.get(it) }
 
         val contextMatrix = Matrix(contextSize, tokenEmbedding.dimension)
@@ -165,7 +166,7 @@ val tinyLanguageModel2 = newSim {
     workspace.addUpdateAction("Predict Next Word") {
         val nextWord = tokenEmbedding.getClosestWord(softMaxLayer.activationArray)
         // update text with predicted word and remove first word so that the context window maintains its size
-        textWorldComponent.world.text = textWorldComponent.world.text.simpleTokenizer(useSpaces = options.useSpaces, usePunctuation = options.usePunctuation)
+        textWorldComponent.world.text = textWorldComponent.world.text.simpleTokenizer(useSpaces = options.useSpaces, usePunctuation = options.tokenizePunctuation)
             .plus(nextWord)
             .takeLast(contextSize)
             .joinToString(if (options.useSpaces) "" else " ")

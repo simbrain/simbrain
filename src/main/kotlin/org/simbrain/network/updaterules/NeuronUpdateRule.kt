@@ -246,7 +246,7 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
 
     /**
      * Apply provided function to the input to the synapse (that is, the activation of the source neuron, before it is
-     * multiplied by the synaptic weight, etc)
+     * multiplied by the synaptic weight, etc.).
      */
     open fun synapticInputModifier(input: Double): Double {
         return input

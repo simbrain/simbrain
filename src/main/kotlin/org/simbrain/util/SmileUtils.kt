@@ -121,7 +121,7 @@ fun Matrix.addi(toAdd: DoubleArray) {
 operator fun Matrix.plus(toAdd: Matrix): Matrix = this.clone().add(toAdd)
 operator fun Matrix.minus(toSubtract: Matrix): Matrix = this.clone().sub(toSubtract)
 operator fun Matrix.times(scalar: Double): Matrix = this.clone().mul(scalar)
-//  Component-wise multiplication
+//  Elementwise-wise multiplication
 operator fun Matrix.times(toMultiply: Matrix): Matrix = this.clone().mul(toMultiply)
 operator fun Double.times(matrix: Matrix): Matrix = matrix.clone().mul(this)
 

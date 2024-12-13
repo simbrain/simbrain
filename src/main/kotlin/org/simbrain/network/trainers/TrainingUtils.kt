@@ -397,7 +397,7 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
     targetValues.validateSameShape(outputLayer.activations)
     lossFunction.validateLayer(outputLayer as NeuronArray)
 
-    val error = lossFunction.scalarLoss(outputLayer.activations, targetValues)
+    val scalarError = lossFunction.scalarLoss(outputLayer.activations, targetValues)
 
     // printActivationsAndWeights()
     var layerError: Matrix = lossFunction.outputError(outputLayer.activations, targetValues)
@@ -406,7 +406,7 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
     reversedLayers.forEach { layer ->
 
         // Error is processed by a layer and a new error is produced
-        println("Processing ${layer.displayName}")
+        //println("Processing ${layer.displayName}")
         when (layer) {
             is NeuronArray -> {
                 // Element-wise product of the layer error with the derivative applied to the weighted inputs
@@ -442,11 +442,11 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
             val errors = wm.backpropagateError(layerError)
             accumulatedLayerError = accumulatedLayerError?.add(errors) ?: errors
         }
-        // The new error which will get pushed further back until the last layers are reached
-        accumulatedLayerError?.let { layerError = it } // null on the last layer
+        // The new error which gets pushed further back until the first layer is reached
+        accumulatedLayerError?.let { layerError = it } // null on the first layer
     }
 
-    return error
+    return scalarError
 }
 
 /**
@@ -542,7 +542,6 @@ class WeightMatrixTree(start: List<Layer>, end: Layer) {
     val outputWeightLayer: WeightMatrix = tree.last().first()
 
 }
-
 
 /**
  * Print debugging info for a list of weight matrices.

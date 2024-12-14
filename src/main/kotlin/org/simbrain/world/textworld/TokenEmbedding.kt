@@ -80,10 +80,12 @@ class TokenEmbedding(
     /**
      * Finds the closest vector in terms of Euclidean distance, then returns the
      * String associated with it.
+     *
+     * If the input key is larger than the embedding dimension, truncate. If it is smaller, pad with zeros
      */
     fun getClosestWord(key: DoubleArray): String {
-        // TODO: Add a default minimum distance and if above that, return null or zero vector
-        return treeMap.findClosestPoint(DataPoint(key))?.label!!
+        val keyVector = DoubleArray(treeMap.dimension) { i -> key.getOrElse(i) { 0.0 } }
+        return treeMap.findClosestPoint(DataPoint(keyVector))?.label!!
     }
 
     override fun toString(): String {

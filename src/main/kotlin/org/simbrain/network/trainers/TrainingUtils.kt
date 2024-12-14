@@ -336,19 +336,18 @@ fun WeightMatrixTree.applyBackprop(targetValues: Matrix, lossFunction: BackpropL
     return error
 }
 
+/**
+ * Breadth-first search starting from the output layer.
+ */
 fun computeUpdateOrderList(end: Layer): LinkedHashSet<Layer> {
     val visited = LinkedHashSet<Layer>()
     val queue = ArrayDeque<Layer>()
-
     queue.add(end)
-
     while (queue.isNotEmpty()) {
         val currentLayer = queue.removeFirst()
-
         if (currentLayer in visited) {
             continue
         }
-
         visited.add(currentLayer)
         for (neighbor in currentLayer.incomingConnectors) {
             if (neighbor.source !in visited) {
@@ -356,10 +355,12 @@ fun computeUpdateOrderList(end: Layer): LinkedHashSet<Layer> {
             }
         }
     }
-
     return LinkedHashSet(visited.reversed())
 }
 
+/**
+ *  Assumes LinkedHashSet has been placed in an appropriate "breadth-first" order by [computeUpdateOrderList].
+ */
 context(Network)
 fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: List<Layer>) {
 
@@ -367,21 +368,21 @@ fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: Lis
     inputValues.zip(inputLayers).forEach { (a, b) -> a.validateSameShape(b.activations) }
 
     val allLayers = this
-
     inputLayers.zip(inputValues).forEach { (layer, value) ->
         (layer as? ArrayLayer)?.activations = value
     }
-
     allLayers.forEach {
         it.accumulateInputs()
         it.update()
     }
-
 }
 
 /**
- * Main backprop algorithm implementation, which supports skip connections and accumulates parameter updates
- * so that the calling function here can handle the addition of accumulated values and apply them to the model parameters.
+ * Main backprop implementation, which supports skip connections and accumulates weight and bias updates.
+ *
+ * Linked because it updates layers in a sequential order and Set because it only updates each layer once.
+ * Assumes LinkedHashSet has been placed in an appropriate "breadth-first" order by [computeUpdateOrderList].
+ *
  */
 context(Network)
 fun LinkedHashSet<Layer>.accumulateBackprop(
@@ -405,8 +406,7 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
     // Go through layers from output to input
     reversedLayers.forEach { layer ->
 
-        // Error is processed by a layer and a new error is produced
-        //println("Processing ${layer.displayName}")
+        // Apply derivative to layer error and accumulate bias updates
         when (layer) {
             is NeuronArray -> {
                 // Element-wise product of the layer error with the derivative applied to the weighted inputs
@@ -427,7 +427,7 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
 
         // Process weight matrices feeding into the current layer.
         // For each one we:
-        //  1. compute a weight delta using source activations
+        //  1. compute and accumulate a weight delta using source activations
         //  2. "backpropagate" the errors by multiplying them by the weight matrix to get a new error
         var accumulatedLayerError: Matrix? = null
         layer.incomingConnectors.forEach { connector ->
@@ -505,6 +505,9 @@ fun getConnectorChain(start: Layer, end: Layer): List<Connector> {
 /**
  * A tree of weight matrices stored in the order they should be updated using backprop. The matrices are organized based
  * on the order in which they are updated during backpropagation. Stored as a list of lists of weight matrices.
+ *
+ * Supports multiple inputs but not skip connections.
+ *
  * Example structure:
  * (
  *   (wm_out),                   # Output weight layer
@@ -513,6 +516,7 @@ fun getConnectorChain(start: Layer, end: Layer): List<Connector> {
  *   ...
  * )
  */
+@Deprecated("Planning to incorporate main use cases into LinkedHashSet.accumulateBackprop")
 class WeightMatrixTree(start: List<Layer>, end: Layer) {
     val tree: List<List<WeightMatrix>>
 

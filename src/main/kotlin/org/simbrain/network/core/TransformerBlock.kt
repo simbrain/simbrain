@@ -121,6 +121,7 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
         vStack.copyFrom(inputs.mm(V))
 
         selfAttention.copyFrom(qStack.mm(kStack.transpose()))
+        // TODO: Add masking using triangular matrix
         selfAttention.div(scale)
 
         // Apply softmax to each row

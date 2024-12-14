@@ -70,16 +70,19 @@ class WorkspaceUpdater(val workspace: Workspace) {
             wc.isRunning = true
         }
         events.runStarted.fire().await()
-        withContext(workspace.coroutineContext) {
-            while (isRunning) {
-                doUpdate()
+        try {
+            withContext(workspace.coroutineContext) {
+                while (isRunning) {
+                    doUpdate()
+                }
             }
+        } finally {
+            isRunning = false
+            for (component in workspace.componentList) {
+                component.isRunning = false
+            }
+            events.runFinished.fire().await()
         }
-        isRunning = false
-        for (component in workspace.componentList) {
-            component.isRunning = false
-        }
-        events.runFinished.fire().await()
     }
 
     /**
@@ -91,13 +94,16 @@ class WorkspaceUpdater(val workspace: Workspace) {
             wc.isRunning = true
         }
         events.runStarted.fire().await()
-        withContext(workspace.coroutineContext) {
-            doUpdate()
-        }
-        events.runFinished.fire().await()
-        isRunning = false
-        for (component in workspace.componentList) {
-            component.isRunning = false
+        try {
+            withContext(workspace.coroutineContext) {
+                doUpdate()
+            }
+        } finally {
+            events.runFinished.fire().await()
+            isRunning = false
+            for (component in workspace.componentList) {
+                component.isRunning = false
+            }
         }
     }
 

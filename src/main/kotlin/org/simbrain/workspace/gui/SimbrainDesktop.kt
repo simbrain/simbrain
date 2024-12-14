@@ -414,10 +414,10 @@ object SimbrainDesktop {
         bar.add(actionManager.iterateAction)
         bar.add(ToggleButton(actionManager.runControlActions).apply {
             setAction("Run")
-            workspace.updater.events.runStarted.on{
+            workspace.updater.events.runStarted.on {
                 setAction("Stop")
             }
-            workspace.updater.events.runFinished.on{
+            workspace.updater.events.runFinished.on {
                 setAction("Run")
             }
         })

@@ -313,8 +313,8 @@ class Workspace: CoroutineScope {
     /**
      * Get a component using its id.
      */
-    fun getComponent(id: String?): WorkspaceComponent? {
-        return componentList.firstOrNull { it.name.equals(id, ignoreCase = true) }
+    fun getComponent(name: String?): WorkspaceComponent? {
+        return componentList.firstOrNull { it.name.equals(name, ignoreCase = true) }
     }
 
     override fun toString(): String {
@@ -422,7 +422,7 @@ class Workspace: CoroutineScope {
     val zipDataHeadless: ByteArray?
         get() = generateZipData(true)
 
-    private fun generateZipData(headless: Boolean): ByteArray? {
+    fun generateZipData(headless: Boolean): ByteArray? {
         try {
             val serializer = WorkspaceSerializer(this)
             val bas = ByteArrayOutputStream()

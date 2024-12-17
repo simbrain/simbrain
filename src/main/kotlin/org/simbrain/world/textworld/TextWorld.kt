@@ -18,14 +18,15 @@
  */
 package org.simbrain.world.textworld
 
+import kotlinx.coroutines.runBlocking
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
 import smile.math.matrix.Matrix
 import java.awt.Color
-import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 /**
@@ -123,21 +124,19 @@ class TextWorld : AttributeContainer, EditableObject {
      */
     @UserParameter(label = "Parse Style", description = "The current parsing style.", order = 1)
     var parseStyle = ParseStyle.WORD
-    // TODO: Fire an event that the radio button listens to
 
-    /**
-     * Regular expression for matcher.
-     */
-    @UserParameter(label = "Regular Expression",
+    var regularExpression by GuiEditable(
+        initValue = "(\\w+)",
         description = "Regular expression used to select tokens",
-        order = 2)
-    private var regularExpression = "(\\w+)"
-        set(value) {
-            field = value
-            pattern = Pattern.compile(regularExpression)
-            matcher = pattern.matcher(text)
-            updateMatcher()
+        order = 2,
+        onUpdate = {
+            enableWidget(widgetValue(TextWorld::parseStyle) == ParseStyle.WORD)
+       },
+        setter = {
+            field = it
+            pattern = Pattern.compile(it)
         }
+    )
 
     @UserParameter(
         label = "Stop at end",
@@ -151,12 +150,6 @@ class TextWorld : AttributeContainer, EditableObject {
      */
     private var pattern: Pattern = Pattern.compile(regularExpression)
     // TODO: Document other good choices in the pref dialog. e.g. (\\w+)
-
-    /**
-     * Pattern matcher.
-     */
-    @Transient
-    private var matcher: Matcher = pattern.matcher(text)
 
     @Transient
     var events = TextWorldEvents()
@@ -207,7 +200,6 @@ class TextWorld : AttributeContainer, EditableObject {
                 // No match found. Go back to the beginning of the text area
                 // and select the first token found
                 position = 0
-                updateMatcher()
                 // Having wrapped to the beginning select the next token, if
                 // there is one.
                 if (findNextToken()) {
@@ -221,32 +213,15 @@ class TextWorld : AttributeContainer, EditableObject {
     }
 
     /**
-     * Reset the parser and specify the region focused on by it, to go from the
-     * current cursor position to the end of the text.
-     */
-    fun updateMatcher() {
-        val begin = position
-        val end = text.length
-        // System.out.println(begin + "," + end);
-        matcher.reset(text)
-        matcher.region(begin, end)
-    }
-
-    /**
      * Find the next token in the text area.
      *
      * @return true if some token is found, false otherwise.
      */
     private fun findNextToken(): Boolean {
-        val foundToken = matcher.find()
-        currentTextItem = if (foundToken) {
-            val begin = matcher.start()
-            val end = matcher.end()
-            val text = matcher.group()
-            // System.out.println("[" + text + "](" + begin + "," + end + ")");
-            TextItem(begin, end, text)
-        } else {
-            null
+        val result = regularExpression.toRegex().find(text, position)
+        val foundToken = result != null
+        currentTextItem = result?.let {
+            TextItem(it.range.first, it.range.last + 1, it.value)
         }
         return foundToken
     }
@@ -266,7 +241,6 @@ class TextWorld : AttributeContainer, EditableObject {
     private fun wrapText() {
         if (atEnd()) {
             position = 0
-            updateMatcher()
         }
     }
 
@@ -276,19 +250,6 @@ class TextWorld : AttributeContainer, EditableObject {
      */
     private fun atEnd(): Boolean {
         return position >= text.length
-    }
-
-    /**
-     * Utility method to "preview" the next token after the current one. Used in
-     * some scripts.
-     *
-     * @return the next token in the text area.
-     */
-    fun previewNextToken(): String {
-        matcher.find()
-        val nextOne = matcher.group()
-        updateMatcher() // Return matcher to its previous state
-        return nextOne
     }
 
 
@@ -306,10 +267,10 @@ class TextWorld : AttributeContainer, EditableObject {
      */
     @Consumable
     fun addTextAtEnd(newText: String, spacing: String = " ") {
-        position = text.length
         text += "$spacing$newText"
-        position = text.length
-        events.textChanged.fire()
+        runBlocking {
+            events.textChanged.fire().await()
+        }
     }
 
     /**

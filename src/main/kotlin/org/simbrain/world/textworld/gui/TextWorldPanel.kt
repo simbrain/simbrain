@@ -117,7 +117,6 @@ class TextWorldPanel constructor(
         textArea.addMouseListener(object : MouseAdapter() {
             override fun mousePressed(e: MouseEvent) {
                 world.setPosition(textArea.caretPosition, false)
-                world.updateMatcher()
             }
         })
 

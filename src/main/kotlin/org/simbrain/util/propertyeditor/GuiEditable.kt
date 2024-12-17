@@ -656,7 +656,7 @@ class StringWidget<O : EditableObject>(
         }
     }
 
-    val fileChooserButton by lazy {
+    private val fileChooserButtonDelegation = lazy {
         JButton("...").also {
             it.addActionListener { e: ActionEvent ->
                 val dir = parameter.value?.let { parameterValue ->
@@ -675,6 +675,8 @@ class StringWidget<O : EditableObject>(
             }
         }
     }
+
+    val fileChooserButton by fileChooserButtonDelegation
 
     override val widget by lazy {
         JPanel().also {
@@ -695,7 +697,10 @@ class StringWidget<O : EditableObject>(
             parameter,
             property,
             enableWidgetProvider = { enabled ->
-                widget.isEnabled = enabled
+                textField.isEnabled = enabled
+                if (fileChooserButtonDelegation.isInitialized()) {
+                    fileChooserButton.isEnabled = enabled
+                }
             },
             widgetVisibilityProvider = { visible ->
                 widget.isVisible = visible

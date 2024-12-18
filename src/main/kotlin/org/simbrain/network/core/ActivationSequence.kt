@@ -3,6 +3,7 @@ package org.simbrain.network.core
 import org.simbrain.network.gui.nodes.ActivationSequenceProcessor
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.NeuronUpdateRule
+import org.simbrain.network.updaterules.interfaces.DifferentiableUpdateRule
 import org.simbrain.network.util.MatrixDataHolder
 import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.util.*
@@ -53,6 +54,16 @@ class ActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inpu
             field.copyFrom(value)
             events.updated.fire()
         }
+
+    override fun accumulateBackprop(gradient: Matrix, rawMatrixAccumulator: HashMap<Matrix, Matrix>): Matrix {
+        var layerError = gradient
+
+        layerError = (updateRule as? DifferentiableUpdateRule)?.getDerivative(inputs)?.let { deriv ->
+            layerError.mul(deriv)
+        } ?: layerError
+
+        return layerError
+    }
 
     override val activationArray: DoubleArray
         get() = activations.flatten()

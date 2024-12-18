@@ -73,14 +73,20 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
 
     val selfAttention = Matrix(sequenceSize, sequenceSize)
 
+    val attentionOutput = Matrix(sequenceSize, size)
+
     // Feedforward network parameters
-    val W1 = Matrix(hiddenSize, size)
+    val W1 = Matrix(hiddenSize, size) // up projection
     val b1 = Matrix(hiddenSize, 1)
-    val W2 = Matrix(size, hiddenSize)
+    val W2 = Matrix(size, hiddenSize) // down projection
     val b2 = Matrix(size, 1)
 
     val feedForwardInput = Matrix(sequenceSize, size)
+
+    val feedForwardHiddenNetInputs = Matrix(sequenceSize, hiddenSize)
     val feedForwardHidden = Matrix(sequenceSize, hiddenSize)
+
+    val feedForwardOutputNetInputs = Matrix(sequenceSize, size)
 
     override val biases: Matrix get() = throw UnsupportedOperationException("Not applicable to Transformer")
 
@@ -109,6 +115,21 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
         return expValues.map { it / sumExp }.toDoubleArray()
     }
 
+    private fun softmaxBackward(dOut: Matrix, out: Matrix): Matrix {
+        val dIn = Matrix(dOut.nrow(), dOut.ncol())
+        for (i in 0 until out.nrow()) {
+            val y = out.row(i)
+            val dy = dOut.row(i)
+            // For each row: dIn = (dy - sum(dy * y)) * y
+            val dot = dy.dot(y)
+            val rowResult = DoubleArray(y.size) { j ->
+                (dy[j] - dot) * y[j]
+            }
+            dIn.setRow(i, rowResult)
+        }
+        return dIn
+    }
+
     context(Network) override fun update() {
         if (isClamped) {
             return
@@ -133,16 +154,87 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
             .toMatrix()
             .let { selfAttention.copyFrom(it) }
 
-        val attentionOutput = selfAttention.mm(vStack)
+        attentionOutput.copyFrom(selfAttention.mm(vStack))
 
         feedForwardInput.copyFrom(inputs.clone().add(attentionOutput).layerNormByRow())
 
-        feedForwardHidden.copyFrom(feedForwardInput.mm(W1.transpose()).addToEachRow(b1).relu())
+        feedForwardHiddenNetInputs.copyFrom(feedForwardInput.mm(W1.transpose()).addToEachRow(b1))
+        feedForwardHidden.copyFrom(feedForwardHiddenNetInputs.relu())
 
-        activations.copyFrom(feedForwardInput.add(feedForwardHidden.mm(W2.transpose()).addToEachRow(b2)).layerNormByRow())
+        feedForwardOutputNetInputs.copyFrom(feedForwardHidden.mm(W2.transpose()).addToEachRow(b2))
+        activations.copyFrom(feedForwardInput.add(feedForwardOutputNetInputs).layerNormByRow())
 
         inputs.mul(0.0)
         events.updated.fire()
+    }
+
+    override fun accumulateBackprop(gradient: Matrix, rawMatrixAccumulator: HashMap<Matrix, Matrix>): Matrix {
+
+        var layerError = gradient
+
+        layerError = feedForwardOutputNetInputs.reluDerivative().broadcastMultiply(layerError)
+        rawMatrixAccumulator.getOrPut(b2) {
+            Matrix(b2.nrow(), b2.ncol())
+        }.add(layerError.colSums().toMatrix())
+
+        val W2Delta = layerError.transpose().mm(feedForwardHidden)
+
+        rawMatrixAccumulator.getOrPut(W2) {
+            Matrix(W2.nrow(), W2.ncol())
+        }.add(W2Delta)
+
+        layerError = layerError.mm(W2)
+
+        layerError = layerError.mul(feedForwardHiddenNetInputs.reluDerivative())
+        rawMatrixAccumulator.getOrPut(b1) {
+            Matrix(b1.nrow(), b1.ncol())
+        }.add(layerError.colSums().toMatrix())
+
+        val W1Delta = layerError.transpose().mm(feedForwardInput)
+        rawMatrixAccumulator.getOrPut(W1) {
+            Matrix(W1.nrow(), W1.ncol())
+        }.add(W1Delta)
+
+        layerError = layerError.mm(W1)
+
+        // feedForwardInput = inputs + attentionOutput
+        // So gradient splits evenly:
+        val dFeedForwardInput = layerError
+        val dAttentionOutput = layerError.clone() // Since attentionOutput is just added to inputs, it receives the same gradient
+        val dInputs_fromSum = layerError.clone()  // The portion of gradient w.r.t inputs from the sum
+
+        // Now backprop through attentionOutput = selfAttention.mm(vStack)
+        val dSelfAttention = dAttentionOutput.mm(vStack.transpose())
+        val dVStack = selfAttention.transpose().mm(dAttentionOutput)
+
+        // Accumulate gradient w.r.t. V: vStack = inputs.mm(V)
+        val dV = inputs.transpose().mm(dVStack)
+        rawMatrixAccumulator.getOrPut(V) { Matrix(V.nrow(), V.ncol()) }.add(dV)
+        val dInputs_fromV = dVStack.mm(V.transpose())
+
+        // Backprop through selfAttention = softmax(QK^T / sqrt(d))
+        // We'll need a softmax backward pass function: softmaxBackward(dOut, out) -> dIn
+        val dQK = softmaxBackward(dSelfAttention, selfAttention).div(sqrt(size.toDouble()))
+
+        // QK^T = qStack.mm(kStack.transpose())
+        val dQStack = dQK.mm(kStack)
+        val dKStack = dQK.transpose().mm(qStack)
+
+        // qStack = inputs.mm(Q)
+        val dQ = inputs.transpose().mm(dQStack)
+        rawMatrixAccumulator.getOrPut(Q) { Matrix(Q.nrow(), Q.ncol()) }.add(dQ)
+        val dInputs_fromQ = dQStack.mm(Q.transpose())
+
+        // kStack = inputs.mm(K)
+        val dK = inputs.transpose().mm(dKStack)
+        rawMatrixAccumulator.getOrPut(K) { Matrix(K.nrow(), K.ncol()) }.add(dK)
+        val dInputs_fromK = dKStack.mm(K.transpose())
+
+        // Combine all gradients w.r.t. inputs
+        val dInputs_total = dInputs_fromSum.add(dInputs_fromQ).add(dInputs_fromK).add(dInputs_fromV)
+
+        // Return the gradient w.r.t. inputs, which can be passed further back in the network
+        return dInputs_total
     }
 
     fun copy() = TransformerBlock(sequenceSize, inputSize, hiddenSize).also {

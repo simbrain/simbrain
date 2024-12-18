@@ -87,11 +87,12 @@ class SupervisedModelTrainer: SupervisedTrainer<SupervisedModel>() {
     override fun SupervisedModel.trainRow(rowNum: Int): Double {
         val weightAccumulator: HashMap<WeightMatrix, Matrix> = HashMap()
         val biasesAccumulator: HashMap<ArrayLayer, Matrix> = HashMap()
+        val rawMatrixAccumulator: HashMap<Matrix, Matrix> = HashMap()
 
         inputLayer.setActivations(trainingSet.inputs.row(rowNum))
         val targetVec = trainingSet.targets.rowVectorTransposed(rowNum)
         layers.forwardPass(listOf(inputLayer.activations), inputLayers = listOf(inputLayer))
-        val error = layers.accumulateBackprop(targetVec, outputLayer, weightAccumulator, biasesAccumulator, lossFunction = lossFunction)
+        val error = layers.accumulateBackprop(targetVec, outputLayer, weightAccumulator, biasesAccumulator, rawMatrixAccumulator, lossFunction = lossFunction)
 
         weightAccumulator.forEach { (wm, delta) ->
             wm.weightMatrix.add(delta.mul(trainer.learningRate))

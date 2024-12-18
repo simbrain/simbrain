@@ -390,6 +390,7 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
     outputLayer: Layer,
     weightAccumulator: HashMap<WeightMatrix, Matrix>,
     biasesAccumulator: HashMap<ArrayLayer, Matrix>,
+    rawMatrixAccumulator: HashMap<Matrix, Matrix>,
     lossFunction: BackpropLossFunction = BackpropLossFunction.SSE
 ): Double {
 
@@ -419,9 +420,7 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
                 }.add(layerError)
             }
             is ActivationSequenceProcessor -> {
-                // temporary until we determine how to implement this
-                val newError = Matrix(layer.activations.nrow(), layer.activations.ncol())
-                layerError = newError
+                layerError = layer.accumulateBackprop(layerError, rawMatrixAccumulator)
             }
         }
 

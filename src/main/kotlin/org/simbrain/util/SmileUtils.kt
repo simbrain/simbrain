@@ -320,6 +320,16 @@ fun Matrix.relu(): Matrix {
     return activated
 }
 
+fun Matrix.reluDerivative(): Matrix {
+    val derivative = Matrix(nrow(), ncol())
+    for (i in 0 until nrow()) {
+        for (j in 0 until ncol()) {
+            derivative[i,j] = if (get(i,j) > 0) 1.0 else 0.0
+        }
+    }
+    return derivative
+}
+
 fun Matrix.eigenValuesString(precision: Int = 2, uniqueEigenvaluesOnly: Boolean = false) = eigen().sort().let {
     val realParts = it.wr
     val imaginaryParts = it.wi

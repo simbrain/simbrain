@@ -155,9 +155,9 @@ val cogMap3Objects = newSim {
     )
 
     withGui{
-        place(networkComponent,896, 449, 483, 427)
-        place(odorWorldComponent,425, 1, 470, 593)
-        place(projectionPlot,896, 1, 478, 448)
+        place(networkComponent,463, 450, 483, 427)
+        place(odorWorldComponent,0, 0, 470, 593)
+        place(projectionPlot,463, 0, 478, 448)
     }
 
 }

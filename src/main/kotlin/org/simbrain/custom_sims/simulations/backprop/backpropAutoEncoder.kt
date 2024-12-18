@@ -2,6 +2,7 @@ package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.addDocViewer
 import org.simbrain.custom_sims.addNetworkComponent
+import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.trainers.MatrixDataset
@@ -33,8 +34,7 @@ val backpropAutoEncoder = newSim {
         targets = Matrix.eye(inputSize)
     )
 
-    val docViewer = addDocViewer(
-        "Information",
+    addSidebarInfo(
         """ 
             # Introduction
             Backpropagation is an algorithm for supervised learning using gradient descent. This is an auto-encoder where the network must learn to associate each input with an identical output. The trick is that it must do so by compressing the input to a smaller hidden layer.  The smaller the hidden layer, the harder the task. 
@@ -57,8 +57,7 @@ val backpropAutoEncoder = newSim {
 
     // Location of the network in the desktop
     withGui {
-        place(docViewer, 0, 0, 450, 700)
-        place(networkComponent,460, 0, 700, 700)
+        place(networkComponent,0, 0, 700, 700)
     }
 
 //    // Adding a docviewer

@@ -64,7 +64,7 @@ abstract class ArrayLayer(
     }
 
     override fun clear() {
-        inputs.mul(0.0)
+        inputs.fill(0.0)
         events.updated.fire()
     }
 

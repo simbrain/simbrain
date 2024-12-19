@@ -222,6 +222,6 @@ class NakaMatrixData(var size: Int) : MatrixDataHolder {
     }
 
     override fun clear() {
-        a.mul(0.0)
+        a.fill(0.0)
     }
 }

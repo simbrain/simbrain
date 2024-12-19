@@ -141,6 +141,6 @@ class RiseAndDecayMatrixData(val rows: Int, val cols: Int) : MatrixDataHolder {
     }
 
     override fun clear() {
-        recoveryMatrix.mul(0.0)
+        recoveryMatrix.fill(0.0)
     }
 }

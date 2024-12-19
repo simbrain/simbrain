@@ -104,6 +104,10 @@ class SupervisedModelTrainer: SupervisedTrainer<SupervisedModel>() {
             na.events.updated.fire()
         }
 
+        rawMatrixAccumulator.forEach { (matrix, delta) ->
+            matrix.add(delta.mul(trainer.learningRate))
+        }
+
         return error
     }
 

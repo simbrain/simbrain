@@ -108,6 +108,14 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
         events.updated.fire()
     }
 
+    override fun clear() {
+        listOf(
+            activations, kStack, qStack, vStack, selfAttention, attentionOutput,
+            feedForwardInput, feedForwardHiddenNetInputs, feedForwardHidden, feedForwardOutputNetInputs
+        ).forEach { it.fill(0.0) }
+        events.updated.fire()
+    }
+
     private fun softmaxRow(row: DoubleArray): DoubleArray {
         val max = row.maxOrNull() ?: 0.0  // For numerical stability
         val expValues = row.map { exp(it - max) }
@@ -164,7 +172,7 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
         feedForwardOutputNetInputs.copyFrom(feedForwardHidden.mm(W2.transpose()).addToEachRow(b2))
         activations.copyFrom(feedForwardInput.add(feedForwardOutputNetInputs).layerNormByRow())
 
-        inputs.mul(0.0)
+        inputs.fill(0.0)
         events.updated.fire()
     }
 

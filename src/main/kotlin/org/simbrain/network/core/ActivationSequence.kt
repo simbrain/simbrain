@@ -91,12 +91,17 @@ class ActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inpu
         events.updated.fire()
     }
 
+    override fun clear() {
+        activations.fill(0.0)
+        events.updated.fire()
+    }
+
     context(Network) override fun update() {
         if (isClamped) {
             return
         }
         updateRule.apply(this, dataHolder)
-        inputs.mul(0.0)
+        inputs.fill(0.0)
         events.updated.fire()
     }
 

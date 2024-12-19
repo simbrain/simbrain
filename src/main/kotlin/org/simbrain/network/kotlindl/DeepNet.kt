@@ -198,7 +198,7 @@
 //             outputs = Matrix(outputSize(), 1)
 //         }
 //         events.updated.fire()
-//         inputs.mul(0.0) // clear inputs
+//         inputs.fill(0.0) // clear inputs
 //     }
 //
 //     override suspend fun delete() {

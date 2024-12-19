@@ -69,7 +69,7 @@ fun List<WeightMatrix>.forwardPass(inputVector: Matrix) {
     }
 
     for (wm in this) {
-        wm.target.inputs.mul(0.0)
+        wm.target.inputs.fill(0.0)
         wm.target.accumulateInputs()
         (wm.target as NeuronArray).updateWithoutClearingInputs()
     }

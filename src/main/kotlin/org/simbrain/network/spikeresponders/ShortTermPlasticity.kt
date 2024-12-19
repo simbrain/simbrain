@@ -251,7 +251,7 @@ class STPMatrixData(val rows: Int, val cols: Int): MatrixDataHolder  {
     }
 
     override fun clear() {
-        u.mul(0.0)
-        R.mul(0.0)
+        u.fill(0.0)
+        R.fill(0.0)
     }
 }

@@ -54,6 +54,7 @@ class TokenEmbeddingDialog(val initialTokenEmbedding: TokenEmbedding, updateToke
 
     init {
         title = "Word Embedding Editor"
+        trainingDocument = initialTokenEmbedding.trainingDocument
         addCommitTask {
             updateTokenEmbedding(
                 TokenEmbedding(

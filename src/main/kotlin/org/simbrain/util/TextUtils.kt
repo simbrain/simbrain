@@ -189,7 +189,7 @@ fun generateCooccurrenceMatrix(
         cocMatrix = manualPPMI(cocMatrix, true)
     }
 
-    return TokenEmbedding(tokens, cocMatrix.replaceNaN(0.0))
+    return TokenEmbedding(tokens, cocMatrix.replaceNaN(0.0), docString)
 }
 
 /**

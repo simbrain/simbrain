@@ -152,7 +152,7 @@ class TokenEmbeddingBuilder(): EditableObject {
                     doc.tokenizeWordsFromString()
                 }
             }.uniqueTokensFromArray()
-            TokenEmbedding(tokens, Matrix.eye(tokens.size))
+            TokenEmbedding(tokens, Matrix.eye(tokens.size), docString)
         }
         EmbeddingType.COC -> {
             generateCooccurrenceMatrix(docString, windowSize, bidirectional, usePPMI, removeStopWords)

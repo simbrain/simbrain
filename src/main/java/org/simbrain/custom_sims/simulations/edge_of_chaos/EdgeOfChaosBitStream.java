@@ -13,6 +13,7 @@ import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
 import org.simbrain.util.SmileUtilsKt;
 import org.simbrain.util.math.SimbrainMath;
+import org.simbrain.util.stats.distributions.NormalDistribution;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.updater.UpdateActionKt;
 
@@ -27,8 +28,6 @@ import javax.swing.*;
  * Video of this in action: https://x.com/JeffYoshimi/status/1529126714948743168
  */
 public class EdgeOfChaosBitStream extends Simulation {
-
-    //TODO: Docviewer definitely needed. Note that we have preliminary documentation on a google doc. It just has to be ported over!
 
     // Simulation Parameters
     int NUM_NEURONS = 120;
@@ -142,15 +141,13 @@ public class EdgeOfChaosBitStream extends Simulation {
         JTextField tf_stdev = panel.addTextField("Weight stdev", "" + variance);
         panel.addButton("Update", () -> {
 
-            // Update variance of weight strengths
-            double new_variance = Double.parseDouble(tf_stdev.getText());
-            for (Synapse synapse : sgRes1.getSynapses()) {
-                synapse.setStrength(synapse.getStrength() * (new_variance / variance));
-            }
-            for (Synapse synapse : sgRes2.getSynapses()) {
-                synapse.setStrength(synapse.getStrength() * (new_variance / variance));
-            }
-            variance = new_variance;
+            variance = Double.parseDouble(tf_stdev.getText());
+            var normalDist1 = new NormalDistribution(0.0, variance);
+            normalDist1.setRandomSeed(42L);
+            sgRes1.randomize(normalDist1);
+            var normalDist2 = new NormalDistribution(0.0, variance);
+            normalDist2.setRandomSeed(42L);
+            sgRes2.randomize(normalDist2);
 
             // Update strength of bitstream signals
             // // TODO: Complain if input strength set to 0.0

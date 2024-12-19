@@ -14,6 +14,8 @@ import org.simbrain.network.neurongroups.NeuronGroup;
 import org.simbrain.network.updaterules.BinaryRule;
 import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.util.decayfunctions.StepDecayFunction;
+import org.simbrain.util.stats.ProbabilityDistribution;
+import org.simbrain.util.stats.distributions.NormalDistribution;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.entities.EntityType;
@@ -41,7 +43,6 @@ public class EdgeOfChaos extends Simulation {
 
     private long seed = 42L;
 
-    // References
     Network net;
     SynapseGroup sgReservoir, cheeseToRes, flowersToRes;
     NeuronGroup reservoir, sensorNodes;
@@ -76,11 +77,9 @@ public class EdgeOfChaos extends Simulation {
         panel.addButton("Update", () -> {
 
             // Update variance of weight strengths
-            double new_variance = Double.parseDouble(tf_stdev.getText());
-            for (Synapse synapse : sgReservoir.getSynapses()) {
-                synapse.setStrength(synapse.getStrength() * (new_variance / variance));
-            }
-            variance = new_variance;
+            variance = Double.parseDouble(tf_stdev.getText());
+            var normalDist = new NormalDistribution(0.0, variance);
+            sgReservoir.randomize(normalDist);
         });
     }
 

@@ -176,11 +176,20 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
         events.updated.fire()
     }
 
-    override fun accumulateBackprop(gradient: Matrix, rawMatrixAccumulator: HashMap<Matrix, Matrix>): Matrix {
+    override fun processError(
+        error: Matrix,
+        errorSource: ArrayLayer,
+        biasesAccumulator: HashMap<ArrayLayer, Matrix>,
+        rawMatrixAccumulator: HashMap<Matrix, Matrix>
+    ): Matrix {
 
-        var layerError = gradient
+        var layerError = error
 
-        layerError = feedForwardOutputNetInputs.reluDerivative().broadcastMultiply(layerError)
+        layerError = if (errorSource is NeuronArray) {
+            feedForwardOutputNetInputs.reluDerivative().broadcastMultiply(layerError)
+        } else {
+            feedForwardOutputNetInputs.reluDerivative().mm(layerError)
+        }
         rawMatrixAccumulator.getOrPut(b2) {
             Matrix(b2.nrow(), b2.ncol())
         }.add(layerError.colSums().toMatrix())

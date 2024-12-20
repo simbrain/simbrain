@@ -81,4 +81,6 @@ abstract class ArrayLayer(
     override fun toggleClamping() {
         isClamped = !isClamped
     }
+
+    abstract fun processError(error: Matrix, errorSource: ArrayLayer, biasesAccumulator: HashMap<ArrayLayer, Matrix>, rawMatrixAccumulator: HashMap<Matrix, Matrix>): Matrix
 }

@@ -99,7 +99,7 @@ fun WeightMatrix.computeWeightDeltas(layerError: Matrix): Matrix {
     val sourceIsActivationSequenceProcessor = source is ActivationSequenceProcessor
     val targetIsActivationSequenceProcessor = target is ActivationSequenceProcessor
 
-    // source is batch and target is vector
+    // source is sequence and target is vector
     if (sourceIsActivationSequenceProcessor && !targetIsActivationSequenceProcessor) {
         return layerError.mm(source.activations.row(source.activations.nrow() - 1).toMatrix().transpose())
     }
@@ -109,7 +109,7 @@ fun WeightMatrix.computeWeightDeltas(layerError: Matrix): Matrix {
         return layerError.mm(source.activations.transpose())
     }
 
-    // source and target are batches
+    // source and target are sequences
     if (sourceIsActivationSequenceProcessor && targetIsActivationSequenceProcessor) {
         return layerError.transpose().mm(source.activations)
     }
@@ -339,9 +339,9 @@ fun WeightMatrixTree.applyBackprop(targetValues: Matrix, lossFunction: BackpropL
 /**
  * Breadth-first search starting from the output layer.
  */
-fun computeUpdateOrderList(end: Layer): LinkedHashSet<Layer> {
-    val visited = LinkedHashSet<Layer>()
-    val queue = ArrayDeque<Layer>()
+fun computeUpdateOrderList(end: ArrayLayer): LinkedHashSet<ArrayLayer> {
+    val visited = LinkedHashSet<ArrayLayer>()
+    val queue = ArrayDeque<ArrayLayer>()
     queue.add(end)
     while (queue.isNotEmpty()) {
         val currentLayer = queue.removeFirst()
@@ -351,7 +351,7 @@ fun computeUpdateOrderList(end: Layer): LinkedHashSet<Layer> {
         visited.add(currentLayer)
         for (neighbor in currentLayer.incomingConnectors) {
             if (neighbor.source !in visited) {
-                queue.add(neighbor.source)
+                queue.add(neighbor.source as ArrayLayer)
             }
         }
     }
@@ -362,7 +362,7 @@ fun computeUpdateOrderList(end: Layer): LinkedHashSet<Layer> {
  *  Assumes LinkedHashSet has been placed in an appropriate "breadth-first" order by [computeUpdateOrderList].
  */
 context(Network)
-fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: List<Layer>) {
+fun LinkedHashSet<ArrayLayer>.forwardPass(inputValues: List<Matrix>, inputLayers: List<ArrayLayer>) {
 
     if (inputValues.size != inputLayers.size) throw IllegalArgumentException("Must provide same number of input vectors as input layers")
     inputValues.zip(inputLayers).forEach { (a, b) -> a.validateSameShape(b.activations) }
@@ -385,7 +385,7 @@ fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: Lis
  *
  */
 context(Network)
-fun LinkedHashSet<Layer>.accumulateBackprop(
+fun LinkedHashSet<ArrayLayer>.accumulateBackprop(
     targetValues: Matrix,
     outputLayer: Layer,
     weightAccumulator: HashMap<WeightMatrix, Matrix>,
@@ -403,26 +403,13 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
 
     // printActivationsAndWeights()
     var layerError: Matrix = lossFunction.outputError(outputLayer.activations, targetValues)
+    var errorSoure: ArrayLayer = outputLayer
 
     // Go through layers from output to input
     reversedLayers.forEach { layer ->
 
         // Apply derivative to layer error and accumulate bias updates
-        when (layer) {
-            is NeuronArray -> {
-                // Element-wise product of the layer error with the derivative applied to the weighted inputs
-                (layer.updateRule as? DifferentiableUpdateRule)?.getDerivative(layer.inputs)?.let {
-                        deriv -> layerError.mul(deriv)
-                }
-                // The scaled layer error is used for bias update
-                biasesAccumulator.getOrPut(layer) {
-                    Matrix(layer.size, 1)
-                }.add(layerError)
-            }
-            is ActivationSequenceProcessor -> {
-                layerError = layer.accumulateBackprop(layerError, rawMatrixAccumulator)
-            }
-        }
+        layerError = layer.processError(layerError, errorSoure, biasesAccumulator, rawMatrixAccumulator)
 
         // Process weight matrices feeding into the current layer.
         // For each one we:
@@ -443,6 +430,7 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
         }
         // The new error which gets pushed further back until the first layer is reached
         accumulatedLayerError?.let { layerError = it } // null on the first layer
+        errorSoure = layer
     }
 
     return scalarError

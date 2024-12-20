@@ -55,11 +55,20 @@ class ActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inpu
             events.updated.fire()
         }
 
-    override fun accumulateBackprop(gradient: Matrix, rawMatrixAccumulator: HashMap<Matrix, Matrix>): Matrix {
-        var layerError = gradient
+    override fun processError(
+        error: Matrix,
+        errorSource: ArrayLayer,
+        biasesAccumulator: HashMap<ArrayLayer, Matrix>,
+        rawMatrixAccumulator: HashMap<Matrix, Matrix>
+    ): Matrix {
+        var layerError = error
 
         layerError = (updateRule as? DifferentiableUpdateRule)?.getDerivative(inputs)?.let { deriv ->
-            layerError.mul(deriv)
+            if (errorSource is NeuronArray) {
+                deriv.broadcastMultiply(layerError)
+            } else {
+                layerError.mul(deriv)
+            }
         } ?: layerError
 
         return layerError

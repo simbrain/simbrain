@@ -1,6 +1,7 @@
 package org.simbrain.custom_sims
 
 import org.simbrain.custom_sims.simulations.*
+import org.simbrain.custom_sims.simulations.backprop.activationSequenceBackprop
 import org.simbrain.custom_sims.simulations.behaviorism.ClassicalConditioning
 import org.simbrain.custom_sims.simulations.behaviorism.OperantConditioning
 import org.simbrain.custom_sims.simulations.behaviorism.SimpleOperant
@@ -42,6 +43,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
     dir("Backprop") {
         item("Three Layer Auto-Encoder") { backpropAutoEncoder }
         item("Tiny MNIST") { tinyMNIST }
+        item("Activation Sequence") { activationSequenceBackprop }
     }
 
     dir("Braitenberg") {

@@ -1,8 +1,10 @@
 package org.simbrain.network.core
 
 import org.simbrain.network.events.NeuronArrayEvents
+import org.simbrain.network.gui.nodes.ActivationSequenceProcessor
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.NeuronUpdateRule
+import org.simbrain.network.updaterules.interfaces.DifferentiableUpdateRule
 import org.simbrain.network.util.MatrixDataHolder
 import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.network.util.SpikingMatrixData
@@ -292,6 +294,27 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         events.updated.fire()
     }
 
+    override fun processError(
+        error: Matrix,
+        errorSource: ArrayLayer,
+        biasesAccumulator: HashMap<ArrayLayer, Matrix>,
+        rawMatrixAccumulator: HashMap<Matrix, Matrix>
+    ): Matrix {
+
+        if (errorSource is ActivationSequenceProcessor) {
+            throw UnsupportedOperationException("ActivationSequenceProcessor not supported")
+        }
+
+        (updateRule as? DifferentiableUpdateRule)?.getDerivative(inputs)?.let {
+                deriv -> error.mul(deriv)
+        }
+        // The scaled layer error is used for bias update
+        biasesAccumulator.getOrPut(this) {
+            Matrix(size, 1)
+        }.add(error)
+
+        return error
+    }
 
     /**
      * See [org.simbrain.workspace.serialization.WorkspaceComponentDeserializer]

@@ -294,21 +294,24 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         events.updated.fire()
     }
 
+    /**
+     * Apply derivative to error signal and accumulate bias updates
+     */
     override fun processError(
         error: Matrix,
-        errorSource: ArrayLayer,
+        signalSource: ArrayLayer,
         biasesAccumulator: HashMap<ArrayLayer, Matrix>,
         rawMatrixAccumulator: HashMap<Matrix, Matrix>
     ): Matrix {
 
-        if (errorSource is ActivationSequenceProcessor) {
+        if (signalSource is ActivationSequenceProcessor) {
             throw UnsupportedOperationException("ActivationSequenceProcessor not supported")
         }
 
         (updateRule as? DifferentiableUpdateRule)?.getDerivative(inputs)?.let {
                 deriv -> error.mul(deriv)
         }
-        // The scaled layer error is used for bias update
+        // The scaled error signal is used for bias update
         biasesAccumulator.getOrPut(this) {
             Matrix(size, 1)
         }.add(error)

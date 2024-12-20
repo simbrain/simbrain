@@ -8,11 +8,10 @@ import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedModel
-import org.simbrain.network.util.Direction
-import org.simbrain.network.util.offsetNetworkModel
+import org.simbrain.util.point
 import org.simbrain.util.toMatrix
 
-val activationSequenceBackprop = newSim {
+val activationSequenceThreeLayer = newSim {
 
     val sequenceSize = 2
     val inputSize = 3
@@ -47,20 +46,18 @@ val activationSequenceBackprop = newSim {
     }
 
     network.addNetworkModels(inputs, hidden, output, wm1, wm2, model).awaitAll()
-
-    offsetNetworkModel(inputs, hidden, Direction.NORTH, 200.0)
-    offsetNetworkModel(hidden, output, Direction.NORTH, 200.0)
+    output.location = point(100, 100)
+    hidden.location = point(100, 500)
+    inputs.location = point(100, 900)
 
     val inputData = arrayOf(
-        doubleArrayOf(0.1, 0.2, 0.3, 0.4, 0.5, 0.6),
-        doubleArrayOf(-.1, -.2, -.3, 0.4, 0.5, 0.6),
-        doubleArrayOf(0.1, 0.1, 0.1, 0.1, 0.1, 0.1),
+        doubleArrayOf(1.0, 0.0, 1.0, 0.0, 1.0, 0.0),
+        doubleArrayOf(0.0, 1.0, 0.0, 0.0, 1.0, 0.0),
     ).toMatrix()
 
     val targetData = arrayOf(
-        doubleArrayOf(0.5, 0.7, 0.9),
-        doubleArrayOf(0.3, 0.3, 0.3),
-        doubleArrayOf(0.2, 0.2, 0.2),
+        doubleArrayOf(1.0, 1.0, 1.0),
+        doubleArrayOf(0.0, 2.0, 0.0)
     ).toMatrix()
 
     model.trainingSet = MatrixDataset(

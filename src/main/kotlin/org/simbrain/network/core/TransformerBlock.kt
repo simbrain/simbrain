@@ -178,47 +178,47 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
 
     override fun processError(
         error: Matrix,
-        errorSource: ArrayLayer,
+        signalSource: ArrayLayer,
         biasesAccumulator: HashMap<ArrayLayer, Matrix>,
         rawMatrixAccumulator: HashMap<Matrix, Matrix>
     ): Matrix {
 
-        var layerError = error
+        var errorSignal = error
 
-        layerError = if (errorSource is NeuronArray) {
-            feedForwardOutputNetInputs.reluDerivative().broadcastMultiply(layerError)
+        errorSignal = if (signalSource is NeuronArray) {
+            feedForwardOutputNetInputs.reluDerivative().broadcastMultiply(errorSignal)
         } else {
-            feedForwardOutputNetInputs.reluDerivative().mm(layerError)
+            feedForwardOutputNetInputs.reluDerivative().mm(errorSignal)
         }
         rawMatrixAccumulator.getOrPut(b2) {
             Matrix(b2.nrow(), b2.ncol())
-        }.add(layerError.colSums().toMatrix())
+        }.add(errorSignal.colSums().toMatrix())
 
-        val W2Delta = layerError.transpose().mm(feedForwardHidden)
+        val W2Delta = errorSignal.transpose().mm(feedForwardHidden)
 
         rawMatrixAccumulator.getOrPut(W2) {
             Matrix(W2.nrow(), W2.ncol())
         }.add(W2Delta)
 
-        layerError = layerError.mm(W2)
+        errorSignal = errorSignal.mm(W2)
 
-        layerError = layerError.mul(feedForwardHiddenNetInputs.reluDerivative())
+        errorSignal = errorSignal.mul(feedForwardHiddenNetInputs.reluDerivative())
         rawMatrixAccumulator.getOrPut(b1) {
             Matrix(b1.nrow(), b1.ncol())
-        }.add(layerError.colSums().toMatrix())
+        }.add(errorSignal.colSums().toMatrix())
 
-        val W1Delta = layerError.transpose().mm(feedForwardInput)
+        val W1Delta = errorSignal.transpose().mm(feedForwardInput)
         rawMatrixAccumulator.getOrPut(W1) {
             Matrix(W1.nrow(), W1.ncol())
         }.add(W1Delta)
 
-        layerError = layerError.mm(W1)
+        errorSignal = errorSignal.mm(W1)
 
         // feedForwardInput = inputs + attentionOutput
         // So gradient splits evenly:
-        val dFeedForwardInput = layerError
-        val dAttentionOutput = layerError.clone() // Since attentionOutput is just added to inputs, it receives the same gradient
-        val dInputs_fromSum = layerError.clone()  // The portion of gradient w.r.t inputs from the sum
+        val dFeedForwardInput = errorSignal
+        val dAttentionOutput = errorSignal.clone() // Since attentionOutput is just added to inputs, it receives the same gradient
+        val dInputs_fromSum = errorSignal.clone()  // The portion of gradient w.r.t inputs from the sum
 
         // Now backprop through attentionOutput = selfAttention.mm(vStack)
         val dSelfAttention = dAttentionOutput.mm(vStack.transpose())

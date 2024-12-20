@@ -57,21 +57,21 @@ class ActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inpu
 
     override fun processError(
         error: Matrix,
-        errorSource: ArrayLayer,
+        signalSource: ArrayLayer,
         biasesAccumulator: HashMap<ArrayLayer, Matrix>,
         rawMatrixAccumulator: HashMap<Matrix, Matrix>
     ): Matrix {
-        var layerError = error
+        var errorSignal = error
 
-        layerError = (updateRule as? DifferentiableUpdateRule)?.getDerivative(inputs)?.let { deriv ->
-            if (errorSource is NeuronArray) {
-                deriv.broadcastMultiply(layerError)
+        errorSignal = (updateRule as? DifferentiableUpdateRule)?.getDerivative(inputs)?.let { deriv ->
+            if (signalSource is NeuronArray) {
+                deriv.broadcastMultiply(errorSignal)
             } else {
-                layerError.mul(deriv)
+                errorSignal.mul(deriv)
             }
-        } ?: layerError
+        } ?: errorSignal
 
-        return layerError
+        return errorSignal
     }
 
     override val activationArray: DoubleArray

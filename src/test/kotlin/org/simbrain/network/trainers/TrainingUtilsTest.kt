@@ -105,12 +105,12 @@ class TrainingUtilsTest {
         )))
         }
         na1.setActivations(doubleArrayOf(1.0, 2.0))
-        val layerError = Matrix.column(doubleArrayOf(.5, -.5, .5))
+        val errorSignal = Matrix.column(doubleArrayOf(.5, -.5, .5))
 
         val initialWeights = wm.weightMatrix.clone()
-        wm.updateWeights(layerError, epsilon = 1.0)
-        // Expected weight deltas: layerError * source.activations.T
-        val expectedDeltas = layerError.mm(na1.activations.transpose())
+        wm.updateWeights(errorSignal, epsilon = 1.0)
+        // Expected weight deltas: errorSignal * source.activations.T
+        val expectedDeltas = errorSignal.mm(na1.activations.transpose())
         val expectedWeights = initialWeights.add(expectedDeltas)
 
         //println(expectedDeltas)
@@ -133,13 +133,13 @@ class TrainingUtilsTest {
             doubleArrayOf(2.0, -2.0)
         )))
 
-        val layerError = Matrix.column(doubleArrayOf(0.0, 1.0, 0.5))
+        val errorSignal = Matrix.column(doubleArrayOf(0.0, 1.0, 0.5))
 
-        // Expected backpropagated error: weightMatrix.T * layerError
+        // Expected backpropagated error: weightMatrix.T * errorSignal
         // Expect 2, -2
-        val expectedBackpropagatedErrors = layerError.transpose().mm(wm.weightMatrix).transpose()
+        val expectedBackpropagatedErrors = errorSignal.transpose().mm(wm.weightMatrix).transpose()
 
-        val backpropagatedErrors = wm.updateWeights(layerError)
+        val backpropagatedErrors = wm.updateWeights(errorSignal)
         for (i in 0 until backpropagatedErrors.nrow()) {
             assertEquals(expectedBackpropagatedErrors[i, 0], backpropagatedErrors[i, 0], 1e-6)
         }

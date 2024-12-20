@@ -79,13 +79,13 @@ fun List<WeightMatrix>.forwardPass(inputVector: Matrix) {
  * Backpropagate the provided errors through this weight matrix, and return the new error.
  */
  @Deprecated("Migrating towards LinkedHashSet<Layer>.accumulateBackprop")
-fun WeightMatrix.updateWeights(layerError: Matrix, epsilon: Double = .1): Matrix {
-    layerError.validateSameShape(target.activations)
-    val weightDeltas = layerError.mm(source.activations.transpose())
+fun WeightMatrix.updateWeights(errorSignal: Matrix, epsilon: Double = .1): Matrix {
+    errorSignal.validateSameShape(target.activations)
+    val weightDeltas = errorSignal.mm(source.activations.transpose())
 
-    // Backpropagate the layer error through the weights to get a new error vector
-    //  Prefer this to layerError.T.mm(wm).T because that requies an extra transpose
-    val backropagatedErrors = weightMatrix.transpose().mm(layerError)
+    // Backpropagate the error signal through the weights to get a new error vector
+    //  Prefer this to errorSignal.T.mm(wm).T because that requies an extra transpose
+    val backropagatedErrors = weightMatrix.transpose().mm(errorSignal)
 
     // Update weights
     weightMatrix.add(weightDeltas.mul(epsilon))
@@ -94,39 +94,39 @@ fun WeightMatrix.updateWeights(layerError: Matrix, epsilon: Double = .1): Matrix
     return backropagatedErrors
 }
 
-fun WeightMatrix.computeWeightDeltas(layerError: Matrix): Matrix {
+fun WeightMatrix.computeWeightDeltas(errorSignal: Matrix): Matrix {
 
     val sourceIsActivationSequenceProcessor = source is ActivationSequenceProcessor
     val targetIsActivationSequenceProcessor = target is ActivationSequenceProcessor
 
     // source is sequence and target is vector
     if (sourceIsActivationSequenceProcessor && !targetIsActivationSequenceProcessor) {
-        return layerError.mm(source.activations.row(source.activations.nrow() - 1).toMatrix().transpose())
+        return source.activations.transpose().broadcastMultiply(errorSignal)
     }
 
     // source and target are vectors
     if (!sourceIsActivationSequenceProcessor && !targetIsActivationSequenceProcessor) {
-        return layerError.mm(source.activations.transpose())
+        return errorSignal.mm(source.activations.transpose())
     }
 
     // source and target are sequences
     if (sourceIsActivationSequenceProcessor && targetIsActivationSequenceProcessor) {
-        return layerError.transpose().mm(source.activations)
+        return errorSignal.transpose().mm(source.activations)
     }
 
     throw IllegalArgumentException("Invalid source and target types: ${source::class.simpleName} and ${target::class.simpleName}")
 }
 
-fun WeightMatrix.backpropagateError(layerError: Matrix): Matrix {
-    // Backpropagate the layer error through the weights to get a new error vector
-    //println("Propagating errors through ${source.displayName} [${layerError.flatten().joinToString(", ") { it.format(2) }}]")
+fun WeightMatrix.backpropagateError(errorSignal: Matrix): Matrix {
+    // Backpropagate the error signal through the weights to get a new error vector
+    //println("Propagating errors through ${source.displayName} [${errorSignal.flatten().joinToString(", ") { it.format(2) }}]")
     return if (target is ActivationSequenceProcessor) {
-        // batch of errors * wm
-        layerError.mm(weightMatrix)
+        // sequence of errors * wm
+        errorSignal.mm(weightMatrix)
     } else {
         // error vector * wm
-        // Prefer this to layerError.T.mm(wm).T because that requies an extra transpose
-        weightMatrix.transpose().mm(layerError)
+        // Prefer this to errorSignal.T.mm(wm).T because that requires an extra transpose
+        weightMatrix.transpose().mm(errorSignal)
     }
 }
 
@@ -235,7 +235,7 @@ fun List<WeightMatrix>.applyBackprop(
     targetValues: Matrix,
     epsilon: Double = .1,
     lossFunction: BackpropLossFunction = BackpropLossFunction.SSE,
-    debug: (index: Int, layerError: List<Double>) -> Unit = { _, _ -> }
+    debug: (index: Int, errorSignal: List<Double>) -> Unit = { _, _ -> }
 ): Double {
 
     targetValues.validateSameShape(last().targetNeuronArray.activations)
@@ -244,15 +244,15 @@ fun List<WeightMatrix>.applyBackprop(
     val error = lossFunction.scalarLoss(last().targetNeuronArray.activations, targetValues)
 
     // printActivationsAndWeights()
-    var layerError: Matrix = lossFunction.outputError(last().targetNeuronArray.activations, targetValues)
+    var errorSignal: Matrix = lossFunction.outputError(last().targetNeuronArray.activations, targetValues)
 
     this.reversed().forEachIndexed { index, wm ->
-        debug(index, layerError.flatten().toList())
+        debug(index, errorSignal.flatten().toList())
         (wm.targetNeuronArray.updateRule as? DifferentiableUpdateRule)?.getDerivative(wm.targetNeuronArray.inputs)?.let { deriv ->
-            layerError.mul(deriv)
+            errorSignal.mul(deriv)
         }
-        wm.targetNeuronArray.updateBiases(layerError, epsilon)
-        layerError = wm.updateWeights(layerError, epsilon)
+        wm.targetNeuronArray.updateBiases(errorSignal, epsilon)
+        errorSignal = wm.updateWeights(errorSignal, epsilon)
     }
 
     return error
@@ -273,17 +273,17 @@ fun List<WeightMatrix>.accumulateBackprop(
     val error = lossFunction.scalarLoss(last().targetNeuronArray.activations, targetValues)
 
     // printActivationsAndWeights()
-    var layerError: Matrix = lossFunction.outputError(last().targetNeuronArray.activations, targetValues)
+    var errorSignal: Matrix = lossFunction.outputError(last().targetNeuronArray.activations, targetValues)
 
     this.reversed().forEach { wm ->
         (wm.targetNeuronArray.updateRule as? DifferentiableUpdateRule)?.getDerivative(wm.targetNeuronArray.inputs)?.let {
-            deriv -> layerError.mul(deriv)
+            deriv -> errorSignal.mul(deriv)
         }
         biasesAccumulator.getOrPut(wm.targetNeuronArray) {
             Matrix(wm.targetNeuronArray.size, 1)
-        }.add(layerError)
-        val weightDeltas = wm.computeWeightDeltas(layerError)
-        layerError = wm.backpropagateError(layerError)
+        }.add(errorSignal)
+        val weightDeltas = wm.computeWeightDeltas(errorSignal)
+        errorSignal = wm.backpropagateError(errorSignal)
         weightAccumulator.getOrPut(wm) {
             Matrix(wm.weightMatrix.nrow(), wm.weightMatrix.ncol())
         }.add(weightDeltas)
@@ -402,35 +402,35 @@ fun LinkedHashSet<ArrayLayer>.accumulateBackprop(
     val scalarError = lossFunction.scalarLoss(outputLayer.activations, targetValues)
 
     // printActivationsAndWeights()
-    var layerError: Matrix = lossFunction.outputError(outputLayer.activations, targetValues)
-    var errorSoure: ArrayLayer = outputLayer
+    var errorSignal: Matrix = lossFunction.outputError(outputLayer.activations, targetValues)
+    var signalSource: ArrayLayer = outputLayer
 
     // Go through layers from output to input
     reversedLayers.forEach { layer ->
 
-        // Apply derivative to layer error and accumulate bias updates
-        layerError = layer.processError(layerError, errorSoure, biasesAccumulator, rawMatrixAccumulator)
+        // Process the error signal. Bias update for neuron array. Full backprop update for transformer block. Etc.
+        errorSignal = layer.processError(errorSignal, signalSource, biasesAccumulator, rawMatrixAccumulator)
 
         // Process weight matrices feeding into the current layer.
         // For each one we:
         //  1. compute and accumulate a weight delta using source activations
-        //  2. "backpropagate" the errors by multiplying them by the weight matrix to get a new error
-        var accumulatedLayerError: Matrix? = null
+        //  2. "backpropagate" the error signals by multiplying them by the weight matrix to get a new signal
+        var accumulatedErrorSignal: Matrix? = null
         layer.incomingConnectors.forEach { connector ->
             val wm = connector as WeightMatrix
-            val weightDeltas = wm.computeWeightDeltas(layerError)
+            val weightDeltas = wm.computeWeightDeltas(errorSignal)
             weightAccumulator.getOrPut(wm) {
                 Matrix(wm.weightMatrix.nrow(), wm.weightMatrix.ncol())
             }.add(weightDeltas)
-            // Note that the source of the weight matrix may be the same across multiple passes through this code,
-            // supporting skip connections. In such cases, the backpropagated errors from these connections
-            // are added together to form the accumulated error.
-            val errors = wm.backpropagateError(layerError)
-            accumulatedLayerError = accumulatedLayerError?.add(errors) ?: errors
+            val currentConnectorErrorSignal = wm.backpropagateError(errorSignal)
+
+            // The source of the weight matrix may be the same across multiple passes through this code,
+            // supporting skip connections. In such cases, the error signals are summed
+            accumulatedErrorSignal = accumulatedErrorSignal?.add(currentConnectorErrorSignal) ?: currentConnectorErrorSignal
         }
-        // The new error which gets pushed further back until the first layer is reached
-        accumulatedLayerError?.let { layerError = it } // null on the first layer
-        errorSoure = layer
+        // The new error signal which gets pushed further back until the first layer is reached
+        accumulatedErrorSignal?.let { errorSignal = it } // null on the first layer
+        signalSource = layer
     }
 
     return scalarError

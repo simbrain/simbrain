@@ -44,6 +44,7 @@ import kotlin.collections.mapOf
 import kotlin.collections.mutableListOf
 import kotlin.collections.mutableMapOf
 import kotlin.collections.mutableSetOf
+import kotlin.collections.reduce
 import kotlin.collections.reverse
 import kotlin.collections.reversed
 import kotlin.collections.set
@@ -101,7 +102,12 @@ fun WeightMatrix.computeWeightDeltas(errorSignal: Matrix): Matrix {
 
     // source is sequence and target is vector
     if (sourceIsActivationSequenceProcessor && !targetIsActivationSequenceProcessor) {
-        return source.activations.transpose().broadcastMultiply(errorSignal)
+        // sum of outer products across rows of activation sequence
+        return source.activations.rows.map { row ->
+            errorSignal.mm(row)
+        }.reduce { acc, matrix ->
+            acc.add(matrix)
+        }
     }
 
     // source and target are vectors

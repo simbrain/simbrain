@@ -409,3 +409,19 @@ fun Matrix.zeroDiagonalInPlace() {
         this[i, i] = 0.0
     }
 }
+
+val Matrix.rows get() = object : Iterable<Matrix> {
+    override fun iterator() = object : Iterator<Matrix> {
+        private var index = 0
+        override fun hasNext() = index < nrow()
+        override fun next() = Matrix.row(row(index++))
+    }
+}
+
+val Matrix.columns get() = object : Iterable<Matrix> {
+    override fun iterator() = object : Iterator<Matrix> {
+        private var index = 0
+        override fun hasNext() = index < ncol()
+        override fun next() = col(index++).toMatrix()
+    }
+}

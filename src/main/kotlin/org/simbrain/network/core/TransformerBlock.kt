@@ -57,6 +57,9 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
             events.updateGraphics.fire()
         }
 
+    @UserParameter(label = "Layer Norm", description = "Use layer normalization", order = 13)
+    var useLayerNorm = false
+
     /**
      * Output activations as double array
      */
@@ -164,13 +167,13 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
 
         attentionOutput.copyFrom(selfAttention.mm(vStack))
 
-        feedForwardInput.copyFrom(inputs.clone().add(attentionOutput).layerNormByRow())
+        feedForwardInput.copyFrom(inputs.clone().add(attentionOutput).let { if (useLayerNorm) it.layerNormByRow() else it })
 
         feedForwardHiddenNetInputs.copyFrom(feedForwardInput.mm(W1.transpose()).addToEachRow(b1))
         feedForwardHidden.copyFrom(feedForwardHiddenNetInputs.relu())
 
         feedForwardOutputNetInputs.copyFrom(feedForwardHidden.mm(W2.transpose()).addToEachRow(b2))
-        activations.copyFrom(feedForwardInput.add(feedForwardOutputNetInputs).layerNormByRow())
+        activations.copyFrom(feedForwardInput.add(feedForwardOutputNetInputs).let { if (useLayerNorm) it.layerNormByRow() else it })
 
         inputs.fill(0.0)
         events.updated.fire()

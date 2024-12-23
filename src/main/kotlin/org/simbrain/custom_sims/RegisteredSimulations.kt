@@ -118,8 +118,10 @@ val simulations = dir("Simulations", alphabetical = true ) {
 
     dir("Hopfield and Boltzmann") {
         item("Hopfield") { hopfieldSim }
+        item("Continuos Hopfield") { hopfieldSimContinuous }
         item("Restricted Boltzmann Machine") { rbmSim }
         item("Room Schema") { roomSchemaSim }
+        item("Forgetting Sim") { forgettingSim }
     }
 
     dir("Machine Learning") {

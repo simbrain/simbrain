@@ -1,5 +1,6 @@
 package org.simbrain.util
 
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.plot.histogram.HistogramModel
 import org.simbrain.plot.histogram.HistogramPanel
 import org.simbrain.util.stats.ProbabilityDistribution
@@ -393,7 +394,7 @@ fun Matrix.addToEachRow(columnVector: Matrix): Matrix {
     return this
 }
 
-fun Matrix.randomizeSymmetric(randomizer: ProbabilityDistribution, zeroDiagonal: Boolean = true): Matrix {
+fun Matrix.randomizeSymmetric(randomizer: ProbabilityDistribution = NetworkPreferences.weightRandomizer, zeroDiagonal: Boolean = true): Matrix {
     for (i in 0 until nrow()) {
         for (j in i until ncol()) {
             val randomValue = if (zeroDiagonal && i == j) 0.0 else randomizer.sampleDouble()

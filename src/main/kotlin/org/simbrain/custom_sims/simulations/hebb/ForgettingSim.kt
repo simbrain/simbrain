@@ -56,24 +56,38 @@ val forgettingSim = newSim {
     var numTrainIterations = 5
     var learningRate = .2
     var forgettingRate = .1
+
+    fun initLearningRate() {
+        (wm.learningRule as HebbianRule).learningRate = learningRate
+    }
+    fun initForgettingRate() {
+        (wm.learningRule as HebbianRule).forgettingRate = forgettingRate
+    }
+    initLearningRate()
+    initForgettingRate()
+
     withGui {
         place(networkComponent, 180, 0, 509, 619)
         createControlPanel("Control Panel", 0, 0) {
             addButton("Random Pattern") {
                 hopfield.randomize(bipolarRandomizer)
             }
+            addButton("Randomize weights") {
+                wm.weightMatrix.randomizeSymmetric()
+                wm.events.updated.fire()
+            }
             addSeparator()
             addTextField("Learning rate", "" + learningRate) {
                 it.toDoubleOrNull()?.let { num ->
                     learningRate = num
                 }
-                (wm.learningRule as HebbianRule).learningRate = learningRate
+                initLearningRate()
             }
             addTextField("Forgetting rate", "" + forgettingRate) {
                 it.toDoubleOrNull()?.let { num ->
                     forgettingRate = num
                 }
-                (wm.learningRule as HebbianRule).forgettingRate = forgettingRate
+                initForgettingRate()
             }
             addSeparator()
             addTextField("Training iterations", "" + numTrainIterations) {

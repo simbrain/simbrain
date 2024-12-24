@@ -56,8 +56,12 @@ val hopfieldSimContinuous = newSim {
 
     val bipolarRandomizer = TwoValued(-1.0, 1.0)
     var numTrainIterations = 5
+    var learningRate = .2
+    fun initLearningRate() {
+        (wm.learningRule as HebbianRule).learningRate = learningRate
+    }
     withGui {
-        place(networkComponent, 180, 0, 509, 619)
+        place(networkComponent, 200, 0, 509, 619)
         createControlPanel("Control Panel", 0, 0) {
             addButton("Pattern 1") {
                 hopfield.neuronList.activations =
@@ -84,14 +88,31 @@ val hopfieldSimContinuous = newSim {
                 hopfield.neuronList.activations =
                     listOf(-1.0, -1.0, 1.0, -1.0, -1.0, 1.0, -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, -1.0, 1.0, -1.0, -1.0)
             }
+            addSeparator()
             addButton("Random Pattern") {
                 hopfield.randomize(bipolarRandomizer)
             }
+            addButton("Randomize weights") {
+                wm.weightMatrix.randomizeSymmetric()
+                wm.events.updated.fire()
+            }
             addSeparator()
+            addTextField("Learning rate", "" + learningRate) {
+                it.toDoubleOrNull()?.let { num ->
+                    learningRate = num
+                }
+                initLearningRate()
+            }
             addTextField("Training iterations", "" + numTrainIterations) {
                 it.toIntOrNull()?.let { num ->
                     numTrainIterations = num
                 }
+            }
+            addSeparator()
+            addButton("Train") {
+                hopfield.isAllClamped = true
+                wm.clamped = false
+                workspace.simpleIterate(numTrainIterations)
             }
             addButton("Training Mode") {
                 hopfield.isAllClamped = true

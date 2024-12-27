@@ -167,13 +167,14 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
 
         attentionOutput.copyFrom(selfAttention.mm(vStack))
 
+        // Skip connection from inputs
         feedForwardInput.copyFrom(inputs.clone().add(attentionOutput).let { if (useLayerNorm) it.layerNormByRow() else it })
-
         feedForwardHiddenNetInputs.copyFrom(feedForwardInput.mm(W1.transpose()).addToEachRow(b1))
         feedForwardHidden.copyFrom(feedForwardHiddenNetInputs.relu())
 
         feedForwardOutputNetInputs.copyFrom(feedForwardHidden.mm(W2.transpose()).addToEachRow(b2))
-        activations.copyFrom(feedForwardInput.add(feedForwardOutputNetInputs).let { if (useLayerNorm) it.layerNormByRow() else it })
+        // Another skip connection from inputs _to the feedforward part of the network_. Also note no relu on the output.
+        activations.copyFrom(feedForwardInput.clone().add(feedForwardOutputNetInputs).let { if (useLayerNorm) it.layerNormByRow() else it })
 
         inputs.fill(0.0)
         events.updated.fire()

@@ -3,6 +3,8 @@ package org.simbrain.network.core
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.simbrain.util.plus
+import org.simbrain.util.relu
 import org.simbrain.util.toMatrix
 import smile.math.matrix.Matrix
 
@@ -15,22 +17,22 @@ class TransformerBlockTest {
     private val hiddenSize = 2
 
     // Create a block with small dimensions so manual math is tractable
-    private val block = TransformerBlock(sequenceSize, inputSize, hiddenSize)
+    private val block = TransformerBlock(sequenceSize, inputSize, hiddenSize).apply {
+        useLayerNorm = false // Assuming no layer norm for now
+    }
 
     private val EPSILON = 1e-6
-    private val TOL = 1e-3
 
     init {
-        // Manually set all block weights to known values, so the test is deterministic.
-        // K, Q, V each 2x2
-        block.K[0, 0] = 0.1; block.K[0, 1] = 0.2
-        block.K[1, 0] = 0.3; block.K[1, 1] = 0.4
+        // Manually set all block weights to known values
+        block.K[0, 0] = 1.0; block.K[0, 1] = 0.0
+        block.K[1, 0] = 0.0; block.K[1, 1] = 1.0
 
-        block.Q[0, 0] = -0.1; block.Q[0, 1] = 0.2
-        block.Q[1, 0] =  0.3; block.Q[1, 1] = -0.4
+        block.Q[0, 0] = 1.0; block.Q[0, 1] = 0.0
+        block.Q[1, 0] = 0.0; block.Q[1, 1] = 1.0
 
-        block.V[0, 0] = 0.0; block.V[0, 1] = 0.1
-        block.V[1, 0] = 0.2; block.V[1, 1] = 0.3
+        block.V[0, 0] = 1.0; block.V[0, 1] = 0.0
+        block.V[1, 0] = 0.0; block.V[1, 1] = 1.0
 
         // W1, W2 each 2x2 in this example
         block.W1[0, 0] = 1.0; block.W1[0, 1] = 0.0
@@ -39,107 +41,78 @@ class TransformerBlockTest {
         block.W2[0, 0] = 1.0; block.W2[0, 1] = 0.0
         block.W2[1, 0] = 0.0; block.W2[1, 1] = 1.0
 
-        // Biases (2x1)
+        // Biases
         block.b1[0, 0] = 0.0; block.b1[1, 0] = 0.0
         block.b2[0, 0] = 0.0; block.b2[1, 0] = 0.0
     }
 
     @Test
     fun `forward pass numeric test`() {
-        // 1) Construct input using toMatrix(). The shape is (2 rows, 2 columns).
+
+        // Set up inputs
         val inputMatrix = arrayOf(
             doubleArrayOf(1.0, 2.0),
             doubleArrayOf(3.0, 4.0)
         ).toMatrix()
-
-        // 2) Supply the input to the block
         block.addInputs(inputMatrix)
 
-        // 3) Perform a forward pass
+        // Forward pass
         with(net) { block.update() }
 
-        // 4) Now we compare the block’s internal states to manually computed references.
-
-        // -- (A) Check kStack, qStack, vStack:
-
-        //  kStack = inputs.mm(K)
-        //    For row0=(1,2),  K=[[0.1,0.2],[0.3,0.4]]:
-        //      => row0 = (1*0.1 + 2*0.3, 1*0.2 + 2*0.4) = (0.7, 1.0)
-        //    For row1=(3,4):
-        //      => row1 = (3*0.1 + 4*0.3, 3*0.2 + 4*0.4) = (1.5, 2.2)
+        // Check K, Q, V multiplications
         val kStackExpected = arrayOf(
-            doubleArrayOf(0.7, 1.0),
-            doubleArrayOf(1.5, 2.2)
+            doubleArrayOf(1.0, 2.0),
+            doubleArrayOf(3.0, 4.0)
         ).toMatrix()
         checkMatrixEquals(kStackExpected, block.kStack, "kStack")
 
-        //  qStack = inputs.mm(Q)
-        //    Q=[[ -0.1, 0.2 ], [0.3, -0.4]]
-        //    row0 => (1*(-0.1) + 2*0.3, 1*0.2 + 2*(-0.4)) = (0.5, -0.6)
-        //    row1 => (3*(-0.1) + 4*0.3, 3*0.2 + 4*(-0.4)) = (0.9, -1.0)
         val qStackExpected = arrayOf(
-            doubleArrayOf(0.5, -0.6),
-            doubleArrayOf(0.9, -1.0)
+            doubleArrayOf(1.0, 2.0),
+            doubleArrayOf(3.0, 4.0)
         ).toMatrix()
         checkMatrixEquals(qStackExpected, block.qStack, "qStack")
 
-        //  vStack = inputs.mm(V)
-        //    V=[[0.0,0.1],[0.2,0.3]]
-        //    row0 => (1*0.0 + 2*0.2, 1*0.1 + 2*0.3) = (0.4, 0.7)
-        //    row1 => (3*0.0 + 4*0.2, 3*0.1 + 4*0.3) = (0.8, 1.5)
         val vStackExpected = arrayOf(
-            doubleArrayOf(0.4, 0.7),
-            doubleArrayOf(0.8, 1.5)
+            doubleArrayOf(1.0, 2.0),
+            doubleArrayOf(3.0, 4.0)
         ).toMatrix()
         checkMatrixEquals(vStackExpected, block.vStack, "vStack")
 
-        // -- (B) Check selfAttention:
-        //   selfAttention = softmax( (qStack.mm(kStack.transpose())) / sqrt(d) ) row-wise.
-        //   d = inputSize=2 => sqrt(2)=1.4142
+        // Check selfAttention:
+        //   selfAttention = softmax( (qStack.mm(kStack.transpose())) / sqrt(scale) ) row-wise.
+        //   scale = sqrt(inputSize) = sqrt(2) = 1.4142
+        //   Computed in python
+        //   Row 1 = [0.01416604, 0.98583396]
+        //   Row 2 = [0.0000502, 0.9999498]
 
-        //   qStack.mm(kStack^T) => shape (2x2)
-        //   row0 dot row0 => 0.5*0.7 + (-0.6)*1.0 = 0.35 - 0.6 = -0.25
-        //   row0 dot row1 => 0.5*1.5 + (-0.6)*2.2 = 0.75 - 1.32 = -0.57
-        //   row1 dot row0 => 0.9*0.7 + (-1.0)*1.0 = 0.63 - 1.0 = -0.37
-        //   row1 dot row1 => 0.9*1.5 + (-1.0)*2.2 = 1.35 - 2.2 = -0.85
-
-        //   => qkT = [[-0.25, -0.57],
-        //             [-0.37, -0.85]]
-        //   => qkT / sqrt(2) ~ [[-0.1768, -0.4033],
-        //                       [-0.2618, -0.6010]]
-
-        //   row0 exponentials => e^-0.1768 ~ 0.838, e^-0.4033 ~ 0.668 => sum ~ 1.506 => softmax => ~ [0.556, 0.444]
-        //   row1 exponentials => e^-0.2618 ~ 0.769, e^-0.6010 ~ 0.548 => sum ~ 1.317 => softmax => ~ [0.584, 0.416]
         val selfAttentionExpected = arrayOf(
-            doubleArrayOf(0.556, 0.444),
-            doubleArrayOf(0.584, 0.416)
+            doubleArrayOf(0.01416604, 0.98583396),
+            doubleArrayOf(0.0000502, 0.9999498)
         ).toMatrix()
         checkMatrixEquals(selfAttentionExpected, block.selfAttention, "selfAttention", tol = 1e-3)
 
-        // check softmax sums to 1
+        // check softmax rows of self attention matrix sum to 1
         assertArrayEquals(doubleArrayOf(1.0, 1.0), block.selfAttention.rowSums())
 
-
-        // -- (C) attentionOutput = selfAttention.mm(vStack)
-
-        //   row0 => (0.556*0.4 + 0.444*0.8, 0.556*0.7 + 0.444*1.5)
-        //         => (0.2224 + 0.3552, 0.3892 + 0.666) = (0.5776, 1.0552)
-        //   row1 => (0.584*0.4 + 0.416*0.8, 0.584*0.7 + 0.416*1.5)
-        //         => (0.2336 + 0.3328, 0.4088 + 0.624) = (0.5664, 1.0328)
-        val attentionOutExpected = arrayOf(
-            doubleArrayOf(0.5776, 1.0552),
-            doubleArrayOf(0.5664, 1.0328)
-        ).toMatrix()
+        // Attention output
+        val attentionOutExpected = selfAttentionExpected.mm(vStackExpected)
         checkMatrixEquals(attentionOutExpected, block.attentionOutput, "attentionOutput", tol = 1e-3)
 
-        // -- (D) The final block.activations includes skip connections + layer norms + feedforward net.
-        //     We'll just confirm it’s not empty and shape is correct for now.
-        assertEquals(sequenceSize, block.activations.nrow(), "activations row count mismatch")
-        assertEquals(inputSize, block.activations.ncol(), "activations col count mismatch")
+        // Feed forward inputs: inputs + attentionOutput (skip connection)
+        checkMatrixEquals(inputMatrix + attentionOutExpected, block.feedForwardInput, "feedForwardInput", tol = 1e-3)
 
-        // -- (E) Check the feedforward net output
+        // Feed forward hidden net inputs: should be same as feedforward inputs since weights are identity
+        checkMatrixEquals(inputMatrix + attentionOutExpected, block.feedForwardHiddenNetInputs, "feedForwardHiddenNetInputs", tol = 1e-3)
 
-        checkMatrixEquals(attentionOutExpected.clone().add(inputMatrix), block.feedForwardHidden, "feedForwardHidden", tol = 1e-3)
+        // Feed forward hidden: relu feedForwardHiddenNetInputs
+        checkMatrixEquals((inputMatrix + attentionOutExpected).relu(), block.feedForwardHidden, "feedForwardHidden", tol = 1e-3)
+
+        // Feed forward output net inputs: same as feed forward hidden because weights are identity
+        checkMatrixEquals((inputMatrix + attentionOutExpected).relu(), block.feedForwardOutputNetInputs, "feedForwardOutputNetInputs", tol = 1e-3)
+
+        // Feed forward output: feedforward input + feed forward output net inputs (another skip connection)
+        // This just is the "activation" of the block
+        checkMatrixEquals(block.feedForwardInput + block.feedForwardOutputNetInputs, block.activations, "output / activations", tol = 1e-3)
 
     }
 

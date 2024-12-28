@@ -116,6 +116,49 @@ class TransformerBlockTest {
 
     }
 
+    @Test
+    fun `test backprop numeric checks`() {
+
+        // 1) Forward pass with known input
+        val inputMatrix = arrayOf(
+            doubleArrayOf(1.0, 2.0),
+            doubleArrayOf(3.0, 4.0)
+        ).toMatrix()
+
+        block.addInputs(inputMatrix)
+
+        with(net) { block.update() }
+
+        // 2) Define an "error" matrix that is effectively dCost/dOutput
+        //    e.g. only the second row is non-zero
+        val error = doubleArrayOf(-1.0, 1.0).toMatrix()
+
+        // 3) Accumulators for the block’s processError
+        val biasesAccumulator = HashMap<ArrayLayer, Matrix>()
+        val rawMatrixAccumulator = HashMap<Matrix, Matrix>()
+
+        // 4) Dummy source layer
+        val dummySource = NeuronArray(2)
+
+        // 5) Call backprop to get analytic gradients
+        block.processError(
+            error = error,
+            signalSource = dummySource,
+            biasesAccumulator = biasesAccumulator,
+            rawMatrixAccumulator = rawMatrixAccumulator
+        )
+
+        // 6) Do a numeric check for each parameter matrix
+
+        // 6a) b2
+        val b2 = block.b2
+        val b2Grad = rawMatrixAccumulator[b2]!!
+        // b2Grad should be the same as the error matrix
+        checkMatrixEquals(error, b2Grad, "b2Grad")
+
+    }
+
+
     /**
      * Helper function to compare two matrices element by element within a tolerance.
      */

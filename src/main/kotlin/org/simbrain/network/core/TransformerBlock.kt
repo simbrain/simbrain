@@ -190,9 +190,12 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
         var errorSignal = error
 
         errorSignal = if (signalSource is NeuronArray) {
-            feedForwardOutputNetInputs.reluDerivative().broadcastMultiply(errorSignal)
+            feedForwardOutputNetInputs.clone().apply {
+                fill(0.0)
+                setRow(nrow() - 1, errorSignal.toDoubleArray())
+            }
         } else {
-            feedForwardOutputNetInputs.reluDerivative().mm(errorSignal)
+            feedForwardOutputNetInputs.clone().apply { fill(1.0) }.mm(errorSignal)
         }
         rawMatrixAccumulator.getOrPut(b2) {
             Matrix(b2.nrow(), b2.ncol())

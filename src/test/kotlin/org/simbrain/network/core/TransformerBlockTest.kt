@@ -1,10 +1,17 @@
 package org.simbrain.network.core
 
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.simbrain.docviewer.DocViewerComponent
+import org.simbrain.network.NetworkComponent
+import org.simbrain.network.subnetworks.SOMNetwork
 import org.simbrain.util.*
 import smile.math.matrix.Matrix
+import java.io.ByteArrayInputStream
+import java.io.InputStream
+import java.nio.charset.StandardCharsets
 
 class TransformerBlockTest {
 
@@ -42,6 +49,10 @@ class TransformerBlockTest {
         // Biases. Setting to 0 for now to simplify testing
         block.b1[0, 0] = 0.0; block.b1[1, 0] = 0.0
         block.b2[0, 0] = 0.0; block.b2[1, 0] = 0.0
+
+        block.label = "TestBlock"
+
+        net.addNetworkModel(block)
     }
 
     @Test
@@ -203,5 +214,19 @@ class TransformerBlockTest {
             }
         }
     }
+
+    @Test
+    fun testXStream() {
+        val xmlRep = getNetworkXStream().toXML(net)
+        val fromXml = getNetworkXStream().fromXML(xmlRep) as Network
+        //println(fromXml)
+        val openedBlock = fromXml.getModelByLabel(TransformerBlock::class.java, "TestBlock")
+        Assertions.assertNotNull(openedBlock)
+        assertEquals(2, openedBlock.inputSize)
+        assertEquals(2, openedBlock.sequenceSize)
+        assertEquals(2, openedBlock.activations.nrow())
+        assertEquals(2, openedBlock.activations.ncol())
+    }
+
 
 }

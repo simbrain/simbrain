@@ -1,14 +1,9 @@
 package org.simbrain.custom_sims.simulations.nlp
 
 import kotlinx.coroutines.awaitAll
-import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.addTextWorld
-import org.simbrain.custom_sims.newSim
-import org.simbrain.custom_sims.simulationsPath
-import org.simbrain.network.core.ActivationSequence
-import org.simbrain.network.core.NeuronArray
-import org.simbrain.network.core.TransformerBlock
-import org.simbrain.network.core.WeightMatrix
+import org.simbrain.custom_sims.*
+import org.simbrain.network.NetworkComponent
+import org.simbrain.network.core.*
 import org.simbrain.network.trainers.BackpropLossFunction
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedModel
@@ -16,7 +11,10 @@ import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.workspace.Workspace
+import org.simbrain.workspace.updater.UpdateAllCouplings
 import org.simbrain.world.textworld.EmbeddingType
+import org.simbrain.world.textworld.TextWorldComponent
 import org.simbrain.world.textworld.TokenEmbeddingBuilder
 import smile.math.matrix.Matrix
 import java.io.File
@@ -150,6 +148,43 @@ val tinyLanguageModel2 = newSim {
         addNetworkModels(model).awaitAll()
     }
 
+    setupUpdateActions(workspace, options)
+
+    inputs.location = point(-1000, -200)
+    embeddings.location = point(-200, -200)
+    transformerBlock.location = point(-300, -600)
+    softMaxLayer.location = point(-1000, -600)
+
+    withGui {
+        createControlPanel("Control Panel", 10, 360) {
+            addButton("Load Workspace") {
+                val loadOk = loadWorkspaceZipFromFileChooser()
+                if (loadOk) {
+                    setupUpdateActions(workspace, options)
+                }
+            }
+        }
+        place(textWorldComponent, 10, 10, 450, 350)
+        place(networkComponent, 460, 10, 1000, 800)
+    }
+
+}
+
+context(SimulationScope)
+fun setupUpdateActions(workspace: Workspace, options: TinyLanguageModelOptions) {
+
+    val network = workspace.componentList.filterIsInstance<NetworkComponent>().first().network
+    val supervisedModel = network.getModels<SupervisedModel>().first()
+    val inputs = network.getModelByLabel<ActivationSequence>("Inputs")
+    val softMaxLayer = network.getModelByLabel<NeuronArray>("Predicted Next Token")
+
+    val contextSize = inputs.sequenceSize
+
+    val textWorldComponent = workspace.componentList.filterIsInstance<TextWorldComponent>().first()
+    val tokenEmbedding = textWorldComponent.world.tokenEmbedding
+
+    workspace.updater.updateManager.clear()
+
     workspace.addUpdateAction("Encode Context Window") {
         val encodedContext = textWorldComponent.world.text
             .simpleTokenizer(useSpaces = options.useSpaces, usePunctuation = options.tokenizePunctuation)
@@ -162,7 +197,17 @@ val tinyLanguageModel2 = newSim {
         inputs.activations = contextMatrix
     }
 
-    workspace.updater.updateManager.swapElements(0, 1)
+    workspace.addUpdateAction(UpdateAllCouplings(workspace.updater))
+
+    workspace.addUpdateAction("Update Text World") {
+        textWorldComponent.update()
+    }
+
+    workspace.addUpdateAction("Update Network") {
+        with(network) {
+            supervisedModel.forwardPass()
+        }
+    }
 
     workspace.addUpdateAction("Predict Next Word") {
         val nextWord = tokenEmbedding.getClosestWord(softMaxLayer.activationArray)
@@ -172,16 +217,4 @@ val tinyLanguageModel2 = newSim {
             .takeLast(contextSize)
             .joinToString(if (options.useSpaces) "" else " ")
     }
-
-    inputs.location = point(-1000, -200)
-    embeddings.location = point(-200, -200)
-    transformerBlock.location = point(-300, -600)
-    softMaxLayer.location = point(-1000, -600)
-
-    withGui {
-        place(textWorldComponent, 10, 10, 450, 350)
-        place(networkComponent, 460, 10, 1000, 800)
-    }
-
 }
-

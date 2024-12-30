@@ -789,7 +789,7 @@ object SimbrainDesktop {
     /**
      * Shows the dialog for opening a workspace file.
      */
-    fun openWorkspace() {
+    suspend fun openWorkspace() {
         workspace.stop()
         val simulationChooser = SFileChooser(WorkspacePreferences.simulationDirectory, "Zip Archive", "zip")
         val simFile = simulationChooser.showOpenDialog()

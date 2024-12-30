@@ -30,7 +30,7 @@ class UpdateAllAction(@Transient val updater: WorkspaceUpdater) : UpdateAction(d
     /**
      * Update couplings.
      */
-    suspend fun updateCouplings() {
+    private fun updateCouplings() {
         updater.workspace.couplingManager.updateCouplings()
         Logger.trace("couplings updated")
         updater.events.couplingsUpdates.fire()

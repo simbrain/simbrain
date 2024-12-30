@@ -1,5 +1,7 @@
 package org.simbrain.workspace.serialization
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.simbrain.util.getSimbrainXStream
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.WorkspaceComponent
@@ -172,7 +174,7 @@ class WorkspaceSerializer(val workspace: Workspace) {
      * @throws IOException if an IO error occurs.
      */
     @Throws(IOException::class)
-    fun deserialize(stream: InputStream) {
+    suspend fun deserialize(stream: InputStream) {
         val byteArrays = processInputStream(stream)
         val archive =
             ArchivedWorkspace.xstream().fromXML(ByteArrayInputStream(byteArrays["contents.xml"])) as ArchivedWorkspace
@@ -237,7 +239,7 @@ class WorkspaceSerializer(val workspace: Workspace) {
         return byteArrays
     }
 
-    private fun deserializeComponents(
+    private suspend fun deserializeComponents(
         archive: ArchivedWorkspace,
         deserializer: WorkspaceComponentDeserializer,
         byteArrays: Map<String, ByteArray?>
@@ -254,7 +256,9 @@ class WorkspaceSerializer(val workspace: Workspace) {
                     if (archivedComponent.desktopComponent != null) {
                         val bounds =
                             getSimbrainXStream().fromXML(ByteArrayInputStream(byteArrays[archivedComponent.desktopComponent.uri])) as Rectangle
-                        val desktopComponent = getDesktopComponent(wc)
+                        val desktopComponent = withContext(Dispatchers.Main) {
+                            getDesktopComponent(wc)
+                        }
                         desktopComponent.parentFrame.bounds = bounds
                     }
                 } catch (ex: Exception) {

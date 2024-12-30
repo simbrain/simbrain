@@ -4,10 +4,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
-/**
- * Also see [WorkspaceTest] for java based test
- */
-class WorkspaceTestKt {
+class WorkspaceIterateTest {
 
     val workspace = Workspace()
 

@@ -58,38 +58,38 @@ fun getSynapse(src: Neuron, tar: Neuron): Synapse? = src.fanOut[tar]
  * Returns a network model with a matching label.  If more than one
  * model has a matching label, the first found is returned.
  */
-inline fun <reified T: NetworkModel> Network.getModelByLabel(label: String): T = getModels<T>().first {
+inline fun <reified T: NetworkModel> Network.getModelByLabel(label: String): T = getModels<T>().firstOrNull {
     it.label.equals(label, ignoreCase = true)
-}
+} ?: throw NoSuchElementException("No model found with label $label of type ${T::class.simpleName}")
 
 /**
  * Version of getModelByLabel that works in Java.
  */
-fun <T: NetworkModel> Network.getModelByLabel(clazz: Class<T>, label: String): T = getModels(clazz).first {
+fun <T: NetworkModel> Network.getModelByLabel(clazz: Class<T>, label: String): T = getModels(clazz).firstOrNull {
     it.label.equals(label, ignoreCase = true)
-}
+} ?: throw NoSuchElementException("No model found with label $label")
 
 /**
  * Unlike other network models, neurons could be in a hierarchy, so we need to search the flattened list.
  */
-fun Network.getNeuronByLabel(label: String): Neuron = flatNeuronList.first {
+fun Network.getNeuronByLabel(label: String): Neuron = flatNeuronList.firstOrNull {
     it.label.equals(label, ignoreCase = true)
-}
+} ?: throw NoSuchElementException("No neuron found with label $label")
 
 /**
  * Returns a network model with a matching id.  If more than one
  * model has a matching id, the first found is returned.
  */
-inline fun <reified T: NetworkModel> Network.getModelById(id: String): T = getModels<T>().first {
+inline fun <reified T: NetworkModel> Network.getModelById(id: String): T = getModels<T>().firstOrNull {
     it.id.equals(id, ignoreCase = true)
-}
+} ?: throw NoSuchElementException("No model found with id $id")
 
 /**
  * Version of getModelById that works in Java.
  */
-fun <T: NetworkModel> Network.getModelById(clazz: Class<T>, id: String): T = getModels(clazz).first {
+fun <T: NetworkModel> Network.getModelById(clazz: Class<T>, id: String): T = getModels(clazz).firstOrNull {
     it.id.equals(id, ignoreCase = true)
-}
+} ?: throw NoSuchElementException("No model found with id $id")
 
 /**
  * Convenient access to a list of activations

@@ -1,115 +1,114 @@
-package org.simbrain.workspace;
+package org.simbrain.workspace
 
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.simbrain.network.NetworkComponent;
-import org.simbrain.network.core.Network;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.plot.projection.ProjectionComponent;
-import org.simbrain.workspace.serialization.WorkspaceSerializer;
-import org.simbrain.world.odorworld.OdorWorldComponent;
+import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.simbrain.network.NetworkComponent
+import org.simbrain.network.core.Network
+import org.simbrain.network.core.Neuron
+import org.simbrain.plot.projection.ProjectionComponent
+import org.simbrain.workspace.couplings.getConsumer
+import org.simbrain.workspace.couplings.getProducer
+import org.simbrain.workspace.serialization.WorkspaceSerializer
+import org.simbrain.world.odorworld.OdorWorldComponent
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
+import java.io.IOException
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+class WorkspaceTest {
+    var workspace: Workspace? = null
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
-public class WorkspaceTest {
-
-    Workspace workspace;
-
-    Neuron n1, n2;
+    val n1 = Neuron()
+    var n2 = Neuron()
 
     @BeforeEach
-    public void setUpTestWorkspace() {
-        workspace = new Workspace();
-        Network net1 = new Network();
-        NetworkComponent nc1 = new NetworkComponent("Net1", net1);
-        Network net2 = new Network();
-        NetworkComponent nc2 = new NetworkComponent("Net2", net2);
-        workspace.addWorkspaceComponent(nc1);
-        workspace.addWorkspaceComponent(nc2);
-        workspace.addWorkspaceComponent(new OdorWorldComponent("odorworld"));
-        workspace.addWorkspaceComponent(new ProjectionComponent("projection"));
+    fun setUpTestWorkspace() {
+        workspace = Workspace()
+        val net1 = Network()
+        val nc1 = NetworkComponent("Net1", net1)
+        val net2 = Network()
+        val nc2 = NetworkComponent("Net2", net2)
+        workspace!!.addWorkspaceComponent(nc1)
+        workspace!!.addWorkspaceComponent(nc2)
+        workspace!!.addWorkspaceComponent(OdorWorldComponent("odorworld"))
+        workspace!!.addWorkspaceComponent(ProjectionComponent("projection"))
 
         // Add a neuron to network 1
-        n1 = new Neuron();
-        net1.addNetworkModel(n1);
+        net1.addNetworkModel(n1)
 
         // Add a neuron to network 2
-        n2 = new Neuron();
-        net2.addNetworkModel(n2);
+        net2.addNetworkModel(n2)
 
         // Couple them
-        workspace.getCouplingManager().createCoupling(
-                workspace.getCouplingManager().getProducer(n1, "getActivation"),
-                workspace.getCouplingManager().getConsumer(n2, "addInputValue"));
-
+        workspace!!.couplingManager.createCoupling(
+            n1.getProducer(Neuron::activation),
+            n2.getConsumer(Neuron::addInputValue)
+        )
     }
 
     @Test
-    public void testComponents() {
-        assertEquals(4, workspace.getComponentList().size());
+    fun testComponents() {
+        Assertions.assertEquals(4, workspace!!.componentList.size)
     }
 
     @Test
-    public void testCouplings() {
-        assertEquals(1, workspace.getCouplingManager().getCouplings().size());
-        n1.setActivation(.8);
-        workspace.simpleIterate();
-        assertEquals(.8, n2.getActivation(), .0001);
-
+    fun testCouplings() {
+        Assertions.assertEquals(1, workspace!!.couplingManager.couplings.size)
+        n1.activation = .8
+        workspace!!.simpleIterate()
+        Assertions.assertEquals(.8, n2.activation, .0001)
     }
 
     @Test
-    public void testSerialization() throws IOException {
-
-        WorkspaceSerializer serializer = new WorkspaceSerializer(workspace);
+    @Throws(IOException::class)
+    fun testSerialization() {
+        val serializer = WorkspaceSerializer(workspace!!)
 
         // "Save" to output stream
-        ByteArrayOutputStream bas = new ByteArrayOutputStream();
-        serializer.serialize(bas, true);
-        bas.close();
+        val bas = ByteArrayOutputStream()
+        serializer.serialize(bas, true)
+        bas.close()
 
         // Clear workspace
-        workspace.clearWorkspace();
+        workspace!!.clearWorkspace()
 
         // Create an input stream from the output stream
-        ByteArrayInputStream bis = new ByteArrayInputStream(bas.toByteArray());
+        val bis = ByteArrayInputStream(bas.toByteArray())
 
         // "Open" from the input stream
-        serializer.deserialize(bis);
-        bis.close();
+        runBlocking {
+            serializer.deserialize(bis)
+        }
+        bis.close()
 
         // Check everything is as expected in the deserialized net
-        assertEquals(4, workspace.getComponentList().size());
-        assertEquals(1, workspace.getCouplingManager().getCouplings().size());
+        Assertions.assertEquals(4, workspace!!.componentList.size)
+        Assertions.assertEquals(1, workspace!!.couplingManager.couplings.size)
 
         // Can't reuse n1 and n2 because it's been deserialized
-        Neuron newN1 = (Neuron) ((NetworkComponent)workspace.getComponent("Net1")).getNetwork().getAllModels().get(0);
-        Neuron newN2 = (Neuron) ((NetworkComponent)workspace.getComponent("Net2")).getNetwork().getAllModels().get(0);
-        newN1.setActivation(.8);
-        workspace.simpleIterate();
-        assertEquals(.8, newN2.getActivation(), .0001);
+        val newN1 = (workspace!!.getComponent("Net1") as NetworkComponent).network.allModels[0] as Neuron
+        val newN2 = (workspace!!.getComponent("Net2") as NetworkComponent).network.allModels[0] as Neuron
+        newN1.activation = .8
+        workspace!!.simpleIterate()
+        Assertions.assertEquals(.8, newN2.activation, .0001)
     }
 
     @Test
-    public void testZipMethods() throws IOException {
-
-        byte[] byteArray = workspace.getZipDataHeadless();
-        workspace.openFromZipData(byteArray);
+    @Throws(IOException::class)
+    fun testZipMethods() {
+        val byteArray = workspace!!.zipDataHeadless
+        runBlocking { workspace!!.openFromZipData(byteArray) }
 
         // Check everything is as expected in the deserialized net
-        assertEquals(4, workspace.getComponentList().size());
-        assertEquals(1, workspace.getCouplingManager().getCouplings().size());
+        Assertions.assertEquals(4, workspace!!.componentList.size)
+        Assertions.assertEquals(1, workspace!!.couplingManager.couplings.size)
 
         // Can't reuse n1 and n2 because it's been deserialized
-        Neuron newN1 = (Neuron) ((NetworkComponent)workspace.getComponent("Net1")).getNetwork().getAllModels().get(0);
-        Neuron newN2 = (Neuron) ((NetworkComponent)workspace.getComponent("Net2")).getNetwork().getAllModels().get(0);
-        newN1.setActivation(.8);
-        workspace.simpleIterate();
-        assertEquals(.8, newN2.getActivation(), .0001);
+        val newN1 = (workspace!!.getComponent("Net1") as NetworkComponent).network.allModels[0] as Neuron
+        val newN2 = (workspace!!.getComponent("Net2") as NetworkComponent).network.allModels[0] as Neuron
+        newN1.activation = .8
+        workspace!!.simpleIterate()
+        Assertions.assertEquals(.8, newN2.activation, .0001)
     }
-
 }

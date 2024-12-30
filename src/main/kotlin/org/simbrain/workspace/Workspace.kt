@@ -371,13 +371,15 @@ class Workspace: CoroutineScope {
      *
      * @param theFile the file to try to open
      */
-    fun openWorkspace(theFile: File?) {
+    suspend fun openWorkspace(theFile: File?) {
         stop()
         val serializer = WorkspaceSerializer(this)
         try {
             if (theFile != null) {
                 clearWorkspace()
-                serializer.deserialize(FileInputStream(theFile))
+                withContext(Dispatchers.IO) {
+                    serializer.deserialize(FileInputStream(theFile))
+                }
                 currentFile = theFile
                 setWorkspaceChanged(false)
                 events.workspaceOpened.fire()
@@ -438,13 +440,15 @@ class Workspace: CoroutineScope {
     /**
      * Open a workspace from the flat representation provided by [.getZipData] }.
      */
-    fun openFromZipData(zipData: ByteArray?) {
+    suspend fun openFromZipData(zipData: ByteArray?) {
         try {
             clearWorkspace()
             val serializer = WorkspaceSerializer(this)
-            val bis = ByteArrayInputStream(zipData)
-            serializer.deserialize(bis)
-            bis.close()
+            withContext(Dispatchers.IO) {
+                val bis = ByteArrayInputStream(zipData)
+                serializer.deserialize(bis)
+                bis.close()
+            }
         } catch (e: IOException) {
             e.printStackTrace()
         }

@@ -1,5 +1,6 @@
 package org.simbrain.plot
 
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
@@ -97,7 +98,7 @@ class PieChartTest {
         val workspace2 = Workspace()
 
         // Iterate the new workspace with new inputs and proportions should change accordingly
-        workspace2.openFromZipData(zip)
+        runBlocking { workspace2.openFromZipData(zip) }
         val savedNg = (workspace2.getComponent("Net") as NetworkComponent).network.getModels<NeuronGroup>().first()
         savedNg.activationArray = doubleArrayOf(1.5, .5)
         val savedPie = (workspace2.getComponent("Pie") as PieChartComponent).model as PieChartModel

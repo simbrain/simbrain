@@ -3,9 +3,7 @@ package org.simbrain.network.core
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.simbrain.util.plus
-import org.simbrain.util.relu
-import org.simbrain.util.toMatrix
+import org.simbrain.util.*
 import smile.math.matrix.Matrix
 
 class TransformerBlockTest {
@@ -41,7 +39,7 @@ class TransformerBlockTest {
         block.W2[0, 0] = 1.0; block.W2[0, 1] = 0.0
         block.W2[1, 0] = 0.0; block.W2[1, 1] = 1.0
 
-        // Biases
+        // Biases. Setting to 0 for now to simplify testing
         block.b1[0, 0] = 0.0; block.b1[1, 0] = 0.0
         block.b2[0, 0] = 0.0; block.b2[1, 0] = 0.0
     }
@@ -119,28 +117,23 @@ class TransformerBlockTest {
     @Test
     fun `test backprop numeric checks`() {
 
-        // 1) Forward pass with known input
+        // Forward pass with known input
         val inputMatrix = arrayOf(
             doubleArrayOf(1.0, 2.0),
             doubleArrayOf(3.0, 4.0)
         ).toMatrix()
 
         block.addInputs(inputMatrix)
-
         with(net) { block.update() }
 
-        // 2) Define an "error" matrix that is effectively dCost/dOutput
-        //    e.g. only the second row is non-zero
+        // Test error
         val error = doubleArrayOf(-1.0, 1.0).toMatrix()
 
-        // 3) Accumulators for the block’s processError
+        // Dummy source layer and accumulators
+        val dummySource = NeuronArray(2)
         val biasesAccumulator = HashMap<ArrayLayer, Matrix>()
         val rawMatrixAccumulator = HashMap<Matrix, Matrix>()
 
-        // 4) Dummy source layer
-        val dummySource = NeuronArray(2)
-
-        // 5) Call backprop to get analytic gradients
         block.processError(
             error = error,
             signalSource = dummySource,
@@ -148,14 +141,43 @@ class TransformerBlockTest {
             rawMatrixAccumulator = rawMatrixAccumulator
         )
 
-        // 6) Do a numeric check for each parameter matrix
+        // Output bias delta should be the same as the error signal
+        val expectedB2delta = error
+        checkMatrixEquals(expectedB2delta, rawMatrixAccumulator[block.b2]!!, "b2delta")
 
-        // 6a) b2
-        val b2 = block.b2
-        val b2Grad = rawMatrixAccumulator[b2]!!
-        // b2Grad should be the same as the error matrix
-        checkMatrixEquals(error, b2Grad, "b2Grad")
+        // Error changes shape. Add error as last row in matrix of zeros. TODO
+        var errorSignal = Matrix(2,2).apply {
+            setRow(1, error.toDoubleArray())
+        }
 
+        //print(errorSignal.transpose())
+        //print(block.feedForwardHidden)
+
+        // W2 deltas should be error "outer product" hidden activations
+        val expectedW2delta = errorSignal.transpose().mm(block.feedForwardHidden)
+        //print(expectedW2delta)
+        checkMatrixEquals(expectedW2delta, rawMatrixAccumulator[block.W2]!!, "w2delta")
+
+        // Error should be backpropped through weights.
+        // Weights are identity so signal unchanged.
+        errorSignal = errorSignal.mm(block.W2)
+        // Hidden bias deltas are  of hadamard with relu deriv, then colsums
+        val expectedB1delta = errorSignal.mul(block.feedForwardHidden.reluDerivative()).colSums().toMatrix()
+        checkMatrixEquals(expectedB1delta, rawMatrixAccumulator[block.b1]!!, "b1delta")
+        //println(expectedB1delta)
+
+        // W1 deltas
+        val expectedW1delta = errorSignal.transpose().mm(block.feedForwardInput)
+        //println(errorSignal.transpose())
+        //println(block.attentionOutput)
+        //print(expectedW1delta)
+        checkMatrixEquals(expectedW1delta, rawMatrixAccumulator[block.W1]!!, "w1delta")
+
+        print(rawMatrixAccumulator[block.K])
+        print(rawMatrixAccumulator[block.Q])
+        print(rawMatrixAccumulator[block.V])
+
+        // TODO: Test the output error signal too, dInputs_total
     }
 
 

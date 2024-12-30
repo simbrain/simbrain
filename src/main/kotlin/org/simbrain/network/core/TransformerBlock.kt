@@ -189,6 +189,7 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
 
         var errorSignal = error
 
+        // Output bias deltas
         errorSignal = if (signalSource is NeuronArray) {
             feedForwardOutputNetInputs.clone().apply {
                 fill(0.0)
@@ -201,19 +202,20 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
             Matrix(b2.nrow(), b2.ncol())
         }.add(errorSignal.colSums().toMatrix())
 
+        // Weight deltas layer 2
         val W2Delta = errorSignal.transpose().mm(feedForwardHidden)
-
         rawMatrixAccumulator.getOrPut(W2) {
             Matrix(W2.nrow(), W2.ncol())
         }.add(W2Delta)
 
+        // Bias deltas hidden layer
         errorSignal = errorSignal.mm(W2)
-
         errorSignal = errorSignal.mul(feedForwardHiddenNetInputs.reluDerivative())
         rawMatrixAccumulator.getOrPut(b1) {
             Matrix(b1.nrow(), b1.ncol())
         }.add(errorSignal.colSums().toMatrix())
 
+        // Weight deltas layer 1
         val W1Delta = errorSignal.transpose().mm(feedForwardInput)
         rawMatrixAccumulator.getOrPut(W1) {
             Matrix(W1.nrow(), W1.ncol())
@@ -221,43 +223,38 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
 
         errorSignal = errorSignal.mm(W1)
 
-        // feedForwardInput = inputs + attentionOutput
-        // So gradient splits evenly:
-        val dFeedForwardInput = errorSignal
-        val dAttentionOutput = errorSignal.clone() // Since attentionOutput is just added to inputs, it receives the same gradient
-        val dInputs_fromSum = errorSignal.clone()  // The portion of gradient w.r.t inputs from the sum
+        // Since attentionOutput is just added to inputs, it receives the same gradient
+        val dAttentionOutput = errorSignal.clone()
+        // The portion of gradient w.r.t inputs from the sum
+        val dInputs_fromSum = errorSignal.clone()
 
-        // Now backprop through attentionOutput = selfAttention.mm(vStack)
-        val dSelfAttention = dAttentionOutput.mm(vStack.transpose())
+        // delta V is gradient of the attention output "outer product" the self attention matrix
         val dVStack = selfAttention.transpose().mm(dAttentionOutput)
-
-        // Accumulate gradient w.r.t. V: vStack = inputs.mm(V)
         val dV = inputs.transpose().mm(dVStack)
         rawMatrixAccumulator.getOrPut(V) { Matrix(V.nrow(), V.ncol()) }.add(dV)
-        val dInputs_fromV = dVStack.mm(V.transpose())
 
         // Backprop through selfAttention = softmax(QK^T / sqrt(d))
-        // We'll need a softmax backward pass function: softmaxBackward(dOut, out) -> dIn
+        val dSelfAttention = dAttentionOutput.mm(vStack.transpose())
         val dQK = softmaxBackward(dSelfAttention, selfAttention).div(sqrt(size.toDouble()))
 
-        // QK^T = qStack.mm(kStack.transpose())
+        // Delta Q is inputs "outer product" derivative of the QStack
         val dQStack = dQK.mm(kStack)
-        val dKStack = dQK.transpose().mm(qStack)
-
-        // qStack = inputs.mm(Q)
         val dQ = inputs.transpose().mm(dQStack)
         rawMatrixAccumulator.getOrPut(Q) { Matrix(Q.nrow(), Q.ncol()) }.add(dQ)
-        val dInputs_fromQ = dQStack.mm(Q.transpose())
 
-        // kStack = inputs.mm(K)
+        // Delta K is inputs "outer product" derivative of the KStacks
+        val dKStack = dQK.transpose().mm(qStack)
         val dK = inputs.transpose().mm(dKStack)
         rawMatrixAccumulator.getOrPut(K) { Matrix(K.nrow(), K.ncol()) }.add(dK)
+
+        // Backprop all gradients wrt inputs and return their sum
         val dInputs_fromK = dKStack.mm(K.transpose())
-
-        // Combine all gradients w.r.t. inputs
-        val dInputs_total = dInputs_fromSum.add(dInputs_fromQ).add(dInputs_fromK).add(dInputs_fromV)
-
-        // Return the gradient w.r.t. inputs, which can be passed further back in the network
+        val dInputs_fromQ = dQStack.mm(Q.transpose())
+        val dInputs_fromV = dVStack.mm(V.transpose())
+        val dInputs_total = dInputs_fromSum
+                .add(dInputs_fromK)
+                .add(dInputs_fromQ)
+                .add(dInputs_fromV)
         return dInputs_total
     }
 

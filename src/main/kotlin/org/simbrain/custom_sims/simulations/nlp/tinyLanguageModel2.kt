@@ -145,6 +145,7 @@ val tinyLanguageModel2 = newSim {
             targets = targetMatrix
         )
         model.trainer.lossFunction = BackpropLossFunction.CrossEntropy
+        model.trainer.learningRate = .0001
         model.trainer.testConfiguration.enabled = false
         addNetworkModels(model).awaitAll()
     }

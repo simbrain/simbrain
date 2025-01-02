@@ -236,8 +236,10 @@ fun String.convertCamelCaseToSpaces(): String {
 }
 
 /**
- * Generates input-target pairs in an autoregressive manner from a given string.
+ * Generates a "Christmas tree" of input-target pairs in an autoregressive manner from a given string.
  * Each pair consists of a prefix of tokens as input and the next token as the target.
+ *
+ * See test case for a clear demo of how it works.
  */
 fun generateAutoregressivePairs(context: List<String>): List<Pair<List<String>, String>> = buildList {
     for (i in 0 until context.size - 1) {

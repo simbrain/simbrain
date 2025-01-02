@@ -1,7 +1,9 @@
 package org.simbrain.network.core
 
+import org.simbrain.network.gui.dialogs.NetworkPreferences.biasesRandomizer
 import org.simbrain.network.gui.dialogs.NetworkPreferences.weightRandomizer
 import org.simbrain.network.gui.nodes.ActivationSequenceProcessor
+import org.simbrain.network.trainers.WeightInitializationStrategy
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
@@ -104,11 +106,19 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
     }
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
-        fun Matrix.applyRandomizer() {
-            randomize((randomizer ?: weightRandomizer))
-        }
-        listOf(K, Q, V, W1, b1, W2, b2).forEach { it.applyRandomizer() }
+        listOf(K, Q, V, W1, W2).forEach { it.randomize((randomizer ?: weightRandomizer)) }
+        listOf(b1, b2).forEach { it.randomize(biasesRandomizer) }
         events.updated.fire()
+    }
+
+    fun initWeights(weightInitializationStrategy: WeightInitializationStrategy) {
+        listOf(K, Q, V, W1, W2).forEach {
+            weightInitializationStrategy.initializeWeights(it)
+        }
+    }
+
+    fun initBiases() {
+        listOf(b1, b2).forEach { it.randomize(biasesRandomizer) }
     }
 
     override fun clear() {

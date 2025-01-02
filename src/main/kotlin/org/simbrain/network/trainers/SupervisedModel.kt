@@ -62,12 +62,14 @@ class SupervisedModel(
 
     override fun initWeights() {
         weightMatrices.forEach { trainer.weightInitializationStrategy.initializeWeights(it as WeightMatrix) }
+        layers.filterIsInstance<TransformerBlock>().forEach { it.initWeights(trainer.weightInitializationStrategy) }
     }
 
     override fun initBiases() {
         layers.forEach {
             it.clear()
             (it as? NeuronArray)?.randomizeBiases()
+            (it as? TransformerBlock)?.initBiases()
         }
     }
 

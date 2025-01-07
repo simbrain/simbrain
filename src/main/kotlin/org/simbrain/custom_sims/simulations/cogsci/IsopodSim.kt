@@ -91,7 +91,7 @@ val isopodSim = newSim {
     // Location of the network in the desktop
     withGui {
         place(networkComponent) {
-            location = point(180, 10)
+            location = point(4, 187)
             width = 400
             height = 400
         }
@@ -187,7 +187,7 @@ val isopodSim = newSim {
 
     withGui {
         place(odorWorldComponent) {
-            location = point(590, 10)
+            location = point(413, 10)
             width = 600
             height = 600
         }
@@ -224,6 +224,10 @@ val isopodSim = newSim {
                 "${neuronLeftTurning.activation},${neuronRightTurning.activation}" +
                 ",${neuronStraight.activation}\n"
     }
+
+    //empty.tmx (413, 10, 600, 600)
+    //Network (4, 187, 400, 400)
+    //Control Panel (5, 10, 143, 173)
 
     withGui {
         createControlPanel("Control Panel", 5, 10) {
@@ -294,6 +298,23 @@ val isopodSim = newSim {
         }
 
     }
+
+    addSidebarInfo(
+        """ 
+            # Introduction
+            The Braitenberg Isopod Simulation explores the reactive behaviors in agent, the isopod, from sensorimotor connections. The isopod reacts to its environment, the fish stimuli, based on connections between its sensors and actuators. The sensors detect the stimuli
+            
+            # What to Do
+            1. Click "Run one trial" to see how the isopod reacts to its environment. One trial of this simulation consists of the isopod moving in the "empty.tmx" window, as it moves towards the fish. The trial ends either when the isopod reaches the bounds of the window or the fish.
+            2. The weights in the "Network" window changes according to the isopod's actions. 
+                - The "Left" and "Right" weights are the inputs that detect the stimuli in the environment of the "empty.tmx" window
+                - The "Turn Left", "Straight", and "Turn Right" weights are the outputs of the isopod's motor actions, steering it
+                - The magnitude of the weights indicate the strength of the connection and influence the output has on the isopod's actions, with a higher weight increasing the likelihood and intensity of the action
+            3. "Run trials" to observe the agent in its environment
+            4. Click "Speed inhibition" to link the speed to the sensory input, creating a connection between "Left", "Right", and "Straight". 
+                - This allows for the isopod to make more "accurate" actions, speeding up in low-stimulus areas, and slowing down when near the fish. 
+        """.trimIndent()
+    )
 
     // addDocViewer("Test", "Braitenberg.html").apply {
     //     place(this) {

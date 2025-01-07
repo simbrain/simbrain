@@ -137,6 +137,12 @@ class TokenEmbeddingBuilder(): EditableObject {
     @UserParameter(label = "If true, keep punctuation marks and add them as tokens", order = 70 )
     var tokenizePunctuation = false
 
+    @UserParameter(label = "If true, use spaces, tabs, and newlines as distinct tokens", order = 80 )
+    var useSpaces = false
+
+    @UserParameter(label = "If true, use newlines as tokens", order = 90 )
+    var useReturns = false
+
     override val name: String
         get() = "Token Embedding Builder"
 
@@ -146,8 +152,8 @@ class TokenEmbeddingBuilder(): EditableObject {
     fun build(docString: String) = when (embeddingType) {
         EmbeddingType.ONE_HOT -> {
             val tokens = docString.let { doc ->
-                if (tokenizePunctuation) {
-                    doc.simpleTokenizer(useSpaces = false, usePunctuation = true)
+                if (tokenizePunctuation || useSpaces || useReturns) {
+                    doc.simpleTokenizer(useSpaces = useSpaces, useReturns = useReturns, usePunctuation = tokenizePunctuation)
                 } else {
                     doc.tokenizeWordsFromString()
                 }

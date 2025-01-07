@@ -49,13 +49,41 @@ fun String.tokenizeWordsFromString(): List<String> {
     return this.lowercase().removeSpecialCharacters().removePunctuation().split(" ")
 }
 
-fun String.simpleTokenizer(useSpaces: Boolean = false, usePunctuation: Boolean = false): List<String> {
+fun String.simpleTokenizer(useSpaces: Boolean = false, useReturns: Boolean = false, usePunctuation: Boolean = false): List<String> {
     val regex = listOf(
         """\w+""", // Words
-        if (useSpaces) """\s+""" else null,
-        if (usePunctuation) """[^\w\s]+""" else null
+        if (useSpaces) """\s""" else null,
+        if (useReturns) """\n""" else null,
+        if (usePunctuation) """[^\w\s]""" else null
     ).filterNotNull().joinToString("|").toRegex()
     return regex.findAll(this).map { it.value }.map { it.lowercase() }.toList()
+}
+
+/**
+ * Join a set of tokens in a way that follows standard spacing conventions:
+ *   - Spaces between words.
+ *   - Spaces after punctuation but not before punctuation.
+ *   - No spaces before or after returns.
+ *
+ * If spacesTokenized = true, these rules are not used, all tokens are joined without spaces because the space is itself a token
+ */
+fun List<String>.tokensToString(spacesTokenized: Boolean = false): String {
+    val punctuationRegex = """\W""".toRegex()
+    val returnsRegex = """\n""".toRegex()
+    if (size <= 1) return joinToString("")
+    return windowed(2)
+        .mapIndexed { i, pair ->
+            val secondTokenIsPunctuation = punctuationRegex.matches(pair[1])
+            val eitherTokenIsReturn = returnsRegex.matches(pair[0]) || returnsRegex.matches(pair[1])
+            val shouldAddSpace = !secondTokenIsPunctuation && !eitherTokenIsReturn && !spacesTokenized
+            if (i == 0) {
+                listOf(pair[0], if (shouldAddSpace) " " else "", pair[1])
+            } else {
+                listOf(if (shouldAddSpace) " " else "", pair[1])
+            }
+        }
+        .flatten()
+        .joinToString("")
 }
 
 /**

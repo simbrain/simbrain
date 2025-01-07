@@ -55,6 +55,13 @@ class TinyLanguageModelOptions: EditableObject {
         tab = "Text Parsing",
         order = 30,
     )
+
+    var tokenizeReturns by GuiEditable(
+        description = "Use newlines as distinct tokens",
+        initValue = false,
+        tab = "Text Parsing",
+        order = 40,
+    )
 }
 
 val tinyLanguageModel2 = newSim {
@@ -69,14 +76,20 @@ val tinyLanguageModel2 = newSim {
 
     val tokenEmbedding = TokenEmbeddingBuilder().apply {
         embeddingType = EmbeddingType.ONE_HOT
-        tokenizePunctuation = true
+        tokenizePunctuation = options.tokenizePunctuation
+        useSpaces = options.useSpaces
+        useReturns = options.tokenizeReturns
     }.build(trainingText)
 
     // Network
     val networkComponent = addNetworkComponent("Network")
     val network = networkComponent.network
 
-    val tokenizedTrainingText = trainingText.simpleTokenizer(options.useSpaces, options.tokenizePunctuation)
+    val tokenizedTrainingText = trainingText.simpleTokenizer(
+        useSpaces = options.useSpaces,
+        useReturns = options.tokenizeReturns,
+        usePunctuation = options.tokenizePunctuation
+    )
     val corpus = tokenizedTrainingText.windowed(min(tokenizedTrainingText.size, contextSize)).flatMap { window ->
         // window along the tokens if the context size is not big enough to cover the entire token list
         generateAutoregressivePairs(window)
@@ -84,7 +97,7 @@ val tinyLanguageModel2 = newSim {
 
     // Text World for Inputs
     val textWorldComponent = addTextWorld("Text World (Inputs)")
-    textWorldComponent.world.text = tokenizedTrainingText.take(contextSize).joinToString(if (options.useSpaces) "" else " ")
+    textWorldComponent.world.text = tokenizedTrainingText.take(contextSize).tokensToString(spacesTokenized = options.useSpaces)
     textWorldComponent.world.tokenEmbedding = tokenEmbedding
 
     val tokenizedCorpus = corpus.map { (context, target) ->
@@ -131,13 +144,12 @@ val tinyLanguageModel2 = newSim {
         WeightMatrix(transformerBlock, softMaxLayer)
     )
 
-    transformerBlock.randomize()
-    weightMatrices.forEach { it.randomize() }
-
     with(network) {
         addNetworkModels(inputs, embeddings, transformerBlock, softMaxLayer).awaitAll()
         addNetworkModels(weightMatrices).awaitAll()
         val model = SupervisedModel(inputs, softMaxLayer, false)
+        model.initWeights()
+        model.initBiases()
         model.trainingSet = MatrixDataset(
             inputs = inputMatrix,
             targets = targetMatrix
@@ -229,7 +241,7 @@ fun setupUpdateActions(workspace: Workspace, options: TinyLanguageModelOptions) 
 
     workspace.addUpdateAction("Encode Context Window") {
         val encodedContext = textWorldComponent.world.text
-            .simpleTokenizer(useSpaces = options.useSpaces, usePunctuation = options.tokenizePunctuation)
+            .simpleTokenizer(useSpaces = options.useSpaces, useReturns = options.tokenizeReturns, usePunctuation = options.tokenizePunctuation)
             .map { tokenEmbedding.get(it) }
 
         val contextMatrix = Matrix(contextSize, tokenEmbedding.dimension)
@@ -254,10 +266,14 @@ fun setupUpdateActions(workspace: Workspace, options: TinyLanguageModelOptions) 
     workspace.addUpdateAction("Predict Next Word") {
         val nextWord = tokenEmbedding.getClosestWord(softMaxLayer.activationArray)
         // update text with predicted word and remove first word so that the context window maintains its size
-        textWorldComponent.world.text = textWorldComponent.world.text.simpleTokenizer(useSpaces = options.useSpaces, usePunctuation = options.tokenizePunctuation)
+        textWorldComponent.world.text = textWorldComponent.world.text.simpleTokenizer(
+            useSpaces = options.useSpaces,
+            useReturns = options.tokenizeReturns,
+            usePunctuation = options.tokenizePunctuation
+        )
             .plus(nextWord)
             .takeLast(contextSize)
-            .joinToString(if (options.useSpaces) "" else " ")
+            .tokensToString(spacesTokenized = options.useSpaces)
     }
 
 }

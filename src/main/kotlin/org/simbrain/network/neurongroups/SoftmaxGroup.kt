@@ -45,6 +45,11 @@ class SoftmaxGroup @JvmOverloads constructor(
         // These are often called "logits", that is, a set of unnormalized values
         val exponentials = neuronList.activations.map { exp(it / params.T) }
         val total = exponentials.sum()
+        // for small values, return a uniform distribution
+        if (total < 1e-6) {
+            neuronList.forEach { it.activation = 1.0 / exponentials.size }
+            return
+        }
         neuronList.forEachIndexed { i, n -> n.activation = (exponentials[i]) / total }
     }
 

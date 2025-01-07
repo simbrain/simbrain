@@ -25,6 +25,10 @@ class SoftmaxRule: NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Bounded
         // These are often called "logits", that is, a set of unnormalized values
         val exponentials = (input.toDoubleArray() zip bias.toDoubleArray()).map { (i, b) -> exp((i + b)/temperature) }
         val total = exponentials.sum()
+        // for small values, return a uniform distribution
+        if (total < 1e-6) {
+            return DoubleArray(exponentials.size) { 1.0 / exponentials.size }
+        }
         return exponentials.map { it/total }.toDoubleArray()
     }
 

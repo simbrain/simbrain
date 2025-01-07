@@ -199,18 +199,30 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
 
         var errorSignal = error
 
-        // Output bias deltas
+        // Error times output activations gives bias deltas
         errorSignal = if (signalSource is NeuronArray) {
+            // If the error signal is from a neuron array, then we only update the gradient for the last row
+            // (corresponding to the last token) of the output layer.
+            // We are assuming the final token only is used to predict outputs. ("Sequence to one")
+            // TODO: Handle sequence to sequence cases
             feedForwardOutputNetInputs.clone().apply {
                 fill(0.0)
                 setRow(nrow() - 1, errorSignal.toDoubleArray())
             }
         } else {
-            feedForwardOutputNetInputs.clone().apply { fill(1.0) }.mm(errorSignal)
+            // If the error signal is from another transformer block, then we should have a matrix of gradients to compute.
+            // This case is not yet tested.
+            TODO()
         }
         rawMatrixAccumulator.getOrPut(b2) {
             Matrix(b2.nrow(), b2.ncol())
         }.add(errorSignal.colSums().toMatrix())
+
+        val dFinalOutput = errorSignal
+
+        // Split into feedForwardInput (for the second skip connection) and feedForwardOutput
+        val dFeedForwardInput = dFinalOutput.clone()
+        val dFeedForwardOutput = dFinalOutput.clone()
 
         // Weight deltas layer 2
         val W2Delta = errorSignal.transpose().mm(feedForwardHidden)
@@ -233,18 +245,20 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
 
         errorSignal = errorSignal.mm(W1)
 
-        // Since attentionOutput is just added to inputs, it receives the same gradient
-        val dAttentionOutput = errorSignal.clone()
-        // The portion of gradient w.r.t inputs from the sum
-        val dInputs_fromSum = errorSignal.clone()
+        val dFeedforwardInputFromMLP = errorSignal.clone()
+        // Incorporate second skip connection and store for use with first skip connection
+        val dFeedforwardInputTotal = dFeedforwardInputFromMLP.clone().add(dFeedForwardInput)
 
-        // delta V is gradient of the attention output "outer product" the self attention matrix
+        // Then pass that total to the attention block:
+        val dAttentionOutput = dFeedforwardInputTotal.clone()
+
+        // delta V
         val dVStack = selfAttention.transpose().mm(dAttentionOutput)
         val dV = inputs.transpose().mm(dVStack)
         rawMatrixAccumulator.getOrPut(V) { Matrix(V.nrow(), V.ncol()) }.add(dV)
 
         // Backprop through selfAttention = softmax(QK^T / sqrt(d))
-        val dSelfAttention = dAttentionOutput.mm(vStack.transpose())
+        val dSelfAttention = dFeedforwardInputFromMLP.mm(vStack.transpose())
         val dQK = softmaxBackward(dSelfAttention, selfAttention).div(sqrt(size.toDouble()))
 
         // Delta Q is inputs "outer product" derivative of the QStack
@@ -258,14 +272,14 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
         rawMatrixAccumulator.getOrPut(K) { Matrix(K.nrow(), K.ncol()) }.add(dK)
 
         // Backprop all gradients wrt inputs and return their sum
-        val dInputs_fromK = dKStack.mm(K.transpose())
-        val dInputs_fromQ = dQStack.mm(Q.transpose())
-        val dInputs_fromV = dVStack.mm(V.transpose())
-        val dInputs_total = dInputs_fromSum
-                .add(dInputs_fromK)
-                .add(dInputs_fromQ)
-                .add(dInputs_fromV)
-        return dInputs_total
+        val dInputsFromK = dKStack.mm(K.transpose())
+        val dInputsFromQ = dQStack.mm(Q.transpose())
+        val dInputsFromV = dVStack.mm(V.transpose())
+        val dInputsTotal = dFeedforwardInputTotal
+                .add(dInputsFromK)
+                .add(dInputsFromQ)
+                .add(dInputsFromV)
+        return dInputsTotal
     }
 
     fun copy() = TransformerBlock(sequenceSize, inputSize, hiddenSize).also {

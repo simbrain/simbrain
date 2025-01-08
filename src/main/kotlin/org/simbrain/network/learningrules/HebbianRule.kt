@@ -23,6 +23,7 @@ import org.simbrain.network.gui.dialogs.NetworkPreferences.defaultLearningRate
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.EmptyScalarData
 import org.simbrain.util.UserParameter
+import smile.math.matrix.Matrix
 
 /**
  * Standard Hebbian learning rule.
@@ -64,9 +65,13 @@ class HebbianRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>() {
                 // delta = rate * (input * output^T)
                 wm.add(output.mt(input).mul(learningRate))
             } else {
-                wm.mul(1 - forgettingRate).add(output.mt(input).mul(learningRate))
+                connector.weightMatrix.mul(1 - forgettingRate).add(output.mt(input).mul(learningRate))
             }
         }
+    }
+
+    fun applyForgetting(connector: WeightMatrix) {
+        connector.weightMatrix.mul(1 - forgettingRate)
     }
 
     context(Network)

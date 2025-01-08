@@ -163,8 +163,12 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
         vStack.copyFrom(inputs.mm(V))
 
         selfAttention.copyFrom(qStack.mm(kStack.transpose()))
-        // TODO: Add masking using triangular matrix
         selfAttention.div(scale)
+
+        // Mask out the upper triangle of the self-attention matrix
+        selfAttention.setValuesInPlace { i, j ->
+            if (i < j) Double.NEGATIVE_INFINITY else selfAttention[i, j]
+        }
 
         // Apply softmax to each row
         (0 until selfAttention.nrow())
@@ -259,6 +263,12 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
 
         // Backprop through selfAttention = softmax(QK^T / sqrt(d))
         val dSelfAttention = dFeedforwardInputFromMLP.mm(vStack.transpose())
+
+        // Mask out the upper triangle of the self-attention matrix with zeros
+        dSelfAttention.setValuesInPlace { i, j ->
+            if (i < j) 0.0 else dSelfAttention[i, j]
+        }
+
         val dQK = softmaxBackward(dSelfAttention, selfAttention).div(sqrt(size.toDouble()))
 
         // Delta Q is inputs "outer product" derivative of the QStack

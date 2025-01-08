@@ -7,6 +7,7 @@ import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.EmptyScalarData
 import org.simbrain.util.UserParameter
+import org.simbrain.util.flatten
 import org.simbrain.util.toDoubleArray
 import smile.math.matrix.Matrix
 import kotlin.math.exp
@@ -23,7 +24,8 @@ class SoftmaxRule: NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Bounded
 
     private fun softmax(input: Matrix, temperature: Double, bias: Matrix = Matrix(input.nrow(), 1)): DoubleArray {
         // These are often called "logits", that is, a set of unnormalized values
-        val exponentials = (input.toDoubleArray() zip bias.toDoubleArray()).map { (i, b) -> exp((i + b)/temperature) }
+        val max = input.flatten().max() // for max normalization to avoid overflow
+        val exponentials = (input.toDoubleArray() zip bias.toDoubleArray()).map { (i, b) -> exp(((i + b) - max) / temperature) }
         val total = exponentials.sum()
         // for small values, return a uniform distribution
         if (total < 1e-6) {

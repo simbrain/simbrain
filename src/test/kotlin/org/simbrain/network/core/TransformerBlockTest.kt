@@ -4,14 +4,8 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.simbrain.docviewer.DocViewerComponent
-import org.simbrain.network.NetworkComponent
-import org.simbrain.network.subnetworks.SOMNetwork
 import org.simbrain.util.*
 import smile.math.matrix.Matrix
-import java.io.ByteArrayInputStream
-import java.io.InputStream
-import java.nio.charset.StandardCharsets
 
 class TransformerBlockTest {
 
@@ -93,9 +87,12 @@ class TransformerBlockTest {
         //   Computed in python
         //   Row 1 = [0.01416604, 0.98583396]
         //   Row 2 = [0.0000502, 0.9999498]
+        // Masked self attention matrix
+        //  Row 1 = [1.0, 0.0]
+        //  Row 2 = [0.0000502, 0.9999498]
 
         val selfAttentionExpected = arrayOf(
-            doubleArrayOf(0.01416604, 0.98583396),
+            doubleArrayOf(1.0, 0.0),
             doubleArrayOf(0.0000502, 0.9999498)
         ).toMatrix()
         checkMatrixEquals(selfAttentionExpected, block.selfAttention, "selfAttention", tol = 1e-3)

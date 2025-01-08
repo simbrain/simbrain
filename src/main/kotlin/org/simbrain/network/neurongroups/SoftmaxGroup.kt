@@ -42,8 +42,10 @@ class SoftmaxGroup @JvmOverloads constructor(
     override fun update() {
         neuronList.forEach { it.accumulateInputs() }
         neuronList.forEach { it.update() }
+
+        val max = neuronList.maxOf { it.activation } // for max normalization to avoid overflow
         // These are often called "logits", that is, a set of unnormalized values
-        val exponentials = neuronList.activations.map { exp(it / params.T) }
+        val exponentials = neuronList.activations.map { exp((it - max) / params.T) }
         val total = exponentials.sum()
         // for small values, return a uniform distribution
         if (total < 1e-6) {

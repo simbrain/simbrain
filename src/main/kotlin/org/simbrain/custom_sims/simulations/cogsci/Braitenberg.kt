@@ -103,9 +103,9 @@ val braitenbergSim = newSim {
     addSidebarInfoFromFile("Braitenberg.html")
 
     withGui {
-        place(vehicle1.networkComponent, 251, 1, 359, 327)
-        place(vehicle2.networkComponent, 249, 329, 361, 319)
-        place(oc, 610, 3, 496, 646)
+        place(vehicle1.networkComponent, 186, 4, 359, 327)
+        place(vehicle2.networkComponent, 186, 332, 361, 319)
+        place(oc, 548, 3, 496, 646)
     }
 
     var leftWeight = 100.0
@@ -173,6 +173,26 @@ val braitenbergSim = newSim {
             }
         }
     }
+
+    addSidebarInfo(
+        """ 
+            # Introduction
+            The Braitenberg Two Braitenberg Vehicles Simulation explores the reactive behaviors in agents, the vehicles, from sensorimotor connections. The vehicles reacts to their environment, based on connections between its sensors and actuators. The sensors detect the stimuli, which determine the strength and direction of movement, and the actuators control the actual movement of the vehicles.
+            
+            # What to Do
+            1. "Run workspace" on the top menu bar to see how the vehicles reacts to its environment. 
+            2. Edit the "Left weight", "Right weight", and the "Velocity" to see how the vehicles adapt to the change.
+                - The vehicles react to these changes, and react to each other's changes based off their sensor motors. 
+            3. The weights in the "Network" window changes according to the isopod's actions. 
+                - The "Circle (L)" and "Circle (R)" weights are the inputs that detect the stimuli in the environment of the "empty.tmx" window.
+                - The "Left", "Straight", and "Right" weights are the outputs of the isopod's motor actions. 
+                - The magnitude of the weights indicate the strength of the connection and influence the output has on the vehicle's actions, with a higher weight increasing the likelihood and intensity of the action.
+            3. Click "Same pair", "Reversed pair", and "Opposite pair" to observe the vehicles' behaviors. The vehicles move towards the other's positive sensor motors.
+                - in "Same pair", the vehicles have the same weight connections between their inputs and outputs, causing them to move in a circle.
+                - in "Reversed pair", the vehicles have the same weight connections on opposite outputs, causing them to move alongside to each other.
+                - in "Opposite pair", one vehicle has positive weight connections, while the other has negative weight connections, causing them to repel each other. 
+        """.trimIndent()
+    )
 
 }
 

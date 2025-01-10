@@ -126,12 +126,12 @@ val binaryReservoir = newSim {
 
     withGui {
         place(networkComponent) {
-            location = point(487, 0)
+            location = point(0, 0)
             width = 567
             height = 617
         }
 
-        createControlPanel("Control Panel", 1055, 0) {
+        createControlPanel("Control Panel", 567, 0) {
             val tf_stdev: JTextField = addTextField("Weight stdev", "" + variance)
             addComponent(tf_stdev)
             addButton("Apply Variance") {
@@ -169,20 +169,19 @@ val binaryReservoir = newSim {
     val projectionPlot = addProjectionPlot("Activations")
     withGui {
         place(projectionPlot) {
-            location = point(1055, 197)
+            location = point(567, 197)
             width = 452
             height = 420
         }
     }
 
-    // Location of the Docviewer
-    val docViewer = addDocViewer("Information",
+    addSidebarInfo(
         """
         # Introduction
         This simulation shows how research can be done in Simbrain and in coordination with other programming environments. Though this simulation can be 
         used directly in any way as desired, pressing the buttons can configure parameters, run simulations, and save data that is outputted to a `.csv` file 
         which can then be analyzed in other programming environments like Python. For more information on the `Binary Reservoir` simulation and its usage, 
-        feel free to contact `jponcedeleon@ucmerced.edu`.
+        feel free to contact jponcedeleon@ucmerced.edu.
 
         ## General Information About The Simulation
 
@@ -222,13 +221,9 @@ val binaryReservoir = newSim {
         
         2) Click the `run one trial` button or, the `run one trial per parameter` button.
         
-        3) Save it to your device after the simulation finishes.
-        
+        3) Save it to your device after the simulation finishes.  
         """.trimIndent()
     )
-    withGui {
-        place(docViewer,10, 0, 477, 617)
-    }
 
     // Couple the neuron array to the projection plot
     with(couplingManager) {

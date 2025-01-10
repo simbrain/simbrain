@@ -24,6 +24,7 @@ import kotlin.math.sqrt
 val forgettingSim = newSim {
 
     // TODO: Better patterns. Maybe letters. Or faces.
+    // TODO: Should this become the generic hopfield sim?
 
     val numNeurons = showNumericInputDialog("Number of neurons", 100) ?: return@newSim
 

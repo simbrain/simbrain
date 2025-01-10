@@ -116,6 +116,19 @@ public class SimulationUtils {
         return docViewer;
     }
 
+    public void addSidebarInfo(String markdownText, Boolean initiallyOpened) {
+        workspace.getInfoDoc().setText(markdownText);
+        workspace.getInfoDoc().render();
+        if (desktop != null) {
+            if (initiallyOpened) {
+                desktop.getSideDockSplitter().showDock(null);
+            } else {
+                desktop.getSideDockSplitter().hideDock();
+            }
+        }
+    }
+
+
     /**
      * Add docviewer directly with markdown text
      */
@@ -227,7 +240,7 @@ public class SimulationUtils {
      * Helper to get a network panel from a network component.
      */
     public NetworkPanel getNetworkPanel(NetworkComponent nc) {
-       return ((NetworkDesktopComponent)desktop.getDesktopComponent(nc)).getNetworkPanel();
+        return ((NetworkDesktopComponent) desktop.getDesktopComponent(nc)).getNetworkPanel();
     }
 
 }

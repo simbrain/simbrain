@@ -55,7 +55,7 @@ public class EdgeOfChaosBitStream extends Simulation {
         sim.getWorkspace().clearWorkspace();
 
         // Build network
-        NetworkComponent nc = sim.addNetwork(494, 10, 480, 590, "Edge of Chaos");
+        NetworkComponent nc = sim.addNetwork(0, 10, 480, 590, "Edge of Chaos");
         net = nc.getNetwork();
         buildNetwork();
 
@@ -65,8 +65,8 @@ public class EdgeOfChaosBitStream extends Simulation {
         // Set up control panel
         controlPanel();
 
-        sim.addDocViewerWithText(15, 11, 471, 590, "Edge Of Chaos",
-"""
+        sim.addSidebarInfo(
+        """
         # Introduction
                         
         This simulation is an experimental study of reservoir networks, studying the ideas that Nils Bertschinger and Thomas Natschlager proposed in their paper, "Real-time computation at 
@@ -134,11 +134,11 @@ public class EdgeOfChaosBitStream extends Simulation {
         
         Here's a quick [demo](https://x.com/JeffYoshimi/status/1529126714948743168) on how the different types of states are exhibited in the time series.
         
-                """);
+        """, true);
     }
 
     private void controlPanel() {
-        ControlPanel panel = ControlPanel.makePanel(sim, "Controller", 984, 10, 205, 180);
+        ControlPanel panel = ControlPanel.makePanel(sim, "Controller", 482, 10, 205, 180);
         JTextField tf_stdev = panel.addTextField("Weight stdev", "" + variance);
         panel.addButton("Update", () -> {
 
@@ -211,7 +211,7 @@ public class EdgeOfChaosBitStream extends Simulation {
 
     private void setUpTimeSeries() {
         // Set up the plot
-        TimeSeriesPlotComponent ts = sim.addTimeSeries(984, 200, 425, 399, "Time Series");
+        TimeSeriesPlotComponent ts = sim.addTimeSeries(481, 179, 425, 399, "Time Series");
         TimeSeriesModel.TimeSeries sts1 = ts.getModel().addTimeSeries("Difference");
 
         sim.getWorkspace().getUpdater().getUpdateManager().addAction(UpdateActionKt.create("Update inputs", () -> {

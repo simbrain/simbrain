@@ -97,17 +97,17 @@ class SupervisedModelTrainer: SupervisedTrainer<SupervisedModel>() {
         val error = layers.accumulateBackprop(targetVec, outputLayer, weightAccumulator, biasesAccumulator, rawMatrixAccumulator, lossFunction = lossFunction)
 
         weightAccumulator.forEach { (wm, delta) ->
-            wm.weightMatrix.add(delta.mul(trainer.learningRate))
+            wm.weightMatrix.add(optimizer.computeDelta(wm.weightMatrix, delta))
             wm.events.updated.fire()
         }
 
         biasesAccumulator.forEach { (na, delta) ->
-            na.biases.add(delta.mul(trainer.learningRate))
+            na.biases.add(optimizer.computeDelta(na.biases, delta))
             na.events.updated.fire()
         }
 
         rawMatrixAccumulator.forEach { (matrix, delta) ->
-            matrix.add(delta.mul(trainer.learningRate))
+            matrix.add(optimizer.computeDelta(matrix, delta))
         }
 
         return error

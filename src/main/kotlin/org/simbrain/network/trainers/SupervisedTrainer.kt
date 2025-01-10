@@ -35,34 +35,46 @@ import kotlin.random.Random
  */
 abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
 
-    @UserParameter(label = "Learning Rate", increment = .01, minimumValue = 0.0, order = 1)
-    var learningRate = .01
-
-    @UserParameter(label = "Update type", showDetails = false, order = 3)
-    open var updateType: UpdateMethod = UpdateMethod.Epoch()
-
-    @UserParameter(label = "Loss Function", order = 2)
+    @UserParameter(label = "Loss Function", order = 10)
     var lossFunction = BackpropLossFunction.SSE
+
+    var optimizer: Optimizer by GuiEditable(
+        initValue = MomentumOptimizer(),
+        showDetails = false,
+        order = 20
+    )
+
+    @UserParameter(label = "Update type", showDetails = false, order = 30)
+    open var updateType: UpdateMethod = UpdateMethod.Epoch()
 
     var weightInitializationStrategy: WeightInitializationStrategy by GuiEditable(
         initValue = Xavier(),
         showDetails = false,
-        order = 4
+        order = 40
     )
 
     var stoppingCondition by GuiEditable(
         initValue = StoppingCondition(),
         showDetails = false,
-        order = 5
+        order = 50
     )
 
     var testConfiguration by GuiEditable(
         initValue = TestConfiguration(),
         showDetails = false,
-        order = 6
+        order = 60
     )
 
+    var learningRate by optimizer::learningRate
+
     var iteration = 0
+        set(value) {
+            field = value
+            if (value == 0) {
+                events.iterationReset.fire()
+                optimizer.reset()
+            }
+        }
 
     /**
      * Used when reopening the trainer controls so user knows where things left off
@@ -92,6 +104,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
                     stopTraining()
                 }
             }
+            events.endTraining.fire()
         }
     }
 
@@ -264,12 +277,12 @@ class BackpropTrainer : SupervisedTrainer<BackpropNetwork>() {
         }
 
         weightAccumulator.forEach { (wm, delta) ->
-            wm.weightMatrix.add(delta.mul(trainer.learningRate))
+            wm.weightMatrix.add(optimizer.computeDelta(wm.weightMatrix, delta))
             wm.events.updated.fire()
         }
 
         biasesAccumulator.forEach { (na, delta) ->
-            na.biases.add(delta.mul(trainer.learningRate))
+            na.biases.add(optimizer.computeDelta(na.biases, delta))
             na.events.updated.fire()
         }
 

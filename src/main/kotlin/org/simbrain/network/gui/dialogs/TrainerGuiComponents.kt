@@ -3,6 +3,7 @@ package org.simbrain.network.gui.dialogs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
 import org.simbrain.network.core.NetworkModel
@@ -18,6 +19,8 @@ import org.simbrain.util.widgets.ToggleButton
 import smile.math.matrix.Matrix
 import java.awt.Cursor
 import java.awt.Dimension
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JLabel
@@ -47,7 +50,7 @@ class TrainerControls<SN>(trainer: SupervisedTrainer<SN>, supervisedNetwork: SN,
         iconPath = "menu_icons/Stop.png",
         description = "Stop training.",
     ) {
-        trainer.stopTraining()
+        trainer.isRunning = false
     }
 
     private val stepAction = createAction(
@@ -65,8 +68,33 @@ class TrainerControls<SN>(trainer: SupervisedTrainer<SN>, supervisedNetwork: SN,
         description = "Initialize weights using selected strategy and biases using randomizer from network preferences",
         iconPath = "menu_icons/Rand.png",
     ) {
-        supervisedNetwork.initWeights()
-        supervisedNetwork.initBiases()
+
+        fun initialize() {
+            supervisedNetwork.initWeights()
+            supervisedNetwork.initBiases()
+            trainer.apply {
+                optimizer.reset()
+            }
+        }
+
+        val wasRunning = trainer.isRunning
+        if (wasRunning) {
+            val cleanUpTasks = mutableListOf<() -> Boolean?>()
+            val unregisterEndTrainingEvent = trainer.events.endTraining.on {
+                initialize()
+                if (cleanUpTasks.isEmpty()) {
+                    println("No cleanup tasks. This should not happen.")
+                    delay(100L)
+                }
+                cleanUpTasks.forEach { it() }
+                with(networkPanel.network) { trainer.run { supervisedNetwork.startTraining() } }
+            }
+            cleanUpTasks.add(unregisterEndTrainingEvent)
+            trainer.isRunning = false
+        } else {
+            initialize()
+        }
+
     }
 
     private val trainerPropsAction = createAction(
@@ -116,6 +144,15 @@ class TrainerControls<SN>(trainer: SupervisedTrainer<SN>, supervisedNetwork: SN,
         runTools.add(JButton(trainerPropsAction), "wrap")
         val labelPanel = LabelledItemPanel()
         labelPanel.addItem("Iterations:", iterationsLabel)
+        labelPanel.addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(e: MouseEvent) {
+                if (e.clickCount == 2) {
+                    trainer.iteration = 0
+                    trainer.events.iterationReset.fire()
+                    iterationsLabel.text = trainer.iteration.toString()
+                }
+            }
+        })
         val errorValue = JLabel(trainer.lastTrainingError.roundToString(4))
         fun errorDescriptionString() = "Mean Error (${trainer.updateType}; ${trainer.lossFunction.shortName})"
         val errorLabel = labelPanel.addItem(errorDescriptionString(), errorValue)

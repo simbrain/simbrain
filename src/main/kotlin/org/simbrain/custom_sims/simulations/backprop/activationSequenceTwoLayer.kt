@@ -8,10 +8,7 @@ import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedModel
-import org.simbrain.network.util.Direction
-import org.simbrain.network.util.offsetNetworkModel
 import org.simbrain.util.point
-import org.simbrain.util.showNumericInputDialog
 import org.simbrain.util.toMatrix
 
 val activationSequenceTwoLayer = newSim {
@@ -37,7 +34,7 @@ val activationSequenceTwoLayer = newSim {
     wm1.randomize()
 
     val model = SupervisedModel(inputs, output, false).apply {
-        trainer.testConfiguration.enabled = false
+        trainerConfig.testConfiguration.enabled = false
     }
 
     network.addNetworkModels(inputs, output, wm1, model).awaitAll()

@@ -17,7 +17,6 @@ import org.simbrain.world.textworld.EmbeddingType
 import org.simbrain.world.textworld.TextWorldComponent
 import org.simbrain.world.textworld.TokenEmbeddingBuilder
 import smile.math.matrix.Matrix
-import java.awt.Dimension
 import java.io.File
 import kotlin.math.min
 
@@ -156,9 +155,9 @@ val tinyLanguageModel2 = newSim {
             inputs = inputMatrix,
             targets = targetMatrix
         )
-        model.trainer.lossFunction = BackpropLossFunction.CrossEntropy
-        model.trainer.learningRate = .001
-        model.trainer.testConfiguration.enabled = false
+        model.trainerConfig.lossFunction = BackpropLossFunction.CrossEntropy
+        model.trainerConfig.learningRate = .001
+        model.trainerConfig.testConfiguration.enabled = false
         addNetworkModels(model).awaitAll()
     }
 

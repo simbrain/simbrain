@@ -10,10 +10,7 @@ import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.nodes.subnetworkNodes.BackpropNetworkNode
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.subnetworks.SRNNetwork
-import org.simbrain.network.trainers.MatrixDataset
-import org.simbrain.network.trainers.SupervisedNetwork
-import org.simbrain.network.trainers.SupervisedTrainer
-import org.simbrain.network.trainers.UnsupervisedNetwork
+import org.simbrain.network.trainers.*
 import org.simbrain.util.*
 import org.simbrain.util.table.MatrixDataFrame
 import org.simbrain.util.table.createAdvanceRowAction
@@ -71,6 +68,7 @@ class DataSetPanel(val dataSet: MatrixDataset, applyAction: suspend DataSetPanel
  */
 context(NetworkPanel)
 fun <SN> SN.getSupervisedTrainingDialog(): StandardDialog where SN: SupervisedNetwork, SN: NetworkModel {
+    val supervisedNetwork = this
     return StandardDialog().apply {
 
         title = "Train Network"
@@ -78,16 +76,22 @@ fun <SN> SN.getSupervisedTrainingDialog(): StandardDialog where SN: SupervisedNe
         // Run training algorithm
         val runControls = JPanel()
         runControls.layout = MigLayout("gap 0px 0px, ins 0")
-        val trainerControls = TrainerControls(trainer as SupervisedTrainer<SN>, this@getSupervisedTrainingDialog, this@NetworkPanel)
+        val trainer = when (supervisedNetwork) {
+            is SRNNetwork -> SRNTrainer(network, supervisedNetwork)
+            is BackpropNetwork -> BackpropTrainer(network, supervisedNetwork)
+            is SupervisedModel -> SupervisedModelTrainer(network, supervisedNetwork)
+            else -> throw IllegalArgumentException("Unsupported network type: ${supervisedNetwork::class.simpleName}")
+        } as SupervisedTrainer<SN>
+        val trainerControls = TrainerControls(trainer, supervisedNetwork, this@NetworkPanel)
 
         fun DataSetPanel.commonApplyAction(selectedRow: Int) {
             with(network) {
                 inputLayer.setActivations(dataSet.inputs.row(selectedRow))
                 this@SN.forwardPass()
-                trainer.lossFunction.scalarLoss(
+                trainerConfig.lossFunction.scalarLoss(
                     outputLayer.activations,
                     dataSet.targets.row(selectedRow).toMatrix()
-                ).also { rowErrorJLabel.text = "${trainer.lossFunction.shortName}: ${it.format(4)}" }
+                ).also { rowErrorJLabel.text = "${trainerConfig.lossFunction.shortName}: ${it.format(4)}" }
             }
         }
 

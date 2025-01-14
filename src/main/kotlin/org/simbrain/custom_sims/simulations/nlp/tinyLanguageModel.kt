@@ -84,7 +84,7 @@ val tinyLanguageModel = newSim {
         }.addToNetwork()
     }
 
-    backpropNetwork.trainer.apply {
+    backpropNetwork.trainerConfig.apply {
         lossFunction = BackpropLossFunction.CrossEntropy
         learningRate = 0.0001
         testConfiguration.enabled = false

@@ -35,39 +35,39 @@ class BackpropNetworkTest {
 
     @Test
     fun `test backprop learning`() {
-        bp.trainer.updateType = UpdateMethod.Epoch()
-        bp.trainer.learningRate = 0.04
+        bp.trainerConfig.updateType = UpdateMethod.Epoch()
+        bp.trainerConfig.learningRate = 0.04
         with(net) {
             with(bp) {
                 runBlocking {
                     repeat(1000) {
-                        trainer.trainOnce()
+                        trainerConfig.trainOnce()
                     }
                 }
             }
         }
 
-        assert(bp.trainer.lastTrainingError < 0.1) { "Error: ${bp.trainer.lastTrainingError}" }
+        assert(bp.trainerConfig.lastTrainingError < 0.1) { "Error: ${bp.trainerConfig.lastTrainingError}" }
 
     }
 
     @Test
     fun `test softmax backprop learning`() {
         bp.outputLayer.updateRule = SoftmaxRule()
-        bp.trainer.lossFunction = org.simbrain.network.trainers.BackpropLossFunction.CrossEntropy
-        bp.trainer.learningRate = 0.1
+        bp.trainerConfig.lossFunction = org.simbrain.network.trainers.BackpropLossFunction.CrossEntropy
+        bp.trainerConfig.learningRate = 0.1
         with(net) {
             with(bp) {
                 runBlocking {
                     repeat(1000) {
-                        trainer.trainOnce()
+                        trainerConfig.trainOnce()
                     }
                 }
             }
         }
 
-        println("Bacprop error ${bp.trainer.lastTrainingError}")
-        assert(bp.trainer.lastTrainingError < 0.1) { "Error: ${bp.trainer.lastTrainingError}" }
+        println("Bacprop error ${bp.trainerConfig.lastTrainingError}")
+        assert(bp.trainerConfig.lastTrainingError < 0.1) { "Error: ${bp.trainerConfig.lastTrainingError}" }
 
     }
 

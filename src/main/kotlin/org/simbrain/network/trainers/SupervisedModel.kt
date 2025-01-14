@@ -22,7 +22,7 @@ class SupervisedModel(
     @Transient
     override val events = LocationEvents()
 
-    override val trainer = SupervisedModelTrainer()
+    override val trainerConfig: SupervisedTrainerConfig = SupervisedTrainerConfig()
 
     override var trainingSet: MatrixDataset = if(useImmediateLearning) { MatrixDataset(
         inputLayer.activations.transpose().clone(),
@@ -61,8 +61,8 @@ class SupervisedModel(
     }
 
     override fun initWeights() {
-        weightMatrices.forEach { trainer.weightInitializationStrategy.initializeWeights(it as WeightMatrix) }
-        layers.filterIsInstance<TransformerBlock>().forEach { it.initWeights(trainer.weightInitializationStrategy) }
+        weightMatrices.forEach { trainerConfig.weightInitializationStrategy.initializeWeights(it as WeightMatrix) }
+        layers.filterIsInstance<TransformerBlock>().forEach { it.initWeights(trainerConfig.weightInitializationStrategy) }
     }
 
     override fun initBiases() {
@@ -83,31 +83,34 @@ class SupervisedModel(
     }
 }
 
-class SupervisedModelTrainer: SupervisedTrainer<SupervisedModel>() {
+class SupervisedModelTrainer(network: Network, supervisedModel: SupervisedModel): SupervisedTrainer<SupervisedModel>(network, supervisedModel) {
 
-    context(Network)
-    override fun SupervisedModel.trainRow(rowNum: Int): Double {
+    override fun trainRow(rowNum: Int): Double {
         val weightAccumulator: HashMap<WeightMatrix, Matrix> = HashMap()
         val biasesAccumulator: HashMap<ArrayLayer, Matrix> = HashMap()
         val rawMatrixAccumulator: HashMap<Matrix, Matrix> = HashMap()
 
-        inputLayer.setActivations(trainingSet.inputs.row(rowNum))
-        val targetVec = trainingSet.targets.rowVectorTransposed(rowNum)
-        layers.forwardPass(listOf(inputLayer.activations), inputLayers = listOf(inputLayer))
-        val error = layers.accumulateBackprop(targetVec, outputLayer, weightAccumulator, biasesAccumulator, rawMatrixAccumulator, lossFunction = lossFunction)
+        val error = with(supervisedNetwork) {
+            inputLayer.setActivations(trainingSet.inputs.row(rowNum))
+            val targetVec = trainingSet.targets.rowVectorTransposed(rowNum)
+            with(network) {
+                layers.forwardPass(listOf(inputLayer.activations), inputLayers = listOf(inputLayer))
+                layers.accumulateBackprop(targetVec, outputLayer, weightAccumulator, biasesAccumulator, rawMatrixAccumulator, lossFunction = config.lossFunction)
+            }
+        }
 
         weightAccumulator.forEach { (wm, delta) ->
-            wm.weightMatrix.add(optimizer.computeDelta(wm.weightMatrix, delta))
+            wm.weightMatrix.add(config.optimizer.computeDelta(wm.weightMatrix, delta))
             wm.events.updated.fire()
         }
 
         biasesAccumulator.forEach { (na, delta) ->
-            na.biases.add(optimizer.computeDelta(na.biases, delta))
+            na.biases.add(config.optimizer.computeDelta(na.biases, delta))
             na.events.updated.fire()
         }
 
         rawMatrixAccumulator.forEach { (matrix, delta) ->
-            matrix.add(optimizer.computeDelta(matrix, delta))
+            matrix.add(config.optimizer.computeDelta(matrix, delta))
         }
 
         return error

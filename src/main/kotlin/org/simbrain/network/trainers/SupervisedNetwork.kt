@@ -21,7 +21,7 @@ import org.simbrain.network.core.Network
  */
 interface SupervisedNetwork {
 
-    val trainer: SupervisedTrainer<*>
+    val trainerConfig: SupervisedTrainerConfig
 
     var trainingSet: MatrixDataset
 

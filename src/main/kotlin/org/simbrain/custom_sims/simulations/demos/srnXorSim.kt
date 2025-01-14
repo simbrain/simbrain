@@ -6,6 +6,7 @@ import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.network.trainers.MatrixDataset
+import org.simbrain.network.trainers.SRNTrainer
 import org.simbrain.network.trainers.SupervisedTrainer
 import org.simbrain.util.*
 import smile.math.matrix.Matrix
@@ -30,15 +31,15 @@ val srnXORSim = newSim {
     // Load with xor data
     val xorInputs = generateTemporalXORData(1000)
     srn.trainingSet = MatrixDataset(xorInputs, xorInputs.shiftUpAndPadEndWithZero())
-    srn.trainer.updateType = SupervisedTrainer.UpdateMethod.Stochastic()
+    srn.trainerConfig.updateType = SupervisedTrainer.UpdateMethod.Stochastic()
+
+    val trainer = SRNTrainer(network, srn)
 
     // Train
-    with(network) {
-        repeat(600) {
-            srn.run { trainer.trainOnce() }
-            if (it % 10 == 0) {
-                println("iteration ${it}: ${srn.trainer.lastTrainingError}")
-            }
+    repeat(600) {
+        trainer.trainOnce()
+        if (it % 10 == 0) {
+            println("iteration ${it}: ${trainer.lastTrainingError}")
         }
     }
 

@@ -6,6 +6,7 @@ import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.trainers.BackpropLossFunction
+import org.simbrain.network.trainers.BackpropTrainer
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedTrainer
 import org.simbrain.network.updaterules.LinearRule
@@ -45,9 +46,9 @@ val tinyMNIST = newSim {
         inputs = csvToDouble2DArray(testInputsCSV).toMatrix(),
         targets = csvToDouble2DArray(testLabelsCSV).toMatrix(),
     )
-    bp.trainer.lossFunction = BackpropLossFunction.CrossEntropy
-    bp.trainer.learningRate = .001
-    bp.trainer.updateType = SupervisedTrainer.UpdateMethod.Batch(35)
+    bp.trainerConfig.lossFunction = BackpropLossFunction.CrossEntropy
+    bp.trainerConfig.learningRate = .001
+    bp.trainerConfig.updateType = SupervisedTrainer.UpdateMethod.Batch(35)
     bp.initBiases()
     bp.initWeights()
 
@@ -92,11 +93,10 @@ val tinyMNIST = newSim {
         place(docViewer, 0, 0, 516, 700)
     }
 
+    val trainer = BackpropTrainer(net, bp)
     // Iterate trainer and network once to get it to display a number in the input
-    with(net) { with(bp) {
-        bp.trainer.trainOnce()
-        net.update()
-    } }
+    trainer.trainOnce()
+    net.update()
 
 //    // Adding a docviewer
 //    val docViewer = addDocViewer(

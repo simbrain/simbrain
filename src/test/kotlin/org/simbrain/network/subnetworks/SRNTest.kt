@@ -23,12 +23,12 @@ class SRNTest {
         with(net) {
             srn.randomize()
             srn.update()
-            srn.trainer.learningRate = 0.01
+            srn.trainerConfig.learningRate = 0.01
             runBlocking {
-                srn.trainer.run { srn.train(10000) }
+                srn.trainerConfig.run { srn.train(10000) }
             }
             // print(srn.trainer.lastError)
-            assert(srn.trainer.lastTrainingError < 0.1) { "Error too high: ${srn.trainer.lastTrainingError}" }
+            assert(srn.trainerConfig.lastTrainingError < 0.1) { "Error too high: ${srn.trainerConfig.lastTrainingError}" }
         }
     }
 

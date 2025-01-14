@@ -3,7 +3,6 @@ package org.simbrain.network.gui.dialogs
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
 import org.simbrain.network.core.NetworkModel
@@ -42,7 +41,7 @@ class TrainerControls<SN>(trainer: SupervisedTrainer<SN>, supervisedNetwork: SN,
         iconPath ="menu_icons/Play.png",
         description = "Iterate training until stop button is pressed"
     ) {
-        with(networkPanel.network) { trainer.run { supervisedNetwork.startTraining() } }
+        trainer.startTraining()
     }
 
     private val stopAction = createAction(
@@ -50,17 +49,23 @@ class TrainerControls<SN>(trainer: SupervisedTrainer<SN>, supervisedNetwork: SN,
         iconPath = "menu_icons/Stop.png",
         description = "Stop training.",
     ) {
-        trainer.isRunning = false
+        trainer.stopTraining()
     }
 
     private val stepAction = createAction(
         name = "Step",
         description = "Iterate training once",
         iconPath =  "menu_icons/Step.png",
+        initBlock = {
+            trainer.events.beginTraining.on {
+                isEnabled = false
+            }
+            trainer.events.endTraining.on {
+                isEnabled = true
+            }
+        }
     ) {
-        trainer.events.beginTraining.fire().await()
-        with(networkPanel.network) { supervisedNetwork.run { trainer.trainOnce() } }
-        trainer.events.endTraining.fire()
+       trainer.trainOnce()
     }
 
     private val initializeParameters = createAction(
@@ -68,33 +73,7 @@ class TrainerControls<SN>(trainer: SupervisedTrainer<SN>, supervisedNetwork: SN,
         description = "Initialize weights using selected strategy and biases using randomizer from network preferences",
         iconPath = "menu_icons/Rand.png",
     ) {
-
-        fun initialize() {
-            supervisedNetwork.initWeights()
-            supervisedNetwork.initBiases()
-            trainer.apply {
-                optimizer.reset()
-            }
-        }
-
-        val wasRunning = trainer.isRunning
-        if (wasRunning) {
-            val cleanUpTasks = mutableListOf<() -> Boolean?>()
-            val unregisterEndTrainingEvent = trainer.events.endTraining.on {
-                initialize()
-                if (cleanUpTasks.isEmpty()) {
-                    println("No cleanup tasks. This should not happen.")
-                    delay(100L)
-                }
-                cleanUpTasks.forEach { it() }
-                with(networkPanel.network) { trainer.run { supervisedNetwork.startTraining() } }
-            }
-            cleanUpTasks.add(unregisterEndTrainingEvent)
-            trainer.isRunning = false
-        } else {
-            initialize()
-        }
-
+        trainer.randomize()
     }
 
     private val trainerPropsAction = createAction(
@@ -102,7 +81,7 @@ class TrainerControls<SN>(trainer: SupervisedTrainer<SN>, supervisedNetwork: SN,
         description = "Edit trainer properties",
         iconPath = "menu_icons/Prefs.png",
     ) {
-        trainer.createEditorDialog {
+        supervisedNetwork.trainerConfig.createEditorDialog {
             (it.updateType as? SupervisedTrainer.UpdateMethod.Batch)?.let { batchUpdate ->
                 if (batchUpdate.batchSize !in 1..supervisedNetwork.trainingSet.size) {
                     batchUpdate.batchSize = batchUpdate.batchSize.coerceIn(1, supervisedNetwork.trainingSet.size)
@@ -154,7 +133,7 @@ class TrainerControls<SN>(trainer: SupervisedTrainer<SN>, supervisedNetwork: SN,
             }
         })
         val errorValue = JLabel(trainer.lastTrainingError.roundToString(4))
-        fun errorDescriptionString() = "Mean Error (${trainer.updateType}; ${trainer.lossFunction.shortName})"
+        fun errorDescriptionString() = "Mean Error (${supervisedNetwork.trainerConfig.updateType}; ${supervisedNetwork.trainerConfig.lossFunction.shortName})"
         val errorLabel = labelPanel.addItem(errorDescriptionString(), errorValue)
         runTools.add(labelPanel)
 

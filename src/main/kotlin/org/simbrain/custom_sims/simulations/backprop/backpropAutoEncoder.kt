@@ -1,6 +1,5 @@
 package org.simbrain.custom_sims.simulations
 
-import org.simbrain.custom_sims.addDocViewer
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
@@ -25,7 +24,7 @@ val backpropAutoEncoder = newSim {
         outputLayer.updateRule = SigmoidalRule().apply {
             type = SigmoidFunctionEnum.LOGISTIC
         }
-        trainer.learningRate = .1
+        trainerConfig.learningRate = .1
     }
     net.addNetworkModels(bp)
 

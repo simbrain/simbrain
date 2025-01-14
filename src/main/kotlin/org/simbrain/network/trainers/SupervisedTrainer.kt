@@ -13,14 +13,15 @@
  */
 package org.simbrain.network.trainers
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.events.TrainerEvents
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.subnetworks.SRNNetwork
+import org.simbrain.network.trainers.SupervisedTrainer.*
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.EditableObject
@@ -30,10 +31,7 @@ import smile.math.matrix.Matrix
 import kotlin.random.Random
 
 
-/**
- * Manage iteration based training algorithms and provides an object that can be edited in the GUI.
- */
-abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
+open class SupervisedTrainerConfig: EditableObject {
 
     @UserParameter(label = "Loss Function", order = 10)
     var lossFunction = BackpropLossFunction.SSE
@@ -66,13 +64,25 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
     )
 
     var learningRate by optimizer::learningRate
+}
+
+/**
+ * Manage iteration based training algorithms and provides an object that can be edited in the GUI.
+ */
+abstract class SupervisedTrainer<SN: SupervisedNetwork>(val network: Network, val supervisedNetwork: SN) : CoroutineScope {
+
+    private var job = SupervisorJob()
+
+    final override val coroutineContext = Dispatchers.Default + job
+
+    val config = supervisedNetwork.trainerConfig
 
     var iteration = 0
         set(value) {
             field = value
             if (value == 0) {
                 events.iterationReset.fire()
-                optimizer.reset()
+                config.optimizer.reset()
             }
         }
 
@@ -85,10 +95,39 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
 
     private var stoppingConditionReached = false
 
-    @Transient val events = TrainerEvents()
+    val events = TrainerEvents()
 
-    context(Network)
-    suspend fun SN.startTraining() {
+    val processorChannel = Channel<Pair<TrainerTask, CompletableDeferred<Unit>>>(capacity = Channel.UNLIMITED)
+
+    init {
+        launch(coroutineContext) {
+            for ((task, signal) in processorChannel) {
+                when (task) {
+                    TrainerTask.Start -> startTrainingHandler()
+                    TrainerTask.Train -> trainOnceHandler()
+                    TrainerTask.Stop -> stopTrainingHandler()
+                    TrainerTask.Randomize -> {
+                        supervisedNetwork.initWeights()
+                        supervisedNetwork.initBiases()
+                        supervisedNetwork.trainerConfig.optimizer.reset()
+                    }
+                }
+                signal.complete(Unit)
+            }
+        }
+    }
+
+    private suspend fun submitTask(task: TrainerTask): CompletableDeferred<Unit> {
+        val signal = CompletableDeferred<Unit>()
+        processorChannel.send(task to signal)
+        return signal
+    }
+
+    suspend fun startTraining() {
+        submitTask(TrainerTask.Start).await()
+    }
+
+    private suspend fun startTrainingHandler() {
         if (stoppingConditionReached) {
             stoppingConditionReached = false
             iteration = 0
@@ -96,60 +135,63 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
         }
         isRunning = true
         events.beginTraining.fire().await()
-        withContext(Dispatchers.Default) {
-            while (isRunning) {
-                trainOnce()
-                if (stoppingCondition.validate(iteration, lastTrainingError)) {
-                    stoppingConditionReached = true
-                    stopTraining()
-                }
-            }
-            events.endTraining.fire()
-        }
+        submitTask(TrainerTask.Train)
     }
 
     suspend fun stopTraining() {
+        submitTask(TrainerTask.Stop).await()
+    }
+
+    private suspend fun stopTrainingHandler() {
         isRunning = false
         events.endTraining.fire()
     }
 
-    context(Network)
-    suspend fun SN.train(iterations: Int) {
-        repeat(iterations) {
-            trainOnce()
-        }
+    suspend fun trainOnce() {
+        submitTask(TrainerTask.Train).await()
     }
 
-    context(Network, SN)
-    suspend fun trainOnce() {
+    private suspend fun trainOnceHandler() {
         iteration++
-        with(updateType) {
+        with(config.updateType) {
             lastTrainingError = when (this) {
-                is UpdateMethod.Stochastic -> trainRow(Random.nextInt(trainingSet.inputs.nrow()))
-                is UpdateMethod.Epoch -> trainBatch(0 until trainingSet.size)
+                is UpdateMethod.Stochastic -> trainRow(Random.nextInt(supervisedNetwork.trainingSet.inputs.nrow()))
+                is UpdateMethod.Epoch -> trainBatch(0 until supervisedNetwork.trainingSet.size)
                 is UpdateMethod.Batch -> {
-                    val startIndex = Random.nextInt(0, trainingSet.size - batchSize + 1)
+                    val startIndex = Random.nextInt(0, supervisedNetwork.trainingSet.size - batchSize + 1)
                     val endIndex = startIndex + batchSize
                     trainBatch(startIndex until  endIndex)
                 }
             }
         }
-        val testError = if (trainer.testConfiguration.enabled && iteration % trainer.testConfiguration.testFrequency == 0) {
+        val testError = if (config.testConfiguration.enabled && iteration % config.testConfiguration.testFrequency == 0) {
             test()
         } else {
             null
         }
         events.errorUpdated.fire(lastTrainingError to testError).await()
+        if (isRunning) {
+            if (config.stoppingCondition.validate(iteration, lastTrainingError)) {
+                stoppingConditionReached = true
+                submitTask(TrainerTask.Stop)
+            } else {
+                submitTask(TrainerTask.Train)
+            }
+        } else {
+            submitTask(TrainerTask.Stop)
+        }
     }
 
-    context(Network)
-    abstract fun SN.trainRow(rowNum: Int): Double
+    suspend fun randomize() {
+        submitTask(TrainerTask.Randomize).await()
+    }
+
+    protected abstract fun trainRow(rowNum: Int): Double
 
     /**
      * @return the mean error for the batch
      */
-    context(Network)
-    open fun SN.trainBatch(rowRange: IntRange): Double {
+    open fun trainBatch(rowRange: IntRange): Double {
         var batchError = 0.0
         for (i in rowRange) {
             batchError += trainRow(i)
@@ -157,14 +199,13 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
         return batchError / rowRange.count()
     }
 
-    context(Network)
-    open fun SN.test(): Double {
-        return testingSet.sumOf { (input, target) ->
-            inputLayer.activations = input
-            forwardPass()
-            val output = outputLayer.activations
-            trainer.lossFunction.scalarLoss(output, target)
-        } / testingSet.size
+    open fun test(): Double {
+        return supervisedNetwork.testingSet.sumOf { (input, target) ->
+            supervisedNetwork.inputLayer.activations = input
+            with(network) { supervisedNetwork.forwardPass() }
+            val output = supervisedNetwork.outputLayer.activations
+            config.lossFunction.scalarLoss(output, target)
+        } / supervisedNetwork.testingSet.size
     }
 
     sealed class UpdateMethod: CopyableObject {
@@ -245,24 +286,30 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork> : EditableObject {
         }
     }
 
-    override val name = "Supervised Trainer"
+    sealed class TrainerTask {
+        object Start : TrainerTask()
+        object Train : TrainerTask()
+        object Stop : TrainerTask()
+        object Randomize : TrainerTask()
+    }
+
 }
 
-class BackpropTrainer : SupervisedTrainer<BackpropNetwork>() {
+class BackpropTrainer(network: Network, backpropNetwork: BackpropNetwork) : SupervisedTrainer<BackpropNetwork>(network, backpropNetwork) {
 
-    context(Network)
-    override fun BackpropNetwork.trainRow(rowNum: Int): Double {
-        inputLayer.setActivations(trainingSet.inputs.row(rowNum))
-        val targetVec = trainingSet.targets.rowVectorTransposed(rowNum)
-        wmList.forwardPass(inputLayer.activations)
-        return wmList.applyBackprop(targetVec, epsilon = learningRate, lossFunction = lossFunction)
+    override fun trainRow(rowNum: Int): Double {
+        supervisedNetwork.inputLayer.setActivations(supervisedNetwork.trainingSet.inputs.row(rowNum))
+        val targetVec = supervisedNetwork.trainingSet.targets.rowVectorTransposed(rowNum)
+        return with(network) {
+            supervisedNetwork.wmList.forwardPass(supervisedNetwork.inputLayer.activations)
+            supervisedNetwork.wmList.applyBackprop(targetVec, epsilon = config.learningRate, lossFunction = config.lossFunction)
+        }
     }
 
     /**
      * Backprop trains using error accumulation.
      */
-    context(Network)
-    override fun BackpropNetwork.trainBatch(rowRange: IntRange): Double {
+    override fun trainBatch(rowRange: IntRange): Double {
 
         val weightAccumulator: HashMap<WeightMatrix, Matrix> = HashMap()
         val biasesAccumulator: HashMap<NeuronArray, Matrix> = HashMap()
@@ -270,19 +317,22 @@ class BackpropTrainer : SupervisedTrainer<BackpropNetwork>() {
         var error = 0.0
 
         for (i in rowRange) {
-            inputLayer.setActivations(trainingSet.inputs.row(i))
-            val targetVec = trainingSet.targets.rowVectorTransposed(i)
-            wmList.forwardPass(inputLayer.activations)
-            error += wmList.accumulateBackprop(targetVec, weightAccumulator, biasesAccumulator, lossFunction = lossFunction)
+            supervisedNetwork.inputLayer.setActivations(supervisedNetwork.trainingSet.inputs.row(i))
+            val targetVec = supervisedNetwork.trainingSet.targets.rowVectorTransposed(i)
+            with(network) {
+                supervisedNetwork.wmList.forwardPass(supervisedNetwork.inputLayer.activations)
+                error += supervisedNetwork.wmList.accumulateBackprop(targetVec, weightAccumulator, biasesAccumulator, lossFunction = config.lossFunction)
+            }
+
         }
 
         weightAccumulator.forEach { (wm, delta) ->
-            wm.weightMatrix.add(optimizer.computeDelta(wm.weightMatrix, delta))
+            wm.weightMatrix.add(config.optimizer.computeDelta(wm.weightMatrix, delta))
             wm.events.updated.fire()
         }
 
         biasesAccumulator.forEach { (na, delta) ->
-            na.biases.add(optimizer.computeDelta(na.biases, delta))
+            na.biases.add(config.optimizer.computeDelta(na.biases, delta))
             na.events.updated.fire()
         }
 
@@ -291,22 +341,23 @@ class BackpropTrainer : SupervisedTrainer<BackpropNetwork>() {
 
 }
 
-class SRNTrainer : SupervisedTrainer<SRNNetwork>() {
-
+class SRNTrainerConfig: SupervisedTrainerConfig() {
     override var updateType: UpdateMethod by GuiEditable(
         initValue = UpdateMethod.Epoch(),
         typeMapProvider = UpdateMethod::srnTypeList, // Only allow epoch for SRN
         order = 3
     )
+}
 
-    context(Network)
-    override fun SRNNetwork.trainRow(rowNum: Int): Double {
-        val targetVec = trainingSet.targets.rowVectorTransposed(rowNum)
-        val inputVec = trainingSet.inputs.rowVectorTransposed(rowNum)
+class SRNTrainer(network: Network, srnNetwork: SRNNetwork) : SupervisedTrainer<SRNNetwork>(network, srnNetwork) {
 
-        inputLayer.activations = inputVec
-        update() // This sets the context layer so that backprop on the tree can be applied
-        return weightMatrixTree.applyBackprop(targetVec, lossFunction = lossFunction, epsilon = learningRate)
+    override fun trainRow(rowNum: Int): Double {
+        val targetVec = supervisedNetwork.trainingSet.targets.rowVectorTransposed(rowNum)
+        val inputVec = supervisedNetwork.trainingSet.inputs.rowVectorTransposed(rowNum)
+
+        supervisedNetwork.inputLayer.activations = inputVec
+        network.update() // This sets the context layer so that backprop on the tree can be applied
+        return supervisedNetwork.weightMatrixTree.applyBackprop(targetVec, lossFunction = supervisedNetwork.trainerConfig.lossFunction, epsilon = supervisedNetwork.trainerConfig.learningRate)
     }
 
 }

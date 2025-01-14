@@ -24,6 +24,7 @@ import org.simbrain.network.events.LocationEvents
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.dialogs.getSupervisedTrainingDialog
 import org.simbrain.network.trainers.SupervisedModel
+import org.simbrain.network.trainers.SupervisedModelTrainer
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.Outline
 import javax.swing.JComponent
@@ -129,11 +130,8 @@ class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: Super
         keyboardShortcut = 'L'
     ) {
         networkPanel.selectionManager.filterSelectedModels<SupervisedModel>().forEach { sm ->
-            with(network) {
-                with(sm) {
-                    sm.trainer.trainOnce()
-                }
-            }
+            val trainer = SupervisedModelTrainer(network, sm)
+            trainer.trainOnce()
         }
     };
 

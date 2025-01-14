@@ -199,7 +199,7 @@ class BackpropTests {
             }
             initWeights()
             initBiases()
-            trainer.learningRate = .1
+            trainerConfig.learningRate = .1
             trainingSet = MatrixDataset(
                 inputs = inputs,
                 targets = inputs
@@ -210,14 +210,14 @@ class BackpropTests {
             with(bp) {
                 runBlocking {
                     repeat(3000) {
-                        bp.trainer.trainOnce()
+                        bp.trainerConfig.trainOnce()
                     }
                 }
             }
         }
         // TODO: Often fails to get near 0. Why? Notice the huge delta
-        print(bp.trainer.lastTrainingError)
-        assertEquals(0.0, bp.trainer.lastTrainingError , .15)
+        print(bp.trainerConfig.lastTrainingError)
+        assertEquals(0.0, bp.trainerConfig.lastTrainingError , .15)
     }
 
     fun makeMockInputs(size: Int): Matrix {

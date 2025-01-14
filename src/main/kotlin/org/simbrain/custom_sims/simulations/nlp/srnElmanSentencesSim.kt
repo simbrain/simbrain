@@ -69,7 +69,7 @@ val srnElmanSentences = newSim {
         targetRowNames = trainingTargetTokens,
         targetColumnNames = textWorldInputs.world.tokenEmbedding.tokens
     )
-    srn.trainer.learningRate = learningRate
+    srn.trainerConfig.learningRate = learningRate
 
     // Comment this out to pretrain the network
     // From the original paper: "The training continued in this manner until the network had experienced 6 complete passes

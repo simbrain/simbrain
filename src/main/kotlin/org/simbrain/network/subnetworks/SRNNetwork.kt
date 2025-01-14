@@ -98,7 +98,7 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
     @XStreamConstructor
     protected constructor() : super()
 
-    override var trainer: SRNTrainer = SRNTrainer()
+    override var trainerConfig: SupervisedTrainerConfig = SRNTrainerConfig()
 
     override val name: String
         get() = "SRN"
@@ -141,7 +141,7 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
     }
 
     override fun initWeights() {
-        (wmList + contextToHidden).forEach { wm -> trainer.weightInitializationStrategy.initializeWeights(wm) }
+        (wmList + contextToHidden).forEach { wm -> trainerConfig.weightInitializationStrategy.initializeWeights(wm) }
     }
 
     override fun initBiases() {

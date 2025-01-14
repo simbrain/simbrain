@@ -42,7 +42,7 @@ val activationSequenceThreeLayer = newSim {
     wm2.randomize()
 
     val model = SupervisedModel(inputs, output, false).apply {
-        trainer.testConfiguration.enabled = false
+        trainerConfig.testConfiguration.enabled = false
     }
 
     network.addNetworkModels(inputs, hidden, output, wm1, wm2, model).awaitAll()

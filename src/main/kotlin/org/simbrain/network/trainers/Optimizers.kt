@@ -24,7 +24,16 @@ abstract class Optimizer: CopyableObject {
     )
 }
 
-class MomentumOptimizer(@UserParameter(label = "Momentum", minimumValue = 0.0, maximumValue = 1.0, order = 1) var momentum: Double = 0.9) : Optimizer() {
+class MomentumOptimizer(
+    @UserParameter(
+        label = "Momentum",
+        description = "How much to weight the last delta. 0 turns it off. .8-.9 are standard defaults.",
+        minimumValue = 0.0,
+        maximumValue = 1.0,
+        order = 1
+    )
+    var momentum: Double = 0.9
+) : Optimizer() {
     private var matrixToLastDeltaMap: HashMap<Matrix, Matrix> = HashMap()
 
     context(SupervisedTrainer<*>)
@@ -54,7 +63,7 @@ class AdamOptimizer(
     private var initialIteration = 0
 
     context(SupervisedTrainer<*>)
-    private val t get() = iteration - initialIteration
+    private val timeSinceLastReset get() = iteration - initialIteration
 
     context(SupervisedTrainer<*>)
     override fun computeDelta(matrix: Matrix, delta: Matrix): Matrix {
@@ -64,8 +73,8 @@ class AdamOptimizer(
         meanEstimate.mul(beta1).add(delta.clone().mul(1 - beta1))
         varianceEstimate.mul(beta2).add(delta.clone().applyFunction { it * it }.mul(1 - beta2))
 
-        val meanCorrected = meanEstimate.clone().div(1 - beta1.pow(t))
-        val varianceCorrected = varianceEstimate.clone().div(1 - beta2.pow(t))
+        val meanCorrected = meanEstimate.clone().div(1 - beta1.pow(timeSinceLastReset))
+        val varianceCorrected = varianceEstimate.clone().div(1 - beta2.pow(timeSinceLastReset))
 
         return meanCorrected.mul(learningRate).div(varianceCorrected.applyFunction { sqrt(it) + 1e-8 })
     }

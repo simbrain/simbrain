@@ -180,7 +180,7 @@ class ErrorTimeSeries(trainer: SupervisedTrainer<*>) : JPanel() {
         mainPanel.add(graphPanel)
         add(mainPanel)
 
-        model.addTimeSeries("Error")
+        model.addTimeSeries("Training Error")
         trainer.events.errorUpdated.on(Dispatchers.Swing) { (trainingError, testingError) ->
             model.addData(0, trainer.iteration.toDouble(), trainingError)
             testingError?.let {

@@ -1,9 +1,11 @@
 package org.simbrain.custom_sims.simulations.nlp
 
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.swing.Swing
 import org.simbrain.custom_sims.*
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.*
+import org.simbrain.network.trainers.AdamOptimizer
 import org.simbrain.network.trainers.BackpropLossFunction
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedModel
@@ -158,6 +160,7 @@ val tinyLanguageModel2 = newSim {
         model.trainerConfig.lossFunction = BackpropLossFunction.CrossEntropy
         model.trainerConfig.learningRate = .001
         model.trainerConfig.testConfiguration.enabled = false
+        model.trainerConfig.optimizer = AdamOptimizer()
         addNetworkModels(model).awaitAll()
     }
 

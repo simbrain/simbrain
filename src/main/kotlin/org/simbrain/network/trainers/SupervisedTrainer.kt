@@ -31,6 +31,9 @@ import smile.math.matrix.Matrix
 import kotlin.random.Random
 
 
+/**
+ * Editable config object for supervised trainer.
+ */
 open class SupervisedTrainerConfig: EditableObject {
 
     @UserParameter(label = "Loss Function", order = 10)
@@ -97,9 +100,11 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork>(val network: Network, va
 
     val events = TrainerEvents()
 
+    // Task queue
     val processorChannel = Channel<Pair<TrainerTask, CompletableDeferred<Unit>>>(capacity = Channel.UNLIMITED)
 
     init {
+        // Wait for incoming tasks and ensures each one is completed before the next one begins
         launch(coroutineContext) {
             for ((task, signal) in processorChannel) {
                 when (task) {
@@ -165,7 +170,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork>(val network: Network, va
             }
         }
         val testError = if (config.testConfiguration.enabled && iteration % config.testConfiguration.testFrequency == 0) {
-            test()
+            computeTestError()
         } else {
             null
         }
@@ -199,7 +204,10 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork>(val network: Network, va
         return batchError / rowRange.count()
     }
 
-    open fun test(): Double {
+    /**
+     * Compute the error on the testing set
+     */
+    open fun computeTestError(): Double {
         return supervisedNetwork.testingSet.sumOf { (input, target) ->
             supervisedNetwork.inputLayer.activations = input
             with(network) { supervisedNetwork.forwardPass() }
@@ -357,7 +365,11 @@ class SRNTrainer(network: Network, srnNetwork: SRNNetwork) : SupervisedTrainer<S
 
         supervisedNetwork.inputLayer.activations = inputVec
         network.update() // This sets the context layer so that backprop on the tree can be applied
-        return supervisedNetwork.weightMatrixTree.applyBackprop(targetVec, lossFunction = supervisedNetwork.trainerConfig.lossFunction, epsilon = supervisedNetwork.trainerConfig.learningRate)
+        return supervisedNetwork.weightMatrixTree.applyBackprop(
+            targetVec,
+            lossFunction = supervisedNetwork.trainerConfig.lossFunction,
+            epsilon = supervisedNetwork.trainerConfig.learningRate
+        )
     }
 
 }

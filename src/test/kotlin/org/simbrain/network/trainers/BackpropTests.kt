@@ -206,18 +206,15 @@ class BackpropTests {
             )
         }
         net.addNetworkModels(bp)
-        with(net) {
-            with(bp) {
-                runBlocking {
-                    repeat(3000) {
-                        bp.trainerConfig.trainOnce()
-                    }
-                }
+        val trainer = BackpropTrainer(net, bp)
+        runBlocking {
+            repeat(3000) {
+                trainer.trainOnce()
             }
         }
         // TODO: Often fails to get near 0. Why? Notice the huge delta
-        print(bp.trainerConfig.lastTrainingError)
-        assertEquals(0.0, bp.trainerConfig.lastTrainingError , .15)
+        print(trainer.lastTrainingError)
+        assertEquals(0.0, trainer.lastTrainingError , .15)
     }
 
     fun makeMockInputs(size: Int): Matrix {

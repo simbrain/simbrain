@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.getModelByLabel
 import org.simbrain.network.core.getNetworkXStream
+import org.simbrain.network.trainers.BackpropTrainer
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedTrainer.UpdateMethod
 import org.simbrain.network.updaterules.SigmoidalRule
@@ -37,17 +38,16 @@ class BackpropNetworkTest {
     fun `test backprop learning`() {
         bp.trainerConfig.updateType = UpdateMethod.Epoch()
         bp.trainerConfig.learningRate = 0.04
-        with(net) {
-            with(bp) {
-                runBlocking {
-                    repeat(1000) {
-                        trainerConfig.trainOnce()
-                    }
-                }
+
+        val trainer = BackpropTrainer(net, bp)
+
+        runBlocking {
+            repeat(1000) {
+                trainer.trainOnce()
             }
         }
 
-        assert(bp.trainerConfig.lastTrainingError < 0.1) { "Error: ${bp.trainerConfig.lastTrainingError}" }
+        assert(trainer.lastTrainingError < 0.1) { "Error: ${trainer.lastTrainingError}" }
 
     }
 
@@ -56,18 +56,17 @@ class BackpropNetworkTest {
         bp.outputLayer.updateRule = SoftmaxRule()
         bp.trainerConfig.lossFunction = org.simbrain.network.trainers.BackpropLossFunction.CrossEntropy
         bp.trainerConfig.learningRate = 0.1
-        with(net) {
-            with(bp) {
-                runBlocking {
-                    repeat(1000) {
-                        trainerConfig.trainOnce()
-                    }
-                }
+
+        val trainer = BackpropTrainer(net, bp)
+
+        runBlocking {
+            repeat(1000) {
+                trainer.trainOnce()
             }
         }
 
-        println("Bacprop error ${bp.trainerConfig.lastTrainingError}")
-        assert(bp.trainerConfig.lastTrainingError < 0.1) { "Error: ${bp.trainerConfig.lastTrainingError}" }
+        println("Bacprop error ${trainer.lastTrainingError}")
+        assert(trainer.lastTrainingError < 0.1) { "Error: ${trainer.lastTrainingError}" }
 
     }
 

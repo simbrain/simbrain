@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.getModelByLabel
 import org.simbrain.network.core.getNetworkXStream
+import org.simbrain.network.trainers.SRNTrainer
 
 class SRNTest {
 
@@ -24,11 +25,16 @@ class SRNTest {
             srn.randomize()
             srn.update()
             srn.trainerConfig.learningRate = 0.01
+
+            val trainer = SRNTrainer(net, srn)
+
             runBlocking {
-                srn.trainerConfig.run { srn.train(10000) }
+                repeat(1000) {
+                    trainer.trainOnce()
+                }
             }
             // print(srn.trainer.lastError)
-            assert(srn.trainerConfig.lastTrainingError < 0.1) { "Error too high: ${srn.trainerConfig.lastTrainingError}" }
+            assert(trainer.lastTrainingError < 0.1) { "Error too high: ${trainer.lastTrainingError}" }
         }
     }
 

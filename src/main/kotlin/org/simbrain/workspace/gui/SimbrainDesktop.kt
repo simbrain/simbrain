@@ -163,9 +163,6 @@ object SimbrainDesktop {
 
     private val workspaceBounds: Rectangle
 
-    /**
-     * Workspace action manager.
-     */
     val actionManager = WorkspaceActions()
 
     /**
@@ -236,9 +233,6 @@ object SimbrainDesktop {
         }
     }
 
-    /**
-     * Default constructor.
-     */
     init {
         frame.iconImages = Arrays.asList(
             ResourceManager.getImage("simbrain_iconset/icon_20x20.png"),
@@ -378,9 +372,6 @@ object SimbrainDesktop {
     }
 
     private val terminalPanel: JConsole
-        /**
-         * @return Terminal panel.
-         */
         get() {
             val console = JConsole()
             interpreter = ConsoleDesktopComponent.getSimbrainInterpreter(console, workspace).also {
@@ -395,17 +386,12 @@ object SimbrainDesktop {
         }
 
     /**
-     * Print text to terminal.
-     *
-     * @param toPrint text to print
+     * Print text to Simbrain terminal.
      */
     fun printToTerminal(toPrint: String?) {
         interpreter!!.println(toPrint)
     }
 
-    /**
-     * Creates the workspace toolbar.
-     */
     private fun createToolBar(): JToolBar {
         val bar = JToolBar()
         bar.add(actionManager.openWorkspaceAction)
@@ -492,11 +478,6 @@ object SimbrainDesktop {
         frame.jMenuBar = menuBar
     }
 
-    /**
-     * Create script menu.
-     *
-     * @return script JMenu
-     */
     private fun createScriptMenu(): JMenu {
         val scriptMenu = JMenu("Simulations")
         simulations.addToMenu(scriptMenu) { newSimulation: Any? ->
@@ -513,11 +494,6 @@ object SimbrainDesktop {
         return scriptMenu
     }
 
-    /**
-     * Create the workspace file menu.
-     *
-     * @return file menu
-     */
     private fun createFileMenu(): JMenu {
         val fileMenu = JMenu("File")
         fileMenu.addMenuListener(menuListener)
@@ -533,11 +509,6 @@ object SimbrainDesktop {
         return fileMenu
     }
 
-    /**
-     * Create the workspace view menu.
-     *
-     * @return view menu
-     */
     private fun createViewMenu(): JMenu {
         val viewMenu = JMenu("View")
         viewMenu.add(JMenuItem(actionManager.resizeAllWindowsAction))
@@ -545,11 +516,6 @@ object SimbrainDesktop {
         return viewMenu
     }
 
-    /**
-     * Create the workspace insert menu.
-     *
-     * @return insert menu
-     */
     private fun createInsertMenu(): JMenu {
         val insertMenu = JMenu("Insert")
         insertMenu.add(actionManager.newNetworkAction)
@@ -571,11 +537,6 @@ object SimbrainDesktop {
         return insertMenu
     }
 
-    /**
-     * Create the workspace couplings menu.
-     *
-     * @return couplings menu
-     */
     private fun createCoupleMenu(): JMenu {
         val coupleMenu = JMenu("Couplings")
         coupleMenu.add(actionManager.openCouplingManagerAction)
@@ -583,11 +544,6 @@ object SimbrainDesktop {
         return coupleMenu
     }
 
-    /**
-     * Create the workspace help menu.
-     *
-     * @return help menu
-     */
     private fun createHelpMenu(): JMenu {
         val helpMenu = JMenu("Help")
         helpMenu.add(ShowHelpAction("Main Help", "https://docs.simbrain.net/"))
@@ -597,9 +553,6 @@ object SimbrainDesktop {
         return helpMenu
     }
 
-    /**
-     * Create a new context menu for this network panel.
-     */
     private fun createContextMenu() {
         contextMenu = JPopupMenu()
         contextMenu!!.add(actionManager.newNetworkAction)
@@ -621,9 +574,6 @@ object SimbrainDesktop {
 
     /**
      * Returns the desktop component corresponding to a workspace component.
-     *
-     * @param component component to check with
-     * @return component guicomponent
      */
     fun getDesktopComponent(component: WorkspaceComponent): DesktopComponent<*> {
         return workspaceComponentDesktopComponentMap[component] ?: throw IllegalStateException("Cannot find component ${component.name} in ${workspaceComponentDesktopComponentMap.keys.map { it.name }}")
@@ -659,11 +609,6 @@ object SimbrainDesktop {
             this.workspaceComponent = workspaceComponent
         }
 
-        /**
-         * Set the Gui Component.
-         *
-         * @param desktopComponent the component to set.
-         */
         fun setGuiComponent(desktopComponent: DesktopComponent<*>?) {
             this.desktopComponent = desktopComponent
         }
@@ -694,11 +639,6 @@ object SimbrainDesktop {
         }
     }
 
-    /**
-     * Add internal frame.
-     *
-     * @param internalFrame the frame to add.
-     */
     fun addInternalFrame(internalFrame: JInternalFrame) {
         internalFrame.addInternalFrameListener(object : InternalFrameListener {
             override fun internalFrameActivated(arg0: InternalFrameEvent) {}
@@ -718,12 +658,6 @@ object SimbrainDesktop {
         desktopPane.add(internalFrame)
     }
 
-    /**
-     * Registers instance of guiComponents.
-     *
-     * @param workspaceComponent Workspace component
-     * @param desktopComponent       GUI component
-     */
     fun registerComponentInstance(
         workspaceComponent: WorkspaceComponent,
         desktopComponent: DesktopComponent<*>
@@ -1093,10 +1027,6 @@ object SimbrainDesktop {
 
     /**
      * Creates an instance of the proper wrapper class around the provided instance.
-     *
-     * @param component   The component to wrap.
-     * @param parentFrame The frame of this component
-     * @return A new desktop component wrapping the provided component.
      */
     @JvmStatic
     fun createDesktopComponent(parentFrame: GenericFrame?, component: WorkspaceComponent): DesktopComponent<*> {
@@ -1106,8 +1036,6 @@ object SimbrainDesktop {
 
     /**
      * Show Gui View of a workspace component. Used from terminal.
-     *
-     * @param component component to view
      */
     fun showJFrame(component: WorkspaceComponent) {
         val theFrame = GenericJFrame()

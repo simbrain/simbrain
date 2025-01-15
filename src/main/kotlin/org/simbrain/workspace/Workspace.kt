@@ -20,25 +20,8 @@ import java.util.*
  * simulated environments, data-tables, plots and gauges are examples of
  * components in a Simbrain workspace. Essentially, an instance of a workspace
  * corresponds to a single simulation, that can be run with or without a
- * graphical view of it. The main visualization of a workspace is [ ].
+ * graphical view of it.
  *
- * To create a new type of workspace component, extend [ ], and [DesktopComponent]. The
- * latter is a gui representation of the former. Follow the pattern in [ ] to register this mapping.  The workspace component
- * holds all the model objects, and manages couplings. Usually there is some
- * central model object, like [org.simbrain.world.odorworld.OdorWorld] or
- * [org.simbrain.network.core.Network] that the workspace component
- * creates and wraps.  The gui component is a [javax.swing.JPanel]  and
- * can either manage the graphics or (more typically) hold custom panels etc.
- * that do.
- *
- * De-serialization has a lot of steps, but the main things to be aware
- * of are to handle custom model deserializing in a readresolve method in the
- * main model object (e.g. Network or OdorWorld) and that if any special
- * graphical syncing is needed that it can be done the guicomponent constructor
- * by overriding [DesktopComponent.postAddInit]. Other init can happen in
- * overrides of [WorkspaceComponent.save] and in a
- * static open method that must also be created. An example is [org.simbrain.world.odorworld.OdorWorldComponent.open]
- * <br></br>
  * For instructions on setting up serialization see [WorkspaceSerializer].
  *
  * @author Jeff Yoshimi
@@ -77,16 +60,11 @@ class Workspace: CoroutineScope {
     var currentFile: File? = null
 
     /**
-     * A persistence representation of the time (the updater's state is not
-     * persisted).
+     * A persistent representation of the time (the updater's state is not persisted).
      */
     var savedTime = 0
         private set
 
-    /**
-     * Listeners on this workspace. The CopyOnWriteArrayList is not a problem
-     * because writes to this list are uncommon.
-     */
     @Transient
     val events = WorkspaceEvents()
 
@@ -112,11 +90,6 @@ class Workspace: CoroutineScope {
         initIdManager()
     }
 
-    /**
-     * Adds a workspace component to the workspace.
-     *
-     * @param component The component to add.
-     */
     fun addWorkspaceComponent(component: WorkspaceComponent) {
         Logger.debug("adding component: $component")
         _componentList.add(component)
@@ -137,11 +110,6 @@ class Workspace: CoroutineScope {
         }
     }
 
-    /**
-     * Remove the specified component.
-     *
-     * @param component The component to remove.
-     */
     fun removeWorkspaceComponent(component: WorkspaceComponent) {
         Logger.debug("removing component: $component")
 
@@ -302,17 +270,10 @@ class Workspace: CoroutineScope {
     fun setWorkspaceChanged(workspaceChanged: Boolean) {
         this.workspaceChanged = workspaceChanged
     }
-    /**
-     * @return the currentDirectory
-     */
-    /**
-     * @param currentDirectory the currentDirectory to set
-     */
+
     var currentDirectory = Utils.USER_DIR + Utils.FS + "simulations" + Utils.FS + "workspaces"
 
-    /**
-     * Get a component using its id.
-     */
+
     fun getComponent(name: String?): WorkspaceComponent? {
         return componentList.firstOrNull { it.name.equals(name, ignoreCase = true) }
     }
@@ -340,15 +301,10 @@ class Workspace: CoroutineScope {
 
     /**
      * Returns global time.
-     *
-     * @return the time
      */
     val time: Int
         get() = updater.time
 
-    /**
-     * Reset time.
-     */
     fun resetTime() {
         updater.resetTime()
     }
@@ -366,11 +322,6 @@ class Workspace: CoroutineScope {
         savedTime = time
     }
 
-    /**
-     * Open a workspace from a file.
-     *
-     * @param theFile the file to try to open
-     */
     suspend fun openWorkspace(theFile: File?) {
         stop()
         val serializer = WorkspaceSerializer(this)
@@ -389,11 +340,6 @@ class Workspace: CoroutineScope {
         }
     }
 
-    /**
-     * Helper method to save a specified file.
-     *
-     * @param file file to save.
-     */
     @JvmOverloads
     fun save(file: File?, headless: Boolean = false) {
         if (file != null) {

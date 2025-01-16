@@ -392,6 +392,15 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         networkPanel.editMode = EditMode.WAND
     }
 
+    val panEditModeAction = networkPanel.createAction(
+        name = "Pan",
+        description = "Pan Mode",
+        iconPath = "menu_icons/Pan.png"
+    ) {
+        networkPanel.editMode = EditMode.PAN
+        autoZoom = false
+    }
+
     val showMainToolBarAction = networkPanel.createAction(
         name = "Main Toolbar",
         description = "Show the main toolbar",
@@ -513,9 +522,10 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         get() = listOf(newNeuronAction, deleteAction)
 
     val networkModeActions
-        get() = listOf<AbstractAction>(
+        get() = listOf(
             selectionEditModeAction,
-            wandEditModeAction
+            wandEditModeAction,
+            panEditModeAction
         )
 
     val showSynapseAdjustmentPanel = networkPanel.createConditionallyEnabledAction(

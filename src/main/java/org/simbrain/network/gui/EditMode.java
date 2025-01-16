@@ -29,95 +29,41 @@ import java.awt.image.BufferedImage;
  */
 public final class EditMode {
 
-    /**
-     * Cursor center point.
-     */
+    // Cursor center point.
     private static final Point CENTER_POINT = new Point(9, 9);
 
-    /**
-     * Cursor for this edit mode.
-     */
     private Cursor cursor;
 
-    /**
-     * Selection edit mode.
-     */
     public static final EditMode SELECTION = new EditMode("selection", "menu_icons/Arrow.png");
-
-    /**
-     * Text edit mode.
-     */
     public static final EditMode TEXT = new EditMode("text", "menu_icons/Text.png");
+    public static final EditMode WAND = new EditMode("wand", null);
+    public static final EditMode PAN = new EditMode("pan", "menu_icons/Pan.png");
 
-    /**
-     * Wand mode mode.
-     */
-    public static final EditMode WAND = new EditMode("wand");
-
-    /**
-     * The image used for the cursor.
-     */
     private BufferedImage cursorImage;
 
-    /**
-     * Create a new edit mode with the specified name.
-     *
-     * @param name       name of this edit mode
-     * @param cursorName cursor name for this edit mode
-     */
     private EditMode(final String name, final String cursorName) {
-
-        Toolkit toolkit = Toolkit.getDefaultToolkit();
-        Image image = ResourceManager.getImage(cursorName);
         if (name.equals("selection")) {
             this.cursor = Cursor.getDefaultCursor();
+        } else if (name.equals("wand")) {
+            resetWandCursor();
         } else {
-            this.cursor = toolkit.createCustomCursor(image, CENTER_POINT, name);
+            this.cursor = Toolkit.getDefaultToolkit().createCustomCursor(ResourceManager.getImage(cursorName), CENTER_POINT, name);
         }
     }
 
-    /**
-     * Construct a "wand" edit mode. TODO: Is this the right place for this?
-     *
-     * @param name   name of edit mode
-     */
-    private EditMode(String name) {
-        resetWandCursor();
-    }
-
-    /**
-     * Return the cursor for this edit mode.
-     *
-     * @return the cursor for this edit mode
-     */
     public Cursor getCursor() {
         return cursor;
     }
 
-    /**
-     * Return true if this edit mode is <code>SELECTION</code>.
-     *
-     * @return true if this edit mode is <code>SELECTION</code>
-     */
     public boolean isSelection() {
         return (this == SELECTION);
     }
-
-
-    /**
-     * Return true if this edit mode is <code>TEXT</code>.
-     *
-     * @return true if this edit mode is <code>TEXT</code>
-     */
+    public boolean isPan() {
+        return (this == PAN);
+    }
     public boolean isText() {
         return (this == TEXT);
     }
-
-    /**
-     * Return true if this edit mode is <code>WAND</code>.
-     *
-     * @return true if this edit mode is <code>WAND</code>
-     */
     public boolean isWand() {
         return (this == WAND);
     }

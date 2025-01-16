@@ -68,6 +68,21 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         }
     }
 
+
+    init {
+        // Only handle events in selection mode
+        eventFilter = object : PInputEventFilter(InputEvent.BUTTON1_MASK) {
+            override fun acceptsEvent(event: PInputEvent, type: Int): Boolean {
+                val editMode = networkPanel.editMode
+                return if (editMode.isSelection || editMode.isPan && super.acceptsEvent(event, type)) {
+                    true
+                } else {
+                    false
+                }
+            }
+        }
+    }
+
     override fun mouseClicked(event: PInputEvent?) {
         super.mouseClicked(event)
         event?.position?.let {
@@ -77,19 +92,6 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         }
     }
 
-    init {
-        // Only handle events in selection mode
-        eventFilter = object : PInputEventFilter(InputEvent.BUTTON1_MASK) {
-            override fun acceptsEvent(event: PInputEvent, type: Int): Boolean {
-                val editMode = networkPanel.editMode
-                return if (editMode.isSelection && super.acceptsEvent(event, type)) {
-                    true
-                } else {
-                    false
-                }
-            }
-        }
-    }
 
     /**
      * Handles beginnings of drag as well as single-click events.
@@ -118,13 +120,13 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         marqueeEndPosition = event.position
         selectionMarquee.reset()
 
-        when {
-            event.isPanKeyDown -> mode = Mode.PAN
-            pickedNode is PCamera -> {
-                if (!event.isShiftDown) networkPanel.selectionManager.clear()
-                mode = Mode.SELECTION
-            }
+        if (event.isPanKeyDown || networkPanel.editMode == EditMode.PAN) {
+            mode = Mode.PAN
+        } else if (pickedNode is PCamera) {
+            if (!event.isShiftDown) networkPanel.selectionManager.clear()
+            mode = Mode.SELECTION
         }
+        println(mode)
     }
 
     override fun drag(event: PInputEvent) {

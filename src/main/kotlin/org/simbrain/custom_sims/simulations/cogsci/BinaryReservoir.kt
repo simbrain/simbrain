@@ -183,7 +183,7 @@ val binaryReservoir = newSim {
         which can then be analyzed in other programming environments like Python. For more information on the `Binary Reservoir` simulation and its usage, 
         feel free to contact jponcedeleon@ucmerced.edu.
 
-        ## General Information About The Simulation
+        # General Information About The Simulation
 
         In this simulation, each trial resets the node connection parameters, and after `400` baseline iterations, it models a **perturbation** to the network by adding 
         an additional input signal to `10%` of the nodes, and continues to update activations for an additional `300` iterations to show the reservoir's response to new input
@@ -193,8 +193,8 @@ val binaryReservoir = newSim {
 
         The `run one trial` button produces one file for the specified `weight stdev`. You can also see the set variance and the actual variance in your programming environment
         after you apply the `weight stdev`. Whereas, the `run one trial per parameter` button will produce a set of files, one for each mean weight variance of a geometric 
-        progression (from `0.1` to `10`). This makes it possible to study how PCI varies with **weight variance**, which is known to be a control parameter for putting networks 
-        into different dynamical regimes, from **ordered** to **chaotic** and in between **edge of chaos**. For an in-depth description and illustration of the different dynamical 
+        progression (from `0.1` to `10`). This makes it possible to study how PCI varies with `weight variance`, which is known to be a control parameter for putting networks 
+        into different dynamical regimes, from `ordered` to `chaotic` and in between `edge of chaos`. For an in-depth description and illustration of the different dynamical 
         regimes, refer to the `Edge of Chaos Bit Stream` simulation.
         
         # What to Do
@@ -213,7 +213,7 @@ val binaryReservoir = newSim {
         5) To `reset` the simulation, stop the simulation by clicking the `play` button again and press `k`. Afterwards, press the `eraser` button in the `Activations` GUI, or
         the `PCA` projection plot to clear the points.
         
-        6) Afterwards, click back on the `pointer` icon, and left-click outside of the reservoir to unselect all neurons.
+        6) Afterwards, click back on the `cursor` icon, and left-click outside of the reservoir to unselect all neurons.
 
         ## Conducting Research on the Relationship between PCI and Dynamical Regimes
         

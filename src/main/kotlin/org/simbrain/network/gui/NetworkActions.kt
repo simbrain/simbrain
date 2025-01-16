@@ -61,11 +61,12 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     ) {
         alignVertical()
     }
-    val clearNodeActivationsAction = networkPanel.createAction(
+    val clearNodeActivationsAction = networkPanel.createConditionallyEnabledAction(
         name = "Clear activations of all nodes",
         description = "Clear all node activations (c)",
         iconPath = "menu_icons/Eraser.png",
-        keyboardShortcut = KeyCombination('C')
+        enablingCondition = EnablingCondition.ALLITEMS,
+        keyboardShortcuts = KeyCombination('C')
     ) {
         clearSelectedObjects()
     }
@@ -161,11 +162,12 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         network.addNetworkModel(neuron)
         network.selectModels(listOf(neuron))
     }
-    val randomizeObjectsAction = networkPanel.createAction(
+    val randomizeObjectsAction = networkPanel.createConditionallyEnabledAction(
         name = "Randomize selection",
         description = "Randomize Selected Elements (r)",
+        enablingCondition = EnablingCondition.ALLITEMS,
         iconPath = "menu_icons/Rand.png",
-        keyboardShortcut = KeyCombination('R')
+        keyboardShortcuts = KeyCombination('R')
     ) {
         with(network) {
             selectionManager.selectedModels.map { it.randomize() }
@@ -761,25 +763,31 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 
     fun resetZoomAction() = networkPanel.createAction(
         "Reset Zoom",
+        description = "Scale to 100%",
         iconPath = "menu_icons/ZoomReset.png",
         keyboardShortcut = CmdOrCtrl + KeyEvent.VK_0
     ) {
         scalingFactor = 1.0
+        autoZoom = false
     }
 
     fun zoomInAction() = networkPanel.createAction(
         "Zoom In",
         iconPath = "menu_icons/ZoomIn.png",
+        description = "Zoom in",
         keyboardShortcuts = listOf(CmdOrCtrl + KeyEvent.VK_ADD, CmdOrCtrl + KeyEvent.VK_EQUALS)
     ) {
         scalingFactor *= 1.1
+        autoZoom = false
     }
 
     fun zoomOutAction() = networkPanel.createAction(
         "Zoom Out",
+        description = "Zoom out",
         iconPath = "menu_icons/ZoomOut.png",
         keyboardShortcuts = listOf(CmdOrCtrl + KeyEvent.VK_SUBTRACT, CmdOrCtrl + KeyEvent.VK_MINUS)
     ) {
         scalingFactor /= 1.1
+        autoZoom = false
     }
 }

@@ -78,7 +78,10 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     var autoZoom = true
         set(value) {
             field = value
-            network.events.zoomToFitPage.fire()
+            network.events.zoomModeChanged.fire(value)
+            if (value) {
+                network.events.zoomToFitPage.fire()
+            }
         }
 
     /**
@@ -95,6 +98,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             val currentScalingFactor = canvas.camera.viewScale
             val scalingFactorRatio = scalingFactor / currentScalingFactor
             canvas.scale(scalingFactorRatio)
+            repaint()
         }
 
     var editMode: EditMode = EditMode.SELECTION
@@ -462,6 +466,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     private fun createEditToolBar() = CustomToolBar().apply {
         with(networkActions) {
             networkEditingActions.forEach { add(it) }
+            addSeparator()
             add(clearNodeActivationsAction)
             add(randomizeObjectsAction)
         }
@@ -681,6 +686,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             addSeparator()
             add(networkActions.zoomInAction())
             add(networkActions.zoomOutAction())
+            add(networkActions.resetZoomAction())
             addSeparator()
             add(JToggleButton().apply {
                 icon = ResourceManager.getSmallIcon("menu_icons/ZoomFitPage.png")
@@ -691,13 +697,15 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
                     toolTipText = "Autozoom is $onOff"
                 }
                 updateButton()
+                network.events.zoomModeChanged.on {
+                    updateButton()
+                }
                 addActionListener { e ->
                     val button = e.source as JToggleButton
                     autoZoom = button.isSelected
                     updateButton()
                 }
             })
-            add(networkActions.resetZoomAction())
         }
     }
 
@@ -731,6 +739,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
                     )
                     launch(Dispatchers.Swing) {
                         canvas.camera.setViewBounds(adjustedFiltered)
+                        repaint()
                     }
                 }
                 launch(Dispatchers.Swing) {

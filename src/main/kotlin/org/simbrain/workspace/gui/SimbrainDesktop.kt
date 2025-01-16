@@ -665,11 +665,6 @@ object SimbrainDesktop {
         workspaceComponentDesktopComponentMap[workspaceComponent] = desktopComponent
     }
 
-    /**
-     * Add a new SimbrainComponent.
-     *
-     * @param workspaceComponent Workspace Component
-     */
     fun addDesktopComponent(workspaceComponent: WorkspaceComponent) {
         Logger.trace("Adding workspace component: $workspaceComponent")
         val componentFrame = DesktopInternalFrame(workspaceComponent)

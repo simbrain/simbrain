@@ -56,13 +56,54 @@ public class EdgeOfChaos extends Simulation {
         sim.getWorkspace().clearWorkspace();
 
         // Build network
-        NetworkComponent nc = sim.addNetwork(5, 0, 443, 620, "Edge of Chaos");
+        NetworkComponent nc = sim.addNetwork(0, 0, 593, 620, "Edge of Chaos");
         net = nc.getNetwork();
         buildNetwork();
 
         // Projection plot
-        ProjectionComponent pc = sim.addProjectionPlot(447,248,412,372, "PCA");
+        ProjectionComponent pc = sim.addProjectionPlot(592, 248, 413, 372, "PCA");
         sim.couple(reservoir, pc);
+
+        // DocViewer
+        sim.addSidebarInfo(
+"""
+        # Introduction
+        
+        This is simulation is an experimental study of how representations work when a network is in different dynamic regimes. See the `Edge Of Chaos
+        Bit Stream` to learn more about the different three different types of dynamical regimes: `chaos`, `edge of chaos`, `ordered`. The main goal of
+        this simulation, similar to the other Edge Of Chaos simulation, is to find the edge of chaos and see the effects of the reservoir network on an agent's
+        representation of an object. Please note, we have not finished studying this network so if you find any patterns or structure, let us know!
+        
+        # General Information About The Simulation
+        
+        In this simulation, a reservoir network is connected to an agent that exists in the 2D environment. In the 2D environment, there is two different
+        groups of objects, flowers and cheeses. There are three different types of each object that will be utilized to interact with the agent. In principle,
+        the three types have similar representations due to similarities in their structure. The object groups (i.e., cheese or flower) would project to different
+        parts of the network. The objects would be moved to the agent and the object would be represented in a PCA plot as points where we can infer similarities 
+        or differences between objects. Similarities and differences can be inferred from the position of the object's representation in the PCA plot.
+         
+        ## What To Do
+        
+        In this simulation, the only configuration to the simulation is the `weight stdev`. To find each state, follow the steps below.
+        
+        1) Change the `weight stdev` value and press the `update` button to change the reservoir's responses to the object, which will be shown in the PCA plot.
+                        
+        2) Start the simulation by clicking on the `play` button in the top-left corner.
+        
+        3) Click on the `cursor` icon, drag one of the six objects to the agent.
+        
+        4) Observe changes in the reservoir's representation in the PCA plot.   
+        
+        5) To `reset` the simulation, stop the simulation by clicking the `play` button again and press `k`.
+        
+        6) Afterwards, click back on the `cursor` icon, and left-click outside of the reservoirs to unselect all neurons.
+ 
+        ## Observing The Representations Of The Objects
+        
+        To observe the object's representation in the network, delete the recurrent connections (the recurrent synapses) by
+        clicking on it and backspace. Then run the simulation and repeat steps 2 to 6.
+
+        """, true);
 
         // Odor world sim
         buildOdorWorld();
@@ -72,7 +113,7 @@ public class EdgeOfChaos extends Simulation {
     }
 
     private void controlPanel() {
-        ControlPanel panel = ControlPanel.makePanel(sim, "Controller", 844,2,215,133);
+        ControlPanel panel = ControlPanel.makePanel(sim, "Controller", 1005, 0, 215, 133);
         JTextField tf_stdev = panel.addTextField("Weight stdev", "" + variance);
         panel.addButton("Update", () -> {
 
@@ -206,7 +247,7 @@ public class EdgeOfChaos extends Simulation {
     private void buildOdorWorld() {
 
         // Create the odor world
-        oc = sim.addOdorWorld(447,1,413,248, "Two objects");
+        oc = sim.addOdorWorld(592, 0, 413, 248, "Two objects");
         oc.getWorld().setObjectsBlockMovement(false);
         oc.getWorld().setUseCameraCentering(false);
         mouse = oc.getWorld().addEntity(165, 110, EntityType.MOUSE);

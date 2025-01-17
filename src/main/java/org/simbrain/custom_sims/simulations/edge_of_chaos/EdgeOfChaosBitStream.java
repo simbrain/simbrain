@@ -55,7 +55,7 @@ public class EdgeOfChaosBitStream extends Simulation {
         sim.getWorkspace().clearWorkspace();
 
         // Build network
-        NetworkComponent nc = sim.addNetwork(0, 10, 480, 590, "Edge of Chaos");
+        NetworkComponent nc = sim.addNetwork(0, 0, 588, 617, "Edge of Chaos");
         net = nc.getNetwork();
         buildNetwork();
 
@@ -72,36 +72,36 @@ public class EdgeOfChaosBitStream extends Simulation {
         This simulation is an experimental study of reservoir networks, studying the ideas that Nils Bertschinger and Thomas Natschlager proposed in their paper, "Real-time computation at 
         the edge of chaos in recurrent neural networks." In this simulation, there is two reservoirs running concurrently where the difference between the two reservoirs are recorded in a 
         time series. From their difference, we can infer the three different states of computation: `ordered`, `edge of chaos`, and `chaos`. Although, the values do not align perfectly to
-        the original paper by Nils Bertschinger and Thomas Natschlager, all three regimes can be observed. Currently, the regimes seems to be split into the specified values: 
+        the original paper by Nils Bertschinger and Thomas Natschlager, all three dynamical regimes can be observed. Currently, the regimes seems to be split into the specified values: 
         `chaos` occurs for `values > 5.0`, `ordered` occurs for `values < 1.5`, and the `edge of chaos` is around `2.5`.
 
-        # Background
+        # Background On Reservoir Networks
                         
         [Reservoir computing](https://en.wikipedia.org/wiki/Reservoir_computing) is a general theory of the computational properties that exists in neural networks and attempts 
         to grasp at the types of computation that a neural network in the brain requires to function properly (i.e., the constant cycling of recurrent activity in response to 
-        varying stimuli/inputs). From this theory emerges two key concepts: the `fading memory property` and the `separation property`.
+        varying stimuli). From this theory emerges two key concepts: the `fading memory property` and the `separation property`.
         
-        1) The **fading memory property** states that recurrent networks can **store different memory states as activation patterns and recall past memory states**.
-        However, the property also states that past activation patterns should fade over time with the influx of new activation inputs. However, we would not want an
-        excess amount, or lack thereof, of the fading of memory, we want just the right amount. Too little, and the network cannot store new information; too much, and 
-        the network cannot collect and store new information.
+        1) The **fading memory property** states that recurrent networks can **store different representations and recall past representations**. However, the property 
+        also states that past representations should fade over time with the influx of new inputs. However, we would not want an excess amount, or lack 
+        thereof, of the fading of memory, we want just the right amount. Too little, and the network cannot store new information; too much, and the network cannot collect 
+        and store new information.
                         
-        2) The **separation property** builds upon the concept of the fading memory property, stating that **with the influx of new activation inputs, a network will produce 
-        different memory states**. However, we would not want an excess amount of separation. Like for instance, if a neural network receives the activation patterns of two 
-        types of flowers, the network should still know that it is a flower with a minor distinction in activation but, not too large of a distinction where it differentiates
-        the two flowers (an example of this can be tested in the `Edge Of Chaos Embodied` simulation).
+        2) The **separation property** builds upon the concept of the fading memory property, stating that **with the influx of new inputs, a network will produce 
+        new representations**. However, we would not want an excess amount of separation. Like for instance, if the representations of two types of flowers are provided to
+        a reservoir network, the network should still know that the object is a flower with a clear distinction in representation but, not too large of a distinction where it 
+        differentiates the two flowers (an example of this can be tested in the `Edge Of Chaos Embodied` simulation).
         
-        Tying these properties to the three different states, an `ordered state` will have a weakened fading and weakened separation of memory states where its activation 
-        patterns will be pulled into a cyclic cycle of activation patterns. In this state, its difference will quickly die off. A `chaotic state` will have both properties however, 
-        with an excess amount of separation where its difference will continuously fluctuate. The `edge of chaos state` is the state that our brains have been theorized to 
-        be within, where there is just the right balance of the separation and fading of memory. In this state, the difference will fluctuate for a period of time, and 
-        then die off.
-        
+        Tying these properties to the three different states, an `ordered state` will have a weakened fading and weakened separation of representations where its activation 
+        patterns will be pulled into a cyclic cycle of activation patterns. In this state, its difference will quickly die off. A `chaotic state` will have both properties 
+        however, with an excess amount of separation where its difference will continuously fluctuate. The `edge of chaos state` is the state that our brains have been 
+        theorized to be within, where there is just the right balance of the separation and fading of memory. In this state, the difference will fluctuate for a period of 
+        time, and then die off.
+      
         # What To Do
         
-        To visualize these concepts, this simulation will utilize two reservoirs as memory states to illustrate the three types of computational states that the neural networks can
-        be in. They will begin with the same activation patterns, and through the addition of new activation inputs, they will produce a difference in activation. This difference 
-        will tell us which computational state we are in.
+        To visualize these concepts, this simulation will utilize two reservoir networks to illustrate the three types of computational states that the neural networks can
+        be in. They will begin with the same representations, and through the addition of new activation inputs, they will differ in representation. This difference 
+        will tell us which computational state the reservoir networks are in.
                         
         ## Finding The Three Different States
         
@@ -111,26 +111,26 @@ public class EdgeOfChaosBitStream extends Simulation {
                         
         2) Start the simulation by clicking on the `play` button in the top-left corner.
         
-        3) Then, click on the `magic wand` (the icon next to the `pointer` icon), and increase the activation in one of the reservoirs by holding left-click 
+        3) Then, click on the `magic wand` (the icon next to the `cursor` icon), and increase the activation in one of the reservoirs by holding left-click 
         and moving around in either reservoirs.
         
         4) Now, observe the changes in the time series and determine its current computational state.   
         
         5) To `reset` the simulation, stop the simulation by clicking the `play` button again and press `k`.
         
-        6) Afterwards, click back on the `pointer` icon, and left-click outside of the reservoirs to unselect all neurons.
+        6) Afterwards, click back on the `cursor` icon, and left-click outside of the reservoirs to unselect all neurons.
 
-        ### Experimentation with The Ordered State
+        ## Experimentation with The Ordered State
         
         An experiment to better understand the `ordered` state is to set `weight stdev` to a very low value, like `0.01`, and look at the two reservoirs' activation patterns. 
         Afterwards, experiment with adding in new activation with the `magic wand` and see how the differences between the two reservoirs are changing.
         
-        ### Find The Edge Of Chaos
+        ## Find The Edge Of Chaos
         
         To find the `edge of chaos` state, find the state where there is just the right amount of orderliness and chaos, where the difference remains a short period of time,
         and then disappears. To start, try a `weight stdev` that is greater than `5.0`, and slowly move down, repeating the steps above until the `edge of chaos`.
                         
-        ## Demo
+        ### Demo
         
         Here's a quick [demo](https://x.com/JeffYoshimi/status/1529126714948743168) on how the different types of states are exhibited in the time series.
         
@@ -138,7 +138,7 @@ public class EdgeOfChaosBitStream extends Simulation {
     }
 
     private void controlPanel() {
-        ControlPanel panel = ControlPanel.makePanel(sim, "Controller", 482, 10, 205, 180);
+        ControlPanel panel = ControlPanel.makePanel(sim, "Controller", 588, 1, 224, 183);
         JTextField tf_stdev = panel.addTextField("Weight stdev", "" + variance);
         panel.addButton("Update", () -> {
 
@@ -211,7 +211,7 @@ public class EdgeOfChaosBitStream extends Simulation {
 
     private void setUpTimeSeries() {
         // Set up the plot
-        TimeSeriesPlotComponent ts = sim.addTimeSeries(481, 179, 425, 399, "Time Series");
+        TimeSeriesPlotComponent ts = sim.addTimeSeries(588, 183, 460, 434, "Time Series");
         TimeSeriesModel.TimeSeries sts1 = ts.getModel().addTimeSeries("Difference");
 
         sim.getWorkspace().getUpdater().getUpdateManager().addAction(UpdateActionKt.create("Update inputs", () -> {

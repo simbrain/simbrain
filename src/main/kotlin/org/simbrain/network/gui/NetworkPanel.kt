@@ -8,8 +8,9 @@ import org.piccolo2d.event.PBasicInputEventHandler
 import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
-import org.simbrain.network.*
+import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.*
+import org.simbrain.network.gui.MouseEventHandler.MouseCursor
 import org.simbrain.network.gui.UndoManager.UndoableAction
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.*
@@ -23,15 +24,18 @@ import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.setViewBoundsNoOverflow
 import org.simbrain.util.piccolo.unionOfGlobalFullBounds
-import java.awt.*
+import java.awt.BorderLayout
+import java.awt.Cursor
+import java.awt.FlowLayout
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.awt.event.MouseWheelEvent
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
-import java.util.*
 import java.util.prefs.PreferenceChangeListener
-import javax.swing.*
+import javax.swing.BorderFactory
+import javax.swing.JPanel
+import javax.swing.JToggleButton
 import kotlin.math.pow
 import kotlin.reflect.KClass
 
@@ -101,15 +105,12 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             repaint()
         }
 
-    var editMode: EditMode = EditMode.SELECTION
-        set(newEditMode) {
-            val oldEditMode = field
-            field = newEditMode
-            if (newEditMode == EditMode.WAND) {
-                newEditMode.resetWandCursor()
-            }
-            firePropertyChange("editMode", oldEditMode, newEditMode)
-            cursor = newEditMode.cursor
+    var mouseCursor: MouseCursor = MouseCursor.Selection
+        set(newCursor) {
+            val oldCursor = field
+            field = newCursor
+            firePropertyChange("editMode", oldCursor, newCursor)
+            cursor = newCursor.cursor
         }
 
     var showTime = true
@@ -163,7 +164,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
         canvas.background = NetworkPreferences.backgroundColor
         nudgeAmount = NetworkPreferences.nudgeAmount
-        editMode.resetWandCursor()
 
         SynapseNode.lineColor = NetworkPreferences.lineColor
         SynapseNode.excitatoryColor = NetworkPreferences.excitatorySynapseColor

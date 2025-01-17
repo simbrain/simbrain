@@ -247,7 +247,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         description = "Selection mode",
         iconPath = "menu_icons/Arrow.png"
     ) {
-        networkPanel.editMode = EditMode.SELECTION
+        networkPanel.mouseCursor = MouseEventHandler.MouseCursor.Selection
     }
     val setNeuronPropertiesAction = networkPanel.createAction(
         name = "Neuron Properties...",
@@ -389,7 +389,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         iconPath = "menu_icons/Wand.png",
         keyboardShortcut = KeyCombination('I')
     ) {
-        networkPanel.editMode = EditMode.WAND
+        networkPanel.mouseCursor = MouseEventHandler.MouseCursor.Wand
     }
 
     val panEditModeAction = networkPanel.createAction(
@@ -397,7 +397,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         description = "Pan Mode",
         iconPath = "menu_icons/Pan.png"
     ) {
-        networkPanel.editMode = EditMode.PAN
+        networkPanel.mouseCursor = MouseEventHandler.MouseCursor.Pan
         autoZoom = false
     }
 

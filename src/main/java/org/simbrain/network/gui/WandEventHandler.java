@@ -57,7 +57,7 @@ final class WandEventHandler extends PDragSequenceEventHandler {
     public WandEventHandler(NetworkPanel networkPanel) {
         super();
         boundsFilter = new BoundsFilter();
-        setEventFilter(new ZoomEventFilter());
+        setEventFilter(new WandEventFilter());
         this.networkPanel = networkPanel;
     }
 
@@ -173,23 +173,23 @@ final class WandEventHandler extends PDragSequenceEventHandler {
 
     /**
      * Selection event filter, accepts various mouse events, but only when the
-     * network panel's edit mode is <code>EditMode.WAND</code>.
+     * network panel's cursor is <code>MouseCursor.Wand</code>.
      */
-    private class ZoomEventFilter extends PInputEventFilter {
+    private class WandEventFilter extends PInputEventFilter {
 
         /**
          * Create a new selection event filter.
          */
-        public ZoomEventFilter() {
+        public WandEventFilter() {
             super(InputEvent.BUTTON1_MASK);
         }
 
         @Override
         public boolean acceptsEvent(final PInputEvent event, final int type) {
 
-            EditMode editMode = networkPanel.getEditMode();
+            MouseEventHandler.MouseCursor mouseCursor = networkPanel.getMouseCursor();
 
-            if (editMode.isWand() && super.acceptsEvent(event, type)) {
+            if (mouseCursor == MouseEventHandler.MouseCursor.Wand.INSTANCE && super.acceptsEvent(event, type)) {
                 return true;
             } else {
                 return false;

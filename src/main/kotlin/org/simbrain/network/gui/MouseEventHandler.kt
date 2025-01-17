@@ -29,18 +29,17 @@ import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PNodeFilter
 import org.simbrain.network.core.LocatableModel
 import org.simbrain.network.core.topLeftLocation
+import org.simbrain.network.gui.dialogs.NetworkPreferences.wandRadius
 import org.simbrain.network.gui.nodes.ScreenElement
-import org.simbrain.util.Utils
-import org.simbrain.util.minus
+import org.simbrain.util.*
 import org.simbrain.util.piccolo.SelectionMarquee
 import org.simbrain.util.piccolo.firstScreenElement
 import org.simbrain.util.piccolo.screenElements
-import org.simbrain.util.point
-import org.simbrain.util.rectangle
-import java.awt.Color
+import java.awt.*
 import java.awt.event.InputEvent
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
+import java.awt.image.BufferedImage
 
 class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHandler() {
 
@@ -73,8 +72,8 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         // Only handle events in selection mode
         eventFilter = object : PInputEventFilter(InputEvent.BUTTON1_MASK) {
             override fun acceptsEvent(event: PInputEvent, type: Int): Boolean {
-                val editMode = networkPanel.editMode
-                return if (editMode.isSelection || editMode.isPan && super.acceptsEvent(event, type)) {
+                val mouseCursor = networkPanel.mouseCursor
+                return if (mouseCursor == MouseCursor.Selection || mouseCursor == MouseCursor.Pan && super.acceptsEvent(event, type)) {
                     true
                 } else {
                     false
@@ -120,7 +119,7 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         marqueeEndPosition = event.position
         selectionMarquee.reset()
 
-        if (event.isPanKeyDown || networkPanel.editMode == EditMode.PAN) {
+        if (event.isPanKeyDown || networkPanel.mouseCursor == MouseCursor.Pan) {
             mode = Mode.PAN
         } else if (pickedNode is PCamera) {
             if (!event.isShiftDown) networkPanel.selectionManager.clear()
@@ -243,5 +242,40 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
 
         override fun acceptChildrenOf(node: PNode) =
             (node.childrenPickable || node is PCamera || node is PLayer) && node !is SelectionMarquee
+    }
+
+    sealed class MouseCursor {
+        val centerPoint = point(9, 9)
+        abstract val cursor: Cursor
+        object Selection : MouseCursor() {
+            override val cursor: Cursor get() = Cursor.getDefaultCursor();
+        }
+        object Wand : MouseCursor() {
+
+            override val cursor: Cursor = with(BufferedImage(wandRadius + 1, wandRadius + 1, BufferedImage.TYPE_INT_ARGB)) {
+                val g2 = graphics as Graphics2D
+
+                // Draw stroke around wand
+                val stroke = 1
+                g2.color = Color.BLACK
+                g2.stroke = BasicStroke(stroke.toFloat())
+                g2.drawOval(0, 0, wandRadius, wandRadius)
+
+                // Draw wand itself
+                // Pure yellow is (255, 255,0) but this does not look good when transparent on a white background.
+                // To get it to actually look yellow reduce the green component a bit.
+                g2.color = Color(255, 230, 0, 180)
+                g2.stroke = BasicStroke(1f)
+
+                g2.fillOval(0, 0, wandRadius, wandRadius)
+
+                val tk = Toolkit.getDefaultToolkit()
+                tk.createCustomCursor(this, centerPoint, "wand")
+            }
+        }
+        object Pan : MouseCursor() {
+            override val cursor: Cursor = Toolkit.getDefaultToolkit()
+                    .createCustomCursor(ResourceManager.getImage("menu_icons/Pan.png"), centerPoint, "pan");
+        }
     }
 }

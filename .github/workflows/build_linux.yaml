@@ -26,6 +26,8 @@ jobs:
         run: ./gradlew clean
       - name: Build with full zip
         run: ./gradlew createZip -PversionSuffix="_full" -PincludeAllPlatforms=true
+      - name: List files
+        run: ls -lah build/dist
       - name: Copy build artifacts
         run: cp build/dist/Simbrain4Beta.zip "$GITHUB_WORKSPACE"
 

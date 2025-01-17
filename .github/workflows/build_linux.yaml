@@ -27,7 +27,7 @@ jobs:
       - name: Build with full zip
         run: ./gradlew createZip -PversionSuffix="_full" -PincludeAllPlatforms=true
       - name: Copy build artifacts
-        run: cp build/dist/Simbrain*.zip $GITHUB_WORKSPACE
+        run: cp build/dist/Simbrain4Beta.zip "$GITHUB_WORKSPACE"
 
       - name: Configure AWS CLI for Cloudflare R2
         env:
@@ -43,4 +43,4 @@ jobs:
           CLOUDFLARE_R2_BUCKET: ${{ secrets.CLOUDFLARE_R2_BUCKET }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          aws s3 cp "$GITHUB_WORKSPACE"/Simbrain*.zip "s3://$CLOUDFLARE_R2_BUCKET/" --endpoint-url=https://$CLOUDFLARE_ACCOUNT_ID.r2.cloudflarestorage.com
+          aws s3 cp "$GITHUB_WORKSPACE/Simbrain4Beta.zip" "s3://$CLOUDFLARE_R2_BUCKET/" --endpoint-url=https://$CLOUDFLARE_ACCOUNT_ID.r2.cloudflarestorage.com

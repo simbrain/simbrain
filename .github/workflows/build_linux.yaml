@@ -28,11 +28,6 @@ jobs:
         run: ./gradlew createZip -PversionSuffix="_full" -PincludeAllPlatforms=true
       - name: Copy build artifacts
         run: cp build/dist/Simbrain*.zip $GITHUB_WORKSPACE
-      - name: Install AWS CLI
-        run: |
-          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-          unzip awscliv2.zip
-          sudo ./aws/install
 
       - name: Configure AWS CLI for Cloudflare R2
         env:

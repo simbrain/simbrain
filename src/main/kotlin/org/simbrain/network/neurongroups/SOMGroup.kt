@@ -19,6 +19,7 @@
 package org.simbrain.network.neurongroups
 
 import org.simbrain.network.core.InfoText
+import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.gui.dialogs.NetworkPreferences.weightRandomizer
@@ -132,6 +133,7 @@ class SOMGroup @JvmOverloads constructor(
      * the SOM neuron with highest activation. Set the activations of input
      * neurons according to the SOM weights.
      */
+    context(Network)
     override fun update() {
         winDistance = Double.POSITIVE_INFINITY
         // winner = 0;

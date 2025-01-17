@@ -1,7 +1,9 @@
 package org.simbrain.network.gui.dialogs
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.withContext
 import net.miginfocom.swing.MigLayout
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
@@ -132,6 +134,8 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
 
         title = "Train Network"
 
+        print("unsupervisedNetwork: $unsupervisedNetwork")
+
         val mainPanel = JPanel().apply {
             layout = MigLayout("gap 0px 0px, ins 0")
         }
@@ -144,14 +148,20 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
             description = "Run training algorithm",
             iconPath = "menu_icons/Play.png",
         ) {
-            with(network) { trainer.startTraining(unsupervisedNetwork) }
+            with(network) {
+                launch {
+                    trainer.startTraining(unsupervisedNetwork)
+                }
+            }
         }
         val stopAction = createAction(
             name = "Stop",
             description = "Stop training algorithm",
             iconPath = "menu_icons/Stop.png",
         ) {
-            trainer.stopTraining()
+            launch {
+                trainer.stopTraining()
+            }
         }
         runControls.add(ToggleButton(listOf(runAction, stopAction)).apply {
             setAction("Run")
@@ -171,9 +181,11 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
             iconPath = "menu_icons/Step.png",
         ) {
             with(network) {
-                trainer.events.beginTraining.fire().await()
-                trainer.trainOnce(unsupervisedNetwork)
-                trainer.events.endTraining.fire()
+                launch {
+                    trainer.events.beginTraining.fire().await()
+                    trainer.trainOnce(unsupervisedNetwork)
+                    trainer.events.endTraining.fire()
+                }
             }
         }
 

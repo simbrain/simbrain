@@ -97,7 +97,7 @@ val hopfieldSim = newSim {
             }
 
             addButton("Train") {
-                hopfield.trainOnCurrentPattern()
+                with(network) { hopfield.trainOnCurrentPattern() }
 
             }
 

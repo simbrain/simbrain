@@ -175,8 +175,13 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
     }
 
     @get:Producible(arrayDescriptionMethod = "getLabelArray")
-    override val activationArray: DoubleArray
+    @set:Consumable
+    override var activationArray: DoubleArray
         get() = activations.toDoubleArray()
+        set(value) {
+            activations.copyFrom(value, allowShapeMismatch = true)
+            events.updated.fire()
+        }
 
     var targetValues: Matrix?
         get() = targets

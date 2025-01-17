@@ -5,6 +5,7 @@ import kotlinx.coroutines.launch
 import org.intellij.lang.annotations.MagicConstant
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
+import java.util.*
 import javax.swing.AbstractAction
 import javax.swing.ActionMap
 import javax.swing.JComponent
@@ -75,7 +76,7 @@ fun JComponent.bindTo(keyCombo: KeyCombination, action: AbstractAction) {
 
 inline fun <C: JComponent> C.bind(vararg keys: String, crossinline action: C.() -> Unit) {
     val keyName = "Key ${keys.joinToString("")}"
-    keys.forEach { key -> putInputMap(KeyStroke.getKeyStroke(key.toUpperCase()), keyName) }
+    keys.forEach { key -> putInputMap(KeyStroke.getKeyStroke(key.uppercase(Locale.getDefault())), keyName) }
     putActionMap(keyName, action)
 }
 

@@ -106,7 +106,8 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork>(val network: Network, va
     init {
         // Wait for incoming tasks and ensures each one is completed before the next one begins
         launch(coroutineContext) {
-            for ((task, signal) in processorChannel) {
+            for (event in processorChannel) {
+                val (task, signal) = event
                 when (task) {
                     TrainerTask.Start -> startTrainingHandler()
                     TrainerTask.Train -> trainOnceHandler()

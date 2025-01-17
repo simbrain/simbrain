@@ -43,14 +43,13 @@ fun Matrix.copyFrom(toCopy: Matrix, allowShapeMismatch: Boolean = false) {
     }
 }
 
-fun Matrix.copyFrom(array: DoubleArray) {
-    if (array.size != nrow() * ncol()) {
+fun Matrix.copyFrom(array: DoubleArray, allowShapeMismatch: Boolean = false) {
+    if (!allowShapeMismatch && array.size != nrow() * ncol()) {
         throw IllegalArgumentException("Array of size ${array.size} does not match matrix of size ${nrow()} x ${ncol()}")
     }
-    for (i in 0 until nrow()) {
-        for (j in 0 until ncol()) {
-            set(i, j, array[i * ncol() + j])
-        }
+    val length = min(array.size, nrow() * ncol())
+    for (i in 0 until length) {
+        set(i / ncol(), i % ncol(), array[i])
     }
 }
 

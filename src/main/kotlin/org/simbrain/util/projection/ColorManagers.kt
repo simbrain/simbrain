@@ -61,6 +61,7 @@ class NoOpColoringManager: ColoringManager() {
         return null
     }
 
+    context(Projector)
     override fun getActivation(dataPoint: DataPoint): Double = 0.0
 
     override fun activate(dataPoint: DataPoint) {
@@ -143,6 +144,7 @@ class DecayColoringManager: ColoringManager() {
         return valuesToColors[colorIndex]
     }
 
+    context(Projector)
     override fun getActivation(dataPoint: DataPoint) = TODO("not implemented")
 
     override fun updateAllColors() {
@@ -290,6 +292,7 @@ class HaloColoringManager: ColoringManager() {
         return HSBInterpolate(hotColor.toHSB(), baseColor.toHSB(), t)
     }
 
+    context(Projector)
     override fun getActivation(dataPoint: DataPoint) = center?.let { target ->
         val distance = dataPoint.euclideanDistance(target)
         (distance / radius).coerceIn(0.0, 1.0)

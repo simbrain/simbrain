@@ -372,6 +372,6 @@ fun <T: AttributeContainer, U> T.getConsumer(function: KFunction2<T, U, Unit>) =
 /**
  * Find the first [Consumer] in an [AttributeContainer] which has the method name of the setter of the given property
  */
-fun <T: AttributeContainer> T.getConsumer(property: KMutableProperty0<T>) = with(SimbrainDesktop.workspace.couplingManager) {
+fun <T: AttributeContainer, U> T.getConsumer(property: KMutableProperty1<T, U>) = with(SimbrainDesktop.workspace.couplingManager) {
     getConsumer(property.setter.javaMethod?.name ?: property.setter.name)
 }

@@ -264,7 +264,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
     constructor(source: Neuron, target: Neuron) {
         this.source = source
         this.target = target
-        if (shouldAdd()) {
+        if (!this.overlapsExistingSynapse()) {
             source.addToFanOut(this)
             target.addToFanIn(this)
         }
@@ -533,6 +533,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
         _strength = 0.0
     }
 
+    context(Network)
     override fun shouldAdd(): Boolean {
         return !this.overlapsExistingSynapse()
     }

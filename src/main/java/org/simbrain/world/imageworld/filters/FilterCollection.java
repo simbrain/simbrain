@@ -76,8 +76,8 @@ public class FilterCollection {
         filters.add(unfiltered);
 
         Filter gray100x100 = new Filter(
-                "Gray 150x150",
-                imageSource, new GrayOp(), 150, 150);
+                "Gray 100x100",
+                imageSource, new GrayOp(), 100, 100);
         filters.add(gray100x100);
 
         Filter color100x100 = new Filter(

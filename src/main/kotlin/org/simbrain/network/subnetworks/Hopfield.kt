@@ -130,6 +130,7 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
      * Apply the basic Hopfield rule to the current pattern. This is not the
      * main training algorithm, which directly makes use of the input data.
      */
+    context(Network)
     override fun trainOnCurrentPattern() {
         neuronGroup.neuronList.forEach(Consumer { src: Neuron ->
             src.fanIn.forEach { s: Synapse ->

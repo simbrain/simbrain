@@ -15,7 +15,7 @@ plugins {
     `java-library`
     idea
     application
-    kotlin("jvm") version "1.9.22"
+    kotlin("jvm") version "2.1.0"
     id("ua.eshepelyuk.ManifestClasspath") version "1.0.0"
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
@@ -66,9 +66,9 @@ val excludeNatives: Action<ExternalModuleDependency> = Action {
 dependencies {
 
     // Kotlin
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.9.22")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.7.3")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:2.1.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.10.1")
 
     // Smile
     implementation(
@@ -196,8 +196,8 @@ tasks.register<JavaExec>("runSim") {
 tasks.withType<KotlinCompile>().configureEach {
     kotlinOptions {
         jvmTarget = "17"
+        languageVersion = "2.1"
         freeCompilerArgs = listOf(
-            "-Xuse-experimental=kotlin.experimental.ExperimentalTypeInference",
             "-Xjvm-default=all",
             "-Xcontext-receivers"
         )

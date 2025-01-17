@@ -6,7 +6,7 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.getModelByLabel
 import org.simbrain.network.core.getNetworkXStream
 
-class FeedForwardTest {
+class FeedForwardTestKt {
 
     val net = Network()
     val ff = FeedForward(intArrayOf(2,3,4), null).apply {

@@ -34,11 +34,8 @@ public class FilterCollection {
     public FilterCollection(ImageSource imageSource) {
         this.imageSource = imageSource;
         initializeDefaultFilters();
-        imageSource.getEvents().getResize().on(null, true, () -> {
-            filters.forEach(Filter::initScaleOp);
-        });
         imageSource.getEvents().getImageUpdate().on(null, true, () -> {
-            filters.forEach(Filter::updateFilter);
+            filters.forEach(Filter::applyFilter);
         });
     }
 
@@ -47,11 +44,8 @@ public class FilterCollection {
      */
     public Object readResolve() {
         events = new FilterCollectionEvents();
-        imageSource.getEvents().getResize().on(() -> {
-            filters.forEach(Filter::initScaleOp);
-        });
         imageSource.getEvents().getImageUpdate().on(() -> {
-            filters.forEach(Filter::updateFilter);
+            filters.forEach(Filter::applyFilter);
         });
         return this;
     }
@@ -71,7 +65,6 @@ public class FilterCollection {
         imageSource.getEvents().getResize().on(null, true, () -> {
             unfiltered.setHeight(imageSource.getCurrentImage().getHeight());
             unfiltered.setWidth(imageSource.getCurrentImage().getWidth());
-            unfiltered.initChannels();
         });
         filters.add(unfiltered);
 

@@ -63,3 +63,24 @@ class CachedObject<T>(private val init: () -> T) {
         isDirty = true
     }
 }
+
+class DependencyInvalidatingCachedObject<T>(private val init: () -> T, private val dependency: KProperty<*>) {
+
+    private var dependencyValue: Any? = dependency.getter.call()
+    private var _value: T? = null
+
+    var value: T
+        get() {
+            val dependencyValue = dependency.getter.call()
+            return if (this.dependencyValue != dependencyValue) {
+                _value = init()
+                this.dependencyValue = dependencyValue
+                _value!!
+            } else {
+                _value!!
+            }
+        }
+        set(value) {
+            _value = value
+        }
+}

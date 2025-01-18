@@ -9,9 +9,11 @@ import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import org.simbrain.world.imageworld.ImageWorldPreferences.imageDirectory
 import org.simbrain.world.imageworld.gui.FilterCollectionGui
 import java.awt.*
-import java.awt.event.*
+import java.awt.event.ActionEvent
+import java.awt.event.ItemEvent
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import java.io.File
-import java.util.*
 import javax.swing.*
 import kotlin.math.min
 
@@ -109,7 +111,7 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
 
         override fun paintComponent(g: Graphics) {
             super.paintComponent(g)
-            imageWorld.filterCollection.currentFilter.updateFilter()
+            imageWorld.filterCollection.currentFilter.applyFilter()
             g.drawImage(
                 imageWorld.filterCollection.currentFilter.filteredImage,
                 0, 0, width, height, this

@@ -4,7 +4,6 @@ import org.simbrain.custom_sims.*
 import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.util.place
-import org.simbrain.util.point
 
 /**
  * Images can be drawn in a 10x10 array and sent to a 10x10 network.
@@ -58,7 +57,7 @@ val simpleImageWorld = newSim {
     // Couple
     with(couplingManager) {
         createCoupling(
-            imageWorld.filterCollection.currentFilter.getProducer(imageWorld.filterCollection.currentFilter::getBrightness),
+            imageWorld.filterCollection.currentFilter.getProducer(imageWorld.filterCollection.currentFilter::brightness),
             inputs.getConsumer(inputs::activationArray)
         )
     }

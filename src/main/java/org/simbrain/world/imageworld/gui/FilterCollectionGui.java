@@ -88,7 +88,7 @@ public class FilterCollectionGui {
             dialogPanel.add(filterEditor);
             filterEditorDialog.addCommitTask(() -> {
                 filterEditor.commitChanges();
-                filter.refreshFilter();
+                filter.applyFilter();
                 filterComboBox.updateUI();
                 parent.repaint();
             });

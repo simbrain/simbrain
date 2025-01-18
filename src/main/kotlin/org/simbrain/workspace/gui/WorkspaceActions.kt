@@ -31,7 +31,10 @@ import org.simbrain.plot.rasterchart.RasterModel
 import org.simbrain.plot.rasterchart.RasterPlotComponent
 import org.simbrain.plot.timeseries.TimeSeriesModel
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
-import org.simbrain.util.*
+import org.simbrain.util.CmdOrCtrl
+import org.simbrain.util.KeyCombination
+import org.simbrain.util.createAction
+import org.simbrain.util.displayInDialog
 import org.simbrain.workspace.Consumer
 import org.simbrain.workspace.Producer
 import org.simbrain.workspace.WorkspaceComponent
@@ -453,7 +456,7 @@ class WorkspaceActions {
         val length = ceil(sqrt(numUnits.toDouble())).toInt()
         workspace.addWorkspaceComponent(component)
         component.world.resetImageAlbum(length, length)
-        val producer = component.world.currentFilter.getProducer(Filter::getBrightness)
+        val producer = component.world.currentFilter.getProducer(Filter::brightness)
         with(workspace.couplingManager) {
             producer couple consumer
         }

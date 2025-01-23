@@ -1,18 +1,21 @@
 package org.simbrain.custom_sims.simulations
 
-import org.simbrain.custom_sims.addDocViewer
-import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.createControlPanel
-import org.simbrain.custom_sims.newSim
+import org.simbrain.custom_sims.*
+import org.simbrain.custom_sims.simulations.hebb.*
 import org.simbrain.network.core.activations
+import org.simbrain.network.learningrules.HebbianRule
 import org.simbrain.network.subnetworks.Hopfield
 import org.simbrain.util.place
+import org.simbrain.util.randomizeSymmetric
+import org.simbrain.util.showNumericInputDialog
 
 /**
- * Demo for studying Hopfield networks,
+ * Demo for studying discrete Hopfield networks,
  */
 
 val hopfieldSim = newSim {
+
+    val numNeurons = showNumericInputDialog(message = "Number of neurons", initValue = 100) ?: return@newSim
 
     // Basic setup
     workspace.clearWorkspace()
@@ -20,7 +23,7 @@ val hopfieldSim = newSim {
     val network = networkComponent.network
 
     // Hopfield network
-    val hopfield = Hopfield(64)
+    val hopfield = Hopfield(numNeurons)
     network.addNetworkModel(hopfield)
 
     // Text to potentially integrate
@@ -28,8 +31,7 @@ val hopfieldSim = newSim {
     // The model learns the pattern and “remembers” it. When randomizing the network (by clicking “N” [Neuron], “R” [Randomize], and “Space” [Iterate], or using “I” [Wand Mode] over the nodes), the network adjusts the nodes on each iteration to reconfigure the inputted pattern.
     // The Network remembers the pattern and the antipattern, and when iterating (“Space”), it iterates to recreate the pattern with the most similar nodes.
     // You can get the pattern to memorize all the different patterns and antipatterns by training each one, randomizing and iterating to see if it is remembered, and training that pattern again if it needs to be learned.
-    val docViewer = addDocViewer(
-        "Information",
+    addSidebarInfo(
         """ 
             # Introduction
             
@@ -55,52 +57,55 @@ val hopfieldSim = newSim {
         """.trimIndent()
     )
 
+
     withGui {
-        place(docViewer, 0, 0, 450, 619)
-        place(networkComponent, 604, 0, 509, 619)
-        createControlPanel("Control Panel", 470, 0) {
+        place(networkComponent, 228, 0, 509, 619)
 
-            addButton("Pattern 1") {
-                hopfield.neuronGroup.neuronList.activations =
-                    listOf(1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0)
+        var numTrainIterations = 1
+        fun trainingMode() {
+            hopfield.neuronGroup.isAllClamped = true
+            hopfield.synapseGroup.synapses.forEach{it.clamped = true}
+        }
+        fun retrievalMode() {
+            hopfield.neuronGroup.isAllClamped = false
+            hopfield.synapseGroup.synapses.forEach{it.clamped = false}
+        }
 
+        createPatternControlPanel(hopfield.neuronGroup, false)?.apply {
+            addTextField("Training iterations", "" + numTrainIterations) {
+                it.toIntOrNull()?.let { num ->
+                    numTrainIterations = num
+                }
             }
-
-            addButton("Pattern 2") {
-                hopfield.neuronGroup.neuronList.activations =
-                    listOf(1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0)
-
+            addButton("Train On All Patterns") {
+                with(network) {
+                    hopfield.randomize()
+                    trainingMode()
+                    repeat(numTrainIterations) {
+                        applyCirclePattern(hopfield.neuronGroup.neuronList)
+                        hopfield.trainOnCurrentPattern()
+                        applySquarePattern(hopfield.neuronGroup.neuronList)
+                        hopfield.trainOnCurrentPattern()
+                        applyLinePattern(hopfield.neuronGroup.neuronList, "diagonal")
+                        hopfield.trainOnCurrentPattern()
+                        applyCrossPattern(hopfield.neuronGroup.neuronList)
+                        hopfield.trainOnCurrentPattern()
+                    }
+                    // Dump into retrieval mode for easy testing
+                    retrievalMode()
+                }
             }
-
-            addButton("Pattern 3") {
-                hopfield.neuronGroup.neuronList.activations =
-                    listOf(1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0)
-
-            }
-
-            addButton("Pattern 4") {
-                hopfield.neuronGroup.neuronList.activations =
-                    listOf(0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 0.0, 1.0, 1.0, 0.0)
-
-            }
-
-            addButton("Pattern 5") {
-                hopfield.neuronGroup.neuronList.activations =
-                    listOf(1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0)
-
-            }
-
-            addButton("Pattern 6") {
-                hopfield.neuronGroup.neuronList.activations =
-                    listOf(0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0)
-
-            }
-
-            addButton("Train") {
+            addSeparator()
+            addButton("Train on current pattern") {
                 with(network) { hopfield.trainOnCurrentPattern() }
-
             }
-
+            addSeparator()
+            addButton("Training Mode") {
+                trainingMode()
+            }
+            addButton("Retrieval Mode") {
+                retrievalMode()
+            }
         }
     }
 

@@ -52,6 +52,9 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
     @UserParameter(label = "Update function")
     var updateFunc = HopfieldUpdate.STOCHASTIC
 
+    @UserParameter(label = "Learning rate")
+    var learningRate = .01
+
     override lateinit var customInfo: InfoText
 
     constructor(numNeurons: Int): super() {
@@ -126,16 +129,12 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
         return if (inputVal == 0.0) -1.0 else inputVal
     }
 
-    /**
-     * Apply the basic Hopfield rule to the current pattern. This is not the
-     * main training algorithm, which directly makes use of the input data.
-     */
     context(Network)
     override fun trainOnCurrentPattern() {
         neuronGroup.neuronList.forEach(Consumer { src: Neuron ->
             src.fanIn.forEach { s: Synapse ->
                 val tar = s.source
-                val deltaW = bipolar(src.activation) * bipolar(tar.activation)
+                val deltaW = learningRate * bipolar(src.activation) * bipolar(tar.activation)
                 s.strength += deltaW
             }
         })

@@ -1,9 +1,6 @@
 package org.simbrain.custom_sims.simulations
 
-import org.simbrain.custom_sims.addDocViewer
-import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.createControlPanel
-import org.simbrain.custom_sims.newSim
+import org.simbrain.custom_sims.*
 import org.simbrain.network.subnetworks.RestrictedBoltzmannMachine
 import org.simbrain.util.place
 import org.simbrain.util.plus
@@ -40,8 +37,7 @@ val rbmSim = newSim {
     // Set training set of rbm to these inputs
     rbm.inputData = Matrix.of(arrayOf(input1, input2, input3, input4, input5, input6))
 
-    val docViewer = addDocViewer(
-        "Information",
+    addSidebarInfo(
         """ 
             # Introduction
             
@@ -61,9 +57,8 @@ val rbmSim = newSim {
     )
 
     withGui {
-        place(docViewer, 0, 0, 464, 619)
-        place(networkComponent, 548, 0, 815, 619)
-        createControlPanel("Control Panel", 404, 0) {
+        place(networkComponent, 141, 0, 815, 619)
+        createControlPanel("Control Panel", 0, 0) {
             addButton("Pattern 1") {
                 rbm.visibleLayer.activations = input1.toMatrix()
             }

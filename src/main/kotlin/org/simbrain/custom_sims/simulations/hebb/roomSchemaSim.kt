@@ -5,10 +5,6 @@ import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.network.core.labels
 import org.simbrain.network.subnetworks.RestrictedBoltzmannMachine
-import org.simbrain.network.util.Alignment
-import org.simbrain.network.util.Direction
-import org.simbrain.network.util.alignNetworkModels
-import org.simbrain.network.util.offsetNetworkModel
 import org.simbrain.util.place
 import org.simbrain.util.runWithProgressWindow
 import org.simbrain.util.toDoubleArray

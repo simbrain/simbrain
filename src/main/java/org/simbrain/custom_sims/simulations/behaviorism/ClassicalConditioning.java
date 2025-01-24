@@ -130,6 +130,11 @@ public class ClassicalConditioning extends Simulation {
             }
         }));
 
+        sim.addSidebarInfo("""
+            # Introduction
+            Todo
+                                  
+            """, true);
     }
 
     @Override

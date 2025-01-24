@@ -74,12 +74,12 @@ public class SimpleOperant extends Simulation {
             // Select "winning" neuron based on its probability
             // TODO: There must be a better, generalizable way to do this
             double random = Math.random();
-            if(random < behaviorNet.getNeuron(0).getAuxValue()){
+            if (random < behaviorNet.getNeuron(0).getAuxValue()) {
                 setWinningNode(0);
-            } else if(random < behaviorNet.getNeuron(0).getAuxValue()
+            } else if (random < behaviorNet.getNeuron(0).getAuxValue()
                     + behaviorNet.getNeuron(1).getAuxValue()) {
                 setWinningNode(1);
-            } else{
+            } else {
                 setWinningNode(2);
             }
 
@@ -101,12 +101,12 @@ public class SimpleOperant extends Simulation {
 
     private void setUpControlPanel() {
 
-        panel = ControlPanel.makePanel(sim, "Control Panel", 5,9,190,150);
+        panel = ControlPanel.makePanel(sim, "Control Panel", 5, 9, 190, 150);
 
         panel.addButton("Reward Agent", () -> {
 
-            for(Neuron n : behaviorNet.getNeuronList()) {
-                if(n.getActivation() > 0){
+            for (Neuron n : behaviorNet.getNeuronList()) {
+                if (n.getActivation() > 0) {
                     double p = n.getAuxValue();
                     n.setAuxValue(Math.max(p + .1 * p, 0));
                 }
@@ -117,8 +117,8 @@ public class SimpleOperant extends Simulation {
         });
 
         panel.addButton("Punish Agent", () -> {
-            for(Neuron n : behaviorNet.getNeuronList()) {
-                if(n.getActivation() > 0){
+            for (Neuron n : behaviorNet.getNeuronList()) {
+                if (n.getActivation() > 0) {
                     double p = n.getAuxValue();
                     n.setAuxValue(Math.max(p - .1 * p, 0));
                 }
@@ -128,22 +128,29 @@ public class SimpleOperant extends Simulation {
             sim.iterate();
         });
 
+        sim.addSidebarInfo(
+            """
+            # Introduction
+            Todo
+                              
+            """, true);
+
     }
 
     private void normalizeProbabilities() {
         double totalMass = 0;
-        for(Neuron n : behaviorNet.getNeuronList()) {
+        for (Neuron n : behaviorNet.getNeuronList()) {
             totalMass += n.getAuxValue();
         }
-        for(Neuron n : behaviorNet.getNeuronList()) {
-            n.setAuxValue(n.getAuxValue() /totalMass);
+        for (Neuron n : behaviorNet.getNeuronList()) {
+            n.setAuxValue(n.getAuxValue() / totalMass);
         }
     }
 
     private void updateNodeLabels() {
-        for(Neuron n : behaviorNet.getNeuronList()) {
+        for (Neuron n : behaviorNet.getNeuronList()) {
             n.setLabel(nodeToLabel.get(n) + ": "
-                + SimbrainMath.roundDouble(n.getAuxValue(), 2));
+                    + SimbrainMath.roundDouble(n.getAuxValue(), 2));
         }
     }
 
@@ -153,7 +160,8 @@ public class SimpleOperant extends Simulation {
     }
 
     @Override
-    public SimpleOperant instantiate(SimbrainDesktop desktop) { return new SimpleOperant(desktop);
+    public SimpleOperant instantiate(SimbrainDesktop desktop) {
+        return new SimpleOperant(desktop);
     }
 
 }

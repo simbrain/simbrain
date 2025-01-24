@@ -39,9 +39,9 @@ public class EdgeOfChaos extends Simulation {
     static int GRID_SPACE = 25;
     //  For 120 neurons: .01,.1, and > .4
     private double variance = .1;
-    private int K = 4; // in-degree (num connections to each neuron)
+    private final int K = 4; // in-degree (num connections to each neuron)
 
-    private long seed = 42L;
+    private final long seed = 42L;
 
     Network net;
     SynapseGroup sgReservoir, cheeseToRes, flowersToRes;
@@ -64,7 +64,6 @@ public class EdgeOfChaos extends Simulation {
         ProjectionComponent pc = sim.addProjectionPlot(592, 248, 413, 372, "PCA");
         sim.couple(reservoir, pc);
 
-        // DocViewer
         sim.addSidebarInfo(
 """
         # Introduction

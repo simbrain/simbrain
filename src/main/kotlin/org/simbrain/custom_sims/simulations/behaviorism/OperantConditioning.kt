@@ -2,6 +2,7 @@ package org.simbrain.custom_sims.simulations.behaviorism
 
 import kotlinx.coroutines.runBlocking
 import org.simbrain.custom_sims.Simulation
+import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.helper_classes.ControlPanel
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.*
@@ -110,6 +111,7 @@ class OperantConditioning : Simulation {
         net.updateManager.addAction(create("Custom behaviorism update") { this.updateNetwork() })
 
         setUpControlPanel()
+
     }
 
     private fun updateNetwork() {

@@ -6,7 +6,9 @@ import org.simbrain.network.desktop.NetworkDesktopComponent
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.neurongroups.getWinner
 import org.simbrain.util.*
+import org.simbrain.util.piccolo.TileMap
 import org.simbrain.workspace.updater.updateAction
+import org.simbrain.world.odorworld.OdorWorldDesktopComponent
 import org.simbrain.world.odorworld.entities.EntityType
 import kotlin.math.max
 import kotlin.random.Random
@@ -55,6 +57,7 @@ val operantWithEnvironment = newSim {
 
     val odorWorldComponent = addOdorWorldComponent("Three Objects")
     val odorWorld = odorWorldComponent.world.apply {
+        tileMap = TileMap(12, 12)
         isObjectsBlockMovement = false
         isUseCameraCentering = false
     }
@@ -66,10 +69,14 @@ val operantWithEnvironment = newSim {
     val cheese = odorWorld.addEntity(27, 50, EntityType.CANDLE)
     val flower = odorWorld.addEntity(79, 50, EntityType.PANSY)
     val fish = odorWorld.addEntity(125, 50, EntityType.FISH)
+    odorWorld.addEntity(cheese)
+    odorWorld.addEntity(flower)
+    odorWorld.addEntity(fish)
 
     val cheeseSensor = mouse.addObjectSensor(EntityType.SWISS, 50.0, 0.0, 65.0)
     val flowerSensor = mouse.addObjectSensor(EntityType.PANSY, 50.0, 0.0, 65.0)
     val fishSensor = mouse.addObjectSensor(EntityType.FISH, 50.0, 0.0, 65.0)
+
 
     fun updateBehaviorNetNeuronLabels() {
         behaviorNet.neuronList.forEach {
@@ -140,11 +147,12 @@ val operantWithEnvironment = newSim {
     updateBehaviorNetNeuronLabels()
 
     withGui {
+        place(networkComponent, 155, 9, 575, 500)
         (getDesktopComponent(networkComponent) as NetworkDesktopComponent)
             .networkPanel.selectionManager.clear()
 
-        place(networkComponent, 155, 9, 575, 500)
         place(odorWorldComponent, 730, 7, 315, 383)
+        (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).worldPanel.scalingFactor = .5
 
         createControlPanel("Control Panel", 5, 10) {
 
@@ -203,5 +211,12 @@ val operantWithEnvironment = newSim {
 
         }
     }
+
+    addSidebarInfo(
+        """
+        # Operant with Environment
+                
+        """.trimIndent()
+    )
 
 }

@@ -30,14 +30,16 @@ val tinyLanguageModel = newSim {
 
     val tokenEmbedding = TokenEmbeddingBuilder().apply {
         embeddingType = EmbeddingType.ONE_HOT
-        tokenizePunctuation = true
+        tokenizer = options.tokenizer
     }.build(trainingText)
+
+    val tokenizer by tokenEmbedding::tokenizer
 
     // Network
     val networkComponent = addNetworkComponent("Network")
     val network = networkComponent.network
 
-    val tokenizedTrainingText = trainingText.simpleTokenizer(options.useSpaces, options.tokenizePunctuation)
+    val tokenizedTrainingText = tokenizer.tokenize(trainingText).map { it.token }
     val corpus = tokenizedTrainingText.windowed(min(tokenizedTrainingText.size, contextSize)).flatMap { window ->
         // window along the tokens if the context size is not big enough to cover the entire token list
         generateAutoregressivePairs(window)
@@ -45,8 +47,10 @@ val tinyLanguageModel = newSim {
 
     // Text World for Inputs
     val textWorldComponent = addTextWorld("Text World (Inputs)")
-    textWorldComponent.world.text = tokenizedTrainingText.take(contextSize).joinToString(if (options.useSpaces) "" else " ")
     textWorldComponent.world.tokenEmbedding = tokenEmbedding
+    textWorldComponent.world.text = tokenizer.joinTokens(tokenizedTrainingText.take(contextSize))
+    textWorldComponent.world.highlightCurrentToken = false
+    textWorldComponent.world.autoAdvance = false
 
     val tokenizedCorpus = corpus.map { (context, target) ->
         context.map { tokenEmbedding.get(it) } to tokenEmbedding.get(target)
@@ -106,10 +110,11 @@ val tinyLanguageModel = newSim {
     workspace.addUpdateAction("Predict Next Word") {
         val nextWord = tokenEmbedding.getClosestWord(backpropNetwork.outputLayer.activationArray)
         // update text with predicted word and remove first word so that the context window maintains its size
-        textWorldComponent.world.text = textWorldComponent.world.text.simpleTokenizer(useSpaces = options.useSpaces, usePunctuation = options.tokenizePunctuation)
+        textWorldComponent.world.text = textWorldComponent.world.text.tokenize(tokenizer)
+            .map { it.token }
             .plus(nextWord)
             .takeLast(contextSize)
-            .joinToString(if (options.useSpaces) "" else " ")
+            .tokensToString(tokenizer)
     }
 
     withGui {

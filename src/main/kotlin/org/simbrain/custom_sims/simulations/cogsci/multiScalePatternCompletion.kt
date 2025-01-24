@@ -175,9 +175,9 @@ val allostaticPatternCompletion = newSim {
 
 
     network.updateManager.addAction(0, updateAction("Set inputs") {
-        var word = textWorld.world.currentItem?.text
+        var word = textWorld.world.currentToken
         if (!word.equals("END")) {
-            word = word?.dropLast(2)
+            word = word.dropLast(2)
         }
         inputs.activationArray = (inputEncodings[word] ?: zeroInput)
         spikes = with(network) {

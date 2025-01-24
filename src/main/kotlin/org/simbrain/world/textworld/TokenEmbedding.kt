@@ -4,6 +4,7 @@ import org.simbrain.util.*
 import org.simbrain.util.projection.DataPoint
 import org.simbrain.util.projection.KDTree
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.table.BasicDataFrame
 import org.simbrain.util.table.SimbrainTablePanel
 import org.simbrain.util.table.createFromDoubleArray
@@ -25,8 +26,9 @@ import smile.math.matrix.Matrix
  */
 class TokenEmbedding(
     inputTokenList: List<String>,
+    val tokenizer: Tokenizer<*>,
     var tokenVectorMatrix: Matrix,
-    var trainingDocument: String? = null
+    var trainingDocument: String? = null,
 ) {
 
     val tokens = inputTokenList.map { it.lowercase() }
@@ -134,14 +136,11 @@ class TokenEmbeddingBuilder(): EditableObject {
     @UserParameter(label = "Remove stopwords", order = 60 )
     var removeStopWords = false
 
-    @UserParameter(label = "If true, keep punctuation marks and add them as tokens", order = 70 )
-    var tokenizePunctuation = false
-
-    @UserParameter(label = "If true, use spaces, tabs, and newlines as distinct tokens", order = 80 )
-    var useSpaces = false
-
-    @UserParameter(label = "If true, use newlines as tokens", order = 90 )
-    var useReturns = false
+    var tokenizer by GuiEditable(
+        initValue = SimpleTokenizer() as Tokenizer<*>,
+        description = "Options for tokenizing text",
+        order = 70
+    )
 
     override val name: String
         get() = "Token Embedding Builder"
@@ -151,17 +150,11 @@ class TokenEmbeddingBuilder(): EditableObject {
      */
     fun build(docString: String) = when (embeddingType) {
         EmbeddingType.ONE_HOT -> {
-            val tokens = docString.let { doc ->
-                if (tokenizePunctuation || useSpaces || useReturns) {
-                    doc.simpleTokenizer(useSpaces = useSpaces, useReturns = useReturns, usePunctuation = tokenizePunctuation)
-                } else {
-                    doc.tokenizeWordsFromString()
-                }
-            }.uniqueTokensFromArray()
-            TokenEmbedding(tokens, Matrix.eye(tokens.size), docString)
+            val tokens = tokenizer.tokenize(docString).map { it.token }.uniqueTokensFromArray()
+            TokenEmbedding(tokens, tokenizer, Matrix.eye(tokens.size), docString)
         }
         EmbeddingType.COC -> {
-            generateCooccurrenceMatrix(docString, windowSize, bidirectional, usePPMI, removeStopWords)
+            generateCooccurrenceMatrix(docString, tokenizer, windowSize, bidirectional, usePPMI, removeStopWords)
         }
         else -> {
             throw IllegalStateException("Custom embeddings must be manually loaded")
@@ -177,7 +170,8 @@ fun main() {
             doubleArrayOf(4.0, 5.0, 6.0),
         )
     )
-    textworld.tokenEmbedding = TokenEmbedding(listOf("Word 1", "Word 2"), embeddings)
+    val tokenizer = SimpleTokenizer()
+    textworld.tokenEmbedding = TokenEmbedding(listOf("Word 1", "Word 2"), tokenizer, embeddings)
     val viewer = SimbrainTablePanel(textworld.tokenEmbedding.createTableModel())
     viewer.displayInDialog()
 }

@@ -19,15 +19,18 @@
 package org.simbrain.world.textworld
 
 import kotlinx.coroutines.runBlocking
+import org.simbrain.util.DependenciesInvalidatingCachedObject
+import org.simbrain.util.SimpleTokenizer
+import org.simbrain.util.TokenizerResult
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
-import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
 import smile.math.matrix.Matrix
 import java.awt.Color
-import java.util.regex.Pattern
+import kotlin.math.max
+import kotlin.math.min
 
 /**
  * TextWorld is an environment for modeling speech and reading and other linguistic phenomena and their interactions
@@ -53,10 +56,12 @@ class TextWorld : AttributeContainer, EditableObject {
      */
     var tokenEmbedding = TokenEmbedding(
         inputTokenList = listOf("Dog", "Cat", "Hello", "how", "are", "you"),
+        tokenizer = SimpleTokenizer(),
         tokenVectorMatrix = Matrix.eye(6)
     )
         set(value) {
             field = value
+            tokenizer = value.tokenizer
             events.tokenVectorMapChanged.fire()
         }
 
@@ -64,6 +69,10 @@ class TextWorld : AttributeContainer, EditableObject {
      * Private backing for [text] field.
      */
     private var _text = ""
+        set(value) {
+            field = value
+            position = min(position, value.length)
+        }
 
     /**
      * The main "world text" associated with this world (which displays in the main window).
@@ -72,23 +81,56 @@ class TextWorld : AttributeContainer, EditableObject {
         get() = _text
         set(value) {
             _text = value
-            events.textChanged.fire()
+            events.textChanged.fireAndBlock()
         }
+
+    @UserParameter(
+        label = "Tokenizer",
+        description = "The tokenizer to use for parsing text.",
+        order = 5
+    )
+    var tokenizer = tokenEmbedding.tokenizer
+
+    var tokens by DependenciesInvalidatingCachedObject(::text, ::tokenEmbedding, ::tokenizer) {
+        tokenizer.tokenize(text)
+    }
+
+    var currentTokenIndex = 0
+        get() {
+            field = field.coerceIn(0, max(tokens.lastIndex, 0))
+            return field
+        }
+        set(value) {
+            field = value
+            events.currentTokenChanged.fireAndBlock(tokens[value])
+        }
+
+    @UserParameter(
+        label = "Auto advance",
+        description = "If true, automatically advance to the next token.",
+        order = 2
+    )
+    var autoAdvance = true
+
+    @UserParameter(
+        label = "Highlight current token",
+        description = "If true, highlight the current token.",
+        order = 3
+    )
+    var highlightCurrentToken = true
+
+    @UserParameter(
+        label = "Show token boundaries",
+        description = "If true, draw a rectangle around each token.",
+        order = 4
+    )
+    var showTokenBoundaries = true
 
     /**
      * Set main text without firing an event.
      */
     fun setTextNoEvent(newText: String) {
         _text = newText
-    }
-
-    @Transient
-    var currentItem: TextItem? = null
-        private set
-
-    suspend fun setCurrentItem(textItem: TextItem?) {
-        currentItem = textItem
-        events.currentTokenChanged.fire(textItem).await()
     }
 
     /**
@@ -109,34 +151,7 @@ class TextWorld : AttributeContainer, EditableObject {
     /**
      * The current text item.
      */
-    @Transient
-    private var currentTextItem: TextItem? = null
-
-    /**
-     * List of parsing style.
-     */
-    enum class ParseStyle {
-        CHARACTER, WORD
-    }
-
-    /**
-     * The current parsing style.
-     */
-    @UserParameter(label = "Parse Style", description = "The current parsing style.", order = 1)
-    var parseStyle = ParseStyle.WORD
-
-    var regularExpression by GuiEditable(
-        initValue = "(\\w+)",
-        description = "Regular expression used to select tokens",
-        order = 2,
-        onUpdate = {
-            enableWidget(widgetValue(TextWorld::parseStyle) == ParseStyle.WORD)
-       },
-        setter = {
-            field = it
-            pattern = Pattern.compile(it)
-        }
-    )
+    private val currentTextItem: TokenizerResult get() = tokens[currentTokenIndex]
 
     @UserParameter(
         label = "Stop at end",
@@ -144,12 +159,6 @@ class TextWorld : AttributeContainer, EditableObject {
         order = 3
     )
     var stopAtEnd: Boolean = false
-
-    /**
-     * Regular expression pattern. By default search for whole words
-     */
-    private var pattern: Pattern = Pattern.compile(regularExpression)
-    // TODO: Document other good choices in the pref dialog. e.g. (\\w+)
 
     @Transient
     var events = TextWorldEvents()
@@ -163,14 +172,7 @@ class TextWorld : AttributeContainer, EditableObject {
      */
     @get:Producible
     val currentVector: DoubleArray
-        get() = currentItem.let {
-            if (it == null) {
-                // Zero vector if no current item
-                DoubleArray(tokenEmbedding.dimension)
-            } else {
-                tokenEmbedding.get(it.text)
-            }
-        }
+        get() = tokens[currentTokenIndex].token.let { tokenEmbedding.get(it) }
 
     /**
      * Display the string associated with the closest matching vector in the embedding
@@ -185,73 +187,20 @@ class TextWorld : AttributeContainer, EditableObject {
      * Advance the position in the text, and update the current item.
      */
     suspend fun update() {
-        if (parseStyle == ParseStyle.CHARACTER) {
-            wrapText()
-            val begin = position
-            val end = position + 1
-            setCurrentItem(TextItem(begin, end, text.substring(begin, end)))
-            position = end
-        } else if (parseStyle == ParseStyle.WORD) {
-            wrapText()
-            val matchFound = findNextToken()
-            if (matchFound) {
-                selectCurrentToken()
-            } else {
-                // No match found. Go back to the beginning of the text area
-                // and select the first token found
-                position = 0
-                // Having wrapped to the beginning select the next token, if
-                // there is one.
-                if (findNextToken()) {
-                    selectCurrentToken()
-                }
-            }
+        if (autoAdvance) {
+            advance()
         }
-        if (atEnd()) {
+    }
+
+    fun advance() {
+        if (currentTokenIndex < tokens.size - 1) {
+            currentTokenIndex++
+        } else {
             events.atEnd.fire()
+            currentTokenIndex = 0
         }
+        position = tokens[currentTokenIndex].end
     }
-
-    /**
-     * Find the next token in the text area.
-     *
-     * @return true if some token is found, false otherwise.
-     */
-    private fun findNextToken(): Boolean {
-        val result = regularExpression.toRegex().find(text, position)
-        val foundToken = result != null
-        currentTextItem = result?.let {
-            TextItem(it.range.first, it.range.last + 1, it.value)
-        }
-        return foundToken
-    }
-
-    /**
-     * Select the current token.
-     */
-    private suspend fun selectCurrentToken() {
-        setCurrentItem(currentTextItem)
-        position = currentTextItem!!.endPosition
-    }
-
-    /**
-     * If the position is at the end of the text area, "reset" the position to
-     * 0.
-     */
-    private fun wrapText() {
-        if (atEnd()) {
-            position = 0
-        }
-    }
-
-    /**
-     * @return true if the current position is past the end of the text area,
-     * false otherwise.
-     */
-    private fun atEnd(): Boolean {
-        return position >= text.length
-    }
-
 
     /**
      * Add a text to the end of the world text.
@@ -259,7 +208,8 @@ class TextWorld : AttributeContainer, EditableObject {
     @Consumable
     fun addTextAtCursor(newText: String) {
         text = StringBuilder(text).insert(position, " $newText ").toString()
-        events.textChanged.fire()
+        position += newText.length + 1
+        events.textChanged.fireAndBlock()
     }
 
     /**
@@ -269,7 +219,10 @@ class TextWorld : AttributeContainer, EditableObject {
     fun addTextAtEnd(newText: String, spacing: String = " ") {
         text += "$spacing$newText"
         runBlocking {
+            position = text.length
+            events.cursorPositionChanged.fire().await()
             events.textChanged.fire().await()
+            events.currentTokenChanged.fire(tokens[tokens.lastIndex]).await()
         }
     }
 
@@ -281,7 +234,7 @@ class TextWorld : AttributeContainer, EditableObject {
      */
     @get:Producible
     val currentToken: String
-        get() = currentItem.let { it?.text ?: "" }
+        get() = tokens[currentTokenIndex].token
 
     fun setPosition(newPosition: Int, fireEvent: Boolean) {
         if (newPosition <= text.length) {
@@ -320,30 +273,6 @@ class TextWorld : AttributeContainer, EditableObject {
 
     override val id = "Text World"
 
-    /**
-     * Represents the "current item" as String, and includes a representation of
-     * the beginning and ending of the item in the main text.
-     */
-    inner class TextItem(
-
-        /**
-         * Initial position in main text.
-         */
-        val beginPosition: Int,
-        /**
-         * Final position in main text.
-         */
-        val endPosition: Int,
-        /**
-         * The item text.
-         */
-        val text: String
-    ) {
-
-        override fun toString(): String {
-            return "($beginPosition,$endPosition) $text"
-        }
-    }
 }
 
 

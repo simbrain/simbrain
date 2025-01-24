@@ -64,23 +64,27 @@ class CachedObject<T>(private val init: () -> T) {
     }
 }
 
-class DependencyInvalidatingCachedObject<T>(private val init: () -> T, private val dependency: KProperty<*>) {
+/**
+ * When dependencies change, the next time the value is accessed, it will be recalculated by calling the init function.
+ * Not intended for high performance use cases.
+ */
+class DependenciesInvalidatingCachedObject<T>(private vararg val dependencies: KProperty<*>, private val init: () -> T) {
 
-    private var dependencyValue: Any? = dependency.getter.call()
+    private var dependencyValues: List<Any?> = dependencies.map { it.getter.call() }
     private var _value: T? = null
 
-    var value: T
-        get() {
-            val dependencyValue = dependency.getter.call()
-            return if (this.dependencyValue != dependencyValue) {
-                _value = init()
-                this.dependencyValue = dependencyValue
-                _value!!
-            } else {
-                _value!!
-            }
+    operator fun getValue(baseObject: Any, property: KProperty<*>): T {
+        val dependencyValue = dependencies.map { it.getter.call() }
+        return if (this.dependencyValues.zip(dependencyValue).any { (a, b) -> a != b }) {
+            _value = init()
+            this.dependencyValues = dependencyValue
+            _value!!
+        } else {
+            _value!!
         }
-        set(value) {
-            _value = value
-        }
+    }
+
+    operator fun setValue(baseObject: Any, property: KProperty<*>, value: T) {
+        _value = value
+    }
 }

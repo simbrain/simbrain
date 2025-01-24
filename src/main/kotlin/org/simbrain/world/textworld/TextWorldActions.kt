@@ -4,7 +4,6 @@ import org.simbrain.util.*
 import org.simbrain.world.textworld.gui.TextWorldDesktopComponent
 import org.simbrain.world.textworld.gui.TokenEmbeddingDialog
 import org.simbrain.world.textworld.gui.showComparisonDialog
-import java.util.*
 
 /**
  * Action for loading a token embedding, by finding every distinct word and
@@ -75,7 +74,9 @@ val TextWorld.textWorldPrefs
         name = "Show preferences...",
         iconPath = "menu_icons/Prefs.png"
     ) {
-        createEditorDialog {}.also {
+        createEditorDialog {
+            events.preferencesChanged.fire()
+        }.also {
             it.title = "Text World Preferences"
         }.display()
     }

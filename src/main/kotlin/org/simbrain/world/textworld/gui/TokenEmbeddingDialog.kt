@@ -4,7 +4,6 @@ import org.simbrain.util.StandardDialog
 import org.simbrain.util.createAction
 import org.simbrain.util.showMessageDialog
 import org.simbrain.util.table.*
-import org.simbrain.util.toMatrix
 import org.simbrain.world.textworld.TokenEmbedding
 import org.simbrain.world.textworld.createExtractEmbeddingAction
 
@@ -29,12 +28,15 @@ class TokenEmbeddingDialog(val initialTokenEmbedding: TokenEmbedding, updateToke
         isEnabled = false
     }
 
+    var updatedTokenEmbedding: TokenEmbedding? = null
+
     val tablePanel = SimbrainTablePanel(initialTokenEmbedding.createTableModel(), useDefaultToolbarAndMenu = false).apply {
         addAction(createExtractEmbeddingAction {
             (table.model as BasicDataFrame).data = it.createTableModel().data
             table.model.rowNames = it.tokens
             trainingDocument = it.trainingDocument
             table.model.fireTableStructureChanged()
+            updatedTokenEmbedding = it
         })
         addAction(viewWordEmbeddingSourceAction)
         addSeparator()
@@ -56,13 +58,7 @@ class TokenEmbeddingDialog(val initialTokenEmbedding: TokenEmbedding, updateToke
         title = "Word Embedding Editor"
         trainingDocument = initialTokenEmbedding.trainingDocument
         addCommitTask {
-            updateTokenEmbedding(
-                TokenEmbedding(
-                    tablePanel.table.model.rowNames as List<String>,
-                    tablePanel.table.model.get2DDoubleArray().toMatrix(),
-                    trainingDocument
-                )
-            )
+            updateTokenEmbedding(updatedTokenEmbedding ?: initialTokenEmbedding)
         }
     }
 

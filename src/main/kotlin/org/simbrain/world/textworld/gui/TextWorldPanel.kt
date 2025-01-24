@@ -20,20 +20,28 @@ package org.simbrain.world.textworld.gui
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
+import org.simbrain.util.TokenizerResult
 import org.simbrain.util.widgets.SimbrainTextArea
-import org.simbrain.world.textworld.*
-import java.awt.BorderLayout
-import java.awt.Color
-import java.awt.Dimension
-import java.awt.FlowLayout
-import java.awt.event.*
-import javax.swing.*
+import org.simbrain.world.textworld.TextWorld
+import org.simbrain.world.textworld.textWorldPrefs
+import org.simbrain.world.textworld.viewTokenEmbedding
+import java.awt.*
+import java.awt.event.ComponentAdapter
+import java.awt.event.ComponentEvent
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
+import javax.swing.BorderFactory
+import javax.swing.JPanel
+import javax.swing.JScrollPane
+import javax.swing.JToolBar
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import javax.swing.text.BadLocationException
 import javax.swing.text.DefaultHighlighter.DefaultHighlightPainter
 import javax.swing.text.Highlighter
 import javax.swing.text.JTextComponent
+import javax.swing.text.View
+
 
 /**
  * Display panel for reading data from user and showing text world's state.
@@ -53,22 +61,6 @@ class TextWorldPanel constructor(
      * The main scroll panel.
      */
     val inputScrollPane: JScrollPane
-
-    /**
-     * Displays the current parse style and allows it to be set.
-     */
-    private val parseStyle = ButtonGroup()
-
-    /**
-     * Parse style is word-based.
-     */
-    private val wordButton = JRadioButton("Word")
-
-    /**
-     * Parse style is character based.
-     */
-    private val charButton = JRadioButton("Character")
-
 
     /**
      * Initialize the panel with an open / close toolbar.
@@ -96,22 +88,8 @@ class TextWorldPanel constructor(
         val bottomToolbarPanel = JPanel()
         bottomToolbarPanel.layout = FlowLayout(FlowLayout.LEFT)
         val toolbarModeSelect = JToolBar()
-        parseStyle.add(wordButton)
-        parseStyle.add(charButton)
-        wordButton.isSelected = true
-        toolbarModeSelect.add(wordButton)
-        toolbarModeSelect.add(charButton)
-        wordButton.addActionListener { world.parseStyle = TextWorld.ParseStyle.WORD }
-        charButton.addActionListener { world.parseStyle = TextWorld.ParseStyle.CHARACTER }
         bottomToolbarPanel.add(toolbarModeSelect)
         add(bottomToolbarPanel, BorderLayout.SOUTH)
-
-        // Syncs the parse style buttons to the underlying model state.
-        if (world.parseStyle === TextWorld.ParseStyle.CHARACTER) {
-            charButton.isSelected = true
-        } else if (world.parseStyle === TextWorld.ParseStyle.WORD) {
-            wordButton.isSelected = true
-        }
 
         // Reset text position when user clicks in text area
         textArea.addMouseListener(object : MouseAdapter() {
@@ -124,18 +102,21 @@ class TextWorldPanel constructor(
         // directly in the area).
         textArea.document.addDocumentListener(object : DocumentListener {
             override fun changedUpdate(arg0: DocumentEvent) {
-                //System.out.println("readerworld: changedUpdate");
+                // System.out.println("readerworld: changedUpdate");
                 world.setTextNoEvent(textArea.text)
+                updateHighlights()
             }
 
             override fun insertUpdate(arg0: DocumentEvent) {
-                //System.out.println("readerworld: insertUpdate");
+                // System.out.println("readerworld: insertUpdate");
                 world.setTextNoEvent(textArea.text)
+                updateHighlights()
             }
 
             override fun removeUpdate(arg0: DocumentEvent) {
-                //System.out.println("readerworld: removeUpdate");
+                // System.out.println("readerworld: removeUpdate");
                 world.setTextNoEvent(textArea.text)
+                updateHighlights()
             }
         })
 
@@ -151,7 +132,7 @@ class TextWorldPanel constructor(
         })
         world.events.textChanged.on(Dispatchers.Swing) {
             textArea.text = world.text
-            if (world.position < textArea.document.length) {
+            if (world.position <= textArea.document.length) {
                 textArea.caretPosition = world.position
             }
         }
@@ -161,25 +142,63 @@ class TextWorldPanel constructor(
         }
 
         world.events.currentTokenChanged.on(Dispatchers.Swing, wait = true) {
-            if (it!!.text.equals("", ignoreCase = true)) {
-                removeHighlights(textArea)
-            } else {
-                highlight(it.beginPosition, it.endPosition)
-            }
-            textArea.caretPosition = world.position
+            updateHighlights()
         }
 
+        world.events.preferencesChanged.on(Dispatchers.Swing, wait = true) {
+
+            updateHighlights()
+        }
+
+    }
+
+    fun updateHighlights() {
+        textArea.highlighter.removeAllHighlights()
+        if (world.showTokenBoundaries) {
+            world.tokens.forEach(::highlightToken)
+        }
+        world.tokens.getOrNull(world.currentTokenIndex)?.let { highlight(it.start, it.end + 1) }
+    }
+
+    /**
+     * Draw boxes around tokens.
+     */
+    class TokenHighlighter(): DefaultHighlightPainter(Color(0, 0, 0, 0)) {
+        override fun paintLayer(
+            g: Graphics, offs0: Int, offs1: Int,
+            bounds: Shape?, c: JTextComponent?, view: View?
+        ): Shape {
+            val s = super.paintLayer(g, offs0, offs1, bounds, c, view)
+            if (s is Rectangle) {
+                val g2 = g.create() as Graphics2D
+                g2.paint = Color.GRAY
+                val r = s.bounds
+                g2.drawRect(r.x, r.y, r.width, r.height - 1)
+                g2.dispose()
+            }
+            return s
+        }
     }
 
     internal inner class MyHighlightPainter(color: Color?) : DefaultHighlightPainter(color)
 
     fun highlight(begin: Int, end: Int) {
+        if (!world.highlightCurrentToken) return
         // An instance of the private subclass of the default highlight painter
         val myHighlightPainter: Highlighter.HighlightPainter = MyHighlightPainter(world.highlightColor)
         removeHighlights(textArea)
         try {
             val hilite = textArea.highlighter
             hilite.addHighlight(begin, end, myHighlightPainter)
+        } catch (e: BadLocationException) {
+            System.err.checkError()
+        }
+    }
+
+    fun highlightToken(token: TokenizerResult) {
+        val tokenHighlighter = TokenHighlighter()
+        try {
+            textArea.highlighter.addHighlight(token.start, token.end + 1, tokenHighlighter)
         } catch (e: BadLocationException) {
             System.err.checkError()
         }

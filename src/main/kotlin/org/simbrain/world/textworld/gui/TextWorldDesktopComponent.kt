@@ -129,7 +129,7 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
                     name = "Record Word Embeddings",
                     world.getProducer(TextWorld::currentVector),
                     sourceName = "${world.id} Word Embeddings",
-                    world.currentVector.size
+                    world.tokenEmbedding.dimension
                 )
             )
             edit.add(

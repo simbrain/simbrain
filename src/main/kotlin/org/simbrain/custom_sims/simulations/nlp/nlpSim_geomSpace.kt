@@ -32,6 +32,7 @@ val nlpSimBasic = newSim {
     // Text World
     val twc = addTextWorld("Text World")
     val textWorld = twc.world
+    textWorld.autoAdvance = true
     val text = readSimulationFileContents("texts" / "corpus_artificial_similarity.txt")
     textWorld.text = text
     textWorld.tokenEmbedding = TokenEmbeddingBuilder().apply {

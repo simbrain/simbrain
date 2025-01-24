@@ -1,6 +1,9 @@
 package org.simbrain.util
 
 import org.simbrain.util.Utils.FS
+import org.simbrain.util.propertyeditor.AutoCopyObject
+import org.simbrain.util.propertyeditor.CopyableObject
+import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.world.textworld.TokenEmbedding
 import smile.math.matrix.Matrix
 import smile.nlp.tokenizer.SimpleSentenceSplitter
@@ -49,42 +52,85 @@ fun String.tokenizeWordsFromString(): List<String> {
     return this.lowercase().removeSpecialCharacters().removePunctuation().split(" ")
 }
 
-fun String.simpleTokenizer(useSpaces: Boolean = false, useReturns: Boolean = false, usePunctuation: Boolean = false): List<String> {
-    val regex = listOf(
-        """\w+""", // Words
-        if (useSpaces) """\s""" else null,
-        if (useReturns) """\n""" else null,
-        if (usePunctuation) """[^\w\s]""" else null
-    ).filterNotNull().joinToString("|").toRegex()
-    return regex.findAll(this).map { it.value }.map { it.lowercase() }.toList()
+abstract class Tokenizer<T: CopyableObject>: AutoCopyObject<T>() {
+    abstract fun tokenize(text: String): List<TokenizerResult>
+    abstract fun joinTokens(tokens: List<String>): String
+
+    override fun getTypeList() = listOf(SimpleTokenizer::class.java)
 }
 
-/**
- * Join a set of tokens in a way that follows standard spacing conventions:
- *   - Spaces between words.
- *   - Spaces after punctuation but not before punctuation.
- *   - No spaces before or after returns.
- *
- * If spacesTokenized = true, these rules are not used, all tokens are joined without spaces because the space is itself a token
- */
-fun List<String>.tokensToString(spacesTokenized: Boolean = false): String {
-    val punctuationRegex = """\W""".toRegex()
-    val returnsRegex = """\n""".toRegex()
-    if (size <= 1) return joinToString("")
-    return windowed(2)
-        .mapIndexed { i, pair ->
-            val secondTokenIsPunctuation = punctuationRegex.matches(pair[1])
-            val eitherTokenIsReturn = returnsRegex.matches(pair[0]) || returnsRegex.matches(pair[1])
-            val shouldAddSpace = !secondTokenIsPunctuation && !eitherTokenIsReturn && !spacesTokenized
-            if (i == 0) {
-                listOf(pair[0], if (shouldAddSpace) " " else "", pair[1])
-            } else {
-                listOf(if (shouldAddSpace) " " else "", pair[1])
+class SimpleTokenizer(
+    usePunctuation: Boolean = false,
+    useSpaces: Boolean = false,
+    useReturns: Boolean = false,
+): Tokenizer<SimpleTokenizer>() {
+
+    var usePunctuation by GuiEditable(
+        initValue = usePunctuation,
+        description = "If true, keep punctuation marks and add them as tokens",
+        order = 10
+    )
+
+    var useSpaces by GuiEditable(
+        initValue = useSpaces,
+        description = "If true, use spaces, tabs, and newlines as distinct tokens",
+        order = 20
+    )
+
+    var useReturns by GuiEditable(
+        initValue = useReturns,
+        description = "If true, use newlines as tokens",
+        order = 30
+    )
+
+    override fun tokenize(text: String): List<TokenizerResult> {
+        val regex = listOfNotNull(
+            """\w+""", // Words
+            if (useSpaces) """\s""" else null,
+            if (useReturns) """\n""" else null,
+            if (usePunctuation) """[^\w\s]""" else null
+        ).joinToString("|").toRegex()
+
+        return regex.findAll(text).map { TokenizerResult(it.value.lowercase(), it.range.first, it.range.last) }.toList()
+    }
+
+    /**
+     * Join a set of tokens in a way that follows standard spacing conventions:
+     *   - Spaces between words.
+     *   - Spaces after punctuation but not before punctuation.
+     *   - No spaces before or after returns.
+     *
+     * If useSpaces = true, these rules are not used, all tokens are joined without spaces because the space is itself a token
+     */
+    override fun joinTokens(tokens: List<String>): String {
+        val punctuationRegex = """\W""".toRegex()
+        val returnsRegex = """\n""".toRegex()
+        if (tokens.size <= 1) return tokens.joinToString("")
+        return tokens.windowed(2)
+            .mapIndexed { i, pair ->
+                val secondTokenIsPunctuation = punctuationRegex.matches(pair[1])
+                val eitherTokenIsReturn = returnsRegex.matches(pair[0]) || returnsRegex.matches(pair[1])
+                val shouldAddSpace = !secondTokenIsPunctuation && !eitherTokenIsReturn && !useSpaces
+                if (i == 0) {
+                    listOf(pair[0], if (shouldAddSpace) " " else "", pair[1])
+                } else {
+                    listOf(if (shouldAddSpace) " " else "", pair[1])
+                }
             }
-        }
-        .flatten()
-        .joinToString("")
+            .flatten()
+            .joinToString("")
+    }
+
 }
+
+fun String.tokenize(tokenizer: Tokenizer<*>): List<TokenizerResult> = tokenizer.tokenize(this)
+fun List<String>.tokensToString(tokenizer: Tokenizer<*>) = tokenizer.joinTokens(this)
+
+class TokenizerResult(
+    val token: String,
+    val start: Int,
+    val end: Int
+)
 
 /**
  * Returns a sorted list of unique tokens in a list of tokens, converted to lowercase.
@@ -164,6 +210,7 @@ fun String.removeWords(wordsToRemove: List<String>): String {
  */
 fun generateCooccurrenceMatrix(
     docString: String,
+    tokenizer: Tokenizer<*>,
     windowSize: Int = 2,
     bidirectional: Boolean = false,
     usePPMI: Boolean = true,
@@ -178,7 +225,7 @@ fun generateCooccurrenceMatrix(
         convertedDocString = convertedDocString.removeWords(stopWords)
     }
 
-    val tokens = convertedDocString.tokenizeWordsFromString().uniqueTokensFromArray()
+    val tokens = convertedDocString.tokenize(tokenizer).map { it.token }.uniqueTokensFromArray()
 
     // Split document into sentences
     val sentences = convertedDocString.tokenizeSentencesFromDoc()
@@ -217,7 +264,7 @@ fun generateCooccurrenceMatrix(
         cocMatrix = manualPPMI(cocMatrix, true)
     }
 
-    return TokenEmbedding(tokens, cocMatrix.replaceNaN(0.0), docString)
+    return TokenEmbedding(tokens, tokenizer,  cocMatrix.replaceNaN(0.0), docString)
 }
 
 /**
@@ -281,7 +328,7 @@ fun main() {
     val theFile = chooser.showOpenDialog()
     if (theFile != null) {
         val text = Utils.readFileContents(theFile)
-        generateCooccurrenceMatrix(text)
+        generateCooccurrenceMatrix(text, SimpleTokenizer())
     }
 }
 

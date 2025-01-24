@@ -1,7 +1,6 @@
 package org.simbrain.custom_sims.simulations.nlp
 
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.swing.Swing
 import org.simbrain.custom_sims.*
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.*
@@ -45,25 +44,11 @@ class TinyLanguageModelOptions(var showEmbeddingDimension: Boolean = true): Edit
         useFileChooser = true,
     )
 
-    var useSpaces by GuiEditable(
-        description = "Use spaces, tabs, and newlines as distinct tokens",
-        initValue = false,
+    var tokenizer by GuiEditable(
+        initValue = SimpleTokenizer() as Tokenizer<*>,
+        description = "Options for tokenizing the text",
         tab = "Text Parsing",
-        order = 20
-    )
-
-    var tokenizePunctuation by GuiEditable(
-        description = "Use punctuation as distinct tokens",
-        initValue = false,
-        tab = "Text Parsing",
-        order = 30,
-    )
-
-    var tokenizeReturns by GuiEditable(
-        description = "Use newlines as distinct tokens",
-        initValue = false,
-        tab = "Text Parsing",
-        order = 40,
+        order = 20,
     )
 }
 
@@ -79,20 +64,16 @@ val tinyLanguageModel2 = newSim {
 
     val tokenEmbedding = TokenEmbeddingBuilder().apply {
         embeddingType = EmbeddingType.ONE_HOT
-        tokenizePunctuation = options.tokenizePunctuation
-        useSpaces = options.useSpaces
-        useReturns = options.tokenizeReturns
+        tokenizer = options.tokenizer
     }.build(trainingText)
+
+    val tokenizer by tokenEmbedding::tokenizer
 
     // Network
     val networkComponent = addNetworkComponent("Network")
     val network = networkComponent.network
 
-    val tokenizedTrainingText = trainingText.simpleTokenizer(
-        useSpaces = options.useSpaces,
-        useReturns = options.tokenizeReturns,
-        usePunctuation = options.tokenizePunctuation
-    )
+    val tokenizedTrainingText = trainingText.tokenize(tokenizer).map { it.token }
     val corpus = tokenizedTrainingText.windowed(min(tokenizedTrainingText.size, contextSize)).flatMap { window ->
         // window along the tokens if the context size is not big enough to cover the entire token list
         generateAutoregressivePairs(window)
@@ -100,8 +81,10 @@ val tinyLanguageModel2 = newSim {
 
     // Text World for Inputs
     val textWorldComponent = addTextWorld("Text World (Inputs)")
-    textWorldComponent.world.text = tokenizedTrainingText.take(contextSize).tokensToString(spacesTokenized = options.useSpaces)
     textWorldComponent.world.tokenEmbedding = tokenEmbedding
+    textWorldComponent.world.text = tokenizedTrainingText.take(contextSize).tokensToString(tokenizer)
+    textWorldComponent.world.highlightCurrentToken = false
+    textWorldComponent.world.autoAdvance = false
 
     val tokenizedCorpus = corpus.map { (context, target) ->
         context.map { tokenEmbedding.get(it) } to tokenEmbedding.get(target)
@@ -164,7 +147,7 @@ val tinyLanguageModel2 = newSim {
         addNetworkModels(model).awaitAll()
     }
 
-    setupUpdateActions(workspace, options)
+    setupUpdateActions(workspace)
 
     inputs.location = point(-1000, -200)
     embeddings.location = point(-200, -200)
@@ -176,7 +159,7 @@ val tinyLanguageModel2 = newSim {
             addButton("Load Workspace") {
                 val loadOk = loadWorkspaceZipFromFileChooser()
                 if (loadOk) {
-                    setupUpdateActions(workspace, options)
+                    setupUpdateActions(workspace)
                 }
             }
         }
@@ -230,7 +213,7 @@ val tinyLanguageModel2 = newSim {
 }
 
 context(SimulationScope)
-fun setupUpdateActions(workspace: Workspace, options: TinyLanguageModelOptions) {
+fun setupUpdateActions(workspace: Workspace) {
 
     val network = workspace.componentList.filterIsInstance<NetworkComponent>().first().network
     val supervisedModel = network.getModels<SupervisedModel>().first()
@@ -240,16 +223,16 @@ fun setupUpdateActions(workspace: Workspace, options: TinyLanguageModelOptions) 
     val contextSize = inputs.sequenceSize
 
     val textWorldComponent = workspace.componentList.filterIsInstance<TextWorldComponent>().first()
-    val tokenEmbedding = textWorldComponent.world.tokenEmbedding
+    val textWorld = textWorldComponent.world
 
     workspace.updater.updateManager.clear()
 
     workspace.addUpdateAction("Encode Context Window") {
-        val encodedContext = textWorldComponent.world.text
-            .simpleTokenizer(useSpaces = options.useSpaces, useReturns = options.tokenizeReturns, usePunctuation = options.tokenizePunctuation)
-            .map { tokenEmbedding.get(it) }
+        val encodedContext = textWorld.text
+            .tokenize(textWorld.tokenizer)
+            .map { textWorld.tokenEmbedding.get(it.token) }
 
-        val contextMatrix = Matrix(contextSize, tokenEmbedding.dimension)
+        val contextMatrix = Matrix(contextSize, textWorld.tokenEmbedding.dimension)
         encodedContext.take(contextSize).forEachIndexed { i, vector ->
             contextMatrix.setRow(i, vector)
         }
@@ -269,16 +252,14 @@ fun setupUpdateActions(workspace: Workspace, options: TinyLanguageModelOptions) 
     }
 
     workspace.addUpdateAction("Predict Next Word") {
-        val nextWord = tokenEmbedding.getClosestWord(softMaxLayer.activationArray)
+        val nextWord = textWorld.tokenEmbedding.getClosestWord(softMaxLayer.activationArray)
         // update text with predicted word and remove first word so that the context window maintains its size
-        textWorldComponent.world.text = textWorldComponent.world.text.simpleTokenizer(
-            useSpaces = options.useSpaces,
-            useReturns = options.tokenizeReturns,
-            usePunctuation = options.tokenizePunctuation
-        )
+        textWorldComponent.world.text = textWorldComponent.world.text.tokenize(textWorld.tokenizer)
+            .map { it.token }
             .plus(nextWord)
             .takeLast(contextSize)
-            .tokensToString(spacesTokenized = options.useSpaces)
+            .tokensToString(textWorld.tokenizer)
+        textWorldComponent.world.currentTokenIndex = textWorldComponent.world.tokens.lastIndex
     }
 
 }

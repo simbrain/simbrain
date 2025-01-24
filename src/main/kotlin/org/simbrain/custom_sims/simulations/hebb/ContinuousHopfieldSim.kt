@@ -85,19 +85,19 @@ val hopfieldSimContinuous = newSim {
                 (wm.learningRule as HebbianRule).forgettingRate = 0.0
                 //(wm.learningRule as HebbianRule).learningRate = (1/numNeurons).toDouble()
                 repeat(numTrainIterations) {
-                    applyCirclePattern(hopfield.neuronList)
+                    applyCirclePattern(hopfield.neuronList, true)
                     with(network) { wm.update() }
                     //wm.weightMatrix.setSpectralRadius(1.0)
 
-                    applySquarePattern(hopfield.neuronList)
+                    applySquarePattern(hopfield.neuronList, true)
                     with(network) { wm.update() }
                     //wm.weightMatrix.setSpectralRadius(1.0)
 
-                    applyLinePattern(hopfield.neuronList, "diagonal")
+                    applyLinePattern(hopfield.neuronList, "diagonal", true)
                     with(network) { wm.update() }
                     //wm.weightMatrix.setSpectralRadius(1.0)
 
-                    applyCrossPattern(hopfield.neuronList)
+                    applyCrossPattern(hopfield.neuronList, true)
                     with(network) { wm.update() }
                     //wm.weightMatrix.setSpectralRadius(1.0)
                 }

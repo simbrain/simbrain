@@ -131,13 +131,10 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
 
     context(Network)
     override fun trainOnCurrentPattern() {
-        neuronGroup.neuronList.forEach(Consumer { src: Neuron ->
-            src.fanIn.forEach { s: Synapse ->
-                val tar = s.source
-                val deltaW = learningRate * bipolar(src.activation) * bipolar(tar.activation)
-                s.strength += deltaW
-            }
-        })
+        synapseGroup.synapses.forEach{ s->
+            val deltaW = learningRate * bipolar(s.source.activation) * bipolar(s.target.activation)
+            s.strength += deltaW
+        }
         synapseGroup.events.updated.fire()
         events.updated.fire()
     }

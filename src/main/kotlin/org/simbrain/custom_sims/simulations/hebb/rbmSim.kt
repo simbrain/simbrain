@@ -1,6 +1,7 @@
 package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.*
+import org.simbrain.custom_sims.simulations.hebb.createPatternControlPanel
 import org.simbrain.network.subnetworks.RestrictedBoltzmannMachine
 import org.simbrain.util.place
 import org.simbrain.util.plus

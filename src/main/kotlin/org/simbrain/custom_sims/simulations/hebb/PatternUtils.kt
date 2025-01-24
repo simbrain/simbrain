@@ -76,7 +76,7 @@ fun applyCrossPattern(neuronList: List<Neuron>, bipolar: Boolean = false) {
     }
 }
 
-suspend fun SimulationScope.createPatternControlPanel(ng: NeuronGroup, isContinuous: Boolean): ControlPanelKt? {
+suspend fun SimulationScope.createPatternControlPanel(ng: NeuronGroup, isContinuous: Boolean = false): ControlPanelKt? {
     val bipolarRandomizer = TwoValued(lowerValue = -1.0, upperValue = 1.0)
     return withGui {
         createControlPanel("Control Panel", 0, 0) {

@@ -26,6 +26,8 @@ jobs:
           [System.IO.File]::WriteAllBytes("simbrain.p12", $certBytes)
           $pfxPassword = ConvertTo-SecureString -String "${{ secrets.CERTIFICATE_PASSWORD }}" -AsPlainText -Force
           Import-PfxCertificate -FilePath "simbrain.p12" -CertStoreLocation Cert:\LocalMachine\My -Password $pfxPassword
+      - name: List Certificates
+        run: Get-ChildItem Cert:\LocalMachine\My\${{ vars.CERTIFICATE_SHA1 }} -Verbose | Format-List *
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
       - name: Build with Gradle

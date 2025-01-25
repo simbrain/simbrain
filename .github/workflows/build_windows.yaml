@@ -19,19 +19,36 @@ jobs:
           java-version: '17'
       - name: Install Windows SDK
         run: choco install windows-sdk-10.1
-      - name: Install Certificate to Store and Clean Up
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+      - name: Build with Gradle
+        shell: powershell
         run: |
+          # 1. Import
           $base64EncodedCert = "${{ secrets.CERTIFICATE_ENCODED }}"
           $certBytes = [System.Convert]::FromBase64String($base64EncodedCert)
           [System.IO.File]::WriteAllBytes("simbrain.p12", $certBytes)
           $pfxPassword = ConvertTo-SecureString -String "${{ secrets.CERTIFICATE_PASSWORD }}" -AsPlainText -Force
           Import-PfxCertificate -FilePath "simbrain.p12" -CertStoreLocation Cert:\CurrentUser\My -Password $pfxPassword
-      - name: List Certificates
-        run: Get-ChildItem Cert:\CurrentUser\My\${{ vars.CERTIFICATE_SHA1 }} -Verbose | Format-List *
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-      - name: Build with Gradle
-        run: ./gradlew signWindowsApp
+          
+          # 2. Verify we see it
+          Write-Host "Listing CurrentUser\My store..."
+          Get-ChildItem Cert:\CurrentUser\My | Format-Table Thumbprint, HasPrivateKey, Subject
+          
+          # 3. Optional: sign a test EXE (or anything) as a quick check
+          #   e.g. "echo 123 > testfile.exe" just so we have a file to sign
+          echo "dummy" | Out-File testfile.exe
+          
+          Write-Host "Trying direct signtool..."
+          signtool sign `
+          /v `
+          /s My `
+          /sha1 $Env:CERTIFICATE_SHA1 `
+          /fd SHA256 `
+          testfile.exe
+          
+          Write-Host "Now running Gradle build..."
+          ./gradlew signWindowsApp
         env:
           CERTIFICATE_SHA1: ${{ vars.CERTIFICATE_SHA1 }}
       - name: Install AWS CLI

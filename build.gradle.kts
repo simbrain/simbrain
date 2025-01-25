@@ -450,8 +450,6 @@ if (OperatingSystem.current().isWindows) {
 
         if (System.getenv("CERTIFICATE_SHA1").isNullOrBlank()) {
             throw GradleException("Environment variable CERTIFICATE_SHA1 is not set.")
-        } else {
-            println("Using certificate with SHA1: ${System.getenv("CERTIFICATE_SHA1")}")
         }
 
         doFirst {
@@ -460,7 +458,6 @@ if (OperatingSystem.current().isWindows) {
             args(
                 "sign",
                 "/v",
-                "/sm",
                 "/s",
                 "My",
                 "/sha1",

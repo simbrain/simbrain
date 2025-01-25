@@ -448,6 +448,10 @@ if (OperatingSystem.current().isWindows) {
 
         val signtool = findWindowsSignTool()
 
+        if (System.getenv("CERTIFICATE_SHA1") == null) {
+            throw GradleException("Environment variable CERTIFICATE_SHA1 is not set.")
+        }
+
         doFirst {
 
             executable(signtool)

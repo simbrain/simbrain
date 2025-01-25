@@ -80,7 +80,7 @@ jobs:
           aws configure set aws_secret_access_key $R2_SECRET_KEY
           aws configure set default.region auto
 
-      - name: Upload to Cloudflare R2
+      - name: Upload to Cloudflare R2 :)
         env:
           CLOUDFLARE_R2_BUCKET: ${{ secrets.CLOUDFLARE_R2_BUCKET }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

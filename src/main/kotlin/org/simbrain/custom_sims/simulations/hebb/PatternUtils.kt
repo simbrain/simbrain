@@ -2,9 +2,10 @@ package org.simbrain.custom_sims.simulations.hebb
 
 import org.simbrain.custom_sims.SimulationScope
 import org.simbrain.custom_sims.createControlPanel
-import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.Layer
+import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
-import org.simbrain.network.neurongroups.NeuronGroup
+import org.simbrain.network.subnetworks.RestrictedBoltzmannMachine
 import org.simbrain.util.ControlPanelKt
 import org.simbrain.util.randomizeSymmetric
 import org.simbrain.util.stats.distributions.TwoValued
@@ -15,96 +16,105 @@ import kotlin.math.sqrt
  * Utils for making pattern in recurrent network simulations
  */
 
-fun applyCirclePattern(neuronList: List<Neuron>, bipolar: Boolean = false) {
+fun applyCirclePattern(layer: Layer, bipolar: Boolean = false) {
     val marginPercent = 0.05
-    val width = sqrt(neuronList.size.toDouble()).toInt()
+    val width = sqrt(layer.size.toDouble()).toInt()
     val centerX = (width / 2) - 1 // Center for even-sized grid
     val centerY = (width / 2) - 1
     val maxRadius = (width / 2) * (1 - marginPercent)
     val minRadius = maxRadius * 0.8 // Inner radius for unfilled effect
 
-    neuronList.forEachIndexed { index, neuron ->
+    val pattern = (0 until layer.size).map { index ->
         val x = index % width
         val y = index / width
         val distance = sqrt((x - centerX).toDouble().pow(2) + (y - centerY).toDouble().pow(2))
-        neuron.activation = if (distance in minRadius..maxRadius) 1.0 else (if (bipolar) -1.0 else 0.0)
-    }
+        if (distance in minRadius..maxRadius) 1.0 else (if (bipolar) -1.0 else 0.0)
+    }.toDoubleArray()
+    layer.setActivations(pattern)
 }
 
-fun applySquarePattern(neuronList: List<Neuron>, bipolar: Boolean = false) {
+fun applySquarePattern(layer: Layer, bipolar: Boolean = false) {
     val marginPercent = 0.1 // 10% margin
-    val width = sqrt(neuronList.size.toDouble()).toInt()
+    val width = sqrt(layer.size.toDouble()).toInt()
     val margin = (width * marginPercent).toInt()
     val endX = width - margin
     val endY = width - margin
 
-    neuronList.forEachIndexed { index, neuron ->
+    val pattern = (0 until layer.size).map { index ->
         val x = index % width
         val y = index / width
-        neuron.activation = if (
+        if (
             (x == margin || x == endX - 1 || y == margin || y == endY - 1) &&
             x in margin until endX && y in margin until endY
-        ) 1.0 else  (if (bipolar) -1.0 else 0.0)
-    }
+        ) 1.0 else (if (bipolar) -1.0 else 0.0)
+    }.toDoubleArray()
+    layer.setActivations(pattern)
 }
 
-fun applyLinePattern(neuronList: List<Neuron>, orientation: String, bipolar: Boolean = false) {
-    val width = sqrt(neuronList.size.toDouble()).toInt()
+fun applyLinePattern(layer: Layer, orientation: String, bipolar: Boolean = false) {
+    val width = sqrt(layer.size.toDouble()).toInt()
 
-    neuronList.forEachIndexed { index, neuron ->
+    val pattern = (0 until layer.size).map { index ->
         val x = index % width
         val y = index / width
-        neuron.activation = when (orientation.lowercase()) {
+        when (orientation.lowercase()) {
             "horizontal" -> if (y == width / 2) 1.0 else (if (bipolar) -1.0 else 0.0)
-            "vertical" -> if (x == width / 2) 1.0 else  (if (bipolar) -1.0 else 0.0)
+            "vertical" -> if (x == width / 2) 1.0 else (if (bipolar) -1.0 else 0.0)
             "diagonal" -> if (x == y) 1.0 else (if (bipolar) -1.0 else 0.0)
             "anti-diagonal" -> if (x + y == width - 1) 1.0 else (if (bipolar) -1.0 else 0.0)
             else -> throw IllegalArgumentException("Invalid orientation")
         }
-    }
+    }.toDoubleArray()
+    layer.setActivations(pattern)
 }
 
-fun applyCrossPattern(neuronList: List<Neuron>, bipolar: Boolean = false) {
-    val width = sqrt(neuronList.size.toDouble()).toInt()
+fun applyCrossPattern(layer: Layer, bipolar: Boolean = false) {
+    val width = sqrt(layer.size.toDouble()).toInt()
     val centerX = (width / 2) - 1 // Center for even-sized grid
     val centerY = (width / 2) - 1
 
-    neuronList.forEachIndexed { index, neuron ->
+    val pattern = (0 until layer.size).map { index ->
         val x = index % width
         val y = index / width
-        neuron.activation = if (x == centerX || y == centerY) 1.0 else (if (bipolar) -1.0 else 0.0)
-    }
+        if (x == centerX || y == centerY) 1.0 else (if (bipolar) -1.0 else 0.0)
+    }.toDoubleArray()
+    layer.setActivations(pattern)
 }
 
-suspend fun SimulationScope.createPatternControlPanel(ng: NeuronGroup, isContinuous: Boolean = false): ControlPanelKt? {
-    val bipolarRandomizer = TwoValued(lowerValue = -1.0, upperValue = 1.0)
+suspend fun SimulationScope.createPatternControlPanel(
+    layer: Layer,
+    isContinuous: Boolean = false,
+    randomizeWeights: () -> Unit = {},
+): ControlPanelKt? {
     return withGui {
         createControlPanel("Control Panel", 0, 0) {
-            addButton("Random Pattern") {
-                ng.randomize(bipolarRandomizer)
+            addButton("Random pattern") {
+                if (isContinuous) {
+                    layer.randomize(TwoValued(-1.0, 1.0))
+                } else {
+                    layer.randomize(TwoValued(0.0, 1.0))
+                }
             }
-            // TODO: add back once Hopfield uses a weight matrix
-            //addButton("Randomize weights") {
-            //    wm.weightMatrix.randomizeSymmetric()
-            //    wm.events.updated.fire()
-            //}
+            addButton("Randomize parameters") {
+                randomizeWeights()
+            }
             if (isContinuous) {
                 addButton("-1 Canvas") {
-                    ng.setActivationLevels(-1.0)
+                    layer.setActivations(DoubleArray(layer.size) { -1.0 })
                 }
             }
             addSeparator()
             addButton("Circle") {
-                applyCirclePattern(ng.neuronList, isContinuous)
+                applyCirclePattern(layer, isContinuous)
             }
             addButton("Square") {
-                applySquarePattern(ng.neuronList, isContinuous)
+                applySquarePattern(layer, isContinuous)
             }
             addButton("Diagonal Line") {
-                applyLinePattern(ng.neuronList, "diagonal", isContinuous)
+                applyLinePattern(layer, "diagonal", isContinuous)
             }
             addButton("Cross") {
-                applyCrossPattern(ng.neuronList, isContinuous)
+                applyCrossPattern(layer, isContinuous)
             }
             addSeparator()
         }

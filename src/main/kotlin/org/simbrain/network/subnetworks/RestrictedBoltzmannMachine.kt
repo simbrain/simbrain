@@ -32,6 +32,7 @@ import org.simbrain.util.*
 import org.simbrain.util.math.SigmoidFunctions
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
+import org.simbrain.util.stats.distributions.TwoValued
 import smile.math.matrix.Matrix
 
 /**
@@ -82,9 +83,10 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
 
         visibleToHidden = WeightMatrix(visibleLayer, hiddenLayer)
         this.addModel(visibleToHidden)
-        visibleToHidden.randomize()
         alignNetworkModels(visibleLayer, hiddenLayer, Alignment.HORIZONTAL)
         offsetNetworkModel(visibleLayer, hiddenLayer, Direction.EAST, 200.0, 258.0, 126.0)
+
+        randomize()
 
         customInfo = InfoText(stateInfoText)
         customInfo.location = point(0, -100)
@@ -171,20 +173,31 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
 
     }
 
-    override fun randomize(randomizer: ProbabilityDistribution?) {
+    // TODO: Use Randomizers? And what should randomizing the whole network randomize? Just weights or also layers?
+    fun randomizeLayers() {
+        visibleLayer.randomize(TwoValued(0.0, 1.0))
+        hiddenLayer.randomize(TwoValued(0.0, 1.0))
+    }
+
+    fun randomizeWeights() {
         visibleToHidden.randomize(NetworkPreferences.weightRandomizer)
         visibleLayer.randomizeBiases(NetworkPreferences.biasesRandomizer)
         hiddenLayer.randomizeBiases(NetworkPreferences.biasesRandomizer)
+    }
+
+    override fun randomize(randomizer: ProbabilityDistribution?) {
+        randomizeWeights()
+        randomizeLayers()
     }
 
     /**
      * Helper class for creating new RBM's nets using [org.simbrain.util.propertyeditor.AnnotatedPropertyEditor].
      */
     class RBMCreator : EditableObject {
-        @UserParameter(label = "Number of visible inputs")
+        @UserParameter(label = "Number of visible inputs", order = 10)
         var numVisible: Int = 25
 
-        @UserParameter(label = "Number of hidden units neurons")
+        @UserParameter(label = "Number of hidden units neurons", order = 20)
         var numHidden: Int = 20
 
         fun create(): RestrictedBoltzmannMachine {

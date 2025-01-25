@@ -2,18 +2,15 @@ package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.*
 import org.simbrain.custom_sims.simulations.hebb.*
-import org.simbrain.network.core.activations
-import org.simbrain.network.learningrules.HebbianRule
 import org.simbrain.network.subnetworks.Hopfield
 import org.simbrain.util.place
-import org.simbrain.util.randomizeSymmetric
 import org.simbrain.util.showNumericInputDialog
 
 /**
  * Demo for studying discrete Hopfield networks,
  */
 
-val hopfieldSim = newSim {
+val discreteHopfieldSim = newSim {
 
     val numNeurons = showNumericInputDialog(message = "Number of neurons", initValue = 100) ?: return@newSim
 
@@ -82,13 +79,13 @@ val hopfieldSim = newSim {
                     hopfield.randomize()
                     trainingMode()
                     repeat(numTrainIterations) {
-                        applyCirclePattern(hopfield.neuronGroup.neuronList)
+                        applyCirclePattern(hopfield.neuronGroup)
                         hopfield.trainOnCurrentPattern()
-                        applySquarePattern(hopfield.neuronGroup.neuronList)
+                        applySquarePattern(hopfield.neuronGroup)
                         hopfield.trainOnCurrentPattern()
-                        applyLinePattern(hopfield.neuronGroup.neuronList, "diagonal")
+                        applyLinePattern(hopfield.neuronGroup, "diagonal")
                         hopfield.trainOnCurrentPattern()
-                        applyCrossPattern(hopfield.neuronGroup.neuronList)
+                        applyCrossPattern(hopfield.neuronGroup)
                         hopfield.trainOnCurrentPattern()
                     }
                     // Dump into retrieval mode for easy testing

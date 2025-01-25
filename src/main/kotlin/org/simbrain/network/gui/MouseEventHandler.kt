@@ -73,11 +73,7 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         eventFilter = object : PInputEventFilter(InputEvent.BUTTON1_MASK) {
             override fun acceptsEvent(event: PInputEvent, type: Int): Boolean {
                 val mouseCursor = networkPanel.mouseCursor
-                return if (mouseCursor == MouseCursor.Selection || mouseCursor == MouseCursor.Pan && super.acceptsEvent(event, type)) {
-                    true
-                } else {
-                    false
-                }
+                return mouseCursor == MouseCursor.Selection || mouseCursor == MouseCursor.Pan && super.acceptsEvent(event, type)
             }
         }
     }
@@ -125,7 +121,6 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
             if (!event.isShiftDown) networkPanel.selectionManager.clear()
             mode = Mode.SELECTION
         }
-        println(mode)
     }
 
     override fun drag(event: PInputEvent) {
@@ -248,7 +243,7 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         val centerPoint = point(9, 9)
         abstract val cursor: Cursor
         object Selection : MouseCursor() {
-            override val cursor: Cursor get() = Cursor.getDefaultCursor();
+            override val cursor: Cursor get() = Cursor.getDefaultCursor()
         }
         object Wand : MouseCursor() {
 
@@ -275,7 +270,7 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         }
         object Pan : MouseCursor() {
             override val cursor: Cursor = Toolkit.getDefaultToolkit()
-                    .createCustomCursor(ResourceManager.getImage("menu_icons/Pan.png"), centerPoint, "pan");
+                    .createCustomCursor(ResourceManager.getImage("menu_icons/Pan.png"), centerPoint, "pan")
         }
     }
 }

@@ -68,6 +68,7 @@ val hopfieldSimContinuous = newSim {
     fun initLearningRate() {
         (wm.learningRule as HebbianRule).learningRate = learningRate
     }
+
     fun initForgettingRate() {
         (wm.learningRule as HebbianRule).forgettingRate = forgettingRate
     }
@@ -75,9 +76,12 @@ val hopfieldSimContinuous = newSim {
     initForgettingRate()
 
     withGui {
-        place(networkComponent, 200, 0, 509, 619)
+        place(networkComponent, 220, 0, 509, 619)
 
-        createPatternControlPanel(hopfield, true)?.apply {
+        createPatternControlPanel(hopfield, true) {
+            wm.weightMatrix.randomizeSymmetric()
+            wm.events.updated.fire()
+        }?.apply {
             addButton("Learn All Patterns") {
                 wm.weightMatrix.randomizeSymmetric()
                 hopfield.isAllClamped = true
@@ -85,19 +89,19 @@ val hopfieldSimContinuous = newSim {
                 (wm.learningRule as HebbianRule).forgettingRate = 0.0
                 //(wm.learningRule as HebbianRule).learningRate = (1/numNeurons).toDouble()
                 repeat(numTrainIterations) {
-                    applyCirclePattern(hopfield.neuronList, true)
+                    applyCirclePattern(hopfield, true)
                     with(network) { wm.update() }
                     //wm.weightMatrix.setSpectralRadius(1.0)
 
-                    applySquarePattern(hopfield.neuronList, true)
+                    applySquarePattern(hopfield, true)
                     with(network) { wm.update() }
                     //wm.weightMatrix.setSpectralRadius(1.0)
 
-                    applyLinePattern(hopfield.neuronList, "diagonal", true)
+                    applyLinePattern(hopfield, "diagonal", true)
                     with(network) { wm.update() }
                     //wm.weightMatrix.setSpectralRadius(1.0)
 
-                    applyCrossPattern(hopfield.neuronList, true)
+                    applyCrossPattern(hopfield, true)
                     with(network) { wm.update() }
                     //wm.weightMatrix.setSpectralRadius(1.0)
                 }

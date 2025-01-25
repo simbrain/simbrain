@@ -1,6 +1,7 @@
 package org.simbrain.network.core
 
 import org.simbrain.network.events.NeuronArrayEvents
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.ActivationSequenceProcessor
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.NeuronUpdateRule
@@ -113,7 +114,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
     var gridMode = false
         set(value) {
             field = value
-            (events as NeuronArrayEvents).visualPropertiesChanged.fire()
+            events.visualPropertiesChanged.fire()
         }
 
     @UserParameter(
@@ -125,7 +126,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
     var circleMode = false
         set(value) {
             field = value
-            (events as NeuronArrayEvents).visualPropertiesChanged.fire()
+            events.visualPropertiesChanged.fire()
         }
 
     @UserParameter(
@@ -137,7 +138,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
     var verticalLayout = false
         set(value) {
             field = value
-            (events as NeuronArrayEvents).visualPropertiesChanged.fire()
+            events.visualPropertiesChanged.fire()
         }
 
     @UserParameter(
@@ -194,10 +195,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         }
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
-        activations = Matrix.rand(
-            size, 1,
-            GaussianDistribution(0.0, 1.0)
-        )
+        activations = (randomizer?:NetworkPreferences.activationRandomizer).sampleDouble(size).toMatrix()
         events.updated.fire()
     }
 
@@ -327,7 +325,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
     /**
      * See [org.simbrain.workspace.serialization.WorkspaceComponentDeserializer]
      */
-    override fun readResolve(): Any? {
+    override fun readResolve(): Any {
         events = NeuronArrayEvents()
         return this
     }

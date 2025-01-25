@@ -45,4 +45,4 @@ jobs:
           CLOUDFLARE_R2_BUCKET: ${{ secrets.CLOUDFLARE_R2_BUCKET }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          aws s3 cp "$GITHUB_WORKSPACE/Simbrain4Beta_full.zip" "s3://$CLOUDFLARE_R2_BUCKET/" --endpoint-url=https://$CLOUDFLARE_ACCOUNT_ID.r2.cloudflarestorage.com --checksum-algorithm sha256
+          aws s3 cp "$GITHUB_WORKSPACE/Simbrain4Beta_full.zip" "s3://$CLOUDFLARE_R2_BUCKET/" --endpoint-url=https://$CLOUDFLARE_ACCOUNT_ID.r2.cloudflarestorage.com --checksum-algorithm SHA256

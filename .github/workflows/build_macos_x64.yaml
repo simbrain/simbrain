@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v4
       - name: Install AWS CLI 2.22.35
         run: |
-          curl "https://awscli.amazonaws.com/AWSCLIV2-2.2.35.pkg" -o "awscliv2.pkg"
+          curl "https://awscli.amazonaws.com/AWSCLIV2-2.22.35.pkg" -o "awscliv2.pkg"
           sudo installer -pkg awscliv2.pkg -target /
       - name: Set up JDK 17
         uses: actions/setup-java@v2

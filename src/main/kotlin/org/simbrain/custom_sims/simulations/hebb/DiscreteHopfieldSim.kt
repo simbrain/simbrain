@@ -59,16 +59,10 @@ val discreteHopfieldSim = newSim {
         place(networkComponent, 228, 0, 509, 619)
 
         var numTrainIterations = 1
-        fun trainingMode() {
-            hopfield.neuronGroup.isAllClamped = true
-            hopfield.synapseGroup.synapses.forEach{it.clamped = true}
-        }
-        fun retrievalMode() {
-            hopfield.neuronGroup.isAllClamped = false
-            hopfield.synapseGroup.synapses.forEach{it.clamped = false}
-        }
 
-        createPatternControlPanel(hopfield.neuronGroup, false)?.apply {
+        createPatternControlPanel(hopfield.neuronGroup, false) {
+            hopfield.randomize()
+        }?.apply {
             addTextField("Training iterations", "" + numTrainIterations) {
                 it.toIntOrNull()?.let { num ->
                     numTrainIterations = num
@@ -76,8 +70,6 @@ val discreteHopfieldSim = newSim {
             }
             addButton("Train On All Patterns") {
                 with(network) {
-                    hopfield.randomize()
-                    trainingMode()
                     repeat(numTrainIterations) {
                         applyCirclePattern(hopfield.neuronGroup)
                         hopfield.trainOnCurrentPattern()
@@ -88,20 +80,11 @@ val discreteHopfieldSim = newSim {
                         applyCrossPattern(hopfield.neuronGroup)
                         hopfield.trainOnCurrentPattern()
                     }
-                    // Dump into retrieval mode for easy testing
-                    retrievalMode()
                 }
             }
             addSeparator()
             addButton("Train on current pattern") {
                 with(network) { hopfield.trainOnCurrentPattern() }
-            }
-            addSeparator()
-            addButton("Training Mode") {
-                trainingMode()
-            }
-            addButton("Retrieval Mode") {
-                retrievalMode()
             }
         }
     }

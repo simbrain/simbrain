@@ -31,18 +31,29 @@ jobs:
           $pfxPassword = ConvertTo-SecureString -String "${{ secrets.CERTIFICATE_PASSWORD }}" -AsPlainText -Force
           Import-PfxCertificate -FilePath "simbrain.p12" -CertStoreLocation Cert:\CurrentUser\My -Password $pfxPassword
           
-          # 2. Verify we see it
-          Write-Host "Listing CurrentUser\My store..."
-          Get-ChildItem Cert:\CurrentUser\My | Format-Table Thumbprint, HasPrivateKey, Subject
+          # 2. Locate the single certificate in CurrentUser\My
+          #    (This assumes exactly one is present, otherwise you'll get an error or unexpected result.)
+          $cert = Get-ChildItem Cert:\CurrentUser\My | Select-Object -First 1
           
-          # 3. Optional: sign a test EXE (or anything) as a quick check
-          #   e.g. "echo 123 > testfile.exe" just so we have a file to sign
+          if (-not $cert) {
+            Write-Error "No certificate found in CurrentUser\My."
+            exit 1
+          }
           
+          # 3. Extract the (cleaned) thumbprint (remove any whitespace just in case)
+          $thumbprint = $cert.Thumbprint -replace '\s',''
+          Write-Host "Found a cert with thumbprint: $thumbprint"
+          Write-Host "HasPrivateKey: $($cert.HasPrivateKey)"
+          Write-Host "Subject: $($cert.Subject)"
+          
+          $Env:CERTIFICATE_SHA1 = $thumbprint
+          
+          # 4. Find and define the path to SignTool.exe
           $windowsKitsPath = 'C:\Program Files (x86)\Windows Kits\10\bin'
           $signtool = Get-ChildItem -Path $windowsKitsPath -Recurse -Filter 'signtool.exe' |
-            Where-Object { $_.FullName -match '\\x64\\' } |
-            Sort-Object FullName -Descending |
-            Select-Object -First 1
+          Where-Object { $_.FullName -match '\\x64\\' } |
+          Sort-Object FullName -Descending |
+          Select-Object -First 1
             
           if (!$signtool) {
             Write-Error "Could not find signtool.exe in any x64 subfolder under $windowsKitsPath."
@@ -57,18 +68,17 @@ jobs:
 
           echo "dummy" | Out-File testfile.exe
           
+          # 5. Perform the signing
           Write-Host "Trying direct signtool..."
           signtool.exe sign `
           /v `
           /s My `
-          /sha1 $Env:CERTIFICATE_SHA1 `
+          /sha1 $thumbprint `
           /fd SHA256 `
           testfile.exe
           
           Write-Host "Now running Gradle build..."
           ./gradlew signWindowsApp
-        env:
-          CERTIFICATE_SHA1: ${{ vars.CERTIFICATE_SHA1 }}
       - name: Install AWS CLI
         run: |
           choco install awscli -y

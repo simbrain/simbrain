@@ -24,58 +24,59 @@ jobs:
       - name: Build with Gradle
         shell: powershell
         run: |
-          # 1. Import
+          # 1. Decode the base64-encoded PFX/P12
           $base64EncodedCert = "${{ secrets.CERTIFICATE_ENCODED }}"
           $certBytes = [System.Convert]::FromBase64String($base64EncodedCert)
           [System.IO.File]::WriteAllBytes("simbrain.p12", $certBytes)
+      
+          # 2. Load the certificate in-memory
           $pfxPassword = ConvertTo-SecureString -String "${{ secrets.CERTIFICATE_PASSWORD }}" -AsPlainText -Force
-          Import-PfxCertificate -FilePath "simbrain.p12" -CertStoreLocation Cert:\CurrentUser\My -Password $pfxPassword
-          
-          # 2. Locate the single certificate in CurrentUser\My
-          #    (This assumes exactly one is present, otherwise you'll get an error or unexpected result.)
-          $cert = Get-ChildItem Cert:\CurrentUser\My | Select-Object -First 1
-          
-          if (-not $cert) {
-            Write-Error "No certificate found in CurrentUser\My."
+          $cert = New-Object System.Security.Cryptography.X509Certificates.X509Certificate2("simbrain.p12", $pfxPassword)
+      
+          # 3. Verify that the certificate actually contains the Code Signing EKU
+          $ekuOid = "1.3.6.1.5.5.7.3.3"  # OID for "Code Signing"
+          $ekuExtension = $cert.Extensions | Where-Object { $_.Oid.FriendlyName -eq "Enhanced Key Usage" }
+      
+          if (-not $ekuExtension) {
+            Write-Error "Certificate has no Enhanced Key Usage extension."
             exit 1
           }
-          
-          # 3. Extract the (cleaned) thumbprint (remove any whitespace just in case)
-          $thumbprint = $cert.Thumbprint -replace '\s',''
-          Write-Host "Found a cert with thumbprint: $thumbprint"
-          Write-Host "HasPrivateKey: $($cert.HasPrivateKey)"
-          Write-Host "Subject: $($cert.Subject)"
-          
-          $Env:CERTIFICATE_SHA1 = $thumbprint
-          
-          # 4. Find and define the path to SignTool.exe
+      
+          $hasCodeSign = $ekuExtension.EnhancedKeyUsages | Where-Object { $_.Value -eq $ekuOid }
+          if (-not $hasCodeSign) {
+            Write-Error "This certificate does not have the Code Signing EKU."
+            exit 1
+          }
+          Write-Host "Certificate is valid for code signing."
+      
+          # 4. Find Signtool.exe in Windows Kits folder (64-bit)
           $windowsKitsPath = 'C:\Program Files (x86)\Windows Kits\10\bin'
           $signtool = Get-ChildItem -Path $windowsKitsPath -Recurse -Filter 'signtool.exe' |
-          Where-Object { $_.FullName -match '\\x64\\' } |
-          Sort-Object FullName -Descending |
-          Select-Object -First 1
-            
+            Where-Object { $_.FullName -match '\\x64\\' } |
+            Sort-Object FullName -Descending |
+            Select-Object -First 1
+      
           if (!$signtool) {
             Write-Error "Could not find signtool.exe in any x64 subfolder under $windowsKitsPath."
             exit 1
           }
-          
-          # Add the containing folder to PATH in this session
+      
+          # Add containing folder to PATH
           $folder = Split-Path $signtool.FullName
           $env:PATH += ";$folder"
-          
           Write-Host "PATH has been updated to: $env:PATH"
-
-          echo "dummy" | Out-File testfile.exe
-          
-          # 5. Perform the signing
-          Write-Host "Trying direct signtool..."
+      
+          # Create a dummy file to test-sign
+          "dummy" | Out-File "testfile.exe"
+      
+          # 5. Sign using the .p12 file directly
+          Write-Host "Signing with file-based approach..."
           signtool.exe sign `
-          /v `
-          /s My `
-          /sha1 $thumbprint `
-          /fd SHA256 `
-          testfile.exe
+            /v `
+            /fd SHA256 `
+            /f simbrain.p12 `
+            /p "${{ secrets.CERTIFICATE_PASSWORD }}" `
+            testfile.exe
           
           Write-Host "Now running Gradle build..."
           ./gradlew signWindowsApp

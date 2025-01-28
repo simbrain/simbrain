@@ -37,10 +37,28 @@ jobs:
           
           # 3. Optional: sign a test EXE (or anything) as a quick check
           #   e.g. "echo 123 > testfile.exe" just so we have a file to sign
+          
+          $windowsKitsPath = 'C:\Program Files (x86)\Windows Kits\10\bin'
+          $signtool = Get-ChildItem -Path $windowsKitsPath -Recurse -Filter 'signtool.exe' |
+            Where-Object { $_.FullName -match '\\x64\\' } |
+            Sort-Object FullName -Descending |
+            Select-Object -First 1
+            
+          if (!$signtool) {
+            Write-Error "Could not find signtool.exe in any x64 subfolder under $windowsKitsPath."
+            exit 1
+          }
+          
+          # Add the containing folder to PATH in this session
+          $folder = Split-Path $signtool.FullName
+          $env:PATH += ";$folder"
+          
+          Write-Host "PATH has been updated to: $env:PATH"
+
           echo "dummy" | Out-File testfile.exe
           
           Write-Host "Trying direct signtool..."
-          signtool sign `
+          signtool.exe sign `
           /v `
           /s My `
           /sha1 $Env:CERTIFICATE_SHA1 `

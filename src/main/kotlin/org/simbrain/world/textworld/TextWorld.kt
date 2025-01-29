@@ -91,10 +91,12 @@ class TextWorld : AttributeContainer, EditableObject {
     )
     var tokenizer = tokenEmbedding.tokenizer
 
+    @delegate:Transient
     var tokens by DependenciesInvalidatingCachedObject(::text, ::tokenEmbedding, ::tokenizer) {
         tokenizer.tokenize(text)
     }
 
+    @Transient
     var currentTokenIndex = 0
         get() {
             field = field.coerceIn(0, max(tokens.lastIndex, 0))

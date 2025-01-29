@@ -3,12 +3,9 @@ package org.simbrain.custom_sims.simulations.hebb
 import org.simbrain.custom_sims.SimulationScope
 import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.network.core.Layer
-import org.simbrain.network.core.NeuronArray
-import org.simbrain.network.core.WeightMatrix
-import org.simbrain.network.subnetworks.RestrictedBoltzmannMachine
 import org.simbrain.util.ControlPanelKt
-import org.simbrain.util.randomizeSymmetric
 import org.simbrain.util.stats.distributions.TwoValued
+import kotlin.math.ceil
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -18,7 +15,7 @@ import kotlin.math.sqrt
 
 fun applyCirclePattern(layer: Layer, bipolar: Boolean = false) {
     val marginPercent = 0.05
-    val width = sqrt(layer.size.toDouble()).toInt()
+    val width = ceil(sqrt(layer.size.toDouble())).toInt()
     val centerX = (width / 2) - 1 // Center for even-sized grid
     val centerY = (width / 2) - 1
     val maxRadius = (width / 2) * (1 - marginPercent)
@@ -35,7 +32,7 @@ fun applyCirclePattern(layer: Layer, bipolar: Boolean = false) {
 
 fun applySquarePattern(layer: Layer, bipolar: Boolean = false) {
     val marginPercent = 0.1 // 10% margin
-    val width = sqrt(layer.size.toDouble()).toInt()
+    val width = ceil(sqrt(layer.size.toDouble())).toInt()
     val margin = (width * marginPercent).toInt()
     val endX = width - margin
     val endY = width - margin
@@ -52,7 +49,7 @@ fun applySquarePattern(layer: Layer, bipolar: Boolean = false) {
 }
 
 fun applyLinePattern(layer: Layer, orientation: String, bipolar: Boolean = false) {
-    val width = sqrt(layer.size.toDouble()).toInt()
+    val width = ceil(sqrt(layer.size.toDouble())).toInt()
 
     val pattern = (0 until layer.size).map { index ->
         val x = index % width
@@ -69,7 +66,7 @@ fun applyLinePattern(layer: Layer, orientation: String, bipolar: Boolean = false
 }
 
 fun applyCrossPattern(layer: Layer, bipolar: Boolean = false) {
-    val width = sqrt(layer.size.toDouble()).toInt()
+    val width = ceil(sqrt(layer.size.toDouble())).toInt()
     val centerX = (width / 2) - 1 // Center for even-sized grid
     val centerY = (width / 2) - 1
 

@@ -19,19 +19,19 @@
 package org.simbrain.network.subnetworks
 
 import org.simbrain.network.core.*
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.trainers.UnsupervisedNetwork
 import org.simbrain.network.trainers.UnsupervisedTrainer
 import org.simbrain.network.updaterules.BinaryRule
-import org.simbrain.network.util.*
-import org.simbrain.util.UserParameter
-import org.simbrain.util.binaryRandomize
-import org.simbrain.util.format
-import org.simbrain.util.point
+import org.simbrain.network.util.Alignment
+import org.simbrain.network.util.Direction
+import org.simbrain.network.util.alignNetworkModels
+import org.simbrain.network.util.offsetNetworkModel
+import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
 import smile.math.matrix.Matrix
-import java.util.function.Consumer
 
 /**
  * A discrete Hopfield network.
@@ -43,17 +43,17 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
     override val inputLayer
         get() = neuronGroup
 
-    lateinit var synapseGroup: SynapseGroup
+    lateinit var weightMatrix: WeightMatrix
 
     override val trainer = UnsupervisedTrainer()
 
     override lateinit var inputData: Matrix
 
     @UserParameter(label = "Update function")
-    var updateFunc = HopfieldUpdate.STOCHASTIC
+    var updateFunc = HopfieldUpdate.SYNC
 
     @UserParameter(label = "Learning rate")
-    var learningRate = .01
+    var learningRate = 0.25
 
     override lateinit var customInfo: InfoText
 
@@ -77,9 +77,9 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
         neuronGroup.setIncrement(1.0)
 
         // Connect the neurons together
-        synapseGroup = SynapseGroup(neuronGroup, neuronGroup)
-        synapseGroup.label = "weights"
-        addModel(synapseGroup)
+        weightMatrix = WeightMatrix(neuronGroup, neuronGroup)
+        weightMatrix.label = "weights"
+        addModel(weightMatrix)
 
         // Symmetric randomization
         // randomize() TODO()
@@ -100,7 +100,7 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
     }
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
-        synapseGroup.randomizeSymmetric(randomizer)
+        weightMatrix.weightMatrix.randomizeSymmetric(randomizer ?: NetworkPreferences.weightRandomizer)
     }
 
     context(Network)
@@ -131,11 +131,15 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
 
     context(Network)
     override fun trainOnCurrentPattern() {
-        synapseGroup.synapses.forEach{ s->
-            val deltaW = learningRate * bipolar(s.source.activation) * bipolar(s.target.activation)
-            s.strength += deltaW
-        }
-        synapseGroup.events.updated.fire()
+        weightMatrix.setMatrixValues(
+            neuronGroup.activations
+                .applyFunction(::bipolar)
+                .mm(neuronGroup.activations.applyFunction(::bipolar).transpose())
+                .mul(learningRate)
+                .add(weightMatrix.weightMatrix)
+        )
+        weightMatrix.weightMatrix.zeroDiagonalInPlace()
+        weightMatrix.events.updated.fire()
         events.updated.fire()
     }
 
@@ -156,9 +160,11 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
              */
             context(Network)
             override fun update(hop: Hopfield) {
-                val randomNeuron = hop.neuronGroup.neuronList.random()
-                randomNeuron.accumulateInputs()
-                randomNeuron.update()
+                val randomIndex = (0 until hop.neuronGroup.size).random()
+                hop.neuronGroup.neuronList[randomIndex].activation = hop.weightMatrix.weightMatrix
+                    .row(randomIndex)
+                    .dot(hop.neuronGroup.activationArray)
+                    .let { if (it > 0.0) 1.0 else 0.0 }
             }
 
             override fun toString(): String {
@@ -171,13 +177,12 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
              */
             context(Network)
             override fun update(hop: Hopfield) {
-                // TODO: Cache the sorted list
-                hop.neuronGroup.neuronList
-                    .sortedBy { it.updatePriority }
-                    .forEach {
-                        it.accumulateInputs()
-                        it.update()
-                    }
+                (0 until hop.neuronGroup.size).forEach {
+                    hop.neuronGroup.neuronList[it].activation = hop.weightMatrix.weightMatrix
+                        .row(it)
+                        .dot(hop.neuronGroup.activationArray)
+                        .let { if (it > 0.0) 1.0 else 0.0 }
+                }
             }
 
 
@@ -188,8 +193,12 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
         SYNC {
             context(Network)
             override fun update(hop: Hopfield) {
-                hop.neuronGroup.neuronList.forEach { it.accumulateInputs() }
-                hop.neuronGroup.neuronList.forEach { it.update() }
+                hop.neuronGroup.setActivations(
+                    hop.weightMatrix.weightMatrix
+                        .mm(hop.neuronGroup.activations)
+                        .applyFunction { if (it > 0.0) 1.0 else 0.0 }
+                        .toDoubleArray()
+                )
             }
 
             override fun toString(): String {

@@ -474,7 +474,9 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
     fun copy() {
         if (selectionManager.isEmpty) return
-        network.placementManager.lastSelectedModel = selectionManager.filterSelectedModels<LocatableModel>().sortTopBottom().first()
+        selectionManager.filterSelectedModels<LocatableModel>().sortTopBottom().firstOrNull()?.let {
+            network.placementManager.lastSelectedModel = it
+        }
         Clipboard.clear()
         Clipboard.add(selectionManager.selectedModels)
     }

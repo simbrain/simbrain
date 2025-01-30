@@ -1,26 +1,12 @@
 package org.simbrain.world.textworld
 
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
-import org.simbrain.network.core.*
-import org.simbrain.network.neurongroups.*
-import org.simbrain.network.subnetworks.BackpropNetwork
-import org.simbrain.network.subnetworks.SRNNetwork
-import org.simbrain.util.point
+import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.workspace.Workspace
-import org.simbrain.workspace.couplings.Coupling
-import org.simbrain.world.odorworld.OdorWorldComponent
-import org.simbrain.world.odorworld.effectors.StraightMovement
-import org.simbrain.world.odorworld.entities.EntityType
-import org.simbrain.world.odorworld.entities.OdorWorldEntity
-import org.simbrain.world.odorworld.sensors.ObjectSensor
-import java.io.ByteArrayInputStream
-import java.io.InputStream
-import java.nio.charset.StandardCharsets
 
 class TextWorldTest {
 
@@ -32,8 +18,8 @@ class TextWorldTest {
 
     @Test
     fun `test update increments current item`() {
-        runBlocking { world.update() }
-        assertEquals("This", world.currentToken)
+        world.autoAdvance = true
+        assertEquals("this", world.currentToken)
         runBlocking { world.update() }
         assertEquals("is", world.currentToken)
     }
@@ -41,12 +27,12 @@ class TextWorldTest {
     @Test
     fun `test wraparound`() {
         world.text = "Word1 Word2"
+        world.autoAdvance = true
         runBlocking {
             world.update()
             world.update()
-            world.update()
         }
-        assertEquals("Word1", world.currentToken)
+        assertEquals("word1", world.currentToken)
     }
 
     @Test

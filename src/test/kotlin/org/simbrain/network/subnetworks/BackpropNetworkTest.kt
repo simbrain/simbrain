@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.getModelByLabel
 import org.simbrain.network.core.getNetworkXStream
+import org.simbrain.network.trainers.AdamOptimizer
 import org.simbrain.network.trainers.BackpropTrainer
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedTrainer.UpdateMethod
@@ -38,6 +39,7 @@ class BackpropNetworkTest {
     fun `test backprop learning`() {
         bp.trainerConfig.updateType = UpdateMethod.Epoch()
         bp.trainerConfig.learningRate = 0.04
+        bp.trainerConfig.optimizer = AdamOptimizer()
 
         val trainer = BackpropTrainer(net, bp)
 

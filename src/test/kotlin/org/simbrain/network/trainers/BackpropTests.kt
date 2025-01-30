@@ -191,15 +191,9 @@ class BackpropTests {
     fun `train 10-7-10 auto-encoder`() {
         val inputs = Matrix.eye(10)
         val bp = BackpropNetwork(intArrayOf(10, 7, 10), null).apply {
-            outputLayer.updateRule = SigmoidalRule().apply {
-                type = SigmoidFunctionEnum.LOGISTIC
-            }
-            hiddenLayers().first().apply {
-                useLayerNorm = true
-            }
             initWeights()
             initBiases()
-            trainerConfig.learningRate = .1
+            trainerConfig.learningRate = .01
             trainingSet = MatrixDataset(
                 inputs = inputs,
                 targets = inputs
@@ -208,11 +202,10 @@ class BackpropTests {
         net.addNetworkModels(bp)
         val trainer = BackpropTrainer(net, bp)
         runBlocking {
-            repeat(3000) {
+            repeat(1000) {
                 trainer.trainOnce()
             }
         }
-        // TODO: Often fails to get near 0. Why? Notice the huge delta
         print(trainer.lastTrainingError)
         assertEquals(0.0, trainer.lastTrainingError , .15)
     }

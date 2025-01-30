@@ -225,7 +225,9 @@ fun generateCooccurrenceMatrix(
         convertedDocString = convertedDocString.removeWords(stopWords)
     }
 
-    val tokens = convertedDocString.tokenize(tokenizer).map { it.token }.uniqueTokensFromArray()
+    val words = convertedDocString.tokenize(tokenizer).map { it.token }
+
+    val tokens = words.uniqueTokensFromArray()
 
     // Split document into sentences
     val sentences = convertedDocString.tokenizeSentencesFromDoc()
@@ -234,28 +236,23 @@ fun generateCooccurrenceMatrix(
     val matrixSize = tokens.size
     var cocMatrix = Matrix(matrixSize, matrixSize)
 
-    // Loop through sentences, through words
-    for (sentence in sentences) {
-        val tokenizedSentence = sentence.tokenizeWordsFromString()
+    for (sentenceIndex in words.indices) {
+        val maxIndex = words.size - 1  // used for window range check
 
-        for (sentenceIndex in tokenizedSentence.indices) {
-            val maxIndex = tokenizedSentence.size - 1  // used for window range check
+        val currentToken = words[sentenceIndex] // Current iterated token
 
-            val currentToken = tokenizedSentence[sentenceIndex] // Current iterated token
+        val contextLowerLimit = sentenceIndex - windowSize
+        val contextUpperLimit = if (bidirectional) (sentenceIndex + windowSize) else (sentenceIndex)
 
-            val contextLowerLimit = sentenceIndex - windowSize
-            val contextUpperLimit = if (bidirectional) (sentenceIndex + windowSize) else (sentenceIndex)
-
-            for (contextIndex in contextLowerLimit..contextUpperLimit) {
-                if (contextIndex in 0..maxIndex && contextIndex != sentenceIndex) {
-                    val currentContext = tokenizedSentence[contextIndex]
-                    val tokenCoordinate = tokens.indexOf(currentToken)
-                    val contextCoordinate = tokens.indexOf(currentContext)
-                    // print(listOf("Current Token:", currentToken, tokenCoordinate))
-                    // println(listOf("Current Context",currentContext, contextCoordinate))
-                    cocMatrix[tokenCoordinate, contextCoordinate] =
-                        cocMatrix[tokenCoordinate, contextCoordinate] + 1
-                }
+        for (contextIndex in contextLowerLimit..contextUpperLimit) {
+            if (contextIndex in 0..maxIndex && contextIndex != sentenceIndex) {
+                val currentContext = words[contextIndex]
+                val tokenCoordinate = tokens.indexOf(currentToken)
+                val contextCoordinate = tokens.indexOf(currentContext)
+                // print(listOf("Current Token:", currentToken, tokenCoordinate))
+                // println(listOf("Current Context",currentContext, contextCoordinate))
+                cocMatrix[tokenCoordinate, contextCoordinate] =
+                    cocMatrix[tokenCoordinate, contextCoordinate] + 1
             }
         }
     }

@@ -40,7 +40,7 @@ open class SupervisedTrainerConfig: EditableObject {
     var lossFunction = BackpropLossFunction.SSE
 
     var optimizer: Optimizer by GuiEditable(
-        initValue = MomentumOptimizer(),
+        initValue = AdamOptimizer(),
         showDetails = false,
         order = 20
     )

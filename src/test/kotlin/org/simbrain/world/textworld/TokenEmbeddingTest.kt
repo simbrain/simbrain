@@ -4,11 +4,12 @@ import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.simbrain.util.SimpleTokenizer
 import smile.math.matrix.Matrix
 
 class TokenEmbeddingTest {
 
-    var tokenEmbedding = TokenEmbedding(listOf("A", "B"), Matrix.eye(2))
+    var tokenEmbedding = TokenEmbedding(listOf("A", "B"), SimpleTokenizer(), Matrix.eye(2))
 
     @Test
     fun `test retrieval of vector given token, for upper and lower case`() {
@@ -32,14 +33,14 @@ class TokenEmbeddingTest {
 
     @Test
     fun `test metrics on a non-square embedding`() {
-        val embedding = TokenEmbedding(listOf("A", "B", "C"),  Matrix(3,2))
+        val embedding = TokenEmbedding(listOf("A", "B", "C"),  SimpleTokenizer(), Matrix(3,2))
         assertEquals(3, embedding.size)
         assertEquals(2, embedding.dimension)
     }
 
     @Test
     fun `token list and matrix must be same size`() {
-        assertThrows<IllegalArgumentException> { TokenEmbedding(listOf("A", "B", "C"),  Matrix(2,3)) }
+        assertThrows<IllegalArgumentException> { TokenEmbedding(listOf("A", "B", "C"), SimpleTokenizer(), Matrix(2,3)) }
     }
 
 

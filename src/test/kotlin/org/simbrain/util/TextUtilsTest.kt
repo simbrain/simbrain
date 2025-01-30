@@ -84,7 +84,7 @@ class TextUtilsTest {
     @Test
     fun `co-occurrence matrix is correct size`() {
         val tokens = simpleText.tokenizeWordsFromString().uniqueTokensFromArray()
-        val cooccurrenceMatrix = generateCooccurrenceMatrix(simpleText, 2, true, removeStopwords = false)
+        val cooccurrenceMatrix = generateCooccurrenceMatrix(simpleText, SimpleTokenizer(),2, true, removeStopwords = false)
         assertEquals(tokens.size, cooccurrenceMatrix.tokenVectorMatrix.nrow())
         assertEquals(tokens.size, cooccurrenceMatrix.tokenVectorMatrix.ncol())
     }
@@ -93,15 +93,16 @@ class TextUtilsTest {
     fun `word embedding have correct size`() {
         val tokenizedSentence = harderText.tokenizeWordsFromString()
         val tokens = tokenizedSentence.uniqueTokensFromArray()
-        val cooccurrenceMatrix = generateCooccurrenceMatrix(harderText, 2, true)
+        val cooccurrenceMatrix = generateCooccurrenceMatrix(harderText, SimpleTokenizer(), 2, true)
         assertEquals(tokens.size, cooccurrenceMatrix.get("obstacles").size)
         assertEquals(tokens.size, cooccurrenceMatrix.get("Quixote").size) // issue wascapital Q
     }
 
     @Test
     fun `co-occurence matrix window size correctly affects similarity`() {
-        val cooccurrenceMatrixShort = generateCooccurrenceMatrix(windowSizeText, 1, true)
-        val cooccurrenceMatrixLong = generateCooccurrenceMatrix(windowSizeText, 4, true)
+        val tokenizer = SimpleTokenizer()
+        val cooccurrenceMatrixShort = generateCooccurrenceMatrix(windowSizeText, tokenizer,1, true)
+        val cooccurrenceMatrixLong = generateCooccurrenceMatrix(windowSizeText, tokenizer,4, true)
         val smallWindowSimilarity = embeddingSimilarity(
             cooccurrenceMatrixShort.get("Jean"),
             cooccurrenceMatrixShort.get("Albert"))
@@ -115,7 +116,7 @@ class TextUtilsTest {
     fun `computes cosine similarity between two vectors`() {
         val tokenizedSentence = similarText.tokenizeWordsFromString()
         val tokens = tokenizedSentence.uniqueTokensFromArray()
-        val cooccurrenceMatrix = generateCooccurrenceMatrix(similarText, 2, true)
+        val cooccurrenceMatrix = generateCooccurrenceMatrix(similarText, SimpleTokenizer(),2, true)
         val vectorA = cooccurrenceMatrix.get("cat")
         val vectorB = cooccurrenceMatrix.get("dog")
         val vectorC = cooccurrenceMatrix.get("table")
@@ -124,7 +125,7 @@ class TextUtilsTest {
 
     @Test
     fun `no NaN values in co-occurrence matrix`() {
-        val cocMatrix = generateCooccurrenceMatrix(mlkText, 2, true)
+        val cocMatrix = generateCooccurrenceMatrix(mlkText, SimpleTokenizer(),2, true)
         for (index in 0..cocMatrix.tokens.size){
             // println(coocMatrix[index,0].toString())
             // println(coocMatrix.row(index).toString())
@@ -137,7 +138,7 @@ class TextUtilsTest {
     @Test
     fun `remove stopwords removes words it should`() {
         // "This", "not", and "is" are stop words, the names are not
-        val coc = generateCooccurrenceMatrix("This is Balthazar not Mordrax", 2, true)
+        val coc = generateCooccurrenceMatrix("This is Balthazar not Mordrax", SimpleTokenizer(),2, true)
         val filteredTokens = removeStopWords(coc.tokens)
         assertEquals(2, filteredTokens.size)
     }

@@ -33,9 +33,9 @@ class TextWorldTest {
     @Test
     fun `test update increments current item`() {
         runBlocking { world.update() }
-        assertEquals("This", world.currentItem?.text)
+        assertEquals("This", world.currentToken)
         runBlocking { world.update() }
-        assertEquals("is", world.currentItem?.text)
+        assertEquals("is", world.currentToken)
     }
 
     @Test
@@ -46,7 +46,7 @@ class TextWorldTest {
             world.update()
             world.update()
         }
-        assertEquals("Word1", world.currentItem?.text)
+        assertEquals("Word1", world.currentToken)
     }
 
     @Test

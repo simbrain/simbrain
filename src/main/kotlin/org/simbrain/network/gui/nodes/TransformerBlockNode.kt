@@ -254,7 +254,8 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
     override val toolTipText
         get() = """
         <html>
-        ${transformerBlock.toString().split("\n").joinToString("<br>")}
+        ${transformerBlock.displayName} <br />
+        Location: ${transformerBlock.location}
         </html>
     """.trimIndent()
 

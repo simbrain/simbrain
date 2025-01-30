@@ -36,8 +36,10 @@ import org.simbrain.util.table.MatrixDataFrame
 import org.simbrain.util.table.SimbrainTablePanel
 import java.awt.Color
 import java.awt.event.ActionEvent
-import java.util.*
-import javax.swing.*
+import javax.swing.AbstractAction
+import javax.swing.Action
+import javax.swing.JMenu
+import javax.swing.JPopupMenu
 
 /**
  * PNode representation for [ActivationSequence]
@@ -153,7 +155,8 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
     override val toolTipText
         get() = """
         <html>
-        ${activationSequence.toString().split("\n").joinToString("<br>")}
+        ${activationSequence.displayName} <br />
+        Location: ${activationSequence.location}
         </html>
     """.trimIndent()
 

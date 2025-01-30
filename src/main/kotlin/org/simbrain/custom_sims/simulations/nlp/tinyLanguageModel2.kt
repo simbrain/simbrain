@@ -37,7 +37,7 @@ class TinyLanguageModelOptions(var showEmbeddingDimension: Boolean = true): Edit
     )
 
     var trainerTextPath by GuiEditable(
-        initValue = simulationsPath / "texts" / "corpus_artificial_similarity.txt",
+        initValue = simulationsPath / "texts" / "casual_texting_small.txt",
         description = "Text used to train the model",
         tab = "Text Parsing",
         order = 10,
@@ -109,15 +109,13 @@ val tinyLanguageModel2 = newSim {
         isClamped = true
     }
 
-    val embeddings = ActivationSequence(contextSize, options.embeddingDimension).apply {
-        label = "Embeddings"
+    val transformerBlock = TransformerBlock(contextSize, options.embeddingDimension, options.embeddingDimension).apply {
+        label = "Transformer Block"
     }
-
-    val transformerBlock = TransformerBlock(contextSize, options.embeddingDimension, options.embeddingDimension)
 
     val softMaxLayer = NeuronArray(tokenEmbedding.dimension).apply {
         updateRule = SoftmaxRule()
-        circleMode = size < 50
+        circleMode = size < 100
         gridMode = true
         labelArray = tokenEmbedding.tokens.toTypedArray()
         // Spaces are a hack for label issue in circle mode
@@ -125,13 +123,12 @@ val tinyLanguageModel2 = newSim {
     }
 
     val weightMatrices = listOf(
-        WeightMatrix(inputs, embeddings),
-        WeightMatrix(embeddings, transformerBlock),
+        WeightMatrix(inputs, transformerBlock),
         WeightMatrix(transformerBlock, softMaxLayer)
     )
 
     with(network) {
-        addNetworkModels(inputs, embeddings, transformerBlock, softMaxLayer).awaitAll()
+        addNetworkModels(inputs, transformerBlock, softMaxLayer).awaitAll()
         addNetworkModels(weightMatrices).awaitAll()
         val model = SupervisedModel(inputs, softMaxLayer, false)
         model.initWeights()
@@ -149,8 +146,7 @@ val tinyLanguageModel2 = newSim {
 
     setupUpdateActions(workspace)
 
-    inputs.location = point(-1000, -200)
-    embeddings.location = point(-200, -200)
+    inputs.location = point(-625, -200)
     transformerBlock.location = point(-300, -600)
     softMaxLayer.location = point(-1000, -600)
 

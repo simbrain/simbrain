@@ -100,7 +100,7 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
         get() {
             val visE = (visibleLayer.activations * visibleLayer.biases).sum()
             val hidE = (hiddenLayer.activations * hiddenLayer.biases).sum()
-            val wtsE = hiddenLayer.activations.mm(visibleLayer.activations.transpose()).mul(visibleToHidden.weightMatrix).sum()
+            val wtsE = hiddenLayer.activations.mm(visibleLayer.activations.transpose()).mul(visibleToHidden.weights).sum()
             return "Energy: ${(-visE - hidE - wtsE).roundToString(2)}"
         }
 
@@ -124,7 +124,7 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
         // Negative phase: hidden -> visible "backwards" through weights
         // Note this is a "reconstructed visible" state, but for Simbrain we are setting the gui visible layer to the reconstructed values
         // Make the hidden layer a row vector and left multiply with the matrix, the make the result back into a column vector
-        visibleLayer.addInputs(hiddenLayer.activations.transpose().mm(visibleToHidden.weightMatrix).transpose())
+        visibleLayer.addInputs(hiddenLayer.activations.transpose().mm(visibleToHidden.weights).transpose())
         visibleLayer.update()
         updateWithSampling(visibleLayer)
 
@@ -150,10 +150,10 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
         updateWithSampling(hiddenLayer)
 
         // Get "reconstructed" activations
-        var reconstructedVisible = hiddenLayer.activations.transpose().mm(visibleToHidden.weightMatrix).transpose()
+        var reconstructedVisible = hiddenLayer.activations.transpose().mm(visibleToHidden.weights).transpose()
         reconstructedVisible += visibleLayer.biases
         updateWithSampling(reconstructedVisible)
-        var reconstructedHidden = visibleToHidden.weightMatrix.mm(reconstructedVisible)
+        var reconstructedHidden = visibleToHidden.weights.mm(reconstructedVisible)
         reconstructedHidden += hiddenLayer.biases
         updateWithSampling(reconstructedHidden)
 
@@ -163,7 +163,7 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
         val negativeGradient = reconstructedHidden.mm(reconstructedVisible.transpose())
 
         //  Weight updates
-        visibleToHidden.setMatrixValues(visibleToHidden.weightMatrix + (positiveGradient - negativeGradient) * learningRate)
+        visibleToHidden.setMatrixValues(visibleToHidden.weights + (positiveGradient - negativeGradient) * learningRate)
 
         //  Bias updates.
         visibleLayer.updateBiases(visibleLayer.activations - reconstructedVisible, learningRate)

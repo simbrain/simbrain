@@ -87,7 +87,7 @@ class SpikeResponderMatrixTest {
         val step = StepResponder()
         wm2.spikeResponder = step
 
-        wm2.weightMatrix.mul(0.5)
+        wm2.weights.mul(0.5)
         step.responseDuration = 3
 
         n1.activations = Matrix.column(doubleArrayOf(1.0, 0.0))

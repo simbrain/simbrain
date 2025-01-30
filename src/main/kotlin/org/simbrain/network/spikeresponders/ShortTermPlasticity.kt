@@ -132,8 +132,8 @@ class ShortTermPlasticity : SpikeResponder() {
         val stpData = responderData as STPMatrixData
         val spikeData = na.dataHolder as SpikingMatrixData
         if (na.updateRule.isSpikingRule) {
-            for (i in 0 until wm.weightMatrix.nrow()) {
-                for (j in 0 until wm.weightMatrix.ncol()) {
+            for (i in 0 until wm.weights.nrow()) {
+                for (j in 0 until wm.weights.ncol()) {
                     val (u, R) = shortTermPlasticity(
                         spikeData.lastSpikeTimes[j],
                         stpData.u[i,j],
@@ -141,7 +141,7 @@ class ShortTermPlasticity : SpikeResponder() {
                     )
                     stpData.u.set(i, j, u)
                     stpData.R.set(i, j, R)
-                    val jumpHeight = R * wm.weightMatrix[i, j] * u
+                    val jumpHeight = R * wm.weights[i, j] * u
                     val spiked = spikeData.spikes[j] && probabilisticSpikeCheck()
                     wm.psrMatrix.set(
                         i, j, when (val sr = spikeResponderLocal) {

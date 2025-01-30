@@ -73,12 +73,12 @@ class JumpAndDecay : SpikeResponder() {
         val na = connector.source.let { if (it is NeuronArray) it else return }
         val spikeData = na.dataHolder.let { if (it is SpikingMatrixData) it else return }
         if (na.updateRule.isSpikingRule) {
-            for (i in 0 until wm.weightMatrix.nrow()) {
-                for (j in 0 until wm.weightMatrix.ncol()) {
+            for (i in 0 until wm.weights.nrow()) {
+                for (j in 0 until wm.weights.ncol()) {
                     val psr = jumpAndDecay(
                             spikeData.spikes[j],
                             wm.psrMatrix[i, j],
-                            wm.weightMatrix[i, j],
+                            wm.weights[i, j],
                             timeStep
                         )
                     wm.psrMatrix.set(i, j, psr)

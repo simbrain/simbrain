@@ -336,7 +336,7 @@ class BackpropTrainer(network: Network, backpropNetwork: BackpropNetwork) : Supe
         }
 
         weightAccumulator.forEach { (wm, delta) ->
-            wm.weightMatrix.add(config.optimizer.computeDelta(wm.weightMatrix, delta))
+            wm.weights.add(config.optimizer.computeDelta(wm.weights, delta))
             wm.events.updated.fire()
         }
 

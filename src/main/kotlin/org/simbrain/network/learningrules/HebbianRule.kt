@@ -18,12 +18,14 @@
  */
 package org.simbrain.network.learningrules
 
-import org.simbrain.network.core.*
+import org.simbrain.network.core.Connector
+import org.simbrain.network.core.Network
+import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.gui.dialogs.NetworkPreferences.defaultLearningRate
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.EmptyScalarData
 import org.simbrain.util.UserParameter
-import smile.math.matrix.Matrix
 
 /**
  * Standard Hebbian learning rule.
@@ -58,20 +60,20 @@ class HebbianRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>() {
     context(Network)
     override fun apply(connector: Connector, data: EmptyMatrixData) {
         if (connector is WeightMatrix) {
-            val wm = connector.weightMatrix
+            val wm = connector.weights
             val input = connector.source.activations
             val output = connector.target.activations
             if (forgettingRate == 0.0) {
                 // delta = rate * (input * output^T)
                 wm.add(output.mt(input).mul(learningRate))
             } else {
-                connector.weightMatrix.mul(1 - forgettingRate).add(output.mt(input).mul(learningRate))
+                connector.weights.mul(1 - forgettingRate).add(output.mt(input).mul(learningRate))
             }
         }
     }
 
     fun applyForgetting(connector: WeightMatrix) {
-        connector.weightMatrix.mul(1 - forgettingRate)
+        connector.weights.mul(1 - forgettingRate)
     }
 
     context(Network)

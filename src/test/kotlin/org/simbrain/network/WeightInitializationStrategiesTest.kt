@@ -20,7 +20,7 @@ class WeightInitializationStrategiesTest {
 
         val amplitude = sqrt(6.0 / (numInputs + numOutputs))
 
-        assert(wm.weights.all { it in -amplitude..amplitude })
+        assert(wm.weightArray.all { it in -amplitude..amplitude })
 
     }
 

@@ -53,7 +53,7 @@ class AdditiveRuleTest {
         val nc1 = NeuronCollection(listOf(n1)).also { network.addNetworkModel(it) }
         val nc2 = NeuronCollection(listOf(n2)).also { network.addNetworkModel(it) }
         val weightMatrix = WeightMatrix(nc1, nc2).also { network.addNetworkModel(it) }
-        weightMatrix.weightMatrix[0, 0] = 1.0
+        weightMatrix.weights[0, 0] = 1.0
         n1.activation = 1.0
         n1.clamped = true
         network.update()

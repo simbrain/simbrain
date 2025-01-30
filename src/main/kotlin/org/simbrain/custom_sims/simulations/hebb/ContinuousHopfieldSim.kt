@@ -1,23 +1,17 @@
 package org.simbrain.custom_sims.simulations
 
 import kotlinx.coroutines.awaitAll
-import org.simbrain.custom_sims.*
+import org.simbrain.custom_sims.addNetworkComponent
+import org.simbrain.custom_sims.addSidebarInfo
+import org.simbrain.custom_sims.newSim
 import org.simbrain.custom_sims.simulations.hebb.*
-import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.WeightMatrix
-import org.simbrain.network.core.activations
 import org.simbrain.network.learningrules.HebbianRule
 import org.simbrain.network.neurongroups.NeuronGroup
-import org.simbrain.network.subnetworks.Hopfield
 import org.simbrain.network.updaterules.AdditiveRule
 import org.simbrain.util.place
 import org.simbrain.util.randomizeSymmetric
-import org.simbrain.util.setSpectralRadius
 import org.simbrain.util.showNumericInputDialog
-import org.simbrain.util.stats.distributions.TwoValued
-import kotlin.math.pow
-import kotlin.math.roundToInt
-import kotlin.math.sqrt
 
 /**
  *  Demo for studying continuous Hopfield networks,
@@ -47,7 +41,7 @@ val hopfieldSimContinuous = newSim {
         learningRule = HebbianRule().apply {
             learningRate = .1
         }
-        weightMatrix.randomizeSymmetric()
+        weights.randomizeSymmetric()
     }
 
     network.addNetworkModels(hopfield, wm).awaitAll()
@@ -79,11 +73,11 @@ val hopfieldSimContinuous = newSim {
         place(networkComponent, 220, 0, 509, 619)
 
         createPatternControlPanel(hopfield, true) {
-            wm.weightMatrix.randomizeSymmetric()
+            wm.weights.randomizeSymmetric()
             wm.events.updated.fire()
         }?.apply {
             addButton("Learn All Patterns") {
-                wm.weightMatrix.randomizeSymmetric()
+                wm.weights.randomizeSymmetric()
                 hopfield.isAllClamped = true
                 wm.clamped = false
                 (wm.learningRule as HebbianRule).forgettingRate = 0.0

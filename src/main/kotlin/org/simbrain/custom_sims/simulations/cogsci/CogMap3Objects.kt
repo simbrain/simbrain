@@ -1,8 +1,6 @@
 package org.simbrain.custom_sims.simulations.patterns_of_activity
 
 import org.simbrain.custom_sims.*
-import org.simbrain.custom_sims.addDocViewer
-import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.WeightMatrix
@@ -43,7 +41,7 @@ val cogMap3Objects = newSim {
     }
     val weightMatrix = WeightMatrix(recurrent, recurrent)
     weightMatrix.randomize()
-    weightMatrix.weightMatrix.setSpectralRadius(spectralRadius)
+    weightMatrix.weights.setSpectralRadius(spectralRadius)
     network.addNetworkModels(recurrent, weightMatrix)
 
     // Inputs to reservoir

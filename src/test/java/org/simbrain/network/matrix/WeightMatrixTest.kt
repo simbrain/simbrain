@@ -28,31 +28,31 @@ class WeightMatrixTest {
     fun testMatrixOperations() {
         // Set first entry to 4
 
-        wm.weightMatrix[0, 0] = 4.0
-        Assertions.assertEquals(4.0, wm.weightMatrix[0, 0], 0.0)
+        wm.weights[0, 0] = 4.0
+        Assertions.assertEquals(4.0, wm.weights[0, 0], 0.0)
 
         // Set to ((0,0);(0,0)) and check sum
         wm.setWeights(doubleArrayOf(0.0, 0.0, 0.0, 0.0))
-        Assertions.assertEquals(0.0, wm.weightMatrix.sum(), 0.0)
+        Assertions.assertEquals(0.0, wm.weights.sum(), 0.0)
 
         // Add 1 to each entry. Should get ((1,1);(1,1))
-        wm.weightMatrix.add(1.0)
-        Assertions.assertEquals(4.0, wm.weightMatrix.sum(), 0.0)
+        wm.weights.add(1.0)
+        Assertions.assertEquals(4.0, wm.weights.sum(), 0.0)
     }
 
     @Test
     fun testSetWeights() {
         wm.setWeights(doubleArrayOf(1.0, 2.0, 3.0, 4.0))
-        Assertions.assertEquals(1.0, wm.weightMatrix[0, 0], 0.0)
-        Assertions.assertEquals(2.0, wm.weightMatrix[0, 1], 0.0)
-        Assertions.assertEquals(3.0, wm.weightMatrix[1, 0], 0.0)
-        Assertions.assertEquals(4.0, wm.weightMatrix[1, 1], 0.0)
+        Assertions.assertEquals(1.0, wm.weights[0, 0], 0.0)
+        Assertions.assertEquals(2.0, wm.weights[0, 1], 0.0)
+        Assertions.assertEquals(3.0, wm.weights[1, 0], 0.0)
+        Assertions.assertEquals(4.0, wm.weights[1, 1], 0.0)
     }
 
     @Test
     fun testDiagonalize() {
         wm.diagonalize() // assume wm is 2x2
-        Assertions.assertEquals(2.0, wm.weightMatrix.sum(), 0.0)
+        Assertions.assertEquals(2.0, wm.weights.sum(), 0.0)
     }
 
     @Test
@@ -108,11 +108,11 @@ class WeightMatrixTest {
         val ng1 = NeuronGroup(1000)
         val ng2 = NeuronGroup(1000)
         val wm = WeightMatrix(ng1, ng2)
-        wm.weightMatrix.add(1.0001)
+        wm.weights.add(1.0001)
 
         val start_time = System.currentTimeMillis()
         for (i in 0..999) {
-            wm.weightMatrix.mm(wm.weightMatrix)
+            wm.weights.mm(wm.weights)
         }
         val stop_time = System.currentTimeMillis()
         val difference = stop_time - start_time

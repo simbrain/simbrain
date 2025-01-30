@@ -65,7 +65,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
     var spikeResponder: SpikeResponder = NonResponder()
         set(value) {
             field = value
-            spikeResponseData = value.createMatrixData(weightMatrix.nrow(), weightMatrix.ncol())
+            spikeResponseData = value.createMatrixData(weights.nrow(), weights.ncol())
         }
 
     /**
@@ -87,7 +87,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
         label = "Spike Responder Data",
         tab = "Data",
         onUpdate = {
-            val proposedDataHolder = widgetValue(::spikeResponder).createMatrixData(weightMatrix.nrow(), weightMatrix.ncol())
+            val proposedDataHolder = widgetValue(::spikeResponder).createMatrixData(weights.nrow(), weights.ncol())
             if (widgetValue(::spikeResponseData)::class != proposedDataHolder::class) {
                 refreshValue(proposedDataHolder)
             }
@@ -99,7 +99,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
      * create a new matrix and copy its value to this one.
      */
     @get:Producible
-    val weightMatrix: Matrix
+    val weights: Matrix
 
     @UserParameter(label = "PSR Matrix", order = 300, tab = "Data")
     override var psrMatrix: Matrix
@@ -135,7 +135,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
         source.addOutgoingConnector(this)
         target.addIncomingConnector(this)
 
-        weightMatrix = Matrix(target.size, source.size)
+        weights = Matrix(target.size, source.size)
 
         excitatoryMask = Matrix(target.size, source.size)
         inhibitoryMask = Matrix(target.size, source.size)
@@ -148,8 +148,8 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
     }
 
     @get:Producible
-    val weights: DoubleArray
-        get() = weightMatrix.flatten()
+    val weightArray: DoubleArray
+        get() = weights.flatten()
 
     /**
      * Set the weights using a double array.
@@ -157,16 +157,16 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
     fun setWeights(newWeights: Array<DoubleArray>) {
         for (i in newWeights.indices) {
             for (j in newWeights[i].indices) {
-                weightMatrix[i, j] = newWeights[i][j]
+                weights[i, j] = newWeights[i][j]
             }
         }
     }
 
     @Consumable
     fun setWeights(newWeights: DoubleArray) {
-        val len = min(weightMatrix.size().toInt().toDouble(), newWeights.size.toDouble()).toInt()
+        val len = min(weights.size().toInt().toDouble(), newWeights.size.toDouble()).toInt()
         for (i in 0 until len) {
-            weightMatrix[i / weightMatrix.ncol(), i % weightMatrix.ncol()] = newWeights[i]
+            weights[i / weights.ncol(), i % weights.ncol()] = newWeights[i]
         }
         updateMasks()
         events.updated.fire()
@@ -174,7 +174,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
 
     @Consumable
     fun setMatrixValues(otherWeightMatrix: Matrix?) {
-        weightMatrix.copyFrom(otherWeightMatrix!!)
+        weights.copyFrom(otherWeightMatrix!!)
         updateMasks()
         events.updated.fire()
     }
@@ -185,7 +185,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
     fun diagonalize() {
         clear()
         val diag = Matrix.eye(target.size, source.size)
-        weightMatrix.copyFrom(diag)
+        weights.copyFrom(diag)
         updateMasks()
         events.updated.fire()
     }
@@ -234,7 +234,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
 
 
             // One "half" of a matrix product. Source activations are element-wise multiplied by rows of matrix
-            psrMatrix.copyFrom(weightMatrix.broadcastMultiply(sourceActivations))
+            psrMatrix.copyFrom(weights.broadcastMultiply(sourceActivations))
 
         } else {
             // Spiking case
@@ -243,27 +243,27 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
     }
 
     private fun updateExcitatoryMask() {
-        for (i in 0 until weightMatrix.nrow()) {
-            for (j in 0 until weightMatrix.ncol()) {
-                val newVal = if ((weightMatrix[i, j] > 0)) 1 else 0
+        for (i in 0 until weights.nrow()) {
+            for (j in 0 until weights.ncol()) {
+                val newVal = if ((weights[i, j] > 0)) 1 else 0
                 excitatoryMask[i, j] = newVal.toDouble()
             }
         }
     }
 
     private fun updateInhibitoryMask() {
-        for (i in 0 until weightMatrix.nrow()) {
-            for (j in 0 until weightMatrix.ncol()) {
-                val newVal = if ((weightMatrix[i, j] < 0)) 1 else 0
+        for (i in 0 until weights.nrow()) {
+            for (j in 0 until weights.ncol()) {
+                val newVal = if ((weights[i, j] < 0)) 1 else 0
                 inhibitoryMask[i, j] = newVal.toDouble()
             }
         }
     }
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
-        for (i in 0 until weightMatrix.nrow()) {
-            for (j in 0 until weightMatrix.ncol()) {
-                weightMatrix[i, j] = (randomizer ?: weightRandomizer).sampleDouble()
+        for (i in 0 until weights.nrow()) {
+            for (j in 0 until weights.ncol()) {
+                weights[i, j] = (randomizer ?: weightRandomizer).sampleDouble()
             }
         }
         updateMasks()
@@ -271,13 +271,13 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
     }
 
     override fun increment() {
-        weightMatrix.add(increment)
+        weights.add(increment)
         updateMasks()
         events.updated.fire()
     }
 
     override fun decrement() {
-        weightMatrix.sub(increment)
+        weights.sub(increment)
         updateMasks()
         events.updated.fire()
     }
@@ -286,13 +286,13 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
      * Set all entries to 0.
      */
     fun hardClear() {
-        weightMatrix.copyFrom(Matrix(weightMatrix.nrow(), weightMatrix.ncol()))
+        weights.copyFrom(Matrix(weights.nrow(), weights.ncol()))
         events.updated.fire()
     }
 
     override fun toString(): String {
         return (id
-                + " (" + weightMatrix.nrow() + "x" + weightMatrix.ncol() + ") "
+                + " (" + weights.nrow() + "x" + weights.ncol() + ") "
                 + "connecting " + source.id + " to " + target.id)
     }
 

@@ -9,7 +9,6 @@ import org.simbrain.network.core.getModelByLabel
 import org.simbrain.network.core.getNetworkXStream
 import org.simbrain.util.flatten
 import org.simbrain.util.minus
-import org.simbrain.util.toDoubleArray
 import org.simbrain.util.toMatrix
 import smile.math.matrix.Matrix
 
@@ -124,7 +123,7 @@ class HopfieldTest {
             println((hopfield.neuronGroup.activations - two.toMatrix()).sum())
 
             // Test that the matrices are the same
-            assertEquals(0, (hopfield.weightMatrix.weightMatrix - testmat).sum())
+            assertEquals(0, (hopfield.weightMatrix.weights - testmat).sum())
         }
 
     }

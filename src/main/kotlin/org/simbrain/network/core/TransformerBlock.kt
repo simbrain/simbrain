@@ -99,7 +99,7 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
         get() = throw UnsupportedOperationException("Not applicable to Transformer")
 
     context(Network) override fun accumulateInputs() {
-        val matrix = (incomingConnectors.firstOrNull() as? WeightMatrix)?.weightMatrix
+        val matrix = (incomingConnectors.firstOrNull() as? WeightMatrix)?.weights
         (incomingConnectors.firstOrNull()?.source as? ActivationSequenceProcessor)?.let { source ->
             inputs.add(source.activations.mm(matrix?.transpose()))
         }

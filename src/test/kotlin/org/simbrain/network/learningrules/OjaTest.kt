@@ -129,9 +129,9 @@ class OjaTest {
         na2.activations = outputs
         net.update()
         // Only uses Hebbian part
-        assertArrayEquals(doubleArrayOf(1.0, -1.0), wm12.weightMatrix.row(0))
-        assertArrayEquals(doubleArrayOf(2.0, -2.0), wm12.weightMatrix.row(1))
-        assertArrayEquals(doubleArrayOf(-1.0, 1.0), wm12.weightMatrix.row(2))
+        assertArrayEquals(doubleArrayOf(1.0, -1.0), wm12.weights.row(0))
+        assertArrayEquals(doubleArrayOf(2.0, -2.0), wm12.weights.row(1))
+        assertArrayEquals(doubleArrayOf(-1.0, 1.0), wm12.weights.row(2))
     }
 
 }

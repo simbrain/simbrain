@@ -20,38 +20,6 @@ import org.simbrain.network.updaterules.interfaces.DifferentiableUpdateRule
 import org.simbrain.util.*
 import smile.math.matrix.Matrix
 import java.util.*
-import kotlin.collections.HashMap
-import kotlin.collections.LinkedHashSet
-import kotlin.collections.List
-import kotlin.collections.Map
-import kotlin.collections.associate
-import kotlin.collections.contains
-import kotlin.collections.emptyList
-import kotlin.collections.filter
-import kotlin.collections.filterIsInstance
-import kotlin.collections.first
-import kotlin.collections.flatMap
-import kotlin.collections.flatten
-import kotlin.collections.forEach
-import kotlin.collections.forEachIndexed
-import kotlin.collections.getOrPut
-import kotlin.collections.intersect
-import kotlin.collections.isNotEmpty
-import kotlin.collections.last
-import kotlin.collections.listOf
-import kotlin.collections.map
-import kotlin.collections.mapOf
-import kotlin.collections.mutableListOf
-import kotlin.collections.mutableMapOf
-import kotlin.collections.mutableSetOf
-import kotlin.collections.reduce
-import kotlin.collections.reverse
-import kotlin.collections.reversed
-import kotlin.collections.set
-import kotlin.collections.toList
-import kotlin.collections.toMutableSet
-import kotlin.collections.toSet
-import kotlin.collections.zip
 
 private val WeightMatrix.sourceNeuronArray get() = source as NeuronArray
 private val WeightMatrix.targetNeuronArray get() = target as NeuronArray
@@ -86,10 +54,10 @@ fun WeightMatrix.updateWeights(errorSignal: Matrix, epsilon: Double = .1): Matri
 
     // Backpropagate the error signal through the weights to get a new error vector
     //  Prefer this to errorSignal.T.mm(wm).T because that requies an extra transpose
-    val backropagatedErrors = weightMatrix.transpose().mm(errorSignal)
+    val backropagatedErrors = weights.transpose().mm(errorSignal)
 
     // Update weights
-    weightMatrix.add(weightDeltas.mul(epsilon))
+    weights.add(weightDeltas.mul(epsilon))
     events.updated.fire()
 
     return backropagatedErrors
@@ -128,11 +96,11 @@ fun WeightMatrix.backpropagateError(errorSignal: Matrix): Matrix {
     //println("Propagating errors through ${source.displayName} [${errorSignal.flatten().joinToString(", ") { it.format(2) }}]")
     return if (target is ActivationSequenceProcessor) {
         // sequence of errors * wm
-        errorSignal.mm(weightMatrix)
+        errorSignal.mm(weights)
     } else {
         // error vector * wm
         // Prefer this to errorSignal.T.mm(wm).T because that requires an extra transpose
-        weightMatrix.transpose().mm(errorSignal)
+        weights.transpose().mm(errorSignal)
     }
 }
 
@@ -291,7 +259,7 @@ fun List<WeightMatrix>.accumulateBackprop(
         val weightDeltas = wm.computeWeightDeltas(errorSignal)
         errorSignal = wm.backpropagateError(errorSignal)
         weightAccumulator.getOrPut(wm) {
-            Matrix(wm.weightMatrix.nrow(), wm.weightMatrix.ncol())
+            Matrix(wm.weights.nrow(), wm.weights.ncol())
         }.add(weightDeltas)
     }
 
@@ -426,7 +394,7 @@ fun LinkedHashSet<ArrayLayer>.accumulateBackprop(
             val wm = connector as WeightMatrix
             val weightDeltas = wm.computeWeightDeltas(errorSignal)
             weightAccumulator.getOrPut(wm) {
-                Matrix(wm.weightMatrix.nrow(), wm.weightMatrix.ncol())
+                Matrix(wm.weights.nrow(), wm.weights.ncol())
             }.add(weightDeltas)
             val currentConnectorErrorSignal = wm.backpropagateError(errorSignal)
 
@@ -551,7 +519,7 @@ fun List<WeightMatrix>.printActivationsAndWeights(showWeights: Boolean = false) 
         wm.target.update()
         println(wm)
         if (showWeights) {
-            println(wm.weightMatrix)
+            println(wm.weights)
         }
         println(wm.target)
     }

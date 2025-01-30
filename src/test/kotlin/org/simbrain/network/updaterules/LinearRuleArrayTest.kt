@@ -35,7 +35,7 @@ class LinearRuleArrayTest {
 
     @Test
     fun `test with negative weights`() {
-        w13.weightMatrix.mul(-1.0)
+        w13.weights.mul(-1.0)
         net.update()
         assertArrayEquals(doubleArrayOf(-2.0, 2.0), output.activationArray, 0.0)
     }

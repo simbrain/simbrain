@@ -44,7 +44,7 @@ class StepResponder(
         for (i in 0 until connector.psrMatrix.ncol()) {
             for (j in 0 until connector.psrMatrix.nrow()) {
                 if (lastSpikeTimes[i] + responseDuration * timeStep >= time && probabilisticSpikeCheck()) {
-                    connector.psrMatrix[j, i] = connector.weightMatrix[j, i]
+                    connector.psrMatrix[j, i] = connector.weights[j, i]
                 } else {
                     connector.psrMatrix[j, i] = 0.0
                 }

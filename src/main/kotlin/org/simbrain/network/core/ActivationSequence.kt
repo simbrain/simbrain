@@ -86,7 +86,7 @@ class ActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inpu
     override val size: Int = inputSize
 
     context(Network) override fun accumulateInputs() {
-        val matrix = (incomingConnectors.firstOrNull() as? WeightMatrix)?.weightMatrix
+        val matrix = (incomingConnectors.firstOrNull() as? WeightMatrix)?.weights
         (incomingConnectors.firstOrNull()?.source as? ActivationSequenceProcessor)?.let { source ->
             inputs.add(source.activations.mm(matrix?.transpose()))
         }

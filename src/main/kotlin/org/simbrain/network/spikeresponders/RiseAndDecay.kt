@@ -56,13 +56,13 @@ class RiseAndDecay : SpikeResponder() {
         val responseData = responderData as RiseAndDecayMatrixData
         val spikeData = na.dataHolder as SpikingMatrixData
         if (na.updateRule.isSpikingRule) {
-            for (i in 0 until wm.weightMatrix.nrow()) {
-                for (j in 0 until wm.weightMatrix.ncol()) {
+            for (i in 0 until wm.weights.nrow()) {
+                for (j in 0 until wm.weights.ncol()) {
                     val (psr, recovery) = riseAndDecay(
                         spikeData.spikes[j],
                         wm.psrMatrix[i, j],
                         responseData.recoveryMatrix[i,j],
-                        wm.weightMatrix[i, j],
+                        wm.weights[i, j],
                         timeStep
                     )
                     wm.psrMatrix.set(i, j, psr)

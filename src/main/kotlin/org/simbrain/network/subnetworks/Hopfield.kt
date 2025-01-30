@@ -100,7 +100,7 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
     }
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
-        weightMatrix.weightMatrix.randomizeSymmetric(randomizer ?: NetworkPreferences.weightRandomizer)
+        weightMatrix.weights.randomizeSymmetric(randomizer ?: NetworkPreferences.weightRandomizer)
     }
 
     context(Network)
@@ -136,9 +136,9 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
                 .applyFunction(::bipolar)
                 .mm(neuronGroup.activations.applyFunction(::bipolar).transpose())
                 .mul(learningRate)
-                .add(weightMatrix.weightMatrix)
+                .add(weightMatrix.weights)
         )
-        weightMatrix.weightMatrix.zeroDiagonalInPlace()
+        weightMatrix.weights.zeroDiagonalInPlace()
         weightMatrix.events.updated.fire()
         events.updated.fire()
     }
@@ -161,7 +161,7 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
             context(Network)
             override fun update(hop: Hopfield) {
                 val randomIndex = (0 until hop.neuronGroup.size).random()
-                hop.neuronGroup.neuronList[randomIndex].activation = hop.weightMatrix.weightMatrix
+                hop.neuronGroup.neuronList[randomIndex].activation = hop.weightMatrix.weights
                     .row(randomIndex)
                     .dot(hop.neuronGroup.activationArray)
                     .let { if (it > 0.0) 1.0 else 0.0 }
@@ -178,7 +178,7 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
             context(Network)
             override fun update(hop: Hopfield) {
                 (0 until hop.neuronGroup.size).forEach {
-                    hop.neuronGroup.neuronList[it].activation = hop.weightMatrix.weightMatrix
+                    hop.neuronGroup.neuronList[it].activation = hop.weightMatrix.weights
                         .row(it)
                         .dot(hop.neuronGroup.activationArray)
                         .let { if (it > 0.0) 1.0 else 0.0 }
@@ -194,7 +194,7 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
             context(Network)
             override fun update(hop: Hopfield) {
                 hop.neuronGroup.setActivations(
-                    hop.weightMatrix.weightMatrix
+                    hop.weightMatrix.weights
                         .mm(hop.neuronGroup.activations)
                         .applyFunction { if (it > 0.0) 1.0 else 0.0 }
                         .toDoubleArray()

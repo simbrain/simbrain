@@ -65,7 +65,7 @@ class OjaRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>() {
     context(Network)
     override fun apply(connector: Connector, dataHolder: EmptyMatrixData) {
         if (connector is WeightMatrix) {
-            val wm = connector.weightMatrix
+            val wm = connector.weights
             val input = (connector.source as NeuronArray).activations
             val output = (connector.target as NeuronArray).activations
             // delta    = rate * (input * output^T - input "broadcast multiplied by" weight matrix)

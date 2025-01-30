@@ -94,7 +94,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
      */
     private fun renderMatrixToImage() {
         val weightMatrix = weightMatrix as WeightMatrix
-        val matrix = weightMatrix.weightMatrix
+        val matrix = weightMatrix.weights
         val screenScalingFactor = getScreenScalingFactor()
         networkPanelScalingFactor = networkPanel.scalingFactor
         val scale = networkPanel.scalingFactor * screenScalingFactor
@@ -185,7 +185,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
                 contextMenu.add(
                     actionManager
                         .createCoupledPlotMenu(
-                            (weightMatrix).getProducer(WeightMatrix::weights),
+                            (weightMatrix).getProducer(WeightMatrix::weightArray),
                             Objects.requireNonNull<String>(weightMatrix.id),
                             "Plot Weight Matrix"
                         )
@@ -198,7 +198,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
                         iconPath = "menu_icons/lambda.png",
                         initBlock = {
                             val canShowEigenValues = try {
-                                weightMatrix.weightMatrix.eigen()
+                                weightMatrix.weights.eigen()
                                 true
                             } catch (e: Exception) {
                                 // println("Error: ${e.message}")
@@ -206,7 +206,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
                             }
                             isEnabled = canShowEigenValues
                         }) {
-                        val eigenValues = weightMatrix.weightMatrix.eigenValuesString()
+                        val eigenValues = weightMatrix.weights.eigenValuesString()
                         JOptionPane.showMessageDialog(
                             this,
                             "[${eigenValues.joinToString(", ")}]",
@@ -222,9 +222,9 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
                                 " churns; > 1 explodes.",
                     ) {
                         val radius =
-                            showNumericInputDialog("Set spectral Radius:", weightMatrix.weightMatrix.maxEigenvalue())
+                            showNumericInputDialog("Set spectral Radius:", weightMatrix.weights.maxEigenvalue())
                         if (radius != null) {
-                            weightMatrix.weightMatrix.setSpectralRadius(radius)
+                            weightMatrix.weights.setSpectralRadius(radius)
                             weightMatrix.events.updated.fire()
                         }
                     }
@@ -234,7 +234,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
                         name = "Randomize symmetric",
                         description = "Use network weight randomizer to randomize the matrix symmetrically ",
                     ) {
-                            weightMatrix.weightMatrix.randomizeSymmetric(NetworkPreferences.weightRandomizer)
+                            weightMatrix.weights.randomizeSymmetric(NetworkPreferences.weightRandomizer)
                             weightMatrix.events.updated.fire()
                     }
                 )
@@ -243,7 +243,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
                         name = "Zero diagonal",
                         description = "Effectively removes self-connections (in the recurrent case)",
                     ) {
-                        weightMatrix.weightMatrix.zeroDiagonalInPlace()
+                        weightMatrix.weights.zeroDiagonalInPlace()
                         weightMatrix.events.updated.fire()
                     }
                 )
@@ -280,7 +280,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
 
             // Weight matrix
             if (weightMatrix is WeightMatrix) {
-                val wm = MatrixDataFrame(weightMatrix.weightMatrix)
+                val wm = MatrixDataFrame(weightMatrix.weights)
                 val wmViewer = SimbrainTablePanel(wm, false)
                 wmViewer.addSimpleDefaults()
                 wmViewer.addSeparator()

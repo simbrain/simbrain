@@ -85,12 +85,12 @@ class HebbTest {
         net.update()
         // Weights start at 0
         // Expecting [[2,6],[1,3]]
-        assertArrayEquals(doubleArrayOf(2.0,6.0), wm12.weightMatrix.row(0))
-        assertArrayEquals(doubleArrayOf(1.0,3.0), wm12.weightMatrix.row(1))
+        assertArrayEquals(doubleArrayOf(2.0,6.0), wm12.weights.row(0))
+        assertArrayEquals(doubleArrayOf(1.0,3.0), wm12.weights.row(1))
         net.update()
         // Expecting [[4,12],[2,6]]
-        assertArrayEquals(doubleArrayOf(4.0,12.0), wm12.weightMatrix.row(0))
-        assertArrayEquals(doubleArrayOf(2.0,6.0), wm12.weightMatrix.row(1))
+        assertArrayEquals(doubleArrayOf(4.0,12.0), wm12.weights.row(0))
+        assertArrayEquals(doubleArrayOf(2.0,6.0), wm12.weights.row(1))
     }
 
     @Test
@@ -102,8 +102,8 @@ class HebbTest {
         (wm12.learningRule as HebbianRule).learningRate = .1
         net.update()
         // Expecting [[.2,.6],[.1,.3]]
-        assertArrayEquals(doubleArrayOf(.2,.6), wm12.weightMatrix.row(0), .01)
-        assertArrayEquals(doubleArrayOf(.1,.3), wm12.weightMatrix.row(1), .01)
+        assertArrayEquals(doubleArrayOf(.2,.6), wm12.weights.row(0), .01)
+        assertArrayEquals(doubleArrayOf(.1,.3), wm12.weights.row(1), .01)
     }
 
     @Test
@@ -123,9 +123,9 @@ class HebbTest {
         na2.activations = outputs
         net.update()
         // Expecting [[1.0, 0.0, -.5],[-1.0, 0.0, .5]]
-        print(wm_v2.weightMatrix)
-        assertArrayEquals(doubleArrayOf(1.0, 0.0, -.5), wm_v2.weightMatrix.row(0), .01)
-        assertArrayEquals(doubleArrayOf(-1.0, 0.0, .5), wm_v2.weightMatrix.row(1), .01)
+        print(wm_v2.weights)
+        assertArrayEquals(doubleArrayOf(1.0, 0.0, -.5), wm_v2.weights.row(0), .01)
+        assertArrayEquals(doubleArrayOf(-1.0, 0.0, .5), wm_v2.weights.row(1), .01)
     }
 
 }

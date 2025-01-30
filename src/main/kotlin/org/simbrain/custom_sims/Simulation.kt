@@ -201,7 +201,7 @@ fun SimulationScope.addDocViewer(title: String, markdownText: String): DocViewer
     return docViewerComponent
 }
 
-suspend fun SimulationScope.addSidebarInfo(markdownText: String, width: Int? = null, initiallyOpened: Boolean = true) {
+suspend fun SimulationScope.addSidebarInfo(markdownText: String, width: Int? = null, initiallyOpened: Boolean = false) {
     workspace.infoDoc.text = markdownText
     workspace.infoDoc.render()
     withGui {

@@ -36,7 +36,6 @@ import smile.math.matrix.Matrix
 import java.awt.Color
 import java.awt.event.ActionEvent
 import java.awt.geom.Point2D
-import java.util.*
 import javax.swing.*
 
 
@@ -150,7 +149,6 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
      */
     private val infoText = PText().apply {
         font = INFO_FONT
-        text = computeInfoText()
         mainNode.addChild(this)
     }
 
@@ -178,7 +176,6 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
 
         events.updateGraphics.on(Dispatchers.Swing) {
             updateImages()
-            updateInfoText()
         }
 
         updateImages()
@@ -252,17 +249,6 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
         }
 
         updateTextLabels()
-    }
-
-    private fun computeInfoText() = """
-            ${transformerBlock.displayName}
-            """.trimIndent()
-
-    /**
-     * Update status text.
-     */
-    private fun updateInfoText() {
-        infoText.text = computeInfoText()
     }
 
     override val toolTipText
@@ -341,7 +327,7 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
         }
 
     override val propertyDialog: StandardDialog
-        get() = transformerBlock.createEditorDialog { updateInfoText() }
+        get() = transformerBlock.createEditorDialog()
 
     override val model: TransformerBlock
         get() = transformerBlock
@@ -352,7 +338,7 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
     fun updateTextLabels() {
         if (!transformerBlock.label.isNullOrEmpty()) {
             labelText.font = NEURON_FONT
-            labelText.text = "" + transformerBlock.label
+            labelText.text = transformerBlock.label
             labelText.setOffset(
                 this.selfAttentionImage.x - labelText.width / 2 + this.selfAttentionImage.width / 2,
                 this.selfAttentionImage.y - labelText.height - 17

@@ -434,3 +434,20 @@ val Matrix.columns get() = object : Iterable<Matrix> {
         override fun next() = col(index++).toMatrix()
     }
 }
+
+fun Matrix.prettyPrint(decimals: Int = 3): String {
+    val formatter = { value: Double -> "%.${decimals}f".format(value) }
+
+    return when {
+        nrow() == 1 -> // Row vector
+            "[ " + (0 until ncol()).joinToString("  ") { formatter(get(0, it)) } + " ]"
+
+        ncol() == 1 -> // Column vector
+            (0 until nrow()).joinToString("\n") { "[ ${formatter(get(it, 0))} ]" }
+
+        else -> // General matrix
+            (0 until nrow()).joinToString("\n") { row ->
+                "[ " + (0 until ncol()).joinToString("  ") { col -> formatter(get(row, col)) } + " ]"
+            }
+    }
+}

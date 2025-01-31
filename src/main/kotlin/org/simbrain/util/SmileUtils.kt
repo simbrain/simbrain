@@ -435,7 +435,7 @@ val Matrix.columns get() = object : Iterable<Matrix> {
     }
 }
 
-fun Matrix.prettyPrint(decimals: Int = 3): String {
+fun Matrix.prettyPrint(decimals: Int = 2): String {
     val formatter = { value: Double -> "%.${decimals}f".format(value) }
 
     return when {

@@ -2,15 +2,15 @@ package org.simbrain.network.subnetworks
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.getModelByLabel
 import org.simbrain.network.core.getNetworkXStream
+import org.simbrain.util.cartesianProduct
 import org.simbrain.util.flatten
-import org.simbrain.util.minus
-import org.simbrain.util.toMatrix
+import org.simbrain.util.sse
 import smile.math.matrix.Matrix
+import kotlin.math.abs
 
 class HopfieldTest {
 
@@ -25,23 +25,34 @@ class HopfieldTest {
 
     val zero = Matrix.of(
         arrayOf(
-            doubleArrayOf(-1.0, 1.0, 1.0, 1.0, -1.0),
-            doubleArrayOf(1.0, -1.0, -1.0, -1.0, 1.0),
-            doubleArrayOf(1.0, -1.0, -1.0, -1.0, 1.0),
-            doubleArrayOf(1.0, -1.0, -1.0, -1.0, 1.0),
-            doubleArrayOf(1.0, -1.0, -1.0, -1.0, 1.0),
-            doubleArrayOf(-1.0, 1.0, 1.0, 1.0, -1.0)
+            doubleArrayOf(0.0, 1.0, 1.0, 1.0, 0.0),
+            doubleArrayOf(1.0, 0.0, 0.0, 0.0, 1.0),
+            doubleArrayOf(1.0, 0.0, 0.0, 0.0, 1.0),
+            doubleArrayOf(1.0, 0.0, 0.0, 0.0, 1.0),
+            doubleArrayOf(1.0, 0.0, 0.0, 0.0, 1.0),
+            doubleArrayOf(0.0, 1.0, 1.0, 1.0, 0.0)
         )
     ).flatten()
 
     val one = Matrix.of(
         arrayOf(
-            doubleArrayOf(-1.0, 1.0, 1.0, -1.0, -1.0),
-            doubleArrayOf(-1.0, -1.0, 1.0, -1.0, -1.0),
-            doubleArrayOf(-1.0, -1.0, 1.0, -1.0, -1.0),
-            doubleArrayOf(-1.0, -1.0, 1.0, -1.0, -1.0),
-            doubleArrayOf(-1.0, -1.0, 1.0, -1.0, -1.0),
-            doubleArrayOf(-1.0, -1.0, 1.0, -1.0, -1.0)
+            doubleArrayOf(0.0, 1.0, 1.0, 0.0, 0.0),
+            doubleArrayOf(0.0, 0.0, 1.0, 0.0, 0.0),
+            doubleArrayOf(0.0, 0.0, 1.0, 0.0, 0.0),
+            doubleArrayOf(0.0, 0.0, 1.0, 0.0, 0.0),
+            doubleArrayOf(0.0, 0.0, 1.0, 0.0, 0.0),
+            doubleArrayOf(0.0, 0.0, 1.0, 0.0, 0.0)
+        )
+    ).flatten()
+
+    val two = Matrix.of(
+        arrayOf(
+            doubleArrayOf(1.0, 1.0, 1.0, 0.0, 0.0),
+            doubleArrayOf(0.0, 0.0, 0.0, 1.0, 0.0),
+            doubleArrayOf(0.0, 0.0, 0.0, 1.0, 0.0),
+            doubleArrayOf(0.0, 1.0, 1.0, 0.0, 0.0),
+            doubleArrayOf(1.0, 0.0, 0.0, 0.0, 0.0),
+            doubleArrayOf(1.0, 1.0, 1.0, 1.0, 1.0)
         )
     ).flatten()
 
@@ -60,7 +71,7 @@ class HopfieldTest {
         doubleArrayOf(-0.3333333333333333, -0.3333333333333333, -0.3333333333333333, 1.0, 0.3333333333333333, 1.0, 0.3333333333333333, -0.3333333333333333, -0.3333333333333333, 1.0, 0.0, 0.3333333333333333, -0.3333333333333333, -0.3333333333333333, 1.0, 1.0, -0.3333333333333333, -1.0, 0.3333333333333333, 1.0, 0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 0.3333333333333333, 1.0, -0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 0.3333333333333333, -0.3333333333333333),
         doubleArrayOf(0.3333333333333333, -1.0, -1.0, 0.3333333333333333, 1.0, 0.3333333333333333, 1.0, 0.3333333333333333, 0.3333333333333333, 0.3333333333333333, 0.3333333333333333, 0.0, 0.3333333333333333, 0.3333333333333333, 0.3333333333333333, 0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 1.0, 0.3333333333333333, -0.3333333333333333, 1.0, 0.3333333333333333, 1.0, 0.3333333333333333, 0.3333333333333333, -0.3333333333333333, -1.0, -0.3333333333333333, 0.3333333333333333),
         doubleArrayOf(-0.3333333333333333, -0.3333333333333333, -0.3333333333333333, -0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 0.3333333333333333, 1.0, -0.3333333333333333, -0.3333333333333333, -0.3333333333333333, 0.3333333333333333, 0.0, -0.3333333333333333, -0.3333333333333333, -0.3333333333333333, -0.3333333333333333, 0.3333333333333333, 0.3333333333333333, -0.3333333333333333, -1.0, 0.3333333333333333, 1.0, 0.3333333333333333, -0.3333333333333333, -0.3333333333333333, -1.0, -0.3333333333333333, -1.0, -0.3333333333333333),
-        doubleArrayOf(1.0, -0.3333333333333333, -0.3333333333333333, -0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 1.0, -0.3333333333333333, -0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 0.0, -0.3333333333333333, -0.3333333333333333, 1.0, 0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 1.0, 0.3333333333333333, -0.3333333333333333, 0.3333333333333333, 1.0),
+        doubleArrayOf(1.0, -0.3333333333333333, -0.3333333333333333, -0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 1.0, -0.3333333333333333, -0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 0.0, -0.3333333333333333, -0.3333333333333333, 1.0, 0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 1.0, 0.3333333333333333, -0.3333333333333333, 0.3333333333333333, 1.0), // 13
         doubleArrayOf(-0.3333333333333333, -0.3333333333333333, -0.3333333333333333, 1.0, 0.3333333333333333, 1.0, 0.3333333333333333, -0.3333333333333333, -0.3333333333333333, 1.0, 1.0, 0.3333333333333333, -0.3333333333333333, -0.3333333333333333, 0.0, 1.0, -0.3333333333333333, -1.0, 0.3333333333333333, 1.0, 0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 0.3333333333333333, 1.0, -0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 0.3333333333333333, -0.3333333333333333),
         doubleArrayOf(-0.3333333333333333, -0.3333333333333333, -0.3333333333333333, 1.0, 0.3333333333333333, 1.0, 0.3333333333333333, -0.3333333333333333, -0.3333333333333333, 1.0, 1.0, 0.3333333333333333, -0.3333333333333333, -0.3333333333333333, 1.0, 0.0, -0.3333333333333333, -1.0, 0.3333333333333333, 1.0, 0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 0.3333333333333333, 1.0, -0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 0.3333333333333333, -0.3333333333333333),
         doubleArrayOf(1.0, -0.3333333333333333, -0.3333333333333333, -0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 1.0, -0.3333333333333333, -0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 1.0, -0.3333333333333333, -0.3333333333333333, 0.0, 0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 1.0, 0.3333333333333333, -0.3333333333333333, 0.3333333333333333, 1.0),
@@ -79,51 +90,42 @@ class HopfieldTest {
         doubleArrayOf(1.0, -0.3333333333333333, -0.3333333333333333, -0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 1.0, -0.3333333333333333, -0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 1.0, -0.3333333333333333, -0.3333333333333333, 1.0, 0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 0.3333333333333333, -0.3333333333333333, 1.0, 0.3333333333333333, -0.3333333333333333, 0.3333333333333333, 0.0)
     ))
 
-    val two = Matrix.of(
-        arrayOf(
-            doubleArrayOf(1.0, 1.0, 1.0, -1.0, -1.0),
-            doubleArrayOf(-1.0, -1.0, -1.0, 1.0, -1.0),
-            doubleArrayOf(-1.0, -1.0, -1.0, 1.0, -1.0),
-            doubleArrayOf(-1.0, 1.0, 1.0, -1.0, -1.0),
-            doubleArrayOf(1.0, -1.0, -1.0, -1.0, -1.0),
-            doubleArrayOf(1.0, 1.0, 1.0, 1.0, 1.0)
-        )
-    ).flatten()
-
     @Test
     fun `train on three patterns and test recall`() {
-        with(net) {
-            hopfield.learningRate = 1.0/3.0
-            hopfield.updateFunc = Hopfield.HopfieldUpdate.STOCHASTIC
-            hopfield.neuronGroup.setActivations(zero)
-            hopfield.trainOnCurrentPattern()
-            hopfield.neuronGroup.setActivations(one)
-            hopfield.trainOnCurrentPattern()
-            hopfield.neuronGroup.setActivations(two)
-            hopfield.trainOnCurrentPattern()
+        fun diffString(expected: DoubleArray, actual: DoubleArray, epsilon: Double = 0.0001) = expected.zip(actual).mapIndexed { i, (a, b) ->
+            if (abs(a - b) > epsilon) "[$i]: $a (expecting $b)" else null
+        }.filterNotNull().joinToString()
 
-            // Test recall
+        // Test recall
+        val patterns = listOf(zero, one, two)
+
+        with(net) {
+            hopfield.learningRate = 1.0 / patterns.size
             hopfield.neuronGroup.setActivations(zero)
-            repeat(10) {
-                hopfield.update()
-            }
-            assertTrue((hopfield.neuronGroup.activations - zero.toMatrix()).sum() < 1)
-            println((hopfield.neuronGroup.activations - zero.toMatrix()).sum())
+            hopfield.trainOnCurrentPattern()
             hopfield.neuronGroup.setActivations(one)
-            repeat(10) {
-                hopfield.update()
-            }
-            assertTrue((hopfield.neuronGroup.activations - one.toMatrix()).sum() < 1)
-            println((hopfield.neuronGroup.activations - one.toMatrix()).sum())
+            hopfield.trainOnCurrentPattern()
             hopfield.neuronGroup.setActivations(two)
-            repeat(10) {
-                hopfield.update()
-            }
-            assertTrue((hopfield.neuronGroup.activations - two.toMatrix()).sum() < 1)
-            println((hopfield.neuronGroup.activations - two.toMatrix()).sum())
+            hopfield.trainOnCurrentPattern()
 
             // Test that the matrices are the same
-            assertEquals(0, (hopfield.weightMatrix.weights - testmat).sum())
+            assertEquals(0.0, (hopfield.weightMatrix.weights.flatten()).sse(testmat.flatten()))
+
+            val updateTypes = listOf(
+                Hopfield.HopfieldUpdate.STOCHASTIC,
+                Hopfield.HopfieldUpdate.SEQ,
+                Hopfield.HopfieldUpdate.SYNC,
+            )
+            (patterns cartesianProduct updateTypes).forEach { (pattern, updateType) ->
+                hopfield.updateFunc = updateType
+                hopfield.neuronGroup.setActivations(pattern)
+                repeat(10) {
+                    hopfield.update()
+                }
+                assert(hopfield.neuronGroup.activations.flatten() sse pattern < 1) {
+                    diffString(pattern, hopfield.neuronGroup.activations.flatten())
+                }
+            }
         }
 
     }
@@ -131,7 +133,6 @@ class HopfieldTest {
     @Test
     fun `test hopfield network serialization`() {
         val xmlRep = getNetworkXStream().toXML(net)
-        println(xmlRep)
         val fromXml = getNetworkXStream().fromXML(xmlRep) as Network
         Assertions.assertNotNull(fromXml.getModelByLabel(Hopfield::class.java, "Hopfield"))
     }

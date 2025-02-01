@@ -38,13 +38,13 @@ class BackpropNetworkTest {
     @Test
     fun `test backprop learning`() {
         bp.trainerConfig.updateType = UpdateMethod.Epoch()
-        bp.trainerConfig.learningRate = 0.04
+        bp.trainerConfig.learningRate = 0.01
         bp.trainerConfig.optimizer = AdamOptimizer()
 
         val trainer = BackpropTrainer(net, bp)
 
         runBlocking {
-            repeat(1000) {
+            repeat(2000) {
                 trainer.trainOnce()
             }
         }

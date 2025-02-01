@@ -85,7 +85,7 @@ class SimpleTokenizer(
 
     override fun tokenize(text: String): List<TokenizerResult> {
         val regex = listOfNotNull(
-            """\w+""", // Words
+            """[\w’]+""", // Words, including words like don’t with apostrophes
             if (useSpaces) """\s""" else null,
             if (useReturns) """\n""" else null,
             if (usePunctuation) """[^\w\s]""" else null

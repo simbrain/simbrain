@@ -63,7 +63,7 @@ class AdamOptimizer(
     private var initialIteration = 0
 
     context(SupervisedTrainer<*>)
-    private val timeSinceLastReset get() = iteration - initialIteration
+    private val timeSinceLastReset get() = (iteration - initialIteration).coerceAtLeast(1)
 
     context(SupervisedTrainer<*>)
     override fun computeDelta(matrix: Matrix, delta: Matrix): Matrix {

@@ -955,14 +955,10 @@ class MatrixWidget<O : EditableObject>(
 
     private var model = MatrixDataFrame(
         // Column display mode only applies to column vectors
-        if (parameter.value.ncol() == 1) {
-            if (parameter.columnMode) {
-                parameter.value
-            } else {
-                parameter.value.transpose()
-            }
-        } else {
+        if (parameter.columnMode && parameter.value.ncol() == 1) {
             parameter.value
+        } else {
+            parameter.value.transpose()
         }
     )
 
@@ -982,7 +978,7 @@ class MatrixWidget<O : EditableObject>(
     }
 
     override val value: Matrix
-        get() = if (parameter.columnMode) {
+        get() = if (parameter.columnMode && parameter.value.ncol() == 1) {
             model.data
         } else {
             model.data.transpose()

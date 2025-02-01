@@ -9,6 +9,7 @@ import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
 import smile.math.matrix.Matrix
 import kotlin.math.exp
+import kotlin.math.pow
 import kotlin.math.sqrt
 
 /**
@@ -60,7 +61,13 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
         }
 
     @UserParameter(label = "Layer Norm", description = "Use layer normalization", order = 13)
-    var useLayerNorm = false
+    var useLayerNorm = true
+    
+    @UserParameter(label = "User Positional Encoding", description = "Use user positional encoding", order = 14)
+    var userPositionalEncoding = false
+
+    @UserParameter(label = "Triangular Mask", description = "Use triangular mask", order = 15)
+    var useTriangularMask = true
 
     /**
      * Output activations as double array
@@ -156,6 +163,17 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
             return
         }
 
+        if (userPositionalEncoding) {
+            val positionalEncoding = Matrix(sequenceSize, size).apply {
+                for (i in 0 until sequenceSize) {
+                    for (j in 0 until size) {
+                        this[i, j] = kotlin.math.sin(i.toDouble() / (10000.0.pow(j.toDouble() / size)))
+                    }
+                }
+            }
+            inputs.add(positionalEncoding)
+        }
+
         val scale = sqrt(size.toDouble())
 
         kStack.copyFrom(inputs.mm(K))
@@ -166,8 +184,10 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
         selfAttention.div(scale)
 
         // Mask out the upper triangle of the self-attention matrix
-        selfAttention.setValuesInPlace { i, j ->
-            if (i < j) Double.NEGATIVE_INFINITY else selfAttention[i, j]
+        if (useTriangularMask) {
+            selfAttention.setValuesInPlace { i, j ->
+                if (i < j) Double.NEGATIVE_INFINITY else selfAttention[i, j]
+            }
         }
 
         // Apply softmax to each row
@@ -294,6 +314,12 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
 
     fun copy() = TransformerBlock(sequenceSize, inputSize, hiddenSize).also {
         it.activations.copyFrom(activations)
+        it.matrixVisibility = matrixVisibility
+        it.sequenceVisibility = sequenceVisibility
+        it.feedForwardVisibility = feedForwardVisibility
+        it.useLayerNorm = useLayerNorm
+        it.userPositionalEncoding = userPositionalEncoding
+        it.useTriangularMask = useTriangularMask
         it.K.copyFrom(K)
         it.Q.copyFrom(Q)
         it.V.copyFrom(V)
@@ -305,8 +331,11 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
         it.qStack.copyFrom(qStack)
         it.vStack.copyFrom(vStack)
         it.selfAttention.copyFrom(selfAttention)
+        it.attentionOutput.copyFrom(attentionOutput)
         it.feedForwardInput.copyFrom(feedForwardInput)
+        it.feedForwardHiddenNetInputs.copyFrom(feedForwardHiddenNetInputs)
         it.feedForwardHidden.copyFrom(feedForwardHidden)
+        it.feedForwardOutputNetInputs.copyFrom(feedForwardOutputNetInputs)
     }
 
     class CreationTemplate : EditableObject {

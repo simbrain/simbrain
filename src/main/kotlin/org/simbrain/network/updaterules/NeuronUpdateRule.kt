@@ -265,6 +265,7 @@ val scalarUpdateRules = listOf(
     ContinuousSigmoidalRule::class.java,
     DecayRule::class.java,
     FitzhughNagumo::class.java,
+    GELU::class.java,
     IACRule::class.java,
     IntegrateAndFireRule::class.java,
     IzhikevichRule::class.java,

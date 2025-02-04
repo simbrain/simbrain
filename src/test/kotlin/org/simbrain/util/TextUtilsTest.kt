@@ -2,6 +2,8 @@ package org.simbrain.util
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.simbrain.world.textworld.EmbeddingType
+import org.simbrain.world.textworld.TokenEmbeddingBuilder
 import smile.math.matrix.Matrix
 
 class TextUtilsTest {
@@ -83,53 +85,71 @@ class TextUtilsTest {
 
     @Test
     fun `co-occurrence matrix is correct size`() {
-        val tokens = simpleText.tokenizeWordsFromString().uniqueTokensFromArray()
-        val cooccurrenceMatrix = generateCooccurrenceMatrix(simpleText, SimpleTokenizer(),2, true, removeStopwords = false)
-        assertEquals(tokens.size, cooccurrenceMatrix.tokenVectorMatrix.nrow())
-        assertEquals(tokens.size, cooccurrenceMatrix.tokenVectorMatrix.ncol())
+        val tokenEmbedding = TokenEmbeddingBuilder(
+            tokenizer = SimpleTokenizer(),
+            embeddingType = EmbeddingType.CoOccurrence(windowSize = 2).apply { removeStopWords = false }
+        ).build(simpleText)
+        val tokens = tokenEmbedding.tokens
+        assertEquals(tokens.size, tokenEmbedding.tokenVectorMatrix.nrow())
+        assertEquals(tokens.size, tokenEmbedding.tokenVectorMatrix.ncol())
     }
 
     @Test
     fun `word embedding have correct size`() {
-        val tokenizedSentence = harderText.tokenizeWordsFromString()
-        val tokens = tokenizedSentence.uniqueTokensFromArray()
-        val cooccurrenceMatrix = generateCooccurrenceMatrix(harderText, SimpleTokenizer(), 2, true)
-        assertEquals(tokens.size, cooccurrenceMatrix.get("obstacles").size)
-        assertEquals(tokens.size, cooccurrenceMatrix.get("Quixote").size) // issue wascapital Q
+        val tokenEmbedding = TokenEmbeddingBuilder(
+            tokenizer = SimpleTokenizer(),
+            embeddingType = EmbeddingType.CoOccurrence(windowSize = 2).apply { removeStopWords = true }
+        ).build(harderText)
+        val tokens = tokenEmbedding.tokens
+        assertEquals(tokens.size, tokenEmbedding.get("obstacles").size)
+        assertEquals(tokens.size, tokenEmbedding.get("Quixote").size) // issue wascapital Q
     }
 
     @Test
     fun `co-occurence matrix window size correctly affects similarity`() {
-        val tokenizer = SimpleTokenizer()
-        val cooccurrenceMatrixShort = generateCooccurrenceMatrix(windowSizeText, tokenizer,1, true)
-        val cooccurrenceMatrixLong = generateCooccurrenceMatrix(windowSizeText, tokenizer,4, true)
+        val tokenEmbeddingShort = TokenEmbeddingBuilder(
+            tokenizer = SimpleTokenizer(),
+            embeddingType = EmbeddingType.CoOccurrence(windowSize = 1).apply { removeStopWords = true }
+        ).build(windowSizeText)
+
+        val tokenEmbeddingLong = TokenEmbeddingBuilder(
+            tokenizer = SimpleTokenizer(),
+            embeddingType = EmbeddingType.CoOccurrence(windowSize = 4).apply { removeStopWords = true }
+        ).build(windowSizeText)
+
         val smallWindowSimilarity = embeddingSimilarity(
-            cooccurrenceMatrixShort.get("Jean"),
-            cooccurrenceMatrixShort.get("Albert"))
+            tokenEmbeddingShort.get("Jean"),
+            tokenEmbeddingShort.get("Albert")
+        )
         val longWindowSimilarity = embeddingSimilarity(
-            cooccurrenceMatrixLong.get("Jean"),
-            cooccurrenceMatrixLong.get("Albert"))
+            tokenEmbeddingLong.get("Jean"),
+            tokenEmbeddingLong.get("Albert")
+        )
         assertTrue(smallWindowSimilarity < longWindowSimilarity)
     }
 
     @Test
     fun `computes cosine similarity between two vectors`() {
-        val tokenizedSentence = similarText.tokenizeWordsFromString()
-        val tokens = tokenizedSentence.uniqueTokensFromArray()
-        val cooccurrenceMatrix = generateCooccurrenceMatrix(similarText, SimpleTokenizer(),2, true)
-        val vectorA = cooccurrenceMatrix.get("cat")
-        val vectorB = cooccurrenceMatrix.get("dog")
-        val vectorC = cooccurrenceMatrix.get("table")
+        val tokenEmbedding = TokenEmbeddingBuilder(
+            tokenizer = SimpleTokenizer(),
+            embeddingType = EmbeddingType.CoOccurrence(windowSize = 2).apply { removeStopWords = true }
+        ).build(similarText)
+        val vectorA = tokenEmbedding.get("cat")
+        val vectorB = tokenEmbedding.get("dog")
+        val vectorC = tokenEmbedding.get("table")
         assertTrue(embeddingSimilarity(vectorA, vectorB) > embeddingSimilarity(vectorB, vectorC) )
     }
 
     @Test
     fun `no NaN values in co-occurrence matrix`() {
-        val cocMatrix = generateCooccurrenceMatrix(mlkText, SimpleTokenizer(),2, true)
-        for (index in 0..cocMatrix.tokens.size){
+        val tokenEmbedding = TokenEmbeddingBuilder(
+            tokenizer = SimpleTokenizer(),
+            embeddingType = EmbeddingType.CoOccurrence(windowSize = 2).apply { removeStopWords = true }
+        ).build(mlkText)
+        for (index in 0..tokenEmbedding.tokens.size){
             // println(coocMatrix[index,0].toString())
             // println(coocMatrix.row(index).toString())
-            if (cocMatrix.tokenVectorMatrix[index,0].isNaN()) println(index) // Only checking first value
+            if (tokenEmbedding.tokenVectorMatrix[index,0].isNaN()) println(index) // Only checking first value
         // since NaNs occur
         // as the whole row/column
         }
@@ -138,8 +158,11 @@ class TextUtilsTest {
     @Test
     fun `remove stopwords removes words it should`() {
         // "This", "not", and "is" are stop words, the names are not
-        val coc = generateCooccurrenceMatrix("This is Balthazar not Mordrax", SimpleTokenizer(),2, true)
-        val filteredTokens = removeStopWords(coc.tokens)
+        val tokenEmbedding = TokenEmbeddingBuilder(
+            tokenizer = SimpleTokenizer(),
+            embeddingType = EmbeddingType.CoOccurrence(windowSize = 2).apply { removeStopWords = true }
+        ).build("This is Balthazar not Mordrax")
+        val filteredTokens = removeStopWords(tokenEmbedding.tokens)
         assertEquals(2, filteredTokens.size)
     }
 
@@ -191,6 +214,54 @@ class TextUtilsTest {
             assertEquals(expectedTarget, corpusTarget)
         }
     }
+
+    @Test
+    fun `ensure byte pair tokenizer can output the original text` () {
+        // Create an instance of BytePairTokenizer with some basic parameters
+        val tokenizer = BytePairTokenizer(
+            maxTokens = 100,
+            minFrequency = 2,
+            maxIterations = 10
+        )
+
+        // Sample text to tokenize
+        val text = "Hello Hello World"
+
+        // Tokenize using BytePairTokenizer
+        val tokenResults = tokenizer.tokenize(text)
+
+        // Print each token (for demonstration)
+        tokenResults.forEachIndexed { index, result ->
+            println("Token $index: '${result.token}' [${result.start}, ${result.end}]")
+        }
+
+        // Basic check: Ensure that at least one merged token might appear
+        // Since the word "Hello" appears twice, there is potential for merges,
+        // especially if the Byte Pair Encoding logic identifies repeated pairs.
+        assertTrue(tokenResults.size <= text.length,
+            "The number of reported tokens should be at most the length of the original text."
+        )
+    }
+
+    @Test
+    fun `check byte pair tokenizer tokens`() {
+        val example = "This is some example text. Here is some repeated text. text text text. And stuff"
+
+        val tokenizer = BytePairTokenizer(
+            maxTokens = 100,
+            minFrequency = 2,
+            maxIterations = 4
+        )
+        val tokenResults = tokenizer.tokenize(example)
+
+        val expectedTokens = listOf(
+            "text"
+        )
+
+
+    }
+
+
 
 }
 

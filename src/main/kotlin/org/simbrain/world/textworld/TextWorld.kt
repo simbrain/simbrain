@@ -27,7 +27,6 @@ import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
-import smile.math.matrix.Matrix
 import java.awt.Color
 import kotlin.math.max
 import kotlin.math.min
@@ -54,14 +53,12 @@ class TextWorld : AttributeContainer, EditableObject {
     /**
      * Associates string tokens with arrays of doubles and vice-versa
      */
-    var tokenEmbedding = TokenEmbedding(
-        inputTokenList = listOf("Dog", "Cat", "Hello", "how", "are", "you"),
+    var tokenEmbedding = TokenEmbeddingBuilder(
         tokenizer = SimpleTokenizer(),
-        tokenVectorMatrix = Matrix.eye(6)
-    )
+        embeddingType = EmbeddingType.OneHot()
+    ).build("Dog cat Hello how are you")
         set(value) {
             field = value
-            tokenizer = value.tokenizer
             events.tokenVectorMapChanged.fire()
         }
 
@@ -89,7 +86,15 @@ class TextWorld : AttributeContainer, EditableObject {
         description = "The tokenizer to use for parsing text.",
         order = 5
     )
-    var tokenizer = tokenEmbedding.tokenizer
+    var tokenizer
+        get() = tokenEmbedding.tokenizer
+        set(value) {
+            tokenEmbedding.trainingDocument?.let {
+                tokenEmbedding = TokenEmbeddingBuilder().apply {
+                    tokenizer = value
+                }.build(it)
+            } ?: throw UnsupportedOperationException("Cannot change tokenizer when training document is not set.")
+        }
 
     @delegate:Transient
     var tokens by DependenciesInvalidatingCachedObject(::text, ::tokenEmbedding, ::tokenizer) {

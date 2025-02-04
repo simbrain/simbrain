@@ -27,7 +27,7 @@ val srnElmanSentences = newSim {
     val allWords = listOf(noun_hum, noun_anim, noun_inanim, noun_agress, noun_frag, noun_food, verb_intran, verb_tran, verb_agpat, verb_percept, verb_destroy, verb_eat)
         .flatten().distinct().joinToString(" ")
     val tokenEmbedding = TokenEmbeddingBuilder().apply {
-        embeddingType = EmbeddingType.ONE_HOT
+        embeddingType = EmbeddingType.OneHot()
     }.build(allWords)
 
     // Text World for Inputs

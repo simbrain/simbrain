@@ -29,7 +29,7 @@ val tinyLanguageModel = newSim {
     val trainingText = File(options.trainerTextPath).readText()
 
     val tokenEmbedding = TokenEmbeddingBuilder().apply {
-        embeddingType = EmbeddingType.ONE_HOT
+        embeddingType = EmbeddingType.OneHot()
         tokenizer = options.tokenizer
     }.build(trainingText)
 

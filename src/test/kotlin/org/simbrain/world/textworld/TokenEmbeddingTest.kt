@@ -9,7 +9,7 @@ import smile.math.matrix.Matrix
 
 class TokenEmbeddingTest {
 
-    var tokenEmbedding = TokenEmbedding(listOf("A", "B"), SimpleTokenizer(), Matrix.eye(2))
+    var tokenEmbedding = TokenEmbeddingBuilder(embeddingType = EmbeddingType.OneHot()).build("A B")
 
     @Test
     fun `test retrieval of vector given token, for upper and lower case`() {
@@ -33,14 +33,14 @@ class TokenEmbeddingTest {
 
     @Test
     fun `test metrics on a non-square embedding`() {
-        val embedding = TokenEmbedding(listOf("A", "B", "C"),  SimpleTokenizer(), Matrix(3,2))
+        val embedding = TokenEmbedding(listOf("A", "B", "C"),  embeddingType = EmbeddingType.OneHot(), SimpleTokenizer(), Matrix(3,2))
         assertEquals(3, embedding.size)
         assertEquals(2, embedding.dimension)
     }
 
     @Test
     fun `token list and matrix must be same size`() {
-        assertThrows<IllegalArgumentException> { TokenEmbedding(listOf("A", "B", "C"), SimpleTokenizer(), Matrix(2,3)) }
+        assertThrows<IllegalArgumentException> { TokenEmbedding(listOf("A", "B", "C"), embeddingType = EmbeddingType.OneHot(), SimpleTokenizer(), Matrix(2,3)) }
     }
 
 

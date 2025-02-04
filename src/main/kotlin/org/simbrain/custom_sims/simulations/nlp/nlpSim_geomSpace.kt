@@ -36,7 +36,7 @@ val nlpSimBasic = newSim {
     val text = readSimulationFileContents("texts" / "corpus_artificial_similarity.txt")
     textWorld.text = text
     textWorld.tokenEmbedding = TokenEmbeddingBuilder().apply {
-        embeddingType = EmbeddingType.COC
+        embeddingType = EmbeddingType.CoOccurrence()
     }.build(text)
 
     withGui {

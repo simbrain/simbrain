@@ -1,8 +1,10 @@
 package org.simbrain.custom_sims.simulations.hebb
 
 import org.simbrain.custom_sims.SimulationScope
+import org.simbrain.custom_sims.addTimeSeriesComponent
 import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.network.core.Layer
+import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
 import org.simbrain.util.ControlPanelKt
 import org.simbrain.util.stats.distributions.TwoValued
 import kotlin.math.ceil
@@ -116,4 +118,57 @@ suspend fun SimulationScope.createPatternControlPanel(
             addSeparator()
         }
     }
+}
+
+fun hammingDistance(pattern1: DoubleArray, pattern2: DoubleArray): Int {
+    return pattern1.zip(pattern2).count { (a, b) -> a != b }
+}
+
+context(SimulationScope)
+fun ControlPanelKt.createHopfieldTestButton(
+    hopfield: Layer,
+    applyTraining: () -> Unit,
+    applyLearningRate: (learningRate: Double) -> Unit,
+    applyReset: () -> Unit,
+    nTests: Int = (hopfield.size * 0.13).toInt(),
+    distanceThreshold: Int = (hopfield.size * 0.05).toInt(),
+    buttonName: String = "Test",
+) = addButton(buttonName) {
+    fun applyRandomPattern(hopfield: Layer): DoubleArray {
+        hopfield.randomize(TwoValued(-1.0, 1.0))
+        return hopfield.activationArray
+    }
+
+    suspend fun runTest(hopfield: Layer, nPatterns: Int): Int {
+        applyLearningRate(1.0 / nPatterns)
+        applyReset()
+        val patterns = (0 until nPatterns).map {
+            val pattern = applyRandomPattern(hopfield)
+            applyTraining()
+            pattern
+        }
+
+        return patterns.count { pattern ->
+            hopfield.setActivations(pattern)
+            workspace.iterateSuspend(2)
+            hammingDistance(hopfield.activationArray, pattern) < distanceThreshold
+        }
+    }
+
+    val plot = workspace.getComponent("Memory") as TimeSeriesPlotComponent?
+        ?: addTimeSeriesComponent("Memory", seriesNames = listOf("% pattern remembered")).apply {
+            model.isAutoRange = false
+            model.rangeUpperBound = 105.0
+            model.rangeLowerBound = -5.0
+        }
+
+    plot.model.clearData()
+
+    for (i in 0 until nTests) {
+        val nTest = i + 1
+        val nSuccess = runTest(hopfield, nTest) * 100.0 / nTest
+        plot.model.addData(0, i.toDouble(), nSuccess.toDouble())
+    }
+
+
 }

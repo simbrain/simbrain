@@ -1,6 +1,8 @@
 package org.simbrain.custom_sims.simulations
 
-import org.simbrain.custom_sims.*
+import org.simbrain.custom_sims.addNetworkComponent
+import org.simbrain.custom_sims.addSidebarInfo
+import org.simbrain.custom_sims.newSim
 import org.simbrain.custom_sims.simulations.hebb.*
 import org.simbrain.network.subnetworks.Hopfield
 import org.simbrain.util.place
@@ -86,6 +88,16 @@ val discreteHopfieldSim = newSim {
             addButton("Train on current pattern") {
                 with(network) { hopfield.trainOnCurrentPattern() }
             }
+            addSeparator()
+            createHopfieldTestButton(
+                hopfield = hopfield.neuronGroup,
+                applyTraining = { with(network) { hopfield.trainOnCurrentPattern()} },
+                applyLearningRate = { hopfield.learningRate = it },
+                applyReset = {
+                    hopfield.clear()
+                    hopfield.weightMatrix.hardClear()
+                }
+            )
         }
     }
 

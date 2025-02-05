@@ -92,6 +92,7 @@ class TextWorld : AttributeContainer, EditableObject {
             tokenEmbedding.trainingDocument?.let {
                 tokenEmbedding = TokenEmbeddingBuilder().apply {
                     tokenizer = value
+                    embeddingType = tokenEmbedding.embeddingType
                 }.build(it)
             } ?: throw UnsupportedOperationException("Cannot change tokenizer when training document is not set.")
         }

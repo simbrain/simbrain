@@ -120,20 +120,18 @@ suspend fun SimulationScope.createPatternControlPanel(
     }
 }
 
-fun hammingDistance(pattern1: DoubleArray, pattern2: DoubleArray): Int {
-    return pattern1.zip(pattern2).count { (a, b) -> a != b }
-}
-
 context(SimulationScope)
 fun ControlPanelKt.createHopfieldTestButton(
     hopfield: Layer,
-    applyTraining: () -> Unit,
+    applyTraining: suspend () -> Unit,
     applyLearningRate: (learningRate: Double) -> Unit,
     applyReset: () -> Unit,
-    nTests: Int = (hopfield.size * 0.13).toInt(),
+    distanceFunction: (actual: DoubleArray, expected: DoubleArray) -> Double = { actual, expected -> actual.zip(expected).count { (a, b) -> a != b }.toDouble() },
+    nTests: Int = (hopfield.size * 0.5).toInt(),
     distanceThreshold: Int = (hopfield.size * 0.05).toInt(),
     buttonName: String = "Test",
 ) = addButton(buttonName) {
+
     fun applyRandomPattern(hopfield: Layer): DoubleArray {
         hopfield.randomize(TwoValued(-1.0, 1.0))
         return hopfield.activationArray
@@ -151,7 +149,7 @@ fun ControlPanelKt.createHopfieldTestButton(
         return patterns.count { pattern ->
             hopfield.setActivations(pattern)
             workspace.iterateSuspend(2)
-            hammingDistance(hopfield.activationArray, pattern) < distanceThreshold
+            distanceFunction(hopfield.activationArray, pattern).also { println(it) } < distanceThreshold
         }
     }
 

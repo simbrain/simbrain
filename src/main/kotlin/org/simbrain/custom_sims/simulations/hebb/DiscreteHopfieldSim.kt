@@ -89,7 +89,7 @@ val discreteHopfieldSim = newSim {
                 with(network) { hopfield.trainOnCurrentPattern() }
             }
             addSeparator()
-            createHopfieldTestButton(
+            createHopfieldTestPane(
                 hopfield = hopfield.neuronGroup,
                 applyTraining = { with(network) { hopfield.trainOnCurrentPattern()} },
                 applyLearningRate = { hopfield.learningRate = it },

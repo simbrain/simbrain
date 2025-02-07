@@ -12,8 +12,6 @@ import org.simbrain.network.updaterules.AdditiveRule
 import org.simbrain.util.place
 import org.simbrain.util.randomizeSymmetric
 import org.simbrain.util.showNumericInputDialog
-import kotlin.math.abs
-import kotlin.math.pow
 
 /**
  *  Demo for studying continuous Hopfield networks,
@@ -148,7 +146,7 @@ val hopfieldSimContinuous = newSim {
                 wm.clamped = true
             }
             addSeparator()
-            createHopfieldTestButton(
+            createHopfieldTestPane(
                 hopfield,
                 applyTraining = {
                     hopfield.isAllClamped = true
@@ -167,14 +165,7 @@ val hopfieldSimContinuous = newSim {
                     hopfield.isAllClamped = false
                     wm.clamped = true
                 },
-                distanceFunction = { actual, expected ->
-                    actual.zip(expected).sumOf { (a, b) ->
-                        val sameSign = a * b >= 0
-                        if (!sameSign) return@sumOf 1.0
-                        if (abs(a) > 1.0) return@sumOf 0.0
-                        return@sumOf (1.0 - abs(a - b)).pow(2)
-                    }
-                }
+                distanceFunction = ::signHammingDistance
             )
         }
 

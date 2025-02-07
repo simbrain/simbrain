@@ -6,7 +6,11 @@ import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.network.core.Layer
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
 import org.simbrain.util.ControlPanelKt
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
+import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.stats.distributions.TwoValued
+import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -120,53 +124,145 @@ suspend fun SimulationScope.createPatternControlPanel(
     }
 }
 
+class PatternTester: EditableObject {
+
+    var distancePercentThreshold by GuiEditable(
+        label = "Distance Threshold",
+        initValue = 5.0,
+        min = 0.0,
+        max = 100.0,
+        increment = 1.0,
+        order = 10
+    )
+
+    var percentToTest by GuiEditable(
+        label = "Percent to Test",
+        initValue = 30.0,
+        min = 0.0,
+        max = 100.0,
+        order = 20
+    )
+
+}
+
+fun hammingDistance(actual: DoubleArray, expected: DoubleArray): Double {
+    return actual.zip(expected).count { (a, b) -> a != b }.toDouble()
+}
+
+fun signHammingDistance(actual: DoubleArray, expected: DoubleArray): Double {
+    return actual.zip(expected).sumOf { (a, b) ->
+        val sameSign = a * b >= 0
+        if (!sameSign) return@sumOf 1.0
+        if (abs(a) > 1.0) return@sumOf 0.0
+        return@sumOf abs(a - b)
+    }
+}
+
 context(SimulationScope)
-fun ControlPanelKt.createHopfieldTestButton(
+fun ControlPanelKt.createHopfieldTestPane(
     hopfield: Layer,
     applyTraining: suspend () -> Unit,
     applyLearningRate: (learningRate: Double) -> Unit,
     applyReset: () -> Unit,
-    distanceFunction: (actual: DoubleArray, expected: DoubleArray) -> Double = { actual, expected -> actual.zip(expected).count { (a, b) -> a != b }.toDouble() },
-    nTests: Int = (hopfield.size * 0.5).toInt(),
-    distanceThreshold: Int = (hopfield.size * 0.05).toInt(),
-    buttonName: String = "Test",
-) = addButton(buttonName) {
+    distanceFunction: (actual: DoubleArray, expected: DoubleArray) -> Double = ::hammingDistance,
+    buttonName: String = "Capacity Test",
+) {
+
+    val patternTester = PatternTester()
+
+
+    val patternTesterEditor = AnnotatedPropertyEditor(patternTester)
+    addAnnotatedPropertyEditor(patternTesterEditor)
+
+    addButton("Apply Config") {
+        patternTesterEditor.commitChanges()
+    }
+
+    fun computeNTests(): Int = (patternTester.percentToTest / 100 * hopfield.size).toInt()
 
     fun applyRandomPattern(hopfield: Layer): DoubleArray {
         hopfield.randomize(TwoValued(-1.0, 1.0))
         return hopfield.activationArray
     }
 
+    val allPatterns = (0 until computeNTests()).map {
+        applyRandomPattern(hopfield)
+    }
+
     suspend fun runTest(hopfield: Layer, nPatterns: Int): Int {
-        applyLearningRate(1.0 / nPatterns)
         applyReset()
-        val patterns = (0 until nPatterns).map {
-            val pattern = applyRandomPattern(hopfield)
+        applyLearningRate(1.0 / nPatterns)
+
+        val patterns = allPatterns.take(nPatterns)
+
+        patterns.forEach { pattern ->
+            hopfield.setActivations(pattern)
             applyTraining()
-            pattern
         }
 
         return patterns.count { pattern ->
             hopfield.setActivations(pattern)
             workspace.iterateSuspend(2)
-            distanceFunction(hopfield.activationArray, pattern).also { println(it) } < distanceThreshold
+            distanceFunction(hopfield.activationArray, pattern) <= patternTester.distancePercentThreshold / 100.0 * hopfield.size
         }
     }
 
-    val plot = workspace.getComponent("Memory") as TimeSeriesPlotComponent?
-        ?: addTimeSeriesComponent("Memory", seriesNames = listOf("% pattern remembered")).apply {
-            model.isAutoRange = false
-            model.rangeUpperBound = 105.0
-            model.rangeLowerBound = -5.0
+    addButton(buttonName) {
+
+        patternTesterEditor.commitChanges()
+
+        val plot = workspace.getComponent("Memory") as TimeSeriesPlotComponent?
+            ?: addTimeSeriesComponent("Memory", seriesNames = listOf("% pattern remembered")).apply {
+                model.isAutoRange = false
+                model.rangeUpperBound = 105.0
+                model.rangeLowerBound = -5.0
+            }
+
+        plot.model.clearData()
+
+        for (i in 0 until computeNTests()) {
+            val nTest = i + 1
+            val nSuccess = runTest(hopfield, nTest) * 100.0 / nTest
+            plot.model.addData(0, i.toDouble(), nSuccess.toDouble())
         }
 
-    plot.model.clearData()
 
-    for (i in 0 until nTests) {
-        val nTest = i + 1
-        val nSuccess = runTest(hopfield, nTest) * 100.0 / nTest
-        plot.model.addData(0, i.toDouble(), nSuccess.toDouble())
     }
 
+    val nTestChooser = object : EditableObject {
+        var nTest by GuiEditable(
+            label = "Number of Patterns",
+            initValue = 0,
+            min = 0,
+            max = computeNTests() - 1,
+            increment = 1,
+            order = 10
+        )
+    }
+    val testChooserEditor = AnnotatedPropertyEditor(nTestChooser)
 
+    addButton("Train Patterns") {
+        testChooserEditor.commitChanges()
+        runTest(hopfield, nTestChooser.nTest)
+    }
+    addAnnotatedPropertyEditor(testChooserEditor)
+
+
+    val nPatternChooser = object : EditableObject {
+        var nPattern by GuiEditable(
+            label = "Pattern No.",
+            initValue = 0,
+            min = 0,
+            max = computeNTests() - 1,
+            increment = 1,
+            order = 10
+        )
+    }
+    val patternChooserEditor = AnnotatedPropertyEditor(nPatternChooser)
+
+    addButton("Apply Pattern") {
+        patternChooserEditor.commitChanges()
+        hopfield.setActivations(allPatterns[nPatternChooser.nPattern])
+    }
+    addAnnotatedPropertyEditor(patternChooserEditor)
 }

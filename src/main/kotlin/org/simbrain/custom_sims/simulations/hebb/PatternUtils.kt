@@ -107,24 +107,24 @@ suspend fun SimulationScope.createPatternControlPanel(
                 }
             }
             addSeparator()
-            addButton("Circle") {
-                applyCirclePattern(layer, isContinuous)
-            }
-            addButton("Square") {
-                applySquarePattern(layer, isContinuous)
-            }
-            addButton("Diagonal Line") {
-                applyLinePattern(layer, "diagonal", isContinuous)
-            }
-            addButton("Cross") {
-                applyCrossPattern(layer, isContinuous)
-            }
-            addSeparator()
+            //addButton("Circle") {
+            //    applyCirclePattern(layer, isContinuous)
+            //}
+            //addButton("Square") {
+            //    applySquarePattern(layer, isContinuous)
+            //}
+            //addButton("Diagonal Line") {
+            //    applyLinePattern(layer, "diagonal", isContinuous)
+            //}
+            //addButton("Cross") {
+            //    applyCrossPattern(layer, isContinuous)
+            //}
+            //addSeparator()
         }
     }
 }
 
-class PatternTester: EditableObject {
+class PatternTestConfig: EditableObject {
 
     var distancePercentThreshold by GuiEditable(
         label = "Distance Threshold",
@@ -168,42 +168,41 @@ fun ControlPanelKt.createHopfieldTestPane(
     buttonName: String = "Capacity Test",
 ) {
 
-    val patternTester = PatternTester()
-
-
-    val patternTesterEditor = AnnotatedPropertyEditor(patternTester)
+    val patternTestConfig = PatternTestConfig()
+    val patternTesterEditor = AnnotatedPropertyEditor(patternTestConfig)
     addAnnotatedPropertyEditor(patternTesterEditor)
-
     addButton("Apply Config") {
         patternTesterEditor.commitChanges()
     }
+    addSeparator()
 
-    fun computeNTests(): Int = (patternTester.percentToTest / 100 * hopfield.size).toInt()
+    fun numTestPatterns(): Int = (patternTestConfig.percentToTest / 100 * hopfield.size).toInt()
 
     fun applyRandomPattern(hopfield: Layer): DoubleArray {
         hopfield.randomize(TwoValued(-1.0, 1.0))
         return hopfield.activationArray
     }
 
-    val allPatterns = (0 until computeNTests()).map {
+    val allPatterns = (0 until numTestPatterns()).map {
         applyRandomPattern(hopfield)
     }
 
+    // Test how many patterns of nPatterns have been encoded by the hopfield network
     suspend fun runTest(hopfield: Layer, nPatterns: Int): Int {
         applyReset()
         applyLearningRate(1.0 / nPatterns)
 
         val patterns = allPatterns.take(nPatterns)
-
         patterns.forEach { pattern ->
             hopfield.setActivations(pattern)
             applyTraining()
         }
 
+        // Returns the number of patterns that remain stable within the specified tolerance
         return patterns.count { pattern ->
             hopfield.setActivations(pattern)
             workspace.iterateSuspend(2)
-            distanceFunction(hopfield.activationArray, pattern) <= patternTester.distancePercentThreshold / 100.0 * hopfield.size
+            distanceFunction(hopfield.activationArray, pattern) <= patternTestConfig.distancePercentThreshold / 100.0 * hopfield.size
         }
     }
 
@@ -220,7 +219,9 @@ fun ControlPanelKt.createHopfieldTestPane(
 
         plot.model.clearData()
 
-        for (i in 0 until computeNTests()) {
+        // Main code for capacity test
+        // Runs the memory test for 1, 2, ... numTestPatterns and plots results
+        for (i in 0 until numTestPatterns()) {
             val nTest = i + 1
             val nSuccess = runTest(hopfield, nTest) * 100.0 / nTest
             plot.model.addData(0, i.toDouble(), nSuccess.toDouble())
@@ -234,7 +235,7 @@ fun ControlPanelKt.createHopfieldTestPane(
             label = "Number of Patterns",
             initValue = 0,
             min = 0,
-            max = computeNTests() - 1,
+            max = numTestPatterns() - 1,
             increment = 1,
             order = 10
         )
@@ -253,7 +254,7 @@ fun ControlPanelKt.createHopfieldTestPane(
             label = "Pattern No.",
             initValue = 0,
             min = 0,
-            max = computeNTests() - 1,
+            max = numTestPatterns() - 1,
             increment = 1,
             order = 10
         )

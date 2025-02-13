@@ -70,41 +70,41 @@ val hopfieldSimContinuous = newSim {
     initForgettingRate()
 
     withGui {
-        place(networkComponent, 220, 0, 509, 619)
+        place(networkComponent, 350, 0, 509, 619)
 
         createPatternControlPanel(hopfield, true) {
             wm.weights.randomizeSymmetric()
             wm.events.updated.fire()
         }?.apply {
-            addButton("Learn All Patterns") {
-                wm.weights.randomizeSymmetric()
-                hopfield.isAllClamped = true
-                wm.clamped = false
-                (wm.learningRule as HebbianRule).forgettingRate = 0.0
-                //(wm.learningRule as HebbianRule).learningRate = (1/numNeurons).toDouble()
-                repeat(numTrainIterations) {
-                    applyCirclePattern(hopfield, true)
-                    with(network) { wm.update() }
-                    //wm.weightMatrix.setSpectralRadius(1.0)
-
-                    applySquarePattern(hopfield, true)
-                    with(network) { wm.update() }
-                    //wm.weightMatrix.setSpectralRadius(1.0)
-
-                    applyLinePattern(hopfield, "diagonal", true)
-                    with(network) { wm.update() }
-                    //wm.weightMatrix.setSpectralRadius(1.0)
-
-                    applyCrossPattern(hopfield, true)
-                    with(network) { wm.update() }
-                    //wm.weightMatrix.setSpectralRadius(1.0)
-                }
-                initForgettingRate()
-                initLearningRate()
-                // Dump into retrieval mode for easy testing
-                hopfield.isAllClamped = false
-                wm.clamped = true
-            }
+            //addButton("Learn All Patterns") {
+            //    wm.weights.randomizeSymmetric()
+            //    hopfield.isAllClamped = true
+            //    wm.clamped = false
+            //    (wm.learningRule as HebbianRule).forgettingRate = 0.0
+            //    //(wm.learningRule as HebbianRule).learningRate = (1/numNeurons).toDouble()
+            //    repeat(numTrainIterations) {
+            //        applyCirclePattern(hopfield, true)
+            //        with(network) { wm.update() }
+            //        //wm.weightMatrix.setSpectralRadius(1.0)
+            //
+            //        applySquarePattern(hopfield, true)
+            //        with(network) { wm.update() }
+            //        //wm.weightMatrix.setSpectralRadius(1.0)
+            //
+            //        applyLinePattern(hopfield, "diagonal", true)
+            //        with(network) { wm.update() }
+            //        //wm.weightMatrix.setSpectralRadius(1.0)
+            //
+            //        applyCrossPattern(hopfield, true)
+            //        with(network) { wm.update() }
+            //        //wm.weightMatrix.setSpectralRadius(1.0)
+            //    }
+            //    initForgettingRate()
+            //    initLearningRate()
+            //    // Dump into retrieval mode for easy testing
+            //    hopfield.isAllClamped = false
+            //    wm.clamped = true
+            //}
             addSeparator()
             addTextField("Learning rate", "" + learningRate) {
                 it.toDoubleOrNull()?.let { num ->

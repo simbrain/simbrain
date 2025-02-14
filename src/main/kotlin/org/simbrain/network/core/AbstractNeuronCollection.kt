@@ -1,7 +1,5 @@
 package org.simbrain.network.core
 
-import org.simbrain.network.*
-import org.simbrain.network.core.*
 import org.simbrain.network.events.NeuronCollectionEvents
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.Layout
@@ -16,7 +14,6 @@ import org.simbrain.workspace.Producible
 import smile.math.matrix.Matrix
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
-import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.math.min
 
@@ -332,12 +329,14 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
         return outgoingSg.remove(sg)
     }
 
-    override suspend fun delete() {
-        outgoingSg.forEach { it.delete() }
-        incomingSgs.forEach { it.delete() }
-        val customInfo = customInfo
-        customInfo?.events?.deleted?.fire(customInfo)?.await()
-        super.delete()
+    override suspend fun delete(): List<NetworkModel> {
+        return buildList {
+            add(this@AbstractNeuronCollection)
+            addAll(outgoingSg.flatMap { it.delete() })
+            addAll(incomingSgs.flatMap { it.delete() })
+            val customInfo = customInfo
+            customInfo?.events?.deleted?.fire(customInfo)?.await()
+        }
     }
 
     context(Network)

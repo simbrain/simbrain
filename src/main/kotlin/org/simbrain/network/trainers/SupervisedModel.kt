@@ -78,8 +78,9 @@ class SupervisedModel(
         layers.forwardPass(listOf(inputLayer.activations), inputLayers = listOf(inputLayer))
     }
 
-    override suspend fun delete() {
+    override suspend fun delete(): List<NetworkModel> {
         events.deleted.fire(this).await()
+        return listOf(this)
     }
 }
 

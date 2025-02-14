@@ -161,6 +161,10 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         val neuron = Neuron()
         network.addNetworkModel(neuron)
         network.selectModels(listOf(neuron))
+        undoManager.addUndoableAction(
+            undo = { neuron.delete() },
+            redo = { network.addNetworkModel(neuron, usePlacementManager = false, useAutoAssignedId = false)?.await() }
+        )
     }
     val randomizeObjectsAction = networkPanel.createConditionallyEnabledAction(
         name = "Randomize selection",

@@ -521,11 +521,17 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
          */
         get() = SimbrainMath.distance(source.location, target.location)
 
-    override suspend fun delete() {
+    override suspend fun delete(): List<NetworkModel> {
         // Remove references to this synapse from parent neurons
         source.removeFromFanOut(this)
         target.removeFromFanIn(this)
         events.deleted.fire(this).await()
+        return listOf(this)
+    }
+
+    override suspend fun unDelete() {
+        source.addToFanOut(this)
+        target.addToFanIn(this)
     }
 
     fun hardClear() {

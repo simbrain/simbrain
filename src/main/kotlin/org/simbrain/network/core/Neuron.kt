@@ -476,31 +476,35 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
      * Delete connected synapses and remove them from the network and any other
      * structures.
      */
-    private suspend fun deleteConnectedSynapses() {
-        deleteFanIn()
-        deleteFanOut()
+    private suspend fun deleteConnectedSynapses(): List<Synapse> {
+        return buildList {
+            addAll(deleteFanIn())
+            addAll(deleteFanOut())
+        }
     }
 
     /**
      * Removes all synapses from fanOut and from the network or any intermediate
      * structures.
      */
-    private suspend fun deleteFanOut() {
-        fanOut.toList().forEach { (target, synapse) ->
-            synapse.delete()
-            fanOut.remove(target)
-        }
+    private suspend fun deleteFanOut(): List<Synapse> {
+        return fanOut.toList().also {
+            it.forEach { (target, synapse) ->
+                synapse.delete()
+                fanOut.remove(target)
+            }
+        }.map { it.second }
     }
 
     /**
      * Removes all synapses from fanIn and from the network or any intermediate
      * structures.
      */
-    private suspend fun deleteFanIn() {
-        fanIn.toList().forEach { synapse ->
+    private suspend fun deleteFanIn(): List<Synapse> {
+        return fanIn.toList().also { it.forEach { synapse ->
             synapse.delete()
             fanIn.remove(synapse)
-        }
+        } }
     }
 
     override fun toString(): String {
@@ -671,9 +675,13 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
     override val name: String
         get() = id!!
 
-    override suspend fun delete() {
-        deleteConnectedSynapses()
+    override suspend fun delete(): List<NetworkModel> {
+        val synapses = deleteConnectedSynapses()
         events.deleted.fire(this).await()
+        return buildList<NetworkModel> {
+            add(this@Neuron)
+            addAll(synapses)
+        }
     }
 
     /**

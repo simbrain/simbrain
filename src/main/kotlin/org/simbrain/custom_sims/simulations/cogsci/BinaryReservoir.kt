@@ -81,7 +81,7 @@ val binaryReservoir = newSim {
     reservoir.location = point(0, 0)
 
     val conn = FixedDegree(degree = k)
-    conn.connectNeurons(resNeurons, resNeurons).addToNetwork(network).awaitAll()
+    conn.connectNeurons(resNeurons, resNeurons).addToNetwork(network)
 
     /**
      * Resets the variance by rescaling synapses. Assumes valid variance to begin with.

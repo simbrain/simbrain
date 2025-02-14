@@ -73,8 +73,7 @@ object Clipboard {
             return
         }
 
-        fun createCopies(destinationNetwork: Network, sourceModels: List<NetworkModel>): MutableList<NetworkModel> {
-            val ret: MutableList<NetworkModel> = ArrayList()
+        fun createCopies(destinationNetwork: Network, sourceModels: List<NetworkModel>): List<NetworkModel> {
 
             // Match new to old neurons for synapse adding
             val neuronMappings = Hashtable<Neuron, Neuron>()
@@ -85,52 +84,53 @@ object Clipboard {
                 return !(allNeurons.contains(this.source) && (allNeurons.contains(this.target)))
             }
 
-            for (item in sourceModels) {
-                when (item) {
-                    is Neuron -> {
-                        val newNeuron = Neuron(item)
-                        ret.add(newNeuron)
-                        neuronMappings[item] = newNeuron
-                    }
-                    is Synapse -> {
-                        if (!item.isStranded()) {
-                            synapses.add(item)
+            return buildList {
+                for (item in sourceModels) {
+                    when (item) {
+                        is Neuron -> {
+                            val newNeuron = Neuron(item)
+                            add(newNeuron)
+                            neuronMappings[item] = newNeuron
+                        }
+                        is Synapse -> {
+                            if (!item.isStranded()) {
+                                synapses.add(item)
+                            }
+                        }
+                        is NetworkTextObject -> {
+                            val newText = NetworkTextObject(item)
+                            add(newText)
+                        }
+                        is NeuronGroup -> {
+                            add(item.copy())
+                        }
+                        is NeuronArray -> {
+                            val copy: LocatableModel = item.copy()
+                            add(copy)
+                        }
+                        is ActivationSequence -> {
+                            val copy: LocatableModel = item.copy()
+                            add(copy)
+                        }
+                        is TransformerBlock -> {
+                            val copy: LocatableModel = item.copy()
+                            add(copy)
                         }
                     }
-                    is NetworkTextObject -> {
-                        val newText = NetworkTextObject(item)
-                        ret.add(newText)
-                    }
-                    is NeuronGroup -> {
-                        ret.add(item.copy())
-                    }
-                    is NeuronArray -> {
-                        val copy: LocatableModel = item.copy()
-                        ret.add(copy)
-                    }
-                    is ActivationSequence -> {
-                        val copy: LocatableModel = item.copy()
-                        ret.add(copy)
-                    }
-                    is TransformerBlock -> {
-                        val copy: LocatableModel = item.copy()
-                        ret.add(copy)
-                    }
+                }
+
+
+                // Copy synapses
+                for (synapse in synapses) {
+                    val newSynapse = Synapse(
+                        neuronMappings[synapse.source]!!,
+                        neuronMappings[synapse.target]!!,
+                        synapse
+                    )
+                    add(newSynapse)
                 }
             }
 
-
-            // Copy synapses
-            for (synapse in synapses) {
-                val newSynapse = Synapse(
-                    neuronMappings[synapse.source]!!,
-                    neuronMappings[synapse.target]!!,
-                    synapse
-                )
-                ret.add(newSynapse)
-            }
-
-            return ret
         }
 
         // Create a copy of the clipboard objects.
@@ -140,6 +140,11 @@ object Clipboard {
 
         // Add the copied object
         net.network.addNetworkModels(copy).awaitAll()
+
+        net.undoManager.addUndoableAction(
+            undo = { copy.forEach { it.delete() } },
+            redo = { net.network.addNetworkModels(copy, usePlacementManager = false, useAutoAssignedId = false).awaitAll() }
+        )
 
         // Unselect "old" copied objects
         net.selectionManager.clear()

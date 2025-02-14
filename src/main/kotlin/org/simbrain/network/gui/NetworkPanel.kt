@@ -11,7 +11,6 @@ import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.*
 import org.simbrain.network.gui.MouseEventHandler.MouseCursor
-import org.simbrain.network.gui.UndoManager.UndoableAction
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.gui.nodes.neuronGroupNodes.SOMGroupNode
@@ -315,15 +314,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     }
 
     suspend fun createNode(neuron: Neuron) = addScreenElement {
-        undoManager.addUndoableAction(object : UndoableAction {
-            override fun undo() {
-                neuron.deleteBlocking()
-            }
-
-            override fun redo() {
-                network.addNetworkModel(neuron)
-            }
-        })
         NeuronNode(this, neuron)
     }
 
@@ -429,36 +419,18 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
 
     suspend fun deleteSelectedObjects() {
 
-        suspend fun deleteGroup(interactionBox: InteractionBox) {
-            interactionBox.parent.let { groupNode ->
-                if (groupNode is ScreenElement) {
-                    groupNode.model.delete()
-                }
-            }
-        }
+        val selectedModels = selectionManager.selection.map { it.model }.sortedBy { updatingOrder(it) }
 
-        suspend fun delete(screenElement: ScreenElement) {
-            when (screenElement) {
-                is NeuronNode -> {
-                    screenElement.model.delete()
-
-                    undoManager.addUndoableAction(object : UndoableAction {
-                        override fun undo() {
-                            network.addNetworkModel(screenElement.model)
-                        }
-
-                        override fun redo() {
-                            screenElement.model.deleteBlocking()
-                        }
-                    })
-                }
-                is InteractionBox -> deleteGroup(screenElement)
-                else -> screenElement.model.delete()
-            }
-        }
-
-        selectionManager.selection.forEach { delete(it) }
+        val deletedModels = selectedModels.reversed().flatMap { it.delete() }
         selectionManager.clear()
+
+        undoManager.addUndoableAction(
+            undo = {
+                network.addNetworkModels(deletedModels, usePlacementManager = false, useAutoAssignedId = false).awaitAll()
+                deletedModels.forEach { it.unDelete() }
+            },
+            redo = { deletedModels.forEach { it.delete() } }
+        )
 
         network.events.zoomToFitPage.fire()
     }
@@ -643,8 +615,12 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             val targetNeurons = filterSelectedModels<Neuron>() +
                     filterSelectedModels<NeuronCollection>().flatMap { it.neuronList } +
                     filterSelectedModels<NeuronGroup>().flatMap { it.neuronList }
-            NetworkPreferences.connectionStrategy.copy().apply { percentExcitatory = 100.0 }.connectNeurons(sourceNeurons, targetNeurons)
-                .addToNetworkAsync(network)
+            val synapses = NetworkPreferences.connectionStrategy.copy().apply { percentExcitatory = 100.0 }.connectNeurons(sourceNeurons, targetNeurons)
+            synapses.addToNetworkAsync(network)
+            undoManager.addUndoableAction(
+                undo = { synapses.forEach { it.delete() } },
+                redo = { synapses.addToNetwork(network, usePlacementManager = false, useAutoAssignId = false) }
+            )
         }
 
     }
@@ -782,22 +758,6 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
                 }
             }
         }
-    }
-
-    /**
-     * TODO: Work in progress.
-     */
-    fun undo() {
-        println("Initial testing on undo...")
-        undoManager.undo()
-    }
-
-    /**
-     * TODO: Work in progress.
-     */
-    fun redo() {
-        println("Initial testing on redo...")
-        undoManager.redo()
     }
 
     fun getNode(model: NetworkModel) = runBlocking { modelNodeMap.get<ScreenElement>(model) }

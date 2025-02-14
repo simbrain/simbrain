@@ -10,7 +10,10 @@ import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.NeuronUpdateRule
-import org.simbrain.network.util.*
+import org.simbrain.network.util.Alignment
+import org.simbrain.network.util.Direction
+import org.simbrain.network.util.alignNetworkModels
+import org.simbrain.network.util.offsetNeuronCollections
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.stats.ProbabilityDistribution
@@ -303,10 +306,10 @@ fun List<Neuron>.getEnergy() = ((this cartesianProduct this)
  */
 fun <T : LocatableModel> List<T>.sortTopBottom() = sortedBy { it.location.x }.sortedBy { it.location.y }
 
-suspend fun NetworkModel.addToNetwork(network: Network) = network.addNetworkModel(this)
-fun NetworkModel.addToNetworkAsync(network: Network) = network.addNetworkModel(this)
-suspend fun List<NetworkModel>.addToNetwork(network: Network) = network.addNetworkModels(this)
-fun List<NetworkModel>.addToNetworkAsync(network: Network) = network.addNetworkModels(this)
+suspend fun NetworkModel.addToNetwork(network: Network, usePlacementManager: Boolean = true, useAutoAssignId: Boolean = true) = network.addNetworkModel(this, usePlacementManager, useAutoAssignId)?.await()
+fun NetworkModel.addToNetworkAsync(network: Network, usePlacementManager: Boolean = true, useAutoAssignId: Boolean = true) = network.addNetworkModel(this, usePlacementManager, useAutoAssignId)
+suspend fun List<NetworkModel>.addToNetwork(network: Network, usePlacementManager: Boolean = true, useAutoAssignId: Boolean = true) = network.addNetworkModels(this, usePlacementManager, useAutoAssignId).awaitAll()
+fun List<NetworkModel>.addToNetworkAsync(network: Network, usePlacementManager: Boolean = true, useAutoAssignId: Boolean = true) = network.addNetworkModels(this, usePlacementManager, useAutoAssignId)
 
 context(Network) suspend fun <T: NetworkModel> T.addToNetwork(): T {
     addNetworkModel(this)?.await()

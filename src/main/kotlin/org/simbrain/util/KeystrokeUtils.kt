@@ -74,28 +74,28 @@ fun JComponent.bindTo(keyCombo: KeyCombination, action: AbstractAction) {
     actionMap.put(keyName, action)
 }
 
-inline fun <C: JComponent> C.bind(vararg keys: String, crossinline action: C.() -> Unit) {
+inline fun <C> C.bind(vararg keys: String, crossinline action: C.() -> Unit)  where C : JComponent, C : CoroutineScope {
     val keyName = "Key ${keys.joinToString("")}"
     keys.forEach { key -> putInputMap(KeyStroke.getKeyStroke(key.uppercase(Locale.getDefault())), keyName) }
     putActionMap(keyName, action)
 }
 
-inline fun <C: JComponent> C.bind(keyStroke: KeyStroke, crossinline action: C.() -> Unit) {
+inline fun <C> C.bind(keyStroke: KeyStroke, crossinline action: C.() -> Unit) where C : JComponent, C : CoroutineScope {
     val keyName = "Key $keyStroke"
     putInputMap(keyStroke, keyName)
     putActionMap(keyName, action)
 }
 
-inline fun <C: JComponent> C.bind(
+inline fun <C> C.bind(
     @MagicConstant(valuesFromClass = KeyStroke::class) key: Int,
     crossinline action: C.() -> Unit
-) {
+) where C : JComponent, C : CoroutineScope {
     val keyName = "Key vki_$key"
     putInputMap(KeyStroke.getKeyStroke(key, 0), keyName)
     putActionMap(keyName, action)
 }
 
-inline fun <C: JComponent> C.bind(vararg keys: KeyCombination, crossinline action: C.() -> Unit) {
+inline fun <C> C.bind(vararg keys: KeyCombination, crossinline action: suspend C.() -> Unit) where C: JComponent, C: CoroutineScope {
     val keyName = "Key ${keys.joinToString("")}"
     keys.forEach { key ->
         key.withKeyStroke { getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(it, keyName) }
@@ -107,12 +107,8 @@ fun JComponent.putInputMap(keyStroke: KeyStroke, mapKey: String) {
     getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyStroke, mapKey)
 }
 
-inline fun <C: JComponent> C.putActionMap(key: String, crossinline action: C.() -> Unit) {
-    if (this is CoroutineScope) {
-        actionMap.put(key) { launch { action() } }
-    } else {
-        actionMap.put(key) { action() }
-    }
+inline fun <C> C.putActionMap(key: String, crossinline action: suspend C.() -> Unit) where C: JComponent, C: CoroutineScope {
+    actionMap.put(key) { launch { action() } }
 }
 
 inline fun ActionMap.put(key: String, crossinline action: () -> Unit) {

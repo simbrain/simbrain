@@ -72,15 +72,16 @@ class SynapseGroup @JvmOverloads constructor(
             removeAllSynapses()
         }
     }
-    suspend fun removeAllSynapses() {
-        this.synapses.forEach { it.delete() }
+    suspend fun removeAllSynapses(): List<NetworkModel> {
+        return this.synapses.flatMap { it.delete() }
     }
 
-    override suspend fun delete() {
-        removeAllSynapses()
+    override suspend fun delete(): List<NetworkModel> {
+        val removedSynapses = removeAllSynapses()
         target.removeIncomingSg(this)
         source.removeOutgoingSg(this)
         events.deleted.fire(this).await()
+        return removedSynapses
     }
 
     fun addSynapse(syn: Synapse) {

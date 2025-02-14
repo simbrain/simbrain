@@ -56,10 +56,19 @@ abstract class NetworkModel {
 
     /**
      * Main public entry point for object deletion.
+     * @return a list of NetworkModels deleted. They could be added back by [org.simbrain.network.gui.UndoManager.UndoableAction]
      */
-    open suspend fun delete() {
+    open suspend fun delete(): List<NetworkModel> {
         // Do NOT create any public deletion methods in network, subnetwork, neurongroup, etc.
         // Deleting the object should fire an event and all cleanup should occur in response to those events.
+        return emptyList()
+    }
+
+    /**
+     * Undo/Redo a deletion
+     */
+    open suspend fun unDelete() {
+
     }
 
     /**

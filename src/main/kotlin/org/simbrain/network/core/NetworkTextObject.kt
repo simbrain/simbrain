@@ -110,8 +110,9 @@ open class NetworkTextObject : LocatableModel {
         return "(${Math.round(x)},${Math.round(y)})"
     }
 
-    override suspend fun delete() {
+    override suspend fun delete(): List<NetworkTextObject> {
         events.deleted.fire(this).await()
+        return listOf(this)
     }
 
     override var location: Point2D

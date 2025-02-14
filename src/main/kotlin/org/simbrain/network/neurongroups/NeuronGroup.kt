@@ -19,12 +19,12 @@ package org.simbrain.network.neurongroups
 
 import org.simbrain.network.core.AbstractNeuronCollection
 import org.simbrain.network.core.Network
+import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.sortTopBottom
 import org.simbrain.network.updaterules.NeuronUpdateRule
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.CustomTypeName
-import java.util.*
 
 /**
  * A group of neurons using a common [NeuronUpdateRule]. After creation the update rule may be changed but
@@ -48,9 +48,13 @@ open class NeuronGroup() : AbstractNeuronCollection() {
         neuronList.forEach { it.updateRule = base.copy() }
     }
 
-    override suspend fun delete() {
-        neuronList.toList().forEach { it.delete() }
+    override suspend fun delete(): List<NetworkModel> {
+        val deletedNeurons = neuronList.toList().flatMap { it.delete() }
         super.delete()
+        return buildList {
+            add(this@NeuronGroup)
+            addAll(deletedNeurons)
+        }
     }
 
     context(Network)

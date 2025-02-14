@@ -153,8 +153,9 @@ abstract class Layer : LocatableModel(), AttributeContainer {
         outgoingConnectors.remove(connector)
     }
 
-    override suspend fun delete() {
+    override suspend fun delete(): List<NetworkModel> {
         events.deleted.fire(this).await()
+        return listOf(this)
     }
 
     /**

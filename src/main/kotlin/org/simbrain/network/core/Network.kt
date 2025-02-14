@@ -321,9 +321,11 @@ class Network: CoroutineScope, EditableObject {
      * For best results call with `?.await()` when possible.
      */
     @JvmOverloads
-    fun addNetworkModel(model: NetworkModel, usePlacementManager: Boolean = true): Deferred<Boolean>? {
+    fun addNetworkModel(model: NetworkModel, usePlacementManager: Boolean = true, useAutoAssignedId: Boolean = true): Deferred<Boolean>? {
         if (model.shouldAdd()) {
-            assignId(model)
+            if (useAutoAssignedId) {
+                assignId(model)
+            }
             networkModels.add(model)
             if (usePlacementManager && model is LocatableModel && model.shouldBePlaced) {
                 placementManager.placeObject(model)
@@ -484,14 +486,14 @@ class Network: CoroutineScope, EditableObject {
      * @param toAdd list of objects to add.
      */
     @JvmOverloads
-    fun addNetworkModels(toAdd: List<NetworkModel>, usePlacementManager: Boolean = true) = toAdd.mapNotNull { addNetworkModel(it, usePlacementManager) }
+    fun addNetworkModels(toAdd: List<NetworkModel>, usePlacementManager: Boolean = true, useAutoAssignedId: Boolean = true) = toAdd.mapNotNull { addNetworkModel(it, usePlacementManager, useAutoAssignedId) }
 
     /**
      * Var arg version of addNetworkModels.
      *
      * Ex: addNetworkModels(synapse1, synapse2, neuron1, neuron2, ...)
      */
-    fun addNetworkModels(vararg toAdd: NetworkModel, usePlacementManager: Boolean = true) = toAdd.mapNotNull { addNetworkModel(it, usePlacementManager) }
+    fun addNetworkModels(vararg toAdd: NetworkModel, usePlacementManager: Boolean = true, useAutoAssignedId: Boolean = true) = toAdd.mapNotNull { addNetworkModel(it, usePlacementManager, useAutoAssignedId) }
 
     fun selectModels(models: List<NetworkModel>) {
         events.selected.fire(models)

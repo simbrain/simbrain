@@ -13,7 +13,6 @@
 package org.simbrain.network.subnetworks
 
 import org.simbrain.network.core.*
-import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.events.SubnetworkEvents
 import org.simbrain.util.minus
 import org.simbrain.util.plus
@@ -73,13 +72,16 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
     /**
      * Delete this subnetwork and its children.
      */
-    override suspend fun delete() {
-        modelList.all.toList().forEach {
+    override suspend fun delete(): List<NetworkModel> {
+        val toDelete = modelList.all.toList()
+
+        toDelete.forEach {
             modelList.remove(it)
             it.delete()
         }
         customInfo?.let { it.events.deleted.fire(it) }
         events.deleted.fire(this).await()
+        return toDelete + this
     }
 
     /**

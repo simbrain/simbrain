@@ -10,7 +10,7 @@ import org.simbrain.network.gui.dialogs.NetworkPreferences.inhibitoryRandomizer
 import org.simbrain.network.gui.dialogs.NetworkPreferences.weightRandomizer
 import org.simbrain.network.gui.dialogs.createSynapseAdjustmentPanel
 import org.simbrain.network.gui.dialogs.createTestInputPanel
-import org.simbrain.network.gui.dialogs.layout.LayoutDialog
+import org.simbrain.network.gui.dialogs.LayoutDialog
 import org.simbrain.network.gui.dialogs.network.*
 import org.simbrain.network.gui.dialogs.neuron.AddNeuronsDialog.createAddNeuronsDialog
 import org.simbrain.network.gui.dialogs.showSRNCreationDialog
@@ -422,6 +422,10 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         textEntryDialog("", "Enter text to add to the network") {
             if (it.isNotEmpty()) {
                 val textObject = NetworkTextObject(it)
+                undoManager.addUndoableAction(
+                    undo = { textObject.delete() },
+                    redo = { network.addNetworkModel(textObject, usePlacementManager = false, useAutoAssignedId = false)?.await() }
+                )
                 network.addNetworkModel(textObject)
             }
         }.display()
@@ -608,10 +612,15 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         ) {
             ConnectionStrategyPanel(strategy).displayInDialog {
                 commitChanges()
-                connectionStrategy.connectNeurons(
+                val synapses = connectionStrategy.connectNeurons(
                     selectionManager.filterSelectedSourceModels<Neuron>(),
                     selectionManager.filterSelectedModels<Neuron>()
-                ).addToNetworkAsync(network)
+                )
+                synapses.addToNetworkAsync(network)
+                undoManager.addUndoableAction(
+                    undo = { synapses.forEach { it.delete() } },
+                    redo = { synapses.addToNetwork(network, usePlacementManager = false, useAutoAssignId = false) }
+                )
             }
         }
     }

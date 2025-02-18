@@ -15,6 +15,7 @@ import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.gui.nodes.neuronGroupNodes.SOMGroupNode
 import org.simbrain.network.gui.nodes.subnetworkNodes.*
+import org.simbrain.network.layouts.Layout
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.neurongroups.SOMGroup
 import org.simbrain.network.smile.SmileClassifier
@@ -41,7 +42,7 @@ import kotlin.reflect.KClass
 /**
  * Main GUI representation of a [Network].
  */
-class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(), CoroutineScope {
+class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), CoroutineScope {
 
     /**
      * Main Piccolo canvas object.
@@ -540,7 +541,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
     }
 
     fun hardClearSelectedObjects() {
-        clearSelectedObjects();
+        clearSelectedObjects()
         selectionManager.filterSelectedModels<Synapse>().forEach { it.hardClear() }
         selectionManager.filterSelectedModels<NeuronArray>().forEach { it.hardClear() }
         selectionManager.filterSelectedModels<WeightMatrix>().forEach { it.hardClear() }
@@ -653,7 +654,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
         val tar = filterSelectedModels(AbstractNeuronCollection::class.java)
         if (src.isNotEmpty() && tar.isNotEmpty()) {
             network.addNetworkModel(SynapseGroup(src.first(), tar.first()))
-            return true;
+            return true
         }
         return false
     }
@@ -783,7 +784,7 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
                     scale(1 / newScale)
                 }
             })
-            addInputEventListener(WandEventHandler(this@NetworkPanel));
+            addInputEventListener(WandEventHandler(this@NetworkPanel))
         }
 
         /**
@@ -801,6 +802,40 @@ class NetworkPanel constructor(val networkComponent: NetworkComponent) : JPanel(
             val newX = x - newWidth / 2
             val newY = y - newHeight / 2
             camera.setViewBoundsNoOverflow(Rectangle2D.Double(newX, newY, newWidth, newHeight))
+        }
+    }
+
+    fun addNeuronsAsync(
+        numNeurons: Int,
+        template: Neuron,
+        layout: Layout
+    ) {
+        launch {
+            val neurons = network.addNeurons(numNeurons) { updateRule = template.updateRule }
+            layout.layoutNeurons(neurons)
+            undoManager.addUndoableAction(
+                undo = { neurons.forEach{it.delete()} },
+                redo = { network.addNetworkModels(neurons, usePlacementManager = false, useAutoAssignedId = false).awaitAll() }
+            )
+        }
+    }
+
+    fun addNeuronGroupAsync(
+        numNeurons: Int,
+        template: Neuron,
+        layout: Layout,
+        label: String
+    ) {
+        launch {
+            val neurons = network.addNeurons(numNeurons) { updateRule = template.updateRule }
+            val ng = NeuronGroup(neurons)
+            ng.layout = layout
+            network.addNetworkModel(ng)
+            ng.applyLayout()
+            if (label.isNotEmpty()) {
+                ng.label = label
+            }
+            // TODO: Undoable action
         }
     }
 

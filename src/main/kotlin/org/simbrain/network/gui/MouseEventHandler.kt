@@ -28,6 +28,7 @@ import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PNodeFilter
 import org.simbrain.network.core.LocatableModel
+import org.simbrain.network.core.centerLocation
 import org.simbrain.network.core.topLeftLocation
 import org.simbrain.network.gui.dialogs.NetworkPreferences.wandRadius
 import org.simbrain.network.gui.nodes.ScreenElement
@@ -54,6 +55,11 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
     private lateinit var marqueeEndPosition: Point2D
 
     /**
+     * For undo / redo
+     */
+    private lateinit var startLocations: List<Point2D>
+
+    /**
      * Red line that shows what the delta for the [PlacementManager] will be.
      */
     private var placementManagerDelta: PPath? = null
@@ -66,7 +72,6 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
             it.visible = false
         }
     }
-
 
     init {
         // Only handle events in selection mode
@@ -86,7 +91,6 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
             }
         }
     }
-
 
     /**
      * Handles beginnings of drag as well as single-click events.
@@ -111,6 +115,9 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         }
 
         priorSelection = networkPanel.selectionManager.selection.toMutableSet()
+        startLocations = networkPanel.selectionManager
+            .filterSelectedModels<LocatableModel>()
+            .map{ it.location}.toList()
         marqueeStartPosition = event.position
         marqueeEndPosition = event.position
         selectionMarquee.reset()
@@ -142,6 +149,13 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
             dragItems(event)
             priorSelection = setOf()
 
+            val models = networkPanel.selectionManager
+                .filterSelectedModels<LocatableModel>()
+            val endLocations = models.map{ it.location}.toList()
+            networkPanel.undoManager.addUndoableAction(
+                undo = { models.zip(startLocations.toList()).forEach{(m,l) -> m.location = l} },
+                redo = { models.zip(endLocations).forEach{(m,l) -> m.location = l} }
+            )
             // Reset the anchor point in the placement manager
             val topLeft = networkPanel.selectionManager.filterSelectedModels<LocatableModel>().topLeftLocation
             val pm = networkPanel.network.placementManager

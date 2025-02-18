@@ -19,6 +19,7 @@
 package org.simbrain.network.gui.dialogs.network;
 
 import org.simbrain.network.gui.NetworkPanel;
+import org.simbrain.network.gui.dialogs.LayeredNetworkCreationPanel;
 import org.simbrain.util.StandardDialog;
 
 import javax.swing.*;

@@ -13,17 +13,14 @@
  */
 package org.simbrain.network.gui.dialogs.neuron;
 
-import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.layouts.GridLayout;
 import org.simbrain.network.layouts.Layout;
-import org.simbrain.network.neurongroups.NeuronGroup;
 import org.simbrain.network.updaterules.LinearRule;
 import org.simbrain.network.updaterules.NeuronUpdateRule;
 import org.simbrain.util.DetailTrianglePanel;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.util.Utils;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 
 import javax.swing.*;
@@ -64,7 +61,7 @@ public class AddNeuronsDialog extends StandardDialog {
     /**
      * The base neuron to copy.
      */
-    private Neuron baseNeuron;
+    private final Neuron baseNeuron;
 
     /**
      * Help Button. Links to information about the currently selected neuron
@@ -91,7 +88,7 @@ public class AddNeuronsDialog extends StandardDialog {
     /**
      * Layout object.
      */
-    private Layout.LayoutEditor layoutObject = new Layout.LayoutEditor();
+    private final Layout.LayoutEditor layoutObject = new Layout.LayoutEditor();
 
     /**
      * A panel where layout settings can be edited.
@@ -185,26 +182,12 @@ public class AddNeuronsDialog extends StandardDialog {
      * @param inGroup if true, add them in a group.
      */
     private void addNeurons(boolean inGroup) {
-        double number = Utils.doubleParsable(numNeurons);
-        if (!Double.isNaN(number)) {
-            Network net = networkPanel.getNetwork();
-            for (int i = 0; i < number; i++) {
-                addedNeurons.add(new Neuron(baseNeuron));
-            }
+        int number = Integer.parseInt(numNeurons.getText());
             if (inGroup) {
-                NeuronGroup ng = new NeuronGroup(addedNeurons);
-                ng.setLayout(layoutObject.getLayout());
-                networkPanel.getNetwork().addNetworkModel(ng);
-                ng.applyLayout();
-                var label = groupPanel.tfGroupName.getText();
-                if (!label.isEmpty()) {
-                    ng.setLabel(label);
-                }
+                networkPanel.addNeuronGroupAsync(number, baseNeuron, layoutObject.getLayout(), groupPanel.tfGroupName.getText());
             } else {
-                addedNeurons.forEach(networkPanel.getNetwork()::addNetworkModel);
-                layoutObject.getLayout().layoutNeurons(addedNeurons);
+                networkPanel.addNeuronsAsync(number, baseNeuron, layoutObject.getLayout());
             }
-        }
     }
 
 
@@ -237,17 +220,17 @@ public class AddNeuronsDialog extends StandardDialog {
         /**
          * Select whether or not to add the neurons in a neuron group.
          */
-        private JCheckBox addToGroup = new JCheckBox();
+        private final JCheckBox addToGroup = new JCheckBox();
 
         /**
          * A label for the neuron group name.
          */
-        private JLabel tfNameLabel = new JLabel("Name: ");
+        private final JLabel tfNameLabel = new JLabel("Name: ");
 
         /**
          * A text box for naming a new neuron group or renaming an existing one.
          */
-        private JTextField tfGroupName = new JTextField();
+        private final JTextField tfGroupName = new JTextField();
 
         /**
          * Creates the neuron group sub-panel

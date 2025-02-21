@@ -28,7 +28,6 @@ import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PNodeFilter
 import org.simbrain.network.core.LocatableModel
-import org.simbrain.network.core.centerLocation
 import org.simbrain.network.core.topLeftLocation
 import org.simbrain.network.gui.dialogs.NetworkPreferences.wandRadius
 import org.simbrain.network.gui.nodes.ScreenElement
@@ -151,9 +150,10 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
 
             val models = networkPanel.selectionManager
                 .filterSelectedModels<LocatableModel>()
+            val startLocations = startLocations.toList()
             val endLocations = models.map{ it.location}.toList()
             networkPanel.undoManager.addUndoableAction(
-                undo = { models.zip(startLocations.toList()).forEach{(m,l) -> m.location = l} },
+                undo = { models.zip(startLocations).forEach{(m,l) -> m.location = l} },
                 redo = { models.zip(endLocations).forEach{(m,l) -> m.location = l} }
             )
             // Reset the anchor point in the placement manager

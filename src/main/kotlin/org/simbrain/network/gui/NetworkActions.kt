@@ -150,6 +150,10 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             if (with(network) { nc.shouldAdd() }) {
                 network.addNetworkModel(nc)
             }
+            undoManager.addUndoableAction(
+                undo = { nc.delete() },
+                redo = { network.addNetworkModel(nc, usePlacementManager = false, useAutoAssignedId = false)?.await() }
+            )
         }
     }
     val newNeuronAction = networkPanel.createAction(

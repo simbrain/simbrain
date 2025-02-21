@@ -3,6 +3,7 @@ package org.simbrain.custom_sims.simulations
 import kotlinx.coroutines.awaitAll
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.OneToOne
+import org.simbrain.network.core.labels
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.neurongroups.NormalizationGroup
 import org.simbrain.util.place
@@ -22,34 +23,49 @@ val spiveyNet = newSim {
     val networkComponent = addNetworkComponent("Spivey Net")
     val net = networkComponent.network
 
-    // TODO: Add Integration nodes and eye nodes and lay them out / wire them up properly
-    // (Right now just did a few to show the idea)
     val lexicalNodes = NormalizationGroup(4).apply {
         layout = LineLayout()
         applyLayout()
         label = "Lexical"
+        neuronList.labels = listOf("candle", "candy", "handle", "fork")
     }
     val visualNodes = NormalizationGroup(4).apply {
         layout = LineLayout()
         applyLayout()
-        label = "Vision"
+        label = "Visual"
     }
     val mouseNodes = NormalizationGroup(4).apply {
         layout = LineLayout()
         applyLayout()
         label = "Mouse"
     }
-    net.addNetworkModels(lexicalNodes, visualNodes, mouseNodes).awaitAll()
-    lexicalNodes.location = point(0,0)
-    visualNodes.location = point(14,152)
-    mouseNodes.location = point(240,152)
+    val eyesNodes = NormalizationGroup(4).apply {
+        layout = LineLayout()
+        applyLayout()
+        label = "Eyes"
+    }
+    val integrationNodes = NormalizationGroup(4).apply {
+        layout = LineLayout()
+        applyLayout()
+        label = "Integration"
+    }
+
+    net.addNetworkModels(lexicalNodes, visualNodes, mouseNodes, eyesNodes, integrationNodes).awaitAll()
+    lexicalNodes.location = point(-3.70,12.64)
+    visualNodes.location = point(285.98,5.92)
+    mouseNodes.location = point(438.46,160.33)
+    eyesNodes.location = point(144.87,158.44)
+    integrationNodes.location = point(131.67, -134.59)
 
     val connector = OneToOne().apply {
         percentExcitatory = 100.0
         useBidirectionalConnections = true
     }
-    net.addNetworkModels(connector.connectNeurons(lexicalNodes.neuronList, visualNodes.neuronList))
     net.addNetworkModels(connector.connectNeurons(visualNodes.neuronList, mouseNodes.neuronList))
+    net.addNetworkModels(connector.connectNeurons(eyesNodes.neuronList, visualNodes.neuronList))
+    net.addNetworkModels(connector.connectNeurons(lexicalNodes.neuronList, integrationNodes.neuronList))
+    net.addNetworkModels(connector.connectNeurons(integrationNodes.neuronList, visualNodes.neuronList))
+    //bidirectional so order doesn't matter
 
     // World
     val oc = addOdorWorldComponent()
@@ -63,58 +79,102 @@ val spiveyNet = newSim {
     world.addEntity(287, 44, EntityType.BELL)
     mouse.isShowTrail = true
 
-    val initialLocation = mouse.location
-
     workspace.addUpdateAction("Move mouse") {
         if (mouse.y > 15) {
-            mouse.y -= 1
+            mouse.y -= 50
         }
         // TODO: Properly implement this to deal with all four nodes and check the paper
-        mouse.x += (mouseNodes.neuronList[0].activation)
-        //mouse.x += (mouseNodes.neuronList[0].activation - mouseNodes.neuronList[1].activation)
+        mouse.x += (mouseNodes.neuronList[0].activation - mouseNodes.neuronList[1].activation)
     }
 
+    fun resetMouse() {
+        mouse.location = point(157,271)
+        mouse.clearTrail()
+    }
 
     withGui {
         //place(docViewer, 0, 0, 464, 619)
         place(networkComponent, 222, 15, 400, 400)
         place(oc, 613, 15, 391, 455)
         createControlPanel("Control Panel", 15, 15) {
-            addButton("Pattern 1") {
-                lexicalNodes.setActivations(doubleArrayOf(1.0,1.0,1.0,1.0))
-                visualNodes.setActivations(doubleArrayOf(1.0,1.0,1.0,1.0))
+            addButton("Lexical") {
+                // Lexical "Candy"
+                // Visual: Candle + Candy (currently bell)
+                resetMouse()
+                mouse.speakToEntity("Candle")
+                lexicalNodes.setActivations(doubleArrayOf(1.0,0.0,0.0,0.0))
+                workspace.simpleIterate(5)
+                visualNodes.setActivations(doubleArrayOf(1.0,1.0,0.0,0.0))
             }.apply {
                 // Hack to make the panel wider
                 preferredSize = Dimension(170, 30)
             }
-            addButton("Pattern 2") {
+            addButton("Visual Trial") { //temp name
+                resetMouse()
                 lexicalNodes.setActivations(doubleArrayOf(-1.0,1.0,-1.0,1.0))
-                visualNodes.setActivations(doubleArrayOf(1.0,-1.0,1.0,-1.0))
+                workspace.simpleIterate(3)
+                visualNodes.setActivations(doubleArrayOf(1.0,-1.0,1.0,-1.0)) // should i change this code to a different "trial" (label)?
+
+            }.apply {
+                // Hack to make the panel wider
+                preferredSize = Dimension(170, 30)
             }
+            addButton("Mouse Trial") {
+                resetMouse()
+                lexicalNodes.setActivations(doubleArrayOf(-1.0,1.0,-1.0,1.0))
+                workspace.simpleIterate(3)
+                visualNodes.setActivations(doubleArrayOf(1.0,-1.0,1.0,-1.0))
+
+            }.apply {
+                // Hack to make the panel wider
+                preferredSize = Dimension(170, 30)
+            }
+            addButton("Eyes Trial") {
+                resetMouse()
+                lexicalNodes.setActivations(doubleArrayOf(-1.0,1.0,-1.0,1.0))
+                workspace.simpleIterate(3)
+                visualNodes.setActivations(doubleArrayOf(1.0,-1.0,1.0,-1.0))
+
+            }.apply {
+                // Hack to make the panel wider
+                preferredSize = Dimension(170, 30)
+            }
+            //
             addButton("Reset") {
-                mouse.clearTrail()
-                mouse.location = initialLocation
+                resetMouse()
             }
         }
     }
+    // TODO: Make + label button for each trial -- NOT COMPLETE
 
-    //val docViewer = addDocViewer(
-    //    "Information",
-    //    """
-    //        # Introduction
-    //
-    //        The Hopfield simulation is a recurrent neural network with a synaptic connection pattern for pattern recognition and memory retrieval.
-    //
-    //        # What to do
-    //
-    //        - Select an input pattern and click the train button on the Control panel to train the network on the selected pattern.
-    //        - The model learns the pattern and “remembers” it.
-    //        - When randomizing the network (by clicking “N” [Neuron], “R” [Randomize], and “Space” [Iterate], or using “I” [Wand Mode] over the nodes), the network adjusts the nodes on each iteration to reconfigure the inputted pattern.
-    //        - The Network remembers the pattern and the antipattern, and when iterating (“Space”), it iterates to recreate the pattern with the most similar nodes.
-    //
-    //        You can get the pattern to memorize all the different patterns and antipatterns by training each one, randomizing and iterating to see if it is remembered, and training that pattern again if it needs to be learned.
-    //
-    //
-    //    """.trimIndent()
-    //)
+
+    // TODO: Add basic info about this
+    addSidebarInfo(
+        """ 
+        # Introduction
+        
+        This is a simulation of a localist attractor simulation of mouse trajectories relative to visual and auditory inputs
+         due to Michael Spivey and others.
+         
+       The simulation shows...
+         
+        # Background
+        
+        Relevant papers are 
+
+        [Continuous attraction toward phonological competitors](  https://pmc.ncbi.nlm.nih.gov/articles/PMC1177386/)
+
+        [A Linking Hypothesis for Eyetracking and Mousetracking in the Visual World Paradigm](https://www.sciencedirect.com/science/article/pii/S0006899325000356/pdfft?md5=593289ceb624d37b85229782945c7b40&pid=1-s2.0-S0006899325000356-main.pdf)
+
+        > Participants were presented with color images of two objects on a screen (one target and one distractor), and a prerecorded speech file instructed them to click one of them with the mouse. Objects were presented in the upper left and upper right corners of the computer screen (e.g., a candle and a candy, in the cohort condition, or a candle and a jacket, in the control condition). Eight target objects were used to make 32 trials in which the distractor object was either a cohort for the target object or a phonologically dissimilar control and in which the target object was either on the left or right side of the display. Participants were instructed to mouse-click a box in the bottom center of the screen when they were ready to begin a trial. At this time, the two object images would appear in the upper left and right, and 500 ms after the onset of the images, a single spoken word (from a speech file on the computer; mean duration, 532 ms) would name the target object. [Imposing this asynchrony between image onset and speech onset grew out of observations from pilot studies in which simultaneous onset caused participants to occasionally wait until the entire word was spoken before beginning their mouse movement. With the spoken word beginning 500 ms after onset of the images, participants usually begin their mouse movement (straight upward) before the onset of the spoken word, which gives distinguishing properties in the acoustic–phonetic input a chance to influence the continuous motor output midflight."
+
+        # What to do
+        
+        1. For the lexical task, press the `lexical` button.. observe that...
+      
+       
+        """.trimIndent()
+    )
+
+
 }

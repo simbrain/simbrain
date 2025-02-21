@@ -430,8 +430,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         selectionManager.clear()
 
         suspend fun reAddToGroup(model: NetworkModel) {
-            val parent = childToParentMap[model]
-            when (parent) {
+            when (val parent = childToParentMap[model]) {
                 is AbstractNeuronCollection -> {
                     (model as? Neuron)?.let { neuron ->
                         parent.neuronList.add(neuron)
@@ -663,9 +662,18 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         val targets = filterSelectedModels(Layer::class.java)
         if (sources.isNotEmpty() && targets.isNotEmpty()) {
             // TODO: Ability to set defaults for weight matrix that is added
-            sources.cartesianProduct(targets).mapNotNull { (s, t) ->
-                network.addNetworkModel(WeightMatrix(s, t))
+            val addedMatrices = sources.cartesianProduct(targets).mapNotNull { (s, t) ->
+                WeightMatrix(s, t)
             }
+            network.addNetworkModels(addedMatrices)
+            undoManager.addUndoableAction(
+                undo = { addedMatrices.forEach {it.delete()}},
+                redo = {
+                    network.addNetworkModels(addedMatrices, usePlacementManager = false, useAutoAssignedId = false)
+                        .awaitAll()
+                    addedMatrices.forEach { it.afterRestore() }
+                }
+            )
             return true
         }
         return false
@@ -680,7 +688,14 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         val src = filterSelectedSourceModels(AbstractNeuronCollection::class.java)
         val tar = filterSelectedModels(AbstractNeuronCollection::class.java)
         if (src.isNotEmpty() && tar.isNotEmpty()) {
-            network.addNetworkModel(SynapseGroup(src.first(), tar.first()))
+            val sg = SynapseGroup(src.first(), tar.first())
+            network.addNetworkModel(sg)
+            undoManager.addUndoableAction(
+                undo = { sg.delete()},
+                redo = {
+                    network.addNetworkModel(sg, usePlacementManager = false, useAutoAssignedId = false)?.await()
+                    sg.afterRestore()
+                })
             return true
         }
         return false

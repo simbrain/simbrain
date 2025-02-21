@@ -578,6 +578,10 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             it.editingObject.create().also { group ->
                 group.applyLayout()
                 network.addNetworkModel(group)
+                undoManager.addUndoableAction(
+                    undo = { group.delete() },
+                    redo = { network.addNetworkModel(group, usePlacementManager = false, useAutoAssignedId = false)?.await() }
+                )
             }
         }.apply { title = "Add Neuron Group" }.display()
     }

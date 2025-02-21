@@ -50,11 +50,14 @@ fun NetworkPanel.showSelectedSynapseProperties() {
     }
 }
 
-
 fun NetworkPanel.showNeuronArrayCreationDialog() {
     NeuronArray.CreationTemplate().createEditorDialog {
         val neuronArray = it.create()
         network.addNetworkModel(neuronArray)
+        undoManager.addUndoableAction(
+            undo = { neuronArray.delete() },
+            redo = { network.addNetworkModel(neuronArray, usePlacementManager = false, useAutoAssignedId = false)?.await() }
+        )
     }.also {
         it.title = "Create Neuron Array"
     }.display()

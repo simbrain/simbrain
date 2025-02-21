@@ -332,7 +332,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             else -> NeuronGroupNode(this, neuronGroup)
         }
 
-        val neuronNodes = neuronGroup.neuronList.map { neuron -> createNode(neuron).also { modelNodeMap[neuron] = it } }
+        val neuronNodes = neuronGroup.neuronList.map { neuron -> createNode(neuron) }
         val customInfoNode = neuronGroup.customInfo?.let { createNode(it) }
         createNeuronGroupNode().apply {
             addNeuronNodes(neuronNodes)
@@ -422,15 +422,42 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
 
         val selectedModels = selectionManager.selection.map { it.model }.sortedBy { updatingOrder(it) }
 
-        val deletedModels = selectedModels.reversed().flatMap { it.delete() }
+        val childToParentMap = network.childToParentMap.toMap()
+
+
+        val deletedModels = network.deleteModels(selectedModels.reversed())
+
         selectionManager.clear()
+
+        suspend fun reAddToGroup(model: NetworkModel) {
+            val parent = childToParentMap[model]
+            when (parent) {
+                is AbstractNeuronCollection -> {
+                    (model as? Neuron)?.let { neuron ->
+                        parent.neuronList.add(neuron)
+                        (modelNodeMap.getImmediately<AbstractNeuronCollectionNode>(parent))?.let { ancNode ->
+                            val neuronNode = createNode(neuron)
+                            ancNode.addNeuronNodes(listOf(neuronNode))
+                        }
+                    }
+                }
+                is SynapseGroup -> {
+                    (model as? Synapse)?.let { synapse ->
+                        parent.addSynapse(synapse)
+                    }
+                }
+            }
+        }
 
         undoManager.addUndoableAction(
             undo = {
-                network.addNetworkModels(deletedModels, usePlacementManager = false, useAutoAssignedId = false).awaitAll()
-                deletedModels.forEach { it.unDelete() }
+                deletedModels.forEach { reAddToGroup(it) }
+                network.addNetworkModels(deletedModels.filter { it !in childToParentMap }, usePlacementManager = false, useAutoAssignedId = false).awaitAll()
+                deletedModels.forEach { it.afterRestore() }
             },
-            redo = { deletedModels.forEach { it.delete() } }
+            redo = {
+                network.deleteModels(selectedModels.reversed())
+            }
         )
 
         network.events.zoomToFitPage.fire()

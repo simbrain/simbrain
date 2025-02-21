@@ -64,10 +64,11 @@ abstract class NetworkModel {
         return emptyList()
     }
 
-    /**
-     * Undo/Redo a deletion
-     */
-    open suspend fun unDelete() {
+    open suspend fun beforeRestore(context: Any? = null) {
+
+    }
+
+    open suspend fun afterRestore(context: Any? = null) {
 
     }
 

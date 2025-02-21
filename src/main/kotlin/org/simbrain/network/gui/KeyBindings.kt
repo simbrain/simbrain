@@ -15,6 +15,9 @@ fun NetworkPanel.addKeyBindings() {
 
     bind(VK_UP) { incrementSelectedObjects() }
     bind(VK_DOWN) { decrementSelectedObjects() }
+    bind(VK_LEFT) {
+        
+    }
     bind(Shift + VK_UP) { nudge(0, -1) }
     bind(Shift + VK_DOWN) { nudge(0, 1) }
     bind(Shift + VK_LEFT) { nudge(-1, 0) }

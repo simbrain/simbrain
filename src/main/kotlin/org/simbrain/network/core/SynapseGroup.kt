@@ -21,7 +21,7 @@ class SynapseGroup @JvmOverloads constructor(
     val source: AbstractNeuronCollection,
     val target: AbstractNeuronCollection,
     var connectionStrategy: ConnectionStrategy = AllToAll(),
-    var synapses: MutableList<Synapse> = connectionStrategy.connectNeurons(source.neuronList, target.neuronList).toMutableList()
+    synapses: MutableList<Synapse> = connectionStrategy.connectNeurons(source.neuronList, target.neuronList).toMutableList()
 ) : NetworkModel(), AttributeContainer {
 
     // TODO: When passing in synapses check all source are in source and all target are in target
@@ -37,6 +37,8 @@ class SynapseGroup @JvmOverloads constructor(
 
     @Transient
     override var events = SynapseGroupEvents()
+
+    var synapses: MutableList<Synapse> = synapses.onEach { synapse -> addSynapseListener(synapse) }
 
     /**
      * Flag for whether synapses should be displayed in a GUI representation of this object.
@@ -73,7 +75,12 @@ class SynapseGroup @JvmOverloads constructor(
         }
     }
     suspend fun removeAllSynapses(): List<NetworkModel> {
-        return this.synapses.flatMap { it.delete() }
+        return buildList {
+            synapses.toList().forEach {  synapse ->
+                val deletedBySynapse = synapse.delete()
+                addAll(deletedBySynapse)
+            }
+        }.also { synapses.clear() }
     }
 
     override suspend fun delete(): List<NetworkModel> {
@@ -81,17 +88,19 @@ class SynapseGroup @JvmOverloads constructor(
         target.removeIncomingSg(this)
         source.removeOutgoingSg(this)
         events.deleted.fire(this).await()
-        return removedSynapses
+        return listOf(this) + removedSynapses
     }
 
     fun addSynapse(syn: Synapse) {
         syn.isVisible = displaySynapses
+        addSynapseListener(syn)
         this.synapses.add(syn)
         events.synapseAdded.fire(syn)
     }
 
-    fun removeSynapse(syn: Synapse) {
+    suspend fun removeSynapse(syn: Synapse) {
         this.synapses.remove(syn)
+        syn.delete()
         events.synapseRemoved.fire(syn)
     }
 
@@ -144,7 +153,7 @@ class SynapseGroup @JvmOverloads constructor(
     }
 
     fun applyConnectionStrategy() {
-        synapses.toList().forEach { removeSynapse(it) }
+        removeAllSyapsesBlocking()
         connectionStrategy.connectNeurons(
             source.neuronList,
             target.neuronList
@@ -160,6 +169,15 @@ class SynapseGroup @JvmOverloads constructor(
 
     fun getWeightMatrix(): Matrix {
         return Matrix.of(SimnetUtils.getWeights(source.neuronList, target.neuronList));
+    }
+
+    fun addSynapseListener(synapse: Synapse) {
+        synapse.events.deleted.on(wait = true) {
+            this.synapses.remove(it)
+            if (this.synapses.isEmpty()) {
+                this.delete()
+            }
+        }
     }
 
     override fun clear() {

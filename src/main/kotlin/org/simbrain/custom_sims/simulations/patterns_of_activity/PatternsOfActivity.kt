@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations.patterns_of_activity
 
+import kotlinx.coroutines.runBlocking
 import org.simbrain.custom_sims.Simulation
 import org.simbrain.network.connections.*
 import org.simbrain.network.core.*
@@ -234,7 +235,7 @@ class PatternsOfActivity : Simulation {
         for (s in inpSynGL.synapses) {
             s.delay = ThreadLocalRandom.current().nextInt(2, maxDly / 2)
             if (s.target.polarity === Polarity.INHIBITORY) {
-                inpSynGL.removeSynapse(s)
+                runBlocking { inpSynGL.removeSynapse(s) }
             }
         }
         val inpSynGR = SynapseGroup(
@@ -248,7 +249,7 @@ class PatternsOfActivity : Simulation {
         for (s in inpSynGR.synapses) {
             s.delay = ThreadLocalRandom.current().nextInt(2, maxDly / 2)
             if (s.target.polarity === Polarity.INHIBITORY) {
-                inpSynGR.removeSynapse(s)
+                runBlocking { inpSynGR.removeSynapse(s) }
             }
         }
 

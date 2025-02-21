@@ -24,8 +24,8 @@ class UndoManager {
         redoStack.removeAllElements()
     }
 
-    fun addUndoableAction(undo: suspend (context: Any?) -> Unit, redo: suspend (context: Any?) -> Unit) {
-        addUndoableAction(undoableAction(undo, redo))
+    fun addUndoableAction(initialContext: Any? = null, undo: suspend (context: Any?) -> Unit, redo: suspend (context: Any?) -> Unit) {
+        addUndoableAction(undoableAction(initialContext, undo, redo))
     }
 
     /**
@@ -60,9 +60,9 @@ class UndoManager {
     }
 }
 
-fun undoableAction(undo: suspend (context: Any?) -> Unit, redo: suspend (context: Any?) -> Unit) = object : UndoableAction {
+fun undoableAction(initialContext: Any?, undo: suspend (context: Any?) -> Unit, redo: suspend (context: Any?) -> Unit) = object : UndoableAction {
 
-    override var context: Any? = null
+    override var context: Any? = initialContext
 
     override suspend fun undo() {
         undo(context)

@@ -529,7 +529,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
         return listOf(this)
     }
 
-    override suspend fun unDelete() {
+    override suspend fun afterRestore(context: Any?) {
         source.addToFanOut(this)
         target.addToFanIn(this)
     }

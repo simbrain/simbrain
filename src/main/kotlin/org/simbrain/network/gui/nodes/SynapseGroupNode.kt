@@ -81,9 +81,6 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
             this@SynapseGroupNode.networkPanel.createNode(it)
             refreshVisible()
         }
-        events.synapseRemoved.on(wait = true) { s ->
-            s.delete()
-        }
         events.synapseRemoved.on(dispatcher = Dispatchers.Swing) {
             refreshVisible()
         }

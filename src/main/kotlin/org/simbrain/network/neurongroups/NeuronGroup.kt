@@ -49,11 +49,10 @@ open class NeuronGroup() : AbstractNeuronCollection() {
     }
 
     override suspend fun delete(): List<NetworkModel> {
-        val deletedNeurons = neuronList.toList().flatMap { it.delete() }
-        super.delete()
+        // val deletedNeurons = neuronList.toList().flatMap { it.delete() }
         return buildList {
-            add(this@NeuronGroup)
-            addAll(deletedNeurons)
+            addAll(super.delete())
+            addAll(neuronList.toList().flatMap { it.delete() })
         }
     }
 

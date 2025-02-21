@@ -331,7 +331,7 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
 
     override suspend fun delete(): List<NetworkModel> {
         return buildList {
-            add(this@AbstractNeuronCollection)
+            addAll(super.delete())
             addAll(outgoingSg.flatMap { it.delete() })
             addAll(incomingSgs.flatMap { it.delete() })
             val customInfo = customInfo

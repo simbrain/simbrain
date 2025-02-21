@@ -154,8 +154,13 @@ abstract class Layer : LocatableModel(), AttributeContainer {
     }
 
     override suspend fun delete(): List<NetworkModel> {
+        val connectors = LinkedHashSet(incomingConnectors + outgoingConnectors)
+        connectors.forEach { it.delete() }
         events.deleted.fire(this).await()
-        return listOf(this)
+        return buildList {
+            add(this@Layer)
+            addAll(connectors)
+        }
     }
 
     /**

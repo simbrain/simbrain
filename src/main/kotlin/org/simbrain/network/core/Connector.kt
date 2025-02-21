@@ -24,13 +24,6 @@ abstract class Connector(var source: Layer, var target: Layer) : NetworkModel(),
         }
 
     /**
-     * Construct a connector and initialize events.
-     */
-    init {
-        initEvents()
-    }
-
-    /**
      * A matrix of PSRs (post-synaptic responses) for each connection.
      */
     abstract val psrMatrix: Matrix
@@ -47,16 +40,15 @@ abstract class Connector(var source: Layer, var target: Layer) : NetworkModel(),
     context(Network)
     abstract fun updatePSR()
 
-    private fun initEvents() {
-        // When the parents of the matrix are deleted, delete the matrix
-        source.events.deleted.on(wait = true) { delete() }
-        target.events.deleted.on(wait = true) { delete() }
-    }
-
     override suspend fun delete(): List<NetworkModel> {
         source.removeOutgoingConnector(this)
         target.removeIncomingConnector(this)
         events.deleted.fire(this).await()
         return listOf(this)
+    }
+
+    override suspend fun afterRestore(context: Any?) {
+        source.addOutgoingConnector(this)
+        target.addIncomingConnector(this)
     }
 }

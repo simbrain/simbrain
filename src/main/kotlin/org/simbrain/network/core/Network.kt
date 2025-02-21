@@ -6,6 +6,7 @@ import org.simbrain.network.gui.PlacementManager
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.subnetworks.Subnetwork
+import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.util.CachedObject
 import org.simbrain.util.SimpleIdManager
 import org.simbrain.util.UserParameter
@@ -68,6 +69,10 @@ class Network: CoroutineScope, EditableObject {
      * Main data structure containing all [NetworkModel]s: neurons, synapses, etc.
      */
     private val networkModels = NetworkModelList()
+
+    private val _childToParentMap = mutableMapOf<NetworkModel, NetworkModel>()
+
+    val childToParentMap: Map<NetworkModel, NetworkModel> get() = _childToParentMap
 
     /**
      * The update manager for this network.
@@ -330,8 +335,9 @@ class Network: CoroutineScope, EditableObject {
             if (usePlacementManager && model is LocatableModel && model.shouldBePlaced) {
                 placementManager.placeObject(model)
             }
-            model.events.deleted.on {
+            model.events.deleted.on(wait = true) {
                 networkModels.remove(it)
+                _childToParentMap.remove(it)
                 events.modelRemoved.fire(it).join()
                 updatePriorityList()
             }
@@ -342,6 +348,29 @@ class Network: CoroutineScope, EditableObject {
                 }
                 model.events.updateRuleChanged.on { _, _ -> shouldUpdateTimeType = true }
                 updatePriorityList()
+            }
+            when(model) {
+                is AbstractNeuronCollection -> {
+                    model.neuronList.forEach { _childToParentMap[it] = model }
+                    (model as? NeuronGroup)?.let { neuronGroup ->
+                        neuronGroup.neuronList.forEach { n ->
+                            n.events.deleted.on(wait = true) { _childToParentMap.remove(n) }
+                        }
+                    }
+                }
+                is SynapseGroup -> {
+                    model.synapses.forEach { _childToParentMap[it] = model }
+                    model.synapses.forEach { s ->
+                        s.events.deleted.on(wait = true) { _childToParentMap.remove(s) }
+                    }
+                }
+                is Subnetwork -> {
+                    model.modelList.all.forEach { _childToParentMap[it] = model }
+                }
+                is SupervisedModel -> {
+                    model.layers.forEach { _childToParentMap[it] = model }
+                    model.weightMatrices.forEach { _childToParentMap[it] = model }
+                }
             }
             return deferred
         }
@@ -358,6 +387,26 @@ class Network: CoroutineScope, EditableObject {
             abs(it) + 1
         } else {
             0
+        }
+    }
+
+    suspend fun deleteModels(networkModels: List<NetworkModel>): List<NetworkModel> {
+        fun isLastChildOfParent(model: NetworkModel): Boolean {
+            return childToParentMap[model]?.let { parent ->
+                childToParentMap.values.count { it == parent } == 1
+            } == true
+        }
+
+        return buildList {
+            networkModels.forEach {
+                if (isLastChildOfParent(it)) {
+                    childToParentMap[it]?.let { parent ->
+                        addAll(parent.delete())
+                    }
+                } else {
+                    addAll(it.delete())
+                }
+            }
         }
     }
 

@@ -39,8 +39,7 @@ val kAgentTrails = newSim {
 //Information (0, 0, 516, 632)
 //>
 
-val docViewer = addDocViewer(
-    "Information",
+val docViewer = addSidebarInfo(
     """ 
         # Introduction
         In this simulation, the network consists of neurons, which, when activated, make the agent move towards it.
@@ -61,19 +60,15 @@ val docViewer = addDocViewer(
         2. In the "Sensory States + Predictions" window, the trail that the mouse walks is plotted in gray, and the predicted path of the mouse is red. 
         3. Repeat this until all 5 paths are taken 
         4. After all 5 Paths, Select any object again from the "Control Panel", and the predictor will be able to crrectly predict where the mouse travels
-        
-        
-        
     """.trimIndent()
 )
 
 
     withGui {
-        place(docViewer, 0, 0, 516, 632)
         place(networkComponent) {
-            location = point(856, 0)
-            width = 439
-            height = 296
+            location = point(322, 13)
+            width = 544
+            height = 336
         }
     }
 
@@ -127,7 +122,7 @@ val docViewer = addDocViewer(
     val odorWorldComponent = addOdorWorldComponent()
 
     withGui {
-        place(odorWorldComponent,532, 248, 315, 388)
+        place(odorWorldComponent,9, 348, 315, 388)
     }
 
     val odorWorld = odorWorldComponent.world.apply {
@@ -181,14 +176,14 @@ val docViewer = addDocViewer(
             projector.tolerance = .001
         }
         place(plot) {
-            location = point(861, 327)
-            width = 441
-            height = 308
+            location = point(324, 346)
+            width = 543
+            height = 390
         }
 
         couplingManager.createCoupling(sensoryNet, plot)
 
-        createControlPanel("Control Panel", 533, 0) {
+        createControlPanel("Control Panel", 11, 16) {
 
 
             fun resetObjects() {

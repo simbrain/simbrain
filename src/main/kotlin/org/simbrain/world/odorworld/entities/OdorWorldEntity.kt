@@ -131,6 +131,8 @@ class OdorWorldEntity @JvmOverloads constructor(
 
     val isRotating get() = entityType.isRotating
 
+    val velocity get() = point(cos(heading.toRadian()) * speed, -sin(heading.toRadian()) * speed)
+
     /**
      * Manages programatic movement (based on couplings to neurons, etc.)
      */
@@ -158,8 +160,7 @@ class OdorWorldEntity @JvmOverloads constructor(
 
         if (speed == 0.0) return
 
-        val dx = cos(heading.toRadian()) * speed
-        val dy = -sin(heading.toRadian()) * speed
+        val (dx, dy) = velocity
 
         val bounds = world.collidableObjects.filter { it !== this }
 

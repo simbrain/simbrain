@@ -5,7 +5,9 @@ import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PBounds
-import org.simbrain.util.*
+import org.simbrain.util.createAction
+import org.simbrain.util.distanceTo
+import org.simbrain.util.minus
 import org.simbrain.util.piccolo.Animations
 import org.simbrain.util.piccolo.RotatingSprite
 import org.simbrain.util.piccolo.Sprite
@@ -24,7 +26,6 @@ import java.awt.geom.Point2D
 import java.util.stream.Collectors
 import javax.swing.JMenuItem
 import javax.swing.JPopupMenu
-import kotlin.math.absoluteValue
 
 /**
  * Piccolo representation of an [OdorWorldEntity].
@@ -248,15 +249,10 @@ class EntityNode(
             (sprite as RotatingSprite?)!!.updateHeading(entity.heading)
         }
         updateAttributesNodes()
+        val isCrossingBorder = !entity.world.contains(entity.location - entity.velocity)
         setOffset(entity.x, entity.y)
         if (entity.isShowTrail && SimbrainDesktop.workspace.updater.isRunning) {
-            fun isCrossingBroder(): Boolean {
-                val delta = (trail.path.currentPoint - entity.location).magnitude.absoluteValue
-                val velocity = entity.speed.absoluteValue
-                // assume jumps of over 20 are wraparounds.  a good enough way to detect wraparound for now
-                return delta > velocity + 20.0
-            }
-            if (isCrossingBroder()) {
+            if (isCrossingBorder) {
                 trail.moveTo(entity.x, entity.y)
             }
             if (entity.location distanceTo trail.path.currentPoint > 0.25) { // don't add points too close to each other

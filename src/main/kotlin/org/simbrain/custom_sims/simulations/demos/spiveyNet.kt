@@ -8,6 +8,7 @@ import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.neurongroups.NormalizationGroup
 import org.simbrain.util.place
 import org.simbrain.util.point
+import org.simbrain.world.odorworld.OdorWorldDesktopComponent
 import org.simbrain.world.odorworld.entities.EntityType
 import java.awt.Dimension
 
@@ -96,15 +97,16 @@ val spiveyNet = newSim {
         //place(docViewer, 0, 0, 464, 619)
         place(networkComponent, 222, 15, 400, 400)
         place(oc, 613, 15, 391, 455)
+        (desktop?.getDesktopComponent(oc) as? OdorWorldDesktopComponent)?.worldPanel?.scalingFactor = 0.1
         createControlPanel("Control Panel", 15, 15) {
             addButton("Lexical") {
                 // Lexical "Candy"
                 // Visual: Candle + Candy (currently bell)
                 resetMouse()
                 mouse.speakToEntity("Candle")
-                lexicalNodes.setActivations(doubleArrayOf(1.0,0.0,0.0,0.0))
+                lexicalNodes.addInputs(doubleArrayOf(1.0,0.0,0.0,0.0))
+                visualNodes.addInputs(doubleArrayOf(1.0,1.0,0.0,0.0))
                 workspace.simpleIterate(5)
-                visualNodes.setActivations(doubleArrayOf(1.0,1.0,0.0,0.0))
             }.apply {
                 // Hack to make the panel wider
                 preferredSize = Dimension(170, 30)

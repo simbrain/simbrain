@@ -451,7 +451,8 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
                 }
                 is SynapseGroup -> {
                     (model as? Synapse)?.let { synapse ->
-                        parent.addSynapse(synapse)
+                        parent.synapses.add(synapse)
+                        createNode(synapse)
                     }
                 }
             }
@@ -698,10 +699,13 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         val tar = filterSelectedModels(AbstractNeuronCollection::class.java)
         if (src.isNotEmpty() && tar.isNotEmpty()) {
             val sg = SynapseGroup(src.first(), tar.first())
+            val synapses = sg.synapses.toList()
             network.addNetworkModel(sg)
             undoManager.addUndoableAction(
                 undo = { sg.delete()},
                 redo = {
+                    sg.synapses.clear()
+                    sg.synapses.addAll(synapses)
                     network.addNetworkModel(sg, usePlacementManager = false, useAutoAssignedId = false)?.await()
                     sg.afterRestore()
                 })

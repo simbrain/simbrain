@@ -9,6 +9,7 @@ import org.simbrain.network.subnetworks.CompetitiveNetwork
 import org.simbrain.util.add
 import org.simbrain.util.place
 import org.simbrain.util.stats.distributions.NormalDistribution
+import org.simbrain.custom_sims.addSidebarInfo
 
 /**
  * Demo for studying Competitive networks with ImageWorld,
@@ -29,8 +30,7 @@ val competitiveGridSim = newSim {
     // Label for winner
     var winningLabel = ""
 
-    val docViewer = addDocViewer(
-        "Information",
+    val docViewer = addSidebarInfo(
         """ 
             # Introduction
             
@@ -44,9 +44,8 @@ val competitiveGridSim = newSim {
     )
 
     withGui {
-        place(docViewer, 0, 0, 366, 275)
-        place(networkComponent, 585, 0, 386, 619)
-        createControlPanel("Control Panel", 417, 0) {
+        place(networkComponent, 153, 10, 386, 619)
+        createControlPanel("Control Panel", 0, 13) {
 
             addButton("Pattern 1") {
                 competitive.inputLayer.neuronList.activations =

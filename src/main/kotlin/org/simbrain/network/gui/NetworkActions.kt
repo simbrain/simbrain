@@ -4,16 +4,12 @@ import kotlinx.coroutines.launch
 import org.simbrain.network.connections.*
 import org.simbrain.network.core.*
 import org.simbrain.network.gui.ConditionallyEnabledAction.EnablingCondition
-import org.simbrain.network.gui.dialogs.NetworkPreferences
+import org.simbrain.network.gui.dialogs.*
 import org.simbrain.network.gui.dialogs.NetworkPreferences.excitatoryRandomizer
 import org.simbrain.network.gui.dialogs.NetworkPreferences.inhibitoryRandomizer
 import org.simbrain.network.gui.dialogs.NetworkPreferences.weightRandomizer
-import org.simbrain.network.gui.dialogs.createSynapseAdjustmentPanel
-import org.simbrain.network.gui.dialogs.createTestInputPanel
-import org.simbrain.network.gui.dialogs.LayoutDialog
 import org.simbrain.network.gui.dialogs.network.*
 import org.simbrain.network.gui.dialogs.neuron.AddNeuronsDialog.createAddNeuronsDialog
-import org.simbrain.network.gui.dialogs.showSRNCreationDialog
 import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.neurongroups.BasicNeuronGroupParams
@@ -152,7 +148,11 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             }
             undoManager.addUndoableAction(
                 undo = { nc.delete() },
-                redo = { network.addNetworkModel(nc, usePlacementManager = false, useAutoAssignedId = false)?.await() }
+                redo = {
+                    nc.neuronList.clear()
+                    nc.neuronList.addAll(neuronList)
+                    network.addNetworkModel(nc, usePlacementManager = false, useAutoAssignedId = false)?.await()
+                }
             )
         }
     }

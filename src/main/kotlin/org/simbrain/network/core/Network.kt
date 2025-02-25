@@ -352,10 +352,8 @@ class Network: CoroutineScope, EditableObject {
             when(model) {
                 is AbstractNeuronCollection -> {
                     model.neuronList.forEach { _childToParentMap[it] = model }
-                    (model as? NeuronGroup)?.let { neuronGroup ->
-                        neuronGroup.neuronList.forEach { n ->
-                            n.events.deleted.on(wait = true) { _childToParentMap.remove(n) }
-                        }
+                    model.neuronList.forEach { n ->
+                        n.events.deleted.on(wait = true) { _childToParentMap.remove(n) }
                     }
                 }
                 is SynapseGroup -> {
@@ -402,6 +400,9 @@ class Network: CoroutineScope, EditableObject {
                 if (isLastChildOfParent(it)) {
                     childToParentMap[it]?.let { parent ->
                         addAll(parent.delete())
+                        if (parent is NeuronCollection) {
+                            addAll(it.delete())
+                        }
                     }
                 } else {
                     addAll(it.delete())

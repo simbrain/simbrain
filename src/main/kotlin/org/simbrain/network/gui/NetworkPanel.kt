@@ -424,19 +424,28 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
 
         val childToParentMap = network.childToParentMap.toMap()
 
-
         val deletedModels = network.deleteModels(selectedModels.reversed())
 
         selectionManager.clear()
 
         suspend fun reAddToGroup(model: NetworkModel) {
             when (val parent = childToParentMap[model]) {
-                is AbstractNeuronCollection -> {
+                is NeuronGroup -> {
                     (model as? Neuron)?.let { neuron ->
                         parent.neuronList.add(neuron)
-                        (modelNodeMap.getImmediately<AbstractNeuronCollectionNode>(parent))?.let { ancNode ->
+                        (modelNodeMap.getImmediately<NeuronGroupNode>(parent))?.let { neuronGroupNode ->
                             val neuronNode = createNode(neuron)
-                            ancNode.addNeuronNodes(listOf(neuronNode))
+                            neuronGroupNode.addNeuronNodes(listOf(neuronNode))
+                        }
+                    }
+                }
+                is NeuronCollection -> {
+                    (model as? Neuron)?.let { neuron ->
+                        network.addNetworkModel(neuron, usePlacementManager = false, useAutoAssignedId = false)?.await()
+                        parent.neuronList.add(neuron)
+                        modelNodeMap.getImmediately<NeuronCollectionNode>(parent)?.let { neuronCollectionNode ->
+                            val neuronNode = modelNodeMap.getImmediately<NeuronNode>(neuron)
+                            neuronCollectionNode.addNeuronNodes(listOf(neuronNode))
                         }
                     }
                 }

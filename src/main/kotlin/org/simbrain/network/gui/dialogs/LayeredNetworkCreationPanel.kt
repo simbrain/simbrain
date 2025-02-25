@@ -138,9 +138,14 @@ class LayeredNetworkCreationPanel(
         // Add the new network
         panel.network.addNetworkModel(net)
         panel.repaint()
+        val models = net.modelList.all
         panel.undoManager.addUndoableAction(
             undo = { net.delete() },
-            redo = { panel.network.addNetworkModel(net, usePlacementManager = false, useAutoAssignedId = false)?.await() }
+            redo = {
+                net.modelList.addAll(models)
+                panel.network.addNetworkModel(net, usePlacementManager = false, useAutoAssignedId = false)?.await()
+                net.afterRestore()
+            }
         )
     }
 

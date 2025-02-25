@@ -84,6 +84,12 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
         return toDelete + this
     }
 
+    override suspend fun afterRestore(context: Any?) {
+        modelList.allInUpdatingOrder.forEach {
+            it.afterRestore()
+        }
+    }
+
     /**
      * A "flat" list containing every neuron in every neuron group in this subnetwork
      */

@@ -3,12 +3,12 @@ package org.simbrain.custom_sims.simulations.hebb
 import org.simbrain.custom_sims.SimulationScope
 import org.simbrain.custom_sims.addTimeSeriesComponent
 import org.simbrain.network.core.Layer
-import org.simbrain.network.subnetworks.Hopfield
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
 import org.simbrain.util.ControlPanelKt
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.util.showAPEOptionDialog
 import org.simbrain.util.stats.distributions.TwoValued
 import org.simbrain.workspace.Workspace
 import kotlin.math.abs
@@ -93,9 +93,6 @@ fun ControlPanelKt.createHopfieldTestPane(
         applyRandomPattern(hopfield)
     }
 
-    val patternTesterEditor = AnnotatedPropertyEditor(patternTestConfig)
-    addAnnotatedPropertyEditor(patternTesterEditor)
-
     val runTest = setUpRunTest(
         workspace = workspace,
         patternTestConfig = patternTestConfig,
@@ -106,12 +103,9 @@ fun ControlPanelKt.createHopfieldTestPane(
         allPatterns = allPatterns
     )
 
-    addButton("Apply Config") {
-        patternTesterEditor.commitChanges()
-    }
     addSeparator()
     addButton(buttonName) {
-        patternTesterEditor.commitChanges()
+        patternTestConfig.showAPEOptionDialog("Capacity Test Parameters")
         val plot = workspace.getComponent("Memory") as TimeSeriesPlotComponent?
             ?: addTimeSeriesComponent("Memory", seriesNames = listOf("% pattern remembered")).apply {
                 model.isAutoRange = false

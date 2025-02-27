@@ -11,6 +11,9 @@ import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.showAPEOptionDialog
 import org.simbrain.util.stats.distributions.TwoValued
 import org.simbrain.workspace.Workspace
+import java.util.*
+import javax.swing.JLabel
+import javax.swing.JSlider
 import kotlin.math.abs
 
 fun hammingDistance(actual: DoubleArray, expected: DoubleArray): Double {
@@ -30,7 +33,6 @@ fun applyRandomPattern(hopfield: Layer): DoubleArray {
     hopfield.randomize(TwoValued(-1.0, 1.0))
     return hopfield.activationArray
 }
-
 
 fun setUpRunTest(
     workspace: Workspace,
@@ -103,8 +105,24 @@ fun ControlPanelKt.createHopfieldTestPane(
         allPatterns = allPatterns
     )
 
-    addSeparator()
-    addButton(buttonName) {
+    addTab("Capacity")
+
+    // Slider for patterns
+    val slider = JSlider(0, numTestPatterns() - 1, 0)
+    fun JSlider.init() {
+        minorTickSpacing = 1
+        val labelTable = Hashtable<Int, JLabel>()
+        labelTable[minimum] = JLabel("${minimum + 1}")
+        labelTable[maximum] = JLabel("${maximum + 1}")
+        labelTable[(minimum + maximum) / 2] = JLabel("${((minimum + maximum) / 2) + 1}")
+        paintTicks = true
+        paintLabels = true
+        snapToTicks = true
+        setLabelTable(labelTable)
+    }
+    slider.init()
+
+    addButton(buttonName, tab = "Capacity") {
         patternTestConfig.showAPEOptionDialog("Capacity Test Parameters")
         val plot = workspace.getComponent("Memory") as TimeSeriesPlotComponent?
             ?: addTimeSeriesComponent("Memory", seriesNames = listOf("% pattern remembered")).apply {
@@ -113,6 +131,10 @@ fun ControlPanelKt.createHopfieldTestPane(
                 model.rangeLowerBound = -5.0
             }
 
+        // Reset slider
+        slider.maximum = numTestPatterns() - 1
+        slider.init()
+
         plot.model.clearData()
         runCapacityTest(
             runTest = runTest,
@@ -120,25 +142,33 @@ fun ControlPanelKt.createHopfieldTestPane(
             numTestPatterns = numTestPatterns(),
             plot = plot
         )
+
     }
 
-    val nTestChooser = object : EditableObject {
-        var nTest by GuiEditable(
-            label = "Number of Patterns",
-            initValue = 0,
-            min = 0,
-            max = numTestPatterns() - 1,
-            increment = 1,
-            order = 10
-        )
+    val patternNum = JLabel("   Pattern number: ")
+    addComponent(slider,  tab = "Capacity")
+    slider.addChangeListener {
+        hopfield.setActivations(allPatterns[slider.value])
+        patternNum.text = "   Pattern number: ${slider.value + 1}"
     }
-    val testChooserEditor = AnnotatedPropertyEditor(nTestChooser)
+    addComponent(patternNum, tab = "Capacity")
 
-    addButton("Train Patterns") {
-        testChooserEditor.commitChanges()
-        runTest(hopfield, nTestChooser.nTest)
-    }
-    addAnnotatedPropertyEditor(testChooserEditor)
+    //val nTestChooser = object : EditableObject {
+    //    var nTest by GuiEditable(
+    //        label = "Number of Patterns",
+    //        initValue = 0,
+    //        min = 0,
+    //        max = numTestPatterns() - 1,
+    //        increment = 1,
+    //        order = 10
+    //    )
+    //}
+    //val testChooserEditor = AnnotatedPropertyEditor(nTestChooser)
+    //addButton("Train Patterns", tab = "Capacity") {
+    //    testChooserEditor.commitChanges()
+    //    runTest(hopfield, nTestChooser.nTest)
+    //}
+    //addAnnotatedPropertyEditor(testChooserEditor, tab = "Capacity")
 
     val nPatternChooser = object : EditableObject {
         var nPattern by GuiEditable(
@@ -151,14 +181,15 @@ fun ControlPanelKt.createHopfieldTestPane(
         )
     }
     val patternChooserEditor = AnnotatedPropertyEditor(nPatternChooser)
+    //addSeparator(tab = "Capacity")
+    //addAnnotatedPropertyEditor(patternChooserEditor, tab = "Capacity")
+    //addButton("Load Pattern", tab = "Capacity") {
+    //    patternChooserEditor.commitChanges()
+    //    hopfield.setActivations(allPatterns[nPatternChooser.nPattern])
+    //}
 
-    addButton("Apply Pattern") {
-        patternChooserEditor.commitChanges()
-        hopfield.setActivations(allPatterns[nPatternChooser.nPattern])
-    }
-    addAnnotatedPropertyEditor(patternChooserEditor)
+
 }
-
 
 class PatternTestConfig: EditableObject {
 

@@ -98,7 +98,7 @@ suspend fun SimulationScope.createPatternControlPanel(
                     layer.randomize(TwoValued(0.0, 1.0))
                 }
             }
-            addButton("Randomize parameters") {
+            addButton("Randomize weights") {
                 randomizeWeights()
             }
             if (isContinuous) {
@@ -107,19 +107,19 @@ suspend fun SimulationScope.createPatternControlPanel(
                 }
             }
             addSeparator()
-            //addButton("Circle") {
-            //    applyCirclePattern(layer, isContinuous)
-            //}
-            //addButton("Square") {
-            //    applySquarePattern(layer, isContinuous)
-            //}
-            //addButton("Diagonal Line") {
-            //    applyLinePattern(layer, "diagonal", isContinuous)
-            //}
-            //addButton("Cross") {
-            //    applyCrossPattern(layer, isContinuous)
-            //}
-            //addSeparator()
+            addButton("Circle") {
+                applyCirclePattern(layer, isContinuous)
+            }
+            addButton("Square") {
+                applySquarePattern(layer, isContinuous)
+            }
+            addButton("Diagonal Line") {
+                applyLinePattern(layer, "diagonal", isContinuous)
+            }
+            addButton("Cross") {
+                applyCrossPattern(layer, isContinuous)
+            }
+            addSeparator()
         }
     }
 }

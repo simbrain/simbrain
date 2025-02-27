@@ -76,53 +76,22 @@ val hopfieldSimContinuous = newSim {
             wm.weights.randomizeSymmetric()
             wm.events.updated.fire()
         }?.apply {
-            //addButton("Learn All Patterns") {
-            //    wm.weights.randomizeSymmetric()
-            //    hopfield.isAllClamped = true
-            //    wm.clamped = false
-            //    (wm.learningRule as HebbianRule).forgettingRate = 0.0
-            //    //(wm.learningRule as HebbianRule).learningRate = (1/numNeurons).toDouble()
-            //    repeat(numTrainIterations) {
-            //        applyCirclePattern(hopfield, true)
-            //        with(network) { wm.update() }
-            //        //wm.weightMatrix.setSpectralRadius(1.0)
-            //
-            //        applySquarePattern(hopfield, true)
-            //        with(network) { wm.update() }
-            //        //wm.weightMatrix.setSpectralRadius(1.0)
-            //
-            //        applyLinePattern(hopfield, "diagonal", true)
-            //        with(network) { wm.update() }
-            //        //wm.weightMatrix.setSpectralRadius(1.0)
-            //
-            //        applyCrossPattern(hopfield, true)
-            //        with(network) { wm.update() }
-            //        //wm.weightMatrix.setSpectralRadius(1.0)
+            //addTextField("Forgetting rate", "" + forgettingRate) {
+            //    it.toDoubleOrNull()?.let { num ->
+            //        forgettingRate = num
             //    }
             //    initForgettingRate()
-            //    initLearningRate()
-            //    // Dump into retrieval mode for easy testing
-            //    hopfield.isAllClamped = false
-            //    wm.clamped = true
             //}
-            addSeparator()
+            addTextField("Training iterations", "" + numTrainIterations) {
+                it.toIntOrNull()?.let { num ->
+                    numTrainIterations = num
+                }
+            }
             addTextField("Learning rate", "" + learningRate) {
                 it.toDoubleOrNull()?.let { num ->
                     learningRate = num
                 }
                 initLearningRate()
-            }
-            addTextField("Forgetting rate", "" + forgettingRate) {
-                it.toDoubleOrNull()?.let { num ->
-                    forgettingRate = num
-                }
-                initForgettingRate()
-            }
-            addSeparator()
-            addTextField("Training iterations", "" + numTrainIterations) {
-                it.toIntOrNull()?.let { num ->
-                    numTrainIterations = num
-                }
             }
             addButton("Train") {
                 // Forces into training mode
@@ -130,22 +99,25 @@ val hopfieldSimContinuous = newSim {
                 wm.clamped = false
                 // Now train
                 workspace.simpleIterate(numTrainIterations)
-            }
-            addButton("Forget") {
-                repeat(numTrainIterations) {
-                    (wm.learningRule as HebbianRule).applyForgetting(wm)
-                }
-            }
-            addSeparator()
-            addButton("Training Mode") {
-                hopfield.isAllClamped = true
-                wm.clamped = false
-            }
-            addButton("Retrieval Mode") {
+                // Go to retrieval mode so user can test
                 hopfield.isAllClamped = false
                 wm.clamped = true
+
             }
-            addSeparator()
+            //addButton("Forget") {
+            //    repeat(numTrainIterations) {
+            //        (wm.learningRule as HebbianRule).applyForgetting(wm)
+            //    }
+            //}
+            //addSeparator()
+            //addButton("Training Mode") {
+            //    hopfield.isAllClamped = true
+            //    wm.clamped = false
+            //}
+            //addButton("Retrieval Mode") {
+            //    hopfield.isAllClamped = false
+            //    wm.clamped = true
+            //}
             createHopfieldTestPane(
                 hopfield,
                 applyTraining = {

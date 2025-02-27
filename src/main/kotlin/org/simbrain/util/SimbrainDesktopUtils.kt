@@ -65,7 +65,7 @@ suspend fun SimulationScope.place(workspaceComponent: WorkspaceComponent, x: Int
     }
 }
 
-class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, true, true), CoroutineScope {
+class   ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, true, true), CoroutineScope {
 
     @Transient
     private var job = SupervisorJob()
@@ -87,16 +87,13 @@ class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, tru
         launch(Dispatchers.Swing) {
             // If tabbedPane is not yet the main component
             if (centralPanel.components.none { it == tabbedPane }) {
-                // Remove mainPanel from centralPanel
                 centralPanel.remove(mainPanel)
-                // Add mainPanel to tabbedPane as "Main" tab
+                // TODO: Make it possible to NOT have a main panel
                 tabbedPane.addTab("Main", mainPanel)
-                // Add tabbedPane to centralPanel
                 centralPanel.add(tabbedPane)
                 centralPanel.revalidate()
                 centralPanel.repaint()
             }
-            // Add new empty panel for the new tab
             tabbedPane.addTab(tabName, LabelledItemPanel())
         }
     }
@@ -116,8 +113,8 @@ class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, tru
         launch(Dispatchers.Swing) { getTab(tab).addItem(component, 1) }
     }
 
-    fun addSeparator() {
-        launch(Dispatchers.Swing) { mainPanel.addItem(JSeparator(SwingConstants.HORIZONTAL)) }
+    fun addSeparator(tab: String? = null) {
+        launch(Dispatchers.Swing) { getTab(tab).addItem(JSeparator(SwingConstants.HORIZONTAL)) }
     }
 
     fun addLabelledText(label: String, text: String, tab: String? = null) = JLabel(text).also {

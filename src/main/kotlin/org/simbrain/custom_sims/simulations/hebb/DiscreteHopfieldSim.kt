@@ -56,7 +56,6 @@ val discreteHopfieldSim = newSim {
         """.trimIndent()
     )
 
-
     withGui {
         place(networkComponent, 350, 0, 509, 619)
 
@@ -70,25 +69,9 @@ val discreteHopfieldSim = newSim {
                     numTrainIterations = num
                 }
             }
-            //addButton("Train On All Patterns") {
-            //    with(network) {
-            //        repeat(numTrainIterations) {
-            //            applyCirclePattern(hopfield.neuronGroup)
-            //            hopfield.trainOnCurrentPattern()
-            //            applySquarePattern(hopfield.neuronGroup)
-            //            hopfield.trainOnCurrentPattern()
-            //            applyLinePattern(hopfield.neuronGroup, "diagonal")
-            //            hopfield.trainOnCurrentPattern()
-            //            applyCrossPattern(hopfield.neuronGroup)
-            //            hopfield.trainOnCurrentPattern()
-            //        }
-            //    }
-            //}
-            //addSeparator()
             addButton("Train on current pattern") {
                 with(network) { hopfield.trainOnCurrentPattern() }
             }
-            addSeparator()
             createHopfieldTestPane(
                 hopfield = hopfield.neuronGroup,
                 applyTraining = { with(network) { hopfield.trainOnCurrentPattern()} },

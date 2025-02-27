@@ -101,6 +101,7 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
         weightMatrix.weights.randomizeSymmetric(randomizer ?: NetworkPreferences.weightRandomizer)
+        weightMatrix.events.updated.fire()
     }
 
     context(Network)

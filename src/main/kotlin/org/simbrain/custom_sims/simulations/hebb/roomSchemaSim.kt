@@ -2,12 +2,9 @@ package org.simbrain.custom_sims.simulations
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
-import org.simbrain.network.core.addNeuronCollection
-import org.simbrain.network.core.labels
 import org.simbrain.network.subnetworks.RestrictedBoltzmannMachine
 import org.simbrain.util.place
 import org.simbrain.util.runWithProgressWindow
-import org.simbrain.util.toDoubleArray
 import kotlin.random.Random
 
 /**
@@ -27,16 +24,7 @@ val roomSchemaSim = newSim {
     rbm.visibleLayer.circleMode = true
     rbm.visibleLayer.offset(-100.0, 0.0)
 
-    // Neuron Collection and Its Configurations
-    val nc = network.addNeuronCollection(42).apply {
-        setUpperBound(1.0)
-        setLowerBound(0.0)
-        isAllClamped = true
-        applyLayout(5, 8)
-    }
-    nc.offset(-400.0, -580.0)
-
-    nc.neuronList.labels = listOf(
+    rbm.visibleLayer.labelArray = arrayOf(
         "ceiling", "large", "telephone", "books", "sofa", "drapes",
         "cupboard", "toilet", "walls", "medium", "bed", "desk-chair",
         "easy-chair", "stove", "sink", "scale", "door", "small",
@@ -46,79 +34,56 @@ val roomSchemaSim = newSim {
         "fireplace", "toaster", "bathtub", "clothes-hanger"
     )
 
-    fun syncNeuronCollectionToRBM() {
-        rbm.visibleLayer.activations = nc.activations
-    }
+    fun activateNode(label: String) = rbm.visibleLayer.labelArray
+        .indexOf(label)
+        .let { index ->
+            if (index < 0) null else index
+        }?.let { index ->
+            rbm.visibleLayer.activations[index, 0] = 1.0
+        }
 
-    fun syncRBMToNeuronCollection() {
-        nc.activationArray = rbm.visibleLayer.activations.toDoubleArray()
+    fun activateNodes(labels: List<String>) {
+        rbm.visibleLayer.clear()
+        labels.forEach { activateNode(it) }
+        rbm.visibleLayer.events.updated.fire()
     }
-
-    workspace.addUpdateAction("Sync RBM to Neuron Collection") {
-        syncRBMToNeuronCollection()
-    }
-
 
     fun flipBitWithChance(bit: Int, chance: Double): Int {
         return if (Random.nextDouble() < chance) 1 - bit else bit
     }
 
     withGui {
-        place(networkComponent, 236, 10, 600, 800)
+        place(networkComponent, 236, 10, 800, 600)
         createControlPanel("Control Panel", 5, 10) {
             addButton("Kitchen") {
-                nc.clear()
-                rbm.visibleLayer.clear()
-                listOf(
+                activateNodes(listOf(
                     "oven", "coffee-pot", "cupboard", "toaster", "refrigerator", "sink", "stove", "drapes",
                     "coffee-cup", "clock", "telephone", "small", "window", "walls", "ceiling"
-                ).mapNotNull { nc.getNeuronByLabel(it) }.forEach { it.activation = 1.0 }
-                syncNeuronCollectionToRBM()
+                ))
             }
             addButton("Office") {
-                nc.clear()
-                rbm.visibleLayer.clear()
-                listOf(
+                activateNodes(listOf(
                     "computer", "ash-tray", "coffee-cup", "picture", "desk-chair", "books", "carpet",
                     "bookshelf", "typewriter", "telephone", "desk", "large", "door", "walls", "ceiling"
-                ).forEach {
-                    nc.getNeuronByLabel(it)?.activation = 1.0
-                }
-                syncNeuronCollectionToRBM()
+                ))
             }
             addButton("Bathroom") {
-                nc.clear()
-                rbm.visibleLayer.clear()
-                listOf("scale", "toilet", "bathtub", "cupboard", "sink", "very-small", "door", "walls", "ceiling").forEach {
-                    nc.getNeuronByLabel(it)?.activation = 1.0
-                }
-                syncNeuronCollectionToRBM()
+                activateNodes(listOf("scale", "toilet", "bathtub", "cupboard", "sink", "very-small", "door", "walls", "ceiling"))
             }
             addButton("Living Room") {
-                nc.clear()
-                rbm.visibleLayer.clear()
-                listOf(
+                activateNodes(listOf(
                     "television", "drapes", "fire-place", "easy-chair", "sofa", "floor-lamp", "picture",
                     "clock", "books", "carpet", "bookshelf", "telephone", "very-large", "window", "door",
                     "walls", "ceiling"
-                ).forEach {
-                    nc.getNeuronByLabel(it)?.activation = 1.0
-                }
-                syncNeuronCollectionToRBM()
+                ))
             }
             addButton("Bedroom") {
-                nc.clear()
-                rbm.visibleLayer.clear()
-                listOf("coat-hanger", "television", "dresser", "drapes", "picture", "clock", "books",
+                activateNodes(listOf("coat-hanger", "television", "dresser", "drapes", "picture", "clock", "books",
                     "carpet", "bookshelf", "bed", "medium", "window", "door", "walls", "ceiling"
-                ).forEach {
-                    nc.getNeuronByLabel(it)?.activation = 1.0
-                }
-                syncNeuronCollectionToRBM()
+                ))
             }
             addSeparator()
             addButton("Train on Current Pattern") {
-                syncNeuronCollectionToRBM()
                 with(network) {
                     runWithProgressWindow(20, batchSize = 10) {
                         rbm.trainOnCurrentPattern()
@@ -126,12 +91,13 @@ val roomSchemaSim = newSim {
                 }
             }
             addButton("Recall Current Pattern") {
-                syncNeuronCollectionToRBM()
                 workspace.iterateSuspend(10)
-                syncRBMToNeuronCollection()
             }
             addButton("Permute Current Pattern") {
-                nc.neuronList.forEach{ it.activation = flipBitWithChance(it.activation.toInt(), .1).toDouble()  }
+                rbm.visibleLayer.activationArray = rbm.visibleLayer
+                    .activationArray
+                    .map { flipBitWithChance(it.toInt(), 0.1).toDouble() }
+                    .toDoubleArray()
             }
         }
     }

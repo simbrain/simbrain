@@ -70,13 +70,14 @@ class Network: CoroutineScope, EditableObject {
      */
     private val networkModels = NetworkModelList()
 
+    /**
+     * Encodes all parent-child relationships between NetworkModels.
+     * For example, each Neuron in a NeuronGroup is mapped to its to parent NeuronGroup
+     * Needed for undo / redo.
+     */
+    val childToParentMap: Map<NetworkModel, NetworkModel> get() = _childToParentMap
     private val _childToParentMap = mutableMapOf<NetworkModel, NetworkModel>()
 
-    val childToParentMap: Map<NetworkModel, NetworkModel> get() = _childToParentMap
-
-    /**
-     * The update manager for this network.
-     */
     @Transient
     var updateManager = NetworkUpdateManager(this)
 
@@ -388,6 +389,11 @@ class Network: CoroutineScope, EditableObject {
         }
     }
 
+    /**
+     * Deletes models
+     *
+     * @return list of deleted models for undo /redo
+     */
     suspend fun deleteModels(networkModels: List<NetworkModel>): List<NetworkModel> {
         fun isLastChildOfParent(model: NetworkModel): Boolean {
             return childToParentMap[model]?.let { parent ->
@@ -395,6 +401,7 @@ class Network: CoroutineScope, EditableObject {
             } == true
         }
 
+        // If deleting the last item in a group, delete the group, rather than the item
         return buildList {
             networkModels.forEach {
                 if (isLastChildOfParent(it)) {

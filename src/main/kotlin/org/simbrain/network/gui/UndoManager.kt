@@ -7,7 +7,7 @@ import java.util.*
  * Manage undo / redo operations in the network panel.
  */
 class UndoManager {
-    // Todo: implement a cap on max-undo.
+
     /**
      * All actions that can be undone are pushed to this stack.
      */

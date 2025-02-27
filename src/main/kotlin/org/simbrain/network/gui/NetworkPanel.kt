@@ -126,9 +126,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
      */
     var nudgeAmount = NetworkPreferences.nudgeAmount
 
-    /**
-     * Undo Manager
-     */
     val undoManager = UndoManager()
 
     /**
@@ -422,12 +419,14 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
 
         val selectedModels = selectionManager.selection.map { it.model }.sortedBy { updatingOrder(it) }
 
+        // Snapshot of deleted objects and their relationships, which can be used to reconstruct a
+        // prior state of the network
         val childToParentMap = network.childToParentMap.toMap()
-
         val deletedModels = network.deleteModels(selectedModels.reversed())
 
         selectionManager.clear()
 
+        // When undoing deletion of a group, its children must be re-added
         suspend fun reAddToGroup(model: NetworkModel) {
             when (val parent = childToParentMap[model]) {
                 is NeuronGroup -> {
@@ -458,10 +457,17 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             }
         }
 
+        fun hasNoParent(model: NetworkModel): Boolean {
+            return model !in childToParentMap
+        }
+
         undoManager.addUndoableAction(
             undo = {
+                // Adds models back to parent groups
                 deletedModels.forEach { reAddToGroup(it) }
-                network.addNetworkModels(deletedModels.filter { it !in childToParentMap }, usePlacementManager = false, useAutoAssignedId = false).awaitAll()
+                // Add all models without parents back
+                network.addNetworkModels(deletedModels.filter { hasNoParent(it) }, usePlacementManager = false, useAutoAssignedId = false).awaitAll()
+                // Call afterRestore on all models to finalize recreation as needed
                 deletedModels.forEach { it.afterRestore() }
             },
             redo = {

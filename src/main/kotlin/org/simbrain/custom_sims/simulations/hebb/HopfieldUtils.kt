@@ -34,46 +34,47 @@ fun applyRandomPattern(hopfield: Layer): DoubleArray {
     return hopfield.activationArray
 }
 
-fun setUpRunTest(
-    workspace: Workspace,
-    patternTestConfig: PatternTestConfig,
-    applyTraining: suspend () -> Unit,
-    applyLearningRate: (learningRate: Double) -> Unit,
-    applyReset: () -> Unit,
-    distanceFunction: (actual: DoubleArray, expected: DoubleArray) -> Double = ::hammingDistance,
-    allPatterns: List<DoubleArray>
-): suspend (hopfield: Layer, nPatterns: Int) -> Int {
-    return { hopfield: Layer, nPatterns: Int ->
-        applyReset()
-        applyLearningRate(1.0 / nPatterns)
+class HopfieldTestConfig(
+    val workspace: Workspace,
+    val hopfield: Layer,
+    val patternTestConfig: PatternTestConfig,
+    val applyTraining: suspend () -> Unit,
+    val applyLearningRate: (learningRate: Double) -> Unit,
+    val applyReset: () -> Unit,
+    val distanceFunction: (actual: DoubleArray, expected: DoubleArray) -> Double = ::hammingDistance)
 
-        val patterns = allPatterns.take(nPatterns)
-        patterns.forEach { pattern ->
-            hopfield.setActivations(pattern)
-            applyTraining()
-        }
+suspend fun runHopfieldTest(config: HopfieldTestConfig, patterns: List<DoubleArray>, numPatternsToTest: Int): Int {
+    config.applyReset()
+    config.applyLearningRate(1.0 / numPatternsToTest)
 
-        // Returns the number of patterns that remain stable within the specified tolerance
-        patterns.count { pattern ->
-            hopfield.setActivations(pattern)
-            workspace.iterateSuspend(2)
-            distanceFunction(hopfield.activationArray, pattern) <= patternTestConfig.distancePercentThreshold / 100.0 * hopfield.size
-        }
+    val patterns = patterns.take(numPatternsToTest)
+    patterns.forEach { pattern ->
+        config.hopfield.setActivations(pattern)
+        config.applyTraining()
     }
 
+    // Returns the number of patterns that remain stable within the specified tolerance
+    return patterns.count { pattern ->
+        config.hopfield.setActivations(pattern)
+        config.workspace.iterateSuspend(2)
+        config.distanceFunction(
+            config.hopfield.activationArray,
+            pattern
+        ) <= config.patternTestConfig.distancePercentThreshold / 100.0 * config.hopfield.size
+    }
 }
 
 suspend fun runCapacityTest(
-    runTest: suspend (hopfield: Layer, nPatterns: Int) -> Int,
-    hopfield: Layer,
-    numTestPatterns: Int,
+    config: HopfieldTestConfig,
+    patterns: List<DoubleArray>,
+    numPatternsToTest: Int,
     plot: TimeSeriesPlotComponent
 ) {
 
     // Runs the memory test for 1, 2, ... numTestPatterns and plots results
-    for (i in 0 until numTestPatterns) {
+    for (i in 0 until numPatternsToTest) {
         val nTest = i + 1
-        val nSuccess = runTest(hopfield, nTest) * 100.0 / nTest
+        val nSuccess = runHopfieldTest(config, patterns, nTest) * 100.0 / nTest
         plot.model.addData(0, i.toDouble(), nSuccess)
     }
 
@@ -81,29 +82,14 @@ suspend fun runCapacityTest(
 
 context(SimulationScope)
 fun ControlPanelKt.createHopfieldTestPane(
-    hopfield: Layer,
-    applyTraining: suspend () -> Unit,
-    applyLearningRate: (learningRate: Double) -> Unit,
-    applyReset: () -> Unit,
-    distanceFunction: (actual: DoubleArray, expected: DoubleArray) -> Double = ::hammingDistance,
-    buttonName: String = "Capacity Test",
+    config: HopfieldTestConfig
 ) {
 
     val patternTestConfig = PatternTestConfig()
-    fun numTestPatterns(): Int = (patternTestConfig.percentToTest / 100 * hopfield.size).toInt()
+    fun numTestPatterns(): Int = (patternTestConfig.percentToTest / 100 * config.hopfield.size).toInt()
     val allPatterns = (0 until numTestPatterns()).map {
-        applyRandomPattern(hopfield)
+        applyRandomPattern(config.hopfield)
     }
-
-    val runTest = setUpRunTest(
-        workspace = workspace,
-        patternTestConfig = patternTestConfig,
-        applyTraining = applyTraining,
-        applyLearningRate = applyLearningRate,
-        applyReset = applyReset,
-        distanceFunction = distanceFunction,
-        allPatterns = allPatterns
-    )
 
     addTab("Capacity")
 
@@ -122,7 +108,7 @@ fun ControlPanelKt.createHopfieldTestPane(
     }
     slider.init()
 
-    addButton(buttonName, tab = "Capacity") {
+    addButton("Capacity Test", tab = "Capacity") {
         patternTestConfig.showAPEOptionDialog("Capacity Test Parameters")
         val plot = workspace.getComponent("Memory") as TimeSeriesPlotComponent?
             ?: addTimeSeriesComponent("Memory", seriesNames = listOf("% pattern remembered")).apply {
@@ -136,19 +122,14 @@ fun ControlPanelKt.createHopfieldTestPane(
         slider.init()
 
         plot.model.clearData()
-        runCapacityTest(
-            runTest = runTest,
-            hopfield = hopfield,
-            numTestPatterns = numTestPatterns(),
-            plot = plot
-        )
+        runCapacityTest(config, allPatterns, numTestPatterns(), plot)
 
     }
 
     val patternNum = JLabel("   Pattern number: ")
     addComponent(slider,  tab = "Capacity")
     slider.addChangeListener {
-        hopfield.setActivations(allPatterns[slider.value])
+        config.hopfield.setActivations(allPatterns[slider.value])
         patternNum.text = "   Pattern number: ${slider.value + 1}"
     }
     addComponent(patternNum, tab = "Capacity")
@@ -187,7 +168,6 @@ fun ControlPanelKt.createHopfieldTestPane(
     //    patternChooserEditor.commitChanges()
     //    hopfield.setActivations(allPatterns[nPatternChooser.nPattern])
     //}
-
 
 }
 

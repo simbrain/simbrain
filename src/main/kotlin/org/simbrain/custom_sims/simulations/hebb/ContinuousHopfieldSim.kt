@@ -70,7 +70,7 @@ val hopfieldSimContinuous = newSim {
     initForgettingRate()
 
     withGui {
-        place(networkComponent, 350, 0, 509, 619)
+        place(networkComponent, 223, 0, 509, 619)
 
         createPatternControlPanel(hopfield, true) {
             wm.weights.randomizeSymmetric()
@@ -118,8 +118,10 @@ val hopfieldSimContinuous = newSim {
             //    hopfield.isAllClamped = false
             //    wm.clamped = true
             //}
-            createHopfieldTestPane(
-                hopfield,
+            val config = HopfieldTestConfig(
+                workspace = workspace,
+                hopfield = hopfield,
+                patternTestConfig = PatternTestConfig(),
                 applyTraining = {
                     hopfield.isAllClamped = true
                     wm.clamped = false
@@ -139,6 +141,7 @@ val hopfieldSimContinuous = newSim {
                 },
                 distanceFunction = ::signHammingDistance
             )
+            createHopfieldTestPane(config)
         }
 
     }

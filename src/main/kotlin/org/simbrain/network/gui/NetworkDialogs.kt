@@ -5,7 +5,9 @@ import kotlinx.coroutines.swing.Swing
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.core.*
-import org.simbrain.network.gui.dialogs.*
+import org.simbrain.network.gui.dialogs.PercentExcitatoryPanel
+import org.simbrain.network.gui.dialogs.SynapseAdjustmentPanel
+import org.simbrain.network.gui.dialogs.createTestInputPanel
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog
 import org.simbrain.network.gui.dialogs.text.TextDialog
@@ -17,13 +19,14 @@ import org.simbrain.util.piccolo.SceneGraphBrowser
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.objectWrapper
 import org.simbrain.util.propertyeditor.wrapperWidget
-import org.simbrain.util.table.*
 import java.awt.Dialog
 import java.awt.Dimension
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
-import java.util.*
-import javax.swing.*
+import javax.swing.BoxLayout
+import javax.swing.JFrame
+import javax.swing.JPanel
+import javax.swing.JTabbedPane
 
 fun NetworkPanel.showTextPropertyDialog(textNodes: Collection<TextNode>) {
     TextDialog(textNodes).apply {
@@ -208,7 +211,7 @@ fun NetworkPanel.showClassifierCreationDialog() {
     val creator = SmileClassifier.ClassifierCreator()
     AnnotatedPropertyEditor(creator).displayInDialog {
         commitChanges()
-        network.addNetworkModel(creator.create(network))
+        addSubnetworkAction(this@NetworkPanel) { creator.create(network) }
     }.also {
         it.title = "Create Classifier"
     }

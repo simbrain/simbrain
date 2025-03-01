@@ -37,6 +37,15 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
     val modelList: NetworkModelList = NetworkModelList()
 
     /**
+     * Encodes all parent-child relationships between NetworkModels.
+     * For example, each Neuron in a NeuronGroup is mapped to its to parent NeuronGroup
+     * Needed for undo / redo.
+     */
+    val childToParentMap = mutableMapOf<NetworkModel, NetworkModel>()
+
+
+
+    /**
      * Whether the GUI should display neuron groups contained in this subnetwork. This will usually be true, but in
      * cases where a subnetwork has just one neuron group it is redundant to display both. So this flag indicates to the
      * GUI that neuron groups in this subnetwork need not be displayed.
@@ -50,9 +59,24 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
                 events.locationChanged.fire()
             }
         }
+        when(model) {
+            is AbstractNeuronCollection -> {
+                model.neuronList.forEach { childToParentMap[it] = model }
+                model.neuronList.forEach { n ->
+                    n.events.deleted.on(wait = true) { childToParentMap.remove(n) }
+                }
+            }
+            is SynapseGroup -> {
+                model.synapses.forEach { childToParentMap[it] = model }
+                model.synapses.forEach { s ->
+                    s.events.deleted.on(wait = true) { childToParentMap.remove(s) }
+                }
+            }
+        }
         events.locationChanged.fire()
         model.events.deleted.on(wait = true) {
             modelList.remove(it)
+            childToParentMap.remove(it)
             if (modelList.size == 0) {
                 delete()
             }

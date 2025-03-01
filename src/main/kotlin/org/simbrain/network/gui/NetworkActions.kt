@@ -8,13 +8,14 @@ import org.simbrain.network.gui.dialogs.*
 import org.simbrain.network.gui.dialogs.NetworkPreferences.excitatoryRandomizer
 import org.simbrain.network.gui.dialogs.NetworkPreferences.inhibitoryRandomizer
 import org.simbrain.network.gui.dialogs.NetworkPreferences.weightRandomizer
-import org.simbrain.network.gui.dialogs.network.*
 import org.simbrain.network.gui.dialogs.neuron.AddNeuronsDialog.createAddNeuronsDialog
 import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.neurongroups.BasicNeuronGroupParams
+import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.neurongroups.NeuronGroupParams
 import org.simbrain.network.subnetworks.RestrictedBoltzmannMachine
+import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.util.Alignment
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
@@ -611,9 +612,10 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             addSubnetAction("Feed Forward Network") { FeedForwardCreationDialog(networkPanel) },
             addSubnetAction("Hopfield") { HopfieldCreationDialog(networkPanel) },
             addSubnetAction("Restricted Boltzmann Machine") {
-                // TODO: As this pattern is reused add a util to NetworkDialogs.kt
                 RestrictedBoltzmannMachine.RBMCreator().createEditorDialog("Create Restricted Boltzmann Machine") {
-                networkPanel.network.addNetworkModel(it.create()) } },
+                    addSubnetworkAction(networkPanel) { it.create() }
+                }
+            },
             addSubnetAction("SOM Network") { SOMCreationDialog(networkPanel) },
             addSubnetAction("SRN (Simple Recurrent Network)") { networkPanel.showSRNCreationDialog() }
         )
@@ -826,4 +828,42 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         scalingFactor /= 1.1
         autoZoom = false
     }
+}
+
+fun addSubnetworkAction(networkPanel: NetworkPanel, block: () -> Subnetwork) {
+    val subnetwork = block()
+    networkPanel.network.addNetworkModel(subnetwork)
+    val models = subnetwork.modelList.all
+    val neuronGroups = models.filterIsInstance<NeuronGroup>()
+    val neuronCollections = models.filterIsInstance<AbstractNeuronCollection>()
+    val synapseGroups = models.filterIsInstance<SynapseGroup>()
+
+    val neuronGroupNeuronsMap = neuronGroups.associateWith { it.neuronList.toList() }
+    val neuronCollectionNeuronsMap = neuronCollections.associateWith { it.neuronList.toList() }
+    val synapseGroupSynapsesMap = synapseGroups.associateWith { it.synapses.toList() }
+
+    networkPanel.undoManager.addUndoableAction(
+        undo = { subnetwork.delete() },
+        redo = {
+
+            neuronGroupNeuronsMap.forEach { (group, neurons) ->
+                group.neuronList.clear()
+                group.neuronList.addAll(neurons)
+            }
+
+            neuronCollectionNeuronsMap.forEach { (collection, neurons) ->
+                collection.neuronList.clear()
+                collection.neuronList.addAll(neurons)
+            }
+
+            synapseGroupSynapsesMap.forEach { (group, synapses) ->
+                group.synapses.clear()
+                group.synapses.addAll(synapses)
+            }
+
+            subnetwork.modelList.addAll(models)
+            networkPanel.network.addNetworkModel(subnetwork, usePlacementManager = false, useAutoAssignedId = false)?.await()
+            subnetwork.afterRestore()
+        }
+    )
 }

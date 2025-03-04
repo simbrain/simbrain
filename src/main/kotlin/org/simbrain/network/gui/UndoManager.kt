@@ -1,6 +1,11 @@
 package org.simbrain.network.gui
 
+import kotlinx.coroutines.awaitAll
+import org.simbrain.network.core.*
 import org.simbrain.network.gui.UndoManager.UndoableAction
+import org.simbrain.network.gui.nodes.*
+import org.simbrain.network.neurongroups.NeuronGroup
+import org.simbrain.network.subnetworks.Subnetwork
 import java.util.*
 
 /**
@@ -71,4 +76,91 @@ fun undoableAction(initialContext: Any?, undo: suspend (context: Any?) -> Unit, 
     override suspend fun redo() {
         redo(context)
     }
+}
+
+
+class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<NetworkModel>) {
+
+    private val network = networkPanel.network
+    private val modelNodeMap get() = networkPanel.modelNodeMap
+
+    private val modelsToDelete = modelsToDelete.sortedBy { updatingOrder(it) }
+
+    private val subnetworks = this.modelsToDelete.filterIsInstance<Subnetwork>()
+
+    // Snapshot of deleted objects and their relationships, which can be used to reconstruct a
+    // prior state of the network
+    private val childToParentMaps = listOf(network.childToParentMap) + subnetworks.map { it.childToParentMap }
+    private val childToParentMapsSnapshots = childToParentMaps.map { it.toMap() }
+    private fun restoreMapSnapshot() {
+        childToParentMaps.zip(childToParentMapsSnapshots).forEach { (map, snapshot) ->
+            map.clear()
+            map.putAll(snapshot)
+        }
+    }
+
+    // When undoing deletion of a group, its children must be re-added
+    context(NetworkPanel)
+    private suspend fun reAddToGroup(model: NetworkModel) {
+        when (val parent = childToParentMaps.firstNotNullOfOrNull { it[model] }) {
+            is NeuronGroup -> {
+                (model as? Neuron)?.let { neuron ->
+                    parent.neuronList.add(neuron)
+                    (modelNodeMap.getImmediately<NeuronGroupNode>(parent))?.let { neuronGroupNode ->
+                        // for free neuron deletion, the group node should have already been created
+                        val neuronNode = createNode(neuron)
+                        neuronGroupNode.addNeuronNodes(listOf(neuronNode))
+                    }
+                }
+            }
+            is NeuronCollection -> {
+                (model as? Neuron)?.let { neuron ->
+                    network.addNetworkModel(neuron, usePlacementManager = false, useAutoAssignedId = false)?.await()
+                    parent.neuronList.add(neuron)
+                    modelNodeMap.getImmediately<NeuronCollectionNode>(parent)?.let { neuronCollectionNode ->
+                        modelNodeMap.getImmediately<NeuronNode>(neuron)?.let { neuronNode ->
+                            neuronCollectionNode.addNeuronNodes(listOf(neuronNode))
+                        }
+                    }
+                }
+            }
+            is SynapseGroup -> {
+                (model as? Synapse)?.let { synapse ->
+                    parent.synapses.add(synapse)
+                    // even though we are not using the synapseGroupNode, we still need to check if this was
+                    // loose synapse deletion or group deletion to synchronize with neuron group recreation
+                    // otherwise a synapse node could be waiting for the neuron nodes to be created which
+                    // doesn't happen until the next processing loop
+                    modelNodeMap.getImmediately<SynapseGroupNode>(parent)?.let { synapseGroupNode ->
+                        createNode(synapse)
+                    }
+                }
+            }
+            is Subnetwork -> {
+                parent.modelList.add(model)
+                modelNodeMap.getImmediately<SubnetworkNode>(parent)?.let { subnetworkNode ->
+                    modelNodeMap.getImmediately<ScreenElement>(model)?.let { screenElement ->
+                        subnetworkNode.addNode(screenElement)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun hasNoParent(model: NetworkModel): Boolean {
+        return childToParentMaps.none { it.containsKey(model) }
+    }
+
+    context(NetworkPanel)
+    suspend fun restore(deletedModels: List<NetworkModel>) {
+        restoreMapSnapshot()
+        val modelsToReAdd = deletedModels.reversed()
+        // Adds models back to parent groups
+        modelsToReAdd.forEach { reAddToGroup(it) }
+        // Add all models without parents back
+        network.addNetworkModels(modelsToReAdd.filter { hasNoParent(it) }, usePlacementManager = false, useAutoAssignedId = false).awaitAll()
+        // Call afterRestore on all models to finalize recreation as needed
+        modelsToReAdd.forEach { it.afterRestore() }
+    }
+
 }

@@ -141,9 +141,13 @@ object Clipboard {
         // Add the copied object
         net.network.addNetworkModels(copy).awaitAll()
 
+        val undeleteContext = UndeleteContext(net, copy)
+
+        var deletedModels: List<NetworkModel>? = null
+
         net.undoManager.addUndoableAction(
-            undo = { copy.forEach { it.delete() } },
-            redo = { net.network.addNetworkModels(copy, usePlacementManager = false, useAutoAssignedId = false).awaitAll() }
+            undo = { deletedModels = net.network.deleteModels(copy) },
+            redo = { with(net) { undeleteContext.restore(deletedModels!!) } }
         )
 
         // Unselect "old" copied objects

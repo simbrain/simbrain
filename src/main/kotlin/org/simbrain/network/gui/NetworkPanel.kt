@@ -336,14 +336,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         }
     }
 
-    //- rbm, hopfield text
-    //         - ng1 > duplicate > connect with wm > undo/redo fails
-    //         - undo/redo of synapse group is slow (double register)
-    //         - transformerblock, arraysequence
-    // - clipboard refactor
-    // - weight matrices need "isstranded"
-    // - deal with copying the things inside something. write a util to traverse
-
     suspend fun createNode(neuronArray: NeuronArray) = addScreenElement { NeuronArrayNode(this, neuronArray) }
 
     suspend fun createNode(activationSequence: ActivationSequence) = addScreenElement { ActivationSequenceNode(this, activationSequence) }
@@ -353,10 +345,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     suspend fun createNode(classifier: SmileClassifier) = addScreenElement {
         SmileClassifierNode(this, classifier)
     }
-
-    // suspend fun createNode(dn: DeepNet) = addScreenElement {
-    //     DeepNetNode(this, dn)
-    // }
 
     suspend fun createNode(neuronCollection: NeuronCollection) = addScreenElement {
         val neuronNodes = neuronCollection.neuronList.map {

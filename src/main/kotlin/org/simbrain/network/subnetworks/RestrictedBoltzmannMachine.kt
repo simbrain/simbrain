@@ -120,7 +120,7 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
         hiddenLayer.accumulateInputs()
         hiddenLayer.update()
         updateWithSampling(hiddenLayer)
-        
+
         // Negative phase: hidden -> visible "backwards" through weights
         // Note this is a "reconstructed visible" state, but for Simbrain we are setting the gui visible layer to the reconstructed values
         // Make the hidden layer a row vector and left multiply with the matrix, the make the result back into a column vector
@@ -190,6 +190,21 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
         randomizeLayers()
     }
 
+    override fun copy(): RestrictedBoltzmannMachine {
+        val copy = RestrictedBoltzmannMachine(visibleLayer.size, hiddenLayer.size)
+
+        copy.visibleLayer.copyFrom(visibleLayer)
+        copy.hiddenLayer.copyFrom(hiddenLayer)
+        copy.visibleToHidden.copyFrom(visibleToHidden)
+        copy.inputData = inputData.clone()
+        copy.customInfo = InfoText(copy.stateInfoText)
+        copy.customInfo.location = customInfo.location
+
+        copy.trainer.copyFrom(trainer)
+
+        return copy
+    }
+
     /**
      * Helper class for creating new RBM's nets using [org.simbrain.util.propertyeditor.AnnotatedPropertyEditor].
      */
@@ -228,6 +243,3 @@ private fun updateWithSampling(na: NeuronArray) {
         na.activations.set(i, 0, if (Math.random() < na.activations.get(i,0)) 1.0 else 0.0)
     }
 }
-
-
-

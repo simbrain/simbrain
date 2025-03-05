@@ -156,4 +156,6 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
      * Optional information about the current state of the group. For display in GUI.
      */
     open val customInfo: NetworkModel? = null
+
+    abstract fun copy(): Subnetwork
 }

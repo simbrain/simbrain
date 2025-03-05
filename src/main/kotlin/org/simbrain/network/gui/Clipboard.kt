@@ -21,7 +21,7 @@ package org.simbrain.network.gui
 import kotlinx.coroutines.awaitAll
 import org.simbrain.network.core.*
 import org.simbrain.network.neurongroups.NeuronGroup
-import java.util.*
+import org.simbrain.network.subnetworks.Subnetwork
 
 /**
  * Buffer which holds network objects for cutting and pasting.
@@ -76,12 +76,20 @@ object Clipboard {
         fun createCopies(destinationNetwork: Network, sourceModels: List<NetworkModel>): List<NetworkModel> {
 
             // Match new to old neurons for synapse adding
-            val neuronMappings = Hashtable<Neuron, Neuron>()
+            val neuronMappings = HashMap<Neuron, Neuron>()
             val synapses = ArrayList<Synapse>()
 
             fun Synapse.isStranded(): Boolean {
                 val allNeurons = sourceModels.filterIsInstance<Neuron>()
                 return !(allNeurons.contains(this.source) && (allNeurons.contains(this.target)))
+            }
+
+            val layerMappings = HashMap<Layer, Layer>()
+            val connectors = ArrayList<WeightMatrix>()
+
+            fun WeightMatrix.isStranded(): Boolean {
+                val allLayer = sourceModels.filterIsInstance<Layer>()
+                return !(allLayer.contains(this.source) && (allLayer.contains(this.target)))
             }
 
             return buildList {
@@ -102,19 +110,41 @@ object Clipboard {
                             add(newText)
                         }
                         is NeuronGroup -> {
+                            val copy = item.copy()
                             add(item.copy())
+                            layerMappings[item] = copy
+                        }
+                        is NeuronCollection -> {
+                            val neurons = item.neuronList.map { Neuron(it) }
+                            addAll(neurons)
+                            val copy = NeuronCollection(neurons).apply {
+                                label = item.label
+                            }
+                            add(copy)
+                            layerMappings[item] = copy
                         }
                         is NeuronArray -> {
-                            val copy: LocatableModel = item.copy()
+                            val copy = item.copy()
+                            layerMappings[item] = copy
                             add(copy)
                         }
                         is ActivationSequence -> {
-                            val copy: LocatableModel = item.copy()
+                            val copy = item.copy()
+                            layerMappings[item] = copy
                             add(copy)
                         }
                         is TransformerBlock -> {
-                            val copy: LocatableModel = item.copy()
+                            val copy = item.copy()
+                            layerMappings[item] = copy
                             add(copy)
+                        }
+                        is WeightMatrix -> {
+                            if (!item.isStranded()) {
+                                connectors.add(item)
+                            }
+                        }
+                        is Subnetwork -> {
+                            add(item.copy())
                         }
                     }
                 }
@@ -128,6 +158,15 @@ object Clipboard {
                         synapse
                     )
                     add(newSynapse)
+                }
+
+                for (connector in connectors) {
+                    val weightMatrix = WeightMatrix(
+                        layerMappings[connector.source]!!,
+                        layerMappings[connector.target]!!
+                    )
+                    weightMatrix.copyFrom(connector)
+                    add(weightMatrix)
                 }
             }
 

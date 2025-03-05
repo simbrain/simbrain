@@ -115,6 +115,37 @@ class CompetitiveNetwork : Subnetwork, UnsupervisedNetwork {
         competitive.normalizeIncomingWeights()
     }
 
+    override fun copy(): CompetitiveNetwork {
+        val copy = CompetitiveNetwork()
+
+        // Copy competitive group
+        copy.competitive = competitive.copy()
+        copy.location = competitive.location
+        copy.competitive.label = competitive.label
+        copy.addModel(copy.competitive)
+
+        // Copy input layer
+        copy.inputLayer = inputLayer.copy()
+        copy.inputLayer.label = inputLayer.label
+        copy.inputLayer.isAllClamped = true
+        copy.addModel(copy.inputLayer)
+
+        // Copy weights
+        copy.weights = SynapseGroup(copy.inputLayer, copy.competitive)
+        // Copy weights from original synapses to new synapses
+        copy.weights.synapses.zip(weights.synapses).forEach { (copyS, origS) ->
+            copyS.copyFrom(origS)
+        }
+        copy.addModel(copy.weights)
+
+        copy.trainer.copyFrom(trainer)
+
+        // Copy input data
+        copy.inputData = inputData.clone()
+
+        return copy
+    }
+
     /**
      * Helper class for creating new competitive nets using [org.simbrain.util.propertyeditor.AnnotatedPropertyEditor].
      */

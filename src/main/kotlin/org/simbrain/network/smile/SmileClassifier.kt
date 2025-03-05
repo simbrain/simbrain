@@ -114,6 +114,10 @@ class SmileClassifier(
 
     val outputSize get() = classifier.outputSize
 
+    override fun copy(): Subnetwork {
+        TODO("Not yet implemented")
+    }
+
     /**
      * Helper class for creating classifiers.
      */

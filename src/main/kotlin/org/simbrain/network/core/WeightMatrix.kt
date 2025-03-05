@@ -300,4 +300,13 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
         updateExcitatoryMask()
         updateInhibitoryMask()
     }
+
+    fun copyFrom(other: WeightMatrix) {
+        this.weights.copyFrom(other.weights)
+        this.excitatoryMask.copyFrom(other.excitatoryMask)
+        this.inhibitoryMask.copyFrom(other.inhibitoryMask)
+        this.psrMatrix.copyFrom(other.psrMatrix)
+        this.learningRuleData = other.learningRuleData.copy()
+        this.spikeResponseData = other.spikeResponseData.copy()
+    }
 }

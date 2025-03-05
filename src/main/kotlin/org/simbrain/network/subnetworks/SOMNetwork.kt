@@ -102,6 +102,31 @@ class SOMNetwork : Subnetwork, UnsupervisedNetwork {
         this.update()
     }
 
+    override fun copy(): SOMNetwork {
+        val copy = SOMNetwork()
+
+        // Copy SOM group
+        copy.som = som.copy()
+        copy.som.label = som.label
+        copy.addModel(copy.som)
+
+        // Copy input layer
+        copy.inputLayer = inputLayer.copy()
+        copy.inputLayer.label = inputLayer.label
+        copy.addModel(copy.inputLayer)
+
+        // Copy input data
+        copy.inputData = inputData.clone()
+
+        // Recreate connections
+        val sg = SynapseGroup(copy.inputLayer, copy.som, AllToAll())
+        copy.addModel(sg)
+
+        copy.trainer.copyFrom(trainer)
+
+        return copy
+    }
+
     /**
      * Helper class for creating new SOM nets using [org.simbrain.util.propertyeditor.AnnotatedPropertyEditor].
      */

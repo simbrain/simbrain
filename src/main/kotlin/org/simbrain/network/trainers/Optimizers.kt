@@ -22,6 +22,8 @@ abstract class Optimizer: CopyableObject {
         MomentumOptimizer::class.java,
         AdamOptimizer::class.java
     )
+
+    abstract override fun copy(): Optimizer
 }
 
 class MomentumOptimizer(

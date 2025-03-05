@@ -151,6 +151,31 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
             customInfo, Direction.NORTH, 40.0, neuronGroupBound.height, neuronGroupBound.width, 24.0, 0.0)
     }
 
+    override fun copy(): Hopfield {
+        val copy = Hopfield()
+
+        // Copy neuron group and its properties
+        copy.neuronGroup = neuronGroup.copy()
+        copy.addModel(copy.neuronGroup)
+
+        // Copy weight matrix
+        copy.weightMatrix = WeightMatrix(copy.neuronGroup, copy.neuronGroup)
+        copy.weightMatrix.label = weightMatrix.label
+        copy.weightMatrix.setMatrixValues(weightMatrix.weights.clone())
+        copy.addModel(copy.weightMatrix)
+
+        // Copy other properties
+        copy.updateFunc = updateFunc
+        copy.learningRate = learningRate
+        copy.inputData = inputData.clone()
+
+        // Copy custom info
+        copy.customInfo = InfoText(stateInfoText)
+        copy.reapplyOffsets()
+
+        return copy
+    }
+
     /**
      * Main forms of Hopfield update rule.
      */

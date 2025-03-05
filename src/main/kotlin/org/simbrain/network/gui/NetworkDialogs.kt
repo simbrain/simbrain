@@ -70,6 +70,10 @@ fun NetworkPanel.showActivationSequenceCreationDialog() {
     ActivationSequence.CreationTemplate().createEditorDialog {
         val activationSequence = it.create()
         network.addNetworkModel(activationSequence)
+        undoManager.addUndoableAction(
+            undo = { activationSequence.delete() },
+            redo = { network.addNetworkModel(activationSequence, usePlacementManager = false, useAutoAssignedId = false)?.await() }
+        )
     }.also {
         it.title = "Create Activation Sequence"
     }.display()
@@ -79,6 +83,10 @@ fun NetworkPanel.showTransformerBlockCreationDialog() {
     TransformerBlock.CreationTemplate().createEditorDialog {
         val transformerBlock = it.create()
         network.addNetworkModel(transformerBlock)
+        undoManager.addUndoableAction(
+            undo = { transformerBlock.delete() },
+            redo = { network.addNetworkModel(transformerBlock, usePlacementManager = false, useAutoAssignedId = false)?.await() }
+        )
     }.also {
         it.title = "Create Transformer Block"
     }.display()

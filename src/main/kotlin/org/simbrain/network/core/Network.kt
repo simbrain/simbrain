@@ -410,6 +410,8 @@ class Network: CoroutineScope, EditableObject {
                 if (isLastChildOfParent(childToParentMap, model)) {
                     childToParentMap[model]?.let { parent ->
                         addAll(parent.delete())
+                        // When undoing the deletion of a neuron collection via the last node, we need to add back
+                        // that last node
                         if (parent is NeuronCollection) {
                             addAll(model.delete())
                         }
@@ -545,7 +547,6 @@ class Network: CoroutineScope, EditableObject {
     fun removeUpdateAction(action: UpdateAction) {
         updateManager.removeAction(action)
     }
-
 
     /**
      * Adds a list of network elements to this network. Used in copy / paste.

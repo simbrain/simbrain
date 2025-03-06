@@ -43,8 +43,6 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
      */
     val childToParentMap = mutableMapOf<NetworkModel, NetworkModel>()
 
-
-
     /**
      * Whether the GUI should display neuron groups contained in this subnetwork. This will usually be true, but in
      * cases where a subnetwork has just one neuron group it is redundant to display both. So this flag indicates to the
@@ -95,10 +93,12 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
 
     /**
      * Delete this subnetwork and its children.
+     *
+     * @return the subnetwork and its components, for undo/redo
      */
     override suspend fun delete(): List<NetworkModel> {
+        // TODO: Should this be collecting the results of each models delete() function
         val toDelete = modelList.all.toList()
-
         toDelete.forEach {
             modelList.remove(it)
             it.delete()

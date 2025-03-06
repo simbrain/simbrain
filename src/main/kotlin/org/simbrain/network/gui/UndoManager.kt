@@ -106,6 +106,7 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
             is NeuronGroup -> {
                 (model as? Neuron)?.let { neuron ->
                     parent.neuronList.add(neuron)
+                    // If the neurongroupnode exists, create neuron nodes for the children and re-add them
                     (modelNodeMap.getImmediately<NeuronGroupNode>(parent))?.let { neuronGroupNode ->
                         // for free neuron deletion, the group node should have already been created
                         val neuronNode = createNode(neuron)
@@ -117,8 +118,11 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
                 (model as? Neuron)?.let { neuron ->
                     network.addNetworkModel(neuron, usePlacementManager = false, useAutoAssignedId = false)?.await()
                     parent.neuronList.add(neuron)
+                    // First check if the NeuronCollectionNode node exists
                     modelNodeMap.getImmediately<NeuronCollectionNode>(parent)?.let { neuronCollectionNode ->
+                        // Then check if the neuronnode exists
                         modelNodeMap.getImmediately<NeuronNode>(neuron)?.let { neuronNode ->
+                            // Only then do we add the node back
                             neuronCollectionNode.addNeuronNodes(listOf(neuronNode))
                         }
                     }
@@ -127,8 +131,9 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
             is SynapseGroup -> {
                 (model as? Synapse)?.let { synapse ->
                     parent.synapses.add(synapse)
-                    // even though we are not using the synapseGroupNode, we still need to check if this was
-                    // loose synapse deletion or group deletion to synchronize with neuron group recreation
+                    // If there is a synapsegroupnode already, we are deleting the synapse and must add the node back
+                    // Note that synapsegroupnodes don't actually contain synapsenodes as children, so all we have to
+                    // do is create the node. The check is still required, to synchronize with neuron group recreation
                     // otherwise a synapse node could be waiting for the neuron nodes to be created which
                     // doesn't happen until the next processing loop
                     modelNodeMap.getImmediately<SynapseGroupNode>(parent)?.let { synapseGroupNode ->
@@ -155,7 +160,7 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
     suspend fun restore(deletedModels: List<NetworkModel>) {
         restoreMapSnapshot()
         val modelsToReAdd = deletedModels.reversed()
-        // Adds models back to parent groups
+        // Adds models back to parent groups.
         modelsToReAdd.forEach { reAddToGroup(it) }
         // Add all models without parents back
         network.addNetworkModels(modelsToReAdd.filter { hasNoParent(it) }, usePlacementManager = false, useAutoAssignedId = false).awaitAll()

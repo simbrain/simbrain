@@ -25,12 +25,17 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.SimbrainDesktop
 import java.awt.event.KeyEvent
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 import javax.swing.AbstractAction
 import javax.swing.Action
 import javax.swing.JCheckBoxMenuItem
 import javax.swing.JOptionPane
 
 class NetworkActions(val networkPanel: NetworkPanel) {
+    // For testing purposes only
+    var fileChooserForTesting: SFileChooser? = null
     val addNeuronsAction = networkPanel.createAction(
         name = "Add Neurons...",
         description = "Add a set of neurons to the network",
@@ -434,6 +439,81 @@ class NetworkActions(val networkPanel: NetworkPanel) {
                 network.addNetworkModel(textObject)
             }
         }.display()
+    }
+
+    val exportSimbrainWebFormatAction = networkPanel.createAction(
+        name = "Export Simbrain Web Format",
+        description = "Export Simbrain Web Format",
+        iconPath = "menu_icons/Export.png",
+    ) {
+
+        class NeuronData(val x: Double, val y: Double, val activation: Double)
+        class SynapseData(val sourceIndex: Int, val targetIndex: Int, val strength: Double)
+
+        val neuronIndexMap = network.flatNeuronList.mapIndexed { index, neuron -> neuron to index }.toMap()
+        val neuronData = network.flatNeuronList.map {  neuron ->
+            NeuronData(neuron.x, neuron.y, neuron.activation)
+        }
+        val synapseData = network.flatSynapseList.mapNotNull { synapse ->
+            val sourceIndex = neuronIndexMap[synapse.source]
+            val targetIndex = neuronIndexMap[synapse.target]
+            val strength = synapse.strength
+            if (sourceIndex != null && targetIndex != null) {
+                SynapseData(sourceIndex, targetIndex, strength)
+            } else {
+                null
+            }
+        }
+
+        val json = """
+            {
+                "neurons": [
+                    ${neuronData.joinToString(",\n        ") { """{"x": ${it.x}, "y": ${it.y}, "activation": ${it.activation} }""" }}
+                ],
+                "synapses": [
+                    ${synapseData.joinToString(",\n        ") { """{"sourceIndex": ${it.sourceIndex}, "targetIndex": ${it.targetIndex}, "strength": ${it.strength}}"""} }
+                ]
+            }
+        """.trimIndent()
+
+        // Allow test injection of file chooser
+        val chooser = fileChooserForTesting ?: SFileChooser("", "Simbrain Web Format", "json")
+        val file = chooser.showSaveDialog(File("network.json"))
+        if (file != null) {
+            try {
+                println("[DEBUG_LOG] Attempting to save to file: ${file.absolutePath}")
+                println("[DEBUG_LOG] File canonical path: ${file.canonicalPath}")
+                println("[DEBUG_LOG] Parent directory exists: ${file.parentFile?.exists()}")
+
+                // Ensure parent directories exist
+                file.parentFile?.mkdirs()
+                println("[DEBUG_LOG] Created parent directories")
+                println("[DEBUG_LOG] Parent directory exists after creation: ${file.parentFile?.exists()}")
+
+                FileOutputStream(file).use { stream ->
+                    val bytes = json.toByteArray()
+                    println("[DEBUG_LOG] Writing ${bytes.size} bytes to file")
+                    stream.write(bytes)
+                    stream.flush()
+                    println("[DEBUG_LOG] File written and flushed")
+                }
+                println("[DEBUG_LOG] File exists after write: ${file.exists()}")
+                println("[DEBUG_LOG] File size after write: ${file.length()} bytes")
+            } catch (e: IOException) {
+                println("[DEBUG_LOG] Error saving file: ${e.message}")
+                e.printStackTrace()
+                JOptionPane.showMessageDialog(
+                    networkPanel,
+                    "Error saving file: ${e.message}",
+                    "Save Error",
+                    JOptionPane.ERROR_MESSAGE
+                )
+            }
+        } else {
+            println("[DEBUG_LOG] No file selected for save")
+        }
+
+
     }
 
     val showNetworkUpdaterDialog = networkPanel.createAction(

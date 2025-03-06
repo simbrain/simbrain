@@ -85,6 +85,7 @@ val NetworkPanel.actionMenu
             add(decayWeightsAction)
             add(pruneWeightsAction)
             add(randomizePolarityAction)
+            add(exportSimbrainWebFormatAction)
         }
     }
 

@@ -1,6 +1,5 @@
 package org.simbrain.network.gui
 
-
 import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PCanvas
@@ -796,6 +795,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
                 override fun mouseWheelRotated(event: PInputEvent) {
                     val swingEvent = (event.sourceSwingEvent as MouseWheelEvent)
                     val newScale = 1.1.pow(swingEvent.preciseWheelRotation)
+                    autoZoom = false
                     scale(1 / newScale)
                 }
             })

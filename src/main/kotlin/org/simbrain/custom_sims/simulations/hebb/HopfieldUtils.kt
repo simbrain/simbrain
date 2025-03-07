@@ -3,12 +3,15 @@ package org.simbrain.custom_sims.simulations.hebb
 import org.simbrain.custom_sims.SimulationScope
 import org.simbrain.custom_sims.addTimeSeriesComponent
 import org.simbrain.network.core.Layer
+import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.learningrules.HebbianRule
+import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
-import org.simbrain.util.ControlPanelKt
-import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
+import org.simbrain.util.*
+import org.simbrain.util.propertyeditor.AutoCopyObject
+import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
-import org.simbrain.util.showAPEOptionDialog
 import org.simbrain.util.stats.distributions.TwoValued
 import org.simbrain.workspace.Workspace
 import java.util.*
@@ -20,18 +23,66 @@ fun hammingDistance(actual: DoubleArray, expected: DoubleArray): Double {
     return actual.zip(expected).count { (a, b) -> a != b }.toDouble()
 }
 
-fun signHammingDistance(actual: DoubleArray, expected: DoubleArray): Double {
+/**
+ * Returns the number of entries that have opposite signs
+ */
+fun signedHammingDistance(actual: DoubleArray, expected: DoubleArray): Double {
     return actual.zip(expected).sumOf { (a, b) ->
         val sameSign = a * b >= 0
-        if (!sameSign) return@sumOf 1.0
-        if (abs(a) > 1.0) return@sumOf 0.0
-        return@sumOf abs(a - b)
+        return@sumOf if (sameSign) 0.0 else 1.0
     }
 }
 
 fun applyRandomPattern(hopfield: Layer): DoubleArray {
     hopfield.randomize(TwoValued(-1.0, 1.0))
     return hopfield.activationArray
+}
+
+/***
+ * For the specified number of patterns, train the network a specified number of times, then apply
+ * forgetting the specified number of times, then determine how many patterns were learned up to a
+ * specified tolerance.
+ *
+ * TODO: Generalize to discrete case
+ */
+suspend fun forgettingTest(
+    config: HopfieldTestConfig,
+    weights: WeightMatrix,
+    numPatterns: Int,
+    iterationsToTrain: Int,
+    iterationsToForget: Int,
+    tolerance: Double,
+    testIterations: Int
+): Int {
+    weights.weights.randomizeSymmetric()
+    val patterns = (0 until numPatterns).map {
+        applyRandomPattern(config.hopfield)
+    }
+
+    // Training
+    patterns.forEach { pattern ->
+        config.hopfield.setActivations(pattern)
+        repeat(iterationsToTrain) {
+            config.applyTraining()
+        }
+    }
+
+    // Forgetting
+    repeat(iterationsToForget) {
+        (weights.learningRule as HebbianRule).applyForgetting(weights)
+    }
+
+    // Test recall
+    return patterns.count { pattern ->
+        config.hopfield.setActivations(pattern)
+        config.workspace.iterateSuspend(testIterations)
+        val distance = config.distanceFunction(
+            config.hopfield.activationArray,
+            pattern
+        )
+        distance <= tolerance
+    }
+
 }
 
 class HopfieldTestConfig(
@@ -56,7 +107,7 @@ suspend fun runHopfieldTest(config: HopfieldTestConfig, patterns: List<DoubleArr
     // Returns the number of patterns that remain stable within the specified tolerance
     return patterns.count { pattern ->
         config.hopfield.setActivations(pattern)
-        config.workspace.iterateSuspend(2)
+        config.workspace.iterateSuspend(config.patternTestConfig.testIterations)
         config.distanceFunction(
             config.hopfield.activationArray,
             pattern
@@ -127,51 +178,16 @@ fun ControlPanelKt.createHopfieldTestPane(
     }
 
     val patternNum = JLabel("   Pattern number: ")
-    addComponent(slider,  tab = "Capacity")
+    addComponent(slider, tab = "Capacity")
     slider.addChangeListener {
         config.hopfield.setActivations(allPatterns[slider.value])
         patternNum.text = "   Pattern number: ${slider.value + 1}"
     }
     addComponent(patternNum, tab = "Capacity")
 
-    //val nTestChooser = object : EditableObject {
-    //    var nTest by GuiEditable(
-    //        label = "Number of Patterns",
-    //        initValue = 0,
-    //        min = 0,
-    //        max = numTestPatterns() - 1,
-    //        increment = 1,
-    //        order = 10
-    //    )
-    //}
-    //val testChooserEditor = AnnotatedPropertyEditor(nTestChooser)
-    //addButton("Train Patterns", tab = "Capacity") {
-    //    testChooserEditor.commitChanges()
-    //    runTest(hopfield, nTestChooser.nTest)
-    //}
-    //addAnnotatedPropertyEditor(testChooserEditor, tab = "Capacity")
-
-    val nPatternChooser = object : EditableObject {
-        var nPattern by GuiEditable(
-            label = "Pattern No.",
-            initValue = 0,
-            min = 0,
-            max = numTestPatterns() - 1,
-            increment = 1,
-            order = 10
-        )
-    }
-    val patternChooserEditor = AnnotatedPropertyEditor(nPatternChooser)
-    //addSeparator(tab = "Capacity")
-    //addAnnotatedPropertyEditor(patternChooserEditor, tab = "Capacity")
-    //addButton("Load Pattern", tab = "Capacity") {
-    //    patternChooserEditor.commitChanges()
-    //    hopfield.setActivations(allPatterns[nPatternChooser.nPattern])
-    //}
-
 }
 
-class PatternTestConfig: EditableObject {
+class PatternTestConfig: CopyableObject {
 
     var distancePercentThreshold by GuiEditable(
         label = "Distance Threshold",
@@ -189,5 +205,19 @@ class PatternTestConfig: EditableObject {
         max = 100.0,
         order = 20
     )
+
+    var testIterations by GuiEditable(
+        initValue = 5,
+        description = "Number of times to iterate when testing recalled pattern",
+        order = 30
+    )
+
+    override fun copy(): CopyableObject {
+        return PatternTestConfig().also {
+            it.distancePercentThreshold = distancePercentThreshold
+            it.percentToTest = percentToTest
+            it.testIterations = testIterations
+        }
+    }
 
 }

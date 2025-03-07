@@ -5,13 +5,16 @@ import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
 import org.simbrain.custom_sims.simulations.hebb.*
+import org.simbrain.custom_sims.simulations.nlp.TinyLanguageModelOptions
+import org.simbrain.custom_sims.simulationsPath
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.learningrules.HebbianRule
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.updaterules.AdditiveRule
-import org.simbrain.util.place
-import org.simbrain.util.randomizeSymmetric
-import org.simbrain.util.showNumericInputDialog
+import org.simbrain.util.*
+import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.propertyeditor.GuiEditable
+import javax.swing.JLabel
 
 /**
  *  Demo for studying continuous Hopfield networks,
@@ -104,11 +107,6 @@ val hopfieldSimContinuous = newSim {
                 wm.clamped = true
 
             }
-            //addButton("Forget") {
-            //    repeat(numTrainIterations) {
-            //        (wm.learningRule as HebbianRule).applyForgetting(wm)
-            //    }
-            //}
             //addSeparator()
             //addButton("Training Mode") {
             //    hopfield.isAllClamped = true
@@ -123,9 +121,11 @@ val hopfieldSimContinuous = newSim {
                 hopfield = hopfield,
                 patternTestConfig = PatternTestConfig(),
                 applyTraining = {
+                    // Training mode
                     hopfield.isAllClamped = true
                     wm.clamped = false
                     workspace.iterateSuspend(numTrainIterations)
+                    // Testing mode
                     hopfield.isAllClamped = false
                     wm.clamped = true
                 },
@@ -139,9 +139,65 @@ val hopfieldSimContinuous = newSim {
                     hopfield.isAllClamped = false
                     wm.clamped = true
                 },
-                distanceFunction = ::signHammingDistance
+                distanceFunction = ::signedHammingDistance
             )
             createHopfieldTestPane(config)
+
+            // Option dialog
+            class ForgettingTestOptions: EditableObject {
+
+                var numPatterns by GuiEditable(
+                    initValue = 10,
+                    description = "Number of patterns to test",
+                    order = 10,
+                )
+
+                var iterationsToTrain by GuiEditable(
+                    initValue = 10,
+                    description = "Number of iterations to apply learning",
+                    order = 20,
+                )
+
+                var iterationsToForget by GuiEditable(
+                    initValue = 10,
+                    description = "Number of iterations to apply forgetting",
+                    order = 30,
+                )
+
+                var tolerance by GuiEditable(
+                    initValue = 5.0,
+                    description = "Number of nodes that can be different and the pattern considered the same",
+                    order = 40
+                )
+
+                var testIterations by GuiEditable(
+                    initValue = 10,
+                    description = "Number of times to iterate when testing recalled pattern",
+                    order = 50
+                )
+
+            }
+
+            // Forgetting
+            addSeparator("Capacity")
+            var numRecalled = 0
+            val memoriesRecalled = JLabel("Memories recalled:--")
+            val options = ForgettingTestOptions()
+            addButton("Forgetting Test", tab = "Capacity") {
+                options.showAPEOptionDialog("ForgettingTest")?.let {
+                    numRecalled = forgettingTest(
+                        config, wm,
+                        it.numPatterns,
+                        it.iterationsToTrain,
+                        it.iterationsToForget,
+                        it.tolerance,
+                        it.testIterations
+                    )
+                    memoriesRecalled.text = "Memories recalled: $numRecalled"
+                }
+            }
+            addComponent(memoriesRecalled, "Capacity")
+
         }
 
     }

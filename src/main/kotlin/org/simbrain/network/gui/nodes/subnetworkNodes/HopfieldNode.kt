@@ -24,7 +24,6 @@ import org.simbrain.network.gui.nodes.SubnetworkNode
 import org.simbrain.network.subnetworks.Hopfield
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.createEditorDialog
-import org.simbrain.util.showAPEOptionDialog
 import org.simbrain.workspace.gui.CouplingMenu
 import javax.swing.JPopupMenu
 

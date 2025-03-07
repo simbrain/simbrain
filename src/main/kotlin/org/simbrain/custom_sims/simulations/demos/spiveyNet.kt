@@ -34,16 +34,21 @@ val spiveyNet = newSim {
         layout = LineLayout()
         applyLayout()
         label = "Visual"
+        neuronList.labels = listOf("candle", "candy", "handle", "fork")
     }
     val mouseNodes = NormalizationGroup(4).apply {
         layout = LineLayout()
         applyLayout()
         label = "Mouse"
+        neuronList.labels = listOf("candle", "candy", "handle", "fork")
     }
+    // TODO: Determine what "foveal prominence" means and how the activaions are determined
+    // stochastically from the visual vector
     val eyesNodes = NormalizationGroup(4).apply {
         layout = LineLayout()
         applyLayout()
         label = "Eyes"
+        neuronList.labels = listOf("candle", "candy", "handle", "fork")
     }
     val integrationNodes = NormalizationGroup(4).apply {
         layout = LineLayout()
@@ -68,6 +73,10 @@ val spiveyNet = newSim {
     net.addNetworkModels(connector.connectNeurons(integrationNodes.neuronList, visualNodes.neuronList))
     //bidirectional so order doesn't matter
 
+    // Target vs competitor index
+    var targetIndex = 0
+    var competitorIndex = 0
+
     // World
     val oc = addOdorWorldComponent()
     val world = oc.world
@@ -84,8 +93,7 @@ val spiveyNet = newSim {
         if (mouse.y > 15) {
             mouse.y -= 50
         }
-        // TODO: Properly implement this to deal with all four nodes and check the paper
-        mouse.x += (mouseNodes.neuronList[0].activation - mouseNodes.neuronList[1].activation)
+        mouse.x += 500 * (mouseNodes.neuronList[targetIndex].activation - mouseNodes.neuronList[competitorIndex].activation)
     }
 
     fun resetMouse() {
@@ -93,55 +101,78 @@ val spiveyNet = newSim {
         mouse.clearTrail()
     }
 
+    // TODO: Make odor world objects match conditions
+
     withGui {
         //place(docViewer, 0, 0, 464, 619)
         place(networkComponent, 222, 15, 400, 400)
         place(oc, 613, 15, 391, 455)
         (desktop?.getDesktopComponent(oc) as? OdorWorldDesktopComponent)?.worldPanel?.scalingFactor = 0.1
         createControlPanel("Control Panel", 15, 15) {
-            addButton("Lexical") {
-                // Lexical "Candy"
-                // Visual: Candle + Candy (currently bell)
+            addButton("Cohort Condition") {
+                // Candle / Candy
                 resetMouse()
-                mouse.speakToEntity("Candle")
-                lexicalNodes.addInputs(doubleArrayOf(1.0,0.0,0.0,0.0))
+                targetIndex = 0
+                competitorIndex = 1
+                // Time 1: Visual input only
                 visualNodes.addInputs(doubleArrayOf(1.0,1.0,0.0,0.0))
-                workspace.simpleIterate(5)
+                workspace.simpleIterate()
+                // Times 2-6: Lexical + Visual
+                visualNodes.addInputs(doubleArrayOf(1.0,1.0,0.0,0.0))
+                lexicalNodes.addInputs(doubleArrayOf(1.0,1.0,0.0,0.0))
+                workspace.simpleIterate()
+                visualNodes.addInputs(doubleArrayOf(1.0,1.0,0.0,0.0))
+                lexicalNodes.addInputs(doubleArrayOf(1.0,1.0,1.0,0.0))
+                workspace.simpleIterate()
+                visualNodes.addInputs(doubleArrayOf(1.0,1.0,0.0,0.0))
+                lexicalNodes.addInputs(doubleArrayOf(1.0,1.0,1.0,0.0))
+                workspace.simpleIterate()
+                visualNodes.addInputs(doubleArrayOf(1.0,1.0,0.0,0.0))
+                lexicalNodes.addInputs(doubleArrayOf(1.0,1.0,1.0,0.0))
+                workspace.simpleIterate()
+                visualNodes.addInputs(doubleArrayOf(1.0,1.0,0.0,0.0))
+                lexicalNodes.addInputs(doubleArrayOf(1.0,0.0,1.0,0.0))
+                workspace.simpleIterate()
             }.apply {
                 // Hack to make the panel wider
                 preferredSize = Dimension(170, 30)
             }
-            addButton("Visual Trial") { //temp name
-                resetMouse()
-                lexicalNodes.setActivations(doubleArrayOf(-1.0,1.0,-1.0,1.0))
-                workspace.simpleIterate(3)
-                visualNodes.setActivations(doubleArrayOf(1.0,-1.0,1.0,-1.0)) // should i change this code to a different "trial" (label)?
-
+            addButton("Target Condition") {
+                // Candle / Fork
+                targetIndex = 0
+                competitorIndex = 3
+                // Time 1: Visual input only
+                visualNodes.addInputs(doubleArrayOf(1.0,0.0,0.0,1.0))
+                workspace.simpleIterate()
+                // Times 2-6: Lexical + Visual
+                visualNodes.addInputs(doubleArrayOf(1.0,0.0,0.0,1.0))
+                lexicalNodes.addInputs(doubleArrayOf(0.0,0.0,0.0,0.0))
+                workspace.simpleIterate()
+                visualNodes.addInputs(doubleArrayOf(1.0,0.0,0.0,1.0))
+                lexicalNodes.addInputs(doubleArrayOf(0.0,0.0,0.0,0.0))
+                workspace.simpleIterate()
+                visualNodes.addInputs(doubleArrayOf(1.0,0.0,0.0,1.0))
+                lexicalNodes.addInputs(doubleArrayOf(0.0,0.0,0.0,0.0))
+                workspace.simpleIterate()
+                visualNodes.addInputs(doubleArrayOf(1.0,0.0,0.0,1.0))
+                lexicalNodes.addInputs(doubleArrayOf(0.0,0.0,0.0,0.0))
+                workspace.simpleIterate()
+                visualNodes.addInputs(doubleArrayOf(1.0,0.0,0.0,1.0))
+                lexicalNodes.addInputs(doubleArrayOf(0.0,0.0,0.0,0.0))
+                workspace.simpleIterate()
             }.apply {
-                // Hack to make the panel wider
                 preferredSize = Dimension(170, 30)
             }
-            addButton("Mouse Trial") {
+            addButton("Rhyme Condition") {
                 resetMouse()
                 lexicalNodes.setActivations(doubleArrayOf(-1.0,1.0,-1.0,1.0))
                 workspace.simpleIterate(3)
                 visualNodes.setActivations(doubleArrayOf(1.0,-1.0,1.0,-1.0))
 
             }.apply {
-                // Hack to make the panel wider
                 preferredSize = Dimension(170, 30)
             }
-            addButton("Eyes Trial") {
-                resetMouse()
-                lexicalNodes.setActivations(doubleArrayOf(-1.0,1.0,-1.0,1.0))
-                workspace.simpleIterate(3)
-                visualNodes.setActivations(doubleArrayOf(1.0,-1.0,1.0,-1.0))
-
-            }.apply {
-                // Hack to make the panel wider
-                preferredSize = Dimension(170, 30)
-            }
-            //
+            // Reset
             addButton("Reset") {
                 resetMouse()
             }
@@ -164,7 +195,7 @@ val spiveyNet = newSim {
         
         Relevant papers are 
 
-        [Continuous attraction toward phonological competitors](  https://pmc.ncbi.nlm.nih.gov/articles/PMC1177386/)
+        [Continuous attraction toward phonological competitors](https://pmc.ncbi.nlm.nih.gov/articles/PMC1177386/)
 
         [A Linking Hypothesis for Eyetracking and Mousetracking in the Visual World Paradigm](https://www.sciencedirect.com/science/article/pii/S0006899325000356/pdfft?md5=593289ceb624d37b85229782945c7b40&pid=1-s2.0-S0006899325000356-main.pdf)
 

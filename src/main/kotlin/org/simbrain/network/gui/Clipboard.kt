@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.gui
 
-import kotlinx.coroutines.awaitAll
 import org.simbrain.network.core.*
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.subnetworks.Subnetwork
@@ -58,8 +57,12 @@ object Clipboard {
 
         // when copying neuron collections/neuron groups, we don't want to copy the neurons again
         val collectionNeurons = objects.filterIsInstance<AbstractNeuronCollection>().flatMap { it.neuronList }.toSet()
-        copiedObjects = objects.filter { (it as? Neuron) !in collectionNeurons }
-        // System.out.println("add-->"+ Arrays.asList(objects));
+        val collectionSynapses = objects.filterIsInstance<SynapseGroup>().flatMap { it.synapses }.toSet()
+
+        copiedObjects = objects
+            .filter { (it as? Neuron) !in collectionNeurons }
+            .filter { (it as? Synapse) !in collectionSynapses }
+
         fireClipboardChanged()
     }
 
@@ -85,9 +88,15 @@ object Clipboard {
             }
 
             val layerMappings = HashMap<Layer, Layer>()
-            val connectors = ArrayList<WeightMatrix>()
+            val weightMatrices = ArrayList<WeightMatrix>()
+            val synapseGroups = ArrayList<SynapseGroup>()
 
-            fun WeightMatrix.isStranded(): Boolean {
+            fun Connector.isStranded(): Boolean {
+                val allLayer = sourceModels.filterIsInstance<Layer>()
+                return !(allLayer.contains(this.source) && (allLayer.contains(this.target)))
+            }
+
+            fun SynapseGroup.isStranded(): Boolean {
                 val allLayer = sourceModels.filterIsInstance<Layer>()
                 return !(allLayer.contains(this.source) && (allLayer.contains(this.target)))
             }
@@ -111,7 +120,8 @@ object Clipboard {
                         }
                         is NeuronGroup -> {
                             val copy = item.copy()
-                            add(item.copy())
+                            neuronMappings.putAll(item.neuronList.zip(copy.neuronList))
+                            add(copy)
                             layerMappings[item] = copy
                         }
                         is NeuronCollection -> {
@@ -120,6 +130,7 @@ object Clipboard {
                             val copy = NeuronCollection(neurons).apply {
                                 label = item.label
                             }
+                            neuronMappings.putAll(item.neuronList.zip(copy.neuronList))
                             add(copy)
                             layerMappings[item] = copy
                         }
@@ -140,7 +151,12 @@ object Clipboard {
                         }
                         is WeightMatrix -> {
                             if (!item.isStranded()) {
-                                connectors.add(item)
+                                weightMatrices.add(item)
+                            }
+                        }
+                        is SynapseGroup -> {
+                            if (!item.isStranded()) {
+                                synapseGroups.add(item)
                             }
                         }
                         is Subnetwork -> {
@@ -160,13 +176,23 @@ object Clipboard {
                     add(newSynapse)
                 }
 
-                for (connector in connectors) {
+                for (connector in weightMatrices) {
                     val weightMatrix = WeightMatrix(
                         layerMappings[connector.source]!!,
                         layerMappings[connector.target]!!
                     )
                     weightMatrix.copyFrom(connector)
                     add(weightMatrix)
+                }
+
+                for (oldGroup in synapseGroups) {
+                    val newGroup = SynapseGroup(
+                        layerMappings[oldGroup.source] as AbstractNeuronCollection,
+                        layerMappings[oldGroup.target] as AbstractNeuronCollection,
+                        oldGroup.connectionStrategy.copy(),
+                        oldGroup.synapses.map { Synapse(neuronMappings[it.source]!!, neuronMappings[it.target]!!, it) }.toMutableList()
+                    )
+                    add(newGroup)
                 }
             }
 
@@ -178,7 +204,7 @@ object Clipboard {
             .forEach { it.shouldBePlaced = false }
 
         // Add the copied object
-        net.network.addNetworkModels(copy).awaitAll()
+        net.network.addNetworkModels(copy)
 
         val undeleteContext = UndeleteContext(net, copy)
 

@@ -172,27 +172,25 @@ fun Collection<Double>.normalize(): List<Double> {
 }
 
 class CompletableDeferredHashMap<K, V : Any>(private val timeoutMillis: Long = 1000) {
-    val map = ConcurrentHashMap<K, CompletableDeferred<V>>()
+    private val map = ConcurrentHashMap<K, CompletableDeferred<V>>()
 
-    suspend fun <T: V> get(key: K): T {
+    suspend fun <T : V> get(key: K): T {
         @Suppress("UNCHECKED_CAST")
-        return withTimeout(timeoutMillis) { map.getOrPut(key) { CompletableDeferred() }.await() as T }
+        return withTimeout(timeoutMillis) {
+            map.computeIfAbsent(key) { CompletableDeferred() }.await() as T
+        }
     }
 
-    suspend fun <T: V> getImmediately(key: K): T? {
+    suspend fun <T : V> getImmediately(key: K): T? {
         return withTimeout(timeoutMillis) { map[key]?.await() as T? }
     }
 
     operator fun set(key: K, value: V): CompletableDeferred<V> {
-        if (map.containsKey(key)) {
-            return map[key]!!.apply {
+        return map.compute(key) { _, existingValue ->
+            (existingValue ?: CompletableDeferred()).apply {
                 complete(value)
             }
-        }
-        val deferred = CompletableDeferred<V>()
-        deferred.complete(value)
-        map[key] = deferred
-        return deferred
+        }!!
     }
 
     fun remove(key: K) {

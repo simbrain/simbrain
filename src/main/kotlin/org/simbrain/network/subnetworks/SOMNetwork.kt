@@ -19,9 +19,7 @@
 package org.simbrain.network.subnetworks
 
 import org.simbrain.network.connections.AllToAll
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.SynapseGroup
-import org.simbrain.network.core.XStreamConstructor
+import org.simbrain.network.core.*
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.neurongroups.SOMGroup
 import org.simbrain.network.trainers.UnsupervisedNetwork
@@ -118,8 +116,15 @@ class SOMNetwork : Subnetwork, UnsupervisedNetwork {
         // Copy input data
         copy.inputData = inputData.clone()
 
+        val neuronMap = mutableMapOf<Neuron, Neuron>()
+
+        neuronMap.putAll(inputLayer.neuronList.zip(copy.inputLayer.neuronList))
+        neuronMap.putAll(som.neuronList.zip(copy.som.neuronList))
+
         // Recreate connections
-        val sg = SynapseGroup(copy.inputLayer, copy.som, AllToAll())
+        val oldSg = modelList.get<SynapseGroup>().first()
+        val synapseCopies = oldSg.synapses.map { oldSynapse -> Synapse(neuronMap[oldSynapse.source]!!, neuronMap[oldSynapse.target]!!, oldSynapse) }
+        val sg = SynapseGroup(copy.inputLayer, copy.som, oldSg.connectionStrategy.copy(), synapseCopies.toMutableList())
         copy.addModel(sg)
 
         copy.trainer.copyFrom(trainer)

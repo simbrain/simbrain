@@ -462,7 +462,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         if (selectionManager.isNotEmpty) {
             copy()
         }
-
+        network.placementManager.useLastClickedLocation = false
         paste()
     }
 

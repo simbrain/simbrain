@@ -9,7 +9,6 @@ import org.simbrain.util.format
 import org.simbrain.util.plus
 import org.simbrain.util.point
 import java.awt.geom.Point2D
-import kotlin.reflect.KClass
 
 /**
  * Manage intelligent placement of new model elements in a [org.simbrain.network.gui.NetworkPanel].
@@ -36,19 +35,6 @@ class PlacementManager() {
     var customOffsetAnchor: LocatableModel? = null
 
     /**
-     * For each object type, the offset to use between pastes, to sue when  repeatedly adding objects, which is
-     * convenient for creating "paste trails". Initialized to defaults for each object type.
-     */
-    var offsetMap = mutableMapOf<KClass<out LocatableModel>, Point2D> (
-        Neuron::class to point(45, 0),
-        NeuronGroup::class to point(400, 0),
-        NeuronArray::class to point(300,0),
-        Hopfield::class to point(300,0),
-        CompetitiveNetwork::class to point(300,0),
-        Subnetwork::class to point(220,0)
-    )
-
-    /**
      * Set last location clicked on screen.
      */
     var lastClickedLocation: Point2D = point(0, 0)
@@ -60,7 +46,29 @@ class PlacementManager() {
     /**
      * Set to true when a location on the screen is clicked.
      */
-    private var useLastClickedLocation = true
+    var useLastClickedLocation = true
+
+    var customOffset: Point2D = point(0, 0)
+        set(point) {
+            field = point
+            useCustomOffset = true
+        }
+
+    var useCustomOffset = false
+
+    fun computeOffset(model: LocatableModel) = if (useCustomOffset) {
+        customOffset
+    } else {
+        when (model) {
+            is Neuron -> point(45, 0)
+            is NeuronGroup -> point(400, 0)
+            is NeuronArray -> point(300,0)
+            is Hopfield -> point(300,0)
+            is CompetitiveNetwork -> point(300,0)
+            is Subnetwork -> point(220,0)
+            else -> point(45, 0)
+        }
+    }
 
     /**
      * Place an object.
@@ -86,7 +94,7 @@ class PlacementManager() {
             useLastClickedLocation = false
             models.moveTo(lastClickedLocation)
         } else {
-            models.moveTo((lastSelectedModel?.location ?: point(0, 0)) + offsetMap.getOrDefault(models.first()::class, point(45, 0)))
+            models.moveTo((lastSelectedModel?.location ?: point(0, 0)) + computeOffset(models.first()))
         }
 
         lastSelectedModel = models.sortTopBottom().first()

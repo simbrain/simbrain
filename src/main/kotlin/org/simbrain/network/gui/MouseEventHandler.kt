@@ -170,7 +170,7 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
             if (event.pickedNode != null && event.isAltDown) {
                 event.pickedNode.firstScreenElement?.model.let {
                     if (it is LocatableModel) {
-                        pm.offsetMap[it.javaClass.kotlin] = topLeft - (pm.customOffsetAnchor?.location ?: point(0, 0))
+                        pm.customOffset = topLeft - (pm.customOffsetAnchor?.location ?: point(0, 0))
                     }
                 }
             }

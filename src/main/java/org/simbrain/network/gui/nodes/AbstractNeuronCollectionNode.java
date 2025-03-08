@@ -130,11 +130,7 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
 
     public void setCustomInfoNode(ScreenElement customInfo) {
         this.customInfo = customInfo;
-
-        var centerLocation = getCenterLocation(getModel().getNeuronList());
-        var minY = getMinY(getModel().getNeuronList());
-
-        ((LocatableModel) customInfo.getModel()).setLocation(centerLocation.getX(), minY - 40);
+        updateCustomInfoLocation();
         nc.getEvents().getCustomInfoUpdated().on(getSwingDispatcher(), this::fireUpdateOutline);
         fireUpdateOutline();
     }
@@ -143,12 +139,22 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
         var nodes = new HashSet<ScreenElement>(neuronNodes);
         if (customInfo != null) {
             nodes.add(customInfo);
+            updateCustomInfoLocation();
         }
         outlinedObjects.resetOutlinedNodes(nodes);
     }
 
     private void fireUpdateOutline() {
         nc.getEvents().getShouldUpdateOutline().fire();
+    }
+
+    private void updateCustomInfoLocation() {
+        if (customInfo != null) {
+            var centerLocation = getCenterLocation(getModel().getNeuronList());
+            var minY = getMinY(getModel().getNeuronList());
+
+            ((LocatableModel) customInfo.getModel()).setLocation(centerLocation.getX(), minY - 40);
+        }
     }
 
     public abstract AbstractNeuronCollection getModel();

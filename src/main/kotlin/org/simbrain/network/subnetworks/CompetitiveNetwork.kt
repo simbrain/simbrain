@@ -120,7 +120,6 @@ class CompetitiveNetwork : Subnetwork, UnsupervisedNetwork {
 
         // Copy competitive group
         copy.competitive = competitive.copy()
-        copy.location = competitive.location
         copy.competitive.label = competitive.label
         copy.addModel(copy.competitive)
 

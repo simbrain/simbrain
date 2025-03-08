@@ -39,19 +39,19 @@ class SmileClassifier(
     /**
      * Returns the label associated with the winning target integer.
      */
-    val winningLabel: String?
+    val winningLabel: String
         @Producible
         get() = classifier.trainingData.labelTargetMap.getInverse(winner) ?: ""
 
     val inputNeuronGroup = NeuronGroup(classifier.inputSize).apply {
         label = "Input Layer"
         setLayoutBasedOnSize()
-    }.also { modelList.add(it) }
+    }.also { addModel(it) }
 
     val outputNeuronGroup = NeuronGroup(classifier.outputSize).apply {
         label = "Output Layer"
         setLayoutBasedOnSize()
-    }.also { modelList.add(it) }
+    }.also { addModel(it) }
 
     init {
         label = classifier.name
@@ -115,13 +115,22 @@ class SmileClassifier(
     val outputSize get() = classifier.outputSize
 
     override fun copy(): Subnetwork {
-        TODO("Not yet implemented")
+        val copy = SmileClassifier(classifier.copy())
+        copy.inputNeuronGroup.label = inputNeuronGroup.label
+        copy.inputNeuronGroup.neuronList.zip(inputNeuronGroup.neuronList).forEach { (n,o) ->
+            n.label = o.label
+        }
+        copy.outputNeuronGroup.label = outputNeuronGroup.label
+        copy.outputNeuronGroup.neuronList.zip(outputNeuronGroup.neuronList).forEach { (n,o) ->
+            n.label = o.label
+        }
+        return copy
     }
 
     /**
      * Helper class for creating classifiers.
      */
-    class ClassifierCreator() : EditableObject {
+    class ClassifierCreator : EditableObject {
 
         @UserParameter(label = "Number of inputs", order = 10)
         var nin = 4

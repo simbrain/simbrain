@@ -5,15 +5,16 @@ import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
 import org.simbrain.custom_sims.simulations.hebb.*
-import org.simbrain.custom_sims.simulations.nlp.TinyLanguageModelOptions
-import org.simbrain.custom_sims.simulationsPath
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.learningrules.HebbianRule
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.updaterules.AdditiveRule
-import org.simbrain.util.*
+import org.simbrain.util.place
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.util.randomizeSymmetric
+import org.simbrain.util.showAPEOptionDialog
+import org.simbrain.util.showNumericInputDialog
 import javax.swing.JLabel
 
 /**
@@ -152,12 +153,6 @@ val hopfieldSimContinuous = newSim {
                     order = 10,
                 )
 
-                var iterationsToTrain by GuiEditable(
-                    initValue = 10,
-                    description = "Number of iterations to apply learning",
-                    order = 20,
-                )
-
                 var iterationsToForget by GuiEditable(
                     initValue = 10,
                     description = "Number of iterations to apply forgetting",
@@ -188,7 +183,6 @@ val hopfieldSimContinuous = newSim {
                     numRecalled = forgettingTest(
                         config, wm,
                         it.numPatterns,
-                        it.iterationsToTrain,
                         it.iterationsToForget,
                         it.tolerance,
                         it.testIterations

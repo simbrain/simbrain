@@ -5,19 +5,17 @@ import org.simbrain.custom_sims.addTimeSeriesComponent
 import org.simbrain.network.core.Layer
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.learningrules.HebbianRule
-import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
-import org.simbrain.util.*
-import org.simbrain.util.propertyeditor.AutoCopyObject
+import org.simbrain.util.ControlPanelKt
 import org.simbrain.util.propertyeditor.CopyableObject
-import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.util.randomizeSymmetric
+import org.simbrain.util.showAPEOptionDialog
 import org.simbrain.util.stats.distributions.TwoValued
 import org.simbrain.workspace.Workspace
 import java.util.*
 import javax.swing.JLabel
 import javax.swing.JSlider
-import kotlin.math.abs
 
 fun hammingDistance(actual: DoubleArray, expected: DoubleArray): Double {
     return actual.zip(expected).count { (a, b) -> a != b }.toDouble()
@@ -49,7 +47,6 @@ suspend fun forgettingTest(
     config: HopfieldTestConfig,
     weights: WeightMatrix,
     numPatterns: Int,
-    iterationsToTrain: Int,
     iterationsToForget: Int,
     tolerance: Double,
     testIterations: Int
@@ -62,9 +59,7 @@ suspend fun forgettingTest(
     // Training
     patterns.forEach { pattern ->
         config.hopfield.setActivations(pattern)
-        repeat(iterationsToTrain) {
-            config.applyTraining()
-        }
+        config.applyTraining()
     }
 
     // Forgetting

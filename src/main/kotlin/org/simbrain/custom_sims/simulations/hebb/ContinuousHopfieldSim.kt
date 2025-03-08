@@ -10,12 +10,8 @@ import org.simbrain.network.learningrules.HebbianRule
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.updaterules.AdditiveRule
 import org.simbrain.util.place
-import org.simbrain.util.propertyeditor.EditableObject
-import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.randomizeSymmetric
-import org.simbrain.util.showAPEOptionDialog
 import org.simbrain.util.showNumericInputDialog
-import javax.swing.JLabel
 
 /**
  *  Demo for studying continuous Hopfield networks,
@@ -120,7 +116,8 @@ val hopfieldSimContinuous = newSim {
             val config = HopfieldTestConfig(
                 workspace = workspace,
                 hopfield = hopfield,
-                patternTestConfig = PatternTestConfig(),
+                weights = wm,
+                patternTestConfig = PatternTestOptions(),
                 applyTraining = {
                     // Training mode
                     hopfield.isAllClamped = true
@@ -143,54 +140,6 @@ val hopfieldSimContinuous = newSim {
                 distanceFunction = ::signedHammingDistance
             )
             createHopfieldTestPane(config)
-
-            // Option dialog
-            class ForgettingTestOptions: EditableObject {
-
-                var numPatterns by GuiEditable(
-                    initValue = 10,
-                    description = "Number of patterns to test",
-                    order = 10,
-                )
-
-                var iterationsToForget by GuiEditable(
-                    initValue = 10,
-                    description = "Number of iterations to apply forgetting",
-                    order = 30,
-                )
-
-                var tolerance by GuiEditable(
-                    initValue = 5.0,
-                    description = "Number of nodes that can be different and the pattern considered the same",
-                    order = 40
-                )
-
-                var testIterations by GuiEditable(
-                    initValue = 10,
-                    description = "Number of times to iterate when testing recalled pattern",
-                    order = 50
-                )
-
-            }
-
-            // Forgetting
-            addSeparator("Capacity")
-            var numRecalled = 0
-            val memoriesRecalled = JLabel("Memories recalled:--")
-            val options = ForgettingTestOptions()
-            addButton("Forgetting Test", tab = "Capacity") {
-                options.showAPEOptionDialog("ForgettingTest")?.let {
-                    numRecalled = forgettingTest(
-                        config, wm,
-                        it.numPatterns,
-                        it.iterationsToForget,
-                        it.tolerance,
-                        it.testIterations
-                    )
-                    memoriesRecalled.text = "Memories recalled: $numRecalled"
-                }
-            }
-            addComponent(memoriesRecalled, "Capacity")
 
         }
 

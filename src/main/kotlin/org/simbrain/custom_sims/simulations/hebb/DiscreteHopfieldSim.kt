@@ -4,7 +4,6 @@ import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
 import org.simbrain.custom_sims.simulations.hebb.*
-import org.simbrain.network.core.Layer
 import org.simbrain.network.subnetworks.Hopfield
 import org.simbrain.util.place
 import org.simbrain.util.showNumericInputDialog
@@ -76,7 +75,8 @@ val discreteHopfieldSim = newSim {
             val config = HopfieldTestConfig(
                 workspace = workspace,
                 hopfield = hopfield.neuronGroup,
-                patternTestConfig = PatternTestConfig(),
+                weights = hopfield.weightMatrix,
+                patternTestConfig = PatternTestOptions(),
                 applyTraining = { with(network) { hopfield.trainOnCurrentPattern()} },
                 applyLearningRate = { hopfield.learningRate = it },
                 applyReset = {

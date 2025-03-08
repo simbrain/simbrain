@@ -8,6 +8,7 @@ import org.simbrain.network.learningrules.HebbianRule
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
 import org.simbrain.util.ControlPanelKt
 import org.simbrain.util.propertyeditor.CopyableObject
+import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.randomizeSymmetric
 import org.simbrain.util.showAPEOptionDialog
@@ -40,18 +41,15 @@ fun applyRandomPattern(hopfield: Layer): DoubleArray {
  * For the specified number of patterns, train the network a specified number of times, then apply
  * forgetting the specified number of times, then determine how many patterns were learned up to a
  * specified tolerance.
- *
- * TODO: Generalize to discrete case
  */
 suspend fun forgettingTest(
     config: HopfieldTestConfig,
-    weights: WeightMatrix,
     numPatterns: Int,
     iterationsToForget: Int,
     tolerance: Double,
     testIterations: Int
 ): Int {
-    weights.weights.randomizeSymmetric()
+    config.weights.weights.randomizeSymmetric()
     val patterns = (0 until numPatterns).map {
         applyRandomPattern(config.hopfield)
     }
@@ -64,7 +62,11 @@ suspend fun forgettingTest(
 
     // Forgetting
     repeat(iterationsToForget) {
-        (weights.learningRule as HebbianRule).applyForgetting(weights)
+        if (config.weights.learningRule is HebbianRule) {
+            (config.weights.learningRule as HebbianRule).applyForgetting(config.weights)
+        } else {
+            config.weights.weights.mul(.9)
+        }
     }
 
     // Test recall
@@ -83,7 +85,8 @@ suspend fun forgettingTest(
 class HopfieldTestConfig(
     val workspace: Workspace,
     val hopfield: Layer,
-    val patternTestConfig: PatternTestConfig,
+    val weights: WeightMatrix,
+    val patternTestConfig: PatternTestOptions,
     val applyTraining: suspend () -> Unit,
     val applyLearningRate: (learningRate: Double) -> Unit,
     val applyReset: () -> Unit,
@@ -131,7 +134,7 @@ fun ControlPanelKt.createHopfieldTestPane(
     config: HopfieldTestConfig
 ) {
 
-    val patternTestConfig = PatternTestConfig()
+    val patternTestConfig = PatternTestOptions()
     fun numTestPatterns(): Int = (patternTestConfig.percentToTest / 100 * config.hopfield.size).toInt()
     val allPatterns = (0 until numTestPatterns()).map {
         applyRandomPattern(config.hopfield)
@@ -180,9 +183,28 @@ fun ControlPanelKt.createHopfieldTestPane(
     }
     addComponent(patternNum, tab = "Capacity")
 
+    // Forgetting
+    addSeparator("Capacity")
+    var numRecalled = 0
+    val memoriesRecalled = JLabel("Memories recalled:--")
+    val options = ForgettingTestOptions()
+    addButton("Forgetting Test", tab = "Capacity") {
+        options.showAPEOptionDialog("ForgettingTest")?.let {
+            numRecalled = forgettingTest(
+                config,
+                it.numPatterns,
+                it.iterationsToForget,
+                it.tolerance,
+                it.testIterations
+            )
+            memoriesRecalled.text = "Memories recalled: $numRecalled"
+        }
+    }
+    addComponent(memoriesRecalled, "Capacity")
+
 }
 
-class PatternTestConfig: CopyableObject {
+class PatternTestOptions: CopyableObject {
 
     var distancePercentThreshold by GuiEditable(
         label = "Distance Threshold",
@@ -208,11 +230,39 @@ class PatternTestConfig: CopyableObject {
     )
 
     override fun copy(): CopyableObject {
-        return PatternTestConfig().also {
+        return PatternTestOptions().also {
             it.distancePercentThreshold = distancePercentThreshold
             it.percentToTest = percentToTest
             it.testIterations = testIterations
         }
     }
+
+}
+
+class ForgettingTestOptions: EditableObject {
+
+    var numPatterns by GuiEditable(
+        initValue = 10,
+        description = "Number of patterns to test",
+        order = 10,
+    )
+
+    var iterationsToForget by GuiEditable(
+        initValue = 10,
+        description = "Number of iterations to apply forgetting",
+        order = 30,
+    )
+
+    var tolerance by GuiEditable(
+        initValue = 5.0,
+        description = "Number of nodes that can be different and the pattern considered the same",
+        order = 40
+    )
+
+    var testIterations by GuiEditable(
+        initValue = 10,
+        description = "Number of times to iterate when testing recalled pattern",
+        order = 50
+    )
 
 }

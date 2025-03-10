@@ -409,7 +409,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val panEditModeAction = networkPanel.createAction(
         name = "Pan",
         description = "Pan Mode",
-        iconPath = "menu_icons/Pan.png"
+        iconPath = "menu_icons/Hand.png"
     ) {
         networkPanel.mouseCursor = MouseEventHandler.MouseCursor.Pan
         autoZoom = false

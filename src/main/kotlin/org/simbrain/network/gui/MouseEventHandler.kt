@@ -290,7 +290,7 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         }
         object Pan : MouseCursor() {
             override val cursor: Cursor = Toolkit.getDefaultToolkit()
-                    .createCustomCursor(ResourceManager.getImage("menu_icons/Pan.png"), centerPoint, "pan")
+                    .createCustomCursor(ResourceManager.getImage("menu_icons/Hand.png"), centerPoint, "pan")
         }
     }
 }

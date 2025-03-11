@@ -7,12 +7,15 @@ import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.learningrules.HebbianRule
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
 import org.simbrain.util.ControlPanelKt
+import org.simbrain.util.applyFunctionInPlace
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.randomizeSymmetric
 import org.simbrain.util.showAPEOptionDialog
+import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.TwoValued
+import org.simbrain.util.stats.distributions.UniformRealDistribution
 import org.simbrain.workspace.Workspace
 import java.util.*
 import javax.swing.JLabel
@@ -82,19 +85,25 @@ suspend fun forgettingTest(
 
 }
 
-class HopfieldTestConfig(
+data class HopfieldTestConfig(
     val workspace: Workspace,
     val hopfield: Layer,
     val weights: WeightMatrix,
-    val patternTestConfig: PatternTestOptions,
     val applyTraining: suspend () -> Unit,
     val applyLearningRate: (learningRate: Double) -> Unit,
     val applyReset: () -> Unit,
-    val distanceFunction: (actual: DoubleArray, expected: DoubleArray) -> Double = ::hammingDistance)
+    val distanceFunction: (actual: DoubleArray, expected: DoubleArray) -> Double = ::hammingDistance
+)
 
-suspend fun runHopfieldTest(config: HopfieldTestConfig, patterns: List<DoubleArray>, numPatternsToTest: Int): Int {
+suspend fun runHopfieldTest(config: HopfieldTestConfig, patternTestConfig: PatternTestOptions, patterns: List<DoubleArray>, numPatternsToTest: Int): Int {
     config.applyReset()
     config.applyLearningRate(1.0 / numPatternsToTest)
+
+    if (patternTestConfig.forgetting) {
+        (config.weights.learningRule as? HebbianRule)?.let { hebbianRule ->
+            hebbianRule.forgettingRate = patternTestConfig.forgettingRate
+        }
+    }
 
     val patterns = patterns.take(numPatternsToTest)
     patterns.forEach { pattern ->
@@ -102,19 +111,35 @@ suspend fun runHopfieldTest(config: HopfieldTestConfig, patterns: List<DoubleArr
         config.applyTraining()
     }
 
+    if (patternTestConfig.forgetting) {
+        repeat(patternTestConfig.forgettingIterations) {
+            if (config.weights.learningRule is HebbianRule) {
+                (config.weights.learningRule as HebbianRule).applyForgetting(config.weights)
+            } else {
+                config.weights.weights.mul(1 - patternTestConfig.forgettingRate)
+            }
+            if (patternTestConfig.perturbWeights) {
+                config.weights.weights.applyFunctionInPlace { w -> w + patternTestConfig.perturbFunction.sampleDouble() }
+                config.weights.events.updated.fire()
+            }
+        }
+    }
+
+
     // Returns the number of patterns that remain stable within the specified tolerance
     return patterns.count { pattern ->
         config.hopfield.setActivations(pattern)
-        config.workspace.iterateSuspend(config.patternTestConfig.testIterations)
+        config.workspace.iterateSuspend(patternTestConfig.testIterations)
         config.distanceFunction(
             config.hopfield.activationArray,
             pattern
-        ) <= config.patternTestConfig.distancePercentThreshold / 100.0 * config.hopfield.size
+        ) <= patternTestConfig.distancePercentThreshold / 100.0 * config.hopfield.size
     }
 }
 
 suspend fun runCapacityTest(
     config: HopfieldTestConfig,
+    patternTestConfig: PatternTestOptions,
     patterns: List<DoubleArray>,
     numPatternsToTest: Int,
     plot: TimeSeriesPlotComponent
@@ -123,8 +148,16 @@ suspend fun runCapacityTest(
     // Runs the memory test for 1, 2, ... numTestPatterns and plots results
     for (i in 0 until numPatternsToTest) {
         val nTest = i + 1
-        val nSuccess = runHopfieldTest(config, patterns, nTest) * 100.0 / nTest
+        val nSuccess = runHopfieldTest(config, patternTestConfig.copy().apply { forgetting = false }, patterns, nTest) * 100.0 / nTest
         plot.model.addData(0, i.toDouble(), nSuccess)
+    }
+
+    if (patternTestConfig.forgetting) {
+        for (i in 0 until numPatternsToTest) {
+            val nTest = i + 1
+            val nSuccess = runHopfieldTest(config, patternTestConfig, patterns, nTest) * 100.0 / nTest
+            plot.model.addData(1, i.toDouble(), nSuccess)
+        }
     }
 
 }
@@ -159,8 +192,12 @@ fun ControlPanelKt.createHopfieldTestPane(
 
     addButton("Capacity Test", tab = "Capacity") {
         patternTestConfig.showAPEOptionDialog("Capacity Test Parameters")
+        val seriesNames = buildList {
+            add("% pattern remembered")
+            if (patternTestConfig.forgetting) add("% pattern remembered (with forgetting)")
+        }
         val plot = workspace.getComponent("Memory") as TimeSeriesPlotComponent?
-            ?: addTimeSeriesComponent("Memory", seriesNames = listOf("% pattern remembered")).apply {
+            ?: addTimeSeriesComponent("Memory", seriesNames).apply {
                 model.isAutoRange = false
                 model.rangeUpperBound = 105.0
                 model.rangeLowerBound = -5.0
@@ -171,7 +208,7 @@ fun ControlPanelKt.createHopfieldTestPane(
         slider.init()
 
         plot.model.clearData()
-        runCapacityTest(config, allPatterns, numTestPatterns(), plot)
+        runCapacityTest(config, patternTestConfig, allPatterns, numTestPatterns(), plot)
 
     }
 
@@ -182,25 +219,6 @@ fun ControlPanelKt.createHopfieldTestPane(
         patternNum.text = "   Pattern number: ${slider.value + 1}"
     }
     addComponent(patternNum, tab = "Capacity")
-
-    // Forgetting
-    addSeparator("Capacity")
-    var numRecalled = 0
-    val memoriesRecalled = JLabel("Memories recalled:--")
-    val options = ForgettingTestOptions()
-    addButton("Forgetting Test", tab = "Capacity") {
-        options.showAPEOptionDialog("ForgettingTest")?.let {
-            numRecalled = forgettingTest(
-                config,
-                it.numPatterns,
-                it.iterationsToForget,
-                it.tolerance,
-                it.testIterations
-            )
-            memoriesRecalled.text = "Memories recalled: $numRecalled"
-        }
-    }
-    addComponent(memoriesRecalled, "Capacity")
 
 }
 
@@ -229,11 +247,50 @@ class PatternTestOptions: CopyableObject {
         order = 30
     )
 
-    override fun copy(): CopyableObject {
+    var forgetting by GuiEditable(
+        initValue = false,
+        description = "Enable forgetting",
+        order = 40
+    )
+
+    var forgettingIterations by GuiEditable(
+        initValue = 10,
+        description = "Number of iterations to apply forgetting",
+        order = 50,
+        conditionallyVisibleBy = PatternTestOptions::forgetting
+    )
+
+    var forgettingRate by GuiEditable(
+        initValue = 0.1,
+        description = "Forgetting rate",
+        order = 60,
+        conditionallyVisibleBy = PatternTestOptions::forgetting
+    )
+
+    var perturbWeights by GuiEditable(
+        initValue = false,
+        description = "Perturb weights",
+        order = 70,
+        conditionallyVisibleBy = PatternTestOptions::forgetting
+    )
+
+    var perturbFunction by GuiEditable(
+        initValue = UniformRealDistribution(-0.1, 0.1) as ProbabilityDistribution,
+        description = "Perturb function",
+        order = 80,
+        conditionallyVisibleBy = PatternTestOptions::perturbWeights
+    )
+
+    override fun copy(): PatternTestOptions {
         return PatternTestOptions().also {
             it.distancePercentThreshold = distancePercentThreshold
             it.percentToTest = percentToTest
             it.testIterations = testIterations
+            it.forgetting = forgetting
+            it.forgettingIterations = forgettingIterations
+            it.forgettingRate = forgettingRate
+            it.perturbWeights = perturbWeights
+            it.perturbFunction = perturbFunction.copy()
         }
     }
 

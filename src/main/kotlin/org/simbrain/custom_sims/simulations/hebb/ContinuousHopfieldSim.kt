@@ -4,7 +4,10 @@ import kotlinx.coroutines.awaitAll
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
-import org.simbrain.custom_sims.simulations.hebb.*
+import org.simbrain.custom_sims.simulations.hebb.HopfieldTestConfig
+import org.simbrain.custom_sims.simulations.hebb.createHopfieldTestPane
+import org.simbrain.custom_sims.simulations.hebb.createPatternControlPanel
+import org.simbrain.custom_sims.simulations.hebb.signedHammingDistance
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.learningrules.HebbianRule
 import org.simbrain.network.neurongroups.NeuronGroup
@@ -117,7 +120,6 @@ val hopfieldSimContinuous = newSim {
                 workspace = workspace,
                 hopfield = hopfield,
                 weights = wm,
-                patternTestConfig = PatternTestOptions(),
                 applyTraining = {
                     // Training mode
                     hopfield.isAllClamped = true

@@ -21,6 +21,7 @@ package org.simbrain.custom_sims;
 import org.simbrain.custom_sims.helper_classes.Simulation;
 import org.simbrain.custom_sims.simulations.actor_critic.ActorCritic;
 import org.simbrain.custom_sims.simulations.agent_trails.AgentTrails;
+import org.simbrain.custom_sims.simulations.agent_trails.ConvertToSimbrain4;
 import org.simbrain.custom_sims.simulations.behaviorism.OperantWithEnvironment;
 import org.simbrain.custom_sims.simulations.behaviorism.SimpleOperant;
 import org.simbrain.custom_sims.simulations.behaviorism.OperantConditioning;
@@ -74,6 +75,7 @@ public abstract class RegisteredSimulation {
         // REGISTERED_SIMS.add(new SimpleOperant());
         // REGISTERED_SIMS.add(new OperantConditioning());
         REGISTERED_SIMS.add(new OperantWithEnvironment());
+        REGISTERED_SIMS.add(new ConvertToSimbrain4());
         // REGISTERED_SIMS.add(new ConvertSim());
 
         // Alphabetize

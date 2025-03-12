@@ -14,6 +14,7 @@ import org.simbrain.custom_sims.simulations.neuroscience.cortexSimple
 import org.simbrain.custom_sims.simulations.nlp.tinyLanguageModel
 import org.simbrain.custom_sims.simulations.nlp.tinyLanguageModel2
 import org.simbrain.custom_sims.simulations.patterns_of_activity.cogMap3Objects
+import org.simbrain.custom_sims.simulations.patterns_of_activity.iacJetsSharks5People
 import org.simbrain.util.StructureDir
 import org.simbrain.util.dir
 
@@ -152,6 +153,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Spivey Net") { spiveyNet }
         item("Activation Sequence (2 layers)") { activationSequenceTwoLayer }
         item("Activation Sequence (3 layers)") { activationSequenceThreeLayer }
+        item("IAC Jets Sharks 5 People") { iacJetsSharks5People }
     }
 
     //dir("Testing") {

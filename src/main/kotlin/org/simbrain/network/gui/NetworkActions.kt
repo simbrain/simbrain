@@ -908,6 +908,32 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         scalingFactor /= 1.1
         autoZoom = false
     }
+
+    fun undoAction() = networkPanel.createAction(
+        "Undo",
+        description = "Undo last action",
+        iconPath = "menu_icons/Undo.png",
+        keyboardShortcut = CmdOrCtrl + KeyEvent.VK_Z
+    ) {
+        networkPanel.undoManager.undo()
+    }
+
+    fun redoAction() = networkPanel.createAction(
+        "Redo",
+        description = "Redo last undone action",
+        iconPath = "menu_icons/Redo.png",
+        keyboardShortcuts = listOf(CmdOrCtrl + KeyEvent.VK_Z,CmdOrCtrl + Shift + 'Z')
+    ) {
+        networkPanel.undoManager.redo()
+    }
+
+    fun undoHistoryAction() = networkPanel.createAction(
+        "Undo history...",
+        description = "Show undo/redo history"
+    ) {
+        networkPanel.showUndoHistoryDialog()
+    }
+
 }
 
 fun addSubnetworkAction(networkPanel: NetworkPanel, block: () -> Subnetwork) {

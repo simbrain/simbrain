@@ -23,10 +23,7 @@ import java.awt.Dialog
 import java.awt.Dimension
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
-import javax.swing.BoxLayout
-import javax.swing.JFrame
-import javax.swing.JPanel
-import javax.swing.JTabbedPane
+import javax.swing.*
 
 fun NetworkPanel.showTextPropertyDialog(textNodes: Collection<TextNode>) {
     TextDialog(textNodes).apply {
@@ -223,6 +220,25 @@ fun NetworkPanel.showClassifierCreationDialog() {
     }.also {
         it.title = "Create Classifier"
     }
+}
+
+fun NetworkPanel.showUndoHistoryDialog() {
+    val dialog = JFrame("Undo / Redo History").apply {
+        defaultCloseOperation = JFrame.DISPOSE_ON_CLOSE
+        setSize(400, 300)
+        setLocationRelativeTo(this@showUndoHistoryDialog)
+    }
+
+    val undoList = undoManager.undoStack.map { "Undo: ${it.description}" }
+    val redoList = undoManager.redoStack.map { "Redo: ${it.description}" }
+    val historyText = (undoList + redoList).joinToString("\n")
+
+    val textArea = JTextArea(historyText).apply {
+        isEditable = false
+    }
+
+    dialog.add(JScrollPane(textArea))
+    dialog.isVisible = true
 }
 
 class ConnectionStrategyPanel(connectionStrategy: ConnectionStrategy) : JPanel() {

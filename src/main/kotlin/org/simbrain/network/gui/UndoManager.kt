@@ -16,20 +16,24 @@ class UndoManager {
     /**
      * All actions that can be undone are pushed to this stack.
      */
-    private val undoStack = Stack<UndoableAction>()
+    val undoStack = Stack<UndoableAction>()
 
     /**
      * When an action is undone, it is popped off the undo stack and pushed on
      * to this stack.
      */
-    private val redoStack = Stack<UndoableAction>()
+    val redoStack = Stack<UndoableAction>()
 
     fun addUndoableAction(action: UndoableAction) {
         undoStack.push(action)
         redoStack.removeAllElements()
     }
 
-    fun addUndoableAction(initialContext: Any? = null, undo: suspend (context: Any?) -> Unit, redo: suspend (context: Any?) -> Unit) {
+    fun addUndoableAction(
+        initialContext: Any? = null,
+        undo: suspend (context: Any?) -> Unit,
+        redo: suspend (context: Any?) -> Unit
+    ) {
         addUndoableAction(undoableAction(initialContext, undo, redo))
     }
 
@@ -56,27 +60,27 @@ class UndoManager {
     }
 
     interface UndoableAction {
-
         var context: Any?
-
+        val description get() = "Default"
         suspend fun undo()
-
         suspend fun redo()
     }
+
 }
 
-fun undoableAction(initialContext: Any?, undo: suspend (context: Any?) -> Unit, redo: suspend (context: Any?) -> Unit) = object : UndoableAction {
+fun undoableAction(initialContext: Any?, undo: suspend (context: Any?) -> Unit, redo: suspend (context: Any?) -> Unit) =
+    object : UndoableAction {
 
-    override var context: Any? = initialContext
+        override var context: Any? = initialContext
 
-    override suspend fun undo() {
-        undo(context)
+        override suspend fun undo() {
+            undo(context)
+        }
+
+        override suspend fun redo() {
+            redo(context)
+        }
     }
-
-    override suspend fun redo() {
-        redo(context)
-    }
-}
 
 
 class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<NetworkModel>) {
@@ -114,6 +118,7 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
                     }
                 }
             }
+
             is NeuronCollection -> {
                 (model as? Neuron)?.let { neuron ->
                     network.addNetworkModel(neuron, usePlacementManager = false, useAutoAssignedId = false)?.await()
@@ -128,6 +133,7 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
                     }
                 }
             }
+
             is SynapseGroup -> {
                 (model as? Synapse)?.let { synapse ->
                     parent.synapses.add(synapse)
@@ -141,6 +147,7 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
                     }
                 }
             }
+
             is Subnetwork -> {
                 parent.modelList.add(model)
                 modelNodeMap.getImmediately<SubnetworkNode>(parent)?.let { subnetworkNode ->
@@ -163,7 +170,11 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
         // Adds models back to parent groups.
         modelsToReAdd.forEach { reAddToGroup(it) }
         // Add all models without parents back
-        network.addNetworkModels(modelsToReAdd.filter { hasNoParent(it) }, usePlacementManager = false, useAutoAssignedId = false).awaitAll()
+        network.addNetworkModels(
+            modelsToReAdd.filter { hasNoParent(it) },
+            usePlacementManager = false,
+            useAutoAssignedId = false
+        ).awaitAll()
         // Call afterRestore on all models to finalize recreation as needed
         modelsToReAdd.forEach { it.afterRestore() }
     }

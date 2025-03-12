@@ -15,6 +15,10 @@ import javax.swing.JPopupMenu
 val NetworkPanel.editMenu
     get() = JMenu("Edit").apply {
         with(networkActions) {
+            add(undoAction())
+            add(redoAction())
+            add(undoHistoryAction())
+            addSeparator()
             add(cutAction)
             add(copyAction)
             add(pasteAction)

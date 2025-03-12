@@ -433,6 +433,9 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
 
     private fun createEditToolBar() = CustomToolBar().apply {
         with(networkActions) {
+            add(undoAction())
+            add(redoAction())
+            addSeparator()
             networkEditingActions.forEach { add(it) }
             addSeparator()
             add(clearNodeActivationsAction)

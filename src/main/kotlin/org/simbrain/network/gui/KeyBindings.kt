@@ -41,9 +41,6 @@ fun NetworkPanel.addKeyBindings() {
     }
     bind(Ctrl + 'P') {showPiccoloDebugger()}
     bind("S") { selectNeuronsInNeuronGroups() }
-    bind(CmdOrCtrl + 'Y') { undoManager.redo() }
-    bind(CmdOrCtrl + 'Z') { undoManager.undo() }
-    bind(CmdOrCtrl + Shift + 'Z') { undoManager.redo() }
 
     bind(Alt + 'R') {
         selectionManager.selectedModels.forEach {

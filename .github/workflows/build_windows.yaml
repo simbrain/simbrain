@@ -34,8 +34,10 @@ jobs:
 #          CERTIFICATE_SHA1: ${{ vars.CERTIFICATE_SHA1 }}
       - name: Install AWS CLI 2.22.35
         run: |
-          curl "https://awscli.amazonaws.com/AWSCLIV2-2.22.35.pkg" -o "awscliv2.pkg"
-          sudo installer -pkg awscliv2.pkg -target /
+          $ProgressPreference = 'SilentlyContinue'
+          Invoke-WebRequest -Uri "https://awscli.amazonaws.com/AWSCLIV2-2.22.35.msi" -OutFile "awscliv2.msi"
+          Start-Process msiexec.exe -Wait -ArgumentList '/i awscliv2.msi /quiet /norestart'
+          aws --version
 
       - name: Configure AWS CLI for Cloudflare R2
         run: |

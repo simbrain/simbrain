@@ -116,8 +116,15 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
     }
 
     val stateInfoText: String
-        get() = "Energy: " + neuronGroup.neuronList.getEnergy().format(4)
+        get() = "Energy: " + getEnergy()
 
+    fun getEnergy(): Double {
+        // Todo: factor in input. - Input vector component-mult activations
+        return neuronGroup.activations.transpose()
+            .mm(weightMatrix.weights)
+            .mm(neuronGroup.activations)
+            .mul(-.5)[0]
+    }
     fun updateStateInfoText() {
         customInfo.text = stateInfoText
         events.customInfoUpdated.fire()

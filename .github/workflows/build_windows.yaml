@@ -13,6 +13,30 @@ jobs:
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
+      - name: Install AWS CLI 2.22.35
+        run: |
+          # Remove AWS CLI v1 if it exists (installed via pip)
+          pip uninstall -y awscli || echo "AWS CLI v1 not installed via pip"
+
+          # Check if AWS CLI v2 exists and uninstall it
+          if (Test-Path "C:\Program Files\Amazon\AWSCLIV2\aws.exe") {
+            Start-Process -FilePath "C:\Program Files\Amazon\AWSCLIV2\uninstall.exe" -ArgumentList "/quiet" -Wait
+            Write-Host "Existing AWS CLI v2 uninstalled"
+          } else {
+            Write-Host "No existing AWS CLI v2 installation found"
+          }
+
+          # Install AWS CLI v2 specific version
+          msiexec.exe /i https://awscli.amazonaws.com/AWSCLIV2-2.22.35.msi /quiet /norestart
+
+          # Wait for installation to complete
+          Start-Sleep -Seconds 10
+
+          # Force PowerShell to refresh its path
+          $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+
+          # Verify installation and version
+          aws --version
       - name: Set up JDK 17
         uses: actions/setup-java@v1
         with:
@@ -32,11 +56,6 @@ jobs:
         run: ./gradlew jpackageWindows
 #        env:
 #          CERTIFICATE_SHA1: ${{ vars.CERTIFICATE_SHA1 }}
-      - name: Install AWS CLI 2.22.35
-        run: |
-          msiexec.exe /i https://awscli.amazonaws.com/AWSCLIV2-2.22.35.msi /quiet /norestart
-          echo "C:\Program Files\Amazon\AWSCLIV2" | Out-File -FilePath $env:GITHUB_PATH -Append
-          aws --version
 
       - name: Configure AWS CLI for Cloudflare R2
         run: |

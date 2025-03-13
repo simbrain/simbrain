@@ -40,51 +40,6 @@ fun applyRandomPattern(hopfield: Layer): DoubleArray {
     return hopfield.activationArray
 }
 
-/***
- * For the specified number of patterns, train the network a specified number of times, then apply
- * forgetting the specified number of times, then determine how many patterns were learned up to a
- * specified tolerance.
- */
-suspend fun forgettingTest(
-    config: HopfieldTestConfig,
-    numPatterns: Int,
-    iterationsToForget: Int,
-    tolerance: Double,
-    testIterations: Int
-): Int {
-    config.weights.weights.randomizeSymmetric()
-    val patterns = (0 until numPatterns).map {
-        applyRandomPattern(config.hopfield)
-    }
-
-    // Training
-    patterns.forEach { pattern ->
-        config.hopfield.setActivations(pattern)
-        config.applyTraining()
-    }
-
-    // Forgetting
-    repeat(iterationsToForget) {
-        if (config.weights.learningRule is HebbianRule) {
-            (config.weights.learningRule as HebbianRule).applyForgetting(config.weights)
-        } else {
-            config.weights.weights.mul(.9)
-        }
-    }
-
-    // Test recall
-    return patterns.count { pattern ->
-        config.hopfield.setActivations(pattern)
-        config.workspace.iterateSuspend(testIterations)
-        val distance = config.distanceFunction(
-            config.hopfield.activationArray,
-            pattern
-        )
-        distance <= tolerance
-    }
-
-}
-
 data class HopfieldTestConfig(
     val workspace: Workspace,
     val hopfield: Layer,
@@ -95,22 +50,30 @@ data class HopfieldTestConfig(
     val distanceFunction: (actual: DoubleArray, expected: DoubleArray) -> Double = ::hammingDistance
 )
 
-suspend fun runHopfieldTest(config: HopfieldTestConfig, patternTestConfig: PatternTestOptions, patterns: List<DoubleArray>, numPatternsToTest: Int): Int {
+suspend fun runHopfieldTest(
+    config: HopfieldTestConfig,
+    patternTestConfig: PatternTestOptions,
+    patterns: List<DoubleArray>,
+    numPatternsToTest: Int): Int {
+
     config.applyReset()
     config.applyLearningRate(1.0 / numPatternsToTest)
 
+    // Set forgetting rates if needed
     if (patternTestConfig.forgetting) {
         (config.weights.learningRule as? HebbianRule)?.let { hebbianRule ->
             hebbianRule.forgettingRate = patternTestConfig.forgettingRate
         }
     }
 
+    // Set up and learn patterns
     val patterns = patterns.take(numPatternsToTest)
     patterns.forEach { pattern ->
         config.hopfield.setActivations(pattern)
         config.applyTraining()
     }
 
+    // Forgetting test
     if (patternTestConfig.forgetting) {
         repeat(patternTestConfig.forgettingIterations) {
             if (config.weights.learningRule is HebbianRule) {
@@ -149,14 +112,15 @@ suspend fun runCapacityTest(
     for (i in 0 until numPatternsToTest) {
         val nTest = i + 1
         val nSuccess = runHopfieldTest(config, patternTestConfig.copy().apply { forgetting = false }, patterns, nTest) * 100.0 / nTest
-        plot.model.addData(0, i.toDouble(), nSuccess)
+        plot.model.addData(0, (i+1).toDouble(), nSuccess)
     }
 
+    // Forgetting test
     if (patternTestConfig.forgetting) {
         for (i in 0 until numPatternsToTest) {
             val nTest = i + 1
             val nSuccess = runHopfieldTest(config, patternTestConfig, patterns, nTest) * 100.0 / nTest
-            plot.model.addData(1, i.toDouble(), nSuccess)
+            plot.model.addData(1, (i+1).toDouble(), nSuccess)
         }
     }
 

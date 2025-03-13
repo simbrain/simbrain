@@ -24,17 +24,12 @@ jobs:
           # If AWS CLI is on PATH via Chocolatey or Python, remove those as well
           # For example, if it was installed via Chocolatey:
           choco uninstall awscli -y || echo "No existing AWS CLI via Chocolatey"
-
-      - name: Install AWS CLI v2.22.35
+      - name: Install AWS CLI 2.22.35
         run: |
-          # Download the MSI for the desired AWS CLI version
-          Invoke-WebRequest "https://awscli.amazonaws.com/AWSCLIV2-2.22.35.msi" -OutFile "awscliv2.msi"
-
-          # Silently install AWS CLI
-          msiexec.exe /i "awscliv2.msi" /qn
-
+          msiexec.exe /i https://awscli.amazonaws.com/AWSCLIV2-2.22.35.msi /quiet /norestart
       - name: Verify AWS CLI version
         run: aws --version
+
       - name: Set up JDK 17
         uses: actions/setup-java@v1
         with:

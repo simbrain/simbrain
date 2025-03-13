@@ -918,7 +918,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         "Undo",
         description = "Undo last action",
         iconPath = "menu_icons/Undo.png",
-        keyboardShortcut = CmdOrCtrl + KeyEvent.VK_Z
+        keyboardShortcut = CmdOrCtrl + 'Z'
     ) {
         networkPanel.undoManager.undo()
     }
@@ -927,7 +927,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         "Redo",
         description = "Redo last undone action",
         iconPath = "menu_icons/Redo.png",
-        keyboardShortcuts = listOf(CmdOrCtrl + KeyEvent.VK_Z,CmdOrCtrl + Shift + 'Z')
+        keyboardShortcuts = listOf(CmdOrCtrl + 'Y', CmdOrCtrl + Shift + 'Z')
     ) {
         networkPanel.undoManager.redo()
     }

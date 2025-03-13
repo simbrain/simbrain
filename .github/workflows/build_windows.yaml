@@ -32,7 +32,7 @@ jobs:
           # Force PowerShell to refresh its path
           $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
       - name: Verify AWS CLI version
-        run: aws --version
+        run: & "C:\Program Files\Amazon\AWSCLIV2\aws" --version
 
       - name: Set up JDK 17
         uses: actions/setup-java@v1
@@ -56,9 +56,9 @@ jobs:
 
       - name: Configure AWS CLI for Cloudflare R2
         run: |
-          aws configure set aws_access_key_id ${{ secrets.R2_ACCESS_KEY }}
-          aws configure set aws_secret_access_key ${{ secrets.R2_SECRET_KEY }}
-          aws configure set default.region auto
+          & "C:\Program Files\Amazon\AWSCLIV2\aws" configure set aws_access_key_id ${{ secrets.R2_ACCESS_KEY }}
+          & "C:\Program Files\Amazon\AWSCLIV2\aws" configure set aws_secret_access_key ${{ secrets.R2_SECRET_KEY }}
+          & "C:\Program Files\Amazon\AWSCLIV2\aws" configure set default.region auto
 
       - name: Upload to Cloudflare R2
         shell: pwsh
@@ -66,7 +66,7 @@ jobs:
           $path = '.\build\dist'
           $files = Get-ChildItem -Path $path -Filter 'Simbrain*.exe'
           if ($files.Count -eq 1) {
-            aws s3 cp $files[0].FullName s3://${{ secrets.CLOUDFLARE_R2_BUCKET }}/ --endpoint-url=https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
+            & "C:\Program Files\Amazon\AWSCLIV2\aws" s3 cp $files[0].FullName s3://${{ secrets.CLOUDFLARE_R2_BUCKET }}/ --endpoint-url=https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
           } elseif ($files.Count -eq 0) {
             Write-Error "No files found matching the pattern 'Simbrain*.exe' in $path"
           } else {

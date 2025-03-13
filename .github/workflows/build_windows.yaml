@@ -32,7 +32,8 @@ jobs:
           # Force PowerShell to refresh its path
           $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
       - name: Verify AWS CLI version
-        run: & "C:\Program Files\Amazon\AWSCLIV2\aws" --version
+        run: |
+          & "C:\Program Files\Amazon\AWSCLIV2\aws" --version
 
       - name: Set up JDK 17
         uses: actions/setup-java@v1

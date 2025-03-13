@@ -226,7 +226,7 @@ object Clipboard {
         )
 
         // Select copied objects after pasting them
-        copy.forEach { it.select() }
+        net.selectionManager.add(copy.map { net.modelNodeMap.get(it) })
     }
 
     @JvmStatic

@@ -26,7 +26,7 @@ jobs:
           choco uninstall awscli -y || echo "No existing AWS CLI via Chocolatey"
       - name: Install AWS CLI 2.22.35
         run: |
-          msiexec.exe /i https://awscli.amazonaws.com/AWSCLIV2-2.22.35.msi
+          msiexec.exe /i https://awscli.amazonaws.com/AWSCLIV2-2.22.35.msi /qn
           # Wait for installation to complete
           Start-Sleep -Seconds 10
           # Force PowerShell to refresh its path

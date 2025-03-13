@@ -153,6 +153,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
                 network.addNetworkModel(nc)
             }
             undoManager.addUndoableAction(
+                description = "Add neurons to collection",
                 undo = { nc.delete() },
                 redo = {
                     nc.neuronList.clear()
@@ -172,6 +173,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         network.addNetworkModel(neuron)
         network.selectModels(listOf(neuron))
         undoManager.addUndoableAction(
+            description = "Add neuron ${neuron.id}",
             undo = { neuron.delete() },
             redo = { network.addNetworkModel(neuron, usePlacementManager = false, useAutoAssignedId = false)?.await() }
         )
@@ -433,6 +435,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             if (it.isNotEmpty()) {
                 val textObject = NetworkTextObject(it)
                 undoManager.addUndoableAction(
+                    description = "Add text object",
                     undo = { textObject.delete() },
                     redo = { network.addNetworkModel(textObject, usePlacementManager = false, useAutoAssignedId = false)?.await() }
                 )
@@ -661,6 +664,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
                 network.addNetworkModel(group)
                 val neurons = group.neuronList.toList()
                 undoManager.addUndoableAction(
+                    description = "Add neuron group ${group.id}",
                     undo = { group.delete() },
                     redo = {
                         group.neuronList.clear()
@@ -713,6 +717,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
                 )
                 synapses.addToNetworkAsync(network)
                 undoManager.addUndoableAction(
+                    description = "Connect using ${connectionStrategy.name}",
                     undo = { synapses.forEach { it.delete() } },
                     redo = { synapses.addToNetwork(network, usePlacementManager = false, useAutoAssignId = false) }
                 )
@@ -949,6 +954,7 @@ fun addSubnetworkAction(networkPanel: NetworkPanel, block: () -> Subnetwork) {
     val synapseGroupSynapsesMap = synapseGroups.associateWith { it.synapses.toList() }
 
     networkPanel.undoManager.addUndoableAction(
+        description = "Add subnetwork ${subnetwork.id}",
         undo = { subnetwork.delete() },
         redo = {
 

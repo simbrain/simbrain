@@ -211,6 +211,7 @@ object Clipboard {
         var deletedModels: List<NetworkModel>? = null
 
         net.undoManager.addUndoableAction(
+            description = "Paste objects",
             undo = { deletedModels = net.network.deleteModels(copy) },
             redo = { with(net) { undeleteContext.restore(deletedModels!!) } }
         )

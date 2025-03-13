@@ -420,6 +420,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         selectionManager.clear()
 
         undoManager.addUndoableAction(
+            description = "Delete selected objects",
             undo = {
                 undeleteContext.restore(deletedModels)
             },
@@ -617,6 +618,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             val synapses = NetworkPreferences.connectionStrategy.copy().apply { percentExcitatory = 100.0 }.connectNeurons(sourceNeurons, targetNeurons)
             synapses.addToNetworkAsync(network)
             undoManager.addUndoableAction(
+                description = "Connect nodes",
                 undo = { synapses.forEach { it.delete() } },
                 redo = { synapses.addToNetwork(network, usePlacementManager = false, useAutoAssignId = false) }
             )
@@ -639,6 +641,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             }
             network.addNetworkModels(addedMatrices)
             undoManager.addUndoableAction(
+                description = "Connect layers",
                 undo = { addedMatrices.forEach {it.delete()}},
                 redo = {
                     network.addNetworkModels(addedMatrices, usePlacementManager = false, useAutoAssignedId = false)
@@ -664,6 +667,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             val synapses = sg.synapses.toList()
             network.addNetworkModel(sg)
             undoManager.addUndoableAction(
+                description = "Connect neuron groups",
                 undo = { sg.delete()},
                 redo = {
                     sg.synapses.clear()
@@ -832,6 +836,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             val neurons = network.addNeurons(numNeurons) { updateRule = template.updateRule }
             layout.layoutNeurons(neurons)
             undoManager.addUndoableAction(
+                description = "Add $numNeurons neuron(s)",
                 undo = { neurons.forEach{it.delete()} },
                 redo = { network.addNetworkModels(neurons, usePlacementManager = false, useAutoAssignedId = false).awaitAll() }
             )

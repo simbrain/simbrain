@@ -153,6 +153,7 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
             val startLocations = startLocations.toList()
             val endLocations = models.map { it.location }.toList()
             networkPanel.undoManager.addUndoableAction(
+                description = "Move items",
                 undo = {
                     models.zip(startLocations).forEach { (m, l) -> m.location = l }
                     networkPanel.network.events.zoomToFitPage.fire()

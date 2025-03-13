@@ -55,6 +55,7 @@ fun NetworkPanel.showNeuronArrayCreationDialog() {
         val neuronArray = it.create()
         network.addNetworkModel(neuronArray)
         undoManager.addUndoableAction(
+            description = "Create neuron array ${neuronArray.id}",
             undo = { neuronArray.delete() },
             redo = { network.addNetworkModel(neuronArray, usePlacementManager = false, useAutoAssignedId = false)?.await() }
         )
@@ -68,6 +69,7 @@ fun NetworkPanel.showActivationSequenceCreationDialog() {
         val activationSequence = it.create()
         network.addNetworkModel(activationSequence)
         undoManager.addUndoableAction(
+            description = "Create activation sequence ${activationSequence.id}",
             undo = { activationSequence.delete() },
             redo = { network.addNetworkModel(activationSequence, usePlacementManager = false, useAutoAssignedId = false)?.await() }
         )
@@ -81,6 +83,7 @@ fun NetworkPanel.showTransformerBlockCreationDialog() {
         val transformerBlock = it.create()
         network.addNetworkModel(transformerBlock)
         undoManager.addUndoableAction(
+            description = "Add transformer block ${transformerBlock.id}",
             undo = { transformerBlock.delete() },
             redo = { network.addNetworkModel(transformerBlock, usePlacementManager = false, useAutoAssignedId = false)?.await() }
         )

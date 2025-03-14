@@ -9,6 +9,9 @@ import java.time.Duration
  * To build add relevant bracketed command to commit message (see tops of the .yaml files).  E.g "[push macos]"
  *
  * To build all just use all of them: "[push macos][push windows][push linux]"
+ *
+ * By default "[push macos]" builds for both silicon and intel. You can also use "[push macos arm64]" and "[push macos x64]"
+ *
  */
 
 plugins {

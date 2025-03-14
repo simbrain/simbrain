@@ -5,11 +5,12 @@ import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.addNeuron
 import org.simbrain.network.core.addSynapse
+import org.simbrain.network.updaterules.IACRule
 import org.simbrain.util.place
 import org.simbrain.util.point
 
 /**
- * Generic 3 object -> recurrent net example using neuron array
+ * Conversion of reduced 5-person IAC Jets and Sharks network from Simbrain 3
  */
 val iacJetsSharks5People = newSim {
 
@@ -116,7 +117,10 @@ val iacJetsSharks5People = newSim {
             location = point(24.842201556015027, 387.9100631095202)
             label = "Divorced"
         })
+    }
 
+    neuronList.forEach {
+        it.updateRule = IACRule()
     }
 
     val synapses = buildList {

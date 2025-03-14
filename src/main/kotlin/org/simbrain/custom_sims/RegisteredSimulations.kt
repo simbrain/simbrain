@@ -135,6 +135,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
 
     dir("Recurrent Networks") {
         item("Basic recurrent net") { recurrentProjection }
+        item("IAC Jets Sharks 5 People") { iacJetsSharks5People }
     }
 
     // dir("Other Demos") {
@@ -153,7 +154,6 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Spivey Net") { spiveyNet }
         item("Activation Sequence (2 layers)") { activationSequenceTwoLayer }
         item("Activation Sequence (3 layers)") { activationSequenceThreeLayer }
-        item("IAC Jets Sharks 5 People") { iacJetsSharks5People }
     }
 
     //dir("Testing") {

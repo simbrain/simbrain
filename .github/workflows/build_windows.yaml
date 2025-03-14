@@ -15,25 +15,11 @@ jobs:
         uses: actions/checkout@v4
       - name: Uninstall any existing AWS CLI (if present)
         run: |
-          # If AWS CLI v2 was previously installed in the default location, remove it
-          if (Test-Path "C:\Program Files\Amazon\AWSCLIV2") {
-            Write-Host "Removing existing AWS CLI install..."
-            Remove-Item -Recurse -Force "C:\Program Files\Amazon\AWSCLIV2"
-          }
-
-          # If AWS CLI is on PATH via Chocolatey or Python, remove those as well
-          # For example, if it was installed via Chocolatey:
           choco uninstall awscli -y || echo "No existing AWS CLI via Chocolatey"
       - name: Install AWS CLI 2.22.35
         run: |
-          msiexec.exe /i https://awscli.amazonaws.com/AWSCLIV2-2.22.35.msi /qn
-          # Wait for installation to complete
-          Start-Sleep -Seconds 10
-          # Force PowerShell to refresh its path
-          $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
-      - name: Verify AWS CLI version
-        run: |
-          & "C:\Program Files\Amazon\AWSCLIV2\aws" --version
+          choco install awscli --version=2.22.35
+          aws --version
 
       - name: Set up JDK 17
         uses: actions/setup-java@v1

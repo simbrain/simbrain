@@ -138,6 +138,7 @@ fun readFromCache(file: File): String? {
 // Function to save downloaded data to the cache
 fun saveToCache(file: File, data: String) {
     try {
+        file.parentFile.mkdirs() // Create parent directories if they don't exist
         file.writeText(data)
     } catch (e: IOException) {
         showWarningDialog("Failed to save cache: ${e.message}")

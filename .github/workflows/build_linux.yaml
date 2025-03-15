@@ -13,7 +13,12 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v4
       - name: Remove AWS CLI
-        run: sudo rm -rf /usr/local/aws-cli
+        run: |
+          sudo rm -rf /usr/local/aws-cli
+          sudo rm -rf /usr/local/bin/aws
+          sudo rm -rf /usr/local/bin/aws_completer
+          sudo rm -rf /usr/local/bin/aws-cli
+          sudo rm -rf /usr/local/bin/aws-cli-plugin
       - name: Install AWS CLI 2.22.35
         run: |
           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.22.35.zip" -o "awscliv2.zip"

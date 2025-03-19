@@ -11,7 +11,6 @@ import org.simbrain.util.applyFunctionInPlace
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
-import org.simbrain.util.randomizeSymmetric
 import org.simbrain.util.showAPEOptionDialog
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.TwoValued
@@ -62,7 +61,7 @@ suspend fun runHopfieldTest(
     // Set forgetting rates if needed
     if (patternTestConfig.forgetting) {
         (config.weights.learningRule as? HebbianRule)?.let { hebbianRule ->
-            hebbianRule.forgettingRate = patternTestConfig.forgettingRate
+            hebbianRule.forgettingRate = patternTestConfig.decayRate
         }
     }
 
@@ -79,7 +78,7 @@ suspend fun runHopfieldTest(
             if (config.weights.learningRule is HebbianRule) {
                 (config.weights.learningRule as HebbianRule).applyForgetting(config.weights)
             } else {
-                config.weights.weights.mul(1 - patternTestConfig.forgettingRate)
+                config.weights.weights.mul(1 - patternTestConfig.decayRate)
             }
             if (patternTestConfig.perturbWeights) {
                 config.weights.weights.applyFunctionInPlace { w -> w + patternTestConfig.perturbFunction.sampleDouble() }
@@ -190,6 +189,7 @@ class PatternTestOptions: CopyableObject {
 
     var distancePercentThreshold by GuiEditable(
         label = "Distance Threshold",
+        description = "Max allowable distance (for discrete Hopfield, Hamming distance) between the recalled and original pattern to be considered correctly remembered",
         initValue = 5.0,
         min = 0.0,
         max = 100.0,
@@ -199,6 +199,7 @@ class PatternTestOptions: CopyableObject {
 
     var percentToTest by GuiEditable(
         label = "Percent to Test",
+        description = "Percent of total stored patterns that will be tested for recall.",
         initValue = 30.0,
         min = 0.0,
         max = 100.0,
@@ -207,40 +208,42 @@ class PatternTestOptions: CopyableObject {
 
     var testIterations by GuiEditable(
         initValue = 5,
-        description = "Number of times to iterate when testing recalled pattern",
+        description = "Number of iterations (proxy for time) the network will run when testing recall of stored pattern.",
         order = 30
     )
 
     var forgetting by GuiEditable(
         initValue = false,
-        description = "Enable forgetting",
+        description = "If true, enable forgetting",
         order = 40
     )
 
     var forgettingIterations by GuiEditable(
         initValue = 10,
-        description = "Number of iterations to apply forgetting",
+        description = "Number of times the forgetting process (scaling, perturbation, or both) is applied",
         order = 50,
         conditionallyVisibleBy = PatternTestOptions::forgetting
     )
 
-    var forgettingRate by GuiEditable(
+    var decayRate by GuiEditable(
         initValue = 0.1,
-        description = "Forgetting rate",
+        description = "Rate that weights are decayed during forgetting. For example, if set to .25, then a weight of " +
+                "10 would be reduced by 2.5 in the next iteration. Set to 0 to disable this type of forgetting.",
         order = 60,
         conditionallyVisibleBy = PatternTestOptions::forgetting
     )
 
     var perturbWeights by GuiEditable(
         initValue = false,
-        description = "Perturb weights",
+        description = "If true, perturb weights during forgetting, by applying a number to each weight supplied by" +
+                "a probability distribution.",
         order = 70,
         conditionallyVisibleBy = PatternTestOptions::forgetting
     )
 
     var perturbFunction by GuiEditable(
         initValue = UniformRealDistribution(-0.1, 0.1) as ProbabilityDistribution,
-        description = "Perturb function",
+        description = "The statistical distribution used for perturbing the weights during forgetting.",
         order = 80,
         conditionallyVisibleBy = PatternTestOptions::perturbWeights
     )
@@ -252,7 +255,7 @@ class PatternTestOptions: CopyableObject {
             it.testIterations = testIterations
             it.forgetting = forgetting
             it.forgettingIterations = forgettingIterations
-            it.forgettingRate = forgettingRate
+            it.decayRate = decayRate
             it.perturbWeights = perturbWeights
             it.perturbFunction = perturbFunction.copy()
         }

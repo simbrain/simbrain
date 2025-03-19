@@ -1,13 +1,13 @@
 package org.simbrain.util
 
 import org.simbrain.util.propertyeditor.CustomTypeName
-import org.simbrain.util.propertyeditor.EditableObject
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 import kotlin.reflect.*
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.hasAnnotation
+import kotlin.reflect.full.superclasses
 import kotlin.reflect.jvm.isAccessible
 import kotlin.reflect.jvm.javaField
 
@@ -85,9 +85,11 @@ fun <O, T> KMutableProperty1<O, T>.invokeLegacySetter(receiver: O, value: Any?) 
     legacySetter.invoke(receiver, value)
 }
 
-val KClass<out EditableObject>.displayName: String
+val KClass<*>.displayName: String
     get() = if (hasAnnotation<CustomTypeName>()) {
         findAnnotation<CustomTypeName>()!!.name
     } else {
         simpleName!!.convertCamelCaseToSpaces()
     }
+
+fun KClass<*>.sealedClassSiblings(): List<KClass<*>>? = (superclasses + this).reversed().firstOrNull() { it.isSealed }?.sealedSubclasses

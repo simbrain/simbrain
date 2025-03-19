@@ -999,7 +999,16 @@ class MatrixWidget<O : EditableObject>(
     }
 }
 
-class ObjectWidget<O : EditableObject, T : CopyableObject>(
+/**
+ * Produce property editor for an object “inside” a larger property editor, displayed in a collapsable panel with a
+ * dropdown.  Assumes there is a [GuiEditable.typeMapProvider] that allows the type of the object to be specified.
+ *
+ * An example is [NeuronUpdateRule].
+ *
+ * If all the fields of an object are singletons, then the widget is displayed using a simpler “enum” style,
+ * without a collapsable panel.
+ */
+class ObjectWidget<O : EditableObject, T : EditableObject>(
     private val editor: AnnotatedPropertyEditor<O>,
     private val objectList: List<T>,
     parameter: GuiEditable<O, T>,
@@ -1012,14 +1021,33 @@ class ObjectWidget<O : EditableObject, T : CopyableObject>(
         get() = _prototypeObject ?: objectList.first()
 
     /**
+     * If all the fields of an object are singletons, then the widget is displayed using a simpler “enum” style,
+     * without a collapsable panel.
+     */
+    val shouldUseCollapsablePanel by lazy {
+        typeMap?.values?.any { it.objectInstance == null } == true
+    }
+
+    /**
      * Finds first superclass with a getTypes method, and if one is found a dropdown is provided that allows the
      * object’s type to be edited. Otherwise, simply embed the object with its own APE.
      */
-    private val typeMap = (if (parameter.typeMapProvider != null) {
-        parameter.typeMapProvider.call(value).map { it.kotlin }
-    } else {
-        value.getTypeList()?.map { it.kotlin }
-    })?.associateBy { it.displayName }
+    private fun getTypeMap(parameter: GuiEditable<O, T>): Map<String, KClass<*>>? {
+        if (parameter.typeMapProvider != null) {
+            return parameter.typeMapProvider.call(value).associate { it.kotlin.displayName to it.kotlin }
+        }
+        (parameter.value)::class.sealedClassSiblings()?.let { subClasses ->
+            return@getTypeMap subClasses.associateBy { it.displayName }
+        }
+        (parameter.value as? CopyableObject)?.let { copyableObject ->
+            copyableObject.getTypeList()?.let { typeList ->
+                return@getTypeMap typeList.associate { it.kotlin.displayName to it.kotlin }
+            }
+        }
+        return null
+    }
+
+    private val typeMap = getTypeMap(parameter)
 
     private val editorPanelContainer = JPanel()
 
@@ -1039,11 +1067,14 @@ class ObjectWidget<O : EditableObject, T : CopyableObject>(
 
                 // Create the prototype object and refresh editor panel
                 try {
-                    val clazz = typeMap[selectedItem as String]
-                    if (clazz != null) {
-                        val prototypeObject = clazz.callNoArgConstructor() as T
-                        objectTypeEditor = AnnotatedPropertyEditor(listOf(prototypeObject))
+                    typeMap[selectedItem as String]?.let {  clazz ->
+                        val prototypeObject = if (clazz.objectInstance != null) {
+                            clazz.objectInstance
+                        } else {
+                            clazz.callNoArgConstructor()
+                        } as T
                         _prototypeObject = prototypeObject
+                        objectTypeEditor = AnnotatedPropertyEditor(listOf(prototypeObject))
                         editorPanelContainer.removeAll()
                         editorPanelContainer.add(objectTypeEditor)
                         this@ObjectWidget.isConsistent = true
@@ -1057,30 +1088,36 @@ class ObjectWidget<O : EditableObject, T : CopyableObject>(
                     exception.printStackTrace()
                 }
             }
-        }
-    }
-
-    override val widget = JPanel(BorderLayout()).apply {
-        if (parameter.showLabeledBorder) {
-            border = BorderFactory.createTitledBorder(parameter.label)
-        }
-        val detailTrianglePanel = DetailTrianglePanel(
-            editorPanelContainer,
-            defaultOpen = parameter.showDetails,
-            topPanelComponent = dropDown
-        )
-        add(detailTrianglePanel, BorderLayout.CENTER)
-        if (!isConsistent) {
-            dropDown?.apply {
+        }.apply {
+            if (!isConsistent) {
                 addItem(NULL_STRING)
                 setSelectedIndex(itemCount - 1)
             }
-        } else {
-            objectTypeEditor = AnnotatedPropertyEditor(objectList)
-            editorPanelContainer.add(objectTypeEditor)
-            if (dropDown == null && objectTypeEditor.parameterWidgetMap.isEmpty()) {
-                isVisible = false
+        }
+    }
+
+    override val widget: JComponent by lazy {
+        if (shouldUseCollapsablePanel) {
+            JPanel(BorderLayout()).apply {
+                if (parameter.showLabeledBorder) {
+                    border = BorderFactory.createTitledBorder(parameter.label)
+                }
+                val detailTrianglePanel = DetailTrianglePanel(
+                    editorPanelContainer,
+                    defaultOpen = parameter.showDetails,
+                    topPanelComponent = dropDown
+                )
+                add(detailTrianglePanel, BorderLayout.CENTER)
+                if (isConsistent) {
+                    objectTypeEditor = AnnotatedPropertyEditor(objectList)
+                    editorPanelContainer.add(objectTypeEditor)
+                    if (dropDown == null && objectTypeEditor.parameterWidgetMap.isEmpty()) {
+                        isVisible = false
+                    }
+                }
             }
+        } else {
+            dropDown ?: JPanel().apply { isVisible = false }
         }
     }
 

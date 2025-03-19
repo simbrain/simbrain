@@ -127,7 +127,7 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
         .sortedBy { (parameter) -> parameter.order }
         .mapNotNull { (parameter, widget) ->
             // object widgets span the dialog and don’t use labels
-            if (widget is ObjectWidget<*, *>) {
+            if (widget is ObjectWidget<*, *> && widget.shouldUseCollapsablePanel) {
                 getLabelledItemPanel(parameter.tab).addItem(widget.component)
                 widget.events.valueChanged.on {
                     parameterWidgetMap.forEach { (_, w) -> w.refresh(widget.parameter.property) }
@@ -185,6 +185,19 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
                 userParameter,
                 isConsistent
             )
+        }
+
+
+        // check for singleton object. the structure doesn't fit in the when-expression
+        userParameter.value?.let {
+            it::class.objectInstance?.let {
+                return ObjectWidget(
+                    this@AnnotatedPropertyEditor,
+                    editingObjects.map { eo -> userParameter.property.get(eo) as EditableObject },
+                    userParameter as GuiEditable<O, EditableObject>,
+                    isConsistent
+                ) as ParameterWidget<O, T>
+            }
         }
 
         return when (userParameter.value) {
@@ -264,13 +277,16 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
         parameterWidgetMap.forEach { (parameter, widget) ->
             editingObjects.forEach { eo ->
                 if (widget.isConsistent) {
-                    (parameter.property as? KMutableProperty1<O, Any>)?.let { property ->
-                        if (widget is ObjectWidget<*, *>) {
+                    (parameter.property as? KMutableProperty1<O, Any>)?.let commitProperty@ { property ->
+                        if (widget is ObjectWidget<*, *> && widget.shouldUseCollapsablePanel) {
                             widget.objectTypeEditor.commitChanges()
-                            if (parameter.useLegacySetter) {
-                                property.invokeLegacySetter(eo, widget.value.copy())
-                            } else {
-                                property.setter.call(eo, widget.value.copy())
+                            (widget.value as? CopyableObject)?.let { co ->
+                                if (parameter.useLegacySetter) {
+                                    property.invokeLegacySetter(eo, co.copy())
+                                } else {
+                                    property.setter.call(eo, co.copy())
+                                }
+                                return@commitProperty
                             }
                         } else {
                             if (parameter.useLegacySetter) {

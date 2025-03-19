@@ -23,8 +23,7 @@ import kotlin.math.sin
 
 class OdorWorldEntity @JvmOverloads constructor(
     val world: OdorWorld,
-    @UserParameter(label = "Type", order = 2)
-    var entityType: EntityType = EntityType.Swiss,
+    entityType: EntityType = EntityType.Swiss,
     @Transient
     var events: EntityEvents = EntityEvents(),
 ) : EditableObject, AttributeContainer, Locatable, Rotatable, Movable, WithSize, Bounded, WithDispersion {
@@ -33,6 +32,13 @@ class OdorWorldEntity @JvmOverloads constructor(
 
     @UserParameter(label = "Name", order = 1)
     override var name: String = "null"
+
+    @UserParameter(label = "Type", order = 2)
+    var entityType: EntityType = entityType
+        set(value) {
+            events.typeChanged.fire(field, value)
+            field = value
+        }
 
     @Transient
     private var locationPointDirty = true
@@ -375,7 +381,7 @@ class OdorWorldEntity @JvmOverloads constructor(
     @Producible
     @JvmOverloads
     fun getNearbyObjectName(radius: Int = 10): String? {
-        return (world.entityList - this).firstOrNull() {
+        return (world.entityList - this).firstOrNull {
             this.location.distance(it.location) < radius
         }?.entityType?.description
     }

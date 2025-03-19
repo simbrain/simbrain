@@ -6,7 +6,8 @@ import org.simbrain.util.propertyeditor.EditableObject
 /**
  * The type of an odor world entity (swiss, candle, etc).
  *
- * For the mapping from type to image, see [EntityNode].
+ * @param rotating: true if separate images are provided for different headings
+ *
  */
 sealed class EntityType(
     val description: String,
@@ -40,6 +41,9 @@ sealed class EntityType(
     object Steve : EntityType("Steve", rotating = true, width = 96, height = 96)
     object Susi : EntityType("Susi", rotating = true, width = 96, height = 96)
     object Isopod : EntityType("Isopod", rotating = true, width = 18, height = 18, numFrames = 2)
+    object Candy : EntityType("Candy", rotating = false, width = 35, height = 35)
+    object Fork : EntityType("Fork", rotating = false, width = 11, height = 35)
+    object Handle : EntityType("Handle", rotating = false, width = 75, height = 75)
 
     object Circle : EntityType("Circle", rotating = true, width = 73, height = 73, imageName = "circle") {
         override val imageBasePaths by lazy {

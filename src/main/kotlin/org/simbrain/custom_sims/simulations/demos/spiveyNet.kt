@@ -10,6 +10,7 @@ import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent
 import org.simbrain.world.odorworld.entities.EntityType
+import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import java.awt.Dimension
 
 /**
@@ -86,7 +87,10 @@ val spiveyNet = newSim {
         heading = 90.0
     }
     world.addEntity(38, 49, EntityType.Candle)
-    world.addEntity(287, 44, EntityType.Bell)
+    val targetObject = OdorWorldEntity(world, EntityType.Candy).apply {
+        location = point(287, 44)
+    }
+    world.addEntity(targetObject)
     mouse.isShowTrail = true
 
     workspace.addUpdateAction("Move mouse") {
@@ -113,6 +117,7 @@ val spiveyNet = newSim {
                 // Candle / Candy
                 resetMouse()
                 targetIndex = 0
+                targetObject.entityType = EntityType.Candy
                 competitorIndex = 1
                 // Time 1: Visual input only
                 visualNodes.addInputs(doubleArrayOf(1.0,1.0,0.0,0.0))
@@ -140,6 +145,7 @@ val spiveyNet = newSim {
             addButton("Target Condition") {
                 // Candle / Fork
                 targetIndex = 0
+                targetObject.entityType = EntityType.Fork
                 competitorIndex = 3
                 // Time 1: Visual input only
                 visualNodes.addInputs(doubleArrayOf(1.0,0.0,0.0,1.0))
@@ -165,6 +171,7 @@ val spiveyNet = newSim {
             }
             addButton("Rhyme Condition") {
                 resetMouse()
+                targetObject.entityType = EntityType.Handle
                 lexicalNodes.setActivations(doubleArrayOf(-1.0,1.0,-1.0,1.0))
                 workspace.simpleIterate(3)
                 visualNodes.setActivations(doubleArrayOf(1.0,-1.0,1.0,-1.0))
@@ -187,23 +194,47 @@ val spiveyNet = newSim {
         # Introduction
         
         This is a simulation of a localist attractor simulation of mouse trajectories relative to visual and auditory inputs
-         due to Michael Spivey and others.
+        due to Michael Spivey and others.
          
-       The simulation shows...
+        Note there is no learning in this type of network. It was hand-crafted, something like an IAC network.
          
         # Background
         
         Relevant papers are 
+        - [Continuous attraction toward phonological competitors](https://pmc.ncbi.nlm.nih.gov/articles/PMC1177386/)
+        - [A Linking Hypothesis for Eyetracking and Mousetracking in the Visual World Paradigm](https://www.sciencedirect.com/science/article/pii/S0006899325000356/pdfft?md5=593289ceb624d37b85229782945c7b40&pid=1-s2.0-S0006899325000356-main.pdf)
 
-        [Continuous attraction toward phonological competitors](https://pmc.ncbi.nlm.nih.gov/articles/PMC1177386/)
+        This simulates a study of eye and mouse tracking.  Participants are shown two objects and told which to point to,
+        and the scientist tracks their mouse and eyes as they point to the requested object.
+        
+         - Control condition: candle target and fork competitor. Eyes should go straight to target.
+         - Cohort condition: candle target and candy competitor. The first phonemes are the same in "candle" and "candy"
+                and so the mouse motion is more complex.
+         - Rhyming condition: candle target and handle competitor. 
+         
+        Here is how Spivey explains it
 
-        [A Linking Hypothesis for Eyetracking and Mousetracking in the Visual World Paradigm](https://www.sciencedirect.com/science/article/pii/S0006899325000356/pdfft?md5=593289ceb624d37b85229782945c7b40&pid=1-s2.0-S0006899325000356-main.pdf)
+        > Participants were presented with color images of two objects on a screen (one target and one distractor), 
+        and a prerecorded speech file instructed them to click one of them with the mouse. 
+        Objects were presented in the upper left and upper right corners of the computer screen 
+        (e.g., a candle and a candy, in the cohort condition, or a candle and a jacket, in the control condition). 
+        Eight target objects were used to make 32 trials in which the distractor object was either a cohort for 
+        the target object or a phonologically dissimilar control and in which the target object was either on the left
+        or right side of the display. Participants were instructed to mouse-click a box in the bottom center of 
+        the screen when they were ready to begin a trial. At this time, the two object images would appear in 
+        the upper left and right, and 500 ms after the onset of the images, a single spoken word 
+        (from a speech file on the computer; mean duration, 532 ms) would name the target object. 
+        [Imposing this asynchrony between image onset and speech onset grew out of observations from 
+        pilot studies in which simultaneous onset caused participants to occasionally wait until 
+        the entire word was spoken before beginning their mouse movement. 
+        With the spoken word beginning 500 ms after onset of the images, participants usually begin their 
+        mouse movement (straight upward) before the onset of the spoken word, which gives distinguishing 
+        properties in the acoustic–phonetic input a chance to influence the continuous motor output midflight.
 
-        > Participants were presented with color images of two objects on a screen (one target and one distractor), and a prerecorded speech file instructed them to click one of them with the mouse. Objects were presented in the upper left and upper right corners of the computer screen (e.g., a candle and a candy, in the cohort condition, or a candle and a jacket, in the control condition). Eight target objects were used to make 32 trials in which the distractor object was either a cohort for the target object or a phonologically dissimilar control and in which the target object was either on the left or right side of the display. Participants were instructed to mouse-click a box in the bottom center of the screen when they were ready to begin a trial. At this time, the two object images would appear in the upper left and right, and 500 ms after the onset of the images, a single spoken word (from a speech file on the computer; mean duration, 532 ms) would name the target object. [Imposing this asynchrony between image onset and speech onset grew out of observations from pilot studies in which simultaneous onset caused participants to occasionally wait until the entire word was spoken before beginning their mouse movement. With the spoken word beginning 500 ms after onset of the images, participants usually begin their mouse movement (straight upward) before the onset of the spoken word, which gives distinguishing properties in the acoustic–phonetic input a chance to influence the continuous motor output midflight."
 
         # What to do
         
-        1. For the lexical task, press the `lexical` button.. observe that...
+        1. ...
       
        
         """.trimIndent()

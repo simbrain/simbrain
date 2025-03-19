@@ -4,20 +4,13 @@ import kotlinx.coroutines.launch
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.*
 import org.simbrain.network.layouts.LineLayout
-import org.simbrain.util.SmellSource
-import org.simbrain.util.component1
-import org.simbrain.util.component2
-import org.simbrain.util.place
-import org.simbrain.util.point
+import org.simbrain.util.*
 import org.simbrain.util.projection.DataPoint
 import org.simbrain.util.projection.HaloColoringManager
 import org.simbrain.workspace.updater.updateAction
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.sensors.SmellSensor
 import java.awt.geom.Point2D
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.component3
 import kotlin.math.sqrt
 
 val kAgentTrails = newSim {
@@ -129,7 +122,7 @@ val docViewer = addSidebarInfo(
         isObjectsBlockMovement = false
     }
 
-    val mouse = odorWorld.addEntity(EntityType.MOUSE).apply {
+    val mouse = odorWorld.addEntity(EntityType.Mouse).apply {
         location = mouseLocation
         heading = 90.0
         addDefaultEffectors()
@@ -141,21 +134,21 @@ val docViewer = addSidebarInfo(
     val (straightMovement, turnLeft, turnRight) = mouse.effectors
     val (smellSensors) = mouse.sensors
 
-    val cheese = odorWorld.addEntity(EntityType.SWISS).apply {
+    val cheese = odorWorld.addEntity(EntityType.Swiss).apply {
         location = cheeseLocation
         smellSource = SmellSource(doubleArrayOf(1.0, 0.0, 0.0)).apply {
             this.dispersion = dispersion
         }
     }
 
-    val flower = odorWorld.addEntity(EntityType.FLOWER).apply {
+    val flower = odorWorld.addEntity(EntityType.Flower).apply {
         location = flowerLocation
         smellSource = SmellSource(doubleArrayOf(0.0, 1.0, 0.0)).apply {
             this.dispersion = dispersion
         }
     }
 
-    val fish = odorWorld.addEntity(EntityType.FISH).apply {
+    val fish = odorWorld.addEntity(EntityType.Fish).apply {
         location = fishLocation
         smellSource = SmellSource(doubleArrayOf(0.0, 0.0, 1.0)).apply {
             this.dispersion = dispersion

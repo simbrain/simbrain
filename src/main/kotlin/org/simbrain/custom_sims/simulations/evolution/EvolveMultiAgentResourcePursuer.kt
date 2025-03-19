@@ -152,7 +152,7 @@ package org.simbrain.custom_sims.simulations
 //                     turningGene { direction = 1.0 }
 //                 )
 //
-//                 val mouse = odorworld.addEntity(EntityType.MOUSE).apply {
+//                 val mouse = odorworld.addEntity(EntityType.Mouse).apply {
 //                     this.name = name
 //                     location = point(200.0, 200.0)
 //                 }
@@ -382,7 +382,7 @@ package org.simbrain.custom_sims.simulations
 //                 workspace.openFromZipData(evolutionWorkspace.zipData)
 //                 val worldComponent = workspace.componentList.filterIsInstance<OdorWorldComponent>().first()
 //                 val world = worldComponent.world
-//                 val newMice = world.entityList.filter { it.entityType == EntityType.MOUSE }
+//                 val newMice = world.entityList.filter { it.entityType == EntityType.Mouse }
 //                 val networkComponents = workspace.componentList.filterIsInstance<NetworkComponent>()
 //                 val networks = networkComponents.map { it.network }
 //                 val thirstNeurons = networks.map { it.getModelByLabel<Neuron>("Thirst") }

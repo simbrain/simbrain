@@ -9,9 +9,6 @@ import org.simbrain.util.graphicalUpperBound
 import org.simbrain.util.place
 import org.simbrain.world.odorworld.entities.EntityType
 import java.awt.geom.Point2D
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.component3
 import kotlin.math.max
 
 /**
@@ -31,10 +28,10 @@ val braitenbergGame = newSim {
     desktop?.getDesktopComponent(oc)?.title = "Obstacle Course"
     //oc.world.isObjectsBlockMovement = false
     oc.world.isUseCameraCentering = false
-    oc.world.addEntity(257, 191, EntityType.POISON)
-    oc.world.addEntity(323, 286, EntityType.POISON)
-    oc.world.addEntity(398, 335, EntityType.POISON)
-    oc.world.addEntity(500, 184, EntityType.SWISS)
+    oc.world.addEntity(257, 191, EntityType.Poison)
+    oc.world.addEntity(323, 286, EntityType.Poison)
+    oc.world.addEntity(398, 335, EntityType.Poison)
+    oc.world.addEntity(500, 184, EntityType.Swiss)
 
     class Vehicle(name: String, entityType: EntityType, entityOffset: Point2D) {
 
@@ -43,7 +40,7 @@ val braitenbergGame = newSim {
         val network get() = networkComponent.network
 
         val agent = oc.world.addEntity(entityOffset.x, entityOffset.y, entityType).apply {
-            addLeftRightSensors(EntityType.SWISS, 270.0)
+            addLeftRightSensors(EntityType.Swiss, 270.0)
             addDefaultEffectors()
         }
 
@@ -106,7 +103,7 @@ val braitenbergGame = newSim {
 
     }
 
-    val vehicle1 = Vehicle("Vehicle 1", EntityType.CIRCLE, Point2D.Double(194.0, 407.0))
+    val vehicle1 = Vehicle("Vehicle 1", EntityType.Circle, Point2D.Double(194.0, 407.0))
 
     withGui {
         place(vehicle1.networkComponent, 53, 282, 359, 327)

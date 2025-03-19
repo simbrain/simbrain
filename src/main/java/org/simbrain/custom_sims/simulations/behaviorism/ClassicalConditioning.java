@@ -94,16 +94,16 @@ public class ClassicalConditioning extends Simulation {
         oc.getWorld().setObjectsBlockMovement(false);
         oc.getWorld().setUseCameraCentering(false);
 
-        mouse = oc.getWorld().addEntity(125, 211, EntityType.MOUSE);
+        mouse = oc.getWorld().addEntity(125, 211, EntityType.Mouse.INSTANCE);
         mouse.setHeading(90);
 
         // Set up world
-        cheese = oc.getWorld().addEntity(13, 67, EntityType.SWISS);
-        bell = oc.getWorld().addEntity(234, 67, EntityType.BELL);
+        cheese = oc.getWorld().addEntity(13, 67, EntityType.Swiss.INSTANCE);
+        bell = oc.getWorld().addEntity(234, 67, EntityType.Bell.INSTANCE);
 
         // Set up object sensors
-        ObjectSensor swissSensor = mouse.addObjectSensor(EntityType.SWISS, 50, 0, 65);
-        ObjectSensor bellSensor = mouse.addObjectSensor(EntityType.BELL, 50, 0, 65);
+        ObjectSensor swissSensor = mouse.addObjectSensor(EntityType.Swiss.INSTANCE, 50, 0, 65);
+        ObjectSensor bellSensor = mouse.addObjectSensor(EntityType.Bell.INSTANCE, 50, 0, 65);
 
         // Couple agent to network
         sim.couple(swissSensor, cheeseDetectorNeuron);

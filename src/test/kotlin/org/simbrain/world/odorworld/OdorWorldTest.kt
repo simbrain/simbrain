@@ -28,11 +28,11 @@ class OdorWorldTest {
 
         // Create a world
         val oc = OdorWorldComponent("Test")
-        val swiss = OdorWorldEntity(oc.world, EntityType.SWISS)
+        val swiss = OdorWorldEntity(oc.world, EntityType.Swiss)
         swiss.location = point(5,6)
         oc.world.addEntity(swiss)
-        val mouse = OdorWorldEntity(oc.world, EntityType.MOUSE)
-        mouse.addSensor(ObjectSensor(EntityType.SWISS, 50.0, 45.0))
+        val mouse = OdorWorldEntity(oc.world, EntityType.Mouse)
+        mouse.addSensor(ObjectSensor(EntityType.Swiss, 50.0, 45.0))
         mouse.addEffector(StraightMovement())
 
         mouse.location = point(10,11)
@@ -46,8 +46,8 @@ class OdorWorldTest {
         // Unmarshall from xstream
         val oc2 = OdorWorldComponent.open(stream, "test2", "xml")
 
-        val newSwiss = oc2.world.entityList.firstOrNull { it.entityType == EntityType.SWISS }
-        val newMouse = oc2.world.entityList.firstOrNull { it.entityType == EntityType.MOUSE }
+        val newSwiss = oc2.world.entityList.firstOrNull { it.entityType == EntityType.Swiss }
+        val newMouse = oc2.world.entityList.firstOrNull { it.entityType == EntityType.Mouse }
         assertNotNull(newMouse)
         assertNotNull(newSwiss)
         assertEquals(mouse.location, newMouse?.location)

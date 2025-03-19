@@ -35,7 +35,6 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.events.OdorWorldEvents
 import org.simbrain.world.odorworld.sensors.Sensor
 import java.awt.geom.Point2D
-import java.util.*
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.function.Consumer
 
@@ -232,7 +231,7 @@ class OdorWorld : EditableObject, Bounded {
      * Add new "agent" (rotating with some default) sensors and effectors at last clicked position.
      */
     fun addAgent(): OdorWorldEntity {
-        val entity = OdorWorldEntity(this, EntityType.MOUSE)
+        val entity = OdorWorldEntity(this, EntityType.Mouse)
         addEntity(entity)
         entity.location = findPlacementLocation(lastClickedPosition)
         entity.addDefaultSensorsEffectors()

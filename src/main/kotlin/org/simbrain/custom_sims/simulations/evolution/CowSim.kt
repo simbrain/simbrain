@@ -151,7 +151,7 @@ val evolveCow = newSim {
             NetworkComponent("Network ${index + 1}").also { workspace.addWorkspaceComponent(it) }.network
         }
         val entities = List(cowGenotypes.size) { i ->
-            OdorWorldEntity(odorWorld, EntityType.COW).also {
+            OdorWorldEntity(odorWorld, EntityType.Cow).also {
                 odorWorld.addEntity(it)
                 it.location = point((i + 1) * 100, (i + 1) * 100)
             }
@@ -167,7 +167,7 @@ val evolveCow = newSim {
         // Central water sensor to determine when water is actually found.
         val centerLakeSensors = entities.associateWith { entity ->
             TileSensor("water", radius = 0.0).apply {
-                decayFunction.dispersion = EntityType.COW.imageWidth / 1.4
+                decayFunction.dispersion = entity.width / 1.4
             }.also { entity.addSensor(it) }
         }
         val effectors = entities.map { entity ->

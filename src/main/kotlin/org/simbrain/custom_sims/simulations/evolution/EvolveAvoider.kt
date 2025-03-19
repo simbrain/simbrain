@@ -95,7 +95,7 @@ package org.simbrain.custom_sims.simulations
 //
 //             val sensors = chromosome(3) {
 //                 objectSensorGene {
-//                     setObjectType(EntityType.POISON)
+//                     setObjectType(EntityType.Poison)
 //                     theta = (it - 1) * 60.0
 //                     radius = 32.0
 //                     decayFunction.dispersion = 200.0
@@ -111,7 +111,7 @@ package org.simbrain.custom_sims.simulations
 //                 turningGene { direction = 1.0 }
 //             )
 //
-//             val mouse = odorworld.addEntity(EntityType.MOUSE).apply {
+//             val mouse = odorworld.addEntity(EntityType.Mouse).apply {
 //                 location = point(200.0, 200.0)
 //             }
 //
@@ -119,7 +119,7 @@ package org.simbrain.custom_sims.simulations
 //                 location = point(random.nextDouble()*300,random.nextDouble()*300)
 //             }
 //
-//             fun addPoison() = odorworld.addEntity(EntityType.POISON).apply {
+//             fun addPoison() = odorworld.addEntity(EntityType.Poison).apply {
 //                 location = point(random.nextDouble()*300,random.nextDouble()*300)
 //                 heading = UniformRealDistribution(0.0,360.0).sampleDouble()
 //                 speed = 3.0

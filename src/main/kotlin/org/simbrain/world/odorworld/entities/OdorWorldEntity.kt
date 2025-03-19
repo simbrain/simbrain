@@ -24,7 +24,7 @@ import kotlin.math.sin
 class OdorWorldEntity @JvmOverloads constructor(
     val world: OdorWorld,
     @UserParameter(label = "Type", order = 2)
-    var entityType: EntityType = EntityType.SWISS,
+    var entityType: EntityType = EntityType.Swiss,
     @Transient
     var events: EntityEvents = EntityEvents(),
 ) : EditableObject, AttributeContainer, Locatable, Rotatable, Movable, WithSize, Bounded, WithDispersion {
@@ -85,8 +85,8 @@ class OdorWorldEntity @JvmOverloads constructor(
             events.moved.fire()
         }
 
-    override val width: Double = entityType.imageWidth
-    override val height: Double = entityType.imageHeight
+    override val width: Double = entityType.width.toDouble()
+    override val height: Double = entityType.height.toDouble()
 
     @UserParameter(label = "Enable Sensors", order = 6)
     var isSensorsEnabled: Boolean = true
@@ -129,7 +129,7 @@ class OdorWorldEntity @JvmOverloads constructor(
     @Transient
     val currentlyHeardPhrases: MutableList<String> = arrayListOf()
 
-    val isRotating get() = entityType.isRotating
+    val isRotating get() = entityType.rotating
 
     val velocity get() = point(cos(heading.toRadian()) * speed, -sin(heading.toRadian()) * speed)
 
@@ -245,10 +245,10 @@ class OdorWorldEntity @JvmOverloads constructor(
 
     fun addDefaultSensorsEffectors() {
         addDefaultEffectors()
-        addSensor(ObjectSensor(EntityType.SWISS, 50.0, 45.0))
-        addSensor(ObjectSensor(EntityType.SWISS, 0.0, 0.0))
+        addSensor(ObjectSensor(EntityType.Swiss, 50.0, 45.0))
+        addSensor(ObjectSensor(EntityType.Swiss, 0.0, 0.0))
         addSensor(
-            ObjectSensor(EntityType.SWISS, 50.0, -45.0)
+            ObjectSensor(EntityType.Swiss, 50.0, -45.0)
         )
         // TODO: Add more defaults
     }

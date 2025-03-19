@@ -9,11 +9,15 @@ import org.piccolo2d.nodes.PImage
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.util.*
-import org.simbrain.util.piccolo.*
+import org.simbrain.util.piccolo.SceneGraphBrowser
+import org.simbrain.util.piccolo.Tile
+import org.simbrain.util.piccolo.setViewBoundsNoOverflow
 import org.simbrain.world.odorworld.dialogs.EntityDialog
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.gui.*
-import java.awt.*
+import java.awt.BorderLayout
+import java.awt.Color
+import java.awt.Rectangle
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.awt.event.MouseEvent
@@ -428,7 +432,7 @@ class OdorWorldPanel(
         get() = selectedEntityNodes.firstOrNull()
 
     val firstSelectedRotatingEntity: OdorWorldEntity?
-        get() = selectedEntityModels.firstOrNull { it.entityType.isRotating }
+        get() = selectedEntityModels.firstOrNull { it.entityType.rotating }
 
     val firstSelectedEntityModel: OdorWorldEntity?
         get() {

@@ -108,7 +108,7 @@ public class SpeechNode extends EntityAttributeNode {
 
     @Override
     public void update(OdorWorldEntity entity) {
-        setOffset(entity.getEntityType().getImageWidth() / 2 - 18, 0);
+        setOffset(entity.getEntityType().getWidth() / 2 - 18, 0);
     }
 
     /**

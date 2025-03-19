@@ -77,7 +77,7 @@ val cogMap3Objects = newSim {
         isObjectsBlockMovement = false
     }
 
-    val mouse = odorWorld.addEntity(EntityType.MOUSE).apply {
+    val mouse = odorWorld.addEntity(EntityType.Mouse).apply {
         location = mouseLocation
         heading = 90.0
         addDefaultEffectors()
@@ -88,21 +88,21 @@ val cogMap3Objects = newSim {
 
     val (smellSensors) = mouse.sensors
 
-    val cheese = odorWorld.addEntity(EntityType.SWISS).apply {
+    val cheese = odorWorld.addEntity(EntityType.Swiss).apply {
         location = cheeseLocation
         smellSource = SmellSource(doubleArrayOf(1.0, 0.0, 0.0)).apply {
             this.dispersion = dispersion
         }
     }
 
-    val flower = odorWorld.addEntity(EntityType.FLOWER).apply {
+    val flower = odorWorld.addEntity(EntityType.Flower).apply {
         location = flowerLocation
         smellSource = SmellSource(doubleArrayOf(0.0, 1.0, 0.0)).apply {
             this.dispersion = dispersion
         }
     }
 
-    val fish = odorWorld.addEntity(EntityType.FISH).apply {
+    val fish = odorWorld.addEntity(EntityType.Fish).apply {
         location = fishLocation
         smellSource = SmellSource(doubleArrayOf(0.0, 0.0, 1.0)).apply {
             this.dispersion = dispersion

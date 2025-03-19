@@ -122,7 +122,7 @@ val isopodSim = newSim {
         tileMap.fill("water_1")
 
         // Body could be represented by a triangle or rhombus
-        isopod = addEntity(centerLocation.x, centerLocation.y, EntityType.ISOPOD).apply {
+        isopod = addEntity(centerLocation.x, centerLocation.y, EntityType.Isopod).apply {
             name = "isopod"
             heading = 90.0
             addDefaultEffectors()
@@ -154,7 +154,7 @@ val isopodSim = newSim {
         }
 
         fun addFish(x: Double, y: Double) {
-            odorWorld.addEntity(x, y, EntityType.FISH).apply {
+            odorWorld.addEntity(x, y, EntityType.Fish).apply {
                 name = "Fish"
                 // Smell value when agent is right on top of fish
                 val maxVal = 1.1
@@ -175,8 +175,8 @@ val isopodSim = newSim {
         }
 
         // adding fish to four corners of the world
-        val fishHalfWidth = EntityType.FISH.imageWidth / 2
-        val fishHalfHeight = EntityType.FISH.imageHeight / 2
+        val fishHalfWidth = EntityType.Fish.width / 2.0
+        val fishHalfHeight = EntityType.Fish.height / 2.0
 
         addFish(odorWorld.width - fishHalfWidth, odorWorld.height - fishHalfHeight)
         addFish(fishHalfWidth, odorWorld.height - fishHalfHeight)
@@ -210,7 +210,7 @@ val isopodSim = newSim {
 
     workspace.addUpdateAction(updateAction("Found fish") {
         val foundFish = odorWorld.entityList
-            .filter { it.entityType == EntityType.FISH }
+            .filter { it.entityType == EntityType.Fish }
             .any { fish -> fish.location.distance(isopod.location) < hitRadius }
         if (foundFish) {
             log += "# Collided with fish\n"

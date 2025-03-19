@@ -64,11 +64,9 @@ class TileSensor @JvmOverloads constructor(
     override val name: String
         get() = "Tile Sensor"
 
-    override fun getLabel(): String {
-        return if (super.getLabel().isEmpty()) {
-            "$directionString$tileType Detector"
-        } else {
-            super.getLabel()
-        }
+    override var label = if (super.label.isEmpty()) {
+        "$directionString$tileType Detector"
+    } else {
+        super.label
     }
 }

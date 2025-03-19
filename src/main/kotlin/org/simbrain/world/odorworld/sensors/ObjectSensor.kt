@@ -19,7 +19,7 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity
  */
 class ObjectSensor @JvmOverloads constructor(
     @UserParameter(label = "Object Type", description = "What type of object this sensor responds to", order = 3)
-    private var objectType: EntityType = EntityType.SWISS,
+    private var objectType: EntityType = EntityType.Swiss,
     radius: Double = DEFAULT_RADIUS,
     theta: Double = DEFAULT_THETA
 ) : SensorWithRelativeLocation(theta, radius), VisualizableEntityAttribute, WithDispersion {
@@ -76,11 +76,9 @@ class ObjectSensor @JvmOverloads constructor(
         this.objectType = objectType
     }
 
-    override fun getLabel(): String {
-        return if (super.getLabel().isEmpty()) {
-            directionString + objectType.description + " Detector"
-        } else {
-            super.getLabel()
-        }
+    override var label = if (super.label.isEmpty()) {
+        directionString + objectType.description + " Detector"
+    } else {
+        super.label
     }
 }

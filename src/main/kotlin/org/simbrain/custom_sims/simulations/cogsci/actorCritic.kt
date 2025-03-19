@@ -74,10 +74,10 @@ val actorCritic = newSim {
     val gridSize = tileSize * tileGridRatio
     val mouseHomeLocation = gridSize * numTilesInADimension - gridSize / 2
 
-    val mouse = world.addEntity(mouseHomeLocation, mouseHomeLocation, EntityType.MOUSE).apply {
+    val mouse = world.addEntity(mouseHomeLocation, mouseHomeLocation, EntityType.Mouse).apply {
         heading = 90.0
     }
-    val cheese = world.addEntity(gridSize / 2, gridSize / 2, EntityType.SWISS)
+    val cheese = world.addEntity(gridSize / 2, gridSize / 2, EntityType.Swiss)
 
     fun resetMouse() {
         mouse.setLocation(mouseHomeLocation, mouseHomeLocation)

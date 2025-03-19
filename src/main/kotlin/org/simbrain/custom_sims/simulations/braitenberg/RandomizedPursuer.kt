@@ -68,13 +68,13 @@ class RandomizedPursuer : Simulation {
         oc = sim.addOdorWorld(440, 8, 378, 297, "World")
         oc.world.isObjectsBlockMovement = false
 
-        mouse = oc.world.addEntity(0, 0, EntityType.MOUSE)
+        mouse = oc.world.addEntity(0, 0, EntityType.Mouse)
         mouse.heading = 90.0
         mouse.setLocationRelativeToCenter(0, 70)
-        mouse.addLeftRightSensors(EntityType.SWISS, 200.0)
+        mouse.addLeftRightSensors(EntityType.Swiss, 200.0)
         mouse.addDefaultEffectors()
 
-        cheese = oc.world.addEntity(0, 0, EntityType.SWISS, doubleArrayOf(1.0, 0.0, 0.0))
+        cheese = oc.world.addEntity(0, 0, EntityType.Swiss, doubleArrayOf(1.0, 0.0, 0.0))
         cheese.setLocationRelativeToCenter(0, -30)
     }
 
@@ -85,7 +85,7 @@ class RandomizedPursuer : Simulation {
         with(net) {
             vehicleNetwork = pursuer.addPursuer(
                 10, 10,
-                mouse, EntityType.SWISS,
+                mouse, EntityType.Swiss,
                 mouse.sensors[0] as ObjectSensor,
                 mouse.sensors[1] as ObjectSensor
             )

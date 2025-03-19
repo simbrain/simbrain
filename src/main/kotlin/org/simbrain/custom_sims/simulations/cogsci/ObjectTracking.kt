@@ -13,19 +13,14 @@ import org.simbrain.network.util.EmptyScalarData
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.network.util.SpikingScalarData
 import org.simbrain.util.*
-import org.simbrain.util.Utils.FS
 import org.simbrain.util.decayfunctions.StepDecayFunction
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.workspace.updater.updateAction
 import org.simbrain.world.odorworld.OdorWorldComponent
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.sensors.ObjectSensor
-import java.io.File
 import java.lang.Double.max
 import javax.swing.JTextField
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.component3
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -165,7 +160,7 @@ val objectTrackingSim = newSim {
     odorWorld.isObjectsBlockMovement = false
 
     // Agent
-    val agent = odorWorld.addEntity(EntityType.CIRCLE).apply {
+    val agent = odorWorld.addEntity(EntityType.Circle).apply {
         location = point(odorWorld.width / 2.0, odorWorld.height / 2.0)
         heading = 90.0
         addDefaultEffectors()
@@ -179,9 +174,9 @@ val objectTrackingSim = newSim {
     val leftSensors = linspace(-31, 89, 31)
     // Left sensors (30 - sensoryNeurons / 2 until 30 + sensoryNeurons / 2).forEachIndexed { counter, position ->//
     leftSensors.forEachIndexed { counter, position ->
-        val cheeseSensorLeft = ObjectSensor(EntityType.SWISS)
+        val cheeseSensorLeft = ObjectSensor(EntityType.Swiss)
         cheeseSensorLeft.theta = position.toDouble()
-        cheeseSensorLeft.radius = EntityType.CIRCLE.imageHeight / 2.0
+        cheeseSensorLeft.radius = EntityType.Circle.height / 2.0
         cheeseSensorLeft.decayFunction = StepDecayFunction()
         cheeseSensorLeft.decayFunction.dispersion = radiusOfRevolution - fudge
         with(couplingManager) {
@@ -193,9 +188,9 @@ val objectTrackingSim = newSim {
     // Right sensors (-30 - sensoryNeurons / 2 until -30 + sensoryNeurons / 2).forEachIndexed { counter, position ->//
     val rightSensors = linspace(-90, 30, 31)
     rightSensors.forEachIndexed { counter, position ->
-        val cheeseSensorRight = ObjectSensor(EntityType.SWISS)
+        val cheeseSensorRight = ObjectSensor(EntityType.Swiss)
         cheeseSensorRight.theta = position.toDouble()
-        cheeseSensorRight.radius = EntityType.CIRCLE.imageHeight / 2.0
+        cheeseSensorRight.radius = EntityType.Circle.height / 2.0
         cheeseSensorRight.decayFunction = StepDecayFunction()
         cheeseSensorRight.decayFunction.dispersion = radiusOfRevolution - fudge
         with(couplingManager) {
@@ -205,7 +200,7 @@ val objectTrackingSim = newSim {
     }
 
     // Objects
-    val cheese = odorWorld.addEntity(EntityType.SWISS).apply {
+    val cheese = odorWorld.addEntity(EntityType.Swiss).apply {
         val (x, y) = point(200.0, 250.0)
         setLocation(x, y)
         smellSource = SmellSource(doubleArrayOf(1.0, .2, .5, .1, 1.0)).apply {

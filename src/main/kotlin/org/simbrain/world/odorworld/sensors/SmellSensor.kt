@@ -70,11 +70,7 @@ class SmellSensor @JvmOverloads constructor(
                 SimbrainMath.roundDouble(theta, 2) + "," +
                 SimbrainMath.roundDouble(radius, 2) + ")"
 
-    override fun getLabel(): String {
-        // TODO: Add labbel.ismpety check. Removed it because label is set by AddSensorDialog.
-        //  So for now custom labels not possible on this sensor
-        return directionString + smellSensorDescription
-    }
+    override var label: String = directionString + smellSensorDescription
 
     override fun copy(): SmellSensor {
         return SmellSensor(name, theta, radius).applyCommonCopy().apply {

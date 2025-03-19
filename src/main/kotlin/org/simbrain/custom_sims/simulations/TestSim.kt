@@ -105,7 +105,7 @@ val testSim = newSim {
         tileMap.makeLake(point(1, 1).asGridCoordinate(), 5, 2)
         tileMap.makeLake(point(4, 2).asGridCoordinate(), 2, 5)
 
-        cow = addEntity(50, 50, EntityType.COW).apply {
+        cow = addEntity(50, 50, EntityType.Cow).apply {
             heading = 90.0
             addDefaultEffectors()
             addSensor(SmellSensor())
@@ -115,16 +115,16 @@ val testSim = newSim {
             manualMovement.manualMotionTurnIncrement = 2.0
         }
 
-        odorWorld.addEntity(200, 260, EntityType.FLAX).apply {
+        odorWorld.addEntity(200, 260, EntityType.Flax).apply {
             smellSource = SmellSource(doubleArrayOf(1.0, 0.0, 0.0))
         }
-        odorWorld.addEntity(210, 120, EntityType.SWISS).apply {
+        odorWorld.addEntity(210, 120, EntityType.Swiss).apply {
             smellSource = SmellSource(doubleArrayOf(1.0, 0.5, 0.0))
         }
-        odorWorld.addEntity(10, 10, EntityType.FLOWER).apply {
+        odorWorld.addEntity(10, 10, EntityType.Flower).apply {
             smellSource = SmellSource(doubleArrayOf(0.0, 0.5, 0.5))
         }
-        odorWorld.addEntity(59, 200, EntityType.CANDLE).apply {
+        odorWorld.addEntity(59, 200, EntityType.Candle).apply {
             smellSource = SmellSource(doubleArrayOf(0.0, 1.0, 0.0))
         }
 

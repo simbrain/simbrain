@@ -32,13 +32,13 @@ abstract class Sensor : PeripheralAttribute {
         description = "Optional string description associated with this sensor",
         order = 1
     )
-    private var label = ""
+    override var label = ""
 
     /**
      * Handle events.
      */
     @Transient
-    private var events = SensorEffectorEvents()
+    override var events = SensorEffectorEvents()
 
     /**
      * Construct a sensor.
@@ -63,19 +63,8 @@ abstract class Sensor : PeripheralAttribute {
      */
     constructor() : super()
 
-    override fun getLabel(): String {
-        return label
-    }
-
-    override fun setLabel(label: String) {
-        this.label = label
-        getEvents().propertyChanged.fire()
-    }
 
     abstract override fun copy(): Sensor
-    override fun getEvents(): SensorEffectorEvents {
-        return events
-    }
 
     fun readResolve(): Any {
         events = SensorEffectorEvents()

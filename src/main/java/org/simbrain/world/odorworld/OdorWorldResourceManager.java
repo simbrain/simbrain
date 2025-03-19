@@ -70,7 +70,11 @@ public class OdorWorldResourceManager {
          * does not seem to allow immediate retrieval of the image size
          * so this method is needed to correctly set the bound for the PNodes.
          */
-        URL url = ClassLoader.getSystemClassLoader().getResource(assertForwardSlash("odorworld" + File.separator + name));
+        var pathString = assertForwardSlash("odorworld" + File.separator + name);
+        URL url = ClassLoader.getSystemClassLoader().getResource(pathString);
+        if (url == null) {
+            throw new IllegalArgumentException("Cannot find image: " + pathString);
+        }
         BufferedImage image = null;
         try {
             // source: https://stackoverflow.com/a/44170254

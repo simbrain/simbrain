@@ -7,6 +7,7 @@ import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PBounds
 import org.simbrain.util.createAction
 import org.simbrain.util.distanceTo
+import org.simbrain.util.div
 import org.simbrain.util.minus
 import org.simbrain.util.piccolo.Animations
 import org.simbrain.util.piccolo.RotatingSprite
@@ -17,9 +18,7 @@ import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.world.odorworld.OdorWorldPanel
 import org.simbrain.world.odorworld.OdorWorldResourceManager
 import org.simbrain.world.odorworld.effectors.Effector
-import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
-import org.simbrain.world.odorworld.entities.RotatingEntityManager
 import org.simbrain.world.odorworld.sensors.Sensor
 import org.simbrain.world.odorworld.sensors.VisualizableEntityAttribute
 import java.awt.geom.Point2D
@@ -207,34 +206,23 @@ class EntityNode(
         if (::sprite.isInitialized) {
             removeChild(sprite)
         }
-        when (entity.entityType) {
-            EntityType.SWISS, EntityType.GOUDA, EntityType.POISON, EntityType.BELL, EntityType.FLOWER, EntityType.TULIP, EntityType.PANSY, EntityType.FLAX, EntityType.FISH -> sprite =
-                Sprite(
-                    OdorWorldResourceManager.getStaticImage(
-                        entity.entityType.description + ".gif"
-                    )
-                )
+        fun getRotatingImage(imagePath: String) = OdorWorldResourceManager.getBufferedImage("rotating" / imagePath)
+        fun getStaticImage(imagePath: String) = OdorWorldResourceManager.getBufferedImage("static" / imagePath)
+        fun createRotatingTileSet(images: List<List<String>>) = images.map { frames ->
+            if (frames.size == 1) {
+                Animations.createAnimation(getRotatingImage(frames.first()))
+            } else {
+                Animations.createLoopedAnimation(frames.map { frame -> getRotatingImage(frame) })
+            }
+        }
+        fun createStaticTileSet(images: List<List<String>>) = getStaticImage(images.flatten().first())
 
-            EntityType.CANDLE -> sprite = Sprite(OdorWorldResourceManager.getStaticImage("Candle.png"))
-            EntityType.DANDELIONS -> sprite = Sprite(OdorWorldResourceManager.getStaticImage("Dandelions.png"))
-            EntityType.GERANIUMS -> sprite = Sprite(OdorWorldResourceManager.getStaticImage("Geraniums.png"))
-            EntityType.BLUECHEESE -> sprite = Sprite(OdorWorldResourceManager.getStaticImage("Bluecheese.gif"))
-            EntityType.MOUSE -> sprite = RotatingSprite(RotatingEntityManager.getMouse())
-            EntityType.CIRCLE -> sprite = RotatingSprite(
-                Animations.createAnimation(
-                    OdorWorldResourceManager.getBufferedImage("circle.png")
-                )
-            )
-
-            EntityType.AMY, EntityType.ARNO, EntityType.BOY, EntityType.COW, EntityType.GIRL, EntityType.JAKE, EntityType.LION, EntityType.STEVE, EntityType.SUSI -> sprite =
-                RotatingSprite(
-                    RotatingEntityManager.getRotatingTileset(
-                        entity.entityType.name, 8
-                    )
-                )
-
-            EntityType.ISOPOD -> sprite = RotatingSprite(RotatingEntityManager.getRotatingTileset("isopod", 2))
-            else -> {}
+        sprite = with(entity.entityType) {
+            if (rotating) {
+                RotatingSprite(createRotatingTileSet(imageBasePaths))
+            } else {
+                Sprite(createStaticTileSet(imageBasePaths))
+            }
         }
         addChild(sprite)
         visualizableAttributeMap.values.forEach { it?.raiseToTop() }
@@ -246,7 +234,7 @@ class EntityNode(
 
     private fun update() {
         if (entity.isRotating) {
-            (sprite as RotatingSprite?)!!.updateHeading(entity.heading)
+            (sprite as? RotatingSprite)?.updateHeading(entity.heading)
         }
         updateAttributesNodes()
         val isCrossingBorder = !entity.world.contains(entity.location - entity.velocity)

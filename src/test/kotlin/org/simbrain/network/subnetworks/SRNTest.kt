@@ -29,7 +29,7 @@ class SRNTest {
             val trainer = SRNTrainer(net, srn)
 
             runBlocking {
-                repeat(1000) {
+                repeat(1500) {
                     trainer.trainOnce()
                 }
             }

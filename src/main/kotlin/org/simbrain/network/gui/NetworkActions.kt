@@ -134,7 +134,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Delete",
         description = """Delete selected node(s) ("Backspace" or "Delete")""",
         enablingCondition = EnablingCondition.ALLITEMS,
-        iconPath = "menu_icons/DeleteNeuron.png",
+        iconPath = "menu_icons/Delete.png",
         keyboardShortcuts = listOf(KeyCombination(KeyEvent.VK_DELETE), KeyCombination(KeyEvent.VK_BACK_SPACE))
     ) {
         launch { deleteSelectedObjects() }
@@ -268,7 +268,6 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val setNeuronPropertiesAction = networkPanel.createAction(
         name = "Neuron Properties...",
         description = "Set the properties of selected neurons",
-        iconPath = "menu_icons/Properties.png",
         keyboardShortcut = CmdOrCtrl + 'E',
         initBlock = {
             fun updateAction() {
@@ -299,8 +298,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val setSynapsePropertiesAction get() = networkPanel.createAction(
         name = "Synapse Properties...",
         description = "Set the properties of selected synapses",
-        iconPath = "menu_icons/Properties.png",
-        keyboardShortcut = KeyCombination('E'),
+        keyboardShortcut = CmdOrCtrl + 'E',
         initBlock = {
             fun updateAction() {
                 isEnabled = networkPanel.selectionManager.filterSelectedModels<Synapse>().isNotEmpty()

@@ -62,7 +62,7 @@ public class RasterPlotActions {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Eraser.png"));
+                putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/Eraser.png"));
                 putValue(SHORT_DESCRIPTION, "Clear graph data");
             }
 

@@ -687,7 +687,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             add(networkActions.zoomInAction())
             add(networkActions.zoomOutAction())
             add(networkActions.resetZoomAction())
-            addSeparator()
             add(JToggleButton().apply {
                 icon = ResourceManager.getSmallIcon("menu_icons/ZoomFitPage.png")
                 fun updateButton() {

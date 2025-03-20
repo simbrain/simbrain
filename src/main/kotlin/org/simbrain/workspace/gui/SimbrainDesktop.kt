@@ -521,12 +521,12 @@ object SimbrainDesktop {
         insertMenu.add(actionManager.newNetworkAction)
         // insertMenu.add(new OpenEditorAction(this)); //TODO: Move this action
         // manager
-        val newGaugeSubMenu = JMenu("New Plot")
+        val newGaugeSubMenu = JMenu("New plot")
         for (action in actionManager.plotActions) {
             newGaugeSubMenu.add(action)
         }
         insertMenu.add(newGaugeSubMenu)
-        val newWorldSubMenu = JMenu("New World")
+        val newWorldSubMenu = JMenu("New world")
         for (action in actionManager.newWorldActions) {
             newWorldSubMenu.add(action)
         }

@@ -37,55 +37,55 @@ val simulations = dir("Simulations", alphabetical = true ) {
     //     item("3. Recurrent Hebb") { hebbianAssociator }
     // }
 
-    dir("Reinforcement Learning") {
-        item("Actor Critic") { actorCritic }
+    dir("Reinforcement learning") {
+        item("Actor critic") { actorCritic }
     }
 
     dir("Backprop") {
-        item("Three Layer Auto-Encoder") { backpropAutoEncoder }
+        item("Three layer auto-encoder") { backpropAutoEncoder }
         item("Tiny MNIST") { tinyMNIST }
     }
 
     dir("Braitenberg") {
-        item("Isopod Simulation") { isopodSim }
-        item("Two Braitenberg Vehicles") { braitenbergSim }
-        item("Braitenberg Game") { braitenbergGame }
+        item("Isopod simulation") { isopodSim }
+        item("Two Braitenberg vehicles") { braitenbergSim }
+        item("Braitenberg game") { braitenbergGame }
     }
 
-    dir("Reservoir Networks") {
-        item("Edge Of Chaos Bit Stream") { EdgeOfChaosBitStream() }
-        item("Edge Of Chaos Embodied") { EdgeOfChaos() }
-        item("Binary Reservoir") { binaryReservoir }
+    dir("Reservoir networks") {
+        item("Edge of chaos bit stream") { EdgeOfChaosBitStream() }
+        item("Edge of chaos embodied") { EdgeOfChaos() }
+        item("Binary reservoir") { binaryReservoir }
         // item("Pattern Completion") { allostaticPatternCompletion }
-        item("Object Tracking Reservoir") { objectTrackingSim }
+        item("Object tracking reservoir") { objectTrackingSim }
     }
 
     dir("Behaviorism") {
-        item("Simple Operant") { SimpleOperant() }
-        item("Classical Conditioning") { ClassicalConditioning() }
-        item("Operant Conditioning") { OperantConditioning() }
-        item("Operant With Environment") { operantWithEnvironment }
+        item("Simple operant") { SimpleOperant() }
+        item("Classical conditioning") { ClassicalConditioning() }
+        item("Operant conditioning") { OperantConditioning() }
+        item("Operant with environment") { operantWithEnvironment }
     }
 
-    dir("Cognitive Maps") {
-        item("Agent Trails") { kAgentTrails }
+    dir("Cognitive maps") {
+        item("Agent trails") { kAgentTrails }
         //item("RandomizedPursuer") { RandomizedPursuer() }
         item("Three object recurrent") { cogMap3Objects }
         // item("ModularOscillatoryNetwork") {ModularOscillatoryNetwork()}
         //item("KuramotoOscillators") { KuramotoOscillators() }
     }
 
-    dir("Language Models") {
-        item("Basic Word Embeddings") { nlpSimBasic }
-        item("Next-Word Prediction") { srnElmanSentences }
-        item("Tiny Language Model") { tinyLanguageModel }
-        item("Tiny Language Model 2") { tinyLanguageModel2 }
+    dir("Language models") {
+        item("Basic word embeddings") { nlpSimBasic }
+        item("Next-word prediction") { srnElmanSentences }
+        item("Tiny language model") { tinyLanguageModel }
+        item("Tiny language model 2") { tinyLanguageModel2 }
     }
 
     dir("Neuroscience") {
-        item("Spiking Neuron") { spikingNeuron }
-        item("Spike Responders") { spikeResponderSim }
-        item("Spike Responders (Array)") { spikeResponderSimArray }
+        item("Spiking neuron") { spikingNeuron }
+        item("Spike responders") { spikeResponderSim }
+        item("Spike responders (array)") { spikeResponderSimArray }
         item("Cortical areas") { cortexKuramoto }
         // item("Hippocampus") { Hippocampus() }
         // item("Cerebellum") { Cerebellum() }
@@ -95,21 +95,21 @@ val simulations = dir("Simulations", alphabetical = true ) {
     dir("Evolution") {
         // item("Evolve Avoider") { evolveAvoider }
         // item("Evolve Thirsty Cows") { evolveCow }
-        item("Evolve Grazing Cows") { grazingCows }
+        item("Evolve grazing cows") { grazingCows }
         // item("Evolve AutoEncoder") { evolveAutoAssociator }
         // item("Evolve Modular (Clune et. al.)") { evolveModularity }
-        item("Evolve Network") { evolveNetwork }
-        item("Evolve Resource Pursuer") { evolveResourcePursuer }
+        item("Evolve network") { evolveNetwork }
+        item("Evolve resource pursuer") { evolveResourcePursuer }
         // item("Evolve Mouse (Sandbox)") { evolveMouse }
         // item("Evolve XOR") { evolveXor }
         item("Evolve XOR") { evolveXor }
     }
 
     dir("Competitive") {
-        item("Competitive Network (Simple)") { competitiveSim }
-        item("Competitive Grid Network") { competitiveGridSim }
-        item("Competitive Image Network") { competitiveImageSim }
-        item("SOM Network") { SOMSim }
+        item("Competitive network (simple)") { competitiveSim }
+        item("Competitive grid network") { competitiveGridSim }
+        item("Competitive image network") { competitiveImageSim }
+        item("SOM network") { SOMSim }
     }
 
     dir("Leabra") {
@@ -119,20 +119,20 @@ val simulations = dir("Simulations", alphabetical = true ) {
     dir("Hopfield and Boltzmann") {
         item("Discrete Hopfield") { discreteHopfieldSim }
         item("Continuous Hopfield") { hopfieldSimContinuous }
-        item("Restricted Boltzmann Machine") { rbmSim }
-        item("Room Schema") { roomSchemaSim }
+        item("Restricted Boltzmann machine") { rbmSim }
+        item("Room schema") { roomSchemaSim }
     }
 
-    dir("Machine Learning") {
-        item("Iris Classifier") { irisClassifier }
+    dir("Machine learning") {
+        item("Iris classifier") { irisClassifier }
     }
 
 
     dir("Projection") {
-        item("PCA Projection") { projectionSim }
+        item("PCA projection") { projectionSim }
     }
 
-    dir("Recurrent Networks") {
+    dir("Recurrent networks") {
         item("Basic recurrent net") { recurrentProjection }
     }
 
@@ -143,15 +143,15 @@ val simulations = dir("Simulations", alphabetical = true ) {
     //     item("LSTM") { lstmBlock() }
     // }
 
-    dir("Image World") {
+    dir("Image world") {
         item("Simple drawings (10 x 10)") { simpleImageWorld }
         item("Photo album (100 x 100)") { photoAlbumExample }
     }
 
     dir("Temp") {
-        item("Spivey Net") { spiveyNet }
-        item("Activation Sequence (2 layers)") { activationSequenceTwoLayer }
-        item("Activation Sequence (3 layers)") { activationSequenceThreeLayer }
+        item("Spivey net") { spiveyNet }
+        item("Activation sequence (2 layers)") { activationSequenceTwoLayer }
+        item("Activation sequence (3 layers)") { activationSequenceThreeLayer }
     }
 
     //dir("Testing") {

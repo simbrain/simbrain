@@ -61,7 +61,7 @@ class WorkspaceActions {
 
     val newNetworkAction = createComponentFactoryAction("Network", "menu_icons/Network.png", CmdOrCtrl + 'N')
     val newConsoleAction = createComponentFactoryAction("Console", "menu_icons/Terminal2.png")
-    val newDocViewerAction = createComponentFactoryAction("Document Viewer", "menu_icons/Copy.png")
+    val newDocViewerAction = createComponentFactoryAction("Document viewer", "menu_icons/Copy.png")
 
     val toggleBottomDock = createAction(
         name = "Bottom Dock",
@@ -99,7 +99,7 @@ class WorkspaceActions {
 
     val openWorkspaceAction = SimbrainDesktop.desktopPane.createAction(
         iconPath = "menu_icons/Open.png",
-        name = "Open Workspace File (.zip) ...",
+        name = "Open workspace file (.zip) ...",
         description = "Open a workspace file from .zip",
         coroutineScope = workspace
     ) {
@@ -185,7 +185,7 @@ class WorkspaceActions {
 
     val showUpdaterDialog = SimbrainDesktop.desktopPane.createAction(
         iconPath = "menu_icons/Sequence.png",
-        name = "Edit Update Sequence...",
+        name = "Edit update sequence...",
         description = "Edit workspace update actions",
         coroutineScope = workspace
     ) {
@@ -229,20 +229,20 @@ class WorkspaceActions {
     }
 
     val plotActions = listOf(
-        createComponentFactoryAction("Bar Chart", "menu_icons/BarChart.png"),
+        createComponentFactoryAction("Bar chart", "menu_icons/BarChart.png"),
         createComponentFactoryAction("Histogram", "menu_icons/BarChart.png"),
-        createComponentFactoryAction("Pie Chart", "menu_icons/PieChart.png"),
-        createComponentFactoryAction("Pixel Plot", "menu_icons/grid.png"),
-        createComponentFactoryAction("Projection Plot", "menu_icons/ProjectionIcon.png"),
-        createComponentFactoryAction("Raster Plot", "menu_icons/ScatterIcon.png"),
-        createComponentFactoryAction("Time Series", "menu_icons/TimeSeries.png")
+        createComponentFactoryAction("Pie chart", "menu_icons/PieChart.png"),
+        createComponentFactoryAction("Pixel plot", "menu_icons/grid.png"),
+        createComponentFactoryAction("Projection plot", "menu_icons/ProjectionIcon.png"),
+        createComponentFactoryAction("Raster plot", "menu_icons/ScatterIcon.png"),
+        createComponentFactoryAction("Time series", "menu_icons/TimeSeries.png")
     )
     val newWorldActions = listOf(
-        createComponentFactoryAction("Data Table", "menu_icons/Table.png"),
-        createComponentFactoryAction("Odor World", "menu_icons/SwissIcon.png"),
-        createComponentFactoryAction("Image World", "menu_icons/photo.png"),
-        createComponentFactoryAction("Text World", "menu_icons/Text.png"),
-        createComponentFactoryAction("Sound World", "menu_icons/speaker.png")
+        createComponentFactoryAction("Data table", "menu_icons/Table.png"),
+        createComponentFactoryAction("Odor world", "menu_icons/SwissIcon.png"),
+        createComponentFactoryAction("Image world", "menu_icons/photo.png"),
+        createComponentFactoryAction("Text world", "menu_icons/Text.png"),
+        createComponentFactoryAction("Sound world", "menu_icons/speaker.png")
     )
 
     fun <T: WorkspaceComponent> createImportAction(desktopComponent: DesktopComponent<T>) = desktopComponent.createAction(

@@ -39,6 +39,45 @@ class SOMTest {
     }
 
     @Test
+    fun `test som network copy`() {
+        // Set up original network
+        som.trainer.learningRate = 0.1
+        val testInput = doubleArrayOf(0.5, 0.7)
+        with(net) {
+            som.inputLayer.activationArray = testInput
+            som.trainOnCurrentPattern()
+        }
+
+        // Create copy and verify structure
+        val copy = som.copy()
+        assertEquals(som.som.size, copy.som.size, "SOM layer size should match")
+        assertEquals(som.inputLayer.size, copy.inputLayer.size, "Input layer size should match")
+        assertEquals(som.modelList.get<SynapseGroup>().size, copy.modelList.get<SynapseGroup>().size,
+            "Should have same number of synapse groups")
+
+        // Verify properties
+        assertEquals(som.trainer.learningRate, copy.trainer.learningRate, "Learning rate should be copied")
+
+        // Test behavior
+        with(net) {
+            // Test original
+            som.inputLayer.activationArray = testInput
+            som.update()
+            val originalActivations = som.som.activationArray
+
+            // Test copy
+            copy.inputLayer.activationArray = testInput
+            copy.update()
+            val copyActivations = copy.som.activationArray
+
+            // Compare activations
+            originalActivations.zip(copyActivations).forEach { (orig, copied) ->
+                assertEquals(orig, copied, 0.0001, "Neuron activations should match")
+            }
+        }
+    }
+
+    @Test
     fun `test SOM serialization`() {
         val xmlRep = getNetworkXStream().toXML(net)
         val fromXml = getNetworkXStream().fromXML(xmlRep) as Network

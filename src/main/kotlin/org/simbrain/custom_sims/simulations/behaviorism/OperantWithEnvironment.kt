@@ -62,20 +62,20 @@ val operantWithEnvironment = newSim {
         isUseCameraCentering = false
     }
 
-    val mouse = odorWorld.addEntity(120, 245, EntityType.MOUSE).apply {
+    val mouse = odorWorld.addEntity(120, 245, EntityType.Mouse).apply {
         heading = 90.0
     }
 
-    val cheese = odorWorld.addEntity(27, 50, EntityType.CANDLE)
-    val flower = odorWorld.addEntity(79, 50, EntityType.PANSY)
-    val fish = odorWorld.addEntity(125, 50, EntityType.FISH)
+    val cheese = odorWorld.addEntity(27, 50, EntityType.Candle)
+    val flower = odorWorld.addEntity(79, 50, EntityType.Pansy)
+    val fish = odorWorld.addEntity(125, 50, EntityType.Fish)
     odorWorld.addEntity(cheese)
     odorWorld.addEntity(flower)
     odorWorld.addEntity(fish)
 
-    val cheeseSensor = mouse.addObjectSensor(EntityType.SWISS, 50.0, 0.0, 65.0)
-    val flowerSensor = mouse.addObjectSensor(EntityType.PANSY, 50.0, 0.0, 65.0)
-    val fishSensor = mouse.addObjectSensor(EntityType.FISH, 50.0, 0.0, 65.0)
+    val cheeseSensor = mouse.addObjectSensor(EntityType.Swiss, 50.0, 0.0, 65.0)
+    val flowerSensor = mouse.addObjectSensor(EntityType.Pansy, 50.0, 0.0, 65.0)
+    val fishSensor = mouse.addObjectSensor(EntityType.Fish, 50.0, 0.0, 65.0)
 
 
     fun updateBehaviorNetNeuronLabels() {

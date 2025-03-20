@@ -24,7 +24,6 @@ import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.network.trainers.SupervisedTrainer.*
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.CopyableObject
-import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.rowVectorTransposed
 import smile.math.matrix.Matrix
@@ -34,7 +33,7 @@ import kotlin.random.Random
 /**
  * Editable config object for supervised trainer.
  */
-open class SupervisedTrainerConfig: EditableObject {
+open class SupervisedTrainerConfig: CopyableObject {
 
     @UserParameter(label = "Loss Function", order = 10)
     var lossFunction = BackpropLossFunction.SSE
@@ -67,6 +66,15 @@ open class SupervisedTrainerConfig: EditableObject {
     )
 
     var learningRate by optimizer::learningRate
+
+    override fun copy() = SupervisedTrainerConfig().also {
+        it.lossFunction = lossFunction
+        it.optimizer = optimizer.copy()
+        it.updateType = updateType.copy()
+        it.weightInitializationStrategy = weightInitializationStrategy.copy()
+        it.stoppingCondition = stoppingCondition.copy()
+        it.testConfiguration = testConfiguration.copy()
+    }
 }
 
 /**
@@ -245,6 +253,8 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork>(val network: Network, va
          * Given the temporal nature of the rule, only Epoch should be used with SRN
          */
         fun srnTypeList() = listOf(Epoch::class.java)
+
+        abstract override fun copy(): UpdateMethod
     }
 
     class StoppingCondition: CopyableObject {
@@ -262,7 +272,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork>(val network: Network, va
             conditionallyEnabledBy = StoppingCondition::useErrorThreshold
         )
 
-        override fun copy(): CopyableObject {
+        override fun copy(): StoppingCondition {
             return StoppingCondition().also {
                 it.maxIterations = maxIterations
                 it.useErrorThreshold = useErrorThreshold
@@ -287,7 +297,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork>(val network: Network, va
             conditionallyEnabledBy = TestConfiguration::enabled
         )
 
-        override fun copy(): CopyableObject {
+        override fun copy(): TestConfiguration {
             return TestConfiguration().also {
                 it.enabled = enabled
                 it.testFrequency = testFrequency

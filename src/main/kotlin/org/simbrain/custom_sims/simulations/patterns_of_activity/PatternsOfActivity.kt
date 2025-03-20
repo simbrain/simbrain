@@ -131,37 +131,37 @@ class PatternsOfActivity : Simulation {
         oc.world.isObjectsBlockMovement = false
         oc.world.isUseCameraCentering = false
         oc.world.tileMap = loadTileMap("empty.tmx")
-        val mouse = oc.world.addEntity(120, 245, EntityType.MOUSE)
+        val mouse = oc.world.addEntity(120, 245, EntityType.Mouse)
         mouse.addSensor(SmellSensor("Smell-Right", 36.0, 40.0))
         mouse.addSensor(SmellSensor("Smell-Left", -36.0, 40.0))
         mouse.heading = 90.0
         val cheese = oc.world.addEntity(
-            72, 220, EntityType.SWISS,
+            72, 220, EntityType.Swiss,
             doubleArrayOf(18.0, 0.0, 5.0, 10.0, 5.0)
         )
         cheese.smellSource.dispersion = dispersion.toDouble()
         val flower = oc.world.addEntity(
-            190, 221, EntityType.FLOWER,
+            190, 221, EntityType.Flower,
             doubleArrayOf(3.0, 18.0, 2.0, 5.0, 10.0)
         )
         flower.smellSource.dispersion = dispersion.toDouble()
         val cow = oc.world.addEntity(
-            90, 50, EntityType.COW,
+            90, 50, EntityType.Cow,
             doubleArrayOf(3.0, 7.0, 16.0, 19.0, 0.0)
         )
         cow.smellSource.dispersion = dispersion.toDouble()
         val lion = oc.world.addEntity(
-            300, 54, EntityType.LION,
+            300, 54, EntityType.Lion,
             doubleArrayOf(5.0, 2.0, 13.0, 16.0, 0.0)
         )
         lion.smellSource.dispersion = dispersion.toDouble()
         val susi = oc.world.addEntity(
-            97, 331, EntityType.SUSI,
+            97, 331, EntityType.Susi,
             doubleArrayOf(0.0, 12.0, 15.0, 20.0)
         )
         susi.smellSource.dispersion = dispersion.toDouble()
         val steve = oc.world.addEntity(
-            315, 305, EntityType.STEVE,
+            315, 305, EntityType.Steve,
             doubleArrayOf(12.0, 0.0, 20.0, 15.0)
         )
         steve.smellSource.dispersion = dispersion.toDouble()

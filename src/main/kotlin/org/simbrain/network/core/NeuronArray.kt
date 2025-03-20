@@ -18,7 +18,6 @@ import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
 import smile.math.matrix.Matrix
-import smile.stat.distribution.GaussianDistribution
 
 /**
  * A "neuron array" backed by a Smile Matrix. Stored as a column vector.
@@ -68,6 +67,10 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
 
     @UserParameter(label = "Labels", description = "Labels for each neuron", order = 2)
     var labelArray: Array<String> = Array(inputSize) { "" }
+        set(value) {
+            value.copyInto(field)
+            events.visualPropertiesChanged.fire()
+        }
 
     @get:Producible
     @UserParameter("Bias Array", "Biases", order = 3)
@@ -164,15 +167,19 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
      */
     fun copy(): NeuronArray {
         val copy = NeuronArray(size)
-        copy.location = location
-        copy.gridMode = gridMode
-        copy.circleMode = circleMode
-        copy.verticalLayout = verticalLayout
-        copy.activations.copyFrom(activations)
-        copy.biases.copyFrom(biases)
-        copy.updateRule = updateRule
-        copy.dataHolder = dataHolder.copy()
+        copy.copyFrom(this)
         return copy
+    }
+
+    fun copyFrom(other: NeuronArray) {
+        this.location = other.location
+        this.gridMode = other.gridMode
+        this.circleMode = other.circleMode
+        this.verticalLayout = other.verticalLayout
+        this.activations.copyFrom(other.activations)
+        this.biases.copyFrom(other.biases)
+        this.updateRule = other.updateRule
+        this.dataHolder = other.dataHolder.copy()
     }
 
     @get:Producible(arrayDescriptionMethod = "getLabelArray")

@@ -101,6 +101,7 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
         weightMatrix.weights.randomizeSymmetric(randomizer ?: NetworkPreferences.weightRandomizer)
+        weightMatrix.events.updated.fire()
     }
 
     context(Network)
@@ -115,8 +116,15 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
     }
 
     val stateInfoText: String
-        get() = "Energy: " + neuronGroup.neuronList.getEnergy().format(4)
+        get() = "Energy: " + getEnergy()
 
+    fun getEnergy(): Double {
+        // Todo: factor in input. - Input vector component-mult activations
+        return neuronGroup.activations.transpose()
+            .mm(weightMatrix.weights)
+            .mm(neuronGroup.activations)
+            .mul(-.5)[0]
+    }
     fun updateStateInfoText() {
         customInfo.text = stateInfoText
         events.customInfoUpdated.fire()
@@ -148,6 +156,31 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
         val neuronGroupBound = neuronGroup.neuronList.bound
         offsetNetworkModel(neuronGroup,
             customInfo, Direction.NORTH, 40.0, neuronGroupBound.height, neuronGroupBound.width, 24.0, 0.0)
+    }
+
+    override fun copy(): Hopfield {
+        val copy = Hopfield()
+
+        // Copy neuron group and its properties
+        copy.neuronGroup = neuronGroup.copy()
+        copy.addModel(copy.neuronGroup)
+
+        // Copy weight matrix
+        copy.weightMatrix = WeightMatrix(copy.neuronGroup, copy.neuronGroup)
+        copy.weightMatrix.label = weightMatrix.label
+        copy.weightMatrix.setMatrixValues(weightMatrix.weights.clone())
+        copy.addModel(copy.weightMatrix)
+
+        // Copy other properties
+        copy.updateFunc = updateFunc
+        copy.learningRate = learningRate
+        copy.inputData = inputData.clone()
+
+        // Copy custom info
+        copy.customInfo = InfoText(stateInfoText)
+        copy.reapplyOffsets()
+
+        return copy
     }
 
     /**

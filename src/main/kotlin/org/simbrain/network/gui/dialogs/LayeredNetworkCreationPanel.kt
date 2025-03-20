@@ -19,6 +19,7 @@
 package org.simbrain.network.gui.dialogs
 
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.network.gui.addSubnetworkAction
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.subnetworks.FeedForward
 import org.simbrain.network.updaterules.LinearRule
@@ -135,13 +136,7 @@ class LayeredNetworkCreationPanel(
             net.layerList[j].updateRule = layerList[net.layerList.size - 1 - j].neuronType!!
         }
 
-        // Add the new network
-        panel.network.addNetworkModel(net)
-        panel.repaint()
-        panel.undoManager.addUndoableAction(
-            undo = { net.delete() },
-            redo = { panel.network.addNetworkModel(net, usePlacementManager = false, useAutoAssignedId = false)?.await() }
-        )
+        addSubnetworkAction(networkPanel = panel) { net }
     }
 
     /**

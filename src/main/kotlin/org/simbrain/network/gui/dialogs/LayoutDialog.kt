@@ -44,6 +44,7 @@ class LayoutDialog(
         layoutEditor.layout.layoutNeurons(neurons)
         networkPanel.repaint()
         networkPanel.undoManager.addUndoableAction(
+            description = "Layout neurons with ${layoutEditor.layout}",
             undo = { neurons.zip(locations).forEach{(n,l) -> n.location = l} },
             redo = {
                 layoutEditor.layout.setInitialLocation(neurons.centerLocation)

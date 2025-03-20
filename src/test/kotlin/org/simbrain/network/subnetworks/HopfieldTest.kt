@@ -131,6 +131,42 @@ class HopfieldTest {
     }
 
     @Test
+    fun `test hopfield network copy`() {
+        // Train the original network
+        with(net) {
+            hopfield.learningRate = 0.33
+            hopfield.neuronGroup.setActivations(zero)
+            hopfield.trainOnCurrentPattern()
+            hopfield.neuronGroup.setActivations(one)
+            hopfield.trainOnCurrentPattern()
+        }
+
+        // Create a copy and verify properties
+        val copy = hopfield.copy()
+        assertEquals(hopfield.learningRate, copy.learningRate, "Learning rate should be copied")
+        assertEquals(hopfield.updateFunc, copy.updateFunc, "Update function should be copied")
+        assertEquals(0.0, copy.weightMatrix.weights.flatten().sse(hopfield.weightMatrix.weights.flatten()),
+            "Weight matrices should be identical")
+
+        // Test that the copy behaves the same as the original
+        val testPattern = zero
+        with(net) {
+            // Test original
+            hopfield.neuronGroup.setActivations(testPattern)
+            repeat(5) { hopfield.update() }
+            val originalResult = hopfield.neuronGroup.activations.flatten()
+
+            // Test copy
+            copy.neuronGroup.setActivations(testPattern)
+            repeat(5) { copy.update() }
+            val copyResult = copy.neuronGroup.activations.flatten()
+
+            assertEquals(0.0, originalResult.sse(copyResult),
+                "Copied network should produce identical results")
+        }
+    }
+
+    @Test
     fun `test hopfield network serialization`() {
         val xmlRep = getNetworkXStream().toXML(net)
         val fromXml = getNetworkXStream().fromXML(xmlRep) as Network

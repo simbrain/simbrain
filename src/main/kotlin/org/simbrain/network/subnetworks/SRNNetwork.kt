@@ -151,6 +151,37 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
         }
     }
 
+    override fun copy(): SRNNetwork {
+        val copy = SRNNetwork(inputLayer.size, hiddenLayer.size, outputLayer.size)
+
+        // Copy base FeedForward structure
+        copy.layerList.zip(layerList).forEach { (copyLayer, originalLayer) ->
+            copyLayer.copyFrom(originalLayer)
+        }
+        copy.wmList.zip(wmList).forEach { (copyWeightMatrix, originalWeightMatrix) ->
+            copyWeightMatrix.copyFrom(originalWeightMatrix)
+        }
+
+        // Copy context layer
+        copy.contextLayer.copyFrom(contextLayer)
+
+        // Copy context to hidden connections
+        copy.contextToHidden.copyFrom(contextToHidden)
+
+        // Copy training related properties
+        copy.trainingSet = MatrixDataset(
+            inputs = trainingSet.inputs.clone(),
+            targets = trainingSet.targets.clone()
+        )
+        copy.testingSet = MatrixDataset(
+            inputs = testingSet.inputs.clone(),
+            targets = testingSet.targets.clone()
+        )
+        copy.trainerConfig = SRNTrainerConfig().copy()
+
+        return copy
+    }
+
     /**
      * Helper class for creating SRN Networks.
      */

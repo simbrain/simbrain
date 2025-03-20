@@ -3,12 +3,12 @@ package org.simbrain.network.gui.dialogs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
-import kotlinx.coroutines.withContext
 import net.miginfocom.swing.MigLayout
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.network.gui.addSubnetworkAction
 import org.simbrain.network.gui.nodes.subnetworkNodes.BackpropNetworkNode
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.subnetworks.SRNNetwork
@@ -262,7 +262,7 @@ fun NetworkPanel.showSRNCreationDialog(): StandardDialog {
         network.placementManager.lastClickedLocation
     )
     return creator.createEditorDialog {
-        network.addNetworkModel(creator.create())
+        addSubnetworkAction(this@NetworkPanel) { creator.create() }
     }
 
 }

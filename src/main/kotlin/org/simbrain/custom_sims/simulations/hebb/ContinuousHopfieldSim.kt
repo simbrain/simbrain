@@ -4,7 +4,10 @@ import kotlinx.coroutines.awaitAll
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
-import org.simbrain.custom_sims.simulations.hebb.*
+import org.simbrain.custom_sims.simulations.hebb.HopfieldTestConfig
+import org.simbrain.custom_sims.simulations.hebb.createHopfieldTestPane
+import org.simbrain.custom_sims.simulations.hebb.createPatternControlPanel
+import org.simbrain.custom_sims.simulations.hebb.signedHammingDistance
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.learningrules.HebbianRule
 import org.simbrain.network.neurongroups.NeuronGroup
@@ -70,59 +73,28 @@ val hopfieldSimContinuous = newSim {
     initForgettingRate()
 
     withGui {
-        place(networkComponent, 350, 0, 509, 619)
+        place(networkComponent, 223, 0, 509, 619)
 
         createPatternControlPanel(hopfield, true) {
             wm.weights.randomizeSymmetric()
             wm.events.updated.fire()
         }?.apply {
-            //addButton("Learn All Patterns") {
-            //    wm.weights.randomizeSymmetric()
-            //    hopfield.isAllClamped = true
-            //    wm.clamped = false
-            //    (wm.learningRule as HebbianRule).forgettingRate = 0.0
-            //    //(wm.learningRule as HebbianRule).learningRate = (1/numNeurons).toDouble()
-            //    repeat(numTrainIterations) {
-            //        applyCirclePattern(hopfield, true)
-            //        with(network) { wm.update() }
-            //        //wm.weightMatrix.setSpectralRadius(1.0)
-            //
-            //        applySquarePattern(hopfield, true)
-            //        with(network) { wm.update() }
-            //        //wm.weightMatrix.setSpectralRadius(1.0)
-            //
-            //        applyLinePattern(hopfield, "diagonal", true)
-            //        with(network) { wm.update() }
-            //        //wm.weightMatrix.setSpectralRadius(1.0)
-            //
-            //        applyCrossPattern(hopfield, true)
-            //        with(network) { wm.update() }
-            //        //wm.weightMatrix.setSpectralRadius(1.0)
+            //addTextField("Forgetting rate", "" + forgettingRate) {
+            //    it.toDoubleOrNull()?.let { num ->
+            //        forgettingRate = num
             //    }
             //    initForgettingRate()
-            //    initLearningRate()
-            //    // Dump into retrieval mode for easy testing
-            //    hopfield.isAllClamped = false
-            //    wm.clamped = true
             //}
-            addSeparator()
+            addTextField("Training iterations", "" + numTrainIterations) {
+                it.toIntOrNull()?.let { num ->
+                    numTrainIterations = num
+                }
+            }
             addTextField("Learning rate", "" + learningRate) {
                 it.toDoubleOrNull()?.let { num ->
                     learningRate = num
                 }
                 initLearningRate()
-            }
-            addTextField("Forgetting rate", "" + forgettingRate) {
-                it.toDoubleOrNull()?.let { num ->
-                    forgettingRate = num
-                }
-                initForgettingRate()
-            }
-            addSeparator()
-            addTextField("Training iterations", "" + numTrainIterations) {
-                it.toIntOrNull()?.let { num ->
-                    numTrainIterations = num
-                }
             }
             addButton("Train") {
                 // Forces into training mode
@@ -130,28 +102,30 @@ val hopfieldSimContinuous = newSim {
                 wm.clamped = false
                 // Now train
                 workspace.simpleIterate(numTrainIterations)
-            }
-            addButton("Forget") {
-                repeat(numTrainIterations) {
-                    (wm.learningRule as HebbianRule).applyForgetting(wm)
-                }
-            }
-            addSeparator()
-            addButton("Training Mode") {
-                hopfield.isAllClamped = true
-                wm.clamped = false
-            }
-            addButton("Retrieval Mode") {
+                // Go to retrieval mode so user can test
                 hopfield.isAllClamped = false
                 wm.clamped = true
+
             }
-            addSeparator()
-            createHopfieldTestPane(
-                hopfield,
+            //addSeparator()
+            //addButton("Training Mode") {
+            //    hopfield.isAllClamped = true
+            //    wm.clamped = false
+            //}
+            //addButton("Retrieval Mode") {
+            //    hopfield.isAllClamped = false
+            //    wm.clamped = true
+            //}
+            val config = HopfieldTestConfig(
+                workspace = workspace,
+                hopfield = hopfield,
+                weights = wm,
                 applyTraining = {
+                    // Training mode
                     hopfield.isAllClamped = true
                     wm.clamped = false
                     workspace.iterateSuspend(numTrainIterations)
+                    // Testing mode
                     hopfield.isAllClamped = false
                     wm.clamped = true
                 },
@@ -165,8 +139,10 @@ val hopfieldSimContinuous = newSim {
                     hopfield.isAllClamped = false
                     wm.clamped = true
                 },
-                distanceFunction = ::signHammingDistance
+                distanceFunction = ::signedHammingDistance
             )
+            createHopfieldTestPane(config)
+
         }
 
     }

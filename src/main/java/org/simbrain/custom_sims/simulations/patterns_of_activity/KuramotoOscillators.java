@@ -175,19 +175,19 @@ public class KuramotoOscillators extends Simulation {
         oc.getWorld().setTileMap(TMXUtils.loadTileMap("empty.tmx"));
 
         // Mouse
-        mouse = oc.getWorld().addEntity(202, 176, EntityType.MOUSE);
+        mouse = oc.getWorld().addEntity(202, 176, EntityType.Mouse.INSTANCE);
         smellSensor = new SmellSensor("Smell-Center", 0, 0);
         mouse.addSensor(smellSensor);
         mouse.setHeading(90);
 
         // Objects
-        OdorWorldEntity cheese = oc.getWorld().addEntity(55, 306, EntityType.SWISS,
+        OdorWorldEntity cheese = oc.getWorld().addEntity(55, 306, EntityType.Swiss.INSTANCE,
             new double[] {25,0,0});
         cheese.getSmellSource().setDispersion(dispersion);
-        OdorWorldEntity flower = oc.getWorld().addEntity(351, 311, EntityType.FLOWER,
+        OdorWorldEntity flower = oc.getWorld().addEntity(351, 311, EntityType.Flower.INSTANCE,
             new double[] {0,25,0});
         flower.getSmellSource().setDispersion(dispersion);
-        OdorWorldEntity fish = oc.getWorld().addEntity(160, 14, EntityType.FISH,
+        OdorWorldEntity fish = oc.getWorld().addEntity(160, 14, EntityType.Fish.INSTANCE,
             new double[] {0,0,25});
         fish.getSmellSource().setDispersion(dispersion);
     }

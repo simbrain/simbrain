@@ -75,4 +75,28 @@ class BackpropNetwork : FeedForward, SupervisedNetwork {
             it.randomizeBiases()
         }
     }
+
+    override fun copy(): BackpropNetwork {
+        // Create a new instance with same structure
+        val nodesPerLayer = layerList.map { it.size }.toIntArray()
+        val copy = BackpropNetwork(nodesPerLayer)
+
+        // Copy weights from original network
+        for (i in wmList.indices) {
+            copy.wmList[i].copyFrom(wmList[i])
+        }
+
+        // Copy training related properties
+        copy.trainingSet = MatrixDataset(
+            inputs = trainingSet.inputs.clone(),
+            targets = trainingSet.targets.clone()
+        )
+        copy.testingSet = MatrixDataset(
+            inputs = testingSet.inputs.clone(),
+            targets = testingSet.targets.clone()
+        )
+        copy.trainerConfig = SupervisedTrainerConfig().copy()
+
+        return copy
+    }
 }

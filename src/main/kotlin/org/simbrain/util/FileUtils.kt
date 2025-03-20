@@ -1,7 +1,6 @@
 package org.simbrain.util
 
 import com.Ostermiller.util.CSVParser
-import org.simbrain.util.Utils.USER_DIR
 import org.simbrain.util.widgets.ProgressWindow
 import java.io.BufferedInputStream
 import java.io.File
@@ -108,9 +107,6 @@ fun csvToDouble2DArray(csvString: String): Array<DoubleArray> {
 // Helper to get the cache file based on the URL and cache directory
 fun getCacheFile(urlString: String, cacheDir: String): File {
 
-    // Create the cache directory if it doesn't exist
-    File(cacheDir).mkdirs()
-
     val url = URI(urlString).toURL()
 
     val fileName = url.path.substringAfterLast('/')
@@ -138,15 +134,55 @@ fun readFromCache(file: File): String? {
 // Function to save downloaded data to the cache
 fun saveToCache(file: File, data: String) {
     try {
+        file.parentFile.mkdirs() // Create parent directories if they don't exist
         file.writeText(data)
     } catch (e: IOException) {
         showWarningDialog("Failed to save cache: ${e.message}")
     }
 }
 
+/**
+ * Returns a system-appropriate directory for application cache files.
+ * This ensures the application has write permissions regardless of installation location.
+ * 
+ * @param appName The name of the application, used to create an app-specific subfolder
+ * @return A File object representing the cache directory
+ */
+fun getSystemCacheDirectory(appName: String = "Simbrain"): File {
+    val userHome = System.getProperty("user.home")
+    
+    val cacheDir = when {
+        // Windows
+        System.getProperty("os.name").lowercase().contains("win") -> {
+            val localAppData = System.getenv("LOCALAPPDATA")
+            if (localAppData != null) {
+                File(localAppData, appName)
+            } else {
+                File(userHome, "AppData/Local/$appName")
+            }
+        }
+        // macOS
+        System.getProperty("os.name").lowercase().contains("mac") -> {
+            File(userHome, "Library/Caches/$appName")
+        }
+        // Linux and others
+        else -> {
+            File(userHome, ".cache/$appName")
+        }
+    }
+    
+    // Create the directory if it doesn't exist
+    if (!cacheDir.exists()) {
+        cacheDir.mkdirs()
+    }
+    
+    return cacheDir
+}
+
 // Function to handle fetching data with caching
 fun fetchDataWithCache(urlString: String): String? {
-    val cacheFile = getCacheFile(urlString, USER_DIR / ".cache")
+    val cacheDir = getSystemCacheDirectory().absolutePath
+    val cacheFile = getCacheFile(urlString, cacheDir)
 
     // Check if cached file exists and is valid
     if (cacheFile.exists() && isCacheValid(cacheFile)) {

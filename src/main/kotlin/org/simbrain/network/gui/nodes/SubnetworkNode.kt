@@ -28,7 +28,9 @@ import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.trainers.UnsupervisedNetwork
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.Outline
-import javax.swing.*
+import javax.swing.JComponent
+import javax.swing.JOptionPane
+import javax.swing.JPopupMenu
 
 /**
  * PNode representation of a subnetwork. This class contains an interaction box
@@ -213,11 +215,7 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
     }
 
     fun setInfoTextNode(infoTextNode: ScreenElement) {
-        val offset = subnetwork.location
-        val infoTextInitLocation = (infoTextNode.model as LocatableModel).location
-        val finalLocation = infoTextInitLocation.plus(offset)
         this.infoTextNode = infoTextNode
-        (infoTextNode.model as LocatableModel).setLocation(finalLocation.x, finalLocation.y)
         subnetwork.events.customInfoUpdated.on(swingDispatcher) { this.updateOutline() }
         updateOutline()
     }

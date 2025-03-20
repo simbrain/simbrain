@@ -60,8 +60,8 @@ class WorkspaceActions {
     val workspace = SimbrainDesktop.workspace
 
     val newNetworkAction = createComponentFactoryAction("Network", "menu_icons/Network.png", CmdOrCtrl + 'N')
-    val newConsoleAction = createComponentFactoryAction("Console", "menu_icons/Terminal2.png")
-    val newDocViewerAction = createComponentFactoryAction("Document viewer", "menu_icons/Copy.png")
+    val newConsoleAction = createComponentFactoryAction("Console", "menu_icons/Terminal.png")
+    val newDocViewerAction = createComponentFactoryAction("Document Viewer", "menu_icons/Copy.png")
 
     val toggleBottomDock = createAction(
         name = "Bottom Dock",

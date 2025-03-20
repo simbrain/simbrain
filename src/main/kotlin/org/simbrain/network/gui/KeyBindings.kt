@@ -14,10 +14,9 @@ import java.awt.event.KeyEvent.*
 fun NetworkPanel.addKeyBindings() {
 
     bind(VK_UP) { incrementSelectedObjects() }
+    bind(VK_RIGHT) {incrementSelectedObjects() }
     bind(VK_DOWN) { decrementSelectedObjects() }
-    bind(VK_LEFT) {
-        
-    }
+    bind(VK_LEFT) { decrementSelectedObjects() }
     bind(Shift + VK_UP) { nudge(0, -1) }
     bind(Shift + VK_DOWN) { nudge(0, 1) }
     bind(Shift + VK_LEFT) { nudge(-1, 0) }
@@ -42,9 +41,6 @@ fun NetworkPanel.addKeyBindings() {
     }
     bind(Ctrl + 'P') {showPiccoloDebugger()}
     bind("S") { selectNeuronsInNeuronGroups() }
-    bind(CmdOrCtrl + 'Y') { undoManager.redo() }
-    bind(CmdOrCtrl + 'Z') { undoManager.undo() }
-    bind(CmdOrCtrl + Shift + 'Z') { undoManager.redo() }
 
     bind(Alt + 'R') {
         selectionManager.selectedModels.forEach {

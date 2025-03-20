@@ -15,9 +15,15 @@ import javax.swing.JPopupMenu
 val NetworkPanel.editMenu
     get() = JMenu("Edit").apply {
         with(networkActions) {
+            add(undoAction())
+            add(redoAction())
+            add(undoHistoryAction())
+            addSeparator()
             add(cutAction)
             add(copyAction)
             add(pasteAction)
+            add(duplicateAction)
+            addSeparator()
             add(deleteAction)
             addSeparator()
             add(clearSourceNeurons)
@@ -85,6 +91,7 @@ val NetworkPanel.actionMenu
             add(decayWeightsAction)
             add(pruneWeightsAction)
             add(randomizePolarityAction)
+            add(exportSimbrainWebFormatAction)
         }
     }
 
@@ -188,6 +195,8 @@ fun NetworkPanel.createNeuronContextMenu() = with(networkActions) {
         add(cutAction)
         add(copyAction)
         add(pasteAction)
+        add(duplicateAction)
+        addSeparator()
         add(deleteAction)
         addSeparator()
         add(clearSourceNeurons)
@@ -232,6 +241,7 @@ val NetworkPanel.synapseContextMenu
             add(cutAction)
             add(copyAction)
             add(pasteAction)
+            add(duplicateAction)
             addSeparator()
             add(deleteAction)
             if (selectedSynapses.isNotEmpty()) {

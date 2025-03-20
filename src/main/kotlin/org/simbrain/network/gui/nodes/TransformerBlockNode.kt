@@ -267,10 +267,11 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
             contextMenu.add(networkPanel.networkActions.cutAction)
             contextMenu.add(networkPanel.networkActions.copyAction)
             contextMenu.add(networkPanel.networkActions.pasteAction)
+            contextMenu.add(networkPanel.networkActions.duplicateAction)
             contextMenu.addSeparator()
             val editArray: Action = object : AbstractAction("Edit...") {
                 override fun actionPerformed(event: ActionEvent) {
-                    propertyDialog?.display()
+                    propertyDialog.display()
                 }
             }
             contextMenu.add(editArray)

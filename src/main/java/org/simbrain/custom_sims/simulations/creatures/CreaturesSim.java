@@ -80,7 +80,7 @@ package org.simbrain.custom_sims.simulations.creatures;
 //
 //     private void setUpNPC() {
 //         // Create a 'non-player character' that talks randomly
-//         npc = oc.getWorld().addEntity(350, 250, EntityType.COW);
+//         npc = oc.getWorld().addEntity(350, 250, EntityType.Cow);
 //         npc.setName("Cow");
 //         npc.setSmellSource(new SmellSource(new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 5.0}));
 //
@@ -111,32 +111,32 @@ package org.simbrain.custom_sims.simulations.creatures;
 //         // TODO: May be able to remove smell sources below since we are new using object sensors
 //
 //         // Create static odor world entities
-//         toy = oc.getWorld().addEntity(395, 590, EntityType.BELL);
+//         toy = oc.getWorld().addEntity(395, 590, EntityType.Bell);
 //         toy.setName("Bell");
 //         toy.setId("Toy");
 //         toy.setSmellSource(new SmellSource(new double[]{5, 0, 0, 0, 0, 0, 0}));
 //
-//         fish = oc.getWorld().addEntity(140, 165, EntityType.FISH);
+//         fish = oc.getWorld().addEntity(140, 165, EntityType.Fish);
 //         fish.setName("Fish");
 //         fish.setId("Fish");
 //         fish.setSmellSource(new SmellSource(new double[]{0, 5, 0, 0, 0, 0, 0}));
 //
-//         cheese = oc.getWorld().addEntity(200, 200, EntityType.SWISS);
+//         cheese = oc.getWorld().addEntity(200, 200, EntityType.Swiss);
 //         cheese.setName("Swiss");
 //         cheese.setId("Cheese");
 //         cheese.setSmellSource(new SmellSource(new double[]{0, 0, 5, 0, 0, 0, 0}));
 //
-//         poison = oc.getWorld().addEntity(320, 20, EntityType.POISON);
+//         poison = oc.getWorld().addEntity(320, 20, EntityType.Poison);
 //         poison.setName("Poison");
 //         poison.setId("Poison");
 //         poison.setSmellSource(new SmellSource(new double[]{0, 0, 0, 5, 0, 0, 0}));
 //
-//         hazard = oc.getWorld().addEntity(25, 200, EntityType.CANDLE);
+//         hazard = oc.getWorld().addEntity(25, 200, EntityType.Candle);
 //         hazard.setName("Candle");
 //         hazard.setId("Hazard");
 //         hazard.setSmellSource(new SmellSource(new double[]{0, 0, 0, 0, 5, 0, 0}));
 //
-//         flower = oc.getWorld().addEntity(200, 100, EntityType.PANSY);
+//         flower = oc.getWorld().addEntity(200, 100, EntityType.Pansy);
 //         flower.setName("Pansy");
 //         flower.setId("Flower");
 //         flower.setSmellSource(new SmellSource(new double[]{0, 0, 0, 0, 0, 5, 0}));
@@ -191,7 +191,7 @@ package org.simbrain.custom_sims.simulations.creatures;
 //         // net.getNetworkPanel().setAutoZoomMode(false);
 //         // net.getNetworkPanel().zoomToFitPage(true);
 //
-//         OdorWorldEntity agent = oc.getWorld().addEntity(250, 250, EntityType.MOUSE);
+//         OdorWorldEntity agent = oc.getWorld().addEntity(250, 250, EntityType.Mouse);
 //         Creature creature = new Creature(this, name, net, agent);
 //         creatureList.add(creature);
 //

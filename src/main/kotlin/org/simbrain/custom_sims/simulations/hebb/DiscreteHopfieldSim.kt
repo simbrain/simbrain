@@ -3,7 +3,9 @@ package org.simbrain.custom_sims.simulations
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
-import org.simbrain.custom_sims.simulations.hebb.*
+import org.simbrain.custom_sims.simulations.hebb.HopfieldTestConfig
+import org.simbrain.custom_sims.simulations.hebb.createHopfieldTestPane
+import org.simbrain.custom_sims.simulations.hebb.createPatternControlPanel
 import org.simbrain.network.subnetworks.Hopfield
 import org.simbrain.util.place
 import org.simbrain.util.showNumericInputDialog
@@ -56,9 +58,8 @@ val discreteHopfieldSim = newSim {
         """.trimIndent()
     )
 
-
     withGui {
-        place(networkComponent, 350, 0, 509, 619)
+        place(networkComponent, 249, 0, 509, 619)
 
         var numTrainIterations = 1
 
@@ -70,27 +71,13 @@ val discreteHopfieldSim = newSim {
                     numTrainIterations = num
                 }
             }
-            //addButton("Train On All Patterns") {
-            //    with(network) {
-            //        repeat(numTrainIterations) {
-            //            applyCirclePattern(hopfield.neuronGroup)
-            //            hopfield.trainOnCurrentPattern()
-            //            applySquarePattern(hopfield.neuronGroup)
-            //            hopfield.trainOnCurrentPattern()
-            //            applyLinePattern(hopfield.neuronGroup, "diagonal")
-            //            hopfield.trainOnCurrentPattern()
-            //            applyCrossPattern(hopfield.neuronGroup)
-            //            hopfield.trainOnCurrentPattern()
-            //        }
-            //    }
-            //}
-            //addSeparator()
             addButton("Train on current pattern") {
                 with(network) { hopfield.trainOnCurrentPattern() }
             }
-            addSeparator()
-            createHopfieldTestPane(
+            val config = HopfieldTestConfig(
+                workspace = workspace,
                 hopfield = hopfield.neuronGroup,
+                weights = hopfield.weightMatrix,
                 applyTraining = { with(network) { hopfield.trainOnCurrentPattern()} },
                 applyLearningRate = { hopfield.learningRate = it },
                 applyReset = {
@@ -98,6 +85,7 @@ val discreteHopfieldSim = newSim {
                     hopfield.weightMatrix.hardClear()
                 }
             )
+            createHopfieldTestPane(config)
         }
     }
 

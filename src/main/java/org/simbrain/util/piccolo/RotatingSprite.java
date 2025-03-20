@@ -1,16 +1,14 @@
 package org.simbrain.util.piccolo;
 
-import org.simbrain.world.odorworld.entities.RotatingEntityManager;
-
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 
 public class RotatingSprite extends Sprite {
 
-    private ArrayList<Animation> animations = new ArrayList<>();
+    private List<Animation> animations = new ArrayList<>();
 
-    public RotatingSprite(ArrayList<Animation> animations) {
+    public RotatingSprite(List<Animation> animations) {
         super(animations.get(0), new HashSet<>(animations));
         this.animations = animations;
     }
@@ -21,6 +19,9 @@ public class RotatingSprite extends Sprite {
     }
 
     public void updateHeading(double degree) {
-        setCurrentAnimation(RotatingEntityManager.getAnimationByHeading(animations, degree));
+        int degreeApart = 360 / animations.size();
+        degree = Math.floor(degree + degreeApart / 2.0) % 360;
+        int index = (int)(degree / degreeApart);
+        setCurrentAnimation(animations.get(index));
     }
 }

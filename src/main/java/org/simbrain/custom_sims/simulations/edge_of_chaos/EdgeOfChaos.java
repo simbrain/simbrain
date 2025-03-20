@@ -14,7 +14,6 @@ import org.simbrain.network.neurongroups.NeuronGroup;
 import org.simbrain.network.updaterules.BinaryRule;
 import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.util.decayfunctions.StepDecayFunction;
-import org.simbrain.util.stats.ProbabilityDistribution;
 import org.simbrain.util.stats.distributions.NormalDistribution;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.OdorWorldComponent;
@@ -249,17 +248,17 @@ public class EdgeOfChaos extends Simulation {
         oc = sim.addOdorWorld(592, 0, 413, 248, "Two objects");
         oc.getWorld().setObjectsBlockMovement(false);
         oc.getWorld().setUseCameraCentering(false);
-        mouse = oc.getWorld().addEntity(165, 110, EntityType.MOUSE);
+        mouse = oc.getWorld().addEntity(165, 110, EntityType.Mouse.INSTANCE);
         mouse.setHeading(90);
 
         // Set up world
         double dispersion = 65;
-        OdorWorldEntity cheese1 = oc.getWorld().addEntity(40, 40,EntityType.SWISS, new double[] {1, 0, 0, 0, 0, 0});
-        OdorWorldEntity cheese2 = oc.getWorld().addEntity(60, 40,EntityType.GOUDA, new double[] {0, 1, 0, 0, 0, 0});
-        OdorWorldEntity cheese3 = oc.getWorld().addEntity(80, 40, EntityType.BLUECHEESE, new double[] {0, 0, 1, 0, 0, 0});
-        OdorWorldEntity flower1 = oc.getWorld().addEntity(290, 40,EntityType.PANSY, new double[] {0, 0, 0, 0, 0, 1});
-        OdorWorldEntity flower2 = oc.getWorld().addEntity(310, 40,EntityType.FLAX, new double[] {0, 0, 0, 0, 1, 0});
-        OdorWorldEntity flower3 = oc.getWorld().addEntity(330, 40,EntityType.TULIP, new double[] {0, 0, 0, 1, 0, 0});
+        OdorWorldEntity cheese1 = oc.getWorld().addEntity(40, 40,EntityType.Swiss.INSTANCE, new double[] {1, 0, 0, 0, 0, 0});
+        OdorWorldEntity cheese2 = oc.getWorld().addEntity(60, 40,EntityType.Gouda.INSTANCE, new double[] {0, 1, 0, 0, 0, 0});
+        OdorWorldEntity cheese3 = oc.getWorld().addEntity(80, 40, EntityType.BlueCheese.INSTANCE, new double[] {0, 0, 1, 0, 0, 0});
+        OdorWorldEntity flower1 = oc.getWorld().addEntity(290, 40,EntityType.Pansy.INSTANCE, new double[] {0, 0, 0, 0, 0, 1});
+        OdorWorldEntity flower2 = oc.getWorld().addEntity(310, 40,EntityType.Flax.INSTANCE, new double[] {0, 0, 0, 0, 1, 0});
+        OdorWorldEntity flower3 = oc.getWorld().addEntity(330, 40,EntityType.Tulip.INSTANCE, new double[] {0, 0, 0, 1, 0, 0});
         cheese1.getSmellSource().setDispersion(dispersion);
         cheese2.getSmellSource().setDispersion(dispersion);
         cheese3.getSmellSource().setDispersion(dispersion);

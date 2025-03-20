@@ -145,6 +145,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
             contextMenu.add(networkPanel.networkActions.cutAction)
             contextMenu.add(networkPanel.networkActions.copyAction)
             contextMenu.add(networkPanel.networkActions.pasteAction)
+            contextMenu.add(networkPanel.networkActions.duplicateAction)
             contextMenu.addSeparator()
 
             // Edit Submenu

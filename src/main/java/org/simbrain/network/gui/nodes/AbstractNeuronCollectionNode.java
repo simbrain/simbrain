@@ -15,6 +15,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import static org.simbrain.network.core.LocatableModelKt.getCenterLocation;
+import static org.simbrain.network.core.LocatableModelKt.getMinY;
 import static org.simbrain.util.SwingUtilsKt.getSwingDispatcher;
 
 public abstract class AbstractNeuronCollectionNode extends ScreenElement {
@@ -128,8 +130,7 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
 
     public void setCustomInfoNode(ScreenElement customInfo) {
         this.customInfo = customInfo;
-        var bounds = getFullBoundsReference();
-        ((LocatableModel) customInfo.getModel()).setLocation(bounds.getX() + bounds.getWidth() / 2.0, bounds.getY() - 5);
+        updateCustomInfoLocation();
         nc.getEvents().getCustomInfoUpdated().on(getSwingDispatcher(), this::fireUpdateOutline);
         fireUpdateOutline();
     }
@@ -138,12 +139,22 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
         var nodes = new HashSet<ScreenElement>(neuronNodes);
         if (customInfo != null) {
             nodes.add(customInfo);
+            updateCustomInfoLocation();
         }
         outlinedObjects.resetOutlinedNodes(nodes);
     }
 
     private void fireUpdateOutline() {
         nc.getEvents().getShouldUpdateOutline().fire();
+    }
+
+    private void updateCustomInfoLocation() {
+        if (customInfo != null) {
+            var centerLocation = getCenterLocation(getModel().getNeuronList());
+            var minY = getMinY(getModel().getNeuronList());
+
+            ((LocatableModel) customInfo.getModel()).setLocation(centerLocation.getX(), minY - 40);
+        }
     }
 
     public abstract AbstractNeuronCollection getModel();

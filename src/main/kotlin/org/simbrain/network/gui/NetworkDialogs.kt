@@ -5,7 +5,9 @@ import kotlinx.coroutines.swing.Swing
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.core.*
-import org.simbrain.network.gui.dialogs.*
+import org.simbrain.network.gui.dialogs.PercentExcitatoryPanel
+import org.simbrain.network.gui.dialogs.SynapseAdjustmentPanel
+import org.simbrain.network.gui.dialogs.createTestInputPanel
 import org.simbrain.network.gui.dialogs.neuron.NeuronDialog
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog
 import org.simbrain.network.gui.dialogs.text.TextDialog
@@ -17,12 +19,10 @@ import org.simbrain.util.piccolo.SceneGraphBrowser
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.objectWrapper
 import org.simbrain.util.propertyeditor.wrapperWidget
-import org.simbrain.util.table.*
 import java.awt.Dialog
 import java.awt.Dimension
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
-import java.util.*
 import javax.swing.*
 
 fun NetworkPanel.showTextPropertyDialog(textNodes: Collection<TextNode>) {
@@ -55,6 +55,7 @@ fun NetworkPanel.showNeuronArrayCreationDialog() {
         val neuronArray = it.create()
         network.addNetworkModel(neuronArray)
         undoManager.addUndoableAction(
+            description = "Create neuron array ${neuronArray.id}",
             undo = { neuronArray.delete() },
             redo = { network.addNetworkModel(neuronArray, usePlacementManager = false, useAutoAssignedId = false)?.await() }
         )
@@ -67,6 +68,11 @@ fun NetworkPanel.showActivationSequenceCreationDialog() {
     ActivationSequence.CreationTemplate().createEditorDialog {
         val activationSequence = it.create()
         network.addNetworkModel(activationSequence)
+        undoManager.addUndoableAction(
+            description = "Create activation sequence ${activationSequence.id}",
+            undo = { activationSequence.delete() },
+            redo = { network.addNetworkModel(activationSequence, usePlacementManager = false, useAutoAssignedId = false)?.await() }
+        )
     }.also {
         it.title = "Create Activation Sequence"
     }.display()
@@ -76,6 +82,11 @@ fun NetworkPanel.showTransformerBlockCreationDialog() {
     TransformerBlock.CreationTemplate().createEditorDialog {
         val transformerBlock = it.create()
         network.addNetworkModel(transformerBlock)
+        undoManager.addUndoableAction(
+            description = "Add transformer block ${transformerBlock.id}",
+            undo = { transformerBlock.delete() },
+            redo = { network.addNetworkModel(transformerBlock, usePlacementManager = false, useAutoAssignedId = false)?.await() }
+        )
     }.also {
         it.title = "Create Transformer Block"
     }.display()
@@ -208,10 +219,29 @@ fun NetworkPanel.showClassifierCreationDialog() {
     val creator = SmileClassifier.ClassifierCreator()
     AnnotatedPropertyEditor(creator).displayInDialog {
         commitChanges()
-        network.addNetworkModel(creator.create(network))
+        addSubnetworkAction(this@NetworkPanel) { creator.create(network) }
     }.also {
         it.title = "Create Classifier"
     }
+}
+
+fun NetworkPanel.showUndoHistoryDialog() {
+    val dialog = JFrame("Undo / Redo History").apply {
+        defaultCloseOperation = JFrame.DISPOSE_ON_CLOSE
+        setSize(400, 300)
+        setLocationRelativeTo(this@showUndoHistoryDialog)
+    }
+
+    val undoList = undoManager.undoStack.map { "Undo: ${it.description}" }
+    val redoList = undoManager.redoStack.map { "Redo: ${it.description}" }
+    val historyText = (undoList + redoList).joinToString("\n")
+
+    val textArea = JTextArea(historyText).apply {
+        isEditable = false
+    }
+
+    dialog.add(JScrollPane(textArea))
+    dialog.isVisible = true
 }
 
 class ConnectionStrategyPanel(connectionStrategy: ConnectionStrategy) : JPanel() {

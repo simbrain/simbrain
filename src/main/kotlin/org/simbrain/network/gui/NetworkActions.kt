@@ -4,21 +4,18 @@ import kotlinx.coroutines.launch
 import org.simbrain.network.connections.*
 import org.simbrain.network.core.*
 import org.simbrain.network.gui.ConditionallyEnabledAction.EnablingCondition
-import org.simbrain.network.gui.dialogs.NetworkPreferences
+import org.simbrain.network.gui.dialogs.*
 import org.simbrain.network.gui.dialogs.NetworkPreferences.excitatoryRandomizer
 import org.simbrain.network.gui.dialogs.NetworkPreferences.inhibitoryRandomizer
 import org.simbrain.network.gui.dialogs.NetworkPreferences.weightRandomizer
-import org.simbrain.network.gui.dialogs.createSynapseAdjustmentPanel
-import org.simbrain.network.gui.dialogs.createTestInputPanel
-import org.simbrain.network.gui.dialogs.LayoutDialog
-import org.simbrain.network.gui.dialogs.network.*
 import org.simbrain.network.gui.dialogs.neuron.AddNeuronsDialog.createAddNeuronsDialog
-import org.simbrain.network.gui.dialogs.showSRNCreationDialog
 import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.neurongroups.BasicNeuronGroupParams
+import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.neurongroups.NeuronGroupParams
 import org.simbrain.network.subnetworks.RestrictedBoltzmannMachine
+import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.util.Alignment
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
@@ -28,12 +25,17 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.SimbrainDesktop
 import java.awt.event.KeyEvent
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 import javax.swing.AbstractAction
 import javax.swing.Action
 import javax.swing.JCheckBoxMenuItem
 import javax.swing.JOptionPane
 
 class NetworkActions(val networkPanel: NetworkPanel) {
+    // For testing purposes only
+    var fileChooserForTesting: SFileChooser? = null
     val addNeuronsAction = networkPanel.createAction(
         name = "Add Neurons...",
         description = "Add a set of neurons to the network",
@@ -132,7 +134,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Delete",
         description = """Delete selected node(s) ("Backspace" or "Delete")""",
         enablingCondition = EnablingCondition.ALLITEMS,
-        iconPath = "menu_icons/DeleteNeuron.png",
+        iconPath = "menu_icons/Delete.png",
         keyboardShortcuts = listOf(KeyCombination(KeyEvent.VK_DELETE), KeyCombination(KeyEvent.VK_BACK_SPACE))
     ) {
         launch { deleteSelectedObjects() }
@@ -151,8 +153,13 @@ class NetworkActions(val networkPanel: NetworkPanel) {
                 network.addNetworkModel(nc)
             }
             undoManager.addUndoableAction(
+                description = "Add neurons to collection",
                 undo = { nc.delete() },
-                redo = { network.addNetworkModel(nc, usePlacementManager = false, useAutoAssignedId = false)?.await() }
+                redo = {
+                    nc.neuronList.clear()
+                    nc.neuronList.addAll(neuronList)
+                    network.addNetworkModel(nc, usePlacementManager = false, useAutoAssignedId = false)?.await()
+                }
             )
         }
     }
@@ -166,6 +173,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         network.addNetworkModel(neuron)
         network.selectModels(listOf(neuron))
         undoManager.addUndoableAction(
+            description = "Add neuron ${neuron.id}",
             undo = { neuron.delete() },
             redo = { network.addNetworkModel(neuron, usePlacementManager = false, useAutoAssignedId = false)?.await() }
         )
@@ -260,7 +268,6 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val setNeuronPropertiesAction = networkPanel.createAction(
         name = "Neuron Properties...",
         description = "Set the properties of selected neurons",
-        iconPath = "menu_icons/Properties.png",
         keyboardShortcut = CmdOrCtrl + 'E',
         initBlock = {
             fun updateAction() {
@@ -291,8 +298,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val setSynapsePropertiesAction get() = networkPanel.createAction(
         name = "Synapse Properties...",
         description = "Set the properties of selected synapses",
-        iconPath = "menu_icons/Properties.png",
-        keyboardShortcut = KeyCombination('E'),
+        keyboardShortcut = CmdOrCtrl + 'E',
         initBlock = {
             fun updateAction() {
                 isEnabled = networkPanel.selectionManager.filterSelectedModels<Synapse>().isNotEmpty()
@@ -403,7 +409,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val panEditModeAction = networkPanel.createAction(
         name = "Pan",
         description = "Pan Mode",
-        iconPath = "menu_icons/Pan.png"
+        iconPath = "menu_icons/Hand.png"
     ) {
         networkPanel.mouseCursor = MouseEventHandler.MouseCursor.Pan
         autoZoom = false
@@ -427,12 +433,88 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             if (it.isNotEmpty()) {
                 val textObject = NetworkTextObject(it)
                 undoManager.addUndoableAction(
+                    description = "Add text object",
                     undo = { textObject.delete() },
                     redo = { network.addNetworkModel(textObject, usePlacementManager = false, useAutoAssignedId = false)?.await() }
                 )
                 network.addNetworkModel(textObject)
             }
         }.display()
+    }
+
+    val exportSimbrainWebFormatAction = networkPanel.createAction(
+        name = "Export Simbrain Web Format",
+        description = "Export Simbrain Web Format",
+        iconPath = "menu_icons/Export.png",
+    ) {
+
+        class NeuronData(val x: Double, val y: Double, val activation: Double)
+        class SynapseData(val sourceIndex: Int, val targetIndex: Int, val strength: Double)
+
+        val neuronIndexMap = network.flatNeuronList.mapIndexed { index, neuron -> neuron to index }.toMap()
+        val neuronData = network.flatNeuronList.map {  neuron ->
+            NeuronData(neuron.x, neuron.y, neuron.activation)
+        }
+        val synapseData = network.flatSynapseList.mapNotNull { synapse ->
+            val sourceIndex = neuronIndexMap[synapse.source]
+            val targetIndex = neuronIndexMap[synapse.target]
+            val strength = synapse.strength
+            if (sourceIndex != null && targetIndex != null) {
+                SynapseData(sourceIndex, targetIndex, strength)
+            } else {
+                null
+            }
+        }
+
+        val json = """
+            {
+                "neurons": [
+                    ${neuronData.joinToString(",\n        ") { """{"x": ${it.x}, "y": ${it.y}, "activation": ${it.activation} }""" }}
+                ],
+                "synapses": [
+                    ${synapseData.joinToString(",\n        ") { """{"sourceIndex": ${it.sourceIndex}, "targetIndex": ${it.targetIndex}, "strength": ${it.strength}}"""} }
+                ]
+            }
+        """.trimIndent()
+
+        // Allow test injection of file chooser
+        val chooser = fileChooserForTesting ?: SFileChooser("", "Simbrain Web Format", "json")
+        val file = chooser.showSaveDialog(File("network.json"))
+        if (file != null) {
+            try {
+                println("[DEBUG_LOG] Attempting to save to file: ${file.absolutePath}")
+                println("[DEBUG_LOG] File canonical path: ${file.canonicalPath}")
+                println("[DEBUG_LOG] Parent directory exists: ${file.parentFile?.exists()}")
+
+                // Ensure parent directories exist
+                file.parentFile?.mkdirs()
+                println("[DEBUG_LOG] Created parent directories")
+                println("[DEBUG_LOG] Parent directory exists after creation: ${file.parentFile?.exists()}")
+
+                FileOutputStream(file).use { stream ->
+                    val bytes = json.toByteArray()
+                    println("[DEBUG_LOG] Writing ${bytes.size} bytes to file")
+                    stream.write(bytes)
+                    stream.flush()
+                    println("[DEBUG_LOG] File written and flushed")
+                }
+                println("[DEBUG_LOG] File exists after write: ${file.exists()}")
+                println("[DEBUG_LOG] File size after write: ${file.length()} bytes")
+            } catch (e: IOException) {
+                println("[DEBUG_LOG] Error saving file: ${e.message}")
+                e.printStackTrace()
+                JOptionPane.showMessageDialog(
+                    networkPanel,
+                    "Error saving file: ${e.message}",
+                    "Save Error",
+                    JOptionPane.ERROR_MESSAGE
+                )
+            }
+        } else {
+            println("[DEBUG_LOG] No file selected for save")
+        }
+
+
     }
 
     val showNetworkUpdaterDialog = networkPanel.createAction(
@@ -578,9 +660,15 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             it.editingObject.create().also { group ->
                 group.applyLayout()
                 network.addNetworkModel(group)
+                val neurons = group.neuronList.toList()
                 undoManager.addUndoableAction(
+                    description = "Add neuron group ${group.id}",
                     undo = { group.delete() },
-                    redo = { network.addNetworkModel(group, usePlacementManager = false, useAutoAssignedId = false)?.await() }
+                    redo = {
+                        group.neuronList.clear()
+                        group.neuronList.addAll(neurons)
+                        network.addNetworkModel(group, usePlacementManager = false, useAutoAssignedId = false)?.await()
+                    }
                 )
             }
         }.apply { title = "Add Neuron Group" }.display()
@@ -606,9 +694,10 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             addSubnetAction("Feed Forward Network") { FeedForwardCreationDialog(networkPanel) },
             addSubnetAction("Hopfield") { HopfieldCreationDialog(networkPanel) },
             addSubnetAction("Restricted Boltzmann Machine") {
-                // TODO: As this pattern is reused add a util to NetworkDialogs.kt
                 RestrictedBoltzmannMachine.RBMCreator().createEditorDialog("Create Restricted Boltzmann Machine") {
-                networkPanel.network.addNetworkModel(it.create()) } },
+                    addSubnetworkAction(networkPanel) { it.create() }
+                }
+            },
             addSubnetAction("SOM Network") { SOMCreationDialog(networkPanel) },
             addSubnetAction("SRN (Simple Recurrent Network)") { networkPanel.showSRNCreationDialog() }
         )
@@ -626,6 +715,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
                 )
                 synapses.addToNetworkAsync(network)
                 undoManager.addUndoableAction(
+                    description = "Connect using ${connectionStrategy.name}",
                     undo = { synapses.forEach { it.delete() } },
                     redo = { synapses.addToNetwork(network, usePlacementManager = false, useAutoAssignId = false) }
                 )
@@ -821,4 +911,69 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         scalingFactor /= 1.1
         autoZoom = false
     }
+
+    fun undoAction() = networkPanel.createAction(
+        "Undo",
+        description = "Undo last action",
+        iconPath = "menu_icons/Undo.png",
+        keyboardShortcut = CmdOrCtrl + 'Z'
+    ) {
+        networkPanel.undoManager.undo()
+    }
+
+    fun redoAction() = networkPanel.createAction(
+        "Redo",
+        description = "Redo last undone action",
+        iconPath = "menu_icons/Redo.png",
+        keyboardShortcuts = listOf(CmdOrCtrl + 'Y', CmdOrCtrl + Shift + 'Z')
+    ) {
+        networkPanel.undoManager.redo()
+    }
+
+    fun undoHistoryAction() = networkPanel.createAction(
+        "Undo history...",
+        description = "Show undo/redo history"
+    ) {
+        networkPanel.showUndoHistoryDialog()
+    }
+
+}
+
+fun addSubnetworkAction(networkPanel: NetworkPanel, block: () -> Subnetwork) {
+    val subnetwork = block()
+    networkPanel.network.addNetworkModel(subnetwork)
+    val models = subnetwork.modelList.all
+    val neuronGroups = models.filterIsInstance<NeuronGroup>()
+    val neuronCollections = models.filterIsInstance<AbstractNeuronCollection>()
+    val synapseGroups = models.filterIsInstance<SynapseGroup>()
+
+    val neuronGroupNeuronsMap = neuronGroups.associateWith { it.neuronList.toList() }
+    val neuronCollectionNeuronsMap = neuronCollections.associateWith { it.neuronList.toList() }
+    val synapseGroupSynapsesMap = synapseGroups.associateWith { it.synapses.toList() }
+
+    networkPanel.undoManager.addUndoableAction(
+        description = "Add subnetwork ${subnetwork.id}",
+        undo = { subnetwork.delete() },
+        redo = {
+
+            neuronGroupNeuronsMap.forEach { (group, neurons) ->
+                group.neuronList.clear()
+                group.neuronList.addAll(neurons)
+            }
+
+            neuronCollectionNeuronsMap.forEach { (collection, neurons) ->
+                collection.neuronList.clear()
+                collection.neuronList.addAll(neurons)
+            }
+
+            synapseGroupSynapsesMap.forEach { (group, synapses) ->
+                group.synapses.clear()
+                group.synapses.addAll(synapses)
+            }
+
+            subnetwork.modelList.addAll(models)
+            networkPanel.network.addNetworkModel(subnetwork, usePlacementManager = false, useAutoAssignedId = false)?.await()
+            subnetwork.afterRestore()
+        }
+    )
 }

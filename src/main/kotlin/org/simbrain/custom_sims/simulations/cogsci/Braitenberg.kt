@@ -9,9 +9,6 @@ import org.simbrain.util.graphicalUpperBound
 import org.simbrain.util.place
 import org.simbrain.world.odorworld.entities.EntityType
 import java.awt.geom.Point2D
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.component3
 import kotlin.math.max
 
 /**
@@ -97,8 +94,8 @@ val braitenbergSim = newSim {
 
     }
 
-    val vehicle1 = Vehicle("Vehicle 1", EntityType.CIRCLE, Point2D.Double(120.0, 245.0))
-    val vehicle2 = Vehicle("Vehicle 2", EntityType.CIRCLE, Point2D.Double(320.0, 245.0))
+    val vehicle1 = Vehicle("Vehicle 1", EntityType.Circle, Point2D.Double(120.0, 245.0))
+    val vehicle2 = Vehicle("Vehicle 2", EntityType.Circle, Point2D.Double(320.0, 245.0))
 
     withGui {
         place(vehicle1.networkComponent, 240, 4, 359, 327)

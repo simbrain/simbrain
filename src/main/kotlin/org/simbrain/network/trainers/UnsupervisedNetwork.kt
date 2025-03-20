@@ -89,4 +89,9 @@ class UnsupervisedTrainer: EditableObject {
             events.progressUpdated.fire("Iteration" to iteration).await()
         }
     }
+
+    fun copyFrom(other: UnsupervisedTrainer) {
+        this.maxIterations = other.maxIterations
+        this.learningRate = other.learningRate
+    }
 }

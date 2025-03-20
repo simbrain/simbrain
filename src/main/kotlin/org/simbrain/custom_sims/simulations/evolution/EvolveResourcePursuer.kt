@@ -372,7 +372,7 @@ val evolveResourcePursuer = newSim { optionString ->
             addLayer(createTileMapLayer("Food Layer"))
         }
 
-        val evolvedAgent = OdorWorldEntity(odorWorld, EntityType.COW).also {
+        val evolvedAgent = OdorWorldEntity(odorWorld, EntityType.Cow).also {
             odorWorld.addEntity(it)
             it.location = point(100, 100)
         }
@@ -388,7 +388,7 @@ val evolveResourcePursuer = newSim { optionString ->
 
         // Central food sensor to determine when food is actually found.
         val centerLakeSensor = TileSensor(foodTileType, radius = 0.0).apply {
-            decayFunction.dispersion = EntityType.LION.imageWidth / 1.4
+            decayFunction.dispersion = EntityType.Lion.width / 1.4
             label = "Center Food Sensor"
         }.also { evolvedAgent.addSensor(it) }
 
@@ -522,7 +522,7 @@ val evolveResourcePursuer = newSim { optionString ->
 
                 val odorWorld = odorWorldComponent.world
 
-                val evolvedAgent = odorWorld.entityList.first { it.entityType == EntityType.COW }
+                val evolvedAgent = odorWorld.entityList.first { it.entityType == EntityType.Cow }
 
                 addActions(workspace, phenotype, evolvedAgent, simState)
 

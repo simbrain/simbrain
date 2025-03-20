@@ -165,7 +165,7 @@ val grazingCows = newSim { optionString ->
             NetworkComponent("Network ${index + 1}").also { workspace.addWorkspaceComponent(it) }.network
         }
         val entities = List(cowGenotypes.size) { i ->
-            OdorWorldEntity(odorWorld, EntityType.COW).also {
+            OdorWorldEntity(odorWorld, EntityType.Cow).also {
                 odorWorld.addEntity(it)
                 it.location = point((i + 1) * 100, (i + 1) * 100)
             }
@@ -173,7 +173,7 @@ val grazingCows = newSim { optionString ->
 
         val dandelionSensors = entities.map { entity ->
             List(3) { index ->
-                ObjectSensor(EntityType.DANDELIONS, radius = 60.0, theta = (index * 120.0)).apply {
+                ObjectSensor(EntityType.Dandelions, radius = 60.0, theta = (index * 120.0)).apply {
                     decayFunction.dispersion = 250.0
                 }.also { entity.addSensor(it) }
             }
@@ -181,7 +181,7 @@ val grazingCows = newSim { optionString ->
 
         val cowSensors = entities.map { entity ->
             List(3) { index ->
-                ObjectSensor(EntityType.COW, radius = 50.0, theta = (index * 120.0)).apply {
+                ObjectSensor(EntityType.Cow, radius = 50.0, theta = (index * 120.0)).apply {
                     decayFunction.dispersion = 200.0
                 }.also { entity.addSensor(it) }
             }
@@ -197,7 +197,7 @@ val grazingCows = newSim { optionString ->
             // Central flower sensor to determine when the flower is actually found.
             entities.forEach{
                 it.addSensor(
-                    ObjectSensor(EntityType.DANDELIONS, radius = 0.0).apply {
+                    ObjectSensor(EntityType.Dandelions, radius = 0.0).apply {
                         label = "centralFlowerSensor"
                         decayFunction = StepDecayFunction()
                         decayFunction.dispersion = 30.0
@@ -207,7 +207,7 @@ val grazingCows = newSim { optionString ->
             repeat(numFlowers) {
                 val loc = odorWorld.getRandomLocation()
                 odorWorld.addEntity(loc.x.toInt(), loc.y.toInt(),
-                    EntityType.DANDELIONS, doubleArrayOf(1.0))
+                    EntityType.Dandelions, doubleArrayOf(1.0))
             }
             workspace.launch {
                 (cowPhenotypes.await() zip entities).forEach { (phenotype, entity) ->
@@ -351,7 +351,7 @@ val grazingCows = newSim { optionString ->
 
                 val world = workspace.componentList.filterIsInstance<OdorWorldComponent>().first().world
                 world.entityList
-                    .filter { e -> e.entityType == EntityType.COW }
+                    .filter { e -> e.entityType == EntityType.Cow }
                     .forEach { addFindFlowerAction(workspace, it) }
             }
         }

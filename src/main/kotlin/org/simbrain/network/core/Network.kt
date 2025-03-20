@@ -70,13 +70,13 @@ class Network: CoroutineScope, EditableObject {
      */
     private val networkModels = NetworkModelList()
 
-    private val _childToParentMap = mutableMapOf<NetworkModel, NetworkModel>()
-
-    val childToParentMap: Map<NetworkModel, NetworkModel> get() = _childToParentMap
-
     /**
-     * The update manager for this network.
+     * Encodes all parent-child relationships between NetworkModels.
+     * For example, each Neuron in a NeuronGroup is mapped to its to parent NeuronGroup
+     * Needed for undo / redo.
      */
+    val childToParentMap = mutableMapOf<NetworkModel, NetworkModel>()
+
     @Transient
     var updateManager = NetworkUpdateManager(this)
 
@@ -337,7 +337,7 @@ class Network: CoroutineScope, EditableObject {
             }
             model.events.deleted.on(wait = true) {
                 networkModels.remove(it)
-                _childToParentMap.remove(it)
+                childToParentMap.remove(it)
                 events.modelRemoved.fire(it).join()
                 updatePriorityList()
             }
@@ -351,25 +351,26 @@ class Network: CoroutineScope, EditableObject {
             }
             when(model) {
                 is AbstractNeuronCollection -> {
-                    model.neuronList.forEach { _childToParentMap[it] = model }
-                    (model as? NeuronGroup)?.let { neuronGroup ->
-                        neuronGroup.neuronList.forEach { n ->
-                            n.events.deleted.on(wait = true) { _childToParentMap.remove(n) }
-                        }
+                    model.neuronList.forEach { childToParentMap[it] = model }
+                    model.neuronList.forEach { n ->
+                        n.events.deleted.on(wait = true) { childToParentMap.remove(n) }
                     }
                 }
                 is SynapseGroup -> {
-                    model.synapses.forEach { _childToParentMap[it] = model }
+                    model.synapses.forEach { childToParentMap[it] = model }
                     model.synapses.forEach { s ->
-                        s.events.deleted.on(wait = true) { _childToParentMap.remove(s) }
+                        s.events.deleted.on(wait = true) { childToParentMap.remove(s) }
                     }
                 }
                 is Subnetwork -> {
-                    model.modelList.all.forEach { _childToParentMap[it] = model }
+                    model.modelList.all.forEach { childToParentMap[it] = model }
+                    model.modelList.all.forEach { m ->
+                        m.events.deleted.on(wait = true) { childToParentMap.remove(m) }
+                    }
                 }
                 is SupervisedModel -> {
-                    model.layers.forEach { _childToParentMap[it] = model }
-                    model.weightMatrices.forEach { _childToParentMap[it] = model }
+                    model.layers.forEach { childToParentMap[it] = model }
+                    model.weightMatrices.forEach { childToParentMap[it] = model }
                 }
             }
             return deferred
@@ -390,22 +391,41 @@ class Network: CoroutineScope, EditableObject {
         }
     }
 
+    /**
+     * Deletes models
+     *
+     * @return list of deleted models for undo /redo
+     */
     suspend fun deleteModels(networkModels: List<NetworkModel>): List<NetworkModel> {
-        fun isLastChildOfParent(model: NetworkModel): Boolean {
+        fun isLastChildOfParent(childToParentMap: Map<NetworkModel, NetworkModel>, model: NetworkModel): Boolean {
             return childToParentMap[model]?.let { parent ->
                 childToParentMap.values.count { it == parent } == 1
             } == true
         }
 
+        // If deleting the last item in a group, delete the group, rather than the item
         return buildList {
-            networkModels.forEach {
-                if (isLastChildOfParent(it)) {
-                    childToParentMap[it]?.let { parent ->
+
+            suspend fun deleteModel(childToParentMap: Map<NetworkModel, NetworkModel>, model: NetworkModel) {
+                if (isLastChildOfParent(childToParentMap, model)) {
+                    childToParentMap[model]?.let { parent ->
                         addAll(parent.delete())
+                        // When undoing the deletion of a neuron collection via the last node, we need to add back
+                        // that last node
+                        if (parent is NeuronCollection) {
+                            addAll(model.delete())
+                        }
                     }
                 } else {
-                    addAll(it.delete())
+                    addAll(model.delete())
                 }
+            }
+
+            networkModels.forEach {
+                if (it is Subnetwork) {
+                    it.modelList.all.forEach { model -> deleteModel(it.childToParentMap, model) }
+                }
+                deleteModel(childToParentMap, it)
             }
         }
     }
@@ -527,7 +547,6 @@ class Network: CoroutineScope, EditableObject {
     fun removeUpdateAction(action: UpdateAction) {
         updateManager.removeAction(action)
     }
-
 
     /**
      * Adds a list of network elements to this network. Used in copy / paste.

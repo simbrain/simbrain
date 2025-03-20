@@ -51,13 +51,13 @@ abstract class Effector : PeripheralAttribute {
         description = "Optional string description associated with this effector",
         order = 2
     )
-    private var label = ""
+    override var label = ""
 
     /**
      * Handle events.
      */
     @Transient
-    private var events = SensorEffectorEvents()
+    override var events = SensorEffectorEvents()
 
     /**
      * Construct an effector.
@@ -82,19 +82,7 @@ abstract class Effector : PeripheralAttribute {
      */
     constructor()
 
-    override fun getLabel(): String {
-        return label
-    }
-
-    override fun setLabel(label: String) {
-        this.label = label
-    }
-
     abstract override fun copy(): Effector
-
-    override fun getEvents(): SensorEffectorEvents {
-        return events
-    }
 
     fun readResolve(): Any {
         events = SensorEffectorEvents()

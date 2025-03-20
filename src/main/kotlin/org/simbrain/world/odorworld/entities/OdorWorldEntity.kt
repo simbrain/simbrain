@@ -23,8 +23,7 @@ import kotlin.math.sin
 
 class OdorWorldEntity @JvmOverloads constructor(
     val world: OdorWorld,
-    @UserParameter(label = "Type", order = 2)
-    var entityType: EntityType = EntityType.SWISS,
+    entityType: EntityType = EntityType.Swiss,
     @Transient
     var events: EntityEvents = EntityEvents(),
 ) : EditableObject, AttributeContainer, Locatable, Rotatable, Movable, WithSize, Bounded, WithDispersion {
@@ -33,6 +32,13 @@ class OdorWorldEntity @JvmOverloads constructor(
 
     @UserParameter(label = "Name", order = 1)
     override var name: String = "null"
+
+    @UserParameter(label = "Type", order = 2)
+    var entityType: EntityType = entityType
+        set(value) {
+            events.typeChanged.fire(field, value)
+            field = value
+        }
 
     @Transient
     private var locationPointDirty = true
@@ -85,8 +91,8 @@ class OdorWorldEntity @JvmOverloads constructor(
             events.moved.fire()
         }
 
-    override val width: Double = entityType.imageWidth
-    override val height: Double = entityType.imageHeight
+    override val width: Double = entityType.width.toDouble()
+    override val height: Double = entityType.height.toDouble()
 
     @UserParameter(label = "Enable Sensors", order = 6)
     var isSensorsEnabled: Boolean = true
@@ -129,7 +135,9 @@ class OdorWorldEntity @JvmOverloads constructor(
     @Transient
     val currentlyHeardPhrases: MutableList<String> = arrayListOf()
 
-    val isRotating get() = entityType.isRotating
+    val isRotating get() = entityType.rotating
+
+    val velocity get() = point(cos(heading.toRadian()) * speed, -sin(heading.toRadian()) * speed)
 
     /**
      * Manages programatic movement (based on couplings to neurons, etc.)
@@ -158,8 +166,7 @@ class OdorWorldEntity @JvmOverloads constructor(
 
         if (speed == 0.0) return
 
-        val dx = cos(heading.toRadian()) * speed
-        val dy = -sin(heading.toRadian()) * speed
+        val (dx, dy) = velocity
 
         val bounds = world.collidableObjects.filter { it !== this }
 
@@ -244,10 +251,10 @@ class OdorWorldEntity @JvmOverloads constructor(
 
     fun addDefaultSensorsEffectors() {
         addDefaultEffectors()
-        addSensor(ObjectSensor(EntityType.SWISS, 50.0, 45.0))
-        addSensor(ObjectSensor(EntityType.SWISS, 0.0, 0.0))
+        addSensor(ObjectSensor(EntityType.Swiss, 50.0, 45.0))
+        addSensor(ObjectSensor(EntityType.Swiss, 0.0, 0.0))
         addSensor(
-            ObjectSensor(EntityType.SWISS, 50.0, -45.0)
+            ObjectSensor(EntityType.Swiss, 50.0, -45.0)
         )
         // TODO: Add more defaults
     }
@@ -374,7 +381,7 @@ class OdorWorldEntity @JvmOverloads constructor(
     @Producible
     @JvmOverloads
     fun getNearbyObjectName(radius: Int = 10): String? {
-        return (world.entityList - this).firstOrNull() {
+        return (world.entityList - this).firstOrNull {
             this.location.distance(it.location) < radius
         }?.entityType?.description
     }

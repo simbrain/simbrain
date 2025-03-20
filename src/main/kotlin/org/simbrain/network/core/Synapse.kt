@@ -299,6 +299,10 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
         target: Neuron,
         templateSynapse: Synapse
     ) : this(source, target) {
+        copyFrom(templateSynapse)
+    }
+
+    fun copyFrom(templateSynapse: Synapse) {
         learningRule = templateSynapse.learningRule.copy()
         forceSetStrength(templateSynapse.strength)
         upperBound = templateSynapse.upperBound
@@ -307,8 +311,6 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
         spikeResponder = templateSynapse.spikeResponder.copy()
         spikeResponderData = templateSynapse.spikeResponderData.copy()
         isEnabled = templateSynapse.isEnabled
-        delay = templateSynapse.delay
-        clamped = templateSynapse.clamped
     }
 
     /**

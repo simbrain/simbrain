@@ -58,7 +58,7 @@ package org.simbrain.custom_sims.simulations
 //
 //             val sensors = chromosome(3) {
 //                 objectSensorGene {
-//                     setObjectType(EntityType.SWISS)
+//                     setObjectType(EntityType.Swiss)
 //                     theta = it * 2 * 60.0
 //                     radius = 32.0
 //                     decayFunction.dispersion = 200.0
@@ -74,11 +74,11 @@ package org.simbrain.custom_sims.simulations
 //                 turningGene { direction = 1.0 }
 //             )
 //
-//             val mouse = odorworld.addEntity(EntityType.MOUSE).apply {
+//             val mouse = odorworld.addEntity(EntityType.Mouse).apply {
 //                 location = point(50.0, 200.0)
 //             }
 //
-//             fun createCheese() = odorworld.addEntity(EntityType.SWISS).apply {
+//             fun createCheese() = odorworld.addEntity(EntityType.Swiss).apply {
 //                 location = point(
 //                     random.nextDouble(100.0, 300.0),
 //                     random.nextDouble(0.0, 300.0)

@@ -179,12 +179,12 @@ class ModularOscillatoryNetwork : Simulation {
         val oc = sim.addOdorWorld(590, 9, 505, 296, "World")
 
         // Mouse
-        mouse = oc.world.addEntity(187, 113, EntityType.MOUSE)
+        mouse = oc.world.addEntity(187, 113, EntityType.Mouse)
 
         // Objects
-        val cheese = oc.world.addEntity(315, 31, EntityType.SWISS)
+        val cheese = oc.world.addEntity(315, 31, EntityType.Swiss)
         worldEntities.add(cheese)
-        val flower = oc.world.addEntity(41, 31, EntityType.FLOWER)
+        val flower = oc.world.addEntity(41, 31, EntityType.Flower)
         flower.smellSource.dispersion = dispersion.toDouble()
         worldEntities.add(flower)
 

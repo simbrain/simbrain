@@ -22,6 +22,8 @@ sealed class WeightInitializationStrategy(val seed: Long? = null): CopyableObjec
         He::class.java,
         LeCun::class.java
     )
+
+    abstract override fun copy(): WeightInitializationStrategy
 }
 
 class Xavier(seed: Long? = null): WeightInitializationStrategy(seed) {
@@ -50,7 +52,7 @@ class Xavier(seed: Long? = null): WeightInitializationStrategy(seed) {
         weightMatrix.randomize(randomizer)
     }
 
-    override fun copy(): CopyableObject {
+    override fun copy(): Xavier {
         return Xavier(seed).also {
             it.distribution = distribution
         }
@@ -83,7 +85,7 @@ class He(seed: Long? = null): WeightInitializationStrategy(seed) {
         weightMatrix.randomize(randomizer)
     }
 
-    override fun copy(): CopyableObject {
+    override fun copy(): He {
         return He(seed).also {
             it.distribution = distribution
         }
@@ -116,7 +118,7 @@ class LeCun(seed: Long? = null): WeightInitializationStrategy(seed) {
         weightMatrix.randomize(randomizer)
     }
 
-    override fun copy(): CopyableObject {
+    override fun copy(): LeCun {
         return LeCun(seed).also {
             it.distribution = distribution
         }
@@ -136,7 +138,7 @@ class Randomize(seed: Long? = null): WeightInitializationStrategy(seed) {
         weightMatrix.randomize(distribution)
     }
 
-    override fun copy(): CopyableObject {
+    override fun copy(): Randomize {
         return Randomize(seed).also {
             it.distribution = distribution.copy()
         }

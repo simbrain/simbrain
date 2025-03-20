@@ -116,7 +116,7 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         priorSelection = networkPanel.selectionManager.selection.toMutableSet()
         startLocations = networkPanel.selectionManager
             .filterSelectedModels<LocatableModel>()
-            .map{ it.location}.toList()
+            .map{ it.location.copy() }.toList()
         marqueeStartPosition = event.position
         marqueeEndPosition = event.position
         selectionMarquee.reset()
@@ -151,10 +151,17 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
             val models = networkPanel.selectionManager
                 .filterSelectedModels<LocatableModel>()
             val startLocations = startLocations.toList()
-            val endLocations = models.map{ it.location}.toList()
+            val endLocations = models.map { it.location }.toList()
             networkPanel.undoManager.addUndoableAction(
-                undo = { models.zip(startLocations).forEach{(m,l) -> m.location = l} },
-                redo = { models.zip(endLocations).forEach{(m,l) -> m.location = l} }
+                description = "Move items",
+                undo = {
+                    models.zip(startLocations).forEach { (m, l) -> m.location = l }
+                    networkPanel.network.events.zoomToFitPage.fire()
+                },
+                redo = {
+                    models.zip(endLocations).forEach { (m, l) -> m.location = l }
+                    networkPanel.network.events.zoomToFitPage.fire()
+                }
             )
             // Reset the anchor point in the placement manager
             val topLeft = networkPanel.selectionManager.filterSelectedModels<LocatableModel>().topLeftLocation
@@ -164,7 +171,7 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
             if (event.pickedNode != null && event.isAltDown) {
                 event.pickedNode.firstScreenElement?.model.let {
                     if (it is LocatableModel) {
-                        pm.offsetMap[it.javaClass.kotlin] = topLeft - (pm.customOffsetAnchor?.location ?: point(0, 0))
+                        pm.customOffset = topLeft - (pm.customOffsetAnchor?.location ?: point(0, 0))
                     }
                 }
             }
@@ -284,7 +291,7 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         }
         object Pan : MouseCursor() {
             override val cursor: Cursor = Toolkit.getDefaultToolkit()
-                    .createCustomCursor(ResourceManager.getImage("menu_icons/Pan.png"), centerPoint, "pan")
+                    .createCustomCursor(ResourceManager.getImage("menu_icons/Hand.png"), centerPoint, "pan")
         }
     }
 }

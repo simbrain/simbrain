@@ -119,4 +119,45 @@ open class FeedForward : Subnetwork {
     }
 
     fun hiddenLayers() = layerList.drop(1).take(layerList.size-2)
+
+    override fun copy(): FeedForward {
+        val copy = FeedForward()
+        copy.betweenLayerInterval = betweenLayerInterval
+
+        // Copy input layer
+        copy.inputLayer = inputLayer.copy()
+        copy.addModel(copy.inputLayer)
+        copy.layerList.add(copy.inputLayer)
+
+        // Memory of last layer created
+        var lastLayer = copy.inputLayer
+
+        // Copy hidden layers and output layer
+        for (i in 1 until layerList.size) {
+            val layer = layerList[i].copy()
+            copy.addModel(layer)
+            copy.layerList.add(layer)
+
+            // Maintain layout
+            offsetNetworkModel(
+                lastLayer,
+                layer,
+                Direction.NORTH,
+                (betweenLayerInterval / 2).toDouble(),
+                100.0,
+                200.0
+            )
+
+            // Copy weight matrix
+            val wm = WeightMatrix(lastLayer, layer)
+            wm.setMatrixValues(wmList[i-1].weights.clone())
+            copy.addModel(wm)
+            copy.wmList.add(wm)
+
+            lastLayer = layer
+        }
+
+        copy.outputLayer = lastLayer
+        return copy
+    }
 }

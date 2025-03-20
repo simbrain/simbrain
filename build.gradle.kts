@@ -9,6 +9,9 @@ import java.time.Duration
  * To build add relevant bracketed command to commit message (see tops of the .yaml files).  E.g "[push macos]"
  *
  * To build all just use all of them: "[push macos][push windows][push linux]"
+ *
+ * By default "[push macos]" builds for both silicon and intel. You can also use "[push macos arm64]" and "[push macos x64]"
+ *
  */
 
 plugins {
@@ -265,7 +268,10 @@ if (OperatingSystem.current().isMacOsX) {
                 "-Duser.dir=\$APPDIR",
                 "--add-opens=java.base/java.util=ALL-UNNAMED",
                 "--add-opens=java.desktop/java.awt=ALL-UNNAMED",
-                "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED"
+                "--add-opens=java.desktop/java.awt.geom=ALL-UNNAMED",
+                "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED",
+                "--add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED",
+                "--add-opens=java.base/java.lang=ALL-UNNAMED"
             ).joinToString(" ")
 
             // Set up the jpackage command and its arguments
@@ -419,7 +425,10 @@ if (OperatingSystem.current().isWindows) {
                 "-Duser.dir=\$APPDIR",
                 "--add-opens=java.base/java.util=ALL-UNNAMED",
                 "--add-opens=java.desktop/java.awt=ALL-UNNAMED",
-                "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED"
+                "--add-opens=java.desktop/java.awt.geom=ALL-UNNAMED",
+                "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED",
+                "--add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED",
+                "--add-opens=java.base/java.lang=ALL-UNNAMED"
             ).joinToString(" ")
 
             // Set up the jpackage command and its arguments
@@ -467,11 +476,16 @@ if (OperatingSystem.current().isWindows) {
                 appPath
             )
         }
+    }
 
+    tasks.register("renameWindowsExecutable") {
+        onlyIf { OperatingSystem.current().isWindows }
+        dependsOn("jpackageWindows")
+        
         doLast {
             val distDir = file(dist)
             val oldFile = File(distDir, "Simbrain-${project.version}.exe")
-            val newFile = File(distDir, "Simbrain${versionName}.exe")
+            val newFile = File(distDir, "Simbrain${versionName}-installer.exe")
 
             if (oldFile.exists()) {
                 val success = oldFile.renameTo(newFile)

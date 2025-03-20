@@ -1,6 +1,5 @@
 package org.simbrain.network.gui
 
-
 import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PCanvas
@@ -75,7 +74,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     /**
      * Associates network models with screen elements
      */
-    private val modelNodeMap = CompletableDeferredHashMap<NetworkModel, ScreenElement>()
+    val modelNodeMap = CompletableDeferredHashMap<NetworkModel, ScreenElement>()
 
     val timeLabel = TimeLabel(this).apply { update() }
 
@@ -126,9 +125,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
      */
     var nudgeAmount = NetworkPreferences.nudgeAmount
 
-    /**
-     * Undo Manager
-     */
     val undoManager = UndoManager()
 
     /**
@@ -277,6 +273,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
      * Add a screen element to the network panel and rezoom the page.
      */
     private inline fun <T : ScreenElement> addScreenElement(block: () -> T) = block().also { node ->
+        modelNodeMap[node.model] = node
         addNodeOrdered(node)
         node.model.events.selected.on {
             if (node is NeuronGroupNode) {
@@ -289,8 +286,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             network.events.batchNodeRemoval.fire(it)
         }
         network.events.zoomToFitPage.fire()
-
-        modelNodeMap[node.model] = node
     }
 
     private suspend fun createNode(model: NetworkModel): ScreenElement {
@@ -349,10 +344,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     suspend fun createNode(classifier: SmileClassifier) = addScreenElement {
         SmileClassifierNode(this, classifier)
     }
-
-    // suspend fun createNode(dn: DeepNet) = addScreenElement {
-    //     DeepNetNode(this, dn)
-    // }
 
     suspend fun createNode(neuronCollection: NeuronCollection) = addScreenElement {
         val neuronNodes = neuronCollection.neuronList.map {
@@ -422,37 +413,16 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
 
         val selectedModels = selectionManager.selection.map { it.model }.sortedBy { updatingOrder(it) }
 
-        val childToParentMap = network.childToParentMap.toMap()
-
+        val undeleteContext = UndeleteContext(this, selectedModels)
 
         val deletedModels = network.deleteModels(selectedModels.reversed())
 
         selectionManager.clear()
 
-        suspend fun reAddToGroup(model: NetworkModel) {
-            when (val parent = childToParentMap[model]) {
-                is AbstractNeuronCollection -> {
-                    (model as? Neuron)?.let { neuron ->
-                        parent.neuronList.add(neuron)
-                        (modelNodeMap.getImmediately<AbstractNeuronCollectionNode>(parent))?.let { ancNode ->
-                            val neuronNode = createNode(neuron)
-                            ancNode.addNeuronNodes(listOf(neuronNode))
-                        }
-                    }
-                }
-                is SynapseGroup -> {
-                    (model as? Synapse)?.let { synapse ->
-                        parent.addSynapse(synapse)
-                    }
-                }
-            }
-        }
-
         undoManager.addUndoableAction(
+            description = "Delete selected objects",
             undo = {
-                deletedModels.forEach { reAddToGroup(it) }
-                network.addNetworkModels(deletedModels.filter { it !in childToParentMap }, usePlacementManager = false, useAutoAssignedId = false).awaitAll()
-                deletedModels.forEach { it.afterRestore() }
+                undeleteContext.restore(deletedModels)
             },
             redo = {
                 network.deleteModels(selectedModels.reversed())
@@ -464,6 +434,9 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
 
     private fun createEditToolBar() = CustomToolBar().apply {
         with(networkActions) {
+            add(undoAction())
+            add(redoAction())
+            addSeparator()
             networkEditingActions.forEach { add(it) }
             addSeparator()
             add(clearNodeActivationsAction)
@@ -493,7 +466,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         if (selectionManager.isNotEmpty) {
             copy()
         }
-
+        network.placementManager.useLastClickedLocation = false
         paste()
     }
 
@@ -645,6 +618,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             val synapses = NetworkPreferences.connectionStrategy.copy().apply { percentExcitatory = 100.0 }.connectNeurons(sourceNeurons, targetNeurons)
             synapses.addToNetworkAsync(network)
             undoManager.addUndoableAction(
+                description = "Connect nodes",
                 undo = { synapses.forEach { it.delete() } },
                 redo = { synapses.addToNetwork(network, usePlacementManager = false, useAutoAssignId = false) }
             )
@@ -667,6 +641,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             }
             network.addNetworkModels(addedMatrices)
             undoManager.addUndoableAction(
+                description = "Connect layers",
                 undo = { addedMatrices.forEach {it.delete()}},
                 redo = {
                     network.addNetworkModels(addedMatrices, usePlacementManager = false, useAutoAssignedId = false)
@@ -689,10 +664,14 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         val tar = filterSelectedModels(AbstractNeuronCollection::class.java)
         if (src.isNotEmpty() && tar.isNotEmpty()) {
             val sg = SynapseGroup(src.first(), tar.first())
+            val synapses = sg.synapses.toList()
             network.addNetworkModel(sg)
             undoManager.addUndoableAction(
+                description = "Connect neuron groups",
                 undo = { sg.delete()},
                 redo = {
+                    sg.synapses.clear()
+                    sg.synapses.addAll(synapses)
                     network.addNetworkModel(sg, usePlacementManager = false, useAutoAssignedId = false)?.await()
                     sg.afterRestore()
                 })
@@ -708,7 +687,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             add(networkActions.zoomInAction())
             add(networkActions.zoomOutAction())
             add(networkActions.resetZoomAction())
-            addSeparator()
             add(JToggleButton().apply {
                 icon = ResourceManager.getSmallIcon("menu_icons/ZoomFitPage.png")
                 fun updateButton() {
@@ -823,6 +801,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
                 override fun mouseWheelRotated(event: PInputEvent) {
                     val swingEvent = (event.sourceSwingEvent as MouseWheelEvent)
                     val newScale = 1.1.pow(swingEvent.preciseWheelRotation)
+                    autoZoom = false
                     scale(1 / newScale)
                 }
             })
@@ -856,6 +835,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             val neurons = network.addNeurons(numNeurons) { updateRule = template.updateRule }
             layout.layoutNeurons(neurons)
             undoManager.addUndoableAction(
+                description = "Add $numNeurons neuron(s)",
                 undo = { neurons.forEach{it.delete()} },
                 redo = { network.addNetworkModels(neurons, usePlacementManager = false, useAutoAssignedId = false).awaitAll() }
             )

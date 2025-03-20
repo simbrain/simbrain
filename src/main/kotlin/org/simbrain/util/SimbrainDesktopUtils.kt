@@ -65,7 +65,7 @@ suspend fun SimulationScope.place(workspaceComponent: WorkspaceComponent, x: Int
     }
 }
 
-class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, true, true), CoroutineScope {
+class   ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, true, true), CoroutineScope {
 
     @Transient
     private var job = SupervisorJob()
@@ -79,76 +79,102 @@ class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, tru
         this@ControlPanelKt.add(BorderLayout.CENTER, this)
     }
 
+    val tabbedPane by lazy {
+        JTabbedPane()
+    }
+
+    fun addTab(tabName: String) {
+        launch(Dispatchers.Swing) {
+            // If tabbedPane is not yet the main component
+            if (centralPanel.components.none { it == tabbedPane }) {
+                centralPanel.remove(mainPanel)
+                // TODO: Make it possible to NOT have a main panel
+                tabbedPane.addTab("Main", mainPanel)
+                centralPanel.add(tabbedPane)
+                centralPanel.revalidate()
+                centralPanel.repaint()
+            }
+            tabbedPane.addTab(tabName, LabelledItemPanel())
+        }
+    }
+
     val mainPanel = LabelledItemPanel().apply {
         centralPanel.add(this)
     }
 
-    fun addComponent(component: JComponent) {
-        launch(Dispatchers.Swing) { mainPanel.addItem(component, 1) }
+    fun getTab(name: String?): LabelledItemPanel = (0 until tabbedPane.tabCount)
+        .firstOrNull { tabbedPane.getTitleAt(it) == name }
+        ?.let { tabbedPane.getComponentAt(it) as? LabelledItemPanel }
+        ?: mainPanel
+    
+    
+
+    fun addComponent(component: JComponent, tab: String? = null) {
+        launch(Dispatchers.Swing) { getTab(tab).addItem(component, 1) }
     }
 
-    fun addSeparator() {
-        launch(Dispatchers.Swing) { mainPanel.addItem(JSeparator(SwingConstants.HORIZONTAL)) }
+    fun addSeparator(tab: String? = null) {
+        launch(Dispatchers.Swing) { getTab(tab).addItem(JSeparator(SwingConstants.HORIZONTAL)) }
     }
 
-    fun addLabelledText(label: String, text: String) = JLabel(text).also {
+    fun addLabelledText(label: String, text: String, tab: String? = null) = JLabel(text).also {
         launch(Dispatchers.Swing) {
-            mainPanel.addItem(label, it)
+            getTab(tab).addItem(label, it)
         }
     }
 
-    fun addButton(label: String, context: CoroutineContext = EmptyCoroutineContext, task: suspend JButton.(ActionEvent) -> Unit) = JButton(label).also { button ->
+    fun addButton(
+        label: String,
+        context: CoroutineContext = EmptyCoroutineContext,
+        tab: String? = null,
+        task: suspend JButton.(ActionEvent) -> Unit
+    ) = JButton(label).also { button ->
         button.addActionListener {
             launch(context) { button.task(it) }
         }
         launch(Dispatchers.Swing) {
-            mainPanel.addItem(button)
+            getTab(tab).addItem(button)
             pack()
         }
     }
 
-    /**
-     * Blocks passed to onChange are applied every time the text field is edited
-     * If an onChange block is provided and the values are converted to numbers, [addFormattedNumericTextField]
-     * should be used instead.
-     */
-    fun addTextField(label: String, initValue: String, onChange: (String) -> Unit = {}) = JTextField(initValue).also { textField ->
-        textField.document.addDocumentListener(object : DocumentListener {
-            override fun insertUpdate(e: DocumentEvent?) {
-                onChange(textField.text)
-            }
-            override fun removeUpdate(e: DocumentEvent?) {
-                onChange(textField.text)
-            }
-            override fun changedUpdate(e: DocumentEvent?) {
-                onChange(textField.text)
-            }
-        })
-        launch(Dispatchers.Swing) {
-            mainPanel.addItem(label, textField)
-        }
-    }
+    fun addTextField(label: String, initValue: String, tab: String? = null, onChange: (String) -> Unit = {}) =
+        JTextField(initValue).also { textField ->
+            textField.document.addDocumentListener(object : DocumentListener {
+                override fun insertUpdate(e: DocumentEvent?) {
+                    onChange(textField.text)
+                }
 
-    /**
-     * Add a text field that will parse numbers.
-     * The initvalue determines the type.
-     *
-     * Blocks passed to onChange are applied every time the text field is edited
-     */
-    inline fun <reified T: Any> addFormattedNumericTextField(
+                override fun removeUpdate(e: DocumentEvent?) {
+                    onChange(textField.text)
+                }
+
+                override fun changedUpdate(e: DocumentEvent?) {
+                    onChange(textField.text)
+                }
+            })
+            launch(Dispatchers.Swing) {
+                getTab(tab).addItem(label, textField)
+            }
+        }
+
+    inline fun <reified T : Any> addFormattedNumericTextField(
         label: String,
         initValue: T,
         columns: Int = 8,
         maximumFractionDigits: Int = 12,
+        tab: String? = null,
         crossinline onChange: (T) -> Unit
     ) = JFormattedTextField(initValue).also { textField ->
         textField.document.addDocumentListener(object : DocumentListener {
             override fun insertUpdate(e: DocumentEvent?) {
                 onChange(textField.value as T)
             }
+
             override fun removeUpdate(e: DocumentEvent?) {
                 onChange(textField.value as T)
             }
+
             override fun changedUpdate(e: DocumentEvent?) {
                 onChange(textField.value as T)
             }
@@ -157,7 +183,8 @@ class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, tru
             val format = if (T::class == Int::class || T::class == Long::class || T::class == Short::class) {
                 NumberFormat.getIntegerInstance(textField.getLocale())
             } else {
-                NumberFormat.getNumberInstance(textField.getLocale()).apply { this.maximumFractionDigits = maximumFractionDigits }
+                NumberFormat.getNumberInstance(textField.getLocale())
+                    .apply { this.maximumFractionDigits = maximumFractionDigits }
             } as DecimalFormat
             val formatterEditor = NumberFormatter(format)
             formatterEditor.valueClass = T::class.java
@@ -173,7 +200,7 @@ class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, tru
                     }
                 }
             })
-            mainPanel.addItem(label, textField)
+            getTab(tab).addItem(label, textField)
         }
     }
 
@@ -183,6 +210,7 @@ class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, tru
         maxValue: Double,
         initValue: Double,
         increment: Double = 0.1,
+        tab: String? = null,
         onChange: suspend (Double) -> Unit = {}
     ) = JSlider(
         (minValue / increment).toInt(),
@@ -195,7 +223,7 @@ class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, tru
         // Set specific labels for min, max, and mid values
         val labelTable = Hashtable<Int, JLabel>()
         val minLabelValue = (minValue / increment).toInt()
-        val midLabelValue = ((minValue + maxValue) / (2 * increment)).toInt() // Midpoint
+        val midLabelValue = ((minValue + maxValue) / (2 * increment)).toInt()
         val maxLabelValue = (maxValue / increment).toInt()
 
         labelTable[minLabelValue] = JLabel(String.format("%.1f", minValue))
@@ -212,27 +240,27 @@ class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, tru
         }
 
         launch(Dispatchers.Swing) {
-            mainPanel.addItem(label, slider)
+            getTab(tab).addItem(label, slider)
             pack()
         }
     }
 
-
-    fun addCheckBox(label: String, checked: Boolean, onChange: suspend (Boolean) -> Unit = {}) = JCheckBox().also { checkBox ->
-        checkBox.addActionListener {
-            launch {
-                onChange(checkBox.isSelected)
+    fun addCheckBox(label: String, checked: Boolean, tab: String? = null, onChange: suspend (Boolean) -> Unit = {}) =
+        JCheckBox().also { checkBox ->
+            checkBox.addActionListener {
+                launch {
+                    onChange(checkBox.isSelected)
+                }
+            }
+            launch(Dispatchers.Swing) {
+                checkBox.isSelected = checked
+                getTab(tab).addItem(label, checkBox)
+                pack()
             }
         }
-        launch(Dispatchers.Swing) {
-            checkBox.isSelected = checked
-            mainPanel.addItem(label, checkBox)
-            pack()
-        }
-    }
 
-    fun <O: EditableObject> addAnnotatedPropertyEditor(editor: AnnotatedPropertyEditor<O>) {
-        launch(Dispatchers.Swing) { mainPanel.addItem(editor) }
+    fun <O : EditableObject> addAnnotatedPropertyEditor(editor: AnnotatedPropertyEditor<O>, tab: String? = null) {
+        launch(Dispatchers.Swing) { getTab(tab).addItem(editor) }
     }
 
 }

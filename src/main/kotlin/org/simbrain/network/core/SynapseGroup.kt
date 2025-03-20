@@ -91,6 +91,12 @@ class SynapseGroup @JvmOverloads constructor(
         return listOf(this) + removedSynapses
     }
 
+    override suspend fun afterRestore(context: Any?) {
+        target.incomingSgs.add(this)
+        source.outgoingSg.add(this)
+        synapses.forEach { it.afterRestore() }
+    }
+
     fun addSynapse(syn: Synapse) {
         syn.isVisible = displaySynapses
         addSynapseListener(syn)

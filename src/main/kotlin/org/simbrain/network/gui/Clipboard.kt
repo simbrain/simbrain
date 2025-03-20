@@ -18,10 +18,9 @@
  */
 package org.simbrain.network.gui
 
-import kotlinx.coroutines.awaitAll
 import org.simbrain.network.core.*
 import org.simbrain.network.neurongroups.NeuronGroup
-import java.util.*
+import org.simbrain.network.subnetworks.Subnetwork
 
 /**
  * Buffer which holds network objects for cutting and pasting.
@@ -58,8 +57,12 @@ object Clipboard {
 
         // when copying neuron collections/neuron groups, we don't want to copy the neurons again
         val collectionNeurons = objects.filterIsInstance<AbstractNeuronCollection>().flatMap { it.neuronList }.toSet()
-        copiedObjects = objects.filter { (it as? Neuron) !in collectionNeurons }
-        // System.out.println("add-->"+ Arrays.asList(objects));
+        val collectionSynapses = objects.filterIsInstance<SynapseGroup>().flatMap { it.synapses }.toSet()
+
+        copiedObjects = objects
+            .filter { (it as? Neuron) !in collectionNeurons }
+            .filter { (it as? Synapse) !in collectionSynapses }
+
         fireClipboardChanged()
     }
 
@@ -76,12 +79,26 @@ object Clipboard {
         fun createCopies(destinationNetwork: Network, sourceModels: List<NetworkModel>): List<NetworkModel> {
 
             // Match new to old neurons for synapse adding
-            val neuronMappings = Hashtable<Neuron, Neuron>()
+            val neuronMappings = HashMap<Neuron, Neuron>()
             val synapses = ArrayList<Synapse>()
 
             fun Synapse.isStranded(): Boolean {
                 val allNeurons = sourceModels.filterIsInstance<Neuron>()
                 return !(allNeurons.contains(this.source) && (allNeurons.contains(this.target)))
+            }
+
+            val layerMappings = HashMap<Layer, Layer>()
+            val weightMatrices = ArrayList<WeightMatrix>()
+            val synapseGroups = ArrayList<SynapseGroup>()
+
+            fun Connector.isStranded(): Boolean {
+                val allLayer = sourceModels.filterIsInstance<Layer>()
+                return !(allLayer.contains(this.source) && (allLayer.contains(this.target)))
+            }
+
+            fun SynapseGroup.isStranded(): Boolean {
+                val allLayer = sourceModels.filterIsInstance<Layer>()
+                return !(allLayer.contains(this.source) && (allLayer.contains(this.target)))
             }
 
             return buildList {
@@ -102,19 +119,48 @@ object Clipboard {
                             add(newText)
                         }
                         is NeuronGroup -> {
-                            add(item.copy())
+                            val copy = item.copy()
+                            neuronMappings.putAll(item.neuronList.zip(copy.neuronList))
+                            add(copy)
+                            layerMappings[item] = copy
+                        }
+                        is NeuronCollection -> {
+                            val neurons = item.neuronList.map { Neuron(it) }
+                            addAll(neurons)
+                            val copy = NeuronCollection(neurons).apply {
+                                label = item.label
+                            }
+                            neuronMappings.putAll(item.neuronList.zip(copy.neuronList))
+                            add(copy)
+                            layerMappings[item] = copy
                         }
                         is NeuronArray -> {
-                            val copy: LocatableModel = item.copy()
+                            val copy = item.copy()
+                            layerMappings[item] = copy
                             add(copy)
                         }
                         is ActivationSequence -> {
-                            val copy: LocatableModel = item.copy()
+                            val copy = item.copy()
+                            layerMappings[item] = copy
                             add(copy)
                         }
                         is TransformerBlock -> {
-                            val copy: LocatableModel = item.copy()
+                            val copy = item.copy()
+                            layerMappings[item] = copy
                             add(copy)
+                        }
+                        is WeightMatrix -> {
+                            if (!item.isStranded()) {
+                                weightMatrices.add(item)
+                            }
+                        }
+                        is SynapseGroup -> {
+                            if (!item.isStranded()) {
+                                synapseGroups.add(item)
+                            }
+                        }
+                        is Subnetwork -> {
+                            add(item.copy())
                         }
                     }
                 }
@@ -129,6 +175,25 @@ object Clipboard {
                     )
                     add(newSynapse)
                 }
+
+                for (connector in weightMatrices) {
+                    val weightMatrix = WeightMatrix(
+                        layerMappings[connector.source]!!,
+                        layerMappings[connector.target]!!
+                    )
+                    weightMatrix.copyFrom(connector)
+                    add(weightMatrix)
+                }
+
+                for (oldGroup in synapseGroups) {
+                    val newGroup = SynapseGroup(
+                        layerMappings[oldGroup.source] as AbstractNeuronCollection,
+                        layerMappings[oldGroup.target] as AbstractNeuronCollection,
+                        oldGroup.connectionStrategy.copy(),
+                        oldGroup.synapses.map { Synapse(neuronMappings[it.source]!!, neuronMappings[it.target]!!, it) }.toMutableList()
+                    )
+                    add(newGroup)
+                }
             }
 
         }
@@ -139,11 +204,16 @@ object Clipboard {
             .forEach { it.shouldBePlaced = false }
 
         // Add the copied object
-        net.network.addNetworkModels(copy).awaitAll()
+        net.network.addNetworkModels(copy)
+
+        val undeleteContext = UndeleteContext(net, copy)
+
+        var deletedModels: List<NetworkModel>? = null
 
         net.undoManager.addUndoableAction(
-            undo = { copy.forEach { it.delete() } },
-            redo = { net.network.addNetworkModels(copy, usePlacementManager = false, useAutoAssignedId = false).awaitAll() }
+            description = "Paste objects",
+            undo = { deletedModels = net.network.deleteModels(copy) },
+            redo = { with(net) { undeleteContext.restore(deletedModels!!) } }
         )
 
         // Unselect "old" copied objects
@@ -156,7 +226,7 @@ object Clipboard {
         )
 
         // Select copied objects after pasting them
-        copy.forEach { it.select() }
+        net.selectionManager.add(copy.map { net.modelNodeMap.get(it) })
     }
 
     @JvmStatic

@@ -142,6 +142,14 @@ class APETestObjectKotlin: EditableObject {
         },
     )
 
+    var sealedObject: TestSealedObject by GuiEditable(
+        label = "Sealed Object",
+        initValue = TestSealedObject.Test1,
+        order = 110,
+        showDetails = false,
+        tab = "Test Tab",
+    )
+
     abstract class TestObjectBase: CopyableObject {
         override fun getTypeList() = listOf(
             TestInnerObject1::class.java,
@@ -183,6 +191,13 @@ class APETestObjectKotlin: EditableObject {
         }
     }
 
+    sealed class TestSealedObject: EditableObject {
+
+        object Test1: TestSealedObject()
+        object Test2: TestSealedObject()
+
+    }
+
     override fun toString(): String {
         return "APETestObject2(${allPropertiesToString()})"
     }
@@ -197,6 +212,7 @@ fun main() {
         name = "test1"
         // (testObject as AnnotatedPropertyEditorTestObject2.TestInnerObject1).test1Int = 3
         testObject = APETestObjectKotlin.TestInnerObject2(3, false)
+        sealedObject = APETestObjectKotlin.TestSealedObject.Test2
     }
     val editor = AnnotatedPropertyEditor(editingObject).displayInDialog {
         commitChanges()

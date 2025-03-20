@@ -20,3 +20,4 @@ Some things you can do to get a quick sense of how Simbrain works.
 ## Running from Source, Submitting PRs, etc.
 
 See the [simbrain wiki](https://github.com/simbrain/simbrain/wiki)
+ 

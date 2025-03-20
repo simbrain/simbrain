@@ -7,6 +7,7 @@ import org.simbrain.network.spikeresponders.JumpAndDecay
 import org.simbrain.network.updaterules.IzhikevichRule
 import org.simbrain.util.place
 import org.simbrain.util.point
+import org.simbrain.custom_sims.addSidebarInfo
 
 /**
  * Create a spiking neuron, with an input, and graph its activity with a time series.
@@ -52,8 +53,7 @@ val spikingNeuron = newSim {
         postSpiking couple spikeResponses.model.timeSeriesList[0]
     }
 
-    val docViewer = addDocViewer(
-        "Spiking Neuron",
+    val docViewer = addSidebarInfo(
         """ 
             # Introduction
              
@@ -85,8 +85,7 @@ val spikingNeuron = newSim {
     withGui {
         place(networkComponent, 0, 0, 400,400)
         place(spikes, 410, 0, 400,400)
-        place(spikeResponses, 410, 410, 400,400)
-        place(docViewer, 0, 410, 400,400)
+        place(spikeResponses, 0, 409, 400, 400)
     }
 
     network.events.zoomToFitPage.fire()

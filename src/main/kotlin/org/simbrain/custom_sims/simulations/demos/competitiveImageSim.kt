@@ -4,6 +4,7 @@ import org.simbrain.custom_sims.*
 import org.simbrain.network.subnetworks.CompetitiveNetwork
 import org.simbrain.util.place
 import org.simbrain.util.toGrayScaleImage
+import org.simbrain.custom_sims.addSidebarInfo
 
 /**
  * Demo for studying Competitive networks with ImageWorld,
@@ -13,8 +14,7 @@ val competitiveImageSim = newSim {
     // Basic setup
     workspace.clearWorkspace()
 
-    val docViewer = addDocViewer(
-        "Information",
+    val docViewer = addSidebarInfo(
         """
             # Introduction
             
@@ -33,12 +33,9 @@ val competitiveImageSim = newSim {
         
         """.trimIndent()
     )
-    withGui {
-        place(docViewer, 0, 0, 369, 675)
-    }
 
     val networkComponent = addNetworkComponent("Network")
-    placeComponent(networkComponent,413, 0, 391, 675)
+    placeComponent(networkComponent,0, 8, 391, 675)
     val network = networkComponent.network
 
     // Competitive network
@@ -49,7 +46,7 @@ val competitiveImageSim = newSim {
 
     // Image world
     val component = addImageWorld("Image World")
-    placeComponent(component,856, 0, 503, 603)
+    placeComponent(component,393, 10, 565, 675)
     val w = 10
     val h = 10
     val imageWorld = component.world.apply {

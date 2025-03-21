@@ -18,6 +18,7 @@ import org.simbrain.network.gui.nodes.ActivationSequenceProcessor
 import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.network.updaterules.interfaces.DifferentiableUpdateRule
 import org.simbrain.util.*
+import org.simbrain.util.propertyeditor.EditableObject
 import smile.math.matrix.Matrix
 import java.util.*
 
@@ -114,9 +115,12 @@ fun NeuronArray.updateBiases(error: Matrix, epsilon: Double = .1) {
     events.updated.fire()
 }
 
-enum class BackpropLossFunction {
+sealed class BackpropLossFunction(
+    val shortName: String,
+    val description: String
+) : EditableObject {
 
-    SSE {
+    object SSE : BackpropLossFunction("SSE", "Sum Squared Error") {
         override fun scalarLoss(actual: Matrix, target: Matrix) = actual sse target
 
         override fun outputError(actual: Matrix, target: Matrix): Matrix {
@@ -125,13 +129,9 @@ enum class BackpropLossFunction {
         }
 
         override fun canUse(layer: NeuronArray) = layer.updateRule !is SoftmaxRule
+    }
 
-        override val shortName = "SSE"
-
-        override val description = "Sum Squared Error"
-    },
-
-    MSE {
+    object MSE : BackpropLossFunction("MSE", "Mean Squared Error") {
         override fun scalarLoss(actual: Matrix, target: Matrix) = actual mse target
 
         override fun outputError(actual: Matrix, target: Matrix): Matrix {
@@ -140,14 +140,9 @@ enum class BackpropLossFunction {
         }
 
         override fun canUse(layer: NeuronArray) = layer.updateRule !is SoftmaxRule
+    }
 
-        override val shortName = "MSE"
-
-        override val description = "Mean Squared Error"
-
-    },
-
-    RMSE {
+    object RMSE : BackpropLossFunction("RMSE", "Root Mean Squared Error") {
         override fun scalarLoss(actual: Matrix, target: Matrix) = actual rmse target
 
         override fun outputError(actual: Matrix, target: Matrix): Matrix {
@@ -157,13 +152,9 @@ enum class BackpropLossFunction {
 
         override fun canUse(layer: NeuronArray) = layer.updateRule !is SoftmaxRule
 
-        override val shortName = "RMSE"
+    }
 
-        override val description = "Root Mean Squared Error"
-
-    },
-
-    CrossEntropy {
+    object CrossEntropy : BackpropLossFunction("Cross Entropy", "Cross Entropy") {
         override fun scalarLoss(actual: Matrix, target: Matrix) = crossEntropy(actual, target)
 
         override fun outputError(actual: Matrix, target: Matrix): Matrix {
@@ -172,23 +163,13 @@ enum class BackpropLossFunction {
         }
 
         override fun canUse(layer: NeuronArray) = layer.updateRule is SoftmaxRule
-
-        override val shortName = "CrossEntropy"
-
-        override val description = "Cross Entropy"
-
-    };
-
+    }
 
     abstract fun scalarLoss(actual: Matrix, target: Matrix): Double
 
     abstract fun outputError(actual: Matrix, target: Matrix): Matrix
 
     abstract fun canUse(layer: NeuronArray): Boolean
-
-    abstract val shortName: String
-
-    abstract val description: String
 
     override fun toString() = description
 

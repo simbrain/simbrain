@@ -4,9 +4,6 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.util.SmellSource
 
-/**
- * Test decay functions
- */
 class SmellSourceTest {
 
     @Test

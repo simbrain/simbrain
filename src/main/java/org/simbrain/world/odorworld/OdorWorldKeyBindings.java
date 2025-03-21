@@ -157,7 +157,7 @@ public class OdorWorldKeyBindings {
         });
 
         // Debug Piccolo
-        canvas.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_D, ActionEvent.CTRL_MASK), "debug");
+        canvas.getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_P, ActionEvent.CTRL_MASK), "debug");
         canvas.getActionMap().put("debug", new AbstractAction() {
             public void actionPerformed(ActionEvent e) {
                 worldPanel.showPNodeDebugger();

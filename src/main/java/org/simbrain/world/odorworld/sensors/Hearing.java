@@ -73,7 +73,7 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
 
     //TODO: Clean up / Make this settable
     private int time = 0;
-    private int lingerTime = 10;
+    private final int lingerTime = 10;
 
     /**
      * Construct the hearing sensor.
@@ -174,4 +174,11 @@ public class Hearing extends Sensor implements VisualizableEntityAttribute {
         this.charactersPerRow = charactersPerRow;
     }
 
+    public double getOutputAmount() {
+        return outputAmount;
+    }
+
+    public void setOutputAmount(double outputAmount) {
+        this.outputAmount = outputAmount;
+    }
 }

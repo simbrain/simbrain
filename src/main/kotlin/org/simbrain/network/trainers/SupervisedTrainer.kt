@@ -36,7 +36,7 @@ import kotlin.random.Random
 open class SupervisedTrainerConfig: CopyableObject {
 
     @UserParameter(label = "Loss Function", order = 10)
-    var lossFunction = BackpropLossFunction.SSE
+    var lossFunction:BackpropLossFunction = BackpropLossFunction.SSE
 
     var optimizer: Optimizer by GuiEditable(
         initValue = AdamOptimizer(),
@@ -64,6 +64,8 @@ open class SupervisedTrainerConfig: CopyableObject {
         showDetails = false,
         order = 60
     )
+
+    override val name = "Optimizer Properties"
 
     var learningRate by optimizer::learningRate
 

@@ -37,17 +37,17 @@ public class CouplingListPanel extends JPanel {
     /**
      * List of network couplings.
      */
-    private JList couplings = new JList();
+    private final JList couplings = new JList();
 
     /**
      * Instance of parent frame.
      */
-    private JFrame couplingFrame = new JFrame();
+    private final JFrame couplingFrame = new JFrame();
 
     /**
      * Simbrain desktop reference.
      */
-    private SimbrainDesktop desktop;
+    private final SimbrainDesktop desktop;
 
     /**
      * List of couplings.
@@ -60,7 +60,7 @@ public class CouplingListPanel extends JPanel {
     Action deleteCouplingsAction = new AbstractAction() {
         // Initialize
         {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Eraser.png"));
+            putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/Eraser.png"));
             putValue(NAME, "Delete couplings");
             putValue(SHORT_DESCRIPTION, "Delete selected couplings");
             CouplingListPanel.this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("BACK_SPACE"), this);

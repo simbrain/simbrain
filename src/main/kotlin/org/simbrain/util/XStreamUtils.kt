@@ -95,7 +95,7 @@ fun createConstructorCallingConverter(
 
             (listOf(source::class) +  source::class.allSuperclasses)
                 .flatMap { it.declaredMemberProperties }
-                .filter { it.javaField?.isTransient() == false }
+                .filter { it.shouldSerialize() }
                 .forEach { property ->
                     // invoke the custom marshaller if it exists
                     val processedByCustomMarshaller = customMarshaller?.invoke(source, property, writer, context) == true
@@ -131,6 +131,10 @@ fun createConstructorCallingConverter(
             } catch (e: ClassNotFoundException) {
                 Class.forName(reader.getAttribute("class")).kotlin
             })
+
+            if (cls.objectInstance != null) {
+                return cls.objectInstance!!
+            }
 
             // Map from variable names to corresponding Kotlin properties.
             // Ex: activation -> Neuron::activation

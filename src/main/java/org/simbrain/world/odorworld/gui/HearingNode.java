@@ -10,6 +10,9 @@ import org.simbrain.world.odorworld.sensors.Hearing;
 import java.awt.*;
 import java.awt.geom.Point2D;
 
+import static org.simbrain.util.GeomKt.getCenter;
+import static org.simbrain.util.GeomKt.minus;
+
 /**
  * Visual representation of hearing sensors.
  */
@@ -97,13 +100,15 @@ public class HearingNode extends EntityAttributeNode {
 
     @Override
     public void update(OdorWorldEntity entity) {
-        setOffset(entity.getEntityType().getWidth() / 2 - 10, 0);
+        var headLocation = entity.getEntityType().computeHeadLocation(entity.getHeading());
+        var anchor = getCenter(this.hearingBubbleTrailSmall.getBounds());
+        setOffset(minus(headLocation, anchor));
     }
 
     /**
      * Update the text and the size hearing bubble.
      */
-    private void updateSensor() {
+    public void updateSensor() {
         shape.setVisible(sensor.isActivated());
         if(!shape.getVisible()) {
             return;

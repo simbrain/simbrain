@@ -314,4 +314,9 @@ fun Rectangle2D.forEachPixel(action: (x: Int, y: Int) -> Unit) {
     }
 }
 
+fun Rectangle2D.uv(uvPoint: Point2D): Point2D {
+    val (u, v) = uvPoint
+    return point(width * u, height * v) + point(x, y)
+}
+
 val sin60deg = sin(Math.toRadians(60.0))

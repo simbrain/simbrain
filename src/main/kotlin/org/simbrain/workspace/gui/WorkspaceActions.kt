@@ -229,20 +229,20 @@ class WorkspaceActions {
     }
 
     val plotActions = listOf(
-        createComponentFactoryAction("Bar chart", "menu_icons/BarChart.png"),
+        createComponentFactoryAction("Bar Chart", "menu_icons/BarChart.png"),
         createComponentFactoryAction("Histogram", "menu_icons/BarChart.png"),
-        createComponentFactoryAction("Pie chart", "menu_icons/PieChart.png"),
-        createComponentFactoryAction("Pixel plot", "menu_icons/grid.png"),
-        createComponentFactoryAction("Projection plot", "menu_icons/ProjectionIcon.png"),
-        createComponentFactoryAction("Raster plot", "menu_icons/ScatterIcon.png"),
-        createComponentFactoryAction("Time series", "menu_icons/TimeSeries.png")
+        createComponentFactoryAction("Pie Chart", "menu_icons/PieChart.png"),
+        createComponentFactoryAction("Pixel Plot", "menu_icons/grid.png"),
+        createComponentFactoryAction("Projection Plot", "menu_icons/ProjectionIcon.png"),
+        createComponentFactoryAction("Raster Plot", "menu_icons/ScatterIcon.png"),
+        createComponentFactoryAction("Time Series", "menu_icons/TimeSeries.png")
     )
     val newWorldActions = listOf(
-        createComponentFactoryAction("Data table", "menu_icons/Table.png"),
-        createComponentFactoryAction("Odor world", "menu_icons/SwissIcon.png"),
-        createComponentFactoryAction("Image world", "menu_icons/photo.png"),
-        createComponentFactoryAction("Text world", "menu_icons/Text.png"),
-        createComponentFactoryAction("Sound world", "menu_icons/speaker.png")
+        createComponentFactoryAction("Data Table", "menu_icons/Table.png"),
+        createComponentFactoryAction("Odor World", "menu_icons/SwissIcon.png"),
+        createComponentFactoryAction("Image World", "menu_icons/photo.png"),
+        createComponentFactoryAction("Text World", "menu_icons/Text.png"),
+        createComponentFactoryAction("Sound World", "menu_icons/speaker.png")
     )
 
     fun <T: WorkspaceComponent> createImportAction(desktopComponent: DesktopComponent<T>) = desktopComponent.createAction(

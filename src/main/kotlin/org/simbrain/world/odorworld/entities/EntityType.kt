@@ -1,13 +1,22 @@
 package org.simbrain.world.odorworld.entities
 
-import org.simbrain.util.div
+import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
+import java.awt.geom.Point2D
+import java.awt.geom.Rectangle2D
 
 /**
  * The type of an odor world entity (swiss, candle, etc).
  *
- * @param rotating: true if separate images are provided for different headings
+ * For the mapping from type to image, see [EntityNode].
  *
+ * @param rotating: true if separate images are provided for different headings
+ * @param headLocation location of the head in uv coordinates when the agent is facing East.
+ *                     Both numbers are ratios. Example: (.5, .5) is the center of the image.
+ *                     (.5, 1.1) is just outside the right side of the image.
+ * @param pivotLocation location of the pivot point when rotating in uv coordinate. defaults to [headLocation]
+ *                      Pivot is the uv coordinates around which the agent’s “head” is assumed to rotate.
+ *                      Used to determine location of speech and hearing bubbles as agents rotate
  */
 sealed class EntityType(
     val description: String,
@@ -17,6 +26,8 @@ sealed class EntityType(
     val imageName: String? = null,
     val imageExt: String = "png",
     val numFrames: Int = if (rotating) 8 else 1,
+    val headLocation: Point2D = point(0.5, 0.5),
+    val pivotLocation: Point2D = headLocation
 ): EditableObject {
     object Swiss: EntityType("Swiss", rotating = false, width = 32, height = 32, imageExt = "gif")
     object Gouda : EntityType("Gouda", rotating = false, width = 32, height = 32, imageExt = "gif")
@@ -31,7 +42,7 @@ sealed class EntityType(
     object Tulip : EntityType("Tulip", rotating = false, width = 32, height = 32, imageExt = "gif")
     object Flax : EntityType("Flax", rotating = false, width = 32, height = 32, imageExt = "gif")
     object Pansy : EntityType("Pansy", rotating = false, width = 32, height = 32, imageExt = "gif")
-    object Amy : EntityType("Amy", rotating = true, width = 96, height = 96)
+    object Amy : EntityType("Amy", rotating = true, width = 96, height = 96, headLocation = point(0.5, 0.25))
     object Arno : EntityType("Arno", rotating = true, width = 96, height = 96)
     object Boy : EntityType("Boy", rotating = true, width = 96, height = 96)
     object Cow : EntityType("Cow", rotating = true, width = 96, height = 96)
@@ -51,12 +62,21 @@ sealed class EntityType(
         }
     }
 
-    object Mouse : EntityType("Mouse", rotating = true, width = 40, height = 40) {
+    object Mouse : EntityType("Mouse", rotating = true, width = 40, height = 40, headLocation = point(1.1, 0.5), pivotLocation = point(0.5, 0.5)) {
         override val imageBasePaths by lazy {
             (0 until 360 step 15).map { angle ->
                 listOf("mouse" / "Mouse_$angle.gif")
             }
         }
+    }
+
+    val boundingBox by lazy {
+        Rectangle2D.Double(0.0, 0.0, width.toDouble(), height.toDouble())
+    }
+
+    fun computeHeadLocation(heading: Double): Point2D {
+        val headUVVector = (headLocation - pivotLocation).rotate(-heading.toRadian())
+        return boundingBox.uv(pivotLocation + headUVVector) - point(width / 2.0, height / 2.0)
     }
 
     open val imageBasePaths by lazy {

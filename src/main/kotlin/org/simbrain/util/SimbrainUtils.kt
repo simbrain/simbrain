@@ -75,7 +75,7 @@ class DependenciesInvalidatingCachedObject<T>(private vararg val dependencies: K
 
     operator fun getValue(baseObject: Any, property: KProperty<*>): T {
         val dependencyValue = dependencies.map { it.getter.call() }
-        return if (this.dependencyValues.zip(dependencyValue).any { (a, b) -> a != b }) {
+        return if (this.dependencyValues.zip(dependencyValue).any { (a, b) -> a != b } || _value == null) {
             _value = init()
             this.dependencyValues = dependencyValue
             _value!!

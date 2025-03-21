@@ -71,6 +71,8 @@ fun Class<*>.isKotlinClass(): Boolean {
 
 fun Field.isTransient() = modifiers.let { mod -> Modifier.isTransient(mod) }
 
+fun KProperty<*>.shouldSerialize() = javaField?.let { !it.isTransient() } == true
+
 /**
  * An improved version of the javaSetter provided by kotlin that searches for a setter with the same name as the property.
  */

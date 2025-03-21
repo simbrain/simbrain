@@ -33,14 +33,18 @@ public abstract class EntityAttributeNode extends PNode {
         if (visualizableEntityAttribute instanceof BumpSensor) {
             return new BumpSensorNode((BumpSensor) visualizableEntityAttribute);
         }
-        if (visualizableEntityAttribute instanceof Hearing) {
-            return new HearingNode((Hearing) visualizableEntityAttribute);
+        if (visualizableEntityAttribute instanceof Hearing hearing) {
+            var node = new HearingNode(hearing);
+            node.updateSensor();
+            return node;
         }
         if (visualizableEntityAttribute instanceof SmellSensor) {
             return new SmellSensorNode((SmellSensor) visualizableEntityAttribute);
         }
-        if (visualizableEntityAttribute instanceof Speech) {
-            return new SpeechNode((Speech) visualizableEntityAttribute);
+        if (visualizableEntityAttribute instanceof Speech speech) {
+            var node = new SpeechNode(speech);
+            node.updateEffector();
+            return node;
         }
         if (visualizableEntityAttribute instanceof ObjectSensor) {
             return new ObjectSensorNode((ObjectSensor) visualizableEntityAttribute);

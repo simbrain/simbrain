@@ -11,6 +11,8 @@ import java.awt.*;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 
+import static org.simbrain.util.GeomKt.plus;
+
 /**
  * Visual representation of speech effectors.
  */
@@ -108,13 +110,14 @@ public class SpeechNode extends EntityAttributeNode {
 
     @Override
     public void update(OdorWorldEntity entity) {
-        setOffset(entity.getEntityType().getWidth() / 2 - 18, 0);
+        var headLocation = entity.getEntityType().computeHeadLocation(entity.getHeading());
+        setOffset(plus(headLocation, new Point2D.Double(-18, 0)));
     }
 
     /**
      * Update the text and the size speech bubble.
      */
-    private void updateEffector() {
+    public void updateEffector() {
         shape.setVisible(effector.isActivated());
         if(!shape.getVisible()) {
             return;

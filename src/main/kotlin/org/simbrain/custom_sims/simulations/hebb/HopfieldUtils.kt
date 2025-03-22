@@ -245,7 +245,9 @@ class PatternTestOptions: CopyableObject {
         initValue = UniformRealDistribution(-0.1, 0.1) as ProbabilityDistribution,
         description = "The statistical distribution used for perturbing the weights during forgetting.",
         order = 80,
-        conditionallyVisibleBy = PatternTestOptions::perturbWeights
+        onUpdate = {
+            showWidget(widgetValue(::forgetting) && widgetValue(::perturbWeights))
+        }
     )
 
     override fun copy(): PatternTestOptions {

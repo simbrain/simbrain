@@ -3,10 +3,12 @@ package org.simbrain.util.propertyeditor
 import org.simbrain.util.LabelledItemPanel
 import org.simbrain.util.UserParameter
 import org.simbrain.util.invokeLegacySetter
+import org.simbrain.util.swingInvokeLater
 import smile.math.matrix.Matrix
 import java.awt.Color
 import javax.swing.JPanel
 import javax.swing.JTabbedPane
+import javax.swing.SwingUtilities
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.full.allSuperclasses
 import kotlin.reflect.full.declaredMemberProperties
@@ -126,19 +128,17 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
     val parameterJLabels = parameterWidgetMap.entries
         .sortedBy { (parameter) -> parameter.order }
         .mapNotNull { (parameter, widget) ->
+            widget.events.valueChanged.on {
+                parameterWidgetMap.forEach { (_, w) -> w.refresh(widget.parameter.property) }
+                swingInvokeLater { SwingUtilities.getWindowAncestor(this)?.pack() }
+            }
             // object widgets span the dialog and don’t use labels
             if (widget is ObjectWidget<*, *> && !widget.useEnumStyle) {
                 getLabelledItemPanel(parameter.tab).addItem(widget.component)
-                widget.events.valueChanged.on {
-                    parameterWidgetMap.forEach { (_, w) -> w.refresh(widget.parameter.property) }
-                }
                 null
             } else {
                 val label = getLabelledItemPanel(parameter.tab).addItem(parameter.label, widget.component)
                 label.toolTipText = parameter.description
-                widget.events.valueChanged.on {
-                    parameterWidgetMap.forEach { (_, w) -> w.refresh(widget.parameter.property) }
-                }
                 parameter to label
             }
         }.toMap()

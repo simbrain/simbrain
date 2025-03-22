@@ -12,7 +12,6 @@ import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaosBitStream
 import org.simbrain.custom_sims.simulations.neuroscience.cortexSimple
 import org.simbrain.custom_sims.simulations.nlp.tinyLanguageModel
-import org.simbrain.custom_sims.simulations.nlp.tinyLanguageModel2
 import org.simbrain.custom_sims.simulations.patterns_of_activity.cogMap3Objects
 import org.simbrain.custom_sims.simulations.patterns_of_activity.iacJetsSharks5People
 import org.simbrain.util.StructureDir
@@ -79,8 +78,8 @@ val simulations = dir("Simulations", alphabetical = true ) {
     dir("Language models") {
         item("Basic word embeddings") { nlpSimBasic }
         item("Next-word prediction") { srnElmanSentences }
+        //item("Tiny language model") { tinyLanguageModelFF }
         item("Tiny language model") { tinyLanguageModel }
-        item("Tiny language model 2") { tinyLanguageModel2 }
     }
 
     dir("Neuroscience") {

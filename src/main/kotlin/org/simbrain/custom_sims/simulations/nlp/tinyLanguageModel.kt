@@ -1,30 +1,64 @@
 package org.simbrain.custom_sims.simulations.nlp
 
-import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.addSidebarInfo
-import org.simbrain.custom_sims.addTextWorld
-import org.simbrain.custom_sims.newSim
-import org.simbrain.network.core.addToNetwork
-import org.simbrain.network.subnetworks.BackpropNetwork
+import kotlinx.coroutines.awaitAll
+import org.simbrain.custom_sims.*
+import org.simbrain.network.NetworkComponent
+import org.simbrain.network.core.*
+import org.simbrain.network.trainers.AdamOptimizer
 import org.simbrain.network.trainers.BackpropLossFunction
 import org.simbrain.network.trainers.MatrixDataset
-import org.simbrain.network.updaterules.SigmoidalRule
+import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.util.*
+import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.workspace.Workspace
+import org.simbrain.workspace.updater.UpdateAllCouplings
 import org.simbrain.world.textworld.EmbeddingType
+import org.simbrain.world.textworld.TextWorldComponent
 import org.simbrain.world.textworld.TokenEmbeddingBuilder
+import smile.math.matrix.Matrix
 import java.io.File
 import kotlin.math.min
 
+class TinyLanguageModelOptions(var showEmbeddingDimension: Boolean = true): EditableObject {
+
+    var contextSize by GuiEditable(
+        initValue = 24,
+        description = "Number of tokens in a context window",
+        order = 10,
+    )
+
+    var embeddingDimension by GuiEditable(
+        description = "Dimensions of the vector embedding. Each token is associated with a vector with this many components.",
+        initValue = 20,
+        order = 20,
+        conditionallyVisibleBy = TinyLanguageModelOptions::showEmbeddingDimension
+    )
+
+    var trainerTextPath by GuiEditable(
+        initValue = simulationsPath / "texts" / "casual_texting_small.txt",
+        description = "Text used to train the model",
+        tab = "Text Parsing",
+        order = 10,
+        useFileChooser = true,
+    )
+
+    var tokenizer by GuiEditable(
+        initValue = SimpleTokenizer(usePunctuation = true) as Tokenizer<*>,
+        description = "Options for tokenizing the text",
+        tab = "Text Parsing",
+        order = 20,
+    )
+}
+
 val tinyLanguageModel = newSim {
 
-    val options = TinyLanguageModelOptions(false).showAPEOptionDialog("Tiny Language Model") ?: return@newSim
+    val options = TinyLanguageModelOptions().showAPEOptionDialog("Tiny Language Model") ?: return@newSim
 
     workspace.clearWorkspace()
 
     val contextSize = options.contextSize
-
-    val hiddenLayerSize = 100  // TODO: Add this to options
 
     val trainingText = File(options.trainerTextPath).readText()
 
@@ -39,7 +73,7 @@ val tinyLanguageModel = newSim {
     val networkComponent = addNetworkComponent("Network")
     val network = networkComponent.network
 
-    val tokenizedTrainingText = tokenizer.tokenize(trainingText).map { it.token }
+    val tokenizedTrainingText = trainingText.tokenize(tokenizer).map { it.token }
     val corpus = tokenizedTrainingText.windowed(min(tokenizedTrainingText.size, contextSize)).flatMap { window ->
         // window along the tokens if the context size is not big enough to cover the entire token list
         generateAutoregressivePairs(window)
@@ -48,7 +82,7 @@ val tinyLanguageModel = newSim {
     // Text World for Inputs
     val textWorldComponent = addTextWorld("Text World (Inputs)")
     textWorldComponent.world.tokenEmbedding = tokenEmbedding
-    textWorldComponent.world.text = tokenizer.joinTokens(tokenizedTrainingText.take(contextSize))
+    textWorldComponent.world.text = tokenizedTrainingText.take(contextSize).tokensToString(tokenizer)
     textWorldComponent.world.highlightCurrentToken = false
     textWorldComponent.world.autoAdvance = false
 
@@ -70,82 +104,103 @@ val tinyLanguageModel = newSim {
 
     val targetMatrix = tokenizedCorpus.map { (_, target) -> target }.toTypedArray().toMatrix()
 
-    val backpropNetwork = with(network) {
-        BackpropNetwork(
-            intArrayOf(contextSize * tokenEmbedding.dimension, hiddenLayerSize, tokenEmbedding.dimension),
-        ).apply {
-            label = "backprop"
-            trainingSet = MatrixDataset(
-                inputs = inputMatrix,
-                targets = targetMatrix
-            )
-            (hiddenLayers().first().updateRule as? SigmoidalRule)?.apply {
-                lowerBound = -1.0
-            }
-            outputLayer.updateRule = SoftmaxRule()
-            inputLayer.gridMode = true
-            inputLayer.location += point(0, 100)
-        }.addToNetwork()
+    val inputs = ActivationSequence(contextSize, tokenEmbedding.dimension).apply {
+        label = "Inputs"
+        isClamped = true
     }
 
-    backpropNetwork.trainerConfig.apply {
-        lossFunction = BackpropLossFunction.CrossEntropy
-        learningRate = 0.0001
-        testConfiguration.enabled = false
+    val transformerBlock = TransformerBlock(contextSize, options.embeddingDimension, options.embeddingDimension).apply {
+        label = "Transformer Block"
     }
 
-    workspace.addUpdateAction("Encode Context Window") {
-        val encodedContext = textWorldComponent.world.text
-            .split(" ")
-            .map { tokenEmbedding.get(it).toList() }
-            .flatten()
-        val inputVector = DoubleArray(tokenEmbedding.dimension * contextSize) { i ->
-            encodedContext.getOrElse(i) { 0.0 }
-        }
-        backpropNetwork.inputLayer.setActivations(inputVector)
+    val softMaxLayer = NeuronArray(tokenEmbedding.dimension).apply {
+        updateRule = SoftmaxRule()
+        circleMode = size < 100
+        gridMode = true
+        labelArray = tokenEmbedding.tokens.toTypedArray()
+        // Spaces are a hack for label issue in circle mode
+        label = "Predicted Next Token"
     }
 
-    workspace.updater.updateManager.swapElements(0, 1)
+    val weightMatrices = listOf(
+        WeightMatrix(inputs, transformerBlock),
+        WeightMatrix(transformerBlock, softMaxLayer)
+    )
 
-    workspace.addUpdateAction("Predict Next Word") {
-        val nextWord = tokenEmbedding.getClosestWord(backpropNetwork.outputLayer.activationArray)
-        // update text with predicted word and remove first word so that the context window maintains its size
-        textWorldComponent.world.text = textWorldComponent.world.text.tokenize(tokenizer)
-            .map { it.token }
-            .plus(nextWord)
-            .takeLast(contextSize)
-            .tokensToString(tokenizer)
+    with(network) {
+        addNetworkModels(inputs, transformerBlock, softMaxLayer).awaitAll()
+        addNetworkModels(weightMatrices).awaitAll()
+        val model = SupervisedModel(inputs, softMaxLayer, false)
+        model.initWeights()
+        model.initBiases()
+        model.trainingSet = MatrixDataset(
+            inputs = inputMatrix,
+            targets = targetMatrix
+        )
+        model.trainerConfig.lossFunction = BackpropLossFunction.CrossEntropy
+        model.trainerConfig.learningRate = .001
+        model.trainerConfig.testConfiguration.enabled = false
+        model.trainerConfig.optimizer = AdamOptimizer()
+        addNetworkModels(model).awaitAll()
     }
+
+    setupUpdateActions(workspace)
+
+    inputs.location = point(-625, -200)
+    transformerBlock.location = point(-300, -600)
+    softMaxLayer.location = point(-1000, -600)
 
     withGui {
+        createControlPanel("Control Panel", 10, 360) {
+            addButton("Load Workspace") {
+                val loadOk = loadWorkspaceZipFromFileChooser()
+                if (loadOk) {
+                    setupUpdateActions(workspace)
+                }
+            }
+        }
         place(textWorldComponent, 10, 10, 450, 350)
-        place(networkComponent, 460, 10, 500, 550)
+        place(networkComponent, 460, 10, 1000, 800)
     }
 
     addSidebarInfo(
         """ 
         # Tiny Language Model
-        A simple language model using a feed-forward network, to begin to illustrate how such models work.
+        A simple GPT-like model with one block and one head.
         
-        The input is generated by taking all each token in the context window, associating it with a one-hot encoding,
-        and concatenating the results. Thus the size of the input matrix is context window * size of vocabulary. 
+        # Configuration / Startup
+        When you first start this script a dialog opens that allows you to set how large the context window 
+        is and also to select a document you will use to train the model. 
         
-        # Basics
-        You can enter an text you like in the text world and run, and it will generate text up to the size of the context 
-        window, in terms of number of tokens. It will only generate up to that amount.
+        Note: The longer the document, the slower training will be.
+
+        # Training your model
+        Click the "supervised model" interaction box and use the training dialog as explained [here](https://docs.simbrain.net/docs/network/trainingNetworks.html)  
+
+        # Using the model
+        At any time you can see how well the model is doing just by running the [workspace](https://docs.simbrain.net/docs/workspace/)
+        You can put partial text of any length in the text world to see how it does with it. 
+        This is a "prompt". 
         
-        If you only enter a few words you can get a sense of how it's working because only a few of the one-hots are visible 
-        in the input.
-         
-        # Things this has that standard language models also have
-        - The output layer is softmax and values are probabilities. 
-        - The "recursive trick" is used to generate outputs
-         
-         # Differences
-         - There is no context representation like self-attention
-         
+        Note that no turn-taking machinery here. The network will just keep generating text until you stop it. 
+ 
+        # Save and Reopen
+        Once you have trained your model, you can save it. 
+        NOTE: When reopening you must use the `Load workspace` button in the control panel below the text world. 
         
+        # Training data
+        Generated by windowing along the tokens in the document used to train the model.  Windows do not respect punctuation,
+        they are simply slid across the words.
+        To see the document used to train the model, in the text world open the word embedding viewer and click "view embedding word source"
+        For each window generate a "christmas tree" of all input / target pairs.
+        Example: if the window is "hi there old friend" target pairs are
         
+        - "hi there old" -> "friend"
+        - "hi there" -> "old"
+        - "hi" -> "there"
+        
+        # What to try
+        - Try different training sets
 
         """.trimIndent(),
         initiallyOpened = false
@@ -153,3 +208,54 @@ val tinyLanguageModel = newSim {
 
 }
 
+context(SimulationScope)
+fun setupUpdateActions(workspace: Workspace) {
+
+    val network = workspace.componentList.filterIsInstance<NetworkComponent>().first().network
+    val supervisedModel = network.getModels<SupervisedModel>().first()
+    val inputs = network.getModelByLabel<ActivationSequence>("Inputs")
+    val softMaxLayer = network.getModelByLabel<NeuronArray>("Predicted Next Token")
+
+    val contextSize = inputs.sequenceSize
+
+    val textWorldComponent = workspace.componentList.filterIsInstance<TextWorldComponent>().first()
+    val textWorld = textWorldComponent.world
+
+    workspace.updater.updateManager.clear()
+
+    workspace.addUpdateAction("Encode Context Window") {
+        val encodedContext = textWorld.text
+            .tokenize(textWorld.tokenizer)
+            .map { textWorld.tokenEmbedding.get(it.token) }
+
+        val contextMatrix = Matrix(contextSize, textWorld.tokenEmbedding.dimension)
+        encodedContext.take(contextSize).forEachIndexed { i, vector ->
+            contextMatrix.setRow(i, vector)
+        }
+        inputs.activations = contextMatrix
+    }
+
+    workspace.addUpdateAction(UpdateAllCouplings(workspace.updater))
+
+    workspace.addUpdateAction("Update Text World") {
+        textWorldComponent.update()
+    }
+
+    workspace.addUpdateAction("Update Network") {
+        with(network) {
+            supervisedModel.forwardPass()
+        }
+    }
+
+    workspace.addUpdateAction("Predict Next Word") {
+        val nextWord = textWorld.tokenEmbedding.getClosestWord(softMaxLayer.activationArray)
+        // update text with predicted word and remove first word so that the context window maintains its size
+        textWorldComponent.world.text = textWorldComponent.world.text.tokenize(textWorld.tokenizer)
+            .map { it.token }
+            .plus(nextWord)
+            .takeLast(contextSize)
+            .tokensToString(textWorld.tokenizer)
+        textWorldComponent.world.currentTokenIndex = textWorldComponent.world.tokens.lastIndex
+    }
+
+}

@@ -1024,8 +1024,8 @@ class ObjectWidget<O : EditableObject, T : EditableObject>(
      * If all the fields of an object are singletons, then the widget is displayed using a simpler “enum” style,
      * without a collapsable panel.
      */
-    val shouldUseCollapsablePanel by lazy {
-        typeMap?.values?.any { it.objectInstance == null } == true
+    val useEnumStyle by lazy {
+        typeMap?.values?.all { it.objectInstance != null } == true
     }
 
     /**
@@ -1097,7 +1097,9 @@ class ObjectWidget<O : EditableObject, T : EditableObject>(
     }
 
     override val widget: JComponent by lazy {
-        if (shouldUseCollapsablePanel) {
+        if (useEnumStyle) {
+            dropDown ?: JPanel().apply { isVisible = false }
+        } else {
             JPanel(BorderLayout()).apply {
                 if (parameter.showLabeledBorder) {
                     border = BorderFactory.createTitledBorder(parameter.label)
@@ -1116,8 +1118,6 @@ class ObjectWidget<O : EditableObject, T : EditableObject>(
                     }
                 }
             }
-        } else {
-            dropDown ?: JPanel().apply { isVisible = false }
         }
     }
 

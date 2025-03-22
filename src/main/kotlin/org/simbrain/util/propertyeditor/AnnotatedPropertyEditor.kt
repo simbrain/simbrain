@@ -127,7 +127,7 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
         .sortedBy { (parameter) -> parameter.order }
         .mapNotNull { (parameter, widget) ->
             // object widgets span the dialog and don’t use labels
-            if (widget is ObjectWidget<*, *> && widget.shouldUseCollapsablePanel) {
+            if (widget is ObjectWidget<*, *> && !widget.useEnumStyle) {
                 getLabelledItemPanel(parameter.tab).addItem(widget.component)
                 widget.events.valueChanged.on {
                     parameterWidgetMap.forEach { (_, w) -> w.refresh(widget.parameter.property) }
@@ -278,7 +278,7 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
             editingObjects.forEach { eo ->
                 if (widget.isConsistent) {
                     (parameter.property as? KMutableProperty1<O, Any>)?.let commitProperty@ { property ->
-                        if (widget is ObjectWidget<*, *> && widget.shouldUseCollapsablePanel) {
+                        if (widget is ObjectWidget<*, *> && !widget.useEnumStyle) {
                             widget.objectTypeEditor.commitChanges()
                             (widget.value as? CopyableObject)?.let { co ->
                                 if (parameter.useLegacySetter) {

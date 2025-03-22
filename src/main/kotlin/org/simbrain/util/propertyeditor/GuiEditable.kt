@@ -57,7 +57,7 @@ class GuiEditable<O : EditableObject, T>(
     val conditionallyEnabledBy: KMutableProperty1<O, Boolean>? = null,
     val conditionallyVisibleBy: KMutableProperty1<O, Boolean>? = null,
     val useCheckboxFrom: KMutableProperty1<O, Boolean>? = null,
-    val typeMapProvider: KFunction<List<Class<out CopyableObject>>>? = null,
+    val typeMapProvider: KFunction<List<Class<out EditableObject>>>? = null,
     val columnMode: Boolean = false,
     val showLabeledBorder: Boolean = true,
     val getter: (GuiEditableGetterContext<O, T>.() -> T)? = null,
@@ -1034,7 +1034,11 @@ class ObjectWidget<O : EditableObject, T : EditableObject>(
      */
     private fun getTypeMap(parameter: GuiEditable<O, T>): Map<String, KClass<*>>? {
         if (parameter.typeMapProvider != null) {
-            return parameter.typeMapProvider.call(value).associate { it.kotlin.displayName to it.kotlin }
+            return when(parameter.typeMapProvider.parameters.size) {
+                0 -> parameter.typeMapProvider.call()
+                1 -> parameter.typeMapProvider.call(value)
+                else -> throw IllegalStateException("Only no-arg functions or member functions of the value type (${value::class.simpleName}) are supported")
+            }.associate { it.kotlin.displayName to it.kotlin }
         }
         (parameter.value)::class.sealedClassSiblings()?.let { subClasses ->
             return@getTypeMap subClasses.associateBy { it.displayName }

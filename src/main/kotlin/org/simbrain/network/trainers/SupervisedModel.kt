@@ -22,7 +22,7 @@ class SupervisedModel(
     @Transient
     override val events = LocationEvents()
 
-    override val trainerConfig: SupervisedTrainerConfig = SupervisedTrainerConfig()
+    override val trainerConfig: SupervisedTrainerConfig = SupervisedTrainerConfig(lossFunctionProvider = ::possibleLossFunctions)
 
     override var trainingSet: MatrixDataset = if(useImmediateLearning) { MatrixDataset(
         inputLayer.activations.transpose().clone(),

@@ -63,7 +63,7 @@ class BackpropNetwork : FeedForward, SupervisedNetwork {
 
     override lateinit var testingSet: MatrixDataset
 
-    override var trainerConfig: SupervisedTrainerConfig = SupervisedTrainerConfig()
+    override var trainerConfig = SupervisedTrainerConfig(lossFunctionProvider = ::possibleLossFunctions)
 
     override fun initWeights() {
         wmList.forEach { wm -> trainerConfig.weightInitializationStrategy.initializeWeights(wm) }
@@ -99,4 +99,5 @@ class BackpropNetwork : FeedForward, SupervisedNetwork {
 
         return copy
     }
+
 }

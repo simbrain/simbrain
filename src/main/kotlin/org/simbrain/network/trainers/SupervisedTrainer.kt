@@ -24,19 +24,23 @@ import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.network.trainers.SupervisedTrainer.*
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.CopyableObject
+import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.rowVectorTransposed
 import smile.math.matrix.Matrix
 import kotlin.random.Random
+import kotlin.reflect.KFunction
 
 
 /**
  * Editable config object for supervised trainer.
  */
-open class SupervisedTrainerConfig: CopyableObject {
+open class SupervisedTrainerConfig(lossFunctionProvider: KFunction<List<Class<out EditableObject>>>? = null): CopyableObject {
 
-    @UserParameter(label = "Loss Function", order = 10)
-    var lossFunction:BackpropLossFunction = BackpropLossFunction.SSE
+    var lossFunction:BackpropLossFunction by GuiEditable(
+        initValue = BackpropLossFunction.SSE,
+        typeMapProvider = lossFunctionProvider
+    )
 
     var optimizer: Optimizer by GuiEditable(
         initValue = AdamOptimizer(),
@@ -69,7 +73,7 @@ open class SupervisedTrainerConfig: CopyableObject {
 
     var learningRate by optimizer::learningRate
 
-    override fun copy() = SupervisedTrainerConfig().also {
+    fun <T: SupervisedTrainerConfig> copyCurrentInto(toCopy: T) = toCopy.also {
         it.lossFunction = lossFunction
         it.optimizer = optimizer.copy()
         it.updateType = updateType.copy()
@@ -77,6 +81,8 @@ open class SupervisedTrainerConfig: CopyableObject {
         it.stoppingCondition = stoppingCondition.copy()
         it.testConfiguration = testConfiguration.copy()
     }
+
+    override fun copy() = copyCurrentInto(SupervisedTrainerConfig())
 }
 
 /**
@@ -362,12 +368,18 @@ class BackpropTrainer(network: Network, backpropNetwork: BackpropNetwork) : Supe
 
 }
 
-class SRNTrainerConfig: SupervisedTrainerConfig() {
+class SRNTrainerConfig(lossFunctionProvider: KFunction<List<Class<out EditableObject>>>? = null): SupervisedTrainerConfig(lossFunctionProvider) {
     override var updateType: UpdateMethod by GuiEditable(
         initValue = UpdateMethod.Epoch(),
         typeMapProvider = UpdateMethod::srnTypeList, // Only allow epoch for SRN
         order = 3
     )
+
+    override fun copy(): SRNTrainerConfig {
+        return copyCurrentInto(SRNTrainerConfig()).also {
+            it.updateType = updateType
+        }
+    }
 }
 
 class SRNTrainer(network: Network, srnNetwork: SRNNetwork) : SupervisedTrainer<SRNNetwork>(network, srnNetwork) {

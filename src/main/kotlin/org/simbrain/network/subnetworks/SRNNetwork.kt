@@ -98,7 +98,7 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
     @XStreamConstructor
     protected constructor() : super()
 
-    override var trainerConfig: SupervisedTrainerConfig = SRNTrainerConfig()
+    override var trainerConfig = SRNTrainerConfig(lossFunctionProvider = ::possibleLossFunctions)
 
     override val name: String
         get() = "SRN"
@@ -177,7 +177,7 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
             inputs = testingSet.inputs.clone(),
             targets = testingSet.targets.clone()
         )
-        copy.trainerConfig = SRNTrainerConfig().copy()
+        copy.trainerConfig = SRNTrainerConfig(lossFunctionProvider = ::possibleLossFunctions).copy()
 
         return copy
     }

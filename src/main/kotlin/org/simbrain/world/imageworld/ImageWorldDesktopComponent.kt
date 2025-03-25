@@ -10,7 +10,6 @@ import org.simbrain.world.imageworld.ImageWorldPreferences.imageDirectory
 import org.simbrain.world.imageworld.gui.FilterCollectionGui
 import java.awt.*
 import java.awt.event.ActionEvent
-import java.awt.event.ItemEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.File
@@ -22,10 +21,7 @@ import kotlin.math.min
 class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldComponent) :
     DesktopComponent<ImageWorldComponent>(frame, component) {
 
-    private val toolbars = JPanel(FlowLayout(FlowLayout.LEFT))
-    private val sourceToolbar = JToolBar()
-    private val imageAlbumToolbar = JToolBar()
-    private val sensorToolbar = JToolBar()
+    private val imageToolbar = JToolBar()
 
     /**
      * Custom file chooser for selecting image files.
@@ -58,7 +54,7 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
     /**
      * Whether to use anti-aliasing (smoothing) when drawing.
      */
-    private var useSmoothing: Boolean = true
+    private var useSmoothing: Boolean = false
     
     /**
      * The quality level of smoothing (LOW, MEDIUM, HIGH)
@@ -82,7 +78,7 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
         }
     }
     
-    private var smoothingQuality: SmoothingQuality = SmoothingQuality.MEDIUM
+    private var smoothingQuality: SmoothingQuality = SmoothingQuality.HIGH
     private var brushShape: BrushShape = BrushShape.CIRCLE
     
     /**
@@ -477,96 +473,13 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
      */
     private fun setupToolbars() {
 
-        imageAlbumToolbar.add(frameLabel)
-        imageAlbumToolbar.add(deleteImageAction)
-        imageAlbumToolbar.add(previousImageAction)
-        imageAlbumToolbar.add(nextImageAction)
-        imageAlbumToolbar.add(takeSnapshotAction)
+        imageToolbar.add(frameLabel)
+        imageToolbar.add(deleteImageAction)
+        imageToolbar.add(previousImageAction)
+        imageToolbar.add(nextImageAction)
+        imageToolbar.add(takeSnapshotAction)
+        imageToolbar.addSeparator()
 
-        // Color options
-        val colorList = arrayOf(
-            Color.white,
-            Color.black,
-            Color.red,
-            Color.blue,
-            Color.green,
-            Color.yellow,
-            Color.cyan,
-            Color.magenta
-        )
-        val colorNames =
-            arrayOf<String?>("White", "Black", "Red", "Blue", "Green", "Yellow", "Cyan", "Magenta", "Custom")
-        val cbColorChoice: JComboBox<*> = JComboBox<Any?>(colorNames)
-
-        // Check box handling
-        val checkBoxDrawMode = JCheckBox("Draw")
-        checkBoxDrawMode.isSelected = paintMode
-        cbColorChoice.isEnabled = checkBoxDrawMode.isSelected
-        checkBoxDrawMode.addItemListener { e: ItemEvent? ->
-            paintMode = checkBoxDrawMode.isSelected
-            cbColorChoice.setEnabled(checkBoxDrawMode.isSelected)
-        }
-
-        cbColorChoice.addActionListener { e: ActionEvent ->
-            val len = cbColorChoice.itemCount
-            if ((e.source as JComboBox<*>).selectedIndex == len - 1) {
-                println("Custom...")
-            } else {
-                this.penColor = colorList[cbColorChoice.selectedIndex]
-            }
-        }
-        
-        // Pen size slider for more precise control
-        sourceToolbar.add(JLabel("Size:"))
-        val penSizeLabel = JLabel("${penSize}px")
-        val penSizeSlider = JSlider(JSlider.HORIZONTAL, 1, 30, penSize)
-        penSizeSlider.preferredSize = Dimension(80, penSizeSlider.preferredSize.height)
-        penSizeSlider.addChangeListener { 
-            penSize = penSizeSlider.value
-            penSizeSlider.toolTipText = "Pen size: ${penSize}px"
-            penSizeLabel.text = "${penSize}px"
-        }
-        
-        sourceToolbar.add(penSizeSlider)
-        sourceToolbar.add(penSizeLabel)
-        
-        // Smoothing checkbox and quality selection
-        val checkBoxSmoothing = JCheckBox("Smoothing")
-        checkBoxSmoothing.isSelected = useSmoothing
-        checkBoxSmoothing.addItemListener {
-            useSmoothing = checkBoxSmoothing.isSelected
-            checkBoxSmoothing.isEnabled = useSmoothing
-        }
-        
-        // Smoothing quality selection
-        val cbSmoothingQuality = JComboBox(SmoothingQuality.values())
-        cbSmoothingQuality.selectedItem = smoothingQuality
-        cbSmoothingQuality.isEnabled = useSmoothing
-        cbSmoothingQuality.toolTipText = "Select smoothing quality level"
-        cbSmoothingQuality.addActionListener {
-            smoothingQuality = cbSmoothingQuality.selectedItem as SmoothingQuality
-        }
-        
-        // Brush shape selection
-        val brushShapeLabel = JLabel("Brush:")
-        val cbBrushShape = JComboBox(BrushShape.values())
-        cbBrushShape.selectedItem = brushShape
-        cbBrushShape.toolTipText = "Select brush shape"
-        cbBrushShape.addActionListener {
-            brushShape = cbBrushShape.selectedItem as BrushShape
-        }
-        
-        // Group smoothing controls
-        val smoothingPanel = JPanel(FlowLayout(FlowLayout.LEFT, 2, 0))
-        smoothingPanel.add(checkBoxSmoothing)
-        smoothingPanel.add(cbSmoothingQuality)
-        sourceToolbar.add(smoothingPanel)
-        
-        // Group brush shape controls
-        val brushShapePanel = JPanel(FlowLayout(FlowLayout.LEFT, 2, 0))
-        brushShapePanel.add(brushShapeLabel)
-        brushShapePanel.add(cbBrushShape)
-        sourceToolbar.add(brushShapePanel)
 
         val fillCanvasAction = org.simbrain.util.createAction(
             "Fill",
@@ -591,11 +504,78 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
             }
         }
 
-        // Add all components to toolbar in logical order
-        sourceToolbar.add(checkBoxDrawMode)
-        sourceToolbar.add(cbColorChoice)
-        sourceToolbar.add(fillCanvasAction)
-        sourceToolbar.add(clearCanvasAction)
+        imageToolbar.add(fillCanvasAction)
+        imageToolbar.add(clearCanvasAction)
+        imageToolbar.addSeparator()
+
+        // Color options
+        val colorList = arrayOf(
+            Color.white,
+            Color.black,
+            Color.red,
+            Color.blue,
+            Color.green,
+            Color.yellow,
+            Color.cyan,
+            Color.magenta
+        )
+        val colorNames =
+            arrayOf<String?>("White", "Black", "Red", "Blue", "Green", "Yellow", "Cyan", "Magenta", "Custom")
+        val cbColorChoice: JComboBox<*> = JComboBox<Any?>(colorNames)
+
+        cbColorChoice.addActionListener { e: ActionEvent ->
+            val len = cbColorChoice.itemCount
+            if ((e.source as JComboBox<*>).selectedIndex == len - 1) {
+                println("Custom...")
+            } else {
+                this.penColor = colorList[cbColorChoice.selectedIndex]
+            }
+        }
+        imageToolbar.add(cbColorChoice)
+
+        // Pen size slider for more precise control
+        val penSizeLabel = JLabel("${penSize}px")
+        val penSizeSlider = JSlider(JSlider.HORIZONTAL, 1, 30, penSize)
+        penSizeSlider.preferredSize = Dimension(80, penSizeSlider.preferredSize.height)
+        penSizeSlider.addChangeListener { 
+            penSize = penSizeSlider.value
+            penSizeSlider.toolTipText = "Pen size: ${penSize}px"
+            penSizeLabel.text = "${penSize}px"
+        }
+        imageToolbar.add(penSizeLabel)
+        imageToolbar.add(penSizeSlider)
+
+        // Smoothing checkbox and quality selection
+        val checkBoxSmoothing = JCheckBox("Smoothing")
+        checkBoxSmoothing.isSelected = useSmoothing
+        checkBoxSmoothing.addItemListener {
+            useSmoothing = checkBoxSmoothing.isSelected
+        }
+        
+        // Smoothing quality selection
+        val cbSmoothingQuality = JComboBox(SmoothingQuality.values())
+        cbSmoothingQuality.selectedItem = smoothingQuality
+        cbSmoothingQuality.isEnabled = useSmoothing
+        cbSmoothingQuality.toolTipText = "Select smoothing quality level"
+        cbSmoothingQuality.addActionListener {
+            smoothingQuality = cbSmoothingQuality.selectedItem as SmoothingQuality
+        }
+        
+        // Brush shape selection
+        val cbBrushShape = JComboBox(BrushShape.values())
+        cbBrushShape.selectedItem = brushShape
+        cbBrushShape.toolTipText = "Select brush shape"
+        cbBrushShape.addActionListener {
+            brushShape = cbBrushShape.selectedItem as BrushShape
+        }
+        val brushShapePanel = JPanel(FlowLayout(FlowLayout.LEFT, 2, 0))
+        brushShapePanel.add(JLabel("Brush:"))
+        brushShapePanel.add(cbBrushShape)
+        imageToolbar.add(brushShapePanel)
+
+        //smoothingPanel.add(cbSmoothingQuality)
+        imageToolbar.add(checkBoxSmoothing)
+
     }
 
     /**
@@ -647,15 +627,10 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
         imageWorld.filterCollection.events.filterChanged.on(swingDispatcher) { _, _ -> this.repaint() }
 
         // Toolbars
-        add(toolbars, BorderLayout.NORTH)
-        toolbars.add(sourceToolbar)
-        toolbars.add(sensorToolbar)
         val filterGui = FilterCollectionGui(this, imageWorld.filterCollection)
-        toolbars.add(filterGui.toolBar)
-
+        add(filterGui.toolBar, BorderLayout.NORTH)
+        add(imageToolbar, BorderLayout.SOUTH)
         setupToolbars()
-
-        add(imageAlbumToolbar, BorderLayout.SOUTH)
         updateToolbar()
 
         // TODO: Below breaks the file chooser

@@ -15,6 +15,8 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.File
 import javax.swing.*
+import kotlin.math.abs
+import kotlin.math.max
 import kotlin.math.min
 
 class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldComponent) :
@@ -47,6 +49,47 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
      * Current pen color when drawing on the current image.
      */
     private var penColor: Color = Color.white
+
+    /**
+     * Current pen size for drawing points. Values greater than 1 will draw wider points.
+     */
+    private var penSize: Int = 1
+    
+    /**
+     * Whether to use anti-aliasing (smoothing) when drawing.
+     */
+    private var useSmoothing: Boolean = true
+    
+    /**
+     * The quality level of smoothing (LOW, MEDIUM, HIGH)
+     */
+    private enum class SmoothingQuality {
+        LOW, MEDIUM, HIGH;
+
+        override fun toString(): String {
+            return name.lowercase().replaceFirstChar { it.uppercase() }
+        }
+    }
+    
+    /**
+     * The available brush shapes
+     */
+    private enum class BrushShape {
+        CIRCLE, SQUARE, SOFT;
+
+        override fun toString(): String {
+            return name.lowercase().replaceFirstChar { it.uppercase() }
+        }
+    }
+    
+    private var smoothingQuality: SmoothingQuality = SmoothingQuality.MEDIUM
+    private var brushShape: BrushShape = BrushShape.CIRCLE
+    
+    /**
+     * Store the last mouse position for drawing continuous lines
+     */
+    private var lastX: Int = -1
+    private var lastY: Int = -1
 
     private val frameLabel = JLabel()
 
@@ -95,7 +138,16 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
                 }
 
                 override fun mousePressed(evt: MouseEvent) {
+                    // Reset last position when starting a new stroke
+                    lastX = -1
+                    lastY = -1
                     drawPixel(evt)
+                }
+
+                override fun mouseReleased(evt: MouseEvent) {
+                    // Reset last position when ending a stroke
+                    lastX = -1
+                    lastY = -1
                 }
 
                 override fun mouseClicked(evt: MouseEvent) {
@@ -130,15 +182,197 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
             val ratioY = 1.0 * height / image.height
             val x = (evt.x / ratioX).toInt()
             val y = (evt.y / ratioY).toInt()
+            
+            // Basic boundary check for the center point
             if (x < 0 || x >= image.width || y < 0 || y >= image.height) {
                 return
             }
-            if (evt.isShiftDown) {
-                image.setRGB(x, y, penColor.invert().rgb)
-            } else {
-                image.setRGB(x, y, penColor.rgb)
+            
+            // Get the color to draw (inverted if shift is down)
+            val drawColor = if (evt.isShiftDown) penColor.invert() else penColor
+            
+            // Create a temporary Graphics2D to draw on the image
+            val g2d = image.createGraphics()
+            
+            // Apply smoothing if enabled
+            if (useSmoothing) {
+                applySmoothing(g2d)
             }
+            
+            // For single pixel mode, just set the RGB value directly
+            if (penSize == 1) {
+                if (lastX >= 0 && lastY >= 0 && (lastX != x || lastY != y)) {
+                    // Draw a line from last position to current for continuous effect
+                    g2d.color = drawColor
+                    g2d.drawLine(lastX, lastY, x, y)
+                } else {
+                    image.setRGB(x, y, drawColor.rgb)
+                }
+            } else {
+                // For multi-pixel mode, draw a circle at the current position
+                g2d.color = drawColor
+                
+                // If we have a last position and it's different from current, draw connecting line
+                if (lastX >= 0 && lastY >= 0 && (abs(lastX - x) > 2 || abs(lastY - y) > 2)) {
+                    // Draw a line of circles between the points for a smoother stroke
+                    val dx = x - lastX
+                    val dy = y - lastY
+                    val distance = max(abs(dx), abs(dy))
+                    
+                    for (i in 0..distance step max(1, penSize / 4)) {
+                        val t = if (distance == 0) 0.0 else i.toDouble() / distance
+                        val ix = (lastX + dx * t).toInt()
+                        val iy = (lastY + dy * t).toInt()
+                        
+                        // Check the intermediary point is within bounds
+                        if (ix >= 0 && ix < image.width && iy >= 0 && iy < image.height) {
+                            drawBrushAt(g2d, ix, iy, penSize, image)
+                        }
+                    }
+                } else {
+                    // Just draw at the current point
+                    drawBrushAt(g2d, x, y, penSize, image)
+                }
+            }
+            
+            // Store current position as last for next draw
+            lastX = x
+            lastY = y
+            
+            g2d.dispose()
             imageWorld.imageAlbum.fireImageUpdate()
+        }
+        
+        /**
+         * Apply smoothing settings to the graphics context based on quality level
+         */
+        private fun applySmoothing(g2d: Graphics2D) {
+            // Apply different rendering hints based on quality setting
+            when (smoothingQuality) {
+                SmoothingQuality.LOW -> {
+                    g2d.setRenderingHint(
+                        RenderingHints.KEY_ANTIALIASING,
+                        RenderingHints.VALUE_ANTIALIAS_ON
+                    )
+                }
+                SmoothingQuality.MEDIUM -> {
+                    g2d.setRenderingHint(
+                        RenderingHints.KEY_ANTIALIASING,
+                        RenderingHints.VALUE_ANTIALIAS_ON
+                    )
+                    g2d.setRenderingHint(
+                        RenderingHints.KEY_STROKE_CONTROL,
+                        RenderingHints.VALUE_STROKE_PURE
+                    )
+                    g2d.setRenderingHint(
+                        RenderingHints.KEY_RENDERING,
+                        RenderingHints.VALUE_RENDER_QUALITY
+                    )
+                }
+                SmoothingQuality.HIGH -> {
+                    g2d.setRenderingHint(
+                        RenderingHints.KEY_ANTIALIASING,
+                        RenderingHints.VALUE_ANTIALIAS_ON
+                    )
+                    g2d.setRenderingHint(
+                        RenderingHints.KEY_STROKE_CONTROL,
+                        RenderingHints.VALUE_STROKE_PURE
+                    )
+                    g2d.setRenderingHint(
+                        RenderingHints.KEY_RENDERING,
+                        RenderingHints.VALUE_RENDER_QUALITY
+                    )
+                    g2d.setRenderingHint(
+                        RenderingHints.KEY_ALPHA_INTERPOLATION,
+                        RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY
+                    )
+                    g2d.setRenderingHint(
+                        RenderingHints.KEY_COLOR_RENDERING,
+                        RenderingHints.VALUE_COLOR_RENDER_QUALITY
+                    )
+                    g2d.setRenderingHint(
+                        RenderingHints.KEY_INTERPOLATION,
+                        RenderingHints.VALUE_INTERPOLATION_BICUBIC
+                    )
+                    g2d.setRenderingHint(
+                        RenderingHints.KEY_DITHERING,
+                        RenderingHints.VALUE_DITHER_ENABLE
+                    )
+                    
+                    // For high quality, use alpha blending for smoother edges
+                    g2d.composite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.9f)
+                    
+                    // Create a radial gradient for a feathered brush effect if we're drawing with larger brushes
+                    if (penSize > 3) {
+                        val center = point(if (lastX != -1) lastX else 0, if (lastY != -1) lastY else 0)
+                        val radius = penSize * 0.8f
+                        val gradient = RadialGradientPaint(
+                            center,
+                            radius,
+                            floatArrayOf(0.0f, 0.7f, 1.0f),
+                            arrayOf(penColor,
+                                   Color(penColor.red, penColor.green, penColor.blue, 180),
+                                   Color(penColor.red, penColor.green, penColor.blue, 0))
+                        )
+                        g2d.paint = gradient
+                    }
+                }
+            }
+        }
+
+        /**
+         * Draw at a specific point according to current brush settings
+         */
+        private fun drawBrushAt(g2d: Graphics2D, x: Int, y: Int, penSize: Int, image: java.awt.image.BufferedImage) {
+            val penX = max(0, x - penSize / 2)
+            val penY = max(0, y - penSize / 2)
+            val actualWidth = min(penSize, image.width - penX)
+            val actualHeight = min(penSize, image.height - penY)
+            
+            when (brushShape) {
+                BrushShape.CIRCLE -> {
+                    g2d.fillOval(penX, penY, actualWidth, actualHeight)
+                }
+                BrushShape.SQUARE -> {
+                    g2d.fillRect(penX, penY, actualWidth, actualHeight)
+                }
+                BrushShape.SOFT -> {
+                    // Draw with decreasing opacity for a soft brush effect
+                    val center = Point(x, y)
+                    val radius = penSize * 0.9f
+                    val gradient = RadialGradientPaint(
+                        center,
+                        radius,
+                        floatArrayOf(0.0f, 0.5f, 0.9f),
+                        arrayOf(g2d.color, 
+                               Color(g2d.color.red, g2d.color.green, g2d.color.blue, 128),
+                               Color(g2d.color.red, g2d.color.green, g2d.color.blue, 0))
+                    )
+                    
+                    // Store the old paint and composite
+                    val oldPaint = g2d.paint
+                    val oldComposite = g2d.composite
+                    
+                    // Set new settings for soft brush
+                    g2d.paint = gradient
+                    g2d.composite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.7f)
+                    
+                    // Draw with some extra size for soft edges
+                    val softSize = (penSize * 1.2).toInt()
+                    val softX = max(0, x - softSize / 2)
+                    val softY = max(0, y - softSize / 2)
+                    g2d.fillOval(
+                        softX,
+                        softY,
+                        min(softSize, image.width - softX),
+                        min(softSize, image.height - softY)
+                    )
+                    
+                    // Restore original settings
+                    g2d.paint = oldPaint
+                    g2d.composite = oldComposite
+                }
+            }
         }
     }
 
@@ -249,17 +483,7 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
         imageAlbumToolbar.add(nextImageAction)
         imageAlbumToolbar.add(takeSnapshotAction)
 
-        //        // Add Color Picker
-        //        JButton setColorButton = new JButton();
-        //        setColorButton.setIcon(ResourceManager.getSmallIcon("menu_icons/PaintView.png"));
-        //        setColorButton.setToolTipText("Pen Color");
-        //        setColorButton.addActionListener(e -> {
-        //            Color newColor = JColorChooser.showDialog(this, "Choose Color", penColor);
-        //            if (newColor != null) {
-        //                this.penColor = newColor;
-        //            }
-        //        });
-        //        sourceToolbar.add(setColorButton);
+        // Color options
         val colorList = arrayOf(
             Color.white,
             Color.black,
@@ -291,6 +515,58 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
                 this.penColor = colorList[cbColorChoice.selectedIndex]
             }
         }
+        
+        // Pen size slider for more precise control
+        sourceToolbar.add(JLabel("Size:"))
+        val penSizeLabel = JLabel("${penSize}px")
+        val penSizeSlider = JSlider(JSlider.HORIZONTAL, 1, 30, penSize)
+        penSizeSlider.preferredSize = Dimension(80, penSizeSlider.preferredSize.height)
+        penSizeSlider.addChangeListener { 
+            penSize = penSizeSlider.value
+            penSizeSlider.toolTipText = "Pen size: ${penSize}px"
+            penSizeLabel.text = "${penSize}px"
+        }
+        
+        sourceToolbar.add(penSizeSlider)
+        sourceToolbar.add(penSizeLabel)
+        
+        // Smoothing checkbox and quality selection
+        val checkBoxSmoothing = JCheckBox("Smoothing")
+        checkBoxSmoothing.isSelected = useSmoothing
+        checkBoxSmoothing.addItemListener {
+            useSmoothing = checkBoxSmoothing.isSelected
+            checkBoxSmoothing.isEnabled = useSmoothing
+        }
+        
+        // Smoothing quality selection
+        val cbSmoothingQuality = JComboBox(SmoothingQuality.values())
+        cbSmoothingQuality.selectedItem = smoothingQuality
+        cbSmoothingQuality.isEnabled = useSmoothing
+        cbSmoothingQuality.toolTipText = "Select smoothing quality level"
+        cbSmoothingQuality.addActionListener {
+            smoothingQuality = cbSmoothingQuality.selectedItem as SmoothingQuality
+        }
+        
+        // Brush shape selection
+        val brushShapeLabel = JLabel("Brush:")
+        val cbBrushShape = JComboBox(BrushShape.values())
+        cbBrushShape.selectedItem = brushShape
+        cbBrushShape.toolTipText = "Select brush shape"
+        cbBrushShape.addActionListener {
+            brushShape = cbBrushShape.selectedItem as BrushShape
+        }
+        
+        // Group smoothing controls
+        val smoothingPanel = JPanel(FlowLayout(FlowLayout.LEFT, 2, 0))
+        smoothingPanel.add(checkBoxSmoothing)
+        smoothingPanel.add(cbSmoothingQuality)
+        sourceToolbar.add(smoothingPanel)
+        
+        // Group brush shape controls
+        val brushShapePanel = JPanel(FlowLayout(FlowLayout.LEFT, 2, 0))
+        brushShapePanel.add(brushShapeLabel)
+        brushShapePanel.add(cbBrushShape)
+        sourceToolbar.add(brushShapePanel)
 
         val fillCanvasAction = org.simbrain.util.createAction(
             "Fill",
@@ -315,6 +591,7 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
             }
         }
 
+        // Add all components to toolbar in logical order
         sourceToolbar.add(checkBoxDrawMode)
         sourceToolbar.add(cbColorChoice)
         sourceToolbar.add(fillCanvasAction)
@@ -448,6 +725,6 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
     }
 
     override fun getPreferredSize(): Dimension {
-        return Dimension(650, 500)
+        return Dimension(800, 600)
     }
 }

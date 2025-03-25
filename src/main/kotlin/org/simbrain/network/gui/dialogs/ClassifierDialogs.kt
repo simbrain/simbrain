@@ -12,6 +12,7 @@ import org.simbrain.util.display
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.showWarningDialog
 import org.simbrain.util.table.*
+import org.simbrain.workspace.gui.SimbrainDesktop
 import java.awt.Dimension
 import javax.swing.JButton
 import javax.swing.JLabel
@@ -21,6 +22,7 @@ import javax.swing.JSeparator
 /**
  * Classifier training dialog.
  */
+context(NetworkPanel)
 fun SmileClassifier.getTrainingDialog(): StandardDialog {
     return StandardDialog().apply {
 
@@ -49,6 +51,20 @@ fun SmileClassifier.getTrainingDialog(): StandardDialog {
             addAction(table.importCsv)
             addAction(table.exportCsv())
             addAction(table.randomizeAction)
+            addSeparator()
+            toolbar.add(table.createApplyAction("Apply Inputs") {
+                inputNeuronGroup.setActivations(table.model.getRow<Double>(it).toDoubleArray())
+                with(network) {
+                    this@SmileClassifier.update()
+                }
+            })
+            toolbar.add(table.createAdvanceRowAction())
+            addAction(table.createApplyAndAdvanceAction {
+                inputNeuronGroup.setActivations(table.model.getRow<Double>(it).toDoubleArray())
+                with(network) {
+                    this@SmileClassifier.update()
+                }
+            })
             preferredSize = Dimension(300, 300)
             addCommitTask {
                 classifier.trainingData.featureVectors = this.model.get2DDoubleArray()
@@ -139,5 +155,5 @@ fun main() {
         addNetworkModel(classifier)
         classifier
     }
-    SmileClassifierNode(np, classifier).propertyDialog?.display()
+    SmileClassifierNode(np, classifier).propertyDialog.display()
 }

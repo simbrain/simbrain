@@ -28,7 +28,7 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
         }
 
     override val propertyDialog: StandardDialog
-        get() = smileClassifier.getTrainingDialog()
+        get() = with(networkPanel) {smileClassifier.getTrainingDialog()}
 
     override fun layoutChildren() {
         super.layoutChildren()

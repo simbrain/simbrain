@@ -56,6 +56,7 @@ class SmileClassifier(
     init {
         label = classifier.name
         alignNetworkModels(inputNeuronGroup, outputNeuronGroup, Alignment.VERTICAL)
+        inputNeuronGroup.isAllClamped = true
         offsetNeuronCollections(inputNeuronGroup, outputNeuronGroup, Direction.NORTH, 150.0)
         when (classifier.trainingData.labelEncoding) {
             ClassificationDataset.LabelEncoding.Bipolar -> {

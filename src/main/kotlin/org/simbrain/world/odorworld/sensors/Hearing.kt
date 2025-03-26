@@ -13,12 +13,12 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity
  */
 class Hearing(
 
-   phrase: String = "Hi!",
+    phrase: String = "Hi!",
 
     @UserParameter(
         label = "Output Amount",
         description = "The amount of activation to be sent to a neuron coupled with this sensor.",
-        order = 5
+        order = 20
     )
     var outputAmount: Double = 1.0
 
@@ -27,7 +27,7 @@ class Hearing(
     @UserParameter(
         label = "Utterance",
         description = "The string or phrase associated with this sensor. Hearing sensors get activated when it senses a speech effectors of the same utterance.",
-        order = 3
+        order = 10
     )
     @set:Consumable(customDescriptionMethod = "getAttributeDescription")
     var phrase: String = phrase
@@ -36,6 +36,14 @@ class Hearing(
             events.propertyChanged.fire()
         }
 
+    @UserParameter(
+        label = "Linger Time",
+        description = "Anything heard will remain `heard` for this many iterations. " +
+                "Allows the agent to process a signal before it disappears.",
+        order = 30
+    )
+    var lingerTime: Int = 10
+
     /**
      * Maximum characters per row before warping around in a HearingNode.
      */
@@ -43,7 +51,7 @@ class Hearing(
         label = "Characters per Row",
         description = ("The maximum number of characters that can be displayed in one row in the hearing bubble. "
                 + "This setting only affects visual representation."),
-        order = 4
+        order = 50
     )
     var charactersPerRow: Int = 32
 
@@ -53,36 +61,28 @@ class Hearing(
     var isActivated: Boolean = false
         private set
 
-    // TODO: Clean up / Make this settable
-    private var time = 0
+    // Counter for lingertime
+    private var counter = 0
 
-    private val heardPhrases = mutableListOf<String>()
-
-    @UserParameter(
-        label = "Linger Time",
-        description = "The time to linger after the phrase is heard.",
-        order = 10
-    )
-    var lingerTime = 10
+    private var utteranceHeard = false
 
     fun hear(phrase: String) {
-        heardPhrases.add(phrase)
+        if (phrase.equals(this.phrase, ignoreCase = true))
+            utteranceHeard = true
     }
 
     override fun update(parent: OdorWorldEntity) {
-        time = (time - 1).coerceAtLeast(0)
+        counter = (counter - 1).coerceAtLeast(0)
 
-        heardPhrases
-            .filter { it.equals(phrase, ignoreCase = true) }
-            .forEach {
-                isActivated = true
-                time = lingerTime
-                events.updated.fire()
-            }
+        if (utteranceHeard) {
+            isActivated = true
+            counter = lingerTime
+            events.updated.fire()
+        }
 
-        heardPhrases.clear()
+        utteranceHeard = false
 
-        if (time <= 0) {
+        if (counter <= 0) {
             if (isActivated) {
                 isActivated = false
                 events.updated.fire()
@@ -109,7 +109,7 @@ class Hearing(
     override fun copy(): Hearing {
         return Hearing(phrase, outputAmount).also {
             it.isActivated = this.isActivated
-            it.time = this.time
+            it.counter = this.counter
             it.lingerTime = this.lingerTime
             it.charactersPerRow = this.charactersPerRow
         }

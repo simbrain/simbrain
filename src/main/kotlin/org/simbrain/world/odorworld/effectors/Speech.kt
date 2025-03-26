@@ -19,14 +19,14 @@ class Speech(
     @UserParameter(
         label = "Utterance",
         description = "The thing this speech effector says.",
-        order = 3
+        order = 5
     )
     var phrase: String = "Hi!",
 
     @UserParameter(
         label = "Threshold",
         description = "Threshold above which to \"the message\".",
-        order = 5
+        order = 10
     ) var threshold: Double = 0.1
 
 ) : Effector("""Say: "$phrase""""), VisualizableEntityAttribute {
@@ -34,12 +34,12 @@ class Speech(
     @UserParameter(
         label = "Characters per Row",
         description = ("The maximum number of characters that can be displayed in one row in the speech bubble. This setting only affects visual representation."),
-        order = 4
+        order = 20
     )
     var charactersPerRow: Int = 32
 
     @UserParameter(label = "Decay Function", order = 10, tab = "Dispersion")
-    private var decayFunction: DecayFunction = LinearDecayFunction(128.0)
+    var decayFunction: DecayFunction = LinearDecayFunction(128.0)
 
     /**
      * Whether this is activated. If so, display the phrase and notify all

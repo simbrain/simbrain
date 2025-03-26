@@ -24,7 +24,7 @@ import smile.math.matrix.Matrix
  */
 class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, AttributeContainer {
 
-    var updateRule: NeuronUpdateRule<ScalarDataHolder, MatrixDataHolder> by GuiEditable(
+    override var updateRule: NeuronUpdateRule<ScalarDataHolder, MatrixDataHolder> by GuiEditable(
         initValue = LinearRule(),
         order = 100,
         tab = "Update Rule",
@@ -33,7 +33,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
             val typeChanged = field::class != it::class
             field = it
             if (typeChanged) {
-                dataHolder = updateRule.createMatrixData(size)
+                dataHolder = it.createMatrixData(size)
             }
             events.updated.fire()
         }
@@ -309,8 +309,8 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
      */
     override fun processError(
         error: Matrix,
-        signalSource: ArrayLayer,
-        biasesAccumulator: HashMap<ArrayLayer, Matrix>,
+        signalSource: Layer,
+        biasesAccumulator: HashMap<Layer, Matrix>,
         rawMatrixAccumulator: HashMap<Matrix, Matrix>
     ): Matrix {
 

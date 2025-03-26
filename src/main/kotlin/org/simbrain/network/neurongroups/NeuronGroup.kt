@@ -44,9 +44,11 @@ open class NeuronGroup() : AbstractNeuronCollection() {
 
     constructor(numNeurons: Int) : this(List(numNeurons) { Neuron() })
 
-    fun setUpdateRule(base: NeuronUpdateRule<*, *>) {
-        neuronList.forEach { it.updateRule = base.copy() }
-    }
+    override var updateRule: NeuronUpdateRule<*, *>
+        get() = neuronList.first().updateRule
+        set(value) {
+            neuronList.forEach { it.updateRule = value.copy() }
+        }
 
     override suspend fun delete(): List<NetworkModel> {
         // val deletedNeurons = neuronList.toList().flatMap { it.delete() }

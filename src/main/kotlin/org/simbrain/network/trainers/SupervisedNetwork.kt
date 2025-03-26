@@ -13,7 +13,7 @@
  */
 package org.simbrain.network.trainers
 
-import org.simbrain.network.core.ArrayLayer
+import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.updaterules.SoftmaxRule
@@ -29,9 +29,9 @@ interface SupervisedNetwork {
 
     var testingSet: MatrixDataset
 
-    val inputLayer: ArrayLayer
+    val inputLayer: Layer
 
-    val outputLayer: ArrayLayer
+    val outputLayer: Layer
 
     context(Network)
     fun update()

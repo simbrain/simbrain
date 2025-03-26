@@ -16,6 +16,8 @@ import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.neurongroups.NeuronGroupParams
 import org.simbrain.network.subnetworks.RestrictedBoltzmannMachine
 import org.simbrain.network.subnetworks.Subnetwork
+import org.simbrain.network.trainers.SupervisedModel
+import org.simbrain.network.trainers.computeUpdateOrderList
 import org.simbrain.network.util.Alignment
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
@@ -347,7 +349,6 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         description = "Show a weight matrix connecting source neurons (adorned with red squares) and target neurons (regular green selection)",
         iconPath = "menu_icons/grid.png",
         enablingCondition = EnablingCondition.SOURCE_AND_TARGET_NEURONS,
-        keyboardShortcuts = Ctrl + 'M'
     ) {
         val sources = selectionManager.filterSelectedSourceModels<Neuron>()
         val targets = selectionManager.filterSelectedModels<Neuron>()
@@ -935,6 +936,55 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         description = "Show undo/redo history"
     ) {
         networkPanel.showUndoHistoryDialog()
+    }
+
+    fun canCreateSupervisedModel(): Pair<Boolean, String> {
+        val reasons = mutableListOf<String>()
+        val source = networkPanel.selectionManager.filterSelectedSourceModels<Layer>().firstOrNull()
+        val target = networkPanel.selectionManager.filterSelectedModels<Layer>().firstOrNull()
+        if (source == null) {
+            reasons.add("No source model selected")
+        }
+        if (target == null) {
+            reasons.add("No target model selected")
+        }
+        if (source != null && target != null && computeUpdateOrderList(target).let { !it.contains(source) || !it.contains(target) }) {
+            reasons.add("No connection between source and target")
+        }
+        if (networkPanel.network.getModels<SupervisedModel>().any {
+            it.layers.first() == source && it.layers.last() == target
+        }) {
+            reasons.add("A supervised model already exists for this connection")
+        }
+        return reasons.isEmpty() to reasons.joinToString(", ")
+    }
+
+
+    fun createCreateSupervisedModelAction(): Action {
+        val (canCreateSupervisedModel, cannotCreateSupervisedModelReason) = canCreateSupervisedModel()
+
+        return networkPanel.createAction(
+            name = "Create Supervised Model",
+            initBlock = {
+                isEnabled = canCreateSupervisedModel
+            },
+            keyboardShortcut = CmdOrCtrl + 'M',
+            description = "Create supervised model with using the current activation as target for immediate training" + if (!canCreateSupervisedModel) " (Disabled: $cannotCreateSupervisedModelReason)" else ""
+        ) {
+
+            val (canCreate) = canCreateSupervisedModel()
+
+            if (canCreate) {
+                val input = selectionManager.sourceModels.firstOrNull() as? Layer
+                val output = selectionManager.selectedModels.firstOrNull() as? Layer
+
+                if (input != null && output != null) {
+                    val supervisedModel = SupervisedModel(input, output)
+                    network.addNetworkModel(supervisedModel)
+                }
+            }
+
+        }
     }
 
 }

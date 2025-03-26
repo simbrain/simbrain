@@ -103,13 +103,13 @@ class PatternsOfActivity : Simulation {
         // Set up sensory group and odor world
         val sensoryNetL = net.addNeuronGroup(-9.25, 95.93, 5)
         // TODO: Removed random spike chance for now
-        sensoryNetL.setUpdateRule(IntegrateAndFireRule())
+        sensoryNetL.updateRule = IntegrateAndFireRule()
         sensoryNetL.setPolarity(Polarity.EXCITATORY)
         sensoryNetL.label = "Sensory Left"
 
         // Set up sensory group and odor world
         val sensoryNetR = net.addNeuronGroup(-9.25, 155.93, 5)
-        sensoryNetR.setUpdateRule(IntegrateAndFireRule())
+        sensoryNetR.updateRule = IntegrateAndFireRule()
         sensoryNetR.setPolarity(Polarity.EXCITATORY)
         sensoryNetR.label = "Sensory Right"
 

@@ -122,7 +122,7 @@ class ModularOscillatoryNetwork : Simulation {
     private fun addBinaryModule(x: Int, y: Int, numNeurons: Int, name: String): NeuronGroup {
         val ng = net.addNeuronGroup(x.toDouble(), y.toDouble(), numNeurons)
         val rule = BinaryRule()
-        ng.setUpdateRule(rule)
+        ng.updateRule = rule
         HexagonalGridLayout.layoutNeurons(ng.neuronList, 40, 40)
         ng.setLocation(x.toDouble(), y.toDouble())
         ng.label = name
@@ -134,7 +134,7 @@ class ModularOscillatoryNetwork : Simulation {
         // KuramotoRule rule = new KuramotoRule();
         // NakaRushtonRule rule = new NakaRushtonRule();
         // rule.setNaturalFrequency(.1);
-        ng.setUpdateRule(rule)
+        ng.updateRule = rule
         for (neuron in ng.neuronList) {
             if (Math.random() < .5) {
                 neuron.polarity = SimbrainConstants.Polarity.EXCITATORY

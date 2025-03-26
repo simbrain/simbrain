@@ -1,6 +1,7 @@
 package org.simbrain.network.core
 
 import org.simbrain.network.events.LocationEvents
+import org.simbrain.network.updaterules.NeuronUpdateRule
 import org.simbrain.util.toDoubleArray
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Producible
@@ -80,7 +81,7 @@ abstract class Layer : LocatableModel(), AttributeContainer {
      * In subclasses under [NeuronArray] the matrices are basic and computations are performed on those.
      * In subclasses under [AbstractNeuronCollection], [activationArray] is basic and computations are performed on those.
      */
-    abstract val activations: Matrix
+    abstract var activations: Matrix
 
     /**
      * See [activations].
@@ -116,6 +117,9 @@ abstract class Layer : LocatableModel(), AttributeContainer {
             field = height
             events.locationChanged.fire()
         }
+
+
+    abstract val updateRule: NeuronUpdateRule<*, *>
 
     /**
      * Event support.
@@ -162,6 +166,8 @@ abstract class Layer : LocatableModel(), AttributeContainer {
             addAll(connectors)
         }
     }
+
+    abstract fun processError(error: Matrix, signalSource: Layer, biasesAccumulator: HashMap<Layer, Matrix>, rawMatrixAccumulator: HashMap<Matrix, Matrix>): Matrix
 
     /**
      * See [org.simbrain.workspace.serialization.WorkspaceComponentDeserializer]

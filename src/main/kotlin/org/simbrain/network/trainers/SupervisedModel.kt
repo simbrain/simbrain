@@ -10,14 +10,14 @@ import smile.math.matrix.Matrix
 import java.awt.geom.Point2D
 
 class SupervisedModel(
-    override val inputLayer: ArrayLayer,
-    override val outputLayer: ArrayLayer,
+    override val inputLayer: Layer,
+    override val outputLayer: Layer,
     private val useImmediateLearning: Boolean = true
 ): LocatableModel(), SupervisedNetwork {
 
     val layers = computeUpdateOrderList(outputLayer)
 
-    val weightMatrices = layers.flatMap { it.outgoingConnectors }
+    val weightMatrices = layers.getAllConnectors()
 
     @Transient
     override val events = LocationEvents()
@@ -28,15 +28,15 @@ class SupervisedModel(
         inputLayer.activations.transpose().clone(),
         outputLayer.activations.transpose().clone()
     )} else {
-        // TODO: Temp so it runs
         MatrixDataset(
-            inputs = Matrix(10,inputLayer.size * (inputLayer as ActivationSequence).sequenceSize),
+            // If the layer is an activation sequence, data are currently flattened
+            inputs = Matrix(10,inputLayer.size * ((inputLayer as? ActivationSequence)?.sequenceSize ?: 1)),
             targets = Matrix(10, outputLayer.size)
         )
     }
 
     override var testingSet: MatrixDataset = MatrixDataset(
-        inputs = Matrix(10,inputLayer.size * (inputLayer as ActivationSequence).sequenceSize),
+        inputs = Matrix(10,inputLayer.size * ((inputLayer as? ActivationSequence)?.sequenceSize ?: 1)),
         targets = Matrix(10, outputLayer.size)
     )
 
@@ -88,7 +88,7 @@ class SupervisedModelTrainer(network: Network, supervisedModel: SupervisedModel)
 
     override fun trainRow(rowNum: Int): Double {
         val weightAccumulator: HashMap<WeightMatrix, Matrix> = HashMap()
-        val biasesAccumulator: HashMap<ArrayLayer, Matrix> = HashMap()
+        val biasesAccumulator: HashMap<Layer, Matrix> = HashMap()
         val rawMatrixAccumulator: HashMap<Matrix, Matrix> = HashMap()
 
         val error = with(supervisedNetwork) {

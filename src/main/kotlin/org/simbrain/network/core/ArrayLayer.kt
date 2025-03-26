@@ -82,5 +82,4 @@ abstract class ArrayLayer(
         isClamped = !isClamped
     }
 
-    abstract fun processError(error: Matrix, signalSource: ArrayLayer, biasesAccumulator: HashMap<ArrayLayer, Matrix>, rawMatrixAccumulator: HashMap<Matrix, Matrix>): Matrix
 }

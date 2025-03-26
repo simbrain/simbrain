@@ -36,7 +36,7 @@ val hopfieldSimContinuous = newSim {
     // Neurons with additive nodes
 
     val hopfield = NeuronGroup(numNeurons).apply {
-        setUpdateRule(AdditiveRule())
+        updateRule = AdditiveRule()
         applyLayout()
         toggleClamping() // Default to clamping for training
     }

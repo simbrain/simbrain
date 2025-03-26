@@ -128,7 +128,7 @@ sealed class BackpropLossFunction(
             return target.clone().sub(actual).mul(2.0)
         }
 
-        override fun canUse(layer: NeuronArray) = layer.updateRule !is SoftmaxRule
+        override fun canUse(layer: Layer) = layer.updateRule !is SoftmaxRule
     }
 
     object MSE : BackpropLossFunction("MSE", "Mean Squared Error") {
@@ -139,7 +139,7 @@ sealed class BackpropLossFunction(
             return target.clone().sub(actual).mul(2.0).div(actual.size().toDouble())
         }
 
-        override fun canUse(layer: NeuronArray) = layer.updateRule !is SoftmaxRule
+        override fun canUse(layer: Layer) = layer.updateRule !is SoftmaxRule
     }
 
     object RMSE : BackpropLossFunction("RMSE", "Root Mean Squared Error") {
@@ -150,7 +150,7 @@ sealed class BackpropLossFunction(
             return target.clone().sub(actual).div(actual.size() * scalarLoss(actual, target))
         }
 
-        override fun canUse(layer: NeuronArray) = layer.updateRule !is SoftmaxRule
+        override fun canUse(layer: Layer) = layer.updateRule !is SoftmaxRule
 
     }
 
@@ -162,18 +162,18 @@ sealed class BackpropLossFunction(
             return actual.clone().sub(target).mul(-1.0) // assume softmax output
         }
 
-        override fun canUse(layer: NeuronArray) = layer.updateRule is SoftmaxRule
+        override fun canUse(layer: Layer) = layer.updateRule is SoftmaxRule
     }
 
     abstract fun scalarLoss(actual: Matrix, target: Matrix): Double
 
     abstract fun outputError(actual: Matrix, target: Matrix): Matrix
 
-    abstract fun canUse(layer: NeuronArray): Boolean
+    abstract fun canUse(layer: Layer): Boolean
 
     override fun toString() = description
 
-    fun validateLayer(layer: NeuronArray) {
+    fun validateLayer(layer: Layer) {
         if (!canUse(layer)) {
             throw IllegalArgumentException("Layer $layer cannot use loss function $this")
         }
@@ -294,9 +294,9 @@ fun WeightMatrixTree.applyBackprop(targetValues: Matrix, lossFunction: BackpropL
 /**
  * Breadth-first search starting from the output layer.
  */
-fun computeUpdateOrderList(end: ArrayLayer): LinkedHashSet<ArrayLayer> {
-    val visited = LinkedHashSet<ArrayLayer>()
-    val queue = ArrayDeque<ArrayLayer>()
+fun computeUpdateOrderList(end: Layer): LinkedHashSet<Layer> {
+    val visited = LinkedHashSet<Layer>()
+    val queue = ArrayDeque<Layer>()
     queue.add(end)
     while (queue.isNotEmpty()) {
         val currentLayer = queue.removeFirst()
@@ -306,29 +306,32 @@ fun computeUpdateOrderList(end: ArrayLayer): LinkedHashSet<ArrayLayer> {
         visited.add(currentLayer)
         for (neighbor in currentLayer.incomingConnectors) {
             if (neighbor.source !in visited) {
-                queue.add(neighbor.source as ArrayLayer)
+                queue.add(neighbor.source as Layer)
             }
         }
     }
     return LinkedHashSet(visited.reversed())
 }
 
+fun LinkedHashSet<Layer>.getAllConnectors() = map { it.outgoingConnectors }.flatten().filter { it.target in this }
+
 /**
  *  Assumes LinkedHashSet has been placed in an appropriate "breadth-first" order by [computeUpdateOrderList].
  */
 context(Network)
-fun LinkedHashSet<ArrayLayer>.forwardPass(inputValues: List<Matrix>, inputLayers: List<ArrayLayer>) {
+fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: List<Layer>) {
 
     if (inputValues.size != inputLayers.size) throw IllegalArgumentException("Must provide same number of input vectors as input layers")
     inputValues.zip(inputLayers).forEach { (a, b) -> a.validateSameShape(b.activations) }
 
     val allLayers = this
     inputLayers.zip(inputValues).forEach { (layer, value) ->
-        (layer as? ArrayLayer)?.activations = value
+        layer.activations = value
     }
     allLayers.forEach {
         it.accumulateInputs()
         it.update()
+        (it as? NeuronCollection)?.let { nc -> nc.neuronList.forEach { n -> n.update() } }
     }
 }
 
@@ -340,11 +343,11 @@ fun LinkedHashSet<ArrayLayer>.forwardPass(inputValues: List<Matrix>, inputLayers
  *
  */
 context(Network)
-fun LinkedHashSet<ArrayLayer>.accumulateBackprop(
+fun LinkedHashSet<Layer>.accumulateBackprop(
     targetValues: Matrix,
     outputLayer: Layer,
     weightAccumulator: HashMap<WeightMatrix, Matrix>,
-    biasesAccumulator: HashMap<ArrayLayer, Matrix>,
+    biasesAccumulator: HashMap<Layer, Matrix>,
     rawMatrixAccumulator: HashMap<Matrix, Matrix>,
     lossFunction: BackpropLossFunction = BackpropLossFunction.SSE
 ): Double {
@@ -352,13 +355,13 @@ fun LinkedHashSet<ArrayLayer>.accumulateBackprop(
     val reversedLayers = reversed()
 
     targetValues.validateSameShape(outputLayer.activations)
-    lossFunction.validateLayer(outputLayer as NeuronArray)
+    lossFunction.validateLayer(outputLayer as Layer)
 
     val scalarError = lossFunction.scalarLoss(outputLayer.activations, targetValues)
 
     // printActivationsAndWeights()
     var errorSignal: Matrix = lossFunction.outputError(outputLayer.activations, targetValues)
-    var signalSource: ArrayLayer = outputLayer
+    var signalSource: Layer = outputLayer
 
     // Go through layers from output to input
     reversedLayers.forEach { layer ->

@@ -12,10 +12,7 @@ import org.simbrain.world.odorworld.effectors.StraightMovement
 import org.simbrain.world.odorworld.effectors.Turning
 import org.simbrain.world.odorworld.events.EntityEvents
 import org.simbrain.world.odorworld.intersect
-import org.simbrain.world.odorworld.sensors.GridSensor
-import org.simbrain.world.odorworld.sensors.ObjectSensor
-import org.simbrain.world.odorworld.sensors.Sensor
-import org.simbrain.world.odorworld.sensors.WithDispersion
+import org.simbrain.world.odorworld.sensors.*
 import java.awt.geom.Point2D
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.math.cos
@@ -128,12 +125,6 @@ class OdorWorldEntity @JvmOverloads constructor(
     val sensors = CopyOnWriteArrayList<Sensor>()
 
     val effectors = CopyOnWriteArrayList<Effector>()
-
-    /**
-     * Whatever phrases the entity can currently "hear".
-     */
-    @Transient
-    val currentlyHeardPhrases: MutableList<String> = arrayListOf()
 
     val isRotating get() = entityType.rotating
 
@@ -300,7 +291,7 @@ class OdorWorldEntity @JvmOverloads constructor(
     }
 
     fun speakToEntity(phrase: String) {
-        currentlyHeardPhrases.add(phrase)
+        sensors.filterIsInstance<Hearing>().forEach { it.hear(phrase) }
     }
 
     /**

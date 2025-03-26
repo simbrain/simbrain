@@ -40,7 +40,10 @@ class SmileClassifierTest {
         )
         this.trainingData.setIntegerTargets(intArrayOf(-1, 1, 1, -1))
     }
-    var xorSVM = SmileClassifier(svm)
+    // Unclamped inputs because this classifier interacts with an external neuron group
+    var xorSVM = SmileClassifier(svm).apply {
+        inputNeuronGroup.isAllClamped = false
+    }
 
     init {
         net = Network()

@@ -84,6 +84,7 @@ open class SimbrainTablePanel @JvmOverloads constructor(
 
 
         model.events.currentRowChanged.on(Dispatchers.Swing) {
+            table.selectedRow = model.currentRowIndex
             scrollToVisible(table.selectedRow)
         }
         model.events.rowNameChanged.on(Dispatchers.Swing) {
@@ -112,12 +113,7 @@ open class SimbrainTablePanel @JvmOverloads constructor(
             table.tableHeader?.revalidate()
             scrollPane.updateResizeMode(it.source as TableModel)
         }
-
-        model.events.currentRowChanged.on {
-            table.selectedRow = model.currentRowIndex
-        }
     }
-
 
     fun initDefaultToolbarAndMenu() {
         if (model.isMutable) {
@@ -256,7 +252,7 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
         }
 
         // Ensure that the AWT Event is unregistered, because the event holds references to instance variables,
-        // and so these table objects won’t be garbage collected
+        // and so these table objects won't be garbage collected
         addPropertyChangeListener("tableCellEditor") {
             if (isEditing) {
                 Toolkit.getDefaultToolkit().addAWTEventListener(unfocusedEvent, AWTEvent.MOUSE_EVENT_MASK)
@@ -276,9 +272,28 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
 
         selectionModel.addListSelectionListener {
             if (!it.valueIsAdjusting) {
-                model.currentRowIndex = selectedRow
+                // Get the actual selected row from JTable's mechanism
+                val selectedRows = getSelectedRows()
+                if (selectedRows.isNotEmpty()) {
+                    // Update the model.currentRowIndex to match the first selected row
+                    model.currentRowIndex = selectedRows[0]
+                }
             }
         }
+    }
+
+    override fun getSelectedRow(): Int {
+        // Use the standard JTable implementation to get the selected row
+        val selected = super.getSelectedRow()
+        
+        // If no row is selected in the JTable but we have a currentRowIndex in the model,
+        // synchronize the JTable selection with the model
+        if (selected == -1 && model.currentRowIndex >= 0 && model.currentRowIndex < rowCount) {
+            setRowSelectionInterval(model.currentRowIndex, model.currentRowIndex)
+            return model.currentRowIndex
+        }
+        
+        return selected
     }
 
     fun setSelectedRow(row: Int) {
@@ -287,20 +302,51 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
         }
         selectAll()
         setRowSelectionInterval(row, row)
-        model.currentRowIndex = row
     }
 
-    override fun getSelectedRow() = model.currentRowIndex
-
     fun initRowSelection() {
-        if (selectedRow == -1) selectedRow = 0
+        // Check if there's already a row selected in the JTable
+        if (super.getSelectedRow() == -1) {
+            // If not, either use the model's currentRowIndex or default to row 0
+            val rowToSelect = if (model.currentRowIndex >= 0 && model.currentRowIndex < rowCount) {
+                model.currentRowIndex
+            } else {
+                0
+            }
+            
+            // Set the selection in the JTable
+            if (rowCount > 0) {
+                setRowSelectionInterval(rowToSelect, rowToSelect)
+                model.currentRowIndex = rowToSelect
+            }
+        }
     }
 
     fun incrementSelectedRow() {
-        // if none selected, select first row (because selectedRow returns -1 in that case)
-        val nextRow = (model.currentRowIndex + 1) % model.rowCount
+        // Get the current selection from JTable first
+        var currentRow = super.getSelectedRow()
+        
+        // If no row is selected, use model.currentRowIndex as a fallback
+        if (currentRow == -1) {
+            currentRow = model.currentRowIndex
+        }
+        
+        // If still no row is selected or the index is invalid, default to 0
+        if (currentRow < 0 || currentRow >= rowCount) {
+            currentRow = 0
+        }
+        
+        // Calculate the next row index
+        val nextRow = (currentRow + 1) % model.rowCount
+        
+        // Update the model
         model.currentRowIndex = nextRow
-        selectedRow = nextRow
+        
+        // Update the JTable selection to match
+        clearSelection()
+        setRowSelectionInterval(nextRow, nextRow)
+        
+        // Fire the event
         (dataModel as? SimbrainDataFrame)?.events?.currentRowChanged?.fire()
     }
 
@@ -445,3 +491,4 @@ fun main() {
 
 
 }
+

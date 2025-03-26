@@ -15,7 +15,7 @@ import smile.stat.distribution.GaussianDistribution
 
 class ActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inputSize), EditableObject, ActivationSequenceProcessor {
 
-    var updateRule: NeuronUpdateRule<ScalarDataHolder, MatrixDataHolder> by GuiEditable(
+    override var updateRule: NeuronUpdateRule<ScalarDataHolder, MatrixDataHolder> by GuiEditable(
         initValue = LinearRule(),
         order = 100,
         typeMapProvider = NeuronUpdateRule<*, *>::getNeuronArrayTypeMap,
@@ -23,7 +23,7 @@ class ActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inpu
             val typeChanged = field::class != it::class
             field = it
             if (typeChanged) {
-                dataHolder = updateRule.createMatrixData(size)
+                dataHolder = it.createMatrixData(size)
             }
             events.updated.fire()
         }
@@ -57,8 +57,8 @@ class ActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inpu
 
     override fun processError(
         error: Matrix,
-        signalSource: ArrayLayer,
-        biasesAccumulator: HashMap<ArrayLayer, Matrix>,
+        signalSource: Layer,
+        biasesAccumulator: HashMap<Layer, Matrix>,
         rawMatrixAccumulator: HashMap<Matrix, Matrix>
     ): Matrix {
         var errorSignal = error

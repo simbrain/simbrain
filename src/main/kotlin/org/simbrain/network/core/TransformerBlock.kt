@@ -4,6 +4,7 @@ import org.simbrain.network.gui.dialogs.NetworkPreferences.biasesRandomizer
 import org.simbrain.network.gui.dialogs.NetworkPreferences.weightRandomizer
 import org.simbrain.network.gui.nodes.ActivationSequenceProcessor
 import org.simbrain.network.trainers.WeightInitializationStrategy
+import org.simbrain.network.updaterules.NeuronUpdateRule
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
@@ -103,6 +104,9 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
     override val biases: Matrix get() = throw UnsupportedOperationException("Not applicable to Transformer")
 
     override val biasArray: DoubleArray
+        get() = throw UnsupportedOperationException("Not applicable to Transformer")
+
+    override val updateRule: NeuronUpdateRule<*, *>
         get() = throw UnsupportedOperationException("Not applicable to Transformer")
 
     context(Network) override fun accumulateInputs() {
@@ -216,8 +220,8 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
 
     override fun processError(
         error: Matrix,
-        signalSource: ArrayLayer,
-        biasesAccumulator: HashMap<ArrayLayer, Matrix>,
+        signalSource: Layer,
+        biasesAccumulator: HashMap<Layer, Matrix>,
         rawMatrixAccumulator: HashMap<Matrix, Matrix>
     ): Matrix {
 

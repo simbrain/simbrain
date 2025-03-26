@@ -233,7 +233,7 @@ suspend fun Network.addNeuronGroup(count: Int, location: Point2D? = null, templa
 fun Network.addNeuronGroup(x: Double, y: Double, numNeurons: Int, rule: NeuronUpdateRule<*, *> = LinearRule()):
         NeuronGroup {
     val ng = NeuronGroup(numNeurons)
-    ng.setUpdateRule(rule)
+    ng.updateRule = rule
     addNetworkModel(ng)
     ng.setLocation(x, y)
     return ng

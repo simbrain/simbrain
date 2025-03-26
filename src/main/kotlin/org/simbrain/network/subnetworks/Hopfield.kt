@@ -73,7 +73,7 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
         binary.threshold = 0.0
         binary.setCeiling(1.0)
         binary.setFloor(0.0)
-        neuronGroup.setUpdateRule(binary)
+        neuronGroup.updateRule = binary
         neuronGroup.setIncrement(1.0)
 
         // Connect the neurons together

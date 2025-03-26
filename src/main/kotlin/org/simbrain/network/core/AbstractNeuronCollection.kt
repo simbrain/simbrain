@@ -1,9 +1,12 @@
 package org.simbrain.network.core
 
 import org.simbrain.network.events.NeuronCollectionEvents
+import org.simbrain.network.gui.nodes.ActivationSequenceProcessor
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.Layout
 import org.simbrain.network.layouts.LineLayout
+import org.simbrain.network.updaterules.NeuronUpdateRule
+import org.simbrain.network.updaterules.interfaces.DifferentiableUpdateRule
 import org.simbrain.network.util.SpikingScalarData
 import org.simbrain.util.*
 import org.simbrain.util.SimbrainConstants.Polarity
@@ -100,9 +103,12 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
      */
     var layout: Layout = GridLayout()
 
-    override val activations: Matrix
+    override var activations: Matrix
         get() = // TODO: Performance drain? Consider caching this.
             Matrix.column(this.activationArray)
+        set(value) {
+            setActivations(value.toDoubleArray())
+        }
 
     override fun addInputs(inputs: Matrix) {
         addInputs(inputs.col(0))
@@ -183,6 +189,12 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
         } else {
             height
         }
+
+    /**
+     * In the case of a neuron collection we simply assume all neurons have the same update rule, but throw a warning if they don’t
+     */
+    override val updateRule: NeuronUpdateRule<*, *>
+        get() = neuronList.firstNotNullOf { it.updateRule }
 
     /**
      * Translate all neurons (the only objects with position information).
@@ -552,6 +564,29 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
     fun applyLayout(newLayout: Layout) {
         layout = newLayout
         applyLayout(location)
+    }
+
+    override fun processError(
+        error: Matrix,
+        signalSource: Layer,
+        biasesAccumulator: HashMap<Layer, Matrix>,
+        rawMatrixAccumulator: HashMap<Matrix, Matrix>
+    ): Matrix {
+
+        if (signalSource is ActivationSequenceProcessor) {
+            throw UnsupportedOperationException("ActivationSequenceProcessor not supported")
+        }
+
+        (neuronList.firstNotNullOf { it.updateRule } as? DifferentiableUpdateRule)?.getDerivative(inputs)?.let {
+                deriv -> error.mul(deriv)
+        }
+
+        // The scaled error signal is used for bias update
+        biasesAccumulator.getOrPut(this) {
+            Matrix(size, 1)
+        }.add(error)
+
+        return error
     }
 
     /**

@@ -196,13 +196,37 @@ val spiveyNet = newSim {
         This is a simulation of a localist attractor simulation of mouse trajectories relative to visual and auditory inputs
         due to Michael Spivey and others.
          
-        Note there is no learning in this type of network. It was hand-crafted, something like an IAC network.
+        The visual world localist attractor is a computational model that serves as a linking hypothesis between internal cognitive processes 
+        (specifically in spoken word recognition) and observable motor outputs like eye movements and 
+        mouse trajectories in the Visual World Paradigm. The core idea is that cognition and action are 
+        dynamically interconnected: what we look at or move toward not only reflects but also 
+        influences what we're thinking. Spivey's model integrates parallel lexical activations, 
+        visual input, and motor output with feedback loops especially from eye position to 
+        simulate how these processes unfold over time. 
+
+        This simulation demonstrates how smooth, continuous cognitive activations can produce 
+        both abrupt saccadic eye movements and gradually curving mouse paths, even replicating 
+        nuanced behavioral patterns seen in experiments (like greater mouse curvature after 
+        competitor fixations). By doing so, the model offers a powerful tool to test and refine 
+        theories of real-time language processing and perception-action coupling.
+
+        There is no learning in this type of network. It was hand-crafted, something like an IAC network.
+
+        Overall, this model illustrates how a relatively simple, structured network can simulate the intricate, r
+        eal-time interplay between language comprehension, visual attention, and motor behavior. 
+        By incorporating dynamic feedback loops, probabilistic saccade generation, and continuous 
+        motor output, the system not only mirrors behavioral data observed in human participants 
+        but also sheds light on the underlying cognitive mechanisms. 
+        The visual world localist attractor thus stands as a compelling demonstration of how cognition 
+        is not a series of isolated stages, but a fluid, embodied process deeply shaped by perception 
+        and action unfolding over time.
          
         # Background
         
         Relevant papers are 
         - [Continuous attraction toward phonological competitors](https://pmc.ncbi.nlm.nih.gov/articles/PMC1177386/)
         - [A Linking Hypothesis for Eyetracking and Mousetracking in the Visual World Paradigm](https://www.sciencedirect.com/science/article/pii/S0006899325000356/pdfft?md5=593289ceb624d37b85229782945c7b40&pid=1-s2.0-S0006899325000356-main.pdf)
+
 
         This simulates a study of eye and mouse tracking.  Participants are shown two objects and told which to point to,
         and the scientist tracks their mouse and eyes as they point to the requested object.
@@ -232,10 +256,68 @@ val spiveyNet = newSim {
         properties in the acoustic–phonetic input a chance to influence the continuous motor output midflight.
 
 
-        # What to do
+        # How it works, step by step
+                 
+        1. Network Architecture
+        Nodes: Represent words (Lexical layer) and visual objects (Visual layer).
+        Layers:
+        Lexical (word units)
+        Visual (object units)
+        Integration (sum of Lexical + Visual)
+        Eyes (fixated object)
+        Mouse (motor plan)
+        All layers have bidirectional connections, allowing feedback.
+         
+        2. Initialization
+        Two objects are present in the display
+        Their nodes in the Visual layer are initialized to 1.0, others 0.0.
+        The Visual vector is normalized so activations sum to 1.0. (e.g., [0.5, 0.5, 0, 0] for 2 objects.)
+         
+        3. Phoneme Input (Over Time Steps)
+        At each timestep, a phoneme of the target word is input to the Lexical layer.
+        Each word node receives 1.0 if the phoneme matches, 0.0 otherwise.
+        E.g., “candle” input at time 2 might activate "candle" and "candy" nodes for /k/.
+         
+        4. Normalize Lexical and Visual Vectors
+        After each input, normalize Lexical and Visual vectors so their activations sum to 1.0.
+         
+        5. Compute the Integration Layer
+        Integration = Lexical + Visual (pointwise sum).
+        Normalize the Integration vector so it also sums to 1.0.
+         
+        6. Generate Motor Outputs
+        Two motor systems: Eye movements and Mouse movements.
+         
+        A. Eye Movements:
+        Stochastic: Each fixation is sampled from the Visual vector (probability distribution).
+        Saccades have a 180 ms refractory period (~3 timesteps).
+        Fixation boosts activation in the Eyes vector: fixated object gets 0.55, others 0.45.
+         
+        B. Mouse Movements:
+        Smooth and continuous.
+        X-position changes based on activation difference between Target and Competitor in the Mouse vector (a copy of the Visual vector).
+        Y-position increases by 50 pixels every timestep (straight up).
+        Curvature emerges if activation leans toward the competitor.
+         
+        7. Feedback to Lexical and Visual Layers
+        Feedback is multiplicative:
+        This biases the system toward currently active items, especially the fixated object (via Eyes vector).
+        After feedback, normalize Lexical and Visual vectors again.
+        This keeps competition active (inhibits less relevant nodes).
         
-        1. ...
-      
+        9. Iterate for Each Timestep
+        Repeat steps 3–8 for each timestep in the trial (usually 6 phoneme inputs).
+        Track Lexical activations, eye fixations, and mouse path at each step.
+        
+        10. Output
+        Mouse trajectories: 2D path of the mouse over time, showing curvature based on perception and production.
+        Overall, this model illustrates how a relatively simple, structured network can simulate the intricate, real-time interplay between language comprehension, 
+        visual attention, and motor behavior. By incorporating dynamic feedback loops, probabilistic 
+        saccade generation, and continuous motor output, the system not only mirrors behavioral 
+        data observed in human participants but also sheds light on the underlying cognitive mechanisms. 
+        The visual world localist attractor thus stands as a compelling demonstration of how cognition 
+        is not a series of isolated stages, but a fluid, embodied process deeply shaped by perception 
+        and action unfolding over time.      
        
         """.trimIndent()
     )

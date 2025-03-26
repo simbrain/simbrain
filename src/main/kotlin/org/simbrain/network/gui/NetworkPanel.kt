@@ -659,25 +659,30 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
      *
      * @retrun false if there source and target neurons did not have a neuron group.
      */
-    fun NetworkSelectionManager.connectNeuronGroups(): Boolean {
-        val src = filterSelectedSourceModels(AbstractNeuronCollection::class.java)
-        val tar = filterSelectedModels(AbstractNeuronCollection::class.java)
-        if (src.isNotEmpty() && tar.isNotEmpty()) {
-            val sg = SynapseGroup(src.first(), tar.first())
-            val synapses = sg.synapses.toList()
-            network.addNetworkModel(sg)
-            undoManager.addUndoableAction(
-                description = "Connect neuron groups",
-                undo = { sg.delete()},
-                redo = {
-                    sg.synapses.clear()
-                    sg.synapses.addAll(synapses)
-                    network.addNetworkModel(sg, usePlacementManager = false, useAutoAssignedId = false)?.await()
-                    sg.afterRestore()
-                })
-            return true
+    fun NetworkSelectionManager.connectNeuronGroups(): List<SynapseGroup> {
+        val sourceCollections = filterSelectedSourceModels(AbstractNeuronCollection::class.java)
+        val targetCollections = filterSelectedModels(AbstractNeuronCollection::class.java)
+        val synapseGroups = (sourceCollections cartesianProduct targetCollections).map { (src, tar) ->
+            SynapseGroup(src, tar).also { network.addNetworkModel(it) }
         }
-        return false
+
+        val synapseGroupSynapses = synapseGroups.associateWith { it.synapses.toList() }
+
+        undoManager.addUndoableAction(
+            description = "Connect neuron groups",
+            undo = { synapseGroups.map { launch { it.delete() } }.joinAll() },
+            redo = {
+                synapseGroupSynapses.entries.map { (sg, synapses) ->
+                    launch {
+                        sg.synapses.clear()
+                        sg.synapses.addAll(synapses)
+                        network.addNetworkModel(sg, usePlacementManager = false, useAutoAssignedId = false)?.await()
+                        sg.afterRestore()
+                    }
+                }.joinAll()
+            })
+
+        return synapseGroups
     }
 
     private fun createMainToolBar() = CustomToolBar().apply {

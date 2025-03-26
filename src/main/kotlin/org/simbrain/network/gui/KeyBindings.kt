@@ -55,7 +55,7 @@ fun NetworkPanel.addKeyBindings() {
 
     bind("1") { selectionManager.convertSelectedNodesToSourceNodes() }
     bind("2") { connectSelectedModelsDefault() }
-    bind("3") { connectSelectedModelsCustom()}
+    bind("3") { connectSelectedModelsCustom() }
     bindTo("6", networkActions.selectIncomingWeightsAction)
     bindTo("7", networkActions.selectOutgoingWeightsAction)
     bind("8") {

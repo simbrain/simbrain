@@ -37,7 +37,6 @@ val cogMap3Objects = newSim {
         // layout(GridLayout())
         label = "Recurrent"
         // setNeuronType(LinearRule())
-        applyLayout()
     }
     val weightMatrix = WeightMatrix(recurrent, recurrent)
     weightMatrix.randomize()
@@ -50,7 +49,6 @@ val cogMap3Objects = newSim {
     inputNetwork.setUpperBound(1.0)
     inputNetwork.label = "Sensory Neurons"
     inputNetwork.layout = LineLayout()
-    inputNetwork.applyLayout()
     network.addNetworkModel(inputNetwork)
     inputNetwork.setLocation(0.0, 751.0)
 

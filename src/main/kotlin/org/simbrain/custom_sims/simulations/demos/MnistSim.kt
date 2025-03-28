@@ -33,7 +33,7 @@
 //     val pixelNet = network.addNeuronGroup(400, point(-9.25, 95.93)).apply {
 //         label = "Retina"
 //         layout = GridLayout(50.0,50.0)
-//         setClamped(true)
+//         isClamped = true
 //         setUpperBound(1.0)
 //     }
 //     pixelNet.applyLayout(-5, -85)

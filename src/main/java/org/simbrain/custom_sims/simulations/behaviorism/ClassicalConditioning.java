@@ -134,7 +134,7 @@ public class ClassicalConditioning extends Simulation {
             # Introduction
             Todo
                                   
-            """, true);
+            """, false);
     }
 
     @Override

@@ -37,7 +37,6 @@ val hopfieldSimContinuous = newSim {
 
     val hopfield = NeuronGroup(numNeurons).apply {
         updateRule = AdditiveRule()
-        applyLayout()
         toggleClamping() // Default to clamping for training
     }
     val wm = WeightMatrix(hopfield, hopfield).apply {

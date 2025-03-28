@@ -52,13 +52,11 @@ class OperantConditioning : Simulation {
         // Behavioral nodes
         behaviorNet = net.addNeuronGroup(-14.0, 73.0, numNeurons)
         behaviorNet.layout = LineLayout(100.0, LineLayout.LineOrientation.HORIZONTAL)
-        behaviorNet.applyLayout()
         behaviorNet.label = "Behaviors"
 
         // Stimulus nodes
         stimulusNet = net.addNeuronGroup(-9.8, 269.93, numNeurons)
         stimulusNet.layout = LineLayout(100.0, LineLayout.LineOrientation.HORIZONTAL)
-        stimulusNet.applyLayout()
         stimulusNet.isClamped = true
         stimulusNet.label = "Stimuli"
         stimulusNet.setIncrement(1.0)

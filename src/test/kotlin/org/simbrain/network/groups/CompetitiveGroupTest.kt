@@ -15,7 +15,7 @@ class CompetitiveGroupTest {
     val competitive = CompetitiveGroup(2)
     lateinit var weights: List<Synapse>
     val inputs = NeuronGroup(2).apply {
-        setClamped(true)
+        isClamped = true
     }
 
     init {

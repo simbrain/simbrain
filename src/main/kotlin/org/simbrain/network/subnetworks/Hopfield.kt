@@ -64,7 +64,6 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
         // Create main neuron group
         neuronGroup = NeuronGroup(numNeurons)
         neuronGroup.label = "Neurons"
-        neuronGroup.applyLayout()
         neuronGroup.location = point(0.0, 0.0)
         addModel(neuronGroup)
 

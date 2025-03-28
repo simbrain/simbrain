@@ -59,7 +59,7 @@ class WorkspaceActions {
 
     val workspace = SimbrainDesktop.workspace
 
-    val newNetworkAction = createComponentFactoryAction("Network", "menu_icons/Network.png", CmdOrCtrl + 'N')
+    val newNetworkAction = createComponentFactoryAction("Network", "menu_icons/network_icon_black.png", CmdOrCtrl + 'N')
     val newConsoleAction = createComponentFactoryAction("Console", "menu_icons/Terminal.png")
     val newDocViewerAction = createComponentFactoryAction("Document Viewer", "menu_icons/Copy.png")
 
@@ -166,7 +166,7 @@ class WorkspaceActions {
     }
 
     val openCouplingManagerAction = SimbrainDesktop.desktopPane.createAction(
-        iconPath = "menu_icons/Coupling.png",
+        iconPath = "menu_icons/chainlink.png",
         name = "Open coupling manager...",
         description = "Open workspace coupling manager.",
         coroutineScope = workspace

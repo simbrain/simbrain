@@ -130,7 +130,7 @@ val tinyLanguageModel = newSim {
     with(network) {
         addNetworkModels(inputs, transformerBlock, softMaxLayer).awaitAll()
         addNetworkModels(weightMatrices).awaitAll()
-        val model = SupervisedModel(inputs, softMaxLayer, false)
+        val model = SupervisedModel(inputs, softMaxLayer)
         model.initWeights()
         model.initBiases()
         model.trainingSet = MatrixDataset(

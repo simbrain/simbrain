@@ -96,8 +96,6 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
             size
         )
 
-    private var targets: Matrix? = null
-
     /**
      * Render an image showing each activation when true.
      */
@@ -188,16 +186,6 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         get() = activations.toDoubleArray()
         set(value) {
             activations.copyFrom(value, allowShapeMismatch = true)
-            events.updated.fire()
-        }
-
-    var targetValues: Matrix?
-        get() = targets
-        set(targets) {
-            if (targets != null) {
-                activations.validateSameShape(targets)
-            }
-            this.targets = targets
             events.updated.fire()
         }
 

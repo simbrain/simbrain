@@ -198,7 +198,7 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
         }
 
         menu.addSeparator();
-        Action createSupervisedModel = getNetworkPanel().getNetworkActions().createCreateSupervisedModelAction();
+        Action createSupervisedModel = getNetworkPanel().getNetworkActions().getCreateSupervisedModelAction();
         menu.add(createSupervisedModel);
         Action testInputs = getNetworkPanel().getNetworkActions().createTestInputPanelAction(neuronGroup);
         menu.add(testInputs);

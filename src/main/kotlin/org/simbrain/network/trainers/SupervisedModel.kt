@@ -2,17 +2,17 @@ package org.simbrain.network.trainers
 
 import org.simbrain.network.core.*
 import org.simbrain.network.events.LocationEvents
-import org.simbrain.util.minus
-import org.simbrain.util.plus
-import org.simbrain.util.rowVectorTransposed
+import org.simbrain.util.*
 import org.simbrain.util.stats.ProbabilityDistribution
 import smile.math.matrix.Matrix
 import java.awt.geom.Point2D
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.random.Random
 
 class SupervisedModel(
     override val inputLayer: Layer,
-    override val outputLayer: Layer,
-    private val useImmediateLearning: Boolean = true
+    override val outputLayer: Layer
 ): LocatableModel(), SupervisedNetwork {
 
     val layers = computeUpdateOrderList(outputLayer)
@@ -24,21 +24,60 @@ class SupervisedModel(
 
     override val trainerConfig: SupervisedTrainerConfig = SupervisedTrainerConfig(lossFunctionProvider = ::possibleLossFunctions)
 
-    override var trainingSet: MatrixDataset = if(useImmediateLearning) { MatrixDataset(
-        inputLayer.activations.transpose().clone(),
-        outputLayer.activations.transpose().clone()
-    )} else {
-        MatrixDataset(
-            // If the layer is an activation sequence, data are currently flattened
-            inputs = Matrix(10,inputLayer.size * ((inputLayer as? ActivationSequence)?.sequenceSize ?: 1)),
-            targets = Matrix(10, outputLayer.size)
-        )
-    }
+    override var trainingSet: MatrixDataset
 
-    override var testingSet: MatrixDataset = MatrixDataset(
-        inputs = Matrix(10,inputLayer.size * ((inputLayer as? ActivationSequence)?.sequenceSize ?: 1)),
-        targets = Matrix(10, outputLayer.size)
-    )
+    override var testingSet: MatrixDataset
+
+    init {
+        val nrows = max(inputLayer.size, outputLayer.size)
+        fun Matrix.applyDefaultPattern(): Matrix {
+            val smallerDimension = min(ncol(), nrow())
+            this.setValuesInPlace { i, j ->
+                if (i % smallerDimension == j % smallerDimension) 1.0 else 0.0
+            }
+            return this
+        }
+
+        val inputs = Matrix(nrows, inputLayer.size).applyDefaultPattern()
+        val targets = Matrix(nrows, outputLayer.size).applyDefaultPattern()
+
+        val random = Random(42L)
+
+        val rowIndices = (0 until nrows).shuffled(random)
+
+        val trainRowCount = (nrows * 0.8).toInt().coerceAtLeast(1)
+        val testRowCount = (nrows - trainRowCount).coerceAtLeast(1)
+
+        val trainRowIndices = rowIndices.take(trainRowCount)
+
+        val testRowIndices = rowIndices.takeLast(testRowCount)
+
+        trainingSet = if (inputLayer is ActivationSequence) {
+            MatrixDataset(
+                // If the layer is an activation sequence, data are currently flattened
+                inputs = Matrix(10, inputLayer.size * inputLayer.sequenceSize),
+                targets = Matrix(10, outputLayer.size)
+            )
+        } else {
+            MatrixDataset(
+                inputs = inputs.rows(*trainRowIndices.toIntArray()),
+                targets = targets.rows(*trainRowIndices.toIntArray())
+            )
+        }
+
+        testingSet = if (inputLayer is ActivationSequence) {
+            MatrixDataset(
+                // If the layer is an activation sequence, data are currently flattened
+                inputs = Matrix(10, inputLayer.size * inputLayer.sequenceSize),
+                targets = Matrix(10, outputLayer.size)
+            )
+        } else {
+            MatrixDataset(
+                inputs = inputs.rows(*testRowIndices.toIntArray()),
+                targets = targets.rows(*testRowIndices.toIntArray())
+            )
+        }
+    }
 
     override var location: Point2D
         get() = layers.centerLocation
@@ -76,6 +115,23 @@ class SupervisedModel(
     context(Network)
     override fun forwardPass() {
         layers.forwardPass(listOf(inputLayer.activations), inputLayers = listOf(inputLayer))
+    }
+
+    context(Network)
+    suspend fun applyImmediateLearning() {
+        val isInputClamped = inputLayer.isClamped
+        val output = outputLayer.activations.toDoubleArray()
+
+        inputLayer.isClamped = true
+        trainingSet = MatrixDataset(
+            inputLayer.activations.transpose().clone(),
+            Matrix.row(output),
+        )
+        SupervisedModelTrainer(this@Network, this@SupervisedModel).trainOnce()
+
+        inputLayer.isClamped = isInputClamped
+        outputLayer.setActivations(output)
+        events.updated.fire()
     }
 
     override suspend fun delete(): List<NetworkModel> {

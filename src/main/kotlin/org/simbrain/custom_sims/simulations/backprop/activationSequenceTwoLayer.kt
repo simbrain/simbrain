@@ -33,7 +33,7 @@ val activationSequenceTwoLayer = newSim {
     val wm1 = WeightMatrix(inputs, output)
     wm1.randomize()
 
-    val model = SupervisedModel(inputs, output, false).apply {
+    val model = SupervisedModel(inputs, output).apply {
         trainerConfig.testConfiguration.enabled = false
     }
 

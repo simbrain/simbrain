@@ -100,6 +100,8 @@ abstract class Layer : LocatableModel(), AttributeContainer {
     open val spikes: DoubleArray
         get() = DoubleArray(this.size)
 
+    abstract var isClamped: Boolean
+
     /**
      * Width of layer. Mainly used by graphica arrows drawn to represent [Connector]s.
      */

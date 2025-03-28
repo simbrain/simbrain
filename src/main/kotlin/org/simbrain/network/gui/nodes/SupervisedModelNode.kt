@@ -24,9 +24,10 @@ import org.simbrain.network.events.LocationEvents
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.dialogs.getSupervisedTrainingDialog
 import org.simbrain.network.trainers.SupervisedModel
-import org.simbrain.network.trainers.SupervisedModelTrainer
-import org.simbrain.util.*
+import org.simbrain.util.StandardDialog
+import org.simbrain.util.createAction
 import org.simbrain.util.piccolo.Outline
+import org.simbrain.util.swingDispatcher
 import javax.swing.JComponent
 import javax.swing.JOptionPane
 import javax.swing.JPopupMenu
@@ -93,8 +94,7 @@ class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: Super
             add(renameAction)
             add(removeAction)
             addSeparator()
-            add(createStepTrainerAction())
-            add(createSetTrainingExampleAction())
+            add(createApplyImmediateLearningAction())
         }
 
     override val propertyDialog: StandardDialog
@@ -124,25 +124,13 @@ class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: Super
         supervisedModel.deleteBlocking()
     }
 
-    private fun createStepTrainerAction() = networkPanel.createAction(
-        name = "Step Trainer...",
-        description = "Step through the trainer...",
+    private fun createApplyImmediateLearningAction() = networkPanel.createAction(
+        name = "Apply Immediate Learning",
+        description = "Train this model on the values currently in the input and target layers",
         keyboardShortcut = 'L'
     ) {
         networkPanel.selectionManager.filterSelectedModels<SupervisedModel>().forEach { sm ->
-            val trainer = SupervisedModelTrainer(network, sm)
-            trainer.trainOnce()
-        }
-    };
-
-    private fun createSetTrainingExampleAction() = networkPanel.createAction(
-        name = "Set input-target pair",
-        description = "Set current values to input and target",
-        keyboardShortcut = CmdOrCtrl + 'T'
-    ) {
-        networkPanel.selectionManager.filterSelectedModels<SupervisedModel>().forEach { sm ->
-            sm.trainingSet.inputs.setRow(0, sm.inputLayer.activationArray)
-            sm.trainingSet.targets.setRow(0, sm.outputLayer.activationArray)
+            with(networkPanel.network) { sm.applyImmediateLearning() }
         }
     }
 
@@ -155,7 +143,7 @@ class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: Super
         events.labelChanged.on(swingDispatcher) { _, _ -> updateText() }
         events.locationChanged.on(swingDispatcher) { this.layoutChildren() }
 
-        createStepTrainerAction()
+        createApplyImmediateLearningAction()
     }
 
     override fun offset(dx: kotlin.Double, dy: kotlin.Double) {

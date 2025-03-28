@@ -110,6 +110,12 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
             setActivations(value.toDoubleArray())
         }
 
+    override var isClamped: Boolean
+        get() = isAllClamped
+        set(value) {
+            isAllClamped = value
+        }
+
     override fun addInputs(inputs: Matrix) {
         addInputs(inputs.col(0))
     }
@@ -262,18 +268,6 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
      */
     fun containsNeuron(n: Neuron?): Boolean {
         return neuronList.contains(n)
-    }
-
-    /**
-     * Set clamping on all neurons in this group.
-     *
-     * @param clamp true to clamp them, false otherwise
-     */
-    @Deprecated("Use isAllClamped instead")
-    fun setClamped(clamp: Boolean) {
-        for (neuron in neuronList) {
-            neuron.clamped = clamp
-        }
     }
 
     /**

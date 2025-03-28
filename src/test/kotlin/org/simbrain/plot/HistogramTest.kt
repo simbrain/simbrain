@@ -16,7 +16,7 @@ class HistogramTest {
     val net = Network()
     val nwc = NetworkComponent("Net", net)
     val ng = NeuronGroup(2).apply {
-        setClamped(true)
+        isClamped = true
     }
     val histogram = HistogramModel()
     val hgc = HistogramComponent("Histogram", histogram)

@@ -80,20 +80,4 @@ val xorSim = newSim {
         place(networkComponent, 0, 0, 700, 700)
     }
 
-//    // Adding a docviewer
-//    val docViewer = addDocViewer(
-//        "Information",
-//        """
-//            # Projection demo
-//            In this demo simply run the simulations and observe how the network activations are projected.
-//            Some things you can try:
-//            - Randomize the weight matrix by clicking on it and pressing "r" to randomize
-//            - Changing the type of projection, for example changing it to `Sammon` and pressing `play` to see an alternative way of projecting data
-//            - At any time you can press the `clear` button (the eraser) in the projection plot to start over with your plot
-//        """.trimIndent()
-//    )
-//    withGui {
-//        place(docViewer, 784, 3, 400, 400)
-//    }
-
 }

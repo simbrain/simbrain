@@ -26,7 +26,6 @@ val operantWithEnvironment = newSim {
 
     val behaviorNet = network.addNeuronGroup(numNeurons, location = point(-9.25, 95.93)).apply {
         layout = LineLayout(100.0, LineLayout.LineOrientation.HORIZONTAL)
-        applyLayout()
         label = "Behaviors"
         neuronList.labels = listOf("Wiggle: ", "Explore: ", "Spin: ")
         neuronList.forEach { it.auxValue = .33 }
@@ -34,7 +33,6 @@ val operantWithEnvironment = newSim {
 
     val stimulusNet = network.addNeuronGroup(numNeurons, location = point(-9.25, 295.93)).apply {
         layout = LineLayout(100.0, LineLayout.LineOrientation.HORIZONTAL)
-        applyLayout()
         isClamped = true
         label = "Stimuli"
         setIncrement(1.0)

@@ -21,7 +21,7 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
 
     fun addAgentAction() = odorWorldPanel.createAction(
         name = "Add agent",
-        iconPath = "odorworld/rotating/mouse/Mouse_225.gif",
+        iconPath = "menu_icons/mouse_icon.png",
         keyboardShortcut = CmdOrCtrl + 'P'
     ) {
         world.addAgent()
@@ -29,7 +29,7 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
 
     fun addEntityAction() = odorWorldPanel.createAction(
         name = "Add entity",
-        iconPath = "odorworld/static/Swiss.gif",
+        iconPath = "menu_icons/swiss_icon.png",
         keyboardShortcut = 'P'
     ) {
         world.addEntity()

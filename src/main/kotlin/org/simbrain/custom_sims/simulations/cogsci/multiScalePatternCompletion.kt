@@ -106,7 +106,7 @@ val allostaticPatternCompletion = newSim {
     }.apply {
         label = "Inputs"
         setLabels(listOf("man", "dog", "walks", "bites", "END"))
-        setClamped(true)
+        isClamped = true
         layout(LineLayout())
         location = point(-550, 0)
     }

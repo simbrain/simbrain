@@ -63,7 +63,7 @@ class SOMNetwork : Subnetwork, UnsupervisedNetwork {
             neuron.lowerBound = 0.0
         }
         inputLayer.label = "Input layer"
-        inputLayer.setClamped(true)
+        inputLayer.isClamped = true
 
         this.inputData = Matrix(10, numInputNeurons).binaryRandomize()
 

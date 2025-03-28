@@ -42,13 +42,13 @@ val hebbianAssociator = newSim {
         createControlPanel("Control Panel", 5, 10) {
 
             addButton("Training Mode (clamped nodes)") {
-                recurrentNet.setClamped(true)
+                recurrentNet.isClamped = true
                 recurrentWeights.forEach { it.clamped = false }
             }.apply {
                 toolTipText = "Clamps nodes and unclamps weights"
             }
             addButton("Test Mode (clamped weights)") {
-                recurrentNet.setClamped(false)
+                recurrentNet.isClamped = false
                 recurrentWeights.forEach { it.clamped = true }
             }.apply {
                 toolTipText = "Clamps weights and unclamps nodes"

@@ -32,6 +32,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import javax.swing.AbstractAction
 import javax.swing.Action
+import javax.swing.Action.SHORT_DESCRIPTION
 import javax.swing.JCheckBoxMenuItem
 import javax.swing.JOptionPane
 
@@ -966,31 +967,43 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     }
 
 
-    fun createCreateSupervisedModelAction(): Action {
-        val (canCreateSupervisedModel, cannotCreateSupervisedModelReason) = canCreateSupervisedModel()
+    val createSupervisedModelAction = networkPanel.createAction(
+        name = "Create Supervised Model",
+        keyboardShortcut = CmdOrCtrl + 'M',
+        description = "Create supervised model with using the current activation as target for immediate training"
+    ) {
 
-        return networkPanel.createAction(
-            name = "Create Supervised Model",
-            initBlock = {
-                isEnabled = canCreateSupervisedModel
-            },
-            keyboardShortcut = CmdOrCtrl + 'M',
-            description = "Create supervised model with using the current activation as target for immediate training" + if (!canCreateSupervisedModel) " (Disabled: $cannotCreateSupervisedModelReason)" else ""
-        ) {
+        val (canCreate) = canCreateSupervisedModel()
 
-            val (canCreate) = canCreateSupervisedModel()
+        if (canCreate) {
+            val input = selectionManager.sourceModels.firstOrNull() as? Layer
+            val output = selectionManager.selectedModels.firstOrNull() as? Layer
 
-            if (canCreate) {
-                val input = selectionManager.sourceModels.firstOrNull() as? Layer
-                val output = selectionManager.selectedModels.firstOrNull() as? Layer
-
-                if (input != null && output != null) {
-                    val supervisedModel = SupervisedModel(input, output)
-                    network.addNetworkModel(supervisedModel)
-                }
+            if (input != null && output != null) {
+                val supervisedModel = SupervisedModel(input, output)
+                network.addNetworkModel(supervisedModel)
             }
-
         }
+
+    }.also {
+
+        fun updateAction() {
+            val (canCreateSupervisedModel, cannotCreateSupervisedModelReason) = canCreateSupervisedModel()
+
+            it.isEnabled = canCreateSupervisedModel
+            it.putValue(
+                SHORT_DESCRIPTION,
+                "Create supervised model with using the current activation as target for immediate training"
+                        + if (!canCreateSupervisedModel) " (Disabled: $cannotCreateSupervisedModelReason)" else ""
+            )
+        }
+
+        updateAction()
+
+        networkPanel.network.events.modelAdded.on { updateAction() }
+        networkPanel.selectionManager.events.selection.on { _, _ -> updateAction() }
+        networkPanel.selectionManager.events.sourceSelection.on { _, _ -> updateAction() }
+
     }
 
 }

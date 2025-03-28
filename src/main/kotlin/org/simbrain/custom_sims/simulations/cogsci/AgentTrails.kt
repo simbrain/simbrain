@@ -75,7 +75,7 @@ val docViewer = addSidebarInfo(
 
     val actionNet = network.addNeuronGroup(3, point(0.0, -0.79)).apply {
         label = "Actions"
-        setClamped(true)
+        isClamped = true
         neuronList.labels = listOf("Straight", "Right", "Left")
         applyLayout(LineLayout())
     }

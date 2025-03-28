@@ -67,7 +67,7 @@ class CompetitiveNetwork : Subnetwork, UnsupervisedNetwork {
         inputLayer = NeuronGroup(numInputNeurons)
         this.addModel(inputLayer)
         inputLayer.label = "Input layer"
-        inputLayer.setClamped(true)
+        inputLayer.isClamped = true
         inputLayer.setLayoutBasedOnSize()
         inputLayer.setLowerBound(0.0)
 

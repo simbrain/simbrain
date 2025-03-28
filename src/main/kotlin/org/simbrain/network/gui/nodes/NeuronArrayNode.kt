@@ -307,7 +307,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
     }
 
     private fun computeInfoText() = """
-            ${neuronArray.id}    Nodes: ${neuronArray.size} ${if (neuronArray.targetValues != null) "T" else ""}
+            ${neuronArray.id}    Nodes: ${neuronArray.size}
             Mean activation: ${neuronArray.activations.toDoubleArray().average().format(4)}
             """.trimIndent()
 
@@ -391,7 +391,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             contextMenu.add(toggleShowBias)
             contextMenu.addSeparator()
 
-            val createSupervisedModelAction = networkPanel.networkActions.createCreateSupervisedModelAction()
+            val createSupervisedModelAction = networkPanel.networkActions.createSupervisedModelAction
 
             contextMenu.add(createSupervisedModelAction)
 

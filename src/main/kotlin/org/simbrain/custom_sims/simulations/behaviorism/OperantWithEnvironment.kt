@@ -35,7 +35,7 @@ val operantWithEnvironment = newSim {
     val stimulusNet = network.addNeuronGroup(numNeurons, location = point(-9.25, 295.93)).apply {
         layout = LineLayout(100.0, LineLayout.LineOrientation.HORIZONTAL)
         applyLayout()
-        setClamped(true)
+        isClamped = true
         label = "Stimuli"
         setIncrement(1.0)
         neuronList.labels = listOf("Candle", "Flower", "Bell")

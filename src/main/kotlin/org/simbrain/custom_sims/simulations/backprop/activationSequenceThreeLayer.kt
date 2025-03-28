@@ -41,7 +41,7 @@ val activationSequenceThreeLayer = newSim {
     wm1.randomize()
     wm2.randomize()
 
-    val model = SupervisedModel(inputs, output, false).apply {
+    val model = SupervisedModel(inputs, output).apply {
         trainerConfig.testConfiguration.enabled = false
     }
 

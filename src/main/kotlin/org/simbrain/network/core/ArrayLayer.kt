@@ -22,7 +22,7 @@ abstract class ArrayLayer(
     var increment = .1
 
     @UserParameter(label = "Clamped", description = "Clamping", order = 3)
-    var isClamped = false
+    override var isClamped = false
         set(clamped) {
             field = clamped
             events.clampChanged.fire()

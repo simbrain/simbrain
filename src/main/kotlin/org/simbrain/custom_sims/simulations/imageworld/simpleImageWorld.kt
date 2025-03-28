@@ -18,7 +18,7 @@ val simpleImageWorld = newSim {
     // Input nodes
     val inputs = network.addNeuronCollection(100).apply {
         label = "Inputs"
-        setClamped(true)
+        isClamped = true
         setUpperBound(1.0)
         layout(GridLayout(40.0, 40.0))
     }

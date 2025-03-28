@@ -2,7 +2,6 @@ package org.simbrain.custom_sims.simulations.behaviorism
 
 import kotlinx.coroutines.runBlocking
 import org.simbrain.custom_sims.Simulation
-import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.helper_classes.ControlPanel
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.*
@@ -60,7 +59,7 @@ class OperantConditioning : Simulation {
         stimulusNet = net.addNeuronGroup(-9.8, 269.93, numNeurons)
         stimulusNet.layout = LineLayout(100.0, LineLayout.LineOrientation.HORIZONTAL)
         stimulusNet.applyLayout()
-        stimulusNet.setClamped(true)
+        stimulusNet.isClamped = true
         stimulusNet.label = "Stimuli"
         stimulusNet.setIncrement(1.0)
 

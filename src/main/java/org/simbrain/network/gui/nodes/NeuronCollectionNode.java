@@ -137,7 +137,7 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
         menu.add(getNetworkPanel().getNetworkActions().getConnectWithSynapseGroup());
 
         menu.addSeparator();
-        Action createSupervisedModel = getNetworkPanel().getNetworkActions().createCreateSupervisedModelAction();
+        Action createSupervisedModel = getNetworkPanel().getNetworkActions().getCreateSupervisedModelAction();
         menu.add(createSupervisedModel);
         Action testInputs = getNetworkPanel().getNetworkActions().createTestInputPanelAction(neuronCollection);
         menu.add(testInputs);

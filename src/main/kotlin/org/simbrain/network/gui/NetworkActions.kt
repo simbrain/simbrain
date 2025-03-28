@@ -948,6 +948,12 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         if (target == null) {
             reasons.add("No target model selected")
         }
+        if (source is TransformerBlock || target is TransformerBlock) {
+            reasons.add("Transformer blocks cannot be used as source or target layers")
+        }
+        if (source is ActivationSequence || target is ActivationSequence) {
+            reasons.add("Activation sequences are not currently supported")
+        }
         if (source != null && target != null && computeUpdateOrderList(target).let { !it.contains(source) || !it.contains(target) }) {
             reasons.add("No connection between source and target")
         }

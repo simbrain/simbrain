@@ -4,17 +4,15 @@ import kotlinx.coroutines.awaitAll
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
-import org.simbrain.network.core.NeuronArray
-import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.WeightMatrix
-import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.network.neurongroups.NeuronGroup
-import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.network.updaterules.SigmoidalRule
-import org.simbrain.network.util.*
-import org.simbrain.util.math.SigmoidFunctionEnum
+import org.simbrain.network.util.Alignment
+import org.simbrain.network.util.Direction
+import org.simbrain.network.util.alignNetworkModels
+import org.simbrain.network.util.offsetNetworkModel
 import org.simbrain.util.place
 import smile.math.matrix.Matrix
 
@@ -34,10 +32,12 @@ val xorSim = newSim {
     val outputLayer = NeuronGroup(1)
     val wm1 = WeightMatrix(inputLayer, hiddenLayer)
     val wm2 = WeightMatrix(hiddenLayer, outputLayer)
-    val sm = SupervisedModel(hiddenLayer, outputLayer)
-    net.addNetworkModels(inputLayer, hiddenLayer, outputLayer, wm1, wm2, sm, usePlacementManager = false).awaitAll()
+    val sm = SupervisedModel(inputLayer, outputLayer)
+    net.addNetworkModels(inputLayer, hiddenLayer, outputLayer, wm1, wm2, sm).awaitAll()
     offsetNetworkModel(inputLayer, hiddenLayer, Direction.NORTH, 250.0)
     offsetNetworkModel(hiddenLayer, outputLayer, Direction.NORTH, 250.0)
+    alignNetworkModels(inputLayer, hiddenLayer, Alignment.VERTICAL)
+    alignNetworkModels(inputLayer, outputLayer, Alignment.VERTICAL)
 
     sm.trainingSet = MatrixDataset(
         inputs = Matrix.of(

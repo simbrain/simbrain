@@ -292,9 +292,17 @@ fun WeightMatrixTree.applyBackprop(targetValues: Matrix, lossFunction: BackpropL
 }
 
 /**
- * Breadth-first search starting from the output layer.
+ * Computes the update order list for layers in a directed graph starting from the specified `start` layer
+ * and ending at the specified `end` layer. This method traverses the incoming connectors of layers in a
+ * reverse breadth-first manner to determine the proper order of updates.
+ *
+ * @param start The starting layer of the update process. The traversal will stop upon reaching this layer.
+ * @param end The ending layer for the update process. The traversal begins from this layer and works backward.
+ * @return A LinkedHashSet of layers representing the ordered list of layers to be updated.
+ *         The order ensures layers are processed starting from the `start` layer to the `end` layer
+ *         in accordance with their dependencies.
  */
-fun computeUpdateOrderList(end: Layer): LinkedHashSet<Layer> {
+fun computeOrderedUpdatePath(start:Layer, end: Layer): LinkedHashSet<Layer> {
     val visited = LinkedHashSet<Layer>()
     val queue = ArrayDeque<Layer>()
     queue.add(end)
@@ -304,6 +312,9 @@ fun computeUpdateOrderList(end: Layer): LinkedHashSet<Layer> {
             continue
         }
         visited.add(currentLayer)
+
+        if (currentLayer == start) break
+
         for (neighbor in currentLayer.incomingConnectors) {
             if (neighbor.source !in visited) {
                 queue.add(neighbor.source as Layer)
@@ -313,10 +324,10 @@ fun computeUpdateOrderList(end: Layer): LinkedHashSet<Layer> {
     return LinkedHashSet(visited.reversed())
 }
 
-fun LinkedHashSet<Layer>.getAllConnectors() = map { it.outgoingConnectors }.flatten().filter { it.target in this }
+fun LinkedHashSet<Layer>.getAllOutgoingConnectors() = map { it.outgoingConnectors }.flatten().filter { it.target in this }
 
 /**
- *  Assumes LinkedHashSet has been placed in an appropriate "breadth-first" order by [computeUpdateOrderList].
+ *  Assumes LinkedHashSet has been placed in an appropriate "breadth-first" order by [computeOrderedUpdatePath].
  */
 context(Network)
 fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: List<Layer>) {
@@ -339,7 +350,7 @@ fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: Lis
  * Main backprop implementation, which supports skip connections and accumulates weight and bias updates.
  *
  * Linked because it updates layers in a sequential order and Set because it only updates each layer once.
- * Assumes LinkedHashSet has been placed in an appropriate "breadth-first" order by [computeUpdateOrderList].
+ * Assumes LinkedHashSet has been placed in an appropriate "breadth-first" order by [computeOrderedUpdatePath].
  *
  */
 context(Network)

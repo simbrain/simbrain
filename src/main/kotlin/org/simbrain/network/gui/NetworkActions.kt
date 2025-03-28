@@ -17,7 +17,7 @@ import org.simbrain.network.neurongroups.NeuronGroupParams
 import org.simbrain.network.subnetworks.RestrictedBoltzmannMachine
 import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.trainers.SupervisedModel
-import org.simbrain.network.trainers.computeUpdateOrderList
+import org.simbrain.network.trainers.computeOrderedUpdatePath
 import org.simbrain.network.util.Alignment
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
@@ -955,7 +955,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         if (source is ActivationSequence || target is ActivationSequence) {
             reasons.add("Activation sequences are not currently supported")
         }
-        if (source != null && target != null && computeUpdateOrderList(target).let { !it.contains(source) || !it.contains(target) }) {
+        if (source != null && target != null && computeOrderedUpdatePath(source, target).let { !it.contains(source) || !it.contains(target) }) {
             reasons.add("No connection between source and target")
         }
         if (networkPanel.network.getModels<SupervisedModel>().any {

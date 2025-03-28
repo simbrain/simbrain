@@ -15,9 +15,9 @@ class SupervisedModel(
     override val outputLayer: Layer
 ): LocatableModel(), SupervisedNetwork {
 
-    val layers = computeUpdateOrderList(outputLayer)
+    val layers = computeOrderedUpdatePath(inputLayer, outputLayer)
 
-    val weightMatrices = layers.getAllConnectors()
+    val weightMatrices = layers.getAllOutgoingConnectors()
 
     @Transient
     override val events = LocationEvents()

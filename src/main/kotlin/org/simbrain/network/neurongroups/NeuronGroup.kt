@@ -40,6 +40,7 @@ open class NeuronGroup() : AbstractNeuronCollection() {
 
     constructor(neurons: List<Neuron>) : this() {
         addNeurons(neurons.sortTopBottom())
+        applyLayout()
     }
 
     constructor(numNeurons: Int) : this(List(numNeurons) { Neuron() })

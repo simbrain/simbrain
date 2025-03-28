@@ -37,11 +37,8 @@ val simulations = dir("Simulations", alphabetical = true ) {
     //     item("3. Recurrent Hebb") { hebbianAssociator }
     // }
 
-    dir("Reinforcement learning") {
-        item("Actor critic") { actorCritic }
-    }
-
     dir("Backprop") {
+        item("XOR") { xorSim }
         item("Three layer auto-encoder") { backpropAutoEncoder }
         item("Tiny MNIST") { tinyMNIST }
     }
@@ -136,6 +133,11 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Basic recurrent net") { recurrentProjection }
         item("IAC Jets Sharks 5 People") { iacJetsSharks5People }
     }
+
+    dir("Reinforcement learning") {
+        item("Actor critic") { actorCritic }
+    }
+
 
     // dir("Other Demos") {
     //     item("SRN - Temporal XOR") { srnXORSim }

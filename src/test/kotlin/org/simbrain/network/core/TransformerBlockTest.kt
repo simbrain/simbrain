@@ -139,7 +139,7 @@ class TransformerBlockTest {
 
         // Dummy source layer and accumulators
         val dummySource = NeuronArray(2)
-        val biasesAccumulator = HashMap<ArrayLayer, Matrix>()
+        val biasesAccumulator = HashMap<Layer, Matrix>()
         val rawMatrixAccumulator = HashMap<Matrix, Matrix>()
 
         block.processError(

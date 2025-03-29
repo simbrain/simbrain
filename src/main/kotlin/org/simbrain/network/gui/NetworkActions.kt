@@ -981,7 +981,20 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 
             if (input != null && output != null) {
                 val supervisedModel = SupervisedModel(input, output)
+                val layers = supervisedModel.layers.toList()
+                val weightMatrices = supervisedModel.weightMatrices.toList()
                 network.addNetworkModel(supervisedModel)
+                undoManager.addUndoableAction(
+                    description = "Add supervised model to collection",
+                    undo = { supervisedModel.delete() },
+                    redo = {
+                        supervisedModel.layers.clear()
+                        supervisedModel.layers.addAll(layers)
+                        supervisedModel.weightMatrices.clear()
+                        supervisedModel.weightMatrices.addAll(weightMatrices)
+                        network.addNetworkModel(supervisedModel, usePlacementManager = false, useAutoAssignedId = false)?.await()
+                    }
+                )
             }
         }
 

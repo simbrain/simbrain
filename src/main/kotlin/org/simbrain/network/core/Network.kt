@@ -371,6 +371,12 @@ class Network: CoroutineScope, EditableObject {
                 is SupervisedModel -> {
                     model.layers.forEach { childToParentMap[it] = model }
                     model.weightMatrices.forEach { childToParentMap[it] = model }
+                    model.layers.forEach { l ->
+                        l.events.deleted.on(wait = true) { childToParentMap.remove(l) }
+                    }
+                    model.weightMatrices.forEach { m ->
+                        m.events.deleted.on(wait = true) { childToParentMap.remove(m) }
+                    }
                 }
             }
             return deferred
@@ -410,9 +416,9 @@ class Network: CoroutineScope, EditableObject {
                 if (isLastChildOfParent(childToParentMap, model)) {
                     childToParentMap[model]?.let { parent ->
                         addAll(parent.delete())
-                        // When undoing the deletion of a neuron collection via the last node, we need to add back
-                        // that last node
-                        if (parent is NeuronCollection) {
+                        // When undoing the deletion of a neuron collection or supervised model via the last node,
+                        // we need to add back that last node
+                        if (parent is NeuronCollection || parent is SupervisedModel) {
                             addAll(model.delete())
                         }
                     }

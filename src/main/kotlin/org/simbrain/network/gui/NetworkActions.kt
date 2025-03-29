@@ -955,8 +955,12 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         if (source is ActivationSequence || target is ActivationSequence) {
             reasons.add("Activation sequences are not currently supported")
         }
-        if (source != null && target != null && computeOrderedUpdatePath(source, target).let { !it.contains(source) || !it.contains(target) }) {
-            reasons.add("No connection between source and target")
+        if (source != null && target != null) {
+            try {
+                computeOrderedUpdatePath(source, target)
+            } catch (e: Exception) {
+                reasons.add("No connection between source and target")
+            }
         }
         if (networkPanel.network.getModels<SupervisedModel>().any {
             it.layers.first() == source && it.layers.last() == target

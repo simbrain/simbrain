@@ -2,9 +2,7 @@ package org.simbrain.network.trainers
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.NeuronArray
-import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.core.*
 import org.simbrain.util.*
 import smile.math.matrix.Matrix
 
@@ -145,5 +143,52 @@ class TrainingUtilsTest {
         }
     }
 
+    @Test
+    fun `test computeOrderedUpdatePath for linear path from start to end`() {
+        val a = NeuronArray(2)
+        val b = NeuronArray(2)
+        val c = NeuronArray(2)
+        val wm1 = WeightMatrix(a, b)
+        val wm2 = WeightMatrix(b, c)
+        val order = computeOrderedUpdatePath(a, c).toList()
+        assertEquals(listOf(a, b, c), order)
+    }
+
+    @Test
+    fun `test computeOrderedUpdatePath when start equals end`() {
+        // Not a case we want but a valid use case for the function
+        val a = NeuronArray(2)
+        val order = computeOrderedUpdatePath(a, a).toList()
+        assertEquals(listOf(a), order)
+    }
+
+    @Test
+    fun `test computeOrderedUpdatePath throws IllegalArgumentException when start and end are disconnected`() {
+        val a = NeuronArray(2)
+        val b = NeuronArray(2) // no connection between a and b
+
+        org.junit.jupiter.api.assertThrows<IllegalArgumentException> {
+            computeOrderedUpdatePath(a, b)
+        }
+    }
+
+    @Test
+    fun `test computeOrderedUpdatePath with branching connections`() {
+        val a = NeuronArray(2)
+        val b = NeuronArray(2)
+        val c = NeuronArray(2)
+        val d = NeuronArray(2)
+
+        val wm1 = WeightMatrix(a, b)
+        val wm2 = WeightMatrix(a, c)
+        val wm3 = WeightMatrix(c, d)
+
+        val order = computeOrderedUpdatePath(a, d).toList()
+
+        // Ensure topological order and presence
+        assertTrue(order.indexOf(a) < order.indexOf(c))
+        assertTrue(order.indexOf(c) < order.indexOf(d))
+        assertTrue(order.containsAll(listOf(a, c, d)))
+    }
 
 }

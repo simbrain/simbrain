@@ -317,9 +317,12 @@ fun computeOrderedUpdatePath(start:Layer, end: Layer): LinkedHashSet<Layer> {
 
         for (neighbor in currentLayer.incomingConnectors) {
             if (neighbor.source !in visited) {
-                queue.add(neighbor.source as Layer)
+                queue.add(neighbor.source)
             }
         }
+    }
+    if (start !in visited) {
+        throw IllegalArgumentException("No path found from start ($start) to end ($end)")
     }
     return LinkedHashSet(visited.reversed())
 }
@@ -366,7 +369,7 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
     val reversedLayers = reversed()
 
     targetValues.validateSameShape(outputLayer.activations)
-    lossFunction.validateLayer(outputLayer as Layer)
+    lossFunction.validateLayer(outputLayer)
 
     val scalarError = lossFunction.scalarLoss(outputLayer.activations, targetValues)
 

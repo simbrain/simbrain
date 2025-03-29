@@ -327,7 +327,7 @@ fun computeOrderedUpdatePath(start:Layer, end: Layer): LinkedHashSet<Layer> {
     return LinkedHashSet(visited.reversed())
 }
 
-fun LinkedHashSet<Layer>.getAllOutgoingConnectors() = map { it.outgoingConnectors }.flatten().filter { it.target in this }
+fun LinkedHashSet<Layer>.getAllOutgoingConnectors() = map { it.outgoingConnectors }.flatten().filter { it.target in this }.toMutableList()
 
 /**
  *  Assumes LinkedHashSet has been placed in an appropriate "breadth-first" order by [computeOrderedUpdatePath].

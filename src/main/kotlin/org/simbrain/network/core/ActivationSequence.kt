@@ -122,7 +122,7 @@ class ActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inpu
         events.updated.fire()
     }
 
-    fun copy() = ActivationSequence(sequenceSize, inputSize).also {
+    override fun copy() = ActivationSequence(sequenceSize, inputSize).also {
         it.activations.copyFrom(activations)
     }
 

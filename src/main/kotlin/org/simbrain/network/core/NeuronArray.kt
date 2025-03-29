@@ -163,7 +163,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
     /**
      * Make a deep copy of this array.
      */
-    fun copy(): NeuronArray {
+    override fun copy(): NeuronArray {
         val copy = NeuronArray(size)
         copy.copyFrom(this)
         return copy

@@ -18,9 +18,8 @@
 package org.simbrain.network.core
 
 import org.simbrain.network.layouts.Layout
+import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.updaterules.NeuronUpdateRule
-import org.simbrain.util.propertyeditor.CopyableObject
-import java.util.*
 import java.util.function.Consumer
 
 /**
@@ -127,7 +126,9 @@ class NeuronCollection : AbstractNeuronCollection {
         layout.layoutNeurons(neuronList)
     }
 
-    override fun copy(): CopyableObject {
-        return NeuronCollection(neuronList)
+    override fun copy(): NeuronCollection {
+        return NeuronCollection(neuronList.map(Neuron::copy)).also {
+            it.label = label
+        }
     }
 }

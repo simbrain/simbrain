@@ -21,6 +21,7 @@ package org.simbrain.network.gui
 import org.simbrain.network.core.*
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.subnetworks.Subnetwork
+import org.simbrain.network.trainers.SupervisedModel
 
 /**
  * Buffer which holds network objects for cutting and pasting.
@@ -125,14 +126,31 @@ object Clipboard {
                             layerMappings[item] = copy
                         }
                         is NeuronCollection -> {
-                            val neurons = item.neuronList.map { Neuron(it) }
-                            addAll(neurons)
-                            val copy = NeuronCollection(neurons).apply {
-                                label = item.label
-                            }
+                            val copy = item.copy()
                             neuronMappings.putAll(item.neuronList.zip(copy.neuronList))
                             add(copy)
+                            addAll(copy.neuronList)
                             layerMappings[item] = copy
+                        }
+                        is SupervisedModel -> {
+                            val layers = item.layers.map { existing ->
+                                existing.copy().also { copy ->
+                                    layerMappings[existing] = copy
+                                    if (copy is AbstractNeuronCollection) {
+                                        neuronMappings.putAll((existing as AbstractNeuronCollection).neuronList.zip(copy.neuronList))
+                                        (copy as? NeuronCollection)?.let { addAll(it.neuronList) }
+                                    }
+                                }
+                            }
+                            addAll(layers)
+                            val weightMatrices = item.weightMatrices.map { existing ->
+                                WeightMatrix(layerMappings[existing.source]!!, layerMappings[existing.target]!!).also { copy ->
+                                   copy.copyFrom(existing as WeightMatrix)
+                                }
+                            }
+                            addAll(weightMatrices)
+                            val copy = SupervisedModel(layerMappings[item.inputLayer]!!, layerMappings[item.outputLayer]!!)
+                            add(copy)
                         }
                         is NeuronArray -> {
                             val copy = item.copy()

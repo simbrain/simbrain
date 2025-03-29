@@ -28,6 +28,7 @@ import org.simbrain.util.StandardDialog
 import org.simbrain.util.createAction
 import org.simbrain.util.piccolo.Outline
 import org.simbrain.util.swingDispatcher
+import java.awt.Color
 import javax.swing.JComponent
 import javax.swing.JOptionPane
 import javax.swing.JPopupMenu
@@ -136,6 +137,7 @@ class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: Super
 
     init {
         interactionBox.setText(supervisedModel.displayName)
+        interactionBox.paint = Color(209, 255, 204)
         addChild(outline)
         addChild(interactionBox)
 

@@ -2,6 +2,7 @@ package org.simbrain.network.core
 
 import org.simbrain.network.events.LocationEvents
 import org.simbrain.network.updaterules.NeuronUpdateRule
+import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.toDoubleArray
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Producible
@@ -26,7 +27,7 @@ import java.awt.geom.Rectangle2D
  * @author Jeff Yoshimi
  * @author Yulin Li
  */
-abstract class Layer : LocatableModel(), AttributeContainer {
+abstract class Layer : LocatableModel(), AttributeContainer, CopyableObject {
     // TODO: Currently Smile Matrices are the "lingua Franca" for different layers.
     //  Keep an eye on Kotlin's Multik as a possible alternative
     /**
@@ -158,6 +159,8 @@ abstract class Layer : LocatableModel(), AttributeContainer {
     fun removeOutgoingConnector(connector: Connector) {
         outgoingConnectors.remove(connector)
     }
+
+    abstract override fun copy(): Layer
 
     override suspend fun delete(): List<NetworkModel> {
         val connectors = LinkedHashSet(incomingConnectors + outgoingConnectors)

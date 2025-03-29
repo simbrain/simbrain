@@ -316,7 +316,7 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
         return dInputsTotal
     }
 
-    fun copy() = TransformerBlock(sequenceSize, inputSize, hiddenSize).also {
+    override fun copy() = TransformerBlock(sequenceSize, inputSize, hiddenSize).also {
         it.activations.copyFrom(activations)
         it.matrixVisibility = matrixVisibility
         it.sequenceVisibility = sequenceVisibility

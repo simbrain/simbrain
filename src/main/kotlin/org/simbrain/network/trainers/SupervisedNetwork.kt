@@ -34,9 +34,6 @@ interface SupervisedNetwork {
     val outputLayer: Layer
 
     context(Network)
-    fun update()
-
-    context(Network)
     fun forwardPass() {
         update()
     }

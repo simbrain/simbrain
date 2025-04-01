@@ -67,8 +67,11 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
             }
         }
 
-    override val biases: Matrix
+    override var biases: Matrix
         get() = Matrix.column(biasArray)
+        set(value) {
+            biasArray = value.toDoubleArray()
+        }
 
     /**
      * Returns an array of binary values that represents the neurons in the neuron list.

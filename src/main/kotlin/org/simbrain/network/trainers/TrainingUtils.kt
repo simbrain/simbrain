@@ -92,6 +92,10 @@ fun WeightMatrix.computeWeightDeltas(errorSignal: Matrix): Matrix {
     throw IllegalArgumentException("Invalid source and target types: ${source::class.simpleName} and ${target::class.simpleName}")
 }
 
+fun SynapseGroup.computeWeightDeltas(errorSignal: Matrix): Matrix {
+    return errorSignal.mm(source.activations.transpose())
+}
+
 fun WeightMatrix.backpropagateError(errorSignal: Matrix): Matrix {
     // Backpropagate the error signal through the weights to get a new error vector
     //println("Propagating errors through ${source.displayName} [${errorSignal.flatten().joinToString(", ") { it.format(2) }}]")
@@ -104,6 +108,11 @@ fun WeightMatrix.backpropagateError(errorSignal: Matrix): Matrix {
         weights.transpose().mm(errorSignal)
     }
 }
+
+fun SynapseGroup.backpropagateError(errorSignal: Matrix): Matrix {
+    return getWeightMatrix().transpose().mm(errorSignal)
+}
+
 
 /**
  * Change to bias is error vector times epsilon. Compute this and add it to biases.
@@ -320,6 +329,11 @@ fun computeOrderedUpdatePath(start:Layer, end: Layer): LinkedHashSet<Layer> {
                 queue.add(neighbor.source)
             }
         }
+        (currentLayer as? AbstractNeuronCollection)?.incomingSgs?.forEach { neighbor ->
+            if (neighbor.source !in visited) {
+                queue.add(neighbor.source)
+            }
+        }
     }
     if (start !in visited) {
         throw IllegalArgumentException("No path found from start ($start) to end ($end)")
@@ -327,7 +341,16 @@ fun computeOrderedUpdatePath(start:Layer, end: Layer): LinkedHashSet<Layer> {
     return LinkedHashSet(visited.reversed())
 }
 
-fun LinkedHashSet<Layer>.getAllOutgoingConnectors() = map { it.outgoingConnectors }.flatten().filter { it.target in this }.toMutableList()
+fun LinkedHashSet<Layer>.getAllOutgoingConnectors() = map { it.outgoingConnectors }
+    .flatten()
+    .filter { it.target in this }
+    .toMutableList()
+
+fun LinkedHashSet<Layer>.getAllOutgoingSynapseGroups() = filterIsInstance<AbstractNeuronCollection>()
+    .map { it.outgoingSg }
+    .flatten()
+    .filter { it.target in this }
+    .toMutableList()
 
 /**
  *  Assumes LinkedHashSet has been placed in an appropriate "breadth-first" order by [computeOrderedUpdatePath].
@@ -345,7 +368,10 @@ fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: Lis
     allLayers.forEach {
         it.accumulateInputs()
         it.update()
-        (it as? NeuronCollection)?.let { nc -> nc.neuronList.forEach { n -> n.update() } }
+        (it as? NeuronCollection)?.let { nc ->
+            nc.neuronList.forEach { n -> n.accumulateInputs() }
+            nc.neuronList.forEach { n -> n.update() }
+        }
     }
 }
 
@@ -361,6 +387,7 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
     targetValues: Matrix,
     outputLayer: Layer,
     weightAccumulator: HashMap<WeightMatrix, Matrix>,
+    synapseGroupAccumulator: HashMap<SynapseGroup, Matrix>,
     biasesAccumulator: HashMap<Layer, Matrix>,
     rawMatrixAccumulator: HashMap<Matrix, Matrix>,
     lossFunction: BackpropLossFunction = BackpropLossFunction.SSE
@@ -398,6 +425,15 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
 
             // The source of the weight matrix may be the same across multiple passes through this code,
             // supporting skip connections. In such cases, the error signals are summed
+            accumulatedErrorSignal = accumulatedErrorSignal?.add(currentConnectorErrorSignal) ?: currentConnectorErrorSignal
+        }
+        (layer as? AbstractNeuronCollection)?.incomingSgs?.forEach { sg ->
+            val weightDeltas = sg.computeWeightDeltas(errorSignal)
+            synapseGroupAccumulator.getOrPut(sg) {
+                Matrix(sg.target.size, sg.source.size)
+            }.add(weightDeltas)
+            val currentConnectorErrorSignal = sg.backpropagateError(errorSignal)
+
             accumulatedErrorSignal = accumulatedErrorSignal?.add(currentConnectorErrorSignal) ?: currentConnectorErrorSignal
         }
         // The new error signal which gets pushed further back until the first layer is reached

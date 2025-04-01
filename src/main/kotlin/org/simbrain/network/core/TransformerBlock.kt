@@ -101,7 +101,9 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
 
     val feedForwardOutputNetInputs = Matrix(sequenceSize, size)
 
-    override val biases: Matrix get() = throw UnsupportedOperationException("Not applicable to Transformer")
+    override var biases: Matrix
+        get() = throw UnsupportedOperationException("Not applicable to Transformer")
+        set(value) { throw UnsupportedOperationException("Not applicable to Transformer") }
 
     override val biasArray: DoubleArray
         get() = throw UnsupportedOperationException("Not applicable to Transformer")

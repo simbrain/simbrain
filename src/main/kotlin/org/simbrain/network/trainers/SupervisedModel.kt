@@ -19,6 +19,8 @@ class SupervisedModel(
 
     val weightMatrices = layers.getAllOutgoingConnectors()
 
+    val synapseGroups = layers.getAllOutgoingSynapseGroups()
+
     @Transient
     override val events = LocationEvents()
 
@@ -101,6 +103,11 @@ class SupervisedModel(
 
     override fun initWeights() {
         weightMatrices.forEach { trainerConfig.weightInitializationStrategy.initializeWeights(it as WeightMatrix) }
+        synapseGroups.forEach {
+            val weightMatrix = it.getWeightMatrix()
+            trainerConfig.weightInitializationStrategy.initializeWeights(weightMatrix)
+            it.setWeightMatrix(weightMatrix)
+        }
         layers.filterIsInstance<TransformerBlock>().forEach { it.initWeights(trainerConfig.weightInitializationStrategy) }
     }
 
@@ -144,6 +151,7 @@ class SupervisedModelTrainer(network: Network, supervisedModel: SupervisedModel)
 
     override fun trainRow(rowNum: Int): Double {
         val weightAccumulator: HashMap<WeightMatrix, Matrix> = HashMap()
+        val synapseGroupAccumulator: HashMap<SynapseGroup, Matrix> = HashMap()
         val biasesAccumulator: HashMap<Layer, Matrix> = HashMap()
         val rawMatrixAccumulator: HashMap<Matrix, Matrix> = HashMap()
 
@@ -152,7 +160,7 @@ class SupervisedModelTrainer(network: Network, supervisedModel: SupervisedModel)
             val targetVec = trainingSet.targets.rowVectorTransposed(rowNum)
             with(network) {
                 layers.forwardPass(listOf(inputLayer.activations), inputLayers = listOf(inputLayer))
-                layers.accumulateBackprop(targetVec, outputLayer, weightAccumulator, biasesAccumulator, rawMatrixAccumulator, lossFunction = config.lossFunction)
+                layers.accumulateBackprop(targetVec, outputLayer, weightAccumulator, synapseGroupAccumulator, biasesAccumulator, rawMatrixAccumulator, lossFunction = config.lossFunction)
             }
         }
 
@@ -161,8 +169,15 @@ class SupervisedModelTrainer(network: Network, supervisedModel: SupervisedModel)
             wm.events.updated.fire()
         }
 
+        synapseGroupAccumulator.forEach { (sg, delta) ->
+            val weightMatrix = sg.getWeightMatrix()
+            val delta = config.optimizer.computeDelta(weightMatrix, delta)
+            sg.setWeightMatrix(weightMatrix.add(delta))
+            sg.events.updated.fire()
+        }
+
         biasesAccumulator.forEach { (na, delta) ->
-            na.biases.add(config.optimizer.computeDelta(na.biases, delta))
+            na.biases = na.biases.add(config.optimizer.computeDelta(na.biases, delta))
             na.events.updated.fire()
         }
 

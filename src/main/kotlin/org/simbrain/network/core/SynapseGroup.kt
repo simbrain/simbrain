@@ -169,12 +169,18 @@ class SynapseGroup @JvmOverloads constructor(
         events.synapseListChanged.fire()
     }
 
-    fun getWeightMatrixArray(): Array<DoubleArray> {
-        return SimnetUtils.getWeights(source.neuronList, target.neuronList);
+    fun getWeightMatrix(): Matrix {
+        return Matrix.of(SimnetUtils.getWeights(source.neuronList, target.neuronList)).transpose()
     }
 
-    fun getWeightMatrix(): Matrix {
-        return Matrix.of(SimnetUtils.getWeights(source.neuronList, target.neuronList));
+    fun setWeightMatrix(matrix: Matrix) {
+        source.neuronList.forEachIndexed { j, s ->
+            target.neuronList.forEachIndexed { i, t ->
+                s.fanOut[t]?.let {
+                    it.strength = matrix[i, j]
+                }
+            }
+        }
     }
 
     fun addSynapseListener(synapse: Synapse) {

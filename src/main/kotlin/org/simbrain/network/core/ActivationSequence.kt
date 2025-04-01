@@ -77,7 +77,7 @@ class ActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inpu
     override val activationArray: DoubleArray
         get() = activations.flatten()
 
-    override val biases: Matrix = Matrix(inputSize, 1)
+    override var biases: Matrix = Matrix(inputSize, 1)
 
     override val biasArray: DoubleArray
         get() = biases.toDoubleArray()

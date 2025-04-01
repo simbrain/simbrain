@@ -89,7 +89,7 @@ abstract class Layer : LocatableModel(), AttributeContainer, CopyableObject {
      */
     abstract val activationArray: DoubleArray
 
-    abstract val biases: Matrix
+    abstract var biases: Matrix
 
     abstract val biasArray: DoubleArray
 

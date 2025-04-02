@@ -140,10 +140,10 @@ val SimbrainJTable.showBoxPlotAction
     get() = createAction(
         name = "Boxplot column",
         description = "Create boxplot for data all numeric columns",
-        iconPath = "menu_icons/BarChart.png" // TODO Better Icon
+        iconPath = "menu_icons/BarChart.png"
     ) {
         launch(context = Dispatchers.Default) {
-            val canvas = BoxPlot.of(*model.getColumnMajorArray()).canvas();
+            val canvas = BoxPlot.of(*model.getColumnMajorArray()).canvas()
             canvas.window()
         }
     }

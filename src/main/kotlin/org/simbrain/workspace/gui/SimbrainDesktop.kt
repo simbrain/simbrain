@@ -144,11 +144,7 @@ object SimbrainDesktop {
             addTab("Terminal", null, terminalPanel, "Simbrain terminal")
             addTab("Performance", null, PerformanceMonitorPanel(this@SimbrainDesktop.workspace), "Performance monitoring")
             addChangeListener {
-                if (selectedIndex == 2) {
-                    PerformanceMonitor.enabled = true
-                } else {
-                    PerformanceMonitor.enabled = false
-                }
+                PerformanceMonitor.enabled = selectedIndex == 2
             }
         },
         orientation = JSplitPane.VERTICAL_SPLIT,
@@ -219,11 +215,7 @@ object SimbrainDesktop {
      */
     private val menuListener: MenuListener = object : MenuListener {
         override fun menuSelected(arg0: MenuEvent) {
-            if (workspace.changesExist()) {
-                actionManager.saveWorkspaceAction.isEnabled = true
-            } else {
-                actionManager.saveWorkspaceAction.isEnabled = false
-            }
+            actionManager.saveWorkspaceAction.isEnabled = workspace.changesExist()
         }
 
         override fun menuDeselected(arg0: MenuEvent) {
@@ -413,7 +405,7 @@ object SimbrainDesktop {
         bar.add(actionManager.newNetworkAction)
 
         var button = JButton()
-        button.icon = ResourceManager.getImageIcon("menu_icons/World.png")
+        button.icon = ResourceManager.getSmallIcon("menu_icons/World.png")
         val worldMenu = JPopupMenu()
         for (action in actionManager.newWorldActions) {
             worldMenu.add(action)
@@ -426,7 +418,7 @@ object SimbrainDesktop {
         bar.add(button)
 
         button = JButton()
-        button.icon = ResourceManager.getImageIcon("menu_icons/BarChart.png")
+        button.icon = ResourceManager.getSmallIcon("menu_icons/BarChart.png")
         val gaugeMenu = JPopupMenu()
         for (action in actionManager.plotActions) {
             gaugeMenu.add(action)
@@ -978,10 +970,10 @@ object SimbrainDesktop {
     fun resizeAllWindows() {
         var maxX = 0
         var maxY = 0
-        val desktopHeight: Double = desktopPane.getSize().getHeight()
-        val desktopWidth: Double = desktopPane.getSize().getWidth()
+        val desktopHeight: Double = desktopPane.size.getHeight()
+        val desktopWidth: Double = desktopPane.size.getWidth()
 
-        for (c in desktopPane.getComponents()) {
+        for (c in desktopPane.components) {
             val bottomRightX = (c.width + c.x)
             val bottomRightY = (c.height + c.y)
             if (maxX < bottomRightX) {
@@ -998,7 +990,7 @@ object SimbrainDesktop {
         val finalScalingRatio = if (xScalingRatio > yScalingRatio) 1 / xScalingRatio else 1 / yScalingRatio
 
         if (finalScalingRatio < 1) {
-            for (c in desktopPane.getComponents()) {
+            for (c in desktopPane.components) {
                 val orignalTopLeftX = c.x.toDouble()
                 val orignalTopLeftY = c.y.toDouble()
                 val originalWidth = c.width
@@ -1054,9 +1046,7 @@ object SimbrainDesktop {
             if (Utils.isLinux()) {
                 UIManager.put("DesktopPaneUI", "javax.swing.plaf.basic.BasicDesktopPaneUI")
             }
-            UIManager.setLookAndFeel(
-                UIManager.getSystemLookAndFeelClassName()
-            )
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
         } catch (e: Exception) {
             e.printStackTrace()
         }

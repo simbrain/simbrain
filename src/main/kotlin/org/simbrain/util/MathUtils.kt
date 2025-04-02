@@ -265,9 +265,38 @@ fun Matrix.binaryRandomize() = apply { twoValueRandomize(0.0, 1.0) }
 
 fun Matrix.bipolarRandomize() = apply { twoValueRandomize(-1.0, 1.0) }
 
+/**
+ * Perturbs the array by changing exactly [hammingDistance] elements by adding small random noise.
+ * Hamming distance here means the number of positions that differ from the original.
+ *
+ * @param hammingDistance The number of elements to perturb.
+ * @param noiseGenerator A lambda that returns the amount of noise to add to a selected element.
+ *                       Default is random in range -0.1 to 0.1.
+ * @return A new DoubleArray with the specified Hamming distance from the original.
+ */
+fun DoubleArray.perturbByHammingDistance(
+    hammingDistance: Int,
+    noiseGenerator: () -> Double = { Random.nextDouble(-0.1, 0.1) }
+): DoubleArray {
+    require(hammingDistance <= size) {
+        "Hamming distance ($hammingDistance) cannot exceed array size (${this.size})"
+    }
+
+    val result = this.copyOf()
+    val indicesToChange = this.indices.shuffled().take(hammingDistance)
+    for (i in indicesToChange) {
+        result[i] += noiseGenerator()
+    }
+    return result
+}
+
 // TODO: Use for unit tests
 fun main() {
-    print(Matrix(10,10).binaryRandomize())
-    print(Matrix(10,10).bipolarRandomize())
-    print(Matrix(10,10).twoValueRandomize(-4.0, 4.0))
+    //print(Matrix(10,10).binaryRandomize())
+    //print(Matrix(10,10).bipolarRandomize())
+    //print(Matrix(10,10).twoValueRandomize(-4.0, 4.0))
+    val original = doubleArrayOf(1.0, 2.0, 3.0, 4.0, 5.0)
+    val perturbed = original.perturbByHammingDistance(2)
+    println("Original: ${original.joinToString()}")
+    println("Perturbed: ${perturbed.joinToString()}")
 }

@@ -166,7 +166,7 @@ class WorkspaceActions {
     }
 
     val openCouplingManagerAction = SimbrainDesktop.desktopPane.createAction(
-        iconPath = "menu_icons/chainlink.png",
+        iconPath = "menu_icons/Link.png",
         name = "Open coupling manager...",
         description = "Open workspace coupling manager.",
         coroutineScope = workspace
@@ -230,16 +230,16 @@ class WorkspaceActions {
 
     val plotActions = listOf(
         createComponentFactoryAction("Bar Chart", "menu_icons/BarChart.png"),
-        createComponentFactoryAction("Histogram", "menu_icons/BarChart.png"),
+        createComponentFactoryAction("Histogram", "menu_icons/Histogram.png"),
         createComponentFactoryAction("Pie Chart", "menu_icons/PieChart.png"),
         createComponentFactoryAction("Pixel Plot", "menu_icons/grid.png"),
-        createComponentFactoryAction("Projection Plot", "menu_icons/ProjectionIcon.png"),
-        createComponentFactoryAction("Raster Plot", "menu_icons/ScatterIcon.png"),
+        createComponentFactoryAction("Projection Plot", "menu_icons/ScatterPlot.png"),
+        createComponentFactoryAction("Raster Plot", "menu_icons/ScatterPlot.png"),
         createComponentFactoryAction("Time Series", "menu_icons/TimeSeries.png")
     )
     val newWorldActions = listOf(
         createComponentFactoryAction("Data Table", "menu_icons/Table.png"),
-        createComponentFactoryAction("Odor World", "menu_icons/SwissIcon.png"),
+        createComponentFactoryAction("Odor World", "menu_icons/mouse_icon.png"),
         createComponentFactoryAction("Image World", "menu_icons/photo.png"),
         createComponentFactoryAction("Text World", "menu_icons/Text.png"),
         createComponentFactoryAction("Sound World", "menu_icons/speaker.png")

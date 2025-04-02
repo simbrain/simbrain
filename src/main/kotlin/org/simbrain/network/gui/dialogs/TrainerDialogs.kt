@@ -37,8 +37,11 @@ class DataSetPanel(val dataSet: MatrixDataset, applyAction: suspend DataSetPanel
         toolbar.add(rowErrorJLabel)
     }
 
+    val inputData get() = (inputs.table.model as MatrixDataFrame).data
 
     val targets = MatrixEditor(dataSet.targets, dataSet.targetRowNames, dataSet.targetColumnNames)
+
+    val targetData get() = (targets.table.model as MatrixDataFrame).data
 
     val addRemoveRows = AddRemoveRows(inputs.table, targets.table)
 
@@ -88,11 +91,11 @@ fun <SN> SN.getSupervisedTrainingDialog(): StandardDialog where SN: SupervisedNe
 
         fun DataSetPanel.commonApplyAction(selectedRow: Int) {
             with(network) {
-                inputLayer.setActivations(dataSet.inputs.row(selectedRow))
+                inputLayer.setActivations(inputData.row(selectedRow))
                 this@SN.forwardPass()
                 trainerConfig.lossFunction.scalarLoss(
                     outputLayer.activations,
-                    dataSet.targets.row(selectedRow).toMatrix()
+                    targetData.row(selectedRow).toMatrix()
                 ).also { rowErrorJLabel.text = "${trainerConfig.lossFunction.shortName}: ${it.format(4)}" }
             }
         }
@@ -106,23 +109,22 @@ fun <SN> SN.getSupervisedTrainingDialog(): StandardDialog where SN: SupervisedNe
         val trainingDataSetPanel = createDataSetPanel(trainingSet)
         val testingDataSetPanel = createDataSetPanel(testingSet)
 
+        fun syncDataSet() {
+            trainingSet = trainingDataSetPanel.exportMatrixDataSet()
+            testingSet = testingDataSetPanel.exportMatrixDataSet()
+        }
+
         val dataSetTabPane = JTabbedPane().apply {
             addTab("Training Set", trainingDataSetPanel)
             addTab("Testing Set", testingDataSetPanel)
         }
 
-        trainer.events.beginTraining.on(Dispatchers.Default) {
-            trainingSet = trainingDataSetPanel.exportMatrixDataSet()
-            testingSet = testingDataSetPanel.exportMatrixDataSet()
-        }
+        trainer.events.beginTraining.on(Dispatchers.Default) { syncDataSet() }
         runControls.add(trainerControls, "span, growx, wrap")
         runControls.add(JSeparator(), "span, growx, wrap")
         runControls.add(dataSetTabPane, "wrap")
 
-        addCommitTask {
-            trainingSet = trainingDataSetPanel.exportMatrixDataSet()
-            testingSet = testingDataSetPanel.exportMatrixDataSet()
-        }
+        addCommitTask { syncDataSet() }
 
         contentPane = runControls
     }

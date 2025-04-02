@@ -85,7 +85,7 @@ val discreteHopfieldSim = newSim {
                     hopfield.weightMatrix.hardClear()
                 }
             )
-            createHopfieldTestPane(config)
+            createHopfieldTestPane(config, true)
         }
     }
 

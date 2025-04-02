@@ -6,12 +6,10 @@ import org.simbrain.network.core.Layer
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.learningrules.HebbianRule
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
-import org.simbrain.util.ControlPanelKt
-import org.simbrain.util.applyFunctionInPlace
+import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
-import org.simbrain.util.showAPEOptionDialog
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.TwoValued
 import org.simbrain.util.stats.distributions.UniformRealDistribution
@@ -49,7 +47,7 @@ data class HopfieldTestConfig(
     val distanceFunction: (actual: DoubleArray, expected: DoubleArray) -> Double = ::hammingDistance
 )
 
-suspend fun runHopfieldTest(
+suspend fun testPatterns(
     config: HopfieldTestConfig,
     patternTestConfig: PatternTestOptions,
     patterns: List<DoubleArray>,
@@ -87,11 +85,17 @@ suspend fun runHopfieldTest(
         }
     }
 
-
     // Returns the number of patterns that remain stable within the specified tolerance
     return patterns.count { pattern ->
-        config.hopfield.setActivations(pattern)
+        // Apply partial cue of pattern to network
+        if (patternTestConfig.isDiscreteHopfield) {
+            config.hopfield.setActivations(pattern.perturbBinaryByHammingDistance(patternTestConfig.cueDistance.toInt()))
+        } else {
+            config.hopfield.setActivations(pattern.perturbByEuclideanDistance(patternTestConfig.cueDistance))
+        }
+        // Run for specified iterations
         config.workspace.iterateSuspend(patternTestConfig.testIterations)
+        // Test if it's within a specified radius of the original pattern
         config.distanceFunction(
             config.hopfield.activationArray,
             pattern
@@ -99,7 +103,10 @@ suspend fun runHopfieldTest(
     }
 }
 
-suspend fun runCapacityTest(
+/**
+ * Run tests for memory capacity with and without forgetting
+ */
+suspend fun runCapacityTests(
     config: HopfieldTestConfig,
     patternTestConfig: PatternTestOptions,
     patterns: List<DoubleArray>,
@@ -107,18 +114,18 @@ suspend fun runCapacityTest(
     plot: TimeSeriesPlotComponent
 ) {
 
-    // Runs the memory test for 1, 2, ... numTestPatterns and plots results
+    // Runs the memory test and plot results
     for (i in 0 until numPatternsToTest) {
         val nTest = i + 1
-        val nSuccess = runHopfieldTest(config, patternTestConfig.copy().apply { forgetting = false }, patterns, nTest) * 100.0 / nTest
+        val nSuccess = testPatterns(config, patternTestConfig.copy().apply { forgetting = false }, patterns, nTest) * 100.0 / nTest
         plot.model.addData(0, (i+1).toDouble(), nSuccess)
     }
 
-    // Forgetting test
+    // Run the forgetting test and plot results
     if (patternTestConfig.forgetting) {
         for (i in 0 until numPatternsToTest) {
             val nTest = i + 1
-            val nSuccess = runHopfieldTest(config, patternTestConfig, patterns, nTest) * 100.0 / nTest
+            val nSuccess = testPatterns(config, patternTestConfig, patterns, nTest) * 100.0 / nTest
             plot.model.addData(1, (i+1).toDouble(), nSuccess)
         }
     }
@@ -127,10 +134,11 @@ suspend fun runCapacityTest(
 
 context(SimulationScope)
 fun ControlPanelKt.createHopfieldTestPane(
-    config: HopfieldTestConfig
+    config: HopfieldTestConfig,
+    isDiscreteHopfield: Boolean
 ) {
 
-    val patternTestConfig = PatternTestOptions()
+    val patternTestConfig = PatternTestOptions(isDiscreteHopfield)
     fun numTestPatterns(): Int = (patternTestConfig.percentToTest / 100 * config.hopfield.size).toInt()
     val allPatterns = (0 until numTestPatterns()).map {
         applyRandomPattern(config.hopfield)
@@ -171,7 +179,7 @@ fun ControlPanelKt.createHopfieldTestPane(
         slider.init()
 
         plot.model.clearData()
-        runCapacityTest(config, patternTestConfig, allPatterns, numTestPatterns(), plot)
+        runCapacityTests(config, patternTestConfig, allPatterns, numTestPatterns(), plot)
 
     }
 
@@ -185,7 +193,7 @@ fun ControlPanelKt.createHopfieldTestPane(
 
 }
 
-class PatternTestOptions: CopyableObject {
+class PatternTestOptions(val isDiscreteHopfield: Boolean): CopyableObject {
 
     var distancePercentThreshold by GuiEditable(
         label = "Distance Threshold",
@@ -204,6 +212,14 @@ class PatternTestOptions: CopyableObject {
         min = 0.0,
         max = 100.0,
         order = 20
+    )
+
+    var cueDistance by GuiEditable(
+        initValue = 3.0,
+        description = "How far away the cue should be when testing retrieval. Hamming for discrete, Euclidean for continuous.",
+        min = 0.0,
+        increment = 1.0,
+        order = 25
     )
 
     var testIterations by GuiEditable(
@@ -251,9 +267,10 @@ class PatternTestOptions: CopyableObject {
     )
 
     override fun copy(): PatternTestOptions {
-        return PatternTestOptions().also {
+        return PatternTestOptions(isDiscreteHopfield).also {
             it.distancePercentThreshold = distancePercentThreshold
             it.percentToTest = percentToTest
+            it.cueDistance = cueDistance
             it.testIterations = testIterations
             it.forgetting = forgetting
             it.forgettingIterations = forgettingIterations

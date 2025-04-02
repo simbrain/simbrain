@@ -35,7 +35,7 @@ import java.util.Scanner;
  */
 public class ResourceManager {
 
-    private static int smallIconSize = 18;
+    private static final int smallIconSize = 18;
 
     /**
      * Retrieve an ImageIcon based on its file name.
@@ -73,7 +73,7 @@ public class ResourceManager {
         try {
             URL url = ClassLoader.getSystemClassLoader().getResource(path);
             ImageIcon imageIcon = new ImageIcon(url);
-            Image image = imageIcon.getImage().getScaledInstance(smallIconSize, smallIconSize, Image.SCALE_AREA_AVERAGING);
+            Image image = imageIcon.getImage().getScaledInstance(smallIconSize, smallIconSize, Image.SCALE_SMOOTH);
             imageIcon.setImage(image);
             return imageIcon;
         } catch (Exception e) {

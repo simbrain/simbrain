@@ -140,7 +140,7 @@ val hopfieldSimContinuous = newSim {
                 },
                 distanceFunction = ::signedHammingDistance
             )
-            createHopfieldTestPane(config)
+            createHopfieldTestPane(config, false)
 
         }
 

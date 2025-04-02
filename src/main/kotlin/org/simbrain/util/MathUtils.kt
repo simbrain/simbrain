@@ -266,27 +266,52 @@ fun Matrix.binaryRandomize() = apply { twoValueRandomize(0.0, 1.0) }
 fun Matrix.bipolarRandomize() = apply { twoValueRandomize(-1.0, 1.0) }
 
 /**
- * Perturbs the array by changing exactly [hammingDistance] elements by adding small random noise.
- * Hamming distance here means the number of positions that differ from the original.
+ * Perturbs a binary-valued DoubleArray by flipping exactly [hammingDistance] values (0.0 ↔ 1.0).
  *
- * @param hammingDistance The number of elements to perturb.
- * @param noiseGenerator A lambda that returns the amount of noise to add to a selected element.
- *                       Default is random in range -0.1 to 0.1.
+ * Assumes the array contains only 0.0 and 1.0 values.
+ *
+ * @param hammingDistance The number of bits to flip.
  * @return A new DoubleArray with the specified Hamming distance from the original.
  */
-fun DoubleArray.perturbByHammingDistance(
-    hammingDistance: Int,
-    noiseGenerator: () -> Double = { Random.nextDouble(-0.1, 0.1) }
-): DoubleArray {
+fun DoubleArray.perturbBinaryByHammingDistance(hammingDistance: Int): DoubleArray {
     require(hammingDistance <= size) {
         "Hamming distance ($hammingDistance) cannot exceed array size (${this.size})"
     }
 
     val result = this.copyOf()
-    val indicesToChange = this.indices.shuffled().take(hammingDistance)
-    for (i in indicesToChange) {
-        result[i] += noiseGenerator()
+    val indicesToFlip = indices.shuffled().take(hammingDistance)
+
+    for (i in indicesToFlip) {
+        result[i] = if (result[i] == 0.0) 1.0 else 0.0
     }
+
+    return result
+}
+
+/**
+ * Perturbs a DoubleArray so that the Euclidean distance from the original is approximately [distance].
+ *
+ * @param distance The target Euclidean distance.
+ * @return A new DoubleArray that differs from the original by approximately [distance].
+ */
+fun DoubleArray.perturbByEuclideanDistance(distance: Double): DoubleArray {
+    require(distance >= 0.0) { "Distance must be non-negative" }
+
+    if (distance == 0.0) return this.copyOf()
+
+    val n = this.size
+    val result = this.copyOf()
+
+    // Generate a random unit vector (direction)
+    val direction = DoubleArray(n) { Random.nextDouble(-1.0, 1.0) }
+    val norm = sqrt(direction.sumOf { it * it })
+    val unitDirection = direction.map { it / norm }
+
+    // Scale the direction vector by the target distance
+    for (i in 0 until n) {
+        result[i] += unitDirection[i] * distance
+    }
+
     return result
 }
 
@@ -295,8 +320,16 @@ fun main() {
     //print(Matrix(10,10).binaryRandomize())
     //print(Matrix(10,10).bipolarRandomize())
     //print(Matrix(10,10).twoValueRandomize(-4.0, 4.0))
-    val original = doubleArrayOf(1.0, 2.0, 3.0, 4.0, 5.0)
-    val perturbed = original.perturbByHammingDistance(2)
-    println("Original: ${original.joinToString()}")
+
+    //val binaryArray = doubleArrayOf(1.0, 0.0, 1.0, 0.0, 1.0)
+    //val perturbed = binaryArray.perturbBinaryByHammingDistance(2)
+    //println("Original:  ${binaryArray.joinToString()}")
+    //println("Perturbed: ${perturbed.joinToString()}")
+
+    val original = doubleArrayOf(1.0, 2.0, 3.0)
+    val perturbed = original.perturbByEuclideanDistance(1.5)
+
+    println("Original:  ${original.joinToString()}")
     println("Perturbed: ${perturbed.joinToString()}")
+    println("Euclidean distance: ${original.euclideanDistance(perturbed)}")
 }

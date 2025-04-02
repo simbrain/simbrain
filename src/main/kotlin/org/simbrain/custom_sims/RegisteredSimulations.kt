@@ -39,6 +39,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
 
     dir("Backprop") {
         item("XOR") { xorSim }
+        item("Three Object Detector") { threeObjectDetector }
         item("Three layer auto-encoder") { backpropAutoEncoder }
         item("Tiny MNIST") { tinyMNIST }
     }

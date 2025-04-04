@@ -13,12 +13,10 @@
  */
 package org.simbrain.network.subnetworks
 
+import org.simbrain.network.core.Network
 import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.core.randomizeBiases
-import org.simbrain.network.trainers.MatrixDataset
-import org.simbrain.network.trainers.SupervisedNetwork
-import org.simbrain.network.trainers.SupervisedTrainerConfig
-import org.simbrain.network.trainers.createDiagonalDataset
+import org.simbrain.network.trainers.*
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.util.math.SigmoidFunctionEnum
@@ -74,6 +72,11 @@ class BackpropNetwork : FeedForward, SupervisedNetwork {
             it.clear()
             it.randomizeBiases()
         }
+    }
+
+    context(Network)
+    override suspend fun forwardPass() {
+        wmList.forwardPass(inputLayer.activations)
     }
 
     override fun copy(): BackpropNetwork {

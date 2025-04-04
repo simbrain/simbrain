@@ -33,9 +33,9 @@ public class FilterCollectionGui {
         this.parent = parent;
         this.filterCollection = filterCollection;
         filterCollection.getEvents().getFilterAdded().on(getSwingDispatcher(), s -> updateComboBox());
-        filterCollection.getEvents().getFilterRemoved().on(getSwingDispatcher(), (Consumer<Filter>) s -> updateComboBox());
+        filterCollection.getEvents().getFilterRemoved().on(getSwingDispatcher(), s -> updateComboBox());
         filterCollection.getEvents().getFilterChanged().on(getSwingDispatcher(),
-                (BiConsumer<Filter, Filter>) (o, n) -> setComboBoxSelection(n));
+                (o, n) -> setComboBoxSelection(n));
     }
 
     public JToolBar getToolBar() {
@@ -65,7 +65,7 @@ public class FilterCollectionGui {
         filterToolbar.add(addFilter);
 
         // Editor Filter
-        JButton editFilter = new JButton(ResourceManager.getImageIcon("menu_icons/Prefs.png"));
+        JButton editFilter = new JButton(ResourceManager.getSmallIcon("menu_icons/Tools.png"));
         editFilter.setToolTipText("Edit Filter");
         editFilter.addActionListener(evt -> {
 

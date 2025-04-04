@@ -169,7 +169,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val newNeuronAction = networkPanel.createAction(
         name = "Add Neuron",
         description = """Add or "put" new node (p)""",
-        iconPath = "menu_icons/AddNeuron.png",
+        iconPath = "menu_icons/plus.png",
         keyboardShortcut = KeyCombination('P')
     ) {
         val neuron = Neuron()

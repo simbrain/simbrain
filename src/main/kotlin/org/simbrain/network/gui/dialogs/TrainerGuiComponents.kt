@@ -79,7 +79,7 @@ class TrainerControls<SN>(trainer: SupervisedTrainer<SN>, supervisedNetwork: SN,
     private val trainerPropsAction = createAction(
         name = "Trainer properties",
         description = "Edit trainer properties",
-        iconPath = "menu_icons/Prefs.png",
+        iconPath = "menu_icons/Tools.png",
     ) {
         supervisedNetwork.trainerConfig.createEditorDialog {
             (it.updateType as? SupervisedTrainer.UpdateMethod.Batch)?.let { batchUpdate ->

@@ -75,7 +75,7 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
     }
 
     val prefsAction = createAction(
-        iconPath = "menu_icons/Prefs.png",
+        iconPath = "menu_icons/Tools.png",
         name = "Preferences...",
         description = "Set projection preferences"
     ) {
@@ -232,9 +232,9 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
     val bottomPanel = JPanel().apply {
         layout = FlowLayout(FlowLayout.LEFT)
         add(pointsLabel)
-        add(Box.createHorizontalStrut(25));
+        add(Box.createHorizontalStrut(25))
         add(dimensionsLabel)
-        add(Box.createHorizontalStrut(25));
+        add(Box.createHorizontalStrut(25))
     }
 
     fun showPrefDialog() {

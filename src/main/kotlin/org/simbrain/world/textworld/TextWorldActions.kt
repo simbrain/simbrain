@@ -72,7 +72,7 @@ val TextWorld.calculateCosineSimilarity
 val TextWorld.textWorldPrefs
     get() = createAction(
         name = "Show preferences...",
-        iconPath = "menu_icons/Prefs.png"
+        iconPath = "menu_icons/Tools.png"
     ) {
         createEditorDialog {
             events.preferencesChanged.fire()

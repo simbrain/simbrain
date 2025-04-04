@@ -363,12 +363,27 @@ fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: Lis
     inputValues.zip(inputLayers).forEach { (a, b) -> a.validateSameShape(b.activations) }
 
     fun NeuronArray.updateWithoutClearingInputs() {
+        if (isClamped) {
+            return
+        }
         updateRule.apply(this, dataHolder)
         events.updated.fire()
     }
 
     fun AbstractNeuronCollection.updateWithoutClearingInputs() {
-        neuronList.forEach { it.update() }
+        if (isClamped) {
+            return
+        }
+        neuronList.forEach { n -> n.accumulateInputs() }
+        neuronList.forEach { neuron ->
+            if (neuron.isSpike) {
+                neuron.isSpike = false
+            }
+            if (!neuron.clamped) {
+                neuron.updateRule.apply(neuron, neuron.dataHolder)
+            }
+
+        }
     }
 
     val allLayers = this
@@ -376,10 +391,8 @@ fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: Lis
         layer.activations = value
     }
     allLayers.forEach {
+        it.clearInputs()
         it.accumulateInputs()
-        (it as? NeuronCollection)?.let { nc ->
-            nc.neuronList.forEach { n -> n.accumulateInputs() }
-        }
         when (it) {
             is NeuronArray -> it.updateWithoutClearingInputs()
             is AbstractNeuronCollection -> it.updateWithoutClearingInputs()
@@ -406,7 +419,7 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
     lossFunction: BackpropLossFunction = BackpropLossFunction.SSE
 ): Double {
 
-    val reversedLayers = reversed()
+    val reversedLayers = drop(1).reversed()
 
     targetValues.validateSameShape(outputLayer.activations)
     lossFunction.validateLayer(outputLayer)

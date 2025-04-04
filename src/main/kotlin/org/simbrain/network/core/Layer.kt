@@ -70,6 +70,8 @@ abstract class Layer : LocatableModel(), AttributeContainer, CopyableObject {
      */
     abstract fun addInputs(inputs: Matrix)
 
+    abstract fun clearInputs()
+
     context(Network) override fun accumulateInputs() {
         incomingConnectors.forEach { it.updatePSR() }
     }

@@ -29,6 +29,7 @@ private val WeightMatrix.targetNeuronArray get() = target as NeuronArray
  * Perform a "forward pass" through a list of weight matrices. Assumes they are all connected.
  */
 context(Network)
+@Deprecated("Migrating towards LinkedHashSet<Layer>.forwardPass")
 fun List<WeightMatrix>.forwardPass(inputVector: Matrix) {
     inputVector.validateSameShape(first().sourceNeuronArray.inputs)
     first().sourceNeuronArray.activations = inputVector
@@ -361,16 +362,28 @@ fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: Lis
     if (inputValues.size != inputLayers.size) throw IllegalArgumentException("Must provide same number of input vectors as input layers")
     inputValues.zip(inputLayers).forEach { (a, b) -> a.validateSameShape(b.activations) }
 
+    fun NeuronArray.updateWithoutClearingInputs() {
+        updateRule.apply(this, dataHolder)
+        events.updated.fire()
+    }
+
+    fun AbstractNeuronCollection.updateWithoutClearingInputs() {
+        neuronList.forEach { it.update() }
+    }
+
     val allLayers = this
     inputLayers.zip(inputValues).forEach { (layer, value) ->
         layer.activations = value
     }
     allLayers.forEach {
         it.accumulateInputs()
-        it.update()
         (it as? NeuronCollection)?.let { nc ->
             nc.neuronList.forEach { n -> n.accumulateInputs() }
-            nc.neuronList.forEach { n -> n.update() }
+        }
+        when (it) {
+            is NeuronArray -> it.updateWithoutClearingInputs()
+            is AbstractNeuronCollection -> it.updateWithoutClearingInputs()
+            else -> it.update()
         }
     }
 }

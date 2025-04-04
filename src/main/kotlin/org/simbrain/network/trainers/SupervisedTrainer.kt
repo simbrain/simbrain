@@ -213,7 +213,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork>(val network: Network, va
     /**
      * @return the mean error for the batch
      */
-    open fun trainBatch(rowRange: IntRange): Double {
+    open fun trainBatch(rowRange: IntRange, probe: (Any) -> Unit = {}): Double {
         var batchError = 0.0
         for (i in rowRange) {
             batchError += trainRow(i)
@@ -224,7 +224,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork>(val network: Network, va
     /**
      * Compute the error on the testing set
      */
-    open fun computeTestError(): Double {
+    open suspend fun computeTestError(): Double {
         return supervisedNetwork.testingSet.sumOf { (input, target) ->
             supervisedNetwork.inputLayer.activations = input
             with(network) { supervisedNetwork.forwardPass() }
@@ -336,7 +336,7 @@ class BackpropTrainer(network: Network, backpropNetwork: BackpropNetwork) : Supe
     /**
      * Backprop trains using error accumulation.
      */
-    override fun trainBatch(rowRange: IntRange): Double {
+    override fun trainBatch(rowRange: IntRange, probe: (Any) -> Unit): Double {
 
         val weightAccumulator: HashMap<WeightMatrix, Matrix> = HashMap()
         val biasesAccumulator: HashMap<NeuronArray, Matrix> = HashMap()
@@ -353,10 +353,14 @@ class BackpropTrainer(network: Network, backpropNetwork: BackpropNetwork) : Supe
 
         }
 
+        probe("weightAccumulator" to weightAccumulator)
+
         weightAccumulator.forEach { (wm, delta) ->
             wm.weights.add(config.optimizer.computeDelta(wm.weights, delta))
             wm.events.updated.fire()
         }
+
+        probe("biasesAccumulator" to biasesAccumulator)
 
         biasesAccumulator.forEach { (na, delta) ->
             na.biases.add(config.optimizer.computeDelta(na.biases, delta))

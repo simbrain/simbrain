@@ -120,7 +120,7 @@ class SupervisedModel(
     }
 
     context(Network)
-    override fun forwardPass() {
+    override suspend fun forwardPass() {
         layers.forwardPass(listOf(inputLayer.activations), inputLayers = listOf(inputLayer))
     }
 
@@ -150,17 +150,31 @@ class SupervisedModel(
 class SupervisedModelTrainer(network: Network, supervisedModel: SupervisedModel): SupervisedTrainer<SupervisedModel>(network, supervisedModel) {
 
     override fun trainRow(rowNum: Int): Double {
+        return trainBatch(rowNum until rowNum + 1)
+    }
+
+    override fun trainBatch(rowRange: IntRange, probe: (Any) -> Unit): Double {
         val weightAccumulator: HashMap<WeightMatrix, Matrix> = HashMap()
         val synapseGroupAccumulator: HashMap<SynapseGroup, Matrix> = HashMap()
         val biasesAccumulator: HashMap<Layer, Matrix> = HashMap()
         val rawMatrixAccumulator: HashMap<Matrix, Matrix> = HashMap()
 
         val error = with(supervisedNetwork) {
-            inputLayer.setActivations(trainingSet.inputs.row(rowNum))
-            val targetVec = trainingSet.targets.rowVectorTransposed(rowNum)
-            with(network) {
-                layers.forwardPass(listOf(inputLayer.activations), inputLayers = listOf(inputLayer))
-                layers.accumulateBackprop(targetVec, outputLayer, weightAccumulator, synapseGroupAccumulator, biasesAccumulator, rawMatrixAccumulator, lossFunction = config.lossFunction)
+            rowRange.sumOf { rowNum ->
+                inputLayer.setActivations(trainingSet.inputs.row(rowNum))
+                val targetVec = trainingSet.targets.rowVectorTransposed(rowNum)
+                with(network) {
+                    layers.forwardPass(listOf(inputLayer.activations), inputLayers = listOf(inputLayer))
+                    layers.accumulateBackprop(
+                        targetVec,
+                        outputLayer,
+                        weightAccumulator,
+                        synapseGroupAccumulator,
+                        biasesAccumulator,
+                        rawMatrixAccumulator,
+                        lossFunction = config.lossFunction
+                    )
+                }
             }
         }
 
@@ -169,6 +183,8 @@ class SupervisedModelTrainer(network: Network, supervisedModel: SupervisedModel)
             wm.events.updated.fire()
         }
 
+        probe("weightAccumulator" to weightAccumulator)
+
         synapseGroupAccumulator.forEach { (sg, delta) ->
             val weightMatrix = sg.getWeightMatrix()
             val delta = config.optimizer.computeDelta(weightMatrix, delta)
@@ -176,16 +192,21 @@ class SupervisedModelTrainer(network: Network, supervisedModel: SupervisedModel)
             sg.events.updated.fire()
         }
 
+        probe("synapseGroupAccumulator" to synapseGroupAccumulator)
+
         biasesAccumulator.forEach { (na, delta) ->
             na.biases = na.biases.add(config.optimizer.computeDelta(na.biases, delta))
             na.events.updated.fire()
         }
 
+        probe("biasesAccumulator" to biasesAccumulator)
+
         rawMatrixAccumulator.forEach { (matrix, delta) ->
             matrix.add(config.optimizer.computeDelta(matrix, delta))
         }
 
+        probe("rawMatrixAccumulator" to rawMatrixAccumulator)
+
         return error
     }
-
 }

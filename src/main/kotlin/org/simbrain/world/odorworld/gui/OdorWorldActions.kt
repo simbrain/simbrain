@@ -44,7 +44,7 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
 
     fun showWorldPrefsAction() = odorWorldPanel.createAction(
         name = "Preferences...",
-        iconPath = "menu_icons/Prefs.png",
+        iconPath = "menu_icons/Tools.png",
         keyboardShortcut = CmdOrCtrl + ','
     ) {
         world.createEditorDialog().apply { title = "World Preferences" }.display()

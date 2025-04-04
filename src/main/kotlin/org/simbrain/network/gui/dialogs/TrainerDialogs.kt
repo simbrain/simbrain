@@ -223,7 +223,7 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         val preferencesButton = JButton(createAction(
             name = "Preferences",
             description = "Edit trainer preferences",
-            iconPath = "menu_icons/Prefs.png",
+            iconPath = "menu_icons/Tools.png",
         ) {
             trainer.createEditorDialog().display()
         })
@@ -277,7 +277,7 @@ fun main() {
         addNetworkModel(backpropNetwork)
         backpropNetwork
     }
-    BackpropNetworkNode(np, result).propertyDialog?.display()
+    BackpropNetworkNode(np, result).propertyDialog.display()
 }
 
 context(Network)

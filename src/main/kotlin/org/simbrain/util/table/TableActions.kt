@@ -77,7 +77,7 @@ val SimbrainJTable.editRandomizerAction
     get() = createAction(
         name = "Edit randomizer...",
         description = "Edit table wide randomizer",
-        iconPath = "menu_icons/Prefs.png"
+        iconPath = "menu_icons/Tools.png"
     ) {
         AnnotatedPropertyEditor(objectWrapper("Table Randomizer", model.cellRandomizer)).displayInDialog()
     }
@@ -337,7 +337,7 @@ val SimbrainJTable.editColumnAction
     get() = createAction(
         name = "Edit column...",
         description = "Edit column properties",
-        iconPath = "menu_icons/Prefs.png"
+        iconPath = "menu_icons/Tools.png"
     ) {
         if (model is BasicDataFrame) {
             if (selectedColumn >= 0) {
@@ -418,7 +418,7 @@ fun SimbrainJTable.createShowMatrixPlotAction() = createAction(
     })
     toolbar.add(createAction(
         name = "Show preferences...",
-        iconPath = "menu_icons/Prefs.png"
+        iconPath = "menu_icons/Tools.png"
     ) {
         matrixPlotPanel.properties.createEditorDialog {
             matrixPlotPanel.repaint()

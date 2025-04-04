@@ -40,7 +40,7 @@ public class TimeSeriesPlotActions {
         return new AbstractAction() {
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Prefs.png"));
+                putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/Tools.png"));
                 putValue(NAME, "Plot properties...");
                 putValue(SHORT_DESCRIPTION, "Show time series graph properties");
             }

@@ -66,7 +66,7 @@ class WorkspaceActions {
     val toggleBottomDock = createAction(
         name = "Bottom Dock",
         description = "Show/hide bottom panels",
-        iconPath = "menu_icons/systemMonitor.png"
+        iconPath = "menu_icons/Tools.png"
     ) {
         SimbrainDesktop.bottomDockSplitter.toggleDock(WorkspacePreferences.bottomDockSize)
     }
@@ -175,7 +175,7 @@ class WorkspaceActions {
     }
 
     val openCouplingListAction = SimbrainDesktop.desktopPane.createAction(
-        iconPath = "menu_icons/CouplingList.png",
+        iconPath = "menu_icons/Table.png",
         name = "Open coupling list...",
         description = "Open list of workspace couplings.",
         coroutineScope = workspace

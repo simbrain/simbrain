@@ -39,7 +39,7 @@ public class RasterPlotActions {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Prefs.png"));
+                putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/Tools.png"));
                 putValue(NAME, "Preferences...");
                 putValue(SHORT_DESCRIPTION, "Show raster chart properties");
             }

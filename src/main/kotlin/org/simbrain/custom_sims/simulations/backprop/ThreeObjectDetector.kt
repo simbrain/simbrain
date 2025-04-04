@@ -3,6 +3,7 @@ package org.simbrain.custom_sims.simulations
 import kotlinx.coroutines.awaitAll
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.AbstractNeuronCollection
+import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.core.setLabels
 import org.simbrain.network.layouts.LineLayout
@@ -42,12 +43,12 @@ val threeObjectDetector = newSim {
         applyLayout(LineLayout())
         setLabels(listOf("Fish", "Gouda", "Blue"))
     }
-    val wm1 = WeightMatrix(inputLayer, hiddenLayer)
-    val wm2 = WeightMatrix(hiddenLayer, outputLayer)
+    val sg1 = SynapseGroup(inputLayer, hiddenLayer)
+    val sg2 = SynapseGroup(hiddenLayer, outputLayer)
     val sm = SupervisedModel(inputLayer, outputLayer)
-    net.addNetworkModels(inputLayer, hiddenLayer, outputLayer, wm1, wm2, sm).awaitAll()
-    offsetNetworkModel(inputLayer, hiddenLayer, Direction.NORTH, 250.0)
-    offsetNetworkModel(hiddenLayer, outputLayer, Direction.NORTH, 250.0)
+    net.addNetworkModels(inputLayer, hiddenLayer, outputLayer, sg1, sg2, sm).awaitAll()
+    offsetNetworkModel(inputLayer, hiddenLayer, Direction.NORTH, 150.0)
+    offsetNetworkModel(hiddenLayer, outputLayer, Direction.NORTH, 150.0)
     alignNetworkModels(inputLayer, hiddenLayer, Alignment.VERTICAL)
     alignNetworkModels(inputLayer, outputLayer, Alignment.VERTICAL)
 
@@ -71,7 +72,7 @@ val threeObjectDetector = newSim {
     )
 
     val odorWorldComponent = addOdorWorldComponent()
-    desktop?.getDesktopComponent(odorWorldComponent)?.title = "Mouse Trace"
+    desktop?.getDesktopComponent(odorWorldComponent)?.title = "World"
     (desktop?.getDesktopComponent(odorWorldComponent) as? OdorWorldDesktopComponent)?.worldPanel?.scalingFactor = 1.0
 
     val odorWorld = odorWorldComponent.world.apply {

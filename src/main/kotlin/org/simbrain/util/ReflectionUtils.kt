@@ -19,7 +19,7 @@ fun <T : Any> KClass<T>.callNoArgConstructor(): T = constructors.asSequence().ma
     }
 }.first()
 
-fun Any.allPropertiesToString(separator: String = "\n") = this::class.declaredMemberProperties.joinToString(separator) {
+fun Any.allPropertiesToString(separator: String = "\n") = this::class.declaredMemberProperties.filter { it.isAccessible }.joinToString(separator) {
     val name = it.name
     val valueString = when(val value = it.getter.call(this)) {
         null -> "<null>"

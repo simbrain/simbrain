@@ -89,7 +89,7 @@ fun <SN> SN.getSupervisedTrainingDialog(): StandardDialog where SN: SupervisedNe
         } as SupervisedTrainer<SN>
         val trainerControls = TrainerControls(trainer, supervisedNetwork, this@NetworkPanel)
 
-        fun DataSetPanel.commonApplyAction(selectedRow: Int) {
+        suspend fun DataSetPanel.commonApplyAction(selectedRow: Int) {
             with(network) {
                 inputLayer.setActivations(inputData.row(selectedRow))
                 this@SN.forwardPass()

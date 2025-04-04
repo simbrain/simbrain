@@ -34,9 +34,7 @@ interface SupervisedNetwork {
     val outputLayer: Layer
 
     context(Network)
-    suspend fun forwardPass() {
-        updateSuspend()
-    }
+    abstract suspend fun forwardPass()
 
     fun initWeights()
 

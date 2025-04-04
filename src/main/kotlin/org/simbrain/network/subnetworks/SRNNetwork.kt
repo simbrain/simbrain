@@ -123,6 +123,11 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
         contextToHidden.update()
     }
 
+    context(Network)
+    override suspend fun forwardPass() {
+        wmList.forwardPass(inputLayer.activations)
+    }
+
     // Forwarded from output layer
     @Producible
     fun getOutputs(): DoubleArray {

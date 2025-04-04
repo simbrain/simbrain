@@ -4,7 +4,7 @@ import kotlinx.coroutines.awaitAll
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
-import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedModel
@@ -30,8 +30,8 @@ val xorSim = newSim {
         updateRule = SigmoidalRule()
     }
     val outputLayer = NeuronGroup(1)
-    val wm1 = WeightMatrix(inputLayer, hiddenLayer)
-    val wm2 = WeightMatrix(hiddenLayer, outputLayer)
+    val wm1 = SynapseGroup(inputLayer, hiddenLayer)
+    val wm2 = SynapseGroup(hiddenLayer, outputLayer)
     val sm = SupervisedModel(inputLayer, outputLayer)
     net.addNetworkModels(inputLayer, hiddenLayer, outputLayer, wm1, wm2, sm).awaitAll()
     offsetNetworkModel(inputLayer, hiddenLayer, Direction.NORTH, 250.0)

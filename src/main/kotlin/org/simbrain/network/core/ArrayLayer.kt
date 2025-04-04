@@ -63,6 +63,10 @@ abstract class ArrayLayer(
         addInputs(inputs.toMatrix().reshape(this.inputs.nrow(), this.inputs.ncol()))
     }
 
+    override fun clearInputs() {
+        this.inputs.fill(0.0)
+    }
+
     override fun clear() {
         inputs.fill(0.0)
         events.updated.fire()

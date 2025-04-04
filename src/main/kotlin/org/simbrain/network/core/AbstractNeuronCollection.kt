@@ -487,7 +487,7 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
             this.activationArray, 10)}"
     }
 
-    fun clearInputs() {
+    override fun clearInputs() {
         neuronList.forEach { it.clearInput() }
     }
 

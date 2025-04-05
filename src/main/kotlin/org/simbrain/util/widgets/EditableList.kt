@@ -34,13 +34,13 @@ open class EditableList<O: EditableObject>(private val showAddRemove: Boolean = 
         add("Center", JScrollPane(mainPanel))
         add("South", JToolBar().apply {
             if (showAddRemove) {
-                add(JButton(ResourceManager.getImageIcon("menu_icons/plus.png")).apply {
+                add(JButton(ResourceManager.getSmallIcon("menu_icons/plus.png")).apply {
                     toolTipText = "Add an item to the list"
                     addActionListener {
                         newElementTask.invoke()
                     }
                 })
-                add(JButton(ResourceManager.getImageIcon("menu_icons/minus.png")).apply {
+                add(JButton(ResourceManager.getSmallIcon("menu_icons/minus.png")).apply {
                     toolTipText = "Remove an item from the list"
                     addActionListener {
                         removeElement()

@@ -41,7 +41,7 @@ public class DropDownTriangle extends JPanel implements MouseListener {
      * Direction the triangle faces when it is "up".
      */
     public enum UpDirection {
-        LEFT, RIGHT;
+        LEFT, RIGHT
     }
 
     /**
@@ -209,23 +209,23 @@ public class DropDownTriangle extends JPanel implements MouseListener {
         /**
          * The image icon for the triangle in it's down pointing state.
          */
-        private ImageIcon downTriangle = ResourceManager.getImageIcon("menu_icons/DownTriangle.png");
+        private final ImageIcon downTriangle = ResourceManager.getSmallIcon("menu_icons/DownTriangle.png");
 
         /**
          * The image icon for the triangle in it's left pointing state.
          */
-        private ImageIcon leftTriangle = ResourceManager.getImageIcon("menu_icons/LeftTriangle.png");
+        private final ImageIcon leftTriangle = ResourceManager.getSmallIcon("menu_icons/LeftTriangle.png");
 
         /**
          * The image icon for the triangle in it's left pointing state.
          */
-        private ImageIcon rightTriangle = ResourceManager.getImageIcon("menu_icons/RightTriangle.png");
+        private final ImageIcon rightTriangle = ResourceManager.getSmallIcon("menu_icons/RightTriangle.png");
 
         /**
          * The image icon for the triangle in it's "up" pointing state
          * (Left/Right).
          */
-        private ImageIcon upTriangle;
+        private final ImageIcon upTriangle;
 
         /**
          * The currently displayed triangle image.
@@ -253,7 +253,7 @@ public class DropDownTriangle extends JPanel implements MouseListener {
          * Sets the size of the panel to fit the triangle image.
          */
         private void setSize() {
-            Dimension size = new Dimension((int) triangle.getWidth(null), (int) triangle.getHeight(null));
+            Dimension size = new Dimension(triangle.getWidth(null), triangle.getHeight(null));
             setPreferredSize(size);
             setMaximumSize(size);
             setMinimumSize(size);

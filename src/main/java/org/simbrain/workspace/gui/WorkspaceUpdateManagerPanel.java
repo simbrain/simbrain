@@ -116,7 +116,7 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
     /**
      * Listener for update manager changes.
      */
-    private UpdateListener listener = new UpdateListener();
+    private final UpdateListener listener = new UpdateListener();
 
     /**
      * Action which deletes selected actions.
@@ -124,7 +124,7 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
     Action deleteActionsAction = new AbstractAction() {
         // Initialize
         {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/minus.png"));
+            putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/minus.png"));
             putValue(NAME, "Remove");
             putValue(SHORT_DESCRIPTION, "Remove the selected update actions.");
             getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("BACK_SPACE"), this);
@@ -144,7 +144,7 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
     Action addPresetAction = new AbstractAction() {
         // Initialize
         {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/plus.png"));
+            putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/plus.png"));
             putValue(NAME, "Add");
             putValue(SHORT_DESCRIPTION, "Add an available predefined update action to the update sequence.");
         }
@@ -185,22 +185,22 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
         buttonPanel.add(deleteActionsButton);
 
         // TODO: Make movement actions apply to multiple selections
-        JButton upButton = new JButton(ResourceManager.getImageIcon("menu_icons/Up.png"));
+        JButton upButton = new JButton(ResourceManager.getSmallIcon("menu_icons/Up.png"));
         upButton.setToolTipText("Move selected action up in sequence");
         upButton.addActionListener(evt -> moveSelectedUpdateAction(-1));
         buttonPanel.add(upButton);
 
-        JButton upFullButton = new JButton(ResourceManager.getImageIcon("menu_icons/UpFull.png"));
+        JButton upFullButton = new JButton(ResourceManager.getSmallIcon("menu_icons/UpFull.png"));
         upFullButton.setToolTipText("Move selected action to top of sequence");
         upFullButton.addActionListener(evt -> moveSelectedUpdateAction(-currentActionJList.getSelectedIndex()));
         buttonPanel.add(upFullButton);
 
-        JButton downButton = new JButton(ResourceManager.getImageIcon("menu_icons/Down.png"));
+        JButton downButton = new JButton(ResourceManager.getSmallIcon("menu_icons/Down.png"));
         downButton.setToolTipText("Move selected action down in sequence");
         downButton.addActionListener(evt -> moveSelectedUpdateAction(1));
         buttonPanel.add(downButton);
 
-        JButton downFullButton = new JButton(ResourceManager.getImageIcon("menu_icons/DownFull.png"));
+        JButton downFullButton = new JButton(ResourceManager.getSmallIcon("menu_icons/DownFull.png"));
         downFullButton.setToolTipText("Move selected action to bottom of sequence");
         downFullButton.addActionListener(evt -> moveSelectedUpdateAction(currentActionListModel.getSize() - currentActionJList.getSelectedIndex()));
         buttonPanel.add(downFullButton);

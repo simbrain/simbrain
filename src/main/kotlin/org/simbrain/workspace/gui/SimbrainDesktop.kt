@@ -448,7 +448,7 @@ object SimbrainDesktop {
                 }
             }
         })
-        runningLabel.icon = ResourceManager.getImageIcon("menu_icons/Throbber.gif")
+        runningLabel.icon = ResourceManager.getSmallIcon("menu_icons/Throbber.gif")
         runningLabel.isVisible = false
         updateTimeLabel()
         bar.add(timeLabel)

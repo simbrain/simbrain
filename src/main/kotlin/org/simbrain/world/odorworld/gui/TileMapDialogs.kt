@@ -269,14 +269,14 @@ fun OdorWorld.layerEditor() = StandardDialog().apply {
     val panel = JPanel(BorderLayout())
     panel.add(BorderLayout.CENTER,JScrollPane(table))
     panel.add(BorderLayout.SOUTH, JPanel().apply {
-        add(JButton("Add", ResourceManager.getImageIcon("menu_icons/plus.png")).apply {
+        add(JButton("Add", ResourceManager.getSmallIcon("menu_icons/plus.png")).apply {
             addActionListener {
                 val newLayer = tileMap.createTileMapLayer("Layer ${tileMap.layers.size}")
                 tileMap.addLayer(newLayer)
                 model.addRow(arrayOf(newLayer.name, newLayer.visible))
             }
         })
-        add(JButton("Remove", ResourceManager.getImageIcon("menu_icons/minus.png")).apply {
+        add(JButton("Remove", ResourceManager.getSmallIcon("menu_icons/minus.png")).apply {
             addActionListener {
                 val selectedRowIndices = table.selectedRows.sortedDescending()
                 val selectedLayers = tileMap.layers.filterIndexed { idx, _ -> idx in selectedRowIndices }

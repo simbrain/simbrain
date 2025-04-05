@@ -55,7 +55,7 @@ public class FilterCollectionGui {
         });
 
         // Add Filter
-        JButton addFilter = new JButton(ResourceManager.getImageIcon("menu_icons/plus.png"));
+        JButton addFilter = new JButton(ResourceManager.getSmallIcon("menu_icons/plus.png"));
         addFilter.setToolTipText("Add Filter");
         addFilter.addActionListener(evt -> {
             CreateFilterDialog dialog = new CreateFilterDialog(filterCollection);

@@ -86,7 +86,7 @@ public class RasterPlotActions {
             // Initialize
             {
                 // putValue(SMALL_ICON,
-                // ResourceManager.getImageIcon("Eraser.png"));
+                // ResourceManager.getSmallIcon("Eraser.png"));
                 putValue(NAME, "Add");
                 putValue(SHORT_DESCRIPTION, "Add a data source");
             }
@@ -110,7 +110,7 @@ public class RasterPlotActions {
             // Initialize
             {
                 // putValue(SMALL_ICON,
-                // ResourceManager.getImageIcon("Eraser.png"));
+                // ResourceManager.getSmallIcon("Eraser.png"));
                 putValue(NAME, "Remove");
                 putValue(SHORT_DESCRIPTION, "Remove a data source");
             }

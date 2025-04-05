@@ -227,7 +227,7 @@ class AddRemoveRows(val table1: SimbrainJTable, val table2: SimbrainJTable) : JP
     init {
         // Add row
         add(JButton().apply {
-            icon = ResourceManager.getImageIcon("menu_icons/AddTableRow.png")
+            icon = ResourceManager.getSmallIcon("menu_icons/AddTableRow.png")
             toolTipText = "Insert row at bottom of input and target tables"
             addActionListener {
                 table1.model.insertRowAtBottom()
@@ -235,7 +235,7 @@ class AddRemoveRows(val table1: SimbrainJTable, val table2: SimbrainJTable) : JP
             }
         })
         add(JButton().apply {
-            icon = ResourceManager.getImageIcon("menu_icons/DeleteRowTable.png")
+            icon = ResourceManager.getSmallIcon("menu_icons/DeleteRowTable.png")
             toolTipText = "Delete last row of input and target tables"
             addActionListener {
                 table1.model.deleteLastRow()

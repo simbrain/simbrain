@@ -169,7 +169,7 @@ class SynapseGroup @JvmOverloads constructor(
     }
 
     fun getWeightMatrix(): Matrix {
-        return getWeightMatrix(source.neuronList, target.neuronList)
+        return getWeightMatrix(source.neuronList, target.neuronList).transpose()
     }
 
     fun setWeightMatrix(matrix: Matrix) {

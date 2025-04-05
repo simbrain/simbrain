@@ -40,6 +40,7 @@ val threeObjectDetector = newSim {
         applyLayout(LineLayout())
     }
     val outputLayer = NeuronGroup(3).apply {
+        updateRule = SigmoidalRule()
         applyLayout(LineLayout())
         setLabels(listOf("Fish", "Gouda", "Blue"))
     }
@@ -64,8 +65,8 @@ val threeObjectDetector = newSim {
         targets = Matrix.of(
             arrayOf(
                 doubleArrayOf(1.0,0.0,0.0),
-                doubleArrayOf(0.0,0.1,0.0),
-                doubleArrayOf(0.0,0.0,0.1),
+                doubleArrayOf(0.0,1.0,0.0),
+                doubleArrayOf(0.0,0.0,1.0),
                 doubleArrayOf(0.0,0.0,0.0),
             )
         ),

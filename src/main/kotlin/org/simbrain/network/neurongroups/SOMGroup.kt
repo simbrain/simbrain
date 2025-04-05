@@ -18,13 +18,9 @@
  */
 package org.simbrain.network.neurongroups
 
-import org.simbrain.network.core.InfoText
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.XStreamConstructor
+import org.simbrain.network.core.*
 import org.simbrain.network.gui.dialogs.NetworkPreferences.weightRandomizer
 import org.simbrain.network.layouts.HexagonalGridLayout
-import org.simbrain.network.util.SimnetUtils
 import org.simbrain.util.UserParameter
 import org.simbrain.util.Utils
 import org.simbrain.util.propertyeditor.CustomTypeName
@@ -160,7 +156,7 @@ class SOMGroup @JvmOverloads constructor(
         // neuron.
         for (i in neuronList.indices) {
             val neuron = neuronList[i]
-            physicalDistance = SimnetUtils.getEuclideanDist(neuron, winner)
+            physicalDistance = getEuclideanDist(neuron, winner!!)
             // The center of the neuron is within the update region.
             if (physicalDistance <= neighborhoodSize) {
                 for (incoming in neuron.fanIn) {

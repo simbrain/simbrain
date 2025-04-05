@@ -6,7 +6,6 @@ import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.events.SynapseGroupEvents
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.SynapseNode
-import org.simbrain.network.util.SimnetUtils
 import org.simbrain.util.SimbrainConstants
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
@@ -170,7 +169,7 @@ class SynapseGroup @JvmOverloads constructor(
     }
 
     fun getWeightMatrix(): Matrix {
-        return Matrix.of(SimnetUtils.getWeights(source.neuronList, target.neuronList)).transpose()
+        return getWeightMatrix(source.neuronList, target.neuronList)
     }
 
     fun setWeightMatrix(matrix: Matrix) {

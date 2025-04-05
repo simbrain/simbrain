@@ -19,7 +19,7 @@ package org.simbrain.network.connections
 
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.util.SimnetUtils.getEuclideanDist
+import org.simbrain.network.core.getEuclideanDist
 import org.simbrain.util.UserParameter
 import org.simbrain.util.cartesianProduct
 import org.simbrain.util.decayfunctions.DecayFunction

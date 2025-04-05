@@ -207,6 +207,6 @@ class SupervisedModelTrainer(network: Network, supervisedModel: SupervisedModel)
 
         probe("rawMatrixAccumulator" to rawMatrixAccumulator)
 
-        return error
+        return error / rowRange.count()
     }
 }

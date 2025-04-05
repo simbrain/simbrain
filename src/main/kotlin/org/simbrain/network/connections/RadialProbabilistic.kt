@@ -19,7 +19,7 @@ package org.simbrain.network.connections
 
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
-import org.simbrain.network.util.SimnetUtils
+import org.simbrain.network.core.getEuclideanDist
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
@@ -185,7 +185,7 @@ fun Neuron.createProbabilisticallySynapses(
 fun Neuron.getNeuronsInRadius(neighbors: List<Neuron>, radius: Double): List<Neuron> {
     val ret = ArrayList<Neuron>()
     for (neuron in neighbors) {
-        if (SimnetUtils.getEuclideanDist(this, neuron) < radius) {
+        if (getEuclideanDist(this, neuron) < radius) {
             ret.add(neuron)
         }
     }

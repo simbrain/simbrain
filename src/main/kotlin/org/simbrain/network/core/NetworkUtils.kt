@@ -17,6 +17,7 @@ import org.simbrain.network.util.offsetNeuronCollections
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.stats.ProbabilityDistribution
+import smile.math.matrix.Matrix
 import java.awt.geom.Point2D
 
 /**
@@ -56,6 +57,14 @@ fun updateNeurons(neuronList: List<Neuron>) {
  * @return synapse from source to target
  */
 fun getSynapse(src: Neuron, tar: Neuron): Synapse? = src.fanOut[tar]
+
+fun getWeightMatrix(sourceNeuronList: List<Neuron>, targetNeuronList: List<Neuron>): Matrix = Matrix.of(
+    sourceNeuronList.mapIndexed { j, s ->
+        targetNeuronList.mapIndexed { i, t ->
+            s.fanOut[t]?.strength ?: 0.0
+        }.toDoubleArray()
+    }.toTypedArray()
+)
 
 /**
  * Returns a network model with a matching label.  If more than one
@@ -305,6 +314,16 @@ fun List<Neuron>.getEnergy() = ((this cartesianProduct this)
  * Sort a list of models left to right and top to bottom
  */
 fun <T : LocatableModel> List<T>.sortTopBottom() = sortedBy { it.location.x }.sortedBy { it.location.y }
+
+/**
+ * Calculates the Euclidean distance between two neurons' positions in coordinate space.
+ *
+ * @param n1 The first neuron.
+ * @param n2 The second neuron.
+ */
+fun getEuclideanDist(n1: Neuron, n2: Neuron): Double {
+    return n1.location distanceTo n2.location
+}
 
 suspend fun NetworkModel.addToNetwork(network: Network, usePlacementManager: Boolean = true, useAutoAssignId: Boolean = true) = network.addNetworkModel(this, usePlacementManager, useAutoAssignId)?.await()
 fun NetworkModel.addToNetworkAsync(network: Network, usePlacementManager: Boolean = true, useAutoAssignId: Boolean = true) = network.addNetworkModel(this, usePlacementManager, useAutoAssignId)

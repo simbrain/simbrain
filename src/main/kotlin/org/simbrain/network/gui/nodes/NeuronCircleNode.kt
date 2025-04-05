@@ -6,8 +6,7 @@ import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.format
-import org.simbrain.util.toColor
-import org.simbrain.util.toSimbrainColor
+import org.simbrain.util.getColorGradient
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Font
@@ -111,7 +110,7 @@ class NeuronCircleNode(val networkPanel: NetworkPanel): PPath.Double() {
     fun drawActivation(activation: kotlin.Double, graphicalBounds: ClosedFloatingPointRange<kotlin.Double>) {
         this.activation = activation
         this.graphicalBounds = graphicalBounds
-        updatePaint(activation.toSimbrainColor(graphicalBounds).toColor())
+        updatePaint(activation.getColorGradient(graphicalBounds, NetworkPreferences.hotNodeColor, NetworkPreferences.coolNodeColor))
         updateStroke()
 
         if (isTextVisible) {

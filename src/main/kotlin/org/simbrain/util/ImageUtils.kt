@@ -14,6 +14,16 @@ import javax.swing.JPanel
 import kotlin.math.floor
 import kotlin.math.min
 
+fun Double.getColorGradient(range: ClosedFloatingPointRange<Double>, lowColor: Color, highColor: Color) = clip(range).let {
+    if (it < 0) {
+        val (h, s, v) = lowColor.toHSB()
+        Color.getHSBColor(h, SimbrainMath.rescale(-it, 0.0, -range.start, 0.0, s.toDouble()).toFloat(), v)
+    } else {
+        val (h, s, v) = highColor.toHSB()
+        Color.getHSBColor(h, SimbrainMath.rescale(it, 0.0, range.endInclusive, 0.0, s.toDouble()).toFloat(), v)
+    }
+}
+
 fun Double.toSimbrainColor(range: ClosedFloatingPointRange<Double>, coolHue: Float = 2/3f, hotHue: Float = 0.0f) = clip(range).let {
     if (it < 0) {
         Color.HSBtoRGB(coolHue, SimbrainMath.rescale(-it, 0.0, -range.start, 0.0, 1.0).toFloat(), 1.0f)

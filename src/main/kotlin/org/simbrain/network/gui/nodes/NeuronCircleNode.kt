@@ -110,7 +110,7 @@ class NeuronCircleNode(val networkPanel: NetworkPanel): PPath.Double() {
     fun drawActivation(activation: kotlin.Double, graphicalBounds: ClosedFloatingPointRange<kotlin.Double>) {
         this.activation = activation
         this.graphicalBounds = graphicalBounds
-        updatePaint(activation.getColorGradient(graphicalBounds, NetworkPreferences.hotNodeColor, NetworkPreferences.coolNodeColor))
+        updatePaint(activation.getColorGradient(graphicalBounds, NetworkPreferences.coolNodeColor, NetworkPreferences.hotNodeColor))
         updateStroke()
 
         if (isTextVisible) {

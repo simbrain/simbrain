@@ -162,7 +162,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
             contextMenu.add(randomizeAction)
             val diagAction: Action = object : AbstractAction("Diagonalize") {
                 init {
-                    // putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/"));
+                    // putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/"));
                     putValue(SHORT_DESCRIPTION, "Diagonalize array")
                 }
 

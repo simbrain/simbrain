@@ -18,12 +18,12 @@ public class LinkIcon extends JPanel implements MouseListener {
     /**
      * The locked lock icon.
      */
-    private ImageIcon linkedImIc = ResourceManager.getImageIcon("menu_icons/chainIcon.png");
+    private final ImageIcon linkedImIc = ResourceManager.getSmallIcon("menu_icons/chainIcon.png");
 
     /**
      * The unlocked lock icon.
      */
-    private ImageIcon unlinkedImIc = ResourceManager.getImageIcon("menu_icons/brokenChainIcon.png");
+    private final ImageIcon unlinkedImIc = ResourceManager.getSmallIcon("menu_icons/brokenChainIcon.png");
 
     /**
      * The image assigned either the locked or unlocked ImageIcon.
@@ -46,7 +46,7 @@ public class LinkIcon extends JPanel implements MouseListener {
         link = linked ? linkedImIc.getImage() : unlinkedImIc.getImage();
         addMouseListener(this);
 
-        Dimension dim = new Dimension((int) link.getWidth(null), link.getHeight(null));
+        Dimension dim = new Dimension(link.getWidth(null), link.getHeight(null));
         setPreferredSize(dim);
         setMinimumSize(dim);
         setMaximumSize(dim);

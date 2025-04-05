@@ -109,7 +109,7 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
         .associateWith { it.kotlin.primaryConstructor!!.call() }
 
     private val freezingToggleButton = JToggleButton().apply {
-        icon = ResourceManager.getImageIcon("menu_icons/Clamp.png")
+        icon = ResourceManager.getSmallIcon("menu_icons/Clamp.png")
         fun updateButton() {
             val pcaProjection = projector.projectionMethod as? PCAProjection ?: return
             val frozen = pcaProjection.freeze

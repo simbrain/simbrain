@@ -51,24 +51,22 @@ public class SensorEffectorPanel extends JPanel {
     /**
      * Table representing sensors / effectors.
      */
-    private JTable table;
+    private final JTable table;
 
     /**
      * Table model.
      */
-    private AttributeModel model;
+    private final AttributeModel model;
 
     /**
      * Whether this is a sensor or effector panel.
      */
     public enum PanelType {Sensor, Effector}
 
-    ;
-
     /**
      * Initial sensor or effector to edit, if any.  Also used to determine the type for this panel.
      */
-    private PanelType type;
+    private final PanelType type;
 
     /**
      * Currently selected attribute
@@ -147,7 +145,7 @@ public class SensorEffectorPanel extends JPanel {
         JPanel buttonBar = new JPanel();
 
         // Add attribute
-        JButton addAttribute = new JButton("Add", ResourceManager.getImageIcon("menu_icons/plus.png"));
+        JButton addAttribute = new JButton("Add", ResourceManager.getSmallIcon("menu_icons/plus.png"));
         addAttribute.setToolTipText("Add...");
         buttonBar.add(addAttribute);
         addAttribute.addActionListener(e -> {
@@ -179,7 +177,7 @@ public class SensorEffectorPanel extends JPanel {
         getActionMap().put("delete", deleteAction);
 
         // Edit attribute
-        JButton editAttribute = new JButton("Edit", ResourceManager.getImageIcon("menu_icons/Properties.png"));
+        JButton editAttribute = new JButton("Edit", ResourceManager.getSmallIcon("menu_icons/Properties.png"));
         editAttribute.setToolTipText("Edit...");
         buttonBar.add(editAttribute);
         editAttribute.addActionListener(e -> editAttribute(selectedAttribute));
@@ -225,7 +223,7 @@ public class SensorEffectorPanel extends JPanel {
     class DeleteItems extends AbstractAction {
 
         public DeleteItems() {
-            super("Delete", ResourceManager.getImageIcon("menu_icons/minus.png"));
+            super("Delete", ResourceManager.getSmallIcon("menu_icons/minus.png"));
         }
 
         @Override
@@ -282,7 +280,7 @@ public class SensorEffectorPanel extends JPanel {
         /**
          * Internal list of components.
          */
-        private List<PeripheralAttribute> data = new ArrayList();
+        private final List<PeripheralAttribute> data = new ArrayList();
 
         /**
          * Helper method to get a reference to the attribute displayed in a row.

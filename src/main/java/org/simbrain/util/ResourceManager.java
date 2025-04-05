@@ -43,7 +43,7 @@ public class ResourceManager {
      * @param path name of the image file to retrieve
      * @return the ImageIcon which can be used with Swing components, etc
      */
-    public static ImageIcon getImageIcon(String path) {
+    public static ImageIcon getRawImageIcon(String path) {
         path = assertForwardSlash(path);
         URL url = ClassLoader.getSystemClassLoader().getResource(path);
         return new ImageIcon(url);

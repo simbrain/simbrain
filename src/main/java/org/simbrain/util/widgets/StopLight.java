@@ -43,17 +43,17 @@ public class StopLight extends JPanel implements ActionListener {
      * A List of images, designed to be a singleton list containing the status
      * image.
      */
-    private ArrayList<Image> imgs = new ArrayList<Image>();
+    private final ArrayList<Image> imgs = new ArrayList<Image>();
 
     /**
      * Default greenlight image.
      */
-    private ImageIcon go = ResourceManager.getImageIcon("menu_icons/GreenCheck.png");
+    private final ImageIcon go = ResourceManager.getSmallIcon("menu_icons/GreenCheck.png");
 
     /**
      * Default redlight image.
      */
-    private ImageIcon stop = ResourceManager.getImageIcon("menu_icons/RedX.png");
+    private final ImageIcon stop = ResourceManager.getSmallIcon("menu_icons/RedX.png");
 
     /**
      * The current image.

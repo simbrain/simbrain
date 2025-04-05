@@ -84,7 +84,7 @@ fun SmileClassifier.getTrainingDialog(): StandardDialog {
         val addRemoveRows = JPanel().apply {
             // Add row
             add(JButton().apply {
-                icon = ResourceManager.getImageIcon("menu_icons/AddTableRow.png")
+                icon = ResourceManager.getSmallIcon("menu_icons/AddTableRow.png")
                 toolTipText = "Insert row at bottom of input and target tables"
                 addActionListener {
                     inputs.table.insertRow()
@@ -92,7 +92,7 @@ fun SmileClassifier.getTrainingDialog(): StandardDialog {
                 }
             })
             add(JButton().apply {
-                icon = ResourceManager.getImageIcon("menu_icons/DeleteRowTable.png")
+                icon = ResourceManager.getSmallIcon("menu_icons/DeleteRowTable.png")
                 toolTipText = "Delete last row of input and target tables"
                 addActionListener {
                     inputs.table.model.deleteRow(inputs.table.rowCount - 1)

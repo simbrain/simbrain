@@ -220,7 +220,7 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
     protected Action removeAction = new AbstractAction() {
 
         {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/RedX_small.png"));
+            putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/RedX_small.png"));
             putValue(NAME, "Remove Neuron Collection.");
             putValue(SHORT_DESCRIPTION, "Remove neuron collection.");
         }
@@ -249,7 +249,7 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
     protected Action clampNeuronsAction = new AbstractAction() {
 
         {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Clamp.png"));
+            putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/Clamp.png"));
             putValue(NAME, "Clamp Neurons");
             putValue(SHORT_DESCRIPTION, "Clamp all neurons in this group.");
         }
@@ -266,7 +266,7 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
     protected Action unclampNeuronsAction = new AbstractAction() {
 
         {
-            putValue(SMALL_ICON, ResourceManager.getImageIcon("menu_icons/Clamp.png"));
+            putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/Clamp.png"));
             putValue(NAME, "Unclamp Neurons");
             putValue(SHORT_DESCRIPTION, "Unclamp all neurons in this group.");
         }

@@ -45,7 +45,7 @@ public final class SavePlotAction extends AbstractAction {
         }
         this.component = component;
         // putValue(SMALL_ICON,
-        // ResourceManager.getImageIcon("PixelMatrix.png"));
+        // ResourceManager.getSmallIcon("PixelMatrix.png"));
         // putValue(SHORT_DESCRIPTION, "Create Pixel Matrix");
     }
 

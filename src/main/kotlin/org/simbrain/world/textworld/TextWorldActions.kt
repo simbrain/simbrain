@@ -86,7 +86,7 @@ val TextWorld.textWorldPrefs
  *
  * @param dir directory to set
  */
-var tokenEmbeddingDirectory: String?
+var tokenEmbeddingDirectory: String
     get() = TextWorldPreferences.tokenEmbeddingDirectory
     set(dir) {
         TextWorldPreferences.tokenEmbeddingDirectory = dir.toString()

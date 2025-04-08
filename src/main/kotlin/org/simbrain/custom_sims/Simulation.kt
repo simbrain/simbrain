@@ -16,6 +16,7 @@ import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.world.imageworld.ImageWorldComponent
 import org.simbrain.world.odorworld.OdorWorldComponent
+import org.simbrain.world.odorworld.OdorWorldDesktopComponent
 import org.simbrain.world.textworld.TextWorldComponent
 import java.io.File
 
@@ -227,3 +228,7 @@ fun SimbrainDesktop.createControlPanel(name: String, x: Int, y: Int, config: Con
         }
 }
 
+context(SimbrainDesktop)
+fun OdorWorldComponent.scale(scale: Double) {
+    (getDesktopComponent(this) as? OdorWorldDesktopComponent)?.worldPanel?.scalingFactor = scale
+}

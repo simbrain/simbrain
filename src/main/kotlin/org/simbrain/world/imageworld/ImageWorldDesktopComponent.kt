@@ -680,7 +680,7 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
             updateToolbar()
 
             // Save preferences
-            imageDirectory = fileChooser.currentLocation
+            imageDirectory = fileChooser.currentLocation!!
         }
     }
 

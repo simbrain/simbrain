@@ -149,7 +149,7 @@ abstract class WorkspaceComponent(name: String) {
      *
      * @return a list of the formats that this component supports.
      */
-    open val formats: List<String?>
+    open val formats: List<String>
         get() = listOf(defaultFormat)
 
     /**

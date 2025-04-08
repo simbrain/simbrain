@@ -2,17 +2,21 @@ package org.simbrain.network.trainers
 
 import org.simbrain.network.core.*
 import org.simbrain.network.events.LocationEvents
+import org.simbrain.network.trainers.SupervisedTrainer.TestConfiguration
 import org.simbrain.util.*
 import org.simbrain.util.stats.ProbabilityDistribution
 import smile.math.matrix.Matrix
 import java.awt.geom.Point2D
 import kotlin.math.max
-import kotlin.math.min
-import kotlin.random.Random
 
+/**
+ * @param trainTestSplitRatio A value between 0 and 1 used to specify how much of the data will be used for training vs testing.
+ *                            Set to 1 if for no testing set.
+ */
 class SupervisedModel(
     override val inputLayer: Layer,
-    override val outputLayer: Layer
+    override val outputLayer: Layer,
+    trainTestSplitRatio: Double = 0.8,
 ): LocatableModel(), SupervisedNetwork {
 
     val layers = computeOrderedUpdatePath(inputLayer, outputLayer)
@@ -24,7 +28,11 @@ class SupervisedModel(
     @Transient
     override val events = LocationEvents()
 
-    override val trainerConfig: SupervisedTrainerConfig = SupervisedTrainerConfig(lossFunctionProvider = ::possibleLossFunctions)
+    override val trainerConfig: SupervisedTrainerConfig = SupervisedTrainerConfig(
+        lossFunctionProvider = ::possibleLossFunctions
+    ).apply {
+        testConfiguration = TestConfiguration().apply { enabled = trainTestSplitRatio < 1.0 }
+    }
 
     override var trainingSet: MatrixDataset
 
@@ -32,27 +40,14 @@ class SupervisedModel(
 
     init {
         val nrows = max(inputLayer.size, outputLayer.size)
-        fun Matrix.applyDefaultPattern(): Matrix {
-            val smallerDimension = min(ncol(), nrow())
-            this.setValuesInPlace { i, j ->
-                if (i % smallerDimension == j % smallerDimension) 1.0 else 0.0
-            }
-            return this
-        }
 
-        val inputs = Matrix(nrows, inputLayer.size).applyDefaultPattern()
-        val targets = Matrix(nrows, outputLayer.size).applyDefaultPattern()
+        val inputs = Matrix(nrows, inputLayer.size).applyDiagonalPattern()
+        val targets = Matrix(nrows, outputLayer.size).applyDiagonalPattern()
 
-        val random = Random(42L)
+        val (trainingData, testingData) = splitDataSet(inputs, targets, trainTestSplitRatio)
 
-        val rowIndices = (0 until nrows).shuffled(random)
-
-        val trainRowCount = (nrows * 0.8).toInt().coerceAtLeast(1)
-        val testRowCount = (nrows - trainRowCount).coerceAtLeast(1)
-
-        val trainRowIndices = rowIndices.take(trainRowCount)
-
-        val testRowIndices = rowIndices.takeLast(testRowCount)
+        val (trainingInputs, trainingTargets) = trainingData
+        val (testingInputs, testingTargets) = testingData
 
         trainingSet = if (inputLayer is ActivationSequence) {
             MatrixDataset(
@@ -62,8 +57,8 @@ class SupervisedModel(
             )
         } else {
             MatrixDataset(
-                inputs = inputs.rows(*trainRowIndices.toIntArray()),
-                targets = targets.rows(*trainRowIndices.toIntArray())
+                inputs = trainingInputs,
+                targets = trainingTargets
             )
         }
 
@@ -75,8 +70,8 @@ class SupervisedModel(
             )
         } else {
             MatrixDataset(
-                inputs = inputs.rows(*testRowIndices.toIntArray()),
-                targets = targets.rows(*testRowIndices.toIntArray())
+                inputs = testingInputs,
+                targets = testingTargets
             )
         }
     }

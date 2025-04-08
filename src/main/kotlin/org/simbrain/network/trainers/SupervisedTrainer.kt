@@ -186,7 +186,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork>(val network: Network, va
                 }
             }
         }
-        val testError = if (config.testConfiguration.enabled && iteration % config.testConfiguration.testFrequency == 0) {
+        val testError = if (config.testConfiguration.enabled && iteration % config.testConfiguration.testFrequency == 1) {
             computeTestError()
         } else {
             null

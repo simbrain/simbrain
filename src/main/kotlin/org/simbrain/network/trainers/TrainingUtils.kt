@@ -21,6 +21,8 @@ import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
 import smile.math.matrix.Matrix
 import java.util.*
+import kotlin.math.min
+import kotlin.random.Random
 
 private val WeightMatrix.sourceNeuronArray get() = source as NeuronArray
 private val WeightMatrix.targetNeuronArray get() = target as NeuronArray
@@ -584,4 +586,44 @@ fun List<WeightMatrix>.printActivationsAndWeights(showWeights: Boolean = false) 
         println(wm.target)
     }
 
+}
+
+/**
+ * Applies a repeating diagonal pattern to the matrix. The matrix is modified in-place.
+ *
+ * @return The matrix with the diagonal pattern applied.
+ */
+fun Matrix.applyDiagonalPattern(): Matrix {
+    val smallerDimension = min(ncol(), nrow())
+    this.setValuesInPlace { i, j ->
+        if (i % smallerDimension == j % smallerDimension) 1.0 else 0.0
+    }
+    return this
+}
+
+fun splitDataSet(inputs: Matrix, targets: Matrix, splitRatio: Double, random: Random = Random(42L)): Pair<Pair<Matrix, Matrix>, Pair<Matrix, Matrix>> {
+    require(inputs.nrow() == targets.nrow()) { "inputs nrow (${inputs.nrow()}) must equal targets nrow (${targets.nrow()})" }
+    require(splitRatio in 0.0..1.0) { "splitRatio must be between 0.0 and 1.0" }
+
+    val nrows = inputs.nrow()
+
+    val rowIndices = (0 until nrows).shuffled(random)
+
+    val trainRowCount = (nrows * splitRatio).toInt().coerceAtLeast(1)
+    val testRowCount = (nrows - trainRowCount).coerceAtLeast(1)
+
+    val trainRowIndices = rowIndices.take(trainRowCount)
+
+    val testRowIndices = rowIndices.takeLast(testRowCount)
+
+    return Pair(
+        Pair(
+            inputs.rows(*trainRowIndices.toIntArray()),
+            targets.rows(*trainRowIndices.toIntArray())
+        ),
+        Pair(
+            inputs.rows(*testRowIndices.toIntArray()),
+            targets.rows(*testRowIndices.toIntArray())
+        )
+    )
 }

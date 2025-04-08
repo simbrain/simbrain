@@ -668,7 +668,7 @@ class StringWidget<O : EditableObject>(
                         }
                     }?.absolutePath
                 } ?: WorkspacePreferences.simulationDirectory
-                SFileChooser(dir, "Open...").showOpenDialog()?.let { file ->
+                SFileChooser(dir, description = "Open...").showOpenDialog()?.let { file ->
                     textField.text = file.absolutePath
                     changed = true
                 }

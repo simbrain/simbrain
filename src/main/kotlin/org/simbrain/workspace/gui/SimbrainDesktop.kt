@@ -716,7 +716,7 @@ object SimbrainDesktop {
         val simFile = simulationChooser.showOpenDialog()
         if (simFile != null) {
             workspace.openWorkspace(simFile)
-            workspace.currentDirectory = simulationChooser.currentLocation
+            workspace.currentDirectory = simulationChooser.currentLocation!!
             workspace.currentFile = simFile
         }
     }
@@ -741,7 +741,7 @@ object SimbrainDesktop {
         // Save the file by setting the current file
         if (theFile != null) {
             workspace.currentFile = theFile
-            workspace.currentDirectory = chooser.currentLocation
+            workspace.currentDirectory = chooser.currentLocation!!
             save(theFile)
         }
     }

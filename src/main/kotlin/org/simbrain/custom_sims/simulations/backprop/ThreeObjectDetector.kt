@@ -4,7 +4,6 @@ import kotlinx.coroutines.awaitAll
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.AbstractNeuronCollection
 import org.simbrain.network.core.SynapseGroup
-import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.core.setLabels
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.neurongroups.NeuronGroup
@@ -19,7 +18,6 @@ import org.simbrain.util.SmellSource
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.workspace.couplings.getProducer
-import org.simbrain.world.odorworld.OdorWorldDesktopComponent
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.sensors.SmellSensor
 import smile.math.matrix.Matrix
@@ -73,8 +71,10 @@ val threeObjectDetector = newSim {
     )
 
     val odorWorldComponent = addOdorWorldComponent()
-    desktop?.getDesktopComponent(odorWorldComponent)?.title = "World"
-    (desktop?.getDesktopComponent(odorWorldComponent) as? OdorWorldDesktopComponent)?.worldPanel?.scalingFactor = 1.0
+    withGui {
+        getDesktopComponent(odorWorldComponent).title = "World"
+        odorWorldComponent.scale(1.0)
+    }
 
     val odorWorld = odorWorldComponent.world.apply {
         isObjectsBlockMovement = false

@@ -57,6 +57,11 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
         interactionBox = SynapseGroupInteractionBox(networkPanel, synapseGroup, this)
         interactionBox.setText(synapseGroup.displayName)
         addChild(interactionBox)
+        interactionBox.addPropertyChangeListener { evt ->
+            if (evt.propertyName == "width") {
+                updateInteractionBoxLocation()
+            }
+        }
         fun invalidateArrow() {
             when (currentNode) {
                 directedNode -> directedNode?.invalidateFullBounds()

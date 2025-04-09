@@ -44,15 +44,31 @@ class SimulationScope private constructor(
     }
 }
 
-class NewSimulation(val task: suspend SimulationScope.(optionString: String?) -> Unit): CoroutineScope {
+class NewSimulation(val id: String?, val task: suspend SimulationScope.(optionString: String?) -> Unit): CoroutineScope {
 
     private val job = SupervisorJob()
 
     override val coroutineContext = Dispatchers.Default + job
 
+    private lateinit var reopenFunction: suspend SimulationScope.(workspace: Workspace) -> Unit
+
     suspend fun run(desktop: SimbrainDesktop? = null, optionString: String? = null) {
         with(SimulationScope(desktop)) {
             task(optionString)
+            workspace.simulationId = id
+        }
+    }
+
+    fun registerReopenFunction(block: suspend SimulationScope.(workspace: Workspace) -> Unit): NewSimulation = apply {
+        if (id == null) {
+            println("reopen function can only be called when the simulation id is set")
+        }
+        reopenFunction = block
+    }
+
+    suspend fun reopen(workspace: Workspace, desktop: SimbrainDesktop? = null) {
+        with(SimulationScope(desktop)) {
+            reopenFunction(workspace)
         }
     }
 }
@@ -60,8 +76,9 @@ class NewSimulation(val task: suspend SimulationScope.(optionString: String?) ->
 /**
  * When running simulation headless, the option string can be used to pass option to the simulation.
  * @see CowGrazing
+ * @param id a unique id for workspace to identify which simulation to run upon deserialization
  */
-fun newSim(block: suspend SimulationScope.(optionString: String?) -> Unit) = NewSimulation(block)
+fun newSim(id: String? = null, block: suspend SimulationScope.(optionString: String?) -> Unit) = NewSimulation(id, block)
 
 fun SimulationScope.addNetworkComponent(name: String, config: NetworkComponent.() -> Unit = { }): NetworkComponent {
     return NetworkComponent(name)

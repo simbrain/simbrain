@@ -9,7 +9,6 @@ import org.simbrain.workspace.couplings.Coupling
 import org.simbrain.workspace.gui.SimbrainDesktop.getDesktopComponent
 import java.awt.Rectangle
 import java.io.*
-import java.util.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
@@ -151,8 +150,16 @@ class WorkspaceSerializer(val workspace: Workspace) {
         coupling: Coupling,
         archive: ArchivedWorkspace
     ) {
-        val producer = ArchivedAttribute(couplingComponents[coupling.producer.baseObject], coupling.producer)
-        val consumer = ArchivedAttribute(couplingComponents[coupling.consumer.baseObject], coupling.consumer)
+        val producer = ArchivedAttribute(
+            couplingComponents[coupling.producer.baseObject]
+                ?: throw IllegalStateException("could not find component for coupling producer <${coupling.producer}>"),
+            coupling.producer
+        )
+        val consumer = ArchivedAttribute(
+            couplingComponents[coupling.consumer.baseObject]
+                ?: throw IllegalStateException("could not find component for coupling consumer <${coupling.consumer}>"),
+            coupling.consumer
+        )
         archive.addCoupling(ArchivedCoupling(producer, consumer))
     }
 
@@ -294,6 +301,7 @@ class WorkspaceSerializer(val workspace: Workspace) {
         if (archive.workspaceParameters != null) {
             workspace.updateDelay = archive.workspaceParameters.updateDelay
             workspace.updater.time = archive.workspaceParameters.savedTime
+            workspace.simulationId = archive.workspaceParameters.simulationId
             workspace.initIdManager()
         }
     }

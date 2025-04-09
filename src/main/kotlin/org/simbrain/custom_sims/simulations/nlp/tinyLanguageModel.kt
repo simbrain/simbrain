@@ -52,7 +52,7 @@ class TinyLanguageModelOptions(var showEmbeddingDimension: Boolean = true): Edit
     )
 }
 
-val tinyLanguageModel = newSim {
+val tinyLanguageModel = newSim("tiny_language_model") {
 
     val options = TinyLanguageModelOptions().showAPEOptionDialog("Tiny Language Model") ?: return@newSim
 
@@ -206,10 +206,9 @@ val tinyLanguageModel = newSim {
         initiallyOpened = false
     )
 
-}
+}.registerReopenFunction { workspace -> setupUpdateActions(workspace) }
 
-context(SimulationScope)
-fun setupUpdateActions(workspace: Workspace) {
+fun SimulationScope.setupUpdateActions(workspace: Workspace) {
 
     val network = workspace.componentList.filterIsInstance<NetworkComponent>().first().network
     val supervisedModel = network.getModels<SupervisedModel>().first()

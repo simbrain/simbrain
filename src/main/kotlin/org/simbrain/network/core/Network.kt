@@ -141,6 +141,7 @@ class Network: CoroutineScope, EditableObject {
      * Returns a flattened list of all network models.
      */
     val allModels get() = networkModels.all
+    val allModelsDeep get() = networkModels.deepAll
 
     /**
      * Returns a list of network models in the order needed to reconstruct a network properly. Example: nodes must be

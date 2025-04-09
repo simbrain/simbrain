@@ -6,6 +6,7 @@ import com.thoughtworks.xstream.converters.MarshallingContext
 import com.thoughtworks.xstream.converters.UnmarshallingContext
 import com.thoughtworks.xstream.io.HierarchicalStreamReader
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter
+import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.util.CachedObject
 import java.util.concurrent.ConcurrentHashMap
@@ -100,6 +101,16 @@ class NetworkModelList {
 
     val all: List<NetworkModel>
         get() = networkModels.values.flatMap { it?.map { item -> item } ?: listOf() }
+
+    val deepAll: List<NetworkModel>
+        get() = networkModels.values.flatMap { set ->
+                set?.flatMap { item ->
+                    when (item) {
+                        is NeuronGroup -> listOf(item) + item.neuronList
+                        else -> listOf(item)
+                    }
+                } ?: listOf()
+        }
 
     private val allInUpdatingOrderCache = CachedObject { all.sortedBy { updatingOrder(it) } }
 

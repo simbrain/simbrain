@@ -715,7 +715,7 @@ object SimbrainDesktop {
         val simulationChooser = SFileChooser(WorkspacePreferences.simulationDirectory, "Zip Archive", "zip")
         val simFile = simulationChooser.showOpenDialog()
         if (simFile != null) {
-            workspace.openWorkspace(simFile)
+            workspace.openWorkspace(simFile, useDesktop = true)
             workspace.currentDirectory = simulationChooser.currentLocation!!
             workspace.currentFile = simFile
         }

@@ -2,12 +2,15 @@ package org.simbrain.workspace
 
 import kotlinx.coroutines.*
 import org.pmw.tinylog.Logger
+import org.simbrain.custom_sims.NewSimulation
+import org.simbrain.custom_sims.simulations
 import org.simbrain.docviewer.DocViewer
 import org.simbrain.util.SimpleIdManager
 import org.simbrain.util.Utils
 import org.simbrain.workspace.couplings.Coupling
 import org.simbrain.workspace.couplings.CouplingManager
 import org.simbrain.workspace.events.WorkspaceEvents
+import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.workspace.serialization.WorkspaceSerializer
 import org.simbrain.workspace.updater.UpdateAction
 import org.simbrain.workspace.updater.WorkspaceUpdater
@@ -58,6 +61,8 @@ class Workspace: CoroutineScope {
      */
     @Transient
     var currentFile: File? = null
+
+    var simulationId: String? = null
 
     /**
      * A persistent representation of the time (the updater's state is not persisted).
@@ -226,6 +231,7 @@ class Workspace: CoroutineScope {
         resetTime()
         setWorkspaceChanged(false)
         currentFile = null
+        simulationId = ""
         couplingManager.clear()
         events.workspaceCleared.fire()
         updater.updateManager.setDefaultUpdateActions()
@@ -321,7 +327,7 @@ class Workspace: CoroutineScope {
         savedTime = time
     }
 
-    suspend fun openWorkspace(theFile: File?) {
+    suspend fun openWorkspace(theFile: File?, useDesktop: Boolean = false) {
         stop()
         val serializer = WorkspaceSerializer(this)
         try {
@@ -331,6 +337,15 @@ class Workspace: CoroutineScope {
                     serializer.deserialize(FileInputStream(theFile))
                 }
                 currentFile = theFile
+                simulations.items.firstNotNullOfOrNull { (_, sim) ->
+                    (sim as? NewSimulation)?.let { newSim ->
+                        if (newSim.id == simulationId) {
+                            newSim
+                        } else {
+                            null
+                        }
+                    }
+                }?.reopen(this, if (useDesktop) SimbrainDesktop else null)
                 setWorkspaceChanged(false)
                 events.workspaceOpened.fire()
             }

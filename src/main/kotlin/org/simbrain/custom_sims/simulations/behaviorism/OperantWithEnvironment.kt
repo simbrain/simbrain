@@ -1,23 +1,26 @@
 package org.simbrain.custom_sims.simulations.behaviorism
 
 import org.simbrain.custom_sims.*
+import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.*
 import org.simbrain.network.desktop.NetworkDesktopComponent
 import org.simbrain.network.layouts.LineLayout
+import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.neurongroups.getWinner
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.TileMap
+import org.simbrain.workspace.Workspace
+import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.workspace.updater.updateAction
+import org.simbrain.world.odorworld.OdorWorldComponent
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent
 import org.simbrain.world.odorworld.entities.EntityType
 import kotlin.math.max
 import kotlin.random.Random
 
 
-val operantWithEnvironment = newSim {
+val operantWithEnvironment = newSim("operant_with_environment") {
     workspace.clearWorkspace()
-
-    val random = Random(Random.nextLong())
 
     val networkComponent = addNetworkComponent("Brain")
     val network = networkComponent.network
@@ -29,6 +32,7 @@ val operantWithEnvironment = newSim {
         label = "Behaviors"
         neuronList.labels = listOf("Wiggle: ", "Explore: ", "Spin: ")
         neuronList.forEach { it.auxValue = .33 }
+        applyLayout()
     }
 
     val stimulusNet = network.addNeuronGroup(numNeurons, location = point(-9.25, 295.93)).apply {
@@ -37,6 +41,7 @@ val operantWithEnvironment = newSim {
         label = "Stimuli"
         setIncrement(1.0)
         neuronList.labels = listOf("Candle", "Flower", "Bell")
+        applyLayout()
     }
 
     val rewardNeuron = network.addNeuron {
@@ -75,19 +80,54 @@ val operantWithEnvironment = newSim {
     val flowerSensor = mouse.addObjectSensor(EntityType.Pansy, 50.0, 0.0, 65.0)
     val fishSensor = mouse.addObjectSensor(EntityType.Fish, 50.0, 0.0, 65.0)
 
-
-    fun updateBehaviorNetNeuronLabels() {
-        behaviorNet.neuronList.forEach {
-            it.label = it.label?.replace(Regex(":.+"), ": ${it.auxValue.format(2)}")
-        }
-    }
-
     with(couplingManager) {
         val (n1, n2, n3) = stimulusNet.neuronList
         cheeseSensor couple n1
         flowerSensor couple n2
         fishSensor couple n3
     }
+
+    updateBehaviorNetNeuronLabels(behaviorNet)
+
+    withGui {
+        place(networkComponent, 155, 9, 575, 500)
+        (getDesktopComponent(networkComponent) as NetworkDesktopComponent)
+            .networkPanel.selectionManager.clear()
+
+        place(odorWorldComponent, 730, 7, 315, 383)
+        (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).worldPanel.scalingFactor = .5
+    }
+
+    setupWorkspace(workspace)
+
+    addSidebarInfo(
+        """
+        # Operant with Environment
+                
+        """.trimIndent()
+    )
+
+}.registerReopenFunction { workspace -> setupWorkspace(workspace) }
+
+fun updateBehaviorNetNeuronLabels(behaviorNet: NeuronGroup) {
+    behaviorNet.neuronList.forEach {
+        it.label = it.label?.replace(Regex(":.+"), ": ${it.auxValue.format(2)}")
+    }
+}
+
+suspend fun SimulationScope.setupWorkspace(workspace: Workspace) {
+
+    val random = Random(Random.nextLong())
+
+    val network = workspace.componentList.filterIsInstance<NetworkComponent>().first().network
+    val behaviorNet = network.getModelByLabel<NeuronGroup>("Behaviors")
+    val stimulusNet = network.getModelByLabel<NeuronGroup>("Stimuli")
+    val rewardNeuron = network.getModelByLabel<Neuron>("Food Pellet")
+    val punishNeuron = network.getModelByLabel<Neuron>("Shock")
+
+    val odorWorldComponent = workspace.componentList.filterIsInstance<OdorWorldComponent>().first()
+    val odorWorld = odorWorldComponent.world
+    val mouse = odorWorld.entityList.first { it.entityType == EntityType.Mouse }
 
     network.updateManager.clear()
     network.updateManager.addAction(updateAction("Custom behaviorism update") {
@@ -137,21 +177,12 @@ val operantWithEnvironment = newSim {
             }
         }
 
-        updateBehaviorNetNeuronLabels()
+        updateBehaviorNetNeuronLabels(stimulusNet)
         updateNetwork()
         updateBehaviors()
     })
 
-    updateBehaviorNetNeuronLabels()
-
     withGui {
-        place(networkComponent, 155, 9, 575, 500)
-        (getDesktopComponent(networkComponent) as NetworkDesktopComponent)
-            .networkPanel.selectionManager.clear()
-
-        place(odorWorldComponent, 730, 7, 315, 383)
-        (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).worldPanel.scalingFactor = .5
-
         createControlPanel("Control Panel", 5, 10) {
 
             fun normIntrinsicProbabilities() {
@@ -183,7 +214,7 @@ val operantWithEnvironment = newSim {
                     val p = winner.auxValue
                     winner.auxValue = max(p + valence * p, 0.0)
                     normIntrinsicProbabilities()
-                    updateBehaviorNetNeuronLabels()
+                    updateBehaviorNetNeuronLabels(behaviorNet)
                 }
             }
 
@@ -191,30 +222,23 @@ val operantWithEnvironment = newSim {
                 learn(1.0)
                 rewardNeuron.activation = 1.0
                 punishNeuron.activation = 0.0
-                workspace.iterateSuspend()
+                SimbrainDesktop.workspace.iterateSuspend()
             }
 
             addButton("Punish") {
                 learn(-1.0)
                 rewardNeuron.activation = 0.0
                 punishNeuron.activation = 1.0
-                workspace.iterateSuspend()
+                SimbrainDesktop.workspace.iterateSuspend()
             }
 
             addButton("Do nothing") {
                 rewardNeuron.activation = 0.0
                 punishNeuron.activation = 0.0
-                workspace.iterateSuspend()
+                SimbrainDesktop.workspace.iterateSuspend()
             }
 
         }
     }
-
-    addSidebarInfo(
-        """
-        # Operant with Environment
-                
-        """.trimIndent()
-    )
 
 }

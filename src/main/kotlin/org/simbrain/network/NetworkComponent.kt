@@ -99,7 +99,7 @@ class NetworkComponent : WorkspaceComponent {
     }
 
     override val attributeContainers: List<AttributeContainer>
-        get() = network.allModels.filterIsInstance<AttributeContainer>()
+        get() = network.allModelsDeep.filterIsInstance<AttributeContainer>()
 
     override fun save(output: OutputStream, format: String?) {
         getNetworkXStream().toXML(network, output)

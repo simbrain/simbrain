@@ -13,8 +13,8 @@ import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.alignNetworkModels
 import org.simbrain.network.util.offsetNetworkModel
+import org.simbrain.util.matrix
 import org.simbrain.util.place
-import smile.math.matrix.Matrix
 
 
 val xorSim = newSim {
@@ -40,22 +40,13 @@ val xorSim = newSim {
     alignNetworkModels(inputLayer, outputLayer, Alignment.VERTICAL)
 
     sm.trainingSet = MatrixDataset(
-        inputs = Matrix.of(
-            arrayOf(
-                doubleArrayOf(0.0, 0.0),
-                doubleArrayOf(1.0, 0.0),
-                doubleArrayOf(0.0, 1.0),
-                doubleArrayOf(1.0, 1.0),
-            )
+        inputs = matrix[4, 2](
+            0, 0,
+            1, 0,
+            0, 1,
+            1, 0
         ),
-        targets = Matrix.of(
-            arrayOf(
-                doubleArrayOf(0.0),
-                doubleArrayOf(1.0),
-                doubleArrayOf(1.0),
-                doubleArrayOf(0.0),
-            )
-        ),
+        targets = matrix[4, 1](0, 1, 1, 0)
     )
 
 

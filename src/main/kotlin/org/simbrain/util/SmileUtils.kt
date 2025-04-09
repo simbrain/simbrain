@@ -451,3 +451,20 @@ fun Matrix.prettyPrint(decimals: Int = 2): String {
             }
     }
 }
+
+object matrix {
+    operator fun get(m: Int, n: Int) = MatrixBuilder(m, n)
+}
+
+class MatrixBuilder(val nrow: Int, val ncol: Int) {
+    operator fun invoke(vararg values: Number): Matrix {
+        require(values.size == nrow * ncol)
+        val result = Matrix(nrow, ncol)
+        for (i in 0 until nrow) {
+            for (j in 0 until ncol) {
+                result[i, j] = values[i * ncol + j].toDouble()
+            }
+        }
+        return result
+    }
+}

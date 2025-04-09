@@ -33,18 +33,7 @@ import java.io.OutputStream
  * [org.simbrain.network.NetworkComponent.open] for an example.
  */
 abstract class WorkspaceComponent(name: String) {
-    /**
-     * Returns the workspace associated with this component.
-     */
-    /**
-     * Sets the workspace for this component. Called by the workspace right
-     * after this component is created.
-     *
-     * @param workspace The workspace for this component.
-     */
-    /**
-     * The workspace that 'owns' this component.
-     */
+
     open lateinit var workspace: Workspace
 
     @Transient

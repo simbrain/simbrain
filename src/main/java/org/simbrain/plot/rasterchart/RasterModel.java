@@ -46,7 +46,7 @@ public class RasterModel implements EditableObject {
     /**
      * List of {@link RasterConsumer}'s that consume raster data.
      */
-    private List<RasterConsumer> rasterConsumerList = new ArrayList<>();
+    private final List<RasterConsumer> rasterConsumerList = new ArrayList<>();
 
     /**
      * Lambda to supply time to the time series model.
@@ -56,7 +56,7 @@ public class RasterModel implements EditableObject {
     /**
      * Raster Data.
      */
-    private XYSeriesCollection dataset = new XYSeriesCollection();
+    private final XYSeriesCollection dataset = new XYSeriesCollection();
 
     /**
      * Should the range automatically change to reflect the data.
@@ -68,7 +68,7 @@ public class RasterModel implements EditableObject {
      * Size of window.
      */
     @UserParameter(label = "Dot Size", description = "Size of dots in chart", order = 5)
-    private int dotSize = 4;
+    private final int dotSize = 4;
 
     /**
      * Size of window.
@@ -243,7 +243,7 @@ public class RasterModel implements EditableObject {
 
         /**
          * Plot an array of values as a vertical bar in a raster plot. Each component of the array is associated with one row of the plot.
-         * Canonically used to display spiking data, represented with binary vectors. If real-values (e.g. activations) are sent in, then values above a threshold (default .5) are intereted as spikes
+         * Canonically used to display spiking data, represented with binary vectors. If real-values (e.g. activations) are sent in, then values above a threshold (default .5) are interpreted as spikes
          * <br>
          * Example 1: [0, 1, 0, 0 , 1] would show 2 dots vertically at the 2nd and 5th position at the current time
          * <br>

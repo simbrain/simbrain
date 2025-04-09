@@ -223,4 +223,12 @@ class SmileUtilsTest {
         assertArrayEquals(doubleArrayOf(10.0, 11.0, 12.0), a.row(3))
     }
 
+    @Test
+    fun `test matrix building shortcut`() {
+        val m1 = Matrix.of(arrayOf(doubleArrayOf(1.0,2.0,3.0)))
+        val m2 = matrix[1,3](1,2,3)
+        assertArrayEquals(m1.flatten(), m2.flatten())
+    }
+
+
 }

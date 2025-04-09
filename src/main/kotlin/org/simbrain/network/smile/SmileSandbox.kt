@@ -1,6 +1,7 @@
 package org.simbrain.network.smile
 
 import org.simbrain.util.Utils
+import org.simbrain.util.matrix
 import smile.io.Read
 import smile.math.matrix.Matrix
 import smile.nlp.normalizer.SimpleNormalizer
@@ -30,7 +31,13 @@ fun matrixBasics() {
         doubleArrayOf(4.0, 5.0, 6.0),
         doubleArrayOf(7.0, 8.0, 9.0)
     ))
+    val usingShortcut = matrix[3,3](
+        1,2,3,
+        4,5,6,
+        7,8,9
+    )
     println("specific: $specific")
+    println("shortcut: $usingShortcut")
 }
 
 
@@ -63,7 +70,7 @@ fun boxPlot() {
         iris.floatVector(1).toDoubleArray(),
         iris.floatVector(2).toDoubleArray(),
         iris.floatVector(3).toDoubleArray()
-    ).canvas();
+    ).canvas()
     // canvas.setAxisLabels("sepallength", "sepalwidth")
     canvas.window()
 }

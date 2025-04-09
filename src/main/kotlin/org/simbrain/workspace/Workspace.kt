@@ -339,7 +339,7 @@ class Workspace: CoroutineScope {
                 currentFile = theFile
                 simulations.items.firstNotNullOfOrNull { (_, sim) ->
                     (sim as? NewSimulation)?.let { newSim ->
-                        if (newSim.id == simulationId) {
+                        if (newSim.id != null && newSim.id == simulationId) {
                             newSim
                         } else {
                             null

@@ -15,12 +15,12 @@ import org.simbrain.network.util.Direction
 import org.simbrain.network.util.alignNetworkModels
 import org.simbrain.network.util.offsetNetworkModel
 import org.simbrain.util.SmellSource
+import org.simbrain.util.matrix
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.sensors.SmellSensor
-import smile.math.matrix.Matrix
 
 
 val threeObjectDetector = newSim {
@@ -44,7 +44,7 @@ val threeObjectDetector = newSim {
     }
     val sg1 = SynapseGroup(inputLayer, hiddenLayer)
     val sg2 = SynapseGroup(hiddenLayer, outputLayer)
-    val sm = SupervisedModel(inputLayer, outputLayer)
+    val sm = SupervisedModel(inputLayer, outputLayer, trainTestSplit = 1.0)
     net.addNetworkModels(inputLayer, hiddenLayer, outputLayer, sg1, sg2, sm).awaitAll()
     offsetNetworkModel(inputLayer, hiddenLayer, Direction.NORTH, 150.0)
     offsetNetworkModel(hiddenLayer, outputLayer, Direction.NORTH, 150.0)
@@ -52,22 +52,18 @@ val threeObjectDetector = newSim {
     alignNetworkModels(inputLayer, outputLayer, Alignment.VERTICAL)
 
     sm.trainingSet = MatrixDataset(
-        inputs = Matrix.of(
-            arrayOf(
-                doubleArrayOf(0.4,0.2,1.0),
-                doubleArrayOf(1.0,0.4,0.2),
-                doubleArrayOf(0.4,1.0,0.2),
-                doubleArrayOf(0.0,0.0,0.0),
-            )
+        inputs = matrix[4,3](
+            0.4,0.2,1.0,
+            1.0,0.4,0.2,
+            0.4,1.0,0.2,
+            0.0,0.0,0.0
         ),
-        targets = Matrix.of(
-            arrayOf(
-                doubleArrayOf(1.0,0.0,0.0),
-                doubleArrayOf(0.0,1.0,0.0),
-                doubleArrayOf(0.0,0.0,1.0),
-                doubleArrayOf(0.0,0.0,0.0),
-            )
-        ),
+        targets = matrix[4,3] (
+            1.0,0.0,0.0,
+            0.0,1.0,0.0,
+            0.0,0.0,1.0,
+            0.0,0.0,0.0
+        )
     )
 
     val odorWorldComponent = addOdorWorldComponent()

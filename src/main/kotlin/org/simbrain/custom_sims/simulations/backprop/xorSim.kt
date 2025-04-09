@@ -4,15 +4,20 @@ import kotlinx.coroutines.awaitAll
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
+import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.SynapseGroup
+import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.neurongroups.NeuronGroup
+import org.simbrain.network.trainers.LeCun
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedModel
+import org.simbrain.network.trainers.Xavier
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.alignNetworkModels
 import org.simbrain.network.util.offsetNetworkModel
+import org.simbrain.util.math.SigmoidFunctionEnum
 import org.simbrain.util.matrix
 import org.simbrain.util.place
 
@@ -26,25 +31,30 @@ val xorSim = newSim {
     val inputLayer = NeuronGroup(2).apply {
         isClamped = true
     }
-    val hiddenLayer = NeuronGroup(4).apply {
+    val hiddenLayer = NeuronGroup(2).apply {
         updateRule = SigmoidalRule()
     }
-    val outputLayer = NeuronGroup(1)
-    val wm1 = SynapseGroup(inputLayer, hiddenLayer)
-    val wm2 = SynapseGroup(hiddenLayer, outputLayer)
-    val sm = SupervisedModel(inputLayer, outputLayer)
-    net.addNetworkModels(inputLayer, hiddenLayer, outputLayer, wm1, wm2, sm).awaitAll()
-    offsetNetworkModel(inputLayer, hiddenLayer, Direction.NORTH, 250.0)
-    offsetNetworkModel(hiddenLayer, outputLayer, Direction.NORTH, 250.0)
+    val outputLayer = NeuronGroup(1).apply {
+        updateRule = SigmoidalRule()
+    }
+    val sg1 = SynapseGroup(inputLayer, hiddenLayer)
+    val sg2 = SynapseGroup(hiddenLayer, outputLayer)
+    val sm = SupervisedModel(inputLayer, outputLayer).apply {
+        trainerConfig.weightInitializationStrategy = LeCun()
+    }
+    net.addNetworkModels(inputLayer, hiddenLayer, outputLayer, sg1, sg2, sm).awaitAll()
+    offsetNetworkModel(inputLayer, hiddenLayer, Direction.NORTH, 150.0)
+    offsetNetworkModel(hiddenLayer, outputLayer, Direction.NORTH, 150.0)
     alignNetworkModels(inputLayer, hiddenLayer, Alignment.VERTICAL)
     alignNetworkModels(inputLayer, outputLayer, Alignment.VERTICAL)
+    sm.randomize()
 
     sm.trainingSet = MatrixDataset(
         inputs = matrix[4, 2](
             0, 0,
             1, 0,
             0, 1,
-            1, 0
+            1, 1
         ),
         targets = matrix[4, 1](0, 1, 1, 0)
     )

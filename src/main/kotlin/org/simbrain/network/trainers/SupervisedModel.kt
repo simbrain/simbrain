@@ -10,13 +10,13 @@ import java.awt.geom.Point2D
 import kotlin.math.max
 
 /**
- * @param trainTestSplitRatio A value between 0 and 1 used to specify how much of the data will be used for training vs testing.
- *                            Set to 1 if for no testing set.
+ * @param trainTestSplit A value between 0 and 1 used to specify how much of the data will be used for training vs testing.
+ *                            Default to 1, which means no testing set.
  */
 class SupervisedModel(
     override val inputLayer: Layer,
     override val outputLayer: Layer,
-    trainTestSplitRatio: Double = 0.8,
+    trainTestSplit: Double = 1.0,
 ): LocatableModel(), SupervisedNetwork {
 
     val layers = computeOrderedUpdatePath(inputLayer, outputLayer)
@@ -31,7 +31,7 @@ class SupervisedModel(
     override val trainerConfig: SupervisedTrainerConfig = SupervisedTrainerConfig(
         lossFunctionProvider = ::possibleLossFunctions
     ).apply {
-        testConfiguration = TestConfiguration().apply { enabled = trainTestSplitRatio < 1.0 }
+        testConfiguration = TestConfiguration().apply { enabled = trainTestSplit < 1.0 }
     }
 
     override var trainingSet: MatrixDataset
@@ -44,7 +44,7 @@ class SupervisedModel(
         val inputs = Matrix(nrows, inputLayer.size).applyDiagonalPattern()
         val targets = Matrix(nrows, outputLayer.size).applyDiagonalPattern()
 
-        val (trainingData, testingData) = splitDataSet(inputs, targets, trainTestSplitRatio)
+        val (trainingData, testingData) = splitDataSet(inputs, targets, trainTestSplit)
 
         val (trainingInputs, trainingTargets) = trainingData
         val (testingInputs, testingTargets) = testingData

@@ -1,28 +1,40 @@
 package org.simbrain.network.groups
 
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.WeightMatrix
-import org.simbrain.network.neurongroups.NeuronGroup
-import org.simbrain.network.neurongroups.SoftmaxGroup
+import org.simbrain.network.NetworkComponent
+import org.simbrain.network.core.*
+import org.simbrain.network.neurongroups.*
+import org.simbrain.network.subnetworks.BackpropNetwork
+import org.simbrain.network.subnetworks.SRNNetwork
+import org.simbrain.workspace.Workspace
+import org.simbrain.workspace.couplings.getConsumer
+import org.simbrain.workspace.couplings.getProducer
+import org.simbrain.workspace.serialization.WorkspaceSerializer
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.util.List
 
 class NeuronGroupTest {
-    var net: Network = Network()
+
+    val workspace = Workspace()
+    val networkComponent = NetworkComponent("Test")
+    var net = networkComponent.network
     var ng: NeuronGroup = NeuronGroup(2)
 
     init {
         ng.label = "test"
         net.addNetworkModel(ng)
+        workspace.addWorkspaceComponent(networkComponent)
     }
-
 
     @Test
     fun testCopy() {
         val ng2 = ng.copy()
         net.addNetworkModel(ng2)
-        Assertions.assertEquals(2, ng2.neuronList.size)
+        assertEquals(2, ng2.neuronList.size)
     }
 
     @Test
@@ -68,7 +80,31 @@ class NeuronGroupTest {
             net.addNetworkModels(ng2, wm)
             net.update()
             // System.out.println(Arrays.toString(ng2.getActivations()));
-            Assertions.assertEquals(1.0, ng2.activations.sum(), .01)
+            assertEquals(1.0, ng2.activations.sum(), .01)
         }
     }
+
+    @Test
+    fun `test serialization with couplings`() {
+
+        with(workspace.couplingManager) {
+            ng.getNeuron(0) couple ng.getNeuron(1)
+        }
+
+        val serializer = WorkspaceSerializer(workspace)
+        val bas = ByteArrayOutputStream()
+        serializer.serialize(bas, true)
+        bas.close()
+        workspace.clearWorkspace()
+
+        // Reopen
+        val bis = ByteArrayInputStream(bas.toByteArray())
+        runBlocking {
+            serializer.deserialize(bis)
+        }
+        bis.close()
+        assertEquals(1, workspace.couplingManager.couplings.size)
+
+    }
+
 }

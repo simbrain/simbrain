@@ -53,8 +53,10 @@ sealed class Preference<T>(val default: T) {
      * Revert all preferences to their default value.
      */
     fun revertToDefault() {
-        systemPreferences.remove(name)
-        cachedValue = null
+        if (this::name.isInitialized) {
+            systemPreferences.remove(name)
+            cachedValue = null
+        }
     }
 
     operator fun <H: PreferenceHolder> getValue(thisRef: H, property: KProperty<*>): T {

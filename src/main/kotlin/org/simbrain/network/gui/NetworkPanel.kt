@@ -8,6 +8,10 @@ import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.NetworkComponent
+import org.simbrain.network.connections.AllToAll
+import org.simbrain.network.connections.FixedDegree
+import org.simbrain.network.connections.RadialProbabilistic
+import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.*
 import org.simbrain.network.gui.MouseEventHandler.MouseCursor
 import org.simbrain.network.gui.dialogs.NetworkPreferences
@@ -559,7 +563,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
      *
      * For neuron groups or arrays, uses a weight matrix.
      */
-    fun connectSelectedModelsDefault() {
+    fun connectSelectedModelsDefault(allowSelfConnection: Boolean = false) {
 
         with(selectionManager) {
 
@@ -567,7 +571,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
                 return
             }
 
-            connectFreeWeights()
+            connectFreeWeights(allowSelfConnection)
         }
     }
 
@@ -605,7 +609,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     /**
      * Connect free weights using the default connection strategy
      */
-    fun connectFreeWeights() {
+    fun connectFreeWeights(allowSelfConnection: Boolean = false) {
         // TODO: For large numbers of connections maybe pop up a warning and depending on button pressed make the
         // weights automatically be invisible
         with(selectionManager) {
@@ -615,7 +619,15 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             val targetNeurons = filterSelectedModels<Neuron>() +
                     filterSelectedModels<NeuronCollection>().flatMap { it.neuronList } +
                     filterSelectedModels<NeuronGroup>().flatMap { it.neuronList }
-            val synapses = NetworkPreferences.connectionStrategy.copy().apply { percentExcitatory = 100.0 }.connectNeurons(sourceNeurons, targetNeurons)
+            val synapses = NetworkPreferences.connectionStrategy.copy().also {
+                it.percentExcitatory = 100.0
+                when (it) {
+                    is AllToAll -> it.allowSelfConnection = allowSelfConnection
+                    is Sparse -> it.allowSelfConnection = allowSelfConnection
+                    is FixedDegree -> it.allowSelfConnections = allowSelfConnection
+                    is RadialProbabilistic -> it.allowSelfConnections = allowSelfConnection
+                }
+            }.connectNeurons(sourceNeurons, targetNeurons)
             synapses.addToNetworkAsync(network)
             undoManager.addUndoableAction(
                 description = "Connect nodes",

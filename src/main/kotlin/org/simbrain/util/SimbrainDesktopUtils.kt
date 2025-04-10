@@ -53,8 +53,13 @@ fun SimbrainDesktop.place(workspaceComponent: WorkspaceComponent, placement: Pla
     }
 }
 
-fun SimbrainDesktop.place(workspaceComponent: WorkspaceComponent, x: Int, y: Int, width: Int, height: Int) {
+suspend fun SimbrainDesktop.place(workspaceComponent: WorkspaceComponent, x: Int, y: Int, width: Int, height: Int) {
     val desktopComponent = getDesktopComponent(workspaceComponent)
+    desktopComponent.parentFrame.bounds = Rectangle(x, y, width, height)
+}
+
+fun SimbrainDesktop.placeBlocking(workspaceComponent: WorkspaceComponent, x: Int, y: Int, width: Int, height: Int) {
+    val desktopComponent = runBlocking { getDesktopComponent(workspaceComponent) }
     desktopComponent.parentFrame.bounds = Rectangle(x, y, width, height)
 }
 

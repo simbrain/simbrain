@@ -1,6 +1,7 @@
 package org.simbrain.workspace.serialization
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.simbrain.util.getSimbrainXStream
 import org.simbrain.workspace.Workspace
@@ -99,7 +100,7 @@ class WorkspaceSerializer(val workspace: Workspace) {
             zipStream.putNextEntry(entry)
             serializer.serializeComponent(component, zipStream)
             if (!headless) {
-                val desktopComponent = getDesktopComponent(component)
+                val desktopComponent = runBlocking { getDesktopComponent(component) }
                 // Makes it possible to save a non-GUI simulation
                 if (desktopComponent != null) {
                     val dc = archiveComp.addDesktopComponent(desktopComponent)

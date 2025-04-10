@@ -246,6 +246,6 @@ fun SimbrainDesktop.createControlPanel(name: String, x: Int, y: Int, config: Con
 }
 
 context(SimbrainDesktop)
-fun OdorWorldComponent.scale(scale: Double) {
+suspend fun OdorWorldComponent.scale(scale: Double) {
     (getDesktopComponent(this) as? OdorWorldDesktopComponent)?.worldPanel?.scalingFactor = scale
 }

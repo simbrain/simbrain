@@ -196,4 +196,10 @@ class CompletableDeferredHashMap<K, V : Any>(private val timeoutMillis: Long = 1
     fun remove(key: K) {
         map.remove(key)
     }
+
+    val keys get() = map.keys
+
+    val size get() = map.size
+
+    fun clear() = map.clear()
 }

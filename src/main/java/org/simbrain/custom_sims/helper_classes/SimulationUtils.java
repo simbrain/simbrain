@@ -54,7 +54,7 @@ public class SimulationUtils {
     public void addComponent(
             WorkspaceComponent wc, int x, int y, int width, int height) {
         workspace.addWorkspaceComponent(wc);
-        SwingUtilities.invokeLater(() -> SimbrainDesktopUtilsKt.place(desktop, wc, x, y, width, height));
+        SwingUtilities.invokeLater(() -> SimbrainDesktopUtilsKt.placeBlocking(desktop, wc, x, y, width, height));
     }
 
     /**
@@ -112,7 +112,7 @@ public class SimulationUtils {
         docViewer.getDocViewer().setText(html);
         docViewer.getDocViewer().render();
         workspace.addWorkspaceComponent(docViewer);
-        SwingUtilities.invokeLater(() -> desktop.getDesktopComponent(docViewer).getParentFrame().setBounds(x, y, width, height));
+        SwingUtilities.invokeLater(() -> desktop.getDesktopComponentBlocking(docViewer).getParentFrame().setBounds(x, y, width, height));
         return docViewer;
     }
 
@@ -137,7 +137,7 @@ public class SimulationUtils {
         docViewer.getDocViewer().setText(markdownText);
         docViewer.getDocViewer().render();
         workspace.addWorkspaceComponent(docViewer);
-        SwingUtilities.invokeLater(() -> desktop.getDesktopComponent(docViewer).getParentFrame().setBounds(x, y, width, height));
+        SwingUtilities.invokeLater(() -> desktop.getDesktopComponentBlocking(docViewer).getParentFrame().setBounds(x, y, width, height));
         return docViewer;
     }
 
@@ -240,7 +240,7 @@ public class SimulationUtils {
      * Helper to get a network panel from a network component.
      */
     public NetworkPanel getNetworkPanel(NetworkComponent nc) {
-        return ((NetworkDesktopComponent) desktop.getDesktopComponent(nc)).getNetworkPanel();
+        return ((NetworkDesktopComponent) desktop.getDesktopComponentBlocking(nc)).getNetworkPanel();
     }
 
 }

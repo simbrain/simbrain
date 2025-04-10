@@ -22,6 +22,7 @@ import bsh.Interpreter
 import bsh.util.JConsole
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
 import org.pmw.tinylog.Logger
 import org.simbrain.console.ConsoleDesktopComponent
@@ -77,10 +78,7 @@ object SimbrainDesktop {
     /**
      * Associates workspace components with their corresponding desktop components.
      */
-    private val workspaceComponentDesktopComponentMap: MutableMap<WorkspaceComponent, DesktopComponent<*>> = LinkedHashMap()
-
-    val desktopComponents: Collection<DesktopComponent<*>>
-        get() = workspaceComponentDesktopComponentMap.values
+    private val workspaceComponentDesktopComponentMap = CompletableDeferredHashMap<WorkspaceComponent, DesktopComponent<*>>()
 
     /**
      * Reference to the last internal frames that were focused, so that they can get the focus when the next one is
@@ -248,7 +246,7 @@ object SimbrainDesktop {
         }
         events.componentAdded.on(Dispatchers.Swing, wait = true) { addDesktopComponent(it) }
         events.componentRemoved.on(Dispatchers.Swing) { wc  ->
-            val component = workspaceComponentDesktopComponentMap[wc] ?: return@on
+            val component = workspaceComponentDesktopComponentMap.getImmediately(wc) as? DesktopComponent<*> ?: return@on
             workspaceComponentDesktopComponentMap.remove(wc)
             component.parentFrame.dispose()
             if (!lastFocusedStack.isEmpty()) {
@@ -567,8 +565,15 @@ object SimbrainDesktop {
     /**
      * Returns the desktop component corresponding to a workspace component.
      */
-    fun getDesktopComponent(component: WorkspaceComponent): DesktopComponent<*> {
-        return workspaceComponentDesktopComponentMap[component] ?: throw IllegalStateException("Cannot find component ${component.name} in ${workspaceComponentDesktopComponentMap.keys.map { it.name }}")
+    fun getDesktopComponentBlocking(component: WorkspaceComponent): DesktopComponent<*> {
+        return runBlocking {
+            workspaceComponentDesktopComponentMap.getImmediately(component)
+                ?: throw IllegalStateException("Cannot find component ${component.name} in ${workspaceComponentDesktopComponentMap.keys.map { it.name }}")
+        }
+    }
+
+    suspend fun getDesktopComponent(component: WorkspaceComponent): DesktopComponent<*> {
+        return workspaceComponentDesktopComponentMap.get(component)
     }
 
     /**
@@ -959,11 +964,11 @@ object SimbrainDesktop {
     /**
      * Reposition all the windows. Useful when windows get resized and can't be "recaptured".
      */
-    fun repositionAllWindows() {
+    suspend fun repositionAllWindows() {
         // TODO: Do this for non-component internal frames as well?
         var i = 0
-        for (component in desktopComponents) {
-            positionComponent(i++, component)
+        for (component in workspaceComponentDesktopComponentMap.keys) {
+            positionComponent(i++, workspaceComponentDesktopComponentMap.get(component))
         }
     }
 

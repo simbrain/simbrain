@@ -84,11 +84,11 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Spiking neuron") { spikingNeuron }
         item("Spike responders") { spikeResponderSim }
         item("Spike responders (array)") { spikeResponderSimArray }
-        item("Cortical areas") { cortexKuramoto }
         // item("Hippocampus") { Hippocampus() }
         // item("Cerebellum") { Cerebellum() }
         item("Cortical layers") { cortexSimple }
         item("Integrate and Fire Network") { integrateAndFireSimulation }
+        item("Cortical areas") { cortexKuramoto }
     }
 
     dir("Evolution") {
@@ -125,7 +125,6 @@ val simulations = dir("Simulations", alphabetical = true ) {
     dir("Machine learning") {
         item("Iris classifier") { irisClassifier }
     }
-
 
     dir("Projection") {
         item("PCA projection") { projectionSim }

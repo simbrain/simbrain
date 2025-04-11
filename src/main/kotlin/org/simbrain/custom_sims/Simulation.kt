@@ -7,6 +7,7 @@ import org.simbrain.docviewer.DocViewerComponent
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.plot.projection.ProjectionComponent
+import org.simbrain.plot.rasterchart.RasterPlotComponent
 import org.simbrain.plot.timeseries.TimeSeriesModel
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
 import org.simbrain.util.*
@@ -118,6 +119,12 @@ suspend fun SimulationScope.addProjectionPlot2(name: String): ProjectionComponen
     val projectionComponent = ProjectionComponent(name)
     workspace.addWorkspaceComponent(projectionComponent)
     return projectionComponent
+}
+
+suspend fun SimulationScope.addRasterPlot(name: String): RasterPlotComponent {
+    val rasterComponent = RasterPlotComponent(name)
+    workspace.addWorkspaceComponent(rasterComponent)
+    return rasterComponent
 }
 
 fun SimulationScope.addImageWorld(name: String): ImageWorldComponent {

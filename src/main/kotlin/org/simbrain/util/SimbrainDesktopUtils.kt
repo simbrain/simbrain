@@ -70,7 +70,7 @@ suspend fun SimulationScope.place(workspaceComponent: WorkspaceComponent, x: Int
     }
 }
 
-class   ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, true, true), CoroutineScope {
+class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, true, true), CoroutineScope {
 
     @Transient
     private var job = SupervisorJob()

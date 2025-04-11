@@ -372,8 +372,9 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
      * Increment this weight by increment.
      */
     override fun increment() {
-        if (_strength < upperBound) {
-            forceSetStrength(_strength + increment)
+        val newStrength = _strength + increment
+        if (newStrength < upperBound) {
+            forceSetStrength(newStrength)
         }
     }
 
@@ -381,9 +382,9 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
      * Decrement this weight by increment.
      */
     override fun decrement() {
-        if (_strength > lowerBound) {
-            forceSetStrength(_strength - increment)
-            _strength -= increment
+        val newStrength = _strength - increment
+        if (newStrength > lowerBound) {
+            forceSetStrength(newStrength)
         }
     }
 

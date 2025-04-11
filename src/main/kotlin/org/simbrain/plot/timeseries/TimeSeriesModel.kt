@@ -34,9 +34,11 @@ import javax.swing.SwingUtilities
 
 /**
  * Data model for a time series plot. A time series consumes an array of
- * doubles, with one component for each member of the time series. There is no
- * support currently for representing separate scalar values in a single time
- * series.
+ * doubles, with one component for each member of the time series.
+ *
+ * To couple to scalar consumer just couple to a specific time series.
+ *
+ * There is no support for representing separate scalar values in a single time series.
  */
 class TimeSeriesModel : AttributeContainer, EditableObject {
 

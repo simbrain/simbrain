@@ -98,7 +98,7 @@ val operantWithEnvironment = newSim("operant_with_environment") {
         (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).worldPanel.scalingFactor = .5
     }
 
-    setupWorkspace(workspace)
+    setupOperantWithEnvironmentWorkspace(workspace)
 
     addSidebarInfo(
         """
@@ -107,7 +107,7 @@ val operantWithEnvironment = newSim("operant_with_environment") {
         """.trimIndent()
     )
 
-}.registerReopenFunction { workspace -> setupWorkspace(workspace) }
+}.registerReopenFunction { workspace -> setupOperantWithEnvironmentWorkspace(workspace) }
 
 fun updateBehaviorNetNeuronLabels(behaviorNet: NeuronGroup) {
     behaviorNet.neuronList.forEach {
@@ -115,7 +115,7 @@ fun updateBehaviorNetNeuronLabels(behaviorNet: NeuronGroup) {
     }
 }
 
-suspend fun SimulationScope.setupWorkspace(workspace: Workspace) {
+suspend fun SimulationScope.setupOperantWithEnvironmentWorkspace(workspace: Workspace) {
 
     val random = Random(Random.nextLong())
 

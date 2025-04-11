@@ -3,10 +3,7 @@ package org.simbrain.custom_sims
 import org.simbrain.custom_sims.simulations.*
 import org.simbrain.custom_sims.simulations.backprop.activationSequenceThreeLayer
 import org.simbrain.custom_sims.simulations.backprop.activationSequenceTwoLayer
-import org.simbrain.custom_sims.simulations.behaviorism.ClassicalConditioning
-import org.simbrain.custom_sims.simulations.behaviorism.OperantConditioning
-import org.simbrain.custom_sims.simulations.behaviorism.SimpleOperant
-import org.simbrain.custom_sims.simulations.behaviorism.operantWithEnvironment
+import org.simbrain.custom_sims.simulations.behaviorism.*
 import org.simbrain.custom_sims.simulations.demos.competitiveSim
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaosBitStream
@@ -59,9 +56,9 @@ val simulations = dir("Simulations", alphabetical = true ) {
     }
 
     dir("Behaviorism") {
-        item("Simple operant") { SimpleOperant() }
-        item("Classical conditioning") { ClassicalConditioning() }
-        item("Operant conditioning") { OperantConditioning() }
+        item("Simple operant") { simpleOperant }
+        item("Classical conditioning") { classicalConditioning }
+        //item("Operant conditioning") { OperantConditioning() }
         item("Operant with environment") { operantWithEnvironment }
     }
 

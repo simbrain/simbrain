@@ -48,6 +48,11 @@ public class Splasher {
     public static void main(final String[] args) {
 
         System.setProperty("sun.java2d.metal", "true");
+        
+        // Set macOS-specific properties for the application name in the menu bar
+        System.setProperty("apple.laf.useScreenMenuBar", "true");
+        System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Simbrain");
+        System.setProperty("apple.awt.application.name", "Simbrain");
 
         // Set up loggers (other logging config for tinylog is in build.gradle)
         Logger.getLogger("com.jme").setLevel(Level.OFF);

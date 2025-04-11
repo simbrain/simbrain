@@ -224,7 +224,7 @@ object SimbrainDesktop {
     }
 
     init {
-        frame.iconImages = Arrays.asList(
+        frame.iconImages = listOf(
             ResourceManager.getImage("simbrain_iconset/icon_20x20.png"),
             ResourceManager.getImage("simbrain_iconset/icon_32x32.png"),
             ResourceManager.getImage("simbrain_iconset/icon_40x40.png"),
@@ -233,6 +233,83 @@ object SimbrainDesktop {
             ResourceManager.getImage("simbrain_iconset/icon_512x512.png")
         )
         createAndAttachMenus()
+        
+        // Add macOS About menu handler
+        if (Utils.isMacOSX()) {
+            Desktop.getDesktop().setAboutHandler {
+                val aboutDialog = JDialog(null as JFrame?, "About Simbrain")
+                aboutDialog.setLayout(BorderLayout())
+                
+                // Logo at the top
+                val logoPanel = JPanel(FlowLayout(FlowLayout.CENTER))
+                val logoLabel = JLabel()
+                val logoImage = ResourceManager.getImage("simbrain_iconset/icon_128x128.png")
+                logoLabel.icon = ImageIcon(logoImage)
+                logoPanel.add(logoLabel)
+                
+                // Middle section with info
+                val infoPanel = JPanel()
+                infoPanel.layout = BoxLayout(infoPanel, BoxLayout.Y_AXIS)
+                infoPanel.border = BorderFactory.createEmptyBorder(5, 15, 5, 15)
+
+                val titleLabel = JLabel("Simbrain 4")
+                titleLabel.font = Font("SansSerif", Font.BOLD, 18)
+                titleLabel.alignmentX = Component.CENTER_ALIGNMENT
+
+                val versionLabel = JLabel("Version 4.0.0 Beta")
+                versionLabel.font = Font("SansSerif", Font.PLAIN, 14)
+                versionLabel.alignmentX = Component.CENTER_ALIGNMENT
+
+
+                val descriptionLabel = JLabel("A framework for neural network simulation")
+                descriptionLabel.alignmentX = Component.CENTER_ALIGNMENT
+                
+                infoPanel.add(Box.createVerticalStrut(10))
+                infoPanel.add(titleLabel)
+                infoPanel.add(Box.createVerticalStrut(5))
+                infoPanel.add(versionLabel)
+                infoPanel.add(Box.createVerticalStrut(10))
+                infoPanel.add(descriptionLabel)
+                infoPanel.add(Box.createVerticalStrut(10))
+
+                // Links
+                val linkPanel = JPanel()
+                linkPanel.layout = BoxLayout(linkPanel, BoxLayout.Y_AXIS)
+                linkPanel.border = BorderFactory.createEmptyBorder(0, 0, 10, 0)
+                
+                val websiteButton = JButton("Visit Simbrain Website")
+                websiteButton.addActionListener { 
+                    Utils.displayURLInBrowser("https://simbrain.net")
+                }
+                websiteButton.alignmentX = Component.CENTER_ALIGNMENT
+                
+                val creditsButton = JButton("View Credits")
+                creditsButton.addActionListener { 
+                    Utils.displayURLInBrowser("https://simbrain.net/SimbrainCredits.html")
+                }
+                creditsButton.alignmentX = Component.CENTER_ALIGNMENT
+                
+                linkPanel.add(websiteButton)
+                linkPanel.add(Box.createVerticalStrut(5))
+                linkPanel.add(creditsButton)
+
+                // Add all components to the dialog
+                val centerPanel = JPanel(BorderLayout())
+                centerPanel.add(logoPanel, BorderLayout.NORTH)
+                centerPanel.add(infoPanel, BorderLayout.CENTER)
+                
+                aboutDialog.add(centerPanel, BorderLayout.CENTER)
+                aboutDialog.add(linkPanel, BorderLayout.SOUTH)
+
+                // Configure dialog
+                aboutDialog.size = Dimension(375, 380)
+                aboutDialog.isResizable = false
+                aboutDialog.isVisible = true
+
+                aboutDialog.setLocationRelativeTo(null)
+            }
+        }
+        
         wsToolBar = createToolBar()
         createContextMenu()
         val events = workspace.events
@@ -1046,6 +1123,13 @@ object SimbrainDesktop {
     @JvmStatic
     fun main(args: Array<String>) {
         try {
+            // Set macOS-specific properties for menu bar
+            if (Utils.isMacOSX()) {
+                System.setProperty("apple.laf.useScreenMenuBar", "true")
+                System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Simbrain")
+                System.setProperty("apple.awt.application.name", "Simbrain")
+            }
+            
             // Line below for Ubuntu so that icons don't turn on by default
             // See https://stackoverflow.com/questions/10356725/jdesktoppane-has-a-toolbar-at-bottom-of-window-on-linux
             if (Utils.isLinux()) {

@@ -1,24 +1,26 @@
 package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.*
+import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connections.Sparse
-import org.simbrain.network.core.addNeuronCollection
-import org.simbrain.network.core.connect
+import org.simbrain.network.core.*
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.updaterules.NakaRushtonRule
+import org.simbrain.plot.projection.ProjectionComponent
 import org.simbrain.plot.projection.ProjectionDesktopComponent
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.util.projection.PCAProjection
 import org.simbrain.util.showNumericInputDialog
 import org.simbrain.util.stats.distributions.UniformRealDistribution
+import org.simbrain.workspace.Workspace
 import javax.swing.JOptionPane
 
 /**
  * Create with a recurrent neuron collection and a projection with a control panel to
  */
-val recurrentProjection = newSim {
+val recurrentProjection = newSim("recurrent_projection") {
 
     val numNeurons = showNumericInputDialog("Number of Neurons:", 25)?:return@newSim
 
@@ -52,18 +54,9 @@ val recurrentProjection = newSim {
     withGui {
         place(networkComponent, 210, 0, 600, 600)
         place(projectionPlot, 810, 0, 600, 600)
-        createControlPanel("Controls", 0, 0) {
-            addButton("Randomize activations") {
-                recurrentNet.randomize(UniformRealDistribution(0.0, 100.0))
-            }
-            addButton("Randomize Weights") {
-                wts.forEach { it.randomize(UniformRealDistribution(-10.0, 10.0)) }
-            }
-            addButton("Clear Plot") {
-                (getDesktopComponent(projectionPlot) as ProjectionDesktopComponent).clearData()
-            }
-        }
     }
+
+    setUpRecurrentSim(workspace)
 
     addSidebarInfo(
         """
@@ -126,4 +119,26 @@ val recurrentProjection = newSim {
             """.trimIndent()
     )
 
+}.registerReopenFunction { workspace -> setUpRecurrentSim(workspace) }
+
+suspend fun SimulationScope.setUpRecurrentSim(workspace: Workspace) {
+
+    val network = workspace.componentList.filterIsInstance<NetworkComponent>().first().network
+    val projectionPlot = workspace.componentList.filterIsInstance<ProjectionComponent>().first()
+    val recurrentNet = network.getModelById<NeuronCollection>("NeuronCollection_1")
+    val wts = network.flatSynapseList
+
+    withGui {
+        createControlPanel("Controls", 0, 0) {
+            addButton("Randomize activations") {
+                recurrentNet.randomize(UniformRealDistribution(0.0, 100.0))
+            }
+            addButton("Randomize Weights") {
+                wts.forEach { it.randomize(UniformRealDistribution(-10.0, 10.0)) }
+            }
+            addButton("Clear Plot") {
+                (getDesktopComponent(projectionPlot) as ProjectionDesktopComponent).clearData()
+            }
+        }
+    }
 }

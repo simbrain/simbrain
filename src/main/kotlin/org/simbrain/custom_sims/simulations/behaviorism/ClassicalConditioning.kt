@@ -85,17 +85,15 @@ val classicalConditioning = newSim("classical conditioning") {
     plot.model.fixedWidth = true
     plot.model.windowSize = 1500
     with(couplingManager) {
-        //  Set up cheese and bell sensor
-        couplingManager.createCoupling(
-            swissSensor.getProducer(ObjectSensor::currentValue),
-            cheeseDetectorNeuron.getConsumer(Neuron::addInputValue))
-        couplingManager.createCoupling(
-            bellSensor.getProducer(ObjectSensor::currentValue),
-            bellDetectorNeuron.getConsumer(Neuron::addInputValue))
-        // Plot synapse strength
-        couplingManager.createCoupling(
-            association.getProducer("getStrength"),
-            plot.model.timeSeriesList[0].getConsumer("setValue"))
+        // Couple sensors to neurons
+        swissSensor.getProducer(ObjectSensor::currentValue) couple
+                cheeseDetectorNeuron.getConsumer(Neuron::addInputValue)
+        bellSensor.getProducer(ObjectSensor::currentValue) couple
+                bellDetectorNeuron.getConsumer(Neuron::addInputValue)
+
+        // Plot association strength
+        association.getProducer("getStrength") couple
+                plot.model.timeSeriesList[0].getConsumer("setValue")
     }
 
     withGui {

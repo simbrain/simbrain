@@ -96,6 +96,10 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
         description = "Clear all points",
         iconPath = "menu_icons/Eraser.png"
     ) {
+        clearData()
+    }
+
+    fun clearData() {
         synchronized(projector.dataset) {
             stopIterating()
             projector.dataset.kdTree.clear()

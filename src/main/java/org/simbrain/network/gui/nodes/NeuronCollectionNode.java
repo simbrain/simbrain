@@ -20,6 +20,7 @@ package org.simbrain.network.gui.nodes;
 
 import org.simbrain.network.core.AbstractNeuronCollection;
 import org.simbrain.network.core.NeuronCollection;
+import org.simbrain.network.core.SpikingNeuronUpdateRule;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.util.ResourceManager;
@@ -157,6 +158,14 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
                 neuronCollection.getDisplayName() + " Activations",
                 "Plot Activations"
         ));
+        if (neuronCollection.getNeuronList().stream().findFirst().stream().anyMatch(it -> it.getUpdateRule() instanceof SpikingNeuronUpdateRule<?, ?>)) {
+            menu.add(
+                    SimbrainDesktop.INSTANCE.getActionManager().createCoupledRasterPlotAction(
+                            SimbrainDesktop.INSTANCE.getWorkspace().getCouplingManager().getProducer(neuronCollection, "getSpikes"),
+                            neuronCollection.getDisplayName() + " Spikes"
+                    )
+            );
+        }
 
         // Coupling menu
         menu.addSeparator();

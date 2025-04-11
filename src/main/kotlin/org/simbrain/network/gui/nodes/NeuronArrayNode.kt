@@ -451,6 +451,14 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                     menuTitle = "Plot Biases"
                 )
             )
+            if (neuronArray.updateRule.isSpikingRule) {
+                contextMenu.add(
+                    actionManager.createCoupledRasterPlotAction(
+                        neuronArray.getProducer(NeuronArray::spikes),
+                        "${neuronArray.displayName} Spikes"
+                    )
+                )
+            }
             contextMenu.add(actionManager.createImageInput(
                 neuronArray.getConsumer(NeuronArray::activationArray),
                 neuronArray.size,

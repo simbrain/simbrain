@@ -590,7 +590,7 @@ public class Utils {
      * @return whether the system is a Mac os x.
      */
     public static boolean isMacOSX() {
-        return Utils.getOSMatches("Mac OS X");
+        return getOSMatches("Mac");
     }
 
     public static boolean isM1Mac() {

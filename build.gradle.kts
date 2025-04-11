@@ -40,7 +40,10 @@ val simbrainJvmArgs = listOf(
     "--add-opens", "java.desktop/java.awt.geom=ALL-UNNAMED",
     "--add-opens", "java.base/java.util.concurrent=ALL-UNNAMED",
     "--add-opens", "java.base/java.util.concurrent.atomic=ALL-UNNAMED",
-    "--add-opens", "java.base/java.lang=ALL-UNNAMED"
+    "--add-opens", "java.base/java.lang=ALL-UNNAMED",
+    "-Dapple.laf.useScreenMenuBar=true",
+    "-Dcom.apple.mrj.application.apple.menu.about.name=Simbrain",
+    "-Dapple.awt.application.name=Simbrain"
 )
 
 application {
@@ -287,6 +290,8 @@ if (OperatingSystem.current().isMacOsX) {
                 "--icon", iconFile,
                 "--java-options", jvmArgs,
                 "--type", "app-image",
+                "--mac-package-name", "Simbrain",
+                "--mac-package-identifier", "org.simbrain"
             )
         }
 

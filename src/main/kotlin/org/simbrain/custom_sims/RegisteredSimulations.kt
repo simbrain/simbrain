@@ -3,11 +3,14 @@ package org.simbrain.custom_sims
 import org.simbrain.custom_sims.simulations.*
 import org.simbrain.custom_sims.simulations.backprop.activationSequenceThreeLayer
 import org.simbrain.custom_sims.simulations.backprop.activationSequenceTwoLayer
-import org.simbrain.custom_sims.simulations.behaviorism.*
+import org.simbrain.custom_sims.simulations.behaviorism.classicalConditioning
+import org.simbrain.custom_sims.simulations.behaviorism.operantWithEnvironment
+import org.simbrain.custom_sims.simulations.behaviorism.simpleOperant
 import org.simbrain.custom_sims.simulations.demos.competitiveSim
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaosBitStream
 import org.simbrain.custom_sims.simulations.neuroscience.cortexSimple
+import org.simbrain.custom_sims.simulations.neuroscience.integrateAndFireSimulation
 import org.simbrain.custom_sims.simulations.nlp.tinyLanguageModel
 import org.simbrain.custom_sims.simulations.patterns_of_activity.cogMap3Objects
 import org.simbrain.custom_sims.simulations.patterns_of_activity.iacJetsSharks5People
@@ -85,6 +88,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         // item("Hippocampus") { Hippocampus() }
         // item("Cerebellum") { Cerebellum() }
         item("Cortical layers") { cortexSimple }
+        item("Integrate and Fire Network") { integrateAndFireSimulation }
     }
 
     dir("Evolution") {

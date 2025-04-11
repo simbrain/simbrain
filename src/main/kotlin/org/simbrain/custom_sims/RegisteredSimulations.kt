@@ -6,6 +6,8 @@ import org.simbrain.custom_sims.simulations.backprop.activationSequenceTwoLayer
 import org.simbrain.custom_sims.simulations.behaviorism.classicalConditioning
 import org.simbrain.custom_sims.simulations.behaviorism.operantWithEnvironment
 import org.simbrain.custom_sims.simulations.behaviorism.simpleOperant
+import org.simbrain.custom_sims.simulations.braitenberg.avoider
+import org.simbrain.custom_sims.simulations.braitenberg.pursuer
 import org.simbrain.custom_sims.simulations.demos.competitiveSim
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaosBitStream
@@ -45,9 +47,11 @@ val simulations = dir("Simulations", alphabetical = true ) {
     }
 
     dir("Braitenberg") {
-        item("Isopod simulation") { isopodSim }
-        item("Two Braitenberg vehicles") { braitenbergSim }
+        item("Pursuer") { pursuer }
+        item("Avoider") { avoider }
         item("Braitenberg game") { braitenbergGame }
+        item("Two Braitenberg vehicles") { braitenbergSim }
+        item("Isopod simulation") { isopodSim }
     }
 
     dir("Reservoir networks") {

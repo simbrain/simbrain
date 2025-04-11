@@ -1,9 +1,7 @@
 package org.simbrain.custom_sims.simulations.neuroscience
 
 import kotlinx.coroutines.runBlocking
-import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.couplingManager
-import org.simbrain.custom_sims.newSim
+import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.connections.polarizeSynapses
 import org.simbrain.network.core.NeuronCollection
@@ -13,6 +11,7 @@ import org.simbrain.network.updaterules.IntegrateAndFireRule
 import org.simbrain.plot.rasterchart.RasterPlotComponent
 import org.simbrain.util.place
 import org.simbrain.util.point
+import org.simbrain.util.showNumericInputDialog
 import org.simbrain.util.stats.distributions.NormalDistribution
 import kotlin.math.sqrt
 
@@ -22,8 +21,9 @@ import kotlin.math.sqrt
  */
 val integrateAndFireSimulation = newSim {
 
-    // Parameters 
-    val numNeurons = 49
+
+    val numNeurons = showNumericInputDialog("Number of Neurons:", 49) ?: return@newSim
+
     val gridSpace = 50.0
     val sparsity = 0.05 // Percent of possible connections to make
     val excitatoryRatio = 5.0 // Percent of connections that will be excitatory
@@ -38,16 +38,18 @@ val integrateAndFireSimulation = newSim {
     
     // Create neurons with integrate and fire rules
     val neurons = buildList {
-        val neuron = runBlocking {
-            network.addNeuron {
-                updateRule = IntegrateAndFireRule().apply {
-                    timeConstant = 5.0
-                    resetPotential = 2.0
-                    threshold = 11.0
+        repeat(numNeurons) {
+            val neuron = runBlocking {
+                network.addNeuron {
+                    updateRule = IntegrateAndFireRule().apply {
+                        timeConstant = 5.0
+                        resetPotential = 2.0
+                        threshold = 11.0
+                    }
                 }
             }
+            add(neuron)
         }
-        add(neuron)
     }
 
     val neuronCollection = NeuronCollection(neurons)
@@ -95,16 +97,18 @@ val integrateAndFireSimulation = newSim {
     
     // Position components in the GUI
     withGui {
-        place(networkComponent) {
-            location = point(10, 10)
-            width = 500
-            height = 500
-        }
-        
-        place(rasterPlot) {
-            location = point(520, 10)
-            width = 500
-            height = 500
+        place(networkComponent, 210, 0, 600, 600)
+        place(rasterPlot, 810, 0, 600, 600)
+        createControlPanel("Controls", 0, 0) {
+            addButton("Randomize Activations") {
+                neuronCollection.randomize()
+            }
+            addButton("Sparsity") {
+                // TODO
+            }
+            addButton("Excitatory Ratio") {
+               // TODO
+            }
         }
     }
     
@@ -113,4 +117,42 @@ val integrateAndFireSimulation = newSim {
         neuronCollection.getProducer(neuronCollection::spikes) couple
             rasterPlot.model.rasterConsumerList[0].getConsumer("setValues")
     }
+
+    addSidebarInfo(
+        """
+            # Integrate-and-Fire Network with Raster Plot
+            
+            ## Overview
+            
+            This simulation allows users to explore the dynamics of a recurrent network of integrate-and-fire neurons. 
+            It's also a good way to learn how **raster plots** can be used to visualize neural spike patterns and how 
+            network structure influences those patterns.
+            
+            ## What You Can Do
+            
+            - **Observe spike dynamics** in a live raster plot.
+            - **Adjust connectivity parameters** like sparsity and excitatory/inhibitory balance.
+            - **Randomize neuron activations** to explore new initial states.
+            - **Rebuild the network** to see how changes in structure affect emergent activity patterns.
+            
+            ## Key Concepts
+            
+            - **Integrate-and-Fire Neurons:** Simple neuron models that spike when their potential exceeds a threshold.
+            - **Raster Plot:** A graphical display of spikes across neurons over time. Each row corresponds to a neuron, and each tick marks a spike.
+            - **Sparsity:** Controls the proportion of possible synaptic connections that are actually created.
+            - **Excitatory Ratio:** Specifies the percentage of synapses that are excitatory versus inhibitory.
+            
+            ## How to Use
+            
+            1. **Start the simulation** (click "Run" in the toolbar).
+            2. Click **"Randomize Activations"** to explore different starting points.
+            3. Adjust **sparsity** or **excitatory ratio** using the respective buttons. Each change rebuilds the network.
+            4. Watch how changes affect the raster plot: 
+               - Are the neurons spiking in synchrony?
+               - Are patterns regular (limit cycles) or irregular (chaotic)?
+            
+            This hands-on tool provides an intuitive way to explore spiking neural dynamics and network connectivity.
+
+            """.trimIndent()
+    )
 }

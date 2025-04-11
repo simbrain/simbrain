@@ -86,8 +86,8 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Spike responders (array)") { spikeResponderSimArray }
         // item("Hippocampus") { Hippocampus() }
         // item("Cerebellum") { Cerebellum() }
-        item("Cortical layers") { cortexSimple }
         item("Integrate and Fire Network") { integrateAndFireSimulation }
+        item("Cortical layers") { cortexSimple }
         item("Cortical areas") { cortexKuramoto }
     }
 

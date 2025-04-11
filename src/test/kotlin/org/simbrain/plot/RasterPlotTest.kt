@@ -5,7 +5,9 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.NeuronArray
+import org.simbrain.network.updaterules.SpikingThresholdRule
 import org.simbrain.plot.rasterchart.RasterPlotComponent
+import org.simbrain.util.setValuesInPlace
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.serialization.WorkspaceSerializer
 import java.io.ByteArrayInputStream
@@ -24,15 +26,15 @@ class RasterPlotTest {
         nc.network.addNetworkModel(na)
         workspace.addWorkspaceComponent(nc)
         workspace.addWorkspaceComponent(rpc)
+    }
+
+    @Test
+    fun `test raster plot communication`() {
         with(workspace.couplingManager) {
             na couple rpc.model.rasterConsumerList[0]
         }
         // Should produce (1,2) and (1,4) since after 1 iteration, since second and fourth components are above threshld
         na.activationArray = doubleArrayOf(-1.0, 0.0, 1.0, 0.0, 2.0)
-    }
-
-    @Test
-    fun `test raster plot communication`() {
         workspace.simpleIterate()
         assertEquals(1.0, rpc.model.dataset.getSeries(0).getDataItem(0).xValue)
         assertEquals(2.0, rpc.model.dataset.getSeries(0).getDataItem(0).yValue)
@@ -47,7 +49,28 @@ class RasterPlotTest {
     }
 
     @Test
+    fun `test raster plot with spiking neurons`() {
+        with(workspace.couplingManager) {
+            na.getProducer(na::spikes) couple rpc.model.rasterConsumerList[0].getConsumer("setValues")
+        }
+        na.isClamped = false
+        na.updateRule = SpikingThresholdRule()
+        na.inputs.setValuesInPlace { i, j -> if ((i + j) % 2 == 1 ) 100.0 else -100.0 }
+        workspace.simpleIterate()
+        workspace.simpleIterate()
+        assertEquals(2.0, rpc.model.dataset.getSeries(0).getDataItem(1).xValue)
+        assertEquals(1.0, rpc.model.dataset.getSeries(0).getDataItem(1).yValue)
+        assertEquals(2.0, rpc.model.dataset.getSeries(0).getDataItem(2).xValue)
+        assertEquals(3.0, rpc.model.dataset.getSeries(0).getDataItem(2).yValue)
+    }
+
+    @Test
     fun `test serialization`() {
+        with(workspace.couplingManager) {
+            na couple rpc.model.rasterConsumerList[0]
+        }
+        // Should produce (1,2) and (1,4) since after 1 iteration, since second and fourth components are above threshld
+        na.activationArray = doubleArrayOf(-1.0, 0.0, 1.0, 0.0, 2.0)
 
         val serializer = WorkspaceSerializer(workspace)
         workspace.simpleIterate()

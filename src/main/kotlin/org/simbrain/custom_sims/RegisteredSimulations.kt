@@ -130,19 +130,16 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Iris classifier") { irisClassifier }
     }
 
-    dir("Projection") {
-        item("PCA projection") { projectionSim }
-    }
 
     dir("Recurrent networks") {
-        item("Basic recurrent net") { recurrentProjection }
+        item("Recurrent net") { recurrentProjection }
+        item("Recurrent net (array)") { recurrentNetArrayBased }
         item("IAC Jets Sharks 5 People") { iacJetsSharks5People }
     }
 
     dir("Reinforcement learning") {
         item("Actor critic") { actorCritic }
     }
-
 
     // dir("Other Demos") {
     //     item("SRN - Temporal XOR") { srnXORSim }

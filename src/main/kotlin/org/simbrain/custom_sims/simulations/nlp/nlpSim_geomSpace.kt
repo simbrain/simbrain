@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations
 
-import org.simbrain.custom_sims.addProjectionPlot2
+import org.simbrain.custom_sims.addProjectionPlot
 import org.simbrain.custom_sims.addTextWorld
 import org.simbrain.custom_sims.newSim
 import org.simbrain.custom_sims.readSimulationFileContents
@@ -48,7 +48,7 @@ val nlpSimBasic = newSim {
     }
 
     // Location of the projection in the desktop
-    val projectionPlot = addProjectionPlot2("Activations")
+    val projectionPlot = addProjectionPlot("Activations")
     projectionPlot.projector.tolerance = .2
     projectionPlot.projector.projectionMethod = PCAProjection()
     projectionPlot.projector.coloringManager = HaloColoringManager().apply{

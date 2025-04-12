@@ -115,12 +115,6 @@ suspend fun SimulationScope.addProjectionPlot(name: String): ProjectionComponent
     return projectionComponent
 }
 
-suspend fun SimulationScope.addProjectionPlot2(name: String): ProjectionComponent {
-    val projectionComponent = ProjectionComponent(name)
-    workspace.addWorkspaceComponent(projectionComponent)
-    return projectionComponent
-}
-
 suspend fun SimulationScope.addRasterPlot(name: String): RasterPlotComponent {
     val rasterComponent = RasterPlotComponent(name)
     workspace.addWorkspaceComponent(rasterComponent)

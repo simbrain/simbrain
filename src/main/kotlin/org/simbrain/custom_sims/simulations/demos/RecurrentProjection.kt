@@ -42,7 +42,7 @@ val recurrentProjection = newSim("recurrent_projection") {
         })
 
     // Location of the projection in the desktop
-    val projectionPlot = addProjectionPlot2("Activations")
+    val projectionPlot = addProjectionPlot("Activations")
     projectionPlot.projector.tolerance = .1
     projectionPlot.projector.projectionMethod = PCAProjection()
 

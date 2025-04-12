@@ -114,7 +114,7 @@ val cogMap3Objects = newSim {
     }
 
     // Plot
-    val projectionPlot = addProjectionPlot2("Cognitive Map")
+    val projectionPlot = addProjectionPlot("Cognitive Map")
     projectionPlot.projector.tolerance = .9
     projectionPlot.projector.connectPoints = false
     projectionPlot.projector.baseColor = Color.GRAY.brighter()

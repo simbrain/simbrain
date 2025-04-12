@@ -141,7 +141,7 @@ val allostaticPatternCompletion = newSim {
     }
 
     // PCA
-    val pca = addProjectionPlot2("Activations")
+    val pca = addProjectionPlot("Activations")
     pca.projector.tolerance = .2
     pca.projector.projectionMethod = PCAProjection()
     withGui {

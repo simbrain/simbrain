@@ -25,6 +25,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.simbrain.plot.raster.RasterModel;
 import org.simbrain.util.SwingUtilsKt;
 
 import javax.swing.*;
@@ -51,17 +52,17 @@ public class RasterPlotPanel extends JPanel {
     /**
      * Panel for chart.
      */
-    private ChartPanel chartPanel = new ChartPanel(null);
+    private final ChartPanel chartPanel = new ChartPanel(null);
 
     /**
      * Data model.
      */
-    private RasterModel model;
+    private final RasterModel model;
 
     /**
      * Button panel.
      */
-    private JPanel buttonPanel = new JPanel();
+    private final JPanel buttonPanel = new JPanel();
 
     /**
      * Renderer object where things like dot color and size are set.
@@ -99,7 +100,7 @@ public class RasterPlotPanel extends JPanel {
         chart = ChartFactory.createScatterPlot("", // Title
             "Iterations", // x-axis Label
             "Value(s)", // y-axis Label
-            model.getDataset(), // Dataset
+                model.dataset, // Dataset
             PlotOrientation.VERTICAL, // Plot Orientation
             true, // Show Legend
             true, // Use tooltips
@@ -123,12 +124,6 @@ public class RasterPlotPanel extends JPanel {
         renderer.setSeriesShape(1, shape2);
         renderer.setSeriesShape(2, shape1);
         renderer.setSeriesShape(3, shape2);
-
-        // Handle range properties
-        chart.getXYPlot().getRangeAxis().setAutoRange(model.isAutoRange());
-        if (!model.isAutoRange()) {
-            chart.getXYPlot().getRangeAxis().setRange(model.getRangeLowerBound(), model.getRangeUpperBound());
-        }
 
         // Handle domain properties
         if (model.isFixedWidth()) {

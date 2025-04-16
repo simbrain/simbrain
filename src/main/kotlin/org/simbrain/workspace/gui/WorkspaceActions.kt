@@ -27,7 +27,7 @@ import org.simbrain.plot.piechart.PieChartModel
 import org.simbrain.plot.pixelplot.PixelPlot
 import org.simbrain.plot.pixelplot.PixelPlotComponent
 import org.simbrain.plot.projection.ProjectionComponent
-import org.simbrain.plot.rasterchart.RasterModel
+import org.simbrain.plot.raster.RasterModel
 import org.simbrain.plot.rasterchart.RasterPlotComponent
 import org.simbrain.plot.timeseries.TimeSeriesModel
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent

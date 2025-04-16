@@ -18,6 +18,7 @@
  */
 package org.simbrain.plot.rasterchart;
 
+import org.simbrain.plot.raster.RasterModel;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;

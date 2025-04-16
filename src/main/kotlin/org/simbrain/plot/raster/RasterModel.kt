@@ -16,93 +16,80 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.plot.rasterchart;
+package org.simbrain.plot.raster
 
-import com.thoughtworks.xstream.XStream;
-import org.jfree.data.xy.XYSeries;
-import org.jfree.data.xy.XYSeriesCollection;
-import org.simbrain.util.UserParameter;
-import org.simbrain.util.XStreamUtils;
-import org.simbrain.util.propertyeditor.EditableObject;
-import org.simbrain.workspace.AttributeContainer;
-import org.simbrain.workspace.Consumable;
-
-import javax.swing.*;
-import java.lang.reflect.InvocationTargetException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Supplier;
+import com.thoughtworks.xstream.XStream
+import org.jfree.data.xy.XYSeries
+import org.jfree.data.xy.XYSeriesCollection
+import org.simbrain.util.UserParameter
+import org.simbrain.util.getSimbrainXStream
+import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.workspace.AttributeContainer
+import org.simbrain.workspace.Consumable
+import java.lang.reflect.InvocationTargetException
+import java.util.function.Supplier
+import javax.swing.SwingUtilities
 
 /**
  * Data model for a raster plot.
  */
-public class RasterModel implements EditableObject {
+class RasterModel(timeSupplier: Supplier<Int>) : EditableObject {
 
     /**
-     * Default number of data sources for plot initialization.
+     * List of [RasterConsumer]'s that consume raster data.
      */
-    private static final int INITIAL_DATA_SOURCES = 1;
-
-    /**
-     * List of {@link RasterConsumer}'s that consume raster data.
-     */
-    private final List<RasterConsumer> rasterConsumerList = new ArrayList<>();
+    val rasterConsumerList: MutableList<RasterConsumer> = ArrayList()
 
     /**
      * Lambda to supply time to the time series model.
      */
-    private transient Supplier<Integer> timeSupplier;
+    @Transient
+    var timeSupplier: Supplier<Int>
 
     /**
      * Raster Data.
      */
-    private final XYSeriesCollection dataset = new XYSeriesCollection();
+    @JvmField
+    val dataset: XYSeriesCollection = XYSeriesCollection()
 
-    /**
-     * Should the range automatically change to reflect the data.
-     */
-    @UserParameter(label = "Auto Range", order = 3)
-    private boolean autoRange = true;
+    @UserParameter(
+        label = "Dot Size",
+        description = "Size of dots in chart",
+        order = 5)
+    var dotSize: Int = 4
 
-    /**
-     * Size of window.
-     */
-    @UserParameter(label = "Dot Size", description = "Size of dots in chart", order = 5)
-    private final int dotSize = 4;
-
-    /**
-     * Size of window.
-     */
-    @UserParameter(label = "Window Size", order = 5)
-    private int windowSize = 100;
-
-    /**
-     * Upper bound of the chart range.
-     */
-    @UserParameter(label = "Range upper Bound", order = 10)
-    private double rangeUpperBound = 1;
-
-    /**
-     * Lower bound of the chart range.
-     */
-    @UserParameter(label = "Range Lower Bound", order = 20)
-    private double rangeLowerBound = 0;
+    var windowSize: Int by GuiEditable(
+        initValue = 100,
+        label = "Window Size",
+        description = "How many time points can be contained in the window",
+        conditionallyEnabledBy = RasterModel::isFixedWidth,
+        order = 10
+    )
 
     /**
      * Whether this chart if fixed width or not.
      */
-    @UserParameter(label = "Fixed width", order = 30)
-    private boolean fixedWidth = true;
+    @UserParameter(
+        label = "Fixed width",
+        description = "If true, the raster window never extends beyond a fixed with",
+        order = 30
+    )
+    var isFixedWidth: Boolean = true
 
-    @UserParameter(label = "Spike Threshold", order = 40)
-    double spikeThreshold = 0.5;
+    @UserParameter(
+        label = "Spike Threshold",
+        description = "For nonspiking neurons activation above this is taken to be a spike",
+        order = 40
+    )
+    var spikeThreshold: Double = 0.5
 
     /**
      * Raster series model constructor.
      */
-    public RasterModel(Supplier<Integer> timeSupplier) {
-        addDataSources(INITIAL_DATA_SOURCES);
-        this.timeSupplier = timeSupplier;
+    init {
+        addDataSources(INITIAL_DATA_SOURCES)
+        this.timeSupplier = timeSupplier
     }
 
     /**
@@ -111,169 +98,119 @@ public class RasterModel implements EditableObject {
      *
      * @param numDataSources number of data sources to initialize plot with
      */
-    public void addDataSources(final int numDataSources) {
-        for (int i = 0; i < numDataSources; i++) {
-            addDataSource();
+    fun addDataSources(numDataSources: Int) {
+        for (i in 0 until numDataSources) {
+            addDataSource()
         }
     }
 
     /**
      * Removes a data source from the chart.
      */
-    public void removeDataSource() {
-        Integer lastSeriesIndex = dataset.getSeriesCount() - 1;
+    fun removeDataSource() {
+        val lastSeriesIndex = dataset.seriesCount - 1
         if (lastSeriesIndex > 0) {
-            dataset.removeSeries(lastSeriesIndex);
-            rasterConsumerList.remove(lastSeriesIndex);
+            dataset.removeSeries(lastSeriesIndex)
+            rasterConsumerList.removeAt(lastSeriesIndex)
         }
-
     }
 
     /**
      * Adds a data source to the chart.
      */
-    public void addDataSource() {
-        Integer currentSize = dataset.getSeriesCount();
-        dataset.addSeries(new XYSeries(currentSize + 1));
-        rasterConsumerList.add(new RasterConsumer(currentSize));
+    fun addDataSource() {
+        val currentSize = dataset.seriesCount
+        dataset.addSeries(XYSeries(currentSize + 1))
+        rasterConsumerList.add(RasterConsumer(currentSize))
     }
 
     /**
      * Clears the plot.
      */
-    public void clearData() {
-        int seriesCount = dataset.getSeriesCount();
-        for (int i = 0; seriesCount > i; ++i) {
-            dataset.getSeries(i).clear();
+    fun clearData() {
+        val seriesCount = dataset.seriesCount
+        var i = 0
+        while (seriesCount > i) {
+            dataset.getSeries(i).clear()
+            ++i
         }
     }
 
-    public XYSeriesCollection getDataset() {
-        return dataset;
+    /**
+     * See [org.simbrain.workspace.serialization.WorkspaceComponentDeserializer]
+     */
+    private fun readResolve(): Any {
+        return this
     }
+
 
     /**
-     * Returns a properly initialized xstream object.
-     *
-     * @return the XStream object
+     * Objects that represent separate sets of raster points, shown in a different color in the
+     * chart.
      */
-    public static XStream getXStream() {
-        XStream xstream = XStreamUtils.getSimbrainXStream();
-        return xstream;
-    }
-
-    /**
-     * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
-     */
-    private Object readResolve() {
-        return this;
-    }
-
-    public boolean isFixedWidth() {
-        return fixedWidth;
-    }
-
-    public void setFixedWidth(final boolean fixedWidth) {
-        this.fixedWidth = fixedWidth;
-    }
-
-
-    public List<RasterConsumer> getRasterConsumerList() {
-        return rasterConsumerList;
-    }
-
-    public Supplier<Integer> getTimeSupplier() {
-        return timeSupplier;
-    }
-
-    public int getDotSize() {
-        return dotSize;
-    }
-
-    public int getWindowSize() {
-        return windowSize;
-    }
-
-    public void setWindowSize(final int windowSize) {
-        this.windowSize = windowSize;
-    }
-
-    public boolean isAutoRange() {
-        return autoRange;
-    }
-
-    public void setAutoRange(final boolean autoRange) {
-        this.autoRange = autoRange;
-    }
-
-    public double getRangeUpperBound() {
-        return rangeUpperBound;
-    }
-
-    public void setRangeUpperBound(final double upperBound) {
-        this.rangeUpperBound = upperBound;
-    }
-
-    public double getRangeLowerBound() {
-        return rangeLowerBound;
-    }
-
-    public void setRangeLowerBound(final double lowerRangeBoundary) {
-        this.rangeLowerBound = lowerRangeBoundary;
-    }
-
-    public void setTimeSupplier(Supplier<Integer> timeSupplier) {
-        this.timeSupplier = timeSupplier;
-    }
-
-    /**
-     *  Objects that represent separate sets of raster points, shown in a different color in the
-     *      chart.
-     */
-    public class RasterConsumer implements AttributeContainer {
-
+    inner class RasterConsumer internal constructor(index: Int) : AttributeContainer {
         /**
-         * Index of this consumer in an {@link XYSeriesCollection}
+         * Index of this consumer in an [XYSeriesCollection]
          */
-        int index = 0;
+        var index: Int = 0
 
-        RasterConsumer(int index) {
-            this.index = index;
+        init {
+            this.index = index
         }
 
         /**
          * Plot an array of values as a vertical bar in a raster plot. Each component of the array is associated with one row of the plot.
          * Canonically used to display spiking data, represented with binary vectors. If real-values (e.g. activations) are sent in, then values above a threshold (default .5) are interpreted as spikes
-         * <br>
+         * <br></br>
          * Example 1: [0, 1, 0, 0 , 1] would show 2 dots vertically at the 2nd and 5th position at the current time
-         * <br>
+         * <br></br>
          * Example 2: [0.0, 0.6, -0.3, 0.0, 1.0] would show 2 dots vertically at the 2nd and 5th position at the current time
          */
-        @Consumable()
-        public void setValues(final double[] values) {
+        @Consumable
+        fun setValues(values: DoubleArray) {
             try {
-                SwingUtilities.invokeAndWait(() -> {
-                    var udpated = false;
-                    for (int i = 0, n = values.length; i < n; i++) {
+                SwingUtilities.invokeAndWait {
+                    var udpated = false
+                    var i = 0
+                    val n = values.size
+                    while (i < n) {
                         if (values[i] >= spikeThreshold) {
-                            getDataset().getSeries(index).add(timeSupplier.get(), Double.valueOf(i));
-                            udpated = true;
+                            dataset.getSeries(index).add(timeSupplier.get(), i)
+                            udpated = true
                         }
+                        i++
                     }
                     if (!udpated) {
-                        getDataset().getSeries(index).add(timeSupplier.get(), null);
+                        dataset.getSeries(index).add(timeSupplier.get(), null)
                     }
-                });
-            } catch (InterruptedException | InvocationTargetException e) {
-                throw new RuntimeException(e);
+                }
+            } catch (e: InterruptedException) {
+                throw RuntimeException(e)
+            } catch (e: InvocationTargetException) {
+                throw RuntimeException(e)
             }
         }
 
-        @Override
-        public String getId() {
-            return "Raster " + (index + 1);
-        }
-
+        override val id: String
+            get() = "Raster " + (index + 1)
     }
 
+    companion object {
+        /**
+         * Default number of data sources for plot initialization.
+         */
+        private const val INITIAL_DATA_SOURCES = 1
+
+        @JvmStatic
+        val xStream: XStream
+            /**
+             * Returns a properly initialized xstream object.
+             *
+             * @return the XStream object
+             */
+            get() {
+                val xstream = getSimbrainXStream()
+                return xstream
+            }
+    }
 }

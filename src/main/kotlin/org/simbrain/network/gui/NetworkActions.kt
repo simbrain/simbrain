@@ -137,7 +137,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Delete",
         description = """Delete selected node(s) ("Backspace" or "Delete")""",
         enablingCondition = EnablingCondition.ALLITEMS,
-        iconPath = "menu_icons/Delete.png",
+        iconPath = "menu_icons/minus.png",
         keyboardShortcuts = listOf(KeyCombination(KeyEvent.VK_DELETE), KeyCombination(KeyEvent.VK_BACK_SPACE))
     ) {
         launch { deleteSelectedObjects() }

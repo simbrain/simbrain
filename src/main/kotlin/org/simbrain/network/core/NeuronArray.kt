@@ -3,6 +3,7 @@ package org.simbrain.network.core
 import org.simbrain.network.events.NeuronArrayEvents
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.ActivationSequenceProcessor
+import org.simbrain.network.trainers.TrainerProbe
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.NeuronUpdateRule
 import org.simbrain.network.updaterules.interfaces.DifferentiableUpdateRule
@@ -299,16 +300,23 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         error: Matrix,
         signalSource: Layer,
         biasesAccumulator: HashMap<Layer, Matrix>,
-        rawMatrixAccumulator: HashMap<Matrix, Matrix>
+        rawMatrixAccumulator: HashMap<Matrix, Matrix>,
+        probe: TrainerProbe?
     ): Matrix {
 
         if (signalSource is ActivationSequenceProcessor) {
             throw UnsupportedOperationException("ActivationSequenceProcessor not supported")
         }
 
-        (updateRule as? DifferentiableUpdateRule)?.getDerivative(inputs)?.let {
-                deriv -> error.mul(deriv)
+        val processErrorProbe = probe?.newContext("processError")
+
+        (updateRule as? DifferentiableUpdateRule)?.getDerivative(inputs)?.let { deriv ->
+            processErrorProbe?.write("deriv", deriv)
+            error.mul(deriv)
         }
+
+        processErrorProbe?.write("error") { error.clone() }
+
         // The scaled error signal is used for bias update
         biasesAccumulator.getOrPut(this) {
             Matrix(size, 1)

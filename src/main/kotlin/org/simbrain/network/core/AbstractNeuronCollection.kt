@@ -5,6 +5,7 @@ import org.simbrain.network.gui.nodes.ActivationSequenceProcessor
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.Layout
 import org.simbrain.network.layouts.LineLayout
+import org.simbrain.network.trainers.TrainerProbe
 import org.simbrain.network.updaterules.NeuronUpdateRule
 import org.simbrain.network.updaterules.interfaces.DifferentiableUpdateRule
 import org.simbrain.network.util.SpikingScalarData
@@ -350,14 +351,11 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
 
     context(Network)
     override fun accumulateInputs() {
-        // if (inputManager.getData() == null) {
-        //     throw new NullPointerException("Test data variable is null," + " but neuron group " + getLabel() + " is in input" + " mode.");
-        // }
-        // inputManager.applyCurrentRow(); // TODO
         super.accumulateInputs()
         val wtdInputs = DoubleArray(size)
         for (c in incomingConnectors) {
-            wtdInputs.addi(c.getSummedPSRs())
+            val summedPSRs = c.getSummedPSRs()
+            wtdInputs.addi(summedPSRs)
         }
         addInputs(wtdInputs)
         addInputs(biasArray)
@@ -489,6 +487,7 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
 
     override fun clearInputs() {
         neuronList.forEach { it.clearInput() }
+        invalidateCachedInputs()
     }
 
     override fun clear() {
@@ -567,16 +566,22 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
         error: Matrix,
         signalSource: Layer,
         biasesAccumulator: HashMap<Layer, Matrix>,
-        rawMatrixAccumulator: HashMap<Matrix, Matrix>
+        rawMatrixAccumulator: HashMap<Matrix, Matrix>,
+        probe: TrainerProbe?
     ): Matrix {
 
         if (signalSource is ActivationSequenceProcessor) {
             throw UnsupportedOperationException("ActivationSequenceProcessor not supported")
         }
 
-        (neuronList.firstNotNullOf { it.updateRule } as? DifferentiableUpdateRule)?.getDerivative(inputs)?.let {
-                deriv -> error.mul(deriv)
+        val processErrorProbe = probe?.newContext("processError")
+
+        (neuronList.firstNotNullOf { it.updateRule } as? DifferentiableUpdateRule)?.getDerivative(inputs)?.let { deriv ->
+            processErrorProbe?.write("deriv", deriv)
+            error.mul(deriv)
         }
+
+        processErrorProbe?.write("error") { error.clone() }
 
         // The scaled error signal is used for bias update
         biasesAccumulator.getOrPut(this) {

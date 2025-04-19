@@ -21,6 +21,7 @@ import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
 import smile.math.matrix.Matrix
 import java.util.*
+import kotlin.math.abs
 import kotlin.math.min
 import kotlin.random.Random
 
@@ -274,10 +275,10 @@ fun WeightMatrixTree.forwardPass(inputVectors: List<Matrix>) {
 }
 
 /**
- * Apply backprop to a tree of weight matrices, beginning with the “output” weight matrix and backpropagating error
+ * Apply backprop to a tree of weight matrices, beginning with the "output" weight matrix and backpropagating error
  * through incoming weight matrices.
  *
- * Weight matrices are updated one “weight layer” at a time. See [WeightMatrixTree] for more information.
+ * Weight matrices are updated one "weight layer" at a time. See [WeightMatrixTree] for more information.
  */
 @Deprecated("Migrating towards LinkedHashSet<Layer>.accumulateBackprop")
 fun WeightMatrixTree.applyBackprop(targetValues: Matrix, lossFunction: BackpropLossFunction = BackpropLossFunction.SSE, epsilon: Double = .0001): Double {
@@ -359,7 +360,9 @@ fun LinkedHashSet<Layer>.getAllOutgoingSynapseGroups() = filterIsInstance<Abstra
  *  Assumes LinkedHashSet has been placed in an appropriate "breadth-first" order by [computeOrderedUpdatePath].
  */
 context(Network)
-fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: List<Layer>) {
+fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: List<Layer>, probe: TrainerProbe? = null) {
+
+    val probeContext = probe?.newContext("forwardPass")
 
     if (inputValues.size != inputLayers.size) throw IllegalArgumentException("Must provide same number of input vectors as input layers")
     inputValues.zip(inputLayers).forEach { (a, b) -> a.validateSameShape(b.activations) }
@@ -376,7 +379,6 @@ fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: Lis
         if (isClamped) {
             return
         }
-        neuronList.forEach { n -> n.accumulateInputs() }
         neuronList.forEach { neuron ->
             if (neuron.isSpike) {
                 neuron.isSpike = false
@@ -392,15 +394,43 @@ fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: Lis
     inputLayers.zip(inputValues).forEach { (layer, value) ->
         layer.activations = value
     }
+    probeContext?.newContext("weightsInForwardPass")?.writeAll(
+        flatMap {
+            it.outgoingConnectors
+        }.associate {
+            it.displayName to (it as? WeightMatrix)?.weights?.clone()
+        }
+    )
+    probeContext?.newContext("activationsAfterApplyingTrainingInputs")?.writeAll(inputLayers.associate { it.displayName to it.activations.clone() })
+    probeContext?.newContext("biasesInForwardPass")?.writeAll(inputLayers.associate { it.displayName to it.biases.clone() })
+    val layersContext = probeContext?.newContext("layersInForwardPass")
     allLayers.forEach {
+        val layerContext = layersContext?.newContext(it.displayName)
+        val inputsBeforeAccumulation = layerContext?.newContext("inputsBeforeAccumulation")
+        val inputsProbe = layerContext?.newContext("inputs")
+        val inputsAfterAccumulation = layerContext?.newContext("inputsAfterAccumulation")
         it.clearInputs()
-        it.accumulateInputs()
         when (it) {
-            is NeuronArray -> it.updateWithoutClearingInputs()
-            is AbstractNeuronCollection -> it.updateWithoutClearingInputs()
+            is NeuronArray -> {
+                inputsBeforeAccumulation?.write(it.displayName, it.inputs.clone())
+                it.accumulateInputs()
+                inputsAfterAccumulation?.write(it.displayName, it.inputs.clone())
+                it.updateWithoutClearingInputs()
+            }
+            is AbstractNeuronCollection -> {
+                inputsBeforeAccumulation?.write(it.displayName, it.inputs.clone())
+                if (it.incomingSgs.isNotEmpty()) {
+                    it.neuronList.forEach { n -> n.accumulateInputs() }
+                } else {
+                    it.accumulateInputs()
+                }
+                inputsAfterAccumulation?.write(it.displayName, it.inputs.clone())
+                it.updateWithoutClearingInputs()
+            }
             else -> it.update()
         }
     }
+    probeContext?.newContext("afterUpdates")?.writeAll(allLayers.associate { it.displayName to it.activations.clone() })
 }
 
 /**
@@ -418,8 +448,11 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
     synapseGroupAccumulator: HashMap<SynapseGroup, Matrix>,
     biasesAccumulator: HashMap<Layer, Matrix>,
     rawMatrixAccumulator: HashMap<Matrix, Matrix>,
-    lossFunction: BackpropLossFunction = BackpropLossFunction.SSE
+    lossFunction: BackpropLossFunction = BackpropLossFunction.SSE,
+    probe: TrainerProbe? = null,
 ): Double {
+
+    val probeContext = probe?.newContext("accumulateBackprop")
 
     val reversedLayers = drop(1).reversed()
 
@@ -428,15 +461,26 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
 
     val scalarError = lossFunction.scalarLoss(outputLayer.activations, targetValues)
 
+    probeContext?.write("scalarError", scalarError)
+
     // printActivationsAndWeights()
     var errorSignal: Matrix = lossFunction.outputError(outputLayer.activations, targetValues)
     var signalSource: Layer = outputLayer
 
+    probeContext?.write("errorSignal") { errorSignal.clone() }
+    probeContext?.write("signalSource") { signalSource.displayName }
+
+    val backpropLayersContext = probeContext?.newListContext("backpropLayers")
+
     // Go through layers from output to input
     reversedLayers.forEach { layer ->
 
+        val layerContext = backpropLayersContext?.newContext(layer.displayName)
+
         // Process the error signal. Bias update for neuron array. Full backprop update for transformer block. Etc.
         errorSignal = layer.processError(errorSignal, signalSource, biasesAccumulator, rawMatrixAccumulator)
+
+        layerContext?.write("processedErrorSignal") { errorSignal.clone() }
 
         // Process weight matrices feeding into the current layer.
         // For each one we:
@@ -444,25 +488,33 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
         //  2. "backpropagate" the error signals by multiplying them by the weight matrix to get a new signal
         var accumulatedErrorSignal: Matrix? = null
         layer.incomingConnectors.forEach { connector ->
+            val connectorContext = layerContext?.newContext(connector.displayName)
             val wm = connector as WeightMatrix
             val weightDeltas = wm.computeWeightDeltas(errorSignal)
+            connectorContext?.write("weightDeltas") { weightDeltas.clone() }
             weightAccumulator.getOrPut(wm) {
                 Matrix(wm.weights.nrow(), wm.weights.ncol())
             }.add(weightDeltas)
             val currentConnectorErrorSignal = wm.backpropagateError(errorSignal)
+            connectorContext?.write("currentConnectorErrorSignal") { currentConnectorErrorSignal.clone() }
 
             // The source of the weight matrix may be the same across multiple passes through this code,
             // supporting skip connections. In such cases, the error signals are summed
             accumulatedErrorSignal = accumulatedErrorSignal?.add(currentConnectorErrorSignal) ?: currentConnectorErrorSignal
+            connectorContext?.write("accumulatedErrorSignal") { accumulatedErrorSignal?.clone() }
         }
         (layer as? AbstractNeuronCollection)?.incomingSgs?.forEach { sg ->
+            val sgContext = layerContext?.newContext(sg.displayName)
             val weightDeltas = sg.computeWeightDeltas(errorSignal)
+            sgContext?.write("weightDeltas") { weightDeltas.clone() }
             synapseGroupAccumulator.getOrPut(sg) {
                 Matrix(sg.target.size, sg.source.size)
             }.add(weightDeltas)
             val currentConnectorErrorSignal = sg.backpropagateError(errorSignal)
+            sgContext?.write("currentConnectorErrorSignal") { currentConnectorErrorSignal.clone() }
 
             accumulatedErrorSignal = accumulatedErrorSignal?.add(currentConnectorErrorSignal) ?: currentConnectorErrorSignal
+            sgContext?.write("accumulatedErrorSignal") { accumulatedErrorSignal.clone() }
         }
         // The new error signal which gets pushed further back until the first layer is reached
         accumulatedErrorSignal?.let { errorSignal = it } // null on the first layer
@@ -626,4 +678,190 @@ fun splitDataSet(inputs: Matrix, targets: Matrix, splitRatio: Double, random: Ra
             targets.rows(*testRowIndices.toIntArray())
         )
     )
+}
+
+sealed class TrainerProbe(var parent: TrainerProbe? = null): Iterable<Pair<Any, Any?>> {
+
+    class MapContext(parent: TrainerProbe? = null) : TrainerProbe(parent) {
+        val data = LinkedHashMap<String, Any?>()
+
+        override fun iterator() = data.entries.map { it.toPair() }.iterator()
+
+        override fun newContext(key: String?): MapContext {
+            require(key != null) { "Key cannot be null for MapContext" }
+            return MapContext(parent = this).also { data[key] = it }
+        }
+        override fun newListContext(key: String?): ListContext {
+            require(key != null) { "Key cannot be null for MapContext" }
+            return ListContext(parent = this).also { data[key] = it }
+        }
+
+        fun write(key: String, value: Any?) {
+            data[key] = value
+        }
+
+        fun <K, V> writeAll(map: Map<K, V>, mappers: (K, V) -> Pair<String, Any?> = { k, v -> k.toString() to v }) {
+            map.map { mappers(it.key, it.value) }.forEach { (key, value) ->
+                write(key, value)
+            }
+        }
+
+        fun write(key: String, valueProvider: () -> Any?) = write(key, valueProvider())
+
+        override fun toTreeString(indentation: Int): String {
+            return data.entries.joinToString("\n") { (key, value) ->
+                " ".repeat(indentation) + key + ": \n" + ((value as? TrainerProbe)?.toTreeString(indentation + 2) ?: value.toString().indent(indentation + 2))
+            }
+        }
+    }
+
+    class ListContext(parent: TrainerProbe? = null) : TrainerProbe(parent) {
+        val data = ArrayList<Any?>()
+        override fun iterator() = data.mapIndexed { index, value -> index to value }.iterator()
+        override fun newContext(key: String?) = MapContext(parent = this).also { data.add(it) }
+        override fun newListContext(key: String?) = ListContext(parent = this).also { data.add(it) }
+
+        fun write(value: Any?) {
+            data.add(value)
+        }
+
+        fun write(valueProvider: () -> Any?) = write(valueProvider())
+
+        override fun toTreeString(indentation: Int): String {
+            return data.mapIndexed { index, value ->
+                " ".repeat(indentation) + index + ": \n" + ((value as? TrainerProbe)?.toTreeString(indentation + 2) ?: value.toString().indent(indentation + 2))
+            }.joinToString("\n")
+        }
+    }
+
+    abstract fun newContext(key: String? = null): MapContext
+    abstract fun newListContext(key: String? = null): ListContext
+
+    abstract fun toTreeString(indentation: Int = 0): String
+}
+
+fun diffTrainerProbes(a: TrainerProbe, b: TrainerProbe, allowMissing: Boolean = false, diffFunction: (Any, Any) -> Any? = { a, b -> 
+    when {
+        a is Number && b is Number -> (a.toDouble() - b.toDouble()).let { if (abs(it) < 1e-6) true else it }
+        a is Matrix && b is Matrix -> a.diff(b).let {
+            when (it) {
+                is MatrixDiffResult.InTolerance -> true
+                is MatrixDiffResult.OutOfTolerance -> it.diff
+                is MatrixDiffResult.DimensionsMismatch -> it.reason
+            }
+        }
+        else -> a == b
+    }
+}): String {
+    val result = StringBuilder()
+    
+    fun TrainerProbe.getPath(pathParts: MutableList<String> = mutableListOf()): List<String> {
+        val parentPath = parent?.getPath(pathParts) ?: pathParts
+        return parentPath
+    }
+    
+    fun formatValue(value: Any?): String {
+        return when (value) {
+            null -> "null"
+            is String -> value
+            is Collection<*> -> "[${value.joinToString(", ") { it.toString() }}]"
+            is Matrix -> (0..value.nrow() - 1).joinToString("\n") { i ->
+                (0..value.ncol() - 1).joinToString(" ") { j ->
+                    value[i, j].let {
+                        (if (it >= 0) " " else "") + it.format(6)
+                    }
+                }
+            }
+
+            else -> value.toString()
+        }.indent()
+    }
+
+    fun formatDiff(path: String, a: String, b: String, diff: String) = "$path:\n${a.indent(4)}\n  <->\n${b.indent(4)}\n  diff:\n${diff.indent(4)}\n"
+
+    fun processNode(nodeA: Pair<Any, Any?>, nodeB: Pair<Any, Any?>?, path: List<String>) {
+        val (keyA, valueA) = nodeA
+        val currentPath = path + keyA.toString()
+        
+        // Handle leaf nodes
+        if (valueA !is TrainerProbe && (nodeB == null || nodeB.second !is TrainerProbe)) {
+            val pathStr = "/" + currentPath.joinToString("/")
+            
+            if (nodeB == null) {
+                if (!allowMissing) {
+                    result.append("${formatDiff(pathStr, formatValue(valueA), "missing", "missing")}\n")
+                }
+            } else {
+                val (_, valueB) = nodeB
+                val diff = diffFunction(valueA ?: "null", valueB ?: "null")
+                val isDifferent = when (diff) {
+                    is Boolean -> !diff
+                    else -> true
+                }
+                
+                if (isDifferent) {
+                    val diffStr = when (diff) {
+                        is Boolean -> diff.toString()
+                        is Number -> diff.toString()
+                        is Matrix -> formatValue(diff)
+                        else -> "different"
+                    }
+                    
+                    val formattedValueA = formatValue(valueA)
+                    val formattedValueB = formatValue(valueB)
+
+                    result.append(formatDiff(pathStr, formattedValueA, formattedValueB, diffStr))
+                }
+            }
+            return
+        }
+        
+        // Handle TrainerProbe nodes
+        if (valueA is TrainerProbe && nodeB?.second is TrainerProbe) {
+            val probeA = valueA
+            val probeB = nodeB.second as TrainerProbe
+            
+            val aEntries = probeA.toList()
+            val bMap = probeB.associate { it.first to it }
+            
+            // Compare each entry in the first probe
+            for (entry in aEntries) {
+                val matchingEntry = bMap[entry.first]
+                processNode(entry, matchingEntry, currentPath)
+            }
+            
+            // Check for entries that exist only in the second probe if not allowing missing
+            if (!allowMissing) {
+                val aKeys = aEntries.map { it.first }.toSet()
+                val bOnlyEntries = probeB.filter { it.first !in aKeys }
+                
+                for (entry in bOnlyEntries) {
+                    val (entryKey, entryValue) = entry
+                    val pathStr = "/" + (currentPath + entryKey.toString()).joinToString("/")
+                    result.append(formatDiff(pathStr, "missing", formatValue(entryValue), "missing"))
+                }
+            }
+        }
+    }
+    
+    // Start the recursion with the root nodes
+    for (entryA in a) {
+        val (keyA, _) = entryA
+        val entryB = b.find { (keyB, _) -> keyB == keyA }
+        processNode(entryA, entryB, emptyList())
+    }
+    
+    // Check for entries in b that don't exist in a
+    if (!allowMissing) {
+        val aKeys = a.map { it.first }.toSet()
+        val bOnlyEntries = b.filter { it.first !in aKeys }
+        
+        for (entryB in bOnlyEntries) {
+            val (keyB, valueB) = entryB
+            val pathStr = "/$keyB"
+            result.append(formatDiff(pathStr, "missing", formatValue(valueB), "missing"))
+        }
+    }
+    
+    return result.toString().trimEnd()
 }

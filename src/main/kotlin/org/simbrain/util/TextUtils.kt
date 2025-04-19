@@ -444,6 +444,10 @@ fun generateAutoregressivePairs(context: List<String>): List<Pair<List<String>, 
     }
 }
 
+fun String.indent(indentation: Int = 2): String {
+    return split("\n").joinToString("\n") { " ".repeat(indentation) + it }
+}
+
 // Test main
 fun main() {
     val chooser = SFileChooser(".", "Text import", "txt")

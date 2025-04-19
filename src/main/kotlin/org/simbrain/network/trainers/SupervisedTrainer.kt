@@ -213,7 +213,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork>(val network: Network, va
     /**
      * @return the mean error for the batch
      */
-    open fun trainBatch(rowRange: IntRange, probe: (Any) -> Unit = {}): Double {
+    open fun trainBatch(rowRange: IntRange, probe: TrainerProbe? = null): Double {
         var batchError = 0.0
         for (i in rowRange) {
             batchError += trainRow(i)
@@ -336,10 +336,12 @@ class BackpropTrainer(network: Network, backpropNetwork: BackpropNetwork) : Supe
     /**
      * Backprop trains using error accumulation.
      */
-    override fun trainBatch(rowRange: IntRange, probe: (Any) -> Unit): Double {
+    override fun trainBatch(rowRange: IntRange, probe: TrainerProbe?): Double {
 
         val weightAccumulator: HashMap<WeightMatrix, Matrix> = HashMap()
         val biasesAccumulator: HashMap<NeuronArray, Matrix> = HashMap()
+
+        val trainBatchContext = probe?.newContext("trainBatch")
 
         var error = 0.0
 
@@ -353,19 +355,36 @@ class BackpropTrainer(network: Network, backpropNetwork: BackpropNetwork) : Supe
 
         }
 
-        probe("weightAccumulator" to weightAccumulator)
+        val weightAccumulatorContext = trainBatchContext?.newContext("weightAccumulators")
+
+        weightAccumulatorContext?.writeAll(weightAccumulator) { wm, delta ->
+            wm.displayName to delta
+        }
 
         weightAccumulator.forEach { (wm, delta) ->
-            wm.weights.add(config.optimizer.computeDelta(wm.weights, delta))
+            val weightsDelta = config.optimizer.computeDelta(wm.weights, delta)
+            weightAccumulatorContext?.write("delta_${wm.displayName}") { weightsDelta.clone() }
+
+            wm.weights.add(weightsDelta)
+            weightAccumulatorContext?.write("weights_${wm.displayName}") { wm.weights.clone() }
+
             wm.events.updated.fire()
         }
 
-        probe("biasesAccumulator" to biasesAccumulator)
+        trainBatchContext?.newContext("biasesAccumulator")?.writeAll(biasesAccumulator) { na, delta ->
+            na.displayName to delta
+        }
+
+        val computeDeltaContext = trainBatchContext?.newContext("computeDelta")
 
         biasesAccumulator.forEach { (na, delta) ->
-            na.biases.add(config.optimizer.computeDelta(na.biases, delta))
+            val delta = config.optimizer.computeDelta(na.biases, delta)
+            computeDeltaContext?.write(na.displayName, delta)
+            na.biases.add(delta)
             na.events.updated.fire()
         }
+
+        trainBatchContext?.newContext("updatedBiases")?.writeAll(biasesAccumulator) { na, _ -> na.displayName to na.biases.clone() }
 
         return error / rowRange.count()
     }

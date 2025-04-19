@@ -3,6 +3,7 @@ package org.simbrain.util
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.plot.histogram.HistogramModel
 import org.simbrain.plot.histogram.HistogramPanel
+import org.simbrain.util.MatrixDiffResult.*
 import org.simbrain.util.stats.ProbabilityDistribution
 import smile.math.matrix.Matrix
 import kotlin.math.*
@@ -468,3 +469,33 @@ class MatrixBuilder(val nrow: Int, val ncol: Int) {
         return result
     }
 }
+
+
+sealed class MatrixDiffResult {
+    data class InTolerance(val diff: Matrix, val maxDiff: Double) : MatrixDiffResult()
+    data class OutOfTolerance(val diff: Matrix, val maxDiff: Double, val reason: String) : MatrixDiffResult()
+    data class DimensionsMismatch(val reason: String) : MatrixDiffResult()
+}
+
+fun Matrix.diff(other: Matrix, tolerance: Double = 1e-6): MatrixDiffResult {
+    if (nrow() != other.nrow() || ncol() != other.ncol()) {
+        return DimensionsMismatch("Matrix dimensions must match")
+    }
+
+    var maxDiff = 0.0
+    val result = Matrix(nrow(), ncol())
+    for (i in 0 until nrow()) {
+        for (j in 0 until ncol()) {
+            result[i, j] = get(i, j) - other[i, j]
+            maxDiff = max(maxDiff, abs(result[i, j]))
+        }
+    }
+
+    return if (maxDiff <= tolerance) {
+        InTolerance(result, maxDiff)
+    } else {
+        OutOfTolerance(result, maxDiff, "Max difference is $maxDiff, which is greater than tolerance $tolerance")
+    }
+}
+
+

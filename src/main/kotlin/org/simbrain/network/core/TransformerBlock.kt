@@ -3,6 +3,7 @@ package org.simbrain.network.core
 import org.simbrain.network.gui.dialogs.NetworkPreferences.biasesRandomizer
 import org.simbrain.network.gui.dialogs.NetworkPreferences.weightRandomizer
 import org.simbrain.network.gui.nodes.ActivationSequenceProcessor
+import org.simbrain.network.trainers.TrainerProbe
 import org.simbrain.network.trainers.WeightInitializationStrategy
 import org.simbrain.network.updaterules.NeuronUpdateRule
 import org.simbrain.util.*
@@ -224,7 +225,8 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
         error: Matrix,
         signalSource: Layer,
         biasesAccumulator: HashMap<Layer, Matrix>,
-        rawMatrixAccumulator: HashMap<Matrix, Matrix>
+        rawMatrixAccumulator: HashMap<Matrix, Matrix>,
+        probe: TrainerProbe?
     ): Matrix {
 
         var errorSignal = error

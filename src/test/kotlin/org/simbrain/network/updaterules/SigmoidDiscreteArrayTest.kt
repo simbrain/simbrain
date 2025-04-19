@@ -1,10 +1,9 @@
 package org.simbrain.network.updaterules
 
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.NeuronArray
-import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.core.*
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
 import org.simbrain.util.get
 import org.simbrain.util.math.SigmoidFunctionEnum
@@ -29,6 +28,19 @@ class SigmoidDiscreteArrayTest {
         input2.activations = doubleArrayOf(-1.0, 1.0).toMatrix()
         input2.isClamped = true
         // Net input will be (1,-1) dot (-1,1) = 0
+    }
+
+    // For scalar vs array comparison tests
+    val scalarNet = Network()
+    val scalarNeuron = Neuron().apply {
+        updateRule = SigmoidalRule()
+    }
+    val arrayNeuron = NeuronArray(1).apply {
+        updateRule = SigmoidalRule()
+    }
+
+    init {
+        scalarNet.addNetworkModels(scalarNeuron, arrayNeuron)
     }
 
     @Test
@@ -112,4 +124,177 @@ class SigmoidDiscreteArrayTest {
 
     }
 
+    /**
+     * Test that compares scalar and array versions of the sigmoid function
+     * to ensure they produce the same results.
+     */
+    @Test
+    fun `test scalar vs array logistic`() {
+        // Configure both neurons with the same settings
+        (scalarNeuron.updateRule as SigmoidalRule).type = SigmoidFunctionEnum.LOGISTIC
+        (scalarNeuron.updateRule as SigmoidalRule).lowerBound = 0.0
+        (scalarNeuron.updateRule as SigmoidalRule).upperBound = 1.0
+        (scalarNeuron.updateRule as SigmoidalRule).slope = 1.0
+
+        (arrayNeuron.updateRule as SigmoidalRule).type = SigmoidFunctionEnum.LOGISTIC
+        (arrayNeuron.updateRule as SigmoidalRule).lowerBound = 0.0
+        (arrayNeuron.updateRule as SigmoidalRule).upperBound = 1.0
+        (arrayNeuron.updateRule as SigmoidalRule).slope = 1.0
+
+        compareScalarAndArray()
+    }
+
+    @Test
+    fun `test scalar vs array arctan`() {
+        // Configure both neurons with the same settings
+        (scalarNeuron.updateRule as SigmoidalRule).type = SigmoidFunctionEnum.ARCTAN
+        (scalarNeuron.updateRule as SigmoidalRule).lowerBound = -1.0
+        (scalarNeuron.updateRule as SigmoidalRule).upperBound = 1.0
+        (scalarNeuron.updateRule as SigmoidalRule).slope = 1.0
+
+        (arrayNeuron.updateRule as SigmoidalRule).type = SigmoidFunctionEnum.ARCTAN
+        (arrayNeuron.updateRule as SigmoidalRule).lowerBound = -1.0
+        (arrayNeuron.updateRule as SigmoidalRule).upperBound = 1.0
+        (arrayNeuron.updateRule as SigmoidalRule).slope = 1.0
+
+        compareScalarAndArray()
+    }
+
+    @Test
+    fun `test scalar vs array tanh`() {
+        // Configure both neurons with the same settings
+        (scalarNeuron.updateRule as SigmoidalRule).type = SigmoidFunctionEnum.TANH
+        (scalarNeuron.updateRule as SigmoidalRule).lowerBound = -1.0
+        (scalarNeuron.updateRule as SigmoidalRule).upperBound = 1.0
+        (scalarNeuron.updateRule as SigmoidalRule).slope = 1.0
+
+        (arrayNeuron.updateRule as SigmoidalRule).type = SigmoidFunctionEnum.TANH
+        (arrayNeuron.updateRule as SigmoidalRule).lowerBound = -1.0
+        (arrayNeuron.updateRule as SigmoidalRule).upperBound = 1.0
+        (arrayNeuron.updateRule as SigmoidalRule).slope = 1.0
+
+        compareScalarAndArray()
+    }
+
+    /**
+     * Helper method to compare scalar and array implementations with various inputs.
+     */
+    private fun compareScalarAndArray() {
+        // Test with zero input
+        scalarNeuron.clear()
+        arrayNeuron.clear()
+        scalarNet.update()
+        assertEquals(scalarNeuron.activation, arrayNeuron.activations[0], 0.0001, "Zero input")
+
+        // Test with bias
+        scalarNeuron.bias = 2.0
+        arrayNeuron.biases = doubleArrayOf(2.0).toMatrix()
+        scalarNet.update()
+        assertEquals(scalarNeuron.activation, arrayNeuron.activations[0], 0.0001, "With bias")
+
+        // Test with high bias
+        scalarNeuron.bias = 100.0
+        arrayNeuron.biases = doubleArrayOf(100.0).toMatrix()
+        scalarNet.update()
+        assertEquals(scalarNeuron.activation, arrayNeuron.activations[0], 0.0001, "High bias")
+
+        // Test with low bias
+        scalarNeuron.bias = -100.0
+        arrayNeuron.biases = doubleArrayOf(-100.0).toMatrix()
+        scalarNet.update()
+        assertEquals(scalarNeuron.activation, arrayNeuron.activations[0], 0.0001, "Low bias")
+
+        // Reset bias
+        scalarNeuron.bias = 0.0
+        arrayNeuron.biases = doubleArrayOf(0.0).toMatrix()
+
+        // Create input sources
+        val inputNeuron = Neuron()
+        val inputArray = NeuronArray(1)
+        scalarNet.addNetworkModels(inputNeuron, inputArray)
+
+        val scalarSynapse = Synapse(inputNeuron, scalarNeuron)
+        scalarSynapse.strength = 1.0
+        val arrayWeight = WeightMatrix(inputArray, arrayNeuron)
+        arrayWeight.setWeights(doubleArrayOf(1.0))
+
+        scalarNet.addNetworkModels(scalarSynapse, arrayWeight)
+
+        // Test with positive activation
+        inputNeuron.activation = 5.0
+        inputArray.activations = doubleArrayOf(5.0).toMatrix()
+        inputNeuron.clamped = true
+        inputArray.isClamped = true
+        scalarNet.update()
+        assertEquals(scalarNeuron.activation, arrayNeuron.activations[0], 0.0001, "Positive activation")
+
+        // Test with negative activation
+        inputNeuron.activation = -5.0
+        inputArray.activations = doubleArrayOf(-5.0).toMatrix()
+        scalarNet.update()
+        assertEquals(scalarNeuron.activation, arrayNeuron.activations[0], 0.0001, "Negative activation")
+
+        // Test with very large positive activation
+        inputNeuron.activation = 100.0
+        inputArray.activations = doubleArrayOf(100.0).toMatrix()
+        scalarNet.update()
+        assertEquals(scalarNeuron.activation, arrayNeuron.activations[0], 0.0001, "Large positive activation")
+
+        // Test with very large negative activation
+        inputNeuron.activation = -100.0
+        inputArray.activations = doubleArrayOf(-100.0).toMatrix()
+        scalarNet.update()
+        assertEquals(scalarNeuron.activation, arrayNeuron.activations[0], 0.0001, "Large negative activation")
+    }
+    /**
+     * Test that demonstrates connections between neurons and neuron arrays.
+     * This test shows how to connect:
+     * 1. Neuron to Neuron (using Synapse)
+     * 2. NeuronArray to NeuronArray (using WeightMatrix)
+     */
+    @Test
+    fun `test connection types`() {
+        // Create a new network for this test
+        val testNet = Network()
+
+        // Create source neurons and neuron arrays
+        val sourceNeuron = Neuron()
+        val sourceArray = NeuronArray(2)
+
+        // Create target neurons and neuron arrays
+        val targetNeuron = Neuron().apply {
+            updateRule = SigmoidalRule()
+        }
+        val targetArray = NeuronArray(2).apply {
+            updateRule = SigmoidalRule()
+        }
+
+        // Add all neurons and arrays to the network
+        testNet.addNetworkModels(sourceNeuron, sourceArray, targetNeuron, targetArray)
+
+        // 1. Neuron to Neuron connection (using Synapse)
+        val neuronToNeuronSynapse = Synapse(sourceNeuron, targetNeuron)
+        neuronToNeuronSynapse.strength = 1.0
+        testNet.addNetworkModel(neuronToNeuronSynapse)
+
+        // 2. NeuronArray to NeuronArray connection (using WeightMatrix)
+        val arrayToArrayWeight = WeightMatrix(sourceArray, targetArray)
+        arrayToArrayWeight.setWeights(doubleArrayOf(0.5, 0.5, 0.5, 0.5))
+        testNet.addNetworkModel(arrayToArrayWeight)
+
+        // Set activations for source neurons and arrays
+        sourceNeuron.activation = 1.0
+        sourceNeuron.clamped = true
+        sourceArray.activations = doubleArrayOf(1.0, 1.0).toMatrix()
+        sourceArray.isClamped = true
+
+        // Update the network
+        testNet.update()
+
+        // Verify that connections work as expected
+        // Since we're using SigmoidalRule, the activation won't be exactly 1.0 or 0.5
+        assertTrue(targetNeuron.activation > 0.9, "Neuron to Neuron connection")
+        assertTrue(targetArray.activations[0] > 0.9, "Array to Array connection")
+        assertTrue(targetArray.activations[1] > 0.9, "Array to Array connection")
+    }
 }

@@ -39,7 +39,8 @@ abstract class ArrayLayer(
         super.accumulateInputs()
         val wtdInputs = Matrix(size, 1)
         for (c in incomingConnectors) {
-            wtdInputs.addi(c.getSummedPSRs())
+            val summedPSRs = c.getSummedPSRs()
+            wtdInputs.addi(summedPSRs)
         }
         addInputs(wtdInputs)
         addInputs(biases)

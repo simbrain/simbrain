@@ -52,7 +52,7 @@ class SigmoidalRule : AbstractSigmoidalRule() {
         if (addNoise) {
             weightedInputs.addi(noiseGenerator.sampleDouble(array.size))
         }
-        array.activations = type.valueOf(weightedInputs, lowerBound, upperBound, slope)
+        array.activations = type.valueOf(weightedInputs, upperBound, lowerBound, slope)
     }
 
     override fun copy(): SigmoidalRule {

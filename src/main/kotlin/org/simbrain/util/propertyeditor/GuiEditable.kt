@@ -514,10 +514,11 @@ class NumericWidget<O : EditableObject, T>(
             ftf.columns = 10
             ftf.isEditable = true
             ftf.setFormatterFactory(factory)
-            if (!isConsistent) {
-                (it.editor as JSpinner.DefaultEditor).textField?.text = NULL_STRING
+            (it.editor as JSpinner.DefaultEditor).textField?.text = if (!isConsistent) {
+                NULL_STRING
+            } else {
+                parameter.value.toString()
             }
-            (it.editor as JSpinner.DefaultEditor).textField?.text = parameter.value.toString()
             ftf.addFocusListener(object : FocusAdapter() {
                 val defaultBorder = ftf.border
                 override fun focusLost(e: FocusEvent) {

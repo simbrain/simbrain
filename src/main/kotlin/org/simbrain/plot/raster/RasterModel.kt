@@ -34,24 +34,24 @@ import javax.swing.SwingUtilities
 /**
  * Data model for a raster plot.
  */
-class RasterModel(timeSupplier: Supplier<Int>) : EditableObject {
-
-    /**
-     * List of [RasterConsumer]'s that consume raster data.
-     */
-    val rasterConsumerList: MutableList<RasterConsumer> = ArrayList()
+class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject {
 
     /**
      * Lambda to supply time to the time series model.
      */
     @Transient
-    var timeSupplier: Supplier<Int>
+    lateinit var timeSupplier: Supplier<Int>
 
     /**
      * Raster Data.
      */
-    @JvmField
     val dataset: XYSeriesCollection = XYSeriesCollection()
+
+    /**
+     * List of [RasterConsumer]'s that consume raster data.
+     */
+    @Transient
+    val rasterConsumerList = dataset.series.mapIndexed { index, _ -> RasterConsumer(index) }.toMutableList()
 
     @UserParameter(
         label = "Dot Size",
@@ -89,7 +89,9 @@ class RasterModel(timeSupplier: Supplier<Int>) : EditableObject {
      */
     init {
         addDataSources(INITIAL_DATA_SOURCES)
-        this.timeSupplier = timeSupplier
+        if (timeSupplier != null) {
+            this.timeSupplier = timeSupplier
+        }
     }
 
     /**

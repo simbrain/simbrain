@@ -46,7 +46,13 @@ class TimeSeriesPlotComponent @JvmOverloads constructor(name: String, val model:
                 // A new array coupling is being added to this time series
                 if (c.consumer.baseObject === model) {
                     // Initialize series with provided names, e.g neuron labels
-                    val labels = c.producer.labelArray
+                    val labels = c.producer.labelArray.groupBy { it }.values.flatMap { identicalLabels ->
+                        if (identicalLabels.size == 1) {
+                            identicalLabels
+                        } else {
+                            identicalLabels.mapIndexed { index, label -> "$label[$index]" }
+                        }
+                    }
                     if (labels != null) {
                         model.removeAllTimeSeries()
                         for (i in labels.indices) {

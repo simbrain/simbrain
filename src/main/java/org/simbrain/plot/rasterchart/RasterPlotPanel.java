@@ -100,7 +100,7 @@ public class RasterPlotPanel extends JPanel {
         chart = ChartFactory.createScatterPlot("", // Title
             "Iterations", // x-axis Label
             "Value(s)", // y-axis Label
-                model.dataset, // Dataset
+                model.getDataset(), // Dataset
             PlotOrientation.VERTICAL, // Plot Orientation
             true, // Show Legend
             true, // Use tooltips

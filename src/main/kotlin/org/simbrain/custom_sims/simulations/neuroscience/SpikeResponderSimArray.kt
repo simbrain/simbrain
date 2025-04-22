@@ -3,8 +3,6 @@ package org.simbrain.custom_sims.simulations
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
-import org.simbrain.network.core.addNeuron
-import org.simbrain.network.core.addSynapse
 import org.simbrain.network.spikeresponders.JumpAndDecay
 import org.simbrain.network.spikeresponders.RiseAndDecay
 import org.simbrain.network.spikeresponders.ShortTermPlasticity
@@ -14,8 +12,6 @@ import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.alignNetworkModels
 import org.simbrain.network.util.offsetNetworkModel
-import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
-import org.simbrain.util.place
 import org.simbrain.util.point
 
 /**
@@ -37,6 +33,7 @@ val spikeResponderSimArray = newSim {
         repeat(10) {increment()}
     }
     val spiking =  NeuronArray(arraySize).apply {
+        labelArray = (1 .. arraySize).map { "$it" }.toTypedArray()
         updateRule = IzhikevichRule().apply {
             setiBg(0.0)
         }

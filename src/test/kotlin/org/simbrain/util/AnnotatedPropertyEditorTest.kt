@@ -5,9 +5,11 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.core.Neuron
+import org.simbrain.util.SimbrainConstants.NULL_STRING
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.NumericWidget
 import org.simbrain.util.propertyeditor.StringWidget
+import javax.swing.JSpinner
 import kotlin.reflect.full.declaredMemberProperties
 
 /**
@@ -81,7 +83,9 @@ class AnnotatedPropertyEditorTest {
         val ape = AnnotatedPropertyEditor(n1, n2)
         val prop = Neuron::class.declaredMemberProperties.first { it.name == "activation" }
         assertEquals(false, (ape.propertyNameWidgetMap[prop.name] as NumericWidget).isConsistent)
+        assertEquals(NULL_STRING, ((ape.getWidgetByLabel("Activation") as NumericWidget).widget.editor as JSpinner.DefaultEditor).textField?.text)
         (ape.propertyNameWidgetMap[prop.name] as NumericWidget).widget.value = .25
+        assertEquals("0.25", ((ape.getWidgetByLabel("Activation") as NumericWidget).widget.editor as JSpinner.DefaultEditor).textField?.text)
         ape.commitChanges()
         assertEquals(.25, n1.activation)
         assertEquals(.25, n2.activation)

@@ -311,8 +311,9 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
         refreshValues()
     }
 
-    private fun getWidgetByLabel(label: String): ParameterWidget<O, *> {
-        return propertyNameWidgetMap.values.first { it.isConsistent && it.parameter.label == label }
+    fun getWidgetByLabel(label: String): ParameterWidget<O, *> {
+        return propertyNameWidgetMap.values.firstOrNull { it.parameter.label == label }
+            ?: throw IllegalArgumentException("No widget found for label $label")
     }
 
     fun getWidgetValueByLabel(label: String): Any? {

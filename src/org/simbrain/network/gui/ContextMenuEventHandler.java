@@ -52,7 +52,7 @@ final class ContextMenuEventHandler extends PBasicInputEventHandler {
         event.setHandled(true); // seems to confuse zoom event handler??
         JPopupMenu contextMenu = networkPanel.getContextMenu();
         Point2D canvasPosition = event.getCanvasPosition();
-        contextMenu.show(networkPanel, (int) canvasPosition.getX(),
+        contextMenu.show(networkPanel.getCanvas(), (int) canvasPosition.getX(),
                 (int) canvasPosition.getY());
         networkPanel.getCanvas().getCamera().localToView(canvasPosition);
         networkPanel.setLastClickedPosition(canvasPosition);

@@ -16,107 +16,109 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.gui;
+package org.simbrain.network.gui
 
-import org.piccolo2d.PCamera;
-import org.piccolo2d.PLayer;
-import org.piccolo2d.PNode;
-import org.piccolo2d.event.PDragSequenceEventHandler;
-import org.piccolo2d.event.PInputEvent;
-import org.piccolo2d.event.PInputEventFilter;
-import org.piccolo2d.util.PNodeFilter;
-import org.simbrain.network.core.Neuron;
-import org.simbrain.network.gui.dialogs.NetworkPreferences;
-import org.simbrain.network.gui.nodes.NeuronNode;
-
-import java.awt.event.InputEvent;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.Point2D;
-import java.util.Collection;
+import org.piccolo2d.PCamera
+import org.piccolo2d.PLayer
+import org.piccolo2d.PNode
+import org.piccolo2d.event.PDragSequenceEventHandler
+import org.piccolo2d.event.PInputEvent
+import org.piccolo2d.event.PInputEventFilter
+import org.piccolo2d.util.PNodeFilter
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.gui.MouseEventHandler.MouseCursor
+import org.simbrain.network.gui.dialogs.NetworkPreferences.wandRadius
+import org.simbrain.network.gui.nodes.NeuronNode
+import java.awt.event.InputEvent
+import java.awt.geom.Ellipse2D
 
 /**
  * Wand event handler. Change activation when dragging over neurons.
  */
-final class WandEventHandler extends PDragSequenceEventHandler {
-
+class WandEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHandler() {
     /**
      * Bounds filter.
      */
-    private final BoundsFilter boundsFilter;
-
-    /**
-     * Network Panel.
-     */
-    private final NetworkPanel networkPanel;
+    private val boundsFilter: BoundsFilter = BoundsFilter()
 
     /**
      * Create a new selection event handler.
      *
      * @param networkPanel
      */
-    public WandEventHandler(NetworkPanel networkPanel) {
-        super();
-        boundsFilter = new BoundsFilter();
-        setEventFilter(new WandEventFilter());
-        this.networkPanel = networkPanel;
+    init {
+        eventFilter = WandEventFilter()
     }
 
-    @Override
-    public void mousePressed(final PInputEvent event) {
-        super.mousePressed(event);
-        //networkPanel.setLastClickedPosition(event.getPosition());
-        //if (event.getPath().getPickedNode() instanceof PCamera) {
+    private var diffsForUndo = mutableMapOf<Neuron, Double>()
+
+    override fun mousePressed(event: PInputEvent) {
+        super.mousePressed(event)
+        diffsForUndo = mutableMapOf()
+
+        val node = event.path.pickedNode
+        if (node is NeuronNode) {
+            modifyNode(node)
+        }
+
+        // networkPanel.setLastClickedPosition(event.getPosition());
+        // if (event.getPath().getPickedNode() instanceof PCamera) {
         //    networkPanel.setBeginPosition(event.getPosition());
         //}
     }
 
-    @Override
-    public void mouseClicked(final PInputEvent event) {
-
-        super.mouseClicked(event);
-
-        if (event.getClickCount() != 1) {
-            return;
-        }
-
-        PNode node = event.getPath().getPickedNode();
-        if (node instanceof NeuronNode) {
-            modifyNode((NeuronNode) node);
+    override fun mouseReleased(event: PInputEvent?) {
+        super.mouseReleased(event)
+        if (diffsForUndo.isNotEmpty()) {
+            val diffs = diffsForUndo
+            val redos = diffs.map { it.key }.associateWith { it.activation }
+            networkPanel.undoManager.addUndoableAction(
+                description = "Wand Actions on ${diffs.count()} Neurons",
+                undo = {
+                    diffs.forEach { (neuron, previousActivation) ->
+                        neuron.activation = previousActivation
+                    }
+                },
+                redo = {
+                    redos.forEach { (neuron, redoActivation) ->
+                        neuron.activation = redoActivation
+                    }
+                }
+            )
         }
     }
 
-    @Override
-    protected void startDrag(final PInputEvent event) {
-        super.startDrag(event);
+    override fun startDrag(event: PInputEvent?) {
+        super.startDrag(event)
     }
 
-    @Override
-    protected void drag(final PInputEvent event) {
+    override fun drag(event: PInputEvent) {
+        super.drag(event)
 
-        super.drag(event);
-
-        int radius = NetworkPreferences.INSTANCE.getWandRadius();
+        val radius = wandRadius
 
         // Create elliptical bounds
-        Point2D position = event.getPosition();
-        Ellipse2D.Double ellipse = new Ellipse2D.Double(position.getX() - radius / 2, position.getY() - radius / 2, radius, radius);
-        boundsFilter.setEllipse(ellipse);
+        val position = event.getPosition()
+        val ellipse = Ellipse2D.Double(
+            position.x - radius / 2,
+            position.y - radius / 2,
+            radius.toDouble(),
+            radius.toDouble()
+        )
+        boundsFilter.setEllipse(ellipse)
 
-        Collection highlightedNodes = networkPanel.getCanvas().getLayer().getRoot().getAllNodes(boundsFilter, null);
+        val highlightedNodes = networkPanel.canvas.layer.getRoot().getAllNodes(boundsFilter, null)
 
         // Auto-highlighter mode
-        for (Object node : highlightedNodes) {
-            if (node instanceof NeuronNode) {
-                modifyNode((NeuronNode) node);
+        for (node in highlightedNodes) {
+            if (node is NeuronNode) {
+                modifyNode(node)
             }
-
         }
-
     }
 
-    @Override
-    protected void endDrag(final PInputEvent event) {
-        super.endDrag(event);
+    override fun endDrag(event: PInputEvent?) {
+        super.endDrag(event)
     }
 
     /**
@@ -124,28 +126,28 @@ final class WandEventHandler extends PDragSequenceEventHandler {
      *
      * @param node node to act on
      */
-    private void modifyNode(NeuronNode node) {
-        Neuron neuron = node.getNeuron();
-        neuron.setActivation(neuron.getUpperBound());
+    private fun modifyNode(node: NeuronNode) {
+        val neuron = node.neuron
+        diffsForUndo.putIfAbsent(neuron, neuron.activation)
+        neuron.activation = neuron.upperBound
     }
 
     /**
      * Bounds filter.
      */
-    private class BoundsFilter implements PNodeFilter {
-
+    private inner class BoundsFilter : PNodeFilter {
         /**
          * Bounds.
          */
-        private Ellipse2D.Double ellipse;
+        private var ellipse: Ellipse2D.Double? = null
 
         /**
-         * Set the bounds for this bounds filter to <code>bounds</code>.
+         * Set the bounds for this bounds filter to `bounds`.
          *
          * @param ellipse bounds for this bounds filter
          */
-        public void setEllipse(Ellipse2D.Double ellipse) {
-            this.ellipse = ellipse;
+        fun setEllipse(ellipse: Ellipse2D.Double) {
+            this.ellipse = ellipse
         }
 
         /**
@@ -153,48 +155,36 @@ final class WandEventHandler extends PDragSequenceEventHandler {
          * @return
          * @see PNodeFilter
          */
-        public boolean accept(final PNode node) {
-            boolean isPickable = node.getPickable();
-            boolean boundsIntersects = ellipse.intersects(node.getGlobalBounds());
-            boolean isLayer = (node instanceof PLayer);
-            boolean isCamera = (node instanceof PCamera);
+        override fun accept(node: PNode): Boolean {
+            val isPickable = node.pickable
+            val boundsIntersects = ellipse!!.intersects(node.globalBounds)
+            val isLayer = (node is PLayer)
+            val isCamera = (node is PCamera)
 
-            return (isPickable && boundsIntersects && !isLayer && !isCamera);
+            return (isPickable && boundsIntersects && !isLayer && !isCamera)
         }
 
-        @Override
-        public boolean acceptChildrenOf(final PNode node) {
-            boolean areChildrenPickable = node.getChildrenPickable();
-            boolean isCamera = (node instanceof PCamera);
-            boolean isLayer = (node instanceof PLayer);
-            return (areChildrenPickable || isCamera || isLayer);
+        override fun acceptChildrenOf(node: PNode): Boolean {
+            val areChildrenPickable = node.childrenPickable
+            val isCamera = (node is PCamera)
+            val isLayer = (node is PLayer)
+            return (areChildrenPickable || isCamera || isLayer)
         }
     }
 
     /**
      * Selection event filter, accepts various mouse events, but only when the
-     * network panel's cursor is <code>MouseCursor.Wand</code>.
+     * network panel's cursor is `MouseCursor.Wand`.
      */
-    private class WandEventFilter extends PInputEventFilter {
+    private inner class WandEventFilter : PInputEventFilter(InputEvent.BUTTON1_MASK) {
+        override fun acceptsEvent(event: PInputEvent?, type: Int): Boolean {
+            val mouseCursor = networkPanel.mouseCursor
 
-        /**
-         * Create a new selection event filter.
-         */
-        public WandEventFilter() {
-            super(InputEvent.BUTTON1_MASK);
-        }
-
-        @Override
-        public boolean acceptsEvent(final PInputEvent event, final int type) {
-
-            MouseEventHandler.MouseCursor mouseCursor = networkPanel.getMouseCursor();
-
-            if (mouseCursor == MouseEventHandler.MouseCursor.Wand.INSTANCE && super.acceptsEvent(event, type)) {
-                return true;
+            if (mouseCursor === MouseCursor.Wand && super.acceptsEvent(event, type)) {
+                return true
             } else {
-                return false;
+                return false
             }
         }
     }
-
 }

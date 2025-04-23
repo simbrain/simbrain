@@ -16,62 +16,30 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package org.simbrain.network.gui;
+package org.simbrain.network.gui
 
-import org.piccolo2d.event.PBasicInputEventHandler;
-import org.piccolo2d.event.PInputEvent;
+import kotlinx.coroutines.launch
+import org.piccolo2d.event.PBasicInputEventHandler
+import org.piccolo2d.event.PInputEvent
 
-import javax.swing.*;
-import java.awt.geom.Point2D;
+class ContextMenuEventHandler(private val networkPanel: NetworkPanel) : PBasicInputEventHandler() {
 
-/**
- * Context menu event handler.
- */
-final class ContextMenuEventHandler extends PBasicInputEventHandler {
-
-    /**
-     * Network Panel.
-     */
-    private final NetworkPanel networkPanel;
-
-    /**
-     * Construct with a network panel.
-     *
-     * @param networkPanel reference to panel
-     */
-    public ContextMenuEventHandler(NetworkPanel networkPanel) {
-        this.networkPanel = networkPanel;
-    }
-
-    /**
-     * Show the context menu.
-     *
-     * @param event event
-     */
-    private void showContextMenu(final PInputEvent event) {
-
-        event.setHandled(true); // seems to confuse zoom event handler??
-        JPopupMenu contextMenu =  NetworkPanelMenusKt.creatContextMenu(networkPanel);
-        Point2D canvasPosition = event.getCanvasPosition();
-        contextMenu.show(networkPanel, (int) canvasPosition.getX(), (int) canvasPosition.getY());
-        networkPanel.getCanvas().getCamera().localToView(canvasPosition);
-        // Set this position so that new objects are added here
-        networkPanel.getNetwork().getPlacementManager().setLastClickedLocation(canvasPosition);
-    }
-
-    @Override
-    public void mousePressed(final PInputEvent event) {
-        if (event.isPopupTrigger()) {
-            NetworkPanelMenusKt.creatContextMenu(networkPanel);
-            showContextMenu(event);
+    private fun showContextMenu(event: PInputEvent) {
+        networkPanel.launch {
+            val contextMenu = networkPanel.creatContextMenu()
+            val canvasPosition = event.canvasPosition
+            contextMenu.show(networkPanel.canvas, canvasPosition.x.toInt(), canvasPosition.y.toInt())
+            networkPanel.canvas.camera.localToView(canvasPosition)
+            // Set this position so that new objects are added here
+            networkPanel.network.placementManager.lastClickedLocation = canvasPosition
         }
     }
 
-    @Override
-    public void mouseReleased(final PInputEvent event) {
+    override fun mousePressed(event: PInputEvent) {
+        super.mousePressed(event)
         if (event.isPopupTrigger()) {
-            NetworkPanelMenusKt.creatContextMenu(networkPanel);
-            showContextMenu(event);
+            showContextMenu(event)
         }
     }
+
 }

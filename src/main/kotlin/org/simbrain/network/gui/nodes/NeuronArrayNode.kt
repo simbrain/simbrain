@@ -441,8 +441,18 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                 actionManager.createCoupledPlotMenu(
                     neuronArray.getProducer(NeuronArray::activationArray),
                     objectName = "${neuronArray.id ?: "Neuron Array"} Activations",
-                    menuTitle = "Plot Activation"
-                )
+                    menuTitle = "Plot Activations${if (neuronArray.updateRule.isSpikingRule) "/Spikes" else ""}"
+                ).also {
+                    if (neuronArray.updateRule.isSpikingRule) {
+                        it.addSeparator()
+                        it.add(
+                            actionManager.createCoupledRasterPlotAction(
+                                neuronArray.getProducer(NeuronArray::spikes),
+                                "${neuronArray.displayName} Spikes"
+                            )
+                        )
+                    }
+                }
             )
             contextMenu.add(
                 actionManager.createCoupledPlotMenu(
@@ -451,14 +461,6 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                     menuTitle = "Plot Biases"
                 )
             )
-            if (neuronArray.updateRule.isSpikingRule) {
-                contextMenu.add(
-                    actionManager.createCoupledRasterPlotAction(
-                        neuronArray.getProducer(NeuronArray::spikes),
-                        "${neuronArray.displayName} Spikes"
-                    )
-                )
-            }
             contextMenu.add(actionManager.createImageInput(
                 neuronArray.getConsumer(NeuronArray::activationArray),
                 neuronArray.size,

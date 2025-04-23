@@ -208,13 +208,15 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
 
         // Projection Plot Action
         menu.addSeparator();
-        menu.add(SimbrainDesktop.INSTANCE.getActionManager().createCoupledPlotMenu(
+        var plotAction = SimbrainDesktop.INSTANCE.getActionManager().createCoupledPlotMenu(
                 SimbrainDesktop.INSTANCE.getWorkspace().getCouplingManager().getProducer(neuronGroup, "getActivationArray"),
                 neuronGroup.getDisplayName() + " Activations",
-                "Plot Activations"
-        ));
+                "Plot"
+        );
+        menu.add(plotAction);
         if (neuronGroup.getNeuronList().stream().findFirst().stream().anyMatch(it -> it.getUpdateRule() instanceof SpikingNeuronUpdateRule<?, ?>)) {
-            menu.add(
+            plotAction.addSeparator();
+            plotAction.add(
                     SimbrainDesktop.INSTANCE.getActionManager().createCoupledRasterPlotAction(
                             SimbrainDesktop.INSTANCE.getWorkspace().getCouplingManager().getProducer(neuronGroup, "getSpikes"),
                             neuronGroup.getDisplayName() + " Spikes"

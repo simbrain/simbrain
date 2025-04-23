@@ -152,14 +152,15 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
         menu.add(unclampNeuronsAction);
 
         // Projection Plot Action
-        menu.addSeparator();
-        menu.add(SimbrainDesktop.INSTANCE.getActionManager().createCoupledPlotMenu(
+        var plotAction = SimbrainDesktop.INSTANCE.getActionManager().createCoupledPlotMenu(
                 SimbrainDesktop.INSTANCE.getWorkspace().getCouplingManager().getProducer(neuronCollection, "getActivationArray"),
                 neuronCollection.getDisplayName() + " Activations",
-                "Plot Activations"
-        ));
+                "Plot"
+        );
+        menu.add(plotAction);
         if (neuronCollection.getNeuronList().stream().findFirst().stream().anyMatch(it -> it.getUpdateRule() instanceof SpikingNeuronUpdateRule<?, ?>)) {
-            menu.add(
+            plotAction.addSeparator();
+            plotAction.add(
                     SimbrainDesktop.INSTANCE.getActionManager().createCoupledRasterPlotAction(
                             SimbrainDesktop.INSTANCE.getWorkspace().getCouplingManager().getProducer(neuronCollection, "getSpikes"),
                             neuronCollection.getDisplayName() + " Spikes"

@@ -118,7 +118,7 @@ class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: Super
 
     private val <T: JComponent> T.removeAction get() = createAction(
         name = "Remove Supervised Model...",
-        iconPath = "menu_icons/RedX_small.png",
+        iconPath = "menu_icons/minus.png",
         description = "Remove this supervised model...",
         coroutineScope = networkPanel.network
     ) {

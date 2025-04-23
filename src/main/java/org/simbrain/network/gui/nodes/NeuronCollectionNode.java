@@ -230,7 +230,7 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
     protected Action removeAction = new AbstractAction() {
 
         {
-            putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/RedX_small.png"));
+            putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/minus.png"));
             putValue(NAME, "Remove Neuron Collection.");
             putValue(SHORT_DESCRIPTION, "Remove neuron collection.");
         }

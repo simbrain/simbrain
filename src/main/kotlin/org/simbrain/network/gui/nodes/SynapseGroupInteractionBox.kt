@@ -56,7 +56,7 @@ class SynapseGroupInteractionBox(
                 synapseGroupNode.getDialog().makeVisible()
             })
             menu.add(networkPanel.createAction(
-                iconPath = "menu_icons/RedX_small.png",
+                iconPath = "menu_icons/minus.png",
                 name = "Delete synapse group"
             ) {
                 synapseGroup.delete()

@@ -238,7 +238,7 @@ object SimbrainDesktop {
         if (Utils.isMacOSX()) {
             Desktop.getDesktop().setAboutHandler {
                 val aboutDialog = JDialog(null as JFrame?, "About Simbrain")
-                aboutDialog.setLayout(BorderLayout())
+                aboutDialog.layout = BorderLayout()
                 
                 // Logo at the top
                 val logoPanel = JPanel(FlowLayout(FlowLayout.CENTER))
@@ -480,7 +480,7 @@ object SimbrainDesktop {
         bar.add(actionManager.newNetworkAction)
 
         var button = JButton()
-        button.icon = ResourceManager.getSmallIcon("menu_icons/World.png")
+        button.icon = ResourceManager.getSmallIcon("menu_icons/World2.png")
         val worldMenu = JPopupMenu()
         for (action in actionManager.newWorldActions) {
             worldMenu.add(action)

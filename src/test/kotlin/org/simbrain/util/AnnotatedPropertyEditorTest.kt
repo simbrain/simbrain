@@ -5,10 +5,14 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.core.Neuron
+import org.simbrain.network.updaterules.LinearRule
+import org.simbrain.network.updaterules.activity_generators.SinusoidalRule
 import org.simbrain.util.SimbrainConstants.NULL_STRING
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.NumericWidget
+import org.simbrain.util.propertyeditor.ObjectWidget
 import org.simbrain.util.propertyeditor.StringWidget
+import javax.swing.JComboBox
 import javax.swing.JSpinner
 import kotlin.reflect.full.declaredMemberProperties
 
@@ -74,6 +78,17 @@ class AnnotatedPropertyEditorTest {
         ape.commitChanges()
         assertEquals(.25, n1.activation)
         assertEquals(.25, n2.activation)
+    }
+
+    @Test
+    fun `test behavior two inconsistent object values`() {
+        n1.updateRule = LinearRule()
+        n2.updateRule = SinusoidalRule()
+        val ape = AnnotatedPropertyEditor(n1, n2)
+        val prop = Neuron::class.declaredMemberProperties.first { it.name == "updateRule" }
+        val selectedObjects = (((ape.propertyNameWidgetMap[prop.name] as ObjectWidget).widget).components.filterIsInstance<DetailTrianglePanel>().first().topPanelComponent as JComboBox<*>).selectedObjects
+        assertEquals(1, selectedObjects.size)
+        assertEquals(NULL_STRING, selectedObjects.first())
     }
 
     @Test

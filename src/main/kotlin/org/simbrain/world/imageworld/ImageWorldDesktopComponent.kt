@@ -92,7 +92,7 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
     private val deleteImageAction = createAction(
         "Delete image",
         description = "Delete current image",
-        iconPath =  "menu_icons/RedX.png"
+        iconPath =  "menu_icons/minus.png"
     ) {
         imageWorld.imageAlbum.deleteCurrentImage()
     }

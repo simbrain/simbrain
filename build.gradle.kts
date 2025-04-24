@@ -131,6 +131,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.0")
     testImplementation(platform("org.junit:junit-bom:5.7.1"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.0")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.10.2")
 
     // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
     implementation(group = "org.apache.commons", name = "commons-math3", version = "3.6.1")

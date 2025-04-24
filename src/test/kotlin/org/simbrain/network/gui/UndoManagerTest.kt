@@ -1,9 +1,17 @@
 package org.simbrain.network.gui
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions.assertEquals
+import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withContext
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.simbrain.network.NetworkComponent
+import org.simbrain.network.core.Network
 import org.simbrain.network.gui.UndoManager.UndoableAction
+import javax.swing.JButton
 
 class UndoManagerTest {
 
@@ -113,5 +121,54 @@ class UndoManagerTest {
 
         // Verify that redo was called with the modified context
         assertEquals(modifiedContext, contextPassedToRedo)
+    }
+
+    @Test
+    fun testNewNeuronActionUndoRedo() = runTest {
+        // Create a network, network component, and network panel
+        val network = Network()
+        val networkComponent = NetworkComponent("Test", network)
+        val networkPanel = NetworkPanel(networkComponent)
+
+        // Get the initial number of neurons in the network
+        val initialNeuronCount = network.flatNeuronList.size
+
+        // Directly implement the functionality of newNeuronAction
+        val newNeuronAction = networkPanel.networkActions.newNeuronAction
+
+        val stubButton = JButton(newNeuronAction)
+
+        withContext(Dispatchers.Swing) {
+            stubButton.doClick()
+        }
+
+        withContext(Dispatchers.Swing) {
+            delay(10)
+        }
+
+        // Verify that a neuron was added
+        assertEquals(initialNeuronCount + 1, network.flatNeuronList.size, "A neuron should be added to the network")
+        val addedNeuron = network.flatNeuronList.last()
+        val addedNeuronId = addedNeuron.id
+
+        // Undo the action
+        networkPanel.undoManager.undo()
+
+        // Verify that the neuron was removed
+        assertEquals(initialNeuronCount, network.flatNeuronList.size, "The neuron should be removed after undo")
+        assertFalse(
+            network.flatNeuronList.any { it.id == addedNeuronId },
+            "The added neuron should not be in the network after undo"
+        )
+
+        // Redo the action
+        networkPanel.undoManager.redo()
+
+        // Verify that the neuron was added back
+        assertEquals(initialNeuronCount + 1, network.flatNeuronList.size, "The neuron should be added back after redo")
+        assertTrue(
+            network.flatNeuronList.any { it.id == addedNeuronId },
+            "A neuron with the same ID should be in the network after redo"
+        )
     }
 }

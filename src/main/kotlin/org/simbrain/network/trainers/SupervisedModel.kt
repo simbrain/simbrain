@@ -148,17 +148,17 @@ class SupervisedModelTrainer(network: Network, supervisedModel: SupervisedModel)
         return trainBatch(rowNum until rowNum + 1)
     }
 
-    override fun trainBatch(rowRange: IntRange, probe: TrainerProbe?): Double {
+    override fun trainBatch(rowRange: IntRange, probe: StructuredProbe?): Double {
         val weightAccumulator: HashMap<WeightMatrix, Matrix> = HashMap()
         val synapseGroupAccumulator: HashMap<SynapseGroup, Matrix> = HashMap()
         val biasesAccumulator: HashMap<Layer, Matrix> = HashMap()
         val rawMatrixAccumulator: HashMap<Matrix, Matrix> = HashMap()
 
-        val probeContext = probe?.newContext("trainBatch")
+        val probeContext = probe?.createMapProbe("trainBatch")
 
         val error = with(supervisedNetwork) {
             rowRange.sumOf { rowNum ->
-                val rowProbeContext = probeContext?.newContext("trainRow-$rowNum")
+                val rowProbeContext = probeContext?.createMapProbe("trainRow-$rowNum")
                 inputLayer.setActivations(trainingSet.inputs.row(rowNum))
                 val targetVec = trainingSet.targets.rowVectorTransposed(rowNum)
                 with(network) {
@@ -178,7 +178,7 @@ class SupervisedModelTrainer(network: Network, supervisedModel: SupervisedModel)
             }
         }
 
-        val weightAccumulatorContext = probeContext?.newContext("weightAccumulators")
+        val weightAccumulatorContext = probeContext?.createMapProbe("weightAccumulators")
 
         weightAccumulatorContext?.writeAll(weightAccumulator) { wm, delta ->
             wm.displayName to delta
@@ -210,11 +210,11 @@ class SupervisedModelTrainer(network: Network, supervisedModel: SupervisedModel)
         }
 
 
-        probeContext?.newContext("biasesAccumulator")?.writeAll(biasesAccumulator) { na, delta ->
+        probeContext?.createMapProbe("biasesAccumulator")?.writeAll(biasesAccumulator) { na, delta ->
             na.displayName to delta
         }
 
-        val computeDeltaContext = probeContext?.newContext("computeDelta")
+        val computeDeltaContext = probeContext?.createMapProbe("computeDelta")
 
         biasesAccumulator.forEach { (na, delta) ->
             val delta = config.optimizer.computeDelta(na.biases, delta)
@@ -223,7 +223,7 @@ class SupervisedModelTrainer(network: Network, supervisedModel: SupervisedModel)
             na.events.updated.fire()
         }
 
-        probeContext?.newContext("updatedBiases")?.writeAll(biasesAccumulator) { na, _ -> na.displayName to na.biases.clone() }
+        probeContext?.createMapProbe("updatedBiases")?.writeAll(biasesAccumulator) { na, _ -> na.displayName to na.biases.clone() }
 
         rawMatrixAccumulator.forEach { (matrix, delta) ->
             matrix.add(config.optimizer.computeDelta(matrix, delta))

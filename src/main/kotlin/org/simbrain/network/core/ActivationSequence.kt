@@ -1,7 +1,7 @@
 package org.simbrain.network.core
 
 import org.simbrain.network.gui.nodes.ActivationSequenceProcessor
-import org.simbrain.network.trainers.TrainerProbe
+import org.simbrain.network.trainers.StructuredProbe
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.NeuronUpdateRule
 import org.simbrain.network.updaterules.interfaces.DifferentiableUpdateRule
@@ -61,11 +61,11 @@ class ActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inpu
         signalSource: Layer,
         biasesAccumulator: HashMap<Layer, Matrix>,
         rawMatrixAccumulator: HashMap<Matrix, Matrix>,
-        probe: TrainerProbe?
+        probe: StructuredProbe?
     ): Matrix {
         var errorSignal = error
 
-        val processErrorProbe = probe?.newContext("processError")
+        val processErrorProbe = probe?.createMapProbe("processError")
 
         errorSignal = (updateRule as? DifferentiableUpdateRule)?.getDerivative(inputs)?.let { deriv ->
             processErrorProbe?.write("deriv", deriv)

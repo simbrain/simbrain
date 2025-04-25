@@ -33,9 +33,12 @@ private val WeightMatrix.targetNeuronArray get() = target as NeuronArray
  */
 context(Network)
 @Deprecated("Migrating towards LinkedHashSet<Layer>.forwardPass")
-fun List<WeightMatrix>.forwardPass(inputVector: Matrix) {
+fun List<WeightMatrix>.forwardPass(inputVector: Matrix, rowProbe: StructuredProbe? = null) {
+
+    val rowProbe = rowProbe?.createMapProbe("ForwardPass")
     inputVector.validateSameShape(first().sourceNeuronArray.inputs)
     first().sourceNeuronArray.activations = inputVector
+    rowProbe?.write("Input", inputVector)
 
     fun NeuronArray.updateWithoutClearingInputs() {
         updateRule.apply(this, dataHolder)
@@ -46,6 +49,8 @@ fun List<WeightMatrix>.forwardPass(inputVector: Matrix) {
         wm.target.inputs.fill(0.0)
         wm.target.accumulateInputs()
         (wm.target as NeuronArray).updateWithoutClearingInputs()
+        rowProbe?.write(wm.displayName, wm.weights)
+
     }
 }
 
@@ -360,9 +365,9 @@ fun LinkedHashSet<Layer>.getAllOutgoingSynapseGroups() = filterIsInstance<Abstra
  *  Assumes LinkedHashSet has been placed in an appropriate "breadth-first" order by [computeOrderedUpdatePath].
  */
 context(Network)
-fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: List<Layer>, probe: TrainerProbe? = null) {
+fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: List<Layer>, probe: StructuredProbe? = null) {
 
-    val probeContext = probe?.newContext("forwardPass")
+    val probeContext = probe?.createMapProbe("forwardPass")
 
     if (inputValues.size != inputLayers.size) throw IllegalArgumentException("Must provide same number of input vectors as input layers")
     inputValues.zip(inputLayers).forEach { (a, b) -> a.validateSameShape(b.activations) }
@@ -394,21 +399,21 @@ fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: Lis
     inputLayers.zip(inputValues).forEach { (layer, value) ->
         layer.activations = value
     }
-    probeContext?.newContext("weightsInForwardPass")?.writeAll(
+    probeContext?.createMapProbe("weightsInForwardPass")?.writeAll(
         flatMap {
             it.outgoingConnectors
         }.associate {
             it.displayName to (it as? WeightMatrix)?.weights?.clone()
         }
     )
-    probeContext?.newContext("activationsAfterApplyingTrainingInputs")?.writeAll(inputLayers.associate { it.displayName to it.activations.clone() })
-    probeContext?.newContext("biasesInForwardPass")?.writeAll(inputLayers.associate { it.displayName to it.biases.clone() })
-    val layersContext = probeContext?.newContext("layersInForwardPass")
+    probeContext?.createMapProbe("activationsAfterApplyingTrainingInputs")?.writeAll(inputLayers.associate { it.displayName to it.activations.clone() })
+    probeContext?.createMapProbe("biasesInForwardPass")?.writeAll(inputLayers.associate { it.displayName to it.biases.clone() })
+    val layersContext = probeContext?.createMapProbe("layersInForwardPass")
     allLayers.forEach {
-        val layerContext = layersContext?.newContext(it.displayName)
-        val inputsBeforeAccumulation = layerContext?.newContext("inputsBeforeAccumulation")
-        val inputsProbe = layerContext?.newContext("inputs")
-        val inputsAfterAccumulation = layerContext?.newContext("inputsAfterAccumulation")
+        val layerContext = layersContext?.createMapProbe(it.displayName)
+        val inputsBeforeAccumulation = layerContext?.createMapProbe("inputsBeforeAccumulation")
+        val inputsProbe = layerContext?.createMapProbe("inputs")
+        val inputsAfterAccumulation = layerContext?.createMapProbe("inputsAfterAccumulation")
         it.clearInputs()
         when (it) {
             is NeuronArray -> {
@@ -430,7 +435,7 @@ fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: Lis
             else -> it.update()
         }
     }
-    probeContext?.newContext("afterUpdates")?.writeAll(allLayers.associate { it.displayName to it.activations.clone() })
+    probeContext?.createMapProbe("afterUpdates")?.writeAll(allLayers.associate { it.displayName to it.activations.clone() })
 }
 
 /**
@@ -449,10 +454,10 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
     biasesAccumulator: HashMap<Layer, Matrix>,
     rawMatrixAccumulator: HashMap<Matrix, Matrix>,
     lossFunction: BackpropLossFunction = BackpropLossFunction.SSE,
-    probe: TrainerProbe? = null,
+    probe: StructuredProbe? = null,
 ): Double {
 
-    val probeContext = probe?.newContext("accumulateBackprop")
+    val probeContext = probe?.createMapProbe("accumulateBackprop")
 
     val reversedLayers = drop(1).reversed()
 
@@ -470,12 +475,12 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
     probeContext?.write("errorSignal") { errorSignal.clone() }
     probeContext?.write("signalSource") { signalSource.displayName }
 
-    val backpropLayersContext = probeContext?.newListContext("backpropLayers")
+    val backpropLayersContext = probeContext?.createListProbe("backpropLayers")
 
     // Go through layers from output to input
     reversedLayers.forEach { layer ->
 
-        val layerContext = backpropLayersContext?.newContext(layer.displayName)
+        val layerContext = backpropLayersContext?.createMapProbe(layer.displayName)
 
         // Process the error signal. Bias update for neuron array. Full backprop update for transformer block. Etc.
         errorSignal = layer.processError(errorSignal, signalSource, biasesAccumulator, rawMatrixAccumulator)
@@ -488,7 +493,7 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
         //  2. "backpropagate" the error signals by multiplying them by the weight matrix to get a new signal
         var accumulatedErrorSignal: Matrix? = null
         layer.incomingConnectors.forEach { connector ->
-            val connectorContext = layerContext?.newContext(connector.displayName)
+            val connectorContext = layerContext?.createMapProbe(connector.displayName)
             val wm = connector as WeightMatrix
             val weightDeltas = wm.computeWeightDeltas(errorSignal)
             connectorContext?.write("weightDeltas") { weightDeltas.clone() }
@@ -504,7 +509,7 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
             connectorContext?.write("accumulatedErrorSignal") { accumulatedErrorSignal?.clone() }
         }
         (layer as? AbstractNeuronCollection)?.incomingSgs?.forEach { sg ->
-            val sgContext = layerContext?.newContext(sg.displayName)
+            val sgContext = layerContext?.createMapProbe(sg.displayName)
             val weightDeltas = sg.computeWeightDeltas(errorSignal)
             sgContext?.write("weightDeltas") { weightDeltas.clone() }
             synapseGroupAccumulator.getOrPut(sg) {
@@ -653,6 +658,9 @@ fun Matrix.applyDiagonalPattern(): Matrix {
     return this
 }
 
+/**
+ * Split a dataset (inputs and targets) into training and testing subsets.
+ */
 fun splitDataSet(inputs: Matrix, targets: Matrix, splitRatio: Double, random: Random = Random(42L)): Pair<Pair<Matrix, Matrix>, Pair<Matrix, Matrix>> {
     require(inputs.nrow() == targets.nrow()) { "inputs nrow (${inputs.nrow()}) must equal targets nrow (${targets.nrow()})" }
     require(splitRatio in 0.0..1.0) { "splitRatio must be between 0.0 and 1.0" }
@@ -680,20 +688,35 @@ fun splitDataSet(inputs: Matrix, targets: Matrix, splitRatio: Double, random: Ra
     )
 }
 
-sealed class TrainerProbe(var parent: TrainerProbe? = null): Iterable<Pair<Any, Any?>> {
+/**
+ * A hierarchical container for structured data capture, supporting both map-like and list-like organization.
+ *
+ *  Useful for tracing, logging, testing, and debugging complex data flows or computation trees.
+ *
+ * This abstract base class allows nesting of probe data via two concrete types: [MapProbe] for key-value mappings
+ * and [ListProbe] for ordered collections. Each node can contain values or nested probe contexts.
+ *
+ * When passing a probe to a new context it's best to create a new probe from it (since you can't write to it directly).
+ *
+ * @property parent Optional parent context, enabling upward traversal or tree-like structures.
+ */
+sealed class StructuredProbe(var parent: StructuredProbe? = null): Iterable<Pair<Any, Any?>> {
 
-    class MapContext(parent: TrainerProbe? = null) : TrainerProbe(parent) {
+    /**
+     * Add key, value pairs to a probe. Basically if you want to give names to things you're probing.
+     */
+    class MapProbe(parent: StructuredProbe? = null) : StructuredProbe(parent) {
         val data = LinkedHashMap<String, Any?>()
 
         override fun iterator() = data.entries.map { it.toPair() }.iterator()
 
-        override fun newContext(key: String?): MapContext {
+        override fun createMapProbe(key: String?): MapProbe {
             require(key != null) { "Key cannot be null for MapContext" }
-            return MapContext(parent = this).also { data[key] = it }
+            return MapProbe(parent = this).also { data[key] = it }
         }
-        override fun newListContext(key: String?): ListContext {
+        override fun createListProbe(key: String?): ListProbe {
             require(key != null) { "Key cannot be null for MapContext" }
-            return ListContext(parent = this).also { data[key] = it }
+            return ListProbe(parent = this).also { data[key] = it }
         }
 
         fun write(key: String, value: Any?) {
@@ -710,16 +733,19 @@ sealed class TrainerProbe(var parent: TrainerProbe? = null): Iterable<Pair<Any, 
 
         override fun toTreeString(indentation: Int): String {
             return data.entries.joinToString("\n") { (key, value) ->
-                " ".repeat(indentation) + key + ": \n" + ((value as? TrainerProbe)?.toTreeString(indentation + 2) ?: value.toString().indent(indentation + 2))
+                " ".repeat(indentation) + key + ": \n" + ((value as? StructuredProbe)?.toTreeString(indentation + 2) ?: value.toString().indent(indentation + 2))
             }
         }
     }
 
-    class ListContext(parent: TrainerProbe? = null) : TrainerProbe(parent) {
+    /**
+     * Push probe items into a list. Useful mostly with foreach.
+     */
+    class ListProbe(parent: StructuredProbe? = null) : StructuredProbe(parent) {
         val data = ArrayList<Any?>()
         override fun iterator() = data.mapIndexed { index, value -> index to value }.iterator()
-        override fun newContext(key: String?) = MapContext(parent = this).also { data.add(it) }
-        override fun newListContext(key: String?) = ListContext(parent = this).also { data.add(it) }
+        override fun createMapProbe(key: String?) = MapProbe(parent = this).also { data.add(it) }
+        override fun createListProbe(key: String?) = ListProbe(parent = this).also { data.add(it) }
 
         fun write(value: Any?) {
             data.add(value)
@@ -729,18 +755,19 @@ sealed class TrainerProbe(var parent: TrainerProbe? = null): Iterable<Pair<Any, 
 
         override fun toTreeString(indentation: Int): String {
             return data.mapIndexed { index, value ->
-                " ".repeat(indentation) + index + ": \n" + ((value as? TrainerProbe)?.toTreeString(indentation + 2) ?: value.toString().indent(indentation + 2))
+                " ".repeat(indentation) + index + ": \n" + ((value as? StructuredProbe)?.toTreeString(indentation + 2) ?: value.toString().indent(indentation + 2))
             }.joinToString("\n")
         }
     }
 
-    abstract fun newContext(key: String? = null): MapContext
-    abstract fun newListContext(key: String? = null): ListContext
+    abstract fun createMapProbe(key: String? = null): MapProbe
+
+    abstract fun createListProbe(key: String? = null): ListProbe
 
     abstract fun toTreeString(indentation: Int = 0): String
 }
 
-fun diffTrainerProbes(a: TrainerProbe, b: TrainerProbe, allowMissing: Boolean = false, diffFunction: (Any, Any) -> Any? = { a, b -> 
+fun diffProbes(a: StructuredProbe, b: StructuredProbe, allowMissing: Boolean = false, diffFunction: (Any, Any) -> Any? = { a, b ->
     when {
         a is Number && b is Number -> (a.toDouble() - b.toDouble()).let { if (abs(it) < 1e-6) true else it }
         a is Matrix && b is Matrix -> a.diff(b).let {
@@ -755,7 +782,7 @@ fun diffTrainerProbes(a: TrainerProbe, b: TrainerProbe, allowMissing: Boolean = 
 }): String {
     val result = StringBuilder()
     
-    fun TrainerProbe.getPath(pathParts: MutableList<String> = mutableListOf()): List<String> {
+    fun StructuredProbe.getPath(pathParts: MutableList<String> = mutableListOf()): List<String> {
         val parentPath = parent?.getPath(pathParts) ?: pathParts
         return parentPath
     }
@@ -784,7 +811,7 @@ fun diffTrainerProbes(a: TrainerProbe, b: TrainerProbe, allowMissing: Boolean = 
         val currentPath = path + keyA.toString()
         
         // Handle leaf nodes
-        if (valueA !is TrainerProbe && (nodeB == null || nodeB.second !is TrainerProbe)) {
+        if (valueA !is StructuredProbe && (nodeB == null || nodeB.second !is StructuredProbe)) {
             val pathStr = "/" + currentPath.joinToString("/")
             
             if (nodeB == null) {
@@ -817,9 +844,9 @@ fun diffTrainerProbes(a: TrainerProbe, b: TrainerProbe, allowMissing: Boolean = 
         }
         
         // Handle TrainerProbe nodes
-        if (valueA is TrainerProbe && nodeB?.second is TrainerProbe) {
+        if (valueA is StructuredProbe && nodeB?.second is StructuredProbe) {
             val probeA = valueA
-            val probeB = nodeB.second as TrainerProbe
+            val probeB = nodeB.second as StructuredProbe
             
             val aEntries = probeA.toList()
             val bMap = probeB.associate { it.first to it }

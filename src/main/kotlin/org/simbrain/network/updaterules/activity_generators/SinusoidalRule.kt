@@ -27,6 +27,7 @@ import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.EmptyScalarData
 import org.simbrain.util.UserParameter
+import org.simbrain.util.propertyeditor.CustomTypeName
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 import kotlin.math.sin
@@ -34,6 +35,7 @@ import kotlin.math.sin
 /**
  * **SinusoidalNeuron** produces a sine wave.
  */
+@CustomTypeName("Sinusoidal Activity Generator")
 class SinusoidalRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), ActivityGenerator, ClippedUpdateRule, NoisyUpdateRule {
     /**
      * Phase.

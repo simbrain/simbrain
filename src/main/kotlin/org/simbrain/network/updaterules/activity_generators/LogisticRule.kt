@@ -26,11 +26,15 @@ import org.simbrain.network.updaterules.interfaces.ClippedUpdateRule
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.EmptyScalarData
 import org.simbrain.util.UserParameter
+import org.simbrain.util.propertyeditor.CustomTypeName
 
 /**
- * **LogisticNeuron** updates using the logistic equation, which is chaotic
- * for the default growth rate. Does not use inputs from other neurons.
+ * Creates a sequence of activations using the logistic equation, which is chaotic
+ * for the default growth rate.
+ *
+ * Not to be confused with the logistic implementation of Sigmoid Rule
  */
+@CustomTypeName("Logistic Activity Generator")
 class LogisticRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>, ActivityGenerator, ClippedUpdateRule {
     /**
      * Growth rate.

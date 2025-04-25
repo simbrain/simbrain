@@ -5,7 +5,7 @@ import org.simbrain.network.gui.nodes.ActivationSequenceProcessor
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.Layout
 import org.simbrain.network.layouts.LineLayout
-import org.simbrain.network.trainers.TrainerProbe
+import org.simbrain.network.trainers.StructuredProbe
 import org.simbrain.network.updaterules.NeuronUpdateRule
 import org.simbrain.network.updaterules.interfaces.DifferentiableUpdateRule
 import org.simbrain.network.util.SpikingScalarData
@@ -567,14 +567,14 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
         signalSource: Layer,
         biasesAccumulator: HashMap<Layer, Matrix>,
         rawMatrixAccumulator: HashMap<Matrix, Matrix>,
-        probe: TrainerProbe?
+        probe: StructuredProbe?
     ): Matrix {
 
         if (signalSource is ActivationSequenceProcessor) {
             throw UnsupportedOperationException("ActivationSequenceProcessor not supported")
         }
 
-        val processErrorProbe = probe?.newContext("processError")
+        val processErrorProbe = probe?.createMapProbe("processError")
 
         (neuronList.firstNotNullOf { it.updateRule } as? DifferentiableUpdateRule)?.getDerivative(inputs)?.let { deriv ->
             processErrorProbe?.write("deriv", deriv)

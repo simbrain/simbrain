@@ -213,7 +213,7 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork>(val network: Network, va
     /**
      * @return the mean error for the batch
      */
-    open fun trainBatch(rowRange: IntRange, probe: TrainerProbe? = null): Double {
+    open fun trainBatch(rowRange: IntRange, probe: StructuredProbe? = null): Double {
         var batchError = 0.0
         for (i in rowRange) {
             batchError += trainRow(i)
@@ -336,46 +336,48 @@ class BackpropTrainer(network: Network, backpropNetwork: BackpropNetwork) : Supe
     /**
      * Backprop trains using error accumulation.
      */
-    override fun trainBatch(rowRange: IntRange, probe: TrainerProbe?): Double {
+    override fun trainBatch(rowRange: IntRange, probe: StructuredProbe?): Double {
 
         val weightAccumulator: HashMap<WeightMatrix, Matrix> = HashMap()
         val biasesAccumulator: HashMap<NeuronArray, Matrix> = HashMap()
 
-        val trainBatchContext = probe?.newContext("trainBatch")
+        val trainBatchProbe = probe?.createMapProbe("trainBatch")
 
         var error = 0.0
 
         for (i in rowRange) {
+            val rowProbe = trainBatchProbe?.createMapProbe("trainRow-$i")
             supervisedNetwork.inputLayer.setActivations(supervisedNetwork.trainingSet.inputs.row(i))
             val targetVec = supervisedNetwork.trainingSet.targets.rowVectorTransposed(i)
             with(network) {
-                supervisedNetwork.wmList.forwardPass(supervisedNetwork.inputLayer.activations)
+                supervisedNetwork.wmList.forwardPass(supervisedNetwork.inputLayer.activations, rowProbe)
+                rowProbe?.write("forwardPassOutputActivations", supervisedNetwork.outputLayer.activations.clone())
                 error += supervisedNetwork.wmList.accumulateBackprop(targetVec, weightAccumulator, biasesAccumulator, lossFunction = config.lossFunction)
             }
 
         }
 
-        val weightAccumulatorContext = trainBatchContext?.newContext("weightAccumulators")
+        val weightAccumulatorProbe = trainBatchProbe?.createMapProbe("weightAccumulators")
 
-        weightAccumulatorContext?.writeAll(weightAccumulator) { wm, delta ->
+        weightAccumulatorProbe?.writeAll(weightAccumulator) { wm, delta ->
             wm.displayName to delta
         }
 
         weightAccumulator.forEach { (wm, delta) ->
             val weightsDelta = config.optimizer.computeDelta(wm.weights, delta)
-            weightAccumulatorContext?.write("delta_${wm.displayName}") { weightsDelta.clone() }
+            weightAccumulatorProbe?.write("delta_${wm.displayName}") { weightsDelta.clone() }
 
             wm.weights.add(weightsDelta)
-            weightAccumulatorContext?.write("weights_${wm.displayName}") { wm.weights.clone() }
+            weightAccumulatorProbe?.write("weights_${wm.displayName}") { wm.weights.clone() }
 
             wm.events.updated.fire()
         }
 
-        trainBatchContext?.newContext("biasesAccumulator")?.writeAll(biasesAccumulator) { na, delta ->
+        trainBatchProbe?.createMapProbe("biasesAccumulator")?.writeAll(biasesAccumulator) { na, delta ->
             na.displayName to delta
         }
 
-        val computeDeltaContext = trainBatchContext?.newContext("computeDelta")
+        val computeDeltaContext = trainBatchProbe?.createMapProbe("computeDelta")
 
         biasesAccumulator.forEach { (na, delta) ->
             val delta = config.optimizer.computeDelta(na.biases, delta)
@@ -384,7 +386,7 @@ class BackpropTrainer(network: Network, backpropNetwork: BackpropNetwork) : Supe
             na.events.updated.fire()
         }
 
-        trainBatchContext?.newContext("updatedBiases")?.writeAll(biasesAccumulator) { na, _ -> na.displayName to na.biases.clone() }
+        trainBatchProbe?.createMapProbe("updatedBiases")?.writeAll(biasesAccumulator) { na, _ -> na.displayName to na.biases.clone() }
 
         return error / rowRange.count()
     }

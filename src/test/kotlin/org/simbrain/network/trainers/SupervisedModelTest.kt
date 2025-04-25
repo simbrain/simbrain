@@ -119,18 +119,18 @@ class SupervisedModelTest {
             "Layer activations should be the same"
         }
 
-        val backpropProbe = TrainerProbe.ListContext()
-        val supervisedProbe = TrainerProbe.ListContext()
+        val backpropProbe = StructuredProbe.ListProbe()
+        val supervisedProbe = StructuredProbe.ListProbe()
 
         (0 until 4).forEach { startingIndex ->
-            val backpropProbeContext = backpropProbe.newContext()
-            val supervisedProbeContext = supervisedProbe.newContext()
+            val backpropProbeContext = backpropProbe.createMapProbe()
+            val supervisedProbeContext = supervisedProbe.createMapProbe()
             with(network1) { backpropTrainer.trainBatch(startingIndex until startingIndex + 1, backpropProbeContext) }
             with(network2) { supervisedTrainer.trainBatch(startingIndex until startingIndex + 1, supervisedProbeContext) }
 
 
 
-            val result = diffTrainerProbes(backpropProbe, supervisedProbe, allowMissing = true)
+            val result = diffProbes(backpropProbe, supervisedProbe, allowMissing = true)
 
             assertTrue(result.isEmpty()) { result }
 
@@ -228,16 +228,16 @@ class SupervisedModelTest {
             "Layer activations should be the same"
         }
 
-        val naProbe = TrainerProbe.ListContext()
-        val ngProbe = TrainerProbe.ListContext()
+        val naProbe = StructuredProbe.ListProbe()
+        val ngProbe = StructuredProbe.ListProbe()
 
         (0 until 4).forEach { startingIndex ->
-            val naProbeContext = naProbe.newContext()
-            val ngProbeContext = ngProbe.newContext()
+            val naProbeContext = naProbe.createMapProbe()
+            val ngProbeContext = ngProbe.createMapProbe()
             with(network1) { naTrainer.trainBatch(startingIndex until startingIndex + 1, naProbeContext) }
             with(network2) { ngTrainer.trainBatch(startingIndex until startingIndex + 1, ngProbeContext) }
 
-            val result = diffTrainerProbes(naProbe, ngProbe)
+            val result = diffProbes(naProbe, ngProbe)
 
             assertTrue(result.isEmpty()) {
                 println("=====================")
@@ -347,16 +347,16 @@ class SupervisedModelTest {
             "Layer activations should be the same"
         }
 
-        val backpropProbe = TrainerProbe.ListContext()
-        val supervisedProbe = TrainerProbe.ListContext()
+        val backpropProbe = StructuredProbe.ListProbe()
+        val supervisedProbe = StructuredProbe.ListProbe()
 
         (0 until 4).forEach { startingIndex ->
-            val backpropProbeContext = backpropProbe.newContext()
-            val supervisedProbeContext = supervisedProbe.newContext()
+            val backpropProbeContext = backpropProbe.createMapProbe()
+            val supervisedProbeContext = supervisedProbe.createMapProbe()
             with(network1) { backpropTrainer.trainBatch(startingIndex until startingIndex + 1, backpropProbeContext) }
             with(network2) { supervisedTrainer.trainBatch(startingIndex until startingIndex + 1, supervisedProbeContext) }
 
-            val result = diffTrainerProbes(backpropProbe, supervisedProbe, allowMissing = true)
+            val result = diffProbes(backpropProbe, supervisedProbe, allowMissing = true)
 
             assertTrue(result.isEmpty()) { result }
 

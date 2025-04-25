@@ -1,7 +1,7 @@
 package org.simbrain.network.core
 
 import org.simbrain.network.events.LocationEvents
-import org.simbrain.network.trainers.TrainerProbe
+import org.simbrain.network.trainers.StructuredProbe
 import org.simbrain.network.updaterules.NeuronUpdateRule
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.toDoubleArray
@@ -175,7 +175,7 @@ abstract class Layer : LocatableModel(), AttributeContainer, CopyableObject {
         }
     }
 
-    abstract fun processError(error: Matrix, signalSource: Layer, biasesAccumulator: HashMap<Layer, Matrix>, rawMatrixAccumulator: HashMap<Matrix, Matrix>, probe: TrainerProbe? = null): Matrix
+    abstract fun processError(error: Matrix, signalSource: Layer, biasesAccumulator: HashMap<Layer, Matrix>, rawMatrixAccumulator: HashMap<Matrix, Matrix>, probe: StructuredProbe? = null): Matrix
 
     /**
      * See [org.simbrain.workspace.serialization.WorkspaceComponentDeserializer]

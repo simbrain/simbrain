@@ -474,13 +474,36 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         paste()
     }
 
+    private fun updateLocationsWithUndoableAction(
+        description: String,
+        models: List<LocatableModel>,
+        modification: (index: Int, model: LocatableModel) -> Unit
+    ) {
+        val previousLocations = models.associateWith { it.location.copy() }
+
+        models.forEachIndexed { index, model -> modification(index, model) }
+
+        val updatedLocations = models.associateWith { it.location.copy() }
+
+        undoManager.addUndoableAction(
+            description = description,
+            undo = {
+                previousLocations.forEach { (model, previousLocation) -> model.location = previousLocation }
+            },
+            redo = {
+                updatedLocations.forEach { (model, updatedLocation) -> model.location = updatedLocation }
+            }
+        )
+    }
+
     fun alignHorizontal() {
         val models = selectionManager.filterSelectedModels<LocatableModel>()
 
         if (models.isEmpty()) return
 
         val minY = models.minOf { it.locationY }
-        models.forEach { it.locationY = minY }
+        updateLocationsWithUndoableAction("Align horizontal", models) { _, model -> model.locationY = minY }
+
         repaint()
     }
 
@@ -490,7 +513,8 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         if (models.isEmpty()) return
 
         val minX = models.minOf { it.locationX }
-        models.forEach { it.locationX = minX }
+        updateLocationsWithUndoableAction("Align vertical", models) { _, model -> model.locationX = minX }
+
         repaint()
     }
 
@@ -504,7 +528,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         val max = sortedModels.last().locationX
         val spacing = (max - min) / (models.size - 1)
 
-        sortedModels.forEachIndexed { i, model -> model.locationX = min + spacing * i }
+        updateLocationsWithUndoableAction("Space horizontal", sortedModels) { i, model -> model.locationX = min + spacing * i }
         repaint()
     }
 
@@ -518,13 +542,13 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         val max = sortedModels.last().locationY
         val spacing = (max - min) / (models.size - 1)
 
-        sortedModels.forEachIndexed { i, model -> model.locationY = min + spacing * i }
+        updateLocationsWithUndoableAction("Space vertical", sortedModels) { i, model -> model.locationY = min + spacing * i }
         repaint()
     }
 
     fun nudge(dx: Int, dy: Int) {
-        selectionManager.filterSelectedModels<LocatableModel>()
-            .translate(dx * nudgeAmount, dy * nudgeAmount)
+        val models = selectionManager.filterSelectedModels<LocatableModel>()
+        updateLocationsWithUndoableAction("Nudge", models) { _, model -> model.location += point(dx * nudgeAmount, dy * nudgeAmount) }
     }
 
     fun toggleClamping() {

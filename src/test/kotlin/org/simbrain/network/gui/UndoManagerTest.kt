@@ -459,4 +459,258 @@ class UndoManagerTest {
             )
         }
     }
+
+    @Test
+    fun testAlignHorizontalUndoRedo() = runTest {
+        // Create a network, network component, and network panel
+        val network = Network()
+        val networkComponent = NetworkComponent("Test", network)
+        val networkPanel = NetworkPanel(networkComponent)
+
+        // Add some neurons to the network with different Y positions
+        val neuron1 = Neuron().apply { 
+            x = 100.0
+            y = 100.0
+        }
+        val neuron2 = Neuron().apply { 
+            x = 200.0
+            y = 200.0
+        }
+        val neuron3 = Neuron().apply { 
+            x = 300.0
+            y = 150.0
+        }
+        network.addNetworkModel(neuron1)
+        network.addNetworkModel(neuron2)
+        network.addNetworkModel(neuron3)
+
+        // Select the neurons
+        network.selectModels(listOf(neuron1, neuron2, neuron3))
+
+        withContext(Dispatchers.Swing) {
+            delay(10)
+        }
+
+        // Record the original Y positions
+        val originalY1 = neuron1.y
+        val originalY2 = neuron2.y
+        val originalY3 = neuron3.y
+
+        // Execute alignHorizontal
+        networkPanel.alignHorizontal()
+
+        // Verify that neurons were aligned horizontally (all have the same Y value, which should be the minimum)
+        val minY = minOf(originalY1, originalY2, originalY3)
+        assertEquals(minY, neuron1.y, "Neuron1 should be aligned to the minimum Y")
+        assertEquals(minY, neuron2.y, "Neuron2 should be aligned to the minimum Y")
+        assertEquals(minY, neuron3.y, "Neuron3 should be aligned to the minimum Y")
+
+        // Undo the action
+        networkPanel.undoManager.undo()
+
+        // Verify original positions were restored
+        assertEquals(originalY1, neuron1.y, "Neuron1 should be restored to original Y")
+        assertEquals(originalY2, neuron2.y, "Neuron2 should be restored to original Y")
+        assertEquals(originalY3, neuron3.y, "Neuron3 should be restored to original Y")
+
+        // Redo the action
+        networkPanel.undoManager.redo()
+
+        // Verify that neurons were aligned horizontally again
+        assertEquals(minY, neuron1.y, "Neuron1 should be aligned to the minimum Y after redo")
+        assertEquals(minY, neuron2.y, "Neuron2 should be aligned to the minimum Y after redo")
+        assertEquals(minY, neuron3.y, "Neuron3 should be aligned to the minimum Y after redo")
+    }
+
+    @Test
+    fun testAlignVerticalUndoRedo() = runTest {
+        // Create a network, network component, and network panel
+        val network = Network()
+        val networkComponent = NetworkComponent("Test", network)
+        val networkPanel = NetworkPanel(networkComponent)
+
+        // Add some neurons to the network with different X positions
+        val neuron1 = Neuron().apply { 
+            x = 100.0
+            y = 100.0
+        }
+        val neuron2 = Neuron().apply { 
+            x = 200.0
+            y = 200.0
+        }
+        val neuron3 = Neuron().apply { 
+            x = 150.0
+            y = 300.0
+        }
+        network.addNetworkModel(neuron1)
+        network.addNetworkModel(neuron2)
+        network.addNetworkModel(neuron3)
+
+        // Select the neurons
+        network.selectModels(listOf(neuron1, neuron2, neuron3))
+
+        withContext(Dispatchers.Swing) {
+            delay(10)
+        }
+
+        // Record the original X positions
+        val originalX1 = neuron1.x
+        val originalX2 = neuron2.x
+        val originalX3 = neuron3.x
+
+        // Execute alignVertical
+        networkPanel.alignVertical()
+
+        // Verify that neurons were aligned vertically (all have the same X value, which should be the minimum)
+        val minX = minOf(originalX1, originalX2, originalX3)
+        assertEquals(minX, neuron1.x, "Neuron1 should be aligned to the minimum X")
+        assertEquals(minX, neuron2.x, "Neuron2 should be aligned to the minimum X")
+        assertEquals(minX, neuron3.x, "Neuron3 should be aligned to the minimum X")
+
+        // Undo the action
+        networkPanel.undoManager.undo()
+
+        // Verify original positions were restored
+        assertEquals(originalX1, neuron1.x, "Neuron1 should be restored to original X")
+        assertEquals(originalX2, neuron2.x, "Neuron2 should be restored to original X")
+        assertEquals(originalX3, neuron3.x, "Neuron3 should be restored to original X")
+
+        // Redo the action
+        networkPanel.undoManager.redo()
+
+        // Verify that neurons were aligned vertically again
+        assertEquals(minX, neuron1.x, "Neuron1 should be aligned to the minimum X after redo")
+        assertEquals(minX, neuron2.x, "Neuron2 should be aligned to the minimum X after redo")
+        assertEquals(minX, neuron3.x, "Neuron3 should be aligned to the minimum X after redo")
+    }
+
+    @Test
+    fun testSpaceHorizontalUndoRedo() = runTest {
+        // Create a network, network component, and network panel
+        val network = Network()
+        val networkComponent = NetworkComponent("Test", network)
+        val networkPanel = NetworkPanel(networkComponent)
+
+        // Add some neurons to the network with specific X positions
+        val neuron1 = Neuron().apply { 
+            x = 100.0
+            y = 100.0
+        }
+        val neuron2 = Neuron().apply { 
+            x = 200.0
+            y = 200.0
+        }
+        val neuron3 = Neuron().apply { 
+            x = 300.0
+            y = 150.0
+        }
+        network.addNetworkModel(neuron1)
+        network.addNetworkModel(neuron2)
+        network.addNetworkModel(neuron3)
+
+        // Select the neurons
+        network.selectModels(listOf(neuron1, neuron2, neuron3))
+
+        withContext(Dispatchers.Swing) {
+            delay(10)
+        }
+
+        // Record the original X positions
+        val originalX1 = neuron1.x
+        val originalX2 = neuron2.x
+        val originalX3 = neuron3.x
+
+        // Execute spaceHorizontal
+        networkPanel.spaceHorizontal()
+
+        // Verify that neurons were evenly spaced horizontally
+        val min = originalX1
+        val max = originalX3
+        val spacing = (max - min) / 2.0
+
+        assertEquals(min, neuron1.x, "First neuron should remain at the minimum X")
+        assertEquals(min + spacing, neuron2.x, "Second neuron should be at min + spacing")
+        assertEquals(max, neuron3.x, "Last neuron should remain at the maximum X")
+
+        // Undo the action
+        networkPanel.undoManager.undo()
+
+        // Verify original positions were restored
+        assertEquals(originalX1, neuron1.x, "Neuron1 should be restored to original X")
+        assertEquals(originalX2, neuron2.x, "Neuron2 should be restored to original X")
+        assertEquals(originalX3, neuron3.x, "Neuron3 should be restored to original X")
+
+        // Redo the action
+        networkPanel.undoManager.redo()
+
+        // Verify that neurons were evenly spaced horizontally again
+        assertEquals(min, neuron1.x, "First neuron should remain at the minimum X after redo")
+        assertEquals(min + spacing, neuron2.x, "Second neuron should be at min + spacing after redo")
+        assertEquals(max, neuron3.x, "Last neuron should remain at the maximum X after redo")
+    }
+
+    @Test
+    fun testSpaceVerticalUndoRedo() = runTest {
+        // Create a network, network component, and network panel
+        val network = Network()
+        val networkComponent = NetworkComponent("Test", network)
+        val networkPanel = NetworkPanel(networkComponent)
+
+        // Add some neurons to the network with specific Y positions
+        val neuron1 = Neuron().apply { 
+            x = 100.0
+            y = 100.0
+        }
+        val neuron2 = Neuron().apply { 
+            x = 200.0
+            y = 200.0
+        }
+        val neuron3 = Neuron().apply { 
+            x = 150.0
+            y = 300.0
+        }
+        network.addNetworkModel(neuron1)
+        network.addNetworkModel(neuron2)
+        network.addNetworkModel(neuron3)
+
+        // Select the neurons
+        network.selectModels(listOf(neuron1, neuron2, neuron3))
+
+        withContext(Dispatchers.Swing) {
+            delay(10)
+        }
+
+        // Record the original Y positions
+        val originalY1 = neuron1.y
+        val originalY2 = neuron2.y
+        val originalY3 = neuron3.y
+
+        // Execute spaceVertical
+        networkPanel.spaceVertical()
+
+        // Verify that neurons were evenly spaced vertically
+        val min = originalY1
+        val max = originalY3
+        val spacing = (max - min) / 2.0
+
+        assertEquals(min, neuron1.y, "First neuron should remain at the minimum Y")
+        assertEquals(min + spacing, neuron2.y, "Second neuron should be at min + spacing")
+        assertEquals(max, neuron3.y, "Last neuron should remain at the maximum Y")
+
+        // Undo the action
+        networkPanel.undoManager.undo()
+
+        // Verify original positions were restored
+        assertEquals(originalY1, neuron1.y, "Neuron1 should be restored to original Y")
+        assertEquals(originalY2, neuron2.y, "Neuron2 should be restored to original Y")
+        assertEquals(originalY3, neuron3.y, "Neuron3 should be restored to original Y")
+
+        // Redo the action
+        networkPanel.undoManager.redo()
+
+        // Verify that neurons were evenly spaced vertically again
+        assertEquals(min, neuron1.y, "First neuron should remain at the minimum Y after redo")
+        assertEquals(min + spacing, neuron2.y, "Second neuron should be at min + spacing after redo")
+        assertEquals(max, neuron3.y, "Last neuron should remain at the maximum Y after redo")
+    }
 }

@@ -25,19 +25,14 @@ import org.simbrain.network.updaterules.interfaces.ActivityGenerator
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.network.util.SpikingScalarData
 import org.simbrain.util.UserParameter
+import org.simbrain.util.propertyeditor.CustomTypeName
 
 /**
- * **StochasticNeuron** is a simple type of random neuron which takes the
- * value of the upper bound if a random variable is above a specified firing
- * probability, and the lower bound otherwise. Ignores inputs.
- *
- *
- * TODO: Separate spiking from non-spiking version?
+ * Produces spikes using a user settable probability.
  */
+@CustomTypeName("Stochastic Spike Generator")
 class StochasticRule : SpikingNeuronUpdateRule<SpikingScalarData, SpikingMatrixData>(), ActivityGenerator {
-    /**
-     * Probability the neuron will fire.
-     */
+
     @UserParameter(
         label = "Firing Probability",
         description = "This parameter determines the probability that the generator will fire, "

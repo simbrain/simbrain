@@ -26,12 +26,14 @@ import org.simbrain.network.updaterules.interfaces.ClippedUpdateRule
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.EmptyScalarData
+import org.simbrain.util.propertyeditor.CustomTypeName
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 
 /**
- * **RandomNeuron** produces random activations within specified parameters.
+ * Produces random activations within specified parameters.
  */
+@CustomTypeName("Random Activity Generator")
 class RandomNeuronRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>, ActivityGenerator, ClippedUpdateRule, NoisyUpdateRule {
     /**
      * Noise source.

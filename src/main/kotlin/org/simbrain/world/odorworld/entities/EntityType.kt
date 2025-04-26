@@ -10,6 +10,10 @@ import java.awt.geom.Rectangle2D
  *
  * For the mapping from type to image, see [EntityNode].
  *
+ * Images are not automatically rescaled to a desired size.
+ *
+ * @param width: the actual width of the image in pixels (the image is not rescaled)
+ * @param height: the actual height of the image
  * @param rotating: true if separate images are provided for different headings
  * @param headLocation location of the head in uv coordinates when the agent is facing East.
  *                     Both numbers are ratios. Example: (.5, .5) is the center of the image.
@@ -53,7 +57,7 @@ sealed class EntityType(
     object Susi : EntityType("Susi", rotating = true, width = 96, height = 96)
     object Isopod : EntityType("Isopod", rotating = true, width = 18, height = 18, numFrames = 2)
     object Candy : EntityType("Candy", rotating = false, width = 35, height = 35)
-    object Fork : EntityType("Fork", rotating = false, width = 11, height = 35)
+    object Fork : EntityType("Fork", rotating = false, width = 16, height = 50)
     object Handle : EntityType("Handle", rotating = false, width = 75, height = 75)
 
     object Circle : EntityType("Circle", rotating = true, width = 73, height = 73, imageName = "circle") {

@@ -19,6 +19,7 @@
 package org.simbrain.plot.piechart;
 
 import com.thoughtworks.xstream.XStream;
+import org.jetbrains.annotations.NotNull;
 import org.jfree.data.general.DefaultPieDataset;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.XStreamUtils;
@@ -134,6 +135,11 @@ public class PieChartModel implements AttributeContainer, EditableObject {
         } catch (InterruptedException | InvocationTargetException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public String getName() {
+        return "Pie chart";
     }
 
     public void setSliceNames(String[] names) {

@@ -73,13 +73,13 @@ val srnXORSim = newSim {
 
             suspend fun test() {
                 fun index() = counter % testData.nrow()
-                srn.inputLayer.activations = testData.row(index()).toMatrix()
+                srn.inputLayer.activations = testData.row(index()).toColumnVector()
                 counter += 1
                 workspace.iterateSuspend()
                 val output = srn.outputLayer.activations
                 actualText.text = testData.row(index())[0].format(3)
                 predictedText.text = output[0].format(3)
-                val error = output rmse testData.row(index()).toMatrix()
+                val error = output rmse testData.row(index()).toColumnVector()
                 errorText.text = error.format(3)
 
                 sumWindow[counter % 12] += error

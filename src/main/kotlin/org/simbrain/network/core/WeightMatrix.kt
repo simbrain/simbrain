@@ -49,7 +49,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
         label = "Clamped",
         description = "If the weight matrix is clamped, local learning rules won't be applied",
         order = 30)
-    public var clamped = false
+    var clamped = false
         set(value) {
             field = value
             events.clampChanged.fire()
@@ -221,7 +221,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
 
             // For activation sequence case, just use last activation vector
             val sourceActivations = if (source is ActivationSequenceProcessor) {
-                source.activations.row(- 1).toMatrix()
+                source.activations.row(- 1).toColumnVector()
             } else {
                 source.activations
             }.let { activations ->

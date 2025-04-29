@@ -69,9 +69,9 @@ val tinyLanguageModelFF = newSim {
                     }
                 }
             }
-        }.toTypedArray().toMatrix()
+        }.toTypedArray().toColumnVector()
 
-    val targetMatrix = tokenizedCorpus.map { (_, target) -> target }.toTypedArray().toMatrix()
+    val targetMatrix = tokenizedCorpus.map { (_, target) -> target }.toTypedArray().toColumnVector()
 
     val backpropNetwork = with(network) {
         BackpropNetwork(

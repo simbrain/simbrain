@@ -134,7 +134,7 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
     context(Network)
     override fun trainOnInputData() {
         inputData.toArray().forEach { row ->
-            visibleLayer.activations = row.toMatrix()
+            visibleLayer.activations = row.toColumnVector()
             trainOnCurrentPattern()
         }
     }

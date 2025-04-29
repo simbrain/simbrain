@@ -1,7 +1,7 @@
 package org.simbrain.network.trainers
 
 import org.simbrain.util.shiftRight
-import org.simbrain.util.toMatrix
+import org.simbrain.util.toColumnVector
 import smile.math.matrix.Matrix
 import kotlin.math.min
 
@@ -30,7 +30,7 @@ class MatrixDataset(
         override fun hasNext() = index < size
         override fun next(): Pair<Matrix, Matrix> {
             if (!hasNext()) throw NoSuchElementException()
-            return (inputs.row(index).toMatrix() to targets.row(index).toMatrix()).also { index++ }
+            return (inputs.row(index).toColumnVector() to targets.row(index).toColumnVector()).also { index++ }
         }
     }
 

@@ -13,7 +13,7 @@ import org.simbrain.util.crossEntropy
 import org.simbrain.util.math.SigmoidFunctionEnum
 import org.simbrain.util.sse
 import org.simbrain.util.stats.distributions.NormalDistribution
-import org.simbrain.util.toMatrix
+import org.simbrain.util.toColumnVector
 import smile.math.matrix.Matrix
 import kotlin.random.Random
 
@@ -167,8 +167,8 @@ class BackpropTests {
     @Test
     fun `test softmax with cross entropy`() {
         with(net) {
-            val inputs = doubleArrayOf(1.0, 2.0, 3.0).toMatrix()
-            val targets = doubleArrayOf(0.0, 1.0, 0.0).toMatrix()
+            val inputs = doubleArrayOf(1.0, 2.0, 3.0).toColumnVector()
+            val targets = doubleArrayOf(0.0, 1.0, 0.0).toColumnVector()
             val inputLayer = NeuronArray(3)
             val outputLayer = NeuronArray(3).apply {
                 updateRule = SoftmaxRule()

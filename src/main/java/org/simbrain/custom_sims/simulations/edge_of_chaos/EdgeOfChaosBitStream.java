@@ -5,7 +5,6 @@ import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.core.Network;
-import org.simbrain.network.core.Synapse;
 import org.simbrain.network.core.SynapseGroup;
 import org.simbrain.network.neurongroups.NeuronGroup;
 import org.simbrain.network.updaterules.BinaryRule;
@@ -37,7 +36,7 @@ public class EdgeOfChaosBitStream extends Simulation {
 
     // Since mean is 0, lower variance means lower average weight strength
     private double variance = .5;
-    private double u_bar = 1.0;
+    private final double u_bar = 1.0;
 
     // References
     Network net;
@@ -45,7 +44,7 @@ public class EdgeOfChaosBitStream extends Simulation {
     NeuronGroup res1, res2, bitStream1, bitStream2;
     int currentRow = 0;
 
-    private long seed = 42L;
+    private final long seed = 42L;
 
 
     @Override
@@ -203,7 +202,7 @@ public class EdgeOfChaosBitStream extends Simulation {
         BinaryRule b = new BinaryRule(0, u_bar, .49);
         bitStreamInputs.setUpdateRule(b);
         var bitStream = new double[][]{{u_bar}, {0.0}, {0.0}, {0.0}, {0.0}, {u_bar}, {0.0}, {u_bar}, {u_bar}, {0.0}, {u_bar}, {u_bar}, {0.0}, {0.0}, {u_bar}};
-        bitStreamInputs.setInputData(SmileUtilsKt.toMatrix(bitStream));
+        bitStreamInputs.setInputData(SmileUtilsKt.toColumnVector(bitStream));
         net.addNetworkModel(bitStreamInputs);
         bitStreamInputs.setLocation(reservoir.getCenterX(), reservoir.getMaxY() + offset);
         return bitStreamInputs;

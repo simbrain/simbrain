@@ -3,7 +3,7 @@ package org.simbrain.network.core
 import org.simbrain.util.UserParameter
 import org.simbrain.util.addi
 import org.simbrain.util.reshape
-import org.simbrain.util.toMatrix
+import org.simbrain.util.toColumnVector
 import org.simbrain.workspace.Consumable
 import smile.math.matrix.Matrix
 
@@ -61,7 +61,7 @@ abstract class ArrayLayer(
      */
     @Consumable
     fun addInputsMismatched(inputs: DoubleArray) {
-        addInputs(inputs.toMatrix().reshape(this.inputs.nrow(), this.inputs.ncol()))
+        addInputs(inputs.toColumnVector().reshape(this.inputs.nrow(), this.inputs.ncol()))
     }
 
     override fun clearInputs() {

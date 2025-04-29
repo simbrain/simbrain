@@ -1,9 +1,8 @@
 package org.simbrain.network.updaterules
 
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.*
-import org.simbrain.util.toMatrix
+import org.simbrain.util.toColumnVector
 
 class GELUTest {
 
@@ -24,7 +23,7 @@ class GELUTest {
         input.clamped = true
 
         net.addNetworkModels(inputArray, outputArray, weightMatrix)
-        inputArray.activations = doubleArrayOf(-1.0, 0.0, 1.0, 2.0).toMatrix()
+        inputArray.activations = doubleArrayOf(-1.0, 0.0, 1.0, 2.0).toColumnVector()
         outputArray.updateRule = GELU()
     }
 
@@ -49,7 +48,7 @@ class GELUTest {
 
     @Test
     fun `test array derivative`() {
-        println(outputRule.getDerivative(doubleArrayOf(-1.0,0.0,1.0,3.0).toMatrix()))
+        println(outputRule.getDerivative(doubleArrayOf(-1.0,0.0,1.0,3.0).toColumnVector()))
     }
 
 }

@@ -22,7 +22,7 @@ import org.simbrain.network.core.*
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.util.createAction
 import org.simbrain.util.table.*
-import org.simbrain.util.toMatrix
+import org.simbrain.util.toColumnVector
 import org.simbrain.workspace.gui.SimbrainDesktop
 import smile.math.matrix.Matrix
 import javax.swing.JCheckBox
@@ -38,7 +38,7 @@ fun NetworkPanel.createTestInputPanel(layer: Layer)= createTestInputPanel(layer.
     } else if (layer is NeuronArray && layer.isClamped) {
         layer.setActivations(this.table.model.getCurrentDoubleRow().toDoubleArray())
     } else {
-        layer.addInputs(this.table.model.getCurrentDoubleRow().toDoubleArray().toMatrix())
+        layer.addInputs(this.table.model.getCurrentDoubleRow().toDoubleArray().toColumnVector())
     }
     with(network) { layer.update() }
 }

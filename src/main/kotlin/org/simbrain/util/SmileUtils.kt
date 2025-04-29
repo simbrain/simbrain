@@ -102,9 +102,9 @@ fun Matrix.rowVectorTransposed(rowIndex: Int): Matrix {
 /**
  * Convert a double array to a Smile Matrix / column vector.
  */
-fun DoubleArray.toMatrix(): Matrix = Matrix.column(this)
+fun DoubleArray.toColumnVector(): Matrix = Matrix.column(this)
 
-fun Array<DoubleArray>.toMatrix(): Matrix = Matrix.of(this)
+fun Array<DoubleArray>.toColumnVector(): Matrix = Matrix.of(this)
 
 /**
  * Add the entries of a double array in-place to a Smile matrix / column vector. Assumes the matrix has as many rows
@@ -432,7 +432,7 @@ val Matrix.columns get() = object : Iterable<Matrix> {
     override fun iterator() = object : Iterator<Matrix> {
         private var index = 0
         override fun hasNext() = index < ncol()
-        override fun next() = col(index++).toMatrix()
+        override fun next() = col(index++).toColumnVector()
     }
 }
 

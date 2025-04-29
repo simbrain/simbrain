@@ -13,7 +13,7 @@ import org.simbrain.network.util.alignNetworkModels
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.util.showOptionDialog
-import org.simbrain.util.toMatrix
+import org.simbrain.util.toColumnVector
 import smile.io.Read
 
 /**
@@ -152,7 +152,7 @@ val irisClassifier = newSim {
     smileClassifier.train()
 
     // Set input data for iris to training data
-    smileClassifier.inputNeuronGroup.inputData = classifier.trainingData.featureVectors.toMatrix()
+    smileClassifier.inputNeuronGroup.inputData = classifier.trainingData.featureVectors.toColumnVector()
 
     network.addNetworkModels(smileClassifier)
 

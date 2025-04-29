@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.*
-import org.simbrain.util.toMatrix
+import org.simbrain.util.toColumnVector
 
 class HebbTest {
 
@@ -78,8 +78,8 @@ class HebbTest {
 
     @Test
     fun `test vectorized rule`() {
-        val inputs = doubleArrayOf(1.0,3.0).toMatrix()
-        val outputs = doubleArrayOf(2.0,1.0).toMatrix()
+        val inputs = doubleArrayOf(1.0,3.0).toColumnVector()
+        val outputs = doubleArrayOf(2.0,1.0).toColumnVector()
         na1.activations = inputs
         na2.activations = outputs
         net.update()
@@ -95,8 +95,8 @@ class HebbTest {
 
     @Test
     fun `test vectorized rule with small learning rate`() {
-        val inputs = doubleArrayOf(1.0,3.0).toMatrix()
-        val outputs = doubleArrayOf(2.0,1.0).toMatrix()
+        val inputs = doubleArrayOf(1.0,3.0).toColumnVector()
+        val outputs = doubleArrayOf(2.0,1.0).toColumnVector()
         na1.activations = inputs
         na2.activations = outputs
         (wm12.learningRule as HebbianRule).learningRate = .1
@@ -108,8 +108,8 @@ class HebbTest {
 
     @Test
     fun `test vectorized rule for 3-to-2 case`() {
-        val inputs = doubleArrayOf(2.0, 0.0, -1.0).toMatrix()
-        val outputs = doubleArrayOf(.5, -.5).toMatrix()
+        val inputs = doubleArrayOf(2.0, 0.0, -1.0).toColumnVector()
+        val outputs = doubleArrayOf(.5, -.5).toColumnVector()
         val na1_v2 = NeuronArray(3)
         val wm_v2 = WeightMatrix(na1_v2, na2).apply {
             learningRule = HebbianRule().apply {

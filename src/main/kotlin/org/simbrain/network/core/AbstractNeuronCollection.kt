@@ -274,18 +274,6 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
         return neuronList.contains(n)
     }
 
-    /**
-     * Set all activations to a specified value.
-     *
-     * @param value the value to set the neurons to
-     */
-    @Consumable
-    fun setActivationLevels(value: Double) {
-        for (n in neuronList) {
-            n.activation = value
-        }
-    }
-
     override fun randomize(randomizer: ProbabilityDistribution?) {
         neuronList.forEach { it.randomize(randomizer) }
     }

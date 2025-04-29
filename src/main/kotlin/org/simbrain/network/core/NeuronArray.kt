@@ -172,6 +172,8 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
     }
 
     fun copyFrom(other: NeuronArray) {
+        this.label = other.label
+        this.labelArray = other.labelArray.copyOf()
         this.location = other.location
         this.gridMode = other.gridMode
         this.circleMode = other.circleMode

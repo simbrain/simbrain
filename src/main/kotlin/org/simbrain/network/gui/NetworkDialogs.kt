@@ -240,15 +240,15 @@ fun NetworkPanel.showUndoHistoryDialog() {
 
     // Create list models for undo and redo stacks
     val undoListModel = DefaultListModel<String>().apply {
-        undoManager.undoStack.reversed().forEachIndexed { index, action ->
-            addElement("${index + 1}. ${action.description}")
-        }
+        addAll(undoManager.undoStack.reversed().mapIndexed { index, action ->
+            "${index + 1}. ${action.description}"
+        })
     }
 
     val redoListModel = DefaultListModel<String>().apply {
-        undoManager.redoStack.reversed().forEachIndexed { index, action ->
-            addElement("${index + 1}. ${action.description}")
-        }
+        addAll(undoManager.redoStack.reversed().mapIndexed { index, action ->
+            "${index + 1}. ${action.description}"
+        })
     }
 
     // Create lists for undo and redo stacks

@@ -1,16 +1,16 @@
 package org.simbrain.network.gui
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.withContext
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.*
+import org.simbrain.network.desktop.NetworkDesktopComponent
 import org.simbrain.network.gui.UndoManager.UndoableAction
+import org.simbrain.network.trainers.SupervisedModel
+import org.simbrain.workspace.gui.SimbrainDesktop
 import javax.swing.JButton
 
 class UndoManagerTest {
@@ -713,4 +713,231 @@ class UndoManagerTest {
         assertEquals(min + spacing, neuron2.y, "Second neuron should be at min + spacing after redo")
         assertEquals(max, neuron3.y, "Last neuron should remain at the maximum Y after redo")
     }
+
+    @Test
+    fun testCreateSupervisedModelActionUndoRedo() = runTest {
+        // Create a network, network component, and network panel
+        val network = Network()
+        val networkComponent = NetworkComponent("Test", network)
+
+        SimbrainDesktop.workspace.addWorkspaceComponent(networkComponent)
+
+        val networkPanel = (SimbrainDesktop.getDesktopComponent(networkComponent) as NetworkDesktopComponent).networkPanel
+
+        // Create input and output layers
+        val inputLayer = NeuronArray(5).apply { 
+            label = "Input Layer"
+            isClamped = true
+        }
+        val outputLayer = NeuronArray(3).apply { 
+            label = "Output Layer"
+        }
+
+        // Create a weight matrix connecting the layers
+        val weightMatrix = WeightMatrix(inputLayer, outputLayer)
+
+        // Add the layers and weight matrix to the network
+        network.addNetworkModels(inputLayer, outputLayer, weightMatrix).awaitAll()
+
+        // Get the initial number of supervised models in the network
+        val initialSupervisedModelCount = network.getModels(SupervisedModel::class.java).size
+
+        // Select the input layer as source and output layer as target.
+        val screenElements = networkPanel.screenElements.associateBy { it.model.label }
+
+        networkPanel.selectionManager.add(screenElements["Input Layer"]!!)
+        networkPanel.selectionManager.convertSelectedNodesToSourceNodes()
+        networkPanel.selectionManager.clear()
+        networkPanel.selectionManager.add(screenElements["Output Layer"]!!)
+
+        // Get the action for this test
+        val createSupervisedModelAction = networkPanel.networkActions.createSupervisedModelAction
+
+        val stubButton = JButton(createSupervisedModelAction)
+
+        withContext(Dispatchers.Swing) {
+            stubButton.doClick()
+        }
+
+        withContext(Dispatchers.Swing) {
+            delay(10)
+        }
+
+        // Verify that a supervised model was added
+        assertEquals(initialSupervisedModelCount + 1, network.getModels(SupervisedModel::class.java).size,
+            "A supervised model should be added to the network")
+        val addedModel = network.getModels(SupervisedModel::class.java).last()
+        val addedModelId = addedModel.id
+
+        // Verify that the model has the correct input and output layers
+        assertEquals(inputLayer, addedModel.inputLayer, "The model should have the correct input layer")
+        assertEquals(outputLayer, addedModel.outputLayer, "The model should have the correct output layer")
+
+        // Undo the action
+        networkPanel.undoManager.undo()
+
+        // Verify that the supervised model was removed
+        assertEquals(initialSupervisedModelCount, network.getModels(SupervisedModel::class.java).size,
+            "The supervised model should be removed after undo")
+        assertFalse(
+            network.getModels(SupervisedModel::class.java).any { it.id == addedModelId },
+            "The added supervised model should not be in the network after undo"
+        )
+
+        // Redo the action
+        networkPanel.undoManager.redo()
+
+        // Verify that the supervised model was added back
+        assertEquals(initialSupervisedModelCount + 1, network.getModels(SupervisedModel::class.java).size,
+            "The supervised model should be added back after redo")
+        val redoModel = network.getModels(SupervisedModel::class.java).last()
+        assertEquals(addedModelId, redoModel.id,
+            "A supervised model with the same ID should be in the network after redo")
+        assertEquals(inputLayer, redoModel.inputLayer, 
+            "The model should have the correct input layer after redo")
+        assertEquals(outputLayer, redoModel.outputLayer, 
+            "The model should have the correct output layer after redo")
+    }
+
+    @Test
+    fun testCreateSupervisedModelActionUndoRedoAll() = runTest {
+        // Create a network, network component, and network panel
+        val network = Network()
+        val networkComponent = NetworkComponent("Test", network)
+
+        SimbrainDesktop.workspace.addWorkspaceComponent(networkComponent)
+
+        val networkPanel = (SimbrainDesktop.getDesktopComponent(networkComponent) as NetworkDesktopComponent).networkPanel
+
+        // Create input and output layers
+        val inputLayer = NeuronArray(5).apply { 
+            label = "Input Layer"
+            isClamped = true
+        }
+        val outputLayer = NeuronArray(3).apply { 
+            label = "Output Layer"
+        }
+
+        // Create a weight matrix connecting the layers
+        val weightMatrix = WeightMatrix(inputLayer, outputLayer)
+
+        // Add the layers and weight matrix to the network
+        network.addNetworkModels(inputLayer, outputLayer, weightMatrix).awaitAll()
+
+        // Get the initial number of supervised models in the network
+        val initialSupervisedModelCount = network.getModels(SupervisedModel::class.java).size
+
+        // Select the input layer as source and output layer as target.
+        val screenElements = networkPanel.screenElements.associateBy { it.model.label }
+
+        networkPanel.selectionManager.add(screenElements["Input Layer"]!!)
+        networkPanel.selectionManager.convertSelectedNodesToSourceNodes()
+        networkPanel.selectionManager.clear()
+        networkPanel.selectionManager.add(screenElements["Output Layer"]!!)
+
+        // Get the action for this test
+        val createSupervisedModelAction = networkPanel.networkActions.createSupervisedModelAction
+
+        val stubButton = JButton(createSupervisedModelAction)
+
+        // Perform multiple actions that can be undone/redone
+
+        // Action 1: Create a supervised model
+        withContext(Dispatchers.Swing) {
+            stubButton.doClick()
+        }
+
+        withContext(Dispatchers.Swing) {
+            delay(10)
+        }
+
+        // Verify that a supervised model was added
+        assertEquals(initialSupervisedModelCount + 1, network.getModels(SupervisedModel::class.java).size,
+            "A supervised model should be added to the network")
+        val addedModel = network.getModels(SupervisedModel::class.java).last()
+        val addedModelId = addedModel.id
+
+        // Verify that the model has the correct input and output layers
+        assertEquals(inputLayer, addedModel.inputLayer, "The model should have the correct input layer")
+        assertEquals(outputLayer, addedModel.outputLayer, "The model should have the correct output layer")
+
+        // Action 2: Add a neuron to the network
+        val newNeuron = Neuron().apply { 
+            label = "New Neuron"
+            x = 300.0
+            y = 300.0
+        }
+        network.addNetworkModel(newNeuron)
+        networkPanel.undoManager.addUndoableAction(
+            description = "Add neuron",
+            undo = { newNeuron.delete() },
+            redo = { network.addNetworkModel(newNeuron, usePlacementManager = false, useAutoAssignedId = false)?.await() }
+        )
+
+        // Verify that the neuron was added
+        assertTrue(network.flatNeuronList.contains(newNeuron), "The neuron should be added to the network")
+
+        // Action 3: Add a text object to the network
+        val textObject = NetworkTextObject("Test Text")
+        network.addNetworkModel(textObject)
+        networkPanel.undoManager.addUndoableAction(
+            description = "Add text object",
+            undo = { textObject.delete() },
+            redo = { network.addNetworkModel(textObject, usePlacementManager = false, useAutoAssignedId = false)?.await() }
+        )
+
+        // Verify that the text object was added
+        assertTrue(network.getModels<NetworkTextObject>().contains(textObject), "The text object should be added to the network")
+
+        repeat(2) {
+            // Store the number of actions in the undo stack
+            val undoStackSize = networkPanel.undoManager.undoStack.size
+
+            // Undo all actions
+            repeat(undoStackSize) {
+                networkPanel.undoManager.undo()
+            }
+
+            // Verify that all actions were undone
+            assertEquals(0, networkPanel.undoManager.undoStack.size, "The undo stack should be empty")
+            assertEquals(undoStackSize, networkPanel.undoManager.redoStack.size, "The redo stack should contain all undone actions")
+
+            // Verify the state after all undos
+            assertEquals(initialSupervisedModelCount, network.getModels(SupervisedModel::class.java).size,
+                "The supervised model should be removed after undoing all actions")
+            assertFalse(
+                network.getModels(SupervisedModel::class.java).any { it.id == addedModelId },
+                "The added supervised model should not be in the network after undoing all actions"
+            )
+            assertFalse(network.flatNeuronList.contains(newNeuron), "The neuron should be removed after undoing all actions")
+            assertFalse(network.getModels<NetworkTextObject>().contains(textObject), "The text object should be removed after undoing all actions")
+
+            // Store the number of actions in the redo stack
+            val redoStackSize = networkPanel.undoManager.redoStack.size
+
+            // Redo all actions
+            repeat(redoStackSize) {
+                networkPanel.undoManager.redo()
+            }
+
+            // Verify that all actions were redone
+            assertEquals(redoStackSize, networkPanel.undoManager.undoStack.size, "The undo stack should contain all redone actions")
+            assertEquals(0, networkPanel.undoManager.redoStack.size, "The redo stack should be empty")
+
+            // Verify the final state after all redos
+            assertEquals(initialSupervisedModelCount + 1, network.getModels(SupervisedModel::class.java).size,
+                "The supervised model should be added back after redoing all actions")
+            val redoModel = network.getModels(SupervisedModel::class.java).last()
+            assertEquals(addedModelId, redoModel.id,
+                "A supervised model with the same ID should be in the network after redoing all actions")
+            assertEquals(inputLayer, redoModel.inputLayer,
+                "The model should have the correct input layer after redoing all actions")
+            assertEquals(outputLayer, redoModel.outputLayer,
+                "The model should have the correct output layer after redoing all actions")
+            assertTrue(network.flatNeuronList.contains(newNeuron), "The neuron should be added back after redoing all actions")
+            assertTrue(network.getModels<NetworkTextObject>().contains(textObject), "The text object should be added back after redoing all actions")
+        }
+
+    }
+
 }

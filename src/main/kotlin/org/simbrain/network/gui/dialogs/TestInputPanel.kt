@@ -51,7 +51,7 @@ fun createTestInputPanel(neurons: List<Neuron>, initData: Matrix = Matrix.eye(ne
 }
 
 private fun createTestInputPanel(initData: Matrix, applyInputs: suspend MatrixEditor.(selectedRow: Int) -> Unit) = MatrixEditor(initData).apply {
-    var workspaceMode = false
+    var workspaceMode = true
     toolbar.addSeparator()
     toolbar.add(JLabel("Workspace Mode"))
     toolbar.add(JCheckBox(createAction(

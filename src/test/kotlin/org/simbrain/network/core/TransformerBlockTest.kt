@@ -56,7 +56,7 @@ class TransformerBlockTest {
         val inputMatrix = arrayOf(
             doubleArrayOf(1.0, 2.0),
             doubleArrayOf(3.0, 4.0)
-        ).toMatrix()
+        ).toColumnVector()
         block.addInputs(inputMatrix)
 
         // Forward pass
@@ -66,19 +66,19 @@ class TransformerBlockTest {
         val kStackExpected = arrayOf(
             doubleArrayOf(1.0, 2.0),
             doubleArrayOf(3.0, 4.0)
-        ).toMatrix()
+        ).toColumnVector()
         checkMatrixEquals(kStackExpected, block.kStack, "kStack")
 
         val qStackExpected = arrayOf(
             doubleArrayOf(1.0, 2.0),
             doubleArrayOf(3.0, 4.0)
-        ).toMatrix()
+        ).toColumnVector()
         checkMatrixEquals(qStackExpected, block.qStack, "qStack")
 
         val vStackExpected = arrayOf(
             doubleArrayOf(1.0, 2.0),
             doubleArrayOf(3.0, 4.0)
-        ).toMatrix()
+        ).toColumnVector()
         checkMatrixEquals(vStackExpected, block.vStack, "vStack")
 
         // Check selfAttention:
@@ -94,7 +94,7 @@ class TransformerBlockTest {
         val selfAttentionExpected = arrayOf(
             doubleArrayOf(1.0, 0.0),
             doubleArrayOf(0.0000502, 0.9999498)
-        ).toMatrix()
+        ).toColumnVector()
         checkMatrixEquals(selfAttentionExpected, block.selfAttention, "selfAttention", tol = 1e-3)
 
         // check softmax rows of self attention matrix sum to 1
@@ -129,13 +129,13 @@ class TransformerBlockTest {
         val inputMatrix = arrayOf(
             doubleArrayOf(1.0, 2.0),
             doubleArrayOf(3.0, 4.0)
-        ).toMatrix()
+        ).toColumnVector()
 
         block.addInputs(inputMatrix)
         with(net) { block.update() }
 
         // Test error
-        val error = doubleArrayOf(-1.0, 1.0).toMatrix()
+        val error = doubleArrayOf(-1.0, 1.0).toColumnVector()
 
         // Dummy source layer and accumulators
         val dummySource = NeuronArray(2)
@@ -170,7 +170,7 @@ class TransformerBlockTest {
         // Weights are identity so signal unchanged.
         errorSignal = errorSignal.mm(block.W2)
         // Hidden bias deltas are  of hadamard with relu deriv, then colsums
-        val expectedB1delta = errorSignal.mul(block.feedForwardHidden.reluDerivative()).colSums().toMatrix()
+        val expectedB1delta = errorSignal.mul(block.feedForwardHidden.reluDerivative()).colSums().toColumnVector()
         checkMatrixEquals(expectedB1delta, rawMatrixAccumulator[block.b1]!!, "b1delta")
         //println(expectedB1delta)
 

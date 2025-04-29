@@ -59,7 +59,7 @@ val srnElmanSentences = newSim {
     val trainingInputs = trainingInputsTokens
         .map {
             tokenEmbedding.get(it)
-        }.toTypedArray().toMatrix()
+        }.toTypedArray().toColumnVector()
 
     val trainingTargetTokens = trainingInputsTokens.drop(1)
     val trainingTarget = trainingInputs.shiftUpAndPadEndWithZero()

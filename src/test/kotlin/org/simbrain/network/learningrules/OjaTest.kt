@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.*
-import org.simbrain.util.toMatrix
+import org.simbrain.util.toColumnVector
 
 class OjaTest {
 
@@ -123,8 +123,8 @@ class OjaTest {
 
     @Test
     fun `test vectorized rule`() {
-        val inputs = doubleArrayOf(1.0, -1.0).toMatrix()
-        val outputs = doubleArrayOf(1.0, 2.0, -1.0).toMatrix()
+        val inputs = doubleArrayOf(1.0, -1.0).toColumnVector()
+        val outputs = doubleArrayOf(1.0, 2.0, -1.0).toColumnVector()
         na1.activations = inputs
         na2.activations = outputs
         net.update()

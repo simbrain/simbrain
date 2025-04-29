@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test
 import org.simbrain.util.linspace
 import org.simbrain.util.math.SigmoidFunctions
 import org.simbrain.util.toDoubleArray
-import org.simbrain.util.toMatrix
+import org.simbrain.util.toColumnVector
 
 class SigmoidFunctionTests {
 
@@ -39,7 +39,7 @@ class SigmoidFunctionTests {
         it[0] = 0.0 // Zero
         it[1] = -1e9 // Negative number with large absolute value -> lower bound of sigmoid
         it[2] = 1e9 // Large number -> Upper bound of sigmoid
-    }.toMatrix()
+    }.toColumnVector()
 
 
     @Test
@@ -68,7 +68,7 @@ class SigmoidFunctionTests {
 
     @Test
     fun `test matrix logistic `() {
-        val outputMatrix = SigmoidFunctions.logistic(inputMatrix, 1.0, 0.0, 1.0);
+        val outputMatrix = SigmoidFunctions.logistic(inputMatrix, 1.0, 0.0, 1.0)
         // print(outputMatrix.toDoubleArray().contentToString())
         assertArrayEquals(inputMatrix.toDoubleArray().map { SigmoidFunctions.logistic(it, 1.0, 0.0, 1.0) }
             .toDoubleArray(),
@@ -77,14 +77,14 @@ class SigmoidFunctionTests {
 
     @Test
     fun `test matrix atan `() {
-        val outputMatrix = SigmoidFunctions.atan(inputMatrix, 1.0, 0.0, 1.0);
+        val outputMatrix = SigmoidFunctions.atan(inputMatrix, 1.0, 0.0, 1.0)
         assertArrayEquals(inputMatrix.toDoubleArray().map { SigmoidFunctions.atan(it, 1.0, 0.0, 1.0) }.toDoubleArray(),
             outputMatrix.toDoubleArray())
     }
 
     @Test
     fun `test matrix tanh `() {
-        val outputMatrix = SigmoidFunctions.tanh(inputMatrix, 1.0, 0.0, 1.0);
+        val outputMatrix = SigmoidFunctions.tanh(inputMatrix, 1.0, 0.0, 1.0)
         assertArrayEquals(inputMatrix.toDoubleArray().map { SigmoidFunctions.tanh(it, 1.0, 0.0, 1.0) }.toDoubleArray(),
             outputMatrix.toDoubleArray())
     }

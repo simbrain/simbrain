@@ -78,7 +78,7 @@ val rbmSim = newSim {
             addButton("Add noise") {
                 rbm.visibleLayer.activations += NormalDistribution(standardDeviation = .1)
                     .sampleDouble(rbm.visibleLayer.size)
-                    .toMatrix()
+                    .toColumnVector()
             }
         }
     }

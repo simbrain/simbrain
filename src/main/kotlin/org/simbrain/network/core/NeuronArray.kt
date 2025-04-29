@@ -192,7 +192,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         }
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
-        activations = (randomizer?:NetworkPreferences.activationRandomizer).sampleDouble(size).toMatrix()
+        activations = (randomizer?:NetworkPreferences.activationRandomizer).sampleDouble(size).toColumnVector()
         events.updated.fire()
     }
 

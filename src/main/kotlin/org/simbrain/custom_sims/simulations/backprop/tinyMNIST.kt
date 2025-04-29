@@ -1,7 +1,6 @@
 package org.simbrain.custom_sims.simulations
 
 import kotlinx.coroutines.awaitAll
-import org.simbrain.custom_sims.addDocViewer
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
@@ -15,7 +14,7 @@ import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.util.csvToDouble2DArray
 import org.simbrain.util.fetchDataWithCache
 import org.simbrain.util.place
-import org.simbrain.util.toMatrix
+import org.simbrain.util.toColumnVector
 
 /**
  * A small implementation of MNIst
@@ -45,12 +44,12 @@ val tinyMNIST = newSim {
         fetchDataWithCache("https://downloads.simbrain.net/simbraindata/tiny_mnist_test_labels.csv") ?: return@newSim
 
     bp.trainingSet = MatrixDataset(
-        inputs = csvToDouble2DArray(trainInputsCSV).toMatrix(),
-        targets = csvToDouble2DArray(trainLabelsCSV).toMatrix(),
+        inputs = csvToDouble2DArray(trainInputsCSV).toColumnVector(),
+        targets = csvToDouble2DArray(trainLabelsCSV).toColumnVector(),
     )
     bp.testingSet = MatrixDataset(
-        inputs = csvToDouble2DArray(testInputsCSV).toMatrix(),
-        targets = csvToDouble2DArray(testLabelsCSV).toMatrix(),
+        inputs = csvToDouble2DArray(testInputsCSV).toColumnVector(),
+        targets = csvToDouble2DArray(testLabelsCSV).toColumnVector(),
     )
     bp.trainerConfig.lossFunction = BackpropLossFunction.CrossEntropy
     bp.trainerConfig.learningRate = .001
@@ -60,7 +59,7 @@ val tinyMNIST = newSim {
 
     bp.inputLayer.gridMode = true
     bp.inputLayer.offset(-350.0, -225.0)
-    bp.inputLayer.inputData = csvToDouble2DArray(testInputsCSV).toMatrix()
+    bp.inputLayer.inputData = csvToDouble2DArray(testInputsCSV).toColumnVector()
     bp.outputLayer.offset(-350.0, 225.0)
     bp.outputLayer.circleMode = true
     bp.outputLayer.gridMode = true

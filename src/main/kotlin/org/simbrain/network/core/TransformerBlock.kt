@@ -203,7 +203,7 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
             .map { row ->
                 softmaxRow(row)
             }.toTypedArray()
-            .toMatrix()
+            .toColumnVector()
             .let { selfAttention.copyFrom(it) }
 
         attentionOutput.copyFrom(selfAttention.mm(vStack))
@@ -248,7 +248,7 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
         }
         rawMatrixAccumulator.getOrPut(b2) {
             Matrix(b2.nrow(), b2.ncol())
-        }.add(errorSignal.colSums().toMatrix())
+        }.add(errorSignal.colSums().toColumnVector())
 
         val dFinalOutput = errorSignal
 
@@ -267,7 +267,7 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
         errorSignal = errorSignal.mul(feedForwardHiddenNetInputs.reluDerivative())
         rawMatrixAccumulator.getOrPut(b1) {
             Matrix(b1.nrow(), b1.ncol())
-        }.add(errorSignal.colSums().toMatrix())
+        }.add(errorSignal.colSums().toColumnVector())
 
         // Weight deltas layer 1
         val W1Delta = errorSignal.transpose().mm(feedForwardInput)

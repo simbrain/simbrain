@@ -9,7 +9,7 @@ import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.util.point
-import org.simbrain.util.toMatrix
+import org.simbrain.util.toColumnVector
 
 val activationSequenceThreeLayer = newSim {
 
@@ -53,12 +53,12 @@ val activationSequenceThreeLayer = newSim {
     val inputData = arrayOf(
         doubleArrayOf(1.0, 0.0, 1.0, 0.0, 1.0, 0.0),
         doubleArrayOf(0.0, 1.0, 0.0, 0.0, 1.0, 0.0),
-    ).toMatrix()
+    ).toColumnVector()
 
     val targetData = arrayOf(
         doubleArrayOf(1.0, 1.0, 1.0),
         doubleArrayOf(0.0, 2.0, 0.0)
-    ).toMatrix()
+    ).toColumnVector()
 
     model.trainingSet = MatrixDataset(
         inputs = inputData,

@@ -95,7 +95,7 @@ fun <SN> SN.getSupervisedTrainingDialog(): StandardDialog where SN: SupervisedNe
                 this@SN.forwardPass()
                 trainerConfig.lossFunction.scalarLoss(
                     outputLayer.activations,
-                    targetData.row(selectedRow).toMatrix()
+                    targetData.row(selectedRow).toColumnVector()
                 ).also { rowErrorJLabel.text = "${trainerConfig.lossFunction.shortName}: ${it.format(4)}" }
             }
         }

@@ -7,7 +7,7 @@ import org.simbrain.network.core.*
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
 import org.simbrain.util.get
 import org.simbrain.util.math.SigmoidFunctionEnum
-import org.simbrain.util.toMatrix
+import org.simbrain.util.toColumnVector
 
 class SigmoidDiscreteArrayTest {
 
@@ -23,9 +23,9 @@ class SigmoidDiscreteArrayTest {
 
     init {
         net.addNetworkModels(input1, input2, output, w13, w23)
-        input1.activations = doubleArrayOf(1.0, -1.0).toMatrix()
+        input1.activations = doubleArrayOf(1.0, -1.0).toColumnVector()
         input1.isClamped = true
-        input2.activations = doubleArrayOf(-1.0, 1.0).toMatrix()
+        input2.activations = doubleArrayOf(-1.0, 1.0).toColumnVector()
         input2.isClamped = true
         // Net input will be (1,-1) dot (-1,1) = 0
     }
@@ -99,25 +99,25 @@ class SigmoidDiscreteArrayTest {
         assertEquals(midpoint, output.activations[0], 0.01, "Zero Input")
         assertEquals(midpoint, output.activations[1], 0.01, "Zero Input")
 
-        output.biases = doubleArrayOf(100.0, 100.0).toMatrix()
+        output.biases = doubleArrayOf(100.0, 100.0).toColumnVector()
         net.update()
         assertEquals(upperBound, output.activations[0], 0.01, "High bias")
         assertEquals(upperBound, output.activations[1], 0.01, "High bias")
 
-        output.biases = doubleArrayOf(-100.0, -100.0).toMatrix()
+        output.biases = doubleArrayOf(-100.0, -100.0).toColumnVector()
         net.update()
         assertEquals(lowerBound, output.activations[0], 0.01, "Low bias")
         assertEquals(lowerBound, output.activations[1], 0.01, "Low bias")
 
         // Reset bias
-        output.biases = doubleArrayOf(0.0, 0.0).toMatrix()
+        output.biases = doubleArrayOf(0.0, 0.0).toColumnVector()
 
-        input1.activations = doubleArrayOf(100.0, 100.0).toMatrix()
+        input1.activations = doubleArrayOf(100.0, 100.0).toColumnVector()
         net.update()
         assertEquals(upperBound, output.activations[0], 0.01, "High activation")
         assertEquals(upperBound, output.activations[1], 0.01, "High activation")
 
-        input1.activations = doubleArrayOf(-100.0, -100.0).toMatrix()
+        input1.activations = doubleArrayOf(-100.0, -100.0).toColumnVector()
         net.update()
         assertEquals(lowerBound, output.activations[0], 0.01, "Low activation")
         assertEquals(lowerBound, output.activations[1], 0.01, "Low activation")
@@ -188,25 +188,25 @@ class SigmoidDiscreteArrayTest {
 
         // Test with bias
         scalarNeuron.bias = 2.0
-        arrayNeuron.biases = doubleArrayOf(2.0).toMatrix()
+        arrayNeuron.biases = doubleArrayOf(2.0).toColumnVector()
         scalarNet.update()
         assertEquals(scalarNeuron.activation, arrayNeuron.activations[0], 0.0001, "With bias")
 
         // Test with high bias
         scalarNeuron.bias = 100.0
-        arrayNeuron.biases = doubleArrayOf(100.0).toMatrix()
+        arrayNeuron.biases = doubleArrayOf(100.0).toColumnVector()
         scalarNet.update()
         assertEquals(scalarNeuron.activation, arrayNeuron.activations[0], 0.0001, "High bias")
 
         // Test with low bias
         scalarNeuron.bias = -100.0
-        arrayNeuron.biases = doubleArrayOf(-100.0).toMatrix()
+        arrayNeuron.biases = doubleArrayOf(-100.0).toColumnVector()
         scalarNet.update()
         assertEquals(scalarNeuron.activation, arrayNeuron.activations[0], 0.0001, "Low bias")
 
         // Reset bias
         scalarNeuron.bias = 0.0
-        arrayNeuron.biases = doubleArrayOf(0.0).toMatrix()
+        arrayNeuron.biases = doubleArrayOf(0.0).toColumnVector()
 
         // Create input sources
         val inputNeuron = Neuron()
@@ -222,7 +222,7 @@ class SigmoidDiscreteArrayTest {
 
         // Test with positive activation
         inputNeuron.activation = 5.0
-        inputArray.activations = doubleArrayOf(5.0).toMatrix()
+        inputArray.activations = doubleArrayOf(5.0).toColumnVector()
         inputNeuron.clamped = true
         inputArray.isClamped = true
         scalarNet.update()
@@ -230,19 +230,19 @@ class SigmoidDiscreteArrayTest {
 
         // Test with negative activation
         inputNeuron.activation = -5.0
-        inputArray.activations = doubleArrayOf(-5.0).toMatrix()
+        inputArray.activations = doubleArrayOf(-5.0).toColumnVector()
         scalarNet.update()
         assertEquals(scalarNeuron.activation, arrayNeuron.activations[0], 0.0001, "Negative activation")
 
         // Test with very large positive activation
         inputNeuron.activation = 100.0
-        inputArray.activations = doubleArrayOf(100.0).toMatrix()
+        inputArray.activations = doubleArrayOf(100.0).toColumnVector()
         scalarNet.update()
         assertEquals(scalarNeuron.activation, arrayNeuron.activations[0], 0.0001, "Large positive activation")
 
         // Test with very large negative activation
         inputNeuron.activation = -100.0
-        inputArray.activations = doubleArrayOf(-100.0).toMatrix()
+        inputArray.activations = doubleArrayOf(-100.0).toColumnVector()
         scalarNet.update()
         assertEquals(scalarNeuron.activation, arrayNeuron.activations[0], 0.0001, "Large negative activation")
     }
@@ -285,7 +285,7 @@ class SigmoidDiscreteArrayTest {
         // Set activations for source neurons and arrays
         sourceNeuron.activation = 1.0
         sourceNeuron.clamped = true
-        sourceArray.activations = doubleArrayOf(1.0, 1.0).toMatrix()
+        sourceArray.activations = doubleArrayOf(1.0, 1.0).toColumnVector()
         sourceArray.isClamped = true
 
         // Update the network

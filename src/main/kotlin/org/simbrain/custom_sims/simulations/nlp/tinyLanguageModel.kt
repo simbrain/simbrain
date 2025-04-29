@@ -100,9 +100,9 @@ val tinyLanguageModel = newSim("tiny_language_model") {
                     }
                 }
             }
-        }.toTypedArray().toMatrix()
+        }.toTypedArray().toColumnVector()
 
-    val targetMatrix = tokenizedCorpus.map { (_, target) -> target }.toTypedArray().toMatrix()
+    val targetMatrix = tokenizedCorpus.map { (_, target) -> target }.toTypedArray().toColumnVector()
 
     val inputs = ActivationSequence(contextSize, tokenEmbedding.dimension).apply {
         label = "Inputs"

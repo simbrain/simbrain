@@ -7,7 +7,7 @@ import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.util.linspace
 import org.simbrain.util.toDoubleArray
-import org.simbrain.util.toMatrix
+import org.simbrain.util.toColumnVector
 
 class LinearRuleArrayTest {
 
@@ -20,9 +20,9 @@ class LinearRuleArrayTest {
 
     init {
         net.addNetworkModels(input1, input2, output, w13, w23)
-        input1.activations = doubleArrayOf(1.0, -1.0).toMatrix()
+        input1.activations = doubleArrayOf(1.0, -1.0).toColumnVector()
         input1.isClamped = true
-        input2.activations = doubleArrayOf(-1.0, 1.0).toMatrix()
+        input2.activations = doubleArrayOf(-1.0, 1.0).toColumnVector()
         input2.isClamped = true
         // Net input will be (1,-1) + (-1,1) = (0.0)
     }
@@ -42,7 +42,7 @@ class LinearRuleArrayTest {
 
     @Test
     fun `test piecewise linear`() {
-        input1.activations = doubleArrayOf(10.0, 10.0).toMatrix()
+        input1.activations = doubleArrayOf(10.0, 10.0).toColumnVector()
         (output.updateRule as LinearRule).apply {
             clippingType = LinearRule.ClippingType.PiecewiseLinear
             lowerBound = -.5
@@ -54,35 +54,35 @@ class LinearRuleArrayTest {
 
     @Test
     fun `test relu`() {
-        input1.activations = doubleArrayOf(10.0, 10.0).toMatrix()
+        input1.activations = doubleArrayOf(10.0, 10.0).toColumnVector()
         // reminder: input 2 = (-1,1)
         (output.updateRule as LinearRule).apply {
             clippingType = LinearRule.ClippingType.Relu
         }
         net.update()
         assertArrayEquals(doubleArrayOf(9.0,11.0), output.activationArray)
-        input1.activations = doubleArrayOf(-10.0, -10.0).toMatrix()
+        input1.activations = doubleArrayOf(-10.0, -10.0).toColumnVector()
         net.update()
         assertArrayEquals(doubleArrayOf(0.0,0.0), output.activationArray)
     }
 
     @Test
     fun `test no clipping`() {
-        input1.activations = doubleArrayOf(10.0, 10.0).toMatrix()
+        input1.activations = doubleArrayOf(10.0, 10.0).toColumnVector()
         // reminder: input 2 = (-1,1)
         (output.updateRule as LinearRule).apply {
             clippingType = LinearRule.ClippingType.NoClipping
         }
         net.update()
         assertArrayEquals(doubleArrayOf(9.0,11.0), output.activationArray)
-        input1.activations = doubleArrayOf(-10.0, -10.0).toMatrix()
+        input1.activations = doubleArrayOf(-10.0, -10.0).toColumnVector()
         net.update()
         assertArrayEquals(doubleArrayOf(-11.0,-9.0), output.activationArray)
     }
 
     @Test
     fun `test bias`() {
-        output.biases = doubleArrayOf(1.0, -1.0).toMatrix()
+        output.biases = doubleArrayOf(1.0, -1.0).toColumnVector()
         net.update()
         assertArrayEquals(doubleArrayOf(1.0, -1.0), output.activationArray, 0.0)
     }
@@ -96,22 +96,22 @@ class LinearRuleArrayTest {
         lr.slope = 5.0
 
         // Above upper bound should return 0
-        var deriv = lr.getDerivative(doubleArrayOf(11.0, 100.0).toMatrix()).toDoubleArray()
+        var deriv = lr.getDerivative(doubleArrayOf(11.0, 100.0).toColumnVector()).toDoubleArray()
         assertArrayEquals(doubleArrayOf(0.0, 0.0), deriv, 0.0)
 
         // Below lower bound should return 0
-        deriv = lr.getDerivative(doubleArrayOf(-11.0, -100.0).toMatrix()).toDoubleArray()
+        deriv = lr.getDerivative(doubleArrayOf(-11.0, -100.0).toColumnVector()).toDoubleArray()
         assertArrayEquals(doubleArrayOf(0.0, 0.0), deriv, 0.0)
 
         // Between lower and upper bound returns the slope
-        deriv = lr.getDerivative(doubleArrayOf(0.0, 0.0).toMatrix()).toDoubleArray()
+        deriv = lr.getDerivative(doubleArrayOf(0.0, 0.0).toColumnVector()).toDoubleArray()
         assertArrayEquals(doubleArrayOf(5.0, 5.0), deriv, 0.0)
     }
 
     @Test
     fun `test array linear derivative with relu`() {
         val lr = LinearRule()
-        val array = linspace(-10.0,10.0,4).toMatrix()
+        val array = linspace(-10.0,10.0,4).toColumnVector()
         lr.clippingType = LinearRule.ClippingType.Relu
         assertArrayEquals(doubleArrayOf(0.0,0.0,1.0,1.0), lr.getDerivative(array).toDoubleArray())
     }
@@ -119,7 +119,7 @@ class LinearRuleArrayTest {
     @Test
     fun `test array linear derivative with no bounds`() {
         val lr = LinearRule()
-        val array = linspace(-10.0,10.0,4).toMatrix()
+        val array = linspace(-10.0,10.0,4).toColumnVector()
         lr.clippingType = LinearRule.ClippingType.NoClipping
         assertArrayEquals(doubleArrayOf(1.0,1.0,1.0,1.0), lr.getDerivative(array).toDoubleArray())
     }
@@ -129,7 +129,7 @@ class LinearRuleArrayTest {
         val lr = LinearRule()
         lr.lowerBound = -5.0
         lr.upperBound = 5.0
-        val array = linspace(-10.0,10.0,4).toMatrix()
+        val array = linspace(-10.0,10.0,4).toColumnVector()
         lr.clippingType = LinearRule.ClippingType.PiecewiseLinear
         assertArrayEquals(doubleArrayOf(0.0,1.0,1.0,0.0), lr.getDerivative(array).toDoubleArray())
     }

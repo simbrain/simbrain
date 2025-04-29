@@ -43,7 +43,7 @@ class SmileUtilsTest {
 
     @Test
     fun `test broadcasting multiplication`() {
-        val vector = doubleArrayOf(0.0, 1.0, 2.0).toMatrix()
+        val vector = doubleArrayOf(0.0, 1.0, 2.0).toColumnVector()
         val result = testMatrix.broadcastMultiply(vector)
         assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0), result.col(0))
         assertArrayEquals(doubleArrayOf(2.0, 5.0, 8.0), result.col(1))
@@ -52,7 +52,7 @@ class SmileUtilsTest {
 
     @Test
     fun `test broadcasting multiplication on non square matrix`() {
-        val vector = doubleArrayOf(0.0, 1.0, 2.0).toMatrix()
+        val vector = doubleArrayOf(0.0, 1.0, 2.0).toColumnVector()
         val result = nonSquareMatrix.broadcastMultiply(vector)
         assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0, 0.0), result.col(0))
         assertArrayEquals(doubleArrayOf(2.0, 5.0, 8.0, 11.0), result.col(1))
@@ -86,11 +86,11 @@ class SmileUtilsTest {
         val a = arrayOf(
             doubleArrayOf(1.0, 2.0),
             doubleArrayOf(3.0, 4.0)
-        ).toMatrix()
+        ).toColumnVector()
         val b = arrayOf(
             doubleArrayOf(5.0, 6.0),
             doubleArrayOf(7.0, 8.0)
-        ).toMatrix()
+        ).toColumnVector()
         val c = a + b
         assertArrayEquals(doubleArrayOf(6.0, 8.0), c.row(0))
         assertArrayEquals(doubleArrayOf(10.0, 12.0), c.row(1))
@@ -101,11 +101,11 @@ class SmileUtilsTest {
         val a = arrayOf(
             doubleArrayOf(1.0, 2.0),
             doubleArrayOf(3.0, 4.0)
-        ).toMatrix()
+        ).toColumnVector()
         val b = arrayOf(
             doubleArrayOf(5.0, 6.0),
             doubleArrayOf(7.0, 8.0)
-        ).toMatrix()
+        ).toColumnVector()
         val c = a - b
         assertArrayEquals(doubleArrayOf(-4.0, -4.0), c.row(0))
         assertArrayEquals(doubleArrayOf(-4.0, -4.0), c.row(1))
@@ -116,14 +116,14 @@ class SmileUtilsTest {
         val a = arrayOf(
             doubleArrayOf(1.0, 2.0),
             doubleArrayOf(3.0, 4.0)
-        ).toMatrix()
+        ).toColumnVector()
         val b = a * 2.0
         assertArrayEquals(doubleArrayOf(2.0, 4.0), b.row(0))
         assertArrayEquals(doubleArrayOf(6.0, 8.0), b.row(1))
         val c = arrayOf(
             doubleArrayOf(1.0, 2.0),
             doubleArrayOf(3.0, 4.0)
-        ).toMatrix()
+        ).toColumnVector()
         val d = -2.0 * c
         assertArrayEquals(doubleArrayOf(-2.0, -4.0), d.row(0))
         assertArrayEquals(doubleArrayOf(-6.0, -8.0), d.row(1))
@@ -131,8 +131,8 @@ class SmileUtilsTest {
 
     @Test
     fun `test cross entropy loss`() {
-        val t1 =  doubleArrayOf(0.0, 1.0, 0.0).toMatrix()
-        val a1 =  doubleArrayOf(0.2, .7, 0.1).toMatrix()
+        val t1 =  doubleArrayOf(0.0, 1.0, 0.0).toColumnVector()
+        val a1 =  doubleArrayOf(0.2, .7, 0.1).toColumnVector()
         assertEquals(0.0, crossEntropy(t1, t1), 0.001)
         assertEquals(-ln(.7), crossEntropy(a1, t1))
     }
@@ -211,7 +211,7 @@ class SmileUtilsTest {
 
     @Test
     fun `test double array to matrix`(){
-        val colVector =  testMatrix.flatten().toMatrix()
+        val colVector =  testMatrix.flatten().toColumnVector()
         assertEquals(9, colVector.nrow())
         assertEquals(1, colVector.ncol())
     }

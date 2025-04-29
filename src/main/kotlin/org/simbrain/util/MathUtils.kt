@@ -238,7 +238,7 @@ fun computeDotProductMatrix(data: Array<DoubleArray>) = createMatrix(data.size, 
     data[i] dot data[j]
 }
 
-fun DoubleArray.outerProduct(other: DoubleArray) = toMatrix().mt(other.toMatrix())
+fun DoubleArray.outerProduct(other: DoubleArray) = toColumnVector().mt(other.toColumnVector())
 
 
 context(Random)

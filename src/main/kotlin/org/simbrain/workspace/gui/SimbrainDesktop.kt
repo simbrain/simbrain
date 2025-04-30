@@ -480,7 +480,7 @@ object SimbrainDesktop {
         bar.add(actionManager.newNetworkAction)
 
         var button = JButton()
-        button.icon = ResourceManager.getSmallIcon("menu_icons/World2.png")
+        button.icon = ResourceManager.getSmallIcon("menu_icons/World.png")
         val worldMenu = JPopupMenu()
         for (action in actionManager.newWorldActions) {
             worldMenu.add(action)

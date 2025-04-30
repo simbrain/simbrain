@@ -6,6 +6,7 @@ import org.simbrain.network.gui.UndoManager.UndoableAction
 import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.subnetworks.Subnetwork
+import org.simbrain.network.trainers.SupervisedModel
 import java.util.*
 
 /**
@@ -160,6 +161,15 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
                 modelNodeMap.getImmediately<SubnetworkNode>(parent)?.let { subnetworkNode ->
                     modelNodeMap.getImmediately<ScreenElement>(model)?.let { screenElement ->
                         subnetworkNode.addNode(screenElement)
+                    }
+                }
+            }
+
+            is SupervisedModel -> {
+                network.addNetworkModel(model, usePlacementManager = false, useAutoAssignedId = false)?.await()
+                modelNodeMap.getImmediately<SupervisedModelNode>(parent)?.let { supervisedModelNode ->
+                    modelNodeMap.getImmediately<ScreenElement>(model)?.let { screenElement ->
+                        supervisedModelNode.addNode(screenElement)
                     }
                 }
             }

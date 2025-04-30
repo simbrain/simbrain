@@ -3,8 +3,11 @@ package org.simbrain.network.trainers
 import org.simbrain.network.core.*
 import org.simbrain.network.events.LocationEvents
 import org.simbrain.network.trainers.SupervisedTrainer.TestConfiguration
-import org.simbrain.util.*
+import org.simbrain.util.minus
+import org.simbrain.util.plus
+import org.simbrain.util.rowVectorTransposed
 import org.simbrain.util.stats.ProbabilityDistribution
+import org.simbrain.util.toDoubleArray
 import smile.math.matrix.Matrix
 import java.awt.geom.Point2D
 import kotlin.math.max
@@ -74,6 +77,30 @@ class SupervisedModel(
                 targets = testingTargets
             )
         }
+        
+        (layers + weightMatrices).forEach {
+            it.events.deleted.on {
+                delete()
+            }
+        }
+    }
+
+    /**
+     * Register component relationships needed for proper copy/paste with undo/redo
+     * This is called when the model is added to a network
+     */
+    context(Network)
+    override fun shouldAdd(): Boolean {
+        // Register layers as children of this model
+        childToParentMap[inputLayer] = this@SupervisedModel
+        childToParentMap[outputLayer] = this@SupervisedModel
+        
+        // Register all weight matrices as children of this model
+        weightMatrices.forEach { matrix ->
+            childToParentMap[matrix] = this@SupervisedModel
+        }
+        
+        return true
     }
 
     override var location: Point2D
@@ -82,14 +109,6 @@ class SupervisedModel(
             val delta = newLocation - location
             layers.forEach { it.location += delta }
         }
-
-    init {
-        listOf(inputLayer, outputLayer).forEach {
-            it.events.deleted.on {
-                delete()
-            }
-        }
-    }
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
         initWeights()
@@ -139,6 +158,21 @@ class SupervisedModel(
     override suspend fun delete(): List<NetworkModel> {
         events.deleted.fire(this).await()
         return listOf(this)
+    }
+
+    /**
+     * After restore, reestablish connections with the layers and weight matrices
+     * This is necessary for proper undo/redo operations with clipboard
+     */
+    override suspend fun afterRestore(context: Any?) {
+        // Ensure layers are properly reconnected
+        inputLayer.afterRestore(context)
+        outputLayer.afterRestore(context)
+        
+        // Ensure weight matrices are properly reconnected
+        weightMatrices.forEach { 
+            it.afterRestore(context)
+        }
     }
 }
 

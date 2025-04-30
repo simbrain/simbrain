@@ -32,6 +32,7 @@ import org.simbrain.network.core.topLeftLocation
 import org.simbrain.network.gui.dialogs.NetworkPreferences.wandRadius
 import org.simbrain.network.gui.nodes.ScreenElement
 import org.simbrain.util.*
+import org.simbrain.util.ResourceManager.smallIconSize
 import org.simbrain.util.piccolo.SelectionMarquee
 import org.simbrain.util.piccolo.firstScreenElement
 import org.simbrain.util.piccolo.screenElements
@@ -291,7 +292,8 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         }
         object Pan : MouseCursor() {
             override val cursor: Cursor = Toolkit.getDefaultToolkit()
-                    .createCustomCursor(ResourceManager.getImage("menu_icons/Hand.png"), centerPoint, "pan")
+                    .createCustomCursor(ResourceManager.getImage("menu_icons/Hand.png")
+                        .getScaledInstance(smallIconSize, smallIconSize, Image.SCALE_SMOOTH), centerPoint, "pan")
         }
     }
 }

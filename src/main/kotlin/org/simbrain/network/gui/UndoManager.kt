@@ -31,12 +31,11 @@ class UndoManager {
     }
 
     fun addUndoableAction(
-        initialContext: Any? = null,
         description: String,
-        undo: suspend (context: Any?) -> Unit,
-        redo: suspend (context: Any?) -> Unit
+        undo: suspend () -> Unit,
+        redo: suspend () -> Unit
     ) {
-        addUndoableAction(undoableAction(initialContext, description, undo, redo))
+        addUndoableAction(undoableAction(description, undo, redo))
     }
 
     /**
@@ -62,7 +61,6 @@ class UndoManager {
     }
 
     interface UndoableAction {
-        var context: Any?
         val description: String
         suspend fun undo()
         suspend fun redo()
@@ -71,22 +69,19 @@ class UndoManager {
 }
 
 fun undoableAction(
-    initialContext: Any?,
     description: String,
-    undo: suspend (context: Any?) -> Unit,
-    redo: suspend (context: Any?) -> Unit) =
+    undo: suspend () -> Unit,
+    redo: suspend () -> Unit) =
     object : UndoableAction {
-
-        override var context: Any? = initialContext
 
         override val description = description
 
         override suspend fun undo() {
-            undo(context)
+            undo()
         }
 
         override suspend fun redo() {
-            redo(context)
+            redo()
         }
     }
 

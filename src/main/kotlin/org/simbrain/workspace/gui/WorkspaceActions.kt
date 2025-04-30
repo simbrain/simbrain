@@ -247,7 +247,7 @@ class WorkspaceActions {
 
     fun <T: WorkspaceComponent> createImportAction(desktopComponent: DesktopComponent<T>) = desktopComponent.createAction(
         name = "Import from xml...",
-        iconPath = "menu_icons/Open.png",
+        iconPath = "menu_icons/import.png",
         description = "Import from xml",
         keyboardShortcut = CmdOrCtrl + 'O',
         coroutineScope = workspace
@@ -257,7 +257,7 @@ class WorkspaceActions {
 
     fun <T: WorkspaceComponent> createExportAction(desktopComponent: DesktopComponent<T>) = desktopComponent.createAction(
         name = "Export to xml...",
-        iconPath = "menu_icons/Save.png",
+        iconPath = "menu_icons/export.png",
         description = "Export to xml",
         keyboardShortcut = CmdOrCtrl + 'S',
         coroutineScope = workspace

@@ -414,7 +414,7 @@ class Network: CoroutineScope, EditableObject {
         // Or a special case for SupervisedModel which upon deletion of its children, the SupervisedModel should be deleted as well.
         return buildList {
 
-            suspend fun deleteModel(childToParentMap: Map<NetworkModel, NetworkModel>, model: NetworkModel) {
+            suspend fun deleteModel(childToParentMap: MutableMap<NetworkModel, NetworkModel>, model: NetworkModel) {
                 val parent = childToParentMap[model]
                 if (isLastChildOfParent(childToParentMap, model) || parent is SupervisedModel) {
                     parent?.let { parent ->
@@ -427,6 +427,10 @@ class Network: CoroutineScope, EditableObject {
                     }
                 } else {
                     addAll(model.delete())
+                }
+                // remove all children of deleted parents from the map
+                childToParentMap.entries.filter { it.value == parent }.map { it.key }.forEach {
+                    childToParentMap.remove(it)
                 }
             }
 

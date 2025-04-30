@@ -159,21 +159,6 @@ class SupervisedModel(
         events.deleted.fire(this).await()
         return listOf(this)
     }
-
-    /**
-     * After restore, reestablish connections with the layers and weight matrices
-     * This is necessary for proper undo/redo operations with clipboard
-     */
-    override suspend fun afterRestore(context: Any?) {
-        // Ensure layers are properly reconnected
-        inputLayer.afterRestore(context)
-        outputLayer.afterRestore(context)
-        
-        // Ensure weight matrices are properly reconnected
-        weightMatrices.forEach { 
-            it.afterRestore(context)
-        }
-    }
 }
 
 class SupervisedModelTrainer(network: Network, supervisedModel: SupervisedModel): SupervisedTrainer<SupervisedModel>(network, supervisedModel) {

@@ -183,7 +183,7 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
     context(NetworkPanel)
     suspend fun restore(deletedModels: List<NetworkModel>) {
         restoreMapSnapshot()
-        val modelsToReAdd = deletedModels.reversed()
+        val modelsToReAdd = LinkedHashSet(deletedModels.reversed())
         // Adds models back to parent groups.
         modelsToReAdd.forEach { reAddToGroup(it) }
         // Add all models without parents back

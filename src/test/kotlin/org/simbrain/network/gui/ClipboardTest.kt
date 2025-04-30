@@ -996,9 +996,6 @@ class ClipboardTest {
         
         // Update the network to propagate the values
         network.update()
-        network.update()
-        network.update()
-        network.update()
 
         // Calculate the expected output manually
         // Note: When a network updates, inputs are transmitted to activations
@@ -1189,6 +1186,36 @@ class ClipboardTest {
             "A target array with the same ID should be in the network after redo")
         assertTrue(network.getModels<WeightMatrix>().any { it.id == pastedWeightMatrixId },
             "A weight matrix with the same ID should be in the network after redo")
+            
+        // Verify functionality of redone model by testing activation propagation
+        // Get the restored components
+        val redoSupervisedModel = network.getModels<org.simbrain.network.trainers.SupervisedModel>().first { it.id == pastedSupervisedModelId }
+        val redoSourceArray = network.getModels<NeuronArray>().first { it.id == pastedSourceArrayId }
+        val redoTargetArray = network.getModels<NeuronArray>().first { it.id == pastedTargetArrayId }
+        val redoWeightMatrix = network.getModels<WeightMatrix>().first { it.id == pastedWeightMatrixId }
+        
+        // Verify the weight matrix still connects the proper arrays
+        assertEquals(redoSourceArray.id, redoWeightMatrix.source.id,
+            "The redone weight matrix should connect to the proper source array")
+        assertEquals(redoTargetArray.id, redoWeightMatrix.target.id,
+            "The redone weight matrix should connect to the proper target array")
+            
+        // Verify the supervised model still references the correct layers
+        assertEquals(redoSourceArray.id, redoSupervisedModel.inputLayer.id,
+            "The redone supervised model should reference the redone source array")
+        assertEquals(redoTargetArray.id, redoSupervisedModel.outputLayer.id,
+            "The redone supervised model should reference the redone target array")
+        
+        // Test that the connectivity still works by simulating input and output
+        // Set activations in the restored source array
+        redoSourceArray.setActivations(sourceActivations)
+        redoSourceArray.isClamped = true
+        
+        // Update the network to propagate the values
+        network.update()
+
+        assertArrayEquals(expectedOutput, redoTargetArray.activationArray, 0.001,
+            "The restored supervised model should correctly propagate activations after redo")
     }
 
 }

@@ -411,11 +411,13 @@ class Network: CoroutineScope, EditableObject {
         }
 
         // If deleting the last item in a group, delete the group, rather than the item
+        // Or a special case for SupervisedModel which upon deletion of its children, the SupervisedModel should be deleted as well.
         return buildList {
 
             suspend fun deleteModel(childToParentMap: Map<NetworkModel, NetworkModel>, model: NetworkModel) {
-                if (isLastChildOfParent(childToParentMap, model)) {
-                    childToParentMap[model]?.let { parent ->
+                val parent = childToParentMap[model]
+                if (isLastChildOfParent(childToParentMap, model) || parent is SupervisedModel) {
+                    parent?.let { parent ->
                         addAll(parent.delete())
                         // When undoing the deletion of a neuron collection or supervised model via the last node,
                         // we need to add back that last node

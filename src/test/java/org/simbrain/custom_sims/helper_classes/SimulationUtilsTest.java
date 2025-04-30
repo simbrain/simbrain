@@ -10,6 +10,7 @@ public class SimulationUtilsTest {
     @Test
     public void testAddWorld() {
         SimulationUtils sim = new SimulationUtils(SimbrainDesktop.INSTANCE);
+        sim.getWorkspace().clearWorkspace();
         sim.addOdorWorld(0,0,100,100, "Test");
 
         assertEquals(1, sim.getWorkspace().getComponentList().size());

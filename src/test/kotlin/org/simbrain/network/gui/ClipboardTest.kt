@@ -35,7 +35,7 @@ class ClipboardTest {
     }
 
     @Test
-    fun `test clear clipboard`() {
+    fun `test add to and clear clipboard`() {
         // Add a neuron to the network
         val neuron = Neuron()
         network.addNetworkModel(neuron)
@@ -51,19 +51,6 @@ class ClipboardTest {
 
         // Verify that the clipboard is empty again
         assertTrue(Clipboard.isEmpty, "Clipboard should be empty after clearing")
-    }
-
-    @Test
-    fun `test add to clipboard`() {
-        // Add a neuron to the network
-        val neuron = Neuron()
-        network.addNetworkModel(neuron)
-
-        // Add the neuron to the clipboard
-        Clipboard.add(listOf(neuron))
-
-        // Verify that the clipboard is not empty
-        assertFalse(Clipboard.isEmpty, "Clipboard should not be empty after adding an object")
     }
 
     @Test
@@ -87,11 +74,7 @@ class ClipboardTest {
     fun `test clipboard listener`() {
         // Create a test listener
         var listenerCalled = false
-        val testListener = object : ClipboardListener {
-            override fun clipboardChanged() {
-                listenerCalled = true
-            }
-        }
+        val testListener = ClipboardListener { listenerCalled = true }
 
         // Add the listener to the clipboard
         Clipboard.addClipboardListener(testListener)

@@ -28,7 +28,6 @@ import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import javax.swing.*
 import javax.swing.border.EmptyBorder
-import javax.swing.event.ListSelectionEvent
 import javax.swing.event.ListSelectionListener
 
 fun NetworkPanel.showTextPropertyDialog(textNodes: Collection<TextNode>) {

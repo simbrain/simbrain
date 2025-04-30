@@ -11,6 +11,13 @@ import java.util.*
 
 /**
  * Manage undo / redo operations in the network panel.
+ *
+ * Related code can be found in callers to [addUndoableAction].
+ *
+ * [Network.deleteModels] is used quite a bit because undo/redo often involves deleting models.
+ *
+ * Also see [NetworkModel.afterRestore]
+ *
  */
 class UndoManager {
 
@@ -115,7 +122,6 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
                     parent.neuronList.add(neuron)
                     // If the neurongroupnode exists, create neuron nodes for the children and re-add them
                     (modelNodeMap.getImmediately<NeuronGroupNode>(parent))?.let { neuronGroupNode ->
-                        // for free neuron deletion, the group node should have already been created
                         val neuronNode = createNode(neuron)
                         neuronGroupNode.addNeuronNodes(listOf(neuronNode))
                     }
@@ -142,9 +148,7 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
                     parent.synapses.add(synapse)
                     // If there is a synapsegroupnode already, we are deleting the synapse and must add the node back
                     // Note that synapsegroupnodes don't actually contain synapsenodes as children, so all we have to
-                    // do is create the node. The check is still required, to synchronize with neuron group recreation
-                    // otherwise a synapse node could be waiting for the neuron nodes to be created which
-                    // doesn't happen until the next processing loop
+                    // do is create the node. The check is still required, to synchronize with neuron group recreation.
                     modelNodeMap.getImmediately<SynapseGroupNode>(parent)?.let { synapseGroupNode ->
                         createNode(synapse)
                     }

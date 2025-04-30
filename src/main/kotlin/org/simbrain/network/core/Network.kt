@@ -399,28 +399,27 @@ class Network: CoroutineScope, EditableObject {
     }
 
     /**
-     * Deletes models
-     *
-     * @return list of deleted models for undo /redo
+     * @return list of deleted models (needed for undo /redo)
      */
     suspend fun deleteModels(networkModels: List<NetworkModel>): List<NetworkModel> {
+
         fun isLastChildOfParent(childToParentMap: Map<NetworkModel, NetworkModel>, model: NetworkModel): Boolean {
             return childToParentMap[model]?.let { parent ->
                 childToParentMap.values.count { it == parent } == 1
             } == true
         }
 
-        // If deleting the last item in a group, delete the group, rather than the item
-        // Or a special case for SupervisedModel which upon deletion of its children, the SupervisedModel should be deleted as well.
         return buildList {
 
             suspend fun deleteModel(childToParentMap: MutableMap<NetworkModel, NetworkModel>, model: NetworkModel) {
+
                 val parent = childToParentMap[model]
                 if (isLastChildOfParent(childToParentMap, model) || parent is SupervisedModel) {
                     parent?.let { parent ->
                         addAll(parent.delete())
-                        // When undoing the deletion of a neuron collection or supervised model via the last node,
-                        // we need to add back that last node
+                        // If (1) deleting a supervised model because one of its children models has been deleted or
+                        //    (2) deleting a neuron collection because its last node was deleted
+                        //  then the child model must be manually deleted
                         if (parent is NeuronCollection || parent is SupervisedModel) {
                             addAll(model.delete())
                         }
@@ -428,7 +427,7 @@ class Network: CoroutineScope, EditableObject {
                 } else {
                     addAll(model.delete())
                 }
-                // remove all children of deleted parents from the map
+                // Remove all children of deleted parents from the map
                 childToParentMap.entries.filter { it.value == parent }.map { it.key }.forEach {
                     childToParentMap.remove(it)
                 }
@@ -445,8 +444,6 @@ class Network: CoroutineScope, EditableObject {
 
     /**
      * Returns a copy of this network based on its xml rep.
-     *
-     * @return the copied network.
      */
     fun copy(): Network {
         val xmlRepresentation = getNetworkXStream().toXML(this)

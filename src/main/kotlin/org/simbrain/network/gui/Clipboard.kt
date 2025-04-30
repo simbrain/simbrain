@@ -226,12 +226,12 @@ object Clipboard {
 
         val undeleteContext = UndeleteContext(net, copy)
 
-        var deletedModels: List<NetworkModel>? = null
+        var deletedModels: LinkedHashSet<NetworkModel>? = null
 
         net.undoManager.addUndoableAction(
             description = "Paste objects",
-            undo = { deletedModels = net.network.deleteModels(copy) },
-            redo = { with(net) { undeleteContext.restore(deletedModels!!) } }
+            undo = { deletedModels = LinkedHashSet( net.network.deleteModels(copy)) },
+            redo = { with(net) { undeleteContext.restore(deletedModels!!.toList()) } }
         )
 
         // Unselect "old" copied objects

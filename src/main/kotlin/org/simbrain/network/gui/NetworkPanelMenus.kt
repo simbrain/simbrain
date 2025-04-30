@@ -40,6 +40,8 @@ val NetworkPanel.editMenu
             addSeparator()
             add(showLayoutDialogAction)
             addSeparator()
+            add(createSupervisedModelAction)
+            addSeparator()
             add(neuronCollectionAction)
             addSeparator()
             add(alignMenu)

@@ -262,8 +262,11 @@ fun NetworkPanel.showUndoHistoryDialog() {
 
     val redoJList = JList(redoListModel).apply {
         selectionMode = ListSelectionModel.SINGLE_SELECTION
-        if (model.size > 0) {
-            selectedIndex = 0
+        // If nothing is selected in undo list and there is something in redo list, select first entry
+        if(undoJList.selectedIndex == -1) {
+            if (model.size > 0) {
+                selectedIndex = 0
+            }
         }
         border = EmptyBorder(5, 5, 5, 5)
     }
@@ -276,7 +279,6 @@ fun NetworkPanel.showUndoHistoryDialog() {
     }
 
     val goToButton = JButton("Go To Selected Point").apply {
-        isEnabled = false
         addActionListener {
             val undoIndex = undoJList.selectedIndex
             val redoIndex = redoJList.selectedIndex
@@ -306,18 +308,16 @@ fun NetworkPanel.showUndoHistoryDialog() {
     }
 
     // Enable the Go To button when an item is selected in either list
-    val listSelectionListener = object : ListSelectionListener {
-        override fun valueChanged(e: ListSelectionEvent) {
-            // If a selection is made in one list, clear the selection in the other list
-            if (e.source === undoJList && !e.valueIsAdjusting && undoJList.selectedIndex != -1) {
-                redoJList.clearSelection()
-            } else if (e.source === redoJList && !e.valueIsAdjusting && redoJList.selectedIndex != -1) {
-                undoJList.clearSelection()
-            }
-
-            // Enable the Go To button if an item is selected in either list
-            goToButton.isEnabled = undoJList.selectedIndex != -1 || redoJList.selectedIndex != -1
+    val listSelectionListener = ListSelectionListener { e ->
+        // If a selection is made in one list, clear the selection in the other list
+        if (e.source === undoJList && !e.valueIsAdjusting && undoJList.selectedIndex != -1) {
+            redoJList.clearSelection()
+        } else if (e.source === redoJList && !e.valueIsAdjusting && redoJList.selectedIndex != -1) {
+            undoJList.clearSelection()
         }
+
+        // Enable the Go To button if an item is selected in either list
+        goToButton.isEnabled = undoJList.selectedIndex != -1 || redoJList.selectedIndex != -1
     }
 
     undoJList.addListSelectionListener(listSelectionListener)

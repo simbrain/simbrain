@@ -135,7 +135,7 @@ abstract class ScreenElement protected constructor(val networkPanel: NetworkPane
      * Returns true if the provided bounds intersect this screen element
      */
     open fun isIntersecting(bound: PBounds?): Boolean {
-        return globalBounds.intersects(bound)
+        return globalFullBounds.intersects(bound)
     }
 
     /**

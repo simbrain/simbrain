@@ -35,7 +35,7 @@ import java.util.Scanner;
  */
 public class ResourceManager {
 
-    private static final int smallIconSize = 18;
+    public static final int smallIconSize = 18;
 
     /**
      * Retrieve an ImageIcon based on its file name.

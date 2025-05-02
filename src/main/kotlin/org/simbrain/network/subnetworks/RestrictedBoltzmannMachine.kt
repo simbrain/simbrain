@@ -95,6 +95,8 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
     @XStreamConstructor()
     constructor(): super()
 
+
+
     // See eq 1 https://www.cs.toronto.edu/~hinton/absps/guideTR.pdf
     val stateInfoText: String
         get() {
@@ -204,6 +206,8 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
 
         return copy
     }
+
+
 
     /**
      * Helper class for creating new RBM's nets using [org.simbrain.util.propertyeditor.AnnotatedPropertyEditor].

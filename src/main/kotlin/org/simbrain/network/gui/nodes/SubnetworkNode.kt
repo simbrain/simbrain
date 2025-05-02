@@ -235,5 +235,8 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
 
         override val model: NetworkModel
             get() = this@SubnetworkNode.subnetwork
+
+        override val toolTipText: String
+            get() = "Double click to train..."
     }
 }

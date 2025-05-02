@@ -1,10 +1,11 @@
 package org.simbrain.custom_sims.simulations
 
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.OneToOne
+import org.simbrain.network.core.NetworkTextObject
 import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.activations
 import org.simbrain.network.core.labels
 import org.simbrain.network.layouts.LineLayout
@@ -17,7 +18,6 @@ import org.simbrain.util.times
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
-import java.awt.Dimension
 
 /**
  * Based on Spivey's 2024 paper, "A Linking Hypothesis for Eyetracking and Mousetracking
@@ -37,6 +37,10 @@ val spiveyNet = newSim {
     // Network
     val networkComponent = addNetworkComponent("Spivey Net")
     val net = networkComponent.network
+
+    val currentCondition = NetworkTextObject("").apply {
+        fontSize = 18
+    }
 
     val lexicalNodes = NeuronGroup(4).apply {
         layout = LineLayout()
@@ -72,7 +76,7 @@ val spiveyNet = newSim {
         neuronList.labels = listOf("candle", "candy", "handle", "fork")
     }
 
-    net.addNetworkModels(lexicalNodes, visualNodes, mouseNodes, eyesNodes, integrationNodes).awaitAll()
+    net.addNetworkModels(lexicalNodes, visualNodes, mouseNodes, eyesNodes, integrationNodes, currentCondition).awaitAll()
     lexicalNodes.location = point(-3.70,12.64)
     visualNodes.location = point(285.98,5.92)
     mouseNodes.location = point(438.46,160.33)
@@ -174,20 +178,34 @@ val spiveyNet = newSim {
 
     }
 
-    fun resetMouse() {
+    suspend fun resetExperiment() {
+        timeIndex = 0
         mouse.location = point(157,271)
-        mouse.clearTrail()
+        withGui {
+            (getDesktopComponent(oc) as OdorWorldDesktopComponent)
+                .worldPanel
+                .getEntityNode(mouse)
+                .startTrailAtCurrentLocation()
+        }
     }
 
     withGui {
         //place(docViewer, 0, 0, 464, 619)
         place(networkComponent, 222, 15, 672, 716)
         place(oc, 890, 17, 434, 548)
-        (desktop?.getDesktopComponent(oc) as? OdorWorldDesktopComponent)?.worldPanel?.scalingFactor = 0.1
+        (getDesktopComponent(oc) as? OdorWorldDesktopComponent)?.worldPanel?.let {
+            it.scalingFactor = 0.1
+            delay(100L)
+            it.clearSelection()
+        }
+
+        currentCondition.location = point(220, -240)
+
         createControlPanel("Control Panel", 15, 15) {
             addButton("Cohort Condition") {
                 // Target = Candle, Competitor = Candy
-                resetMouse()
+                currentCondition.text = "Cohort Condition"
+                resetExperiment()
                 targetIndex = 0
                 targetObject.entityType = EntityType.Candy
                 competitorIndex = 1
@@ -195,21 +213,24 @@ val spiveyNet = newSim {
             }
             addButton("Control Condition") {
                 // Candle / Fork
+                currentCondition.text = "Control Condition"
                 targetIndex = 0
                 targetObject.entityType = EntityType.Fork
                 competitorIndex = 3
-                resetMouse()
+                resetExperiment()
                 visualNodes.setActivations(doubleArrayOf(1.0,0.0,0.0,1.0))
             }
             addButton("Rhyme Condition") {
                 // Candle / Handle
+                currentCondition.text = "Rhymee Condition"
                 targetIndex = 0
                 targetObject.entityType = EntityType.Handle
                 competitorIndex = 2
-                resetMouse()
+                resetExperiment()
                 visualNodes.setActivations(doubleArrayOf(1.0,0.0,1.0,0.0))
             }
             addButton("Iterate") {
+                mouse.drawTrailWithoutRunningWorkspace = true
                 when(timeIndex) {
                     0 -> {
                         lexicalNodes.setActivations(doubleArrayOf(1.0,1.0,0.0,0.0))
@@ -236,11 +257,14 @@ val spiveyNet = newSim {
                     }
                 }
                 workspace.iterateSuspend()
+                delay(100L)
+                mouse.drawTrailWithoutRunningWorkspace = false
             }
             addButton("Reset") {
-                resetMouse()
+                currentCondition.text = ""
+                resetExperiment()
                 net.flatNeuronList.forEach { n -> n.clear() }
-                timeIndex = 0
+                mouse.clearTrail()
             }
         }
     }

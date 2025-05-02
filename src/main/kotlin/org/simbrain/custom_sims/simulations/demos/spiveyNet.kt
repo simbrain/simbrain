@@ -31,14 +31,15 @@ val spiveyNet = newSim {
     // 0: Candle, 1: Candy, 2: Handle, 3: Fork
     var targetIndex = 0
     var competitorIndex = 0
-
     var timeIndex = 0
+    var conditionText = ""
+    var useFeedback = false // if true incorporate feedback from eyes and mouse
 
     // Network
     val networkComponent = addNetworkComponent("Spivey Net")
     val net = networkComponent.network
 
-    val currentCondition = NetworkTextObject("").apply {
+    val currentStatus = NetworkTextObject("").apply {
         fontSize = 18
     }
 
@@ -76,11 +77,11 @@ val spiveyNet = newSim {
         neuronList.labels = listOf("candle", "candy", "handle", "fork")
     }
 
-    net.addNetworkModels(lexicalNodes, visualNodes, mouseNodes, eyesNodes, integrationNodes, currentCondition).awaitAll()
-    lexicalNodes.location = point(-3.70,12.64)
-    visualNodes.location = point(285.98,5.92)
-    mouseNodes.location = point(438.46,160.33)
-    eyesNodes.location = point(144.87,158.44)
+    net.addNetworkModels(lexicalNodes, visualNodes, mouseNodes, eyesNodes, integrationNodes, currentStatus).awaitAll()
+    lexicalNodes.location = point(-3.70, 12.64)
+    visualNodes.location = point(285.98, 5.92)
+    mouseNodes.location = point(438.46, 160.33)
+    eyesNodes.location = point(144.87, 158.44)
     integrationNodes.location = point(131.67, -134.59)
 
     val connector = OneToOne().apply {
@@ -108,7 +109,7 @@ val spiveyNet = newSim {
     fun List<Neuron>.normalize() {
         val total = activations.sum()
         if (total != 0.0) {
-            forEach{ it.activation /= total }
+            forEach { it.activation /= total }
         }
     }
 
@@ -125,7 +126,6 @@ val spiveyNet = newSim {
             visualNodes.neuronList.normalize()
             mouseNodes.update()
         }
-
 
         // Eye movements
         timeIndex++
@@ -158,17 +158,19 @@ val spiveyNet = newSim {
             }
         }
 
-        // Multiplicative feedback
-        // TODO: Moderate by checkbox
         lexicalNodes.activations += (integrationNodes.activations * lexicalNodes.activations)
-        visualNodes.activations += (integrationNodes.activations * lexicalNodes.activations) +
-                (eyesNodes.activations * visualNodes.activations) +
-                (mouseNodes.activations * visualNodes.activations)
+        if (useFeedback) {
+            visualNodes.activations += (integrationNodes.activations * lexicalNodes.activations) +
+                    (eyesNodes.activations * visualNodes.activations) +
+                    (mouseNodes.activations * visualNodes.activations)
+        } else {
+            visualNodes.activations += (integrationNodes.activations * lexicalNodes.activations)
+        }
         lexicalNodes.neuronList.normalize()
         visualNodes.neuronList.normalize()
 
         // Move mouse
-        val pix = 20.0 // 50 in Spivey's matlab code
+        val pix = 20.0 // 50 in Spivey's matlab code. Set here by trial and error
         if (mouse.y > 15) {
             mouse.y -= pix
         }
@@ -180,7 +182,7 @@ val spiveyNet = newSim {
 
     suspend fun resetExperiment() {
         timeIndex = 0
-        mouse.location = point(157,271)
+        mouse.location = point(157, 271)
         withGui {
             (getDesktopComponent(oc) as OdorWorldDesktopComponent)
                 .worldPanel
@@ -199,61 +201,74 @@ val spiveyNet = newSim {
             it.clearSelection()
         }
 
-        currentCondition.location = point(220, -240)
+        currentStatus.location = point(220, -240)
 
         createControlPanel("Control Panel", 15, 15) {
             addButton("Cohort Condition") {
                 // Target = Candle, Competitor = Candy
-                currentCondition.text = "Cohort Condition"
+                conditionText = "Cohort Condition"
+                currentStatus.text = conditionText
                 resetExperiment()
                 targetIndex = 0
                 targetObject.entityType = EntityType.Candy
                 competitorIndex = 1
-                visualNodes.setActivations(doubleArrayOf(1.0,1.0,0.0,0.0))
+                visualNodes.setActivations(doubleArrayOf(1.0, 1.0, 0.0, 0.0))
             }
             addButton("Control Condition") {
                 // Candle / Fork
-                currentCondition.text = "Control Condition"
+                conditionText = "Control Condition"
+                currentStatus.text = conditionText
                 targetIndex = 0
                 targetObject.entityType = EntityType.Fork
                 competitorIndex = 3
                 resetExperiment()
-                visualNodes.setActivations(doubleArrayOf(1.0,0.0,0.0,1.0))
+                visualNodes.setActivations(doubleArrayOf(1.0, 0.0, 0.0, 1.0))
             }
             addButton("Rhyme Condition") {
                 // Candle / Handle
-                currentCondition.text = "Rhymee Condition"
+                conditionText = "Rhyme Condition"
+                currentStatus.text = conditionText
                 targetIndex = 0
                 targetObject.entityType = EntityType.Handle
                 competitorIndex = 2
                 resetExperiment()
-                visualNodes.setActivations(doubleArrayOf(1.0,0.0,1.0,0.0))
+                visualNodes.setActivations(doubleArrayOf(1.0, 0.0, 1.0, 0.0))
+            }
+            addCheckBox("Use feedback", useFeedback) {
+                useFeedback = it
+            }.apply {
+                toolTipText = "If checked, visual nodes incorporate multiplicative feedback from eyes and mouse"
             }
             addButton("Iterate") {
                 mouse.drawTrailWithoutRunningWorkspace = true
-                when(timeIndex) {
+                when (timeIndex) {
                     0 -> {
-                        lexicalNodes.setActivations(doubleArrayOf(1.0,1.0,0.0,0.0))
-                        lexicalNodes.label = "Lexical: now hearing /k/"
+                        lexicalNodes.setActivations(doubleArrayOf(1.0, 1.0, 0.0, 0.0))
+                        currentStatus.text = "$conditionText\nLexical: now hearing /k/"
                     }
+
                     1 -> {
-                        lexicalNodes.setActivations(doubleArrayOf(1.0,1.0,1.0,0.0))
-                        lexicalNodes.label = "Lexical: now hearing /a/"
+                        lexicalNodes.setActivations(doubleArrayOf(1.0, 1.0, 1.0, 0.0))
+                        currentStatus.text = "$conditionText\nLexical: now hearing /a/"
                     }
+
                     2 -> {
-                        lexicalNodes.setActivations(doubleArrayOf(1.0,1.0,1.0,0.0))
-                        lexicalNodes.label = "Lexical: now hearing /n/"
+                        lexicalNodes.setActivations(doubleArrayOf(1.0, 1.0, 1.0, 0.0))
+                        currentStatus.text = "$conditionText\nLexical: now hearing /n/"
                     }
+
                     3 -> {
-                        lexicalNodes.setActivations(doubleArrayOf(1.0,1.0,1.0,0.0))
-                        lexicalNodes.label = "Lexical: now hearing /d/"
+                        lexicalNodes.setActivations(doubleArrayOf(1.0, 1.0, 1.0, 0.0))
+                        currentStatus.text = "$conditionText\nLexical: now hearing /d/"
                     }
+
                     4 -> {
-                        lexicalNodes.setActivations(doubleArrayOf(1.0,0.0,1.0,0.0))
-                        lexicalNodes.label = "Lexical: now hearing /l/"
+                        lexicalNodes.setActivations(doubleArrayOf(1.0, 0.0, 1.0, 0.0))
+                        currentStatus.text = "$conditionText\nLexical: now hearing /l/"
                     }
+
                     else -> {
-                        lexicalNodes.label = "Lexical"
+                        currentStatus.text = conditionText
                     }
                 }
                 workspace.iterateSuspend()
@@ -261,7 +276,7 @@ val spiveyNet = newSim {
                 mouse.drawTrailWithoutRunningWorkspace = false
             }
             addButton("Reset") {
-                currentCondition.text = ""
+                currentStatus.text = ""
                 resetExperiment()
                 net.flatNeuronList.forEach { n -> n.clear() }
                 mouse.clearTrail()

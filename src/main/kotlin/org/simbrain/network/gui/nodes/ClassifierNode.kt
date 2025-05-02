@@ -24,7 +24,6 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
                     propertyDialog.display()
                 }
             })
-            addSeparator()
         }
 
     override val propertyDialog: StandardDialog

@@ -133,6 +133,9 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
             """.trimIndent()
     }
 
+    override val name: String
+        get() = "" + javaClass.simpleName
+
     /**
      * Default subnetwork update just updates all neuron and synapse groups. Subclasses with custom update should
      * override this.

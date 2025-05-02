@@ -547,5 +547,9 @@ class OdorWorldPanel(
             EntityDialog(it.entity).apply { title = "Edit ${it.entity.name}" }.display()
         }
     }
+
+    fun getEntityNode(entity: OdorWorldEntity): EntityNode {
+        return canvas.layer.allNodes.filterIsInstance<EntityNode>().first { it.entity == entity }
+    }
 }
 

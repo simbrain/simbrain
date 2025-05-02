@@ -43,6 +43,7 @@ class EntityNode(
      */
     var trail: PPath = PPath.createPolyline(arrayOf(Point2D.Float(entity.x.toFloat(),entity.y.toFloat()))).apply {
         paint = null
+        pickable = false
     }
 
     /**
@@ -121,7 +122,9 @@ class EntityNode(
             }
         }
         entity.world.events.worldStarted.on(dispatcher = Dispatchers.Swing) {
-            trail.moveTo(entity.x, entity.y)
+            if (entity.isShowTrail && !entity.drawTrailWithoutRunningWorkspace) {
+                trail.moveTo(entity.x, entity.y)
+            }
         }
         drawDispersionCircleAround(this)
         entity.events.propertyChanged.on(dispatcher = Dispatchers.Swing) {
@@ -163,6 +166,10 @@ class EntityNode(
         val p = this.globalTranslation
         entity.x = p.x
         entity.y = p.y
+    }
+
+    fun startTrailAtCurrentLocation() {
+        trail.moveTo(entity.x, entity.y)
     }
 
     /**
@@ -239,7 +246,7 @@ class EntityNode(
         updateAttributesNodes()
         val isCrossingBorder = !entity.world.contains(entity.location - entity.velocity)
         setOffset(entity.x, entity.y)
-        if (entity.isShowTrail && SimbrainDesktop.workspace.updater.isRunning) {
+        if (entity.isShowTrail && (SimbrainDesktop.workspace.updater.isRunning || entity.drawTrailWithoutRunningWorkspace)) {
             if (isCrossingBorder) {
                 trail.moveTo(entity.x, entity.y)
             }

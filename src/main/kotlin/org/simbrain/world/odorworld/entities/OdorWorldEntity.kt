@@ -3,6 +3,7 @@ package org.simbrain.world.odorworld.entities
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Producible
@@ -115,6 +116,13 @@ class OdorWorldEntity @JvmOverloads constructor(
             field = value
             events.trailVisibilityChanged.fire(value, oldValue)
         }
+
+    var drawTrailWithoutRunningWorkspace by GuiEditable(
+        initValue = false,
+        description = "Draw trials even when the workspace is not running",
+        order = 60,
+        conditionallyEnabledBy = OdorWorldEntity::isShowTrail
+    )
 
     /**
      * Smell Source (if any). Initialize to random smell source with 10

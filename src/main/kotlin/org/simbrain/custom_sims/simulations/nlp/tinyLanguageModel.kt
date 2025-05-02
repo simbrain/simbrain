@@ -150,6 +150,11 @@ val tinyLanguageModel = newSim("tiny_language_model") {
     transformerBlock.location = point(-300, -600)
     softMaxLayer.location = point(-1000, -600)
 
+    withGui {
+        place(textWorldComponent, 10, 10, 450, 350)
+        place(networkComponent, 460, 10, 1000, 800)
+    }
+
     addSidebarInfo(
         """ 
         # Tiny Language Model

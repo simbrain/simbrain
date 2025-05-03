@@ -284,6 +284,8 @@ class UpdateFunctionContext<O : EditableObject, T>(
         return editor.propertyNameWidgetMap.containsKey(name)
     }
 
+    val thisValue: T get() = parameter.value
+
     fun enableWidget(enabled: Boolean) {
         enableWidgetProvider(enabled)
     }

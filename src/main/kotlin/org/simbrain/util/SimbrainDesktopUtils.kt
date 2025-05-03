@@ -3,6 +3,10 @@ package org.simbrain.util
 import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
 import org.simbrain.custom_sims.SimulationScope
+import org.simbrain.network.smile.SmileClassifier
+import org.simbrain.plot.projection.ProjectionComponent
+import org.simbrain.util.projection.AuxDataColoringManager
+import org.simbrain.util.projection.DataPoint
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.workspace.WorkspaceComponent
@@ -286,4 +290,31 @@ suspend fun SimbrainDesktop.loadWorkspaceZipFromFileChooser(): Boolean {
         return true
     }
     return false
+}
+
+fun SimbrainDesktop.createClassifierProjectionPlot(smileClassifier: SmileClassifier): ProjectionComponent {
+    val projectionComponent = ProjectionComponent("${smileClassifier.displayName} Plot").apply {
+        projector.coloringManager = AuxDataColoringManager()
+    }
+    val deregisterDeleteEvent = smileClassifier.events.deleted.on {
+        workspace.removeWorkspaceComponent(projectionComponent)
+    }
+    val deregisterUpdateEvent = smileClassifier.events.updated.on {
+        val colors = generateColorSequence().take(smileClassifier.outputNeuronGroup.size).toList()
+        val datapoint = DataPoint(
+            smileClassifier.inputNeuronGroup.activationArray,
+            aux = colors[smileClassifier.winner]
+        )
+        projectionComponent.projector.addDataPoint(datapoint)
+    }
+    workspace.addWorkspaceComponent(
+        projectionComponent
+    )
+    workspace.events.componentRemoved.on {
+        if (it == projectionComponent) {
+            deregisterDeleteEvent()
+            deregisterUpdateEvent()
+        }
+    }
+    return projectionComponent
 }

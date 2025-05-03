@@ -46,7 +46,7 @@ val coloringManagerTypes = listOf(
     DecayColoringManager::class.java,
     FrequencyColoringManager::class.java,
     MarkovColoringManager::class.java,
-    HaloColoringManager::class.java
+    HaloColoringManager::class.java,
 )
 
 /**
@@ -310,5 +310,30 @@ class HaloColoringManager: ColoringManager() {
             it.radius = radius
         }
     }
+
+}
+
+@CustomTypeName("AuxData")
+class AuxDataColoringManager: ColoringManager() {
+
+    context(Projector@Projector)
+    override fun getColor(dataPoint: DataPoint): Color? {
+        return dataPoint.aux as? Color
+    }
+
+    context(Projector@Projector)
+    override fun getActivation(dataPoint: DataPoint) = 0.0
+
+    override fun activate(dataPoint: DataPoint) {
+
+    }
+
+    override fun updateAllColors() {
+    }
+
+    override fun reset() {
+    }
+
+    override fun copy(): CopyableObject = AuxDataColoringManager()
 
 }

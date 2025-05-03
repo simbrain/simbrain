@@ -2,7 +2,7 @@ package org.simbrain.util.projection
 
 import org.simbrain.util.euclideanDistance
 
-class DataPoint @JvmOverloads constructor(val upstairsPoint: DoubleArray, downstairsDimension: Int = 2, var label: String? = null) {
+class DataPoint @JvmOverloads constructor(val upstairsPoint: DoubleArray, downstairsDimension: Int = 2, var label: String? = null, var aux: Any? = null) {
 
     val downstairsPoint = DoubleArray(downstairsDimension)
 

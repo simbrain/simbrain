@@ -1,12 +1,17 @@
 package org.simbrain.network.gui.nodes
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.dialogs.getTrainingDialog
 import org.simbrain.network.smile.SmileClassifier
 import org.simbrain.util.StandardDialog
+import org.simbrain.util.createAction
+import org.simbrain.util.createClassifierProjectionPlot
 import org.simbrain.util.display
 import org.simbrain.util.widgets.bezierArrow
+import org.simbrain.workspace.gui.SimbrainDesktop
 import javax.swing.JMenuItem
 import javax.swing.JPopupMenu
 
@@ -22,6 +27,11 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
             add(JMenuItem("Set Properties / Train ...").apply {
                 addActionListener {
                     propertyDialog.display()
+                }
+            })
+            add(createAction("Visualize Classifier") {
+                SimbrainDesktop.workspace.launch(Dispatchers.Default) {
+                    SimbrainDesktop.createClassifierProjectionPlot(smileClassifier)
                 }
             })
         }

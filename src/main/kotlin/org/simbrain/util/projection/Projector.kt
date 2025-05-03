@@ -7,6 +7,7 @@ import org.simbrain.util.UserParameter
 import org.simbrain.util.createEditorDialog
 import org.simbrain.util.display
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.propertyeditor.GuiEditable
 import java.awt.Color
 
 class Projector(initialDimension: Int = 25) : EditableObject, CoroutineScope {
@@ -67,8 +68,13 @@ class Projector(initialDimension: Int = 25) : EditableObject, CoroutineScope {
     @UserParameter(label = "Use hot point", description = "If true, current point is rendered using the hotpoint color", order = 50)
     var useHotColor = true
 
-    @UserParameter(label = "Coloring Manager", order = 110)
-    var coloringManager: ColoringManager = NoOpColoringManager()
+    var coloringManager: ColoringManager by GuiEditable(
+        initValue = NoOpColoringManager(),
+        order = 110,
+        onUpdate = {
+            showWidget(thisValue !is AuxDataColoringManager)
+        }
+    )
 
     fun addDataPoint(newPoint: DataPoint) {
         // If a different size point is added simply reset the dataset to match

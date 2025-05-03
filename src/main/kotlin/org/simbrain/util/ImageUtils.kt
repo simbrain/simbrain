@@ -13,6 +13,7 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import kotlin.math.floor
 import kotlin.math.min
+import kotlin.random.Random
 
 fun Double.getColorGradient(range: ClosedFloatingPointRange<Double>, lowColor: Color, highColor: Color) = clip(range).let {
     if (it < 0) {
@@ -284,6 +285,23 @@ fun DoubleArray.toScaledImageData(imageWidth: Int, imageHeight: Int, arrayWidth:
     val matrixBound = Rectangle2D.Double(0.0, 0.0, arrayWidth.toDouble(), arrayHeight.toDouble())
 
     return ImageData(nearestNeighborInterpolation(matrixBound, imageBound), width, height)
+}
+
+/**
+ * Generates a sequence of random colors using the HSB (hue, saturation, brightness) model which guarantees some
+ * separation in color space
+ */
+fun generateColorSequence(random: Random = Random(42L)): Sequence<Color> {
+    return sequence {
+        var hue = random.nextDouble(0.0, 1.0)
+        while (true) {
+            val h = (hue + random.nextDouble(0.3, 0.7)).toFloat()
+            hue = h % 1.0
+            val s = random.nextDouble(0.5, 1.0).toFloat()
+            val b = random.nextDouble(0.3, 1.0).toFloat()
+            yield(Color.getHSBColor(h, s, b))
+        }
+    }
 }
 
 

@@ -13,7 +13,7 @@ class KNNClassifier @JvmOverloads constructor(inputSize: Int = 4, outputSize: In
     outputSize) {
 
     @UserParameter(label = "K", order = 10)
-    var k = 2
+    var k = outputSize
 
     override var model: Classifier<DoubleArray>? = null
 

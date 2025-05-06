@@ -4,6 +4,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
 import org.simbrain.custom_sims.SimulationScope
 import org.simbrain.network.smile.SmileClassifier
+import org.simbrain.network.trainers.ClassificationDataset.LabelEncoding
 import org.simbrain.plot.projection.ProjectionComponent
 import org.simbrain.util.projection.AuxDataColoringManager
 import org.simbrain.util.projection.DataPoint
@@ -300,8 +301,12 @@ fun SimbrainDesktop.createClassifierProjectionPlot(smileClassifier: SmileClassif
     with(smileClassifier) {
         train()
         classifier.trainingData.featureVectors.forEach {
-            val result = classifier.predict(it)
-            projectionComponent.projector.addDataPoint(DataPoint(it, aux = colors[result]))
+            val colorIndex = if (classifier.trainingData.labelEncoding == LabelEncoding.Bipolar) {
+                if (classifier.predict(it) > 0) 1 else 0
+            } else {
+                classifier.predict(it)
+            }
+            projectionComponent.projector.addDataPoint(DataPoint(it, aux = colors[colorIndex]))
         }
     }
     val deregisterDeleteEvent = smileClassifier.events.deleted.on {

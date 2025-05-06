@@ -20,7 +20,7 @@ abstract class ClassificationAlgorithm(
     /**
      * Main training data.
      */
-    var trainingData = ClassificationDataset(inputSize, outputSize, 4)
+    var trainingData = ClassificationDataset(inputSize, outputSize, outputSize)
 
     /**
      * Fit a model to the training data.

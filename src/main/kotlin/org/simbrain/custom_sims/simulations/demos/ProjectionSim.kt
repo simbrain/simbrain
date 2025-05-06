@@ -22,7 +22,7 @@ val recurrentNetArrayBased = newSim {
     val neuronArray = NeuronArray(numNeurons)
     val weightMatrix = WeightMatrix(neuronArray, neuronArray)
     weightMatrix.randomize()
-    weightMatrix.weights.setSpectralRadius(.9) // for nicer dynamics
+    weightMatrix.weights.setSpectralRadius(.99) // for nicer dynamics
     network.addNetworkModels(listOf(neuronArray, weightMatrix))
 
     val projectionPlot = addProjectionPlot("Projection Plot").apply {

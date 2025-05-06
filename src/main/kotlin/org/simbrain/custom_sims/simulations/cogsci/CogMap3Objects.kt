@@ -26,7 +26,7 @@ val cogMap3Objects = newSim {
     workspace.clearWorkspace()
 
     val numNeurons = 120
-    val spectralRadius = .9
+    val spectralRadius = .99
 
     //workspace.clearWorkspace()
     val networkComponent = addNetworkComponent("Network")

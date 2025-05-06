@@ -296,11 +296,18 @@ fun SimbrainDesktop.createClassifierProjectionPlot(smileClassifier: SmileClassif
     val projectionComponent = ProjectionComponent("${smileClassifier.displayName} Plot").apply {
         projector.coloringManager = AuxDataColoringManager()
     }
+    val colors = generateColorSequence().take(smileClassifier.outputNeuronGroup.size).toList()
+    with(smileClassifier) {
+        train()
+        classifier.trainingData.featureVectors.forEach {
+            val result = classifier.predict(it)
+            projectionComponent.projector.addDataPoint(DataPoint(it, aux = colors[result]))
+        }
+    }
     val deregisterDeleteEvent = smileClassifier.events.deleted.on {
         workspace.removeWorkspaceComponent(projectionComponent)
     }
     val deregisterUpdateEvent = smileClassifier.events.updated.on {
-        val colors = generateColorSequence().take(smileClassifier.outputNeuronGroup.size).toList()
         val datapoint = DataPoint(
             smileClassifier.inputNeuronGroup.activationArray,
             aux = colors[smileClassifier.winner]

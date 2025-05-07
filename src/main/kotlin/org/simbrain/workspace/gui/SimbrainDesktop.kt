@@ -479,31 +479,18 @@ object SimbrainDesktop {
         bar.addSeparator()
         bar.add(actionManager.newNetworkAction)
 
-        var button = JButton()
-        button.icon = ResourceManager.getSmallIcon("menu_icons/World.png")
-        val worldMenu = JPopupMenu()
-        for (action in actionManager.newWorldActions) {
-            worldMenu.add(action)
-        }
-        button.addActionListener { e ->
-            val button = e.source as JButton
-            worldMenu.show(button, 0, button.height)
-        }
-        button.componentPopupMenu = worldMenu
-        bar.add(button)
+        bar.add(createDropdownButton(
+            ResourceManager.getSmallIcon("menu_icons/World.png"),
+            actionManager.newWorldActions,
+            "Create a new world"
+        ))
 
-        button = JButton()
-        button.icon = ResourceManager.getSmallIcon("menu_icons/BarChart.png")
-        val gaugeMenu = JPopupMenu()
-        for (action in actionManager.plotActions) {
-            gaugeMenu.add(action)
-        }
-        button.addActionListener { e ->
-            val button = e.source as JButton
-            gaugeMenu.show(button, 0, button.height)
-        }
-        button.componentPopupMenu = gaugeMenu
-        bar.add(button)
+        bar.add(createDropdownButton(
+            ResourceManager.getSmallIcon("menu_icons/BarChart.png"),
+            actionManager.plotActions,
+            "Create a new plot"
+        ))
+
         bar.add(actionManager.newConsoleAction)
 
         // Toggle docks

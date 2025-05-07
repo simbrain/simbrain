@@ -20,6 +20,7 @@ import org.jfree.data.xy.XYSeriesCollection
 import org.simbrain.util.*
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.projection.*
+import org.simbrain.util.widgets.ShowHelpAction
 import org.simbrain.util.widgets.ToggleButton
 import org.simbrain.workspace.gui.DesktopComponent
 import java.awt.*
@@ -281,6 +282,12 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
             add(JMenu("Edit").apply {
                 val prefsAction: Action = prefsAction
                 add(JMenuItem(prefsAction))
+            })
+            add(JMenu("Help").apply {
+                val helpItem = JMenuItem("Help")
+                val helpAction = ShowHelpAction("https://docs.simbrain.net/docs/plots/projectionPlot.html")
+                helpItem.action = helpAction
+                add(helpItem)
             })
         }
 

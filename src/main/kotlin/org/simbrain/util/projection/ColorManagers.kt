@@ -213,8 +213,8 @@ class FrequencyColoringManager: ColoringManager() {
 @CustomTypeName("Markov")
 class MarkovColoringManager: ColoringManager() {
 
-    @UserParameter(label = "High frequency color", order = 10)
-    var highFrequencyColor = Color.green
+    @UserParameter(label = "High probability color", order = 10)
+    var highProbabilityColor = Color.green
 
     private val transitionCounts: MutableMap<DataPoint, MutableMap<DataPoint, Int>> = HashMap()
 
@@ -237,7 +237,7 @@ class MarkovColoringManager: ColoringManager() {
     context(Projector)
     override fun getColor(dataPoint: DataPoint): Color {
         val t = getActivation(dataPoint)
-        return HSBInterpolate(baseColor.toHSB(), highFrequencyColor.toHSB(), t)
+        return HSBInterpolate(baseColor.toHSB(), highProbabilityColor.toHSB(), t)
     }
 
     context(Projector)

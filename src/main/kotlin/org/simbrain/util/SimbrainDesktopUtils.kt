@@ -330,3 +330,28 @@ fun SimbrainDesktop.createClassifierProjectionPlot(smileClassifier: SmileClassif
     }
     return projectionComponent
 }
+
+fun createDropdownButton(icon: Icon, actions: List<Action>, toolTip: String? = null): JButton {
+    val button = JButton().apply {
+        this.icon = icon
+        text = "▾"
+        horizontalTextPosition = SwingConstants.RIGHT
+        verticalTextPosition = SwingConstants.CENTER
+        if (toolTip != null) {
+            toolTipText = toolTip
+        }
+    }
+    
+    val popupMenu = JPopupMenu()
+    for (action in actions) {
+        popupMenu.add(action)
+    }
+    
+    button.addActionListener { e ->
+        val btn = e.source as JButton
+        popupMenu.show(btn, 0, btn.height)
+    }
+    
+    button.componentPopupMenu = popupMenu
+    return button
+}

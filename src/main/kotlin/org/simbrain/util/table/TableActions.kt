@@ -347,7 +347,7 @@ val SimbrainJTable.editColumnAction
         }
     }
 
-fun SimbrainJTable.createApplyAction(name: String = "Apply", applyInputs: suspend (selectedRow: Int) -> Unit) =
+fun SimbrainJTable.createApplyAction(name: String = "Apply", applyInputs: suspend SimbrainJTable.(selectedRow: Int) -> Unit) =
     createAction(
         name = name,
         description = "Apply current row as input to network",
@@ -357,24 +357,6 @@ fun SimbrainJTable.createApplyAction(name: String = "Apply", applyInputs: suspen
         (model as? SimbrainDataFrame)?.events?.currentRowChanged?.fire()
         applyInputs(selectedRow)
     }
-
-fun SimbrainJTable.createAdvanceRowAction() = createAction(
-    name = "Advance Row",
-    description = "Increment the current row",
-    iconPath = "menu_icons/plus.png",
-) {
-    incrementSelectedRow()
-}
-
-fun SimbrainJTable.createApplyAndAdvanceAction(applyInputs: suspend (selectedRow: Int) -> Unit) = createAction(
-    name = "Apply and Advance",
-    description = "Apply current row as input and increment selected row",
-    iconPath = "menu_icons/StepReturn.png",
-) {
-    initRowSelection()
-    applyInputs(selectedRow)
-    incrementSelectedRow()
-}
 
 fun SimbrainJTable.createShowMatrixPlotAction() = createAction(
     name = "Show matrix plot",

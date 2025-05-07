@@ -15,9 +15,7 @@ import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.network.trainers.*
 import org.simbrain.util.*
 import org.simbrain.util.table.MatrixDataFrame
-import org.simbrain.util.table.createAdvanceRowAction
 import org.simbrain.util.table.createApplyAction
-import org.simbrain.util.table.createApplyAndAdvanceAction
 import org.simbrain.util.widgets.ToggleButton
 import java.awt.Cursor
 import javax.swing.*
@@ -28,11 +26,16 @@ class DataSetPanel(val dataSet: MatrixDataset, applyAction: suspend DataSetPanel
 
     val inputs = MatrixEditor(dataSet.inputs, dataSet.inputRowNames, dataSet.inputColumnNames).apply {
         toolbar.addSeparator()
+        val advanceRowCheckbox = JCheckBox("Auto Advance").apply { isSelected = true }
         toolbar.add(
-            table.createApplyAction("Apply Inputs") { applyAction(it) }
+            table.createApplyAction("Apply Inputs") {
+                applyAction(it)
+                if (advanceRowCheckbox.isSelected) {
+                    incrementSelectedRow()
+                }
+            }
         )
-        toolbar.add(table.createAdvanceRowAction())
-        toolbar.add(table.createApplyAndAdvanceAction { applyAndAdvanceAction(it) })
+        toolbar.add(advanceRowCheckbox)
         toolbar.addSeparator()
         toolbar.add(rowErrorJLabel)
     }
@@ -236,15 +239,16 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         inputData.layout = MigLayout("gap 0px 0px, ins 0")
         val inputs = MatrixEditor(unsupervisedNetwork.inputData)
         inputs.toolbar.addSeparator()
+        val advanceRowCheckbox = JCheckBox("Auto Advance").apply { isSelected = true }
         inputs.toolbar.add(
             inputs.table.createApplyAction("Apply Inputs") { selectedRow ->
                 unsupervisedNetwork.inputLayer.setActivations(inputs.table.model.getCurrentDoubleRow().toDoubleArray())
+                if (advanceRowCheckbox.isSelected) {
+                    incrementSelectedRow()
+                }
             }
         )
-        inputs.toolbar.add(inputs.table.createAdvanceRowAction())
-        inputs.toolbar.add(inputs.table.createApplyAndAdvanceAction {
-            unsupervisedNetwork.inputLayer.setActivations(inputs.table.model.getCurrentDoubleRow().toDoubleArray())
-        })
+        inputs.toolbar.add(advanceRowCheckbox)
         inputData.add(inputs)
         mainPanel.add(inputData)
 

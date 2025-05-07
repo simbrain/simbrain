@@ -21,7 +21,9 @@ package org.simbrain.network.gui.dialogs
 import org.simbrain.network.core.*
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.util.createAction
-import org.simbrain.util.table.*
+import org.simbrain.util.table.createApplyAction
+import org.simbrain.util.table.deleteRowAction
+import org.simbrain.util.table.insertRowAction
 import org.simbrain.util.toColumnVector
 import org.simbrain.workspace.gui.SimbrainDesktop
 import smile.math.matrix.Matrix
@@ -62,19 +64,17 @@ private fun createTestInputPanel(initData: Matrix, applyInputs: suspend MatrixEd
         }
     }).apply { this.isSelected = workspaceMode })
     toolbar.addSeparator()
+    val advanceRowCheckbox = JCheckBox("Auto Advance").apply { isSelected = true }
     toolbar.add(table.createApplyAction("Apply Inputs") {
         applyInputs(it)
         if (workspaceMode) {
             SimbrainDesktop.workspace.updater.iterate(1)
         }
-    })
-    toolbar.add(table.createAdvanceRowAction())
-    toolbar.add(table.createApplyAndAdvanceAction {
-        applyInputs(it)
-        if (workspaceMode) {
-            SimbrainDesktop.workspace.updater.iterate(1)
+        if (advanceRowCheckbox.isSelected) {
+            incrementSelectedRow()
         }
     })
+    toolbar.add(advanceRowCheckbox)
     toolbar.add(table.insertRowAction)
     toolbar.add(table.deleteRowAction)
 }

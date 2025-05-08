@@ -300,8 +300,6 @@ class TileMap(width: Int, height: Int) {
     /**
      * Clear and resize the map to the specified size. Maintains current tilemap.
      *
-     * TODO: consider creating empty map instead of using this to avoid mutability
-     *
      * @param width the new width of the map
      * @param height the new height of the map
      */

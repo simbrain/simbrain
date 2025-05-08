@@ -6,11 +6,14 @@ import org.simbrain.network.core.addSynapse
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.util.SmellSource
 import org.simbrain.util.decayfunctions.LinearDecayFunction
+import org.simbrain.util.getDesktopComponentAs
 import org.simbrain.util.place
 import org.simbrain.util.point
+import org.simbrain.world.odorworld.OdorWorldDesktopComponent
 import org.simbrain.world.odorworld.effectors.StraightMovement
 import org.simbrain.world.odorworld.effectors.Turning
 import org.simbrain.world.odorworld.entities.EntityType
+import org.simbrain.world.odorworld.fitWorldToFrameSize
 import org.simbrain.world.odorworld.sensors.SmellSensor
 
 val pursuer = newSim {
@@ -179,8 +182,9 @@ val pursuer = newSim {
             width = 400
             height = 435
         }
+        odorWorldComponent.getDesktopComponentAs<OdorWorldDesktopComponent>().fitWorldToFrameSize()
     }
-    
+
     // Create couplings - from contents.xml
     with(couplingManager) {
         // Neuron outputs to effectors

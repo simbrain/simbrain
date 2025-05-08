@@ -257,7 +257,7 @@ val actorCritic = newSim {
         place(networkComponent,210, 10, 522, 595)
         place(odorWorldComponent, 728, 11, 500, 500)
         place(plot, 729, 599, 519, 293)
-        (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).setFrameSizeOnCanvasSize(500, 500)
+        (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).zoomToFitSize(500, 500)
         place(docViewer) {
             location = point(0, 0)
         }

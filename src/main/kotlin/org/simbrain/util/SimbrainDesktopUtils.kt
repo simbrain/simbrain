@@ -11,6 +11,7 @@ import org.simbrain.util.projection.DataPoint
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.workspace.WorkspaceComponent
+import org.simbrain.workspace.gui.DesktopComponent
 import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.workspace.serialization.WorkspaceSerializer
 import java.awt.BorderLayout
@@ -42,20 +43,18 @@ data class Placement(
     var height: Int? = null
 )
 
-fun SimbrainDesktop.place(workspaceComponent: WorkspaceComponent, placement: Placement.() -> Unit) {
-    workspace.launch {
-        val (location, width, height) = Placement().apply(placement)
-        val desktopComponent = withContext(Dispatchers.Main) {
-            getDesktopComponent(workspaceComponent)
-        }
-        val bounds = desktopComponent.parentFrame.bounds
-        desktopComponent.parentFrame.bounds = Rectangle(
-            location?.x ?: bounds.x,
-            location?.y ?: bounds.y,
-            width ?: bounds.width,
-            height ?: bounds.height
-        )
+suspend fun SimbrainDesktop.place(workspaceComponent: WorkspaceComponent, placement: suspend Placement.() -> Unit) {
+    val (location, width, height) = Placement().apply { placement() }
+    val desktopComponent = withContext(Dispatchers.Main) {
+        getDesktopComponent(workspaceComponent)
     }
+    val bounds = desktopComponent.parentFrame.bounds
+    desktopComponent.parentFrame.bounds = Rectangle(
+        location?.x ?: bounds.x,
+        location?.y ?: bounds.y,
+        width ?: bounds.width,
+        height ?: bounds.height
+    )
 }
 
 suspend fun SimbrainDesktop.place(workspaceComponent: WorkspaceComponent, x: Int, y: Int, width: Int, height: Int) {
@@ -354,4 +353,9 @@ fun createDropdownButton(icon: Icon, actions: List<Action>, toolTip: String? = n
     
     button.componentPopupMenu = popupMenu
     return button
+}
+
+context(SimbrainDesktop)
+suspend inline fun <reified T : DesktopComponent<*>> WorkspaceComponent.getDesktopComponentAs(): T {
+    return getDesktopComponent(this) as T
 }

@@ -32,3 +32,21 @@ fun Bounded.intersect(other: Bounded): BoundIntersection {
 fun OdorWorld.getRandomLocation(rand: Random = Random): Point2D {
     return point(rand.nextInt(width.toInt()), rand.nextInt(height.toInt()))
 }
+
+/**
+ * Resizes the tile map of the `worldPanel` to fit the current frame size based on the camera's dimensions.
+ *
+ * Calculates the number of tiles required to fill the frame by dividing the width and height of
+ * the camera by the dimensions of a single tile.
+ */
+fun OdorWorldDesktopComponent.fitWorldToFrameSize() {
+    val width = worldPanel.canvas.camera.width.toInt()
+    val height = worldPanel.canvas.camera.height.toInt()
+
+    val widthInTiles = width / worldPanel.world.tileMap.tileWidth
+    val heightInTiles = height / worldPanel.world.tileMap.tileHeight
+
+    worldPanel.world.tileMap.updateMapSize(widthInTiles, heightInTiles)
+
+    fitFrameToWorldSize()
+}

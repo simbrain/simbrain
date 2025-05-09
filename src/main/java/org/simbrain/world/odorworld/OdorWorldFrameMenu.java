@@ -120,8 +120,7 @@ public class OdorWorldFrameMenu extends JMenuBar {
         fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createExportAction(parent));
         fileMenu.addSeparator();
 
-        JMenu loadTileMapMenu = new JMenu("Load Tile Map...");
-        JMenuItem loadTileMapItem = new JMenuItem(new AbstractAction("Load Tile Map...") {
+        fileMenu.add(new AbstractAction("Load Tile Map...") {
             @Override
             public void actionPerformed(ActionEvent e) {
                 SFileChooser chooser = new SFileChooser(OdorWorldPreferences.INSTANCE.getTileMapDirectory(), "Load TMX Tilemap", null, true);
@@ -133,32 +132,9 @@ public class OdorWorldFrameMenu extends JMenuBar {
                 }
             }
         });
-        loadTileMapMenu.add(loadTileMapItem);
-        loadTileMapMenu.addSeparator();
 
-        loadTileMapMenu.add(new JMenuItem(new AbstractAction("Load Empty World") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                parent.getWorldPanel().getWorld().setTileMap(TMXUtils.loadTileMap("empty.tmx"));
-            }
-        }));
+        fileMenu.add(odorWorldActions.clearTileMapAction());
 
-
-        loadTileMapMenu.add(new JMenuItem(new AbstractAction("Load Ari's World") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                parent.getWorldPanel().getWorld().setTileMap(TMXUtils.loadTileMap("aris_world.tmx"));
-            }
-        }));
-
-        loadTileMapMenu.add(new JMenuItem(new AbstractAction("Load Yulin's World") {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                parent.getWorldPanel().getWorld().setTileMap(TMXUtils.loadTileMap("yulins_world.tmx"));
-            }
-        }));
-
-        fileMenu.add(loadTileMapMenu);
         fileMenu.addSeparator();
         fileMenu.add(odorWorldActions.showWorldPrefsAction());
         fileMenu.addSeparator();

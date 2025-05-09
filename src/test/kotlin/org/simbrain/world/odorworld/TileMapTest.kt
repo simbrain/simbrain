@@ -16,7 +16,7 @@ class TileMapTest {
 
     @Test
     fun `test loading tilemap`() {
-        world.tileMap = loadTileMap("yulins_world.tmx")
+        world.tileMap = loadEmptyMap()
     }
 
     @Test
@@ -34,7 +34,7 @@ class TileMapTest {
 
     @Test
     fun `test pixel coordinates to grid coordinates`() {
-        world.tileMap = loadTileMap("empty.tmx")
+        world.tileMap = loadEmptyMap()
         with(world.tileMap) {
             // Tile Width is 32
             val coord = PixelCoordinate(32+16, 32+32+16)
@@ -46,7 +46,7 @@ class TileMapTest {
 
     @Test
     fun `test grid coordinates to pixel coordinates`() {
-        world.tileMap = loadTileMap("empty.tmx")
+        world.tileMap = loadEmptyMap()
         with(world.tileMap) {
             val gridCoord = GridCoordinate(1,2)
             // Should return center of that pixel
@@ -58,7 +58,7 @@ class TileMapTest {
 
     @Test
     fun `test grid coordinates in radius`() {
-        world.tileMap = loadTileMap("empty.tmx")
+        world.tileMap.updateMapSize(14, 14)
         var gridLocations = world.tileMap.getRelativeGridLocationsInRadius(15.0).toList()
         assertEquals(1, gridLocations.size)
         assertEquals(0.0, gridLocations.first().x)

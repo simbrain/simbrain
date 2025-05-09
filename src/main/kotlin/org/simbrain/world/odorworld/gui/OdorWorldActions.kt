@@ -1,6 +1,9 @@
 package org.simbrain.world.odorworld.gui
 
 import org.simbrain.util.*
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
+import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.OdorWorldPanel
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
@@ -134,6 +137,25 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
         keyboardShortcuts = listOf(CmdOrCtrl + KeyEvent.VK_SUBTRACT, CmdOrCtrl + KeyEvent.VK_MINUS)
     ) {
         scalingFactor /= 1.1
+    }
+
+    fun clearTileMapAction() = odorWorldPanel.createAction("Clear Tile Map...") {
+        val size = object : EditableObject {
+            var width by GuiEditable(
+                initValue = odorWorldPanel.canvas.camera.width.toInt() / world.tileMap.tileWidth
+            )
+
+            var height by GuiEditable(
+                initValue = odorWorldPanel.canvas.camera.height.toInt() / world.tileMap.tileHeight
+            )
+        }
+
+        val editorPanel = AnnotatedPropertyEditor(size)
+
+        editorPanel.displayInDialog {
+            world.tileMap.updateMapSize(size.width, size.height)
+        }
+
     }
 
 }

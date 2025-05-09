@@ -10,7 +10,6 @@ import org.simbrain.network.core.Synapse
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.StepDecayFunction
 import org.simbrain.util.geneticalgorithm.*
-import org.simbrain.util.piccolo.loadTileMap
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.serialization.WorkspaceSerializer
@@ -154,7 +153,6 @@ val grazingCows = newSim { optionString ->
             workspace.addWorkspaceComponent(it)
         }.world.apply {
             isObjectsBlockMovement = false
-            loadTileMap("empty.tmx")
             with(tileMap) {
                 updateMapSize(25, 25)
                 fill("Grass1")

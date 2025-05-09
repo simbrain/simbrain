@@ -14,7 +14,7 @@ import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.util.SpikingScalarData
 import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.math.SimbrainMath
-import org.simbrain.util.piccolo.loadTileMap
+import org.simbrain.util.piccolo.loadEmptyMap
 import org.simbrain.util.projection.MarkovColoringManager
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.workspace.gui.SimbrainDesktop
@@ -130,7 +130,7 @@ class PatternsOfActivity : Simulation {
         val oc = sim.addOdorWorld(547, 5, 504, 548, "World")
         oc.world.isObjectsBlockMovement = false
         oc.world.isUseCameraCentering = false
-        oc.world.tileMap = loadTileMap("empty.tmx")
+        oc.world.tileMap = loadEmptyMap()
         val mouse = oc.world.addEntity(120, 245, EntityType.Mouse)
         mouse.addSensor(SmellSensor("Smell-Right", 36.0, 40.0))
         mouse.addSensor(SmellSensor("Smell-Left", -36.0, 40.0))

@@ -24,7 +24,7 @@ import org.simbrain.util.UserParameter
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.piccolo.TileMap
 import org.simbrain.util.piccolo.TileMapLayer
-import org.simbrain.util.piccolo.loadTileMap
+import org.simbrain.util.piccolo.loadEmptyMap
 import org.simbrain.util.plus
 import org.simbrain.util.point
 import org.simbrain.util.propertyeditor.EditableObject
@@ -56,7 +56,7 @@ class OdorWorld : EditableObject, Bounded {
     /**
      * Basic tilemap that determines the size and basic features of the world.
      */
-    var tileMap = loadTileMap("empty.tmx")
+    var tileMap = loadEmptyMap()
         set(value) {
             field = value
             this.selectedLayer = value.layers[0]

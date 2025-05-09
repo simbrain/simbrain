@@ -11,7 +11,6 @@ import org.simbrain.plot.rasterchart.RasterPlotComponent
 import org.simbrain.plot.timeseries.TimeSeriesModel
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
 import org.simbrain.util.*
-import org.simbrain.util.piccolo.loadTileMap
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.gui.SimbrainDesktop
@@ -94,12 +93,10 @@ fun SimulationScope.addNetworkComponent(name: String, network : Network): Networ
 
 fun SimulationScope.addOdorWorldComponent(
     name: String? = null,
-    map: String = "empty.tmx",
     config: OdorWorldComponent.() -> Unit = { }
 ): OdorWorldComponent {
-    return OdorWorldComponent(name ?: map)
+    return OdorWorldComponent(name)
         .apply(config)
-        .also { if (map != "empty.tmx") it.world.tileMap = loadTileMap(map) }
         .also { workspace.addWorkspaceComponent(it) }
 }
 

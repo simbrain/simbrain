@@ -172,7 +172,7 @@ public class KuramotoOscillators extends Simulation {
         OdorWorldComponent oc = sim.addOdorWorld(445, 14, 426, 437, "World");
         oc.getWorld().setObjectsBlockMovement(false);
         oc.getWorld().setUseCameraCentering(false);
-        oc.getWorld().setTileMap(TMXUtils.loadTileMap("empty.tmx"));
+        oc.getWorld().setTileMap(TMXUtils.loadEmptyMap());
 
         // Mouse
         mouse = oc.getWorld().addEntity(202, 176, EntityType.Mouse.INSTANCE);

@@ -39,16 +39,9 @@ fun loadTileMap(file: File?): TileMap {
     return OdorWorldComponent.odorWorldXStream.fromXML(file) as TileMap
 }
 
-/**
- * Create a tilemap by parsing a tmx file, which is an xml representation
- * of a tilemap.
- *
- * @param filename name of the file to parse
- * @return the tilemap object from the given file
- */
-fun loadTileMap(filename: String): TileMap {
+fun loadEmptyMap(): TileMap {
     return OdorWorldComponent.odorWorldXStream.fromXML(
-        OdorWorldResourceManager.getFileURL("tilemap" + File.separator + filename)
+        OdorWorldResourceManager.getFileURL("tilemap" / "empty.tmx")
     ) as TileMap
 }
 

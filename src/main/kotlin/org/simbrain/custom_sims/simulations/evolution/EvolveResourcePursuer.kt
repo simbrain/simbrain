@@ -16,7 +16,6 @@ import org.simbrain.util.*
 import org.simbrain.util.geneticalgorithm.*
 import org.simbrain.util.piccolo.createTileMapLayer
 import org.simbrain.util.piccolo.fillRect
-import org.simbrain.util.piccolo.loadTileMap
 import org.simbrain.util.piccolo.nextGridCoordinate
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
@@ -362,7 +361,6 @@ val evolveResourcePursuer = newSim { optionString ->
             workspace.addWorkspaceComponent(it)
         }
         val odorWorld = odorWorldComponent.world.apply {
-            loadTileMap("empty.tmx")
             with(tileMap) {
                 updateMapSize(24, 24)
                 fill("Grass1")

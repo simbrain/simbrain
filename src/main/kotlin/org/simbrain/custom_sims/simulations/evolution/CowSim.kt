@@ -12,7 +12,6 @@ import org.simbrain.util.cartesianProduct
 import org.simbrain.util.format
 import org.simbrain.util.geneticalgorithm.*
 import org.simbrain.util.piccolo.createTileMapLayer
-import org.simbrain.util.piccolo.loadTileMap
 import org.simbrain.util.piccolo.makeLake
 import org.simbrain.util.piccolo.nextGridCoordinate
 import org.simbrain.util.point
@@ -138,7 +137,6 @@ val evolveCow = newSim {
         val odorWorld = OdorWorldComponent("Odor World").also {
             workspace.addWorkspaceComponent(it)
         }.world.apply {
-            loadTileMap("empty.tmx")
             with(tileMap) {
                 updateMapSize(32, 32)
                 fill("Grass1")

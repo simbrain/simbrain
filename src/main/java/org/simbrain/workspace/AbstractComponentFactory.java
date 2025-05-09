@@ -28,6 +28,7 @@ import org.simbrain.world.imageworld.ImageWorldComponent;
 import org.simbrain.world.imageworld.ImageWorldDesktopComponent;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent;
+import org.simbrain.world.odorworld.OdorWorldUtilsKt;
 import org.simbrain.world.soundworld.SoundWorldComponent;
 import org.simbrain.world.soundworld.gui.SoundWorldDesktopComponent;
 import org.simbrain.world.textworld.TextWorldComponent;
@@ -58,7 +59,11 @@ public class AbstractComponentFactory {
         putWorkspaceComponentFactory("Network", () -> new NetworkComponent(""));
         putGuiComponentFactory(NetworkComponent.class, NetworkDesktopComponent::new);
 
-        putWorkspaceComponentFactory("Odor World", () -> new OdorWorldComponent(""));
+        putWorkspaceComponentFactory("Odor World", () -> {
+            var component = new OdorWorldComponent("");
+            OdorWorldUtilsKt.addDefaultEntities(component.getWorld());
+            return component;
+        });
         putGuiComponentFactory(OdorWorldComponent.class, OdorWorldDesktopComponent::new);
 
         putWorkspaceComponentFactory("Data Table", () -> new DataWorldComponent(""));

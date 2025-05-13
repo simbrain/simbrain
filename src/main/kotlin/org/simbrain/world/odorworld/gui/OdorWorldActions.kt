@@ -17,6 +17,7 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
 
     fun createSelectAllAction() = odorWorldPanel.createAction(
         name = "Select All",
+        description = "Select all entities",
         keyboardShortcut = CmdOrCtrl + 'A'
     ) {
         odorWorldPanel.selectionManager.addAll(odorWorldPanel.canvas.layer.allNodes.filterIsInstance<EntityNode>().toMutableSet())
@@ -24,6 +25,7 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
 
     fun addAgentAction() = odorWorldPanel.createAction(
         name = "Add agent",
+        description = "Add a new agent to the world. A mouse by default. Double click to edit",
         iconPath = "menu_icons/mouse_icon.png",
         keyboardShortcut = CmdOrCtrl + 'P'
     ) {
@@ -32,6 +34,7 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
 
     fun addEntityAction() = odorWorldPanel.createAction(
         name = "Add entity",
+        description = "Add a new entity to the world. Cheese by default. Double click to edit.",
         iconPath = "menu_icons/swiss_icon.png",
         keyboardShortcut = 'P'
     ) {
@@ -40,6 +43,7 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
 
     fun deleteSelectedAction() = odorWorldPanel.createAction(
         name = "Delete selected entities",
+        description = "Delete selected entities",
         keyboardShortcuts = listOf(KeyCombination(KeyEvent.VK_DELETE), KeyCombination(KeyEvent.VK_BACK_SPACE))
     ) {
         odorWorldPanel.deleteSelectedEntities()
@@ -47,6 +51,7 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
 
     fun showWorldPrefsAction() = odorWorldPanel.createAction(
         name = "Preferences...",
+        description = "Show odor world preferences",
         iconPath = "menu_icons/Tools.png",
         keyboardShortcut = CmdOrCtrl + ','
     ) {
@@ -55,6 +60,7 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
 
     val showPropertyDialogAction = odorWorldPanel.createAction(
         name = "Edit entity...",
+        description = "Edit selected entity",
         iconPath = "menu_icons/Properties.png",
         keyboardShortcut = CmdOrCtrl + 'E'
     ) {
@@ -117,6 +123,7 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
 
     fun resetZoomAction() = odorWorldPanel.createAction(
         "Reset Zoom",
+        description = "Resetting the zoom. Entities will appear at their original size (in pixels) ",
         iconPath = "menu_icons/ZoomReset.png",
         keyboardShortcut = CmdOrCtrl + KeyEvent.VK_0
     ) {
@@ -125,6 +132,7 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
 
     fun zoomInAction() = odorWorldPanel.createAction(
         "Zoom In",
+        description = "Zoom in",
         iconPath = "menu_icons/ZoomIn.png",
         keyboardShortcuts = listOf(CmdOrCtrl + KeyEvent.VK_ADD, CmdOrCtrl + KeyEvent.VK_EQUALS)
     ) {
@@ -133,6 +141,7 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
 
     fun zoomOutAction() = odorWorldPanel.createAction(
         "Zoom Out",
+        description = "Zoom out",
         iconPath = "menu_icons/ZoomOut.png",
         keyboardShortcuts = listOf(CmdOrCtrl + KeyEvent.VK_SUBTRACT, CmdOrCtrl + KeyEvent.VK_MINUS)
     ) {

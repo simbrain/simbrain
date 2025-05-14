@@ -97,7 +97,7 @@ class PlacementManager() {
             models.moveTo((lastSelectedModel?.location ?: point(0, 0)) + computeOffset(models.first()))
         }
 
-        lastSelectedModel = models.sortTopBottom().first()
+        lastSelectedModel = models.sortLeftRightTopBottom().first()
     }
 
     private fun pointToString(point: Point2D?) = if (point != null) "(${point.x.format(2)}, ${point.y.format(2)})" else "null"

@@ -21,7 +21,7 @@ import org.simbrain.network.core.AbstractNeuronCollection
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.sortTopBottom
+import org.simbrain.network.core.sortLeftRightTopBottom
 import org.simbrain.network.updaterules.NeuronUpdateRule
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.CustomTypeName
@@ -39,7 +39,7 @@ import org.simbrain.util.propertyeditor.CustomTypeName
 open class NeuronGroup() : AbstractNeuronCollection() {
 
     constructor(neurons: List<Neuron>) : this() {
-        addNeurons(neurons.sortTopBottom())
+        addNeurons(neurons.sortLeftRightTopBottom())
         applyLayout()
     }
 

@@ -314,8 +314,13 @@ fun List<Neuron>.getEnergy() = ((this cartesianProduct this)
 
 /**
  * Sort a list of models left to right and top to bottom
+ * Example:
+ *   1 2 3
+ *     4
+ *       5
+ *   6 7
  */
-fun <T : LocatableModel> List<T>.sortTopBottom() = sortedBy { it.location.x }.sortedBy { it.location.y }
+fun <T : LocatableModel> List<T>.sortLeftRightTopBottom() = sortedBy { it.location.x }.sortedBy { it.location.y }
 
 /**
  * Calculates the Euclidean distance between two neurons' positions in coordinate space.

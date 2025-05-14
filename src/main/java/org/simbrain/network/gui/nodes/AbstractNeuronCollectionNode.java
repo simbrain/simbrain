@@ -1,5 +1,7 @@
 package org.simbrain.network.gui.nodes;
 
+import org.jetbrains.annotations.Nullable;
+import org.piccolo2d.util.PBounds;
 import org.simbrain.network.core.AbstractNeuronCollection;
 import org.simbrain.network.core.LocatableModel;
 import org.simbrain.network.core.NetworkModel;
@@ -201,4 +203,8 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
         return true;
     }
 
+    @Override
+    public boolean isIntersecting(@Nullable PBounds bound) {
+        return interactionBox.isIntersecting(bound);
+    }
 }

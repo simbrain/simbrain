@@ -8,6 +8,7 @@ import org.simbrain.network.gui.dialogs.NetworkPreferences.biasesRandomizer
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.subnetworks.Subnetwork
+import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.NeuronUpdateRule
 import org.simbrain.network.util.Alignment
@@ -33,6 +34,7 @@ fun updatingOrder(obj: NetworkModel): Int = when (obj) {
     is SynapseGroup -> 60
     is Subnetwork -> 70
     is Synapse -> 80
+    is SupervisedModel -> 90
     else -> 55
 }
 

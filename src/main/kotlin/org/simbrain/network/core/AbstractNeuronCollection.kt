@@ -585,4 +585,11 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
      */
     open val customInfo: NetworkModel?
         get() = null
+
+    override suspend fun afterRestore(context: Any?) {
+        super.afterRestore(context)
+        val sortedNeuronList = neuronList.sortTopBottom()
+        neuronList.clear()
+        neuronList.addAll(sortedNeuronList)
+    }
 }

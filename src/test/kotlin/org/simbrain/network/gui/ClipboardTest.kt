@@ -1585,7 +1585,7 @@ class ClipboardTest {
         assertTrue(network.getModels<NeuronCollection>().any { it.id == pastedTargetCollectionId },
             "A target array with the same ID should be in the network after redo")
         assertTrue(network.getModels<SynapseGroup>().any { it.id == pastedSynapseGroupId },
-            "A weight matrix with the same ID should be in the network after redo")
+            "A synapse group with the same ID should be in the network after redo")
 
         // Verify functionality of redone model by testing activation propagation
         // Get the restored components
@@ -1594,11 +1594,11 @@ class ClipboardTest {
         val redoTargetArray = network.getModels<NeuronCollection>().first { it.id == pastedTargetCollectionId }
         val redoSynapseGroup = network.getModels<SynapseGroup>().first { it.id == pastedSynapseGroupId }
 
-        // Verify the weight matrix still connects the proper arrays
+        // Verify the synapse group still connects the proper arrays
         assertEquals(redoSourceArray.id, redoSynapseGroup.source.id,
-            "The redone weight matrix should connect to the proper source array")
+            "The redone synapse group should connect to the proper source array")
         assertEquals(redoTargetArray.id, redoSynapseGroup.target.id,
-            "The redone weight matrix should connect to the proper target array")
+            "The redone synapse group should connect to the proper target array")
 
         // Verify the supervised model still references the correct layers
         assertEquals(redoSourceArray.id, redoSupervisedModel.inputLayer.id,
@@ -1610,6 +1610,14 @@ class ClipboardTest {
         // Set activations in the restored source array
         redoSourceArray.setActivations(sourceActivations)
         redoSourceArray.isClamped = true
+
+        // Verify the synapse group still has the same values
+        for (row in 0 until redoSynapseGroup.getWeightMatrix().nrow()) {
+            for (col in 0 until redoSynapseGroup.getWeightMatrix().ncol()) {
+                assertEquals(synapseGroup.getWeightMatrix()[row, col], redoSynapseGroup.getWeightMatrix()[row, col], 0.001,
+                    "Weight at position [$row, $col] should be copied correctly")
+            }
+        }
 
         // Update the network to propagate the values
         network.update()

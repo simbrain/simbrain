@@ -450,7 +450,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
 
     fun copy() {
         if (selectionManager.isEmpty) return
-        selectionManager.filterSelectedModels<LocatableModel>().sortTopBottom().firstOrNull()?.let {
+        selectionManager.filterSelectedModels<LocatableModel>().sortLeftRightTopBottom().firstOrNull()?.let {
             network.placementManager.lastSelectedModel = it
         }
         Clipboard.clear()

@@ -32,7 +32,7 @@ class NeuronCollection : AbstractNeuronCollection {
     constructor(): super()
 
     constructor(neurons: List<Neuron>): super() {
-        addNeurons(neurons.sortTopBottom())
+        addNeurons(neurons.sortLeftRightTopBottom())
 
         neurons.forEach { n: Neuron ->
             n.events.locationChanged.on { events.locationChanged }

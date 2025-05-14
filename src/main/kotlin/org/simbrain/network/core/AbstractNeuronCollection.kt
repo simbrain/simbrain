@@ -588,7 +588,7 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
 
     override suspend fun afterRestore(context: Any?) {
         super.afterRestore(context)
-        val sortedNeuronList = neuronList.sortTopBottom()
+        val sortedNeuronList = neuronList.sortLeftRightTopBottom()
         neuronList.clear()
         neuronList.addAll(sortedNeuronList)
     }

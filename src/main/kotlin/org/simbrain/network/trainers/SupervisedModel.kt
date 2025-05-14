@@ -159,6 +159,13 @@ class SupervisedModel(
         events.deleted.fire(this).await()
         return listOf(this)
     }
+
+    override suspend fun afterRestore(context: Any?) {
+        super.afterRestore(context)
+        layers.forEach { it.afterRestore(context) }
+        weightMatrices.forEach { it.afterRestore(context) }
+        synapseGroups.forEach { it.afterRestore(context) }
+    }
 }
 
 class SupervisedModelTrainer(network: Network, supervisedModel: SupervisedModel): SupervisedTrainer<SupervisedModel>(network, supervisedModel) {

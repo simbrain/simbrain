@@ -192,7 +192,7 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
             useAutoAssignedId = false
         ).awaitAll()
         // Call afterRestore on all models to finalize recreation as needed
-        modelsToReAdd.forEach { it.afterRestore() }
+        modelsToReAdd.filter { hasNoParent(it) }.forEach { it.afterRestore() }
     }
 
 }

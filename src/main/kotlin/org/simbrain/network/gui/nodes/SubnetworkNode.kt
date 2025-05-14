@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.nodes
 
+import org.piccolo2d.util.PBounds
 import org.simbrain.network.core.LocatableModel
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.events.LocationEvents
@@ -218,6 +219,10 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
         this.infoTextNode = infoTextNode
         subnetwork.events.customInfoUpdated.on(swingDispatcher) { this.updateOutline() }
         updateOutline()
+    }
+
+    override fun isIntersecting(bound: PBounds?): Boolean {
+        return interactionBox.isIntersecting(bound)
     }
 
 

@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.gui.nodes
 
+import org.piccolo2d.util.PBounds
 import org.simbrain.network.core.LocatableModel
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.events.LocationEvents
@@ -159,6 +160,10 @@ class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: Super
     private fun updateOutline() {
         val nodes = HashSet(outlinedObjects)
         outline.resetOutlinedNodes(nodes)
+    }
+
+    override fun isIntersecting(bound: PBounds?): Boolean {
+        return interactionBox.isIntersecting(bound)
     }
 
     /**

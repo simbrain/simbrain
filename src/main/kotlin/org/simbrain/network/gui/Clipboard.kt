@@ -56,13 +56,21 @@ object Clipboard {
      */
     fun add(objects: List<NetworkModel>) {
 
-        // when copying neuron collections/neuron groups, we don't want to copy the neurons again
-        val collectionNeurons = objects.filterIsInstance<AbstractNeuronCollection>().flatMap { it.neuronList }.toSet()
-        val collectionSynapses = objects.filterIsInstance<SynapseGroup>().flatMap { it.synapses }.toSet()
+        // when copying models that are part of a collection, we don't want to copy those models again
+        val collectionNeurons = objects.filterIsInstance<AbstractNeuronCollection>().flatMap { it.neuronList }.toMutableSet()
+        val collectionSynapses = objects.filterIsInstance<SynapseGroup>().flatMap { it.synapses }.toMutableSet()
+        val supervisedModelWeightMatrices = objects.filterIsInstance<SupervisedModel>().flatMap { it.weightMatrices }.toMutableSet()
+        val supervisedModelSynapseGroups = objects.filterIsInstance<SupervisedModel>().flatMap { it.synapseGroups }.toMutableSet()
+        val supervisedModelLayers = objects.filterIsInstance<SupervisedModel>().flatMap { it.layers }.toMutableSet()
+        val supervisedModelNeurons = supervisedModelLayers.filterIsInstance<NeuronCollection>().flatMap { it.neuronList }.toMutableSet()
+        val supervisedModelSynapses = supervisedModelSynapseGroups.flatMap { it.synapses }.toMutableSet()
+
+        val collectionObjects = collectionNeurons + collectionSynapses +
+                supervisedModelWeightMatrices + supervisedModelSynapseGroups +
+                supervisedModelLayers + supervisedModelNeurons + supervisedModelSynapses
 
         copiedObjects = objects
-            .filter { (it as? Neuron) !in collectionNeurons }
-            .filter { (it as? Synapse) !in collectionSynapses }
+            .filter { it !in collectionObjects }
 
         fireClipboardChanged()
     }
@@ -77,20 +85,17 @@ object Clipboard {
             return
         }
 
-        fun createCopies(destinationNetwork: Network, sourceModels: List<NetworkModel>): List<NetworkModel> {
+        // Match new to old neurons for synapse adding
+        val neuronMappings = LinkedHashMap<Neuron, Neuron>()
+        // Match new to old layers for connector adding
+        val layerMappings = LinkedHashMap<Layer, Layer>()
 
-            // Match new to old neurons for synapse adding
-            val neuronMappings = HashMap<Neuron, Neuron>()
-            val synapses = ArrayList<Synapse>()
+        fun createCopies(destinationNetwork: Network, sourceModels: List<NetworkModel>): List<NetworkModel> {
 
             fun Synapse.isStranded(): Boolean {
                 val allNeurons = sourceModels.filterIsInstance<Neuron>()
                 return !(allNeurons.contains(this.source) && (allNeurons.contains(this.target)))
             }
-
-            val layerMappings = HashMap<Layer, Layer>()
-            val weightMatrices = ArrayList<WeightMatrix>()
-            val synapseGroups = ArrayList<SynapseGroup>()
 
             fun Connector.isStranded(): Boolean {
                 val allLayer = sourceModels.filterIsInstance<Layer>()
@@ -103,7 +108,7 @@ object Clipboard {
             }
 
             return buildList {
-                for (item in sourceModels) {
+                for (item in sourceModels.sortedBy { updatingOrder(it) }) {
                     when (item) {
                         is Neuron -> {
                             val newNeuron = Neuron(item)
@@ -112,7 +117,12 @@ object Clipboard {
                         }
                         is Synapse -> {
                             if (!item.isStranded()) {
-                                synapses.add(item)
+                                val newSynapse = Synapse(
+                                    neuronMappings[item.source]!!,
+                                    neuronMappings[item.target]!!,
+                                    item
+                                )
+                                add(newSynapse)
                             }
                         }
                         is NetworkTextObject -> {
@@ -133,24 +143,17 @@ object Clipboard {
                             layerMappings[item] = copy
                         }
                         is SupervisedModel -> {
-                            val layers = item.layers.map { existing ->
-                                existing.copy().also { copy ->
-                                    layerMappings[existing] = copy
-                                    if (copy is AbstractNeuronCollection) {
-                                        neuronMappings.putAll((existing as AbstractNeuronCollection).neuronList.zip(copy.neuronList))
-                                        (copy as? NeuronCollection)?.let { addAll(it.neuronList) }
+                            addAll(
+                                createCopies(
+                                    destinationNetwork,
+                                    buildList {
+                                        addAll(item.layers)
+                                        addAll(item.weightMatrices)
+                                        addAll(item.synapseGroups)
                                     }
-                                }
-                            }
-                            addAll(layers)
-                            val weightMatrices = item.weightMatrices.map { existing ->
-                                WeightMatrix(layerMappings[existing.source]!!, layerMappings[existing.target]!!).also { copy ->
-                                   copy.copyFrom(existing as WeightMatrix)
-                                }
-                            }
-                            addAll(weightMatrices)
-                            val copy = SupervisedModel(layerMappings[item.inputLayer]!!, layerMappings[item.outputLayer]!!)
-                            add(copy)
+                                )
+                            )
+                            add(SupervisedModel(layerMappings[item.inputLayer]!!, layerMappings[item.outputLayer]!!))
                         }
                         is NeuronArray -> {
                             val copy = item.copy()
@@ -169,12 +172,23 @@ object Clipboard {
                         }
                         is WeightMatrix -> {
                             if (!item.isStranded()) {
-                                weightMatrices.add(item)
+                                val weightMatrix = WeightMatrix(
+                                    layerMappings[item.source]!!,
+                                    layerMappings[item.target]!!
+                                )
+                                weightMatrix.copyFrom(item)
+                                add(weightMatrix)
                             }
                         }
                         is SynapseGroup -> {
                             if (!item.isStranded()) {
-                                synapseGroups.add(item)
+                                val newGroup = SynapseGroup(
+                                    layerMappings[item.source] as AbstractNeuronCollection,
+                                    layerMappings[item.target] as AbstractNeuronCollection,
+                                    item.connectionStrategy.copy(),
+                                    item.synapses.map { Synapse(neuronMappings[it.source]!!, neuronMappings[it.target]!!, it) }.toMutableList()
+                                )
+                                add(newGroup)
                             }
                         }
                         is Subnetwork -> {
@@ -183,35 +197,6 @@ object Clipboard {
                     }
                 }
 
-
-                // Copy synapses
-                for (synapse in synapses) {
-                    val newSynapse = Synapse(
-                        neuronMappings[synapse.source]!!,
-                        neuronMappings[synapse.target]!!,
-                        synapse
-                    )
-                    add(newSynapse)
-                }
-
-                for (connector in weightMatrices) {
-                    val weightMatrix = WeightMatrix(
-                        layerMappings[connector.source]!!,
-                        layerMappings[connector.target]!!
-                    )
-                    weightMatrix.copyFrom(connector)
-                    add(weightMatrix)
-                }
-
-                for (oldGroup in synapseGroups) {
-                    val newGroup = SynapseGroup(
-                        layerMappings[oldGroup.source] as AbstractNeuronCollection,
-                        layerMappings[oldGroup.target] as AbstractNeuronCollection,
-                        oldGroup.connectionStrategy.copy(),
-                        oldGroup.synapses.map { Synapse(neuronMappings[it.source]!!, neuronMappings[it.target]!!, it) }.toMutableList()
-                    )
-                    add(newGroup)
-                }
             }
 
         }

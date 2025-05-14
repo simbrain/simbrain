@@ -372,11 +372,15 @@ class Network: CoroutineScope, EditableObject {
                 is SupervisedModel -> {
                     model.layers.forEach { childToParentMap[it] = model }
                     model.weightMatrices.forEach { childToParentMap[it] = model }
+                    model.synapseGroups.forEach { childToParentMap[it] = model }
                     model.layers.forEach { l ->
                         l.events.deleted.on(wait = true) { childToParentMap.remove(l) }
                     }
                     model.weightMatrices.forEach { m ->
                         m.events.deleted.on(wait = true) { childToParentMap.remove(m) }
+                    }
+                    model.synapseGroups.forEach { sg ->
+                        sg.events.deleted.on(wait = true) { childToParentMap.remove(sg) }
                     }
                 }
             }

@@ -56,14 +56,6 @@ abstract class ArrayLayer(
         addInputs(Matrix.column(inputs))
     }
 
-    /**
-     * Add input array even if size is mismatched, in which case the input is reshaped. See [reshape]
-     */
-    @Consumable
-    fun addInputsMismatched(inputs: DoubleArray) {
-        addInputs(inputs.toColumnVector().reshape(this.inputs.nrow(), this.inputs.ncol()))
-    }
-
     override fun clearInputs() {
         this.inputs.fill(0.0)
     }

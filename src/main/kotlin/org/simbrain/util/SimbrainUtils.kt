@@ -41,6 +41,12 @@ class LazyVarImpl<O, T>(val initializer: () -> T) : ReadWriteProperty<O, T>, Laz
     override fun toString(): String = if (isInitialized()) value.toString() else "Lazy value not initialized yet."
 }
 
+/**
+ * A generic class that acts as a cache for an object of type [T], initializing or refreshing its value
+ * only when marked as dirty or explicitly set externally. It helps in reducing redundant computations
+ * or re-initializations for cases where the value is expected to remain constant until [CachedObject.invalidate] is
+ * called.
+ */
 class CachedObject<T>(private val init: () -> T) {
 
     private var isDirty = true

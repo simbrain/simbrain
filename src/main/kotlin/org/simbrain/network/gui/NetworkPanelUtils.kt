@@ -1,5 +1,7 @@
 package org.simbrain.network.gui
 
+import org.simbrain.network.core.NetworkModel
+import org.simbrain.network.gui.nodes.ScreenElement
 import org.simbrain.util.KeyCombination
 import org.simbrain.util.createAction
 import java.awt.event.ActionEvent
@@ -50,3 +52,6 @@ fun NetworkPanel.createConditionallyEnabledAction(
     keyboardShortcuts?.let { listOf(it) } ?: listOf(),
     block
 )
+
+inline fun <reified T: NetworkModel> NetworkPanel.filterSelectedModelByClass(): List<T> = selectionManager.selectedModels.filterIsInstance<T>()
+inline fun <reified T: ScreenElement> NetworkPanel.filterSelectedNodeByClass(): List<T> = selectionManager.selection.filterIsInstance<T>()

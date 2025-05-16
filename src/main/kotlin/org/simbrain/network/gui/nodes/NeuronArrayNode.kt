@@ -26,11 +26,8 @@ import org.piccolo2d.nodes.PText
 import org.simbrain.network.core.Layer
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.randomizeBiases
-import org.simbrain.network.gui.NetworkPanel
-import org.simbrain.network.gui.alignMenu
-import org.simbrain.network.gui.createCouplingMenu
+import org.simbrain.network.gui.*
 import org.simbrain.network.gui.dialogs.NetworkPreferences
-import org.simbrain.network.gui.spaceMenu
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.addBorder
@@ -337,7 +334,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             contextMenu.addSeparator()
             val editArray: Action = object : AbstractAction("Edit...") {
                 override fun actionPerformed(event: ActionEvent) {
-                    propertyDialog.display()
+                    propertyDialog?.display()
                 }
             }
             contextMenu.add(editArray)
@@ -495,8 +492,19 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             return contextMenu
         }
 
-    override val propertyDialog: StandardDialog
-        get() = neuronArray.createEditorDialog { updateInfoText() }
+    override fun createEditDialog(): StandardDialog? = networkPanel.filterSelectedNodeByClass<NeuronArrayNode>().let { nanList ->
+
+        if (nanList.isEmpty()) return null
+
+        nanList.map { it.model }.createEditorDialog(
+            titleName = if (nanList.size == 1) "Edit ${nanList.first().neuronArray.displayName}" else "Edit ${nanList.size} Neuron Arrays"
+        ) {
+            nanList.forEach { it.updateInfoText() }
+        }
+    }
+
+    override val propertyDialog: StandardDialog?
+        get() = createEditDialog()
 
     override val model: NeuronArray
         get() = neuronArray

@@ -31,7 +31,6 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import javax.swing.AbstractAction
-import javax.swing.Action
 import javax.swing.Action.SHORT_DESCRIPTION
 import javax.swing.JCheckBoxMenuItem
 import javax.swing.JOptionPane
@@ -268,27 +267,21 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     ) {
         networkPanel.mouseCursor = MouseEventHandler.MouseCursor.Selection
     }
+
+    val editSelectedModelsAction = networkPanel.createAction(
+        name = "Edit selected models",
+        iconPath = "menu_icons/edit.png",
+        keyboardShortcut = CmdOrCtrl + 'E',
+    ) {
+        networkPanel.showEditDialogsForSelectedModels()
+    }
+
     val setNeuronPropertiesAction = networkPanel.createAction(
         name = "Neuron Properties...",
         description = "Set the properties of selected neurons",
         keyboardShortcut = CmdOrCtrl + 'E',
-        initBlock = {
-            fun updateAction() {
-                isEnabled = networkPanel.selectionManager.filterSelectedModels<Neuron>().isNotEmpty()
-                val numNeurons = networkPanel.selectionManager.filterSelectedModels<Neuron>().size
-                if (numNeurons > 0) {
-                    putValue(Action.NAME, "Edit $numNeurons Selected ${if (numNeurons > 1) "Neurons" else "Neuron"}")
-                } else {
-                    putValue(Action.NAME, "Edit Selected Neuron(s)")
-                }
-            }
-            updateAction()
-            networkPanel.selectionManager.events.selection.on { _, _ ->
-                updateAction()
-            }
-        }
     ) {
-        networkPanel.showSelectedNeuronProperties()
+        networkPanel.filterSelectedNodeByClass<NeuronNode>().firstOrNull()?.createEditDialog()?.display()
     }
     val setSourceNeurons get() = networkPanel.createConditionallyEnabledAction(
         name = "Set Source Neurons",
@@ -302,23 +295,8 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Synapse Properties...",
         description = "Set the properties of selected synapses",
         keyboardShortcut = CmdOrCtrl + 'E',
-        initBlock = {
-            fun updateAction() {
-                isEnabled = networkPanel.selectionManager.filterSelectedModels<Synapse>().isNotEmpty()
-                val numSynapses = networkPanel.selectionManager.filterSelectedModels<Synapse>().size
-                if (numSynapses > 0) {
-                    putValue(Action.NAME, "Edit $numSynapses Selected ${if (numSynapses > 1) "Synapses" else "Synapse"}")
-                } else {
-                    putValue(Action.NAME, "Edit Selected Synapse(s)")
-                }
-            }
-            updateAction()
-            networkPanel.selectionManager.events.selection.on { _, _ ->
-                updateAction()
-            }
-        }
     ) {
-        networkPanel.showSelectedSynapseProperties()
+        networkPanel.filterSelectedNodeByClass<SynapseNode>().firstOrNull()?.createEditDialog()?.display()
     }
     val showEditToolBarAction = networkPanel.createAction(
         name = "Edit Toolbar",

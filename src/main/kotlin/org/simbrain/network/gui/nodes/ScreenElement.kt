@@ -28,6 +28,7 @@ import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.display
 import org.simbrain.util.int
+import org.simbrain.util.piccolo.firstScreenElement
 import java.awt.event.InputEvent
 import javax.swing.JPopupMenu
 import javax.swing.SwingUtilities
@@ -61,6 +62,10 @@ abstract class ScreenElement protected constructor(val networkPanel: NetworkPane
      */
     open fun acceptsSourceHandle(): Boolean {
         return false
+    }
+
+    open fun createEditDialog(): StandardDialog? {
+        return null
     }
 
     /**
@@ -98,6 +103,9 @@ abstract class ScreenElement protected constructor(val networkPanel: NetworkPane
             event.isHandled = true
             val (x, y) = event.canvasPosition.int
             contextMenu?.show(networkPanel.canvas, x, y)
+            event.pickedNode.firstScreenElement?.let {
+                networkPanel.selectionManager.add(it)
+            }
         }
 
         override fun mousePressed(event: PInputEvent) {

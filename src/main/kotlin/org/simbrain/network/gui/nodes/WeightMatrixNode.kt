@@ -6,10 +6,7 @@ import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.core.AbstractNeuronCollection
 import org.simbrain.network.core.Connector
 import org.simbrain.network.core.WeightMatrix
-import org.simbrain.network.gui.ImageBox
-import org.simbrain.network.gui.NetworkPanel
-import org.simbrain.network.gui.WeightMatrixArrow
-import org.simbrain.network.gui.createCouplingMenu
+import org.simbrain.network.gui.*
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
@@ -151,8 +148,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
             // Edit Submenu
             val editArray: Action = object : AbstractAction("Edit...") {
                 override fun actionPerformed(event: ActionEvent) {
-                    val dialog: StandardDialog = matrixDialog
-                    dialog.setVisible(true)
+                    propertyDialog?.display()
                 }
             }
             contextMenu.add(editArray)
@@ -268,32 +264,40 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
     /**
      * Returns the dialog for editing this weight matrix
      */
-    private val matrixDialog: StandardDialog
-        get() {
+    private fun createEditDialog(editingObjects: List<WeightMatrix>): StandardDialog? {
+
+            if (editingObjects.isEmpty()) return null
+
             val dialog = StandardDialog()
-            dialog.setTitle("Edit Weight Matrix")
-            val tabs = JTabbedPane()
 
-            // Property Editor
-            val ape: AnnotatedPropertyEditor<*> = AnnotatedPropertyEditor(weightMatrix)
-            tabs.addTab("Properties", ape)
-            dialog.addCommitTask { ape.commitChanges() }
+            val ape = AnnotatedPropertyEditor(editingObjects)
 
-            // Weight matrix
-            if (weightMatrix is WeightMatrix) {
-                val wm = MatrixDataFrame(weightMatrix.weights)
+            val contentPane: JComponent
+            if (editingObjects.size == 1) {
+                val editingObject = editingObjects.first()
+                dialog.title = "Edit ${editingObject.displayName}"
+                contentPane = JTabbedPane()
+                contentPane.addTab("Properties", ape)
+
+                val wm = MatrixDataFrame(editingObject.weights)
                 val wmViewer = SimbrainTablePanel(wm, false)
                 wmViewer.addSimpleDefaults()
                 wmViewer.addSeparator()
                 wmViewer.addAction(wmViewer.table.createShowEigenValuesAction())
-                tabs.addTab("Weight Matrix", wmViewer)
-                weightMatrix.events.updated.on { wmViewer.model.fireTableDataChanged() }
+                contentPane.addTab("Weight Matrix", wmViewer)
+                editingObject.events.updated.on { wmViewer.model.fireTableDataChanged() }
                 dialog.addCommitTask {
-                    weightMatrix.setWeights(wm.get2DDoubleArray())
-                    weightMatrix.events.updated.fire()
+                    editingObject.setWeights(wm.get2DDoubleArray())
+                    editingObject.events.updated.fire()
                 }
+            } else {
+                dialog.title = "Edit ${editingObjects.size} Weight Matrices"
+                contentPane = ape
             }
-            dialog.setContentPane(tabs)
+
+            dialog.addCommitTask { ape.commitChanges() }
+
+            dialog.setContentPane(contentPane)
             dialog.pack()
             dialog.setLocationRelativeTo(null)
             return dialog
@@ -309,16 +313,16 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         }
     }
 
+    override fun createEditDialog(): StandardDialog? = createEditDialog(networkPanel.filterSelectedModelByClass<WeightMatrix>())
 
-    override val propertyDialog: StandardDialog
-        get() = matrixDialog
+    override val propertyDialog: StandardDialog? get() = createEditDialog()
 
     override val model: Connector
         get() = weightMatrix
 
     inner class WeightMatrixInteractionBox : InteractionBox(networkPanel) {
 
-        override val propertyDialog: StandardDialog = this@WeightMatrixNode.propertyDialog
+        override val propertyDialog: StandardDialog? = this@WeightMatrixNode.propertyDialog
 
         override val model: Connector
             get() = weightMatrix

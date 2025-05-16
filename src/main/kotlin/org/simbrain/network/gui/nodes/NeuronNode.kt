@@ -25,12 +25,14 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.createNeuronContextMenu
 import org.simbrain.network.gui.dialogs.NetworkPreferences
-import org.simbrain.network.gui.neuronDialog
+import org.simbrain.network.gui.dialogs.neuron.NeuronDialog
+import org.simbrain.network.gui.filterSelectedModelByClass
 import org.simbrain.network.updaterules.interfaces.ActivityGenerator
 import org.simbrain.util.SimbrainConstants
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.plus
 import org.simbrain.util.point
+import java.awt.Dialog
 import java.awt.geom.Point2D
 import javax.swing.JPopupMenu
 
@@ -161,8 +163,15 @@ class NeuronNode(net: NetworkPanel, val neuron: Neuron) : ScreenElement(net) {
     override val contextMenu: JPopupMenu
         get() = networkPanel.createNeuronContextMenu()
 
-    override val propertyDialog: StandardDialog?
-        get() = networkPanel.neuronDialog
+    override fun createEditDialog(): StandardDialog? {
+        return networkPanel.filterSelectedModelByClass<Neuron>().let { neurons ->
+            if (neurons.isEmpty()) return null
+
+            NeuronDialog(neurons).apply { modalityType = Dialog.ModalityType.MODELESS }
+        }
+    }
+
+    override val propertyDialog get() = createEditDialog()
 
     /**
      * Returns String representation of this NeuronNode.

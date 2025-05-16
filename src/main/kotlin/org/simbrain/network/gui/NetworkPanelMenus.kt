@@ -47,8 +47,7 @@ val NetworkPanel.editMenu
             add(alignMenu)
             add(spaceMenu)
             addSeparator()
-            add(setNeuronPropertiesAction)
-            add(setSynapsePropertiesAction)
+            add(editSelectedModelsAction)
             addSeparator()
             add(selectionMenu)
         }

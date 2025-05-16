@@ -18,7 +18,7 @@ val braitenbergSim = newSim {
 
     workspace.clearWorkspace()
 
-    val oc = addOdorWorldComponent {
+    val oc = addOdorWorldComponent("World") {
         world.tileMap.updateMapSize(20, 18)
     }
     oc.world.isObjectsBlockMovement = false

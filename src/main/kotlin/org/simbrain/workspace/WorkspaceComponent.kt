@@ -27,14 +27,22 @@ import java.io.OutputStream
 /**
  * Represents a component in a Simbrain [Workspace]. Extend this class to create your own component type.
  *
- *
- * For deserialization sublclasses must have a static "open" method, that is called using reflection by
+ * For deserialization sub-classes must have a static "open" method, that is called using reflection by
  * [org.simbrain.workspace.serialization.WorkspaceComponentDeserializer]. See
  * [org.simbrain.network.NetworkComponent.open] for an example.
+ *
  */
 abstract class WorkspaceComponent(name: String) {
 
     open lateinit var workspace: Workspace
+
+
+    var isRunning: Boolean = false
+
+    /**
+     * The name of this component. Used in the title, in saving, etc.
+     */
+    var name: String = ""
 
     @Transient
     val events: WorkspaceComponentEvents = WorkspaceComponentEvents()
@@ -70,54 +78,18 @@ abstract class WorkspaceComponent(name: String) {
         }
 
     /**
-     * @return if this component is marked as running
-     */
-    /**
-     * Sets whether or not this component is marked as currently running...
-     * meant to be false if only doing a one-off update
-     *
-     * @param running
-     */
-    /**
-     * Whether or not this component is being iterated more than just one time.
-     */
-    var isRunning: Boolean = false
-
-    /**
-     * Returns the name of this component.
-     */
-    /**
-     * The name of this component. Used in the title, in saving, etc.
-     */
-    var name: String = ""
-
-    /**
-     * Current file. Used when "saving" a component. Subclasses can provide a
+     * Used when "saving" a component. Subclasses can provide a
      * default value using User Preferences.
      */
     var currentFile: File? = null
 
     /**
-     * Return the serializePriority
-     */
-    /**
-     * @param serializePriority the serializePriority to set
-     */
-    /**
      * If set to true, serialize this component before others. Possibly replace
      * with priority system later.
      */
     var serializePriority: Int = 0
-        /**
-         * @param serializePriority the serializePriority to set
-         */
         protected set
 
-    /**
-     * Construct a workspace component.
-     *
-     * @param name The name of the component.
-     */
     init {
         this.name = name
         Logger.trace(javaClass.canonicalName + ": " + name + " created")

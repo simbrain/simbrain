@@ -92,7 +92,7 @@ val spiveyNet = newSim {
     net.addNetworkModels(connector.connectNeurons(visualNodes.neuronList, mouseNodes.neuronList))
 
     // World
-    val oc = addOdorWorldComponent()
+    val oc = addOdorWorldComponent("Screen")
     val world = oc.world
     world.isUseCameraCentering = false
     desktop?.getDesktopComponent(oc)?.title = "Mouse Trace"

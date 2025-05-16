@@ -44,6 +44,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
      * Holds data for prototype rule.
      */
     var dataHolder: MatrixDataHolder by GuiEditable(
+        label = "State variables",
         initValue = updateRule.createMatrixData(inputSize),
         order = 99,
         onUpdate = {

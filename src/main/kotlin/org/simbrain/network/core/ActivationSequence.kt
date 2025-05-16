@@ -34,6 +34,7 @@ class ActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inpu
      * Holds data for prototype rule.
      */
     var dataHolder: MatrixDataHolder by GuiEditable(
+        label = "State variables",
         initValue = updateRule.createMatrixData(inputSize),
         order = 99,
         onUpdate = {

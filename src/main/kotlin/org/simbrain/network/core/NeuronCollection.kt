@@ -126,6 +126,9 @@ class NeuronCollection : AbstractNeuronCollection {
         layout.layoutNeurons(neuronList)
     }
 
+    /**
+     * When called, the neuron collection must be added to the network, as well as the neurons (which are themselves copies).
+     */
     override fun copy(): NeuronCollection {
         return NeuronCollection(neuronList.map(Neuron::copy)).also {
             it.label = label

@@ -159,20 +159,10 @@ class Workspace: CoroutineScope {
     }
 
     /**
-     * Iterate asynchronously.
-     */
-    fun iterateAsync() {
-        for (wc in componentList) {
-            wc.start()
-        }
-        launch {
-            updater.runOnce()
-        }
-        stop()
-    }
-
-    /**
-     * Iterate asynchronously for a specified number of iterations.
+     * Initiates asynchronous iteration of the system from Java or non-coroutine environments.
+     * Internally launches a coroutine to perform the work in the background.
+     *
+     * Note: This method is intended for Java compatibility and does not block the calling thread.
      */
     fun iterateAsync(numIterations: Int) {
         for (wc in componentList) {
@@ -180,12 +170,14 @@ class Workspace: CoroutineScope {
         }
         launch {
             updater.iterate(numIterations)
+            stop()
         }
-        stop()
     }
 
     /**
-     * Iterate and suspend (wait without blocking). The preferred iteration method if the context allows it.
+     * Suspends while iterating the system for the given number of iterations.
+     * This function must be called from a coroutine or another suspending function.
+     * This is the preferred iteration method to use when working in Kotlin coroutine-based environments.
      */
     suspend fun iterateSuspend(numIterations: Int = 1) {
         for (wc in componentList) {

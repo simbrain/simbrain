@@ -81,7 +81,7 @@ public class Cerebellum extends Simulation {
         setUpControlPanel();
 
         // Add docviewer
-        sim.addDocViewer(771,293,293,340, "Information", "cerebellum.html");
+        sim.addDocViewer(771, 293, 293, 340, "Information", "cerebellum.html");
 
     }
 
@@ -91,7 +91,7 @@ public class Cerebellum extends Simulation {
     void buildNetwork() {
 
         // Set up network
-        nc = sim.addNetwork(234,9,538,595, "Cerebellum");
+        nc = sim.addNetwork(234, 9, 538, 595, "Cerebellum");
         network = nc.getNetwork();
 
         DecayRule generalRule = new DecayRule();
@@ -128,7 +128,7 @@ public class Cerebellum extends Simulation {
 
         // Cortex to Red Nucleus
         network.addNetworkModel(new Synapse(cortex.getNeuronList().get(0),
-            redNucleus.getNeuronList().get(0), 1));
+                redNucleus.getNeuronList().get(0), 1));
 
         // Inferior Olive
         Neuron inferiorOlive = new Neuron();
@@ -141,7 +141,7 @@ public class Cerebellum extends Simulation {
 
         // Red Nucleus to Inf. Olive
         network.addNetworkModel(new Synapse(redNucleus.getNeuronList().get(0),
-            inferiorOlive, 1));
+                inferiorOlive, 1));
 
         // To Spinal Cord
         NeuronGroup toSpinalCord = new NeuronGroup(2);
@@ -153,11 +153,11 @@ public class Cerebellum extends Simulation {
 
         // Cortex to Spinal Cord
         network.addNetworkModel(new Synapse(cortex.getNeuronList().get(0),
-            toSpinalCord.getNeuronList().get(0), 1));
+                toSpinalCord.getNeuronList().get(0), 1));
 
         // Red Nucleus to Spinal Cord
         network.addNetworkModel(new Synapse(redNucleus.getNeuronList().get(1),
-            toSpinalCord.getNeuronList().get(1), 1));
+                toSpinalCord.getNeuronList().get(1), 1));
 
         // Output
         output = new Neuron();
@@ -169,9 +169,9 @@ public class Cerebellum extends Simulation {
 
         // Spinal Cord to Output
         network.addNetworkModel(
-            new Synapse(toSpinalCord.getNeuronList().get(0), output, 1));
+                new Synapse(toSpinalCord.getNeuronList().get(0), output, 1));
         network.addNetworkModel(
-            new Synapse(toSpinalCord.getNeuronList().get(1), output, 1));
+                new Synapse(toSpinalCord.getNeuronList().get(1), output, 1));
 
         // Thalamus
         Neuron thalamus = new Neuron();
@@ -183,7 +183,7 @@ public class Cerebellum extends Simulation {
 
         // Thalamus to Cortex
         network.addNetworkModel(
-            new Synapse(thalamus, cortex.getNeuronList().get(0), 1));
+                new Synapse(thalamus, cortex.getNeuronList().get(0), 1));
 
         // Cerebellum
         NeuronGroup cerebellum = new NeuronGroup(5);
@@ -208,29 +208,29 @@ public class Cerebellum extends Simulation {
 
         // Purkinje to DCN and Granule to Purkinje
         network.addNetworkModel(new Synapse(cerebellum.getNeuronList().get(0),
-            cerebellum.getNeuronList().get(1), -2));
+                cerebellum.getNeuronList().get(1), -2));
         network.addNetworkModel(new Synapse(cerebellum.getNeuronList().get(0),
-            cerebellum.getNeuronList().get(2), -2));
+                cerebellum.getNeuronList().get(2), -2));
         network.addNetworkModel(new Synapse(cerebellum.getNeuronList().get(3),
-            cerebellum.getNeuronList().get(0), 0.02));
+                cerebellum.getNeuronList().get(0), 0.02));
         network.addNetworkModel(new Synapse(cerebellum.getNeuronList().get(4),
-            cerebellum.getNeuronList().get(0), 0.02));
+                cerebellum.getNeuronList().get(0), 0.02));
 
         // DCNe to RedNucleus
         network.addNetworkModel(new Synapse(cerebellum.getNeuronList().get(1),
-            redNucleus.getNeuronList().get(1), 1));
+                redNucleus.getNeuronList().get(1), 1));
 
         // DCNi to inferior Olive
         network.addNetworkModel(new Synapse(cerebellum.getNeuronList().get(2),
-            inferiorOlive, -1));
+                inferiorOlive, -1));
 
         // Inferior Olive to DCN, Pukinje
         network.addNetworkModel(new Synapse(inferiorOlive,
-            cerebellum.getNeuronList().get(0), 0.3));
+                cerebellum.getNeuronList().get(0), 0.3));
         network.addNetworkModel(new Synapse(inferiorOlive,
-            cerebellum.getNeuronList().get(1), 1));
+                cerebellum.getNeuronList().get(1), 1));
         network.addNetworkModel(new Synapse(inferiorOlive,
-            cerebellum.getNeuronList().get(2), 1));
+                cerebellum.getNeuronList().get(2), 1));
 
         // // DCNe to Thalamus
         // network.addNetworkModel(new Synapse(cerebellum.getNeuronList().get(1),
@@ -251,9 +251,9 @@ public class Cerebellum extends Simulation {
         network.addNetworkModel(new Synapse(fromSpinalCord.getNeuronList().get(0), cerebellum.getNeuronList().get(3), 1));
         network.addNetworkModel(new Synapse(fromSpinalCord.getNeuronList().get(1), cerebellum.getNeuronList().get(4), 1));
         network.addNetworkModel(new Synapse(fromSpinalCord.getNeuronList().get(0),
-            cerebellum.getNeuronList().get(3), 1));
+                cerebellum.getNeuronList().get(3), 1));
         network.addNetworkModel(new Synapse(fromSpinalCord.getNeuronList().get(1),
-            cerebellum.getNeuronList().get(4), 1));
+                cerebellum.getNeuronList().get(4), 1));
 
         // DA
         dopamine = new Neuron();
@@ -300,7 +300,7 @@ public class Cerebellum extends Simulation {
     void loadCustomUpdater() {
 
         // References
-        Neuron dopamine = getNeuronByLabel(network,"Basal Ganglia (GPi)");
+        Neuron dopamine = getNeuronByLabel(network, "Basal Ganglia (GPi)");
         Neuron output = getNeuronByLabel(network, "Output");
         Neuron target = getNeuronByLabel(network, "Target");
         Neuron purkinje = getNeuronByLabel(network, "Purkinje");
@@ -322,8 +322,7 @@ public class Cerebellum extends Simulation {
                 // Update parallel fiber weights
                 for (Synapse p_fiber : p_fibers) {
                     if (!p_fiber.getSource().getLabel()
-                            .equalsIgnoreCase("Inferior Olive"))
-                    {
+                            .equalsIgnoreCase("Inferior Olive")) {
                         double delta_w = eta
                                 * p_fiber.getSource().getActivation()
                                 * (alpha - xi * i_olive.getActivation());
@@ -352,7 +351,7 @@ public class Cerebellum extends Simulation {
         public void stateChanged(ChangeEvent e) {
             JSlider source = (JSlider) e.getSource();
             if (!source.getValueIsAdjusting()) {
-                currentTrialLength = (int) source.getValue();
+                currentTrialLength = source.getValue();
             }
         }
     }
@@ -361,8 +360,8 @@ public class Cerebellum extends Simulation {
      * Set up the controls.
      */
     void setUpControlPanel() {
-        panel = ControlPanel.makePanel(sim, "Train / Test", 4,9,230,221);
-        
+        panel = ControlPanel.makePanel(sim, "Train / Test", 4, 9, 230, 221);
+
         NeuronGroup inputs = getModelByLabel(network, NeuronGroup.class, "From Spinal Cord");
         Neuron target = getModelByLabel(network, Neuron.class, "Target");
         Neuron dopamine = getModelByLabel(network, Neuron.class, "Basal Ganglia (GPi)");
@@ -412,30 +411,32 @@ public class Cerebellum extends Simulation {
             }
         });
 
-         // Individual trial runs
-         JButton button2 = new JButton("Train Pattern 1");
-         button2.addActionListener(new ActionListener() {
-         public void actionPerformed(ActionEvent arg0) {
-         inputs.getNeuronList().get(0).setActivation(1);
-         inputs.getNeuronList().get(1).setActivation(0);
-         target.setActivation(1);
-             sim.getWorkspace().iterateAsync(currentTrialLength/2);
-         }});
-         //panel.addItem("Pattern 1", button2);
+        // Individual trial runs
+        JButton button2 = new JButton("Train Pattern 1");
+        button2.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                inputs.getNeuronList().get(0).setActivation(1);
+                inputs.getNeuronList().get(1).setActivation(0);
+                target.setActivation(1);
+                sim.iterate(currentTrialLength / 2);
+            }
+        });
+        //panel.addItem("Pattern 1", button2);
 
-         JButton button3 = new JButton("Train Pattern 2");
-         button3.addActionListener(new ActionListener() {
-         public void actionPerformed(ActionEvent arg0) {
-         inputs.getNeuronList().get(0).setActivation(0);
-         inputs.getNeuronList().get(1).setActivation(1);
-         target.setActivation(0);
-             sim.getWorkspace().iterateAsync(currentTrialLength/2);
-         }});
-         //panel.addItem("Pattern 2", button3);
+        JButton button3 = new JButton("Train Pattern 2");
+        button3.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent arg0) {
+                inputs.getNeuronList().get(0).setActivation(0);
+                inputs.getNeuronList().get(1).setActivation(1);
+                target.setActivation(0);
+                sim.iterate(currentTrialLength / 2);
+            }
+        });
+        //panel.addItem("Pattern 2", button3);
 
         // JSlider to manually set for how long it runs for
         JSlider trialLengthSlider = new JSlider(JSlider.HORIZONTAL, 0, 400,
-            currentTrialLength);
+                currentTrialLength);
         trialLengthSlider.addChangeListener(new SliderListener());
         // Turn on labels at major tick marks.
         trialLengthSlider.setMajorTickSpacing(100);
@@ -454,8 +455,8 @@ public class Cerebellum extends Simulation {
     //
     void addTimeSeries() {
 
-        TimeSeriesPlotComponent ts = sim.addTimeSeries(772,9,363,285,
-            "Time Series");
+        TimeSeriesPlotComponent ts = sim.addTimeSeries(772, 9, 363, 285,
+                "Time Series");
         ts.getModel().setFixedWidth(true);
         ts.getModel().setWindowSize(1000);
         TimeSeriesModel.TimeSeries sts1 = ts.getModel().addTimeSeries("Dopamine");

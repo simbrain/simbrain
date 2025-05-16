@@ -24,10 +24,7 @@ import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PImage
 import org.piccolo2d.nodes.PText
 import org.simbrain.network.core.TransformerBlock
-import org.simbrain.network.gui.NetworkPanel
-import org.simbrain.network.gui.alignMenu
-import org.simbrain.network.gui.createCouplingMenu
-import org.simbrain.network.gui.spaceMenu
+import org.simbrain.network.gui.*
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.addBorder
 import org.simbrain.util.table.MatrixDataFrame
@@ -271,7 +268,7 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
             contextMenu.addSeparator()
             val editArray: Action = object : AbstractAction("Edit...") {
                 override fun actionPerformed(event: ActionEvent) {
-                    propertyDialog.display()
+                    propertyDialog?.display()
                 }
             }
             contextMenu.add(editArray)
@@ -328,8 +325,19 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
             return contextMenu
         }
 
-    override val propertyDialog: StandardDialog
-        get() = transformerBlock.createEditorDialog()
+    override fun createEditDialog(): StandardDialog? {
+        val editingObjects = networkPanel.filterSelectedModelByClass<TransformerBlock>()
+        if (editingObjects.isEmpty()) return null
+        return editingObjects.createEditorDialog(
+            titleName = if (editingObjects.size == 1)
+                "Edit ${editingObjects.first().displayName}"
+            else
+                "Edit ${editingObjects.size} Transformer Blocks",
+        )
+    }
+
+    override val propertyDialog: StandardDialog?
+        get() = createEditDialog()
 
     override val model: TransformerBlock
         get() = transformerBlock

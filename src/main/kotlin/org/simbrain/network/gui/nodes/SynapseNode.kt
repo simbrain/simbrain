@@ -27,13 +27,17 @@ import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.dialogs.NetworkPreferences.excitatorySynapseColor
 import org.simbrain.network.gui.dialogs.NetworkPreferences.inhibitorySynapseColor
-import org.simbrain.network.gui.dialogs.NetworkPreferences.lineColor
 import org.simbrain.network.gui.dialogs.NetworkPreferences.maxWeightSize
 import org.simbrain.network.gui.dialogs.NetworkPreferences.minWeightSize
 import org.simbrain.network.gui.dialogs.NetworkPreferences.spikingColor
-import org.simbrain.network.gui.dialogs.NetworkPreferences.zeroWeightColor
+import org.simbrain.network.gui.dialogs.synapse.SynapseDialog
+import org.simbrain.network.gui.nodes.SynapseNode.Companion.excitatoryColor
+import org.simbrain.network.gui.nodes.SynapseNode.Companion.inhibitoryColor
+import org.simbrain.network.gui.nodes.SynapseNode.Companion.lineColor
+import org.simbrain.network.gui.nodes.SynapseNode.Companion.maxDiameter
+import org.simbrain.network.gui.nodes.SynapseNode.Companion.minDiameter
+import org.simbrain.network.gui.nodes.SynapseNode.Companion.zeroWeightColor
 import org.simbrain.network.gui.synapseContextMenu
-import org.simbrain.network.gui.synapseDialog
 import org.simbrain.util.StandardDialog
 import java.awt.Color
 import java.awt.geom.Arc2D
@@ -398,8 +402,11 @@ class SynapseNode(
             // return contextMenu;
             networkPanel.synapseContextMenu
 
-    override val propertyDialog: StandardDialog
-        get() = networkPanel.synapseDialog
+    override fun createEditDialog(): StandardDialog? {
+        return SynapseDialog.createSynapseDialog(networkPanel.selectionManager.filterSelectedModels<Synapse>())
+    }
+
+    override val propertyDialog: StandardDialog? get() = createEditDialog()
 
     /**
      * Returns String representation of this NeuronNode.

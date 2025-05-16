@@ -227,7 +227,21 @@ fun <E : EditableObject> E.createEditorDialog(
 ): StandardDialog {
     val editor = AnnotatedPropertyEditor(listOf(this))
     return StandardDialog(editor).apply {
-        title = "$titleName"
+        title = titleName
+        addCommitTask {
+            editor.commitChanges()
+            block(this@createEditorDialog)
+        }
+    }
+}
+
+fun <E : EditableObject> List<E>.createEditorDialog(
+    titleName: String = "Edit $size ${first()::class.simpleName?.convertCamelCaseToSpaces()}",
+    block: (List<E>) -> Unit = {}
+): StandardDialog {
+    val editor = AnnotatedPropertyEditor(this)
+    return StandardDialog(editor).apply {
+        title = titleName
         addCommitTask {
             editor.commitChanges()
             block(this@createEditorDialog)

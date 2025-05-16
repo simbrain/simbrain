@@ -26,10 +26,7 @@ import org.piccolo2d.nodes.PText
 import org.simbrain.network.core.ActivationSequence
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.randomizeBiases
-import org.simbrain.network.gui.NetworkPanel
-import org.simbrain.network.gui.alignMenu
-import org.simbrain.network.gui.createCouplingMenu
-import org.simbrain.network.gui.spaceMenu
+import org.simbrain.network.gui.*
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.addBorder
 import org.simbrain.util.table.MatrixDataFrame
@@ -172,7 +169,7 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
             contextMenu.addSeparator()
             val editArray: Action = object : AbstractAction("Edit...") {
                 override fun actionPerformed(event: ActionEvent) {
-                    propertyDialog.display()
+                    propertyDialog?.display()
                 }
             }
             contextMenu.add(editArray)
@@ -232,8 +229,19 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
             return contextMenu
         }
 
-    override val propertyDialog: StandardDialog
-        get() = activationSequence.createEditorDialog { updateInfoText() }
+    private fun createEditDialog(editingObjects: List<ActivationSequenceNode>): StandardDialog? = editingObjects.let { aqnList ->
+
+        if (aqnList.isEmpty()) return null
+
+        aqnList.map { it.model }.createEditorDialog {
+            aqnList.forEach { it.updateInfoText() }
+        }
+    }
+
+
+    override fun createEditDialog(): StandardDialog? = createEditDialog(networkPanel.filterSelectedNodeByClass<ActivationSequenceNode>())
+
+    override val propertyDialog get() = createEditDialog(listOf(this))
 
     override val model: ActivationSequence
         get() = activationSequence

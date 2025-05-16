@@ -352,7 +352,6 @@ object SimbrainDesktop {
             desktopPane.border = BorderFactory.createLoweredBevelBorder()
         }
         desktopPane.addMouseListener(mouseListener)
-        desktopPane.addKeyListener(WorkspaceKeyAdapter(workspace))
         desktopPane.preferredSize =
             Dimension(screenSize.width - WORKSPACE_INSET * 2, screenSize.height - WORKSPACE_INSET * 3)
 
@@ -367,7 +366,6 @@ object SimbrainDesktop {
         frame.bounds = workspaceBounds
         frame.pack()
         frame.addWindowListener(windowListener)
-        frame.addKeyListener(WorkspaceKeyAdapter(workspace))
         frame.isVisible = true
 
         // Set initial desktopPane bounds
@@ -379,7 +377,6 @@ object SimbrainDesktop {
         frame.contentPane = mainPanel
         frame.pack()
         frame.addWindowListener(windowListener)
-        frame.addKeyListener(WorkspaceKeyAdapter(workspace))
 
         // Set the "dock" image.
         if (Taskbar.isTaskbarSupported() && Taskbar.getTaskbar().isSupported(Taskbar.Feature.ICON_IMAGE)) {

@@ -51,7 +51,7 @@ val SOMSim = newSim {
             }
             addButton("Train") {
                 SOM.inputLayer.activationArray = SOM.inputLayer.activationArray.add(NormalDistribution().sampleDouble(SOM.inputLayer.activationArray.size))
-                workspace.iterateAsync()
+                workspace.iterateSuspend()
             }
         }
     }

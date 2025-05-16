@@ -40,23 +40,16 @@ class OdorWorldComponent : WorkspaceComponent {
     var world: OdorWorld
         private set
 
-    /**
-     * Default constructor.
-     *
-     * @param name
-     */
-    constructor(name: String?) : super(name!!) {
+
+    constructor(name: String) : super(name) {
         world = OdorWorld()
         init()
     }
 
     /**
      * Constructor used in deserializing.
-     *
-     * @param name  name of world
-     * @param world model world
      */
-    constructor(name: String?, world: OdorWorld) : super(name!!) {
+    constructor(name: String, world: OdorWorld) : super(name) {
         this.world = world
         init()
     }
@@ -129,7 +122,7 @@ class OdorWorldComponent : WorkspaceComponent {
         /**
          * Recreates an instance of this class from a saved component.
          */
-        fun open(input: InputStream?, name: String?, format: String?): OdorWorldComponent {
+        fun open(input: InputStream?, name: String, format: String?): OdorWorldComponent {
             val xstream = odorWorldXStream
             val newWorld = xstream.fromXML(input) as OdorWorld
             return OdorWorldComponent(name, newWorld)

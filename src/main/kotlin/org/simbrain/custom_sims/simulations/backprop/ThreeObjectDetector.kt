@@ -66,9 +66,8 @@ val threeObjectDetector = newSim {
         )
     )
 
-    val odorWorldComponent = addOdorWorldComponent()
+    val odorWorldComponent = addOdorWorldComponent("World")
     withGui {
-        getDesktopComponent(odorWorldComponent).title = "World"
         odorWorldComponent.scale(1.0)
     }
 

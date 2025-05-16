@@ -92,7 +92,7 @@ fun SimulationScope.addNetworkComponent(name: String, network : Network): Networ
 }
 
 fun SimulationScope.addOdorWorldComponent(
-    name: String? = null,
+    name: String,
     config: OdorWorldComponent.() -> Unit = { }
 ): OdorWorldComponent {
     return OdorWorldComponent(name)

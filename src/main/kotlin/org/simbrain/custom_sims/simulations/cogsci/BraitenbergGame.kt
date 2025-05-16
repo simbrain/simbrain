@@ -5,9 +5,12 @@ import org.simbrain.custom_sims.*
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.addNeuron
 import org.simbrain.network.core.addSynapse
+import org.simbrain.util.getDesktopComponentAs
 import org.simbrain.util.graphicalUpperBound
 import org.simbrain.util.place
+import org.simbrain.world.odorworld.OdorWorldDesktopComponent
 import org.simbrain.world.odorworld.entities.EntityType
+import org.simbrain.world.odorworld.fitWorldToFrameSize
 import java.awt.geom.Point2D
 import kotlin.math.max
 
@@ -22,10 +25,7 @@ val braitenbergGame = newSim {
 
     workspace.clearWorkspace()
 
-    val oc = addOdorWorldComponent {
-        world.tileMap.updateMapSize(20, 18)
-    }
-    desktop?.getDesktopComponent(oc)?.title = "Obstacle Course"
+    val oc = addOdorWorldComponent("Obstacle Course")
     //oc.world.isObjectsBlockMovement = false
     oc.world.isUseCameraCentering = false
     oc.world.addEntity(257, 191, EntityType.Poison)
@@ -108,6 +108,7 @@ val braitenbergGame = newSim {
     withGui {
         place(vehicle1.networkComponent, 53, 282, 359, 327)
         place(oc, 462, 19, 600, 600)
+        oc.getDesktopComponentAs<OdorWorldDesktopComponent>().fitWorldToFrameSize()
     }
 
     withGui {

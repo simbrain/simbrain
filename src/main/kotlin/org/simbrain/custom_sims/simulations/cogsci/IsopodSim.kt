@@ -99,7 +99,7 @@ val isopodSim = newSim {
 
     // ----- Build 2d World ------
 
-    val odorWorldComponent = addOdorWorldComponent()
+    val odorWorldComponent = addOdorWorldComponent("World")
     val odorWorld = odorWorldComponent.world
 
     // Object references we'll need later

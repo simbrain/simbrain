@@ -112,7 +112,7 @@ val docViewer = addSidebarInfo(
         lastPredicted = predictionNet.neuronList.activations
     })
 
-    val odorWorldComponent = addOdorWorldComponent()
+    val odorWorldComponent = addOdorWorldComponent("World")
 
     withGui {
         place(odorWorldComponent,9, 348, 315, 388)

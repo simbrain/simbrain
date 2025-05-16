@@ -85,7 +85,7 @@ val testSim = newSim {
 
     // ----- Build 2d World ------
 
-    val odorWorldComponent = addOdorWorldComponent()
+    val odorWorldComponent = addOdorWorldComponent("Test")
     val odorWorld = odorWorldComponent.world
     var straightMovement: Effector
     var turnLeft: Effector

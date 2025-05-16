@@ -120,6 +120,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
     }
 
     dir("Hopfield and Boltzmann") {
+        item("Hopfield patterns") { hopfieldPatterns }
         item("Discrete Hopfield") { discreteHopfieldSim }
         item("Continuous Hopfield") { hopfieldSimContinuous }
         item("Restricted Boltzmann machine") { rbmSim }

@@ -281,8 +281,7 @@ val scalarUpdateRules = listOf(
     SinusoidalRule::class.java,
     SpikingThresholdRule::class.java,
     StochasticRule::class.java,
-    ThreeValueRule::class.java,
-    TimedAccumulatorRule::class.java
+    ThreeValueRule::class.java
 )
 
 val neuronArrayUpdateRules = listOf(

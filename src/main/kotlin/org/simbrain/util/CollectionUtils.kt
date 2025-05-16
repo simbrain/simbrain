@@ -94,25 +94,19 @@ val Array<*>.shape: IntArray
 
 /**
  * Reshape a 1-d double array into a 2d array with the indicated number of rows and columns.
+ *
+ * Values are filled in row-major order, across rows first.
  */
-fun reshape(rows: Int, cols: Int, array: DoubleArray) =
-    Array(rows) { i ->
+fun reshape(rows: Int, cols: Int, array: DoubleArray): Array<DoubleArray> {
+    require(array.size == rows * cols) {
+        "Cannot reshape array of size ${array.size} into shape ($rows, $cols)"
+    }
+    return Array(rows) { i ->
         val row = DoubleArray(cols)
         for (j in 0 until cols) {
             row[j] = array[i * cols + j]
         }
         row
-    }
-
-fun FloatArray.reshape(rows: Int, cols: Int, channels: Int): Array<Array<FloatArray>> {
-    return Array(channels) { c ->
-        Array(rows) { i ->
-            val row = FloatArray(cols)
-            for (j in 0 until cols) {
-                row[j] = this[c * rows * cols + i * cols + j]
-            }
-            row
-        }
     }
 }
 
@@ -159,18 +153,34 @@ fun <T> ListIterator<T>.toSequence() = sequence {
     }
 }
 
+/**
+ * Normalize the values in this collection to the range [0, 1], using min-max normalization.
+ * Recenter and scale by the range.
+ */
 fun Collection<Double>.minMaxNormalize(): List<Double> {
     val min = minOrNull() ?: 0.0
     val max = maxOrNull() ?: 1.0
     val range = max - min
-    return map { (it - min) / range }
+    return if (range == 0.0) map { 0.0 } else map { (it - min) / range }
 }
 
+/**
+ * Normalize so that the values sum to 1, by dividing each member by the sum.
+ *
+ * Does not enforce non-negativity. If all values are positive it produces a probability distribution.
+ */
 fun Collection<Double>.normalize(): List<Double> {
     val sum = sum()
     return map { it / sum }
 }
 
+/**
+ * A map that associates keys with deferred values, allowing asynchronous retrieval and completion.
+ *
+ * Useful when a value is expected to be provided later, and other code can `await` its availability.
+ *
+ * @param timeoutMillis Maximum time in milliseconds to wait for a value before timing out.
+ */
 class CompletableDeferredHashMap<K, V : Any>(private val timeoutMillis: Long = 1000) {
     private val map = ConcurrentHashMap<K, CompletableDeferred<V>>()
 

@@ -2,6 +2,7 @@ package org.simbrain.custom_sims.simulations
 
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
+import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.*
@@ -266,5 +267,33 @@ val evolveNetwork = newSim {
             runSim()
         }
 
+        addSidebarInfo(
+            """ 
+        # Network Evolution
+        
+        This is a simulation of the evolution of a network. The default fitness of this simulation is based on the difference between the current nodes and weights to the target number of nodes and weights. The simulation will continue to add nodes and weights (including synaptic connections) while changing the physical layout of the nodes until the network has reached the target error or lower, or it has reached the maximum number of generations. The target error in this case is the total sum of error of the target number of nodes and the target number of weights. However, if there are more items selected as qualities/fitness, the target error will be based on the difference of all actual qualities present in the simulation and all active target qualities (this includes the target number of nodes and weights if they are active).
+        
+        This simulation has additional items that are added to control the target results that we want the EvolveNetwork to produce. Below are the sample interface and the explanations of the additional items, excluding already explained items in the EvolveXOR sample interface above.
+                
+        In addition to the items in the EvolveXOR interface:
+        
+        - **Target Number of Nodes:** Desired number of nodes.
+        - **Target Number of Weights:** Desired number of weights.
+        - **Target Total Activation:** Total sum of node activations.
+        - **Target Average Activation:** Average node activations.
+        - **Target Average Connection Length:** Average length of connections (the lines that connect neurons) in pixels.
+        - **Target Node Area:** How much space the nodes take up, in pixels squared.
+        
+        The simulation evolves until the target qualities are met or the maximum generations are reached. If the criteria are target fitness instead of error, the goal is for the simulation to meet or exceed this fitness level.
+        
+        Note: If there are multiple target qualities/fitnesses active, the evolutionary simulation will continue to evolve until it has all of the target qualities or until it has reached the maximum number of generations. 
+        
+        For example, if `target num nodes` is set to 20 and `target num weights` is set to 20, and `target total activation` is set to 10, 
+        the simulation will evolve until its relative error in the actual number of nodes and weights and activation of the network 
+        compared to the target number of nodes and weights is as close to that as possible. The evolutionary algorithm will run 
+         until it has as close as possible to those values or until it has reached the maximum number of generations. 
+                
+        """.trimIndent()
+        )
     }
 }

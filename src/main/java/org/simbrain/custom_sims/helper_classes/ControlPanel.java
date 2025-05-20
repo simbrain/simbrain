@@ -142,7 +142,7 @@ public class ControlPanel extends JPanel {
      * @param component the component to add
      */
     public void addComponent(JComponent component) {
-        mainPanel.addItem(component, 1);
+        mainPanel.addItem(component);
     }
 
     /**

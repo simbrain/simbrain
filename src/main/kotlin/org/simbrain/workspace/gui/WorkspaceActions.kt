@@ -234,7 +234,7 @@ class WorkspaceActions {
         createComponentFactoryAction("Pie Chart", "menu_icons/PieChart.png"),
         createComponentFactoryAction("Pixel Plot", "menu_icons/PixelPlot.png"),
         createComponentFactoryAction("Projection Plot", "menu_icons/CubeShadow.png"),
-        createComponentFactoryAction("Raster Plot", "menu_icons/ScatterPlot.png"),
+        createComponentFactoryAction("Raster Plot", "menu_icons/RasterPlot.png"),
         createComponentFactoryAction("Time Series", "menu_icons/TimeSeries.png")
     )
     val newWorldActions = listOf(
@@ -394,7 +394,7 @@ class WorkspaceActions {
         producer = producer,
         plotType = plotType,
         objectName = objectName,
-        iconPath = "menu_icons/ScatterIcon.png",
+        iconPath = "menu_icons/RasterPlot.png",
         componentCreator = { name -> RasterPlotComponent(name) },
         consumerProvider = {
             it.model.rasterConsumerList.first().getConsumer(RasterModel.RasterConsumer::setValues)

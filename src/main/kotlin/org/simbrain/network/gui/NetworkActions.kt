@@ -26,6 +26,7 @@ import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.SimbrainDesktop
+import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import java.awt.event.KeyEvent
 import java.io.File
 import java.io.FileOutputStream
@@ -999,6 +1000,13 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         networkPanel.selectionManager.events.sourceSelection.on { _, _ -> updateAction() }
 
     }
+
+    fun createRecordActivationAction(source: Layer) = actionManager.createCoupledDataWorldAction(
+        name = "Record Activations",
+        source.getProducer(Layer::activationArray),
+        sourceName = "${source.displayName} Activations",
+        source.size
+    )
 
 }
 

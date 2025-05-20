@@ -151,6 +151,8 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
         menu.add(clampNeuronsAction);
         menu.add(unclampNeuronsAction);
 
+        menu.addSeparator();
+
         // Projection Plot Action
         var plotAction = SimbrainDesktop.INSTANCE.getActionManager().createCoupledPlotMenu(
                 SimbrainDesktop.INSTANCE.getWorkspace().getCouplingManager().getProducer(neuronCollection, "getActivationArray"),
@@ -167,6 +169,7 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
                     )
             );
         }
+        menu.add(getNetworkPanel().getNetworkActions().createRecordActivationAction(neuronCollection));
 
         // Coupling menu
         menu.addSeparator();

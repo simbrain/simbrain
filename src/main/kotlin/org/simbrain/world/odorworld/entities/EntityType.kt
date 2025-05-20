@@ -6,9 +6,9 @@ import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
 
 /**
- * The type of an odor world entity (swiss, candle, etc).
+ * The type of an odor world entity (swiss, candle, etc.).
  *
- * For the mapping from type to image, see [EntityNode].
+ * Images are loaded in [EntityNode]. Imagse are stored in `kotlin > resources > odorworld`
  *
  * Images are not automatically rescaled to a desired size.
  *
@@ -59,6 +59,7 @@ sealed class EntityType(
     object Candy : EntityType("Candy", rotating = false, width = 35, height = 35)
     object Fork : EntityType("Fork", rotating = false, width = 16, height = 50)
     object Handle : EntityType("Handle", rotating = false, width = 75, height = 75)
+    object Hand : EntityType("Hand", rotating = false, width = 96, height = 96)
 
     object Circle : EntityType("Circle", rotating = true, width = 73, height = 73, imageName = "circle") {
         override val imageBasePaths by lazy {

@@ -96,7 +96,7 @@ val spiveyNet = newSim {
     val world = oc.world
     world.isUseCameraCentering = false
     desktop?.getDesktopComponent(oc)?.title = "Mouse Trace"
-    val mouse = world.addEntity(157, 271, EntityType.Mouse).apply {
+    val mouse = world.addEntity(157, 271, EntityType.Hand).apply {
         heading = 90.0
     }
     world.addEntity(38, 49, EntityType.Candle)

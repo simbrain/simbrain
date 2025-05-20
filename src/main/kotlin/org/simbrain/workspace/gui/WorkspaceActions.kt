@@ -233,7 +233,7 @@ class WorkspaceActions {
         createComponentFactoryAction("Histogram", "menu_icons/Histogram.png"),
         createComponentFactoryAction("Pie Chart", "menu_icons/PieChart.png"),
         createComponentFactoryAction("Pixel Plot", "menu_icons/PixelPlot.png"),
-        createComponentFactoryAction("Projection Plot", "menu_icons/ScatterPlot.png"),
+        createComponentFactoryAction("Projection Plot", "menu_icons/CubeShadow.png"),
         createComponentFactoryAction("Raster Plot", "menu_icons/ScatterPlot.png"),
         createComponentFactoryAction("Time Series", "menu_icons/TimeSeries.png")
     )

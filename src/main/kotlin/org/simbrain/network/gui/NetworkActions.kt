@@ -270,7 +270,6 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 
     val editSelectedModelsAction = networkPanel.createAction(
         name = "Edit selected models",
-        iconPath = "menu_icons/edit.png",
         keyboardShortcut = CmdOrCtrl + 'E',
     ) {
         networkPanel.showEditDialogsForSelectedModels()

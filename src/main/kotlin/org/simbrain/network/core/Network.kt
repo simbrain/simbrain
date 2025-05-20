@@ -7,6 +7,8 @@ import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.trainers.SupervisedModel
+import org.simbrain.network.util.SpikingMatrixData
+import org.simbrain.network.util.SpikingScalarData
 import org.simbrain.util.CachedObject
 import org.simbrain.util.SimpleIdManager
 import org.simbrain.util.UserParameter
@@ -520,11 +522,14 @@ class Network: CoroutineScope, EditableObject {
         time += timeStep
     }
 
-    /**
-     * Reset time. Note that last spike time computations for spiking networks will be incorrect.
-     */
     fun resetTime() {
         time = 0.0
+        flatNeuronList.forEach {
+            (it.dataHolder as? SpikingScalarData)?.lastSpikeTime = Double.MIN_VALUE
+        }
+        networkModels.get<NeuronArray>().forEach {
+            (it.dataHolder as? SpikingMatrixData)?.lastSpikeTimes?.fill(Double.MIN_VALUE)
+        }
     }
 
     /**

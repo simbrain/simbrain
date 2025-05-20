@@ -119,7 +119,7 @@ class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, tru
     
 
     fun addComponent(component: JComponent, tab: String? = null) {
-        launch(Dispatchers.Swing) { getTab(tab).addItem(component, 1) }
+        launch(Dispatchers.Swing) { getTab(tab).addItem(component) }
     }
 
     fun addSeparator(tab: String? = null) {

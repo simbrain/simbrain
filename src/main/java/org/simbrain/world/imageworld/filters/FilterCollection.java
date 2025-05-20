@@ -127,7 +127,6 @@ public class FilterCollection {
 
 
     public void setCurrentFilter(Filter currentFilter) {
-        events.getFilterChanged().fire(this.currentFilter, currentFilter);
         this.currentFilter = currentFilter;
     }
 

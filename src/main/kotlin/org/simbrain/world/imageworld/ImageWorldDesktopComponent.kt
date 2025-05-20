@@ -625,6 +625,7 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
             repaint()
         }
         imageWorld.filterCollection.events.filterChanged.on(swingDispatcher) { _, _ -> this.repaint() }
+        imageWorld.filterCollection.events.filterSelectionChanged.on(swingDispatcher) { this.repaint() }
 
         // Toolbars
         val filterGui = FilterCollectionGui(this, imageWorld.filterCollection)

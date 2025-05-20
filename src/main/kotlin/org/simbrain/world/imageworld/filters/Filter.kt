@@ -31,7 +31,7 @@ class Filter(
     val source: ImageSource,
 
     @UserParameter(label = "Filter", order = 3)
-    private val imageOp: ImageOperation<*>,
+    var imageOp: ImageOperation<*>,
 
     width: Int,
 
@@ -139,4 +139,5 @@ class Filter(
         return (target - 0.1f) / source
     }
 
+    override val name get() = id
 }

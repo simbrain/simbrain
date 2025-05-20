@@ -11,5 +11,6 @@ class FilterCollectionEvents: Events() {
     val filterAdded = OneArgEvent<Filter>()
     val filterRemoved = OneArgEvent<Filter>()
     val filterChanged = ChangedEvent<Filter>()
+    val filterSelectionChanged = OneArgEvent<Filter>()
 
 }

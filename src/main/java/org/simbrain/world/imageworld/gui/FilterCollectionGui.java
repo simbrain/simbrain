@@ -12,8 +12,6 @@ import org.simbrain.world.imageworld.filters.FilterCollection;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 
 import static org.simbrain.util.SwingUtilsKt.getSwingDispatcher;
 
@@ -36,6 +34,8 @@ public class FilterCollectionGui {
         filterCollection.getEvents().getFilterRemoved().on(getSwingDispatcher(), s -> updateComboBox());
         filterCollection.getEvents().getFilterChanged().on(getSwingDispatcher(),
                 (o, n) -> setComboBoxSelection(n));
+        filterCollection.getEvents().getFilterSelectionChanged().on(getSwingDispatcher(),
+                filterCollection::setCurrentFilter);
     }
 
     public JToolBar getToolBar() {
@@ -51,6 +51,7 @@ public class FilterCollectionGui {
             Filter selectedFilter = (Filter) filterComboBox.getSelectedItem();
             if (selectedFilter != null) {
                 filterCollection.setCurrentFilter(selectedFilter);
+                filterCollection.getEvents().getFilterSelectionChanged().fire(selectedFilter);
             }
         });
 
@@ -103,7 +104,7 @@ public class FilterCollectionGui {
                     return;
                 }
                 int dialogResult = JOptionPane.showConfirmDialog(filterEditorDialog,
-                        "Are you sure you want to delete filter panel \"" + filter.getName() + "\" ?", "Warning",
+                        "Are you sure you want to delete filter \"" + filter.getName() + "\" ?", "Warning",
                         JOptionPane.YES_NO_OPTION);
                 if (dialogResult == JOptionPane.YES_OPTION) {
                     filterCollection.removeFilter(filter);

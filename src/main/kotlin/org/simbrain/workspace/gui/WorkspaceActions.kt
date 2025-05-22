@@ -318,7 +318,7 @@ class WorkspaceActions {
         producer = producer,
         plotType = plotType,
         objectName = objectName,
-        iconPath = "menu_icons/ProjectionIcon.png",
+        iconPath = "menu_icons/CubeShadow.png",
         componentCreator = { name -> ProjectionComponent(name) },
         consumerProvider = {
             it.getConsumer("addPoint")

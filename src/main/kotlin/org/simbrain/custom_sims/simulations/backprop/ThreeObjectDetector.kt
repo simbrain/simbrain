@@ -76,7 +76,9 @@ val threeObjectDetector = newSim {
         isUseCameraCentering = false
     }
 
-    val smellSensor = SmellSensor()
+    val smellSensor = SmellSensor().apply {
+        radius = 35.0
+    }
     val mouse = odorWorld.addEntity(EntityType.Mouse).apply {
         location = point(134, 152)
         heading = 0.0

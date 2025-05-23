@@ -9,6 +9,7 @@ import org.simbrain.util.graphicalUpperBound
 import org.simbrain.util.place
 import org.simbrain.world.odorworld.entities.EntityType
 import java.awt.geom.Point2D
+import kotlin.math.abs
 import kotlin.math.max
 
 /**
@@ -124,23 +125,24 @@ val braitenbergSim = newSim {
             }
             // Update neuron and weight bounds to reasonable values given weight values
             fun updateBounds(w1: Double, w2: Double) {
-                val bound = graphicalUpperBound(max(w1, w2))
-                vehicle1.leftSynapse.upperBound = bound
-                vehicle1.rightSynapse.upperBound = bound
-                vehicle2.leftSynapse.upperBound = bound
-                vehicle2.rightSynapse.upperBound = bound
-                vehicle1.leftSynapse.lowerBound = -bound
-                vehicle1.rightSynapse.lowerBound = -bound
-                vehicle2.leftSynapse.lowerBound = -bound
-                vehicle2.rightSynapse.lowerBound = -bound
-                vehicle1.leftTurn.upperBound = bound
-                vehicle1.rightTurn.upperBound = bound
-                vehicle2.leftTurn.upperBound = bound
-                vehicle2.rightTurn.upperBound = bound
-                vehicle1.leftTurn.lowerBound = -bound
-                vehicle1.rightTurn.lowerBound = -bound
-                vehicle2.leftTurn.lowerBound = -bound
-                vehicle2.rightTurn.lowerBound = -bound
+                val upperBound = graphicalUpperBound(max(abs(w1), abs(w2)))
+
+                vehicle1.leftSynapse.upperBound = upperBound
+                vehicle1.rightSynapse.upperBound = upperBound
+                vehicle2.leftSynapse.upperBound = upperBound
+                vehicle2.rightSynapse.upperBound = upperBound
+                vehicle1.leftSynapse.lowerBound = -upperBound
+                vehicle1.rightSynapse.lowerBound = -upperBound
+                vehicle2.leftSynapse.lowerBound = -upperBound
+                vehicle2.rightSynapse.lowerBound = -upperBound
+                vehicle1.leftTurn.upperBound = upperBound
+                vehicle1.rightTurn.upperBound = upperBound
+                vehicle2.leftTurn.upperBound = upperBound
+                vehicle2.rightTurn.upperBound = upperBound
+                vehicle1.leftTurn.lowerBound = -upperBound
+                vehicle1.rightTurn.lowerBound = -upperBound
+                vehicle2.leftTurn.lowerBound = -upperBound
+                vehicle2.rightTurn.lowerBound = -upperBound
             }
             addButton("Same pair") {
                 vehicle1.leftSynapse.strength = leftWeight

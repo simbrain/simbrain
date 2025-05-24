@@ -104,25 +104,26 @@ val braitenbergSim = newSim {
         place(oc, 590, 3, 496, 646)
     }
 
-    var leftWeight = 100.0
+    var leftWeight = 30.0
     var rightWeight = 50.0
     var velocity = 1.0
 
     withGui {
         createControlPanel("Control Panel", 5, 5) {
-            addFormattedNumericTextField("Left weight", initValue = 100.0) {
+            addFormattedNumericTextField("Left weight", initValue = leftWeight) {
                 leftWeight = it
             }
-            addFormattedNumericTextField("Right weight", initValue = 50.0) {
+            addFormattedNumericTextField("Right weight", initValue = rightWeight) {
                 rightWeight = it
             }
-            addFormattedNumericTextField("Velocity", initValue = 1.0) {
+            addFormattedNumericTextField("Velocity", initValue = velocity) {
                 velocity = it
             }
             fun setVelocity() {
                 vehicle1.straight.activation = velocity
                 vehicle2.straight.activation = velocity
             }
+
             // Update neuron and weight bounds to reasonable values given weight values
             fun updateBounds(w1: Double, w2: Double) {
                 val upperBound = graphicalUpperBound(max(abs(w1), abs(w2)))
@@ -144,13 +145,16 @@ val braitenbergSim = newSim {
                 vehicle2.leftTurn.lowerBound = -upperBound
                 vehicle2.rightTurn.lowerBound = -upperBound
             }
-            addButton("Same pair") {
+            fun initSamePair() {
                 vehicle1.leftSynapse.strength = leftWeight
                 vehicle1.rightSynapse.strength = rightWeight
                 vehicle2.leftSynapse.strength = leftWeight
                 vehicle2.rightSynapse.strength = rightWeight
                 setVelocity()
                 updateBounds(leftWeight, rightWeight)
+            }
+            addButton("Same pair") {
+                initSamePair()
             }
             addButton("Reversed pair") {
                 vehicle1.leftSynapse.strength = leftWeight
@@ -168,6 +172,7 @@ val braitenbergSim = newSim {
                 setVelocity()
                 updateBounds(leftWeight, rightWeight)
             }
+            initSamePair() // Default to same pair / revolving config
         }
     }
 

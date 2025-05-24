@@ -5,13 +5,14 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 /**
  * Add key bindings to odor world. Controls many keyboard shortcuts. Bindings
  * not found here are in the action classes.
  *
- * TODO: Migrate to KeystrokeUtils.kt
+ * TODO: Migrate to Kotlin and use KeystrokeUtils.kt
  */
 public class OdorWorldKeyBindings {
 
@@ -152,6 +153,19 @@ public class OdorWorldKeyBindings {
                     } else {
                         entity.getManualMovement().stopTurning();
                     }
+                }
+            }
+        });
+
+        // Toggle all trails
+        canvas.getInputMap().put(KeyStroke.getKeyStroke("pressed T"), "turn on trails");
+        canvas.getActionMap().put("turn on trails", new AbstractAction() {
+            public void actionPerformed(ActionEvent e) {
+                var firstEntityHasTrail = world.getEntityList().stream().findFirst().get().isShowTrail();
+                if (firstEntityHasTrail) {
+                    worldPanel.getOdorWorldActions().getTurnOffTrails().actionPerformed(e);
+                } else {
+                    worldPanel.getOdorWorldActions().getTurnOnTrails().actionPerformed(e);
                 }
             }
         });

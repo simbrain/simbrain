@@ -23,15 +23,15 @@ class PriorityUpdateTest {
         net.getUpdateManager().addAction(new PriorityUpdate(net));
 
         n1 = new Neuron();
-        n1.setUpdatePriority(1);
+        n1.setPriority(1);
         n1.setClamped(true);
         n1.setActivation(.5);
 
         n2 = new Neuron();
-        n2.setUpdatePriority(2);
+        n2.setPriority(2);
 
         n3 = new Neuron();
-        n3.setUpdatePriority(3);
+        n3.setPriority(3);
 
         s1 = new Synapse(n1, n2);
         s2 = new Synapse(n2, n3);

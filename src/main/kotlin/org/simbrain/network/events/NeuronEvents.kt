@@ -12,5 +12,4 @@ class NeuronEvents: LocationEvents() {
     val spiked = OneArgEvent<Boolean>()
     val colorChanged = NoArgEvent()
     val updateRuleChanged = ChangedEvent<NeuronUpdateRule<*, *>>()
-    val priorityChanged = ChangedEvent<Int>()
 }

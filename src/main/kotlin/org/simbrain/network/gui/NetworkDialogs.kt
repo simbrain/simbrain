@@ -19,6 +19,7 @@ import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.objectWrapper
 import org.simbrain.util.propertyeditor.wrapperWidget
 import java.awt.BorderLayout
+import java.awt.Color
 import java.awt.Dimension
 import java.awt.FlowLayout
 import java.awt.event.WindowAdapter
@@ -26,6 +27,7 @@ import java.awt.event.WindowEvent
 import javax.swing.*
 import javax.swing.border.EmptyBorder
 import javax.swing.event.ListSelectionListener
+import javax.swing.table.DefaultTableModel
 
 fun NetworkPanel.showTextPropertyDialog(textNodes: Collection<TextNode>) {
     TextDialog(textNodes).apply {
@@ -325,6 +327,89 @@ fun NetworkPanel.showUndoHistoryDialog() {
     dialog.contentPane.add(buttonPanel, BorderLayout.SOUTH)
 
     dialog.isVisible = true
+}
+
+fun NetworkPanel.showPriorityTableDialog() {
+    val dialog = StandardDialog()
+    dialog.title = "Network Model Priorities"
+
+    val allModels = network.allModels.sortedBy { it.priority }
+
+    val columnNames = arrayOf("Display Name", "Priority")
+    val data = allModels.map { model ->
+        arrayOf(model.displayName, model.priority)
+    }.toTypedArray()
+
+    val tableModel = object : DefaultTableModel(data, columnNames) {
+        override fun getColumnClass(column: Int): Class<*> {
+            return when (column) {
+                0 -> String::class.java
+                1 -> Integer::class.java
+                else -> Any::class.java
+            }
+        }
+
+        override fun isCellEditable(row: Int, column: Int): Boolean {
+            return column == 1 // Only priority column is editable
+        }
+
+        override fun setValueAt(aValue: Any?, row: Int, column: Int) {
+            if (column == 1 && aValue != null) {
+                try {
+                    val priority = when (aValue) {
+                        is Int -> aValue
+                        is String -> aValue.toInt()
+                        else -> aValue.toString().toInt()
+                    }
+                    super.setValueAt(priority, row, column)
+                } catch (e: NumberFormatException) {
+                    // Invalid number, don't update the table
+                    super.setValueAt(getValueAt(row, column), row, column) // Keep original value
+                }
+            }
+        }
+    }
+
+    val table = JTable(tableModel).apply {
+        setRowSelectionAllowed(true)
+        setColumnSelectionAllowed(false)
+        setCellSelectionEnabled(true)
+        gridColor = Color.LIGHT_GRAY
+        autoCreateRowSorter = true
+
+        // Custom cell editor for priority column that selects all text on focus
+        val priorityEditor = object : DefaultCellEditor(JTextField()) {
+            override fun getTableCellEditorComponent(
+                table: JTable?,
+                value: Any?,
+                isSelected: Boolean,
+                row: Int,
+                column: Int
+            ): java.awt.Component {
+                val textField = super.getTableCellEditorComponent(table, value, isSelected, row, column) as JTextField
+                textField.selectAll()
+                return textField
+            }
+        }
+
+        // Set the custom editor for the priority column (column 1)
+        columnModel.getColumn(1).cellEditor = priorityEditor
+    }
+
+    val scrollPane = JScrollPane(table)
+    scrollPane.preferredSize = Dimension(400, 300)
+
+    dialog.contentPane = scrollPane
+
+    // Add commit task to save priority changes when dialog is closed with OK
+    dialog.addCommitTask {
+        for (row in 0 until tableModel.rowCount) {
+            val newPriority = tableModel.getValueAt(row, 1) as Int
+            allModels[row].priority = newPriority
+        }
+    }
+
+    dialog.display()
 }
 
 class ConnectionStrategyPanel(connectionStrategy: ConnectionStrategy) : JPanel() {

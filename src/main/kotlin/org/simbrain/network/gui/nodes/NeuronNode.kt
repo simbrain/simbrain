@@ -20,7 +20,6 @@ package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
-import org.piccolo2d.nodes.PText
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.createNeuronContextMenu
@@ -43,12 +42,6 @@ import javax.swing.JPopupMenu
 class NeuronNode(net: NetworkPanel, val neuron: Neuron) : ScreenElement(net) {
 
     private val neuronCircleNode = NeuronCircleNode(net).also { addChild(it) }
-
-    /**
-     * Text corresponding to neuron's update priority.
-     */
-    private val priorityText = PText()
-
 
     /**
      * Create a new neuron node.
@@ -120,31 +113,6 @@ class NeuronNode(net: NetworkPanel, val neuron: Neuron) : ScreenElement(net) {
      */
     fun updateTextLabel() {
         neuronCircleNode.setLabel(neuron.label)
-    }
-
-    /**
-     * Toggles the visibility of the priority view text label.
-     *
-     * @param makePriorityTextVisible whether the priority text label should be
-     * visible or not
-     */
-    fun setPriorityView(makePriorityTextVisible: Boolean) {
-        if (makePriorityTextVisible) {
-            setPriorityTextPosition()
-            addChild(priorityText)
-        } else {
-            priorityText?.let { removeChild(it) }
-        }
-    }
-
-    /**
-     * Set position of priority label.
-     */
-    private fun setPriorityTextPosition() {
-        if (priorityText == null || !neuronCircleNode.isTextVisible) {
-            return
-        }
-        priorityText.setOffset(neuronCircleNode.bounds.centerX, neuronCircleNode.bounds.centerY + NEURON_DIAMETER - 10)
     }
 
     override val isDraggable: Boolean = true

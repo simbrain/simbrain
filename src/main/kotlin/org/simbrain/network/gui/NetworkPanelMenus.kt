@@ -173,13 +173,14 @@ val NetworkPanel.viewMenu
                 add(showEditToolBarAction.toMenuItem().apply { isSelected = editToolBar.isVisible })
             })
             addSeparator()
-            add(JCheckBoxMenuItem(showPrioritiesAction).apply { this.state = networkPanel.prioritiesVisible })
             add(JCheckBoxMenuItem(toggleFreeWeightVisibility).apply {
                 this.state = networkPanel.freeWeightsVisible
                 networkPanel.network.events.freeWeightVisibilityChanged.on {
                     this.state = it
                 }
             })
+            addSeparator()
+            add(showPriorityTableAction)
         }
     }
 

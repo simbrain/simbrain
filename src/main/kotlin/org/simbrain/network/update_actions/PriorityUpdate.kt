@@ -4,15 +4,14 @@ import org.simbrain.network.core.Network
 import org.simbrain.workspace.updater.UpdateAction
 
 /**
- * Free neurons (neurons not in groups) are updated in accordance with an
- * ordered priority list. User sets the priority for each neuron. Default
+ * Network models are updated in accordance with an
+ * ordered priority list. User sets the priority for each neuron. The default
  * priority value is 0. Elements with smaller priority value are updated first.
  *
  * @author jyoshimi
  */
-class PriorityUpdate(private val network: Network): UpdateAction("Free neurons (priority) and synapses", "Priority update of free neurons") {
+class PriorityUpdate(private val network: Network): UpdateAction("Priority Update", "Priority update of all network models") {
     override suspend fun run() {
-        network.updateNeuronsByPriority()
-        network.updateAllButNeurons()
+        network.updateModelsByPriority()
     }
 }

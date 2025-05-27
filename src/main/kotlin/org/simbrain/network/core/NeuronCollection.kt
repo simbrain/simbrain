@@ -131,7 +131,7 @@ class NeuronCollection : AbstractNeuronCollection {
      */
     override fun copy(): NeuronCollection {
         return NeuronCollection(neuronList.map(Neuron::copy)).also {
-            it.label = label
+            it.commonCopyFrom(this)
         }
     }
 }

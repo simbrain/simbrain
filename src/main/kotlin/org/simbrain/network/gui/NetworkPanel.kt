@@ -132,15 +132,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     val undoManager = UndoManager()
 
     /**
-     * Whether to display update priorities.
-     */
-    var prioritiesVisible = false
-        set(value) {
-            field = value
-            filterScreenElements<NeuronNode>().forEach { it.setPriorityView(value) }
-        }
-
-    /**
      * Whether to display free weights (those not in a synapse group) or not.
      */
     var freeWeightsVisible = true

@@ -146,13 +146,17 @@ class SmileUtilsTest {
     }
 
     @Test
-    fun `test copy matrix`(){
+    fun `test copy matrix using copyFrom`(){
         val a = Matrix(3, 3)
         a.copyFrom(testMatrix)
-        assertArrayEquals(doubleArrayOf(2.0, 5.0, 8.0), a.col(1))
+        assertArrayEquals(doubleArrayOf(1.0, 2.0, 3.0), a.row(0))
+        assertArrayEquals(doubleArrayOf(4.0, 5.0, 6.0), a.row(1))
+        assertArrayEquals(doubleArrayOf(7.0, 8.0, 9.0), a.row(2))
 
         a.copyFrom(nonSquareMatrix, allowShapeMismatch = true)
-        assertArrayEquals(doubleArrayOf(2.0, 5.0, 8.0), a.col(1))
+        assertArrayEquals(doubleArrayOf(1.0, 2.0, 3.0), a.row(0))
+        assertArrayEquals(doubleArrayOf(4.0, 5.0, 6.0), a.row(1))
+        assertArrayEquals(doubleArrayOf(7.0, 8.0, 9.0), a.row(2))
     }
 
     @Test

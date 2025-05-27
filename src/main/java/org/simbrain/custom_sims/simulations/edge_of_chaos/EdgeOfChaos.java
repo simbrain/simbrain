@@ -68,11 +68,11 @@ public class EdgeOfChaos extends Simulation {
         # Introduction
         
         This is simulation is an experimental study of how representations work when a network is in different dynamic regimes. See the `Edge Of Chaos
-        Bit Stream` to learn more about the different three different types of dynamical regimes: `chaos`, `edge of chaos`, `ordered`. The main goal of
-        this simulation, similar to the other Edge Of Chaos simulation, is to find the edge of chaos and see the effects of the reservoir network on an agent's
+        bitstream` simulation to learn more about the different three different types of dynamical regimes: `chaos`, `edge of chaos`, `ordered`. The main goal of
+        this simulation, similar to the other `Edge Of Chaos` simulation, is to find the edge of chaos and see the effects of the reservoir network on an agent's
         representation of an object. Please note, we have not finished studying this network so if you find any patterns or structure, let us know!
         
-        # General Information About The Simulation
+        ## Simulation Details
         
         In this simulation, a reservoir network is connected to an agent that exists in the 2D environment. In the 2D environment, there is two different
         groups of objects, flowers and cheeses. There are three different types of each object that will be utilized to interact with the agent. In principle,
@@ -80,7 +80,7 @@ public class EdgeOfChaos extends Simulation {
         parts of the network. The objects would be moved to the agent and the object would be represented in a PCA plot as points where we can infer similarities 
         or differences between objects. Similarities and differences can be inferred from the position of the object's representation in the PCA plot.
          
-        ## What To Do
+        # What To Do
         
         In this simulation, the only configuration to the simulation is the `weight stdev`. To find each state, follow the steps below.
         

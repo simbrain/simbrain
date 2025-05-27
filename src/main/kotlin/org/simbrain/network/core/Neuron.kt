@@ -60,7 +60,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
      * Copy constructor.
      */
     constructor(n: Neuron) {
-        updatePriority = n.updatePriority
+        priority = n.priority
         updateRule = n.updateRule.copy()
         dataHolder = n.dataHolder.copy()
         clamped = n.clamped
@@ -201,22 +201,6 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
             field = value
             fanOut.values.filterNotNull().forEach { s -> s.strength = field.value(s.strength) }
             events.colorChanged.fire()
-        }
-
-    /**
-     * Sequence in which the update function should be called for this neuron.
-     * By default, this is set to 0 for all the neurons. If you want a subset of
-     * neurons to fire before other neurons, assign it a smaller priority value.
-     */
-    @UserParameter(
-        label = "Update Priority", description = "What order neurons should be updated" +
-                "in, starting with lower values. <br> Only used with priority-based network update", order = 20
-    )
-    var updatePriority: Int = 0
-        set(updatePriority) {
-            val old = field
-            field = updatePriority
-            events.priorityChanged.fire(updatePriority, old)
         }
 
     /**

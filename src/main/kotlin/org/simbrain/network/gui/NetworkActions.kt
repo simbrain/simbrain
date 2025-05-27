@@ -316,13 +316,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             isVisible = true
         }
     }
-    val showPrioritiesAction = networkPanel.createAction(
-        name = "Show Neuron Priorities",
-        description = "Show neuron priorities (for use in priority update)",
-    ) {
-        val cb = it.source as JCheckBoxMenuItem
-        prioritiesVisible = cb.isSelected
-    }
+
     val showWeightMatrixAction = networkPanel.createConditionallyEnabledAction(
         name = "Display / Edit Weight Matrix...",
         description = "Show a weight matrix connecting source neurons (adorned with red squares) and target neurons (regular green selection)",
@@ -614,6 +608,14 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             excitatoryRandomizer,
             inhibitoryRandomizer
         )?.displayInDialog()
+    }
+
+    val showPriorityTableAction = networkPanel.createAction(
+        name = "Show Priority Table...",
+        description = "Show a table of all network models and their update priorities",
+        iconPath = "menu_icons/grid.png"
+    ) {
+        networkPanel.showPriorityTableDialog()
     }
 
     private fun addSubnetAction(name: String, createDialog: (NetworkPanel) -> StandardDialog) = networkPanel.createAction(

@@ -9,7 +9,6 @@ import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.network.util.SpikingScalarData
-import org.simbrain.util.CachedObject
 import org.simbrain.util.SimpleIdManager
 import org.simbrain.util.UserParameter
 import org.simbrain.util.math.SimbrainMath
@@ -108,15 +107,6 @@ class Network: CoroutineScope, EditableObject {
     private var updateCompleted = AtomicBoolean(false)
 
     /**
-     * List of neurons sorted by their update priority. Used in priority based update.
-     * Lower numbers updated first, as in first priority, second priority, etc.
-     */
-    @Transient
-    private var prioritySortedNeuronList = CachedObject {
-        flatNeuronList.sortedBy { it.updatePriority }.toMutableList()
-    }
-
-    /**
      * Manage ids for all network elements.
      */
     @Transient
@@ -201,7 +191,7 @@ class Network: CoroutineScope, EditableObject {
      * Update the priority list used for priority based update.
      */
     private fun updatePriorityList() {
-        prioritySortedNeuronList.invalidate()
+        networkModels.updatePriorityList()
     }
 
     /**
@@ -210,33 +200,11 @@ class Network: CoroutineScope, EditableObject {
      * neurons and sub-networks get updated - smaller priority value elements will be updated before larger priority
      * value elements.
      */
-    fun updateNeuronsByPriority() {
-        for (neuron in prioritySortedNeuronList.value) {
-            neuron.accumulateInputs()
-            neuron.update()
+    fun updateModelsByPriority() {
+        networkModels.allInPriorityOrder.forEach {
+            it.accumulateInputs()
+            it.update()
         }
-    }
-
-    /**
-     * Update all network models except for neurons.
-     * Obviously a temporary method!
-     */
-    fun updateAllButNeurons() {
-        // TODO: Temporary function until we create a generalized priority based update
-        listOf(
-            NeuronGroup::class.java,
-            NeuronCollection::class.java,
-            NeuronArray::class.java,
-            Connector::class.java,
-            SynapseGroup::class.java,
-            Subnetwork::class.java,
-            Synapse::class.java
-        )
-            .flatMap { networkModels[it] }
-            .forEach {nm ->
-                nm.accumulateInputs()
-                nm.update()
-            }
     }
 
     /**
@@ -345,13 +313,6 @@ class Network: CoroutineScope, EditableObject {
                 updatePriorityList()
             }
             val deferred = events.modelAdded.fire(model)
-            if (model is Neuron) {
-                model.events.priorityChanged.on { _, _ ->
-                    updatePriorityList()
-                }
-                model.events.updateRuleChanged.on { _, _ -> shouldUpdateTimeType = true }
-                updatePriorityList()
-            }
             when(model) {
                 is AbstractNeuronCollection -> {
                     model.neuronList.forEach { childToParentMap[it] = model }
@@ -472,9 +433,6 @@ class Network: CoroutineScope, EditableObject {
         placementManager = PlacementManager()
 
         updateCompleted = AtomicBoolean(false)
-        prioritySortedNeuronList = CachedObject {
-            flatNeuronList.sortedBy { it.updatePriority }.toMutableList()
-        }
 
         // Initialize update manager
         networkModels.allInUpdatingOrder.forEach { model ->

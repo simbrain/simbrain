@@ -30,6 +30,9 @@ abstract class NetworkModel {
             events.labelChanged.fire(oldLabel, this.label)
         }
 
+    @UserParameter(label = "Update Priority", order = 20)
+    var priority: Int = 0
+
     /**
      * First pass of updating. Generally a "weighted input".
      */
@@ -111,4 +114,9 @@ abstract class NetworkModel {
     open fun toggleClamping() {}
 
     val displayName get() = label ?: id ?: "Uninitialized Network Model"
+
+    fun commonCopyFrom(other: NetworkModel) {
+        this.label = other.label
+        this.priority = other.priority
+    }
 }

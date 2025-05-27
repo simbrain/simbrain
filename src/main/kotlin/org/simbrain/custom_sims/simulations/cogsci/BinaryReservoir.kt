@@ -178,13 +178,14 @@ val binaryReservoir = newSim {
     addSidebarInfo(
         """
         # Introduction
+        
         This simulation shows how research can be done in Simbrain and in coordination with other programming environments. Though this simulation can be 
         used directly in any way as desired, pressing the buttons can configure parameters, run simulations, and save data that is outputted to a `.csv` file 
         which can then be analyzed in other programming environments like Python. For more information on the `Binary Reservoir` simulation and its usage, 
         feel free to contact jponcedeleon@ucmerced.edu.
 
-        # General Information About The Simulation
-
+        ## Simulation Details
+        
         In this simulation, each trial resets the node connection parameters, and after `400` baseline iterations, it models a **perturbation** to the network by adding 
         an additional input signal to `10%` of the nodes, and continues to update activations for an additional `300` iterations to show the reservoir's response to new input
         (these and other parameters can be configured in the [simulation code](https://docs.simbrain.net/docs/simulations/)). This perturbation allows for the calculation of a 
@@ -195,14 +196,14 @@ val binaryReservoir = newSim {
         after you apply the `weight stdev`. Whereas, the `run one trial per parameter` button will produce a set of files, one for each mean weight variance of a geometric 
         progression (from `0.1` to `10`). This makes it possible to study how PCI varies with `weight variance`, which is known to be a control parameter for putting networks 
         into different dynamical regimes, from `ordered` to `chaotic` and in between `edge of chaos`. For an in-depth description and illustration of the different dynamical 
-        regimes, refer to the `Edge of Chaos Bit Stream` simulation.
+        regimes, refer to the `Edge of Chaos bitstream` simulation.
         
         # What to Do
         
         In this simulation, similarly to the other reservoir network simulations, the only configuration to the simulation is the `weight stdev`. Below are two different ways
         that you can utilize this simulation.
         
-        ## Observations on the Edge of Chaos
+        ## Observing The Edge of Chaos
         
         1) Change the `weight stdev` value and press the `Apply Variance` button to change the reservoir's weight distribution.
                         

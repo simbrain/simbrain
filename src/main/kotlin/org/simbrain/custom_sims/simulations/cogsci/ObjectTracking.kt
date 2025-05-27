@@ -1,10 +1,7 @@
 package org.simbrain.custom_sims.simulations
 
 import kotlinx.coroutines.awaitAll
-import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.couplingManager
-import org.simbrain.custom_sims.createControlPanel
-import org.simbrain.custom_sims.newSim
+import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.*
 import org.simbrain.network.layouts.GridLayout
@@ -131,9 +128,9 @@ val objectTrackingSim = newSim {
     // Location of the network in the desktop
     withGui {
         place(networkComponent) {
-            location = point(0, 0)
-            width = 400
-            height = 400
+            location = point(183, 0)
+            width = 600
+            height = 600
         }
     }
 
@@ -232,7 +229,9 @@ val objectTrackingSim = newSim {
     workspace.addWorkspaceComponent(odorWorldComponent)
     withGui {
         place(odorWorldComponent) {
-            location = point(403, 14)
+            location = point(783, 0)
+            width = 600
+            height = 600
         }
     }
 
@@ -243,7 +242,7 @@ val objectTrackingSim = newSim {
     }
 
     withGui {
-        createControlPanel("Control Panel", 50, 400) {
+        createControlPanel("Control Panel", 0, 0) {
             val tfNumIterations: JTextField = addTextField("Number of iterations", "1000")
             val cbRecordSpikes = addCheckBox("Record spikes", recordSpikes)
             addButton("Run trial") {
@@ -258,6 +257,56 @@ val objectTrackingSim = newSim {
         }
     }
 
+    addSidebarInfo(
+        """
+        # Introduction
+        
+        This simulation, in principle, builds upon the theoretical foundations that are mentioned in the `Edge of Chaos bitstream` simulation. 
+        
+        This is a simulation of an agent learning how to track an object using a reservoir network. The simulation consists of two sensory neuron groups, two effector 
+        nodes (e.g., left or, right turn), a reservoir network, and an odor world with an object (e.g., cheese) and the agent in it. The input activations are outputted into 
+        the reservoir network where the reservoir network processes the pattern and learns how to track the object. 
+        
+        ## Simulation Details
+        
+        The reservoir network uses an [**unsupervised allostatic learning rule**](https://sciencedirect.com/science/article/pii/S0006899321004352?via%3Dihub) developed by Ben 
+        Falandays. The unsupervised allostatic learning rule allows the reservoir network to adapt and adjust its weights accordingly to the movement of cheese (i.e., 
+        the activation values received from sensing the cheese). Through this process, the network learns to anticipate the cheese's movement correctly in order to stabilize 
+        the network's input arrays. Through this stabilization phase, the network activity will also be stabilized. Sometimes, the agent can break out of this stable state
+        as a result of the object changing directions. And this process repeats. 
+        
+        The agent's ability to track the cheese is not pre-built in the agent (i.e., it is not being told to track the object), rather, this ability emerges from the dynamics 
+        within the network. When the agent tracks the object, the entire agent-environment system falls into stable, attracting states that corresponds to states where the 
+        object stays in front of the object.
+        
+        ## Connection with Representational Drift
+        
+        When the network activity becomes stable, it stops developing new activation patterns. Sometimes, the agent breaks out of its stable state as a result of the object
+        moving into a opposite direction. When this occurs, the agent will not utilize its pre-existing representation of the object's movement. It instead develops new 
+        representations (i.e., patterns) of the object's movement. The developed representation is always new, so there is no stable permanent representation. It is always 
+        coming up with new representation on the fly for a given rotational direction. This shift in network activity is [**representational drift**](https://pmc.ncbi.nlm.nih.gov/articles/PMC7385530/).
+        
+        # What to Do
+        
+        In this simulation, the only configurations are `Number of iterations` and `Record spikes`. Before explaining the utilization of the configurations, this is the general
+        method that you can utilize this simulation:
+        
+        1) Run the simulation.
+        
+        2) While it runs, look at the reservoir network. To observe its network activity (i.e., state): right-click the reservoir network, click on `plot`, and click on `projection 
+        plot`. 
+        
+        3) Observe the agent's behavior in correspondence to the reservoir network's activity.
+        
+        ## Conducting Research With The Object Tracking Simulation
+         
+        The other method to utilize this simulation is using it to conduct research. The `Number of iterations` is the number of timesteps before the reservoir network's activation 
+        is saved into an Excel spreadsheet. If you also want to record the activation spikes that occurs in the reservoir network, check the `Record spikes` box. After saving the data,
+        you can analyze the data. For example, analyzing when representational drift happens and when it happens. When doing this, you can also analyze how changes in the [simulation code](https://docs.simbrain.net/docs/simulations/)
+        can affect the agent's learning performance like changing the learning rate or, the synaptic weight values.
+        
+        """.trimIndent()
+    )
 }
 
 /**

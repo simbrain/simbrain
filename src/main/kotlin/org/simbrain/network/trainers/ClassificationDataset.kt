@@ -5,13 +5,19 @@ import org.simbrain.util.getDiagonal2DDoubleArray
 import org.simbrain.util.stats.distributions.UniformIntegerDistribution
 
 /**
- * Encapsulates a 2d array of feature vectors and a set of String labels used to train a classifier.
+ * Encapsulates training data for a 2d array of feature vectors and a set of String labels used to train a classifier.
  *
  * String labels are used to set targets, and these are then associated with integers which can be retrieved using
  * [getIntegerTargets].
  *
  */
-class ClassificationDataset(val numFeatures: Int, val numOutputs: Int, val numSamples: Int) {
+class ClassificationDataset(
+    // Number of columns in the training data
+    val numFeatures: Int,
+    val numOutputs: Int,
+    // Number of rows
+    val numSamples: Int)
+{
 
     /**
      * Method of associating string labels to integer indices.
@@ -23,7 +29,9 @@ class ClassificationDataset(val numFeatures: Int, val numOutputs: Int, val numSa
     var labelEncoding = LabelEncoding.Integer
 
     /**
-     * A 2d array. Rows correspond to feature vectors
+     * A 2d array. Rows correspond to feature vectors.
+     *
+     * Filled with default data but should usually be set.
      *
      * Xor example: [[0,0],[1,0],[0,1],[1,1]]
      */

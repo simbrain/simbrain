@@ -14,6 +14,7 @@ import org.simbrain.network.neurongroups.NeuronGroup;
 import org.simbrain.network.updaterules.BinaryRule;
 import org.simbrain.plot.projection.ProjectionComponent;
 import org.simbrain.util.decayfunctions.StepDecayFunction;
+import org.simbrain.util.projection.DecayColoringManager;
 import org.simbrain.util.stats.distributions.NormalDistribution;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.world.odorworld.OdorWorldComponent;
@@ -61,6 +62,7 @@ public class EdgeOfChaos extends Simulation {
 
         // Projection plot
         ProjectionComponent pc = sim.addProjectionPlot(592, 248, 413, 372, "PCA");
+        pc.getProjector().setColoringManager(new DecayColoringManager());
         sim.couple(reservoir, pc);
 
         sim.addSidebarInfo(

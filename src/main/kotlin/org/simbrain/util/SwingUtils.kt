@@ -162,7 +162,7 @@ fun <T : JComponent> T.createAction(
     keyboardShortcut: KeyCombination? = null,
     initBlock: AbstractAction.() -> Unit = {},
     coroutineScope: CoroutineScope? = null,
-    block: suspend T.(e: ActionEvent) -> Unit
+    block: suspend T.(e: ActionEvent?) -> Unit
 ) = createAction(name, description, iconPath, keyboardShortcut?.let { listOf(it) } ?: listOf(), initBlock, coroutineScope, block)
 
 /**
@@ -172,7 +172,7 @@ fun createAction(
     name: String? = null,
     iconPath: String? = null,
     description: String? = null,
-    block: (e: ActionEvent) -> Unit
+    block: (e: ActionEvent?) -> Unit
 ): AbstractAction {
     return object : AbstractAction() {
         init {
@@ -184,7 +184,7 @@ fun createAction(
             putValue(SHORT_DESCRIPTION, description)
         }
 
-        override fun actionPerformed(e: ActionEvent) {
+        override fun actionPerformed(e: ActionEvent?) {
             block(e)
         }
     }
@@ -200,7 +200,7 @@ fun <T : JComponent> T.createAction(
     keyboardShortcut: Char,
     initBlock: AbstractAction.() -> Unit = {},
     coroutineScope: CoroutineScope? = null,
-    block: suspend T.(e: ActionEvent) -> Unit
+    block: suspend T.(e: ActionEvent?) -> Unit
 ): AbstractAction {
     return createAction(
         iconPath = iconPath,

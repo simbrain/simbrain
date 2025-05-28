@@ -3,6 +3,7 @@ package org.simbrain.util
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.intellij.lang.annotations.MagicConstant
+import org.piccolo2d.PCanvas
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
 import java.util.*
@@ -74,28 +75,34 @@ fun JComponent.bindTo(keyCombo: KeyCombination, action: AbstractAction) {
     actionMap.put(keyName, action)
 }
 
-inline fun <C> C.bind(vararg keys: String, crossinline action: C.() -> Unit)  where C : JComponent, C : CoroutineScope {
+inline fun <C> C.bind(vararg keys: String, crossinline action: C.(e: ActionEvent?) -> Unit)  where C : JComponent, C : CoroutineScope {
     val keyName = "Key ${keys.joinToString("")}"
     keys.forEach { key -> putInputMap(KeyStroke.getKeyStroke(key.uppercase(Locale.getDefault())), keyName) }
     putActionMap(keyName, action)
 }
 
-inline fun <C> C.bind(keyStroke: KeyStroke, crossinline action: C.() -> Unit) where C : JComponent, C : CoroutineScope {
+inline fun <C> C.bind(keyStroke: KeyStroke, crossinline action: C.(e: ActionEvent?) -> Unit) where C : JComponent, C : CoroutineScope {
     val keyName = "Key $keyStroke"
     putInputMap(keyStroke, keyName)
     putActionMap(keyName, action)
 }
 
+inline fun <C> C.bind(vararg keys: String, crossinline action: C.(e: ActionEvent?) -> Unit)  where C : PCanvas, C : CoroutineScope {
+    val keyName = "Key ${keys.joinToString("")}"
+    keys.forEach { key -> putInputMap(KeyStroke.getKeyStroke(key), keyName) }
+    putActionMap(keyName, action)
+}
+
 inline fun <C> C.bind(
     @MagicConstant(valuesFromClass = KeyStroke::class) key: Int,
-    crossinline action: C.() -> Unit
+    crossinline action: C.(e: ActionEvent?) -> Unit
 ) where C : JComponent, C : CoroutineScope {
     val keyName = "Key vki_$key"
     putInputMap(KeyStroke.getKeyStroke(key, 0), keyName)
     putActionMap(keyName, action)
 }
 
-inline fun <C> C.bind(vararg keys: KeyCombination, crossinline action: suspend C.() -> Unit) where C: JComponent, C: CoroutineScope {
+inline fun <C> C.bind(vararg keys: KeyCombination, crossinline action: suspend C.(e: ActionEvent?) -> Unit) where C: JComponent, C: CoroutineScope {
     val keyName = "Key ${keys.joinToString("")}"
     keys.forEach { key ->
         key.withKeyStroke { getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(it, keyName) }
@@ -107,14 +114,14 @@ fun JComponent.putInputMap(keyStroke: KeyStroke, mapKey: String) {
     getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyStroke, mapKey)
 }
 
-inline fun <C> C.putActionMap(key: String, crossinline action: suspend C.() -> Unit) where C: JComponent, C: CoroutineScope {
-    actionMap.put(key) { launch { action() } }
+inline fun <C> C.putActionMap(key: String, crossinline action: suspend C.(e: ActionEvent?) -> Unit) where C: JComponent, C: CoroutineScope {
+    actionMap.put(key) { launch { action(it) } }
 }
 
-inline fun ActionMap.put(key: String, crossinline action: () -> Unit) {
+inline fun ActionMap.put(key: String, crossinline action: (e: ActionEvent?) -> Unit) {
     put(key, object : AbstractAction() {
-        override fun actionPerformed(e: ActionEvent) {
-            action()
+        override fun actionPerformed(e: ActionEvent?) {
+            action(e)
         }
     })
 }

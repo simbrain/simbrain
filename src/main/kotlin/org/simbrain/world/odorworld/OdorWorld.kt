@@ -18,6 +18,9 @@
  */
 package org.simbrain.world.odorworld
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import org.simbrain.util.SimpleIdManager.SimpleId
 import org.simbrain.util.SmellSource
 import org.simbrain.util.UserParameter
@@ -46,7 +49,13 @@ import java.util.function.Consumer
  * Contains a [TileMap] which is a grid of tiles. This tilemap determines the size of the world.
  * The world's size cannot be set directly.
  */
-class OdorWorld : EditableObject, Bounded {
+class OdorWorld : EditableObject, Bounded, CoroutineScope {
+
+    @Transient
+    private var job = SupervisorJob()
+
+    @Transient
+    override var coroutineContext = Dispatchers.Default + job
 
     /**
      * List of odor world entities.

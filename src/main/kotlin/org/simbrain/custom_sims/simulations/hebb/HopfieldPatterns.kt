@@ -4,16 +4,11 @@ import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
-import org.simbrain.custom_sims.simulations.hebb.HopfieldTestConfig
-import org.simbrain.custom_sims.simulations.hebb.createHopfieldTestPane
-import org.simbrain.custom_sims.simulations.hebb.createPatternControlPanel
 import org.simbrain.network.subnetworks.Hopfield
 import org.simbrain.util.computeCorrelationMatrix
 import org.simbrain.util.displayInDialog
 import org.simbrain.util.place
-import org.simbrain.util.showNumericInputDialog
-import org.simbrain.util.table.MatrixDataFrame
-import org.simbrain.util.widgets.MatrixPlot
+import org.simbrain.util.widgets.CorrPlotPanel
 
 /**
  * Demo for studying discrete Hopfield networks.
@@ -296,22 +291,22 @@ val hopfieldPatterns = newSim {
                 with(network) { hopfield.trainOnCurrentPattern() }
             }
             addButton("Show correlations") {
-                MatrixPlot(
-                    listOf("UShape",
-                        "zeroShape",
-                        "DShape",
-                        "EShape",
-                        "YShape",
-                        "ZShape",
-                        "HShape",
-                        "VShape",
-                        "eightShape",
-                        "AShape",
-                        "BShape",
-                        "SShape",
-                        "OShape",
-                        "QShape",
-                        "IShape"),
+                CorrPlotPanel(
+                    listOf("U",
+                        "zero",
+                        "D",
+                        "E",
+                        "Y",
+                        "Z",
+                        "H",
+                        "V",
+                        "eight",
+                        "A",
+                        "B",
+                        "S",
+                        "O",
+                        "Q",
+                        "I"),
                     computeCorrelationMatrix(
                         arrayOf(
                             UShape,

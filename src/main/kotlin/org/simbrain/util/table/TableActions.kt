@@ -9,15 +9,13 @@ import org.simbrain.util.*
 import org.simbrain.util.projection.DataPoint
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.objectWrapper
-import org.simbrain.util.widgets.MatrixPlot
+import org.simbrain.util.widgets.CorrPlotPanel
 import org.simbrain.workspace.gui.SimbrainDesktop
 import smile.io.Read
 import smile.plot.swing.BoxPlot
 import smile.plot.swing.Histogram
 import smile.plot.swing.PlotGrid
-import java.awt.BorderLayout
-import java.awt.Dimension
-import javax.swing.*
+import javax.swing.JOptionPane
 import kotlin.reflect.KClass
 
 /**
@@ -364,62 +362,24 @@ fun SimbrainJTable.createShowMatrixPlotAction() = createAction(
     iconPath = "menu_icons/grid.png",
 ) {
 
-    val binaryOperations =
-        arrayOf("Correlation", "Covariance", "Cosine Similarity", "Euclidean Distance", "Dot Product")
-
     val (data, rowNames) = if (selectedRows.size > 0) {
         getSelectedRowDoubleValues().toDoubleArray() to getSelectedRowNames()
     } else {
         model.get2DDoubleArray() to model.getAllRowNames()
     }
 
-    val panel = JPanel(BorderLayout())
-
-    var matrixPlotPanel = MatrixPlot(rowNames, computeCorrelationMatrix(data))
-
-    val toolbar = JToolBar()
-    toolbar.isFloatable = false
-    toolbar.add(JLabel("Comparison Function: "))
-    toolbar.add(JComboBox(binaryOperations).apply {
-        addActionListener { e ->
-            val functionSelected = (e?.source as? JComboBox<*>)?.selectedItem as? String
-            val newPanel = when (functionSelected) {
-                "Correlation" -> MatrixPlot(rowNames, computeCorrelationMatrix(data))
-                "Covariance" -> MatrixPlot(rowNames, computeCovarianceMatrix(data))
-                "Cosine Similarity" -> MatrixPlot(rowNames, computeCosineSimilarityMatrix(data))
-                "Euclidean Distance" -> MatrixPlot(rowNames, computeSimilarityMatrix(data))
-                "Dot Product" -> MatrixPlot(rowNames, computeDotProductMatrix(data))
-                else -> MatrixPlot(rowNames, computeCorrelationMatrix(data))
-            }
-            panel.remove(matrixPlotPanel)
-            matrixPlotPanel = newPanel
-            panel.add(matrixPlotPanel, BorderLayout.CENTER)
-            panel.revalidate()
-        }
-        maximumSize = Dimension(150, preferredSize.height)
-    })
-    toolbar.add(createAction(
+    val corrPlot = CorrPlotPanel(rowNames, data)
+    corrPlot.toolbar.add(createAction(
         name = "Show preferences...",
         iconPath = "menu_icons/Tools.png"
     ) {
-        matrixPlotPanel.properties.createEditorDialog {
-            matrixPlotPanel.repaint()
+        corrPlot.matrixPlot.properties.createEditorDialog {
+            corrPlot.matrixPlot.repaint()
         }.also {
             it.title = "Text World Preferences"
         }.display()
     })
 
-    panel.add(toolbar, BorderLayout.NORTH)
-    panel.add(
-        JScrollPane(matrixPlotPanel).apply {
-            border = null
-            verticalScrollBar.unitIncrement = 10
-            horizontalScrollBar.unitIncrement = 10
-            minimumSize = Dimension(400, 400)
-        },
-        BorderLayout.CENTER
-    )
-
-    panel.displayInDialog()
+    corrPlot.displayInDialog()
 
 }

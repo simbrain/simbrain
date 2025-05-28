@@ -1,17 +1,11 @@
 package org.simbrain.util.widgets
 
-import org.simbrain.util.displayInDialog
-import org.simbrain.util.flatten
+import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
-import org.simbrain.util.toSimbrainColor
-import java.awt.Color
-import java.awt.Dimension
-import java.awt.Graphics
-import java.awt.GraphicsEnvironment
+import java.awt.*
 import java.awt.image.BufferedImage
-import javax.swing.JPanel
-import javax.swing.JScrollPane
+import javax.swing.*
 import kotlin.math.abs
 import kotlin.random.Random
 
@@ -121,6 +115,48 @@ class MatrixPlotProperties: EditableObject {
         min = 0.0,
         conditionallyEnabledBy = MatrixPlotProperties::fixedColorScale
     )
+}
+
+class CorrPlotPanel(private val labels: List<String>, private val data: Array<DoubleArray>): JPanel(BorderLayout()) {
+
+    var matrixPlot = MatrixPlot(labels, data)
+
+    val matrixPlotPanel = JScrollPane(matrixPlot).apply {
+        border = null
+        verticalScrollBar.unitIncrement = 10
+        horizontalScrollBar.unitIncrement = 10
+        minimumSize = Dimension(400, 400)
+    }
+
+    val toolbar = JToolBar().apply {
+        isFloatable = false
+        add(JLabel("Comparison Function: "))
+        val binaryOperations =
+            arrayOf("Correlation", "Covariance", "Cosine Similarity", "Euclidean Distance", "Dot Product")
+        add(JComboBox(binaryOperations).apply {
+            addActionListener { e ->
+                val functionSelected = (e?.source as? JComboBox<*>)?.selectedItem as? String
+                val newPanel = when (functionSelected) {
+                    "Correlation" -> MatrixPlot(labels, computeCorrelationMatrix(data))
+                    "Covariance" -> MatrixPlot(labels, computeCovarianceMatrix(data))
+                    "Cosine Similarity" -> MatrixPlot(labels, computeCosineSimilarityMatrix(data))
+                    "Euclidean Distance" -> MatrixPlot(labels, computeSimilarityMatrix(data))
+                    "Dot Product" -> MatrixPlot(labels, computeDotProductMatrix(data))
+                    else -> MatrixPlot(labels, computeCorrelationMatrix(data))
+                }
+                matrixPlotPanel.remove(matrixPlot)
+                matrixPlotPanel.viewport.view = newPanel
+                revalidate()
+                matrixPlotPanel.revalidate()
+            }
+            maximumSize = Dimension(150, preferredSize.height)
+        })
+    }
+
+    init {
+        add(toolbar, BorderLayout.NORTH)
+        add(matrixPlotPanel, BorderLayout.CENTER)
+    }
 }
 
 fun main() {

@@ -302,8 +302,8 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Edit Toolbar",
         description = "Show the edit toolbar",
     ) {
-        val cb = it.source as JCheckBoxMenuItem
-        editToolBar.isVisible = cb.isSelected
+        val cb = it?.source as? JCheckBoxMenuItem
+        editToolBar.isVisible = cb?.isSelected == true
     }
     val showLayoutDialogAction = networkPanel.createConditionallyEnabledAction(
         name = "Layout Neurons...",
@@ -393,8 +393,8 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Main Toolbar",
         description = "Show the main toolbar",
     ) {
-        val cb = it.source as JCheckBoxMenuItem
-        mainToolBar.isVisible = cb.isSelected
+        val cb = it?.source as? JCheckBoxMenuItem
+        mainToolBar.isVisible = cb?.isSelected == true
     }
 
     val addTextAction = networkPanel.createAction(
@@ -552,11 +552,11 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         description = "Toggle visibilty of free weights",
         keyboardShortcut = KeyCombination('5')
     ) { event ->
-        event.source.let {
-            if (it is JCheckBoxMenuItem) {
-                freeWeightsVisible = it.state
+        event?.source?.let {
+            freeWeightsVisible = if (it is JCheckBoxMenuItem) {
+                it.state
             } else {
-                freeWeightsVisible = !freeWeightsVisible
+                !freeWeightsVisible
             }
         }
     }

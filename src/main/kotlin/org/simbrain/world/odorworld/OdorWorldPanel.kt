@@ -1,5 +1,6 @@
 package org.simbrain.world.odorworld
 
+import kotlinx.coroutines.CoroutineScope
 import org.piccolo2d.PCanvas
 import org.piccolo2d.PNode
 import org.piccolo2d.event.PBasicInputEventHandler
@@ -36,7 +37,9 @@ import kotlin.math.pow
 class OdorWorldPanel(
     val odorWorldComponent: OdorWorldComponent,
     val world: OdorWorld
-) : JPanel() {
+) : CoroutineScope, JPanel() {
+
+    override val coroutineContext get() = world.coroutineContext
 
     /**
      * The Piccolo PCanvas.
@@ -128,7 +131,10 @@ class OdorWorldPanel(
     /**
      * Extend PCanvas for custom handling of tooltips
      */
-    inner class OdorWorldCanvas : PCanvas() {
+    inner class OdorWorldCanvas : PCanvas(), CoroutineScope {
+
+        override val coroutineContext get() = this@OdorWorldPanel.coroutineContext
+
         init {
             // Paradoxically, low quality rendering produces sharper quality for rendering pixel images
             // use nearest neighbor instead of bi-linear
@@ -227,8 +233,7 @@ class OdorWorldPanel(
         canvas.removeInputEventListener(panEventHandler)
         canvas.removeInputEventListener(zoomEventHandler)
 
-        // Add key bindings
-        OdorWorldKeyBindings.addBindings(this)
+        addKeyBindings()
 
         // Mouse events
         canvas.addInputEventListener(WorldMouseHandler(this, world))

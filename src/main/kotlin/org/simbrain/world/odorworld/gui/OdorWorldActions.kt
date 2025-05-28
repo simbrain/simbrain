@@ -104,9 +104,10 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
         }
     }
 
-    val turnOnTrails = odorWorldPanel.createAction("Turn on trails") {
+    val toggleAllTrails = odorWorldPanel.createAction(name = "Toggle all trails", keyboardShortcut = 'T') {
+        val firstEntityHasTrail = world.entityList.firstOrNull()?.isShowTrail ?: false
         world.entityList.map {
-            it.isShowTrail = true
+            it.isShowTrail = !firstEntityHasTrail
         }
     }
 

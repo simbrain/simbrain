@@ -18,7 +18,6 @@
  */
 package org.simbrain.network.updaterules
 
-import org.simbrain.custom_sims.simulations.AllostaticUpdateRule
 import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron

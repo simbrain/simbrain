@@ -6,6 +6,7 @@ import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.*
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.LineLayout
+import org.simbrain.network.updaterules.AllostaticUpdateRule
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.util.place
 import org.simbrain.util.point

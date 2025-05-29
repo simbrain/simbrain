@@ -51,7 +51,8 @@ suspend fun testPatterns(
     config: HopfieldTestConfig,
     patternTestConfig: PatternTestOptions,
     patterns: List<DoubleArray>,
-    numPatternsToTest: Int): Int {
+    numPatternsToTest: Int
+): Int {
 
     config.applyReset()
     config.applyLearningRate(1.0 / numPatternsToTest)
@@ -140,7 +141,10 @@ fun ControlPanelKt.createHopfieldTestPane(
 
     val patternTestConfig = PatternTestOptions(isDiscreteHopfield)
     fun numTestPatterns(): Int = (patternTestConfig.percentToTest / 100 * config.hopfield.size).toInt()
-    val allPatterns = (0 until numTestPatterns()).map {
+
+    // When the panel is created a specific set of patterns is created so that runs of all tests for any percentage of patterns
+    // should produce determinate results
+    val allPatterns = (0 until   config.hopfield.size).map {
         applyRandomPattern(config.hopfield)
     }
 

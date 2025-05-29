@@ -304,6 +304,7 @@ val isopodSim = newSim {
             # Introduction
             The Braitenberg Isopod Simulation explores the reactive behaviors in agent, the isopod, from sensorimotor connections. The isopod reacts to its environment, the fish stimuli, based on connections between its sensors and actuators. The sensors detect the stimuli, which determine the strength and direction of movement, and the actuators control the actual movement of the vehicles.
             
+            The graphs are showing multiple trials where we place the isopod in the center of the world, let it go, and see what it does. Each trial can either terminate in it obtaining food, hitting a wall, or the max trials running out. The bias controls its speed in these sims (prob something to change)  and so generally these guys aren’t finding the food, which is in the four corners.
             # What to Do
             1. Click "Run one trial" to see how the isopod reacts to its environment. One trial of this simulation consists of the isopod moving in the "empty.tmx" window, as it moves towards the fish. The trial ends either when the isopod reaches the bounds of the window or the fish.
             2. The weights in the "Network" window changes according to the isopod's actions. 

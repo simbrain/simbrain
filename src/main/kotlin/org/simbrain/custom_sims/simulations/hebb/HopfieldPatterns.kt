@@ -34,6 +34,8 @@ val hopfieldPatterns = newSim {
             This demo allows you to study [Hopfield networks](https://en.wikipedia.org/wiki/Hopfield_network), which are recurent networks often used for pattern recognition and to model memory retrieval. 
             
             In this simulation you can compare how patterns that overlap more or less to see how many you get it to to learn, based on their correlations.
+            
+            For a more systematic approach to testing memory retrieval, try the `Discrete Hopfield` or `Continuous Hopfield` simulations, which has more features. 
 
             # Training on One pattern         
             

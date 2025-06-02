@@ -148,7 +148,8 @@ val pursuer = newSim {
     }
     
     // Add documentation sidebar
-    addSidebarInfo("""
+    addSidebarInfo(
+        """
         # Pursuer
 
         This simulation is similar to the avoider simulation relating to [Braitenberg vehicles](http://en.wikipedia.org/wiki/Braitenberg_vehicle). Braitenbeg vehicles are simple agents that move around in response to environmental stimuli. 
@@ -162,12 +163,18 @@ val pursuer = newSim {
         
         Move the cheese around and watch the mouse chase it. Take note of the activity of the neurons in the nework window. Press the stop button to stop the network from running.
 
-        ### Reference
-        Braitenberg, V. (1986). [Vehicles: Experiments in synthetic psychology](http://www1.appstate.edu/~kms/classes/psy5150/Documents/Braitenberg1984.pdf). MIT press.
+        ### References
+        
+        1) Braitenberg, V. (1986). [_Vehicles: Experiments in synthetic psychology_](https://mitpress.mit.edu/9780262521123/vehicles/). MIT press.
+            
+        2) Hotton, S., & Yoshimi, J. (2024). [_The Open Dynamics of Braitenberg Vehicles_](https://mitpress.mit.edu/9780262548199/the-open-dynamics-of-braitenberg-vehicles/). MIT Press.
 
         ### Credits
+        
         Jeff Yoshimi and Saraching Chao.
-    """.trimIndent())
+        
+        """.trimIndent()
+    )
     
     // GUI layout
     withGui {

@@ -174,7 +174,8 @@ val avoider = newSim {
     }
     
     // Add documentation sidebar
-    addSidebarInfo("""
+    addSidebarInfo(
+        """
         # Avoider
 
         [Braitenberg vehicles](http://en.wikipedia.org/wiki/Braitenberg_vehicle) are simple agents that move around in response to environmental stimuli. This simulation will demonstrate movement similar to vehicle 2a (the "coward" vehicle) from Braitenberg's book, "Vehicles: Experiments in Synthetic Psychology," which can be downloaded from the link below.
@@ -185,12 +186,18 @@ val avoider = newSim {
         ## Relation to Braitenberg
         Note the connections are not the same as in Braitenberg's book. The mouse agent (vehicle) will orient to the left if its right sensor is activiated by a source on its right, moving away from the source, and if it senses a source on its left, the mouse will orient to the right and away from the source.
 
-        ## Reference
-        Braitenberg, V. (1986). [Vehicles: Experiments in synthetic psychology](http://www1.appstate.edu/~kms/classes/psy5150/Documents/Braitenberg1984.pdf). MIT press.
+        ### References
+        
+        1) Braitenberg, V. (1986). [_Vehicles: Experiments in synthetic psychology_](https://mitpress.mit.edu/9780262521123/vehicles/). MIT press.
+            
+        2) Hotton, S., & Yoshimi, J. (2024). [_The Open Dynamics of Braitenberg Vehicles_](https://mitpress.mit.edu/9780262548199/the-open-dynamics-of-braitenberg-vehicles/). MIT Press.
 
-        ## Credits
+        ### Credits
+        
         Jeff Yoshimi and Saraching Chao.
-    """.trimIndent())
+        
+        """.trimIndent()
+    )
     
     // GUI layout
     withGui {

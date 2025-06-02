@@ -148,6 +148,26 @@ val braitenbergGame = newSim {
         }
     }
 
+    addSidebarInfo(
+    """ 
+            
+    # Braitenberg Game
+        
+    Work in progress.        
+
+    ### References
+        
+    1) Braitenberg, V. (1986). [_Vehicles: Experiments in synthetic psychology_](https://mitpress.mit.edu/9780262521123/vehicles/). MIT press.
+            
+    2) Hotton, S., & Yoshimi, J. (2024). [_The Open Dynamics of Braitenberg Vehicles_](https://mitpress.mit.edu/9780262548199/the-open-dynamics-of-braitenberg-vehicles/). MIT Press.
+            
+    ### Credits
+            
+    ...
+            
+    """.trimIndent()
+    )
+
 }
 
 

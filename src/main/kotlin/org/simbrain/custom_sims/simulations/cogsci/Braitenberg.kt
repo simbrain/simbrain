@@ -179,58 +179,63 @@ val braitenbergSim = newSim {
     addSidebarInfo(
         """ 
             
-            # Braitenberg Vehicles
+        # Braitenberg Vehicles
 
-            This simulation accompanies the book *The Open Dynamics of Braitenberg Vehicles*, MIT Press, 2023, by Scott Hotton and Jeff Yoshimi.
+        This simulation accompanies the book *The Open Dynamics of Braitenberg Vehicles*, MIT Press, 2023, by Scott Hotton and Jeff Yoshimi.
 
-            In this simulation, you can set the weights of two Braitenberg vehicles and observe the resulting behavior. By using the sample parameters below, you can produce revolving behaviors (where the two vehicles revolve around each other), translating behaviors (where they move alongside one another), and various types of "meandering" behaviors where they spin while they revolve around each other or travel side by side. Other behaviors are possible, many of which are described in the book.
+        In this simulation, you can set the weights of two Braitenberg vehicles and observe the resulting behavior. By using the sample parameters below, you can produce revolving behaviors (where the two vehicles revolve around each other), translating behaviors (where they move alongside one another), and various types of "meandering" behaviors where they spin while they revolve around each other or travel side by side. Other behaviors are possible, many of which are described in the book.
+        
+        The simulation explores the reactive behaviors in agents, the vehicles, from sensorimotor connections. The vehicles reacts to their environment, based on connections between its sensors and actuators. The sensors detect the stimuli, which determine the strength and direction of movement, and the actuators control the actual movement of the vehicles.
             
-            The simulation explores the reactive behaviors in agents, the vehicles, from sensorimotor connections. The vehicles reacts to their environment, based on connections between its sensors and actuators. The sensors detect the stimuli, which determine the strength and direction of movement, and the actuators control the actual movement of the vehicles.
-                
-            The simulation shows two vehicles, Vehicle 1 and Vehicle 2. You can set the properties of the vehicles directly in the network windows, as with any Simbrain simulation, although this simulation is designed to make it easy for you to reproduce the behaviors described in the book.
+        The simulation shows two vehicles, Vehicle 1 and Vehicle 2. You can set the properties of the vehicles directly in the network windows, as with any Simbrain simulation, although this simulation is designed to make it easy for you to reproduce the behaviors described in the book.
 
-            In general, set the weights directly or with the button panel, press the play button, and watch the vehicles go! If they move too far away from each other, you can grab them and pull them next to each other.
+        In general, set the weights directly or with the button panel, press the play button, and watch the vehicles go! If they move too far away from each other, you can grab them and pull them next to each other.
 
-            # What to Do (First Pass)
+        # What to Do (First Pass)
+        
+        1. "Run workspace" on the top menu bar to see how the vehicles reacts to its environment. 
+        2. Edit the "Left weight", "Right weight", and the "Velocity" to see how the vehicles adapt to the change.
+            - The vehicles react to these changes, and react to each other's changes based off their sensor motors. 
+        3. The weights in the "Network" window changes according to the isopod's actions. 
+            - The "Circle (L)" and "Circle (R)" weights are the inputs that detect the stimuli in the environment of the "empty.tmx" window.
+            - The "Left", "Straight", and "Right" weights are the outputs of the isopod's motor actions. 
+            - The magnitude of the weights indicate the strength of the connection and influence the output has on the vehicle's actions, with a higher weight increasing the likelihood and intensity of the action.
+        3. Click "Same pair", "Reversed pair", and "Opposite pair" to observe the vehicles' behaviors. The vehicles move towards the other's positive sensor motors.
+            - in "Same pair", the vehicles have the same weight connections between their inputs and outputs, causing them to move in a circle.
+            - in "Reversed pair", the vehicles have the same weight connections on opposite outputs, causing them to move alongside to each other.
+            - in "Opposite pair", one vehicle has positive weight connections, while the other has negative weight connections, causing them to repel each other.
+        
+        ## The Button Panel
+        
+        The button panel contains two fields labeled **"left weight"** and **"right weight"** where you can set the weights of the two vehicles, using one of the three buttons described below. In general, pairs of positive weights create pursuers, and pairs of negative weights create avoiders. The buttons work as follows:
+        
+        - **Same pair**: Takes the left and right weights in those text fields and copies them to both vehicles. Thus, the two vehicles have the same pair of weights. This is a point in what we call \(W_{same}\) in the book. These vehicles can pursue each other in circles or in meanders.
+        - **Reversed pair**: Takes the left and right weights and applies them directly to Vehicle 1, and in reverse order to Vehicle 2. Thus, we have a pair of vehicles with reversed weights. Example: Vehicle 1 has weights (100, 50) and Vehicle 2 has weights (50, 100). This is a point in what we call \(W_{rev}\) in the book. These vehicles can move side by side, sometimes while meandering or counter-rotating.
+        - **Opposite pair**: Takes the left and right weights and applies them directly to Vehicle 1, then multiplies each by -1 and applies these "opposite" values to Vehicle 2. This produces a pair of vehicles with opposite weights. These form pursuer-avoider pairs.
+        
+        # Example Behaviors
+        
+        Enter the values below in the left weight and right weight fields, press the button indicated, and press run to see the corresponding behavior.
+        
+        - **(100, 50)** and **Same pair**: Revolving behavior (attracting revolving type relative equilibrium).
+        - **(100, 80)** and **Same pair**: Revolving meander (attracting relative periodic orbit).
+        - **(100, 50)** and **Reversed pair**: Side by side behavior (attracting translating type relative equilibrium).
+        - **(20, 25)** and **Reversed pair**: Side by side meander (attracting translating type relative periodic orbit).
+        - **(100, 50)** and **Opposite pair**: Pursuer-avoider behavior.
+        
+        # Bifurcations
+        You can see several bifurcations by setting the **left weight** to 100 and then varying the **right weight** (each time you change the number, press **Same pair** and run the simulation to get a feel for what happens). You can start at 75 and slowly raise the value past 80, and then past 100. The Hopf-like bifurcation occurs around 80, and at 100 we pass through \(W_{eq}\) (equal weights) and the vehicles change direction. Other behaviors from the book can be observed; for example, around 76, we see "billiard-like" behaviors.
+        
+       ### References
+    
+        1) Braitenberg, V. (1986). [_Vehicles: Experiments in synthetic psychology_](https://mitpress.mit.edu/9780262521123/vehicles/). MIT press.
+        
+        2) Hotton, S., & Yoshimi, J. (2024). [_The Open Dynamics of Braitenberg Vehicles_](https://mitpress.mit.edu/9780262548199/the-open-dynamics-of-braitenberg-vehicles/). MIT Press.
+        
+        ### Credits
+        
+        [Jeff Yoshimi](https://jeffyoshimi.net/index.html) and Jasmine Lau.
             
-            1. "Run workspace" on the top menu bar to see how the vehicles reacts to its environment. 
-            2. Edit the "Left weight", "Right weight", and the "Velocity" to see how the vehicles adapt to the change.
-                - The vehicles react to these changes, and react to each other's changes based off their sensor motors. 
-            3. The weights in the "Network" window changes according to the isopod's actions. 
-                - The "Circle (L)" and "Circle (R)" weights are the inputs that detect the stimuli in the environment of the "empty.tmx" window.
-                - The "Left", "Straight", and "Right" weights are the outputs of the isopod's motor actions. 
-                - The magnitude of the weights indicate the strength of the connection and influence the output has on the vehicle's actions, with a higher weight increasing the likelihood and intensity of the action.
-            3. Click "Same pair", "Reversed pair", and "Opposite pair" to observe the vehicles' behaviors. The vehicles move towards the other's positive sensor motors.
-                - in "Same pair", the vehicles have the same weight connections between their inputs and outputs, causing them to move in a circle.
-                - in "Reversed pair", the vehicles have the same weight connections on opposite outputs, causing them to move alongside to each other.
-                - in "Opposite pair", one vehicle has positive weight connections, while the other has negative weight connections, causing them to repel each other.
-            
-            ## The Button Panel
-            
-            The button panel contains two fields labeled **"left weight"** and **"right weight"** where you can set the weights of the two vehicles, using one of the three buttons described below. In general, pairs of positive weights create pursuers, and pairs of negative weights create avoiders. The buttons work as follows:
-            
-            - **Same pair**: Takes the left and right weights in those text fields and copies them to both vehicles. Thus, the two vehicles have the same pair of weights. This is a point in what we call \(W_{same}\) in the book. These vehicles can pursue each other in circles or in meanders.
-            - **Reversed pair**: Takes the left and right weights and applies them directly to Vehicle 1, and in reverse order to Vehicle 2. Thus, we have a pair of vehicles with reversed weights. Example: Vehicle 1 has weights (100, 50) and Vehicle 2 has weights (50, 100). This is a point in what we call \(W_{rev}\) in the book. These vehicles can move side by side, sometimes while meandering or counter-rotating.
-            - **Opposite pair**: Takes the left and right weights and applies them directly to Vehicle 1, then multiplies each by -1 and applies these "opposite" values to Vehicle 2. This produces a pair of vehicles with opposite weights. These form pursuer-avoider pairs.
-            
-            # Example Behaviors
-            
-            Enter the values below in the left weight and right weight fields, press the button indicated, and press run to see the corresponding behavior.
-            
-            - **(100, 50)** and **Same pair**: Revolving behavior (attracting revolving type relative equilibrium).
-            - **(100, 80)** and **Same pair**: Revolving meander (attracting relative periodic orbit).
-            - **(100, 50)** and **Reversed pair**: Side by side behavior (attracting translating type relative equilibrium).
-            - **(20, 25)** and **Reversed pair**: Side by side meander (attracting translating type relative periodic orbit).
-            - **(100, 50)** and **Opposite pair**: Pursuer-avoider behavior.
-            
-            # Bifurcations
-            You can see several bifurcations by setting the **left weight** to 100 and then varying the **right weight** (each time you change the number, press **Same pair** and run the simulation to get a feel for what happens). You can start at 75 and slowly raise the value past 80, and then past 100. The Hopf-like bifurcation occurs around 80, and at 100 we pass through \(W_{eq}\) (equal weights) and the vehicles change direction. Other behaviors from the book can be observed; for example, around 76, we see "billiard-like" behaviors.
-            
-            
-            
-            
-            
-
         """.trimIndent()
     )
 

@@ -66,44 +66,59 @@ public class EdgeOfChaos extends Simulation {
         sim.couple(reservoir, pc);
 
         sim.addSidebarInfo(
-"""
-        # Introduction
-        
-        This is simulation is an experimental study of how representations work when a network is in different dynamic regimes. See the `Edge Of Chaos
-        bitstream` simulation to learn more about the different three different types of dynamical regimes: `chaos`, `edge of chaos`, `ordered`. The main goal of
-        this simulation, similar to the other `Edge Of Chaos` simulation, is to find the edge of chaos and see the effects of the reservoir network on an agent's
-        representation of an object. Please note, we have not finished studying this network so if you find any patterns or structure, let us know!
-        
-        ## Simulation Details
-        
-        In this simulation, a reservoir network is connected to an agent that exists in the 2D environment. In the 2D environment, there is two different
-        groups of objects, flowers and cheeses. There are three different types of each object that will be utilized to interact with the agent. In principle,
-        the three types have similar representations due to similarities in their structure. The object groups (i.e., cheese or flower) would project to different
-        parts of the network. The objects would be moved to the agent and the object would be represented in a PCA plot as points where we can infer similarities 
-        or differences between objects. Similarities and differences can be inferred from the position of the object's representation in the PCA plot.
-         
-        # What To Do
-        
-        In this simulation, the only configuration to the simulation is the `weight stdev`. To find each state, follow the steps below.
-        
-        1) Change the `weight stdev` value and press the `update` button to change the reservoir's responses to the object, which will be shown in the PCA plot.
-                        
-        2) Start the simulation by clicking on the `play` button in the top-left corner.
-        
-        3) Click on the `cursor` icon, drag one of the six objects to the agent.
-        
-        4) Observe changes in the reservoir's representation in the PCA plot.   
-        
-        5) To `reset` the simulation, stop the simulation by clicking the `play` button again and press `k`.
-        
-        6) Afterwards, click back on the `cursor` icon, and left-click outside of the reservoirs to unselect all neurons.
- 
-        ## Observing The Representations Of The Objects
-        
-        To observe the object's representation in the network, delete the recurrent connections (the recurrent synapses) by
-        clicking on it and backspace. Then run the simulation and repeat steps 2 to 6.
+                """
+                        # Embodied Edge of Chaos
+                                
+                        This simulation is an experimental study of how representations in a reservoir network are effected in different dynamic regimes: chaos, `edge of chaos`, and `ordered`. This simulation
+                        builds upon the work in the `Edge of Chaos bitstream` simulation, specifically, the work of Nils Bertschinger and Thomas Natschl\u00E4ger, _Real-time computation at the edge of chaos in
+                        recurrent neural networks_ [[1](https://doi.org/10.1162/089976604323057443)]. For an in-depth description and illustration of the different dynamical regimes, refer to the `Edge of Chaos bitstream` simulation. 
+                        The main goal of this simulation, similar to the other `Edge Of Chaos` simulation, is to find the edge of chaos and visualize its effects on an agent's representation of an object. Please note,
+                        we have not finished studying this network so if you find any patterns or structure, let us know!
+                                
+                        ## Simulation Details
+                                
+                        This simulation models how an agent visually represents an object that exists in an environment (i.e., in the odor world) using a reservoir network. In the odor world, there are 
+                        two different groups of objects: flowers and cheeses. There are three different "species" in each group that will be utilized to interact with the agent. In principle,
+                        the objects in each group have similar representations with one another due to similarities in their structure. The object groups (i.e., cheese or flower) are
+                        projected to different locations in the state space if the reservoir is not in a chaotic state. To visualize this, the objects are moved on top of the agent where they are
+                        represented in a PCA plot as points. The PCA plot tracks the agent's representation of the objects using a decaying color scheme. It uses the [coloring manager](https://docs.simbrain.net/docs/plots/projectionPlot.html#coloring-manager) 
+                        to make the states of the reservoir more red if they are closer to the real-time timestep, and they become more transparent as the simulation runs (moving away from the 
+                        real-time timestep).
+                         
+                        # What To Do
+                                
+                        In this simulation, the only configuration for the simulation is the `weight stdev`. To find each state, follow the steps below.
+                                
+                        1) Change the `weight stdev` value and press the `update` button to change the reservoir's responses to the object, which will be shown in the PCA plot.
+                                        
+                        2) Start the simulation by clicking on the `play` button in the top-left corner.
+                                
+                        3) Click on the `cursor` icon, drag one of the six objects to the agent.
+                                
+                        4) Observe changes in the reservoir's representation in the PCA plot.
+                                
+                            - The flowers and cheeses are all represented similarly with their corresponding group type where, their representations branch into two different state spaces in the
+                            PCA plot (looks like a pair of "wings"). If the weight stdev is very high (i.e., in the chaos state), the state space will become blurred with representations all over the place. If
+                            the weight stdev is very low (i.e., in the ordered state), the state space collapses to a few points in the state space.
+                                
+                        5) To `reset` the simulation, stop the simulation by clicking the `play` button again and press `k`. Then clear all points in the PCA plot by clicking on the `clear` button.
+                                
+                        6) Afterwards, click back on the `cursor` button, and left-click outside of the reservoirs to unselect all neurons.
+                         
+                        ## Observing The Representations Of The Objects
+                                
+                        To observe the object's representation in the network, delete the recurrent connections (the recurrent synapses) by
+                        clicking on them and pressing backspace. Then run the simulation and repeat steps 2 to 6.
+                                
+                        ### References
+                                
+                        1) Bertschinger, N., & Natschl\u00E4ger, T. (2004). [Real-Time Computation at the Edge of Chaos in Recurrent Neural Networks](https://doi.org/10.1162/089976604323057443). _Neural Computation_, _16_(7), 1413\u20131436.
+                                
+                        ### Credits
+                                
+                        [Jeff Yoshimi](https://jeffyoshimi.net/index.html) and Kanly Thao.
 
-        """, true);
+                        """, true);
 
         // Odor world sim
         buildOdorWorld();

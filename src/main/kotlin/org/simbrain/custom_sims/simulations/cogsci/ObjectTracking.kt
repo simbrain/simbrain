@@ -3,12 +3,14 @@ package org.simbrain.custom_sims.simulations
 import kotlinx.coroutines.awaitAll
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.Sparse
-import org.simbrain.network.core.*
+import org.simbrain.network.core.Network
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.NeuronCollection
+import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.updaterules.AllostaticUpdateRule
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.util.EmptyScalarData
-import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.network.util.SpikingScalarData
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.StepDecayFunction
@@ -17,7 +19,6 @@ import org.simbrain.workspace.updater.updateAction
 import org.simbrain.world.odorworld.OdorWorldComponent
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.sensors.ObjectSensor
-import java.lang.Double.max
 import javax.swing.JTextField
 import kotlin.math.cos
 import kotlin.math.sin
@@ -260,51 +261,60 @@ val objectTrackingSim = newSim {
 
     addSidebarInfo(
         """
-        # Introduction
+        # Object Tracking Reservoir
         
-        This simulation, in principle, builds upon the theoretical foundations that are mentioned in the `Edge of Chaos bitstream` simulation. 
-        
-        This is a simulation of an agent learning how to track an object using a reservoir network. The simulation consists of two sensory neuron groups, two effector 
-        nodes (e.g., left or, right turn), a reservoir network, and an odor world with an object (e.g., cheese) and the agent in it. The input activations are outputted into 
-        the reservoir network where the reservoir network processes the pattern and learns how to track the object. 
+        This is one of the models presented in the paper, *A potential mechanism for Gibsonian resonance: behavioral entrainment emerges from local homeostasis 
+        in an unsupervised reservoir network* [[1](https://doi.org/10.1007/s11571-023-09988-2), [2](https://doi.org/10.31234/osf.io/pt7bn)]. This simulation simulates an agent 
+        learning how to visually track an object using a reservoir network. 
         
         ## Simulation Details
         
-        The reservoir network uses an [**unsupervised allostatic learning rule**](https://sciencedirect.com/science/article/pii/S0006899321004352?via%3Dihub) developed by Ben 
-        Falandays. The unsupervised allostatic learning rule allows the reservoir network to adapt and adjust its weights accordingly to the movement of cheese (i.e., 
-        the activation values received from sensing the cheese). Through this process, the network learns to anticipate the cheese's movement correctly in order to stabilize 
-        the network's input arrays. Through this stabilization phase, the network activity will also be stabilized. Sometimes, the agent can break out of this stable state
-        as a result of the object changing directions. And this process repeats. 
+        The reservoir network uses an **unsupervised allostatic learning rule** that Ben Falandays and his colleagues developed [[3](https://doi.org/10.1016/j.brainres.2021.147578)]. 
+        The unsupervised allostatic learning rule allows the reservoir network to adapt and adjust its weights in response to the movement of the cheese (i.e., the activation values received 
+        from sensing the cheese). Through this process, the agent learns to accurately anticipate the cheese's movement in order to stabilize its sensory neuron inputs (i.e., left and right).
+        In addition, the agent's learned representations of the cheese's movement also stabilize. When the agent's representations become stable, it stops developing new representations.
+        But sometimes, the agent can break out of this stable state as a result of the object moving in the opposite direction. When this occurs, the agent generates new, unique representations
+        of the object's movement on the fly for a given rotational direction, never reusing its pre-existing representations, creating no stable permanent representations. This transition
+        from stabilization to destabilization is considered as a **representational drift** [[4](https://pmc.ncbi.nlm.nih.gov/articles/PMC7385530/)]. This cycle of stabilization to destabilization
+        creates an illustration of how an agent can behave consistently to its learned information and how its behavior can adapt in response to new ongoing changes in neural activity
+        (i.e., new incoming information).
         
-        The agent's ability to track the cheese is not pre-built in the agent (i.e., it is not being told to track the object), rather, this ability emerges from the dynamics 
-        within the network. When the agent tracks the object, the entire agent-environment system falls into stable, attracting states that corresponds to states where the 
-        object stays in front of the object.
-        
-        ## Connection with Representational Drift
-        
-        When the network activity becomes stable, it stops developing new activation patterns. Sometimes, the agent breaks out of its stable state as a result of the object
-        moving into a opposite direction. When this occurs, the agent will not utilize its pre-existing representation of the object's movement. It instead develops new 
-        representations (i.e., patterns) of the object's movement. The developed representation is always new, so there is no stable permanent representation. It is always 
-        coming up with new representation on the fly for a given rotational direction. This shift in network activity is [**representational drift**](https://pmc.ncbi.nlm.nih.gov/articles/PMC7385530/).
+        Note that the agent's ability to track the cheese is not pre-built in the agent (i.e., it is not being told to track the object). Instead, it emerges from the dynamics within the reservoir network.
         
         # What to Do
         
-        In this simulation, the only configurations are `Number of iterations` and `Record spikes`. Before explaining the utilization of the configurations, this is the general
-        method that you can utilize this simulation:
+        In this simulation, the only configurations are `Number of iterations` and `Record spikes`. Before explaining the utilization of these configurations, to explore this simulation:
         
         1) Run the simulation.
         
-        2) While it runs, look at the reservoir network. To observe its network activity (i.e., state): right-click the reservoir network, click on `plot`, and click on `projection 
-        plot`. 
+        2) While it runs, look at the reservoir network. To observe its state: right-click the `Reservoir` group tag → `plot` → `projection plot`. 
         
-        3) Observe the agent's behavior in correspondence to the reservoir network's activity.
+            - In this projection plot, each point represents a unique reservoir state; as the object moves in one direction, its representations stabilize, where the activation will alternate
+            between the pre-existing states. Once the object changes directions, the reservoir's representations destabilize and it re-generates new states for the new pattern of movement.
+            This transition illustrates representational drift.
+         
+        3) Observe the agent's behavior in correspondence to the reservoir network's representations in the PCA plot.
         
         ## Conducting Research With The Object Tracking Simulation
          
-        The other method to utilize this simulation is using it to conduct research. The `Number of iterations` is the number of timesteps before the reservoir network's activation 
-        is saved into an Excel spreadsheet. If you also want to record the activation spikes that occurs in the reservoir network, check the `Record spikes` box. After saving the data,
-        you can analyze the data. For example, analyzing when representational drift happens and when it happens. When doing this, you can also analyze how changes in the [simulation code](https://docs.simbrain.net/docs/simulations/)
-        can affect the agent's learning performance like changing the learning rate or, the synaptic weight values.
+        Using the configurations, you can utilize this simulation to conduct research. The `Number of iterations` is the number of timesteps before the reservoir network's activation 
+        is saved into an Excel spreadsheet. If you also want to record the activation spikes that occur in the reservoir network, check the `Record spikes` box. After saving the data,
+        you can analyze the data. For example, analyzing when representational drift happens and how often it occurs. When doing this, you can also analyze how changes in the [simulation 
+        code](https://docs.simbrain.net/docs/simulations/) can affect the agent's behaviors like changing the learning rate or the synaptic weight values.
+        
+        ### References
+        
+        1) Falandays, J. B., Yoshimi, J., Warren, W., & Spivey, M. J. (2023). [A potential mechanism for Gibsonian resonance: behavioral entrainment emerges from local homeostasis in an unsupervised reservoir network](https://doi.org/10.1007/s11571-023-09988-2). _Cognitive Neurodynamics_, _18_(4), 1811–1834. 
+        
+        2) Falandays, J. B., Yoshimi, J., Warren, W., & Spivey, M. J. (2023, February 2). [A Potential Mechanism for Gibsonian Resonance: Behavioral Entrainment Emerges from Local Homeostasis in an Unsupervised Reservoir Network](https://doi.org/10.31234/osf.io/pt7bn). Preprint.
+        
+        3) Falandays, J. B., Nguyen, B., & Spivey, M. J. (2021). [Is prediction nothing more than multi-scale pattern completion of the future?](https://doi.org/10.1016/j.brainres.2021.147578) _Brain Research_, _1768_, 147578. 
+         
+        4)  Rule, M. E., O'Leary, T., & Harvey, C. D. (2019). [Causes and consequences of representational drift](https://pmc.ncbi.nlm.nih.gov/articles/PMC7385530/). _Current opinion in neurobiology_, _58_, 141–147.
+        
+        ### Credits
+        
+        [Jeff Yoshimi](https://jeffyoshimi.net/index.html) and Kanly Thao.
         
         """.trimIndent()
     )

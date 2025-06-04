@@ -45,6 +45,6 @@ class HopfieldNode(networkPanel: NetworkPanel, val hopfieldNet: Hopfield)
         }
 
     override val propertyDialog: StandardDialog
-        get() = hopfieldNet.createEditorDialog("Edit Hopfield Network")
+        get() = with(networkPanel) {hopfieldNet.makeTrainerPanel()}
 
 }

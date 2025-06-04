@@ -19,13 +19,10 @@
 package org.simbrain.network.gui.nodes.subnetworkNodes
 
 import org.simbrain.network.gui.NetworkPanel
-import org.simbrain.network.gui.dialogs.createTrainOnPatternAction
-import org.simbrain.network.gui.dialogs.getUnsupervisedTrainingPanel
 import org.simbrain.network.gui.dialogs.makeTrainerPanel
 import org.simbrain.network.gui.nodes.SubnetworkNode
 import org.simbrain.network.subnetworks.SOMNetwork
 import org.simbrain.util.StandardDialog
-import org.simbrain.util.createAction
 import org.simbrain.workspace.gui.CouplingMenu
 import javax.swing.JPopupMenu
 

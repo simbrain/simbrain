@@ -139,7 +139,7 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
 
         title = "Train Network"
 
-        print("unsupervisedNetwork: $unsupervisedNetwork")
+        //print("unsupervisedNetwork: $unsupervisedNetwork")
 
         val mainPanel = JPanel().apply {
             layout = MigLayout("gap 0px 0px, ins 0")
@@ -197,12 +197,13 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         runControls.add(JButton(stepAction))
 
         val resetAction = createAction(
-            name = "Reset",
-            description = "Reset iteration and randomize network",
-            iconPath = "menu_icons/Reset.png",
+            name = "Randomize",
+            description = "Randomize network and reset interations",
+            iconPath = "menu_icons/Rand.png",
         ) {
             unsupervisedNetwork.randomize()
             trainer.iteration = 0
+            trainer.events.progressUpdated.fire("Iteration" to trainer.iteration)
         }
         val resetButton = JButton(resetAction)
         resetButton.hideActionText = true
@@ -219,12 +220,8 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
 
         runControls.layout = MigLayout("gap 0px 0px, ins 0")
 
-        val trainOnCurrentPatternButton = JButton(with(network) { unsupervisedNetwork.createTrainOnPatternAction()})
-        trainOnCurrentPatternButton.hideActionText = true
-        runControls.add(trainOnCurrentPatternButton)
-
         val preferencesButton = JButton(createAction(
-            name = "Preferences",
+            name = "Trainer properties",
             description = "Edit trainer preferences",
             iconPath = "menu_icons/Tools.png",
         ) {
@@ -232,7 +229,9 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         })
         runControls.add(preferencesButton)
 
+        mainPanel.add(JLabel("Training tools"), "gapy 0px 10px, wrap")
         mainPanel.add(runControls, "wrap")
+        mainPanel.add(JSeparator(),  "growx, span, wrap, gapy 10px 10px")
 
         // Run training algorithm
         val inputData = JPanel()
@@ -250,12 +249,12 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         )
         inputs.toolbar.add(advanceRowCheckbox)
         inputData.add(inputs)
+        mainPanel.add(JLabel("Testing tools"), "gapy 0px 10px, wrap")
         mainPanel.add(inputData)
 
         contentPane = mainPanel
     }
 }
-
 
 context(NetworkPanel)
 fun UnsupervisedNetwork.makeTrainerPanel(): StandardDialog = getUnsupervisedTrainingPanel(this) {

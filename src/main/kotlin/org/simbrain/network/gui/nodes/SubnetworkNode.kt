@@ -140,7 +140,7 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
         add(createAction("Train...") {
             getUnsupervisedTrainingPanel(net) {
                 net.trainOnCurrentPattern()
-            }
+            }.display()
         })
         add(with(networkPanel.network) { net.createTrainOnPatternAction() })
         addSeparator()

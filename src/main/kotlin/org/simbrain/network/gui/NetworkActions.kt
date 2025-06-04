@@ -262,8 +262,8 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     }
 
     val selectionEditModeAction = networkPanel.createAction(
-        name = "Selection",
-        description = "Selection mode",
+        name = "Select",
+        description = "Select",
         iconPath = "menu_icons/Arrow.png"
     ) {
         networkPanel.mouseCursor = MouseEventHandler.MouseCursor.Selection
@@ -354,11 +354,11 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         spaceVertical()
     }
 
-    fun List<Neuron>.createCoupleActivationToTimeSeriesAction() = SimbrainDesktop.actionManager.createCoupledTimeSeriesPlotAction(
+    fun List<Neuron>.createCoupleActivationToTimeSeriesAction() = actionManager.createCoupledTimeSeriesPlotAction(
         producers = map { it.getProducer(Neuron::activation) },
     )
 
-    fun List<Synapse>.createCoupleWeightToTimeSeriesAction() = SimbrainDesktop.actionManager.createCoupledTimeSeriesPlotAction(
+    fun List<Synapse>.createCoupleWeightToTimeSeriesAction() = actionManager.createCoupledTimeSeriesPlotAction(
         producers = map { it.getProducer(Synapse::strength) },
     )
 
@@ -372,9 +372,9 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     }
 
     val wandEditModeAction = networkPanel.createAction(
-        name = "Wand",
-        description = "Wand Mode (I)",
-        iconPath = "menu_icons/Wand.png",
+        name = "Activate",
+        description = "Activate nodes",
+        iconPath = "menu_icons/ActivationTool.png",
         keyboardShortcut = KeyCombination('I')
     ) {
         networkPanel.mouseCursor = MouseEventHandler.MouseCursor.Wand
@@ -382,7 +382,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 
     val panEditModeAction = networkPanel.createAction(
         name = "Pan",
-        description = "Pan Mode",
+        description = "Pan",
         iconPath = "menu_icons/Hand.png"
     ) {
         networkPanel.mouseCursor = MouseEventHandler.MouseCursor.Pan

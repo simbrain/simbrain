@@ -52,7 +52,6 @@ class UnsupervisedTrainer: EditableObject {
         initValue = 1000
     )
 
-
     @UserParameter("Learning Rate")
     var learningRate = .01
 
@@ -94,4 +93,7 @@ class UnsupervisedTrainer: EditableObject {
         this.maxIterations = other.maxIterations
         this.learningRate = other.learningRate
     }
+
+    override val name: String
+        get() = "Unsupervised Trainer"
 }

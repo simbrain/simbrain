@@ -248,8 +248,40 @@ val actorCritic = newSim {
     workspace.updater.updateManager.addAction(UpdateCoupling(errorPlot))
 
     // Doc viewer
-    val docViewer = addDocViewerFromFile("Information", "ActorCritic.html")
-    docViewer.events.componentMinimized.fire(true)
+    addSidebarInfo(
+        """
+    # Actor Critic model
+
+    Based on Richard Sutton (1996), *Generalization in Reinforcement Learning: Successful Examples Using Sparse Coarse Coding*. Simbrain implementation by Jeff Yoshimi and Jonathon Vickrey.
+
+    ## Getting started
+
+    A model which learns the location of rewarding stimuli. Do a few runs through 5 trials using the "run" button on the control panel. Using default values, the rat should figure out how to get the cheese.
+
+    ## Parameters and what they mean
+
+    **Epsilon**: Probability of taking a random action. 0 for no random actions; 1 for all random actions. [Doya, 2007](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2645553/) suggests this may be related to noradrenaline, which regulates overall arousal.
+
+    **Learning rate**: How much weights are updated at each time step. [Doya, 2007](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2645553/) suggests this may be related to acetylcholine, which regulates some forms of plasticity.
+
+    **Discount Factor (gamma)**: Determines how "future oriented" the agent is. Range is 0–1. A lower gamma makes the agent short-sighted; higher gamma leads to longer-term planning. With gamma near 1, the agent learns to value chains of actions leading to reward.
+
+    Tanaka et al. (2007) relate gamma to serotonin:
+
+    > *The activity of the ventral part of the striatum was correlated with reward prediction at shorter time scales, and this correlated activity was stronger at low serotonin levels. By contrast, the activity of the dorsal part of the striatum was correlated with reward prediction at longer time scales, and this correlated activity was stronger at high serotonin levels.* ([Tanaka et al., 2007](https://www.ncbi.nlm.nih.gov/pubmed/18091999))
+
+    ## Reward, Value, TD Error
+
+    - **Reward (red time series)**: Increases when the agent is on top of the cheese.
+    - **Value (green time series)**: Increases when the agent expects reward.
+    - **TD Error (blue time series)**: Signals mismatch between expected and received reward. Positive error increases value/action weights; negative error decreases them.
+
+    ## Changes in values with learning
+
+    Repeated trials tend to increase value, make reward more frequent, and reduce error. These trends depend on parameter settings.
+    """.trimIndent()
+    )
+
 
     // Lay everything out
     withGui {
@@ -258,9 +290,6 @@ val actorCritic = newSim {
         place(odorWorldComponent, 728, 11, 500, 500)
         place(plot, 729, 599, 519, 293)
         (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).zoomToFitSize(500, 500)
-        place(docViewer) {
-            location = point(0, 0)
-        }
 
         // Control panel
         createControlPanel("RL Controls", 10, 10) {

@@ -45,7 +45,6 @@ fun MatrixDataset.createDataSetPanel(applyAction: suspend DataSetPanel.(selected
 class DataSetPanel(
     val inputDataFrame: SimbrainDataFrame,
     val targetDataFrame: SimbrainDataFrame,
-    val randomizeActionProvider: SimbrainTablePanel.() -> AbstractAction = { table.randomizeAction },
     applyAction: suspend DataSetPanel.(selectedRow: Int) -> Unit
 ): JPanel() {
 
@@ -54,7 +53,7 @@ class DataSetPanel(
     fun SimbrainTablePanel.applyCommonAttributes() {
         addAction(table.importCsv)
         addAction(table.exportCsv())
-        addAction(randomizeActionProvider())
+        addAction(table.randomizeAction)
         addAction(table.showBoxPlotAction)
         addAction(table.showHistogramAction)
         preferredSize = Dimension(400, 250)

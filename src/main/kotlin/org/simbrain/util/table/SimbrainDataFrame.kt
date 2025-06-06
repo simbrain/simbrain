@@ -46,7 +46,7 @@ abstract class SimbrainDataFrame : AbstractTableModel() {
      * Table-wide cell randomizer for arbitrary groups of cells.
      */
     @UserParameter(label = "Table Randomizer")
-    var cellRandomizer = UniformRealDistribution()
+    var cellRandomizer: ProbabilityDistribution = UniformRealDistribution()
 
     /**
      * This can be directly edited, but events must be manually fired. See dataworld.update

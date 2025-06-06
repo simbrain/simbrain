@@ -15,6 +15,8 @@ import org.simbrain.util.StandardDialog
 import org.simbrain.util.display
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.showWarningDialog
+import org.simbrain.util.stats.distributions.TwoValued
+import org.simbrain.util.stats.distributions.UniformIntegerDistribution
 import org.simbrain.util.table.BasicDataFrame
 import javax.swing.*
 
@@ -45,7 +47,13 @@ fun ClassifierNetwork.getTrainingDialog(): StandardDialog {
 
         fun createDataSetPanel(dataSet: ClassificationDataset) = DataSetPanel(
             BasicDataFrame(dataSet.inputs),
-            BasicDataFrame(dataSet.targets.map { listOf(it) }),
+            BasicDataFrame(dataSet.targets.map { listOf(it) }).apply {
+                cellRandomizer = if (classifier is SVMClassifier) {
+                    TwoValued()
+                } else {
+                    UniformIntegerDistribution(0, dataSet.numClasses - 1)
+                }
+            },
             applyAction = {
                 withContext(Dispatchers.Default) {
                     with(network) {

@@ -16,10 +16,7 @@ import org.simbrain.util.display
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.showWarningDialog
 import org.simbrain.util.table.BasicDataFrame
-import javax.swing.JButton
-import javax.swing.JLabel
-import javax.swing.JPanel
-import javax.swing.JSeparator
+import javax.swing.*
 
 /**
  * Classifier training dialog.
@@ -46,9 +43,9 @@ fun ClassifierNetwork.getTrainingDialog(): StandardDialog {
             updateStatsLabel()
         }
 
-        val dataSetPanel = DataSetPanel(
-            BasicDataFrame(classifier.trainingData.inputs),
-            BasicDataFrame(classifier.trainingData.targets.map { listOf(it) }),
+        fun createDataSetPanel(dataSet: ClassificationDataset) = DataSetPanel(
+            BasicDataFrame(dataSet.inputs),
+            BasicDataFrame(dataSet.targets.map { listOf(it) }),
             applyAction = {
                 withContext(Dispatchers.Default) {
                     with(network) {
@@ -61,15 +58,30 @@ fun ClassifierNetwork.getTrainingDialog(): StandardDialog {
             }
         )
 
+        val trainingDataSetPanel = createDataSetPanel(classifier.trainingData)
+        val testingDataSetPanel = createDataSetPanel(classifier.testingData)
+
+        fun DataSetPanel.exportDataSet() = createClassificationDataset(
+            inputs = inputDataFrame.get2DDoubleList().map { it.toMutableList() }.toMutableList(),
+            targets = targetDataFrame.getIntColumn(0).toMutableList()
+        )
+
+        fun syncDataSet() {
+            classifier.trainingData = trainingDataSetPanel.exportDataSet()
+            classifier.testingData = testingDataSetPanel.exportDataSet()
+        }
+
+        val dataSetTabPane = JTabbedPane().apply {
+            addTab("Training Set", trainingDataSetPanel)
+            addTab("Testing Set", testingDataSetPanel)
+        }
+
         // Training Button
         val trainButton = JButton("Train").apply {
             addActionListener {
                 try {
                     classfierProps.commitChanges()
-                    classifier.trainingData = createClassificationDataset(
-                        inputs = dataSetPanel.inputDataFrame.get2DDoubleList().map { it.toMutableList() }.toMutableList(),
-                        targets = dataSetPanel.targetDataFrame.getIntColumn(0).toMutableList()
-                    )
+                    syncDataSet()
                     train()
                 } catch(e: Exception) {
                     showWarningDialog(e.message.toString())
@@ -84,7 +96,7 @@ fun ClassifierNetwork.getTrainingDialog(): StandardDialog {
         }
         contentPane.add(trainButton)
         contentPane.add(statsLabel, "wrap")
-        contentPane.add(dataSetPanel)
+        contentPane.add(dataSetTabPane, "wrap")
     }
 }
 

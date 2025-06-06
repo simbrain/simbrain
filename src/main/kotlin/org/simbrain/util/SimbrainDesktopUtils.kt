@@ -297,7 +297,6 @@ fun SimbrainDesktop.createClassifierProjectionPlot(smileClassifier: ClassifierNe
     }
     val colors = generateColorSequence().take(smileClassifier.outputNeuronGroup.size).toList()
     with(smileClassifier) {
-        train()
         classifier.trainingData.inputs.forEach {
             val vector = it.toDoubleArray()
             val colorIndex = classifier.predict(vector).let { prediction ->

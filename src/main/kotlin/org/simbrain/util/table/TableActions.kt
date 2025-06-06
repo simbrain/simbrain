@@ -171,7 +171,7 @@ fun SimbrainJTable.createShowEigenValuesAction() = createAction(
     iconPath = "menu_icons/lambda.png",
     initBlock = {
         val canShowEigenValues = try {
-            model.get2DDoubleArray(replaceInvalid = 0.0).toColumnVector().eigen()
+            model.get2DDoubleArray(replaceInvalid = 0.0).toMatrix().eigen()
             true
         } catch (e: Exception) {
             //println("Error: ${e.message}")
@@ -180,7 +180,7 @@ fun SimbrainJTable.createShowEigenValuesAction() = createAction(
         isEnabled = canShowEigenValues
     },
 ) {
-    val eigenValues = model.get2DDoubleArray(replaceInvalid = 0.0).toColumnVector().eigenValuesString()
+    val eigenValues = model.get2DDoubleArray(replaceInvalid = 0.0).toMatrix().eigenValuesString()
     JOptionPane.showMessageDialog(
         this,
         "[${eigenValues.joinToString(", ")}]",
@@ -279,7 +279,7 @@ fun SimbrainJTable.importCSVAction(fixedColumns: Boolean = true, skipImportOptio
                     val rawData = Utils.getDoubleMatrix(csvFile).map { l -> l.toTypedArray() }.toTypedArray()
                     val importedData = createFrom2DArray(rawData, options, dataType)
                     if (!fixedColumns || checkColumns(importedData.columnCount)) {
-                        it.data = importedData.data.map { l -> l.map { e -> e as Double }.toDoubleArray() }.toTypedArray().toColumnVector()
+                        it.data = importedData.data.map { l -> l.map { e -> e as Double }.toDoubleArray() }.toTypedArray().toMatrix()
                         it.columnNames = importedData.columnNames
                         it.rowNames = importedData.rowNames
                         it.fireTableStructureChanged()

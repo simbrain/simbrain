@@ -203,7 +203,7 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
             .map { row ->
                 softmaxRow(row)
             }.toTypedArray()
-            .toColumnVector()
+            .toMatrix()
             .let { selfAttention.copyFrom(it) }
 
         attentionOutput.copyFrom(selfAttention.mm(vStack))

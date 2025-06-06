@@ -14,17 +14,54 @@ import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.network.trainers.*
 import org.simbrain.util.*
-import org.simbrain.util.table.MatrixDataFrame
-import org.simbrain.util.table.createApplyAction
+import org.simbrain.util.table.*
 import org.simbrain.util.widgets.ToggleButton
+import smile.math.matrix.Matrix
 import java.awt.Cursor
+import java.awt.Dimension
 import javax.swing.*
 
-class DataSetPanel(val dataSet: MatrixDataset, applyAction: suspend DataSetPanel.(selectedRow: Int) -> Unit, applyAndAdvanceAction: suspend DataSetPanel.(selectedRow: Int) -> Unit): JPanel() {
+fun MatrixDataset.createDataSetPanel(applyAction: suspend DataSetPanel.(selectedRow: Int) -> Unit): DataSetPanel {
+    
+    fun createDataFrame(
+        data: Array<DoubleArray>,
+        rowNames: List<String>?,
+        columnNames: List<String>?
+    ): BasicDataFrame {
+        return BasicDataFrame(
+            data.map { it.toMutableList() as MutableList<Any?> }.toMutableList()
+        ).also { dataFrame ->
+            rowNames?.let { names -> dataFrame.rowNames = names }
+            columnNames?.let { names -> dataFrame.columnNames = names }
+        }.apply {  }
+    }
+    
+    val inputDataFrame = createDataFrame(inputs.toArray(), inputRowNames, inputColumnNames)
+    val targetDataFrame = createDataFrame(targets.toArray(), targetRowNames, targetColumnNames)
+
+    return DataSetPanel(inputDataFrame, targetDataFrame, applyAction = applyAction)
+}
+
+class DataSetPanel(
+    val inputDataFrame: SimbrainDataFrame,
+    val targetDataFrame: SimbrainDataFrame,
+    val randomizeActionProvider: SimbrainTablePanel.() -> AbstractAction = { table.randomizeAction },
+    applyAction: suspend DataSetPanel.(selectedRow: Int) -> Unit
+): JPanel() {
 
     val rowErrorJLabel = JLabel("")
 
-    val inputs = MatrixEditor(dataSet.inputs, dataSet.inputRowNames, dataSet.inputColumnNames).apply {
+    fun SimbrainTablePanel.applyCommonAttributes() {
+        addAction(table.importCsv)
+        addAction(table.exportCsv())
+        addAction(randomizeActionProvider())
+        addAction(table.showBoxPlotAction)
+        addAction(table.showHistogramAction)
+        preferredSize = Dimension(400, 250)
+    }
+
+    val inputs = SimbrainTablePanel(inputDataFrame, false).apply {
+        applyCommonAttributes()
         toolbar.addSeparator()
         val advanceRowCheckbox = JCheckBox("Auto Advance").apply { isSelected = true }
         toolbar.add(
@@ -40,11 +77,9 @@ class DataSetPanel(val dataSet: MatrixDataset, applyAction: suspend DataSetPanel
         toolbar.add(rowErrorJLabel)
     }
 
-    val inputData get() = (inputs.table.model as MatrixDataFrame).data
-
-    val targets = MatrixEditor(dataSet.targets, dataSet.targetRowNames, dataSet.targetColumnNames)
-
-    val targetData get() = (targets.table.model as MatrixDataFrame).data
+    val targets = SimbrainTablePanel(targetDataFrame, false).apply {
+        applyCommonAttributes()
+    }
 
     val addRemoveRows = AddRemoveRows(inputs.table, targets.table)
 
@@ -58,15 +93,6 @@ class DataSetPanel(val dataSet: MatrixDataset, applyAction: suspend DataSetPanel
         add(JLabel("Add / Remove rows:"), "split 2")
         add(addRemoveRows)
     }
-
-    fun exportMatrixDataSet() = MatrixDataset(
-        (inputs.table.model as MatrixDataFrame).data,
-        (targets.table.model as MatrixDataFrame).data,
-        dataSet.inputRowNames,
-        dataSet.targetRowNames,
-        dataSet.inputColumnNames,
-        dataSet.targetColumnNames
-    )
 
 }
 
@@ -94,23 +120,28 @@ fun <SN> SN.getSupervisedTrainingDialog(): StandardDialog where SN: SupervisedNe
 
         suspend fun DataSetPanel.commonApplyAction(selectedRow: Int) {
             with(network) {
-                inputLayer.setActivations(inputData.row(selectedRow))
+                inputLayer.setActivations(inputDataFrame.getRow<Double>(selectedRow).toDoubleArray())
                 this@SN.forwardPass()
                 trainerConfig.lossFunction.scalarLoss(
                     outputLayer.activations,
-                    targetData.row(selectedRow).toColumnVector()
+                    targetDataFrame.getRow<Double>(selectedRow).toDoubleArray().toColumnVector()
                 ).also { rowErrorJLabel.text = "${trainerConfig.lossFunction.shortName}: ${it.format(4)}" }
             }
         }
 
-        fun createDataSetPanel(dataSet: MatrixDataset) = DataSetPanel(
-            dataSet,
-            applyAction = { selectedRow -> commonApplyAction(selectedRow) },
-            applyAndAdvanceAction = { selectedRow -> commonApplyAction(selectedRow) }
-        )
+        fun createDataSetPanel(dataSet: MatrixDataset) = dataSet.createDataSetPanel { selectedRow -> commonApplyAction(selectedRow) }
 
         val trainingDataSetPanel = createDataSetPanel(trainingSet)
         val testingDataSetPanel = createDataSetPanel(testingSet)
+
+        fun DataSetPanel.exportMatrixDataSet() = MatrixDataset(
+            Matrix.of(inputs.table.model.get2DDoubleArray()),
+            Matrix.of(targets.table.model.get2DDoubleArray()),
+            inputDataFrame.rowNames.map { it.toString() } as List<String>?,
+            targetDataFrame.rowNames.map { it.toString() } as List<String>?,
+            inputDataFrame.columnNames,
+            targetDataFrame.columnNames
+        )
 
         fun syncDataSet() {
             trainingSet = trainingDataSetPanel.exportMatrixDataSet()

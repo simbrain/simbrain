@@ -688,6 +688,37 @@ fun splitDataSet(inputs: Matrix, targets: Matrix, splitRatio: Double, random: Ra
     )
 }
 
+fun splitDataSet(inputs: Array<DoubleArray>, targets: Array<String>, splitRatio: Double, random: Random = Random(42L)): Pair<Pair<Array<DoubleArray>, Array<String>>, Pair<Array<DoubleArray>, Array<String>>> {
+    require(inputs.size == targets.size) { "inputs size (${inputs.size}) must equal targets nrow (${targets.size})" }
+    require(splitRatio in 0.0..1.0) { "splitRatio must be between 0.0 and 1.0" }
+
+    val nrows = inputs.size
+
+    val trainRowCount = (nrows * splitRatio).toInt().coerceAtLeast(1)
+    val testRowCount = (nrows - trainRowCount).coerceAtLeast(1)
+
+    val seed = random.nextLong()
+    val inputsRandom = Random(seed)
+    val targetsRandom = Random(seed)
+
+    val (trainingInputs, testInputs) = inputs.toList().shuffled(inputsRandom).let {
+        val trainSplit = it.take(trainRowCount)
+        val testSplit = it.takeLast(testRowCount)
+        Pair(trainSplit.toTypedArray(), testSplit.toTypedArray())
+    }
+
+    val (trainingTargets, testTargets) = targets.toList().shuffled(targetsRandom).let {
+        val trainSplit = it.take(trainRowCount)
+        val testSplit = it.takeLast(testRowCount)
+        Pair(trainSplit.toTypedArray(), testSplit.toTypedArray())
+    }
+
+    return Pair(
+        Pair(trainingInputs, trainingTargets),
+        Pair(testInputs, testTargets)
+    )
+}
+
 /**
  * A hierarchical container for structured data capture, supporting both map-like and list-like organization.
  *

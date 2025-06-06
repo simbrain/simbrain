@@ -2,6 +2,8 @@ package org.simbrain.network.smile.classifiers
 
 import org.simbrain.network.smile.ClassificationAlgorithm
 import org.simbrain.network.trainers.ClassificationDataset
+import org.simbrain.network.trainers.ClassificationDatasetEncoding
+import org.simbrain.network.trainers.createClassificationDataset
 import org.simbrain.util.UserParameter
 import org.simbrain.util.getOneHotArray
 import smile.classification.Classifier
@@ -12,16 +14,15 @@ import smile.validation.metric.Accuracy
 /**
  * Wrapper for Smile SVM Classifier.
  */
-class SVMClassifier @JvmOverloads constructor(inputSize: Int = 4):
-    ClassificationAlgorithm(inputSize, 2) {
-
-    init {
-        if (outputSize != 2) {
-            System.err.println("SVN can only have 2 outputs, what you entered was ignored")
-        }
-        // SVM Assumes targets are -1 or 1
-        trainingData.labelEncoding = ClassificationDataset.LabelEncoding.Bipolar
-    }
+class SVMClassifier(
+    dataset: ClassificationDataset = createClassificationDataset(
+        inputs = mutableListOf<MutableList<Double>>(),
+        targets = mutableListOf(-1, 1),
+        encoding = ClassificationDatasetEncoding.Bipolar
+    ),
+    splitRatio: Double = 0.8
+):
+    ClassificationAlgorithm(dataset, splitRatio) {
 
     // TODO: Provide separate object for selecting Kernel
     @UserParameter(label = "Polynomial Kernel Degree", order = 20)
@@ -36,7 +37,7 @@ class SVMClassifier @JvmOverloads constructor(inputSize: Int = 4):
     override var model: Classifier<DoubleArray>? = null
 
     override fun copy(): ClassificationAlgorithm {
-        return SVMClassifier(inputSize).also {
+        return SVMClassifier(dataset.copy()).also {
             it.kernelDegree = kernelDegree
             it.C = C
             it.tolerance = tolerance
@@ -60,9 +61,9 @@ class SVMClassifier @JvmOverloads constructor(inputSize: Int = 4):
         // -1 is assumed to come from a bipolar -1/1 encoding, and is thus mapped to a the first entry of one-hot
         // vector
         return if (winner == -1) {
-            getOneHotArray(0, outputSize)
+            getOneHotArray(0, numClasses)
         } else {
-            getOneHotArray(1, outputSize)
+            getOneHotArray(1, numClasses)
         }
     }
 

@@ -5,7 +5,7 @@ import kotlinx.coroutines.launch
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.dialogs.getTrainingDialog
-import org.simbrain.network.smile.SmileClassifier
+import org.simbrain.network.smile.ClassifierNetwork
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.createAction
 import org.simbrain.util.createClassifierProjectionPlot
@@ -15,7 +15,7 @@ import org.simbrain.workspace.gui.SimbrainDesktop
 import javax.swing.JMenuItem
 import javax.swing.JPopupMenu
 
-class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifier: SmileClassifier):
+class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifier: ClassifierNetwork):
     SubnetworkNode(networkPanel, smileClassifier) {
 
     val arrow =  bezierArrow {

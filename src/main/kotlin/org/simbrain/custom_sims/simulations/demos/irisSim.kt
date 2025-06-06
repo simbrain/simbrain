@@ -3,17 +3,17 @@ package org.simbrain.custom_sims.simulations
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
-import org.simbrain.network.core.setLabels
 import org.simbrain.network.layouts.LineLayout
-import org.simbrain.network.smile.SmileClassifier
+import org.simbrain.network.smile.ClassifierNetwork
 import org.simbrain.network.smile.classifiers.KNNClassifier
 import org.simbrain.network.smile.classifiers.LogisticRegClassifier
+import org.simbrain.network.trainers.createClassificationDataset
 import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.alignNetworkModels
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.util.showOptionDialog
-import org.simbrain.util.toColumnVector
+import org.simbrain.util.toMatrix
 import smile.io.Read
 
 /**
@@ -27,9 +27,18 @@ val irisClassifier = newSim {
         arrayOf("KNN", "Logistic Regression")
     )
 
+    // Last column is target data
+    val iris = Read.arff("simulations/tables/iris.arff")
+
+    val classificationDataset = createClassificationDataset(
+        dataFrame = iris,
+        inputColumns = intArrayOf(0, 1, 2, 3),
+        targetColumn = 4
+    )
+
     val classifier = when (option) {
-        0 -> KNNClassifier(4, 3)
-        1 -> LogisticRegClassifier(4, 3)
+        0 -> KNNClassifier(classificationDataset)
+        1 -> LogisticRegClassifier(classificationDataset)
         else -> return@newSim
     }
 
@@ -38,6 +47,7 @@ val irisClassifier = newSim {
     val networkComponent = addNetworkComponent("Network")
     val network = networkComponent.network
 
+    val smileClassifier = ClassifierNetwork(classifier).apply {
     // Last column is target data
     val iris = Read.arff("simulations/tables/iris.arff")
 
@@ -152,7 +162,7 @@ val irisClassifier = newSim {
     smileClassifier.train()
 
     // Set input data for iris to training data
-    smileClassifier.inputNeuronGroup.inputData = classifier.trainingData.featureVectors.toColumnVector()
+    smileClassifier.inputNeuronGroup.inputData = classifier.trainingData.inputs.toMatrix()
 
     network.addNetworkModels(smileClassifier)
 

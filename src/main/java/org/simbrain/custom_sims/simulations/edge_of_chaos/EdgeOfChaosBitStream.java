@@ -213,7 +213,7 @@ public class EdgeOfChaosBitStream extends Simulation {
         BinaryRule b = new BinaryRule(0, u_bar, .49);
         bitStreamInputs.setUpdateRule(b);
         var bitStream = new double[][]{{u_bar}, {0.0}, {0.0}, {0.0}, {0.0}, {u_bar}, {0.0}, {u_bar}, {u_bar}, {0.0}, {u_bar}, {u_bar}, {0.0}, {0.0}, {u_bar}};
-        bitStreamInputs.setInputData(SmileUtilsKt.toColumnVector(bitStream));
+        bitStreamInputs.setInputData(SmileUtilsKt.toMatrix(bitStream));
         net.addNetworkModel(bitStreamInputs);
         bitStreamInputs.setLocation(reservoir.getCenterX(), reservoir.getMaxY() + offset);
         return bitStreamInputs;

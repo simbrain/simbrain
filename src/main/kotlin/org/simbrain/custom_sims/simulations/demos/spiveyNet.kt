@@ -312,14 +312,22 @@ val spiveyNet = newSim {
         # Simulation Details
         
         In the studies in (Spivey et al., 2005) participants were shown two objects and told which to point to.
-        The scientists tracked their mouse and eyes as they pointed to the requested objects. There were three main conditions
+        The scientists tracked their mouse and eyes as they pointed to the requested objects. This is the kind of data
+         that were gathered
+         
+         <img src="//localfiles/simulations/images/spiveyMouseTrace.png" alt="Mouse trace icon" height="200">
+        
+        There were three main conditions
         
          1. **Control condition**: candle target and fork competitor. Eyes should go straight to target without being influenced by the competitor,
             because candle and fork have very different phonemic representations.
+           <img src="//localfiles/simulations/images/Fork.png" alt="Fork icon" height="50">
          2. **Cohort condition**: candle target and candy competitor. The first four phonemes are the same in "candle" and "candy"
-                and so the mouse motion should be drawn slightly towards "candy", because of their shared initial phonemic representations. 
+                and so the mouse motion should be drawn slightly towards "candy", because of their shared initial phonemic representations.
+                <img src="//localfiles/simulations/images/Candy.png" alt="Candy icon" height="50">
          3. **Rhyming condition**: candle target and handle competitor. There is shared phonemic representation but it is in the final phonemes.
                 Thus the mouse trace should be pulled towards the competitor but not as much as in the cohort condition.
+                <img src="//localfiles/simulations/images/Handle.png" alt="Handle icon" height="50">
         
         # What to Do
         
@@ -349,7 +357,11 @@ val spiveyNet = newSim {
         ## To plot activations 
         
         In (Spivey, 2025), the central figure is Figure 5 which shows time series plots for activations in different parts of the network,
-        which illustrates the dynamics governing the mouse traces. This can also be simulated in Simbrain.
+        which illustrates the dynamics governing the mouse traces. 
+        
+        <img src="//localfiles/simulations/images/spiveyActivationDynamics.png" alt="Activation dynamics icon" height="200">
+        
+        This can also be simulated in Simbrain (but note the colors and details will be slightly different)
         
         1. Right-click on the interaction box (the yellow box of the groups of nodes) of whatever network is of interest (eyes, integration, etc)  
         1. Select `Plot > Time Series Plot` from the dropdown.

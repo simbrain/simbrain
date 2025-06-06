@@ -41,9 +41,9 @@ class LogisticRegClassifier(
     override fun predict(input: DoubleArray): Int {
         val ret: Int
         if (showProbabilities) {
-            ret = model!!.predict(input, outputProbabilities)
+            ret = model?.predict(input, outputProbabilities)?:0
         }  else {
-            ret = model!!.predict(input)
+            ret = model?.predict(input)?:0
         }
         return ret
     }

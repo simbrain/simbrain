@@ -159,7 +159,6 @@ val irisClassifier = newSim {
 
         alignNetworkModels(inputNeuronGroup, outputNeuronGroup, Alignment.VERTICAL)
     }
-    smileClassifier.train()
 
     // Set input data for iris to training data
     smileClassifier.inputNeuronGroup.inputData = classifier.trainingData.inputs.toMatrix()

@@ -1,6 +1,6 @@
 package org.simbrain.network.smile.classifiers
 
-import org.simbrain.network.smile.ClassificationAlgorithm
+import org.simbrain.network.smile.SimbrainClassifier
 import org.simbrain.network.trainers.ClassificationDataset
 import org.simbrain.network.trainers.ClassificationDatasetEncoding
 import org.simbrain.network.trainers.createClassificationDataset
@@ -22,7 +22,7 @@ class SVMClassifier(
     ),
     splitRatio: Double = 0.8
 ):
-    ClassificationAlgorithm(dataset, splitRatio) {
+    SimbrainClassifier(dataset, splitRatio) {
 
     // TODO: Provide separate object for selecting Kernel
     @UserParameter(label = "Polynomial Kernel Degree", order = 20)
@@ -36,7 +36,7 @@ class SVMClassifier(
 
     override var model: Classifier<DoubleArray>? = null
 
-    override fun copy(): ClassificationAlgorithm {
+    override fun copy(): SimbrainClassifier {
         return SVMClassifier(dataset.copy()).also {
             it.kernelDegree = kernelDegree
             it.C = C

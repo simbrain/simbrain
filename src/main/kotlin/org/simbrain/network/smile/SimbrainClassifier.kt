@@ -13,7 +13,7 @@ import smile.classification.Classifier
 /**
  * Superclass for wrappers of Smile classifier objects.
  */
-abstract class ClassificationAlgorithm(
+abstract class SimbrainClassifier(
     val dataset: ClassificationDataset,
     splitRatio: Double = 0.8,
 ): CopyableObject {
@@ -70,7 +70,7 @@ abstract class ClassificationAlgorithm(
     /**
      * For use with object type editor.
      */
-    abstract override fun copy(): ClassificationAlgorithm
+    abstract override fun copy(): SimbrainClassifier
 
     override fun getTypeList() = classifierTypes
 

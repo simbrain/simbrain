@@ -29,7 +29,7 @@ import kotlin.reflect.full.primaryConstructor
  *
  */
 class ClassifierNetwork(
-    val classifier: ClassificationAlgorithm
+    val classifier: SimbrainClassifier
 ) : Subnetwork(), EditableObject {
 
     /**
@@ -141,7 +141,7 @@ class ClassifierNetwork(
         )
 
         @UserParameter(label = "Classifier Type", showDetails = false, order = 40)
-        var classifierType: ClassificationAlgorithm = SVMClassifier()
+        var classifierType: SimbrainClassifier = SVMClassifier()
 
         override val name = "Classifier"
 

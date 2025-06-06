@@ -1,6 +1,6 @@
 package org.simbrain.network.smile.classifiers
 
-import org.simbrain.network.smile.ClassificationAlgorithm
+import org.simbrain.network.smile.SimbrainClassifier
 import org.simbrain.network.trainers.ClassificationDataset
 import org.simbrain.network.trainers.createClassificationDataset
 import org.simbrain.util.UserParameter
@@ -17,7 +17,7 @@ class KNNClassifier(
         targets = mutableListOf<Int>()
     ),
     splitRatio: Double = 0.8
-): ClassificationAlgorithm(dataset, splitRatio) {
+): SimbrainClassifier(dataset, splitRatio) {
 
     @UserParameter(label = "K", order = 10)
     var k = numClasses
@@ -38,7 +38,7 @@ class KNNClassifier(
         return model?.predict(input) ?: -1
     }
 
-    override fun copy(): ClassificationAlgorithm {
+    override fun copy(): SimbrainClassifier {
         return KNNClassifier(dataset).also {
             it.k = k
         }

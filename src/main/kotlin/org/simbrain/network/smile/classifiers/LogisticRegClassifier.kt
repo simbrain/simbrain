@@ -1,6 +1,6 @@
 package org.simbrain.network.smile.classifiers
 
-import org.simbrain.network.smile.ClassificationAlgorithm
+import org.simbrain.network.smile.SimbrainClassifier
 import org.simbrain.network.trainers.ClassificationDataset
 import org.simbrain.network.trainers.createClassificationDataset
 import org.simbrain.util.UserParameter
@@ -17,8 +17,7 @@ class LogisticRegClassifier(
         targets = mutableListOf<Int>()
     ),
     splitRatio: Double = 0.8
-):
-    ClassificationAlgorithm(dataset, splitRatio) {
+): SimbrainClassifier(dataset, splitRatio) {
 
     override var model: Classifier<DoubleArray>? = null
 
@@ -58,7 +57,7 @@ class LogisticRegClassifier(
         }
     }
 
-    override fun copy(): ClassificationAlgorithm {
+    override fun copy(): SimbrainClassifier {
         return LogisticRegClassifier(dataset)
     }
 

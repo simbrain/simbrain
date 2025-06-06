@@ -33,16 +33,19 @@ class SmileClassifierTest {
     /**
      * Create a trained SVM (on xor) for testing. Use a weirdly shaped 3 -> 2 xor for better tests.
      */
-    val svm = SVMClassifier(createClassificationDataset(
-        inputs = mutableListOf(
-            mutableListOf(0.0, 0.0, 0.0),
-            mutableListOf(1.0, 0.0, 0.0),
-            mutableListOf(0.0, 1.0, 0.0),
-            mutableListOf(1.0, 1.0, 0.0)
+    val svm = SVMClassifier(
+        createClassificationDataset(
+            inputs = mutableListOf(
+                mutableListOf(0.0, 0.0, 0.0),
+                mutableListOf(1.0, 0.0, 0.0),
+                mutableListOf(0.0, 1.0, 0.0),
+                mutableListOf(1.0, 1.0, 0.0)
+            ),
+            targets = mutableListOf(-1, 1, 1, -1),
+            encoding = ClassificationDatasetEncoding.Bipolar
         ),
-        targets = mutableListOf(-1, 1, 1, -1),
-        encoding = ClassificationDatasetEncoding.Bipolar
-    ))
+        1.0
+    )
     // Unclamped inputs because this classifier interacts with an external neuron group
     var xorSVM = ClassifierNetwork(svm).apply {
         inputNeuronGroup.isAllClamped = false
@@ -69,7 +72,7 @@ class SmileClassifierTest {
         net.addNetworkModel(xorSVM)
         xorSVM.inputNeuronGroup.addInputs(Matrix.column(doubleArrayOf(0.0, 0.0, 0.0)))
         net.update()
-        // assertArrayEquals(doubleArrayOf(1.0, 0.0), xorSVM.outputNeuronGroup.activationArray)
+        assertArrayEquals(doubleArrayOf(1.0, 0.0), xorSVM.outputNeuronGroup.activationArray)
         xorSVM.inputNeuronGroup.addInputs(Matrix.column(doubleArrayOf(1.0, 0.0, 0.0)))
         net.update()
         assertArrayEquals(doubleArrayOf(0.0, 1.0), xorSVM.outputNeuronGroup.activationArray)
@@ -105,7 +108,7 @@ class SmileClassifierTest {
         net.update()
         assertArrayEquals(doubleArrayOf(0.0, 1.0, 0.0),inputNa.activationArray, .001)
         assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0),xorSVM.inputNeuronGroup.activationArray, .001)
-        // assertArrayEquals(doubleArrayOf(1.0, 0.0),xorSVM.outputNeuronGroup.activationArray, .001)
+        assertArrayEquals(doubleArrayOf(1.0, 0.0),xorSVM.outputNeuronGroup.activationArray, .001)
         assertArrayEquals(doubleArrayOf(0.0, 0.0),outputNa.activationArray, .001)
 
         // Expected values after two updates
@@ -122,15 +125,15 @@ class SmileClassifierTest {
         net.update()
         assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0),inputNa.activationArray)
         assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0),xorSVM.inputNeuronGroup.activationArray)
-        // assertArrayEquals(doubleArrayOf(1.0, 0.0),xorSVM.outputNeuronGroup.activationArray)
+        assertArrayEquals(doubleArrayOf(1.0, 0.0),xorSVM.outputNeuronGroup.activationArray)
         assertArrayEquals(doubleArrayOf(0.0, 1.0),outputNa.activationArray)
 
         // Expected values after four updates
         net.update()
         assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0),inputNa.activationArray)
         assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0),xorSVM.inputNeuronGroup.activationArray)
-        // assertArrayEquals(doubleArrayOf(1.0, 0.0),xorSVM.outputNeuronGroup.activationArray)
-        // assertArrayEquals(doubleArrayOf(1.0, 0.0),outputNa.activationArray)
+        assertArrayEquals(doubleArrayOf(1.0, 0.0),xorSVM.outputNeuronGroup.activationArray)
+        assertArrayEquals(doubleArrayOf(1.0, 0.0),outputNa.activationArray)
 
         // TODO: A second version of this test using neurongroups or neuron collections
     }

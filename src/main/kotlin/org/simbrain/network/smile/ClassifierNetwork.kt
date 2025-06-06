@@ -14,7 +14,6 @@ import org.simbrain.network.util.offsetNeuronCollections
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
-import org.simbrain.workspace.Producible
 import kotlin.reflect.full.primaryConstructor
 
 /**
@@ -37,13 +36,6 @@ class ClassifierNetwork(
      */
     var winner = Integer.MIN_VALUE
 
-    /**
-     * Returns the label associated with the winning target integer.
-     */
-    val winningLabel: String
-        @Producible
-        get() = classifier.trainingData.targetLabelMap.get(winner) ?: ""
-
     val inputNeuronGroup = NeuronGroup(classifier.trainingData.inputs.first().size).apply {
         label = "Input Layer"
         setLayoutBasedOnSize()
@@ -59,9 +51,8 @@ class ClassifierNetwork(
         alignNetworkModels(inputNeuronGroup, outputNeuronGroup, Alignment.VERTICAL)
         inputNeuronGroup.isAllClamped = true
         offsetNeuronCollections(inputNeuronGroup, outputNeuronGroup, Direction.NORTH, 150.0)
-        (classifier.trainingData.targetLabelMap.toSortedMap { k, _ -> k }.entries zip outputNeuronGroup.neuronList).forEach { (targetLabel, neuron) ->
-            val (_, label) = targetLabel
-            neuron.label = label
+        outputNeuronGroup.neuronList.forEachIndexed { i, n ->
+            n.label = "Class ${i + 1}"
         }
     }
     

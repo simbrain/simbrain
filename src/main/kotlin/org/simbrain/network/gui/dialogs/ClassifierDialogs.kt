@@ -10,7 +10,6 @@ import org.simbrain.network.smile.ClassifierNetwork
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.network.trainers.ClassificationDataset
 import org.simbrain.network.trainers.createClassificationDataset
-import org.simbrain.util.BiMap
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.display
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
@@ -119,8 +118,7 @@ fun main() {
                 mutableListOf(0.0, 1.0),
                 mutableListOf(1.0, 1.0)
             ),
-            targets = mutableListOf(-1, 1, 1, -1),
-            targetLabelMap = BiMap<Int, String>().apply { putAll(mapOf(-1 to "F", 1 to "T")) }
+            targets = mutableListOf(-1, 1, 1, -1)
         ))
         val classifier = ClassifierNetwork(svm)
         addNetworkModel(classifier)

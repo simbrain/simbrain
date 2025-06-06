@@ -1,6 +1,5 @@
 package org.simbrain.network.trainers
 
-import org.simbrain.util.BiMap
 import org.simbrain.util.DependenciesInvalidatingCachedObject
 import org.simbrain.util.stats.distributions.NormalDistribution
 import smile.data.DataFrame
@@ -72,14 +71,11 @@ fun createClassificationDataset(
     val inputs = dataFrame.select(*inputColumns).toMatrix().toArray().map { it.toMutableList() }.toMutableList()
     val targetLabels = dataFrame.column(targetColumn).toStringArray().toMutableList()
 
-   val targetLabelMap = BiMap<Int, String>().apply {
-       putAll(targetLabels.toSortedSet().mapIndexed { index, label -> index to label }.toMap())
-   }
+   val targetLabelMap = targetLabels.toSortedSet().mapIndexed { index, label -> label to index }.toMap()
 
     return ClassificationDataset(
         inputs = inputs,
-        targets = targetLabels.map { targetLabelMap.getInverse(it) }.toMutableList(),
-        targetLabelMap = targetLabelMap
+        targets = targetLabels.map { targetLabelMap[it]!! }.toMutableList(),
     )
 
 }
@@ -90,24 +86,7 @@ fun createClassificationDataset(
     encoding: ClassificationDatasetEncoding = ClassificationDatasetEncoding.Integer
 ) = ClassificationDataset(
     inputs,
-    targets,
-    when (encoding) {
-        ClassificationDatasetEncoding.Bipolar -> {
-            val targetSize = targets.toSet().size
-            require(targetSize == 2) { "Bipolar can only encode two classes, got $targetSize" }
-            val targetLabelMap = BiMap<Int, String>()
-            targetLabelMap.put(-1, "Class 1")
-            targetLabelMap.put(1, "Class 2")
-            targetLabelMap
-        }
-        ClassificationDatasetEncoding.Integer -> {
-            val targetLabelMap = BiMap<Int, String>()
-            targets.toSet().sorted().forEachIndexed { index, target ->
-                targetLabelMap.put(target, "Class ${index + 1}")
-            }
-            targetLabelMap
-        }
-    }
+    targets
 )
 
 fun ClassificationDataset.split(ratio: Double = 0.8, seed: Long = 42L): Pair<ClassificationDataset, ClassificationDataset> {
@@ -117,12 +96,10 @@ fun ClassificationDataset.split(ratio: Double = 0.8, seed: Long = 42L): Pair<Cla
     val trainingData = ClassificationDataset(
         inputs.subList(0, splitIndex).map { it.toMutableList() }.toMutableList(),
         targets.subList(0, splitIndex).toMutableList(),
-        targetLabelMap
     )
     val testData = ClassificationDataset(
         inputs.subList(splitIndex, inputs.size).map { it.toMutableList() }.toMutableList(),
         targets.subList(splitIndex, targets.size).toMutableList(),
-        targetLabelMap
     )
     return trainingData to testData
 }
@@ -134,12 +111,8 @@ enum class ClassificationDatasetEncoding(val description: String) {
 
 class ClassificationDataset(
     val inputs: MutableList<MutableList<Double>>,
-    val targets: MutableList<Int>,
-    val targetLabelMap: BiMap<Int, String>
+    val targets: MutableList<Int>
 ) {
-
-    val targetLabels by DependenciesInvalidatingCachedObject(::targets) { targets.map { targetLabelMap.get(it) } }
-
     val numClasses by DependenciesInvalidatingCachedObject(::targets) { targets.toSet().size }
 
     val inputArrays: Array<DoubleArray> by DependenciesInvalidatingCachedObject(::inputs) { inputs.map { it.toDoubleArray() }.toTypedArray() }
@@ -148,7 +121,6 @@ class ClassificationDataset(
 
     fun copy() = ClassificationDataset(
         inputs.map { it.toMutableList() }.toMutableList(),
-        targets.toMutableList(),
-        BiMap<Int, String>().apply { putAll(targetLabelMap) }
+        targets.toMutableList()
     )
 }

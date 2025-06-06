@@ -141,11 +141,14 @@ abstract class SimbrainDataFrame : AbstractTableModel() {
         return  columnsOfType((0 until columnCount).toList(), *classes)
     }
 
-    private fun getDoubleRowUnsafe(row: Int, replaceInvalid: Double = Double.NaN): DoubleArray {
+    private fun getDoubleRowUnsafe(row: Int, replaceInvalid: Double = Double.NaN): List<Double> {
         // No type check
         return (0 until columnCount)
             .map { ((getValueAt(row, it) ?: replaceInvalid) as Number).toDouble() }
-            .toDoubleArray()
+    }
+
+    private fun getDoubleRowArrayUnsafe(row: Int, replaceInvalid: Double = Double.NaN): DoubleArray {
+        return getDoubleRowUnsafe(row, replaceInvalid).toDoubleArray()
     }
 
     private fun getFloatRowUnsafe(row: Int): FloatArray {
@@ -156,11 +159,11 @@ abstract class SimbrainDataFrame : AbstractTableModel() {
     }
 
     /**
-     * Returns a 2d double array using provided column indices.
+     * Returns a 2d double list using provided column indices.
      *
      * Note that numeric types are cast to doubles.
      */
-    fun get2DDoubleArray(colIndices: List<Int>): Array<DoubleArray> {
+    fun get2DDoubleList(colIndices: List<Int>): List<List<Double>> {
         if (!columnsOfType(colIndices, Double::class.java, Int::class.java, Float::class.java)) {
             throw Error("getDoubleArray called on a non-double column")
         }
@@ -168,8 +171,17 @@ abstract class SimbrainDataFrame : AbstractTableModel() {
             .map { rowIndex ->
                 colIndices.map { colIndex ->
                     (getValueAt(rowIndex, colIndex) as Number).toDouble()
-                }.toDoubleArray()
-            }.toTypedArray()
+                }
+            }
+    }
+
+    /**
+     * Returns a 2d double array using provided column indices.
+     *
+     * Note that numeric types are cast to doubles.
+     */
+    fun get2DDoubleArray(colIndices: List<Int>): Array<DoubleArray> {
+        return get2DDoubleList(colIndices).map { it.toDoubleArray() }.toTypedArray()
     }
 
 
@@ -178,6 +190,20 @@ abstract class SimbrainDataFrame : AbstractTableModel() {
      */
     fun get2DDoubleArray(indices: IntRange): Array<DoubleArray> {
         return get2DDoubleArray(indices.toList())
+    }
+
+
+    /**
+     * Returns an array of double array rows for the table (comparable to "row major" order).
+     *
+     * Numeric types are cast to doubles.
+     */
+    fun get2DDoubleList(replaceInvalid: Double = Double.NaN): List<List<Double>> {
+        if (!columnsOfType(Double::class.java)) {
+            throw Error("getDoubleArray called on a non-numeric column")
+        }
+        return (0 until rowCount)
+            .map { getDoubleRowUnsafe(it, replaceInvalid) }
     }
 
     /**
@@ -190,7 +216,7 @@ abstract class SimbrainDataFrame : AbstractTableModel() {
             throw Error("getDoubleArray called on a non-numeric column")
         }
         return (0 until rowCount)
-            .map { getDoubleRowUnsafe(it, replaceInvalid) }
+            .map { getDoubleRowArrayUnsafe(it, replaceInvalid) }
             .toTypedArray()
     }
 

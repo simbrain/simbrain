@@ -1,6 +1,7 @@
 package org.simbrain.util
 
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertArrayEquals
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
@@ -86,11 +87,11 @@ class SmileUtilsTest {
         val a = arrayOf(
             doubleArrayOf(1.0, 2.0),
             doubleArrayOf(3.0, 4.0)
-        ).toColumnVector()
+        ).toMatrix()
         val b = arrayOf(
             doubleArrayOf(5.0, 6.0),
             doubleArrayOf(7.0, 8.0)
-        ).toColumnVector()
+        ).toMatrix()
         val c = a + b
         assertArrayEquals(doubleArrayOf(6.0, 8.0), c.row(0))
         assertArrayEquals(doubleArrayOf(10.0, 12.0), c.row(1))
@@ -101,11 +102,11 @@ class SmileUtilsTest {
         val a = arrayOf(
             doubleArrayOf(1.0, 2.0),
             doubleArrayOf(3.0, 4.0)
-        ).toColumnVector()
+        ).toMatrix()
         val b = arrayOf(
             doubleArrayOf(5.0, 6.0),
             doubleArrayOf(7.0, 8.0)
-        ).toColumnVector()
+        ).toMatrix()
         val c = a - b
         assertArrayEquals(doubleArrayOf(-4.0, -4.0), c.row(0))
         assertArrayEquals(doubleArrayOf(-4.0, -4.0), c.row(1))
@@ -116,14 +117,14 @@ class SmileUtilsTest {
         val a = arrayOf(
             doubleArrayOf(1.0, 2.0),
             doubleArrayOf(3.0, 4.0)
-        ).toColumnVector()
+        ).toMatrix()
         val b = a * 2.0
         assertArrayEquals(doubleArrayOf(2.0, 4.0), b.row(0))
         assertArrayEquals(doubleArrayOf(6.0, 8.0), b.row(1))
         val c = arrayOf(
             doubleArrayOf(1.0, 2.0),
             doubleArrayOf(3.0, 4.0)
-        ).toColumnVector()
+        ).toMatrix()
         val d = -2.0 * c
         assertArrayEquals(doubleArrayOf(-2.0, -4.0), d.row(0))
         assertArrayEquals(doubleArrayOf(-6.0, -8.0), d.row(1))

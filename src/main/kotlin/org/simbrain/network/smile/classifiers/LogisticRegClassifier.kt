@@ -1,6 +1,8 @@
 package org.simbrain.network.smile.classifiers
 
 import org.simbrain.network.smile.ClassificationAlgorithm
+import org.simbrain.network.trainers.ClassificationDataset
+import org.simbrain.network.trainers.createClassificationDataset
 import org.simbrain.util.UserParameter
 import smile.classification.Classifier
 import smile.classification.LogisticRegression
@@ -9,8 +11,14 @@ import smile.validation.metric.Accuracy
 /**
  * Wrapper for Smile's logistic regression. Despite the name, it is a classifier.
  */
-class LogisticRegClassifier @JvmOverloads constructor(inputSize: Int = 4, outputSize: Int = 4):
-    ClassificationAlgorithm(inputSize, outputSize) {
+class LogisticRegClassifier(
+    dataset: ClassificationDataset = createClassificationDataset(
+        inputs = mutableListOf<MutableList<Double>>(),
+        targets = mutableListOf<Int>()
+    ),
+    splitRatio: Double = 0.8
+):
+    ClassificationAlgorithm(dataset, splitRatio) {
 
     override var model: Classifier<DoubleArray>? = null
 
@@ -26,7 +34,7 @@ class LogisticRegClassifier @JvmOverloads constructor(inputSize: Int = 4, output
 
     override fun fit(inputs: Array<DoubleArray>, targets: IntArray) {
         model = LogisticRegression.fit(inputs, targets)
-        outputProbabilities = DoubleArray(outputSize)
+        outputProbabilities = DoubleArray(numClasses)
         val pred = model?.predict(inputs)
         setAccuracyLabel(Accuracy.of(targets, pred))
     }
@@ -51,8 +59,7 @@ class LogisticRegClassifier @JvmOverloads constructor(inputSize: Int = 4, output
     }
 
     override fun copy(): ClassificationAlgorithm {
-        return LogisticRegClassifier(inputSize, outputSize).also {
-        }
+        return LogisticRegClassifier(dataset)
     }
 
     override val name = "Logistic Regression"

@@ -9,7 +9,7 @@ import kotlin.reflect.KClass
  * Mutable table whose columns have arbitrary types.
  */
 class BasicDataFrame(
-    data: MutableList<MutableList<Any?>>,
+    data: List<List<Any?>>,
     override var columns: MutableList<Column> = inferColumns(data)
 ) : SimbrainDataFrame() {
 
@@ -17,7 +17,7 @@ class BasicDataFrame(
 
     override var isMutable = true
 
-    var data: MutableList<MutableList<Any?>> = data
+    var data: MutableList<MutableList<Any?>> = data.map { it.toMutableList() }.toMutableList()
         set(value) {
             field = value
             columns = inferColumns(columns.map { it.columName }, value)
@@ -156,12 +156,12 @@ class BasicDataFrame(
 /**
  * Infer a column from a 2d array of data.
  */
-private fun inferColumns(data: MutableList<MutableList<Any?>>) =
+private fun inferColumns(data: List<List<*>>) =
     (0..data.first().lastIndex).map { i ->
         createColumn("Column ${i + 1}", data.asSequence().map { it[i] }.firstNotNullOfOrNull { it })
     }.toMutableList()
 
-private fun inferColumns(names: List<String?>, data: MutableList<MutableList<Any?>>) =
+private fun inferColumns(names: List<String?>, data: List<List<*>>) =
     (0..data.first().lastIndex).map { i ->
         createColumn(names.getOrNull(i) ?: "Column ${i + 1}", data.asSequence().map { it[i] }.firstNotNullOfOrNull { it })
     }.toMutableList()

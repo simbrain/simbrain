@@ -3,8 +3,7 @@ package org.simbrain.util
 import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
 import org.simbrain.custom_sims.SimulationScope
-import org.simbrain.network.smile.SmileClassifier
-import org.simbrain.network.trainers.ClassificationDataset.LabelEncoding
+import org.simbrain.network.smile.ClassifierNetwork
 import org.simbrain.plot.projection.ProjectionComponent
 import org.simbrain.util.projection.AuxDataColoringManager
 import org.simbrain.util.projection.DataPoint
@@ -292,20 +291,19 @@ suspend fun SimbrainDesktop.loadWorkspaceZipFromFileChooser(): Boolean {
     return false
 }
 
-fun SimbrainDesktop.createClassifierProjectionPlot(smileClassifier: SmileClassifier): ProjectionComponent {
+fun SimbrainDesktop.createClassifierProjectionPlot(smileClassifier: ClassifierNetwork): ProjectionComponent {
     val projectionComponent = ProjectionComponent("${smileClassifier.displayName} Plot").apply {
         projector.coloringManager = AuxDataColoringManager()
     }
     val colors = generateColorSequence().take(smileClassifier.outputNeuronGroup.size).toList()
     with(smileClassifier) {
         train()
-        classifier.trainingData.featureVectors.forEach {
-            val colorIndex = if (classifier.trainingData.labelEncoding == LabelEncoding.Bipolar) {
-                if (classifier.predict(it) > 0) 1 else 0
-            } else {
-                classifier.predict(it)
+        classifier.trainingData.inputs.forEach {
+            val vector = it.toDoubleArray()
+            val colorIndex = classifier.predict(vector).let { prediction ->
+                if (prediction < 0) 0 else prediction
             }
-            projectionComponent.projector.addDataPoint(DataPoint(it, aux = colors[colorIndex]))
+            projectionComponent.projector.addDataPoint(DataPoint(vector, aux = colors[colorIndex]))
         }
     }
     val deregisterDeleteEvent = smileClassifier.events.deleted.on {
@@ -314,7 +312,7 @@ fun SimbrainDesktop.createClassifierProjectionPlot(smileClassifier: SmileClassif
     val deregisterUpdateEvent = smileClassifier.events.updated.on {
         val datapoint = DataPoint(
             smileClassifier.inputNeuronGroup.activationArray,
-            aux = colors[smileClassifier.winner]
+            aux = colors.getOrNull(smileClassifier.winner)
         )
         projectionComponent.projector.addDataPoint(datapoint)
     }

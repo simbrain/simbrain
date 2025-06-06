@@ -12,7 +12,7 @@ import org.simbrain.network.gui.dialogs.createTestInputPanel
 import org.simbrain.network.gui.dialogs.text.TextDialog
 import org.simbrain.network.gui.nodes.SynapseGroupNode
 import org.simbrain.network.gui.nodes.TextNode
-import org.simbrain.network.smile.SmileClassifier
+import org.simbrain.network.smile.ClassifierNetwork
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.SceneGraphBrowser
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
@@ -195,7 +195,7 @@ fun SynapseGroupNode.getDialog(): StandardDialog {
  * Show dialog for Smile classifier creation
  */
 fun NetworkPanel.showClassifierCreationDialog() {
-    val creator = SmileClassifier.ClassifierCreator()
+    val creator = ClassifierNetwork.ClassifierCreator()
     AnnotatedPropertyEditor(creator).displayInDialog {
         commitChanges()
         addSubnetworkAction(this@NetworkPanel) { creator.create(network) }

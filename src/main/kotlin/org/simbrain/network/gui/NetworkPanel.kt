@@ -21,7 +21,7 @@ import org.simbrain.network.gui.nodes.subnetworkNodes.*
 import org.simbrain.network.layouts.Layout
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.neurongroups.SOMGroup
-import org.simbrain.network.smile.SmileClassifier
+import org.simbrain.network.smile.ClassifierNetwork
 import org.simbrain.network.subnetworks.*
 import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.util.*
@@ -336,7 +336,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
 
     suspend fun createNode(transformerBlock: TransformerBlock) = addScreenElement { TransformerBlockNode(this, transformerBlock) }
 
-    suspend fun createNode(classifier: SmileClassifier) = addScreenElement {
+    suspend fun createNode(classifier: ClassifierNetwork) = addScreenElement {
         SmileClassifierNode(this, classifier)
     }
 
@@ -388,7 +388,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             is SRNNetwork -> SRNNode(this, subnetwork)
             is RestrictedBoltzmannMachine -> RBMNode(this, subnetwork)
             is BackpropNetwork -> BackpropNetworkNode(this, subnetwork)
-            is SmileClassifier -> SmileClassifierNode(this, subnetwork)
+            is ClassifierNetwork -> SmileClassifierNode(this, subnetwork)
             else -> SubnetworkNode(this, subnetwork)
         }
 

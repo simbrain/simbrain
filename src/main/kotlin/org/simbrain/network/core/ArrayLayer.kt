@@ -2,8 +2,6 @@ package org.simbrain.network.core
 
 import org.simbrain.util.UserParameter
 import org.simbrain.util.addi
-import org.simbrain.util.reshape
-import org.simbrain.util.toColumnVector
 import org.simbrain.workspace.Consumable
 import smile.math.matrix.Matrix
 

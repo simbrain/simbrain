@@ -4,6 +4,7 @@ import org.simbrain.network.smile.classifiers.KNNClassifier
 import org.simbrain.network.smile.classifiers.LogisticRegClassifier
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.network.trainers.ClassificationDataset
+import org.simbrain.network.trainers.split
 import org.simbrain.util.Utils
 import org.simbrain.util.getOneHotArray
 import org.simbrain.util.propertyeditor.CopyableObject
@@ -13,14 +14,20 @@ import smile.classification.Classifier
  * Superclass for wrappers of Smile classifier objects.
  */
 abstract class ClassificationAlgorithm(
-    val inputSize: Int,
-    val outputSize: Int
+    val dataset: ClassificationDataset,
+    splitRatio: Double = 0.8,
 ): CopyableObject {
 
-    /**
-     * Main training data.
-     */
-    var trainingData = ClassificationDataset(inputSize, outputSize, outputSize)
+    var trainingData: ClassificationDataset
+    var testingData: ClassificationDataset
+
+    init {
+        val (training, testing) = dataset.split(splitRatio)
+        this.trainingData = training
+        this.testingData = testing
+    }
+
+    val numClasses: Int get() = trainingData.numClasses
 
     /**
      * Fit a model to the training data.
@@ -43,8 +50,8 @@ abstract class ClassificationAlgorithm(
     abstract fun predict(input: DoubleArray): Int
 
     fun assertValidWinnerIndex(winner: Int) {
-        if (winner > outputSize) {
-            throw IllegalArgumentException("Prediction of ${winner} > output size of ${outputSize}")
+        if (winner > numClasses) {
+            throw IllegalArgumentException("Prediction of ${winner} > output size of ${numClasses}")
         }
     }
 
@@ -53,7 +60,7 @@ abstract class ClassificationAlgorithm(
      */
     open fun getOutputArray(winner: Int): DoubleArray {
         assertValidWinnerIndex(winner)
-        return getOneHotArray(winner, outputSize)
+        return getOneHotArray(winner, numClasses)
     }
 
     fun setAccuracyLabel(accuracy: Double) {

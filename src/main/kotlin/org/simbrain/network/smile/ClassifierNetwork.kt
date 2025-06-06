@@ -5,7 +5,8 @@ import org.simbrain.network.core.activations
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.network.subnetworks.Subnetwork
-import org.simbrain.network.trainers.ClassificationDataset
+import org.simbrain.network.trainers.ClassificationDatasetEncoding
+import org.simbrain.network.trainers.makeBlobs
 import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.alignNetworkModels
@@ -27,7 +28,7 @@ import kotlin.reflect.full.primaryConstructor
  * Different classifiers are trained in different ways and thus have different properties and dialogs.
  *
  */
-class SmileClassifier(
+class ClassifierNetwork(
     val classifier: ClassificationAlgorithm
 ) : Subnetwork(), EditableObject {
 
@@ -41,14 +42,14 @@ class SmileClassifier(
      */
     val winningLabel: String
         @Producible
-        get() = classifier.trainingData.labelTargetMap.getInverse(winner) ?: ""
+        get() = classifier.trainingData.targetLabelMap.get(winner) ?: ""
 
-    val inputNeuronGroup = NeuronGroup(classifier.inputSize).apply {
+    val inputNeuronGroup = NeuronGroup(classifier.trainingData.inputs.first().size).apply {
         label = "Input Layer"
         setLayoutBasedOnSize()
     }.also { addModel(it) }
 
-    val outputNeuronGroup = NeuronGroup(classifier.outputSize).apply {
+    val outputNeuronGroup = NeuronGroup(classifier.numClasses).apply {
         label = "Output Layer"
         setLayoutBasedOnSize()
     }.also { addModel(it) }
@@ -58,16 +59,9 @@ class SmileClassifier(
         alignNetworkModels(inputNeuronGroup, outputNeuronGroup, Alignment.VERTICAL)
         inputNeuronGroup.isAllClamped = true
         offsetNeuronCollections(inputNeuronGroup, outputNeuronGroup, Direction.NORTH, 150.0)
-        when (classifier.trainingData.labelEncoding) {
-            ClassificationDataset.LabelEncoding.Bipolar -> {
-                outputNeuronGroup.neuronList[0].label = "Off"
-                outputNeuronGroup.neuronList[1].label = "On"
-            }
-            ClassificationDataset.LabelEncoding.Integer -> {
-                classifier.trainingData.labelTargetMap.entries.forEach { (label, index) ->
-                    outputNeuronGroup.neuronList.getOrNull(index)?.label = label
-                }
-            }
+        (classifier.trainingData.targetLabelMap.toSortedMap { k, _ -> k }.entries zip outputNeuronGroup.neuronList).forEach { (targetLabel, neuron) ->
+            val (_, label) = targetLabel
+            neuron.label = label
         }
     }
     
@@ -76,7 +70,7 @@ class SmileClassifier(
      */
     fun train() {
         classifier.apply {
-            fit(trainingData.featureVectors, trainingData.getIntegerTargets())
+            fit(trainingData.inputArrays, trainingData.targetArray)
         }
         events.updated.fire()
     }
@@ -100,7 +94,7 @@ class SmileClassifier(
                     classifier.getOutputArray(winner)
                 } catch (e: IllegalArgumentException) {
                     System.err.println(e.message)
-                    DoubleArray(classifier.outputSize) { 0.0 }
+                    DoubleArray(classifier.numClasses) { 0.0 }
                 }.toList()
             }
         }
@@ -108,15 +102,15 @@ class SmileClassifier(
     }
 
     override fun toString(): String {
-        return "${label} (${classifier.name}): ${classifier.inputSize} -> $outputSize"
+        return "${label} (${classifier.name}): ${classifier.trainingData.inputs.first().size} -> $outputSize"
     }
 
-    val inputSize get() = classifier.inputSize
+    val inputSize get() = classifier.trainingData.inputs.first().size
 
-    val outputSize get() = classifier.outputSize
+    val outputSize get() = classifier.numClasses
 
     override fun copy(): Subnetwork {
-        val copy = SmileClassifier(classifier.copy())
+        val copy = ClassifierNetwork(classifier.copy())
         copy.inputNeuronGroup.label = inputNeuronGroup.label
         copy.inputNeuronGroup.neuronList.zip(inputNeuronGroup.neuronList).forEach { (n,o) ->
             n.label = o.label
@@ -151,13 +145,18 @@ class SmileClassifier(
 
         override val name = "Classifier"
 
-        fun create(net: Network): SmileClassifier {
+        fun create(net: Network): ClassifierNetwork {
             val classifier = classifierType::class.primaryConstructor?.let { constructor ->
-                val paramMap = mapOf("inputSize" to nin, "outputSize" to nout)
-                val map = constructor.parameters.associateWith { p -> paramMap[p.name] }
-                constructor.callBy(map)
+                val dataset = makeBlobs(
+                    nSamples = 100,
+                    nCenters = nout,
+                    nFeatures = nin,
+                    clusterStd = 1.0,
+                    encoding = if (classifierType is SVMClassifier) ClassificationDatasetEncoding.Bipolar else ClassificationDatasetEncoding.Integer
+                )
+                constructor.call(dataset, 0.8)
             }!!
-            return SmileClassifier(classifier)
+            return ClassifierNetwork(classifier)
         }
 
     }

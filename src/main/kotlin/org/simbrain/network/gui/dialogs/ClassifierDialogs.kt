@@ -1,28 +1,34 @@
 package org.simbrain.network.gui.dialogs
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import net.miginfocom.swing.MigLayout
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.nodes.SmileClassifierNode
-import org.simbrain.network.smile.SmileClassifier
+import org.simbrain.network.smile.ClassifierNetwork
 import org.simbrain.network.smile.classifiers.SVMClassifier
-import org.simbrain.util.ResourceManager
+import org.simbrain.network.trainers.ClassificationDataset
+import org.simbrain.network.trainers.createClassificationDataset
+import org.simbrain.util.BiMap
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.display
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.showWarningDialog
-import org.simbrain.util.table.*
-import java.awt.Dimension
-import javax.swing.*
+import org.simbrain.util.table.BasicDataFrame
+import javax.swing.JButton
+import javax.swing.JLabel
+import javax.swing.JPanel
+import javax.swing.JSeparator
 
 /**
  * Classifier training dialog.
  */
 context(NetworkPanel)
-fun SmileClassifier.getTrainingDialog(): StandardDialog {
+fun ClassifierNetwork.getTrainingDialog(): StandardDialog {
     return StandardDialog().apply {
 
-        title = "Train ${classifier.name} classifier with ${classifier.outputSize} labels"
+        title = "Train ${classifier.name} classifier with ${classifier.numClasses} labels"
         contentPane = JPanel()
         // layout = MigLayout("fillx, debug")
 
@@ -40,76 +46,34 @@ fun SmileClassifier.getTrainingDialog(): StandardDialog {
             updateStatsLabel()
         }
 
-        // Data Panels
-        val inputs = SimbrainTablePanel(
-            createFromDoubleArray(classifier.trainingData.featureVectors), false
-        ).apply {
-            addAction(table.importCsv)
-            addAction(table.exportCsv())
-            addAction(table.randomizeAction)
-            addSeparator()
-            val advanceRowCheckbox = JCheckBox("Auto Advance").apply { isSelected = true }
-            toolbar.add(table.createApplyAction("Apply Inputs") {
-                inputNeuronGroup.setActivations(table.model.getRow<Double>(it).toDoubleArray())
-                with(network) {
-                    this@SmileClassifier.update()
+        val dataSetPanel = DataSetPanel(
+            BasicDataFrame(classifier.trainingData.inputs),
+            BasicDataFrame(classifier.trainingData.targets.map { listOf(it) }),
+            applyAction = {
+                withContext(Dispatchers.Default) {
+                    with(network) {
+                        inputDataFrame.getRow<Double>(it).let { activations ->
+                            inputNeuronGroup.setActivations(activations.toDoubleArray())
+                            update()
+                        }
+                    }
                 }
-                if (advanceRowCheckbox.isSelected) {
-                    incrementSelectedRow()
-                }
-            })
-            toolbar.add(advanceRowCheckbox)
-            preferredSize = Dimension(300, 300)
-            addCommitTask {
-                classifier.trainingData.featureVectors = this.model.get2DDoubleArray()
             }
-        }
-
-        val targets = SimbrainTablePanel(createBasicDataFrameFromColumn(classifier.trainingData.targetLabels), false).apply {
-            addAction(table.importCsv)
-            addAction(table.exportCsv())
-            addAction(table.randomizeColumnAction)
-            preferredSize = Dimension(200, 300)
-            addCommitTask {
-                classifier.trainingData.targetLabels = this.model.getStringColumn(0)
-            }
-        }
-
-        val addRemoveRows = JPanel().apply {
-            // Add row
-            add(JButton().apply {
-                icon = ResourceManager.getSmallIcon("menu_icons/AddTableRow.png")
-                toolTipText = "Insert row at bottom of input and target tables"
-                addActionListener {
-                    inputs.table.insertRow()
-                    targets.table.insertRow()
-                }
-            })
-            add(JButton().apply {
-                icon = ResourceManager.getSmallIcon("menu_icons/DeleteRowTable.png")
-                toolTipText = "Delete last row of input and target tables"
-                addActionListener {
-                    inputs.table.model.deleteRow(inputs.table.rowCount - 1)
-                    targets.table.model.deleteRow(targets.table.rowCount - 1)
-                }
-            })
-        }
-
-        fun applyDataAndTrain() {
-            try {
-                classfierProps.commitChanges()
-                classifier.trainingData.featureVectors = inputs.model.get2DDoubleArray()
-                classifier.trainingData.targetLabels = targets.model.getStringColumn(0)
-                train()
-            } catch(e: Exception) {
-                showWarningDialog(e.message.toString())
-            }
-        }
+        )
 
         // Training Button
         val trainButton = JButton("Train").apply {
             addActionListener {
-                applyDataAndTrain()
+                try {
+                    classfierProps.commitChanges()
+                    classifier.trainingData = createClassificationDataset(
+                        inputs = dataSetPanel.inputDataFrame.get2DDoubleList().map { it.toMutableList() }.toMutableList(),
+                        targets = dataSetPanel.targetDataFrame.getIntColumn(0).toMutableList()
+                    )
+                    train()
+                } catch(e: Exception) {
+                    showWarningDialog(e.message.toString())
+                }
             }
         }
 
@@ -120,16 +84,7 @@ fun SmileClassifier.getTrainingDialog(): StandardDialog {
         }
         contentPane.add(trainButton)
         contentPane.add(statsLabel, "wrap")
-        contentPane.add(JSeparator(), "span, growx, wrap")
-        contentPane.add(JLabel("Inputs"))
-        contentPane.add(JLabel("Target Labels"))
-        contentPane.add(JSeparator(), "span, growx, wrap")
-        contentPane.add(inputs)
-        contentPane.add(targets, "wrap")
-        contentPane.add(JPanel().apply {
-            add(JLabel("Add / Remove rows:"))
-            add(addRemoveRows)
-        })
+        contentPane.add(dataSetPanel)
     }
 }
 
@@ -137,15 +92,17 @@ fun main() {
     val networkComponent = NetworkComponent("net 1")
     val np = NetworkPanel(networkComponent)
     val classifier = with(networkComponent.network) {
-        val svm = SVMClassifier(2)
-        val classifier = SmileClassifier(svm)
-        svm.trainingData.featureVectors = arrayOf(
-            doubleArrayOf(0.0, 0.0),
-            doubleArrayOf(1.0, 0.0),
-            doubleArrayOf(0.0, 1.0),
-            doubleArrayOf(1.0, 1.0)
-        )
-        svm.trainingData.targetLabels = arrayOf("F", "T", "T", "F")
+        val svm = SVMClassifier(ClassificationDataset(
+            inputs = mutableListOf(
+                mutableListOf(0.0, 0.0),
+                mutableListOf(1.0, 0.0),
+                mutableListOf(0.0, 1.0),
+                mutableListOf(1.0, 1.0)
+            ),
+            targets = mutableListOf(-1, 1, 1, -1),
+            targetLabelMap = BiMap<Int, String>().apply { putAll(mapOf(-1 to "F", 1 to "T")) }
+        ))
+        val classifier = ClassifierNetwork(svm)
         addNetworkModel(classifier)
         classifier
     }

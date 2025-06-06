@@ -56,7 +56,7 @@ class TransformerBlockTest {
         val inputMatrix = arrayOf(
             doubleArrayOf(1.0, 2.0),
             doubleArrayOf(3.0, 4.0)
-        ).toColumnVector()
+        ).toMatrix()
         block.addInputs(inputMatrix)
 
         // Forward pass
@@ -66,19 +66,19 @@ class TransformerBlockTest {
         val kStackExpected = arrayOf(
             doubleArrayOf(1.0, 2.0),
             doubleArrayOf(3.0, 4.0)
-        ).toColumnVector()
+        ).toMatrix()
         checkMatrixEquals(kStackExpected, block.kStack, "kStack")
 
         val qStackExpected = arrayOf(
             doubleArrayOf(1.0, 2.0),
             doubleArrayOf(3.0, 4.0)
-        ).toColumnVector()
+        ).toMatrix()
         checkMatrixEquals(qStackExpected, block.qStack, "qStack")
 
         val vStackExpected = arrayOf(
             doubleArrayOf(1.0, 2.0),
             doubleArrayOf(3.0, 4.0)
-        ).toColumnVector()
+        ).toMatrix()
         checkMatrixEquals(vStackExpected, block.vStack, "vStack")
 
         // Check selfAttention:
@@ -94,7 +94,7 @@ class TransformerBlockTest {
         val selfAttentionExpected = arrayOf(
             doubleArrayOf(1.0, 0.0),
             doubleArrayOf(0.0000502, 0.9999498)
-        ).toColumnVector()
+        ).toMatrix()
         checkMatrixEquals(selfAttentionExpected, block.selfAttention, "selfAttention", tol = 1e-3)
 
         // check softmax rows of self attention matrix sum to 1
@@ -129,7 +129,7 @@ class TransformerBlockTest {
         val inputMatrix = arrayOf(
             doubleArrayOf(1.0, 2.0),
             doubleArrayOf(3.0, 4.0)
-        ).toColumnVector()
+        ).toMatrix()
 
         block.addInputs(inputMatrix)
         with(net) { block.update() }

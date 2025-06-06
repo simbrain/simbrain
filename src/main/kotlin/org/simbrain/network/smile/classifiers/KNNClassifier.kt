@@ -1,6 +1,8 @@
 package org.simbrain.network.smile.classifiers
 
 import org.simbrain.network.smile.ClassificationAlgorithm
+import org.simbrain.network.trainers.ClassificationDataset
+import org.simbrain.network.trainers.createClassificationDataset
 import org.simbrain.util.UserParameter
 import smile.classification.Classifier
 import smile.classification.KNN
@@ -9,18 +11,23 @@ import smile.validation.metric.Accuracy
 /**
  * Wrapper for Smile KNN Classifier.
  */
-class KNNClassifier @JvmOverloads constructor(inputSize: Int = 4, outputSize: Int = 4): ClassificationAlgorithm(inputSize,
-    outputSize) {
+class KNNClassifier(
+    dataset: ClassificationDataset = createClassificationDataset(
+        inputs = mutableListOf<MutableList<Double>>(),
+        targets = mutableListOf<Int>()
+    ),
+    splitRatio: Double = 0.8
+): ClassificationAlgorithm(dataset, splitRatio) {
 
     @UserParameter(label = "K", order = 10)
-    var k = outputSize
+    var k = numClasses
 
     override var model: Classifier<DoubleArray>? = null
 
     override val name: String = "K Nearest Neighbors"
 
     override fun fit(inputs: Array<DoubleArray>, targets: IntArray) {
-        if (k > trainingData.numSamples) {
+        if (k > trainingData.inputs.size) {
             throw IllegalStateException("k must be less than the number of rows in the training dataset")
         }
         model = KNN.fit(inputs, targets, k)
@@ -32,7 +39,7 @@ class KNNClassifier @JvmOverloads constructor(inputSize: Int = 4, outputSize: In
     }
 
     override fun copy(): ClassificationAlgorithm {
-        return KNNClassifier(inputSize, outputSize).also {
+        return KNNClassifier(dataset).also {
             it.k = k
         }
     }

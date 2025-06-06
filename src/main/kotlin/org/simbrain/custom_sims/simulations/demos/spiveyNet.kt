@@ -204,16 +204,6 @@ val spiveyNet = newSim {
         currentStatus.location = point(220, -240)
 
         createControlPanel("Control Panel", 15, 15) {
-            addButton("Cohort Condition") {
-                // Target = Candle, Competitor = Candy
-                conditionText = "Cohort Condition"
-                currentStatus.text = conditionText
-                resetExperiment()
-                targetIndex = 0
-                targetObject.entityType = EntityType.Candy
-                competitorIndex = 1
-                visualNodes.setActivations(doubleArrayOf(1.0, 1.0, 0.0, 0.0))
-            }
             addButton("Control Condition") {
                 // Candle / Fork
                 conditionText = "Control Condition"
@@ -223,6 +213,16 @@ val spiveyNet = newSim {
                 competitorIndex = 3
                 resetExperiment()
                 visualNodes.setActivations(doubleArrayOf(1.0, 0.0, 0.0, 1.0))
+            }
+            addButton("Cohort Condition") {
+                // Target = Candle, Competitor = Candy
+                conditionText = "Cohort Condition"
+                currentStatus.text = conditionText
+                resetExperiment()
+                targetIndex = 0
+                targetObject.entityType = EntityType.Candy
+                competitorIndex = 1
+                visualNodes.setActivations(doubleArrayOf(1.0, 1.0, 0.0, 0.0))
             }
             addButton("Rhyme Condition") {
                 // Candle / Handle
@@ -288,14 +288,18 @@ val spiveyNet = newSim {
         """ 
         # Introduction
         
-        This is a simulation of a localist attractor simulation of mouse trajectories relative to visual and auditory inputs
-        due to Michael Spivey and others.
+        This is a localist attractor network based on (Spivey, 2025) that simulates mouse trajectories relative to visual and auditory inputs.
+         It is a computational model of behavioral studies described in (Spivey et al., 2005). It is not a model of learning
+         but rather an illustration of how a relatively simple, structured network can simulate the intricate
+         real-time interplay between language comprehension, visual attention, and motor behavior. 
+         It shows how cognition  is not a series of isolated stages, but a fluid, embodied process deeply shaped by perception 
+         and action unfolding over time.
          
-        The visual world localist attractor is a computational model that serves as a linking hypothesis between internal cognitive processes 
-        (specifically in spoken word recognition) and observable motor outputs like eye movements and 
-        mouse trajectories in the Visual World Paradigm. The core idea is that cognition and action are 
-        dynamically interconnected: what we look at or move toward not only reflects but also 
-        influences what we're thinking. Spivey's model integrates parallel lexical activations, 
+        The visual world localist attractor network is a computational model that serves as a linking hypothesis between 
+        internal cognitive processes (specifically in spoken word recognition) and observable motor outputs like 
+        eye movements and mouse trajectories in the [Visual World Paradigm](https://people.clas.ufl.edu/jvaldeskroff/files/SecondLang_Chapter.pdf). 
+        The core idea is that cognition and action are dynamically interconnected: what we look at or move toward not 
+        only reflects but also influences what we're thinking. Spivey's model integrates parallel lexical activations, 
         visual input, and motor output with feedback loops especially from eye position to 
         simulate how these processes unfold over time. 
 
@@ -304,117 +308,134 @@ val spiveyNet = newSim {
         nuanced behavioral patterns seen in experiments (like greater mouse curvature after 
         competitor fixations). By doing so, the model offers a powerful tool to test and refine 
         theories of real-time language processing and perception-action coupling.
-
-        There is no learning in this type of network. It was hand-crafted, something like an IAC network.
-
-        Overall, this model illustrates how a relatively simple, structured network can simulate the intricate, r
-        eal-time interplay between language comprehension, visual attention, and motor behavior. 
-        By incorporating dynamic feedback loops, probabilistic saccade generation, and continuous 
-        motor output, the system not only mirrors behavioral data observed in human participants 
-        but also sheds light on the underlying cognitive mechanisms. 
-        The visual world localist attractor thus stands as a compelling demonstration of how cognition 
-        is not a series of isolated stages, but a fluid, embodied process deeply shaped by perception 
-        and action unfolding over time.
-         
-        # Background
         
-        Relevant papers are 
-        - [Continuous attraction toward phonological competitors](https://pmc.ncbi.nlm.nih.gov/articles/PMC1177386/)
-        - [A Linking Hypothesis for Eyetracking and Mousetracking in the Visual World Paradigm](https://www.sciencedirect.com/science/article/pii/S0006899325000356/pdfft?md5=593289ceb624d37b85229782945c7b40&pid=1-s2.0-S0006899325000356-main.pdf)
-
-
-        This simulates a study of eye and mouse tracking.  Participants are shown two objects and told which to point to,
-        and the scientist tracks their mouse and eyes as they point to the requested object.
+        # Simulation Details
         
-         - Control condition: candle target and fork competitor. Eyes should go straight to target.
-         - Cohort condition: candle target and candy competitor. The first phonemes are the same in "candle" and "candy"
-                and so the mouse motion is more complex.
-         - Rhyming condition: candle target and handle competitor. 
-         
-        Here is how Spivey explains it
-
-        > Participants were presented with color images of two objects on a screen (one target and one distractor), 
-        and a prerecorded speech file instructed them to click one of them with the mouse. 
-        Objects were presented in the upper left and upper right corners of the computer screen 
-        (e.g., a candle and a candy, in the cohort condition, or a candle and a jacket, in the control condition). 
-        Eight target objects were used to make 32 trials in which the distractor object was either a cohort for 
-        the target object or a phonologically dissimilar control and in which the target object was either on the left
-        or right side of the display. Participants were instructed to mouse-click a box in the bottom center of 
-        the screen when they were ready to begin a trial. At this time, the two object images would appear in 
-        the upper left and right, and 500 ms after the onset of the images, a single spoken word 
-        (from a speech file on the computer; mean duration, 532 ms) would name the target object. 
-        [Imposing this asynchrony between image onset and speech onset grew out of observations from 
-        pilot studies in which simultaneous onset caused participants to occasionally wait until 
-        the entire word was spoken before beginning their mouse movement. 
-        With the spoken word beginning 500 ms after onset of the images, participants usually begin their 
-        mouse movement (straight upward) before the onset of the spoken word, which gives distinguishing 
-        properties in the acoustic–phonetic input a chance to influence the continuous motor output midflight.
-
-
-        # How it works, step by step
-                 
-        1. Network Architecture
-        Nodes: Represent words (Lexical layer) and visual objects (Visual layer).
-        Layers:
-        Lexical (word units)
-        Visual (object units)
-        Integration (sum of Lexical + Visual)
-        Eyes (fixated object)
-        Mouse (motor plan)
-        All layers have bidirectional connections, allowing feedback.
-         
-        2. Initialization
-        Two objects are present in the display
-        Their nodes in the Visual layer are initialized to 1.0, others 0.0.
-        The Visual vector is normalized so activations sum to 1.0. (e.g., [0.5, 0.5, 0, 0] for 2 objects.)
-         
-        3. Phoneme Input (Over Time Steps)
-        At each timestep, a phoneme of the target word is input to the Lexical layer.
-        Each word node receives 1.0 if the phoneme matches, 0.0 otherwise.
-        E.g., “candle” input at time 2 might activate "candle" and "candy" nodes for /k/.
-         
-        4. Normalize Lexical and Visual Vectors
-        After each input, normalize Lexical and Visual vectors so their activations sum to 1.0.
-         
-        5. Compute the Integration Layer
-        Integration = Lexical + Visual (pointwise sum).
-        Normalize the Integration vector so it also sums to 1.0.
-         
-        6. Generate Motor Outputs
-        Two motor systems: Eye movements and Mouse movements.
-         
-        A. Eye Movements:
-        Stochastic: Each fixation is sampled from the Visual vector (probability distribution).
-        Saccades have a 180 ms refractory period (~3 timesteps).
-        Fixation boosts activation in the Eyes vector: fixated object gets 0.55, others 0.45.
-         
-        B. Mouse Movements:
-        Smooth and continuous.
-        X-position changes based on activation difference between Target and Competitor in the Mouse vector (a copy of the Visual vector).
-        Y-position increases by 50 pixels every timestep (straight up).
-        Curvature emerges if activation leans toward the competitor.
-         
-        7. Feedback to Lexical and Visual Layers
-        Feedback is multiplicative:
-        This biases the system toward currently active items, especially the fixated object (via Eyes vector).
-        After feedback, normalize Lexical and Visual vectors again.
-        This keeps competition active (inhibits less relevant nodes).
+        In the studies in (Spivey et al., 2005) participants were shown two objects and told which to point to.
+        The scientists tracked their mouse and eyes as they pointed to the requested objects. There were three main conditions
         
-        9. Iterate for Each Timestep
-        Repeat steps 3–8 for each timestep in the trial (usually 6 phoneme inputs).
-        Track Lexical activations, eye fixations, and mouse path at each step.
+         1. **Control condition**: candle target and fork competitor. Eyes should go straight to target without being influenced by the competitor,
+            because candle and fork have very different phonemic representations.
+         2. **Cohort condition**: candle target and candy competitor. The first four phonemes are the same in "candle" and "candy"
+                and so the mouse motion should be drawn slightly towards "candy", because of their shared initial phonemic representations. 
+         3. **Rhyming condition**: candle target and handle competitor. There is shared phonemic representation but it is in the final phonemes.
+                Thus the mouse trace should be pulled towards the competitor but not as much as in the cohort condition.
         
-        10. Output
-        Mouse trajectories: 2D path of the mouse over time, showing curvature based on perception and production.
-        Overall, this model illustrates how a relatively simple, structured network can simulate the intricate, real-time interplay between language comprehension, 
-        visual attention, and motor behavior. By incorporating dynamic feedback loops, probabilistic 
-        saccade generation, and continuous motor output, the system not only mirrors behavioral 
-        data observed in human participants but also sheds light on the underlying cognitive mechanisms. 
-        The visual world localist attractor thus stands as a compelling demonstration of how cognition 
-        is not a series of isolated stages, but a fluid, embodied process deeply shaped by perception 
-        and action unfolding over time.      
+        # What to Do
+        
+        ## Compare conditions
+        
+        1. Control Condition
+        - Click on the `Control condition` button
+        - Click the `iterate` button repeatedly
+        - Observe the mouse goes straight to the candle
+        
+        2. Cohort Condition
+        - Click on the `Cohort condition` button
+        - Click the `iterate` button repeatedly
+        - Observe the mouse goes towards the the candle, but is pulled a bit towards candy
+
+        3. Rhyming Condition
+        - Click on the `Rhyming condition` button
+        - Click the `iterate` button repeatedly
+        - Observe the mouse goes towards the the candle, but is pulled a bit towards the handle, but not as much as in the cohort condition, and
+            is pulled more towards the end of the trajectory.
+        
+        
+        You can reset at any time using the `reset button` to erase all the trajectories
+        You can reset without erasing trajectories by pressing the Control, Cohort, or Rhyming buttons.  
+        You can click the `feeback` button to simulate feedback in a way that is described in (Spivey, 2025).
+       
+        ## To plot activations 
+        
+        In (Spivey, 2025), the central figure is Figure 5 which shows time series plots for activations in different parts of the network,
+        which illustrates the dynamics governing the mouse traces. This can also be simulated in Simbrain.
+        
+        1. Right-click on the interaction box (the yellow box of the groups of nodes) of whatever network is of interest (eyes, integration, etc)  
+        1. Select `Plot > Time Series Plot` from the dropdown.
+        1. Repeat the steps above (selecting a condition then iterating) to see activation dynamics in the time series
+        1. There will generally be four lines corresponding to the four nodes in each neuron group.
+        
+        # Reference
+        
+        Spivey, M. J. (2025). [A linking hypothesis for eyetracking and mousetracking in the visual world paradigm](https://www.sciencedirect.com/science/article/pii/S0006899325000356). Brain Research, 149477.
+        
+        Spivey, M. J., Grosjean, M., & Knoblich, G. (2005). [Continuous attraction toward phonological competitors](https://pmc.ncbi.nlm.nih.gov/articles/PMC1177386/). Proceedings of the National Academy of Sciences, 102(29), 10393-10398.
+
+        # Credits
+        
+        [Suzanne Garcia](www.linkedin.com/in/suzanne-garcia5537bb293)
+        
+        Olivia Gawel
+        
+        [Jeff Yoshimi](www.jeffyoshimi.net)
        
         """.trimIndent()
     )
 
+
 }
+
+
+
+// Ask Spivey for things we should look for, esp in the feedback
+//1. Network Architecture
+//Nodes: Represent words (Lexical layer) and visual objects (Visual layer).
+//Layers:
+//Lexical (word units)
+//Visual (object units)
+//Integration (sum of Lexical + Visual)
+//Eyes (fixated object)
+//Mouse (motor plan)
+//All layers have bidirectional connections, allowing feedback.
+//
+//2. Initialization
+//Two objects are present in the display
+//Their nodes in the Visual layer are initialized to 1.0, others 0.0.
+//The Visual vector is normalized so activations sum to 1.0. (e.g., [0.5, 0.5, 0, 0] for 2 objects.)
+//
+//3. Phoneme Input (Over Time Steps)
+//At each timestep, a phoneme of the target word is input to the Lexical layer.
+//Each word node receives 1.0 if the phoneme matches, 0.0 otherwise.
+//E.g., “candle” input at time 2 might activate "candle" and "candy" nodes for /k/.
+//
+//4. Normalize Lexical and Visual Vectors
+//After each input, normalize Lexical and Visual vectors so their activations sum to 1.0.
+//
+//5. Compute the Integration Layer
+//Integration = Lexical + Visual (pointwise sum).
+//Normalize the Integration vector so it also sums to 1.0.
+//
+//6. Generate Motor Outputs
+//Two motor systems: Eye movements and Mouse movements.
+//
+//A. Eye Movements:
+//Stochastic: Each fixation is sampled from the Visual vector (probability distribution).
+//Saccades have a 180 ms refractory period (~3 timesteps).
+//Fixation boosts activation in the Eyes vector: fixated object gets 0.55, others 0.45.
+//
+//B. Mouse Movements:
+//Smooth and continuous.
+//X-position changes based on activation difference between Target and Competitor in the Mouse vector (a copy of the Visual vector).
+//Y-position increases by 50 pixels every timestep (straight up).
+//Curvature emerges if activation leans toward the competitor.
+//
+//7. Feedback to Lexical and Visual Layers
+//Feedback is multiplicative:
+//This biases the system toward currently active items, especially the fixated object (via Eyes vector).
+//After feedback, normalize Lexical and Visual vectors again.
+//This keeps competition active (inhibits less relevant nodes).
+//
+//9. Iterate for Each Timestep
+//Repeat steps 3–8 for each timestep in the trial (usually 6 phoneme inputs).
+//Track Lexical activations, eye fixations, and mouse path at each step.
+//
+//10. Output
+//Mouse trajectories: 2D path of the mouse over time, showing curvature based on perception and production.
+//Overall, this model illustrates how a relatively simple, structured network can simulate the intricate, real-time interplay between language comprehension,
+//visual attention, and motor behavior. By incorporating dynamic feedback loops, probabilistic
+//saccade generation, and continuous motor output, the system not only mirrors behavioral
+//data observed in human participants but also sheds light on the underlying cognitive mechanisms.
+//The visual world localist attractor thus stands as a compelling demonstration of how cognition
+//is not a series of isolated stages, but a fluid, embodied process deeply shaped by perception
+//and action unfolding over time.

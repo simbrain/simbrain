@@ -48,7 +48,8 @@ class SVMClassifier(
 
     override fun fit(inputs: Array<DoubleArray>, targets: IntArray) {
         model = SVM.fit(inputs, targets, PolynomialKernel(kernelDegree), C, tolerance)
-        setAccuracyLabel(Accuracy.of(targets, model?.predict(inputs)))
+        setTrainingStats(Accuracy.of(targets, model?.predict(inputs)))
+        setTestingStats(Accuracy.of(testingData.targetArray, model?.predict(testingData.inputArrays)))
     }
 
     override fun predict(input: DoubleArray): Int {

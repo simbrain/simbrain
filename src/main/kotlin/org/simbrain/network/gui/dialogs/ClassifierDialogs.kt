@@ -34,10 +34,12 @@ fun ClassifierNetwork.getTrainingDialog(): StandardDialog {
         val classfierProps = AnnotatedPropertyEditor(classifier)
 
         // Manage stats label
-        val statsLabel = JLabel("---")
+        val trainingStatsLabel = JLabel("---")
+        val testingStatsLabel = JLabel("---")
         layout = MigLayout("fillx")
         fun updateStatsLabel() {
-            statsLabel.text = classifier.stats
+            trainingStatsLabel.text = classifier.trainingStats
+            testingStatsLabel.text = classifier.testingStats
         }
         updateStatsLabel()
         events.updated.on {
@@ -78,9 +80,19 @@ fun ClassifierNetwork.getTrainingDialog(): StandardDialog {
             classifier.testingData = testingDataSetPanel.exportDataSet()
         }
 
+        val trainingPanel = JPanel(MigLayout()).apply {
+            add(trainingStatsLabel, "wrap")
+            add(trainingDataSetPanel)
+        }
+
+        val testPanel = JPanel(MigLayout()).apply {
+            add(testingStatsLabel, "wrap")
+            add(testingDataSetPanel)
+        }
+
         val dataSetTabPane = JTabbedPane().apply {
-            addTab("Training Set", trainingDataSetPanel)
-            addTab("Testing Set", testingDataSetPanel)
+            addTab("Training Set", trainingPanel)
+            addTab("Testing Set", testPanel)
         }
 
         // Training Button
@@ -101,8 +113,7 @@ fun ClassifierNetwork.getTrainingDialog(): StandardDialog {
             addCommitTask(classfierProps::commitChanges)
             add(JSeparator(), "growx, span, wrap")
         }
-        contentPane.add(trainButton)
-        contentPane.add(statsLabel, "wrap")
+        contentPane.add(trainButton,  "wrap")
         contentPane.add(dataSetTabPane, "wrap")
     }
 }

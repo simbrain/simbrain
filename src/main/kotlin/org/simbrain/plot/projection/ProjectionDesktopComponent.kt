@@ -206,9 +206,9 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
     /**
      * The JFreeChart chart.
      */
-    private val chart: JFreeChart = ChartFactory.createScatterPlot(
+    val chart: JFreeChart = ChartFactory.createScatterPlot(
         "", "Projection X", "Projection Y",
-        xyCollection, PlotOrientation.VERTICAL, false, true, false
+        xyCollection, PlotOrientation.VERTICAL, true, true, false
     ).apply {
         xyPlot.backgroundPaint = Color.white
         xyPlot.domainGridlinePaint = Color.gray
@@ -362,13 +362,16 @@ fun main() {
 private class CustomRenderer(val proj: ProjectionDesktopComponent) : XYLineAndShapeRenderer() {
     override fun getItemPaint(series: Int, index: Int): Paint {
         val projector = proj.projector
-        val hotColor = if (projector.useHotColor) projector.hotColor else projector.baseColor
-        if (proj.pointList[index] === proj.projector.dataset.currentPoint) {
-            return hotColor
-        }
         return with(projector) {
             projector.coloringManager.getColor(proj.pointList[index])?: projector.baseColor
         }
+    }
+
+    override fun getItemOutlineStroke(series: Int, index: Int): Stroke? {
+        if (proj.pointList[index] === proj.projector.dataset.currentPoint) {
+            return BasicStroke(6f)
+        }
+        return BasicStroke(0f)
     }
 }
 

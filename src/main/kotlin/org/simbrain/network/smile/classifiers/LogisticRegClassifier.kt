@@ -35,7 +35,8 @@ class LogisticRegClassifier(
         model = LogisticRegression.fit(inputs, targets)
         outputProbabilities = DoubleArray(numClasses)
         val pred = model?.predict(inputs)
-        setAccuracyLabel(Accuracy.of(targets, pred))
+        setTrainingStats(Accuracy.of(targets, pred))
+        setTestingStats(Accuracy.of(testingData.targetArray, model?.predict(testingData.inputArrays)))
     }
 
     override fun predict(input: DoubleArray): Int {

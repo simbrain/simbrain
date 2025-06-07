@@ -142,7 +142,7 @@ class ClassifierNetwork(
                     nSamples = 100,
                     nCenters = nout,
                     nFeatures = nin,
-                    clusterStd = 1.0,
+                    clusterStd = 2.0,
                     encoding = if (classifierType is SVMClassifier) ClassificationDatasetEncoding.Bipolar else ClassificationDatasetEncoding.Integer
                 )
                 constructor.call(dataset, 0.8)

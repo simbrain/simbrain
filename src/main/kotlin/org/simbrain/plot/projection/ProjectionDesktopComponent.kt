@@ -194,6 +194,7 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
     }
 
     private val renderer = CustomRenderer(this).apply {
+        setUseOutlinePaint(true)
         setSeriesLinesVisible(0, projector.connectPoints)
         setSeriesShape(0, Ellipse2D.Double(-7.0, -7.0, 7.0, 7.0))
         val generator = CustomToolTipGenerator(this@ProjectionDesktopComponent)
@@ -367,7 +368,11 @@ private class CustomRenderer(val proj: ProjectionDesktopComponent) : XYLineAndSh
         }
     }
 
-    override fun getItemOutlineStroke(series: Int, index: Int): Stroke? {
+    override fun getItemOutlinePaint(series: Int, index: Int): Paint {
+        return proj.projector.hotColor
+    }
+
+    override fun getItemOutlineStroke(series: Int, index: Int): Stroke {
         if (proj.pointList[index] === proj.projector.dataset.currentPoint) {
             return BasicStroke(6f)
         }

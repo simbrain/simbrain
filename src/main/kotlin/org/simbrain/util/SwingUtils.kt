@@ -92,6 +92,15 @@ fun showDirectorySelectionDialog(approveButtonText: String = "Select Folder"): S
 fun <T : JComponent> T.displayInDialog(block: T.() -> Unit = {}): StandardDialog {
     val dialog = StandardDialog()
     dialog.contentPane = this
+    dialog.defaultCloseOperation = JDialog.DISPOSE_ON_CLOSE
+
+    // Add Escape key binding
+    dialog.rootPane.registerKeyboardAction(
+        { dialog.dispose() },
+        KeyStroke.getKeyStroke("ESCAPE"),
+        JComponent.WHEN_IN_FOCUSED_WINDOW
+    )
+
     dialog.makeVisible()
     dialog.addCommitTask { block() }
     return dialog

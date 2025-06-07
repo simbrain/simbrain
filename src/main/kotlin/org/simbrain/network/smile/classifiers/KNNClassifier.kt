@@ -31,7 +31,8 @@ class KNNClassifier(
             throw IllegalStateException("k must be less than the number of rows in the training dataset")
         }
         model = KNN.fit(inputs, targets, k)
-        setAccuracyLabel(Accuracy.of(targets, model?.predict(inputs)))
+        setTrainingStats(Accuracy.of(targets, model?.predict(inputs)))
+        setTestingStats(Accuracy.of(testingData.targetArray, model?.predict(testingData.inputArrays)))
     }
 
     override fun predict(input: DoubleArray): Int {

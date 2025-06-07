@@ -2,9 +2,12 @@ package org.simbrain.util
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
+import org.jfree.chart.LegendItem
+import org.jfree.chart.LegendItemCollection
 import org.simbrain.custom_sims.SimulationScope
 import org.simbrain.network.smile.ClassifierNetwork
 import org.simbrain.plot.projection.ProjectionComponent
+import org.simbrain.plot.projection.ProjectionDesktopComponent
 import org.simbrain.util.projection.AuxDataColoringManager
 import org.simbrain.util.projection.DataPoint
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
@@ -291,7 +294,7 @@ suspend fun SimbrainDesktop.loadWorkspaceZipFromFileChooser(): Boolean {
     return false
 }
 
-fun SimbrainDesktop.createClassifierProjectionPlot(smileClassifier: ClassifierNetwork): ProjectionComponent {
+suspend fun SimbrainDesktop.createClassifierProjectionPlot(smileClassifier: ClassifierNetwork): ProjectionComponent {
     val projectionComponent = ProjectionComponent("${smileClassifier.displayName} Plot").apply {
         projector.coloringManager = AuxDataColoringManager()
     }
@@ -318,6 +321,13 @@ fun SimbrainDesktop.createClassifierProjectionPlot(smileClassifier: ClassifierNe
     workspace.addWorkspaceComponent(
         projectionComponent
     )
+    (getDesktopComponent(projectionComponent) as ProjectionDesktopComponent).chart.apply {
+        xyPlot.fixedLegendItems = LegendItemCollection().apply {
+            (colors zip smileClassifier.outputNeuronGroup.labelArray).forEach { (color, label) ->
+                add(LegendItem(label, color))
+            }
+        }
+    }
     workspace.events.componentRemoved.on {
         if (it == projectionComponent) {
             deregisterDeleteEvent()

@@ -193,7 +193,7 @@ class SmileClassifierTest {
         // Fit the model
         val lr = LogisticRegClassifier(createClassificationDataset(inputs.map { it.toMutableList() }.toMutableList(), targets.toMutableList()))
         lr.fit(inputs, targets)
-        println("\nModel Accuracy: ${Utils.round(lr.stats.toDouble(), 3)}\n")
+        println("\nModel Accuracy: ${Utils.round(lr.trainingStats.toDouble(), 3)}\n")
 
         // Make some predictions
         fun predict(rowNum: Int) {

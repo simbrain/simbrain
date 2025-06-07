@@ -37,7 +37,9 @@ abstract class SimbrainClassifier(
     /**
      * Statistics to display after training
      */
-    var stats = ""
+    var trainingStats = ""
+
+    var testingStats = ""
 
     /**
      * The main model used for classification.
@@ -63,8 +65,12 @@ abstract class SimbrainClassifier(
         return getOneHotArray(winner, numClasses)
     }
 
-    fun setAccuracyLabel(accuracy: Double) {
-        stats = "Accuracy: ${Utils.round(accuracy, 3)}"
+    fun setTrainingStats(accuracy: Double) {
+        trainingStats = "Accuracy: ${Utils.round(accuracy, 3)}"
+    }
+
+    fun setTestingStats(accuracy: Double) {
+        testingStats = "Accuracy: ${Utils.round(accuracy, 3)}"
     }
 
     /**

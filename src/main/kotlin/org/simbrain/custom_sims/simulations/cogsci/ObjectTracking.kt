@@ -261,21 +261,21 @@ val objectTrackingSim = newSim {
 
     addSidebarInfo(
         """
-        # Object Tracking Reservoir
+        # Introduction
         
         This is one of the models presented in the paper, *A potential mechanism for Gibsonian resonance: behavioral entrainment emerges from local homeostasis 
-        in an unsupervised reservoir network* [[1](https://doi.org/10.1007/s11571-023-09988-2), [2](https://doi.org/10.31234/osf.io/pt7bn)]. This simulation simulates an agent 
-        learning how to visually track an object using a reservoir network. 
+        in an unsupervised reservoir network*. This simulation simulates an agent learning how to visually track an object using a reservoir network. 
         
-        ## Simulation Details
+        # Simulation Details
         
-        The reservoir network uses an **unsupervised allostatic learning rule** that Ben Falandays and his colleagues developed [[3](https://doi.org/10.1016/j.brainres.2021.147578)]. 
+        The reservoir network uses an unsupervised allostatic learning rule that Ben Falandays and his colleagues developed (Falandays et al., 2021). 
         The unsupervised allostatic learning rule allows the reservoir network to adapt and adjust its weights in response to the movement of the cheese (i.e., the activation values received 
         from sensing the cheese). Through this process, the agent learns to accurately anticipate the cheese's movement in order to stabilize its sensory neuron inputs (i.e., left and right).
         In addition, the agent's learned representations of the cheese's movement also stabilize. When the agent's representations become stable, it stops developing new representations.
         But sometimes, the agent can break out of this stable state as a result of the object moving in the opposite direction. When this occurs, the agent generates new, unique representations
-        of the object's movement on the fly for a given rotational direction, never reusing its pre-existing representations, creating no stable permanent representations. This transition
-        from stabilization to destabilization is considered as a **representational drift** [[4](https://pmc.ncbi.nlm.nih.gov/articles/PMC7385530/)]. This cycle of stabilization to destabilization
+        of the object's movement on the fly for a given rotational direction, never reusing its pre-existing representations, creating no stable permanent representations. 
+        
+        This transition from stabilization to destabilization is considered as a representational drift (Rule et al., 2019). This cycle of stabilization to destabilization
         creates an illustration of how an agent can behave consistently to its learned information and how its behavior can adapt in response to new ongoing changes in neural activity
         (i.e., new incoming information).
         
@@ -302,19 +302,19 @@ val objectTrackingSim = newSim {
         you can analyze the data. For example, analyzing when representational drift happens and how often it occurs. When doing this, you can also analyze how changes in the [simulation 
         code](https://docs.simbrain.net/docs/simulations/) can affect the agent's behaviors like changing the learning rate or the synaptic weight values.
         
-        ### References
+        # References
         
-        1) Falandays, J. B., Yoshimi, J., Warren, W., & Spivey, M. J. (2023). [A potential mechanism for Gibsonian resonance: behavioral entrainment emerges from local homeostasis in an unsupervised reservoir network](https://doi.org/10.1007/s11571-023-09988-2). _Cognitive Neurodynamics_, _18_(4), 1811–1834. 
-        
-        2) Falandays, J. B., Yoshimi, J., Warren, W., & Spivey, M. J. (2023, February 2). [A Potential Mechanism for Gibsonian Resonance: Behavioral Entrainment Emerges from Local Homeostasis in an Unsupervised Reservoir Network](https://doi.org/10.31234/osf.io/pt7bn). Preprint.
-        
-        3) Falandays, J. B., Nguyen, B., & Spivey, M. J. (2021). [Is prediction nothing more than multi-scale pattern completion of the future?](https://doi.org/10.1016/j.brainres.2021.147578) _Brain Research_, _1768_, 147578. 
+        Falandays, J. B., Yoshimi, J., Warren, W., & Spivey, M. J. (2023). [A potential mechanism for Gibsonian resonance: behavioral entrainment emerges from local homeostasis in an unsupervised reservoir network](https://doi.org/10.1007/s11571-023-09988-2). ([Preprint](https://doi.org/10.31234/osf.io/pt7bn)). _Cognitive Neurodynamics_, _18_(4), 1811–1834. 
+                
+        Falandays, J. B., Nguyen, B., & Spivey, M. J. (2021). [Is prediction nothing more than multi-scale pattern completion of the future?](https://doi.org/10.1016/j.brainres.2021.147578) _Brain Research_, _1768_, 147578. 
          
-        4)  Rule, M. E., O'Leary, T., & Harvey, C. D. (2019). [Causes and consequences of representational drift](https://pmc.ncbi.nlm.nih.gov/articles/PMC7385530/). _Current opinion in neurobiology_, _58_, 141–147.
+        Rule, M. E., O'Leary, T., & Harvey, C. D. (2019). [Causes and consequences of representational drift](https://doi.org/10.1016/j.conb.2019.08.005). _Current opinion in neurobiology_, _58_, 141–147.
         
-        ### Credits
+        # Credits
         
-        [Jeff Yoshimi](https://jeffyoshimi.net/index.html) and Kanly Thao.
+        [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
+        
+        Kanly Thao
         
         """.trimIndent()
     )

@@ -2,6 +2,7 @@ package org.simbrain.custom_sims.simulations
 
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
+import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
@@ -176,5 +177,50 @@ val evolveXor = newSim {
             evaluatorParams.addProgressWindow()
             runSim()
         }
+
+        addSidebarInfo(
+            """ 
+        # Introduction
+        
+        This simulation of the evolution of a neural network evolving to solve the XOR problem using an evolutionary framework in Simbrain. 
+        
+        # Simulation Details
+        
+        This simulation simulates the evolution of a neural network until the `target error` in the control panel is met, exceeded, or when it has reached the maximum generation. The
+        goal of this simulation is to evolve until it is as close as possible to the `target error`. The `target error is calculated as the difference between the existing dataset (i.e.,
+        neuron groups) and the actual solution to the XOR problem.
+        
+        For a comprehensive look into how evolutionary simulations are developed in Simbrain, look [here](https://docs.simbrain.net/docs/evolution/).
+        
+        ## Evolutionary Process
+        
+        The simulation begins with a starting population of simulations. In generation 0, each simulation starts with a three-layer network of the XOR solution and a preset amount of 
+        connections (1 per layer). Within each generation, the simulation will iterate itself till the specified value. Then after each generation, a certain percentage of the population 
+        is eliminated (e.g., `elimination ratio`) and repopulated with new simulations. During this process of reproduction, the new simulations will have mutations, where the simulation 
+        develops more hidden nodes (10% chance), connections (25% chance), changes in node biases and weight strengths. After each generation, the fitness or, the performance of the simulation is
+        calculated and a percentage of the top performers is evaluated (e.g, `Evaluation percentile`) to determine if the `target error` has been achieved. This process continues until
+        the simulation has reached the target error or lower, or it has reached the maximum number of generations. 
+        
+        # What to Do    
+            
+        In this simulation, similarly to the other evolutionary simulations, the control panel controls how the evolutionary process works. There are no target qualities that
+        you can evolve the simulation towards because the simulation is designed to have the target of solving the XOR problem. Meaning that the simulation will evolve until it
+        has solved the XOR problem. Below are the steps to evolving the simulation:
+        
+        1) Specify the parameters of the simulation.
+        
+        2) After confirming the parameters are what you want, click on the `Evolve` button to start the simulation.
+        
+        3) Now, wait for the evolution process to finish, note that it can take a while depending on your configurations.
+
+        # Credits
+ 
+        [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
+        
+        Kanly Thao
+        
+        """.trimIndent()
+        )
+
     }
 }

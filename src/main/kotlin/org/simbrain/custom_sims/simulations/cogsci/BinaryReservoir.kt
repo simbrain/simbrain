@@ -177,10 +177,10 @@ val binaryReservoir = newSim {
 
     addSidebarInfo(
         """
-        # Binary Reservoir
+        # Introduction
         
         This simulation shows how research can be done in Simbrain and in coordination with other programming environments. Though this simulation can be 
-        used directly in any way as desired, pressing the buttons can configure parameters, run simulations, and save data that is outputted to a `.csv` file 
+        used directly in any way as desired, pressing the buttons can configure parameters, run simulations, and save data that is outputted to a .csv file 
         which can then be analyzed in other programming environments like Python. For more information on the `Binary Reservoir` simulation and its usage, 
         feel free to contact jponcedeleon@ucmerced.edu.
 
@@ -189,13 +189,13 @@ val binaryReservoir = newSim {
         In this simulation, each trial resets the node connection parameters, and after `400` baseline iterations, it models a perturbation to the network by adding 
         an additional input signal to `10%` of the nodes, and continues to update activations for an additional `300` iterations to show the reservoir's response to new input
         (these and other parameters can be configured in the [simulation code](https://docs.simbrain.net/docs/simulations/)). This perturbation allows for the calculation of a 
-        measure called the **perturbational complexity index (PCI)**, which is associated with consciousness in humans and other animals [[1](https://pubmed.ncbi.nlm.nih.gov/31133480/)]. 
+        measure called the perturbational complexity index (PCI), which is associated with consciousness in humans and other animals (Comolatti et al., 2019).
         In this simulation, the relationship between PCI and edge-of-chaos activation dynamics is studied in a binary reservoir network.
 
         The `run one trial` button produces one file for the specified `weight stdev`. You can also see the set variance and the actual variance in your programming environment
         after you apply the `weight stdev`. Whereas, the `run one trial per parameter` button will produce a set of files, one for each mean weight variance of a geometric 
         progression (from `0.1` to `10`). This makes it possible to study how PCI varies with `weight variance`, which is known to be a control parameter for putting networks 
-        into different dynamical regimes, from `ordered` to `chaotic` and in between `edge of chaos`. For an in-depth description and illustration of the different dynamical 
+        into different dynamical regimes, from ordered to chaotic and in between edge of chaos. For an in-depth description and illustration of the different dynamical 
         regimes, refer to the `Edge of Chaos bitstream` simulation.
         
         # What to Do
@@ -214,7 +214,7 @@ val binaryReservoir = newSim {
         5) To reset the simulation, stop the simulation by clicking the `run` button again, and click on the reservoir, then press `k`. Afterwards, press the `clear` button in the 
         PCA plot to clear the points.
         
-        6) Afterwards, click back on the `cursor` button, and left-click outside of the reservoir to unselect all neurons.
+        6) Afterwards, click back on the `cursor` icon, and left-click outside of the reservoir to unselect all neurons.
 
         ## Conducting Research on the Relationship between PCI and Dynamical Regimes
         
@@ -224,13 +224,17 @@ val binaryReservoir = newSim {
         
         3) Save it to your device after the simulation finishes.  
         
-        ### References
+        # References
         
-        1) Comolatti, R., Pigorini, A., Casarotto, S., Fecchio, M., Faria, G., Sarasso, S., Rosanova, M., Gosseries, O., Boly, M., Bodart, O., Ledoux, D., Brichant, J. F., Nobili, L., Laureys, S., Tononi, G., Massimini, M., & Casali, A. G. (2019). [A fast and general method to empirically estimate the complexity of brain responses to transcranial and intracranial stimulations](https://doi.org/10.1016/j.brs.2019.05.013). _Brain stimulation_, _12_(5), 1280–1289. 
+        Comolatti, R., Pigorini, A., Casarotto, S., Fecchio, M., Faria, G., Sarasso, S., Rosanova, M., Gosseries, O., Boly, M., Bodart, O., Ledoux, D., Brichant, J. F., Nobili, L., Laureys, S., Tononi, G., Massimini, M., & Casali, A. G. (2019). [A fast and general method to empirically estimate the complexity of brain responses to transcranial and intracranial stimulations](https://doi.org/10.1016/j.brs.2019.05.013). _Brain stimulation_, _12_(5), 1280–1289. 
         
-        ### Credits
+        # Credits
         
-        [Jeff Yoshimi](https://jeffyoshimi.net/index.html), Kanly Thao, and Sergio Ponce de Leon.
+        [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
+        
+        Kanly Thao
+        
+        Sergio Ponce de Leon
         
         """.trimIndent()
     )

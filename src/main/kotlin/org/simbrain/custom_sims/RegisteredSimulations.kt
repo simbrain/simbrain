@@ -7,6 +7,8 @@ import org.simbrain.custom_sims.simulations.behaviorism.classicalConditioning
 import org.simbrain.custom_sims.simulations.behaviorism.operantWithEnvironment
 import org.simbrain.custom_sims.simulations.behaviorism.simpleOperant
 import org.simbrain.custom_sims.simulations.braitenberg.avoider
+import org.simbrain.custom_sims.simulations.braitenberg.braitenbergGame
+import org.simbrain.custom_sims.simulations.braitenberg.braitenbergSim
 import org.simbrain.custom_sims.simulations.braitenberg.pursuer
 import org.simbrain.custom_sims.simulations.demos.competitiveSim
 import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos
@@ -16,6 +18,7 @@ import org.simbrain.custom_sims.simulations.neuroscience.integrateAndFireSimulat
 import org.simbrain.custom_sims.simulations.nlp.tinyLanguageModel
 import org.simbrain.custom_sims.simulations.patterns_of_activity.cogMap3Objects
 import org.simbrain.custom_sims.simulations.patterns_of_activity.iacJetsSharks5People
+import org.simbrain.custom_sims.simulations.rl.braitenbergRL
 import org.simbrain.util.StructureDir
 import org.simbrain.util.dir
 
@@ -141,6 +144,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
     }
 
     dir("Reinforcement learning") {
+        item("Braitenberg RL") { braitenbergRL }
         item("Actor critic") { actorCritic }
     }
 

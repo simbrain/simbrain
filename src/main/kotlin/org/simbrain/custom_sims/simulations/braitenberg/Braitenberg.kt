@@ -1,4 +1,4 @@
-package org.simbrain.custom_sims.simulations
+package org.simbrain.custom_sims.simulations.braitenberg
 
 import kotlinx.coroutines.runBlocking
 import org.simbrain.custom_sims.*

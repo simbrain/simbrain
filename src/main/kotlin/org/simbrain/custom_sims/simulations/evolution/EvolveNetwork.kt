@@ -268,31 +268,49 @@ val evolveNetwork = newSim {
         }
 
         addSidebarInfo(
-            """ 
-        # Network Evolution
+        """ 
+        # Introduction
         
-        This is a simulation of the evolution of a network. The default fitness of this simulation is based on the difference between the current nodes and weights to the target number of nodes and weights. The simulation will continue to add nodes and weights (including synaptic connections) while changing the physical layout of the nodes until the network has reached the target error or lower, or it has reached the maximum number of generations. The target error in this case is the total sum of error of the target number of nodes and the target number of weights. However, if there are more items selected as qualities/fitness, the target error will be based on the difference of all actual qualities present in the simulation and all active target qualities (this includes the target number of nodes and weights if they are active).
+        This is a simulation of the evolution of a network towards a target quality (or configuration) using an evolutionary framework in Simbrain. 
         
-        This simulation has additional items that are added to control the target results that we want the EvolveNetwork to produce. Below are the sample interface and the explanations of the additional items, excluding already explained items in the EvolveXOR sample interface above.
-                
-        In addition to the items in the EvolveXOR interface:
+        # Simulation Details
         
-        - **Target Number of Nodes:** Desired number of nodes.
-        - **Target Number of Weights:** Desired number of weights.
-        - **Target Total Activation:** Total sum of node activations.
-        - **Target Average Activation:** Average node activations.
-        - **Target Average Connection Length:** Average length of connections (the lines that connect neurons) in pixels.
-        - **Target Node Area:** How much space the nodes take up, in pixels squared.
+        This simulation simulates the evolution of a neural network until the `target error` in the control panel is met, exceeded, or when it has reached the maximum generation. 
+        The goal of this simulation is to evolve until it is as close as possible to the `target error`. The `target error` is calculated as the total sum error of the target 
+        qualities (e.g., `Target Num of Nodes` `Target Num of Weights`, etc). Each target quality error is calculated as the difference between current active quality vs 
+        active target quality.
         
-        The simulation evolves until the target qualities are met or the maximum generations are reached. If the criteria are target fitness instead of error, the goal is for the simulation to meet or exceed this fitness level.
+        The target qualities are explained in the tooltip. To see their explanations, hover over them in the control panel. For a comprehensive look into how evolutionary simulations
+        are developed in Simbrain and comprehensive explanation of the target qualities, look [here](https://docs.simbrain.net/docs/evolution/).
         
-        Note: If there are multiple target qualities/fitnesses active, the evolutionary simulation will continue to evolve until it has all of the target qualities or until it has reached the maximum number of generations. 
+        ## Evolutionary Process
         
-        For example, if `target num nodes` is set to 20 and `target num weights` is set to 20, and `target total activation` is set to 10, 
-        the simulation will evolve until its relative error in the actual number of nodes and weights and activation of the network 
-        compared to the target number of nodes and weights is as close to that as possible. The evolutionary algorithm will run 
-         until it has as close as possible to those values or until it has reached the maximum number of generations. 
-                
+        The simulation begins with a starting population of simulations. In generation 0, each simulation starts with 2 neurons. After each generation, a certain percentage of the 
+        population is eliminated (e.g., `elimination ratio`) and repopulated with new simulations. During this process of reproduction, the new simulations will have mutations, where
+        the simulation develops more nodes, changes in node biases, weight strengths, the physical layout of the nodes, and new connections between nodes (25%). After each generation, 
+        the fitness or, the performance of the simulation is calculated and a percentage of the top performers is evaluated (e.g, `Evaluation percentile`) to determine if the 
+        `target error` has been achieved. This process continues until the simulation has reached the target error or lower, or it has reached the maximum number of generations. 
+        
+        # What to Do    
+            
+        In this simulation, similarly to the other evolutionary simulations, the control panel controls how the evolutionary process works and what your target qualities are. There
+        will always be the default evolutionary configurations that are required for all evolutionary simulations (e.g., `Max Generations`, `Population Size`, etc.) that you can play
+        with. Below are the steps to evolving the simulation:
+        
+        1) Specify which target quality you want by checking the box next to it.
+        
+        2) Specify the target value(s) that you want in the box next to it.
+        
+        3) After confirming all the default and target values are what you want, click on the `Evolve` button to start the simulation.
+        
+        4) Now, wait for the evolution process to finish, note that it can take a while depending on your configurations.
+
+        # Credits
+ 
+        [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
+        
+        Kanly Thao
+        
         """.trimIndent()
         )
     }

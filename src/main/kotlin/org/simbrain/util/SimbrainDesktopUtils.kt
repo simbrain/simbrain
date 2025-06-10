@@ -321,10 +321,13 @@ suspend fun SimbrainDesktop.createClassifierProjectionPlot(smileClassifier: Clas
     workspace.addWorkspaceComponent(
         projectionComponent
     )
-    (getDesktopComponent(projectionComponent) as ProjectionDesktopComponent).chart.apply {
-        xyPlot.fixedLegendItems = LegendItemCollection().apply {
-            (colors zip smileClassifier.outputNeuronGroup.labelArray).forEach { (color, label) ->
-                add(LegendItem(label, color))
+    (getDesktopComponent(projectionComponent) as ProjectionDesktopComponent).apply {
+        projector.dataset.currentPoint = null
+        chart.apply {
+            xyPlot.fixedLegendItems = LegendItemCollection().apply {
+                (colors zip smileClassifier.outputNeuronGroup.labelArray).forEach { (color, label) ->
+                    add(LegendItem(label, color))
+                }
             }
         }
     }

@@ -222,7 +222,7 @@ class MatrixEditor(matrix: Matrix, rowNames: List<String>? = null, columnNames: 
 /**
  * Panel with buttons to add or removes rows from the end of the provided tables
  */
-class AddRemoveRows(val table1: SimbrainJTable, val table2: SimbrainJTable) : JPanel() {
+class AddRemoveRows(val tables: List<SimbrainJTable>) : JPanel() {
 
     init {
         // Add row
@@ -230,16 +230,54 @@ class AddRemoveRows(val table1: SimbrainJTable, val table2: SimbrainJTable) : JP
             icon = ResourceManager.getSmallIcon("menu_icons/AddTableRow.png")
             toolTipText = "Insert row at bottom of input and target tables"
             addActionListener {
-                table1.model.insertRowAtBottom()
-                table2.model.insertRowAtBottom()
+                tables.forEach { it.model.insertRowAtBottom() }
             }
         })
         add(JButton().apply {
             icon = ResourceManager.getSmallIcon("menu_icons/DeleteRowTable.png")
             toolTipText = "Delete last row of input and target tables"
             addActionListener {
-                table1.model.deleteLastRow()
-                table2.model.deleteLastRow()
+                tables.forEach { it.model.deleteLastRow() }
+            }
+        })
+        // Set number of rows
+        add(JButton().apply {
+            icon = ResourceManager.getSmallIcon("menu_icons/Tools.png")
+            toolTipText = "Set number of rows in input and target tables"
+            addActionListener {
+                val currentRows = if (tables.isNotEmpty()) tables[0].model.rowCount else 0
+                val input = javax.swing.JOptionPane.showInputDialog(
+                    this@AddRemoveRows,
+                    "Enter number of rows:",
+                    "Set Number of Rows",
+                    javax.swing.JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    null,
+                    currentRows.toString()
+                ) as String?
+                
+                input?.let { inputStr ->
+                    try {
+                        val numRows = inputStr.toInt()
+                        if (numRows >= 0) {
+                            tables.forEach { it.model.setNumRows(numRows) }
+                        } else {
+                            javax.swing.JOptionPane.showMessageDialog(
+                                this@AddRemoveRows,
+                                "Number of rows must be non-negative",
+                                "Invalid Input",
+                                javax.swing.JOptionPane.ERROR_MESSAGE
+                            )
+                        }
+                    } catch (e: NumberFormatException) {
+                        javax.swing.JOptionPane.showMessageDialog(
+                            this@AddRemoveRows,
+                            "Please enter a valid integer",
+                            "Invalid Input",
+                            javax.swing.JOptionPane.ERROR_MESSAGE
+                        )
+                    }
+                }
             }
         })
     }

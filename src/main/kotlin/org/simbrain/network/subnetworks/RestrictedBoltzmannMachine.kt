@@ -22,6 +22,7 @@ import org.simbrain.network.core.*
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.trainers.UnsupervisedNetwork
 import org.simbrain.network.trainers.UnsupervisedTrainer
+import org.simbrain.network.trainers.splitDataSet
 import org.simbrain.network.trainers.updateBiases
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.util.Alignment
@@ -51,7 +52,9 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
 
     val defaultRowsInputData = 10
 
-    override lateinit var inputData: Matrix
+    override lateinit var trainingData: Matrix
+
+    override lateinit var testingData: Matrix
 
     override val inputLayer: NeuronArray
         get() = visibleLayer
@@ -63,7 +66,11 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
     override val trainer = UnsupervisedTrainer()
 
     constructor(numVisibleNodes: Int, numHiddenNodes: Int): super() {
-        this.inputData = Matrix.rand(defaultRowsInputData, numVisibleNodes)
+        val initialData = Matrix.rand(defaultRowsInputData, numVisibleNodes)
+        val (training, testing) = splitDataSet(initialData, 0.8)
+        this.trainingData = training
+        this.testingData = testing
+        
         visibleLayer = NeuronArray(numVisibleNodes).apply {
             label = "Visible layer"
             gridMode = true
@@ -135,7 +142,7 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
 
     context(Network)
     override fun trainOnInputData() {
-        inputData.toArray().forEach { row ->
+        trainingData.toArray().forEach { row ->
             visibleLayer.activations = row.toColumnVector()
             trainOnCurrentPattern()
         }
@@ -198,7 +205,8 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
         copy.visibleLayer.copyFrom(visibleLayer)
         copy.hiddenLayer.copyFrom(hiddenLayer)
         copy.visibleToHidden.copyFrom(visibleToHidden)
-        copy.inputData = inputData.clone()
+        copy.trainingData = trainingData.clone()
+        copy.testingData = testingData.clone()
         copy.customInfo = InfoText(copy.stateInfoText)
         copy.customInfo.location = customInfo.location
 

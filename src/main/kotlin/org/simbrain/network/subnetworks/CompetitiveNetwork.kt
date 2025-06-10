@@ -25,6 +25,7 @@ import org.simbrain.network.neurongroups.CompetitiveGroup
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.trainers.UnsupervisedNetwork
 import org.simbrain.network.trainers.UnsupervisedTrainer
+import org.simbrain.network.trainers.splitDataSet
 import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.alignNetworkModels
@@ -45,7 +46,9 @@ class CompetitiveNetwork : Subnetwork, UnsupervisedNetwork {
 
     lateinit var competitive: CompetitiveGroup
 
-    override lateinit var inputData: Matrix
+    override lateinit var trainingData: Matrix
+
+    override lateinit var testingData: Matrix
 
     val defaultRowsInputData = 10
 
@@ -57,7 +60,10 @@ class CompetitiveNetwork : Subnetwork, UnsupervisedNetwork {
 
     constructor(numInputNeurons: Int, numCompetitiveNeurons: Int): super() {
 
-        this.inputData = Matrix.rand(defaultRowsInputData, numInputNeurons)
+        val initialData = Matrix.rand(defaultRowsInputData, numInputNeurons)
+        val (training, testing) = splitDataSet(initialData, 0.8)
+        this.trainingData = training
+        this.testingData = testing
 
         competitive = CompetitiveGroup(numCompetitiveNeurons)
         competitive.label = "Competitive Group"
@@ -85,7 +91,7 @@ class CompetitiveNetwork : Subnetwork, UnsupervisedNetwork {
     }
 
     context(Network) override fun trainOnInputData() {
-        inputData.toArray().forEach { row ->
+        trainingData.toArray().forEach { row ->
             inputLayer.activationArray = row
             trainOnCurrentPattern()
         }
@@ -140,7 +146,8 @@ class CompetitiveNetwork : Subnetwork, UnsupervisedNetwork {
         copy.trainer.copyFrom(trainer)
 
         // Copy input data
-        copy.inputData = inputData.clone()
+        copy.trainingData = trainingData.clone()
+        copy.testingData = testingData.clone()
 
         return copy
     }

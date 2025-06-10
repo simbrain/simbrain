@@ -24,6 +24,7 @@ import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.neurongroups.SOMGroup
 import org.simbrain.network.trainers.UnsupervisedNetwork
 import org.simbrain.network.trainers.UnsupervisedTrainer
+import org.simbrain.network.trainers.splitDataSet
 import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.alignNetworkModels
@@ -48,7 +49,9 @@ class SOMNetwork : Subnetwork, UnsupervisedNetwork {
 
     override val trainer = UnsupervisedTrainer()
 
-    override lateinit var inputData: Matrix
+    override lateinit var trainingData: Matrix
+
+    override lateinit var testingData: Matrix
 
     constructor(numInputNeurons: Int, numSOMNeurons: Int): super() {
         som = SOMGroup(numSOMNeurons)
@@ -65,7 +68,10 @@ class SOMNetwork : Subnetwork, UnsupervisedNetwork {
         inputLayer.label = "Input layer"
         inputLayer.isClamped = true
 
-        this.inputData = Matrix(10, numInputNeurons).binaryRandomize()
+        val initialData = Matrix(10, numInputNeurons).binaryRandomize()
+        val (training, testing) = splitDataSet(initialData, 0.8)
+        this.trainingData = training
+        this.testingData = testing
 
         // Connect layers
         val sg = SynapseGroup(inputLayer, som, AllToAll())
@@ -90,7 +96,7 @@ class SOMNetwork : Subnetwork, UnsupervisedNetwork {
     }
 
     context(Network) override fun trainOnInputData() {
-        inputData.toArray().forEach { row ->
+        trainingData.toArray().forEach { row ->
             inputLayer.activationArray = row
             trainOnCurrentPattern()
         }
@@ -114,7 +120,8 @@ class SOMNetwork : Subnetwork, UnsupervisedNetwork {
         copy.addModel(copy.inputLayer)
 
         // Copy input data
-        copy.inputData = inputData.clone()
+        copy.trainingData = trainingData.clone()
+        copy.testingData = testingData.clone()
 
         val neuronMap = mutableMapOf<Neuron, Neuron>()
 

@@ -23,6 +23,7 @@ import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.trainers.UnsupervisedNetwork
 import org.simbrain.network.trainers.UnsupervisedTrainer
+import org.simbrain.network.trainers.splitDataSet
 import org.simbrain.network.updaterules.BinaryRule
 import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.Direction
@@ -47,7 +48,9 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
 
     override val trainer = UnsupervisedTrainer()
 
-    override lateinit var inputData: Matrix
+    override lateinit var trainingData: Matrix
+
+    override lateinit var testingData: Matrix
 
     @UserParameter(label = "Update function")
     var updateFunc = HopfieldUpdate.SYNC
@@ -59,7 +62,10 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
 
     constructor(numNeurons: Int): super() {
 
-        this.inputData = Matrix(10, numNeurons).binaryRandomize()
+        val initialData = Matrix(10, numNeurons).binaryRandomize()
+        val (training, testing) = splitDataSet(initialData, 0.8)
+        this.trainingData = training
+        this.testingData = testing
 
         // Create main neuron group
         neuronGroup = NeuronGroup(numNeurons)
@@ -92,7 +98,7 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
     constructor(): super()
 
     context(Network) override fun trainOnInputData() {
-        inputData.toArray().forEach { row ->
+        trainingData.toArray().forEach { row ->
             inputLayer.activationArray = row
             trainOnCurrentPattern()
         }
@@ -173,7 +179,8 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
         // Copy other properties
         copy.updateFunc = updateFunc
         copy.learningRate = learningRate
-        copy.inputData = inputData.clone()
+        copy.trainingData = trainingData.clone()
+        copy.testingData = testingData.clone()
 
         // Copy custom info
         copy.customInfo = InfoText(stateInfoText)

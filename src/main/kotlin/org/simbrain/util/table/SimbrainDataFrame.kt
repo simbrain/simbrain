@@ -317,6 +317,34 @@ abstract class SimbrainDataFrame : AbstractTableModel() {
         deleteRow(rowCount - 1 , true)
     }
 
+    /**
+     * Set the number of rows in the dataframe to the specified value.
+     * If numRows is greater than current row count, new rows will be added at the bottom.
+     * If numRows is less than current row count, rows will be deleted from the bottom.
+     */
+    fun setNumRows(numRows: Int) {
+        if (numRows < 0) {
+            throw IllegalArgumentException("Number of rows cannot be negative")
+        }
+        
+        val currentRows = rowCount
+        when {
+            numRows > currentRows -> {
+                // Add rows
+                repeat(numRows - currentRows) {
+                    insertRowAtBottom()
+                }
+            }
+            numRows < currentRows -> {
+                // Remove rows
+                repeat(currentRows - numRows) {
+                    deleteLastRow()
+                }
+            }
+            // If numRows == currentRows, do nothing
+        }
+    }
+
     fun canEditAt(rowIndex: Int, columnIndex: Int): Boolean {
         return allowNullEditing || getValueAt(rowIndex, columnIndex) != null
     }

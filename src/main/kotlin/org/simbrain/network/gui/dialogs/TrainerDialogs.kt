@@ -80,7 +80,7 @@ class DataSetPanel(
         applyCommonAttributes()
     }
 
-    val addRemoveRows = AddRemoveRows(inputs.table, targets.table)
+    val addRemoveRows = AddRemoveRows(listOf(inputs.table, targets.table))
 
     init {
         layout = MigLayout("gap 0px 0px, ins 0")
@@ -169,8 +169,6 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
 
         title = "Train Network"
 
-        //print("unsupervisedNetwork: $unsupervisedNetwork")
-
         val mainPanel = JPanel().apply {
             layout = MigLayout("gap 0px 0px, ins 0")
         }
@@ -228,7 +226,7 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
 
         val resetAction = createAction(
             name = "Randomize",
-            description = "Randomize network and reset interations",
+            description = "Randomize network and reset iterations",
             iconPath = "menu_icons/Rand.png",
         ) {
             unsupervisedNetwork.randomize()
@@ -259,28 +257,68 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         })
         runControls.add(preferencesButton)
 
+        // Create data panels for training and testing data
+        fun createUnsupervisedDataPanel(data: Matrix, label: String): JPanel {
+            val panel = JPanel().apply {
+                layout = MigLayout("gap 0px 0px, ins 0")
+            }
+            
+            val matrixEditor = MatrixEditor(data)
+            matrixEditor.toolbar.addSeparator()
+            val advanceRowCheckbox = JCheckBox("Auto Advance").apply { isSelected = true }
+            matrixEditor.toolbar.add(
+                matrixEditor.table.createApplyAction("Apply Inputs") { selectedRow ->
+                    unsupervisedNetwork.inputLayer.setActivations(matrixEditor.table.model.getCurrentDoubleRow().toDoubleArray())
+                    trainAction(network)
+                    if (advanceRowCheckbox.isSelected) {
+                        matrixEditor.table.incrementSelectedRow()
+                    }
+                }
+            )
+            matrixEditor.toolbar.add(advanceRowCheckbox)
+            
+            val addRemoveRows = AddRemoveRows(listOf(matrixEditor.table))
+            
+            panel.add(JSeparator(), "span, growx, wrap")
+            panel.add(matrixEditor, "span, grow")
+            panel.add(JLabel("Add / Remove rows:"), "split 2")
+            panel.add(addRemoveRows)
+
+            return panel
+        }
+
+        val trainingDataPanel = createUnsupervisedDataPanel(unsupervisedNetwork.trainingData, "Training")
+        val testingDataPanel = createUnsupervisedDataPanel(unsupervisedNetwork.testingData, "Testing")
+
+        fun syncDataSet() {
+            // Extract data from the matrix editors and update the network's data
+            val trainingMatrixEditor = trainingDataPanel.components
+                .filterIsInstance<MatrixEditor>()
+                .firstOrNull()
+            val testingMatrixEditor = testingDataPanel.components
+                .filterIsInstance<MatrixEditor>()
+                .firstOrNull()
+                
+            trainingMatrixEditor?.let { editor ->
+                unsupervisedNetwork.trainingData = Matrix.of(editor.table.model.get2DDoubleArray())
+            }
+            testingMatrixEditor?.let { editor ->
+                unsupervisedNetwork.testingData = Matrix.of(editor.table.model.get2DDoubleArray())
+            }
+        }
+
+        val dataSetTabPane = JTabbedPane().apply {
+            addTab("Training Set", trainingDataPanel)
+            addTab("Testing Set", testingDataPanel)
+        }
+
+        trainer.events.beginTraining.on(Dispatchers.Default) { syncDataSet() }
+
         mainPanel.add(JLabel("Training tools"), "gapy 0px 10px, wrap")
         mainPanel.add(runControls, "wrap")
-        mainPanel.add(JSeparator(),  "growx, span, wrap, gapy 10px 10px")
+        mainPanel.add(dataSetTabPane, "span, grow")
 
-        // Run training algorithm
-        val inputData = JPanel()
-        inputData.layout = MigLayout("gap 0px 0px, ins 0")
-        val inputs = MatrixEditor(unsupervisedNetwork.inputData)
-        inputs.toolbar.addSeparator()
-        val advanceRowCheckbox = JCheckBox("Auto Advance").apply { isSelected = true }
-        inputs.toolbar.add(
-            inputs.table.createApplyAction("Apply Inputs") { selectedRow ->
-                unsupervisedNetwork.inputLayer.setActivations(inputs.table.model.getCurrentDoubleRow().toDoubleArray())
-                if (advanceRowCheckbox.isSelected) {
-                    incrementSelectedRow()
-                }
-            }
-        )
-        inputs.toolbar.add(advanceRowCheckbox)
-        inputData.add(inputs)
-        mainPanel.add(JLabel("Testing tools"), "gapy 0px 10px, wrap")
-        mainPanel.add(inputData)
+        addCommitTask { syncDataSet() }
 
         contentPane = mainPanel
     }

@@ -26,7 +26,9 @@ import smile.math.matrix.Matrix
 
 interface UnsupervisedNetwork: EditableObject {
 
-    var inputData: Matrix
+    var trainingData: Matrix
+
+    var testingData: Matrix
 
     val inputLayer: Layer
 

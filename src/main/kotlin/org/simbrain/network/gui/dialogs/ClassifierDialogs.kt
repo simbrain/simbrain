@@ -91,8 +91,8 @@ fun ClassifierNetwork.getTrainingDialog(): StandardDialog {
         }
 
         val dataSetTabPane = JTabbedPane().apply {
-            addTab("Training Set", trainingPanel)
-            addTab("Testing Set", testPanel)
+            addTab("Training data", trainingPanel)
+            addTab("Testing data", testPanel)
         }
 
         // Training Button

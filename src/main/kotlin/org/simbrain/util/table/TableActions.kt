@@ -111,7 +111,7 @@ val SimbrainJTable.deleteRowAction
     get() = createAction(
         name = "Delete rows",
         description = "Delete selected rows",
-        iconPath = "menu_icons/DeleteRowTable.png"
+        iconPath = "menu_icons/DeleteTableRow.png"
     ) {
         deleteSelectedRows()
     }

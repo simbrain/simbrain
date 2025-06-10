@@ -234,7 +234,7 @@ class AddRemoveRows(val tables: List<SimbrainJTable>) : JPanel() {
             }
         })
         add(JButton().apply {
-            icon = ResourceManager.getSmallIcon("menu_icons/DeleteRowTable.png")
+            icon = ResourceManager.getSmallIcon("menu_icons/DeleteTableRow.png")
             toolTipText = "Delete last row of input and target tables"
             addActionListener {
                 tables.forEach { it.model.deleteLastRow() }
@@ -242,7 +242,7 @@ class AddRemoveRows(val tables: List<SimbrainJTable>) : JPanel() {
         })
         // Set number of rows
         add(JButton().apply {
-            icon = ResourceManager.getSmallIcon("menu_icons/Tools.png")
+            icon = ResourceManager.getSmallIcon("menu_icons/PenToSquare.png")
             toolTipText = "Set number of rows in input and target tables"
             addActionListener {
                 val currentRows = if (tables.isNotEmpty()) tables[0].model.rowCount else 0

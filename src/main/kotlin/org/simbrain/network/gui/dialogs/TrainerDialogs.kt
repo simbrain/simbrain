@@ -62,9 +62,9 @@ class DataSetPanel(
     val inputs = SimbrainTablePanel(inputDataFrame, false).apply {
         applyCommonAttributes()
         toolbar.addSeparator()
-        val advanceRowCheckbox = JCheckBox("Auto Advance").apply { isSelected = true }
+        val advanceRowCheckbox = JCheckBox("Auto advance").apply { isSelected = true }
         toolbar.add(
-            table.createApplyAction("Apply Inputs") {
+            table.createApplyAction("Apply inputs") {
                 applyAction(it)
                 if (advanceRowCheckbox.isSelected) {
                     incrementSelectedRow()
@@ -89,7 +89,7 @@ class DataSetPanel(
         add(JLabel("Targets"), "wrap")
         add(inputs)
         add(targets, "wrap")
-        add(JLabel("Add / Remove rows:"), "split 2")
+        add(JLabel("Add / remove rows:"), "split 2")
         add(addRemoveRows)
     }
 
@@ -148,8 +148,8 @@ fun <SN> SN.getSupervisedTrainingDialog(): StandardDialog where SN: SupervisedNe
         }
 
         val dataSetTabPane = JTabbedPane().apply {
-            addTab("Training Set", trainingDataSetPanel)
-            addTab("Testing Set", testingDataSetPanel)
+            addTab("Training data", trainingDataSetPanel)
+            addTab("Testing data", testingDataSetPanel)
         }
 
         trainer.events.beginTraining.on(Dispatchers.Default) { syncDataSet() }
@@ -265,9 +265,9 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
             
             val matrixEditor = MatrixEditor(data)
             matrixEditor.toolbar.addSeparator()
-            val advanceRowCheckbox = JCheckBox("Auto Advance").apply { isSelected = true }
+            val advanceRowCheckbox = JCheckBox("Auto advance").apply { isSelected = true }
             matrixEditor.toolbar.add(
-                matrixEditor.table.createApplyAction("Apply Inputs") { selectedRow ->
+                matrixEditor.table.createApplyAction("Apply inputs") { selectedRow ->
                     unsupervisedNetwork.inputLayer.setActivations(matrixEditor.table.model.getCurrentDoubleRow().toDoubleArray())
                     trainAction(network)
                     if (advanceRowCheckbox.isSelected) {
@@ -281,7 +281,7 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
             
             panel.add(JSeparator(), "span, growx, wrap")
             panel.add(matrixEditor, "span, grow")
-            panel.add(JLabel("Add / Remove rows:"), "split 2")
+            panel.add(JLabel("Add / remove rows:"), "split 2")
             panel.add(addRemoveRows)
 
             return panel
@@ -308,13 +308,12 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         }
 
         val dataSetTabPane = JTabbedPane().apply {
-            addTab("Training Set", trainingDataPanel)
-            addTab("Testing Set", testingDataPanel)
+            addTab("Training data", trainingDataPanel)
+            addTab("Testing data", testingDataPanel)
         }
 
         trainer.events.beginTraining.on(Dispatchers.Default) { syncDataSet() }
 
-        mainPanel.add(JLabel("Training tools"), "gapy 0px 10px, wrap")
         mainPanel.add(runControls, "wrap")
         mainPanel.add(dataSetTabPane, "span, grow")
 

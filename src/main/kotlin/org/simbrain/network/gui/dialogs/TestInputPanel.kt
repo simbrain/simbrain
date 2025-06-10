@@ -64,8 +64,8 @@ private fun createTestInputPanel(initData: Matrix, applyInputs: suspend MatrixEd
         }
     }).apply { this.isSelected = workspaceMode })
     toolbar.addSeparator()
-    val advanceRowCheckbox = JCheckBox("Auto Advance").apply { isSelected = true }
-    toolbar.add(table.createApplyAction("Apply Inputs") {
+    val advanceRowCheckbox = JCheckBox("Auto advance").apply { isSelected = true }
+    toolbar.add(table.createApplyAction("Apply inputs") {
         applyInputs(it)
         if (workspaceMode) {
             SimbrainDesktop.workspace.updater.iterate(1)

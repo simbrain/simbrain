@@ -23,7 +23,6 @@ import org.simbrain.network.gui.dialogs.makeTrainerPanel
 import org.simbrain.network.gui.nodes.SubnetworkNode
 import org.simbrain.network.subnetworks.SOMNetwork
 import org.simbrain.util.StandardDialog
-import org.simbrain.workspace.gui.CouplingMenu
 import javax.swing.JPopupMenu
 
 /**
@@ -37,8 +36,6 @@ class SOMNetworkNode(networkPanel: NetworkPanel, val somNet: SOMNetwork):
             with(networkPanel) {
                 applyUnsupervisedActions(somNet)
             }
-            addSeparator()
-            add(CouplingMenu(networkPanel.networkComponent, somNet))
         }
 
     override val propertyDialog: StandardDialog

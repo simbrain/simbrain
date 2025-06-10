@@ -7,7 +7,6 @@ import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.createAction
 import org.simbrain.util.display
-import org.simbrain.workspace.gui.CouplingMenu
 import javax.swing.JPopupMenu
 
 class SRNNode(networkPanel: NetworkPanel, private val srn: SRNNetwork):
@@ -31,10 +30,6 @@ class SRNNode(networkPanel: NetworkPanel, private val srn: SRNNetwork):
             add(networkPanel.createAction(name = "Train network") {
                 srn.getSupervisedTrainingDialog().display()
             })
-
-            // Coupling menu
-            addSeparator()
-            add(CouplingMenu(networkPanel.networkComponent, srn))
         }
 
     override val propertyDialog: StandardDialog

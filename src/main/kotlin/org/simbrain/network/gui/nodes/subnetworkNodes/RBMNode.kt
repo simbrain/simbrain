@@ -6,7 +6,6 @@ import org.simbrain.network.gui.dialogs.makeTrainerPanel
 import org.simbrain.network.gui.nodes.SubnetworkNode
 import org.simbrain.network.subnetworks.RestrictedBoltzmannMachine
 import org.simbrain.util.StandardDialog
-import org.simbrain.workspace.gui.CouplingMenu
 import javax.swing.JPopupMenu
 
 class RBMNode(networkPanel: NetworkPanel, private val rbm: RestrictedBoltzmannMachine):
@@ -23,8 +22,6 @@ class RBMNode(networkPanel: NetworkPanel, private val rbm: RestrictedBoltzmannMa
             with(networkPanel) {
                 applyUnsupervisedActions(rbm)
             }
-            addSeparator()
-            add(CouplingMenu(networkPanel.networkComponent, rbm))
         }
 
     override val propertyDialog: StandardDialog

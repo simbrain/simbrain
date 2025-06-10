@@ -23,8 +23,6 @@ import org.simbrain.network.gui.dialogs.makeTrainerPanel
 import org.simbrain.network.gui.nodes.SubnetworkNode
 import org.simbrain.network.subnetworks.Hopfield
 import org.simbrain.util.StandardDialog
-import org.simbrain.util.createEditorDialog
-import org.simbrain.workspace.gui.CouplingMenu
 import javax.swing.JPopupMenu
 
 /**
@@ -40,8 +38,6 @@ class HopfieldNode(networkPanel: NetworkPanel, val hopfieldNet: Hopfield)
             with(networkPanel) {
                 applyUnsupervisedActions(hopfieldNet)
             }
-            addSeparator()
-            add(CouplingMenu(networkPanel.networkComponent, hopfieldNet))
         }
 
     override val propertyDialog: StandardDialog

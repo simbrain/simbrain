@@ -31,6 +31,7 @@ import org.simbrain.util.Utils
 import org.simbrain.util.createAction
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.workspace.WorkspaceComponent
+import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import org.simbrain.workspace.gui.SimbrainDesktop.createDesktopComponent
 import org.simbrain.workspace.gui.SimbrainDesktop.getDesktopComponent
 import org.simbrain.workspace.gui.SimbrainDesktop.registerComponentInstance
@@ -86,12 +87,7 @@ var parentFrame: GenericFrame, workspaceComponent: E
         showImportDialog()
     }
 
-    val closeAction = createAction(
-        name = "Close component",
-        coroutineScope = workspace
-    ) {
-        close()
-    }
+    val closeAction = actionManager.createCloseAction(this)
 
     /**
      * Construct a workspace component.

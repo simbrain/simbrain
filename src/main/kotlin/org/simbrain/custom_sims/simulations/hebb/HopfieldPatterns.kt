@@ -25,6 +25,7 @@ val hopfieldPatterns = newSim {
 
     // Hopfield network
     val hopfield = Hopfield(100)
+    hopfield.learningRate = 1.0
     network.addNetworkModel(hopfield)
 
     addSidebarInfo(

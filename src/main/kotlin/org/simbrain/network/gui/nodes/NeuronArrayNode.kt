@@ -462,7 +462,10 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                 neuronArray.getConsumer(NeuronArray::activationArray),
                 neuronArray.size,
                 menuTitle = "Add coupled image world",
-                postActionBlock = { neuronArray.gridMode = true }
+                postActionBlock = {
+                    neuronArray.gridMode = true
+                    neuronArray.isClamped = true
+                }
             ))
             contextMenu.add(
                 actionManager.createCoupledDataWorldAction(

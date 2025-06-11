@@ -223,6 +223,7 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
                     )
             );
         }
+        menu.add(getNetworkPanel().getNetworkActions().createAbstractNeuronCollectionCoupledImageWorld(neuronGroup));
         menu.add(getNetworkPanel().getNetworkActions().createRecordActivationAction(neuronGroup));
 
         // Coupling menu

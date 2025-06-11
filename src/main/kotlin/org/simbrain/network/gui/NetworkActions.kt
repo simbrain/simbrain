@@ -24,8 +24,8 @@ import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.propertyeditor.objectWrapper
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
+import org.simbrain.workspace.couplings.getConsumer
 import org.simbrain.workspace.couplings.getProducer
-import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import java.awt.event.KeyEvent
 import java.io.File
@@ -1011,6 +1011,13 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         source.getProducer(Layer::activationArray),
         sourceName = "${source.displayName} Activations",
         source.size
+    )
+
+    fun createAbstractNeuronCollectionCoupledImageWorld(collection: AbstractNeuronCollection) = actionManager.createImageInput(
+        collection.getConsumer(AbstractNeuronCollection::activationArray),
+        collection.size,
+        menuTitle = "Add coupled image world",
+        postActionBlock = { collection.isClamped = true }
     )
 
 }

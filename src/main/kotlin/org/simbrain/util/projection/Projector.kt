@@ -46,7 +46,7 @@ class Projector(initialDimension: Int = 25) : EditableObject, CoroutineScope {
             events.methodChanged.fire(oldMethod, value)
         }
 
-    @UserParameter(label = "Tolerance", description = "Only add new points if they are more than this distance from any existing point", minimumValue = 0.0, increment = .1, order =  1)
+    @UserParameter(label = "Tolerance", description = "Only add new points if they are more than this distance from any existing point. Points below this distance are treated as being equivalent to an existing point.", minimumValue = 0.0, increment = .1, order =  1)
     var tolerance: Double = 0.1
 
     @UserParameter(label = "Connect points", description = "Draw lines between points in plot", order = 10)

@@ -84,7 +84,6 @@ class DataSetPanel(
 
     init {
         layout = MigLayout("gap 0px 0px, ins 0")
-        add(JSeparator(), "span, growx, wrap")
         add(JLabel("Inputs"))
         add(JLabel("Targets"), "wrap")
         add(inputs)
@@ -154,7 +153,6 @@ fun <SN> SN.getSupervisedTrainingDialog(): StandardDialog where SN: SupervisedNe
 
         trainer.events.beginTraining.on(Dispatchers.Default) { syncDataSet() }
         runControls.add(trainerControls, "span, growx, wrap")
-        runControls.add(JSeparator(), "span, growx, wrap")
         runControls.add(dataSetTabPane, "wrap")
 
         addCommitTask { syncDataSet() }
@@ -170,7 +168,7 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         title = "Train Network"
 
         val mainPanel = JPanel().apply {
-            layout = MigLayout("gap 0px 0px, ins 0")
+            layout = MigLayout("gap 0px 0px, ins 15")
         }
 
         val trainer = unsupervisedNetwork.trainer
@@ -314,7 +312,7 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
 
         trainer.events.beginTraining.on(Dispatchers.Default) { syncDataSet() }
 
-        mainPanel.add(runControls, "wrap")
+        mainPanel.add(runControls, "wrap, gapbottom 10px")
         mainPanel.add(dataSetTabPane, "span, grow")
 
         addCommitTask { syncDataSet() }

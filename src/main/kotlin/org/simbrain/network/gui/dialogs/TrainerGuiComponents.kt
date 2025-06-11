@@ -95,13 +95,14 @@ class TrainerControls<SN>(trainer: SupervisedTrainer<SN>, supervisedNetwork: SN,
     init {
 
         val errorPlotPanel = JPanel().apply {
-            layout = BoxLayout(this, BoxLayout.Y_AXIS)
+            layout = MigLayout("ins 0, gap 0px 0px, fillx, wrap")
             val errorPlot = ErrorTimeSeries(trainer)
-            add(errorPlot)
-            JPanel().apply {
-                add(JButton(TimeSeriesPlotActions.getClearGraphAction(errorPlot.graphPanel)))
-                add(JButton(TimeSeriesPlotActions.getPropertiesDialogAction(errorPlot.graphPanel)))
-            }.also { add(it) }
+            add(errorPlot, "growx, wrap")
+
+            val buttonPanel = JPanel(MigLayout("ins 0, gap 0px 0px"))
+            buttonPanel.add(JButton(TimeSeriesPlotActions.getClearGraphAction(errorPlot.graphPanel)))
+            buttonPanel.add(JButton(TimeSeriesPlotActions.getPropertiesDialogAction(errorPlot.graphPanel)))
+            add(buttonPanel, "wrap, align center, gapbottom 20px")
         }
 
         val runTools = JPanel().apply { layout = MigLayout("nogrid ") }
@@ -145,7 +146,7 @@ class TrainerControls<SN>(trainer: SupervisedTrainer<SN>, supervisedNetwork: SN,
 
         layout = MigLayout("ins 0, gap 0px 0px")
         add(runTools)
-        add(errorPlotPanel, "grow")
+        add(errorPlotPanel, "grow, gapbottom 0px")
     }
 
 }
@@ -155,7 +156,7 @@ class ErrorTimeSeries(trainer: SupervisedTrainer<*>) : JPanel() {
     val graphPanel: TimeSeriesPlotPanel
 
     init {
-        val mainPanel = JPanel()
+        layout = MigLayout("ins 0, gap 0px 0px")
 
         // TODO: Consider passing some of these values in
         val model = TimeSeriesModel()
@@ -174,13 +175,11 @@ class ErrorTimeSeries(trainer: SupervisedTrainer<*>) : JPanel() {
         graphPanel.preferredSize = Dimension(graphPanel.preferredSize.width, 200)
 
         graphPanel.removeAllButtonsFromToolBar()
-        // TODO: The buttons below are useful but take up space; find a better place for them.
-        // graphPanel.addClearGraphDataButton()
-        // graphPanel.addPreferencesButton()
-        mainPanel.add(graphPanel)
-        add(mainPanel)
+
+        add(graphPanel, "growx, growy, push") // Make graph fill the panel
 
         model.addTimeSeries("Training Error")
+
         trainer.events.errorUpdated.on(Dispatchers.Swing) { (trainingError, testingError) ->
             model.addData(0, trainer.iteration.toDouble(), trainingError)
             testingError?.let {
@@ -190,11 +189,13 @@ class ErrorTimeSeries(trainer: SupervisedTrainer<*>) : JPanel() {
                 model.addData(1, trainer.iteration.toDouble(), it)
             }
         }
+
         trainer.events.iterationReset.on(Dispatchers.Swing, wait = true) {
             model.clearData()
         }
     }
 }
+
 
 
 /**

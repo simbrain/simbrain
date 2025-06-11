@@ -145,8 +145,6 @@ class NetworkModelList {
 
     override fun toString(): String =  all.joinToString("\n") { "$it" }
 
-    fun toStringTabbed(): String =  all.joinToString("\n") { "\t$it" }
-
     val size get() = networkModels.values.sumBy { it?.size ?: 0 }
 }
 

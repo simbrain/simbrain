@@ -3,11 +3,8 @@ package org.simbrain.network.trainers
 import org.simbrain.network.core.*
 import org.simbrain.network.events.LocationEvents
 import org.simbrain.network.trainers.SupervisedTrainer.TestConfiguration
-import org.simbrain.util.minus
-import org.simbrain.util.plus
-import org.simbrain.util.rowVectorTransposed
+import org.simbrain.util.*
 import org.simbrain.util.stats.ProbabilityDistribution
-import org.simbrain.util.toDoubleArray
 import smile.math.matrix.Matrix
 import java.awt.geom.Point2D
 import kotlin.math.max
@@ -165,6 +162,11 @@ class SupervisedModel(
         layers.forEach { it.afterRestore(context) }
         weightMatrices.forEach { it.afterRestore(context) }
         synapseGroups.forEach { it.afterRestore(context) }
+    }
+
+    override fun toString(): String {
+        val models = layers + weightMatrices + synapseGroups
+        return "$displayName: ${models.joinToString("\n") { it.toString().indent(2) }}"
     }
 }
 

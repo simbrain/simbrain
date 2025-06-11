@@ -28,7 +28,8 @@ import kotlin.math.sqrt
 class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: Int): ArrayLayer(inputSize), EditableObject, ActivationSequenceProcessor {
 
     /**
-     * Size of inputs is same as outputs in a transformer block
+     * Size of inputs is same as outputs in a transformer block, and also going into the feedforward part
+     * That is, the "size" of the "residual stream"
      */
     override val size: Int = inputSize
 
@@ -208,13 +209,15 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
 
         attentionOutput.copyFrom(selfAttention.mm(vStack))
 
-        // Skip connection from inputs
+        // Skip connection from main inputs to MLP input
         feedForwardInput.copyFrom(inputs.clone().add(attentionOutput).let { if (useLayerNorm) it.layerNormByRow() else it })
+
+        // MLP computation
         feedForwardHiddenNetInputs.copyFrom(feedForwardInput.mm(W1.transpose()).addToEachRow(b1))
         feedForwardHidden.copyFrom(feedForwardHiddenNetInputs.relu())
-
         feedForwardOutputNetInputs.copyFrom(feedForwardHidden.mm(W2.transpose()).addToEachRow(b2))
-        // Another skip connection from inputs _to the feedforward part of the network_. Also note no relu on the output.
+
+        // Skip connection from MLP input to output of transformer (activations)
         activations.copyFrom(feedForwardInput.clone().add(feedForwardOutputNetInputs).let { if (useLayerNorm) it.layerNormByRow() else it })
 
         inputs.fill(0.0)

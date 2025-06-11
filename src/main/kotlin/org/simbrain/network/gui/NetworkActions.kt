@@ -133,6 +133,10 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     ) {
         showTransformerBlockCreationDialog()
     }
+    val addClassifierAction = createAction("Add classifier") {
+        networkPanel.showClassifierCreationDialog()
+    }
+
     val deleteAction = networkPanel.createConditionallyEnabledAction(
         name = "Delete",
         description = """Delete selected node(s) ("Backspace" or "Delete")""",
@@ -671,7 +675,6 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val newNetworkActions
         get() = listOf(
             addSubnetAction("Backprop") { BackpropCreationDialog(networkPanel) },
-            createAction("Classifier") { networkPanel.showClassifierCreationDialog() },
             addSubnetAction("Competitive Network") { CompetitiveCreationDialog(networkPanel) },
             addSubnetAction("Feed Forward Network") { FeedForwardCreationDialog(networkPanel) },
             addSubnetAction("Hopfield") { HopfieldCreationDialog(networkPanel) },
@@ -680,8 +683,8 @@ class NetworkActions(val networkPanel: NetworkPanel) {
                     addSubnetworkAction(networkPanel) { it.create() }
                 }
             },
-            addSubnetAction("SOM Network") { SOMCreationDialog(networkPanel) },
-            addSubnetAction("SRN (Simple Recurrent Network)") { networkPanel.showSRNCreationDialog() }
+            addSubnetAction("SOM network") { SOMCreationDialog(networkPanel) },
+            addSubnetAction("SRN (simple recurrent network)") { networkPanel.showSRNCreationDialog() }
         )
 
     fun applyConnectionAction(strategy: ConnectionStrategy): AbstractAction {

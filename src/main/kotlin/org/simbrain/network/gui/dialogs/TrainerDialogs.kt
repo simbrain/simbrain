@@ -89,7 +89,7 @@ class DataSetPanel(
         add(JLabel("Targets"), "wrap")
         add(inputs)
         add(targets, "wrap")
-        add(JLabel("Add / remove rows:"), "split 2")
+        add(JLabel("Edit rows:"), "split 2")
         add(addRemoveRows)
     }
 
@@ -281,7 +281,7 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
             
             panel.add(JSeparator(), "span, growx, wrap")
             panel.add(matrixEditor, "span, grow")
-            panel.add(JLabel("Add / remove rows:"), "split 2")
+            panel.add(JLabel("Edit rows:"), "split 2")
             panel.add(addRemoveRows)
 
             return panel

@@ -29,16 +29,16 @@ import kotlin.math.max
 open class SimbrainTablePanel @JvmOverloads constructor(
     model: SimbrainDataFrame,
     useDefaultToolbarAndMenu: Boolean = true,
-    useHeaders: Boolean = true,
-    usePadding: Boolean = true,
+    useRowHeaders: Boolean = true,
+    usePadding: Boolean = false,
 ) : JPanel() {
 
-    val table = SimbrainJTable(model, useHeaders)
+    val table = SimbrainJTable(model, useRowHeaders)
     val toolbar by lazy {
         JToolBar().also { add(it, BorderLayout.NORTH) }
     }
 
-    val scrollPane = DataViewerScrollPane(table, useHeaders)
+    val scrollPane = DataViewerScrollPane(table, useRowHeaders)
 
     var model: SimbrainDataFrame
         get() = table.model
@@ -160,7 +160,7 @@ open class SimbrainTablePanel @JvmOverloads constructor(
 
 }
 
-class DataViewerScrollPane(val table: JTable, useHeaders: Boolean = true): JScrollPane(table) {
+class DataViewerScrollPane(val table: JTable, useRowHeaders: Boolean = true): JScrollPane(table) {
 
     /**
      * Custom table with row numbers shown
@@ -183,7 +183,7 @@ class DataViewerScrollPane(val table: JTable, useHeaders: Boolean = true): JScro
     }
 
     init {
-        if (useHeaders) {
+        if (useRowHeaders) {
             setRowHeaderView(rowTable)
         }
         updateResizeMode(table.model)

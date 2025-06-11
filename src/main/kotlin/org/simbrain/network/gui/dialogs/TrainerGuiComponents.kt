@@ -225,6 +225,7 @@ class MatrixEditor(matrix: Matrix, rowNames: List<String>? = null, columnNames: 
 class AddRemoveRows(val tables: List<SimbrainJTable>) : JPanel() {
 
     init {
+        layout = MigLayout("ins 0, gap 2px")
         // Add row
         add(JButton().apply {
             icon = ResourceManager.getSmallIcon("menu_icons/AddTableRow.png")

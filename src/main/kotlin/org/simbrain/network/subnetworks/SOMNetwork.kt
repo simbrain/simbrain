@@ -32,6 +32,7 @@ import org.simbrain.network.util.offsetNeuronCollections
 import org.simbrain.util.UserParameter
 import org.simbrain.util.binaryRandomize
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.stats.ProbabilityDistribution
 import smile.math.matrix.Matrix
 
 /**
@@ -104,6 +105,10 @@ class SOMNetwork : Subnetwork, UnsupervisedNetwork {
 
     context(Network) override fun trainOnCurrentPattern() {
         this.update()
+    }
+
+    override fun randomize(randomizer: ProbabilityDistribution?) {
+        som.randomizeIncomingWeights(randomizer)
     }
 
     override fun copy(): SOMNetwork {

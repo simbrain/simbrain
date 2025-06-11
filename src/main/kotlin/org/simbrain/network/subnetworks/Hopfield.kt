@@ -53,7 +53,7 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
     override lateinit var testingData: Matrix
 
     @UserParameter(label = "Update function")
-    var updateFunc = HopfieldUpdate.STOCHASTIC
+    var updateFunc = HopfieldUpdate.SYNC
 
     @UserParameter(label = "Learning rate")
     var learningRate = 0.25
@@ -124,6 +124,7 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
         get() = "Energy: " + getEnergy()
 
     fun getEnergy(): Double {
+        // Convert activations to bipolar (-1, +1) for proper Hopfield energy calculation
         val bipolarActivations = neuronGroup.activations.applyFunction(::bipolar)
         return bipolarActivations.transpose()
             .mm(weightMatrix.weights)

@@ -27,6 +27,7 @@ import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.setViewBoundsNoOverflow
 import org.simbrain.util.piccolo.unionOfGlobalFullBounds
+import org.simbrain.util.widgets.SimbrainToggleButton
 import java.awt.BorderLayout
 import java.awt.Cursor
 import java.awt.FlowLayout
@@ -36,9 +37,7 @@ import java.awt.event.MouseWheelEvent
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
 import java.util.prefs.PreferenceChangeListener
-import javax.swing.BorderFactory
 import javax.swing.JPanel
-import javax.swing.JToggleButton
 import kotlin.math.pow
 import kotlin.reflect.KClass
 
@@ -719,22 +718,14 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             add(networkActions.zoomInAction())
             add(networkActions.zoomOutAction())
             //add(networkActions.resetZoomAction())
-            add(JToggleButton().apply {
-                icon = ResourceManager.getSmallIcon("menu_icons/ZoomFitPage.png")
-                fun updateButton() {
-                    isSelected = autoZoom
-                    border = if (autoZoom) BorderFactory.createLoweredBevelBorder() else BorderFactory.createEmptyBorder()
-                    val onOff = if (autoZoom) "on" else "off"
-                    toolTipText = "Autozoom is $onOff"
-                }
-                updateButton()
+            add(SimbrainToggleButton(
+                icon = ResourceManager.getSmallIcon("menu_icons/ZoomFitPage.png"),
+                stateGetter = { autoZoom },
+                stateSetter = { autoZoom = it },
+                tooltipGenerator = { isOn -> "Autozoom is ${if (isOn) "on" else "off"}" }
+            ).apply {
                 network.events.zoomModeChanged.on {
-                    updateButton()
-                }
-                addActionListener { e ->
-                    val button = e.source as JToggleButton
-                    autoZoom = button.isSelected
-                    updateButton()
+                    updateFromExternalState()
                 }
             })
         }

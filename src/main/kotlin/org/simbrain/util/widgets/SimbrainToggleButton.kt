@@ -7,6 +7,7 @@ import java.awt.RenderingHints
 import javax.swing.BorderFactory
 import javax.swing.Icon
 import javax.swing.JToggleButton
+import javax.swing.UIManager
 
 class SimbrainToggleButton(
     text: String? = null,
@@ -85,7 +86,7 @@ class SimbrainToggleButton(
             isSelected -> Color(200, 200, 200) // Darker when active/selected
             model.isPressed -> Color(220, 220, 220) // Slightly darker when pressed
             model.isRollover -> Color(240, 240, 240) // Light gray on hover
-            else -> Color.WHITE // Default background
+            else -> UIManager.getColor("Button.background") ?: Color(238, 238, 238)
         }
         
         g2d.color = bgColor

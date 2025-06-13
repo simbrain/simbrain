@@ -266,6 +266,20 @@ fun Matrix.binaryRandomize() = apply { twoValueRandomize(0.0, 1.0) }
 fun Matrix.bipolarRandomize() = apply { twoValueRandomize(-1.0, 1.0) }
 
 /**
+ * Convert 0 to -1 in order to convert binary vectors like (0,1) to bipolar vectors like (-1,1)
+ */
+fun bipolar(inputVal: Double): Double {
+    return if (inputVal == 0.0) -1.0 else inputVal
+}
+
+/**
+ * Convert values to binary based on sign.
+ */
+fun binary(inputVal: Double): Double {
+    return if (inputVal > 0.0) 1.0 else 0.0
+}
+
+/**
  * Perturbs a binary-valued DoubleArray by flipping exactly [hammingDistance] values (0.0 ↔ 1.0).
  *
  * Assumes the array contains only 0.0 and 1.0 values.

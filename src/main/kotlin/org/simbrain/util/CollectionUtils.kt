@@ -147,6 +147,22 @@ fun linspace(start: Double, stop: Double, numPoints: Int) = DoubleArray(numPoint
 fun Array<DoubleArray>.flatten() = flattenArray(this)
 fun Array<FloatArray>.flatten() = flattenArray(this)
 
+fun DoubleArray.applyFunctionInPlace(fn: (Double) -> Double): DoubleArray {
+    for (i in indices) {
+        this[i] = fn(this[i])
+    }
+    return this
+}
+
+fun DoubleArray.applyFunction(fn: (Double) -> Double): DoubleArray {
+    val retArray = DoubleArray(size)
+    for (i in indices) {
+        retArray[i] = fn(this[i])
+    }
+    return retArray
+}
+
+
 fun <T> ListIterator<T>.toSequence() = sequence {
     while (hasNext()) {
         yield(next())

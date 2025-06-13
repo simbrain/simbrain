@@ -19,7 +19,7 @@ import kotlin.math.sin
 class RecurrentArrow(color: Color) : PNode() {
 
     private val radius = 100.0
-    private val startDeg = 20.0
+    private val startDeg = 10.0
     private val endDeg = 320.0
 
     /**

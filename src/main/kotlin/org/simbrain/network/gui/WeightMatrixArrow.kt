@@ -12,7 +12,9 @@ import org.simbrain.util.widgets.bezierArrow
 class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode() {
 
     private val source get() = weightMatrixNode.model.source
+    private val sourceNode get() = weightMatrixNode.sourceNode
     private val target get() = weightMatrixNode.model.target
+    private val targetNode get() = weightMatrixNode.targetNode
     private fun isBidirectional() = target.outgoingConnectors.any { it.target == source }
 
     private val arrow = if (source == target) {
@@ -23,7 +25,7 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
 
             padding {
                 tail = when (source) {
-                    is ArrayLayer -> 5.0
+                    is ArrayLayer -> 0.0
                     else -> defaultTail
                 }
                 head = when (target) {
@@ -47,8 +49,8 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
 
     override fun layoutChildren() {
         when (arrow) {
-            is RecurrentArrow -> arrow.layout(source.location) { (x, y) -> weightMatrixNode.imageBox.centerFullBoundsOnPoint(x, y) }
-            is BezierArrow -> arrow.layout(source.bound.outlines, target.bound.outlines, isBidirectional())
+            is RecurrentArrow -> arrow.layout(sourceNode.globalBounds.centerLeft + point(15, 0)) { (x, y) -> weightMatrixNode.imageBox.centerFullBoundsOnPoint(x, y) }
+            is BezierArrow -> arrow.layout(sourceNode.globalBounds.outlines, targetNode.globalBounds.outlines, isBidirectional())
         }
     }
 }

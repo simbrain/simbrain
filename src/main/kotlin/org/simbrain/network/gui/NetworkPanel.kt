@@ -233,29 +233,21 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
      * Calls to lowerToBottom and raiseToTop should be avoided for top level screen elements in favor of using this function.
      */
     private fun addNodeOrdered(node: ScreenElement) {
-        fun addNodeToIndex(node: ScreenElement, index: Int) {
-            if (index > 0) {
-                canvas.layer.addChild(index, node)
-            } else {
-                canvas.layer.addChild(node)
-            }
-        }
-
         fun findIndexOfType(type: KClass<out ScreenElement>): Int {
             return canvas.layer.childrenIterator.toSequence().indexOfLast { it != null && it::class == type }
         }
 
         when (node) {
-            is SynapseNode -> {
+            is WeightMatrixNode -> {
                 canvas.layer.addChild(0, node)
+            }
+            is SynapseNode -> {
+                val index = findIndexOfType(WeightMatrixNode::class)
+                canvas.layer.addChild(index + 1, node)
             }
             is SynapseGroupNode -> {
                 val index = findIndexOfType(SynapseNode::class)
-                addNodeToIndex(node, index)
-            }
-            is WeightMatrixNode -> {
-                val index = findIndexOfType(SynapseGroupNode::class)
-                addNodeToIndex(node, index)
+                canvas.layer.addChild(index + 1, node)
             }
             else -> {
                 canvas.layer.addChild(node)

@@ -212,6 +212,7 @@ operator fun Rectangle2D.component4() = height
 
 val Rectangle2D.center get() = point(centerX, centerY)
 val Rectangle2D.topLeft get() = point(x, y)
+val Rectangle2D.centerLeft get() = point(x, y + height / 2)
 
 fun Rectangle2D.centerOn(point: Point2D) {
     val (px, py) = point

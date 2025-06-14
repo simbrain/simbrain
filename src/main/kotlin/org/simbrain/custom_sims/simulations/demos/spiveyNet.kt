@@ -70,7 +70,7 @@ val spiveyNet = newSim {
         label = "Eyes"
         neuronList.labels = listOf("candle", "candy", "handle", "fork")
     }
-    val integrationNodes = NormalizationGroup(4).apply {
+    val integrationNodes = NeuronGroup(4).apply {
         layout = LineLayout()
         applyLayout()
         label = "Integration"

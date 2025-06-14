@@ -46,10 +46,10 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
      */
     private var directedNode: SynapseGroupNodeDirected? = null
 
-    /**
-     * The interaction box for this neuron group.
-     */
     var interactionBox: SynapseGroupInteractionBox
+
+    val sourceNode by lazy { networkPanel.getNode(synapseGroup.source) as AbstractNeuronCollectionNode }
+    val targetNode by lazy { networkPanel.getNode(synapseGroup.target) as AbstractNeuronCollectionNode }
 
     init {
         // Note the children pnodes to outlined objects are created in
@@ -124,14 +124,12 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
             currentNode = expandedNode
         } else {
             removeEverythingButInteractionBox()
-            if (!synapseGroup.isRecurrent()) {
-                if (directedNode == null) {
-                    directedNode = SynapseGroupNodeDirected(this)
-                }
-                addChild(directedNode)
-                interactionBox.raiseAbove(directedNode)
-                currentNode = directedNode
+            if (directedNode == null) {
+                directedNode = SynapseGroupNodeDirected(this)
             }
+            addChild(directedNode)
+            interactionBox.raiseAbove(directedNode)
+            currentNode = directedNode
         }
     }
 

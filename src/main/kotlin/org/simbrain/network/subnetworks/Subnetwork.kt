@@ -151,12 +151,13 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
         set(newLocation) {
             val delta = newLocation - location
             locatableModels.forEach { it.location += delta }
+            customInfo?.location += delta
         }
 
     /**
      * Optional information about the current state of the group. For display in GUI.
      */
-    open val customInfo: NetworkModel? = null
+    open val customInfo: LocatableModel? = null
 
     abstract fun copy(): Subnetwork
 }

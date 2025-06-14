@@ -182,7 +182,6 @@ val spiveyNet = newSim {
         timeIndex = 0
         mouse.location = point(157, 271)
         networkComponent.network.clearActivations()
-        integrationNodes.clear() // Why is this needed?
         withGui {
             (getDesktopComponent(oc) as OdorWorldDesktopComponent)
                 .worldPanel

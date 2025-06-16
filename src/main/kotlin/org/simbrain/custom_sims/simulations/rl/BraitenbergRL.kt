@@ -14,6 +14,7 @@ import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.fitWorldToFrameSize
 import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
+import org.simbrain.world.odorworld.sensors.ObjectSensor
 import org.simbrain.workspace.updater.updateAction
 import java.awt.geom.Point2D
 import kotlin.math.max
@@ -40,6 +41,7 @@ val braitenbergRL = newSim {
     var trialStep = 0
     var goalAchieved = false
     val goalRadius = 30.0
+    var stopRequested = false
 
     workspace.clearWorkspace()
     val oc = addOdorWorldComponent("RL Braitenberg World")
@@ -54,47 +56,87 @@ val braitenbergRL = newSim {
         agent: OdorWorldEntity,
         world: OdorWorld,
         lastDistance: Double,
+        lastDistanceToPoison: Double,
         lastPos: Point2D,
         stationarySteps: Int
-    ): Pair<Double, Int> {
+    ): Triple<Double, Double, Int> {
         var reward = 0.0
-        val cheese = world.entityList.find { it.entityType == EntityType.Swiss } ?: return Pair(0.0, stationarySteps)
-        val distanceToCheese = agent.location.distance(cheese.location)
+        val cheese = world.entityList.find { it.entityType == EntityType.Swiss } ?: return Triple(0.0, 0.0, stationarySteps)
+        val poison = world.entityList.find { it.entityType == EntityType.Poison }
 
-        reward += when {
-            distanceToCheese < 50 -> 10.0
-            distanceToCheese < 100 -> 5.0
-            distanceToCheese < 200 -> 1.0
-            else -> 0.0
-        }
+        var cheeseComponent = 0.0
+        var poisonComponent = 0.0
 
-        if (distanceToCheese > lastDistance) {
-            reward -= 10
-        }
-
-        if (agent.location.distance(lastPos) < 0.1) {
-            reward -= 0.5  // penalize being stuck
-        }
-
-        if (agent.location.distance(lastPos) < 1.0) {
-            val newStationarySteps = stationarySteps + 1
-            if (newStationarySteps >= 15) {
-                reward -= 10.0
-                return Pair(reward, 0)
+        // Cheese Proximity Reward
+        if (cheese != null) {
+            val distanceToCheese = agent.location.distance(cheese.location)
+            cheeseComponent += when {
+                distanceToCheese < 50 -> 10.0
+                distanceToCheese < 100 -> 5.0
+                distanceToCheese < 200 -> 1.0
+                else -> 0.0
             }
-            return Pair(reward, newStationarySteps)
-        } else {
-            return Pair(reward, 0)
         }
+
+        // Poison Proximity penalty
+        if (poison != null) {
+            val distanceToPoison = agent.location.distance(poison.location)
+            poisonComponent += when {
+                distanceToPoison < 30 -> -10.0
+                distanceToPoison < 60 -> -5.0
+                distanceToPoison < 100 -> -2.0
+                else -> 0.0
+            }
+
+            if (distanceToPoison > lastDistanceToPoison) {
+                poisonComponent += 2.0  // reward for escaping
+            }
+        }
+
+        // if (distanceToCheese > lastDistance) {
+        //     reward -= 10
+        // }
+
+        // if (agent.location.distance(lastPos) < 0.1) {
+        //     reward -= 0.5  // penalize being stuck
+        // }
+
+        // if (agent.location.distance(lastPos) < 1.0) {
+        //     val newStationarySteps = stationarySteps + 1
+        //     if (newStationarySteps >= 15) {
+        //         reward -= 10.0
+        //         return Pair(reward, 0)
+        //     }
+        //     return Pair(reward, newStationarySteps)
+        // } else {
+        //     return Pair(reward, 0)
+        // }
+        return Triple(cheeseComponent, poisonComponent, 0)
     }
 
     val networkComponent = addNetworkComponent("Network")
     val network = networkComponent.network
     val entityOffset = Point2D.Double(100.0, 100.0)
-
+    val dispersion = 150.0
     val agent = oc.world.addEntity(entityOffset.x, entityOffset.y, EntityType.Circle).apply {
-        addLeftRightSensors(EntityType.Swiss, 270.0)
+        addSensor(ObjectSensor(EntityType.Swiss, 50.0, 45.0).apply { 
+            label = "Cheese Left"
+            decayFunction.dispersion = dispersion
+        })
+        addSensor(ObjectSensor(EntityType.Swiss, 50.0, -45.0).apply { 
+            label = "Cheese Right" 
+            decayFunction.dispersion = dispersion
+        })
+        addSensor(ObjectSensor(EntityType.Poison, 50.0, 45.0).apply { 
+            label = "Poison Left" 
+            decayFunction.dispersion = dispersion
+        })
+        addSensor(ObjectSensor(EntityType.Poison, 50.0, -45.0).apply { 
+            label = "Poison Right" 
+            decayFunction.dispersion = dispersion
+        })
         addDefaultEffectors()
+        //isShowTrail = true
     }
     val leftInput = runBlocking {
         network.addNeuron(0, 100).apply {
@@ -105,6 +147,18 @@ val braitenbergRL = newSim {
     val rightInput = runBlocking {
         network.addNeuron(100, 100).apply {
             label = "Cheese (R)"
+            clamped = true
+        }
+    }
+    val poisonLeftInput = runBlocking {
+    network.addNeuron(0, 150).apply {
+        label = "Poison (L)"
+        clamped = true
+    }
+    }
+    val poisonRightInput = runBlocking {
+        network.addNeuron(100, 150).apply {
+            label = "Poison (R)"
             clamped = true
         }
     }
@@ -132,22 +186,65 @@ val braitenbergRL = newSim {
             lowerBound = -200.0
             upperBound = 200.0
         }
-
     }
+    val cheeseReward = network.addNeuron(300, 0).apply {
+        clamped = true
+        label = "Cheese Reward"
+    }
+    val poisonPenalty = network.addNeuron(300, 50).apply {
+        clamped = true
+        label = "Poison Penalty"
+    }
+    val rewardNeuron = network.addNeuron(300, 100).apply {
+        clamped = true
+        label = "Reward"
+    }
+    val valueNeuron = network.addNeuron(350, 100).apply {
+        label = "Value"
+        upperBound = 100.0
+    }
+    val tdErrorNeuron = network.addNeuron(400, 100).apply {
+        label = "TD Error"
+        upperBound = 100.0
+        lowerBound = -100.0
+    }
+
+    val (plot, rewardSeries, valueSeries, tdErrorSeries) = addTimeSeries(
+        "Reward, Value, TD Error", 
+        seriesNames = listOf("Reward", "Value", "TD Error")
+    )
+
+    couplingManager.createCoupling(rewardNeuron, rewardSeries)
+    couplingManager.createCoupling(valueNeuron, valueSeries)
+    couplingManager.createCoupling(tdErrorNeuron, tdErrorSeries)
+
     val leftSynapse = network.addSynapse(leftInput, leftTurn)
     val rightSynapse = network.addSynapse(rightInput, rightTurn)
     val straightSynapseLeft = network.addSynapse(leftInput, straight)
     val straightSynapseRight = network.addSynapse(rightInput, straight)
+    val poisonToRightTurn = network.addSynapse(poisonLeftInput, rightTurn)
+    val poisonToLeftTurn = network.addSynapse(poisonRightInput, leftTurn)
+    val poisonToStraightLeft = network.addSynapse(poisonLeftInput, straight)
+    val poisonToStraightRight = network.addSynapse(poisonRightInput, straight)
+    val valueInputs = listOf(leftInput, rightInput, poisonLeftInput, poisonRightInput)
+    val criticWeights = valueInputs.map { input ->
+        network.addSynapse(input, valueNeuron).apply {
+            strength = 0.0
+        }
+    }
 
-    // val neuronCollection = network.addNetworkModelAsync(
-    //     NeuronCollection(network, listOf(leftInput, rightInput, straight, leftTurn, rightTurn))
-    // )
-
-    val (leftSensor, rightSensor) = agent.sensors
+    val cheeseLeftSensor = agent.getSensor("Cheese Left")
+    val cheeseRightSensor = agent.getSensor("Cheese Right")
+    val poisonLeftSensor = agent.getSensor("Poison Left")
+    val poisonRightSensor = agent.getSensor("Poison Right")
     val (eStraight, eLeft, eRight) = agent.effectors
+
     with(couplingManager) {
-        leftSensor couple leftInput
-        rightSensor couple rightInput
+        cheeseLeftSensor couple leftInput
+        cheeseRightSensor couple rightInput
+        poisonLeftSensor couple poisonLeftInput
+        poisonRightSensor couple poisonRightInput
+
         leftTurn couple eLeft
         rightTurn couple eRight
         straight couple eStraight
@@ -155,15 +252,35 @@ val braitenbergRL = newSim {
 
     // Start off with synapse strength of 0
     network.freeSynapses.forEach {  s -> s.strength = 0.0 }
-
+    
+    // Start off with aversion to poison (otherwise it has no reason to turn away)
+    // Move and Turn quickly away from
+    poisonToLeftTurn.strength = 2.0
+    poisonToRightTurn.strength = 2.0
+    poisonToStraightLeft.strength = 1.0
+    poisonToStraightRight.strength = 1.0
+    
     fun resetVehicle() {
-        agent.location = Point2D.Double(60.0, 400.0)
+        agent.location = Point2D.Double((50..150).random().toDouble(), (350..450).random().toDouble())
         agent.heading = 45.0
+    }
+
+    fun resetObjects() {
+        world.entityList.find { it.entityType == EntityType.Swiss }?.setLocation(
+            (100..500).random().toDouble(),
+            (100..500).random().toDouble()
+        )
+
+        world.entityList.find { it.entityType == EntityType.Poison }?.setLocation(
+            (100..500).random().toDouble(),
+            (100..500).random().toDouble()
+        )
     }
 
     withGui {
         place(networkComponent, 53, 282, 359, 327)
         place(oc, 462, 19, 600, 600)
+        place(plot, 1080, 0, 500, 500)
         oc.getDesktopComponentAs<OdorWorldDesktopComponent>().fitWorldToFrameSize()
 
         // Add control panel for RL parameters
@@ -177,54 +294,89 @@ val braitenbergRL = newSim {
             addFormattedNumericTextField("Max Steps", initValue = maxStepsPerTrial.toDouble()) {
                 maxStepsPerTrial = it.toInt()
             }
+            addButton("Stop") {
+                stopRequested = true
+            }
             addButton("Run Trials") {
+                this@addButton.isEnabled = false  // disable the button
                 workspace.launch {
-                    for (trial in 1..numTrials) {
-                        trialStep = 0
-                        resetVehicle()
-                        var goalAchieved = false
-                        var lastDistanceToCheese = Double.POSITIVE_INFINITY
-                        var lastPosition = agent.location
-                        var stationarySteps = 0
+                    try {
+                        for (trial in 1..numTrials) {
+                            trialStep = 0
+                            resetVehicle()
+                            resetObjects()
+                            var goalAchieved = false
+                            var lastDistanceToCheese = Double.POSITIVE_INFINITY
+                            var lastDistanceToPoison = Double.POSITIVE_INFINITY
+                            var lastPosition = agent.location
+                            var stationarySteps = 0
 
-                        while (trialStep++ < maxStepsPerTrial && !goalAchieved) {
-                            workspace.iterateSuspend(1)
+                            while (trialStep++ < maxStepsPerTrial && !goalAchieved && !stopRequested) {
+                                workspace.iterateSuspend(1)
 
-                            val cheese = world.entityList.find { it.entityType == EntityType.Swiss } ?: continue
-                            val distanceToCheese = agent.location.distance(cheese.location)
-                            if (distanceToCheese < 30.0) {
-                                goalAchieved = true
-                                break
+                                val cheese = world.entityList.find { it.entityType == EntityType.Swiss } ?: continue
+                                val distanceToCheese = agent.location.distance(cheese.location)
+                                if (distanceToCheese < 30.0) {
+                                    goalAchieved = true
+                                    break
+                                }
+
+                                val (cheeseR, poisonR, newStationarySteps) = calculateReward(
+                                    agent,
+                                    world,
+                                    lastDistanceToCheese,
+                                    lastDistanceToPoison,
+                                    lastPosition,
+                                    stationarySteps
+                                )
+
+                                cheeseReward.activation = cheeseR
+                                poisonPenalty.activation = poisonR
+                                rewardNeuron.activation = cheeseR + poisonR
+
+                                val tdError = rewardNeuron.activation + gamma * valueNeuron.activation - valueNeuron.auxValue
+                                tdErrorNeuron.activation = tdError
+
+                                // Update critic weights
+                                valueNeuron.fanIn.forEach { syn ->
+                                    syn.strength += learningRate * tdError * syn.source.auxValue
+                                }
+                                valueNeuron.auxValue = valueNeuron.activation
+
+                                // Update Actro weights
+                                if (tdError > 0) {
+                                    leftSynapse.strength += learningRate * tdError * leftInput.auxValue
+                                    rightSynapse.strength += learningRate * tdError * rightInput.auxValue
+                                    straightSynapseLeft.strength += learningRate * tdError * leftInput.auxValue
+                                    straightSynapseRight.strength += learningRate * tdError * rightInput.auxValue
+                                    poisonToRightTurn.strength += learningRate * tdError * poisonLeftInput.auxValue
+                                    poisonToLeftTurn.strength += learningRate * tdError * poisonRightInput.auxValue
+                                    poisonToStraightLeft.strength += learningRate * tdError * poisonLeftInput.auxValue
+                                    poisonToStraightRight.strength += learningRate * tdError * poisonRightInput.auxValue
+                                }
+
+                                leftSynapse.strength = leftSynapse.strength.coerceIn(-10.0, 10.0)
+                                rightSynapse.strength = rightSynapse.strength.coerceIn(-10.0, 10.0)
+                                poisonToRightTurn.strength = poisonToRightTurn.strength.coerceIn(-10.0, 10.0)
+                                poisonToLeftTurn.strength = poisonToLeftTurn.strength.coerceIn(-10.0, 10.0)
+                                straightSynapseLeft.strength = straightSynapseLeft.strength.coerceIn(-3.0, 3.0)
+                                straightSynapseRight.strength = straightSynapseRight.strength.coerceIn(-3.0, 3.0)
+
+                                lastDistanceToCheese = distanceToCheese
+                                lastPosition = agent.location
+                                stationarySteps = newStationarySteps
+                                valueInputs.forEach { it.auxValue = it.activation }
+                                valueNeuron.auxValue = valueNeuron.activation
+                                lastDistanceToPoison = agent.location.distance(
+                                    world.entityList.find { it.entityType == EntityType.Poison }?.location ?: agent.location
+                                )
                             }
-                            //for (poison in world.entityList.filter { it.entityType == EntityType.Poison }) {
-                            //    if (agent.location.distance(poison.location) < 30.0) {
-                            //        goalAchieved = true
-                            //        break
-                            //    }
-                            //}
 
-                            val (reward, newStationarySteps) = calculateReward(
-                                agent,
-                                world,
-                                lastDistanceToCheese,
-                                lastPosition,
-                                stationarySteps
-                            )
-                            val tdError = -reward
-                            leftSynapse.strength += learningRate * tdError * leftInput.activation
-                            rightSynapse.strength += learningRate * tdError * rightInput.activation
-                            straightSynapseLeft.strength += learningRate * tdError * leftInput.activation
-                            straightSynapseRight.strength += learningRate * tdError * rightInput.activation
-                            leftSynapse.strength = leftSynapse.strength.coerceIn(-10.0, 10.0)
-                            rightSynapse.strength = rightSynapse.strength.coerceIn(-10.0, 10.0)
-                            straightSynapseLeft.strength = straightSynapseLeft.strength.coerceIn(-3.0, 3.0)
-                            straightSynapseRight.strength =
-                                straightSynapseRight.strength.coerceIn(-3.0, 3.0)
-
-                            lastDistanceToCheese = distanceToCheese
-                            lastPosition = agent.location
-                            stationarySteps = newStationarySteps
+                            if (stopRequested) break
                         }
+                    } finally {
+                        this@addButton.isEnabled = true  // re-enable the button
+                        stopRequested = false           // reset stop flag
                     }
                 }
             }
@@ -251,7 +403,7 @@ val braitenbergRL = newSim {
     
     Jeff Yoshimi
     
-    Dave Noelle suggested the origina idea
+    Dave Noelle suggested the original idea
             
     """.trimIndent()
     )

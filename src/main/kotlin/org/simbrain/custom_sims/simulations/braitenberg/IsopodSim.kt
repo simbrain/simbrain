@@ -42,7 +42,7 @@ val isopodSim = newSim {
 
     val networkComponent = addNetworkComponent("Network")
     val network = networkComponent.network
-    val noiseSource = NormalDistribution(1.0, .9)
+    var noiseSource = NormalDistribution(1.0, .9)
 
     val neuronLeftSensor = network.addNeuron {
         location = point(0, 100)
@@ -232,6 +232,39 @@ val isopodSim = newSim {
     withGui {
         createControlPanel("Control Panel", 5, 10) {
 
+            suspend fun runTrials() {
+                var iteration = 0
+                while (trialNum < defaultNumTrials) {
+                    log += "# Trial: ${trialNum + 1}\n"
+                    resetIsopod()
+                    log += "# Heading: ${isopod.heading}\n"
+                    workspace.iterateWhile {
+                        if (!collision) {
+                            logAgentState()
+                        }
+                        !collision && ++iteration < maxIterationsPerTrial
+                    }
+                    trialNum++
+                    iteration = 0
+                    collision = false
+                }
+                trialNum = 0
+            }
+
+            suspend fun useSpeedInhibition() {
+                if (leftSpeedWeight == null) {
+                    with(network) {
+                        leftSpeedWeight = connect(neuronLeftSensor, neuronStraight, -1.0, -50.0, 50.0)
+                        rightSpeedWeight = connect(neuronRightSensor, neuronStraight, -1.0, -50.0, 50.0)
+                    }
+                } else {
+                    leftSpeedWeight?.delete()
+                    leftSpeedWeight = null
+                    rightSpeedWeight?.delete()
+                    rightSpeedWeight = null
+                }
+            }
+
             addButton("Run one trial") {
                 resetIsopod()
                 log = ""
@@ -260,40 +293,29 @@ val isopodSim = newSim {
             }
 
             addButton("Run trials") {
-                log = ""
-                var iteration = 0
-                while (trialNum < defaultNumTrials) {
-                    log += "# Trial: ${trialNum + 1}\n"
-                    resetIsopod()
-                    log += "# Heading: ${isopod.heading}\n"
-                    workspace.iterateWhile {
-                        if (!collision) {
-                            logAgentState()
-                        }
-                        !collision && ++iteration < maxIterationsPerTrial
-                    }
-                    trialNum++
-                    iteration = 0
-                    collision = false
-                }
-                trialNum = 0
-                showSaveDialog("", "multipleTrials.csv") {
+                runTrials()
+                showSaveDialog("", "isopodData.csv") {
                     writeText(log)
                 }
             }
 
+            // Uncomment below to create a custom button with a bespoke sim
+            //addButton("Custom Sim") {
+            //    log = "# Velocity = 1, stdev = .01\n"
+            //    neuronStraight.bias = 1.0
+            //    noiseSource = NormalDistribution(.01, .9)
+            //    runTrials()
+            //    log += "# Velocity = 2, stdev = .03\n"
+            //    neuronStraight.bias = 2.0
+            //    noiseSource = NormalDistribution(.03, .9)
+            //    runTrials()
+            //    showSaveDialog("", "isopodData.csv") {
+            //        writeText(log)
+            //    }
+            //}
+
             addButton("Speed inhibition") {
-                if (leftSpeedWeight == null) {
-                    with(network) {
-                        leftSpeedWeight = connect(neuronLeftSensor, neuronStraight, -1.0, -50.0, 50.0)
-                        rightSpeedWeight = connect(neuronRightSensor, neuronStraight, -1.0, -50.0, 50.0)
-                    }
-                } else {
-                    leftSpeedWeight?.delete()
-                    leftSpeedWeight = null
-                    rightSpeedWeight?.delete()
-                    rightSpeedWeight = null
-                }
+                useSpeedInhibition()
             }
         }
 
@@ -329,12 +351,5 @@ val isopodSim = newSim {
         """.trimIndent()
     )
 
-    // addDocViewer("Test", "Braitenberg.html").apply {
-    //     place(this) {
-    //         location = point(145, 421)
-    //         width = 400
-    //         height = 330
-    //     }
-    // }
-
 }
+

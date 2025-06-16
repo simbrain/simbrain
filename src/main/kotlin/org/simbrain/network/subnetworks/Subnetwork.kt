@@ -14,6 +14,7 @@ package org.simbrain.network.subnetworks
 
 import org.simbrain.network.core.*
 import org.simbrain.network.events.SubnetworkEvents
+import org.simbrain.util.indent
 import org.simbrain.util.minus
 import org.simbrain.util.plus
 import org.simbrain.util.propertyeditor.EditableObject
@@ -127,10 +128,7 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
         get() = modelList[Synapse::class.java].toList()
 
     override fun toString(): String {
-        return """
-            $id: ${javaClass.simpleName}
-            ${modelList.toStringTabbed()}
-            """.trimIndent()
+        return "$id: ${javaClass.simpleName}\n${modelList.all.joinToString("\n") { it.toString().indent(2) }}"
     }
 
     override val name: String
@@ -153,12 +151,13 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
         set(newLocation) {
             val delta = newLocation - location
             locatableModels.forEach { it.location += delta }
+            customInfo?.location += delta
         }
 
     /**
      * Optional information about the current state of the group. For display in GUI.
      */
-    open val customInfo: NetworkModel? = null
+    open val customInfo: LocatableModel? = null
 
     abstract fun copy(): Subnetwork
 }

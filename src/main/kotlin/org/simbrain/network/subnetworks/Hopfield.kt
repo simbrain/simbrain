@@ -124,22 +124,16 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
         get() = "Energy: " + getEnergy()
 
     fun getEnergy(): Double {
-        // Todo: factor in input. - Input vector component-mult activations
-        return neuronGroup.activations.transpose()
+        // Convert activations to bipolar (-1, +1) for proper Hopfield energy calculation
+        val bipolarActivations = neuronGroup.activations.applyFunction(::bipolar)
+        return bipolarActivations.transpose()
             .mm(weightMatrix.weights)
-            .mm(neuronGroup.activations)
+            .mm(bipolarActivations)
             .mul(-.5)[0]
     }
     fun updateStateInfoText() {
         customInfo.text = stateInfoText
         events.customInfoUpdated.fire()
-    }
-
-    /**
-     * Convert 0 to -1 in order to convert binary vectors like (0,1) to bipolar vectors like (-1,1)
-     */
-    fun bipolar(inputVal: Double): Double {
-        return if (inputVal == 0.0) -1.0 else inputVal
     }
 
     context(Network)
@@ -202,8 +196,8 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
                 val randomIndex = (0 until hop.neuronGroup.size).random()
                 hop.neuronGroup.neuronList[randomIndex].activation = hop.weightMatrix.weights
                     .row(randomIndex)
-                    .dot(hop.neuronGroup.activationArray)
-                    .let { if (it > 0.0) 1.0 else 0.0 }
+                    .dot(hop.neuronGroup.activationArray.applyFunctionInPlace(::bipolar))
+                    .let { binary(it) }
             }
 
             override fun toString(): String {
@@ -219,8 +213,8 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
                 (0 until hop.neuronGroup.size).forEach {
                     hop.neuronGroup.neuronList[it].activation = hop.weightMatrix.weights
                         .row(it)
-                        .dot(hop.neuronGroup.activationArray)
-                        .let { if (it > 0.0) 1.0 else 0.0 }
+                        .dot(hop.neuronGroup.activationArray.applyFunctionInPlace(::bipolar))
+                        .let { binary(it) }
                 }
             }
 
@@ -234,8 +228,8 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
             override fun update(hop: Hopfield) {
                 hop.neuronGroup.setActivations(
                     hop.weightMatrix.weights
-                        .mm(hop.neuronGroup.activations)
-                        .applyFunction { if (it > 0.0) 1.0 else 0.0 }
+                        .mm(hop.neuronGroup.activations.applyFunctionInPlace(::bipolar))
+                        .applyFunction(::binary)
                         .toDoubleArray()
                 )
             }
@@ -270,6 +264,5 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
             return Hopfield(numNeurons)
         }
     }
-
 
 }

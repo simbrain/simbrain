@@ -232,15 +232,15 @@ class Network: CoroutineScope, EditableObject {
      * @return the flat list
      */
     val flatNeuronList: List<Neuron>
-        get() = sequence {
-            yieldAll(networkModels.get<Neuron>())
-            for (neuronGroup in networkModels.get<NeuronGroup>()) {
-                yieldAll(neuronGroup.neuronList)
+        get() = buildList {
+            addAll(networkModels.get<Neuron>())
+            for (neuronGroup in networkModels.all.filterIsInstance<NeuronGroup>()) {
+                addAll(neuronGroup.neuronList)
             }
             for (subnetwork in networkModels.get<Subnetwork>()) {
-                yieldAll(subnetwork.modelList.get<NeuronGroup>().flatMap { it.neuronList })
+                addAll(subnetwork.modelList.get<NeuronGroup>().flatMap { it.neuronList })
             }
-        }.toList()
+        }
 
     /**
      * Create "flat" list of synapses, which includes the top-level synapses plus all subnet synapses.

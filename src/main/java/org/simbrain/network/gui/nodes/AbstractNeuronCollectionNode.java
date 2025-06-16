@@ -207,4 +207,8 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
     public boolean isIntersecting(@Nullable PBounds bound) {
         return interactionBox.isIntersecting(bound);
     }
+
+    public Outline getOutlinedObjects() {
+        return outlinedObjects;
+    }
 }

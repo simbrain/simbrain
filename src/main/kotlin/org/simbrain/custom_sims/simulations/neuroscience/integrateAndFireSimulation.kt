@@ -13,6 +13,7 @@ import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.util.showNumericInputDialog
 import org.simbrain.util.stats.distributions.NormalDistribution
+import org.simbrain.util.stats.distributions.PoissonDistribution
 import kotlin.math.sqrt
 
 /**
@@ -77,14 +78,17 @@ val integrateAndFireSimulation = newSim {
     // Polarize synapses according to specified excitatory ratio
     polarizeSynapses(synapses, excitatoryRatio)
     
-    // Randomize weights with appropriate distributions
+    // Randomize weights and delays
+    val randDelay = PoissonDistribution(3.0)
     synapses.forEach { synapse ->
         if (synapse.strength > 0) {
             synapse.strength = exciteRand.sampleDouble()
         } else {
             synapse.strength = -inhibRand.sampleDouble()
         }
+        synapse.delay = randDelay.sampleInt()
     }
+
 
     network.addNetworkModels(synapses)
     

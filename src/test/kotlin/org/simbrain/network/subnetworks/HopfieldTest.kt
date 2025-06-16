@@ -6,9 +6,7 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.getModelByLabel
 import org.simbrain.network.core.getNetworkXStream
-import org.simbrain.util.cartesianProduct
-import org.simbrain.util.flatten
-import org.simbrain.util.sse
+import org.simbrain.util.*
 import smile.math.matrix.Matrix
 import kotlin.math.abs
 
@@ -165,6 +163,109 @@ class HopfieldTest {
                 "Copied network should produce identical results")
         }
     }
+
+    @Test
+    fun `energy decreases and stable recall with correlated patterns`() {
+        with(net) {
+            // Create 3 correlated patterns (small variations of base pattern)
+            val basePattern = doubleArrayOf(
+                    1.0, 1.0, 1.0, 0.0, 0.0,
+                    1.0, 1.0, 1.0, 0.0, 0.0,
+                    1.0, 1.0, 1.0, 0.0, 0.0,
+                    0.0, 0.0, 0.0, 1.0, 1.0,
+                    0.0, 0.0, 0.0, 1.0, 1.0,
+                    0.0, 0.0, 0.0, 1.0, 1.0
+                )
+
+            val pattern1 = basePattern
+            val pattern2 = pattern1.clone().perturbBinaryByHammingDistance(8)
+            val pattern3 = pattern2.clone().perturbBinaryByHammingDistance(8)
+
+            val patterns = listOf(pattern1, pattern2, pattern3)
+
+            hopfield.learningRate = 1.0 / patterns.size
+            patterns.forEach {
+                hopfield.neuronGroup.setActivations(it)
+                hopfield.trainOnCurrentPattern()
+            }
+
+            // Test that each pattern is a stable attractor, with energy < -10.0 (arbitrary but large magnitude)
+            val updateTypes = listOf(
+                Hopfield.HopfieldUpdate.STOCHASTIC,
+                Hopfield.HopfieldUpdate.SEQ,
+                Hopfield.HopfieldUpdate.SYNC,
+            )
+
+            (patterns cartesianProduct updateTypes).forEach { (pattern, updateType) ->
+                hopfield.updateFunc = updateType
+                hopfield.neuronGroup.setActivations(pattern)
+
+                val initialEnergy = hopfield.getEnergy()
+
+                repeat(40) { hopfield.update() }
+
+                val finalEnergy = hopfield.getEnergy()
+
+                // Energy should not increase
+                assert(finalEnergy <= initialEnergy) {
+                    "Energy increased during update! $initialEnergy -> $finalEnergy"
+                }
+
+                // Final pattern should be close to stored one
+                val sse = hopfield.neuronGroup.activationArray sse pattern
+                //println(sse)
+                assert(sse < 5) {
+                    "Failed to recall pattern for update $updateType; SSE: $sse"
+                }
+
+                // Final energy should be a strong minimum (arbitrary threshold)
+                assert(finalEnergy < -10.0) {
+                    "Final energy too high: $finalEnergy"
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `exact energy computation test`() {
+        with(net) {
+            // Simple pattern for which we can compute energy by hand
+            val pattern = doubleArrayOf(
+                1.0, -1.0, 1.0, -1.0, 1.0,
+                -1.0, 1.0, -1.0, 1.0, -1.0,
+                1.0, -1.0, 1.0, -1.0, 1.0,
+                -1.0, 1.0, -1.0, 1.0, -1.0,
+                1.0, -1.0, 1.0, -1.0, 1.0,
+                -1.0, 1.0, -1.0, 1.0, -1.0
+            )
+
+            // Train on this pattern only
+            hopfield.learningRate = 1.0
+            hopfield.neuronGroup.setActivations(pattern)
+            hopfield.trainOnCurrentPattern()
+
+            // Now compute expected energy:
+            // E = -0.5 * sum_i sum_j w_ij * s_i * s_j
+            // But since weights are outer product of pattern with itself (minus diagonal),
+            // we can compute this exactly:
+            //
+            // sum_i sum_j (pattern[i] * pattern[j])^2 = N * (N - 1)
+            // Energy = -0.5 * (N * (N-1))
+            //
+            // Since we use learningRate = 1.0 / P = 1.0, this matches the Hebbian scaling.
+
+            val N = hopfield.neuronGroup.size
+            val expectedEnergy = -0.5 * (N * (N - 1)).toDouble()
+
+            // Check energy
+            val actualEnergy = hopfield.getEnergy()
+
+            println("Expected energy: $expectedEnergy, actual energy: $actualEnergy")
+
+            assertEquals(expectedEnergy, actualEnergy, 1e-6, "Energy computation mismatch!")
+        }
+    }
+
 
     @Test
     fun `test hopfield network serialization`() {

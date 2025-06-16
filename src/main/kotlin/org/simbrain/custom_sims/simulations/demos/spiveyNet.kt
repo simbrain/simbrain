@@ -33,7 +33,7 @@ val spiveyNet = newSim {
     var competitorIndex = 0
     var timeIndex = 0
     var conditionText = ""
-    var useFeedback = false // if true incorporate feedback from eyes and mouse
+    var useFeedback = true // if true incorporate feedback from eyes and mouse
 
     // Network
     val networkComponent = addNetworkComponent("Spivey Net")
@@ -54,7 +54,7 @@ val spiveyNet = newSim {
         layout = LineLayout()
         applyLayout()
         isClamped = true
-        label = "Visual"
+        label = "Visual Attention"
         neuronList.labels = listOf("candle", "candy", "handle", "fork")
     }
     val mouseNodes = NeuronGroup(4).apply {
@@ -70,7 +70,7 @@ val spiveyNet = newSim {
         label = "Eyes"
         neuronList.labels = listOf("candle", "candy", "handle", "fork")
     }
-    val integrationNodes = NormalizationGroup(4).apply {
+    val integrationNodes = NeuronGroup(4).apply {
         layout = LineLayout()
         applyLayout()
         label = "Integration"
@@ -114,9 +114,7 @@ val spiveyNet = newSim {
     }
 
     net.updateManager.clear()
-    workspace.addUpdateAction("Spivey Net Update") {
-
-        // Custom network update
+    workspace.addUpdateAction("Spivey Net Update", position = 0) {
 
         // Assume lexical nodes have been updated by a control panel button
         with(net) {
@@ -160,11 +158,11 @@ val spiveyNet = newSim {
 
         lexicalNodes.activations += (integrationNodes.activations * lexicalNodes.activations)
         if (useFeedback) {
-            visualNodes.activations += (integrationNodes.activations * lexicalNodes.activations) +
+            visualNodes.activations += (integrationNodes.activations * visualNodes.activations) +
                     (eyesNodes.activations * visualNodes.activations) +
                     (mouseNodes.activations * visualNodes.activations)
         } else {
-            visualNodes.activations += (integrationNodes.activations * lexicalNodes.activations)
+            visualNodes.activations += (integrationNodes.activations * visualNodes.activations)
         }
         lexicalNodes.neuronList.normalize()
         visualNodes.neuronList.normalize()
@@ -183,6 +181,7 @@ val spiveyNet = newSim {
     suspend fun resetExperiment() {
         timeIndex = 0
         mouse.location = point(157, 271)
+        networkComponent.network.clearActivations()
         withGui {
             (getDesktopComponent(oc) as OdorWorldDesktopComponent)
                 .worldPanel

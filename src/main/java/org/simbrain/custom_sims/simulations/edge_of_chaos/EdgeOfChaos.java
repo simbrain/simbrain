@@ -171,6 +171,10 @@ public class EdgeOfChaos extends Simulation {
         flowersToRes = createSensorConnections(sensorNodes, reservoir, new int[] {3, 4, 5}, .6, 3);
         net.addNetworkModel(flowersToRes);
         sensorNodes.applyLayout();
+        SwingUtilities.invokeLater(() -> {
+            cheeseToRes.initializeSynapseVisibility();
+            flowersToRes.initializeSynapseVisibility();
+        });
     }
 
     public static NeuronGroup createReservoir(Network parentNet, int x, int y, int numNeurons) {

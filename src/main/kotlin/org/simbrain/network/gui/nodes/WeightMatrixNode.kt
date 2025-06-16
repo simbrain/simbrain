@@ -5,6 +5,7 @@ import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.core.AbstractNeuronCollection
 import org.simbrain.network.core.Connector
+import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.gui.*
 import org.simbrain.network.gui.dialogs.NetworkPreferences
@@ -51,6 +52,9 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
 
     private val interactionBox = WeightMatrixInteractionBox()
 
+    val sourceNode by lazy { networkPanel.getNode(weightMatrix.source) }
+    val targetNode by lazy { networkPanel.getNode(weightMatrix.target) }
+
     init {
         updateShowWeights()
         pickable = true
@@ -67,6 +71,12 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
             updateLocations()
         }
         weightMatrix.target.events.locationChanged.on(Dispatchers.Swing) {
+            updateLocations()
+        }
+        (weightMatrix.source as? NeuronArray)?.events?.visualPropertiesChanged?.on(Dispatchers.Swing) {
+            updateLocations()
+        }
+        (weightMatrix.target as? NeuronArray)?.events?.visualPropertiesChanged?.on(Dispatchers.Swing) {
             updateLocations()
         }
         invalidateFullBounds()

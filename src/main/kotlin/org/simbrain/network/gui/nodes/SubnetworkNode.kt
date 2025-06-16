@@ -201,9 +201,7 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
                 node.offset(dx, dy)
             }
         }
-        if (infoTextNode != null) {
-            infoTextNode!!.offset(dx, dy)
-        }
+        infoTextNode?.offset(dx, dy)
         outline.resetOutlinedNodes(outlinedObjects)
     }
 

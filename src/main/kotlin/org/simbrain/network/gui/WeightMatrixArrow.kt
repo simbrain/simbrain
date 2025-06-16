@@ -3,6 +3,7 @@ package org.simbrain.network.gui
 import org.piccolo2d.PNode
 import org.simbrain.network.core.ArrayLayer
 import org.simbrain.network.gui.dialogs.NetworkPreferences
+import org.simbrain.network.gui.nodes.AbstractNeuronCollectionNode
 import org.simbrain.network.gui.nodes.WeightMatrixNode
 import org.simbrain.util.*
 import org.simbrain.util.widgets.BezierArrow
@@ -12,7 +13,19 @@ import org.simbrain.util.widgets.bezierArrow
 class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode() {
 
     private val source get() = weightMatrixNode.model.source
+    private val sourceNodeBounds get() = with(weightMatrixNode.sourceNode) {
+        when (this) {
+            is AbstractNeuronCollectionNode -> outlinedObjects.globalFullBounds
+            else -> this.globalBounds
+        }
+    }
     private val target get() = weightMatrixNode.model.target
+    private val targetNodeBounds get() = with(weightMatrixNode.targetNode) {
+        when (this) {
+            is AbstractNeuronCollectionNode -> outlinedObjects.globalFullBounds
+            else -> this.globalBounds
+        }
+    }
     private fun isBidirectional() = target.outgoingConnectors.any { it.target == source }
 
     private val arrow = if (source == target) {
@@ -23,7 +36,7 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
 
             padding {
                 tail = when (source) {
-                    is ArrayLayer -> 5.0
+                    is ArrayLayer -> 0.0
                     else -> defaultTail
                 }
                 head = when (target) {
@@ -47,8 +60,8 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
 
     override fun layoutChildren() {
         when (arrow) {
-            is RecurrentArrow -> arrow.layout(source.location) { (x, y) -> weightMatrixNode.imageBox.centerFullBoundsOnPoint(x, y) }
-            is BezierArrow -> arrow.layout(source.bound.outlines, target.bound.outlines, isBidirectional())
+            is RecurrentArrow -> arrow.layout(sourceNodeBounds.centerLeft + point(15, 0)) { (x, y) -> weightMatrixNode.imageBox.centerFullBoundsOnPoint(x, y) }
+            is BezierArrow -> arrow.layout(sourceNodeBounds.outlines, targetNodeBounds.outlines, isBidirectional())
         }
     }
 }

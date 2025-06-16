@@ -154,7 +154,7 @@ class SynapseGroup @JvmOverloads constructor(
     }
 
     override fun toString(): String {
-        return ("$id  with ${size()} synapse(s) from $source.id to $target.id")
+        return ("$displayName  with ${size()} synapse(s) from ${source.displayName} to ${target.displayName}")
     }
 
     fun applyConnectionStrategy() {

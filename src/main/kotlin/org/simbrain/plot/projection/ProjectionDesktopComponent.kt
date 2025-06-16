@@ -21,6 +21,7 @@ import org.simbrain.util.*
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.projection.*
 import org.simbrain.util.widgets.ShowHelpAction
+import org.simbrain.util.widgets.SimbrainToggleButton
 import org.simbrain.util.widgets.ToggleButton
 import org.simbrain.workspace.gui.DesktopComponent
 import java.awt.*
@@ -113,25 +114,22 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
     val projectionMethods = projectionTypes
         .associateWith { it.kotlin.primaryConstructor!!.call() }
 
-    private val freezingToggleButton = JToggleButton().apply {
-        icon = ResourceManager.getSmallIcon("menu_icons/Clamp.png")
-        fun updateButton() {
-            val pcaProjection = projector.projectionMethod as? PCAProjection ?: return
-            val frozen = pcaProjection.freeze
-            isSelected = frozen
-            border = if (frozen) BorderFactory.createLoweredBevelBorder() else BorderFactory.createEmptyBorder()
-            val frozenText = if (frozen) "on" else "off"
-            toolTipText = "PCA 'freezing' is $frozenText"
-        }
-        updateButton()
-        addActionListener { e ->
+    private val freezingToggleButton = SimbrainToggleButton(
+        icon = ResourceManager.getSmallIcon("menu_icons/Clamp.png"),
+        stateGetter = { 
+            val pcaProjection = projector.projectionMethod as? PCAProjection ?: return@SimbrainToggleButton false
+            pcaProjection.freeze
+        },
+        stateSetter = { isSelected ->
             (projector.projectionMethod as? PCAProjection)?.let { pcaProjection ->
-                val button = e.source as JToggleButton
-                pcaProjection.freeze = button.isSelected
-                updateButton()
+                pcaProjection.freeze = isSelected
             }
+        },
+        tooltipGenerator = { frozen ->
+            val frozenText = if (frozen) "on" else "off"
+            "PCA 'freezing' is $frozenText"
         }
-    }
+    )
 
     private val projectionSelector: JComboBox<ProjectionMethod> = JComboBox<ProjectionMethod>().apply {
         maximumSize = Dimension(200, 100)

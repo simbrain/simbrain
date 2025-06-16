@@ -760,7 +760,7 @@ class DoubleArrayWidget<O : EditableObject>(
         JPanel().apply {
             layout = BorderLayout()
             SimbrainTablePanel(
-                model, useDefaultToolbarAndMenu = false, useHeaders = false,
+                model, useDefaultToolbarAndMenu = false, useRowHeaders = false,
                 usePadding = false
             ).also {
                 it.table.tableHeader = null
@@ -809,7 +809,7 @@ class IntArrayWidget<O : EditableObject>(
         JPanel().apply {
             layout = BorderLayout()
             SimbrainTablePanel(
-                model, useDefaultToolbarAndMenu = false, useHeaders = false,
+                model, useDefaultToolbarAndMenu = false, useRowHeaders = false,
                 usePadding = false
             ).also {
                 it.table.tableHeader = null
@@ -858,7 +858,7 @@ class BooleanArrayWidget<O : EditableObject>(
         JPanel().apply {
             layout = BorderLayout()
             SimbrainTablePanel(
-                model, useDefaultToolbarAndMenu = false, useHeaders = false,
+                model, useDefaultToolbarAndMenu = false, useRowHeaders = false,
                 usePadding = false
             ).also {
                 it.table.tableHeader = null
@@ -917,7 +917,7 @@ class StringArrayWidget<O : EditableObject>(
         JPanel().apply {
             layout = BorderLayout()
             SimbrainTablePanel(
-                model, useDefaultToolbarAndMenu = false, useHeaders = false,
+                model, useDefaultToolbarAndMenu = false, useRowHeaders = false,
                 usePadding = false
             ).also {
                 it.table.tableHeader = null
@@ -969,7 +969,7 @@ class MatrixWidget<O : EditableObject>(
         JPanel().apply {
             layout = BorderLayout()
             SimbrainTablePanel(
-                model, useDefaultToolbarAndMenu = false, useHeaders = false,
+                model, useDefaultToolbarAndMenu = false, useRowHeaders = false,
                 usePadding = false
             ).also {
                 it.table.tableHeader = null

@@ -18,6 +18,7 @@
  */
 package org.simbrain.plot.timeseries
 
+import net.miginfocom.swing.MigLayout
 import org.jfree.chart.ChartFactory
 import org.jfree.chart.ChartPanel
 import org.jfree.chart.JFreeChart
@@ -78,14 +79,14 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
      */
     init {
         preferredSize = PREFERRED_SIZE
-        layout = BorderLayout()
+        layout = MigLayout("ins 0, gap 0px 0px")
 
         addClearGraphDataButton()
         addPreferencesButton()
         addAddDeleteButtons()
 
-        add("Center", chartPanel)
-        add("South", buttonPanel)
+        add(chartPanel, "wrap")
+        add(buttonPanel)
 
         timeSeriesModel.events.propertyChanged.on { this.updateChartSettings() }
 
@@ -195,7 +196,6 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
     fun showPropertiesDialog() {
         val dialog = timeSeriesModel.createEditorDialog { e: TimeSeriesModel? ->
             updateChartSettings()
-            Unit
         }
         dialog.display()
     }

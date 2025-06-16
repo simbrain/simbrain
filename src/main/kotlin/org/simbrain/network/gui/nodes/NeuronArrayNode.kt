@@ -357,7 +357,8 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             contextMenu.add(switchStyle)
 
             val switchOrientation: Action = networkPanel.createAction(
-                name = "Switch to ${if (neuronArray.verticalLayout) "horizontal" else "vertical"} layout",
+                name = "Toggle horizontal / vertical layout",
+                keyboardShortcut = 'L',
                 description = "Toggle horizontal / vertical layout"
             ) {
                 networkPanel.selectionManager
@@ -368,6 +369,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
 
             val toggleCircleMode: Action = networkPanel.createAction(
                 name = "Toggle circle mode",
+                keyboardShortcut = 'M',
                 description = "Toggle activation rendering mode between circle and image",
             ) {
                 networkPanel.selectionManager
@@ -462,7 +464,10 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                 neuronArray.getConsumer(NeuronArray::activationArray),
                 neuronArray.size,
                 menuTitle = "Add coupled image world",
-                postActionBlock = { neuronArray.gridMode = true }
+                postActionBlock = {
+                    neuronArray.gridMode = true
+                    neuronArray.isClamped = true
+                }
             ))
             contextMenu.add(
                 actionManager.createCoupledDataWorldAction(

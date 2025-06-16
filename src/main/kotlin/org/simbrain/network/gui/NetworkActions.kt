@@ -24,8 +24,8 @@ import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.propertyeditor.objectWrapper
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
+import org.simbrain.workspace.couplings.getConsumer
 import org.simbrain.workspace.couplings.getProducer
-import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import java.awt.event.KeyEvent
 import java.io.File
@@ -133,6 +133,10 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     ) {
         showTransformerBlockCreationDialog()
     }
+    val addClassifierAction = createAction("Add classifier") {
+        networkPanel.showClassifierCreationDialog()
+    }
+
     val deleteAction = networkPanel.createConditionallyEnabledAction(
         name = "Delete",
         description = """Delete selected node(s) ("Backspace" or "Delete")""",
@@ -671,7 +675,6 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val newNetworkActions
         get() = listOf(
             addSubnetAction("Backprop") { BackpropCreationDialog(networkPanel) },
-            createAction("Classifier") { networkPanel.showClassifierCreationDialog() },
             addSubnetAction("Competitive Network") { CompetitiveCreationDialog(networkPanel) },
             addSubnetAction("Feed Forward Network") { FeedForwardCreationDialog(networkPanel) },
             addSubnetAction("Hopfield") { HopfieldCreationDialog(networkPanel) },
@@ -680,8 +683,8 @@ class NetworkActions(val networkPanel: NetworkPanel) {
                     addSubnetworkAction(networkPanel) { it.create() }
                 }
             },
-            addSubnetAction("SOM Network") { SOMCreationDialog(networkPanel) },
-            addSubnetAction("SRN (Simple Recurrent Network)") { networkPanel.showSRNCreationDialog() }
+            addSubnetAction("SOM network") { SOMCreationDialog(networkPanel) },
+            addSubnetAction("SRN (simple recurrent network)") { networkPanel.showSRNCreationDialog() }
         )
 
     fun applyConnectionAction(strategy: ConnectionStrategy): AbstractAction {
@@ -1008,6 +1011,13 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         source.getProducer(Layer::activationArray),
         sourceName = "${source.displayName} Activations",
         source.size
+    )
+
+    fun createAbstractNeuronCollectionCoupledImageWorld(collection: AbstractNeuronCollection) = actionManager.createImageInput(
+        collection.getConsumer(AbstractNeuronCollection::activationArray),
+        collection.size,
+        menuTitle = "Add coupled image world",
+        postActionBlock = { collection.isClamped = true }
     )
 
 }

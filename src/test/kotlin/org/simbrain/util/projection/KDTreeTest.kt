@@ -194,6 +194,6 @@ class KDTreeTest {
         val deserializedPointsSet = deserializedPointsList.map { it.upstairsPoint.contentToString() }.toSet()
         assertEquals(originalPointsSet, deserializedPointsSet)
         
-        println("KDTree serialization test passed: Tree structure preserved")
+        //println("KDTree serialization test passed: Tree structure preserved")
     }
 }

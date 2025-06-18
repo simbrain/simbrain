@@ -23,7 +23,12 @@ class Projector(initialDimension: Int = 25) : EditableObject, CoroutineScope {
 
     var dimension: Int = initialDimension
         set(value) {
-            dataset = Dataset(value)
+            // Only create a new dataset if the dimension has actually changed AND
+            // the current dataset doesn't already have the correct dimension
+            // This prevents overwriting the dataset during deserialization
+            if (field != value && dataset.dimension != value) {
+                dataset = Dataset(value)
+            }
             field = value
         }
 

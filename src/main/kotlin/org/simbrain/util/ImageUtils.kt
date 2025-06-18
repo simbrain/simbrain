@@ -135,8 +135,18 @@ fun BooleanArray.toOverlay(width: Int, height: Int, color: Color ): BufferedImag
         32, 0xff0000, 0x00ff00, 0x0000ff, 0xff shl 24
     )
     val sampleModel = colorModel.createCompatibleSampleModel(width, height)
-    val dataBuffer =  this.map { if (it) color.rgb else 0}.toIntArray()
-    val raster = Raster.createWritableRaster(sampleModel, DataBufferInt(dataBuffer, size), null)
+    val dataBuffer = IntArray(width * height).let { buffer ->
+        // Fill extra pixels with transparent if array is smaller than image
+        if (this.size < buffer.size) {
+            buffer.fill(0, this.size, buffer.size) // transparent for missing pixels
+        }
+        // Copy boolean data, using min to avoid out of bounds
+        for (i in 0 until min(this.size, buffer.size)) {
+            buffer[i] = if (this[i]) color.rgb else 0
+        }
+        buffer
+    }
+    val raster = Raster.createWritableRaster(sampleModel, DataBufferInt(dataBuffer, width * height), null)
     return BufferedImage(colorModel, raster, false, null)
 }
 

@@ -195,29 +195,34 @@ class ShortTermPlasticity : SpikeResponder() {
                 U = NormalDistribution(mean = 0.5, standardDeviation = 0.25).sampleDouble()
                 D = NormalDistribution(mean = 1100.0, standardDeviation = 550.0).sampleDouble()
                 F = NormalDistribution(mean = 50.0, standardDeviation = 25.0).sampleDouble()
+                (spikeResponderLocal as? JumpAndDecay)?.timeConstant = 3.0
             }
             s.source.polarity === Polarity.EXCITATORY
                     && s.target.polarity === Polarity.INHIBITORY -> {
-                U = NormalDistribution(mean = 0.5, standardDeviation = 0.25).sampleDouble()
+                U = NormalDistribution(mean = 0.05, standardDeviation = 0.025).sampleDouble()
                 D = NormalDistribution(mean = 125.0, standardDeviation = 62.5).sampleDouble()
                 F = NormalDistribution(mean = 120.0, standardDeviation = 60.0).sampleDouble()
+                (spikeResponderLocal as? JumpAndDecay)?.timeConstant = 3.0
             }
             s.source.polarity === Polarity.INHIBITORY
                     && s.target.polarity === Polarity.EXCITATORY -> {
-                U = NormalDistribution(mean = 0.5, standardDeviation = 0.25).sampleDouble()
+                U = NormalDistribution(mean = 0.25, standardDeviation = 0.125).sampleDouble()
                 D = NormalDistribution(mean = 700.0, standardDeviation = 350.0).sampleDouble()
                 F = NormalDistribution(mean = 20.0, standardDeviation = 10.0).sampleDouble()
+                (spikeResponderLocal as? JumpAndDecay)?.timeConstant = 6.0
             }
             s.source.polarity === Polarity.INHIBITORY
-                    && s.target.polarity === Polarity.EXCITATORY -> {
+                    && s.target.polarity === Polarity.INHIBITORY -> {
                 U = NormalDistribution(mean = 0.32, standardDeviation = 0.16).sampleDouble()
                 D = NormalDistribution(mean = 144.0, standardDeviation = 72.0).sampleDouble()
                 F = NormalDistribution(mean = 60.0, standardDeviation = 30.0).sampleDouble()
+                (spikeResponderLocal as? JumpAndDecay)?.timeConstant = 6.0
             }
             else -> {
                 U = NormalDistribution(mean = 0.5, standardDeviation = 0.25).sampleDouble()
                 D = NormalDistribution(mean = 1100.0, standardDeviation = 550.0).sampleDouble()
                 F = NormalDistribution(mean = 50.0, standardDeviation = 25.0).sampleDouble()
+                (spikeResponderLocal as? JumpAndDecay)?.timeConstant = 3.0
             }
         }
     }

@@ -1,6 +1,8 @@
 package org.simbrain.custom_sims.simulations.neuroscience
 
 import org.simbrain.custom_sims.addNetworkComponent
+import org.simbrain.custom_sims.addRasterPlot
+import org.simbrain.custom_sims.couplingManager
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.SynapseGroup
@@ -8,6 +10,7 @@ import org.simbrain.network.core.addNeuronGroup
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.spikeresponders.ShortTermPlasticity
 import org.simbrain.network.updaterules.IntegrateAndFireRule
+import org.simbrain.plot.rasterchart.RasterPlotDesktopComponent
 import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.place
@@ -56,8 +59,15 @@ val cortexSimple = newSim {
 
     val net = nc.network
 
+    val rasterPlot = addRasterPlot("Raster Plot")
+    rasterPlot.model.removeDataSource()
+    rasterPlot.model.addDataSources(3, listOf("L2/3", "L4", "L5/6"))
+
     withGui {
         place(nc, 10, 10, 550, 800)
+        place(rasterPlot, 560, 12, 524, 568)
+        rasterPlot.model.windowSize = 1000
+        (getDesktopComponent(rasterPlot) as RasterPlotDesktopComponent).rasterPanel.updateChartSettings()
     }
 
     suspend fun buildLayer(
@@ -86,9 +96,8 @@ val cortexSimple = newSim {
         sparsity: Double
     ): SynapseGroup {
         val exRand: ProbabilityDistribution = LogNormalDistribution(exlocation, exscale, false)
-        val inRand: ProbabilityDistribution = LogNormalDistribution(exlocation, exscale, true)
+        val inRand: ProbabilityDistribution = LogNormalDistribution(inlocation, inscale, true)
         val con = Sparse(sparsity, false, false)
-        con.connectionDensity = 0.65
         val sg = SynapseGroup(src, tar, con)
         sg.connectionStrategy.exRandomizer = exRand
         sg.connectionStrategy.inRandomizer = inRand
@@ -106,7 +115,9 @@ val cortexSimple = newSim {
         }
 
         sg.synapses.forEach {
-            it.spikeResponder = ShortTermPlasticity()
+            val stp = ShortTermPlasticity()
+            stp.init(it)
+            it.spikeResponder = stp
         }
         net.addNetworkModel(sg)?.await()
         return sg
@@ -199,6 +210,14 @@ val cortexSimple = newSim {
                 )
             }
             sg.label = sgn
+        }
+
+        val (layer23Plot, layer4Plot, layer56Plot) = rasterPlot.model.rasterConsumerList
+
+        with(couplingManager) {
+            layer_23.getProducer(layer_23::spikes) couple layer23Plot.getConsumer(layer23Plot::setValues)
+            layer_4.getProducer(layer_4::spikes) couple layer4Plot.getConsumer(layer4Plot::setValues)
+            layer_56.getProducer(layer_56::spikes) couple layer56Plot.getConsumer(layer56Plot::setValues)
         }
     }
 

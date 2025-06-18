@@ -100,9 +100,9 @@ class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject {
      *
      * @param numDataSources number of data sources to initialize plot with
      */
-    fun addDataSources(numDataSources: Int) {
+    fun addDataSources(numDataSources: Int, names: List<String>? = null) {
         for (i in 0 until numDataSources) {
-            addDataSource()
+            addDataSource(names?.get(i) ?: (dataset.seriesCount + 1).toString())
         }
     }
 
@@ -111,7 +111,7 @@ class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject {
      */
     fun removeDataSource() {
         val lastSeriesIndex = dataset.seriesCount - 1
-        if (lastSeriesIndex > 0) {
+        if (lastSeriesIndex >= 0) {
             dataset.removeSeries(lastSeriesIndex)
             rasterConsumerList.removeAt(lastSeriesIndex)
         }
@@ -120,9 +120,10 @@ class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject {
     /**
      * Adds a data source to the chart.
      */
-    fun addDataSource() {
+    @JvmOverloads
+    fun addDataSource(name: String = (dataset.seriesCount + 1).toString()) {
         val currentSize = dataset.seriesCount
-        dataset.addSeries(XYSeries(currentSize + 1))
+        dataset.addSeries(XYSeries(name))
         rasterConsumerList.add(RasterConsumer(currentSize))
     }
 

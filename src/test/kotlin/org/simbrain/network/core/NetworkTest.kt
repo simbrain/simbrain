@@ -170,11 +170,88 @@ class NetworkTest {
     @Test
     fun testNeuronCounts() {
         // 2 free neurons
-
         Assertions.assertEquals(2, net.freeNeurons.size)
 
-        // 2 free neurons, 2 x 10 in each of two neuron groups = 22
-        // (2 in neuron collection are free neurons)
-        Assertions.assertEquals(22, net.flatNeuronList.size)
+        // Calculate expected total:
+        // 2 free neurons + 
+        // 2 x 10 in each of two neuron groups (ng1, ng2) = 20 +
+        // 4 x 5 in each of four special neuron groups (softmax, som, competitive, wta) = 20
+        // Total = 2 + 20 + 20 = 42
+        // (Note: the 2 in neuron collection are the same as the free neurons)
+        Assertions.assertEquals(42, net.flatNeuronList.size)
+    }
+
+    @Test
+    fun testFlatListsComprehensive() {
+        // Test flatNeuronList - manually count all neurons from all sources
+        var expectedNeuronCount = 0
+        
+        // Free neurons (top-level)
+        expectedNeuronCount += net.freeNeurons.size // 2 neurons (n1, n2)
+        
+        // Neurons from neuron groups (NeuronArray are matrix-based, not collections of Neuron objects)
+        expectedNeuronCount += ng1.neuronList.size // 10 neurons
+        expectedNeuronCount += ng2.neuronList.size // 10 neurons
+        
+        // Neurons from special neuron groups
+        expectedNeuronCount += softmax.neuronList.size // 5 neurons
+        expectedNeuronCount += som.neuronList.size // 5 neurons
+        expectedNeuronCount += competitive.neuronList.size // 5 neurons
+        expectedNeuronCount += wta.neuronList.size // 5 neurons
+        
+        // Neurons from subnetworks (BackpropNetwork and SRNNetwork use NeuronArray objects which are matrix-based, 
+        // not collections of individual Neuron objects, so they don't contribute to flatNeuronList)
+        
+        Assertions.assertEquals(expectedNeuronCount, net.flatNeuronList.size,
+            "flatNeuronList should include all neurons from free neurons, neuron groups, neuron arrays, and subnetworks")
+        
+        // Test flatSynapseList - manually count all synapses from all sources
+        var expectedSynapseCount = 0
+        
+        // Free synapses (top-level)
+        expectedSynapseCount += net.freeSynapses.size // 1 synapse (s1)
+        
+        // Synapses from synapse groups
+        expectedSynapseCount += sg1.synapses.size // Should be ng1.size * ng2.size = 100
+        
+        // Synapses from weight matrices (connecting NeuronArrays)
+        // Weight matrices don't contain individual Synapse objects (they're matrix-based), 
+        // so they don't contribute to flatSynapseList
+        
+        // Synapses from subnetworks (BackpropNetwork and SRNNetwork use WeightMatrix objects which don't contain 
+        // individual Synapse objects, so they don't contribute to flatSynapseList)
+        
+        Assertions.assertEquals(expectedSynapseCount, net.flatSynapseList.size,
+            "flatSynapseList should include all synapses from free synapses, synapse groups, weight matrices, and subnetworks")
+        
+        // Verify that free neurons are actually included in flat list
+        Assertions.assertTrue(net.flatNeuronList.containsAll(net.freeNeurons), 
+            "flatNeuronList should contain all free neurons")
+        
+        // Verify that free synapses are actually included in flat list
+        Assertions.assertTrue(net.flatSynapseList.containsAll(net.freeSynapses),
+            "flatSynapseList should contain all free synapses")
+        
+        // Verify that neuron group neurons are included in flat list
+        Assertions.assertTrue(net.flatNeuronList.containsAll(ng1.neuronList),
+            "flatNeuronList should contain all neurons from neuron groups")
+        Assertions.assertTrue(net.flatNeuronList.containsAll(ng2.neuronList),
+            "flatNeuronList should contain all neurons from neuron groups")
+        
+        // Verify that special neuron group subtypes are also captured (this was a previous bug)
+        Assertions.assertTrue(net.flatNeuronList.containsAll(softmax.neuronList),
+            "flatNeuronList should contain all neurons from SoftmaxGroup (NeuronGroup subtype)")
+        Assertions.assertTrue(net.flatNeuronList.containsAll(som.neuronList),
+            "flatNeuronList should contain all neurons from SOMGroup (NeuronGroup subtype)")
+        Assertions.assertTrue(net.flatNeuronList.containsAll(competitive.neuronList),
+            "flatNeuronList should contain all neurons from CompetitiveGroup (NeuronGroup subtype)")
+        Assertions.assertTrue(net.flatNeuronList.containsAll(wta.neuronList),
+            "flatNeuronList should contain all neurons from WinnerTakeAll (NeuronGroup subtype)")
+        
+        // Verify that synapse group synapses are included in flat list
+        Assertions.assertTrue(net.flatSynapseList.containsAll(sg1.synapses),
+            "flatSynapseList should contain all synapses from synapse groups")
+        
+        // Weight matrices don't contain individual synapse objects, so no verification needed
     }
 }

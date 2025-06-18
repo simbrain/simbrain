@@ -113,7 +113,7 @@ public class RasterPlotPanel extends JPanel {
 
     }
 
-    private void updateChartSettings() {
+    public void updateChartSettings() {
 
         // Renderer properties
         double size = model.getDotSize();

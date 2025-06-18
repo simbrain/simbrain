@@ -91,4 +91,7 @@ public class RasterPlotDesktopComponent extends DesktopComponent<RasterPlotCompo
         getParentFrame().setJMenuBar(bar);
     }
 
+    public RasterPlotPanel getRasterPanel() {
+        return rasterPanel;
+    }
 }

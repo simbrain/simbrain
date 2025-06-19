@@ -1065,6 +1065,9 @@ class ObjectWidget<O : EditableObject, T : EditableObject>(
      * if null, then the object type is not editable
      */
     private val dropDown: JComboBox<String>? = typeMap?.run {
+        if (typeMap.size == 1) {
+            return@run null
+        }
         JComboBox<String>().apply {
             typeMap.keys.forEach {
                 addItem(it)

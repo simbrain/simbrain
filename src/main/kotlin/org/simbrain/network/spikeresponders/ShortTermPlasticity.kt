@@ -24,6 +24,7 @@ import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.UserParameter
+import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.stats.distributions.NormalDistribution
 import smile.math.matrix.Matrix
 import kotlin.math.exp
@@ -77,17 +78,21 @@ class ShortTermPlasticity : SpikeResponder() {
     )
     var F = 750.0
 
-    // TODO: Restrict options to jump and decay using typeMapProvider
-    @UserParameter(
+    fun validSpikeResponderLocals() = listOf(
+        JumpAndDecay::class.java,
+    )
+
+    var spikeResponderLocal by GuiEditable(
+        JumpAndDecay().apply {
+            useConvolution = true
+            timeConstant = 20.0
+        },
+        typeMapProvider = ::validSpikeResponderLocals,
         label = "Spike Responder",
         description = "Short term plasticity sets the max response of this responder",
         showDetails = false,
         order = 50
     )
-    var spikeResponderLocal: SpikeResponder = JumpAndDecay().apply {
-        useConvolution = true
-        timeConstant = 20.0
-    }
 
     /**
      * Does not actually copy this UDF object. Since UDF has values always

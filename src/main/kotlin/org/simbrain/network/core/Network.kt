@@ -441,6 +441,12 @@ class Network: CoroutineScope, EditableObject {
                 events.modelRemoved.fire(it)
             }
         }
+        
+        // Set up neuron listeners for all neuron collections after deserialization
+        networkModels.allInUpdatingOrder.filterIsInstance<AbstractNeuronCollection>().forEach { collection ->
+            collection.setupNeuronListeners()
+        }
+        
         idManager = SimpleIdManager ({ cls -> networkModels.getRawModelSet(cls).size + 1 })
         return this
     }

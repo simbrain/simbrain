@@ -34,49 +34,19 @@ import javax.swing.JPanel
 import kotlin.math.max
 import kotlin.math.min
 
-/**
- * Display a TimeSeriesPlot. This component can be used independently of the
- * time series workspace component.
- */
+
 class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
-    /**
-     * Chart un-initialized instance.
-     */
+
     private val chart: JFreeChart
 
-    /**
-     * Panel for chart.
-     */
     val chartPanel: ChartPanel = ChartPanel(null)
 
-    /**
-     * Return button panel in case user would like to add custom buttons.
-     */
-    /**
-     * Button panel.
-     */
     val buttonPanel: JPanel = JPanel()
 
-    /**
-     * Combo box to select coupling mode (array or scalar).
-     */
-    private val couplingModeComboBox: JComboBox<*>? = null
-
-    /**
-     * Button to delete scalar time series.
-     */
     private var deleteButton: JButton? = null
 
-    /**
-     * Button to add scalar time series
-     */
     private var addButton: JButton? = null
 
-    /**
-     * Construct a time series panel.
-     *
-     * @param timeSeriesModel model underlying model
-     */
     init {
         preferredSize = PREFERRED_SIZE
         layout = MigLayout("ins 0, gap 0px 0px")
@@ -152,16 +122,12 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
 
 
     /**
-     * Remove all buttons from the button panel; used when customzing the
-     * buttons on this panel.
+     * Used when customzing buttons on this panel.
      */
     fun removeAllButtonsFromToolBar() {
         buttonPanel.removeAll()
     }
 
-    /**
-     * Add buttons for adding and deleting [TimeSeriesModel.TimeSeries] objects.
-     */
     fun addAddDeleteButtons() {
         deleteButton = JButton("Delete")
         deleteButton!!.action = TimeSeriesPlotActions.getRemoveSourceAction(this)
@@ -171,18 +137,13 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
         buttonPanel.add(addButton)
     }
 
-    /**
-     * Add button for clearing graph data.
-     */
     fun addClearGraphDataButton() {
         val clearButton = JButton("Clear")
         clearButton.action = TimeSeriesPlotActions.getClearGraphAction(this)
         buttonPanel.add(clearButton)
     }
 
-    /**
-     * Add button for showing preferences.
-     */
+
     fun addPreferencesButton() {
         val prefsButton = JButton("Prefs")
         prefsButton.hideActionText = true
@@ -190,9 +151,6 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
         buttonPanel.add(prefsButton)
     }
 
-    /**
-     * Show properties dialog.
-     */
     fun showPropertiesDialog() {
         val dialog = timeSeriesModel.createEditorDialog { e: TimeSeriesModel? ->
             updateChartSettings()
@@ -201,9 +159,6 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
     }
 
     companion object {
-        /**
-         * Initial size.
-         */
         private val PREFERRED_SIZE = Dimension(500, 400)
     }
 }

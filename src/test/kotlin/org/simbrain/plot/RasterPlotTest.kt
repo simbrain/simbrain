@@ -66,6 +66,7 @@ class RasterPlotTest {
 
     @Test
     fun `test serialization`() {
+        rpc.model.addDataSources(2)
         with(workspace.couplingManager) {
             na couple rpc.model.rasterConsumerList[0]
         }
@@ -91,6 +92,8 @@ class RasterPlotTest {
         val na = networkComponent.network.getModels<NeuronArray>().first()
 
         assertEquals(1, workspace.couplingManager.couplings.size)
+
+        assertEquals(3, rpc.model.numDataSources)
         assertEquals(1.0, rpc.model.dataset.getSeries(0).getDataItem(0).xValue)
         assertEquals(2.0, rpc.model.dataset.getSeries(0).getDataItem(0).yValue)
         assertEquals(1.0, rpc.model.dataset.getSeries(0).getDataItem(1).xValue)

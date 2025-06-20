@@ -19,10 +19,10 @@ class AddSTDPRule : STDPRule() {
 
     override fun copy(): SynapseUpdateRule<*, *> {
         val duplicateSynapse = STDPRule()
-        duplicateSynapse.tau_minus = this.tau_minus
-        duplicateSynapse.tau_plus = this.tau_plus
-        duplicateSynapse.w_minus = this.w_minus
-        duplicateSynapse.w_plus = this.w_plus
+        duplicateSynapse.tauMinus = this.tauMinus
+        duplicateSynapse.tauPlus = this.tauPlus
+        duplicateSynapse.wMinus = this.wMinus
+        duplicateSynapse.wPlus = this.wPlus
         duplicateSynapse.learningRate = this.learningRate
         return duplicateSynapse
     }

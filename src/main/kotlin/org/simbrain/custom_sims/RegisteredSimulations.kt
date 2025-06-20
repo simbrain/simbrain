@@ -92,11 +92,12 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Spiking neurons two inputs") { spikingNeuronTwoInputs }
         item("Spike responders") { spikeResponderSim }
         item("Spike responders (array)") { spikeResponderSimArray }
+        item("STDP") { stdpSim }
         // item("Hippocampus") { Hippocampus() }
         // item("Cerebellum") { Cerebellum() }
         item("Integrate and Fire Network") { integrateAndFireSimulation }
         item("Cortical layers") { cortexSimple }
-        item("Cortical areas") { cortexKuramoto }
+        //item("Cortical areas") { cortexKuramoto }
     }
 
     dir("Evolution") {

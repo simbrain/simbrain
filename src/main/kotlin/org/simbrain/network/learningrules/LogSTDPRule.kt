@@ -53,12 +53,12 @@ class LogSTDPRule : STDPRule() {
     /**
      * A constant for LTP. c_+ in the cited paper.
      */
-    override var w_plus: Double = 2.0
+    override var wPlus: Double = 2.0
 
     /**
      * A constant for LTD. c_- in the cited paper.
      */
-    override var w_minus: Double = 1.0
+    override var wMinus: Double = 1.0
 
     /**
      * The degree to which the distribution is pushed logarithmically. Has an
@@ -84,7 +84,7 @@ class LogSTDPRule : STDPRule() {
      */
     var noiseVar: Double = 0.6
 
-    override var delta_w: Double = 0.0
+    override var deltaW: Double = 0.0
 
     private val dist = NormalDistribution(0.0, noiseVar)
 
@@ -110,23 +110,23 @@ class LogSTDPRule : STDPRule() {
             val noise = 1 + dist.sampleDouble()
             if (delta_t < 0) {
                 calcW_plusTerm(s)
-                delta_w = timeStep * learningRate * (w_plus * exp(delta_t / tau_plus)) * (1 + noise)
+                deltaW = timeStep * learningRate * (wPlus * exp(delta_t / tauPlus)) * (1 + noise)
             } else if (delta_t > 0) {
                 calcW_minusTerm(s)
-                delta_w = timeStep * learningRate * (-w_minus * exp(-delta_t / tau_minus)) * (1 + noise)
+                deltaW = timeStep * learningRate * (-wMinus * exp(-delta_t / tauMinus)) * (1 + noise)
             } else {
-                delta_w = 0.0
+                deltaW = 0.0
             }
         } else if (s.strength <= 0) {
-            delta_w = if (delta_t > 0) {
-                learningRate * 1.5 * exp(-delta_t / tau_plus)
+            deltaW = if (delta_t > 0) {
+                learningRate * 1.5 * exp(-delta_t / tauPlus)
             } else if (delta_t < 0) {
-                learningRate * -1 * exp(delta_t / tau_minus)
+                learningRate * -1 * exp(delta_t / tauMinus)
             } else {
                 0.0
             }
         }
-        s.strength -= delta_w
+        s.strength -= deltaW
     }
 
 
@@ -135,7 +135,7 @@ class LogSTDPRule : STDPRule() {
      * @return
      */
     private fun calcW_plusTerm(s: Synapse): Double {
-        w_plus = w_plus * exp(-abs(s.strength) / (smallWtThreshold * ltpMod))
+        wPlus = wPlus * exp(-abs(s.strength) / (smallWtThreshold * ltpMod))
         // if (s.getStrength() > 0) {
         // if (s.getStrength() >= s.getUpperBound()) {
         // w_plus = 0;
@@ -151,7 +151,7 @@ class LogSTDPRule : STDPRule() {
         // / (s.getLowerBound() - s.getStrength()), 2));
         // }
         // }
-        return w_plus
+        return wPlus
     }
 
     /**
@@ -161,10 +161,10 @@ class LogSTDPRule : STDPRule() {
     private fun calcW_minusTerm(s: Synapse): Double {
         val wt = abs(s.strength)
         if (wt <= smallWtThreshold) {
-            w_minus = w_minus * wt / smallWtThreshold
+            wMinus = wMinus * wt / smallWtThreshold
         } else {
             val numerator = ln(1 + (logSaturation * ((wt / smallWtThreshold) - 1)))
-            w_minus = w_minus * (1 + (numerator / logSaturation))
+            wMinus = wMinus * (1 + (numerator / logSaturation))
         }
         // if (s.getStrength() < 0) {
         // if (s.getStrength() >= s.getUpperBound()) {
@@ -183,6 +183,6 @@ class LogSTDPRule : STDPRule() {
         // - s.getStrength()), 2));
         // }
         // }
-        return w_minus
+        return wMinus
     }
 }

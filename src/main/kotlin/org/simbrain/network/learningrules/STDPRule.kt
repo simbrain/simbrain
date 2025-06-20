@@ -27,67 +27,45 @@ import kotlin.math.exp
 import kotlin.math.sign
 
 /**
- * **STDPSynapse** models spike time dependent plasticity.
- *
- *
+ * Models spike time dependent plasticity.
  * Only works if source and target neurons are spiking neurons.
- *
- *
  * Drew on: Jean-Philippe Thivierge and Paul Cisek (2008), Journal of
  * Neuroscience. Nonperiodic Synchronization in Heterogeneous Networks of
  * Spiking Neurons. Also drew on the Scholarpedia article.
  */
 open class STDPRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData> {
-    // TODO: check description
-    /**
-     * Time constant for LTD.
-     */
+
     @UserParameter(label = "Tau minus", description = "Time constant " + "for LTD.", increment = .1, order = 0)
-    var tau_minus: Double = 60.0
+    var tauMinus: Double = 60.0
 
-    /**
-     * Time constant for LTP.
-     */
     @UserParameter(label = "Tau plus", description = "Time constant " + "for LTP.", increment = .1, order = 1)
-    var tau_plus: Double = 30.0
+    var tauPlus: Double = 30.0
 
-    /**
-     * Learning rate for LTP case. Controls magnitude of LTP changes.
-     */
     @UserParameter(
         label = "W+",
         description = "Learning rate for " + "LTP case. Controls magnitude of LTP changes.",
         increment = .1,
         order = 2
     )
-    open var w_plus: Double = 10.0
+    open var wPlus: Double = 10.0
 
-    /**
-     * Learning rate for LTP case. Controls magnitude of LTD changes.
-     */
     @UserParameter(
         label = "W-",
         description = "Learning rate for " + "LTP case. Controls magnitude of LTD changes.",
         increment = .1,
         order = 3
     )
-    open var w_minus: Double = 10.0
+    open var wMinus: Double = 10.0
 
-    /**
-     * General learning rate.
-     */
     @UserParameter(label = "Learning rate", description = "General learning " + "rate.", increment = .1, order = 4)
     var learningRate: Double = 0.01
 
-    /**
-     * Sets whether or not STDP acts directly on W or dW/dt
-     */
-    @UserParameter(
-        label = "Smooth STDP",
-        description = "Whether STDP acts directly on weight or on its derivative instead",
-        order = 5
-    )
-    var isContinuous: Boolean = false
+    //@UserParameter(
+    //    label = "Smooth STDP",
+    //    description = "Whether STDP acts directly on weight or on its derivative instead",
+    //    order = 5
+    //)
+    //var isContinuous: Boolean = false
 
     override fun init(synapse: Synapse) {
     }
@@ -97,11 +75,6 @@ open class STDPRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData> {
 
     constructor()
 
-    constructor(toCpy: STDPRule) : this(
-        toCpy.w_plus, toCpy.w_minus, toCpy.tau_plus,
-        toCpy.tau_minus, toCpy.learningRate, toCpy.isContinuous
-    )
-
     constructor(
         w_plus: Double,
         w_minus: Double,
@@ -110,20 +83,20 @@ open class STDPRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData> {
         learningRate: Double,
         continuous: Boolean
     ) {
-        this.w_plus = w_plus
-        this.w_minus = w_minus
-        this.tau_plus = tau_plus
-        this.tau_minus = tau_minus
+        this.wPlus = w_plus
+        this.wMinus = w_minus
+        this.tauPlus = tau_plus
+        this.tauMinus = tau_minus
         this.learningRate = learningRate
-        this.isContinuous = continuous
+        //this.isContinuous = continuous
     }
 
     override fun copy(): SynapseUpdateRule<*, *> {
         val duplicateSynapse = STDPRule()
-        duplicateSynapse.tau_minus = tau_minus
-        duplicateSynapse.tau_plus = tau_plus
-        duplicateSynapse.w_minus = w_minus
-        duplicateSynapse.w_plus = w_plus
+        duplicateSynapse.tauMinus = tauMinus
+        duplicateSynapse.tauPlus = tauPlus
+        duplicateSynapse.wMinus = wMinus
+        duplicateSynapse.wPlus = wPlus
         duplicateSynapse.learningRate = learningRate
         duplicateSynapse.isHebbian = isHebbian
         return duplicateSynapse
@@ -131,36 +104,32 @@ open class STDPRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData> {
 
     var isHebbian: Boolean = true
 
-    open var delta_w: Double = 0.0
+    open var deltaW: Double = 0.0
 
     context(Network)
     override fun apply(synapse: Synapse, data: EmptyScalarData) {
-        val strength = synapse.strength
         if (synapse.source.isSpike || synapse.target.isSpike) {
             try {
-                val delta_t = ((synapse.source.lastSpikeTime
+                val deltaT = ((synapse.source.lastSpikeTime
                         - synapse.target.lastSpikeTime)
                         * (if (isHebbian) 1 else -1))
-                if (delta_t < 0) {
-                    delta_w = w_plus * exp(delta_t / tau_plus) * learningRate
-                } else if (delta_t > 0) {
-                    delta_w = -w_minus * exp(-delta_t / tau_minus) * learningRate
+                if (deltaT < 0) {
+                    deltaW = wPlus * exp(deltaT / tauPlus) * learningRate
+                } else if (deltaT > 0) {
+                    deltaW = -wMinus * exp(-deltaT / tauMinus) * learningRate
                 }
             } catch (cce: ClassCastException) {
                 cce.printStackTrace()
                 println("Don't use non-spiking neurons with STDP!")
             }
-            if (!isContinuous && sign(strength) == -1.0) {
-                synapse.strength = strength - delta_w * timeStep
-            } else {
-                synapse.strength = strength + delta_w * timeStep
-            }
         }
 
-        if (isContinuous && sign(strength) == -1.0) {
-            synapse.strength = strength - delta_w * timeStep
-        } else {
-            synapse.strength = strength + delta_w * timeStep
-        }
+        synapse.strength += deltaW * timeStep
+
+        //if (isContinuous && sign(strength) == -1.0) {
+        //    synapse.strength = strength - delta_w * timeStep
+        //} else {
+        //    synapse.strength = strength + delta_w * timeStep
+        //}
     }
 }

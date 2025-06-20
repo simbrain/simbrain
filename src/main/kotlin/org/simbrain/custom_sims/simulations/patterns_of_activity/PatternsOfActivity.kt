@@ -363,16 +363,16 @@ class PatternsOfActivity : Simulation {
         sim.couple(mouse.getSensor("Smell-Right") as SmellSensor, sensoryNetR)
 
         // Add everything to the network
-        net!!.addNetworkModel(recurrentNetwork!!)
-        net!!.addNetworkModel(inpSynGL)
-        net!!.addNetworkModel(inpSynGR)
-        net!!.addNetworkModel(recSyns)
-        net!!.addNetworkModel(outGroup)
-        net!!.addNetworkModel(rec2out)
-        net!!.addNetworkModel(outputNeurons!!)
-        net!!.addNetworkModel(out2read)
-        net!!.addNetworkModel(sensoryNetL)
-        net!!.addNetworkModel(sensoryNetR)
+        net.addNetworkModel(recurrentNetwork!!)
+        net.addNetworkModel(inpSynGL)
+        net.addNetworkModel(inpSynGR)
+        net.addNetworkModel(recSyns)
+        net.addNetworkModel(outGroup)
+        net.addNetworkModel(rec2out)
+        net.addNetworkModel(outputNeurons!!)
+        net.addNetworkModel(out2read)
+        net.addNetworkModel(sensoryNetL)
+        net.addNetworkModel(sensoryNetR)
 
         // Set up concurrent buffered update
         // net.getUpdateManager().clear();
@@ -482,16 +482,16 @@ class PatternsOfActivity : Simulation {
                     }
                 }
                 val dampFac = nv * ln(5 - (abs(s.strength) / 50))
-                (s.learningRule as STDPRule).delta_w = ((s.learningRule as STDPRule).delta_w
+                (s.learningRule as STDPRule).deltaW = ((s.learningRule as STDPRule).deltaW
                         * dampFac)
-                if (java.lang.Double.isNaN((s.learningRule as STDPRule).delta_w) ||
+                if (java.lang.Double.isNaN((s.learningRule as STDPRule).deltaW) ||
                     java.lang.Double.isNaN(s.strength)
                 ) {
                     println()
                 }
                 if (abs(s.strength) > 200) {
                     val sgn = -sign(s.strength)
-                    (s.learningRule as STDPRule).delta_w = sgn * abs((s.learningRule as STDPRule).delta_w)
+                    (s.learningRule as STDPRule).deltaW = sgn * abs((s.learningRule as STDPRule).deltaW)
                 }
             }
 

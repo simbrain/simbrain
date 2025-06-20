@@ -16,10 +16,10 @@ class logSTDPTest {
         net.addNetworkModels(n1, n2, s12)
         s12.learningRule = LogSTDPRule().apply {
             learningRate = 1.0
-            tau_minus = 60.0
-            tau_plus = 30.0
-            w_plus = 10.0
-            w_minus = 10.0
+            tauMinus = 60.0
+            tauPlus = 30.0
+            wPlus = 10.0
+            wMinus = 10.0
         }
         s12.strength = 0.0
         n1.clamped = true

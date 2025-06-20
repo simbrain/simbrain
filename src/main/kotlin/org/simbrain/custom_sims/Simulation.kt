@@ -14,6 +14,8 @@ import org.simbrain.util.*
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.gui.SimbrainDesktop
+import org.simbrain.world.dataworld.DataWorld
+import org.simbrain.world.dataworld.DataWorldComponent
 import org.simbrain.world.imageworld.ImageWorldComponent
 import org.simbrain.world.odorworld.OdorWorldComponent
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent
@@ -153,6 +155,19 @@ fun SimulationScope.addTimeSeries(name: String, seriesNames: List<String>): Time
     val series = seriesNames.map { timeSeriesPlotComponent.addTimeSeries(it) }
     workspace.addWorkspaceComponent(timeSeriesPlotComponent)
     return TimeSeriesPlotComponentSeriesData(timeSeriesPlotComponent, series)
+}
+
+/**
+ * Add a DataWorld (numeric table) component.
+ *
+ * @param name title to display at top of panel
+ * @param numColumns the number of columns in the table
+ */
+fun SimulationScope.addDataWorldComponent(name: String, numRows: Int, numColumns: Int): DataWorldComponent {
+    val table = DataWorld(numRows, numColumns)
+    val component = DataWorldComponent(name, table)
+    workspace.addWorkspaceComponent(component)
+    return component
 }
 
 suspend fun SimulationScope.placeComponent(component: WorkspaceComponent, x: Int, y: Int, width: Int, height: Int) {

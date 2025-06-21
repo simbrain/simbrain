@@ -27,11 +27,14 @@ import kotlin.math.exp
 import kotlin.math.sign
 
 /**
- * Models spike time dependent plasticity.
- * Only works if source and target neurons are spiking neurons.
- * Drew on: Jean-Philippe Thivierge and Paul Cisek (2008), Journal of
- * Neuroscience. Nonperiodic Synchronization in Heterogeneous Networks of
- * Spiking Neurons. Also drew on the Scholarpedia article.
+ * Models spike time dependent plasticity STDP.
+ *
+ * Assumes source and target neurons are spiking neurons.
+ *
+ * See: Jean-Philippe Thivierge and Paul Cisek (2008), Nonperiodic Synchronization in Heterogeneous Networks of  Spiking Neurons
+ * and the Scholarpedia article on STDP.
+ *
+ * Also on anti-hebbian stdp: https://journals.physiology.org/doi/pdf/10.1152/jn.00551.2006
  */
 open class STDPRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData> {
 
@@ -60,12 +63,12 @@ open class STDPRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData> {
     @UserParameter(label = "Learning rate", description = "General learning " + "rate.", increment = .1, order = 4)
     var learningRate: Double = 0.01
 
-    //@UserParameter(
-    //    label = "Smooth STDP",
-    //    description = "Whether STDP acts directly on weight or on its derivative instead",
-    //    order = 5
-    //)
-    //var isContinuous: Boolean = false
+    @UserParameter(
+        label = "Hebbian",
+        description = "If true, hebbian learning, else anti-hebbian",
+        order = 10
+    )
+    var isHebbian: Boolean = true
 
     override fun init(synapse: Synapse) {
     }
@@ -88,7 +91,6 @@ open class STDPRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData> {
         this.tauPlus = tau_plus
         this.tauMinus = tau_minus
         this.learningRate = learningRate
-        //this.isContinuous = continuous
     }
 
     override fun copy(): SynapseUpdateRule<*, *> {
@@ -102,34 +104,24 @@ open class STDPRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData> {
         return duplicateSynapse
     }
 
-    var isHebbian: Boolean = true
-
     open var deltaW: Double = 0.0
 
     context(Network)
     override fun apply(synapse: Synapse, data: EmptyScalarData) {
         if (synapse.source.isSpike || synapse.target.isSpike) {
-            try {
-                val deltaT = ((synapse.source.lastSpikeTime
-                        - synapse.target.lastSpikeTime)
-                        * (if (isHebbian) 1 else -1))
-                if (deltaT < 0) {
-                    deltaW = wPlus * exp(deltaT / tauPlus) * learningRate
-                } else if (deltaT > 0) {
-                    deltaW = -wMinus * exp(-deltaT / tauMinus) * learningRate
-                }
-            } catch (cce: ClassCastException) {
-                cce.printStackTrace()
-                println("Don't use non-spiking neurons with STDP!")
+            val deltaT = ((synapse.source.lastSpikeTime
+                    - synapse.target.lastSpikeTime)
+                    * (if (isHebbian) 1 else -1))
+            if (deltaT < 0) {
+                // LTP Case
+                deltaW = wPlus * exp(deltaT / tauPlus) * learningRate
+            } else if (deltaT > 0) {
+                // LTD Case
+                deltaW = -wMinus * exp(-deltaT / tauMinus) * learningRate
             }
+
+            synapse.strength +=  deltaW * timeStep
         }
 
-        synapse.strength += deltaW * timeStep
-
-        //if (isContinuous && sign(strength) == -1.0) {
-        //    synapse.strength = strength - delta_w * timeStep
-        //} else {
-        //    synapse.strength = strength + delta_w * timeStep
-        //}
     }
 }

@@ -26,25 +26,19 @@ import kotlin.random.Random
  * able to inject current and see it propagate consistently with empirical
  * studies.
  *
- *
  * Also see Haeusler and Mass, 2007.
  *
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
-val cortexSimple = newSim {
-    // Simulation Parameters
-    var NUM_NEURONS = 120
-    var GRID_SPACE = 25
+val cortexLayers = newSim {
 
     // Location and scale params for lognormal dist of all synapse groups
-    var location = -1.0
-    var scale = .35
     var exlocation = 0.0
     var exscale = .5
     var inlocation = 1.0
     var inscale = .5
-    var numNeuPerLay = 300
+    var neuronsPerLayer = 200 // Was 300
 
     // TODO: Membrane properties
     // TODO: Build using z coordinates
@@ -144,7 +138,7 @@ val cortexSimple = newSim {
         val btwnLayerSpacing = 150
         // resting potential, time constant, threshold, resistance
         val layer_23 = buildLayer(
-            numNeuPerLay,
+            neuronsPerLayer,
             range(-71.5, .35),
             range(29.0, 0.45),
             range(-38.4, 0.2),
@@ -152,7 +146,7 @@ val cortexSimple = newSim {
         )
         layer_23.label = "Layer 2/3"
         val layer_4 = buildLayer(
-            numNeuPerLay,
+            neuronsPerLayer,
             range(-66.0, 0.3),
             range(34.8, 0.5),
             range(-39.7, 0.2),
@@ -160,7 +154,7 @@ val cortexSimple = newSim {
         )
         layer_4.label = "Layer 4"
         val layer_56 = buildLayer(
-            numNeuPerLay,
+            neuronsPerLayer,
             range(-62.8, 0.2),
             range(31.7, 0.65),
             range(-40.0, 0.25),

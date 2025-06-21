@@ -8,6 +8,7 @@ import org.simbrain.network.learningrules.STDPRule
 import org.simbrain.network.spikeresponders.JumpAndDecay
 import org.simbrain.network.updaterules.IntegrateAndFireRule
 import org.simbrain.network.updaterules.LinearRule
+import org.simbrain.network.updaterules.SpikingThresholdRule
 import org.simbrain.util.place
 import org.simbrain.util.point
 
@@ -23,30 +24,22 @@ val stdpSim = newSim {
 
     // Data
     val numRows = 20
-    val stimAmount = 10.0
+    val stimAmount = 1.0
     val dataWorldComponent = addDataWorldComponent("Pre/Post Activity Table", numRows, 2)
     dataWorldComponent.dataWorld.dataModel.setValueAt(stimAmount, 5, 0)
-    dataWorldComponent.dataWorld.dataModel.setValueAt(stimAmount, 9, 1)
+    dataWorldComponent.dataWorld.dataModel.setValueAt(stimAmount, 7, 1)
 
 
     // Pre and Post neurons (Integrate and Fire)
     val pre = network.addNeuron {
         label = "Pre"
-        updateRule = IntegrateAndFireRule().apply {
-            backgroundCurrent = 100.0
-            timeConstant = .1
-            resetPotential = -70.0
-        }
+        updateRule = SpikingThresholdRule()
         location = point(137, 94)
     }
 
     val post = network.addNeuron {
         label = "Post"
-        updateRule = IntegrateAndFireRule().apply {
-            backgroundCurrent = 100.0
-            timeConstant = .1
-            resetPotential = -70.0
-        }
+        updateRule = SpikingThresholdRule()
         location = point(208, 94)
     }
 
@@ -63,15 +56,8 @@ val stdpSim = newSim {
     val nc = NeuronCollection(listOf(input1, input2))
     network.addNetworkModel(nc)
 
-    network.addSynapse(input1, pre).apply {
-        upperBound = 100.0
-        strength = 25.0
-    }
-
-    network.addSynapse(input2, post).apply {
-        upperBound = 100.0
-        strength = 25.0
-    }
+    network.addSynapse(input1, pre)
+    network.addSynapse(input2, post)
 
     // STDP synapse from pre to post
     val syn = network.addSynapse(pre, post).apply {
@@ -108,7 +94,7 @@ val stdpSim = newSim {
 
     addSidebarInfo(
         """
-        # STDP (Spike Timing Dependent Plasticity)
+        # Spike Timing Dependent Plasticity (STDP)
 
         [STDP](http://www.scholarpedia.org/article/Spike-timing_dependent_plasticity) is a form of synaptic plasticity
         whereby when one neuron ("pre") fires before another to which it's connected ("post"), the synapse is strengthened,

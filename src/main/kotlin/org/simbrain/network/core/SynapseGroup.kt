@@ -53,6 +53,16 @@ class SynapseGroup @JvmOverloads constructor(
         }
 
     init {
+        // Validate that all synapses have sources in source collection and targets in target collection
+        synapses.forEach { synapse ->
+            require(synapse.source in source.neuronList) { 
+                "Synapse source ${synapse.source.displayName} is not in source collection ${source.displayName}"
+            }
+            require(synapse.target in target.neuronList) { 
+                "Synapse target ${synapse.target.displayName} is not in target collection ${target.displayName}"
+            }
+        }
+        
         initializeSynapseVisibility()
         source.outgoingSg.add(this)
         target.incomingSgs.add(this)
@@ -92,6 +102,14 @@ class SynapseGroup @JvmOverloads constructor(
     }
 
     fun addSynapse(syn: Synapse) {
+        // Validate that synapse source and target are in the respective collections
+        require(syn.source in source.neuronList) { 
+            "Synapse source ${syn.source.displayName} is not in source collection ${source.displayName}"
+        }
+        require(syn.target in target.neuronList) { 
+            "Synapse target ${syn.target.displayName} is not in target collection ${target.displayName}"
+        }
+        
         syn.isVisible = displaySynapses
         addSynapseListener(syn)
         this.synapses.add(syn)

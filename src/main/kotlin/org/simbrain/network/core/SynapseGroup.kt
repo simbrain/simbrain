@@ -23,10 +23,6 @@ class SynapseGroup @JvmOverloads constructor(
     synapses: MutableList<Synapse> = connectionStrategy.connectNeurons(source.neuronList, target.neuronList).toMutableList()
 ) : NetworkModel(), AttributeContainer {
 
-    // TODO: When passing in synapses check all source are in source and all target are in target
-    // reuse this in addsynapse
-
-
     /**
      * Randomizer for all weights, regardless of polarity. Applying it can change the polarity of a weight.
      * The connection strategy contains randomizers for excitatory and inhibitory weights specifically.
@@ -101,7 +97,7 @@ class SynapseGroup @JvmOverloads constructor(
         synapses.forEach { it.afterRestore() }
     }
 
-    fun addSynapse(syn: Synapse) {
+    private fun addSynapse(syn: Synapse) {
         // Validate that synapse source and target are in the respective collections
         require(syn.source in source.neuronList) { 
             "Synapse source ${syn.source.displayName} is not in source collection ${source.displayName}"

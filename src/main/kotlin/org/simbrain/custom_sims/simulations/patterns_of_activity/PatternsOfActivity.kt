@@ -195,32 +195,34 @@ class PatternsOfActivity : Simulation {
         sensoryNetR.setLocation(recurrentNetwork!!.maxX + 300, recurrentNetwork!!.minY + 100)
 
         // Set up recurrent synapses
+        // Create synapse list first with custom connection logic
+        val recurrentSynapses = mutableListOf<Synapse>()
+        for (n in neuronList) {
+            for (m in neuronList) {
+                if (Math.random() < 0.002 && n != m) {
+                    val s = Synapse(n, m)
+                    s.strength = n.polarity.value(20.0)
+                    // Set delays based on distance
+                    val d = SimbrainMath.distance(s.source.position3D, s.target.position3D)
+                    s.delay = (maxDly * d / maxDist).toInt()
+                    recurrentSynapses.add(s)
+                }
+            }
+        }
+        
         val recSyns = SynapseGroup(
             recurrentNetwork!!, recurrentNetwork!!,
             RadialGaussian(
                 DEFAULT_EE_CONST * 3, DEFAULT_EI_CONST * 3,
                 DEFAULT_IE_CONST * 3, DEFAULT_II_CONST * 3, .25, 200.0
-            )
+            ),
+            recurrentSynapses
         )
         // new Sparse(0.10, false, false)
         //        .connectNeurons(recSyns);
         // initializeSynParameters(recSyns);
         // TODO
         // recSyns.setLearningRule(ruleExRec, Polarity.EXCITATORY);
-        for (n in neuronList) {
-            for (m in neuronList) {
-                if (Math.random() < 0.002 && n != m) {
-                    val s = Synapse(n, m)
-                    s.strength = n.polarity.value(20.0)
-                    recSyns.addSynapse(s)
-                    // Delays based on distance
-                }
-            }
-        }
-        for (s in recSyns.synapses) {
-            val d = SimbrainMath.distance(s.source.position3D, s.target.position3D)
-            s.delay = (maxDly * d / maxDist).toInt()
-        }
 
         // Set up input synapses (connections from sensory group to the recurrent group)
         // Create filtered synapse list for sensory left to recurrent connections
@@ -283,8 +285,8 @@ class PatternsOfActivity : Simulation {
 
         // Set up the synapses between the recurrent network and the output
         // Each neuron recieves from one quadrant of the recurrent neurons in terms of location
-        val rec2out = SynapseGroup(recurrentNetwork!!, outGroup)
-        // initializeSynParameters(rec2out);
+        // Create synapse list first based on quadrant logic
+        val rec2outSynapses = mutableListOf<Synapse>()
         val xEdge = recurrentNetwork!!.centerX
         val yEdge = recurrentNetwork!!.centerY
         for (ii in 0 until netSize) {
@@ -298,7 +300,7 @@ class PatternsOfActivity : Simulation {
                 if (x < xEdge && Math.random() < quadrantDensity) {
                     val s = Synapse(n, outGroup.getNeuron(2))
                     s.delay = ThreadLocalRandom.current().nextInt(5, 10)
-                    rec2out.addSynapse(s)
+                    rec2outSynapses.add(s)
                     dwQuad.add(n)
                     continue
                 }
@@ -306,7 +308,7 @@ class PatternsOfActivity : Simulation {
                     val s = Synapse(n, outGroup.getNeuron(3))
                     s.delay = ThreadLocalRandom.current().nextInt(5, 10)
                     upQuad.add(n)
-                    rec2out.addSynapse(s)
+                    rec2outSynapses.add(s)
                     continue
                 }
             } else {
@@ -314,18 +316,25 @@ class PatternsOfActivity : Simulation {
                     rtQuad.add(n)
                     val s = Synapse(n, outGroup.getNeuron(0))
                     s.delay = ThreadLocalRandom.current().nextInt(5, 10)
-                    rec2out.addSynapse(s)
+                    rec2outSynapses.add(s)
                     continue
                 }
                 if (x > xEdge && Math.random() < quadrantDensity) {
                     lfQuad.add(n)
                     val s = Synapse(n, outGroup.getNeuron(1))
                     s.delay = ThreadLocalRandom.current().nextInt(5, 10)
-                    rec2out.addSynapse(s)
+                    rec2outSynapses.add(s)
                     continue
                 }
             }
         }
+        
+        val rec2out = SynapseGroup(
+            recurrentNetwork!!, outGroup,
+            AllToAll(),
+            rec2outSynapses
+        )
+        // initializeSynParameters(rec2out);
 
         // rec2out.setConnectionManager(new AllToAll());
 

@@ -18,11 +18,10 @@
  */
 package org.simbrain.network.learningrules
 
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.SpikingNeuronUpdateRule
-import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.*
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.EmptyScalarData
+import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.util.UserParameter
 
 /**
@@ -120,6 +119,43 @@ class ShortTermPlasticityRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixDa
             strength -= (decayRate * (strength - baseLineStrength))
         }
         synapse.strength = strength
+    }
+
+    context(Network)
+    override fun apply(connector: Connector, dataHolder: EmptyMatrixData) {
+        if (connector is WeightMatrix) {
+            val wm = connector.weights
+            val sourceArray = connector.source as NeuronArray
+            
+            // Check if source array has spiking data for more accurate plasticity
+            val sourceSpikingData = sourceArray.dataHolder as? SpikingMatrixData
+            
+            for (i in 0 until wm.nrow()) {
+                for (j in 0 until wm.ncol()) {
+                    val activated = if (sourceSpikingData != null && sourceArray.updateRule.isSpikingRule) {
+                        // Use spike data if available
+                        sourceSpikingData.spikes[j]
+                    } else {
+                        // Fall back to activation-based threshold
+                        sourceArray.activations[j, 0] > firingThreshold
+                    }
+                    
+                    var strength = wm[i, j]
+                    if (activated) {
+                        if (plasticityType == STD) {
+                            // Assuming default bounds for matrix version
+                            strength -= (bumpRate * (strength - (-1.0))) // Using -1.0 as lower bound
+                        } else {
+                            // Assuming default bounds for matrix version  
+                            strength += (bumpRate * (1.0 - strength)) // Using 1.0 as upper bound
+                        }
+                    } else {
+                        strength -= (decayRate * (strength - baseLineStrength))
+                    }
+                    wm[i, j] = strength
+                }
+            }
+        }
     }
 
     companion object {

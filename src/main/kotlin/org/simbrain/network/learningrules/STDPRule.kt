@@ -18,13 +18,12 @@
  */
 package org.simbrain.network.learningrules
 
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.*
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.EmptyScalarData
+import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.util.UserParameter
 import kotlin.math.exp
-import kotlin.math.sign
 
 /**
  * Models spike time dependent plasticity STDP.
@@ -123,5 +122,49 @@ open class STDPRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData> {
             synapse.strength +=  deltaW * timeStep
         }
 
+    }
+
+    context(Network)
+    override fun apply(connector: Connector, dataHolder: EmptyMatrixData) {
+        val weightMatrix = connector as? WeightMatrix ?: return
+        val sourceNeuronArray = weightMatrix.source as? NeuronArray ?: return
+        val targetNeuronArray = weightMatrix.target as? NeuronArray ?: return
+        
+        // Ensure both neuron arrays have spiking data
+        val sourceSpikingData = sourceNeuronArray.dataHolder as? SpikingMatrixData ?: return
+        val targetSpikingData = targetNeuronArray.dataHolder as? SpikingMatrixData ?: return
+        
+        // Only apply if either source or target neurons have spiked
+        val hasSourceSpikes = sourceSpikingData.spikes.any { it }
+        val hasTargetSpikes = targetSpikingData.spikes.any { it }
+        
+        if (hasSourceSpikes || hasTargetSpikes) {
+            // Get spike times
+            val sourceSpikeTimes = sourceSpikingData.lastSpikeTimes
+            val targetSpikeTimes = targetSpikingData.lastSpikeTimes
+            
+            // Apply STDP rule to each connection
+            for (i in 0 until weightMatrix.weights.nrow()) { // target neurons
+                for (j in 0 until weightMatrix.weights.ncol()) { // source neurons
+                    // Only update if at least one neuron has spiked
+                    if (sourceSpikingData.spikes[j] || targetSpikingData.spikes[i]) {
+                        val deltaT = ((sourceSpikeTimes[j] - targetSpikeTimes[i]) 
+                                * (if (isHebbian) 1 else -1))
+                        
+                        val deltaW = if (deltaT < 0) {
+                            // LTP Case
+                            wPlus * exp(deltaT / tauPlus) * learningRate
+                        } else if (deltaT > 0) {
+                            // LTD Case
+                            -wMinus * exp(-deltaT / tauMinus) * learningRate
+                        } else {
+                            0.0
+                        }
+                        
+                        weightMatrix.weights[i, j] += deltaW * timeStep
+                    }
+                }
+            }
+        }
     }
 }

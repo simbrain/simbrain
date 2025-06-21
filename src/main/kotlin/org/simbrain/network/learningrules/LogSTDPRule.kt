@@ -12,9 +12,10 @@
  */
 package org.simbrain.network.learningrules
 
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.*
+import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.EmptyScalarData
+import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.util.stats.distributions.NormalDistribution
 import kotlin.math.abs
 import kotlin.math.exp
@@ -129,6 +130,56 @@ class LogSTDPRule : STDPRule() {
         s.strength -= deltaW
     }
 
+    context(Network)
+    override fun apply(connector: Connector, dataHolder: EmptyMatrixData) {
+        val weightMatrix = connector as? WeightMatrix ?: return
+        val sourceNeuronArray = weightMatrix.source as? NeuronArray ?: return
+        val targetNeuronArray = weightMatrix.target as? NeuronArray ?: return
+        
+        // Ensure both neuron arrays have spiking update rules
+        if (!sourceNeuronArray.updateRule.isSpikingRule || !targetNeuronArray.updateRule.isSpikingRule) {
+            return // Log-STDP is non-sensical if one of the arrays doesn't spike
+        }
+        
+        // Ensure both neuron arrays have spiking data
+        val sourceSpikingData = sourceNeuronArray.dataHolder as? SpikingMatrixData ?: return
+        val targetSpikingData = targetNeuronArray.dataHolder as? SpikingMatrixData ?: return
+        
+        // Get spike times
+        val sourceSpikeTimes = sourceSpikingData.lastSpikeTimes
+        val targetSpikeTimes = targetSpikingData.lastSpikeTimes
+        
+        // Apply Log-STDP rule to each connection
+        for (i in 0 until weightMatrix.weights.nrow()) { // target neurons
+            for (j in 0 until weightMatrix.weights.ncol()) { // source neurons
+                val weight = weightMatrix.weights[i, j]
+                val deltaT = sourceSpikeTimes[j] - targetSpikeTimes[i]
+                
+                val deltaW = if (weight >= 0) {
+                    val noise = 1 + dist.sampleDouble()
+                    when {
+                        deltaT < 0 -> {
+                            val adjustedWPlus = calcW_plusTerm(weight)
+                            timeStep * learningRate * (adjustedWPlus * exp(deltaT / tauPlus)) * (1 + noise)
+                        }
+                        deltaT > 0 -> {
+                            val adjustedWMinus = calcW_minusTerm(weight)
+                            timeStep * learningRate * (-adjustedWMinus * exp(-deltaT / tauMinus)) * (1 + noise)
+                        }
+                        else -> 0.0
+                    }
+                } else {
+                    when {
+                        deltaT > 0 -> learningRate * 1.5 * exp(-deltaT / tauPlus)
+                        deltaT < 0 -> learningRate * -1 * exp(deltaT / tauMinus)
+                        else -> 0.0
+                    }
+                }
+                
+                weightMatrix.weights[i, j] = weight - deltaW
+            }
+        }
+    }
 
     /**
      * @param s
@@ -136,22 +187,14 @@ class LogSTDPRule : STDPRule() {
      */
     private fun calcW_plusTerm(s: Synapse): Double {
         wPlus = wPlus * exp(-abs(s.strength) / (smallWtThreshold * ltpMod))
-        // if (s.getStrength() > 0) {
-        // if (s.getStrength() >= s.getUpperBound()) {
-        // w_plus = 0;
-        // } else {
-        // w_plus *= Math.exp(-20 * Math.pow(s.getStrength()
-        // / (s.getUpperBound() - s.getStrength()), 2));
-        // }
-        // } else {
-        // if (s.getStrength() <= s.getLowerBound()) {
-        // w_plus = 0;
-        // } else {
-        // w_plus *= Math.exp(-20 * Math.pow(s.getStrength()
-        // / (s.getLowerBound() - s.getStrength()), 2));
-        // }
-        // }
         return wPlus
+    }
+
+    /**
+     * Weight-based version for matrix implementation
+     */
+    private fun calcW_plusTerm(weight: Double): Double {
+        return wPlus * exp(-abs(weight) / (smallWtThreshold * ltpMod))
     }
 
     /**
@@ -166,23 +209,19 @@ class LogSTDPRule : STDPRule() {
             val numerator = ln(1 + (logSaturation * ((wt / smallWtThreshold) - 1)))
             wMinus = wMinus * (1 + (numerator / logSaturation))
         }
-        // if (s.getStrength() < 0) {
-        // if (s.getStrength() >= s.getUpperBound()) {
-        // w_minus = 0;
-        // } else {
-        // w_minus *= Math.exp(-0.25 * Math.pow((s.getLowerBound()
-        // - s.getStrength()) / (s.getUpperBound()
-        // - s.getStrength()), 2));
-        // }
-        // } else {
-        // if (s.getStrength() <= s.getLowerBound()) {
-        // w_minus = 0;
-        // } else {
-        // w_minus *= Math.exp(-0.25 * Math.pow((s.getUpperBound()
-        // - s.getStrength()) / (s.getLowerBound()
-        // - s.getStrength()), 2));
-        // }
-        // }
         return wMinus
+    }
+
+    /**
+     * Weight-based version for matrix implementation
+     */
+    private fun calcW_minusTerm(weight: Double): Double {
+        val wt = abs(weight)
+        return if (wt <= smallWtThreshold) {
+            wMinus * wt / smallWtThreshold
+        } else {
+            val numerator = ln(1 + (logSaturation * ((wt / smallWtThreshold) - 1)))
+            wMinus * (1 + (numerator / logSaturation))
+        }
     }
 }

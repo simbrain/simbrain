@@ -60,11 +60,12 @@ val stdpSim = newSim {
     network.addSynapse(input2, post)
 
     // STDP synapse from pre to post
+    // Use a small time window (tauMinu/tauPlus) to avoid interference from spikes at the end of the data looping around to the beginning.
     val syn = network.addSynapse(pre, post).apply {
         strength = 0.0
         learningRule = STDPRule().apply {
-            tauMinus = 60.0
-            tauPlus = 30.0
+            tauMinus = .1 // Make a small time window so we don't get "roll-around" effects
+            tauPlus = .1
             wPlus = 10.0
             wMinus = 10.0
             learningRate = 0.01
@@ -94,16 +95,31 @@ val stdpSim = newSim {
 
     addSidebarInfo(
         """
-        # Spike Timing Dependent Plasticity (STDP)
+    # Spike Timing Dependent Plasticity (STDP)
 
-        [STDP](http://www.scholarpedia.org/article/Spike-timing_dependent_plasticity) is a form of synaptic plasticity
-        whereby when one neuron ("pre") fires before another to which it's connected ("post"), the synapse is strengthened,
-        whereas when post fires before pre, the synapse is weakened.
+    [STDP](http://www.scholarpedia.org/article/Spike-timing_dependent_plasticity) is a form of synaptic plasticity
+    in which the timing of spikes determines how synaptic weights are modified. If a presynaptic neuron ("pre") fires 
+    shortly before a postsynaptic neuron ("post"), the synapse is typically strengthened (LTP). If the post fires before 
+    the pre, the synapse is weakened (LTD). The closer in time the spikes occur, the stronger the effect.
 
-        In this simulation, the pre and post neurons are coupled to the first and second columns of the table below.
-        Currently the table is set so the connection will strengthen (pre fires before post). To see weakening,
-        adjust the table so post fires before pre. You can also adjust the time-lag between the signals
-        and observe its effect on learning. To edit the STDP synapse, double-click it.
-        """.trimIndent()
+    This mechanism reinforces causal relationships between neurons: if pre tends to cause post to fire, the connection 
+    strengthens; if post tends to fire before pre, the connection weakens.
+
+    # What to Do 
+
+    In this simulation, the pre and post neurons are driven by the two columns in the table below. 
+    Currently, the table is set up so that pre fires before post, which causes the connection to strengthen. 
+    To observe weakening, adjust the table so post fires before pre.
+
+    You can experiment with the time lag between pre and post and observe how this affects synaptic learning.
+
+    **Note:** Because the data table loops (repeats), spikes from the end of the sequence can influence the beginning 
+    of the next cycle. For instance, a post spike at the end and a pre spike at the beginning may still produce LTD. 
+    This is why the time constants in the STDP rule are set very small: to restrict updates to spikes that occur close 
+    together in time and avoid these wraparound effects.
+
+    You can inspect and modify the STDP parameters by double-clicking the synapse between pre and post. This lets you 
+    change the time constants, learning rates, and other properties to see how they affect plasticity behavior.
+    """.trimIndent()
     )
 }

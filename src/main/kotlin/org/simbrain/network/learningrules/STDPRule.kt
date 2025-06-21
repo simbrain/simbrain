@@ -30,42 +30,61 @@ import kotlin.math.exp
  *
  * Assumes source and target neurons are spiking neurons.
  *
- * See: Jean-Philippe Thivierge and Paul Cisek (2008), Nonperiodic Synchronization in Heterogeneous Networks of  Spiking Neurons
+ * See [StdpSim.kt] for more information about the rule.
+ *
+ * Sources: Jean-Philippe Thivierge and Paul Cisek (2008), Nonperiodic Synchronization in Heterogeneous Networks of  Spiking Neurons
  * and the Scholarpedia article on STDP.
  *
  * Also on anti-hebbian stdp: https://journals.physiology.org/doi/pdf/10.1152/jn.00551.2006
  */
 open class STDPRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData> {
 
-    @UserParameter(label = "Tau minus", description = "Time constant " + "for LTD.", increment = .1, order = 0)
-    var tauMinus: Double = 60.0
-
-    @UserParameter(label = "Tau plus", description = "Time constant " + "for LTP.", increment = .1, order = 1)
+    @UserParameter(
+        label = "Tau plus",
+        description = "Time constant for LTP (weight strengthening when pre fires before post. Smaller values narrow the window within which LTP is applied.",
+        increment = .1,
+        order = 10)
     var tauPlus: Double = 30.0
+
+    // Often wider than tau plus in the literature
+    @UserParameter(
+        label = "Tau minus",
+        description = "Time constant for LTD (weight decay when post fires before pre). Smaller values narrow the window within which LTD is applied.",
+        increment = .1,
+        minimumValue = 0.0,
+        order = 20)
+    var tauMinus: Double = 60.0
 
     @UserParameter(
         label = "W+",
-        description = "Learning rate for " + "LTP case. Controls magnitude of LTP changes.",
+        description = "Learning rate for LTP case. Controls the magnitude of LTP changes.",
         increment = .1,
-        order = 2
+        minimumValue = 0.0,
+        order = 30
     )
     open var wPlus: Double = 10.0
 
     @UserParameter(
         label = "W-",
-        description = "Learning rate for " + "LTP case. Controls magnitude of LTD changes.",
+        description = "Learning rate for LTD. Controls magnitude of LTD changes",
         increment = .1,
-        order = 3
+        minimumValue = 0.0,
+        order = 40
     )
     open var wMinus: Double = 10.0
 
-    @UserParameter(label = "Learning rate", description = "General learning " + "rate.", increment = .1, order = 4)
+    @UserParameter(
+        label = "Learning rate",
+        description = "Global learning rate",
+        increment = .1,
+        minimumValue = 0.0,
+        order = 50)
     var learningRate: Double = 0.01
 
     @UserParameter(
         label = "Hebbian",
-        description = "If true, hebbian learning, else anti-hebbian",
-        order = 10
+        description = "If true, use hebbian learning, else anti-hebbian",
+        order = 60
     )
     var isHebbian: Boolean = true
 

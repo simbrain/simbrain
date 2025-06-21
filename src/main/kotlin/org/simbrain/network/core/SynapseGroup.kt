@@ -15,6 +15,8 @@ import smile.math.matrix.Matrix
 /**
  * Lightweight collection of synapses. Contains references to a source and target layer, a connection strategy, and a
  * list of synapses.
+ *
+ * Create new Synapse Groups by specifying a strategy or providing a list of synapses.
  */
 class SynapseGroup @JvmOverloads constructor(
     val source: AbstractNeuronCollection,

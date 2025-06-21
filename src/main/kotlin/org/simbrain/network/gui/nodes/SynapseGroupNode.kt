@@ -95,6 +95,9 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
         }
         setVisibility()
         interactionBox.invalidateFullBounds()
+
+        // call once to make sure all the actions are registered
+        interactionBox.contextMenu
     }
 
     private fun removeEverythingButInteractionBox() {

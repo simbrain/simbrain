@@ -68,12 +68,7 @@ class SynapseGroup @JvmOverloads constructor(
         displaySynapses = source.size * target.size <= threshold
     }
 
-    fun removeAllSyapsesBlocking() {
-        runBlocking {
-            removeAllSynapses()
-        }
-    }
-    suspend fun removeAllSynapses(): List<NetworkModel> {
+    private suspend fun removeAllSynapses(): List<NetworkModel> {
         return buildList {
             synapses.toList().forEach {  synapse ->
                 val deletedBySynapse = synapse.delete()
@@ -101,12 +96,6 @@ class SynapseGroup @JvmOverloads constructor(
         addSynapseListener(syn)
         this.synapses.add(syn)
         events.synapseAdded.fire(syn)
-    }
-
-    suspend fun removeSynapse(syn: Synapse) {
-        this.synapses.remove(syn)
-        syn.delete()
-        events.synapseRemoved.fire(syn)
     }
 
     fun isRecurrent(): Boolean {
@@ -158,7 +147,9 @@ class SynapseGroup @JvmOverloads constructor(
     }
 
     fun applyConnectionStrategy() {
-        removeAllSyapsesBlocking()
+        runBlocking {
+            removeAllSynapses()
+        }
         connectionStrategy.connectNeurons(
             source.neuronList,
             target.neuronList

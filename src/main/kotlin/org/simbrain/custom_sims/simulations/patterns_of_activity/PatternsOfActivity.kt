@@ -1,6 +1,5 @@
 package org.simbrain.custom_sims.simulations.patterns_of_activity
 
-import kotlinx.coroutines.runBlocking
 import org.simbrain.custom_sims.Simulation
 import org.simbrain.network.connections.*
 import org.simbrain.network.core.*
@@ -224,34 +223,42 @@ class PatternsOfActivity : Simulation {
         }
 
         // Set up input synapses (connections from sensory group to the recurrent group)
+        // Create filtered synapse list for sensory left to recurrent connections
+        val sparseConnectionStrategy = Sparse(0.25, true, false)
+        val synapsesL = sparseConnectionStrategy.connectNeurons(sensoryNetL.neuronList, recurrentNetwork!!.neuronList)
+            .filter { s -> s.target.polarity !== Polarity.INHIBITORY }
+            .also { synapses ->
+                synapses.forEach { s ->
+                    s.delay = ThreadLocalRandom.current().nextInt(2, maxDly / 2)
+                }
+            }
         val inpSynGL = SynapseGroup(
             sensoryNetL, recurrentNetwork!!,
-            Sparse(0.25, true, false)
+            sparseConnectionStrategy,
+            synapsesL.toMutableList()
         )
         // initializeSynParameters(inpSynGL);
         // TODO
         // inpSynGL.setStrength(50, Polarity.EXCITATORY);
         // inpSynGL.setStrength(-10, Polarity.INHIBITORY);
-        for (s in inpSynGL.synapses) {
-            s.delay = ThreadLocalRandom.current().nextInt(2, maxDly / 2)
-            if (s.target.polarity === Polarity.INHIBITORY) {
-                runBlocking { inpSynGL.removeSynapse(s) }
+
+        // Create filtered synapse list for sensory right to recurrent connections
+        val synapsesR = sparseConnectionStrategy.connectNeurons(sensoryNetR.neuronList, recurrentNetwork!!.neuronList)
+            .filter { s -> s.target.polarity !== Polarity.INHIBITORY }
+            .also { synapses ->
+                synapses.forEach { s ->
+                    s.delay = ThreadLocalRandom.current().nextInt(2, maxDly / 2)
+                }
             }
-        }
         val inpSynGR = SynapseGroup(
             sensoryNetR, recurrentNetwork!!,
-            Sparse(0.25, true, false)
+            sparseConnectionStrategy,
+            synapsesR.toMutableList()
         )
         // initializeSynParameters(inpSynGR);
         // TODO
         // inpSynGR.setStrength(50, Polarity.EXCITATORY);
         // inpSynGL.setStrength(-10, Polarity.INHIBITORY);
-        for (s in inpSynGR.synapses) {
-            s.delay = ThreadLocalRandom.current().nextInt(2, maxDly / 2)
-            if (s.target.polarity === Polarity.INHIBITORY) {
-                runBlocking { inpSynGR.removeSynapse(s) }
-            }
-        }
 
         // Set up the first out group (comprised of LIF neurons to allow for STDP)
         val outGroup = NeuronGroup(4)

@@ -3,6 +3,7 @@ package org.simbrain.custom_sims.simulations.edge_of_chaos;
 import org.simbrain.custom_sims.Simulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.network.NetworkComponent;
+import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.Direction;
 import org.simbrain.network.connections.FixedDegree;
 import org.simbrain.network.core.Network;
@@ -24,6 +25,7 @@ import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 import javax.swing.*;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -238,11 +240,9 @@ public class EdgeOfChaos extends Simulation {
             xEnd = targetGroup.getMaxX();
         }
 
-        // Create a new SynapseGroup
-        SynapseGroup synapseGroup = new SynapseGroup(sourceGroup, targetGroup);
-
-        synapseGroup.removeAllSyapsesBlocking();
-
+        // Create synapses list first based on custom quadrant logic
+        List<Synapse> synapses = new ArrayList<>();
+        
         // Iterate over neurons in the target group
         List<Neuron> targetNeurons = targetGroup.getNeuronList();
         for (Neuron targetNeuron : targetNeurons) {
@@ -257,11 +257,16 @@ public class EdgeOfChaos extends Simulation {
                         Neuron sourceNeuron = sourceGroup.getNeuronList().get(sourceIndex);
                         Synapse synapse = new Synapse(sourceNeuron, targetNeuron);
                         synapse.setStrength(1.0); // Default strength
-                        synapseGroup.addSynapse(synapse);
+                        synapses.add(synapse);
                     }
                 }
             }
         }
+
+        // Create SynapseGroup with pre-created synapse list
+        SynapseGroup synapseGroup = new SynapseGroup(sourceGroup, targetGroup, 
+            new AllToAll(),
+            new ArrayList<>(synapses));
 
         return synapseGroup;
     }

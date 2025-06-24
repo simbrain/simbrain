@@ -3,7 +3,6 @@ package org.simbrain.custom_sims.simulations.edge_of_chaos;
 import org.simbrain.custom_sims.Simulation;
 import org.simbrain.custom_sims.helper_classes.ControlPanel;
 import org.simbrain.network.NetworkComponent;
-import org.simbrain.network.connections.AllToAll;
 import org.simbrain.network.connections.Direction;
 import org.simbrain.network.connections.FixedDegree;
 import org.simbrain.network.core.Network;
@@ -46,7 +45,7 @@ public class EdgeOfChaos extends Simulation {
     private final long seed = 42L;
 
     Network net;
-    SynapseGroup sgReservoir, cheeseToRes, flowersToRes;
+    SynapseGroup sgReservoir;
     NeuronGroup reservoir, sensorNodes;
     OdorWorldComponent oc;
     OdorWorldEntity mouse;
@@ -168,15 +167,9 @@ public class EdgeOfChaos extends Simulation {
         // Make custom connections from sensor nodes to upper-left and
         // lower-right quadrants of the reservoir network to ensure visually
         // distinct patterns.
-        cheeseToRes = createSensorConnections(sensorNodes, reservoir, new int[] {0, 1, 2}, .6, 1);
-        net.addNetworkModel(cheeseToRes);
-        flowersToRes = createSensorConnections(sensorNodes, reservoir, new int[] {3, 4, 5}, .6, 3);
-        net.addNetworkModel(flowersToRes);
+        createSensorConnections(sensorNodes, reservoir, new int[] {0, 1, 2}, .6, 1);
+        createSensorConnections(sensorNodes, reservoir, new int[] {3, 4, 5}, .6, 3);
         sensorNodes.applyLayout();
-        SwingUtilities.invokeLater(() -> {
-            cheeseToRes.initializeSynapseVisibility();
-            flowersToRes.initializeSynapseVisibility();
-        });
     }
 
     public static NeuronGroup createReservoir(Network parentNet, int x, int y, int numNeurons) {
@@ -217,7 +210,7 @@ public class EdgeOfChaos extends Simulation {
      * @return a {@link SynapseGroup} representing the newly created connections
      */
 
-    private SynapseGroup createSensorConnections(
+    private void createSensorConnections(
             NeuronGroup sourceGroup, NeuronGroup targetGroup, int[] sourceNodeIndices,
             double sparsity, int quadrant) {
 
@@ -262,13 +255,7 @@ public class EdgeOfChaos extends Simulation {
                 }
             }
         }
-
-        // Create SynapseGroup with pre-created synapse list
-        SynapseGroup synapseGroup = new SynapseGroup(sourceGroup, targetGroup, 
-            new AllToAll(),
-            new ArrayList<>(synapses));
-
-        return synapseGroup;
+        net.addNetworkModels(synapses);
     }
     private void buildOdorWorld() {
 

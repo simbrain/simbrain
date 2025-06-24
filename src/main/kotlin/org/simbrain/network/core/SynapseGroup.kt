@@ -35,7 +35,10 @@ class SynapseGroup @JvmOverloads constructor(
     @Transient
     override var events = SynapseGroupEvents()
 
-    var synapses: MutableList<Synapse> = synapses.onEach { synapse -> addSynapseListener(synapse) }
+    var synapses: MutableList<Synapse> = synapses.onEach { synapse ->
+        synapse.isVisible = false
+        addSynapseListener(synapse)
+    }
 
     /**
      * Flag for whether synapses should be displayed in a GUI representation of this object.
@@ -111,7 +114,6 @@ class SynapseGroup @JvmOverloads constructor(
         syn.isVisible = displaySynapses
         addSynapseListener(syn)
         this.synapses.add(syn)
-        events.synapseAdded.fire(syn)
     }
 
     fun isRecurrent(): Boolean {
@@ -163,16 +165,19 @@ class SynapseGroup @JvmOverloads constructor(
     }
 
     fun applyConnectionStrategy() {
-        runBlocking {
-            removeAllSynapses()
-        }
-        connectionStrategy.connectNeurons(
+        val newSynapses = connectionStrategy.connectNeurons(
             source.neuronList,
             target.neuronList
-        ).forEach {
-            addSynapse(it)
+        )
+        if (newSynapses.isNotEmpty()) {
+            runBlocking {
+                removeAllSynapses()
+            }
+            newSynapses.forEach {
+                addSynapse(it)
+            }
+            events.synapseListChanged.fire()
         }
-        events.synapseListChanged.fire()
     }
 
     fun getWeightMatrix(): Matrix {

@@ -66,7 +66,7 @@ public class AbstractComponentFactory {
         });
         putGuiComponentFactory(OdorWorldComponent.class, OdorWorldDesktopComponent::new);
 
-        putWorkspaceComponentFactory("Data Table", () -> new DataWorldComponent(""));
+        putWorkspaceComponentFactory("Data World", () -> new DataWorldComponent(""));
         putGuiComponentFactory(DataWorldComponent.class, DataWorldDesktopComponent::new);
 
         putWorkspaceComponentFactory("Text World", () -> new TextWorldComponent(""));

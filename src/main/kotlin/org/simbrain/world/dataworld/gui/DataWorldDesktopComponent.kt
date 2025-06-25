@@ -53,7 +53,7 @@ class DataWorldDesktopComponent(frame: GenericFrame, val component: DataWorldCom
 
     private val helpItem = JMenuItem("Reader Help")
 
-    private val tablePanel: SimbrainTablePanel = SimbrainTablePanel(
+    val tablePanel: SimbrainTablePanel = SimbrainTablePanel(
         component.dataWorld.dataModel, false
     )
 
@@ -120,6 +120,7 @@ class DataWorldDesktopComponent(frame: GenericFrame, val component: DataWorldCom
 
         fun createEditMenu() {
             edit.removeAll()
+            edit.add(tablePanel.table.setRowsColumnsAction)
             edit.add(
                 actionManager.createCoupledPlotMenu(
                     dataWorld.getProducer(DataWorld::getCurrentNumericRow),

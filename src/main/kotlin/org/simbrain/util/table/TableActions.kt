@@ -116,6 +116,107 @@ val SimbrainJTable.deleteRowAction
         deleteSelectedRows()
     }
 
+val SimbrainJTable.setRowsColumnsAction
+    get() = createAction(
+        name = "Set rows / columns",
+        description = "Set number of rows and columns (cells are zeroed out)",
+    ) {
+        fun createDimensionDialog(): Pair<Int, Int>? {
+            val currentRows = model.rowCount
+            val currentCols = model.columnCount
+            
+            val rowField = javax.swing.JTextField(currentRows.toString(), 10)
+            val colField = javax.swing.JTextField(currentCols.toString(), 10)
+            
+            val panel = javax.swing.JPanel(java.awt.GridBagLayout()).apply {
+                val gbc = java.awt.GridBagConstraints()
+                
+                gbc.gridx = 0; gbc.gridy = 0; gbc.anchor = java.awt.GridBagConstraints.WEST; gbc.insets = java.awt.Insets(5, 5, 5, 5)
+                add(javax.swing.JLabel("Number of rows:"), gbc)
+                
+                gbc.gridx = 1
+                add(rowField, gbc)
+                
+                gbc.gridx = 0; gbc.gridy = 1
+                add(javax.swing.JLabel("Number of columns:"), gbc)
+                
+                gbc.gridx = 1
+                add(colField, gbc)
+            }
+            
+            val result = JOptionPane.showConfirmDialog(
+                this@setRowsColumnsAction,
+                panel,
+                "Set Table Dimensions",
+                JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.QUESTION_MESSAGE
+            )
+            
+            return if (result == JOptionPane.OK_OPTION) {
+                try {
+                    val newRows = rowField.text.toInt()
+                    val newCols = colField.text.toInt()
+                    if (newRows > 0 && newCols > 0) {
+                        Pair(newRows, newCols)
+                    } else {
+                        JOptionPane.showMessageDialog(
+                            this@setRowsColumnsAction,
+                            "Rows and columns must be positive integers",
+                            "Invalid Input",
+                            JOptionPane.ERROR_MESSAGE
+                        )
+                        null
+                    }
+                } catch (e: NumberFormatException) {
+                    JOptionPane.showMessageDialog(
+                        this@setRowsColumnsAction,
+                        "Please enter valid integer values",
+                        "Invalid Input",
+                        JOptionPane.ERROR_MESSAGE
+                    )
+                    null
+                }
+            } else null
+        }
+
+        fun updateRowNames(count: Int, existing: List<String?>): MutableList<String?> {
+            return (0 until count).map { i ->
+                if (i < existing.size) existing[i] else null
+            }.toMutableList()
+        }
+        
+        val dimensions = createDimensionDialog()
+        if (dimensions != null) {
+            val (newRows, newCols) = dimensions
+            
+            when (val tableModel = model) {
+                is BasicDataFrame -> {
+                    val newData = (0 until newRows).map { 
+                        (0 until newCols).map { 0.0 as Any? }.toMutableList()
+                    }.toMutableList()
+                    
+                    tableModel.data = newData
+                    tableModel.rowNames = updateRowNames(newRows, tableModel.rowNames)
+                    tableModel.fireTableStructureChanged()
+                }
+                is MatrixDataFrame -> {
+                    val newMatrix = Array(newRows) { DoubleArray(newCols) { 0.0 } }.toMatrix()
+                    
+                    tableModel.data = newMatrix
+                    tableModel.rowNames = updateRowNames(newRows, tableModel.rowNames)
+                    tableModel.fireTableStructureChanged()
+                }
+                else -> {
+                    JOptionPane.showMessageDialog(
+                        this,
+                        "Reshaping not supported for this table type",
+                        "Warning",
+                        JOptionPane.WARNING_MESSAGE
+                    )
+                }
+            }
+        }
+    }
 
 val SimbrainJTable.showHistogramAction
     get() = createAction(

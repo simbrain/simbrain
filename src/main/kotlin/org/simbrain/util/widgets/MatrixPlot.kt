@@ -119,7 +119,7 @@ class MatrixPlotProperties: EditableObject {
 
 class CorrPlotPanel(private val labels: List<String>, private val data: Array<DoubleArray>): JPanel(BorderLayout()) {
 
-    var matrixPlot = MatrixPlot(labels, data)
+    var matrixPlot = MatrixPlot(labels, computeCorrelationMatrix(data))
 
     val matrixPlotPanel = JScrollPane(matrixPlot).apply {
         border = null

@@ -206,6 +206,7 @@ class PfisterGerstner2006Rule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixDa
         }
     }
 
+    // Note: This function has not been tested.
     // Note: Matrix implementation requires managing trace matrices for each connection
     // This is computationally intensive but doable for moderate sized networks
     context(Network)

@@ -27,10 +27,7 @@ import org.simbrain.util.UserParameter
  * **HebbianThresholdSynapse**.
  */
 class HebbianThresholdRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>() {
-    // TODO: check description
-    /**
-     * Learning rate.
-     */
+
     @UserParameter(
         label = "Learning rate",
         description = "Learning rate for Hebb threshold rule",
@@ -39,9 +36,6 @@ class HebbianThresholdRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>
     )
     var learningRate: Double = 0.1
 
-    /**
-     * Output threshold.
-     */
     @UserParameter(
         label = "Threshold",
         description = "Output threshold for Hebb threshold rule",
@@ -50,9 +44,6 @@ class HebbianThresholdRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>
     )
     var outputThreshold: Double = .5
 
-    /**
-     * Output threshold momentum.
-     */
     @UserParameter(
         label = "Threshold Momentum",
         description = "Output threshold momentum for Hebb threshold rule",
@@ -61,9 +52,6 @@ class HebbianThresholdRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>
     )
     var outputThresholdMomentum: Double = .1
 
-    /**
-     * Use sliding output threshold.
-     */
     @UserParameter(
         label = "Sliding Threshold",
         description = "Use sliding output threshold for Hebb threshold rule",
@@ -97,6 +85,7 @@ class HebbianThresholdRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>
         synapse.strength += learningRate * input * output * (output - outputThreshold)
     }
 
+    // Note: This function has not been tested.
     context(Network)
     override fun apply(connector: Connector, dataHolder: EmptyMatrixData) {
         if (connector is WeightMatrix) {

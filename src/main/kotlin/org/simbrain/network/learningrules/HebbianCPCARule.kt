@@ -111,6 +111,7 @@ class HebbianCPCARule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>() {
         synapse.strength = synapse.strength + deltaW
     }
 
+    // Note: This function has not been tested.
     context(Network)
     override fun apply(connector: Connector, dataHolder: EmptyMatrixData) {
         if (connector is WeightMatrix) {

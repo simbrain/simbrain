@@ -96,11 +96,7 @@ class ShortTermPlasticityRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixDa
         // Determine whether to activate short term dynamics
 
         activated = if (synapse.source.updateRule is SpikingNeuronUpdateRule<*, *>) {
-            if (synapse.source.isSpike) {
-                true
-            } else {
-                false
-            }
+            synapse.source.isSpike
         } else {
             if (synapse.source.activation > firingThreshold) {
                 true
@@ -121,6 +117,7 @@ class ShortTermPlasticityRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixDa
         synapse.strength = strength
     }
 
+    // Note: This function has not been tested.
     context(Network)
     override fun apply(connector: Connector, dataHolder: EmptyMatrixData) {
         if (connector is WeightMatrix) {

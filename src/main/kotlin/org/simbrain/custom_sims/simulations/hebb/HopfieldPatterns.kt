@@ -43,32 +43,30 @@ val hopfieldPatterns = newSim {
             Each neuron in this network is connected to each other neuron using the Hebb rule ("neurons that wire
             together, fire together"). To start, this network is initialized with all weights equal to zero.
             When you train this network on a pattern, it takes the dot product of each neuron activation in the network with all other neuron activations in the network.
-            Even though we show 1s and 0s here, we actually use bipolar (-1s and 1s) to train and update the network.
-            This matrix is then multiplied by a learning rate, typically 1/(pattern count), and then added to the weight matrix. Note that the diagonals need to be zeroed (can you think about why?).
+            Even though we show 1s and 0s here, we actually use bipolar activations (-1s and 1s) to train and update the network.
+            This matrix is then multiplied by a learning rate, typically 1/(pattern count), and then added to the weight matrix. Note that the diagonals need to be zeroed.
+            A typical Hopfield network can learn up to around 0.15*(Neuron count) perfectly orthogonal patterns.
             
             ## Testing
             Typically in a hopfield network, the neurons are updated asynchonously. They are updated randomly, one at a time for a set amount of updates.
             However, in this example, we perform a synchronous update, updating all the neurons at once. Run the network and you will observe
             that it will converge to some pattern (hopefully it's one that you trained!). You will also see that the network goes to a lower energy state.
-            
-            ## Patterns
-            Each pattern shown on the sidebar was compiled to have maximum orthogonality, yet still be
-            rememberable to humans.
                         
             # What to Do        
             
             - Select one of the patterns on the button panel. 
             - Press the train button to train the network on that pattern. Each time you press "train" it will "burn in" the pattern further.
             - Note that it will learn both the pattern and its anti-pattern.
-            - To confirm the pattern is remembered, try randomzing the network with `N -> R` and then iterating by pressing space to see if the pattern is recreated.
+            - To confirm the pattern is remembered, try randomizing the network with `N -> R` and then iterating by pressing space to see if the pattern is recreated.
             - You can also manually create part of the pattern you trained the network and see if it can recreate it.
             - You can also select an already trained pattern and changing a few of the neurons to see if it will go back to the pattern.
             
             # A few experiments...
-            
-            - How many patterns can you fit in the network before it starts to break down?
-            - How many patterns should the network theoretically be able to remember?
-            - Compare the two values. Why do you think this is? Hint: what kinds patterns do Hopfield networks remember well?
+            - Train the network on the E, F, and L patterns, then randomize and iterate the network (N -> R). What do you notice?
+            - Click on Show Correlations. What do you notice about the above patterns?
+            - Now, reset the network try to train the network to try to remember as many patterns as possible. How many can you fit in?
+            - How many patterns should the network theoretically be able to remember (assuming all patterns are perfectly orthogonal)?
+            - Train the network solely on a blank pattern (all 0s). Notice how the diagonal activations are zeroed out in the weight matrix. Why do you think this is?
 
             # Credits
             

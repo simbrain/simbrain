@@ -1,7 +1,6 @@
 package org.simbrain.util
 
 import org.simbrain.util.Utils.FS
-import org.simbrain.util.propertyeditor.AutoCopyObject
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.world.textworld.EmbeddingType
@@ -53,7 +52,7 @@ fun String.tokenizeWordsFromString(): List<String> {
     return this.lowercase().removeSpecialCharacters().removePunctuation().split(" ")
 }
 
-abstract class Tokenizer<T: CopyableObject>: AutoCopyObject<T>() {
+abstract class Tokenizer<T: CopyableObject>: CopyableObject {
     open fun initialize(trainingDocument: String) {}
     abstract fun tokenize(text: String): List<TokenizerResult>
     abstract fun joinTokens(tokens: List<String>): String
@@ -121,6 +120,14 @@ class SimpleTokenizer(
             }
             .flatten()
             .joinToString("")
+    }
+
+    override fun copy(): SimpleTokenizer {
+        return SimpleTokenizer(
+            usePunctuation = this.usePunctuation,
+            useSpaces = this.useSpaces,
+            useReturns = this.useReturns
+        )
     }
 
 }

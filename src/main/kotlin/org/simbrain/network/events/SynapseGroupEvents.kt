@@ -8,7 +8,6 @@ import org.simbrain.util.Events
  */
 class SynapseGroupEvents: NetworkModelEvents() {
     val visibilityChanged = NoArgEvent()
-    val synapseAdded = OneArgEvent<Synapse>()
     val synapseRemoved = OneArgEvent<Synapse>()
     val synapseListChanged = NoArgEvent()
 }

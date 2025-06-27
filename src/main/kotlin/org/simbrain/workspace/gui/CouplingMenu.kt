@@ -3,14 +3,18 @@ package org.simbrain.workspace.gui
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
+import org.simbrain.util.createAction
+import org.simbrain.util.displayInDialog
 import org.simbrain.workspace.Attribute
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Producer
 import org.simbrain.workspace.WorkspaceComponent
+import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager
 import smile.math.matrix.Matrix
 import javax.swing.JMenu
 import javax.swing.JMenuItem
 import javax.swing.JSeparator
+import kotlin.math.max
 
 /**
  * A JMenu that appears relative to some object (an [AttributeContainer]) in
@@ -42,8 +46,8 @@ class CouplingMenu(
         }
         with(sourceComponent.couplingManager) {
             sourceComponent.workspace.launch(Dispatchers.Swing) {
-                sources.flatMap { it.visibleProducers }.forEach { createProducerSubmenu(it) }
-                sources.flatMap { it.visibleConsumers }.forEach { createConsumerSubmenu(it) }
+                sources.flatMap { it.producers }.forEach { createProducerSubmenu(it) }
+                sources.flatMap { it.consumers }.forEach { createConsumerSubmenu(it) }
             }
         }
     }
@@ -79,33 +83,57 @@ class CouplingMenu(
      */
     private fun createProducerSubmenu(producer: Producer) {
         val workspace = sourceComponent.workspace
-        sequence {
-            workspace.componentList.forEach { wc ->
-                with(sourceComponent.couplingManager) {
-                    producer.compatiblesOfComponent(wc).forEach { consumer ->
-                        CouplingMenuItem(workspace,
-                                "${wc.name} / ${consumer.simpleDescription}",
-                                producer,
-                                consumer
-                        ).let { yield(it) }
-                    }
-                }
+        val compatibleConsumers = workspace.componentList.flatMap { wc ->
+            with(workspace.couplingManager) {
+                producer.compatiblesOfComponent(wc).map { wc to it }
             }
-        }.createSubmenu("Send ${producer.simpleDescription} (${producer.typeName}) to")
+        }
+        val menuItems = compatibleConsumers.take(maxVisibleMenuItems).map { (wc, consumer) ->
+            CouplingMenuItem(workspace,
+                "${wc.name} / ${consumer.simpleDescription}",
+                producer,
+                consumer
+            )
+        }
+        menuItems.createSubmenu(
+            "Send ${producer.simpleDescription} (${producer.typeName}) to",
+            max(0, compatibleConsumers.count() - maxVisibleMenuItems)
+        )
     }
 
     private fun createConsumerSubmenu(consumer: org.simbrain.workspace.Consumer) {
         val workspace = sourceComponent.workspace
-        sequence {
-            workspace.componentList.forEach { wc ->
-                with(workspace.couplingManager) {
-                    consumer.compatiblesOfComponent(wc)
-                }.forEach { product ->
-                    CouplingMenuItem(workspace, "${wc.name}/${product.simpleDescription}", product, consumer)
-                            .let { yield(it) }
-                }
+        val compatibleProducers = workspace.componentList.flatMap { wc ->
+            with(workspace.couplingManager) {
+                consumer.compatiblesOfComponent(wc).map { wc to it }
             }
-        }.createSubmenu("Receive ${consumer.simpleDescription} (${consumer.typeName}) from")
+        }
+        val menuItems = compatibleProducers.take(maxVisibleMenuItems).map { (wc, producer) ->
+            CouplingMenuItem(workspace, "${wc.name}/${producer.simpleDescription}", producer, consumer)
+        }
+        menuItems.createSubmenu(
+            "Receive ${consumer.simpleDescription} (${consumer.typeName}) from",
+            max(0, compatibleProducers.count() - maxVisibleMenuItems)
+        )
+    }
+
+    private fun List<CouplingMenuItem>.createSubmenu(description: String, moreItems: Int) {
+        if (isEmpty()) {
+            add(JMenuItem(description).apply {
+                toolTipText = "No compatible coupling found"
+                isEnabled = false
+            })
+            return
+        }
+        val submenu = JMenu(description)
+        map { it.create() }.forEach { submenu.add(it) }
+        if (moreItems > 0) {
+            submenu.add(JSeparator())
+            submenu.add(createAction("... and $moreItems more ${if (moreItems == 1) "item" else "items"}") {
+                DesktopCouplingManager(SimbrainDesktop).displayInDialog {  }
+            })
+        }
+        add(submenu)
     }
 
     private fun Sequence<CouplingMenuItem>.createSubmenu(description: String) {

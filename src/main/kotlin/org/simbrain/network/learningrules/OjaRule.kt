@@ -30,17 +30,11 @@ import org.simbrain.util.broadcastMultiply
  * squares of the weights attaching to a neuron to a user-defined value.
  */
 class OjaRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>() {
-    /**
-     * Learning rate.
-     */
+
     @UserParameter(label = "Learning rate", description = "Learning rate for Oja rule", increment = .1, minimumValue = 0.0, order = 1)
     var learningRate = defaultLearningRate
 
-    // TODO: check description
-    /**
-     * Normalization factor.
-     */
-    @UserParameter(label = "Normalize to", description = "Normalization factor for Oja rule", increment = .1, order = 1)
+    @UserParameter(label = "Normalization Factor", description = "Normalization factor for Oja rule", increment = .1, order = 1)
     var normalizationFactor = 1.0
     override fun init(synapse: Synapse) {}
 

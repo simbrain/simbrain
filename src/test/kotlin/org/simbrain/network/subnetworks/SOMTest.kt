@@ -8,6 +8,7 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.*
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.nodes.NeuronNode
+import org.simbrain.workspace.Workspace
 
 class SOMTest {
 
@@ -33,7 +34,10 @@ class SOMTest {
     @Test
     fun `test som node creation`() {
         runBlocking {
-            val np = NetworkPanel(NetworkComponent("Test", net))
+            val workspace = Workspace()
+            val networkComponent = NetworkComponent("Test", net)
+            workspace.addWorkspaceComponent(networkComponent)
+            val np = NetworkPanel(networkComponent)
             assertEquals(3, np.filterScreenElements<NeuronNode>().size)
         }
     }

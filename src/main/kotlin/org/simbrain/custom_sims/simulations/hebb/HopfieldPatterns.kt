@@ -292,14 +292,14 @@ val hopfieldPatterns = newSim {
         "L Pattern" to LShape,
         "U Pattern" to UShape,
         "V Pattern" to VShape,
+        "X Pattern" to XShape,
         "Y Pattern" to YShape,
         "Z Pattern" to ZShape,
         "Zero Pattern" to zeroShape,
         "Eight Pattern" to eightShape,
-        "X Pattern" to XShape,
-        "Checker Pattern" to CheckerShape,
         "Diamond Pattern" to DiamondShape,
         "Stripe Pattern" to StripeShape,
+        "Checker Pattern" to CheckerShape,
     )
     withGui {
         place(networkComponent, 249, 0, 509, 619)
@@ -331,15 +331,15 @@ val hopfieldPatterns = newSim {
                         "L",
                         "U",
                         "V",
+                        "X",
                         "Y",
                         "Z",
                         "zero",
                         "eight",
-                        "X",
-                        "Checker",
                         "Diamond",
-                        "Stripe"
-                    ),
+                        "Stripe",
+                        "Checker"
+                        ),
                     computeCorrelationMatrix(
                         arrayOf(
                             DShape,
@@ -349,15 +349,15 @@ val hopfieldPatterns = newSim {
                             LShape,
                             UShape,
                             VShape,
+                            XShape,
                             YShape,
                             ZShape,
                             zeroShape,
                             eightShape,
-                            XShape,
-                            CheckerShape,
                             DiamondShape,
-                            StripeShape
-                        )
+                            StripeShape,
+                            CheckerShape
+                            )
                     )
                 ).displayInDialog().apply {
                     title = "Inter-pattern correlations"

@@ -117,9 +117,12 @@ abstract class SynapseUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataH
          */
         var RULE_LIST: List<Class<out CopyableObject?>> = Arrays.asList<Class<out CopyableObject?>>(
             StaticSynapseRule::class.java,
-            HebbianRule::class.java, HebbianCPCARule::class.java, HebbianThresholdRule::class.java,
-            OjaRule::class.java, PfisterGerstner2006Rule::class.java, ShortTermPlasticityRule::class.java,
-            STDPRule::class.java, SubtractiveNormalizationRule::class.java
+            HebbianRule::class.java,
+            OjaRule::class.java,
+            //PfisterGerstner2006Rule::class.java,
+            //ShortTermPlasticityRule::class.java,
+            STDPRule::class.java,
+            //SubtractiveNormalizationRule::class.java
         )
 
         /**

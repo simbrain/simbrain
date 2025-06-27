@@ -30,10 +30,6 @@ import org.simbrain.workspace.couplings.Coupling
 import java.io.InputStream
 import java.io.OutputStream
 
-/**
- * Represents time series data.
- */
-
 class TimeSeriesPlotComponent @JvmOverloads constructor(name: String, val model: TimeSeriesModel = TimeSeriesModel()) : WorkspaceComponent(name) {
 
     override var workspace: Workspace

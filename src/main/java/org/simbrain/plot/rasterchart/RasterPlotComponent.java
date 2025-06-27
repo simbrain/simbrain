@@ -33,19 +33,12 @@ import java.util.List;
  */
 public class RasterPlotComponent extends WorkspaceComponent {
 
-    /**
-     * The data model.
-     */
     private final RasterModel model;
 
-    /**
-     * Create new raster plot component.
-     *
-     * @param name name
-     */
     public RasterPlotComponent(final String name) {
         super(name);
         model = new RasterModel(() -> getWorkspace().getTime());
+        initEvents();
     }
 
     /**
@@ -58,6 +51,12 @@ public class RasterPlotComponent extends WorkspaceComponent {
     public RasterPlotComponent(final String name, final RasterModel model) {
         super(name);
         this.model = model;
+        initEvents();
+    }
+
+    private void initEvents() {
+        model.getEvents().getRasterConsumerAdded().on(this::fireAttributeContainerAdded);
+        model.getEvents().getRasterConsumerRemoved().on(this::fireAttributeContainerRemoved);
     }
 
     public RasterModel getModel() {

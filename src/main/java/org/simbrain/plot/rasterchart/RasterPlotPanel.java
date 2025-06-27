@@ -39,19 +39,10 @@ import java.awt.geom.Rectangle2D;
  */
 public class RasterPlotPanel extends JPanel {
 
-    /**
-     * Chart un-initialized instance.
-     */
     private JFreeChart chart;
 
-    /**
-     * Initial size.
-     */
     private static final Dimension PREFERRED_SIZE = new Dimension(500, 400);
 
-    /**
-     * Panel for chart.
-     */
     private final ChartPanel chartPanel = new ChartPanel(null);
 
     /**
@@ -69,12 +60,6 @@ public class RasterPlotPanel extends JPanel {
      */
     private XYItemRenderer renderer;
 
-
-    /**
-     * Construct a raster panel.
-     *
-     * @param rasterModel model underlying model
-     */
     public RasterPlotPanel(final RasterModel rasterModel) {
 
         model = rasterModel;
@@ -108,6 +93,7 @@ public class RasterPlotPanel extends JPanel {
         );
         renderer = ((XYPlot) chart.getPlot()).getRenderer();
         updateChartSettings();
+        model.getEvents().getPropertyChanged().on(this::updateChartSettings);
         chartPanel.setChart(chart);
         chart.setBackgroundPaint(null);
 

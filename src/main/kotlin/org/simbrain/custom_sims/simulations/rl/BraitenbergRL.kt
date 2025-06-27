@@ -234,6 +234,8 @@ val braitenbergRL = newSim {
     poisonLeftToRightTurn.strength = 2.0
     poisonLeftToStraight.strength = 1.0
     poisonRightToStraightRight.strength = 1.0
+    cheeseLeftToLeftTurn.strength = 2.0
+    cheeseRightToRightTurn.strength = 2.0
 
     fun resetVehicle() {
         agent.location = Point2D.Double((50..150).random().toDouble(), (350..450).random().toDouble())
@@ -262,8 +264,28 @@ val braitenbergRL = newSim {
                     resetObjects()
                     var lastDistanceToPoison = Double.POSITIVE_INFINITY
 
+                    val actorSynapses = listOf(
+                            cheeseLeftToLeftTurn,
+                            cheeseLeftToRightTurn,
+                            cheeseLeftToStraight,
+                            cheeseRightToLeftTurn,
+                            cheeseRightToRightTurn,
+                            cheeseRightToStraight,
+                            poisonLeftToLeftTurn,
+                            poisonLeftToRightTurn,
+                            poisonLeftToStraight,
+                            poisonRightToLeftTurn,
+                            poisonRightToRightTurn,
+                            poisonRightToStraightRight
+                        )
+
                     while (trialStep++ < maxStepsPerTrial && !stopRequested) {
                         workspace.iterateSuspend(1)
+
+                        // Add noise to turn neurons
+                        val random = java.util.Random()
+                        leftTurn.activation += random.nextGaussian() * 0.2
+                        rightTurn.activation += random.nextGaussian() * 0.2
 
                         val cheese = world.entityList.find { it.entityType == EntityType.Swiss } ?: continue
                         val distanceToCheese = agent.location.distance(cheese.location)
@@ -283,27 +305,48 @@ val braitenbergRL = newSim {
                         }
                         valueNeuron.auxValue = valueNeuron.activation
 
-                        // Update actor weights
-                        if (tdError > 0) {
-                            if (leftTurn.activation > rightTurn.activation) {
-                                // When turning left train fan-in to left turning node
-                                cheeseLeftToLeftTurn.strength += learningRate * tdError * cheeseLeftInput.auxValue
-                                cheeseRightToLeftTurn.strength += learningRate * tdError * cheeseRightInput.auxValue
-                                poisonLeftToLeftTurn.strength += learningRate * tdError * poisonLeftInput.auxValue
-                                poisonRightToLeftTurn.strength += learningRate * tdError * poisonRightInput.auxValue
-                            } else if (rightTurn.activation > leftTurn.activation) {
-                                // When turning right train fan-in to right turning node
-                                cheeseLeftToRightTurn.strength += learningRate * tdError * cheeseLeftInput.auxValue
-                                cheeseRightToRightTurn.strength += learningRate * tdError * cheeseRightInput.auxValue
-                                poisonLeftToRightTurn.strength += learningRate * tdError * poisonLeftInput.auxValue
-                                poisonRightToRightTurn.strength += learningRate * tdError * poisonRightInput.auxValue
-                            }
-                            cheeseLeftToStraight.strength += learningRate * tdError * cheeseLeftInput.auxValue
-                            cheeseRightToStraight.strength += learningRate * tdError * cheeseRightInput.auxValue
-                            poisonLeftToStraight.strength += learningRate * tdError * poisonLeftInput.auxValue
-                            poisonRightToStraightRight.strength += learningRate * tdError * poisonRightInput.auxValue
+                        // Directional Correlation-Based Learning
+                        val turnPairs = listOf(
+                            // Each input is paired with two turn synapses (preferred, opposing)
+                            cheeseLeftInput to Pair(cheeseLeftToLeftTurn, cheeseLeftToRightTurn),
+                            cheeseRightInput to Pair(cheeseRightToRightTurn, cheeseRightToLeftTurn),
+                            poisonLeftInput to Pair(poisonLeftToLeftTurn, poisonLeftToRightTurn),
+                            poisonRightInput to Pair(poisonRightToRightTurn, poisonRightToLeftTurn),
+                        )
+
+                        for ((input, pair) in turnPairs) {
+                            val (synToPreferred, synToOpposing) = pair
+                            val inputActivation = input.auxValue
+
+                            // Reinforce preferred turn
+                            synToPreferred.strength += learningRate * tdError * inputActivation * synToPreferred.target.activation
+
+                            // Inhibit opposing turn slightly
+                            synToOpposing.strength -= learningRate * tdError * inputActivation * synToOpposing.target.activation * 0.5
                         }
 
+                        // Synaptic Competition: Normalize incoming weights per turn neuron
+                        val turnFanIns = listOf(leftTurn, rightTurn).map { turnNeuron ->
+                            turnNeuron to turnNeuron.fanIn.filter { it in actorSynapses }
+                        }
+
+                        turnFanIns.forEach { (turnNeuron, fanIns) ->
+                            val totalStrength = fanIns.sumOf { kotlin.math.abs(it.strength) }
+                            if (totalStrength > 1e-6) {  // avoid divide-by-zero
+                                fanIns.forEach { syn ->
+                                    syn.strength /= totalStrength
+                                    // Optional: rescale to keep total input strength around 1.0 or 2.0
+                                    syn.strength *= 2.0
+                                }
+                            }
+                        }
+
+                        // Clamp weights to prevent runaway
+                        actorSynapses.forEach { syn ->
+                            syn.strength = syn.strength.coerceIn(-5.0, 5.0)
+                        }
+
+                        // Update Aux Values 
                         valueInputs.forEach { it.auxValue = it.activation }
                         valueNeuron.auxValue = valueNeuron.activation
                         lastDistanceToPoison = agent.location.distance(

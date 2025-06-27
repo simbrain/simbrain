@@ -339,12 +339,16 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     }
 
     suspend fun createNode(synapseGroup: SynapseGroup) = addScreenElement {
-        with(synapseGroup.synapses) {
-            if (size < NetworkPreferences.synapseVisibilityThreshold) {
-                forEach {
+        suspend fun createNodes(synapseList: List<Synapse>) {
+            if (synapseList.size < NetworkPreferences.synapseVisibilityThreshold) {
+                synapseList.forEach {
                     createNode(it)
                 }
             }
+        }
+        createNodes(synapseGroup.synapses)
+        synapseGroup.events.synapseListChanged.on {
+            createNodes(synapseGroup.synapses)
         }
         SynapseGroupNode(this, synapseGroup)
     }

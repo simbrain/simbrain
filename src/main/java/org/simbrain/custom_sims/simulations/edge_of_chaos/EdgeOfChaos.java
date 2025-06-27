@@ -24,6 +24,7 @@ import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 import javax.swing.*;
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -44,7 +45,7 @@ public class EdgeOfChaos extends Simulation {
     private final long seed = 42L;
 
     Network net;
-    SynapseGroup sgReservoir, cheeseToRes, flowersToRes;
+    SynapseGroup sgReservoir;
     NeuronGroup reservoir, sensorNodes;
     OdorWorldComponent oc;
     OdorWorldEntity mouse;
@@ -166,15 +167,9 @@ public class EdgeOfChaos extends Simulation {
         // Make custom connections from sensor nodes to upper-left and
         // lower-right quadrants of the reservoir network to ensure visually
         // distinct patterns.
-        cheeseToRes = createSensorConnections(sensorNodes, reservoir, new int[] {0, 1, 2}, .6, 1);
-        net.addNetworkModel(cheeseToRes);
-        flowersToRes = createSensorConnections(sensorNodes, reservoir, new int[] {3, 4, 5}, .6, 3);
-        net.addNetworkModel(flowersToRes);
+        createSensorConnections(sensorNodes, reservoir, new int[] {0, 1, 2}, .6, 1);
+        createSensorConnections(sensorNodes, reservoir, new int[] {3, 4, 5}, .6, 3);
         sensorNodes.applyLayout();
-        SwingUtilities.invokeLater(() -> {
-            cheeseToRes.initializeSynapseVisibility();
-            flowersToRes.initializeSynapseVisibility();
-        });
     }
 
     public static NeuronGroup createReservoir(Network parentNet, int x, int y, int numNeurons) {
@@ -215,7 +210,7 @@ public class EdgeOfChaos extends Simulation {
      * @return a {@link SynapseGroup} representing the newly created connections
      */
 
-    private SynapseGroup createSensorConnections(
+    private void createSensorConnections(
             NeuronGroup sourceGroup, NeuronGroup targetGroup, int[] sourceNodeIndices,
             double sparsity, int quadrant) {
 
@@ -238,11 +233,9 @@ public class EdgeOfChaos extends Simulation {
             xEnd = targetGroup.getMaxX();
         }
 
-        // Create a new SynapseGroup
-        SynapseGroup synapseGroup = new SynapseGroup(sourceGroup, targetGroup);
-
-        synapseGroup.removeAllSyapsesBlocking();
-
+        // Create synapses list first based on custom quadrant logic
+        List<Synapse> synapses = new ArrayList<>();
+        
         // Iterate over neurons in the target group
         List<Neuron> targetNeurons = targetGroup.getNeuronList();
         for (Neuron targetNeuron : targetNeurons) {
@@ -257,13 +250,12 @@ public class EdgeOfChaos extends Simulation {
                         Neuron sourceNeuron = sourceGroup.getNeuronList().get(sourceIndex);
                         Synapse synapse = new Synapse(sourceNeuron, targetNeuron);
                         synapse.setStrength(1.0); // Default strength
-                        synapseGroup.addSynapse(synapse);
+                        synapses.add(synapse);
                     }
                 }
             }
         }
-
-        return synapseGroup;
+        net.addNetworkModels(synapses);
     }
     private void buildOdorWorld() {
 

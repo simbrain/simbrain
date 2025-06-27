@@ -18,8 +18,7 @@
  */
 package org.simbrain.network.learningrules
 
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.*
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.EmptyScalarData
 import org.simbrain.util.UserParameter
@@ -53,5 +52,33 @@ class SubtractiveNormalizationRule : SynapseUpdateRule<EmptyScalarData, EmptyMat
         val output = synapse.target.activation
         val averageInput = synapse.target.averageInput
         synapse.strength += (learningRate * output * input) - (learningRate * output * averageInput)
+    }
+
+    context(Network)
+    override fun apply(connector: Connector, dataHolder: EmptyMatrixData) {
+        if (connector is WeightMatrix) {
+            val wm = connector.weights
+            val input = (connector.source as NeuronArray).activations
+            val output = (connector.target as NeuronArray).activations
+            
+            // Matrix-based Subtractive Normalization: simplified version
+            // Note: In matrix form, we compute a global average input rather than per-neuron averageInput
+            // since individual neuron properties are not accessible in matrix operations
+            
+            var totalInput = 0.0
+            for (i in 0 until input.nrow()) {
+                totalInput += input[i, 0]
+            }
+            val globalAverageInput = totalInput / input.nrow()
+            
+            for (i in 0 until wm.nrow()) {
+                val outputActivation = output[i, 0]
+                
+                for (j in 0 until wm.ncol()) {
+                    val inputActivation = input[j, 0]
+                    wm[i, j] += (learningRate * outputActivation * inputActivation) - (learningRate * outputActivation * globalAverageInput)
+                }
+            }
+        }
     }
 }

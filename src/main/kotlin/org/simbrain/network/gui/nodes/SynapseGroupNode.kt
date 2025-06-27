@@ -82,30 +82,22 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
         val events = synapseGroup.events
         events.labelChanged.on { _, _ -> updateText() }
         events.visibilityChanged.on(Dispatchers.Swing) { setVisibility() }
-        events.synapseAdded.on(dispatcher = Dispatchers.Swing) {
-            this@SynapseGroupNode.networkPanel.createNode(it)
-            refreshVisible()
-        }
         events.synapseRemoved.on(dispatcher = Dispatchers.Swing) {
-            refreshVisible()
+            setVisibility()
         }
         events.synapseListChanged.on(dispatcher = Dispatchers.Swing) {
             setVisibility()
-            refreshVisible()
         }
         setVisibility()
         interactionBox.invalidateFullBounds()
+
+        // call once to make sure all the actions are registered
+        interactionBox.contextMenu
     }
 
     private fun removeEverythingButInteractionBox() {
         removeChild(directedNode)
         removeChild(expandedNode)
-    }
-
-    private fun refreshVisible() {
-        removeChild(expandedNode)
-        expandedNode = null
-        setVisibility()
     }
 
     private fun updateInteractionBoxLocation() {

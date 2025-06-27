@@ -18,10 +18,10 @@
  */
 package org.simbrain.network.learningrules
 
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.*
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.EmptyScalarData
+import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.util.UserParameter
 
 /**
@@ -203,6 +203,52 @@ class PfisterGerstner2006Rule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixDa
 
         if (postSpiked) {
             synapse.strength = synapse.strength + r1 * (a2P + a3P * o2p)
+        }
+    }
+
+    // Note: This function has not been tested.
+    // Note: Matrix implementation requires managing trace matrices for each connection
+    // This is computationally intensive but doable for moderate sized networks
+    context(Network)
+    override fun apply(connector: Connector, dataHolder: EmptyMatrixData) {
+        val weightMatrix = connector as? WeightMatrix ?: return
+        val sourceNeuronArray = weightMatrix.source as? NeuronArray ?: return
+        val targetNeuronArray = weightMatrix.target as? NeuronArray ?: return
+        
+        // Ensure both neuron arrays have spiking data
+        val sourceSpikingData = sourceNeuronArray.dataHolder as? SpikingMatrixData ?: return
+        val targetSpikingData = targetNeuronArray.dataHolder as? SpikingMatrixData ?: return
+        
+        // For matrix implementation, we would need to maintain trace matrices
+        // This is a simplified version that applies the rule when spikes occur
+        // A full implementation would require additional MatrixDataHolder for traces
+        
+        val sourceSpikes = sourceSpikingData.spikes
+        val targetSpikes = targetSpikingData.spikes
+        
+        // Apply rule to each connection where spikes occur
+        for (i in 0 until weightMatrix.weights.nrow()) { // target neurons
+            for (j in 0 until weightMatrix.weights.ncol()) { // source neurons
+                val preSpiked = sourceSpikes[j]
+                val postSpiked = targetSpikes[i]
+                
+                if (preSpiked || postSpiked) {
+                    // This is a simplified implementation - full version would need trace management
+                    // For now, applying basic potentiation/depression based on spike timing
+                    val currentWeight = weightMatrix.weights[i, j]
+                    
+                    if (preSpiked && postSpiked) {
+                        // Both spiked - apply both LTP and LTD components
+                        weightMatrix.weights[i, j] = currentWeight + (a2P - a2N)
+                    } else if (preSpiked) {
+                        // Only pre-spiked - apply LTD
+                        weightMatrix.weights[i, j] = currentWeight - a2N
+                    } else if (postSpiked) {
+                        // Only post-spiked - apply LTP
+                        weightMatrix.weights[i, j] = currentWeight + a2P
+                    }
+                }
+            }
         }
     }
 

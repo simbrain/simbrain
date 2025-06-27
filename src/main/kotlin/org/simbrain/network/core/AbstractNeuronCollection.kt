@@ -90,7 +90,16 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
      * References to neurons in this collection
      */
     val neuronList: CopyOnWriteArrayList<Neuron> = CopyOnWriteArrayList()
-
+    
+    /**
+     * Set up listeners for all neurons in the list. Call this after deserialization.
+     */
+    fun setupNeuronListeners() {
+        neuronList.forEach { neuron ->
+            addListener(neuron)
+        }
+    }
+    
     /**
      * Space between neurons within a layer.
      */
@@ -246,7 +255,7 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
     /**
      * Add listener to indicated neuron.
      */
-    protected fun addListener(n: Neuron) {
+    internal fun addListener(n: Neuron) {
         n.events.locationChanged.on { events.locationChanged.fire() }
         n.events.deleted.on(wait = true) { neuron ->
             neuronList.remove(neuron)

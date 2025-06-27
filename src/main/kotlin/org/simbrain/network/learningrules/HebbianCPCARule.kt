@@ -18,8 +18,7 @@
  */
 package org.simbrain.network.learningrules
 
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.*
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.EmptyScalarData
 import org.simbrain.util.UserParameter
@@ -110,6 +109,30 @@ class HebbianCPCARule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>() {
         // strength = sigmoidal(strength);
         // strength = clip(strength + deltaW);
         synapse.strength = synapse.strength + deltaW
+    }
+
+    // Note: This function has not been tested.
+    context(Network)
+    override fun apply(connector: Connector, dataHolder: EmptyMatrixData) {
+        if (connector is WeightMatrix) {
+            val wm = connector.weights
+            val input = (connector.source as NeuronArray).activations
+            val output = (connector.target as NeuronArray).activations
+            
+            // Matrix-based Hebbian CPCA: vectorized version of the CPCA rule
+            // deltaW = learningRate * (output * input^T - output "broadcast multiplied by" weights)
+            val hebbTerm = output.mt(input)  // output * input^T
+            
+            // For the second term (output * strength), we need to multiply each row of weights by the corresponding output
+            for (i in 0 until wm.nrow()) {
+                val outputActivation = output[i, 0]
+                for (j in 0 until wm.ncol()) {
+                    val inputActivation = input[j, 0]
+                    val deltaW = learningRate * ((outputActivation * inputActivation) - (outputActivation * wm[i, j]))
+                    wm[i, j] += deltaW
+                }
+            }
+        }
     }
 
     /**

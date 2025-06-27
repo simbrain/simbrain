@@ -15,6 +15,8 @@ import smile.math.matrix.Matrix
 /**
  * Lightweight collection of synapses. Contains references to a source and target layer, a connection strategy, and a
  * list of synapses.
+ *
+ * Create new Synapse Groups by specifying a strategy or providing a list of synapses.
  */
 class SynapseGroup @JvmOverloads constructor(
     val source: AbstractNeuronCollection,
@@ -22,10 +24,6 @@ class SynapseGroup @JvmOverloads constructor(
     var connectionStrategy: ConnectionStrategy = AllToAll(),
     synapses: MutableList<Synapse> = connectionStrategy.connectNeurons(source.neuronList, target.neuronList).toMutableList()
 ) : NetworkModel(), AttributeContainer {
-
-    // TODO: When passing in synapses check all source are in source and all target are in target
-    // reuse this in addsynapse
-
 
     /**
      * Randomizer for all weights, regardless of polarity. Applying it can change the polarity of a weight.
@@ -37,7 +35,10 @@ class SynapseGroup @JvmOverloads constructor(
     @Transient
     override var events = SynapseGroupEvents()
 
-    var synapses: MutableList<Synapse> = synapses.onEach { synapse -> addSynapseListener(synapse) }
+    var synapses: MutableList<Synapse> = synapses.onEach { synapse ->
+        synapse.isVisible = false
+        addSynapseListener(synapse)
+    }
 
     /**
      * Flag for whether synapses should be displayed in a GUI representation of this object.
@@ -53,6 +54,16 @@ class SynapseGroup @JvmOverloads constructor(
         }
 
     init {
+        // Validate that all synapses have sources in source collection and targets in target collection
+        synapses.forEach { synapse ->
+            require(synapse.source in source.neuronList) { 
+                "Synapse source ${synapse.source.displayName} is not in source collection ${source.displayName}"
+            }
+            require(synapse.target in target.neuronList) { 
+                "Synapse target ${synapse.target.displayName} is not in target collection ${target.displayName}"
+            }
+        }
+        
         initializeSynapseVisibility()
         source.outgoingSg.add(this)
         target.incomingSgs.add(this)
@@ -68,12 +79,7 @@ class SynapseGroup @JvmOverloads constructor(
         displaySynapses = source.size * target.size <= threshold
     }
 
-    fun removeAllSyapsesBlocking() {
-        runBlocking {
-            removeAllSynapses()
-        }
-    }
-    suspend fun removeAllSynapses(): List<NetworkModel> {
+    private suspend fun removeAllSynapses(): List<NetworkModel> {
         return buildList {
             synapses.toList().forEach {  synapse ->
                 val deletedBySynapse = synapse.delete()
@@ -96,17 +102,18 @@ class SynapseGroup @JvmOverloads constructor(
         synapses.forEach { it.afterRestore() }
     }
 
-    fun addSynapse(syn: Synapse) {
+    private fun addSynapse(syn: Synapse) {
+        // Validate that synapse source and target are in the respective collections
+        require(syn.source in source.neuronList) { 
+            "Synapse source ${syn.source.displayName} is not in source collection ${source.displayName}"
+        }
+        require(syn.target in target.neuronList) { 
+            "Synapse target ${syn.target.displayName} is not in target collection ${target.displayName}"
+        }
+        
         syn.isVisible = displaySynapses
         addSynapseListener(syn)
         this.synapses.add(syn)
-        events.synapseAdded.fire(syn)
-    }
-
-    suspend fun removeSynapse(syn: Synapse) {
-        this.synapses.remove(syn)
-        syn.delete()
-        events.synapseRemoved.fire(syn)
     }
 
     fun isRecurrent(): Boolean {
@@ -158,14 +165,19 @@ class SynapseGroup @JvmOverloads constructor(
     }
 
     fun applyConnectionStrategy() {
-        removeAllSyapsesBlocking()
-        connectionStrategy.connectNeurons(
+        val newSynapses = connectionStrategy.connectNeurons(
             source.neuronList,
             target.neuronList
-        ).forEach {
-            addSynapse(it)
+        )
+        if (newSynapses.isNotEmpty()) {
+            runBlocking {
+                removeAllSynapses()
+            }
+            newSynapses.forEach {
+                addSynapse(it)
+            }
+            events.synapseListChanged.fire()
         }
-        events.synapseListChanged.fire()
     }
 
     fun getWeightMatrix(): Matrix {

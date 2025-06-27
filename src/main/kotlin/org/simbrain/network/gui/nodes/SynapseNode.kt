@@ -51,30 +51,14 @@ import kotlin.math.cos
 import kotlin.math.sin
 
 /**
- * **SynapseNode** is a Piccolo PNode corresponding to a Neuron in the neural
- * network model.
+ *  Piccolo representation of [Synapse]
  */
 class SynapseNode(
     net: NetworkPanel?,
-    /**
-     * Reference to source neuron.
-     */
     var source: NeuronNode,
-    /**
-     * Reference to target neuron.
-     */
     var target: NeuronNode,
-    /**
-     * The logical synapse this screen element represents.
-     */
     var synapse: Synapse
 ) : ScreenElement(net!!) {
-    /**
-     * @return Returns the synapse.
-     */
-    /**
-     * @param synapse The synapse to set.
-     */
 
     /**
      * Location of circle relative to target node.
@@ -82,13 +66,10 @@ class SynapseNode(
     private val offset = 7.0
 
     /**
-     * Main circle of synapse.
+     * Main circle of the synapse.
      */
     private var circle: PPath? = null
 
-    /**
-     * @return the line
-     */
     /**
      * Line connecting nodes. More of a loop for self connections.
      */
@@ -106,28 +87,6 @@ class SynapseNode(
     var arcBound: Arc2D.Float = Arc2D.Float()
         private set
 
-    /**
-     * @return Returns the source.
-     */
-    /**
-     * @param source The source to set.
-     */
-
-    /**
-     * @return Returns the target.
-     */
-    /**
-     * @param target The target to set.
-     */
-
-    /**
-     * Create a new synapse node connecting a source and target neuron.
-     *
-     * @param net     Reference to NetworkPanel
-     * @param source  source neuronnode
-     * @param target  target neuronmode
-     * @param synapse the model synapse this PNode represents
-     */
     init {
         updatePosition()
         this.addChild(circle)
@@ -165,9 +124,7 @@ class SynapseNode(
         source.neuron.events.spiked.on(dispatcher = Dispatchers.Swing) { updateSpikeColor() }
     }
 
-    /**
-     * Update position of synapse.
-     */
+
     fun updatePosition() {
         // Position the synapse
         val synapseCenter = if (isSelfConnection) {
@@ -211,9 +168,7 @@ class SynapseNode(
         }
     }
 
-    /**
-     * of a synapse based on whether it is clamped or not.
-     */
+
     fun updateClampStatus() {
         if (synapse.clamped) {
             circle!!.strokePaint = Color.black
@@ -223,18 +178,12 @@ class SynapseNode(
     }
 
     val isSelfConnection: Boolean
-        /**
-         * Whether this synapse connects a neuron to itself or not.
-         *
-         * @return true if this synapse connects a neuron to itself.
-         */
         get() = (source.neuron == target.neuron)
 
     /**
      * Create the line depending on whether this is self connected or not.
      *
      * @param center the center of the synapse
-     * @return the line
      */
     private fun createLine(center: Point2D): Float {
         return if (isSelfConnection) {
@@ -361,15 +310,9 @@ class SynapseNode(
     }
 
     override val isDraggable: Boolean
-        /**
-         * @return
-         * @see ScreenElement
-         */
         get() = false
 
-    /**
-     * @see ScreenElement
-     */
+
     protected fun hasToolTipText(): Boolean {
         return true
     }
@@ -378,29 +321,7 @@ class SynapseNode(
         get() = synapse.toolTipText.toString()
 
     override val contextMenu: JPopupMenu
-        get() = // JPopupMenu contextMenu = new JPopupMenu();
-        //
-        // contextMenu.add(new CutAction(getNetworkPanel()));
-        // contextMenu.add(new CopyAction(getNetworkPanel()));
-        // contextMenu.add(new PasteAction(getNetworkPanel()));
-        // contextMenu.addSeparator();
-        //
-        // contextMenu.add(new DeleteAction(getNetworkPanel()));
-        // contextMenu.addSeparator();
-        //
-        // contextMenu.add(getNetworkPanel().getActionManager().getNeuronCollectionAction());
-        // contextMenu.addSeparator();
-        //
-        // // Workspace workspace = getNetworkPanel().getWorkspace();
-        // // if (workspace.getGaugeList().size() > 0) {
-        // // contextMenu.add(workspace.getGaugeMenu(getNetworkPanel()));
-        // // contextMenu.addSeparator();
-        // // }
-        //
-        // contextMenu.add(new SetSynapsePropertiesAction(getNetworkPanel()));
-        //
-            // return contextMenu;
-            networkPanel.synapseContextMenu
+        get() = networkPanel.synapseContextMenu
 
     override fun createEditDialog(): StandardDialog? {
         return SynapseDialog.createSynapseDialog(networkPanel.selectionManager.filterSelectedModels<Synapse>())
@@ -408,11 +329,6 @@ class SynapseNode(
 
     override val propertyDialog: StandardDialog? get() = createEditDialog()
 
-    /**
-     * Returns String representation of this NeuronNode.
-     *
-     * @return String representation of this node.
-     */
     override fun toString(): String {
         var ret = ""
         ret += "SynapseNode: (" + this.globalFullBounds.x + ")(" + globalFullBounds.y + ")\n"
@@ -439,70 +355,16 @@ class SynapseNode(
          */
         private const val ZERO_PROXY = .001
 
-        /**
-         * @return the excitatoryColor
-         */
-        /**
-         * @param excitatoryColor the excitatoryColor to set
-         */
-        /**
-         * Color of "excitatory" synapses, with positive values.
-         */
         var excitatoryColor: Color = excitatorySynapseColor
 
-        /**
-         * @return the inhibitoryColor
-         */
-        /**
-         * @param inhibitoryColor the inhibitoryColor to set
-         */
-        /**
-         * Color of "inhibitory" synapses, with negative values.
-         */
         var inhibitoryColor: Color = inhibitorySynapseColor
 
-        /**
-         * @return the zeroWeightColor
-         */
-        /**
-         * @param zeroWeightColor the zeroWeightColor to set
-         */
-        /**
-         * Color of "zero" weights.
-         */
         var zeroWeightColor: Color = NetworkPreferences.zeroWeightColor
 
-        /**
-         * @return the maxDiameter
-         */
-        /**
-         * @param maxDiameter the maxDiameter to set
-         */
-        /**
-         * Maximum diameter of the circle representing the synapse.
-         */
         var maxDiameter: Int = maxWeightSize
 
-        /**
-         * @return the minDiameter
-         */
-        /**
-         * @param minDiameter the minDiameter to set
-         */
-        /**
-         * Minimum diameter of the circle representing the synapse.
-         */
         var minDiameter: Int = minWeightSize
 
-        /**
-         * @return the lineColor
-         */
-        /**
-         * @param lineColor the lineColor to set
-         */
-        /**
-         * Color of lines in synapse representation. Also used for node representation.
-         */
         var lineColor: Color = NetworkPreferences.lineColor
     }
 }

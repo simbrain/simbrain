@@ -19,7 +19,6 @@ class OjaTest {
     val na2 = NeuronArray(3)
     var wm12 = WeightMatrix(na1, na2)
 
-
     init {
         net.addNetworkModels(input, output, weight, na1, na2, wm12)
         weight.learningRule = OjaRule().apply {
@@ -132,6 +131,39 @@ class OjaTest {
         assertArrayEquals(doubleArrayOf(1.0, -1.0), wm12.weights.row(0))
         assertArrayEquals(doubleArrayOf(2.0, -2.0), wm12.weights.row(1))
         assertArrayEquals(doubleArrayOf(-1.0, 1.0), wm12.weights.row(2))
+    }
+
+    @Test
+    fun `weight norm converges to sqrt of normalization factor`() {
+        val inputSize = 5
+        val outputNeuron = Neuron().apply { clamped = true }
+        val inputs = (1..inputSize).map { Neuron().apply { clamped = true } }
+        val synapses = inputs.map { input ->
+            Synapse(input, outputNeuron).apply {
+                learningRule = OjaRule().apply {
+                    learningRate = 0.1
+                    normalizationFactor = 4.0
+                }
+                strength = Math.random() - 0.5
+                upperBound = 10.0
+                lowerBound = -10.0
+            }
+        }
+
+        val net = Network()
+        net.addNetworkModels(outputNeuron)
+        net.addNetworkModels(inputs)
+        net.addNetworkModels(synapses)
+
+        repeat(1000) {
+            inputs.forEach { it.activation = Math.random() - 0.5 }
+            val y = synapses.sumOf { it.source.activation * it.strength }
+            outputNeuron.activation = y
+            net.update()
+        }
+
+        val norm = Math.sqrt(synapses.sumOf { it.strength * it.strength })
+        assertEquals(2.0, norm, 0.1)  // sqrt(4.0) = 2.0
     }
 
 }

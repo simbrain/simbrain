@@ -722,17 +722,14 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     fun createSynapseGroupVisibilityAction() = networkPanel.createAction(
         name = "Toggle visibility of selected synapse groups",
         keyboardShortcut = CmdOrCtrl + 'T',
-        initBlock = {
-            isEnabled = networkPanel.selectionManager.filterSelectedModels<SynapseGroup>().isNotEmpty() &&
-                    networkPanel.selectionManager.filterSelectedModels<SynapseGroup>().none {
-                        it.synapses.size > NetworkPreferences.synapseVisibilityThreshold
-                    }
-        }
     ) {
-        val sgs = selectionManager.filterSelectedModels<SynapseGroup>()
-        sgs.forEach {
-            it.displaySynapses = !it.displaySynapses
+        val (groupsAboveThreshold, groupsBelowThreshold) = selectionManager.filterSelectedModels<SynapseGroup>().partition {
+            it.synapses.size > NetworkPreferences.synapseVisibilityThreshold
         }
+        if (groupsAboveThreshold.isNotEmpty()) {
+            showWarningDialog("Current visibility threshold: ${NetworkPreferences.synapseVisibilityThreshold}. \nCould not toggle visibility of:\n${groupsAboveThreshold.joinToString("\n") { "  ${it.displayName} (size: ${it.size()})" }}")
+        }
+        groupsBelowThreshold.forEach { it.displaySynapses = !it.displaySynapses }
     }
 
     /**

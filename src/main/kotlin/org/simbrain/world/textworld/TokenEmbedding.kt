@@ -3,7 +3,6 @@ package org.simbrain.world.textworld
 import org.simbrain.util.*
 import org.simbrain.util.projection.DataPoint
 import org.simbrain.util.projection.KDTree
-import org.simbrain.util.propertyeditor.AutoCopyObject
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.table.BasicDataFrame
@@ -113,7 +112,7 @@ class TokenEmbedding(
     }
 }
 
-sealed class EmbeddingType<T : CopyableObject>(): AutoCopyObject<T>() {
+sealed class EmbeddingType<T : CopyableObject>(): CopyableObject {
     
     @UserParameter(label = "Remove stopwords", order = 60 )
     var removeStopWords = false
@@ -130,6 +129,13 @@ sealed class EmbeddingType<T : CopyableObject>(): AutoCopyObject<T>() {
                 if (convertToLowerCase) it.map { it.lowercase() } else it
             }
             return TokenEmbedding(tokens, this, tokenizer, Matrix.eye(tokens.size), docString)
+        }
+
+        override fun copy(): OneHot {
+            return OneHot().also {
+                it.removeStopWords = this.removeStopWords
+                it.convertToLowerCase = this.convertToLowerCase
+            }
         }
     }
 
@@ -199,6 +205,17 @@ sealed class EmbeddingType<T : CopyableObject>(): AutoCopyObject<T>() {
 
             return TokenEmbedding(tokens, this, tokenizer,  cocMatrix.replaceNaN(0.0), docString)
         }
+
+        override fun copy(): CoOccurrence {
+            return CoOccurrence(
+                windowSize = this.windowSize,
+                bidirectional = this.bidirectional,
+                usePPMI = this.usePPMI
+            ).also {
+                it.removeStopWords = this.removeStopWords
+                it.convertToLowerCase = this.convertToLowerCase
+            }
+        }
     }
     
     class Custom: EmbeddingType<Custom>() {
@@ -207,6 +224,13 @@ sealed class EmbeddingType<T : CopyableObject>(): AutoCopyObject<T>() {
             docString: String
         ): TokenEmbedding {
             throw IllegalStateException("Custom embeddings must be manually loaded")
+        }
+
+        override fun copy(): Custom {
+            return Custom().also {
+                it.removeStopWords = this.removeStopWords
+                it.convertToLowerCase = this.convertToLowerCase
+            }
         }
     }
 

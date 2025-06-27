@@ -121,11 +121,6 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
     )
 
     /**
-     * Names for the time series.  Set via coupling events.
-     */
-    private val seriesNames = arrayOf<String>()
-
-    /**
      * List of time series objects which can be coupled to.
      */
     val timeSeriesList: MutableList<TimeSeries> = ArrayList()
@@ -145,8 +140,6 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
 
     /**
      * Create specified number of data sources.
-     *
-     * @param numSeries number of data sources to add to the plot.
      */
     fun addTimeSeries(numSeries: Int) {
         for (i in 0 until numSeries) {
@@ -154,9 +147,6 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
         }
     }
 
-    /**
-     * Clears the plot.
-     */
     fun clearData() {
         val seriesCount = dataset.seriesCount
         var i = 0

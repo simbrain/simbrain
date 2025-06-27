@@ -4,6 +4,7 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.gui.nodes.NeuronNode
+import org.simbrain.network.gui.nodes.SynapseNode
 import org.simbrain.util.widgets.ShowHelpAction
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.gui.CouplingMenu
@@ -251,6 +252,11 @@ val NetworkPanel.synapseContextMenu
             if (selectedSynapses.isNotEmpty()) {
                 addSeparator()
                 add(selectedSynapses.createCoupleWeightToTimeSeriesAction())
+            }
+            if (selectionManager.filterSelectedNodes<SynapseNode>().size == 1) {
+                val node = selectionManager.filterSelectedNodes<SynapseNode>()[0]
+                addSeparator()
+                add(CouplingMenu(networkComponent, node.synapse))
             }
             addSeparator()
             add(setSynapsePropertiesAction)

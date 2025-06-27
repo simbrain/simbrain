@@ -21,6 +21,8 @@ package org.simbrain.plot.raster
 import com.thoughtworks.xstream.XStream
 import org.jfree.data.xy.XYSeries
 import org.jfree.data.xy.XYSeriesCollection
+import org.simbrain.plot.RasterPlotEvents
+import org.simbrain.plot.TimeSeriesEvents
 import org.simbrain.util.UserParameter
 import org.simbrain.util.getSimbrainXStream
 import org.simbrain.util.propertyeditor.EditableObject
@@ -42,14 +44,8 @@ class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject {
     @Transient
     lateinit var timeSupplier: Supplier<Int>
 
-    /**
-     * Raster Data.
-     */
     val dataset: XYSeriesCollection = XYSeriesCollection()
 
-    /**
-     * List of [RasterConsumer]'s that consume raster data.
-     */
     @Transient
     val rasterConsumerList = dataset.series.mapIndexed { index, _ -> RasterConsumer(index) }.toMutableList()
 
@@ -58,24 +54,33 @@ class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject {
         description = "Size of dots in chart",
         order = 5)
     var dotSize: Int = 4
+        set(value) {
+            field = value
+            events.propertyChanged.fire()
+        }
 
     var windowSize: Int by GuiEditable(
         initValue = 100,
         label = "Window Size",
+        setter = {
+            field = it
+            events.propertyChanged.fire()
+        },
         description = "How many time points can be contained in the window",
         conditionallyEnabledBy = RasterModel::isFixedWidth,
         order = 10
     )
 
-    /**
-     * Whether this chart if fixed width or not.
-     */
     @UserParameter(
         label = "Fixed width",
         description = "If true, the raster window never extends beyond a fixed with",
         order = 30
     )
     var isFixedWidth: Boolean = true
+        set(value) {
+            field = value
+            events.propertyChanged.fire()
+        }
 
     @UserParameter(
         label = "Spike Threshold",
@@ -84,9 +89,10 @@ class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject {
     )
     var spikeThreshold: Double = 0.5
 
-    /**
-     * Raster series model constructor.
-     */
+    @Transient
+    var events = RasterPlotEvents()
+        private set
+
     init {
         addDataSources(INITIAL_DATA_SOURCES)
         if (timeSupplier != null) {
@@ -113,27 +119,29 @@ class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject {
         val lastSeriesIndex = dataset.seriesCount - 1
         if (lastSeriesIndex >= 0) {
             dataset.removeSeries(lastSeriesIndex)
-            rasterConsumerList.removeAt(lastSeriesIndex)
+            val rc = rasterConsumerList[lastSeriesIndex]
+            events.rasterConsumerRemoved.fire(rc)
+            rasterConsumerList.remove(rc)
         }
     }
 
-    /**
-     * Adds a data source to the chart.
-     */
+    val numDataSources get() = dataset.seriesCount
+
     @JvmOverloads
     fun addDataSource(name: String = (dataset.seriesCount + 1).toString()) {
         val currentSize = dataset.seriesCount
         dataset.addSeries(XYSeries(name))
-        rasterConsumerList.add(RasterConsumer(currentSize))
+        val rc = RasterConsumer(currentSize)
+        events.rasterConsumerAdded.fire(rc)
+        rasterConsumerList.add(rc)
     }
 
-    /**
-     * Clears the plot.
-     */
     fun clearData() {
         val seriesCount = dataset.seriesCount
         var i = 0
         while (seriesCount > i) {
+            val rc = rasterConsumerList[i]
+            events.rasterConsumerRemoved.fire(rc)
             dataset.getSeries(i).clear()
             ++i
         }
@@ -143,6 +151,7 @@ class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject {
      * See [org.simbrain.workspace.serialization.WorkspaceComponentDeserializer]
      */
     private fun readResolve(): Any {
+        events = RasterPlotEvents()
         return this
     }
 

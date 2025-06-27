@@ -10,7 +10,6 @@ import org.simbrain.network.core.activations
 import org.simbrain.network.core.labels
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.neurongroups.NeuronGroup
-import org.simbrain.network.neurongroups.NormalizationGroup
 import org.simbrain.util.place
 import org.simbrain.util.plus
 import org.simbrain.util.point
@@ -99,12 +98,19 @@ val spiveyNet = newSim {
     val mouse = world.addEntity(157, 271, EntityType.Hand).apply {
         heading = 90.0
     }
-    world.addEntity(38, 49, EntityType.Candle)
-    val targetObject = OdorWorldEntity(world, EntityType.Candy).apply {
+    val targetObject = world.addEntity(38, 49, EntityType.Candle)
+
+    val competitorObject = OdorWorldEntity(world, EntityType.Candy).apply {
         location = point(287, 44)
     }
-    world.addEntity(targetObject)
+    world.addEntity(competitorObject)
     mouse.isShowTrail = true
+
+    val eye = OdorWorldEntity(world, EntityType.Eye).apply {
+        location = point(145, 157)
+    }
+    world.addEntity(eye)
+    eye.isShowTrail = true
 
     fun List<Neuron>.normalize() {
         val total = activations.sum()
@@ -176,18 +182,67 @@ val spiveyNet = newSim {
         mouse.x += mouseNodes.neuronList[targetIndex].activation * -pix +
                 mouseNodes.neuronList[competitorIndex].activation * pix
 
+        val eyeTargetActivation = eyesNodes.neuronList[0].activation
+        val eyeCompetitorActivation = eyesNodes.neuronList.drop(1).sumOf { it.activation }
+
+        val delta = eyeTargetActivation - eyeCompetitorActivation
+
+        eye.location = if (delta > 0.01) {
+            targetObject.location
+        } else if (delta < -0.01){
+            competitorObject.location
+        } else {
+            eye.location
+        }
+
+
+
     }
 
     suspend fun resetExperiment() {
         timeIndex = 0
         mouse.location = point(157, 271)
+        eye.location = point(145, 157)
         networkComponent.network.clearActivations()
         withGui {
-            (getDesktopComponent(oc) as OdorWorldDesktopComponent)
-                .worldPanel
-                .getEntityNode(mouse)
-                .startTrailAtCurrentLocation()
+            (getDesktopComponent(oc) as OdorWorldDesktopComponent).worldPanel.apply {
+                getEntityNode(mouse).startTrailAtCurrentLocation()
+                getEntityNode(eye).startTrailAtCurrentLocation()
+            }
         }
+    }
+
+    suspend fun applyControlCondition() {
+        // Candle / Fork
+        conditionText = "Control Condition"
+        currentStatus.text = conditionText
+        targetIndex = 0
+        competitorObject.entityType = EntityType.Fork
+        competitorIndex = 3
+        resetExperiment()
+        visualNodes.setActivations(doubleArrayOf(1.0, 0.0, 0.0, 1.0))
+    }
+
+    suspend fun applyCohortCondition() {
+        // Target = Candle, Competitor = Candy
+        conditionText = "Cohort Condition"
+        currentStatus.text = conditionText
+        resetExperiment()
+        targetIndex = 0
+        competitorObject.entityType = EntityType.Candy
+        competitorIndex = 1
+        visualNodes.setActivations(doubleArrayOf(1.0, 1.0, 0.0, 0.0))
+    }
+
+    suspend fun applyRhymeCondition() {
+        // Candle / Handle
+        conditionText = "Rhyme Condition"
+        currentStatus.text = conditionText
+        targetIndex = 0
+        competitorObject.entityType = EntityType.Handle
+        competitorIndex = 2
+        resetExperiment()
+        visualNodes.setActivations(doubleArrayOf(1.0, 0.0, 1.0, 0.0))
     }
 
     withGui {
@@ -202,36 +257,17 @@ val spiveyNet = newSim {
 
         currentStatus.location = point(220, -240)
 
+        applyControlCondition()
+
         createControlPanel("Control Panel", 15, 15) {
             addButton("Control Condition") {
-                // Candle / Fork
-                conditionText = "Control Condition"
-                currentStatus.text = conditionText
-                targetIndex = 0
-                targetObject.entityType = EntityType.Fork
-                competitorIndex = 3
-                resetExperiment()
-                visualNodes.setActivations(doubleArrayOf(1.0, 0.0, 0.0, 1.0))
+                applyControlCondition()
             }
             addButton("Cohort Condition") {
-                // Target = Candle, Competitor = Candy
-                conditionText = "Cohort Condition"
-                currentStatus.text = conditionText
-                resetExperiment()
-                targetIndex = 0
-                targetObject.entityType = EntityType.Candy
-                competitorIndex = 1
-                visualNodes.setActivations(doubleArrayOf(1.0, 1.0, 0.0, 0.0))
+                applyCohortCondition()
             }
             addButton("Rhyme Condition") {
-                // Candle / Handle
-                conditionText = "Rhyme Condition"
-                currentStatus.text = conditionText
-                targetIndex = 0
-                targetObject.entityType = EntityType.Handle
-                competitorIndex = 2
-                resetExperiment()
-                visualNodes.setActivations(doubleArrayOf(1.0, 0.0, 1.0, 0.0))
+                applyRhymeCondition()
             }
             addCheckBox("Use feedback", useFeedback) {
                 useFeedback = it
@@ -240,6 +276,7 @@ val spiveyNet = newSim {
             }
             addButton("Iterate") {
                 mouse.drawTrailWithoutRunningWorkspace = true
+                eye.drawTrailWithoutRunningWorkspace = true
                 when (timeIndex) {
                     0 -> {
                         lexicalNodes.setActivations(doubleArrayOf(1.0, 1.0, 0.0, 0.0))
@@ -279,6 +316,7 @@ val spiveyNet = newSim {
                 resetExperiment()
                 net.flatNeuronList.forEach { n -> n.clear() }
                 mouse.clearTrail()
+                eye.clearTrail()
             }
         }
     }

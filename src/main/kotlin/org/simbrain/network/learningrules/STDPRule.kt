@@ -18,76 +18,75 @@
  */
 package org.simbrain.network.learningrules
 
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.*
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.EmptyScalarData
+import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.util.UserParameter
 import kotlin.math.exp
-import kotlin.math.sign
 
 /**
- * **STDPSynapse** models spike time dependent plasticity.
+ * Models spike time dependent plasticity STDP.
  *
+ * Assumes source and target neurons are spiking neurons.
  *
- * Only works if source and target neurons are spiking neurons.
+ * See [StdpSim.kt] for more information about the rule.
  *
+ * Sources: Jean-Philippe Thivierge and Paul Cisek (2008), Nonperiodic Synchronization in Heterogeneous Networks of  Spiking Neurons
+ * and the Scholarpedia article on STDP.
  *
- * Drew on: Jean-Philippe Thivierge and Paul Cisek (2008), Journal of
- * Neuroscience. Nonperiodic Synchronization in Heterogeneous Networks of
- * Spiking Neurons. Also drew on the Scholarpedia article.
+ * Also on anti-hebbian stdp: https://journals.physiology.org/doi/pdf/10.1152/jn.00551.2006
  */
 open class STDPRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData> {
-    // TODO: check description
-    /**
-     * Time constant for LTD.
-     */
-    @UserParameter(label = "Tau minus", description = "Time constant " + "for LTD.", increment = .1, order = 0)
-    var tau_minus: Double = 60.0
 
-    /**
-     * Time constant for LTP.
-     */
-    @UserParameter(label = "Tau plus", description = "Time constant " + "for LTP.", increment = .1, order = 1)
-    var tau_plus: Double = 30.0
+    @UserParameter(
+        label = "Tau plus",
+        description = "Time constant for LTP (weight strengthening when pre fires before post. Smaller values narrow the window within which LTP is applied.",
+        increment = .1,
+        order = 10)
+    var tauPlus: Double = 30.0
 
-    /**
-     * Learning rate for LTP case. Controls magnitude of LTP changes.
-     */
+    // Often wider than tau plus in the literature
+    @UserParameter(
+        label = "Tau minus",
+        description = "Time constant for LTD (weight decay when post fires before pre). Smaller values narrow the window within which LTD is applied.",
+        increment = .1,
+        minimumValue = 0.0,
+        order = 20)
+    var tauMinus: Double = 60.0
+
     @UserParameter(
         label = "W+",
-        description = "Learning rate for " + "LTP case. Controls magnitude of LTP changes.",
+        description = "Learning rate for LTP case. Controls the magnitude of LTP changes.",
         increment = .1,
-        order = 2
+        minimumValue = 0.0,
+        order = 30
     )
-    open var w_plus: Double = 10.0
+    open var wPlus: Double = 10.0
 
-    /**
-     * Learning rate for LTP case. Controls magnitude of LTD changes.
-     */
     @UserParameter(
         label = "W-",
-        description = "Learning rate for " + "LTP case. Controls magnitude of LTD changes.",
+        description = "Learning rate for LTD. Controls magnitude of LTD changes",
         increment = .1,
-        order = 3
+        minimumValue = 0.0,
+        order = 40
     )
-    open var w_minus: Double = 10.0
+    open var wMinus: Double = 10.0
 
-    /**
-     * General learning rate.
-     */
-    @UserParameter(label = "Learning rate", description = "General learning " + "rate.", increment = .1, order = 4)
+    @UserParameter(
+        label = "Learning rate",
+        description = "Global learning rate",
+        increment = .1,
+        minimumValue = 0.0,
+        order = 50)
     var learningRate: Double = 0.01
 
-    /**
-     * Sets whether or not STDP acts directly on W or dW/dt
-     */
     @UserParameter(
-        label = "Smooth STDP",
-        description = "Whether STDP acts directly on weight or on its derivative instead",
-        order = 5
+        label = "Hebbian",
+        description = "If true, use hebbian learning, else anti-hebbian",
+        order = 60
     )
-    var isContinuous: Boolean = false
+    var isHebbian: Boolean = true
 
     override fun init(synapse: Synapse) {
     }
@@ -97,11 +96,6 @@ open class STDPRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData> {
 
     constructor()
 
-    constructor(toCpy: STDPRule) : this(
-        toCpy.w_plus, toCpy.w_minus, toCpy.tau_plus,
-        toCpy.tau_minus, toCpy.learningRate, toCpy.isContinuous
-    )
-
     constructor(
         w_plus: Double,
         w_minus: Double,
@@ -110,57 +104,86 @@ open class STDPRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData> {
         learningRate: Double,
         continuous: Boolean
     ) {
-        this.w_plus = w_plus
-        this.w_minus = w_minus
-        this.tau_plus = tau_plus
-        this.tau_minus = tau_minus
+        this.wPlus = w_plus
+        this.wMinus = w_minus
+        this.tauPlus = tau_plus
+        this.tauMinus = tau_minus
         this.learningRate = learningRate
-        this.isContinuous = continuous
     }
 
     override fun copy(): SynapseUpdateRule<*, *> {
         val duplicateSynapse = STDPRule()
-        duplicateSynapse.tau_minus = tau_minus
-        duplicateSynapse.tau_plus = tau_plus
-        duplicateSynapse.w_minus = w_minus
-        duplicateSynapse.w_plus = w_plus
+        duplicateSynapse.tauMinus = tauMinus
+        duplicateSynapse.tauPlus = tauPlus
+        duplicateSynapse.wMinus = wMinus
+        duplicateSynapse.wPlus = wPlus
         duplicateSynapse.learningRate = learningRate
         duplicateSynapse.isHebbian = isHebbian
         return duplicateSynapse
     }
 
-    var isHebbian: Boolean = true
-
-    open var delta_w: Double = 0.0
+    open var deltaW: Double = 0.0
 
     context(Network)
     override fun apply(synapse: Synapse, data: EmptyScalarData) {
-        val strength = synapse.strength
         if (synapse.source.isSpike || synapse.target.isSpike) {
-            try {
-                val delta_t = ((synapse.source.lastSpikeTime
-                        - synapse.target.lastSpikeTime)
-                        * (if (isHebbian) 1 else -1))
-                if (delta_t < 0) {
-                    delta_w = w_plus * exp(delta_t / tau_plus) * learningRate
-                } else if (delta_t > 0) {
-                    delta_w = -w_minus * exp(-delta_t / tau_minus) * learningRate
-                }
-            } catch (cce: ClassCastException) {
-                cce.printStackTrace()
-                println("Don't use non-spiking neurons with STDP!")
+            val deltaT = ((synapse.source.lastSpikeTime
+                    - synapse.target.lastSpikeTime)
+                    * (if (isHebbian) 1 else -1))
+            if (deltaT < 0) {
+                // LTP Case
+                deltaW = wPlus * exp(deltaT / tauPlus) * learningRate
+            } else if (deltaT > 0) {
+                // LTD Case
+                deltaW = -wMinus * exp(-deltaT / tauMinus) * learningRate
             }
-            if (!isContinuous && sign(strength) == -1.0) {
-                synapse.strength = strength - delta_w * timeStep
-            } else {
-                synapse.strength = strength + delta_w * timeStep
-            }
+
+            synapse.strength +=  deltaW * timeStep
         }
 
-        if (isContinuous && sign(strength) == -1.0) {
-            synapse.strength = strength - delta_w * timeStep
-        } else {
-            synapse.strength = strength + delta_w * timeStep
+    }
+
+    context(Network)
+    override fun apply(connector: Connector, dataHolder: EmptyMatrixData) {
+        val weightMatrix = connector as? WeightMatrix ?: return
+        val sourceNeuronArray = weightMatrix.source as? NeuronArray ?: return
+        val targetNeuronArray = weightMatrix.target as? NeuronArray ?: return
+        
+        // Ensure both neuron arrays have spiking data
+        val sourceSpikingData = sourceNeuronArray.dataHolder as? SpikingMatrixData ?: return
+        val targetSpikingData = targetNeuronArray.dataHolder as? SpikingMatrixData ?: return
+        
+        // Only apply if either source or target neurons have spiked
+        val hasSourceSpikes = sourceSpikingData.spikes.any { it }
+        val hasTargetSpikes = targetSpikingData.spikes.any { it }
+        
+        if (hasSourceSpikes || hasTargetSpikes) {
+            // Get spike times
+            val sourceSpikeTimes = sourceSpikingData.lastSpikeTimes
+            val targetSpikeTimes = targetSpikingData.lastSpikeTimes
+            
+            // Apply STDP rule to each connection
+            for (i in 0 until weightMatrix.weights.nrow()) { // target neurons
+                for (j in 0 until weightMatrix.weights.ncol()) { // source neurons
+                    // Only update if at least one neuron has spiked
+                    if (sourceSpikingData.spikes[j] || targetSpikingData.spikes[i]) {
+                        val deltaT = ((sourceSpikeTimes[j] - targetSpikeTimes[i]) 
+                                * (if (isHebbian) 1 else -1))
+                        
+                        val deltaW = if (deltaT < 0) {
+                            // LTP Case
+                            wPlus * exp(deltaT / tauPlus) * learningRate
+                        } else if (deltaT > 0) {
+                            // LTD Case
+                            -wMinus * exp(-deltaT / tauMinus) * learningRate
+                        } else {
+                            0.0
+                        }
+                        
+                        weightMatrix.weights[i, j] += deltaW * timeStep
+                    }
+                }
+            }
         }
     }
 }

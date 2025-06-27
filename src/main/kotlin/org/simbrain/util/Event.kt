@@ -331,7 +331,7 @@ open class Events(val timeout: Duration = 5.seconds): CoroutineScope {
 
         @Suppress("UNCHECKED_CAST")
 
-        fun on(dispatcher: CoroutineDispatcher? = null, wait: Boolean = false, handler: (new: T, old: T) -> Unit) = onSuspendHelper(dispatcher, wait) {
+        fun on(dispatcher: CoroutineDispatcher? = null, wait: Boolean = false, handler: suspend (new: T, old: T) -> Unit) = onSuspendHelper(dispatcher, wait) {
                 new, old -> handler(new as T, old as T)
         }
 

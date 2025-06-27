@@ -124,8 +124,10 @@ val objectTrackingSim = newSim {
     rightTurnNeuron.location = point(573, 323)
     val resToLeftTurn = SynapseGroup(reservoir, leftTurnCollection, sparse)
     network.addNetworkModel(resToLeftTurn)?.await()
+    resToLeftTurn.displaySynapses = false
     val resToRightTurn = SynapseGroup(reservoir, rightTurnCollection, sparse)
     network.addNetworkModel(resToRightTurn)?.await()
+    resToRightTurn.displaySynapses = false
 
     // Location of the network in the desktop
     withGui {

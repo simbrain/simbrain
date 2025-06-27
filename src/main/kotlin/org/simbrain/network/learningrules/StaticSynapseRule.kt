@@ -18,6 +18,7 @@
  */
 package org.simbrain.network.learningrules
 
+import org.simbrain.network.core.Connector
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.util.EmptyMatrixData
@@ -44,6 +45,12 @@ open class StaticSynapseRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixDat
         // if (clipped) {
         // super.setStrength(Synapse(synapse.getStrength()));
         // }
+    }
+
+    context(Network)
+    override fun apply(connector: Connector, dataHolder: EmptyMatrixData) {
+        // Static synapse rule does nothing for both scalar and matrix versions
+        // Weights remain unchanged
     }
 
     override val name: String

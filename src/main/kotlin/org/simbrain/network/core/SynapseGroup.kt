@@ -1,8 +1,8 @@
 package org.simbrain.network.core
 
-import kotlinx.coroutines.runBlocking
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.ConnectionStrategy
+import org.simbrain.network.connections.Sparse
 import org.simbrain.network.events.SynapseGroupEvents
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.SynapseNode
@@ -164,20 +164,20 @@ class SynapseGroup @JvmOverloads constructor(
         return ("$displayName  with ${size()} synapse(s) from ${source.displayName} to ${target.displayName}")
     }
 
-    fun applyConnectionStrategy() {
+    suspend fun applyConnectionStrategy() {
+        val existingSynapses = synapses.toList()
         val newSynapses = connectionStrategy.connectNeurons(
             source.neuronList,
             target.neuronList
         )
-        if (newSynapses.isNotEmpty()) {
-            runBlocking {
-                removeAllSynapses()
-            }
-            newSynapses.forEach {
-                addSynapse(it)
-            }
-            events.synapseListChanged.fire()
+        // Can’t let number of synapses get to 0, because this triggers deletion of the synapse group.
+        newSynapses.forEach {
+            addSynapse(it)
         }
+        if (connectionStrategy !is Sparse) {
+            existingSynapses.toList().forEach { it.delete() }
+        }
+        events.synapseListChanged.fire()
     }
 
     fun getWeightMatrix(): Matrix {

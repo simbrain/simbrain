@@ -410,16 +410,12 @@ class DetailTrianglePanel @JvmOverloads constructor(
 
 }
 
-fun <C: JComponent> C.createApplyPanel(commitAction: C.() -> Unit): JPanel {
+fun <C: JComponent> C.createApplyPanel(commitAction: suspend C.() -> Unit): JPanel {
     val component = this
     return JPanel().apply {
         layout = BorderLayout()
         add(component)
-        JButton("Apply").apply {
-            addActionListener {
-                commitAction()
-            }
-        }.also { applyButton ->
+        JButton(createAction("Apply") { commitAction() }).also { applyButton ->
             add(JPanel(FlowLayout(FlowLayout.RIGHT)).also { it.add(applyButton) }, BorderLayout.SOUTH)
         }
     }

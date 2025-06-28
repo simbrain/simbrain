@@ -1,5 +1,6 @@
 package org.simbrain.network.core
 
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -56,7 +57,7 @@ class SynapseGroupTestKt {
         val sg = SynapseGroup(sourceGroup, targetGroup)
         val originalSize = sg.size()
         sg.synapses.forEach { it.strength = 0.99 }
-        sg.applyConnectionStrategy()
+        runBlocking { sg.applyConnectionStrategy() }
         assertEquals(originalSize, sg.size())
         assertTrue(sg.synapses.none { it.strength == 0.99 }) // We expect new synapses
     }
@@ -141,5 +142,90 @@ class SynapseGroupTestKt {
     }
 
 
+    @Test
+    fun `sparse connection strategy increasing and decreasing density works properly`() = runBlocking {
+        // Create a larger source and target group for meaningful sparse connections
+        val largeSourceGroup = NeuronGroup(List(10) { Neuron() }.also { network.addNetworkModels(it) })
+            .apply { network.addNetworkModel(this) }
+        val largeTargetGroup = NeuronGroup(List(10) { Neuron() }.also { network.addNetworkModels(it) })
+            .apply { network.addNetworkModel(this) }
+
+        // Start with 10% density
+        val sparse = Sparse().apply {
+            connectionDensity = 0.1
+            allowSelfConnection = true
+        }
+        val sg = SynapseGroup(largeSourceGroup, largeTargetGroup, sparse)
+        network.addNetworkModel(sg)
+
+        // Initial connections should be 10% of 10x10 = 10 synapses
+        assertEquals(10, sg.size())
+        val originalSynapses = sg.synapses.toList()
+
+        // Increase density to 20% and apply connection strategy
+        sparse.connectionDensity = 0.2
+        sg.applyConnectionStrategy()
+
+        // Should now have 20 synapses total, with original 10 still present
+        assertEquals(20, sg.size())
+        assertTrue(originalSynapses.all { original ->
+            sg.synapses.any { current ->
+                current.source == original.source && current.target == original.target
+            }
+        })
+
+        val synapses20Percent = sg.synapses.toList()
+
+        // Decrease density to 5% and apply connection strategy
+        sparse.connectionDensity = 0.05
+        sg.applyConnectionStrategy()
+
+        // Should now have 5 synapses total, all from the previous set
+        assertEquals(5, sg.size())
+        assertTrue(sg.synapses.all { current ->
+            synapses20Percent.any { previous ->
+                current.source == previous.source && current.target == previous.target
+            }
+        })
+    }
+
+    @Test
+    fun `sparse synapse group produces same pattern as loose neurons with same seed`() = runBlocking {
+        // Create neurons for loose connection test
+        val looseSourceNeurons = List(5) { Neuron() }.also { network.addNetworkModels(it) }
+        val looseTargetNeurons = List(5) { Neuron() }.also { network.addNetworkModels(it) }
+
+        // Create neuron groups for synapse group test
+        val sourceGroup = NeuronGroup(List(5) { Neuron() }.also { network.addNetworkModels(it) })
+            .apply { network.addNetworkModel(this) }
+        val targetGroup = NeuronGroup(List(5) { Neuron() }.also { network.addNetworkModels(it) })
+            .apply { network.addNetworkModel(this) }
+
+        // Use same seed for both approaches
+        val seed = 42L
+        val sparse1 = Sparse(seed = seed, connectionDensity = 0.4, allowSelfConnection = true)
+        val sparse2 = Sparse(seed = seed, connectionDensity = 0.4, allowSelfConnection = true)
+
+        // Create connections using loose neurons
+        val looseSynapses = sparse1.connectNeurons(looseSourceNeurons, looseTargetNeurons)
+
+        // Create synapse group with same strategy
+        val sg = SynapseGroup(sourceGroup, targetGroup, sparse2)
+        network.addNetworkModel(sg)
+
+        // Both should produce the same number of synapses
+        assertEquals(looseSynapses.size, sg.size())
+
+        // The connection patterns should be equivalent when mapped by neuron index
+        val looseConnections = looseSynapses.map {
+            looseSourceNeurons.indexOf(it.source) to looseTargetNeurons.indexOf(it.target)
+        }.toSet()
+
+        val groupConnections = sg.synapses.map {
+            sourceGroup.neuronList.indexOf(it.source) to targetGroup.neuronList.indexOf(it.target)
+        }.toSet()
+
+        assertEquals(looseConnections, groupConnections)
+    }
 
 }

@@ -348,7 +348,29 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         }
         createNodes(synapseGroup.synapses)
         synapseGroup.events.synapseListChanged.on {
-            createNodes(synapseGroup.synapses)
+            // Clean up orphaned SynapseNodes that belong to this SynapseGroup but no longer have valid synapses
+            val currentSynapses = synapseGroup.synapses.toList() // Snapshot to avoid concurrent modification
+            val allSynapseNodes = filterScreenElements<SynapseNode>()
+            val orphanedNodes = allSynapseNodes.filter { synapseNode ->
+                // Only consider SynapseNodes whose synapses were originally from this SynapseGroup
+                // and check if the synapse is still valid in the network
+                val synapse = synapseNode.synapse
+                val sourceNeuron = synapse.source
+                val targetNeuron = synapse.target
+                
+                // Check if this synapse belongs to this SynapseGroup's neurons
+                val belongsToThisGroup = (sourceNeuron in synapseGroup.source.neuronList && 
+                                         targetNeuron in synapseGroup.target.neuronList)
+                
+                // If it belongs to this group, check if it's still a valid connection
+                belongsToThisGroup && !currentSynapses.contains(synapse)
+            }
+            orphanedNodes.forEach { orphanedNode ->
+                canvas.layer.removeChild(orphanedNode)
+                modelNodeMap.remove(orphanedNode.model)
+            }
+            // Create nodes for current synapses 
+            createNodes(currentSynapses)
         }
         SynapseGroupNode(this, synapseGroup)
     }
@@ -740,7 +762,11 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
                 val nodes = modelsUniq.map {
                     modelNodeMap.getImmediately<ScreenElement>(it)
                 }
-                withContext(Swing) { canvas.layer.removeChildren(nodes) }
+                withContext(Swing) {
+                    nodes.forEach {
+                        canvas.layer.removeChild(it)
+                    }
+                }
                 modelsUniq.forEach { modelNodeMap.remove(it) }
             }
             updateActionsChanged.on(Dispatchers.Swing) { timeLabel.update() }

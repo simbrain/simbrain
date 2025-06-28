@@ -4,7 +4,8 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.simbrain.network.connections.*
+import org.simbrain.network.connections.AllToAll
+import org.simbrain.network.connections.Sparse
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 import smile.math.matrix.Matrix
@@ -131,7 +132,8 @@ class SynapseGroupTestKt {
         sg.connectionStrategy = Sparse().apply {
             connectionDensity = .5
         }
-        sg.applyConnectionStrategy()
+
+        runBlocking { sg.applyConnectionStrategy() }
 
         // Synapse group still exists
         assertTrue(network.getModels<SynapseGroup>().contains(sg))

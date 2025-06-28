@@ -83,9 +83,6 @@ public class LifeCycle {
         this.bites = bites;
     }
 
-    /**
-     * @return the parent
-     */
     public OdorWorldEntity getParent() {
         return parent;
     }
@@ -97,9 +94,6 @@ public class LifeCycle {
         bites++;
     }
 
-    /**
-     * @return the isDead
-     */
     public boolean isDead() {
         return isDead;
     }

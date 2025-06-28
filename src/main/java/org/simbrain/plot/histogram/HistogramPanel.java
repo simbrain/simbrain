@@ -290,27 +290,14 @@ public class HistogramPanel extends JPanel {
         }
     }
 
-    /**
-     * Return reference to underlying data.
-     *
-     * @return the data
-     */
     public HistogramModel getModel() {
         return model;
     }
 
-    /**
-     * Returns default number of datasets.
-     *
-     * @return default num datasets.
-     */
     public static int getDefaultNumDatasets() {
         return DEFAULT_NUM_DATASETS;
     }
 
-    /**
-     * @return the xAxisName
-     */
     public String getxAxisName() {
         return xAxisName;
     }
@@ -322,9 +309,6 @@ public class HistogramPanel extends JPanel {
         this.xAxisName = xAxisName;
     }
 
-    /**
-     * @return the yAxisName
-     */
     public String getyAxisName() {
         return yAxisName;
     }

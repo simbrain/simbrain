@@ -25,12 +25,6 @@ public class OdorWorldDesktopComponent extends DesktopComponent<OdorWorldCompone
      */
     private OdorWorldFrameMenu menu;
 
-    /**
-     * Default constructor.
-     *
-     * @param frame
-     * @param component
-     */
     public OdorWorldDesktopComponent(GenericFrame frame, OdorWorldComponent component) {
         super(frame, component);
         setLayout(new BorderLayout());

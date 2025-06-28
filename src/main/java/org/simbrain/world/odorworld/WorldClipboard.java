@@ -15,10 +15,8 @@ public final class WorldClipboard {
      */
     private static OdorWorldEntity clipboardEntity;
 
-    /**
-     * Default constructor.
-     */
-    private WorldClipboard() {
+    public WorldClipboard() {
+        super();
     }
 
     /**

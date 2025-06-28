@@ -56,19 +56,13 @@ public class PlotActionManager {
      * @return the open/save plot actions.
      */
     public List<Action> getOpenSavePlotActions() {
-        return Arrays.asList(new Action[]{openPlotAction, savePlotAction});
+        return Arrays.asList(openPlotAction, savePlotAction);
     }
 
-    /**
-     * @return the openPlotAction
-     */
     public Action getOpenPlotAction() {
         return openPlotAction;
     }
 
-    /**
-     * @return the savePlotAction
-     */
     public Action getSavePlotAction() {
         return savePlotAction;
     }

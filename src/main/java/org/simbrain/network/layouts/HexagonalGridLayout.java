@@ -84,10 +84,8 @@ public class HexagonalGridLayout extends Layout {
         this.numColumns = numColumns;
     }
 
-    /**
-     * Default Constructor.
-     */
     public HexagonalGridLayout() {
+        super();
     }
 
     @Override

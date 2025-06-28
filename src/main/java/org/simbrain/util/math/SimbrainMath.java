@@ -199,7 +199,6 @@ public class SimbrainMath {
      * The soft-max of the vector.
      *
      * @param vec the vector to soft-max
-     * @return
      */
     public static double[] softMax(double[] vec) {
         double expSum = exp_sum(vec);
@@ -515,9 +514,6 @@ public class SimbrainMath {
      * Returns the maximum value of an array of numbers. Warning: comparisons
      * are done using the numbers' double values and they are
      * compared/stored/returned as doubles.
-     *
-     * @param arr
-     * @return
      */
     public static double getMaximum(final Number[] arr) {
         double max = Double.NEGATIVE_INFINITY;
@@ -529,14 +525,6 @@ public class SimbrainMath {
         return max;
     }
 
-    /**
-     * Returns the minimum value of an array of numbers. Warning: comparisons
-     * are done using the numbers' double values and they are
-     * compared/stored/returned as doubles.
-     *
-     * @param arr
-     * @return
-     */
     /**
      * Returns the minimum value of an array of numbers.
      */
@@ -552,8 +540,6 @@ public class SimbrainMath {
 
     /**
      * Normalize between minimum and maximium value of vectors.
-     * @param vec
-     * @return
      */
     public static double[] minMaxNormalize(double[] vec) {
         double min = getMinimum(vec);
@@ -649,7 +635,6 @@ public class SimbrainMath {
      * Returns the Euclidean norm of the supplied vector.
      *
      * @param vector vector to check
-     * @return the norm
      */
     public static double getVectorNorm(double[] vector) {
         double ret = 0;
@@ -702,7 +687,6 @@ public class SimbrainMath {
      *
      * @param src source vector
      * @param tar target vector
-     * @return the mse
      * @throws IllegalArgumentException if src and tar have different lengths
      */
     public static double getMeanSquaredError(final double[] src,

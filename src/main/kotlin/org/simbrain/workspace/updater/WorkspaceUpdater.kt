@@ -182,12 +182,6 @@ class WorkspaceUpdater(val workspace: Workspace) {
         Logger.trace("done: $time")
     }
 
-    /**
-     * Constructor for the updater that uses the default controller and default
-     * number of threads.
-     *
-     * @param workspace The parent workspace.
-     */
     init {
         // A single thread updates the workspace
         // A single thread to fire notification events

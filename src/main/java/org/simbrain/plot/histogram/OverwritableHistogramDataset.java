@@ -411,11 +411,6 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset impl
         }
     }
 
-    /**
-     * Returns the set of colored data series.
-     *
-     * @return the data
-     */
     public Collection<ColoredDataSeries> getDataSeries() {
         return dataMap.values();
     }

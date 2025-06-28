@@ -43,11 +43,6 @@ public class HistogramComponent extends WorkspaceComponent {
     }
 
 
-    /**
-     * Returns model.
-     *
-     * @return the model.
-     */
     public HistogramModel getModel() {
         return model;
     }

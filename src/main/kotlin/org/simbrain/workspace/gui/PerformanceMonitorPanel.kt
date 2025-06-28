@@ -31,11 +31,6 @@ class PerformanceMonitorPanel(private val workspace: Workspace) : JPanel(BorderL
 
     private val threadActions: MutableMap<String, ThreadAction> = TreeMap()
 
-    /**
-     * Constructor for viewer panel.
-     *
-     * @param workspace reference to parent workspace.
-     */
     init {
         contentPanel.layout = BoxLayout(contentPanel, BoxLayout.X_AXIS)
         val timersList = JList<String>()

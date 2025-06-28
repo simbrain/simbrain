@@ -169,10 +169,6 @@ class LogSTDPRule : STDPRule() {
         }
     }
 
-    /**
-     * @param s
-     * @return
-     */
     private fun calcW_plusTerm(s: Synapse): Double {
         wPlus = wPlus * exp(-abs(s.strength) / (smallWtThreshold * ltpMod))
         return wPlus
@@ -185,10 +181,6 @@ class LogSTDPRule : STDPRule() {
         return wPlus * exp(-abs(weight) / (smallWtThreshold * ltpMod))
     }
 
-    /**
-     * @param s
-     * @return
-     */
     private fun calcW_minusTerm(s: Synapse): Double {
         val wt = abs(s.strength)
         if (wt <= smallWtThreshold) {

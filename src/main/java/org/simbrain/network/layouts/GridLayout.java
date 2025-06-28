@@ -74,10 +74,8 @@ public class GridLayout extends Layout {
         order = 20)
     private int numColumns = DEFAULT_NUM_COLUMNS;
 
-    /**
-     * Default constructor.
-     */
     public GridLayout() {
+        super();
     }
 
     /**

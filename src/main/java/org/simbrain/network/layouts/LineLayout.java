@@ -96,10 +96,8 @@ public class LineLayout extends Layout {
         this.orientation = orientation;
     }
 
-    /**
-     * Default Constructor.
-     */
     public LineLayout() {
+        super();
     }
 
     @Override
@@ -134,9 +132,6 @@ public class LineLayout extends Layout {
         return "Line";
     }
 
-    /**
-     * @return the orientation
-     */
     @NotNull
     public LineOrientation getOrientation() {
         return orientation;
@@ -150,9 +145,6 @@ public class LineLayout extends Layout {
         // System.out.println("LineLayout orientation: " + this.orientation);
     }
 
-    /**
-     * @return the spacing
-     */
     public double getSpacing() {
         return spacing;
     }

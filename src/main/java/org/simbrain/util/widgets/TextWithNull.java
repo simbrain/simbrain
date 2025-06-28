@@ -21,9 +21,6 @@ public class TextWithNull extends JTextField {
      */
     boolean isNull = false;
 
-    /**
-     * Default constructor.
-     */
     public TextWithNull() {
         super();
 

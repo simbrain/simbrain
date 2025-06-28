@@ -21,11 +21,8 @@ public class ImageWorldComponent extends WorkspaceComponent {
     /**
      * The image world this component displays.
      */
-    private ImageWorld world;
+    private final ImageWorld world;
 
-    /**
-     * Default constructor.
-     */
     public ImageWorldComponent() {
         super("");
         this.world = new ImageWorld();

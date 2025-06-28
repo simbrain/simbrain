@@ -22,9 +22,6 @@ public class ChoicesWithNull extends JComboBox {
     private boolean hasNull = false;
 
 
-    /**
-     * Default constructor.
-     */
     public ChoicesWithNull() {
         super();
         setRenderer(new TitleCaseRenderer());

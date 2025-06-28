@@ -25,9 +25,6 @@ public class YesNoNull extends ChoicesWithNull {
      */
     private static final int NULL = 2;
 
-    /**
-     * Default constructor.
-     */
     public YesNoNull() {
         super();
         addItem("Yes");

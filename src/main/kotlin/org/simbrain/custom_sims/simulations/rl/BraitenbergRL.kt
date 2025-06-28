@@ -22,9 +22,6 @@ import javax.swing.JButton
  */
 val braitenbergRL = newSim {
 
-    // TODO:
-    //   Experiment with use of noise
-
     var learningRate = 0.01
     var gamma = 0.9
 
@@ -39,40 +36,35 @@ val braitenbergRL = newSim {
     world.isObjectsBlockMovement = true
     oc.world.isUseCameraCentering = false
 
-    oc.world.addEntity(398, 335, EntityType.Poison)
-    oc.world.addEntity(500, 184, EntityType.Swiss)
+    val poison = oc.world.addEntity(398, 335, EntityType.Poison)
+    val cheese = oc.world.addEntity(500, 184, EntityType.Swiss)
 
     // Returns a (reward, penalty) pair
     fun calculateReward(
         agent: OdorWorldEntity,
-        lastDistanceToPoison: Double,
     ): Pair<Double, Double> {
-        val cheese = world.entityList.find { it.entityType == EntityType.Swiss } ?: return Pair(0.0, 0.0)
-        val poison = world.entityList.find { it.entityType == EntityType.Poison }
 
         var cheeseComponent = 0.0
         var poisonComponent = 0.0
 
         // Cheese Proximity Reward
-        if (cheese != null) {
-            val distanceToCheese = agent.location.distance(cheese.location)
-            cheeseComponent += when {
-                distanceToCheese < 50 -> 10.0
-                distanceToCheese < 100 -> 5.0
-                distanceToCheese < 200 -> 1.0
-                else -> 0.0
-            }
+        val distanceToCheese = agent.location.distance(cheese.location)
+        cheeseComponent += when {
+            distanceToCheese < 50 -> 10.0
+            distanceToCheese < 100 -> 5.0
+            distanceToCheese < 200 -> 1.0
+            else -> 0.0
         }
 
+
         // Poison Proximity penalty
-        if (poison != null) {
-            val distanceToPoison = agent.location.distance(poison.location)
-            poisonComponent += when {
-                distanceToPoison < 30 -> -10.0
-                distanceToPoison < 60 -> -5.0
-                distanceToPoison < 100 -> -2.0
-                else -> 0.0
-            }
+        val distanceToPoison = agent.location.distance(poison.location)
+        poisonComponent += when {
+            distanceToPoison < 30 -> -10.0
+            distanceToPoison < 60 -> -5.0
+            distanceToPoison < 100 -> -2.0
+            else -> 0.0
+
 
             // reward for escaping
             //if (distanceToPoison > lastDistanceToPoison) {
@@ -178,14 +170,14 @@ val braitenbergRL = newSim {
         lowerBound = -100.0
     }
 
-    val (plot, rewardSeries, valueSeries, tdErrorSeries) = addTimeSeries(
-        "Reward, Value, TD Error",
-        seriesNames = listOf("Reward", "Value", "TD Error")
-    )
+    //val (plot, rewardSeries, valueSeries, tdErrorSeries) = addTimeSeries(
+    //    "Reward, Value, TD Error",
+    //    seriesNames = listOf("Reward", "Value", "TD Error")
+    //)
 
-    couplingManager.createCoupling(rewardNeuron, rewardSeries)
-    couplingManager.createCoupling(valueNeuron, valueSeries)
-    couplingManager.createCoupling(tdErrorNeuron, tdErrorSeries)
+    //couplingManager.createCoupling(rewardNeuron, rewardSeries)
+    //couplingManager.createCoupling(valueNeuron, valueSeries)
+    //couplingManager.createCoupling(tdErrorNeuron, tdErrorSeries)
 
     // All weights
     val cheeseLeftToLeftTurn = network.addSynapse(cheeseLeftInput, leftTurn)
@@ -230,12 +222,12 @@ val braitenbergRL = newSim {
     network.freeSynapses.forEach { s -> s.strength = 0.0 }
 
     // Start off with aversion to poison (otherwise it has no reason to turn away)
-    poisonRightToLeftTurn.strength = 2.0
-    poisonLeftToRightTurn.strength = 2.0
-    poisonLeftToStraight.strength = 1.0
-    poisonRightToStraightRight.strength = 1.0
-    cheeseLeftToLeftTurn.strength = 2.0
-    cheeseRightToRightTurn.strength = 2.0
+    //poisonRightToLeftTurn.strength = 2.0
+    //poisonLeftToRightTurn.strength = 2.0
+    //poisonLeftToStraight.strength = 1.0
+    //poisonRightToStraightRight.strength = 1.0
+    //cheeseLeftToLeftTurn.strength = 2.0
+    //cheeseRightToRightTurn.strength = 2.0
 
     fun resetVehicle() {
         agent.location = Point2D.Double((50..150).random().toDouble(), (350..450).random().toDouble())
@@ -256,41 +248,37 @@ val braitenbergRL = newSim {
 
     fun applyLearning(button: JButton) {
         button.isEnabled = false
+        val random = java.util.Random()
         workspace.launch {
             try {
                 for (trial in 1..numTrials) {
                     trialStep = 0
                     resetVehicle()
                     resetObjects()
-                    var lastDistanceToPoison = Double.POSITIVE_INFINITY
 
                     val actorSynapses = listOf(
-                            cheeseLeftToLeftTurn,
-                            cheeseLeftToRightTurn,
-                            cheeseLeftToStraight,
-                            cheeseRightToLeftTurn,
-                            cheeseRightToRightTurn,
-                            cheeseRightToStraight,
-                            poisonLeftToLeftTurn,
-                            poisonLeftToRightTurn,
-                            poisonLeftToStraight,
-                            poisonRightToLeftTurn,
-                            poisonRightToRightTurn,
-                            poisonRightToStraightRight
-                        )
+                        cheeseLeftToLeftTurn,
+                        cheeseLeftToRightTurn,
+                        cheeseLeftToStraight,
+                        cheeseRightToLeftTurn,
+                        cheeseRightToRightTurn,
+                        cheeseRightToStraight,
+                        poisonLeftToLeftTurn,
+                        poisonLeftToRightTurn,
+                        poisonLeftToStraight,
+                        poisonRightToLeftTurn,
+                        poisonRightToRightTurn,
+                        poisonRightToStraightRight
+                    )
 
                     while (trialStep++ < maxStepsPerTrial && !stopRequested) {
                         workspace.iterateSuspend(1)
 
                         // Add noise to turn neurons
-                        val random = java.util.Random()
                         leftTurn.activation += random.nextGaussian() * 0.2
                         rightTurn.activation += random.nextGaussian() * 0.2
 
-                        val cheese = world.entityList.find { it.entityType == EntityType.Swiss } ?: continue
-                        val distanceToCheese = agent.location.distance(cheese.location)
-
-                        val (cheeseR, poisonR) = calculateReward(agent, lastDistanceToPoison)
+                        val (cheeseR, poisonR) = calculateReward(agent)
 
                         cheeseReward.activation = cheeseR
                         poisonPenalty.activation = poisonR
@@ -325,21 +313,21 @@ val braitenbergRL = newSim {
                             synToOpposing.strength -= learningRate * tdError * inputActivation * synToOpposing.target.activation * 0.5
                         }
 
-                        // Synaptic Competition: Normalize incoming weights per turn neuron
-                        val turnFanIns = listOf(leftTurn, rightTurn).map { turnNeuron ->
-                            turnNeuron to turnNeuron.fanIn.filter { it in actorSynapses }
-                        }
-
-                        turnFanIns.forEach { (turnNeuron, fanIns) ->
-                            val totalStrength = fanIns.sumOf { kotlin.math.abs(it.strength) }
-                            if (totalStrength > 1e-6) {  // avoid divide-by-zero
-                                fanIns.forEach { syn ->
-                                    syn.strength /= totalStrength
-                                    // Optional: rescale to keep total input strength around 1.0 or 2.0
-                                    syn.strength *= 2.0
-                                }
-                            }
-                        }
+                        //// Synaptic Competition: Normalize incoming weights per turn neuron
+                        //val turnFanIns = listOf(leftTurn, rightTurn).map { turnNeuron ->
+                        //    turnNeuron to turnNeuron.fanIn.filter { it in actorSynapses }
+                        //}
+                        //
+                        //turnFanIns.forEach { (turnNeuron, fanIns) ->
+                        //    val totalStrength = fanIns.sumOf { kotlin.math.abs(it.strength) }
+                        //    if (totalStrength > 1e-6) {  // avoid divide-by-zero
+                        //        fanIns.forEach { syn ->
+                        //            syn.strength /= totalStrength
+                        //            // Optional: rescale to keep total input strength around 1.0 or 2.0
+                        //            syn.strength *= 2.0
+                        //        }
+                        //    }
+                        //}
 
                         // Clamp weights to prevent runaway
                         actorSynapses.forEach { syn ->
@@ -349,9 +337,6 @@ val braitenbergRL = newSim {
                         // Update Aux Values 
                         valueInputs.forEach { it.auxValue = it.activation }
                         valueNeuron.auxValue = valueNeuron.activation
-                        lastDistanceToPoison = agent.location.distance(
-                            world.entityList.find { it.entityType == EntityType.Poison }?.location ?: agent.location
-                        )
                     }
 
                     if (stopRequested) break
@@ -366,7 +351,7 @@ val braitenbergRL = newSim {
     withGui {
         place(networkComponent, 53, 282, 359, 327)
         place(oc, 462, 19, 600, 600)
-        place(plot, 1080, 0, 500, 500)
+        //place(plot, 1080, 0, 500, 500)
         oc.getDesktopComponentAs<OdorWorldDesktopComponent>().fitWorldToFrameSize()
 
         // Add control panel for RL parameters

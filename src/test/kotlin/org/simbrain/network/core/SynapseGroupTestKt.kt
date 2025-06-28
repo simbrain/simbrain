@@ -3,7 +3,7 @@ package org.simbrain.network.core
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.simbrain.network.connections.AllToAll
+import org.simbrain.network.connections.*
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 import smile.math.matrix.Matrix
@@ -17,6 +17,7 @@ class SynapseGroupTestKt {
     lateinit var sourceGroup: NeuronGroup
     lateinit var targetGroup: NeuronGroup
 
+    // One source node, two target nodes
     @BeforeEach
     fun setup() {
         network = Network()
@@ -118,6 +119,26 @@ class SynapseGroupTestKt {
         }
     }
 
+    @Test
+    fun `changing connection strategy retains synapse group and applies new strategy`() {
+        // Start with the default AllToAll‐built group
+        val sg = SynapseGroup(sourceGroup, targetGroup)
+
+        // All to all makes 2 synapses
+        assertEquals(2, sg.size())
+
+        sg.connectionStrategy = Sparse().apply {
+            connectionDensity = .5
+        }
+        sg.applyConnectionStrategy()
+
+        // Synapse group still exists
+        assertTrue(network.getModels<SynapseGroup>().contains(sg))
+
+        // Sparse at 50% should make 1 synapse
+        assertEquals(1, sg.size())
+
+    }
 
 
 

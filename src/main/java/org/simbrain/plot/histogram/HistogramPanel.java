@@ -1,21 +1,3 @@
-/*
- * Part of Simbrain--a java-based neural network kit
- * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 package org.simbrain.plot.histogram;
 
 import org.jfree.chart.ChartFactory;
@@ -63,7 +45,7 @@ public class HistogramPanel extends JPanel {
     /**
      * The preferred dimensions of the histogram.
      */
-    private Dimension dimPref = new Dimension(DEFAULT_PREF_WIDTH, DEFAULT_PREF_HEIGHT);
+    private final Dimension dimPref = new Dimension(DEFAULT_PREF_WIDTH, DEFAULT_PREF_HEIGHT);
 
     /**
      * The grid width of this panel, for use by possible parent panels.
@@ -94,9 +76,7 @@ public class HistogramPanel extends JPanel {
 
     public static Color[] getDefault_Pallet() {
         Color[] pallet = new Color[DEFAULT_PALLET.length];
-        for (int i = 0; i < DEFAULT_PALLET.length; i++) {
-            pallet[i] = DEFAULT_PALLET[i];
-        }
+        System.arraycopy(DEFAULT_PALLET, 0, pallet, 0, DEFAULT_PALLET.length);
         return pallet;
     }
 
@@ -133,7 +113,7 @@ public class HistogramPanel extends JPanel {
     /**
      * The color pallet, initialized to the default number of data sets.
      */
-    private Color[] colorPallet = Arrays.copyOf(DEFAULT_PALLET, DEFAULT_NUM_DATASETS);
+    private final Color[] colorPallet = Arrays.copyOf(DEFAULT_PALLET, DEFAULT_NUM_DATASETS);
 
     /**
      * The main panel supporting the histogram chart.
@@ -158,22 +138,22 @@ public class HistogramPanel extends JPanel {
     /**
      * The title of the histogram.
      */
-    private String title = "";
+    private final String title = "";
 
     /**
      * A button for updating the histogram for different numbers of bins.
      */
-    private JButton binButton = new JButton("Set bins");
+    private final JButton binButton = new JButton("Set bins");
 
     /**
      * Number of bins label.
      */
-    private JLabel numBinLabel = new JLabel("# of Bins: ");
+    private final JLabel numBinLabel = new JLabel("# of Bins: ");
 
     /**
      * A text field for specifying the number of bins.
      */
-    private JTextField numBins = new JTextField(6);
+    private final JTextField numBins = new JTextField(6);
 
     /**
      * Reference to the histogram data.

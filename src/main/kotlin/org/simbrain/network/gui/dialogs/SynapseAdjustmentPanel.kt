@@ -1,21 +1,3 @@
-/*
- * Part of Simbrain--a java-based neural network kit
- * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 package org.simbrain.network.gui.dialogs
 
 import org.simbrain.network.connections.RadialProbabilistic
@@ -509,7 +491,7 @@ class SynapseAdjustmentPanel(
     /**
      * Panel for scaling synapses.
      */
-    inner class SynapseScalerPanel() : LabelledItemPanel() {
+    inner class SynapseScalerPanel : LabelledItemPanel() {
         /**
          * Percentage to increase or decrease indicated synapses.
          */
@@ -548,7 +530,7 @@ class SynapseAdjustmentPanel(
      * Panel for pruning synapses. If synapse strength above absolute value of the threshold,
      * prune the synapse when the prune button is pressed.
      */
-    inner class PrunerPanel() : LabelledItemPanel() {
+    inner class PrunerPanel : LabelledItemPanel() {
 
         private val tfThreshold = JTextField(".1")
 
@@ -626,7 +608,7 @@ fun createSynapseAdjustmentPanel(
         JOptionPane.showMessageDialog(
             null, "No synapses to display", "Warning",
             JOptionPane.WARNING_MESSAGE
-        );
+        )
         return null
     }
     return sap

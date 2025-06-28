@@ -1,21 +1,3 @@
-/*
- * Part of Simbrain--a java-based neural network kit
- * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 package org.simbrain.network.gui.nodes;
 
 import org.piccolo2d.PCamera;
@@ -44,7 +26,7 @@ public abstract class InteractionBox extends ScreenElement {
     /**
      * Text label.
      */
-    private PText textLabel;
+    private final PText textLabel;
 
     /**
      * This is the largest amount an interaction box's scale can be zoomed when the scale gets small. Easiest to
@@ -60,7 +42,7 @@ public abstract class InteractionBox extends ScreenElement {
     /**
      * Rectangle that displays the box.
      */
-    private Rectangle2D rect = new Rectangle2D.Float(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    private final Rectangle2D rect = new Rectangle2D.Float(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT);
 
     /**
      * Create a new tab node.

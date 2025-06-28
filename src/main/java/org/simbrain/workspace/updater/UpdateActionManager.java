@@ -1,21 +1,3 @@
-/*
- * Part of Simbrain--a java-based neural network kit
- * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 package org.simbrain.workspace.updater;
 
 import org.simbrain.workspace.WorkspaceComponent;
@@ -50,19 +32,19 @@ public class UpdateActionManager {
          *
          * @param action The action that was added.
          */
-        public void actionAdded(UpdateAction action);
+        void actionAdded(UpdateAction action);
 
         /**
          * Called whenever an action is removed from the update action manager.
          *
          * @param action The action that was removed.
          */
-        public void actionRemoved(UpdateAction action);
+        void actionRemoved(UpdateAction action);
 
         /**
          * Called whenever the order of update actions is changed.
          */
-        public void actionOrderChanged();
+        void actionOrderChanged();
     }
 
     /**
@@ -90,13 +72,13 @@ public class UpdateActionManager {
      * Keep track of relations between coupling and coupling actions so they can
      * be cleaned up.
      */
-    private HashMap<Coupling, UpdateCoupling> couplingActionMap = new HashMap<>();
+    private final HashMap<Coupling, UpdateCoupling> couplingActionMap = new HashMap<>();
 
     /**
      * Keep track of relations between component and component actions so they
      * can be cleaned up.
      */
-    private HashMap<WorkspaceComponent, UpdateComponent> componentActionMap = new HashMap<>();
+    private final HashMap<WorkspaceComponent, UpdateComponent> componentActionMap = new HashMap<>();
 
     /**
      * Construct a new update manager.

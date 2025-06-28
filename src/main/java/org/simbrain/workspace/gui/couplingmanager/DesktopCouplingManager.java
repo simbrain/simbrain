@@ -1,21 +1,3 @@
-/*
- * Part of Simbrain--a java-based neural network kit
- * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 package org.simbrain.workspace.gui.couplingmanager;
 
 import kotlin.Pair;
@@ -47,27 +29,27 @@ public class DesktopCouplingManager extends JPanel {
     /**
      * List of producers.
      */
-    private AttributePanel producerPanel;
+    private final AttributePanel producerPanel;
 
     /**
      * List of consumers.
      */
-    private AttributePanel consumerPanel;
+    private final AttributePanel consumerPanel;
 
     /**
      * Methods for making couplings.
      */
-    private String[] tempStrings = {"One to One", "One to Many"};
+    private final String[] tempStrings = {"One to One", "One to Many"};
 
     /**
      * Methods for making couplings.
      */
-    private JComboBox<String> couplingMethodComboBox = new JComboBox<String>(tempStrings);
+    private final JComboBox<String> couplingMethodComboBox = new JComboBox<String>(tempStrings);
 
     /**
      * Reference to desktop.
      */
-    private SimbrainDesktop desktop;
+    private final SimbrainDesktop desktop;
 
     /**
      * Creates and displays the coupling manager.

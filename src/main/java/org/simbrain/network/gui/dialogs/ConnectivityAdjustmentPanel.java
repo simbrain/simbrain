@@ -1,21 +1,3 @@
-/*
- * Part of Simbrain--a java-based neural network kit
- * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 package org.simbrain.network.gui.dialogs;
 
 import org.simbrain.network.connections.Sparse;
@@ -43,12 +25,12 @@ public class ConnectivityAdjustmentPanel extends JPanel {
     /**
      * A slider for setting the sparsity of the connections.
      */
-    private JSlider sparsitySlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 10);
+    private final JSlider sparsitySlider = new JSlider(JSlider.HORIZONTAL, 0, 100, 10);
 
     /**
      * A text field for setting the sparsity of the connections.
      */
-    private JFormattedTextField sparsity = new JFormattedTextField(NumberFormat.getNumberInstance());
+    private final JFormattedTextField sparsity = new JFormattedTextField(NumberFormat.getNumberInstance());
 
     /**
      * The number of target neurons.
@@ -63,7 +45,7 @@ public class ConnectivityAdjustmentPanel extends JPanel {
      */
     private boolean userFlag = true;
 
-    private Sparse connection;
+    private final Sparse connection;
 
     public ConnectivityAdjustmentPanel(final Sparse connection, final NetworkPanel networkPanel) {
         this.connection = connection;
@@ -208,7 +190,7 @@ public class ConnectivityAdjustmentPanel extends JPanel {
             sparsity.setValue(.01);
 
         } else {
-            sparsity.setValue(((Sparse) connection).getConnectionDensity());
+            sparsity.setValue(connection.getConnectionDensity());
         }
     }
 

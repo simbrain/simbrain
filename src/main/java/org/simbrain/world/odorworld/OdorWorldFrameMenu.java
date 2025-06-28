@@ -1,21 +1,3 @@
-/*
- * Part of Simbrain--a java-based neural network kit
- * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 package org.simbrain.world.odorworld;
 
 import org.simbrain.util.SFileChooser;
@@ -41,43 +23,43 @@ public class OdorWorldFrameMenu extends JMenuBar {
     /**
      * Parent frame.
      */
-    private OdorWorldDesktopComponent parent;
+    private final OdorWorldDesktopComponent parent;
 
-    private OdorWorldActions odorWorldActions;
+    private final OdorWorldActions odorWorldActions;
 
     /**
      * File menu.
      */
-    private JMenu fileMenu = new JMenu("File  ");
+    private final JMenu fileMenu = new JMenu("File  ");
 
     /**
      * Edit menu.
      */
-    private JMenu editMenu = new JMenu("Edit  ");
+    private final JMenu editMenu = new JMenu("Edit  ");
 
     /**
      * Copy menu item.
      */
-    private JMenuItem copyItem = new JMenuItem("Copy");
+    private final JMenuItem copyItem = new JMenuItem("Copy");
 
     /**
      * Cut menu item.
      */
-    private JMenuItem cutItem = new JMenuItem("Cut");
+    private final JMenuItem cutItem = new JMenuItem("Cut");
 
     /**
      * Paste menu item.
      */
-    private JMenuItem pasteItem = new JMenuItem("Paste");
+    private final JMenuItem pasteItem = new JMenuItem("Paste");
     /**
      * Help menu.
      */
-    private JMenu helpMenu = new JMenu("Help");
+    private final JMenu helpMenu = new JMenu("Help");
 
     /**
      * Help menu item.
      */
-    private JMenuItem helpItem = new JMenuItem("World Help");
+    private final JMenuItem helpItem = new JMenuItem("World Help");
 
     /**
      * Reference to odor world.

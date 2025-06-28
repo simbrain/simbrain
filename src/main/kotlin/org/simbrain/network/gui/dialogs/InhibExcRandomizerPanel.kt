@@ -1,21 +1,3 @@
-/*
- * Part of Simbrain--a java-based neural network kit
- * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 package org.simbrain.network.gui.dialogs
 
 import org.simbrain.network.connections.ConnectionStrategy
@@ -54,12 +36,12 @@ class InhibExcRandomizerPanel(var synapses: List<Synapse>) : JPanel() {
     /**
      * The randomizer for excitatory synapses.
      */
-    var exRandomizer: ProbabilityDistribution = NormalDistribution();
+    var exRandomizer: ProbabilityDistribution = NormalDistribution()
 
     /**
      * The randomizer for inhibitory synapses.
      */
-    var inRandomizer: ProbabilityDistribution = NormalDistribution();
+    var inRandomizer: ProbabilityDistribution = NormalDistribution()
 
     init {
 
@@ -171,7 +153,7 @@ class EditableRandomizerPanel : JPanel {
         layout = GridBagLayout()
         // val colorBorder = BorderFactory.createLineBorder(if (Polarity.EXCITATORY == polarity) Color.red else Color.blue)
         // this.setBorder(BorderFactory.createTitledBorder(colorBorder, polarity?.title()));
-        this.setBorder(BorderFactory.createLineBorder(Color.gray));
+        this.setBorder(BorderFactory.createLineBorder(Color.gray))
         val gbc = GridBagConstraints()
         gbc.anchor = GridBagConstraints.NORTHWEST
         gbc.fill = GridBagConstraints.BOTH
@@ -204,7 +186,7 @@ class EditableRandomizerPanel : JPanel {
         val bottomPanel = JPanel(FlowLayout(FlowLayout.RIGHT))
         bottomPanel.add(applyButton)
         bottomPanel.preferredSize =
-            Dimension(randomizerPanel!!.preferredSize.width, bottomPanel.preferredSize.height)
+            Dimension(randomizerPanel.preferredSize.width, bottomPanel.preferredSize.height)
         this.add(bottomPanel, gbc)
         // }
     }
@@ -217,7 +199,7 @@ class EditableRandomizerPanel : JPanel {
     fun initListeners() {
         applyButton.addActionListener {
             if (enableStatusTriangle.isDown) {
-                randomizerPanel!!.commitChanges()
+                randomizerPanel.commitChanges()
                 // if (Polarity.EXCITATORY == polarity) {
                 //     if (synapseGroup != null) {
                 //         synapseGroup.setExcitatoryRandomizer(randomizer.probDist)
@@ -237,7 +219,7 @@ class EditableRandomizerPanel : JPanel {
         }
         enableStatusTriangle.addMouseListener(object : MouseListener {
             override fun mouseClicked(arg0: MouseEvent) {
-                randomizerPanel!!.isVisible = enableStatusTriangle.isDown
+                randomizerPanel.isVisible = enableStatusTriangle.isDown
                 repaint()
                 // parent.pack()
             }
@@ -286,7 +268,7 @@ fun createInhibExcPanel(synapses: List<Synapse>): InhibExcRandomizerPanel? {
         JOptionPane.showMessageDialog(
             null, "No synapses to display", "Warning",
             JOptionPane.WARNING_MESSAGE
-        );
+        )
         return null
     }
     return panel

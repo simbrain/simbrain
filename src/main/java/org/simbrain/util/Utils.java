@@ -1,21 +1,3 @@
-/*
- * Part of Simbrain--a java-based neural network kit
- * Copyright (C) 2005,2007 The Authors.  See http://www.simbrain.net/credits
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 package org.simbrain.util;
 
 import com.Ostermiller.util.CSVParser;
@@ -133,7 +115,7 @@ public class Utils {
         try {
             f = new FileOutputStream(theFile);
         } catch (Exception e) {
-            System.out.println("Could not open file stream: " + e.toString());
+            System.out.println("Could not open file stream: " + e);
         }
 
         if (f == null) {
@@ -167,7 +149,7 @@ public class Utils {
         String relativePath = absolutePath.substring(totalLength - diff);
         relativePath = relativePath.replaceAll("/./", "/");
         relativePath.replace('/', System.getProperty("file.separator").charAt(0)); // For window machines..
-        relativePath = new String("." + relativePath);
+        relativePath = "." + relativePath;
 
         return relativePath;
     }
@@ -295,10 +277,10 @@ public class Utils {
         String retString = "";
 
         for (int i = 0; i < (theVec.length - 1); i++) {
-            retString = retString.concat("" + round(theVec[i], precision) + delimiter);
+            retString = retString.concat(round(theVec[i], precision) + delimiter);
         }
         // Don't use the delimeter for the last component.
-        retString = retString.concat("" + round(theVec[theVec.length - 1], precision));
+        retString = retString.concat(round(theVec[theVec.length - 1], precision));
 
         return retString;
     }
@@ -558,7 +540,7 @@ public class Utils {
      * @return the formatted string
      */
     public static String doubleMatrixToString(double[][] matrix) {
-        StringBuilder strBuilder = new StringBuilder("");
+        StringBuilder strBuilder = new StringBuilder();
         for (int i = 0; i < matrix.length; i++) {
             for (int j = 0; j < matrix[i].length; j++) {
                 strBuilder.append(Utils.round(matrix[i][j], 2) + " ");
@@ -857,12 +839,10 @@ public class Utils {
      * @param toFlatten matrix to flatten
      * @return flattened matrix
      */
-    public static double[] flatten(double toFlatten[][]) {
+    public static double[] flatten(double[][] toFlatten) {
         double[] newArray = new double[toFlatten.length * toFlatten[0].length ];
         for (int i = 0; i < toFlatten.length; i++) {
-            for (int j = 0; j < toFlatten[0].length; j++) {
-                newArray[i * toFlatten[0].length + j] = toFlatten[i][j];
-            }
+            System.arraycopy(toFlatten[i], 0, newArray, i * toFlatten[0].length + 0, toFlatten[0].length);
         }
         return newArray;
     }

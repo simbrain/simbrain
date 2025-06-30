@@ -39,7 +39,7 @@ public class EdgeOfChaos extends Simulation {
     int NUM_NEURONS = 120;
     static int GRID_SPACE = 25;
     //  For 120 neurons: .01,.1, and > .4
-    private double variance = .1;
+    private double variance = 1.4;
     private final int K = 4; // in-degree (num connections to each neuron)
 
     private final long seed = 42L;
@@ -57,12 +57,12 @@ public class EdgeOfChaos extends Simulation {
         sim.getWorkspace().clearWorkspace();
 
         // Build network
-        NetworkComponent nc = sim.addNetwork(0, 0, 593, 620, "Edge of Chaos");
+        NetworkComponent nc = sim.addNetwork(0, 0, 590, 675, "Edge of Chaos");
         net = nc.getNetwork();
         buildNetwork();
 
         // Projection plot
-        ProjectionComponent pc = sim.addProjectionPlot(592, 248, 413, 372, "PCA");
+        ProjectionComponent pc = sim.addProjectionPlot(590, 312, 422, 363, "PCA");
         pc.getProjector().setColoringManager(new DecayColoringManager());
         sim.couple(reservoir, pc);
 
@@ -81,7 +81,7 @@ public class EdgeOfChaos extends Simulation {
         This simulation models how an agent visually represents an object that exists in an environment (i.e., in the odor world) using a reservoir network. In the odor world, there are 
         two different groups of objects: flowers and cheeses. There are three different "species" in each group that will be utilized to interact with the agent. In principle,
         the objects in each group have similar representations with one another due to similarities in their structure. The object groups (i.e., cheese or flower) are
-        projected to different locations in the state space if the reservoir is not in a chaotic state. To visualize this, the objects are moved on top of the agent where they are
+        projected to different locations in the state space if the reservoir is not in a chaotic state. To visualize this, the agent is moved towards the objects where their states are
         represented in a PCA plot as points. The PCA plot tracks the agent's representation of the objects using a decaying color scheme. It uses the [coloring manager](https://docs.simbrain.net/docs/plots/projectionPlot.html#coloring-manager) 
         to make the states of the reservoir more red if they are closer to the real-time timestep, and they become more transparent as the simulation runs (moving away from the 
         real-time timestep).
@@ -94,7 +94,7 @@ public class EdgeOfChaos extends Simulation {
                         
         2) Start the simulation by clicking on the `run` button in the top-left corner.
                 
-        3) Click on the `cursor` icon, drag one of the six objects to the agent.
+        3) Click on the `cursor` icon, drag the agent (mouse) to each object until it stabilizes.
                 
         4) Observe changes in the reservoir's representation in the PCA plot.
                 
@@ -108,8 +108,8 @@ public class EdgeOfChaos extends Simulation {
          
         ## Observing The Representations Of The Objects
                 
-        To observe the object's representation in the network, delete the recurrent connections (the recurrent synapses) by
-        clicking on them and pressing backspace. Then run the simulation and repeat steps 2 to 6.
+        To observe the object's representation in the network, delete the recurrent connections (the recurrent synapses) by clicking on them and pressing backspace. Then run 
+        the simulation and repeat steps 2 to 6.
                 
         # References
                 
@@ -131,7 +131,7 @@ public class EdgeOfChaos extends Simulation {
     }
 
     private void controlPanel() {
-        ControlPanel panel = ControlPanel.makePanel(sim, "Controller", 1005, 0, 215, 133);
+        ControlPanel panel = ControlPanel.makePanel(sim, "Controller", 1010,0, 215, 130);
         JTextField tf_stdev = panel.addTextField("Weight stdev", "" + variance);
         panel.addButton("Update", () -> {
 
@@ -260,20 +260,20 @@ public class EdgeOfChaos extends Simulation {
     private void buildOdorWorld() {
 
         // Create the odor world
-        oc = sim.addOdorWorld(592, 0, 413, 248, "Two objects");
+        oc = sim.addOdorWorld(590, 0, 420, 312, "Two objects");
         oc.getWorld().setObjectsBlockMovement(false);
         oc.getWorld().setUseCameraCentering(false);
-        mouse = oc.getWorld().addEntity(165, 110, EntityType.Mouse.INSTANCE);
+        mouse = oc.getWorld().addEntity(200, 110, EntityType.Mouse.INSTANCE);
         mouse.setHeading(90);
 
         // Set up world
         double dispersion = 65;
-        OdorWorldEntity cheese1 = oc.getWorld().addEntity(40, 40,EntityType.Swiss.INSTANCE, new double[] {1, 0, 0, 0, 0, 0});
-        OdorWorldEntity cheese2 = oc.getWorld().addEntity(60, 40,EntityType.Gouda.INSTANCE, new double[] {0, 1, 0, 0, 0, 0});
-        OdorWorldEntity cheese3 = oc.getWorld().addEntity(80, 40, EntityType.BlueCheese.INSTANCE, new double[] {0, 0, 1, 0, 0, 0});
-        OdorWorldEntity flower1 = oc.getWorld().addEntity(290, 40,EntityType.Pansy.INSTANCE, new double[] {0, 0, 0, 0, 0, 1});
-        OdorWorldEntity flower2 = oc.getWorld().addEntity(310, 40,EntityType.Flax.INSTANCE, new double[] {0, 0, 0, 0, 1, 0});
-        OdorWorldEntity flower3 = oc.getWorld().addEntity(330, 40,EntityType.Tulip.INSTANCE, new double[] {0, 0, 0, 1, 0, 0});
+        OdorWorldEntity cheese1 = oc.getWorld().addEntity(50, 110,EntityType.Swiss.INSTANCE, new double[] {1, 0, 0, 0, 0, 0});
+        OdorWorldEntity cheese2 = oc.getWorld().addEntity(110,40,EntityType.Gouda.INSTANCE, new double[] {0, 1, 0, 0, 0, 0});
+        OdorWorldEntity cheese3 = oc.getWorld().addEntity(110, 180, EntityType.BlueCheese.INSTANCE, new double[] {0, 0, 1, 0, 0, 0});
+        OdorWorldEntity flower1 = oc.getWorld().addEntity(350, 110,EntityType.Pansy.INSTANCE, new double[] {0, 0, 0, 0, 0, 1});
+        OdorWorldEntity flower2 = oc.getWorld().addEntity(290, 40,EntityType.Flax.INSTANCE, new double[] {0, 0, 0, 0, 1, 0});
+        OdorWorldEntity flower3 = oc.getWorld().addEntity(290, 180,EntityType.Tulip.INSTANCE, new double[] {0, 0, 0, 1, 0, 0});
         cheese1.getSmellSource().setDispersion(dispersion);
         cheese2.getSmellSource().setDispersion(dispersion);
         cheese3.getSmellSource().setDispersion(dispersion);

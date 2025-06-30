@@ -553,7 +553,8 @@ val evolveResourcePursuer = newSim { optionString ->
         In simple terms, the fitness is calculated as `calories(t) - hunger(t)` where `calories` is calculated as `totalActivation(t) + Movement(t)`. 
         
         For a more in-depth look into how the fitness is calculated, use this [page](https://docs.simbrain.net/docs/simulations/) as a guide to see the simulation code. Whereas for a comprehensive 
-        look into how evolutionary simulations are developed in Simbrain, look [here](https://docs.simbrain.net/docs/evolution/).
+        look into how evolutionary simulations are developed in Simbrain, look [here](https://docs.simbrain.net/docs/evolution/). To see example simulations that were made during a SURF project, 
+        see [here](https://tbmvthao.github.io/SampleEvosims/).
         
         ## Evolutionary Process
         

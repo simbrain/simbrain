@@ -62,44 +62,85 @@ val spikingNeuronTwoInputs = newSim {
 
     addSidebarInfo(
         """
-    # Simple Integrate-and-Fire Neuron
+        # Two-Input Spiking Neuron
 
-    ## Overview
+        # Introduction
 
-    This simulation demonstrates a basic spiking neuron model receiving input from two clamped sources:
+        ## Basic
+        This simulation shows how a simple spiking neuron responds to two types of input: one excitatory and one inhibitory. It’s a hands-on way to understand how neurons add up signals and decide when to fire (spike), and how opposing inputs can either trigger or prevent that firing.
 
-    - One **excitatory input** (positive influence)
-    - One **inhibitory input** (negative influence)
+        ## Advanced
+        A single Izhikevich spiking neuron receives input from two clamped sources — one excitatory, one inhibitory. This setup demonstrates how membrane potential dynamics and spike threshold interact with balanced or unbalanced inputs to shape neural spiking patterns.
 
-    The output neuron's spiking behavior is visualized over time using a **time series plot**.
+        # Background
 
-    ## How It Works
+        ## Basic
+        Neurons fire (or “spike”) when their internal voltage gets high enough. Excitatory inputs push that voltage up, while inhibitory inputs push it down. In this simulation, you can see how increasing or decreasing each type of input changes the spiking pattern of the neuron.
 
-    - When the membrane potential of the spiking neuron exceeds a threshold, it emits a spike and resets.
-    - The excitatory input increases its potential.
-    - The inhibitory input decreases it.
-    - You can adjust the input activations in the GUI by selecting an input neuron and pressing the arrow keys (up/down).
+        ## Advanced
+        The spiking neuron uses the Izhikevich model, which captures rich firing behaviors with a simple set of equations. The excitatory input sends a strong positive current; the inhibitory input sends a strong negative current. Their net effect determines whether the neuron crosses the spike threshold and resets.
 
-    ## Instructions
+        # Simulation Details
 
-    1. **Press Run** to start the simulation.
-    2. **Select an input neuron** and use the arrow keys to adjust its activation.
-    3. **Observe** how the spiking neuron responds in the time series plot.
+        ## Neuron Model
 
-    ## Concepts Illustrated
+        - Basic: The main neuron collects signals from both inputs. When its voltage goes over a threshold, it spikes and resets.
+        - Advanced: The neuron uses the [Izhikevich model](https://docs.simbrain.net/docs/network/neurons/izhikevich), with a manually set threshold of `5.0`. It integrates incoming synaptic input and spikes based on internal voltage dynamics.
 
-    - **Integrate-and-fire model:** A simplified model capturing the essence of neuronal spiking.
-    - **Excitatory and inhibitory inputs:** Fundamental building blocks of neural computation.
-    - **Spike trains:** Repeated spiking activity shown in a plot can resemble real neuron recordings.
+        ## Network Structure
 
-    ## Try This
+        - Basic: Two clamped input neurons connect to one spiking neuron.
+        - Excitatory Input: Raises the voltage of the spiking neuron.
+        - Inhibitory Input: Lowers it.
+        - Advanced: The network includes:
+        - One clamped excitatory neuron (`+5.0` synaptic strength).
+        - One clamped inhibitory neuron (`-5.0` synaptic strength).
+        - One Izhikevich neuron integrating both inputs.
+        - No recurrent or lateral connections.
 
-    - Increase excitatory input and see regular spiking.
-    - Increase inhibitory input to suppress spiking.
-    - Balance both inputs to finely control the spiking rate.
-    - Change the type of the neuron from Izkhikevich to another type of spiking neuron, like Integrate and Fire or Adex.
-    """.trimIndent()
+        ## Visualization
+
+        - Basic: A time series plot shows when the spiking neuron fires over time. Peaks in the graph indicate spikes.
+        - Advanced: The time series plot reflects the neuron's voltage (or spiking state), illustrating how dynamic input patterns shape firing behavior.
+
+        Learn more: [Time Series Plot Docs](https://docs.simbrain.net/docs/plots/timeseries.html)
+
+        ## Key Concepts
+
+        - **Izhikevich Neuron**: A biologically inspired spiking model that simulates a variety of neuron types.
+        - **Excitatory Input**: Adds positive current, pushing the neuron toward spiking.
+        - **Inhibitory Input**: Adds negative current, making spiking less likely.
+        - **Spike Threshold**: The membrane potential value at which a spike occurs.
+
+        # What to Do
+
+        ## How to Use
+
+        1. Press `Run` to start the simulation.
+        2. Select `Excitatory Input` or `Inhibitory Input`.
+        3. Use the arrow keys (`↑`/`↓`) to adjust each neuron's activation.
+        4. Observe how the spiking neuron's activity changes in the plot.
+
+        ## Try This
+
+        - Increase only the excitatory input: The neuron should spike regularly.
+        - Increase only the inhibitory input: The neuron may stop spiking altogether.
+        - Adjust both inputs to balance spiking vs. suppression.
+        - Double-click the spiking neuron to:
+        - Explore Izhikevich parameters.
+        - Change its type to something simpler, like [Integrate and Fire](https://docs.simbrain.net/docs/network/neurons/integrateAndFire.html).
+
+        # Links
+
+        - [Izhikevich Neuron Docs](https://docs.simbrain.net/docs/network/neurons/izhikevich) – Explore the neuron model.
+        - [Integrate-and-Fire Model](https://docs.simbrain.net/docs/network/neurons/integrateAndFire.html) – A simpler alternative.
+        - [Time Series Plot](https://docs.simbrain.net/docs/plots/timeseries.html) – Info on visualizing activity.
+
+        # Credits
+
+        Jeff Yoshimi,  
+        Kanly Thao,
+        Elijah Olson
+        """.trimIndent()
     )
-
-
 }

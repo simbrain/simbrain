@@ -92,4 +92,92 @@ val spikeResponderSim = newSim {
         stp couple stpSeries
     }
 
+    addSidebarInfo(
+        """
+        # Spike Responders
+
+        # Introduction
+
+        ## Basic
+        This simulation shows how different **spike responders** work in Simbrain by applying them to a single spiking neuron. It lets you see how spikes from one neuron influence downstream neurons in various ways.
+
+        ## Advanced
+        A single **Izhikevich neuron** receives input from a clamped source and sends spikes to four target neurons, each connected with a different spike responder type. This highlights how different biological synaptic dynamics can be modeled and compared side-by-side.
+
+        # Background
+
+        ## Basic
+        Spike responders translate presynaptic spikes into effects on postsynaptic neurons. They mimic various types of synaptic transmission seen in real brains.
+
+        ## Advanced
+        Simbrain includes multiple spike responders modeling distinct post-synaptic dynamics:
+
+        - **Step Responder:** Holds a fixed input value for a duration after each spike.
+        - **Jump and Decay:** Produces an immediate jump in input followed by exponential decay.
+        - **Rise and Decay:** Smoothly rises then decays more slowly, resembling chemical synaptic transmission.
+        - **Short-Term Plasticity:** Changes response based on spike history, modeling facilitation or depression.
+
+        Learn more: [Spike Responders Overview](https://docs.simbrain.net/docs/network/spikeresponders/).
+
+        # Simulation Details
+
+        ## Neuron Model
+
+        - Basic: A clamped input neuron (‘clamped’ meaning its activation level is fixed and controlled directly by the user) activates an Izhikevich neuron, which then spikes.
+        - Advanced: The Izhikevich neuron model captures realistic spiking patterns; it connects to four downstream neurons with distinct spike responders.
+
+        ## Network Structure
+
+        - Four downstream neurons each receive input via a different spike responder type.
+        - A time series tracks spikes and post-synaptic responses.
+
+        ## Visualization
+
+        - Basic: A simple time series shows when the Izhikevich neuron fires.
+        - Advanced: Plots display both spiking activity and how each spike responder shapes downstream neuron signals over time.
+
+        # What to Do
+
+        ## How to Use
+
+        1. Click **Run** to start the simulation.
+        2. Select the **Input** neuron and adjust its activation using the up/down arrow keys.
+        3. Observe the Izhikevich neuron spike in response.
+        4. Watch the **Spike Responders** plot to compare how each responder reacts to spikes.
+
+        ## Try This
+
+        - Modify the input activation to change spike frequency.
+        - Double-click the Izhikevich neuron to alter its spiking behavior (e.g., bursting).
+        - Change synapse types by double-clicking connections and selecting different spike responders.
+        - Add new output neurons or try different spiking neuron models.
+
+        # Spike Responder Types
+
+        - 🔵 **[Step](https://docs.simbrain.net/docs/network/spikeresponders/step.html)**  
+        Fixed output for a set time after a spike; simple and direct.
+
+        - 🔴 **[Jump and Decay](https://docs.simbrain.net/docs/network/spikeresponders/jumpdecay.html)**  
+        Immediate jump in input followed by exponential decay; mimics fast synaptic response.
+
+        - 🟡 **[Rise and Decay](https://docs.simbrain.net/docs/network/spikeresponders/riseAndDecay.html)**  
+        Smooth rise then slower decay; models chemical synaptic transmission.
+
+        - 🟢 **[Short-Term Plasticity](https://docs.simbrain.net/docs/network/spikeresponders/shorttermplasticity.html)**  
+        Dynamic response adapting to spike history; simulates facilitation or depression.
+
+        # Links
+
+        - [Spike Responders Overview](https://docs.simbrain.net/docs/network/spikeresponders/)
+        - [Izhikevich Neuron](https://docs.simbrain.net/docs/network/neurons/izhikevich.html)
+        - [Spiking Neurons](https://docs.simbrain.net/docs/network/spikingneurons.html)
+        - [Synaptic Transmission (Wikipedia)](https://en.wikipedia.org/wiki/Synaptic_transmission)
+
+        # Credits
+
+        Jeff Yoshimi,  
+        Kanly Thao,
+        Elijah Olson
+        """.trimIndent()
+    )
 }

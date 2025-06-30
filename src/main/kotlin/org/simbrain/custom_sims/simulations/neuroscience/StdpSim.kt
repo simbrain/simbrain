@@ -95,31 +95,80 @@ val stdpSim = newSim {
 
     addSidebarInfo(
         """
-    # Spike Timing Dependent Plasticity (STDP)
+        # Spike Timing Dependent Plasticity (STDP)
 
-    [STDP](http://www.scholarpedia.org/article/Spike-timing_dependent_plasticity) is a form of synaptic plasticity
-    in which the timing of spikes determines how synaptic weights are modified. If a presynaptic neuron ("pre") fires 
-    shortly before a postsynaptic neuron ("post"), the synapse is typically strengthened (LTP). If the post fires before 
-    the pre, the synapse is weakened (LTD). The closer in time the spikes occur, the stronger the effect.
+        # Introduction
 
-    This mechanism reinforces causal relationships between neurons: if pre tends to cause post to fire, the connection 
-    strengthens; if post tends to fire before pre, the connection weakens.
+        ## Basic
+        This simulation demonstrates how the timing between neuron spikes affects synaptic strength. If a presynaptic neuron fires just before a postsynaptic neuron, the connection strengthens. If the order is reversed, the connection weakens.
 
-    # What to Do 
+        ## Advanced
+        This is a minimal example of **STDP**, a biologically plausible learning rule where synaptic weights are updated based on the temporal relationship between spikes. Two spiking neurons ("pre" and "post") are stimulated by inputs from a data table. A synapse connecting them uses an STDP learning rule, and changes in its strength are plotted over time.
 
-    In this simulation, the pre and post neurons are driven by the two columns in the table below. 
-    Currently, the table is set up so that pre fires before post, which causes the connection to strengthen. 
-    To observe weakening, adjust the table so post fires before pre.
+        # Background
 
-    You can experiment with the time lag between pre and post and observe how this affects synaptic learning.
+        ## Basic
+        STDP mimics a key learning mechanism in the brain: **"fire together, wire together"** — but with timing. The direction and timing of spikes determine whether a connection is strengthened or weakened.
 
-    **Note:** Because the data table loops (repeats), spikes from the end of the sequence can influence the beginning 
-    of the next cycle. For instance, a post spike at the end and a pre spike at the beginning may still produce LTD. 
-    This is why the time constants in the STDP rule are set very small: to restrict updates to spikes that occur close 
-    together in time and avoid these wraparound effects.
+        ## Advanced
+        STDP modifies synaptic weights according to the relative timing of pre- and postsynaptic spikes. If the **pre** neuron fires just before the **post**, long-term potentiation (LTP) occurs. If the **post** fires first, long-term depression (LTD) happens. Simbrain’s STDP implementation includes tunable parameters: time constants (`tauPlus`, `tauMinus`), learning rates, and weights (`wPlus`, `wMinus`) for potentiation and depression.
 
-    You can inspect and modify the STDP parameters by double-clicking the synapse between pre and post. This lets you 
-    change the time constants, learning rates, and other properties to see how they affect plasticity behavior.
-    """.trimIndent()
+        Learn more: [STDP Overview](http://www.scholarpedia.org/article/Spike-timing_dependent_plasticity)
+
+        # Simulation Details
+
+        ## Neuron Model
+
+        - Basic: Two **SpikingThreshold** neurons (pre and post) receive input from two linear input neurons.
+        - Advanced: Inputs are defined via a looping data table that injects current at specific time steps to cause spikes.
+
+        ## Network Structure
+
+        - Two main neurons: **Pre** and **Post**, each connected to an input.
+        - One plastic synapse from Pre to Post governed by the **STDP learning rule**.
+        - The synapse includes a **Jump and Decay** spike responder to model fast, decaying influence on the postsynaptic neuron.
+
+        ## Visualization
+
+        - Basic: A **time series plot** shows the strength of the Pre→Post synapse over time.
+        - Advanced: A data table defines when each neuron receives stimulation, allowing precise control over spike timing.
+
+        # What to Do
+
+        ## How to Use
+
+        1. Click **Run** to start the simulation.
+        2. Inspect the **data table** to see when Pre and Post neurons are activated.
+        3. Observe the synaptic strength between Pre and Post in the plot.
+        4. Try reversing the spike order to see the synapse weaken.
+
+        ## Try This
+
+        - Change the stimulation time so the **Post** neuron fires *before* the **Pre**.
+        - Edit the STDP synapse by double-clicking it to modify learning rates and time constants.
+        - Add delays or multiple spikes in the data table to explore how complex timing affects plasticity.
+        - Observe wraparound effects and reduce time constants if needed.
+
+        # STDP Rule Parameters
+
+        - **tauPlus**: Decay time constant for LTP (Pre before Post)
+        - **tauMinus**: Decay time constant for LTD (Post before Pre)
+        - **wPlus**: Maximum weight increment for potentiation
+        - **wMinus**: Maximum weight decrement for depression
+        - **Learning Rate**: Controls the speed of weight updates
+
+        # Links
+
+        - [STDP in Simbrain](https://docs.simbrain.net/docs/network/synapses/stdp.html)
+        - [Spiking Neurons](https://docs.simbrain.net/docs/network/spikingneurons.html)
+        - [Jump and Decay Responder](https://docs.simbrain.net/docs/network/spikeresponders/jumpdecay.html)
+        - [STDP (Scholarpedia)](http://www.scholarpedia.org/article/Spike-timing_dependent_plasticity)
+
+        # Credits
+
+        Jeff Yoshimi,  
+        Kanly Thao,  
+        Elijah Olson
+        """.trimIndent()
     )
 }

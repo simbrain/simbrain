@@ -1,6 +1,7 @@
 package org.simbrain.custom_sims.simulations
 
 import kotlinx.coroutines.*
+import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
@@ -354,6 +355,59 @@ val grazingCows = newSim { optionString ->
             }
         }
     }
+
+    addSidebarInfo(
+        """ 
+        # Introduction
+        
+        This is a simulation of the evolution of a neural network that is coupled to an agent in an odor world that contains food resources with the possibility of multiple agents. The neural network(s) will evolve
+        to optimize the simulation's performance using an evolutionary framework in Simbrain.
+        
+        # Simulation Details
+        
+        This simulation simulates the evolution of a neural network, or multiple neural networks until the `target fitness` is met, exceeded, or when it has reached the `maximum generation`. The goal of this simulation is 
+        to evolve until it is as close as possible to the `target fitness`. By default, the target fitness is the `10th` percentile, and if it is the target mean group fitness, the `target fitness` would be the `50th` 
+        percentile.
+        
+        For a more in-depth look into how the fitness is calculated, use this [page](https://docs.simbrain.net/docs/simulations/) as a guide to see the simulation code. Whereas for a comprehensive look into how 
+        evolutionary simulations are developed in Simbrain, look [here](https://docs.simbrain.net/docs/evolution/).
+        
+        ## Evolutionary Process
+        
+        The evolutionary process begins with a starting `population size` of simulations. In generation `0`, each simulation starts with a three-layer network (`7` input neurons, `2` hidden neurons, and `3` output neurons) and a
+        preset amount of connections (`4` in the input-hidden layer, `3` in the hidden-output layer). If the `number of cows` is more than `1`, there will be multiple networks that correspond to different agents in a
+        simulation. Within each generation, a simulation will iterate until the specified value while the fitness of each simulation is calculated and recorded. When food is obtained, a value is added to the current 
+        fitness of the simulation and new food is repopulated at a random location in the odor world. All the agents will accumulate towards a single fitness value (the fitness of the simulation).
+        
+        Then after each generation, a percentage of the population is eliminated (e.g., `elimination ratio`) and repopulated with new simulations. During this process of reproduction, some of the new 
+        simulations will have mutations, where the simulation develops new neurons in the hidden layer (`10%` chance), new connections between layers (`25%` chance), changes in neuron biases and weight strengths. 
+
+        Then, a percentage of the top performers is evaluated (e.g, `Evaluation percentile`) to determine if the `target fitness` has been achieved. This process continues until the simulation has reached the target
+        fitness or better, or when the evolutionary process ends.
+
+        # What to Do
+        
+        In this simulation, similar to the other evolutionary simulations, the control panel controls how the evolutionary process works. Below are the steps to evolving the simulation:
+        
+        1) Specify the parameters of the simulation.
+        
+            - Number of agents (e.g., cows)
+            
+            - Use of mean group target fitness (`50th` percentile) vs default fitness (`10th` percentile)
+        
+        2) After confirming the parameters are what you want, click on the `Evolve` button to start the simulation.
+        
+        3) Now, wait for the evolution process to finish, note that it can take a while depending on your configurations.
+
+        # Credits
+ 
+        [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
+        
+        Kanly Thao
+        
+        """.trimIndent()
+    )
+
     if (optionString?.isNotEmpty() == true) {
         val options = optionString.split(":")
         numCows = options[0].toInt()

@@ -4,6 +4,7 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
+import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.*
@@ -536,6 +537,68 @@ val evolveResourcePursuer = newSim { optionString ->
             }
         }
     }
+
+    addSidebarInfo(
+        """ 
+        # Introduction
+        
+        This is a simulation of the evolution of a neural network that is coupled to an agent in an odor world that contains food resources. The neural network will evolve
+        to optimize its foraging strategy within the limitations of caloric expenditure and gain using an evolutionary framework in Simbrain.
+        
+        # Simulation Details
+        
+        This simulation simulates the evolution of a neural network until the `target fitness` in the control panel is met, exceeded, or when it has reached the `maximum generation`. The
+        goal of this simulation is to evolve until it is as close as possible to the `target fitness`. 
+        
+        In simple terms, the fitness is calculated as `calories(t) - hunger(t)` where `calories` is calculated as `totalActivation(t) + Movement(t)`. 
+        
+        For a more in-depth look into how the fitness is calculated, use this [page](https://docs.simbrain.net/docs/simulations/) as a guide to see the simulation code. Whereas for a comprehensive 
+        look into how evolutionary simulations are developed in Simbrain, look [here](https://docs.simbrain.net/docs/evolution/). To see example simulations that were made during a SURF project, 
+        see [here](https://tbmvthao.github.io/SampleEvosims/).
+        
+        ## Evolutionary Process
+        
+        The evolutionary process begins with a starting `population size` of simulations. In generation `0`, each simulation starts with a three-layer network (`3` input neurons, `2` hidden neurons, and `3` output 
+        neurons), a `Hunger` neuron, and a preset amount of connections (`3` per layer). Within each generation, a simulation will iterate until the specified value while the fitness of each simulation is calculated
+        and recorded. As a simulation iterates, `400` calories are added when the agent obtains food and the `Hunger` neuron's activation is increased by `10` at each iteration. Hunger will reset to `0` when the agent
+        obtains food and new food is repopulated at a random location in the odor world.
+        
+        After each generation, a percentage of the population is eliminated (e.g., `elimination ratio`) and repopulated with new simulations. During this process of reproduction, some of the new simulations will have 
+        mutations, where the simulation develops new connections between neuron layers (`25%` chance), new neurons in the hidden layer (`50%` chance), changes in neuron biases and weight strengths. If the any of the 
+        other genes are active, they will also produce other possible mutations:
+        
+        1) Changes in `learning rule` for weights (`10%` chance)
+        
+        2) Changes in `connection strategy` (`10%` chance)
+        
+        3) Changes in `update rule` for hidden neurons (`10%` chance)
+        
+        4) Changes in the `layout` of the hidden layer (`10%` chance) 
+        
+        Then a percentage of the top performers is evaluated (e.g, `Evaluation percentile`) to determine if the `target fitness` has been achieved. This process continues until the simulation has reached the 
+        `target fitness` or better, or when the evolutionary process ends. 
+
+        # What to Do
+        
+        In this simulation, similar to the other evolutionary simulations, the control panel controls how the evolutionary process works. As mentioned before, there are genes that can be activated to allow
+        the simulation to have additional mutations. Click on the dropdown box next to the gene you want active, and change it to `Yes`. Below are the steps to evolving the simulation:
+        
+        1) Specify the parameters of the simulation.
+            
+            - The addition of more mutations. 
+        
+        2) After confirming the parameters are what you want, click on the `Evolve` button to start the simulation.
+        
+        3) Now, wait for the evolution process to finish, note that it can take a while depending on your configurations.
+
+        # Credits
+ 
+        [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
+        
+        Kanly Thao
+        
+        """.trimIndent()
+    )
 
     if (optionString?.isNotEmpty() == true) {
         val options = JSONObject(optionString)

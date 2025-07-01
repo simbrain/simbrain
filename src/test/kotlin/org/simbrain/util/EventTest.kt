@@ -209,10 +209,18 @@ class EventTest {
         batchChangedEvent.fireAndBlock("new1", "old1")
         batchChangedEvent.fireAndBlock("new2", "old2")
         
-        assertTrue(receivedChanges.isNotEmpty())
-        val (newValues, oldValues) = receivedChanges.first()
-        assertTrue(newValues.containsAll(listOf("new1", "new2")))
-        assertTrue(oldValues.containsAll(listOf("old1", "old2")))
+        // With interval = 0, each fireAndBlock should process immediately as a separate batch
+        assertEquals(2, receivedChanges.size)
+        
+        // First call processes first event
+        val (firstNew, firstOld) = receivedChanges[0]
+        assertEquals(listOf("new1"), firstNew)
+        assertEquals(listOf("old1"), firstOld)
+        
+        // Second call processes second event (queue was cleared after first call)
+        val (secondNew, secondOld) = receivedChanges[1]
+        assertEquals(listOf("new2"), secondNew)
+        assertEquals(listOf("old2"), secondOld)
     }
 
     @Test

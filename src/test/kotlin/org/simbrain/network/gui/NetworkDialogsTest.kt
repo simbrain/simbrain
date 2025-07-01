@@ -1,6 +1,6 @@
 package org.simbrain.network.gui
 
-import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
@@ -10,7 +10,7 @@ import org.simbrain.network.core.Neuron
 class NetworkDialogsTest {
 
     @Test
-    fun testUndoRedoFunctionality() = runTest {
+    fun testUndoRedoFunctionality() = runBlocking {
         // Create a network, network component, and network panel
         val network = Network()
         val networkComponent = NetworkComponent("Test", network)

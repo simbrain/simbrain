@@ -150,28 +150,54 @@ val pursuer = newSim {
     // Add documentation sidebar
     addSidebarInfo(
         """
-        # Pursuer
+        # Introduction
 
-        This simulation is similar to the avoider simulation relating to [Braitenberg vehicles](http://en.wikipedia.org/wiki/Braitenberg_vehicle). Braitenbeg vehicles are simple agents that move around in response to environmental stimuli. 
+        [Braitenberg vehicles](http://en.wikipedia.org/wiki/Braitenberg_vehicle) are simple agents that move around in response to environmental stimuli. This simulation simulates a Braitenberg vehicle as an agent
+        in an odor world that is attracted to an object.
 
-        Unlike the avoider simulation in which the mouse agent (vehicle) orients away from the source, this simulation will demonstrate movement similar to vehicle 2b (the "aggressive" vehicle) from Braitenberg's book (see link below).
+        # Simulation Details
 
-        The mouse will move to the left if its left sensor is activiated by a source on its left, heading straight towards the source. And if it senses a source on its right, the mouse will move to the right and straight towards the source. 
+        In this simulation, the Braitenberg vehicle has the characteristics of a _pursuer_ where it demonstrates movement similar to vehicle 2b (the _aggressive vehicle_) from Braitenberg's book (see link below).
 
-        ## Running This Simulation
-        Simply press the play button on the top toolbar and observe the behavior of the mouse in the odor world window.
+        The agent will move to the left if its left sensor is activated by an object on its left side, heading straight towards it. And if it senses a source on its right side, the agent will move to the right 
+        and straight towards the object. 
+
+        # What to Do
         
-        Move the cheese around and watch the mouse chase it. Take note of the activity of the neurons in the nework window. Press the stop button to stop the network from running.
-
-        ### References
+        In this simulation similar to the other Braitenberg simulations, simply press the `play` button on the top toolbar for the simulation to run.
         
-        1) Braitenberg, V. (1986). [_Vehicles: Experiments in synthetic psychology_](https://mitpress.mit.edu/9780262521123/vehicles/). MIT press.
+        1) While it runs, observe the behavior of the agent in the odor world.
+        
+        2) Move the cheese around and watch the agent chase it and observe the the activity of the neurons in the network window.
+        
+        3) Press the `stop` button to stop the network from running.
+        
+        ## Other Observations
+        
+        In addition to how you can use this simulation normally, you can also control the velocity of the agent's movement. To do this, simply press the up/down arrow keys
+        to control its velocity while the simulation runs.
+        
+        Three key value range to observe:
+        
+        1) Positive
+        
+        2) Negative
+        
+        3) Zero.
+
+        # References
+        
+        Braitenberg, V. (1986). [_Vehicles: Experiments in synthetic psychology_](https://mitpress.mit.edu/9780262521123/vehicles/). MIT press.
             
-        2) Hotton, S., & Yoshimi, J. (2024). [_The Open Dynamics of Braitenberg Vehicles_](https://mitpress.mit.edu/9780262548199/the-open-dynamics-of-braitenberg-vehicles/). MIT Press.
+        Hotton, S., & Yoshimi, J. (2024). [_The Open Dynamics of Braitenberg Vehicles_](https://mitpress.mit.edu/9780262548199/the-open-dynamics-of-braitenberg-vehicles/). MIT Press.
 
-        ### Credits
+        # Credits
         
-        Jeff Yoshimi and Saraching Chao.
+        [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
+        
+        Kanly Thao
+        
+        Saraching Chao
         
         """.trimIndent()
     )

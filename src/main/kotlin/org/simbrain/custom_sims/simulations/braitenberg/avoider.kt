@@ -176,25 +176,56 @@ val avoider = newSim {
     // Add documentation sidebar
     addSidebarInfo(
         """
-        # Avoider
 
-        [Braitenberg vehicles](http://en.wikipedia.org/wiki/Braitenberg_vehicle) are simple agents that move around in response to environmental stimuli. This simulation will demonstrate movement similar to vehicle 2a (the "coward" vehicle) from Braitenberg's book, "Vehicles: Experiments in Synthetic Psychology," which can be downloaded from the link below.
+        # Introduction
 
-        ## Running This Simulation
-        Simply press the play button on the top toolbar and observe the behavior of the mouse in the odor world window, while taking note of the activity of the neurons in the nework window. Feel free to grab the cheese and move them towards the mouse. The mouse should avoid the cheese. Press the stop button to stop the network from running.
+        [Braitenberg vehicles](http://en.wikipedia.org/wiki/Braitenberg_vehicle) are simple agents that move around in response to environmental stimuli. This simulation simulates a Braitenberg vehicle as an agent
+        in an odor world that avoids an object.
 
-        ## Relation to Braitenberg
-        Note the connections are not the same as in Braitenberg's book. The mouse agent (vehicle) will orient to the left if its right sensor is activiated by a source on its right, moving away from the source, and if it senses a source on its left, the mouse will orient to the right and away from the source.
+        # Simulation Details
 
-        ### References
+        In this simulation, the Braitenberg vehicle has the characteristics of an _avoider_ where it demonstrates movement similar to vehicle 2a (the _coward vehicle_) from Braitenberg's book (see link below).
+        Note that the connections are not the same as in Braitenberg's book. 
+
+        The agent will orient to the left if its right sensor is activated by an object on its right side, moving away from it. If it senses a object on its left side, the agent will orient to
+        the right and move away from the object.
+
+        # What to Do
         
-        1) Braitenberg, V. (1986). [_Vehicles: Experiments in synthetic psychology_](https://mitpress.mit.edu/9780262521123/vehicles/). MIT press.
+        In this simulation similar to the other Braitenberg simulations, simply press the `play` button on the top toolbar for the simulation to run.
+        
+        1) While it runs, observe the behavior of the agent in the odor world.
+        
+        2) Move any of the objects around and watch the agent avoid it and observe the the activity of the neurons in the network window.
+        
+        3) Press the `stop` button to stop the network from running.
+        
+        ## Other Observations
+        
+        In addition to how you can use this simulation normally, you can also control the velocity of the agent's movement. To do this, simply press the up/down arrow keys
+        to control its velocity while the simulation runs.
+        
+        Three key value range to observe:
+        
+        1) Positive
+        
+        2) Negative
+        
+        3) Zero.
+
+        # References
+        
+        Braitenberg, V. (1986). [_Vehicles: Experiments in synthetic psychology_](https://mitpress.mit.edu/9780262521123/vehicles/). MIT press.
             
-        2) Hotton, S., & Yoshimi, J. (2024). [_The Open Dynamics of Braitenberg Vehicles_](https://mitpress.mit.edu/9780262548199/the-open-dynamics-of-braitenberg-vehicles/). MIT Press.
+        Hotton, S., & Yoshimi, J. (2024). [_The Open Dynamics of Braitenberg Vehicles_](https://mitpress.mit.edu/9780262548199/the-open-dynamics-of-braitenberg-vehicles/). MIT Press.
 
-        ### Credits
+        # Credits
         
-        Jeff Yoshimi and Saraching Chao.
+        [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
+        
+        Kanly Thao
+        
+        Saraching Chao
         
         """.trimIndent()
     )

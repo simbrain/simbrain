@@ -302,12 +302,14 @@ class OdorWorldPanel(
         }
 
         world.events.worldStopped.on(null, true, Runnable {
-            movementTimer = Timer().apply {
-                schedule(object : TimerTask() {
-                    override fun run() {
-                        manualMovementUpdate()
-                    }
-                }, 10, 10)
+            if (movementTimer == null) {
+                movementTimer = Timer().apply {
+                    schedule(object : TimerTask() {
+                        override fun run() {
+                            manualMovementUpdate()
+                        }
+                    }, 10, 10)
+                }
             }
             if (animationTimer != null) {
                 animationTimer?.cancel()

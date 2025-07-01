@@ -125,6 +125,7 @@ class SynapseGroupTestKt {
     fun `changing connection strategy retains synapse group and applies new strategy`() {
         // Start with the default AllToAll‐built group
         val sg = SynapseGroup(sourceGroup, targetGroup)
+        network.addNetworkModel(sg)
 
         // All to all makes 2 synapses
         assertEquals(2, sg.size())

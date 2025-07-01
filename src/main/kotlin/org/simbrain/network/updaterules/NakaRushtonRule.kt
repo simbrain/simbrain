@@ -19,9 +19,7 @@ import kotlin.math.pow
  * Spikes, Decisions, and Action. p. 20-21.
  */
 class NakaRushtonRule : NeuronUpdateRule<NakaScalarData, NakaMatrixData>(), ClippedUpdateRule, NoisyUpdateRule {
-    /**
-     * Steepness.
-     */
+
     @UserParameter(
         label = "Steepness",
         description = "This value controls the steepness of the sigmoidal-like function S(W).",
@@ -30,9 +28,6 @@ class NakaRushtonRule : NeuronUpdateRule<NakaScalarData, NakaMatrixData>(), Clip
     )
     var steepness: Double = 2.0
 
-    /**
-     * Semi saturation constant.
-     */
     @UserParameter(
         label = "Semi-Saturation Constant",
         description = "This value is the point at which S(W) reaches half of its maximum value.",
@@ -41,9 +36,6 @@ class NakaRushtonRule : NeuronUpdateRule<NakaScalarData, NakaMatrixData>(), Clip
     )
     var semiSaturationConstant: Double = 120.0
 
-    /**
-     * Time constant of spike rate adaptation.
-     */
     @UserParameter(
         label = "Adaptation Time Constant",
         description = "This value controls the rate at which the adaptation variable tends to "
@@ -53,9 +45,6 @@ class NakaRushtonRule : NeuronUpdateRule<NakaScalarData, NakaMatrixData>(), Clip
     )
     var adaptationTimeConstant: Double = 1.0
 
-    /**
-     * Parameter of spike rate adaptation.
-     */
     @UserParameter(
         label = "Adaptation Parameter",
         description = "The parameter of spike rate adaptation.",
@@ -64,9 +53,6 @@ class NakaRushtonRule : NeuronUpdateRule<NakaScalarData, NakaMatrixData>(), Clip
     )
     var adaptationParameter: Double = .7
 
-    /**
-     * Whether to use spike rate adaptation or not.
-     */
     @UserParameter(
         label = "Use Adaptation",
         description = "If this is set to true, spike rate adaptation is utilized.",
@@ -75,9 +61,6 @@ class NakaRushtonRule : NeuronUpdateRule<NakaScalarData, NakaMatrixData>(), Clip
     )
     var useAdaptation: Boolean = false
 
-    /**
-     * Time constant.
-     */
     @UserParameter(
         label = "Time Constant",
         description = "This value controls the rate at which the activation tends to the fixed "
@@ -87,24 +70,12 @@ class NakaRushtonRule : NeuronUpdateRule<NakaScalarData, NakaMatrixData>(), Clip
     )
     var timeConstant: Double = 1.0
 
-    /**
-     * Noise generator.
-     */
     override var noiseGenerator: ProbabilityDistribution = UniformRealDistribution()
 
-    /**
-     * Add noise to neuron.
-     */
     override var addNoise: Boolean = false
 
-    /**
-     * The upper bound of the activity.
-     */
     override var upperBound: Double = DEFAULT_UPPER_BOUND.toDouble()
 
-    /**
-     * The lower bound of the activity.
-     */
     override var lowerBound: Double = 0.0
 
     /**
@@ -120,7 +91,9 @@ class NakaRushtonRule : NeuronUpdateRule<NakaScalarData, NakaMatrixData>(), Clip
         val rn = NakaRushtonRule()
         rn.steepness = steepness
         rn.semiSaturationConstant = semiSaturationConstant
+        rn.lowerBound = lowerBound
         rn.upperBound = upperBound
+        rn.isClipped = isClipped
         rn.addNoise = addNoise
         rn.useAdaptation = useAdaptation
         rn.adaptationParameter = adaptationParameter
@@ -186,10 +159,6 @@ class NakaRushtonRule : NeuronUpdateRule<NakaScalarData, NakaMatrixData>(), Clip
 
     override fun createScalarData(): NakaScalarData {
         return NakaScalarData()
-    }
-
-    override fun clear(neuron: Neuron) {
-        super.clear(neuron)
     }
 
 

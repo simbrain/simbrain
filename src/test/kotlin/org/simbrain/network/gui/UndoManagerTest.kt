@@ -396,7 +396,7 @@ class UndoManagerTest {
     }
 
     @Test
-    fun testAlignHorizontalUndoRedo() = runTest {
+    fun testAlignHorizontalUndoRedo() = runBlocking {
         // Create a network, network component, and network panel
         val network = Network()
         val networkComponent = NetworkComponent("Test", network)

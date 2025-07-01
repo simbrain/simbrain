@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.*
 import org.simbrain.network.desktop.NetworkDesktopComponent
-import org.simbrain.network.gui.UndoManager.UndoableAction
 import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.workspace.gui.SimbrainDesktop
 import javax.swing.JButton
@@ -651,7 +650,7 @@ class UndoManagerTest {
     }
 
     @Test
-    fun testCreateSupervisedModelActionUndoRedo() = runTest {
+    fun testCreateSupervisedModelActionUndoRedo() = runBlocking {
         // Create a network, network component, and network panel
         val network = Network()
         val networkComponent = NetworkComponent("Test", network)

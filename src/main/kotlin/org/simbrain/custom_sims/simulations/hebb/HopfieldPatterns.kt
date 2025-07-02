@@ -63,10 +63,9 @@ val hopfieldPatterns = newSim {
             
             # A few experiments...
             - Train the network on the E, F, and L patterns, then randomize and iterate the network (N -> R). What do you notice?
-            - Click on Show Correlations. What do you notice about the above patterns?
-            - Now, reset the network try to train the network to try to remember as many patterns as possible. How many can you fit in?
-            - How many patterns should the network theoretically be able to remember (assuming all patterns are perfectly orthogonal)?
-            - Train the network solely on a blank pattern (all 0s). Notice how the diagonal activations are zeroed out in the weight matrix. Why do you think this is?
+            - Click on `Show Correlations`. What do you notice about the above patterns?
+            - Now, reset the network try to train the network to try to remember as many patterns as possible. Recall that the theoretical limit is 15% of the number of nodes, assuming uncorrelated patterns. See how close you can get to that limit.
+            - Click on `Show correlations` again and note that some patterns are correlated, for example L, E, and F. The network should not do as well learning those patterns (they might interfere in different ways). 
 
             # Credits
             

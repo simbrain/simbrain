@@ -1,5 +1,7 @@
 package org.simbrain.util.table
 
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -18,50 +20,51 @@ class TableEventsTest {
     }
 
     @Test
-    fun `test current row changed event`() {
+    fun `test current row changed event`() = runBlocking{
+
         // Add event listener
-        events.currentRowChanged.on {
+        events.currentRowChanged.on(wait = true) {
             currentRowChangedCount++
         }
 
         // Fire event and verify it was received
-        events.currentRowChanged.fire()
+        events.currentRowChanged.fire().await()
         assertEquals(1, currentRowChangedCount)
 
         // Fire multiple times
-        events.currentRowChanged.fire()
-        events.currentRowChanged.fire()
+        events.currentRowChanged.fire().await()
+        events.currentRowChanged.fire().await()
         assertEquals(3, currentRowChangedCount)
     }
 
     @Test
-    fun `test row name changed event`() {
+    fun `test row name changed event`() = runBlocking{
         // Add event listener
-        events.rowNameChanged.on {
+        events.rowNameChanged.on(wait = true) {
             rowNameChangedCount++
         }
 
         // Fire event and verify it was received
-        events.rowNameChanged.fire()
+        events.rowNameChanged.fire().await()
         assertEquals(1, rowNameChangedCount)
 
         // Fire multiple times
-        events.rowNameChanged.fire()
-        events.rowNameChanged.fire()
+        events.rowNameChanged.fire().await()
+        events.rowNameChanged.fire().await()
         assertEquals(3, rowNameChangedCount)
     }
 
     @Test
-    fun `test multiple listeners on same event`() {
+    fun `test multiple listeners on same event`() = runBlocking {
         var listener1Count = 0
         var listener2Count = 0
 
         // Add multiple listeners to the same event
-        events.currentRowChanged.on { listener1Count++ }
-        events.currentRowChanged.on { listener2Count++ }
+        events.currentRowChanged.on(wait = true) { listener1Count++ }
+        events.currentRowChanged.on(wait = true) { listener2Count++ }
 
         // Fire event once
-        events.currentRowChanged.fire()
+        events.currentRowChanged.fire().await()
 
         // Both listeners should have been called
         assertEquals(1, listener1Count)
@@ -69,20 +72,20 @@ class TableEventsTest {
     }
 
     @Test
-    fun `test events are independent`() {
+    fun `test events are independent`() = runBlocking {
         // Add listeners to both events
-        events.currentRowChanged.on { currentRowChangedCount++ }
-        events.rowNameChanged.on { rowNameChangedCount++ }
+        events.currentRowChanged.on(wait = true) { currentRowChangedCount++ }
+        events.rowNameChanged.on(wait = true) { rowNameChangedCount++ }
 
         // Fire only one event
-        events.currentRowChanged.fire()
+        events.currentRowChanged.fire().await()
 
         // Only the corresponding counter should change
         assertEquals(1, currentRowChangedCount)
         assertEquals(0, rowNameChangedCount)
 
         // Fire the other event
-        events.rowNameChanged.fire()
+        events.rowNameChanged.fire().await()
 
         // Now both should have changed
         assertEquals(1, currentRowChangedCount)
@@ -112,7 +115,7 @@ class TableEventsTest {
     }
 
     @Test
-    fun `test integration with dataframe`() {
+    fun `test integration with dataframe`() = runBlocking{
         // Test that TableEvents can be used with a real dataframe
         val df = BasicDataFrame(listOf(
             listOf("A", "B"),
@@ -120,10 +123,11 @@ class TableEventsTest {
         ))
 
         var eventFired = false
-        df.events.rowNameChanged.on { eventFired = true }
+        df.events.rowNameChanged.on(wait = true) { eventFired = true }
 
         // Change row names should fire the event
         df.rowNames = listOf("Row1", "Row2")
+        delay(10L)
         assertTrue(eventFired)
     }
 

@@ -72,7 +72,7 @@ class MatrixDataFrame @JvmOverloads constructor(
             for (i in 0 until rowIndex)
                 for (j in 0 until data.ncol())
                     data[i,j] = oldData[i,j]
-            for (i in rowIndex + 1 until data.nrow())
+            for (i in rowIndex + 1 until oldData.nrow())
                 for (j in 0 until data.ncol())
                     data[i-1,j] = oldData[i,j]
             if (fireEvent) {

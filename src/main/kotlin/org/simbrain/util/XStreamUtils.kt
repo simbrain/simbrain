@@ -18,6 +18,8 @@ import org.simbrain.util.piccolo.Tile
 import org.simbrain.util.piccolo.TileMapLayer
 import org.simbrain.util.projection.Projector
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.table.BasicDataFrame
+import org.simbrain.world.imageworld.ImageAlbum
 import org.simbrain.world.odorworld.OdorWorld
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
@@ -51,6 +53,7 @@ fun getSimbrainXStream(): XStream {
         )
         registerConverter(DoubleArrayConverter())
         registerConverter(MatrixConverter())
+        registerConverter(BasicDataFrameConverter())
         registerConverter(
             createConstructorCallingConverter(
                 listOf(
@@ -64,7 +67,9 @@ fun getSimbrainXStream(): XStream {
                     OdorWorld::class.java,
                     Tile::class.java,
                     TileMapLayer::class.java,
-                    Projector::class.java
+                    Projector::class.java,
+                    BasicDataFrame::class.java,  // Exclude since we have custom converter
+                    ImageAlbum::class.java       // Exclude to use default XStream converter
                 )
             )
         )
@@ -344,4 +349,112 @@ fun <T> createXStreamPropertyConverter(
 
 class ConvertedObjectEvent: Events() {
     val objectCompleted = OneArgEvent<Any>()
+}
+
+/**
+ * Custom converter for BasicDataFrame to avoid AbstractTableModel serialization issues
+ */
+class BasicDataFrameConverter : com.thoughtworks.xstream.converters.Converter {
+    
+    override fun canConvert(type: Class<*>?): Boolean {
+        return type == BasicDataFrame::class.java
+    }
+    
+    override fun marshal(source: Any, writer: HierarchicalStreamWriter, context: MarshallingContext) {
+        val dataFrame = source as BasicDataFrame
+        
+        // Serialize data with explicit type information to preserve strings
+        writer.startNode("data")
+        writer.startNode("rows")
+        for (row in dataFrame.data) {
+            writer.startNode("row")
+            for (item in row) {
+                writer.startNode("item")
+                writer.addAttribute("type", item?.javaClass?.simpleName ?: "null")
+                if (item != null) {
+                    writer.setValue(item.toString())
+                }
+                writer.endNode()
+            }
+            writer.endNode()
+        }
+        writer.endNode()
+        writer.endNode()
+        
+        writer.startNode("columns")
+        context.convertAnother(dataFrame.columns)
+        writer.endNode()
+        
+        writer.startNode("currentRowIndex")
+        context.convertAnother(dataFrame.currentRowIndex)
+        writer.endNode()
+        
+        writer.startNode("rowNames")
+        context.convertAnother(dataFrame.rowNames)
+        writer.endNode()
+    }
+    
+    override fun unmarshal(reader: HierarchicalStreamReader, context: UnmarshallingContext): Any {
+        var data: MutableList<MutableList<Any?>>? = null
+        var columns: MutableList<org.simbrain.util.table.Column>? = null
+        var currentRowIndex = 0
+        var rowNames: List<String?> = emptyList()
+        
+        while (reader.hasMoreChildren()) {
+            reader.moveDown()
+            when (reader.nodeName) {
+                "data" -> {
+                    // Parse custom data format with type preservation
+                    data = mutableListOf()
+                    reader.moveDown() // Move to "rows"
+                    while (reader.hasMoreChildren()) {
+                        reader.moveDown() // Move to "row"
+                        val row = mutableListOf<Any?>()
+                        while (reader.hasMoreChildren()) {
+                            reader.moveDown() // Move to "item"
+                            val typeAttr = reader.getAttribute("type")
+                            val value = reader.value
+                            
+                            val convertedValue = when (typeAttr) {
+                                "String" -> value
+                                "Integer" -> value?.toIntOrNull()
+                                "Double" -> value?.toDoubleOrNull()
+                                "Float" -> value?.toFloatOrNull()
+                                "Long" -> value?.toLongOrNull()
+                                "Boolean" -> value?.toBooleanStrictOrNull()
+                                "null" -> null
+                                else -> value // Default to string if unknown type
+                            }
+                            row.add(convertedValue)
+                            reader.moveUp() // Back from "item"
+                        }
+                        data.add(row)
+                        reader.moveUp() // Back from "row"
+                    }
+                    reader.moveUp() // Back from "rows"
+                }
+                "columns" -> {
+                    @Suppress("UNCHECKED_CAST")
+                    columns = context.convertAnother(null, MutableList::class.java) as MutableList<org.simbrain.util.table.Column>
+                }
+                "currentRowIndex" -> {
+                    currentRowIndex = context.convertAnother(null, Int::class.java) as Int
+                }
+                "rowNames" -> {
+                    @Suppress("UNCHECKED_CAST")
+                    rowNames = context.convertAnother(null, List::class.java) as List<String?>
+                }
+            }
+            reader.moveUp()
+        }
+
+        val dataFrame = BasicDataFrame(emptyList(), mutableListOf())
+        dataFrame.data = data ?: mutableListOf()
+        dataFrame.columns = columns ?: mutableListOf()
+        // Set properties directly to avoid triggering any conversion
+        dataFrame.currentRowIndex = currentRowIndex
+        dataFrame.rowNames = rowNames
+        
+        return dataFrame
+    }
 }

@@ -55,6 +55,7 @@ class Filter(
     /**
      * The filtered image that can be displayed in the desktop.
      */
+    @Transient
     private var filteredImageCache: CachedObject<BufferedImage> = CachedObject {
         createFilteredImage()
     }
@@ -75,6 +76,8 @@ class Filter(
      * See [org.simbrain.workspace.serialization.WorkspaceComponentDeserializer]
      */
     fun readResolve(): Any {
+        // Reinitialize the transient cache after deserialization
+        filteredImageCache = CachedObject { createFilteredImage() }
         applyFilter()
         return this
     }

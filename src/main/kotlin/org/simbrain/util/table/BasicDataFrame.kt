@@ -94,7 +94,7 @@ class BasicDataFrame(
     }
 
     override fun getColumnCount(): Int {
-        return data[0].size
+        return if (data.isEmpty()) 0 else data[0].size
     }
 
     override fun getValueAt(rowIndex: Int, columnIndex: Int): Any? {
@@ -121,10 +121,11 @@ class BasicDataFrame(
             when (columns[colIndex].type) {
                 Column.DataType.DoubleType -> block(tryParsingDouble(value))
                 Column.DataType.IntType -> block(tryParsingInt(value))
-                Column.DataType.StringType -> if (value is String) block(value)
+                Column.DataType.StringType -> if (value is String) block(value) else block(value.toString())
             }
         } catch (e: NumberFormatException) {
-            println("There was a problem parsing ${value} in a column of type ${columns[colIndex].type}")
+            // If we can't parse it, don't call the block - leave the original value unchanged
+            // Could add logging here if needed: logger.debug("Failed to parse value $value for column type ${columns[colIndex].type}")
         }
     }
 
@@ -132,17 +133,18 @@ class BasicDataFrame(
         if (validateColumnIndex(col)) {
             // String case
             if (columns[col].type == Column.DataType.StringType) {
-                randomizeStringColum(col)
-            }
-            // Numeric case
-            (0 until rowCount).forEach {
-                setValueAt(columns[col].getRandom(), it, col)
+                randomizeStringColumn(col)
+            } else {
+                // Numeric case - only run this for non-string columns
+                (0 until rowCount).forEach {
+                    setValueAt(columns[col].getRandom(), it, col)
+                }
             }
             fireTableDataChanged()
         }
     }
 
-    fun randomizeStringColum(col: Int) {
+    fun randomizeStringColumn(col: Int) {
         if (validateColumnIndex(col) && columns[col].type == Column.DataType.StringType ) {
             val options = getStringColumn(col).toSet().toList()
             (0 until rowCount).forEach {
@@ -157,14 +159,22 @@ class BasicDataFrame(
  * Infer a column from a 2d array of data.
  */
 private fun inferColumns(data: List<List<*>>) =
-    (0..data.first().lastIndex).map { i ->
-        createColumn("Column ${i + 1}", data.asSequence().map { it[i] }.firstNotNullOfOrNull { it })
-    }.toMutableList()
+    if (data.isEmpty()) {
+        mutableListOf<Column>()
+    } else {
+        (0..data.first().lastIndex).map { i ->
+            createColumn("Column ${i + 1}", data.asSequence().map { it[i] }.firstNotNullOfOrNull { it })
+        }.toMutableList()
+    }
 
 private fun inferColumns(names: List<String?>, data: List<List<*>>) =
-    (0..data.first().lastIndex).map { i ->
-        createColumn(names.getOrNull(i) ?: "Column ${i + 1}", data.asSequence().map { it[i] }.firstNotNullOfOrNull { it })
-    }.toMutableList()
+    if (data.isEmpty()) {
+        mutableListOf<Column>()
+    } else {
+        (0..data.first().lastIndex).map { i ->
+            createColumn(names.getOrNull(i) ?: "Column ${i + 1}", data.asSequence().map { it[i] }.firstNotNullOfOrNull { it })
+        }.toMutableList()
+    }
 
 fun createFrom2DArray(
     data: Array<out Array<out Any?>>,

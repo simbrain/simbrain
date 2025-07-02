@@ -123,9 +123,11 @@ fun Matrix.addi(toAdd: DoubleArray) {
 operator fun Matrix.plus(toAdd: Matrix): Matrix = this.clone().add(toAdd)
 operator fun Matrix.minus(toSubtract: Matrix): Matrix = this.clone().sub(toSubtract)
 operator fun Matrix.times(scalar: Double): Matrix = this.clone().mul(scalar)
-//  Elementwise-wise multiplication
+//  Elementwise-wise (Hadamard) multiplication
 operator fun Matrix.times(toMultiply: Matrix): Matrix = this.clone().mul(toMultiply)
 operator fun Double.times(matrix: Matrix): Matrix = matrix.clone().mul(this)
+fun Matrix.hadamard(toMultiply: Matrix): Matrix = this.clone().mul(toMultiply)
+fun Double.hadamard(matrix: Matrix): Matrix = matrix.clone().mul(this)
 
 fun Matrix.clip(min: Double, max: Double) {
     for (i in 0 until nrow()) {
@@ -232,17 +234,12 @@ fun Matrix.shiftUpAndPadEndWithZero(): Matrix {
 }
 
 /**
- * The column vector is elementwise multiplied by each row of the matrix.
- *
- * Assumes vector is a column vector and that it has as many rows as the matrix has columns.
+ * Scale each column of the matrix by the provided column vector.
+ * Multiplies the vector elementwise by each column of the matrix.
  */
-fun Matrix.broadcastMultiply(vector: Matrix): Matrix {
-    if (vector.ncol() != 1) {
-        throw IllegalArgumentException("Vector is ${vector.shapeString}, but it must be a column vector")
-    }
-    if (ncol() != vector.nrow()) {
-        throw IllegalArgumentException("Size mismatched. Number of left matrix columns should match number of right vector rows: ${ncol()} columns, vector has ${vector.nrow()} rows.")
-    }
+fun Matrix.scaleColumns(vector: Matrix): Matrix {
+    require(vector.ncol() == 1) { "Vector is ${vector.shapeString}, but it must be a column vector" }
+    require(ncol() == vector.nrow()) { "\"Size mismatched. Number of left matrix columns should match number of right vector rows: ${ncol()} columns, vector has ${vector.nrow()} rows.\"" }
     val result = Matrix(nrow(), ncol())
     for (i in 0 until nrow()) {
         for (j in 0 until ncol()) {
@@ -250,6 +247,24 @@ fun Matrix.broadcastMultiply(vector: Matrix): Matrix {
         }
     }
     return result
+}
+
+/**
+ * Scale each row of the matrix by the provided column vector.
+ * Multiplies the vector elementwise by each row of the matrix.
+ */
+fun Matrix.scaleRows(vector: Matrix): Matrix {
+    require(vector.ncol() == 1) { "Must be a column vector" }
+    require(vector.nrow() == this.nrow()) {
+        "Vector length (${vector.nrow()}) must equal # of rows (${nrow()})"
+    }
+    val out = Matrix(nrow(), ncol())
+    for (i in 0 until nrow()) {
+        for (j in 0 until ncol()) {
+            out[i,j] = this[i,j] * vector[i,0]
+        }
+    }
+    return out
 }
 
 fun Matrix.flatten(): DoubleArray = flattenArray(toArray())

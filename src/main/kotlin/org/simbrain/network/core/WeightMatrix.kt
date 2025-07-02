@@ -234,7 +234,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
 
 
             // One "half" of a matrix product. Source activations are element-wise multiplied by rows of matrix
-            psrMatrix.copyFrom(weights.broadcastMultiply(sourceActivations))
+            psrMatrix.copyFrom(weights.scaleColumns(sourceActivations))
 
         } else {
             // Spiking case

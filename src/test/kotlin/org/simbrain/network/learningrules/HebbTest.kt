@@ -44,7 +44,7 @@ class HebbTest {
         assertEquals(1.0,s12.strength )
         net.update()
         assertEquals(2.0,s12.strength )
-        println("Strength is ${s12.strength}")
+        //println("Strength is ${s12.strength}")
     }
 
     @Test
@@ -84,6 +84,8 @@ class HebbTest {
         na2.activations = outputs
         net.update()
         // Weights start at 0
+        // Remember we default to target-source, so best to think of
+        //  (2,1)^T times (1,3)
         // Expecting [[2,6],[1,3]]
         assertArrayEquals(doubleArrayOf(2.0,6.0), wm12.weights.row(0))
         assertArrayEquals(doubleArrayOf(1.0,3.0), wm12.weights.row(1))

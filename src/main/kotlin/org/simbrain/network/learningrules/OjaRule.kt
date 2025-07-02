@@ -4,8 +4,7 @@ import org.simbrain.network.core.*
 import org.simbrain.network.gui.dialogs.NetworkPreferences.defaultLearningRate
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.EmptyScalarData
-import org.simbrain.util.UserParameter
-import org.simbrain.util.broadcastMultiply
+import org.simbrain.util.*
 
 /**
  * **OjaSynapse** is a synapse which asymptotically normalizes the sum of
@@ -44,11 +43,14 @@ class OjaRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>() {
             val wm = connector.weights
             val input = (connector.source as NeuronArray).activations
             val output = (connector.target as NeuronArray).activations
-            // delta    = rate * (input * output^T - input "broadcast multiplied by" weight matrix)
-            //          = rate * (hebbTerm - weightDecayTerm)
+            // delta    = rate * (input * output^T - (output ⨀ output^T rowScale wm )/N)
+            //          = rate * (hebbTerm - stabilizationTerm)
             val hebbTerm = output.mt(input)
-            val weightDecayTerm = wm.broadcastMultiply(input)
-            wm.add(hebbTerm.sub(weightDecayTerm).mul(learningRate))
+            val decayCoeffs = output.hadamard(output)  // elementwise square of y
+            val stabilizationTerm = wm
+                .scaleRows(decayCoeffs)    // rows scaled by y_i²
+                .div(normalizationFactor)
+            wm.add(hebbTerm.sub(stabilizationTerm).mul(learningRate))
         }
     }
 }

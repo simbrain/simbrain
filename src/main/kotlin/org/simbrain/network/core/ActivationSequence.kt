@@ -71,7 +71,7 @@ class ActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inpu
         errorSignal = (updateRule as? DifferentiableUpdateRule)?.getDerivative(inputs)?.let { deriv ->
             processErrorProbe?.write("deriv", deriv)
             if (signalSource is NeuronArray) {
-                deriv.broadcastMultiply(errorSignal)
+                deriv.scaleColumns(errorSignal)
             } else {
                 errorSignal.mul(deriv)
             }

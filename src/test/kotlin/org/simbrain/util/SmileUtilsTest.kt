@@ -43,18 +43,27 @@ class SmileUtilsTest {
     }
 
     @Test
-    fun `test broadcasting multiplication`() {
+    fun `test broadcasting a vector across columns`() {
         val vector = doubleArrayOf(0.0, 1.0, 2.0).toColumnVector()
-        val result = testMatrix.broadcastMultiply(vector)
+        val result = testMatrix.scaleColumns(vector)
         assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0), result.col(0))
         assertArrayEquals(doubleArrayOf(2.0, 5.0, 8.0), result.col(1))
         assertArrayEquals(doubleArrayOf(6.0, 12.0, 18.0), result.col(2))
     }
 
     @Test
+    fun `test broadcasting a vector across rows`() {
+        val vector = doubleArrayOf(0.0, 1.0, 2.0).toColumnVector()
+        val result = testMatrix.scaleRows(vector)
+        assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0), result.row(0))
+        assertArrayEquals(doubleArrayOf(4.0, 5.0, 6.0), result.row(1))
+        assertArrayEquals(doubleArrayOf(14.0, 16.0, 18.0), result.row(2))
+    }
+
+    @Test
     fun `test broadcasting multiplication on non square matrix`() {
         val vector = doubleArrayOf(0.0, 1.0, 2.0).toColumnVector()
-        val result = nonSquareMatrix.broadcastMultiply(vector)
+        val result = nonSquareMatrix.scaleColumns(vector)
         assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0, 0.0), result.col(0))
         assertArrayEquals(doubleArrayOf(2.0, 5.0, 8.0, 11.0), result.col(1))
         assertArrayEquals(doubleArrayOf(6.0, 12.0, 18.0, 24.0), result.col(2))

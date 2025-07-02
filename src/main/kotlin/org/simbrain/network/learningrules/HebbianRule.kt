@@ -46,7 +46,7 @@ class HebbianRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>() {
             val input = connector.source.activations
             val output = connector.target.activations
             if (forgettingRate == 0.0) {
-                // delta = rate * (input * output^T)
+                // delta = rate * (output * input^T)
                 wm.add(output.mt(input).mul(learningRate))
             } else {
                 connector.weights.mul(1 - forgettingRate).add(output.mt(input).mul(learningRate))

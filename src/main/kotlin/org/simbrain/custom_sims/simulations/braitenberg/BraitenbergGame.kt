@@ -149,21 +149,41 @@ val braitenbergGame = newSim {
     }
 
     addSidebarInfo(
-    """ 
-            
-    # Braitenberg Game
-        
-    Work in progress.        
+    """     
+    # Introduction
 
-    ### References
+    [Braitenberg vehicles](http://en.wikipedia.org/wiki/Braitenberg_vehicle) are simple agents that move around in response to environmental stimuli. This simulation simulates a Braitenberg vehicle as a controllable
+    agent that can be tweaked to avoid dangerous obstacles and pursue a target.      
+
+    # Simulation Details
+    
+    In this simulation, the Braitenberg vehicle is controlled through a control panel rather than being a preset Braitenberg vehicle (e.g., the `Pursuer`/`Avoider` simulations). In the odor world,
+    there are `4` objects, `3` of which are obstacles that the agent has to avoid or go around to get the target (e.g., cheese).
+    
+    The agent in this simulation, can have both characteristics of the _aggressive vehicle_ and the _coward vehicle_, which were explored in the `Pursuer` and `Avoider` simulations independently. This is as a result
+    of the agent's parameters (e.g., weight strengths and velocity) being changed in real-time as the simulation runs.
+    
+    # What to Do
+    
+     In this simulation similar to the other Braitenberg simulations, simply press the `play` button on the top toolbar for the simulation to run.
         
-    1) Braitenberg, V. (1986). [_Vehicles: Experiments in synthetic psychology_](https://mitpress.mit.edu/9780262521123/vehicles/). MIT press.
-            
-    2) Hotton, S., & Yoshimi, J. (2024). [_The Open Dynamics of Braitenberg Vehicles_](https://mitpress.mit.edu/9780262548199/the-open-dynamics-of-braitenberg-vehicles/). MIT Press.
-            
-    ### Credits
-            
-    ...
+    1) While it runs, tweak the parameters of the agent to avoid the obstacles and get to the cheese.
+    
+    2) Continue doing so until the agent has approached the cheese.
+    
+    3) Press the `stop` button to stop the network from running.
+
+    # References
+        
+    Braitenberg, V. (1986). [_Vehicles: Experiments in synthetic psychology_](https://mitpress.mit.edu/9780262521123/vehicles/). MIT press.
+        
+    Hotton, S., & Yoshimi, J. (2024). [_The Open Dynamics of Braitenberg Vehicles_](https://mitpress.mit.edu/9780262548199/the-open-dynamics-of-braitenberg-vehicles/). MIT Press.
+
+    # Credits
+    
+    [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
+    
+    Kanly Thao
             
     """.trimIndent()
     )

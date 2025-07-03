@@ -176,7 +176,6 @@ val avoider = newSim {
     // Add documentation sidebar
     addSidebarInfo(
         """
-
         # Introduction
 
         [Braitenberg vehicles](http://en.wikipedia.org/wiki/Braitenberg_vehicle) are simple agents that move around in response to environmental stimuli. This simulation simulates a Braitenberg vehicle as an agent
@@ -202,16 +201,18 @@ val avoider = newSim {
         
         ## Other Observations
         
-        In addition to how you can use this simulation normally, you can also control the velocity of the agent's movement. To do this, simply press the up/down arrow keys
-        to control its velocity while the simulation runs.
+        In this simulation, you can control the velocity of the agent's movement. There are three key value ranges to observe: positive, zero, negative. To do this: 
         
-        Three key value range to observe:
+        1) Click on the `Straight` neuron.
         
-        1) Positive
+        2) Press the up/down arrow keys to control the neuron's activation (e.g., velocity).
         
-        2) Negative
+        In addition to controlling the velocity, you can control the strength of the agent's sensors by changing the values of the weights from sensors to orientation. This changes
+        how aggressive the agent turns in response to the object. To do this:
         
-        3) Zero.
+        1) Click on either weights between the sensor neurons and turn neurons.
+        
+        2) Press the up/down arrow keys to control their strength (e.g., the agent's turn aggression towards the object).
 
         # References
         

@@ -185,7 +185,7 @@ class FrequencyColoringManager: ColoringManager() {
     override fun activate(dataPoint: DataPoint) {
         val count = visitCounts.getOrDefault(dataPoint, 0)
         visitCounts[dataPoint] = count + 1
-        maxCount = max(maxCount, count)
+        maxCount = max(maxCount, count + 1)
     }
 
     // TODO: Cache hotcolor and bascolor
@@ -206,7 +206,9 @@ class FrequencyColoringManager: ColoringManager() {
         visitCounts.clear()
     }
 
-    override fun copy() = FrequencyColoringManager()
+    override fun copy() = FrequencyColoringManager().also {
+        it.highFrequencyColor = highFrequencyColor
+    }
 
 }
 
@@ -225,11 +227,11 @@ class MarkovColoringManager: ColoringManager() {
     override fun activate(dataPoint: DataPoint) {
         lastPoint?.let { prev ->
             transitionCounts.getOrPut(prev) {
-                mutableMapOf(dataPoint to 0)
+                mutableMapOf()
             }
             val count = transitionCounts[prev]!![dataPoint] ?: 0
             transitionCounts[prev]!![dataPoint] = count + 1
-            maxCounts[prev] = max(maxCounts[prev]?:0, count)
+            maxCounts[prev] = max(maxCounts[prev]?:0, count + 1)
         }
         lastPoint = dataPoint
     }
@@ -255,7 +257,9 @@ class MarkovColoringManager: ColoringManager() {
         lastPoint = null
     }
 
-    override fun copy() = MarkovColoringManager()
+    override fun copy() = MarkovColoringManager().also {
+        it.highProbabilityColor = highProbabilityColor
+    }
 
 }
 

@@ -1,7 +1,6 @@
 package org.simbrain.network.connections
 
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
@@ -9,20 +8,19 @@ import org.simbrain.util.point
 
 class FixedDegreeTest {
 
-    var net = Network()
-    lateinit var n1: Neuron
-    lateinit var n2: Neuron
-    lateinit var n3: Neuron
-    lateinit var conn: FixedDegree
+    private val net = Network()
+    private val n1: Neuron
+    private val n2: Neuron
+    private val n3: Neuron
+    private val conn: FixedDegree
 
-    @BeforeEach
-    fun setUp() {
+    init {
         conn = FixedDegree()
-        n1 = Neuron();
+        n1 = Neuron()
         n1.location = point(0, 0)
-        n2 = Neuron();
+        n2 = Neuron()
         n2.location = point(0, 50)
-        n3 = Neuron();
+        n3 = Neuron()
         n3.location = point(0, 100)
         net.addNetworkModels(listOf(n1, n2, n3))
     }

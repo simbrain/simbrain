@@ -1,17 +1,15 @@
 package org.simbrain.util.table
 
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import smile.math.matrix.Matrix
 
 class MatrixDataFrameTest {
 
-    private lateinit var matrix: Matrix
-    private lateinit var df: MatrixDataFrame
+    private val matrix: Matrix
+    private val df: MatrixDataFrame
 
-    @BeforeEach
-    fun setUp() {
+    init {
         matrix = Matrix(3, 4)
         // Fill with test data
         for (i in 0 until 3) {

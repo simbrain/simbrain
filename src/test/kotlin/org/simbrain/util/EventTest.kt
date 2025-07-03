@@ -3,17 +3,15 @@ package org.simbrain.util
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.time.Duration.Companion.seconds
 
 class EventTest {
 
-    lateinit var events: Events
+    private val events: Events
 
-    @BeforeEach
-    fun setUp() {
+    init {
         events = Events(timeout = 1.seconds)
     }
 

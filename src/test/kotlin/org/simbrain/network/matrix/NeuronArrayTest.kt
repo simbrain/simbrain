@@ -12,8 +12,7 @@ class NeuronArrayTest {
     var net: Network = Network()
     var na: NeuronArray = NeuronArray(10)
 
-    @BeforeEach
-    fun setUp() {
+    init {
         net.addNetworkModel(na)
     }
 

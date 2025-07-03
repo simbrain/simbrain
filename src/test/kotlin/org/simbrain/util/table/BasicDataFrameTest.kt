@@ -1,18 +1,16 @@
 package org.simbrain.util.table
 
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import smile.math.matrix.Matrix
 
 class BasicDataFrameTest {
 
-    private lateinit var df: BasicDataFrame
-    private lateinit var mixedTypeData: List<List<Any?>>
+    private val df: BasicDataFrame
+    private val mixedTypeData: List<List<Any?>>
 
-    @BeforeEach
-    fun setUp() {
+    init {
         // Mixed type data for testing
         mixedTypeData = listOf(
             listOf("Alice", 25, 3.14),

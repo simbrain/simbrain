@@ -1,18 +1,16 @@
 package org.simbrain.world.dataworld
 
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.simbrain.util.table.BasicDataFrame
 import org.simbrain.world.dataworld.DataWorld.DataEntryMode
 
 class DataWorldTest {
 
-    lateinit var dataWorld: DataWorld
-    lateinit var dataComponent: DataWorldComponent
+    private val dataWorld: DataWorld
+    private val dataComponent: DataWorldComponent
 
-    @BeforeEach
-    fun setUp() {
+    init {
         dataWorld = DataWorld(rows = 5, cols = 3)
         dataComponent = DataWorldComponent("Test Data World")
     }

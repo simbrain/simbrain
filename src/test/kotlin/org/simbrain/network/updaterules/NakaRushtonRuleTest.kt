@@ -2,7 +2,6 @@ package org.simbrain.network.updaterules
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
@@ -11,15 +10,14 @@ import kotlin.math.pow
 
 class NakaRushtonRuleTest {
 
-    lateinit var net: Network
-    lateinit var input1: Neuron
-    lateinit var input2: Neuron
-    lateinit var output: Neuron
-    lateinit var w1: Synapse
-    lateinit var nakaRushtonRule: NakaRushtonRule
+    private val net: Network
+    private val input1: Neuron
+    private val input2: Neuron
+    private val output: Neuron
+    private val w1: Synapse
+    private val nakaRushtonRule: NakaRushtonRule
 
-    @BeforeEach
-    fun setUp() {
+    init {
         net = Network()
         input1 = Neuron()
         input2 = Neuron()

@@ -1,23 +1,21 @@
 package org.simbrain.network.connections
 
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 
 class AllToAllTest {
 
-    var net = Network()
-    lateinit var n1: Neuron
-    lateinit var n2: Neuron
-    lateinit var conn: AllToAll
+    private val net = Network()
+    private val n1: Neuron
+    private val n2: Neuron
+    private val conn: AllToAll
     
-    @BeforeEach
-    fun setUp() {
+    init {
         conn = AllToAll()
-        n1 = Neuron();
-        n2 = Neuron();
+        n1 = Neuron()
+        n2 = Neuron()
         net.addNetworkModels(listOf(n1, n2))
     }
 

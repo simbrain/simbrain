@@ -2,7 +2,6 @@ package org.simbrain.network.gui
 
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connections.AllToAll
@@ -15,11 +14,10 @@ import smile.math.matrix.Matrix
 
 class ClipboardTest {
 
-    private lateinit var network: Network
-    private lateinit var networkComponent: NetworkComponent
+    private val network: Network
+    private val networkComponent: NetworkComponent
 
-    @BeforeEach
-    fun setUp() {
+    init {
         SimbrainDesktop.workspace.clearWorkspace()
         // Clear the clipboard before each test
         Clipboard.clear()
@@ -1280,7 +1278,7 @@ class ClipboardTest {
         // Get the pasted arrays and weight matrix
         val pastedSourceArray = pastedSupervisedModel.inputLayer as NeuronGroup
         val pastedTargetArray = pastedSupervisedModel.outputLayer as NeuronGroup
-        val pastedSynapseGroup = pastedSupervisedModel.synapseGroups.first() as SynapseGroup
+        val pastedSynapseGroup = pastedSupervisedModel.synapseGroups.first()
 
         // Verify the arrays have the same dimensions
         assertEquals(sourceGroup.size, pastedSourceArray.size,
@@ -1489,7 +1487,7 @@ class ClipboardTest {
         // Get the pasted arrays and weight matrix
         val pastedSourceCollection = pastedSupervisedModel.inputLayer as NeuronCollection
         val pastedTargetCollection = pastedSupervisedModel.outputLayer as NeuronCollection
-        val pastedSynapseGroup = pastedSupervisedModel.synapseGroups.first() as SynapseGroup
+        val pastedSynapseGroup = pastedSupervisedModel.synapseGroups.first()
 
         // Verify the arrays have the same dimensions
         assertEquals(sourceCollection.size, pastedSourceCollection.size,

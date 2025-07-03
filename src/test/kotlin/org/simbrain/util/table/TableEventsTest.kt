@@ -3,17 +3,15 @@ package org.simbrain.util.table
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
 class TableEventsTest {
 
-    private lateinit var events: TableEvents
+    private val events: TableEvents
     private var currentRowChangedCount = 0
     private var rowNameChangedCount = 0
 
-    @BeforeEach
-    fun setUp() {
+    init {
         events = TableEvents()
         currentRowChangedCount = 0
         rowNameChangedCount = 0

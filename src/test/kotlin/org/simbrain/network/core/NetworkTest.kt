@@ -2,7 +2,6 @@ package org.simbrain.network.core
 
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.simbrain.network.neurongroups.*
 import org.simbrain.network.spikeresponders.ShortTermPlasticity
@@ -14,29 +13,28 @@ import org.simbrain.util.point
 import java.util.List
 
 class NetworkTest {
-    lateinit var net: Network
-    lateinit var n1: Neuron
-    lateinit var n2: Neuron
-    lateinit var s1: Synapse
-    lateinit var ng1: NeuronGroup
-    lateinit var ng2: NeuronGroup
-    lateinit var na1: NeuronArray
-    lateinit var na2: NeuronArray
-    lateinit var nc1: NeuronCollection
-    lateinit var wm1: WeightMatrix
-    lateinit var sg1: SynapseGroup
-    lateinit var softmax: SoftmaxGroup
-    lateinit var som: SOMGroup
-    lateinit var wta: WinnerTakeAll
-    lateinit var competitive: CompetitiveGroup
+    private val net: Network
+    private val n1: Neuron
+    private val n2: Neuron
+    private val s1: Synapse
+    private val ng1: NeuronGroup
+    private val ng2: NeuronGroup
+    private val na1: NeuronArray
+    private val na2: NeuronArray
+    private val nc1: NeuronCollection
+    private val wm1: WeightMatrix
+    private val sg1: SynapseGroup
+    private val softmax: SoftmaxGroup
+    private val som: SOMGroup
+    private val wta: WinnerTakeAll
+    private val competitive: CompetitiveGroup
 
     // TODO: Other subneworks
-    var bp: BackpropNetwork? = null
-    var srn: SRNNetwork? = null
+    private val bp: BackpropNetwork?
+    private val srn: SRNNetwork?
 
 
-    @BeforeEach
-    fun setUpNetwork() {
+    init {
         net = Network()
 
         n1 = Neuron()
@@ -84,10 +82,10 @@ class NetworkTest {
         net.addNetworkModels(softmax, som, competitive, wta)
 
         bp = BackpropNetwork(intArrayOf(3, 5, 4), point(0, 0))
-        bp!!.label = "backprop"
+        bp.label = "backprop"
         srn = SRNNetwork(5, 5, 5, point(0, 0))
-        srn!!.label = "srn"
-        net.addNetworkModels(bp!!, srn!!)
+        srn.label = "srn"
+        net.addNetworkModels(bp, srn)
     }
 
     @Test

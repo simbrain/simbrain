@@ -1,7 +1,6 @@
 package org.simbrain.network.learningrules
 
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.*
 import org.simbrain.network.updaterules.LinearRule
@@ -15,11 +14,10 @@ import org.simbrain.network.util.EmptyScalarData
  */
 class MatrixScalarComparisonTest {
 
-    private lateinit var network: Network
+    private val network: Network
     private val tolerance = 1e-10
 
-    @BeforeEach
-    fun setUp() {
+    init {
         network = Network()
     }
 

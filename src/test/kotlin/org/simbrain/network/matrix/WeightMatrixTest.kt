@@ -10,13 +10,12 @@ import org.simbrain.network.neurongroups.NeuronGroup
 import java.util.List
 
 class WeightMatrixTest {
-    lateinit var net: Network
-    lateinit var na1: NeuronArray
-    lateinit var na2: NeuronArray
-    lateinit var wm: WeightMatrix
+    var net: Network
+    var na1: NeuronArray
+    var na2: NeuronArray
+    var wm: WeightMatrix
 
-    @BeforeEach
-    fun setUp() {
+    init {
         net = Network()
         na1 = NeuronArray(2)
         na2 = NeuronArray(2)

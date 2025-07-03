@@ -1,7 +1,6 @@
 package org.simbrain.world.imageworld
 
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.simbrain.world.imageworld.events.ImageEvents
 import org.simbrain.world.imageworld.filters.FilterCollection
@@ -10,11 +9,10 @@ import java.awt.image.BufferedImage
 
 class ImageWorldTest {
 
-    lateinit var imageComponent: ImageWorldComponent
-    lateinit var imageWorld: ImageWorld
+    private val imageComponent: ImageWorldComponent
+    private val imageWorld: ImageWorld
 
-    @BeforeEach
-    fun setUp() {
+    init {
         imageComponent = ImageWorldComponent("Test Image World")
         imageWorld = imageComponent.world
     }

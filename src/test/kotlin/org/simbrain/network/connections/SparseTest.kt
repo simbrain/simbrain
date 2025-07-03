@@ -3,7 +3,6 @@ package org.simbrain.network.connections
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
@@ -11,11 +10,10 @@ import org.simbrain.network.core.addNeuronCollection
 
 class SparseTest {
 
-    var net = Network()
-    lateinit var sparse: Sparse
+    private val net = Network()
+    private val sparse: Sparse
     
-    @BeforeEach
-    fun setUp() {
+    init {
         sparse = Sparse()
         net.addNetworkModels(List(10) { Neuron() })
     }

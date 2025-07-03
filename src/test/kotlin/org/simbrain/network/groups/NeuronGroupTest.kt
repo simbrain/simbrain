@@ -7,11 +7,7 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.*
 import org.simbrain.network.neurongroups.*
-import org.simbrain.network.subnetworks.BackpropNetwork
-import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.workspace.Workspace
-import org.simbrain.workspace.couplings.getConsumer
-import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.serialization.WorkspaceSerializer
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream

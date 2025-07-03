@@ -2,7 +2,6 @@ package org.simbrain.network.core
 
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.Sparse
@@ -12,16 +11,15 @@ import smile.math.matrix.Matrix
 
 class SynapseGroupTestKt {
 
-    lateinit var network: Network
-    lateinit var n1: Neuron
-    lateinit var n2: Neuron
-    lateinit var n3: Neuron
-    lateinit var sourceGroup: NeuronGroup
-    lateinit var targetGroup: NeuronGroup
+    private val network: Network
+    private val n1: Neuron
+    private val n2: Neuron
+    private val n3: Neuron
+    private val sourceGroup: NeuronGroup
+    private val targetGroup: NeuronGroup
 
     // One source node, two target nodes
-    @BeforeEach
-    fun setup() {
+    init {
         network = Network()
         n1 = Neuron().apply { network.addNetworkModel(this) }
         n2 = Neuron().apply { network.addNetworkModel(this) }

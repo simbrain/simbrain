@@ -10,7 +10,6 @@ import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.updaterules.IntegrateAndFireRule
 import org.simbrain.plot.rasterchart.RasterPlotComponent
 import org.simbrain.util.place
-import org.simbrain.util.point
 import org.simbrain.util.showNumericInputDialog
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.stats.distributions.PoissonDistribution
@@ -27,7 +26,7 @@ val integrateAndFireSimulation = newSim {
 
     val gridSpace = 50.0
     val sparsity = 0.20 // Percent of possible connections to make, and change to alter synchronous firing
-    val excitatoryRatio = 5.0 // Percent of connections that will be excitatory
+    var percentExcitatory = 5.0
     
     // Setup workspace and create network component
     workspace.clearWorkspace()
@@ -76,7 +75,7 @@ val integrateAndFireSimulation = newSim {
     }
     
     // Polarize synapses according to specified excitatory ratio
-    polarizeSynapses(synapses, excitatoryRatio)
+    polarizeSynapses(synapses, percentExcitatory)
     
     // Randomize weights and delays
     val randDelay = PoissonDistribution(3.0)
@@ -108,10 +107,65 @@ val integrateAndFireSimulation = newSim {
                 neuronCollection.randomize()
             }
             addButton("Sparsity") {
-                // TODO
+                val newSparsity = showNumericInputDialog("Enter new sparsity (0.0 to 1.0):", sparsity) ?: return@addButton
+                
+                // Remove existing synapses
+                network.flatSynapseList.filter { synapse ->
+                    synapse.source in neurons && synapse.target in neurons
+                }.forEach { synapse ->
+                    runBlocking { synapse.delete() }
+                }
+                
+                // Create new sparse connections with updated sparsity
+                val newSparse = Sparse(newSparsity, false, true)
+                val newSynapses = newSparse.connectNeurons(neurons, neurons)
+                
+                // Polarize synapses according to current excitatory ratio
+                polarizeSynapses(newSynapses, percentExcitatory)
+                
+                // Randomize weights and delays
+                newSynapses.forEach { synapse ->
+                    if (synapse.strength > 0) {
+                        synapse.strength = exciteRand.sampleDouble()
+                    } else {
+                        synapse.strength = -inhibRand.sampleDouble()
+                    }
+                    synapse.delay = randDelay.sampleInt()
+                }
+                
+                // Add new synapses to network
+                network.addNetworkModels(newSynapses)
             }
             addButton("Excitatory Ratio") {
-               // TODO
+                percentExcitatory = showNumericInputDialog(
+                    "Enter new percent excitatory (0.0 to 100.0):", percentExcitatory) ?: return@addButton
+                
+                // Remove existing synapses
+                network.flatSynapseList.filter { synapse ->
+                    synapse.source in neurons && synapse.target in neurons
+                }.forEach { synapse ->
+                    runBlocking { synapse.delete() }
+                }
+                
+                // Create new sparse connections with current sparsity
+                val newSparse = Sparse(sparsity, false, true)
+                val newSynapses = newSparse.connectNeurons(neurons, neurons)
+                
+                // Polarize synapses according to new excitatory ratio
+                polarizeSynapses(newSynapses, percentExcitatory)
+                
+                // Randomize weights and delays
+                newSynapses.forEach { synapse ->
+                    if (synapse.strength > 0) {
+                        synapse.strength = exciteRand.sampleDouble()
+                    } else {
+                        synapse.strength = -inhibRand.sampleDouble()
+                    }
+                    synapse.delay = randDelay.sampleInt()
+                }
+                
+                // Add new synapses to network
+                network.addNetworkModels(newSynapses)
             }
         }
     }
@@ -126,28 +180,26 @@ val integrateAndFireSimulation = newSim {
         """
         # Integrate-and-Fire Network with Raster Plot
 
-        # Introduction
-
-        ## Basic
         This simulation lets you explore how a network of simple brain-like cells, called integrate-and-fire neurons, behave together. It's a great way to learn how raster plots help visualize when neurons "spike" or send signals, and how the structure of a recurrent neural network influences these spiking patterns over time.
-
-        ## Advanced
-        This simulation models a recurrent network of leaky integrate-and-fire neurons, demonstrating complex spiking behavior shaped by sparse, balanced excitatory and inhibitory connectivity.
-
+        
+        **Note**. You can use `view > toggle weight visibility` or press 5 to make synapses invisibility, which makes the simulation run faster
+       
         # Background
 
-        ## Basic
-        Integrate-and-fire neurons are simple, biologically-inspired models of brain cells that “spike” when their internal signal, or membrane potential, crosses a certain threshold. By adjusting how the neurons connect and how they’re activated, you can observe a wide range of network behaviors—from random, asynchronous firing to more organized bursts of activity.
+        This simulation models a recurrent network of leaky integrate-and-fire neurons, demonstrating complex spiking behavior shaped by sparse, balanced excitatory and inhibitory connectivity.
 
-        ## Advanced
+        Integrate-and-fire neurons are simple, biologically-inspired models of brain cells that "spike" when their internal signal, or membrane potential, crosses a certain threshold. By adjusting how the neurons connect and how they're activated, you can observe a wide range of network behaviors—from random, asynchronous firing to more organized bursts of activity.
+
         The neurons implement leaky integrate-and-fire dynamics: they integrate synaptic input currents, experience membrane potential decay over time, and emit spikes upon reaching threshold. Network connectivity is sparse (~5%), with balanced excitatory and inhibitory neuron populations influencing emergent firing patterns.
 
+        In the raster plot, vertical clusters of spikes reflect synchronous firing across many neurons whose combined  currents generate the signals picked up by [EEG](https://en.wikipedia.org/wiki/Electroencephalography)
+         .The timing between these clusters then determines which EEG frequency band dominates, For example, clusters repeating every 250–1000 ms underlie delta (1–4 Hz), every 125–250 ms theta (4–8 Hz), roughly every 83–125 ms alpha (8–12 Hz), 33–83 ms beta (12–30 Hz), and sub-33 ms gamma (>30 Hz).
+         So the spacing between spike‐bands in the raster offers a direct visual correlate of the oscillatory rhythms seen in EEG.
+        
         # Simulation Details
 
-        ## Neuron Model
-
-        - Basic: Each neuron in the network adds up incoming signals and fires, or “spikes,” when it reaches a certain level, then resets. These are leaky integrate-and-fire neurons, meaning their internal signal also fades or “leaks” over time, creating more realistic, time-dependent behavior as they integrate input and respond when a threshold is crossed.
-        - Advanced: Neurons follow leaky integrate-and-fire dynamics — integrating input currents, undergoing exponential decay, and firing spikes at threshold crossing, followed by a reset to resting potential.
+        Each neuron in the network adds up incoming signals and fires, or "spikes," when it reaches a certain level, then resets. These are leaky integrate-and-fire neurons, meaning their internal signal also fades or "leaks" over time, creating more realistic, time-dependent behavior as they integrate input and respond when a threshold is crossed.
+        Neurons follow leaky integrate-and-fire dynamics — integrating input currents, undergoing exponential decay, and firing spikes at threshold crossing, followed by a reset to resting potential.
 
         For more info: [Integrate-and-Fire documentation](https://docs.simbrain.net/docs/network/neurons/integrateAndFire.html).
 
@@ -185,6 +237,8 @@ val integrateAndFireSimulation = newSim {
 
         ## Try This
 
+        - Look for vertical bands of spikes, reflecting synchronous firing, as well as distance between bands, which reflect
+            the kind of thing EEG bands pick up. See above.
         - Observe spike dynamics live on the raster plot.
         - Change connectivity settings like sparsity and excitatory/inhibitory balance.
         - Randomize neuron activations to explore different network states.
@@ -202,7 +256,7 @@ val integrateAndFireSimulation = newSim {
 
         # Credits
 
-        Jeff Yoshimi, 
+        [Jeff Yoshimi](www.jeffyoshimi.net) 
         Elijah Olson
         """.trimIndent()
     )

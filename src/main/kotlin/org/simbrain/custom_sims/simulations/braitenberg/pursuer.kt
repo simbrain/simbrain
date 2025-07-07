@@ -164,7 +164,7 @@ val pursuer = newSim {
 
         # What to Do
         
-        In this simulation similar to the other Braitenberg simulations, simply press the `play` button on the top toolbar for the simulation to run.
+        In this simulation similar to the other Braitenberg simulations, simply press the `play` button on the top toolbar for the simulation to run. Below are the steps:
         
         1) While it runs, observe the behavior of the agent in the odor world.
         
@@ -185,7 +185,7 @@ val pursuer = newSim {
         
         1) Click on either weights between the sensor neurons and turn neurons.
         
-        2) Press the up/down arrow keys to control their strength (e.g., the agent's turn aggression towards the object).
+        2) Press the up/down arrow keys to control their strength (e.g., the agent's turn aggression towards the object). 
         
         # References
         

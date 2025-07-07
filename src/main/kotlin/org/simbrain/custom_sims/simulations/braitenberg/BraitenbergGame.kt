@@ -165,7 +165,7 @@ val braitenbergGame = newSim {
     
     # What to Do
     
-     In this simulation similar to the other Braitenberg simulations, simply press the `play` button on the top toolbar for the simulation to run.
+     In this simulation similar to the other Braitenberg simulations, simply press the `play` button on the top toolbar for the simulation to run. Below are the steps:
         
     1) While it runs, tweak the parameters of the agent to avoid the obstacles and get to the cheese.
     

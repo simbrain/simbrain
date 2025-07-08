@@ -91,7 +91,7 @@ val isopodSim = newSim {
     // Location of the network in the desktop
     withGui {
         place(networkComponent) {
-            location = point(4, 187)
+            location = point(0, 210)
             width = 400
             height = 400
         }
@@ -187,7 +187,7 @@ val isopodSim = newSim {
 
     withGui {
         place(odorWorldComponent) {
-            location = point(413, 10)
+            location = point(410, 10)
             width = 600
             height = 600
         }
@@ -230,7 +230,7 @@ val isopodSim = newSim {
     //Control Panel (5, 10, 143, 173)
 
     withGui {
-        createControlPanel("Control Panel", 5, 10) {
+        createControlPanel("Control Panel", 130, 15) {
 
             suspend fun runTrials() {
                 var iteration = 0
@@ -325,28 +325,50 @@ val isopodSim = newSim {
         """ 
         # Introduction
         
-        The Braitenberg Isopod Simulation explores the reactive behaviors in agent, the isopod, from sensorimotor connections. The isopod reacts to its environment, the fish stimuli, based on connections between its sensors and actuators. The sensors detect the stimuli, which determine the strength and direction of movement, and the actuators control the actual movement of the vehicles.
+        This simulation explores the reactive behaviors in the isopod from sensorimotor connections. The isopod reacts to its environment, the fish stimuli, based on connections between 
+        its sensors and actuators. The sensors detect the stimuli, which determine the strength and direction of movement, and the actuators control the actual movement of the vehicles.
         
-        The graphs are showing multiple trials where we place the isopod in the center of the world, let it go, and see what it does. Each trial can either terminate in it obtaining food, hitting a wall, or the max trials running out. The bias controls its speed in these sims (prob something to change)  and so generally these guys aren’t finding the food, which is in the four corners.
+        # Simulation Details
+        
+        In this simulation, the `Left` and `Right` neurons receive activation when the isopod detects stimuli. These activations are sent to the actuator neurons which controls the isopod's motor actions. The magnitude 
+        of the weights indicate the strength of the connection between the detector neurons and the actuator neurons. The weight strength influences the magnitude of the isopod's action. For example, with a higher
+        weight strength, it increases the likelihood and intensity of the action (e.g., turn left, turn right).
+        
+        Unlike the other Braitenberg simulations, this simulation has a `Speed inhibition` button which creates synaptic connections between the isopod's velocity to the sensory inputs, creating a connection between
+        the `Left` and `Right` neurons to the `Straight` neuron. This allows the isopod to make more _accurate_ actions, speeding up in low-stimulus areas, and slowing down when near the fish.
+        
+        The graphs are showing multiple trials where we place the isopod in the center of the world, let it go, and see what it does. Each trial can either terminate in it obtaining food, hitting a wall, or the max
+        trials running out. The bias controls its speed in these sims (prob something to change) and so generally these guys aren’t finding the food, which is in the four corners.
+        
         # What to Do
-        1. Click "Run one trial" to see how the isopod reacts to its environment. One trial of this simulation consists of the isopod moving in the "empty.tmx" window, as it moves towards the fish. The trial ends either when the isopod reaches the bounds of the window or the fish.
-        2. The weights in the "Network" window changes according to the isopod's actions. 
-            - The "Left" and "Right" weights are the inputs that detect the stimuli in the environment of the "empty.tmx" window.
-            - The "Turn Left", "Straight", and "Turn Right" weights are the outputs of the isopod's motor actions, steering it.
-            - The magnitude of the weights indicate the strength of the connection and influence the output has on the isopod's actions, with a higher weight increasing the likelihood and intensity of the action.
-        3. "Run trials" to observe the agent in its environment.
-        4. Click "Speed inhibition" to link the speed to the sensory input, creating a connection between "Left", "Right", and "Straight". 
-            - This allows for the isopod to make more "accurate" actions, speeding up in low-stimulus areas, and slowing down when near the fish. 
-            
-        ### References
+        
+        Below is the general method to use this simulation:
+        
+        1) Click `Run one trial` to see how the isopod reacts to its environment. To run multiple trials, click `Run trials`.
+        
+        2) Observe the isopod's behavior.
+        
+        3) To make it have more naturalistic behaviors, click `Speed inhibition`. 
+        
+        4) Observe the difference in behaviors.
+
+        5) Save the results.
+        
+        6) Analyze the results in a statistical computing environment. 
+              
+        # References
     
-        1) Braitenberg, V. (1986). [_Vehicles: Experiments in synthetic psychology_](https://mitpress.mit.edu/9780262521123/vehicles/). MIT press.
+        Braitenberg, V. (1986). [_Vehicles: Experiments in synthetic psychology_](https://mitpress.mit.edu/9780262521123/vehicles/). MIT press.
         
-        2) Hotton, S., & Yoshimi, J. (2024). [_The Open Dynamics of Braitenberg Vehicles_](https://mitpress.mit.edu/9780262548199/the-open-dynamics-of-braitenberg-vehicles/). MIT Press.
+        Hotton, S., & Yoshimi, J. (2024). [_The Open Dynamics of Braitenberg Vehicles_](https://mitpress.mit.edu/9780262548199/the-open-dynamics-of-braitenberg-vehicles/). MIT Press.
         
-        ### Credits
+        # Credits
         
-        [Jeff Yoshimi](https://jeffyoshimi.net/index.html) and Jasmine Lau.
+        Jasmine Lau
+        
+        [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
+        
+        Kanly Thao
         
         """.trimIndent()
     )

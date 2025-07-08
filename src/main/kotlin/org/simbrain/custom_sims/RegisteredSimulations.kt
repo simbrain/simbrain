@@ -120,9 +120,9 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("SOM network") { SOMSim }
     }
 
-    dir("Leabra") {
-        item("Point neuron") { pointNeuronSim }
-    }
+    //dir("Leabra") {
+    //    item("Point neuron") { pointNeuronSim }
+    //}
 
     dir("Hopfield and Boltzmann") {
         item("Hopfield patterns") { hopfieldPatterns }

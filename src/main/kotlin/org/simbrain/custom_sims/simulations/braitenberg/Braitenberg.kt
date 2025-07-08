@@ -186,7 +186,12 @@ val braitenbergSim = newSim {
         vehicles revolve around each other), translating behaviors (where they move alongside one another), and various types of _meandering_ behaviors where they spin while they revolve around each other or travel 
         side by side. Other behaviors are possible, many of which are described in the book.
         
-        For an introduction to some of the behaviors of Braitenberg vehicles individually rather than as a joint behavior, look into the `Pursuer` and `Avoider` simulations.
+        For an introduction to some of the behaviors of Braitenberg vehicles individually, see the `Pursuer` and `Avoider` simulations.
+        
+        For a quick sense of what is possible in this simulation, press `play` to run the simulation, click in the 
+        world window and press `T` to turn on trails, and [observe the pattern they make](https://bsky.app/profile/jyoshimi.bsky.social/post/3lsbun2wtdc2d).
+         
+        For more simulations you can skip to __What to do__ below.
         
         # Simulation Details
         
@@ -222,15 +227,12 @@ val braitenbergSim = newSim {
         
         In this simulation similar to the other Braitenberg simulations, simply press the `play` button on the top toolbar for the simulation to run and observe the behaviors. Below are the steps:
         
-        1) Press the `play` button on the top menu bar and observe how the vehicles reacts to its environment. 
-        
-        2) Edit the `Left weight`, `Right weight`, and the `Velocity` text boxes to adjust the vehicles' parameters.
-        
-        3) Press either `Same pair`, `Reversed pair`, and `Opposite pair` to confirm the weight changes and to observe changes in the vehicles' behaviors. 
-        
-        4) If the vehicles get too far from one another, press the `play` button again to pause the simulation and manually move the vehicles near each other.
-        
-        5) After doing so, press the `play` button to start the simulation again.
+        1. Press the `play` button on the top menu bar and observe how the vehicles reacts to its environment.        
+        1. Edit the `Left weight`, `Right weight`, and the `Velocity` text boxes to adjust the vehicles' parameters.
+        1. Press either `Same pair`, `Reversed pair`, and `Opposite pair` to confirm the weight changes and to observe changes in the vehicles' behaviors.
+        1. If you press `T` it will toggle trails. This can be useful to show what patterns the vehicles are making. Press it once to turn on trails and again to turn it off (it can slow down a simulation after a while). 
+        1. If the vehicles get too far from one another, press the `play` button again to pause the simulation and manually move the vehicles near each other.
+        1. After doing so, press the `play` button to start the simulation again.
         
         **Note**: After changing the weight strength values, press one of the three buttons to confirm the change.
         

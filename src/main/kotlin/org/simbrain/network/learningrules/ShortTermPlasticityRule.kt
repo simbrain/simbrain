@@ -10,9 +10,7 @@ import org.simbrain.util.UserParameter
  * **ShortTermPlasticitySynapse**.
  */
 class ShortTermPlasticityRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>() {
-    /**
-     * Plasticity type.
-     */
+
     @UserParameter(label = "Plasticity Type", description = "Plasticity Type", increment = 1.0, order = 1)
     var plasticityType: Int = STD
 
@@ -22,27 +20,15 @@ class ShortTermPlasticityRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixDa
     @UserParameter(label = "Spike Threshold", description = "Pseudo Spike Threshold", increment = .1, order = 2)
     var firingThreshold: Double = DEFAULT_FIRING_THRESHOLD
 
-    /**
-     * Base line strength.
-     */
     @UserParameter(label = "Line Strength", description = "Base line strength", increment = .1, order = 3)
     var baseLineStrength: Double = DEFAULT_BASE_LINE_STRENGTH
 
-    /**
-     * Input threshold.
-     */
     @UserParameter(label = "Input Threshold", description = "Input threshold", increment = .1, order = 4)
     var inputThreshold: Double = DEFAULT_INPUT_THRESHOLD
 
-    /**
-     * Bump rate.
-     */
     @UserParameter(label = "Bump rate", description = "Bump Rate", increment = .1, order = 5)
     var bumpRate: Double = DEFAULT_BUMP_RATE
 
-    /**
-     * Rate at which the synapse will decay.
-     */
     @UserParameter(
         label = "Decay Rate",
         description = "Rate at which the synapse will decay",
@@ -51,9 +37,6 @@ class ShortTermPlasticityRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixDa
     )
     var decayRate: Double = DEFAULT_DECAY_RATE
 
-    /**
-     * Activated.
-     */
     @UserParameter(label = "Activated", description = "Activated", increment = .1, order = 7)
     private var activated = DEFAULT_ACTIVATED
 
@@ -70,6 +53,7 @@ class ShortTermPlasticityRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixDa
         stp.decayRate = decayRate
         stp.inputThreshold = inputThreshold
         stp.plasticityType = plasticityType
+        stp.firingThreshold = firingThreshold
         return stp
     }
 

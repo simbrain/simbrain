@@ -32,7 +32,7 @@ val isopodSim = newSim {
     val hitRadius = 80
 
     // Other variables
-    var log = ""
+    val log = StringBuilder()
     var trialNum = 0
 
     // Clear the workspace
@@ -145,7 +145,7 @@ val isopodSim = newSim {
             }
             events.collided.on {
                 if (it is OdorWorld && !collision) {
-                    log += "# Collided with wall\n"
+                    log.append("# Collided with wall\n")
                 }
                 collision = true
             }
@@ -208,21 +208,23 @@ val isopodSim = newSim {
         isopod.heading = UniformRealDistribution(0.0, 360.0).sampleDouble()
     }
 
-    workspace.addUpdateAction(updateAction("Found fish") {
+    // Create the fish collision detection action once and add it to workspace
+    val fishCollisionAction = updateAction("Found fish") {
         val foundFish = odorWorld.entityList
             .filter { it.entityType == EntityType.Fish }
             .any { fish -> fish.location.distance(isopod.location) < hitRadius }
         if (foundFish) {
-            log += "# Collided with fish\n"
+            log.append("# Collided with fish\n")
             collision = true
         }
-    })
+    }
+    workspace.addUpdateAction(fishCollisionAction)
 
     fun logAgentState() {
-        log += "${isopod.x}, ${isopod.y}," +
+        log.append("${isopod.x}, ${isopod.y}," +
                 "${neuronLeftSensor.activation},${neuronRightSensor.activation}" +
                 "${neuronLeftTurning.activation},${neuronRightTurning.activation}" +
-                ",${neuronStraight.activation}\n"
+                ",${neuronStraight.activation}\n")
     }
 
     //empty.tmx (413, 10, 600, 600)
@@ -233,11 +235,14 @@ val isopodSim = newSim {
         createControlPanel("Control Panel", 130, 15) {
 
             suspend fun runTrials() {
+                // Reset before starting trials
+                log.clear() // Clear log to prevent memory accumulation
+                
                 var iteration = 0
                 while (trialNum < defaultNumTrials) {
-                    log += "# Trial: ${trialNum + 1}\n"
+                    log.append("# Trial: ${trialNum + 1}\n")
                     resetIsopod()
-                    log += "# Heading: ${isopod.heading}\n"
+                    log.append("# Heading: ${isopod.heading}\n")
                     workspace.iterateWhile {
                         if (!collision) {
                             logAgentState()
@@ -266,11 +271,13 @@ val isopodSim = newSim {
             }
 
             addButton("Run one trial") {
+                // Reset for single trial
                 resetIsopod()
-                log = ""
+                log.clear() // Clear log to prevent memory accumulation
+                
                 var iteration = 0
                 workspace.launch {
-                    log += "# Heading: ${isopod.heading}\n"
+                    log.append("# Heading: ${isopod.heading}\n")
                     while (++iteration < maxIterationsPerTrial) {
                         workspace.iterateSuspend(1)
                         if (collision) {
@@ -280,8 +287,9 @@ val isopodSim = newSim {
                         }
                     }
                     collision = false
+                    
                     showSaveDialog("", "singleTrial.csv") {
-                        writeText(log)
+                        writeText(log.toString())
                     }
                 }
             }
@@ -293,9 +301,11 @@ val isopodSim = newSim {
             }
 
             addButton("Run trials") {
-                runTrials()
-                showSaveDialog("", "isopodData.csv") {
-                    writeText(log)
+                workspace.launch {
+                    runTrials()
+                    showSaveDialog("", "isopodData.csv") {
+                        writeText(log.toString())
+                    }
                 }
             }
 
@@ -315,7 +325,9 @@ val isopodSim = newSim {
             //}
 
             addButton("Speed inhibition") {
-                useSpeedInhibition()
+                workspace.launch {
+                    useSpeedInhibition()
+                }
             }
         }
 
@@ -338,7 +350,7 @@ val isopodSim = newSim {
         the `Left` and `Right` neurons to the `Straight` neuron. This allows the isopod to make more _accurate_ actions, speeding up in low-stimulus areas, and slowing down when near the fish.
         
         The graphs are showing multiple trials where we place the isopod in the center of the world, let it go, and see what it does. Each trial can either terminate in it obtaining food, hitting a wall, or the max
-        trials running out. The bias controls its speed in these sims (prob something to change) and so generally these guys aren’t finding the food, which is in the four corners.
+        trials running out. The bias controls its speed in these sims (prob something to change) and so generally these guys aren't finding the food, which is in the four corners.
         
         # What to Do
         

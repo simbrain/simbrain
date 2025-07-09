@@ -38,7 +38,7 @@ val cortexLayers = newSim {
     var exscale = .5
     var inlocation = 1.0
     var inscale = .5
-    var neuronsPerLayer = 200 // Was 300
+    var neuronsPerLayer = 300 // Was 300
 
     // TODO: Membrane properties
     // TODO: Build using z coordinates

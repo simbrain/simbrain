@@ -6,7 +6,9 @@ import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.UserParameter
+import org.simbrain.util.applyFunctionInPlace
 import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.util.setValuesInPlace
 import org.simbrain.util.stats.distributions.NormalDistribution
 import smile.math.matrix.Matrix
 import kotlin.math.exp
@@ -98,12 +100,8 @@ class ShortTermPlasticity : SpikeResponder() {
     context(Network)
     override fun apply(synapse: Synapse, responderData: ScalarDataHolder) {
         val udfData = responderData as STPScalarData
-        var u by udfData::u
-        var R by udfData::R
-        val (newU, newR) = shortTermPlasticity(synapse.source.lastSpikeTime, u, R)
-        u = newU
-        R = newR
-        val jumpHeight = R * synapse.strength * u
+        udfData.update(time, synapse.source.lastSpikeTime, U, D, F)
+        val jumpHeight = udfData.R * synapse.strength * udfData.u
         val spiked = synapse.source.isSpike && probabilisticSpikeCheck()
         synapse.psr = when (val sr = spikeResponderLocal) {
             is JumpAndDecay -> sr.jumpAndDecay(spiked, synapse.psr, jumpHeight, timeStep)
@@ -119,16 +117,10 @@ class ShortTermPlasticity : SpikeResponder() {
         val stpData = responderData as STPMatrixData
         val spikeData = na.dataHolder as SpikingMatrixData
         if (na.updateRule.isSpikingRule) {
+            stpData.update(time, spikeData.lastSpikeTimes, U, D, F)
             for (i in 0 until wm.weights.nrow()) {
                 for (j in 0 until wm.weights.ncol()) {
-                    val (u, R) = shortTermPlasticity(
-                        spikeData.lastSpikeTimes[j],
-                        stpData.u[i,j],
-                        stpData.R[i,j],
-                    )
-                    stpData.u.set(i, j, u)
-                    stpData.R.set(i, j, R)
-                    val jumpHeight = R * wm.weights[i, j] * u
+                    val jumpHeight = stpData.R[i, j] * wm.weights[i, j] * stpData.u[i, j]
                     val spiked = spikeData.spikes[j] && probabilisticSpikeCheck()
                     wm.psrMatrix.set(
                         i, j, when (val sr = spikeResponderLocal) {
@@ -225,6 +217,18 @@ class STPScalarData(
         return STPScalarData(u, R)
     }
 
+    fun update(
+        time: Double,
+        lastSpikeTime: Double,
+        U: Double,
+        D: Double,
+        F: Double,
+    ) {
+        val ISI = lastSpikeTime - time
+        u = U + u * (1 - U) * exp(ISI / F)
+        R = 1 + (R - u * R - 1) * exp(ISI / D)
+    }
+
     override fun clear() {
         u = 0.0
         R = 0.0
@@ -236,6 +240,27 @@ class STPMatrixData(val rows: Int, val cols: Int): MatrixDataHolder  {
     var u = Matrix(rows, cols)
     @UserParameter(label = "R", description = "Depression variable", order = 2)
     var R = Matrix(rows, cols)
+
+    fun update(
+        time: Double,
+        lastSpikeTime: DoubleArray,
+        U: Double,
+        D: Double,
+        F: Double,
+    ) {
+        val ISIArray = lastSpikeTime.applyFunctionInPlace { it - time }
+        u.setValuesInPlace { i, j ->
+            val ISI = ISIArray[j]
+            val u = this[i, j]
+            U + u * (1 - U) * exp(ISI / F)
+        }
+        R.setValuesInPlace { i, j ->
+            val ISI = ISIArray[j]
+            val R = this[i, j]
+            val u = u[i, j]
+            1 + (R - u * R - 1) * exp(ISI / D)
+        }
+    }
 
     override fun copy() = STPMatrixData(rows, cols).also {
         it.u = u.clone()

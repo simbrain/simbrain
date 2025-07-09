@@ -395,7 +395,7 @@ fun Matrix.applyFunctionInPlace(fn: (Double) -> Double): Matrix {
     return this
 }
 
-fun Matrix.setValuesInPlace(fn: (i: Int, j: Int) -> Double): Matrix {
+inline fun Matrix.setValuesInPlace(fn: Matrix.(i: Int, j: Int) -> Double): Matrix {
     for (i in 0 until nrow()) {
         for (j in 0 until ncol()) {
             set(i, j, fn(i, j))

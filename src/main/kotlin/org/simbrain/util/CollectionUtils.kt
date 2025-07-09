@@ -147,7 +147,7 @@ fun linspace(start: Double, stop: Double, numPoints: Int) = DoubleArray(numPoint
 fun Array<DoubleArray>.flatten() = flattenArray(this)
 fun Array<FloatArray>.flatten() = flattenArray(this)
 
-fun DoubleArray.applyFunctionInPlace(fn: (Double) -> Double): DoubleArray {
+inline fun DoubleArray.applyFunctionInPlace(fn: (Double) -> Double): DoubleArray {
     for (i in indices) {
         this[i] = fn(this[i])
     }

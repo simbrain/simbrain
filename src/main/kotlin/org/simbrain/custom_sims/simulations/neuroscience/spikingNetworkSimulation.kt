@@ -42,22 +42,28 @@ val spikingNetworkSimulation = newSim {
     
     // Create layout for neurons
     val layout = GridLayout(gridSpace, gridSpace, (sqrt(numNeurons.toDouble())).toInt())
-    
+
+    // Default params for Integrate and Fire Rules
+    fun IntegrateAndFireRule.setIntFireParams() {
+        timeConstant = 5.0
+        resetPotential = 2.0
+        threshold = 11.0
+    }
+
     // Create neurons with integrate and fire rules
     val neurons = buildList {
         repeat(numNeurons) {
             val neuron = runBlocking {
                 network.addNeuron {
                     updateRule = IntegrateAndFireRule().apply {
-                        timeConstant = 5.0
-                        resetPotential = 2.0
-                        threshold = 11.0
+                        setIntFireParams()
                     }
                 }
             }
             add(neuron)
         }
     }
+
 
     val neuronCollection = NeuronCollection(neurons)
 
@@ -204,29 +210,29 @@ val spikingNetworkSimulation = newSim {
                     neurons.forEach { neuron ->
                         neuron.updateRule = when (selectedOption) {
                             0 -> IntegrateAndFireRule().apply {
-                                timeConstant = 5.0
-                                resetPotential = 2.0
-                                threshold = 11.0
+                                setIntFireParams()
                             }
                             1 -> IzhikevichRule().apply {
-                                a = 0.02
-                                b = 0.2
-                                c = -65.0
-                                d = 2.0  // Reduced from 6.0 for more relaxed behavior
-                                backgroundCurrent = 5.0  // Reduced from 14.0 for less frequent spiking
-                                threshold = 30.0
+                                // "Subthreshold" params, which hover around rest with little voltage ripples but never fire unless you add enough current to push them into the spiking regime.
+                                a = 0.05
+                                b = 0.26
+                                c = -60.0
+                                d = -1.0
+                                backgroundCurrent = 0.0
                             }
                             2 -> SpikingThresholdRule().apply {
                                 threshold = 0.5
                             }
-                            else -> IntegrateAndFireRule()
+                            else -> IntegrateAndFireRule().apply {
+                                setIntFireParams()
+                            }
                         }
                     }
                 }
             }
             addButton("Add Pacemaker") {
                 if (pacemakerNeuron == null) {
-                    val frequency = showNumericInputDialog("Enter pacemaker frequency (Hz):", 0.1) ?: return@addButton
+                    val frequency = showNumericInputDialog("Enter pacemaker frequency (Hz):", 0.5) ?: return@addButton
                     
                     // Create pacemaker neuron with sinusoidal activity
                     pacemakerNeuron = runBlocking {
@@ -238,8 +244,8 @@ val spikingNetworkSimulation = newSim {
                                 phase = 0.0
                             }
                             // Position off to the side
-                            x = -100.0
-                            y = (numNeurons / 2) * gridSpace / 2.0
+                            x = neuronCollection.bound.minX
+                            y = neuronCollection.bound.maxY + 100.0
                         }
                     }
                     
@@ -249,8 +255,8 @@ val spikingNetworkSimulation = newSim {
                             val synapse = runBlocking {
                                 network.addSynapse(pacemakerNeuron!!, targetNeuron)
                             }
-                            synapse.strength = 2.0  // Moderate strength
-                            synapse.delay = 1
+                            synapse.strength = 2.0
+                            //synapse.delay = 1
                             add(synapse)
                         }
                     }

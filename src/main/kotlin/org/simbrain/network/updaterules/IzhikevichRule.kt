@@ -69,7 +69,7 @@ class IzhikevichRule : SpikingNeuronUpdateRule<IzhikevichScalarData, IzhikevichM
     @UserParameter(label = "I bkgd", description = "Constant background current.", increment = .1, order = 5)
     var backgroundCurrent = 14.0
 
-    @UserParameter(label = "Threshold", description = "Threshold value to signal a spike", increment = .1, order = 10)
+    @UserParameter(label = "Threshold", description = "Threshold value to signal a spike. (Note that all of Izhikevich's results assume a threshold of 30, so change at your own risk).", increment = .1, order = 10)
     var threshold = 30.0
 
     override var noiseGenerator: ProbabilityDistribution = UniformRealDistribution()
@@ -84,6 +84,7 @@ class IzhikevichRule : SpikingNeuronUpdateRule<IzhikevichScalarData, IzhikevichM
         ir.d = d
         ir.setiBg(getiBg())
         ir.addNoise = addNoise
+        ir.threshold = threshold
         ir.noiseGenerator = noiseGenerator.copy()
         return ir
     }

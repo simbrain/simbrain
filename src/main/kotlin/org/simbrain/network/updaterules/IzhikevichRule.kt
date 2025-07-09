@@ -12,10 +12,12 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution
 import smile.math.matrix.Matrix
 
 /**
- * **IzhikevichNeuron**. Default values correspond to "tonic spiking". TODO:
- * Store a bunch of useful parameters, and add a combo box to switch between the
- * different types. Students could just look it up, but this would be
- * faster/cooler. Just a thought.
+ * IzhikevichNeuron. Default values correspond to "tonic spiking".
+ *
+ * https://docs.simbrain.net/docs/network/neurons/izhikevich.html
+ *
+ * Implementation is based on  Izhikevich (2004), “Which Model to Use For Cortical Spiking Neurons,” IEEE Transactions on Neural Networks
+ *
  */
 class IzhikevichRule : SpikingNeuronUpdateRule<IzhikevichScalarData, IzhikevichMatrixData>(), NoisyUpdateRule {
 

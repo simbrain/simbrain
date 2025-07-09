@@ -9,6 +9,7 @@ import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.addNeuron
 import org.simbrain.network.core.addSynapse
 import org.simbrain.network.layouts.GridLayout
+import org.simbrain.network.spikeresponders.JumpAndDecay
 import org.simbrain.network.updaterules.IntegrateAndFireRule
 import org.simbrain.network.updaterules.IzhikevichRule
 import org.simbrain.network.updaterules.SpikingThresholdRule
@@ -29,8 +30,8 @@ val spikingNetworkSimulation = newSim {
     val numNeurons = showNumericInputDialog("Number of Neurons:", 49) ?: return@newSim
 
     val gridSpace = 50.0
-    val sparsity = 0.20 // Percent of possible connections to make, and change to alter synchronous firing
-    val excitatoryRatio = 5.0 // Percent of connections that will be excitatory
+    var sparsity = 0.20 // Percent of possible connections to make, and change to alter synchronous firing
+    var percentExcitatory = 70.0
     
     // Pacemaker neuron tracking
     var pacemakerNeuron: Neuron? = null
@@ -64,7 +65,6 @@ val spikingNetworkSimulation = newSim {
         }
     }
 
-
     val neuronCollection = NeuronCollection(neurons)
 
     network.addNetworkModel(neuronCollection)
@@ -75,11 +75,11 @@ val spikingNetworkSimulation = newSim {
     // Create sparse connections between neurons
     val sparse = Sparse(sparsity, false, true)
     val synapses = sparse.connectNeurons(neurons, neurons)
-    
+
     // Setup randomizers for excitatory and inhibitory weights
     val exciteRand = NormalDistribution().apply {
-        mean = 1.0
-        standardDeviation = 0.1
+        mean = 10.0
+        standardDeviation = 5.0
     }
     
     val inhibRand = NormalDistribution().apply {
@@ -88,7 +88,7 @@ val spikingNetworkSimulation = newSim {
     }
     
     // Polarize synapses according to specified excitatory ratio
-    polarizeSynapses(synapses, excitatoryRatio)
+    polarizeSynapses(synapses, percentExcitatory)
     
     // Randomize weights and delays
     val randDelay = PoissonDistribution(3.0)
@@ -101,17 +101,20 @@ val spikingNetworkSimulation = newSim {
         synapse.delay = randDelay.sampleInt()
     }
 
-
     network.addNetworkModels(synapses)
-    
+    fun setUpSpikeResponders() {
+        network.flatSynapseList.forEach { s -> s.spikeResponder = JumpAndDecay().apply {
+            timeConstant = 10.0
+        }}
+    }
+    setUpSpikeResponders()
     // Randomize neuron activations
     neurons.forEach { it.randomize() }
     
     // Create a raster plot to visualize the spikes
     val rasterPlot = RasterPlotComponent("Spike Raster Plot")
     workspace.addWorkspaceComponent(rasterPlot)
-    
-    // Position components in the GUI
+
     withGui {
         place(networkComponent, 210, 0, 600, 600)
         place(rasterPlot, 810, 0, 600, 600)
@@ -120,7 +123,7 @@ val spikingNetworkSimulation = newSim {
                 neuronCollection.randomize()
             }
             addButton("Sparsity") {
-                val newSparsity = showNumericInputDialog("Enter new sparsity (0.0 to 1.0):", sparsity) ?: return@addButton
+                sparsity = showNumericInputDialog("Enter new sparsity (0.0 to 1.0):", sparsity) ?: return@addButton
                 
                 // Remove existing synapses
                 network.flatSynapseList.filter { synapse ->
@@ -130,11 +133,11 @@ val spikingNetworkSimulation = newSim {
                 }
                 
                 // Create new sparse connections with updated sparsity
-                val newSparse = Sparse(newSparsity, false, true)
+                val newSparse = Sparse(sparsity, false, true)
                 val newSynapses = newSparse.connectNeurons(neurons, neurons)
                 
                 // Polarize synapses according to current excitatory ratio
-                polarizeSynapses(newSynapses, excitatoryRatio)
+                polarizeSynapses(newSynapses, percentExcitatory)
                 
                 // Randomize weights and delays
                 newSynapses.forEach { synapse ->
@@ -148,9 +151,10 @@ val spikingNetworkSimulation = newSim {
                 
                 // Add new synapses to network
                 network.addNetworkModels(newSynapses)
+                setUpSpikeResponders()
             }
             addButton("Excitatory Ratio") {
-                val newExcitatoryRatio = showNumericInputDialog("Enter new excitatory ratio (0.0 to 100.0):", excitatoryRatio) ?: return@addButton
+                percentExcitatory = showNumericInputDialog("Enter percent excitatory (0.0 to 100.0):", percentExcitatory) ?: return@addButton
                 
                 // Remove existing synapses
                 network.flatSynapseList.filter { synapse ->
@@ -164,7 +168,7 @@ val spikingNetworkSimulation = newSim {
                 val newSynapses = newSparse.connectNeurons(neurons, neurons)
                 
                 // Polarize synapses according to new excitatory ratio
-                polarizeSynapses(newSynapses, newExcitatoryRatio)
+                polarizeSynapses(newSynapses, percentExcitatory)
                 
                 // Randomize weights and delays
                 newSynapses.forEach { synapse ->
@@ -178,6 +182,7 @@ val spikingNetworkSimulation = newSim {
                 
                 // Add new synapses to network
                 network.addNetworkModels(newSynapses)
+                setUpSpikeResponders()
             }
             addButton("Delays") {
                 val newDelayMean = showNumericInputDialog("Enter new mean synaptic delay in milliseconds (Poisson parameter):", randDelay.p) ?: return@addButton
@@ -300,7 +305,9 @@ val spikingNetworkSimulation = newSim {
         A [raster plot](https://docs.simbrain.net/docs/plots/rasterPlot.html). shows when each neuron spikes over time—each row represents a neuron, and each tick marks a spike. If many ticks align vertically, it means neurons are firing together (synchrony), though in this simulation, the spikes are mostly scattered and asynchronous.
         Raster plots visualize precise spike timing and synchrony among neurons, revealing how network structure shapes dynamic patterns.
 
-        # What to Do
+        # Things you can do 
+        
+        ## Observe Dynamics
 
         1. Click `Run` to start the simulation.
         2. Press `Randomize Activations` to explore different starting points.
@@ -309,12 +316,16 @@ val spikingNetworkSimulation = newSim {
         - Are neurons spiking together (synchrony)?
         - Are firing patterns regular (limit cycles) or irregular (probably chaotic)?
 
-        Other things you can try:
+        ## Other things you can try:
 
-        - Switch between different neuron models (Integrate-and-Fire, Izhikevich, Spiking Threshold) to see how they affect network dynamics.
-        - Adjust synaptic delays to explore how temporal dynamics influence firing patterns.
-        - With neurons as Izhikevich try parameters (`N` and double click to edit all) and use parameers from the [Izhikevich docs](https://docs.simbrain.net/docs/network/neurons/izhikevich.html) at the bottom to create specific types of node
-        - Add a pacemaker neuron with sinusoidal activity that drives the entire network at a regular frequency - observe how this affects synchrony and firing patterns.
+        - Reminder to press `5` to toggle weight visibility to increase performance when needed but bring them back to edit and also see spikes better
+        - Press `k` periodically to clear activation
+        - Pass the wand over neurons in the network (when it is relatively quiet) and watch the result in the raster plot
+        - Use the buttons to set indicated properties and observe impact on dynamics. 
+        - Select all nodes with `n`, double click, and adjust the parameters of the neuron update rule you have selected. 
+            For Izhikevich you can use the [docs (see the table at the bottom)](https://docs.simbrain.net/docs/network/neurons/izhikevich.html) to create specific types of Izhikevich neurons
+        - Select all nodes with `n` and click `cmd/ctrl r` to open up the [synapse adjustment dialog](https://docs.simbrain.net/docs/network/networkDialogs.html) which allows weight strengths to be highly customized 
+        - Select all synapses with `w`, double click, and adjust the [spike responders](https://docs.simbrain.net/docs/network/spikeresponders/). Or add a learnig rule like [stdp](https://docs.simbrain.net/docs/network/synapses/stdp.html)
         
         # References
 

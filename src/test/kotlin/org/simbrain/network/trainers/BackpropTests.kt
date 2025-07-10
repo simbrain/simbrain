@@ -190,7 +190,7 @@ class BackpropTests {
     @Test
     fun `train 10-7-10 auto-encoder`() {
         val inputs = Matrix.eye(10)
-        val bp = BackpropNetwork(intArrayOf(10, 7, 10), null).apply {
+        val bp = BackpropNetwork(intArrayOf(10, 5, 10), null).apply {
             initWeights()
             initBiases()
             trainerConfig.learningRate = .01
@@ -207,7 +207,7 @@ class BackpropTests {
             }
         }
         print(trainer.lastTrainingError)
-        assertEquals(0.0, trainer.lastTrainingError , .15)
+        assertEquals(0.0, trainer.lastTrainingError , .01)
     }
 
     fun makeMockInputs(size: Int): Matrix {

@@ -77,7 +77,9 @@ val SimbrainJTable.editRandomizerAction
         description = "Edit table wide randomizer",
         iconPath = "menu_icons/Tools.png"
     ) {
-        AnnotatedPropertyEditor(objectWrapper("Table Randomizer", model.cellRandomizer)).displayInDialog()
+        objectWrapper("Table Randomizer", model.cellRandomizer).createEditorDialog {
+            model.cellRandomizer = it.editingObject
+        }
     }
 
 val SimbrainJTable.insertColumnAction

@@ -33,9 +33,9 @@ import javax.swing.*
  */
 class SynapseAdjustmentPanel(
     var synapses: List<Synapse>,
-    var allRandomizer: ProbabilityDistribution = UniformRealDistribution(-1.0, 1.0),
-    var excitatoryRandomizer: ProbabilityDistribution = UniformRealDistribution(0.0, 1.0),
-    var inhibitoryRandomizer: ProbabilityDistribution = UniformRealDistribution(-1.0, 0.0),
+    allRandomizer: ProbabilityDistribution = UniformRealDistribution(-1.0, 1.0),
+    excitatoryRandomizer: ProbabilityDistribution = UniformRealDistribution(0.0, 1.0),
+    inhibitoryRandomizer: ProbabilityDistribution = UniformRealDistribution(-1.0, 0.0),
     val onApply: () -> Unit = {}
 ) : JPanel() {
 
@@ -55,6 +55,10 @@ class SynapseAdjustmentPanel(
     private val allPanel = AnnotatedPropertyEditor(objectWrapper("All Randomizer", allRandomizer))
     private val excitatoryPanel = AnnotatedPropertyEditor(objectWrapper("Excitatory Randomizer", excitatoryRandomizer))
     private val inhibitoryPanel = AnnotatedPropertyEditor(objectWrapper("Inhibitory Randomizer", inhibitoryRandomizer))
+
+    private val allRandomizer get() = allPanel.editingObjects.first().editingObject
+    private val excitatoryRandomizer get() = excitatoryPanel.editingObjects.first().editingObject
+    private val inhibitoryRandomizer get() = inhibitoryPanel.editingObjects.first().editingObject
 
     private var chooseRandomizerPanel = JPanel()
     private val randomizeButton = JButton("Apply")

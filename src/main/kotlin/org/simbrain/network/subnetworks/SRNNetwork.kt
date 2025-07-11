@@ -48,7 +48,7 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
 
     override lateinit var testingSet: MatrixDataset
 
-    lateinit var weightMatrixTree: WeightMatrixTree
+    lateinit var layers: LinkedHashSet<Layer>
 
     constructor(
         numInputNodes: Int = 10,
@@ -91,7 +91,7 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
 
         setLocation(initialPosition.x, initialPosition.y)
 
-        weightMatrixTree = WeightMatrixTree(listOf(inputLayer, contextLayer), outputLayer)
+        layers = computeOrderedUpdatePath(setOf(inputLayer, contextLayer), outputLayer)
     }
 
 
@@ -125,7 +125,10 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
 
     context(Network)
     override suspend fun forwardPass() {
-        wmList.forwardPass(inputLayer.activations)
+        layers.forwardPass(
+            listOf(inputLayer.activations, hiddenLayer.activations),
+            listOf(inputLayer, contextLayer)
+        )
     }
 
     // Forwarded from output layer

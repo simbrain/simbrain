@@ -15,9 +15,7 @@ package org.simbrain.network.trainers
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.NeuronArray
-import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.core.*
 import org.simbrain.network.events.TrainerEvents
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.subnetworks.SRNNetwork
@@ -409,17 +407,98 @@ class SRNTrainerConfig(lossFunctionProvider: KFunction<List<Class<out EditableOb
 
 class SRNTrainer(network: Network, srnNetwork: SRNNetwork) : SupervisedTrainer<SRNNetwork>(network, srnNetwork) {
 
-    override fun trainRow(rowNum: Int): Double {
-        val targetVec = supervisedNetwork.trainingSet.targets.rowVectorTransposed(rowNum)
-        val inputVec = supervisedNetwork.trainingSet.inputs.rowVectorTransposed(rowNum)
+    override fun trainBatch(
+        rowRange: IntRange,
+        probe: StructuredProbe?
+    ): Double {
+        val weightAccumulator: HashMap<WeightMatrix, Matrix> = HashMap()
+        val synapseGroupAccumulator: HashMap<SynapseGroup, Matrix> = HashMap()
+        val biasesAccumulator: HashMap<Layer, Matrix> = HashMap()
+        val rawMatrixAccumulator: HashMap<Matrix, Matrix> = HashMap()
 
-        supervisedNetwork.inputLayer.activations = inputVec
-        network.update() // This sets the context layer so that backprop on the tree can be applied
-        return supervisedNetwork.weightMatrixTree.applyBackprop(
-            targetVec,
-            lossFunction = supervisedNetwork.trainerConfig.lossFunction,
-            epsilon = supervisedNetwork.trainerConfig.learningRate
-        )
+        val probeContext = probe?.createMapProbe("trainBatch")
+
+        val error = with(supervisedNetwork) {
+            rowRange.sumOf { rowNum ->
+                val rowProbeContext = probeContext?.createMapProbe("trainRow-$rowNum")
+                inputLayer.setActivations(trainingSet.inputs.row(rowNum))
+                val targetVec = trainingSet.targets.rowVectorTransposed(rowNum)
+                with(network) {
+                    layers.forwardPass(listOf(inputLayer.activations, hiddenLayer.activations), inputLayers = listOf(inputLayer, contextLayer), rowProbeContext)
+                    rowProbeContext?.write("forwardPassOutputActivations", outputLayer.activations.clone())
+                    layers.accumulateBackprop(
+                        listOf(inputLayer, contextLayer),
+                        targetVec,
+                        outputLayer,
+                        weightAccumulator,
+                        synapseGroupAccumulator,
+                        biasesAccumulator,
+                        rawMatrixAccumulator,
+                        lossFunction = config.lossFunction,
+                        probe = rowProbeContext
+                    )
+                }
+            }
+        }
+
+        val weightAccumulatorContext = probeContext?.createMapProbe("weightAccumulators")
+
+        weightAccumulatorContext?.writeAll(weightAccumulator) { wm, delta ->
+            wm.displayName to delta
+        }
+
+        weightAccumulator.forEach { (wm, delta) ->
+            val weightsDelta = config.optimizer.computeDelta(wm.weights, delta)
+            weightAccumulatorContext?.write("delta_${wm.displayName}") { weightsDelta.clone() }
+
+            wm.weights.add(weightsDelta)
+            weightAccumulatorContext?.write("weights_${wm.displayName}") { wm.weights.clone() }
+
+            wm.events.updated.fire()
+        }
+
+        weightAccumulatorContext?.writeAll(synapseGroupAccumulator) { sg, delta ->
+            sg.displayName to delta
+        }
+
+        synapseGroupAccumulator.forEach { (sg, delta) ->
+            val weightMatrix = sg.getWeightMatrix()
+            val delta = config.optimizer.computeDelta(weightMatrix, delta)
+            weightAccumulatorContext?.write("delta_${sg.displayName}") { delta.clone() }
+
+            sg.setWeightMatrix(weightMatrix.add(delta))
+            weightAccumulatorContext?.write("weights_${sg.displayName}") { sg.getWeightMatrix().clone() }
+
+            sg.events.updated.fire()
+        }
+
+
+        probeContext?.createMapProbe("biasesAccumulator")?.writeAll(biasesAccumulator) { na, delta ->
+            na.displayName to delta
+        }
+
+        val computeDeltaContext = probeContext?.createMapProbe("computeDelta")
+
+        biasesAccumulator.forEach { (na, delta) ->
+            val delta = config.optimizer.computeDelta(na.biases, delta)
+            computeDeltaContext?.write(na.displayName, delta)
+            na.biases = na.biases.add(delta)
+            na.events.updated.fire()
+        }
+
+        probeContext?.createMapProbe("updatedBiases")?.writeAll(biasesAccumulator) { na, _ -> na.displayName to na.biases.clone() }
+
+        rawMatrixAccumulator.forEach { (matrix, delta) ->
+            matrix.add(config.optimizer.computeDelta(matrix, delta))
+        }
+
+        probeContext?.write("rawMatrixAccumulator", rawMatrixAccumulator)
+
+        return error / rowRange.count()
+    }
+
+    override fun trainRow(rowNum: Int): Double {
+        return trainBatch(rowNum until rowNum + 1)
     }
 
 }

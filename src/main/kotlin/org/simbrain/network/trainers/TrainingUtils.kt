@@ -320,9 +320,10 @@ fun WeightMatrixTree.applyBackprop(targetValues: Matrix, lossFunction: BackpropL
  *         The order ensures layers are processed starting from the `start` layer to the `end` layer
  *         in accordance with their dependencies.
  */
-fun computeOrderedUpdatePath(start:Layer, end: Layer): LinkedHashSet<Layer> {
+fun computeOrderedUpdatePath(start: Set<Layer>, end: Layer): LinkedHashSet<Layer> {
     val visited = LinkedHashSet<Layer>()
     val queue = ArrayDeque<Layer>()
+    val remainingStarts = start.toMutableSet()
     queue.add(end)
     while (queue.isNotEmpty()) {
         val currentLayer = queue.removeFirst()
@@ -331,7 +332,8 @@ fun computeOrderedUpdatePath(start:Layer, end: Layer): LinkedHashSet<Layer> {
         }
         visited.add(currentLayer)
 
-        if (currentLayer == start) break
+        remainingStarts.remove(currentLayer)
+        if (remainingStarts.isEmpty()) break
 
         for (neighbor in currentLayer.incomingConnectors) {
             if (neighbor.source !in visited) {
@@ -344,8 +346,8 @@ fun computeOrderedUpdatePath(start:Layer, end: Layer): LinkedHashSet<Layer> {
             }
         }
     }
-    if (start !in visited) {
-        throw IllegalArgumentException("No path found from start ($start) to end ($end)")
+    if (start.any { it !in visited }) {
+        throw IllegalArgumentException("No path found from start (${start.any { it !in visited }}) to end ($end)")
     }
     return LinkedHashSet(visited.reversed())
 }
@@ -447,6 +449,7 @@ fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: Lis
  */
 context(Network)
 fun LinkedHashSet<Layer>.accumulateBackprop(
+    inputLayers: List<Layer>,
     targetValues: Matrix,
     outputLayer: Layer,
     weightAccumulator: HashMap<WeightMatrix, Matrix>,
@@ -459,7 +462,9 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
 
     val probeContext = probe?.createMapProbe("accumulateBackprop")
 
-    val reversedLayers = drop(1).reversed()
+    val reversedLayers = reversed().also {
+        inputLayers.forEach { inputLayer -> it.remove(inputLayer) }
+    }
 
     targetValues.validateSameShape(outputLayer.activations)
     lossFunction.validateLayer(outputLayer)
@@ -477,52 +482,60 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
 
     val backpropLayersContext = probeContext?.createListProbe("backpropLayers")
 
+    // Map to accumulate error signals per layer (fixes skip connection issue)
+    val layerErrorSignals = mutableMapOf<Layer, Matrix>()
+    
+    // Initialize the output layer's error signal
+    layerErrorSignals[outputLayer] = errorSignal
+
     // Go through layers from output to input
     reversedLayers.forEach { layer ->
 
         val layerContext = backpropLayersContext?.createMapProbe(layer.displayName)
 
-        // Process the error signal. Bias update for neuron array. Full backprop update for transformer block. Etc.
-        errorSignal = layer.processError(errorSignal, signalSource, biasesAccumulator, rawMatrixAccumulator)
+        // Get the accumulated error signal for this layer
+        val currentLayerErrorSignal = layerErrorSignals[layer] ?: errorSignal
+        layerContext?.write("currentLayerErrorSignal") { currentLayerErrorSignal.clone() }
 
-        layerContext?.write("processedErrorSignal") { errorSignal.clone() }
+        // Process the error signal. Bias update for neuron array. Full backprop update for transformer block. Etc.
+        val processedErrorSignal = layer.processError(currentLayerErrorSignal, signalSource, biasesAccumulator, rawMatrixAccumulator)
+
+        layerContext?.write("processedErrorSignal") { processedErrorSignal.clone() }
 
         // Process weight matrices feeding into the current layer.
         // For each one we:
         //  1. compute and accumulate a weight delta using source activations
-        //  2. "backpropagate" the error signals by multiplying them by the weight matrix to get a new signal
-        var accumulatedErrorSignal: Matrix? = null
+        //  2. "backpropagate" the error signals by accumulating them for the specific source layer
         layer.incomingConnectors.forEach { connector ->
             val connectorContext = layerContext?.createMapProbe(connector.displayName)
             val wm = connector as WeightMatrix
-            val weightDeltas = wm.computeWeightDeltas(errorSignal)
+            val weightDeltas = wm.computeWeightDeltas(processedErrorSignal)
             connectorContext?.write("weightDeltas") { weightDeltas.clone() }
             weightAccumulator.getOrPut(wm) {
                 Matrix(wm.weights.nrow(), wm.weights.ncol())
             }.add(weightDeltas)
-            val currentConnectorErrorSignal = wm.backpropagateError(errorSignal)
+            val currentConnectorErrorSignal = wm.backpropagateError(processedErrorSignal)
             connectorContext?.write("currentConnectorErrorSignal") { currentConnectorErrorSignal.clone() }
 
-            // The source of the weight matrix may be the same across multiple passes through this code,
-            // supporting skip connections. In such cases, the error signals are summed
-            accumulatedErrorSignal = accumulatedErrorSignal?.add(currentConnectorErrorSignal) ?: currentConnectorErrorSignal
-            connectorContext?.write("accumulatedErrorSignal") { accumulatedErrorSignal?.clone() }
+            // Accumulate error signal for the specific source layer (supports skip connections)
+            layerErrorSignals[wm.source] = layerErrorSignals[wm.source]?.add(currentConnectorErrorSignal) ?: currentConnectorErrorSignal
+            connectorContext?.write("accumulatedErrorSignalForSource") { layerErrorSignals[wm.source]?.clone() }
         }
         (layer as? AbstractNeuronCollection)?.incomingSgs?.forEach { sg ->
             val sgContext = layerContext?.createMapProbe(sg.displayName)
-            val weightDeltas = sg.computeWeightDeltas(errorSignal)
+            val weightDeltas = sg.computeWeightDeltas(processedErrorSignal)
             sgContext?.write("weightDeltas") { weightDeltas.clone() }
             synapseGroupAccumulator.getOrPut(sg) {
                 Matrix(sg.target.size, sg.source.size)
             }.add(weightDeltas)
-            val currentConnectorErrorSignal = sg.backpropagateError(errorSignal)
+            val currentConnectorErrorSignal = sg.backpropagateError(processedErrorSignal)
             sgContext?.write("currentConnectorErrorSignal") { currentConnectorErrorSignal.clone() }
 
-            accumulatedErrorSignal = accumulatedErrorSignal?.add(currentConnectorErrorSignal) ?: currentConnectorErrorSignal
-            sgContext?.write("accumulatedErrorSignal") { accumulatedErrorSignal.clone() }
+            // Accumulate error signal for the specific source layer (supports skip connections)
+            layerErrorSignals[sg.source] = layerErrorSignals[sg.source]?.add(currentConnectorErrorSignal) ?: currentConnectorErrorSignal
+            sgContext?.write("accumulatedErrorSignalForSource") { layerErrorSignals[sg.source]?.clone() }
         }
-        // The new error signal which gets pushed further back until the first layer is reached
-        accumulatedErrorSignal?.let { errorSignal = it } // null on the first layer
+        
         signalSource = layer
     }
 

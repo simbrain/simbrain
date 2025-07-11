@@ -19,7 +19,7 @@ class SupervisedModel(
     trainTestSplit: Double = 1.0,
 ): LocatableModel(), SupervisedNetwork {
 
-    val layers = computeOrderedUpdatePath(inputLayer, outputLayer)
+    val layers = computeOrderedUpdatePath(setOf(inputLayer), outputLayer)
 
     val weightMatrices = layers.getAllOutgoingConnectors()
 
@@ -193,6 +193,7 @@ class SupervisedModelTrainer(network: Network, supervisedModel: SupervisedModel)
                     layers.forwardPass(listOf(inputLayer.activations), inputLayers = listOf(inputLayer), rowProbeContext)
                     rowProbeContext?.write("forwardPassOutputActivations", outputLayer.activations.clone())
                     layers.accumulateBackprop(
+                        listOf(inputLayer),
                         targetVec,
                         outputLayer,
                         weightAccumulator,

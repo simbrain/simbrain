@@ -937,7 +937,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         }
         if (source != null && target != null) {
             try {
-                computeOrderedUpdatePath(source, target)
+                computeOrderedUpdatePath(setOf(source), target)
             } catch (e: Exception) {
                 reasons.add("No connection between source and target")
             }

@@ -16,7 +16,7 @@ import kotlin.math.exp
 /**
  * A spike responder with short term synaptic plasticity enabled.
  * Can model both short term depression (STD) and short term facilitation (STF)
- * Sometimes referred to as "UDF"
+ * Sometimes referred to as "UDF" for Use, Depression, and Facilitation
  *
  * Params for STD: A=1, U=0.45, D=750ms, F=50ms, responder decay = 20ms
  * Params for STF: U=0.15, F=750ms, and D=50ms.

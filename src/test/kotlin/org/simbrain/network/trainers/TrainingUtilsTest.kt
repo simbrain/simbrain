@@ -1,7 +1,9 @@
 package org.simbrain.network.trainers
 
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
@@ -191,6 +193,335 @@ class TrainingUtilsTest {
         assertTrue(order.indexOf(a) < order.indexOf(c))
         assertTrue(order.indexOf(c) < order.indexOf(d))
         assertTrue(order.containsAll(listOf(a, c, d)))
+    }
+
+    @Test
+    fun `test skip connection backprop with different layer sizes`() {
+        val net = Network()
+        
+        // Create layers with different sizes to test skip connection handling
+        val inputLayer = NeuronArray(3).apply { 
+            label = "input"
+            isClamped = true 
+        }
+        val hiddenLayer = NeuronArray(5).apply { 
+            label = "hidden" 
+        }
+        val outputLayer = NeuronArray(2).apply { 
+            label = "output" 
+        }
+
+        // Create connections: input -> hidden -> output, plus skip connection input -> output
+        val wm1 = WeightMatrix(inputLayer, hiddenLayer).apply { label = "input_to_hidden" }
+        val wm2 = WeightMatrix(hiddenLayer, outputLayer).apply { label = "hidden_to_output" }
+        val skipWm = WeightMatrix(inputLayer, outputLayer).apply { label = "skip_connection" }
+
+        runBlocking {
+            net.addNetworkModels(inputLayer, hiddenLayer, outputLayer, wm1, wm2, skipWm)
+        }
+
+        // Initialize weights to known values
+        wm1.weights.fill(0.1)
+        wm2.weights.fill(0.2) 
+        skipWm.weights.fill(0.3)
+
+        // Create supervised model and test data
+        val supervisedModel = SupervisedModel(inputLayer, outputLayer)
+        runBlocking {
+            net.addNetworkModel(supervisedModel)
+        }
+
+        val inputData = Matrix.of(arrayOf(
+            doubleArrayOf(1.0, 0.0, 1.0),
+            doubleArrayOf(0.0, 1.0, 0.0),
+            doubleArrayOf(1.0, 1.0, 1.0)
+        ))
+        val targetData = Matrix.of(arrayOf(
+            doubleArrayOf(1.0, 0.0),
+            doubleArrayOf(0.0, 1.0),
+            doubleArrayOf(1.0, 1.0)
+        ))
+
+        supervisedModel.trainingSet = MatrixDataset(inputData, targetData)
+
+        // Test that forward pass works with skip connections
+        runBlocking {
+            with(net) {
+                supervisedModel.inputLayer.activations = inputData.row(0).toColumnVector()
+                supervisedModel.forwardPass()
+                
+                // Verify outputs are reasonable (not NaN, finite)
+                supervisedModel.outputLayer.activationArray.forEach { activation ->
+                    assertTrue(activation.isFinite(), "Output activation should be finite")
+                }
+            }
+
+            // Test backprop with skip connections
+            val trainer = SupervisedModelTrainer(net, supervisedModel)
+            val initialError = with(net) { 
+                supervisedModel.inputLayer.activations = inputData.row(0).toColumnVector()
+                supervisedModel.forwardPass()
+                BackpropLossFunction.SSE.scalarLoss(supervisedModel.outputLayer.activations, targetData.row(0).toColumnVector())
+            }
+
+            // Train for a few iterations
+            repeat(10) {
+                trainer.trainOnce()
+            }
+
+            // Verify error decreased
+            val finalError = trainer.lastTrainingError
+            assertTrue(finalError < initialError, "Training error should decrease with skip connections: $initialError -> $finalError")
+        }
+    }
+
+    @Test 
+    fun `test multiple skip connections accumulate correctly`() {
+        val net = Network()
+        
+        // Create a network with multiple paths to the same layer
+        val inputLayer = NeuronArray(2).apply { 
+            label = "input"
+            isClamped = true 
+        }
+        val branch1Layer = NeuronArray(3).apply { label = "branch1" }
+        val branch2Layer = NeuronArray(4).apply { label = "branch2" } 
+        val outputLayer = NeuronArray(2).apply { label = "output" }
+
+        // Create multiple paths: input -> branch1 -> output, input -> branch2 -> output, input -> output
+        val wm1 = WeightMatrix(inputLayer, branch1Layer)
+        val wm2 = WeightMatrix(inputLayer, branch2Layer)
+        val wm3 = WeightMatrix(branch1Layer, outputLayer)
+        val wm4 = WeightMatrix(branch2Layer, outputLayer)
+        val skipWm = WeightMatrix(inputLayer, outputLayer)
+
+        runBlocking {
+            net.addNetworkModels(inputLayer, branch1Layer, branch2Layer, outputLayer, wm1, wm2, wm3, wm4, skipWm)
+        }
+
+        // Initialize weights
+        listOf(wm1, wm2, wm3, wm4, skipWm).forEach { wm ->
+            wm.weights.fill(0.1)
+        }
+
+        val supervisedModel = SupervisedModel(inputLayer, outputLayer)
+        runBlocking {
+            net.addNetworkModel(supervisedModel)
+        }
+
+        val inputData = Matrix.of(arrayOf(doubleArrayOf(1.0, -1.0)))
+        val targetData = Matrix.of(arrayOf(doubleArrayOf(0.5, -0.5)))
+
+        supervisedModel.trainingSet = MatrixDataset(inputData, targetData)
+
+        // Test that accumulation works properly - no exceptions thrown
+        val trainer = SupervisedModelTrainer(net, supervisedModel).apply {
+            config.learningRate = 0.01  // Set learning rate so weights actually update
+        }
+        
+        runBlocking {
+            // Verify gradients were applied to all weight matrices
+            val initialWeights = mapOf(
+                "wm1" to wm1.weights.clone(),
+                "wm2" to wm2.weights.clone(), 
+                "wm3" to wm3.weights.clone(),
+                "wm4" to wm4.weights.clone(),
+                "skip" to skipWm.weights.clone()
+            )
+            
+            // Run multiple training iterations
+            repeat(10) {
+                trainer.trainOnce()
+            }
+            
+
+            
+            // Check that all weights were updated (indicating proper gradient flow)
+            fun weightsChanged(current: Matrix, initial: Matrix): Boolean {
+                return (0 until current.nrow()).any { i ->
+                    (0 until current.ncol()).any { j ->
+                        kotlin.math.abs(current[i,j] - initial[i,j]) > 1e-10
+                    }
+                }
+            }
+            
+            assertTrue(weightsChanged(wm1.weights, initialWeights["wm1"]!!), "wm1 weights should be updated")
+            assertTrue(weightsChanged(wm2.weights, initialWeights["wm2"]!!), "wm2 weights should be updated")
+            assertTrue(weightsChanged(wm3.weights, initialWeights["wm3"]!!), "wm3 weights should be updated")
+            assertTrue(weightsChanged(wm4.weights, initialWeights["wm4"]!!), "wm4 weights should be updated")
+            assertTrue(weightsChanged(skipWm.weights, initialWeights["skip"]!!), "skip weights should be updated")
+        }
+    }
+
+    @Test
+    fun `test residual connection pattern`() {
+        val net = Network()
+        
+        // Create a residual block pattern: input -> hidden -> output, with input -> output skip
+        val inputLayer = NeuronArray(4).apply { 
+            label = "input"
+            isClamped = true 
+        }
+        val hiddenLayer = NeuronArray(4).apply { 
+            label = "hidden" 
+        }
+        val outputLayer = NeuronArray(4).apply { 
+            label = "output" 
+        }
+
+        val mainPath = WeightMatrix(inputLayer, hiddenLayer)
+        val skipConnection = WeightMatrix(inputLayer, outputLayer) 
+        val outputPath = WeightMatrix(hiddenLayer, outputLayer)
+
+        runBlocking {
+            net.addNetworkModels(inputLayer, hiddenLayer, outputLayer, mainPath, skipConnection, outputPath)
+        }
+
+        // Initialize weights  
+        mainPath.weights.fill(0.1)
+        outputPath.weights.fill(0.1)
+        skipConnection.weights.setValuesInPlace { i, j -> if (i == j) 0.5 else 0.05 } // Near-identity for residual
+
+        val supervisedModel = SupervisedModel(inputLayer, outputLayer)
+        runBlocking {
+            net.addNetworkModel(supervisedModel)
+        }
+
+        val inputData = Matrix.of(arrayOf(
+            doubleArrayOf(1.0, 0.0, -1.0, 0.5),
+            doubleArrayOf(0.5, -0.5, 1.0, -1.0)
+        ))
+        val targetData = Matrix.of(arrayOf(
+            doubleArrayOf(1.5, 0.2, -0.8, 0.7),  
+            doubleArrayOf(0.3, -0.3, 1.2, -0.8)
+        ))
+
+        supervisedModel.trainingSet = MatrixDataset(inputData, targetData)
+
+        val trainer = SupervisedModelTrainer(net, supervisedModel).apply {
+            config.learningRate = 0.01
+        }
+
+        runBlocking {
+            val initialError = run {
+                trainer.trainBatch(0 until 1)
+                trainer.lastTrainingError
+            }
+
+            // Train multiple iterations
+            repeat(50) {
+                trainer.trainOnce()
+            }
+
+            val finalError = trainer.lastTrainingError
+            // With residual connections, the network should be able to learn and achieve reasonable error
+            assertTrue(finalError.isFinite(), "Error should be finite")
+            assertTrue(finalError < 2.0, "Should achieve reasonable error with residual connections: final=$finalError")
+        }
+    }
+
+    @Test
+    fun `test error signal accumulation correctness`() {
+        val net = Network()
+        
+        // Simple case: two paths to same source layer  
+        val sourceLayer = NeuronArray(2).apply { 
+            label = "source"
+            isClamped = true 
+        }
+        val intermediate1 = NeuronArray(2).apply { label = "int1" }
+        val intermediate2 = NeuronArray(3).apply { label = "int2" }
+        val targetLayer = NeuronArray(2).apply { label = "target" }
+
+        val wm1 = WeightMatrix(sourceLayer, intermediate1)
+        val wm2 = WeightMatrix(sourceLayer, intermediate2)  
+        val wm3 = WeightMatrix(intermediate1, targetLayer)
+        val wm4 = WeightMatrix(intermediate2, targetLayer)
+
+        runBlocking {
+            net.addNetworkModels(sourceLayer, intermediate1, intermediate2, targetLayer, wm1, wm2, wm3, wm4)
+        }
+
+        // Set specific weights to test error accumulation
+        wm1.weights.setValuesInPlace { i, j -> (i + 1) * (j + 1) * 0.1 }
+        wm2.weights.setValuesInPlace { i, j -> (i + 1) * (j + 1) * 0.2 }
+        wm3.weights.setValuesInPlace { i, j -> (i + 1) * (j + 1) * 0.1 }
+        wm4.weights.setValuesInPlace { i, j -> (i + 1) * (j + 1) * 0.1 }
+
+        val layers: LinkedHashSet<Layer> = linkedSetOf(sourceLayer, intermediate1, intermediate2, targetLayer)
+        val inputs = Matrix.of(arrayOf(doubleArrayOf(1.0, -0.5)))
+        val targets = Matrix.of(arrayOf(doubleArrayOf(0.5, 0.3)))
+
+        // Test accumulation manually with probe
+        val probe = StructuredProbe.MapProbe()
+        val weightAccumulator: HashMap<WeightMatrix, Matrix> = HashMap()
+        val biasAccumulator: HashMap<Layer, Matrix> = HashMap()
+        val sgAccumulator: HashMap<org.simbrain.network.core.SynapseGroup, Matrix> = HashMap()
+        val rawMatrixAccumulator: HashMap<Matrix, Matrix> = HashMap()
+
+        val error = runBlocking {
+            // Perform forward pass
+            with(net) {
+                layers.forwardPass(listOf(inputs.row(0).toColumnVector()), listOf(sourceLayer))
+            }
+
+            with(net) {
+                layers.accumulateBackprop(
+                    inputLayers = listOf(sourceLayer),
+                    targetValues = targets.row(0).toColumnVector(),
+                    outputLayer = targetLayer,
+                    weightAccumulator = weightAccumulator,
+                    synapseGroupAccumulator = sgAccumulator,
+                    biasesAccumulator = biasAccumulator,
+                    rawMatrixAccumulator = rawMatrixAccumulator,
+                    probe = probe
+                )
+            }
+        }
+
+        // Verify all weight matrices have accumulated gradients
+        assertTrue(weightAccumulator.containsKey(wm1), "wm1 should have accumulated gradients")
+        assertTrue(weightAccumulator.containsKey(wm2), "wm2 should have accumulated gradients") 
+        assertTrue(weightAccumulator.containsKey(wm3), "wm3 should have accumulated gradients")
+        assertTrue(weightAccumulator.containsKey(wm4), "wm4 should have accumulated gradients")
+
+        // Verify gradients are finite
+        weightAccumulator.values.forEach { gradients ->
+            for (i in 0 until gradients.nrow()) {
+                for (j in 0 until gradients.ncol()) {
+                    assertTrue(gradients[i, j].isFinite(), "All gradients should be finite")
+                }
+            }
+        }
+
+        assertTrue(error.isFinite() && error >= 0, "Error should be finite and non-negative")
+    }
+
+    @Test
+    fun `test computeOrderedUpdatePath with skip connections`() {
+        val inputLayer = NeuronArray(2)
+        val hiddenLayer = NeuronArray(3) 
+        val outputLayer = NeuronArray(2)
+
+        val wm1 = WeightMatrix(inputLayer, hiddenLayer)
+        val wm2 = WeightMatrix(hiddenLayer, outputLayer)
+        val skipWm = WeightMatrix(inputLayer, outputLayer) // Skip connection
+
+        val orderedLayers = computeOrderedUpdatePath(setOf(inputLayer), outputLayer)
+
+        assertEquals(3, orderedLayers.size, "Should include all layers")
+        assertTrue(orderedLayers.contains(inputLayer), "Should contain input layer")
+        assertTrue(orderedLayers.contains(hiddenLayer), "Should contain hidden layer") 
+        assertTrue(orderedLayers.contains(outputLayer), "Should contain output layer")
+
+        val layerList = orderedLayers.toList()
+        val inputIndex = layerList.indexOf(inputLayer)
+        val hiddenIndex = layerList.indexOf(hiddenLayer)
+        val outputIndex = layerList.indexOf(outputLayer)
+
+        assertTrue(inputIndex < hiddenIndex, "Input should come before hidden")
+        assertTrue(inputIndex < outputIndex, "Input should come before output")
+        assertTrue(hiddenIndex < outputIndex, "Hidden should come before output")
     }
 
 }

@@ -13,6 +13,7 @@
  */
 package org.simbrain.network.subnetworks
 
+import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.core.randomizeBiases
@@ -32,6 +33,9 @@ import kotlin.math.min
  * @author Jeff Yoshimi
  */
 class BackpropNetwork : FeedForward, SupervisedNetwork {
+
+    override val layers: LinkedHashSet<Layer>
+        get() = LinkedHashSet(layerList)
 
     constructor(nodesPerLayer: IntArray, initialPosition: Point2D? = point(0,0)): super(nodesPerLayer, initialPosition) {
         layerList.forEach { it.updateRule = LinearRule() }
@@ -75,7 +79,7 @@ class BackpropNetwork : FeedForward, SupervisedNetwork {
     }
 
     context(Network)
-    override suspend fun forwardPass() {
+    override fun forwardPass() {
         wmList.forwardPass(inputLayer.activations)
     }
 

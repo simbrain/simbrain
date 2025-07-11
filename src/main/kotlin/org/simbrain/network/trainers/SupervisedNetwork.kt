@@ -33,8 +33,10 @@ interface SupervisedNetwork {
 
     val outputLayer: Layer
 
+    val layers: LinkedHashSet<Layer>
+
     context(Network)
-    abstract suspend fun forwardPass()
+    abstract fun forwardPass()
 
     fun initWeights()
 

@@ -49,7 +49,7 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
 
     override lateinit var testingSet: MatrixDataset
 
-    lateinit var layers: LinkedHashSet<Layer>
+    override lateinit var layers: LinkedHashSet<Layer>
 
     constructor(
         numInputNodes: Int = 10,
@@ -128,7 +128,7 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
     }
 
     context(Network)
-    override suspend fun forwardPass() {
+    override fun forwardPass() {
         layers.forwardPass(
             listOf(inputLayer.activations, hiddenLayer.activations),
             listOf(inputLayer, contextLayer)

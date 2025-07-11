@@ -13,6 +13,7 @@
  */
 package org.simbrain.network.subnetworks
 
+import kotlinx.coroutines.runBlocking
 import org.simbrain.network.core.*
 import org.simbrain.network.trainers.*
 import org.simbrain.network.updaterules.LinearRule
@@ -32,7 +33,7 @@ import java.awt.geom.Point2D
 import kotlin.math.ceil
 
 /**
- *  Implements a simple recurrent network (See, e.g, Elman 1991).
+ *  Implements a simple recurrent network (See Elman 1990, Finding Structure in Time).
  *
  * @author Jeff Yoshimi
  */
@@ -111,16 +112,19 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
 
     context(Network)
     override fun update() {
-        inputLayer.update()
-        hiddenLayer.accumulateInputs()
-        hiddenLayer.update()
-        contextLayer.activations = hiddenLayer.activations.clone()
-        outputLayer.accumulateInputs()
-        outputLayer.update()
-        // Since it's expected, updating weight matrices in case learning rules have been added. In the normal case
-        // there is no such rule and these calls are bypassed.
-        wmList.forEach { it.update() }
-        contextToHidden.update()
+        runBlocking {
+            forwardPass()
+        }
+        //inputLayer.update()
+        //hiddenLayer.accumulateInputs()
+        //hiddenLayer.update()
+        //contextLayer.activations = hiddenLayer.activations.clone()
+        //outputLayer.accumulateInputs()
+        //outputLayer.update()
+        //// Since it's expected, updating weight matrices in case learning rules have been added. In the normal case
+        //// there is no such rule and these calls are bypassed.
+        //wmList.forEach { it.update() }
+        //contextToHidden.update()
     }
 
     context(Network)

@@ -414,7 +414,7 @@ fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: Lis
     allLayers.forEach {
         val layerContext = layersContext?.createMapProbe(it.displayName)
         val inputsBeforeAccumulation = layerContext?.createMapProbe("inputsBeforeAccumulation")
-        val inputsProbe = layerContext?.createMapProbe("inputs")
+        layerContext?.createMapProbe("inputs")
         val inputsAfterAccumulation = layerContext?.createMapProbe("inputsAfterAccumulation")
         it.clearInputs()
         when (it) {
@@ -462,9 +462,7 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
 
     val probeContext = probe?.createMapProbe("accumulateBackprop")
 
-    val reversedLayers = reversed().also {
-        inputLayers.forEach { inputLayer -> it.remove(inputLayer) }
-    }
+    val reversedLayers = reversed()
 
     targetValues.validateSameShape(outputLayer.activations)
     lossFunction.validateLayer(outputLayer)

@@ -4,6 +4,7 @@ import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addTimeSeriesComponent
 import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
+import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SRNTrainer
@@ -17,7 +18,7 @@ import kotlin.random.Random
 /**
  * Simulate temporal xor in a simple recurrent network as described by Elman (1990).
  *
- * TODO: After ElmanSentences was fixed work on this dropped off. It was never made to work but getting it to work should not be too hard.
+ * TODO: Still not working as expected.
  */
 val srnXORSim = newSim {
 
@@ -25,25 +26,26 @@ val srnXORSim = newSim {
     workspace.clearWorkspace()
     val networkComponent = addNetworkComponent("Network")
     val network = networkComponent.network
-    val srn = SRNNetwork(1, 2, 1)
+    val srn = SRNNetwork(1, 4, 1)
     network.addNetworkModel(srn)
+    srn.layers.filterIsInstance<NeuronArray>().forEach { it.circleMode = true }
 
     // Load with xor data
     val xorInputs = generateTemporalXORData(1000)
     srn.trainingSet = MatrixDataset(xorInputs, xorInputs.shiftUpAndPadEndWithZero())
-    srn.trainerConfig.updateType = SupervisedTrainer.UpdateMethod.Stochastic()
+    srn.trainerConfig.updateType = SupervisedTrainer.UpdateMethod.Epoch()
 
     val trainer = SRNTrainer(network, srn)
+    trainer.config.learningRate = .01
 
     // Train
-    repeat(600) {
+    repeat(10) {
         trainer.trainOnce()
-        if (it % 10 == 0) {
-            println("iteration ${it}: ${trainer.lastTrainingError}")
-        }
+        println("iteration ${it}: ${trainer.lastTrainingError}")
     }
 
     val testData = generateTemporalXORData(1200 / 3)
+    // TODO use srn.testingSet
 
     srn.inputLayer.inputData = testData
 
@@ -64,12 +66,16 @@ val srnXORSim = newSim {
             height = 550
         }
 
-        val sumWindow = MutableList(12) { 0.0 }
-
         createControlPanel("Control Panel", 5, 10) {
             val actualText = addLabelledText("Actual Next: ", "0.000")
             val predictedText = addLabelledText("Predicted Next: ", "0.000")
             val errorText = addLabelledText("Error: ", "0.000")
+
+            // TODO: Could add a message or text that says "predictable" every third iteration
+
+            val timeSeriesWindowLength = 30 * 3
+            // A rolling window used to accumulate errors; sized to match the window length
+            val sumWindow = MutableList(timeSeriesWindowLength) { 0.0 }
 
             suspend fun test() {
                 fun index() = counter % testData.nrow()
@@ -82,12 +88,12 @@ val srnXORSim = newSim {
                 val error = output rmse testData.row(index()).toColumnVector()
                 errorText.text = error.format(3)
 
-                sumWindow[counter % 12] += error
-                if (counter % 12 == 0) {
-                    // println(sumWindow.map { it / max(1.0, floor(counter / 12.0)) }.map { it.format(3) })
+                sumWindow[counter % timeSeriesWindowLength] += error
+                if (counter % timeSeriesWindowLength == 0) {
+                    // println(sumWindow.map { it / max(1.0, floor(counter / timeSeriesWindowLength.0)) }.map { it.format(3) })
                     timeSeries.model.timeSeriesList[0].series.clear()
                 }
-                timeSeries.model.timeSeriesList[0].series.add(counter % 12, sumWindow[counter % 12] / max(1.0, floor(counter / 12.0)))
+                timeSeries.model.timeSeriesList[0].series.add(counter % timeSeriesWindowLength, sumWindow[counter % timeSeriesWindowLength] / max(1.0, floor(counter / timeSeriesWindowLength.toDouble())))
             }
 
             addButton("Test") {

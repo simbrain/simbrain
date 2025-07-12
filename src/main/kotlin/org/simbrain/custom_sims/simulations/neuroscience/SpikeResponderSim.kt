@@ -96,87 +96,53 @@ val spikeResponderSim = newSim {
         """
         # Spike Responders
 
-        # Introduction
+        This simulation shows how different types of **spike responders** affect downstream neurons. A [**spiking neuron**](https://docs.simbrain.net/docs/network/spikingneurons.html) sends signals to four targets—each with a different spike responder—so you can visually compare how spikes are transmitted through different synapse models.
 
-        ## Basic
-        This simulation shows how different **spike responders** work in Simbrain by applying them to a single spiking neuron. It lets you see how spikes from one neuron influence downstream neurons in various ways.
+        The setup includes an [**Izhikevich neuron**](https://docs.simbrain.net/docs/network/neurons/izhikevich.html) triggered by a clamped input, connected to four downstream neurons. These outputs respond differently depending on the spike responder type. This lets you explore different biological models of [**synaptic transmission**](https://en.wikipedia.org/wiki/Synaptic_transmission), including step responses, exponential decay, and plasticity effects.
 
-        ## Advanced
-        A single **Izhikevich neuron** receives input from a clamped source and sends spikes to four target neurons, each connected with a different spike responder type. This highlights how different biological synaptic dynamics can be modeled and compared side-by-side.
+        # Main Components
+
+        - **Clamped Input**: A user-controlled input neuron, which you adjust with arrow keys.
+        - **Izhikevich Neuron**: A biologically inspired spiking model that drives the system.
+        - [**Spike Responders**](https://docs.simbrain.net/docs/network/spikeresponders/): Each connection uses a different spike responder to shape the signal:
+        - 🔵 [**Step**](https://docs.simbrain.net/docs/network/spikeresponders/step.html): Fixed response for a set duration.
+        - 🔴 [**Jump and Decay**](https://docs.simbrain.net/docs/network/spikeresponders/jumpdecay.html): Instant rise with exponential decay.
+        - 🟡 [**Rise and Decay**](https://docs.simbrain.net/docs/network/spikeresponders/riseAndDecay.html): Gradual rise and fall, mimicking slower chemical transmission.
+        - 🟢 [**Short-Term Plasticity**](https://docs.simbrain.net/docs/network/spikeresponders/shortTermPlasticity.html): History-dependent responses that adapt over time.
+        - **Spike Responders Plot**: A time series that visualizes each downstream neuron’s post-synaptic response to spikes.
 
         # Background
 
-        ## Basic
-        Spike responders translate presynaptic spikes into effects on postsynaptic neurons. They mimic various types of synaptic transmission seen in real brains.
+        **Spike responders** convert spikes into post-synaptic signals, modeling how neurons influence one another across synapses. Simbrain includes several types, each representing a different kind of [**synaptic dynamic**](https://www.sciencedirect.com/topics/computer-science/synaptic-dynamic).
 
-        ## Advanced
-        Simbrain includes multiple spike responders modeling distinct post-synaptic dynamics:
+        In this simulation, a **clamped input neuron** triggers an **Izhikevich neuron**, which exhibits dynamic spiking behavior. Each spike travels to four downstream neurons through distinct spike responders, allowing you to see side-by-side how each model transforms the spike signal.
 
-        - **Step Responder:** Holds a fixed input value for a duration after each spike.
-        - **Jump and Decay:** Produces an immediate jump in input followed by exponential decay.
-        - **Rise and Decay:** Smoothly rises then decays more slowly, resembling chemical synaptic transmission.
-        - **Short-Term Plasticity:** Changes response based on spike history, modeling facilitation or depression.
+        These responders help simulate key phenomena:
+        - **Step**: Simple, constant post-spike effect.
+        - **Jump-and-Decay**: Immediate response that fades over time.
+        - **Rise-and-Decay**: Slower, more gradual influence.
+        - **Short-Term Plasticity**: Adapts based on recent spike history—mimicking facilitation or depression seen in real neurons.
 
-        Learn more: [Spike Responders Overview](https://docs.simbrain.net/docs/network/spikeresponders/).
-
-        # Simulation Details
-
-        ## Neuron Model
-
-        - Basic: A clamped input neuron (‘clamped’ meaning its activation level is fixed and controlled directly by the user) activates an Izhikevich neuron, which then spikes.
-        - Advanced: The Izhikevich neuron model captures realistic spiking patterns; it connects to four downstream neurons with distinct spike responders.
-
-        ## Network Structure
-
-        - Four downstream neurons each receive input via a different spike responder type.
-        - A time series tracks spikes and post-synaptic responses.
-
-        ## Visualization
-
-        - Basic: A simple time series shows when the Izhikevich neuron fires.
-        - Advanced: Plots display both spiking activity and how each spike responder shapes downstream neuron signals over time.
+        Learn more in the [Spike Responders Overview](https://docs.simbrain.net/docs/network/spikeresponders/).
 
         # What to Do
 
-        ## How to Use
+        1. Click `Run` to start the simulation.
+        2. Select the **Input** neuron and use the up/down arrow keys to change its activation.
+        3. Watch the Izhikevich neuron fire in response.
+        4. Observe each downstream neuron's unique post-synaptic response in the **Spike Responders** plot.
 
-        1. Click **Run** to start the simulation.
-        2. Select the **Input** neuron and adjust its activation using the up/down arrow keys.
-        3. Observe the Izhikevich neuron spike in response.
-        4. Watch the **Spike Responders** plot to compare how each responder reacts to spikes.
+        # Try This
 
-        ## Try This
-
-        - Modify the input activation to change spike frequency.
-        - Double-click the Izhikevich neuron to alter its spiking behavior (e.g., bursting).
-        - Change synapse types by double-clicking connections and selecting different spike responders.
-        - Add new output neurons or try different spiking neuron models.
-
-        # Spike Responder Types
-
-        - 🔵 **[Step](https://docs.simbrain.net/docs/network/spikeresponders/step.html)**  
-        Fixed output for a set time after a spike; simple and direct.
-
-        - 🔴 **[Jump and Decay](https://docs.simbrain.net/docs/network/spikeresponders/jumpdecay.html)**  
-        Immediate jump in input followed by exponential decay; mimics fast synaptic response.
-
-        - 🟡 **[Rise and Decay](https://docs.simbrain.net/docs/network/spikeresponders/riseAndDecay.html)**  
-        Smooth rise then slower decay; models chemical synaptic transmission.
-
-        - 🟢 **[Short-Term Plasticity](https://docs.simbrain.net/docs/network/spikeresponders/shorttermplasticity.html)**  
-        Dynamic response adapting to spike history; simulates facilitation or depression.
-
-        # Links
-
-        - [Spike Responders Overview](https://docs.simbrain.net/docs/network/spikeresponders/)
-        - [Izhikevich Neuron](https://docs.simbrain.net/docs/network/neurons/izhikevich.html)
-        - [Spiking Neurons](https://docs.simbrain.net/docs/network/spikingneurons.html)
-        - [Synaptic Transmission (Wikipedia)](https://en.wikipedia.org/wiki/Synaptic_transmission)
+        - Adjust input strength to change spiking frequency.
+        - Double-click the **Izhikevich neuron** to modify its spiking parameters (e.g., tonic spiking, bursting).
+        - Click on connections to switch spike responders and experiment with different signal types.
+        - Add new neurons or try different neuron models like [Integrate-and-Fire](https://docs.simbrain.net/docs/network/neurons/integrateAndFire.html) to see how different spiking behaviors affect responders.
 
         # Credits
 
-        Jeff Yoshimi,  
-        Kanly Thao,
+        Jeff Yoshimi  
+        Kanly Thao  
         Elijah Olson
         """.trimIndent()
     )

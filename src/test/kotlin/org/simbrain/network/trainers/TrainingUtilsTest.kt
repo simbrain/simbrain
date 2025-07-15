@@ -13,7 +13,7 @@ import smile.math.matrix.Matrix
 class TrainingUtilsTest {
 
     val net = Network()
-    val na1 = NeuronArray(2)
+    val na1 = NeuronArray(2).apply { isClamped = true }
     val na2 = NeuronArray(3)
     val na3 = NeuronArray(2)
     val wm1 = WeightMatrix(na1, na2)
@@ -53,7 +53,8 @@ class TrainingUtilsTest {
     fun `test forward pass`() {
         val inputs = Matrix.column(doubleArrayOf(-1.0, 1.0))
         with(net) {
-            listOf(wm1, wm2).forwardPass(inputs)
+            val layers = computeOrderedUpdatePath(setOf(na1), na3)
+            layers.forwardPass(listOf(inputs), listOf(na1))
             //listOf(wm1, wm2).printActivationsAndWeights(true)
         }
         assertArrayEquals(inputs.toDoubleArray(), wm2.target.activations.toDoubleArray())
@@ -96,7 +97,7 @@ class TrainingUtilsTest {
     }
 
     @Test
-    fun `test weight update with specific values`() {
+    fun `test weight delta computation with specific values`() {
         val na1 = NeuronArray(2)
         val na2 = NeuronArray(3)
         val wm = WeightMatrix(na1, na2).apply {
@@ -110,16 +111,17 @@ class TrainingUtilsTest {
         val errorSignal = Matrix.column(doubleArrayOf(.5, -.5, .5))
 
         val initialWeights = wm.weights.clone()
-        wm.updateWeights(errorSignal, epsilon = 1.0)
+        val weightDeltas = wm.computeWeightDeltas(errorSignal)
         // Expected weight deltas: errorSignal * source.activations.T
         val expectedDeltas = errorSignal.mm(na1.activations.transpose())
+        
+        // Verify that computeWeightDeltas returns the correct deltas
+        assertArrayEquals(expectedDeltas.flatten(), weightDeltas.flatten())
+        
+        // Manually apply the deltas to test the expected behavior
+        wm.weights.add(weightDeltas)
         val expectedWeights = initialWeights.add(expectedDeltas)
-
-        //println(expectedDeltas)
-        //println(expectedWeights)
-        //println(wm.weightMatrix)
         assertArrayEquals(expectedWeights.flatten(), wm.weightArray)
-
     }
 
     @Test
@@ -139,9 +141,9 @@ class TrainingUtilsTest {
 
         // Expected backpropagated error: weightMatrix.T * errorSignal
         // Expect 2, -2
-        val expectedBackpropagatedErrors = errorSignal.transpose().mm(wm.weights).transpose()
+        val expectedBackpropagatedErrors = wm.weights.transpose().mm(errorSignal)
 
-        val backpropagatedErrors = wm.updateWeights(errorSignal)
+        val backpropagatedErrors = wm.backpropagateError(errorSignal)
         for (i in 0 until backpropagatedErrors.nrow()) {
             assertEquals(expectedBackpropagatedErrors[i, 0], backpropagatedErrors[i, 0], 1e-6)
         }

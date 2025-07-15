@@ -16,7 +16,6 @@ package org.simbrain.network.trainers
 import org.simbrain.network.core.*
 import org.simbrain.network.gui.nodes.ActivationSequenceProcessor
 import org.simbrain.network.updaterules.SoftmaxRule
-import org.simbrain.network.updaterules.interfaces.DifferentiableUpdateRule
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
 import smile.math.matrix.Matrix
@@ -25,53 +24,6 @@ import kotlin.math.abs
 import kotlin.math.min
 import kotlin.random.Random
 
-private val WeightMatrix.sourceNeuronArray get() = source as NeuronArray
-private val WeightMatrix.targetNeuronArray get() = target as NeuronArray
-
-/**
- * Perform a "forward pass" through a list of weight matrices. Assumes they are all connected.
- */
-context(Network)
-@Deprecated("Migrating towards LinkedHashSet<Layer>.forwardPass")
-fun List<WeightMatrix>.forwardPass(inputVector: Matrix, rowProbe: StructuredProbe? = null) {
-
-    val rowProbe = rowProbe?.createMapProbe("ForwardPass")
-    inputVector.validateSameShape(first().sourceNeuronArray.inputs)
-    first().sourceNeuronArray.activations = inputVector
-    rowProbe?.write("Input", inputVector)
-
-    fun NeuronArray.updateWithoutClearingInputs() {
-        updateRule.apply(this, dataHolder)
-        events.updated.fire()
-    }
-
-    for (wm in this) {
-        wm.target.inputs.fill(0.0)
-        wm.target.accumulateInputs()
-        (wm.target as NeuronArray).updateWithoutClearingInputs()
-        rowProbe?.write(wm.displayName, wm.weights)
-
-    }
-}
-
-/**
- * Backpropagate the provided errors through this weight matrix, and return the new error.
- */
- @Deprecated("Migrating towards LinkedHashSet<Layer>.accumulateBackprop")
-fun WeightMatrix.updateWeights(errorSignal: Matrix, epsilon: Double = .1): Matrix {
-    errorSignal.validateSameShape(target.activations)
-    val weightDeltas = errorSignal.mm(source.activations.transpose())
-
-    // Backpropagate the error signal through the weights to get a new error vector
-    //  Prefer this to errorSignal.T.mm(wm).T because that requies an extra transpose
-    val backropagatedErrors = weights.transpose().mm(errorSignal)
-
-    // Update weights
-    weights.add(weightDeltas.mul(epsilon))
-    events.updated.fire()
-
-    return backropagatedErrors
-}
 
 fun WeightMatrix.computeWeightDeltas(errorSignal: Matrix): Matrix {
 
@@ -196,117 +148,6 @@ sealed class BackpropLossFunction(
             throw IllegalArgumentException("Layer $layer cannot use loss function $this")
         }
     }
-}
-
-/**
- * Apply backprop algorithm to this list of matrices, for the provided input/target pair. Assumes weight matrices are
- * stored in a sequence from input to output layers
- */
-context(Network)
-@Deprecated("Migrating towards LinkedHashSet<Layer>.accumulateBackprop")
-fun List<WeightMatrix>.applyBackprop(
-    targetValues: Matrix,
-    epsilon: Double = .1,
-    lossFunction: BackpropLossFunction = BackpropLossFunction.SSE,
-    debug: (index: Int, errorSignal: List<Double>) -> Unit = { _, _ -> }
-): Double {
-
-    targetValues.validateSameShape(last().targetNeuronArray.activations)
-    lossFunction.validateLayer(last().targetNeuronArray)
-
-    val error = lossFunction.scalarLoss(last().targetNeuronArray.activations, targetValues)
-
-    // printActivationsAndWeights()
-    var errorSignal: Matrix = lossFunction.outputError(last().targetNeuronArray.activations, targetValues)
-
-    this.reversed().forEachIndexed { index, wm ->
-        debug(index, errorSignal.flatten().toList())
-        (wm.targetNeuronArray.updateRule as? DifferentiableUpdateRule)?.getDerivative(wm.targetNeuronArray.inputs)?.let { deriv ->
-            errorSignal.mul(deriv)
-        }
-        wm.targetNeuronArray.updateBiases(errorSignal, epsilon)
-        errorSignal = wm.updateWeights(errorSignal, epsilon)
-    }
-
-    return error
-}
-
-context(Network)
-@Deprecated("Migrating towards LinkedHashSet<Layer>.accumulateBackprop")
-fun List<WeightMatrix>.accumulateBackprop(
-    targetValues: Matrix,
-    weightAccumulator: HashMap<WeightMatrix, Matrix>,
-    biasesAccumulator: HashMap<NeuronArray, Matrix>,
-    lossFunction: BackpropLossFunction = BackpropLossFunction.SSE
-): Double {
-
-    targetValues.validateSameShape(last().targetNeuronArray.activations)
-    lossFunction.validateLayer(last().targetNeuronArray)
-
-    val error = lossFunction.scalarLoss(last().targetNeuronArray.activations, targetValues)
-
-    // printActivationsAndWeights()
-    var errorSignal: Matrix = lossFunction.outputError(last().targetNeuronArray.activations, targetValues)
-
-    this.reversed().forEach { wm ->
-        (wm.targetNeuronArray.updateRule as? DifferentiableUpdateRule)?.getDerivative(wm.targetNeuronArray.inputs)?.let {
-            deriv -> errorSignal.mul(deriv)
-        }
-        biasesAccumulator.getOrPut(wm.targetNeuronArray) {
-            Matrix(wm.targetNeuronArray.size, 1)
-        }.add(errorSignal)
-        val weightDeltas = wm.computeWeightDeltas(errorSignal)
-        errorSignal = wm.backpropagateError(errorSignal)
-        weightAccumulator.getOrPut(wm) {
-            Matrix(wm.weights.nrow(), wm.weights.ncol())
-        }.add(weightDeltas)
-    }
-
-    return error
-}
-
-context(Network)
-fun WeightMatrixTree.forwardPass(inputVectors: List<Matrix>) {
-    if (inputVectors.size != inputWeightLayers.size) throw IllegalArgumentException("Must provide same number of input vectors as input layers")
-    inputVectors.zip(inputWeightLayers).forEach { (a, b) -> a.validateSameShape(b.sourceNeuronArray.inputs) }
-
-    inputWeightLayers.zip(inputVectors).forEach { (wm, iv) -> wm.sourceNeuronArray.activations = iv }
-    val allNeuronArrays = LinkedHashSet(tree.flatMap { it.map { it.target } })
-
-    allNeuronArrays.forEach {
-        it.accumulateInputs()
-        it.update()
-    }
-}
-
-/**
- * Apply backprop to a tree of weight matrices, beginning with the "output" weight matrix and backpropagating error
- * through incoming weight matrices.
- *
- * Weight matrices are updated one "weight layer" at a time. See [WeightMatrixTree] for more information.
- */
-@Deprecated("Migrating towards LinkedHashSet<Layer>.accumulateBackprop")
-fun WeightMatrixTree.applyBackprop(targetValues: Matrix, lossFunction: BackpropLossFunction = BackpropLossFunction.SSE, epsilon: Double = .0001): Double {
-
-    targetValues.validateSameShape(outputWeightLayer.targetNeuronArray.activations)
-    lossFunction.validateLayer(outputWeightLayer.targetNeuronArray)
-
-    val error = lossFunction.scalarLoss(outputWeightLayer.targetNeuronArray.activations, targetValues)
-    var errorVectors: Map<NeuronArray, Matrix> =
-        mapOf(outputWeightLayer.targetNeuronArray to lossFunction.outputError(outputWeightLayer.targetNeuronArray.activations, targetValues))
-    // TODO: Creating a map every iteration is a potential performance drain.
-    tree.reversed().forEach { wms ->
-        errorVectors = wms.associate { wm ->
-            val tar = wm.targetNeuronArray
-            val errorVector = errorVectors[tar]!!
-            val deriv = (wm.targetNeuronArray.updateRule as DifferentiableUpdateRule).getDerivative(wm.targetNeuronArray.inputs)
-            errorVector.mul(deriv)
-            wm.targetNeuronArray.updateBiases(errorVector, epsilon)
-            wm.sourceNeuronArray to wm.updateWeights(errorVector, epsilon)
-        }
-
-    }
-    return error
 }
 
 /**

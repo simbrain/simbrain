@@ -259,7 +259,7 @@ class TrainingUtilsTest {
             }
 
             // Test backprop with skip connections
-            val trainer = SupervisedModelTrainer(net, supervisedModel)
+            val trainer = SupervisedTrainer(net, supervisedModel)
             val initialError = with(net) { 
                 supervisedModel.inputLayer.activations = inputData.row(0).toColumnVector()
                 supervisedModel.forwardPass()
@@ -317,7 +317,7 @@ class TrainingUtilsTest {
         supervisedModel.trainingSet = MatrixDataset(inputData, targetData)
 
         // Test that accumulation works properly - no exceptions thrown
-        val trainer = SupervisedModelTrainer(net, supervisedModel).apply {
+        val trainer = SupervisedTrainer(net, supervisedModel).apply {
             config.learningRate = 0.01  // Set learning rate so weights actually update
         }
         
@@ -400,7 +400,7 @@ class TrainingUtilsTest {
 
         supervisedModel.trainingSet = MatrixDataset(inputData, targetData)
 
-        val trainer = SupervisedModelTrainer(net, supervisedModel).apply {
+        val trainer = SupervisedTrainer(net, supervisedModel).apply {
             config.learningRate = 0.01
         }
 

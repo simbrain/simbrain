@@ -5,9 +5,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.subnetworks.BackpropNetwork
-import org.simbrain.network.updaterules.SigmoidalRule
-import org.simbrain.util.math.SigmoidFunctionEnum
-import smile.math.matrix.Matrix
 
 class SupervisedTrainerTest {
 
@@ -16,7 +13,7 @@ class SupervisedTrainerTest {
 
     @Test
     fun `test trainer state`() {
-        val trainer = BackpropTrainer(net, bp)
+        val trainer = SupervisedTrainer(net, bp)
         assertEquals(false, trainer.isRunning)
         runBlocking {
             trainer.startTraining()

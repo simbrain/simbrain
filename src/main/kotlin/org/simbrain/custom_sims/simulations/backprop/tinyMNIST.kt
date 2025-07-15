@@ -6,7 +6,6 @@ import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.trainers.BackpropLossFunction
-import org.simbrain.network.trainers.BackpropTrainer
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedTrainer
 import org.simbrain.network.updaterules.LinearRule
@@ -101,7 +100,7 @@ val tinyMNIST = newSim {
         place(networkComponent, 0, 0, 700, 700)
     }
 
-    val trainer = BackpropTrainer(net, bp)
+    val trainer = SupervisedTrainer(net, bp)
     // Iterate trainer and network once to get it to display a number in the input
     trainer.trainOnce()
     net.update()

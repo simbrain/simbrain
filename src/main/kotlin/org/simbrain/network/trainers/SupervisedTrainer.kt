@@ -20,8 +20,6 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.events.TrainerEvents
-import org.simbrain.network.subnetworks.BackpropNetwork
-import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.network.trainers.SupervisedTrainer.*
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.CopyableObject
@@ -89,7 +87,7 @@ open class SupervisedTrainerConfig(lossFunctionProvider: KFunction<List<Class<ou
 /**
  * Manage iteration based training algorithms and provides an object that can be edited in the GUI.
  */
-abstract class SupervisedTrainer<SN: SupervisedNetwork>(val network: Network, val supervisedNetwork: SN) : CoroutineScope {
+class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedNetwork) : CoroutineScope {
 
     private var job = SupervisorJob()
 
@@ -404,8 +402,6 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork>(val network: Network, va
 
 }
 
-class BackpropTrainer(network: Network, backpropNetwork: BackpropNetwork) : SupervisedTrainer<BackpropNetwork>(network, backpropNetwork)
-
 class SRNTrainerConfig(lossFunctionProvider: KFunction<List<Class<out EditableObject>>>? = null): SupervisedTrainerConfig(lossFunctionProvider) {
     override var updateType: UpdateMethod by GuiEditable(
         initValue = UpdateMethod.Epoch(),
@@ -419,5 +415,3 @@ class SRNTrainerConfig(lossFunctionProvider: KFunction<List<Class<out EditableOb
         }
     }
 }
-
-class SRNTrainer(network: Network, srnNetwork: SRNNetwork) : SupervisedTrainer<SRNNetwork>(network, srnNetwork)

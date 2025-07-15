@@ -12,10 +12,10 @@ abstract class Optimizer: CopyableObject {
     @UserParameter(label = "Learning Rate", increment = .01, minimumValue = 0.0, order = 1)
     var learningRate = 0.01
 
-    context(SupervisedTrainer<*>)
+    context(SupervisedTrainer)
     abstract fun computeDelta(matrix: Matrix, delta: Matrix): Matrix
 
-    context(SupervisedTrainer<*>)
+    context(SupervisedTrainer)
     abstract fun reset()
 
     override fun getTypeList() = listOf(
@@ -38,7 +38,7 @@ class MomentumOptimizer(
 ) : Optimizer() {
     private var matrixToLastDeltaMap: HashMap<Matrix, Matrix> = HashMap()
 
-    context(SupervisedTrainer<*>)
+    context(SupervisedTrainer)
     override fun computeDelta(matrix: Matrix, delta: Matrix): Matrix {
         val lastDelta = matrixToLastDeltaMap.getOrPut(matrix) { Matrix(matrix.nrow(), matrix.ncol()) }
         val adjustment = lastDelta.mul(momentum)
@@ -46,7 +46,7 @@ class MomentumOptimizer(
         return adjustment.add(delta).mul(learningRate)
     }
 
-    context(SupervisedTrainer<*>)
+    context(SupervisedTrainer)
     override fun reset() {
         matrixToLastDeltaMap.clear()
     }
@@ -64,10 +64,10 @@ class AdamOptimizer(
 
     private var initialIteration = 0
 
-    context(SupervisedTrainer<*>)
+    context(SupervisedTrainer)
     private val timeSinceLastReset get() = (iteration - initialIteration).coerceAtLeast(1)
 
-    context(SupervisedTrainer<*>)
+    context(SupervisedTrainer)
     override fun computeDelta(matrix: Matrix, delta: Matrix): Matrix {
         val meanEstimate = matrixRunningMeanMap.getOrPut(matrix) { Matrix(matrix.nrow(), matrix.ncol()) }
         val varianceEstimate = matrixRunningVarianceMap.getOrPut(matrix) { Matrix(matrix.nrow(), matrix.ncol()) }
@@ -81,7 +81,7 @@ class AdamOptimizer(
         return meanCorrected.mul(learningRate).div(varianceCorrected.applyFunction { sqrt(it) + 1e-8 })
     }
 
-    context(SupervisedTrainer<*>)
+    context(SupervisedTrainer)
     override fun reset() {
         matrixRunningMeanMap.clear()
         matrixRunningVarianceMap.clear()

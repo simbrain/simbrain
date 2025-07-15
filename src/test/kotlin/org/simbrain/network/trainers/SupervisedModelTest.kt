@@ -57,10 +57,10 @@ class SupervisedModelTest {
 
         val supervisedModel = SupervisedModel(layer1, layer3).also { network2.addNetworkModels(it) }
 
-        val backpropTrainer = BackpropTrainer(network1, backpropNetwork).apply {
+        val SupervisedTrainer = SupervisedTrainer(network1, backpropNetwork).apply {
             config.optimizer = MomentumOptimizer()
         }
-        val supervisedTrainer = SupervisedModelTrainer(network2, supervisedModel).apply {
+        val supervisedTrainer = SupervisedTrainer(network2, supervisedModel).apply {
             config.optimizer = MomentumOptimizer()
         }
 
@@ -88,9 +88,9 @@ class SupervisedModelTest {
             targets = trainingTargets.clone()
         )
 
-        assertEquals(backpropTrainer.config.learningRate, supervisedTrainer.config.learningRate) { "Learning rate should be the same" }
+        assertEquals(SupervisedTrainer.config.learningRate, supervisedTrainer.config.learningRate) { "Learning rate should be the same" }
         assertEquals(
-            backpropTrainer.config.optimizer.let { "${it::class.simpleName} [${it.allPropertiesToString(", ")}]" },
+            SupervisedTrainer.config.optimizer.let { "${it::class.simpleName} [${it.allPropertiesToString(", ")}]" },
             supervisedTrainer.config.optimizer.let { "${it::class.simpleName} [${it.allPropertiesToString(", ")}]" }
         ) { "Optimizer should be the same" }
 
@@ -125,7 +125,7 @@ class SupervisedModelTest {
         (0 until 4).forEach { startingIndex ->
             val backpropProbeContext = backpropProbe.createMapProbe()
             val supervisedProbeContext = supervisedProbe.createMapProbe()
-            with(network1) { backpropTrainer.trainBatch(startingIndex until startingIndex + 1, backpropProbeContext) }
+            with(network1) { SupervisedTrainer.trainBatch(startingIndex until startingIndex + 1, backpropProbeContext) }
             with(network2) { supervisedTrainer.trainBatch(startingIndex until startingIndex + 1, supervisedProbeContext) }
 
 
@@ -134,7 +134,7 @@ class SupervisedModelTest {
 
             assertTrue(result.isEmpty()) { result }
 
-            assertEquals(backpropTrainer.lastTrainingError, supervisedTrainer.lastTrainingError) {
+            assertEquals(SupervisedTrainer.lastTrainingError, supervisedTrainer.lastTrainingError) {
                 "Training error should be the same on training batch $startingIndex"
             }
 
@@ -170,11 +170,11 @@ class SupervisedModelTest {
 
         val ngModel = SupervisedModel(ng1, ng3).also { network2.addNetworkModels(it) }
 
-        val naTrainer = SupervisedModelTrainer(network1, naModel).apply {
+        val naTrainer = SupervisedTrainer(network1, naModel).apply {
             config.optimizer = MomentumOptimizer(0.0)
         }
 
-        val ngTrainer = SupervisedModelTrainer(network2, ngModel).apply {
+        val ngTrainer = SupervisedTrainer(network2, ngModel).apply {
             config.optimizer = MomentumOptimizer(0.0)
         }
 
@@ -281,10 +281,10 @@ class SupervisedModelTest {
 
         val supervisedModel = SupervisedModel(layer1, layer3).also { network2.addNetworkModels(it) }
 
-        val backpropTrainer = BackpropTrainer(network1, backpropNetwork).apply {
+        val SupervisedTrainer = SupervisedTrainer(network1, backpropNetwork).apply {
             config.optimizer = MomentumOptimizer(0.0)
         }
-        val supervisedTrainer = SupervisedModelTrainer(network2, supervisedModel).apply {
+        val supervisedTrainer = SupervisedTrainer(network2, supervisedModel).apply {
             config.optimizer = MomentumOptimizer(0.0)
         }
 
@@ -312,9 +312,9 @@ class SupervisedModelTest {
             targets = trainingTargets.clone()
         )
 
-        assertEquals(backpropTrainer.config.learningRate, supervisedTrainer.config.learningRate) { "Learning rate should be the same" }
+        assertEquals(SupervisedTrainer.config.learningRate, supervisedTrainer.config.learningRate) { "Learning rate should be the same" }
         assertEquals(
-            backpropTrainer.config.optimizer.let { "${it::class.simpleName} [${it.allPropertiesToString(", ")}]" },
+            SupervisedTrainer.config.optimizer.let { "${it::class.simpleName} [${it.allPropertiesToString(", ")}]" },
             supervisedTrainer.config.optimizer.let { "${it::class.simpleName} [${it.allPropertiesToString(", ")}]" }
         ) { "Optimizer should be the same" }
 
@@ -353,14 +353,14 @@ class SupervisedModelTest {
         (0 until 4).forEach { startingIndex ->
             val backpropProbeContext = backpropProbe.createMapProbe()
             val supervisedProbeContext = supervisedProbe.createMapProbe()
-            with(network1) { backpropTrainer.trainBatch(startingIndex until startingIndex + 1, backpropProbeContext) }
+            with(network1) { SupervisedTrainer.trainBatch(startingIndex until startingIndex + 1, backpropProbeContext) }
             with(network2) { supervisedTrainer.trainBatch(startingIndex until startingIndex + 1, supervisedProbeContext) }
 
             val result = diffProbes(backpropProbe, supervisedProbe, allowMissing = true)
 
             assertTrue(result.isEmpty()) { result }
 
-            assertEquals(backpropTrainer.lastTrainingError, supervisedTrainer.lastTrainingError) {
+            assertEquals(SupervisedTrainer.lastTrainingError, supervisedTrainer.lastTrainingError) {
                 "Training error should be the same on training batch $startingIndex"
             }
 

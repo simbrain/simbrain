@@ -107,7 +107,7 @@ class BackpropTests {
             na2.randomizeBiases(NormalDistribution(0.0, .01))
             na3.randomizeBiases(NormalDistribution(0.0, .01))
             supervisedModel.trainingSet = MatrixDataset(inputVector.transpose(), targetVector.transpose())
-            val trainer = SupervisedModelTrainer(net, supervisedModel)
+            val trainer = SupervisedTrainer(net, supervisedModel)
             repeat(nRuns) {
                 trainer.trainOnce()
             }
@@ -182,7 +182,7 @@ class BackpropTests {
             )
         }
         net.addNetworkModels(bp)
-        val trainer = BackpropTrainer(net, bp)
+        val trainer = SupervisedTrainer(net, bp)
         runBlocking {
             repeat(1000) {
                 trainer.trainOnce()

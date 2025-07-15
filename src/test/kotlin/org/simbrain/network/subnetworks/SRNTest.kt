@@ -6,14 +6,8 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.getModelByLabel
 import org.simbrain.network.core.getNetworkXStream
-import org.simbrain.network.trainers.MatrixDataset
-import org.simbrain.network.trainers.SRNTrainer
+import org.simbrain.network.trainers.SupervisedTrainer
 import org.simbrain.network.trainers.createDiagonalDataset
-import org.simbrain.network.trainers.splitDataSet
-import smile.math.matrix.Matrix
-import kotlin.math.ceil
-import org.simbrain.custom_sims.simulations.generateTemporalXORData
-import org.simbrain.util.shiftUpAndPadEndWithZero
 
 class SRNTest {
 
@@ -30,7 +24,7 @@ class SRNTest {
             srn.update()
             srn.trainerConfig.learningRate = 0.01
 
-            val trainer = SRNTrainer(net, srn)
+            val trainer = SupervisedTrainer(net, srn)
 
             runBlocking {
                 repeat(1500) {

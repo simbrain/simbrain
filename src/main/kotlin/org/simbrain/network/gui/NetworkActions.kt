@@ -929,6 +929,9 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         if (target == null) {
             reasons.add("No target model selected")
         }
+        if (source == target) {
+            reasons.add("Source and target cannot be the same")
+        }
         if (source is TransformerBlock || target is TransformerBlock) {
             reasons.add("Transformer blocks cannot be used as source or target layers")
         }

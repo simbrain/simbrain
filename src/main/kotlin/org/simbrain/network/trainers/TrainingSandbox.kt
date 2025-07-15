@@ -19,7 +19,7 @@ fun testBPProbe() {
         ),
         targets = matrix[4, 1](0, 1, 1, 0)
     )
-    val trainer = BackpropTrainer(network, bp).apply {
+    val trainer = SupervisedTrainer(network, bp).apply {
         config.optimizer = MomentumOptimizer()
     }
 

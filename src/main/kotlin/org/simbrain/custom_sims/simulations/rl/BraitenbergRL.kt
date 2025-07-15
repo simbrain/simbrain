@@ -5,6 +5,7 @@ import kotlinx.coroutines.runBlocking
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.addNeuron
+import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.addSynapse
 import org.simbrain.util.getDesktopComponentAs
 import org.simbrain.util.place
@@ -44,32 +45,14 @@ val braitenbergRL = newSim {
         agent: OdorWorldEntity,
     ): Pair<Double, Double> {
 
-        var cheeseComponent = 0.0
-        var poisonComponent = 0.0
-
-        // Cheese Proximity Reward
         val distanceToCheese = agent.location.distance(cheese.location)
-        cheeseComponent += when {
-            distanceToCheese < 50 -> 10.0
-            distanceToCheese < 100 -> 5.0
-            distanceToCheese < 200 -> 1.0
-            else -> 0.0
-        }
-
-
-        // Poison Proximity penalty
         val distanceToPoison = agent.location.distance(poison.location)
-        poisonComponent += when {
-            distanceToPoison < 30 -> -10.0
-            distanceToPoison < 60 -> -5.0
-            distanceToPoison < 100 -> -2.0
-            else -> 0.0
 
-
-            // reward for escaping
-            //if (distanceToPoison > lastDistanceToPoison) {
-            //    poisonComponent += 2.0
-            //}
+        val cheeseComponent = 200.0 / (1.0 + distanceToCheese)
+        val poisonComponent = if (distanceToPoison < 150) {
+            -200.0 / (1.0 + distanceToPoison * distanceToPoison)
+        } else {
+            0.0
         }
 
         return Pair(cheeseComponent, poisonComponent)
@@ -221,13 +204,10 @@ val braitenbergRL = newSim {
     // Start off with synapse strength of 0
     network.freeSynapses.forEach { s -> s.strength = 0.0 }
 
-    // Start off with aversion to poison (otherwise it has no reason to turn away)
-    //poisonRightToLeftTurn.strength = 2.0
-    //poisonLeftToRightTurn.strength = 2.0
-    //poisonLeftToStraight.strength = 1.0
-    //poisonRightToStraightRight.strength = 1.0
-    //cheeseLeftToLeftTurn.strength = 2.0
-    //cheeseRightToRightTurn.strength = 2.0
+    cheeseLeftToLeftTurn.strength = 1.0
+    cheeseRightToRightTurn.strength = 1.0
+    poisonLeftToRightTurn.strength = 1.0
+    poisonRightToLeftTurn.strength = 1.0
 
     fun resetVehicle() {
         agent.location = Point2D.Double((50..150).random().toDouble(), (350..450).random().toDouble())
@@ -279,10 +259,11 @@ val braitenbergRL = newSim {
                         rightTurn.activation += random.nextGaussian() * 0.2
 
                         val (cheeseR, poisonR) = calculateReward(agent)
+                        val totalReward = (cheeseR + poisonR).coerceIn(-50.0, 50.0)
+                        rewardNeuron.activation = totalReward
 
                         cheeseReward.activation = cheeseR
                         poisonPenalty.activation = poisonR
-                        rewardNeuron.activation = cheeseR + poisonR
 
                         val tdError = rewardNeuron.activation + gamma * valueNeuron.activation - valueNeuron.auxValue
                         tdErrorNeuron.activation = tdError
@@ -293,24 +274,26 @@ val braitenbergRL = newSim {
                         }
                         valueNeuron.auxValue = valueNeuron.activation
 
-                        // Directional Correlation-Based Learning
-                        val turnPairs = listOf(
-                            // Each input is paired with two turn synapses (preferred, opposing)
-                            cheeseLeftInput to Pair(cheeseLeftToLeftTurn, cheeseLeftToRightTurn),
-                            cheeseRightInput to Pair(cheeseRightToRightTurn, cheeseRightToLeftTurn),
-                            poisonLeftInput to Pair(poisonLeftToLeftTurn, poisonLeftToRightTurn),
-                            poisonRightInput to Pair(poisonRightToRightTurn, poisonRightToLeftTurn),
+                        // Reinforce the turn that was actually taken
+                        val turnNeurons = listOf(leftTurn, rightTurn)
+
+                        val inputNeurons = listOf(
+                            cheeseLeftInput,
+                            cheeseRightInput,
+                            poisonLeftInput,
+                            poisonRightInput
                         )
 
-                        for ((input, pair) in turnPairs) {
-                            val (synToPreferred, synToOpposing) = pair
+                        for (input in inputNeurons) {
                             val inputActivation = input.auxValue
 
-                            // Reinforce preferred turn
-                            synToPreferred.strength += learningRate * tdError * inputActivation * synToPreferred.target.activation
+                            for (output in listOf(leftTurn, rightTurn)) {
+                                val syn = input.fanOut.toList()
+                                    .filterIsInstance<Synapse>()
+                                    .find { it.target == output } ?: continue
 
-                            // Inhibit opposing turn slightly
-                            synToOpposing.strength -= learningRate * tdError * inputActivation * synToOpposing.target.activation * 0.5
+                                syn.strength += learningRate * tdError * inputActivation * output.activation
+                            }
                         }
 
                         //// Synaptic Competition: Normalize incoming weights per turn neuron

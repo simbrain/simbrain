@@ -56,6 +56,9 @@ object NetworkPreferences: PreferenceHolder() {
     @UserParameter(label = "Wand radius", tab = "GUI")
     var wandRadius by IntegerPreference(40)
 
+    @UserParameter(label = "Weight Matrix Transpose Graphics", tab = "GUI")
+    var weightMatrixTransposeGraphics by BooleanPreference(false)
+
     @UserParameter(
         label = "Matrix image max width/height",
         description = "Maximum size of the weight matrix image in pixels in either dimension (i.e. width or height).",

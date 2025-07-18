@@ -171,6 +171,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         }
         network.getModels<WeightMatrix>().forEach {
             it.events.colorPreferencesChanged.fire()
+            it.events.updateGraphics.fire()
         }
 
     }

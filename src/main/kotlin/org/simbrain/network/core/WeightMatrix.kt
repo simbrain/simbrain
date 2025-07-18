@@ -219,9 +219,13 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
 
             // Connectionist case
 
-            // For activation sequence case, just use last activation vector
+            // For activation sequence case, use last meaningful position (not necessarily last row)
             val sourceActivations = if (source is ActivationSequenceProcessor) {
-                source.activations.row(- 1).toColumnVector()
+                val actualLength = (source as? ActivationSequence)?.actualSequenceLength ?: 
+                                   (source as? ActivationSequence)?.sequenceSize ?: 
+                                   source.activations.nrow()
+                val lastMeaningfulIndex = (actualLength - 1).coerceIn(0, source.activations.nrow() - 1)
+                source.activations.row(lastMeaningfulIndex).toColumnVector()
             } else {
                 source.activations
             }.let { activations ->

@@ -238,6 +238,22 @@ fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: Lis
         }
     }
 
+    fun ArrayLayer.updateWithoutClearingInputs() {
+        if (isClamped) {
+            return
+        }
+        // For ArrayLayer (like TransformerBlock), we need to call update but preserve the input 
+        // accumulation pattern used in training. The inputs.fill(0.0) in TransformerBlock.update() 
+        // is for regular iteration, but during training we want controlled input management.
+        
+        // Temporarily store inputs before calling update
+        val inputsBackup = this.inputs.clone()
+        this.update()
+        // During training, inputs should be managed by the training loop, not cleared by update()
+        // So we restore them here. The training loop will clear them at the appropriate time.
+        this.inputs.copyFrom(inputsBackup)
+    }
+
     val allLayers = this
     inputLayers.zip(inputValues).forEach { (layer, value) ->
         layer.activations = value
@@ -273,6 +289,13 @@ fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: Lis
                     it.accumulateInputs()
                 }
                 inputsAfterAccumulation?.write(it.displayName, it.inputs.clone())
+                it.updateWithoutClearingInputs()
+            }
+            is ArrayLayer -> {
+                inputsBeforeAccumulation?.write(it.displayName, it.inputs.clone())
+                it.accumulateInputs()
+                inputsAfterAccumulation?.write(it.displayName, it.inputs.clone())
+                // For ArrayLayer, call update but don't clear inputs since accumulateInputs properly manages them
                 it.updateWithoutClearingInputs()
             }
             else -> it.update()

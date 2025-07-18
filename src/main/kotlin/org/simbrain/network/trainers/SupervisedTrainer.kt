@@ -15,10 +15,7 @@ package org.simbrain.network.trainers
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import org.simbrain.network.core.Layer
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.SynapseGroup
-import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.core.*
 import org.simbrain.network.events.TrainerEvents
 import org.simbrain.network.trainers.SupervisedTrainer.*
 import org.simbrain.util.UserParameter
@@ -226,7 +223,28 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
             rowRange.sumOf { rowNum ->
                 val rowProbeContext = probeContext?.createMapProbe("trainRow-$rowNum")
                 inputLayer.setActivations(trainingSet.inputs.row(rowNum))
-                val targetVec = trainingSet.targets.rowVectorTransposed(rowNum)
+                
+                // Handle target reshaping for ActivationSequence outputs
+                val targetVec = if (outputLayer is ActivationSequence) {
+                    // Reshape flattened target back to sequence format
+                    val flatTarget = trainingSet.targets.row(rowNum)
+                    val sequenceLayer = outputLayer as ActivationSequence
+                    val sequenceSize = sequenceLayer.sequenceSize
+                    val vocabSize = sequenceLayer.size
+                    
+                    // Reshape from (1, sequenceSize * vocabSize) to (sequenceSize, vocabSize)
+                    val reshapedTarget = Matrix(sequenceSize, vocabSize)
+                    for (seqPos in 0 until sequenceSize) {
+                        for (vocabPos in 0 until vocabSize) {
+                            val flatIndex = seqPos * vocabSize + vocabPos
+                            reshapedTarget[seqPos, vocabPos] = flatTarget[flatIndex]
+                        }
+                    }
+                    reshapedTarget
+                } else {
+                    trainingSet.targets.rowVectorTransposed(rowNum)
+                }
+                
                 with(network) {
                     forwardPass()
                     rowProbeContext?.write("forwardPassOutputActivations", outputLayer.activations.clone())
@@ -309,7 +327,28 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
             supervisedNetwork.inputLayer.activations = input
             with(network) { supervisedNetwork.forwardPass() }
             val output = supervisedNetwork.outputLayer.activations
-            config.lossFunction.scalarLoss(output, target)
+            
+            // Handle target reshaping for ActivationSequence outputs
+            val reshapedTarget = if (supervisedNetwork.outputLayer is ActivationSequence) {
+                // Reshape flattened target back to sequence format
+                val sequenceLayer = supervisedNetwork.outputLayer as ActivationSequence
+                val sequenceSize = sequenceLayer.sequenceSize
+                val vocabSize = sequenceLayer.size
+                
+                // Reshape from (sequenceSize * vocabSize, 1) to (sequenceSize, vocabSize)
+                val reshapedTarget = Matrix(sequenceSize, vocabSize)
+                for (seqPos in 0 until sequenceSize) {
+                    for (vocabPos in 0 until vocabSize) {
+                        val flatIndex = seqPos * vocabSize + vocabPos
+                        reshapedTarget[seqPos, vocabPos] = target[flatIndex, 0]
+                    }
+                }
+                reshapedTarget
+            } else {
+                target
+            }
+            
+            config.lossFunction.scalarLoss(output, reshapedTarget)
         } / supervisedNetwork.testingSet.size
     }
 

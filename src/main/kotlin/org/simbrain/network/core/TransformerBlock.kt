@@ -234,21 +234,27 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
 
         var errorSignal = error
 
-        // Error times output activations gives bias deltas
-        errorSignal = if (signalSource is NeuronArray) {
-            // If the error signal is from a neuron array, then we only update the gradient for the last row
-            // (corresponding to the last token) of the output layer.
-            // We are assuming the final token only is used to predict outputs. ("Sequence to one")
-            // TODO: Handle sequence to sequence cases
+        // Handle different error signal formats based on source type
+        errorSignal = when (signalSource) {
+            is NeuronArray -> {
+                // For NeuronArray source, we currently only get error for the last position
+                // But we should extend this to support multiple targets for proper autoregressive training
+                // For now, maintain current behavior but prepare for future enhancement
             feedForwardOutputNetInputs.clone().apply {
                 fill(0.0)
                 setRow(nrow() - 1, errorSignal.toDoubleArray())
             }
-        } else {
-            // If the error signal is from another transformer block, then we should have a matrix of gradients to compute.
-            // This case is not yet tested.
-            TODO()
+            }
+            is ActivationSequenceProcessor -> {
+                // Sequence-to-sequence: error signal is already a matrix with errors for each position
+                error
+            }
+            else -> {
+                // Fallback: use the error signal as-is
+                error
+            }
         }
+
         rawMatrixAccumulator.getOrPut(b2) {
             Matrix(b2.nrow(), b2.ncol())
         }.add(errorSignal.colSums().toColumnVector())

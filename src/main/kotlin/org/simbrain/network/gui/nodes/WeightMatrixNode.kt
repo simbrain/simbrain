@@ -109,7 +109,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         // Create the image data from the weight matrix using nearest neighbor interpolation
         val imageData = matrix.toScaledImageData(imageWidth, imageHeight, scale)
 
-        val img = imageData.toSimbrainColorImage().let { if (weightMatrix.transposeGraphics) it.transposed() else it }
+        val img = imageData.toSimbrainColorImage().let { if (NetworkPreferences.weightMatrixTransposeGraphics) it.transposed() else it }
         imageBox.image = img
     }
 
@@ -181,14 +181,6 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
             contextMenu.add(diagAction)
             contextMenu.addSeparator()
             if (weightMatrix is WeightMatrix) {
-                contextMenu.add(
-                    networkPanel.createAction(
-                        name = "Transpose weight matrix image (Currently ${if (weightMatrix.transposeGraphics) "Source -> Target" else "Target -> Source"})",
-                        description = "Transpose the weight matrix image",
-                    ) {
-                        weightMatrix.transposeGraphics = !weightMatrix.transposeGraphics
-                    }
-                )
                 contextMenu.add(
                     actionManager
                         .createCoupledPlotMenu(

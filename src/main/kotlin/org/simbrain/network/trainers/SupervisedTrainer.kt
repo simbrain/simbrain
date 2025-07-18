@@ -17,8 +17,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import org.simbrain.network.core.*
 import org.simbrain.network.events.TrainerEvents
-import org.simbrain.network.subnetworks.BackpropNetwork
-import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.network.trainers.SupervisedTrainer.*
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.CopyableObject
@@ -86,7 +84,7 @@ open class SupervisedTrainerConfig(lossFunctionProvider: KFunction<List<Class<ou
 /**
  * Manage iteration based training algorithms and provides an object that can be edited in the GUI.
  */
-abstract class SupervisedTrainer<SN: SupervisedNetwork>(val network: Network, val supervisedNetwork: SN) : CoroutineScope {
+class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedNetwork) : CoroutineScope {
 
     private var job = SupervisorJob()
 
@@ -225,7 +223,28 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork>(val network: Network, va
             rowRange.sumOf { rowNum ->
                 val rowProbeContext = probeContext?.createMapProbe("trainRow-$rowNum")
                 inputLayer.setActivations(trainingSet.inputs.row(rowNum))
-                val targetVec = trainingSet.targets.rowVectorTransposed(rowNum)
+                
+                // Handle target reshaping for ActivationSequence outputs
+                val targetVec = if (outputLayer is ActivationSequence) {
+                    // Reshape flattened target back to sequence format
+                    val flatTarget = trainingSet.targets.row(rowNum)
+                    val sequenceLayer = outputLayer as ActivationSequence
+                    val sequenceSize = sequenceLayer.sequenceSize
+                    val vocabSize = sequenceLayer.size
+                    
+                    // Reshape from (1, sequenceSize * vocabSize) to (sequenceSize, vocabSize)
+                    val reshapedTarget = Matrix(sequenceSize, vocabSize)
+                    for (seqPos in 0 until sequenceSize) {
+                        for (vocabPos in 0 until vocabSize) {
+                            val flatIndex = seqPos * vocabSize + vocabPos
+                            reshapedTarget[seqPos, vocabPos] = flatTarget[flatIndex]
+                        }
+                    }
+                    reshapedTarget
+                } else {
+                    trainingSet.targets.rowVectorTransposed(rowNum)
+                }
+                
                 with(network) {
                     forwardPass()
                     rowProbeContext?.write("forwardPassOutputActivations", outputLayer.activations.clone())
@@ -308,7 +327,28 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork>(val network: Network, va
             supervisedNetwork.inputLayer.activations = input
             with(network) { supervisedNetwork.forwardPass() }
             val output = supervisedNetwork.outputLayer.activations
-            config.lossFunction.scalarLoss(output, target)
+            
+            // Handle target reshaping for ActivationSequence outputs
+            val reshapedTarget = if (supervisedNetwork.outputLayer is ActivationSequence) {
+                // Reshape flattened target back to sequence format
+                val sequenceLayer = supervisedNetwork.outputLayer as ActivationSequence
+                val sequenceSize = sequenceLayer.sequenceSize
+                val vocabSize = sequenceLayer.size
+                
+                // Reshape from (sequenceSize * vocabSize, 1) to (sequenceSize, vocabSize)
+                val reshapedTarget = Matrix(sequenceSize, vocabSize)
+                for (seqPos in 0 until sequenceSize) {
+                    for (vocabPos in 0 until vocabSize) {
+                        val flatIndex = seqPos * vocabSize + vocabPos
+                        reshapedTarget[seqPos, vocabPos] = target[flatIndex, 0]
+                    }
+                }
+                reshapedTarget
+            } else {
+                target
+            }
+            
+            config.lossFunction.scalarLoss(output, reshapedTarget)
         } / supervisedNetwork.testingSet.size
     }
 
@@ -401,77 +441,6 @@ abstract class SupervisedTrainer<SN: SupervisedNetwork>(val network: Network, va
 
 }
 
-class BackpropTrainer(network: Network, backpropNetwork: BackpropNetwork) : SupervisedTrainer<BackpropNetwork>(network, backpropNetwork) {
-
-    override fun trainRow(rowNum: Int): Double {
-        supervisedNetwork.inputLayer.setActivations(supervisedNetwork.trainingSet.inputs.row(rowNum))
-        val targetVec = supervisedNetwork.trainingSet.targets.rowVectorTransposed(rowNum)
-        return with(network) {
-            supervisedNetwork.wmList.forwardPass(supervisedNetwork.inputLayer.activations)
-            supervisedNetwork.wmList.applyBackprop(targetVec, epsilon = config.learningRate, lossFunction = config.lossFunction)
-        }
-    }
-
-    /**
-     * Backprop trains using error accumulation.
-     */
-    override fun trainBatch(rowRange: IntRange, probe: StructuredProbe?): Double {
-
-        val weightAccumulator: HashMap<WeightMatrix, Matrix> = HashMap()
-        val biasesAccumulator: HashMap<NeuronArray, Matrix> = HashMap()
-
-        val trainBatchProbe = probe?.createMapProbe("trainBatch")
-
-        var error = 0.0
-
-        for (i in rowRange) {
-            val rowProbe = trainBatchProbe?.createMapProbe("trainRow-$i")
-            supervisedNetwork.inputLayer.setActivations(supervisedNetwork.trainingSet.inputs.row(i))
-            val targetVec = supervisedNetwork.trainingSet.targets.rowVectorTransposed(i)
-            with(network) {
-                supervisedNetwork.wmList.forwardPass(supervisedNetwork.inputLayer.activations, rowProbe)
-                rowProbe?.write("forwardPassOutputActivations", supervisedNetwork.outputLayer.activations.clone())
-                error += supervisedNetwork.wmList.accumulateBackprop(targetVec, weightAccumulator, biasesAccumulator, lossFunction = config.lossFunction)
-            }
-
-        }
-
-        val weightAccumulatorProbe = trainBatchProbe?.createMapProbe("weightAccumulators")
-
-        weightAccumulatorProbe?.writeAll(weightAccumulator) { wm, delta ->
-            wm.displayName to delta
-        }
-
-        weightAccumulator.forEach { (wm, delta) ->
-            val weightsDelta = config.optimizer.computeDelta(wm.weights, delta)
-            weightAccumulatorProbe?.write("delta_${wm.displayName}") { weightsDelta.clone() }
-
-            wm.weights.add(weightsDelta)
-            weightAccumulatorProbe?.write("weights_${wm.displayName}") { wm.weights.clone() }
-
-            wm.events.updated.fire()
-        }
-
-        trainBatchProbe?.createMapProbe("biasesAccumulator")?.writeAll(biasesAccumulator) { na, delta ->
-            na.displayName to delta
-        }
-
-        val computeDeltaContext = trainBatchProbe?.createMapProbe("computeDelta")
-
-        biasesAccumulator.forEach { (na, delta) ->
-            val delta = config.optimizer.computeDelta(na.biases, delta)
-            computeDeltaContext?.write(na.displayName, delta)
-            na.biases.add(delta)
-            na.events.updated.fire()
-        }
-
-        trainBatchProbe?.createMapProbe("updatedBiases")?.writeAll(biasesAccumulator) { na, _ -> na.displayName to na.biases.clone() }
-
-        return error / rowRange.count()
-    }
-
-}
-
 class SRNTrainerConfig(lossFunctionProvider: KFunction<List<Class<out EditableObject>>>? = null): SupervisedTrainerConfig(lossFunctionProvider) {
     override var updateType: UpdateMethod by GuiEditable(
         initValue = UpdateMethod.Epoch(),
@@ -485,5 +454,3 @@ class SRNTrainerConfig(lossFunctionProvider: KFunction<List<Class<out EditableOb
         }
     }
 }
-
-class SRNTrainer(network: Network, srnNetwork: SRNNetwork) : SupervisedTrainer<SRNNetwork>(network, srnNetwork)

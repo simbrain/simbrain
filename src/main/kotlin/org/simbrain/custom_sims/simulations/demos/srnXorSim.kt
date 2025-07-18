@@ -7,7 +7,6 @@ import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.network.trainers.MatrixDataset
-import org.simbrain.network.trainers.SRNTrainer
 import org.simbrain.network.trainers.SupervisedTrainer
 import org.simbrain.util.*
 import smile.math.matrix.Matrix
@@ -35,7 +34,7 @@ val srnXORSim = newSim {
     srn.trainingSet = MatrixDataset(xorInputs, xorInputs.shiftUpAndPadEndWithZero())
     srn.trainerConfig.updateType = SupervisedTrainer.UpdateMethod.Epoch()
 
-    val trainer = SRNTrainer(network, srn)
+    val trainer = SupervisedTrainer(network, srn)
     trainer.config.learningRate = .01
 
     // Train

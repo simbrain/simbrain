@@ -5,7 +5,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
-import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.trainers.SupervisedNetwork
 import org.simbrain.network.trainers.SupervisedTrainer
@@ -20,7 +19,6 @@ import java.awt.Cursor
 import java.awt.Dimension
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -28,7 +26,7 @@ import javax.swing.JPanel
 /**
  * Controls used by Supervised learning dialogs.
  */
-class TrainerControls<SN>(trainer: SupervisedTrainer<SN>, supervisedNetwork: SN, networkPanel: NetworkPanel): JPanel(), CoroutineScope where SN: SupervisedNetwork, SN: NetworkModel {
+class TrainerControls(trainer: SupervisedTrainer, supervisedNetwork: SupervisedNetwork, networkPanel: NetworkPanel): JPanel(), CoroutineScope {
 
     private val job = SupervisorJob()
 
@@ -151,7 +149,7 @@ class TrainerControls<SN>(trainer: SupervisedTrainer<SN>, supervisedNetwork: SN,
 
 }
 
-class ErrorTimeSeries(trainer: SupervisedTrainer<*>) : JPanel() {
+class ErrorTimeSeries(trainer: SupervisedTrainer) : JPanel() {
 
     val graphPanel: TimeSeriesPlotPanel
 

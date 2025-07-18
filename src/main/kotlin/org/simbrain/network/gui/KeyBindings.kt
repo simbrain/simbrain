@@ -44,9 +44,6 @@ fun NetworkPanel.addKeyBindings() {
 
     bind(Alt + 'R') {
         selectionManager.selectedModels.forEach {
-            if (it is WeightMatrix) {
-                it.transposeGraphics = !it.transposeGraphics
-            }
             if (it is NeuronArray) {
                 it.verticalLayout = !it.verticalLayout
             }

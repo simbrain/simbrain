@@ -7,8 +7,8 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.getModelByLabel
 import org.simbrain.network.core.getNetworkXStream
 import org.simbrain.network.trainers.AdamOptimizer
-import org.simbrain.network.trainers.BackpropTrainer
 import org.simbrain.network.trainers.MatrixDataset
+import org.simbrain.network.trainers.SupervisedTrainer
 import org.simbrain.network.trainers.SupervisedTrainer.UpdateMethod
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.updaterules.SoftmaxRule
@@ -41,7 +41,7 @@ class BackpropNetworkTest {
         bp.trainerConfig.learningRate = 0.01
         bp.trainerConfig.optimizer = AdamOptimizer()
 
-        val trainer = BackpropTrainer(net, bp)
+        val trainer = SupervisedTrainer(net, bp)
 
         runBlocking {
             repeat(2000) {
@@ -59,7 +59,7 @@ class BackpropNetworkTest {
         bp.trainerConfig.lossFunction = org.simbrain.network.trainers.BackpropLossFunction.CrossEntropy
         bp.trainerConfig.learningRate = 0.1
 
-        val trainer = BackpropTrainer(net, bp)
+        val trainer = SupervisedTrainer(net, bp)
 
         runBlocking {
             repeat(1000) {

@@ -1,13 +1,11 @@
 package org.simbrain.custom_sims.simulations.nlp
 
 import kotlinx.coroutines.awaitAll
+import org.json.JSONObject
 import org.simbrain.custom_sims.*
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.*
-import org.simbrain.network.trainers.AdamOptimizer
-import org.simbrain.network.trainers.BackpropLossFunction
-import org.simbrain.network.trainers.MatrixDataset
-import org.simbrain.network.trainers.SupervisedModel
+import org.simbrain.network.trainers.*
 import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
@@ -16,10 +14,76 @@ import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.updater.UpdateAllCouplings
 import org.simbrain.world.textworld.EmbeddingType
 import org.simbrain.world.textworld.TextWorldComponent
+import org.simbrain.world.textworld.TokenEmbedding
 import org.simbrain.world.textworld.TokenEmbeddingBuilder
 import smile.math.matrix.Matrix
 import java.io.File
-import kotlin.math.min
+
+/**
+ * Creates sequence-to-sequence training data for proper GPT-style training.
+ * 
+ * For input sequence ["hi", "there", "old", "friend"], creates:
+ * Input:  Matrix(contextSize, vocabSize) for each training example
+ * Target: Matrix(contextSize, vocabSize) for each training example (shifted by 1)
+ * 
+ * Each position learns to predict the next token simultaneously.
+ */
+fun buildSequenceToSequenceDataset(
+    tokenizedText: List<String>, 
+    contextSize: Int, 
+    tokenEmbedding: TokenEmbedding
+): MatrixDataset {
+    
+    // Create sliding windows of contextSize + 1 for input + target
+    val sequences = tokenizedText.windowed(contextSize + 1, step = 1)
+    
+    val numSequences = sequences.size
+    val vocabSize = tokenEmbedding.dimension
+    
+    // Each training example is a matrix: (contextSize, vocabSize)
+    val allInputMatrices = mutableListOf<Matrix>()
+    val allTargetMatrices = mutableListOf<Matrix>()
+    
+    sequences.forEach { window ->
+        val inputTokens = window.dropLast(1)  // First contextSize tokens
+        val targetTokens = window.drop(1)     // Last contextSize tokens (shifted by 1)
+        
+        // Create input matrix for this training example
+        val inputMatrix = Matrix(contextSize, vocabSize)
+        inputTokens.forEachIndexed { positionIndex, token ->
+            val oneHot = tokenEmbedding.get(token)
+            inputMatrix.setRow(positionIndex, oneHot)
+        }
+        
+        // Create target matrix for this training example  
+        val targetMatrix = Matrix(contextSize, vocabSize)
+        targetTokens.forEachIndexed { positionIndex, token ->
+            val oneHot = tokenEmbedding.get(token)
+            targetMatrix.setRow(positionIndex, oneHot)
+        }
+        
+        allInputMatrices.add(inputMatrix)
+        allTargetMatrices.add(targetMatrix)
+    }
+    
+    // Convert to the format expected by MatrixDataset
+    // Each row in the final matrices represents one training example (flattened)
+    val finalInputMatrix = Matrix(numSequences, contextSize * vocabSize)
+    val finalTargetMatrix = Matrix(numSequences, contextSize * vocabSize)
+    
+    allInputMatrices.forEachIndexed { exampleIndex, inputMatrix ->
+        finalInputMatrix.setRow(exampleIndex, inputMatrix.flatten())
+    }
+    
+    allTargetMatrices.forEachIndexed { exampleIndex, targetMatrix ->
+        finalTargetMatrix.setRow(exampleIndex, targetMatrix.flatten())
+    }
+    
+    return MatrixDataset(
+        inputs = finalInputMatrix,
+        targets = finalTargetMatrix
+    )
+}
 
 class TinyLanguageModelOptions(var showEmbeddingDimension: Boolean = true): EditableObject {
 
@@ -52,9 +116,50 @@ class TinyLanguageModelOptions(var showEmbeddingDimension: Boolean = true): Edit
     )
 }
 
-val tinyLanguageModel = newSim("tiny_language_model") {
+/**
+ * To run from command line, use:
+ * `gradle runSim -PsimName="Tiny language model" -PoptionString='{"contextSize": 12, "embeddingDimension": 16, "textFile": "chess.txt", "trainingIterations": 100, "enableConsoleOutput": true}'`
+ * 
+ * Available options:
+ * - contextSize: Number of tokens in context window (default: 24)
+ * - embeddingDimension: Vector embedding dimensions (default: 20)  
+ * - textFile: Training text filename in simulations/texts/ (default: "casual_texting_small.txt")
+ * - usePunctuation: Whether tokenizer should include punctuation (default: true)
+ * - trainingIterations: Number of training iterations to run (default: 0, no training)
+ * - workspaceIterations: Number of workspace iterations to run (default: 0)
+ * - enableConsoleOutput: Print debug info to console (default: false)
+ * - learningRate: Learning rate for Adam optimizer (default: 0.001)
+ */
+val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
 
-    val options = TinyLanguageModelOptions().showAPEOptionDialog("Tiny Language Model") ?: return@newSim
+    // Training and debugging parameters
+    var trainingIterations = 0
+    var workspaceIterations = 0
+    var enableConsoleOutput = false
+    var learningRate = 0.001
+
+    val options = if (optionString?.isNotEmpty() == true) {
+        // Parse parameters from gradle
+        val jsonOptions = JSONObject(optionString)
+        trainingIterations = jsonOptions.optInt("trainingIterations", 0)
+        workspaceIterations = jsonOptions.optInt("workspaceIterations", 0)
+        enableConsoleOutput = jsonOptions.optBoolean("enableConsoleOutput", false)
+        learningRate = jsonOptions.optDouble("learningRate", 0.001)
+        
+        TinyLanguageModelOptions().apply {
+            contextSize = jsonOptions.optInt("contextSize", contextSize)
+            embeddingDimension = jsonOptions.optInt("embeddingDimension", embeddingDimension)
+            if (jsonOptions.has("textFile")) {
+                trainerTextPath = simulationsPath / "texts" / jsonOptions.getString("textFile")
+            }
+            if (jsonOptions.has("usePunctuation")) {
+                tokenizer = SimpleTokenizer(usePunctuation = jsonOptions.getBoolean("usePunctuation")) as Tokenizer<*>
+            }
+        }
+    } else {
+        // Use GUI dialog for interactive mode
+        TinyLanguageModelOptions().showAPEOptionDialog("Tiny Language Model") ?: return@newSim
+    }
 
     workspace.clearWorkspace()
 
@@ -74,10 +179,7 @@ val tinyLanguageModel = newSim("tiny_language_model") {
     val network = networkComponent.network
 
     val tokenizedTrainingText = trainingText.tokenize(tokenizer).map { it.token }
-    val corpus = tokenizedTrainingText.windowed(min(tokenizedTrainingText.size, contextSize)).flatMap { window ->
-        // window along the tokens if the context size is not big enough to cover the entire token list
-        generateAutoregressivePairs(window)
-    }
+    val trainingSet = buildSequenceToSequenceDataset(tokenizedTrainingText, contextSize, tokenEmbedding)
 
     // Text World for Inputs
     val textWorldComponent = addTextWorld("Text World (Inputs)")
@@ -85,24 +187,6 @@ val tinyLanguageModel = newSim("tiny_language_model") {
     textWorldComponent.world.text = tokenizedTrainingText.take(contextSize).tokensToString(tokenizer)
     textWorldComponent.world.highlightCurrentToken = false
     textWorldComponent.world.autoAdvance = false
-
-    val tokenizedCorpus = corpus.map { (context, target) ->
-        context.map { tokenEmbedding.get(it) } to tokenEmbedding.get(target)
-    }
-
-    val inputMatrix = tokenizedCorpus
-        .map { (context, _) -> context }
-        .map {
-            DoubleArray(tokenEmbedding.dimension * contextSize) { 0.0 }.also { array ->
-                it.forEachIndexed { i, vector ->
-                    vector.forEachIndexed { j, value ->
-                        array[i * tokenEmbedding.dimension + j] = value
-                    }
-                }
-            }
-        }.toTypedArray().toMatrix()
-
-    val targetMatrix = tokenizedCorpus.map { (_, target) -> target }.toTypedArray().toMatrix()
 
     val inputs = ActivationSequence(contextSize, tokenEmbedding.dimension).apply {
         label = "Inputs"
@@ -113,32 +197,37 @@ val tinyLanguageModel = newSim("tiny_language_model") {
         label = "Transformer Block"
     }
 
-    val softMaxLayer = NeuronArray(tokenEmbedding.dimension).apply {
-        updateRule = SoftmaxRule()
+    // Sequence-to-sequence softmax layer for proper GPT training
+    val softmaxSequence = ActivationSequence(contextSize, tokenEmbedding.dimension).apply {
+        updateRule = SoftmaxRule().apply {
+            temperature = 0.2
+        }
+        label = "Softmax Sequence (Training)"
+    }
+
+    // Separate inference layer for update actions (maintains old behavior)
+    val inferenceOutput = NeuronArray(tokenEmbedding.dimension).apply {
         circleMode = size < 100
         gridMode = true
         labelArray = tokenEmbedding.tokens.toTypedArray()
-        // Spaces are a hack for label issue in circle mode
-        label = "Predicted Next Token"
+        label = "Predicted Next Token (Inference)"
     }
 
     val weightMatrices = listOf(
         WeightMatrix(inputs, transformerBlock),
-        WeightMatrix(transformerBlock, softMaxLayer)
+        WeightMatrix(transformerBlock, softmaxSequence)
+        // Note: No weight matrix to inferenceOutput - handled by custom update action
     )
 
     with(network) {
-        addNetworkModels(inputs, transformerBlock, softMaxLayer).awaitAll()
+        addNetworkModels(inputs, transformerBlock, softmaxSequence, inferenceOutput).awaitAll()
         addNetworkModels(weightMatrices).awaitAll()
-        val model = SupervisedModel(inputs, softMaxLayer)
+        val model = SupervisedModel(inputs, softmaxSequence) // Train on sequence, not single output
         model.initWeights()
         model.initBiases()
-        model.trainingSet = MatrixDataset(
-            inputs = inputMatrix,
-            targets = targetMatrix
-        )
+        model.trainingSet = trainingSet
         model.trainerConfig.lossFunction = BackpropLossFunction.CrossEntropy
-        model.trainerConfig.learningRate = .001
+        model.trainerConfig.learningRate = learningRate
         model.trainerConfig.testConfiguration.enabled = false
         model.trainerConfig.optimizer = AdamOptimizer()
         addNetworkModels(model).awaitAll()
@@ -148,7 +237,8 @@ val tinyLanguageModel = newSim("tiny_language_model") {
 
     inputs.location = point(-625, -200)
     transformerBlock.location = point(-300, -600)
-    softMaxLayer.location = point(-1000, -600)
+    softmaxSequence.location = point(-1000, -600)
+    inferenceOutput.location = point(-1000, -400)
 
     withGui {
         place(textWorldComponent, 10, 10, 450, 350)
@@ -198,6 +288,99 @@ val tinyLanguageModel = newSim("tiny_language_model") {
         initiallyOpened = false
     )
 
+    // Run training and workspace iterations if specified (for headless mode)
+    if (trainingIterations > 0 || workspaceIterations > 0) {
+        
+        if (enableConsoleOutput) {
+            println("Starting headless execution...")
+            println("Training iterations: $trainingIterations")
+            println("Workspace iterations: $workspaceIterations")
+            println("Learning rate: $learningRate")
+            println("Context size: $contextSize")
+            println("Embedding dimension: ${options.embeddingDimension}")
+            println("Text file: ${options.trainerTextPath}")
+            println()
+        }
+
+        // Get components for headless execution
+        val network = workspace.componentList.filterIsInstance<NetworkComponent>().first().network
+        val supervisedModel = network.getModels<SupervisedModel>().first()
+        val trainer = SupervisedTrainer(network, supervisedModel)
+        val softmaxSequence = network.getModelByLabel<ActivationSequence>("Softmax Sequence (Training)")
+        val inferenceOutput = network.getModelByLabel<NeuronArray>("Predicted Next Token (Inference)")
+        
+        try {
+            // Run training iterations
+            if (trainingIterations > 0) {
+                if (enableConsoleOutput) println("Starting training...")
+                repeat(trainingIterations) { iteration ->
+                    trainer.trainOnce()
+                    
+                    if (enableConsoleOutput) {
+                        // Run a forward pass to get current activations
+                        with(network) {
+                            supervisedModel.forwardPass()
+                        }
+                        
+                        // Copy sequence output to inference output for visualization
+                        val lastMeaningfulIndex = (contextSize - 1).coerceAtLeast(0)
+                        val sequenceOutput = softmaxSequence.activations.row(lastMeaningfulIndex)
+                        
+                        // Print error for every iteration
+                        println("Iteration ${iteration + 1}/$trainingIterations, Loss: ${"%.6f".format(trainer.lastTrainingError)}")
+                        
+                        // Sample activations every iteration
+                        println("  Softmax Sequence activations (first 3 positions, first 5 tokens):")
+                        for (pos in 0 until minOf(3, softmaxSequence.sequenceSize)) {
+                            val positionActivations = (0 until minOf(5, softmaxSequence.size)).map { 
+                                softmaxSequence.activations[pos, it] 
+                            }
+                            println("    Position $pos: [${positionActivations.joinToString(", ") { "%.3f".format(it) }}...]")
+                        }
+                        
+                        // Show predicted next token probabilities
+                        println("  Predicted Next Token (top 5 probabilities):")
+                        val topIndices = inferenceOutput.activationArray
+                            .mapIndexed { index, value -> index to value }
+                            .sortedByDescending { it.second }
+                            .take(5)
+                        
+                        topIndices.forEach { (tokenIndex, prob) ->
+                            val token = if (tokenIndex < tokenEmbedding.tokens.size) {
+                                tokenEmbedding.tokens[tokenIndex]
+                            } else "UNK"
+                            println("    '$token': ${"%.3f".format(prob)}")
+                        }
+                        println()
+                    }
+                }
+                if (enableConsoleOutput) println("Training completed.")
+            }
+
+            // Run workspace iterations
+            if (workspaceIterations > 0) {
+                if (enableConsoleOutput) println("Starting workspace iterations...")
+                repeat(workspaceIterations) { iteration ->
+                    workspace.iterateSuspend()
+                    if (enableConsoleOutput && (iteration + 1) % 10 == 0) {
+                        println("Workspace iteration ${iteration + 1}/$workspaceIterations")
+                    }
+                }
+                if (enableConsoleOutput) println("Workspace iterations completed.")
+            }
+
+        } catch (e: Exception) {
+            println("ERROR during execution: ${e.message}")
+            e.printStackTrace()
+            throw e
+        }
+
+        if (enableConsoleOutput) {
+            println("Headless execution completed successfully!")
+            println("Final loss: ${"%.6f".format(trainer.lastTrainingError)}")
+        }
+    }
+
 }.registerReopenFunction { workspace -> setupUpdateActions(workspace) }
 
 fun SimulationScope.setupUpdateActions(workspace: Workspace) {
@@ -205,7 +388,8 @@ fun SimulationScope.setupUpdateActions(workspace: Workspace) {
     val network = workspace.componentList.filterIsInstance<NetworkComponent>().first().network
     val supervisedModel = network.getModels<SupervisedModel>().first()
     val inputs = network.getModelByLabel<ActivationSequence>("Inputs")
-    val softMaxLayer = network.getModelByLabel<NeuronArray>("Predicted Next Token")
+    val softmaxSequence = network.getModelByLabel<ActivationSequence>("Softmax Sequence (Training)")
+    val inferenceOutput = network.getModelByLabel<NeuronArray>("Predicted Next Token (Inference)")
 
     val contextSize = inputs.sequenceSize
 
@@ -238,8 +422,19 @@ fun SimulationScope.setupUpdateActions(workspace: Workspace) {
         }
     }
 
+    workspace.addUpdateAction("Copy Sequence Output to Inference") {
+        // Determine the last meaningful position in the context window
+        val currentTokens = textWorld.text.tokenize(textWorld.tokenizer).map { it.token }
+        val actualLength = minOf(currentTokens.size, contextSize)
+        val lastMeaningfulIndex = (actualLength - 1).coerceAtLeast(0)
+        
+        // Copy activations from the last meaningful position in the sequence to inference output
+        val sequenceOutput = softmaxSequence.activations.row(lastMeaningfulIndex)
+        inferenceOutput.activations = sequenceOutput.toColumnVector()
+    }
+
     workspace.addUpdateAction("Predict Next Word") {
-        val nextWord = textWorld.tokenEmbedding.getClosestWord(softMaxLayer.activationArray)
+        val nextWord = textWorld.tokenEmbedding.getClosestWord(inferenceOutput.activationArray)
         // update text with predicted word and remove first word so that the context window maintains its size
         textWorldComponent.world.text = textWorldComponent.world.text.tokenize(textWorld.tokenizer)
             .map { it.token }

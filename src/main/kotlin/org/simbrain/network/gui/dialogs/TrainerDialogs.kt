@@ -6,13 +6,15 @@ import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
-import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.addSubnetworkAction
 import org.simbrain.network.gui.nodes.subnetworkNodes.BackpropNetworkNode
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.subnetworks.SRNNetwork
-import org.simbrain.network.trainers.*
+import org.simbrain.network.trainers.MatrixDataset
+import org.simbrain.network.trainers.SupervisedNetwork
+import org.simbrain.network.trainers.SupervisedTrainer
+import org.simbrain.network.trainers.UnsupervisedNetwork
 import org.simbrain.util.*
 import org.simbrain.util.table.*
 import org.simbrain.util.widgets.ToggleButton
@@ -99,7 +101,7 @@ class DataSetPanel(
  * Generic training dialog for supervised learning.
  */
 context(NetworkPanel)
-fun <SN> SN.getSupervisedTrainingDialog(): StandardDialog where SN: SupervisedNetwork, SN: NetworkModel {
+fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
     val supervisedNetwork = this
     return StandardDialog().apply {
 
@@ -108,18 +110,13 @@ fun <SN> SN.getSupervisedTrainingDialog(): StandardDialog where SN: SupervisedNe
         // Run training algorithm
         val runControls = JPanel()
         runControls.layout = MigLayout("gap 0px 0px, ins 0")
-        val trainer = when (supervisedNetwork) {
-            is SRNNetwork -> SRNTrainer(network, supervisedNetwork)
-            is BackpropNetwork -> BackpropTrainer(network, supervisedNetwork)
-            is SupervisedModel -> SupervisedModelTrainer(network, supervisedNetwork)
-            else -> throw IllegalArgumentException("Unsupported network type: ${supervisedNetwork::class.simpleName}")
-        } as SupervisedTrainer<SN>
+        val trainer = SupervisedTrainer(network, supervisedNetwork)
         val trainerControls = TrainerControls(trainer, supervisedNetwork, this@NetworkPanel)
 
         suspend fun DataSetPanel.commonApplyAction(selectedRow: Int) {
             with(network) {
                 inputLayer.setActivations(inputDataFrame.getRow<Double>(selectedRow).toDoubleArray())
-                this@SN.forwardPass()
+                this@SupervisedNetwork.forwardPass()
                 trainerConfig.lossFunction.scalarLoss(
                     outputLayer.activations,
                     targetDataFrame.getRow<Double>(selectedRow).toDoubleArray().toColumnVector()

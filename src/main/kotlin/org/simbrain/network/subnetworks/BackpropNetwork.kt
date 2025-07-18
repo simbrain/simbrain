@@ -34,8 +34,10 @@ import kotlin.math.min
  */
 class BackpropNetwork : FeedForward, SupervisedNetwork {
 
-    override val layers: LinkedHashSet<Layer>
-        get() = LinkedHashSet(layerList)
+    @delegate:Transient
+    override val layers: LinkedHashSet<Layer> by lazy {
+        computeOrderedUpdatePath(setOf(inputLayer), outputLayer)
+    }
 
     constructor(nodesPerLayer: IntArray, initialPosition: Point2D? = point(0,0)): super(nodesPerLayer, initialPosition) {
         layerList.forEach { it.updateRule = LinearRule() }
@@ -80,7 +82,7 @@ class BackpropNetwork : FeedForward, SupervisedNetwork {
 
     context(Network)
     override fun forwardPass() {
-        wmList.forwardPass(inputLayer.activations)
+        layers.forwardPass(listOf(inputLayer.activations), listOf(inputLayer))
     }
 
     override fun copy(): BackpropNetwork {

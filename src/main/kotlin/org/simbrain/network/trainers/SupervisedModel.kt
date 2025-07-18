@@ -148,7 +148,7 @@ class SupervisedModel(
             inputLayer.activations.transpose().clone(),
             Matrix.row(output),
         )
-        SupervisedModelTrainer(this@Network, this@SupervisedModel).trainOnce()
+        SupervisedTrainer(this@Network, this@SupervisedModel).trainOnce()
 
         inputLayer.isClamped = isInputClamped
         outputLayer.setActivations(output)
@@ -172,5 +172,3 @@ class SupervisedModel(
         return "$displayName: ${models.joinToString("\n") { it.toString().indent(2) }}"
     }
 }
-
-class SupervisedModelTrainer(network: Network, supervisedModel: SupervisedModel): SupervisedTrainer<SupervisedModel>(network, supervisedModel)

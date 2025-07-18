@@ -8,6 +8,7 @@ import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.addNeuronGroup
 import org.simbrain.network.neurongroups.NeuronGroup
+import org.simbrain.network.spikeresponders.JumpAndDecay
 import org.simbrain.network.spikeresponders.ShortTermPlasticity
 import org.simbrain.network.updaterules.IntegrateAndFireRule
 import org.simbrain.plot.rasterchart.RasterPlotDesktopComponent
@@ -87,7 +88,8 @@ val cortexLayers = newSim {
 
     suspend fun connectLayers(
         src: NeuronGroup, tar: NeuronGroup,
-        sparsity: Double
+        sparsity: Double,
+        spikeResponderParams: Triple<Double, Double, Double> = Triple(0.2, 600.0, 30.0) // U, D, F defaults
     ): SynapseGroup {
         val exRand: ProbabilityDistribution = LogNormalDistribution(exlocation, exscale, false)
         val inRand: ProbabilityDistribution = LogNormalDistribution(inlocation, inscale, true)
@@ -110,7 +112,17 @@ val cortexLayers = newSim {
 
         sg.synapses.forEach {
             val stp = ShortTermPlasticity()
-            stp.init(it)
+            // Use specific parameters for this connection type
+            val (u, d, f) = spikeResponderParams
+            stp.U = u
+            stp.D = d
+            stp.F = f
+            // Configure the internal JumpAndDecay spike responder
+            (stp.spikeResponderLocal as JumpAndDecay).apply {
+                timeConstant = 5.0  // Standard decay time
+                useConvolution = false
+                baseLine = 0.0
+            }
             it.spikeResponder = stp
         }
         net.addNetworkModel(sg)?.await()
@@ -186,15 +198,19 @@ val cortexLayers = newSim {
 
         // Connect layers
         val synGroups: MutableMap<String, SynapseGroup> = HashMap()
-        synGroups["L2/3 Rec."] = connectLayers(layer_23, layer_23, .12)
-        synGroups["L4 Rec."] = connectLayers(layer_4, layer_4, .24)
-        synGroups["L5/6 Rec."] = connectLayers(layer_56, layer_56, .24)
-        synGroups["L4 \u2192 L2/3"] = connectLayers(layer_4, layer_23, .14)
-        synGroups["L2/3 \u2192 L4"] = connectLayers(layer_23, layer_4, .01)
-        synGroups["L4 \u2192 L5/6"] = connectLayers(layer_4, layer_56, .08)
-        synGroups["L5/6 \u2192 L4"] = connectLayers(layer_56, layer_4, .007)
-        synGroups["L2/3 \u2192 L5/6"] = connectLayers(layer_23, layer_56, .08)
-        synGroups["L5/6 \u2192 L2/3"] = connectLayers(layer_56, layer_23, .03)
+        // Recurrent connections - moderate strength to maintain activity but prevent runaway
+        synGroups["L2/3 Rec."] = connectLayers(layer_23, layer_23, .12, Triple(0.15, 800.0, 25.0))
+        synGroups["L4 Rec."] = connectLayers(layer_4, layer_4, .24, Triple(0.15, 800.0, 25.0))
+        synGroups["L5/6 Rec."] = connectLayers(layer_56, layer_56, .24, Triple(0.15, 800.0, 25.0))
+        // Strong forward connections - Layer 4 is the main input that drives other layers
+        synGroups["L4 \u2192 L2/3"] = connectLayers(layer_4, layer_23, .14, Triple(0.4, 200.0, 100.0))  // Strong
+        synGroups["L4 \u2192 L5/6"] = connectLayers(layer_4, layer_56, .08, Triple(0.4, 200.0, 100.0))  // Strong
+        synGroups["L2/3 \u2192 L5/6"] = connectLayers(layer_23, layer_56, .08, Triple(0.35, 250.0, 80.0))  // Strong
+        
+        // Weak feedback connections - minimal influence
+        synGroups["L2/3 \u2192 L4"] = connectLayers(layer_23, layer_4, .01, Triple(0.1, 1000.0, 10.0))  // Weak
+        synGroups["L5/6 \u2192 L4"] = connectLayers(layer_56, layer_4, .007, Triple(0.1, 1000.0, 10.0))  // Weak
+        synGroups["L5/6 \u2192 L2/3"] = connectLayers(layer_56, layer_23, .03, Triple(0.1, 1000.0, 10.0))  // Weak
         for (sgn in synGroups.keys) {
             val sg = synGroups[sgn]
             for (s in sg!!.synapses) {

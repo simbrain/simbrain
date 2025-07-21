@@ -34,12 +34,6 @@ val actorCritic = newSim {
     var alpha = .25
 
     /**
-     * Eligibility trace. 0 for no trace; 1 for permanent trace. .9 default. Not
-     * currently used.
-     */
-    var lambda = 0.0
-
-    /**
      * Prob. of taking a random action. "Exploitation" vs. "exploration".
      */
     var epsilon = .25
@@ -47,7 +41,7 @@ val actorCritic = newSim {
     /**
      * Discount factor . 0-1. 0 predict next value only. .5 predict future
      * values. As it increases toward one, values of y in the more distant
-     * future become more significant.t
+     * future become more significant.
      */
     var gamma = 1.0
 
@@ -252,59 +246,78 @@ val actorCritic = newSim {
     """
     # Introduction
 
-    This simulation is based on Richard Sutton (1996), *Generalization in Reinforcement Learning: Successful Examples Using Sparse Coarse Coding*. 
-
+    This simulation models an agent that learns the location of rewarding stimuli using [reinforcement learning](https://en.wikipedia.org/wiki/Reinforcement_learning).
+    Each time you press `run` a simulation is run. The agent (the mouse) initially takes random actions. But when
+    it finds the cheese it is rewarded, and it reinforces the action of moving towards the cheese next time it is near it.
+    It also learns to value the state it's in right _before_ it gets the cheese, and will reinforce actions that lead to
+    that state. In this way it slowly learns a path to the cheese. In the default case of a 5x5 world, after about 15 trials 
+    it should be able to do a pretty good job of finding the cheese.  Once it learns this, you can move the cheese a little 
+    and observe it "looking" for the cheese in the location where it initially learned it to be. 
+    
+    **Tip**: To get the simulation to run faster, minimize the network window.
+    
+    **Tip**: A [time series](https://docs.simbrain.net/docs/plots/timeSeries.html) window is minimized that shows how reward, value, and td error unfold as the simulation runs. 
+       
     # Simulation Details
 
-    This simulation models an agent that learns the location of rewarding stimuli using reinforcement learning. The environment of the agent is determined when you open the simulation and
-    have stated your desired `Num Tiles`. 
+    The simulation uses the [actor critic](https://en.wikipedia.org/wiki/Actor-critic_algorithm) algorithm. The algorithm is
+    biologically realistic, modeling how dopamine is used to predict reward.
     
-    In this simulation, there are parameters that you can use to control agent's learning behavior. The parameters are:
+    Sensor nodes represent a flattened [sensor grid](https://docs.simbrain.net/docs/worlds/odorworld.html#grid-sensor) which
+     is modeled on place cells in the brain. As the simulation runs notice that the agent's current location is reflected in these.
+     
+    Outputs are a simple motor system (the "actor" in "actor critic") that is based on a [winner take all](https://docs.simbrain.net/docs/network/neurongroups/wta.html) algorithm.
     
-    1) `Trials`: Determines how many trials the simulation will run before stopping.
+    The value node is the "critic", that estimates how likely reward is to be achieved relative to the current state.
     
+    The td error node corresponds to a dopamine signal, which indicates how much better or worse reward is relative to what the critic or value node is predicting.
+     When things are better than expected, the node fires above 0; when worse it fires below 0.
+   
+    The weights between the sensor nodes and the outputs and between the sensor nodes and the value node are what are trained. 
+     The weight change is determined by the learning rate and the td error. So when things are better than expected (td error is positive)
+     the weights are strengthened; when they are worse than expected, the are weakened.
+    
+    ## Parameters
+    
+    The following parameters can be used to control how the agent learns. The parameters are:
+    
+    1) `Trials`: Determines how many trials the simulation will run before stopping. A trial ends when it reaches the cheese. 
     2) `Discount Factor (gamma)`: Determines how "future oriented" the agent is. Range is from `0`-`1`.
         
         - A lower gamma makes the agent short-sighted; higher gamma leads to longer-term planning. With gamma near `1`, the agent learns to value chains of actions that lead to reward.
         
-        - Tanaka et al. (2007) relate gamma to serotonin. Below is a passage from their paper:
+        - Tanaka et al. (2007) relate gamma to serotonin: "The activity of the ventral part of the striatum was correlated with reward prediction at shorter time scales, and this correlated activity was stronger at low serotonin levels. By contrast, the activity of 
+        the dorsal part of the striatum was correlated with reward prediction at longer time scales, and this correlated activity was stronger at high serotonin levels."
         
-        _The activity of the ventral part of the striatum was correlated with reward prediction at shorter time scales, and this correlated activity was stronger at low serotonin levels. By contrast, the activity of 
-        the dorsal part of the striatum was correlated with reward prediction at longer time scales, and this correlated activity was stronger at high serotonin levels._
-        
-    3) `Learning rate (Alpha)`: Determines how much the weights update at each time step. 
+    3) `Learning rate (Alpha)`: Determines how much the weights update at each time step. Doya (2007) suggests that this may be related to acetylcholine, which regulates some forms of plasticity.
     
-        - Doya (2007) suggests that this may be related to acetylcholine, which regulates some forms of plasticity.
+    4) `Epsilon`: Determines the probability of taking a random action. `0` for no random actions; `1` for all random actions. Doya (2007) suggests that this may be related to noradrenaline, which regulates overall arousal.
     
-    4) `Epsilon`: Determines the probability of taking a random action. `0` for no random actions; `1` for all random actions.
-    
-        - Doya (2007) suggests that this may be related to noradrenaline, which regulates overall arousal.
-    
-    In addition to the parameters, there is a time series plot that captures `reward`, `value`, and `TD Error`. This time series is hidden at the bottom of the screen. In the time series are
-    three trend lines in three different colors: red, green, and blue. These colors correspond to the captured values mentioned above over time.
+    ## Time Series
     
     1) `Reward` (red time series): This increases when the agent is on top of the cheese.
-    
     2) `Value` (green time series): This increases when the agent expects a reward.
-    
     3) `TD Error` (blue time series): This is the signal mismatch between expected and received reward. Positive error increases value/action weights whereas negative error decreases them.
     
     # What to Do
     
-    In this simulation, there are parameters that you can use to change the agent's learning behaviors. To get a quick feel of the simulation, do the following steps:
-    
     1) Click `Run` using the default parameters on the control panel.
-    
-    2) Observe the agent's action. It should figure out how to reach the cheese at the end of the run.
-    
+    2) Observe the agent's actions. It should figure out how to reach the cheese at the end of the run.
     3) Open the hidden time series plot that contains `reward`, `value`, and `TD Error`.
+    4) Now, repeatedly click `Run` for a few times after simulation stops. As you continue to run trials, it will increase `value`, make `reward` more frequent, and reduce `TD Error`.     
+    5) After it has learned where the cheese is, keep running, but move the cheese. Observe how it perseverates on old locations. 
+    6) After it learns to find the cheese in the upper left, you can pull the cheese
+    down a little, and run until it finds the new spot. You can hold the cheese "near" it to help it along and keep re-running the sim. 
+    You can eventually make it learn to follow an arbitrary pattern to find the cheese.
     
-    4) Now, repeatedly click `Run` for a few times after simulation stops. As you continue to run trials, it will increase `value`, make `reward` more frequent, and reduce `TD Error`. 
-    These trends will depend on your parameter settings and you can observe these changes in the time series plot.
-    
-    ## Experimenting With Other Parameter Values
+    ## Experimenting With Parameter Values
     
     You can change the agent's learning behavior by changing the parameters of the simulation and then follow the steps above again to see the impacts of the changes on the simulation.
+    
+    - By making epsilon higher, like .8, it should move randomly. Then try making it low, or take it all the way to 0. 
+        At 0 it will follow the same path every time, reflecting what it's learned.
+    - Higher gamma encourages longer-term thinking. At 0 it only learns one step ahead, and it will never learn the full path. 
+        As it approaches 1 it thinks more and more long term and will learn the path, but as gamma is higher it takes longer to learn. 
     
     # References
     

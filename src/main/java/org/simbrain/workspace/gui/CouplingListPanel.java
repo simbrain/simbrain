@@ -42,7 +42,7 @@ public class CouplingListPanel extends JPanel {
     Action deleteCouplingsAction = new AbstractAction() {
         // Initialize
         {
-            putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/Eraser.png"));
+            putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/minus.png"));
             putValue(NAME, "Delete couplings");
             putValue(SHORT_DESCRIPTION, "Delete selected couplings");
             CouplingListPanel.this.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke("BACK_SPACE"), this);

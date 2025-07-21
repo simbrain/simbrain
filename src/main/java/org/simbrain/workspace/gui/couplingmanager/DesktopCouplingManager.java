@@ -1,6 +1,7 @@
 package org.simbrain.workspace.gui.couplingmanager;
 
 import kotlin.Pair;
+import org.simbrain.util.ResourceManager;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.MismatchedAttributesException;
@@ -98,6 +99,8 @@ public class DesktopCouplingManager extends JPanel {
         bottomPanel.add(couplingMethodComboBox);
 
         JButton addCouplingsButton = new JButton("Add Coupling(s)");
+        addCouplingsButton.setToolTipText("Create couplings from currently selected producers and consumers");
+        addCouplingsButton.setIcon(ResourceManager.getSmallIcon("menu_icons/plus.png"));
         addCouplingsButton.setActionCommand("addCouplings");
         addCouplingsButton.addActionListener((e) -> {
             addCouplings();

@@ -95,7 +95,7 @@ val SimbrainJTable.deleteColumnAction
     get() = createAction(
         name = "Delete columns",
         description = "Delete selected columns",
-        iconPath = "menu_icons/DeleteColumnTable.png"
+        iconPath = "menu_icons/DeleteTableColumn.png"
     ) {
         deleteSelectedColumns()
     }
@@ -298,7 +298,7 @@ fun SimbrainJTable.createShowEigenValuesAction() = createAction(
 fun SimbrainJTable.createOpenProjectionAction(useRowLabels: Boolean = false) = createAction(
         name = "Plot word embedding",
         description = "PCA plot of word embedding",
-        iconPath = "menu_icons/ProjectionIcon.png",
+        iconPath = "menu_icons/RasterPlot.png",
     ) {
         withContext(Dispatchers.Default) {
             val projectionComponent = ProjectionComponent("Projection of table data")
@@ -461,8 +461,8 @@ fun SimbrainJTable.createApplyAction(name: String = "Apply", applyInputs: suspen
 
 fun SimbrainJTable.createShowMatrixPlotAction() = createAction(
     name = "Show matrix plot",
-    description = "Show plots (like correlation plot) that display pairwise relation between row vectors in this table.",
-    iconPath = "menu_icons/grid.png",
+    description = "Show 'corr plots' that display all pairwise relations (correlation, cosine similarity, etc.) between row vectors in this table.",
+    iconPath = "menu_icons/PixelPlot.png",
 ) {
 
     val (data, rowNames) = if (selectedRows.size > 0) {

@@ -13,7 +13,7 @@ import org.simbrain.world.textworld.gui.showComparisonDialog
 fun createExtractEmbeddingAction(block: (TokenEmbedding) -> Unit) = createAction(
     name = "Extract embedding...",
     description = "Extract embedding...",
-    iconPath = "menu_icons/ExtractDoc.png"
+    iconPath = "menu_icons/Extract.png"
 ) {
     val chooser = SFileChooser(tokenEmbeddingDirectory, "text file", "txt")
     val trainingDocument = chooser.showOpenDialog()

@@ -249,36 +249,79 @@ val actorCritic = newSim {
 
     // Doc viewer
     addSidebarInfo(
-        """
-    # Actor Critic model
+    """
+    # Introduction
 
-    Based on Richard Sutton (1996), *Generalization in Reinforcement Learning: Successful Examples Using Sparse Coarse Coding*. Simbrain implementation by Jeff Yoshimi and Jonathon Vickrey.
+    This simulation is based on Richard Sutton (1996), *Generalization in Reinforcement Learning: Successful Examples Using Sparse Coarse Coding*. 
 
-    ## Getting started
+    # Simulation Details
 
-    A model which learns the location of rewarding stimuli. Do a few runs through 5 trials using the "run" button on the control panel. Using default values, the rat should figure out how to get the cheese.
-
-    ## Parameters and what they mean
-
-    **Epsilon**: Probability of taking a random action. 0 for no random actions; 1 for all random actions. [Doya, 2007](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2645553/) suggests this may be related to noradrenaline, which regulates overall arousal.
-
-    **Learning rate**: How much weights are updated at each time step. [Doya, 2007](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2645553/) suggests this may be related to acetylcholine, which regulates some forms of plasticity.
-
-    **Discount Factor (gamma)**: Determines how "future oriented" the agent is. Range is 0–1. A lower gamma makes the agent short-sighted; higher gamma leads to longer-term planning. With gamma near 1, the agent learns to value chains of actions leading to reward.
-
-    Tanaka et al. (2007) relate gamma to serotonin:
-
-    > *The activity of the ventral part of the striatum was correlated with reward prediction at shorter time scales, and this correlated activity was stronger at low serotonin levels. By contrast, the activity of the dorsal part of the striatum was correlated with reward prediction at longer time scales, and this correlated activity was stronger at high serotonin levels.* ([Tanaka et al., 2007](https://www.ncbi.nlm.nih.gov/pubmed/18091999))
-
-    ## Reward, Value, TD Error
-
-    - **Reward (red time series)**: Increases when the agent is on top of the cheese.
-    - **Value (green time series)**: Increases when the agent expects reward.
-    - **TD Error (blue time series)**: Signals mismatch between expected and received reward. Positive error increases value/action weights; negative error decreases them.
-
-    ## Changes in values with learning
-
-    Repeated trials tend to increase value, make reward more frequent, and reduce error. These trends depend on parameter settings.
+    This simulation models an agent that learns the location of rewarding stimuli using reinforcement learning. The environment of the agent is determined when you open the simulation and
+    have stated your desired `Num Tiles`. 
+    
+    In this simulation, there are parameters that you can use to control agent's learning behavior. The parameters are:
+    
+    1) `Trials`: Determines how many trials the simulation will run before stopping.
+    
+    2) `Discount Factor (gamma)`: Determines how "future oriented" the agent is. Range is from `0`-`1`.
+        
+        - A lower gamma makes the agent short-sighted; higher gamma leads to longer-term planning. With gamma near `1`, the agent learns to value chains of actions that lead to reward.
+        
+        - Tanaka et al. (2007) relate gamma to serotonin. Below is a passage from their paper:
+        
+        _The activity of the ventral part of the striatum was correlated with reward prediction at shorter time scales, and this correlated activity was stronger at low serotonin levels. By contrast, the activity of 
+        the dorsal part of the striatum was correlated with reward prediction at longer time scales, and this correlated activity was stronger at high serotonin levels._
+        
+    3) `Learning rate (Alpha)`: Determines how much the weights update at each time step. 
+    
+        - Doya (2007) suggests that this may be related to acetylcholine, which regulates some forms of plasticity.
+    
+    4) `Epsilon`: Determines the probability of taking a random action. `0` for no random actions; `1` for all random actions.
+    
+        - Doya (2007) suggests that this may be related to noradrenaline, which regulates overall arousal.
+    
+    In addition to the parameters, there is a time series plot that captures `reward`, `value`, and `TD Error`. This time series is hidden at the bottom of the screen. In the time series are
+    three trend lines in three different colors: red, green, and blue. These colors correspond to the captured values mentioned above over time.
+    
+    1) `Reward` (red time series): This increases when the agent is on top of the cheese.
+    
+    2) `Value` (green time series): This increases when the agent expects a reward.
+    
+    3) `TD Error` (blue time series): This is the signal mismatch between expected and received reward. Positive error increases value/action weights whereas negative error decreases them.
+    
+    # What to Do
+    
+    In this simulation, there are parameters that you can use to change the agent's learning behaviors. To get a quick feel of the simulation, do the following steps:
+    
+    1) Click `Run` using the default parameters on the control panel.
+    
+    2) Observe the agent's action. It should figure out how to reach the cheese at the end of the run.
+    
+    3) Open the hidden time series plot that contains `reward`, `value`, and `TD Error`.
+    
+    4) Now, repeatedly click `Run` for a few times after simulation stops. As you continue to run trials, it will increase `value`, make `reward` more frequent, and reduce `TD Error`. 
+    These trends will depend on your parameter settings and you can observe these changes in the time series plot.
+    
+    ## Experimenting With Other Parameter Values
+    
+    You can change the agent's learning behavior by changing the parameters of the simulation and then follow the steps above again to see the impacts of the changes on the simulation.
+    
+    # References
+    
+    1) Sutton, R. S. (1995). [Generalization in Reinforcement Learning: Successful Examples Using Sparse Coarse Coding.](https://proceedings.neurips.cc/paper_files/paper/1995/hash/8f1d43620bc6bb580df6e80b0dc05c48-Abstract.html) _Neural Information Processing Systems_; MIT Press.
+    
+    2) Tanaka, S. C., Schweighofer, N., Asahi, S., Shishida, K., Okamoto, Y., Yamawaki, S., & Doya, K. (2007). [Serotonin Differentially Regulates Short- and Long-Term Prediction of Rewards in the Ventral and Dorsal Striatum.](https://doi.org/10.1371/journal.pone.0001333) _PLoS ONE_, _2_(12), e1333.
+    
+    3) Doya, K. (2007). [Reinforcement learning: Computational theory and biological mechanisms.](https://doi.org/10.2976/1.2732246/10.2976/1) _HFSP Journal_, _1_(1), 30–40.
+    
+    # Credits
+    
+    Jonathon Vickrey
+    
+    [Jeff Yoshimi](www.jeffyoshimi.net)
+    
+    Kanly Thao
+    
     """.trimIndent()
     )
 
@@ -286,9 +329,9 @@ val actorCritic = newSim {
     // Lay everything out
     withGui {
 
-        place(networkComponent,210, 10, 522, 595)
-        place(odorWorldComponent, 728, 11, 500, 500)
-        place(plot, 729, 599, 519, 293)
+        place(networkComponent,210, 10, 520, 600)
+        place(odorWorldComponent, 730, 10, 500, 500)
+        place(plot, 730, 590, 520, 300)
         (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).zoomToFitSize(500, 500)
 
         // Control panel

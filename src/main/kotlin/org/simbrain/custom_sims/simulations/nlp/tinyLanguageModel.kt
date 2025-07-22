@@ -1,12 +1,17 @@
 package org.simbrain.custom_sims.simulations.nlp
 
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.delay
 import org.json.JSONObject
 import org.simbrain.custom_sims.*
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.*
 import org.simbrain.network.trainers.*
 import org.simbrain.network.updaterules.SoftmaxRule
+import org.simbrain.network.util.Alignment
+import org.simbrain.network.util.Direction
+import org.simbrain.network.util.alignNetworkModels
+import org.simbrain.network.util.offsetNetworkModel
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
@@ -18,72 +23,6 @@ import org.simbrain.world.textworld.TokenEmbedding
 import org.simbrain.world.textworld.TokenEmbeddingBuilder
 import smile.math.matrix.Matrix
 import java.io.File
-
-/**
- * Creates sequence-to-sequence training data for proper GPT-style training.
- * 
- * For input sequence ["hi", "there", "old", "friend"], creates:
- * Input:  Matrix(contextSize, vocabSize) for each training example
- * Target: Matrix(contextSize, vocabSize) for each training example (shifted by 1)
- * 
- * Each position learns to predict the next token simultaneously.
- */
-fun buildSequenceToSequenceDataset(
-    tokenizedText: List<String>, 
-    contextSize: Int, 
-    tokenEmbedding: TokenEmbedding
-): MatrixDataset {
-    
-    // Create sliding windows of contextSize + 1 for input + target
-    val sequences = tokenizedText.windowed(contextSize + 1, step = 1)
-    
-    val numSequences = sequences.size
-    val vocabSize = tokenEmbedding.dimension
-    
-    // Each training example is a matrix: (contextSize, vocabSize)
-    val allInputMatrices = mutableListOf<Matrix>()
-    val allTargetMatrices = mutableListOf<Matrix>()
-    
-    sequences.forEach { window ->
-        val inputTokens = window.dropLast(1)  // First contextSize tokens
-        val targetTokens = window.drop(1)     // Last contextSize tokens (shifted by 1)
-        
-        // Create input matrix for this training example
-        val inputMatrix = Matrix(contextSize, vocabSize)
-        inputTokens.forEachIndexed { positionIndex, token ->
-            val oneHot = tokenEmbedding.get(token)
-            inputMatrix.setRow(positionIndex, oneHot)
-        }
-        
-        // Create target matrix for this training example  
-        val targetMatrix = Matrix(contextSize, vocabSize)
-        targetTokens.forEachIndexed { positionIndex, token ->
-            val oneHot = tokenEmbedding.get(token)
-            targetMatrix.setRow(positionIndex, oneHot)
-        }
-        
-        allInputMatrices.add(inputMatrix)
-        allTargetMatrices.add(targetMatrix)
-    }
-    
-    // Convert to the format expected by MatrixDataset
-    // Each row in the final matrices represents one training example (flattened)
-    val finalInputMatrix = Matrix(numSequences, contextSize * vocabSize)
-    val finalTargetMatrix = Matrix(numSequences, contextSize * vocabSize)
-    
-    allInputMatrices.forEachIndexed { exampleIndex, inputMatrix ->
-        finalInputMatrix.setRow(exampleIndex, inputMatrix.flatten())
-    }
-    
-    allTargetMatrices.forEachIndexed { exampleIndex, targetMatrix ->
-        finalTargetMatrix.setRow(exampleIndex, targetMatrix.flatten())
-    }
-    
-    return MatrixDataset(
-        inputs = finalInputMatrix,
-        targets = finalTargetMatrix
-    )
-}
 
 class TinyLanguageModelOptions(var showEmbeddingDimension: Boolean = true): EditableObject {
 
@@ -197,20 +136,20 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         label = "Transformer Block"
     }
 
-    // Sequence-to-sequence softmax layer for proper GPT training
+    // Sequence-to-sequence softmax layer
     val softmaxSequence = ActivationSequence(contextSize, tokenEmbedding.dimension).apply {
         updateRule = SoftmaxRule().apply {
             temperature = 0.2
         }
-        label = "Softmax Sequence (Training)"
+        label = "Softmax Sequence"
     }
 
-    // Separate inference layer for update actions (maintains old behavior)
+    // Separate inference layer for update actions
     val inferenceOutput = NeuronArray(tokenEmbedding.dimension).apply {
         circleMode = size < 100
         gridMode = true
         labelArray = tokenEmbedding.tokens.toTypedArray()
-        label = "Predicted Next Token (Inference)"
+        label = "Predicted Next Token"
     }
 
     val weightMatrices = listOf(
@@ -238,12 +177,14 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
     inputs.location = point(-625, -200)
     transformerBlock.location = point(-300, -600)
     softmaxSequence.location = point(-1000, -600)
-    inferenceOutput.location = point(-1000, -400)
 
     withGui {
         place(textWorldComponent, 10, 10, 450, 350)
         place(networkComponent, 460, 10, 1000, 800)
     }
+
+    offsetNetworkModel(transformerBlock, inferenceOutput, Direction.WEST, transformerBlock.width / 2 + 100.0)
+    alignNetworkModels(transformerBlock, inferenceOutput, Alignment.HORIZONTAL)
 
     addSidebarInfo(
         """ 
@@ -306,8 +247,8 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         val network = workspace.componentList.filterIsInstance<NetworkComponent>().first().network
         val supervisedModel = network.getModels<SupervisedModel>().first()
         val trainer = SupervisedTrainer(network, supervisedModel)
-        val softmaxSequence = network.getModelByLabel<ActivationSequence>("Softmax Sequence (Training)")
-        val inferenceOutput = network.getModelByLabel<NeuronArray>("Predicted Next Token (Inference)")
+        val softmaxSequence = network.getModelByLabel<ActivationSequence>("Softmax Sequence")
+        val inferenceOutput = network.getModelByLabel<NeuronArray>("Predicted Next Token")
         
         try {
             // Run training iterations
@@ -388,8 +329,8 @@ fun SimulationScope.setupUpdateActions(workspace: Workspace) {
     val network = workspace.componentList.filterIsInstance<NetworkComponent>().first().network
     val supervisedModel = network.getModels<SupervisedModel>().first()
     val inputs = network.getModelByLabel<ActivationSequence>("Inputs")
-    val softmaxSequence = network.getModelByLabel<ActivationSequence>("Softmax Sequence (Training)")
-    val inferenceOutput = network.getModelByLabel<NeuronArray>("Predicted Next Token (Inference)")
+    val softmaxSequence = network.getModelByLabel<ActivationSequence>("Softmax Sequence")
+    val inferenceOutput = network.getModelByLabel<NeuronArray>("Predicted Next Token")
 
     val contextSize = inputs.sequenceSize
 
@@ -444,4 +385,71 @@ fun SimulationScope.setupUpdateActions(workspace: Workspace) {
         textWorldComponent.world.currentTokenIndex = textWorldComponent.world.tokens.lastIndex
     }
 
+}
+
+
+/**
+ * Creates sequence-to-sequence training data for proper GPT-style training.
+ *
+ * For input sequence ["hi", "there", "old", "friend"], creates:
+ * Input: Matrix(contextSize, vocabSize) for each training example
+ * Target: Matrix(contextSize, vocabSize) for each training example (shifted by 1)
+ *
+ * Each position learns to predict the next token simultaneously.
+ */
+fun buildSequenceToSequenceDataset(
+    tokenizedText: List<String>,
+    contextSize: Int,
+    tokenEmbedding: TokenEmbedding
+): MatrixDataset {
+
+    // Create sliding windows of contextSize + 1 for input + target
+    val sequences = tokenizedText.windowed(contextSize + 1, step = 1)
+
+    val numSequences = sequences.size
+    val vocabSize = tokenEmbedding.dimension
+
+    // Each training example is a matrix: (contextSize, vocabSize)
+    val allInputMatrices = mutableListOf<Matrix>()
+    val allTargetMatrices = mutableListOf<Matrix>()
+
+    sequences.forEach { window ->
+        val inputTokens = window.dropLast(1)  // First contextSize tokens
+        val targetTokens = window.drop(1)     // Last contextSize tokens (shifted by 1)
+
+        // Create input matrix for this training example
+        val inputMatrix = Matrix(contextSize, vocabSize)
+        inputTokens.forEachIndexed { positionIndex, token ->
+            val oneHot = tokenEmbedding.get(token)
+            inputMatrix.setRow(positionIndex, oneHot)
+        }
+
+        // Create target matrix for this training example
+        val targetMatrix = Matrix(contextSize, vocabSize)
+        targetTokens.forEachIndexed { positionIndex, token ->
+            val oneHot = tokenEmbedding.get(token)
+            targetMatrix.setRow(positionIndex, oneHot)
+        }
+
+        allInputMatrices.add(inputMatrix)
+        allTargetMatrices.add(targetMatrix)
+    }
+
+    // Convert to the format expected by MatrixDataset
+    // Each row in the final matrices represents one training example (flattened)
+    val finalInputMatrix = Matrix(numSequences, contextSize * vocabSize)
+    val finalTargetMatrix = Matrix(numSequences, contextSize * vocabSize)
+
+    allInputMatrices.forEachIndexed { exampleIndex, inputMatrix ->
+        finalInputMatrix.setRow(exampleIndex, inputMatrix.flatten())
+    }
+
+    allTargetMatrices.forEachIndexed { exampleIndex, targetMatrix ->
+        finalTargetMatrix.setRow(exampleIndex, targetMatrix.flatten())
+    }
+
+    return MatrixDataset(
+        inputs = finalInputMatrix,
+        targets = finalTargetMatrix
+    )
 }

@@ -6,6 +6,7 @@ import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Producible
 import org.simbrain.world.imageworld.ImageSource
+import java.awt.RenderingHints.*
 import java.awt.image.BufferedImage
 
 /**
@@ -117,29 +118,43 @@ class Filter(
     }
 
     private fun createFilteredImage(): BufferedImage {
-        val scaleX = computeScalingFactor(source.width, width)
-        val scaleY = computeScalingFactor(source.height, height)
-        val scaleOp = FilterUtils.createScaleOp(scaleX, scaleY, true)
-        var image = source.currentImage
-        image = scaleOp.filter(image, null)
-        return imageOp.getOp().filter(image, null).also {
-            if (it.height != height || it.width != width) {
-                throw AssertionError(
-                    String.format(
-                        "Filtered image size not equal to filter size (filtered image size: %d x %d, filter size: %d x %d)", it.width,
-                        it.height, width, height
-                    )
-                )
-            }
-        }
-    }
+        val sourceImage = source.currentImage
 
-    private fun computeScalingFactor(source: Int, target: Int): Float {
-        if (source == target) {
-            return 1f
+        // to guarantee the values won't change throughout the function call
+        val targetWidth = width
+        val targetHeight = height
+        
+        // If dimensions match exactly, no scaling needed
+        if (sourceImage.width == targetWidth && sourceImage.height == targetHeight) {
+            return imageOp.getOp().filter(sourceImage, null)
         }
-        // Subtract 0.1 from width and height to avoid exceeding the specified dimension due to floating point error.
-        return (target - 0.1f) / source
+        
+        // Scale the image to exact target dimensions
+        val scaledImage = BufferedImage(targetWidth, targetHeight, sourceImage.type)
+        val graphics = scaledImage.createGraphics()
+        
+        try {
+            // Use high-quality scaling
+            graphics.setRenderingHint(KEY_INTERPOLATION, VALUE_INTERPOLATION_BILINEAR)
+            graphics.setRenderingHint(KEY_RENDERING, VALUE_RENDER_QUALITY)
+            graphics.setRenderingHint(KEY_ANTIALIASING, VALUE_ANTIALIAS_ON)
+            
+            // Draw the scaled image
+            graphics.drawImage(sourceImage, 0, 0, targetWidth, targetHeight, null)
+        } finally {
+            graphics.dispose()
+        }
+        
+        // Verify the scaled image has the exact dimensions we want
+        if (scaledImage.width != targetWidth || scaledImage.height != targetHeight) {
+            throw AssertionError(
+                "Scaled image dimensions (${scaledImage.width} x ${scaledImage.height}) " +
+                "do not match target dimensions ($targetWidth x $targetHeight)"
+            )
+        }
+        
+        // Apply the filter operation to the SCALED image, not the original
+        return imageOp.getOp().filter(scaledImage, null)
     }
 
     override val name get() = id

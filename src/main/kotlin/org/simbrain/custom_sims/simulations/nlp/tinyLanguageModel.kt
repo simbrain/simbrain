@@ -1,7 +1,6 @@
 package org.simbrain.custom_sims.simulations.nlp
 
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.delay
 import org.json.JSONObject
 import org.simbrain.custom_sims.*
 import org.simbrain.network.NetworkComponent
@@ -183,7 +182,12 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         place(networkComponent, 460, 10, 1000, 800)
     }
 
-    offsetNetworkModel(transformerBlock, inferenceOutput, Direction.WEST, transformerBlock.width / 2 + 100.0)
+    offsetNetworkModel(inputs, transformerBlock, Direction.NORTH, transformerBlock.height / 2 + 300.0)
+    alignNetworkModels(inputs, transformerBlock, Alignment.VERTICAL)
+    offsetNetworkModel(transformerBlock, softmaxSequence, Direction.NORTH, transformerBlock.height / 2 + 300.0)
+    alignNetworkModels(transformerBlock, softmaxSequence, Alignment.VERTICAL)
+
+    offsetNetworkModel(transformerBlock, inferenceOutput, Direction.WEST, transformerBlock.width / 2 + 300.0)
     alignNetworkModels(transformerBlock, inferenceOutput, Alignment.HORIZONTAL)
 
     addSidebarInfo(

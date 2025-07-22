@@ -53,6 +53,7 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
                 val offset = if (isBidirectional()) 0.25 else 0.5
                 val (x, y) = curve?.p(offset) ?: line(source.location, target.location).p(offset)
                 weightMatrixNode.imageBox.centerFullBoundsOnPoint(x, y)
+                weightMatrixNode.labelNode.centerFullBoundsOnPoint(x, y - weightMatrixNode.imageBox.height / 2.0 - 10.0)
             }
 
         }

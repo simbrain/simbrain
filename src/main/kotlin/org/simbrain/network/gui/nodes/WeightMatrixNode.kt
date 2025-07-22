@@ -2,6 +2,8 @@ package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
+import org.piccolo2d.PNode
+import org.piccolo2d.nodes.PText
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.core.AbstractNeuronCollection
 import org.simbrain.network.core.Connector
@@ -52,6 +54,25 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
 
     private val interactionBox = WeightMatrixInteractionBox()
 
+    val labelNode = PNode()
+
+    /**
+     * Text corresponding to weight matrix's (optional) label.
+     */
+    private val labelText = PText().also {
+        it.font = NEURON_FONT
+        labelNode.addChild(it)
+    }
+
+    /**
+     * Background for label text, so that background objects don't show up.
+     */
+    private val labelBackground = PNode().apply {
+        paint = Color.white
+        setBounds(labelText.bounds)
+        addChild(labelText)
+    }.also { labelNode.addChild(it) }
+
     val sourceNode by lazy { networkPanel.getNode(weightMatrix.source) }
     val targetNode by lazy { networkPanel.getNode(weightMatrix.target) }
 
@@ -62,7 +83,10 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         events.updated.on { events.updateGraphics.fire() }
         events.clampChanged.on { setClamped((weightMatrix as WeightMatrix).clamped) }
         events.updateGraphics.on(Dispatchers.Swing) { renderMatrixToImage() }
-        events.labelChanged.on(Dispatchers.Swing) { _, newLabel -> interactionBox.setText(newLabel) }
+        events.labelChanged.on(Dispatchers.Swing) { _, newLabel -> 
+            updateTextLabel()
+        }
+        addChild(labelNode)
         fun updateLocations() {
             arrow.invalidateFullBounds()
             updateInteractionBoxLocation()
@@ -86,6 +110,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         }
         interactionBox.setText(weightMatrix.displayName)
         setClamped((weightMatrix as WeightMatrix).clamped)
+        updateTextLabel()
     }
 
     private fun updateInteractionBoxLocation() {
@@ -121,6 +146,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
             addChild(arrow)
             addChild(imageBox)
             renderMatrixToImage()
+            updateTextLabel()
         } else {
             updateInteractionBoxLocation()
             interactionBox.invalidateFullBounds()
@@ -321,6 +347,23 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
 
     override val model: Connector
         get() = weightMatrix
+
+    /**
+     * Update the text label. Only shows the label when weights are being displayed and label is defined.
+     */
+    private fun updateTextLabel() {
+        if (weightMatrix.isShowWeights && !weightMatrix.label.isNullOrEmpty()) {
+            labelNode.visible = true
+            labelText.text = weightMatrix.label
+            swingInvokeLater {
+                labelBackground.setBounds(labelText.fullBounds)
+                // text is placed on top of the image, which depends on the location of the arrow
+                arrow.invalidateFullBounds()
+            }
+        } else {
+            labelNode.visible = false
+        }
+    }
 
     inner class WeightMatrixInteractionBox : InteractionBox(networkPanel) {
 

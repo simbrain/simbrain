@@ -13,6 +13,9 @@ import java.awt.geom.Point2D
 import kotlin.math.max
 
 /**
+ * A type of [SupervisedNetwork] that can be assembled from existing components that are already in the network.
+ * Can be transiently assembled on the fly to represent a supervised learning task.
+ *
  * @param trainTestSplit A value between 0 and 1 used to specify how much of the data will be used for training vs testing.
  *                            Default to 1, which means no testing set.
  */

@@ -60,6 +60,12 @@ fun updateNeurons(neuronList: List<Neuron>) {
  */
 fun getSynapse(src: Neuron, tar: Neuron): Synapse? = src.fanOut[tar]
 
+/**
+ * Builds a weight matrix representing connection strengths from a provided set of source neurons
+ * to a set of target neurons. The weight matrix is in "source-target" format (weight i,j represents a weight from node i to node j).
+ * For nonexistent connections, 0 is used.
+ * The weight can be transposed for target-source format.
+ */
 fun getWeightMatrix(sourceNeuronList: List<Neuron>, targetNeuronList: List<Neuron>): Matrix = Matrix.of(
     sourceNeuronList.mapIndexed { j, s ->
         targetNeuronList.mapIndexed { i, t ->

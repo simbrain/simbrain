@@ -69,7 +69,7 @@ open class SupervisedTrainerConfig(lossFunctionProvider: KFunction<List<Class<ou
 }
 
 /**
- * Manage iteration based training algorithms and provides an object that can be edited in the GUI.
+ * Manage iteration-based training algorithms for [SupervisedNetwork], which in turn has a [SupervisedTrainerConfig].
  */
 class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedNetwork) : CoroutineScope {
 

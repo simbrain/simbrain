@@ -1,15 +1,20 @@
+/**
+ * Numeric utilities in Kotlin. Comparable to [SimbrainMath].
+ */
 package org.simbrain.util
 
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.stats.distributions.TwoValued
 import smile.math.matrix.Matrix
+import kotlin.math.ln
 import kotlin.math.min
 import kotlin.math.sqrt
 import kotlin.random.Random
 
 /**
- * Numeric utilities in Kotlin. Comparable to [SimbrainMath].
+ * Constant value for Math.log(10); used to approximate log 10.
  */
+val LOG_10 = ln(10.0)
 
 fun <T : Comparable<T>> T.clip(lowerBound: T, upperBound: T) =
     maxOf(minOf(lowerBound, upperBound), minOf(maxOf(upperBound, lowerBound), this))

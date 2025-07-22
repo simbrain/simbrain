@@ -1,3 +1,13 @@
+/**
+ * Many of the functions used to implement supervised learning are in this file.
+ *
+ * A good starting place is [forwardPass]. Note that the general update logic in Simbrain involves first accumulating inputs
+ * to each neuron array, which in turn involves updating a "PSR Matrix".
+ * For more on this, see https://docs.simbrain.net/docs/network/updateLogic.html
+ *
+ * The entrypoint for backprop is [accumulateBackprop].
+ *
+ */
 package org.simbrain.network.trainers
 
 import org.simbrain.network.core.*
@@ -10,7 +20,6 @@ import java.util.*
 import kotlin.math.abs
 import kotlin.math.min
 import kotlin.random.Random
-
 
 fun WeightMatrix.computeWeightDeltas(errorSignal: Matrix): Matrix {
 
@@ -60,7 +69,6 @@ fun WeightMatrix.backpropagateError(errorSignal: Matrix): Matrix {
 fun SynapseGroup.backpropagateError(errorSignal: Matrix): Matrix {
     return getWeightMatrix().transpose().mm(errorSignal)
 }
-
 
 /**
  * Change to bias is error vector times epsilon. Compute this and add it to biases.
@@ -192,7 +200,15 @@ fun LinkedHashSet<Layer>.getAllOutgoingSynapseGroups() = filterIsInstance<Abstra
     .toMutableList()
 
 /**
- *  Assumes LinkedHashSet has been placed in an appropriate "breadth-first" order by [computeOrderedUpdatePath].
+ * Perform a single forward pass through an ordered set of layers.
+ *
+ * Assumes the LinkedHashSet has been placed in an appropriate breadth-first order by [computeOrderedUpdatePath], to
+ * support skip connections.
+ *
+ * Multiple inputs can be specified (this is not yet supported in the GUI however)
+ *
+ * (Optionally) records probes of weights, biases, inputs, and activations at key stages of processing.
+ *
  */
 context(Network)
 fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: List<Layer>, probe: StructuredProbe? = null) {
@@ -202,6 +218,7 @@ fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: Lis
     if (inputValues.size != inputLayers.size) throw IllegalArgumentException("Must provide same number of input vectors as input layers")
     inputValues.zip(inputLayers).forEach { (a, b) -> a.validateSameShape(b.activations) }
 
+    // Need special update to methods that update components but preserve the input accumulation pattern used in training.
     fun NeuronArray.updateWithoutClearingInputs() {
         if (isClamped) {
             return
@@ -209,7 +226,6 @@ fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: Lis
         updateRule.apply(this, dataHolder)
         events.updated.fire()
     }
-
     fun AbstractNeuronCollection.updateWithoutClearingInputs() {
         if (isClamped) {
             return
@@ -224,14 +240,10 @@ fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: Lis
 
         }
     }
-
     fun ArrayLayer.updateWithoutClearingInputs() {
         if (isClamped) {
             return
         }
-        // For ArrayLayer (like TransformerBlock), we need to call update but preserve the input 
-        // accumulation pattern used in training. The inputs.fill(0.0) in TransformerBlock.update() 
-        // is for regular iteration, but during training we want controlled input management.
         
         // Temporarily store inputs before calling update
         val inputsBackup = this.inputs.clone()
@@ -255,11 +267,13 @@ fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: Lis
     probeContext?.createMapProbe("activationsAfterApplyingTrainingInputs")?.writeAll(inputLayers.associate { it.displayName to it.activations.clone() })
     probeContext?.createMapProbe("biasesInForwardPass")?.writeAll(inputLayers.associate { it.displayName to it.biases.clone() })
     val layersContext = probeContext?.createMapProbe("layersInForwardPass")
+
     allLayers.forEach {
         val layerContext = layersContext?.createMapProbe(it.displayName)
         val inputsBeforeAccumulation = layerContext?.createMapProbe("inputsBeforeAccumulation")
         layerContext?.createMapProbe("inputs")
         val inputsAfterAccumulation = layerContext?.createMapProbe("inputsAfterAccumulation")
+
         it.clearInputs()
         when (it) {
             is NeuronArray -> {
@@ -294,9 +308,13 @@ fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: Lis
 /**
  * Main backprop implementation, which supports skip connections and accumulates weight and bias updates.
  *
- * Linked because it updates layers in a sequential order and Set because it only updates each layer once.
+ * The data structure is linked because it updates layers in a sequential order and is a set because it only updates each layer once.
  * Assumes LinkedHashSet has been placed in an appropriate "breadth-first" order by [computeOrderedUpdatePath].
  *
+ * Parameters are not updated directly. Parameter deltas are accumulated in data structures provided to this function.
+ * [SupervisedTrainer.trainBatch] sums these deltas and uses them to update weights, synapses, and biases.
+ *
+ * Returns a scalar error used in the GUI when training.
  */
 context(Network)
 fun LinkedHashSet<Layer>.accumulateBackprop(
@@ -331,7 +349,7 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
 
     val backpropLayersContext = probeContext?.createListProbe("backpropLayers")
 
-    // Map to accumulate error signals per layer (fixes skip connection issue)
+    // Map that associates layers with their error signals
     val layerErrorSignals = mutableMapOf<Layer, Matrix>()
     
     // Initialize the output layer's error signal
@@ -346,7 +364,7 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
         val currentLayerErrorSignal = layerErrorSignals[layer] ?: errorSignal
         layerContext?.write("currentLayerErrorSignal") { currentLayerErrorSignal.clone() }
 
-        // Process the error signal. Bias update for neuron array. Full backprop update for transformer block. Etc.
+        // Process the error signal. Bias update for neuronarray. Full backprop update for transformer block. Etc.
         val processedErrorSignal = layer.processError(currentLayerErrorSignal, signalSource, biasesAccumulator, rawMatrixAccumulator)
 
         layerContext?.write("processedErrorSignal") { processedErrorSignal.clone() }
@@ -370,6 +388,7 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
             layerErrorSignals[wm.source] = layerErrorSignals[wm.source]?.add(currentConnectorErrorSignal) ?: currentConnectorErrorSignal
             connectorContext?.write("accumulatedErrorSignalForSource") { layerErrorSignals[wm.source]?.clone() }
         }
+        // Synapse groups are updated in the same way but with different data structures
         (layer as? AbstractNeuronCollection)?.incomingSgs?.forEach { sg ->
             val sgContext = layerContext?.createMapProbe(sg.displayName)
             val weightDeltas = sg.computeWeightDeltas(processedErrorSignal)

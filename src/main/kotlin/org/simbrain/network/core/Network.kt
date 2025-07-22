@@ -9,6 +9,7 @@ import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.network.util.SpikingScalarData
+import org.simbrain.util.LOG_10
 import org.simbrain.util.SimpleIdManager
 import org.simbrain.util.UserParameter
 import org.simbrain.util.math.SimbrainMath
@@ -21,10 +22,7 @@ import kotlin.math.ceil
 import kotlin.math.ln
 import kotlin.random.Random
 
-/**
- * Constant value for Math.log(10); used to approximate log 10.
- */
-private val LOG_10 = ln(10.0)
+
 
 /**
  * <b>Network</b> provides core neural network functionality and is the main neural network model object. The core
@@ -34,7 +32,12 @@ private val LOG_10 = ln(10.0)
  * To add models, use [Network.addNetworkModel] and friends.
  *
  * To remove models use [Network.getModels] and call .delete() on the resulting models. Get models can be called with
- * an argument to filter by model type, e.g. getModels(Neuron.class)
+ * an argument to filter by model type, e.g., getModels(Neuron.class)
+ *
+ * For details about network update see https://docs.simbrain.net/docs/network/updateLogic.html
+ *
+ * Note that much of the logic of the updates happens in [Layer.accumulateInputs] or [Neuron.accumulateInputs], and in [Connector.updatePSR] or [Synapse.updatePSR]
+ *
  */
 class Network: CoroutineScope, EditableObject {
 

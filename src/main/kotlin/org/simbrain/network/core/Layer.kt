@@ -175,6 +175,14 @@ abstract class Layer : LocatableModel(), AttributeContainer, CopyableObject {
         }
     }
 
+    /**
+     * Process the error signal prior to computing weight updates.
+     *
+     * Includes bias update for neuronarray, and full backprop pass for transformer block. Etc.
+     *
+     * Includes a bias accumulator and a more generic matrix accumulator for all the all matrix deltas in a transformer.
+     *
+     */
     abstract fun processError(error: Matrix, signalSource: Layer, biasesAccumulator: HashMap<Layer, Matrix>, rawMatrixAccumulator: HashMap<Matrix, Matrix>, probe: StructuredProbe? = null): Matrix
 
     /**

@@ -210,8 +210,6 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
     override fun updatePSR() {
         if (spikeResponder is NonResponder) {
 
-            // Connectionist case
-
             // For activation sequence case, use last meaningful position (not necessarily last row)
             val sourceActivations = if (source is ActivationSequenceProcessor) {
                 val actualLength = (source as? ActivationSequence)?.actualSequenceLength ?: 
@@ -229,8 +227,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
                 ?: activations
             }
 
-
-            // One "half" of a matrix product. Source activations are element-wise multiplied by rows of matrix
+            // One "half" of a matrix product ([getSummedPSRs] does the rest). Source activations are element-wise multiplied by rows of matrix
             psrMatrix.copyFrom(weights.scaleColumns(sourceActivations))
 
         } else {

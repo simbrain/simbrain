@@ -25,7 +25,8 @@ import kotlin.math.sqrt
  *
  * @see <a href="https://arxiv.org/abs/1706.03762">Attention Is All You Need</a>
  */
-class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: Int): ArrayLayer(inputSize), EditableObject, ActivationSequenceProcessor {
+class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: Int) : ArrayLayer(inputSize),
+    EditableObject, ActivationSequenceProcessor {
 
     /**
      * Size of inputs is same as outputs in a transformer block, and also going into the feedforward part
@@ -65,7 +66,7 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
 
     @UserParameter(label = "Layer Norm", description = "Use layer normalization", order = 13)
     var useLayerNorm = true
-    
+
     @UserParameter(label = "User Positional Encoding", description = "Use user positional encoding", order = 14)
     var userPositionalEncoding = false
 
@@ -105,7 +106,9 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
 
     override var biases: Matrix
         get() = throw UnsupportedOperationException("Not applicable to Transformer")
-        set(value) { throw UnsupportedOperationException("Not applicable to Transformer") }
+        set(value) {
+            throw UnsupportedOperationException("Not applicable to Transformer")
+        }
 
     override val biasArray: DoubleArray
         get() = throw UnsupportedOperationException("Not applicable to Transformer")
@@ -210,7 +213,8 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
         attentionOutput.copyFrom(selfAttention.mm(vStack))
 
         // Skip connection from main inputs to MLP input
-        feedForwardInput.copyFrom(inputs.clone().add(attentionOutput).let { if (useLayerNorm) it.layerNormByRow() else it })
+        feedForwardInput.copyFrom(
+            inputs.clone().add(attentionOutput).let { if (useLayerNorm) it.layerNormByRow() else it })
 
         // MLP computation
         feedForwardHiddenNetInputs.copyFrom(feedForwardInput.mm(W1.transpose()).addToEachRow(b1))
@@ -218,7 +222,9 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
         feedForwardOutputNetInputs.copyFrom(feedForwardHidden.mm(W2.transpose()).addToEachRow(b2))
 
         // Skip connection from MLP input to output of transformer (activations)
-        activations.copyFrom(feedForwardInput.clone().add(feedForwardOutputNetInputs).let { if (useLayerNorm) it.layerNormByRow() else it })
+        activations.copyFrom(
+            feedForwardInput.clone().add(feedForwardOutputNetInputs)
+                .let { if (useLayerNorm) it.layerNormByRow() else it })
 
         inputs.fill(0.0)
         events.updated.fire()
@@ -240,15 +246,17 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
                 // For NeuronArray source, we currently only get error for the last position
                 // But we should extend this to support multiple targets for proper autoregressive training
                 // For now, maintain current behavior but prepare for future enhancement
-            feedForwardOutputNetInputs.clone().apply {
-                fill(0.0)
-                setRow(nrow() - 1, errorSignal.toDoubleArray())
+                feedForwardOutputNetInputs.clone().apply {
+                    fill(0.0)
+                    setRow(nrow() - 1, errorSignal.toDoubleArray())
+                }
             }
-            }
+
             is ActivationSequenceProcessor -> {
                 // Sequence-to-sequence: error signal is already a matrix with errors for each position
                 error
             }
+
             else -> {
                 // Fallback: use the error signal as-is
                 error
@@ -263,7 +271,7 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
 
         // Split into feedForwardInput (for the second skip connection) and feedForwardOutput
         val dFeedForwardInput = dFinalOutput.clone()
-        val dFeedForwardOutput = dFinalOutput.clone()
+        dFinalOutput.clone()
 
         // Weight deltas layer 2
         val W2Delta = errorSignal.transpose().mm(feedForwardHidden)
@@ -323,9 +331,9 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
         val dInputsFromQ = dQStack.mm(Q.transpose())
         val dInputsFromV = dVStack.mm(V.transpose())
         val dInputsTotal = dFeedforwardInputTotal
-                .add(dInputsFromK)
-                .add(dInputsFromQ)
-                .add(dInputsFromV)
+            .add(dInputsFromK)
+            .add(dInputsFromQ)
+            .add(dInputsFromV)
         return dInputsTotal
     }
 
@@ -363,7 +371,11 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
         @UserParameter(label = "Input Size", description = "Number of inputs to the layer", order = 2)
         var inputSize = 4
 
-        @UserParameter(label = "Hidden Size", description = "Size of the hidden layer in the feedforward network", order = 3)
+        @UserParameter(
+            label = "Hidden Size",
+            description = "Size of the hidden layer in the feedforward network",
+            order = 3
+        )
         var hiddenSize = 16
 
         fun create(): TransformerBlock {

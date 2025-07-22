@@ -82,7 +82,6 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
         layers = computeOrderedUpdatePath(setOf(inputLayer, contextLayer), outputLayer)
     }
 
-
     @XStreamConstructor
     protected constructor() : super()
 

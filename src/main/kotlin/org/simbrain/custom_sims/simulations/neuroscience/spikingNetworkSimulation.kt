@@ -30,8 +30,8 @@ val spikingNetworkSimulation = newSim {
     val numNeurons = showNumericInputDialog("Number of Neurons:", 49) ?: return@newSim
 
     val gridSpace = 50.0
-    var sparsity = 0.20 // Percent of possible connections to make, and change to alter synchronous firing
-    var percentExcitatory = 70.0
+    var sparsity = 0.50 // Percent of possible connections to make, and change to alter synchronous firing
+    var percentExcitatory = 90.0
     
     // Pacemaker neuron tracking
     var pacemakerNeuron: Neuron? = null
@@ -46,9 +46,10 @@ val spikingNetworkSimulation = newSim {
 
     // Default params for Integrate and Fire Rules
     fun IntegrateAndFireRule.setIntFireParams() {
-        timeConstant = 5.0
-        resetPotential = 2.0
-        threshold = 11.0
+        timeConstant = 30.0
+        resetPotential = -5.0
+        restingPotential = 0.0
+        threshold = 8.0
     }
 
     // Create neurons with integrate and fire rules
@@ -67,6 +68,9 @@ val spikingNetworkSimulation = newSim {
 
     val neuronCollection = NeuronCollection(neurons)
 
+    neurons[0].activation = 10.0
+    neurons[1].activation = 10.0
+
     network.addNetworkModel(neuronCollection)
     
     // Apply layout to neurons
@@ -78,7 +82,7 @@ val spikingNetworkSimulation = newSim {
 
     // Setup randomizers for excitatory and inhibitory weights
     val exciteRand = NormalDistribution().apply {
-        mean = 10.0
+        mean = 20.0
         standardDeviation = 5.0
     }
     
@@ -244,7 +248,7 @@ val spikingNetworkSimulation = newSim {
                         network.addNeuron {
                             updateRule = SinusoidalRule().apply {
                                 this.frequency = frequency
-                                upperBound = 1.0
+                                upperBound = 5.0
                                 lowerBound = -1.0
                                 phase = 0.0
                             }
@@ -260,7 +264,7 @@ val spikingNetworkSimulation = newSim {
                             val synapse = runBlocking {
                                 network.addSynapse(pacemakerNeuron!!, targetNeuron)
                             }
-                            synapse.strength = 2.0
+                            synapse.strength = 10.0
                             //synapse.delay = 1
                             add(synapse)
                         }
@@ -318,9 +322,9 @@ val spikingNetworkSimulation = newSim {
 
         ## Other things you can try:
 
-        - Reminder to press `5` to toggle weight visibility to increase performance when needed but bring them back to edit and also see spikes better
-        - Press `k` periodically to clear activation
-        - Pass the wand over neurons in the network (when it is relatively quiet) and watch the result in the raster plot
+        - IMPORTANT NOTE: press `5` or on the neuron display window, click 'View' then 'Toggle Weight Visibility' to toggle weight visibility connections, and increase performance and run simulation. Bring them back when simulation is paused to edit and see spikes more clearly.
+        - Press `k` periodically to clear activation.
+        - Pass the wand over neurons in the network (when it is relatively quiet) and watch the result in the raster plot.
         - Use the buttons to set indicated properties and observe impact on dynamics. 
         - Select all nodes with `n`, double click, and adjust the parameters of the neuron update rule you have selected. 
             For Izhikevich you can use the [docs (see the table at the bottom)](https://docs.simbrain.net/docs/network/neurons/izhikevich.html) to create specific types of Izhikevich neurons

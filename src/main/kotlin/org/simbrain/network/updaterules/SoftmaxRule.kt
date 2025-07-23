@@ -3,6 +3,8 @@ package org.simbrain.network.updaterules
 import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.NeuronArray
+import org.simbrain.network.gui.nodes.ActivationSequenceProcessor
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.EmptyScalarData
@@ -13,6 +15,13 @@ import org.simbrain.util.toDoubleArray
 import smile.math.matrix.Matrix
 import kotlin.math.exp
 
+/**
+ * A standard softmax. Softmax assumes knowledge of inputs (or "logits") to a group of nodes and is thus not defined for scalar
+ * data or for free neurons.
+ *
+ * Note that [org.simbrain.network.updaterules.interfaces.DifferentiableUpdateRule] is not overridden because the derivative
+ * relative to the cross-entropy loss can be computed in a simplified way. See [org.simbrain.network.trainers.BackpropLossFunction]
+ */
 class SoftmaxRule: NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), BoundedUpdateRule {
 
     @UserParameter(
@@ -36,64 +45,14 @@ class SoftmaxRule: NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Bounded
         return exponentials.map { it/total }.toDoubleArray()
     }
 
-    /**
-     * Apply softmax row-wise to a matrix. Each row gets its own softmax distribution.
-     * Used for ActivationSequence where each row represents one sequence position.
-     */
-    private fun softmaxRowWise(input: Matrix, temperature: Double, bias: Matrix): Matrix {
-        val result = Matrix(input.nrow(), input.ncol())
-        
-        for (rowIndex in 0 until input.nrow()) {
-            val rowVector = input.row(rowIndex)
-            
-            // Handle bias: use the first row if bias has only one row (broadcast), 
-            // otherwise use the corresponding row
-            val biasVector = if (bias.nrow() == 1) {
-                // For single row bias, if it's a column vector, broadcast the single value
-                if (bias.ncol() == 1) {
-                    DoubleArray(input.ncol()) { bias[0, 0] } // Broadcast single bias value
-                } else {
-                    bias.row(0) // Use the bias row directly
-                }
-            } else if (rowIndex < bias.nrow()) {
-                if (bias.ncol() == 1) {
-                    DoubleArray(input.ncol()) { bias[rowIndex, 0] } // Broadcast row-specific bias value
-                } else {
-                    bias.row(rowIndex) // Use row-specific bias
-                }
-            } else {
-                DoubleArray(input.ncol()) { 0.0 } // Zero bias if no bias available
-            }
-            
-            // Apply softmax to this row
-            val max = rowVector.max() // for numerical stability
-            val exponentials = rowVector.mapIndexed { colIndex, value -> 
-                exp(((value + biasVector[colIndex]) - max) / temperature) 
-            }
-            val total = exponentials.sum()
-            
-            // Handle edge case of very small exponentials
-            val probabilities = if (total < 1e-6) {
-                DoubleArray(exponentials.size) { 1.0 / exponentials.size }
-            } else {
-                exponentials.map { it / total }.toDoubleArray()
-            }
-            
-            result.setRow(rowIndex, probabilities)
-        }
-        
-        return result
-    }
-
     context(Network) override fun apply(layer: Layer, dataHolder: EmptyMatrixData) {
         val inputs = layer.inputs
         val biases = layer.biases
         
-        if (inputs.nrow() == 1 || inputs.ncol() == 1) {
-            // Single vector case: use existing logic (either row or column vector)
+        if (layer is NeuronArray) {
             layer.setActivations(softmax(inputs, temperature, biases))
-        } else {
-            // Multiple rows case (ActivationSequence): apply softmax row-wise
+        } else if (layer is ActivationSequenceProcessor){
+            // Multiple rows case: apply softmax row-wise
             layer.activations = softmaxRowWise(inputs, temperature, biases)
         }
     }
@@ -120,4 +79,55 @@ class SoftmaxRule: NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Bounded
     override var lowerBound: Double
         get() = 0.0
         set(value) {}
+
+
+    /**
+     * Apply softmax row-wise to a matrix. Each row gets its own softmax distribution.
+     * Used for ActivationSequence where each row represents one sequence position.
+     */
+    private fun softmaxRowWise(input: Matrix, temperature: Double, bias: Matrix): Matrix {
+        val result = Matrix(input.nrow(), input.ncol())
+
+        for (rowIndex in 0 until input.nrow()) {
+            val rowVector = input.row(rowIndex)
+
+            // Handle bias: use the first row if bias has only one row (broadcast),
+            // otherwise use the corresponding row
+            val biasVector = if (bias.nrow() == 1) {
+                // For single row bias, if it's a column vector, broadcast the single value
+                if (bias.ncol() == 1) {
+                    DoubleArray(input.ncol()) { bias[0, 0] } // Broadcast single bias value
+                } else {
+                    bias.row(0) // Use the bias row directly
+                }
+            } else if (rowIndex < bias.nrow()) {
+                if (bias.ncol() == 1) {
+                    DoubleArray(input.ncol()) { bias[rowIndex, 0] } // Broadcast row-specific bias value
+                } else {
+                    bias.row(rowIndex) // Use row-specific bias
+                }
+            } else {
+                DoubleArray(input.ncol()) { 0.0 } // Zero bias if no bias available
+            }
+
+            // Apply softmax to this row
+            val max = rowVector.max() // for numerical stability
+            val exponentials = rowVector.mapIndexed { colIndex, value ->
+                exp(((value + biasVector[colIndex]) - max) / temperature)
+            }
+            val total = exponentials.sum()
+
+            // Handle edge case of very small exponentials
+            val probabilities = if (total < 1e-6) {
+                DoubleArray(exponentials.size) { 1.0 / exponentials.size }
+            } else {
+                exponentials.map { it / total }.toDoubleArray()
+            }
+
+            result.setRow(rowIndex, probabilities)
+        }
+
+        return result
+    }
+
 }

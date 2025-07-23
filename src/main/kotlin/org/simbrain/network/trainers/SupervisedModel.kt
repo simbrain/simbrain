@@ -3,6 +3,7 @@ package org.simbrain.network.trainers
 import org.simbrain.network.core.*
 import org.simbrain.network.events.LocationEvents
 import org.simbrain.network.trainers.SupervisedTrainer.TestConfiguration
+import org.simbrain.util.applyDiagonalPattern
 import org.simbrain.util.indent
 import org.simbrain.util.minus
 import org.simbrain.util.plus

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
+import org.simbrain.network.trainers.crossEntropy
 import smile.math.matrix.Matrix
 import kotlin.math.ln
 
@@ -179,7 +180,7 @@ class SmileUtilsTest {
         assertThrows<IllegalArgumentException>{a.validateSameShape(testMatrix)}
         val b = a.reshape(3,3)
         assertArrayEquals(doubleArrayOf(0.0, 0.0, 0.0), b.row(2))
-        val c = testMatrix.reshape(4,2)
+        testMatrix.reshape(4,2)
     }
 
     @Test

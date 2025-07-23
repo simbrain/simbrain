@@ -187,7 +187,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
     offsetNetworkModel(transformerBlock, softmaxSequence, Direction.NORTH, transformerBlock.height / 2 + 300.0)
     alignNetworkModels(transformerBlock, softmaxSequence, Alignment.VERTICAL)
 
-    offsetNetworkModel(transformerBlock, inferenceOutput, Direction.WEST, transformerBlock.width / 2 + 300.0)
+    offsetNetworkModel(transformerBlock, inferenceOutput, Direction.EAST, transformerBlock.width / 2 + 400.0)
     alignNetworkModels(transformerBlock, inferenceOutput, Alignment.HORIZONTAL)
 
     addSidebarInfo(
@@ -266,11 +266,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
                         with(network) {
                             supervisedModel.forwardPass()
                         }
-                        
-                        // Copy sequence output to inference output for visualization
-                        val lastMeaningfulIndex = (contextSize - 1).coerceAtLeast(0)
-                        val sequenceOutput = softmaxSequence.activations.row(lastMeaningfulIndex)
-                        
+
                         // Print error for every iteration
                         println("Iteration ${iteration + 1}/$trainingIterations, Loss: ${"%.6f".format(trainer.lastTrainingError)}")
                         
@@ -367,14 +363,16 @@ fun SimulationScope.setupUpdateActions(workspace: Workspace) {
         }
     }
 
+    /**
+     * Update the text world with the predicted next token. The output activation sequence actually predicts next tokens
+     * at every position, so choose the prediction corresponding (roughly) to the current number of tokens in the context
+     * window.
+     */
     workspace.addUpdateAction("Copy Sequence Output to Inference") {
-        // Determine the last meaningful position in the context window
         val currentTokens = textWorld.text.tokenize(textWorld.tokenizer).map { it.token }
         val actualLength = minOf(currentTokens.size, contextSize)
-        val lastMeaningfulIndex = (actualLength - 1).coerceAtLeast(0)
-        
-        // Copy activations from the last meaningful position in the sequence to inference output
-        val sequenceOutput = softmaxSequence.activations.row(lastMeaningfulIndex)
+        val tokenPosition = (actualLength - 1).coerceAtLeast(0)
+        val sequenceOutput = softmaxSequence.activations.row(tokenPosition)
         inferenceOutput.activations = sequenceOutput.toColumnVector()
     }
 

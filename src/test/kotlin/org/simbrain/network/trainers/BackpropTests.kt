@@ -12,7 +12,6 @@ import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
-import org.simbrain.util.crossEntropy
 import org.simbrain.util.math.SigmoidFunctionEnum
 import org.simbrain.util.sse
 import org.simbrain.util.stats.distributions.NormalDistribution

@@ -18,6 +18,7 @@ import org.simbrain.util.propertyeditor.EditableObject
 import smile.math.matrix.Matrix
 import java.util.*
 import kotlin.math.abs
+import kotlin.math.ln
 import kotlin.math.min
 import kotlin.random.Random
 
@@ -80,10 +81,29 @@ fun NeuronArray.updateBiases(error: Matrix, epsilon: Double = .1) {
     events.updated.fire()
 }
 
+/**
+ * Loss functions for backprop. Note that some of the logic for backprop is encoded in subclasses of this class.
+ */
 sealed class BackpropLossFunction(
     val shortName: String,
     val description: String
 ) : EditableObject {
+
+    /**
+     * A scalar loss function (e.g., MSE) used primarily in the GUI and as a stopping condition. For example,
+     * take the mean of the error values in the [outputError].
+     */
+    abstract fun scalarLoss(actual: Matrix, target: Matrix): Double
+
+    /**
+     * The "vector" of errors at the output layer, which is backpropagated through the network in training.
+     */
+    abstract fun outputError(actual: Matrix, target: Matrix): Matrix
+
+    /**
+     * Called to determine whether a given layer can use this loss function. For example, softmax cannot use SSE or MSE.
+     */
+    abstract fun canUse(layer: Layer): Boolean
 
     object SSE : BackpropLossFunction("SSE", "Sum Squared Error") {
         override fun scalarLoss(actual: Matrix, target: Matrix) = actual sse target
@@ -122,6 +142,12 @@ sealed class BackpropLossFunction(
     object CrossEntropy : BackpropLossFunction("Cross Entropy", "Cross Entropy") {
         override fun scalarLoss(actual: Matrix, target: Matrix) = crossEntropy(actual, target)
 
+        /**
+         * The error here incorporates the gradient with respect to an assumed softmax output. This is a standard
+         * performance optimization (actual outputs - targets)
+         *
+         * This also explains why [SoftmaxRule] does not implement [org.simbrain.network.updaterules.interfaces.DifferentiableUpdateRule]
+         */
         override fun outputError(actual: Matrix, target: Matrix): Matrix {
             actual.validateSameShape(target)
             return actual.clone().sub(target).mul(-1.0) // assume softmax output
@@ -129,12 +155,6 @@ sealed class BackpropLossFunction(
 
         override fun canUse(layer: Layer) = layer.updateRule is SoftmaxRule
     }
-
-    abstract fun scalarLoss(actual: Matrix, target: Matrix): Double
-
-    abstract fun outputError(actual: Matrix, target: Matrix): Matrix
-
-    abstract fun canUse(layer: Layer): Boolean
 
     override fun toString() = description
 
@@ -218,7 +238,8 @@ fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: Lis
     if (inputValues.size != inputLayers.size) throw IllegalArgumentException("Must provide same number of input vectors as input layers")
     inputValues.zip(inputLayers).forEach { (a, b) -> a.validateSameShape(b.activations) }
 
-    // Need special update to methods that update components but preserve the input accumulation pattern used in training.
+    // Update components but preserve the input accumulation pattern used in training.
+    // Normally updates clear inputs (see https://docs.simbrain.net/docs/network/updateLogic.html)
     fun NeuronArray.updateWithoutClearingInputs() {
         if (isClamped) {
             return
@@ -526,17 +547,41 @@ fun List<WeightMatrix>.printActivationsAndWeights(showWeights: Boolean = false) 
 
 }
 
-/**
- * Applies a repeating diagonal pattern to the matrix. The matrix is modified in-place.
- *
- * @return The matrix with the diagonal pattern applied.
- */
-fun Matrix.applyDiagonalPattern(): Matrix {
-    val smallerDimension = min(ncol(), nrow())
-    this.setValuesInPlace { i, j ->
-        if (i % smallerDimension == j % smallerDimension) 1.0 else 0.0
+fun crossEntropy(predictions: Matrix, targets: Matrix): Double {
+    // Handle sequence data (multiple rows)
+    if (predictions.nrow() > 1 && targets.nrow() > 1) {
+        return crossEntropySequence(predictions, targets)
     }
-    return this
+
+    // Original column vector case
+    targets.validateColumnVector()
+    predictions.validateColumnVector()
+    var loss = 0.0
+    for (i in 0 until targets.nrow()) {
+        loss += targets[i, 0] * ln(predictions.get(i, 0).coerceAtLeast(1e-15))
+    }
+    return -loss
+}
+
+/**
+ * Compute cross-entropy loss for sequence data where each row is a separate probability distribution.
+ * Both predictions and targets should have shape (sequence_length, vocab_size).
+ */
+fun crossEntropySequence(predictions: Matrix, targets: Matrix): Double {
+    require(predictions.nrow() == targets.nrow()) {
+        "Sequence length mismatch: predictions has ${predictions.nrow()} rows but targets has ${targets.nrow()} rows"
+    }
+    require(predictions.ncol() == targets.ncol()) {
+        "Vocabulary size mismatch: predictions has ${predictions.ncol()} columns but targets has ${targets.ncol()} columns"
+    }
+
+    var totalLoss = 0.0
+    for (i in 0 until predictions.nrow()) {
+        for (j in 0 until predictions.ncol()) {
+            totalLoss += targets[i, j] * ln(predictions[i, j].coerceAtLeast(1e-15))
+        }
+    }
+    return -totalLoss
 }
 
 /**

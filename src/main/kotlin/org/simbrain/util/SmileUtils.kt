@@ -63,7 +63,6 @@ fun Matrix.reshape(newNrows: Int, newNcols: Int): Matrix {
     return newMatrix
 }
 
-
 val Matrix.shapeString get() = "(${nrow()},${ncol()})"
 
 // TODO: Flatten the two arrays so that this can be used for arbitrary matrices (currently works only on vectors)
@@ -72,43 +71,6 @@ infix fun Matrix.sse(other: Matrix) = (this.toDoubleArray() sse other.toDoubleAr
 infix fun Matrix.mse(other: Matrix) = (this.toDoubleArray() mse other.toDoubleArray())
 
 infix fun Matrix.rmse(other: Matrix) = sqrt(this mse other)
-
-fun crossEntropy(predictions: Matrix, targets: Matrix): Double {
-    // Handle sequence data (multiple rows)
-    if (predictions.nrow() > 1 && targets.nrow() > 1) {
-        return crossEntropySequence(predictions, targets)
-    }
-    
-    // Original column vector case
-    targets.validateColumnVector()
-    predictions.validateColumnVector()
-    var loss = 0.0
-    for (i in 0 until targets.nrow()) {
-        loss += targets[i, 0] * ln(predictions.get(i, 0).coerceAtLeast(1e-15))
-    }
-    return -loss
-}
-
-/**
- * Compute cross entropy loss for sequence data where each row is a separate probability distribution.
- * Both predictions and targets should have shape (sequence_length, vocab_size).
- */
-fun crossEntropySequence(predictions: Matrix, targets: Matrix): Double {
-    require(predictions.nrow() == targets.nrow()) { 
-        "Sequence length mismatch: predictions has ${predictions.nrow()} rows but targets has ${targets.nrow()} rows" 
-    }
-    require(predictions.ncol() == targets.ncol()) { 
-        "Vocabulary size mismatch: predictions has ${predictions.ncol()} columns but targets has ${targets.ncol()} columns" 
-    }
-    
-    var totalLoss = 0.0
-    for (i in 0 until predictions.nrow()) {
-        for (j in 0 until predictions.ncol()) {
-            totalLoss += targets[i, j] * ln(predictions[i, j].coerceAtLeast(1e-15))
-        }
-    }
-    return -totalLoss
-}
 
 /**
  * Returns a specified row of a matrix, transposed so that it is a column vector.
@@ -541,4 +503,16 @@ fun Matrix.diff(other: Matrix, tolerance: Double = 1e-6): MatrixDiffResult {
     }
 }
 
+/**
+ * Applies a repeating diagonal pattern to the matrix. The matrix is modified in-place.
+ *
+ * @return The matrix with the diagonal pattern applied.
+ */
+fun Matrix.applyDiagonalPattern(): Matrix {
+    val smallerDimension = min(ncol(), nrow())
+    this.setValuesInPlace { i, j ->
+        if (i % smallerDimension == j % smallerDimension) 1.0 else 0.0
+    }
+    return this
+}
 

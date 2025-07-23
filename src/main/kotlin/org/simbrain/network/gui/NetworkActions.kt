@@ -133,7 +133,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     ) {
         showTransformerBlockCreationDialog()
     }
-    val addClassifierAction = createAction("Add classifier") {
+    val addClassifierAction = createAction("Add Classifier") {
         networkPanel.showClassifierCreationDialog()
     }
 

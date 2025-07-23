@@ -210,14 +210,11 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
     override fun updatePSR() {
         if (spikeResponder is NonResponder) {
 
-            // For activation sequence case, use last meaningful position (not necessarily last row)
             val sourceActivations = if (source is ActivationSequenceProcessor) {
-                val actualLength = (source as? ActivationSequence)?.actualSequenceLength ?: 
-                                   (source as? ActivationSequence)?.sequenceSize ?: 
-                                   source.activations.nrow()
-                val lastMeaningfulIndex = (actualLength - 1).coerceIn(0, source.activations.nrow() - 1)
-                source.activations.row(lastMeaningfulIndex).toColumnVector()
+                // For activation sequence case, use the last row
+                source.activations.row(source.activations.nrow() -1).toColumnVector()
             } else {
+                // Default case of one neuron array to another
                 source.activations
             }.let { activations ->
                 // Some update rules apply a rule to source activations before they are multiplied by weights

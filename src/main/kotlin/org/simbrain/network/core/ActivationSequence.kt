@@ -30,15 +30,6 @@ class ActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inpu
         }
     )
 
-    /**
-     * Tracks the actual meaningful length of the sequence (for handling shorter sequences than sequenceSize).
-     * Used by WeightMatrix to determine which position to use for inference.
-     */
-    var actualSequenceLength: Int = sequenceSize
-        set(value) {
-            field = value.coerceIn(1, sequenceSize)
-            events.updated.fire()
-        }
 
     /**
      * Holds data for prototype rule.

@@ -1,9 +1,21 @@
 package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.*
+import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.core.addNeuronCollection
+import org.simbrain.network.desktop.NetworkDesktopComponent
+import org.simbrain.network.gui.dialogs.getSupervisedTrainingDialog
 import org.simbrain.network.layouts.GridLayout
-import org.simbrain.util.place
+import org.simbrain.network.trainers.MatrixDataset
+import org.simbrain.network.trainers.SupervisedModel
+import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
+import org.simbrain.network.util.Alignment
+import org.simbrain.network.util.Direction
+import org.simbrain.network.util.alignNetworkModels
+import org.simbrain.network.util.offsetNeuronCollections
+import org.simbrain.util.*
+import smile.math.matrix.Matrix
+import java.awt.image.BufferedImage
 
 /**
  * Images can be drawn in a 10x10 array and sent to a 10x10 network.
@@ -22,37 +34,91 @@ val simpleImageWorld = newSim {
         setUpperBound(1.0)
         layout(GridLayout(40.0, 40.0))
     }
-    network.addNetworkModel(inputs)
 
-    // // Recurrent net
-    // val recurrentNet = network.addNeuronCollection(25).apply {
-    //     label = "Process"
-    //     layout(GridLayout())
-    //     location = point (200, -400)
-    // }
-    // network.addNetworkModel(recurrentNet)
-    // network.connect(recurrentNet.neuronList, recurrentNet.neuronList, Sparse().apply {
-    //     connectionDensity = .15
-    // })
+    val hidden = network.addNeuronCollection(64).apply {
+        label = "Hidden"
+        layout(GridLayout(40.0, 40.0))
+    }
 
-    // // Input to recurrent
-    // SynapseGroup(inputs, recurrentNet, Sparse().apply {
-    //     connectionDensity = .25
-    // }).also {
-    //     network.addNetworkModel(it)
-    // }
+    val outputs = network.addNeuronCollection(10).apply {
+        label = "Outputs"
+        (updateRule as? BoundedUpdateRule)?.apply {
+            upperBound = 1.0
+            lowerBound = -1.0
+        }
+    }
 
-    // Place network in the desktop
-    withGui {
-        place(networkComponent, 0, 5, 563, 530)
+    val weights = listOf(
+        WeightMatrix(inputs, hidden),
+        WeightMatrix(hidden, outputs)
+    ).onEach { it.randomize() }.also { network.addNetworkModels(it) }
+
+    offsetNeuronCollections(inputs, hidden, Direction.NORTH, 200.0)
+    alignNetworkModels(inputs, hidden, Alignment.VERTICAL)
+
+    offsetNeuronCollections(hidden, outputs, Direction.NORTH, 200.0)
+    alignNetworkModels(hidden, outputs, Alignment.VERTICAL)
+
+    val supervisedModel = SupervisedModel(inputs, outputs, 1.0).also {
+        network.addNetworkModel(it)
+        it.trainingSet = MatrixDataset(
+            Matrix(outputs.size, inputs.size),
+            Matrix.eye(outputs.size, outputs.size)
+        )
     }
 
     // Image world
-    val component = addImageWorld("Image World")
-    placeComponent(component,555, 5, 659, 531)
-    val imageWorld = component.world
-    imageWorld.resetImageAlbum(10, 10)
-    imageWorld.setCurrentFilter("Threshold 10x10")
+    val imageWorldComponent = addImageWorld("Image World")
+    val imageWorld = imageWorldComponent.world.apply {
+        resetImageAlbum(10, 10)
+        setCurrentFilter("Threshold 10x10")
+        repeat(outputs.size) { index ->
+            imageAlbum.addImage(BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB))
+        }
+    }
+
+    // Place network in the desktop
+    withGui {
+        val networkDesktopComponent = getDesktopComponent(networkComponent) as NetworkDesktopComponent
+        val networkPanel = networkDesktopComponent.networkPanel
+        val controlPanel = createControlPanel("Control Panel", 5, 10) {
+            repeat(outputs.size) { index ->
+                addTextField("Category ${index + 1}", "") { category ->
+                    outputs.neuronList[index].label = category
+                }
+                addButton("Save Image for Category ${index + 1}") {
+                    supervisedModel.trainingSet.inputs.setRow(index, imageWorld.currentFilter.brightness)
+                    val image = imageWorld.currentImage.copy()
+                    val frame = imageWorld.imageAlbum.frames[index]
+                    frame.drawImage(image)
+                    imageWorld.imageAlbum.fireImageUpdate()
+                    if (index != imageWorld.imageAlbum.frameIndex) {
+                        imageWorld.imageAlbum.clearCurrentImage()
+                    }
+                    supervisedModel.inputLayer.setActivations(supervisedModel.trainingSet.inputs.row(index))
+                    supervisedModel.outputLayer.setActivations(DoubleArray(outputs.size) { if (it == index) 1.0 else 0.0 })
+                }
+            }
+            addSeparator()
+            addButton("Train...") {
+                with(networkPanel) { supervisedModel.getSupervisedTrainingDialog().display() }
+            }
+        }
+        var controlPanelHeight = controlPanel.size.height
+        waitFor {
+            val condition = controlPanel.size.height > 100 && controlPanelHeight == controlPanel.size.height
+            controlPanelHeight = controlPanel.size.height
+            condition
+        }
+        place(networkComponent, controlPanel.size.width + 10, 10, 350, controlPanel.size.height)
+        place(
+            imageWorldComponent,
+            controlPanel.size.width + 10 + 350 + 10,
+            10,
+            600,
+            600
+        )
+    }
 
     // Couple
     with(couplingManager) {

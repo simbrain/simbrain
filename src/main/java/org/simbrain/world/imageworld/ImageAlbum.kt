@@ -7,6 +7,7 @@ import org.simbrain.workspace.Consumable
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
+import java.util.*
 import javax.imageio.ImageIO
 import javax.swing.ImageIcon
 import javax.swing.JOptionPane
@@ -20,7 +21,9 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
     /**
      * A list of buffered images that can be stepped through.
      */
-    private val frames: MutableList<BufferedImage> = ArrayList()
+    private val _frames: MutableList<BufferedImage> = ArrayList()
+
+    val frames: List<BufferedImage> = Collections.unmodifiableList(_frames)
 
     /**
      * Current frame being shown.
@@ -43,7 +46,7 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
      */
     @Consumable
     fun loadImage(filename: String) {
-        frames.clear()
+        _frames.clear()
         if (filename.isEmpty()) {
             currentImage = BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB)
         } else {
@@ -72,9 +75,9 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
                 e.printStackTrace()
             }
         }
-        frames.clear()
-        frames.addAll(list)
-        currentImage = frames[0]
+        _frames.clear()
+        _frames.addAll(list)
+        currentImage = _frames[0]
     }
 
     fun writeCurrentImageToFile(destination: File) {
@@ -83,8 +86,8 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
 
     fun writeAllImagesToFile(destination: File, fileNamePrefix: String) {
         assert(destination.isDirectory) { "Destination must be a directory" }
-        for (i in frames.indices) {
-            ImageIO.write(frames[i], "png", File(destination, "${fileNamePrefix}$i.png"))
+        for (i in _frames.indices) {
+            ImageIO.write(_frames[i], "png", File(destination, "${fileNamePrefix}$i.png"))
         }
     }
 
@@ -92,8 +95,8 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
      * Add a new image to the album and set the current frame to it.
      */
     fun addImage(image: BufferedImage) {
-        frames.add(image)
-        frameIndex = frames.size - 1
+        _frames.add(image)
+        frameIndex = _frames.size - 1
         currentImage = image
     }
 
@@ -116,8 +119,8 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
      */
     fun nextFrame() {
         saveCurrentFrame()
-        frameIndex = (frameIndex + 1) % frames.size
-        currentImage = frames[frameIndex]
+        frameIndex = (frameIndex + 1) % _frames.size
+        currentImage = _frames[frameIndex]
     }
 
     /**
@@ -125,28 +128,28 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
      */
     fun previousFrame() {
         saveCurrentFrame()
-        frameIndex = (frameIndex + frames.size - 1) % frames.size
-        currentImage = frames[frameIndex]
+        frameIndex = (frameIndex + _frames.size - 1) % _frames.size
+        currentImage = _frames[frameIndex]
     }
 
     /**
      * Returns number of frames in the album
      */
     val numFrames: Int
-        get() = frames.size
+        get() = _frames.size
 
     /**
      * Set album to frame aat provided index.
      */
     fun setFrame(frameIndex: Int) {
-        if (frameIndex >= 0 && frameIndex < frames.size) {
+        if (frameIndex >= 0 && frameIndex < _frames.size) {
             saveCurrentFrame()
-            currentImage = frames[frameIndex]
+            currentImage = _frames[frameIndex]
         }
     }
 
     fun reset(width: Int, height: Int) {
-        frames.clear()
+        _frames.clear()
         frameIndex = 0
         setCurrentImage(BufferedImage(width, height, BufferedImage.TYPE_INT_RGB), true)
     }
@@ -161,20 +164,20 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
 
     fun saveCurrentFrame() {
         val snapshot = currentImage.copy()
-        frames[frameIndex].data = snapshot.data
+        _frames[frameIndex].data = snapshot.data
     }
 
     fun deleteCurrentImage() {
-        if (frames.size == 0) {
+        if (_frames.size == 0) {
             return
         }
-        if (frames.size == 1) {
+        if (_frames.size == 1) {
             reset(currentImage.width, currentImage.height)
             return
         }
-        frames.removeAt(frameIndex)
-        frameIndex = (frameIndex + frames.size - 1) % frames.size
-        currentImage = frames[frameIndex]
+        _frames.removeAt(frameIndex)
+        frameIndex = (frameIndex + _frames.size - 1) % _frames.size
+        currentImage = _frames[frameIndex]
     }
 
     override val id: String

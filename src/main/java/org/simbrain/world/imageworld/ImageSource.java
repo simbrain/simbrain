@@ -101,6 +101,10 @@ public abstract class ImageSource  {
         setCurrentImage(ImageUtilsKt.copy(image), true);
     }
 
+    public void clearCurrentImage() {
+        setCurrentImage(new BufferedImage(currentImage.getWidth(), currentImage.getHeight(), BufferedImage.TYPE_INT_RGB));
+    }
+
     public int getWidth() {
         return currentImage.getWidth();
     }

@@ -1,5 +1,6 @@
 package org.simbrain.util
 
+import kotlinx.coroutines.withTimeout
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
@@ -92,5 +93,19 @@ class DependenciesInvalidatingCachedObject<T>(private vararg val dependencies: K
 
     operator fun setValue(baseObject: Any, property: KProperty<*>, value: T) {
         _value = value
+    }
+}
+
+suspend fun waitFor(timeout: Long = 10000L, condition: () -> Boolean) {
+    try {
+        withTimeout(timeout) {
+            var count = 0
+            while (!condition()) {
+                count++
+                kotlinx.coroutines.delay(count * 100L)
+            }
+        }
+    } catch (e: Exception) {
+        throw IllegalStateException("Timeout waiting for condition", e)
     }
 }

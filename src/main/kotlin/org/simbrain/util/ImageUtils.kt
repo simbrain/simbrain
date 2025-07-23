@@ -243,11 +243,29 @@ fun BufferedImage.copy(): BufferedImage {
     }
 }
 
-fun BufferedImage.fill(color: Color) {
-    val g = graphics
-    g.color = color
-    g.fillRect(0, 0, width, height)
-    g.dispose()
+fun BufferedImage.fill(color: Color) = createGraphics().let { g ->
+    try {
+        g.color = color
+        g.fillRect(0, 0, width, height)
+    } finally {
+        g.dispose()
+    }
+}
+
+fun BufferedImage.drawImage(img: BufferedImage, x: Int = 0, y: Int = 0) = createGraphics().let { g ->
+    try {
+        g.drawImage(img, x, y, null)
+    } finally {
+        g.dispose()
+    }
+}
+
+fun BufferedImage.clear() = createGraphics().let { g ->
+    try {
+        g.clearRect(0, 0, width, height)
+    } finally {
+        g.dispose()
+    }
 }
 
 fun Color.invert() = Color(255 - red, 255 - green, 255 - blue)

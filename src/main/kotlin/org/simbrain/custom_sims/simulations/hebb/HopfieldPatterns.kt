@@ -5,6 +5,7 @@ import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.subnetworks.Hopfield
+import org.simbrain.network.subnetworks.Hopfield.HopfieldUpdate
 import org.simbrain.util.computeCorrelationMatrix
 import org.simbrain.util.displayInDialog
 import org.simbrain.util.perturbBinaryByHammingDistance
@@ -23,7 +24,9 @@ val hopfieldPatterns = newSim {
     val network = networkComponent.network
 
     // Hopfield network
-    val hopfield = Hopfield(100)
+    val hopfield = Hopfield(100).apply {
+        updateFunc = HopfieldUpdate.SYNC
+    }
     var patternCnt = 0.0
     network.addNetworkModel(hopfield)
 

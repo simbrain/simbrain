@@ -7,6 +7,7 @@ import org.simbrain.custom_sims.simulations.hebb.HopfieldTestConfig
 import org.simbrain.custom_sims.simulations.hebb.createHopfieldTestPane
 import org.simbrain.custom_sims.simulations.hebb.createPatternControlPanel
 import org.simbrain.network.subnetworks.Hopfield
+import org.simbrain.network.subnetworks.Hopfield.HopfieldUpdate
 import org.simbrain.util.place
 import org.simbrain.util.showNumericInputDialog
 
@@ -24,7 +25,9 @@ val discreteHopfieldSim = newSim {
     val network = networkComponent.network
 
     // Hopfield network
-    val hopfield = Hopfield(numNeurons)
+    val hopfield = Hopfield(numNeurons).apply {
+        updateFunc = HopfieldUpdate.SYNC
+    }
     network.addNetworkModel(hopfield)
 
     // Text to potentially integrate

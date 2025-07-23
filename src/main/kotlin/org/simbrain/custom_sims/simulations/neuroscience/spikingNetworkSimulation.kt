@@ -4,10 +4,7 @@ import kotlinx.coroutines.runBlocking
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.connections.polarizeSynapses
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.NeuronCollection
-import org.simbrain.network.core.addNeuron
-import org.simbrain.network.core.addSynapse
+import org.simbrain.network.core.*
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.spikeresponders.JumpAndDecay
 import org.simbrain.network.updaterules.IntegrateAndFireRule
@@ -53,16 +50,9 @@ val spikingNetworkSimulation = newSim {
     }
 
     // Create neurons with integrate and fire rules
-    val neurons = buildList {
-        repeat(numNeurons) {
-            val neuron = runBlocking {
-                network.addNeuron {
-                    updateRule = IntegrateAndFireRule().apply {
-                        setIntFireParams()
-                    }
-                }
-            }
-            add(neuron)
+    val neurons = network.addNeurons(numNeurons) {
+        updateRule = IntegrateAndFireRule().apply {
+            setIntFireParams()
         }
     }
 

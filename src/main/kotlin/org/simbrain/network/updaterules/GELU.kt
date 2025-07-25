@@ -38,7 +38,7 @@ open class GELU : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Differen
 
     fun gelu(input: Double): Double {
         val tanhInput = sqrt(2 / PI) * (input + (0.044715 * (input.pow(3))))
-        val clampedTanhInput = clamp(tanhInput, -1.0, 1.0)
+        val clampedTanhInput = clamp(tanhInput, -1000.0, 1000.0)
 
         return (input * 0.5) * (1 + tanh(clampedTanhInput))
     }
@@ -64,7 +64,7 @@ open class GELU : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Differen
         val sqrtTerm = sqrt(2 / PI)
         val xCubed = input.pow(3)
         val tanhInput = sqrtTerm * (input + 0.044715 * xCubed)
-        val clampedTanhInput = clamp(tanhInput, -1.0, 1.0)
+        val clampedTanhInput = clamp(tanhInput, -1000.0, 1000.0)
         val tanhVal = tanh(clampedTanhInput)
         val sech2 = 1 - tanhVal.pow(2)
         val term1 = 0.5 * (1 + tanhVal)

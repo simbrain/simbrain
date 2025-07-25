@@ -6,7 +6,7 @@ import org.simbrain.custom_sims.*
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.*
 import org.simbrain.network.trainers.*
-import org.simbrain.network.trainers.SamplingStrategy
+import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.Direction
@@ -26,7 +26,11 @@ import java.io.File
 
 class TinyLanguageModelOptions(var showEmbeddingDimension: Boolean = true): EditableObject {
 
-    var samplingStrategy: SamplingStrategy = SamplingStrategy.TopK(3)
+    var samplingStrategy: SamplingStrategy by GuiEditable(
+        initValue = SamplingStrategy.TopK(k = 5),
+        description = "How to sample from softmax to produce new tokens",
+        order = 0,
+    )
 
     var contextSize by GuiEditable(
         initValue = 24,
@@ -101,19 +105,15 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
             
             // Parse sampling strategy
             val samplingStrategyStr = jsonOptions.optString("samplingStrategy", "topk")
-            val temperature = jsonOptions.optDouble("temperature", 1.0)
             samplingStrategy = when (samplingStrategyStr.lowercase()) {
                 "greedy" -> SamplingStrategy.Greedy
                 "topk" -> SamplingStrategy.TopK(
                     k = jsonOptions.optInt("topK", 5),
-                    temperature = temperature
                 )
                 "topp" -> SamplingStrategy.TopP(
                     p = jsonOptions.optDouble("topP", 0.9),
-                    temperature = temperature
                 )
-                "random" -> SamplingStrategy.Random(temperature = temperature)
-                else -> SamplingStrategy.TopK(k = 5, temperature = 1.0)
+                else -> SamplingStrategy.TopK(k = 5)
             }
         }
     } else {
@@ -147,6 +147,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
     textWorldComponent.world.text = tokenizedTrainingText.take(contextSize).tokensToString(tokenizer)
     textWorldComponent.world.highlightCurrentToken = false
     textWorldComponent.world.autoAdvance = false
+    textWorldComponent.world.samplingStrategy = options.samplingStrategy
 
     val inputs = ActivationSequence(contextSize, tokenEmbedding.dimension).apply {
         label = "Inputs"
@@ -171,11 +172,15 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         gridMode = true
         labelArray = tokenEmbedding.tokens.toTypedArray()
         label = "Predicted Next Token"
+        (updateRule as? LinearRule)?.let {
+            it.upperBound = 1.0
+            it.lowerBound = -1.0
+        }
     }
 
     val weightMatrices = listOf(
-        WeightMatrix(inputs, transformerBlock),
-        WeightMatrix(transformerBlock, softmaxSequence)
+        WeightMatrix(inputs, transformerBlock).apply { label = "Embedding" },
+        WeightMatrix(transformerBlock, softmaxSequence).apply { label = "Unembedding" },
         // Note: No weight matrix to inferenceOutput - handled by custom update action
     )
 
@@ -254,8 +259,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
           - **Greedy**: Always picks the most probable token (deterministic)
           - **Top-K**: Samples from the K most probable tokens (good balance)
           - **Top-P (Nucleus)**: Samples from tokens whose cumulative probability exceeds P
-          - **Random**: Samples from the full distribution
-        - Adjust temperature to control randomness (higher = more random)
+        - Adjust temperature on the Softmax Sequence to control randomness (higher = more random)
 
         """.trimIndent(),
         initiallyOpened = false
@@ -409,7 +413,7 @@ fun SimulationScope.setupUpdateActions(workspace: Workspace, options: TinyLangua
     }
 
     workspace.addUpdateAction("Predict Next Word") {
-        val nextWord = textWorld.tokenEmbedding.sampleToken(inferenceOutput.activationArray, options.samplingStrategy)
+        val nextWord = textWorld.sampleToken(inferenceOutput.activationArray)
         // update text with predicted word and remove first word so that the context window maintains its size
         textWorldComponent.world.text = textWorldComponent.world.text.tokenize(textWorld.tokenizer)
             .map { it.token }

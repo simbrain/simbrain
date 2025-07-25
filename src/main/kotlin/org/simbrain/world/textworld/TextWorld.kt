@@ -1,11 +1,13 @@
 package org.simbrain.world.textworld
 
 import kotlinx.coroutines.runBlocking
+import org.simbrain.network.trainers.SamplingStrategy
 import org.simbrain.util.DependenciesInvalidatingCachedObject
 import org.simbrain.util.SimpleTokenizer
 import org.simbrain.util.TokenizerResult
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
@@ -115,6 +117,12 @@ class TextWorld : AttributeContainer, EditableObject {
         order = 4
     )
     var showTokenBoundaries = true
+
+    var samplingStrategy: SamplingStrategy by GuiEditable(
+        initValue = SamplingStrategy.TopK(k = 5),
+        description = "How to sample from softmax to produce new tokens",
+        order = 0,
+    )
 
     /**
      * Set main text without firing an event.
@@ -251,6 +259,17 @@ class TextWorld : AttributeContainer, EditableObject {
             return text.substring(0, 1)
         }
         return ""
+    }
+
+    /**
+     * Sample a token using various sampling strategies
+     * @param probabilities Raw logits from the model
+     * @param samplingStrategy The sampling strategy to use
+     * @return The sampled token
+     */
+    fun sampleToken(probabilities: DoubleArray): String {
+        val tokenIndex = samplingStrategy.sample(probabilities)
+        return tokenEmbedding.tokens.getOrElse(tokenIndex) { "UNK" }
     }
 
     /**

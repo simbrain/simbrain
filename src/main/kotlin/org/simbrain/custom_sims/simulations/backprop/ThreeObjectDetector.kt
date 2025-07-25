@@ -9,18 +9,17 @@ import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedModel
+import org.simbrain.network.trainers.splitDataSet
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.alignNetworkModels
 import org.simbrain.network.util.offsetNetworkModel
-import org.simbrain.util.SmellSource
-import org.simbrain.util.matrix
-import org.simbrain.util.place
-import org.simbrain.util.point
+import org.simbrain.util.*
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.sensors.SmellSensor
+import smile.math.matrix.Matrix
 
 
 val threeObjectDetector = newSim {
@@ -50,21 +49,6 @@ val threeObjectDetector = newSim {
     offsetNetworkModel(hiddenLayer, outputLayer, Direction.NORTH, 150.0)
     alignNetworkModels(inputLayer, hiddenLayer, Alignment.VERTICAL)
     alignNetworkModels(inputLayer, outputLayer, Alignment.VERTICAL)
-
-    sm.trainingSet = MatrixDataset(
-        inputs = matrix[4,3](
-            0.4,0.2,1.0,
-            1.0,0.4,0.2,
-            0.4,1.0,0.2,
-            0.0,0.0,0.0
-        ),
-        targets = matrix[4,3] (
-            1.0,0.0,0.0,
-            0.0,1.0,0.0,
-            0.0,0.0,1.0,
-            0.0,0.0,0.0
-        )
-    )
 
     val odorWorldComponent = addOdorWorldComponent("World")
     withGui {
@@ -99,6 +83,54 @@ val threeObjectDetector = newSim {
         location = point(178, 300)
         smellSource = SmellSource(doubleArrayOf(0.4, 0.2, 1.0))
     }
+
+    val steps = 10
+
+    fun smellGenerator(smellSource: SmellSource) = Array(steps) { scalingFactor ->
+        smellSource.stimulusVector!!.applyFunction { (0.5 / (steps)) * scalingFactor * it + 0.5 * it }
+    }
+
+    val smells = buildList {
+        addAll(smellGenerator(gouda.smellSource))
+        addAll(smellGenerator(blueCheese.smellSource))
+        addAll(smellGenerator(fish.smellSource))
+    }.toTypedArray()
+
+    val targets = buildList {
+        repeat(steps) { add(doubleArrayOf(1.0, 0.0, 0.0)) }
+        repeat(steps) { add(doubleArrayOf(0.0, 1.0, 0.0)) }
+        repeat(steps) { add(doubleArrayOf(0.0, 0.0, 1.0)) }
+    }.toTypedArray()
+
+    val (training, testing) = splitDataSet(Matrix.of(smells), Matrix.of(targets), 0.8)
+
+    val (testingInputs, testingTargets) = testing
+
+    val trainingInputs = training.let { (i, _) ->
+        buildList {
+            addAll(i.toArray())
+            add(doubleArrayOf(0.0, 0.0, 0.0))
+        }.toTypedArray().toMatrix()
+    }
+
+    val trainingTargets = training.let { (_, t) ->
+        buildList {
+            addAll(t.toArray())
+            add(doubleArrayOf(0.0, 0.0, 0.0))
+        }.toTypedArray().toMatrix()
+    }
+
+    sm.trainingSet = MatrixDataset(
+        inputs = trainingInputs,
+        targets = trainingTargets
+    )
+
+    sm.testingSet = MatrixDataset(
+        inputs = testingInputs,
+        targets = testingTargets
+    )
+
+    sm.trainerConfig.testConfiguration.enabled = true
 
     with(couplingManager) {
         smellSensor.getProducer(SmellSensor::smellVector) couple inputLayer.getConsumer(AbstractNeuronCollection::setActivations)

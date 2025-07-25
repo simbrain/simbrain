@@ -1,5 +1,7 @@
 package org.simbrain.world.textworld
 
+import org.simbrain.network.trainers.SamplingStrategy
+import org.simbrain.network.trainers.SamplingUtils
 import org.simbrain.util.*
 import org.simbrain.util.projection.DataPoint
 import org.simbrain.util.projection.KDTree
@@ -87,6 +89,22 @@ class TokenEmbedding(
     fun getClosestWord(key: DoubleArray): String {
         val keyVector = DoubleArray(treeMap.dimension) { i -> key.getOrElse(i) { 0.0 } }
         return treeMap.findClosestPoint(DataPoint(keyVector))?.label!!
+    }
+
+    /**
+     * Sample a token using various sampling strategies
+     * @param logits Raw logits from the model
+     * @param samplingStrategy The sampling strategy to use
+     * @return The sampled token
+     */
+    fun sampleToken(logits: DoubleArray, samplingStrategy: SamplingStrategy = SamplingStrategy.Greedy): String {
+        val tokenIndex = when (samplingStrategy) {
+            is SamplingStrategy.Greedy -> SamplingUtils.greedySampling(logits)
+            is SamplingStrategy.TopK -> SamplingUtils.topKSampling(logits, samplingStrategy.k, samplingStrategy.temperature)
+            is SamplingStrategy.TopP -> SamplingUtils.topPSampling(logits, samplingStrategy.p, samplingStrategy.temperature)
+            is SamplingStrategy.Random -> SamplingUtils.randomSampling(logits, samplingStrategy.temperature)
+        }
+        return tokens.getOrElse(tokenIndex) { "UNK" }
     }
 
     override fun toString(): String {

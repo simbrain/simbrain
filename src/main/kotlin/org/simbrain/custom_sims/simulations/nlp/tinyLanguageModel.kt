@@ -6,6 +6,7 @@ import org.simbrain.custom_sims.*
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.*
 import org.simbrain.network.trainers.*
+import org.simbrain.network.trainers.SamplingStrategy
 import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.Direction
@@ -24,6 +25,8 @@ import smile.math.matrix.Matrix
 import java.io.File
 
 class TinyLanguageModelOptions(var showEmbeddingDimension: Boolean = true): EditableObject {
+
+    var samplingStrategy: SamplingStrategy = SamplingStrategy.TopK(3)
 
     var contextSize by GuiEditable(
         initValue = 24,
@@ -67,6 +70,8 @@ class TinyLanguageModelOptions(var showEmbeddingDimension: Boolean = true): Edit
  * - workspaceIterations: Number of workspace iterations to run (default: 0)
  * - enableConsoleOutput: Print debug info to console (default: false)
  * - learningRate: Learning rate for Adam optimizer (default: 0.001)
+ * - samplingStrategy: how to sample from softmax to produce new tokens
+ * - temperature: Temperature for sampling (default: 1.0)
  */
 val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
 
@@ -92,6 +97,23 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
             }
             if (jsonOptions.has("usePunctuation")) {
                 tokenizer = SimpleTokenizer(usePunctuation = jsonOptions.getBoolean("usePunctuation")) as Tokenizer<*>
+            }
+            
+            // Parse sampling strategy
+            val samplingStrategyStr = jsonOptions.optString("samplingStrategy", "topk")
+            val temperature = jsonOptions.optDouble("temperature", 1.0)
+            samplingStrategy = when (samplingStrategyStr.lowercase()) {
+                "greedy" -> SamplingStrategy.Greedy
+                "topk" -> SamplingStrategy.TopK(
+                    k = jsonOptions.optInt("topK", 5),
+                    temperature = temperature
+                )
+                "topp" -> SamplingStrategy.TopP(
+                    p = jsonOptions.optDouble("topP", 0.9),
+                    temperature = temperature
+                )
+                "random" -> SamplingStrategy.Random(temperature = temperature)
+                else -> SamplingStrategy.TopK(k = 5, temperature = 1.0)
             }
         }
     } else {
@@ -171,7 +193,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         addNetworkModels(model).awaitAll()
     }
 
-    setupUpdateActions(workspace)
+    setupUpdateActions(workspace, options)
 
     inputs.location = point(-625, -200)
     transformerBlock.location = point(-300, -600)
@@ -228,6 +250,12 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         
         # What to try
         - Try different training sets
+        - Experiment with temperature and different sampling strategies:
+          - **Greedy**: Always picks the most probable token (deterministic)
+          - **Top-K**: Samples from the K most probable tokens (good balance)
+          - **Top-P (Nucleus)**: Samples from tokens whose cumulative probability exceeds P
+          - **Random**: Samples from the full distribution
+        - Adjust temperature to control randomness (higher = more random)
 
         """.trimIndent(),
         initiallyOpened = false
@@ -322,9 +350,13 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         }
     }
 
-}.registerReopenFunction { workspace -> setupUpdateActions(workspace) }
+}.registerReopenFunction { workspace -> 
+    // For reopen, we'll use default options since we can't access the original options
+    val defaultOptions = TinyLanguageModelOptions()
+    setupUpdateActions(workspace, defaultOptions) 
+}
 
-fun SimulationScope.setupUpdateActions(workspace: Workspace) {
+fun SimulationScope.setupUpdateActions(workspace: Workspace, options: TinyLanguageModelOptions) {
 
     val network = workspace.componentList.filterIsInstance<NetworkComponent>().first().network
     val supervisedModel = network.getModels<SupervisedModel>().first()
@@ -377,7 +409,7 @@ fun SimulationScope.setupUpdateActions(workspace: Workspace) {
     }
 
     workspace.addUpdateAction("Predict Next Word") {
-        val nextWord = textWorld.tokenEmbedding.getClosestWord(inferenceOutput.activationArray)
+        val nextWord = textWorld.tokenEmbedding.sampleToken(inferenceOutput.activationArray, options.samplingStrategy)
         // update text with predicted word and remove first word so that the context window maintains its size
         textWorldComponent.world.text = textWorldComponent.world.text.tokenize(textWorld.tokenizer)
             .map { it.token }

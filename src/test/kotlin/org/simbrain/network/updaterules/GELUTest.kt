@@ -59,7 +59,7 @@ class GELUTest {
 
     }
 
-    //All expected values calculated using Desmos
+    //All expected values calculated using desmos
     @Test
     fun `test scalar update`() {
         //Testing activation values for the linear portions as well as the curve

@@ -19,7 +19,7 @@ import kotlin.math.*
 
 /**
  * GELU activation function. See [https://paperswithcode.com/method/gelu]
- */
+ */ 
 open class GELU : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), DifferentiableUpdateRule {
 
     context(Network)

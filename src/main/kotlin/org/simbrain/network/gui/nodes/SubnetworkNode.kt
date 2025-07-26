@@ -45,10 +45,9 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
 
     public override fun layoutChildren() {
         updateOutline()
-        interactionBox.setOffset(
-            outline.fullBounds.getX()
-                    + Outline.ARC_SIZE / 2,
-            outline.fullBounds.getY() - interactionBox.fullBounds.getHeight() + 1
+        interactionBox.centerFullBoundsOnPoint(
+            outline.fullBounds.centerX,
+            outline.fullBounds.getY() - interactionBox.fullBounds.getHeight() / 2 + 0.5
         )
     }
 

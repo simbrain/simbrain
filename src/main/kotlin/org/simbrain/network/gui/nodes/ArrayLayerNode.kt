@@ -13,10 +13,13 @@ import org.simbrain.util.*
 import java.awt.BasicStroke
 import java.awt.Font
 import java.awt.RenderingHints
+import javax.swing.JPopupMenu
 import javax.swing.SwingUtilities
 
 abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer):
     ScreenElement(networkPanel) {
+
+    private val interactionBox: ArrayLayerInteractionBox = ArrayLayerInteractionBox(networkPanel)
 
     protected val CLAMPED_STROKE = BasicStroke(2f)
 
@@ -66,14 +69,26 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
     init {
         layer.events.apply {
             clampChanged.on(dispatcher = Dispatchers.Swing) { updateBorder() }
-            locationChanged.on(dispatcher = Dispatchers.Swing) { pullViewPositionFromModel() }
+            locationChanged.on(dispatcher = Dispatchers.Swing) { 
+                pullViewPositionFromModel()
+                layoutChildren()
+            }
+            labelChanged.on(dispatcher = Dispatchers.Swing) { _, _ ->
+                interactionBox.setText(layer.displayName)
+            }
         }
         (layer as? NeuronArray)?.events?.visualPropertiesChanged?.on(dispatcher = Dispatchers.Swing) { rotateNode() }
         rotateNode()
 
+        addChild(interactionBox)
+        interactionBox.setText(layer.displayName)
+
         pickable = true
 
         pullViewPositionFromModel()
+        
+        // Position interaction box initially
+        layoutChildren()
     }
 
     private fun pullViewPositionFromModel() {
@@ -116,6 +131,13 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
 
     override val isDraggable = true
 
+    public override fun layoutChildren() {
+        interactionBox.centerFullBoundsOnPoint(
+            borderBox.fullBounds.centerX,
+            borderBox.fullBounds.getY() - interactionBox.fullBounds.getHeight() / 2 + 0.5
+        )
+    }
+
     /**
      * Forces sharp rendering.
      */
@@ -126,4 +148,25 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
         )
         super.paint(paintContext)
     }
+
+    /**
+     * Basic interaction box for array layer nodes. Ensures a property dialog
+     * appears when the box is double-clicked.
+     */
+    inner class ArrayLayerInteractionBox(net: NetworkPanel) : InteractionBox(net) {
+
+        override val contextMenu: JPopupMenu?
+            get() = this@ArrayLayerNode.contextMenu
+
+        override val propertyDialog: StandardDialog?
+            get() = this@ArrayLayerNode.propertyDialog
+
+        override val model: ArrayLayer
+            get() = this@ArrayLayerNode.layer
+
+        override val toolTipText: String
+            get() = this@ArrayLayerNode.toolTipText ?: ""
+
+    }
+
 }

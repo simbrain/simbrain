@@ -12,7 +12,6 @@ import org.simbrain.util.piccolo.addBorder
 import org.simbrain.util.table.MatrixDataFrame
 import org.simbrain.util.table.SimbrainTablePanel
 import smile.math.matrix.Matrix
-import java.awt.Color
 import java.awt.event.ActionEvent
 import java.awt.geom.Point2D
 import javax.swing.*
@@ -111,15 +110,7 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
 
     val feedForwardW2Label = feedForwardGroup.addLabel("Hidden -> Output")
 
-    /**
-     * Text corresponding to neuron's (optional) label.
-     */
-    private val labelText = PText()
 
-    /**
-     * Background for label text, so that background objects don't show up.
-     */
-    private val labelBackground = PNode()
 
     override val margin = 10.0
 
@@ -141,13 +132,7 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
 
         val events = transformerBlock.events
 
-        // TODO: Link to network preferences
-        labelBackground.paint = Color.white
-        labelBackground.setBounds(labelText.bounds)
-        labelBackground.addChild(labelText)
-        addChild(labelBackground)
-        events.labelChanged.on(Dispatchers.Swing) { o, n -> updateTextLabels() }
-        updateTextLabels()
+
 
         events.updated.on {
             events.updateGraphics.fire()
@@ -325,19 +310,9 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
         get() = transformerBlock
 
     /**
-     * Update the text label.
+     * Update the text labels for components.
      */
     fun updateTextLabels() {
-        if (!transformerBlock.label.isNullOrEmpty()) {
-            labelText.font = NEURON_FONT
-            labelText.text = transformerBlock.label
-            labelText.setOffset(
-                this.selfAttentionImage.x - labelText.width / 2 + this.selfAttentionImage.width / 2,
-                this.selfAttentionImage.y - labelText.height - 17
-            )
-            labelBackground.setBounds(labelText.fullBounds)
-        }
-
         fun PText.centerBelow(image: PImage, padding: kotlin.Double = 0.0) {
             setBounds(
                 image.x + image.width / 2 - width / 2,

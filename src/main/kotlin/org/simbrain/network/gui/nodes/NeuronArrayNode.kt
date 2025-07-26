@@ -4,7 +4,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PImage
-import org.piccolo2d.nodes.PText
 import org.simbrain.network.core.Layer
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.randomizeBiases
@@ -18,7 +17,6 @@ import org.simbrain.util.table.SimbrainTablePanel
 import org.simbrain.workspace.couplings.getConsumer
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
-import java.awt.Color
 import java.awt.event.ActionEvent
 import javax.swing.AbstractAction
 import javax.swing.Action
@@ -91,14 +89,11 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
     protected val biasImage = PImage()
 
     /**
-     * Text corresponding to neuron's (optional) label.
-     */
-    private val labelText = PText()
-
-    /**
      * Background for label text, so that background objects don't show up.
      */
     private val labelBackground = PNode()
+
+    private val imageSize = 100.0
 
     /**
      * If true, show the image array as a grid; if false show it as a horizontal line.
@@ -133,15 +128,6 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
     private val flatPixelArrayHeight = 10
 
     /**
-     * Text showing info about the array.
-     */
-    private val infoText = PText().apply {
-        font = INFO_FONT
-        text = computeInfoText()
-        mainNode.addChild(this)
-    }
-
-    /**
      * Create a new neuron array node.
      *
      * @param np Reference to NetworkPanel
@@ -160,13 +146,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         gridMode = neuronArray.gridMode
         showBias = neuronArray.isShowBias
 
-        // TODO: Link to network preferences
-        labelBackground.paint = Color.white
-        labelBackground.setBounds(labelText.bounds)
-        labelBackground.addChild(labelText)
         addChild(labelBackground)
-        events.labelChanged.on(Dispatchers.Swing) { o, n -> updateTextLabel() }
-        updateTextLabel()
 
         events.updated.on {
             events.updateGraphics.fire()
@@ -174,7 +154,6 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
 
         events.updateGraphics.on(Dispatchers.Swing) {
             updateActivationImage()
-            updateInfoText()
         }
         events.updateRuleChanged.on(Dispatchers.Swing) {
             if (!neuronArray.updateRule.isSpikingRule) {
@@ -184,10 +163,11 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         events.clampChanged.on(Dispatchers.Swing) {
             updateActivationImage()
         }
+
         updateActivationImage()
-        neuronCircleGroup.setOffset(NEURON_DIAMETER / 2.0, NEURON_DIAMETER / 2.0 + 20.0 + infoText.height)
-        activationImage.offset(0.0, infoText.offset.y + infoText.height + 5)
-        spikeImage.offset(0.0, infoText.offset.y + infoText.height + 5)
+        neuronCircleGroup.setOffset(NEURON_DIAMETER / 2.0, NEURON_DIAMETER / 2.0 + 20.0)
+        activationImage.offset(0.0, 5.0)
+        spikeImage.offset(0.0, 5.0)
         activationImage.addBorder()
         updateBorder()
 
@@ -208,7 +188,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             activationImage.image = img
             activationImage.setBounds(
                 0.0, 0.0,
-                infoText.width, infoText.width
+                imageSize, imageSize
             )
             activationImage.addBorder()
             if (neuronArray.updateRule.isSpikingRule) {
@@ -216,15 +196,15 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                 spikeImage.image = spikes.toOverlay(len, len, NetworkPreferences.spikingColor)
                 spikeImage.setBounds(
                     0.0, 0.0,
-                    infoText.width, infoText.width
+                    imageSize, imageSize
                 )
                 spikeImage.addBorder()
             }
             if (showBias) {
                 biasImage.image = neuronArray.biases.toDoubleArray().toSimbrainColorImage(len, len)
                 biasImage.setBounds(
-                    0.0, infoText.width + infoText.height + margin,
-                    infoText.width, infoText.width
+                    0.0, imageSize + margin,
+                    imageSize, imageSize
                 )
                 biasImage.addBorder()
             }
@@ -235,7 +215,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             activationImage.image = img
             activationImage.setBounds(
                 0.0, 0.0,
-                infoText.width, flatPixelArrayHeight.toDouble()
+                imageSize, flatPixelArrayHeight.toDouble()
             )
             activationImage.addBorder()
             if (neuronArray.updateRule.isSpikingRule) {
@@ -243,15 +223,15 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                 spikeImage.image = spikes.toOverlay(activations.size, 1, NetworkPreferences.spikingColor)
                 spikeImage.setBounds(
                     0.0, 0.0,
-                    infoText.width, flatPixelArrayHeight.toDouble()
+                    imageSize, flatPixelArrayHeight.toDouble()
                 )
                 spikeImage.addBorder()
             }
             if (showBias) {
                 biasImage.image = neuronArray.biases.toDoubleArray().toSimbrainColorImage(activations.size, 1)
                 biasImage.setBounds(
-                    0.0, flatPixelArrayHeight.toDouble() + infoText.height + margin,
-                    infoText.width, flatPixelArrayHeight.toDouble()
+                    0.0, flatPixelArrayHeight.toDouble() + margin,
+                    imageSize, flatPixelArrayHeight.toDouble()
                 )
                 biasImage.addBorder()
             }
@@ -282,19 +262,6 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                 renderFlatImages()
             }
         }
-        updateTextLabel()
-    }
-
-    private fun computeInfoText() = """
-            ${neuronArray.id}    Nodes: ${neuronArray.size}
-            Mean activation: ${neuronArray.activations.toDoubleArray().average().format(4)}
-            """.trimIndent()
-
-    /**
-     * Update status text.
-     */
-    private fun updateInfoText() {
-        infoText.text = computeInfoText()
     }
 
     override val toolTipText
@@ -391,7 +358,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                 description = "Randomize the biases of this neuron array",
                 iconPath = "menu_icons/Rand.png"
             ) {
-                with(network) {
+                with(networkPanel.network) {
                     networkPanel.selectionManager
                         .filterSelectedModels<NeuronArray>()
                         .forEach { it.randomizeBiases() }
@@ -485,9 +452,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
 
         nanList.map { it.model }.createEditorDialog(
             titleName = if (nanList.size == 1) "Edit ${nanList.first().neuronArray.displayName}" else "Edit ${nanList.size} Neuron Arrays"
-        ) {
-            nanList.forEach { it.updateInfoText() }
-        }
+        )
     }
 
     override val propertyDialog: StandardDialog?
@@ -496,21 +461,6 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
     override val model: NeuronArray
         get() = neuronArray
 
-    /**
-     * Update the text label.
-     */
-    fun updateTextLabel() {
-        if (!neuronArray.label.isNullOrEmpty()) {
-            labelText.font = NEURON_FONT
-            labelText.text = "" + neuronArray.label
-            swingInvokeLater {
-                labelText.setOffset(
-                    borderBox.x + borderBox.width / 2 - labelText.width / 2,
-                    borderBox.y - labelText.height - 5
-                )
-                labelBackground.setBounds(labelText.fullBounds)
-            }
-        }
-    }
+
 
 }

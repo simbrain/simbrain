@@ -2,7 +2,6 @@ package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
-import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PImage
 import org.piccolo2d.nodes.PText
 import org.simbrain.network.core.ActivationSequence
@@ -13,7 +12,6 @@ import org.simbrain.util.*
 import org.simbrain.util.piccolo.addBorder
 import org.simbrain.util.table.MatrixDataFrame
 import org.simbrain.util.table.SimbrainTablePanel
-import java.awt.Color
 import java.awt.event.ActionEvent
 import javax.swing.AbstractAction
 import javax.swing.Action
@@ -42,15 +40,6 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
 
     protected val biasImage = PImage()
 
-    /**
-     * Text corresponding to neuron's (optional) label.
-     */
-    private val labelText = PText()
-
-    /**
-     * Background for label text, so that background objects don't show up.
-     */
-    private val labelBackground = PNode()
 
     override val margin = 10.0
 
@@ -78,13 +67,7 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
 
         val events = activationSequence.events
 
-        // TODO: Link to network preferences
-        labelBackground.paint = Color.white
-        labelBackground.setBounds(labelText.bounds)
-        labelBackground.addChild(labelText)
-        addChild(labelBackground)
-        events.labelChanged.on(Dispatchers.Swing) { o, n -> updateTextLabel() }
-        updateTextLabel()
+
 
         events.updated.on {
             events.updateGraphics.fire()
@@ -119,7 +102,6 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
             infoText.width, infoText.width
         )
         activationImage.addBorder()
-        updateTextLabel()
     }
 
     private fun computeInfoText() = """
@@ -228,15 +210,5 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
     override val model: ActivationSequence
         get() = activationSequence
 
-    fun updateTextLabel() {
-        if (!activationSequence.label.isNullOrEmpty()) {
-            labelText.font = NEURON_FONT
-            labelText.text = "" + activationSequence.label
-            labelText.setOffset(
-                activationImage.x - labelText.width / 2 + activationImage.width / 2,
-                activationImage.y - labelText.height - 17
-            )
-            labelBackground.setBounds(labelText.fullBounds)
-        }
-    }
+
 }

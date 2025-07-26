@@ -133,7 +133,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     /**
      * Whether to display free weights (those not in a synapse group) or not.
      */
-    var freeWeightsVisible = true
+    var freeWeightsVisible = false
         set(value) {
             field = value
             network.freeSynapses.forEach { it.isVisible = value }

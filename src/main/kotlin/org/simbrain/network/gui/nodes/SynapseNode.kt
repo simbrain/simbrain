@@ -31,6 +31,9 @@ import kotlin.math.abs
 import kotlin.math.atan
 import kotlin.math.cos
 import kotlin.math.sin
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  *  Piccolo representation of [Synapse]
@@ -195,6 +198,11 @@ class SynapseNode(
     private fun updateSpikeColor() {
         if (with(networkPanel.network) { source.neuron.isSpike }) {
             line!!.strokePaint = spikingColor
+            synapse.isVisible = true
+            CoroutineScope(Dispatchers.Main).launch {
+                delay(50)  // keep visible for 100 ms or adjust as needed
+                synapse.isVisible = false  // hide after delay
+            }
         } else {
             line!!.strokePaint = lineColor
         }

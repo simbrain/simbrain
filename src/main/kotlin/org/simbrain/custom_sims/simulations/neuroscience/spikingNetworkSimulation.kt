@@ -312,7 +312,6 @@ val spikingNetworkSimulation = newSim {
 
         ## Other things you can try:
 
-        - IMPORTANT NOTE: press `5` or on the neuron display window, click 'View' then 'Toggle Weight Visibility' to toggle weight visibility connections, and increase performance and run simulation. Bring them back when simulation is paused to edit and see spikes more clearly.
         - Press `k` periodically to clear activation.
         - Pass the wand over neurons in the network (when it is relatively quiet) and watch the result in the raster plot.
         - Use the buttons to set indicated properties and observe impact on dynamics. 

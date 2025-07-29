@@ -2,10 +2,8 @@ package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
-import org.piccolo2d.PNode
-import org.piccolo2d.nodes.PText
+import org.piccolo2d.PCamera
 import org.piccolo2d.util.PPaintContext
-import org.simbrain.network.core.AbstractNeuronCollection
 import org.simbrain.network.core.Connector
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
@@ -52,44 +50,26 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
 
     private val arrow = WeightMatrixArrow(this)
 
-    private val interactionBox = WeightMatrixInteractionBox()
-
-    val labelNode = PNode()
-
-    /**
-     * Text corresponding to weight matrix's (optional) label.
-     */
-    private val labelText = PText().also {
-        it.font = NEURON_FONT
-        labelNode.addChild(it)
-    }
-
-    /**
-     * Background for label text, so that background objects don't show up.
-     */
-    private val labelBackground = PNode().apply {
-        paint = Color.white
-        setBounds(labelText.bounds)
-        addChild(labelText)
-    }.also { labelNode.addChild(it) }
+    val interactionBox: WeightMatrixInteractionBox = WeightMatrixInteractionBox(networkPanel)
 
     val sourceNode by lazy { networkPanel.getNode(weightMatrix.source) }
     val targetNode by lazy { networkPanel.getNode(weightMatrix.target) }
 
     init {
-        updateShowWeights()
         pickable = true
         val events = weightMatrix.events
         events.updated.on { events.updateGraphics.fire() }
         events.clampChanged.on { setClamped((weightMatrix as WeightMatrix).clamped) }
         events.updateGraphics.on(Dispatchers.Swing) { renderMatrixToImage() }
         events.labelChanged.on(Dispatchers.Swing) { _, newLabel -> 
-            updateTextLabel()
+            interactionBox.setText(weightMatrix.displayName)
         }
-        addChild(labelNode)
+        addChild(interactionBox)
+        addChild(arrow)
+        addChild(imageBox)
+        
         fun updateLocations() {
             arrow.invalidateFullBounds()
-            updateInteractionBoxLocation()
         }
         weightMatrix.source.events.locationChanged.on(Dispatchers.Swing) {
             updateLocations()
@@ -103,19 +83,17 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         (weightMatrix.target as? NeuronArray)?.events?.visualPropertiesChanged?.on(Dispatchers.Swing) {
             updateLocations()
         }
+        networkPanel.canvas.camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM) {
+            updateLocations()
+        }
+        networkPanel
         invalidateFullBounds()
-        weightMatrix.events.showWeightsChanged.on { updateShowWeights() }
         weightMatrix.events.colorPreferencesChanged.on {
             imageBox.box.strokePaint = NetworkPreferences.weightMatrixBoundaryColor
         }
-        interactionBox.setText(weightMatrix.displayName)
         setClamped((weightMatrix as WeightMatrix).clamped)
-        updateTextLabel()
-    }
-
-    private fun updateInteractionBoxLocation() {
-        val (x, y) = ((weightMatrix.target.location - weightMatrix.source.location) / 2) + weightMatrix.source.location
-        interactionBox.centerFullBoundsOnPoint(x, y)
+        interactionBox.setText(weightMatrix.displayName)
+        renderMatrixToImage()
     }
 
     /**
@@ -136,24 +114,6 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
 
         val img = imageData.toSimbrainColorImage().let { if (NetworkPreferences.weightMatrixTransposeGraphics) it.transposed() else it }
         imageBox.image = img
-    }
-
-    private fun updateShowWeights() {
-        networkPanel.selectionManager.remove(this)
-        if (weightMatrix.isShowWeights) {
-            arrow.invalidateFullBounds()
-            removeChild(interactionBox)
-            addChild(arrow)
-            addChild(imageBox)
-            renderMatrixToImage()
-            updateTextLabel()
-        } else {
-            updateInteractionBoxLocation()
-            interactionBox.invalidateFullBounds()
-            removeChild(arrow)
-            removeChild(imageBox)
-            addChild(interactionBox)
-        }
     }
 
     override fun paint(paintContext: PPaintContext) {
@@ -274,13 +234,6 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
                 )
             }
 
-            if (model.source is AbstractNeuronCollection) {
-                contextMenu.addSeparator()
-                contextMenu.add(networkPanel.createAction(name = "Toggle show weights") {
-                    weightMatrix.isShowWeights = !weightMatrix.isShowWeights
-                })
-            }
-
             // Coupling menu
             contextMenu.addSeparator()
             val couplingMenu: JMenu = networkPanel.networkComponent.createCouplingMenu(weightMatrix)
@@ -349,36 +302,22 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         get() = weightMatrix
 
     /**
-     * Update the text label. Only shows the label when weights are being displayed and label is defined.
+     * Basic interaction box for weight matrix nodes. Ensures a property dialog
+     * appears when the box is double-clicked.
      */
-    private fun updateTextLabel() {
-        if (weightMatrix.isShowWeights && !weightMatrix.label.isNullOrEmpty()) {
-            labelNode.visible = true
-            labelText.text = weightMatrix.label
-            swingInvokeLater {
-                labelBackground.setBounds(labelText.fullBounds)
-                // text is placed on top of the image, which depends on the location of the arrow
-                arrow.invalidateFullBounds()
-            }
-        } else {
-            labelNode.visible = false
-        }
-    }
-
-    inner class WeightMatrixInteractionBox : InteractionBox(networkPanel) {
-
-        override val propertyDialog: StandardDialog? = this@WeightMatrixNode.propertyDialog
-
-        override val model: Connector
-            get() = weightMatrix
-
-        override val isDraggable: Boolean = false
+    inner class WeightMatrixInteractionBox(net: NetworkPanel) : InteractionBox(net) {
 
         override val contextMenu: JPopupMenu
             get() = this@WeightMatrixNode.contextMenu
 
-        override val toolTipText: String
-            get() = this@WeightMatrixNode.toolTipText
+        override fun createEditDialog(): StandardDialog? {
+            return this@WeightMatrixNode.createEditDialog()
+        }
 
+        override val isDraggable: Boolean
+            get() = false
+
+        override val model: Connector
+            get() = this@WeightMatrixNode.model
     }
 }

@@ -15,15 +15,6 @@ abstract class Connector(var source: Layer, var target: Layer) : NetworkModel(),
     override val events: ConnectorEvents = ConnectorEvents()
 
     /**
-     * If true render an image showing all weight strengths as pixels
-     */
-    var isShowWeights: Boolean = true
-        set(showWeights) {
-            field = showWeights
-            events.showWeightsChanged.fire()
-        }
-
-    /**
      * A matrix of PSRs (post-synaptic responses) for each connection.
      */
     abstract val psrMatrix: Matrix

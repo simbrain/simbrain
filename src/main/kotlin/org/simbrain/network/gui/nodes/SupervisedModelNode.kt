@@ -151,7 +151,7 @@ class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: Super
      * Basic interaction box for supervisedModel nodes. Ensures a property dialog
      * appears when the box is double-clicked.
      */
-    inner class SupervisedModelNodeInteractionBox(net: NetworkPanel?) : InteractionBox(net) {
+    inner class SupervisedModelNodeInteractionBox(net: NetworkPanel) : InteractionBox(net) {
 
         override val contextMenu: JPopupMenu
             get() = this@SupervisedModelNode.contextMenu

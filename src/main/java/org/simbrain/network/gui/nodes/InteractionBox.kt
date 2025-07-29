@@ -1,78 +1,154 @@
-package org.simbrain.network.gui.nodes;
+package org.simbrain.network.gui.nodes
 
-import org.piccolo2d.PCamera;
-import org.piccolo2d.nodes.PText;
-import org.simbrain.network.gui.NetworkPanel;
-
-import java.awt.*;
-import java.awt.geom.Rectangle2D;
-import java.beans.PropertyChangeListener;
+import org.piccolo2d.PCamera
+import org.piccolo2d.PNode
+import org.piccolo2d.event.PBasicInputEventHandler
+import org.piccolo2d.event.PInputEvent
+import org.piccolo2d.nodes.PPath
+import org.piccolo2d.nodes.PText
+import org.simbrain.network.gui.NetworkPanel
+import java.awt.BasicStroke
+import java.awt.Color
+import java.awt.geom.Rectangle2D
+import java.beans.PropertyChangeEvent
+import java.beans.PropertyChangeListener
 
 /**
  * Interaction Box: graphical element for interacting with a group. Subclasses support custom menus, dialogs, etc.
  */
-public abstract class InteractionBox extends ScreenElement {
+abstract class InteractionBox(networkPanel: NetworkPanel) : ScreenElement(networkPanel) {
+
+    private val textLabel: PText
+    private val hamburgerMenu: PNode
 
     /**
-     * Width of interaction box.
+     * Padding values for layout
      */
-    private final static float DEFAULT_WIDTH = 20;
-
-    /**
-     * Height of interaction box.
-     */
-    private final static float DEFAULT_HEIGHT = 10;
-
-    /**
-     * Text label.
-     */
-    private final PText textLabel;
+    private val paddingX = 4.0
+    private val paddingY = 0.0
+    private val hamburgerPadding = 3.0
 
     /**
      * This is the largest amount an interaction box's scale can be zoomed when the scale gets small. Easiest to
      * understand by changing the value and "zooming  out" of a network containing a neuron group.
      */
-    private final double largestZoomRescaleFactor = 4;
+    private val largestZoomRescaleFactor = 4.0
 
     /**
      * Reference to property change listener so it can be cleaned up later.
      */
-    private final PropertyChangeListener zoomListener;
+    val zoomListener: PropertyChangeListener = PropertyChangeListener { evt: PropertyChangeEvent? ->
+        val viewScale = networkPanel.canvas.camera.viewScale
+        if (viewScale < 1) {
+            // Rescale based on linear equation so that as view scale
+            // goes from 1 to 0 rescaleAmount goes from 1 to "largestZoomRescaleFactor"
+            val rescaleAmount = (1 - largestZoomRescaleFactor) * viewScale + largestZoomRescaleFactor
+            setScale(rescaleAmount)
+        } else {
+            setScale(1.0)
+        }
+    }
 
     /**
      * Rectangle that displays the box.
      */
-    private final Rectangle2D rect = new Rectangle2D.Float(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    private val rect: Rectangle2D = Rectangle2D.Float(0f, 0f, DEFAULT_WIDTH, DEFAULT_HEIGHT)
 
     /**
      * Create a new tab node.
      */
-    public InteractionBox(final NetworkPanel net) {
-        super(net);
-
-        this.append(rect, false);
-        Color color = new Color(248, 252, 184);
-        setPaint(color);
+    init {
+        this.append(rect, false)
+        val color = Color(248, 252, 184)
+        setPaint(color)
         // setTransparency(.2f);
-        setStrokePaint(java.awt.Color.GRAY);
-        textLabel = new PText();
-        addChild(textLabel);
+        setStrokePaint(Color.GRAY)
+        
+        textLabel = PText()
+        addChild(textLabel)
+        
+        // Create hamburger menu button
+        hamburgerMenu = createHamburgerMenu()
+        addChild(hamburgerMenu)
+        
+        networkPanel.canvas.camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, zoomListener)
+    }
 
-        // Add listener to camera which causes the interaction box
-        // to re-scale when the canvas is "zoomed out" (view scale below 1)
-        zoomListener = evt -> {
-            double viewScale = net.getCanvas().getCamera().getViewScale();
-            if (viewScale < 1) {
-                // Rescale based on linear equation so that as view scale
-                // goes from 1 to 0 rescaleAmount goes from 1 to "largestZoomRescaleFactor"
-                double rescaleAmount = (1 - largestZoomRescaleFactor) * viewScale + largestZoomRescaleFactor;
-                setScale(rescaleAmount);
-            } else {
-                setScale(1);
+    /**
+     * Creates a three-dot menu icon with horizontal dots inside a circle
+     */
+    private fun createHamburgerMenu(): PNode {
+        val menuNode = PNode()
+        val dotSize = 1.5
+        val dotSpacing = 1.0
+        val dotsWidth = (dotSize * 3) + (dotSpacing * 2)
+        val circlePadding = 2.0
+        val circleSize = maxOf(dotsWidth, dotSize) + (circlePadding * 2)
+        
+        // Set explicit bounds for the menu container with padding for hover area
+        menuNode.setBounds(0.0, 0.0, circleSize + (hamburgerPadding * 2), circleSize + (hamburgerPadding * 2))
+        
+        val dots = mutableListOf<PPath>()
+        val normalDotColor = Color.DARK_GRAY
+        val normalCircleStroke = Color.DARK_GRAY
+        val hoverDotColor = Color.GRAY
+        val hoverCircleStroke = Color.GRAY
+        
+        // Create background circle outline
+        val backgroundCircle = PPath.createEllipse(
+            hamburgerPadding,
+            hamburgerPadding,
+            circleSize,
+            circleSize
+        )
+        backgroundCircle.setPaint(null) // No fill, just outline
+        backgroundCircle.stroke = BasicStroke(1.0f)
+        backgroundCircle.strokePaint = normalCircleStroke
+        menuNode.addChild(backgroundCircle)
+        
+        // Calculate offset to center dots within the circle
+        val dotsStartX = hamburgerPadding + (circleSize - dotsWidth) / 2
+        val dotsStartY = hamburgerPadding + (circleSize - dotSize) / 2
+        
+        // Create three circular dots, arranged horizontally and centered in the circle
+        for (i in 0..2) {
+            val dot = PPath.createEllipse(
+                dotsStartX + i * (dotSize + dotSpacing),
+                dotsStartY,
+                dotSize,
+                dotSize
+            )
+            dot.setPaint(normalDotColor)
+            dot.setStroke(null) // No border, just filled circles
+            dots.add(dot)
+            menuNode.addChild(dot)
+        }
+        
+        // Add input event handlers for click and hover
+        menuNode.addInputEventListener(object : PBasicInputEventHandler() {
+            override fun mouseClicked(event: PInputEvent) {
+                onHamburgerMenuClicked(event)
             }
-        };
-        net.getCanvas().getCamera().addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, zoomListener);
-
+            
+            override fun mouseEntered(event: PInputEvent) {
+                backgroundCircle.strokePaint = hoverCircleStroke
+                dots.forEach { it.setPaint(hoverDotColor) }
+            }
+            
+            override fun mouseExited(event: PInputEvent) {
+                backgroundCircle.strokePaint = normalCircleStroke
+                dots.forEach { it.setPaint(normalDotColor) }
+            }
+        })
+        
+        return menuNode
+    }
+    
+    /**
+     * Override this method in subclasses to handle hamburger menu clicks
+     */
+    protected open fun onHamburgerMenuClicked(event: PInputEvent) {
+        contextMenu?.show(networkPanel, event.canvasPosition.x.toInt(), event.canvasPosition.y.toInt())
     }
 
     /**
@@ -80,39 +156,68 @@ public abstract class InteractionBox extends ScreenElement {
      *
      * @param text the textLabel to set
      */
-    public void setText(String text) {
+    fun setText(text: String?) {
+        var text = text
         if (text == null) {
-            return;
+            return
         }
 
         if (text.isEmpty()) {
-            text = " "; // Use a blank string rather than an empty string so that the box does not disappear
+            text = " " // Use a blank string rather than an empty string so that the box does not disappear
         }
-        textLabel.setText(text);
+        textLabel.setText(text)
 
         // Make smaller than interaction box if scale is 1
         // (Otherwise it keeps getting smaller when editing)
-        if (textLabel.getScale() == 1) {
-            textLabel.scaleAboutPoint(.8, getBounds().getCenter2D().getX(),
-                    getBounds().getCenter2D().getY());
+        if (textLabel.getScale() == 1.0) {
+            textLabel.scaleAboutPoint(
+                .8, bounds.center2D.x,
+                bounds.center2D.y
+            )
         }
 
-        // Set interaction box bounds to text bounds
-        setBounds(textLabel.getBounds());
+        updateLayout()
+    }
+    
+            /**
+     * Updates the layout of text and hamburger menu within the bounds
+     */
+    private fun updateLayout() {
+        // Calculate total width needed (text + padding + menu + padding)
+        val textBounds = textLabel.bounds
+        val menuBounds = hamburgerMenu.bounds  // Now using regular bounds since we set them explicitly
+        val totalWidth = textBounds.width + paddingX + menuBounds.width + paddingX
+        val totalHeight = maxOf(textBounds.height, menuBounds.height) + paddingY * 2
+        
+        // Set the interaction box bounds
+        val newBounds = Rectangle2D.Double(bounds.x, bounds.y, totalWidth, totalHeight)
+        setBounds(newBounds)
+        
+        // Position text on the left with padding
+        textLabel.setOffset(paddingX, (totalHeight - textBounds.height) / 2)
+        
+        // Position hamburger menu on the right with padding
+        hamburgerMenu.setOffset(
+            totalWidth - menuBounds.width,
+            (totalHeight - menuBounds.height) / 2
+        )
     }
 
-    // See MouseEventHandler.kt#dragItems
-    @Override
-    public boolean isDraggable() {
-        return false;
+    override val isDraggable: Boolean = false
+
+    public override fun acceptsSourceHandle(): Boolean {
+        return true
     }
 
-    public PropertyChangeListener getZoomListener() {
-        return zoomListener;
-    }
+    companion object {
+        /**
+         * Width of interaction box.
+         */
+        private const val DEFAULT_WIDTH = 20f
 
-    @Override
-    public boolean acceptsSourceHandle() {
-        return true;
+        /**
+         * Height of interaction box.
+         */
+        private const val DEFAULT_HEIGHT = 10f
     }
 }

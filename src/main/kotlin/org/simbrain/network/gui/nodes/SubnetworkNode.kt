@@ -209,7 +209,7 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
      * Basic interaction box for subnetwork nodes. Ensures a property dialog
      * appears when the box is double-clicked.
      */
-    inner class SubnetworkNodeInteractionBox(net: NetworkPanel?) : InteractionBox(net) {
+    inner class SubnetworkNodeInteractionBox(net: NetworkPanel) : InteractionBox(net) {
 
         override val contextMenu: JPopupMenu?
             get() = this@SubnetworkNode.contextMenu

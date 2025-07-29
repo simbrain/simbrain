@@ -22,6 +22,9 @@ import java.awt.image.BufferedImage
  */
 val simpleImageWorld = newSim {
 
+    val numCategories = 7
+    val numHiddenNodes = 64
+
     // Basic setup
     workspace.clearWorkspace()
     val networkComponent = addNetworkComponent("Network")
@@ -35,12 +38,13 @@ val simpleImageWorld = newSim {
         layout(GridLayout(40.0, 40.0))
     }
 
-    val hidden = network.addNeuronCollection(64).apply {
+    val hidden = network.addNeuronCollection(numHiddenNodes).apply {
         label = "Hidden"
         layout(GridLayout(40.0, 40.0))
     }
 
-    val outputs = network.addNeuronCollection(10).apply {
+    // The number of neurons determines how many categories are shown
+    val outputs = network.addNeuronCollection(numCategories).apply {
         label = "Outputs"
         (updateRule as? BoundedUpdateRule)?.apply {
             upperBound = 1.0

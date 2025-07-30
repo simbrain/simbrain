@@ -1,4 +1,4 @@
-name: Unified Build
+name: Build and Push
 
 on:
   workflow_dispatch:

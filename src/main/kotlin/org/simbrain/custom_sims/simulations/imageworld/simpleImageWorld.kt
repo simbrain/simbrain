@@ -75,7 +75,7 @@ val simpleImageWorld = newSim {
     val imageWorldComponent = addImageWorld("Image World")
     val imageWorld = imageWorldComponent.world.apply {
         resetImageAlbum(10, 10)
-        setCurrentFilter("Threshold 10x10")
+        setCurrentTransformation("Threshold 10x10")
         repeat(outputs.size) { index ->
             imageAlbum.addImage(BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB))
         }

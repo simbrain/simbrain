@@ -2,13 +2,15 @@ package org.simbrain.world.imageworld.transformations
 
 import org.simbrain.world.imageworld.ImageSource
 import org.simbrain.world.imageworld.events.TransformationCollectionEvents
-import org.simbrain.world.imageworld.filters.*
+import org.simbrain.world.imageworld.filters.Filter
+import org.simbrain.world.imageworld.filters.GrayOp
+import org.simbrain.world.imageworld.filters.IdentityOp
+import org.simbrain.world.imageworld.filters.ThresholdOp
 
 /**
  * Maintains a list of transformations that can be applied to an ImageSource.
- * Renamed from FilterCollection to better distinguish from the new multi-filter system.
  */
-class TransformationCollection(private val imageSource: ImageSource) {
+class TransformationCollection(val imageSource: ImageSource) {
 
     /**
      * List of transformations that can be applied to an image.
@@ -18,7 +20,7 @@ class TransformationCollection(private val imageSource: ImageSource) {
     /**
      * Currently selected transformation.
      */
-    var currentTransformation: Filter? = null
+    lateinit var currentTransformation: Filter
         private set
 
     /**
@@ -119,21 +121,4 @@ class TransformationCollection(private val imageSource: ImageSource) {
 
     val transformations: List<Filter> get() = transformationsList.toList()
 
-    fun getImageSource() = imageSource
-
-    // Legacy methods for backward compatibility
-    @Deprecated("Use transformations instead", ReplaceWith("transformations"))
-    fun getFilters() = transformations
-
-    @Deprecated("Use currentTransformation instead", ReplaceWith("currentTransformation"))
-    fun getCurrentFilter() = currentTransformation
-
-    @Deprecated("Use setCurrentTransformation instead", ReplaceWith("setCurrentTransformation(filter)"))
-    fun setCurrentFilter(filter: Filter) = setCurrentTransformation(filter)
-
-    @Deprecated("Use addTransformation instead", ReplaceWith("addTransformation(filter)"))
-    fun addFilter(filter: Filter) = addTransformation(filter)
-
-    @Deprecated("Use removeTransformation instead", ReplaceWith("removeTransformation(filter)"))
-    fun removeFilter(filter: Filter) = removeTransformation(filter)
 }

@@ -82,13 +82,4 @@ class ImageWorld {
      */
     val currentImage: BufferedImage get() = imageAlbum.currentImage
 
-    // Legacy methods for backward compatibility
-    @Deprecated("Use transformationCollection instead", ReplaceWith("transformationCollection"))
-    val filterCollection get() = transformationCollection
-
-    @Deprecated("Use currentTransformation instead", ReplaceWith("currentTransformation"))
-    val currentFilter get() = currentTransformation
-
-    @Deprecated("Use setCurrentTransformation instead", ReplaceWith("setCurrentTransformation(name)"))
-    fun setCurrentFilter(name: String) = setCurrentTransformation(name)
 }

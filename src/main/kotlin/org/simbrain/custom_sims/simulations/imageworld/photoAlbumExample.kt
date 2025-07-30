@@ -80,7 +80,7 @@ val photoAlbumExample = newSim {
     val imageNames = imageFiles.map { it.nameWithoutExtension }
     val imageCategories = imageNames.associateWith { it.takeWhile { ch -> !ch.isDigit() } }
     imageWorld.loadImages(imageFiles)
-    imageWorld.setCurrentFilter("Color 100x100")
+    imageWorld.setCurrentTransformation("Color 100x100")
 
     // Create training data
     val categoryNames = listOf("bird", "crocodile", "flower", "plane")

@@ -2,8 +2,6 @@ package org.simbrain.world.imageworld
 
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import org.simbrain.world.imageworld.events.ImageEvents
-import org.simbrain.world.imageworld.filters.FilterCollection
 import java.awt.Color
 import java.awt.image.BufferedImage
 
@@ -20,7 +18,7 @@ class ImageWorldTest {
     @Test
     fun `test image world creation`() {
         assertNotNull(imageWorld.imageAlbum)
-        assertNotNull(imageWorld.filterCollection)
+        assertNotNull(imageWorld.transformationCollection)
         assertEquals("Test Image World", imageComponent.name)
     }
 
@@ -71,12 +69,12 @@ class ImageWorldTest {
 
     @Test
     fun `test filter collection`() {
-        val filterCollection = imageWorld.filterCollection
-        assertNotNull(filterCollection.currentFilter)
+        val filterCollection = imageWorld.transformationCollection
+        assertNotNull(filterCollection.currentTransformation)
         
         // Test that filter can be applied
         val originalImage = imageWorld.currentImage
-        val filteredImage = filterCollection.currentFilter.filteredImage
+        val filteredImage = filterCollection.currentTransformation.filteredImage
         
         // Images should have same dimensions
         assertEquals(originalImage.width, filteredImage.width)
@@ -205,7 +203,7 @@ class ImageWorldTest {
         // Basic checks
         assertNotNull(deserializedComponent.world)
         assertNotNull(deserializedComponent.world.imageAlbum)
-        assertNotNull(deserializedComponent.world.filterCollection)
+        assertNotNull(deserializedComponent.world.transformationCollection)
     }
 
     @Test

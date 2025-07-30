@@ -2,9 +2,7 @@ package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.*
 import org.simbrain.network.subnetworks.CompetitiveNetwork
-import org.simbrain.util.place
 import org.simbrain.util.toGrayScaleImage
-import org.simbrain.custom_sims.addSidebarInfo
 
 /**
  * Demo for studying Competitive networks with ImageWorld,
@@ -52,7 +50,7 @@ val competitiveImageSim = newSim {
     val imageWorld = component.world.apply {
 
         resetImageAlbum(w, h)
-        setCurrentFilter("Threshold 10x10")
+        setCurrentTransformation("Threshold 10x10")
         imageAlbum.addImage(
             listOf(
                 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,

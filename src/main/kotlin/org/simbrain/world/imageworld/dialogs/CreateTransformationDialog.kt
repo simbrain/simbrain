@@ -2,7 +2,8 @@ package org.simbrain.world.imageworld.dialogs
 
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
-import org.simbrain.world.imageworld.filters.*
+import org.simbrain.world.imageworld.filters.Filter
+import org.simbrain.world.imageworld.filters.IdentityOp
 import org.simbrain.world.imageworld.transformations.TransformationCollection
 import javax.swing.JPanel
 
@@ -24,7 +25,7 @@ class CreateTransformationDialog(private val transformationCollection: Transform
         // Create a template transformation
         val templateTransformation = Filter(
             "Transformation ${transformationCollection.transformations.size + 1}",
-            transformationCollection.getImageSource(),
+            transformationCollection.imageSource,
             IdentityOp(),
             100,
             100

@@ -56,8 +56,12 @@ object NetworkPreferences: PreferenceHolder() {
     @UserParameter(label = "Wand radius", tab = "GUI")
     var wandRadius by IntegerPreference(40)
 
-    @UserParameter(label = "Weight Matrix Transpose Graphics", tab = "GUI")
-    var weightMatrixTransposeGraphics by BooleanPreference(false)
+    @UserParameter(
+        label = "Weight Matrix Target-Source Format",
+        description = "If yes, each row correspond to an output and each column corresponds to an input." +
+                "If no (source-target format),each row corresponds to an input and each column corresponds to an output." ,
+        tab = "GUI")
+    var weightMatrixTransposeGraphics by BooleanPreference(true)
 
     @UserParameter(
         label = "Matrix image max width/height",

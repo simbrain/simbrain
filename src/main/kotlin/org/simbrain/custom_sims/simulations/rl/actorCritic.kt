@@ -301,11 +301,11 @@ val actorCritic = newSim {
     
     # What to Do
     
-    1) Click `Run` using the default parameters on the control panel.
+    1) Click the `run` button in the control panel on the left side of the screen.
     2) Observe the agent's actions. It should figure out how to reach the cheese at the end of the run.
-    3) Open the hidden time series plot that contains `reward`, `value`, and `TD Error`.
-    4) Now, repeatedly click `Run` for a few times after simulation stops. As you continue to run trials, it will increase `value`, make `reward` more frequent, and reduce `TD Error`.     
-    5) After it has learned where the cheese is, keep running, but move the cheese. Observe how it perseverates on old locations. 
+    3) Open the hidden time series plot that contains `reward`, `value`, and `TD error`.
+    4) Now, keep training the agent. As you continue to run trials, it will increase `value`, make `reward` more frequent, and reduce `TD Error`.     
+    5) After it has learned where the cheese is, you can keep training it, but move where the cheese is. Observe how it perseverates on old locations. 
     6) After it learns to find the cheese in the upper left, you can pull the cheese
     down a little, and run until it finds the new spot. You can hold the cheese "near" it to help it along and keep re-running the sim. 
     You can eventually make it learn to follow an arbitrary pattern to find the cheese.

@@ -7,7 +7,6 @@ import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
 import org.simbrain.network.gui.NetworkPanel
-import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.geom.Rectangle2D
 import java.beans.PropertyChangeEvent
@@ -19,14 +18,15 @@ import java.beans.PropertyChangeListener
 abstract class InteractionBox(networkPanel: NetworkPanel) : ScreenElement(networkPanel) {
 
     private val textLabel: PText
-    private val hamburgerMenu: PNode
+    private val kebabMenu: PNode
 
     /**
      * Padding values for layout
      */
     private val paddingX = 4.0
     private val paddingY = 0.0
-    private val hamburgerPadding = 3.0
+    private val kebabPaddingX = 6.0
+    private val kebabPaddingY = 2.0
 
     /**
      * This is the largest amount an interaction box's scale can be zoomed when the scale gets small. Easiest to
@@ -67,54 +67,38 @@ abstract class InteractionBox(networkPanel: NetworkPanel) : ScreenElement(networ
         textLabel = PText()
         addChild(textLabel)
         
-        // Create hamburger menu button
-        hamburgerMenu = createHamburgerMenu()
-        addChild(hamburgerMenu)
+        // Create kebab menu button
+        kebabMenu = createKebabMenu()
+        addChild(kebabMenu)
         
         networkPanel.canvas.camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, zoomListener)
     }
 
     /**
-     * Creates a three-dot menu icon with horizontal dots inside a circle
+     * Creates a three-dot menu icon with vertical dots (kebab style)
      */
-    private fun createHamburgerMenu(): PNode {
+    private fun createKebabMenu(): PNode {
         val menuNode = PNode()
         val dotSize = 1.5
         val dotSpacing = 1.0
-        val dotsWidth = (dotSize * 3) + (dotSpacing * 2)
-        val circlePadding = 2.0
-        val circleSize = maxOf(dotsWidth, dotSize) + (circlePadding * 2)
+        val dotsHeight = (dotSize * 3) + (dotSpacing * 2)
         
         // Set explicit bounds for the menu container with padding for hover area
-        menuNode.setBounds(0.0, 0.0, circleSize + (hamburgerPadding * 2), circleSize + (hamburgerPadding * 2))
+        menuNode.setBounds(0.0, 0.0, dotSize + (kebabPaddingX * 2), dotsHeight + (kebabPaddingY * 2))
         
         val dots = mutableListOf<PPath>()
         val normalDotColor = Color.DARK_GRAY
-        val normalCircleStroke = Color.DARK_GRAY
         val hoverDotColor = Color.GRAY
-        val hoverCircleStroke = Color.GRAY
         
-        // Create background circle outline
-        val backgroundCircle = PPath.createEllipse(
-            hamburgerPadding,
-            hamburgerPadding,
-            circleSize,
-            circleSize
-        )
-        backgroundCircle.setPaint(null) // No fill, just outline
-        backgroundCircle.stroke = BasicStroke(1.0f)
-        backgroundCircle.strokePaint = normalCircleStroke
-        menuNode.addChild(backgroundCircle)
+        // Calculate starting position for dots
+        val dotsStartX = kebabPaddingX
+        val dotsStartY = kebabPaddingY
         
-        // Calculate offset to center dots within the circle
-        val dotsStartX = hamburgerPadding + (circleSize - dotsWidth) / 2
-        val dotsStartY = hamburgerPadding + (circleSize - dotSize) / 2
-        
-        // Create three circular dots, arranged horizontally and centered in the circle
+        // Create three circular dots, arranged vertically
         for (i in 0..2) {
             val dot = PPath.createEllipse(
-                dotsStartX + i * (dotSize + dotSpacing),
-                dotsStartY,
+                dotsStartX,
+                dotsStartY + i * (dotSize + dotSpacing),
                 dotSize,
                 dotSize
             )
@@ -127,16 +111,14 @@ abstract class InteractionBox(networkPanel: NetworkPanel) : ScreenElement(networ
         // Add input event handlers for click and hover
         menuNode.addInputEventListener(object : PBasicInputEventHandler() {
             override fun mouseClicked(event: PInputEvent) {
-                onHamburgerMenuClicked(event)
+                onKebabMenuClicked(event)
             }
             
             override fun mouseEntered(event: PInputEvent) {
-                backgroundCircle.strokePaint = hoverCircleStroke
                 dots.forEach { it.setPaint(hoverDotColor) }
             }
             
             override fun mouseExited(event: PInputEvent) {
-                backgroundCircle.strokePaint = normalCircleStroke
                 dots.forEach { it.setPaint(normalDotColor) }
             }
         })
@@ -145,9 +127,9 @@ abstract class InteractionBox(networkPanel: NetworkPanel) : ScreenElement(networ
     }
     
     /**
-     * Override this method in subclasses to handle hamburger menu clicks
+     * Override this method in subclasses to handle kebab menu clicks
      */
-    protected open fun onHamburgerMenuClicked(event: PInputEvent) {
+    protected open fun onKebabMenuClicked(event: PInputEvent) {
         contextMenu?.show(networkPanel, event.canvasPosition.x.toInt(), event.canvasPosition.y.toInt())
     }
 
@@ -180,12 +162,12 @@ abstract class InteractionBox(networkPanel: NetworkPanel) : ScreenElement(networ
     }
     
             /**
-     * Updates the layout of text and hamburger menu within the bounds
+     * Updates the layout of text and kebab menu within the bounds
      */
     private fun updateLayout() {
         // Calculate total width needed (text + padding + menu + padding)
         val textBounds = textLabel.bounds
-        val menuBounds = hamburgerMenu.bounds  // Now using regular bounds since we set them explicitly
+        val menuBounds = kebabMenu.bounds  // Now using regular bounds since we set them explicitly
         val totalWidth = textBounds.width + paddingX + menuBounds.width + paddingX
         val totalHeight = maxOf(textBounds.height, menuBounds.height) + paddingY * 2
         
@@ -196,8 +178,8 @@ abstract class InteractionBox(networkPanel: NetworkPanel) : ScreenElement(networ
         // Position text on the left with padding
         textLabel.setOffset(paddingX, (totalHeight - textBounds.height) / 2)
         
-        // Position hamburger menu on the right with padding
-        hamburgerMenu.setOffset(
+        // Position kebab menu on the right with padding
+        kebabMenu.setOffset(
             totalWidth - menuBounds.width,
             (totalHeight - menuBounds.height) / 2
         )

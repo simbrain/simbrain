@@ -2,15 +2,14 @@ package org.simbrain.world.imageworld.gui
 
 import org.simbrain.util.ResourceManager
 import org.simbrain.util.StandardDialog
-import org.simbrain.util.swingDispatcher
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
-import org.simbrain.world.imageworld.ImageSource
+import org.simbrain.util.swingDispatcher
 import org.simbrain.world.imageworld.ImageWorldDesktopComponent
 import org.simbrain.world.imageworld.dialogs.CreateTransformationDialog
 import org.simbrain.world.imageworld.dialogs.FilterSelectionDialog
-import org.simbrain.world.imageworld.filters.Filter
 import org.simbrain.world.imageworld.filters.FilterManager
+import org.simbrain.world.imageworld.filters.ImageTransformation
 import org.simbrain.world.imageworld.transformations.TransformationCollection
 import java.awt.Component
 import java.awt.Dimension
@@ -27,15 +26,15 @@ class TransformationCollectionGui(
     private val filterManager: FilterManager
 ) {
 
-    private val transformationComboBox = JComboBox<Filter>()
+    private val transformationComboBox = JComboBox<ImageTransformation>()
 
     init {
         transformationCollection.events.transformationAdded.on(swingDispatcher) { updateComboBox() }
         transformationCollection.events.transformationRemoved.on(swingDispatcher) { updateComboBox() }
-        transformationCollection.events.transformationChanged.on(swingDispatcher) { newTransformation: Filter, _: Filter ->
+        transformationCollection.events.transformationChanged.on(swingDispatcher) { newTransformation: ImageTransformation, _: ImageTransformation ->
             setComboBoxSelection(newTransformation)
         }
-        transformationCollection.events.transformationSelectionChanged.on(swingDispatcher) { transformation: Filter ->
+        transformationCollection.events.transformationSelectionChanged.on(swingDispatcher) { transformation: ImageTransformation ->
             transformationCollection.setCurrentTransformation(transformation)
         }
     }
@@ -50,7 +49,7 @@ class TransformationCollectionGui(
         transformationComboBox.selectedItem = transformationCollection.currentTransformation
         transformationComboBox.maximumSize = Dimension(200, 100)
         transformationComboBox.addActionListener { evt ->
-            val selectedTransformation = transformationComboBox.selectedItem as? Filter
+            val selectedTransformation = transformationComboBox.selectedItem as? ImageTransformation
             if (selectedTransformation != null) {
                 transformationCollection.setCurrentTransformation(selectedTransformation)
                 transformationCollection.events.transformationSelectionChanged.fire(selectedTransformation)
@@ -139,7 +138,7 @@ class TransformationCollectionGui(
         return transformationToolbar
     }
 
-    private fun setComboBoxSelection(transformation: Filter?) {
+    private fun setComboBoxSelection(transformation: ImageTransformation?) {
         transformationComboBox.selectedItem = transformation
     }
 

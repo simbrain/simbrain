@@ -332,6 +332,14 @@ fun generateColorSequence(random: Random = Random(42L)): Sequence<Color> {
     }
 }
 
+fun BufferedImage.getBrightnessArray() = getRGB(0, 0, width, height, null, 0, width).map { color ->
+    val red = ((color ushr 16) and 0xFF) / 255.0
+    val green = ((color ushr 8) and 0xFF) / 255.0
+    val blue = (color and 0xFF) / 255.0
+    // Cf. https://en.wikipedia.org/wiki/Luma_(video)
+    red * 0.2126 + green * 0.7152 + blue * 0.0722
+}.toDoubleArray()
+
 
 fun main() {
     println(graphicalUpperBound(820.0))

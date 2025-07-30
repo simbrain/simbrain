@@ -7,19 +7,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Maintains a list of {@link Filter}s that can be applied to an {@link ImageSource}.
+ * Maintains a list of {@link ImageTransformation}s that can be applied to an {@link ImageSource}.
  */
-public class FilterCollection {
+public class ImageTransformationCollection {
 
     /**
      * List of filters that can be applied to an image.
      */
-    private List<Filter> filters = new ArrayList<>();
+    private List<ImageTransformation> imageTransformations = new ArrayList<>();
 
     /**
      * Currently selected sensor matrix.
      */
-    private Filter currentFilter;
+    private ImageTransformation currentImageTransformation;
 
     /**
      * Provides the image that is filtered.
@@ -31,11 +31,11 @@ public class FilterCollection {
      */
     private transient FilterCollectionEvents events = new FilterCollectionEvents();
 
-    public FilterCollection(ImageSource imageSource) {
+    public ImageTransformationCollection(ImageSource imageSource) {
         this.imageSource = imageSource;
         initializeDefaultFilters();
         imageSource.getEvents().getImageUpdate().on(null, true, () -> {
-            filters.forEach(Filter::applyFilter);
+            imageTransformations.forEach(ImageTransformation::applyFilter);
         });
     }
 
@@ -45,7 +45,7 @@ public class FilterCollection {
     public Object readResolve() {
         events = new FilterCollectionEvents();
         imageSource.getEvents().getImageUpdate().on(() -> {
-            filters.forEach(Filter::applyFilter);
+            imageTransformations.forEach(ImageTransformation::applyFilter);
         });
         return this;
     }
@@ -58,76 +58,76 @@ public class FilterCollection {
     void initializeDefaultFilters() {
 
         // Load default sensor matrices
-        Filter unfiltered = new Filter(
-                "Unfiltered",
+        ImageTransformation unfiltered = new ImageTransformation(
+                "Untransformed",
                 imageSource, new IdentityOp(), imageSource.getWidth(), imageSource.getHeight()
         );
         imageSource.getEvents().getResize().on(null, true, () -> {
             unfiltered.setHeight(imageSource.getCurrentImage().getHeight());
             unfiltered.setWidth(imageSource.getCurrentImage().getWidth());
         });
-        filters.add(unfiltered);
+        imageTransformations.add(unfiltered);
 
-        Filter gray100x100 = new Filter(
+        ImageTransformation gray100x100 = new ImageTransformation(
                 "Gray 100x100",
                 imageSource, new GrayOp(), 100, 100);
-        filters.add(gray100x100);
+        imageTransformations.add(gray100x100);
 
-        Filter color100x100 = new Filter(
+        ImageTransformation color100x100 = new ImageTransformation(
                 "Color 100x100", imageSource, new IdentityOp(), 100, 100);
-        filters.add(color100x100);
+        imageTransformations.add(color100x100);
 
-        Filter threshold10x10 = new Filter(
+        ImageTransformation threshold10x10 = new ImageTransformation(
                 "Threshold 10x10", imageSource, new ThresholdOp(.5f), 10, 10);
-        filters.add(threshold10x10);
+        imageTransformations.add(threshold10x10);
 
-        Filter threshold250x250 = new Filter(
+        ImageTransformation threshold250x250 = new ImageTransformation(
                 "Threshold 250x250",
                 imageSource, new ThresholdOp(.5f), 250, 250);
-        filters.add(threshold250x250);
+        imageTransformations.add(threshold250x250);
 
-        currentFilter = filters.get(0);
+        currentImageTransformation = imageTransformations.get(0);
     }
 
     /**
      * Add a new filterContainer to the list.
      *
-     * @param filter the filterContainer to add
+     * @param imageTransformation the filterContainer to add
      */
-    public void addFilter(Filter filter) {
-        filters.add(filter);
-        events.getFilterAdded().fire(filter);
+    public void addFilter(ImageTransformation imageTransformation) {
+        imageTransformations.add(imageTransformation);
+        events.getImageTransformationAdded().fire(imageTransformation);
     }
 
     /**
      * Remove the indicated sensor matrix.
      *
-     * @param filter the sensor matrix to remove
+     * @param imageTransformation the sensor matrix to remove
      */
-    public void removeFilter(Filter filter) {
+    public void removeFilter(ImageTransformation imageTransformation) {
         // Can't remove the "Unfiltered" option
-        if (filter.getName().equalsIgnoreCase("Unfiltered")) {
+        if (imageTransformation.getName().equalsIgnoreCase("Unfiltered")) {
             return;
         }
-        filters.remove(filter);
-        getEvents().getFilterRemoved().fire(filter);
+        imageTransformations.remove(imageTransformation);
+        getEvents().getImageTransformationRemoved().fire(imageTransformation);
     }
 
     public ImageSource getImageSource() {
         return imageSource;
     }
 
-    public List<Filter> getFilters() {
-        return filters;
+    public List<ImageTransformation> getFilters() {
+        return imageTransformations;
     }
 
-    public Filter getCurrentFilter() {
-        return currentFilter;
+    public ImageTransformation getCurrentFilter() {
+        return currentImageTransformation;
     }
 
 
-    public void setCurrentFilter(Filter currentFilter) {
-        this.currentFilter = currentFilter;
+    public void setCurrentFilter(ImageTransformation currentImageTransformation) {
+        this.currentImageTransformation = currentImageTransformation;
     }
 
     public FilterCollectionEvents getEvents() {

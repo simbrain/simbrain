@@ -3,9 +3,9 @@ package org.simbrain.world.imageworld.dialogs;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 import org.simbrain.util.widgets.ShowHelpAction;
-import org.simbrain.world.imageworld.filters.Filter;
-import org.simbrain.world.imageworld.filters.FilterCollection;
 import org.simbrain.world.imageworld.filters.IdentityOp;
+import org.simbrain.world.imageworld.filters.ImageTransformation;
+import org.simbrain.world.imageworld.filters.ImageTransformationCollection;
 
 import javax.swing.*;
 
@@ -14,26 +14,26 @@ import javax.swing.*;
  */
 public class CreateFilterDialog extends StandardDialog {
 
-    private final FilterCollection filterCollection;
+    private final ImageTransformationCollection imageTransformationCollection;
 
     private final AnnotatedPropertyEditor editorPanel;
 
-    private Filter templateFilter;
+    private ImageTransformation templateImageTransformation;
 
-    public CreateFilterDialog(FilterCollection filterCollection) {
+    public CreateFilterDialog(ImageTransformationCollection imageTransformationCollection) {
         setTitle("Create Filter");
-        this.filterCollection = filterCollection;
+        this.imageTransformationCollection = imageTransformationCollection;
 
         // TODO: rename help
         ShowHelpAction helpAction = new ShowHelpAction("https://docs.simbrain.net/docs/worlds/imageworld.html");
         addButton(new JButton(helpAction));
 
-        templateFilter =
-                new Filter("Filter " + (filterCollection.getFilters().size() + 1),
-                        filterCollection.getImageSource(),
+        templateImageTransformation =
+                new ImageTransformation("Filter " + (imageTransformationCollection.getFilters().size() + 1),
+                        imageTransformationCollection.getImageSource(),
                         new IdentityOp(), 100, 100);
 
-        editorPanel = new AnnotatedPropertyEditor(templateFilter);
+        editorPanel = new AnnotatedPropertyEditor(templateImageTransformation);
         Box mainPanel = Box.createVerticalBox();
         mainPanel.add(editorPanel);
 
@@ -53,8 +53,8 @@ public class CreateFilterDialog extends StandardDialog {
      */
     public void commitChanges() {
         editorPanel.commitChanges();
-        templateFilter.applyFilter();
-        filterCollection.addFilter(templateFilter);
-        filterCollection.setCurrentFilter(templateFilter);
+        templateImageTransformation.applyFilter();
+        imageTransformationCollection.addFilter(templateImageTransformation);
+        imageTransformationCollection.setCurrentFilter(templateImageTransformation);
     }
 }

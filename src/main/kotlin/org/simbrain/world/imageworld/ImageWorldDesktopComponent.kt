@@ -7,8 +7,8 @@ import org.simbrain.workspace.gui.CouplingMenu
 import org.simbrain.workspace.gui.DesktopComponent
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import org.simbrain.world.imageworld.ImageWorldPreferences.imageDirectory
+import org.simbrain.world.imageworld.filters.ImageTransformation
 import org.simbrain.world.imageworld.gui.TransformationCollectionGui
-import org.simbrain.world.imageworld.filters.Filter
 import java.awt.*
 import java.awt.event.ActionEvent
 import java.awt.event.MouseAdapter
@@ -160,21 +160,14 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
 
         override fun paintComponent(g: Graphics) {
             super.paintComponent(g)
-            
-            // Apply transformation first
-            imageWorld.transformationCollection.currentTransformation?.applyFilter()
-            val transformedImage = imageWorld.transformationCollection.currentTransformation?.filteredImage
-            
+
+            imageWorld.transformationCollection.currentTransformation.applyFilter()
+            val transformedImage = imageWorld.transformationCollection.currentTransformation.transformedImage
+
             // Then apply filters in sequence
-            val finalImage = if (transformedImage != null) {
-                imageWorld.filterManager.applyFilters(transformedImage)
-            } else {
-                null
-            }
-            
-            if (finalImage != null) {
-                g.drawImage(finalImage, 0, 0, width, height, this)
-            }
+            val finalImage = imageWorld.filterManager.applyFilters(transformedImage)
+
+            g.drawImage(finalImage, 0, 0, width, height, this)
         }
 
         /**
@@ -637,8 +630,8 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
             updateToolbar()
             repaint()
         }
-        imageWorld.transformationCollection.events.transformationChanged.on(swingDispatcher) { _: Filter, _: Filter -> this.repaint() }
-        imageWorld.transformationCollection.events.transformationSelectionChanged.on(swingDispatcher) { _: Filter -> this.repaint() }
+        imageWorld.transformationCollection.events.transformationChanged.on(swingDispatcher) { _: ImageTransformation, _: ImageTransformation -> this.repaint() }
+        imageWorld.transformationCollection.events.transformationSelectionChanged.on(swingDispatcher) { _: ImageTransformation -> this.repaint() }
 
         // Toolbars
         val transformationGui = TransformationCollectionGui(this, imageWorld.transformationCollection, imageWorld.filterManager)

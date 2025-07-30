@@ -74,7 +74,7 @@ class ImageWorldTest {
         
         // Test that filter can be applied
         val originalImage = imageWorld.currentImage
-        val filteredImage = filterCollection.currentTransformation.filteredImage
+        val filteredImage = filterCollection.currentTransformation.transformedImage
         
         // Images should have same dimensions
         assertEquals(originalImage.width, filteredImage.width)

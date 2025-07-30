@@ -2,6 +2,7 @@ package org.simbrain.world.imageworld.filters
 
 import org.simbrain.util.CachedObject
 import org.simbrain.util.UserParameter
+import org.simbrain.util.getBrightnessArray
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Producible
@@ -27,11 +28,11 @@ import java.awt.image.BufferedImage
  * @author Tim Shea
  * @author Jeff Yoshimi
  */
-class Filter(
+class ImageTransformation(
     @UserParameter(label = "Name") override var id: String,
     val source: ImageSource,
 
-    @UserParameter(label = "Filter", order = 3)
+    @UserParameter(label = "Image Operation", order = 3)
     var imageOp: ImageOperation<*>,
 
     width: Int,
@@ -58,16 +59,16 @@ class Filter(
      */
     @Transient
     private var filteredImageCache: CachedObject<BufferedImage> = CachedObject {
-        createFilteredImage()
+        createTransformedImage()
     }
 
-    var filteredImage by filteredImageCache::value
+    var transformedImage by filteredImageCache::value
 
     /**
      * Array of ints representing rgb colors. See [BufferedImage.getRGB]
      */
-    @get:Producible
-    val rGBColor: IntArray get() = filteredImage.getRGB(0, 0, width, height, null, 0, width)
+    @get:Producible(defaultVisibility = false)
+    val rGBColor: IntArray get() = transformedImage.getRGB(0, 0, width, height, null, 0, width)
 
     init {
         applyFilter()
@@ -78,46 +79,40 @@ class Filter(
      */
     fun readResolve(): Any {
         // Reinitialize the transient cache after deserialization
-        filteredImageCache = CachedObject { createFilteredImage() }
+        filteredImageCache = CachedObject { createTransformedImage() }
         applyFilter()
         return this
     }
 
-    @get:Producible
+    @get:Producible(defaultVisibility = false)
     val brightness: DoubleArray
-        get() = filteredImage.getRGB(0, 0, width, height, null, 0, width).map { color ->
-            val red = ((color ushr 16) and 0xFF) / 255.0
-            val green = ((color ushr 8) and 0xFF) / 255.0
-            val blue = (color and 0xFF) / 255.0
-            // Cf. https://en.wikipedia.org/wiki/Luma_(video)
-            red * 0.2126 + green * 0.7152 + blue * 0.0722
-        }.toDoubleArray()
+        get() = transformedImage.getBrightnessArray()
 
     @get:Producible(defaultVisibility = false)
     val red: DoubleArray
-        get() = filteredImage.getRGB(0, 0, width, height, null, 0, width).map { color ->
+        get() = transformedImage.getRGB(0, 0, width, height, null, 0, width).map { color ->
             ((color ushr 16) and 0xFF) / 255.0
         }.toDoubleArray()
 
     @get:Producible(defaultVisibility = false)
     val green: DoubleArray
-        get() = filteredImage.getRGB(0, 0, width, height, null, 0, width).map { color ->
+        get() = transformedImage.getRGB(0, 0, width, height, null, 0, width).map { color ->
             ((color ushr 8) and 0xFF) / 255.0
         }.toDoubleArray()
 
     @get:Producible(defaultVisibility = false)
     val blue: DoubleArray
-        get() = filteredImage.getRGB(0, 0, width, height, null, 0, width).map { color ->
+        get() = transformedImage.getRGB(0, 0, width, height, null, 0, width).map { color ->
             (color and 0xFF) / 255.0
         }.toDoubleArray()
 
     override fun toString() = this.id
 
     fun applyFilter() {
-        filteredImage = createFilteredImage()
+        transformedImage = createTransformedImage()
     }
 
-    private fun createFilteredImage(): BufferedImage {
+    private fun createTransformedImage(): BufferedImage {
         val sourceImage = source.currentImage
 
         // to guarantee the values won't change throughout the function call

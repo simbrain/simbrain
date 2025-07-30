@@ -2,9 +2,9 @@ package org.simbrain.world.imageworld.transformations
 
 import org.simbrain.world.imageworld.ImageSource
 import org.simbrain.world.imageworld.events.TransformationCollectionEvents
-import org.simbrain.world.imageworld.filters.Filter
 import org.simbrain.world.imageworld.filters.GrayOp
 import org.simbrain.world.imageworld.filters.IdentityOp
+import org.simbrain.world.imageworld.filters.ImageTransformation
 import org.simbrain.world.imageworld.filters.ThresholdOp
 
 /**
@@ -15,12 +15,12 @@ class TransformationCollection(val imageSource: ImageSource) {
     /**
      * List of transformations that can be applied to an image.
      */
-    private val transformationsList = mutableListOf<Filter>()
+    private val transformationsList = mutableListOf<ImageTransformation>()
 
     /**
      * Currently selected transformation.
      */
-    lateinit var currentTransformation: Filter
+    lateinit var currentTransformation: ImageTransformation
         private set
 
     /**
@@ -53,7 +53,7 @@ class TransformationCollection(val imageSource: ImageSource) {
      */
     private fun initializeDefaultTransformations() {
         // Load default transformations
-        val unfiltered = Filter(
+        val unfiltered = ImageTransformation(
             "Unfiltered",
             imageSource, IdentityOp(), imageSource.width, imageSource.height
         )
@@ -63,23 +63,23 @@ class TransformationCollection(val imageSource: ImageSource) {
         }
         transformationsList.add(unfiltered)
 
-        val gray100x100 = Filter(
+        val gray100x100 = ImageTransformation(
             "Gray 100x100",
             imageSource, GrayOp(), 100, 100
         )
         transformationsList.add(gray100x100)
 
-        val color100x100 = Filter(
+        val color100x100 = ImageTransformation(
             "Color 100x100", imageSource, IdentityOp(), 100, 100
         )
         transformationsList.add(color100x100)
 
-        val threshold10x10 = Filter(
+        val threshold10x10 = ImageTransformation(
             "Threshold 10x10", imageSource, ThresholdOp(0.5), 10, 10
         )
         transformationsList.add(threshold10x10)
 
-        val threshold250x250 = Filter(
+        val threshold250x250 = ImageTransformation(
             "Threshold 250x250",
             imageSource, ThresholdOp(0.5), 250, 250
         )
@@ -91,7 +91,7 @@ class TransformationCollection(val imageSource: ImageSource) {
     /**
      * Add a new transformation to the list.
      */
-    fun addTransformation(transformation: Filter) {
+    fun addTransformation(transformation: ImageTransformation) {
         transformationsList.add(transformation)
         events.transformationAdded.fire(transformation)
     }
@@ -99,7 +99,7 @@ class TransformationCollection(val imageSource: ImageSource) {
     /**
      * Remove the indicated transformation.
      */
-    fun removeTransformation(transformation: Filter) {
+    fun removeTransformation(transformation: ImageTransformation) {
         // Can't remove the "Unfiltered" option
         if (transformation.id.equals("Unfiltered", ignoreCase = true)) {
             return
@@ -111,7 +111,7 @@ class TransformationCollection(val imageSource: ImageSource) {
     /**
      * Set the current transformation.
      */
-    fun setCurrentTransformation(transformation: Filter) {
+    fun setCurrentTransformation(transformation: ImageTransformation) {
         val oldTransformation = currentTransformation
         currentTransformation = transformation
         if (oldTransformation != null) {
@@ -119,6 +119,6 @@ class TransformationCollection(val imageSource: ImageSource) {
         }
     }
 
-    val transformations: List<Filter> get() = transformationsList.toList()
+    val transformations: List<ImageTransformation> get() = transformationsList.toList()
 
 }

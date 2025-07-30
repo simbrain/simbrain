@@ -1,7 +1,7 @@
 package org.simbrain.world.imageworld
 
-import org.simbrain.world.imageworld.filters.Filter
 import org.simbrain.world.imageworld.filters.FilterManager
+import org.simbrain.world.imageworld.filters.ImageTransformation
 import org.simbrain.world.imageworld.transformations.TransformationCollection
 import java.awt.image.BufferedImage
 import java.io.File
@@ -66,7 +66,7 @@ class ImageWorld {
     /**
      * Convenience method to get current transformation.
      */
-    val currentTransformation: Filter? get() = transformationCollection.currentTransformation
+    val currentTransformation: ImageTransformation? get() = transformationCollection.currentTransformation
 
     /**
      * Convenience method to set current transformation on collection.

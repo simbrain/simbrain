@@ -27,7 +27,7 @@ import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager
 import org.simbrain.world.dataworld.DataWorld
 import org.simbrain.world.dataworld.DataWorldComponent
 import org.simbrain.world.imageworld.ImageWorldComponent
-import org.simbrain.world.imageworld.filters.Filter
+import org.simbrain.world.imageworld.filters.ImageTransformation
 import java.lang.Math.ceil
 import java.lang.Math.sqrt
 import javax.swing.Action
@@ -438,7 +438,7 @@ class WorkspaceActions {
         val length = ceil(sqrt(numUnits.toDouble())).toInt()
         workspace.addWorkspaceComponent(component)
         component.world.resetImageAlbum(length, length)
-        val producer = component.world.currentTransformation!!.getProducer(Filter::brightness)
+        val producer = component.world.currentTransformation!!.getProducer(ImageTransformation::brightness)
         with(workspace.couplingManager) {
             producer couple consumer
         }

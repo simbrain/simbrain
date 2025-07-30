@@ -1,7 +1,7 @@
 package org.simbrain.world.imageworld.events
 
-import org.simbrain.util.*
-import org.simbrain.world.imageworld.filters.Filter
+import org.simbrain.util.Events
+import org.simbrain.world.imageworld.filters.ImageTransformation
 
 /**
  * Events for transformation collection management.
@@ -9,9 +9,9 @@ import org.simbrain.world.imageworld.filters.Filter
  */
 class TransformationCollectionEvents: Events() {
 
-    val transformationAdded = OneArgEvent<Filter>()
-    val transformationRemoved = OneArgEvent<Filter>()
-    val transformationChanged = ChangedEvent<Filter>()
-    val transformationSelectionChanged = OneArgEvent<Filter>()
+    val transformationAdded = OneArgEvent<ImageTransformation>()
+    val transformationRemoved = OneArgEvent<ImageTransformation>()
+    val transformationChanged = ChangedEvent<ImageTransformation>()
+    val transformationSelectionChanged = OneArgEvent<ImageTransformation>()
 
 }

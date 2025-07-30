@@ -7,8 +7,8 @@ import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.world.imageworld.ImageSource;
 import org.simbrain.world.imageworld.ImageWorldDesktopComponent;
 import org.simbrain.world.imageworld.dialogs.CreateFilterDialog;
-import org.simbrain.world.imageworld.filters.Filter;
-import org.simbrain.world.imageworld.filters.FilterCollection;
+import org.simbrain.world.imageworld.filters.ImageTransformation;
+import org.simbrain.world.imageworld.filters.ImageTransformationCollection;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,26 +16,26 @@ import java.awt.*;
 import static org.simbrain.util.SwingUtilsKt.getSwingDispatcher;
 
 /**
- * Provides a toolbar for adding, deleting, and setting a current {@link Filter}
- * in a {@link FilterCollection}.
+ * Provides a toolbar for adding, deleting, and setting a current {@link ImageTransformation}
+ * in a {@link ImageTransformationCollection}.
  */
 public class FilterCollectionGui {
 
-    private final FilterCollection filterCollection;
+    private final ImageTransformationCollection imageTransformationCollection;
 
-    private final JComboBox<Filter> filterComboBox = new JComboBox<>();
+    private final JComboBox<ImageTransformation> filterComboBox = new JComboBox<>();
 
     private final ImageWorldDesktopComponent parent;
 
-    public FilterCollectionGui(ImageWorldDesktopComponent parent, FilterCollection filterCollection) {
+    public FilterCollectionGui(ImageWorldDesktopComponent parent, ImageTransformationCollection imageTransformationCollection) {
         this.parent = parent;
-        this.filterCollection = filterCollection;
-        filterCollection.getEvents().getFilterAdded().on(getSwingDispatcher(), s -> updateComboBox());
-        filterCollection.getEvents().getFilterRemoved().on(getSwingDispatcher(), s -> updateComboBox());
-        filterCollection.getEvents().getFilterChanged().on(getSwingDispatcher(),
+        this.imageTransformationCollection = imageTransformationCollection;
+        imageTransformationCollection.getEvents().getImageTransformationAdded().on(getSwingDispatcher(), s -> updateComboBox());
+        imageTransformationCollection.getEvents().getImageTransformationRemoved().on(getSwingDispatcher(), s -> updateComboBox());
+        imageTransformationCollection.getEvents().getImageTransformationChanged().on(getSwingDispatcher(),
                 (o, n) -> setComboBoxSelection(n));
-        filterCollection.getEvents().getFilterSelectionChanged().on(getSwingDispatcher(),
-                filterCollection::setCurrentFilter);
+        imageTransformationCollection.getEvents().getImageTransformationSelectionChanged().on(getSwingDispatcher(),
+                imageTransformationCollection::setCurrentFilter);
     }
 
     public JToolBar getToolBar() {
@@ -45,13 +45,13 @@ public class FilterCollectionGui {
         filterToolbar.add(filterComboBox);
         filterComboBox.setToolTipText("Which filter to view");
         updateComboBox();
-        filterComboBox.setSelectedItem(filterCollection.getCurrentFilter());
+        filterComboBox.setSelectedItem(imageTransformationCollection.getCurrentFilter());
         filterComboBox.setMaximumSize(new Dimension(200, 100));
         filterComboBox.addActionListener(evt -> {
-            Filter selectedFilter = (Filter) filterComboBox.getSelectedItem();
-            if (selectedFilter != null) {
-                filterCollection.setCurrentFilter(selectedFilter);
-                filterCollection.getEvents().getFilterSelectionChanged().fire(selectedFilter);
+            ImageTransformation selectedImageTransformation = (ImageTransformation) filterComboBox.getSelectedItem();
+            if (selectedImageTransformation != null) {
+                imageTransformationCollection.setCurrentFilter(selectedImageTransformation);
+                imageTransformationCollection.getEvents().getImageTransformationSelectionChanged().fire(selectedImageTransformation);
             }
         });
 
@@ -59,7 +59,7 @@ public class FilterCollectionGui {
         JButton addFilter = new JButton(ResourceManager.getSmallIcon("menu_icons/plus.png"));
         addFilter.setToolTipText("Add Filter");
         addFilter.addActionListener(evt -> {
-            CreateFilterDialog dialog = new CreateFilterDialog(filterCollection);
+            CreateFilterDialog dialog = new CreateFilterDialog(imageTransformationCollection);
             dialog.setLocationRelativeTo(null);
             dialog.setVisible(true);
         });
@@ -77,19 +77,19 @@ public class FilterCollectionGui {
             filterEditorDialog.setContentPane(dialogPanel);
 
             // Edit the top level filter, basically just a name
-            Filter filter = filterCollection.getCurrentFilter();
-            AnnotatedPropertyEditor topLevelFilterEditor = new AnnotatedPropertyEditor(filter);
+            ImageTransformation imageTransformation = imageTransformationCollection.getCurrentFilter();
+            AnnotatedPropertyEditor topLevelFilterEditor = new AnnotatedPropertyEditor(imageTransformation);
             dialogPanel.add(topLevelFilterEditor);
             filterEditorDialog.addCommitTask(topLevelFilterEditor::commitChanges);
 
             // If the filter is a filtered image source, edit it too
-            ImageSource imageSource = filter.getSource();
-            filterEditorDialog.setTitle("Edit " + filter.getName());
+            ImageSource imageSource = imageTransformation.getSource();
+            filterEditorDialog.setTitle("Edit " + imageTransformation.getName());
             AnnotatedPropertyEditor filterEditor = new AnnotatedPropertyEditor((EditableObject) imageSource);
             dialogPanel.add(filterEditor);
             filterEditorDialog.addCommitTask(() -> {
                 filterEditor.commitChanges();
-                filter.applyFilter();
+                imageTransformation.applyFilter();
                 filterComboBox.updateUI();
                 parent.repaint();
             });
@@ -99,15 +99,15 @@ public class FilterCollectionGui {
             deleteFilter.setToolTipText("Delete Filter");
             deleteFilter.setAlignmentX(Component.CENTER_ALIGNMENT);
             deleteFilter.addActionListener(e -> {
-                if (filter.getName().equalsIgnoreCase("Unfiltered")) {
+                if (imageTransformation.getName().equalsIgnoreCase("Unfiltered")) {
                     JOptionPane.showMessageDialog(filterEditorDialog, "Can't remove unfiltered option");
                     return;
                 }
                 int dialogResult = JOptionPane.showConfirmDialog(filterEditorDialog,
-                        "Are you sure you want to delete filter \"" + filter.getName() + "\" ?", "Warning",
+                        "Are you sure you want to delete filter \"" + imageTransformation.getName() + "\" ?", "Warning",
                         JOptionPane.YES_NO_OPTION);
                 if (dialogResult == JOptionPane.YES_OPTION) {
-                    filterCollection.removeFilter(filter);
+                    imageTransformationCollection.removeFilter(imageTransformation);
                     updateComboBox();
                 }
                 filterEditorDialog.setVisible(false);
@@ -123,8 +123,8 @@ public class FilterCollectionGui {
         return filterToolbar;
     }
 
-    private void setComboBoxSelection(Filter filter) {
-        filterComboBox.setSelectedItem(filter);
+    private void setComboBoxSelection(ImageTransformation imageTransformation) {
+        filterComboBox.setSelectedItem(imageTransformation);
     }
 
         /**
@@ -132,16 +132,16 @@ public class FilterCollectionGui {
          */
     private void updateComboBox() {
         filterComboBox.removeAllItems();
-        Filter selectedFilter = filterCollection.getCurrentFilter();
-        for (Filter filter : filterCollection.getFilters()) {
-            filterComboBox.addItem(filter);
-            if (filter.equals(selectedFilter)) {
-                filterComboBox.setSelectedItem(filter);
+        ImageTransformation selectedImageTransformation = imageTransformationCollection.getCurrentFilter();
+        for (ImageTransformation imageTransformation : imageTransformationCollection.getFilters()) {
+            filterComboBox.addItem(imageTransformation);
+            if (imageTransformation.equals(selectedImageTransformation)) {
+                filterComboBox.setSelectedItem(imageTransformation);
             }
         }
     }
 
-    public JComboBox<Filter> getFilterComboBox() {
+    public JComboBox<ImageTransformation> getFilterComboBox() {
         return filterComboBox;
     }
 }

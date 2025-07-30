@@ -101,7 +101,7 @@ val photoAlbumExample = newSim {
         workspace.simpleIterate() // Update to load the image
         
         // Get pixel values from the current filter
-        val pixelValues = imageWorld.filterCollection.currentFilter.brightness
+        val pixelValues = imageWorld.transformationCollection.currentTransformation?.brightness ?: doubleArrayOf()
         inputs.setRow(index, pixelValues)
         
         // Create one-hot encoded target based on image category
@@ -131,10 +131,12 @@ val photoAlbumExample = newSim {
 
     // Couple
     with(couplingManager) {
-        createCoupling(
-            imageWorld.filterCollection.currentFilter.getProducer(imageWorld.filterCollection.currentFilter::brightness),
-            inputArray.getConsumer(inputArray::setActivations)
-        )
+        imageWorld.transformationCollection.currentTransformation?.let { transformation ->
+            createCoupling(
+                transformation.getProducer(transformation::brightness),
+                inputArray.getConsumer(inputArray::setActivations)
+            )
+        }
     }
 
     // Force first image to load

@@ -91,7 +91,7 @@ val simpleImageWorld = newSim {
                     outputs.neuronList[index].label = category
                 }
                 addButton("Save Image for Category ${index + 1}") {
-                    supervisedModel.trainingSet.inputs.setRow(index, imageWorld.currentFilter.brightness)
+                    supervisedModel.trainingSet.inputs.setRow(index, imageWorld.currentTransformation?.brightness ?: doubleArrayOf())
                     val image = imageWorld.currentImage.copy()
                     val frame = imageWorld.imageAlbum.frames[index]
                     frame.drawImage(image)
@@ -126,10 +126,12 @@ val simpleImageWorld = newSim {
 
     // Couple
     with(couplingManager) {
-        createCoupling(
-            imageWorld.filterCollection.currentFilter.getProducer(imageWorld.filterCollection.currentFilter::brightness),
-            inputs.getConsumer(inputs::activationArray)
-        )
+        imageWorld.transformationCollection.currentTransformation?.let { transformation ->
+            createCoupling(
+                transformation.getProducer(transformation::brightness),
+                inputs.getConsumer(inputs::activationArray)
+            )
+        }
     }
 
 }

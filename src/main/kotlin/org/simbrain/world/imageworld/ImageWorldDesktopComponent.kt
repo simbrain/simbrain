@@ -7,7 +7,8 @@ import org.simbrain.workspace.gui.CouplingMenu
 import org.simbrain.workspace.gui.DesktopComponent
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import org.simbrain.world.imageworld.ImageWorldPreferences.imageDirectory
-import org.simbrain.world.imageworld.gui.FilterCollectionGui
+import org.simbrain.world.imageworld.gui.TransformationCollectionGui
+import org.simbrain.world.imageworld.filters.Filter
 import java.awt.*
 import java.awt.event.ActionEvent
 import java.awt.event.MouseAdapter
@@ -159,11 +160,21 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
 
         override fun paintComponent(g: Graphics) {
             super.paintComponent(g)
-            imageWorld.filterCollection.currentFilter.applyFilter()
-            g.drawImage(
-                imageWorld.filterCollection.currentFilter.filteredImage,
-                0, 0, width, height, this
-            )
+            
+            // Apply transformation first
+            imageWorld.transformationCollection.currentTransformation?.applyFilter()
+            val transformedImage = imageWorld.transformationCollection.currentTransformation?.filteredImage
+            
+            // Then apply filters in sequence
+            val finalImage = if (transformedImage != null) {
+                imageWorld.filterManager.applyFilters(transformedImage)
+            } else {
+                null
+            }
+            
+            if (finalImage != null) {
+                g.drawImage(finalImage, 0, 0, width, height, this)
+            }
         }
 
         /**
@@ -432,7 +443,9 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
             editMenu.removeAll()
             editMenu.add(resetCanvasAction)
             editMenu.addSeparator()
-            editMenu.add(CouplingMenu(workspaceComponent,  imageWorld.filterCollection.currentFilter))
+            imageWorld.transformationCollection.currentTransformation?.let { transformation ->
+                editMenu.add(CouplingMenu(workspaceComponent, transformation))
+            }
         }
         swingInvokeLater {
             createEditMenu()
@@ -461,10 +474,10 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
         contextMenu.add(saveImageAction)
         contextMenu.add(saveImageAllAction)
         contextMenu.addSeparator()
-        val filterMenu = CouplingMenu(
-            workspaceComponent, imageWorld.filterCollection.currentFilter
-        )
-        contextMenu.add(filterMenu)
+        imageWorld.transformationCollection.currentTransformation?.let { transformation ->
+            val transformationMenu = CouplingMenu(workspaceComponent, transformation)
+            contextMenu.add(transformationMenu)
+        }
         contextMenu.show(this, evt.x, evt.y)
     }
 
@@ -624,12 +637,12 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
             updateToolbar()
             repaint()
         }
-        imageWorld.filterCollection.events.filterChanged.on(swingDispatcher) { _, _ -> this.repaint() }
-        imageWorld.filterCollection.events.filterSelectionChanged.on(swingDispatcher) { this.repaint() }
+        imageWorld.transformationCollection.events.transformationChanged.on(swingDispatcher) { _: Filter, _: Filter -> this.repaint() }
+        imageWorld.transformationCollection.events.transformationSelectionChanged.on(swingDispatcher) { _: Filter -> this.repaint() }
 
         // Toolbars
-        val filterGui = FilterCollectionGui(this, imageWorld.filterCollection)
-        add(filterGui.toolBar, BorderLayout.NORTH)
+        val transformationGui = TransformationCollectionGui(this, imageWorld.transformationCollection, imageWorld.filterManager)
+        add(transformationGui.getToolBar(), BorderLayout.NORTH)
         add(imageToolbar, BorderLayout.SOUTH)
         setupToolbars()
         updateToolbar()
@@ -675,7 +688,7 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
         if (files != null) {
             // Load the images
 
-            imageWorld.loadImages(files)
+            imageWorld.loadImages(files.filterNotNull().toTypedArray())
 
             // Update status of buttons
             updateToolbar()

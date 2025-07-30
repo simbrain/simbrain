@@ -438,7 +438,7 @@ class WorkspaceActions {
         val length = ceil(sqrt(numUnits.toDouble())).toInt()
         workspace.addWorkspaceComponent(component)
         component.world.resetImageAlbum(length, length)
-        val producer = component.world.currentFilter.getProducer(Filter::brightness)
+        val producer = component.world.currentTransformation!!.getProducer(Filter::brightness)
         with(workspace.couplingManager) {
             producer couple consumer
         }

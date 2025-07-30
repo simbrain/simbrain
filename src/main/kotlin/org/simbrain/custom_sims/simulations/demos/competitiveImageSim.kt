@@ -128,7 +128,7 @@ val competitiveImageSim = newSim {
     // Couple
     with(couplingManager) {
         createCoupling(
-            imageWorld.filterCollection.currentFilter.getProducer(imageWorld.filterCollection.currentFilter::brightness),
+            imageWorld.transformationCollection.currentTransformation!!.getProducer(imageWorld.transformationCollection.currentTransformation!!::brightness),
             inputs.getConsumer(inputs::activationArray))
     }
 

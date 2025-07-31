@@ -6,6 +6,7 @@ import org.simbrain.custom_sims.*
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.addNeuron
 import org.simbrain.network.core.addSynapse
+import org.simbrain.network.core.getSynapse
 import org.simbrain.util.getDesktopComponentAs
 import org.simbrain.util.place
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent
@@ -15,20 +16,33 @@ import org.simbrain.world.odorworld.fitWorldToFrameSize
 import org.simbrain.world.odorworld.sensors.ObjectSensor
 import java.awt.geom.Point2D
 import javax.swing.JButton
+import kotlin.math.abs
 
 
 /**
- * Using actor-critic to train a braitenberg pursuer
+ * Using actor-critic to train a braitenberg vehicles
+ *
+ * Define behavioral modules that correspond to braitenberg vehicle types: Cheese Pursuer, Poison Pursuer, Cheese Avoider, Poison Avoider.
+ * At each time step estimate which of these modules was more responsible for the behavior.
+ * Then reinforce that. These are theoretically motivated actions.
+ *
+ * This is better than updating each synapse because learning then is slow and noisey and can produce descrutive interference.
  */
 val braitenbergRL = newSim {
 
-    var learningRate = 0.01
-    var gamma = 0.9
+    var learningRate = 0.05
+    var gamma = 0.95
 
-    var numTrials = 10
-    var maxStepsPerTrial = 500
+    var numTrials = 20
+    var maxStepsPerTrial = 300
     var trialStep = 0
     var stopRequested = false
+    
+    var explorationRate = 0.3
+    var explorationDecay = 0.995
+
+    var cheeseRewardMultiplier = 1.0
+    var poisonRewardMultiplier = -1.0
 
     workspace.clearWorkspace()
     val oc = addOdorWorldComponent("RL Braitenberg World")
@@ -39,7 +53,7 @@ val braitenbergRL = newSim {
     val poison = oc.world.addEntity(398, 335, EntityType.Poison)
     val cheese = oc.world.addEntity(500, 184, EntityType.Swiss)
 
-    // Returns a (reward, penalty) pair
+    // Improved reward function with smoother gradients
     fun calculateReward(
         agent: OdorWorldEntity,
     ): Pair<Double, Double> {
@@ -47,22 +61,23 @@ val braitenbergRL = newSim {
         var cheeseComponent = 0.0
         var poisonComponent = 0.0
 
-        // Cheese Proximity Reward
+        // Cheese Proximity Reward - smoother gradient
         val distanceToCheese = agent.location.distance(cheese.location)
-        cheeseComponent += when {
-            distanceToCheese < 20 -> 10.0
-            distanceToCheese < 40 -> 3.0
-            distanceToCheese < 60 -> 1.0
+        cheeseComponent = when {
+            distanceToCheese < 20 -> 15.0 * cheeseRewardMultiplier
+            distanceToCheese < 40 -> 8.0 * (1.0 - (distanceToCheese - 20) / 20.0) * cheeseRewardMultiplier
+            distanceToCheese < 80 -> 2.0 * (1.0 - (distanceToCheese - 40) / 40.0) * cheeseRewardMultiplier
+            distanceToCheese < 150 -> 0.5 * (1.0 - (distanceToCheese - 80) / 70.0) * cheeseRewardMultiplier
             else -> 0.0
         }
 
-
-        // Poison Proximity penalty
+        // Poison Proximity penalty - smoother gradient
         val distanceToPoison = agent.location.distance(poison.location)
-        poisonComponent += when {
-            distanceToPoison < 30 -> -10.0
-            distanceToPoison < 60 -> -5.0
-            distanceToPoison < 100 -> -2.0
+        poisonComponent = when {
+            distanceToPoison < 30 -> -15.0 * poisonRewardMultiplier
+            distanceToPoison < 60 -> -8.0 * (1.0 - (distanceToPoison - 30) / 30.0) * poisonRewardMultiplier
+            distanceToPoison < 120 -> -2.0 * (1.0 - (distanceToPoison - 60) / 60.0) * poisonRewardMultiplier
+            distanceToPoison < 200 -> -0.5 * (1.0 - (distanceToPoison - 120) / 80.0) * poisonRewardMultiplier
             else -> 0.0
         }
 
@@ -163,9 +178,10 @@ val braitenbergRL = newSim {
         lowerBound = -100.0
     }
 
+    // Add time series for monitoring
     // val (plot, rewardSeries, valueSeries, tdErrorSeries) = addTimeSeries(
-    //    "Reward, Value, TD Error",
-    //    seriesNames = listOf("Reward", "Value", "TD Error")
+    //     "Reward, Value, TD Error",
+    //     seriesNames = listOf("Reward", "Value", "TD Error")
     // )
 
     // couplingManager.createCoupling(rewardNeuron, rewardSeries)
@@ -211,8 +227,9 @@ val braitenbergRL = newSim {
         straight couple eStraight
     }
 
-    // Start off with synapse strength of 0
-    network.freeSynapses.forEach { s -> s.strength = 0.0 }
+    network.freeSynapses.forEach { s ->
+        s.strength = (Math.random() - 0.5) * 0.1
+    }
 
     fun resetVehicle() {
         agent.location = Point2D.Double((50..500).random().toDouble(), (50..500).random().toDouble())
@@ -240,6 +257,9 @@ val braitenbergRL = newSim {
                     trialStep = 0
                     resetVehicle()
                     resetObjects()
+                    
+                    // Store previous value for TD error calculation
+                    var previousValue = 0.0
 
                     val actorSynapses = listOf(
                         cheeseLeftToLeftTurn,
@@ -259,9 +279,10 @@ val braitenbergRL = newSim {
                     while (trialStep++ < maxStepsPerTrial && !stopRequested) {
                         workspace.iterateSuspend(1)
 
-                        // Add noise to turn neurons
-                        leftTurn.activation += random.nextGaussian() * 0.2
-                        rightTurn.activation += random.nextGaussian() * 0.2
+                        // Add exploration noise that decays over time
+                        val currentExploration = explorationRate * Math.pow(explorationDecay, trial.toDouble())
+                        leftTurn.activation += random.nextGaussian() * currentExploration
+                        rightTurn.activation += random.nextGaussian() * currentExploration
 
                         val (cheeseR, poisonR) = calculateReward(agent)
 
@@ -269,59 +290,81 @@ val braitenbergRL = newSim {
                         poisonPenalty.activation = poisonR
                         rewardNeuron.activation = cheeseR + poisonR
 
-                        val tdError = rewardNeuron.activation + gamma * (valueNeuron.activation - valueNeuron.auxValue)
+                        // Correct TD error calculation
+                        val currentValue = valueNeuron.activation
+                        val tdError = rewardNeuron.activation + gamma * currentValue - previousValue
                         tdErrorNeuron.activation = tdError
 
                         // Update critic weights
                         valueNeuron.fanIn.forEach { syn ->
-                            syn.strength += learningRate * tdError * syn.source.auxValue
+                            syn.strength += learningRate * tdError * syn.source.activation
                         }
-                        valueNeuron.auxValue = valueNeuron.activation
 
-                        // Directional Correlation-Based Learning
-                        val turnPairs = listOf(
-                            // Each input is paired with two turn synapses (preferred, opposing)
-                            cheeseLeftInput to Pair(cheeseLeftToLeftTurn, cheeseLeftToRightTurn),
-                            cheeseRightInput to Pair(cheeseRightToRightTurn, cheeseRightToLeftTurn),
-                            poisonLeftInput to Pair(poisonLeftToLeftTurn, poisonLeftToRightTurn),
-                            poisonRightInput to Pair(poisonRightToRightTurn, poisonRightToLeftTurn),
+                        // Improved module selection based on actual behavior
+                        val cheesePursuer = mapOf(
+                            cheeseLeftInput to leftTurn,
+                            cheeseRightInput to rightTurn,
                         )
 
-                        for ((input, pair) in turnPairs) {
-                            val (synToPreferred, synToOpposing) = pair
-                            val inputActivation = input.auxValue
+                        val cheeseAvoider = mapOf(
+                            cheeseLeftInput to rightTurn,
+                            cheeseRightInput to leftTurn,
+                        )
 
-                            // Reinforce preferred turn
-                            synToPreferred.strength += learningRate * tdError * inputActivation //* synToPreferred.target.activation
+                        val poisonPursuer = mapOf(
+                            poisonLeftInput to leftTurn,
+                            poisonRightInput to rightTurn,
+                        )
 
-                            // Inhibit opposing turn slightly
-                            synToOpposing.strength -= learningRate * tdError * inputActivation * 0.5 //* synToOpposing.target.activation
+                        val poisonAvoider = mapOf(
+                            poisonLeftInput to rightTurn,
+                            poisonRightInput to leftTurn,
+                        )
+
+                        val behaviorModules = listOf(
+                            "cheesePursuer" to cheesePursuer,
+                            "cheeseAvoider" to cheeseAvoider,
+                            "poisonPursuer" to poisonPursuer,
+                            "poisonAvoider" to poisonAvoider,
+                        )
+
+                        // Identify the most active module in the sense that those neurons
+                        // are most active
+                        fun scoreModule(module: Map<Neuron, Neuron>): Double {
+                            return module.entries.sumOf { (input, output) ->
+                                val syn = getSynapse(input, output)
+                                if (syn != null) {
+                                    syn.strength * input.activation * output.activation
+                                } else {
+                                    0.0
+                                }
+                            }
                         }
 
-                        //// Synaptic Competition: Normalize incoming weights per turn neuron
-                        //val turnFanIns = listOf(leftTurn, rightTurn).map { turnNeuron ->
-                        //    turnNeuron to turnNeuron.fanIn.filter { it in actorSynapses }
-                        //}
-                        //
-                        //turnFanIns.forEach { (turnNeuron, fanIns) ->
-                        //    val totalStrength = fanIns.sumOf { kotlin.math.abs(it.strength) }
-                        //    if (totalStrength > 1e-6) {  // avoid divide-by-zero
-                        //        fanIns.forEach { syn ->
-                        //            syn.strength /= totalStrength
-                        //            // Optional: rescale to keep total input strength around 1.0 or 2.0
-                        //            syn.strength *= 2.0
-                        //        }
-                        //    }
-                        //}
+                        // Identify the most active module
+                        val (winningName, winningModule) = behaviorModules.maxByOrNull { scoreModule(it.second) } ?: continue
+
+                        // Only update if TD error is significant
+                        if (abs(tdError) > 0.1) {
+                            // Reinforce the winning module
+                            for ((input, output) in winningModule) {
+                                val syn = getSynapse(input, output) ?: continue
+                                val inputActivation = input.activation
+                                syn.strength += learningRate * tdError * inputActivation
+                            }
+                            
+                            //if (trial % 5 == 0) { // Print less frequently
+                            //    println("Trial $trial, Step $trialStep: $winningName, TD Error: $tdError")
+                            //}
+                        }
 
                         // Clamp weights to prevent runaway
                         actorSynapses.forEach { syn ->
-                            syn.strength = syn.strength.coerceIn(-5.0, 5.0)
+                            syn.strength = syn.strength.coerceIn(-10.0, 10.0)
                         }
 
-                        // Update Aux Values 
-                        valueInputs.forEach { it.auxValue = it.activation }
-                        valueNeuron.auxValue = valueNeuron.activation
+                        // Update previous value for next iteration
+                        previousValue = currentValue
                     }
 
                     if (stopRequested) break
@@ -334,15 +377,24 @@ val braitenbergRL = newSim {
     }
 
     withGui {
-        place(networkComponent, 53, 282, 359, 327)
-        place(oc, 462, 19, 600, 600)
-        //place(plot, 1080, 0, 500, 500)
+        place(networkComponent, 272, 0, 404, 595)
+        place(oc, 662, 0, 601, 592)
+        // place(plot, 1080, 0, 500, 500)
         oc.getDesktopComponentAs<OdorWorldDesktopComponent>().fitWorldToFrameSize()
 
-        // Add control panel for RL parameters
-        createControlPanel("RL Parameters", 10, 10) {
+        // Combined control panel
+        createControlPanel("RL Parameters", 0, 10) {
             addFormattedNumericTextField("Learning Rate", initValue = learningRate) {
                 learningRate = it
+            }
+            addFormattedNumericTextField("Gamma", initValue = gamma) {
+                gamma = it
+            }
+            addFormattedNumericTextField("Exploration Rate", initValue = explorationRate) {
+                explorationRate = it
+            }
+            addFormattedNumericTextField("Exploration Decay", initValue = explorationDecay) {
+                explorationDecay = it
             }
             addFormattedNumericTextField("Trials", initValue = numTrials) {
                 numTrials = it.toInt()
@@ -356,6 +408,31 @@ val braitenbergRL = newSim {
             addButton("Run Trials") {
                 applyLearning(this@addButton)
             }
+            
+            addSeparator()
+            
+            //addFormattedNumericTextField("Cheese Multiplier", initValue = cheeseRewardMultiplier) {
+            //    cheeseRewardMultiplier = it
+            //}
+            //addFormattedNumericTextField("Poison Multiplier", initValue = poisonRewardMultiplier) {
+            //    poisonRewardMultiplier = it
+            //}
+            addButton("Both Rewarding") {
+                cheeseRewardMultiplier = 1.0
+                poisonRewardMultiplier = 1.0
+            }
+            addButton("Both Punishing") {
+                cheeseRewardMultiplier = -1.0
+                poisonRewardMultiplier = -1.0
+            }
+            addButton("Reverse") {
+                cheeseRewardMultiplier = -1.0
+                poisonRewardMultiplier = 1.0
+            }
+            addButton("Normal") {
+                cheeseRewardMultiplier = 1.0
+                poisonRewardMultiplier = -1.0
+            }
         }
     }
 
@@ -365,8 +442,16 @@ val braitenbergRL = newSim {
             
     # Braitenberg RL
         
-    Work in progress.        
-
+    Improved version with better learning dynamics.
+    
+    ### Key Improvements:
+    
+    1. **Fixed TD Error**: Now correctly calculates temporal difference error
+    2. **Better Exploration**: Decaying exploration rate for better learning
+    3. **Smoother Rewards**: Continuous reward gradients instead of binary
+    4. **Improved Module Selection**: Better scoring of behavioral modules
+    5. **Random Initialization**: Weights start with small random values
+    
     ### References
         
     1. Braitenberg, V. (1986). [_Vehicles: Experiments in synthetic psychology_](https://mitpress.mit.edu/9780262521123/vehicles/). MIT press.

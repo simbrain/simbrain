@@ -39,7 +39,7 @@ val threeObjectDetector = newSim {
     val outputLayer = NeuronGroup(3).apply {
         updateRule = SigmoidalRule()
         applyLayout(LineLayout())
-        setLabels(listOf("Fish", "Gouda", "Blue"))
+        setLabels(listOf("Gouda", "Blue", "Fish"))
     }
     val sg1 = SynapseGroup(inputLayer, hiddenLayer)
     val sg2 = SynapseGroup(hiddenLayer, outputLayer)

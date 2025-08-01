@@ -35,6 +35,11 @@ class SynapseGroupNodeDirected(private val synapseGroupNode: SynapseGroupNode) :
                 if (isBidirectional()) 0.35 else 0.5
             }
 
+            padding {
+                head = arrowSize
+                tail = 0.0
+            }
+
             onUpdated { curve ->
                 val offset = if (isBidirectional()) 0.75 else 0.5
                 val (x, y) = curve?.p(offset) ?: line(source.location, target.location).p(offset)

@@ -277,7 +277,8 @@ fun SimbrainJTable.createShowEigenValuesAction() = createAction(
             model.get2DDoubleArray(replaceInvalid = 0.0).toMatrix().eigen()
             true
         } catch (e: Exception) {
-            //println("Error: ${e.message}")
+            false
+        } catch (e: Error) {
             false
         }
         isEnabled = canShowEigenValues

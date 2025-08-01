@@ -212,8 +212,8 @@ abstract class SimbrainDataFrame : AbstractTableModel() {
      * Numeric types are cast to doubles.
      */
     fun get2DDoubleArray(replaceInvalid: Double = Double.NaN): Array<DoubleArray> {
-        if (!columnsOfType(Double::class.java)) {
-            throw Error("getDoubleArray called on a non-numeric column")
+        if (!columnsOfType(Double::class.java) && replaceInvalid.isNaN()) {
+            throw IllegalStateException("getDoubleArray called on a non-numeric column")
         }
         return (0 until rowCount)
             .map { getDoubleRowArrayUnsafe(it, replaceInvalid) }

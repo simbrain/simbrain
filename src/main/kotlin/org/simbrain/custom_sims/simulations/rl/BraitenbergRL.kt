@@ -17,6 +17,7 @@ import org.simbrain.world.odorworld.sensors.ObjectSensor
 import java.awt.geom.Point2D
 import javax.swing.JButton
 import kotlin.math.abs
+import kotlin.math.exp
 
 
 /**
@@ -33,7 +34,7 @@ val braitenbergRL = newSim {
     var learningRate = 0.05
     var gamma = 0.95
 
-    var numTrials = 20
+    var numTrials = 50
     var maxStepsPerTrial = 300
     var trialStep = 0
     var stopRequested = false
@@ -61,25 +62,13 @@ val braitenbergRL = newSim {
         var cheeseComponent = 0.0
         var poisonComponent = 0.0
 
-        // Cheese Proximity Reward - smoother gradient
+        // Cheese Proximity Reward. Exponential decay from 15 to 0 as distance increases
         val distanceToCheese = agent.location.distance(cheese.location)
-        cheeseComponent = when {
-            distanceToCheese < 20 -> 15.0 * cheeseRewardMultiplier
-            distanceToCheese < 40 -> 8.0 * (1.0 - (distanceToCheese - 20) / 20.0) * cheeseRewardMultiplier
-            distanceToCheese < 80 -> 2.0 * (1.0 - (distanceToCheese - 40) / 40.0) * cheeseRewardMultiplier
-            distanceToCheese < 150 -> 0.5 * (1.0 - (distanceToCheese - 80) / 70.0) * cheeseRewardMultiplier
-            else -> 0.0
-        }
+        cheeseComponent = 15.0 * exp(-0.05 * distanceToCheese) * cheeseRewardMultiplier
 
-        // Poison Proximity penalty - smoother gradient
+        // Poison Proximity penalty. Exponential decay from 15 to 0 as distance increases
         val distanceToPoison = agent.location.distance(poison.location)
-        poisonComponent = when {
-            distanceToPoison < 30 -> -15.0 * poisonRewardMultiplier
-            distanceToPoison < 60 -> -8.0 * (1.0 - (distanceToPoison - 30) / 30.0) * poisonRewardMultiplier
-            distanceToPoison < 120 -> -2.0 * (1.0 - (distanceToPoison - 60) / 60.0) * poisonRewardMultiplier
-            distanceToPoison < 200 -> -0.5 * (1.0 - (distanceToPoison - 120) / 80.0) * poisonRewardMultiplier
-            else -> 0.0
-        }
+        poisonComponent = 15.0 * exp(-0.05 * distanceToPoison) * poisonRewardMultiplier
 
         return Pair(cheeseComponent, poisonComponent)
     }
@@ -228,7 +217,8 @@ val braitenbergRL = newSim {
     }
 
     network.freeSynapses.forEach { s ->
-        s.strength = (Math.random() - 0.5) * 0.1
+        s.strength = 0.0
+        //s.strength = (Math.random() - 0.5) * 0.1
     }
 
     fun resetVehicle() {
@@ -236,17 +226,23 @@ val braitenbergRL = newSim {
         agent.heading = (0..360).random().toDouble()
     }
 
-    fun resetObjects() {
-        world.entityList.find { it.entityType == EntityType.Swiss }?.setLocation(
-            (100..500).random().toDouble(),
-            (100..500).random().toDouble()
-        )
+    // Minseparation is between cheese and poison so it does not confuse them
+    fun resetObjects(minSeparation: Double = 100.0) {
+        val swiss = world.entityList.find { it.entityType == EntityType.Swiss } ?: return
+        val poison = world.entityList.find { it.entityType == EntityType.Poison } ?: return
 
-        world.entityList.find { it.entityType == EntityType.Poison }?.setLocation(
-            (100..500).random().toDouble(),
-            (100..500).random().toDouble()
-        )
+        var cheeseLoc: Point2D
+        var poisonLoc: Point2D
+
+        do {
+            cheeseLoc = Point2D.Double((100..500).random().toDouble(), (100..500).random().toDouble())
+            poisonLoc = Point2D.Double((100..500).random().toDouble(), (100..500).random().toDouble())
+        } while (cheeseLoc.distance(poisonLoc) < minSeparation)
+
+        swiss.location = cheeseLoc
+        poison.location = poisonLoc
     }
+
 
     fun applyLearning(button: JButton) {
         button.isEnabled = false
@@ -352,7 +348,7 @@ val braitenbergRL = newSim {
                                 val inputActivation = input.activation
                                 syn.strength += learningRate * tdError * inputActivation
                             }
-                            
+
                             //if (trial % 5 == 0) { // Print less frequently
                             //    println("Trial $trial, Step $trialStep: $winningName, TD Error: $tdError")
                             //}

@@ -39,7 +39,8 @@ public class ImageWorldComponent extends WorkspaceComponent {
     @Override
     public List<AttributeContainer> getAttributeContainers() {
         List<AttributeContainer> containers = new ArrayList<>();
-        containers.addAll(world.getTransformationCollection().getTransformations());
+        containers.add(world.getImagePipelineCollection());
+        containers.addAll(world.getImagePipelineCollection().getPipelines());
         return containers;
     }
 

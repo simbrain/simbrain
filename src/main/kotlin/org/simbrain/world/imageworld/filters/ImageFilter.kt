@@ -1,33 +1,12 @@
 package org.simbrain.world.imageworld.filters
 
-import org.simbrain.util.UserParameter
-import org.simbrain.util.propertyeditor.EditableObject
 import java.awt.image.BufferedImage
 
 /**
  * Base class for image processing filters that can be applied to BufferedImages.
- * Unlike transformations which change the size/format of images, filters perform
- * pixel-level processing operations that can be chained together.
+ * Filters perform pixel-level processing operations that can be chained together.
  */
-abstract class ImageFilter : EditableObject {
-
-    @UserParameter(label = "Enabled", description = "Whether this filter is active", order = 0)
-    var enabled: Boolean = true
-
-    @UserParameter(label = "Name", description = "Name of this filter", order = 1)
-    override var name: String = this::class.simpleName ?: "Unknown Filter"
-
-    /**
-     * Apply this filter to the input image and return the filtered result.
-     * If the filter is disabled, returns the input image unchanged.
-     */
-    fun apply(input: BufferedImage): BufferedImage {
-        return if (enabled) {
-            applyFilter(input)
-        } else {
-            input
-        }
-    }
+abstract class ImageFilter : ImageOperation() {
 
     /**
      * Implement the actual filtering logic in subclasses.
@@ -36,9 +15,14 @@ abstract class ImageFilter : EditableObject {
     protected abstract fun applyFilter(input: BufferedImage): BufferedImage
 
     /**
+     * Implementation of the ImageOperation interface - delegates to applyFilter
+     */
+    final override fun applyOperation(input: BufferedImage): BufferedImage {
+        return applyFilter(input)
+    }
+
+    /**
      * Create a copy of this filter with the same settings.
      */
-    abstract fun copy(): ImageFilter
-
-    override fun toString(): String = name
+    abstract override fun copy(): ImageFilter
 }

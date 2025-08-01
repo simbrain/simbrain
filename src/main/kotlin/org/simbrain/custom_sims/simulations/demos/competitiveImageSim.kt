@@ -50,7 +50,7 @@ val competitiveImageSim = newSim {
     val imageWorld = component.world.apply {
 
         resetImageAlbum(w, h)
-        setCurrentTransformation("Threshold 10x10")
+        setCurrentPipeline("Threshold 10x10")
         imageAlbum.addImage(
             listOf(
                 1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -126,7 +126,7 @@ val competitiveImageSim = newSim {
     // Couple
     with(couplingManager) {
         createCoupling(
-            imageWorld.transformationCollection.currentTransformation!!.getProducer(imageWorld.transformationCollection.currentTransformation!!::brightness),
+            imageWorld.imagePipelineCollection.currentPipeline.getProducer(imageWorld.imagePipelineCollection.currentPipeline::brightness),
             inputs.getConsumer(inputs::activationArray))
     }
 

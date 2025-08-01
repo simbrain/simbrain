@@ -5,7 +5,6 @@ import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Consumable;
 import org.simbrain.world.imageworld.events.ImageEvents;
-import org.simbrain.world.imageworld.filters.ImageTransformation;
 
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
@@ -16,7 +15,7 @@ import java.util.Arrays;
  * values are stored in two arrays, one for rgb colors and
  * another with separate channels for brightness, red, green, and blue.
  * <br>
- * An pixel plot is a kind of countepart to a {@link ImageTransformation}. Rather
+ * An pixel plot is a kind of countepart to a {@link org.simbrain.world.imageworld.filters.ImageProcessingPipeline}. Rather
  * than sensing visual locations emitters are like pixels that an "organism" can emit
  * cf. a squid's iridiphores.
  *

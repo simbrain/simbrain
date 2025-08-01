@@ -1,85 +1,115 @@
 package org.simbrain.world.imageworld
 
-import org.simbrain.world.imageworld.filters.FilterManager
-import org.simbrain.world.imageworld.filters.ImageTransformation
-import org.simbrain.world.imageworld.transformations.TransformationCollection
+import org.simbrain.util.UserParameter
+import org.simbrain.util.math.SimbrainMath
+import org.simbrain.workspace.WorkspaceComponent
+import org.simbrain.world.imageworld.filters.ImageProcessingPipeline
+import org.simbrain.world.imageworld.transformations.ImagePipelineCollection
 import java.awt.image.BufferedImage
-import java.io.File
+import java.io.OutputStream
 
 /**
- * At each update, apply the current transformation in a [TransformationCollection] to the current image in an [ImageAlbum]
+ * Image World. Displays an image and (hopefully) allows it to provide a kind
+ * of "retina" for neural networks. Images are loaded and filtered (currently
+ * down-sampled and thresholded). The filtered image then provides arrays that
+ * can be coupled to a neural network.
  *
- * Display the result of the current transformation applied to the current image to the screen.
+ * @author Jeff Yoshimi
+ * @author Tim Shea
  */
-class ImageWorld {
+class ImageWorld : WorkspaceComponent("Image World") {
 
     /**
-     * Contains the current image rendered here.
+     * The current image.
+     */
+    @UserParameter(label = "Image URL")
+    var imageSourceName: String = ""
+        set(value) {
+            field = value
+            if (value.isNotEmpty()) {
+                imageAlbum.loadImage(value)
+            }
+        }
+
+    /**
+     * The image album that manages multiple images.
      */
     val imageAlbum = ImageAlbum()
 
-    /**
-     * List of transformations.
-     */
-    val transformationCollection = TransformationCollection(imageAlbum)
+    val imagePipelineCollection = ImagePipelineCollection(imageAlbum)
 
-    /**
-     * Manager for multiple image filters.
-     */
-    val filterManager = FilterManager()
-
-    /**
-     * Clear the image album and set the current image with a blank canvas of the indicated size.
-     */
-    fun resetImageAlbum(width: Int, height: Int) {
-        imageAlbum.reset(width, height)
+    init {
+        if (imageSourceName.isNotEmpty()) {
+            imageAlbum.loadImage(imageSourceName)
+        }
     }
 
     /**
-     * Load images from an array.
+     * Initialize the source images.
      *
-     * @param files array of images to load
+     * @param simImages images to read and display
      */
-    fun loadImages(files: Array<File>) {
-        imageAlbum.loadImages(files)
+    fun initializeImages(vararg simImages: String) {
+        for (image in simImages) {
+            imageAlbum.loadImage(image)
+        }
     }
 
     /**
-     * Returns number of frames in the "album" associated with this component.
+     * Initialize the source images from a provided list.
+     *
+     * @param images images to read and display
      */
-    val numImages: Int get() = imageAlbum.numFrames
-
-    /**
-     * Update the image source to the next image.
-     */
-    fun nextFrame() {
-        imageAlbum.nextFrame()
+    fun initializeImages(images: List<String>) {
+        for (image in images) {
+            imageAlbum.loadImage(image)
+        }
     }
 
     /**
-     * Update the image source to the previous image.
+     * Convenience method to get current pipeline.
      */
-    fun previousFrame() {
-        imageAlbum.previousFrame()
-    }
+    val currentPipeline: ImageProcessingPipeline get() = imagePipelineCollection.currentPipeline
 
     /**
-     * Convenience method to get current transformation.
+     * Convenience method to set current pipeline on collection.
      */
-    val currentTransformation: ImageTransformation? get() = transformationCollection.currentTransformation
-
-    /**
-     * Convenience method to set current transformation on collection.
-     */
-    fun setCurrentTransformation(name: String) {
-        transformationCollection.transformations
+    fun setCurrentPipeline(name: String) {
+        imagePipelineCollection.pipelines
             .find { it.name == name }
-            ?.let { transformationCollection.setCurrentTransformation(it) }
+            ?.let { imagePipelineCollection.setCurrentPipeline(it) }
     }
 
     /**
      * Convenience method to get current image.
      */
-    val currentImage: BufferedImage get() = imageAlbum.currentImage
+    val currentBufferedImage: BufferedImage get() = imagePipelineCollection.currentPipeline.processedImage
 
+    /**
+     * Rounds the values before sending them out as a string.
+     */
+    override fun toString(): String {
+        return SimbrainMath.roundDouble(imagePipelineCollection.currentPipeline.brightness.first(), 2).toString()
+    }
+
+    override fun save(output: OutputStream, format: String?) {
+        // TODO: Implement save functionality
+    }
+
+    // Legacy methods for backward compatibility
+    fun resetImageAlbum(width: Int, height: Int) {
+        imageAlbum.reset(width, height)
+    }
+
+    val numImages: Int get() = imageAlbum.numFrames
+
+    fun nextFrame() = imageAlbum.nextFrame()
+
+    fun previousFrame() = imageAlbum.previousFrame()
+
+    val currentImage: BufferedImage get() = currentBufferedImage
+
+    fun loadImages(files: Array<java.io.File>) {
+        imageAlbum.loadImages(files)
+    }
 }

@@ -14,6 +14,8 @@ import org.simbrain.network.util.offsetNetworkModel
 import org.simbrain.util.getFilesWithExtension
 import org.simbrain.util.place
 import org.simbrain.util.setRow
+import org.simbrain.world.imageworld.filters.EdgeDetectionFilter
+import org.simbrain.world.imageworld.filters.ResizeOperation
 import smile.math.matrix.Matrix
 
 /**
@@ -76,11 +78,15 @@ val photoAlbumExample = newSim {
     val component = addImageWorld("Image World")
     placeComponent(component,350,0,720,600)
     val imageWorld = component.world
+    imageWorld.imagePipelineCollection.addPipeline("Edge Detector 100x100") {
+        addOperation(ResizeOperation(100, 100))
+        addOperation(EdgeDetectionFilter())
+    }
     val imageFiles = getFilesWithExtension("simulations/images/Caltech101Sample", "jpg")
     val imageNames = imageFiles.map { it.nameWithoutExtension }
     val imageCategories = imageNames.associateWith { it.takeWhile { ch -> !ch.isDigit() } }
     imageWorld.loadImages(imageFiles)
-    imageWorld.setCurrentTransformation("Color 100x100")
+    imageWorld.setCurrentPipeline("Edge Detector 100x100")
 
     // Create training data
     val categoryNames = listOf("bird", "crocodile", "flower", "plane")
@@ -101,7 +107,7 @@ val photoAlbumExample = newSim {
         workspace.simpleIterate() // Update to load the image
         
         // Get pixel values from the current filter
-        val pixelValues = imageWorld.transformationCollection.currentTransformation?.brightness ?: doubleArrayOf()
+        val pixelValues = imageWorld.imagePipelineCollection.currentPipeline.brightness
         inputs.setRow(index, pixelValues)
         
         // Create one-hot encoded target based on image category
@@ -131,15 +137,17 @@ val photoAlbumExample = newSim {
 
     // Couple
     with(couplingManager) {
-        imageWorld.transformationCollection.currentTransformation?.let { transformation ->
+        imageWorld.imagePipelineCollection.currentPipeline.let { pipeline ->
             createCoupling(
-                transformation.getProducer(transformation::brightness),
+                pipeline.getProducer(pipeline::brightness),
                 inputArray.getConsumer(inputArray::setActivations)
             )
         }
     }
 
     // Force first image to load
-    workspace.simpleIterate()
+    workspace.iterateSuspend(1)
+
+    imageWorld.setCurrentPipeline("Unfiltered")
 
 }

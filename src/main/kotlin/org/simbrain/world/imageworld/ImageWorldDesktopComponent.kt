@@ -7,8 +7,8 @@ import org.simbrain.workspace.gui.CouplingMenu
 import org.simbrain.workspace.gui.DesktopComponent
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import org.simbrain.world.imageworld.ImageWorldPreferences.imageDirectory
-import org.simbrain.world.imageworld.filters.ImageTransformation
-import org.simbrain.world.imageworld.gui.TransformationCollectionGui
+import org.simbrain.world.imageworld.filters.ImageProcessingPipeline
+import org.simbrain.world.imageworld.gui.ImagePipelineCollectionGui
 import java.awt.*
 import java.awt.event.ActionEvent
 import java.awt.event.MouseAdapter
@@ -161,13 +161,10 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
         override fun paintComponent(g: Graphics) {
             super.paintComponent(g)
 
-            imageWorld.transformationCollection.currentTransformation.applyFilter()
-            val transformedImage = imageWorld.transformationCollection.currentTransformation.transformedImage
+            imageWorld.imagePipelineCollection.currentPipeline.applyPipeline()
+            val processedImage = imageWorld.imagePipelineCollection.currentPipeline.processedImage
 
-            // Then apply filters in sequence
-            val finalImage = imageWorld.filterManager.applyFilters(transformedImage)
-
-            g.drawImage(finalImage, 0, 0, width, height, this)
+            g.drawImage(processedImage, 0, 0, width, height, this)
         }
 
         /**
@@ -436,8 +433,8 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
             editMenu.removeAll()
             editMenu.add(resetCanvasAction)
             editMenu.addSeparator()
-            imageWorld.transformationCollection.currentTransformation?.let { transformation ->
-                editMenu.add(CouplingMenu(workspaceComponent, transformation))
+            imageWorld.imagePipelineCollection.currentPipeline?.let { pipeline ->
+                editMenu.add(CouplingMenu(workspaceComponent, pipeline))
             }
         }
         swingInvokeLater {
@@ -467,9 +464,9 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
         contextMenu.add(saveImageAction)
         contextMenu.add(saveImageAllAction)
         contextMenu.addSeparator()
-        imageWorld.transformationCollection.currentTransformation?.let { transformation ->
-            val transformationMenu = CouplingMenu(workspaceComponent, transformation)
-            contextMenu.add(transformationMenu)
+        imageWorld.imagePipelineCollection.currentPipeline?.let { pipeline ->
+            val pipelineMenu = CouplingMenu(workspaceComponent, pipeline)
+            contextMenu.add(pipelineMenu)
         }
         contextMenu.show(this, evt.x, evt.y)
     }
@@ -630,12 +627,12 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
             updateToolbar()
             repaint()
         }
-        imageWorld.transformationCollection.events.transformationChanged.on(swingDispatcher) { _: ImageTransformation, _: ImageTransformation -> this.repaint() }
-        imageWorld.transformationCollection.events.transformationSelectionChanged.on(swingDispatcher) { _: ImageTransformation -> this.repaint() }
+        imageWorld.imagePipelineCollection.events.pipelineChanged.on(swingDispatcher) { _: ImageProcessingPipeline, _: ImageProcessingPipeline -> this.repaint() }
+        imageWorld.imagePipelineCollection.events.pipelineSelectionChanged.on(swingDispatcher) { _: ImageProcessingPipeline -> this.repaint() }
 
         // Toolbars
-        val transformationGui = TransformationCollectionGui(this, imageWorld.transformationCollection, imageWorld.filterManager)
-        add(transformationGui.getToolBar(), BorderLayout.NORTH)
+        val transformationGui = ImagePipelineCollectionGui(this, imageWorld.imagePipelineCollection)
+        add(transformationGui.toolbar, BorderLayout.NORTH)
         add(imageToolbar, BorderLayout.SOUTH)
         setupToolbars()
         updateToolbar()

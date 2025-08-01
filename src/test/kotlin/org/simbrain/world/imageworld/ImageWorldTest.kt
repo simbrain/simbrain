@@ -18,7 +18,7 @@ class ImageWorldTest {
     @Test
     fun `test image world creation`() {
         assertNotNull(imageWorld.imageAlbum)
-        assertNotNull(imageWorld.transformationCollection)
+        assertNotNull(imageWorld.imagePipelineCollection)
         assertEquals("Test Image World", imageComponent.name)
     }
 
@@ -69,12 +69,12 @@ class ImageWorldTest {
 
     @Test
     fun `test filter collection`() {
-        val filterCollection = imageWorld.transformationCollection
-        assertNotNull(filterCollection.currentTransformation)
+        val filterCollection = imageWorld.imagePipelineCollection
+        assertNotNull(filterCollection.currentPipeline)
         
-        // Test that filter can be applied
+        // Test that pipeline can be applied
         val originalImage = imageWorld.currentImage
-        val filteredImage = filterCollection.currentTransformation.transformedImage
+        val filteredImage = filterCollection.currentPipeline.processedImage
         
         // Images should have same dimensions
         assertEquals(originalImage.width, filteredImage.width)
@@ -203,7 +203,7 @@ class ImageWorldTest {
         // Basic checks
         assertNotNull(deserializedComponent.world)
         assertNotNull(deserializedComponent.world.imageAlbum)
-        assertNotNull(deserializedComponent.world.transformationCollection)
+        assertNotNull(deserializedComponent.world.imagePipelineCollection)
     }
 
     @Test

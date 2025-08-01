@@ -137,35 +137,7 @@ class ImagePipelineCollection(val imageSource: ImageSource): AttributeContainer 
 
     val pipelines: List<ImageProcessingPipeline> get() = pipelinesList.toList()
 
-    // Legacy methods for compatibility with existing code (will be updated later)
-    @Deprecated("Use addPipeline instead")
-    fun addTransformation(transformation: Any) {
-        if (transformation is ImageProcessingPipeline) {
-            addPipeline(transformation)
-        }
-    }
-
-    @Deprecated("Use removePipeline instead")
-    fun removeTransformation(transformation: Any) {
-        if (transformation is ImageProcessingPipeline) {
-            removePipeline(transformation)
-        }
-    }
-
-    @Deprecated("Use setCurrentPipeline instead")
-    fun setCurrentTransformation(transformation: Any) {
-        if (transformation is ImageProcessingPipeline) {
-            setCurrentPipeline(transformation)
-        }
-    }
-
-    @Deprecated("Use pipelines instead")
-    val transformations: List<Any> get() = pipelinesList.toList()
-
-    @Deprecated("Use currentPipeline instead")
-    val currentTransformation: Any get() = currentPipeline
-
-    override val id: String = "TransformationCollection"
+    override val id: String = "ImagePipelineCollection"
 
     override val childrenContainers get() = pipelinesList.toList()
 }

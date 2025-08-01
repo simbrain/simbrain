@@ -44,45 +44,14 @@ class ImageWorld : WorkspaceComponent("Image World") {
         }
     }
 
-    /**
-     * Initialize the source images.
-     *
-     * @param simImages images to read and display
-     */
-    fun initializeImages(vararg simImages: String) {
-        for (image in simImages) {
-            imageAlbum.loadImage(image)
-        }
-    }
-
-    /**
-     * Initialize the source images from a provided list.
-     *
-     * @param images images to read and display
-     */
-    fun initializeImages(images: List<String>) {
-        for (image in images) {
-            imageAlbum.loadImage(image)
-        }
-    }
-
-    /**
-     * Convenience method to get current pipeline.
-     */
     val currentPipeline: ImageProcessingPipeline get() = imagePipelineCollection.currentPipeline
 
-    /**
-     * Convenience method to set current pipeline on collection.
-     */
     fun setCurrentPipeline(name: String) {
         imagePipelineCollection.pipelines
             .find { it.name == name }
             ?.let { imagePipelineCollection.setCurrentPipeline(it) }
     }
 
-    /**
-     * Convenience method to get current image.
-     */
     val currentBufferedImage: BufferedImage get() = imagePipelineCollection.currentPipeline.processedImage
 
     /**
@@ -96,7 +65,6 @@ class ImageWorld : WorkspaceComponent("Image World") {
         // TODO: Implement save functionality
     }
 
-    // Legacy methods for backward compatibility
     fun resetImageAlbum(width: Int, height: Int) {
         imageAlbum.reset(width, height)
     }

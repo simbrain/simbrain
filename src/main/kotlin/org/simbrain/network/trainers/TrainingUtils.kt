@@ -485,51 +485,6 @@ fun getConnectorChain(start: Layer, end: Layer): List<Connector> {
 }
 
 /**
- * A tree of weight matrices stored in the order they should be updated using backprop. The matrices are organized based
- * on the order in which they are updated during backpropagation. Stored as a list of lists of weight matrices.
- *
- * Supports multiple inputs but not skip connections.
- *
- * Example structure:
- * (
- *   (wm_out),                   # Output weight layer
- *   (wm_hidden_1),               # First hidden weight layer
- *   (wm_hidden_21, wm_hidden_22) # Second hidden weight layer with a branch
- *   ...
- * )
- */
-@Deprecated("Planning to incorporate main use cases into LinkedHashSet.accumulateBackprop")
-class WeightMatrixTree(start: List<Layer>, end: Layer) {
-    val tree: List<List<WeightMatrix>>
-
-    init {
-        val validLayers = start.flatMap { getConnectorChain(it, end).filterIsInstance<WeightMatrix>() }.toMutableSet()
-        tree = sequence {
-            var frontier = listOf(end)
-            while (validLayers.isNotEmpty()) {
-                val weightMatrices = frontier.flatMap { it.incomingConnectors }
-                    .filter { validLayers.contains(it) }
-                    .filterIsInstance<WeightMatrix>()
-                yield(weightMatrices)
-                val layers = weightMatrices.map { it.source }
-                frontier = layers
-                validLayers.removeAll(weightMatrices.toSet())
-            }
-        }.toList().reversed()
-    }
-
-    val inputWeightLayers: List<WeightMatrix> = start
-        .map { it.outgoingConnectors }
-        .flatten()
-        .filterIsInstance<WeightMatrix>()
-        .toSet()
-        .intersect(tree.flatten().toSet())
-        .toList()
-    val outputWeightLayer: WeightMatrix = tree.last().first()
-
-}
-
-/**
  * Print debugging info for a list of weight matrices.
  */
 context(Network)
@@ -586,6 +541,9 @@ fun crossEntropySequence(predictions: Matrix, targets: Matrix): Double {
 
 /**
  * Split a dataset (inputs and targets) into training and testing subsets.
+ *
+ * Split ratio of 0 is all testing. Split ratio of .8 is 80% training. Split ratio of 1 is 100% training.
+ *
  */
 fun splitDataSet(inputs: Matrix, targets: Matrix, splitRatio: Double, random: Random = Random(42L)): Pair<Pair<Matrix, Matrix>, Pair<Matrix, Matrix>> {
     require(inputs.nrow() == targets.nrow()) { "inputs nrow (${inputs.nrow()}) must equal targets nrow (${targets.nrow()})" }

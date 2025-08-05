@@ -1,5 +1,6 @@
 package org.simbrain.world.imageworld
 
+import kotlinx.coroutines.CoroutineScope
 import org.simbrain.util.*
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.widgets.ShowHelpAction
@@ -18,7 +19,7 @@ import javax.swing.*
 import kotlin.math.min
 
 class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldComponent) :
-    DesktopComponent<ImageWorldComponent>(frame, component) {
+    DesktopComponent<ImageWorldComponent>(frame, component), CoroutineScope by component.world {
 
     private val imageToolbar = JToolBar()
 

@@ -6,6 +6,22 @@ import kotlin.math.*
 
 /**
  * Edge detection filter with multiple algorithms for detecting edges in images.
+ *
+ * Edge detection finds rapid changes in brightness/color that typically correspond to object boundaries.
+ * Different algorithms use different mathematical approaches:
+ *
+ * SOBEL: Uses 3x3 kernels with more weight on center pixels for noise reduction
+ *   X-kernel: [[-1,0,1],[-2,0,2],[-1,0,1]]  Y-kernel: [[-1,-2,-1],[0,0,0],[1,2,1]]
+ *
+ * PREWITT: Similar to Sobel but with equal weighting
+ *   X-kernel: [[-1,0,1],[-1,0,1],[-1,0,1]]  Y-kernel: [[-1,-1,-1],[0,0,0],[1,1,1]]
+ *
+ * ROBERTS: Uses 2x2 kernels for fast computation, sensitive to noise
+ *   X-kernel: [[1,0],[0,-1]]  Y-kernel: [[0,1],[-1,0]]
+ *
+ * CANNY: Multi-stage algorithm with Gaussian blur, gradient calculation,
+ *        non-maximum suppression, and hysteresis thresholding (simplified here)
+ *
  */
 class EdgeDetectionFilter : ImageFilter() {
 

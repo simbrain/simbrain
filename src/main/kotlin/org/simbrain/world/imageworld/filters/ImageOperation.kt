@@ -7,6 +7,13 @@ import java.awt.image.BufferedImage
 /**
  * Base class for all image processing operations that can be applied in a pipeline.
  * This includes both transformations (resize, format changes) and filters (blur, edge detection, etc.).
+ *
+ *  Key concepts:
+ *  - Operations can be enabled/disabled without removing them from the pipeline
+ *  - Operations should be stateless and create new images rather than modifying input
+ *  - Operations form a chain where each operation's output becomes the next operation's input
+ *  - The enabled flag allows quick toggling without reconfiguring the pipeline
+ *
  */
 abstract class ImageOperation : CopyableObject {
 

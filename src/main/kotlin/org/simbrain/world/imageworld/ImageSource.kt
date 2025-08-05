@@ -1,13 +1,11 @@
-package org.simbrain.world.imageworld;
+package org.simbrain.world.imageworld
 
-import org.simbrain.util.ImageUtilsKt;
-import org.simbrain.world.imageworld.events.ImageEvents;
-
-import java.awt.image.BufferedImage;
+import org.simbrain.world.imageworld.events.ImageEvents
+import java.awt.image.BufferedImage
 
 /**
  * Produces BufferedImages periodically and notifies listeners when the image changes or is resized.
- * <br>
+ * <br></br>
  * Image sources can be enabled or disabled. E.g. if a webcam is available it can enable its image source, and then
  * when it is turned off the image source can be disabled (however this is not currently used and has not been tested).
  *
@@ -16,104 +14,75 @@ import java.awt.image.BufferedImage;
  *
  * @author Tim Shea
  */
-public abstract class ImageSource  {
-
+abstract class ImageSource {
     /**
      * Whether the source will update the image when updateImage
      * is invoked.
      */
-    private boolean enabled = true;
+    var isEnabled: Boolean = true
 
     /**
      * Image backing the source.
      */
-    private BufferedImage currentImage;
+    var currentImage: BufferedImage
+        private set
 
     /**
      * Handle Image source Events.
      */
-    private transient ImageEvents events = new ImageEvents();
-
-    /**
-     * Construct a new ImageSourceAdapter and initialize the current image.
-     */
-    public ImageSource() {
-        currentImage = new BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB);
-        getEvents().getImageUpdate().fire();
-    }
+    @Transient
+    var events: ImageEvents = ImageEvents()
+        private set
 
     /**
      * Construct a new ImageSourceAdapter with the specified currentImage.
      *
      * @param currentImage the image to provide from the source
      */
-    public ImageSource(BufferedImage currentImage) {
-        this.currentImage = currentImage;
+    constructor(currentImage: BufferedImage = BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB)) {
+        events = ImageEvents()
+        this.currentImage = currentImage
+        events.imageUpdate.fire()
     }
 
     /**
-     * See {@link org.simbrain.workspace.serialization.WorkspaceComponentDeserializer}
+     * See [org.simbrain.workspace.serialization.WorkspaceComponentDeserializer]
      */
-    public Object readResolve() {
-        events = new ImageEvents();
-        return this;
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean value) {
-        enabled = value;
+    fun readResolve(): Any {
+        events = ImageEvents()
+        return this
     }
 
     /**
      * Notify ImageSourceListeners that a new image is available.
      */
-    public void fireImageUpdate() {
-        if (isEnabled()) {
-            events.getImageUpdate().fire();
+    suspend fun fireImageUpdate() {
+        if (this.isEnabled) {
+            events.imageUpdate.fire().await()
         }
-    }
-
-    public BufferedImage getCurrentImage() {
-        return currentImage;
     }
 
     /**
      * Set the current image on the source, and optionally fire an updaet event.
      */
-    protected void setCurrentImage(BufferedImage image, boolean fireEvents) {
-        boolean resized = image.getWidth() != currentImage.getWidth() || image.getHeight() != currentImage.getHeight();
-        currentImage = image;
+    suspend fun setCurrentImage(image: BufferedImage, fireEvents: Boolean = true) {
+        val resized = image.width != currentImage.width || image.height != currentImage.height
+        currentImage = image
         if (fireEvents) {
-            if (resized && isEnabled()) {
-                events.getResize().fire();
+            if (resized && this.isEnabled) {
+                events.resize.fire()
             }
-            fireImageUpdate();
+            fireImageUpdate()
         }
     }
 
-    /**
-     * @param image The image to assign to the current image.
-     */
-    protected void setCurrentImage(BufferedImage image) {
-        setCurrentImage(ImageUtilsKt.copy(image), true);
+    suspend fun clearCurrentImage() {
+        setCurrentImage(BufferedImage(currentImage.width, currentImage.height, BufferedImage.TYPE_INT_RGB))
     }
 
-    public void clearCurrentImage() {
-        setCurrentImage(new BufferedImage(currentImage.getWidth(), currentImage.getHeight(), BufferedImage.TYPE_INT_RGB));
-    }
+    val width: Int
+        get() = currentImage.width
 
-    public int getWidth() {
-        return currentImage.getWidth();
-    }
-
-    public int getHeight() {
-        return currentImage.getHeight();
-    }
-
-    public ImageEvents getEvents() {
-        return events;
-    }
+    val height: Int
+        get() = currentImage.height
 }

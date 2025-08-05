@@ -12,6 +12,7 @@ import java.beans.PropertyChangeEvent
 import java.io.File
 import javax.swing.*
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.math.min
 
 
@@ -130,6 +131,7 @@ fun <T : JComponent> T.createAction(
     keyboardShortcuts: List<KeyCombination>,
     initBlock: AbstractAction.() -> Unit = {},
     coroutineScope: CoroutineScope? = null,
+    coroutineContext: CoroutineContext = EmptyCoroutineContext,
     block: suspend T.(e: ActionEvent) -> Unit
 ): AbstractAction {
     return object : AbstractAction() {
@@ -150,9 +152,9 @@ fun <T : JComponent> T.createAction(
 
         override fun actionPerformed(e: ActionEvent) {
             if (coroutineScope != null) {
-                coroutineScope.launch { block(e) }
+                coroutineScope.launch(coroutineContext) { block(e) }
             } else if (this@createAction is CoroutineScope) {
-                this@createAction.launch { block(e) }
+                this@createAction.launch(coroutineContext) { block(e) }
             } else {
                 runBlocking { block(e) }
             }
@@ -171,8 +173,9 @@ fun <T : JComponent> T.createAction(
     keyboardShortcut: KeyCombination? = null,
     initBlock: AbstractAction.() -> Unit = {},
     coroutineScope: CoroutineScope? = null,
+    coroutineContext: CoroutineContext = EmptyCoroutineContext,
     block: suspend T.(e: ActionEvent?) -> Unit
-) = createAction(name, description, iconPath, keyboardShortcut?.let { listOf(it) } ?: listOf(), initBlock, coroutineScope, block)
+) = createAction(name, description, iconPath, keyboardShortcut?.let { listOf(it) } ?: listOf(), initBlock, coroutineScope, coroutineContext, block)
 
 /**
  * Create an action when no JComponent available. Keyboard shortcuts are not possible.
@@ -209,6 +212,7 @@ fun <T : JComponent> T.createAction(
     keyboardShortcut: Char,
     initBlock: AbstractAction.() -> Unit = {},
     coroutineScope: CoroutineScope? = null,
+    coroutineContext: CoroutineContext = EmptyCoroutineContext,
     block: suspend T.(e: ActionEvent?) -> Unit
 ): AbstractAction {
     return createAction(
@@ -218,6 +222,7 @@ fun <T : JComponent> T.createAction(
         keyboardShortcuts = listOf(KeyCombination(keyboardShortcut)),
         initBlock = initBlock,
         coroutineScope = coroutineScope,
+        coroutineContext = coroutineContext,
         block = block
     )
 }

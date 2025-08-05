@@ -1,5 +1,6 @@
 package org.simbrain.world.imageworld
 
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -13,12 +14,8 @@ class ImageSourceTest {
     // Concrete implementation for testing
     private class TestableImageSource : ImageSource() {
         
-        fun testSetCurrentImage(image: BufferedImage, fireEvents: Boolean = true) {
+        fun testSetCurrentImage(image: BufferedImage, fireEvents: Boolean = true) = runBlocking {
             setCurrentImage(image, fireEvents)
-        }
-        
-        fun testSetCurrentImageCopy(image: BufferedImage) {
-            currentImage = image
         }
     }
 
@@ -121,25 +118,7 @@ class ImageSourceTest {
     }
 
     @Test
-    fun `test set current image copy`() {
-        val originalImage = BufferedImage(25, 25, BufferedImage.TYPE_INT_RGB)
-        originalImage.setRGB(0, 0, Color.MAGENTA.rgb)
-        
-        imageSource.testSetCurrentImageCopy(originalImage)
-        
-        // Should be copied, not the same instance
-        assertNotSame(originalImage, imageSource.currentImage)
-        assertEquals(25, imageSource.width)
-        assertEquals(25, imageSource.height)
-        assertEquals(Color.MAGENTA.rgb, imageSource.currentImage.getRGB(0, 0))
-        
-        // Modify original - should not affect the copy
-        originalImage.setRGB(0, 0, Color.CYAN.rgb)
-        assertEquals(Color.MAGENTA.rgb, imageSource.currentImage.getRGB(0, 0))
-    }
-
-    @Test
-    fun `test fire image update when enabled`() {
+    fun `test fire image update when enabled`() = runBlocking {
         var eventFired = false
         imageSource.events.imageUpdate.on { eventFired = true }
         
@@ -149,7 +128,7 @@ class ImageSourceTest {
     }
 
     @Test
-    fun `test fire image update when disabled`() {
+    fun `test fire image update when disabled`() = runBlocking {
         var eventFired = false
         imageSource.events.imageUpdate.on { eventFired = true }
 
@@ -159,7 +138,7 @@ class ImageSourceTest {
     }
 
     @Test
-    fun `test clear current image`() {
+    fun `test clear current image`() = runBlocking {
         val coloredImage = BufferedImage(35, 35, BufferedImage.TYPE_INT_RGB)
         coloredImage.setRGB(0, 0, Color.ORANGE.rgb)
         
@@ -204,7 +183,7 @@ class ImageSourceTest {
     }
 
     @Test
-    fun `test multiple event listeners`() {
+    fun `test multiple event listeners`() = runBlocking {
         var listener1Fired = false
         var listener2Fired = false
         

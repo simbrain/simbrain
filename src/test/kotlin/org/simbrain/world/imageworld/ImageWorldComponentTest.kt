@@ -1,5 +1,6 @@
 package org.simbrain.world.imageworld
 
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -62,7 +63,7 @@ class ImageWorldComponentTest {
     }
 
     @Test
-    fun `test component has access to image album`() {
+    fun `test component has access to image album`() = runBlocking {
         val imageAlbum = component.world.imageAlbum
         assertNotNull(imageAlbum)
         
@@ -101,13 +102,13 @@ class ImageWorldComponentTest {
     @Test
     fun `test get xstream does not throw`() {
         assertDoesNotThrow {
-            val xstream = ImageWorldComponent.getXStream()
+            val xstream = ImageWorldComponent.xStream
             assertNotNull(xstream)
         }
     }
 
     @Test
-    fun `test component workflow integration`() {
+    fun `test component workflow integration`() = runBlocking {
         val world = component.world
         
         // Create a test image
@@ -129,7 +130,7 @@ class ImageWorldComponentTest {
     }
 
     @Test
-    fun `test multiple components independence`() {
+    fun `test multiple components independence`() = runBlocking {
         val component1 = ImageWorldComponent("Component 1")
         val component2 = ImageWorldComponent("Component 2")
         
@@ -161,7 +162,7 @@ class ImageWorldComponentTest {
     }
 
     @Test
-    fun `test world operations through component`() {
+    fun `test world operations through component`() = runBlocking {
         val world = component.world
         
         // Test image source name setting

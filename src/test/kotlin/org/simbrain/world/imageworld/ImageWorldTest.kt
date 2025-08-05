@@ -1,5 +1,6 @@
 package org.simbrain.world.imageworld
 
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.awt.Color
@@ -31,7 +32,7 @@ class ImageWorldTest {
     }
 
     @Test
-    fun `test image album operations`() {
+    fun `test image album operations`() = runBlocking {
         val album = imageWorld.imageAlbum
         val initialSize = album.numFrames
         
@@ -47,7 +48,7 @@ class ImageWorldTest {
     }
 
     @Test
-    fun `test frame navigation`() {
+    fun `test frame navigation`() = runBlocking {
         val album = imageWorld.imageAlbum
         
         // Add some images to test navigation
@@ -108,7 +109,7 @@ class ImageWorldTest {
     }
 
     @Test
-    fun `test reset image album`() {
+    fun `test reset image album`() = runBlocking {
         imageWorld.imageAlbum.numFrames
         
         // Reset with new dimensions
@@ -122,7 +123,7 @@ class ImageWorldTest {
     }
 
     @Test
-    fun `test snapshot functionality`() {
+    fun `test snapshot functionality`() = runBlocking {
         val album = imageWorld.imageAlbum
         val originalSize = album.numFrames
         
@@ -140,7 +141,7 @@ class ImageWorldTest {
     }
 
     @Test
-    fun `test image album navigation bounds`() {
+    fun `test image album navigation bounds`() = runBlocking {
         val album = imageWorld.imageAlbum
         
         // Ensure we have at least 2 images
@@ -170,7 +171,7 @@ class ImageWorldTest {
     }
 
     @Test
-    fun `test multiple image operations`() {
+    fun `test multiple image operations`() = runBlocking {
         val album = imageWorld.imageAlbum
         
         // Create several snapshots with different modifications
@@ -211,7 +212,7 @@ class ImageWorldTest {
     }
 
     @Test
-    fun `test image album deletion with bounds checking`() {
+    fun `test image album deletion with bounds checking`() = runBlocking {
         val album = imageWorld.imageAlbum
         
         // Ensure we have multiple images

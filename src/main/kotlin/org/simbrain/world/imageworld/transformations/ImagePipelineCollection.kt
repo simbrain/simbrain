@@ -97,26 +97,27 @@ class ImagePipelineCollection(val imageSource: ImageSource): AttributeContainer 
     /**
      * Add a new pipeline to the list.
      */
-    fun addPipeline(pipeline: ImageProcessingPipeline) {
+    suspend fun addPipeline(pipeline: ImageProcessingPipeline) {
         pipelinesList.add(pipeline)
-        events.pipelineAdded.fire(pipeline)
+        events.pipelineAdded.fire(pipeline).await()
     }
 
-    fun addPipeline(name: String, config: ImageProcessingPipeline.() -> Unit = {}) {
+    suspend fun addPipeline(name: String, config: ImageProcessingPipeline.() -> Unit = {}) {
         val pipeline = ImageProcessingPipeline(name, imageSource).apply(config)
         pipelinesList.add(pipeline)
+        events.pipelineAdded.fire(pipeline).await()
     }
 
     /**
      * Remove the indicated pipeline.
      */
-    fun removePipeline(pipeline: ImageProcessingPipeline) {
+    suspend fun removePipeline(pipeline: ImageProcessingPipeline) {
         // Cannot remove the default unfiltered pipeline
         if (pipeline === defaultUnfilteredPipeline) {
             return
         }
         pipelinesList.remove(pipeline)
-        events.pipelineRemoved.fire(pipeline)
+        events.pipelineRemoved.fire(pipeline).await()
     }
 
     /**
@@ -129,15 +130,16 @@ class ImagePipelineCollection(val imageSource: ImageSource): AttributeContainer 
     /**
      * Set the current pipeline.
      */
-    fun setCurrentPipeline(pipeline: ImageProcessingPipeline) {
+    suspend fun setCurrentPipeline(pipeline: ImageProcessingPipeline) {
         val oldPipeline = currentPipeline
         currentPipeline = pipeline
-        events.pipelineChanged.fire(pipeline, oldPipeline)
+        events.pipelineChanged.fire(pipeline, oldPipeline).await()
+        events.pipelineSelectionChanged.fire(pipeline).await()
     }
 
     val pipelines: List<ImageProcessingPipeline> get() = pipelinesList.toList()
 
-    override val id: String = "ImagePipelineCollection"
+    override val id: String = "Image album"
 
     override val childrenContainers get() = pipelinesList.toList()
 }

@@ -106,6 +106,7 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
 
         if (event.isPanKeyDown || networkPanel.mouseCursor == MouseCursor.Pan) {
             mode = Mode.PAN
+            networkPanel.autoZoom = false
         } else if (pickedNode is PCamera) {
             if (!event.isShiftDown) networkPanel.selectionManager.clear()
             mode = Mode.SELECTION

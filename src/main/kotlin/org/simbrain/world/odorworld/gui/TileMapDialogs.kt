@@ -1,5 +1,6 @@
 package org.simbrain.world.odorworld
 
+import kotlinx.coroutines.delay
 import org.piccolo2d.PCanvas
 import org.piccolo2d.PLayer
 import org.piccolo2d.event.PDragSequenceEventHandler
@@ -117,6 +118,7 @@ fun List<TileSet>.tilePicker(currentGid: Int, block: (Int) -> Unit) = StandardDi
                 // Select the tile that was initially clicked on
                 this.layer.allNodes.filterIsInstance<PTiledImage>().find { it.gid == pickedTile }?.let {
                     swingInvokeLater {
+                        delay(1L) // to prevent intermittent transformation calculation error when the view is not fully rendered yet
                         it.select()
                         val centerX = it.globalBounds.centerX
                         val centerY = it.globalBounds.centerY

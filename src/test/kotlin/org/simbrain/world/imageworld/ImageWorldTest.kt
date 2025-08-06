@@ -3,8 +3,17 @@ package org.simbrain.world.imageworld
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.simbrain.util.point
+import org.simbrain.world.odorworld.OdorWorldComponent
+import org.simbrain.world.odorworld.effectors.StraightMovement
+import org.simbrain.world.odorworld.entities.EntityType
+import org.simbrain.world.odorworld.entities.OdorWorldEntity
+import org.simbrain.world.odorworld.sensors.ObjectSensor
 import java.awt.Color
 import java.awt.image.BufferedImage
+import java.io.ByteArrayInputStream
+import java.io.InputStream
+import java.nio.charset.StandardCharsets
 
 class ImageWorldTest {
 
@@ -228,5 +237,101 @@ class ImageWorldTest {
         // Current index should still be valid
         assertTrue(album.frameIndex >= 0)
         assertTrue(album.frameIndex < album.numFrames)
+    }
+
+    @Test
+    fun `test xstream serialization`() = runBlocking {
+        val album = imageWorld.imageAlbum
+        
+        // Clear existing images and create known test images
+        imageWorld.resetImageAlbum(64, 64)
+        
+        // Create first test image - red square in top-left
+        val image1 = imageWorld.currentImage
+        val graphics1 = image1.createGraphics()
+        graphics1.color = Color.RED
+        graphics1.fillRect(0, 0, 32, 32)
+        graphics1.dispose()
+        album.takeSnapshot()
+        
+        // Create second test image - green square in top-right
+        val image2 = imageWorld.currentImage
+        val graphics2 = image2.createGraphics()
+        graphics2.color = Color.GREEN
+        graphics2.fillRect(32, 0, 32, 32)
+        graphics2.dispose()
+        album.takeSnapshot()
+        
+        // Create third test image - blue square in bottom-left
+        val image3 = imageWorld.currentImage
+        val graphics3 = image3.createGraphics()
+        graphics3.color = Color.BLUE
+        graphics3.fillRect(0, 32, 32, 32)
+        graphics3.dispose()
+        album.takeSnapshot()
+        
+        // Create fourth test image - yellow square in bottom-right
+        val image4 = imageWorld.currentImage
+        val graphics4 = image4.createGraphics()
+        graphics4.color = Color.YELLOW
+        graphics4.fillRect(32, 32, 32, 32)
+        graphics4.dispose()
+        album.takeSnapshot()
+        
+        // Verify we have 4 + 1 images before serialization
+        assertEquals(5, album.numFrames)
+        
+        // Store expected colors for each frame
+        val expectedColors = mapOf(
+            0 to Color.RED.rgb,
+            1 to Color.GREEN.rgb,
+            2 to Color.BLUE.rgb,
+            3 to Color.YELLOW.rgb
+        )
+        
+        // Verify images before serialization
+        expectedColors.forEach { (frameIndex, expectedColor) ->
+            album.setFrame(frameIndex)
+            val testImage = imageWorld.currentImage
+            when (frameIndex) {
+                0 -> assertEquals(expectedColor, testImage.getRGB(16, 16)) // red square center
+                1 -> assertEquals(expectedColor, testImage.getRGB(48, 16)) // green square center
+                2 -> assertEquals(expectedColor, testImage.getRGB(16, 48)) // blue square center
+                3 -> assertEquals(expectedColor, testImage.getRGB(48, 48)) // yellow square center
+            }
+        }
+
+        // Serialize to XML
+        val xstream = imageWorld.xml
+        //println(xstream)
+        assertNotNull(xstream)
+        val stream: InputStream = ByteArrayInputStream(xstream?.toByteArray(StandardCharsets.UTF_8))
+
+        // Deserialize from XML
+        val deserializedImageWorld = ImageWorldComponent.open(stream, "test2", "xml")
+        assertNotNull(deserializedImageWorld)
+
+        val deserializedAlbum = deserializedImageWorld.world.imageAlbum
+
+        // Test that the deserialized world has the same number of images
+        assertEquals(5, deserializedAlbum.numFrames, "Deserialized album should have 4 images")
+
+        // Test that each image has the expected content
+        expectedColors.forEach { (frameIndex, expectedColor) ->
+            deserializedAlbum.setFrame(frameIndex)
+            val deserializedImage = deserializedImageWorld.world.currentImage
+
+            // Check the appropriate pixel location for each colored square
+            val actualColor = when (frameIndex) {
+                0 -> deserializedImage.getRGB(16, 16) // red square center
+                1 -> deserializedImage.getRGB(48, 16) // green square center
+                2 -> deserializedImage.getRGB(16, 48) // blue square center
+                3 -> deserializedImage.getRGB(48, 48) // yellow square center
+                else -> 0
+            }
+
+            assertEquals(expectedColor, actualColor,
+                "Frame $frameIndex should have correct color at expected position")
+        }
     }
 } 

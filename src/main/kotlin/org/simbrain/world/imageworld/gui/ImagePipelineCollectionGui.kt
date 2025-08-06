@@ -5,7 +5,6 @@ import kotlinx.coroutines.launch
 import org.simbrain.util.ResourceManager
 import org.simbrain.util.createAction
 import org.simbrain.util.swingDispatcher
-import org.simbrain.world.imageworld.ImageWorldComponent
 import org.simbrain.world.imageworld.ImageWorldDesktopComponent
 import org.simbrain.world.imageworld.dialogs.ImageProcessingPipelineDialog
 import org.simbrain.world.imageworld.filters.ImageProcessingPipeline
@@ -26,7 +25,7 @@ class ImagePipelineCollectionGui(
         toolTipText = "Which pipeline to view"
         maximumSize = Dimension(200, 100)
         addActionListener { evt ->
-            (imageWorldDesktopComponent.workspaceComponent as ImageWorldComponent).world.launch(Dispatchers.Default) {
+            imageWorldDesktopComponent.workspaceComponent.world.launch(Dispatchers.Default) {
                 val selectedPipeline = selectedItem as? ImageProcessingPipeline
                 if (selectedPipeline != null) {
                     imagePipelineCollection.setCurrentPipeline(selectedPipeline)

@@ -20,6 +20,7 @@ import org.simbrain.util.projection.Projector
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.table.BasicDataFrame
 import org.simbrain.world.imageworld.ImageAlbum
+import org.simbrain.world.imageworld.ImageWorld
 import org.simbrain.world.odorworld.OdorWorld
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
@@ -59,6 +60,7 @@ fun getSimbrainXStream(): XStream {
                 listOf(
                     EditableObject::class.java,
                     NetworkModel::class.java,
+                    ImageWorld::class.java,
                 ),
                 mapper,
                 reflectionProvider,

@@ -6,12 +6,10 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import org.simbrain.util.UserParameter
 import org.simbrain.util.math.SimbrainMath
-import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.world.imageworld.filters.ImageProcessingPipeline
 import org.simbrain.world.imageworld.transformations.ImagePipelineCollection
 import java.awt.Color
 import java.awt.image.BufferedImage
-import java.io.OutputStream
 
 /**
  * Image World. Displays an image and (hopefully) allows it to provide a kind
@@ -22,7 +20,7 @@ import java.io.OutputStream
  * @author Jeff Yoshimi
  * @author Tim Shea
  */
-class ImageWorld : WorkspaceComponent("Image World"), CoroutineScope {
+class ImageWorld: CoroutineScope {
 
     var penColor: Color = Color.white
 
@@ -102,10 +100,6 @@ class ImageWorld : WorkspaceComponent("Image World"), CoroutineScope {
      */
     override fun toString(): String {
         return SimbrainMath.roundDouble(imagePipelineCollection.currentPipeline.brightness.first(), 2).toString()
-    }
-
-    override fun save(output: OutputStream, format: String?) {
-        // TODO: Implement save functionality
     }
 
     suspend fun resetImageAlbum(width: Int, height: Int) {

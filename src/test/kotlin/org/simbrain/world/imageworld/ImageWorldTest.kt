@@ -3,12 +3,6 @@ package org.simbrain.world.imageworld
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import org.simbrain.util.point
-import org.simbrain.world.odorworld.OdorWorldComponent
-import org.simbrain.world.odorworld.effectors.StraightMovement
-import org.simbrain.world.odorworld.entities.EntityType
-import org.simbrain.world.odorworld.entities.OdorWorldEntity
-import org.simbrain.world.odorworld.sensors.ObjectSensor
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
@@ -17,13 +11,8 @@ import java.nio.charset.StandardCharsets
 
 class ImageWorldTest {
 
-    private val imageComponent: ImageWorldComponent
-    private val imageWorld: ImageWorld
-
-    init {
-        imageComponent = ImageWorldComponent("Test Image World")
-        imageWorld = imageComponent.world
-    }
+    private val imageComponent = ImageWorldComponent("Test Image World")
+    private val imageWorld get() = imageComponent.world
 
     @Test
     fun `test image world creation`() {
@@ -302,8 +291,8 @@ class ImageWorldTest {
         }
 
         // Serialize to XML
-        val xstream = imageWorld.xml
-        //println(xstream)
+        val xstream = imageComponent.xml
+        // println(xstream)
         assertNotNull(xstream)
         val stream: InputStream = ByteArrayInputStream(xstream?.toByteArray(StandardCharsets.UTF_8))
 

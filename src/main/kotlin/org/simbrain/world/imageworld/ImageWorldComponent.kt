@@ -36,8 +36,11 @@ class ImageWorldComponent : WorkspaceComponent {
             addAll(world.imagePipelineCollection.pipelines)
         }
 
+    override val xml: String?
+        get() = xStream.toXML(world)
+
     override fun save(output: OutputStream, format: String?) {
-        xStream.toXML(this.world, output)
+        xStream.toXML(world, output)
     }
 
     /**

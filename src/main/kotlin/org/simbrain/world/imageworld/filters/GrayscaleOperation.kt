@@ -10,6 +10,7 @@ import java.awt.image.ColorConvertOp
  */
 class GrayscaleOperation : ImageOperation() {
 
+    @Transient
     private val colorConvertOp = ColorConvertOp(ColorSpace.getInstance(ColorSpace.CS_GRAY), null)
 
     init {

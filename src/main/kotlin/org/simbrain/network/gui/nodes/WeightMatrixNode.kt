@@ -3,6 +3,7 @@ package org.simbrain.network.gui.nodes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PCamera
+import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.core.Connector
 import org.simbrain.network.core.NeuronArray
@@ -93,6 +94,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         }
         setClamped((weightMatrix as WeightMatrix).clamped)
         interactionBox.setText(weightMatrix.displayName)
+        interactionBox.raiseToTop()
         renderMatrixToImage()
     }
 
@@ -300,6 +302,13 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
 
     override val model: Connector
         get() = weightMatrix
+
+    override fun isIntersecting(bound: PBounds?): Boolean {
+        // Check intersection with actual visual components rather than full bounds
+        return imageBox.globalBounds.intersects(bound) ||
+               arrow.globalBounds.intersects(bound) ||
+               interactionBox.globalBounds.intersects(bound)
+    }
 
     /**
      * Basic interaction box for weight matrix nodes. Ensures a property dialog

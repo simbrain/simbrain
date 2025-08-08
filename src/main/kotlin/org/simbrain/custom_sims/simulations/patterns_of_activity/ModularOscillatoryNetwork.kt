@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations.patterns_of_activity
 
+import kotlinx.coroutines.runBlocking
 import org.simbrain.custom_sims.Simulation
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connections.*
@@ -42,7 +43,7 @@ class ModularOscillatoryNetwork : Simulation {
         sim.workspace.clearWorkspace()
 
         // Set up world
-        setUpWorld()
+        runBlocking { setUpWorld() }
 
         // Set up network
         setUpNetwork()
@@ -175,7 +176,7 @@ class ModularOscillatoryNetwork : Simulation {
         return sg
     }
 
-    private fun setUpWorld() {
+    private suspend fun setUpWorld() {
         val oc = sim.addOdorWorld(590, 9, 505, 296, "World")
 
         // Mouse

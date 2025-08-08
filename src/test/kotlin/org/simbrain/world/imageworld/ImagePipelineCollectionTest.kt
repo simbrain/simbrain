@@ -41,7 +41,7 @@ class ImagePipelineCollectionTest {
     }
 
     @Test
-    fun `test set current pipeline`() {
+    fun `test set current pipeline`() = runBlocking {
         val pipelines = pipelineCollection.pipelines
         if (pipelines.size > 1) {
             val firstPipeline = pipelines[0]
@@ -56,7 +56,7 @@ class ImagePipelineCollectionTest {
     }
 
     @Test
-    fun `test pipeline processed image`() {
+    fun `test pipeline processed image`() = runBlocking {
         val testImage = BufferedImage(20, 20, BufferedImage.TYPE_INT_RGB)
         testImage.setRGB(0, 0, Color.RED.rgb)
         
@@ -74,7 +74,7 @@ class ImagePipelineCollectionTest {
     }
 
     @Test
-    fun `test pipeline collection events`() {
+    fun `test pipeline collection events`() = runBlocking {
         var pipelineAddedFired = false
         var pipelineRemovedFired = false
         var pipelineChangedFired = false
@@ -126,7 +126,7 @@ class ImagePipelineCollectionTest {
     }
 
     @Test
-    fun `test cannot remove all pipelines`() {
+    fun `test cannot remove all pipelines`() = runBlocking {
         val pipelines = pipelineCollection.pipelines.toList()
         
         // Try to remove all but ensure at least one remains
@@ -140,7 +140,7 @@ class ImagePipelineCollectionTest {
     }
 
     @Test
-    fun `test pipeline collection with different image sizes`() {
+    fun `test pipeline collection with different image sizes`() = runBlocking {
         val smallImage = BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB)
         val largeImage = BufferedImage(100, 100, BufferedImage.TYPE_INT_RGB)
         
@@ -169,7 +169,7 @@ class ImagePipelineCollectionTest {
     }
 
     @Test
-    fun `test get brightness data`() {
+    fun `test get brightness data`() = runBlocking {
         val testImage = BufferedImage(5, 5, BufferedImage.TYPE_INT_RGB)
         
         // Create a gradient

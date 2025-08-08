@@ -163,11 +163,13 @@ val grazingCows = newSim { optionString ->
         val networks = List(cowGenotypes.size) { index ->
             NetworkComponent("Network ${index + 1}").also { workspace.addWorkspaceComponent(it) }.network
         }
-        val entities = List(cowGenotypes.size) { i ->
-            OdorWorldEntity(odorWorld, EntityType.Cow).also {
-                odorWorld.addEntity(it)
-                it.location = point((i + 1) * 100, (i + 1) * 100)
-            }
+        val entities = runBlocking {
+            List(cowGenotypes.size) { i ->
+                OdorWorldEntity(odorWorld, EntityType.Cow).also {
+                    odorWorld.addEntity(it)
+                    it.location = point((i + 1) * 100, (i + 1) * 100)
+                }
+        }
         }
 
         val dandelionSensors = entities.map { entity ->
@@ -203,10 +205,12 @@ val grazingCows = newSim { optionString ->
                     }
                 )
             }
-            repeat(numFlowers) {
-                val loc = odorWorld.getRandomLocation()
-                odorWorld.addEntity(loc.x.toInt(), loc.y.toInt(),
-                    EntityType.Dandelions, doubleArrayOf(1.0))
+            runBlocking {
+                repeat(numFlowers) {
+                    val loc = odorWorld.getRandomLocation()
+                    odorWorld.addEntity(loc.x.toInt(), loc.y.toInt(),
+                        EntityType.Dandelions, doubleArrayOf(1.0))
+                }
             }
             workspace.launch {
                 (cowPhenotypes.await() zip entities).forEach { (phenotype, entity) ->

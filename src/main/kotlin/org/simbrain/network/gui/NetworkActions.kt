@@ -565,6 +565,22 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         }
     }
 
+    /**
+     * Toggle synapse spiking-only display mode.
+     */
+    val toggleSynapseSpikingOnlyVisibility = networkPanel.createAction(
+        name = "Only show synapses when spiking",
+        description = "When enabled, synapses are only drawn while their source neuron is spiking"
+    ) { event ->
+        event?.source?.let {
+            networkPanel.synapseSpikingOnlyVisible = if (it is JCheckBoxMenuItem) {
+                it.state
+            } else {
+                !networkPanel.synapseSpikingOnlyVisible
+            }
+        }
+    }
+
     val connectSelectedModels = networkPanel.createAction(
         name = "Connect selected objects...",
         description = "Creates synapse, weight matrix, etc. between selected source and target entities",

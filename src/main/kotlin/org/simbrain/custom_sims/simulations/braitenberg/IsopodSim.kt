@@ -153,7 +153,7 @@ val isopodSim = newSim {
             manualMovement.manualMotionTurnIncrement = 2.0
         }
 
-        fun addFish(x: Double, y: Double) {
+        suspend fun addFish(x: Double, y: Double) {
             odorWorld.addEntity(x, y, EntityType.Fish).apply {
                 name = "Fish"
                 // Smell value when agent is right on top of fish

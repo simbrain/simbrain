@@ -1,12 +1,15 @@
 package org.simbrain.world.imageworld
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import org.simbrain.util.UserParameter
 import org.simbrain.util.math.SimbrainMath
-import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.world.imageworld.filters.ImageProcessingPipeline
 import org.simbrain.world.imageworld.transformations.ImagePipelineCollection
+import java.awt.Color
 import java.awt.image.BufferedImage
-import java.io.OutputStream
 
 /**
  * Image World. Displays an image and (hopefully) allows it to provide a kind
@@ -17,7 +20,45 @@ import java.io.OutputStream
  * @author Jeff Yoshimi
  * @author Tim Shea
  */
-class ImageWorld : WorkspaceComponent("Image World") {
+class ImageWorld: CoroutineScope {
+
+    var penColor: Color = Color.white
+
+    var penSize: Int = 1
+
+    var useSmoothing: Boolean = false
+
+    /**
+     * The quality level of smoothing (LOW, MEDIUM, HIGH)
+     */
+    enum class SmoothingQuality {
+        LOW, MEDIUM, HIGH;
+
+        override fun toString(): String {
+            return name.lowercase().replaceFirstChar { it.uppercase() }
+        }
+    }
+
+    /**
+     * The available brush shapes
+     */
+    enum class BrushShape {
+        CIRCLE, SQUARE, SOFT;
+
+        override fun toString(): String {
+            return name.lowercase().replaceFirstChar { it.uppercase() }
+        }
+    }
+
+    var smoothingQuality: SmoothingQuality = SmoothingQuality.HIGH
+    var brushShape: BrushShape = BrushShape.CIRCLE
+
+
+    @Transient
+    private val job = SupervisorJob()
+
+    @Transient
+    override val coroutineContext = Dispatchers.Default + job
 
     /**
      * The current image.
@@ -27,7 +68,7 @@ class ImageWorld : WorkspaceComponent("Image World") {
         set(value) {
             field = value
             if (value.isNotEmpty()) {
-                imageAlbum.loadImage(value)
+                launch { imageAlbum.loadImage(value) }
             }
         }
 
@@ -40,13 +81,13 @@ class ImageWorld : WorkspaceComponent("Image World") {
 
     init {
         if (imageSourceName.isNotEmpty()) {
-            imageAlbum.loadImage(imageSourceName)
+            launch { imageAlbum.loadImage(imageSourceName) }
         }
     }
 
     val currentPipeline: ImageProcessingPipeline get() = imagePipelineCollection.currentPipeline
 
-    fun setCurrentPipeline(name: String) {
+    suspend fun setCurrentPipeline(name: String) {
         imagePipelineCollection.pipelines
             .find { it.name == name }
             ?.let { imagePipelineCollection.setCurrentPipeline(it) }
@@ -61,23 +102,19 @@ class ImageWorld : WorkspaceComponent("Image World") {
         return SimbrainMath.roundDouble(imagePipelineCollection.currentPipeline.brightness.first(), 2).toString()
     }
 
-    override fun save(output: OutputStream, format: String?) {
-        // TODO: Implement save functionality
-    }
-
-    fun resetImageAlbum(width: Int, height: Int) {
+    suspend fun resetImageAlbum(width: Int, height: Int) {
         imageAlbum.reset(width, height)
     }
 
     val numImages: Int get() = imageAlbum.numFrames
 
-    fun nextFrame() = imageAlbum.nextFrame()
+    suspend fun nextFrame() = imageAlbum.nextFrame()
 
-    fun previousFrame() = imageAlbum.previousFrame()
+    suspend fun previousFrame() = imageAlbum.previousFrame()
 
     val currentImage: BufferedImage get() = currentBufferedImage
 
-    fun loadImages(files: Array<java.io.File>) {
+    suspend fun loadImages(files: Array<java.io.File>) {
         imageAlbum.loadImages(files)
     }
 }

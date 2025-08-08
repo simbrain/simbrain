@@ -1,5 +1,6 @@
 package org.simbrain.world.odorworld
 
+import kotlinx.coroutines.runBlocking
 import org.simbrain.util.SmellSource
 import org.simbrain.util.decayfunctions.GaussianDecayFunction
 import org.simbrain.util.point
@@ -94,6 +95,8 @@ fun OdorWorld.addDefaultEntities() {
             }
         })
     }
-    world.addEntity(mouse)
-    objects.forEach { world.addEntity(it) }
+    runBlocking {
+        world.addEntity(mouse)
+        objects.forEach { world.addEntity(it) }
+    }
 }

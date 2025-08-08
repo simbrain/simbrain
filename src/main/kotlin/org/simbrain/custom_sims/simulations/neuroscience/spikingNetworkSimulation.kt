@@ -5,6 +5,7 @@ import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.connections.polarizeSynapses
 import org.simbrain.network.core.*
+import org.simbrain.network.desktop.NetworkDesktopComponent
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.spikeresponders.JumpAndDecay
 import org.simbrain.network.updaterules.IntegrateAndFireRule
@@ -16,6 +17,7 @@ import org.simbrain.util.place
 import org.simbrain.util.showNumericInputDialog
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.stats.distributions.PoissonDistribution
+import org.simbrain.workspace.gui.SimbrainDesktop.getDesktopComponent
 import javax.swing.JOptionPane
 import kotlin.math.sqrt
 
@@ -37,7 +39,7 @@ val spikingNetworkSimulation = newSim {
     workspace.clearWorkspace()
     val networkComponent = addNetworkComponent("Integrate and Fire Network")
     val network = networkComponent.network
-    
+
     // Create layout for neurons
     val layout = GridLayout(gridSpace, gridSpace, (sqrt(numNeurons.toDouble())).toInt())
 
@@ -110,6 +112,7 @@ val spikingNetworkSimulation = newSim {
     workspace.addWorkspaceComponent(rasterPlot)
 
     withGui {
+        getNetworkPanel(networkComponent).synapseSpikingOnlyVisible = true
         place(networkComponent, 210, 0, 600, 600)
         place(rasterPlot, 810, 0, 600, 600)
         createControlPanel("Controls", 0, 0) {

@@ -11,8 +11,8 @@ import org.simbrain.custom_sims.simulations.braitenberg.braitenbergGame
 import org.simbrain.custom_sims.simulations.braitenberg.braitenbergSim
 import org.simbrain.custom_sims.simulations.braitenberg.pursuer
 import org.simbrain.custom_sims.simulations.demos.competitiveSim
-import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaos
-import org.simbrain.custom_sims.simulations.edge_of_chaos.EdgeOfChaosBitStream
+import org.simbrain.custom_sims.simulations.edge_of_chaos.edgeOfChaos
+import org.simbrain.custom_sims.simulations.edge_of_chaos.edgeOfChaosBitStream
 import org.simbrain.custom_sims.simulations.neuroscience.cortexLayers
 import org.simbrain.custom_sims.simulations.neuroscience.spikingNetworkSimulation
 import org.simbrain.custom_sims.simulations.nlp.tinyLanguageModel
@@ -58,8 +58,8 @@ val simulations = dir("Simulations", alphabetical = true ) {
     }
 
     dir("Reservoir networks") {
-        item("Edge of chaos bit stream") { EdgeOfChaosBitStream() }
-        item("Edge of chaos embodied") { EdgeOfChaos() }
+        item("Edge of chaos bit stream") { edgeOfChaosBitStream }
+        item("Edge of chaos embodied") { edgeOfChaos }
         item("Binary reservoir") { binaryReservoir }
         // item("Pattern Completion") { allostaticPatternCompletion }
         item("Object tracking reservoir") { objectTrackingSim }
@@ -77,7 +77,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         //item("RandomizedPursuer") { RandomizedPursuer() }
         item("Three object recurrent") { cogMap3Objects }
         // item("ModularOscillatoryNetwork") {ModularOscillatoryNetwork()}
-        //item("KuramotoOscillators") { KuramotoOscillators() }
+        // item("Kuramoto Oscillators") { kuramotoOscillators }
     }
 
     dir("Language models") {

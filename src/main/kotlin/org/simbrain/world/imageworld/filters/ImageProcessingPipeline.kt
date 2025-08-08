@@ -40,6 +40,7 @@ class ImageProcessingPipeline(
     /**
      * Events fired when the pipeline changes
      */
+    @Transient
     val events = PipelineEvents()
 
     class PipelineEvents : Events() {

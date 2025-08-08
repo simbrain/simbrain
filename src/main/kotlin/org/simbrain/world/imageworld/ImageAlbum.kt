@@ -3,7 +3,6 @@ package org.simbrain.world.imageworld
 import org.simbrain.util.copy
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.workspace.AttributeContainer
-import org.simbrain.workspace.Consumable
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
@@ -44,14 +43,13 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
      * @param filename the file to load.
      * @throws IOException upon failure to read the requested file
      */
-    @Consumable
-    fun loadImage(filename: String) {
+    suspend fun loadImage(filename: String) {
         _frames.clear()
         if (filename.isEmpty()) {
-            currentImage = BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB)
+            setCurrentImage(BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB))
         } else {
             val image = ImageIO.read(File(filename))
-            currentImage = image
+            setCurrentImage(image)
         }
     }
 
@@ -60,7 +58,7 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
      *
      * @param files the images to load
      */
-    fun loadImages(files: Array<File>) {
+    suspend fun loadImages(files: Array<File>) {
         val list: MutableList<BufferedImage> = ArrayList()
         for (file in files) {
             try {
@@ -77,7 +75,7 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
         }
         _frames.clear()
         _frames.addAll(list)
-        currentImage = _frames[0]
+        setCurrentImage(_frames[0])
     }
 
     fun writeCurrentImageToFile(destination: File) {
@@ -94,10 +92,11 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
     /**
      * Add a new image to the album and set the current frame to it.
      */
-    fun addImage(image: BufferedImage) {
+    suspend fun addImage(image: BufferedImage) {
         _frames.add(image)
         frameIndex = _frames.size - 1
-        currentImage = image
+        setCurrentImage(image)
+        events.imageUpdate.fire().await()
     }
 
     /**
@@ -105,31 +104,31 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
      *
      * @param imageIcon the image icon
      */
-    fun loadImage(imageIcon: ImageIcon) {
+    suspend fun loadImage(imageIcon: ImageIcon) {
         val image = BufferedImage(imageIcon.iconWidth, imageIcon.iconHeight, BufferedImage.TYPE_INT_RGB)
         val graphics = image.createGraphics()
         graphics.drawImage(imageIcon.image, 0, 0, null)
         graphics.dispose()
-        currentImage = image
+        setCurrentImage(image)
         events.imageUpdate.fire()
     }
 
     /**
      * Update the current image to the next image in the frame list.
      */
-    fun nextFrame() {
+    suspend fun nextFrame() {
         saveCurrentFrame()
         frameIndex = (frameIndex + 1) % _frames.size
-        currentImage = _frames[frameIndex]
+        setCurrentImage(_frames[frameIndex])
     }
 
     /**
      * Update the current image to the previous image in the frame list.
      */
-    fun previousFrame() {
+    suspend fun previousFrame() {
         saveCurrentFrame()
         frameIndex = (frameIndex + _frames.size - 1) % _frames.size
-        currentImage = _frames[frameIndex]
+        setCurrentImage(_frames[frameIndex])
     }
 
     /**
@@ -141,23 +140,26 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
     /**
      * Set album to frame aat provided index.
      */
-    fun setFrame(frameIndex: Int) {
+    suspend fun setFrame(frameIndex: Int) {
         if (frameIndex >= 0 && frameIndex < _frames.size) {
             saveCurrentFrame()
-            currentImage = _frames[frameIndex]
+            this.frameIndex = frameIndex
+            setCurrentImage(_frames[frameIndex])
         }
     }
 
-    fun reset(width: Int, height: Int) {
+    suspend fun reset(width: Int, height: Int) {
         _frames.clear()
         frameIndex = 0
-        setCurrentImage(BufferedImage(width, height, BufferedImage.TYPE_INT_RGB), true)
+        val newImage = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
+        _frames.add(newImage)
+        setCurrentImage(newImage, true)
     }
 
     /**
      * Add the current image world image to the album.
      */
-    fun takeSnapshot() {
+    suspend fun takeSnapshot() {
         val snapshot = currentImage.copy()
         addImage(snapshot)
     }
@@ -167,8 +169,8 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
         _frames[frameIndex].data = snapshot.data
     }
 
-    fun deleteCurrentImage() {
-        if (_frames.size == 0) {
+    suspend fun deleteCurrentImage() {
+        if (_frames.isEmpty()) {
             return
         }
         if (_frames.size == 1) {
@@ -177,7 +179,7 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
         }
         _frames.removeAt(frameIndex)
         frameIndex = (frameIndex + _frames.size - 1) % _frames.size
-        currentImage = _frames[frameIndex]
+        setCurrentImage(_frames[frameIndex])
     }
 
     override val id: String

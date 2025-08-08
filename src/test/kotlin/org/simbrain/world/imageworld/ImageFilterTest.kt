@@ -28,10 +28,11 @@ class ImageFilterTest {
             for (x in 0 until input.width) {
                 for (y in 0 until input.height) {
                     val rgb = input.getRGB(x, y)
+                    val a = (rgb shr 24) and 0xFF
                     val r = 255 - (rgb shr 16 and 0xFF)
                     val g = 255 - (rgb shr 8 and 0xFF)
                     val b = 255 - (rgb and 0xFF)
-                    output.setRGB(x, y, (r shl 16) or (g shl 8) or b)
+                    output.setRGB(x, y, (a shl 24) or (r shl 16) or (g shl 8) or b)
                 }
             }
             return output

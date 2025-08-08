@@ -3,7 +3,6 @@ package org.simbrain.network.gui.nodes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.nodes.PImage
-import org.piccolo2d.nodes.PText
 import org.simbrain.network.core.ActivationSequence
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.randomizeBiases
@@ -40,22 +39,9 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
 
     protected val biasImage = PImage()
 
+    val imageSize = 100.0
 
     override val margin = 10.0
-
-    /**
-     * Height of array when in "flat" mode.
-     */
-    private val flatPixelArrayHeight = 10
-
-    /**
-     * Text showing info about the array.
-     */
-    private val infoText = PText().apply {
-        font = INFO_FONT
-        text = computeInfoText()
-        mainNode.addChild(this)
-    }
 
     /**
      * Create a new neuron array node.
@@ -75,12 +61,11 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
 
         events.updateGraphics.on(Dispatchers.Swing) {
             updateActivationImage()
-            updateInfoText()
         }
 
         updateActivationImage()
-        activationImage.offset(0.0, infoText.offset.y + infoText.height + 5)
-        spikeImage.offset(0.0, infoText.offset.y + infoText.height + 5)
+        activationImage.offset(0.0, 5.0)
+        spikeImage.offset(0.0, 5.0)
         activationImage.addBorder()
         updateBorder()
 
@@ -99,18 +84,9 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
         activationImage.image = img
         activationImage.setBounds(
             0.0, 0.0,
-            infoText.width, infoText.width
+            imageSize, imageSize
         )
         activationImage.addBorder()
-    }
-
-    private fun computeInfoText() = """
-            ${activationSequence.id}    Rows: ${activationSequence.activations.nrow()} Cols: ${activationSequence.activations.ncol()}
-            Mean activation: ${activationSequence.activations.flatten().average().format(4)}
-            """.trimIndent()
-
-    private fun updateInfoText() {
-        infoText.text = computeInfoText()
     }
 
     override val toolTipText
@@ -197,9 +173,7 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
 
         if (aqnList.isEmpty()) return null
 
-        aqnList.map { it.model }.createEditorDialog {
-            aqnList.forEach { it.updateInfoText() }
-        }
+        aqnList.map { it.model }.createEditorDialog()
     }
 
 

@@ -3,15 +3,19 @@ package org.simbrain.custom_sims.simulations
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.trainers.BackpropLossFunction
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.network.trainers.splitDataSet
+import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.SigmoidalRule
+import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.alignNetworkModels
 import org.simbrain.network.util.offsetNetworkModel
 import org.simbrain.util.getFilesWithExtension
+import org.simbrain.util.math.SigmoidFunctionEnum
 import org.simbrain.util.place
 import org.simbrain.util.setRow
 import org.simbrain.world.imageworld.filters.EdgeDetectionFilter
@@ -37,8 +41,13 @@ val photoAlbumExample = newSim {
     network.addNetworkModel(inputArray)
 
     // Hidden layer
-    val hiddenLayer = NeuronArray(40).apply {
+    val hiddenLayer = NeuronArray(60).apply {
         label = "Hidden"
+        updateRule = SigmoidalRule().apply {
+            type = SigmoidFunctionEnum.TANH
+            lowerBound = -1.0
+        }
+        gridMode = true
     }
     network.addNetworkModel(hiddenLayer)
 
@@ -47,15 +56,15 @@ val photoAlbumExample = newSim {
         label = "Output"
         isClamped = false
         circleMode = true
-        updateRule = SigmoidalRule()
+        updateRule = SoftmaxRule()
         labelArray = arrayOf("Bird", "Crocodile", "Flower", "Plane")
     }
     network.addNetworkModel(outputLayer)
 
-    offsetNetworkModel(inputArray, hiddenLayer, Direction.NORTH, 250.0)
+    offsetNetworkModel(inputArray, hiddenLayer, Direction.NORTH, 300.0)
     alignNetworkModels(inputArray, hiddenLayer, Alignment.VERTICAL)
 
-    offsetNetworkModel(hiddenLayer, outputLayer, Direction.NORTH, 250.0)
+    offsetNetworkModel(hiddenLayer, outputLayer, Direction.NORTH, 300.0)
     alignNetworkModels(hiddenLayer, outputLayer, Alignment.VERTICAL)
 
 
@@ -63,7 +72,11 @@ val photoAlbumExample = newSim {
     val weights = listOf(
         WeightMatrix(inputArray, hiddenLayer).apply { label = "Input to Hidden" },
         WeightMatrix(hiddenLayer, outputLayer).apply { label = "Hidden to Output" }
-    ).onEach { it.randomize() }.also { network.addNetworkModels(it) }
+    ).onEach {
+        it.randomize()
+    }.also {
+        network.addNetworkModels(it)
+    }
 
     // Create supervised model
     val supervisedModel = SupervisedModel(inputArray, outputLayer).apply {
@@ -96,7 +109,6 @@ val photoAlbumExample = newSim {
     val numImages = imageFiles.size
     val inputSize = 100 * 100
 
-
     val inputs = Matrix(numImages, inputSize)
     val targets = Matrix(numImages, 4)
     
@@ -121,7 +133,8 @@ val photoAlbumExample = newSim {
         targets.setRow(index, oneHotTarget)
     }
 
-    val (training, testing) = splitDataSet(inputs, targets, 0.8)
+    // Change split ratio to 1.0 for all training / no testing
+    val (training, testing) = splitDataSet(inputs, targets, .8)
     val (trainingInputs, trainingTargets) = training
     val (testingInputs, testingTargets) = testing
     
@@ -134,6 +147,8 @@ val photoAlbumExample = newSim {
         inputs = testingInputs,
         targets = testingTargets,
     )
+
+    supervisedModel.trainerConfig.lossFunction = BackpropLossFunction.CrossEntropy
 
     // Couple
     with(couplingManager) {

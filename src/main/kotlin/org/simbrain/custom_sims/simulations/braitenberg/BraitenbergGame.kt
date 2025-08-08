@@ -1,10 +1,9 @@
 package org.simbrain.custom_sims.simulations.braitenberg
 
-import kotlinx.coroutines.runBlocking
-import org.simbrain.custom_sims.*
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.addNeuron
-import org.simbrain.network.core.addSynapse
+import org.simbrain.custom_sims.addOdorWorldComponent
+import org.simbrain.custom_sims.addSidebarInfo
+import org.simbrain.custom_sims.createControlPanel
+import org.simbrain.custom_sims.newSim
 import org.simbrain.util.getDesktopComponentAs
 import org.simbrain.util.graphicalUpperBound
 import org.simbrain.util.place
@@ -33,77 +32,7 @@ val braitenbergGame = newSim {
     oc.world.addEntity(398, 335, EntityType.Poison)
     oc.world.addEntity(500, 184, EntityType.Swiss)
 
-    class Vehicle(name: String, entityType: EntityType, entityOffset: Point2D) {
-
-        val networkComponent = addNetworkComponent(name)
-
-        val network get() = networkComponent.network
-
-        val agent = oc.world.addEntity(entityOffset.x, entityOffset.y, entityType).apply {
-            addLeftRightSensors(EntityType.Swiss, 270.0)
-            addDefaultEffectors()
-        }
-
-        val leftInput = runBlocking {
-            network.addNeuron(0, 100).apply {
-                label = "$entityType (L)"
-                clamped = true
-            }
-        }
-
-        val rightInput = runBlocking {
-            network.addNeuron(100, 100).apply {
-                label = "$entityType (R)"
-                clamped = true
-            }
-        }
-
-        val straight = runBlocking {
-            network.addNeuron(50, 0).apply {
-                label = "Speed"
-                activation = 1.0
-                clamped = true
-            }
-        }
-
-        val leftTurn = runBlocking {
-            network.addNeuron(0, 0).apply {
-                label = "Left"
-                lowerBound = -200.0
-                upperBound = 200.0
-            }
-        }
-        val rightTurn: Neuron = runBlocking {
-            network.addNeuron(100, 0).apply {
-                label = "Right"
-                lowerBound = -200.0
-                upperBound = 200.0
-            }
-
-        }
-        val leftSynapse = network.addSynapse(leftInput, leftTurn)
-
-        val rightSynapse = network.addSynapse(rightInput, rightTurn)
-
-        // val neuronCollection = network.addNetworkModelAsync(
-        //     NeuronCollection(network, listOf(leftInput, rightInput, straight, leftTurn, rightTurn))
-        // )
-
-        init {
-            val (leftSensor, rightSensor) = agent.sensors
-            val (eStraight, eLeft, eRight) = agent.effectors
-            with(couplingManager) {
-                leftSensor couple leftInput
-                rightSensor couple rightInput
-                straight couple eStraight
-                leftTurn couple eLeft
-                rightTurn couple eRight
-            }
-        }
-
-    }
-
-    val vehicle1 = Vehicle("Vehicle 1", EntityType.Circle, Point2D.Double(194.0, 407.0))
+    val vehicle1 = oc.world.createVehicle("Vehicle 1", EntityType.Circle, EntityType.Swiss, Point2D.Double(194.0, 407.0))
 
     withGui {
         place(vehicle1.networkComponent, 53, 282, 359, 327)

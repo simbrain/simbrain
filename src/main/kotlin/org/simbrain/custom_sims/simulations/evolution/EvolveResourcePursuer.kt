@@ -2,6 +2,7 @@ package org.simbrain.custom_sims.simulations
 
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import org.simbrain.custom_sims.addSidebarInfo
@@ -371,9 +372,11 @@ val evolveResourcePursuer = newSim { optionString ->
             addLayer(createTileMapLayer("Food Layer"))
         }
 
-        val evolvedAgent = OdorWorldEntity(odorWorld, EntityType.Cow).also {
-            odorWorld.addEntity(it)
-            it.location = point(100, 100)
+        val evolvedAgent = runBlocking {
+            OdorWorldEntity(odorWorld, EntityType.Cow).also {
+                odorWorld.addEntity(it)
+                it.location = point(100, 100)
+            }
         }
 
         // Food sensors that can guide the agent

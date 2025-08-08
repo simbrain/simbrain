@@ -1,13 +1,11 @@
 package org.simbrain.world.imageworld
 
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.awt.image.BufferedImage
-import java.io.File
-import java.io.IOException
-import javax.imageio.ImageIO
 import javax.swing.ImageIcon
 
 class ImageAlbumTest {
@@ -29,7 +27,7 @@ class ImageAlbumTest {
     }
 
     @Test
-    fun `test add single image`() {
+    fun `test add single image`() = runBlocking {
         val testImage = BufferedImage(50, 50, BufferedImage.TYPE_INT_RGB)
         testImage.setRGB(0, 0, Color.RED.rgb)
         
@@ -41,7 +39,7 @@ class ImageAlbumTest {
     }
 
     @Test
-    fun `test add multiple images`() {
+    fun `test add multiple images`() = runBlocking {
         val image1 = BufferedImage(30, 30, BufferedImage.TYPE_INT_RGB)
         val image2 = BufferedImage(40, 40, BufferedImage.TYPE_INT_RGB)
         val image3 = BufferedImage(50, 50, BufferedImage.TYPE_INT_RGB)
@@ -60,7 +58,7 @@ class ImageAlbumTest {
     }
 
     @Test
-    fun `test frame navigation`() {
+    fun `test frame navigation`() = runBlocking {
         val image1 = BufferedImage(30, 30, BufferedImage.TYPE_INT_RGB)
         val image2 = BufferedImage(30, 30, BufferedImage.TYPE_INT_RGB)
         val image3 = BufferedImage(30, 30, BufferedImage.TYPE_INT_RGB)
@@ -108,7 +106,7 @@ class ImageAlbumTest {
     }
 
     @Test
-    fun `test set frame bounds checking`() {
+    fun `test set frame bounds checking`() = runBlocking {
         val image1 = BufferedImage(30, 30, BufferedImage.TYPE_INT_RGB)
         val image2 = BufferedImage(30, 30, BufferedImage.TYPE_INT_RGB)
         
@@ -126,11 +124,11 @@ class ImageAlbumTest {
     }
 
     @Test
-    fun `test take snapshot`() {
+    fun `test take snapshot`() = runBlocking {
         val originalImage = BufferedImage(25, 25, BufferedImage.TYPE_INT_RGB)
         originalImage.setRGB(0, 0, Color.YELLOW.rgb)
         
-        imageAlbum.currentImage = originalImage
+        imageAlbum.setCurrentImage(originalImage)
         val initialFrames = imageAlbum.numFrames
         
         imageAlbum.takeSnapshot()
@@ -143,7 +141,7 @@ class ImageAlbumTest {
     }
 
     @Test
-    fun `test delete current image with multiple images`() {
+    fun `test delete current image with multiple images`() = runBlocking {
         val image1 = BufferedImage(30, 30, BufferedImage.TYPE_INT_RGB)
         val image2 = BufferedImage(30, 30, BufferedImage.TYPE_INT_RGB)
         val image3 = BufferedImage(30, 30, BufferedImage.TYPE_INT_RGB)
@@ -170,7 +168,7 @@ class ImageAlbumTest {
     }
 
     @Test
-    fun `test delete last remaining image creates default`() {
+    fun `test delete last remaining image creates default`() = runBlocking {
         val testImage = BufferedImage(60, 60, BufferedImage.TYPE_INT_RGB)
         imageAlbum.addImage(testImage)
         
@@ -183,7 +181,7 @@ class ImageAlbumTest {
     }
 
     @Test
-    fun `test reset album`() {
+    fun `test reset album`() = runBlocking {
         val image1 = BufferedImage(30, 30, BufferedImage.TYPE_INT_RGB)
         val image2 = BufferedImage(30, 30, BufferedImage.TYPE_INT_RGB)
         
@@ -199,7 +197,7 @@ class ImageAlbumTest {
     }
 
     @Test
-    fun `test load image from empty filename`() {
+    fun `test load image from empty filename`() = runBlocking {
         imageAlbum.loadImage("")
         
         assertEquals(10, imageAlbum.currentImage.width)
@@ -208,7 +206,7 @@ class ImageAlbumTest {
     }
 
     @Test
-    fun `test load image from ImageIcon`() {
+    fun `test load image from ImageIcon`() = runBlocking {
         val iconImage = BufferedImage(32, 32, BufferedImage.TYPE_INT_RGB)
         iconImage.setRGB(0, 0, Color.MAGENTA.rgb)
         val icon = ImageIcon(iconImage)
@@ -221,7 +219,7 @@ class ImageAlbumTest {
     }
 
     @Test
-    fun `test save current frame`() {
+    fun `test save current frame`() = runBlocking {
         val originalImage = BufferedImage(25, 25, BufferedImage.TYPE_INT_RGB)
         originalImage.setRGB(0, 0, Color.CYAN.rgb)
         
@@ -238,7 +236,7 @@ class ImageAlbumTest {
     }
 
     @Test
-    fun `test frame access`() {
+    fun `test frame access`() = runBlocking {
         val image1 = BufferedImage(20, 20, BufferedImage.TYPE_INT_RGB)
         val image2 = BufferedImage(20, 20, BufferedImage.TYPE_INT_RGB)
         
@@ -257,6 +255,7 @@ class ImageAlbumTest {
         assertThrows(UnsupportedOperationException::class.java) {
             (frames as MutableList<BufferedImage>).add(BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB))
         }
+        Unit
     }
 
     @Test
@@ -272,7 +271,7 @@ class ImageAlbumTest {
     }
 
     @Test
-    fun `test image dimensions`() {
+    fun `test image dimensions`() = runBlocking {
         assertEquals(10, imageAlbum.width)
         assertEquals(10, imageAlbum.height)
         
@@ -284,7 +283,7 @@ class ImageAlbumTest {
     }
 
     @Test
-    fun `test clear current image`() {
+    fun `test clear current image`() = runBlocking {
         val coloredImage = BufferedImage(50, 50, BufferedImage.TYPE_INT_RGB)
         coloredImage.setRGB(0, 0, Color.RED.rgb)
         

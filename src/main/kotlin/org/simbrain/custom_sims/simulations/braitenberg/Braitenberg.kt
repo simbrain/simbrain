@@ -1,13 +1,17 @@
 package org.simbrain.custom_sims.simulations.braitenberg
 
-import kotlinx.coroutines.runBlocking
 import org.simbrain.custom_sims.*
+import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.addNeuron
 import org.simbrain.network.core.addSynapse
 import org.simbrain.util.graphicalUpperBound
 import org.simbrain.util.place
+import org.simbrain.workspace.couplings.CouplingManager
+import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.entities.EntityType
+import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import java.awt.geom.Point2D
 import kotlin.math.abs
 import kotlin.math.max
@@ -25,78 +29,8 @@ val braitenbergSim = newSim {
     oc.world.isObjectsBlockMovement = false
     oc.world.isUseCameraCentering = false
 
-    class Vehicle(name: String, entityType: EntityType, entityOffset: Point2D) {
-
-        val networkComponent = addNetworkComponent(name)
-
-        val network get() = networkComponent.network
-
-        val agent = oc.world.addEntity(entityOffset.x, entityOffset.y, entityType).apply {
-            addLeftRightSensors(entityType, 270.0)
-            addDefaultEffectors()
-        }
-
-        val leftInput = runBlocking {
-            network.addNeuron(0, 100).apply {
-                label = "$entityType (L)"
-                clamped = true
-            }
-        }
-
-        val rightInput = runBlocking {
-            network.addNeuron(100, 100).apply {
-                label = "$entityType (R)"
-                clamped = true
-            }
-        }
-
-        val straight = runBlocking {
-            network.addNeuron(50, 0).apply {
-                label = "Speed"
-                activation = 1.0
-                clamped = true
-            }
-        }
-
-        val leftTurn = runBlocking {
-            network.addNeuron(0, 0).apply {
-                label = "Left"
-                lowerBound = -200.0
-                upperBound = 200.0
-            }
-        }
-        val rightTurn: Neuron = runBlocking {
-            network.addNeuron(100, 0).apply {
-                label = "Right"
-                lowerBound = -200.0
-                upperBound = 200.0
-            }
-
-        }
-        val leftSynapse = network.addSynapse(leftInput, leftTurn)
-
-        val rightSynapse = network.addSynapse(rightInput, rightTurn)
-
-        // val neuronCollection = network.addNetworkModelAsync(
-        //     NeuronCollection(network, listOf(leftInput, rightInput, straight, leftTurn, rightTurn))
-        // )
-
-        init {
-            val (leftSensor, rightSensor) = agent.sensors
-            val (eStraight, eLeft, eRight) = agent.effectors
-            with(couplingManager) {
-                leftSensor couple leftInput
-                rightSensor couple rightInput
-                straight couple eStraight
-                leftTurn couple eLeft
-                rightTurn couple eRight
-            }
-        }
-
-    }
-
-    val vehicle1 = Vehicle("Vehicle 1", EntityType.Circle, Point2D.Double(120.0, 245.0))
-    val vehicle2 = Vehicle("Vehicle 2", EntityType.Circle, Point2D.Double(320.0, 245.0))
+    val vehicle1 = oc.world.createVehicle("Vehicle 1", EntityType.Circle, EntityType.Circle, Point2D.Double(120.0, 245.0))
+    val vehicle2 = oc.world.createVehicle("Vehicle 2", EntityType.Circle, EntityType.Circle, Point2D.Double(320.0, 245.0))
 
     withGui {
         place(vehicle1.networkComponent, 230, 0, 360, 323)
@@ -145,6 +79,7 @@ val braitenbergSim = newSim {
                 vehicle2.leftTurn.lowerBound = -upperBound
                 vehicle2.rightTurn.lowerBound = -upperBound
             }
+
             fun initSamePair() {
                 vehicle1.leftSynapse.strength = leftWeight
                 vehicle1.rightSynapse.strength = rightWeight
@@ -273,4 +208,85 @@ val braitenbergSim = newSim {
 
 }
 
+data class Vehicle(
+    val couplingManager: CouplingManager,
+    val networkComponent: NetworkComponent,
+    val agent: OdorWorldEntity,
+    val leftInput: Neuron,
+    val rightInput: Neuron,
+    val straight: Neuron,
+    val leftTurn: Neuron,
+    val rightTurn: Neuron,
+    val leftSynapse: Synapse,
+    val rightSynapse: Synapse,
+) {
+    val network get() = networkComponent.network
 
+    init {
+        val (leftSensor, rightSensor) = agent.sensors
+        val (eStraight, eLeft, eRight) = agent.effectors
+        with(couplingManager) {
+            leftSensor couple leftInput
+            rightSensor couple rightInput
+            straight couple eStraight
+            leftTurn couple eLeft
+            rightTurn couple eRight
+        }
+    }
+}
+
+context(SimulationScope)
+suspend fun OdorWorld.createVehicle(name: String, entityType: EntityType, sensorEntityType: EntityType, entityOffset: Point2D): Vehicle {
+    val networkComponent = addNetworkComponent(name)
+    val network = networkComponent.network
+
+    val agent = addEntity(entityOffset.x, entityOffset.y, entityType).apply {
+        addLeftRightSensors(sensorEntityType, 270.0)
+        addDefaultEffectors()
+    }
+
+    val leftInput = network.addNeuron(0, 100).apply {
+        label = "$entityType (L)"
+        clamped = true
+    }
+
+    val rightInput = network.addNeuron(100, 100).apply {
+        label = "$entityType (R)"
+        clamped = true
+    }
+
+    val straight = network.addNeuron(50, 0).apply {
+        label = "Speed"
+        activation = 1.0
+        clamped = true
+    }
+
+    val leftTurn = network.addNeuron(0, 0).apply {
+        label = "Left"
+        lowerBound = -200.0
+        upperBound = 200.0
+    }
+
+    val rightTurn: Neuron = network.addNeuron(100, 0).apply {
+        label = "Right"
+        lowerBound = -200.0
+        upperBound = 200.0
+    }
+
+    val leftSynapse = network.addSynapse(leftInput, leftTurn)
+
+    val rightSynapse = network.addSynapse(rightInput, rightTurn)
+
+    return Vehicle(
+        couplingManager,
+        networkComponent,
+        agent,
+        leftInput,
+        rightInput,
+        straight,
+        leftTurn,
+        rightTurn,
+        leftSynapse,
+        rightSynapse
+    )
+}

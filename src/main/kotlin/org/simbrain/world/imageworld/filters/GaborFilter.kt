@@ -7,6 +7,11 @@ import kotlin.math.*
 /**
  * Gabor filter for detecting edges and textures at specific orientations and frequencies.
  * Gabor filters are commonly used in computer vision and image processing for feature detection.
+ *
+ * Gabor filters are mathematical tools that detect edges and textures at specific orientations and frequencies.
+ * They combine a Gaussian envelope (blob-like shape) with a sinusoidal wave pattern.
+ * Formula: g(x,y) = exp(-0.5 * (x'²/σx² + y'²/σy²)) * cos(2π * f * x' + φ)
+ * Where x',y' are rotated coordinates, σx,σy control spread, f is frequency, φ is phase.
  */
 class GaborFilter : ImageFilter() {
 

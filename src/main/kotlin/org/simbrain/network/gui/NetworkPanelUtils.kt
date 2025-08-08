@@ -5,6 +5,7 @@ import org.simbrain.network.gui.nodes.ScreenElement
 import org.simbrain.util.KeyCombination
 import org.simbrain.util.createAction
 import java.awt.event.ActionEvent
+import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * [createAction] that is conditionally enabled based on the state of the network, using [ConditionallyEnabledAction.EnablingCondition]
@@ -31,6 +32,7 @@ fun NetworkPanel.createConditionallyEnabledAction(
         selectionManager.events.sourceSelection.on { _, _ -> updateAction() }
     },
     coroutineScope = null,
+    coroutineContext = EmptyCoroutineContext,
     block
 )
 

@@ -5,7 +5,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import org.simbrain.docviewer.DocViewerComponent
 import org.simbrain.network.NetworkComponent
+import org.simbrain.network.desktop.NetworkDesktopComponent
 import org.simbrain.network.core.Network
+import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.plot.projection.ProjectionComponent
 import org.simbrain.plot.rasterchart.RasterPlotComponent
 import org.simbrain.plot.timeseries.TimeSeriesModel
@@ -262,3 +264,10 @@ context(SimbrainDesktop)
 suspend fun OdorWorldComponent.scale(scale: Double) {
     (getDesktopComponent(this) as? OdorWorldDesktopComponent)?.worldPanel?.scalingFactor = scale
 }
+
+context(SimbrainDesktop)
+suspend fun getNetworkPanel(component: NetworkComponent): NetworkPanel {
+    val desktopComponent = getDesktopComponent(component) as NetworkDesktopComponent
+    return desktopComponent.networkPanel
+}
+

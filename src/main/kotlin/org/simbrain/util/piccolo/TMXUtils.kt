@@ -173,7 +173,7 @@ fun getTile(label: String) = tileSets.firstNotNullOfOrNull { tileSet -> tileSet[
  * Make a lake of the indicated size (in # of tiles) starting at the top left grid location.
  * If two lakes are put together, they are merged into one with shared edges removed.
  */
-fun TileMap.makeLake(topLeftLocation: GridCoordinate, width: Int, height: Int, layer: TileMapLayer = layers.first()) {
+suspend fun TileMap.makeLake(topLeftLocation: GridCoordinate, width: Int, height: Int, layer: TileMapLayer = layers.first()) {
 
     /**
      * Compute edge type string based on surround
@@ -209,9 +209,11 @@ fun TileMap.makeLake(topLeftLocation: GridCoordinate, width: Int, height: Int, l
     val lakeCoordinates = getCoordinates(topLeftLocation, width, height)
 
     // make a basic lake
-    lakeCoordinates.forEach {
-        val p = it.int
-        setTile(p.x, p.y,2, layer)
+    layer.setTiles { setTile ->
+        lakeCoordinates.forEach {
+            val p = it.int
+            setTile(p.x, p.y,2)
+        }
     }
 
     // replace edges and corners
@@ -241,9 +243,11 @@ fun TileMap.makeLake(topLeftLocation: GridCoordinate, width: Int, height: Int, l
 
 }
 
-fun TileMap.fillRect(tileId: Int, topLeftLocation: GridCoordinate, width: Int, height: Int, layer: TileMapLayer = layers.first()) {
-    getCoordinates(topLeftLocation, width, height).forEach {
-        val (x, y) = it.int
-        setTile(x, y, tileId, layer)
+suspend fun TileMap.fillRect(tileId: Int, topLeftLocation: GridCoordinate, width: Int, height: Int, layer: TileMapLayer = layers.first()) {
+    layer.setTiles { setTile ->
+        getCoordinates(topLeftLocation, width, height).forEach {
+            val (x, y) = it.int
+            setTile(x, y, tileId)
+        }
     }
 }

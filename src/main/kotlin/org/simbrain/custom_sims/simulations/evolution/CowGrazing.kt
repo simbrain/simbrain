@@ -153,10 +153,12 @@ val grazingCows = newSim { optionString ->
         val odorWorld = OdorWorldComponent("Odor World 1").also {
             workspace.addWorkspaceComponent(it)
         }.world.apply {
-            isObjectsBlockMovement = false
-            with(tileMap) {
-                updateMapSize(25, 25)
-                fill("Grass1")
+            launch {
+                isObjectsBlockMovement = false
+                with(tileMap) {
+                    updateMapSize(25, 25)
+                    fill("Grass1")
+                }
             }
         }
 

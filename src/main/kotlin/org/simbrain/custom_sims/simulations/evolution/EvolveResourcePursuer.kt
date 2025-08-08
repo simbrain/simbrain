@@ -1,9 +1,6 @@
 package org.simbrain.custom_sims.simulations
 
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.*
 import org.json.JSONObject
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
@@ -282,7 +279,7 @@ val evolveResourcePursuer = newSim { optionString ->
     ) {
         fun computeCalories() = max(0.0, calories - (totalActivation + movement + baseMetabolism) * (1.0 / evaluatorParams.iterationsPerRun))
         fun OdorWorld.randomTileCoordinate() = with(tileMap) { random.nextGridCoordinate() }
-        fun OdorWorld.makeFoodPatch(size: IntRange = 2..8) = with(tileMap) {
+        suspend fun OdorWorld.makeFoodPatch(size: IntRange = 2..8) = with(tileMap) {
             fillRect(foodTileId, randomTileCoordinate(), random.nextInt(size), random.nextInt(size), getLayer("Food Layer"))
         }
         fun generateEnergyText() = """
@@ -363,9 +360,11 @@ val evolveResourcePursuer = newSim { optionString ->
             workspace.addWorkspaceComponent(it)
         }
         val odorWorld = odorWorldComponent.world.apply {
-            with(tileMap) {
-                updateMapSize(24, 24)
-                fill("Grass1")
+            launch {
+                with(tileMap) {
+                    updateMapSize(24, 24)
+                    fill("Grass1")
+                }
             }
         }
         val foodLayer = odorWorld.tileMap.run {
@@ -395,8 +394,10 @@ val evolveResourcePursuer = newSim { optionString ->
         }.also { evolvedAgent.addSensor(it) }
 
         init {
-            with(simState) {
-                odorWorld.makeFoodPatch()
+            workspace.launch {
+                with(simState) {
+                    odorWorld.makeFoodPatch()
+                }
             }
 
             evolvedAgent.addDefaultEffectors()

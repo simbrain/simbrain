@@ -138,9 +138,11 @@ val evolveCow = newSim {
         val odorWorld = OdorWorldComponent("Odor World").also {
             workspace.addWorkspaceComponent(it)
         }.world.apply {
-            with(tileMap) {
-                updateMapSize(32, 32)
-                fill("Grass1")
+            launch {
+                with(tileMap) {
+                    updateMapSize(32, 32)
+                    fill("Grass1")
+                }
             }
         }
         val lakeLayer = odorWorld.tileMap.run{
@@ -178,12 +180,12 @@ val evolveCow = newSim {
 
 
         init {
-            List(1) { randomTileCoordinate() }.forEach {
-                with(odorWorld.tileMap) {
-                    makeLake(it, lakeSize, lakeSize, lakeLayer)
-                }
-            }
             workspace.launch {
+                List(1) { randomTileCoordinate() }.forEach {
+                    with(odorWorld.tileMap) {
+                        makeLake(it, lakeSize, lakeSize, lakeLayer)
+                    }
+                }
                 (cowPhenotypes.await() zip entities).forEach { (phenotype, entity) ->
                     addUpdateActions(phenotype, entity)
                 }

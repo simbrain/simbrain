@@ -15,7 +15,6 @@ import java.awt.*
 import java.awt.event.MouseEvent
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
-import java.util.function.Consumer
 import javax.swing.*
 import javax.swing.border.MatteBorder
 import javax.swing.border.TitledBorder
@@ -23,16 +22,16 @@ import javax.swing.table.DefaultTableModel
 import kotlin.math.min
 
 
-fun showTilePicker(tileSets: List<TileSet>, currentTileId: Int? = null, block: Consumer<Int>): StandardDialog {
+fun showTilePicker(tileSets: List<TileSet>, currentTileId: Int? = null, block: suspend (Int) -> Unit): StandardDialog {
     return tileSets.tilePicker(currentTileId ?: 1) {
-        block.accept(it)
+        block(it)
     }.apply { makeVisible() }
 }
 
 /**
  * Returns a dialog that is used to pick a tile from a tilset. Double clicking edits the tile.
  */
-fun List<TileSet>.tilePicker(currentGid: Int, block: (Int) -> Unit) = StandardDialog().apply {
+fun List<TileSet>.tilePicker(currentGid: Int, block: suspend (Int) -> Unit) = StandardDialog().apply {
 
     var pickedTile = currentGid
     title = "Pick / Edit Tile"
@@ -148,7 +147,7 @@ fun List<TileSet>.tilePicker(currentGid: Int, block: (Int) -> Unit) = StandardDi
         }
     }
     contentPane = tabbedPane
-    addCommitTask { block(pickedTile) }
+    addCommitTask { swingInvokeLater { block(pickedTile) } }
     preferredSize = Dimension(600, 600)
 }
 
@@ -174,7 +173,7 @@ fun TileMap.editor(p: Point2D) = StandardDialog().apply {
 
     class TilePanel(var onCommit: () -> Unit = { }) : JPanel()
 
-    fun tilePanel(name: String, tile: Tile, change: (Int) -> Unit) = TilePanel().apply titlePanel@{
+    fun tilePanel(name: String, tile: Tile, change: suspend (Int) -> Unit) = TilePanel().apply titlePanel@{
 
         border = TitledBorder(MatteBorder(1, 1, 1, 1, Color.LIGHT_GRAY), name)
 
@@ -188,7 +187,7 @@ fun TileMap.editor(p: Point2D) = StandardDialog().apply {
             onDoubleClick {
                 tileSets.tilePicker(tile.id) {
                     this@button.icon = ImageIcon(tileImage(it))
-                    onCommit = { change(it) }
+                    onCommit = { swingInvokeLater { change(it) } }
                 }.also { it.makeVisible() }
             }
         }
@@ -215,7 +214,11 @@ fun TileMap.editor(p: Point2D) = StandardDialog().apply {
     }
 
     val panels = (layers zip getTileStackAt(x, y)).reversed()
-        .map { (layer, tile) -> tilePanel(layer.name, tile) { layer.setTile(x, y, it) } }
+        .map { (layer, tile) ->
+            tilePanel(layer.name, tile) {
+                layer.setTile(x, y, it)
+            }
+        }
         .onEach { mainPanel.add(it, gbc) }
 
     addCommitTask { panels.forEach { it.onCommit() } }

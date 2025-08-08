@@ -149,7 +149,7 @@ class TileMap(width: Int, height: Int) {
      * Edit tiles in first layer. Use with care; assumes just one layer.
      */
     @JvmOverloads
-    fun setTile(x: Int, y: Int, tileID: Int, layer: TileMapLayer = layers.first()) {
+    suspend fun setTile(x: Int, y: Int, tileID: Int, layer: TileMapLayer = layers.first()) {
         layer.setTile(x, y, tileID)
     }
 
@@ -157,7 +157,7 @@ class TileMap(width: Int, height: Int) {
      * @param suppressMissingNames by default this function prints out a warning if a tile could not be found in the
      *      tile sets. To disable that warning for specific tiles, provide their names in this list
      */
-    fun setTile(x: Int, y: Int, tileStringID: String, layer: TileMapLayer = layers.first(), suppressMissingNames: List<String> = listOf()) {
+    suspend fun setTile(x: Int, y: Int, tileStringID: String, layer: TileMapLayer = layers.first(), suppressMissingNames: List<String> = listOf()) {
         val tileID = tileSets.asSequence().map { it[tileStringID] }.first()?.id
         tileID?.let { layer.setTile(x, y, it + 1) }
             ?: if (tileStringID !in suppressMissingNames) println("warn: no tile string id [$tileStringID] found") else Unit
@@ -166,21 +166,21 @@ class TileMap(width: Int, height: Int) {
     /**
      * Edit tile in a named layer
      */
-    fun setTile(layerName: String, x: Int, y: Int, tileID: Int) {
+    suspend fun setTile(layerName: String, x: Int, y: Int, tileID: Int) {
         getLayer(layerName).setTile(x, y, tileID)
     }
 
     /**
      * Clear the indicated layer.
      */
-    fun clear(layer: TileMapLayer = layers.first()) {
+    suspend fun clear(layer: TileMapLayer = layers.first()) {
         fill(0, layer)
     }
 
     /**
      * Set all tiles on first layer to specified tile id.
      */
-    fun fill(tileId: Int, layer: TileMapLayer = layers.first()) {
+    suspend fun fill(tileId: Int, layer: TileMapLayer = layers.first()) {
         (0 until width).forEach { i ->
             (0 until height).forEach { j ->
                 layer[i, j] = tileId
@@ -189,21 +189,26 @@ class TileMap(width: Int, height: Int) {
         layer.render()
     }
 
-    fun fill(tileLabel: String) {
+    suspend fun fill(tileLabel: String) {
         fill(tileSets.getGidFromLabel(tileLabel))
     }
 
     // TODO: should not be able to edit tile map layers that don't belong to this map
-    fun TileMapLayer.setTile(x: Int, y: Int, tileID: Int) {
+    suspend fun TileMapLayer.setTile(x: Int, y: Int, tileID: Int) {
         this[x, y] = tileID
         render()
     }
 
-    private fun TileMapLayer.render() {
+    suspend fun TileMapLayer.setTiles(modification: (setTile: (x: Int, y: Int, tileID: Int) -> Unit) -> Unit) {
+        modification { x, y, tileID -> this[x, y] = tileID }
+        render()
+    }
+
+    private suspend fun TileMapLayer.render() {
         if (guiEnabled) {
             val oldRenderedImage = layerImage
             val newRenderedImage = renderImage(tileSets, true)
-            events.layerImageChanged.fireAndBlock(oldRenderedImage, newRenderedImage)
+            events.layerImageChanged.fire(oldRenderedImage, newRenderedImage).await()
         }
     }
 

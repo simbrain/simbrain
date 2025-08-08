@@ -229,7 +229,7 @@ class OdorWorld : EditableObject, Bounded, CoroutineScope {
         return entity
     }
 
-    fun addTile() {
+    suspend fun addTile() {
         tileMap.setTile(
             lastClickedPosition.x.toInt() / tileMap.tileWidth,
             lastClickedPosition.y.toInt() / tileMap.tileHeight,

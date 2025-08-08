@@ -34,8 +34,8 @@ val braitenbergRL = newSim {
     var learningRate = 0.05
     var gamma = 0.95
 
-    var numTrials = 50
-    var maxStepsPerTrial = 300
+    var numTrials = 100
+    var maxStepsPerTrial = 1000
     var trialStep = 0
     var stopRequested = false
     
@@ -289,6 +289,7 @@ val braitenbergRL = newSim {
                         // Correct TD error calculation
                         val currentValue = valueNeuron.activation
                         val tdError = rewardNeuron.activation + gamma * currentValue - previousValue
+                        tdErrorNeuron.activation = tdError.coerceIn(-1.0, 1.0)
                         tdErrorNeuron.activation = tdError
 
                         // Update critic weights

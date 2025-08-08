@@ -3,7 +3,6 @@ package org.simbrain.custom_sims.simulations
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.core.addNeuronCollection
-import org.simbrain.network.desktop.NetworkDesktopComponent
 import org.simbrain.network.gui.dialogs.getSupervisedTrainingDialog
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.trainers.MatrixDataset
@@ -83,8 +82,7 @@ val simpleImageWorld = newSim {
 
     // Place network in the desktop
     withGui {
-        val networkDesktopComponent = getDesktopComponent(networkComponent) as NetworkDesktopComponent
-        val networkPanel = networkDesktopComponent.networkPanel
+        val networkPanel = getNetworkPanel(networkComponent)
         val controlPanel = createControlPanel("Control Panel", 5, 10) {
             repeat(outputs.size) { index ->
                 addTextField("Category ${index + 1}", "") { category ->

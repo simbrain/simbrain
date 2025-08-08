@@ -19,13 +19,7 @@ class SynapseGroupNodeExpanded(networkPanel: NetworkPanel, val parent: SynapseGr
      * positions of children nodes.
      */
     override fun layoutChildren() {
-        val srcX: Double = parent.synapseGroup.source.centerX
-        val srcY: Double = parent.synapseGroup.source.centerY
-        val tarX: Double = parent.synapseGroup.target.centerX
-        val tarY: Double = parent.synapseGroup.target.centerY
-        val x = (srcX + tarX) / 2
-        val y = (srcY + tarY) / 2
-        parent.interactionBox.centerFullBoundsOnPoint(x, y)
+        parent.updateInteractionBoxLocation()
     }
 
 }

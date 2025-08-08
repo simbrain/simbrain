@@ -58,6 +58,18 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
             invalidateArrow()
             updateInteractionBoxLocation()
         }
+        
+        // Listen to individual neuron movements for recurrent groups
+        if (synapseGroup.isRecurrent()) {
+            synapseGroup.source.neuronList.forEach { neuron ->
+                val cleanup = neuron.events.locationChanged.on(Dispatchers.Swing) {
+                    updateInteractionBoxLocation()
+                }
+                synapseGroup.events.deleted.on {
+                    cleanup()
+                }
+            }
+        }
         updateInteractionBoxLocation()
 
         // Handle events
@@ -82,9 +94,25 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
         removeChild(expandedNode)
     }
 
-    private fun updateInteractionBoxLocation() {
+    fun updateInteractionBoxLocation() {
         val (x, y) = ((synapseGroup.target.location - synapseGroup.source.location) / 2) + synapseGroup.source.location
         interactionBox.centerFullBoundsOnPoint(x, y)
+
+        // Only apply smart positioning logic when synapses are visible (expanded mode)
+        // When in directed mode (arrow only), position should stay on the arrow
+        if (synapseGroup.isRecurrent() && synapseGroup.displaySynapses) {
+            // Use source node since source == target for recurrent groups
+            val neurons = sourceNode.neuronNodes
+            val ibBounds = interactionBox.globalFullBounds
+            val overlapsNeuron = neurons.any { neuronNode -> ibBounds.intersects(neuronNode.globalFullBounds)}
+
+            if (overlapsNeuron) {
+                val outlineBounds = sourceNode.outlinedObjects.fullBounds
+                val bx = outlineBounds.centerX
+                val by = outlineBounds.maxY + interactionBox.fullBounds.height / 2
+                interactionBox.centerFullBoundsOnPoint(bx, by)
+            }
+        }
     }
 
     private fun setVisibility() {

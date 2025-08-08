@@ -29,8 +29,8 @@ val spikingNetworkSimulation = newSim {
     val numNeurons = showNumericInputDialog("Number of Neurons:", 49) ?: return@newSim
 
     val gridSpace = 50.0
-    var sparsity = 0.50 // Percent of possible connections to make, and change to alter synchronous firing
-    var percentExcitatory = 90.0
+    var sparsity = 0.15 // Percent of possible connections to make, and change to alter synchronous firing
+    var percentExcitatory = 80.0
     
     // Pacemaker neuron tracking
     var pacemakerNeuron: Neuron? = null
@@ -290,7 +290,7 @@ val spikingNetworkSimulation = newSim {
 
         Integrate-and-fire neurons are  biologically-inspired models of brain cells that "spike" when their internal signal, or membrane potential, crosses a certain threshold. By adjusting how the neurons connect and how they're activated, you can observe a wide range of network behaviors—from random, asynchronous firing to more organized bursts of activity.
 
-        The neurons implement leaky integrate-and-fire dynamics: they integrate synaptic input currents, experience membrane potential decay over time, and emit spikes upon reaching threshold. Network connectivity is sparse (~5%), with balanced excitatory and inhibitory neuron populations influencing emergent firing patterns.
+        The neurons implement leaky integrate-and-fire dynamics: they integrate synaptic input currents, experience membrane potential decay over time, and emit spikes upon reaching threshold. Network connectivity is sparse (~15%), with  80% balanced excitatory to inhibitory neuron populations influencing emergent firing patterns.
 
         Each neuron in the network adds up incoming signals and fires, or "spikes," when it reaches a certain level, then resets. These are leaky integrate-and-fire neurons, meaning their internal signal also fades or "leaks" over time, creating more realistic, time-dependent behavior as they integrate input and respond when a threshold is crossed.
 
@@ -327,6 +327,9 @@ val spikingNetworkSimulation = newSim {
         # References
 
         Brunel, N. (2000). [Dynamics of sparsely connected networks of excitatory and inhibitory spiking neurons](https://doi.org/10.1023/A:1008925309027). _Journal of Computational Neuroscience_, _8_(3), 183–208.
+        Alreja, A., Nemenman, I., & Rozell, C. J. (2022). [Constrained brain volume in an efficient coding model explains the fraction of excitatory and inhibitory neurons in sensory cortices](https://doi.org/10.1371/journal.pcbi.1009642). PLOS Computational Biology, 18(1), e1009642. 
+        Planert, H., Mittermaier, F. X., Grosser, S., Fidzinski, P., Schneider, U. C., Radbruch, H., Onken, J., Holtkamp, M., Schmitz, D., Alle, H., Vida, I., Geiger, J. R. P., & Peng, Y. (2023). [Cellular and synaptic diversity of layer 2–3 pyramidal neurons in human individuals [Preprint]](https://www.researchgate.net/publication/356119349_Cellular_and_Synaptic_Diversity_of_Layer_2-3_Pyramidal_Neurons_in_Human_Individuals#pf6). ResearchGate. bioRxiv.
+        
 
         # Credits
 

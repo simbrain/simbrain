@@ -141,6 +141,19 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         }
 
     /**
+     * When true, synapses are only displayed while their source neuron is spiking.
+     * This does not override an individual synapse's own visibility (that remains
+     * the higher-priority gate).
+     */
+    var synapseSpikingOnlyVisible = false
+        set(value) {
+            field = value
+            network.events.synapseSpikingOnlyVisibilityChanged.fire(value)
+            // Trigger a redraw by nudging synapse graphics via the throttled update event
+            // Individual SynapseNodes will listen and adjust their own visibility accordingly
+        }
+
+    /**
      * Turn GUI on or off.
      */
     var guiOn = true

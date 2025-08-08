@@ -13,12 +13,6 @@ import org.simbrain.network.gui.dialogs.NetworkPreferences.maxWeightSize
 import org.simbrain.network.gui.dialogs.NetworkPreferences.minWeightSize
 import org.simbrain.network.gui.dialogs.NetworkPreferences.spikingColor
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog
-import org.simbrain.network.gui.nodes.SynapseNode.Companion.excitatoryColor
-import org.simbrain.network.gui.nodes.SynapseNode.Companion.inhibitoryColor
-import org.simbrain.network.gui.nodes.SynapseNode.Companion.lineColor
-import org.simbrain.network.gui.nodes.SynapseNode.Companion.maxDiameter
-import org.simbrain.network.gui.nodes.SynapseNode.Companion.minDiameter
-import org.simbrain.network.gui.nodes.SynapseNode.Companion.zeroWeightColor
 import org.simbrain.network.gui.synapseContextMenu
 import org.simbrain.util.StandardDialog
 import java.awt.Color
@@ -95,15 +89,26 @@ class SynapseNode(
             updateDiameter()
             updateSpikeColor()
         }
-        events.visbilityChanged.on(dispatcher = Dispatchers.Swing) { _, newVisibility -> visible = newVisibility }
-        visible = synapse.isVisible
+        events.visbilityChanged.on(dispatcher = Dispatchers.Swing) { _, newVisibility -> updateVisibility(newVisibility) }
+        updateVisibility(synapse.isVisible)
         events.clampChanged.on { this.updateClampStatus() }
         updateClampStatus()
 
         events.locationChanged.on(dispatcher = Dispatchers.Swing) { this.updatePosition() }
 
         // Respond to spiking events
-        source.neuron.events.spiked.on(dispatcher = Dispatchers.Swing) { updateSpikeColor() }
+        source.neuron.events.spiked.on(dispatcher = Dispatchers.Swing) {
+            updateSpikeColor()
+            // If spiking-only mode is on, adjust visibility in response to spike changes
+            if (networkPanel.synapseSpikingOnlyVisible) {
+                applySpikingOnlyVisibility()
+            }
+        }
+
+        // Respond to global toggles for spiking-only visibility
+        networkPanel.network.events.synapseSpikingOnlyVisibilityChanged.on(dispatcher = Dispatchers.Swing) {
+            applySpikingOnlyVisibility()
+        }
     }
 
 
@@ -197,6 +202,38 @@ class SynapseNode(
             line!!.strokePaint = spikingColor
         } else {
             line!!.strokePaint = lineColor
+        }
+    }
+
+    /**
+     * Apply combined logic for visibility:
+     * - If the model's own visibility is false, this node must remain hidden.
+     * - If spiking-only mode is enabled, only show while the source neuron is spiking.
+     * - Otherwise reflect the model's own visibility.
+     */
+    private fun applySpikingOnlyVisibility() {
+        // Old synapse visibility has higher priority
+        if (!synapse.isVisible) {
+            super.setVisible(false)
+            return
+        }
+        if (networkPanel.synapseSpikingOnlyVisible) {
+            val show = with(networkPanel.network) { source.neuron.isSpike }
+            super.setVisible(show)
+        } else {
+            super.setVisible(true)
+        }
+    }
+
+    private fun updateVisibility(modelVisibility: Boolean) {
+        if (!modelVisibility) {
+            super.setVisible(false)
+            return
+        }
+        if (networkPanel.synapseSpikingOnlyVisible) {
+            applySpikingOnlyVisibility()
+        } else {
+            super.setVisible(true)
         }
     }
 

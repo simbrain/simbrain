@@ -182,6 +182,12 @@ val NetworkPanel.viewMenu
                     this.state = it
                 }
             })
+            add(JCheckBoxMenuItem(toggleSynapseSpikingOnlyVisibility).apply {
+                this.state = networkPanel.synapseSpikingOnlyVisible
+                networkPanel.network.events.synapseSpikingOnlyVisibilityChanged.on {
+                    this.state = it
+                }
+            })
             addSeparator()
             add(showPriorityTableAction)
         }

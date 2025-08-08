@@ -14,6 +14,7 @@ class NetworkEvents: Events() {
     val modelRemoved = OneArgEvent<NetworkModel>()
     val updateActionsChanged = NoArgEvent()
     val freeWeightVisibilityChanged = OneArgEvent<Boolean>()
+    val synapseSpikingOnlyVisibilityChanged = OneArgEvent<Boolean>()
     val selected = OneArgEvent<List<NetworkModel>>()
     val batchNodeRemoval = BatchOneArgEvent<NetworkModel>(interval = 10)
 }

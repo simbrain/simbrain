@@ -3,6 +3,7 @@ package org.simbrain.custom_sims.simulations
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
@@ -148,10 +149,12 @@ val evolveCow = newSim {
         val networks = List(cowGenotypes.size) { index ->
             NetworkComponent("Network ${index + 1}").also { workspace.addWorkspaceComponent(it) }.network
         }
-        val entities = List(cowGenotypes.size) { i ->
-            OdorWorldEntity(odorWorld, EntityType.Cow).also {
-                odorWorld.addEntity(it)
-                it.location = point((i + 1) * 100, (i + 1) * 100)
+        val entities = runBlocking {
+            List(cowGenotypes.size) { i ->
+                OdorWorldEntity(odorWorld, EntityType.Cow).also {
+                    odorWorld.addEntity(it)
+                    it.location = point((i + 1) * 100, (i + 1) * 100)
+                }
             }
         }
         // Water sensors that can guide the cow

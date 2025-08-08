@@ -144,7 +144,7 @@ class OdorWorld : EditableObject, Bounded, CoroutineScope {
      *
      * @param entity the entity to add
      */
-    fun addEntity(entity: OdorWorldEntity) {
+    suspend fun addEntity(entity: OdorWorldEntity) {
         if (entityList.contains(entity)) {
             return
         }
@@ -156,7 +156,7 @@ class OdorWorld : EditableObject, Bounded, CoroutineScope {
         // Add entity to the map
         entityList.add(entity)
 
-        events.entityAdded.fire(entity)
+        events.entityAdded.fire(entity).await()
         entity.events.deleted.on { handleEntityDelete(it) }
 
         // Recompute max stimulus length
@@ -179,7 +179,7 @@ class OdorWorld : EditableObject, Bounded, CoroutineScope {
     /**
      * Add new entity at last clicked position with default properties.
      */
-    fun addEntity(): OdorWorldEntity {
+    suspend fun addEntity(): OdorWorldEntity {
         val entity = OdorWorldEntity(this)
         entity.location = findPlacementLocation(lastClickedPosition)
         addEntity(entity)
@@ -189,7 +189,7 @@ class OdorWorld : EditableObject, Bounded, CoroutineScope {
     /**
      * Add entity of a specified type.
      */
-    fun addEntity(type: EntityType?): OdorWorldEntity {
+    suspend fun addEntity(type: EntityType?): OdorWorldEntity {
         val entity = OdorWorldEntity(this, type!!)
         addEntity(entity)
         return entity
@@ -198,14 +198,14 @@ class OdorWorld : EditableObject, Bounded, CoroutineScope {
     /**
      * Add entity with a stimulus value.
      */
-    fun addEntity(x: Int, y: Int, type: EntityType?, stimulus: DoubleArray?): OdorWorldEntity {
+    suspend fun addEntity(x: Int, y: Int, type: EntityType?, stimulus: DoubleArray?): OdorWorldEntity {
         val entity = addEntity(x, y, type)
         entity.smellSource = SmellSource(stimulus)
         addEntity(entity)
         return entity
     }
 
-    fun addEntity(x: Int, y: Int, type: EntityType?): OdorWorldEntity {
+    suspend fun addEntity(x: Int, y: Int, type: EntityType?): OdorWorldEntity {
         val entity = OdorWorldEntity(this, type!!)
         entity.setLocation(x, y)
         entity.smellSource = SmellSource(6)
@@ -214,14 +214,14 @@ class OdorWorld : EditableObject, Bounded, CoroutineScope {
         return entity
     }
 
-    fun addEntity(x: Double, y: Double, type: EntityType?): OdorWorldEntity {
+    suspend fun addEntity(x: Double, y: Double, type: EntityType?): OdorWorldEntity {
         return addEntity(x.toInt(), y.toInt(), type)
     }
 
     /**
      * Add new "agent" (rotating with some default) sensors and effectors at last clicked position.
      */
-    fun addAgent(): OdorWorldEntity {
+    suspend fun addAgent(): OdorWorldEntity {
         val entity = OdorWorldEntity(this, EntityType.Mouse)
         addEntity(entity)
         entity.location = findPlacementLocation(lastClickedPosition)

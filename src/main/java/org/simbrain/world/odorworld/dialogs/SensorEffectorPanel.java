@@ -4,7 +4,6 @@ import org.simbrain.util.CmdOrCtrl;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.SwingUtilsKt;
-import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.PeripheralAttribute;
@@ -371,8 +370,4 @@ public class SensorEffectorPanel extends JPanel {
 
     }
 
-    public static void main(String[] args) {
-        var entity = new OdorWorld().addAgent();
-        SwingUtilsKt.displayInDialog(new SensorEffectorPanel(entity, PanelType.Sensor, null));
-    }
 }

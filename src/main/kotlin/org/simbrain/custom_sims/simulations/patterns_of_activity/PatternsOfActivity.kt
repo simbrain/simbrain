@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations.patterns_of_activity
 
+import kotlinx.coroutines.runBlocking
 import org.simbrain.custom_sims.Simulation
 import org.simbrain.network.connections.*
 import org.simbrain.network.core.*
@@ -113,7 +114,7 @@ class PatternsOfActivity : Simulation {
         sensoryNetR.label = "Sensory Right"
 
         // Build odor world
-        mouse = buildWorld()
+        mouse = runBlocking { buildWorld() }
 
         // Create network
         buildNetwork(sensoryNetL, sensoryNetR, mouse)
@@ -124,7 +125,7 @@ class PatternsOfActivity : Simulation {
         addProjection(outputNeurons, 723, 562, .1, "getActivationArray")
     }
 
-    private fun buildWorld(): OdorWorldEntity {
+    private suspend fun buildWorld(): OdorWorldEntity {
         // Set up odor world
         val oc = sim.addOdorWorld(547, 5, 504, 548, "World")
         oc.world.isObjectsBlockMovement = false

@@ -694,19 +694,28 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         val targets = filterSelectedModels(Layer::class.java)
         if (sources.isNotEmpty() && targets.isNotEmpty()) {
             // TODO: Ability to set defaults for weight matrix that is added
-            val addedMatrices = sources.cartesianProduct(targets).mapNotNull { (s, t) ->
-                WeightMatrix(s, t)
-            }
-            network.addNetworkModels(addedMatrices)
-            undoManager.addUndoableAction(
-                description = "Connect layers",
-                undo = { addedMatrices.forEach {it.delete()}},
-                redo = {
-                    network.addNetworkModels(addedMatrices, usePlacementManager = false, useAutoAssignedId = false)
-                        .awaitAll()
-                    addedMatrices.forEach { it.afterRestore() }
+            val addedMatrices = sources.cartesianProduct(targets)
+                .filter { (s, t) ->
+                    // Skip if WeightMatrix already exists between source and target
+                    s.outgoingConnectors.none { connector ->
+                        connector is WeightMatrix && connector.target == t
+                    }
                 }
-            )
+                .map { (s, t) ->
+                    WeightMatrix(s, t)
+                }
+            if (addedMatrices.isNotEmpty()) {
+                network.addNetworkModels(addedMatrices)
+                undoManager.addUndoableAction(
+                    description = "Connect layers",
+                    undo = { addedMatrices.forEach {it.delete()}},
+                    redo = {
+                        network.addNetworkModels(addedMatrices, usePlacementManager = false, useAutoAssignedId = false)
+                            .awaitAll()
+                        addedMatrices.forEach { it.afterRestore() }
+                    }
+                )
+            }
             return true
         }
         return false
@@ -720,25 +729,34 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     fun NetworkSelectionManager.connectNeuronGroups(): List<SynapseGroup> {
         val sourceCollections = filterSelectedSourceModels(AbstractNeuronCollection::class.java)
         val targetCollections = filterSelectedModels(AbstractNeuronCollection::class.java)
-        val synapseGroups = (sourceCollections cartesianProduct targetCollections).map { (src, tar) ->
-            SynapseGroup(src, tar).also { network.addNetworkModel(it) }
-        }
+        val synapseGroups = (sourceCollections cartesianProduct targetCollections)
+            .filter { (src, tar) ->
+                // Skip if SynapseGroup already exists between source and target
+                src.outgoingSg.none { synapseGroup ->
+                    synapseGroup.target == tar
+                }
+            }
+            .map { (src, tar) ->
+                SynapseGroup(src, tar).also { network.addNetworkModel(it) }
+            }
 
         val synapseGroupSynapses = synapseGroups.associateWith { it.synapses.toList() }
 
-        undoManager.addUndoableAction(
-            description = "Connect neuron groups",
-            undo = { synapseGroups.map { launch { it.delete() } }.joinAll() },
-            redo = {
-                synapseGroupSynapses.entries.map { (sg, synapses) ->
-                    launch {
-                        sg.synapses.clear()
-                        sg.synapses.addAll(synapses)
-                        network.addNetworkModel(sg, usePlacementManager = false, useAutoAssignedId = false)?.await()
-                        sg.afterRestore()
-                    }
-                }.joinAll()
-            })
+        if (synapseGroups.isNotEmpty()) {
+            undoManager.addUndoableAction(
+                description = "Connect neuron groups",
+                undo = { synapseGroups.map { launch { it.delete() } }.joinAll() },
+                redo = {
+                    synapseGroupSynapses.entries.map { (sg, synapses) ->
+                        launch {
+                            sg.synapses.clear()
+                            sg.synapses.addAll(synapses)
+                            network.addNetworkModel(sg, usePlacementManager = false, useAutoAssignedId = false)?.await()
+                            sg.afterRestore()
+                        }
+                    }.joinAll()
+                })
+        }
 
         return synapseGroups
     }

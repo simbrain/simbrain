@@ -10,6 +10,8 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.geom.Point2D;
 import java.util.ArrayList;
 import java.util.List;
@@ -105,11 +107,19 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
 
         // Selection submenu
         menu.addSeparator();
-        Action selectSynapses = new AbstractAction("Select Neurons") {
+        Action selectSynapses = new AbstractAction("Select Internal Neurons") {
+
+            {
+                // Main key binding is in Keybindings.kt. This is here just to force the binding to show in UI.
+                putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, 0));
+            }
+
             @Override
             public void actionPerformed(final ActionEvent event) {
                 selectNeurons();
             }
+
+
         };
         menu.add(selectSynapses);
         Action selectIncomingNodes = new AbstractAction("Select Incoming Synapses") {

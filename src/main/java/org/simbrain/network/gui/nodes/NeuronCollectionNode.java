@@ -13,6 +13,8 @@ import org.simbrain.workspace.gui.SimbrainDesktop;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 
 import static org.simbrain.network.gui.NetworkPanelMenusKt.createCouplingMenu;
 
@@ -90,7 +92,12 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
 
         // Selection submenu
         menu.addSeparator();
-        Action selectNeurons = new AbstractAction("Select Neurons") {
+        Action selectNeurons = new AbstractAction("Select Internal Neurons") {
+            {
+                // Main key binding is in Keybindings.kt. This is here just to force the binding to show in UI.
+                putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, 0));
+            }
+
             @Override
             public void actionPerformed(final ActionEvent event) {
                 selectNeurons();

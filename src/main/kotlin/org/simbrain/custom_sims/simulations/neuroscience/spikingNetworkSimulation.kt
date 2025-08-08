@@ -29,8 +29,8 @@ val spikingNetworkSimulation = newSim {
     val numNeurons = showNumericInputDialog("Number of Neurons:", 49) ?: return@newSim
 
     val gridSpace = 50.0
-    var sparsity = 0.50 // Percent of possible connections to make, and change to alter synchronous firing
-    var percentExcitatory = 90.0
+    var sparsity = 0.15 // Percent of possible connections to make, and change to alter synchronous firing
+    var percentExcitatory = 80.0
     
     // Pacemaker neuron tracking
     var pacemakerNeuron: Neuron? = null

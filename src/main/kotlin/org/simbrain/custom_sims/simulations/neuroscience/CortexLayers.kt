@@ -20,6 +20,7 @@ import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.LogNormalDistribution
 import kotlin.math.sqrt
 import kotlin.random.Random
+import org.simbrain.custom_sims.*
 
 /**
  * Model of canonical cortex (Douglas and Martin, 2004) using rat barrel cortex
@@ -232,4 +233,51 @@ val cortexLayers = newSim {
     }
 
     buildNetwork()
+    addSidebarInfo(
+        """
+        # Cortical Layers Simulation
+
+        This simulation models three major layers of the mammalian cerebral cortex (Layers 2/3, 4, and 5/6), each containing populations of spiking integrate-and-fire neurons connected with biologically-inspired synaptic dynamics. You can observe how activity propagates through these layers via [feedforward](https://docs.simbrain.net/docs/network/subnetworks/feedForward.html), [recurrent](https://docs.simbrain.net/docs/network/subnetworks/simpleRecurrentNetwork.html), and [feedback connections](https://pmc.ncbi.nlm.nih.gov/articles/PMC9990137/).
+
+        # Background
+
+        The [cerebral cortex](https://en.wikipedia.org/wiki/Cerebral_cortex) is organized into distinct layers, each with specialized types of neurons and connection patterns. Layers 2/3 are involved in processing and integrating information, Layer 4 primarily receives sensory input, and Layers 5/6 project to other brain areas. This layered structure supports complex computations like perception, motor control, and cognition.
+
+        This model is inspired by canonical microcircuitry described in [Douglas and Martin (2004)](https://www.cns.nyu.edu/~tony/vns/readings/douglas-martin-2004.pdf) and empirical data from [rodent barrel cortex studies (Lefort et al., 2009)](https://doi.org/10.1016/j.neuron.2008.12.020). Neurons are modeled with leaky [integrate-and-fire dynamics](https://docs.simbrain.net/docs/network/neurons/integrateAndFire.html#integrate-and-fire), and [synapses](https://docs.simbrain.net/docs/network/synapses/) include [short-term plasticity](https://docs.simbrain.net/docs/network/spikeresponders/shortTermPlasticity.html) to capture dynamic changes in [synaptic strength](https://docs.simbrain.net/docs/network/synapses/hebbian.html#hebbian-rule) during activity.
+
+        The simulation uses [sparse connectivity](https://docs.simbrain.net/docs/network/connections/sparse.html) with varying synaptic strengths and delays, reflecting realistic cortical connectivity. [Excitatory and inhibitory](https://docs.simbrain.net/docs/network/networkDialogs.html#excitatory--inhibitory-ratio) neuron populations are assigned according to experimentally observed ratios (~20% inhibitory neurons).
+
+        # Visualization
+
+        The [raster plot](https://docs.simbrain.net/docs/plots/rasterPlot.html#raster) shows [spiking](https://docs.simbrain.net/docs/network/spikingneurons.htm) activity in each cortical layer over time. Each dot represents a spike from an individual neuron. Patterns of synchronous or asynchronous firing reveal how information may flow and be processed within and between layers.
+
+        # Things you can do
+
+        ## Explore Layer Dynamics
+
+        1. Click `Run` to start the simulation.
+        2. Observe how spikes propagate from Layer 4 (main sensory input) to Layers 2/3 and 5/6.
+        3. Modify synaptic sparsity or strengths by adjusting parameters in the code to see effects on network dynamics.
+        4. Watch how recurrent connections within layers sustain or dampen activity.
+        5. Inject current or perturb neurons to simulate sensory input and observe activity patterns.
+
+        ## Experimental Ideas
+
+        - Alter the ratio of excitatory to inhibitory neurons and note the impact on firing patterns.
+        - Change short-term plasticity parameters to simulate different synaptic dynamics.
+        - Visualize synaptic delays to understand the timing of signal propagation across layers.
+
+        # References
+
+        [Douglas, R. J., & Martin, K. A. (2004). Neuronal circuits of the neocortex. *Annual Review of Neuroscience*, 27, 419–451.](https://www.cns.nyu.edu/~tony/vns/readings/douglas-martin-2004.pdf)
+
+        [Lefort, S., Tomm, C., Sarria, J. C. F., & Petersen, C. C. H. (2009). The excitatory neuronal network of the C2 barrel column in mouse primary somatosensory cortex. *Neuron*, 61(2), 301–316.](https://doi.org/10.1016/j.neuron.2008.12.020)
+
+        # Credits
+
+        Zoë Tosi  
+        Jeff Yoshimi  
+        Elijah Olson
+        """.trimIndent()
+    )
 }

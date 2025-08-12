@@ -547,7 +547,7 @@ class Network: CoroutineScope, EditableObject {
     fun addNetworkModelsAsync(toAdd: List<NetworkModel>, usePlacementManager: Boolean = true, useAutoAssignedId: Boolean = true) = toAdd.mapNotNull { addNetworkModelAsync(it, usePlacementManager, useAutoAssignedId) }
 
     suspend fun addNetworkModels(toAdd: List<NetworkModel>, usePlacementManager: Boolean = true, useAutoAssignedId: Boolean = true) {
-        addNetworkModels(toAdd, usePlacementManager, useAutoAssignedId)
+        addNetworkModelsAsync(toAdd, usePlacementManager, useAutoAssignedId).awaitAll()
     }
 
     /**
@@ -558,7 +558,7 @@ class Network: CoroutineScope, EditableObject {
     fun addNetworkModelsAsync(vararg toAdd: NetworkModel, usePlacementManager: Boolean = true, useAutoAssignedId: Boolean = true) = toAdd.mapNotNull { addNetworkModelAsync(it, usePlacementManager, useAutoAssignedId) }
 
     suspend fun addNetworkModels(vararg toAdd: NetworkModel, usePlacementManager: Boolean = true, useAutoAssignedId: Boolean = true) {
-        addNetworkModels(*toAdd, usePlacementManager = usePlacementManager, useAutoAssignedId = useAutoAssignedId)
+        addNetworkModelsAsync(*toAdd, usePlacementManager = usePlacementManager, useAutoAssignedId = useAutoAssignedId).awaitAll()
     }
 
     fun selectModels(models: List<NetworkModel>) {

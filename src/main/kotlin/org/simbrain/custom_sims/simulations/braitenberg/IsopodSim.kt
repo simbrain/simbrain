@@ -42,7 +42,7 @@ val isopodSim = newSim {
 
     val networkComponent = addNetworkComponent("Network")
     val network = networkComponent.network
-    var noiseSource = NormalDistribution(1.0, .9)
+    var noiseSource = NormalDistribution(2.0, .9)
 
     val neuronLeftSensor = network.addNeuron {
         location = point(0, 100)
@@ -95,6 +95,8 @@ val isopodSim = newSim {
             width = 400
             height = 400
         }
+        // Select isopod by default
+
     }
 
     // ----- Build 2d World ------
@@ -191,6 +193,7 @@ val isopodSim = newSim {
             width = 600
             height = 600
         }
+        isopod.select()
     }
 
     // ----- Make Couplings ------

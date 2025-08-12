@@ -32,8 +32,8 @@ val kAgentTrails = newSim {
 //Information (0, 0, 516, 632)
 //>
 
-val docViewer = addSidebarInfo(
-    """ 
+    val docViewer = addSidebarInfo(
+        """ 
         # Introduction
         In this simulation, the network consists of neurons, which, when activated, make the agent move towards it.
         
@@ -54,16 +54,7 @@ val docViewer = addSidebarInfo(
         3. Repeat this until all 5 paths are taken 
         4. After all 5 Paths, Select any object again from the "Control Panel", and the predictor will be able to crrectly predict where the mouse travels
     """.trimIndent()
-)
-
-
-    withGui {
-        place(networkComponent) {
-            location = point(322, 13)
-            width = 544
-            height = 336
-        }
-    }
+    )
 
     val network = networkComponent.network
 
@@ -113,10 +104,6 @@ val docViewer = addSidebarInfo(
     })
 
     val odorWorldComponent = addOdorWorldComponent("World")
-
-    withGui {
-        place(odorWorldComponent,9, 348, 315, 388)
-    }
 
     val odorWorld = odorWorldComponent.world.apply {
         isObjectsBlockMovement = false
@@ -168,16 +155,13 @@ val docViewer = addSidebarInfo(
         val plot = addProjectionPlot("Sensory States + Predictions").apply {
             projector.tolerance = .001
         }
-        place(plot) {
-            location = point(324, 346)
-            width = 543
-            height = 390
-        }
+        place(odorWorldComponent, 9, 348, 319, 399)
+        place(networkComponent, 322, 13, 544, 336)
+        place(plot, 324, 346, 543, 390)
 
         couplingManager.createCoupling(sensoryNet, plot)
 
         createControlPanel("Control Panel", 11, 16) {
-
 
             fun resetObjects() {
                 cheese.location = cheeseLocation
@@ -255,7 +239,7 @@ val docViewer = addSidebarInfo(
                     flower.speed = 2.0
                     fish.speed = 2.0
                     val (x, y) = cheeseLocation
-                    mouse.location = point(odorWorld.width/2, odorWorld.height/2)
+                    mouse.location = point(odorWorld.width / 2, odorWorld.height / 2)
                     mouse.heading = 90.0
                     straightNeuron.activation = 0.0
                     workspace.iterateSuspend(200)

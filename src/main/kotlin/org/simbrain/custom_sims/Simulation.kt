@@ -21,6 +21,7 @@ import org.simbrain.world.dataworld.DataWorldComponent
 import org.simbrain.world.imageworld.ImageWorldComponent
 import org.simbrain.world.odorworld.OdorWorldComponent
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent
+import org.simbrain.world.odorworld.OdorWorldPanel
 import org.simbrain.world.textworld.TextWorldComponent
 import java.io.File
 
@@ -269,5 +270,11 @@ context(SimbrainDesktop)
 suspend fun getNetworkPanel(component: NetworkComponent): NetworkPanel {
     val desktopComponent = getDesktopComponent(component) as NetworkDesktopComponent
     return desktopComponent.networkPanel
+}
+
+context(SimbrainDesktop)
+suspend fun getOdorWorldPanel(component: OdorWorldComponent): OdorWorldPanel {
+    val desktopComponent = getDesktopComponent(component) as OdorWorldDesktopComponent
+    return desktopComponent.worldPanel
 }
 

@@ -38,7 +38,7 @@ val edgeOfChaosBitStream = newSim("edgeOfChaosBitStream") {
     val res1 = createReservoir(net, 10, 10, NUM_NEURONS).apply {
         label = "Reservoir 1"
     }
-    val res2 = createReservoir(net, res1.maxX.toInt() + 100, 10, NUM_NEURONS).apply {
+    val res2 = createReservoir(net, res1.maxX.toInt() + 400, 10, NUM_NEURONS).apply {
         label = "Reservoir 2"
     }
 

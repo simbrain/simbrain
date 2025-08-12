@@ -18,13 +18,7 @@ val roomSchemaSim = newSim {
     val networkComponent = addNetworkComponent("Network")
     val network = networkComponent.network
 
-    // Competitive network
-    val rbm = RestrictedBoltzmannMachine(42, 64)
-    network.addNetworkModel(rbm)
-    rbm.visibleLayer.circleMode = true
-    rbm.visibleLayer.offset(-100.0, 0.0)
-
-    rbm.visibleLayer.labelArray = arrayOf(
+    val labels = arrayOf(
         "ceiling", "large", "telephone", "books", "sofa", "drapes",
         "cupboard", "toilet", "walls", "medium", "bed", "desk-chair",
         "easy-chair", "stove", "sink", "scale", "door", "small",
@@ -33,6 +27,14 @@ val roomSchemaSim = newSim {
         "television", "computer", "very-large", "desk", "carpet", "floor-lamp",
         "fireplace", "toaster", "bathtub", "clothes-hanger"
     )
+
+    // Competitive network
+    val rbm = RestrictedBoltzmannMachine(labels.size, 64)
+    network.addNetworkModel(rbm)
+    rbm.visibleLayer.circleMode = true
+    rbm.visibleLayer.offset(-100.0, 0.0)
+
+    rbm.visibleLayer.labelArray = labels
 
     fun activateNode(label: String) = rbm.visibleLayer.labelArray
         .indexOf(label)

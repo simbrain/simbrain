@@ -241,7 +241,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             neuronCircles.forEachIndexed { i, circle ->
                 circle.drawActivation(activations[i], neuronArray.updateRule.graphicalBounds)
                 circle.setClamped(neuronArray.isClamped)
-                circle.setLabel(neuronArray.labelArray[i])
+                circle.setLabel(neuronArray.labelArray.getOrNull(i))
             }
         }
 

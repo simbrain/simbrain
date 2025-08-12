@@ -232,6 +232,7 @@ val isopodSim = newSim {
     //Control Panel (5, 10, 143, 173)
 
     withGui {
+        isopod.select()
         createControlPanel("Control Panel", 130, 15) {
 
             suspend fun runTrials() {

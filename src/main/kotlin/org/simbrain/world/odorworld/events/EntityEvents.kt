@@ -28,6 +28,7 @@ class EntityEvents: Events(), EntityLocationEvent {
     override val moved = NoArgEvent()
     val trailVisibilityChanged = ChangedEvent<Boolean>()
     val trailCleared = NoArgEvent()
+    val selected = OneArgEvent<OdorWorldEntity>()
 
 }
 /**

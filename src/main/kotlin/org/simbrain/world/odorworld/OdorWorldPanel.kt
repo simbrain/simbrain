@@ -239,11 +239,18 @@ class OdorWorldPanel(
         canvas.addInputEventListener(WorldMouseHandler(this, world))
         canvas.addInputEventListener(WorldContextMenuEventHandler(this, world))
 
-        world.events.entityAdded.on(swingDispatcher, wait = true) { e: OdorWorldEntity? ->
-            val node = EntityNode(e!!)
+        world.events.entityAdded.on(swingDispatcher, wait = true) { e ->
+            val node = EntityNode(e)
             canvas.layer.addChild(node)
             selectionManager.clear()
             selectionManager.add(node)
+
+            world.events.cleanups[e] = e.events.selected.on(swingDispatcher) {
+                selectionManager.add(node)
+            }
+        }
+        world.events.entityRemoved.on {
+            world.events.cleanups[it]?.invoke()
         }
         world.events.updated.on(swingDispatcher, wait = true) { this.centerCameraToSelectedEntity() }
         world.events.frameAdvanced.on(swingDispatcher) {

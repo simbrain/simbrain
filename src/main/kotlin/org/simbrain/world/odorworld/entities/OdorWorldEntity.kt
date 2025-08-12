@@ -389,6 +389,10 @@ class OdorWorldEntity @JvmOverloads constructor(
         events.trailCleared.fire()
     }
 
+    suspend fun select() {
+        events.selected.fire(this).await()
+    }
+
     override val childrenContainers: List<AttributeContainer>
         get() = sensors + effectors
 

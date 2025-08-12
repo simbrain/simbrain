@@ -356,7 +356,7 @@ class Network: CoroutineScope, EditableObject {
     }
 
     suspend fun addNetworkModel(model: NetworkModel, usePlacementManager: Boolean = true, useAutoAssignedId: Boolean = true) {
-        addNetworkModel(model, usePlacementManager, useAutoAssignedId)
+        addNetworkModelAsync(model, usePlacementManager, useAutoAssignedId)?.await()
     }
 
     /**

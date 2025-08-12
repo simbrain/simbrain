@@ -164,6 +164,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
     dir("Temp") {
         item("Activation sequence (2 layers)") { activationSequenceTwoLayer }
         item("Activation sequence (3 layers)") { activationSequenceThreeLayer }
+        item("Denison Attention net") { denisonNet }
     }
 
     //dir("Testing") {

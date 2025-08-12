@@ -246,6 +246,7 @@ class OdorWorldPanel(
             selectionManager.add(node)
 
             world.events.cleanups[e] = e.events.selected.on(swingDispatcher) {
+                selectionManager.clear()
                 selectionManager.add(node)
             }
         }

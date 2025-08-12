@@ -42,7 +42,7 @@ public class CompetitiveCreationDialog extends StandardDialog {
     protected void closeDialogOk() {
         competitivePanel.commitChanges();
         CompetitiveNetwork cn = cc.create();
-        networkPanel.getNetwork().addNetworkModel(cn);
+        networkPanel.getNetwork().addNetworkModelAsync(cn);
         super.closeDialogOk();
     }
 

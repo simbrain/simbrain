@@ -1,9 +1,6 @@
 package org.simbrain.custom_sims.simulations.neuroscience
 
-import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.addRasterPlot
-import org.simbrain.custom_sims.couplingManager
-import org.simbrain.custom_sims.newSim
+import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.addNeuronGroup
@@ -20,7 +17,6 @@ import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.LogNormalDistribution
 import kotlin.math.sqrt
 import kotlin.random.Random
-import org.simbrain.custom_sims.*
 
 /**
  * Model of canonical cortex (Douglas and Martin, 2004) using rat barrel cortex
@@ -126,7 +122,7 @@ val cortexLayers = newSim {
             }
             it.spikeResponder = stp
         }
-        net.addNetworkModel(sg)?.await()
+        net.addNetworkModel(sg)
         return sg
     }
 

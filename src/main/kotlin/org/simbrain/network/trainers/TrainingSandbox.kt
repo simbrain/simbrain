@@ -9,7 +9,7 @@ fun testBPProbe() {
     // 2-2-1 xor
     val network = Network()
     val bp = BackpropNetwork(intArrayOf(2, 2, 1), null)
-        .also { network.addNetworkModels(it) }
+        .also { network.addNetworkModelsAsync(it) }
     bp.trainingSet = MatrixDataset(
         inputs = matrix[4, 2](
             0, 0,

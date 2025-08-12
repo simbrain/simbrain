@@ -21,19 +21,19 @@ class NetworkDialogsTest {
         val neuron2 = Neuron()
 
         // Add first neuron with an undoable action
-        network.addNetworkModel(neuron1)
+        network.addNetworkModelAsync(neuron1)
         networkPanel.undoManager.addUndoableAction(
             description = "Add neuron 1",
             undo = { neuron1.delete() },
-            redo = { network.addNetworkModel(neuron1, usePlacementManager = false, useAutoAssignedId = false)?.await() }
+            redo = { network.addNetworkModel(neuron1, usePlacementManager = false, useAutoAssignedId = false) }
         )
 
         // Add second neuron with an undoable action
-        network.addNetworkModel(neuron2)
+        network.addNetworkModelAsync(neuron2)
         networkPanel.undoManager.addUndoableAction(
             description = "Add neuron 2",
             undo = { neuron2.delete() },
-            redo = { network.addNetworkModel(neuron2, usePlacementManager = false, useAutoAssignedId = false)?.await() }
+            redo = { network.addNetworkModel(neuron2, usePlacementManager = false, useAutoAssignedId = false) }
         )
 
         // Verify that there are 2 actions in the undo stack

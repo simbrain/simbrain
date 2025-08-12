@@ -1,6 +1,5 @@
 package org.simbrain.custom_sims.simulations
 
-import kotlinx.coroutines.awaitAll
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
@@ -64,7 +63,7 @@ val tinyMNIST = newSim {
     bp.outputLayer.gridMode = true
     bp.outputLayer.labelArray = Array(10) { "$it" }
 
-    net.addNetworkModels(bp).awaitAll()
+    net.addNetworkModels(bp)
 
     addSidebarInfo(
         """ 

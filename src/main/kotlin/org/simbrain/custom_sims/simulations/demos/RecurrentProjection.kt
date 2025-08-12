@@ -3,19 +3,19 @@ package org.simbrain.custom_sims.simulations
 import org.simbrain.custom_sims.*
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connections.Sparse
-import org.simbrain.network.core.*
-import org.simbrain.network.gui.dialogs.NetworkPreferences
+import org.simbrain.network.core.NeuronCollection
+import org.simbrain.network.core.addNeuronCollection
+import org.simbrain.network.core.connect
+import org.simbrain.network.core.getModelById
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.updaterules.NakaRushtonRule
 import org.simbrain.plot.projection.ProjectionComponent
 import org.simbrain.plot.projection.ProjectionDesktopComponent
 import org.simbrain.util.place
-import org.simbrain.util.point
 import org.simbrain.util.projection.PCAProjection
 import org.simbrain.util.showNumericInputDialog
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 import org.simbrain.workspace.Workspace
-import javax.swing.JOptionPane
 
 /**
  * Create with a recurrent neuron collection and a projection with a control panel to
@@ -36,7 +36,7 @@ val recurrentProjection = newSim("recurrent_projection") {
     }
     recurrentNet.label = "Network"
     recurrentNet.layout(GridLayout())
-    network.addNetworkModel(recurrentNet)?.await()
+    network.addNetworkModel(recurrentNet)
     val wts = network.connect(recurrentNet.neuronList, recurrentNet.neuronList, Sparse().apply {
             connectionDensity = .15
         })

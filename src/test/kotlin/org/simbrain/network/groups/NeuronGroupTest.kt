@@ -5,8 +5,9 @@ import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
-import org.simbrain.network.core.*
-import org.simbrain.network.neurongroups.*
+import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.neurongroups.NeuronGroup
+import org.simbrain.network.neurongroups.SoftmaxGroup
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.serialization.WorkspaceSerializer
 import java.io.ByteArrayInputStream
@@ -22,14 +23,14 @@ class NeuronGroupTest {
 
     init {
         ng.label = "test"
-        net.addNetworkModel(ng)
+        net.addNetworkModelAsync(ng)
         workspace.addWorkspaceComponent(networkComponent)
     }
 
     @Test
     fun testCopy() {
         val ng2 = ng.copy()
-        net.addNetworkModel(ng2)
+        net.addNetworkModelAsync(ng2)
         assertEquals(2, ng2.neuronList.size)
     }
 
@@ -39,7 +40,7 @@ class NeuronGroupTest {
         ng.getNeuron(1).activation = -1.0
         val ng2 = NeuronGroup(2)
         val wm = WeightMatrix(ng, ng2)
-        net.addNetworkModels(List.of(ng2, wm))
+        net.addNetworkModelsAsync(List.of(ng2, wm))
         net.update()
         Assertions.assertArrayEquals(doubleArrayOf(1.0, -1.0), ng2.activationArray)
     }
@@ -49,7 +50,7 @@ class NeuronGroupTest {
         ng.activationArray = doubleArrayOf(1.0, -1.0)
         val ng2 = NeuronGroup(2)
         val wm = WeightMatrix(ng, ng2)
-        net.addNetworkModels(List.of(ng2, wm))
+        net.addNetworkModelsAsync(List.of(ng2, wm))
         net.update()
         Assertions.assertArrayEquals(doubleArrayOf(1.0, -1.0), ng2.activationArray)
     }
@@ -62,7 +63,7 @@ class NeuronGroupTest {
             ng.getNeuron(1).activation = -1.0
             val ng2 = NeuronGroup(2)
             val wm = WeightMatrix(ng, ng2)
-            net.addNetworkModels(List.of(ng2, wm))
+            net.addNetworkModelsAsync(List.of(ng2, wm))
             net.update()
             Assertions.assertArrayEquals(doubleArrayOf(1.0, -1.0), ng2.activationArray)
         }
@@ -73,7 +74,7 @@ class NeuronGroupTest {
             ng.randomize()
             val ng2 = SoftmaxGroup(5)
             val wm = WeightMatrix(ng, ng2)
-            net.addNetworkModels(ng2, wm)
+            net.addNetworkModelsAsync(ng2, wm)
             net.update()
             // System.out.println(Arrays.toString(ng2.getActivations()));
             assertEquals(1.0, ng2.activations.sum(), .01)

@@ -22,7 +22,7 @@ class PieChartTest {
     val pcc = PieChartComponent("Pie", pieChart)
 
     init {
-        net.addNetworkModels(ng)
+        net.addNetworkModelsAsync(ng)
         workspace.addWorkspaceComponent(pcc)
         workspace.addWorkspaceComponent(nwc)
         workspace.couplingManager.createCoupling(ng, pieChart)

@@ -22,7 +22,7 @@ class SigmoidDiscreteArrayTest {
     var w23 = WeightMatrix(input2, output)
 
     init {
-        net.addNetworkModels(input1, input2, output, w13, w23)
+        net.addNetworkModelsAsync(input1, input2, output, w13, w23)
         input1.activations = doubleArrayOf(1.0, -1.0).toColumnVector()
         input1.isClamped = true
         input2.activations = doubleArrayOf(-1.0, 1.0).toColumnVector()
@@ -40,7 +40,7 @@ class SigmoidDiscreteArrayTest {
     }
 
     init {
-        scalarNet.addNetworkModels(scalarNeuron, arrayNeuron)
+        scalarNet.addNetworkModelsAsync(scalarNeuron, arrayNeuron)
     }
 
     @Test
@@ -211,14 +211,14 @@ class SigmoidDiscreteArrayTest {
         // Create input sources
         val inputNeuron = Neuron()
         val inputArray = NeuronArray(1)
-        scalarNet.addNetworkModels(inputNeuron, inputArray)
+        scalarNet.addNetworkModelsAsync(inputNeuron, inputArray)
 
         val scalarSynapse = Synapse(inputNeuron, scalarNeuron)
         scalarSynapse.strength = 1.0
         val arrayWeight = WeightMatrix(inputArray, arrayNeuron)
         arrayWeight.setWeights(doubleArrayOf(1.0))
 
-        scalarNet.addNetworkModels(scalarSynapse, arrayWeight)
+        scalarNet.addNetworkModelsAsync(scalarSynapse, arrayWeight)
 
         // Test with positive activation
         inputNeuron.activation = 5.0
@@ -270,17 +270,17 @@ class SigmoidDiscreteArrayTest {
         }
 
         // Add all neurons and arrays to the network
-        testNet.addNetworkModels(sourceNeuron, sourceArray, targetNeuron, targetArray)
+        testNet.addNetworkModelsAsync(sourceNeuron, sourceArray, targetNeuron, targetArray)
 
         // 1. Neuron to Neuron connection (using Synapse)
         val neuronToNeuronSynapse = Synapse(sourceNeuron, targetNeuron)
         neuronToNeuronSynapse.strength = 1.0
-        testNet.addNetworkModel(neuronToNeuronSynapse)
+        testNet.addNetworkModelAsync(neuronToNeuronSynapse)
 
         // 2. NeuronArray to NeuronArray connection (using WeightMatrix)
         val arrayToArrayWeight = WeightMatrix(sourceArray, targetArray)
         arrayToArrayWeight.setWeights(doubleArrayOf(0.5, 0.5, 0.5, 0.5))
-        testNet.addNetworkModel(arrayToArrayWeight)
+        testNet.addNetworkModelAsync(arrayToArrayWeight)
 
         // Set activations for source neurons and arrays
         sourceNeuron.activation = 1.0

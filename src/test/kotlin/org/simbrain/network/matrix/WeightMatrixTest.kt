@@ -1,7 +1,6 @@
 package org.simbrain.network.matrix
 
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NeuronArray
@@ -20,7 +19,7 @@ class WeightMatrixTest {
         na1 = NeuronArray(2)
         na2 = NeuronArray(2)
         wm = WeightMatrix(na1, na2)
-        net.addNetworkModels(na1, na2, wm)
+        net.addNetworkModelsAsync(na1, na2, wm)
     }
 
     @Test
@@ -94,7 +93,7 @@ class WeightMatrixTest {
         val ng = NeuronGroup(2)
         val wm2 = WeightMatrix(na1, ng)
         wm2.diagonalize()
-        net.addNetworkModels(List.of(ng, wm2))
+        net.addNetworkModelsAsync(List.of(ng, wm2))
         net.update()
         Assertions.assertArrayEquals(doubleArrayOf(.5, -.5), ng.activationArray, 0.0)
         net.update() // All should be cleared on second update

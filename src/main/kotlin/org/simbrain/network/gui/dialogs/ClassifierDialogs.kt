@@ -132,7 +132,7 @@ fun main() {
             targets = mutableListOf(-1, 1, 1, -1)
         ))
         val classifier = ClassifierNetwork(svm)
-        addNetworkModel(classifier)
+        addNetworkModelAsync(classifier)
         classifier
     }
     SmileClassifierNode(np, classifier).propertyDialog.display()

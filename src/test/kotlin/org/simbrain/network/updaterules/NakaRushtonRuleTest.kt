@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
-import kotlin.math.pow
 
 class NakaRushtonRuleTest {
 
@@ -26,7 +25,7 @@ class NakaRushtonRuleTest {
         w1 = Synapse(input1, output, 1.0)
         
         output.updateRule = nakaRushtonRule
-        net.addNetworkModels(input1, input2, output, w1)
+        net.addNetworkModelsAsync(input1, input2, output, w1)
         input1.activation = 1.0
         input1.clamped = true
         input2.activation = 0.5
@@ -131,7 +130,7 @@ class NakaRushtonRuleTest {
     @Test
     fun `test multiple inputs`() {
         val w2 = Synapse(input2, output, 1.0)
-        net.addNetworkModel(w2)
+        net.addNetworkModelAsync(w2)
 
         nakaRushtonRule.steepness = 2.0
         nakaRushtonRule.semiSaturationConstant = 1.0

@@ -34,7 +34,7 @@ class PriorityUpdateTest {
         s1 = Synapse(n1, n2)
         s2 = Synapse(n2, n3)
 
-        net.addNetworkModels(listOf(n1, n2, n3, s1, s2))
+        net.addNetworkModelsAsync(listOf(n1, n2, n3, s1, s2))
         net.update()
 
         // With priority based updating, .5 makes it all the way in one update
@@ -76,7 +76,7 @@ class PriorityUpdateTest {
         val wm1 = WeightMatrix(inputGroup, hiddenGroup)
         val wm2 = WeightMatrix(hiddenGroup, outputGroup)
 
-        net.addNetworkModels(listOf(inputGroup, hiddenGroup, outputGroup, wm1, wm2))
+        net.addNetworkModelsAsync(listOf(inputGroup, hiddenGroup, outputGroup, wm1, wm2))
 
         net.update()
 
@@ -122,7 +122,7 @@ class PriorityUpdateTest {
         val wm1 = WeightMatrix(input, hidden)
         val wm2 = WeightMatrix(hidden, output)
 
-        net.addNetworkModels(listOf(input, hidden, output, wm1, wm2))
+        net.addNetworkModelsAsync(listOf(input, hidden, output, wm1, wm2))
 
         net.update()
 

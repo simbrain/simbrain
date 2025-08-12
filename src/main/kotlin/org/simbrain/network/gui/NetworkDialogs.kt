@@ -45,11 +45,11 @@ fun NetworkPanel.showEditDialogsForSelectedModels() {
 fun NetworkPanel.showNeuronArrayCreationDialog() {
     NeuronArray.CreationTemplate().createEditorDialog {
         val neuronArray = it.create()
-        network.addNetworkModel(neuronArray)
+        network.addNetworkModelAsync(neuronArray)
         undoManager.addUndoableAction(
             description = "Create neuron array ${neuronArray.id}",
             undo = { neuronArray.delete() },
-            redo = { network.addNetworkModel(neuronArray, usePlacementManager = false, useAutoAssignedId = false)?.await() }
+            redo = { network.addNetworkModel(neuronArray, usePlacementManager = false, useAutoAssignedId = false) }
         )
     }.also {
         it.title = "Create Neuron Array"
@@ -59,11 +59,11 @@ fun NetworkPanel.showNeuronArrayCreationDialog() {
 fun NetworkPanel.showActivationSequenceCreationDialog() {
     ActivationSequence.CreationTemplate().createEditorDialog {
         val activationSequence = it.create()
-        network.addNetworkModel(activationSequence)
+        network.addNetworkModelAsync(activationSequence)
         undoManager.addUndoableAction(
             description = "Create activation sequence ${activationSequence.id}",
             undo = { activationSequence.delete() },
-            redo = { network.addNetworkModel(activationSequence, usePlacementManager = false, useAutoAssignedId = false)?.await() }
+            redo = { network.addNetworkModel(activationSequence, usePlacementManager = false, useAutoAssignedId = false) }
         )
     }.also {
         it.title = "Create Activation Sequence"
@@ -73,11 +73,11 @@ fun NetworkPanel.showActivationSequenceCreationDialog() {
 fun NetworkPanel.showTransformerBlockCreationDialog() {
     TransformerBlock.CreationTemplate().createEditorDialog {
         val transformerBlock = it.create()
-        network.addNetworkModel(transformerBlock)
+        network.addNetworkModelAsync(transformerBlock)
         undoManager.addUndoableAction(
             description = "Add transformer block ${transformerBlock.id}",
             undo = { transformerBlock.delete() },
-            redo = { network.addNetworkModel(transformerBlock, usePlacementManager = false, useAutoAssignedId = false)?.await() }
+            redo = { network.addNetworkModel(transformerBlock, usePlacementManager = false, useAutoAssignedId = false) }
         )
     }.also {
         it.title = "Create Transformer Block"

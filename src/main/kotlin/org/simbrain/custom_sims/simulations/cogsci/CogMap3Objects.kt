@@ -41,7 +41,7 @@ val cogMap3Objects = newSim {
     val weightMatrix = WeightMatrix(recurrent, recurrent)
     weightMatrix.randomize()
     weightMatrix.weights.setSpectralRadius(spectralRadius)
-    network.addNetworkModels(recurrent, weightMatrix)
+    network.addNetworkModelsAsync(recurrent, weightMatrix)
 
     // Inputs to reservoir
     val inputNetwork = NeuronGroup(3)
@@ -49,7 +49,7 @@ val cogMap3Objects = newSim {
     inputNetwork.setUpperBound(1.0)
     inputNetwork.label = "Sensory Neurons"
     inputNetwork.layout = LineLayout()
-    network.addNetworkModel(inputNetwork)
+    network.addNetworkModelAsync(inputNetwork)
     inputNetwork.setLocation(0.0, 751.0)
 
     val sparseExcitatory = Sparse(0.7, true, false)
@@ -60,7 +60,7 @@ val cogMap3Objects = newSim {
     inputToRes.displaySynapses = false
     inputToRes.label = "Sparse Excitatory"
     inputToRes.randomizeExcitatory()
-    network.addNetworkModel(inputToRes)
+    network.addNetworkModelAsync(inputToRes)
 
     // World
     val dispersion = 100.0

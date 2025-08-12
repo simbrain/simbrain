@@ -1,8 +1,11 @@
 package org.simbrain.network.gui
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withContext
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
@@ -117,8 +120,8 @@ class UndoManagerTest {
         // Add some neurons to the network
         val neuron1 = Neuron()
         val neuron2 = Neuron()
-        network.addNetworkModel(neuron1)
-        network.addNetworkModel(neuron2)
+        network.addNetworkModelAsync(neuron1)
+        network.addNetworkModelAsync(neuron2)
 
         // Get the initial number of neuron collections in the network
         val initialCollectionCount = network.getModels<NeuronCollection>().size
@@ -192,11 +195,11 @@ class UndoManagerTest {
         val textObject = NetworkTextObject(testText)
 
         // Add the text object to the network and create an undoable action
-        network.addNetworkModel(textObject)
+        network.addNetworkModelAsync(textObject)
         networkPanel.undoManager.addUndoableAction(
             description = "Add text object",
             undo = { textObject.delete() },
-            redo = { network.addNetworkModel(textObject, usePlacementManager = false, useAutoAssignedId = false)?.await() }
+            redo = { network.addNetworkModel(textObject, usePlacementManager = false, useAutoAssignedId = false) }
         )
 
         // Verify that a text object was added
@@ -247,8 +250,8 @@ class UndoManagerTest {
             x = 200.0
             y = 200.0
         }
-        network.addNetworkModel(neuron1)
-        network.addNetworkModel(neuron2)
+        network.addNetworkModelAsync(neuron1)
+        network.addNetworkModelAsync(neuron2)
 
         // Get the initial number of neurons in the network
         val initialNeuronCount = network.flatNeuronList.size
@@ -332,8 +335,8 @@ class UndoManagerTest {
             x = 200.0
             y = 200.0
         }
-        network.addNetworkModel(neuron1)
-        network.addNetworkModel(neuron2)
+        network.addNetworkModelAsync(neuron1)
+        network.addNetworkModelAsync(neuron2)
 
         // Get the initial number of neurons in the network
         val initialNeuronCount = network.flatNeuronList.size
@@ -415,9 +418,9 @@ class UndoManagerTest {
             x = 300.0
             y = 150.0
         }
-        network.addNetworkModel(neuron1)
-        network.addNetworkModel(neuron2)
-        network.addNetworkModel(neuron3)
+        network.addNetworkModelAsync(neuron1)
+        network.addNetworkModelAsync(neuron2)
+        network.addNetworkModelAsync(neuron3)
 
         // Select the neurons
         network.selectModels(listOf(neuron1, neuron2, neuron3))
@@ -477,9 +480,9 @@ class UndoManagerTest {
             x = 150.0
             y = 300.0
         }
-        network.addNetworkModel(neuron1)
-        network.addNetworkModel(neuron2)
-        network.addNetworkModel(neuron3)
+        network.addNetworkModelAsync(neuron1)
+        network.addNetworkModelAsync(neuron2)
+        network.addNetworkModelAsync(neuron3)
 
         // Select the neurons
         network.selectModels(listOf(neuron1, neuron2, neuron3))
@@ -539,9 +542,9 @@ class UndoManagerTest {
             x = 300.0
             y = 150.0
         }
-        network.addNetworkModel(neuron1)
-        network.addNetworkModel(neuron2)
-        network.addNetworkModel(neuron3)
+        network.addNetworkModelAsync(neuron1)
+        network.addNetworkModelAsync(neuron2)
+        network.addNetworkModelAsync(neuron3)
 
         // Select the neurons
         network.selectModels(listOf(neuron1, neuron2, neuron3))
@@ -604,9 +607,9 @@ class UndoManagerTest {
             x = 150.0
             y = 300.0
         }
-        network.addNetworkModel(neuron1)
-        network.addNetworkModel(neuron2)
-        network.addNetworkModel(neuron3)
+        network.addNetworkModelAsync(neuron1)
+        network.addNetworkModelAsync(neuron2)
+        network.addNetworkModelAsync(neuron3)
 
         // Select the neurons
         network.selectModels(listOf(neuron1, neuron2, neuron3))
@@ -672,7 +675,7 @@ class UndoManagerTest {
         val weightMatrix = WeightMatrix(inputLayer, outputLayer)
 
         // Add the layers and weight matrix to the network
-        network.addNetworkModels(inputLayer, outputLayer, weightMatrix).awaitAll()
+        network.addNetworkModels(inputLayer, outputLayer, weightMatrix)
 
         // Get the initial number of supervised models in the network
         val initialSupervisedModelCount = network.getModels(SupervisedModel::class.java).size
@@ -757,7 +760,7 @@ class UndoManagerTest {
         val weightMatrix = WeightMatrix(inputLayer, outputLayer)
 
         // Add the layers and weight matrix to the network
-        network.addNetworkModels(inputLayer, outputLayer, weightMatrix).awaitAll()
+        network.addNetworkModels(inputLayer, outputLayer, weightMatrix)
 
         // Get the initial number of supervised models in the network
         val initialSupervisedModelCount = network.getModels(SupervisedModel::class.java).size
@@ -802,11 +805,11 @@ class UndoManagerTest {
             x = 300.0
             y = 300.0
         }
-        network.addNetworkModel(newNeuron)
+        network.addNetworkModelAsync(newNeuron)
         networkPanel.undoManager.addUndoableAction(
             description = "Add neuron",
             undo = { newNeuron.delete() },
-            redo = { network.addNetworkModel(newNeuron, usePlacementManager = false, useAutoAssignedId = false)?.await() }
+            redo = { network.addNetworkModel(newNeuron, usePlacementManager = false, useAutoAssignedId = false) }
         )
 
         // Verify that the neuron was added
@@ -814,11 +817,11 @@ class UndoManagerTest {
 
         // Action 3: Add a text object to the network
         val textObject = NetworkTextObject("Test Text")
-        network.addNetworkModel(textObject)
+        network.addNetworkModelAsync(textObject)
         networkPanel.undoManager.addUndoableAction(
             description = "Add text object",
             undo = { textObject.delete() },
-            redo = { network.addNetworkModel(textObject, usePlacementManager = false, useAutoAssignedId = false)?.await() }
+            redo = { network.addNetworkModel(textObject, usePlacementManager = false, useAutoAssignedId = false) }
         )
 
         // Verify that the text object was added

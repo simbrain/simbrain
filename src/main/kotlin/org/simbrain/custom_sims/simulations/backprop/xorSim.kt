@@ -1,23 +1,18 @@
 package org.simbrain.custom_sims.simulations
 
-import kotlinx.coroutines.awaitAll
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
-import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.SynapseGroup
-import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.trainers.LeCun
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedModel
-import org.simbrain.network.trainers.Xavier
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.alignNetworkModels
 import org.simbrain.network.util.offsetNetworkModel
-import org.simbrain.util.math.SigmoidFunctionEnum
 import org.simbrain.util.matrix
 import org.simbrain.util.place
 
@@ -42,7 +37,7 @@ val xorSim = newSim {
     val sm = SupervisedModel(inputLayer, outputLayer).apply {
         trainerConfig.weightInitializationStrategy = LeCun()
     }
-    net.addNetworkModels(inputLayer, hiddenLayer, outputLayer, sg1, sg2, sm).awaitAll()
+    net.addNetworkModels(inputLayer, hiddenLayer, outputLayer, sg1, sg2, sm)
     offsetNetworkModel(inputLayer, hiddenLayer, Direction.NORTH, 150.0)
     offsetNetworkModel(hiddenLayer, outputLayer, Direction.NORTH, 150.0)
     alignNetworkModels(inputLayer, hiddenLayer, Alignment.VERTICAL)

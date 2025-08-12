@@ -6,7 +6,6 @@ import org.simbrain.network.core.addNeuron
 import org.simbrain.network.core.addSynapse
 import org.simbrain.network.learningrules.STDPRule
 import org.simbrain.network.spikeresponders.JumpAndDecay
-import org.simbrain.network.updaterules.IntegrateAndFireRule
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.SpikingThresholdRule
 import org.simbrain.util.place
@@ -54,7 +53,7 @@ val stdpSim = newSim {
     }
 
     val nc = NeuronCollection(listOf(input1, input2))
-    network.addNetworkModel(nc)
+    network.addNetworkModelAsync(nc)
 
     network.addSynapse(input1, pre)
     network.addSynapse(input2, post)

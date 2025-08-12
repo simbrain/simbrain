@@ -26,7 +26,7 @@ val backpropAutoEncoder = newSim {
         }
         trainerConfig.learningRate = .1
     }
-    net.addNetworkModels(bp)
+    net.addNetworkModelsAsync(bp)
 
     bp.trainingSet = MatrixDataset(
         inputs = Matrix.eye(inputSize),

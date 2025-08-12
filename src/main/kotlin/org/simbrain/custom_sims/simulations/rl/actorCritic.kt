@@ -122,7 +122,7 @@ val actorCritic = newSim {
 
     // Outputs
     val outputs = WinnerTakeAll(network, 4).apply {
-        network.addNetworkModel(this)
+        network.addNetworkModelAsync(this)
         params.isUseRandom = true
         params.randomProb = epsilon
         // Add a little extra spacing between neurons to accommodate labels

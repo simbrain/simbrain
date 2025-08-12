@@ -46,7 +46,7 @@ class TransformerBlockTest {
 
         block.label = "TestBlock"
 
-        net.addNetworkModel(block)
+        net.addNetworkModelAsync(block)
     }
 
     @Test

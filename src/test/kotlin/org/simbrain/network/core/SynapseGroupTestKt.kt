@@ -21,11 +21,11 @@ class SynapseGroupTestKt {
     // One source node, two target nodes
     init {
         network = Network()
-        n1 = Neuron().apply { network.addNetworkModel(this) }
-        n2 = Neuron().apply { network.addNetworkModel(this) }
-        n3 = Neuron().apply { network.addNetworkModel(this) }
-        sourceGroup = NeuronGroup(listOf(n1)).apply { network.addNetworkModel(this) }
-        targetGroup = NeuronGroup(listOf(n2, n3)).apply { network.addNetworkModel(this) }
+        n1 = Neuron().apply { network.addNetworkModelAsync(this) }
+        n2 = Neuron().apply { network.addNetworkModelAsync(this) }
+        n3 = Neuron().apply { network.addNetworkModelAsync(this) }
+        sourceGroup = NeuronGroup(listOf(n1)).apply { network.addNetworkModelAsync(this) }
+        targetGroup = NeuronGroup(listOf(n2, n3)).apply { network.addNetworkModelAsync(this) }
     }
 
     @Test
@@ -123,7 +123,7 @@ class SynapseGroupTestKt {
     fun `changing connection strategy retains synapse group and applies new strategy`() {
         // Start with the default AllToAll‐built group
         val sg = SynapseGroup(sourceGroup, targetGroup)
-        network.addNetworkModel(sg)
+        network.addNetworkModelAsync(sg)
 
         // All to all makes 2 synapses
         assertEquals(2, sg.size())
@@ -146,10 +146,10 @@ class SynapseGroupTestKt {
     @Test
     fun `sparse connection strategy increasing and decreasing density works properly`() = runBlocking {
         // Create a larger source and target group for meaningful sparse connections
-        val largeSourceGroup = NeuronGroup(List(10) { Neuron() }.also { network.addNetworkModels(it) })
-            .apply { network.addNetworkModel(this) }
-        val largeTargetGroup = NeuronGroup(List(10) { Neuron() }.also { network.addNetworkModels(it) })
-            .apply { network.addNetworkModel(this) }
+        val largeSourceGroup = NeuronGroup(List(10) { Neuron() }.also { network.addNetworkModelsAsync(it) })
+            .apply { network.addNetworkModelAsync(this) }
+        val largeTargetGroup = NeuronGroup(List(10) { Neuron() }.also { network.addNetworkModelsAsync(it) })
+            .apply { network.addNetworkModelAsync(this) }
 
         // Start with 10% density
         val sparse = Sparse().apply {
@@ -157,7 +157,7 @@ class SynapseGroupTestKt {
             allowSelfConnection = true
         }
         val sg = SynapseGroup(largeSourceGroup, largeTargetGroup, sparse)
-        network.addNetworkModel(sg)
+        network.addNetworkModelAsync(sg)
 
         // Initial connections should be 10% of 10x10 = 10 synapses
         assertEquals(10, sg.size())
@@ -193,14 +193,14 @@ class SynapseGroupTestKt {
     @Test
     fun `sparse synapse group produces same pattern as loose neurons with same seed`() = runBlocking {
         // Create neurons for loose connection test
-        val looseSourceNeurons = List(5) { Neuron() }.also { network.addNetworkModels(it) }
-        val looseTargetNeurons = List(5) { Neuron() }.also { network.addNetworkModels(it) }
+        val looseSourceNeurons = List(5) { Neuron() }.also { network.addNetworkModelsAsync(it) }
+        val looseTargetNeurons = List(5) { Neuron() }.also { network.addNetworkModelsAsync(it) }
 
         // Create neuron groups for synapse group test
-        val sourceGroup = NeuronGroup(List(5) { Neuron() }.also { network.addNetworkModels(it) })
-            .apply { network.addNetworkModel(this) }
-        val targetGroup = NeuronGroup(List(5) { Neuron() }.also { network.addNetworkModels(it) })
-            .apply { network.addNetworkModel(this) }
+        val sourceGroup = NeuronGroup(List(5) { Neuron() }.also { network.addNetworkModelsAsync(it) })
+            .apply { network.addNetworkModelAsync(this) }
+        val targetGroup = NeuronGroup(List(5) { Neuron() }.also { network.addNetworkModelsAsync(it) })
+            .apply { network.addNetworkModelAsync(this) }
 
         // Use same seed for both approaches
         val seed = 42L
@@ -212,7 +212,7 @@ class SynapseGroupTestKt {
 
         // Create synapse group with same strategy
         val sg = SynapseGroup(sourceGroup, targetGroup, sparse2)
-        network.addNetworkModel(sg)
+        network.addNetworkModelAsync(sg)
 
         // Both should produce the same number of synapses
         assertEquals(looseSynapses.size, sg.size())

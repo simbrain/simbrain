@@ -22,7 +22,7 @@ class HistogramTest {
     val hgc = HistogramComponent("Histogram", histogram)
 
     init {
-        net.addNetworkModels(ng)
+        net.addNetworkModelsAsync(ng)
         workspace.addWorkspaceComponent(hgc)
         workspace.addWorkspaceComponent(nwc)
         workspace.couplingManager.createCoupling(ng, histogram)

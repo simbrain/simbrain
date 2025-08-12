@@ -21,7 +21,7 @@ val SOMSim = newSim {
 
     // SOM network
     val SOM = SOMNetwork(7, 16)
-    network.addNetworkModel(SOM)
+    network.addNetworkModelAsync(SOM)
     SOM.inputLayer.setUpperBound(1.0)
     //SOM.weights.randomize()
 

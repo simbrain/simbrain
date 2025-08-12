@@ -44,7 +44,7 @@ class BackpropTests {
         }
         (na3.updateRule as BoundedUpdateRule).upperBound = 1.0
         (na3.updateRule as BoundedUpdateRule).lowerBound = -1.0
-        net.addNetworkModels(na1, na2, na3, wm1, wm2)
+        net.addNetworkModelsAsync(na1, na2, na3, wm1, wm2)
         weightInit.initializeWeights(wm1)
         weightInit.initializeWeights(wm2)
     }
@@ -139,7 +139,7 @@ class BackpropTests {
 
             val targetVector = makeMockTargets(na4.size)
 
-            net.addNetworkModels(wm3, na4)
+            net.addNetworkModelsAsync(wm3, na4)
             val supervisedModel = SupervisedModel(na1, na4)
             testBackprop(commonInputs, targetVector, supervisedModel, nRuns = 100)
             //println("Outputs: ${na4.activations}, SSE = ${targetVector sse na4.activations}")
@@ -158,7 +158,7 @@ class BackpropTests {
             }
             val wm = WeightMatrix(inputLayer, outputLayer)
             weightInit.initializeWeights(wm)
-            addNetworkModels(inputLayer, outputLayer, wm)
+            addNetworkModelsAsync(inputLayer, outputLayer, wm)
             val supervisedModel = SupervisedModel(inputLayer, outputLayer)
             supervisedModel.trainerConfig.lossFunction = BackpropLossFunction.CrossEntropy
             testBackprop(inputs, targets, supervisedModel, nRuns = 10000)
@@ -180,7 +180,7 @@ class BackpropTests {
                 targets = inputs
             )
         }
-        net.addNetworkModels(bp)
+        net.addNetworkModelsAsync(bp)
         val trainer = SupervisedTrainer(net, bp)
         runBlocking {
             repeat(1000) {

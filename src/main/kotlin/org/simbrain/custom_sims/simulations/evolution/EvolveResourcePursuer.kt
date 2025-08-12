@@ -139,18 +139,18 @@ val evolveResourcePursuer = newSim { optionString ->
 
         suspend fun expressWith(network: Network): EvolvePursuerPhenotype {
             val driveNeurons = NeuronCollection(network.express(driveChromosome)).also {
-                network.addNetworkModel(it); it.label = "drives"
+                network.addNetworkModelAsync(it); it.label = "drives"
             }
             val inputNeurons = NeuronCollection(network.express(inputChromosome)).also {
-                network.addNetworkModel(it); it.label = "inputs"
+                network.addNetworkModelAsync(it); it.label = "inputs"
             }
             inputNeurons.neuronList.labels = listOf("Left", "Center", "Right")
 
             val hiddenNeurons = NeuronCollection(network.express(hiddenChromosome)).also {
-                network.addNetworkModel(it);
+                network.addNetworkModelAsync(it);
             }
             val outputNeurons = NeuronCollection(network.express(outputChromosome)).also {
-                network.addNetworkModel(it); it.label = "outputs"
+                network.addNetworkModelAsync(it); it.label = "outputs"
             }
             outputNeurons.neuronList.labels = listOf("Straight", "Left", "Right")
 
@@ -461,7 +461,7 @@ val evolveResourcePursuer = newSim { optionString ->
                     }
 
                     val energyTextObject = NetworkTextObject(simState.generateEnergyText())
-                    networkComponent.network.addNetworkModels(energyTextObject)
+                    networkComponent.network.addNetworkModelsAsync(energyTextObject)
                     workspace.addUpdateAction("update energy text") {
                         energyTextObject.text = simState.generateEnergyText()
                     }

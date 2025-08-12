@@ -169,7 +169,7 @@ fun main() {
     wm.randomize()
 
     val net = Network()
-    net.addNetworkModels(source, target, wm)
+    net.addNetworkModelsAsync(source, target, wm)
 
     println(target.activations)
 

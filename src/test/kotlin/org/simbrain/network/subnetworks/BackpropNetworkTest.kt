@@ -30,7 +30,7 @@ class BackpropNetworkTest {
     }
 
     init {
-        net.addNetworkModels(bp)
+        net.addNetworkModelsAsync(bp)
         bp.initBiases()
         bp.initWeights()
     }

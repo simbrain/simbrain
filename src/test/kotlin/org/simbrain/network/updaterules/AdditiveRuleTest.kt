@@ -11,18 +11,18 @@ class AdditiveRuleTest {
 
     val network = Network()
 
-    val n1 = Neuron().also { network.addNetworkModel(it) }
+    val n1 = Neuron().also { network.addNetworkModelAsync(it) }
 
     val n2 = Neuron().apply {
         updateRule = AdditiveRule()
-    }.also { network.addNetworkModel(it) }
+    }.also { network.addNetworkModelAsync(it) }
 
     @Test
     fun `test single synapse update`() {
 
         val synapse = Synapse(n1, n2).also {
             it.strength = 1.0
-            network.addNetworkModel(it)
+            network.addNetworkModelAsync(it)
         }
 
         n1.activation = 1.0
@@ -35,9 +35,9 @@ class AdditiveRuleTest {
 
     @Test
     fun `test synapse group update`() {
-        val nc1 = NeuronCollection(listOf(n1)).also { network.addNetworkModel(it) }
-        val nc2 = NeuronCollection(listOf(n2)).also { network.addNetworkModel(it) }
-        val synapseGroup = SynapseGroup(nc1, nc2).also { network.addNetworkModel(it) }
+        val nc1 = NeuronCollection(listOf(n1)).also { network.addNetworkModelAsync(it) }
+        val nc2 = NeuronCollection(listOf(n2)).also { network.addNetworkModelAsync(it) }
+        val synapseGroup = SynapseGroup(nc1, nc2).also { network.addNetworkModelAsync(it) }
         synapseGroup.synapses.first().strength = 1.0
         n1.activation = 1.0
         n1.clamped = true
@@ -50,9 +50,9 @@ class AdditiveRuleTest {
 
     @Test
     fun `test weight matrix update`() {
-        val nc1 = NeuronCollection(listOf(n1)).also { network.addNetworkModel(it) }
-        val nc2 = NeuronCollection(listOf(n2)).also { network.addNetworkModel(it) }
-        val weightMatrix = WeightMatrix(nc1, nc2).also { network.addNetworkModel(it) }
+        val nc1 = NeuronCollection(listOf(n1)).also { network.addNetworkModelAsync(it) }
+        val nc2 = NeuronCollection(listOf(n2)).also { network.addNetworkModelAsync(it) }
+        val weightMatrix = WeightMatrix(nc1, nc2).also { network.addNetworkModelAsync(it) }
         weightMatrix.weights[0, 0] = 1.0
         n1.activation = 1.0
         n1.clamped = true

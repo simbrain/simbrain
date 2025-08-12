@@ -1,6 +1,5 @@
 package org.simbrain.custom_sims.simulations.edge_of_chaos
 
-import kotlinx.coroutines.awaitAll
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.Direction
 import org.simbrain.network.connections.FixedDegree
@@ -56,7 +55,7 @@ val edgeOfChaos = newSim("edgeOfChaos") {
     // Set up sensor nodes
     val sensorNodes = NeuronGroup(6).apply {
         label = "Sensors"
-        net.addNetworkModel(this)
+        net.addNetworkModelAsync(this)
         setLocation(229.0, 561.0)
         applyLayout()
     }
@@ -254,7 +253,7 @@ suspend fun createSensorConnections(
             }
         }
     }
-    net.addNetworkModels(synapses).awaitAll()
+    net.addNetworkModels(synapses)
 }
 
 const val GRID_SPACE: Int = 25
@@ -264,7 +263,7 @@ suspend fun createReservoir(parentNet: Network, x: Int, y: Int, numNeurons: Int)
     val ng = NeuronGroup(numNeurons)
     val thresholdUnit = BinaryRule()
     ng.updateRule = thresholdUnit
-    parentNet.addNetworkModel(ng)?.await()
+    parentNet.addNetworkModel(ng)
 
     ng.layout = layout
     ng.applyLayout(Point2D.Double(x.toDouble(), y.toDouble()))
@@ -277,7 +276,7 @@ suspend fun connectReservoir(parentNet: Network, res: NeuronGroup, variance: Dou
 
     val reservoir = SynapseGroup(res, res, con)
     reservoir.label = "Recurrent Synapses"
-    parentNet.addNetworkModel(reservoir)?.await()
+    parentNet.addNetworkModel(reservoir)
 
     return reservoir
 }

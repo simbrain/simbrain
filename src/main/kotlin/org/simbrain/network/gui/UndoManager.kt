@@ -130,7 +130,7 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
 
             is NeuronCollection -> {
                 (model as? Neuron)?.let { neuron ->
-                    network.addNetworkModel(neuron, usePlacementManager = false, useAutoAssignedId = false)?.await()
+                    network.addNetworkModel(neuron, usePlacementManager = false, useAutoAssignedId = false)
                     parent.neuronList.add(neuron)
                     // First check if the NeuronCollectionNode node exists
                     modelNodeMap.getImmediately<NeuronCollectionNode>(parent)?.let { neuronCollectionNode ->
@@ -165,7 +165,7 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
             }
 
             is SupervisedModel -> {
-                network.addNetworkModel(model, usePlacementManager = false, useAutoAssignedId = false)?.await()
+                network.addNetworkModel(model, usePlacementManager = false, useAutoAssignedId = false)
                 modelNodeMap.getImmediately<SupervisedModelNode>(parent)?.let { supervisedModelNode ->
                     modelNodeMap.getImmediately<ScreenElement>(model)?.let { screenElement ->
                         supervisedModelNode.addNode(screenElement)
@@ -186,7 +186,7 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
         // Adds models back to parent groups.
         modelsToReAdd.forEach { reAddToGroup(it) }
         // Add all models without parents back
-        network.addNetworkModels(
+        network.addNetworkModelsAsync(
             modelsToReAdd.filter { hasNoParent(it) },
             usePlacementManager = false,
             useAutoAssignedId = false

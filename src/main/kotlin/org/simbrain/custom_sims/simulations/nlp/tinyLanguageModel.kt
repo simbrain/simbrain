@@ -1,6 +1,5 @@
 package org.simbrain.custom_sims.simulations.nlp
 
-import kotlinx.coroutines.awaitAll
 import org.json.JSONObject
 import org.simbrain.custom_sims.*
 import org.simbrain.network.NetworkComponent
@@ -185,8 +184,8 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
     )
 
     with(network) {
-        addNetworkModels(inputs, transformerBlock, softmaxSequence, inferenceOutput).awaitAll()
-        addNetworkModels(weightMatrices).awaitAll()
+        addNetworkModels(inputs, transformerBlock, softmaxSequence, inferenceOutput)
+        addNetworkModels(weightMatrices)
         val model = SupervisedModel(inputs, softmaxSequence) // Train on sequence, not single output
         model.initWeights()
         model.initBiases()
@@ -195,7 +194,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         model.trainerConfig.learningRate = learningRate
         model.trainerConfig.testConfiguration.enabled = false
         model.trainerConfig.optimizer = AdamOptimizer()
-        addNetworkModels(model).awaitAll()
+        addNetworkModels(model)
     }
 
     setupUpdateActions(workspace, options)

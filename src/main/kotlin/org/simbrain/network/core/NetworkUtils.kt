@@ -1,7 +1,6 @@
 package org.simbrain.network.core
 
 import com.thoughtworks.xstream.XStream
-import kotlinx.coroutines.awaitAll
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.gui.dialogs.NetworkPreferences.biasesRandomizer
@@ -173,7 +172,7 @@ fun connect(source: Neuron, target: Neuron, value: Double, lowerBound: Double = 
     synapse.forceSetStrength(value)
     synapse.lowerBound = lowerBound
     synapse.upperBound = upperBound
-    addNetworkModel(synapse)
+    addNetworkModelAsync(synapse)
     return synapse
 }
 
@@ -219,26 +218,26 @@ suspend fun Network.addNeurons(numNeurons: Int, template: suspend Neuron.() -> U
     val neurons = (0 until numNeurons).map {
         Neuron().apply { template() }
     }
-    addNetworkModels(neurons).awaitAll()
+    addNetworkModels(neurons)
     return neurons
 }
 
 suspend fun Network.addNeuron(usePlacementManager: Boolean = false, block: Neuron.() -> Unit = { }) = Neuron()
     .also(block)
-    .also { addNetworkModel(it, usePlacementManager)?.await() }
+    .also { addNetworkModel(it, usePlacementManager) }
 
 suspend fun Network.addNeuron(x: Int, y: Int, usePlacementManager: Boolean = false, block: Neuron.() -> Unit = { }) = addNeuron(usePlacementManager, block)
     .also{ it.location = point(x,y) }
 
 fun Network.addSynapse(source: Neuron, target: Neuron, block: Synapse.() -> Unit = { }) = Synapse(source, target)
     .apply(block)
-    .also(this::addNetworkModel)
+    .also(this::addNetworkModelAsync)
 
 suspend fun Network.addNeuronGroup(count: Int, location: Point2D? = null, template: Neuron.() -> Unit = { }): NeuronGroup {
     return NeuronGroup(List(count) {
         Neuron().apply(template)
     }).also {
-        addNetworkModel(it, usePlacementManager = false)?.await()
+        addNetworkModel(it, usePlacementManager = false)
         if (location != null) {
             val (x, y) = location
             it.location = point(x, y)
@@ -251,14 +250,14 @@ fun Network.addNeuronGroup(x: Double, y: Double, numNeurons: Int, rule: NeuronUp
         NeuronGroup {
     val ng = NeuronGroup(numNeurons)
     ng.updateRule = rule
-    addNetworkModel(ng)
+    addNetworkModelAsync(ng)
     ng.setLocation(x, y)
     return ng
 }
 
 suspend fun Network.addNeuronCollection(numNeurons: Int, template: suspend Neuron.() -> Unit = {}) : NeuronCollection {
     val nc = NeuronCollection(addNeurons(numNeurons, template))
-    addNetworkModel(nc)?.await()
+    addNetworkModel(nc)
     return nc
 }
 
@@ -269,7 +268,7 @@ suspend fun Network.addNeuronCollection(numNeurons: Int, template: suspend Neuro
  */
 fun Network.addSynapseGroup(source: NeuronGroup, target: NeuronGroup): SynapseGroup {
     val sg = SynapseGroup(source, target)
-    addNetworkModel(sg)
+    addNetworkModelAsync(sg)
     return sg
 }
 
@@ -338,21 +337,21 @@ fun getEuclideanDist(n1: Neuron, n2: Neuron): Double {
     return n1.location distanceTo n2.location
 }
 
-suspend fun NetworkModel.addToNetwork(network: Network, usePlacementManager: Boolean = true, useAutoAssignId: Boolean = true) = network.addNetworkModel(this, usePlacementManager, useAutoAssignId)?.await()
-fun NetworkModel.addToNetworkAsync(network: Network, usePlacementManager: Boolean = true, useAutoAssignId: Boolean = true) = network.addNetworkModel(this, usePlacementManager, useAutoAssignId)
-suspend fun List<NetworkModel>.addToNetwork(network: Network, usePlacementManager: Boolean = true, useAutoAssignId: Boolean = true) = network.addNetworkModels(this, usePlacementManager, useAutoAssignId).awaitAll()
-fun List<NetworkModel>.addToNetworkAsync(network: Network, usePlacementManager: Boolean = true, useAutoAssignId: Boolean = true) = network.addNetworkModels(this, usePlacementManager, useAutoAssignId)
+suspend fun NetworkModel.addToNetwork(network: Network, usePlacementManager: Boolean = true, useAutoAssignId: Boolean = true) = network.addNetworkModel(this, usePlacementManager, useAutoAssignId)
+fun NetworkModel.addToNetworkAsync(network: Network, usePlacementManager: Boolean = true, useAutoAssignId: Boolean = true) = network.addNetworkModelAsync(this, usePlacementManager, useAutoAssignId)
+suspend fun List<NetworkModel>.addToNetwork(network: Network, usePlacementManager: Boolean = true, useAutoAssignId: Boolean = true) = network.addNetworkModels(this, usePlacementManager, useAutoAssignId)
+fun List<NetworkModel>.addToNetworkAsync(network: Network, usePlacementManager: Boolean = true, useAutoAssignId: Boolean = true) = network.addNetworkModelsAsync(this, usePlacementManager, useAutoAssignId)
 
 context(Network) suspend fun <T: NetworkModel> T.addToNetwork(): T {
-    addNetworkModel(this)?.await()
+    addNetworkModel(this)
     return this
 }
-context(Network) fun NetworkModel.addToNetworkAsync() = addNetworkModel(this)
+context(Network) fun NetworkModel.addToNetworkAsync() = addNetworkModelAsync(this)
 context(Network) suspend fun <T: NetworkModel> List<T>.addToNetwork(): List<T> {
-    addNetworkModels(this).awaitAll()
+    addNetworkModels(this)
     return this
 }
-context(Network) fun List<NetworkModel>.addToNetworkAsync() = addNetworkModels(this)
+context(Network) fun List<NetworkModel>.addToNetworkAsync() = addNetworkModelsAsync(this)
 
 suspend fun Network.createLayeredFreeNeurons(topology: List<Int>, _layerNames: List<String>? = null, alignment: Alignment = Alignment.VERTICAL) {
 
@@ -373,7 +372,7 @@ suspend fun Network.createLayeredFreeNeurons(topology: List<Int>, _layerNames: L
     }
     layers.zipWithNext().forEach { (source, target) ->
         val synapseGroup = SynapseGroup(source, target)
-        addNetworkModel(synapseGroup)
+        addNetworkModelAsync(synapseGroup)
     }
     layers.zipWithNext().forEach { (source, target) ->
         alignNetworkModels(source, target, alignment)

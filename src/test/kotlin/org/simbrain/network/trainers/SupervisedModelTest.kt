@@ -21,7 +21,7 @@ class SupervisedModelTest {
     val wm = WeightMatrix(inputArray, outputArray)
     val sm = SupervisedModel(inputArray, outputArray)
     init {
-        net.addNetworkModels(inputArray, outputArray, wm, sm)
+        net.addNetworkModelsAsync(inputArray, outputArray, wm, sm)
     }
 
     @Test
@@ -46,16 +46,16 @@ class SupervisedModelTest {
 
         val network2 = Network()
 
-        val backpropNetwork = BackpropNetwork(intArrayOf(2,2,1), null).also { network1.addNetworkModels(it) }
+        val backpropNetwork = BackpropNetwork(intArrayOf(2,2,1), null).also { network1.addNetworkModelsAsync(it) }
 
-        val layer1 = NeuronArray(2).also { network2.addNetworkModels(it) }.also { it.isClamped = true }
-        val layer2 = NeuronArray(2).also { network2.addNetworkModels(it) }.also { it.updateRule = SigmoidalRule() }
-        val layer3 = NeuronArray(1).also { network2.addNetworkModels(it) }.also { it.updateRule = SigmoidalRule() }
+        val layer1 = NeuronArray(2).also { network2.addNetworkModelsAsync(it) }.also { it.isClamped = true }
+        val layer2 = NeuronArray(2).also { network2.addNetworkModelsAsync(it) }.also { it.updateRule = SigmoidalRule() }
+        val layer3 = NeuronArray(1).also { network2.addNetworkModelsAsync(it) }.also { it.updateRule = SigmoidalRule() }
 
-        val wm1 = WeightMatrix(layer1, layer2).also { network2.addNetworkModels(it) }
-        val wm2 = WeightMatrix(layer2, layer3).also { network2.addNetworkModels(it) }
+        val wm1 = WeightMatrix(layer1, layer2).also { network2.addNetworkModelsAsync(it) }
+        val wm2 = WeightMatrix(layer2, layer3).also { network2.addNetworkModelsAsync(it) }
 
-        val supervisedModel = SupervisedModel(layer1, layer3).also { network2.addNetworkModels(it) }
+        val supervisedModel = SupervisedModel(layer1, layer3).also { network2.addNetworkModelsAsync(it) }
 
         val SupervisedTrainer = SupervisedTrainer(network1, backpropNetwork).apply {
             config.optimizer = MomentumOptimizer()
@@ -152,23 +152,23 @@ class SupervisedModelTest {
 
         val network2 = Network()
 
-        val na1 = NeuronArray(2).also { network1.addNetworkModels(it) }.also { it.isClamped = true; it.label = "layer1" }
-        val na2 = NeuronArray(2).also { network1.addNetworkModels(it) }.also { it.updateRule = SigmoidalRule().apply { type = SigmoidFunctionEnum.ARCTAN }; it.label = "layer2" }
-        val na3 = NeuronArray(1).also { network1.addNetworkModels(it) }.also { it.updateRule = SigmoidalRule().apply { type = SigmoidFunctionEnum.ARCTAN }; it.label = "layer3" }
+        val na1 = NeuronArray(2).also { network1.addNetworkModelsAsync(it) }.also { it.isClamped = true; it.label = "layer1" }
+        val na2 = NeuronArray(2).also { network1.addNetworkModelsAsync(it) }.also { it.updateRule = SigmoidalRule().apply { type = SigmoidFunctionEnum.ARCTAN }; it.label = "layer2" }
+        val na3 = NeuronArray(1).also { network1.addNetworkModelsAsync(it) }.also { it.updateRule = SigmoidalRule().apply { type = SigmoidFunctionEnum.ARCTAN }; it.label = "layer3" }
 
-        val ng1 = NeuronGroup(2).also { network2.addNetworkModels(it) }.also { it.isClamped = true; it.label = "layer1" }
-        val ng2 = NeuronGroup(2).also { network2.addNetworkModels(it) }.also { it.updateRule = SigmoidalRule().apply { type = SigmoidFunctionEnum.ARCTAN }; it.label = "layer2" }
-        val ng3 = NeuronGroup(1).also { network2.addNetworkModels(it) }.also { it.updateRule = SigmoidalRule().apply { type = SigmoidFunctionEnum.ARCTAN }; it.label = "layer3" }
+        val ng1 = NeuronGroup(2).also { network2.addNetworkModelsAsync(it) }.also { it.isClamped = true; it.label = "layer1" }
+        val ng2 = NeuronGroup(2).also { network2.addNetworkModelsAsync(it) }.also { it.updateRule = SigmoidalRule().apply { type = SigmoidFunctionEnum.ARCTAN }; it.label = "layer2" }
+        val ng3 = NeuronGroup(1).also { network2.addNetworkModelsAsync(it) }.also { it.updateRule = SigmoidalRule().apply { type = SigmoidFunctionEnum.ARCTAN }; it.label = "layer3" }
 
-        val nawm1 = WeightMatrix(na1, na2).also { network1.addNetworkModels(it) }.also { it.label = "wm1" }
-        val nawm2 = WeightMatrix(na2, na3).also { network1.addNetworkModels(it) }.also { it.label = "wm2" }
+        val nawm1 = WeightMatrix(na1, na2).also { network1.addNetworkModelsAsync(it) }.also { it.label = "wm1" }
+        val nawm2 = WeightMatrix(na2, na3).also { network1.addNetworkModelsAsync(it) }.also { it.label = "wm2" }
 
-        val ngwm1 = WeightMatrix(ng1, ng2).also { network2.addNetworkModels(it) }.also { it.label = "wm1" }
-        val ngwm2 = WeightMatrix(ng2, ng3).also { network2.addNetworkModels(it) }.also { it.label = "wm2" }
+        val ngwm1 = WeightMatrix(ng1, ng2).also { network2.addNetworkModelsAsync(it) }.also { it.label = "wm1" }
+        val ngwm2 = WeightMatrix(ng2, ng3).also { network2.addNetworkModelsAsync(it) }.also { it.label = "wm2" }
 
-        val naModel = SupervisedModel(na1, na3).also { network1.addNetworkModels(it) }
+        val naModel = SupervisedModel(na1, na3).also { network1.addNetworkModelsAsync(it) }
 
-        val ngModel = SupervisedModel(ng1, ng3).also { network2.addNetworkModels(it) }
+        val ngModel = SupervisedModel(ng1, ng3).also { network2.addNetworkModelsAsync(it) }
 
         val naTrainer = SupervisedTrainer(network1, naModel).apply {
             config.optimizer = MomentumOptimizer(0.0)
@@ -267,19 +267,19 @@ class SupervisedModelTest {
 
         val network2 = Network()
 
-        val backpropNetwork = BackpropNetwork(intArrayOf(2,2,1), null).also { network1.addNetworkModels(it) }
+        val backpropNetwork = BackpropNetwork(intArrayOf(2,2,1), null).also { network1.addNetworkModelsAsync(it) }
 
         backpropNetwork.layerList.forEachIndexed { index, layer -> layer.label = "layer${index + 1}" }
         backpropNetwork.wmList.forEachIndexed { index, wm -> wm.label = "wm${index + 1}" }
 
-        val layer1 = NeuronGroup(2).also { network2.addNetworkModels(it) }.also { it.label = "layer1"; it.isClamped = true }
-        val layer2 = NeuronGroup(2).also { network2.addNetworkModels(it) }.also { it.label = "layer2"; it.updateRule = SigmoidalRule() }
-        val layer3 = NeuronGroup(1).also { network2.addNetworkModels(it) }.also { it.label = "layer3"; it.updateRule = SigmoidalRule() }
+        val layer1 = NeuronGroup(2).also { network2.addNetworkModelsAsync(it) }.also { it.label = "layer1"; it.isClamped = true }
+        val layer2 = NeuronGroup(2).also { network2.addNetworkModelsAsync(it) }.also { it.label = "layer2"; it.updateRule = SigmoidalRule() }
+        val layer3 = NeuronGroup(1).also { network2.addNetworkModelsAsync(it) }.also { it.label = "layer3"; it.updateRule = SigmoidalRule() }
 
-        val wm1 = SynapseGroup(layer1, layer2).also { it.label = "wm1"; network2.addNetworkModels(it) }
-        val wm2 = SynapseGroup(layer2, layer3).also { it.label = "wm2"; network2.addNetworkModels(it) }
+        val wm1 = SynapseGroup(layer1, layer2).also { it.label = "wm1"; network2.addNetworkModelsAsync(it) }
+        val wm2 = SynapseGroup(layer2, layer3).also { it.label = "wm2"; network2.addNetworkModelsAsync(it) }
 
-        val supervisedModel = SupervisedModel(layer1, layer3).also { network2.addNetworkModels(it) }
+        val supervisedModel = SupervisedModel(layer1, layer3).also { network2.addNetworkModelsAsync(it) }
 
         val SupervisedTrainer = SupervisedTrainer(network1, backpropNetwork).apply {
             config.optimizer = MomentumOptimizer(0.0)

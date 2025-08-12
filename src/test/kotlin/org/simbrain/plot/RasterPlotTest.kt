@@ -23,7 +23,7 @@ class RasterPlotTest {
     val rpc = RasterPlotComponent("Test Raster Plot")
 
     init {
-        nc.network.addNetworkModel(na)
+        nc.network.addNetworkModelAsync(na)
         workspace.addWorkspaceComponent(nc)
         workspace.addWorkspaceComponent(rpc)
     }

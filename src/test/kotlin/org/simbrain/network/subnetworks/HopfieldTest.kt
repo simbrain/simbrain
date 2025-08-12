@@ -6,7 +6,10 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.getModelByLabel
 import org.simbrain.network.core.getNetworkXStream
-import org.simbrain.util.*
+import org.simbrain.util.cartesianProduct
+import org.simbrain.util.flatten
+import org.simbrain.util.perturbBinaryByHammingDistance
+import org.simbrain.util.sse
 import smile.math.matrix.Matrix
 import kotlin.math.abs
 
@@ -18,7 +21,7 @@ class HopfieldTest {
     }
 
     init {
-        net.addNetworkModels(hopfield)
+        net.addNetworkModelsAsync(hopfield)
     }
 
     val zero = Matrix.of(

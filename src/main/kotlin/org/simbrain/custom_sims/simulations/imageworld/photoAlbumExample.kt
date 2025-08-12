@@ -7,7 +7,6 @@ import org.simbrain.network.trainers.BackpropLossFunction
 import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.network.trainers.splitDataSet
-import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.network.util.Alignment
@@ -38,7 +37,7 @@ val photoAlbumExample = newSim {
         isClamped = true
         gridMode = true
     }
-    network.addNetworkModel(inputArray)
+    network.addNetworkModelAsync(inputArray)
 
     // Hidden layer
     val hiddenLayer = NeuronArray(60).apply {
@@ -49,7 +48,7 @@ val photoAlbumExample = newSim {
         }
         gridMode = true
     }
-    network.addNetworkModel(hiddenLayer)
+    network.addNetworkModelAsync(hiddenLayer)
 
     // Output layer (4 categories: bird, crocodile, flower, plane)
     val outputLayer = NeuronArray(4).apply {
@@ -59,7 +58,7 @@ val photoAlbumExample = newSim {
         updateRule = SoftmaxRule()
         labelArray = arrayOf("Bird", "Crocodile", "Flower", "Plane")
     }
-    network.addNetworkModel(outputLayer)
+    network.addNetworkModelAsync(outputLayer)
 
     offsetNetworkModel(inputArray, hiddenLayer, Direction.NORTH, 300.0)
     alignNetworkModels(inputArray, hiddenLayer, Alignment.VERTICAL)
@@ -75,7 +74,7 @@ val photoAlbumExample = newSim {
     ).onEach {
         it.randomize()
     }.also {
-        network.addNetworkModels(it)
+        network.addNetworkModelsAsync(it)
     }
 
     // Create supervised model
@@ -83,7 +82,7 @@ val photoAlbumExample = newSim {
         label = "Image Classifier"
         trainerConfig.testConfiguration.enabled = true
     }
-    network.addNetworkModel(supervisedModel)
+    network.addNetworkModelAsync(supervisedModel)
 
     place(networkComponent,0,0,340,800)
 

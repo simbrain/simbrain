@@ -49,7 +49,7 @@ val edgeOfChaosBitStream = newSim("edgeOfChaosBitStream") {
     }
 
     // Set up "bit-stream" inputs
-    fun buildBitStream(reservoir: NeuronGroup): NeuronGroup {
+    suspend fun buildBitStream(reservoir: NeuronGroup): NeuronGroup {
         // Offset in pixels of input nodes to right of reservoir
         val offset = 200
         val bitStreamInputs = NeuronGroup(1).apply {

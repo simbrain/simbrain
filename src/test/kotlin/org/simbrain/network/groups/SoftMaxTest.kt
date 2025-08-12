@@ -17,7 +17,7 @@ class SoftMaxTest {
 
     init {
         with(net) {
-            net.addNetworkModels(softmax, n1, n2)
+            net.addNetworkModelsAsync(softmax, n1, n2)
             n1.clamped = true
             n2.clamped = true
             connect(n1, softmax.getNeuron(0), 1.0)
@@ -50,7 +50,7 @@ class SoftMaxTest {
     @Test
     fun `Test copy function`() {
         val softmax2 = softmax.copy()
-        net.addNetworkModels(softmax2)
+        net.addNetworkModelsAsync(softmax2)
         assertEquals(2, softmax2.neuronList.size)
     }
 }

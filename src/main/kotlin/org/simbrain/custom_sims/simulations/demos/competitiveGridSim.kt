@@ -1,7 +1,7 @@
 package org.simbrain.custom_sims.simulations
 
-import org.simbrain.custom_sims.addDocViewer
 import org.simbrain.custom_sims.addNetworkComponent
+import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.activations
@@ -9,7 +9,6 @@ import org.simbrain.network.subnetworks.CompetitiveNetwork
 import org.simbrain.util.add
 import org.simbrain.util.place
 import org.simbrain.util.stats.distributions.NormalDistribution
-import org.simbrain.custom_sims.addSidebarInfo
 
 /**
  * Demo for studying Competitive networks with ImageWorld,
@@ -23,7 +22,7 @@ val competitiveGridSim = newSim {
 
     // Competitive network
     val competitive = CompetitiveNetwork(100, 5)
-    network.addNetworkModel(competitive)
+    network.addNetworkModelAsync(competitive)
     competitive.inputLayer.setUpperBound(1.0)
     val inputs = competitive.inputLayer
 

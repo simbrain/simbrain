@@ -38,7 +38,7 @@ class ClipboardTest {
     fun `test add to and clear clipboard`() {
         // Add a neuron to the network
         val neuron = Neuron()
-        network.addNetworkModel(neuron)
+        network.addNetworkModelAsync(neuron)
 
         // Add the neuron to the clipboard
         Clipboard.add(listOf(neuron))
@@ -59,9 +59,9 @@ class ClipboardTest {
         val neuron1 = Neuron()
         val neuron2 = Neuron()
         val textObject = NetworkTextObject("Test Text")
-        network.addNetworkModel(neuron1)
-        network.addNetworkModel(neuron2)
-        network.addNetworkModel(textObject)
+        network.addNetworkModelAsync(neuron1)
+        network.addNetworkModelAsync(neuron2)
+        network.addNetworkModelAsync(textObject)
 
         // Add the objects to the clipboard
         Clipboard.add(listOf(neuron1, neuron2, textObject))
@@ -81,7 +81,7 @@ class ClipboardTest {
 
         // Add a neuron to the clipboard
         val neuron = Neuron()
-        network.addNetworkModel(neuron)
+        network.addNetworkModelAsync(neuron)
         Clipboard.add(listOf(neuron))
 
         // Verify that the listener was called
@@ -120,7 +120,7 @@ class ClipboardTest {
             x = 100.0
             y = 100.0
         }
-        network.addNetworkModel(originalNeuron)
+        network.addNetworkModelAsync(originalNeuron)
 
         // Add the neuron to the clipboard
         Clipboard.add(listOf(originalNeuron))
@@ -155,7 +155,7 @@ class ClipboardTest {
         val textObject = NetworkTextObject(originalText).apply {
             location = java.awt.geom.Point2D.Double(100.0, 100.0)
         }
-        network.addNetworkModel(textObject)
+        network.addNetworkModelAsync(textObject)
 
         // Add the text object to the clipboard
         Clipboard.add(listOf(textObject))
@@ -195,14 +195,14 @@ class ClipboardTest {
             x = 200.0
             y = 100.0
         }
-        network.addNetworkModel(sourceNeuron)?.await()
-        network.addNetworkModel(targetNeuron)?.await()
+        network.addNetworkModel(sourceNeuron)
+        network.addNetworkModel(targetNeuron)
 
         // Create a synapse between the neurons
         val synapse = Synapse(sourceNeuron, targetNeuron).apply {
             strength = 0.75
         }
-        network.addNetworkModel(synapse)?.await()
+        network.addNetworkModel(synapse)
 
         // Add both neurons and the synapse to the clipboard
         Clipboard.add(listOf(sourceNeuron, targetNeuron, synapse))
@@ -242,7 +242,7 @@ class ClipboardTest {
             label = "Test Neuron"
             activation = 0.5
         }
-        network.addNetworkModel(neuron)
+        network.addNetworkModelAsync(neuron)
 
         // Add the neuron to the clipboard
         Clipboard.add(listOf(neuron))
@@ -295,12 +295,12 @@ class ClipboardTest {
             x = 150.0
             y = 100.0
         }
-        network.addNetworkModel(neuron1)
-        network.addNetworkModel(neuron2)
+        network.addNetworkModelAsync(neuron1)
+        network.addNetworkModelAsync(neuron2)
         
         // Create a neuron collection
         val originalCollection = NeuronCollection(listOf(neuron1, neuron2))
-        network.addNetworkModel(originalCollection)
+        network.addNetworkModelAsync(originalCollection)
         
         // Add the collection to the clipboard
         Clipboard.add(listOf(originalCollection))
@@ -371,12 +371,12 @@ class ClipboardTest {
             x = 150.0
             y = 100.0
         }
-        network.addNetworkModel(neuron1)
-        network.addNetworkModel(neuron2)
+        network.addNetworkModelAsync(neuron1)
+        network.addNetworkModelAsync(neuron2)
         
         // Create a neuron collection
         val originalCollection = NeuronCollection(listOf(neuron1, neuron2))
-        network.addNetworkModel(originalCollection)
+        network.addNetworkModelAsync(originalCollection)
         
         // Add the collection to the clipboard
         Clipboard.add(listOf(originalCollection))
@@ -482,20 +482,20 @@ class ClipboardTest {
         )
         
         // Add neurons to network
-        sourceNeurons.forEach { network.addNetworkModel(it) }
-        targetNeurons.forEach { network.addNetworkModel(it) }
+        sourceNeurons.forEach { network.addNetworkModelAsync(it) }
+        targetNeurons.forEach { network.addNetworkModelAsync(it) }
         
         // Create neuron collections
         val sourceCollection = NeuronCollection(sourceNeurons)
         val targetCollection = NeuronCollection(targetNeurons)
         
-        network.addNetworkModel(sourceCollection)
-        network.addNetworkModel(targetCollection)
+        network.addNetworkModelAsync(sourceCollection)
+        network.addNetworkModelAsync(targetCollection)
         
         // Create a synapse group connecting the collections using a connection strategy
         val connectionStrategy = AllToAll()
         val synapseGroup = SynapseGroup(sourceCollection, targetCollection, connectionStrategy)
-        network.addNetworkModel(synapseGroup)
+        network.addNetworkModelAsync(synapseGroup)
         
         // Verify synapse group has the expected number of synapses (2 source * 2 target = 4 synapses)
         assertEquals(4, synapseGroup.synapses.size, "Synapse group should have 4 synapses")
@@ -603,20 +603,20 @@ class ClipboardTest {
         )
         
         // Add neurons to network
-        sourceNeurons.forEach { network.addNetworkModel(it) }
-        targetNeurons.forEach { network.addNetworkModel(it) }
+        sourceNeurons.forEach { network.addNetworkModelAsync(it) }
+        targetNeurons.forEach { network.addNetworkModelAsync(it) }
         
         // Create neuron collections
         val sourceCollection = NeuronCollection(sourceNeurons)
         val targetCollection = NeuronCollection(targetNeurons)
         
-        network.addNetworkModel(sourceCollection)
-        network.addNetworkModel(targetCollection)
+        network.addNetworkModelAsync(sourceCollection)
+        network.addNetworkModelAsync(targetCollection)
         
         // Create a synapse group connecting the collections using a connection strategy
         val connectionStrategy = AllToAll()
         val synapseGroup = SynapseGroup(sourceCollection, targetCollection, connectionStrategy)
-        network.addNetworkModel(synapseGroup)
+        network.addNetworkModelAsync(synapseGroup)
         
         // Add both collections and the synapse group to clipboard
         Clipboard.add(listOf(sourceCollection, targetCollection, synapseGroup))
@@ -756,8 +756,8 @@ class ClipboardTest {
         }
         
         // Add the arrays to the network
-        network.addNetworkModel(sourceArray)
-        network.addNetworkModel(targetArray)
+        network.addNetworkModelAsync(sourceArray)
+        network.addNetworkModelAsync(targetArray)
         
         // Create a weight matrix connecting the arrays
         val weightMatrix = WeightMatrix(sourceArray, targetArray)
@@ -771,7 +771,7 @@ class ClipboardTest {
         weights[1, 1] = 0.0  // target row 1, source column 1
         weights[1, 2] = 1.0  // target row 1, source column 2
         
-        network.addNetworkModel(weightMatrix)
+        network.addNetworkModelAsync(weightMatrix)
         
         // Add all components to the clipboard
         Clipboard.add(listOf(sourceArray, targetArray, weightMatrix))
@@ -872,8 +872,8 @@ class ClipboardTest {
         }
         
         // Add the arrays to the network
-        network.addNetworkModel(sourceArray)
-        network.addNetworkModel(targetArray)
+        network.addNetworkModelAsync(sourceArray)
+        network.addNetworkModelAsync(targetArray)
         
         // Create a weight matrix connecting the arrays
         val weightMatrix = WeightMatrix(sourceArray, targetArray)
@@ -887,7 +887,7 @@ class ClipboardTest {
         weights[1, 1] = 0.0  // target row 1, source column 1
         weights[1, 2] = 1.0  // target row 1, source column 2
         
-        network.addNetworkModel(weightMatrix)
+        network.addNetworkModelAsync(weightMatrix)
         
         // Add all components to the clipboard
         Clipboard.add(listOf(sourceArray, targetArray, weightMatrix))
@@ -1010,8 +1010,8 @@ class ClipboardTest {
         }
         
         // Add the arrays to the network
-        network.addNetworkModel(sourceArray)
-        network.addNetworkModel(targetArray)
+        network.addNetworkModelAsync(sourceArray)
+        network.addNetworkModelAsync(targetArray)
         
         // Create a weight matrix connecting the arrays
         val weightMatrix = WeightMatrix(sourceArray, targetArray)
@@ -1025,11 +1025,11 @@ class ClipboardTest {
         weights[1, 1] = 0.0
         weights[1, 2] = 1.0
         
-        network.addNetworkModel(weightMatrix)
+        network.addNetworkModelAsync(weightMatrix)
         
         // Create a supervised model using the arrays
         val supervisedModel = org.simbrain.network.trainers.SupervisedModel(sourceArray, targetArray)
-        network.addNetworkModel(supervisedModel)
+        network.addNetworkModelAsync(supervisedModel)
         
         // Add the supervised model to the clipboard
         Clipboard.add(listOf(supervisedModel))
@@ -1214,8 +1214,8 @@ class ClipboardTest {
         }
 
         // Add the arrays to the network
-        network.addNetworkModel(sourceGroup)
-        network.addNetworkModel(targetGroup)
+        network.addNetworkModelAsync(sourceGroup)
+        network.addNetworkModelAsync(targetGroup)
 
         // Create a weight matrix connecting the arrays
         val synapseGroup = SynapseGroup(sourceGroup, targetGroup)
@@ -1231,11 +1231,11 @@ class ClipboardTest {
 
         synapseGroup.setWeightMatrix(weights)
 
-        network.addNetworkModel(synapseGroup)
+        network.addNetworkModelAsync(synapseGroup)
 
         // Create a supervised model using the arrays
         val supervisedModel = org.simbrain.network.trainers.SupervisedModel(sourceGroup, targetGroup)
-        network.addNetworkModel(supervisedModel)
+        network.addNetworkModelAsync(supervisedModel)
 
         // Add the supervised model to the clipboard
         Clipboard.add(listOf(supervisedModel))
@@ -1410,8 +1410,8 @@ class ClipboardTest {
     @Test
     fun `test SupervisedModel with NeuronCollection copy paste`() = runBlocking {
 
-        val sourceNeurons = (0 until 3).map { Neuron().also { network.addNetworkModel(it) } }
-        val targetNeurons = (0 until 2).map { Neuron().also { network.addNetworkModel(it) } }
+        val sourceNeurons = (0 until 3).map { Neuron().also { network.addNetworkModelAsync(it) } }
+        val targetNeurons = (0 until 2).map { Neuron().also { network.addNetworkModelAsync(it) } }
 
         val sourceCollection = NeuronCollection(sourceNeurons).apply {
             label = "Source Group"
@@ -1423,8 +1423,8 @@ class ClipboardTest {
         }
 
         // Add the arrays to the network
-        network.addNetworkModel(sourceCollection)
-        network.addNetworkModel(targetCollection)
+        network.addNetworkModelAsync(sourceCollection)
+        network.addNetworkModelAsync(targetCollection)
 
         // Create a weight matrix connecting the arrays
         val synapseGroup = SynapseGroup(sourceCollection, targetCollection)
@@ -1440,11 +1440,11 @@ class ClipboardTest {
 
         synapseGroup.setWeightMatrix(weights)
 
-        network.addNetworkModel(synapseGroup)
+        network.addNetworkModelAsync(synapseGroup)
 
         // Create a supervised model using the arrays
         val supervisedModel = org.simbrain.network.trainers.SupervisedModel(sourceCollection, targetCollection)
-        network.addNetworkModel(supervisedModel)
+        network.addNetworkModelAsync(supervisedModel)
 
         // Add the supervised model to the clipboard
         Clipboard.add(listOf(supervisedModel))

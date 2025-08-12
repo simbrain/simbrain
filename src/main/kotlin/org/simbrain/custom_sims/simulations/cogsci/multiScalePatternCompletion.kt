@@ -1,6 +1,5 @@
 package org.simbrain.custom_sims.simulations
 
-import kotlinx.coroutines.awaitAll
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.*
@@ -84,13 +83,13 @@ val allostaticPatternCompletion = newSim {
     val reservoir = List(numResNeurons) {
         Neuron(AllostaticUpdateRule())
     }.let {
-        network.addNetworkModels(it).awaitAll()
+        network.addNetworkModels(it)
         NeuronCollection(it)
     }.apply {
         label = "Reservoir"
         location = point(0, 0)
     }
-    network.addNetworkModel(reservoir)?.await()
+    network.addNetworkModel(reservoir)
     reservoir.layout(GridLayout())
     val sparse = Sparse()
     sparse.connectionDensity = .1
@@ -99,7 +98,7 @@ val allostaticPatternCompletion = newSim {
     reservoirSynapseGroup.synapses.forEach { s ->
         s.strength = dist.sampleDouble()
     }
-    network.addNetworkModel(reservoirSynapseGroup)?.await()
+    network.addNetworkModel(reservoirSynapseGroup)
 
     // Input nodes
     val inputs = network.addNeuronCollection(5) {
@@ -115,7 +114,7 @@ val allostaticPatternCompletion = newSim {
     // Connect input nodes to reservoir
     val inputsToRes = SynapseGroup(inputs, reservoir, sparse)
     inputsToRes.label = "Inputs to Res"
-    network.addNetworkModel(inputsToRes)?.await()
+    network.addNetworkModel(inputsToRes)
     inputsToRes.synapses.forEach { s ->
         s.strength = 5.0
     }

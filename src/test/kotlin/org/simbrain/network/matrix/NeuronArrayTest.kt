@@ -1,7 +1,6 @@
 package org.simbrain.network.matrix
 
 import org.junit.jupiter.api.Assertions
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NeuronArray
@@ -13,7 +12,7 @@ class NeuronArrayTest {
     var na: NeuronArray = NeuronArray(10)
 
     init {
-        net.addNetworkModel(na)
+        net.addNetworkModelAsync(na)
     }
 
     @Test
@@ -46,7 +45,7 @@ class NeuronArrayTest {
         val naTarget = NeuronArray(3)
         val wm1 = WeightMatrix(na1, naTarget)
         wm1.setWeights(doubleArrayOf(5.0, -1.0, 1.0, 1.0, -1.0, -1.0))
-        net.addNetworkModels(na1, naTarget, wm1)
+        net.addNetworkModelsAsync(na1, naTarget, wm1)
 
         net.update()
         // Expecting 5 for first row, 2 for second row, and 0 for the last row
@@ -58,7 +57,7 @@ class NeuronArrayTest {
         na2.setActivations(doubleArrayOf(1.0, 1.0))
         val wm2 = WeightMatrix(na2, naTarget)
         wm2.setWeights(doubleArrayOf(1.0, 0.0, -1.0, -1.0, 1.0, 1.0))
-        net.addNetworkModels(na2, wm2)
+        net.addNetworkModelsAsync(na2, wm2)
 
         net.update()
         // Now expecting 6, 2, 2
@@ -73,7 +72,7 @@ class NeuronArrayTest {
         val naTarget = NeuronArray(3)
         val wm1 = WeightMatrix(na1, naTarget)
         wm1.setWeights(doubleArrayOf(5.0, -1.0, 1.0, 1.0, -1.0, -1.0))
-        net.addNetworkModels(na1, naTarget, wm1)
+        net.addNetworkModelsAsync(na1, naTarget, wm1)
 
         net.update()
         // Expecting -1 for first row, 0 for second row, and -2 for the last row
@@ -85,7 +84,7 @@ class NeuronArrayTest {
         na2.setActivations(doubleArrayOf(1.0, 1.0))
         val wm2 = WeightMatrix(na2, naTarget)
         wm2.setWeights(doubleArrayOf(1.0, 0.0, -1.0, -1.0, 1.0, 1.0))
-        net.addNetworkModels(na2, wm2)
+        net.addNetworkModelsAsync(na2, wm2)
 
         net.update()
         // Now expecting -1, -2, -2

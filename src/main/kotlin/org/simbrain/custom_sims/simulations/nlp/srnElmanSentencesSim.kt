@@ -51,7 +51,7 @@ val srnElmanSentences = newSim {
         150,
         textWorldInputs.world.tokenEmbedding.dimension,
         point(0,0))
-    network.addNetworkModel(srn)?.await()
+    network.addNetworkModel(srn)
 
     val trainingInputsTokens = makeElmanVector(numTrainingSentences)
         .tokenizeWordsFromString()

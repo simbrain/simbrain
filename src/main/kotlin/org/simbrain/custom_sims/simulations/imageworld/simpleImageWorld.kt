@@ -54,7 +54,7 @@ val simpleImageWorld = newSim {
     val weights = listOf(
         WeightMatrix(inputs, hidden),
         WeightMatrix(hidden, outputs)
-    ).onEach { it.randomize() }.also { network.addNetworkModels(it) }
+    ).onEach { it.randomize() }.also { network.addNetworkModelsAsync(it) }
 
     offsetNeuronCollections(inputs, hidden, Direction.NORTH, 200.0)
     alignNetworkModels(inputs, hidden, Alignment.VERTICAL)
@@ -63,7 +63,7 @@ val simpleImageWorld = newSim {
     alignNetworkModels(hidden, outputs, Alignment.VERTICAL)
 
     val supervisedModel = SupervisedModel(inputs, outputs, 1.0).also {
-        network.addNetworkModel(it)
+        network.addNetworkModelAsync(it)
         it.trainingSet = MatrixDataset(
             Matrix(outputs.size, inputs.size),
             Matrix.eye(outputs.size, outputs.size)

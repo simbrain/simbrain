@@ -1,6 +1,5 @@
 package org.simbrain.custom_sims.simulations
 
-import kotlinx.coroutines.awaitAll
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.AbstractNeuronCollection
 import org.simbrain.network.core.SynapseGroup
@@ -44,7 +43,7 @@ val threeObjectDetector = newSim {
     val sg1 = SynapseGroup(inputLayer, hiddenLayer)
     val sg2 = SynapseGroup(hiddenLayer, outputLayer)
     val sm = SupervisedModel(inputLayer, outputLayer, trainTestSplit = 1.0)
-    net.addNetworkModels(inputLayer, hiddenLayer, outputLayer, sg1, sg2, sm).awaitAll()
+    net.addNetworkModels(inputLayer, hiddenLayer, outputLayer, sg1, sg2, sm)
     offsetNetworkModel(inputLayer, hiddenLayer, Direction.NORTH, 150.0)
     offsetNetworkModel(hiddenLayer, outputLayer, Direction.NORTH, 150.0)
     alignNetworkModels(inputLayer, hiddenLayer, Alignment.VERTICAL)

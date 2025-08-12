@@ -40,7 +40,7 @@ val spikeResponderSimArray = newSim {
         label = "Izhikevich"
     }
     val weightsInput = WeightMatrix(input, spiking)
-    network.addNetworkModels(input, spiking, weightsInput)
+    network.addNetworkModelsAsync(input, spiking, weightsInput)
     offsetNetworkModel(input, spiking, Direction.EAST, 300.0)
 
     val stepResponder = NeuronArray(arraySize).apply {
@@ -49,7 +49,7 @@ val spikeResponderSimArray = newSim {
     val weightsStep = WeightMatrix(spiking, stepResponder).apply {
         spikeResponder = StepResponder()
     }
-    network.addNetworkModels(stepResponder, weightsStep, usePlacementManager = false)
+    network.addNetworkModelsAsync(stepResponder, weightsStep, usePlacementManager = false)
     offsetNetworkModel(spiking, stepResponder, Direction.EAST, 400.0)
     offsetNetworkModel(spiking, stepResponder, Direction.NORTH, 300.0)
 
@@ -59,7 +59,7 @@ val spikeResponderSimArray = newSim {
     val weightsJump = WeightMatrix(spiking, jumpAndDecay).apply {
         spikeResponder = JumpAndDecay()
     }
-    network.addNetworkModels(jumpAndDecay, weightsJump, usePlacementManager = false)
+    network.addNetworkModelsAsync(jumpAndDecay, weightsJump, usePlacementManager = false)
     alignNetworkModels(stepResponder, jumpAndDecay, Alignment.VERTICAL)
     offsetNetworkModel(stepResponder, jumpAndDecay, Direction.SOUTH, 200.0)
 
@@ -69,7 +69,7 @@ val spikeResponderSimArray = newSim {
     val weightsRise = WeightMatrix(spiking, riseAndDecay).apply {
         spikeResponder = RiseAndDecay()
     }
-    network.addNetworkModels(riseAndDecay, weightsRise, usePlacementManager = false)
+    network.addNetworkModelsAsync(riseAndDecay, weightsRise, usePlacementManager = false)
     alignNetworkModels(stepResponder, riseAndDecay, Alignment.VERTICAL)
     offsetNetworkModel(jumpAndDecay, riseAndDecay, Direction.SOUTH, 200.0)
 
@@ -79,7 +79,7 @@ val spikeResponderSimArray = newSim {
     val weightsSTP = WeightMatrix(spiking, stp).apply {
         spikeResponder = ShortTermPlasticity()
     }
-    network.addNetworkModels(stp, weightsSTP, usePlacementManager = false)
+    network.addNetworkModelsAsync(stp, weightsSTP, usePlacementManager = false)
     alignNetworkModels(stepResponder, stp, Alignment.VERTICAL)
     offsetNetworkModel(riseAndDecay, stp, Direction.SOUTH, 200.0)
 

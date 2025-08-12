@@ -17,7 +17,7 @@ class SRNTest {
         val srn = SRNNetwork(10, 5, 10).apply {
             label = "SRN"
         }
-        net.addNetworkModels(srn)
+        net.addNetworkModelsAsync(srn)
         srn.trainingSet = createDiagonalDataset(10, 10, shiftAmount = 1)
         with(net) {
             srn.randomize()
@@ -42,7 +42,7 @@ class SRNTest {
         val srn = SRNNetwork(10, 5, 10).apply {
             label = "SRN"
         }
-        net.addNetworkModels(srn)
+        net.addNetworkModelsAsync(srn)
         val xmlRep = getNetworkXStream().toXML(net)
         val fromXml = getNetworkXStream().fromXML(xmlRep) as Network
         Assertions.assertNotNull(fromXml.getModelByLabel(SRNNetwork::class.java, "SRN"))

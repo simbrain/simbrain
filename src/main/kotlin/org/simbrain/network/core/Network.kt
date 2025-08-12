@@ -29,7 +29,7 @@ import kotlin.random.Random
  * data structure is a [NetworkModelList] that associates classes of [NetworkModel] with linked hash sets of
  * instances of those types.
  *
- * To add models, use [Network.addNetworkModel] and friends.
+ * To add models, use [Network.addNetworkModelAsync] and friends.
  *
  * To remove models use [Network.getModels] and call .delete() on the resulting models. Get models can be called with
  * an argument to filter by model type, e.g., getModels(Neuron.class)
@@ -300,7 +300,7 @@ class Network: CoroutineScope, EditableObject {
      * For best results call with `?.await()` when possible.
      */
     @JvmOverloads
-    fun addNetworkModel(model: NetworkModel, usePlacementManager: Boolean = true, useAutoAssignedId: Boolean = true): Deferred<Boolean>? {
+    fun addNetworkModelAsync(model: NetworkModel, usePlacementManager: Boolean = true, useAutoAssignedId: Boolean = true): Deferred<Boolean>? {
         if (model.shouldAdd()) {
             if (useAutoAssignedId) {
                 assignId(model)
@@ -353,6 +353,10 @@ class Network: CoroutineScope, EditableObject {
             return deferred
         }
         return null
+    }
+
+    suspend fun addNetworkModel(model: NetworkModel, usePlacementManager: Boolean = true, useAutoAssignedId: Boolean = true) {
+        addNetworkModel(model, usePlacementManager, useAutoAssignedId)
     }
 
     /**
@@ -540,14 +544,22 @@ class Network: CoroutineScope, EditableObject {
      * @param toAdd list of objects to add.
      */
     @JvmOverloads
-    fun addNetworkModels(toAdd: List<NetworkModel>, usePlacementManager: Boolean = true, useAutoAssignedId: Boolean = true) = toAdd.mapNotNull { addNetworkModel(it, usePlacementManager, useAutoAssignedId) }
+    fun addNetworkModelsAsync(toAdd: List<NetworkModel>, usePlacementManager: Boolean = true, useAutoAssignedId: Boolean = true) = toAdd.mapNotNull { addNetworkModelAsync(it, usePlacementManager, useAutoAssignedId) }
+
+    suspend fun addNetworkModels(toAdd: List<NetworkModel>, usePlacementManager: Boolean = true, useAutoAssignedId: Boolean = true) {
+        addNetworkModels(toAdd, usePlacementManager, useAutoAssignedId)
+    }
 
     /**
      * Var arg version of addNetworkModels.
      *
      * Ex: addNetworkModels(synapse1, synapse2, neuron1, neuron2, ...)
      */
-    fun addNetworkModels(vararg toAdd: NetworkModel, usePlacementManager: Boolean = true, useAutoAssignedId: Boolean = true) = toAdd.mapNotNull { addNetworkModel(it, usePlacementManager, useAutoAssignedId) }
+    fun addNetworkModelsAsync(vararg toAdd: NetworkModel, usePlacementManager: Boolean = true, useAutoAssignedId: Boolean = true) = toAdd.mapNotNull { addNetworkModelAsync(it, usePlacementManager, useAutoAssignedId) }
+
+    suspend fun addNetworkModels(vararg toAdd: NetworkModel, usePlacementManager: Boolean = true, useAutoAssignedId: Boolean = true) {
+        addNetworkModels(*toAdd, usePlacementManager = usePlacementManager, useAutoAssignedId = useAutoAssignedId)
+    }
 
     fun selectModels(models: List<NetworkModel>) {
         events.selected.fire(models)

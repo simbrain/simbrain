@@ -1,6 +1,5 @@
 package org.simbrain.network.gui
 
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -21,7 +20,7 @@ class NetworkPanelTest {
             val np = NetworkPanel(nc)
             val n1 = Neuron()
             val n2 = Neuron()
-            net.addNetworkModels(n1, n2).awaitAll()
+            net.addNetworkModels(n1, n2)
             assertEquals(2, np.screenElements.size)
         }
     }
@@ -34,10 +33,10 @@ class NetworkPanelTest {
             val np = NetworkPanel(nc)
             
             // Create two neuron groups with 10 neurons each
-            val sourceGroup = NeuronGroup(List(10) { Neuron() }.also { net.addNetworkModels(it).awaitAll() })
-                .apply { net.addNetworkModel(this)?.await() }
-            val targetGroup = NeuronGroup(List(10) { Neuron() }.also { net.addNetworkModels(it).awaitAll() })
-                .apply { net.addNetworkModel(this)?.await() }
+            val sourceGroup = NeuronGroup(List(10) { Neuron() }.also { net.addNetworkModels(it) })
+                .apply { net.addNetworkModel(this) }
+            val targetGroup = NeuronGroup(List(10) { Neuron() }.also { net.addNetworkModels(it) })
+                .apply { net.addNetworkModel(this) }
             
             // Create a SynapseGroup with Sparse connection strategy
             val sparse = Sparse().apply { 
@@ -45,7 +44,7 @@ class NetworkPanelTest {
                 allowSelfConnection = true
             }
             val synapseGroup = SynapseGroup(sourceGroup, targetGroup, sparse)
-            net.addNetworkModel(synapseGroup)?.await()
+            net.addNetworkModel(synapseGroup)
             
             // Initial state: 10% of 10x10 = 10 synapses
             assertEquals(10, synapseGroup.size())

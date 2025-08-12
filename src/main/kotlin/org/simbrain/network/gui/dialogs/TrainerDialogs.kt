@@ -339,7 +339,7 @@ fun main() {
     val np = NetworkPanel(networkComponent)
     val result = with(networkComponent.network) {
         val backpropNetwork = BackpropNetwork(intArrayOf(50, 20, 50))
-        addNetworkModel(backpropNetwork)
+        addNetworkModelAsync(backpropNetwork)
         backpropNetwork
     }
     BackpropNetworkNode(np, result).propertyDialog.display()

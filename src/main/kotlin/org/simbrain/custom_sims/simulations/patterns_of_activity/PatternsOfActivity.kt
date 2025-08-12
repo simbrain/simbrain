@@ -380,16 +380,16 @@ class PatternsOfActivity : Simulation {
         sim.couple(mouse.getSensor("Smell-Right") as SmellSensor, sensoryNetR)
 
         // Add everything to the network
-        net.addNetworkModel(recurrentNetwork!!)
-        net.addNetworkModel(inpSynGL)
-        net.addNetworkModel(inpSynGR)
-        net.addNetworkModel(recSyns)
-        net.addNetworkModel(outGroup)
-        net.addNetworkModel(rec2out)
-        net.addNetworkModel(outputNeurons!!)
-        net.addNetworkModel(out2read)
-        net.addNetworkModel(sensoryNetL)
-        net.addNetworkModel(sensoryNetR)
+        net.addNetworkModelAsync(recurrentNetwork!!)
+        net.addNetworkModelAsync(inpSynGL)
+        net.addNetworkModelAsync(inpSynGR)
+        net.addNetworkModelAsync(recSyns)
+        net.addNetworkModelAsync(outGroup)
+        net.addNetworkModelAsync(rec2out)
+        net.addNetworkModelAsync(outputNeurons!!)
+        net.addNetworkModelAsync(out2read)
+        net.addNetworkModelAsync(sensoryNetL)
+        net.addNetworkModelAsync(sensoryNetR)
 
         // Set up concurrent buffered update
         // net.getUpdateManager().clear();

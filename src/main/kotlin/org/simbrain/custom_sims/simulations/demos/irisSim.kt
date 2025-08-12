@@ -61,7 +61,7 @@ val irisClassifier = newSim {
     // Set input data for iris to training data
     smileClassifier.inputNeuronGroup.inputData = classifier.trainingData.inputs.toMatrix()
 
-    network.addNetworkModels(smileClassifier)
+    network.addNetworkModelsAsync(smileClassifier)
 
     addSidebarInfo(
     """

@@ -60,7 +60,7 @@ class SmileClassifierTest {
     @Test
     fun testInit() {
         val classifier = ClassifierNetwork(svm)
-        net.addNetworkModel(classifier)
+        net.addNetworkModelAsync(classifier)
         classifier.inputNeuronGroup.addInputs(Matrix.column(doubleArrayOf(1.0,2.0,3.0)))
         assertEquals(6.0, classifier.inputNeuronGroup.inputs.sum())
         net.update()
@@ -69,7 +69,7 @@ class SmileClassifierTest {
 
     @Test
     fun `test SVM XOR`() {
-        net.addNetworkModel(xorSVM)
+        net.addNetworkModelAsync(xorSVM)
         xorSVM.inputNeuronGroup.addInputs(Matrix.column(doubleArrayOf(0.0, 0.0, 0.0)))
         net.update()
         assertArrayEquals(doubleArrayOf(1.0, 0.0), xorSVM.outputNeuronGroup.activationArray)
@@ -97,7 +97,7 @@ class SmileClassifierTest {
         outputNa.clear()
         val wm2 = WeightMatrix(xorSVM.outputNeuronGroup, outputNa)
         wm2.diagonalize()
-        net.addNetworkModels(listOf(inputNa, wm1, xorSVM, wm2, outputNa))
+        net.addNetworkModelsAsync(listOf(inputNa, wm1, xorSVM, wm2, outputNa))
 
         // Set inputs
         inputNa.clear()

@@ -1,15 +1,12 @@
 package org.simbrain.network.updaterules
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import kotlin.math.PI
 import kotlin.math.abs
-import kotlin.math.sin
 
 class KuramotoRuleTest {
 
@@ -27,7 +24,7 @@ class KuramotoRuleTest {
         n1.activation = PI / 4  // 45 degrees
         n2.activation = 3 * PI / 4  // 135 degrees
         
-        net.addNetworkModels(n1, n2)
+        net.addNetworkModelsAsync(n1, n2)
     }
 
     @Test
@@ -62,7 +59,7 @@ class KuramotoRuleTest {
         // Connect n1 to n2
         val synapse = Synapse(n1, n2)
         synapse.strength = 1.0  
-        net.addNetworkModel(synapse)
+        net.addNetworkModelAsync(synapse)
         
         kuramotoRule2.slope = 0.0  // No natural frequency for n2
         kuramotoRule2.isClipped = false
@@ -83,14 +80,14 @@ class KuramotoRuleTest {
         kuramotoRule3.isClipped = false
         n3.updateRule = kuramotoRule3
         n3.activation = PI / 2
-        net.addNetworkModel(n3)
+        net.addNetworkModelAsync(n3)
         
         // Connect both n1 and n2 to n3
         val s13 = Synapse(n1, n3)
         val s23 = Synapse(n2, n3)
         s13.strength = 1.0
         s23.strength = 1.0
-        net.addNetworkModels(s13, s23)
+        net.addNetworkModelsAsync(s13, s23)
         
         kuramotoRule3.slope = 0.0
         val initialPhaseN3 = n3.activation
@@ -158,7 +155,7 @@ class KuramotoRuleTest {
         val synapse21 = Synapse(n2, n1)
         synapse12.strength = 2.0
         synapse21.strength = 2.0
-        net.addNetworkModels(synapse12, synapse21)
+        net.addNetworkModelsAsync(synapse12, synapse21)
         
         // Start with different phases
         n1.activation = 0.0

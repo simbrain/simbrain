@@ -33,10 +33,10 @@ class WorkspaceTest {
         workspace.addWorkspaceComponent(ProjectionComponent("projection"))
 
         // Add a neuron to network 1
-        net1.addNetworkModel(n1)
+        net1.addNetworkModelAsync(n1)
 
         // Add a neuron to network 2
-        net2.addNetworkModel(n2)
+        net2.addNetworkModelAsync(n2)
 
         // Couple them
         workspace.couplingManager.createCoupling(

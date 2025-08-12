@@ -15,7 +15,7 @@ class LayerTest {
     var wm = WeightMatrix(na1, na2)
 
     init {
-        net.addNetworkModels(na1, na2, wm)
+        net.addNetworkModelsAsync(na1, na2, wm)
     }
 
     @Test

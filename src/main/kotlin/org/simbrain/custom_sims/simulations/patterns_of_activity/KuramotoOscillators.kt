@@ -74,7 +74,7 @@ val kuramotoOscillators = newSim("kuramotoOscillators") {
     }
     val reservoirNet = NeuronGroup(neuronList).apply {
         layout = HexagonalGridLayout(spacing, spacing, sqrt(neuronList.size.toDouble()).toInt())
-        net.addNetworkModel(this)
+        net.addNetworkModelAsync(this)
         setLocation(185.0, 50.0)
         applyLayout(-5, -85)
         label = "Reservoir"
@@ -86,7 +86,7 @@ val kuramotoOscillators = newSim("kuramotoOscillators") {
     }
     val recurrentSyns = SynapseGroup(reservoirNet, reservoirNet, connection).apply {
         label = "Synapses"
-        net.addNetworkModel(this)
+        net.addNetworkModelAsync(this)
     }
 
     // Inputs
@@ -114,7 +114,7 @@ val kuramotoOscillators = newSim("kuramotoOscillators") {
     }
     val inputToRes = SynapseGroup(inputNetwork, reservoirNet, sparseExcitatory).apply {
         connectionStrategy.exRandomizer = NormalDistribution(10.0, 1.0)
-        net.addNetworkModel(this)
+        net.addNetworkModelAsync(this)
         SwingUtilities.invokeLater { displaySynapses = false }
         randomizeExcitatory()
     }

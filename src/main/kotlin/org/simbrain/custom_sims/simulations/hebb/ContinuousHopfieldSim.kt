@@ -1,6 +1,5 @@
 package org.simbrain.custom_sims.simulations
 
-import kotlinx.coroutines.awaitAll
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
@@ -46,7 +45,7 @@ val hopfieldSimContinuous = newSim {
         weights.randomizeSymmetric()
     }
 
-    network.addNetworkModels(hopfield, wm).awaitAll()
+    network.addNetworkModels(hopfield, wm)
 
     addSidebarInfo(
         """

@@ -25,7 +25,7 @@ val hebbianAssociator = newSim {
         label = "Neurons"
         layout(GridLayout(40.0, 40.0))
     }
-    network.addNetworkModel(recurrentNet)
+    network.addNetworkModelAsync(recurrentNet)
     val recurrentWeights = network.connect(recurrentNet.neuronList, recurrentNet.neuronList, AllToAll())
     recurrentWeights.forEach { s ->
         s.learningRule = HebbianRule().apply {

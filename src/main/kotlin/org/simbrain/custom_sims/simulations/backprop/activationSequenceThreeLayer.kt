@@ -1,6 +1,5 @@
 package org.simbrain.custom_sims.simulations.backprop
 
-import kotlinx.coroutines.awaitAll
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.ActivationSequence
@@ -45,7 +44,7 @@ val activationSequenceThreeLayer = newSim {
         trainerConfig.testConfiguration.enabled = false
     }
 
-    network.addNetworkModels(inputs, hidden, output, wm1, wm2, model).awaitAll()
+    network.addNetworkModels(inputs, hidden, output, wm1, wm2, model)
     output.location = point(100, 100)
     hidden.location = point(100, 500)
     inputs.location = point(100, 900)

@@ -15,7 +15,7 @@ class SparseTest {
     
     init {
         sparse = Sparse()
-        net.addNetworkModels(List(10) { Neuron() })
+        net.addNetworkModelsAsync(List(10) { Neuron() })
     }
 
     // TODO: Check equalize efferents
@@ -43,11 +43,11 @@ class SparseTest {
         // Add weights
         sparse.connectionDensity = .1
         sparse.allowSelfConnection = true
-        val syns1 = sparse.connectNeurons(net.freeNeurons.toList(), net.freeNeurons.toList()).also { net.addNetworkModels(it) }
+        val syns1 = sparse.connectNeurons(net.freeNeurons.toList(), net.freeNeurons.toList()).also { net.addNetworkModelsAsync(it) }
 
         // Up sparsity to 20% and add more weights.
         sparse.connectionDensity = .2
-        val syns2 = sparse.connectNeurons(net.freeNeurons.toList(), net.freeNeurons.toList()).also { net.addNetworkModels(it) }
+        val syns2 = sparse.connectNeurons(net.freeNeurons.toList(), net.freeNeurons.toList()).also { net.addNetworkModelsAsync(it) }
         assertEquals(10, syns2.size) // Only the new synapses are return
         assertEquals(20, net.freeSynapses.size)
         // All the originally added synapses should still be there
@@ -55,7 +55,7 @@ class SparseTest {
 
         // Reduce sparsity to 5%
         sparse.connectionDensity = .05
-        sparse.connectNeurons(net.freeNeurons.toList(), net.freeNeurons.toList()).also { net.addNetworkModels(it) }
+        sparse.connectNeurons(net.freeNeurons.toList(), net.freeNeurons.toList()).also { net.addNetworkModelsAsync(it) }
         assertEquals(5, net.freeSynapses.size)
         // All the originally added synapses should still be there
         assertTrue(net.freeSynapses.all { (syns1 + syns2).contains(it) })
@@ -68,10 +68,10 @@ class SparseTest {
         // Add "recurrent" weights
         sparse.connectionDensity = .1
         sparse.allowSelfConnection = true
-        val syns1 = sparse.connectNeurons(net.freeNeurons.toList(), net.freeNeurons.toList()).also { net.addNetworkModels(it) }
+        val syns1 = sparse.connectNeurons(net.freeNeurons.toList(), net.freeNeurons.toList()).also { net.addNetworkModelsAsync(it) }
 
         val newNeurons = listOf(Neuron())
-        val syns2 = sparse.connectNeurons(net.freeNeurons.toList(), newNeurons).also { net.addNetworkModels(it) }
+        val syns2 = sparse.connectNeurons(net.freeNeurons.toList(), newNeurons).also { net.addNetworkModelsAsync(it) }
 
         assertEquals(1, syns2.size)
 

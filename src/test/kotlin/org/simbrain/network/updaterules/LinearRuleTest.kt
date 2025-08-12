@@ -19,7 +19,7 @@ class LinearRuleTest {
     var w23 = Synapse(input2, output)
 
     init {
-        net.addNetworkModels(input1, input2, output, w13, w23)
+        net.addNetworkModelsAsync(input1, input2, output, w13, w23)
         input1.activation = 1.0
         input1.clamped = true
 

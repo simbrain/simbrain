@@ -20,7 +20,7 @@ val roomSchemaSim = newSim {
 
     // Competitive network
     val rbm = RestrictedBoltzmannMachine(42, 64)
-    network.addNetworkModel(rbm)?.await()
+    network.addNetworkModel(rbm)
     rbm.visibleLayer.circleMode = true
     rbm.visibleLayer.offset(-100.0, 0.0)
 

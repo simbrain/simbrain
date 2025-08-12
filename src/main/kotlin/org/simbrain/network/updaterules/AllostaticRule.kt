@@ -83,16 +83,16 @@ class AllostaticUpdateRule : SpikingNeuronUpdateRule<AllostaticDataHolder, Spiki
         with(Network()) {
             val n1 = Neuron()
             val n2 = Neuron()
-            addNetworkModels(n1, n2)
+            addNetworkModelsAsync(n1, n2)
             n1.clamped = true
             n2.clamped = true
             val n3 = Neuron()
-            addNetworkModel(n3)
+            addNetworkModelAsync(n3)
             val s1 = Synapse(n1, n3)
             s1.strength = 1.0
             val s2 = Synapse(n2, n3)
             s2.strength = .5
-            addNetworkModels(s1, s2)
+            addNetworkModelsAsync(s1, s2)
             n1.isSpike = true
             n2.isSpike = true
             println(n3.getAllostaticInput())

@@ -38,7 +38,7 @@ val competitiveImageSim = newSim {
 
     // Competitive network
     val competitive = CompetitiveNetwork(100, 5)
-    network.addNetworkModel(competitive)
+    network.addNetworkModelAsync(competitive)
     competitive.inputLayer.setUpperBound(1.0)
     val inputs = competitive.inputLayer
 

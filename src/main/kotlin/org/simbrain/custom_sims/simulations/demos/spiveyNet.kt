@@ -1,6 +1,5 @@
 package org.simbrain.custom_sims.simulations
 
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.OneToOne
@@ -76,7 +75,7 @@ val spiveyNet = newSim {
         neuronList.labels = listOf("candle", "candy", "handle", "fork")
     }
 
-    net.addNetworkModels(lexicalNodes, visualNodes, mouseNodes, eyesNodes, integrationNodes, currentStatus).awaitAll()
+    net.addNetworkModels(lexicalNodes, visualNodes, mouseNodes, eyesNodes, integrationNodes, currentStatus)
     lexicalNodes.location = point(-3.70, 12.64)
     visualNodes.location = point(285.98, 5.92)
     mouseNodes.location = point(438.46, 160.33)
@@ -86,9 +85,9 @@ val spiveyNet = newSim {
     val connector = OneToOne().apply {
         percentExcitatory = 100.0
     }
-    net.addNetworkModels(connector.connectNeurons(visualNodes.neuronList, integrationNodes.neuronList))
-    net.addNetworkModels(connector.connectNeurons(lexicalNodes.neuronList, integrationNodes.neuronList))
-    net.addNetworkModels(connector.connectNeurons(visualNodes.neuronList, mouseNodes.neuronList))
+    net.addNetworkModelsAsync(connector.connectNeurons(visualNodes.neuronList, integrationNodes.neuronList))
+    net.addNetworkModelsAsync(connector.connectNeurons(lexicalNodes.neuronList, integrationNodes.neuronList))
+    net.addNetworkModelsAsync(connector.connectNeurons(visualNodes.neuronList, mouseNodes.neuronList))
 
     // World
     val oc = addOdorWorldComponent("Screen")

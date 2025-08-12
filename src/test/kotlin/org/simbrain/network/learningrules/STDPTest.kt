@@ -1,13 +1,12 @@
 package org.simbrain.network.learningrules
 
-import org.junit.jupiter.api.Assertions.assertArrayEquals
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.simbrain.network.core.*
+import org.simbrain.network.core.Network
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.Synapse
 import org.simbrain.network.updaterules.IntegrateAndFireRule
 import org.simbrain.network.util.EmptyScalarData
 import org.simbrain.network.util.SpikingScalarData
-import org.simbrain.util.toColumnVector
 
 class STDPTest {
 
@@ -39,7 +38,7 @@ class STDPTest {
                     tauMinus = 10.0
                 }
             }
-            network.addNetworkModels(pre, post, synapse)
+            network.addNetworkModelsAsync(pre, post, synapse)
             (synapse.learningRule as STDPRule).apply(synapse, EmptyScalarData)
             assert(synapse.strength > 0.5)
         }
@@ -68,7 +67,7 @@ class STDPTest {
                     tauMinus = 10.0
                 }
             }
-            network.addNetworkModels(pre, post, synapse)
+            network.addNetworkModelsAsync(pre, post, synapse)
             (synapse.learningRule as STDPRule).apply(synapse, EmptyScalarData)
 
             assert(synapse.strength < 0.5)

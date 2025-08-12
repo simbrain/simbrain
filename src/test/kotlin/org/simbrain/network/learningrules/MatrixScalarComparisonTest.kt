@@ -339,8 +339,8 @@ class MatrixScalarComparisonTest {
         }
 
         // Add to network and update to trigger spikes
-        network.addNetworkModels(scalarInputs + scalarOutputs + scalarSynapses)
-        network.addNetworkModels(matrixInput, matrixOutput, weightMatrix)
+        network.addNetworkModelsAsync(scalarInputs + scalarOutputs + scalarSynapses)
+        network.addNetworkModelsAsync(matrixInput, matrixOutput, weightMatrix)
         
         with(network) {
             // First update to trigger spikes

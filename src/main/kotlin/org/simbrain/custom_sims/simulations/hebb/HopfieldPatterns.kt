@@ -28,7 +28,7 @@ val hopfieldPatterns = newSim {
         updateFunc = HopfieldUpdate.SYNC
     }
     var patternCnt = 0.0
-    network.addNetworkModel(hopfield)
+    network.addNetworkModelAsync(hopfield)
 
     addSidebarInfo(
         """ 

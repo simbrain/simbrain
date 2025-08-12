@@ -1,6 +1,9 @@
 package org.simbrain.custom_sims.simulations
 
-import org.simbrain.custom_sims.*
+import org.simbrain.custom_sims.addNetworkComponent
+import org.simbrain.custom_sims.addTimeSeries
+import org.simbrain.custom_sims.couplingManager
+import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.updaterules.PointNeuronRule
@@ -36,7 +39,7 @@ val pointNeuronSim = newSim {
     val weight2 = Synapse(inputNeuron2, pointNeuron).apply {
         strength = -1.0
     }
-    network.addNetworkModels(inputNeuron1, inputNeuron2, pointNeuron, weight1, weight2, usePlacementManager = false)
+    network.addNetworkModelsAsync(inputNeuron1, inputNeuron2, pointNeuron, weight1, weight2, usePlacementManager = false)
 
     val (neuronPlot, voltageSeries) = addTimeSeries("Neuron plot", seriesNames = listOf("Voltage"))
     with(couplingManager) {

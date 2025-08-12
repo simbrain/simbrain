@@ -1,8 +1,6 @@
 package org.simbrain.network.learningrules
 
-import org.junit.jupiter.api.Assertions.assertArrayEquals
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.*
 import org.simbrain.util.toColumnVector
@@ -22,7 +20,7 @@ class OjaTest {
     var wm12 = WeightMatrix(na1, na2)
 
     init {
-        net.addNetworkModels(input, output, weight, na1, na2, wm12)
+        net.addNetworkModelsAsync(input, output, weight, na1, na2, wm12)
         weight.learningRule = OjaRule().apply {
             learningRate = 1.0
             normalizationFactor = 1.0
@@ -163,9 +161,9 @@ class OjaTest {
         }
 
         val net = Network()
-        net.addNetworkModels(outputNeuron)
-        net.addNetworkModels(inputs)
-        net.addNetworkModels(synapses)
+        net.addNetworkModelsAsync(outputNeuron)
+        net.addNetworkModelsAsync(inputs)
+        net.addNetworkModelsAsync(synapses)
 
         repeat(1000) {
             inputs.forEach { it.activation = Math.random() - 0.5 }
@@ -205,7 +203,7 @@ class OjaTest {
             lowerBound = -2.0
         }
         
-        net.addNetworkModels(input1, input2, output, weight1, weight2)
+        net.addNetworkModelsAsync(input1, input2, output, weight1, weight2)
         
         // Use only positive correlated patterns for stability
         val patterns = listOf(
@@ -259,7 +257,7 @@ class OjaTest {
             strength = 0.1
         }
         
-        net.addNetworkModels(strongInput, weakInput, output, strongWeight, weakWeight)
+        net.addNetworkModelsAsync(strongInput, weakInput, output, strongWeight, weakWeight)
         
         // Present patterns where one input is consistently stronger
         repeat(500) {
@@ -287,7 +285,7 @@ class OjaTest {
             randomize() // Start with small random weights
         }
         
-        net.addNetworkModels(inputs, outputs, weights)
+        net.addNetworkModelsAsync(inputs, outputs, weights)
         
         // Create structured input patterns
         val inputPatterns = listOf(

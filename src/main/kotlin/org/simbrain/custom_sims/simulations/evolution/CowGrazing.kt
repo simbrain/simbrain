@@ -73,13 +73,13 @@ val grazingCows = newSim { optionString ->
         suspend fun expressWith(network: Network): Phenotype {
             return Phenotype(
                 NeuronCollection(network.express(inputChromosome)).also {
-                    network.addNetworkModel(it); it.label = "input"
+                    network.addNetworkModelAsync(it); it.label = "input"
                 },
                 NeuronCollection(network.express(hiddenChromosome)).also {
-                    network.addNetworkModel(it); it.label = "hidden"
+                    network.addNetworkModelAsync(it); it.label = "hidden"
                 },
                 NeuronCollection(network.express(outputChromosome)).also {
-                    network.addNetworkModel(it); it.label = "output"
+                    network.addNetworkModelAsync(it); it.label = "output"
                 },
                 network.express(connectionChromosome)
             )

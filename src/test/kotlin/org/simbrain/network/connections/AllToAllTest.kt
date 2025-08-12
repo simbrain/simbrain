@@ -16,7 +16,7 @@ class AllToAllTest {
         conn = AllToAll()
         n1 = Neuron()
         n2 = Neuron()
-        net.addNetworkModels(listOf(n1, n2))
+        net.addNetworkModelsAsync(listOf(n1, n2))
     }
 
     @Test

@@ -5,7 +5,6 @@ import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.connections.polarizeSynapses
 import org.simbrain.network.core.*
-import org.simbrain.network.desktop.NetworkDesktopComponent
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.spikeresponders.JumpAndDecay
 import org.simbrain.network.updaterules.IntegrateAndFireRule
@@ -17,7 +16,6 @@ import org.simbrain.util.place
 import org.simbrain.util.showNumericInputDialog
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.stats.distributions.PoissonDistribution
-import org.simbrain.workspace.gui.SimbrainDesktop.getDesktopComponent
 import javax.swing.JOptionPane
 import kotlin.math.sqrt
 
@@ -63,7 +61,7 @@ val spikingNetworkSimulation = newSim {
     neurons[0].activation = 10.0
     neurons[1].activation = 10.0
 
-    network.addNetworkModel(neuronCollection)
+    network.addNetworkModelAsync(neuronCollection)
     
     // Apply layout to neurons
     layout.layoutNeurons(neurons)
@@ -97,7 +95,7 @@ val spikingNetworkSimulation = newSim {
         synapse.delay = randDelay.sampleInt()
     }
 
-    network.addNetworkModels(synapses)
+    network.addNetworkModelsAsync(synapses)
     fun setUpSpikeResponders() {
         network.flatSynapseList.forEach { s -> s.spikeResponder = JumpAndDecay().apply {
             timeConstant = 10.0
@@ -147,7 +145,7 @@ val spikingNetworkSimulation = newSim {
                 }
                 
                 // Add new synapses to network
-                network.addNetworkModels(newSynapses)
+                network.addNetworkModelsAsync(newSynapses)
                 setUpSpikeResponders()
             }
             addButton("Excitatory Ratio") {
@@ -178,7 +176,7 @@ val spikingNetworkSimulation = newSim {
                 }
                 
                 // Add new synapses to network
-                network.addNetworkModels(newSynapses)
+                network.addNetworkModelsAsync(newSynapses)
                 setUpSpikeResponders()
             }
             addButton("Delays") {
@@ -263,7 +261,7 @@ val spikingNetworkSimulation = newSim {
                         }
                     }
                     
-                    network.addNetworkModels(pacemakerSynapses)
+                    network.addNetworkModelsAsync(pacemakerSynapses)
                 } else {
                     // Update existing pacemaker frequency
                     val currentFreq = (pacemakerNeuron!!.updateRule as SinusoidalRule).frequency

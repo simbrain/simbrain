@@ -28,7 +28,7 @@ val hebbianAssociatorSimple = newSim {
         label = "Neuron 2"
     }
     val weight = Synapse(neuron1, neuron2, HebbianRule())
-    network.addNetworkModels(neuron1, neuron2, weight)
+    network.addNetworkModelsAsync(neuron1, neuron2, weight)
 
     // Location of the network in the desktop
     withGui {

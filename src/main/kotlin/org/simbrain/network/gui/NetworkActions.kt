@@ -157,7 +157,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         if (neuronList.isNotEmpty()) {
             val nc = NeuronCollection(neuronList)
             if (with(network) { nc.shouldAdd() }) {
-                network.addNetworkModel(nc)
+                network.addNetworkModelAsync(nc)
             }
             undoManager.addUndoableAction(
                 description = "Add neurons to collection",
@@ -165,7 +165,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
                 redo = {
                     nc.neuronList.clear()
                     nc.neuronList.addAll(neuronList)
-                    network.addNetworkModel(nc, usePlacementManager = false, useAutoAssignedId = false)?.await()
+                    network.addNetworkModel(nc, usePlacementManager = false, useAutoAssignedId = false)
                 }
             )
         }
@@ -177,12 +177,12 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         keyboardShortcut = KeyCombination('P')
     ) {
         val neuron = Neuron()
-        network.addNetworkModel(neuron)
+        network.addNetworkModelAsync(neuron)
         network.selectModels(listOf(neuron))
         undoManager.addUndoableAction(
             description = "Add neuron ${neuron.id}",
             undo = { neuron.delete() },
-            redo = { network.addNetworkModel(neuron, usePlacementManager = false, useAutoAssignedId = false)?.await() }
+            redo = { network.addNetworkModel(neuron, usePlacementManager = false, useAutoAssignedId = false) }
         )
     }
     val randomizeObjectsAction = networkPanel.createConditionallyEnabledAction(
@@ -413,9 +413,9 @@ class NetworkActions(val networkPanel: NetworkPanel) {
                 undoManager.addUndoableAction(
                     description = "Add text object",
                     undo = { textObject.delete() },
-                    redo = { network.addNetworkModel(textObject, usePlacementManager = false, useAutoAssignedId = false)?.await() }
+                    redo = { network.addNetworkModel(textObject, usePlacementManager = false, useAutoAssignedId = false) }
                 )
-                network.addNetworkModel(textObject)
+                network.addNetworkModelAsync(textObject)
             }
         }.display()
     }
@@ -661,7 +661,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         objectWrapper("Neuron Group Parameters", BasicNeuronGroupParams() as NeuronGroupParams, showLabeledBorder = false).createEditorDialog {
             it.editingObject.create().also { group ->
                 group.applyLayout()
-                network.addNetworkModel(group)
+                network.addNetworkModelAsync(group)
                 val neurons = group.neuronList.toList()
                 undoManager.addUndoableAction(
                     description = "Add neuron group ${group.id}",
@@ -669,7 +669,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
                     redo = {
                         group.neuronList.clear()
                         group.neuronList.addAll(neurons)
-                        network.addNetworkModel(group, usePlacementManager = false, useAutoAssignedId = false)?.await()
+                        network.addNetworkModel(group, usePlacementManager = false, useAutoAssignedId = false)
                     }
                 )
             }
@@ -834,7 +834,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Add 100 nodes",
     ) {
         List(100) { Neuron() }.apply {
-            network.addNetworkModels(this)
+            network.addNetworkModelsAsync(this)
             GridLayout().layoutNeurons(this)
         }.also { network.selectModels(it) }
         network.events.zoomToFitPage.fire()
@@ -986,7 +986,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
                 val supervisedModel = SupervisedModel(input, output)
                 val layers = supervisedModel.layers.toList()
                 val weightMatrices = supervisedModel.weightMatrices.toList()
-                network.addNetworkModel(supervisedModel)
+                network.addNetworkModelAsync(supervisedModel)
                 undoManager.addUndoableAction(
                     description = "Add supervised model to collection",
                     undo = { supervisedModel.delete() },
@@ -995,7 +995,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
                         supervisedModel.layers.addAll(layers)
                         supervisedModel.weightMatrices.clear()
                         supervisedModel.weightMatrices.addAll(weightMatrices)
-                        network.addNetworkModel(supervisedModel, usePlacementManager = false, useAutoAssignedId = false)?.await()
+                        network.addNetworkModel(supervisedModel, usePlacementManager = false, useAutoAssignedId = false)
                     }
                 )
             }
@@ -1040,7 +1040,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 
 fun addSubnetworkAction(networkPanel: NetworkPanel, block: () -> Subnetwork) {
     val subnetwork = block()
-    networkPanel.network.addNetworkModel(subnetwork)
+    networkPanel.network.addNetworkModelAsync(subnetwork)
     val models = subnetwork.modelList.all
     val neuronGroups = models.filterIsInstance<NeuronGroup>()
     val neuronCollections = models.filterIsInstance<AbstractNeuronCollection>()
@@ -1071,7 +1071,7 @@ fun addSubnetworkAction(networkPanel: NetworkPanel, block: () -> Subnetwork) {
             }
 
             subnetwork.modelList.addAll(models)
-            networkPanel.network.addNetworkModel(subnetwork, usePlacementManager = false, useAutoAssignedId = false)?.await()
+            networkPanel.network.addNetworkModel(subnetwork, usePlacementManager = false, useAutoAssignedId = false)
             subnetwork.afterRestore()
         }
     )

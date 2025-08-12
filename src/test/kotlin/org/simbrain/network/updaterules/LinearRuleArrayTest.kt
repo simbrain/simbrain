@@ -6,8 +6,8 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.util.linspace
-import org.simbrain.util.toDoubleArray
 import org.simbrain.util.toColumnVector
+import org.simbrain.util.toDoubleArray
 
 class LinearRuleArrayTest {
 
@@ -19,7 +19,7 @@ class LinearRuleArrayTest {
     var w23 = WeightMatrix(input2, output)
 
     init {
-        net.addNetworkModels(input1, input2, output, w13, w23)
+        net.addNetworkModelsAsync(input1, input2, output, w13, w23)
         input1.activations = doubleArrayOf(1.0, -1.0).toColumnVector()
         input1.isClamped = true
         input2.activations = doubleArrayOf(-1.0, 1.0).toColumnVector()

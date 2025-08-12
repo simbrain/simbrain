@@ -30,12 +30,12 @@ val classicalConditioning = newSim("classical conditioning") {
 
     // Construct the network
     val bellDetectorNeuron = Neuron()
-    net.addNetworkModel(bellDetectorNeuron)
+    net.addNetworkModelAsync(bellDetectorNeuron)
     bellDetectorNeuron.setLocation(295.0, 194.0)
     bellDetectorNeuron.label = "Bell Detector"
 
     val cheeseDetectorNeuron = Neuron()
-    net.addNetworkModel(cheeseDetectorNeuron)
+    net.addNetworkModelAsync(cheeseDetectorNeuron)
     cheeseDetectorNeuron.setLocation(160.0, 194.0)
     cheeseDetectorNeuron.label = "Cheese Detector"
 
@@ -43,12 +43,12 @@ val classicalConditioning = newSim("classical conditioning") {
     responseRule.threshold = .5
     responseRule.lowerBound = 0.0
     val salivationResponse = Neuron()
-    net.addNetworkModel(salivationResponse)
+    net.addNetworkModelAsync(salivationResponse)
     salivationResponse.setLocation(160.0, 60.0)
     salivationResponse.label = "Salivation"
 
     val cheeseToSalivation = Synapse(cheeseDetectorNeuron, salivationResponse, 1.0)
-    net.addNetworkModel(cheeseToSalivation)
+    net.addNetworkModelAsync(cheeseToSalivation)
 
     val association = Synapse(bellDetectorNeuron, cheeseDetectorNeuron).apply {
         strength = 0.0
@@ -56,7 +56,7 @@ val classicalConditioning = newSim("classical conditioning") {
         upperBound = 1.0
     }
 
-    net.addNetworkModel(association)
+    net.addNetworkModelAsync(association)
     withGui {
         (getDesktopComponent(nc) as NetworkDesktopComponent)
             .networkPanel.selectionManager.clear()

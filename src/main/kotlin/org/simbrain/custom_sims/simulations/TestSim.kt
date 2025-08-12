@@ -205,7 +205,7 @@ val linkedNeuronList = newSim {
             Neuron()
         }
 
-        neurons.mapNotNull { n -> network.addNetworkModel(n) }.joinAll()
+        neurons.mapNotNull { n -> network.addNetworkModelAsync(n) }.joinAll()
         val (first) = neurons
         first.activation = 1.0
 

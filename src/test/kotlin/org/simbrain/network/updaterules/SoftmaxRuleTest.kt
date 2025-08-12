@@ -16,7 +16,7 @@ class SoftmaxRuleTest {
     }
 
     init {
-        net.addNetworkModels(na)
+        net.addNetworkModelsAsync(na)
     }
 
     @Test
@@ -107,7 +107,7 @@ class SoftmaxRuleTest {
         val na3 = NeuronArray(3).apply {
             updateRule = SoftmaxRule()
         }
-        net.addNetworkModels(na3)
+        net.addNetworkModelsAsync(na3)
         
         na3.clearInputs()
         na3.addInputs(doubleArrayOf(1.0, 0.5, 0.2))
@@ -126,7 +126,7 @@ class SoftmaxRuleTest {
         val na3 = NeuronArray(3).apply {
             updateRule = SoftmaxRule()
         }
-        net.addNetworkModels(na3)
+        net.addNetworkModelsAsync(na3)
         
         na3.clearInputs()
         na3.addInputs(doubleArrayOf(1.0, 0.8, 0.6))

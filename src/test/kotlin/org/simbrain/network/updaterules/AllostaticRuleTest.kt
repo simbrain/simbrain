@@ -21,7 +21,7 @@ class AllostaticRuleTest {
     val resWeight = Synapse(reservoirInput, n)
 
     init {
-        net.addNetworkModels(n, externalInput, reservoirInput, externalWeight, resWeight)
+        net.addNetworkModelsAsync(n, externalInput, reservoirInput, externalWeight, resWeight)
     }
 
     fun printNeuronState() {

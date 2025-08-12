@@ -23,7 +23,7 @@ class TrainingUtilsTest {
         listOf(na1, na2, na3).forEach {
             it.clear()
         }
-        net.addNetworkModels(na1, na2, na3, wm1, wm2)
+        net.addNetworkModelsAsync(na1, na2, na3, wm1, wm2)
     }
 
     @Test
@@ -192,7 +192,7 @@ class TrainingUtilsTest {
         val skipWm = WeightMatrix(inputLayer, outputLayer).apply { label = "skip_connection" }
 
         runBlocking {
-            net.addNetworkModels(inputLayer, hiddenLayer, outputLayer, wm1, wm2, skipWm)
+            net.addNetworkModelsAsync(inputLayer, hiddenLayer, outputLayer, wm1, wm2, skipWm)
         }
 
         // Initialize weights to known values
@@ -203,7 +203,7 @@ class TrainingUtilsTest {
         // Create supervised model and test data
         val supervisedModel = SupervisedModel(inputLayer, outputLayer)
         runBlocking {
-            net.addNetworkModel(supervisedModel)
+            net.addNetworkModelAsync(supervisedModel)
         }
 
         val inputData = Matrix.of(arrayOf(
@@ -271,7 +271,7 @@ class TrainingUtilsTest {
         val skipWm = WeightMatrix(inputLayer, outputLayer)
 
         runBlocking {
-            net.addNetworkModels(inputLayer, branch1Layer, branch2Layer, outputLayer, wm1, wm2, wm3, wm4, skipWm)
+            net.addNetworkModelsAsync(inputLayer, branch1Layer, branch2Layer, outputLayer, wm1, wm2, wm3, wm4, skipWm)
         }
 
         // Initialize weights
@@ -281,7 +281,7 @@ class TrainingUtilsTest {
 
         val supervisedModel = SupervisedModel(inputLayer, outputLayer)
         runBlocking {
-            net.addNetworkModel(supervisedModel)
+            net.addNetworkModelAsync(supervisedModel)
         }
 
         val inputData = Matrix.of(arrayOf(doubleArrayOf(1.0, -1.0)))
@@ -349,7 +349,7 @@ class TrainingUtilsTest {
         val outputPath = WeightMatrix(hiddenLayer, outputLayer)
 
         runBlocking {
-            net.addNetworkModels(inputLayer, hiddenLayer, outputLayer, mainPath, skipConnection, outputPath)
+            net.addNetworkModelsAsync(inputLayer, hiddenLayer, outputLayer, mainPath, skipConnection, outputPath)
         }
 
         // Initialize weights  
@@ -359,7 +359,7 @@ class TrainingUtilsTest {
 
         val supervisedModel = SupervisedModel(inputLayer, outputLayer)
         runBlocking {
-            net.addNetworkModel(supervisedModel)
+            net.addNetworkModelAsync(supervisedModel)
         }
 
         val inputData = Matrix.of(arrayOf(
@@ -414,7 +414,7 @@ class TrainingUtilsTest {
         val wm4 = WeightMatrix(intermediate2, targetLayer)
 
         runBlocking {
-            net.addNetworkModels(sourceLayer, intermediate1, intermediate2, targetLayer, wm1, wm2, wm3, wm4)
+            net.addNetworkModelsAsync(sourceLayer, intermediate1, intermediate2, targetLayer, wm1, wm2, wm3, wm4)
         }
 
         // Set specific weights to test error accumulation

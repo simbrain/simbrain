@@ -25,7 +25,7 @@ class IzhikevichRuleTest {
             backgroundCurrent = 0.0  // Disable background current for pure threshold testing
         }
         val neuron = Neuron(rule)
-        net.addNetworkModel(neuron)
+        net.addNetworkModelAsync(neuron)
         
         // Set activation well below threshold and adjust recovery to prevent spiking
         neuron.activation = -70.0  // Start at resting potential
@@ -63,7 +63,7 @@ class IzhikevichRuleTest {
             backgroundCurrent = 0.0
         }
         val neuron = Neuron(rule)
-        net.addNetworkModel(neuron)
+        net.addNetworkModelAsync(neuron)
         
         // Set up initial conditions
         neuron.activation = 30.0 // At threshold
@@ -91,7 +91,7 @@ class IzhikevichRuleTest {
             backgroundCurrent = 10.0  // Constant current as in paper
         }
         val neuron = Neuron(rule)
-        net.addNetworkModel(neuron)
+        net.addNetworkModelAsync(neuron)
         
         // Initialize at resting potential
         neuron.activation = -65.0
@@ -134,7 +134,7 @@ class IzhikevichRuleTest {
             backgroundCurrent = 10.0
         }
         val neuron = Neuron(rule)
-        net.addNetworkModel(neuron)
+        net.addNetworkModelAsync(neuron)
         
         // Initialize
         neuron.activation = -65.0
@@ -176,7 +176,7 @@ class IzhikevichRuleTest {
             backgroundCurrent = 10.0
         }
         val neuron = Neuron(rule)
-        net.addNetworkModel(neuron)
+        net.addNetworkModelAsync(neuron)
         
         // Initialize
         neuron.activation = -65.0
@@ -212,7 +212,7 @@ class IzhikevichRuleTest {
             backgroundCurrent = 10.0
         }
         val neuron = Neuron(rule)
-        net.addNetworkModel(neuron)
+        net.addNetworkModelAsync(neuron)
         
         // Initialize
         neuron.activation = -65.0
@@ -258,7 +258,7 @@ class IzhikevichRuleTest {
             backgroundCurrent = 10.0
         }
         val neuron = Neuron(rule)
-        net.addNetworkModel(neuron)
+        net.addNetworkModelAsync(neuron)
         
         // Initialize
         neuron.activation = -65.0
@@ -290,7 +290,7 @@ class IzhikevichRuleTest {
             backgroundCurrent = 0.0  // No current to prevent spiking
         }
         val neuron = Neuron(rule)
-        net.addNetworkModel(neuron)
+        net.addNetworkModelAsync(neuron)
         
         // Set initial conditions
         val v0 = -70.0
@@ -329,7 +329,7 @@ class IzhikevichRuleTest {
             backgroundCurrent = 0.0
         }
         val neuron = Neuron(rule)
-        net.addNetworkModel(neuron)
+        net.addNetworkModelAsync(neuron)
         
         // Set initial conditions
         neuron.activation = -65.0
@@ -373,7 +373,7 @@ class IzhikevichRuleTest {
             backgroundCurrent = 14.0  // Default background current
         }
         val neuron = Neuron(rule)
-        net.addNetworkModel(neuron)
+        net.addNetworkModelAsync(neuron)
         
         // Initialize
         neuron.activation = -65.0

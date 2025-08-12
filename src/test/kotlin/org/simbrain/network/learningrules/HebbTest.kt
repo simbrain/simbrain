@@ -21,7 +21,7 @@ class HebbTest {
     var wm12 = WeightMatrix(na1, na2)
 
     init {
-        net.addNetworkModels(n1, n2, s12, na1, na2, wm12)
+        net.addNetworkModelsAsync(n1, n2, s12, na1, na2, wm12)
         s12.learningRule = HebbianRule().apply {
             learningRate = 1.0
         }
@@ -119,7 +119,7 @@ class HebbTest {
             }
         }
         wm_v2.hardClear()
-        net.addNetworkModels(na1_v2, wm_v2)
+        net.addNetworkModelsAsync(na1_v2, wm_v2)
         na1_v2.isClamped = true
         na1_v2.activations = inputs
         na2.activations = outputs

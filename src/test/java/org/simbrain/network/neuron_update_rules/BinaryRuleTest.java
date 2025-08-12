@@ -15,7 +15,7 @@ public class BinaryRuleTest {
 
         Network net = new Network();
         Neuron n = new Neuron(new BinaryRule());
-        net.addNetworkModel(n);
+        net.addNetworkModelAsync(n);
         BinaryRule br = (BinaryRule) n.getUpdateRule();
 
         // Set up rule

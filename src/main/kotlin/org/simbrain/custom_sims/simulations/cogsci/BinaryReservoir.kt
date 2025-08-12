@@ -1,6 +1,5 @@
 package org.simbrain.custom_sims.simulations
 
-import kotlinx.coroutines.awaitAll
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.FixedDegree
 import org.simbrain.network.core.Network
@@ -73,9 +72,9 @@ val binaryReservoir = newSim {
         rule.threshold = .5
         Neuron(rule)
     }
-    network.addNetworkModels(resNeurons).awaitAll()
+    network.addNetworkModels(resNeurons)
     val reservoir = NeuronCollection(resNeurons)
-    network.addNetworkModel(reservoir)?.await()
+    network.addNetworkModel(reservoir)
     reservoir.label = "Reservoir"
     reservoir.layout(GridLayout())
     reservoir.location = point(0, 0)

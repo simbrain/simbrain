@@ -28,7 +28,7 @@ val discreteHopfieldSim = newSim {
     val hopfield = Hopfield(numNeurons).apply {
         updateFunc = HopfieldUpdate.SYNC
     }
-    network.addNetworkModel(hopfield)
+    network.addNetworkModelAsync(hopfield)
 
     // Text to potentially integrate
     // Select an input pattern and click the train button on the Control panel to train the network on the selected pattern.

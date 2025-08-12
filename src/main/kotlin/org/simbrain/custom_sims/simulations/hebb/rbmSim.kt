@@ -1,10 +1,15 @@
 package org.simbrain.custom_sims.simulations
 
-import org.simbrain.custom_sims.*
+import org.simbrain.custom_sims.addNetworkComponent
+import org.simbrain.custom_sims.addSidebarInfo
+import org.simbrain.custom_sims.newSim
 import org.simbrain.custom_sims.simulations.hebb.*
 import org.simbrain.network.subnetworks.RestrictedBoltzmannMachine
-import org.simbrain.util.*
+import org.simbrain.util.place
+import org.simbrain.util.plus
+import org.simbrain.util.showAPEOptionDialog
 import org.simbrain.util.stats.distributions.NormalDistribution
+import org.simbrain.util.toColumnVector
 
 /**
  * Demo for studying restricted Boltzmann machines.
@@ -20,7 +25,7 @@ val rbmSim = newSim {
     workspace.clearWorkspace()
     val networkComponent = addNetworkComponent("Network")
     val network = networkComponent.network
-    network.addNetworkModel(rbm)
+    network.addNetworkModelAsync(rbm)
 
     addSidebarInfo(
         """ 

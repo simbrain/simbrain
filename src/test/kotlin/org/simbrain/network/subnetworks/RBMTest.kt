@@ -14,7 +14,7 @@ class RBMTest {
     }
 
     init {
-        net.addNetworkModels(rbm)
+        net.addNetworkModelsAsync(rbm)
     }
 
     @Test

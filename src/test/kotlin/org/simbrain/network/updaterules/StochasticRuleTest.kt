@@ -14,7 +14,7 @@ class StochasticRuleTest {
     var n = Neuron(rule)
 
     init {
-        net.addNetworkModels(n)
+        net.addNetworkModelsAsync(n)
     }
 
     @Test

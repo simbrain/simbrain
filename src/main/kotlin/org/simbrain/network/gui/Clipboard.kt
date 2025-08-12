@@ -189,7 +189,7 @@ object Clipboard {
             .forEach { it.shouldBePlaced = false }
 
         // Add the copied object
-        net.network.addNetworkModels(copy)
+        net.network.addNetworkModelsAsync(copy)
 
         val undeleteContext = UndeleteContext(net, copy)
 

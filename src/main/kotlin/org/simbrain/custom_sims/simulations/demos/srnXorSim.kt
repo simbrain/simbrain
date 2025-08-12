@@ -26,7 +26,7 @@ val srnXORSim = newSim {
     val networkComponent = addNetworkComponent("Network")
     val network = networkComponent.network
     val srn = SRNNetwork(1, 4, 1)
-    network.addNetworkModel(srn)
+    network.addNetworkModelAsync(srn)
     srn.layers.filterIsInstance<NeuronArray>().forEach { it.circleMode = true }
 
     // Load with xor data

@@ -16,7 +16,7 @@ class CompetitiveNetworkTest {
     }
 
     init {
-        net.addNetworkModels(cn)
+        net.addNetworkModelsAsync(cn)
     }
 
     @Test

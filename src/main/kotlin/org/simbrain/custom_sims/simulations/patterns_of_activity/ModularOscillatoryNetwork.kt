@@ -155,7 +155,7 @@ class ModularOscillatoryNetwork : Simulation {
             DEFAULT_IE_CONST * 3, DEFAULT_II_CONST * 0, .25, 50.0
         )
         val sg = SynapseGroup(sourceNg!!, targetNg!!, radialConnection)
-        net.addNetworkModel(sg)
+        net.addNetworkModelAsync(sg)
         sg.displaySynapses = false
         return sg
     }
@@ -171,7 +171,7 @@ class ModularOscillatoryNetwork : Simulation {
         // TODO!
         // , exRatio)
         //        sparse.connectNeurons(sg);
-        net.addNetworkModel(sg)
+        net.addNetworkModelAsync(sg)
         sg.displaySynapses = false
         return sg
     }

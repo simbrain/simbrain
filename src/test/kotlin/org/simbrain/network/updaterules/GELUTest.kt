@@ -1,8 +1,6 @@
 package org.simbrain.network.updaterules
 
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Assertions.fail
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.*
 import org.simbrain.util.toColumnVector
@@ -33,12 +31,12 @@ class GELUTest {
     var weightMatrix5x3 = WeightMatrix(input5x3, output5x3)
 
     init {
-        net.addNetworkModels(input, output, weight)
+        net.addNetworkModelsAsync(input, output, weight)
         input.activation = 1.0
         input.clamped = true
 
         //add 1-1 network
-        net.addNetworkModels(input5x5, output5x5, weightMatrix5x5)
+        net.addNetworkModelsAsync(input5x5, output5x5, weightMatrix5x5)
         output5x5.updateRule = GELU()
 
         //add few-many network
@@ -47,14 +45,14 @@ class GELUTest {
             0.5, 0.5, 1.0,
             0.5, 1.0, 0.5,
             1.0, 0.5, 0.5,))
-        net.addNetworkModels(input3x5, output3x5, weightMatrix3x5)
+        net.addNetworkModelsAsync(input3x5, output3x5, weightMatrix3x5)
         output3x5.updateRule = GELU()
 
         //add many-few network
         weightMatrix5x3.setWeights(doubleArrayOf(1.0, 0.5, 0.5, 0.5, 1.0,
             0.5, 1.0, 0.5, 1.0, 0.5,
             0.5, 0.5, 1.0, 0.5, 0.5))
-        net.addNetworkModels(input5x3, output5x3, weightMatrix5x3)
+        net.addNetworkModelsAsync(input5x3, output5x3, weightMatrix5x3)
         output5x3.updateRule = GELU()
 
     }

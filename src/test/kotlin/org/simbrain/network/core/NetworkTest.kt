@@ -40,35 +40,35 @@ class NetworkTest {
         n1 = Neuron()
         n1.label = "neuron1"
         n1.bias = 1.0
-        net.addNetworkModel(n1)
+        net.addNetworkModelAsync(n1)
         n2 = Neuron().apply {
             updateRule = IzhikevichRule()
         }
         n2.label = "neuron2"
-        net.addNetworkModel(n2)
+        net.addNetworkModelAsync(n2)
 
         s1 = Synapse(n1, n2).apply {
             spikeResponder = ShortTermPlasticity()
         }
-        net.addNetworkModel(s1)
+        net.addNetworkModelAsync(s1)
 
         nc1 = NeuronCollection(List.of(n1, n2))
-        net.addNetworkModel(nc1)
+        net.addNetworkModelAsync(nc1)
 
         ng1 = NeuronGroup(10)
         ng1.label = "neuron_group_1"
-        net.addNetworkModel(ng1)
+        net.addNetworkModelAsync(ng1)
         ng2 = NeuronGroup(10)
         ng2.label = "ng2"
-        net.addNetworkModel(ng2)
+        net.addNetworkModelAsync(ng2)
 
         sg1 = SynapseGroup(ng1, ng2)
-        net.addNetworkModel(sg1)
+        net.addNetworkModelAsync(sg1)
 
         na1 = NeuronArray(10)
         na2 = NeuronArray(10)
         wm1 = WeightMatrix(na1, na2)
-        net.addNetworkModels(List.of(na1, na2, wm1))
+        net.addNetworkModelsAsync(List.of(na1, na2, wm1))
 
         softmax = SoftmaxGroup(5)
         softmax.label = "softmax"
@@ -79,13 +79,13 @@ class NetworkTest {
         wta = WinnerTakeAll(net, 5)
         wta.label = "wta"
 
-        net.addNetworkModels(softmax, som, competitive, wta)
+        net.addNetworkModelsAsync(softmax, som, competitive, wta)
 
         bp = BackpropNetwork(intArrayOf(3, 5, 4), point(0, 0))
         bp.label = "backprop"
         srn = SRNNetwork(5, 5, 5, point(0, 0))
         srn.label = "srn"
-        net.addNetworkModels(bp, srn)
+        net.addNetworkModelsAsync(bp, srn)
     }
 
     @Test

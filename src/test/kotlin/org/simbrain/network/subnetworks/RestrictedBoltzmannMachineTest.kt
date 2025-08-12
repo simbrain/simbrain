@@ -16,7 +16,7 @@ class RestrictedBoltzmannMachineTest {
     }
 
     init {
-        net.addNetworkModels(rbm)
+        net.addNetworkModelsAsync(rbm)
     }
 
     @Test

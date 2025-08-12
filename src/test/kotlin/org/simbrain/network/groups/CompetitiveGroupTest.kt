@@ -20,7 +20,7 @@ class CompetitiveGroupTest {
 
     init {
         with(net) {
-            net.addNetworkModels(inputs, competitive)
+            net.addNetworkModelsAsync(inputs, competitive)
             weights = connectAllToAll(inputs, competitive, 0.1)
         }
     }
@@ -29,7 +29,7 @@ class CompetitiveGroupTest {
     fun `Test copy function`() {
         competitive.params.learningRate = .8
         val competitive2 = competitive.copy()
-        net.addNetworkModels(competitive2)
+        net.addNetworkModelsAsync(competitive2)
         assertEquals(2, competitive2.neuronList.size)
         assertEquals(competitive.params.updateMethod, competitive2.params.updateMethod)
         assertEquals(competitive.params.learningRate, competitive2.params.learningRate)

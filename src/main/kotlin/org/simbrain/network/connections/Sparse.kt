@@ -156,7 +156,7 @@ fun createSparseSynapses(
     } else {
         val numbersOfConnectionToRemove = -(sparsityDelta * possibleConnections.size).roundToInt()
         val connectionsToRemove = existingSynapses.shuffled(random).take(numbersOfConnectionToRemove)
-        return ConnectionsResult.Remove(connectionsToRemove)
+        return ConnectionsResult.Remove(connectionsToRemove, numbersOfConnectionToRemove == existingSynapses.size)
     }
 }
 
@@ -176,6 +176,6 @@ fun createSparseSynapses(
 
 sealed interface ConnectionsResult {
     data class Add(val connectionsToAdd: List<Synapse>) : ConnectionsResult
-    data class Remove(val connectionsToRemove: List<Synapse>): ConnectionsResult
+    data class Remove(val connectionsToRemove: List<Synapse>, val removedAll: Boolean): ConnectionsResult
     data class Reset(val resultConnections: List<Synapse>): ConnectionsResult
 }

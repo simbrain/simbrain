@@ -1,12 +1,11 @@
 package org.simbrain.network.core
 
-import org.simbrain.network.connections.AllToAll
-import org.simbrain.network.connections.ConnectionStrategy
-import org.simbrain.network.connections.Sparse
+import org.simbrain.network.connections.*
 import org.simbrain.network.events.SynapseGroupEvents
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.SynapseNode
 import org.simbrain.util.SimbrainConstants
+import org.simbrain.util.showWarningDialog
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 import org.simbrain.workspace.AttributeContainer
@@ -165,19 +164,48 @@ class SynapseGroup @JvmOverloads constructor(
     }
 
     suspend fun applyConnectionStrategy() {
-        val existingSynapses = synapses.toList()
-        val newSynapses = connectionStrategy.connectNeurons(
-            source.neuronList,
-            target.neuronList
-        )
-        // Can’t let number of synapses get to 0, because this triggers deletion of the synapse group.
-        newSynapses.forEach {
-            addSynapse(it)
+        connectionStrategy.let { strategy ->
+            if (strategy is Sparse) {
+                with(strategy) {
+                    val result = createSparseSynapses(source.neuronList, target.neuronList, connectionDensity, allowSelfConnection, equalizeEfferents, random)
+                    if (result is ConnectionsResult.Remove && result.removedAll) {
+                        showWarningDialog("Connection strategy not applied: The result is empty. Please check your connection strategy parameters.")
+                        return
+                    }
+                    when(result) {
+                        is ConnectionsResult.Add -> {
+                            polarizeSynapses(result.connectionsToAdd, percentExcitatory)
+                            result.connectionsToAdd.forEach {
+                                addSynapse(it)
+                            }
+                        }
+                        is ConnectionsResult.Reset -> {
+                            polarizeSynapses(result.resultConnections, percentExcitatory)
+                        }
+                        is ConnectionsResult.Remove -> {
+                            result.connectionsToRemove.forEach { it.delete() }
+                        }
+                    }
+                }
+
+            } else {
+                val existingSynapses = synapses.toList()
+                val newSynapses = strategy.connectNeurons(
+                    source.neuronList,
+                    target.neuronList
+                )
+                if (newSynapses.isEmpty()) {
+                    showWarningDialog("Connection strategy not applied: The result is empty. Please check your connection strategy parameters.")
+                    return
+                }
+                // Can’t let number of synapses get to 0, because this triggers deletion of the synapse group.
+                newSynapses.forEach {
+                    addSynapse(it)
+                }
+                existingSynapses.toList().forEach { it.delete() }
+            }
+            events.synapseListChanged.fire()
         }
-        if (connectionStrategy !is Sparse) {
-            existingSynapses.toList().forEach { it.delete() }
-        }
-        events.synapseListChanged.fire()
     }
 
     fun getWeightMatrix(): Matrix {

@@ -139,7 +139,13 @@ class TextWorldPanel(
         if (world.showTokenBoundaries) {
             world.tokens.forEach(::highlightToken)
         }
-        world.tokens.getOrNull(world.currentTokenIndex)?.let { highlight(it.start, it.end + 1) }
+        world.tokens.getOrNull(world.currentTokenIndex)?.let { token ->
+            highlight(token.start, token.end + 1)
+            // Scroll to make the highlighted token visible
+            textArea.modelToView(token.start)?.let { rect ->
+                textArea.scrollRectToVisible(rect)
+            }
+        }
     }
 
     /**

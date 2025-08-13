@@ -25,6 +25,9 @@ val SOMSim = newSim {
     SOM.inputLayer.setUpperBound(1.0)
     //SOM.weights.randomize()
 
+    // Label for winner
+    var winningLabel = ""
+
     withGui {
         place(networkComponent, 139, 10, 868, 619)
         createControlPanel("Control Panel", 5, 10) {
@@ -32,26 +35,35 @@ val SOMSim = newSim {
             addButton("Pattern 1") {
                 SOM.inputLayer.neuronList.activations =
                     listOf(0.5, 1.0, 0.5, 0.0, 0.0, 0.0, 0.0)
+                winningLabel = "P1"
             }
             addButton("Pattern 2") {
                 SOM.inputLayer.neuronList.activations =
                     listOf(0.0, 0.5, 1.0, 0.5, 0.0, 0.0, 0.0)
+                winningLabel = "P2"
             }
             addButton("Pattern 3") {
                 SOM.inputLayer.neuronList.activations =
                     listOf(0.0, 0.0, 0.5, 1.0, 0.5, 0.0, 0.0)
+                winningLabel = "P3"
             }
             addButton("Pattern 4") {
                 SOM.inputLayer.neuronList.activations =
                     listOf(0.0, 0.0, 0.0, 0.5, 1.0, 0.5, 0.0)
+                winningLabel = "P4"
             }
             addButton("Pattern 5") {
                 SOM.inputLayer.neuronList.activations =
                     listOf(0.0, 0.0, 0.0, 0.0, 0.5, 1.0, 0.5)
+                winningLabel = "P5"
             }
             addButton("Train") {
                 SOM.inputLayer.activationArray = SOM.inputLayer.activationArray.add(NormalDistribution().sampleDouble(SOM.inputLayer.activationArray.size))
                 workspace.iterateSuspend()
+                val winner = SOM.som.winner
+                if (winner != null && winningLabel.isNotEmpty()) {
+                    winner.label = winningLabel
+                }
             }
         }
     }

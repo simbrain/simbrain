@@ -323,6 +323,9 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
             return this@WeightMatrixNode.createEditDialog()
         }
 
+        override val propertyDialog: StandardDialog?
+            get() = this@WeightMatrixNode.createEditDialog()
+
         override val isDraggable: Boolean
             get() = false
 

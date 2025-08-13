@@ -446,12 +446,12 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             return contextMenu
         }
 
-    override fun createEditDialog(): StandardDialog? = networkPanel.filterSelectedNodeByClass<NeuronArrayNode>().let { nanList ->
+    override fun createEditDialog(): StandardDialog? = networkPanel.filterSelectedModelByClass<NeuronArray>().let { nanList ->
 
         if (nanList.isEmpty()) return null
 
-        nanList.map { it.model }.createEditorDialog(
-            titleName = if (nanList.size == 1) "Edit ${nanList.first().neuronArray.displayName}" else "Edit ${nanList.size} Neuron Arrays"
+        nanList.createEditorDialog(
+            titleName = if (nanList.size == 1) "Edit ${nanList.first().displayName}" else "Edit ${nanList.size} Neuron Arrays"
         )
     }
 

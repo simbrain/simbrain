@@ -14,9 +14,6 @@ class RBMNode(networkPanel: NetworkPanel, private val rbm: RestrictedBoltzmannMa
     override val model: NetworkModel
         get() = rbm
 
-    override val toolTipText: String
-        get() = rbm.toString()
-
     override val contextMenu: JPopupMenu
         get() = JPopupMenu().apply {
             with(networkPanel) {

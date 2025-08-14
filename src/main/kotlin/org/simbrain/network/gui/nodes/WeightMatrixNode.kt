@@ -331,5 +331,8 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
 
         override val model: Connector
             get() = this@WeightMatrixNode.model
+
+        override val toolTipText: String?
+            get() = this@WeightMatrixNode.toolTipText
     }
 }

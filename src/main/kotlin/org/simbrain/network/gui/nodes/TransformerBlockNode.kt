@@ -215,14 +215,6 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
         updateTextLabels()
     }
 
-    override val toolTipText
-        get() = """
-        <html>
-        ${transformerBlock.displayName} <br />
-        Location: ${transformerBlock.location}
-        </html>
-    """.trimIndent()
-
     override val contextMenu: JPopupMenu
         get() {
             val contextMenu = JPopupMenu()

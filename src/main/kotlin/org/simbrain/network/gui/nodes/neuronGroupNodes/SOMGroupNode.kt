@@ -1,6 +1,7 @@
 package org.simbrain.network.gui.nodes.neuronGroupNodes
 
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.network.gui.createTooltipTextWithLocation
 import org.simbrain.network.gui.nodes.NeuronGroupNode
 import org.simbrain.network.neurongroups.SOMGroup
 import org.simbrain.util.Utils
@@ -33,12 +34,14 @@ class SOMGroupNode(networkPanel: NetworkPanel?, group: SOMGroup?) : NeuronGroupN
      */
     private inner class SOMInteractionBox(net: NetworkPanel?) : NeuronGroupInteractionBox(net) {
         override val toolTipText: String
-            get() = "Current learning rate: " + Utils.round(
-                (neuronGroup as SOMGroup).learningRate,
-                2
-            ) + "  Current neighborhood size: " + Utils.round(
-                (neuronGroup as SOMGroup).neighborhoodSize, 2
-            )
+            get() = createTooltipTextWithLocation(model) {
+                "Current learning rate: " + Utils.round(
+                    (neuronGroup as SOMGroup).learningRate,
+                    2
+                ) + "\nCurrent neighborhood size: " + Utils.round(
+                    (neuronGroup as SOMGroup).neighborhoodSize, 2
+                )
+            }
     }
 
     /**

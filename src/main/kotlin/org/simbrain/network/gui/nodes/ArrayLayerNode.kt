@@ -164,9 +164,6 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
         override val model: ArrayLayer
             get() = this@ArrayLayerNode.layer
 
-        override val toolTipText: String
-            get() = this@ArrayLayerNode.toolTipText ?: ""
-
     }
 
 }

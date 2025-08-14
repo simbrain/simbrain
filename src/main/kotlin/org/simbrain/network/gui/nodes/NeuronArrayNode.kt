@@ -264,13 +264,6 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         }
     }
 
-    override val toolTipText
-        get() = """
-        <html>
-        ${neuronArray.toString().split("\n").joinToString("<br>")}
-        </html>
-    """.trimIndent()
-
     override val contextMenu: JPopupMenu
         get() {
             val contextMenu = JPopupMenu()

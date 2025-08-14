@@ -30,9 +30,6 @@ class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: Super
      */
     private val outlinedObjects: MutableSet<ScreenElement> = LinkedHashSet()
 
-    override val toolTipText: String
-        get() = "Double click here to train..."
-
     public override fun layoutChildren() {
         updateOutline()
         interactionBox.centerFullBoundsOnPoint(
@@ -161,9 +158,6 @@ class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: Super
 
         override val model: NetworkModel
             get() = this@SupervisedModelNode.supervisedModel
-
-        override val toolTipText: String
-            get() = "Double click to train..."
 
     }
 }

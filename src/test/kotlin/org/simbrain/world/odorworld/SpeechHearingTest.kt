@@ -11,18 +11,23 @@ import org.simbrain.world.odorworld.sensors.Hearing
 class SpeechHearingTest {
 
     val world = OdorWorld()
-    val talker = OdorWorldEntity(world).apply{
-        world.addEntity(this)
+    val talker = OdorWorldEntity(world).apply {
     }
     val listener = OdorWorldEntity(world).apply {
         location = point(50,50)
-        world.addEntity(this)
     }
     val speechEffector = Speech("Test", 0.0).also {
         talker.addEffector(it)
     }
     val hearingSensor = Hearing("Test", 1.0).also {
         listener.addSensor(it)
+    }
+
+    init {
+        runBlocking {
+            world.addEntity(talker)
+            world.addEntity(listener)
+        }
     }
 
     @Test

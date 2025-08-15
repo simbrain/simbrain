@@ -1,5 +1,6 @@
 package org.simbrain.world.odorworld
 
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
@@ -14,7 +15,7 @@ class OdorWorldEntityTest {
     var world = OdorWorld()
 
     @Test
-    fun `created entity can be retrieved by its id`() {
+    fun `created entity can be retrieved by its id`() = runBlocking {
         val entity = OdorWorldEntity(world)
         world.addEntity(entity)
         assertNotNull(world.getEntity(entity.id))
@@ -96,7 +97,7 @@ class OdorWorldEntityTest {
     }
 
     @Test
-    fun `object blocks properly`() {
+    fun `object blocks properly`() = runBlocking {
         val agent = OdorWorldEntity(world)
         agent.location = point(0,0)
         agent.heading  = 0.0

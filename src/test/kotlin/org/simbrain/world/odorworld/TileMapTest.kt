@@ -1,5 +1,6 @@
 package org.simbrain.world.odorworld
 
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.util.piccolo.*
@@ -9,7 +10,7 @@ class TileMapTest {
     var world = OdorWorld()
 
     @Test
-    fun testEditingExistingTile() {
+    fun testEditingExistingTile() = runBlocking {
         world.tileMap.setTile("Tile Layer 1", 4, 4, 25)
         assertEquals(25, world.tileMap.layers[0][4, 4])
     }
@@ -20,7 +21,7 @@ class TileMapTest {
     }
 
     @Test
-    fun `test filling a layer`() {
+    fun `test filling a layer`() = runBlocking {
         world.tileMap.fill("Grass1")
         assertEquals("Grass1", world.tileMap.getTileStackAt(0,0).first().label)
     }

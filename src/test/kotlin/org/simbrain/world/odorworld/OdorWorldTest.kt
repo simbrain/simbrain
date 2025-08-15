@@ -1,5 +1,6 @@
 package org.simbrain.world.odorworld
 
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -24,7 +25,7 @@ class OdorWorldTest {
     }
 
     @Test
-    fun testXStream() {
+    fun testXStream() = runBlocking {
 
         // Create a world
         val oc = OdorWorldComponent("Test")

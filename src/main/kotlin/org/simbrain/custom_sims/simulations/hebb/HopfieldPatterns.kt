@@ -30,9 +30,7 @@ val hopfieldPatterns = newSim {
     val hopfield = Hopfield(100).apply {
         updateFunc = HopfieldUpdate.SYNC
         customInfo.fontSize = 24
-        val neuronGroupBound = neuronGroup.neuronList.bound
-        offsetNetworkModel(neuronGroup,
-            customInfo, Direction.NORTH, 60.0, neuronGroupBound.height, neuronGroupBound.width, 24.0, 0.0)
+        customInfo.locationY = neuronGroup.neuronList.bound.minY - 70.0
     }
     var patternCnt = 0.0
     network.addNetworkModelAsync(hopfield)

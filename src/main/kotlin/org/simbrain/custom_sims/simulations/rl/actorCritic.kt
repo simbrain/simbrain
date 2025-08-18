@@ -20,7 +20,9 @@ import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.sensors.GridSensor
 import org.simbrain.world.odorworld.sensors.ObjectSensor
+import java.awt.Dimension
 import java.util.function.Consumer
+import javax.swing.JLabel
 import kotlin.math.cos
 import kotlin.math.sin
 
@@ -39,7 +41,7 @@ val actorCritic = newSim {
     var epsilon = .25
 
     /**
-     * Discount factor . 0-1. 0 predict next value only. .5 predict future
+     * Discount factor. 0-1. 0 predict next value only. .5 predict future
      * values. As it increases toward one, values of y in the more distant
      * future become more significant.
      */
@@ -122,7 +124,7 @@ val actorCritic = newSim {
 
     // Outputs
     val outputs = WinnerTakeAll(network, 4).apply {
-        network.addNetworkModelAsync(this)
+        network.addNetworkModel(this)
         params.isUseRandom = true
         params.randomProb = epsilon
         // Add a little extra spacing between neurons to accommodate labels
@@ -198,6 +200,10 @@ val actorCritic = newSim {
 
     // Workspace update
     workspace.updater.updateManager.clear()
+    workspace.updater.updateManager.addAction(UpdateComponent(odorWorldComponent))
+    workspace.updater.updateManager.addAction(UpdateCoupling(gridCoupling))
+    workspace.updater.updateManager.addAction(UpdateCoupling(rewardCoupling))
+    workspace.updater.updateManager.addAction(UpdateComponent(networkComponent))
     workspace.updater.updateManager.addAction(updateAction("Net -> Movement") {
         outputs.neuronList.firstOrNull { it.activation > 0.0 }?.let {
 
@@ -233,10 +239,6 @@ val actorCritic = newSim {
             mouse.applyGridMovement()
         }
     })
-    workspace.updater.updateManager.addAction(UpdateComponent(odorWorldComponent))
-    workspace.updater.updateManager.addAction(UpdateCoupling(gridCoupling))
-    workspace.updater.updateManager.addAction(UpdateCoupling(rewardCoupling))
-    workspace.updater.updateManager.addAction(UpdateComponent(networkComponent))
     workspace.updater.updateManager.addAction(UpdateCoupling(rewardPlot))
     workspace.updater.updateManager.addAction(UpdateCoupling(valuePlot))
     workspace.updater.updateManager.addAction(UpdateCoupling(errorPlot))
@@ -342,9 +344,9 @@ val actorCritic = newSim {
     // Lay everything out
     withGui {
 
-        place(networkComponent,210, 10, 520, 600)
-        place(odorWorldComponent, 730, 10, 500, 500)
-        place(plot, 730, 590, 520, 300)
+        place(networkComponent,240, 10, 520, 600)
+        place(odorWorldComponent, 760, 10, 500, 500)
+        place(plot, 760, 590, 520, 300)
         (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).zoomToFitSize(500, 500)
 
         // Control panel
@@ -354,6 +356,9 @@ val actorCritic = newSim {
             val tfGamma = addTextField("Discount (gamma)", "" + gamma)
             val tfAlpha = addTextField("Alpha", "" + alpha)
             val tfEpsilon = addTextField("Epsilon", "" + epsilon)
+            // Hyphens are just a hack to make sure the panel is big enough when trial numbers are shown
+            val progressLabel = JLabel("Status: ------ Ready ------")
+            addComponent(progressLabel)
 
             addButton("Run") {
                 workspace.launch {
@@ -373,7 +378,7 @@ val actorCritic = newSim {
                             if (stop) {
                                 break
                             }
-                            tfTrials.text = "" + i
+                            progressLabel.text = "Status: Running Trial $i of $numTrials"
                             goalAchieved = false
                             network.clearActivations()
                             resetMouse()
@@ -386,8 +391,8 @@ val actorCritic = newSim {
                             }
                         }
 
-                        // Reset the text in the trial field
-                        tfTrials.text = "" + numTrials
+                        // Reset the status
+                        progressLabel.text = "Status: Completed $numTrials trials"
                     } finally {
                         this@addButton.isEnabled = true
                     }
@@ -398,6 +403,7 @@ val actorCritic = newSim {
             addButton("Stop") {
                 goalAchieved = true
                 stop = true
+                progressLabel.text = "Status: Stopped"
             }
         }
     }

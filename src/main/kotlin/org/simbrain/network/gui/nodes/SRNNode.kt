@@ -19,9 +19,6 @@ class SRNNode(networkPanel: NetworkPanel, private val srn: SRNNetwork):
     override val model: NetworkModel
         get() = srn
 
-    override val toolTipText: String
-        get() = srn.toString()
-
     override val contextMenu: JPopupMenu
         get() = JPopupMenu().apply {
             applyBasicActions()

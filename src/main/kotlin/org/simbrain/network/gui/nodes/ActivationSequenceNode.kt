@@ -89,14 +89,6 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
         activationImage.addBorder()
     }
 
-    override val toolTipText
-        get() = """
-        <html>
-        ${activationSequence.displayName} <br />
-        Location: ${activationSequence.location}
-        </html>
-    """.trimIndent()
-
     override val contextMenu: JPopupMenu
         get() {
             val contextMenu = JPopupMenu()

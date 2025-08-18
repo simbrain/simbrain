@@ -1,9 +1,11 @@
 package org.simbrain.network.gui
 
+import org.simbrain.network.core.LocatableModel
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.gui.nodes.ScreenElement
 import org.simbrain.util.KeyCombination
 import org.simbrain.util.createAction
+import org.simbrain.util.format
 import java.awt.event.ActionEvent
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -57,3 +59,10 @@ fun NetworkPanel.createConditionallyEnabledAction(
 
 inline fun <reified T: NetworkModel> NetworkPanel.filterSelectedModelByClass(): List<T> = selectionManager.selectedModels.filterIsInstance<T>()
 inline fun <reified T: ScreenElement> NetworkPanel.filterSelectedNodeByClass(): List<T> = selectionManager.selection.filterIsInstance<T>()
+
+fun createTooltipTextWithLocation(locatableModel: LocatableModel, convertToHtml: Boolean = true, stringSupplier: (LocatableModel) -> String = { it.toString() }) = """
+        <html>
+        ${stringSupplier(locatableModel).let { if (convertToHtml) it.split("\n").joinToString("<br>") else it }} <br>
+        Location: ${locatableModel.location.format(0)}
+        </html>
+    """.trimIndent()

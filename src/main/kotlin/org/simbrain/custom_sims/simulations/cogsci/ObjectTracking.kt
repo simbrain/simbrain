@@ -79,7 +79,7 @@ val objectTrackingSim = newSim {
     network.addNetworkModel(leftInputs)
     leftInputs.label = "Left Inputs"
     leftInputs.layout(GridLayout())
-    leftInputs.location = point(-616, -195)
+    leftInputs.location = point(-816, -250)
 
     // Right inputs
     val rightInputNeurons = (0 until sensoryNeurons).map {
@@ -92,7 +92,7 @@ val objectTrackingSim = newSim {
     network.addNetworkModel(rightInputs)
     rightInputs.label = "Right Inputs"
     rightInputs.layout(GridLayout())
-    rightInputs.location = point(-616, 225)
+    rightInputs.location = point(-816, 280)
 
     // Connect input nodes to reservoir
     val leftInputsToRes = SynapseGroup(leftInputs, reservoir, sparse)
@@ -115,27 +115,18 @@ val objectTrackingSim = newSim {
     rightTurnNeuron.upperBound = 100.0
     val leftTurnCollection = NeuronCollection(listOf(leftTurnNeuron))
     leftTurnCollection.label = "Left Turn"
-    network.addNetworkModelAsync(leftTurnCollection)
+    network.addNetworkModel(leftTurnCollection)
     val rightTurnCollection = NeuronCollection(listOf(rightTurnNeuron))
     rightTurnCollection.label = "Right Turn"
-    network.addNetworkModelAsync(rightTurnCollection)
-    leftTurnNeuron.location = point(546, -203)
-    rightTurnNeuron.location = point(573, 323)
+    network.addNetworkModel(rightTurnCollection)
+    leftTurnNeuron.location = point(700, -300)
+    rightTurnNeuron.location = point(700, 350)
     val resToLeftTurn = SynapseGroup(reservoir, leftTurnCollection, sparse)
     network.addNetworkModel(resToLeftTurn)
     resToLeftTurn.displaySynapses = false
     val resToRightTurn = SynapseGroup(reservoir, rightTurnCollection, sparse)
     network.addNetworkModel(resToRightTurn)
     resToRightTurn.displaySynapses = false
-
-    // Location of the network in the desktop
-    withGui {
-        place(networkComponent) {
-            location = point(183, 0)
-            width = 600
-            height = 600
-        }
-    }
 
     network.addUpdateAction(updateAction("Record activations") {
         if (isRecording) {
@@ -231,11 +222,9 @@ val objectTrackingSim = newSim {
 
     workspace.addWorkspaceComponent(odorWorldComponent)
     withGui {
-        place(odorWorldComponent) {
-            location = point(783, 0)
-            width = 600
-            height = 600
-        }
+        place(networkComponent, 258, 0, 600, 600)
+        place(odorWorldComponent, 867, 0, 600, 600)
+
     }
 
     // Couple output neurons to effectors

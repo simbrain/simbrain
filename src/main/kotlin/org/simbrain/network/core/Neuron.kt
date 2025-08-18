@@ -57,7 +57,11 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
      * The update method of this neuron, which corresponds to what kind of
      * neuron it is.
      */
-    @UserParameter(label = "Update Rule", order = 100)
+    @UserParameter(
+        label = "Update Rule",
+        description = "Neuron update rule, which determines how activations evolve and respond to inputs.",
+        order = 100
+    )
     var updateRule: NeuronUpdateRule<*, *> = LinearRule()
         set(value) {
             val oldRule = field

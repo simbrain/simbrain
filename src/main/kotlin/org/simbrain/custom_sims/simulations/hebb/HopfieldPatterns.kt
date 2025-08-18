@@ -4,8 +4,11 @@ import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
+import org.simbrain.network.core.bound
 import org.simbrain.network.subnetworks.Hopfield
 import org.simbrain.network.subnetworks.Hopfield.HopfieldUpdate
+import org.simbrain.network.util.Direction
+import org.simbrain.network.util.offsetNetworkModel
 import org.simbrain.util.computeCorrelationMatrix
 import org.simbrain.util.displayInDialog
 import org.simbrain.util.perturbBinaryByHammingDistance
@@ -26,6 +29,8 @@ val hopfieldPatterns = newSim {
     // Hopfield network
     val hopfield = Hopfield(100).apply {
         updateFunc = HopfieldUpdate.SYNC
+        customInfo.fontSize = 24
+        customInfo.locationY = neuronGroup.neuronList.bound.minY - 70.0
     }
     var patternCnt = 0.0
     network.addNetworkModelAsync(hopfield)

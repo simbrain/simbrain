@@ -82,9 +82,9 @@ val simulations = dir("Simulations", alphabetical = true ) {
 
     dir("Language models") {
         item("Basic word embeddings") { nlpSimBasic }
-        item("Next-word prediction") { srnElmanSentences }
+        item("Next-word prediction (SRN)") { srnElmanSentences }
         //item("Tiny language model") { tinyLanguageModelFF }
-        item("Tiny language model") { tinyLanguageModel }
+        item("Tiny language model (Transformer)") { tinyLanguageModel }
     }
 
     dir("Neuroscience") {
@@ -145,8 +145,8 @@ val simulations = dir("Simulations", alphabetical = true ) {
     }
 
     dir("Reinforcement learning") {
-        item("Braitenberg RL") { braitenbergRL }
         item("Actor critic") { actorCritic }
+        item("Braitenberg RL") { braitenbergRL }
     }
 
     // dir("Other Demos") {

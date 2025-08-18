@@ -40,7 +40,7 @@ val srnElmanSentences = newSim {
     // Text World for Outputs
     val textWorldOut = addTextWorld("Text World (Outputs)").apply { updateOn = false }
     textWorldOut.world.showTokenBoundaries = false
-    textWorldOut.world.autoAdvance = false
+    textWorldOut.world.highlightCurrentToken = false
     TokenEmbeddingBuilder().build(text)
 
     // Network
@@ -84,7 +84,7 @@ val srnElmanSentences = newSim {
 
     withGui {
         place(textWorldInputs, 0, 7, 531, 929)
-        place(textWorldOut, 523, 7, 516, 930)
+        place(textWorldOut, 523, 7, 516, 250)
         place(networkComponent, 1046, 10, 500, 550)
     }
 
@@ -109,15 +109,10 @@ val srnElmanSentences = newSim {
         val chosenWords = choices.map { (index, _) -> tokenEmbedding.tokens[index] }
         val chosenProbs = choices.map { (_, d) -> d / totalActivations }
         val chosen = chosenWords.zip(chosenProbs).joinToString(" ") { (word, prob) -> "$word (${prob.format(3)})" }
-        textWorldOut.world.addTextAtEnd(
-            """
-                |Current Word: ${textWorldInputs.world.currentToken}
-                |Predicted Next Words: $chosen
-                |
-                |
-            """.trimMargin("|"),
-            ""
-        )
+        textWorldOut.world.text = """
+            Current Word: ${textWorldInputs.world.currentToken}
+            Predicted Next Words: $chosen
+        """.trimIndent()
     }
 
     workspace.launch {

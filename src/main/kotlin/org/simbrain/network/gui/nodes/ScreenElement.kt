@@ -5,8 +5,10 @@ import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.event.PInputEventFilter
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PBounds
+import org.simbrain.network.core.LocatableModel
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.network.gui.createTooltipTextWithLocation
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.display
 import org.simbrain.util.int
@@ -60,7 +62,7 @@ abstract class ScreenElement protected constructor(val networkPanel: NetworkPane
      * screen element does not have tool tip text.
      */
     open val toolTipText: String?
-        get() = null
+        get() = (model as? LocatableModel)?.let { createTooltipTextWithLocation(it) }
 
     /**
      * Return a context menu specific to this screen element or null if none.

@@ -99,7 +99,7 @@ class TextWorld : AttributeContainer, EditableObject {
 
     @UserParameter(
         label = "Auto advance",
-        description = "If true, automatically advance to the next token.",
+        description = "If true, automatically advance selected token on update.",
         order = 2
     )
     var autoAdvance = true
@@ -120,8 +120,9 @@ class TextWorld : AttributeContainer, EditableObject {
 
     var samplingStrategy: SamplingStrategy by GuiEditable(
         initValue = SamplingStrategy.TopK(k = 5),
-        description = "How to sample from softmax to produce new tokens",
-        order = 0,
+        description = "When given set of probabilities to select a token from the dictionary, how to sample from that distribution produce new tokens",
+        showDetails = false,
+        order = 100,
     )
 
     /**

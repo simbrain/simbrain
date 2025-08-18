@@ -119,4 +119,6 @@ abstract class NetworkModel {
         this.label = other.label
         this.priority = other.priority
     }
+
+    override fun toString(): String = displayName
 }

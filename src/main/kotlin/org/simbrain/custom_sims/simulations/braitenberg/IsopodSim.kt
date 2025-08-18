@@ -30,6 +30,8 @@ val isopodSim = newSim {
     var defaultNumTrials = 5
     val maxIterationsPerTrial = 5000
     val hitRadius = 80
+    val smellDispersion = 350.0
+    val speed = 5.0
 
     // Other variables
     val log = StringBuilder()
@@ -77,7 +79,7 @@ val isopodSim = newSim {
         lowerBound = 0.0
         upperBound = 10.0
         label = "Straight"
-        bias = 5.0
+        bias = speed
     }
 
     // Create the weights
@@ -95,8 +97,6 @@ val isopodSim = newSim {
             width = 400
             height = 400
         }
-        // Select isopod by default
-
     }
 
     // ----- Build 2d World ------
@@ -164,7 +164,7 @@ val isopodSim = newSim {
                     // How the smell decays with distances
                     decayFunction = LinearDecayFunction()
                     decayFunction.peakDistance = 0.0
-                    decayFunction.dispersion = 350.0
+                    decayFunction.dispersion = smellDispersion
                     showDispersion = true
                 }
                 // A convenient way to show the hit radius. Not used as a sensor.

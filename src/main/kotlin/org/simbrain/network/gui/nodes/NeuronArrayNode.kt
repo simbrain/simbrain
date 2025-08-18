@@ -264,13 +264,6 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         }
     }
 
-    override val toolTipText
-        get() = """
-        <html>
-        ${neuronArray.toString().split("\n").joinToString("<br>")}
-        </html>
-    """.trimIndent()
-
     override val contextMenu: JPopupMenu
         get() {
             val contextMenu = JPopupMenu()
@@ -446,12 +439,12 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             return contextMenu
         }
 
-    override fun createEditDialog(): StandardDialog? = networkPanel.filterSelectedNodeByClass<NeuronArrayNode>().let { nanList ->
+    override fun createEditDialog(): StandardDialog? = networkPanel.filterSelectedModelByClass<NeuronArray>().let { nanList ->
 
         if (nanList.isEmpty()) return null
 
-        nanList.map { it.model }.createEditorDialog(
-            titleName = if (nanList.size == 1) "Edit ${nanList.first().neuronArray.displayName}" else "Edit ${nanList.size} Neuron Arrays"
+        nanList.createEditorDialog(
+            titleName = if (nanList.size == 1) "Edit ${nanList.first().displayName}" else "Edit ${nanList.size} Neuron Arrays"
         )
     }
 

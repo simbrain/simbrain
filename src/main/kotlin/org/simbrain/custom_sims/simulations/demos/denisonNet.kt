@@ -7,30 +7,36 @@ import org.simbrain.network.core.NetworkTextObject
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.util.*
 import kotlin.random.Random
-import org.simbrain.network.core.NeuronArray
 import org.simbrain.util.toGrayScaleImage
+import kotlin.math.cos
 import kotlin.math.min
 import kotlin.math.pow
 
+
 val denisonNet = newSim {
     workspace.clearWorkspace()
-    val net = addNetworkComponent("Denison Net").network
+    val netComponent = addNetworkComponent("Denison Net")
+    val net = netComponent.network
 
     val currentStatus = NetworkTextObject("").apply { fontSize = 18 }
     val reportStatus = NetworkTextObject("").apply { fontSize = 18 }
+    val modelDecision = NetworkTextObject("").apply {fontSize = 18}
 
+    /*
     val inputs = NeuronArray(100*100).apply {
         label = "Inputs"
         isClamped = true
         gridMode = true
     }
+    */
+
     val sensory1 = NeuronGroup(12).apply { label = "Sensory 1" }
     val sensory2 = NeuronGroup(12).apply { label = "Sensory 2" }
     val decision = NeuronGroup(2).apply { label = "Decision" }
-    val vaLayer = NeuronGroup(1).apply { label = "Voluntary Attention" }
-    val iaLayer = NeuronGroup(1).apply { label = "Involuntary Attention" }
+    val vaLayer = NeuronGroup(1).apply { label = "VA" }
+    val iaLayer = NeuronGroup(1).apply { label = "IA" }
 
-    net.addNetworkModels(inputs, sensory1, sensory2, decision, vaLayer, iaLayer, currentStatus, reportStatus)
+    net.addNetworkModels( sensory1, sensory2, decision, vaLayer, iaLayer, currentStatus, reportStatus, modelDecision)
     val connector = OneToOne().apply { percentExcitatory = 100.0 }
     net.addNetworkModels(connector.connectNeurons(sensory1.neuronList, sensory2.neuronList))
 
@@ -42,11 +48,13 @@ val denisonNet = newSim {
     imageWorld.imageAlbum.addImage(background)
 
     withGui {
-        place(component, 393, 10, 565, 675)
+        place(netComponent, 130, 15, 516, 556)
+        place(component, 645, 15, 565, 675)
         var vaState = 0
 
         currentStatus.location = point(220, -240)
         reportStatus.location = point(220, -220)
+        modelDecision.location = point(220, -200)
         currentStatus.text = "Paying Attention to Both"
 
         var reportTarget = 1  // 1 for T1, 2 for T2
@@ -64,7 +72,7 @@ val denisonNet = newSim {
                 val degree = if (target <= 11) target * -0.1 - 1.4 else (target - 12) * 0.1 + 1.4
                 val rad = Math.toRadians(degree)
                 val orientations = DoubleArray(12) { Math.toRadians(-90 + it * 16.36) }
-                return orientations.map { Math.max(0.0, Math.cos(rad - it)) }.toDoubleArray()
+                return orientations.map { 0.0.coerceAtLeast(cos(rad - it)) }.toDoubleArray()
             }
 
             fun voluntaryGain(vaState: Int, soa: Int, wN: Double = 0.28, tR: Int = 918): Pair<DoubleArray, DoubleArray> {
@@ -80,9 +88,10 @@ val denisonNet = newSim {
                 }
             }
 
-            fun updateS2(s1: DoubleArray, s2: DoubleArray, n: Double = 1.5, sigma: Double = 1.4, dt: Double = 1.0, tau: Double = 100.0): DoubleArray {
-                val s = s1.sumOf { it.pow(n) }
-                val denom = s + sigma.pow(n)
+            fun updateS2(s1: DoubleArray, s2: DoubleArray,
+                         n: Double = 1.5, sigma: Double = 1.4,
+                         dt: Double = 1.0, tau: Double = 10.0): DoubleArray {
+                val denom = s1.sumOf { it.pow(n) } + sigma.pow(n)
                 return DoubleArray(s1.size) { i ->
                     val num = s1[i].pow(n)
                     val dR = (-s2[i] + num / denom) * (dt / tau)
@@ -90,14 +99,15 @@ val denisonNet = newSim {
                 }
             }
 
-            fun updateDecision(decision: DoubleArray, s2: DoubleArray, dt: Double = 1.0): DoubleArray {
-                return doubleArrayOf(
-                    decision[0] + s2.slice(0..5).sum() * dt,
-                    decision[1] + s2.slice(6..11).sum() * dt
-                )
+            fun nextGaussian(mean: Double = 0.0, std: Double = 1.0): Double {
+                val u1 = Random.nextDouble()
+                val u2 = Random.nextDouble()
+                val r = kotlin.math.sqrt(-2.0 * kotlin.math.ln(u1)) * kotlin.math.cos(2.0 * Math.PI * u2)
+                return mean + std * r
             }
 
             suspend fun runTrial() {
+                // --- Trial parameters ---
                 val SOA = Random.nextInt(100, 801)
                 val T1 = Random.nextInt(0, 24)
                 val T2 = Random.nextInt(0, 24)
@@ -105,323 +115,93 @@ val denisonNet = newSim {
                 val T2input = calculateStimulusInput(T2)
                 val (vaT1, vaT2) = voluntaryGain(vaState, SOA)
 
+                // --- State variables ---
                 var ia = DoubleArray(12) { 0.0 }
                 var s2 = DoubleArray(12) { 0.0 }
-                var decisionActs = DoubleArray(2) { 0.0 }
+                var rT1 = 0.0   // decision neuron for T1
+                var rT2 = 0.0   // decision neuron for T2
+                decision.setActivations(doubleArrayOf(0.0, 0.0))
+
+                val bVA = 40.0       // voluntary gain amplitude
+                val bIA = 8.5        // involuntary gain amplitude
+                val n    = 1.5       // normalization exponent
+                val sigma = 1.4      // semi-saturation constant
+
+                // --- Time control ---
                 val start = System.currentTimeMillis()
 
                 while (true) {
                     val t = System.currentTimeMillis() - start
-                    if (t < 1000) {
-                        sensory1.setActivations(DoubleArray(12))
-                        imageWorld.setFrame(24)
-                    } else if (t < 1030) {
-                        val s1 = DoubleArray(12) { i -> T1input[i] * vaT1[i] * (1 + ia[i]) }
-                        sensory1.setActivations(s1)
-                        val s1Acts = sensory1.activations.toDoubleArray()
-                        ia = updateIA(ia, s1Acts)
-                        s2 = updateS2(s1Acts, s2)
-                        decisionActs = updateDecision(decisionActs, s2)
 
-                        iaLayer.setActivations(doubleArrayOf(ia.average()))
-                        sensory2.setActivations(s2)
-                        decision.setActivations(decisionActs)
-                        imageWorld.setFrame(T1)
-                        vaLayer.setActivations(doubleArrayOf(vaT1.average()))
-                    } else if (t < 1030 + SOA) {
-                        sensory1.setActivations(DoubleArray(12))
-                        imageWorld.setFrame(24)
-                    } else if (t < 1060 + SOA) {
-                        val s1 = DoubleArray(12) { i -> T2input[i] * vaT2[i] * (1 + ia[i]) }
-                        sensory1.setActivations(s1)
-                        val s1Acts = sensory1.activations.toDoubleArray()
-                        ia = updateIA(ia, s1Acts)
-                        s2 = updateS2(s1Acts, s2)
-                        decisionActs = updateDecision(decisionActs, s2)
+                    when {
+                        // Pre-trial fixation
+                        t < 1000 -> {
+                            sensory1.setActivations(DoubleArray(12))
+                            imageWorld.setFrame(24)
+                        }
 
-                        iaLayer.setActivations(ia)
-                        sensory2.setActivations(s2)
-                        decision.setActivations(decisionActs)
-                        imageWorld.setFrame(T2)
-                        vaLayer.setActivations(doubleArrayOf(vaT2.average()))
-                    } else {
-                        // Trial complete. Evaluate decision based on report target
-                        val finalDecision = if (decisionActs[0] > decisionActs[1]) "CCW" else "CW"
-                        val reportedStim = if (reportTarget == 1) T1 else T2
-                        val correctOrientation = if (reportedStim < 12) "CCW" else "CW"
-                        val correctness = if (finalDecision == correctOrientation) "✔" else "✘"
-                        reportStatus.text = "Reported $finalDecision | True: $correctOrientation $correctness"
+                        // presentation window (30 ms)
+                        t in 1000 until 1030 || t in (1030 + SOA) until (1060 + SOA)-> {
+                            var neuron = if (t in 1000 until 1030) 1 else 2
+                            val va = if (neuron == 1) vaT1 else vaT2
 
-                        sensory1.setActivations(DoubleArray(12))
-                        imageWorld.setFrame(24)
+                            val s1 = DoubleArray(12) { i ->
+                                val gain = (1 + bVA * va[i]) * (1 + bIA * ia[i])
+                                if (neuron == 1) T1input[i] * gain else T2input[i] * gain
+                            }
+                            sensory1.setActivations(s1)
+                            ia = updateIA(ia, s1)
+                            s2 = updateS2(s1, s2, n, sigma)
 
-                        break
+                            val evidence = s2.slice(6..11).sum() - s2.slice(0..5).sum()
+
+                            if(neuron == 1) {
+                                rT1 += evidence + nextGaussian(0.0, 0.02)
+                                imageWorld.setFrame(T1)
+                                vaLayer.setActivations(doubleArrayOf(va.average()))
+                            } else {
+                                rT2 += evidence + nextGaussian(0.0, 0.02)
+                                imageWorld.setFrame(T2)
+                                vaLayer.setActivations(doubleArrayOf(va.average()))
+                            }
+
+                            iaLayer.setActivations(doubleArrayOf(ia.average()))
+                            sensory2.setActivations(s2)
+                            decision.setActivations(doubleArrayOf(rT1, rT2))
+                        }
+
+                        // Inter-stimulus interval
+                        t in 1030 until (1030 + SOA) -> {
+                            sensory1.setActivations(DoubleArray(12))
+                            imageWorld.setFrame(24)
+                        }
+
+                        // Trial end (clear display and evaluate response)
+                        else -> {
+                            val finalDecision = if (reportTarget == 1) {
+                                if (rT1 > 0) "CW" else "CCW"
+                            } else {
+                                if (rT2 > 0) "CW" else "CCW"
+                            }
+                            val reportedStim = if (reportTarget == 1) T1 else T2
+                            val correctOrientation = if (reportedStim < 12) "CCW" else "CW"
+                            val correctness = if (finalDecision == correctOrientation) "✔" else "✘"
+                            modelDecision.text = "Reported $finalDecision | True: $correctOrientation $correctness"
+
+                            // Reset sensory display
+                            sensory1.setActivations(DoubleArray(12))
+                            imageWorld.setFrame(24)
+                            break
+                        }
                     }
                     delay(1L)
                 }
             }
 
+
             addButton("Start") { runTrial() }
         }
     }
-}
-
-
-
-
-
-/*
-package org.simbrain.custom_sims.simulations
-
-import kotlinx.coroutines.delay
-import org.simbrain.custom_sims.*
-import org.simbrain.network.connections.OneToOne
-import org.simbrain.network.core.NetworkTextObject
-import org.simbrain.network.neurongroups.NeuronGroup
-import org.simbrain.util.*
-import kotlin.random.Random
-import org.simbrain.network.core.NeuronArray
-import org.simbrain.util.toGrayScaleImage
-import smile.math.matrix.Matrix
-import kotlin.math.min
-import kotlin.math.pow
-
-
-val denisonNet = newSim {
-
-    workspace.clearWorkspace()
-    //Network
-    val networkComponent = addNetworkComponent("Denison Net")
-    val net = networkComponent.network
-
-    val currentStatus = NetworkTextObject("").apply {
-        fontSize = 18
-    }
-
-    val reportStatus = NetworkTextObject("").apply {
-        fontSize = 18
-    }
-    val inputs = NeuronArray(100*100).apply {
-        label = "Inputs"
-        isClamped = true
-        gridMode = true
-    }
-    val sensory1 = NeuronGroup(12).apply {
-        label = "Sensory 1"
-    }
-    val sensory2 = NeuronGroup(12).apply{
-        label = "Sensory 2"
-    }
-    val decision = NeuronGroup(2).apply {
-        label = "Decision"
-    }
-    //also voluntary attention and involuntary attention layers
-
-    net.addNetworkModels(inputs, sensory1, sensory2, decision, currentStatus, reportStatus)
-    val connector = OneToOne().apply {
-        percentExcitatory = 100.0
-    }
-    net.addNetworkModels(connector.connectNeurons(sensory1.neuronList, sensory2.neuronList))
-
-    //World
-    val component = addImageWorld("Gratings")
-    val imageWorld = component.world
-
-    imageWorld.loadImages(getFilesWithExtension("simulations/images/denisonGratings", "png"))
-
-    val background = DoubleArray(10000) { 0.0 }.toGrayScaleImage(100, 100)
-    imageWorld.imageAlbum.addImage(background)
-
-    withGui{
-        place(component,393, 10, 565, 675)
-
-        var VA_stat = 0
-
-        currentStatus.location = point(220, -240)
-        reportStatus.location = point(220, -220)
-        currentStatus.text = "Paying Attention to Both"
-        createControlPanel("Control Panel", 15, 15) {
-            addButton("Cue T1"){
-                VA_stat = 1
-                currentStatus.text = "Paying Attention to T1"
-            }
-            addButton("Cue T2"){
-                VA_stat = 2
-                currentStatus.text = "Paying Attention to T2"
-            }
-            addButton("Cue Both"){
-                VA_stat = 0
-                currentStatus.text = "Paying Attention to Both"
-            }
-            addSeparator()
-
-            addButton("Report T1"){
-                reportStatus.text = "Reporting T1"
-            }
-            addButton("Report T2"){
-                reportStatus.text = "Reporting T2"
-            }
-
-            addSeparator()
-
-            fun calculateInputs(target: Double):DoubleArray{
-                var degree = 0.0
-                degree = if (target <= 11) {
-                    target*-0.1-1.4
-                } else{
-                    (target-12)*0.1+1.4
-                }
-                val rad = Math.toRadians(degree)
-                val orientations = doubleArrayOf(-90.0, -73.63636364, -57.27272727, -40.90909091, -24.54545455,
-                    -8.18181818,   8.18181818,  24.54545455,  40.90909091,  57.27272727, 73.63636364,  90.0) //maybe there's a linspace function?
-                val inputs = orientations.map{ orientation ->
-                    val orientationRad = Math.toRadians(orientation)
-                    maxOf(0.0, Math.cos(rad - orientationRad))
-                }.toDoubleArray()
-
-                return inputs
-            }
-
-            fun VAControl(VA_stat:Int, SOA:Int, wN:Double = 0.28, tR:Int = 918): DoubleArray{
-                val amp = doubleArrayOf(0.0, 0.0) //index 0 is T1, index 1 is T1
-                if (VA_stat == 0){
-                    amp[0] = wN
-                    amp[1] = 1.0 - wN
-                }
-                else if (VA_stat == 1){
-                    amp[0] = 1.0
-                    amp[1] = min(1.0, (SOA/tR).toDouble())
-                }
-                else if (VA_stat == 2){
-                    amp[0] = min(1.0, (SOA/tR).toDouble())
-                    amp[1] = 1.0
-                }
-                return amp
-            }
-
-            fun updateS2(s1Acts: DoubleArray, s2Acts: DoubleArray, dt: Double = 1.0, tau: Double = 100.0, n: Double = 1.5, sigma: Double = 1.4): DoubleArray {
-                val newActs = DoubleArray(s1Acts.size)
-                val s = s1Acts.sumOf { it.pow(n) }
-                val denom = s + sigma.pow(n)
-
-                for (i in s1Acts.indices) {
-                    val num = s1Acts[i].pow(n)
-                    val dR = (-s2Acts[i] + num / denom) * (dt / tau)
-                    newActs[i] = s2Acts[i] + dR
-                }
-
-                return newActs
-            }
-
-            fun updateDecision(
-                decisionActs: DoubleArray,
-                s2Acts: DoubleArray,
-                dt: Double = 1.0
-            ): DoubleArray {
-                val newActs = decisionActs.copyOf()
-                val ccwSum = s2Acts.slice(0..5).sum()
-                val cwSum = s2Acts.slice(6..11).sum()
-
-                newActs[0] += ccwSum * dt  // CCW unit
-                newActs[1] += cwSum * dt   // CW unit
-
-                return newActs
-            }
-
-            suspend fun runTrial(){
-                //experiment parameters
-                val SOA = Random.nextInt(100,801)
-
-                //0-11 is CCW, 12-23 is CW
-                val T1 = Random.nextInt(0,24)
-                val T2 = Random.nextInt(0, 24)
-
-                val T1input = calculateInputs(T1.toDouble())
-                val T2input = calculateInputs(T2.toDouble())
-
-                val amplitudes = VAControl(VA_stat, SOA)
-
-                val vaGainT1 = DoubleArray(12) { amplitudes[0] }
-                val vaGainT2 = DoubleArray(12) { amplitudes[1] }
-
-                val T1inputWithVA = T1input.zip(vaGainT1) { stim, gain -> stim * gain }.toDoubleArray()
-                val T2inputWithVA = T2input.zip(vaGainT2) { stim, gain -> stim * gain }.toDoubleArray()
-
-                //trial vars
-                var trialComplete = false
-                val startTime = System.currentTimeMillis()
-                val buffer = 1L
-                var decisionActs = DoubleArray(2) { 0.0 }
-
-                //run the model
-                while(!trialComplete){
-                    var t = (System.currentTimeMillis()-startTime)
-                    if (t < 1000){
-                        sensory1.setActivations(DoubleArray(12) { 0.0 })
-                        imageWorld.setFrame(24)
-                    }
-                    else if(t < 1030){
-                        val iaBoost = DoubleArray(12) { 1.2 }
-                        val input = T1input.zip(vaGainT1).zip(iaBoost.toList()) { (stim, va), ia -> stim * va * ia }.toDoubleArray()
-                        sensory1.setActivations(input)
-
-                        val s1Acts = sensory1.activations.toDoubleArray()
-                        val s2Acts = sensory2.activations.toDoubleArray()
-                        val updatedS2 = updateS2(s1Acts, s2Acts)
-                        sensory2.setActivations(updatedS2)
-
-                        decisionActs = updateDecision(decisionActs, sensory2.activations.toDoubleArray())
-                        decision.setActivations(decisionActs)
-
-                        imageWorld.setFrame(T1)
-                    }
-                    else if (t < 1030 + SOA){
-                        sensory1.setActivations(DoubleArray(12) { 0.0 })
-                        imageWorld.setFrame(24)
-                    }
-                    else if (t < 1060 + SOA){
-                        val iaBoost = DoubleArray(12) { 1.2 }
-                        val input = T2input.zip(vaGainT2).zip(iaBoost.toList()) { (stim, va), ia -> stim * va * ia }.toDoubleArray()
-                        sensory1.setActivations(input)
-
-                        val s1Acts = sensory1.activations.toDoubleArray()
-                        val s2Acts = sensory2.activations.toDoubleArray()
-                        val updatedS2 = updateS2(s1Acts, s2Acts)
-                        sensory2.setActivations(updatedS2)
-
-                        decisionActs = updateDecision(decisionActs, sensory2.activations.toDoubleArray())
-                        decision.setActivations(decisionActs)
-
-                        imageWorld.setFrame(T2)
-                    }
-                    else if (t < 1090 + SOA) {
-                        sensory1.setActivations(DoubleArray(12) { 0.0 })
-                        imageWorld.setFrame(24)
-                    }
-                    else {
-                        trialComplete = true
-                    }
-                    delay(buffer)
-                }
-            }
-
-
-
-            addButton("Start"){
-                runTrial()
-            }
-        }
-    }
-
-/*
-    with(couplingManager) {
-        createCoupling(
-            imageWorld.filterCollection.currentFilter.getProducer(imageWorld.filterCollection.currentFilter::brightness),
-            inputs.getConsumer(inputs::setActivations)
-        )
-    }
- */
-
     addSidebarInfo(
         """
         # Introduction
@@ -443,6 +223,4 @@ val denisonNet = newSim {
         (Involutary and Voluntary), and there is 1 decision layer.
         """.trimIndent()
     )
-
 }
-*/

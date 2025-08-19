@@ -6,14 +6,13 @@ import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.trainers.LeCun
-import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedModel
+import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.alignNetworkModels
 import org.simbrain.network.util.offsetNetworkModel
-import org.simbrain.util.matrix
 import org.simbrain.util.place
 
 
@@ -44,14 +43,19 @@ val xorSim = newSim {
     alignNetworkModels(inputLayer, outputLayer, Alignment.VERTICAL)
     sm.randomize()
 
-    sm.trainingSet = MatrixDataset(
-        inputs = matrix[4, 2](
-            0, 0,
-            1, 0,
-            0, 1,
-            1, 1
+    sm.trainingSet = TrainingDataset(
+        inputs = mutableListOf(
+            mutableListOf(0.0, 0.0),
+            mutableListOf(1.0, 0.0),
+            mutableListOf(0.0, 1.0),
+            mutableListOf(1.0, 1.0)
         ),
-        targets = matrix[4, 1](0, 1, 1, 0)
+        targets = mutableListOf(
+            mutableListOf(0.0),
+            mutableListOf(1.0),
+            mutableListOf(1.0),
+            mutableListOf(0.0)
+        )
     )
 
 

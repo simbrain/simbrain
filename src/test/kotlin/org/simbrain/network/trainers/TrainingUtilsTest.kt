@@ -217,7 +217,7 @@ class TrainingUtilsTest {
             doubleArrayOf(1.0, 1.0)
         ))
 
-        supervisedModel.trainingSet = MatrixDataset(inputData, targetData)
+        supervisedModel.trainingSet = TrainingDataset(inputData.toMutableListOfLists(), targetData.toMutableListOfLists())
 
         // Test that forward pass works with skip connections
         runBlocking {
@@ -287,7 +287,7 @@ class TrainingUtilsTest {
         val inputData = Matrix.of(arrayOf(doubleArrayOf(1.0, -1.0)))
         val targetData = Matrix.of(arrayOf(doubleArrayOf(0.5, -0.5)))
 
-        supervisedModel.trainingSet = MatrixDataset(inputData, targetData)
+        supervisedModel.trainingSet = TrainingDataset(inputData.toMutableListOfLists(), targetData.toMutableListOfLists())
 
         // Test that accumulation works properly - no exceptions thrown
         val trainer = SupervisedTrainer(net, supervisedModel).apply {
@@ -371,7 +371,7 @@ class TrainingUtilsTest {
             doubleArrayOf(0.3, -0.3, 1.2, -0.8)
         ))
 
-        supervisedModel.trainingSet = MatrixDataset(inputData, targetData)
+        supervisedModel.trainingSet = TrainingDataset(inputData.toMutableListOfLists(), targetData.toMutableListOfLists())
 
         val trainer = SupervisedTrainer(net, supervisedModel).apply {
             config.learningRate = 0.01
@@ -498,5 +498,7 @@ class TrainingUtilsTest {
         assertTrue(inputIndex < outputIndex, "Input should come before output")
         assertTrue(hiddenIndex < outputIndex, "Hidden should come before output")
     }
+
+
 
 }

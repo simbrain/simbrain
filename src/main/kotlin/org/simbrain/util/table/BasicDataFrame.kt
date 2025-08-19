@@ -94,7 +94,7 @@ class BasicDataFrame(
     }
 
     override fun getColumnCount(): Int {
-        return if (data.isEmpty()) 0 else data[0].size
+        return columns.size
     }
 
     override fun getValueAt(rowIndex: Int, columnIndex: Int): Any? {

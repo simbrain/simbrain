@@ -3,12 +3,8 @@ package org.simbrain.network.trainers
 import org.simbrain.network.core.*
 import org.simbrain.network.events.LocationEvents
 import org.simbrain.network.trainers.SupervisedTrainer.TestConfiguration
-import org.simbrain.util.applyDiagonalPattern
-import org.simbrain.util.indent
-import org.simbrain.util.minus
-import org.simbrain.util.plus
+import org.simbrain.util.*
 import org.simbrain.util.stats.ProbabilityDistribution
-import org.simbrain.util.toDoubleArray
 import smile.math.matrix.Matrix
 import java.awt.geom.Point2D
 import kotlin.math.max
@@ -41,15 +37,15 @@ class SupervisedModel(
         testConfiguration = TestConfiguration().apply { enabled = trainTestSplit < 1.0 }
     }
 
-    override var trainingSet: MatrixDataset
+    override var trainingSet: TrainingDataset
 
-    override var testingSet: MatrixDataset
+    override var testingSet: TrainingDataset
 
     init {
         val nrows = max(inputLayer.size, outputLayer.size)
 
-        val inputs = Matrix(nrows, inputLayer.size).applyDiagonalPattern()
-        val targets = Matrix(nrows, outputLayer.size).applyDiagonalPattern()
+        val inputs = identityMutableList(nrows, inputLayer.size)
+        val targets = identityMutableList(nrows, outputLayer.size)
 
         val (trainingData, testingData) = splitDataSet(inputs, targets, trainTestSplit)
 
@@ -57,28 +53,36 @@ class SupervisedModel(
         val (testingInputs, testingTargets) = testingData
 
         trainingSet = if (inputLayer is ActivationSequence) {
-            MatrixDataset(
+            TrainingDataset(
                 // If the layer is an activation sequence, data are currently flattened
-                inputs = Matrix(10, inputLayer.size * inputLayer.sequenceSize),
-                targets = Matrix(10, outputLayer.size)
+                inputs = zeroMutableList(10, inputLayer.size * inputLayer.sequenceSize),
+                targets = zeroMutableList(10, outputLayer.size),
+                inputSize = inputLayer.size * inputLayer.sequenceSize,
+                targetSize = outputLayer.size
             )
         } else {
-            MatrixDataset(
-                inputs = trainingInputs,
-                targets = trainingTargets
+            TrainingDataset(
+                inputs = trainingInputs.copy(),
+                targets = trainingTargets.copy(),
+                inputSize = inputLayer.size,
+                targetSize = outputLayer.size
             )
         }
 
         testingSet = if (inputLayer is ActivationSequence) {
-            MatrixDataset(
+            TrainingDataset(
                 // If the layer is an activation sequence, data are currently flattened
-                inputs = Matrix(10, inputLayer.size * inputLayer.sequenceSize),
-                targets = Matrix(10, outputLayer.size)
+                inputs = zeroMutableList(10, inputLayer.size * inputLayer.sequenceSize),
+                targets = zeroMutableList(10, outputLayer.size),
+                inputSize = inputLayer.size * inputLayer.sequenceSize,
+                targetSize = outputLayer.size
             )
         } else {
-            MatrixDataset(
+            TrainingDataset(
                 inputs = testingInputs,
-                targets = testingTargets
+                targets = testingTargets,
+                inputSize = inputLayer.size,
+                targetSize = outputLayer.size
             )
         }
         
@@ -148,9 +152,11 @@ class SupervisedModel(
         val output = outputLayer.activations.toDoubleArray()
 
         inputLayer.isClamped = true
-        trainingSet = MatrixDataset(
-            inputLayer.activations.transpose().clone(),
-            Matrix.row(output),
+        trainingSet = TrainingDataset(
+            inputs = inputLayer.activations.transpose().clone().toMutableListOfLists(),
+            targets = Matrix.row(output).toMutableListOfLists(),
+            inputSize = inputLayer.size,
+            targetSize = outputLayer.size
         )
         SupervisedTrainer(this@Network, this@SupervisedModel).trainOnce()
 

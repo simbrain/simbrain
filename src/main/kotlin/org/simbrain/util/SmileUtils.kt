@@ -1,12 +1,16 @@
 package org.simbrain.util
 
 import org.simbrain.network.gui.dialogs.NetworkPreferences
+import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.plot.histogram.HistogramModel
 import org.simbrain.plot.histogram.HistogramPanel
 import org.simbrain.util.MatrixDiffResult.*
 import org.simbrain.util.stats.ProbabilityDistribution
 import smile.math.matrix.Matrix
-import kotlin.math.*
+import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.sqrt
 
 /**
  * Make sure the two matrices have the same shape
@@ -95,6 +99,62 @@ fun DoubleArray.toColumnVector(): Matrix = Matrix.column(this)
 
 fun List<List<Double>>.toMatrix(): Matrix = map { it.toDoubleArray() }.toTypedArray().toMatrix()
 fun Array<DoubleArray>.toMatrix(): Matrix = Matrix.of(this)
+
+/**
+ * Creates an identity-like matrix as MutableList format (equivalent to Matrix.eye).
+ * For non-square matrices, creates 1.0 on the main diagonal, 0.0 elsewhere.
+ */
+fun identityMutableList(nrows: Int, ncols: Int = nrows): MutableList<MutableList<Double>> =
+    MutableList(nrows) { row ->
+        MutableList(ncols) { col ->
+            if (row == col) 1.0 else 0.0
+        }
+    }
+
+/**
+ * Creates a zero-filled matrix as MutableList format (equivalent to Matrix(nrows, ncols))
+ */
+fun zeroMutableList(nrows: Int, ncols: Int): MutableList<MutableList<Double>> =
+    MutableList(nrows) { MutableList(ncols) { 0.0 } }
+
+fun Matrix.toMutableListOfLists(): MutableList<MutableList<Double>> = 
+    toArray().map { it.toMutableList() }.toMutableList()
+
+/**
+ * Converts List<List<Double>> to MutableList<MutableList<Double>>.
+ * This creates a mutable copy suitable for TrainingDataset.
+ */
+fun List<List<Double>>.toMutableListOfLists(): MutableList<MutableList<Double>> = 
+    map { it.toMutableList() }.toMutableList()
+
+
+fun MutableList<MutableList<Double>>.copy(): MutableList<MutableList<Double>> =
+    map { it.toMutableList() }.toMutableList()
+
+fun TrainingDataset.copy(): TrainingDataset = TrainingDataset(
+    inputs = inputs.copy(),
+    targets = targets.copy(),
+    inputSize = inputSize,
+    targetSize = targetSize,
+    inputRowNames = inputRowNames?.toMutableList(),
+    targetRowNames = targetRowNames?.toMutableList()
+)
+
+/**
+ * Shifts all rows up by one position and pads the last row with zeros.
+ * This is commonly used for temporal sequence learning where the target
+ * is the next time step of the input.
+ */
+fun MutableList<MutableList<Double>>.shiftUpAndPadEndWithZero(): MutableList<MutableList<Double>> {
+    if (isEmpty()) return this
+    
+    return mutableListOf<MutableList<Double>>().apply {
+        // Add all rows except the first one (shift up)
+        addAll(this@shiftUpAndPadEndWithZero.drop(1))
+        // Pad the end with a zero row of the same width as the original rows
+        add(MutableList(this@shiftUpAndPadEndWithZero[0].size) { 0.0 })
+    }
+}
 
 /**
  * Add the entries of a double array in-place to a Smile matrix / column vector. Assumes the matrix has as many rows

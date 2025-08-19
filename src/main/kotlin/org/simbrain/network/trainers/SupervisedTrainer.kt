@@ -9,7 +9,7 @@ import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
-import org.simbrain.util.rowVectorTransposed
+import org.simbrain.util.toColumnVector
 import smile.math.matrix.Matrix
 import kotlin.random.Random
 import kotlin.reflect.KFunction
@@ -160,7 +160,7 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
         iteration++
         with(config.updateType) {
             lastTrainingError = when (this) {
-                is UpdateMethod.Stochastic -> trainRow(Random.nextInt(supervisedNetwork.trainingSet.inputs.nrow()))
+                is UpdateMethod.Stochastic -> trainRow(Random.nextInt(supervisedNetwork.trainingSet.size))
                 is UpdateMethod.Epoch -> trainBatch(0 until supervisedNetwork.trainingSet.size)
                 is UpdateMethod.Batch -> {
                     val startIndex = Random.nextInt(0, supervisedNetwork.trainingSet.size - batchSize + 1)
@@ -209,12 +209,12 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
         val error = with(supervisedNetwork) {
             rowRange.sumOf { rowNum ->
                 val rowProbeContext = probeContext?.createMapProbe("trainRow-$rowNum")
-                inputLayer.setActivations(trainingSet.inputs.row(rowNum))
+                inputLayer.setActivations(trainingSet.inputs[rowNum].toDoubleArray())
                 
                 // Handle target reshaping for ActivationSequence outputs
                 val targetVec = if (outputLayer is ActivationSequence) {
                     // Reshape flattened target back to sequence format
-                    val flatTarget = trainingSet.targets.row(rowNum)
+                    val flatTarget = trainingSet.targets[rowNum].toDoubleArray()
                     val sequenceLayer = outputLayer as ActivationSequence
                     val sequenceSize = sequenceLayer.sequenceSize
                     val vocabSize = sequenceLayer.size
@@ -229,7 +229,7 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
                     }
                     reshapedTarget
                 } else {
-                    trainingSet.targets.rowVectorTransposed(rowNum)
+                    trainingSet.targets[rowNum].toDoubleArray().toColumnVector()
                 }
                 
                 with(network) {
@@ -311,7 +311,7 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
      */
     open suspend fun computeTestError(): Double {
         return supervisedNetwork.testingSet.sumOf { (input, target) ->
-            supervisedNetwork.inputLayer.activations = input
+            supervisedNetwork.inputLayer.activations = input.toDoubleArray().toColumnVector()
             with(network) { supervisedNetwork.forwardPass() }
             val output = supervisedNetwork.outputLayer.activations
             
@@ -327,12 +327,12 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
                 for (seqPos in 0 until sequenceSize) {
                     for (vocabPos in 0 until vocabSize) {
                         val flatIndex = seqPos * vocabSize + vocabPos
-                        reshapedTarget[seqPos, vocabPos] = target[flatIndex, 0]
+                        reshapedTarget[seqPos, vocabPos] = target[flatIndex]
                     }
                 }
                 reshapedTarget
             } else {
-                target
+                target.toDoubleArray().toColumnVector()
             }
             
             config.lossFunction.scalarLoss(output, reshapedTarget)

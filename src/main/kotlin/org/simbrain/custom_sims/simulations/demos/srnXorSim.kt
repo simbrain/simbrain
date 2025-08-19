@@ -6,10 +6,9 @@ import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.subnetworks.SRNNetwork
-import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedTrainer
+import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.util.*
-import smile.math.matrix.Matrix
 import kotlin.math.floor
 import kotlin.math.max
 import kotlin.random.Random
@@ -31,7 +30,11 @@ val srnXORSim = newSim {
 
     // Load with xor data
     val xorInputs = generateTemporalXORData(1000)
-    srn.trainingSet = MatrixDataset(xorInputs, xorInputs.shiftUpAndPadEndWithZero())
+    
+    // Create shifted targets (shift up and pad last with zeros)
+    val xorTargets = xorInputs.shiftUpAndPadEndWithZero()
+    
+    srn.trainingSet = TrainingDataset(xorInputs, xorTargets)
     srn.trainerConfig.updateType = SupervisedTrainer.UpdateMethod.Epoch()
 
     val trainer = SupervisedTrainer(network, srn)
@@ -46,7 +49,9 @@ val srnXORSim = newSim {
     val testData = generateTemporalXORData(1200 / 3)
     // TODO use srn.testingSet
 
-    srn.inputLayer.inputData = testData
+    // Convert to Matrix for inputData compatibility
+    val testDataMatrix = testData.toMatrix()
+    srn.inputLayer.inputData = testDataMatrix
 
     var counter = 0
 
@@ -77,14 +82,14 @@ val srnXORSim = newSim {
             val sumWindow = MutableList(timeSeriesWindowLength) { 0.0 }
 
             suspend fun test() {
-                fun index() = counter % testData.nrow()
-                srn.inputLayer.activations = testData.row(index()).toColumnVector()
+                fun index() = counter % testDataMatrix.nrow()
+                srn.inputLayer.activations = testDataMatrix.row(index()).toColumnVector()
                 counter += 1
                 workspace.iterateSuspend()
                 val output = srn.outputLayer.activations
-                actualText.text = testData.row(index())[0].format(3)
+                actualText.text = testDataMatrix.row(index())[0].format(3)
                 predictedText.text = output[0].format(3)
-                val error = output rmse testData.row(index()).toColumnVector()
+                val error = output rmse testDataMatrix.row(index()).toColumnVector()
                 errorText.text = error.format(3)
 
                 sumWindow[counter % timeSeriesWindowLength] += error
@@ -116,27 +121,29 @@ val srnXORSim = newSim {
  * @param n The number of triplets to generate.
  * @return A DoubleArray representing the sequence of bits.
  */
-fun generateTemporalXORData(n: Int): Matrix {
-    // Initialize an array of size 3n to hold the bits
-    val temporalXorMatrix = Matrix(3 * n, 1)
+fun generateTemporalXORData(n: Int): MutableList<MutableList<Double>> {
+    // Initialize list to hold the bits
+    val temporalXorData = mutableListOf<MutableList<Double>>()
 
-    // Fill the array with the triplets
+    // Fill the list with the triplets
     for (i in 0 until n) {
-        val index = i * 3
         val bit1 = Random.nextInt(2).toDouble()
         val bit2 = Random.nextInt(2).toDouble()
         val xorBit = if (bit1 == bit2) 0.0 else 1.0
-        temporalXorMatrix[index, 0] = bit1
-        temporalXorMatrix[index + 1, 0] = bit2
-        temporalXorMatrix[index + 2, 0] = xorBit
+        temporalXorData.add(mutableListOf(bit1))
+        temporalXorData.add(mutableListOf(bit2))
+        temporalXorData.add(mutableListOf(xorBit))
     }
 
-    return temporalXorMatrix
+    return temporalXorData
 }
 
 fun main() {
     val xorData = generateTemporalXORData(3)
-    println("Temporal XOR (input data):\t${xorData.transpose()}")
-    println("Left-shifted Targets:\t\t${xorData.shiftUpAndPadEndWithZero().transpose()}")
+    println("Temporal XOR (input data):\t${xorData.map { it[0] }}")
+    
+    // Create shifted targets using the utility function
+    val targets = xorData.shiftUpAndPadEndWithZero()
+    println("Left-shifted Targets:\t\t${targets.map { it[0] }}")
 }
 

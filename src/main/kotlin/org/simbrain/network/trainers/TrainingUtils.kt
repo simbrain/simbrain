@@ -19,7 +19,6 @@ import smile.math.matrix.Matrix
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.ln
-import kotlin.math.min
 import kotlin.random.Random
 
 fun WeightMatrix.computeWeightDeltas(errorSignal: Matrix): Matrix {
@@ -540,36 +539,88 @@ fun crossEntropySequence(predictions: Matrix, targets: Matrix): Double {
 }
 
 /**
- * Split a dataset (inputs and targets) into training and testing subsets.
- *
- * Split ratio of 0 is all testing. Split ratio of .8 is 80% training. Split ratio of 1 is 100% training.
- *
+ * Split a dataset into training and testing subsets using MutableList format.
  */
-fun splitDataSet(inputs: Matrix, targets: Matrix, splitRatio: Double, random: Random = Random(42L)): Pair<Pair<Matrix, Matrix>, Pair<Matrix, Matrix>> {
-    require(inputs.nrow() == targets.nrow()) { "inputs nrow (${inputs.nrow()}) must equal targets nrow (${targets.nrow()})" }
+fun splitDataSet(
+    inputs: MutableList<MutableList<Double>>,
+    targets: MutableList<MutableList<Double>>,
+    splitRatio: Double, 
+    random: Random = Random(42L)
+): Pair<Pair<MutableList<MutableList<Double>>, MutableList<MutableList<Double>>>, Pair<MutableList<MutableList<Double>>, MutableList<MutableList<Double>>>> {
+    require(inputs.size == targets.size) { "inputs size (${inputs.size}) must equal targets size (${targets.size})" }
     require(splitRatio in 0.0..1.0) { "splitRatio must be between 0.0 and 1.0" }
 
-    val nrows = inputs.nrow()
-
+    val nrows = inputs.size
     val rowIndices = (0 until nrows).shuffled(random)
-
-    val trainRowCount = (nrows * splitRatio).toInt().coerceAtLeast(1)
-    val testRowCount = (nrows - trainRowCount).coerceAtLeast(1)
+    
+    val trainRowCount = (nrows * splitRatio).toInt()
+    val testRowCount = nrows - trainRowCount
 
     val trainRowIndices = rowIndices.take(trainRowCount)
-
     val testRowIndices = rowIndices.takeLast(testRowCount)
 
-    return Pair(
-        Pair(
-            inputs.rows(*trainRowIndices.toIntArray()),
-            targets.rows(*trainRowIndices.toIntArray())
-        ),
-        Pair(
-            inputs.rows(*testRowIndices.toIntArray()),
-            targets.rows(*testRowIndices.toIntArray())
-        )
+    val trainingInputs = trainRowIndices.map { inputs[it].toMutableList() }.toMutableList()
+    val trainingTargets = trainRowIndices.map { targets[it].toMutableList() }.toMutableList()
+    val testingInputs = testRowIndices.map { inputs[it].toMutableList() }.toMutableList()
+    val testingTargets = testRowIndices.map { targets[it].toMutableList() }.toMutableList()
+
+    return (trainingInputs to trainingTargets) to (testingInputs to testingTargets)
+}
+
+/**
+ * Split a TrainingDataset into training and testing TrainingDatasets.
+ * Preserves input and target dimensions, allowing for empty datasets when splitRatio is 0.0 or 1.0.
+ */
+fun splitDataSet(
+    dataset: TrainingDataset,
+    splitRatio: Double,
+    random: Random = Random(42L)
+): Pair<TrainingDataset, TrainingDataset> {
+    require(splitRatio in 0.0..1.0) { "splitRatio must be between 0.0 and 1.0" }
+
+    // Generate the same row indices that will be used for data splitting
+    val nrows = dataset.inputs.size
+    val rowIndices = (0 until nrows).shuffled(random)
+    val trainRowCount = (nrows * splitRatio).toInt()
+    val trainRowIndices = rowIndices.take(trainRowCount)
+    val testRowIndices = rowIndices.drop(trainRowCount)
+
+    // Split the data using the existing function (but we already know the indices)
+    val (training, testing) = splitDataSet(dataset.inputs, dataset.targets, splitRatio, random)
+    val (trainingInputs, trainingTargets) = training
+    val (testingInputs, testingTargets) = testing
+
+    val trainingDataset = TrainingDataset(
+        inputs = trainingInputs,
+        targets = trainingTargets,
+        inputSize = dataset.inputSize,
+        targetSize = dataset.targetSize,
+        inputRowNames = dataset.inputRowNames?.let { names ->
+            trainRowIndices.map { names.getOrNull(it) ?: "Row $it" }
+        },
+        targetRowNames = dataset.targetRowNames?.let { names ->
+            trainRowIndices.map { names.getOrNull(it) ?: "Row $it" }
+        },
+        inputColumnNames = dataset.inputColumnNames,
+        targetColumnNames = dataset.targetColumnNames
     )
+
+    val testingDataset = TrainingDataset(
+        inputs = testingInputs,
+        targets = testingTargets,
+        inputSize = dataset.inputSize,
+        targetSize = dataset.targetSize,
+        inputRowNames = dataset.inputRowNames?.let { names ->
+            testRowIndices.map { names.getOrNull(it) ?: "Row $it" }
+        },
+        targetRowNames = dataset.targetRowNames?.let { names ->
+            testRowIndices.map { names.getOrNull(it) ?: "Row $it" }
+        },
+        inputColumnNames = dataset.inputColumnNames,
+        targetColumnNames = dataset.targetColumnNames
+    )
+
+    return trainingDataset to testingDataset
 }
 
 /**

@@ -4,11 +4,11 @@ import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.subnetworks.BackpropNetwork
-import org.simbrain.network.trainers.MatrixDataset
+import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.network.updaterules.SigmoidalRule
+import org.simbrain.util.identityMutableList
 import org.simbrain.util.math.SigmoidFunctionEnum
 import org.simbrain.util.place
-import smile.math.matrix.Matrix
 
 
 val backpropAutoEncoder = newSim {
@@ -28,9 +28,9 @@ val backpropAutoEncoder = newSim {
     }
     net.addNetworkModelsAsync(bp)
 
-    bp.trainingSet = MatrixDataset(
-        inputs = Matrix.eye(inputSize),
-        targets = Matrix.eye(inputSize)
+    bp.trainingSet = TrainingDataset(
+        inputs = identityMutableList(inputSize, inputSize),
+        targets = identityMutableList(inputSize, inputSize)
     )
 
     addSidebarInfo(

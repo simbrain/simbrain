@@ -439,7 +439,7 @@ fun buildSequenceToSequenceDataset(
     tokenizedText: List<String>,
     contextSize: Int,
     tokenEmbedding: TokenEmbedding
-): MatrixDataset {
+): TrainingDataset {
 
     // Create sliding windows of contextSize + 1 for input + target
     val sequences = tokenizedText.windowed(contextSize + 1, step = 1)
@@ -486,8 +486,8 @@ fun buildSequenceToSequenceDataset(
         finalTargetMatrix.setRow(exampleIndex, targetMatrix.flatten())
     }
 
-    return MatrixDataset(
-        inputs = finalInputMatrix,
-        targets = finalTargetMatrix
+    return TrainingDataset(
+        inputs = finalInputMatrix.toArray().map { it.toMutableList() }.toMutableList(),
+        targets = finalTargetMatrix.toArray().map { it.toMutableList() }.toMutableList()
     )
 }

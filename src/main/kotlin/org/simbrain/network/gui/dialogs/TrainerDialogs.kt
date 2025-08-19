@@ -11,9 +11,9 @@ import org.simbrain.network.gui.addSubnetworkAction
 import org.simbrain.network.gui.nodes.subnetworkNodes.BackpropNetworkNode
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.subnetworks.SRNNetwork
-import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedNetwork
 import org.simbrain.network.trainers.SupervisedTrainer
+import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.network.trainers.UnsupervisedNetwork
 import org.simbrain.util.*
 import org.simbrain.util.table.*
@@ -23,30 +23,38 @@ import java.awt.Cursor
 import java.awt.Dimension
 import javax.swing.*
 
-fun MatrixDataset.createDataSetPanel(applyAction: suspend DataSetPanel.(selectedRow: Int) -> Unit): DataSetPanel {
+fun TrainingDataset.createDataSetPanel(applyAction: suspend DataSetPanel.(selectedRow: Int) -> Unit): DataSetPanel {
     
     fun createDataFrame(
-        data: Array<DoubleArray>,
+        data: MutableList<MutableList<Double>>,
         rowNames: List<String>?,
-        columnNames: List<String>?
+        columnNames: List<String>?,
+        expectedColumnCount: Int
     ): BasicDataFrame {
+        // Always create explicit columns to simplify logic
+        val columns = (0 until expectedColumnCount).map { i ->
+            val columnName = columnNames?.getOrNull(i) ?: "Column ${i + 1}"
+            Column(columnName, Column.DataType.DoubleType)
+        }.toMutableList()
+        
         return BasicDataFrame(
-            data.map { it.toMutableList() as MutableList<Any?> }.toMutableList()
+            data.map { it.map { value -> value as Any? }.toMutableList() }.toMutableList(), 
+            columns
         ).also { dataFrame ->
             rowNames?.let { names -> dataFrame.rowNames = names }
-            columnNames?.let { names -> dataFrame.columnNames = names }
-        }.apply {  }
+            // No need to set columnNames again since we already set them in the Column objects
+        }
     }
     
-    val inputDataFrame = createDataFrame(inputs.toArray(), inputRowNames, inputColumnNames)
-    val targetDataFrame = createDataFrame(targets.toArray(), targetRowNames, targetColumnNames)
+    val inputDataFrame = createDataFrame(inputs, inputRowNames, inputColumnNames, inputSize)
+    val targetDataFrame = createDataFrame(targets, targetRowNames, targetColumnNames, targetSize)
 
     return DataSetPanel(inputDataFrame, targetDataFrame, applyAction = applyAction)
 }
 
 class DataSetPanel(
-    val inputDataFrame: SimbrainDataFrame,
-    val targetDataFrame: SimbrainDataFrame,
+    val inputDataFrame: BasicDataFrame,
+    val targetDataFrame: BasicDataFrame,
     applyAction: suspend DataSetPanel.(selectedRow: Int) -> Unit
 ): JPanel() {
 
@@ -124,18 +132,20 @@ fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
             }
         }
 
-        fun createDataSetPanel(dataSet: MatrixDataset) = dataSet.createDataSetPanel { selectedRow -> commonApplyAction(selectedRow) }
+        fun createDataSetPanel(dataSet: TrainingDataset) = dataSet.createDataSetPanel { selectedRow -> commonApplyAction(selectedRow) }
 
         val trainingDataSetPanel = createDataSetPanel(trainingSet)
         val testingDataSetPanel = createDataSetPanel(testingSet)
 
-        fun DataSetPanel.exportMatrixDataSet() = MatrixDataset(
-            Matrix.of(inputs.table.model.get2DDoubleArray()),
-            Matrix.of(targets.table.model.get2DDoubleArray()),
-            inputDataFrame.rowNames.map { it.toString() } as List<String>?,
-            targetDataFrame.rowNames.map { it.toString() } as List<String>?,
-            inputDataFrame.columnNames,
-            targetDataFrame.columnNames
+        fun DataSetPanel.exportMatrixDataSet() = TrainingDataset(
+            inputs.table.model.get2DDoubleList().toMutableListOfLists(),
+            targets.table.model.get2DDoubleList().toMutableListOfLists(),
+            inputSize = inputDataFrame.columnNames.size,
+            targetSize = targetDataFrame.columnNames.size,
+            inputRowNames = inputDataFrame.rowNames.map { it.toString() } as List<String>?,
+            targetRowNames = targetDataFrame.rowNames.map { it.toString() } as List<String>?,
+            inputColumnNames = inputDataFrame.columnNames,
+            targetColumnNames = targetDataFrame.columnNames
         )
 
         fun syncDataSet() {

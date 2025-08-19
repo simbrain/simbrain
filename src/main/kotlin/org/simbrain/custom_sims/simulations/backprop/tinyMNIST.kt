@@ -5,8 +5,8 @@ import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.trainers.BackpropLossFunction
-import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedTrainer
+import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.util.csvToDouble2DArray
@@ -41,13 +41,13 @@ val tinyMNIST = newSim {
     val testLabelsCSV =
         fetchDataWithCache("https://downloads.simbrain.net/simbraindata/tiny_mnist_test_labels.csv") ?: return@newSim
 
-    bp.trainingSet = MatrixDataset(
-        inputs = csvToDouble2DArray(trainInputsCSV).toMatrix(),
-        targets = csvToDouble2DArray(trainLabelsCSV).toMatrix(),
+    bp.trainingSet = TrainingDataset(
+        inputs = csvToDouble2DArray(trainInputsCSV).map { it.toMutableList() }.toMutableList(),
+        targets = csvToDouble2DArray(trainLabelsCSV).map { it.toMutableList() }.toMutableList(),
     )
-    bp.testingSet = MatrixDataset(
-        inputs = csvToDouble2DArray(testInputsCSV).toMatrix(),
-        targets = csvToDouble2DArray(testLabelsCSV).toMatrix(),
+    bp.testingSet = TrainingDataset(
+        inputs = csvToDouble2DArray(testInputsCSV).map { it.toMutableList() }.toMutableList(),
+        targets = csvToDouble2DArray(testLabelsCSV).map { it.toMutableList() }.toMutableList(),
     )
     bp.trainerConfig.lossFunction = BackpropLossFunction.CrossEntropy
     bp.trainerConfig.learningRate = .001

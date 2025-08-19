@@ -6,19 +6,21 @@ import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.setLabels
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.neurongroups.NeuronGroup
-import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedModel
+import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.network.trainers.splitDataSet
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.alignNetworkModels
 import org.simbrain.network.util.offsetNetworkModel
-import org.simbrain.util.*
+import org.simbrain.util.SmellSource
+import org.simbrain.util.applyFunction
+import org.simbrain.util.place
+import org.simbrain.util.point
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.sensors.SmellSensor
-import smile.math.matrix.Matrix
 
 
 val threeObjectDetector = newSim {
@@ -90,43 +92,47 @@ val threeObjectDetector = newSim {
     }
 
     val smells = buildList {
-        addAll(smellGenerator(gouda.smellSource))
-        addAll(smellGenerator(blueCheese.smellSource))
-        addAll(smellGenerator(fish.smellSource))
-    }.toTypedArray()
+        addAll(smellGenerator(gouda.smellSource).map { it.toMutableList() })
+        addAll(smellGenerator(blueCheese.smellSource).map { it.toMutableList() })
+        addAll(smellGenerator(fish.smellSource).map { it.toMutableList() })
+    }.toMutableList()
 
     val targets = buildList {
-        repeat(steps) { add(doubleArrayOf(1.0, 0.0, 0.0)) }
-        repeat(steps) { add(doubleArrayOf(0.0, 1.0, 0.0)) }
-        repeat(steps) { add(doubleArrayOf(0.0, 0.0, 1.0)) }
-    }.toTypedArray()
+        repeat(steps) { add(mutableListOf(1.0, 0.0, 0.0)) }
+        repeat(steps) { add(mutableListOf(0.0, 1.0, 0.0)) }
+        repeat(steps) { add(mutableListOf(0.0, 0.0, 1.0)) }
+    }.toMutableList()
 
-    val (training, testing) = splitDataSet(Matrix.of(smells), Matrix.of(targets), 0.8)
+    val (training, testing) = splitDataSet(smells, targets, 0.8)
 
     val (testingInputs, testingTargets) = testing
 
     val trainingInputs = training.let { (i, _) ->
         buildList {
-            addAll(i.toArray())
-            add(doubleArrayOf(0.0, 0.0, 0.0))
-        }.toTypedArray().toMatrix()
+            addAll(i)
+            add(mutableListOf(0.0, 0.0, 0.0))
+        }.toMutableList()
     }
 
     val trainingTargets = training.let { (_, t) ->
         buildList {
-            addAll(t.toArray())
-            add(doubleArrayOf(0.0, 0.0, 0.0))
-        }.toTypedArray().toMatrix()
+            addAll(t)
+            add(mutableListOf(0.0, 0.0, 0.0))
+        }.toMutableList()
     }
 
-    sm.trainingSet = MatrixDataset(
+    sm.trainingSet = TrainingDataset(
         inputs = trainingInputs,
-        targets = trainingTargets
+        targets = trainingTargets,
+        inputSize = smells.first().size,
+        targetSize = targets.first().size
     )
 
-    sm.testingSet = MatrixDataset(
+    sm.testingSet = TrainingDataset(
         inputs = testingInputs,
-        targets = testingTargets
+        targets = testingTargets,
+        inputSize = smells.first().size,
+        targetSize = targets.first().size
     )
 
     sm.trainerConfig.testConfiguration.enabled = true

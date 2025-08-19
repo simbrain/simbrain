@@ -1025,11 +1025,11 @@ class ClipboardTest {
         weights[1, 1] = 0.0
         weights[1, 2] = 1.0
         
-        network.addNetworkModelAsync(weightMatrix)
+        network.addNetworkModel(weightMatrix)
         
         // Create a supervised model using the arrays
         val supervisedModel = org.simbrain.network.trainers.SupervisedModel(sourceArray, targetArray)
-        network.addNetworkModelAsync(supervisedModel)
+        network.addNetworkModel(supervisedModel)
         
         // Add the supervised model to the clipboard
         Clipboard.add(listOf(supervisedModel))
@@ -1214,8 +1214,8 @@ class ClipboardTest {
         }
 
         // Add the arrays to the network
-        network.addNetworkModelAsync(sourceGroup)
-        network.addNetworkModelAsync(targetGroup)
+        network.addNetworkModel(sourceGroup)
+        network.addNetworkModel(targetGroup)
 
         // Create a weight matrix connecting the arrays
         val synapseGroup = SynapseGroup(sourceGroup, targetGroup)
@@ -1231,11 +1231,11 @@ class ClipboardTest {
 
         synapseGroup.setWeightMatrix(weights)
 
-        network.addNetworkModelAsync(synapseGroup)
+        network.addNetworkModel(synapseGroup)
 
         // Create a supervised model using the arrays
         val supervisedModel = org.simbrain.network.trainers.SupervisedModel(sourceGroup, targetGroup)
-        network.addNetworkModelAsync(supervisedModel)
+        network.addNetworkModel(supervisedModel)
 
         // Add the supervised model to the clipboard
         Clipboard.add(listOf(supervisedModel))
@@ -1410,8 +1410,8 @@ class ClipboardTest {
     @Test
     fun `test SupervisedModel with NeuronCollection copy paste`() = runBlocking {
 
-        val sourceNeurons = (0 until 3).map { Neuron().also { network.addNetworkModelAsync(it) } }
-        val targetNeurons = (0 until 2).map { Neuron().also { network.addNetworkModelAsync(it) } }
+        val sourceNeurons = (0 until 3).map { Neuron().also { network.addNetworkModel(it) } }
+        val targetNeurons = (0 until 2).map { Neuron().also { network.addNetworkModel(it) } }
 
         val sourceCollection = NeuronCollection(sourceNeurons).apply {
             label = "Source Group"
@@ -1423,8 +1423,8 @@ class ClipboardTest {
         }
 
         // Add the arrays to the network
-        network.addNetworkModelAsync(sourceCollection)
-        network.addNetworkModelAsync(targetCollection)
+        network.addNetworkModel(sourceCollection)
+        network.addNetworkModel(targetCollection)
 
         // Create a weight matrix connecting the arrays
         val synapseGroup = SynapseGroup(sourceCollection, targetCollection)
@@ -1440,11 +1440,11 @@ class ClipboardTest {
 
         synapseGroup.setWeightMatrix(weights)
 
-        network.addNetworkModelAsync(synapseGroup)
+        network.addNetworkModel(synapseGroup)
 
         // Create a supervised model using the arrays
         val supervisedModel = org.simbrain.network.trainers.SupervisedModel(sourceCollection, targetCollection)
-        network.addNetworkModelAsync(supervisedModel)
+        network.addNetworkModel(supervisedModel)
 
         // Add the supervised model to the clipboard
         Clipboard.add(listOf(supervisedModel))

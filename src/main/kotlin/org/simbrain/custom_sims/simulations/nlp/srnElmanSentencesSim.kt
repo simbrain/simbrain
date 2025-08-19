@@ -6,7 +6,7 @@ import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addTextWorld
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.subnetworks.SRNNetwork
-import org.simbrain.network.trainers.MatrixDataset
+import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.util.*
 import org.simbrain.world.textworld.EmbeddingType
 import org.simbrain.world.textworld.TokenEmbeddingBuilder
@@ -64,9 +64,9 @@ val srnElmanSentences = newSim {
     val trainingTargetTokens = trainingInputsTokens.drop(1)
     val trainingTarget = trainingInputs.shiftUpAndPadEndWithZero()
 
-    srn.trainingSet = MatrixDataset(
-        trainingInputs,
-        trainingTarget,
+    srn.trainingSet = TrainingDataset(
+        inputs = trainingInputs.toArray().map { it.toMutableList() }.toMutableList(),
+        targets = trainingTarget.toArray().map { it.toMutableList() }.toMutableList(),
         inputRowNames = trainingInputsTokens,
         inputColumnNames = textWorldInputs.world.tokenEmbedding.tokens,
         targetRowNames = trainingTargetTokens,

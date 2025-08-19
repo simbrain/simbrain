@@ -4,8 +4,8 @@ import org.simbrain.custom_sims.*
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.trainers.BackpropLossFunction
-import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedModel
+import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.network.trainers.splitDataSet
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.updaterules.SoftmaxRule
@@ -16,10 +16,8 @@ import org.simbrain.network.util.offsetNetworkModel
 import org.simbrain.util.getFilesWithExtension
 import org.simbrain.util.math.SigmoidFunctionEnum
 import org.simbrain.util.place
-import org.simbrain.util.setRow
 import org.simbrain.world.imageworld.filters.EdgeDetectionFilter
 import org.simbrain.world.imageworld.filters.ResizeOperation
-import smile.math.matrix.Matrix
 
 /**
  * Load image world with photo album coupled to a 100x100 neuron array.
@@ -104,45 +102,42 @@ val photoAlbumExample = newSim {
     val categoryNames = listOf("bird", "crocodile", "flower", "plane")
     val categoryIndices = categoryNames.withIndex().associate { it.value to it.index }
     
-    // Prepare input matrix (40 images x 10000 pixels)
-    val numImages = imageFiles.size
-    val inputSize = 100 * 100
-
-    val inputs = Matrix(numImages, inputSize)
-    val targets = Matrix(numImages, 4)
+    // Prepare input and target lists
+    val inputs = mutableListOf<MutableList<Double>>()
+    val targets = mutableListOf<MutableList<Double>>()
     
     // Load each image and create training data
-    imageFiles.forEachIndexed { index, imageFile ->
+    imageFiles.forEach { imageFile ->
         // Set the current image to load its pixel data
-        imageWorld.imageAlbum.setFrame(index)
+        imageWorld.imageAlbum.setFrame(imageFiles.indexOf(imageFile))
         workspace.simpleIterate() // Update to load the image
         
         // Get pixel values from the current filter
         val pixelValues = imageWorld.imagePipelineCollection.currentPipeline.brightness
-        inputs.setRow(index, pixelValues)
+        inputs.add(pixelValues.toMutableList())
         
         // Create one-hot encoded target based on image category
         val imageName = imageFile.nameWithoutExtension
         val category = imageName.takeWhile { !it.isDigit() }
         val categoryIndex = categoryIndices[category] ?: 0
         
-        // Create one-hot encoded target manually as DoubleArray
-        val oneHotTarget = DoubleArray(4) { 0.0 }
+        // Create one-hot encoded target
+        val oneHotTarget = MutableList(4) { 0.0 }
         oneHotTarget[categoryIndex] = 1.0
-        targets.setRow(index, oneHotTarget)
+        targets.add(oneHotTarget)
     }
 
-    // Change split ratio to 1.0 for all training / no testing
+    // Split data into training and testing
     val (training, testing) = splitDataSet(inputs, targets, .8)
     val (trainingInputs, trainingTargets) = training
     val (testingInputs, testingTargets) = testing
     
     // Set training data for supervised model
-    supervisedModel.trainingSet = MatrixDataset(
+    supervisedModel.trainingSet = TrainingDataset(
         inputs = trainingInputs,
         targets = trainingTargets,
     )
-    supervisedModel.testingSet = MatrixDataset(
+    supervisedModel.testingSet = TrainingDataset(
         inputs = testingInputs,
         targets = testingTargets,
     )

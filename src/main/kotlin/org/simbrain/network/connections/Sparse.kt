@@ -91,6 +91,8 @@ class Sparse @JvmOverloads constructor(
 
     override fun toString() = name
 
+    override fun tooltipText(): String = "Sparse (${(connectionDensity * 100).toInt()}%)"
+
     override fun copy(): Sparse {
         return Sparse(connectionDensity, equalizeEfferents, allowSelfConnection).also {
             commonCopy(it)

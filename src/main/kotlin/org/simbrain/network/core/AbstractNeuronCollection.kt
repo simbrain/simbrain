@@ -478,8 +478,10 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
     override fun onCommit() {}
 
     override fun toString(): String {
-        return "$id with ${this.activationArray.size} activations: ${Utils.getTruncatedArrayString(
-            this.activationArray, 10)}"
+        return """
+            Name: $displayName ($shapeString)
+            Activations: ${Utils.getTruncatedArrayString(activationArray, 10)}
+        """.trimIndent()
     }
 
     override fun clearInputs() {

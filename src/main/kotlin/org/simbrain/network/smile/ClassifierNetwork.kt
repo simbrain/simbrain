@@ -92,6 +92,7 @@ class ClassifierNetwork(
         events.updated.fire()
     }
 
+
     override fun toString(): String {
         return "${label} (${classifier.name}): ${classifier.trainingData.inputs.first().size} -> $outputSize"
     }

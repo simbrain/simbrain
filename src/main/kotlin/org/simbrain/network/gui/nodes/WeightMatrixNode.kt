@@ -132,7 +132,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
     override val isDraggable: Boolean = false
 
     override val toolTipText: String
-        get() = weightMatrix.toString()
+        get() = createTooltipText(weightMatrix)
 
     override val contextMenu: JPopupMenu
         get() {

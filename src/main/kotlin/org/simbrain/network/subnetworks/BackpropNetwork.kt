@@ -72,6 +72,19 @@ class BackpropNetwork : FeedForward, SupervisedNetwork {
         layers.forwardPass(listOf(inputLayer.activations), listOf(inputLayer))
     }
 
+    override fun toString(): String {
+        val hiddenLayerSizes = hiddenLayers().map { it.size }
+        val hiddenInfo = if (hiddenLayerSizes.isEmpty()) "None" 
+                        else hiddenLayerSizes.joinToString(", ")
+        return """
+            Name: $displayName
+            Type: Backprop Network
+            Input Layer: ${inputLayer.size} neurons
+            Hidden Layers: $hiddenInfo
+            Output Layer: ${outputLayer.size} neurons
+        """.trimIndent()
+    }
+
     override fun copy(): BackpropNetwork {
         // Create a new instance with same structure
         val nodesPerLayer = layerList.map { it.size }.toIntArray()

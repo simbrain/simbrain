@@ -181,6 +181,15 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
         randomizeLayers()
     }
 
+    override fun toString(): String {
+        return """
+            Name: $displayName
+            Type: Restricted Boltzmann Machine
+            Visible Layer: ${visibleLayer.size} units
+            Hidden Layer: ${hiddenLayer.size} units
+        """.trimIndent()
+    }
+
     override fun copy(): RestrictedBoltzmannMachine {
         val copy = RestrictedBoltzmannMachine(visibleLayer.size, hiddenLayer.size)
 

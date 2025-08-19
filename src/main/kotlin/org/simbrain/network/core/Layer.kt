@@ -197,4 +197,6 @@ abstract class Layer : LocatableModel(), AttributeContainer, CopyableObject {
             field.setLocation(location)
             events.locationChanged.fire()
         }
+
+    open val shapeString: String get() = "$size x 1"
 }

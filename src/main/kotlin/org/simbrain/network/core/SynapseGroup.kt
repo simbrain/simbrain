@@ -5,6 +5,8 @@ import org.simbrain.network.events.SynapseGroupEvents
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.SynapseNode
 import org.simbrain.util.SimbrainConstants
+import org.simbrain.util.Utils
+import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.showWarningDialog
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
@@ -159,8 +161,15 @@ class SynapseGroup @JvmOverloads constructor(
         this.synapses.forEach { it.toggleClamping() }
     }
 
+
     override fun toString(): String {
-        return ("$displayName  with ${size()} synapse(s) from ${source.displayName} to ${target.displayName}")
+        return """
+            Name: $displayName
+            Size: ${size()} synapses
+            Source: ${source.displayName}
+            Target: ${target.displayName} 
+            Connection Strategy: ${connectionStrategy.tooltipText()}
+        """.trimIndent()
     }
 
     suspend fun applyConnectionStrategy() {

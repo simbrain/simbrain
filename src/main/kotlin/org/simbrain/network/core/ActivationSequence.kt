@@ -109,6 +109,16 @@ class ActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inpu
         events.updated.fire()
     }
 
+    override fun toString(): String {
+        return """
+                Name: $displayName
+                Input Size: $inputSize 
+                Sequence Size: $sequenceSize 
+            """.trimIndent()
+    }
+
+    override val shapeString: String get() = "$sequenceSize x $inputSize"
+
     override fun clear() {
         activations.fill(0.0)
         events.updated.fire()

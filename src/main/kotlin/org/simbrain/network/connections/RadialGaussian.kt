@@ -129,6 +129,8 @@ class RadialGaussian(
         return "Radial (Gaussian)"
     }
 
+    override fun tooltipText(): String = "Radial Gaussian (λ=${lambda.toInt()})"
+
     override fun copy(): RadialGaussian {
         return RadialGaussian(eeDistConst, eiDistConst, ieDistConst, iiDistConst, distConst, lambda).also {
             commonCopy(it)

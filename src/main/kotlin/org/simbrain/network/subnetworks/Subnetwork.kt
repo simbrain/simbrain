@@ -115,10 +115,6 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
     val flatSynapseList: List<Synapse>
         get() = modelList[Synapse::class.java].toList()
 
-    override fun toString(): String {
-        return "$id: ${javaClass.simpleName}\n${modelList.all.joinToString("\n") { it.toString().indent(2) }}"
-    }
-
     override val name: String
         get() = "" + javaClass.simpleName
 
@@ -139,7 +135,7 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
         set(newLocation) {
             val delta = newLocation - location
             locatableModels.forEach { it.location += delta }
-            customInfo?.location += delta
+            customInfo?.let { it.location += delta }
         }
 
     /**

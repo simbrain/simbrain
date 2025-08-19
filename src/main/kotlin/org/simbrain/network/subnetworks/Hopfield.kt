@@ -139,6 +139,14 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
             customInfo, Direction.NORTH, 40.0, neuronGroupBound.height, neuronGroupBound.width, 24.0, 0.0)
     }
 
+    override fun toString(): String {
+        return """
+            Name: $displayName
+            Type: Hopfield Network
+            Neurons: ${neuronGroup.size}
+        """.trimIndent()
+    }
+
     override fun copy(): Hopfield {
         val copy = Hopfield()
 

@@ -134,7 +134,6 @@ class PointNeuronRule : SpikingNeuronUpdateRule<PointNeuronScalarData, SpikingMa
     )
     var leakConductance: Double = .1
 
-
     var toolTipString = ""
 
     /**
@@ -215,10 +214,10 @@ class PointNeuronRule : SpikingNeuronUpdateRule<PointNeuronScalarData, SpikingMa
         data.membranePotential += timeStep * netCurrent
 
         toolTipString = """
-            membrane potential ${data.membranePotential.roundToString(2)}<br>
-            excitatory conductance ${data.excitatoryConductance.roundToString(2)}<br>
-            inhibitory conductance ${data.inhibitoryConductance.roundToString(2)}<br>
-            leak current ${leakCurrent.roundToString(2)}
+            Membrane potential: ${data.membranePotential.roundToString(2)}<br>
+            Excitatory conductance: ${data.excitatoryConductance.roundToString(2)}<br>
+            Inhibitory conductance: ${data.inhibitoryConductance.roundToString(2)}<br>
+            Leak current: ${leakCurrent.roundToString(2)}
         """.trimIndent()
 
 //        println(toolTipString)
@@ -273,7 +272,7 @@ class PointNeuronRule : SpikingNeuronUpdateRule<PointNeuronScalarData, SpikingMa
         return neuron.fanIn.filter { it.strength < 0.0 }.sumOf { abs(it.psr) }.clip(0.0..1.0)
     }
 
-    override fun getToolTipText(neuron: Neuron): String? {
+    override fun getToolTipText(neuron: Neuron): String {
         return toolTipString
     }
 

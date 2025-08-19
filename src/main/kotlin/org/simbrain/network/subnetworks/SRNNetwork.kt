@@ -149,6 +149,17 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
         }
     }
 
+    override fun toString(): String {
+        return """
+            Name: $displayName
+            Type: SRN Network
+            Input Layer: ${inputLayer.size} neurons
+            Hidden Layer: ${hiddenLayer.size} neurons
+            Context Layer: ${contextLayer.size} neurons
+            Output Layer: ${outputLayer.size} neurons
+        """.trimIndent()
+    }
+
     override fun copy(): SRNNetwork {
         val copy = SRNNetwork(inputLayer.size, hiddenLayer.size, outputLayer.size)
 

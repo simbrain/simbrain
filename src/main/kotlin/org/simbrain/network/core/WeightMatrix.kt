@@ -282,9 +282,10 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
     }
 
     override fun toString(): String {
-        return (id
-                + " (" + weights.nrow() + "x" + weights.ncol() + ") "
-                + "connecting " + source.id + " to " + target.id)
+        return """
+            Name: $displayName (${weights.nrow()} x ${weights.ncol()})
+            Source: ${source.id}
+            Target: ${target.id}""".trimIndent()
     }
 
     fun updateMasks() {

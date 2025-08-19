@@ -6,6 +6,7 @@ import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.network.util.SpikingScalarData
 import org.simbrain.util.UserParameter
 import org.simbrain.util.Utils.round
+import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 
@@ -180,8 +181,11 @@ open class IntegrateAndFireRule : SpikingNeuronUpdateRule<SpikingScalarData, Spi
     }
 
     override fun getToolTipText(neuron: Neuron): String {
-        return "${neuron.id}  Location: ( ${neuron.x.toInt()}, ${neuron.x.toInt()}). " +
-                "Activation (Membrane Potential): ${round(neuron.activation, 3)}"
+        return """
+            Name: $neuron.displayName
+            Update rule: $name 
+            Activation (Membrane Potential): ${round(neuron.activation, 3)}
+        """.trimIndent()
     }
 
     override val name = "Integrate and Fire"

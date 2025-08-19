@@ -103,6 +103,15 @@ class CompetitiveNetwork : Subnetwork, UnsupervisedNetwork {
         competitive.normalizeIncomingWeights()
     }
 
+    override fun toString(): String {
+        return """
+            Name: $displayName
+            Type: Competitive Network
+            Input Layer: ${inputLayer.size} neurons
+            Competitive Layer: ${competitive.size} neurons
+        """.trimIndent()
+    }
+
     override fun copy(): CompetitiveNetwork {
         val copy = CompetitiveNetwork()
 

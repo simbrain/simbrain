@@ -172,7 +172,10 @@ class SupervisedModel(
     }
 
     override fun toString(): String {
-        val models = layers + weightMatrices + synapseGroups
-        return "$displayName: ${models.joinToString("\n") { it.toString().indent(2) }}"
+        return """
+                Name: $displayName
+                Input: ${inputLayer.displayName} (${inputLayer.shapeString}) 
+                Output: ${outputLayer.displayName} (${outputLayer.shapeString}) 
+            """.trimIndent()
     }
 }

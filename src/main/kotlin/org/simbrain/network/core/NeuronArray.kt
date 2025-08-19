@@ -270,9 +270,8 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
 
     override fun toString(): String {
         return """
-            $id with ${this.activations.size()} components.
+            Name: $displayName ($shapeString)
             Activations: ${Utils.getTruncatedArrayString(activationArray, 10)}
-            $dataHolder
         """.trimIndent()
     }
 

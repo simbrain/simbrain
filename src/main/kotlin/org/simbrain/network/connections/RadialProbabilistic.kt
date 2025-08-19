@@ -119,6 +119,8 @@ class RadialProbabilistic(
         return name
     }
 
+    override fun tooltipText(): String = "Radial Prob (r=${excitatoryRadius.toInt()})"
+
     override fun copy(): RadialProbabilistic {
         return RadialProbabilistic(
             excitatoryProbability, inhibitoryProbability, excitatoryRadius, inhibitoryRadius, allowSelfConnections

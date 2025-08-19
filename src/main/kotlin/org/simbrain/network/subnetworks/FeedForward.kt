@@ -107,6 +107,20 @@ open class FeedForward : Subnetwork {
 
     fun hiddenLayers() = layerList.drop(1).take(layerList.size-2)
 
+    override fun toString(): String {
+        val hiddenLayerSizes = hiddenLayers().map { it.size }
+        val hiddenInfo = if (hiddenLayerSizes.isEmpty()) "None" 
+                        else hiddenLayerSizes.joinToString(", ")
+        return """
+            Name: $displayName
+            Type: Feed Forward Network
+            Input Layer: ${inputLayer.size} neurons
+            Hidden Layers: $hiddenInfo
+            Output Layer: ${outputLayer.size} neurons
+            Total Layers: ${layerList.size}
+        """.trimIndent()
+    }
+
     override fun copy(): FeedForward {
         val copy = FeedForward()
         copy.betweenLayerInterval = betweenLayerInterval

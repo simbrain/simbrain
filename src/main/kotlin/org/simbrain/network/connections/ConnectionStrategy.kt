@@ -87,6 +87,12 @@ abstract class ConnectionStrategy(seed: Long = Random.nextLong()) : CopyableObje
 
     override fun getTypeList() = connectionTypes
 
+    /**
+     * Provides tooltip text for display in GUI components.
+     * Subclasses can override to provide strategy-specific information.
+     */
+    open fun tooltipText(): String = name
+
 }
 
 val connectionTypes = listOf(

@@ -93,6 +93,15 @@ class SOMNetwork : Subnetwork, UnsupervisedNetwork {
         som.randomizeIncomingWeights(randomizer)
     }
 
+    override fun toString(): String {
+        return """
+            Name: $displayName
+            Type: SOM Network
+            Input Layer: ${inputLayer.size} neurons
+            SOM Layer: ${som.size} neurons
+        """.trimIndent()
+    }
+
     override fun copy(): SOMNetwork {
         val copy = SOMNetwork()
 

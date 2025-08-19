@@ -60,6 +60,12 @@ fun NetworkPanel.createConditionallyEnabledAction(
 inline fun <reified T: NetworkModel> NetworkPanel.filterSelectedModelByClass(): List<T> = selectionManager.selectedModels.filterIsInstance<T>()
 inline fun <reified T: ScreenElement> NetworkPanel.filterSelectedNodeByClass(): List<T> = selectionManager.selection.filterIsInstance<T>()
 
+fun createTooltipText(networkModel: NetworkModel, convertToHtml: Boolean = true, stringSupplier: (NetworkModel) -> String = { it.toString() }) = """
+        <html>
+        ${stringSupplier(networkModel).let { if (convertToHtml) it.split("\n").joinToString("<br>") else it }} <br>
+        </html>
+    """.trimIndent()
+
 fun createTooltipTextWithLocation(locatableModel: LocatableModel, convertToHtml: Boolean = true, stringSupplier: (LocatableModel) -> String = { it.toString() }) = """
         <html>
         ${stringSupplier(locatableModel).let { if (convertToHtml) it.split("\n").joinToString("<br>") else it }} <br>

@@ -82,6 +82,8 @@ class FixedDegree(
         return name
     }
 
+    override fun tooltipText(): String = "Fixed Degree ($degree)"
+
     override fun copy(): FixedDegree {
         return FixedDegree(degree, direction, useRadius, radius, allowSelfConnections).also {
             commonCopy(it)

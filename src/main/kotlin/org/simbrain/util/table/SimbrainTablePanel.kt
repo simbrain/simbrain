@@ -377,11 +377,6 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
 
     fun deleteSelectedRows() {
         for (i in 0 until selectedRows.size) {
-            // Allowing removal of all rows causes weird behavior, so we just aren't allowing it
-            //  TODO: Empty tables should be possible.
-            if (rowCount <= 1) {
-                break
-            }
             model.deleteRow(selectedRow, false)
         }
         model.fireTableStructureChanged()

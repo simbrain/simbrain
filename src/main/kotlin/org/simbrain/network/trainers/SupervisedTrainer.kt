@@ -169,7 +169,7 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
                 }
             }
         }
-        val testError = if (config.testConfiguration.enabled && iteration % config.testConfiguration.testFrequency == 1) {
+        val testError = if (config.testConfiguration.enabled && supervisedNetwork.testingSet.size > 0 && iteration % config.testConfiguration.testFrequency == 1) {
             computeTestError()
         } else {
             null

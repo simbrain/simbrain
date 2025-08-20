@@ -20,7 +20,6 @@ import org.simbrain.util.table.*
 import org.simbrain.util.widgets.ToggleButton
 import java.awt.Cursor
 import java.awt.Dimension
-import java.awt.FlowLayout
 import javax.swing.*
 
 fun TrainingDataset.createDataSetPanel(applyAction: suspend DataSetPanel.(selectedRow: Int) -> Unit): DataSetPanel {
@@ -52,6 +51,15 @@ fun TrainingDataset.createDataSetPanel(applyAction: suspend DataSetPanel.(select
     return DataSetPanel(inputDataFrame, targetDataFrame, applyAction = applyAction)
 }
 
+fun SimbrainTablePanel.applyCommonTrainerAttributes() {
+    addAction(table.importCsv)
+    addAction(table.exportCsv())
+    addAction(table.randomizeAction)
+    addAction(table.showBoxPlotAction)
+    addAction(table.showHistogramAction)
+    preferredSize = Dimension(400, 250)
+}
+
 class DataSetPanel(
     val inputDataFrame: BasicDataFrame,
     val targetDataFrame: BasicDataFrame,
@@ -60,17 +68,8 @@ class DataSetPanel(
 
     val rowErrorJLabel = JLabel("")
 
-    fun SimbrainTablePanel.applyCommonAttributes() {
-        addAction(table.importCsv)
-        addAction(table.exportCsv())
-        addAction(table.randomizeAction)
-        addAction(table.showBoxPlotAction)
-        addAction(table.showHistogramAction)
-        preferredSize = Dimension(400, 250)
-    }
-
     val inputs = SimbrainTablePanel(inputDataFrame, false).apply {
-        applyCommonAttributes()
+        applyCommonTrainerAttributes()
         toolbar.addSeparator()
         val advanceRowCheckbox = JCheckBox("Auto advance").apply { isSelected = true }
         toolbar.add(
@@ -87,7 +86,7 @@ class DataSetPanel(
     }
 
     val targets = SimbrainTablePanel(targetDataFrame, false).apply {
-        applyCommonAttributes()
+        applyCommonTrainerAttributes()
     }
 
     val addRemoveRows = AddRemoveRows(listOf(inputs.table, targets.table))
@@ -262,70 +261,52 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         })
         runControls.add(preferencesButton)
 
-        // Create data panels for training and testing data
-        fun createUnsupervisedDataPanel(data: MutableList<MutableList<Double>>, label: String): JPanel {
-            val panel = JPanel().apply {
-                layout = MigLayout("gap 0px 0px, ins 0")
-            }
-            
-            // Use explicit column creation like supervised training to prevent index out of range
+        // Create data frame for unsupervised data with explicit columns like DataSetPanel
+        fun createUnsupervisedDataFrame(data: MutableList<MutableList<Double>>): BasicDataFrame {
             val inputSize = unsupervisedNetwork.inputLayer.size
-            
-            // Create explicit columns to prevent column index out of range errors
             val columns = (0 until inputSize).map { i ->
                 Column("Input ${i + 1}", Column.DataType.DoubleType)
             }.toMutableList()
             
-            val dataFrame = BasicDataFrame(
+            return BasicDataFrame(
                 data.copy().map { it.map { value -> value as Any? }.toMutableList() }.toMutableList(),
                 columns
             )
-            val tablePanel = SimbrainTablePanel(dataFrame)
-            
-            val advanceRowCheckbox = JCheckBox("Auto advance").apply { isSelected = true }
-            val applyButton = JButton("Apply inputs").apply {
-                addActionListener {
-                    val selectedRow = tablePanel.table.selectedRow
-                    if (selectedRow >= 0) {
-                        unsupervisedNetwork.inputLayer.setActivations(dataFrame.getRow<Double>(selectedRow).toDoubleArray())
-                        trainAction(network)
-                        if (advanceRowCheckbox.isSelected) {
-                            tablePanel.table.incrementSelectedRow()
-                        }
-                    }
-                }
-            }
-            
-            val toolbar = JPanel().apply {
-                layout = FlowLayout(FlowLayout.LEFT)
-                add(applyButton)
-                add(advanceRowCheckbox)
-            }
-            
-            panel.add(toolbar, "span, growx, wrap")
-            panel.add(tablePanel, "span, grow")
-
-            return panel
         }
 
-        val trainingDataPanel = createUnsupervisedDataPanel(unsupervisedNetwork.trainingData, "Training")
-        val testingDataPanel = createUnsupervisedDataPanel(unsupervisedNetwork.testingData, "Testing")
+        // Create data panels for training and testing data
+        fun createUnsupervisedDataPanel(data: MutableList<MutableList<Double>>) = object : JPanel() {
+            val dataFrame = createUnsupervisedDataFrame(data)
+            val tablePanel = SimbrainTablePanel(dataFrame, false).apply {
+                applyCommonTrainerAttributes()
+                toolbar.addSeparator()
+                val advanceRowCheckbox = JCheckBox("Auto advance").apply { isSelected = true }
+                toolbar.add(
+                    table.createApplyAction("Apply inputs") {
+                        unsupervisedNetwork.inputLayer.setActivations(dataFrame.getRow<Double>(it).toDoubleArray())
+                        trainAction(network)
+                        if (advanceRowCheckbox.isSelected) {
+                            incrementSelectedRow()
+                        }
+                    }
+                )
+                toolbar.add(advanceRowCheckbox)
+            }
+            val addRemoveRows = AddRemoveRows(listOf(tablePanel.table))
+            init {
+                layout = MigLayout("gap 0px 0px, ins 0")
+                add(tablePanel, "wrap")
+                add(addRemoveRows)
+            }
+        }
+
+        val trainingDataPanel = createUnsupervisedDataPanel(unsupervisedNetwork.trainingData)
+        val testingDataPanel = createUnsupervisedDataPanel(unsupervisedNetwork.testingData)
 
         fun syncDataSet() {
             // Extract data from the table panels and update the network's data
-            val trainingTablePanel = trainingDataPanel.components
-                .filterIsInstance<SimbrainTablePanel>()
-                .firstOrNull()
-            val testingTablePanel = testingDataPanel.components
-                .filterIsInstance<SimbrainTablePanel>()
-                .firstOrNull()
-                
-            trainingTablePanel?.let { panel ->
-                unsupervisedNetwork.trainingData = panel.table.model.get2DDoubleList().toMutableListOfLists()
-            }
-            testingTablePanel?.let { panel ->
-                unsupervisedNetwork.testingData = panel.table.model.get2DDoubleList().toMutableListOfLists()
-            }
+            unsupervisedNetwork.trainingData = trainingDataPanel.tablePanel.table.model.get2DDoubleList().toMutableListOfLists()
+            unsupervisedNetwork.testingData = testingDataPanel.tablePanel.table.model.get2DDoubleList().toMutableListOfLists()
         }
 
         val dataSetTabPane = JTabbedPane().apply {

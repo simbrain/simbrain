@@ -34,7 +34,7 @@ class SOMNetwork : Subnetwork, UnsupervisedNetwork {
 
     override lateinit var trainingData: MutableList<MutableList<Double>>
 
-    override lateinit var testingData: MutableList<MutableList<Double>>
+    override var testingData: MutableList<MutableList<Double>> = mutableListOf()
 
     constructor(numInputNeurons: Int, numSOMNeurons: Int): super() {
         som = SOMGroup(numSOMNeurons)

@@ -5,7 +5,6 @@ import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.trainers.UnsupervisedNetwork
 import org.simbrain.network.trainers.UnsupervisedTrainer
-import org.simbrain.network.trainers.splitDataSet
 import org.simbrain.network.updaterules.BinaryRule
 import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.Direction
@@ -31,7 +30,7 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
 
     override lateinit var trainingData: MutableList<MutableList<Double>>
 
-    override lateinit var testingData: MutableList<MutableList<Double>>
+    override var testingData: MutableList<MutableList<Double>> = mutableListOf()
 
     @UserParameter(label = "Update function")
     var updateFunc = HopfieldUpdate.SYNC
@@ -43,10 +42,7 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
 
     constructor(numNeurons: Int): super() {
 
-        val initialData = randomMutableList(10, numNeurons)
-        val (training, testing) = splitDataSet(initialData, 0.8)
-        this.trainingData = training
-        this.testingData = testing
+        this.trainingData = randomMutableList(10, numNeurons)
 
         // Create main neuron group
         neuronGroup = NeuronGroup(numNeurons)

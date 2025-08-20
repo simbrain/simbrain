@@ -4,7 +4,6 @@ import org.simbrain.network.core.*
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.trainers.UnsupervisedNetwork
 import org.simbrain.network.trainers.UnsupervisedTrainer
-import org.simbrain.network.trainers.splitDataSet
 import org.simbrain.network.trainers.updateBiases
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.util.Alignment
@@ -36,7 +35,7 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
 
     override lateinit var trainingData: MutableList<MutableList<Double>>
 
-    override lateinit var testingData: MutableList<MutableList<Double>>
+    override var testingData: MutableList<MutableList<Double>> = mutableListOf()
 
     override val inputLayer: NeuronArray
         get() = visibleLayer
@@ -48,10 +47,7 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
     override val trainer = UnsupervisedTrainer()
 
     constructor(numVisibleNodes: Int, numHiddenNodes: Int): super() {
-        val initialData = randomMutableList(defaultRowsInputData, numVisibleNodes)
-        val (training, testing) = splitDataSet(initialData, 0.8)
-        this.trainingData = training
-        this.testingData = testing
+        trainingData = randomMutableList(defaultRowsInputData, numVisibleNodes)
         
         visibleLayer = NeuronArray(numVisibleNodes).apply {
             label = "Visible layer"

@@ -77,6 +77,15 @@ class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: Super
             add(renameAction)
             add(removeAction)
             addSeparator()
+            add(createAction("Add Current Data to Training Set") {
+                supervisedModel.trainingSet.inputs.add(supervisedModel.inputLayer.activationArray.toMutableList())
+                supervisedModel.trainingSet.targets.add(supervisedModel.outputLayer.activationArray.toMutableList())
+            })
+            add(createAction("Add Current Data to Testing Set") {
+                supervisedModel.testingSet.inputs.add(supervisedModel.inputLayer.activationArray.toMutableList())
+                supervisedModel.testingSet.targets.add(supervisedModel.outputLayer.activationArray.toMutableList())
+            })
+            addSeparator()
             add(createApplyImmediateLearningAction())
         }
 

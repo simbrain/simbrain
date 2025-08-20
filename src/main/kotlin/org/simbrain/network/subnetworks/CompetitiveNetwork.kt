@@ -7,7 +7,6 @@ import org.simbrain.network.neurongroups.CompetitiveGroup
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.trainers.UnsupervisedNetwork
 import org.simbrain.network.trainers.UnsupervisedTrainer
-import org.simbrain.network.trainers.splitDataSet
 import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.alignNetworkModels
@@ -31,7 +30,7 @@ class CompetitiveNetwork : Subnetwork, UnsupervisedNetwork {
 
     override lateinit var trainingData: MutableList<MutableList<Double>>
 
-    override lateinit var testingData: MutableList<MutableList<Double>>
+    override var testingData: MutableList<MutableList<Double>> = mutableListOf()
 
     val defaultRowsInputData = 10
 
@@ -43,10 +42,7 @@ class CompetitiveNetwork : Subnetwork, UnsupervisedNetwork {
 
     constructor(numInputNeurons: Int, numCompetitiveNeurons: Int): super() {
 
-        val initialData = randomMutableList(defaultRowsInputData, numInputNeurons)
-        val (training, testing) = splitDataSet(initialData, 0.8)
-        this.trainingData = training
-        this.testingData = testing
+        trainingData = randomMutableList(defaultRowsInputData, numInputNeurons)
 
         competitive = CompetitiveGroup(numCompetitiveNeurons)
         competitive.label = "Competitive Group"

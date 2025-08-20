@@ -140,8 +140,8 @@ val simulations = dir("Simulations", alphabetical = true ) {
     dir("Recurrent networks") {
         item("Recurrent net") { recurrentProjection }
         item("Recurrent net (array)") { recurrentNetArrayBased }
-        item("IAC Jets Sharks 5 People") { iacJetsSharks5People }
-        item("Spivey net") { spiveyNet }
+        item("IAC Jets Sharks 5 people") { iacJetsSharks5People }
+        item("Mouse and eye tracking") { spiveyNet }
     }
 
     dir("Reinforcement learning") {

@@ -224,7 +224,7 @@ class WorkspaceActions {
         createComponentFactoryAction("Odor World", "menu_icons/mouse_icon.png"),
         createComponentFactoryAction("Image World", "menu_icons/camera.png"),
         createComponentFactoryAction("Text World", "menu_icons/Text.png"),
-        createComponentFactoryAction("Sound World", "menu_icons/speaker.png")
+        //createComponentFactoryAction("Sound World", "menu_icons/speaker.png")
     )
 
     fun <T: WorkspaceComponent> createImportAction(desktopComponent: DesktopComponent<T>) = desktopComponent.createAction(

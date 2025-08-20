@@ -6,7 +6,6 @@ import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.neurongroups.SOMGroup
 import org.simbrain.network.trainers.UnsupervisedNetwork
 import org.simbrain.network.trainers.UnsupervisedTrainer
-import org.simbrain.network.trainers.splitDataSet
 import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.alignNetworkModels
@@ -51,10 +50,7 @@ class SOMNetwork : Subnetwork, UnsupervisedNetwork {
         inputLayer.label = "Input layer"
         inputLayer.isClamped = true
 
-        val initialData = randomMutableList(10, numInputNeurons)
-        val (training, testing) = splitDataSet(initialData, 0.8)
-        this.trainingData = training
-        this.testingData = testing
+        trainingData = randomMutableList(10, numInputNeurons)
 
         // Connect layers
         val sg = SynapseGroup(inputLayer, som, AllToAll())
@@ -93,15 +89,6 @@ class SOMNetwork : Subnetwork, UnsupervisedNetwork {
         som.randomizeIncomingWeights(randomizer)
     }
 
-    override fun toString(): String {
-        return """
-            Name: $displayName
-            Type: SOM Network
-            Input Layer: ${inputLayer.size} neurons
-            SOM Layer: ${som.size} neurons
-        """.trimIndent()
-    }
-
     override fun copy(): SOMNetwork {
         val copy = SOMNetwork()
 
@@ -117,7 +104,6 @@ class SOMNetwork : Subnetwork, UnsupervisedNetwork {
 
         // Copy input data
         copy.trainingData = trainingData.copy()
-        copy.testingData = testingData.copy()
 
         val neuronMap = mutableMapOf<Neuron, Neuron>()
 

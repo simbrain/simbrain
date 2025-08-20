@@ -25,13 +25,6 @@ import java.io.File
 
 class TinyLanguageModelOptions(var showEmbeddingDimension: Boolean = true): EditableObject {
 
-    var samplingStrategy: SamplingStrategy by GuiEditable(
-        initValue = SamplingStrategy.TopK(k = 5),
-        description = "How to sample from softmax to produce new tokens",
-        showDetails = false,
-        order = 0,
-    )
-
     var contextSize by GuiEditable(
         initValue = 24,
         description = "Number of tokens in a context window",
@@ -48,9 +41,15 @@ class TinyLanguageModelOptions(var showEmbeddingDimension: Boolean = true): Edit
     var trainerTextPath by GuiEditable(
         initValue = simulationsPath / "texts" / "casual_texting_small.txt",
         description = "Text used to train the model",
-        tab = "Text Parsing",
-        order = 10,
+        order = 30,
         useFileChooser = true,
+    )
+
+    var samplingStrategy: SamplingStrategy by GuiEditable(
+        initValue = SamplingStrategy.TopK(k = 5),
+        description = "How to sample from softmax to produce new tokens",
+        showDetails = false,
+        order = 40,
     )
 
     var tokenizer by GuiEditable(

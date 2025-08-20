@@ -243,7 +243,7 @@ class SynapseNode(
      * strength.
      */
     fun updateDiameter() {
-        val diameter: Double
+        val diameter: kotlin.Double
 
         var upperBound = synapse.upperBound
         var lowerBound = synapse.lowerBound

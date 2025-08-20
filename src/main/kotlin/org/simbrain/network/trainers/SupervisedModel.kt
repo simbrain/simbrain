@@ -42,15 +42,13 @@ class SupervisedModel(
     override var testingSet: TrainingDataset
 
     init {
-        val nrows = max(inputLayer.size, outputLayer.size)
 
-        val inputs = identityMutableList(nrows, inputLayer.size)
-        val targets = identityMutableList(nrows, outputLayer.size)
-
-        val (trainingData, testingData) = splitDataSet(inputs, targets, trainTestSplit)
-
-        val (trainingInputs, trainingTargets) = trainingData
-        val (testingInputs, testingTargets) = testingData
+        val initialData = createSimpleBinaryDataset(inputLayer.size, outputLayer.size)
+        val (trainingData, testingData) = splitDataSet(initialData, 0.8)
+        val trainingInputs = trainingData.inputs
+        val trainingTargets = trainingData.targets
+        val testingInputs = testingData.inputs
+        val testingTargets = testingData.targets
 
         trainingSet = if (inputLayer is ActivationSequence) {
             TrainingDataset(

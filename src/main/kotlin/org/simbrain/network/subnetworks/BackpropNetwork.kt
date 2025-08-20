@@ -10,6 +10,7 @@ import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.util.copy
 import org.simbrain.util.math.SigmoidFunctionEnum
 import org.simbrain.util.point
+import org.simbrain.util.randomMutableList
 import java.awt.geom.Point2D
 import kotlin.math.ceil
 import kotlin.math.min
@@ -40,11 +41,10 @@ class BackpropNetwork : FeedForward, SupervisedNetwork {
         }
         val nin = nodesPerLayer.first()
         val nout = nodesPerLayer.last()
-        trainingSet = createDiagonalDataset(nin, nout, min(nin,nout))
-        testingSet = TrainingDataset(
-            inputs = MutableList(ceil(trainingSet.size * 0.2).toInt()) { MutableList(trainingSet.inputs.firstOrNull()?.size ?: 0) { 0.0 } },
-            targets = MutableList(ceil(trainingSet.size * 0.2).toInt()) { MutableList(trainingSet.targets.firstOrNull()?.size ?: 0) { 0.0 } }
-        )
+        val initialData = createSimpleBinaryDataset(nin, nout)
+        val (training, testing) = splitDataSet(initialData, 0.8)
+        trainingSet = training
+        testingSet = testing
     }
 
     @XStreamConstructor()

@@ -276,7 +276,6 @@ fun MutableList<MutableList<Double>>.binaryRandomize() = apply { twoValueRandomi
 
 fun MutableList<MutableList<Double>>.bipolarRandomize() = apply { twoValueRandomize(-1.0, 1.0) }
 
-
 /**
  * Convert 0 to -1 in order to convert binary vectors like (0,1) to bipolar vectors like (-1,1)
  */

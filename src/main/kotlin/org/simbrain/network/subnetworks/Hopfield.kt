@@ -14,7 +14,6 @@ import org.simbrain.network.util.offsetNetworkModel
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
-import smile.math.matrix.Matrix
 
 /**
  * A discrete Hopfield network.
@@ -30,9 +29,9 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
 
     override val trainer = UnsupervisedTrainer()
 
-    override lateinit var trainingData: Matrix
+    override lateinit var trainingData: MutableList<MutableList<Double>>
 
-    override lateinit var testingData: Matrix
+    override lateinit var testingData: MutableList<MutableList<Double>>
 
     @UserParameter(label = "Update function")
     var updateFunc = HopfieldUpdate.SYNC
@@ -44,7 +43,7 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
 
     constructor(numNeurons: Int): super() {
 
-        val initialData = Matrix(10, numNeurons).binaryRandomize()
+        val initialData = randomMutableList(10, numNeurons)
         val (training, testing) = splitDataSet(initialData, 0.8)
         this.trainingData = training
         this.testingData = testing
@@ -80,8 +79,8 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
     constructor(): super()
 
     context(Network) override fun trainOnInputData() {
-        trainingData.toArray().forEach { row ->
-            inputLayer.activationArray = row
+        trainingData.forEach { row ->
+            neuronGroup.activationArray = row.toDoubleArray()
             trainOnCurrentPattern()
         }
     }
@@ -163,8 +162,8 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
         // Copy other properties
         copy.updateFunc = updateFunc
         copy.learningRate = learningRate
-        copy.trainingData = trainingData.clone()
-        copy.testingData = testingData.clone()
+        copy.trainingData = trainingData.copy()
+        copy.testingData = testingData.copy()
 
         // Copy custom info
         copy.customInfo = InfoText(stateInfoText)

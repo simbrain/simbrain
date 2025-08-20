@@ -24,6 +24,12 @@ fun Matrix.randomize(dist: ProbabilityDistribution) {
     }
 }
 
+fun MutableList<MutableList<Double>>.randomize(dist: ProbabilityDistribution) {
+    forEach { row ->
+        row.forEachIndexed { i, _ -> row[i] = dist.sampleDouble() }
+    }
+}
+
 fun <T> List<T>.sampleWithReplacement(
     random: Random = Random(Random.nextLong())
 ) = sequence {

@@ -13,9 +13,10 @@ import org.simbrain.network.util.Direction
 import org.simbrain.network.util.alignNetworkModels
 import org.simbrain.network.util.offsetNeuronCollections
 import org.simbrain.util.UserParameter
+import org.simbrain.util.copy
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.randomMutableList
 import org.simbrain.util.stats.ProbabilityDistribution
-import smile.math.matrix.Matrix
 
 /**
  * **CompetitiveNetwork** is a small network encompassing a Competitive
@@ -28,9 +29,9 @@ class CompetitiveNetwork : Subnetwork, UnsupervisedNetwork {
 
     lateinit var competitive: CompetitiveGroup
 
-    override lateinit var trainingData: Matrix
+    override lateinit var trainingData: MutableList<MutableList<Double>>
 
-    override lateinit var testingData: Matrix
+    override lateinit var testingData: MutableList<MutableList<Double>>
 
     val defaultRowsInputData = 10
 
@@ -42,7 +43,7 @@ class CompetitiveNetwork : Subnetwork, UnsupervisedNetwork {
 
     constructor(numInputNeurons: Int, numCompetitiveNeurons: Int): super() {
 
-        val initialData = Matrix.rand(defaultRowsInputData, numInputNeurons)
+        val initialData = randomMutableList(defaultRowsInputData, numInputNeurons)
         val (training, testing) = splitDataSet(initialData, 0.8)
         this.trainingData = training
         this.testingData = testing
@@ -73,8 +74,8 @@ class CompetitiveNetwork : Subnetwork, UnsupervisedNetwork {
     }
 
     context(Network) override fun trainOnInputData() {
-        trainingData.toArray().forEach { row ->
-            inputLayer.activationArray = row
+        trainingData.forEach { row ->
+            inputLayer.activationArray = row.toDoubleArray()
             trainOnCurrentPattern()
         }
     }
@@ -137,8 +138,8 @@ class CompetitiveNetwork : Subnetwork, UnsupervisedNetwork {
         copy.trainer.copyFrom(trainer)
 
         // Copy input data
-        copy.trainingData = trainingData.clone()
-        copy.testingData = testingData.clone()
+        copy.trainingData = trainingData.copy()
+        copy.testingData = testingData.copy()
 
         return copy
     }

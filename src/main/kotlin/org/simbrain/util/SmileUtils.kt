@@ -11,6 +11,7 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.sqrt
+import kotlin.random.Random
 
 /**
  * Make sure the two matrices have the same shape
@@ -110,6 +111,12 @@ fun identityMutableList(nrows: Int, ncols: Int = nrows): MutableList<MutableList
             if (row == col) 1.0 else 0.0
         }
     }
+
+/**
+ * Creates a random matrix as MutableList format (equivalent to Matrix.rand).
+ */
+fun randomMutableList(nrows: Int, ncols: Int, random: Random = Random): MutableList<MutableList<Double>> =
+    MutableList(nrows) { MutableList(ncols) { random.nextDouble() } }
 
 /**
  * Creates a zero-filled matrix as MutableList format (equivalent to Matrix(nrows, ncols))

@@ -270,6 +270,13 @@ fun Matrix.binaryRandomize() = apply { twoValueRandomize(0.0, 1.0) }
 
 fun Matrix.bipolarRandomize() = apply { twoValueRandomize(-1.0, 1.0) }
 
+fun MutableList<MutableList<Double>>.twoValueRandomize(lower: Double, upper: Double) = apply { randomize(TwoValued(lower, upper)) }
+
+fun MutableList<MutableList<Double>>.binaryRandomize() = apply { twoValueRandomize(0.0, 1.0) }
+
+fun MutableList<MutableList<Double>>.bipolarRandomize() = apply { twoValueRandomize(-1.0, 1.0) }
+
+
 /**
  * Convert 0 to -1 in order to convert binary vectors like (0,1) to bipolar vectors like (-1,1)
  */

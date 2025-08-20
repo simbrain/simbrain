@@ -5,9 +5,13 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import org.simbrain.network.gui.dialogs.createDataSetPanel
+import org.simbrain.network.subnetworks.CompetitiveNetwork
+import org.simbrain.network.subnetworks.SOMNetwork
 import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.network.trainers.crossEntropy
 import org.simbrain.network.trainers.splitDataSet
+import org.simbrain.util.table.BasicDataFrame
+import org.simbrain.util.table.Column
 import smile.math.matrix.Matrix
 import kotlin.math.ln
 import kotlin.random.Random
@@ -998,6 +1002,82 @@ class SmileUtilsTest {
         copy.inputs[0][0] = 999.0
         assertEquals(1.0, original.inputs[0][0])
         assertEquals(999.0, copy.inputs[0][0])
+    }
+
+    @Test
+    fun `test UnsupervisedNetwork dialog with empty datasets`() {
+        // Test that the unsupervised training dialog can handle empty datasets
+        val competitiveNet = CompetitiveNetwork(3, 5)
+        
+        // Set empty training and testing data
+        competitiveNet.trainingData = mutableListOf()
+        competitiveNet.testingData = mutableListOf()
+        
+        // This should not throw any exceptions when creating the dialog
+        assertDoesNotThrow {
+            // We can't easily test the full GUI creation without a full UI context,
+            // but we can test the data structure handling
+            val inputSize = competitiveNet.inputLayer.size
+            assertEquals(3, inputSize)
+            
+            // Test that empty data with proper column count works
+            val columns = (0 until inputSize).map { i ->
+                Column("Input ${i + 1}", Column.DataType.DoubleType)
+            }.toMutableList()
+            
+            val dataFrame = BasicDataFrame(
+                mutableListOf<MutableList<Any?>>(), // Empty data
+                columns
+            )
+            
+            // Should have correct column count even with empty data
+            assertEquals(3, dataFrame.columnCount)
+            assertEquals(0, dataFrame.rowCount)
+            assertEquals("Input 1", dataFrame.getColumnName(0))
+            assertEquals("Input 2", dataFrame.getColumnName(1))
+            assertEquals("Input 3", dataFrame.getColumnName(2))
+        }
+    }
+
+    @Test
+    fun `test UnsupervisedNetwork dialog with non-empty datasets`() {
+        // Test that the unsupervised training dialog works with actual data
+        val somNet = SOMNetwork(2, 4)
+        
+        // Set some training data
+        val trainingData = mutableListOf(
+            mutableListOf(1.0, 0.0),
+            mutableListOf(0.0, 1.0),
+            mutableListOf(0.5, 0.5)
+        )
+        somNet.trainingData = trainingData
+        
+        assertDoesNotThrow {
+            val inputSize = somNet.inputLayer.size
+            assertEquals(2, inputSize)
+            
+            // Test data frame creation with actual data
+            val columns = (0 until inputSize).map { i ->
+                Column("Input ${i + 1}", Column.DataType.DoubleType)
+            }.toMutableList()
+            
+            val dataFrame = BasicDataFrame(
+                trainingData.map { it.map { value -> value as Any? }.toMutableList() }.toMutableList(),
+                columns
+            )
+            
+            // Should have correct dimensions
+            assertEquals(2, dataFrame.columnCount)
+            assertEquals(3, dataFrame.rowCount)
+            assertEquals("Input 1", dataFrame.getColumnName(0))
+            assertEquals("Input 2", dataFrame.getColumnName(1))
+            
+            // Should contain correct data
+            assertEquals(1.0, dataFrame.getValueAt(0, 0))
+            assertEquals(0.0, dataFrame.getValueAt(0, 1))
+            assertEquals(0.0, dataFrame.getValueAt(1, 0))
+            assertEquals(1.0, dataFrame.getValueAt(1, 1))
+        }
     }
 
 

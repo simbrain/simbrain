@@ -34,9 +34,9 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
 
     val defaultRowsInputData = 10
 
-    override lateinit var trainingData: Matrix
+    override lateinit var trainingData: MutableList<MutableList<Double>>
 
-    override lateinit var testingData: Matrix
+    override lateinit var testingData: MutableList<MutableList<Double>>
 
     override val inputLayer: NeuronArray
         get() = visibleLayer
@@ -48,7 +48,7 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
     override val trainer = UnsupervisedTrainer()
 
     constructor(numVisibleNodes: Int, numHiddenNodes: Int): super() {
-        val initialData = Matrix.rand(defaultRowsInputData, numVisibleNodes)
+        val initialData = randomMutableList(defaultRowsInputData, numVisibleNodes)
         val (training, testing) = splitDataSet(initialData, 0.8)
         this.trainingData = training
         this.testingData = testing
@@ -124,8 +124,8 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
 
     context(Network)
     override fun trainOnInputData() {
-        trainingData.toArray().forEach { row ->
-            visibleLayer.activations = row.toColumnVector()
+        trainingData.forEach { row ->
+            visibleLayer.activations = row.toDoubleArray().toColumnVector()
             trainOnCurrentPattern()
         }
     }
@@ -196,8 +196,8 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
         copy.visibleLayer.copyFrom(visibleLayer)
         copy.hiddenLayer.copyFrom(hiddenLayer)
         copy.visibleToHidden.copyFrom(visibleToHidden)
-        copy.trainingData = trainingData.clone()
-        copy.testingData = testingData.clone()
+        copy.trainingData = trainingData.copy()
+        copy.testingData = testingData.copy()
         copy.customInfo = InfoText(copy.stateInfoText)
         copy.customInfo.location = customInfo.location
 

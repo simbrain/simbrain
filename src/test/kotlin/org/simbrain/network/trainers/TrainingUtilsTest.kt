@@ -9,6 +9,7 @@ import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.util.*
 import smile.math.matrix.Matrix
+import kotlin.random.Random
 
 class TrainingUtilsTest {
 
@@ -499,6 +500,121 @@ class TrainingUtilsTest {
         assertTrue(hiddenIndex < outputIndex, "Hidden should come before output")
     }
 
+    @Test
+    fun `test splitDataSet for unsupervised learning with MutableList`() {
+        val inputs = mutableListOf(
+            mutableListOf(1.0, 2.0, 3.0),
+            mutableListOf(4.0, 5.0, 6.0),
+            mutableListOf(7.0, 8.0, 9.0),
+            mutableListOf(10.0, 11.0, 12.0),
+            mutableListOf(13.0, 14.0, 15.0)
+        )
+        
+        val (training, testing) = splitDataSet(inputs, 0.6, Random(42))
+        
+        // Should split 5 rows into ~3 training and ~2 testing
+        assertEquals(3, training.size)
+        assertEquals(2, testing.size)
+        
+        // Each row should maintain 3 columns
+        training.forEach { row ->
+            assertEquals(3, row.size)
+        }
+        testing.forEach { row ->
+            assertEquals(3, row.size)
+        }
+        
+        // Total rows should equal original
+        assertEquals(inputs.size, training.size + testing.size)
+        
+        // No row should appear in both sets
+        val allTrainingData = training.flatten()
+        val allTestingData = testing.flatten()
+        val allOriginalData = inputs.flatten()
+        
+        assertEquals(allOriginalData.size, allTrainingData.size + allTestingData.size)
+    }
 
+    @Test
+    fun `test splitDataSet unsupervised with edge case ratios`() {
+        val inputs = mutableListOf(
+            mutableListOf(1.0, 2.0),
+            mutableListOf(3.0, 4.0),
+            mutableListOf(5.0, 6.0)
+        )
+        
+        // Test ratio 1.0 - all data goes to training
+        val (training1, testing1) = splitDataSet(inputs, 1.0)
+        assertEquals(3, training1.size)
+        assertEquals(0, testing1.size)
+        
+        // Test ratio 0.0 - all data goes to testing
+        val (training0, testing0) = splitDataSet(inputs, 0.0)
+        assertEquals(0, training0.size)
+        assertEquals(3, testing0.size)
+        
+        // Verify data integrity
+        training1.forEach { row ->
+            assertEquals(2, row.size)
+        }
+        testing0.forEach { row ->
+            assertEquals(2, row.size)
+        }
+    }
+
+    @Test
+    fun `test splitDataSet unsupervised with single row`() {
+        val inputs = mutableListOf(
+            mutableListOf(42.0, 43.0, 44.0)
+        )
+        
+        val (training, testing) = splitDataSet(inputs, 0.7)
+        
+        // With only one row, should go to training based on ratio calculation
+        assertEquals(0, training.size) // floor(1 * 0.7) = 0
+        assertEquals(1, testing.size)
+        
+        assertEquals(3, testing[0].size)
+        assertEquals(42.0, testing[0][0])
+        assertEquals(43.0, testing[0][1])
+        assertEquals(44.0, testing[0][2])
+    }
+
+    @Test
+    fun `test splitDataSet unsupervised with empty input`() {
+        val inputs = mutableListOf<MutableList<Double>>()
+        
+        val (training, testing) = splitDataSet(inputs, 0.5)
+        
+        assertEquals(0, training.size)
+        assertEquals(0, testing.size)
+    }
+
+    @Test
+    fun `test splitDataSet unsupervised maintains data independence`() {
+        val inputs = mutableListOf(
+            mutableListOf(1.0, 2.0),
+            mutableListOf(3.0, 4.0),
+            mutableListOf(5.0, 6.0),
+            mutableListOf(7.0, 8.0)
+        )
+        
+        val (training, testing) = splitDataSet(inputs, 0.5, Random(123))
+        
+        // Modify original data
+        inputs[0][0] = 999.0
+        
+        // Split data should be independent (deep copied)
+        assertFalse(training.any { row -> row.contains(999.0) })
+        assertFalse(testing.any { row -> row.contains(999.0) })
+        
+        // Modify split data
+        if (training.isNotEmpty()) {
+            training[0][0] = 888.0
+        }
+        
+        // Original should be unaffected by split modifications
+        assertFalse(inputs.flatten().contains(888.0))
+    }
 
 }

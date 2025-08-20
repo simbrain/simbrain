@@ -646,6 +646,27 @@ fun splitDataSet(inputs: Matrix, splitRatio: Double, random: Random = Random(42L
 }
 
 /**
+ * Split a dataset (inputs only) into training and testing subsets for unsupervised learning using MutableList format.
+ */
+fun splitDataSet(inputs: MutableList<MutableList<Double>>, splitRatio: Double, random: Random = Random(42L)): Pair<MutableList<MutableList<Double>>, MutableList<MutableList<Double>>> {
+    require(splitRatio in 0.0..1.0) { "splitRatio must be between 0.0 and 1.0" }
+
+    val nrows = inputs.size
+    val rowIndices = (0 until nrows).shuffled(random)
+
+    val trainRowCount = (nrows * splitRatio).toInt()
+    val testRowCount = nrows - trainRowCount
+
+    val trainRowIndices = rowIndices.take(trainRowCount)
+    val testRowIndices = rowIndices.takeLast(testRowCount)
+
+    val trainingInputs = trainRowIndices.map { inputs[it].toMutableList() }.toMutableList()
+    val testingInputs = testRowIndices.map { inputs[it].toMutableList() }.toMutableList()
+
+    return trainingInputs to testingInputs
+}
+
+/**
  * A hierarchical container for structured data capture, supporting both map-like and list-like organization.
  *
  *  Useful for tracing, logging, testing, and debugging complex data flows or computation trees.

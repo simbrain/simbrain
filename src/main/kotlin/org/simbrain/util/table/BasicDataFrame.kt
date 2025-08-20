@@ -47,6 +47,7 @@ class BasicDataFrame(
     override fun deleteColumn(colIndex: Int, fireEvent: Boolean) {
         if (validateColumnIndex(colIndex)) {
             data.forEach { row -> row.removeAt(colIndex) }
+            columns.removeAt(colIndex) // Also remove from columns list
             if (fireEvent) {
                 fireTableStructureChanged()
             }

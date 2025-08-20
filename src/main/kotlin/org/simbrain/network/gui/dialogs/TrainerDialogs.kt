@@ -18,9 +18,9 @@ import org.simbrain.network.trainers.UnsupervisedNetwork
 import org.simbrain.util.*
 import org.simbrain.util.table.*
 import org.simbrain.util.widgets.ToggleButton
-import smile.math.matrix.Matrix
 import java.awt.Cursor
 import java.awt.Dimension
+import java.awt.FlowLayout
 import javax.swing.*
 
 fun TrainingDataset.createDataSetPanel(applyAction: suspend DataSetPanel.(selectedRow: Int) -> Unit): DataSetPanel {
@@ -263,31 +263,47 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         runControls.add(preferencesButton)
 
         // Create data panels for training and testing data
-        fun createUnsupervisedDataPanel(data: Matrix, label: String): JPanel {
+        fun createUnsupervisedDataPanel(data: MutableList<MutableList<Double>>, label: String): JPanel {
             val panel = JPanel().apply {
                 layout = MigLayout("gap 0px 0px, ins 0")
             }
             
-            val matrixEditor = MatrixEditor(data)
-            matrixEditor.toolbar.addSeparator()
+            // Use explicit column creation like supervised training to prevent index out of range
+            val inputSize = unsupervisedNetwork.inputLayer.size
+            
+            // Create explicit columns to prevent column index out of range errors
+            val columns = (0 until inputSize).map { i ->
+                Column("Input ${i + 1}", Column.DataType.DoubleType)
+            }.toMutableList()
+            
+            val dataFrame = BasicDataFrame(
+                data.copy().map { it.map { value -> value as Any? }.toMutableList() }.toMutableList(),
+                columns
+            )
+            val tablePanel = SimbrainTablePanel(dataFrame)
+            
             val advanceRowCheckbox = JCheckBox("Auto advance").apply { isSelected = true }
-            matrixEditor.toolbar.add(
-                matrixEditor.table.createApplyAction("Apply inputs") { selectedRow ->
-                    unsupervisedNetwork.inputLayer.setActivations(matrixEditor.table.model.getCurrentDoubleRow().toDoubleArray())
-                    trainAction(network)
-                    if (advanceRowCheckbox.isSelected) {
-                        matrixEditor.table.incrementSelectedRow()
+            val applyButton = JButton("Apply inputs").apply {
+                addActionListener {
+                    val selectedRow = tablePanel.table.selectedRow
+                    if (selectedRow >= 0) {
+                        unsupervisedNetwork.inputLayer.setActivations(dataFrame.getRow<Double>(selectedRow).toDoubleArray())
+                        trainAction(network)
+                        if (advanceRowCheckbox.isSelected) {
+                            tablePanel.table.incrementSelectedRow()
+                        }
                     }
                 }
-            )
-            matrixEditor.toolbar.add(advanceRowCheckbox)
+            }
             
-            val addRemoveRows = AddRemoveRows(listOf(matrixEditor.table))
+            val toolbar = JPanel().apply {
+                layout = FlowLayout(FlowLayout.LEFT)
+                add(applyButton)
+                add(advanceRowCheckbox)
+            }
             
-            panel.add(JSeparator(), "span, growx, wrap")
-            panel.add(matrixEditor, "span, grow")
-            panel.add(JLabel("Edit rows:"), "split 2")
-            panel.add(addRemoveRows)
+            panel.add(toolbar, "span, growx, wrap")
+            panel.add(tablePanel, "span, grow")
 
             return panel
         }
@@ -296,19 +312,19 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         val testingDataPanel = createUnsupervisedDataPanel(unsupervisedNetwork.testingData, "Testing")
 
         fun syncDataSet() {
-            // Extract data from the matrix editors and update the network's data
-            val trainingMatrixEditor = trainingDataPanel.components
-                .filterIsInstance<MatrixEditor>()
+            // Extract data from the table panels and update the network's data
+            val trainingTablePanel = trainingDataPanel.components
+                .filterIsInstance<SimbrainTablePanel>()
                 .firstOrNull()
-            val testingMatrixEditor = testingDataPanel.components
-                .filterIsInstance<MatrixEditor>()
+            val testingTablePanel = testingDataPanel.components
+                .filterIsInstance<SimbrainTablePanel>()
                 .firstOrNull()
                 
-            trainingMatrixEditor?.let { editor ->
-                unsupervisedNetwork.trainingData = Matrix.of(editor.table.model.get2DDoubleArray())
+            trainingTablePanel?.let { panel ->
+                unsupervisedNetwork.trainingData = panel.table.model.get2DDoubleList().toMutableListOfLists()
             }
-            testingMatrixEditor?.let { editor ->
-                unsupervisedNetwork.testingData = Matrix.of(editor.table.model.get2DDoubleArray())
+            testingTablePanel?.let { panel ->
+                unsupervisedNetwork.testingData = panel.table.model.get2DDoubleList().toMutableListOfLists()
             }
         }
 

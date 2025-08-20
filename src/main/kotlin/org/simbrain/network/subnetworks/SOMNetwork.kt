@@ -12,10 +12,10 @@ import org.simbrain.network.util.Direction
 import org.simbrain.network.util.alignNetworkModels
 import org.simbrain.network.util.offsetNeuronCollections
 import org.simbrain.util.UserParameter
-import org.simbrain.util.binaryRandomize
+import org.simbrain.util.copy
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.randomMutableList
 import org.simbrain.util.stats.ProbabilityDistribution
-import smile.math.matrix.Matrix
 
 /**
  * SOMNetwork is a  network encompassing an [SomGroup]. An input
@@ -32,9 +32,9 @@ class SOMNetwork : Subnetwork, UnsupervisedNetwork {
 
     override val trainer = UnsupervisedTrainer()
 
-    override lateinit var trainingData: Matrix
+    override lateinit var trainingData: MutableList<MutableList<Double>>
 
-    override lateinit var testingData: Matrix
+    override lateinit var testingData: MutableList<MutableList<Double>>
 
     constructor(numInputNeurons: Int, numSOMNeurons: Int): super() {
         som = SOMGroup(numSOMNeurons)
@@ -51,7 +51,7 @@ class SOMNetwork : Subnetwork, UnsupervisedNetwork {
         inputLayer.label = "Input layer"
         inputLayer.isClamped = true
 
-        val initialData = Matrix(10, numInputNeurons).binaryRandomize()
+        val initialData = randomMutableList(10, numInputNeurons)
         val (training, testing) = splitDataSet(initialData, 0.8)
         this.trainingData = training
         this.testingData = testing
@@ -79,8 +79,8 @@ class SOMNetwork : Subnetwork, UnsupervisedNetwork {
     }
 
     context(Network) override fun trainOnInputData() {
-        trainingData.toArray().forEach { row ->
-            inputLayer.activationArray = row
+        trainingData.forEach { row ->
+            inputLayer.activationArray = row.toDoubleArray()
             trainOnCurrentPattern()
         }
     }
@@ -116,8 +116,8 @@ class SOMNetwork : Subnetwork, UnsupervisedNetwork {
         copy.addModel(copy.inputLayer)
 
         // Copy input data
-        copy.trainingData = trainingData.clone()
-        copy.testingData = testingData.clone()
+        copy.trainingData = trainingData.copy()
+        copy.testingData = testingData.copy()
 
         val neuronMap = mutableMapOf<Neuron, Neuron>()
 

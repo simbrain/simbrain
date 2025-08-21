@@ -38,6 +38,12 @@ class TinyLanguageModelOptions(var showEmbeddingDimension: Boolean = true): Edit
         conditionallyVisibleBy = TinyLanguageModelOptions::showEmbeddingDimension
     )
 
+    var hiddenSize by GuiEditable(
+        initValue = 30,
+        description = "Number of hidden units in the transformer block",
+        order = 25,
+    )
+
     var trainerTextPath by GuiEditable(
         initValue = simulationsPath / "texts" / "casual_texting_small.txt",
         description = "Text used to train the model",
@@ -95,6 +101,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         TinyLanguageModelOptions().apply {
             contextSize = jsonOptions.optInt("contextSize", contextSize)
             embeddingDimension = jsonOptions.optInt("embeddingDimension", embeddingDimension)
+            hiddenSize = jsonOptions.optInt("hiddenSize", hiddenSize)
             if (jsonOptions.has("textFile")) {
                 trainerTextPath = simulationsPath / "texts" / jsonOptions.getString("textFile")
             }
@@ -153,7 +160,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         isClamped = true
     }
 
-    val transformerBlock = TransformerBlock(contextSize, options.embeddingDimension, options.embeddingDimension).apply {
+    val transformerBlock = TransformerBlock(contextSize, options.embeddingDimension, options.hiddenSize).apply {
         label = "Transformer Block"
     }
 

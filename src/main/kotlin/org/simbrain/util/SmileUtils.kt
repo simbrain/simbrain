@@ -68,7 +68,7 @@ fun Matrix.reshape(newNrows: Int, newNcols: Int): Matrix {
     return newMatrix
 }
 
-val Matrix.shapeString get() = "(${nrow()},${ncol()})"
+val Matrix.shapeString get() = "${nrow()} x ${ncol()}"
 
 // TODO: Flatten the two arrays so that this can be used for arbitrary matrices (currently works only on vectors)
 infix fun Matrix.sse(other: Matrix) = (this.toDoubleArray() sse other.toDoubleArray())
@@ -582,4 +582,3 @@ fun Matrix.applyDiagonalPattern(): Matrix {
     }
     return this
 }
-

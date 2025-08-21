@@ -111,9 +111,9 @@ class ActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inpu
 
     override fun toString(): String {
         return """
-                Name: $displayName
-                Input Size: $inputSize 
-                Sequence Size: $sequenceSize 
+                Name: $displayName ($sequenceSize x $inputSize)
+                Sequence Size: $sequenceSize
+                Input Size: $inputSize
             """.trimIndent()
     }
 

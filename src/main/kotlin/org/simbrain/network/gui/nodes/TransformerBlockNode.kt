@@ -24,7 +24,7 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
         mainNode.addChild(this)
     }
 
-    val selfAttentionLabel = mainNode.addLabel("Self Attention")
+    val selfAttentionLabel = mainNode.addLabel("Attention Scores (${transformerBlock.selfAttention.shapeString})")
 
     val sequenceGroup = PNode().apply {
         if (transformerBlock.sequenceVisibility) {
@@ -36,19 +36,19 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
         sequenceGroup.addChild(this)
     }
 
-    val qSequenceLabel = sequenceGroup.addLabel("q sequence")
+    val qSequenceLabel = sequenceGroup.addLabel("q (${transformerBlock.qStack.shapeString})")
 
     val kSequenceImage = PImage().apply {
         sequenceGroup.addChild(this)
     }
 
-    val kSequenceLabel = sequenceGroup.addLabel("k sequence")
+    val kSequenceLabel = sequenceGroup.addLabel("k (${transformerBlock.qStack.shapeString})")
 
     val vSequenceImage = PImage().apply {
         sequenceGroup.addChild(this)
     }
 
-    val vSequenceLabel = sequenceGroup.addLabel("v sequence")
+    val vSequenceLabel = sequenceGroup.addLabel("v (${transformerBlock.qStack.shapeString})")
 
     val matrixGroup = PNode().apply {
         if (transformerBlock.matrixVisibility) {
@@ -60,19 +60,19 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
         matrixGroup.addChild(this)
     }
 
-    val qMatrixLabel = matrixGroup.addLabel("Q matrix")
+    val qMatrixLabel = matrixGroup.addLabel("Q (${transformerBlock.Q.shapeString})")
 
     val kMatrixImage = PImage().apply {
         matrixGroup.addChild(this)
     }
 
-    val kMatrixLabel = matrixGroup.addLabel("K matrix")
+    val kMatrixLabel = matrixGroup.addLabel("K (${transformerBlock.K.shapeString})")
 
     val vMatrixImage = PImage().apply {
         matrixGroup.addChild(this)
     }
 
-    val vMatrixLabel = matrixGroup.addLabel("V matrix")
+    val vMatrixLabel = matrixGroup.addLabel("V (${transformerBlock.V.shapeString})")
 
     val feedForwardGroup = PNode().apply {
         if (transformerBlock.feedForwardVisibility) {
@@ -84,31 +84,31 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
         feedForwardGroup.addChild(this)
     }
 
-    val feedForwardInputLabel = feedForwardGroup.addLabel("FF Input")
+    val feedForwardInputLabel = feedForwardGroup.addLabel("FF Input (${transformerBlock.feedForwardInput.shapeString})")
 
     val feedForwardHiddenImage = PImage().apply {
         feedForwardGroup.addChild(this)
     }
 
-    val feedForwardHiddenLabel = feedForwardGroup.addLabel("FF Hidden")
+    val feedForwardHiddenLabel = feedForwardGroup.addLabel("FF Hidden (${transformerBlock.feedForwardHidden.shapeString})")
 
     val feedForwardOutputImage = PImage().apply {
         feedForwardGroup.addChild(this)
     }
 
-    val feedForwardOutputLabel = feedForwardGroup.addLabel("FF Output")
+    val feedForwardOutputLabel = feedForwardGroup.addLabel("FF Output (${transformerBlock.activations.shapeString})")
 
     val feedForwardW1Image = PImage().apply {
         feedForwardGroup.addChild(this)
     }
 
-    val feedForwardW1Label = feedForwardGroup.addLabel("Input -> Hidden")
+    val feedForwardW1Label = feedForwardGroup.addLabel("Input -> Hidden (${transformerBlock.W1.shapeString})")
 
     val feedForwardW2Image = PImage().apply {
         feedForwardGroup.addChild(this)
     }
 
-    val feedForwardW2Label = feedForwardGroup.addLabel("Hidden -> Output")
+    val feedForwardW2Label = feedForwardGroup.addLabel("Hidden -> Output (${transformerBlock.W2.shapeString})")
 
 
 

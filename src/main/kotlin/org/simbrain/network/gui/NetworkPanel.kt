@@ -38,6 +38,7 @@ import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
 import java.util.prefs.PreferenceChangeListener
 import javax.swing.JPanel
+import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.reflect.KClass
 
@@ -878,7 +879,10 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
                 override fun mouseWheelRotated(event: PInputEvent) {
                     val swingEvent = (event.sourceSwingEvent as MouseWheelEvent)
                     val newScale = 1.1.pow(swingEvent.preciseWheelRotation)
-                    autoZoom = false
+                    // Only turn off autozoom if the mouse wheel is turned more than a few clicks.
+                    if (abs(swingEvent.preciseWheelRotation) > 2) {
+                        autoZoom = false
+                    }
                     scale(1 / newScale)
                 }
             })

@@ -322,7 +322,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     }
 
     val showWeightMatrixAction = networkPanel.createConditionallyEnabledAction(
-        name = "Display / Edit Weight Matrix...",
+        name = "Display / Edit Matrix for Free Weights...",
         description = "Show a weight matrix connecting source neurons (adorned with red squares) and target neurons (regular green selection)",
         iconPath = "menu_icons/grid.png",
         enablingCondition = EnablingCondition.SOURCE_AND_TARGET_NEURONS,

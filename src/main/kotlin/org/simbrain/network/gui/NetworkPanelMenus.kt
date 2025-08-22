@@ -73,9 +73,6 @@ val NetworkPanel.insertMenu
             // add(addDeepNetAction)
             add(newNetworkMenu)
             addSeparator()
-            add(testInputAction)
-            add(showWeightMatrixAction)
-            addSeparator()
             add(addTextAction)
         }
     }
@@ -188,6 +185,8 @@ val NetworkPanel.viewMenu
                     this.state = it
                 }
             })
+            addSeparator()
+            add(showWeightMatrixAction)
             addSeparator()
             add(showPriorityTableAction)
         }

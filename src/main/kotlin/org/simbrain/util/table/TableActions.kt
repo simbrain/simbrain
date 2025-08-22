@@ -144,7 +144,15 @@ val SimbrainJTable.deleteRowAction
     get() = createAction(
         name = "Delete rows",
         description = "Delete selected rows",
-        iconPath = "menu_icons/DeleteTableRow.png"
+        iconPath = "menu_icons/DeleteTableRow.png",
+        initBlock = {
+            fun updateAction() {
+                isEnabled = getSelectedCells().isNotEmpty()
+            }
+            updateAction()
+            selectionModel.addListSelectionListener { updateAction() }
+            columnModel.selectionModel.addListSelectionListener { updateAction() }
+        }
     ) {
         deleteSelectedRows()
     }

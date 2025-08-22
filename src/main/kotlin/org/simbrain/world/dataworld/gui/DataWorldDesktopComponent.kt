@@ -1,8 +1,5 @@
 package org.simbrain.world.dataworld.gui
 
-import org.simbrain.util.createAction
-import org.simbrain.util.createEditorDialog
-import org.simbrain.util.display
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.table.*
 import org.simbrain.util.widgets.ShowHelpAction
@@ -33,7 +30,7 @@ class DataWorldDesktopComponent(frame: GenericFrame, val component: DataWorldCom
 
     private val help = JMenu("Help")
 
-    private val helpItem = JMenuItem("Reader Help")
+    private val helpItem = JMenuItem("Help")
 
     val tablePanel: SimbrainTablePanel = SimbrainTablePanel(
         component.dataWorld.dataModel, false
@@ -55,8 +52,8 @@ class DataWorldDesktopComponent(frame: GenericFrame, val component: DataWorldCom
             addSeparator()
             addAction(table.fillAction)
             addAction(table.randomizeAction)
+            addSeparator()
             addAction(table.showBoxPlotAction)
-            addAction(table.showHistogramAction)
             addAction(table.createShowMatrixPlotAction())
             addSeparator()
             addAction(table.insertRowAction)
@@ -90,19 +87,21 @@ class DataWorldDesktopComponent(frame: GenericFrame, val component: DataWorldCom
         file.add(actionManager.createExportAction(this))
         file.addSeparator()
         file.add(tablePanel.table.importCSVAction(fixedColumns = false))
-        file.add(tablePanel.table.exportCsv())
-        file.addSeparator()
-        file.add(createAction(name = "Preferences...") {
-            component.dataWorld.createEditorDialog().display()
-        })
-        file.addSeparator()
-        file.add(actionManager.createRenameAction(this))
         file.addSeparator()
         file.add(actionManager.createCloseAction(this))
 
+        // Edit Menu
         fun createEditMenu() {
             edit.removeAll()
+
             edit.add(tablePanel.table.setRowsColumnsAction)
+            edit.addSeparator()
+            edit.add(tablePanel.table.fillAction)
+            edit.add(tablePanel.table.randomizeAction)
+            edit.add(tablePanel.table.editRandomizerAction)
+            edit.addSeparator()
+            
+            // Add coupling menu
             edit.add(
                 actionManager.createCoupledPlotMenu(
                     dataWorld.getProducer(DataWorld::getCurrentNumericRow),

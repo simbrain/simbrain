@@ -56,7 +56,6 @@ fun SimbrainTablePanel.applyCommonTrainerAttributes() {
     addAction(table.exportCsv())
     addAction(table.randomizeAction)
     addAction(table.showBoxPlotAction)
-    addAction(table.showHistogramAction)
     preferredSize = Dimension(400, 250)
 }
 

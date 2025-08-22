@@ -207,7 +207,6 @@ class MatrixEditor(matrix: Matrix, rowNames: List<String>? = null, columnNames: 
         addAction(table.exportCsv())
         addAction(table.randomizeAction)
         addAction(table.showBoxPlotAction)
-        addAction(table.showHistogramAction)
         preferredSize = Dimension(400, 250)
         if (columnNames != null) {
             model.columnNames = columnNames

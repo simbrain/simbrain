@@ -33,7 +33,15 @@ val SimbrainJTable.randomizeAction
         name = "Randomize",
         description = "Randomize selected cells",
         iconPath = "menu_icons/Rand.png",
-        keyboardShortcut = CmdOrCtrl + 'R'
+        keyboardShortcut = CmdOrCtrl + 'R',
+        initBlock = {
+            fun updateAction() {
+                isEnabled = getSelectedCells().isNotEmpty()
+            }
+            updateAction()
+            selectionModel.addListSelectionListener { updateAction() }
+            columnModel.selectionModel.addListSelectionListener { updateAction() }
+        }
     ) {
         randomizeSelectedCells()
     }
@@ -42,7 +50,14 @@ val SimbrainJTable.randomizeColumnAction
     get() = createAction(
         name = "Randomize column",
         description = "Randomize cells in selected column",
-        iconPath = "menu_icons/Rand_C.png"
+        iconPath = "menu_icons/Rand_C.png",
+        initBlock = {
+            fun updateAction() {
+                isEnabled = selectedColumn >= 0
+            }
+            updateAction()
+            columnModel.selectionModel.addListSelectionListener { updateAction() }
+        }
     ) {
         model.randomizeColumn(selectedColumn)
     }
@@ -52,7 +67,15 @@ val SimbrainJTable.zeroFillAction
         name = "Zero Fill",
         description = "Zero Fill selected cells",
         iconPath = "menu_icons/Fill_0.png",
-        keyboardShortcut = 'Z'
+        keyboardShortcut = 'Z',
+        initBlock = {
+            fun updateAction() {
+                isEnabled = getSelectedCells().isNotEmpty()
+            }
+            updateAction()
+            selectionModel.addListSelectionListener { updateAction() }
+            columnModel.selectionModel.addListSelectionListener { updateAction() }
+        }
     ) {
         zeroFillSelectedCells()
     }
@@ -61,7 +84,15 @@ val SimbrainJTable.fillAction
     get() = createAction(
         name = "Fill...",
         description = "Fill selected cells",
-        iconPath = "menu_icons/fill.png"
+        iconPath = "menu_icons/fill.png",
+        initBlock = {
+            fun updateAction() {
+                isEnabled = getSelectedCells().isNotEmpty()
+            }
+            updateAction()
+            selectionModel.addListSelectionListener { updateAction() }
+            columnModel.selectionModel.addListSelectionListener { updateAction() }
+        }
     ) {
         JOptionPane.showInputDialog(this, "Value:", "0")
             ?.toDouble()
@@ -79,7 +110,7 @@ val SimbrainJTable.editRandomizerAction
     ) {
         objectWrapper("Table Randomizer", model.cellRandomizer).createEditorDialog {
             model.cellRandomizer = it.editingObject
-        }
+        }.display()
     }
 
 val SimbrainJTable.insertColumnAction
@@ -147,7 +178,7 @@ val SimbrainJTable.setRowsColumnsAction
             }
             
             val result = JOptionPane.showConfirmDialog(
-                this@setRowsColumnsAction,
+                this@createAction,
                 panel,
                 "Set Table Dimensions",
                 JOptionPane.OK_CANCEL_OPTION,
@@ -162,7 +193,7 @@ val SimbrainJTable.setRowsColumnsAction
                         Pair(newRows, newCols)
                     } else {
                         JOptionPane.showMessageDialog(
-                            this@setRowsColumnsAction,
+                            this@createAction,
                             "Rows and columns must be positive integers",
                             "Invalid Input",
                             JOptionPane.ERROR_MESSAGE
@@ -171,7 +202,7 @@ val SimbrainJTable.setRowsColumnsAction
                     }
                 } catch (e: NumberFormatException) {
                     JOptionPane.showMessageDialog(
-                        this@setRowsColumnsAction,
+                        this@createAction,
                         "Please enter valid integer values",
                         "Invalid Input",
                         JOptionPane.ERROR_MESSAGE
@@ -194,7 +225,7 @@ val SimbrainJTable.setRowsColumnsAction
             when (val tableModel = model) {
                 is BasicDataFrame -> {
                     val newData = (0 until newRows).map { 
-                        (0 until newCols).map { 0.0 as Any? }.toMutableList()
+                        (0 until newCols).map<Int, Any?> { 0.0 }.toMutableList()
                     }.toMutableList()
                     
                     tableModel.data = newData
@@ -220,11 +251,19 @@ val SimbrainJTable.setRowsColumnsAction
         }
     }
 
+@Deprecated("Tables don't have obvious column selection now, and the panel is a bit ugly anyway")
 val SimbrainJTable.showHistogramAction
     get() = createAction(
         iconPath = "menu_icons/histogram.png",
         name = "Histogram",
-        description = "Create histograms for data in selected column"
+        description = "Create histograms for data in selected column",
+        initBlock = {
+            fun updateAction() {
+                isEnabled = selectedColumn >= 0
+            }
+            updateAction()
+            columnModel.selectionModel.addListSelectionListener { updateAction() }
+        }
     ) {
         // canvas.window() uses invokeAndWait, so this actually has to be invoked from a non-swing thread
         launch(Dispatchers.Default) {
@@ -239,8 +278,8 @@ val SimbrainJTable.showHistogramAction
 
 val SimbrainJTable.showBoxPlotAction
     get() = createAction(
-        name = "Boxplot column",
-        description = "Create boxplot for data all numeric columns",
+        name = "Boxplots for columns",
+        description = "Create a boxplot for data in all numeric columns",
         iconPath = "menu_icons/BarChart.png"
     ) {
         launch(context = Dispatchers.Default) {
@@ -439,7 +478,14 @@ val SimbrainJTable.editColumnAction
     get() = createAction(
         name = "Edit column...",
         description = "Edit column properties",
-        iconPath = "menu_icons/Tools.png"
+        iconPath = "menu_icons/Tools.png",
+        initBlock = {
+            fun updateAction() {
+                isEnabled = selectedColumn >= 0 && model is BasicDataFrame
+            }
+            updateAction()
+            columnModel.selectionModel.addListSelectionListener { updateAction() }
+        }
     ) {
         if (model is BasicDataFrame) {
             if (selectedColumn >= 0) {

@@ -140,7 +140,6 @@ open class SimbrainTablePanel @JvmOverloads constructor(
         }
         addAction(table.createOpenProjectionAction())
         addSeparator()
-        addAction(table.showHistogramAction)
         addAction(table.showBoxPlotAction)
         addAction(table.createShowMatrixPlotAction())
     }

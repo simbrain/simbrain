@@ -58,6 +58,11 @@ object SimbrainDesktop {
     val frame: JFrame = JFrame(FRAME_TITLE)
 
     /**
+     * Manager for onboarding popups
+     */
+    val onboardingManager = OnboardingPopupManager(frame)
+
+    /**
      * Associates workspace components with their corresponding desktop components.
      */
     private val workspaceComponentDesktopComponentMap = CompletableDeferredHashMap<WorkspaceComponent, DesktopComponent<*>>()
@@ -98,10 +103,9 @@ object SimbrainDesktop {
      */
     private var contextMenu: JPopupMenu? = null
 
-    /**
-     * Workspace toolbar.
-     */
-    private var wsToolBar = JToolBar()
+    var wsToolBar = JToolBar()
+
+    lateinit var infoDockButton: AbstractButton
 
     val screenSize = Toolkit.getDefaultToolkit().screenSize
 
@@ -115,7 +119,27 @@ object SimbrainDesktop {
         },
         orientation = JSplitPane.HORIZONTAL_SPLIT,
         defaultSize = (screenSize.width * .2).toInt()
-    )
+    ).apply {
+        // Add listener for when the info dock becomes visible to show onboarding popup
+        dockComponent.addComponentListener(object : ComponentAdapter() {
+            override fun componentShown(e: ComponentEvent?) {
+                swingInvokeLater {
+                    onboardingManager.showPopup(
+                        PopupConfig(
+                            title = "Info Panel Toggle",
+                            message = "Use this button to toggle the visibility of this info screen. The info panel shows documentation and help content for various features.",
+                            targetComponent = infoDockButton,
+                            placement = PopupPlacement.BOTTOM_CENTER,
+                            //suppressionKey = "info_dock_help",  // TODO: Commented-out for debugging
+                            style = PopupStyle.INFO
+                        )
+                    )
+
+                }
+
+            }
+        })
+    }
 
     val bottomDockSplitter = SimbrainDesktopDock(
         mainComponent = sideDockSplitter,
@@ -475,7 +499,7 @@ object SimbrainDesktop {
         // Toggle docks
         bar.addSeparator()
         bar.add(actionManager.toggleBottomDock)
-        bar.add(actionManager.toggleInfoDock)
+        infoDockButton = bar.add(actionManager.toggleInfoDock)
 
         // Initialize time label
         timeLabel.border = BorderFactory.createEmptyBorder(0, 10, 0, 10)

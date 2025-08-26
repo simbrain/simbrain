@@ -15,6 +15,7 @@ import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.workspace.Workspace
+import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.workspace.updater.UpdateAllCouplings
 import org.simbrain.world.textworld.EmbeddingType
 import org.simbrain.world.textworld.TextWorldComponent
@@ -148,9 +149,8 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
     val trainingSet = buildSequenceToSequenceDataset(tokenizedTrainingText, contextSize, tokenEmbedding)
 
     // Text World for Inputs
-    val textWorldComponent = addTextWorld("Text World (Inputs)")
+    val textWorldComponent = addTextWorld("Text Inputs")
     textWorldComponent.world.tokenEmbedding = tokenEmbedding
-    textWorldComponent.world.text = tokenizedTrainingText.take(contextSize).tokensToString(tokenizer)
     textWorldComponent.world.highlightCurrentToken = false
     textWorldComponent.world.autoAdvance = false
     textWorldComponent.world.samplingStrategy = options.samplingStrategy
@@ -213,6 +213,17 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
     withGui {
         place(textWorldComponent, 10, 10, 450, 350)
         place(networkComponent, 460, 10, 1000, 800)
+        val textWorldDesktopComponent = SimbrainDesktop.getDesktopComponent(textWorldComponent)
+        SimbrainDesktop.onboardingManager.showPopup(
+            PopupConfig(
+                title = "Language Model Prompt",
+                message = "To enter a prompt, add some text here. To process your prompt through the network, click the play button on the main toolbar.",
+                targetComponent = textWorldDesktopComponent as javax.swing.JComponent,
+                placement = PopupPlacement.BOTTOM_CENTER,
+                //suppressionKey = "tiny_language_model_prompt_help",  // TODO: Disabling this for now while debugging
+                style = PopupStyle.SUCCESS
+            )
+        )
     }
 
     offsetNetworkModel(inputs, transformerBlock, Direction.NORTH, transformerBlock.height / 2 + 300.0)

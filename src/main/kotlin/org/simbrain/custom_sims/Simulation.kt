@@ -5,8 +5,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import org.simbrain.docviewer.DocViewerComponent
 import org.simbrain.network.NetworkComponent
-import org.simbrain.network.desktop.NetworkDesktopComponent
 import org.simbrain.network.core.Network
+import org.simbrain.network.desktop.NetworkDesktopComponent
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.plot.projection.ProjectionComponent
 import org.simbrain.plot.rasterchart.RasterPlotComponent
@@ -235,7 +235,7 @@ fun SimulationScope.addDocViewer(title: String, markdownText: String): DocViewer
     return docViewerComponent
 }
 
-suspend fun SimulationScope.addSidebarInfo(markdownText: String, width: Int? = null, initiallyOpened: Boolean = false) {
+suspend fun SimulationScope.addSidebarInfo(markdownText: String, width: Int? = null, initiallyOpened: Boolean = true) {
     workspace.infoDoc.text = markdownText
     workspace.infoDoc.render()
     withGui {

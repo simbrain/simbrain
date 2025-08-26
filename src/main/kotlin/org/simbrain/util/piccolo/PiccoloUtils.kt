@@ -9,6 +9,11 @@ import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PAffineTransform
 import org.piccolo2d.util.PBounds
 import org.simbrain.network.gui.nodes.ScreenElement
+import org.simbrain.util.component1
+import org.simbrain.util.component2
+import org.simbrain.util.minus
+import org.simbrain.util.plus
+import org.simbrain.util.point
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.event.MouseEvent
@@ -66,3 +71,35 @@ fun PCamera.setViewBoundsNoOverflow(centerBounds: Rectangle2D): PTransformActivi
     }
     return animateViewToTransform(newTransform, 0)
 }
+
+data class PNodeAnchor(val node: PNode, val offsetX: Double, val offsetY: Double) {
+    val globalPoint get() = node.globalFullBounds.let { (gx, gy) -> point(gx + offsetX, gy + offsetY) }
+}
+
+fun PNode.anchor(offsetX: Double = 0.0, offsetY: Double = 0.0) = PNodeAnchor(this, offsetX, offsetY)
+fun PNode.anchorRelative(offsetX: Double = 0.0, offsetY: Double = 0.0) =
+    PNodeAnchor(this, fullBounds.width * offsetX, fullBounds.height * offsetY)
+
+fun PNode.anchorCenter() = anchorRelative(0.5, 0.5)
+
+fun PNode.anchorCenterLeft() = anchorRelative(0.0, 0.5)
+fun PNode.anchorCenterRight() = anchorRelative(1.0, 0.5)
+fun PNode.anchorCenterBottom() = anchorRelative(0.5, 1.0)
+fun PNode.anchorCenterTop() = anchorRelative(0.5, 0.0)
+fun PNode.anchorTopLeft() = anchorRelative(0.0, 0.0)
+fun PNode.anchorTopRight() = anchorRelative(1.0, 0.0)
+fun PNode.anchorBottomLeft() = anchorRelative(0.0, 1.0)
+fun PNode.anchorBottomRight() = anchorRelative(1.0, 1.0)
+
+fun align(reference: PNodeAnchor, target: PNodeAnchor, offsetX: Double = 0.0, offsetY: Double = 0.0) {
+    val referenceAnchorPoint = reference.globalPoint
+    val targetAnchorPoint = target.globalPoint
+
+    val (dx, dy) = referenceAnchorPoint - targetAnchorPoint + point(offsetX, offsetY)
+
+    val (ox, oy) = target.node.offset
+    target.node.setOffset(ox + dx, oy + dy)
+}
+
+fun PNodeAnchor.alignTo(reference: PNodeAnchor, offsetX: Double = 0.0, offsetY: Double = 0.0) =
+    align(reference, this, offsetX, offsetY)

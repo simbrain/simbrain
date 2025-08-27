@@ -220,7 +220,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
                 message = "To enter a prompt, add some text here. To process your prompt through the network, click the play button on the main toolbar.",
                 targetComponent = textWorldDesktopComponent as javax.swing.JComponent,
                 placement = PopupPlacement.BOTTOM_CENTER,
-                //suppressionKey = "tiny_language_model_prompt_help",  // TODO: Disabling this for now while debugging
+                suppressionKey = "tiny_language_model_prompt_help",
                 style = PopupStyle.SUCCESS
             )
         )

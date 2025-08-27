@@ -138,6 +138,8 @@ val irisClassifier = newSim {
             width = 800
             height = 500
         }
+        // Initial training ensures scatter plot is in correct state when opened before the trainer
+        smileClassifier.train()
     }
 
 }

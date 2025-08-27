@@ -605,6 +605,8 @@ object SimbrainDesktop {
         val helpMenu = JMenu("Help")
         helpMenu.add(ShowHelpAction("Main Help", "https://docs.simbrain.net/"))
         helpMenu.addSeparator()
+        helpMenu.add(actionManager.toggleInfoDock)
+        helpMenu.addSeparator()
         helpMenu.add(ShowHelpAction("Quick start and shortcuts", "https://docs.simbrain.net/docs/quickstart.html"))
         helpMenu.add(ShowHelpAction("Credits", "https://simbrain.net/SimbrainCredits.html"))
         return helpMenu

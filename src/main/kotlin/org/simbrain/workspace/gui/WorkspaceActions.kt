@@ -54,8 +54,8 @@ class WorkspaceActions {
     }
 
     val toggleInfoDock = SimbrainDesktop.desktopPane.createAction(
-        name = "Info Panel",
-        description = "Show/hide info panel",
+        name = "Show/hide info panel",
+        description = "Toggle visibilty of info panel",
         iconPath = "menu_icons/Info.png",
         initBlock = {
             isEnabled = false

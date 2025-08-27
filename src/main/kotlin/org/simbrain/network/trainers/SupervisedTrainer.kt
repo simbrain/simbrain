@@ -73,7 +73,7 @@ open class SupervisedTrainerConfig(lossFunctionProvider: KFunction<List<Class<ou
  */
 class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedNetwork) : CoroutineScope {
 
-    private var job = SupervisorJob()
+    val job = SupervisorJob()
 
     override val coroutineContext = Dispatchers.Default + job
 

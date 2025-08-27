@@ -91,6 +91,12 @@ class TrainerControls(trainer: SupervisedTrainer, supervisedNetwork: SupervisedN
     }
 
     init {
+        
+        // Cancel the trainer's coroutine scope when this component is disposed
+        onWindowClose {
+            trainer.job.cancel()
+            job.cancel()
+        }
 
         val errorPlotPanel = JPanel().apply {
             layout = MigLayout("ins 0, gap 0px 0px, fillx, wrap")

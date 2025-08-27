@@ -130,7 +130,7 @@ object SimbrainDesktop {
                             message = "Use this button to toggle the visibility of this info screen. The info panel shows documentation and help content for various features.",
                             targetComponent = infoDockButton,
                             placement = PopupPlacement.BOTTOM_CENTER,
-                            //suppressionKey = "info_dock_help",  // TODO: Commented-out for debugging
+                            suppressionKey = "info_dock_help",
                             style = PopupStyle.INFO
                         )
                     )

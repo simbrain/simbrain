@@ -61,55 +61,36 @@ class OnboardingPopupManager(private val rootFrame: JFrame) {
         
         // Find target component bounds relative to the glass pane
         val targetBounds = if (config.targetComponent != null) {
-            // Wait a bit for component to be fully rendered, then try screen coordinates
-            SwingUtilities.invokeLater {
-                // This ensures the component is fully laid out
-            }
+            // Force a layout pass to ensure component is positioned
+            config.targetComponent.validate()
+            rootFrame.validate()
             
-            // Give it a moment to settle, then try again
+            // Use SwingUtilities.convertRectangle for reliable coordinate conversion
             try {
-                // Force a layout pass to ensure component is positioned
-                config.targetComponent.validate()
-                rootFrame.validate()
-                
-                if (config.targetComponent.isShowing && config.targetComponent.isDisplayable) {
-                    val componentLocationOnScreen = config.targetComponent.locationOnScreen
-                    val glassPaneLocationOnScreen = glassPane.locationOnScreen
-                    
-                    // Calculate relative position
-                    val relativeX = componentLocationOnScreen.x - glassPaneLocationOnScreen.x
-                    val relativeY = componentLocationOnScreen.y - glassPaneLocationOnScreen.y
-                    
-                    //println("DEBUG: Component showing, using screen coordinates")
-                    //println("DEBUG: Component: ${config.targetComponent.javaClass.simpleName}")
-                    //println("DEBUG: Component screen location: $componentLocationOnScreen")
-                    //println("DEBUG: Glass pane screen location: $glassPaneLocationOnScreen")
-                    //println("DEBUG: Relative position: ($relativeX, $relativeY)")
-                    
-                    Rectangle(
-                        relativeX,
-                        relativeY,
-                        config.targetComponent.width,
-                        config.targetComponent.height
-                    )
-                } else {
-                    println("DEBUG: Component not showing/displayable, using SwingUtilities fallback")
-                    println("DEBUG: isShowing: ${config.targetComponent.isShowing}, isDisplayable: ${config.targetComponent.isDisplayable}")
-                    // Use SwingUtilities as final fallback
-                    SwingUtilities.convertRectangle(
-                        config.targetComponent,
-                        config.targetComponent.bounds,
-                        glassPane
-                    )
-                }
-            } catch (e: IllegalComponentStateException) {
-                println("DEBUG: Exception caught, using SwingUtilities fallback: ${e.message}")
-                // Another fallback if screen location fails
                 SwingUtilities.convertRectangle(
-                    config.targetComponent,
+                    config.targetComponent.parent ?: config.targetComponent,
                     config.targetComponent.bounds,
                     glassPane
                 )
+            } catch (e: Exception) {
+                // Fallback to screen coordinates if SwingUtilities fails
+                try {
+                    if (config.targetComponent.isShowing && config.targetComponent.isDisplayable) {
+                        val componentLocationOnScreen = config.targetComponent.locationOnScreen
+                        val glassPaneLocationOnScreen = glassPane.locationOnScreen
+                        
+                        val relativeX = componentLocationOnScreen.x - glassPaneLocationOnScreen.x
+                        val relativeY = componentLocationOnScreen.y - glassPaneLocationOnScreen.y
+                        
+                        Rectangle(relativeX, relativeY, config.targetComponent.width, config.targetComponent.height)
+                    } else {
+                        // Final fallback: use component bounds directly
+                        config.targetComponent.bounds
+                    }
+                } catch (e2: Exception) {
+                    // Last resort: use component bounds
+                    config.targetComponent.bounds
+                }
             }
         } else {
             Rectangle(config.position.x, config.position.y, 0, 0)
@@ -478,11 +459,6 @@ private class OnboardingPopup(
                         doNotShowAgainChecked = !doNotShowAgainChecked
                         if (doNotShowAgainChecked && config.suppressionKey != null) {
                             WorkspacePreferences.suppressPopup(config.suppressionKey)
-                        }
-                        // Show visual feedback for a moment before dismissing
-                        javax.swing.Timer(500) { dismiss() }.apply {
-                            isRepeats = false
-                            start()
                         }
                     }
                     return true

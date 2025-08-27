@@ -129,31 +129,51 @@ val cogMap3Objects = newSim {
     }
 
     addSidebarInfo(
-        """ 
-        # Introduction
+    """ 
+    # Introduction
+    
+    The Generic 3 Objects Simulation consists of a central recurrent network where, sparse input from the distributed olfactory neuron group (`Sensory Neurons`) are sent into the recurrent network. The inputs function 
+    similarly to the `Agent Trails` simulation; objects sensed by the agent's receptors are plotted into the plot where, the agent's responses to each object are recorded.  
+    
+    # Simulation Details
+    
+    This simulation models the distance-based interactions between the agent and objects, showing how networks develop cognitive maps of their environment. Each object is associated with "smell vectors", where an object
+    has a stronger impact on the agent's sensory receptors the closer an object is. Because there are multiple objects in this environment, the agent is presented with multiple overlapping patterns of activation. 
+    The total pattern of activation of the agent's olfactory receptors is a sum of scaled smell vectors. 
+    
+    In this simulation, the agent will be dragged to each of the objects where, its sensory activations are recorded and plotted into the `Cognitive Maps` window. In this PCA plot is a graph of the agent's sensory receptors
+    and the objects that it has interacted with at different points. Points are labeled when the agent is directly on top of an object. This PCA plot can be thought of as the agent's perception of its environment where,
+    through the agent's movement in the odor world, it develops an understanding of its environment.
+    
+    # What to Do
+    
+    In this simulation, the mouse is the agent with `3` objects, the cheese, fish, and flower. To get a quick feel of the simulation, run the simulation and drag the agent to each of the objects and observe changes
+    in the `Cognitive Maps` window. Below are the step-by-step instructions:
+    
+    1. Run the simulation with the `Run workspace` button in the toolbar (the play button). 
+    
+    2. In the `World` window, drag the agent (the mouse) towards each of the objects (cheese, flower, fish).
+    
+    3. Observe how the elements in the `Network` and `Cognitive Map` windows change when the agent is moved around.
+
+    4. If the map development slows down, restart the "Cognitive Map" window with the "Eraser" button in the plot toolbar.
+    
+        - Note: You can also run the simulation again to start the mapping again and reset the weights. 
         
-        The Generic 3 Objects Simulation consists of a central recurrent network, where sparse input from the distributed olfactor inputs into the network. The inputs function similarly to the Agent Trails, as the objects sensed by the agent's receptors are plotted into the graph, modelling the reponse of the agent to its world.  
-        
-        Objects in this network are each associated with "smell vectors", which have a stronger impact the closer they are to the agent. Because there are multiple objects in this environment, the agent is presented with multiple overlapping patterns of activation. The total pattern of inputs into the agent's olfactory receptors is a sum of scaled smell vectors. 
-        
-        This simulation models distance based interactions between the agent and objects, showing how networks develop cognitive maps of their environment. 
-        
-        # What to Do
-        1. Run the simulation with the "Run workspace" button in the toolbar. 
-        2. In the "World" window, drag the mouse (the agent) towards the cheese, flower, and fish objects.
-        3. Observe how the elements in the "Network" window and map "Cognitive Map" windows develop when moving the agent
-            - The "Cognitive Map" creates a graph of where the agent senses the objects it interacts with. 
-            - When the agent is directly on top of an object, it labels the point with the corresponding object. 
-        4. The map showcases how an agent develops a sense of an environment. 
-        5. If the map development slows down, restart the "Cognitive Map" window with the "Eraser" button in the tool bar
-            - You can run the simulation again to start mapping again. 
-        """.trimIndent(),
+    # Credits
+    
+    Jasmine Lau
+    
+    [Jeff Yoshimi](www.jeffyoshimi.net)
+    
+    Kanly Thao
+    """.trimIndent(),
     )
 
     withGui{
-        place(networkComponent,463, 450, 483, 427)
+        place(networkComponent,470, 450, 470, 427)
         place(odorWorldComponent,0, 0, 470, 593)
-        place(projectionPlot,463, 0, 478, 448)
+        place(projectionPlot,470, 0, 470, 450)
     }
 
 }

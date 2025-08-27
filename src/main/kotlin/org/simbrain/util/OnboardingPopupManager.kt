@@ -27,15 +27,23 @@ class OnboardingPopupManager(private val rootFrame: JFrame) {
             
             g2.dispose()
         }
+        
+        // Override to only consume events that hit our popups
+        override fun contains(x: Int, y: Int): Boolean {
+            return activePopups.any { it.contains(Point(x, y)) }
+        }
     }.apply {
         isOpaque = false
         layout = null
         addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent) {
-                handleGlassPaneMouseEvent(e)
+                handlePopupMouseEvent(e)
             }
             override fun mousePressed(e: MouseEvent) {
-                handleGlassPaneMouseEvent(e)
+                handlePopupMouseEvent(e)
+            }
+            override fun mouseReleased(e: MouseEvent) {
+                handlePopupMouseEvent(e)
             }
         })
     }
@@ -119,11 +127,13 @@ class OnboardingPopupManager(private val rootFrame: JFrame) {
     }
     
     /**
-     * Handle mouse events on the glass pane
+     * Handle mouse events that hit our popups
      */
-    private fun handleGlassPaneMouseEvent(e: MouseEvent) {
+    private fun handlePopupMouseEvent(e: MouseEvent) {
         val point = e.point
-        for (popup in activePopups.reversed()) { // Check in reverse order (top to bottom)
+        
+        // Check popups in reverse order (top to bottom)
+        for (popup in activePopups.reversed()) {
             if (popup.contains(point)) {
                 val handled = popup.handleMouseEvent(e)
                 if (handled) {
@@ -133,14 +143,6 @@ class OnboardingPopupManager(private val rootFrame: JFrame) {
                 }
             }
         }
-        // If no popup handled the event, pass it through by making glass pane temporarily invisible
-        glassPane.isVisible = false
-        val component = SwingUtilities.getDeepestComponentAt(rootFrame.contentPane, e.x, e.y)
-        if (component != null) {
-            val convertedEvent = SwingUtilities.convertMouseEvent(glassPane, e, component)
-            component.dispatchEvent(convertedEvent)
-        }
-        glassPane.isVisible = activePopups.isNotEmpty()
     }
 }
 

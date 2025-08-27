@@ -45,13 +45,12 @@ class TrainerControls(trainer: SupervisedTrainer, supervisedNetwork: SupervisedN
     private val stopAction = createAction(
         name = "Stop",
         iconPath = "menu_icons/Stop.png",
-        description = "Stop training.",
+        description = "Stop training",
     ) {
         trainer.stopTraining()
     }
 
     private val stepAction = createAction(
-        name = "Step",
         description = "Iterate training once",
         iconPath =  "menu_icons/Step.png",
         initBlock = {
@@ -110,6 +109,7 @@ class TrainerControls(trainer: SupervisedTrainer, supervisedNetwork: SupervisedN
         }
 
         val runTools = JPanel().apply { layout = MigLayout("nogrid ") }
+        runTools.add(JButton(stepAction))
         runTools.add(ToggleButton(listOf(runAction, stopAction)).apply {
             setAction("Run")
             trainer.events.beginTraining.on {
@@ -121,7 +121,6 @@ class TrainerControls(trainer: SupervisedTrainer, supervisedNetwork: SupervisedN
                 setAction("Run")
             }
         })
-        runTools.add(JButton(stepAction))
         val initParamsButton = JButton(initializeParameters)
         initParamsButton.hideActionText = true
         runTools.add(initParamsButton)

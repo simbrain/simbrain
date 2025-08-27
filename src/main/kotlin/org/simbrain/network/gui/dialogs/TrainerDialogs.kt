@@ -1,6 +1,7 @@
 package org.simbrain.network.gui.dialogs
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
@@ -163,6 +164,8 @@ fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
         addCommitTask { syncDataSet() }
 
         contentPane = runControls
+
+        setAsDoneDialog()
     }
 }
 
@@ -177,42 +180,13 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         }
 
         val trainer = unsupervisedNetwork.trainer
+        
+        // Track the training job so we can cancel it when dialog closes
+        var trainingJob: Job? = null
 
         val runControls = JPanel().apply { layout = MigLayout("nogrid") }
-        val runAction = createAction(
-            name = "Run",
-            description = "Run training algorithm",
-            iconPath = "menu_icons/Play.png",
-        ) {
-            with(network) {
-                launch {
-                    trainer.startTraining(unsupervisedNetwork)
-                }
-            }
-        }
-        val stopAction = createAction(
-            name = "Stop",
-            description = "Stop training algorithm",
-            iconPath = "menu_icons/Stop.png",
-        ) {
-            launch {
-                trainer.stopTraining()
-            }
-        }
-        runControls.add(ToggleButton(listOf(runAction, stopAction)).apply {
-            setAction("Run")
-            trainer.events.beginTraining.on {
-                this@dialog.cursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR)
-                setAction("Stop")
-            }
-            trainer.events.endTraining.on {
-                this@dialog.cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)
-                setAction("Run")
-            }
-        })
 
         val stepAction = createAction(
-            name = "Step",
             description = "Iterate training once",
             iconPath = "menu_icons/Step.png",
         ) {
@@ -226,6 +200,39 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         }
 
         runControls.add(JButton(stepAction))
+
+        val runAction = createAction(
+            name = "Run",
+            description = "Run training algorithm",
+            iconPath = "menu_icons/Play.png",
+        ) {
+            with(network) {
+                trainingJob = launch {
+                    trainer.startTraining(unsupervisedNetwork)
+                }
+            }
+        }
+        val stopAction = createAction(
+            name = "Stop",
+            description = "Stop training algorithm",
+            iconPath = "menu_icons/Stop.png",
+        ) {
+            launch {
+                trainer.stopTraining()
+            }
+            trainingJob?.cancel()
+        }
+        runControls.add(ToggleButton(listOf(runAction, stopAction)).apply {
+            setAction("Run")
+            trainer.events.beginTraining.on {
+                this@dialog.cursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR)
+                setAction("Stop")
+            }
+            trainer.events.endTraining.on {
+                this@dialog.cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)
+                setAction("Run")
+            }
+        })
 
         val resetAction = createAction(
             name = "Randomize",
@@ -319,8 +326,12 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         mainPanel.add(dataSetTabPane, "span, grow")
 
         addCommitTask { syncDataSet() }
+        addCloseTask {
+            trainingJob?.cancel()
+        }
 
         contentPane = mainPanel
+        setAsDoneDialog()
     }
 }
 

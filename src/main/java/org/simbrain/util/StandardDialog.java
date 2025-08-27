@@ -189,9 +189,8 @@ public class StandardDialog extends GenericJDialog {
         // Process this event the same as the "Cancel" button.
         WindowAdapter windowAdapter = new WindowAdapter() {
             public void windowClosing(final WindowEvent windowEvent) {
-                invokeWhenClosing.forEach(Runnable::run);
                 myIsDialogCancelled = true;
-                closeDialogCancel();
+                closeDialogCancel(); // closeDialogCancel() now handles running close tasks
             }
         };
 
@@ -208,15 +207,21 @@ public class StandardDialog extends GenericJDialog {
     }
 
     /**
-     * Adds a function to invoke when closing the dialog.
+     * Adds a function to invoke when committing the dialog (OK/Done button only).
      * Note: Must call this before making the dialog visible!
      *
-     * @param task a Runnable to execute when closing
+     * @param task a Runnable to execute when committing
      */
     public void addCommitTask(Runnable task) {
         invokeWhenCommitting.add(task);
     }
 
+    /**
+     * Adds a function to invoke when closing the dialog (ALL close methods: OK, Cancel, X button).
+     * Note: Must call this before making the dialog visible!
+     *
+     * @param task a Runnable to execute when closing
+     */
     public void addCloseTask(Runnable task) {
         invokeWhenClosing.add(task);
     }
@@ -235,6 +240,10 @@ public class StandardDialog extends GenericJDialog {
         for (Runnable task : invokeWhenCommitting) {
             task.run();
         }
+        // Run close tasks for OK button as well - close tasks should run for ALL dialog closures
+        for (Runnable task : invokeWhenClosing) {
+            task.run();
+        }
         dispose();
     }
 
@@ -242,6 +251,10 @@ public class StandardDialog extends GenericJDialog {
      * Override to perform specific clean up when dialog closed.
      */
     protected void closeDialogCancel() {
+        // Run close tasks for Cancel button
+        for (Runnable task : invokeWhenClosing) {
+            task.run();
+        }
         dispose();
     }
 

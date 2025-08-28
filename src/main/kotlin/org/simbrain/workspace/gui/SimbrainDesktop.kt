@@ -12,6 +12,7 @@ import org.simbrain.custom_sims.NewSimulation
 import org.simbrain.custom_sims.Simulation
 import org.simbrain.custom_sims.simulations
 import org.simbrain.docviewer.DocViewerViewPanel
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.*
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.genericframe.GenericJFrame
@@ -158,6 +159,10 @@ object SimbrainDesktop {
             if (dockComponent.isVisible) {
                 WorkspacePreferences.bottomDockSize = dividerLocation
             }
+        }
+        // Show dock based on preference
+        if (WorkspacePreferences.showBottomDockByDefault) {
+            showDock()
         }
     }
 
@@ -561,6 +566,19 @@ object SimbrainDesktop {
         fileMenu.add(actionManager.clearWorkspaceAction)
         fileMenu.addSeparator()
         fileMenu.add(actionManager.showUpdaterDialog)
+        fileMenu.addSeparator()
+        fileMenu.add(desktopPane.createAction(
+            name = "Workspace Preferences...",
+            description = "Set default properties that apply to all networks in the Simbrain workspace.",
+        ) {
+            getPreferenceDialog(WorkspacePreferences).display()
+        })
+        fileMenu.add(desktopPane.createAction(
+            name = "Network Preferences...",
+            description = "Set default properties that apply to all networks in the Simbrain workspace.",
+        ) {
+            getPreferenceDialog(NetworkPreferences).display()
+        })
         fileMenu.addSeparator()
         fileMenu.add(actionManager.quitWorkspaceAction)
         return fileMenu

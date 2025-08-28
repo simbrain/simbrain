@@ -15,6 +15,7 @@ import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
 import org.simbrain.util.*
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.WorkspaceComponent
+import org.simbrain.workspace.WorkspacePreferences
 import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.world.dataworld.DataWorld
 import org.simbrain.world.dataworld.DataWorldComponent
@@ -210,7 +211,7 @@ fun SimulationScope.addDocViewerFromFile(title: String, fileName: String): DocVi
     return docViewerComponent
 }
 
-suspend fun SimulationScope.addSidebarInfoFromFile(fileName: String, initiallyOpened: Boolean = true) {
+suspend fun SimulationScope.addSidebarInfoFromFile(fileName: String, initiallyOpened: Boolean = WorkspacePreferences.showSimulationInfoByDefault) {
     workspace.infoDoc.text =  ResourceManager.readFileContents(
         "custom_sims" + Utils.FS + fileName
     )
@@ -235,7 +236,7 @@ fun SimulationScope.addDocViewer(title: String, markdownText: String): DocViewer
     return docViewerComponent
 }
 
-suspend fun SimulationScope.addSidebarInfo(markdownText: String, width: Int? = null, initiallyOpened: Boolean = true) {
+suspend fun SimulationScope.addSidebarInfo(markdownText: String, width: Int? = null, initiallyOpened: Boolean = WorkspacePreferences.showSimulationInfoByDefault) {
     workspace.infoDoc.text = markdownText
     workspace.infoDoc.render()
     withGui {

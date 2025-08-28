@@ -446,22 +446,18 @@ private class OnboardingPopup(
     }
     
     fun handleMouseEvent(e: MouseEvent): Boolean {
-        // Handle both clicked and pressed events for better responsiveness
-        if (e.id == MouseEvent.MOUSE_CLICKED || e.id == MouseEvent.MOUSE_PRESSED) {
+        // Handle mouse pressed events for immediate responsiveness
+        if (e.id == MouseEvent.MOUSE_PRESSED) {
             when {
                 closeButtonBounds.contains(e.point) -> {
-                    if (e.id == MouseEvent.MOUSE_CLICKED) { // Only dismiss on actual click
-                        dismiss()
-                    }
+                    dismiss()
                     return true
                 }
                 config.showDoNotShowAgain && 
                 (checkboxBounds.contains(e.point) || checkboxTextBounds.contains(e.point)) -> {
-                    if (e.id == MouseEvent.MOUSE_CLICKED) { // Only toggle on actual click
-                        doNotShowAgainChecked = !doNotShowAgainChecked
-                        if (doNotShowAgainChecked && config.suppressionKey != null) {
-                            WorkspacePreferences.suppressPopup(config.suppressionKey)
-                        }
+                    doNotShowAgainChecked = !doNotShowAgainChecked
+                    if (doNotShowAgainChecked && config.suppressionKey != null) {
+                        WorkspacePreferences.suppressPopup(config.suppressionKey)
                     }
                     return true
                 }

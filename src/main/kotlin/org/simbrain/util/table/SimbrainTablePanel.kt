@@ -305,6 +305,10 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
         // synchronize the JTable selection with the model
         if (selected == -1 && model.currentRowIndex >= 0 && model.currentRowIndex < rowCount) {
             setRowSelectionInterval(model.currentRowIndex, model.currentRowIndex)
+            // Select all columns for this row to get the full row highlight
+            if (columnCount > 0) {
+                setColumnSelectionInterval(0, columnCount - 1)
+            }
             return model.currentRowIndex
         }
         
@@ -317,6 +321,10 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
         }
         clearSelection()
         setRowSelectionInterval(row, row)
+        // Select all columns for this row to get the full row highlight
+        if (columnCount > 0) {
+            setColumnSelectionInterval(0, columnCount - 1)
+        }
     }
 
     fun setSelectedColumn(column: Int) {
@@ -340,6 +348,10 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
             // Set the selection in the JTable
             if (rowCount > 0) {
                 setRowSelectionInterval(rowToSelect, rowToSelect)
+                // Select all columns for this row to get the full row highlight
+                if (columnCount > 0) {
+                    setColumnSelectionInterval(0, columnCount - 1)
+                }
                 model.currentRowIndex = rowToSelect
             }
         }
@@ -368,6 +380,10 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
         // Update the JTable selection to match
         clearSelection()
         setRowSelectionInterval(nextRow, nextRow)
+        // Select all columns for this row to get the full row highlight
+        if (columnCount > 0) {
+            setColumnSelectionInterval(0, columnCount - 1)
+        }
         
         // Fire the event
         (dataModel as? SimbrainDataFrame)?.events?.currentRowChanged?.fire()
@@ -392,6 +408,13 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
 
     override fun isCellEditable(row: Int, column: Int): Boolean {
         return model.isMutable
+    }
+
+    override fun scrollRectToVisible(aRect: Rectangle) {
+        // Override to prevent automatic scrolling when selection changes programmatically
+        // This allows manual scrolling but prevents unwanted automatic scrolling
+        // when rows/columns are selected via code
+        // Do nothing - suppress the default scrolling behavior
     }
 
     fun getSelectedCells(): List<Pair<Int, Int>> {

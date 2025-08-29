@@ -29,7 +29,7 @@ import kotlin.random.Random
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
-val cortexLayers = newSim {
+val corticalLayers = newSim {
 
     // Location and scale params for lognormal dist of all synapse groups
     var exlocation = 0.0
@@ -110,14 +110,11 @@ val cortexLayers = newSim {
         sg.synapses.forEach {
             val stp = ShortTermPlasticity()
             // Use specific parameters for this connection type
-            val (u, d, f) = spikeResponderParams
-            stp.U = u
-            stp.D = d
-            stp.F = f
+            stp.init(it)
             // Configure the internal JumpAndDecay spike responder
             (stp.spikeResponderLocal as JumpAndDecay).apply {
                 timeConstant = 5.0  // Standard decay time
-                useConvolution = false
+                useConvolution = true
                 baseLine = 0.0
             }
             it.spikeResponder = stp
@@ -252,16 +249,9 @@ val cortexLayers = newSim {
         ## Explore Layer Dynamics
 
         1. Click `Run` to start the simulation.
-        2. Observe how spikes propagate from Layer 4 (main sensory input) to Layers 2/3 and 5/6.
-        3. Modify synaptic sparsity or strengths by adjusting parameters in the code to see effects on network dynamics.
-        4. Watch how recurrent connections within layers sustain or dampen activity.
-        5. Inject current or perturb neurons to simulate sensory input and observe activity patterns.
-
-        ## Experimental Ideas
-
-        - Alter the ratio of excitatory to inhibitory neurons and note the impact on firing patterns.
-        - Change short-term plasticity parameters to simulate different synaptic dynamics.
-        - Visualize synaptic delays to understand the timing of signal propagation across layers.
+        2. Use the node activation tool to inject activation into the  “output” layer 5/6. Few spikes in the other layers should be observed.
+        3.  Use the node activation tool to inject activation into layer 4. A burst of activity in 2/3 should then be observed, followed by a burst of activity in 5/6, consistent with known connectivity.
+        4.  Use the node activation tool to inject activation into layer 2/3. This should lead, after some delay, to activity in 5/6, and then to a burst of activity in layer 4.
 
         # References
 

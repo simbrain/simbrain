@@ -13,7 +13,7 @@ import org.simbrain.custom_sims.simulations.braitenberg.pursuer
 import org.simbrain.custom_sims.simulations.demos.competitiveSim
 import org.simbrain.custom_sims.simulations.edge_of_chaos.edgeOfChaos
 import org.simbrain.custom_sims.simulations.edge_of_chaos.edgeOfChaosBitStream
-import org.simbrain.custom_sims.simulations.neuroscience.cortexLayers
+import org.simbrain.custom_sims.simulations.neuroscience.corticalLayers
 import org.simbrain.custom_sims.simulations.neuroscience.spikingNetworkSimulation
 import org.simbrain.custom_sims.simulations.nlp.tinyLanguageModel
 import org.simbrain.custom_sims.simulations.patterns_of_activity.cogMap3Objects
@@ -96,7 +96,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         // item("Hippocampus") { Hippocampus() }
         // item("Cerebellum") { Cerebellum() }
         item("Spiking Network") { spikingNetworkSimulation }
-        item("Cortical layers") { cortexLayers }
+        item("Cortical layers") { corticalLayers }
         //item("Cortical areas") { cortexKuramoto }
     }
 

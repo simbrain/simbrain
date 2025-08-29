@@ -105,10 +105,10 @@ val spikeResponderSim = newSim {
         - **Clamped Input**: A user-controlled input neuron, which you adjust with arrow keys.
         - **Izhikevich Neuron**: A biologically inspired spiking model that drives the system.
         - [**Spike Responders**](https://docs.simbrain.net/docs/network/spikeresponders/): Each connection uses a different spike responder to shape the signal:
-        - 🔵 [**Step**](https://docs.simbrain.net/docs/network/spikeresponders/step.html): Fixed response for a set duration.
-        - 🔴 [**Jump and Decay**](https://docs.simbrain.net/docs/network/spikeresponders/jumpdecay.html): Instant rise with exponential decay.
-        - 🟡 [**Rise and Decay**](https://docs.simbrain.net/docs/network/spikeresponders/riseAndDecay.html): Gradual rise and fall, mimicking slower chemical transmission.
-        - 🟢 [**Short-Term Plasticity**](https://docs.simbrain.net/docs/network/spikeresponders/shortTermPlasticity.html): History-dependent responses that adapt over time.
+        - [**Step**](https://docs.simbrain.net/docs/network/spikeresponders/step.html): Fixed response for a set duration.
+        - [**Jump and Decay**](https://docs.simbrain.net/docs/network/spikeresponders/jumpdecay.html): Instant rise with exponential decay.
+        - [**Rise and Decay**](https://docs.simbrain.net/docs/network/spikeresponders/riseAndDecay.html): Gradual rise and fall, mimicking slower chemical transmission.
+        - [**Short-Term Plasticity**](https://docs.simbrain.net/docs/network/spikeresponders/shortTermPlasticity.html): History-dependent responses that adapt over time.
         - **Spike Responders Plot**: A time series that visualizes each downstream neuron’s post-synaptic response to spikes.
 
         # Background

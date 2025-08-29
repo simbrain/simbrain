@@ -11,10 +11,24 @@ class DataWorld(val rows: Int = 30, val cols: Int = 5): AttributeContainer, Edit
 
     var dataModel = BasicDataFrame(rows, cols)
 
-    var dataEntryMode: DataEntryMode by GuiEditable(
-        initValue = DataEntryMode.LOOP,
-        description = "How row advancement and data entry are handled. Either stay on same row each iteration (static) or" +
-                "advance each iteration and wrap around at the last row"
+    /**
+     * Controls how the current row advances on each update tick.
+     * - LOOP: advance to next row, wrap to 0 at the end
+     * - STATIC: stay on the current row
+     */
+    var rowAdvancement: RowAdvancement by GuiEditable(
+        initValue = RowAdvancement.LOOP,
+        description = "Row advancement per update: Loop cycles through rows; Static stays on the current row."
+    )
+
+    /**
+     * Controls what happens when data is written.
+     * - OVERWRITE: write into the current row
+     * - APPEND: if writing at the last row, insert a new row after it (table grows)
+     */
+    var writeBehavior: WriteBehavior by GuiEditable(
+        initValue = WriteBehavior.OVERWRITE,
+        description = "Data write behavior: Overwrite writes into current row; append grows the table at the end."
     )
 
     @Producible
@@ -36,18 +50,14 @@ class DataWorld(val rows: Int = 30, val cols: Int = 5): AttributeContainer, Edit
     }
 
     /**
-     * Handle post-write behavior based on current data entry mode
+     * Handle post-write behavior based on writeBehavior.
+     * APPEND only takes effect when we're at the last row.
      */
     private fun handleRowWrite() {
-        when (dataEntryMode) {
-            DataEntryMode.APPEND -> {
-                if (dataModel.currentRowIndex == dataModel.rowCount - 1) {
-                    dataModel.insertRow(dataModel.currentRowIndex + 1)
-                }
-            }
-            DataEntryMode.LOOP, DataEntryMode.STATIC -> {
-                // No additional action needed for LOOP or STATIC modes during write
-            }
+        if (writeBehavior == WriteBehavior.APPEND &&
+            dataModel.currentRowIndex == dataModel.rowCount - 1
+        ) {
+            dataModel.insertRow(dataModel.currentRowIndex + 1)
         }
     }
 
@@ -56,19 +66,13 @@ class DataWorld(val rows: Int = 30, val cols: Int = 5): AttributeContainer, Edit
         dataModel.events.currentRowChanged.fire().await()
     }
 
-    /**
-     * Handle row advancement based on current data entry mode
-     */
     private fun handleRowAdvancement() {
-        when (dataEntryMode) {
-            DataEntryMode.LOOP -> {
+        when (rowAdvancement) {
+            RowAdvancement.LOOP -> {
                 dataModel.currentRowIndex = (dataModel.currentRowIndex + 1) % dataModel.rowCount
             }
-            DataEntryMode.APPEND -> {
-                dataModel.currentRowIndex = (dataModel.currentRowIndex + 1) % dataModel.rowCount
-            }
-            DataEntryMode.STATIC -> {
-                // Stay on current row - no advancement
+            RowAdvancement.STATIC -> {
+                // no movement
             }
         }
     }
@@ -79,14 +83,18 @@ class DataWorld(val rows: Int = 30, val cols: Int = 5): AttributeContainer, Edit
         get() = id
 
     /**
-     * Defines how the DataWorld handles row advancement and data entry
+     * How the current row advances each update.
      */
-    enum class DataEntryMode {
-        /** Advance to next row on each update, loop back to start when reaching end */
+    enum class RowAdvancement {
         LOOP,
-        /** Advance to next row on each update, add new rows when reaching end */
-        APPEND,
-        /** Stay on current row, no automatic advancement */
         STATIC
+    }
+
+    /**
+     * How data writes behave at the end of the table.
+     */
+    enum class WriteBehavior {
+        OVERWRITE,
+        APPEND
     }
 }

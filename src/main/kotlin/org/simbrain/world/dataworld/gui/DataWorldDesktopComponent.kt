@@ -1,5 +1,8 @@
 package org.simbrain.world.dataworld.gui
 
+import org.simbrain.util.createAction
+import org.simbrain.util.createEditorDialog
+import org.simbrain.util.display
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.table.*
 import org.simbrain.util.widgets.ShowHelpAction
@@ -89,6 +92,10 @@ class DataWorldDesktopComponent(frame: GenericFrame, val component: DataWorldCom
         file.add(tablePanel.table.importCSVAction(fixedColumns = false))
         file.addSeparator()
         file.add(actionManager.createCloseAction(this))
+        file.addSeparator()
+        file.add(createAction("Configure Data World") {
+            component.dataWorld.createEditorDialog("Configure Data World").display()
+        })
 
         // Edit Menu
         fun createEditMenu() {

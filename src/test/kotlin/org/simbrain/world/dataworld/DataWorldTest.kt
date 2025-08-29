@@ -1,5 +1,6 @@
 package org.simbrain.world.dataworld
 
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.util.table.BasicDataFrame
@@ -20,7 +21,7 @@ class DataWorldTest {
         assertEquals(5, dataWorld.dataModel.rowCount)
         assertEquals(3, dataWorld.dataModel.columnCount)
         assertEquals(0, dataWorld.dataModel.currentRowIndex)
-        assertEquals(DataEntryMode.LOOP, dataWorld.appendMode)
+        assertEquals(DataEntryMode.LOOP, dataWorld.dataEntryMode)
     }
 
     @Test
@@ -39,7 +40,7 @@ class DataWorldTest {
     }
 
     @Test
-    fun `test update advances current row`() {
+    fun `test update advances current row`() = runBlocking {
         assertEquals(0, dataWorld.dataModel.currentRowIndex)
         
         dataWorld.update()
@@ -50,8 +51,8 @@ class DataWorldTest {
     }
 
     @Test
-    fun `test loop mode wraps around`() {
-        dataWorld.appendMode = DataEntryMode.LOOP
+    fun `test loop mode wraps around`() = runBlocking {
+        dataWorld.dataEntryMode = DataEntryMode.LOOP
         
         // Advance to last row
         repeat(4) { dataWorld.update() }
@@ -85,7 +86,7 @@ class DataWorldTest {
 
     @Test
     fun `test append mode in loop mode`() {
-        dataWorld.appendMode = DataEntryMode.LOOP
+        dataWorld.dataEntryMode = DataEntryMode.LOOP
         val initialRowCount = dataWorld.dataModel.rowCount
         
         // Change columns to StringType to properly test string functionality
@@ -101,7 +102,7 @@ class DataWorldTest {
 
     @Test
     fun `test append mode creates new row`() {
-        dataWorld.appendMode = DataEntryMode.APPEND
+        dataWorld.dataEntryMode = DataEntryMode.APPEND
         val initialRowCount = dataWorld.dataModel.rowCount
         
         // Change columns to StringType to properly test string functionality
@@ -117,7 +118,7 @@ class DataWorldTest {
 
     @Test
     fun `test append mode with numeric data`() {
-        dataWorld.appendMode = DataEntryMode.APPEND
+        dataWorld.dataEntryMode = DataEntryMode.APPEND
         val initialRowCount = dataWorld.dataModel.rowCount
         
         // Move to last row and set numeric data
@@ -193,6 +194,39 @@ class DataWorldTest {
         // Should handle empty access gracefully
         assertNotNull(emptyWorld.getCurrentStringRow())
         assertNotNull(emptyWorld.getCurrentNumericRow())
+    }
+
+    @Test
+    fun `test static mode stays on current row`() = runBlocking {
+        dataWorld.dataEntryMode = DataEntryMode.STATIC
+        assertEquals(0, dataWorld.dataModel.currentRowIndex)
+        
+        // Update multiple times - should stay on row 0
+        repeat(5) { dataWorld.update() }
+        assertEquals(0, dataWorld.dataModel.currentRowIndex)
+        
+        // Manually change row and verify it stays there
+        dataWorld.dataModel.currentRowIndex = 3
+        repeat(3) { dataWorld.update() }
+        assertEquals(3, dataWorld.dataModel.currentRowIndex)
+    }
+
+    @Test
+    fun `test static mode with data writing`() {
+        dataWorld.dataEntryMode = DataEntryMode.STATIC
+        val initialRowCount = dataWorld.dataModel.rowCount
+        
+        // Write to current row multiple times
+        dataWorld.setCurrentNumericRow(doubleArrayOf(1.0, 2.0, 3.0))
+        dataWorld.setCurrentNumericRow(doubleArrayOf(4.0, 5.0, 6.0))
+        
+        // Should not add new rows and should stay on same row
+        assertEquals(initialRowCount, dataWorld.dataModel.rowCount)
+        assertEquals(0, dataWorld.dataModel.currentRowIndex)
+        
+        // Verify the data was written to row 0
+        val retrievedRow = dataWorld.dataModel.getRow<Double>(0)
+        assertArrayEquals(doubleArrayOf(4.0, 5.0, 6.0), retrievedRow.toDoubleArray(), 0.001)
     }
 
 

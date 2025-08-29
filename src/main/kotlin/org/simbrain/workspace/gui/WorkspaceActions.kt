@@ -422,7 +422,7 @@ class WorkspaceActions {
         coroutineScope = workspace
     ) {
         val component = DataWorldComponent(sourceName, DataWorld(cols = numCols)).apply {
-            dataWorld.appendMode = DataWorld.DataEntryMode.APPEND
+            dataWorld.dataEntryMode = DataWorld.DataEntryMode.APPEND
         }
         workspace.addWorkspaceComponent(component)
         with(workspace.couplingManager) {

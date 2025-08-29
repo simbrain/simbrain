@@ -4,22 +4,37 @@ import org.simbrain.util.*
 
 object WorkspacePreferences: PreferenceHolder() {
 
-    @UserParameter(label = "Sim directory", useFileChooser = true)
+    @UserParameter(
+        label = "Show info dock by default",
+        description = "Show simulation info by default",
+        order = 10
+    )
+    var showSimulationInfoByDefault by BooleanPreference(true)
+
+    @UserParameter(
+        label = "Show bottom dock by default",
+        description = "Show bottom dock by default",
+        order = 20
+    )
+    var showBottomDockByDefault by BooleanPreference(false)
+
+    @UserParameter(
+        label = "Bottom dock size",
+        description = "Size of bottom dock in pixel",
+        order = 30
+    )
+    var bottomDockSize by IntegerPreference(800)
+
+    @UserParameter(
+        label = "Simulation directory",
+        useFileChooser = true,
+        order = 50
+    )
     var simulationDirectory by StringPreference("." + Utils.FS +"simulations" + Utils.FS + "workspaces")
 
-    @UserParameter(label = "Show bottom dock by Default", description = "Show bottom dock by default")
-    var showBottomDockByDefault by BooleanPreference(true)
-
-    @UserParameter(label = "Bottom dock size", description = "Size of bottom dock in pixel")
-    var bottomDockSize by IntegerPreference(800)
-    
     // Onboarding popup preferences - stored as comma-separated suppressed popup keys
-    @UserParameter(label = "Onboarding popups", description = "Delete all strings to reset all popups")
     var suppressedPopups by StringPreference("")
 
-    @UserParameter(label = "Show Info Dock by Default", description = "Show simulation info by default")
-    var showSimulationInfoByDefault by BooleanPreference(true)
-    
     /**
      * Check if a popup with the given key has been suppressed by the user
      */

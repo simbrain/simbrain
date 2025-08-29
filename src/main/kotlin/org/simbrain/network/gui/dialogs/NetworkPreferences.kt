@@ -89,7 +89,7 @@ object NetworkPreferences: PreferenceHolder() {
         order = 10,
         tab = "Randomizers"
     )
-    var weightRandomizer by ProbabilityDistributionPreference(NormalDistribution(0.0, 0.1))
+    var weightRandomizer by ProbabilityDistributionPreference(NormalDistribution(0.0, 1.5))
 
     @UserParameter(
         label = "Excitatory Randomizer",

@@ -1,5 +1,6 @@
 package org.simbrain.workspace.gui
 
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.plot.barchart.BarChartComponent
 import org.simbrain.plot.barchart.BarChartModel
 import org.simbrain.plot.histogram.HistogramComponent
@@ -13,16 +14,14 @@ import org.simbrain.plot.raster.RasterModel
 import org.simbrain.plot.rasterchart.RasterPlotComponent
 import org.simbrain.plot.timeseries.TimeSeriesModel
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
-import org.simbrain.util.CmdOrCtrl
-import org.simbrain.util.KeyCombination
-import org.simbrain.util.createAction
-import org.simbrain.util.displayInDialog
+import org.simbrain.util.*
 import org.simbrain.workspace.Consumer
 import org.simbrain.workspace.Producer
 import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.WorkspacePreferences
 import org.simbrain.workspace.couplings.CouplingManager
 import org.simbrain.workspace.couplings.getProducer
+import org.simbrain.workspace.gui.SimbrainDesktop.desktopPane
 import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager
 import org.simbrain.world.dataworld.DataWorld
 import org.simbrain.world.dataworld.DataWorldComponent
@@ -53,7 +52,7 @@ class WorkspaceActions {
         SimbrainDesktop.bottomDockSplitter.toggleDock(WorkspacePreferences.bottomDockSize)
     }
 
-    val toggleInfoDock = SimbrainDesktop.desktopPane.createAction(
+    val toggleInfoDock = desktopPane.createAction(
         name = "Show/hide info panel",
         description = "Toggle visibilty of info panel",
         iconPath = "menu_icons/Info.png",
@@ -70,7 +69,7 @@ class WorkspaceActions {
         SimbrainDesktop.sideDockSplitter.toggleDock()
     }
 
-    val clearWorkspaceAction = SimbrainDesktop.desktopPane.createAction(
+    val clearWorkspaceAction = desktopPane.createAction(
         name = "Clear desktop",
         description = "Remove all windows from the desktop",
         keyboardShortcut = CmdOrCtrl + 'K',
@@ -79,7 +78,7 @@ class WorkspaceActions {
         SimbrainDesktop.clearDesktop()
     }
 
-    val openWorkspaceAction = SimbrainDesktop.desktopPane.createAction(
+    val openWorkspaceAction = desktopPane.createAction(
         iconPath = "menu_icons/Open.png",
         name = "Open workspace file (.zip) ...",
         description = "Open a workspace file from .zip",
@@ -88,7 +87,7 @@ class WorkspaceActions {
         SimbrainDesktop.openWorkspace()
     }
 
-    val saveWorkspaceAction = SimbrainDesktop.desktopPane.createAction(
+    val saveWorkspaceAction = desktopPane.createAction(
         iconPath = "menu_icons/Save.png",
         name = "Save workspace",
         description = "Save current workspace file",
@@ -98,7 +97,7 @@ class WorkspaceActions {
         SimbrainDesktop.save()
     }
 
-    private val saveWorkspaceAsAction = SimbrainDesktop.desktopPane.createAction(
+    private val saveWorkspaceAsAction = desktopPane.createAction(
         iconPath = "menu_icons/Save.png",
         name = "Save workspace as...",
         description = "Save current workspace file as .zip",
@@ -107,7 +106,7 @@ class WorkspaceActions {
         SimbrainDesktop.saveAs()
     }
 
-    val quitWorkspaceAction = SimbrainDesktop.desktopPane.createAction(
+    val quitWorkspaceAction = desktopPane.createAction(
         name = "Quit Simbrain",
         description = "Quit Simbrain",
         keyboardShortcut = CmdOrCtrl + 'Q',
@@ -116,7 +115,7 @@ class WorkspaceActions {
         SimbrainDesktop.quit(false)
     }
 
-    val iterateAction = SimbrainDesktop.desktopPane.createAction(
+    val iterateAction = desktopPane.createAction(
         iconPath = "menu_icons/Step.png",
         name = "Iterate workspace",
         description = "Iterate workspace once",
@@ -129,7 +128,7 @@ class WorkspaceActions {
         workspace.iterateSuspend()
     }
 
-    val runAction = SimbrainDesktop.desktopPane.createAction(
+    val runAction = desktopPane.createAction(
         iconPath = "menu_icons/Play.png",
         name = "Run",
         description = "Run workspace",
@@ -138,7 +137,7 @@ class WorkspaceActions {
         workspace.run()
     }
 
-    val stopAction = SimbrainDesktop.desktopPane.createAction(
+    val stopAction = desktopPane.createAction(
         iconPath = "menu_icons/Stop.png",
         name = "Stop",
         description = "Stop workspace",
@@ -147,7 +146,7 @@ class WorkspaceActions {
         workspace.stop()
     }
 
-    val openCouplingManagerAction = SimbrainDesktop.desktopPane.createAction(
+    val openCouplingManagerAction = desktopPane.createAction(
         iconPath = "menu_icons/Link.png",
         name = "Open coupling manager...",
         description = "Open workspace coupling manager.",
@@ -156,7 +155,7 @@ class WorkspaceActions {
         DesktopCouplingManager(SimbrainDesktop).displayInDialog {  }
     }
 
-    val openCouplingListAction = SimbrainDesktop.desktopPane.createAction(
+    val openCouplingListAction = desktopPane.createAction(
         iconPath = "menu_icons/Table.png",
         name = "Open coupling list...",
         description = "Open list of workspace couplings.",
@@ -165,7 +164,29 @@ class WorkspaceActions {
         CouplingListPanel(SimbrainDesktop, SimbrainDesktop.workspace.couplings).displayInDialog {  }
     }
 
-    val showUpdaterDialog = SimbrainDesktop.desktopPane.createAction(
+    val resetOnboardingWindows = desktopPane.createAction(
+        name = "Reset Onboarding Windows",
+        description = "All onboarding windows will be reset to appear again.",
+    ) {
+        WorkspacePreferences.clearAllPopupSuppressions()
+    }
+
+
+    val showNetworkPreferencesAction = desktopPane.createAction(
+        name = "Network Preferences...",
+        description = "Set default properties that apply to all networks in the Simbrain workspace.",
+    ) {
+        getPreferenceDialog(NetworkPreferences).display()
+    }
+
+    val showWorkspacePreferencesAction = createAction(
+        name = "Workspace Preferences...",
+        description = "Set default properties that apply to all networks in the Simbrain workspace.",
+    ) {
+        getPreferenceDialog(WorkspacePreferences).display()
+    }
+
+    val showUpdaterDialog = desktopPane.createAction(
         iconPath = "menu_icons/Sequence.png",
         name = "Edit update sequence...",
         description = "Edit workspace update actions",
@@ -174,7 +195,7 @@ class WorkspaceActions {
         WorkspaceUpdateManagerPanel(workspace).displayInDialog {  }
     }
 
-    val repositionAllWindowsAction = SimbrainDesktop.desktopPane.createAction(
+    val repositionAllWindowsAction = desktopPane.createAction(
         name = "Gather windows",
         description = "Repositions and resize all windows. Useful when windows get \"lost\" offscreen.",
         coroutineScope = workspace
@@ -182,7 +203,7 @@ class WorkspaceActions {
         SimbrainDesktop.repositionAllWindows()
     }
 
-    val resizeAllWindowsAction = SimbrainDesktop.desktopPane.createAction(
+    val resizeAllWindowsAction = desktopPane.createAction(
         name = "Resize windows",
         description = "Resize all windows on screen so they fit on the current SimbrainDesktop. Useful when windows get \"lost\" offscreen.",
         coroutineScope = workspace
@@ -199,7 +220,7 @@ class WorkspaceActions {
         iconPath: String,
         keyboardShortcut: KeyCombination? = null
     ): Action {
-        return SimbrainDesktop.desktopPane.createAction(
+        return desktopPane.createAction(
             name = name,
             iconPath = iconPath,
             description = "Create $name",
@@ -282,7 +303,7 @@ class WorkspaceActions {
         description: String = "Create Coupled $plotType",
         componentCreator: (componentName: String) -> T,
         consumerProvider: CouplingManager.(T) -> Consumer
-    ) = SimbrainDesktop.desktopPane.createAction(
+    ) = desktopPane.createAction(
         name = "$plotType of $objectName",
         iconPath = iconPath,
         description = description,
@@ -319,7 +340,7 @@ class WorkspaceActions {
         }
     )
 
-    fun createCoupledTimeSeriesPlotAction(producers: List<Producer>) = SimbrainDesktop.desktopPane.createAction(
+    fun createCoupledTimeSeriesPlotAction(producers: List<Producer>) = desktopPane.createAction(
         name = "Time Series Plot of ${producers.size} ${producers.map { it.baseObject::class.simpleName }.toSet().joinToString(", ")}${if (producers.size > 1) "s" else ""}",
         iconPath = "menu_icons/TimeSeries.png",
         description = "Create Coupled Time Series Plot",
@@ -395,7 +416,7 @@ class WorkspaceActions {
         }
     )
 
-    fun createCoupledDataWorldAction(name: String = "Record Data", producer: Producer, sourceName: String, numCols: Int) = SimbrainDesktop.desktopPane.createAction(
+    fun createCoupledDataWorldAction(name: String = "Record Data", producer: Producer, sourceName: String, numCols: Int) = desktopPane.createAction(
         name = name,
         iconPath = "menu_icons/Table.png",
         coroutineScope = workspace
@@ -428,7 +449,7 @@ class WorkspaceActions {
      */
     @JvmOverloads
     fun createImageInput(consumer: Consumer, numUnits: Int, menuTitle: String = "Create Image Input", postActionBlock:
-        () -> Unit = {}) = SimbrainDesktop.desktopPane.createAction(
+        () -> Unit = {}) = desktopPane.createAction(
         name = menuTitle,
         iconPath = "menu_icons/photo.png",
         description = "Create Image Input",

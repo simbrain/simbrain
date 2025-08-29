@@ -12,7 +12,9 @@ class DataWorld(val rows: Int = 30, val cols: Int = 5): AttributeContainer, Edit
     var dataModel = BasicDataFrame(rows, cols)
 
     var dataEntryMode: DataEntryMode by GuiEditable(
-        initValue = DataEntryMode.STATIC
+        initValue = DataEntryMode.LOOP,
+        description = "How row advancement and data entry are handled. Either stay on same row each iteration (static) or" +
+                "advance each iteration and wrap around at the last row"
     )
 
     @Producible

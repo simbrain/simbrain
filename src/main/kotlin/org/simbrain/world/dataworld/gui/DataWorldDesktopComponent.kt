@@ -91,11 +91,11 @@ class DataWorldDesktopComponent(frame: GenericFrame, val component: DataWorldCom
         file.addSeparator()
         file.add(tablePanel.table.importCSVAction(fixedColumns = false))
         file.addSeparator()
-        file.add(actionManager.createCloseAction(this))
-        file.addSeparator()
-        file.add(createAction("Configure Data World") {
+        file.add(createAction("Data world preferences...") {
             component.dataWorld.createEditorDialog("Configure Data World").display()
         })
+        file.addSeparator()
+        file.add(actionManager.createCloseAction(this))
 
         // Edit Menu
         fun createEditMenu() {

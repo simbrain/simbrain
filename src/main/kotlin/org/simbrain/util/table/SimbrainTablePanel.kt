@@ -232,7 +232,23 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
         rowSelectionAllowed = true
 
         if (useHeaders) {
-            tableHeader = JXTableHeader(columnModel)
+            tableHeader = JXTableHeader(columnModel).apply {
+                // Add mouse listener to handle column selection when clicking on headers
+                addMouseListener(object : MouseAdapter() {
+                    override fun mousePressed(e: MouseEvent) {
+                        val column = columnAtPoint(e.point)
+                        if (column >= 0) {
+                            // Select the entire column when header is clicked
+                            clearSelection()
+                            setColumnSelectionInterval(column, column)
+                            // Select all rows in this column
+                            for (row in 0 until rowCount) {
+                                changeSelection(row, column, row > 0, false)
+                            }
+                        }
+                    }
+                })
+            }
         }
 
         setGridColor(Color.gray)
@@ -299,8 +315,16 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
         if (row < 0 || row >= rowCount) {
             throw IllegalArgumentException("Invalid row index $row")
         }
-        selectAll()
+        clearSelection()
         setRowSelectionInterval(row, row)
+    }
+
+    fun setSelectedColumn(column: Int) {
+        if (column < 0 || column >= columnCount) {
+            throw IllegalArgumentException("Invalid column index $column")
+        }
+        clearSelection()
+        setColumnSelectionInterval(column, column)
     }
 
     fun initRowSelection() {
@@ -347,6 +371,23 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
         
         // Fire the event
         (dataModel as? SimbrainDataFrame)?.events?.currentRowChanged?.fire()
+    }
+
+    fun incrementSelectedColumn() {
+        // Get the current selection from JTable first
+        var currentColumn = super.getSelectedColumn()
+        
+        // If no column is selected, default to 0
+        if (currentColumn < 0 || currentColumn >= columnCount) {
+            currentColumn = 0
+        }
+        
+        // Calculate the next column index
+        val nextColumn = (currentColumn + 1) % columnCount
+        
+        // Update the JTable selection to match
+        clearSelection()
+        setColumnSelectionInterval(nextColumn, nextColumn)
     }
 
     override fun isCellEditable(row: Int, column: Int): Boolean {
@@ -458,10 +499,22 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
 
     fun getSelectedRowNames() = selectedRows.map { model.getRowName(it) }
 
+    fun getSelectedColumnDoubleValues() = selectedColumns.map { col ->
+        (0 until model.rowCount).map { row -> 
+            model.getValueAt(row, col) as? Double ?: 0.0 
+        }
+    }
+
+    fun getSelectedColumnNames() = selectedColumns.map { model.getColumnName(it) }
+
 
     init {
-        // a hack to force something to put the table in a state where row selection works
-        setColumnSelectionInterval(0, 0)
+        // Initialize selection properly - allow both row and column selection
+        // but don't force any specific selection initially
+        if (columnCount > 0 && rowCount > 0) {
+            // Only set initial selection if we have data
+            clearSelection()
+        }
     }
 }
 

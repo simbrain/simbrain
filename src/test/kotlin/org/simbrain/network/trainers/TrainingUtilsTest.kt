@@ -7,6 +7,8 @@ import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.updaterules.LinearRule
+import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.util.*
 import smile.math.matrix.Matrix
 import kotlin.random.Random
@@ -615,6 +617,387 @@ class TrainingUtilsTest {
         
         // Original should be unaffected by split modifications
         assertFalse(inputs.flatten().contains(888.0))
+    }
+
+    @Test
+    fun `test CrossEntropy accuracy with perfect predictions`() {
+        // Test case where predictions exactly match targets
+        val predictions = Matrix.of(arrayOf(
+            doubleArrayOf(0.1, 0.9, 0.0),  // Predicted class 1
+            doubleArrayOf(0.8, 0.1, 0.1),  // Predicted class 0
+            doubleArrayOf(0.0, 0.0, 1.0)   // Predicted class 2
+        ))
+        val targets = Matrix.of(arrayOf(
+            doubleArrayOf(0.0, 1.0, 0.0),  // Target class 1
+            doubleArrayOf(1.0, 0.0, 0.0),  // Target class 0
+            doubleArrayOf(0.0, 0.0, 1.0)   // Target class 2
+        ))
+        
+        val accuracy = BackpropLossFunction.CrossEntropy.accuracy(predictions, targets)
+        assertEquals(1.0, accuracy, 1e-6, "Perfect predictions should have 100% accuracy")
+    }
+
+    @Test
+    fun `test CrossEntropy accuracy with no correct predictions`() {
+        // Test case where no predictions match targets
+        val predictions = Matrix.of(arrayOf(
+            doubleArrayOf(0.9, 0.1, 0.0),  // Predicted class 0
+            doubleArrayOf(0.1, 0.8, 0.1),  // Predicted class 1
+            doubleArrayOf(1.0, 0.0, 0.0)   // Predicted class 0
+        ))
+        val targets = Matrix.of(arrayOf(
+            doubleArrayOf(0.0, 1.0, 0.0),  // Target class 1
+            doubleArrayOf(0.0, 0.0, 1.0),  // Target class 2
+            doubleArrayOf(0.0, 0.0, 1.0)   // Target class 2
+        ))
+        
+        val accuracy = BackpropLossFunction.CrossEntropy.accuracy(predictions, targets)
+        assertEquals(0.0, accuracy, 1e-6, "No correct predictions should have 0% accuracy")
+    }
+
+    @Test
+    fun `test CrossEntropy accuracy with partial correct predictions`() {
+        // Test case with 2 out of 3 correct predictions
+        val predictions = Matrix.of(arrayOf(
+            doubleArrayOf(0.1, 0.9, 0.0),  // Predicted class 1 ✓
+            doubleArrayOf(0.8, 0.1, 0.1),  // Predicted class 0 ✗ (target is class 2)
+            doubleArrayOf(0.0, 0.0, 1.0)   // Predicted class 2 ✓
+        ))
+        val targets = Matrix.of(arrayOf(
+            doubleArrayOf(0.0, 1.0, 0.0),  // Target class 1
+            doubleArrayOf(0.0, 0.0, 1.0),  // Target class 2
+            doubleArrayOf(0.0, 0.0, 1.0)   // Target class 2
+        ))
+        
+        val accuracy = BackpropLossFunction.CrossEntropy.accuracy(predictions, targets)
+        assertEquals(2.0/3.0, accuracy, 1e-6, "2 out of 3 correct should be 66.67% accuracy")
+    }
+
+    @Test
+    fun `test CrossEntropy accuracy with single prediction column vector`() {
+        // Test single prediction as column vector
+        val predictions = doubleArrayOf(0.1, 0.9, 0.0).toColumnVector()
+        val targets = doubleArrayOf(0.0, 1.0, 0.0).toColumnVector()
+        
+        val accuracy = BackpropLossFunction.CrossEntropy.accuracy(predictions, targets)
+        assertEquals(1.0, accuracy, 1e-6, "Single correct prediction should have 100% accuracy")
+    }
+
+    @Test
+    fun `test CrossEntropy accuracy with single incorrect prediction column vector`() {
+        // Test single incorrect prediction as column vector
+        val predictions = doubleArrayOf(0.9, 0.1, 0.0).toColumnVector()  // Predicted class 0
+        val targets = doubleArrayOf(0.0, 1.0, 0.0).toColumnVector()      // Target class 1
+        
+        val accuracy = BackpropLossFunction.CrossEntropy.accuracy(predictions, targets)
+        assertEquals(0.0, accuracy, 1e-6, "Single incorrect prediction should have 0% accuracy")
+    }
+
+    @Test
+    fun `test CrossEntropy accuracy with tie in predictions`() {
+        // Test case where highest probability is tied (should pick first occurrence)
+        val predictions = Matrix.of(arrayOf(
+            doubleArrayOf(0.5, 0.5, 0.0),  // Tie between class 0 and 1, maxByOrNull picks 0
+            doubleArrayOf(0.3, 0.3, 0.4)   // Class 2 wins
+        ))
+        val targets = Matrix.of(arrayOf(
+            doubleArrayOf(1.0, 0.0, 0.0),  // Target class 0 ✓
+            doubleArrayOf(0.0, 0.0, 1.0)   // Target class 2 ✓
+        ))
+        
+        val accuracy = BackpropLossFunction.CrossEntropy.accuracy(predictions, targets)
+        assertEquals(1.0, accuracy, 1e-6, "Both predictions should be correct")
+    }
+
+    @Test
+    fun `test CrossEntropy accuracy with sequence data`() {
+        // Test sequence-to-sequence accuracy (multiple rows)
+        val predictions = Matrix.of(arrayOf(
+            doubleArrayOf(0.1, 0.9),  // Position 0: predicted class 1
+            doubleArrayOf(0.8, 0.2),  // Position 1: predicted class 0
+            doubleArrayOf(0.3, 0.7)   // Position 2: predicted class 1
+        ))
+        val targets = Matrix.of(arrayOf(
+            doubleArrayOf(0.0, 1.0),  // Position 0: target class 1 ✓
+            doubleArrayOf(1.0, 0.0),  // Position 1: target class 0 ✓
+            doubleArrayOf(1.0, 0.0)   // Position 2: target class 0 ✗
+        ))
+        
+        val accuracy = BackpropLossFunction.CrossEntropy.accuracy(predictions, targets)
+        assertEquals(2.0/3.0, accuracy, 1e-6, "2 out of 3 sequence positions correct")
+    }
+
+    @Test
+    fun `test CrossEntropy accuracy with binary classification`() {
+        // Test binary classification (2 classes)
+        val predictions = Matrix.of(arrayOf(
+            doubleArrayOf(0.8, 0.2),  // Predicted class 0
+            doubleArrayOf(0.3, 0.7),  // Predicted class 1
+            doubleArrayOf(0.6, 0.4),  // Predicted class 0
+            doubleArrayOf(0.1, 0.9)   // Predicted class 1
+        ))
+        val targets = Matrix.of(arrayOf(
+            doubleArrayOf(1.0, 0.0),  // Target class 0 ✓
+            doubleArrayOf(0.0, 1.0),  // Target class 1 ✓
+            doubleArrayOf(0.0, 1.0),  // Target class 1 ✗
+            doubleArrayOf(0.0, 1.0)   // Target class 1 ✓
+        ))
+        
+        val accuracy = BackpropLossFunction.CrossEntropy.accuracy(predictions, targets)
+        assertEquals(0.75, accuracy, 1e-6, "3 out of 4 correct should be 75% accuracy")
+    }
+
+    @Test
+    fun `test CrossEntropy accuracy validates matrix shapes`() {
+        val predictions = Matrix.of(arrayOf(doubleArrayOf(0.5, 0.5)))
+        val wrongTargets = Matrix.of(arrayOf(doubleArrayOf(1.0, 0.0, 0.0)))  // Different shape
+        
+        org.junit.jupiter.api.assertThrows<IllegalArgumentException> {
+            BackpropLossFunction.CrossEntropy.accuracy(predictions, wrongTargets)
+        }
+    }
+
+    @Test
+    fun `test accuracy computation can be disabled in trainer config`() {
+        val net = Network()
+        val inputLayer = NeuronArray(3).apply { 
+            isClamped = true 
+            updateRule = LinearRule()
+        }
+        val outputLayer = NeuronArray(3).apply {
+            updateRule = SoftmaxRule()
+        }
+        val wm = WeightMatrix(inputLayer, outputLayer)
+        
+        runBlocking {
+            net.addNetworkModelsAsync(inputLayer, outputLayer, wm)
+        }
+        
+        val supervisedModel = SupervisedModel(inputLayer, outputLayer)
+        supervisedModel.trainerConfig.lossFunction = BackpropLossFunction.CrossEntropy
+        
+        // Test with accuracy computation enabled (default)
+        supervisedModel.trainerConfig.computeAccuracy = true
+        val trainerEnabled = SupervisedTrainer(net, supervisedModel)
+        
+        runBlocking {
+            trainerEnabled.trainOnce()
+        }
+        
+        assertNotNull(trainerEnabled.lastTrainingAccuracy, "Accuracy should be computed when enabled")
+        
+        // Test with accuracy computation disabled
+        supervisedModel.trainerConfig.computeAccuracy = false
+        val trainerDisabled = SupervisedTrainer(net, supervisedModel)
+        
+        runBlocking {
+            trainerDisabled.trainOnce()
+        }
+        
+        assertNull(trainerDisabled.lastTrainingAccuracy, "Accuracy should not be computed when disabled")
+    }
+
+    @Test
+    fun `test optimized accuracy computation performance`() {
+        val net = Network()
+        val inputLayer = NeuronArray(10).apply { 
+            isClamped = true 
+            updateRule = LinearRule()
+        }
+        val outputLayer = NeuronArray(5).apply {
+            updateRule = SoftmaxRule()
+        }
+        val wm = WeightMatrix(inputLayer, outputLayer)
+        
+        runBlocking {
+            net.addNetworkModelsAsync(inputLayer, outputLayer, wm)
+        }
+        
+        val supervisedModel = SupervisedModel(inputLayer, outputLayer)
+        supervisedModel.trainerConfig.lossFunction = BackpropLossFunction.CrossEntropy
+        supervisedModel.trainerConfig.computeAccuracy = true
+        
+        // Create a larger training set to test performance
+        val largeInputs = (0 until 100).map { 
+            (0 until 10).map { Random.nextDouble() }.toMutableList() 
+        }.toMutableList()
+        val largeTargets = (0 until 100).map { 
+            val oneHot = DoubleArray(5) { 0.0 }
+            oneHot[Random.nextInt(5)] = 1.0
+            oneHot.toMutableList()
+        }.toMutableList()
+        
+        supervisedModel.trainingSet = TrainingDataset(largeInputs, largeTargets)
+        
+        val trainer = SupervisedTrainer(net, supervisedModel)
+        
+        // Test that accuracy is computed efficiently (should not take long)
+        val startTime = System.currentTimeMillis()
+        runBlocking {
+            repeat(5) {
+                trainer.trainOnce()
+            }
+        }
+        val endTime = System.currentTimeMillis()
+        
+        // Verify accuracy was computed
+        assertNotNull(trainer.lastTrainingAccuracy, "Accuracy should be computed")
+        assertTrue(trainer.lastTrainingAccuracy!! >= 0.0 && trainer.lastTrainingAccuracy!! <= 1.0, 
+                  "Accuracy should be between 0 and 1")
+        
+        // Performance should be reasonable (less than 5 seconds for 5 iterations on 100 samples)
+        val duration = endTime - startTime
+        assertTrue(duration < 5000, "Training with accuracy should complete in reasonable time: ${duration}ms")
+    }
+
+    @Test
+    fun `test training and testing accuracy computation`() {
+        val net = Network()
+        val inputLayer = NeuronArray(3).apply { 
+            isClamped = true 
+            updateRule = LinearRule()
+        }
+        val outputLayer = NeuronArray(3).apply {
+            updateRule = SoftmaxRule()
+        }
+        val wm = WeightMatrix(inputLayer, outputLayer)
+        
+        runBlocking {
+            net.addNetworkModelsAsync(inputLayer, outputLayer, wm)
+        }
+        
+        val supervisedModel = SupervisedModel(inputLayer, outputLayer)
+        supervisedModel.trainerConfig.lossFunction = BackpropLossFunction.CrossEntropy
+        supervisedModel.trainerConfig.computeAccuracy = true
+        supervisedModel.trainerConfig.testConfiguration.enabled = true
+        supervisedModel.trainerConfig.testConfiguration.testFrequency = 1 // Test every iteration
+        
+        val trainer = SupervisedTrainer(net, supervisedModel)
+        
+        runBlocking {
+            trainer.trainOnce()
+        }
+        
+        // Both training and testing accuracy should be computed
+        assertNotNull(trainer.lastTrainingAccuracy, "Training accuracy should be computed")
+        assertNotNull(trainer.lastTestingAccuracy, "Testing accuracy should be computed when test is enabled")
+        
+        assertTrue(trainer.lastTrainingAccuracy!! >= 0.0 && trainer.lastTrainingAccuracy!! <= 1.0, 
+                  "Training accuracy should be between 0 and 1")
+        assertTrue(trainer.lastTestingAccuracy!! >= 0.0 && trainer.lastTestingAccuracy!! <= 1.0, 
+                  "Testing accuracy should be between 0 and 1")
+        
+        // Test with testing disabled
+        supervisedModel.trainerConfig.testConfiguration.enabled = false
+        val trainerNoTest = SupervisedTrainer(net, supervisedModel)
+        
+        runBlocking {
+            trainerNoTest.trainOnce()
+        }
+        
+        // Only training accuracy should be computed
+        assertNotNull(trainerNoTest.lastTrainingAccuracy, "Training accuracy should be computed")
+        assertNull(trainerNoTest.lastTestingAccuracy, "Testing accuracy should not be computed when test is disabled")
+    }
+
+    @Test
+    fun `test accuracy computation can be disabled and enabled dynamically`() {
+        val net = Network()
+        val inputLayer = NeuronArray(3).apply { 
+            isClamped = true 
+            updateRule = LinearRule()
+        }
+        val outputLayer = NeuronArray(3).apply {
+            updateRule = SoftmaxRule()
+        }
+        val wm = WeightMatrix(inputLayer, outputLayer)
+        
+        runBlocking {
+            net.addNetworkModelsAsync(inputLayer, outputLayer, wm)
+        }
+        
+        val supervisedModel = SupervisedModel(inputLayer, outputLayer)
+        supervisedModel.trainerConfig.lossFunction = BackpropLossFunction.CrossEntropy
+        
+        // Start with accuracy disabled
+        supervisedModel.trainerConfig.computeAccuracy = false
+        val trainer = SupervisedTrainer(net, supervisedModel)
+        
+        runBlocking {
+            trainer.trainOnce()
+        }
+        
+        // No accuracy should be computed
+        assertNull(trainer.lastTrainingAccuracy, "Training accuracy should not be computed when disabled")
+        assertNull(trainer.lastTestingAccuracy, "Testing accuracy should not be computed when disabled")
+        
+        // Enable accuracy computation
+        supervisedModel.trainerConfig.computeAccuracy = true
+        
+        runBlocking {
+            trainer.trainOnce()
+        }
+        
+        // Now accuracy should be computed
+        assertNotNull(trainer.lastTrainingAccuracy, "Training accuracy should be computed when enabled")
+        assertTrue(trainer.lastTrainingAccuracy!! >= 0.0 && trainer.lastTrainingAccuracy!! <= 1.0, 
+                  "Training accuracy should be between 0 and 1")
+    }
+
+    @Test
+    fun `test testing accuracy persists between test runs`() {
+        val net = Network()
+        val inputLayer = NeuronArray(3).apply { 
+            isClamped = true 
+            updateRule = LinearRule()
+        }
+        val outputLayer = NeuronArray(3).apply {
+            updateRule = SoftmaxRule()
+        }
+        val wm = WeightMatrix(inputLayer, outputLayer)
+        
+        runBlocking {
+            net.addNetworkModelsAsync(inputLayer, outputLayer, wm)
+        }
+        
+        val supervisedModel = SupervisedModel(inputLayer, outputLayer)
+        supervisedModel.trainerConfig.lossFunction = BackpropLossFunction.CrossEntropy
+        supervisedModel.trainerConfig.computeAccuracy = true
+        supervisedModel.trainerConfig.testConfiguration.enabled = true
+        supervisedModel.trainerConfig.testConfiguration.testFrequency = 2 // Test every 2 iterations
+        
+        val trainer = SupervisedTrainer(net, supervisedModel)
+        
+        // First iteration - no test accuracy yet
+        runBlocking {
+            trainer.trainOnce() // iteration 1
+        }
+        
+        assertNull(trainer.lastTestingAccuracy, "Testing accuracy should be null on iteration 1")
+        
+        // Second iteration - test accuracy should be computed
+        runBlocking {
+            trainer.trainOnce() // iteration 2
+        }
+        
+        assertNotNull(trainer.lastTestingAccuracy, "Testing accuracy should be computed on iteration 2")
+        val firstTestAccuracy = trainer.lastTestingAccuracy!!
+        
+        // Third iteration - test accuracy should persist (not reset to null)
+        runBlocking {
+            trainer.trainOnce() // iteration 3
+        }
+        
+        assertEquals(firstTestAccuracy, trainer.lastTestingAccuracy, 
+                    "Testing accuracy should persist from previous test run")
+        
+        // Fourth iteration - test accuracy should be updated again
+        runBlocking {
+            trainer.trainOnce() // iteration 4
+        }
+        
+        assertNotNull(trainer.lastTestingAccuracy, "Testing accuracy should be computed again on iteration 4")
+        // Note: We don't assert it's different because with random weights it might be the same value
     }
 
 }

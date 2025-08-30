@@ -5,9 +5,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
+import org.simbrain.network.core.NeuronArray
+import org.simbrain.network.events.TrainingStats
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.trainers.SupervisedNetwork
 import org.simbrain.network.trainers.SupervisedTrainer
+import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.plot.timeseries.TimeSeriesModel
 import org.simbrain.plot.timeseries.TimeSeriesPlotActions
 import org.simbrain.plot.timeseries.TimeSeriesPlotPanel
@@ -85,7 +88,7 @@ class TrainerControls(trainer: SupervisedTrainer, supervisedNetwork: SupervisedN
                     showWarningDialog("Batch size exceeds training set size; setting to ${batchUpdate.batchSize}")
                 }
             }
-            trainer.events.errorUpdated.fire(trainer.lastTrainingError to null)
+            trainer.events.errorUpdated.fire(TrainingStats(trainer.lastTrainingError, null, trainer.lastTrainingAccuracy, trainer.lastTestingAccuracy))
         }.display()
     }
 
@@ -139,12 +142,49 @@ class TrainerControls(trainer: SupervisedTrainer, supervisedNetwork: SupervisedN
         val errorValue = JLabel(trainer.lastTrainingError.roundToString(4))
         fun errorDescriptionString() = "Mean Error (${supervisedNetwork.trainerConfig.updateType}; ${supervisedNetwork.trainerConfig.lossFunction.shortName})"
         val errorLabel = labelPanel.addItem(errorDescriptionString(), errorValue)
+        
+        // Add accuracy labels for softmax networks (always create, but conditionally show)
+        val trainingAccuracyValue = JLabel(trainer.lastTrainingAccuracy?.format(3) ?: "N/A")
+        val trainingAccuracyLabel = labelPanel.addItem("Training Accuracy:", trainingAccuracyValue)
+        
+        val testingAccuracyValue = JLabel(trainer.lastTestingAccuracy?.format(3) ?: "N/A")
+        val testingAccuracyLabel = labelPanel.addItem("Testing Accuracy:", testingAccuracyValue)
+        
+        // Function to update accuracy label visibility
+        fun updateAccuracyVisibility() {
+            val shouldShowTrainingAccuracy = supervisedNetwork.trainerConfig.computeAccuracy && isSoftmaxNetwork(supervisedNetwork)
+            val shouldShowTestingAccuracy = supervisedNetwork.trainerConfig.computeAccuracy && 
+                                           supervisedNetwork.trainerConfig.testConfiguration.enabled && 
+                                           isSoftmaxNetwork(supervisedNetwork)
+            
+            trainingAccuracyLabel.isVisible = shouldShowTrainingAccuracy
+            trainingAccuracyValue.isVisible = shouldShowTrainingAccuracy
+            testingAccuracyLabel.isVisible = shouldShowTestingAccuracy
+            testingAccuracyValue.isVisible = shouldShowTestingAccuracy
+        }
+        
+        // Set initial visibility
+        updateAccuracyVisibility()
+        
         runTools.add(labelPanel)
 
-        trainer.events.errorUpdated.on(Dispatchers.Swing) { (error, ) ->
+        trainer.events.errorUpdated.on(Dispatchers.Swing) { trainingStats ->
             iterationsLabel.text = "" + trainer.iteration
-            errorValue.text = "" + error.format(4)
+            errorValue.text = "" + trainingStats.trainingError.format(4)
             errorLabel.text = errorDescriptionString()
+            
+            // Update accuracy visibility (in case configuration changed)
+            updateAccuracyVisibility()
+            
+            // Update training accuracy value (only when available)
+            trainingStats.trainingAccuracy?.let { accuracy ->
+                trainingAccuracyValue.text = accuracy.format(3)
+            }
+            
+            // Update testing accuracy value (only when available, keep previous value otherwise)
+            trainingStats.testingAccuracy?.let { accuracy ->
+                testingAccuracyValue.text = accuracy.format(3)
+            }
         }
 
         layout = MigLayout("ins 0, gap 0px 0px")
@@ -152,6 +192,13 @@ class TrainerControls(trainer: SupervisedTrainer, supervisedNetwork: SupervisedN
         add(errorPlotPanel, "grow, gapbottom 0px")
     }
 
+}
+
+/**
+ * Check if the supervised network uses softmax activation
+ */
+private fun isSoftmaxNetwork(supervisedNetwork: SupervisedNetwork): Boolean {
+    return (supervisedNetwork.outputLayer as? NeuronArray)?.updateRule is SoftmaxRule
 }
 
 class ErrorTimeSeries(trainer: SupervisedTrainer) : JPanel() {
@@ -183,9 +230,9 @@ class ErrorTimeSeries(trainer: SupervisedTrainer) : JPanel() {
 
         model.addTimeSeries("Training Error")
 
-        trainer.events.errorUpdated.on(Dispatchers.Swing) { (trainingError, testingError) ->
-            model.addData(0, trainer.iteration.toDouble(), trainingError)
-            testingError?.let {
+        trainer.events.errorUpdated.on(Dispatchers.Swing) { trainingStats ->
+            model.addData(0, trainer.iteration.toDouble(), trainingStats.trainingError)
+            trainingStats.testingError?.let {
                 if (model.timeSeriesList.size == 1) {
                     model.addTimeSeries("Testing Error")
                 }

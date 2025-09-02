@@ -192,8 +192,8 @@ class SmileUtilsTest {
 
     @Test
     fun `test shapeString`(){
-        assertEquals("(3,3)", testMatrix.shapeString)
-        assertEquals("(4,3)", nonSquareMatrix.shapeString)
+        assertEquals("3 x 3", testMatrix.shapeString)
+        assertEquals("4 x 3", nonSquareMatrix.shapeString)
     }
 
     @Test

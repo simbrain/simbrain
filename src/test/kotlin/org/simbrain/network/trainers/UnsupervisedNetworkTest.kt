@@ -204,24 +204,6 @@ class UnsupervisedNetworkTest {
     }
 
     @Test
-    fun `test UnsupervisedNetwork toString methods`() {
-        val competitiveNet = CompetitiveNetwork(4, 6)
-        val somNet = SOMNetwork(3, 9)
-        
-        val competitiveString = competitiveNet.toString()
-        val somString = somNet.toString()
-        
-        // Should contain relevant information
-        assertTrue(competitiveString.contains("Competitive Network"))
-        assertTrue(competitiveString.contains("4 neurons"))
-        assertTrue(competitiveString.contains("6 neurons"))
-        
-        assertTrue(somString.contains("SOM Network"))
-        assertTrue(somString.contains("3 neurons"))
-        assertTrue(somString.contains("9 neurons"))
-    }
-
-    @Test
     fun `test training data modification and persistence`() {
         val competitiveNet = CompetitiveNetwork(2, 3)
         

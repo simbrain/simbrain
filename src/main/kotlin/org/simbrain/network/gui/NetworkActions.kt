@@ -423,7 +423,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val exportSimbrainWebFormatAction = networkPanel.createAction(
         name = "Export Simbrain Web Format",
         description = "Export Simbrain Web Format",
-        iconPath = "menu_icons/Export.png",
+        iconPath = "menu_icons/export.png",
     ) {
 
         class NeuronData(val x: Double, val y: Double, val activation: Double)

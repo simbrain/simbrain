@@ -136,7 +136,7 @@ fun <T : JComponent> T.createAction(
 ): AbstractAction {
     return object : AbstractAction() {
         init {
-            if (iconPath != null) {
+            if (!iconPath.isNullOrEmpty()) {
                 putValue(SMALL_ICON, ResourceManager.getSmallIcon(iconPath))
             }
 

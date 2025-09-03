@@ -24,4 +24,11 @@ class ContextMenuEventHandler(private val networkPanel: NetworkPanel) : PBasicIn
         }
     }
 
+    override fun mouseReleased(event: PInputEvent) {
+        super.mouseReleased(event)
+        if (event.isPopupTrigger) {
+            showContextMenu(event)
+        }
+    }
+
 }

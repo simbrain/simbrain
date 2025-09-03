@@ -19,7 +19,6 @@ import org.simbrain.util.piccolo.SelectionMarquee
 import org.simbrain.util.piccolo.firstScreenElement
 import org.simbrain.util.piccolo.screenElements
 import java.awt.*
-import java.awt.event.InputEvent
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
 import java.awt.image.BufferedImage
@@ -57,8 +56,11 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
 
     init {
         // Only handle events in selection mode
-        eventFilter = object : PInputEventFilter(InputEvent.BUTTON1_MASK) {
+        eventFilter = object : PInputEventFilter() {
             override fun acceptsEvent(event: PInputEvent, type: Int): Boolean {
+
+                if (event.isPopupTrigger) return false
+
                 val mouseCursor = networkPanel.mouseCursor
                 return mouseCursor == MouseCursor.Selection || mouseCursor == MouseCursor.Pan && super.acceptsEvent(event, type)
             }

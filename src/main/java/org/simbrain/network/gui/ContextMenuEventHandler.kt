@@ -3,6 +3,7 @@ package org.simbrain.network.gui
 import kotlinx.coroutines.launch
 import org.piccolo2d.event.PBasicInputEventHandler
 import org.piccolo2d.event.PInputEvent
+import org.simbrain.util.Utils
 
 class ContextMenuEventHandler(private val networkPanel: NetworkPanel) : PBasicInputEventHandler() {
 
@@ -26,8 +27,10 @@ class ContextMenuEventHandler(private val networkPanel: NetworkPanel) : PBasicIn
 
     override fun mouseReleased(event: PInputEvent) {
         super.mouseReleased(event)
-        if (event.isPopupTrigger) {
-            showContextMenu(event)
+        if (!Utils.isMacOSX()) {
+            if (event.isPopupTrigger) {
+                showContextMenu(event)
+            }
         }
     }
 

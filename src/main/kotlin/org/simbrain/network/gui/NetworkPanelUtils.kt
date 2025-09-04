@@ -10,13 +10,13 @@ import java.awt.event.ActionEvent
 import kotlin.coroutines.EmptyCoroutineContext
 
 /**
- * [createAction] that is conditionally enabled based on the state of the network, using [ConditionallyEnabledAction.EnablingCondition]
+ * [createAction] that is conditionally enabled based on the state of the network, using a function condition
  * with a list of keyboard shortcuts.
  */
 fun NetworkPanel.createConditionallyEnabledAction(
     iconPath: String? = null,
     name: String,
-    enablingCondition: ConditionallyEnabledAction.EnablingCondition,
+    enablingCondition: NetworkPanel.() -> Boolean,
     description: String = name,
     keyboardShortcuts: List<KeyCombination>,
     block: suspend NetworkPanel.(e: ActionEvent) -> Unit
@@ -27,11 +27,13 @@ fun NetworkPanel.createConditionallyEnabledAction(
     keyboardShortcuts = keyboardShortcuts,
     initBlock = {
         fun updateAction() {
-            isEnabled = selectionManager.checkEnablingFunction(enablingCondition)
+            isEnabled = this@NetworkPanel.enablingCondition()
         }
         updateAction()
         selectionManager.events.selection.on { _, _ -> updateAction() }
         selectionManager.events.sourceSelection.on { _, _ -> updateAction() }
+        // Also listen to clipboard changes for conditions that depend on clipboard state
+        Clipboard.addClipboardListener { updateAction() }
     },
     coroutineScope = null,
     coroutineContext = EmptyCoroutineContext,
@@ -44,7 +46,7 @@ fun NetworkPanel.createConditionallyEnabledAction(
 fun NetworkPanel.createConditionallyEnabledAction(
     iconPath: String? = null,
     name: String,
-    enablingCondition: ConditionallyEnabledAction.EnablingCondition,
+    enablingCondition: NetworkPanel.() -> Boolean,
     description: String = name,
     keyboardShortcuts: KeyCombination? = null,
     block: suspend NetworkPanel.(e: ActionEvent) -> Unit

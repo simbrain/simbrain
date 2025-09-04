@@ -3,7 +3,6 @@ package org.simbrain.network.gui
 import kotlinx.coroutines.launch
 import org.simbrain.network.connections.*
 import org.simbrain.network.core.*
-import org.simbrain.network.gui.ConditionallyEnabledAction.EnablingCondition
 import org.simbrain.network.gui.dialogs.*
 import org.simbrain.network.gui.dialogs.NetworkPreferences.excitatoryRandomizer
 import org.simbrain.network.gui.dialogs.NetworkPreferences.inhibitoryRandomizer
@@ -54,7 +53,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Align Horizontal",
         description = "Align selected nodes horizontally",
         iconPath = "menu_icons/AlignHorizontal.png",
-        enablingCondition = EnablingCondition.ALLITEMS
+        enablingCondition = EnablingConditions.LOCATABLE_MODELS
     ) {
         alignHorizontal()
     }
@@ -62,7 +61,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Align Vertical",
         description = "Align selected nodes vertically",
         iconPath = "menu_icons/AlignVertical.png",
-        enablingCondition = EnablingCondition.ALLITEMS
+        enablingCondition = EnablingConditions.LOCATABLE_MODELS
     ) {
         alignVertical()
     }
@@ -70,7 +69,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Clear activations of all nodes",
         description = "Clear all node activations (c)",
         iconPath = "menu_icons/Eraser.png",
-        enablingCondition = EnablingCondition.ALLITEMS,
+        enablingCondition = EnablingConditions.ALLITEMS,
         keyboardShortcuts = KeyCombination('C')
     ) {
         clearSelectedObjects()
@@ -78,39 +77,43 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val clearSourceNeurons = networkPanel.createConditionallyEnabledAction(
         name = "Clear Source Neurons",
         description = "Remove all source neurons (neurons with red squares around them)",
-        enablingCondition = EnablingCondition.SOURCE_NEURONS
+        enablingCondition = EnablingConditions.SOURCE_NEURONS
     ) {
         selectionManager.clearAllSource()
     }
-    val copyAction = networkPanel.createAction(
+    val copyAction = networkPanel.createConditionallyEnabledAction(
         name = "Copy",
         description = "Copy selected neurons, (connected) synapses, and neuron groups",
-        keyboardShortcut = CmdOrCtrl + 'C',
-        iconPath = "menu_icons/Copy.png"
+        keyboardShortcuts = CmdOrCtrl + 'C',
+        iconPath = "menu_icons/Copy.png",
+        enablingCondition = EnablingConditions.LOCATABLE_MODELS
     ) {
         copy()
     }
-    val cutAction = networkPanel.createAction(
+    val cutAction = networkPanel.createConditionallyEnabledAction(
         name = "Cut",
         description = "Cut selected neurons, (connected) synapses, and neuron groups",
-        keyboardShortcut = CmdOrCtrl + 'X',
-        iconPath = "menu_icons/Cut.png"
+        keyboardShortcuts = CmdOrCtrl + 'X',
+        iconPath = "menu_icons/Cut.png",
+        enablingCondition = EnablingConditions.LOCATABLE_MODELS
     ) {
         cut()
     }
-    val pasteAction = networkPanel.createAction(
+    val pasteAction = networkPanel.createConditionallyEnabledAction(
         name = "Paste",
         description = "Paste copied neurons, (connected) synapses, and neuron groups",
-        keyboardShortcut = CmdOrCtrl + 'V',
-        iconPath = "menu_icons/Paste.png"
+        keyboardShortcuts = CmdOrCtrl + 'V',
+        iconPath = "menu_icons/Paste.png",
+        enablingCondition = EnablingConditions.CLIPBOARD_NOT_EMPTY
     ) {
         paste()
     }
-    val duplicateAction = networkPanel.createAction(
+    val duplicateAction = networkPanel.createConditionallyEnabledAction(
         name = "Duplicate",
         description = "Duplicate selected neurons, (connected) synapses, and neuron groups",
-        keyboardShortcut = CmdOrCtrl + 'D',
-        iconPath = "menu_icons/Copy.png"
+        keyboardShortcuts = CmdOrCtrl + 'D',
+        iconPath = "menu_icons/Copy.png",
+        enablingCondition = EnablingConditions.LOCATABLE_MODELS
     ) {
         duplicate()
     }
@@ -140,7 +143,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val deleteAction = networkPanel.createConditionallyEnabledAction(
         name = "Delete",
         description = """Delete selected node(s) ("Backspace" or "Delete")""",
-        enablingCondition = EnablingCondition.ALLITEMS,
+        enablingCondition = EnablingConditions.ALLITEMS,
         iconPath = "menu_icons/minus.png",
         keyboardShortcuts = listOf(KeyCombination(KeyEvent.VK_DELETE), KeyCombination(KeyEvent.VK_BACK_SPACE))
     ) {
@@ -150,7 +153,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val neuronCollectionAction = networkPanel.createConditionallyEnabledAction(
         name = "Add Neurons to Collection",
         description = "Add selected neurons to a neuron collection (Cmd-G)",
-        enablingCondition = EnablingCondition.NEURONS,
+        enablingCondition = EnablingConditions.NEURONS,
         keyboardShortcuts = CmdOrCtrl + 'G'
     ) {
         val neuronList = selectionManager.filterSelectedModels<Neuron>()
@@ -188,7 +191,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val randomizeObjectsAction = networkPanel.createConditionallyEnabledAction(
         name = "Randomize selection",
         description = "Randomize Selected Elements (r)",
-        enablingCondition = EnablingCondition.ALLITEMS,
+        enablingCondition = EnablingConditions.ALLITEMS,
         iconPath = "menu_icons/Rand.png",
         keyboardShortcuts = KeyCombination('R')
     ) {
@@ -290,7 +293,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val setSourceNeurons get() = networkPanel.createConditionallyEnabledAction(
         name = "Set Source Neurons",
         description = "Set selected neurons as source neurons.  They can then be connected to target neurons using the connect commands.",
-        enablingCondition = EnablingCondition.NEURONS
+        enablingCondition = EnablingConditions.NEURONS
     ) {
         selectionManager.convertSelectedNodesToSourceNodes()
     }
@@ -312,7 +315,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val showLayoutDialogAction = networkPanel.createConditionallyEnabledAction(
         name = "Layout Neurons...",
         description = "Lay out the selected neurons",
-        enablingCondition = EnablingCondition.NEURONS
+        enablingCondition = EnablingConditions.NEURONS
     ) {
         LayoutDialog(networkPanel).apply {
             pack()
@@ -325,7 +328,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Display / Edit Matrix for Free Weights...",
         description = "Show a weight matrix connecting source neurons (adorned with red squares) and target neurons (regular green selection)",
         iconPath = "menu_icons/grid.png",
-        enablingCondition = EnablingCondition.SOURCE_AND_TARGET_NEURONS,
+        enablingCondition = EnablingConditions.SOURCE_AND_TARGET_NEURONS,
     ) {
         val sources = selectionManager.filterSelectedSourceModels<Neuron>()
         val targets = selectionManager.filterSelectedModels<Neuron>()
@@ -344,7 +347,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Space Horizontal",
         description = "Space selected nodes horizontally",
         iconPath = "menu_icons/SpaceHorizontal.png",
-        enablingCondition = EnablingCondition.ALLITEMS
+        enablingCondition = EnablingConditions.LOCATABLE_MODELS
     ) {
         spaceHorizontal()
     }
@@ -353,7 +356,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Space Vertical",
         description = "Space selected nodes vertically",
         iconPath = "menu_icons/SpaceVertical.png",
-        enablingCondition = EnablingCondition.ALLITEMS
+        enablingCondition = EnablingConditions.LOCATABLE_MODELS
     ) {
         spaceVertical()
     }
@@ -370,7 +373,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Create Input Table...",
         description = "Create a table whose rows provide input to selected neurons",
         iconPath = "menu_icons/TestInput.png",
-        enablingCondition = EnablingCondition.NEURONS
+        enablingCondition = EnablingConditions.NEURONS
     ) {
         showInputPanel(networkPanel.selectionManager.filterSelectedModels<Neuron>())
     }
@@ -620,7 +623,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         iconPath = "menu_icons/Rand.png",
         name = "Weight randomization dialog...",
         keyboardShortcuts = CmdOrCtrl + 'R',
-        enablingCondition = EnablingCondition.SYNAPSES
+        enablingCondition = EnablingConditions.SYNAPSES
     ) {
         createSynapseAdjustmentPanel(
             network.getModels<Synapse>().toList(),
@@ -706,7 +709,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     fun applyConnectionAction(strategy: ConnectionStrategy): AbstractAction {
         return networkPanel.createConditionallyEnabledAction(
             name = "Connect ${strategy.name}...",
-            enablingCondition = EnablingCondition.SOURCE_AND_TARGET_NEURONS
+            enablingCondition = EnablingConditions.SOURCE_AND_TARGET_NEURONS
         ) {
             ConnectionStrategyPanel(strategy).displayInDialog {
                 commitChanges()
@@ -753,7 +756,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
      */
     val decayWeightsAction = networkPanel.createConditionallyEnabledAction(
         name = "Decay selected weights based on axon length",
-        enablingCondition = EnablingCondition.SYNAPSES
+        enablingCondition = EnablingConditions.SYNAPSES
     ) {
         DecayFunction.DecayFunctionSelector().createEditorDialog {
             selectionManager.filterSelectedModels<Synapse>()
@@ -766,7 +769,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
      */
     val pruneWeightsAction = networkPanel.createConditionallyEnabledAction(
         name = "Prune selected weights",
-        enablingCondition = EnablingCondition.SYNAPSES
+        enablingCondition = EnablingConditions.SYNAPSES
     ) {
         val threshold: String = JOptionPane.showInputDialog(
             null,
@@ -783,7 +786,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
      */
     val fastSparseAction  = networkPanel.createConditionallyEnabledAction(
         name = "Create sparse connection",
-        enablingCondition = EnablingCondition.SOURCE_AND_TARGET_NEURONS
+        enablingCondition = EnablingConditions.SOURCE_AND_TARGET_NEURONS
     ) {
         val sparsity: String = JOptionPane.showInputDialog(
             null,
@@ -804,7 +807,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
      */
     val randomizePolarityAction = networkPanel.createConditionallyEnabledAction(
         name = "Randomize polarity of selected neurons",
-        enablingCondition = EnablingCondition.NEURONS
+        enablingCondition = EnablingConditions.NEURONS
     ) {
         // TODO: Indicate the threshold somehow in a prompt
         objectWrapper<ProbabilityDistribution>("Randomize polarity", UniformRealDistribution()).createEditorDialog { dist ->
@@ -821,7 +824,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val fastGridAction = networkPanel.createConditionallyEnabledAction(
         name = "Apply grid layout to selected nodes",
         keyboardShortcuts = CmdOrCtrl + 'L',
-        enablingCondition = EnablingCondition.NEURONS
+        enablingCondition = EnablingConditions.NEURONS
     ) {
         GridLayout().layoutNeurons(selectionManager.filterSelectedModels<Neuron>())
         network.events.zoomToFitPage.fire()

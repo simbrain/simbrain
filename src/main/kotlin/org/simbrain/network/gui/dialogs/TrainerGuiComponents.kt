@@ -5,12 +5,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
-import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.events.TrainingStats
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.trainers.SupervisedNetwork
 import org.simbrain.network.trainers.SupervisedTrainer
-import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.plot.timeseries.TimeSeriesModel
 import org.simbrain.plot.timeseries.TimeSeriesPlotActions
 import org.simbrain.plot.timeseries.TimeSeriesPlotPanel
@@ -152,10 +150,9 @@ class TrainerControls(trainer: SupervisedTrainer, supervisedNetwork: SupervisedN
         
         // Function to update accuracy label visibility
         fun updateAccuracyVisibility() {
-            val shouldShowTrainingAccuracy = supervisedNetwork.trainerConfig.computeAccuracy && isSoftmaxNetwork(supervisedNetwork)
+            val shouldShowTrainingAccuracy = supervisedNetwork.trainerConfig.computeAccuracy
             val shouldShowTestingAccuracy = supervisedNetwork.trainerConfig.computeAccuracy && 
-                                           supervisedNetwork.trainerConfig.testConfiguration.enabled && 
-                                           isSoftmaxNetwork(supervisedNetwork)
+                                           supervisedNetwork.trainerConfig.testConfiguration.enabled
             
             trainingAccuracyLabel.isVisible = shouldShowTrainingAccuracy
             trainingAccuracyValue.isVisible = shouldShowTrainingAccuracy
@@ -194,12 +191,6 @@ class TrainerControls(trainer: SupervisedTrainer, supervisedNetwork: SupervisedN
 
 }
 
-/**
- * Check if the supervised network uses softmax activation
- */
-private fun isSoftmaxNetwork(supervisedNetwork: SupervisedNetwork): Boolean {
-    return (supervisedNetwork.outputLayer as? NeuronArray)?.updateRule is SoftmaxRule
-}
 
 class ErrorTimeSeries(trainer: SupervisedTrainer) : JPanel() {
 

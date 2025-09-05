@@ -6,7 +6,6 @@ import org.simbrain.network.core.*
 import org.simbrain.network.events.TrainerEvents
 import org.simbrain.network.events.TrainingStats
 import org.simbrain.network.trainers.SupervisedTrainer.*
-import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.EditableObject
@@ -56,15 +55,12 @@ open class SupervisedTrainerConfig(lossFunctionProvider: KFunction<List<Class<ou
 
     @UserParameter(
         label = "Compute Accuracy",
-        description = "Calculate and display classification accuracy for softmax networks",
+        description = "Calculate and display classification accuracy for networks with one-hot encoded targets",
         order = 70
     )
     var computeAccuracy by GuiEditable(
         initValue = false,
-        description = "Calculate and display classification accuracy for softmax networks",
-        onUpdate = {
-            showWidget(widgetValue(::lossFunction) == BackpropLossFunction.CrossEntropy)
-        },
+        description = "Calculate and display classification accuracy for networks with one-hot encoded targets",
         order = 70
     )
 
@@ -301,9 +297,12 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
                     rowProbeContext?.write("forwardPassOutputActivations", outputLayer.activations.clone())
                     
                     // Accumulate accuracy during training (reuse forward pass results)
-                    if (config.computeAccuracy && isSoftmaxNetwork() && config.lossFunction is BackpropLossFunction.CrossEntropy) {
-                        batchAccuracySum += BackpropLossFunction.CrossEntropy.accuracy(outputLayer.activations, targetVec)
-                        batchSampleCount++
+                    if (config.computeAccuracy) {
+                        val accuracy = classificationAccuracy(outputLayer.activations, targetVec)
+                        if (accuracy != null) {
+                            batchAccuracySum += accuracy
+                            batchSampleCount++
+                        }
                     }
                     
                     supervisedNetwork.layers.accumulateBackprop(
@@ -414,11 +413,7 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
      * Compute the accuracy on the testing set
      */
     open suspend fun computeTestAccuracy(): Double {
-        if (!isSoftmaxNetwork() || config.lossFunction !is BackpropLossFunction.CrossEntropy) {
-            return 0.0
-        }
-
-        return supervisedNetwork.testingSet.sumOf { (input, target) ->
+        return supervisedNetwork.testingSet.mapNotNull { (input, target) ->
             supervisedNetwork.inputLayer.activations = input.toDoubleArray().toColumnVector()
             with(network) { supervisedNetwork.forwardPass() }
             val output = supervisedNetwork.outputLayer.activations
@@ -443,16 +438,12 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
                 target.toDoubleArray().toColumnVector()
             }
             
-            BackpropLossFunction.CrossEntropy.accuracy(output, reshapedTarget)
-        } / supervisedNetwork.testingSet.size
+            classificationAccuracy(output, reshapedTarget)
+        }.let { validAccuracies ->
+            if (validAccuracies.isEmpty()) 0.0 else validAccuracies.sum() / validAccuracies.size
+        }
     }
 
-    /**
-     * Check if the supervised network uses softmax activation
-     */
-    private fun isSoftmaxNetwork(): Boolean {
-        return (supervisedNetwork.outputLayer as? NeuronArray)?.updateRule is SoftmaxRule
-    }
 
 
 

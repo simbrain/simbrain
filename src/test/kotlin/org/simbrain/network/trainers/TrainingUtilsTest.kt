@@ -633,8 +633,9 @@ class TrainingUtilsTest {
             doubleArrayOf(0.0, 0.0, 1.0)   // Target class 2
         ))
         
-        val accuracy = BackpropLossFunction.CrossEntropy.accuracy(predictions, targets)
-        assertEquals(1.0, accuracy, 1e-6, "Perfect predictions should have 100% accuracy")
+        val accuracy = classificationAccuracy(predictions, targets)
+        assertNotNull(accuracy, "Accuracy should not be null for valid one-hot targets")
+        assertEquals(1.0, accuracy!!, 1e-6, "Perfect predictions should have 100% accuracy")
     }
 
     @Test
@@ -651,8 +652,9 @@ class TrainingUtilsTest {
             doubleArrayOf(0.0, 0.0, 1.0)   // Target class 2
         ))
         
-        val accuracy = BackpropLossFunction.CrossEntropy.accuracy(predictions, targets)
-        assertEquals(0.0, accuracy, 1e-6, "No correct predictions should have 0% accuracy")
+        val accuracy = classificationAccuracy(predictions, targets)
+        assertNotNull(accuracy, "Accuracy should not be null for valid one-hot targets")
+        assertEquals(0.0, accuracy!!, 1e-6, "No correct predictions should have 0% accuracy")
     }
 
     @Test
@@ -669,8 +671,9 @@ class TrainingUtilsTest {
             doubleArrayOf(0.0, 0.0, 1.0)   // Target class 2
         ))
         
-        val accuracy = BackpropLossFunction.CrossEntropy.accuracy(predictions, targets)
-        assertEquals(2.0/3.0, accuracy, 1e-6, "2 out of 3 correct should be 66.67% accuracy")
+        val accuracy = classificationAccuracy(predictions, targets)
+        assertNotNull(accuracy, "Accuracy should not be null for valid one-hot targets")
+        assertEquals(2.0/3.0, accuracy!!, 1e-6, "2 out of 3 correct should be 66.67% accuracy")
     }
 
     @Test
@@ -679,8 +682,9 @@ class TrainingUtilsTest {
         val predictions = doubleArrayOf(0.1, 0.9, 0.0).toColumnVector()
         val targets = doubleArrayOf(0.0, 1.0, 0.0).toColumnVector()
         
-        val accuracy = BackpropLossFunction.CrossEntropy.accuracy(predictions, targets)
-        assertEquals(1.0, accuracy, 1e-6, "Single correct prediction should have 100% accuracy")
+        val accuracy = classificationAccuracy(predictions, targets)
+        assertNotNull(accuracy, "Accuracy should not be null for valid one-hot targets")
+        assertEquals(1.0, accuracy!!, 1e-6, "Single correct prediction should have 100% accuracy")
     }
 
     @Test
@@ -689,8 +693,9 @@ class TrainingUtilsTest {
         val predictions = doubleArrayOf(0.9, 0.1, 0.0).toColumnVector()  // Predicted class 0
         val targets = doubleArrayOf(0.0, 1.0, 0.0).toColumnVector()      // Target class 1
         
-        val accuracy = BackpropLossFunction.CrossEntropy.accuracy(predictions, targets)
-        assertEquals(0.0, accuracy, 1e-6, "Single incorrect prediction should have 0% accuracy")
+        val accuracy = classificationAccuracy(predictions, targets)
+        assertNotNull(accuracy, "Accuracy should not be null for valid one-hot targets")
+        assertEquals(0.0, accuracy!!, 1e-6, "Single incorrect prediction should have 0% accuracy")
     }
 
     @Test
@@ -705,8 +710,9 @@ class TrainingUtilsTest {
             doubleArrayOf(0.0, 0.0, 1.0)   // Target class 2 ✓
         ))
         
-        val accuracy = BackpropLossFunction.CrossEntropy.accuracy(predictions, targets)
-        assertEquals(1.0, accuracy, 1e-6, "Both predictions should be correct")
+        val accuracy = classificationAccuracy(predictions, targets)
+        assertNotNull(accuracy, "Accuracy should not be null for valid one-hot targets")
+        assertEquals(1.0, accuracy!!, 1e-6, "Both predictions should be correct")
     }
 
     @Test
@@ -723,8 +729,9 @@ class TrainingUtilsTest {
             doubleArrayOf(1.0, 0.0)   // Position 2: target class 0 ✗
         ))
         
-        val accuracy = BackpropLossFunction.CrossEntropy.accuracy(predictions, targets)
-        assertEquals(2.0/3.0, accuracy, 1e-6, "2 out of 3 sequence positions correct")
+        val accuracy = classificationAccuracy(predictions, targets)
+        assertNotNull(accuracy, "Accuracy should not be null for valid one-hot targets")
+        assertEquals(2.0/3.0, accuracy!!, 1e-6, "2 out of 3 sequence positions correct")
     }
 
     @Test
@@ -743,8 +750,9 @@ class TrainingUtilsTest {
             doubleArrayOf(0.0, 1.0)   // Target class 1 ✓
         ))
         
-        val accuracy = BackpropLossFunction.CrossEntropy.accuracy(predictions, targets)
-        assertEquals(0.75, accuracy, 1e-6, "3 out of 4 correct should be 75% accuracy")
+        val accuracy = classificationAccuracy(predictions, targets)
+        assertNotNull(accuracy, "Accuracy should not be null for valid one-hot targets")
+        assertEquals(0.75, accuracy!!, 1e-6, "3 out of 4 correct should be 75% accuracy")
     }
 
     @Test
@@ -753,8 +761,149 @@ class TrainingUtilsTest {
         val wrongTargets = Matrix.of(arrayOf(doubleArrayOf(1.0, 0.0, 0.0)))  // Different shape
         
         org.junit.jupiter.api.assertThrows<IllegalArgumentException> {
-            BackpropLossFunction.CrossEntropy.accuracy(predictions, wrongTargets)
+            classificationAccuracy(predictions, wrongTargets)
         }
+    }
+
+    @Test
+    fun `test classificationAccuracy returns null for invalid one-hot targets`() {
+        val predictions = Matrix.of(arrayOf(
+            doubleArrayOf(0.1, 0.9, 0.0),
+            doubleArrayOf(0.8, 0.1, 0.1),
+            doubleArrayOf(0.0, 0.0, 1.0)
+        ))
+        
+        // Test case 1: Multiple 1s in a row (invalid one-hot)
+        val invalidTargets1 = Matrix.of(arrayOf(
+            doubleArrayOf(1.0, 1.0, 0.0),  // Two 1s - invalid
+            doubleArrayOf(1.0, 0.0, 0.0),
+            doubleArrayOf(0.0, 0.0, 1.0)
+        ))
+        
+        val accuracy1 = classificationAccuracy(predictions, invalidTargets1)
+        assertNull(accuracy1, "Should return null for targets with multiple 1s in a row")
+        
+        // Test case 2: No 1s in a row (invalid one-hot)
+        val invalidTargets2 = Matrix.of(arrayOf(
+            doubleArrayOf(0.0, 0.0, 0.0),  // No 1s - invalid
+            doubleArrayOf(1.0, 0.0, 0.0),
+            doubleArrayOf(0.0, 0.0, 1.0)
+        ))
+        
+        val accuracy2 = classificationAccuracy(predictions, invalidTargets2)
+        assertNull(accuracy2, "Should return null for targets with no 1s in a row")
+        
+        // Test case 3: Non-binary values (invalid one-hot)
+        val invalidTargets3 = Matrix.of(arrayOf(
+            doubleArrayOf(0.0, 0.5, 0.5),  // Non-binary values - invalid
+            doubleArrayOf(1.0, 0.0, 0.0),
+            doubleArrayOf(0.0, 0.0, 1.0)
+        ))
+        
+        val accuracy3 = classificationAccuracy(predictions, invalidTargets3)
+        assertNull(accuracy3, "Should return null for targets with non-binary values")
+    }
+
+    @Test
+    fun `test classificationAccuracy returns null for invalid one-hot column vectors`() {
+        val predictions = doubleArrayOf(0.1, 0.9, 0.0).toColumnVector()
+        
+        // Test case 1: Multiple 1s (invalid one-hot)
+        val invalidTargets1 = doubleArrayOf(1.0, 1.0, 0.0).toColumnVector()
+        val accuracy1 = classificationAccuracy(predictions, invalidTargets1)
+        assertNull(accuracy1, "Should return null for column vector with multiple 1s")
+        
+        // Test case 2: No 1s (invalid one-hot)
+        val invalidTargets2 = doubleArrayOf(0.0, 0.0, 0.0).toColumnVector()
+        val accuracy2 = classificationAccuracy(predictions, invalidTargets2)
+        assertNull(accuracy2, "Should return null for column vector with no 1s")
+        
+        // Test case 3: Non-binary values (invalid one-hot)
+        val invalidTargets3 = doubleArrayOf(0.0, 0.7, 0.3).toColumnVector()
+        val accuracy3 = classificationAccuracy(predictions, invalidTargets3)
+        assertNull(accuracy3, "Should return null for column vector with non-binary values")
+    }
+
+    @Test
+    fun `test isValidOneHot function`() {
+        // Valid one-hot cases
+        val validOneHot1 = Matrix.of(arrayOf(
+            doubleArrayOf(0.0, 1.0, 0.0),
+            doubleArrayOf(1.0, 0.0, 0.0),
+            doubleArrayOf(0.0, 0.0, 1.0)
+        ))
+        assertTrue(isValidOneHot(validOneHot1), "Should recognize valid one-hot matrix")
+        
+        val validOneHotColumn = doubleArrayOf(0.0, 1.0, 0.0).toColumnVector()
+        assertTrue(isValidOneHot(validOneHotColumn), "Should recognize valid one-hot column vector")
+        
+        // Invalid one-hot cases
+        val invalidOneHot1 = Matrix.of(arrayOf(
+            doubleArrayOf(1.0, 1.0, 0.0),  // Multiple 1s
+            doubleArrayOf(1.0, 0.0, 0.0),
+            doubleArrayOf(0.0, 0.0, 1.0)
+        ))
+        assertFalse(isValidOneHot(invalidOneHot1), "Should reject matrix with multiple 1s in a row")
+        
+        val invalidOneHot2 = Matrix.of(arrayOf(
+            doubleArrayOf(0.0, 0.0, 0.0),  // No 1s
+            doubleArrayOf(1.0, 0.0, 0.0),
+            doubleArrayOf(0.0, 0.0, 1.0)
+        ))
+        assertFalse(isValidOneHot(invalidOneHot2), "Should reject matrix with no 1s in a row")
+        
+        val invalidOneHot3 = Matrix.of(arrayOf(
+            doubleArrayOf(0.0, 0.5, 0.5),  // Non-binary values
+            doubleArrayOf(1.0, 0.0, 0.0),
+            doubleArrayOf(0.0, 0.0, 1.0)
+        ))
+        assertFalse(isValidOneHot(invalidOneHot3), "Should reject matrix with non-binary values")
+    }
+
+    @Test
+    fun `test isValidOneHot with XOR-style single element vectors`() {
+        // XOR targets are single-element vectors like [0.0] and [1.0]
+        // These should NOT be considered valid one-hot because:
+        // - [1.0] has only one class, so there's no classification choice
+        // - [0.0] has no 1.0 values, violating one-hot requirements
+        
+        val xorTarget1 = doubleArrayOf(1.0).toColumnVector()  // XOR output for cases that should output 1
+        val xorTarget0 = doubleArrayOf(0.0).toColumnVector()  // XOR output for cases that should output 0
+        
+        // Single-element vectors should be invalid for classification
+        // because true one-hot encoding requires at least 2 classes
+        assertFalse(isValidOneHot(xorTarget1), "Single element [1.0] should not be valid one-hot (only one class)")
+        assertFalse(isValidOneHot(xorTarget0), "Single element [0.0] should not be valid one-hot (no 1.0 values)")
+        
+        // Verify that classificationAccuracy returns null for these cases
+        val predictions1 = doubleArrayOf(0.8).toColumnVector()  // Network prediction
+        val predictions0 = doubleArrayOf(0.2).toColumnVector()  // Network prediction
+        
+        assertNull(classificationAccuracy(predictions1, xorTarget1), 
+                  "Should return null for XOR-style single element targets [1.0]")
+        assertNull(classificationAccuracy(predictions0, xorTarget0), 
+                  "Should return null for XOR-style single element targets [0.0]")
+    }
+
+    @Test
+    fun `test isValidOneHot requires at least two classes for classification`() {
+        // Valid binary classification (2 classes)
+        val validBinary1 = doubleArrayOf(1.0, 0.0).toColumnVector()
+        val validBinary2 = doubleArrayOf(0.0, 1.0).toColumnVector()
+        
+        assertTrue(isValidOneHot(validBinary1), "Binary [1.0, 0.0] should be valid one-hot")
+        assertTrue(isValidOneHot(validBinary2), "Binary [0.0, 1.0] should be valid one-hot")
+        
+        // Valid multi-class classification (3 classes)
+        val validMultiClass = doubleArrayOf(0.0, 0.0, 1.0).toColumnVector()
+        assertTrue(isValidOneHot(validMultiClass), "Multi-class [0.0, 0.0, 1.0] should be valid one-hot")
+        
+        // Invalid single-class cases
+        val invalidSingle1 = doubleArrayOf(1.0).toColumnVector()
+        val invalidSingle0 = doubleArrayOf(0.0).toColumnVector()
+        
+        assertFalse(isValidOneHot(invalidSingle1), "Single element [1.0] should be invalid (only one class)")
+        assertFalse(isValidOneHot(invalidSingle0), "Single element [0.0] should be invalid (no 1.0 values)")
     }
 
     @Test

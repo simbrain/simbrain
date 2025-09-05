@@ -1,4 +1,4 @@
-package org.simbrain.custom_sims.simulations
+package org.simbrain.custom_sims.simulations.psychology
 
 import kotlinx.coroutines.delay
 import org.simbrain.custom_sims.*

@@ -159,4 +159,45 @@ val photoAlbumExample = newSim {
 
     imageWorld.setCurrentPipeline("Unfiltered")
 
+    addSidebarInfo(
+        """
+        # Photo Album Example
+        
+        This simulation demonstrates image classification using a neural network trained on actual photographs. 
+        It processes images from a sample photo album and learns to classify them into different categories.
+
+        This network does not train very well, because there are no convolutional layers, but it is still a good example
+        of how to train a network on images.
+        
+        # Simulation Details
+        
+        The simulation consists of:
+        - Image World: Displays photos from a image sample dataset
+        - Image Processing: Resizes images to 100x100 pixels and applies edge detection
+        - Neural Network: 3-layer network (10,000 input → 100 hidden → 3 output neurons)
+
+        # What to Do
+        
+        The main thing to do is to simply train the network by double clicking on the interaction box and pressing the "play" button
+        and running until error is relatively low. It will not completely train, but it will get better.
+        
+        Other things you can try:
+        
+        - Browse images using the navigation controls in the image world
+        
+        - Apply filters to see how edge detection and other processing affects the images
+                
+        - Test classification on new images to see how well the network generalizes. You can do this by manually adding images or editing existing images
+
+        # Background
+        
+        This simulation uses a subset of the Caltech101 dataset, which is a standard benchmark for image classification. The edge detection filter helps highlight important visual features while reducing the impact of lighting and color variations.
+
+        # Credits
+        
+        [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
+        
+        """.trimIndent()
+    )
+
 }

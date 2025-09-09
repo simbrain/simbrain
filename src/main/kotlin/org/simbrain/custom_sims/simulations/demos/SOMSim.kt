@@ -1,6 +1,7 @@
 package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.addNetworkComponent
+import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.activations
@@ -67,4 +68,55 @@ val SOMSim = newSim {
             }
         }
     }
+
+    addSidebarInfo(
+        """
+        # Self-Organizing Map (SOM)
+        
+        This simulation demonstrates a Self-Organizing Map (SOM), also known as a Kohonen map. SOMs are unsupervised neural 
+        networks that learn to create topologically ordered representations of input data. They organize similar inputs 
+        to be mapped to nearby locations in the output space.
+        
+        SOMs implement competitive learning where neurons compete to respond to inputs. The winner and its spatial 
+        neighbors update their weights toward the input, creating smooth topological maps where similar inputs map to 
+        nearby outputs.
+
+        # Simulation Details
+        
+        The simulation consists of:
+        - Input Layer: 7 input neurons that receive pattern activations
+        - SOM Layer: A 4x4 grid of neurons that compete to respond to inputs
+        - Weight Matrix: Connections between input and SOM layers that adapt during learning
+        
+        During training, the SOM learns to map similar input patterns to nearby locations in the 2D grid. 
+        The "winning" neuron (most active) and its neighbors adjust their weights to become more responsive to the current input pattern.
+        
+        As the network learns you can observe the spatial range of learning and the learning rate reduce. You can right 
+        click in the network interaction box to reset this process.
+
+        # What to Do
+        
+        1. Select input patterns using the Pattern 1-5 buttons to present different input patterns to the network
+        
+        2. Train the network by clicking the `Train` button after selecting a pattern. This updates the weights based on the current input
+        
+        3. Observe the organization. After training with different patterns, similar patterns (which you can invoke with the buttons on the contorl panel, or manually by editing the inputs) should activate neurons in nearby locations
+        
+        4. Experiment with different training sequences:
+           - Train with the same pattern multiple times to see how it becomes more strongly represented
+           - Alternate between different patterns to see how the map organizes
+           - Try training patterns in different orders
+        
+        5. Watch the winner labels. The winning neuron gets labeled with the pattern name, helping you see the organization
+
+        # References
+        
+        Kohonen, T. (1982). [Self-organized formation of topologically correct feature maps](https://doi.org/10.1007/BF00337288). _Biological Cybernetics_, _43_(1), 59-69.
+
+        # Credits
+        
+        [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
+        
+        """.trimIndent()
+    )
 }

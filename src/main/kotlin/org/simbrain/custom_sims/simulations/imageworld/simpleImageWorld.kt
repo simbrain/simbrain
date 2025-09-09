@@ -131,4 +131,39 @@ val simpleImageWorld = newSim {
         }
     }
 
+    addSidebarInfo(
+        """
+        # Simple Image World
+        
+        This simulation demonstrates basic image processing using a 10x10 pixel drawing canvas connected to a neural network. 
+        You can draw simple images and train a network to classify them into different categories.
+
+        # Simulation Details
+        
+        The simulation consists of:
+        - Image World: A 10x10 pixel canvas where you can draw simple images
+        - Input Layer: 100 neurons (10x10) that receive pixel brightness values
+        - Hidden Layer: ${numHiddenNodes} neurons for feature extraction
+        - Output Layer: ${numCategories} neurons representing different categories
+        - Training System: Supervised learning to classify drawn images
+
+        # What to Do
+        
+        1. Draw images in the image world canvas using the drawing tools
+        
+        2. Assign categories by setting the target output for each drawing
+        
+        3. Train the network using the supervised training dialog
+        
+        4. Test classification by drawing new images and observing which category the network predicts
+        
+        5. Experiment with different patterns to see how well the network can discriminate between categories
+
+        # Credits
+        
+        [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
+        
+        """.trimIndent()
+    )
+
 }

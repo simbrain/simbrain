@@ -1,8 +1,6 @@
 package org.simbrain.custom_sims
 
 import org.simbrain.custom_sims.simulations.*
-import org.simbrain.custom_sims.simulations.backprop.activationSequenceThreeLayer
-import org.simbrain.custom_sims.simulations.backprop.activationSequenceTwoLayer
 import org.simbrain.custom_sims.simulations.behaviorism.classicalConditioning
 import org.simbrain.custom_sims.simulations.behaviorism.operantWithEnvironment
 import org.simbrain.custom_sims.simulations.behaviorism.simpleOperant
@@ -167,10 +165,10 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Photo album (100 x 100)") { photoAlbumExample }
     }
 
-    dir("Temp") {
-        item("Activation sequence (2 layers)") { activationSequenceTwoLayer }
-        item("Activation sequence (3 layers)") { activationSequenceThreeLayer }
-    }
+    // dir("Temp") {
+    //     item("Activation sequence (2 layers)") { activationSequenceTwoLayer }
+    //     item("Activation sequence (3 layers)") { activationSequenceThreeLayer }
+    // }
 
     //dir("Testing") {
     //    // item("Test Sim") { testSim }

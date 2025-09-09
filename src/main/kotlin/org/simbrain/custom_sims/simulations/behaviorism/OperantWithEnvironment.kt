@@ -102,7 +102,64 @@ val operantWithEnvironment = newSim("operant_with_environment") {
 
     addSidebarInfo(
         """
-        # Operant with Environment
+        
+        # Introduction
+        
+        This simulation demonstrates operant conditioning in an environment where an agent learns to associate stimuli with behaviors through reward and punishment. The agent has three basic behaviors (`Wiggle`, `Explore`, `Spin`) that it performs with certain probabilities. These behaviors can be reinforced or discouraged based on environmental feedback.
+        
+        # Simulation Details
+        
+        In this simulation, an agent (mouse) can sense three different objects: a `Candle`, `Flower`, and `Fish`.  
+        The agent can perform three behaviors:
+        
+        - Wiggle: oscillates left and right  
+        - Explore: moves around randomly  
+        - Spin: rotates in place  
+        
+        The agent's behavior is controlled by a neural network with the following elements:
+        
+        - Stimulus neurons detect objects in the environment  
+        - Behavior neurons control which action the agent performs  
+        - Intrinsic probabilities (shown as labels on behavior neurons) determine baseline or spontaneous behavior tendencies  
+        - Connections between stimuli and behaviors can be strengthened or weakened through learning. These connections determine behaviors that are conditional on the presence of stimuli.  
+        
+        When the agent is near an object and performs a behavior, you can reward or punish that stimulus–response pairing. This increases or decreases the likelihood of that behavior occurring in that context.
+        
+        # What to Do
+        
+        1. Run the simulation and observe the agent's initial random behavior.  
+        
+        2. Train the agent to perform a behavior spontaneously. This is like the simple operant conditioning simulation.  
+        
+        3. Add a conditional behavior. Wait for the agent to approach an object (candle, flower, or fish). You will see the corresponding stimulus neuron activate.  
+        
+        4. Observe which behavior the agent performs near the object.  
+        
+        5. Provide feedback:  
+           - Click `Reward` to encourage the stimulus–behavior pairing  
+           - Click `Punish` to discourage it  
+           - Click `Do nothing` to let the agent continue without feedback  
+        
+        6. Repeat the process. Over time, the agent will learn to associate certain stimuli with rewarded behaviors.  
+        
+        7. Monitor the changes:  
+           - Watch how the connection weights between stimuli and behaviors change  
+           - Notice how the agent's behavior becomes more predictable near certain objects  
+           - Observe how intrinsic behavior probabilities (shown on the behavior neurons) adjust when no stimuli are present  
+        
+        At this point you can demonstrate the idea of a discriminative stimulus (also called a controlling stimulus). This is a stimulus that, after training, increases the probability of an operant behavior. It signals the relationship between a behavior and a reinforcer. The behavior can then be said to be under the control of that stimulus. For example, pressing a lever may only produce food when a light is on.  
+        
+        In this simulation, you might first train the agent to wiggle spontaneously. Then you can transfer control of this behavior to the candle, so that wiggling only occurs when the candle is present. You could punish wiggling when the candle is absent, and train the agent to do something else spontaneously instead. In that case, wiggling is said to be under the control of the candle, which is now the discriminative stimulus.
+        
+        # References
+        
+        Skinner, B. F. (1953). [_Science and human behavior_](https://www.bfskinner.org/newtestsite/wp-content/uploads/2014/02/ScienceHumanBehavior.pdf). Macmillan.
+
+        # Credits
+        
+        Tim Meyer
+        
+        [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
                 
         """.trimIndent()
     )

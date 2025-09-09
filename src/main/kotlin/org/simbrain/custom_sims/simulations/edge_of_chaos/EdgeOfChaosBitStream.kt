@@ -70,8 +70,8 @@ val edgeOfChaosBitStream = newSim("edgeOfChaosBitStream") {
     val bitStream1 = buildBitStream(res1).apply { label = "Bit stream 1" }
     val bitStream2 = buildBitStream(res2).apply { label = "Bit stream 2" }
 
-    val connector1 = AllToAll(false, seed)
-    val connector2 = AllToAll(false, seed)
+    val connector1 = AllToAll(allowSelfConnection = false, seed = seed)
+    val connector2 = AllToAll(allowSelfConnection = false, seed = seed)
     val thing1 = connector1.connectNeurons(bitStream1.neuronList, res1.neuronList)
     val thing2 = connector2.connectNeurons(bitStream2.neuronList, res2.neuronList)
     net.addNetworkModels(thing1)

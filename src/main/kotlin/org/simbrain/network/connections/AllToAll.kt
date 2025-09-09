@@ -26,6 +26,12 @@ class AllToAll @JvmOverloads constructor(
     )
     var allowSelfConnection: Boolean = false,
 
+    /**
+     * If true, synapses are added in both directions.
+     */
+    @UserParameter(label = "Bi-directional", order = 2)
+    var useBidirectionalConnections: Boolean = false,
+
     seed: Long = Random.nextLong()
 
 ) : ConnectionStrategy(seed) {
@@ -37,7 +43,7 @@ class AllToAll @JvmOverloads constructor(
     }
 
     override fun copy(): AllToAll {
-        return AllToAll(allowSelfConnection).also {
+        return AllToAll(allowSelfConnection, useBidirectionalConnections).also {
             commonCopy(it)
         }
     }
@@ -46,7 +52,7 @@ class AllToAll @JvmOverloads constructor(
         source: List<Neuron>,
         target: List<Neuron>
     ): List<Synapse> {
-        val syns = createAllToAllSynapses(source, target, allowSelfConnection)
+        val syns = createAllToAllSynapses(source, target, allowSelfConnection, useBidirectionalConnections)
         polarizeSynapses(syns, percentExcitatory, random)
         return syns
     }
@@ -59,12 +65,30 @@ class AllToAll @JvmOverloads constructor(
 fun createAllToAllSynapses(
     sourceNeurons: List<Neuron>,
     targetNeurons: List<Neuron>,
-    allowSelfConnection: Boolean = false
+    allowSelfConnection: Boolean = false,
+    useBidirectionalConnections: Boolean = false
 ): List<Synapse> {
-    return (sourceNeurons cartesianProduct targetNeurons)
+    val synapses = mutableListOf<Synapse>()
+    
+    // Create synapses from source to target
+    (sourceNeurons cartesianProduct targetNeurons)
         .filter { (src, tar) ->
             allowSelfConnection || src !== tar
-        }.map { (src, tar) ->
-            Synapse(src, tar).apply { strength = 1.0 }
+        }.forEach { (src, tar) ->
+            synapses.add(Synapse(src, tar).apply { strength = 1.0 })
         }
+    
+    // If bidirectional, create synapses from target to source (avoiding duplicates)
+    if (useBidirectionalConnections) {
+        (targetNeurons cartesianProduct sourceNeurons)
+            .filter { (tar, src) ->
+                // Only add if it's not the same connection we already added
+                (allowSelfConnection || src !== tar) && 
+                !synapses.any { it.source === tar && it.target === src }
+            }.forEach { (tar, src) ->
+                synapses.add(Synapse(tar, src).apply { strength = 1.0 })
+            }
+    }
+    
+    return synapses
 }

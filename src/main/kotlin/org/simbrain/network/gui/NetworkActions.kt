@@ -718,6 +718,11 @@ class NetworkActions(val networkPanel: NetworkPanel) {
                     selectionManager.filterSelectedModels<Neuron>()
                 )
                 synapses.addToNetworkAsync(network)
+                // Select synapses after creating them so it is easy to edit the new synapses
+                // When using key commands we don't do this, to facilitae quick creation using the "1-2 trick"
+                networkPanel.selectionManager.clear()
+                networkPanel.selectionManager.clearAllSource()
+                network.selectModels(synapses)
                 undoManager.addUndoableAction(
                     description = "Connect using ${connectionStrategy.name}",
                     undo = { synapses.forEach { it.delete() } },

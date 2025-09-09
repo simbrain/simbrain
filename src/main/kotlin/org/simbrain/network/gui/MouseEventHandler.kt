@@ -209,17 +209,19 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         val draggableElements = networkPanel.selectionManager.selection.map { it.screenElements.firstOrNull(ScreenElement::isDraggable) }
         draggableElements.forEach { it?.offset(delta.x, delta.y) }
 
+        val placementManager = networkPanel.network.placementManager
+        val selectionManager = networkPanel.selectionManager
+        val customOffsetAnchor = placementManager.customOffsetAnchor
+
         // Show placementManagerDelta for placement manager
-        if (event.isAltDown) {
-            val topLeft = networkPanel.selectionManager.filterSelectedModels<LocatableModel>().topLeftLocation
-            val pm = networkPanel.network.placementManager
+        if (event.isAltDown && customOffsetAnchor?.let { selectionManager.selectedModels.contains(it) } == false) {
+            val topLeft = selectionManager.filterSelectedModels<LocatableModel>().topLeftLocation
             networkPanel.canvas.layer.removeChild(placementManagerDelta)
-            val customOffsetAnchor = pm.customOffsetAnchor
             placementManagerDelta = PPath.createLine(
                 topLeft.x,
                 topLeft.y,
-                customOffsetAnchor?.location?.x ?: 0.0,
-                customOffsetAnchor?.location?.y ?: 0.0
+                customOffsetAnchor.location.x,
+                customOffsetAnchor.location.y
             ).apply {
                 this.stroke = PPath.DEFAULT_STROKE
                 this.strokePaint = Color.red

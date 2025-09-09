@@ -11,6 +11,10 @@ class ContextMenuEventHandler(private val networkPanel: NetworkPanel) : PBasicIn
         networkPanel.launch {
             val contextMenu = networkPanel.creatContextMenu()
             val canvasPosition = event.canvasPosition
+            
+            // Apply both drag reset and mouse button fixes using the utility
+            MouseEventUtils.applyContextMenuFixes(networkPanel, event, contextMenu)
+            
             contextMenu.show(networkPanel.canvas, canvasPosition.x.toInt(), canvasPosition.y.toInt())
             networkPanel.canvas.camera.localToView(canvasPosition)
             // Set this position so that new objects are added here

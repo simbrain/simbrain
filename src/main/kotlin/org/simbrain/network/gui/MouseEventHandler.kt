@@ -206,8 +206,8 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
      */
     private fun dragItems(event: PInputEvent) {
         val delta = event.position - marqueeEndPosition
-        networkPanel.selectionManager.selection.map { it.screenElements.firstOrNull(ScreenElement::isDraggable) }
-            .forEach { it?.offset(delta.x, delta.y) }
+        val draggableElements = networkPanel.selectionManager.selection.map { it.screenElements.firstOrNull(ScreenElement::isDraggable) }
+        draggableElements.forEach { it?.offset(delta.x, delta.y) }
 
         // Show placementManagerDelta for placement manager
         if (event.isAltDown) {

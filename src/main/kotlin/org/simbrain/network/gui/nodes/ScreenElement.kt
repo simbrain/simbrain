@@ -88,42 +88,8 @@ abstract class ScreenElement protected constructor(val networkPanel: NetworkPane
             val (x, y) = event.canvasPosition.int
             
             contextMenu?.let { menu ->
-                // Add a popup menu listener to fix mouse button state when menu closes
-                menu.addPopupMenuListener(object : javax.swing.event.PopupMenuListener {
-                    override fun popupMenuWillBecomeVisible(e: javax.swing.event.PopupMenuEvent?) {}
-                    
-                    override fun popupMenuWillBecomeInvisible(e: javax.swing.event.PopupMenuEvent?) {
-                        // Fix for Piccolo2D mouse button counting bug when JPopupMenu consumes mouse release events
-                        try {
-                            val inputManager = networkPanel.canvas.root.defaultInputManager
-                            val buttonsField = inputManager.javaClass.getDeclaredField("buttonsPressed")
-                            buttonsField.isAccessible = true
-                            val currentCount = buttonsField.getInt(inputManager)
-                            
-                            // Only fix if we have exactly 1 unmatched button (the right mouse button)
-                            if (currentCount == 1) {
-                                // Create a synthetic mouse release event for the right button
-                                val mouseEvent = java.awt.event.MouseEvent(
-                                    networkPanel.canvas,
-                                    java.awt.event.MouseEvent.MOUSE_RELEASED,
-                                    System.currentTimeMillis(),
-                                    java.awt.event.InputEvent.BUTTON3_DOWN_MASK,
-                                    0, 0, // x, y coordinates (not important for this fix)
-                                    1, // click count
-                                    true, // popup trigger
-                                    java.awt.event.MouseEvent.BUTTON3
-                                )
-                                
-                                // Dispatch the synthetic event through the canvas
-                                networkPanel.canvas.dispatchEvent(mouseEvent)
-                            }
-                        } catch (ex: Exception) {
-                            // Silently ignore reflection errors
-                        }
-                    }
-                    
-                    override fun popupMenuCanceled(e: javax.swing.event.PopupMenuEvent?) {}
-                })
+                // Apply both drag reset and mouse button fixes using the utility
+                org.simbrain.network.gui.MouseEventUtils.applyContextMenuFixes(networkPanel, event, menu)
                 menu.show(networkPanel.canvas, x, y)
             }
             

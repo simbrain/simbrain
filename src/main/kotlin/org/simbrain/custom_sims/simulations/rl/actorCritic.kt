@@ -248,32 +248,23 @@ val actorCritic = newSim {
     """
     # Introduction
 
-    This simulation models an agent that learns the location of rewarding stimuli using [reinforcement learning](https://en.wikipedia.org/wiki/Reinforcement_learning).
-    Each time you press `run` a simulation is run. The agent (the mouse) initially takes random actions. But when
-    it finds the cheese it is rewarded, and it reinforces the action of moving towards the cheese next time it is near it.
-    It also learns to value the state it's in right _before_ it gets the cheese, and will reinforce actions that lead to
-    that state. In this way it slowly learns a path to the cheese. In the default case of a 5x5 world, after about 15 trials 
-    it should be able to do a pretty good job of finding the cheese.  Once it learns this, you can move the cheese a little 
-    and observe it "looking" for the cheese in the location where it initially learned it to be. 
+    This simulation models an agent that learns the location of rewarding stimuli using [reinforcement learning](https://en.wikipedia.org/wiki/Reinforcement_learning). Each time you press `run` a simulation is run. The agent (the mouse) initially takes random actions. But when it finds the cheese it is rewarded, and it reinforces the action of moving towards the cheese next time it is near it. It also learns to value the state it's in right before it gets the cheese, and will reinforce actions that lead to that state. In this way it slowly learns a path to the cheese. In the default case of a 5x5 world, after about 15 trials it should be able to do a pretty good job of finding the cheese. Once it learns this, you can move the cheese a little and observe it "looking" for the cheese in the location where it initially learned it to be.
     
-    **Tip**: To get the simulation to run faster, minimize the network window.
+    Tip: To get the simulation to run faster, minimize the network window.
     
-    **Tip**: A [time series](https://docs.simbrain.net/docs/plots/timeSeries.html) window is minimized that shows how reward, value, and td error unfold as the simulation runs. 
+    Tip: A [time series](https://docs.simbrain.net/docs/plots/timeSeries.html) window is minimized that shows how reward, value, and td error unfold as the simulation runs.
        
     # Simulation Details
 
-    The simulation uses the [actor critic](https://en.wikipedia.org/wiki/Actor-critic_algorithm) algorithm. The algorithm is
-    biologically realistic, modeling how dopamine is used to predict reward.
+    The simulation uses the [actor critic](https://en.wikipedia.org/wiki/Actor-critic_algorithm) algorithm. The algorithm is biologically realistic, modeling how dopamine is used to predict reward.
     
-    Sensor nodes represent a flattened [sensor grid](https://docs.simbrain.net/docs/worlds/odorworld.html#grid-sensor) which
-     is modeled on place cells in the brain. As the simulation runs notice that the agent's current location is reflected in these.
+    Sensor nodes represent a flattened [sensor grid](https://docs.simbrain.net/docs/worlds/odorworld.html#grid-sensor) which is modeled on place cells in the brain. As the simulation runs notice that the agent's current location is reflected in these.
      
     Outputs are a simple motor system (the "actor" in "actor critic") that is based on a [winner take all](https://docs.simbrain.net/docs/network/neurongroups/wta.html) algorithm.
     
     The value node is the "critic", that estimates how likely reward is to be achieved relative to the current state.
     
-    The td error node corresponds to a dopamine signal, which indicates how much better or worse reward is relative to what the critic or value node is predicting.
-     When things are better than expected, the node fires above 0; when worse it fires below 0.
+    The td error node corresponds to a dopamine signal, which indicates how much better or worse reward is relative to what the critic or value node is predicting. When things are better than expected, the node fires above 0; when worse it fires below 0.
    
     The weights between the sensor nodes and the outputs and between the sensor nodes and the value node are what are trained. 
      The weight change is determined by the learning rate and the td error. So when things are better than expected (td error is positive)

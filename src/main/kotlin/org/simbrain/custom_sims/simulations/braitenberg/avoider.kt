@@ -178,32 +178,29 @@ val avoider = newSim {
         """
         # Introduction
 
-        [Braitenberg vehicles](http://en.wikipedia.org/wiki/Braitenberg_vehicle) are simple agents that move around in response to environmental stimuli. This simulation simulates a Braitenberg vehicle as an agent
-        in an odor world that avoids an object.
+        [Braitenberg vehicles](http://en.wikipedia.org/wiki/Braitenberg_vehicle) are simple agents that move around in response to environmental stimuli. This simulation simulates a Braitenberg vehicle as an agent in an odor world that avoids an object.
 
         # Simulation Details
 
-        In this simulation, the Braitenberg vehicle has the characteristics of an _avoider_ where it demonstrates movement similar to vehicle 2a (the _coward vehicle_) from Braitenberg's book (see link below).
-        Note that the connections are not the same as in Braitenberg's book. 
+        In this simulation, the Braitenberg vehicle has the characteristics of an avoider where it demonstrates movement similar to vehicle 2a (the coward vehicle) from Braitenberg's book (see link below). Note that the connections are not the same as in Braitenberg's book.
 
-        The agent will orient to the left if its right sensor is activated by an object on its right side, moving away from it. If it senses a object on its left side, the agent will orient to
-        the right and move away from the object.
+        The agent will orient to the left if its right sensor is activated by an object on its right side, moving away from it. If it senses an object on its left side, the agent will orient to the right and move away from the object.
 
         # What to Do
         
         In this simulation similar to the other Braitenberg simulations, simply press the `play` button on the top toolbar for the simulation to run. Below are the steps:
         
-        1) While it runs, observe the behavior of the agent in the odor world.
+        1. While it runs, observe the behavior of the agent in the odor world
         
-        2) Move any of the objects around and watch the agent avoid it and observe the the activity of the neurons in the network window.
+        2. Move any of the objects around and watch the agent avoid it and observe the activity of the neurons in the network window
         
-        3) Press the `stop` button to stop the network from running.
+        3. Press the `stop` button to stop the network from running
         
         ## Other Observations
         
         In this simulation, you can control the velocity of the agent's movement. There are three key value ranges to observe: positive, zero, negative. To do this: 
         
-        1) Click on the `Straight` neuron.
+        1. Click on the `Straight` neuron
         
         2) Press the up/down arrow keys to control the neuron's activation (e.g., velocity).
         

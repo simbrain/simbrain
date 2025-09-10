@@ -36,18 +36,18 @@ val hopfieldPatterns = newSim {
     network.addNetworkModelAsync(hopfield)
 
     addSidebarInfo(
-        """ 
-            # Introduction
-            
-            This demo allows you to study [Hopfield networks](https://en.wikipedia.org/wiki/Hopfield_network), which are recurent networks often used for pattern recognition and to model memory retrieval. 
-            
-            In this simulation you can compare how patterns that overlap more or less to see how many you get it to to learn, based on their correlations.
-            
-            For a more systematic approach to testing memory retrieval, try the `Discrete Hopfield` or `Continuous Hopfield` simulations, which has more features. 
-            
-            # Simulation Details
-            
-            ## Training
+        """
+        # Introduction
+        
+        This demo allows you to study [Hopfield networks](https://en.wikipedia.org/wiki/Hopfield_network), which are recurrent networks often used for pattern recognition and to model memory retrieval.
+        
+        In this simulation you can compare how patterns that overlap more or less to see how many you can get it to learn, based on their correlations.
+        
+        For a more systematic approach to testing memory retrieval, try the `Discrete Hopfield` or `Continuous Hopfield` simulations, which have more features.
+        
+        # Simulation Details
+        
+        ## Training
             Each neuron in this network is connected to each other neuron using the Hebb rule ("neurons that wire
             together, fire together"). To start, this network is initialized with all weights equal to zero.
             When you train this network on a pattern, it takes the dot product of each neuron activation in the network with all other neuron activations in the network.

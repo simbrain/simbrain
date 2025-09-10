@@ -363,27 +363,20 @@ val grazingCows = newSim { optionString ->
     }
 
     addSidebarInfo(
-        """ 
+        """
         # Introduction
         
-        This is a simulation of the evolution of a neural network that is coupled to an agent in an odor world that contains food resources with the possibility of multiple agents. The neural network(s) will evolve
-        to optimize the simulation's performance using an evolutionary framework in Simbrain.
+        This is a simulation of the evolution of a neural network that is coupled to an agent in an odor world that contains food resources with the possibility of multiple agents. The neural network(s) will evolve to optimize the simulation's performance using an evolutionary framework in Simbrain.
         
         # Simulation Details
         
-        This simulation simulates the evolution of a neural network, or multiple neural networks until the `target fitness` is met, exceeded, or when it has reached the `maximum generation`. The goal of this simulation is 
-        to evolve until it is as close as possible to the `target fitness`. By default, the target fitness is the `10th` percentile, and if it is the target mean group fitness, the `target fitness` would be the `50th` 
-        percentile.
+        This simulation simulates the evolution of a neural network, or multiple neural networks until the target fitness is met, exceeded, or when it has reached the maximum generation. The goal of this simulation is to evolve until it is as close as possible to the target fitness. By default, the target fitness is the 10th percentile, and if it is the target mean group fitness, the target fitness would be the 50th percentile.
         
-        For a more in-depth look into how the fitness is calculated, use this [page](https://docs.simbrain.net/docs/simulations/) as a guide to see the simulation code. Whereas for a comprehensive look into how 
-        evolutionary simulations are developed in Simbrain, look [here](https://docs.simbrain.net/docs/evolution/).
+        For a more in-depth look into how the fitness is calculated, use this [page](https://docs.simbrain.net/docs/simulations/) as a guide to see the simulation code. For a comprehensive look into how evolutionary simulations are developed in Simbrain, look [here](https://docs.simbrain.net/docs/evolution/).
         
         ## Evolutionary Process
         
-        The evolutionary process begins with a starting `population size` of simulations. In generation `0`, each simulation starts with a three-layer network (`7` input neurons, `2` hidden neurons, and `3` output neurons) and a
-        preset amount of connections (`4` in the input-hidden layer, `3` in the hidden-output layer). If the `number of cows` is more than `1`, there will be multiple networks that correspond to different agents in a
-        simulation. Within each generation, a simulation will iterate until the specified value while the fitness of each simulation is calculated and recorded. When food is obtained, a value is added to the current 
-        fitness of the simulation and new food is repopulated at a random location in the odor world. All the agents will accumulate towards a single fitness value (the fitness of the simulation).
+        The evolutionary process begins with a starting population size of simulations. In generation 0, each simulation starts with a three-layer network (7 input neurons, 2 hidden neurons, and 3 output neurons) and a preset amount of connections (4 in the input-hidden layer, 3 in the hidden-output layer). If the number of cows is more than 1, there will be multiple networks that correspond to different agents in a simulation. Within each generation, a simulation will iterate until the specified value while the fitness of each simulation is calculated and recorded. When food is obtained, a value is added to the current fitness of the simulation and new food is repopulated at a random location in the odor world. All the agents will accumulate towards a single fitness value (the fitness of the simulation).
         
         Then after each generation, a percentage of the population is eliminated (e.g., `elimination ratio`) and repopulated with new simulations. During this process of reproduction, some of the new 
         simulations will have mutations, where the simulation develops new neurons in the hidden layer (`10%` chance), new connections between layers (`25%` chance), changes in neuron biases and weight strengths. 

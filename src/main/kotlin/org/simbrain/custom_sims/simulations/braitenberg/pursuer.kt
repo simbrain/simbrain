@@ -152,40 +152,37 @@ val pursuer = newSim {
         """
         # Introduction
 
-        [Braitenberg vehicles](http://en.wikipedia.org/wiki/Braitenberg_vehicle) are simple agents that move around in response to environmental stimuli. This simulation simulates a Braitenberg vehicle as an agent
-        in an odor world that is attracted to an object.
+        [Braitenberg vehicles](http://en.wikipedia.org/wiki/Braitenberg_vehicle) are simple agents that move around in response to environmental stimuli. This simulation simulates a Braitenberg vehicle as an agent in an odor world that is attracted to an object.
 
         # Simulation Details
 
-        In this simulation, the Braitenberg vehicle has the characteristics of a _pursuer_ where it demonstrates movement similar to vehicle 2b (the _aggressive vehicle_) from Braitenberg's book (see link below).
+        In this simulation, the Braitenberg vehicle has the characteristics of a pursuer where it demonstrates movement similar to vehicle 2b (the aggressive vehicle) from Braitenberg's book (see link below).
 
-        The agent will move to the left if its left sensor is activated by an object on its left side, heading straight towards it. And if it senses a source on its right side, the agent will move to the right 
-        and straight towards the object. 
+        The agent will move to the left if its left sensor is activated by an object on its left side, heading straight towards it. And if it senses a source on its right side, the agent will move to the right and straight towards the object. 
 
         # What to Do
         
         In this simulation similar to the other Braitenberg simulations, simply press the `play` button on the top toolbar for the simulation to run. Below are the steps:
         
-        1) While it runs, observe the behavior of the agent in the odor world.
+        1. While it runs, observe the behavior of the agent in the odor world
         
-        2) Move the cheese around and watch the agent chase it and observe the the activity of the neurons in the network window.
+        2. Move the cheese around and watch the agent chase it and observe the activity of the neurons in the network window
         
-        3) Press the `stop` button to stop the network from running.
+        3. Press the `stop` button to stop the network from running
         
         ## Other Observations
         
         In this simulation, you can control the velocity of the agent's movement. There are three key value ranges to observe: positive, zero, negative. To do this: 
         
-        1) Click on the `Straight` neuron.
+        1. Click on the `Straight` neuron
         
-        2) Press the up/down arrow keys to control the neuron's activation (e.g., velocity).
+        2. Press the up/down arrow keys to control the neuron's activation (i.e., velocity)
         
-        In addition to controlling the velocity, you can control the strength of the agent's sensors by changing the values of the weights from sensors to orientation. This changes
-        how aggressive the agent turns in response to the object. To do this:
+        In addition to controlling the velocity, you can control the strength of the agent's sensors by changing the values of the weights from sensors to orientation. This changes how aggressive the agent turns in response to the object. To do this:
         
-        1) Click on either weights between the sensor neurons and turn neurons.
+        1. Click on either weights between the sensor neurons and turn neurons
         
-        2) Press the up/down arrow keys to control their strength (e.g., the agent's turn aggression towards the object). 
+        2. Press the up/down arrow keys to control their strength (i.e., the agent's turn aggression towards the object) 
         
         # References
         

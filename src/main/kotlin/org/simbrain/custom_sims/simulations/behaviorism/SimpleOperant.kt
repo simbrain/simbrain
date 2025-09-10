@@ -140,29 +140,29 @@ suspend fun SimulationScope.setUpSimpleOperantWorkpace(workspace: Workspace) {
             # Simulation Details
             
             In this model:
-            - **Three behavior neurons** represent possible actions the agent can take
-            - **Initial probabilities** (visible in labels beneath the neurons) are equal (0.33 each) so all behaviors are equally likely
-            - **Winning behavior** is selected based on sampling from current probabilities each time step
-            - **Learning** occurs when you reward or punish the currently active behavior
+            - Three behavior neurons represent possible actions the agent can take
+            - Initial probabilities (visible in labels beneath the neurons) are equal (0.33 each) so all behaviors are equally likely
+            - Winning behavior is selected based on sampling from current probabilities each time step
+            - Learning occurs when you reward or punish the currently active behavior
             
             When you reward a behavior, its probability increases. When you punish it, the probability decreases. After each learning event, probabilities are normalized so they always sum to 1.0.
 
             # What to Do
             
-            1. **Run the simulation** to see random behavior selection based on current probabilities
+            1. Run the simulation to see random behavior selection based on current probabilities
             
-            2. **Choose a target behavior** you want the agent to learn (e.g., make it always "Sit")
+            2. Choose a target behavior you want the agent to learn (e.g., make it always "Sit")
             
-            3. **Apply reinforcement**:
+            3. Apply reinforcement:
                - When your target behavior is active (activation = 1.0), click `Reward Agent`
                - When other behaviors are active, click `Punish Agent`
                - You can also click `Do Nothing` to just observe without learning
             
-            4. **Monitor the probabilities** shown in the neuron labels. They should shift toward your target behavior over time.
+            4. Monitor the probabilities shown in the neuron labels. They should shift toward your target behavior over time.
             
-            5. **Continue training** until the desired behavior becomes highly probable
+            5. Continue training until the desired behavior becomes highly probable
             
-            6. **Experiment** with different reinforcement schedules or try training different behaviors
+            6. Experiment with different reinforcement schedules or try training different behaviors
 
             # References
             

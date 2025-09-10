@@ -113,17 +113,30 @@ class NeuronCircleNode(val networkPanel: NetworkPanel): PPath.Double() {
         updatePaint(activation.getColorGradient(graphicalBounds, NetworkPreferences.coolNodeColor, NetworkPreferences.hotNodeColor))
         updateStroke()
 
+        updateActivationText()
+    }
+
+    private fun updateActivationText() {
         if (isTextVisible) {
+            val decimalPlaces = NetworkPreferences.neuronActivationDecimalPlaces
             activationText.text = if (activation > -0.95 && activation < 0.95) {
-                activation.format(1).replace("0.", ".").replace(Regex("^-?.0$"), "0")
+                // For small values, use the preference-based decimal places but apply special formatting
+                activation.format(decimalPlaces).replace("0.", ".").replace(Regex("^-?.0+$"), "0")
             } else {
-                activation.format(0)
+                // For large values, use the preference-based decimal places
+                activation.format(decimalPlaces)
             }
 
             val targetWidth = min(NEURON_DIAMETER.toDouble() * 0.8, activationText.width)
             activationText.scale = targetWidth / activationText.width
             activationText.centerBoundsOnPoint(mainNode.bounds.x + mainNode.bounds.width / 2, mainNode.bounds.y + mainNode.bounds.height / 2)
         }
+    }
+
+    fun forceUpdateActivationText() {
+        // Force text visibility check and update regardless of scaling factor
+        isTextVisible = networkPanel.scalingFactor > TEXT_VISIBILITY_THRESHOLD
+        updateActivationText()
     }
 
     fun setLabel(label: String?) {

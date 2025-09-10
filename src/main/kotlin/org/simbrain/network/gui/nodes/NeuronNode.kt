@@ -75,6 +75,10 @@ class NeuronNode(net: NetworkPanel, val neuron: Neuron) : ScreenElement(net) {
         neuronCircleNode.drawActivation(neuron.activation, neuron.updateRule.graphicalBounds)
     }
 
+    fun forceUpdateActivationText() {
+        neuronCircleNode.forceUpdateActivationText()
+    }
+
     private fun updatePolarity() {
         neuronCircleNode.customStrokeColor = when (neuron.polarity) {
             SimbrainConstants.Polarity.EXCITATORY -> NetworkPreferences.hotNodeColor

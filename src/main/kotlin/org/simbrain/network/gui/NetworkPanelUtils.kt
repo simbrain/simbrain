@@ -2,6 +2,7 @@ package org.simbrain.network.gui
 
 import org.simbrain.network.core.LocatableModel
 import org.simbrain.network.core.NetworkModel
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.ScreenElement
 import org.simbrain.util.KeyCombination
 import org.simbrain.util.createAction
@@ -71,6 +72,6 @@ fun createTooltipText(networkModel: NetworkModel, convertToHtml: Boolean = true,
 fun createTooltipTextWithLocation(locatableModel: LocatableModel, convertToHtml: Boolean = true, stringSupplier: (LocatableModel) -> String = { it.toString() }) = """
         <html>
         ${stringSupplier(locatableModel).let { if (convertToHtml) it.split("\n").joinToString("<br>") else it }} <br>
-        Location: ${locatableModel.location.format(0)}
+        Location: ${locatableModel.location.format(NetworkPreferences.tooltipDecimalPlaces)}
         </html>
     """.trimIndent()

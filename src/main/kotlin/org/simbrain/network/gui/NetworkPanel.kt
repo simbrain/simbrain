@@ -180,6 +180,8 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         network.flatNeuronList.map {
             it.events.colorChanged.fire()
         }
+        // Force update activation text for decimal places preference changes
+        filterScreenElements<NeuronNode>().forEach { it.forceUpdateActivationText() }
         network.flatSynapseList.forEach {
             it.events.colorPreferencesChanged.fire()
         }

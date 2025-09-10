@@ -2,6 +2,7 @@ package org.simbrain.network.core
 
 import org.simbrain.network.events.NeuronEvents
 import org.simbrain.network.gui.createTooltipText
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.NeuronUpdateRule
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
@@ -10,6 +11,7 @@ import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.network.util.SpikingScalarData
 import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.UserParameter
+import org.simbrain.util.format
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.plus
 import org.simbrain.util.point
@@ -482,7 +484,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
         return """
             Name: $displayName
             Update rule: $type 
-            Activation: ${SimbrainMath.roundDouble(activation, 3)}
+            Activation: ${activation.format(NetworkPreferences.tooltipDecimalPlaces)}
         """.trimIndent()
     }
 

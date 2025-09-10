@@ -381,7 +381,12 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
      */
     open suspend fun computeTestError(): Double {
         return supervisedNetwork.testingSet.sumOf { (input, target) ->
-            supervisedNetwork.inputLayer.activations = input.toDoubleArray().toColumnVector()
+            // Handle input reshaping for ActivationSequence inputs
+            if (supervisedNetwork.inputLayer is ActivationSequence) {
+                supervisedNetwork.inputLayer.setActivations(input.toDoubleArray())
+            } else {
+                supervisedNetwork.inputLayer.activations = input.toDoubleArray().toColumnVector()
+            }
             with(network) { supervisedNetwork.forwardPass() }
             val output = supervisedNetwork.outputLayer.activations
             
@@ -414,7 +419,12 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
      */
     open suspend fun computeTestAccuracy(): Double {
         return supervisedNetwork.testingSet.mapNotNull { (input, target) ->
-            supervisedNetwork.inputLayer.activations = input.toDoubleArray().toColumnVector()
+            // Handle input reshaping for ActivationSequence inputs
+            if (supervisedNetwork.inputLayer is ActivationSequence) {
+                supervisedNetwork.inputLayer.setActivations(input.toDoubleArray())
+            } else {
+                supervisedNetwork.inputLayer.activations = input.toDoubleArray().toColumnVector()
+            }
             with(network) { supervisedNetwork.forwardPass() }
             val output = supervisedNetwork.outputLayer.activations
             

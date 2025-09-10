@@ -7,7 +7,6 @@ import org.simbrain.util.*
 import org.simbrain.util.stats.ProbabilityDistribution
 import smile.math.matrix.Matrix
 import java.awt.geom.Point2D
-import kotlin.math.max
 
 /**
  * A type of [SupervisedNetwork] that can be assembled from existing components that are already in the network.
@@ -51,12 +50,18 @@ class SupervisedModel(
         val testingTargets = testingData.targets
 
         trainingSet = if (inputLayer is ActivationSequence) {
+            val inputSize = inputLayer.size * inputLayer.sequenceSize
+            val targetSize = if (outputLayer is ActivationSequence) {
+                outputLayer.size * outputLayer.sequenceSize
+            } else {
+                outputLayer.size
+            }
             TrainingDataset(
                 // If the layer is an activation sequence, data are currently flattened
-                inputs = zeroMutableList(10, inputLayer.size * inputLayer.sequenceSize),
-                targets = zeroMutableList(10, outputLayer.size),
-                inputSize = inputLayer.size * inputLayer.sequenceSize,
-                targetSize = outputLayer.size
+                inputs = zeroMutableList(10, inputSize),
+                targets = zeroMutableList(10, targetSize),
+                inputSize = inputSize,
+                targetSize = targetSize
             )
         } else {
             TrainingDataset(
@@ -68,12 +73,18 @@ class SupervisedModel(
         }
 
         testingSet = if (inputLayer is ActivationSequence) {
+            val inputSize = inputLayer.size * inputLayer.sequenceSize
+            val targetSize = if (outputLayer is ActivationSequence) {
+                outputLayer.size * outputLayer.sequenceSize
+            } else {
+                outputLayer.size
+            }
             TrainingDataset(
                 // If the layer is an activation sequence, data are currently flattened
-                inputs = zeroMutableList(10, inputLayer.size * inputLayer.sequenceSize),
-                targets = zeroMutableList(10, outputLayer.size),
-                inputSize = inputLayer.size * inputLayer.sequenceSize,
-                targetSize = outputLayer.size
+                inputs = zeroMutableList(10, inputSize),
+                targets = zeroMutableList(10, targetSize),
+                inputSize = inputSize,
+                targetSize = targetSize
             )
         } else {
             TrainingDataset(

@@ -20,7 +20,7 @@ class AllToAll @JvmOverloads constructor(
      * are the same.
      */
     @UserParameter(
-        label = "Self-Connections Allowed ",
+        label = "Self-connections allowed",
         description = "Can there exist synapses whose source and target are the same?",
         order = 1
     )
@@ -29,7 +29,7 @@ class AllToAll @JvmOverloads constructor(
     /**
      * If true, synapses are added in both directions.
      */
-    @UserParameter(label = "Bi-directional", order = 2)
+    @UserParameter(label = "Bi-directional", description = "If true, synapses are added in both directions.", order = 2)
     var useBidirectionalConnections: Boolean = false,
 
     seed: Long = Random.nextLong()

@@ -24,7 +24,7 @@ open class LinearRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Di
     NoisyUpdateRule, BoundedUpdateRule {
     override var upperBound by GuiEditable(
         initValue = DEFAULT_UPPER_BOUND,
-        label = "Upper Bound",
+        label = "Upper bound",
         description = "Upper bound that determines the maximum level of activity of a node.",
         order = -20,
         onUpdate = {
@@ -34,7 +34,7 @@ open class LinearRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Di
 
     override var lowerBound by GuiEditable(
         initValue = DEFAULT_LOWER_BOUND,
-        label = "Lower Bound",
+        label = "Lower bound",
         description = "Lower bound that determines the minimum level of activity of a node.",
         order = -10,
         onUpdate = {
@@ -44,7 +44,7 @@ open class LinearRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Di
 
     @UserParameter(
         label = "Type",
-        description = "No clipping, clip floor and ceiling (piecewise linear), clip floor (relu)",
+        description = "No clipping, clip floor and ceiling (piecewise linear), clip floor (relu).",
         order = 10
     )
     var clippingType = ClippingType.PiecewiseLinear
@@ -71,7 +71,7 @@ open class LinearRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Di
         }
     }
 
-    @UserParameter(label = "Slope", description = "Slope of linear rule", increment = .1, order = 20)
+    @UserParameter(label = "Slope", description = "Slope of linear rule.", increment = .1, order = 20)
     var slope = 1.0
 
     override var noiseGenerator: ProbabilityDistribution = UniformRealDistribution()

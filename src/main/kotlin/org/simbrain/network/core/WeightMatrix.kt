@@ -40,7 +40,7 @@ import kotlin.math.min
  */
 class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
 
-    @UserParameter(label = "Increment amount", increment = .1, order = 20)
+    @UserParameter(label = "Increment amount", description = "Amount to increment weights by.", increment = .1, order = 20)
     var increment = .1
 
     /**
@@ -48,7 +48,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
      */
     @UserParameter(
         label = "Clamped",
-        description = "If the weight matrix is clamped, local learning rules won't be applied",
+        description = "If the weight matrix is clamped, local learning rules won't be applied.",
         order = 30)
     var clamped = false
         set(value) {
@@ -56,13 +56,13 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
             events.clampChanged.fire()
         }
 
-    @UserParameter(label = "Learning Rule", order = 100)
+    @UserParameter(label = "Learning rule", description = "Learning rule for updating weights.", order = 100)
     var learningRule: SynapseUpdateRule<*, *> = StaticSynapseRule()
 
     /**
      * Only used if source connector's rule is spiking.
      */
-    @UserParameter(label = "Spike Responder", showDetails = false, order = 200)
+    @UserParameter(label = "Spike responder", description = "Only used if source connector's rule is spiking.", showDetails = false, order = 200)
     var spikeResponder: SpikeResponder = NonResponder()
         set(value) {
             field = value
@@ -75,7 +75,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
     var learningRuleData: MatrixDataHolder by GuiEditable(
         initValue = EmptyMatrixData,
         order = 210,
-        label = "Learning Rule Data",
+        label = "Learning rule data",
         tab = "Data"
     )
 
@@ -85,7 +85,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
     var spikeResponseData: MatrixDataHolder by GuiEditable(
         initValue = EmptyMatrixData,
         order = 220,
-        label = "Spike Responder Data",
+        label = "Spike responder data",
         tab = "Data",
         onUpdate = {
             val proposedDataHolder = widgetValue(::spikeResponder).createMatrixData(weights.nrow(), weights.ncol())
@@ -102,7 +102,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
     @get:Producible
     val weights: Matrix
 
-    @UserParameter(label = "PSR Matrix", order = 300, tab = "Data")
+    @UserParameter(label = "PSR matrix", description = "Post-synaptic response matrix.", order = 300, tab = "Data")
     override var psrMatrix: Matrix
 
     /**

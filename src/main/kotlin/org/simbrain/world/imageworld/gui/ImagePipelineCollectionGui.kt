@@ -49,10 +49,10 @@ class ImagePipelineCollectionGui(
             pipelineComboBox.selectedItem = newPipeline
             imagePipelineCollection.setCurrentPipeline(newPipeline)
         }
-    }).apply { toolTipText = "Add Pipeline" }
+    }).apply { toolTipText = "Add pipeline" }
 
     private val editPipelineButton = JButton(ResourceManager.getSmallIcon("menu_icons/Tools.png")).apply {
-        toolTipText = "Edit Pipeline"
+        toolTipText = "Edit pipeline"
         addActionListener {
             val currentPipeline = imagePipelineCollection.currentPipeline
             val pipelineDialog = ImageProcessingPipelineDialog(imageWorldDesktopComponent, currentPipeline)
@@ -76,7 +76,7 @@ class ImagePipelineCollectionGui(
                 imagePipelineCollection.setCurrentPipeline(imagePipelineCollection.pipelines[0])
             }
         }
-    }).apply { toolTipText = "Delete Pipeline" }
+    }).apply { toolTipText = "Delete pipeline" }
 
     val toolbar = JToolBar().apply {
         add(JLabel("Pipelines:"))
@@ -111,8 +111,8 @@ class ImagePipelineCollectionGui(
             editPipelineButton.toolTipText = "Cannot edit the default unfiltered pipeline"
             deletePipelineButton.toolTipText = "Cannot delete the default unfiltered pipeline"
         } else {
-            editPipelineButton.toolTipText = "Edit Pipeline"
-            deletePipelineButton.toolTipText = "Delete Pipeline"
+            editPipelineButton.toolTipText = "Edit pipeline"
+            deletePipelineButton.toolTipText = "Delete pipeline"
         }
     }
 

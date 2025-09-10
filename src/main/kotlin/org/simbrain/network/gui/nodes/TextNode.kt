@@ -67,7 +67,7 @@ open class TextNode(
             if (textNodes.size == 1) {
                 contextMenu.add(object : AbstractAction() {
                     init {
-                        putValue(NAME, "Edit Text...")
+                        putValue(NAME, "Edit text...")
                     }
 
                     override fun actionPerformed(e: ActionEvent) {

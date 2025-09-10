@@ -27,7 +27,7 @@ class Sparse @JvmOverloads constructor(
      * What percent (as a probability) of possible connections to make.
      */
     @UserParameter(
-        label = "Connection Density",
+        label = "Connection density",
         description = "What percent (as a probability) of possible connections to make.",
         order = 10,
         minimumValue = 0.0,
@@ -44,7 +44,7 @@ class Sparse @JvmOverloads constructor(
      */
     @get:JvmName("isEqualizeEfferents")
     @UserParameter(
-        label = "Equalize Efferents",
+        label = "Equalize efferents",
         description = "Whether or not each source neuron is given an equal number of efferent synapses.",
         order = 20
     )
@@ -56,7 +56,7 @@ class Sparse @JvmOverloads constructor(
      */
     @get:JvmName("isSelfConnectionAllowed")
     @UserParameter(
-        label = "Allow Self Connection",
+        label = "Allow self connection",
         description = "Whether or not connections where the source and target are the same neuron are allowed.",
         order = 30
     )

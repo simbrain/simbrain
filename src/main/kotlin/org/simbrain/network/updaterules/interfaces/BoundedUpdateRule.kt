@@ -14,7 +14,7 @@ interface BoundedUpdateRule {
      * Sets the upper bound of this neuron update rule's activation.
      */
     @UserParameter(
-        label = "Upper Bound",
+        label = "Upper bound",
         description = "Upper bound that determines the maximum level of activity of a node.",
         order = -20
     )
@@ -24,7 +24,7 @@ interface BoundedUpdateRule {
      * Sets the lower bound of this neuron update rule's activation.
      */
     @UserParameter(
-        label = "Lower Bound",
+        label = "Lower bound",
         description = "Lower bound that determines the minimum level of activity of a node.",
         order = -10
     )

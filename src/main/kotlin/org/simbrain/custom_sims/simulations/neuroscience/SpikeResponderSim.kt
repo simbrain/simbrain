@@ -37,7 +37,7 @@ val spikeResponderSim = newSim {
     network.addSynapse(input, spiking)
 
     val stepResponder = network.addNeuron {
-        label = "Step Responder"
+        label = "Step responder"
         location = point(290, 10)
     }
     network.addSynapse(spiking, stepResponder).apply {
@@ -53,7 +53,7 @@ val spikeResponderSim = newSim {
     }
 
     val riseAndDecay = network.addNeuron {
-        label = "Rise And Decay"
+        label = "Rise and decay"
         location = point(290, 110)
     }
     network.addSynapse(spiking, riseAndDecay).apply {
@@ -61,7 +61,7 @@ val spikeResponderSim = newSim {
     }
 
     val stp = network.addNeuron {
-        label = "Short Term Plasticity"
+        label = "Short term plasticity"
         location = point(290, 160)
     }
     network.addSynapse(spiking, stp).apply {

@@ -44,7 +44,7 @@ val spikeResponderSimArray = newSim {
     offsetNetworkModel(input, spiking, Direction.EAST, 400.0)
 
     val stepResponder = NeuronArray(arraySize).apply {
-        label = "Step Responder"
+        label = "Step responder"
     }
     val weightsStep = WeightMatrix(spiking, stepResponder).apply {
         spikeResponder = StepResponder()
@@ -74,7 +74,7 @@ val spikeResponderSimArray = newSim {
     offsetNetworkModel(jumpAndDecay, riseAndDecay, Direction.SOUTH, 300.0)
 
     val stp = NeuronArray(arraySize).apply {
-        label = "Short Term Plasticity"
+        label = "Short term plasticity"
     }
     val weightsSTP = WeightMatrix(spiking, stp).apply {
         spikeResponder = ShortTermPlasticity()

@@ -39,7 +39,7 @@ public final class SavePlotAsAction extends AbstractAction {
      * @param component GUI Component, must not be null.
      */
     public SavePlotAsAction(final DesktopComponent component) {
-        super("Save As...");
+        super("Save as...");
         if (component == null) {
             throw new IllegalArgumentException("Desktop component must not be null");
         }

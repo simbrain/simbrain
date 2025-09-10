@@ -359,7 +359,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             }
             contextMenu.add(randomizeBiasesAction)
             contextMenu.addSeparator()
-            val editComponents: Action = object : AbstractAction("Edit Components...") {
+            val editComponents: Action = object : AbstractAction("Edit components...") {
                 override fun actionPerformed(event: ActionEvent) {
                     val dialog = StandardDialog()
                     val arrayData = MatrixDataFrame(neuronArray.activations)

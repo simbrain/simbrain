@@ -67,7 +67,7 @@ open class IntegrateAndFireRule : SpikingNeuronUpdateRule<SpikingScalarData, Spi
     var restingPotential = -70.0
 
     @UserParameter(
-        label = "Reset Potential (mV)",
+        label = "Reset potential (mV)",
         description = "The value of the membrane potential to which it is set immediately "
                 + "after firing an action potential.",
         order = 2
@@ -75,7 +75,7 @@ open class IntegrateAndFireRule : SpikingNeuronUpdateRule<SpikingScalarData, Spi
     var resetPotential = -55.0
 
     @UserParameter(
-        label = "Background Current (nA)",
+        label = "Background current (nA)",
         description = "A constant background current to the neuron.",
         increment = .1,
         order = 5
@@ -86,7 +86,7 @@ open class IntegrateAndFireRule : SpikingNeuronUpdateRule<SpikingScalarData, Spi
      * Refractory Period (ms) .
      */
     @UserParameter(
-        label = "Refractory Period (ms)",
+        label = "Refractory period (ms)",
         description = "The period of time after a spike during which a neuron will not fire and rejects external input",
         increment = .1,
         order = 7

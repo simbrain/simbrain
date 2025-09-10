@@ -45,7 +45,7 @@ val edgeOfChaosBitStream = newSim("edgeOfChaosBitStream") {
     // Connect reservoirs
     val sgRes1 = connectReservoir(net, res1, variance, 4, seed)
     val sgRes2 = connectReservoir(net, res2, variance, 4, seed).apply {
-        label = "Recurrent Synapses"
+        label = "Recurrent synapses"
     }
 
     // Set up "bit-stream" inputs

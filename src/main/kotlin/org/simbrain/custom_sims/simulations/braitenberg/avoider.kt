@@ -40,7 +40,7 @@ val avoider = newSim {
             lowerBound = -1.0
         }
         location = point(159.7, 89.9)
-        label = "Right Sensor"
+        label = "Right sensor"
     }
     
     val turnLeft = network.addNeuron {
@@ -49,7 +49,7 @@ val avoider = newSim {
             lowerBound = -1.0
         }
         location = point(37.6, 11.2)
-        label = "Turn Left"
+        label = "Turn left"
     }
     
     val straight = network.addNeuron {
@@ -70,7 +70,7 @@ val avoider = newSim {
             lowerBound = -1.0
         }
         location = point(159.8, 15.6)
-        label = "Turn Right"
+        label = "Turn right"
     }
     
     // Create synapses - from Network6.xml

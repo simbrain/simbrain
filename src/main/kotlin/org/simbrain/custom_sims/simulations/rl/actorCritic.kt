@@ -119,7 +119,7 @@ val actorCritic = newSim {
         100.0, 100.0, numTilesInADimension * numTilesInADimension
     ).apply {
         layout = GridLayout(50.0, 50.0)
-        label = "Sensor Nodes"
+        label = "Sensor nodes"
     }
 
     // Outputs

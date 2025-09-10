@@ -122,7 +122,7 @@ public class AddNeuronsDialog extends StandardDialog {
      */
     private void init() {
 
-        setTitle("Add Neurons...");
+        setTitle("Add neurons...");
 
         // Basics Sub-Panel
         JPanel basicsPanel = new JPanel(new GridBagLayout());

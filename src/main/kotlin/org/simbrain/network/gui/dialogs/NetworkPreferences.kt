@@ -17,7 +17,7 @@ object NetworkPreferences: PreferenceHolder() {
     var backgroundColor by ColorPreference(Color.WHITE)
 
     @UserParameter(
-        label = "Node Hot color",
+        label = "Node hot color",
         description = "Color for neurons with high positive activation or excitatory polarity",
         tab = "Colors",
         order = 20
@@ -25,7 +25,7 @@ object NetworkPreferences: PreferenceHolder() {
     var hotNodeColor by ColorPreference(Color.RED)
 
     @UserParameter(
-        label = "Node Cool color",
+        label = "Node cool color",
         description = "Color for neurons with low/negative activation or inhibitory polarity",
         tab = "Colors",
         order = 30
@@ -89,7 +89,7 @@ object NetworkPreferences: PreferenceHolder() {
     var weightMatrixBoundaryColor by ColorPreference(Color.ORANGE)
 
     @UserParameter(
-        label = "Synapse Group arrow color",
+        label = "Synapse group arrow color",
         description = "Color for arrows indicating synapse group connections",
         tab = "Colors",
         order = 110
@@ -126,7 +126,7 @@ object NetworkPreferences: PreferenceHolder() {
 
     @UserParameter(
         label = "Min synapse size",
-        description = "Minimum visual diameter for synapse circles (in pixels)",
+        description = "Minimum visual diameter for synapse circles (in pixels).",
         tab = "GUI",
         order = 40
     )
@@ -134,7 +134,7 @@ object NetworkPreferences: PreferenceHolder() {
 
     @UserParameter(
         label = "Max synapse size",
-        description = "Maximum visual diameter for synapse circles (in pixels)",
+        description = "Maximum visual diameter for synapse circles (in pixels).",
         tab = "GUI",
         order = 50
     )
@@ -142,7 +142,7 @@ object NetworkPreferences: PreferenceHolder() {
 
     @UserParameter(
         label = "Visibility threshold",
-        description = "Hide individual synapses when synapse groups exceed this number",
+        description = "Hide individual synapses when synapse groups exceed this number.",
         tab = "GUI",
         order = 60
     )
@@ -150,16 +150,16 @@ object NetworkPreferences: PreferenceHolder() {
 
     @UserParameter(
         label = "Wand radius",
-        description = "Radius in pixels for the wand selection tool",
+        description = "Radius in pixels for the wand selection tool.",
         tab = "GUI",
         order = 70
     )
     var wandRadius by IntegerPreference(40)
 
     @UserParameter(
-        label = "Weight Matrix Target-Source Format",
-        description = "If yes, each row correspond to an output and each column corresponds to an input." +
-                "If no (source-target format),each row corresponds to an input and each column corresponds to an output." ,
+        label = "Weight matrix target-source format",
+        description = "If yes, each row corresponds to an output and each column corresponds to an input. " +
+                "If no (source-target format), each row corresponds to an input and each column corresponds to an output.",
         tab = "GUI",
         order = 80)
     var weightMatrixTransposeGraphics by BooleanPreference(true)
@@ -176,7 +176,7 @@ object NetworkPreferences: PreferenceHolder() {
 
     @UserParameter(
         label = "Default network time step",
-        description = "Default time step for network simulation (in milliseconds)",
+        description = "Default time step for network simulation (in milliseconds).",
         minimumValue = 0.0,
         increment = .1,
         tab = "Model",
@@ -187,7 +187,7 @@ object NetworkPreferences: PreferenceHolder() {
     // Of course specific rules can have specific defaults
     @UserParameter(
         label = "Default learning rate",
-        description = "Default learning rate for learning algorithms",
+        description = "Default learning rate for learning algorithms.",
         minimumValue = 0.0,
         increment = .1,
         tab = "Model",
@@ -197,14 +197,14 @@ object NetworkPreferences: PreferenceHolder() {
 
     @UserParameter(
         label = "Default connection strategy",
-        description = "Default method for connecting neurons when creating synapses",
+        description = "Default method for connecting neurons when creating synapses.",
         tab = "Connections",
         order = 10
     )
     var connectionStrategy by ConnectionStrategyPreference(AllToAll())
 
     @UserParameter(
-        label = "Weight Randomizer",
+        label = "Weight randomizer",
         description = "Randomizer for all free weights, regardless of polarity. Applying it can change the polarity of a neuron.",
         showDetails = false,
         order = 10,
@@ -213,7 +213,7 @@ object NetworkPreferences: PreferenceHolder() {
     var weightRandomizer by ProbabilityDistributionPreference(NormalDistribution(0.0, 1.5))
 
     @UserParameter(
-        label = "Excitatory Randomizer",
+        label = "Excitatory randomizer",
         description = "Randomizer for all weights from polarized excitatory neurons. Applying it will not change the polarity of a neuron.",
         showDetails = false,
         order = 20,
@@ -222,7 +222,7 @@ object NetworkPreferences: PreferenceHolder() {
     var excitatoryRandomizer by ProbabilityDistributionPreference(UniformRealDistribution(0.0, 1.0))
 
     @UserParameter(
-        label = "Inhibitory Randomizer",
+        label = "Inhibitory randomizer",
         description = "Randomizer for all weights from polarized inhibitory neurons. Applying it will not change the polarity of a neuron.",
         showDetails = false,
         order = 30,
@@ -231,8 +231,8 @@ object NetworkPreferences: PreferenceHolder() {
     var inhibitoryRandomizer by ProbabilityDistributionPreference(UniformRealDistribution(-1.0, 0.0))
 
     @UserParameter(
-        label = "Activation Randomizer",
-        description = "Randomizer for initial neuron activation values",
+        label = "Activation randomizer",
+        description = "Randomizer for initial neuron activation values.",
         showDetails = false,
         order = 40,
         tab = "Randomizers"
@@ -240,7 +240,7 @@ object NetworkPreferences: PreferenceHolder() {
     var activationRandomizer by ProbabilityDistributionPreference(NormalDistribution(0.0, 1.0))
 
     @UserParameter(
-        label = "Bias Randomizer",
+        label = "Bias randomizer",
         description = "Randomizer for all biases.",
         showDetails = false,
         order = 50,

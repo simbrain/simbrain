@@ -161,7 +161,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
     }
 
     val transformerBlock = TransformerBlock(contextSize, options.embeddingDimension, options.hiddenSize).apply {
-        label = "Transformer Block"
+        label = "Transformer block"
     }
 
     // Sequence-to-sequence softmax layer
@@ -169,7 +169,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         updateRule = SoftmaxRule().apply {
             temperature = 0.2
         }
-        label = "Softmax Sequence"
+        label = "Softmax sequence"
     }
 
     // Separate inference layer for update actions
@@ -177,7 +177,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         circleMode = size < 100
         gridMode = true
         labelArray = tokenEmbedding.tokens.toTypedArray()
-        label = "Predicted Next Token"
+        label = "Predicted next token"
         (updateRule as? LinearRule)?.let {
             it.upperBound = 1.0
             it.lowerBound = -1.0

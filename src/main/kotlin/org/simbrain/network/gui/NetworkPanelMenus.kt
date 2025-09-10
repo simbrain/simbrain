@@ -96,7 +96,7 @@ val NetworkPanel.actionMenu
     }
 
 val NetworkPanel.newNetworkMenu
-    get() = JMenu("Add Subnetwork").apply {
+    get() = JMenu("Add subnetwork").apply {
         networkActions.newNetworkActions.forEach { add(it) }
     }
 

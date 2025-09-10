@@ -22,14 +22,14 @@ class FixedDegree(
      */
     @UserParameter(
         label = "Degree",
-        description = "Maximum degree of connections per neuron",
+        description = "Maximum degree of connections per neuron.",
         minimumValue = 0.0,
         order = 30
     )
     var degree: Int = 2,
 
     @UserParameter(
-        label = "Indegree / Outdegree",
+        label = "Indegree / outdegree",
         description = "Make connections 'inward' (connections sent in to each neuron) or 'outward' (connections " +
                 "radiating out from each neuron).",
         order = 10
@@ -38,7 +38,7 @@ class FixedDegree(
 
     @UserParameter(
         label = "Use radius",
-        description = "If true, only connect within a radius",
+        description = "If true, only connect within a radius.",
         order = 20
     )
     var useRadius: Boolean = false,
@@ -47,7 +47,7 @@ class FixedDegree(
 
     @UserParameter(
         label = "Allow self connections",
-        description = "Allow synapses from neurons to themselves",
+        description = "Allow synapses from neurons to themselves.",
         order = 50
     )
     var allowSelfConnections: Boolean = false,
@@ -57,7 +57,7 @@ class FixedDegree(
     ) : ConnectionStrategy(seed), EditableObject {
 
     var radius by GuiEditable(
-        description = "Radius within which to make connections",
+        description = "Radius within which to make connections.",
         initValue = radius,
         conditionallyEnabledBy = FixedDegree::useRadius,
         order = 30

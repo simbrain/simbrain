@@ -313,7 +313,7 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
             contextMenu.add(randomizeAction)
 
             contextMenu.addSeparator()
-            val editComponents: Action = object : AbstractAction("Edit Components...") {
+            val editComponents: Action = object : AbstractAction("Edit components...") {
                 override fun actionPerformed(event: ActionEvent) {
                     val dialog = StandardDialog()
                     val arrayData = MatrixDataFrame(transformerBlock.selfAttention)

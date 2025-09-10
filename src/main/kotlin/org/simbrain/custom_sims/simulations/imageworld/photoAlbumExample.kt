@@ -77,7 +77,7 @@ val photoAlbumExample = newSim {
 
     // Create supervised model
     val supervisedModel = SupervisedModel(inputArray, outputLayer).apply {
-        label = "Image Classifier"
+        label = "Image classifier"
         trainerConfig.testConfiguration.enabled = true
     }
     network.addNetworkModelAsync(supervisedModel)

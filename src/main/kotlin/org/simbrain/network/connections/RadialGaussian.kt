@@ -56,7 +56,7 @@ class RadialGaussian(
      * The connection constant for connections between 2 excitatory neurons.
      */
     @UserParameter(
-        label = "Exc. \u2192 Exc. Constant", minimumValue = 0.0, maximumValue = 1.0, increment = .1, order
+        label = "Exc. \u2192 exc. constant", minimumValue = 0.0, maximumValue = 1.0, increment = .1, order
         = 2
     )
     var eeDistConst: Double = DEFAULT_EE_CONST,
@@ -65,7 +65,7 @@ class RadialGaussian(
      * The connection constant for connection from an excitatory to an inhibitory neuron.
      */
     @UserParameter(
-        label = "Exc. \u2192 Inh. Constant", minimumValue = 0.0, maximumValue = 1.0, increment = .1, order
+        label = "Exc. \u2192 inh. constant", minimumValue = 0.0, maximumValue = 1.0, increment = .1, order
         = 3
     )
     var eiDistConst: Double = DEFAULT_EI_CONST,
@@ -74,7 +74,7 @@ class RadialGaussian(
      * The connection constant for connection from an inhibitory to an excitatory neuron.
      */
     @UserParameter(
-        label = "Inh. \u2192 Exc. Constant", minimumValue = 0.0, maximumValue = 1.0, increment = .1, order
+        label = "Inh. \u2192 exc. constant", minimumValue = 0.0, maximumValue = 1.0, increment = .1, order
         = 4
     )
     var ieDistConst: Double = DEFAULT_IE_CONST,
@@ -83,7 +83,7 @@ class RadialGaussian(
      * The connection constant for connections between 2 inhibitory neurons.
      */
     @UserParameter(
-        label = "Inh. \u2192 Inh. Constant", minimumValue = 0.0, maximumValue = 1.0, increment = .1, order
+        label = "Inh. \u2192 inh. constant", minimumValue = 0.0, maximumValue = 1.0, increment = .1, order
         = 5
     )
     var iiDistConst: Double = DEFAULT_II_CONST,
@@ -92,8 +92,8 @@ class RadialGaussian(
      * The connection constant for general connections. Used in cases where neurons have no explicit polarity.
      */
     @UserParameter(
-        label = "No Polarity Constant", description = "Connection probability for" +
-                "non-polar synapses", minimumValue = 0.0, maximumValue = 1.0, increment = .1, order = 6
+        label = "No polarity constant", description = "Connection probability for " +
+                "non-polar synapses.", minimumValue = 0.0, maximumValue = 1.0, increment = .1, order = 6
     )
     var distConst: Double = DEFAULT_DIST_CONST,
 
@@ -102,7 +102,7 @@ class RadialGaussian(
      * be thought of as the average connection distance in pixels.
      */
     @UserParameter(
-        label = "Distance Drop-off",
+        label = "Distance drop-off",
         description = "Roughly the average connection distance in pixels.",
         increment = 5.0,
         minimumValue = 0.01,

@@ -61,7 +61,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
      * neuron it is.
      */
     @UserParameter(
-        label = "Update Rule",
+        label = "Update rule",
         description = "Neuron update rule, which determines how activations evolve and respond to inputs.",
         order = 100
     )

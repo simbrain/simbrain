@@ -35,7 +35,7 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
         menuBar.add(fileMenu)
 
         // Add load images menu item if it's an image album world
-        val loadImages = JMenuItem(createAction("Load Images...") { loadImages() })
+        val loadImages = JMenuItem(createAction("Load images...") { loadImages() })
         fileMenu.add(loadImages)
 
         fileMenu.add(imageWorldPanel.saveImageAction)

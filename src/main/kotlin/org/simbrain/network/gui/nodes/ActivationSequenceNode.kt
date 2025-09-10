@@ -133,7 +133,7 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
             }
             contextMenu.add(randomizeBiasesAction)
             contextMenu.addSeparator()
-            val editComponents: Action = object : AbstractAction("Edit Components...") {
+            val editComponents: Action = object : AbstractAction("Edit components...") {
                 override fun actionPerformed(event: ActionEvent) {
                     val dialog = StandardDialog()
                     val arrayData = MatrixDataFrame(activationSequence.activations)

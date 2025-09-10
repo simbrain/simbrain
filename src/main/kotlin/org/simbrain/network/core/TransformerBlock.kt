@@ -43,34 +43,34 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
     @UserParameter(label = "Activations", description = "Output activations", order = 1)
     override var activations: Matrix = Matrix(sequenceSize, size)
 
-    @UserParameter(label = "Matrix Visibility", description = "Show the QKV matrices", order = 10)
+    @UserParameter(label = "Matrix visibility", description = "Show the QKV matrices.", order = 10)
     var matrixVisibility = true
         set(value) {
             field = value
             events.updateGraphics.fire()
         }
 
-    @UserParameter(label = "Sequence Visibility", description = "Show the qkv sequences", order = 11)
+    @UserParameter(label = "Sequence visibility", description = "Show the qkv sequences.", order = 11)
     var sequenceVisibility = true
         set(value) {
             field = value
             events.updateGraphics.fire()
         }
 
-    @UserParameter(label = "Feedforward Visibility", description = "Show the feedforward network", order = 12)
+    @UserParameter(label = "Feedforward visibility", description = "Show the feedforward network.", order = 12)
     var feedForwardVisibility = true
         set(value) {
             field = value
             events.updateGraphics.fire()
         }
 
-    @UserParameter(label = "Layer Norm", description = "Use layer normalization", order = 13)
+    @UserParameter(label = "Layer norm", description = "Use layer normalization.", order = 13)
     var useLayerNorm = true
 
-    @UserParameter(label = "User Positional Encoding", description = "Use user positional encoding", order = 14)
+    @UserParameter(label = "User positional encoding", description = "Use user positional encoding", order = 14)
     var userPositionalEncoding = false
 
-    @UserParameter(label = "Triangular Mask", description = "Use triangular mask", order = 15)
+    @UserParameter(label = "Triangular mask", description = "Use triangular mask.", order = 15)
     var useTriangularMask = true
 
     /**
@@ -365,14 +365,14 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
 
     class CreationTemplate : EditableObject {
 
-        @UserParameter(label = "Stack Size", description = "Number of activation vectors in the sequence", order = 1)
+        @UserParameter(label = "Stack size", description = "Number of activation vectors in the sequence", order = 1)
         var sequenceSize = 7
 
-        @UserParameter(label = "Input Size", description = "Number of inputs to the layer", order = 2)
+        @UserParameter(label = "Input size", description = "Number of inputs to the layer", order = 2)
         var inputSize = 4
 
         @UserParameter(
-            label = "Hidden Size",
+            label = "Hidden size",
             description = "Size of the hidden layer in the feedforward network",
             order = 3
         )

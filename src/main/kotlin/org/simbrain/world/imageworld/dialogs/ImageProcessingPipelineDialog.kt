@@ -216,12 +216,12 @@ class ImageProcessingPipelineDialog(
         panel.add(toggleButton)
 
         val upButton = JButton("▲")
-        upButton.toolTipText = "Move Up"
+        upButton.toolTipText = "Move up"
         upButton.addActionListener { moveSelectedOperationUp() }
         panel.add(upButton)
 
         val downButton = JButton("▼")
-        downButton.toolTipText = "Move Down"
+        downButton.toolTipText = "Move down"
         downButton.addActionListener { moveSelectedOperationDown() }
         panel.add(downButton)
 
@@ -240,7 +240,7 @@ class ImageProcessingPipelineDialog(
             val result = JOptionPane.showConfirmDialog(
                 this,
                 "Remove all operations from the pipeline?",
-                "Clear All Operations",
+                "Clear all operations",
                 JOptionPane.YES_NO_OPTION
             )
             if (result == JOptionPane.YES_OPTION) {

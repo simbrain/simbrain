@@ -615,7 +615,7 @@ object SimbrainDesktop {
 
     private fun createHelpMenu(): JMenu {
         val helpMenu = JMenu("Help")
-        helpMenu.add(ShowHelpAction("Main Help", "https://docs.simbrain.net/"))
+        helpMenu.add(ShowHelpAction("Main help", "https://docs.simbrain.net/"))
         helpMenu.addSeparator()
         helpMenu.add(actionManager.toggleInfoDock)
         helpMenu.addSeparator()

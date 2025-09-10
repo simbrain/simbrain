@@ -150,10 +150,10 @@ class ActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inpu
 
     class CreationTemplate : EditableObject {
 
-        @UserParameter(label = "Sequence Size", description = "Number of activation vectors in the sequence", order = 1)
+        @UserParameter(label = "Sequence size", description = "Number of activation vectors in the sequence", order = 1)
         var sequenceSize = 7
 
-        @UserParameter(label = "Input Size", description = "Length of each activation vector", order = 2)
+        @UserParameter(label = "Input size", description = "Length of each activation vector.", order = 2)
         var inputSize = 4
 
         fun create(): ActivationSequence {

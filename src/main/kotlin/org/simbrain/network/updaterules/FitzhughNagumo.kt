@@ -22,7 +22,7 @@ class FitzhughNagumo : SpikingNeuronUpdateRule<FitzHughData, FitzHughMatrixData>
      * Constant background current. KEEP
      */
     @UserParameter(
-        label = "Background Current (nA)",
+        label = "Background current (nA)",
         description = "Background current to the cell.",
         increment = .1,
         order = 4

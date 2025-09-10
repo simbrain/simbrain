@@ -18,7 +18,7 @@ class OneToOne(
     /**
      * If true, synapses are added in both directions.
      */
-    @UserParameter(label = "Bi-directional", order = 2)
+    @UserParameter(label = "Bi-directional", description = "If true, synapses are added in both directions.", order = 2)
     var useBidirectionalConnections: Boolean = false,
 
     seed: Long = Random.nextLong()

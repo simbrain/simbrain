@@ -16,8 +16,8 @@ class DistanceBased (
      * Amount to decay connection probabilty as a function of pixel distance
      */
     @UserParameter(
-        label = "Distance Function",
-        description = "Decay function for connectionprobability",
+        label = "Distance function",
+        description = "Decay function for connection probability.",
         order = 1)
     var decayFunction: DecayFunction = GaussianDecayFunction(),
 

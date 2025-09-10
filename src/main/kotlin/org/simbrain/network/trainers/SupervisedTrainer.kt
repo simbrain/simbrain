@@ -54,7 +54,7 @@ open class SupervisedTrainerConfig(lossFunctionProvider: KFunction<List<Class<ou
     )
 
     @UserParameter(
-        label = "Compute Accuracy",
+        label = "Compute accuracy",
         description = "Calculate and display classification accuracy for networks with one-hot encoded targets",
         order = 70
     )
@@ -468,7 +468,7 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
             override fun toString() = "Epoch"
         }
 
-        class Batch(@UserParameter(label = "Batch Size", minimumValue = 1.0, order = 1) var batchSize: Int = 5) : UpdateMethod() {
+        class Batch(@UserParameter(label = "Batch size", minimumValue = 1.0, order = 1) var batchSize: Int = 5) : UpdateMethod() {
             override fun copy() = Batch(batchSize)
             override fun toString() = "Batch"
         }

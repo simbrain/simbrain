@@ -42,7 +42,7 @@ object NetworkPreferences: PreferenceHolder() {
 
     @UserParameter(
         label = "Spiking color",
-        description = "Color used to highlight neurons and synapses when spiking",
+        description = "Color used to highlight neurons and connections when spiking",
         tab = "Colors",
         order = 50
     )
@@ -98,7 +98,7 @@ object NetworkPreferences: PreferenceHolder() {
 
     @UserParameter(
         label = "Nudge amount",
-        description = "Distance in pixels to move selected objects when using arrow keys",
+        description = "Distance in pixels to move selected objects when using Shift + arrow keys",
         tab = "GUI",
         order = 10
     )

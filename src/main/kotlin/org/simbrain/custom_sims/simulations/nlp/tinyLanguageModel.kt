@@ -201,6 +201,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         model.trainerConfig.learningRate = learningRate
         model.trainerConfig.testConfiguration.enabled = false
         model.trainerConfig.optimizer = AdamOptimizer()
+        model.trainerConfig.computeAccuracy = true
         addNetworkModels(model)
     }
 

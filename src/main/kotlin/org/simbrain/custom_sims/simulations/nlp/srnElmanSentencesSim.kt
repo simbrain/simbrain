@@ -74,6 +74,7 @@ val srnElmanSentences = newSim {
         targetColumnNames = textWorldInputs.world.tokenEmbedding.tokens
     )
     srn.trainerConfig.learningRate = learningRate
+    srn.trainerConfig.computeAccuracy = true
 
     // Comment this out to pretrain the network
     // From the original paper: "The training continued in this manner until the network had experienced 6 complete passes

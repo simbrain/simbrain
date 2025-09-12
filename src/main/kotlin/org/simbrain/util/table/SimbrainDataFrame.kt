@@ -247,7 +247,7 @@ abstract class SimbrainDataFrame : AbstractTableModel() {
      */
     inline fun <reified T> getRow(index: Int): List<T> = (0 until columnCount).map {
         when(T::class) {
-            String::class -> getValueAt(index, it).toString()
+            String::class -> getValueAt(index, it)?.toString() ?: ""
             Double::class -> getValueAt(index, it)?.let { (it as Number).toDouble() } ?: Double.NaN
             Float::class -> getValueAt(index, it)?.let { (it as Number).toFloat() } ?: Float.NaN
             Int::class -> (getValueAt(index, it) as Number).toInt()

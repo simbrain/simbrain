@@ -117,7 +117,7 @@ class BasicDataFrame(
             when (columns[colIndex].type) {
                 Column.DataType.DoubleType -> block(tryParsingDouble(value))
                 Column.DataType.IntType -> block(tryParsingInt(value))
-                Column.DataType.StringType -> if (value is String) block(value) else block(value.toString())
+                Column.DataType.StringType -> if (value is String) block(value) else block(value?.toString() ?: "")
             }
         } catch (e: NumberFormatException) {
             // If we can't parse it, don't call the block - leave the original value unchanged
@@ -205,7 +205,7 @@ fun createFrom2DArray(
     val valueParser = when (dataType) {
         Double::class -> { it: Any? -> (it as? String)?.toDouble() ?: it }
         Int::class -> { it: Any? -> (it as? String)?.toInt() ?: it }
-        String::class -> { it: Any? -> it.toString() }
+        String::class -> { it: Any? -> it?.toString() ?: "" }
         else -> { it: Any? -> it }
     }
 

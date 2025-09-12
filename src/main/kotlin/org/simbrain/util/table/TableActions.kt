@@ -12,6 +12,7 @@ import org.simbrain.util.propertyeditor.objectWrapper
 import org.simbrain.util.widgets.CorrPlotPanel
 import org.simbrain.workspace.gui.SimbrainDesktop
 import smile.io.Read
+import smile.math.matrix.Matrix
 import smile.plot.swing.BoxPlot
 import smile.plot.swing.Histogram
 import smile.plot.swing.PlotGrid
@@ -421,18 +422,59 @@ fun SimbrainJTable.importCSVAction(fixedColumns: Boolean = true, skipImportOptio
                     val rawData = Utils.getStringMatrix(csvFile)
                     val importedData = createFrom2DArray(rawData, options, dataType)
                     if (!fixedColumns || checkColumns(importedData.columnCount)) {
-                        it.data = importedData.data
+                        // Perform cell-by-cell data parsing with type validation
+                        val numRows = importedData.data.size
+                        val numCols = importedData.data.firstOrNull()?.size ?: 0
+                        
+                        // Resize the table if needed
+                        if (it.rowCount != numRows) {
+                            it.setNumRows(numRows)
+                        }
+                        
+                        // Update column names and row names first
                         it.columnNames = importedData.columnNames
                         it.rowNames = importedData.rowNames
+                        
+                        // Parse each cell individually using the column's data type
+                        for (row in 0 until numRows) {
+                            for (col in 0 until numCols) {
+                                val rawValue = importedData.data[row][col]
+                                it.withValidatedValue(rawValue, col) { parsedValue ->
+                                    it.data[row][col] = parsedValue
+                                }
+                            }
+                        }
+                        
                         it.fireTableStructureChanged()
                     }
                 } else if (it is MatrixDataFrame) {
                     val rawData = Utils.getDoubleMatrix(csvFile).map { l -> l.toTypedArray() }.toTypedArray()
                     val importedData = createFrom2DArray(rawData, options, dataType)
                     if (!fixedColumns || checkColumns(importedData.columnCount)) {
-                        it.data = importedData.data.map { l -> l.map { e -> e as Double }.toDoubleArray() }.toTypedArray().toMatrix()
+                        // Perform cell-by-cell data parsing for MatrixDataFrame (all numeric)
+                        val numRows = importedData.data.size
+                        val numCols = importedData.data.firstOrNull()?.size ?: 0
+                        
+                        // Create new matrix with proper dimensions
+                        it.data = Matrix(numRows, numCols)
+                        
+                        // Update column names and row names first
                         it.columnNames = importedData.columnNames
                         it.rowNames = importedData.rowNames
+                        
+                        // Parse each cell individually using tryParsingDouble
+                        for (row in 0 until numRows) {
+                            for (col in 0 until numCols) {
+                                val rawValue = importedData.data[row][col]
+                                try {
+                                    it.data[row, col] = tryParsingDouble(rawValue)
+                                } catch (e: NumberFormatException) {
+                                    // If parsing fails, use 0.0 as default for numeric matrix
+                                    it.data[row, col] = 0.0
+                                }
+                            }
+                        }
+                        
                         it.fireTableStructureChanged()
                     }
                 } else if (it is SmileDataFrame) {

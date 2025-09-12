@@ -68,7 +68,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         }
 
     @UserParameter(label = "Labels", description = "Labels for each neuron", order = 2)
-    var labelArray: Array<String> = Array(inputSize) { "" }
+    var labelArray: Array<String> = Array(inputSize) { "$it" }
         set(value) {
             value.copyInto(field)
             events.visualPropertiesChanged.fire()

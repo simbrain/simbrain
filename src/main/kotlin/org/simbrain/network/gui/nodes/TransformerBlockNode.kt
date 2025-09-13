@@ -16,8 +16,8 @@ import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Graphics2D
 import java.awt.event.ActionEvent
-import java.awt.geom.Path2D
 import java.awt.geom.Point2D
+import java.awt.geom.Rectangle2D
 import javax.swing.*
 
 
@@ -102,6 +102,9 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
 
     val feedForwardOutputLabel = feedForwardGroup.addLabel("FF Output (${transformerBlock.activations.shapeString})")
 
+    // Track current arrows so they can be removed when updating
+    private val currentArrows = mutableListOf<Arrow>()
+
     val feedForwardW1Image = PImage().apply {
         feedForwardGroup.addChild(this)
     }
@@ -113,6 +116,10 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
     }
 
     val feedForwardW2Label = feedForwardGroup.addLabel("Hidden -> Output (${transformerBlock.W2.shapeString})")
+
+
+    val blockInputLabel = mainNode.addLabel("Input")
+    val blockOutputLabel = mainNode.addLabel("Output")
 
 
 
@@ -227,54 +234,115 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
             feedForwardGroup.removeFromParent()
         }
 
-        mainNode.run {
-            listOf(
-                createArrowPath()
-                    .startAt(qMatrixImage.anchorCenterTop())
-                    .lineTo(qMatrixImage.anchorCenterTop().withOffset(offsetY = -70.0))
-                    .lineToX(selfAttentionImage.anchorCenterBottom())
-                    .lineTo(selfAttentionImage.anchorCenterBottom())
-                    .build(),
-                createArrowPath()
-                    .startAt(kMatrixImage.anchorCenterTop())
-                    .lineTo(kMatrixImage.anchorCenterTop().withOffset(offsetY = -70.0))
-                    .lineToX(selfAttentionImage.anchorCenterBottom())
-                    .lineTo(selfAttentionImage.anchorCenterBottom())
-                    .buildWithoutArrowhead(),
-                createArrowPath()
-                    .startAt(vMatrixImage.anchorCenterTop())
-                    .lineToXY(
-                        vMatrixImage.anchorCenterTop(),
-                        selfAttentionImage.anchorCenterTop().withOffset(offsetY = -10.0)
-                    )
-                    .lineToX(feedForwardInputImage.anchorCenterBottom())
-                    .lineTo(feedForwardInputImage.anchorCenterBottom())
-                    .build(),
-                createArrowPath()
-                    .startAt(selfAttentionImage.anchorCenterRight())
-                    .lineToX(vMatrixImage.anchorCenterTop().withOffset(offsetX = -40.0))
-                    .lineToY(selfAttentionImage.anchorCenterTop().withOffset(offsetY = -10.0))
-                    .build(),
-                createArrowPath()
-                    .startAt(feedForwardInputImage.anchorRelative(1.0, 0.25))
-                    .lineToX(feedForwardW1Image.anchorTopLeft())
-                    .build(),
-                createArrowPath()
-                    .startAtXY(feedForwardW1Image.anchorTopLeft(), feedForwardHiddenImage.anchorRelative(1.0, 0.25))
-                    .lineToX(feedForwardHiddenImage.anchorCenterRight())
-                    .build(),
-                createArrowPath()
-                    .startAt(feedForwardHiddenImage.anchorRelative(1.0, 0.75))
-                    .lineToX(feedForwardW2Image.anchorTopLeft())
-                    .build(),
-                createArrowPath()
-                    .startAtXY(feedForwardW2Image.anchorTopLeft(), feedForwardOutputImage.anchorRelative(1.0, 0.75))
-                    .lineToX(feedForwardOutputImage.anchorCenterRight())
-                    .build()
-            )
-        }.forEach {
+        // Remove existing arrows before adding new ones
+        currentArrows.forEach { arrow ->
+            arrow.removeFromParent()
+        }
+        currentArrows.clear()
+
+        val arrows = mutableListOf<Arrow>()
+
+        val busX = selfAttentionImage.anchorCenterLeft().withOffset(offsetX = -40.0)
+        
+        arrows.addAll(listOf(
+
+            createArrowPath()
+                .startAt(qMatrixImage.anchorCenterTop())
+                .lineTo(qMatrixImage.anchorCenterTop().withOffset(offsetY = -70.0))
+                .lineToX(selfAttentionImage.anchorCenterBottom())
+                .lineTo(selfAttentionImage.anchorCenterBottom())
+                .build(),
+            createArrowPath()
+                .startAt(kMatrixImage.anchorCenterTop())
+                .lineTo(kMatrixImage.anchorCenterTop().withOffset(offsetY = -70.0))
+                .lineToX(selfAttentionImage.anchorCenterBottom())
+                .lineTo(selfAttentionImage.anchorCenterBottom())
+                .buildWithoutArrowhead(),
+            createArrowPath()
+                .startAt(vMatrixImage.anchorCenterTop())
+                .lineToXY(
+                    vMatrixImage.anchorCenterTop(),
+                    selfAttentionImage.anchorCenterTop().withOffset(offsetY = -10.0)
+                )
+                .lineToX(busX)
+                .buildWithJunction(),
+            createArrowPath()
+                .startAt(selfAttentionImage.anchorCenterRight())
+                .lineToX(vMatrixImage.anchorCenterTop().withOffset(offsetX = -40.0))
+                .lineToY(selfAttentionImage.anchorCenterTop().withOffset(offsetY = -10.0))
+                .build(),
+            createArrowPath()
+                .startAt(feedForwardInputImage.anchorRelative(1.0, 0.25))
+                .lineToX(feedForwardW1Image.anchorTopLeft())
+                .build(),
+            createArrowPath()
+                .startAtXY(feedForwardW1Image.anchorTopLeft(), feedForwardHiddenImage.anchorRelative(1.0, 0.25))
+                .lineToX(feedForwardHiddenImage.anchorCenterRight())
+                .build(),
+            createArrowPath()
+                .startAt(feedForwardHiddenImage.anchorRelative(1.0, 0.75))
+                .lineToX(feedForwardW2Image.anchorTopLeft())
+                .build(),
+            createArrowPath()
+                .startAtXY(feedForwardW2Image.anchorTopLeft(), feedForwardOutputImage.anchorRelative(1.0, 0.75))
+                .lineToX(feedForwardOutputImage.anchorCenterRight())
+                .build(),
+
+            // vertical line from inputs
+            createArrowPath()
+                .startAtXY(this@TransformerBlockNode.anchorCenterBottom(), qMatrixImage.anchorCenterBottom().withOffset(offsetY = 50.0))
+                .lineToY(qMatrixImage.anchorCenterBottom().withOffset(offsetY = 30.0))
+                .buildWithoutArrowhead(),
+
+            // First skip connection: inputs -> bus (around attention)
+            // This represents the residual connection around the self-attention mechanism
+            createArrowPath()
+                .startAtXY(this@TransformerBlockNode.anchorCenterBottom(), qMatrixImage.anchorCenterBottom().withOffset(offsetY = 40.0))
+                .lineToX(busX)
+                .buildWithoutArrowhead(),
+            // Second skip connection: feedForwardInput -> bus -> feedForwardOutput (around MLP)
+            // This represents the residual connection around the feed-forward network
+            createArrowPath()
+                .startAtXY(busX, feedForwardInputImage.anchorCenterBottom().withOffset(offsetY = 10.0))
+                .lineToX(feedForwardInputImage.anchorCenterBottom())
+                .lineToY(feedForwardInputImage.anchorCenterBottom())
+                .build(),
+            createArrowPath()
+                .startAt(feedForwardOutputImage.anchorCenterTop())
+                .lineToY(feedForwardOutputImage.anchorCenterTop().withOffset(offsetY = -10.0))
+                .lineToX(busX)
+                .buildWithJunction(),
+
+            createArrowPath()
+                .startAt(qMatrixImage.anchorCenterBottom().withOffset(offsetY = 30.0))
+                .lineToX(vMatrixImage.anchorCenterBottom())
+                .buildWithoutArrowhead(),
+            createArrowPath()
+                .startAt(qMatrixImage.anchorCenterBottom().withOffset(offsetY = 30.0))
+                .lineToY(qMatrixImage.anchorCenterBottom())
+                .build(),
+            createArrowPath()
+                .startAt(kMatrixImage.anchorCenterBottom().withOffset(offsetY = 30.0))
+                .lineToY(kMatrixImage.anchorCenterBottom())
+                .build(),
+            createArrowPath()
+                .startAt(vMatrixImage.anchorCenterBottom().withOffset(offsetY = 30.0))
+                .lineToY(vMatrixImage.anchorCenterBottom())
+                .build(),
+
+            // main bus
+            createArrowPath()
+                .startAtXY(busX, qMatrixImage.anchorCenterBottom().withOffset(offsetY = 40.0))
+                .lineToY(feedForwardOutputImage.anchorCenterTop().withOffset(offsetY = -30.0))
+                .lineToX(this@TransformerBlockNode.anchorCenterTop())
+                .lineToRelative(0.0, -20.0)
+                .build(),
+        ))
+
+        arrows.forEach {
             mainNode.addChild(it)
             it.lowerToBottom()
+            currentArrows.add(it)
         }
 
         updateTextLabels()
@@ -389,6 +457,10 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
         feedForwardOutputLabel.centerBelow(feedForwardOutputImage)
         feedForwardW1Label.centerBelow(feedForwardW1Image)
         feedForwardW2Label.centerBelow(feedForwardW2Image)
+
+        blockInputLabel.anchorCenterBottom().alignTo(this@TransformerBlockNode.anchorCenterBottom().withOffset(offsetY = -5.0))
+        blockOutputLabel.anchorCenterBottom().alignXTo(this@TransformerBlockNode.anchorCenterTop())
+        blockOutputLabel.anchorCenterBottom().alignYTo(feedForwardOutputImage.anchorCenterTop().withOffset(offsetY = -55.0))
     }
 
     fun PNode.addLabel(text: String): PText {
@@ -470,11 +542,15 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
         }
         
         fun build(strokeWidth: kotlin.Float = 1.0f, strokeColor: Color = Color.GRAY): Arrow {
-            return Arrow(points.toList(), hasArrowhead = true, strokeWidth = strokeWidth, strokeColor = strokeColor)
+            return Arrow(points.toList(), ArrowType.ARROWHEAD, strokeWidth = strokeWidth, strokeColor = strokeColor)
         }
         
         fun buildWithoutArrowhead(strokeWidth: kotlin.Float = 1.0f, strokeColor: Color = Color.GRAY): Arrow {
-            return Arrow(points.toList(), hasArrowhead = false, strokeWidth = strokeWidth, strokeColor = strokeColor)
+            return Arrow(points.toList(), ArrowType.NONE, strokeWidth = strokeWidth, strokeColor = strokeColor)
+        }
+        
+        fun buildWithJunction(strokeWidth: kotlin.Float = 1.0f, strokeColor: Color = Color.GRAY): Arrow {
+            return Arrow(points.toList(), ArrowType.JUNCTION, strokeWidth = strokeWidth, strokeColor = strokeColor)
         }
     }
     
@@ -492,14 +568,21 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
         return PNodeAnchor(this.node, this.offsetX + offsetX, this.offsetY + offsetY)
     }
 
+    enum class ArrowType {
+        ARROWHEAD,
+        NONE,
+        JUNCTION
+    }
+
     class Arrow(
         private val path: List<Point2D>, 
-        private val hasArrowhead: Boolean = true,
+        private val arrowType: ArrowType = ArrowType.ARROWHEAD,
         private val strokeWidth: kotlin.Float = 1.0f,
         private val strokeColor: Color = Color.GRAY
     ): PNode() {
         
         private val arrowHeadSize = 5.0
+        private val junctionRadius = 4.0
         
         init {
             if (path.size >= 2) {
@@ -508,54 +591,23 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
         }
         
         private fun createArrowPath() {
-            // Create the main line path
-            val linePath = Path2D.Double()
-            linePath.moveTo(path[0].x, path[0].y)
-            
-            for (i in 1 until path.size) {
-                linePath.lineTo(path[i].x, path[i].y)
+            // Just set the bounds based on the path
+            val bounds = Rectangle2D.Double()
+            path.forEach { point ->
+                bounds.add(point)
             }
-            
-            // Create arrowhead at the end
-            val arrowHeadPath = createArrowHead()
-            
-            // Combine paths
-            val combinedPath = Path2D.Double()
-            combinedPath.append(linePath, false)
-            combinedPath.append(arrowHeadPath, false)
-            
-            // Set the path as the shape for this node
-            setBounds(combinedPath.bounds2D)
-        }
-        
-        private fun createArrowHead(): Path2D.Double {
-            if (path.size < 2) return Path2D.Double()
-            
-            val lastPoint = path.last()
-            val secondLastPoint = path[path.size - 2]
-            
-            // Calculate the angle of the line
-            val dx = lastPoint.x - secondLastPoint.x
-            val dy = lastPoint.y - secondLastPoint.y
-            val angle = kotlin.math.atan2(dy, dx)
-            
-            // Calculate arrowhead points
-            val arrowAngle = kotlin.math.PI / 6 // 30 degrees
-            
-            val x1 = lastPoint.x - arrowHeadSize * kotlin.math.cos(angle - arrowAngle)
-            val y1 = lastPoint.y - arrowHeadSize * kotlin.math.sin(angle - arrowAngle)
-            
-            val x2 = lastPoint.x - arrowHeadSize * kotlin.math.cos(angle + arrowAngle)
-            val y2 = lastPoint.y - arrowHeadSize * kotlin.math.sin(angle + arrowAngle)
-            
-            // Create arrowhead path
-            val arrowHead = Path2D.Double()
-            arrowHead.moveTo(lastPoint.x, lastPoint.y)
-            arrowHead.lineTo(x1, y1)
-            arrowHead.moveTo(lastPoint.x, lastPoint.y)
-            arrowHead.lineTo(x2, y2)
-            
-            return arrowHead
+            // Expand bounds slightly for arrowhead or junction
+            val expandSize = when (arrowType) {
+                ArrowType.JUNCTION -> junctionRadius
+                else -> arrowHeadSize
+            }
+            bounds.setRect(
+                bounds.x - expandSize, 
+                bounds.y - expandSize,
+                bounds.width + 2 * expandSize, 
+                bounds.height + 2 * expandSize
+            )
+            setBounds(bounds)
         }
         
         override fun paint(paintContext: org.piccolo2d.util.PPaintContext) {
@@ -570,32 +622,75 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
             g2.color = strokeColor
             
             // Draw the main line
-            for (i in 1 until path.size) {
-                g2.drawLine(
-                    path[i-1].x.toInt(), path[i-1].y.toInt(),
-                    path[i].x.toInt(), path[i].y.toInt()
-                )
-            }
+            val xArray = IntArray(path.size) { i -> path[i].x.toInt() }
+            val yArray = IntArray(path.size) { i -> path[i].y.toInt() }
+            g2.drawPolyline(xArray, yArray, path.size)
             
-            // Draw the arrowhead
-            if (hasArrowhead && path.size >= 2) {
-                val lastPoint = path.last()
-                val secondLastPoint = path[path.size - 2]
-                
-                val dx = lastPoint.x - secondLastPoint.x
-                val dy = lastPoint.y - secondLastPoint.y
-                val angle = kotlin.math.atan2(dy, dx)
-                
-                val arrowAngle = kotlin.math.PI / 6 // 30 degrees
-                
-                val x1 = lastPoint.x - arrowHeadSize * kotlin.math.cos(angle - arrowAngle)
-                val y1 = lastPoint.y - arrowHeadSize * kotlin.math.sin(angle - arrowAngle)
-                
-                val x2 = lastPoint.x - arrowHeadSize * kotlin.math.cos(angle + arrowAngle)
-                val y2 = lastPoint.y - arrowHeadSize * kotlin.math.sin(angle + arrowAngle)
-                
-                g2.drawLine(lastPoint.x.toInt(), lastPoint.y.toInt(), x1.toInt(), y1.toInt())
-                g2.drawLine(lastPoint.x.toInt(), lastPoint.y.toInt(), x2.toInt(), y2.toInt())
+            // Draw the ending based on arrow type
+            when (arrowType) {
+                ArrowType.ARROWHEAD -> {
+                    if (path.size >= 2) {
+                        val lastPoint = path.last()
+                        val secondLastPoint = path[path.size - 2]
+
+                        val dx = lastPoint.x - secondLastPoint.x
+                        val dy = lastPoint.y - secondLastPoint.y
+                        val angle = kotlin.math.atan2(dy, dx)
+
+                        val arrowAngle = kotlin.math.PI / 6 // 30 degrees
+
+                        val x1 = lastPoint.x - arrowHeadSize * kotlin.math.cos(angle - arrowAngle)
+                        val y1 = lastPoint.y - arrowHeadSize * kotlin.math.sin(angle - arrowAngle)
+
+                        val x2 = lastPoint.x - arrowHeadSize * kotlin.math.cos(angle + arrowAngle)
+                        val y2 = lastPoint.y - arrowHeadSize * kotlin.math.sin(angle + arrowAngle)
+
+                        g2.drawLine(lastPoint.x.toInt(), lastPoint.y.toInt(), x1.toInt(), y1.toInt())
+                        g2.drawLine(lastPoint.x.toInt(), lastPoint.y.toInt(), x2.toInt(), y2.toInt())
+                    }
+                }
+                ArrowType.JUNCTION -> {
+                    val lastPoint = path.last()
+                    
+                    // Draw filled white circle
+                    val originalFillColor = g2.color
+                    g2.color = Color.WHITE
+                    g2.fillOval(
+                        (lastPoint.x - junctionRadius).toInt(),
+                        (lastPoint.y - junctionRadius).toInt(),
+                        (2 * junctionRadius).toInt(),
+                        (2 * junctionRadius).toInt()
+                    )
+                    
+                    // Draw circle border
+                    g2.color = strokeColor
+                    g2.drawOval(
+                        (lastPoint.x - junctionRadius).toInt(),
+                        (lastPoint.y - junctionRadius).toInt(),
+                        (2 * junctionRadius).toInt(),
+                        (2 * junctionRadius).toInt()
+                    )
+                    
+                    // Draw plus sign
+                    val plusSize = junctionRadius * 0.5
+                    // Horizontal line
+                    g2.drawLine(
+                        (lastPoint.x - plusSize).toInt(),
+                        lastPoint.y.toInt(),
+                        (lastPoint.x + plusSize).toInt(),
+                        lastPoint.y.toInt()
+                    )
+                    // Vertical line
+                    g2.drawLine(
+                        lastPoint.x.toInt(),
+                        (lastPoint.y - plusSize).toInt(),
+                        lastPoint.x.toInt(),
+                        (lastPoint.y + plusSize).toInt()
+                    )
+                }
+                ArrowType.NONE -> {
+                    // No ending decoration
+                }
             }
             
             // Restore original graphics state

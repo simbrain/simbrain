@@ -101,5 +101,31 @@ fun align(reference: PNodeAnchor, target: PNodeAnchor, offsetX: Double = 0.0, of
     target.node.setOffset(ox + dx, oy + dy)
 }
 
+fun alignX(reference: PNodeAnchor, target: PNodeAnchor, offsetX: Double = 0.0) {
+    val referenceAnchorPoint = reference.globalPoint
+    val targetAnchorPoint = target.globalPoint
+
+    val dx = referenceAnchorPoint.x - targetAnchorPoint.x + offsetX
+
+    val (ox, oy) = target.node.offset
+    target.node.setOffset(ox + dx, oy)
+}
+
+fun alignY(reference: PNodeAnchor, target: PNodeAnchor, offsetY: Double = 0.0) {
+    val referenceAnchorPoint = reference.globalPoint
+    val targetAnchorPoint = target.globalPoint
+
+    val dy = referenceAnchorPoint.y - targetAnchorPoint.y + offsetY
+
+    val (ox, oy) = target.node.offset
+    target.node.setOffset(ox, oy + dy)
+}
+
 fun PNodeAnchor.alignTo(reference: PNodeAnchor, offsetX: Double = 0.0, offsetY: Double = 0.0) =
     align(reference, this, offsetX, offsetY)
+
+fun PNodeAnchor.alignXTo(reference: PNodeAnchor, offsetX: Double = 0.0) =
+    alignX(reference, this, offsetX)
+
+fun PNodeAnchor.alignYTo(reference: PNodeAnchor, offsetY: Double = 0.0) =
+    alignY(reference, this, offsetY)

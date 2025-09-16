@@ -22,12 +22,6 @@ class BinaryRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>, BoundedUp
 
     override var lowerBound: Double = 0.0
 
-    /**
-     * Bias for binary neurons.
-     */
-    @UserParameter(label = "Bias", description = "Bias for binary neurons.", increment = .1, order = 4)
-    var bias: Double = 0.0
-
     constructor()
 
     constructor(floor: Double, ceil: Double, threshold: Double) {
@@ -97,10 +91,10 @@ class BinaryRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>, BoundedUp
     }
 
     override val graphicalLowerBound: Double
-        get() = lowerBound - 1
+        get() = lowerBound
 
     override val graphicalUpperBound: Double
-        get() = upperBound + 1
+        get() = upperBound
 
     override val timeType: Network.TimeType
         get() = Network.TimeType.DISCRETE

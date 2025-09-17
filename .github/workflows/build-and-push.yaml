@@ -54,8 +54,14 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
       
+      - name: Generate build info
+        run: |
+          echo "BUILD_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
+          echo "COMMIT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "BUILD_TIMESTAMP=$(date -u +%Y%m%d_%H%M%S)" >> $GITHUB_ENV
+      
       - name: Build standard zip
-        run: ./gradlew createZip
+        run: ./gradlew createZip -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
       
       - name: Copy standard build artifacts
         run: cp build/dist/Simbrain*.zip $GITHUB_WORKSPACE
@@ -64,7 +70,7 @@ jobs:
         run: ./gradlew clean
       
       - name: Build full zip
-        run: ./gradlew createZip -PversionSuffix="_full" -PincludeAllPlatforms=true
+        run: ./gradlew createZip -PversionSuffix="_full" -PincludeAllPlatforms=true -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
       
       - name: Copy full build artifacts
         run: cp build/dist/Simbrain4Beta_full.zip "$GITHUB_WORKSPACE"
@@ -121,8 +127,14 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
       
+      - name: Generate build info
+        run: |
+          echo "BUILD_NUMBER=${{ github.run_number }}" >> $env:GITHUB_ENV
+          echo "COMMIT_SHA=$(git rev-parse --short HEAD)" >> $env:GITHUB_ENV
+          echo "BUILD_TIMESTAMP=$(Get-Date -Format 'yyyyMMdd_HHmmss' -AsUTC)" >> $env:GITHUB_ENV
+      
       - name: Build Windows executable
-        run: ./gradlew renameWindowsExecutable
+        run: ./gradlew renameWindowsExecutable -PbuildNumber=$env:BUILD_NUMBER -PcommitSha=$env:COMMIT_SHA -PbuildTimestamp=$env:BUILD_TIMESTAMP
       
       - name: Configure AWS CLI
         run: |
@@ -199,19 +211,25 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
       
+      - name: Generate build info
+        run: |
+          echo "BUILD_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
+          echo "COMMIT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "BUILD_TIMESTAMP=$(date -u +%Y%m%d_%H%M%S)" >> $GITHUB_ENV
+      
       - name: Build and Sign
         env:
           DEVELOPER_ID: ${{ secrets.DEVELOPER_ID }}
         run: |
-          ./gradlew shadowJar
+          ./gradlew shadowJar -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
           ./etc/sign_mac_jar.sh
           mkdir -p build/main
           cp build/libs/Simbrain.jar build/main/Simbrain.jar
           cp -r simulations build/main/simulations
           cp -r scripts build/main/scripts
           cp etc/License.txt build/main/License.txt
-          ./gradlew jpackageMacOS
-          ./gradlew notarizeMacApp
+          ./gradlew jpackageMacOS -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
+          ./gradlew notarizeMacApp -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
       
       - name: Configure AWS CLI
         env:
@@ -285,19 +303,25 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
       
+      - name: Generate build info
+        run: |
+          echo "BUILD_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
+          echo "COMMIT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "BUILD_TIMESTAMP=$(date -u +%Y%m%d_%H%M%S)" >> $GITHUB_ENV
+      
       - name: Build and Sign
         env:
           DEVELOPER_ID: ${{ secrets.DEVELOPER_ID }}
         run: |
-          ./gradlew shadowJar
+          ./gradlew shadowJar -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
           ./etc/sign_mac_jar.sh
           mkdir -p build/main
           cp build/libs/Simbrain.jar build/main/Simbrain.jar
           cp -r simulations build/main/simulations
           cp -r scripts build/main/scripts
           cp etc/License.txt build/main/License.txt
-          ./gradlew jpackageMacOS
-          ./gradlew notarizeMacApp -PversionSuffix="_x64"
+          ./gradlew jpackageMacOS -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
+          ./gradlew notarizeMacApp -PversionSuffix="_x64" -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
       
       - name: Configure AWS CLI
         env:

@@ -50,7 +50,7 @@ object SimbrainDesktop {
     /**
      * Name to display in Simbrain desktop window.
      */
-    private const val FRAME_TITLE = "Simbrain 4 Beta"
+    private val FRAME_TITLE = BuildInfo.applicationTitle
 
     /**
      * The frame that will hold the workspace.
@@ -262,13 +262,22 @@ object SimbrainDesktop {
                 infoPanel.layout = BoxLayout(infoPanel, BoxLayout.Y_AXIS)
                 infoPanel.border = BorderFactory.createEmptyBorder(5, 15, 5, 15)
 
-                val titleLabel = JLabel("Simbrain 4")
+                val titleLabel = JLabel("Simbrain ${BuildInfo.versionName}")
                 titleLabel.font = Font("SansSerif", Font.BOLD, 18)
                 titleLabel.alignmentX = Component.CENTER_ALIGNMENT
 
-                val versionLabel = JLabel("Version 4.0.0 Beta")
+                val versionLabel = JLabel(BuildInfo.fullVersionString)
                 versionLabel.font = Font("SansSerif", Font.PLAIN, 14)
                 versionLabel.alignmentX = Component.CENTER_ALIGNMENT
+                
+                // Add build info if available
+                val buildInfoLabel = if (BuildInfo.buildNumber != "dev" && BuildInfo.commitSha != "unknown") {
+                    JLabel("Commit: ${BuildInfo.commitSha}").apply {
+                        font = Font("SansSerif", Font.PLAIN, 12)
+                        alignmentX = Component.CENTER_ALIGNMENT
+                        foreground = Color.GRAY
+                    }
+                } else null
 
 
                 val descriptionLabel = JLabel("A framework for neural network simulation")
@@ -278,6 +287,10 @@ object SimbrainDesktop {
                 infoPanel.add(titleLabel)
                 infoPanel.add(Box.createVerticalStrut(5))
                 infoPanel.add(versionLabel)
+                buildInfoLabel?.let {
+                    infoPanel.add(Box.createVerticalStrut(3))
+                    infoPanel.add(it)
+                }
                 infoPanel.add(Box.createVerticalStrut(10))
                 infoPanel.add(descriptionLabel)
                 infoPanel.add(Box.createVerticalStrut(10))
@@ -1130,8 +1143,8 @@ object SimbrainDesktop {
             // Set macOS-specific properties for menu bar
             if (Utils.isMacOSX()) {
                 System.setProperty("apple.laf.useScreenMenuBar", "true")
-                System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Simbrain")
-                System.setProperty("apple.awt.application.name", "Simbrain")
+                System.setProperty("com.apple.mrj.application.apple.menu.about.name", BuildInfo.applicationTitle)
+                System.setProperty("apple.awt.application.name", BuildInfo.applicationTitle)
             }
             
             // Line below for Ubuntu so that icons don't turn on by default

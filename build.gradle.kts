@@ -32,6 +32,11 @@ val buildMain = "${buildDir}/main"
 val includeAllPlatforms = project.findProperty("includeAllPlatforms")?.toString()?.toBoolean() ?: false
 val versionSuffixString = project.findProperty("versionSuffix")?.toString() ?: ""
 
+// Build information from CI/CD
+val buildNumber = project.findProperty("buildNumber")?.toString() ?: "dev"
+val commitSha = project.findProperty("commitSha")?.toString() ?: "unknown"
+val buildTimestamp = project.findProperty("buildTimestamp")?.toString() ?: "unknown"
+
 project.version = version
 
 val simbrainJvmArgs = listOf(
@@ -213,6 +218,7 @@ tasks.withType<KotlinCompile>().configureEach {
 
 // Configure the shadow plugin
 tasks.shadowJar {
+    dependsOn("generateBuildInfo")
     archiveClassifier.set("shadow")
     manifest {
         attributes(
@@ -222,8 +228,25 @@ tasks.shadowJar {
     archiveFileName.set("Simbrain.jar")
 }
 
+// Generate build info properties file
+tasks.register("generateBuildInfo") {
+    doLast {
+        val buildInfoDir = File("${buildDir}/resources/main")
+        buildInfoDir.mkdirs()
+        val buildInfoFile = File(buildInfoDir, "build-info.properties")
+        buildInfoFile.writeText("""
+            version=${version}
+            versionName=${versionName}
+            buildNumber=${buildNumber}
+            commitSha=${commitSha}
+            buildTimestamp=${buildTimestamp}
+        """.trimIndent())
+    }
+}
+
 tasks.register<Copy>("buildDistribution") {
     dependsOn("shadowJar")
+    dependsOn("generateBuildInfo")
 
     doFirst {
         from("${buildDir}/libs/Simbrain.jar")

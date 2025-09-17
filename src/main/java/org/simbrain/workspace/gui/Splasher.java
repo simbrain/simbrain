@@ -1,5 +1,6 @@
 package org.simbrain.workspace.gui;
 
+import org.simbrain.util.BuildInfo;
 import org.simbrain.util.ResourceManager;
 import smile.math.blas.BLAS;
 
@@ -33,8 +34,8 @@ public class Splasher {
         
         // Set macOS-specific properties for the application name in the menu bar
         System.setProperty("apple.laf.useScreenMenuBar", "true");
-        System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Simbrain");
-        System.setProperty("apple.awt.application.name", "Simbrain");
+        System.setProperty("com.apple.mrj.application.apple.menu.about.name", BuildInfo.INSTANCE.getApplicationTitle());
+        System.setProperty("apple.awt.application.name", BuildInfo.INSTANCE.getApplicationTitle());
 
         // Set up loggers (other logging config for tinylog is in build.gradle)
         Logger.getLogger("com.jme").setLevel(Level.OFF);

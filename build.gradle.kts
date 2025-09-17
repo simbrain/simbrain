@@ -514,7 +514,12 @@ if (OperatingSystem.current().isWindows) {
         doLast {
             val distDir = file(dist)
             val oldFile = File(distDir, "Simbrain-${project.version}.exe")
-            val newFile = File(distDir, "Simbrain${versionName}-installer.exe")
+            val executableName = if (buildNumber != "dev" && buildNumber != "unknown") {
+                "Simbrain${versionName}-build${buildNumber}-installer.exe"
+            } else {
+                "Simbrain${versionName}-installer.exe"
+            }
+            val newFile = File(distDir, executableName)
 
             if (oldFile.exists()) {
                 val success = oldFile.renameTo(newFile)

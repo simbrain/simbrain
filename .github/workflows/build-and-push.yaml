@@ -128,10 +128,12 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
       
       - name: Generate build info
+        shell: pwsh
         run: |
           echo "BUILD_NUMBER=${{ github.run_number }}" >> $env:GITHUB_ENV
           echo "COMMIT_SHA=$(git rev-parse --short HEAD)" >> $env:GITHUB_ENV
-          echo "BUILD_TIMESTAMP=$(Get-Date -Format 'yyyyMMdd_HHmmss' -AsUTC)" >> $env:GITHUB_ENV
+          $timestamp = (Get-Date).ToUniversalTime().ToString("yyyyMMdd_HHmmss")
+          echo "BUILD_TIMESTAMP=$timestamp" >> $env:GITHUB_ENV
       
       - name: Build Windows executable
         run: ./gradlew renameWindowsExecutable -PbuildNumber=$env:BUILD_NUMBER -PcommitSha=$env:COMMIT_SHA -PbuildTimestamp=$env:BUILD_TIMESTAMP

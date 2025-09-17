@@ -247,89 +247,7 @@ object SimbrainDesktop {
         // Add macOS About menu handler
         if (Utils.isMacOSX()) {
             Desktop.getDesktop().setAboutHandler {
-                val aboutDialog = JDialog(null as JFrame?, "About Simbrain")
-                aboutDialog.layout = BorderLayout()
-                
-                // Logo at the top
-                val logoPanel = JPanel(FlowLayout(FlowLayout.CENTER))
-                val logoLabel = JLabel()
-                val logoImage = ResourceManager.getImage("simbrain_iconset/icon_128x128.png")
-                logoLabel.icon = ImageIcon(logoImage)
-                logoPanel.add(logoLabel)
-                
-                // Middle section with info
-                val infoPanel = JPanel()
-                infoPanel.layout = BoxLayout(infoPanel, BoxLayout.Y_AXIS)
-                infoPanel.border = BorderFactory.createEmptyBorder(5, 15, 5, 15)
-
-                val titleLabel = JLabel("Simbrain ${BuildInfo.versionName}")
-                titleLabel.font = Font("SansSerif", Font.BOLD, 18)
-                titleLabel.alignmentX = Component.CENTER_ALIGNMENT
-
-                val versionLabel = JLabel(BuildInfo.fullVersionString)
-                versionLabel.font = Font("SansSerif", Font.PLAIN, 14)
-                versionLabel.alignmentX = Component.CENTER_ALIGNMENT
-                
-                // Add build info if available
-                val buildInfoLabel = if (BuildInfo.buildNumber != "dev" && BuildInfo.commitSha != "unknown") {
-                    JLabel("Commit: ${BuildInfo.commitSha}").apply {
-                        font = Font("SansSerif", Font.PLAIN, 12)
-                        alignmentX = Component.CENTER_ALIGNMENT
-                        foreground = Color.GRAY
-                    }
-                } else null
-
-
-                val descriptionLabel = JLabel("A framework for neural network simulation")
-                descriptionLabel.alignmentX = Component.CENTER_ALIGNMENT
-                
-                infoPanel.add(Box.createVerticalStrut(10))
-                infoPanel.add(titleLabel)
-                infoPanel.add(Box.createVerticalStrut(5))
-                infoPanel.add(versionLabel)
-                buildInfoLabel?.let {
-                    infoPanel.add(Box.createVerticalStrut(3))
-                    infoPanel.add(it)
-                }
-                infoPanel.add(Box.createVerticalStrut(10))
-                infoPanel.add(descriptionLabel)
-                infoPanel.add(Box.createVerticalStrut(10))
-
-                // Links
-                val linkPanel = JPanel()
-                linkPanel.layout = BoxLayout(linkPanel, BoxLayout.Y_AXIS)
-                linkPanel.border = BorderFactory.createEmptyBorder(0, 0, 10, 0)
-                
-                val websiteButton = JButton("Visit Simbrain Website")
-                websiteButton.addActionListener { 
-                    Utils.displayURLInBrowser("https://simbrain.net")
-                }
-                websiteButton.alignmentX = Component.CENTER_ALIGNMENT
-                
-                val creditsButton = JButton("View Credits")
-                creditsButton.addActionListener { 
-                    Utils.displayURLInBrowser("https://simbrain.net/SimbrainCredits.html")
-                }
-                creditsButton.alignmentX = Component.CENTER_ALIGNMENT
-                
-                linkPanel.add(websiteButton)
-                linkPanel.add(Box.createVerticalStrut(5))
-                linkPanel.add(creditsButton)
-
-                // Add all components to the dialog
-                val centerPanel = JPanel(BorderLayout())
-                centerPanel.add(logoPanel, BorderLayout.NORTH)
-                centerPanel.add(infoPanel, BorderLayout.CENTER)
-                
-                aboutDialog.add(centerPanel, BorderLayout.CENTER)
-                aboutDialog.add(linkPanel, BorderLayout.SOUTH)
-
-                // Configure dialog
-                aboutDialog.size = Dimension(375, 380)
-                aboutDialog.isResizable = false
-                aboutDialog.isVisible = true
-
-                aboutDialog.setLocationRelativeTo(null)
+                showAboutDialog()
             }
         }
         
@@ -634,7 +552,106 @@ object SimbrainDesktop {
         helpMenu.addSeparator()
         helpMenu.add(ShowHelpAction("Quick start and shortcuts", "https://docs.simbrain.net/docs/quickstart.html"))
         helpMenu.add(ShowHelpAction("Credits", "https://simbrain.net/SimbrainCredits.html"))
+        
+        // Add About menu item for non-macOS platforms (macOS has native About menu)
+        if (!Utils.isMacOSX()) {
+            helpMenu.addSeparator()
+            val aboutAction = object : AbstractAction("About Simbrain") {
+                override fun actionPerformed(e: ActionEvent) {
+                    showAboutDialog()
+                }
+            }
+            helpMenu.add(aboutAction)
+        }
+        
         return helpMenu
+    }
+    
+    /**
+     * Show the About dialog with version and build information
+     */
+    private fun showAboutDialog() {
+        val aboutDialog = JDialog(frame, "About Simbrain", true)
+        aboutDialog.layout = BorderLayout()
+        
+        // Logo at the top
+        val logoPanel = JPanel(FlowLayout(FlowLayout.CENTER))
+        val logoLabel = JLabel()
+        val logoImage = ResourceManager.getImage("simbrain_iconset/icon_128x128.png")
+        logoLabel.icon = ImageIcon(logoImage)
+        logoPanel.add(logoLabel)
+        
+        // Middle section with info
+        val infoPanel = JPanel()
+        infoPanel.layout = BoxLayout(infoPanel, BoxLayout.Y_AXIS)
+        infoPanel.border = BorderFactory.createEmptyBorder(5, 15, 5, 15)
+
+        val titleLabel = JLabel("Simbrain ${BuildInfo.versionName}")
+        titleLabel.font = Font("SansSerif", Font.BOLD, 18)
+        titleLabel.alignmentX = Component.CENTER_ALIGNMENT
+
+        val versionLabel = JLabel(BuildInfo.fullVersionString)
+        versionLabel.font = Font("SansSerif", Font.PLAIN, 14)
+        versionLabel.alignmentX = Component.CENTER_ALIGNMENT
+        
+        // Add build info if available
+        val buildInfoLabel = if (BuildInfo.buildNumber != "dev" && BuildInfo.commitSha != "unknown") {
+            JLabel("Commit: ${BuildInfo.commitSha}").apply {
+                font = Font("SansSerif", Font.PLAIN, 12)
+                alignmentX = Component.CENTER_ALIGNMENT
+                foreground = Color.GRAY
+            }
+        } else null
+
+        val descriptionLabel = JLabel("A framework for neural network simulation")
+        descriptionLabel.alignmentX = Component.CENTER_ALIGNMENT
+        
+        infoPanel.add(Box.createVerticalStrut(10))
+        infoPanel.add(titleLabel)
+        infoPanel.add(Box.createVerticalStrut(5))
+        infoPanel.add(versionLabel)
+        buildInfoLabel?.let {
+            infoPanel.add(Box.createVerticalStrut(3))
+            infoPanel.add(it)
+        }
+        infoPanel.add(Box.createVerticalStrut(10))
+        infoPanel.add(descriptionLabel)
+        infoPanel.add(Box.createVerticalStrut(10))
+
+        // Links
+        val linkPanel = JPanel()
+        linkPanel.layout = BoxLayout(linkPanel, BoxLayout.Y_AXIS)
+        linkPanel.border = BorderFactory.createEmptyBorder(0, 0, 10, 0)
+        
+        val websiteButton = JButton("Visit Simbrain Website")
+        websiteButton.addActionListener { 
+            Utils.displayURLInBrowser("https://simbrain.net")
+        }
+        websiteButton.alignmentX = Component.CENTER_ALIGNMENT
+        
+        val creditsButton = JButton("View Credits")
+        creditsButton.addActionListener { 
+            Utils.displayURLInBrowser("https://simbrain.net/SimbrainCredits.html")
+        }
+        creditsButton.alignmentX = Component.CENTER_ALIGNMENT
+        
+        linkPanel.add(websiteButton)
+        linkPanel.add(Box.createVerticalStrut(5))
+        linkPanel.add(creditsButton)
+
+        // Add all components to the dialog
+        val centerPanel = JPanel(BorderLayout())
+        centerPanel.add(logoPanel, BorderLayout.NORTH)
+        centerPanel.add(infoPanel, BorderLayout.CENTER)
+        
+        aboutDialog.add(centerPanel, BorderLayout.CENTER)
+        aboutDialog.add(linkPanel, BorderLayout.SOUTH)
+
+        // Configure dialog
+        aboutDialog.size = Dimension(375, 380)
+        aboutDialog.isResizable = false
+        aboutDialog.setLocationRelativeTo(frame)
+        aboutDialog.isVisible = true
     }
 
     private fun createContextMenu() {

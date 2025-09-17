@@ -21,7 +21,7 @@ class PieChartModel : AttributeContainer, EditableObject {
     /**
      * JFreeChart dataset for pie charts.
      */
-    private val dataset = DefaultPieDataset<String>()
+    val dataset = DefaultPieDataset<String>()
 
     @UserParameter(
         label = "Empty pie threshold",
@@ -35,7 +35,7 @@ class PieChartModel : AttributeContainer, EditableObject {
      * Names for the "slices" in the barchart. Can be set via coupling events
      * in [PieChartComponent].
      */
-    private var sliceNames = arrayOf<String>()
+    var sliceNames = arrayOf<String>()
 
     /**
      * Track how many slices there are. If an array with a different number of
@@ -45,10 +45,6 @@ class PieChartModel : AttributeContainer, EditableObject {
 
     init {
         emptyPie()
-    }
-
-    fun getDataset(): DefaultPieDataset<String> {
-        return dataset
     }
 
     private fun updatePieStatus() {
@@ -107,14 +103,6 @@ class PieChartModel : AttributeContainer, EditableObject {
 
     override val name: String
         get() = "Pie chart"
-
-    fun setSliceNames(names: Array<String>) {
-        this.sliceNames = names
-    }
-
-    fun getSliceNames(): Array<String> {
-        return sliceNames
-    }
 
     companion object {
         /**

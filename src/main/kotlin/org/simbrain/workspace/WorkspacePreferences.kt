@@ -32,6 +32,13 @@ object WorkspacePreferences: PreferenceHolder() {
     )
     var simulationDirectory by StringPreference("." + Utils.FS +"simulations" + Utils.FS + "workspaces")
 
+    @UserParameter(
+        label = "CSV directory",
+        useFileChooser = true,
+        order = 60
+    )
+    var tableDirectory by StringPreference("." + Utils.FS + "simulations" + Utils.FS + "wordembeddings")
+
     // Onboarding popup preferences - stored as comma-separated suppressed popup keys
     var suppressedPopups by StringPreference("")
 

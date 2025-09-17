@@ -10,6 +10,7 @@ import org.simbrain.util.projection.DataPoint
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.objectWrapper
 import org.simbrain.util.widgets.CorrPlotPanel
+import org.simbrain.workspace.WorkspacePreferences
 import org.simbrain.workspace.gui.SimbrainDesktop
 import smile.io.Read
 import smile.math.matrix.Matrix
@@ -18,11 +19,6 @@ import smile.plot.swing.Histogram
 import smile.plot.swing.PlotGrid
 import javax.swing.JOptionPane
 import kotlin.reflect.KClass
-
-/**
- * Default directory where tables are stored.
- */
-private val TABLE_DIRECTORY = "." + Utils.FS + "simulations" + Utils.FS + "wordembeddings"
 
 fun SimbrainTablePanel.addSimpleDefaults() {
     addAction(table.zeroFillAction)
@@ -365,9 +361,10 @@ val SimbrainJTable.importArff
         description = "Import WEKA arff file",
         iconPath = "menu_icons/import.png"
     ) {
-        val chooser = SFileChooser(TABLE_DIRECTORY, "", "arff")
+        val chooser = SFileChooser(WorkspacePreferences.tableDirectory, "", "arff")
         val arffFile = chooser.showOpenDialog()
         if (arffFile != null) {
+            WorkspacePreferences.tableDirectory = arffFile.parentFile.absolutePath
             model.let {
                 if (it is SmileDataFrame) {
                     it.df = Read.arff(arffFile.absolutePath)
@@ -401,7 +398,7 @@ fun SimbrainJTable.importCSVAction(fixedColumns: Boolean = true, skipImportOptio
     iconPath = "menu_icons/import.png"
 ) {
     fun import(options: ImportExportOptions = defaultOptions) {
-        val chooser = SFileChooser(TABLE_DIRECTORY, "", "csv")
+        val chooser = SFileChooser(WorkspacePreferences.tableDirectory, "", "csv")
         val csvFile = chooser.showOpenDialog()
         fun checkColumns(numColumns: Int): Boolean {
             if (numColumns != model.columnCount) {
@@ -417,6 +414,7 @@ fun SimbrainJTable.importCSVAction(fixedColumns: Boolean = true, skipImportOptio
             return true
         }
         if (csvFile != null) {
+            WorkspacePreferences.tableDirectory = csvFile.parentFile.absolutePath
             model.let {
                 if (it is BasicDataFrame) {
                     val rawData = Utils.getStringMatrix(csvFile)
@@ -503,9 +501,10 @@ fun SimbrainJTable.exportCsv(fileName: String = "", skipExportOptions: Boolean =
     iconPath = "menu_icons/export.png"
 ) {
     fun export(options: ImportExportOptions = defaultOptions) {
-        val chooser = SFileChooser(TABLE_DIRECTORY, "", "csv")
+        val chooser = SFileChooser(WorkspacePreferences.tableDirectory, "", "csv")
         val csvFile = chooser.showSaveDialog(fileName)
         if (csvFile != null) {
+            WorkspacePreferences.tableDirectory = csvFile.parentFile.absolutePath
             val writer = csvFile.bufferedWriter()
             val printer = CSVPrinter(writer)
 

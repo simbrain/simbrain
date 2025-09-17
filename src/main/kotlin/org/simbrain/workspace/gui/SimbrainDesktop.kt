@@ -802,7 +802,7 @@ object SimbrainDesktop {
         val simFile = simulationChooser.showOpenDialog()
         if (simFile != null) {
             workspace.openWorkspace(simFile, useDesktop = true)
-            workspace.currentDirectory = simulationChooser.currentLocation!!
+            WorkspacePreferences.simulationDirectory = simulationChooser.currentLocation!!
             workspace.currentFile = simFile
         }
     }
@@ -813,7 +813,7 @@ object SimbrainDesktop {
     fun saveAs() {
 
         // Create the file chooser
-        val chooser = SFileChooser(workspace.currentDirectory, "Zip Archive", "zip")
+        val chooser = SFileChooser(WorkspacePreferences.simulationDirectory, "Zip Archive", "zip")
 
         // Set the file
         val theFile: File?
@@ -827,7 +827,7 @@ object SimbrainDesktop {
         // Save the file by setting the current file
         if (theFile != null) {
             workspace.currentFile = theFile
-            workspace.currentDirectory = chooser.currentLocation!!
+            WorkspacePreferences.simulationDirectory = chooser.currentLocation!!
             save(theFile)
         }
     }

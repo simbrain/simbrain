@@ -67,7 +67,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
             events.updated.fire()
         }
 
-    @UserParameter(label = "Labels", description = "Labels for each neuron", order = 2)
+    @UserParameter(label = "Label array", description = "Labels for each neuron", order = 2)
     var labelArray: Array<String> = Array(inputSize) { "$it" }
         set(value) {
             value.copyInto(field)

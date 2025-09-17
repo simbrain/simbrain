@@ -6,7 +6,6 @@ import org.simbrain.custom_sims.NewSimulation
 import org.simbrain.custom_sims.simulations
 import org.simbrain.docviewer.DocViewer
 import org.simbrain.util.SimpleIdManager
-import org.simbrain.util.Utils
 import org.simbrain.workspace.couplings.Coupling
 import org.simbrain.workspace.couplings.CouplingManager
 import org.simbrain.workspace.events.WorkspaceEvents
@@ -267,9 +266,6 @@ class Workspace: CoroutineScope {
     fun setWorkspaceChanged(workspaceChanged: Boolean) {
         this.workspaceChanged = workspaceChanged
     }
-
-    var currentDirectory = Utils.USER_DIR + Utils.FS + "simulations" + Utils.FS + "workspaces"
-
 
     fun getComponent(name: String?): WorkspaceComponent? {
         return componentList.firstOrNull { it.name.equals(name, ignoreCase = true) }

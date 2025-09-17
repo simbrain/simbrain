@@ -13,6 +13,7 @@ import org.simbrain.util.projection.DataPoint
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.workspace.WorkspaceComponent
+import org.simbrain.workspace.WorkspacePreferences
 import org.simbrain.workspace.gui.DesktopComponent
 import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.workspace.serialization.WorkspaceSerializer
@@ -277,7 +278,7 @@ class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, tru
 }
 
 suspend fun SimbrainDesktop.loadWorkspaceZipFromFileChooser(): Boolean {
-    val simulationChooser = SFileChooser(workspace.currentDirectory, "Zip Archive", "zip")
+    val simulationChooser = SFileChooser(WorkspacePreferences.simulationDirectory, "Zip Archive", "zip")
     val simFile = simulationChooser.showOpenDialog()
     val serializer = WorkspaceSerializer(workspace)
 

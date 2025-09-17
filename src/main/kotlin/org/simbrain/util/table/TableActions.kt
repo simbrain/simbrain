@@ -392,13 +392,19 @@ val SimbrainJTable.importCsv
 /**
  * @dataTypes The data types to use for all cells in the table. Defaults to String. TODO: provide support for per-column data types.
  */
-fun SimbrainJTable.importCSVAction(fixedColumns: Boolean = true, skipImportOptions: Boolean = false, defaultOptions: ImportExportOptions = ImportExportOptions(), dataType: KClass<*>? = null) = createAction(
+fun SimbrainJTable.importCSVAction(
+    fixedColumns: Boolean = true,
+    skipImportOptions: Boolean = false,
+    defaultOptions: ImportExportOptions = ImportExportOptions(),
+    dataType: KClass<*>? = null,
+    customDir: String? = null
+) = createAction(
     name = "Import csv...",
     description = "Import comma separated values file",
     iconPath = "menu_icons/import.png"
 ) {
     fun import(options: ImportExportOptions = defaultOptions) {
-        val chooser = SFileChooser(WorkspacePreferences.tableDirectory, "", "csv")
+        val chooser = SFileChooser(customDir?:WorkspacePreferences.tableDirectory, "", "csv")
         val csvFile = chooser.showOpenDialog()
         fun checkColumns(numColumns: Int): Boolean {
             if (numColumns != model.columnCount) {
@@ -414,7 +420,9 @@ fun SimbrainJTable.importCSVAction(fixedColumns: Boolean = true, skipImportOptio
             return true
         }
         if (csvFile != null) {
-            WorkspacePreferences.tableDirectory = csvFile.parentFile.absolutePath
+            if (customDir == null) {
+                WorkspacePreferences.tableDirectory = csvFile.parentFile.absolutePath
+            }
             model.let {
                 if (it is BasicDataFrame) {
                     val rawData = Utils.getStringMatrix(csvFile)

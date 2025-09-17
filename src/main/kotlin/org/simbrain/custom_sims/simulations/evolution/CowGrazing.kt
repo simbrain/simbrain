@@ -13,6 +13,7 @@ import org.simbrain.util.decayfunctions.StepDecayFunction
 import org.simbrain.util.geneticalgorithm.*
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.Workspace
+import org.simbrain.workspace.WorkspacePreferences
 import org.simbrain.workspace.serialization.WorkspaceSerializer
 import org.simbrain.world.odorworld.OdorWorldComponent
 import org.simbrain.world.odorworld.entities.EntityType
@@ -343,7 +344,7 @@ val grazingCows = newSim { optionString ->
             }
 
             addButton("Load file") {
-                val simulationChooser = SFileChooser(workspace.currentDirectory, "Zip Archive", "zip")
+                val simulationChooser = SFileChooser(WorkspacePreferences.simulationDirectory, "Zip Archive", "zip")
                 val simFile = simulationChooser.showOpenDialog()
                 val serializer = WorkspaceSerializer(workspace)
                 if (simFile != null) {

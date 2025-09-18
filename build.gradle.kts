@@ -226,21 +226,96 @@ tasks.shadowJar {
         )
     }
     archiveFileName.set("Simbrain.jar")
+    
+    doLast {
+        println("=== SHADOW JAR VERIFICATION ===")
+        val jarFile = archiveFile.get().asFile
+        println("Shadow JAR created: ${jarFile.absolutePath}")
+        println("JAR size: ${jarFile.length()} bytes")
+        
+        // Check if build-info.properties is in the JAR
+        try {
+            val process = ProcessBuilder("jar", "tf", jarFile.absolutePath)
+                .redirectErrorStream(true)
+                .start()
+            
+            val output = process.inputStream.bufferedReader().readText()
+            val hasBuildInfo = output.contains("build-info.properties")
+            
+            if (hasBuildInfo) {
+                println("✓ build-info.properties found in JAR")
+            } else {
+                println("✗ ERROR: build-info.properties NOT found in JAR")
+                println("JAR contents (first 20 entries):")
+                output.lines().take(20).forEach { println("  $it") }
+            }
+        } catch (e: Exception) {
+            println("Could not verify JAR contents: ${e.message}")
+        }
+        println("=== END SHADOW JAR VERIFICATION ===")
+    }
+}
+
+// Ensure build info is generated before processing resources
+tasks.processResources {
+    dependsOn("generateBuildInfo")
+    
+    doLast {
+        println("=== PROCESS RESOURCES VERIFICATION ===")
+        val resourcesDir = File("${buildDir}/resources/main")
+        val buildInfoFile = File(resourcesDir, "build-info.properties")
+        
+        println("Resources directory: ${resourcesDir.absolutePath}")
+        println("Build info file path: ${buildInfoFile.absolutePath}")
+        
+        if (buildInfoFile.exists()) {
+            println("✓ build-info.properties exists in processed resources")
+            println("File size: ${buildInfoFile.length()} bytes")
+        } else {
+            println("✗ ERROR: build-info.properties missing from processed resources")
+            println("Contents of resources directory:")
+            resourcesDir.listFiles()?.forEach { file ->
+                println("  ${file.name} (${if (file.isDirectory()) "dir" else "file"})")
+            }
+        }
+        println("=== END PROCESS RESOURCES VERIFICATION ===")
+    }
 }
 
 // Generate build info properties file
 tasks.register("generateBuildInfo") {
     doLast {
+        println("=== BUILD INFO GENERATION ===")
+        println("Build Number: ${buildNumber}")
+        println("Commit SHA: ${commitSha}")
+        println("Build Timestamp: ${buildTimestamp}")
+        
         val buildInfoDir = File("${buildDir}/resources/main")
-        buildInfoDir.mkdirs()
+        println("Creating build info directory: ${buildInfoDir.absolutePath}")
+        val dirCreated = buildInfoDir.mkdirs()
+        println("Directory created: ${dirCreated} (or already exists)")
+        
         val buildInfoFile = File(buildInfoDir, "build-info.properties")
-        buildInfoFile.writeText("""
+        val content = """
             version=${version}
             versionName=${versionName}
             buildNumber=${buildNumber}
             commitSha=${commitSha}
             buildTimestamp=${buildTimestamp}
-        """.trimIndent())
+        """.trimIndent()
+        
+        println("Writing build info to: ${buildInfoFile.absolutePath}")
+        buildInfoFile.writeText(content)
+        
+        if (buildInfoFile.exists()) {
+            println("✓ Build info file created successfully")
+            println("File size: ${buildInfoFile.length()} bytes")
+            println("File content:")
+            println(buildInfoFile.readText())
+        } else {
+            println("✗ ERROR: Build info file was not created!")
+        }
+        println("=== END BUILD INFO GENERATION ===")
     }
 }
 

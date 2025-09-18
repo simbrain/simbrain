@@ -136,7 +136,7 @@ jobs:
           echo "BUILD_TIMESTAMP=$timestamp" >> $env:GITHUB_ENV
       
       - name: Build Windows executable
-        run: ./gradlew renameWindowsExecutable -PbuildNumber=$env:BUILD_NUMBER -PcommitSha=$env:COMMIT_SHA -PbuildTimestamp=$env:BUILD_TIMESTAMP
+        run: ./gradlew renameWindowsExecutable -PbuildNumber=${{ env.BUILD_NUMBER }} -PcommitSha=${{ env.COMMIT_SHA }} -PbuildTimestamp=${{ env.BUILD_TIMESTAMP }}
       
       - name: Configure AWS CLI
         run: |

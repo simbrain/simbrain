@@ -255,36 +255,23 @@ tasks.shadowJar {
     }
 }
 
-// Ensure build info is generated after processing resources
-tasks.processResources {
-    finalizedBy("generateBuildInfo")
-    
-    doLast {
-        println("=== PROCESS RESOURCES COMPLETED ===")
-        val resourcesDir = File("${buildDir}/resources/main")
-        println("Resources directory: ${resourcesDir.absolutePath}")
-        println("Contents of resources directory:")
-        resourcesDir.listFiles()?.forEach { file ->
-            println("  ${file.name} (${if (file.isDirectory()) "dir" else "file"})")
-        }
-        println("=== END PROCESS RESOURCES ===")
-    }
-}
-
 // Generate build info properties file
 tasks.register("generateBuildInfo") {
+    val outputDir = File("${buildDir}/generated-resources/main")
+    val outputFile = File(outputDir, "build-info.properties")
+    
+    outputs.file(outputFile)
+    
     doLast {
         println("=== BUILD INFO GENERATION ===")
         println("Build Number: ${buildNumber}")
         println("Commit SHA: ${commitSha}")
         println("Build Timestamp: ${buildTimestamp}")
         
-        val buildInfoDir = File("${buildDir}/resources/main")
-        println("Creating build info directory: ${buildInfoDir.absolutePath}")
-        val dirCreated = buildInfoDir.mkdirs()
+        println("Creating build info directory: ${outputDir.absolutePath}")
+        val dirCreated = outputDir.mkdirs()
         println("Directory created: ${dirCreated} (or already exists)")
         
-        val buildInfoFile = File(buildInfoDir, "build-info.properties")
         val content = """
             version=${version}
             versionName=${versionName}
@@ -293,18 +280,25 @@ tasks.register("generateBuildInfo") {
             buildTimestamp=${buildTimestamp}
         """.trimIndent()
         
-        println("Writing build info to: ${buildInfoFile.absolutePath}")
-        buildInfoFile.writeText(content)
+        println("Writing build info to: ${outputFile.absolutePath}")
+        outputFile.writeText(content)
         
-        if (buildInfoFile.exists()) {
+        if (outputFile.exists()) {
             println("✓ Build info file created successfully")
-            println("File size: ${buildInfoFile.length()} bytes")
+            println("File size: ${outputFile.length()} bytes")
             println("File content:")
-            println(buildInfoFile.readText())
+            println(outputFile.readText())
         } else {
             println("✗ ERROR: Build info file was not created!")
         }
         println("=== END BUILD INFO GENERATION ===")
+    }
+}
+
+// Register generated build info directory as additional output
+sourceSets {
+    main {
+        output.dir(tasks.named("generateBuildInfo"))
     }
 }
 

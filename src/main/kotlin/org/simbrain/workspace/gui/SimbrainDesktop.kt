@@ -1160,8 +1160,8 @@ object SimbrainDesktop {
             // Set macOS-specific properties for menu bar
             if (Utils.isMacOSX()) {
                 System.setProperty("apple.laf.useScreenMenuBar", "true")
-                System.setProperty("com.apple.mrj.application.apple.menu.about.name", BuildInfo.applicationTitle)
-                System.setProperty("apple.awt.application.name", BuildInfo.applicationTitle)
+                System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Simbrain")
+                System.setProperty("apple.awt.application.name", "Simbrain")
             }
             
             // Line below for Ubuntu so that icons don't turn on by default

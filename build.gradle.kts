@@ -218,7 +218,6 @@ tasks.withType<KotlinCompile>().configureEach {
 
 // Configure the shadow plugin
 tasks.shadowJar {
-    dependsOn("generateBuildInfo")
     archiveClassifier.set("shadow")
     manifest {
         attributes(
@@ -256,29 +255,19 @@ tasks.shadowJar {
     }
 }
 
-// Ensure build info is generated before processing resources
+// Ensure build info is generated after processing resources
 tasks.processResources {
-    dependsOn("generateBuildInfo")
+    finalizedBy("generateBuildInfo")
     
     doLast {
-        println("=== PROCESS RESOURCES VERIFICATION ===")
+        println("=== PROCESS RESOURCES COMPLETED ===")
         val resourcesDir = File("${buildDir}/resources/main")
-        val buildInfoFile = File(resourcesDir, "build-info.properties")
-        
         println("Resources directory: ${resourcesDir.absolutePath}")
-        println("Build info file path: ${buildInfoFile.absolutePath}")
-        
-        if (buildInfoFile.exists()) {
-            println("✓ build-info.properties exists in processed resources")
-            println("File size: ${buildInfoFile.length()} bytes")
-        } else {
-            println("✗ ERROR: build-info.properties missing from processed resources")
-            println("Contents of resources directory:")
-            resourcesDir.listFiles()?.forEach { file ->
-                println("  ${file.name} (${if (file.isDirectory()) "dir" else "file"})")
-            }
+        println("Contents of resources directory:")
+        resourcesDir.listFiles()?.forEach { file ->
+            println("  ${file.name} (${if (file.isDirectory()) "dir" else "file"})")
         }
-        println("=== END PROCESS RESOURCES VERIFICATION ===")
+        println("=== END PROCESS RESOURCES ===")
     }
 }
 

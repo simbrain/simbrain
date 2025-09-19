@@ -642,7 +642,14 @@ val runScriptFile = File.createTempFile("run", ".sh").apply {
         fi
 
         # Run the jar using the appropriate Java version
-        ${dollar}java_path -jar Simbrain.jar
+        ${dollar}java_path \
+            --add-opens java.base/java.util=ALL-UNNAMED \
+            --add-opens java.desktop/java.awt=ALL-UNNAMED \
+            --add-opens java.desktop/java.awt.geom=ALL-UNNAMED \
+            --add-opens java.base/java.util.concurrent=ALL-UNNAMED \
+            --add-opens java.base/java.util.concurrent.atomic=ALL-UNNAMED \
+            --add-opens java.base/java.lang=ALL-UNNAMED \
+            -jar Simbrain.jar
     """.trimIndent()
     )
     setExecutable(true)

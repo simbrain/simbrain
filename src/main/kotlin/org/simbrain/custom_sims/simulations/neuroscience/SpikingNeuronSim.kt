@@ -44,8 +44,8 @@ val spikingNeuron = newSim {
         place(networkComponent, 0, 0, 400,400)
     }
 
-    val spikes = addTimeSeriesComponent("Spikes", seriesNames = listOf("Spiking"))
-    val spikeResponses = addTimeSeriesComponent("Spike Responses", seriesNames = listOf("PSR"))
+    val spikes = addTimeSeriesComponent("Voltage trace of spiking neuron", seriesNames = listOf("Spiking"))
+    val spikeResponses = addTimeSeriesComponent("Post synaptic response", seriesNames = listOf("PSR"))
 
     with(couplingManager) {
         spiking couple spikes.model.timeSeriesList[0]
@@ -88,9 +88,9 @@ val spikingNeuron = newSim {
         Some things you can try:
 
         - Change the Izhikevich parameters: Double-click the `Spiking` neuron and modify A, B, C, D. Use the [Izhikevich documentation](https://docs.simbrain.net/docs/network/neurons/izhikevich.html) to explore different firing behaviors. The bottom of that page has a list of parameter settings you can try, for example, "Tonic Bursting" or "Phasic Spiking". Observe the different behaviors in the Spikes plot
-        - **Experiment with spike responders**: Double-click the connection from `Spiking` to `Post-Synaptic Response`, then change to a different [spike responder](https://docs.simbrain.net/docs/network/spikeresponders/).
-        - **Swap neuron models**: Try using a different spiking neuron, like the [Integrate-and-Fire neuron](https://docs.simbrain.net/docs/network/neurons/integrateAndFire.html), and compare behaviors.
-        - **Explore related simulations**: Try the “Spike Responders” simulation to see different post-synaptic effects compared in one view.
+        - Experiment with spike responders: Double-click the connection from `Spiking` to `Post-Synaptic Response`, then change to a different [spike responder](https://docs.simbrain.net/docs/network/spikeresponders/).
+        - Swap neuron models: Try using a different spiking neuron, like the [Integrate-and-Fire neuron](https://docs.simbrain.net/docs/network/neurons/integrateAndFire.html), and compare behaviors.
+        - Explore related simulations: Try the “Spike Responders” simulation to see different post-synaptic effects compared in one view.
 
         # Links
 
@@ -114,7 +114,7 @@ val spikingNeuron = newSim {
     withGui {
         place(networkComponent, 0, 0, 400,400)
         place(spikes, 410, 0, 400,400)
-        place(spikeResponses, 0, 409, 400, 400)
+        place(spikeResponses, 824, 2, 400, 400)
     }
 
     network.events.zoomToFitPage.fire()

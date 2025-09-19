@@ -20,6 +20,7 @@ import java.awt.Cursor
 import java.awt.Dimension
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import javax.swing.Action
 import javax.swing.JButton
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -27,7 +28,7 @@ import javax.swing.JPanel
 /**
  * Controls used by Supervised learning dialogs.
  */
-class TrainerControls(trainer: SupervisedTrainer, supervisedNetwork: SupervisedNetwork, networkPanel: NetworkPanel): JPanel(), CoroutineScope {
+class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork: SupervisedNetwork, networkPanel: NetworkPanel): JPanel(), CoroutineScope {
 
     private val job = SupervisorJob()
 
@@ -35,7 +36,10 @@ class TrainerControls(trainer: SupervisedTrainer, supervisedNetwork: SupervisedN
 
     val iterationsLabel = JLabel(trainer.iteration.toString())
 
-    private val runAction = createAction(
+    // Validation state for row count matching
+    private var isValidationEnabled = true
+    
+    internal val runAction = createAction(
         name = "Run",
         iconPath ="menu_icons/Play.png",
         description = "Iterate training until stop button is pressed"
@@ -51,7 +55,7 @@ class TrainerControls(trainer: SupervisedTrainer, supervisedNetwork: SupervisedN
         trainer.stopTraining()
     }
 
-    private val stepAction = createAction(
+    internal val stepAction = createAction(
         description = "Iterate training once",
         iconPath =  "menu_icons/Step.png",
         initBlock = {
@@ -59,7 +63,7 @@ class TrainerControls(trainer: SupervisedTrainer, supervisedNetwork: SupervisedN
                 isEnabled = false
             }
             trainer.events.endTraining.on {
-                isEnabled = true
+                isEnabled = isValidationEnabled
             }
         }
     ) {
@@ -90,6 +94,55 @@ class TrainerControls(trainer: SupervisedTrainer, supervisedNetwork: SupervisedN
         }.display()
     }
 
+    // Store references to buttons for validation updates
+    private lateinit var stepButton: JButton
+    private lateinit var runStopToggleButton: ToggleButton
+    
+    /**
+     * Updates the validation state based on input and target table row counts for both training and testing data.
+     * Disables training buttons if row counts don't match.
+     */
+    fun updateValidationState(
+        trainingInputRows: Int, 
+        trainingTargetRows: Int,
+        testingInputRows: Int,
+        testingTargetRows: Int,
+        trainingValid: Boolean,
+        testingValid: Boolean
+    ) {
+        val isValid = trainingValid && testingValid
+        isValidationEnabled = isValid
+        
+        // Update button states
+        stepAction.isEnabled = isValid && !trainer.isRunning
+        runAction.isEnabled = isValid
+        
+        // Update tooltips to show validation message
+        val validationMessage = when {
+            isValid -> "Iterate training once"
+            !trainingValid && !testingValid -> 
+                "Cannot train: Training data (${trainingInputRows} inputs, ${trainingTargetRows} targets) and testing data (${testingInputRows} inputs, ${testingTargetRows} targets) have mismatched row counts. All tables must have matching row counts."
+            !trainingValid -> 
+                "Cannot train: Training data has ${trainingInputRows} input rows and ${trainingTargetRows} target rows. Row counts must match."
+            !testingValid -> 
+                "Cannot train: Testing data has ${testingInputRows} input rows and ${testingTargetRows} target rows. Row counts must match."
+            else -> "Cannot train: Row count validation failed"
+        }
+        stepAction.putValue(Action.SHORT_DESCRIPTION, validationMessage)
+        
+        val runValidationMessage = when {
+            isValid -> "Iterate training until stop button is pressed"
+            !trainingValid && !testingValid -> 
+                "Cannot train: Both training and testing data have mismatched input/target row counts"
+            !trainingValid -> 
+                "Cannot train: Training data input and target tables must have the same number of rows"
+            !testingValid -> 
+                "Cannot train: Testing data input and target tables must have the same number of rows"
+            else -> "Cannot train: Row count validation failed"
+        }
+        runAction.putValue(Action.SHORT_DESCRIPTION, runValidationMessage)
+    }
+
     init {
         
         // Cancel the trainer's coroutine scope when this component is disposed
@@ -110,8 +163,9 @@ class TrainerControls(trainer: SupervisedTrainer, supervisedNetwork: SupervisedN
         }
 
         val runTools = JPanel().apply { layout = MigLayout("nogrid ") }
-        runTools.add(JButton(stepAction))
-        runTools.add(ToggleButton(listOf(runAction, stopAction)).apply {
+        stepButton = JButton(stepAction)
+        runTools.add(stepButton)
+        runStopToggleButton = ToggleButton(listOf(runAction, stopAction)).apply {
             setAction("Run")
             trainer.events.beginTraining.on {
                 this@TrainerControls.cursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR)
@@ -121,7 +175,8 @@ class TrainerControls(trainer: SupervisedTrainer, supervisedNetwork: SupervisedN
                 this@TrainerControls.cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)
                 setAction("Run")
             }
-        })
+        }
+        runTools.add(runStopToggleButton)
         val initParamsButton = JButton(initializeParameters)
         initParamsButton.hideActionText = true
         runTools.add(initParamsButton)

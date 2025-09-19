@@ -67,6 +67,9 @@ class DataSetPanel(
 ): JPanel() {
 
     val rowErrorJLabel = JLabel("")
+    
+    // Callback for when row counts change
+    var onRowCountChanged: ((inputRowCount: Int, targetRowCount: Int) -> Unit)? = null
 
     val inputs = SimbrainTablePanel(inputDataFrame, false).apply {
         applyCommonTrainerAttributes()
@@ -99,6 +102,14 @@ class DataSetPanel(
         add(targets, "wrap")
         add(JLabel("Edit rows:"), "split 2")
         add(addRemoveRows)
+        
+        // Listen for table model changes to update validation
+        val tableModelListener = javax.swing.event.TableModelListener {
+            onRowCountChanged?.invoke(inputDataFrame.rowCount, targetDataFrame.rowCount)
+        }
+        
+        inputDataFrame.addTableModelListener(tableModelListener)
+        targetDataFrame.addTableModelListener(tableModelListener)
     }
 
 }
@@ -135,6 +146,32 @@ fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
 
         val trainingDataSetPanel = createDataSetPanel(trainingSet)
         val testingDataSetPanel = createDataSetPanel(testingSet)
+
+        // Set up validation callbacks
+        fun updateOverallValidation() {
+            val trainingValid = trainingDataSetPanel.inputDataFrame.rowCount == trainingDataSetPanel.targetDataFrame.rowCount
+            val testingValid = testingDataSetPanel.inputDataFrame.rowCount == testingDataSetPanel.targetDataFrame.rowCount
+            
+            trainerControls.updateValidationState(
+                trainingInputRows = trainingDataSetPanel.inputDataFrame.rowCount,
+                trainingTargetRows = trainingDataSetPanel.targetDataFrame.rowCount,
+                testingInputRows = testingDataSetPanel.inputDataFrame.rowCount,
+                testingTargetRows = testingDataSetPanel.targetDataFrame.rowCount,
+                trainingValid = trainingValid,
+                testingValid = testingValid
+            )
+        }
+        
+        trainingDataSetPanel.onRowCountChanged = { _, _ ->
+            updateOverallValidation()
+        }
+        
+        testingDataSetPanel.onRowCountChanged = { _, _ ->
+            updateOverallValidation()
+        }
+        
+        // Initial validation check
+        updateOverallValidation()
 
         fun DataSetPanel.exportMatrixDataSet() = TrainingDataset(
             inputs.table.model.get2DDoubleList().toMutableListOfLists(),

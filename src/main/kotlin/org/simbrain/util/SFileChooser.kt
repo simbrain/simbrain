@@ -172,9 +172,7 @@ class SFileChooser(currentDirectory: String, description: String? = null, extens
     }
 
     private fun showOpenDialogSwing(): File? {
-        val chooser = JFileChooser()
-
-        // TODO: If used, a default directory will have to be passed in
+        val chooser = JFileChooser(currentLocation)
         if (exts.size > 1) {
             chooser.addChoosableFileFilter(ExtensionSetFileFilter(exts.keys, description))
         }
@@ -216,7 +214,7 @@ class SFileChooser(currentDirectory: String, description: String? = null, extens
      */
     private fun showSaveDialogNative(file: File?): File? {
         val chooser = FileDialog(JFrame(), "Save", FileDialog.SAVE)
-        chooser.setDirectory(Utils.USER_HOME)
+        chooser.setDirectory(currentLocation ?: Utils.USER_HOME)
         if (file != null) {
             if (exts.isNotEmpty()) {
                 chooser.setFilenameFilter(ExtensionSetFileFilter(exts.keys, description))
@@ -242,8 +240,7 @@ class SFileChooser(currentDirectory: String, description: String? = null, extens
      * @return Name of file saved
      */
     private fun showSaveDialogSwing(file: File?): File? {
-        val chooser = JFileChooser()
-        // Filechooser default directory is arleady user-home
+        val chooser = JFileChooser(currentLocation)
         chooser.setAcceptAllFileFilterUsed(false)
         val filters = addExtensions(chooser)
 

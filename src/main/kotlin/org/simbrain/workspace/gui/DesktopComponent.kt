@@ -7,20 +7,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import org.pmw.tinylog.Logger
-import org.simbrain.network.NetworkComponent
 import org.simbrain.util.SFileChooser
-import org.simbrain.util.Utils
 import org.simbrain.util.createAction
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.workspace.WorkspaceComponent
+import org.simbrain.workspace.WorkspacePreferences
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import org.simbrain.workspace.gui.SimbrainDesktop.createDesktopComponent
 import org.simbrain.workspace.gui.SimbrainDesktop.getDesktopComponent
 import org.simbrain.workspace.gui.SimbrainDesktop.registerComponentInstance
 import org.simbrain.workspace.gui.SimbrainDesktop.workspace
 import org.simbrain.workspace.serialization.WorkspaceComponentDeserializer
-import org.simbrain.world.dataworld.DataWorldComponent
-import org.simbrain.world.odorworld.OdorWorldComponent
 import java.awt.Dimension
 import java.awt.Rectangle
 import java.beans.PropertyVetoException
@@ -48,8 +45,6 @@ var parentFrame: GenericFrame, workspaceComponent: E
 
     var workspaceComponent: E
         private set
-
-    private val chooser: SFileChooser
 
     val exportAction = createAction(
         iconPath = "menu_icons/Save.png",
@@ -79,11 +74,6 @@ var parentFrame: GenericFrame, workspaceComponent: E
      */
     init {
         this.workspaceComponent = workspaceComponent
-        val defaultDirectory = getDefaultDirectory(workspaceComponent::class.java)
-        chooser = SFileChooser(defaultDirectory, null)
-        for (format in workspaceComponent.formats) {
-            chooser.addExtension(format)
-        }
 
         // Add a default update listener
         val events = workspaceComponent.events
@@ -114,12 +104,12 @@ var parentFrame: GenericFrame, workspaceComponent: E
      */
     suspend fun showImportDialog() {
         workspace.stop()
-        val chooser = SFileChooser(getDefaultDirectory(workspaceComponent.javaClass), null)
+        val chooser = SFileChooser(WorkspacePreferences.importExportDirectory, null)
         for (format in workspaceComponent.formats) {
             chooser.addExtension(format)
         }
         val file = chooser.showOpenDialog() ?: return
-        val dir = file.parentFile.absolutePath
+        WorkspacePreferences.importExportDirectory = file.parentFile.absolutePath
         val name = file.name
         val ext = SFileChooser.getExtension(file)
         val inputStream: FileInputStream = try {
@@ -169,9 +159,14 @@ var parentFrame: GenericFrame, workspaceComponent: E
         if (theFile == null) {
             theFile = File(name)
         }
+        val chooser = SFileChooser(WorkspacePreferences.importExportDirectory, null)
+        for (format in workspaceComponent.formats) {
+            chooser.addExtension(format)
+        }
         theFile = chooser.showSaveDialog(theFile)
         if (theFile != null) {
             workspaceComponent.currentFile = theFile
+            WorkspacePreferences.importExportDirectory = theFile.parentFile.absolutePath
             try {
                 val stream = FileOutputStream(theFile)
                 // TODO format?
@@ -302,27 +297,6 @@ var parentFrame: GenericFrame, workspaceComponent: E
                 componentEventUnregisteringHandlers[it]?.forEach { it() }
             }
         }
-    }
-
-    /**
-     * Returns the default directory for specific component types.
-     *
-     * @param componentType the component type
-     * @return the directory
-     */
-    private fun getDefaultDirectory(
-        componentType: Class<out WorkspaceComponent?>
-    ): String {
-        val defaultDirectory: String = if (componentType == OdorWorldComponent::class.java) {
-            Utils.USER_DIR + Utils.FS + "simulations" + Utils.FS + "worlds"
-        } else if (componentType == DataWorldComponent::class.java) {
-            Utils.USER_DIR + Utils.FS + "simulations" + Utils.FS + "tables"
-        } else if (componentType == NetworkComponent::class.java) {
-            Utils.USER_DIR + Utils.FS + "simulations" + Utils.FS + "networks"
-        } else {
-            Utils.USER_DIR + Utils.FS + "simulations"
-        }
-        return defaultDirectory
     }
 
     override fun getPreferredSize(): Dimension {

@@ -34,10 +34,19 @@ object WorkspacePreferences: PreferenceHolder() {
 
     @UserParameter(
         label = "Table directory",
+        description = "Directory for importing and exporting tables stored as csv files",
         useFileChooser = true,
         order = 60
     )
     var tableDirectory by StringPreference("." + Utils.FS + "simulations" + Utils.FS + "tables")
+
+    @UserParameter(
+        label = "Import / export directory",
+        description = "Directory for importing and exporting xml files",
+        useFileChooser = true,
+        order = 70
+    )
+    var importExportDirectory by StringPreference(".")
 
     // Onboarding popup preferences - stored as comma-separated suppressed popup keys
     var suppressedPopups by StringPreference("")

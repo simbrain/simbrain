@@ -12,7 +12,6 @@ import org.simbrain.network.util.SpikingScalarData
 import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.UserParameter
 import org.simbrain.util.format
-import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.plus
 import org.simbrain.util.point
 import org.simbrain.util.propertyeditor.EditableObject
@@ -51,6 +50,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
         clamped = n.clamped
         increment = n.increment
         activation = n.activation
+        bias = n.bias
         x = n.x
         y = n.y
         label = n.label

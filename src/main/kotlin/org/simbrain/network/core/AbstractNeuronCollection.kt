@@ -355,7 +355,16 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
             wtdInputs.addi(summedPSRs)
         }
         addInputs(wtdInputs)
-        addInputs(biasArray)
+        
+        // Only add bias if individual neurons are not being updated separately
+        // This prevents double bias application when neurons are in both the collection
+        // and the neuron list in the network
+        val freeNeuronsInNetwork = getModels<Neuron>()
+        val hasDuplicateNeurons = neuronList.any { neuron -> freeNeuronsInNetwork.contains(neuron) }
+        
+        if (!hasDuplicateNeurons) {
+            addInputs(biasArray)
+        }
     }
 
     var isAllClamped: Boolean

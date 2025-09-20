@@ -1,9 +1,8 @@
 package org.simbrain.network.util
 
 import org.simbrain.network.core.Network
-import org.simbrain.util.*
+import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.CopyableObject
-import java.util.*
 
 /**
  * Holders for matrix valued data used in array based update rules. E.g. [NeuronArray]
@@ -67,14 +66,6 @@ object EmptyScalarData : ScalarDataHolder {
     override fun toString(): String = ""
 }
 
-class BiasedScalarData(
-    @UserParameter(label = "bias")
-    var bias: Double = 0.0
-) : ScalarDataHolder {
-    override fun copy(): BiasedScalarData {
-        return BiasedScalarData(bias)
-    }
-}
 
 open class SpikingScalarData(
     /**

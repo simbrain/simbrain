@@ -89,7 +89,8 @@ abstract class NetworkModel {
     }
 
     /**
-     * Override to provide a means of randomizing a model.
+     * Override to provide a means of randomizing a model. Custom randomizers can be passed in (usually by simulations)
+     * but implementations generally also use reasonable defaults.
      */
     open fun randomize(randomizer: ProbabilityDistribution? = null) {}
 

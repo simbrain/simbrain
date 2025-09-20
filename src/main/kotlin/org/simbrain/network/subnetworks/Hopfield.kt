@@ -1,7 +1,6 @@
 package org.simbrain.network.subnetworks
 
 import org.simbrain.network.core.*
-import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.trainers.UnsupervisedNetwork
 import org.simbrain.network.trainers.UnsupervisedTrainer
@@ -13,6 +12,7 @@ import org.simbrain.network.util.offsetNetworkModel
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
+import org.simbrain.util.stats.distributions.NormalDistribution
 
 /**
  * A discrete Hopfield network.
@@ -32,11 +32,19 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
 
     override var testingData: MutableList<MutableList<Double>> = mutableListOf()
 
-    @UserParameter(label = "Update function")
+    @UserParameter(label = "Update function", order = 10)
     var updateFunc = HopfieldUpdate.SYNC
 
-    @UserParameter(label = "Learning rate")
+    @UserParameter(label = "Learning rate", order = 20)
     var learningRate = 0.25
+
+    @UserParameter(
+        label = "Hopfield Weight randomizer",
+        showDetails = false,
+        description = "Randomizer for Hopfield Weights.",
+        order = 30,
+    )
+    var hopfieldWeightRandomizer = NormalDistribution(0.0, .1)
 
     override lateinit var customInfo: InfoText
 
@@ -82,7 +90,7 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
     }
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
-        weightMatrix.weights.randomizeSymmetric(randomizer ?: NetworkPreferences.weightRandomizer)
+        weightMatrix.weights.randomizeSymmetric(randomizer ?: hopfieldWeightRandomizer)
         weightMatrix.events.updated.fire()
     }
 

@@ -75,7 +75,9 @@ object Clipboard {
         fun createCopies(destinationNetwork: Network, sourceModels: List<NetworkModel>): List<NetworkModel> {
 
             fun Synapse.isStranded(): Boolean {
-                val allNeurons = sourceModels.filterIsInstance<Neuron>()
+                val allNeurons = sourceModels.filterIsInstance<Neuron>().toMutableSet()
+                // Also include neurons from collections that are being copied
+                allNeurons.addAll(sourceModels.filterIsInstance<AbstractNeuronCollection>().flatMap { it.neuronList })
                 return !(allNeurons.contains(this.source) && (allNeurons.contains(this.target)))
             }
 

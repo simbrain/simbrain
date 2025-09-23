@@ -1624,4 +1624,147 @@ class ClipboardTest {
             "The restored supervised model should correctly propagate activations after redo")
     }
 
+    @Test
+    fun `test copy neuron collection with connected synapses`() = runBlocking {
+        // This test verifies that copying a neuron collection along with synapses that connect 
+        // neurons within that collection works correctly when both the collection and synapses 
+        // are selected for copying.
+        //
+        // EXPECTED BEHAVIOR:
+        // When copying a neuron collection with synapses, the synapses should be copied and connected
+        // to the new neurons in the copied collection, maintaining the same connectivity pattern.
+        
+        // Create neurons for the collection
+        val neuron1 = Neuron().apply {
+            label = "Neuron 1"
+            activation = 0.5
+            x = 100.0
+            y = 100.0
+        }
+        val neuron2 = Neuron().apply {
+            label = "Neuron 2" 
+            activation = 0.8
+            x = 150.0
+            y = 100.0
+        }
+        val neuron3 = Neuron().apply {
+            label = "Neuron 3"
+            activation = 0.3
+            x = 200.0
+            y = 100.0
+        }
+        
+        // Add neurons to network
+        network.addNetworkModelAsync(neuron1)
+        network.addNetworkModelAsync(neuron2)
+        network.addNetworkModelAsync(neuron3)
+        
+        // Create a neuron collection
+        val neuronCollection = NeuronCollection(listOf(neuron1, neuron2, neuron3))
+        network.addNetworkModelAsync(neuronCollection)
+        
+        // Create synapses connecting neurons within the collection
+        val synapse1to2 = Synapse(neuron1, neuron2).apply {
+            strength = 0.75
+        }
+        val synapse2to3 = Synapse(neuron2, neuron3).apply {
+            strength = 0.60
+        }
+        val synapse3to1 = Synapse(neuron3, neuron1).apply {
+            strength = 0.45
+        }
+        
+        network.addNetworkModelAsync(synapse1to2)
+        network.addNetworkModelAsync(synapse2to3)
+        network.addNetworkModelAsync(synapse3to1)
+        
+        // Add both the neuron collection and the synapses to the clipboard
+        // This simulates the user selecting both the collection and the synapses
+        Clipboard.add(listOf(neuronCollection, synapse1to2, synapse2to3, synapse3to1))
+        
+        // Verify the clipboard is not empty
+        assertFalse(Clipboard.isEmpty, "Clipboard should not be empty after adding objects")
+        
+        // Get the network panel
+        val networkPanel = (SimbrainDesktop.getDesktopComponent(networkComponent) as NetworkDesktopComponent).networkPanel
+        
+        // Initial counts
+        val initialNeuronCount = network.flatNeuronList.size
+        val initialCollectionCount = network.getModels<NeuronCollection>().size
+        val initialSynapseCount = network.flatSynapseList.size
+        
+        // Paste the clipboard contents
+        Clipboard.paste(networkPanel)
+        
+        // Verify new items were created
+        assertEquals(initialCollectionCount + 1, network.getModels<NeuronCollection>().size, 
+            "A new neuron collection should be created after pasting")
+        assertEquals(initialNeuronCount + 3, network.flatNeuronList.size, 
+            "Three new neurons should be created after pasting")
+        
+        // Get the pasted collection
+        val pastedCollection = network.getModels<NeuronCollection>().last()
+        
+        // Verify the collection is not the same as the original
+        assertNotEquals(neuronCollection.id, pastedCollection.id, 
+            "The pasted collection should have a different ID than the original")
+        
+        // The critical test: verify that synapses were correctly copied and connect the pasted neurons
+        val expectedSynapseCount = initialSynapseCount + 3
+        assertEquals(expectedSynapseCount, network.flatSynapseList.size, 
+            "Three new synapses should be created after pasting")
+        
+        // Get the pasted neurons
+        val pastedNeurons = pastedCollection.neuronList
+        assertEquals(3, pastedNeurons.size, "The pasted collection should have 3 neurons")
+        
+        // Try to find synapses connecting the pasted neurons
+        // This is where we expect to see the problem - the synapses might not be properly connected
+        // to the pasted neurons, or might not exist at all
+        val pastedNeuron1 = pastedNeurons.find { it.label == "Neuron 1" }
+        val pastedNeuron2 = pastedNeurons.find { it.label == "Neuron 2" }
+        val pastedNeuron3 = pastedNeurons.find { it.label == "Neuron 3" }
+        
+        assertNotNull(pastedNeuron1, "Pasted neuron 1 should exist")
+        assertNotNull(pastedNeuron2, "Pasted neuron 2 should exist")
+        assertNotNull(pastedNeuron3, "Pasted neuron 3 should exist")
+        
+        // Check if synapses connecting the pasted neurons exist
+        val pastedSynapse1to2 = pastedNeuron1!!.fanOut[pastedNeuron2!!]
+        val pastedSynapse2to3 = pastedNeuron2.fanOut[pastedNeuron3!!]
+        val pastedSynapse3to1 = pastedNeuron3.fanOut[pastedNeuron1]
+        
+        // Verify that synapses connecting the pasted neurons exist
+        assertNotNull(pastedSynapse1to2, "Synapse from pasted neuron 1 to pasted neuron 2 should exist")
+        assertNotNull(pastedSynapse2to3, "Synapse from pasted neuron 2 to pasted neuron 3 should exist")  
+        assertNotNull(pastedSynapse3to1, "Synapse from pasted neuron 3 to pasted neuron 1 should exist")
+        
+        // If the synapses do exist, verify they have the correct strengths
+        if (pastedSynapse1to2 != null) {
+            assertEquals(synapse1to2.strength, pastedSynapse1to2.strength, 0.001, 
+                "Pasted synapse 1->2 should have the same strength as original")
+        }
+        if (pastedSynapse2to3 != null) {
+            assertEquals(synapse2to3.strength, pastedSynapse2to3.strength, 0.001, 
+                "Pasted synapse 2->3 should have the same strength as original")
+        }
+        if (pastedSynapse3to1 != null) {
+            assertEquals(synapse3to1.strength, pastedSynapse3to1.strength, 0.001, 
+                "Pasted synapse 3->1 should have the same strength as original")
+        }
+        
+        // Test functional connectivity by setting activation and checking propagation
+        // This will only work if the synapses were correctly copied
+        pastedNeuron1.activation = 1.0
+        pastedNeuron1.clamped = true
+        
+        // Update the network to propagate activations
+        network.update()
+        
+        // Verify functional connectivity - neuron2 should receive input from neuron1
+        assertTrue(pastedNeuron2.activation > 0.0, 
+            "Pasted neuron 2 should receive input from pasted neuron 1")
+    }
+
+
 }

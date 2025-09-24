@@ -31,9 +31,7 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
     val selfAttentionLabel = mainNode.addLabel("Attention Scores (${transformerBlock.selfAttention.shapeString})")
 
     val sequenceGroup = PNode().apply {
-        if (transformerBlock.sequenceVisibility) {
-            mainNode.addChild(this)
-        }
+        mainNode.addChild(this)
     }
 
     val qSequenceImage = PImage().apply {
@@ -55,9 +53,7 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
     val vSequenceLabel = sequenceGroup.addLabel("v (${transformerBlock.qStack.shapeString})")
 
     val matrixGroup = PNode().apply {
-        if (transformerBlock.matrixVisibility) {
-            mainNode.addChild(this)
-        }
+        mainNode.addChild(this)
     }
 
     val qMatrixImage = PImage().apply {
@@ -79,9 +75,7 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
     val vMatrixLabel = matrixGroup.addLabel("V (${transformerBlock.V.shapeString})")
 
     val feedForwardGroup = PNode().apply {
-        if (transformerBlock.feedForwardVisibility) {
-            mainNode.addChild(this)
-        }
+        mainNode.addChild(this)
     }
 
     val feedForwardInputImage = PImage().apply {
@@ -178,61 +172,48 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
 
         renderImage(selfAttentionImage, transformerBlock.selfAttention, 100.0, 100.0)
 
-        if (transformerBlock.matrixVisibility) {
-            if (indexOfChild(matrixGroup) == -1) {
-                mainNode.addChild(matrixGroup)
-            }
-            renderImage(qMatrixImage, transformerBlock.Q, 60.0, 60.0, strokeWidth = 2f)
-            renderImage(kMatrixImage, transformerBlock.K, 60.0, 60.0, strokeWidth = 2f) {
-                it.anchorCenterLeft().alignTo(qMatrixImage.anchorCenterRight(), offsetX = 20.0)
-            }
-            renderImage(vMatrixImage, transformerBlock.V, 60.0, 60.0, strokeWidth = 2f) {
-                it.anchorCenterLeft().alignTo(kMatrixImage.anchorCenterRight(), offsetX = 60.0)
-            }
-            matrixGroup.anchorRelative(0.3, 0.0).alignTo(selfAttentionImage.anchorCenterBottom(), offsetY = 100.0)
-        } else {
-            matrixGroup.removeFromParent()
+        if (indexOfChild(matrixGroup) == -1) {
+            mainNode.addChild(matrixGroup)
+        }
+        renderImage(qMatrixImage, transformerBlock.Q, 60.0, 60.0, strokeWidth = 2f)
+        renderImage(kMatrixImage, transformerBlock.K, 60.0, 60.0, strokeWidth = 2f) {
+            it.anchorCenterLeft().alignTo(qMatrixImage.anchorCenterRight(), offsetX = 20.0)
+        }
+        renderImage(vMatrixImage, transformerBlock.V, 60.0, 60.0, strokeWidth = 2f) {
+            it.anchorCenterLeft().alignTo(kMatrixImage.anchorCenterRight(), offsetX = 60.0)
+        }
+        matrixGroup.anchorRelative(0.3, 0.0).alignTo(selfAttentionImage.anchorCenterBottom(), offsetY = 100.0)
+
+        if (indexOfChild(sequenceGroup) == -1) {
+            mainNode.addChild(sequenceGroup)
+        }
+        renderImage(qSequenceImage, transformerBlock.qStack, 40.0, 40.0) {
+            it.anchorCenterBottom().alignTo(qMatrixImage.anchorCenterTop(), offsetY = -20.0)
+        }
+        renderImage(kSequenceImage, transformerBlock.kStack, 40.0, 40.0) {
+            it.anchorCenterBottom().alignTo(kMatrixImage.anchorCenterTop(), offsetY = -20.0)
+        }
+        renderImage(vSequenceImage, transformerBlock.vStack, 40.0, 40.0) {
+            it.anchorCenterBottom().alignTo(vMatrixImage.anchorCenterTop(), offsetY = -20.0)
         }
 
-        if (transformerBlock.sequenceVisibility) {
-            if (indexOfChild(sequenceGroup) == -1) {
-                mainNode.addChild(sequenceGroup)
-            }
-            renderImage(qSequenceImage, transformerBlock.qStack, 40.0, 40.0) {
-                it.anchorCenterBottom().alignTo(qMatrixImage.anchorCenterTop(), offsetY = -20.0)
-            }
-            renderImage(kSequenceImage, transformerBlock.kStack, 40.0, 40.0) {
-                it.anchorCenterBottom().alignTo(kMatrixImage.anchorCenterTop(), offsetY = -20.0)
-            }
-            renderImage(vSequenceImage, transformerBlock.vStack, 40.0, 40.0) {
-                it.anchorCenterBottom().alignTo(vMatrixImage.anchorCenterTop(), offsetY = -20.0)
-            }
-
-        } else {
-            sequenceGroup.removeFromParent()
+        if (indexOfChild(feedForwardGroup) == -1) {
+            mainNode.addChild(feedForwardGroup)
         }
-
-        if (transformerBlock.feedForwardVisibility) {
-            if (indexOfChild(feedForwardGroup) == -1) {
-                mainNode.addChild(feedForwardGroup)
-            }
-            renderImage(feedForwardInputImage, transformerBlock.feedForwardInput, 40.0, 40.0)
-            renderImage(feedForwardHiddenImage, transformerBlock.feedForwardHidden, 40.0, 40.0) {
-                it.anchorCenterBottom().alignTo(feedForwardInputImage.anchorCenterTop(), offsetY = -16.0)
-            }
-            renderImage(feedForwardOutputImage, transformerBlock.activations, 40.0, 40.0) {
-                it.anchorCenterBottom().alignTo(feedForwardHiddenImage.anchorCenterTop(), offsetY = -16.0)
-            }
-            renderImage(feedForwardW1Image, transformerBlock.W1, 40.0, 40.0, strokeWidth = 2f) {
-                it.anchorCenterLeft().alignTo(feedForwardInputImage.anchorTopRight(), offsetX = 32.0, offsetY = -8.0)
-            }
-            renderImage(feedForwardW2Image, transformerBlock.W2, 40.0, 40.0, strokeWidth = 2f) {
-                it.anchorCenterLeft().alignTo(feedForwardHiddenImage.anchorTopRight(), offsetX = 32.0, offsetY = -8.0)
-            }
-            feedForwardGroup.anchorCenterBottom().alignTo(selfAttentionImage.anchorTopRight(), offsetY = -20.0)
-        } else {
-            feedForwardGroup.removeFromParent()
+        renderImage(feedForwardInputImage, transformerBlock.feedForwardInput, 40.0, 40.0)
+        renderImage(feedForwardHiddenImage, transformerBlock.feedForwardHidden, 40.0, 40.0) {
+            it.anchorCenterBottom().alignTo(feedForwardInputImage.anchorCenterTop(), offsetY = -16.0)
         }
+        renderImage(feedForwardOutputImage, transformerBlock.activations, 40.0, 40.0) {
+            it.anchorCenterBottom().alignTo(feedForwardHiddenImage.anchorCenterTop(), offsetY = -16.0)
+        }
+        renderImage(feedForwardW1Image, transformerBlock.W1, 40.0, 40.0, strokeWidth = 2f) {
+            it.anchorCenterLeft().alignTo(feedForwardInputImage.anchorTopRight(), offsetX = 32.0, offsetY = -8.0)
+        }
+        renderImage(feedForwardW2Image, transformerBlock.W2, 40.0, 40.0, strokeWidth = 2f) {
+            it.anchorCenterLeft().alignTo(feedForwardHiddenImage.anchorTopRight(), offsetX = 32.0, offsetY = -8.0)
+        }
+        feedForwardGroup.anchorCenterBottom().alignTo(selfAttentionImage.anchorTopRight(), offsetY = -20.0)
 
         // Remove existing arrows before adding new ones
         currentArrows.forEach { arrow ->

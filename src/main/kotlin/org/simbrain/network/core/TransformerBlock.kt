@@ -43,34 +43,14 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
     @UserParameter(label = "Activations", description = "Output activations", order = 1)
     override var activations: Matrix = Matrix(sequenceSize, size)
 
-    @UserParameter(label = "Matrix visibility", description = "Show the QKV matrices.", order = 10)
-    var matrixVisibility = true
-        set(value) {
-            field = value
-            events.updateGraphics.fire()
-        }
 
-    @UserParameter(label = "Sequence visibility", description = "Show the qkv sequences.", order = 11)
-    var sequenceVisibility = true
-        set(value) {
-            field = value
-            events.updateGraphics.fire()
-        }
-
-    @UserParameter(label = "Feedforward visibility", description = "Show the feedforward network.", order = 12)
-    var feedForwardVisibility = true
-        set(value) {
-            field = value
-            events.updateGraphics.fire()
-        }
-
-    @UserParameter(label = "Layer norm", description = "Use layer normalization.", order = 13)
+    @UserParameter(label = "Layer norm", description = "Use layer normalization.", order = 10)
     var useLayerNorm = true
 
-    @UserParameter(label = "User positional encoding", description = "Use user positional encoding", order = 14)
+    @UserParameter(label = "User positional encoding", description = "Use user positional encoding", order = 11)
     var userPositionalEncoding = false
 
-    @UserParameter(label = "Triangular mask", description = "Use triangular mask.", order = 15)
+    @UserParameter(label = "Triangular mask", description = "Use triangular mask.", order = 12)
     var useTriangularMask = true
 
     /**
@@ -339,9 +319,6 @@ class TransformerBlock(val sequenceSize: Int, inputSize: Int, val hiddenSize: In
 
     override fun copy() = TransformerBlock(sequenceSize, inputSize, hiddenSize).also {
         it.activations.copyFrom(activations)
-        it.matrixVisibility = matrixVisibility
-        it.sequenceVisibility = sequenceVisibility
-        it.feedForwardVisibility = feedForwardVisibility
         it.useLayerNorm = useLayerNorm
         it.userPositionalEncoding = userPositionalEncoding
         it.useTriangularMask = useTriangularMask

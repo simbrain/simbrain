@@ -290,7 +290,6 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
     /**
      * Randomize bias for all neurons in group.
      */
-    context(Network)
     fun randomizeBiases() {
         for (neuron in neuronList) {
             neuron.randomizeBias()

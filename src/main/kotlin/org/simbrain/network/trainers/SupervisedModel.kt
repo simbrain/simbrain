@@ -146,6 +146,7 @@ class SupervisedModel(
         layers.forEach {
             it.clear()
             (it as? NeuronArray)?.randomizeBiases()
+            (it as? AbstractNeuronCollection)?.randomizeBiases()
             (it as? TransformerBlock)?.initBiases()
         }
     }

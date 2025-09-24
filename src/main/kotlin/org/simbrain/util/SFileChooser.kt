@@ -1,9 +1,11 @@
 package org.simbrain.util
 
+import java.awt.Component
 import java.awt.FileDialog
 import java.io.File
 import java.io.FilenameFilter
 import java.util.*
+import javax.swing.JDialog
 import javax.swing.JFileChooser
 import javax.swing.JFrame
 import javax.swing.JOptionPane
@@ -104,13 +106,25 @@ class SFileChooser(currentDirectory: String, description: String? = null, extens
     /**
      * Shows dialog for opening files.
      *
+     * @param parent the parent component for the dialog (optional)
      * @return File if selected
      */
-    fun showOpenDialog(): File? {
+    fun showOpenDialog(parent: Component? = null): File? {
         return if (useNativeFileChooser) {
-            showOpenDialogNative()
+            showOpenDialogNative(parent)
         } else {
-            showOpenDialogSwing()
+            showOpenDialogSwing(parent)
+        }
+    }
+
+    /**
+     * Helper function to get the appropriate parent frame from a component.
+     */
+    private fun getParentFrame(parent: Component?): JFrame {
+        return when (parent) {
+            is JFrame -> parent
+            is JDialog -> parent.owner as? JFrame ?: JFrame()
+            else -> JFrame()
         }
     }
 
@@ -119,8 +133,8 @@ class SFileChooser(currentDirectory: String, description: String? = null, extens
      *
      * @return file
      */
-    private fun showOpenDialogNative(): File? {
-        val chooser = FileDialog(JFrame(), "Open", FileDialog.LOAD)
+    private fun showOpenDialogNative(parent: Component? = null): File? {
+        val chooser = FileDialog(getParentFrame(parent), "Open", FileDialog.LOAD)
         chooser.setDirectory(this.currentLocation)
 
         setFileChooserFilter(chooser)
@@ -141,7 +155,7 @@ class SFileChooser(currentDirectory: String, description: String? = null, extens
      * @return an array of selected files
      */
     fun showMultiOpenDialogNative(): Array<File?>? {
-        val chooser = FileDialog(JFrame(), "Open", FileDialog.LOAD)
+        val chooser = FileDialog(getParentFrame(null), "Open", FileDialog.LOAD)
         chooser.isMultipleMode = true
         chooser.setDirectory(this.currentLocation)
 
@@ -171,7 +185,7 @@ class SFileChooser(currentDirectory: String, description: String? = null, extens
         }
     }
 
-    private fun showOpenDialogSwing(): File? {
+    private fun showOpenDialogSwing(parent: Component? = null): File? {
         val chooser = JFileChooser(currentLocation)
         if (exts.size > 1) {
             chooser.addChoosableFileFilter(ExtensionSetFileFilter(exts.keys, description))
@@ -185,7 +199,7 @@ class SFileChooser(currentDirectory: String, description: String? = null, extens
 
         addExtensions(chooser)
 
-        if (chooser.showDialog(null, "Open") == JFileChooser.APPROVE_OPTION) {
+        if (chooser.showDialog(parent, "Open") == JFileChooser.APPROVE_OPTION) {
             this.currentLocation = chooser.currentDirectory.path
             return chooser.selectedFile.also { checkEmptyFileWarningDialog(it) }
         } else {
@@ -213,7 +227,7 @@ class SFileChooser(currentDirectory: String, description: String? = null, extens
      * @return the saved file, or null if cancel, etc.
      */
     private fun showSaveDialogNative(file: File?): File? {
-        val chooser = FileDialog(JFrame(), "Save", FileDialog.SAVE)
+        val chooser = FileDialog(getParentFrame(null), "Save", FileDialog.SAVE)
         chooser.setDirectory(currentLocation ?: Utils.USER_HOME)
         if (file != null) {
             if (exts.isNotEmpty()) {

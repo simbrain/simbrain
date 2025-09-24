@@ -17,6 +17,7 @@ import smile.math.matrix.Matrix
 import smile.plot.swing.BoxPlot
 import smile.plot.swing.Histogram
 import smile.plot.swing.PlotGrid
+import java.awt.Component
 import javax.swing.JOptionPane
 import kotlin.reflect.KClass
 
@@ -397,7 +398,9 @@ fun SimbrainJTable.importCSVAction(
     skipImportOptions: Boolean = false,
     defaultOptions: ImportExportOptions = ImportExportOptions(),
     dataType: KClass<*>? = null,
-    customDir: String? = null
+    customDir: String? = null,
+    parentComponent: Component? = null,
+    isModal: Boolean = true
 ) = createAction(
     name = "Import csv...",
     description = "Import comma separated values file",
@@ -405,7 +408,7 @@ fun SimbrainJTable.importCSVAction(
 ) {
     fun import(options: ImportExportOptions = defaultOptions) {
         val chooser = SFileChooser(customDir?:WorkspacePreferences.tableDirectory, "", "csv")
-        val csvFile = chooser.showOpenDialog()
+        val csvFile = chooser.showOpenDialog(parentComponent)
         fun checkColumns(numColumns: Int): Boolean {
             if (numColumns != model.columnCount) {
                 JOptionPane.showOptionDialog(
@@ -499,11 +502,11 @@ fun SimbrainJTable.importCSVAction(
         val options = ImportExportOptions()
         options.createEditorDialog("Import CSV") {
             import(it)
-        }.display()
+        }.display(parentComponent, isModal)
     }
 }
 
-fun SimbrainJTable.exportCsv(fileName: String = "", skipExportOptions: Boolean = false, defaultOptions: ImportExportOptions = ImportExportOptions()) = createAction(
+fun SimbrainJTable.exportCsv(fileName: String = "", skipExportOptions: Boolean = false, defaultOptions: ImportExportOptions = ImportExportOptions(), parentComponent: Component? = null, isModal: Boolean = true) = createAction(
     name = "Export csv...",
     description = "Export comma separated values file",
     iconPath = "menu_icons/export.png"
@@ -527,7 +530,7 @@ fun SimbrainJTable.exportCsv(fileName: String = "", skipExportOptions: Boolean =
         val options = ImportExportOptions()
         options.createEditorDialog("Export CSV") {
             export(it)
-        }.display()
+        }.display(parentComponent, isModal)
     }
 }
 

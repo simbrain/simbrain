@@ -13,7 +13,6 @@ import org.simbrain.util.SimbrainConstants
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.plus
 import org.simbrain.util.point
-import java.awt.Dialog
 import java.awt.geom.Point2D
 import javax.swing.JPopupMenu
 
@@ -121,7 +120,7 @@ class NeuronNode(net: NetworkPanel, val neuron: Neuron) : ScreenElement(net) {
         return networkPanel.filterSelectedModelByClass<Neuron>().let { neurons ->
             if (neurons.isEmpty()) return null
 
-            NeuronDialog(neurons).apply { modalityType = Dialog.ModalityType.MODELESS }
+            NeuronDialog(neurons)
         }
     }
 

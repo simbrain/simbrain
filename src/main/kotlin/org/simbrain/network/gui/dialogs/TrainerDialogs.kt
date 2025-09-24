@@ -20,10 +20,11 @@ import org.simbrain.util.*
 import org.simbrain.util.table.*
 import org.simbrain.util.widgets.ToggleButton
 import java.awt.Cursor
+import java.awt.Dialog
 import java.awt.Dimension
 import javax.swing.*
 
-fun TrainingDataset.createDataSetPanel(applyAction: suspend DataSetPanel.(selectedRow: Int) -> Unit): DataSetPanel {
+fun TrainingDataset.createDataSetPanel(applyAction: suspend DataSetPanel.(selectedRow: Int) -> Unit, parentDialog: StandardDialog? = null): DataSetPanel {
     
     fun createDataFrame(
         data: MutableList<MutableList<Double>>,
@@ -49,12 +50,12 @@ fun TrainingDataset.createDataSetPanel(applyAction: suspend DataSetPanel.(select
     val inputDataFrame = createDataFrame(inputs, inputRowNames, inputColumnNames, inputSize)
     val targetDataFrame = createDataFrame(targets, targetRowNames, targetColumnNames, targetSize)
 
-    return DataSetPanel(inputDataFrame, targetDataFrame, applyAction = applyAction)
+    return DataSetPanel(inputDataFrame, targetDataFrame, applyAction = applyAction, parentDialog = parentDialog)
 }
 
-fun SimbrainTablePanel.applyCommonTrainerAttributes() {
-    addAction(table.importCsv)
-    addAction(table.exportCsv())
+fun SimbrainTablePanel.applyCommonTrainerAttributes(parentDialog: StandardDialog? = null) {
+    addAction(table.importCSVAction(parentComponent = parentDialog))
+    addAction(table.exportCsv(parentComponent = parentDialog))
     addAction(table.randomizeAction)
     addAction(table.showBoxPlotAction)
     preferredSize = Dimension(400, 250)
@@ -63,7 +64,8 @@ fun SimbrainTablePanel.applyCommonTrainerAttributes() {
 class DataSetPanel(
     val inputDataFrame: BasicDataFrame,
     val targetDataFrame: BasicDataFrame,
-    applyAction: suspend DataSetPanel.(selectedRow: Int) -> Unit
+    applyAction: suspend DataSetPanel.(selectedRow: Int) -> Unit,
+    parentDialog: StandardDialog? = null
 ): JPanel() {
 
     val rowErrorJLabel = JLabel("")
@@ -72,7 +74,7 @@ class DataSetPanel(
     var onRowCountChanged: ((inputRowCount: Int, targetRowCount: Int) -> Unit)? = null
 
     val inputs = SimbrainTablePanel(inputDataFrame, false).apply {
-        applyCommonTrainerAttributes()
+        applyCommonTrainerAttributes(parentDialog)
         toolbar.addSeparator()
         val advanceRowCheckbox = JCheckBox("Auto advance").apply { isSelected = true }
         toolbar.add(
@@ -89,7 +91,7 @@ class DataSetPanel(
     }
 
     val targets = SimbrainTablePanel(targetDataFrame, false).apply {
-        applyCommonTrainerAttributes()
+        applyCommonTrainerAttributes(parentDialog)
     }
 
     val addRemoveRows = AddRemoveRows(listOf(inputs.table, targets.table))
@@ -121,9 +123,20 @@ class DataSetPanel(
 context(NetworkPanel)
 fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
     val supervisedNetwork = this
-    return StandardDialog().apply {
+    val parentWindow = SwingUtilities.getWindowAncestor(this@NetworkPanel)
+    return StandardDialog(parentWindow as? JFrame, "Train Network").apply {
 
-        title = "Train Network"
+        isModal = true
+        isAlwaysOnTop = false  // Ensure this is not always on top
+        modalityType = Dialog.ModalityType.APPLICATION_MODAL
+        
+        // Ensure proper focus management for child dialogs
+        addWindowFocusListener(object : java.awt.event.WindowAdapter() {
+            override fun windowGainedFocus(e: java.awt.event.WindowEvent?) {
+                // When this dialog gains focus, ensure it stays in front
+                toFront()
+            }
+        })
 
         // Run training algorithm
         val runControls = JPanel()
@@ -142,7 +155,7 @@ fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
             }
         }
 
-        fun createDataSetPanel(dataSet: TrainingDataset) = dataSet.createDataSetPanel { selectedRow -> commonApplyAction(selectedRow) }
+        fun createDataSetPanel(dataSet: TrainingDataset) = dataSet.createDataSetPanel({ selectedRow -> commonApplyAction(selectedRow) }, this@apply)
 
         val trainingDataSetPanel = createDataSetPanel(trainingSet)
         val testingDataSetPanel = createDataSetPanel(testingSet)
@@ -208,9 +221,10 @@ fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
 
 context(NetworkPanel)
 fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, trainAction: context(Network)() -> Unit = {}): StandardDialog {
-    return StandardDialog().apply dialog@ {
+    val parentWindow = SwingUtilities.getWindowAncestor(this@NetworkPanel)
+    return StandardDialog(parentWindow as? JFrame, "Train Network").apply dialog@ {
 
-        title = "Train Network"
+        isModal = true
 
         val mainPanel = JPanel().apply {
             layout = MigLayout("gap 0px 0px, ins 15")
@@ -321,7 +335,7 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         fun createUnsupervisedDataPanel(data: MutableList<MutableList<Double>>) = object : JPanel() {
             val dataFrame = createUnsupervisedDataFrame(data)
             val tablePanel = SimbrainTablePanel(dataFrame, false).apply {
-                applyCommonTrainerAttributes()
+                applyCommonTrainerAttributes(this@dialog)
                 toolbar.addSeparator()
                 val advanceRowCheckbox = JCheckBox("Auto advance").apply { isSelected = true }
                 toolbar.add(

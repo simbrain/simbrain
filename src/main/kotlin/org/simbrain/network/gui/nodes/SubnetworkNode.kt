@@ -194,10 +194,6 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
 
     private fun updateOutline() {
         val nodes = HashSet(outlinedObjects)
-        val infoText = subnetwork.customInfo as? InfoText
-        if (infoText?.includeInOutline == true && infoTextNode != null) {
-            nodes.add(infoTextNode!!)
-        }
         outline.resetOutlinedNodes(nodes)
     }
 

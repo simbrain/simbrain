@@ -4,7 +4,6 @@ import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
-import org.simbrain.network.core.bound
 import org.simbrain.network.subnetworks.Hopfield
 import org.simbrain.network.subnetworks.Hopfield.HopfieldUpdate
 import org.simbrain.util.computeCorrelationMatrix
@@ -27,7 +26,7 @@ val hopfieldPatterns = newSim {
     val hopfield = Hopfield(100).apply {
         updateFunc = HopfieldUpdate.SYNC
         customInfo.fontSize = 24
-        customInfo.locationY = neuronGroup.neuronList.bound.minY - 70.0
+        customInfo.spacing = 20.0
     }
     var patternCnt = 0.0
     network.addNetworkModelAsync(hopfield)

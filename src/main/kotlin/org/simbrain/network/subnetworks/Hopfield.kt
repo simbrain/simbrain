@@ -1,14 +1,13 @@
 package org.simbrain.network.subnetworks
 
-import org.simbrain.network.core.*
+import org.simbrain.network.core.InfoText
+import org.simbrain.network.core.Network
+import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.trainers.UnsupervisedNetwork
 import org.simbrain.network.trainers.UnsupervisedTrainer
 import org.simbrain.network.updaterules.BinaryRule
-import org.simbrain.network.util.Alignment
-import org.simbrain.network.util.Direction
-import org.simbrain.network.util.alignNetworkModels
-import org.simbrain.network.util.offsetNetworkModel
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
@@ -75,8 +74,9 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
         // randomize() TODO()
 
         // Create info text
-        customInfo = InfoText(stateInfoText)
-        reapplyOffsets()
+        customInfo = InfoText(stateInfoText).apply {
+
+        }
     }
 
     @XStreamConstructor
@@ -106,7 +106,7 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
     }
 
     val stateInfoText: String
-        get() = "Energy: " + getEnergy()
+        get() = "Energy: " + getEnergy().format(2)
 
     fun getEnergy(): Double {
         // Convert activations to bipolar (-1, +1) for proper Hopfield energy calculation
@@ -135,12 +135,6 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
         events.updated.fire()
     }
 
-    fun reapplyOffsets() {
-        alignNetworkModels(neuronGroup, customInfo, Alignment.HORIZONTAL)
-        val neuronGroupBound = neuronGroup.neuronList.bound
-        offsetNetworkModel(neuronGroup,
-            customInfo, Direction.NORTH, 40.0, neuronGroupBound.height, neuronGroupBound.width, 24.0, 0.0)
-    }
 
     override fun toString(): String {
         return """
@@ -171,7 +165,6 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
 
         // Copy custom info
         copy.customInfo = InfoText(stateInfoText)
-        copy.reapplyOffsets()
 
         return copy
     }

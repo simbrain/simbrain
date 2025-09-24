@@ -6,7 +6,6 @@ import org.simbrain.custom_sims.newSim
 import org.simbrain.custom_sims.simulations.hebb.HopfieldTestConfig
 import org.simbrain.custom_sims.simulations.hebb.createHopfieldTestPane
 import org.simbrain.custom_sims.simulations.hebb.createPatternControlPanel
-import org.simbrain.network.core.bound
 import org.simbrain.network.subnetworks.Hopfield
 import org.simbrain.network.subnetworks.Hopfield.HopfieldUpdate
 import org.simbrain.util.place
@@ -29,7 +28,6 @@ val discreteHopfieldSim = newSim {
     val hopfield = Hopfield(numNeurons).apply {
         updateFunc = HopfieldUpdate.SYNC
         customInfo.fontSize = 24
-        customInfo.locationY = neuronGroup.neuronList.bound.minY - 70.0
     }
     network.addNetworkModelAsync(hopfield)
 

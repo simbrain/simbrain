@@ -90,7 +90,6 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
         randomize()
 
         customInfo = InfoText(stateInfoText)
-        customInfo.location = point(0, -100)
     }
 
     @XStreamConstructor()
@@ -209,7 +208,6 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
         copy.trainingData = trainingData.copy()
         copy.testingData = testingData.copy()
         copy.customInfo = InfoText(copy.stateInfoText)
-        copy.customInfo.location = customInfo.location
 
         copy.trainer.copyFrom(trainer)
 

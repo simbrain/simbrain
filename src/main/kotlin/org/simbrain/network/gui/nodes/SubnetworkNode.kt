@@ -1,6 +1,7 @@
 package org.simbrain.network.gui.nodes
 
 import org.piccolo2d.util.PBounds
+import org.simbrain.network.core.InfoText
 import org.simbrain.network.core.LocatableModel
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.events.LocationEvents
@@ -49,6 +50,11 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
             outline.fullBounds.centerX,
             outline.fullBounds.getY() - interactionBox.fullBounds.getHeight() / 2 + 0.5
         )
+        
+        // Automatically position InfoText relative to interaction box
+        infoTextNode?.let { infoNode ->
+            positionInfoTextNode(infoNode)
+        }
     }
 
     /**
@@ -188,7 +194,8 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
 
     private fun updateOutline() {
         val nodes = HashSet(outlinedObjects)
-        if (infoTextNode != null) {
+        val infoText = subnetwork.customInfo as? InfoText
+        if (infoText?.includeInOutline == true && infoTextNode != null) {
             nodes.add(infoTextNode!!)
         }
         outline.resetOutlinedNodes(nodes)
@@ -196,9 +203,39 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
 
     fun setInfoTextNode(infoTextNode: ScreenElement) {
         this.infoTextNode = infoTextNode
-        subnetwork.events.customInfoUpdated.on(swingDispatcher) { this.updateOutline() }
-        updateOutline()
+        subnetwork.events.customInfoUpdated.on(swingDispatcher) { this.layoutChildren() }
+        layoutChildren() // Trigger initial positioning
     }
+
+    /**
+     * Automatically position InfoText based on its configuration
+     */
+    private fun positionInfoTextNode(infoNode: ScreenElement) {
+        // Get InfoText configuration from the model
+        val infoText = subnetwork.customInfo as? InfoText ?: return
+        
+        when (infoText.position) {
+            InfoText.Position.BELOW_INTERACTION_BOX -> {
+                infoNode.centerFullBoundsOnPoint(
+                    interactionBox.fullBounds.centerX,
+                    interactionBox.fullBounds.maxY + infoText.spacing + infoNode.fullBounds.height / 2
+                )
+            }
+            InfoText.Position.ABOVE_INTERACTION_BOX -> {
+                infoNode.centerFullBoundsOnPoint(
+                    interactionBox.fullBounds.centerX,
+                    interactionBox.fullBounds.minY - infoText.spacing - infoNode.fullBounds.height / 2
+                )
+            }
+            InfoText.Position.BELOW_OUTLINE -> {
+                infoNode.centerFullBoundsOnPoint(
+                    outline.fullBounds.centerX,
+                    outline.fullBounds.maxY + infoText.spacing + infoNode.fullBounds.height / 2
+                )
+            }
+        }
+    }
+
 
     override fun isIntersecting(bound: PBounds?): Boolean {
         return interactionBox.isIntersecting(bound)

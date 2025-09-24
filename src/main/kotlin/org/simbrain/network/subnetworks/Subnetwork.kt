@@ -2,7 +2,6 @@ package org.simbrain.network.subnetworks
 
 import org.simbrain.network.core.*
 import org.simbrain.network.events.SubnetworkEvents
-import org.simbrain.util.indent
 import org.simbrain.util.minus
 import org.simbrain.util.plus
 import org.simbrain.util.propertyeditor.EditableObject

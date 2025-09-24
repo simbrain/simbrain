@@ -62,7 +62,6 @@ class HopfieldCreationDialog(private val networkPanel: NetworkPanel) : StandardD
             hopfield.neuronGroup.layout = layoutEditor.layout
             hopfield.neuronGroup.applyLayout()
         }
-        hopfield.reapplyOffsets()
         
         // Add network with undo/redo support
         addSubnetworkAction(networkPanel) {

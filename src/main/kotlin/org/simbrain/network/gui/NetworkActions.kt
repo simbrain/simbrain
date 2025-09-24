@@ -7,7 +7,7 @@ import org.simbrain.network.gui.dialogs.*
 import org.simbrain.network.gui.dialogs.NetworkPreferences.excitatoryRandomizer
 import org.simbrain.network.gui.dialogs.NetworkPreferences.inhibitoryRandomizer
 import org.simbrain.network.gui.dialogs.NetworkPreferences.weightRandomizer
-import org.simbrain.network.gui.dialogs.neuron.AddNeuronsDialog.createAddNeuronsDialog
+import org.simbrain.network.gui.dialogs.neuron.AddNeuronsDialog
 import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.neurongroups.BasicNeuronGroupParams
@@ -43,11 +43,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         description = "Add a set of neurons to the network (n)",
         keyboardShortcut = KeyCombination('N')
     ) {
-        createAddNeuronsDialog(networkPanel).apply {
-            pack()
-            setLocationRelativeTo(null)
-            isVisible = true
-        }
+        AddNeuronsDialog(networkPanel).display()
     }
     val alignHorizontalAction = networkPanel.createConditionallyEnabledAction(
         name = "Align horizontal",

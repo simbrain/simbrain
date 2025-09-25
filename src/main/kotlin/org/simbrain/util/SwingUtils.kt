@@ -112,8 +112,8 @@ fun <T : JComponent> T.displayInDialog(
         JComponent.WHEN_IN_FOCUSED_WINDOW
     )
 
-    dialog.makeVisible()
     dialog.addCommitTask { block() }
+    dialog.makeVisible()
     return dialog
 }
 

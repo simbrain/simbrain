@@ -132,7 +132,7 @@ class CorrPlotPanel(private val labels: List<String>, private val data: Array<Do
         isFloatable = false
         add(JLabel("Comparison Function: "))
         val binaryOperations =
-            arrayOf("Correlation", "Covariance", "Cosine Similarity", "Euclidean Distance", "Dot Product")
+            arrayOf("Correlation", "Cosine Similarity", "Covariance", "Dot Product", "Euclidean Distance")
         add(JComboBox(binaryOperations).apply {
             addActionListener { e ->
                 val functionSelected = (e?.source as? JComboBox<*>)?.selectedItem as? String

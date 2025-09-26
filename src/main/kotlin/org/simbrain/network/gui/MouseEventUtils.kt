@@ -68,7 +68,7 @@ object MouseEventUtils {
                             java.awt.event.InputEvent.BUTTON3_DOWN_MASK,
                             0, 0, // x, y coordinates (not important for this fix)
                             1, // click count
-                            true, // popup trigger
+                            false, // popup trigger = false to prevent feedback loop
                             java.awt.event.MouseEvent.BUTTON3
                         )
                         

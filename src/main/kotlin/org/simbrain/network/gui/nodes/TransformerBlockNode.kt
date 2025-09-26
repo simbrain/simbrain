@@ -257,12 +257,12 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
                 .lineToX(feedForwardW1Image.anchorTopLeft())
                 .build(),
             createArrowPath()
-                .startAtXY(feedForwardW1Image.anchorTopLeft(), feedForwardHiddenImage.anchorRelative(1.0, 0.25))
-                .lineToX(feedForwardHiddenImage.anchorCenterRight())
+                .startAtXY(feedForwardHiddenImage.anchorCenterRight(), feedForwardHiddenImage.anchorRelative(1.0, 0.25))
+                .lineToX(feedForwardW1Image.anchorTopLeft())
                 .build(),
             createArrowPath()
-                .startAt(feedForwardHiddenImage.anchorRelative(1.0, 0.75))
-                .lineToX(feedForwardW2Image.anchorTopLeft())
+                .startAt(feedForwardW1Image.anchorTopLeft())
+                .lineToX(feedForwardHiddenImage.anchorRelative(1.0, 0.75))
                 .build(),
             createArrowPath()
                 .startAtXY(feedForwardW2Image.anchorTopLeft(), feedForwardOutputImage.anchorRelative(1.0, 0.75))

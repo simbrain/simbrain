@@ -34,11 +34,6 @@ public class NetworkUpdateManagerPanel extends JPanel {
      */
     private final Network network;
 
-    /**
-     * Script directory for custom workspace updates.
-     */
-    private static final String SCRIPT_DIR = "." + System.getProperty("file.separator") + "scripts" + System.getProperty("file.separator") + "updateScripts" + System.getProperty("file.separator") + "networkUpdate";
-
     public NetworkUpdateManagerPanel(final Network network) {
 
         super(new BorderLayout());

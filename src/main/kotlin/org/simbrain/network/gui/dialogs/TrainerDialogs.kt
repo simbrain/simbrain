@@ -24,7 +24,7 @@ import java.awt.Dialog
 import java.awt.Dimension
 import javax.swing.*
 
-fun TrainingDataset.createDataSetPanel(applyAction: suspend DataSetPanel.(selectedRow: Int) -> Unit, parentDialog: StandardDialog? = null): DataSetPanel {
+fun TrainingDataset.createDataSetPanel(parentDialog: StandardDialog? = null, applyAction: suspend DataSetPanel.(selectedRow: Int) -> Unit): DataSetPanel {
     
     fun createDataFrame(
         data: MutableList<MutableList<Double>>,
@@ -155,7 +155,11 @@ fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
             }
         }
 
-        fun createDataSetPanel(dataSet: TrainingDataset) = dataSet.createDataSetPanel({ selectedRow -> commonApplyAction(selectedRow) }, this@apply)
+        fun createDataSetPanel(dataSet: TrainingDataset) = dataSet.createDataSetPanel(this@apply) { selectedRow ->
+            commonApplyAction(
+                selectedRow
+            )
+        }
 
         val trainingDataSetPanel = createDataSetPanel(trainingSet)
         val testingDataSetPanel = createDataSetPanel(testingSet)

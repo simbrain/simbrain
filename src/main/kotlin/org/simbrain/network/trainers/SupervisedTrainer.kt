@@ -167,6 +167,8 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
             iteration = 0
             events.iterationReset.fire()
         }
+        // Reset early stopping state when training starts
+        config.stoppingCondition.resetEarlyStopping()
         isRunning = true
         events.beginTraining.fire().await()
         submitTask(TrainerTask.Train)
@@ -236,7 +238,7 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
         )
         events.errorUpdated.fire(trainingStats).await()
         if (isRunning) {
-            if (config.stoppingCondition.validate(iteration, lastTrainingError)) {
+            if (config.stoppingCondition.validate(iteration, lastTrainingError, testError)) {
                 stoppingConditionReached = true
                 submitTask(TrainerTask.Stop)
             } else {
@@ -503,17 +505,89 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
             order = 3,
             conditionallyEnabledBy = StoppingCondition::useErrorThreshold
         )
+        
+        var useEarlyStopping by GuiEditable(
+            initValue = false,
+            order = 4,
+            description = "Stop training when test error stops improving (requires test data)"
+        )
+        var earlyStoppingPatience by GuiEditable(
+            initValue = 5,
+            order = 5,
+            description = "Number of test evaluations to wait for improvement before stopping",
+            conditionallyEnabledBy = StoppingCondition::useEarlyStopping
+        )
+        var earlyStoppingMinDelta by GuiEditable(
+            initValue = 0.0,
+            order = 6,
+            description = "Minimum improvement required to reset patience counter",
+            conditionallyEnabledBy = StoppingCondition::useEarlyStopping
+        )
+        
+        // Internal state for early stopping (not serialized)
+        @Transient
+        private var bestTestError = Double.MAX_VALUE
+        @Transient
+        private var patienceCounter = 0
 
         override fun copy(): StoppingCondition {
             return StoppingCondition().also {
                 it.maxIterations = maxIterations
                 it.useErrorThreshold = useErrorThreshold
                 it.errorThreshold = errorThreshold
+                it.useEarlyStopping = useEarlyStopping
+                it.earlyStoppingPatience = earlyStoppingPatience
+                it.earlyStoppingMinDelta = earlyStoppingMinDelta
+                // Don't copy transient state - let it reset
             }
         }
 
-        fun validate(iterations: Int, error: Double): Boolean {
-            return iterations >= maxIterations || (useErrorThreshold && error < errorThreshold)
+        fun validate(iterations: Int, trainingError: Double, testError: Double? = null): Boolean {
+            // Check standard stopping conditions
+            val standardStop = iterations >= maxIterations || (useErrorThreshold && trainingError < errorThreshold)
+            
+            // Check early stopping if enabled and test error is available
+            val earlyStop = if (useEarlyStopping && testError != null) {
+                checkEarlyStopping(testError)
+            } else {
+                false
+            }
+            
+            return standardStop || earlyStop
+        }
+        
+        private fun checkEarlyStopping(testError: Double): Boolean {
+            val improvement = bestTestError - testError
+            
+            if (improvement > earlyStoppingMinDelta) {
+                // Improvement found - reset patience and update best error
+                bestTestError = testError
+                patienceCounter = 0
+                return false
+            } else {
+                // No improvement - increment patience
+                patienceCounter++
+                return patienceCounter >= earlyStoppingPatience
+            }
+        }
+        
+        /**
+         * Reset early stopping state (called when training starts)
+         */
+        fun resetEarlyStopping() {
+            bestTestError = Double.MAX_VALUE
+            patienceCounter = 0
+        }
+        
+        /**
+         * Get current early stopping status for display
+         */
+        fun getEarlyStoppingStatus(): String? {
+            return if (useEarlyStopping) {
+                "Best test error: ${if (bestTestError == Double.MAX_VALUE) "N/A" else "%.6f".format(bestTestError)}, Patience: $patienceCounter/$earlyStoppingPatience"
+            } else {
+                null
+            }
         }
     }
 

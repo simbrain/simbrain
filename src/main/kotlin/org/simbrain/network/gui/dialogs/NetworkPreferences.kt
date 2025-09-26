@@ -108,7 +108,6 @@ object NetworkPreferences: PreferenceHolder() {
         label = "Neuron activation decimal places",
         description = "Number of decimal places to display in neuron activation text",
         minimumValue = 0.0,
-        maximumValue = 5.0,
         tab = "GUI",
         order = 20
     )
@@ -118,7 +117,6 @@ object NetworkPreferences: PreferenceHolder() {
         label = "Tooltip decimal places",
         description = "Number of decimal places to display in neuron tooltips",
         minimumValue = 0.0,
-        maximumValue = 8.0,
         tab = "GUI",
         order = 30
     )

@@ -23,32 +23,42 @@ open class SupervisedTrainerConfig(lossFunctionProvider: KFunction<List<Class<ou
 
     var lossFunction:BackpropLossFunction by GuiEditable(
         initValue = BackpropLossFunction.SSE,
+        description = "Loss function used to measure prediction error. SSE/MSE for regression; cross Entropy for classification",
         typeMapProvider = lossFunctionProvider
     )
 
     var optimizer: Optimizer by GuiEditable(
         initValue = AdamOptimizer(),
+        description = "Optimization algorithm for updating network weights.",
         showDetails = false,
         order = 20
     )
 
-    @UserParameter(label = "Update type", showDetails = false, order = 30)
+    @UserParameter(
+        label = "Update type", 
+        description = "Training update method. Epoch processes entire dataset; batch processes fixed-size batches",
+        showDetails = false, 
+        order = 30
+    )
     open var updateType: UpdateMethod = UpdateMethod.Epoch()
 
     var weightInitializationStrategy: WeightInitializationStrategy by GuiEditable(
         initValue = Xavier(),
+        description = "Strategy for initializing network weights. Xavier for general use, He for ReLU networks, LeCun for SELU networks",
         showDetails = false,
         order = 40
     )
 
     var stoppingCondition by GuiEditable(
         initValue = StoppingCondition(),
+        description = "Conditions for automatically stopping training. Can stop after max iterations, error threshold, or early stopping",
         showDetails = false,
         order = 50
     )
 
     var testConfiguration by GuiEditable(
         initValue = TestConfiguration(),
+        description = "Settings for testing the network on validation data during training to monitor generalization performance",
         showDetails = false,
         order = 60
     )
@@ -470,7 +480,12 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
             override fun toString() = "Epoch"
         }
 
-        class Batch(@UserParameter(label = "Batch size", minimumValue = 1.0, order = 1) var batchSize: Int = 5) : UpdateMethod() {
+        class Batch(@UserParameter(
+            label = "Batch size", 
+            description = "Number of training examples processed together in each update. Larger batches are more stable but use more memory",
+            minimumValue = 1.0, 
+            order = 1
+        ) var batchSize: Int = 5) : UpdateMethod() {
             override fun copy() = Batch(batchSize)
             override fun toString() = "Batch"
         }
@@ -494,14 +509,17 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
     class StoppingCondition: CopyableObject {
         var maxIterations by GuiEditable(
             initValue = 10_000,
+            description = "Maximum number of training iterations before stopping automatically",
             order = 1
         )
         var useErrorThreshold by GuiEditable(
             initValue = false,
+            description = "Stop training when error falls below specified threshold",
             order = 2
         )
         var errorThreshold by GuiEditable(
             0.1,
+            description = "Training stops when error falls below this value",
             order = 3,
             conditionallyEnabledBy = StoppingCondition::useErrorThreshold
         )
@@ -594,11 +612,13 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
     class TestConfiguration: CopyableObject {
         var enabled by GuiEditable(
             initValue = true,
+            description = "Enable testing on validation data during training to monitor generalization performance",
             order = 1
         )
 
         var testFrequency by GuiEditable(
             initValue = 10,
+            description = "How often to test on validation data (every N training iterations)",
             order = 2,
             conditionallyEnabledBy = TestConfiguration::enabled
         )

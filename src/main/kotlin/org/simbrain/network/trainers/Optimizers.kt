@@ -9,7 +9,13 @@ import kotlin.math.sqrt
 
 abstract class Optimizer: CopyableObject {
 
-    @UserParameter(label = "Learning Rate", increment = .01, minimumValue = 0.0, order = 1)
+    @UserParameter(
+        label = "Learning Rate", 
+        description = "Step size for gradient descent updates. Higher values learn faster but may overshoot. Typical range: 0.001-0.1",
+        increment = .01, 
+        minimumValue = 0.0, 
+        order = 1
+    )
     var learningRate = 0.01
 
     context(SupervisedTrainer)
@@ -56,8 +62,20 @@ class MomentumOptimizer(
 }
 
 class AdamOptimizer(
-    @UserParameter(label = "Beta1", minimumValue = 0.0, maximumValue = 1.0, order = 1) var beta1: Double = 0.9,
-    @UserParameter(label = "Beta2", minimumValue = 0.0, maximumValue = 1.0, order = 2) var beta2: Double = 0.999
+    @UserParameter(
+        label = "Beta1", 
+        description = "Exponential decay rate for first moment estimates (momentum). Controls how much past gradients influence current update.",
+        minimumValue = 0.0, 
+        maximumValue = 1.0, 
+        order = 1
+    ) var beta1: Double = 0.9,
+    @UserParameter(
+        label = "Beta2", 
+        description = "Exponential decay rate for second moment estimates (variance). Controls adaptive learning rate scaling.",
+        minimumValue = 0.0, 
+        maximumValue = 1.0, 
+        order = 2
+    ) var beta2: Double = 0.999
 ) : Optimizer() {
 
     private val matrixRunningMeanMap: HashMap<Matrix, Matrix> = HashMap()
@@ -102,10 +120,33 @@ class AdamOptimizer(
  * Reference: "Decoupled Weight Decay Regularization" by Loshchilov & Hutter (2017)
  */
 class AdamWOptimizer(
-    @UserParameter(label = "Beta1", minimumValue = 0.0, maximumValue = 1.0, order = 1) var beta1: Double = 0.9,
-    @UserParameter(label = "Beta2", minimumValue = 0.0, maximumValue = 1.0, order = 2) var beta2: Double = 0.999,
-    @UserParameter(label = "Weight Decay", minimumValue = 0.0, order = 3) var weightDecay: Double = 0.01,
-    @UserParameter(label = "Learning Rate Decay", minimumValue = 0.0, maximumValue = 1.0, order = 4) var learningRateDecay: Double = 0.0
+    @UserParameter(
+        label = "Beta1", 
+        description = "Exponential decay rate for first moment estimates (momentum). Controls how much past gradients influence current update.",
+        minimumValue = 0.0, 
+        maximumValue = 1.0, 
+        order = 1
+    ) var beta1: Double = 0.9,
+    @UserParameter(
+        label = "Beta2", 
+        description = "Exponential decay rate for second moment estimates (variance). Controls adaptive learning rate scaling.",
+        minimumValue = 0.0, 
+        maximumValue = 1.0, 
+        order = 2
+    ) var beta2: Double = 0.999,
+    @UserParameter(
+        label = "Weight Decay", 
+        description = "L2 regularization strength applied directly to weights (decoupled from gradients). Helps prevent overfitting.",
+        minimumValue = 0.0, 
+        order = 3
+    ) var weightDecay: Double = 0.01,
+    @UserParameter(
+        label = "Learning Rate Decay", 
+        description = "Exponential decay rate for learning rate over time. 0.0 means no decay. Higher values decay faster",
+        minimumValue = 0.0, 
+        maximumValue = 1.0, 
+        order = 4
+    ) var learningRateDecay: Double = 0.0
 ) : Optimizer() {
 
     private val matrixRunningMeanMap: HashMap<Matrix, Matrix> = HashMap()

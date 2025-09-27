@@ -40,7 +40,10 @@ class UnsupervisedTrainer: EditableObject {
         initValue = 1000
     )
 
-    @UserParameter("Learning Rate")
+    @UserParameter(
+        label = "Learning Rate",
+        description = "Step size for unsupervised learning updates. Controls how quickly weights adapt to input patterns"
+    )
     var learningRate = .01
 
     @Transient

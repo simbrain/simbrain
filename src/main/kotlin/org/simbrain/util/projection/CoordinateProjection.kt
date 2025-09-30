@@ -26,7 +26,10 @@ class CoordinateProjection: ProjectionMethod() {
         projectPoint(point)
     }
 
-    override fun copy() = CoordinateProjection()
+    override fun copy() = CoordinateProjection().also { 
+        it.dim1 = dim1
+        it.dim2 = dim2
+    }
 
     override val name = "Coordinate"
 

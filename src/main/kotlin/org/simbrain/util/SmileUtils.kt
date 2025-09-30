@@ -582,3 +582,81 @@ fun Matrix.applyDiagonalPattern(): Matrix {
     }
     return this
 }
+
+/**
+ * Computes the Frobenius norm (Euclidean norm) of the matrix.
+ * This is the square root of the sum of squares of all matrix elements.
+ */
+fun Matrix.frobeniusNorm(): Double {
+    var sum = 0.0
+    for (i in 0 until nrow()) {
+        for (j in 0 until ncol()) {
+            val value = get(i, j)
+            sum += value * value
+        }
+    }
+    return sqrt(sum)
+}
+
+/**
+ * Asserts that two matrices are equal within a given tolerance.
+ * 
+ * @param expected The expected matrix
+ * @param actual The actual matrix to test
+ * @param message Optional message to display if assertion fails
+ * @param tolerance The tolerance for floating-point comparison (default: 1e-6)
+ */
+fun assertMatrixEquals(expected: Matrix, actual: Matrix, message: String = "", tolerance: Double = 1e-6) {
+    if (expected.nrow() != actual.nrow() || expected.ncol() != actual.ncol()) {
+        val errorMsg = if (message.isNotEmpty()) "$message - " else ""
+        throw AssertionError("${errorMsg}Matrix dimensions don't match: expected ${expected.shapeString}, actual ${actual.shapeString}")
+    }
+    
+    for (i in 0 until expected.nrow()) {
+        for (j in 0 until expected.ncol()) {
+            val expectedValue = expected[i, j]
+            val actualValue = actual[i, j]
+            val diff = abs(expectedValue - actualValue)
+            
+            if (diff > tolerance) {
+                val errorMsg = if (message.isNotEmpty()) "$message - " else ""
+                throw AssertionError("${errorMsg}Matrices differ at position [$i, $j]: expected $expectedValue, actual $actualValue (difference: $diff)")
+            }
+        }
+    }
+}
+
+/**
+ * Asserts that two matrices are NOT equal within a given tolerance.
+ * 
+ * @param expected The expected matrix
+ * @param actual The actual matrix to test
+ * @param message Optional message to display if assertion fails
+ * @param tolerance The tolerance for floating-point comparison (default: 1e-6)
+ */
+fun assertMatrixNotEquals(expected: Matrix, actual: Matrix, message: String = "", tolerance: Double = 1e-6) {
+    if (expected.nrow() != actual.nrow() || expected.ncol() != actual.ncol()) {
+        // Different dimensions means they're not equal
+        return
+    }
+    
+    var allEqual = true
+    for (i in 0 until expected.nrow()) {
+        for (j in 0 until expected.ncol()) {
+            val expectedValue = expected[i, j]
+            val actualValue = actual[i, j]
+            val diff = abs(expectedValue - actualValue)
+            
+            if (diff > tolerance) {
+                allEqual = false
+                break
+            }
+        }
+        if (!allEqual) break
+    }
+    
+    if (allEqual) {
+        val errorMsg = if (message.isNotEmpty()) "$message - " else ""
+        throw AssertionError("${errorMsg}Matrices are equal within tolerance $tolerance")
+    }
+}

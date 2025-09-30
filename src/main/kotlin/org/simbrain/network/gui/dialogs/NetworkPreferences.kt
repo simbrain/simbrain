@@ -120,7 +120,7 @@ object NetworkPreferences: PreferenceHolder() {
         tab = "GUI",
         order = 30
     )
-    var tooltipDecimalPlaces by IntegerPreference(3)
+    var tooltipDecimalPlaces by IntegerPreference(8)
 
     @UserParameter(
         label = "Min synapse size",

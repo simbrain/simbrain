@@ -112,7 +112,13 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
 
     // Top stuff
     val projectionMethods = projectionTypes
-        .associateWith { it.kotlin.primaryConstructor!!.call() }
+        .associateWith {
+            if (it == projector.projectionMethod.javaClass) {
+                projector.projectionMethod // reuse instance from projector to avoid re-initialization
+            } else {
+                it.kotlin.primaryConstructor!!.call()
+            }
+        }
 
     private val freezingToggleButton = SimbrainToggleButton(
         icon = ResourceManager.getSmallIcon("menu_icons/Clamp.png"),

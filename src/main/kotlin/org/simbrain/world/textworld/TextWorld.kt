@@ -62,7 +62,7 @@ class TextWorld : AttributeContainer, EditableObject {
         get() = _text
         set(value) {
             _text = value
-            events.textChanged.fireAndBlock()
+            events.textChanged.fire()
         }
 
     @UserParameter(

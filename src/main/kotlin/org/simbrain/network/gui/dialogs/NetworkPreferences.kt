@@ -160,7 +160,7 @@ object NetworkPreferences: PreferenceHolder() {
                 "If no (source-target format), each row corresponds to an input and each column corresponds to an output.",
         tab = "GUI",
         order = 80)
-    var weightMatrixTransposeGraphics by BooleanPreference(true)
+    var weightMatrixTargetSource by BooleanPreference(true)
 
     @UserParameter(
         label = "Matrix image max width/height",

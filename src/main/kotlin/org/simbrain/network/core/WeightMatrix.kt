@@ -282,10 +282,10 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
         events.updated.fire()
     }
 
-    val sizeString get() = if (NetworkPreferences.weightMatrixTransposeGraphics) {
-        "${weights.ncol()} x ${weights.nrow()}"
-    } else {
+    val sizeString get() = if (NetworkPreferences.weightMatrixTargetSource) {
         "${weights.nrow()} x ${weights.ncol()}"
+    } else {
+        "${weights.ncol()} x ${weights.nrow()}"
     }
 
     override fun toString(): String {

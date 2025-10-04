@@ -10,6 +10,7 @@ import org.simbrain.world.odorworld.effectors.StraightMovement;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 
 import javax.swing.*;
+import java.awt.*;
 
 /**
  * EffectorDialog is a dialog box for adding effectors to Odor World.
@@ -37,9 +38,22 @@ public class AddEffectorDialog extends StandardDialog {
     /**
      * Effector Dialog add effector constructor.
      *
+     * @param entity entity to add effector to
+     * @param parent parent window for proper dialog stacking
+     */
+    public AddEffectorDialog(OdorWorldEntity entity, Window parent) {
+        super(parent, "Add Effector");
+        this.entity = entity;
+        init("Add effector");
+    }
+    
+    /**
+     * Effector Dialog add effector constructor (without parent).
+     *
      * @param entity
      */
     public AddEffectorDialog(OdorWorldEntity entity) {
+        super();
         this.entity = entity;
         init("Add effector");
     }

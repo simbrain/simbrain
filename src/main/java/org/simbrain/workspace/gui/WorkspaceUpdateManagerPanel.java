@@ -271,7 +271,8 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
             listModel.addElement(action);
         }
         configureAvailableJList(availableActionJList);
-        StandardDialog addActionsDialog = new StandardDialog() {
+        Window parentWindow = SwingUtilities.getWindowAncestor(this);
+        StandardDialog addActionsDialog = new StandardDialog(parentWindow, "Add Available Update Action") {
             @Override
             protected void closeDialogOk() {
                 super.closeDialogOk();
@@ -280,11 +281,9 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
                 }
             }
         };
-        addActionsDialog.setTitle("Add Available Update Action");
         addActionsDialog.setContentPane(availableListScroll);
-        addActionsDialog.pack();
-        addActionsDialog.setLocationRelativeTo(null);
-        addActionsDialog.setVisible(true);
+        addActionsDialog.setModal(true);
+        addActionsDialog.makeVisible();
     }
 
     /**

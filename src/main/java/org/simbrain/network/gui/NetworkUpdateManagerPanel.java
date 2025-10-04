@@ -212,7 +212,8 @@ public class NetworkUpdateManagerPanel extends JPanel {
                 listModel.addElement(action);
             }
             configureAvailableJList(availableActionJList);
-            StandardDialog addActionsDialog = new StandardDialog() {
+            Window parentWindow = SwingUtilities.getWindowAncestor(NetworkUpdateManagerPanel.this);
+            StandardDialog addActionsDialog = new StandardDialog(parentWindow, "Add predefined action") {
                 @Override
                 protected void closeDialogOk() {
                     super.closeDialogOk();
@@ -221,11 +222,9 @@ public class NetworkUpdateManagerPanel extends JPanel {
                     }
                 }
             };
-            addActionsDialog.setTitle("Add predefined action");
             addActionsDialog.setContentPane(availableListScroll);
-            addActionsDialog.pack();
-            addActionsDialog.setLocationRelativeTo(null);
-            addActionsDialog.setVisible(true);
+            addActionsDialog.setModal(true);
+            addActionsDialog.makeVisible();
 
         }
     };

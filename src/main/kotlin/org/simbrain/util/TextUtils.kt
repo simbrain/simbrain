@@ -7,6 +7,7 @@ import org.simbrain.world.textworld.EmbeddingType
 import org.simbrain.world.textworld.TokenEmbeddingBuilder
 import smile.math.matrix.Matrix
 import smile.nlp.tokenizer.SimpleSentenceSplitter
+import java.awt.Frame
 import java.util.*
 import javax.swing.JScrollPane
 import javax.swing.JTextArea
@@ -411,7 +412,7 @@ fun embeddingSimilarity(vectorA: DoubleArray, vectorB: DoubleArray, simfun: (Dou
 
 @JvmOverloads
 fun textEntryDialog(initialString: String, title: String = "Edit Text", columns: Int = 20, rows: Int = 5, commitAction: (String) -> Unit = {}): StandardDialog {
-    val dialog = StandardDialog(null, title)
+    val dialog = StandardDialog(null as Frame?, title)
     val textArea = JTextArea(initialString)
     textArea.columns = columns
     textArea.rows = rows

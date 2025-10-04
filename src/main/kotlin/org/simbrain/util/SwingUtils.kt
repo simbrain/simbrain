@@ -95,7 +95,7 @@ fun <T : JComponent> T.displayInDialog(
     parent: Component? = null,
     block: T.() -> Unit = {}
 ): StandardDialog {
-    val dialog = StandardDialog(getParentFrame(parent), "Dialog")
+    val dialog = StandardDialog(getParentFrame(parent) as Frame?, "Dialog")
     
     dialog.contentPane = this
     dialog.defaultCloseOperation = JDialog.DISPOSE_ON_CLOSE
@@ -140,7 +140,13 @@ fun JDialog.display(
     
     pack()
     setLocationRelativeTo(effectiveParent)
-    isVisible = true
+    
+    // Make visible and ensure it gets focus
+    SwingUtilities.invokeLater {
+        isVisible = true
+        toFront()
+        requestFocus()
+    }
 
 }
 
@@ -279,11 +285,22 @@ private fun getParentFrame(parent: Component?): JFrame? {
 @JvmOverloads
 fun <E : EditableObject> E.createEditorDialog(
     titleName: String = "Edit " + name.convertCamelCaseToSpaces(),
+    parent: Window? = null,
     block: (E) -> Unit = {}
 ): StandardDialog {
     val editor = AnnotatedPropertyEditor(listOf(this))
-    return StandardDialog(editor).apply {
-        title = titleName
+    val dialog = if (parent != null) {
+        StandardDialog(parent, titleName)
+    } else {
+        StandardDialog(editor)
+    }
+    return dialog.apply {
+        if (parent == null) {
+            title = titleName
+        }
+        if (parent != null) {
+            contentPane = editor
+        }
         addCommitTask {
             editor.commitChanges()
             block(this@createEditorDialog)

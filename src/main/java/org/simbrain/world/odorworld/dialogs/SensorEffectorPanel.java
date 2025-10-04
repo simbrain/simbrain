@@ -132,17 +132,12 @@ public class SensorEffectorPanel extends JPanel {
         addAttribute.addActionListener(e -> {
             StandardDialog dialog;
             if (type == PanelType.Sensor) {
-                dialog = new AddSensorDialog(parentEntity);
+                dialog = new AddSensorDialog(parentEntity, parentWindow);
             } else {
-                dialog = new AddEffectorDialog(parentEntity);
+                dialog = new AddEffectorDialog(parentEntity, parentWindow);
             }
-            // Putting these on the side since I can't figure out a way to get this in front of its parent dialog
-            // after trying everything (toFront, alwaysOnTop, etc).
-            SwingUtilities.invokeLater(() -> {
-                dialog.setLocation(parentWindow.getX() - dialog.getWidth(), parentWindow.getY());
-            });
-            dialog.pack();
-            dialog.setVisible(true);
+            dialog.setModal(true);
+            dialog.makeVisible();
         });
 
         // Delete attribute
@@ -238,14 +233,12 @@ public class SensorEffectorPanel extends JPanel {
             return;
         }
 
-        var dialog = SwingUtilsKt.createEditorDialog(attribute);
-        SwingUtilities.invokeLater(() -> {
-            dialog.setLocation(parentWindow.getX() - dialog.getWidth(), parentWindow.getY());
-        });
-        dialog.addCommitTask(() -> {
+        StandardDialog dialog = SwingUtilsKt.createEditorDialog(attribute, "Edit " + attribute.getName(), parentWindow, (obj) -> {
             attribute.getEvents().getPropertyChanged().fire();
+            return null;
         });
-        SwingUtilsKt.display(dialog);
+        dialog.setModal(true);
+        dialog.makeVisible();
     }
 
     /**

@@ -118,11 +118,11 @@ public class StandardDialog extends GenericJDialog {
         super(parent, title);
         init();
     }
-
+    
     /**
-     * Create a modeless StandardDialog as a child of the specified JFrame.
+     * Create a StandardDialog as a child of the specified Window (supports Frame, Dialog, or any Window).
      */
-    public StandardDialog(JFrame parent, String title) {
+    public StandardDialog(Window parent, String title) {
         super(parent, title);
         init();
     }

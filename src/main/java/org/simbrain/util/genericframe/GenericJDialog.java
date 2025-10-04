@@ -12,6 +12,10 @@ public class GenericJDialog extends JDialog implements GenericFrame {
     public GenericJDialog(Frame parent, String title) {
         super(parent, title);
     }
+    
+    public GenericJDialog(Window parent, String title) {
+        super(parent, title);
+    }
 
     public GenericJDialog() {
     }

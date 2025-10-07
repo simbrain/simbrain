@@ -4,7 +4,6 @@ import com.Ostermiller.util.CSVParser;
 import com.Ostermiller.util.CSVPrinter;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
-import org.pmw.tinylog.Logger;
 import org.simbrain.util.math.SimbrainMath;
 
 import javax.swing.*;
@@ -617,27 +616,6 @@ public class Utils {
             }
         }
         return ret;
-    }
-
-    /**
-     * Return the Simbrain properties file, or null if it is not found.
-     *
-     * @return the Simbrain properties file
-     */
-    public static Properties getSimbrainProperties() {
-        try {
-            Properties properties = new Properties();
-            File file = new File("." + FS + "etc" + FS + "config.properties");
-            if (file.exists()) {
-                properties.load(new FileInputStream(file));
-            } else {
-                Logger.info("Could not find properties file at " + file.getAbsolutePath());
-            }
-            return properties;
-        } catch (IOException ex) {
-            ex.printStackTrace();
-        }
-        return null;
     }
 
     /**

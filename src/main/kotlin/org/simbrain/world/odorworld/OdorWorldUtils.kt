@@ -58,10 +58,6 @@ fun OdorWorldDesktopComponent.fitWorldToFrameSize() {
 
 fun OdorWorld.addDefaultEntities() {
     val world = this
-    // Add agent to environment
-    val mouse = OdorWorldEntity(world, EntityType.Mouse).apply {
-        setLocation(162, 200)
-    }
 
     val objects = buildList {
         add(OdorWorldEntity(world, EntityType.Swiss).apply {
@@ -96,7 +92,7 @@ fun OdorWorld.addDefaultEntities() {
         })
     }
     runBlocking {
-        world.addEntity(mouse)
+        world.addAgent().location = point(162, 200)
         objects.forEach { world.addEntity(it) }
     }
 }

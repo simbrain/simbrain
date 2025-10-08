@@ -16,9 +16,7 @@ import java.io.OutputStream
  * buttons, and serializing of world data. The main environment codes is in [OdorWorldPanel].
  */
 class OdorWorldComponent : WorkspaceComponent {
-    /**
-     * Reference to model world.
-     */
+
     var world: OdorWorld
         private set
 

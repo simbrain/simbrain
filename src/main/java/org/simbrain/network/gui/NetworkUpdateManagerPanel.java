@@ -63,7 +63,8 @@ public class NetworkUpdateManagerPanel extends JPanel {
         upButton.setToolTipText("Move selected action up in sequence");
         upButton.addActionListener(e -> {
             int moveMe = currentActionJList.getSelectedIndex();
-            if (moveMe != 0) {
+            int listSize = currentActionListModel.getSize();
+            if (moveMe > 0 && listSize > 0 && moveMe < listSize) {
                 swap(moveMe, moveMe - 1);
                 currentActionJList.setSelectedIndex(moveMe - 1);
                 currentActionJList.ensureIndexIsVisible(moveMe - 1);
@@ -74,7 +75,7 @@ public class NetworkUpdateManagerPanel extends JPanel {
         upFullButton.setToolTipText("Move selected action to top of sequence");
         upFullButton.addActionListener(e -> {
             int moveMe = currentActionJList.getSelectedIndex();
-            if (moveMe != 0) {
+            if (moveMe > 0 && currentActionListModel.getSize() > 0) {
                 swap(moveMe, 0);
                 currentActionJList.setSelectedIndex(0);
                 currentActionJList.ensureIndexIsVisible(0);
@@ -85,7 +86,8 @@ public class NetworkUpdateManagerPanel extends JPanel {
         downButton.setToolTipText("Move selected action down in sequence");
         downButton.addActionListener(e -> {
             int moveMe = currentActionJList.getSelectedIndex();
-            if (moveMe != currentActionListModel.getSize() - 1) {
+            int listSize = currentActionListModel.getSize();
+            if (moveMe >= 0 && listSize > 0 && moveMe < listSize - 1) {
                 swap(moveMe, moveMe + 1);
                 currentActionJList.setSelectedIndex(moveMe + 1);
                 currentActionJList.ensureIndexIsVisible(moveMe + 1);
@@ -96,8 +98,12 @@ public class NetworkUpdateManagerPanel extends JPanel {
         downFullButton.setToolTipText("Move selected action to bottom of sequence");
         downFullButton.addActionListener(e -> {
             int moveMe = currentActionJList.getSelectedIndex();
-            int lastIndex = currentActionListModel.getSize() - 1;
-            if (moveMe != lastIndex) {
+            int listSize = currentActionListModel.getSize();
+            if (listSize == 0) {
+                return; // Empty list, nothing to do
+            }
+            int lastIndex = listSize - 1;
+            if (moveMe >= 0 && moveMe != lastIndex) {
                 swap(moveMe, lastIndex);
                 currentActionJList.setSelectedIndex(lastIndex);
                 currentActionJList.ensureIndexIsVisible(lastIndex);
@@ -209,7 +215,9 @@ public class NetworkUpdateManagerPanel extends JPanel {
             availableActionJList.setModel(listModel);
             listModel.clear();
             for (UpdateAction action : network.getUpdateManager().getAvailableActionList()) {
-                listModel.addElement(action);
+                if (action != null) {
+                    listModel.addElement(action);
+                }
             }
             configureAvailableJList(availableActionJList);
             Window parentWindow = SwingUtilities.getWindowAncestor(NetworkUpdateManagerPanel.this);
@@ -218,7 +226,9 @@ public class NetworkUpdateManagerPanel extends JPanel {
                 protected void closeDialogOk() {
                     super.closeDialogOk();
                     for (Object action : availableActionJList.getSelectedValuesList()) {
-                        network.getUpdateManager().addAction((UpdateAction) action);
+                        if (action != null && action instanceof UpdateAction) {
+                            network.getUpdateManager().addAction((UpdateAction) action);
+                        }
                     }
                 }
             };

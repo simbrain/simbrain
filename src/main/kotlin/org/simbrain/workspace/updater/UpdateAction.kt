@@ -7,17 +7,11 @@ package org.simbrain.workspace.updater
  * @author jyoshimi
  */
 abstract class UpdateAction(
-    /**
-     * Provide a String description of this update method.
-     *
-     * @return the update description
-     */
+
     open val description: String?,
 
     /**
-     * Provide a longer description for tooltips, etc.
-     *
-     * @return the update description
+     * A longer description for tooltips, etc.
      */
     open val longDescription: String? = description
 

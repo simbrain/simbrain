@@ -189,7 +189,7 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
 
         JButton downFullButton = new JButton(ResourceManager.getSmallIcon("menu_icons/DownFull.png"));
         downFullButton.setToolTipText("Move selected action to bottom of sequence");
-        downFullButton.addActionListener(evt -> moveSelectedUpdateAction(currentActionListModel.getSize() - currentActionJList.getSelectedIndex()));
+        downFullButton.addActionListener(evt -> moveSelectedUpdateAction(currentActionListModel.getSize() - 1 - currentActionJList.getSelectedIndex()));
         buttonPanel.add(downFullButton);
 
         add(buttonPanel, BorderLayout.SOUTH);
@@ -312,6 +312,9 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
             return;
         }
         int selected = currentActionJList.getSelectedIndex();
+        if (selected < 0) {
+            return; // No item selected
+        }
         int target = selected + move;
         if (target >= 0 && target < currentActionListModel.getSize()) {
             swap(selected, target);

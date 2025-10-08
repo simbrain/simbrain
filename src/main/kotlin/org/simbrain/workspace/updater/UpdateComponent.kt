@@ -4,8 +4,6 @@ import org.simbrain.workspace.WorkspaceComponent
 
 /**
  * Update a specific workspace component.
- *
- * @author jyoshimi
  */
 class UpdateComponent(
     val component: WorkspaceComponent

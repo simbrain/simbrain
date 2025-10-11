@@ -214,6 +214,8 @@ fun NetworkPanel.createNeuronContextMenu() = with(networkActions) {
         addSeparator()
         add(showLayoutDialogAction)
         addSeparator()
+        add(neuronCollectionAction)
+        addSeparator()
         add(showNetworkPropertiesAction)
         addSeparator()
         if (selectedNeuronList.size > 1) {

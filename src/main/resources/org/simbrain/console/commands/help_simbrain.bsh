@@ -1,0 +1,18 @@
+help_simbrain() {
+    print("");
+    print("Currently there is one system variable: workspace\n");
+    print("To see available custom console commands, enter: dir(\"scripts/console\");");
+    print("");
+
+    print("---- SOME SAMPLE COMMANDS ----");
+    print("componentBounds();");
+    print("print(workspace);");
+    print("workspace.iterate(100);");
+    print("workspace.run();");
+    print("workspace.stop();");
+    print("addNetwork(\"MyNet\");");
+    print("getNetwork(\"MyNet\").randomizeNeurons()");
+    print("print(getNetwork(\"MyNet\"));");
+    print("showGUI(getComponent(\"MyNet\"));");
+    print("createScriptLines();");
+}

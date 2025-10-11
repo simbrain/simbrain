@@ -1,0 +1,8 @@
+import org.simbrain.network.*;
+import org.simbrain.network.core.*;
+
+Network getNetwork(String in) {
+
+	return ((NetworkComponent) workspace.getComponent(in)).getNetwork();
+}
+

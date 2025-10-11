@@ -158,13 +158,6 @@ fun getNetworkXStream(): XStream {
     return xstream
 }
 
-fun networkUpdateAction(description: String, longDescription: String = description, action: () -> Unit) =
-    object : NetworkUpdateAction {
-        override val description = description
-        override val longDescription = longDescription
-        override fun invoke() = action()
-    }
-
 context(Network)
 @JvmOverloads
 fun connect(source: Neuron, target: Neuron, value: Double, lowerBound: Double = Synapse.DEFAULT_LOWER_BOUND, upperBound: Double = Synapse.DEFAULT_UPPER_BOUND): Synapse {

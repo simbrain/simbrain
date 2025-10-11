@@ -10,8 +10,8 @@ import org.simbrain.workspace.updater.UpdateAction
  * @author jyoshimi
  */
 class UpdateNetworkModel(private val networkModel: NetworkModel, val network: Network) : UpdateAction(
-    networkModel.label,
-    "Update ${networkModel.label}"
+    networkModel.displayName,
+    "Update ${networkModel.displayName}"
 ) {
     override suspend fun run() {
         with(network) { networkModel.update() }

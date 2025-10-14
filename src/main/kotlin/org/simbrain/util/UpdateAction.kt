@@ -1,10 +1,7 @@
-package org.simbrain.workspace.updater
+package org.simbrain.util
 
 /**
- * Classes that implement this interface describe individual actions that
- * together comprise a workspace update.
- *
- * @author jyoshimi
+ * Executable actions and a description for those actions. Used by [org.simbrain.workspace.updater.WorkspaceUpdater] and by [org.simbrain.network.core.NetworkUpdateManager]
  */
 abstract class UpdateAction(
 

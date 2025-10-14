@@ -1,5 +1,6 @@
 package org.simbrain.workspace.updater
 
+import org.simbrain.util.UpdateAction
 import org.simbrain.workspace.WorkspaceComponent
 
 /**
@@ -7,7 +8,10 @@ import org.simbrain.workspace.WorkspaceComponent
  */
 class UpdateComponent(
     val component: WorkspaceComponent
-) : UpdateAction("Update ${component.name}") {
+) : UpdateAction(
+    "Update ${component.name}",
+    "An action that updates ${component.name}"
+) {
     override suspend fun run() {
         component.update()
     }

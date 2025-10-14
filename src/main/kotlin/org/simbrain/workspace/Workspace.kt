@@ -6,14 +6,14 @@ import org.simbrain.custom_sims.NewSimulation
 import org.simbrain.custom_sims.simulations
 import org.simbrain.docviewer.DocViewer
 import org.simbrain.util.SimpleIdManager
+import org.simbrain.util.UpdateAction
+import org.simbrain.util.updateAction
 import org.simbrain.workspace.couplings.Coupling
 import org.simbrain.workspace.couplings.CouplingManager
 import org.simbrain.workspace.events.WorkspaceEvents
 import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.workspace.serialization.WorkspaceSerializer
-import org.simbrain.workspace.updater.UpdateAction
 import org.simbrain.workspace.updater.WorkspaceUpdater
-import org.simbrain.workspace.updater.updateAction
 import java.io.*
 import java.util.*
 

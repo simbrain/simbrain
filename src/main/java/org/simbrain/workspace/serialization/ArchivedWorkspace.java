@@ -2,11 +2,15 @@ package org.simbrain.workspace.serialization;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
+import org.simbrain.util.UpdateAction;
 import org.simbrain.util.XStreamUtils;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.couplings.Coupling;
-import org.simbrain.workspace.updater.*;
+import org.simbrain.workspace.updater.UpdateAllAction;
+import org.simbrain.workspace.updater.UpdateComponent;
+import org.simbrain.workspace.updater.UpdateCoupling;
+import org.simbrain.workspace.updater.WorkspaceUpdater;
 
 import java.io.OutputStream;
 import java.lang.reflect.Constructor;

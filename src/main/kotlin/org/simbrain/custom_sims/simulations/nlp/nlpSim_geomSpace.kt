@@ -7,7 +7,7 @@ import org.simbrain.util.point
 import org.simbrain.util.projection.DataPoint
 import org.simbrain.util.projection.HaloColoringManager
 import org.simbrain.util.projection.PCAProjection
-import org.simbrain.workspace.updater.updateAction
+import org.simbrain.util.updateAction
 import org.simbrain.world.textworld.EmbeddingType
 import org.simbrain.world.textworld.TokenEmbeddingBuilder
 

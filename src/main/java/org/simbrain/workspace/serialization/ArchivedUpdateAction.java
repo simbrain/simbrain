@@ -1,7 +1,7 @@
 package org.simbrain.workspace.serialization;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
-import org.simbrain.workspace.updater.UpdateAction;
+import org.simbrain.util.UpdateAction;
 
 /**
  * A persistable form of update action that can be used to recreate the

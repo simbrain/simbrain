@@ -2,6 +2,7 @@ package org.simbrain.workspace.updater
 
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import org.simbrain.util.UpdateAction
 import org.simbrain.workspace.gui.PerformanceMonitorPanel
 import kotlin.system.measureNanoTime
 

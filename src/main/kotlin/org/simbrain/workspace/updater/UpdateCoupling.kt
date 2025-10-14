@@ -1,5 +1,6 @@
 package org.simbrain.workspace.updater
 
+import org.simbrain.util.UpdateAction
 import org.simbrain.workspace.couplings.Coupling
 
 /**

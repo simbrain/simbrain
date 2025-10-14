@@ -7,7 +7,6 @@ import org.simbrain.network.layouts.LineLayout
 import org.simbrain.util.*
 import org.simbrain.util.projection.DataPoint
 import org.simbrain.util.projection.HaloColoringManager
-import org.simbrain.workspace.updater.updateAction
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.sensors.SmellSensor
 import java.awt.geom.Point2D

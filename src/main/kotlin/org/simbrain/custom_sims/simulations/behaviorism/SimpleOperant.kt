@@ -9,9 +9,9 @@ import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.place
+import org.simbrain.util.updateAction
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.gui.SimbrainDesktop
-import org.simbrain.workspace.updater.updateAction
 import kotlin.math.max
 
 /**

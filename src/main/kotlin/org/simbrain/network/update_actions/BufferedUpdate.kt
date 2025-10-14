@@ -1,7 +1,7 @@
 package org.simbrain.network.update_actions
 
 import org.simbrain.network.core.Network
-import org.simbrain.workspace.updater.UpdateAction
+import org.simbrain.util.UpdateAction
 
 /**
  * Buffered update of all network models. Write values to appropriate buffers. Then read all values from them,

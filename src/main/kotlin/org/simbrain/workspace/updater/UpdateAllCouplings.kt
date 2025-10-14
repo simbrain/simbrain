@@ -2,6 +2,7 @@ package org.simbrain.workspace.updater
 
 import kotlinx.coroutines.coroutineScope
 import org.pmw.tinylog.Logger
+import org.simbrain.util.UpdateAction
 
 /**
  * This is the default action for all workspace updates.

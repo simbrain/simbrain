@@ -3,7 +3,7 @@ package org.simbrain.network.gui;
 import org.simbrain.network.core.Network;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
-import org.simbrain.workspace.updater.UpdateAction;
+import org.simbrain.util.UpdateAction;
 
 import javax.swing.*;
 import java.awt.*;

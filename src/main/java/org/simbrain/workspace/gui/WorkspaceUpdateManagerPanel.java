@@ -2,8 +2,8 @@ package org.simbrain.workspace.gui;
 
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.UpdateAction;
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.updater.UpdateAction;
 import org.simbrain.workspace.updater.UpdateActionManager.UpdateManagerListener;
 
 import javax.swing.*;

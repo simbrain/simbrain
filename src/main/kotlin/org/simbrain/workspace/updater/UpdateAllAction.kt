@@ -4,6 +4,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import org.pmw.tinylog.Logger
+import org.simbrain.util.UpdateAction
 
 /**
  * This is the default action for all workspace updates.

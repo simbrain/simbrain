@@ -8,7 +8,7 @@ import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.place
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.toMatrix
-import org.simbrain.workspace.updater.updateAction
+import org.simbrain.util.updateAction
 
 /**
  * Demonstration of representational capacities of recurrent networks based on

@@ -546,11 +546,12 @@ object SimbrainDesktop {
 
     private fun createHelpMenu(): JMenu {
         val helpMenu = JMenu("Help")
-        helpMenu.add(ShowHelpAction("Main help", "https://docs.simbrain.net/"))
+        helpMenu.add(ShowHelpAction("Documentation", "https://docs.simbrain.net/"))
+        helpMenu.add(ShowHelpAction("Quick start", "https://docs.simbrain.net/docs/quickstart.html"))
+        helpMenu.add(ShowHelpAction("Keyboard shortcuts", "https://docs.simbrain.net/docs/shortcuts.html"))
         helpMenu.addSeparator()
         helpMenu.add(actionManager.toggleInfoDock)
         helpMenu.addSeparator()
-        helpMenu.add(ShowHelpAction("Quick start and shortcuts", "https://docs.simbrain.net/docs/quickstart.html"))
         helpMenu.add(ShowHelpAction("Credits", "https://simbrain.net/SimbrainCredits.html"))
         
         // Add About menu item for non-macOS platforms (macOS has native About menu)

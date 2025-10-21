@@ -16,6 +16,7 @@ import org.simbrain.util.*
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.genericframe.GenericJFrame
 import org.simbrain.util.genericframe.GenericJInternalFrame
+import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.util.widgets.ShowHelpAction
 import org.simbrain.util.widgets.ToggleButton
 import org.simbrain.workspace.Workspace
@@ -832,9 +833,24 @@ object SimbrainDesktop {
         val simulationChooser = SFileChooser(WorkspacePreferences.simulationDirectory, "Zip Archive", "zip")
         val simFile = simulationChooser.showOpenDialog()
         if (simFile != null) {
-            workspace.openWorkspace(simFile, useDesktop = true)
-            WorkspacePreferences.simulationDirectory = simulationChooser.currentLocation!!
-            workspace.currentFile = simFile
+            val progressWindow = ProgressWindow(100, "Loading workspace...")
+            progressWindow.minimumSize = Dimension(300, 100)
+            progressWindow.setLocationRelativeTo(null)
+            
+            try {
+                workspace.openWorkspace(simFile, useDesktop = true) { current, total ->
+                    swingInvokeLater {
+                        progressWindow.progressBar.maximum = total
+                        progressWindow.value = current
+                        progressWindow.text = "Loading components: $current / $total"
+                    }
+                }
+                WorkspacePreferences.simulationDirectory = simulationChooser.currentLocation!!
+                workspace.currentFile = simFile
+            } finally {
+                // Close progress window when done
+                progressWindow.close()
+            }
         }
     }
 

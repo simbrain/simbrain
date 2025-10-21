@@ -177,16 +177,17 @@ class WorkspaceSerializer(val workspace: Workspace) {
      * Creates a workspace from a zip compressed input stream.
      *
      * @param stream The stream to read from. This is expected to be zip compressed.
+     * @param progressCallback Optional callback for tracking deserialization progress (current, total)
      * @throws IOException if an IO error occurs.
      */
     @Throws(IOException::class)
-    suspend fun deserialize(stream: InputStream) {
+    suspend fun deserialize(stream: InputStream, progressCallback: ((Int, Int) -> Unit)? = null) {
         val byteArrays = processInputStream(stream)
         val archive =
             ArchivedWorkspace.xstream().fromXML(ByteArrayInputStream(byteArrays["contents.xml"])) as ArchivedWorkspace
 
         val deserializer = WorkspaceComponentDeserializer()
-        deserializeComponents(archive, deserializer, byteArrays)
+        deserializeComponents(archive, deserializer, byteArrays, progressCallback)
 
         deserializeCouplings(archive)
         // deserializeUpdateActions(archive, deserializer);
@@ -248,9 +249,13 @@ class WorkspaceSerializer(val workspace: Workspace) {
     private suspend fun deserializeComponents(
         archive: ArchivedWorkspace,
         deserializer: WorkspaceComponentDeserializer,
-        byteArrays: Map<String, ByteArray?>
+        byteArrays: Map<String, ByteArray?>,
+        progressCallback: ((Int, Int) -> Unit)? = null
     ) {
         if (archive.archivedComponents != null) {
+            val totalComponents = archive.archivedComponents.size
+            var currentComponent = 0
+            
             for (archivedComponent in archive.archivedComponents) {
                 try {
                     val wc = deserializer.deserializeWorkspaceComponent(
@@ -265,6 +270,10 @@ class WorkspaceSerializer(val workspace: Workspace) {
                         val desktopComponent = getDesktopComponent(wc)
                         desktopComponent.parentFrame.bounds = bounds
                     }
+                    
+                    // Update progress after successfully loading each component
+                    currentComponent++
+                    progressCallback?.invoke(currentComponent, totalComponents)
                 } catch (ex: Exception) {
                     ex.printStackTrace()
                     val message = String.format("Failed to deserialize component %s.", archivedComponent.name)

@@ -315,14 +315,14 @@ class Workspace: CoroutineScope {
         savedTime = time
     }
 
-    suspend fun openWorkspace(theFile: File?, useDesktop: Boolean = false) {
+    suspend fun openWorkspace(theFile: File?, useDesktop: Boolean = false, progressCallback: ((Int, Int) -> Unit)? = null) {
         stop()
         val serializer = WorkspaceSerializer(this)
         try {
             if (theFile != null) {
                 clearWorkspace()
                 withContext(Dispatchers.IO) {
-                    serializer.deserialize(FileInputStream(theFile))
+                    serializer.deserialize(FileInputStream(theFile), progressCallback)
                 }
                 currentFile = theFile
                 simulations.items.firstNotNullOfOrNull { (_, sim) ->

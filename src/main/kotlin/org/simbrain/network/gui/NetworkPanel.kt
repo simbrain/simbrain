@@ -656,11 +656,9 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     }
 
     /**
-     * Connect free weights using the default connection strategy
+     * Connect free weights using AllToAll with 100% excitatory and no self-connections by default
      */
     fun connectFreeWeights(allowSelfConnection: Boolean = false) {
-        // TODO: For large numbers of connections maybe pop up a warning and depending on button pressed make the
-        // weights automatically be invisible
         with(selectionManager) {
             val sourceNeurons = filterSelectedSourceModels<Neuron>() +
                     filterSelectedSourceModels<NeuronCollection>().flatMap { it.neuronList } +
@@ -668,14 +666,9 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             val targetNeurons = filterSelectedModels<Neuron>() +
                     filterSelectedModels<NeuronCollection>().flatMap { it.neuronList } +
                     filterSelectedModels<NeuronGroup>().flatMap { it.neuronList }
-            val synapses = NetworkPreferences.connectionStrategy.copy().also {
-                it.percentExcitatory = 100.0
-                when (it) {
-                    is AllToAll -> it.allowSelfConnection = allowSelfConnection
-                    is Sparse -> it.allowSelfConnection = allowSelfConnection
-                    is FixedDegree -> it.allowSelfConnections = allowSelfConnection
-                    is RadialProbabilistic -> it.allowSelfConnections = allowSelfConnection
-                }
+            val synapses = AllToAll().apply {
+                this.allowSelfConnection = allowSelfConnection
+                this.percentExcitatory = 100.0
             }.connectNeurons(sourceNeurons, targetNeurons)
             synapses.addToNetworkAsync(network)
             undoManager.addUndoableAction(

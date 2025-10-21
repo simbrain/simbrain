@@ -195,7 +195,7 @@ object NetworkPreferences: PreferenceHolder() {
 
     @UserParameter(
         label = "Default connection strategy",
-        description = "Default method for connecting neurons when creating synapses.",
+        description = "Default method for connecting neurons when creating synapses. Applied when using the 1-3 trick (press 1 to set sources, then 3 to connect with this strategy).",
         tab = "Connections",
         order = 10
     )

@@ -858,6 +858,21 @@ object SimbrainDesktop {
      * Show a save-as dialog.
      */
     fun saveAs() {
+        saveAs(checkForProblems = true)
+    }
+
+    /**
+     * Show a save-as dialog.
+     * @param checkForProblems whether to check for problematic save scenarios and show warning
+     */
+    private fun saveAs(checkForProblems: Boolean) {
+
+        // Check if save would be problematic and show warning before file chooser
+        if (checkForProblems && workspace.isSaveProblematic(this)) {
+            if (!showSaveWarningDialog()) {
+                return // User cancelled
+            }
+        }
 
         // Create the file chooser
         val chooser = SFileChooser(WorkspacePreferences.simulationDirectory, "Zip Archive", "zip")
@@ -888,10 +903,17 @@ object SimbrainDesktop {
 
         // Ignore the save command if there are no changes
         if (workspace.changesExist()) {
+            // Check if save would be problematic and show warning
+            if (workspace.isSaveProblematic(this)) {
+                if (!showSaveWarningDialog()) {
+                    return // User cancelled
+                }
+            }
+            
             if (workspace.currentFile != null) {
                 save(workspace.currentFile)
             } else {
-                saveAs() // Show save-as if there is no current file.
+                saveAs(checkForProblems = false) // Warning already shown above
             }
         }
     }
@@ -906,6 +928,68 @@ object SimbrainDesktop {
             frame.title = file.name
             workspace.save(file)
         }
+    }
+
+    /**
+     * Show a warning dialog when saving a workspace with custom update actions or control panels
+     * that won't be restored on reopen.
+     *
+     * @return true if user wants to proceed with save, false if cancelled
+     */
+    private fun showSaveWarningDialog(): Boolean {
+        // Get the default dialog font
+        val font = UIManager.getFont("Label.font")
+        val fontFamily = font.family
+        val fontSize = font.size
+        
+        val message = """
+            <html>
+            <body style='width: 400px; padding: 10px; font-family: $fontFamily; font-size: ${fontSize}pt;'>
+            <p>This workspace contains custom update actions or control panels
+            that will <b>NOT</b> be restored when reopening.</p>
+            
+            <p>To make this workspace reopenable, the simulation must:</p>
+            <ul>
+            <li>Have a unique simulationId (e.g., newSim("my_sim_id"))</li>
+            <li>Register a reopen function with .registerReopenFunction()</li>
+            </ul>
+            
+            <p>For more information, see:<br>
+            <a href="https://docs.simbrain.net/docs/simulations/#saving-and-reopening-simulations">
+            https://docs.simbrain.net/docs/simulations/#saving-and-reopening-simulations</a></p>
+            
+            <p>Do you want to save anyway?</p>
+            </body>
+            </html>
+        """.trimIndent()
+        
+        // Create a JEditorPane to display HTML with clickable links
+        val editorPane = JEditorPane("text/html", message).apply {
+            isEditable = false
+            isOpaque = false
+            addHyperlinkListener { e ->
+                if (e.eventType == HyperlinkEvent.EventType.ACTIVATED) {
+                    try {
+                        Desktop.getDesktop().browse(e.url.toURI())
+                    } catch (ex: Exception) {
+                        ex.printStackTrace()
+                    }
+                }
+            }
+        }
+        
+        val options = arrayOf("Yes", "No")
+        val result = JOptionPane.showOptionDialog(
+            frame,
+            editorPane,
+            "Warning: Workspace May Not Reopen Correctly",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE,
+            null, // icon
+            options, // button labels
+            options[1] // initial value - "No" is the default
+        )
+        return result == 0 // 0 = Yes, 1 = No
     }
 
     /**

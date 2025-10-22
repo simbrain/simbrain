@@ -48,12 +48,16 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
         initialPosition
     ) {
 
+        inputLayer.label = "Input"
+        
         hiddenLayer = layerList[1].also {
             it.updateRule = SigmoidalRule()
+            it.label = "Hidden"
         }
 
         contextLayer = NeuronArray(numHiddenNodes).apply {
             updateRule = LinearRule()
+            label = "Context"
         }
         contextLayer.fillActivations(.5)
         addModels(contextLayer)
@@ -61,6 +65,7 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
         inputLayer.isClamped = true
         contextLayer.isClamped = true
 
+        outputLayer.label = "Output"
         outputLayer.updateRule = SigmoidalRule()
 
         alignNetworkModels(inputLayer, contextLayer, Alignment.HORIZONTAL)

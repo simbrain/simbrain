@@ -41,6 +41,7 @@ open class FeedForward : Subnetwork {
      */
     constructor(nodesPerLayer: IntArray, initialPosition: Point2D?): super() {
         inputLayer = NeuronArray(nodesPerLayer[0])
+        inputLayer.label = "Input"
         addModel(inputLayer)
         layerList.add(inputLayer)
 
@@ -50,6 +51,12 @@ open class FeedForward : Subnetwork {
         // Make hidden layers and output layer
         for (i in 1 until nodesPerLayer.size) {
             val hiddenLayer = NeuronArray(nodesPerLayer[i])
+            if (i < nodesPerLayer.size - 1) {
+                val numHiddenLayers = nodesPerLayer.size - 2
+                hiddenLayer.label = if (numHiddenLayers == 1) "Hidden" else "Hidden $i"
+            } else {
+                hiddenLayer.label = "Output"
+            }
             addModel(hiddenLayer)
             layerList.add(hiddenLayer)
             offsetNetworkModel(
@@ -127,6 +134,7 @@ open class FeedForward : Subnetwork {
 
         // Copy input layer
         copy.inputLayer = inputLayer.copy()
+        copy.inputLayer.label = "Input"
         copy.addModel(copy.inputLayer)
         copy.layerList.add(copy.inputLayer)
 
@@ -136,6 +144,12 @@ open class FeedForward : Subnetwork {
         // Copy hidden layers and output layer
         for (i in 1 until layerList.size) {
             val layer = layerList[i].copy()
+            if (i < layerList.size - 1) {
+                val numHiddenLayers = layerList.size - 2
+                layer.label = if (numHiddenLayers == 1) "Hidden" else "Hidden $i"
+            } else {
+                layer.label = "Output"
+            }
             copy.addModel(layer)
             copy.layerList.add(layer)
 

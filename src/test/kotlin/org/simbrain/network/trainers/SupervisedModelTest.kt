@@ -47,9 +47,9 @@ class SupervisedModelTest {
 
         val backpropNetwork = BackpropNetwork(intArrayOf(2,2,1), null).also { network1.addNetworkModelsAsync(it) }
 
-        val layer1 = NeuronArray(2).also { network2.addNetworkModelsAsync(it) }.also { it.isClamped = true }
-        val layer2 = NeuronArray(2).also { network2.addNetworkModelsAsync(it) }.also { it.updateRule = SigmoidalRule() }
-        val layer3 = NeuronArray(1).also { network2.addNetworkModelsAsync(it) }.also { it.updateRule = SigmoidalRule() }
+        val layer1 = NeuronArray(2).also { network2.addNetworkModelsAsync(it) }.also { it.isClamped = true; it.label = "Input" }
+        val layer2 = NeuronArray(2).also { network2.addNetworkModelsAsync(it) }.also { it.updateRule = SigmoidalRule(); it.label = "Hidden" }
+        val layer3 = NeuronArray(1).also { network2.addNetworkModelsAsync(it) }.also { it.updateRule = SigmoidalRule(); it.label = "Output" }
 
         val wm1 = WeightMatrix(layer1, layer2).also { network2.addNetworkModelsAsync(it) }
         val wm2 = WeightMatrix(layer2, layer3).also { network2.addNetworkModelsAsync(it) }

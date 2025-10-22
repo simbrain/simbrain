@@ -3,6 +3,7 @@ package org.simbrain.network.trainers
 import org.simbrain.util.UserParameter
 import org.simbrain.util.applyFunction
 import org.simbrain.util.propertyeditor.CopyableObject
+import org.simbrain.util.propertyeditor.CustomTypeName
 import smile.math.matrix.Matrix
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -119,6 +120,7 @@ class AdamOptimizer(
  *
  * Reference: "Decoupled Weight Decay Regularization" by Loshchilov & Hutter (2017)
  */
+@CustomTypeName("AdamW Optimizer")
 class AdamWOptimizer(
     @UserParameter(
         label = "Beta1", 

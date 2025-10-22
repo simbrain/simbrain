@@ -197,10 +197,10 @@ class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork:
         val errorLabel = labelPanel.addItem(errorDescriptionString(), errorValue)
         
         // Add accuracy labels for softmax networks (always create, but conditionally show)
-        val trainingAccuracyValue = JLabel(trainer.lastTrainingAccuracy?.format(3) ?: "N/A")
+        val trainingAccuracyValue = JLabel(trainer.lastTrainingAccuracy?.let { "${(it * 100).format(1)}%" } ?: "N/A")
         val trainingAccuracyLabel = labelPanel.addItem("Training Accuracy:", trainingAccuracyValue)
         
-        val testingAccuracyValue = JLabel(trainer.lastTestingAccuracy?.format(3) ?: "N/A")
+        val testingAccuracyValue = JLabel(trainer.lastTestingAccuracy?.let { "${(it * 100).format(1)}%" } ?: "N/A")
         val testingAccuracyLabel = labelPanel.addItem("Testing Accuracy:", testingAccuracyValue)
         
         // Function to update accuracy label visibility
@@ -230,12 +230,12 @@ class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork:
             
             // Update training accuracy value (only when available)
             trainingStats.trainingAccuracy?.let { accuracy ->
-                trainingAccuracyValue.text = accuracy.format(3)
+                trainingAccuracyValue.text = "${(accuracy * 100).format(1)}%"
             }
             
             // Update testing accuracy value (only when available, keep previous value otherwise)
             trainingStats.testingAccuracy?.let { accuracy ->
-                testingAccuracyValue.text = accuracy.format(3)
+                testingAccuracyValue.text = "${(accuracy * 100).format(1)}%"
             }
         }
 

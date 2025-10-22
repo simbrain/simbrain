@@ -49,7 +49,7 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
 
     constructor(numNeurons: Int): super() {
 
-        this.trainingData = randomMutableList(10, numNeurons)
+        this.trainingData = mutableListOf()
 
         // Create main neuron group
         neuronGroup = NeuronGroup(numNeurons)

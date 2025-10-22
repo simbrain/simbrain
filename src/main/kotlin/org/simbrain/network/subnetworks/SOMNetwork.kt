@@ -13,7 +13,6 @@ import org.simbrain.network.util.offsetNeuronCollections
 import org.simbrain.util.UserParameter
 import org.simbrain.util.copy
 import org.simbrain.util.propertyeditor.EditableObject
-import org.simbrain.util.randomMutableList
 import org.simbrain.util.stats.ProbabilityDistribution
 
 /**
@@ -50,7 +49,7 @@ class SOMNetwork : Subnetwork, UnsupervisedNetwork {
         inputLayer.label = "Input layer"
         inputLayer.isClamped = true
 
-        trainingData = randomMutableList(10, numInputNeurons)
+        trainingData = mutableListOf()
 
         // Connect layers
         val sg = SynapseGroup(inputLayer, som, AllToAll())

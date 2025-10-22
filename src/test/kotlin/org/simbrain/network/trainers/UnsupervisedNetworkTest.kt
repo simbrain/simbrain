@@ -207,8 +207,8 @@ class UnsupervisedNetworkTest {
     fun `test training data modification and persistence`() {
         val competitiveNet = CompetitiveNetwork(2, 3)
         
-        // Original data should not be empty (from constructor)
-        assertTrue(competitiveNet.trainingData.isNotEmpty() || competitiveNet.testingData.isNotEmpty())
+        // Original data should be empty (from constructor)
+        assertTrue(competitiveNet.trainingData.isEmpty() && competitiveNet.testingData.isEmpty())
         
         // Set new training data
         val newData = mutableListOf(

@@ -14,7 +14,6 @@ import org.simbrain.network.util.offsetNeuronCollections
 import org.simbrain.util.UserParameter
 import org.simbrain.util.copy
 import org.simbrain.util.propertyeditor.EditableObject
-import org.simbrain.util.randomMutableList
 import org.simbrain.util.stats.ProbabilityDistribution
 
 /**
@@ -42,7 +41,7 @@ class CompetitiveNetwork : Subnetwork, UnsupervisedNetwork {
 
     constructor(numInputNeurons: Int, numCompetitiveNeurons: Int): super() {
 
-        trainingData = randomMutableList(defaultRowsInputData, numInputNeurons)
+        trainingData = mutableListOf()
 
         competitive = CompetitiveGroup(numCompetitiveNeurons)
         competitive.label = "Competitive Group"

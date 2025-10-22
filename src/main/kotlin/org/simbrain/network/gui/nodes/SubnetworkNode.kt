@@ -124,6 +124,10 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
     context(NetworkPanel)
     protected fun JPopupMenu.applyUnsupervisedActions(net: UnsupervisedNetwork) = apply {
         applyBasicActions()
+        add(createAction("Add Current Pattern to Training Data") {
+            net.trainingData.add(net.inputLayer.activationArray.toMutableList())
+        })
+        addSeparator()
         add(createAction("Train...") {
             getUnsupervisedTrainingPanel(net) {
                 net.trainOnCurrentPattern()

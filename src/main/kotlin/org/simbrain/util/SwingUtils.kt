@@ -311,7 +311,7 @@ fun <E : EditableObject> E.createEditorDialog(
 @JvmOverloads
 @JvmName("createEditorDialogFromList")
 fun <E : EditableObject> List<E>.createEditorDialog(
-    titleName: String = "Edit $size ${first()::class.simpleName?.convertCamelCaseToSpaces()}",
+    titleName: String = "Edit $size ${first()::class.simpleName?.convertCamelCaseToSpaces()}${if (size > 1) "s" else ""}",
     block: (List<E>) -> Unit = {}
 ): StandardDialog {
     val editor = AnnotatedPropertyEditor(this)

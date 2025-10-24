@@ -19,7 +19,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
 
 import static org.simbrain.network.core.LocatableModelKt.getCenterLocation;
 import static org.simbrain.network.core.LocatableModelKt.getMinY;
-import static org.simbrain.util.SwingUtilsKt.getSwingDispatcher;
+import static org.simbrain.util.SwingUtilsKt.*;
 
 public abstract class AbstractNeuronCollectionNode extends ScreenElement {
 
@@ -74,6 +74,10 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
      */
     public void selectNeurons() {
         getNeuronNodes().stream().map(NeuronNode::getNeuron).forEach(NetworkModel::select);
+    }
+
+    public void editNeurons() {
+        display(createEditorDialogFromList(getNeuronNodes().stream().map(NeuronNode::getNeuron).toList()));
     }
 
     /**

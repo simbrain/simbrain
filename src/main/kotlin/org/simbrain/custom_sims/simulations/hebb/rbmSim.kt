@@ -36,8 +36,8 @@ val rbmSim = newSim {
             # What to do
             
             - Click train on all patterns or click a pattern and click train on current pattern
-            - To test the trained network, click on the visible layer, click `R` to randomize it, and click space to see if the pattern is recreated
-            - Try training in different amounts on different groups of patterns and seeing how well they are remembered.
+            - To test the trained network, click on the visible layer, click `R` to randomize it, and click space repeatedly to see if on of the training patterns is recreated
+            - Try training different patterns by different amounts to see how well they are remembered.
 
         """.trimIndent()
     )

@@ -346,51 +346,142 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
 
     addSidebarInfo(
         """
-        # Introduction
+        # Tiny Language Model
         
-        A simple GPT-like model with one block and one head.
+        A simplified GPT-style language model with a single transformer block. This simulation demonstrates how neural networks can learn to predict text patterns and generate new text based on training data. The model learns from sequences of text and can generate continuations based on prompts.
         
-        # Configuration / Startup
+        # Simulation Details
         
-        When you first start this script a dialog opens that allows you to set how large the context window is and also to select a document you will use to train the model.
+        The simulation consists of several interconnected components:
         
-        Note: The longer the document, the slower training will be.
-
-        # Training Your Model
+        ## Text Inputs Component
         
-        Click the "supervised model" interaction box and use the training dialog as explained [here](https://docs.simbrain.net/docs/network/trainingNetworks.html).
-
-        # Using the Model
+        The `Text Inputs` component at the left shows the current context window. This is where you enter prompts for the model to continue. The context window is a fixed-size sliding window of recent tokens that the model uses to predict what comes next.
         
-        At any time you can see how well the model is doing just by running the [workspace](https://docs.simbrain.net/docs/workspace/). You can put partial text of any length in the text world to see how it does with it. This is a "prompt".
+        ## Network Components
         
-        Note that no turn-taking machinery here. The network will just keep generating text until you stop it.
- 
-        # Save and Reopen
+        The network contains several key layers:
         
-        Once you have trained your model, you can save it. 
+        - **Inputs**: An activation sequence that holds the encoded context window. Each token is represented as a one-hot vector, and the full sequence forms a matrix.
         
-        NOTE: When reopening you must use the `Load workspace` button in the control panel below the text world.
+        - **Transformer block**: The core of the model. This layer processes the input sequence using self-attention and feed-forward transformations to create rich representations that capture patterns in the text.
         
-        # Training Data
+        - **Softmax sequence**: Converts the transformer outputs into probability distributions over possible next tokens. Each position in the sequence predicts the next token at that position. Temperature controls randomness (lower = more deterministic, higher = more random).
         
-        The model uses sequence-to-sequence training with sliding windows over the training text. Each training example consists of a context window of tokens, where every position in the sequence learns to predict the next token simultaneously. 
+        - **Predicted next token**: A separate output layer that shows the probability distribution for the next token that will be generated. This is what gets sampled to produce new text.
         
-        For example, if the context size is 4 and we have the text "hi there old friend", the training creates:
-        - Input sequence: ["hi", "there", "old", "friend"]  
-        - Target sequence: ["there", "old", "friend", "next_token"]
+        ## Weight Matrices
         
-        Each position in the input learns to predict its corresponding position in the target (shifted by 1). This allows the transformer to learn next-token prediction at every position in parallel, which is more efficient than autoregressive "christmas tree" training.
+        Two key weight matrices connect these components:
         
-        To see the document used to train the model, in the text world open the word embedding viewer and click "view embedding word source".
+        - **Embedding**: Maps input tokens into the transformer's representation space
+        - **Unembedding**: Maps transformer outputs back to token probabilities
         
-        # What to try
-        - Try different training sets
-        - Experiment with temperature and different sampling strategies:
-          - **Greedy**: Always picks the most probable token (deterministic)
-          - **Top-K**: Samples from the K most probable tokens (good balance)
-          - **Top-P (Nucleus)**: Samples from tokens whose cumulative probability exceeds P
-        - Adjust temperature on the Softmax Sequence to control randomness (higher = more random)
+        These matrices are what the model learns during training.
+        
+        ## Configuration
+        
+        When you first start this simulation, a dialog appears with these options:
+        
+        - **Context Size**: Number of tokens the model can see at once. Larger contexts allow the model to capture longer-range patterns but require more memory and training time.
+        
+        - **Embedding Dimension**: Size of the internal representation vectors. Higher dimensions allow more expressive representations but require more training data.
+        
+        - **Hidden Size**: Number of units in the transformer's feed-forward layer.
+        
+        - **Training Text**: The document used to train the model. The longer the document, the more patterns the model can learn, but training will take longer.
+        
+        - **Test Text**: Optional separate text file for validation. If not provided, the training text is automatically split.
+        
+        - **Sampling Strategy**: How the model chooses the next token from the probability distribution (see experiments below).
+        
+        # What to Do
+        
+        ## Initial Setup
+        
+        When the simulation starts, you'll see a configuration dialog. Choose your settings or use the defaults. The simulation comes with several sample text files in the `simulations/texts/` directory.
+        
+        ## Training Your Model
+        
+        The model starts untrained. To train it:
+        
+        1. Click the `Supervised Model` interaction box in the network
+        2. Open the training dialog (see the [training networks documentation](https://docs.simbrain.net/docs/network/trainingNetworks.html) for details)
+        3. Click `Run` to train on your text corpus
+        4. Watch the error plots to monitor learning progress
+        
+        Training teaches the model to predict what token comes next based on context. The model learns patterns like common word sequences, grammar, and text structure.
+        
+        ## Using Your Trained Model
+        
+        Once trained, you can use the model to generate text:
+        
+        1. Type a prompt in the `Text Inputs` component (any text you want the model to continue)
+        2. Click the `Play` button in the main toolbar
+        3. Watch as the model generates new tokens, extending your prompt
+        4. The model will continue generating until you press `Stop`
+        
+        The `Predicted next token` layer shows the probability distribution over possible next tokens. Higher activations indicate more likely continuations.
+        
+        ## Saving and Reopening
+        
+        After training, save your workspace to preserve the learned weights. When reopening a saved workspace, use the `Load workspace` button in the control panel below the text world to properly restore the update actions.
+        
+        # Experiments
+        
+        ## Train on Different Text Types
+        
+        Try training on different text corpora to see how the model adapts:
+        
+        - `casual_texting_small.txt`: Informal conversational text
+        - `chess.txt`: Chess-related terminology and patterns
+        - `mlk.txt`: Formal speech text
+        - Your own text files
+        
+        Each text type will produce different learned patterns. A model trained on chess text will generate chess-related content, while one trained on casual text will produce more informal language.
+        
+        ## Adjust Context Size
+        
+        Experiment with different context sizes:
+        
+        - Small contexts (8-12 tokens): Faster training, captures local patterns
+        - Large contexts (24-48 tokens): Slower training, captures longer-range dependencies
+        
+        Try prompts that require different amounts of context to complete sensibly.
+        
+        ## Modify Sampling Strategies
+        
+        The sampling strategy determines how the model selects the next token. In the `Text Inputs` component, try different options:
+        
+        - **Greedy**: Always picks the most probable token. Produces deterministic, predictable output that may be repetitive.
+        
+        - **Top-K**: Randomly samples from the K most probable tokens. Good balance between creativity and coherence. Try K values from 3 to 10.
+        
+        - **Top-P (Nucleus)**: Samples from tokens whose cumulative probability exceeds P. More dynamic than Top-K. Try P values from 0.8 to 0.95.
+        
+        ## Adjust Temperature
+        
+        Click on the `Softmax sequence` layer and adjust its temperature parameter:
+        
+        - Low temperature (0.1-0.5): More confident, focused predictions (less random)
+        - Medium temperature (0.5-1.0): Balanced randomness
+        - High temperature (1.0-2.0): More diverse, creative, but potentially incoherent output
+        
+        Observe how temperature interacts with sampling strategy to affect generation quality.
+        
+        ## Regularization Experiments
+        
+        In the startup dialog's Regularization tab, try different settings:
+        
+        - **Weight Decay**: Prevents overfitting by penalizing large weights. Try values from 0.001 to 0.1.
+        - **Learning Rate Decay**: Gradually reduces the learning rate during training for more stable convergence.
+        - **AdamW vs Adam**: Compare the AdamW optimizer (with decoupled weight decay) to standard Adam.
+        
+        Regularization is especially important with small training datasets where overfitting is common.
+        
+        ## View Training Data
+        
+        To see what text the model was trained on, open the `Text Inputs` component, click the word embedding viewer button, and select `view embedding word source`. This shows the complete vocabulary and source text.
 
         """.trimIndent(),
         initiallyOpened = false

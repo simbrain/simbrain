@@ -105,7 +105,7 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
 
         // Selection submenu
         menu.addSeparator();
-        Action selectSynapses = new AbstractAction("Select Internal Neurons") {
+        Action selectSynapses = new AbstractAction("Select neurons") {
 
             {
                 // Main key binding is in Keybindings.kt. This is here just to force the binding to show in UI.
@@ -120,6 +120,15 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
 
         };
         menu.add(selectSynapses);
+        Action editNeurons = new AbstractAction("Edit neurons...") {
+
+            @Override
+            public void actionPerformed(final ActionEvent event) {
+                editNeurons();
+            }
+        };
+        menu.add(editNeurons);
+        menu.addSeparator();
         Action selectIncomingNodes = new AbstractAction("Select Incoming Synapses") {
             @Override
             public void actionPerformed(final ActionEvent event) {

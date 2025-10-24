@@ -90,7 +90,7 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
 
         // Selection submenu
         menu.addSeparator();
-        Action selectNeurons = new AbstractAction("Select Neurons") {
+        Action selectNeurons = new AbstractAction("Select neurons") {
             {
                 // Main key binding is in Keybindings.kt. This is here just to force the binding to show in UI.
                 putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, 0));
@@ -102,7 +102,7 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
             }
         };
         menu.add(selectNeurons);
-        Action editNeurons = new AbstractAction("Edit Neurons...") {
+        Action editNeurons = new AbstractAction("Edit neurons...") {
 
             @Override
             public void actionPerformed(final ActionEvent event) {

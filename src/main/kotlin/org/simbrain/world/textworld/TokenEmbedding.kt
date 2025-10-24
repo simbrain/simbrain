@@ -310,13 +310,19 @@ fun getEmbeddingTypeListForExtraction(): List<Class<out EditableObject>> {
     )
 }
 
-class ExtractEmbeddingOptions: EditableObject {
+class ExtractEmbeddingOptions(
+    /**
+     * If true, show document path selector. If false, document will be provided directly.
+     */
+    var showDocumentPath: Boolean = true
+): EditableObject {
     
     var documentPath by GuiEditable(
         initValue = "",
         description = "Text file to extract embeddings from",
         order = 0,
         useFileChooser = true,
+        conditionallyVisibleBy = ExtractEmbeddingOptions::showDocumentPath
     )
     
     var embeddingType: EmbeddingType<*> by GuiEditable(
@@ -334,8 +340,20 @@ class ExtractEmbeddingOptions: EditableObject {
     
     override val name: String get() = "Extract Embedding Options"
     
+    /**
+     * Build embedding from file path (when showDocumentPath is true).
+     */
     fun buildEmbedding(): TokenEmbedding {
         val docString = Utils.readFileContents(File(documentPath))
+        return embeddingType.build(tokenizer.also { it.initialize(docString) }, docString).also {
+            it.trainingDocument = docString
+        }
+    }
+    
+    /**
+     * Build embedding from provided document string (when showDocumentPath is false).
+     */
+    fun buildEmbeddingFromText(docString: String): TokenEmbedding {
         return embeddingType.build(tokenizer.also { it.initialize(docString) }, docString).also {
             it.trainingDocument = docString
         }

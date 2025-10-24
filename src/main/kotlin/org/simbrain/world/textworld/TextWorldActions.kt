@@ -49,6 +49,35 @@ fun createExtractEmbeddingAction(block: (TokenEmbedding) -> Unit) = createAction
 }
 
 /**
+ * Action for extracting embedding from the current text world document.
+ * This variant doesn't require file selection - it uses the text directly from the text world.
+ */
+val TextWorld.extractEmbeddingFromCurrentText
+    get() = createAction(
+        name = "Extract embedding from current text",
+        description = "Generate word embedding from the current text world document.",
+        iconPath = "menu_icons/Extract.png"
+    ) {
+        if (text.isEmpty()) {
+            showWarningDialog("No text in text world. Please load or enter some text first.")
+            return@createAction
+        }
+        
+        val options = ExtractEmbeddingOptions(showDocumentPath = false)
+        val editor = org.simbrain.util.propertyeditor.AnnotatedPropertyEditor(listOf(options))
+        val dialog = StandardDialog(editor).apply {
+            title = "Generate Word Embedding From Current Text"
+            
+            addCommitTask {
+                editor.commitChanges()
+                tokenEmbedding = options.buildEmbeddingFromText(text)
+            }
+        }
+        
+        dialog.display()
+    }
+
+/**
  * Action for viewing and editing the embedding.
  */
 val TextWorld.viewTokenEmbedding

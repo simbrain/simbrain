@@ -5,6 +5,7 @@ import kotlinx.coroutines.swing.Swing
 import org.simbrain.util.TokenizerResult
 import org.simbrain.util.widgets.SimbrainTextArea
 import org.simbrain.world.textworld.TextWorld
+import org.simbrain.world.textworld.extractEmbeddingFromCurrentText
 import org.simbrain.world.textworld.textWorldPrefs
 import org.simbrain.world.textworld.viewTokenEmbedding
 import java.awt.*
@@ -61,6 +62,7 @@ class TextWorldPanel(
 
         // Top toolbar
         val topToolBar = JToolBar()
+        topToolBar.add(world.extractEmbeddingFromCurrentText)
         topToolBar.add(world.viewTokenEmbedding)
         topToolBar.addSeparator()
         topToolBar.add(world.textWorldPrefs)

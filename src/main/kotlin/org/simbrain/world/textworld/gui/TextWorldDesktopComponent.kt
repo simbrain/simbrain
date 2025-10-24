@@ -131,6 +131,7 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
 
         // View Menu
         val viewMenu = JMenu("View")
+        viewMenu.add(world.extractEmbeddingFromCurrentText)
         viewMenu.add(world.viewTokenEmbedding)
         menuBar.add(viewMenu)
 

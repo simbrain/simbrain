@@ -12,8 +12,10 @@ import org.simbrain.network.util.Direction
 import org.simbrain.network.util.alignNetworkModels
 import org.simbrain.network.util.offsetNetworkModel
 import org.simbrain.util.*
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.util.propertyeditor.objectWrapper
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.workspace.updater.UpdateAllCouplings
@@ -323,6 +325,44 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
     withGui {
         place(textWorldComponent, 10, 10, 450, 350)
         place(networkComponent, 460, 10, 1000, 800)
+
+        // Create control panel for language model controls
+        createControlPanel("Language Model Controls", 10, 370) {
+
+            // Temperature control with slider and text field
+            addSliderWithTextField("Temperature", 0.01, 2.0, (softmaxSequence.updateRule as SoftmaxRule).temperature, 0.01) { temp ->
+                (softmaxSequence.updateRule as SoftmaxRule).temperature = temp
+            }
+
+            addSeparator()
+
+            // Quick generation button
+            addButton("Generate 10 Tokens") {
+                workspace.iterateSuspend(10)
+            }
+
+            addButton("Clear Text") {
+                textWorldComponent.world.text = ""
+            }
+
+            addSeparator()
+
+            addButton("Configure Sampling Strategy...") {
+                // Create a wrapper for the sampling strategy to edit it
+                val wrapper = objectWrapper("Sampling Strategy", textWorldComponent.world.samplingStrategy.copy() as SamplingStrategy)
+                val editor = AnnotatedPropertyEditor(wrapper)
+                val dialog = StandardDialog(editor).apply {
+                    title = "Configure Sampling Strategy"
+                    addCommitTask {
+                        editor.commitChanges()
+                        // Sync the edited value back to the TextWorld
+                        textWorldComponent.world.samplingStrategy = wrapper.editingObject as SamplingStrategy
+                    }
+                }
+                dialog.display()
+            }
+        }
+
         val textWorldDesktopComponent = SimbrainDesktop.getDesktopComponent(textWorldComponent)
         SimbrainDesktop.onboardingManager.showPopup(
             PopupConfig(

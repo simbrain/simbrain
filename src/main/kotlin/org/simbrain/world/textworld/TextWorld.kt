@@ -7,7 +7,6 @@ import org.simbrain.util.SimpleTokenizer
 import org.simbrain.util.TokenizerResult
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
-import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
@@ -119,12 +118,11 @@ class TextWorld : AttributeContainer, EditableObject {
     )
     var showTokenBoundaries = true
 
-    var samplingStrategy: SamplingStrategy by GuiEditable(
-        initValue = SamplingStrategy.TopP(),
-        description = "When given set of probabilities to select a token from the dictionary, how to sample from that distribution produce new tokens",
-        showDetails = false,
-        order = 100,
-    )
+    /**
+     * Sampling strategy for generating tokens from probability distributions.
+     * Used primarily by language model simulations.
+     */
+    var samplingStrategy: SamplingStrategy = SamplingStrategy.TopP()
 
     /**
      * Set main text without firing an event.

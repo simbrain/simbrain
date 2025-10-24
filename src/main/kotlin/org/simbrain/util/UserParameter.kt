@@ -93,4 +93,6 @@ annotation class UserParameter(
     val columnMode: Boolean = false,
 
     val useFileChooser: Boolean = false,
+
+    val fileChooserInitialDirectory: String = "",
 )

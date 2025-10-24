@@ -63,6 +63,7 @@ class GuiEditable<O : EditableObject, T>(
     val getter: (GuiEditableGetterContext<O, T>.() -> T)? = null,
     val setter: (GuiEditableSetterContext<O, T>.(T) -> Unit)? = null,
     val useFileChooser: Boolean = false,
+    val fileChooserInitialDirectory: String? = null,
     private val onUpdate: (UpdateFunctionContext<O, T>).() -> Unit = { }
 ) {
 
@@ -214,6 +215,7 @@ fun <O : EditableObject> UserParameter.toGuiEditable(obj: O, property: KProperty
         useLegacySetter = useLegacySetter,
         columnMode = columnMode,
         useFileChooser = useFileChooser,
+        fileChooserInitialDirectory = fileChooserInitialDirectory.ifEmpty { null },
         tab = tab,
         typeMapProvider = if (typeMapProvider.isNotEmpty()) {
             property.returnType
@@ -670,7 +672,7 @@ class StringWidget<O : EditableObject>(
                             null
                         }
                     }?.absolutePath
-                } ?: WorkspacePreferences.simulationDirectory
+                } ?: parameter.fileChooserInitialDirectory ?: WorkspacePreferences.simulationDirectory
                 SFileChooser(dir, description = "Open...").showOpenDialog()?.let { file ->
                     textField.text = file.absolutePath
                     changed = true

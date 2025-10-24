@@ -322,6 +322,7 @@ class ExtractEmbeddingOptions(
         description = "Text file to extract embeddings from",
         order = 0,
         useFileChooser = true,
+        fileChooserInitialDirectory = TextWorldPreferences.sampleTextsDirectory,
         conditionallyVisibleBy = ExtractEmbeddingOptions::showDocumentPath
     )
     

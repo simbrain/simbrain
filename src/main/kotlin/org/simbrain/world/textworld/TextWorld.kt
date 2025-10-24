@@ -120,7 +120,7 @@ class TextWorld : AttributeContainer, EditableObject {
     var showTokenBoundaries = true
 
     var samplingStrategy: SamplingStrategy by GuiEditable(
-        initValue = SamplingStrategy.TopK(k = 5),
+        initValue = SamplingStrategy.TopP(),
         description = "When given set of probabilities to select a token from the dictionary, how to sample from that distribution produce new tokens",
         showDetails = false,
         order = 100,

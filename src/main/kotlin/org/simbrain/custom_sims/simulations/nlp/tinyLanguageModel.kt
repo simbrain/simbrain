@@ -87,7 +87,7 @@ class TinyLanguageModelOptions(var showEmbeddingDimension: Boolean = true): Edit
     )
 
     var samplingStrategy: SamplingStrategy by GuiEditable(
-        initValue = SamplingStrategy.TopK(k = 5),
+        initValue = SamplingStrategy.TopP(),
         description = "How to sample from softmax to produce new tokens",
         showDetails = false,
         order = 50,
@@ -157,7 +157,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
             }
             
             // Parse sampling strategy
-            val samplingStrategyStr = jsonOptions.optString("samplingStrategy", "topk")
+            val samplingStrategyStr = jsonOptions.optString("samplingStrategy", "topp")
             samplingStrategy = when (samplingStrategyStr.lowercase()) {
                 "greedy" -> SamplingStrategy.Greedy
                 "topk" -> SamplingStrategy.TopK(

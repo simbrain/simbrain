@@ -28,7 +28,7 @@ sealed class SamplingStrategy: CopyableObject {
     data class TopK(@UserParameter(
         label = "k", 
         description = "Number of highest probability tokens to consider for sampling."
-    ) var k: Int) : SamplingStrategy() {
+    ) var k: Int = 5) : SamplingStrategy() {
         override fun sample(probabilities: DoubleArray, random: Random): Int {
             require(k > 0) { "k must be positive" }
             
@@ -62,7 +62,7 @@ sealed class SamplingStrategy: CopyableObject {
     data class TopP(@UserParameter(
         label = "p", 
         description = "Cumulative probability threshold for nucleus sampling. Higher values include more tokens (0.9 is typical)"
-    ) var p: Double) : SamplingStrategy() {
+    ) var p: Double = 0.9) : SamplingStrategy() {
         override fun sample(probabilities: DoubleArray, random: Random): Int {
             require(p in 0.0..1.0) { "p must be between 0.0 and 1.0" }
             

@@ -51,6 +51,7 @@ class ActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inpu
     @UserParameter(
         label = "Activations",
         description = "Activations in the sequence",
+        columnMode = true,
         order = 1)
     override var activations: Matrix = Matrix(sequenceSize, inputSize)
         set(value) {

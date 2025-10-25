@@ -7,6 +7,7 @@ import org.piccolo2d.nodes.PImage
 import org.piccolo2d.nodes.PText
 import org.simbrain.network.core.TransformerBlock
 import org.simbrain.network.gui.*
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.*
 import org.simbrain.util.table.MatrixDataFrame
@@ -120,6 +121,19 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
     override val margin = 10.0
 
     /**
+     * Get the shape string for a matrix, accounting for the weight matrix preference.
+     * If it's a weight matrix and the preference is set to source-target format (not target-source),
+     * return the transposed dimensions.
+     */
+    private fun Matrix.getShapeString(isWeightMatrix: Boolean = false): String {
+        return if (isWeightMatrix && !NetworkPreferences.weightMatrixTargetSource) {
+            "${ncol()} x ${nrow()}"
+        } else {
+            "${nrow()} x ${ncol()}"
+        }
+    }
+
+    /**
      * Create a new neuron array node.
      *
      * @param np Reference to NetworkPanel
@@ -153,10 +167,12 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
         width: kotlin.Double,
         height: kotlin.Double,
         strokeWidth: kotlin.Float = 1f,
+        isWeightMatrix: Boolean = false,
         offset: (PImage) -> Unit = { }
     ) {
         image.removeAllChildren()
         val img = matrix.flatten().toSimbrainColorImage(matrix.ncol(), matrix.nrow())
+            .let { if (isWeightMatrix && !NetworkPreferences.weightMatrixTargetSource) it.transposed() else it }
         image.image = img
         image.setBounds(
             image.x, image.y,
@@ -175,11 +191,11 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
         if (indexOfChild(matrixGroup) == -1) {
             mainNode.addChild(matrixGroup)
         }
-        renderImage(qMatrixImage, transformerBlock.Q, 60.0, 60.0, strokeWidth = 2f)
-        renderImage(kMatrixImage, transformerBlock.K, 60.0, 60.0, strokeWidth = 2f) {
+        renderImage(qMatrixImage, transformerBlock.Q, 60.0, 60.0, strokeWidth = 2f, isWeightMatrix = true)
+        renderImage(kMatrixImage, transformerBlock.K, 60.0, 60.0, strokeWidth = 2f, isWeightMatrix = true) {
             it.anchorCenterLeft().alignTo(qMatrixImage.anchorCenterRight(), offsetX = 20.0)
         }
-        renderImage(vMatrixImage, transformerBlock.V, 60.0, 60.0, strokeWidth = 2f) {
+        renderImage(vMatrixImage, transformerBlock.V, 60.0, 60.0, strokeWidth = 2f, isWeightMatrix = true) {
             it.anchorCenterLeft().alignTo(kMatrixImage.anchorCenterRight(), offsetX = 60.0)
         }
         matrixGroup.anchorRelative(0.3, 0.0).alignTo(selfAttentionImage.anchorCenterBottom(), offsetY = 100.0)
@@ -207,10 +223,10 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
         renderImage(feedForwardOutputImage, transformerBlock.activations, 40.0, 40.0) {
             it.anchorCenterBottom().alignTo(feedForwardHiddenImage.anchorCenterTop(), offsetY = -16.0)
         }
-        renderImage(feedForwardW1Image, transformerBlock.W1, 40.0, 40.0, strokeWidth = 2f) {
+        renderImage(feedForwardW1Image, transformerBlock.W1, 40.0, 40.0, strokeWidth = 2f, isWeightMatrix = true) {
             it.anchorCenterLeft().alignTo(feedForwardInputImage.anchorTopRight(), offsetX = 32.0, offsetY = -8.0)
         }
-        renderImage(feedForwardW2Image, transformerBlock.W2, 40.0, 40.0, strokeWidth = 2f) {
+        renderImage(feedForwardW2Image, transformerBlock.W2, 40.0, 40.0, strokeWidth = 2f, isWeightMatrix = true) {
             it.anchorCenterLeft().alignTo(feedForwardHiddenImage.anchorTopRight(), offsetX = 32.0, offsetY = -8.0)
         }
         feedForwardGroup.anchorCenterBottom().alignTo(selfAttentionImage.anchorTopRight(), offsetY = -20.0)
@@ -423,20 +439,42 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
             anchorCenterTop().alignTo(image.anchorCenterBottom(), offsetY = padding)
         }
 
+        // Update label text for sequences (not weight matrices)
+        qSequenceLabel.text = "q (${transformerBlock.qStack.getShapeString()})"
         qSequenceLabel.centerBelow(qSequenceImage)
+        
+        kSequenceLabel.text = "k (${transformerBlock.kStack.getShapeString()})"
         kSequenceLabel.centerBelow(kSequenceImage)
+        
+        vSequenceLabel.text = "v (${transformerBlock.vStack.getShapeString()})"
         vSequenceLabel.centerBelow(vSequenceImage)
 
+        // Update label text for weight matrices with preference consideration
+        qMatrixLabel.text = "Q (${transformerBlock.Q.getShapeString(isWeightMatrix = true)})"
         qMatrixLabel.centerBelow(qMatrixImage)
+        
+        kMatrixLabel.text = "K (${transformerBlock.K.getShapeString(isWeightMatrix = true)})"
         kMatrixLabel.centerBelow(kMatrixImage)
+        
+        vMatrixLabel.text = "V (${transformerBlock.V.getShapeString(isWeightMatrix = true)})"
         vMatrixLabel.centerBelow(vMatrixImage)
 
+        selfAttentionLabel.text = "Attention Scores (${transformerBlock.selfAttention.getShapeString()})"
         selfAttentionLabel.centerBelow(selfAttentionImage)
 
+        feedForwardInputLabel.text = "FF Input (${transformerBlock.feedForwardInput.getShapeString()})"
         feedForwardInputLabel.centerBelow(feedForwardInputImage)
+        
+        feedForwardHiddenLabel.text = "FF Hidden (${transformerBlock.feedForwardHidden.getShapeString()})"
         feedForwardHiddenLabel.centerBelow(feedForwardHiddenImage)
+        
+        feedForwardOutputLabel.text = "FF Output (${transformerBlock.activations.getShapeString()})"
         feedForwardOutputLabel.centerBelow(feedForwardOutputImage)
+        
+        feedForwardW1Label.text = "Input -> Hidden (${transformerBlock.W1.getShapeString(isWeightMatrix = true)})"
         feedForwardW1Label.centerBelow(feedForwardW1Image)
+        
+        feedForwardW2Label.text = "Hidden -> Output (${transformerBlock.W2.getShapeString(isWeightMatrix = true)})"
         feedForwardW2Label.centerBelow(feedForwardW2Image)
 
         blockInputLabel.anchorCenterBottom().alignTo(this@TransformerBlockNode.anchorCenterBottom().withOffset(offsetY = -5.0))

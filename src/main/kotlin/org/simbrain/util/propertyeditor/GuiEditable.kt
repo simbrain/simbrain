@@ -959,11 +959,16 @@ class MatrixWidget<O : EditableObject>(
 ) : ParameterWidget<O, Matrix>(parameter, isConsistent) {
 
     private var model = MatrixDataFrame(
-        // Column display mode only applies to column vectors
-        if (parameter.columnMode && parameter.value.ncol() == 1) {
-            parameter.value
+
+        if (parameter.value.nrow() > 1 && parameter.value.ncol() > 1) {
+            parameter.value // don't transpose matrices since they are already in the correct orientation
         } else {
-            parameter.value.transpose()
+            // Column display mode only applies to column vectors
+            if (parameter.columnMode && parameter.value.ncol() == 1) {
+                parameter.value
+            } else {
+                parameter.value.transpose()
+            }
         }
     )
 

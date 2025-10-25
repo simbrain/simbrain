@@ -9,9 +9,6 @@ import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connections.AllToAll
-import org.simbrain.network.connections.FixedDegree
-import org.simbrain.network.connections.RadialProbabilistic
-import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.*
 import org.simbrain.network.gui.MouseEventHandler.MouseCursor
 import org.simbrain.network.gui.dialogs.NetworkPreferences
@@ -187,6 +184,9 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         }
         network.getModels<WeightMatrix>().forEach {
             it.events.colorPreferencesChanged.fire()
+            it.events.updateGraphics.fire()
+        }
+        network.getModels<TransformerBlock>().forEach {
             it.events.updateGraphics.fire()
         }
 

@@ -10,6 +10,7 @@ import org.simbrain.world.odorworld.sensors.Sensor;
 import org.simbrain.world.odorworld.sensors.SmellSensor;
 
 import javax.swing.*;
+import java.awt.*;
 
 /**
  * SensorDialog is a dialog box for adding Sensors to Odor World.
@@ -37,9 +38,22 @@ public class AddSensorDialog extends StandardDialog {
     /**
      * Sensor Dialog add sensor constructor.
      *
+     * @param entity entity to add sensor to
+     * @param parent parent window for proper dialog stacking
+     */
+    public AddSensorDialog(OdorWorldEntity entity, Window parent) {
+        super(parent, "Add Sensor");
+        this.entity = entity;
+        init("Add Sensor");
+    }
+    
+    /**
+     * Sensor Dialog add sensor constructor (without parent).
+     *
      * @param entity
      */
     public AddSensorDialog(OdorWorldEntity entity) {
+        super();
         this.entity = entity;
         init("Add Sensor");
     }

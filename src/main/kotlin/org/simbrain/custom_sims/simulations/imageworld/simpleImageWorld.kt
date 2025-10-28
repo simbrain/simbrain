@@ -5,15 +5,14 @@ import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.network.gui.dialogs.getSupervisedTrainingDialog
 import org.simbrain.network.layouts.GridLayout
-import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedModel
+import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
 import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.alignNetworkModels
 import org.simbrain.network.util.offsetNeuronCollections
 import org.simbrain.util.*
-import smile.math.matrix.Matrix
 import java.awt.image.BufferedImage
 
 /**
@@ -64,9 +63,9 @@ val simpleImageWorld = newSim {
 
     val supervisedModel = SupervisedModel(inputs, outputs, 1.0).also {
         network.addNetworkModelAsync(it)
-        it.trainingSet = MatrixDataset(
-            Matrix(outputs.size, inputs.size),
-            Matrix.eye(outputs.size, outputs.size)
+        it.trainingSet = TrainingDataset(
+            inputs = MutableList(outputs.size) { MutableList(inputs.size) { 0.0 } },
+            targets = MutableList(outputs.size) { i -> MutableList(outputs.size) { j -> if (i == j) 1.0 else 0.0 } }
         )
     }
 
@@ -89,7 +88,7 @@ val simpleImageWorld = newSim {
                     outputs.neuronList[index].label = category
                 }
                 addButton("Save Image for Category ${index + 1}") {
-                    supervisedModel.trainingSet.inputs.setRow(index, imageWorld.currentPipeline?.brightness ?: doubleArrayOf())
+                    supervisedModel.trainingSet.inputs[index] = (imageWorld.currentPipeline?.brightness ?: doubleArrayOf()).toMutableList()
                     val image = imageWorld.currentImage.copy()
                     val frame = imageWorld.imageAlbum.frames[index]
                     frame.drawImage(image)
@@ -97,7 +96,7 @@ val simpleImageWorld = newSim {
                     if (index != imageWorld.imageAlbum.frameIndex) {
                         imageWorld.imageAlbum.clearCurrentImage()
                     }
-                    supervisedModel.inputLayer.setActivations(supervisedModel.trainingSet.inputs.row(index))
+                    supervisedModel.inputLayer.setActivations(supervisedModel.trainingSet.inputs[index].toDoubleArray())
                     supervisedModel.outputLayer.setActivations(DoubleArray(outputs.size) { if (it == index) 1.0 else 0.0 })
                 }
             }
@@ -131,5 +130,40 @@ val simpleImageWorld = newSim {
             )
         }
     }
+
+    addSidebarInfo(
+        """
+        # Simple Image World
+        
+        This simulation demonstrates basic image processing using a 10x10 pixel drawing canvas connected to a neural network. 
+        You can draw simple images and train a network to classify them into different categories.
+
+        # Simulation Details
+        
+        The simulation consists of:
+        - Image World: A 10x10 pixel canvas where you can draw simple images
+        - Input Layer: 100 neurons (10x10) that receive pixel brightness values
+        - Hidden Layer: ${numHiddenNodes} neurons for feature extraction
+        - Output Layer: ${numCategories} neurons representing different categories
+        - Training System: Supervised learning to classify drawn images
+
+        # What to Do
+        
+        1. Draw images in the image world canvas using the drawing tools
+        
+        2. Assign categories by setting the target output for each drawing
+        
+        3. Train the network using the supervised training dialog
+        
+        4. Test classification by drawing new images and observing which category the network predicts
+        
+        5. Experiment with different patterns to see how well the network can discriminate between categories
+
+        # Credits
+        
+        [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
+        
+        """.trimIndent()
+    )
 
 }

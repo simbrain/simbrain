@@ -21,7 +21,7 @@ sealed class NeuronGroupParams: CopyableObject {
         listOf(
             BasicNeuronGroupParams::class.java,
             CompetitiveGroupParams::class.java,
-            KWTAParams::class.java,
+            // KWTAParams::class.java,
             NormalizationGroup.NormalizationGroupParams::class.java,
             SoftmaxParams::class.java,
             SOMParams::class.java,

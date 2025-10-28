@@ -1,12 +1,17 @@
 package org.simbrain.util
 
 import org.simbrain.network.gui.dialogs.NetworkPreferences
+import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.plot.histogram.HistogramModel
 import org.simbrain.plot.histogram.HistogramPanel
 import org.simbrain.util.MatrixDiffResult.*
 import org.simbrain.util.stats.ProbabilityDistribution
 import smile.math.matrix.Matrix
-import kotlin.math.*
+import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
+import kotlin.math.sqrt
+import kotlin.random.Random
 
 /**
  * Make sure the two matrices have the same shape
@@ -63,7 +68,7 @@ fun Matrix.reshape(newNrows: Int, newNcols: Int): Matrix {
     return newMatrix
 }
 
-val Matrix.shapeString get() = "(${nrow()},${ncol()})"
+val Matrix.shapeString get() = "${nrow()} x ${ncol()}"
 
 // TODO: Flatten the two arrays so that this can be used for arbitrary matrices (currently works only on vectors)
 infix fun Matrix.sse(other: Matrix) = (this.toDoubleArray() sse other.toDoubleArray())
@@ -95,6 +100,68 @@ fun DoubleArray.toColumnVector(): Matrix = Matrix.column(this)
 
 fun List<List<Double>>.toMatrix(): Matrix = map { it.toDoubleArray() }.toTypedArray().toMatrix()
 fun Array<DoubleArray>.toMatrix(): Matrix = Matrix.of(this)
+
+/**
+ * Creates an identity-like matrix as MutableList format (equivalent to Matrix.eye).
+ * For non-square matrices, creates 1.0 on the main diagonal, 0.0 elsewhere.
+ */
+fun identityMutableList(nrows: Int, ncols: Int = nrows): MutableList<MutableList<Double>> =
+    MutableList(nrows) { row ->
+        MutableList(ncols) { col ->
+            if (row == col) 1.0 else 0.0
+        }
+    }
+
+/**
+ * Creates a random matrix as MutableList format (equivalent to Matrix.rand).
+ */
+fun randomMutableList(nrows: Int, ncols: Int, random: Random = Random): MutableList<MutableList<Double>> =
+    MutableList(nrows) { MutableList(ncols) { random.nextDouble() } }
+
+/**
+ * Creates a zero-filled matrix as MutableList format (equivalent to Matrix(nrows, ncols))
+ */
+fun zeroMutableList(nrows: Int, ncols: Int): MutableList<MutableList<Double>> =
+    MutableList(nrows) { MutableList(ncols) { 0.0 } }
+
+fun Matrix.toMutableListOfLists(): MutableList<MutableList<Double>> = 
+    toArray().map { it.toMutableList() }.toMutableList()
+
+/**
+ * Converts List<List<Double>> to MutableList<MutableList<Double>>.
+ * This creates a mutable copy suitable for TrainingDataset.
+ */
+fun List<List<Double>>.toMutableListOfLists(): MutableList<MutableList<Double>> = 
+    map { it.toMutableList() }.toMutableList()
+
+
+fun MutableList<MutableList<Double>>.copy(): MutableList<MutableList<Double>> =
+    map { it.toMutableList() }.toMutableList()
+
+fun TrainingDataset.copy(): TrainingDataset = TrainingDataset(
+    inputs = inputs.copy(),
+    targets = targets.copy(),
+    inputSize = inputSize,
+    targetSize = targetSize,
+    inputRowNames = inputRowNames?.toMutableList(),
+    targetRowNames = targetRowNames?.toMutableList()
+)
+
+/**
+ * Shifts all rows up by one position and pads the last row with zeros.
+ * This is commonly used for temporal sequence learning where the target
+ * is the next time step of the input.
+ */
+fun MutableList<MutableList<Double>>.shiftUpAndPadEndWithZero(): MutableList<MutableList<Double>> {
+    if (isEmpty()) return this
+    
+    return mutableListOf<MutableList<Double>>().apply {
+        // Add all rows except the first one (shift up)
+        addAll(this@shiftUpAndPadEndWithZero.drop(1))
+        // Pad the end with a zero row of the same width as the original rows
+        add(MutableList(this@shiftUpAndPadEndWithZero[0].size) { 0.0 })
+    }
+}
 
 /**
  * Add the entries of a double array in-place to a Smile matrix / column vector. Assumes the matrix has as many rows
@@ -516,3 +583,80 @@ fun Matrix.applyDiagonalPattern(): Matrix {
     return this
 }
 
+/**
+ * Computes the Frobenius norm (Euclidean norm) of the matrix.
+ * This is the square root of the sum of squares of all matrix elements.
+ */
+fun Matrix.frobeniusNorm(): Double {
+    var sum = 0.0
+    for (i in 0 until nrow()) {
+        for (j in 0 until ncol()) {
+            val value = get(i, j)
+            sum += value * value
+        }
+    }
+    return sqrt(sum)
+}
+
+/**
+ * Asserts that two matrices are equal within a given tolerance.
+ * 
+ * @param expected The expected matrix
+ * @param actual The actual matrix to test
+ * @param message Optional message to display if assertion fails
+ * @param tolerance The tolerance for floating-point comparison (default: 1e-6)
+ */
+fun assertMatrixEquals(expected: Matrix, actual: Matrix, message: String = "", tolerance: Double = 1e-6) {
+    if (expected.nrow() != actual.nrow() || expected.ncol() != actual.ncol()) {
+        val errorMsg = if (message.isNotEmpty()) "$message - " else ""
+        throw AssertionError("${errorMsg}Matrix dimensions don't match: expected ${expected.shapeString}, actual ${actual.shapeString}")
+    }
+    
+    for (i in 0 until expected.nrow()) {
+        for (j in 0 until expected.ncol()) {
+            val expectedValue = expected[i, j]
+            val actualValue = actual[i, j]
+            val diff = abs(expectedValue - actualValue)
+            
+            if (diff > tolerance) {
+                val errorMsg = if (message.isNotEmpty()) "$message - " else ""
+                throw AssertionError("${errorMsg}Matrices differ at position [$i, $j]: expected $expectedValue, actual $actualValue (difference: $diff)")
+            }
+        }
+    }
+}
+
+/**
+ * Asserts that two matrices are NOT equal within a given tolerance.
+ * 
+ * @param expected The expected matrix
+ * @param actual The actual matrix to test
+ * @param message Optional message to display if assertion fails
+ * @param tolerance The tolerance for floating-point comparison (default: 1e-6)
+ */
+fun assertMatrixNotEquals(expected: Matrix, actual: Matrix, message: String = "", tolerance: Double = 1e-6) {
+    if (expected.nrow() != actual.nrow() || expected.ncol() != actual.ncol()) {
+        // Different dimensions means they're not equal
+        return
+    }
+    
+    var allEqual = true
+    for (i in 0 until expected.nrow()) {
+        for (j in 0 until expected.ncol()) {
+            val expectedValue = expected[i, j]
+            val actualValue = actual[i, j]
+            val diff = abs(expectedValue - actualValue)
+            
+            if (diff > tolerance) {
+                allEqual = false
+                break
+            }
+        }
+        if (!allEqual) break
+    }
+    
+    if (allEqual) {
+        val errorMsg = if (message.isNotEmpty()) "$message - " else ""
+        throw AssertionError("${errorMsg}Matrices are equal within tolerance $tolerance")
+    }
+}

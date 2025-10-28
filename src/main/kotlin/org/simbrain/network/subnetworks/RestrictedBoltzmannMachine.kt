@@ -1,10 +1,8 @@
 package org.simbrain.network.subnetworks
 
 import org.simbrain.network.core.*
-import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.trainers.UnsupervisedNetwork
 import org.simbrain.network.trainers.UnsupervisedTrainer
-import org.simbrain.network.trainers.splitDataSet
 import org.simbrain.network.trainers.updateBiases
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.util.Alignment
@@ -15,6 +13,7 @@ import org.simbrain.util.*
 import org.simbrain.util.math.SigmoidFunctions
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
+import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.stats.distributions.TwoValued
 import smile.math.matrix.Matrix
 
@@ -32,11 +31,27 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
 
     lateinit var visibleLayer: NeuronArray
 
+    @UserParameter(
+        label = "RBM Weight randomizer",
+        showDetails = false,
+        description = "Randomizer for RBM Weights.",
+        order = 30,
+    )
+    var rbmWeightRandomizer = NormalDistribution(0.0, .1)
+
+    @UserParameter(
+        label = "RBM Bias randomizer",
+        showDetails = false,
+        description = "Randomizer for RBM biases.",
+        order = 40,
+    )
+    var rbmBiasRandomizer = NormalDistribution(0.0, .01)
+
     val defaultRowsInputData = 10
 
-    override lateinit var trainingData: Matrix
+    override lateinit var trainingData: MutableList<MutableList<Double>>
 
-    override lateinit var testingData: Matrix
+    override var testingData: MutableList<MutableList<Double>> = mutableListOf()
 
     override val inputLayer: NeuronArray
         get() = visibleLayer
@@ -48,10 +63,7 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
     override val trainer = UnsupervisedTrainer()
 
     constructor(numVisibleNodes: Int, numHiddenNodes: Int): super() {
-        val initialData = Matrix.rand(defaultRowsInputData, numVisibleNodes)
-        val (training, testing) = splitDataSet(initialData, 0.8)
-        this.trainingData = training
-        this.testingData = testing
+        trainingData = mutableListOf()
         
         visibleLayer = NeuronArray(numVisibleNodes).apply {
             label = "Visible layer"
@@ -78,12 +90,10 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
         randomize()
 
         customInfo = InfoText(stateInfoText)
-        customInfo.location = point(0, -100)
     }
 
     @XStreamConstructor()
     constructor(): super()
-
 
 
     // See eq 1 https://www.cs.toronto.edu/~hinton/absps/guideTR.pdf
@@ -124,8 +134,8 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
 
     context(Network)
     override fun trainOnInputData() {
-        trainingData.toArray().forEach { row ->
-            visibleLayer.activations = row.toColumnVector()
+        trainingData.forEach { row ->
+            visibleLayer.activations = row.toDoubleArray().toColumnVector()
             trainOnCurrentPattern()
         }
     }
@@ -164,21 +174,29 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
 
     }
 
-    // TODO: Use Randomizers? And what should randomizing the whole network randomize? Just weights or also layers?
-    fun randomizeLayers() {
-        visibleLayer.randomize(TwoValued(0.0, 1.0))
-        hiddenLayer.randomize(TwoValued(0.0, 1.0))
+    fun randomizeLayers(randomizer: ProbabilityDistribution? = null) {
+        visibleLayer.randomize(randomizer ?: TwoValued(0.0, 1.0))
+        hiddenLayer.randomize(randomizer ?: TwoValued(0.0, 1.0))
     }
 
-    fun randomizeWeights() {
-        visibleToHidden.randomize(NetworkPreferences.weightRandomizer)
-        visibleLayer.randomizeBiases(NetworkPreferences.biasesRandomizer)
-        hiddenLayer.randomizeBiases(NetworkPreferences.biasesRandomizer)
+    fun randomizeWeights(randomizer: ProbabilityDistribution? = null) {
+        visibleToHidden.randomize(randomizer ?: rbmWeightRandomizer)
+        visibleLayer.randomizeBiases(randomizer ?: rbmBiasRandomizer)
+        hiddenLayer.randomizeBiases(randomizer ?: rbmBiasRandomizer)
     }
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
-        randomizeWeights()
-        randomizeLayers()
+        randomizeWeights(randomizer)
+        randomizeLayers(randomizer)
+    }
+
+    override fun toString(): String {
+        return """
+            Name: $displayName
+            Type: Restricted Boltzmann Machine
+            Visible Layer: ${visibleLayer.size} units
+            Hidden Layer: ${hiddenLayer.size} units
+        """.trimIndent()
     }
 
     override fun copy(): RestrictedBoltzmannMachine {
@@ -187,10 +205,9 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
         copy.visibleLayer.copyFrom(visibleLayer)
         copy.hiddenLayer.copyFrom(hiddenLayer)
         copy.visibleToHidden.copyFrom(visibleToHidden)
-        copy.trainingData = trainingData.clone()
-        copy.testingData = testingData.clone()
+        copy.trainingData = trainingData.copy()
+        copy.testingData = testingData.copy()
         copy.customInfo = InfoText(copy.stateInfoText)
-        copy.customInfo.location = customInfo.location
 
         copy.trainer.copyFrom(trainer)
 

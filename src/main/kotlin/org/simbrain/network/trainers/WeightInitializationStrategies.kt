@@ -3,6 +3,7 @@ package org.simbrain.network.trainers
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.CopyableObject
+import org.simbrain.util.propertyeditor.CustomTypeName
 import org.simbrain.util.setValuesInPlace
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.NormalDistribution
@@ -32,7 +33,10 @@ class Xavier(seed: Long? = null): WeightInitializationStrategy(seed) {
         UNIFORM, NORMAL
     }
 
-    @UserParameter("Distribution")
+    @UserParameter(
+        label = "Distribution",
+        description = "Weight distribution type. Uniform uses bounded random values, Normal uses Gaussian distribution with calculated variance"
+    )
     var distribution = Distribution.UNIFORM
 
     private fun createRandomizer(numInputs: Int, numOutputs: Int): ProbabilityDistribution {
@@ -65,7 +69,10 @@ class He(seed: Long? = null): WeightInitializationStrategy(seed) {
         UNIFORM, NORMAL
     }
 
-    @UserParameter("Distribution")
+    @UserParameter(
+        label = "Distribution",
+        description = "Weight distribution type. Uniform uses bounded random values, Normal uses Gaussian distribution optimized for ReLU activations"
+    )
     var distribution = Distribution.UNIFORM
 
     private fun createRandomizer(numInputs: Int): ProbabilityDistribution {
@@ -98,7 +105,10 @@ class LeCun(seed: Long? = null): WeightInitializationStrategy(seed) {
         UNIFORM, NORMAL
     }
 
-    @UserParameter("Distribution")
+    @UserParameter(
+        label = "Distribution",
+        description = "Weight distribution type."
+    )
     var distribution = Distribution.UNIFORM
 
     private fun createRandomizer(numInputs: Int): ProbabilityDistribution {
@@ -125,9 +135,14 @@ class LeCun(seed: Long? = null): WeightInitializationStrategy(seed) {
     }
 }
 
+@CustomTypeName("Random Initialization")
 class Randomize(seed: Long? = null): WeightInitializationStrategy(seed) {
 
-    @UserParameter("Distribution", showDetails = false)
+    @UserParameter(
+        label = "Distribution", 
+        description = "Custom probability distribution for weight initialization. Can use any available distribution type",
+        showDetails = false
+    )
     var distribution: ProbabilityDistribution = NormalDistribution()
 
     override fun initializeWeights(matrix: Matrix) {

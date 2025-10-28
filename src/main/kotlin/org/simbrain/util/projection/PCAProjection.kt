@@ -45,7 +45,7 @@ class PCAProjection: ProjectionMethod() {
         }
     }
 
-    override fun copy() = PCAProjection()
+    override fun copy() = PCAProjection().also { it.freeze = freeze }
 
     override val name = "PCA"
 

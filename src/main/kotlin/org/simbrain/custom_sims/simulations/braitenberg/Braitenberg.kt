@@ -117,26 +117,21 @@ val braitenbergSim = newSim {
         
         This simulation accompanies the book _The Open Dynamics of Braitenberg Vehicles_ by Scott Hotton and Jeff Yoshimi.
         
-        In this simulation, you can set the weights of two Braitenberg vehicles and observe the resulting dynamical behavior. By using the sample parameters below, you can produce revolving behaviors (where the two 
-        vehicles revolve around each other), translating behaviors (where they move alongside one another), and various types of _meandering_ behaviors where they spin while they revolve around each other or travel 
-        side by side. Other behaviors are possible, many of which are described in the book.
+        In this simulation, you can set the weights of two Braitenberg vehicles and observe the resulting dynamical behavior. By using the sample parameters below, you can produce revolving behaviors (where the two vehicles revolve around each other), translating behaviors (where they move alongside one another), and various types of meandering behaviors where they spin while they revolve around each other or travel side by side. Other behaviors are possible, many of which are described in the book.
         
         For an introduction to some of the behaviors of Braitenberg vehicles individually, see the `Pursuer` and `Avoider` simulations.
         
-        For a quick sense of what is possible in this simulation, press `play` to run the simulation, click in the 
-        world window and press `T` to turn on trails, and [observe the pattern they make](https://bsky.app/profile/jyoshimi.bsky.social/post/3lsbun2wtdc2d).
+        For a quick sense of what is possible in this simulation, press `play` to run the simulation, click in the world window and press `T` to turn on trails, and [observe the pattern they make](https://bsky.app/profile/jyoshimi.bsky.social/post/3lsbun2wtdc2d).
          
-        For more simulations you can skip to __What to do__ below.
+        For more simulations you can skip to the "What to Do" section below.
         
         # Simulation Details
         
-        The simulation explores the reactive behaviors in the Braitenberg vehicles from sensorimotor connections. The vehicles react to their environment based on connections between its sensors and 
-        actuators (e.g., turn response). The sensors detect the stimuli, which determine the strength and direction of movement, and the actuators control the actual movement of the vehicles.
+        The simulation explores the reactive behaviors in the Braitenberg vehicles from sensorimotor connections. The vehicles react to their environment based on connections between their sensors and actuators (e.g., turn response). The sensors detect the stimuli, which determine the strength and direction of movement, and the actuators control the actual movement of the vehicles.
         
-        The simulation shows two vehicles, Vehicle `1` and Vehicle `2`. You can set the properties of the vehicles directly in the network windows although this simulation is designed to make it easy for 
-        you to reproduce the behaviors described in the book.
+        The simulation shows two vehicles, Vehicle `1` and Vehicle `2`. You can set the properties of the vehicles directly in the network windows although this simulation is designed to make it easy for you to reproduce the behaviors described in the book.
         
-        In each vehicle, the `Circle (L)` neuron and the `Circle (R)` neuron are the sensors that detects stimuli in the environment (e.g., odor world). The weights connected between the `Circle (L)` and `Circle (R)` 
+        In each vehicle, the `Circle (L)` neuron and the `Circle (R)` neuron are the sensors that detect stimuli in the environment (e.g., odor world). The weights connected between the `Circle (L)` and `Circle (R)` 
         to their actuators links the stimuli to the vehicles' motor response. The weight strength influences how the vehicle behaves; for example, a higher weight strength increases the likelihood and intensity of 
         the behavior (e.g., turn left, turn right). The vehicles will move towards the other's positive sensor motors.
         

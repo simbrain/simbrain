@@ -9,6 +9,7 @@ import org.simbrain.util.table.insertRowAction
 import org.simbrain.util.toColumnVector
 import org.simbrain.workspace.gui.SimbrainDesktop
 import smile.math.matrix.Matrix
+import java.awt.Dimension
 import javax.swing.JCheckBox
 import javax.swing.JCheckBoxMenuItem
 import javax.swing.JLabel
@@ -36,15 +37,10 @@ fun createTestInputPanel(neurons: List<Neuron>, initData: Matrix = Matrix.eye(ne
 
 private fun createTestInputPanel(initData: Matrix, applyInputs: suspend MatrixEditor.(selectedRow: Int) -> Unit) = MatrixEditor(initData).apply {
     var workspaceMode = true
+    preferredSize = Dimension(600, 250)
     toolbar.addSeparator()
-    toolbar.add(JLabel("Workspace Mode"))
-    toolbar.add(JCheckBox(createAction(
-        description = "Workspace Mode"
-    ) { event ->
-        event?.source.let {
-            workspaceMode = if (it is JCheckBoxMenuItem) it.state else !workspaceMode
-        }
-    }).apply { this.isSelected = workspaceMode })
+    toolbar.add(table.insertRowAction)
+    toolbar.add(table.deleteRowAction)
     toolbar.addSeparator()
     val advanceRowCheckbox = JCheckBox("Auto advance").apply { isSelected = true }
     toolbar.add(table.createApplyAction("Apply inputs") {
@@ -57,6 +53,12 @@ private fun createTestInputPanel(initData: Matrix, applyInputs: suspend MatrixEd
         }
     })
     toolbar.add(advanceRowCheckbox)
-    toolbar.add(table.insertRowAction)
-    toolbar.add(table.deleteRowAction)
+    toolbar.add(JCheckBox(createAction(
+        description = "Workspace Mode"
+    ) { event ->
+        event?.source.let {
+            workspaceMode = if (it is JCheckBoxMenuItem) it.state else !workspaceMode
+        }
+    }).apply { this.isSelected = workspaceMode })
+    toolbar.add(JLabel("Workspace Mode"))
 }

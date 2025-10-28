@@ -73,9 +73,6 @@ val NetworkPanel.insertMenu
             // add(addDeepNetAction)
             add(newNetworkMenu)
             addSeparator()
-            add(testInputAction)
-            add(showWeightMatrixAction)
-            addSeparator()
             add(addTextAction)
         }
     }
@@ -99,7 +96,7 @@ val NetworkPanel.actionMenu
     }
 
 val NetworkPanel.newNetworkMenu
-    get() = JMenu("Add Subnetwork").apply {
+    get() = JMenu("Add subnetwork").apply {
         networkActions.newNetworkActions.forEach { add(it) }
     }
 
@@ -163,7 +160,6 @@ fun NetworkPanel.creatContextMenu() = JPopupMenu().apply {
         addSeparator()
 
         // Preferences
-        add(showNetworkDefaultsAction)
         add(showNetworkPropertiesAction)
     }
 }
@@ -188,6 +184,8 @@ val NetworkPanel.viewMenu
                     this.state = it
                 }
             })
+            addSeparator()
+            add(showWeightMatrixAction)
             addSeparator()
             add(showPriorityTableAction)
         }
@@ -216,7 +214,8 @@ fun NetworkPanel.createNeuronContextMenu() = with(networkActions) {
         addSeparator()
         add(showLayoutDialogAction)
         addSeparator()
-        add(showNetworkDefaultsAction)
+        add(neuronCollectionAction)
+        addSeparator()
         add(showNetworkPropertiesAction)
         addSeparator()
         if (selectedNeuronList.size > 1) {

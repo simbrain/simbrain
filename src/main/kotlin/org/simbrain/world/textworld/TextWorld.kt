@@ -7,12 +7,10 @@ import org.simbrain.util.SimpleTokenizer
 import org.simbrain.util.TokenizerResult
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
-import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
 import java.awt.Color
-import kotlin.math.max
 import kotlin.math.min
 
 /**
@@ -62,7 +60,7 @@ class TextWorld : AttributeContainer, EditableObject {
         get() = _text
         set(value) {
             _text = value
-            events.textChanged.fireAndBlock()
+            events.textChanged.fire()
         }
 
     @UserParameter(
@@ -89,12 +87,14 @@ class TextWorld : AttributeContainer, EditableObject {
     @Transient
     var currentTokenIndex = 0
         get() {
-            field = field.coerceIn(0, max(tokens.lastIndex, 0))
+            if (tokens.isEmpty()) return 0
+            field = field.coerceIn(0, tokens.lastIndex)
             return field
         }
         set(value) {
-            field = value
-            events.currentTokenChanged.fireAndBlock(tokens[value])
+            if (tokens.isEmpty()) return
+            field = value.coerceIn(0, tokens.lastIndex)
+            events.currentTokenChanged.fire(tokens[field])
         }
 
     @UserParameter(
@@ -118,12 +118,11 @@ class TextWorld : AttributeContainer, EditableObject {
     )
     var showTokenBoundaries = true
 
-    var samplingStrategy: SamplingStrategy by GuiEditable(
-        initValue = SamplingStrategy.TopK(k = 5),
-        description = "When given set of probabilities to select a token from the dictionary, how to sample from that distribution produce new tokens",
-        showDetails = false,
-        order = 100,
-    )
+    /**
+     * Sampling strategy for generating tokens from probability distributions.
+     * Used primarily by language model simulations.
+     */
+    var samplingStrategy: SamplingStrategy = SamplingStrategy.TopP()
 
     /**
      * Set main text without firing an event.
@@ -138,11 +137,6 @@ class TextWorld : AttributeContainer, EditableObject {
     var position = 0
 
     /**
-     * Last position in the text.
-     */
-    protected var lastPosition = 0
-
-    /**
      * Highlight color.
      */
     var highlightColor = Color.GRAY
@@ -151,6 +145,29 @@ class TextWorld : AttributeContainer, EditableObject {
      * The current text item.
      */
     private val currentTextItem: TokenizerResult get() = tokens[currentTokenIndex]
+
+    /**
+     * Find the token index that contains the given character position.
+     * If no exact match, finds the closest token (preferring the one before the cursor).
+     * Returns 0 if tokens are empty.
+     */
+    private fun findTokenIndexAtPosition(pos: Int): Int {
+        if (tokens.isEmpty()) return 0
+        
+        // Try exact match first (cursor is within token bounds)
+        val exactMatch = tokens.indexOfFirst { token -> 
+            pos >= token.start && pos <= token.end
+        }
+        if (exactMatch >= 0) return exactMatch
+        
+        // If no exact match, find the last token whose end is before the cursor position
+        // (this handles cursor in spaces between tokens or after the last character)
+        val tokenBeforeCursor = tokens.indexOfLast { it.end < pos }
+        if (tokenBeforeCursor >= 0) return tokenBeforeCursor
+        
+        // If position is before all tokens, return first token
+        return 0
+    }
 
     @UserParameter(
         label = "Stop at end",
@@ -171,7 +188,9 @@ class TextWorld : AttributeContainer, EditableObject {
      */
     @get:Producible
     val currentVector: DoubleArray
-        get() = tokens[currentTokenIndex].token.let { tokenEmbedding.get(it) }
+        get() = tokens.getOrNull(currentTokenIndex)?.token?.let { 
+            tokenEmbedding.get(it) 
+        } ?: doubleArrayOf()
 
     /**
      * Display the string associated with the closest matching vector in the embedding
@@ -233,12 +252,14 @@ class TextWorld : AttributeContainer, EditableObject {
      */
     @get:Producible
     val currentToken: String
-        get() = tokens[currentTokenIndex].token
+        get() = tokens.getOrNull(currentTokenIndex)?.token ?: ""
 
     fun setPosition(newPosition: Int, fireEvent: Boolean) {
         if (newPosition <= text.length) {
-            lastPosition = position
             position = newPosition
+            if (tokens.isNotEmpty()) {
+                currentTokenIndex = findTokenIndexAtPosition(newPosition)
+            }
             if (fireEvent) {
                 events.cursorPositionChanged.fire()
             }

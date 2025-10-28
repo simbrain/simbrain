@@ -30,7 +30,7 @@ class OdorWorldFrameMenu(private val parent: OdorWorldDesktopComponent, private 
 
     private val helpMenu = JMenu("Help")
 
-    private val helpItem = JMenuItem("World Help")
+    private val helpItem = JMenuItem("World help")
 
     init {
         odorWorldActions = parent.getWorldPanel().odorWorldActions
@@ -53,7 +53,7 @@ class OdorWorldFrameMenu(private val parent: OdorWorldDesktopComponent, private 
         fileMenu.add(SimbrainDesktop.actionManager.createExportAction<OdorWorldComponent>(parent))
         fileMenu.addSeparator()
 
-        fileMenu.add(object : AbstractAction("Load Tile Map...") {
+        fileMenu.add(object : AbstractAction("Load tile map...") {
             override fun actionPerformed(e: ActionEvent?) {
                 val chooser = SFileChooser(OdorWorldPreferences.tileMapDirectory, "Load TMX Tilemap", null, true)
                 chooser.addExtension("tmx")
@@ -84,9 +84,9 @@ class OdorWorldFrameMenu(private val parent: OdorWorldDesktopComponent, private 
         // editMenu.addSeparator();
 
         // TODO: Factor the code for placing new entities out of network, to utils, and reuse here.
-        val addEntity = JMenuItem(parent.worldPanel.createAction("Add Entity") { world.addEntity() })
+        val addEntity = JMenuItem(parent.worldPanel.createAction("Add entity") { world.addEntity() })
         editMenu.add(addEntity)
-        val addAgent = JMenuItem(parent.worldPanel.createAction("Add Agent") { world.addAgent() })
+        val addAgent = JMenuItem(parent.worldPanel.createAction("Add agent") { world.addAgent() })
         editMenu.add(addAgent)
         editMenu.addSeparator()
         editMenu.add(odorWorldActions.deleteSelectedAction())

@@ -6,6 +6,7 @@ import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PBounds
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.network.gui.createTooltipText
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.dialogs.NetworkPreferences.excitatorySynapseColor
 import org.simbrain.network.gui.dialogs.NetworkPreferences.inhibitorySynapseColor
@@ -279,8 +280,8 @@ class SynapseNode(
 
         val delta = (circle!!.bounds.getWidth() - diameter) / 2
 
-        circle!!.setWidth(diameter)
-        circle!!.setHeight(diameter)
+        circle!!.width = diameter
+        circle!!.height = diameter
         // offset properly moves circle, but this is not reflected in bounds
         circle!!.offset(delta, delta)
         setBounds(circle!!.fullBounds)
@@ -337,7 +338,9 @@ class SynapseNode(
     }
 
     override val toolTipText: String
-        get() = synapse.toolTipText.toString()
+        get() = createTooltipText(synapse) {
+            synapse.toString()
+        }
 
     override val contextMenu: JPopupMenu
         get() = networkPanel.synapseContextMenu

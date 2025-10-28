@@ -7,22 +7,22 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.getModelByLabel
 import org.simbrain.network.core.getNetworkXStream
 import org.simbrain.network.trainers.AdamOptimizer
-import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedTrainer
 import org.simbrain.network.trainers.SupervisedTrainer.UpdateMethod
+import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.updaterules.SoftmaxRule
+import org.simbrain.util.identityMutableList
 import org.simbrain.util.math.SigmoidFunctionEnum
-import smile.math.matrix.Matrix
 
 class BackpropNetworkTest {
 
     val net = Network()
     val bp = BackpropNetwork(intArrayOf(10,8,10), null).apply {
         label = "backprop"
-        trainingSet = MatrixDataset(
-            inputs = Matrix.eye(10),
-            targets = Matrix.eye(10)
+        trainingSet = TrainingDataset(
+            inputs = identityMutableList(10),
+            targets = identityMutableList(10)
         )
         outputLayer.updateRule = SigmoidalRule().apply {
             type = SigmoidFunctionEnum.LOGISTIC

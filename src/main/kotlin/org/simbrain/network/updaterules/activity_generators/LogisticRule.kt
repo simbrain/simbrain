@@ -22,7 +22,7 @@ class LogisticRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>, Activit
      * Growth rate.
      */
     @UserParameter(
-        label = "Growth Rate", description = "A number that determines the exact form of the quadratic function. "
+        label = "Growth rate", description = "A number that determines the exact form of the quadratic function."
                 + "It must be between 0 and 4.", minimumValue = 0.0, maximumValue = 4.0, order = 1
     )
     var growthRate: Double = 3.9

@@ -7,15 +7,14 @@ import org.simbrain.network.neurongroups.CompetitiveGroup
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.trainers.UnsupervisedNetwork
 import org.simbrain.network.trainers.UnsupervisedTrainer
-import org.simbrain.network.trainers.splitDataSet
 import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.alignNetworkModels
 import org.simbrain.network.util.offsetNeuronCollections
 import org.simbrain.util.UserParameter
+import org.simbrain.util.copy
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
-import smile.math.matrix.Matrix
 
 /**
  * **CompetitiveNetwork** is a small network encompassing a Competitive
@@ -28,9 +27,9 @@ class CompetitiveNetwork : Subnetwork, UnsupervisedNetwork {
 
     lateinit var competitive: CompetitiveGroup
 
-    override lateinit var trainingData: Matrix
+    override lateinit var trainingData: MutableList<MutableList<Double>>
 
-    override lateinit var testingData: Matrix
+    override var testingData: MutableList<MutableList<Double>> = mutableListOf()
 
     val defaultRowsInputData = 10
 
@@ -42,10 +41,7 @@ class CompetitiveNetwork : Subnetwork, UnsupervisedNetwork {
 
     constructor(numInputNeurons: Int, numCompetitiveNeurons: Int): super() {
 
-        val initialData = Matrix.rand(defaultRowsInputData, numInputNeurons)
-        val (training, testing) = splitDataSet(initialData, 0.8)
-        this.trainingData = training
-        this.testingData = testing
+        trainingData = mutableListOf()
 
         competitive = CompetitiveGroup(numCompetitiveNeurons)
         competitive.label = "Competitive Group"
@@ -73,8 +69,8 @@ class CompetitiveNetwork : Subnetwork, UnsupervisedNetwork {
     }
 
     context(Network) override fun trainOnInputData() {
-        trainingData.toArray().forEach { row ->
-            inputLayer.activationArray = row
+        trainingData.forEach { row ->
+            inputLayer.activationArray = row.toDoubleArray()
             trainOnCurrentPattern()
         }
     }
@@ -103,6 +99,15 @@ class CompetitiveNetwork : Subnetwork, UnsupervisedNetwork {
         competitive.normalizeIncomingWeights()
     }
 
+    override fun toString(): String {
+        return """
+            Name: $displayName
+            Type: Competitive Network
+            Input Layer: ${inputLayer.size} neurons
+            Competitive Layer: ${competitive.size} neurons
+        """.trimIndent()
+    }
+
     override fun copy(): CompetitiveNetwork {
         val copy = CompetitiveNetwork()
 
@@ -128,8 +133,8 @@ class CompetitiveNetwork : Subnetwork, UnsupervisedNetwork {
         copy.trainer.copyFrom(trainer)
 
         // Copy input data
-        copy.trainingData = trainingData.clone()
-        copy.testingData = testingData.clone()
+        copy.trainingData = trainingData.copy()
+        copy.testingData = testingData.copy()
 
         return copy
     }

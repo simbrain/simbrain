@@ -9,29 +9,21 @@ import java.awt.event.ActionEvent
 import java.util.stream.Collectors
 import javax.swing.AbstractAction
 import javax.swing.JPopupMenu
-import javax.swing.text.*
+import javax.swing.text.BadLocationException
+import javax.swing.text.DefaultStyledDocument
+import javax.swing.text.SimpleAttributeSet
+import javax.swing.text.StyleConstants
 
 /**
  * An editable text element, which wraps a PStyledText object.
  */
 open class TextNode(
     netPanel: NetworkPanel,
-    /**
-     * Underlying model text object.
-     */
     val textObject: NetworkTextObject
 ) : ScreenElement(netPanel) {
-    /**
-     * The text object.
-     */
+
     val pStyledText: PStyledText = PStyledText()
 
-    /**
-     * Construct text object at specified location.
-     *
-     * @param netPanel reference to networkPanel
-     * @param text     the network text object
-     */
     init {
         pStyledText.document = DefaultStyledDocument()
         this.addChild(pStyledText)
@@ -67,7 +59,7 @@ open class TextNode(
             if (textNodes.size == 1) {
                 contextMenu.add(object : AbstractAction() {
                     init {
-                        putValue(NAME, "Edit Text...")
+                        putValue(NAME, "Edit text...")
                     }
 
                     override fun actionPerformed(e: ActionEvent) {

@@ -142,6 +142,7 @@ public class BarChartDesktopComponent extends DesktopComponent<BarChartComponent
             var dialog = SwingUtilsKt.createEditorDialog(
                     getWorkspaceComponent().getModel(),
                     getWorkspaceComponent().getModel().getName(),
+                    null,
                     (e) -> {
                 chart.getCategoryPlot()
                         .getRenderer()

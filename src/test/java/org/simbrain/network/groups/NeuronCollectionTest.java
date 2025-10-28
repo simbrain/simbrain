@@ -10,6 +10,7 @@ import org.simbrain.network.core.WeightMatrix;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class NeuronCollectionTest {
 
@@ -53,5 +54,22 @@ class NeuronCollectionTest {
         nc1.setActivations(new double[]{1.0,-1.0});
         net.update();
         assertArrayEquals(new double[]{1.0, -1.0}, nc2.getActivationArray());
+    }
+
+    @Test
+    void testNoDoubleBiasApplication() {
+        // Set up neurons with specific bias values
+        n1.setBias(0.5);
+        n2.setBias(0.3);
+        
+        // Clear activations to start fresh
+        n1.setActivation(0.0);
+        n2.setActivation(0.0);
+        
+        // Update the network - this should apply bias only once per neuron (there was a bug where it was applied twice)
+        net.update();
+
+        assertEquals(0.5, n1.getActivation(), 0.001, "Neuron 1 should have activation equal to its bias (0.5), not double bias");
+        assertEquals(0.3, n2.getActivation(), 0.001, "Neuron 2 should have activation equal to its bias (0.3), not double bias");
     }
 }

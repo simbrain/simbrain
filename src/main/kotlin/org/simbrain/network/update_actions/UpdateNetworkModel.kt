@@ -2,7 +2,7 @@ package org.simbrain.network.update_actions
 
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkModel
-import org.simbrain.workspace.updater.UpdateAction
+import org.simbrain.util.UpdateAction
 
 /**
  * Action to update a specific network model (NeuronGroup, SynapseGroup, etc.).
@@ -10,8 +10,8 @@ import org.simbrain.workspace.updater.UpdateAction
  * @author jyoshimi
  */
 class UpdateNetworkModel(private val networkModel: NetworkModel, val network: Network) : UpdateAction(
-    networkModel.label,
-    "Update ${networkModel.label}"
+    "Update ${networkModel.displayName}",
+    "An action that updates ${networkModel.displayName}"
 ) {
     override suspend fun run() {
         with(network) { networkModel.update() }

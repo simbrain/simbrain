@@ -4,6 +4,7 @@ import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.WeightMatrixViewer
 import org.simbrain.network.gui.createCouplingMenu
+import org.simbrain.network.gui.createTooltipText
 import org.simbrain.network.gui.getDialog
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.createAction
@@ -123,8 +124,6 @@ class SynapseGroupInteractionBox(
             return menu
         }
 
-    override val toolTipText: String
-        get() = "Synapses: ${synapseGroup.size()} Density: " + synapseGroup.size()
-            .toDouble() / (synapseGroup.source.size * synapseGroup.target.size)
+    override val toolTipText get() = createTooltipText(synapseGroup) { synapseGroup.toString() }
 
 }

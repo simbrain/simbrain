@@ -1,6 +1,7 @@
 package org.simbrain.network.gui.dialogs
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
@@ -11,58 +12,69 @@ import org.simbrain.network.gui.addSubnetworkAction
 import org.simbrain.network.gui.nodes.subnetworkNodes.BackpropNetworkNode
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.subnetworks.SRNNetwork
-import org.simbrain.network.trainers.MatrixDataset
 import org.simbrain.network.trainers.SupervisedNetwork
 import org.simbrain.network.trainers.SupervisedTrainer
+import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.network.trainers.UnsupervisedNetwork
 import org.simbrain.util.*
 import org.simbrain.util.table.*
 import org.simbrain.util.widgets.ToggleButton
-import smile.math.matrix.Matrix
 import java.awt.Cursor
+import java.awt.Dialog
 import java.awt.Dimension
 import javax.swing.*
 
-fun MatrixDataset.createDataSetPanel(applyAction: suspend DataSetPanel.(selectedRow: Int) -> Unit): DataSetPanel {
+fun TrainingDataset.createDataSetPanel(parentDialog: StandardDialog? = null, applyAction: suspend DataSetPanel.(selectedRow: Int) -> Unit): DataSetPanel {
     
     fun createDataFrame(
-        data: Array<DoubleArray>,
+        data: MutableList<MutableList<Double>>,
         rowNames: List<String>?,
-        columnNames: List<String>?
+        columnNames: List<String>?,
+        expectedColumnCount: Int
     ): BasicDataFrame {
+        // Always create explicit columns to simplify logic
+        val columns = (0 until expectedColumnCount).map { i ->
+            val columnName = columnNames?.getOrNull(i) ?: "Column ${i + 1}"
+            Column(columnName, Column.DataType.DoubleType)
+        }.toMutableList()
+        
         return BasicDataFrame(
-            data.map { it.toMutableList() as MutableList<Any?> }.toMutableList()
+            data.map { it.map { value -> value as Any? }.toMutableList() }.toMutableList(), 
+            columns
         ).also { dataFrame ->
             rowNames?.let { names -> dataFrame.rowNames = names }
-            columnNames?.let { names -> dataFrame.columnNames = names }
-        }.apply {  }
+            // No need to set columnNames again since we already set them in the Column objects
+        }
     }
     
-    val inputDataFrame = createDataFrame(inputs.toArray(), inputRowNames, inputColumnNames)
-    val targetDataFrame = createDataFrame(targets.toArray(), targetRowNames, targetColumnNames)
+    val inputDataFrame = createDataFrame(inputs, inputRowNames, inputColumnNames, inputSize)
+    val targetDataFrame = createDataFrame(targets, targetRowNames, targetColumnNames, targetSize)
 
-    return DataSetPanel(inputDataFrame, targetDataFrame, applyAction = applyAction)
+    return DataSetPanel(inputDataFrame, targetDataFrame, applyAction = applyAction, parentDialog = parentDialog)
+}
+
+fun SimbrainTablePanel.applyCommonTrainerAttributes(parentDialog: StandardDialog? = null) {
+    addAction(table.importCSVAction(parentComponent = parentDialog))
+    addAction(table.exportCsv(parentComponent = parentDialog))
+    addAction(table.randomizeAction)
+    addAction(table.showBoxPlotAction)
+    preferredSize = Dimension(400, 250)
 }
 
 class DataSetPanel(
-    val inputDataFrame: SimbrainDataFrame,
-    val targetDataFrame: SimbrainDataFrame,
-    applyAction: suspend DataSetPanel.(selectedRow: Int) -> Unit
+    val inputDataFrame: BasicDataFrame,
+    val targetDataFrame: BasicDataFrame,
+    applyAction: suspend DataSetPanel.(selectedRow: Int) -> Unit,
+    parentDialog: StandardDialog? = null
 ): JPanel() {
 
     val rowErrorJLabel = JLabel("")
-
-    fun SimbrainTablePanel.applyCommonAttributes() {
-        addAction(table.importCsv)
-        addAction(table.exportCsv())
-        addAction(table.randomizeAction)
-        addAction(table.showBoxPlotAction)
-        addAction(table.showHistogramAction)
-        preferredSize = Dimension(400, 250)
-    }
+    
+    // Callback for when row counts change
+    var onRowCountChanged: ((inputRowCount: Int, targetRowCount: Int) -> Unit)? = null
 
     val inputs = SimbrainTablePanel(inputDataFrame, false).apply {
-        applyCommonAttributes()
+        applyCommonTrainerAttributes(parentDialog)
         toolbar.addSeparator()
         val advanceRowCheckbox = JCheckBox("Auto advance").apply { isSelected = true }
         toolbar.add(
@@ -79,7 +91,7 @@ class DataSetPanel(
     }
 
     val targets = SimbrainTablePanel(targetDataFrame, false).apply {
-        applyCommonAttributes()
+        applyCommonTrainerAttributes(parentDialog)
     }
 
     val addRemoveRows = AddRemoveRows(listOf(inputs.table, targets.table))
@@ -92,6 +104,14 @@ class DataSetPanel(
         add(targets, "wrap")
         add(JLabel("Edit rows:"), "split 2")
         add(addRemoveRows)
+        
+        // Listen for table model changes to update validation
+        val tableModelListener = javax.swing.event.TableModelListener {
+            onRowCountChanged?.invoke(inputDataFrame.rowCount, targetDataFrame.rowCount)
+        }
+        
+        inputDataFrame.addTableModelListener(tableModelListener)
+        targetDataFrame.addTableModelListener(tableModelListener)
     }
 
 }
@@ -103,9 +123,20 @@ class DataSetPanel(
 context(NetworkPanel)
 fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
     val supervisedNetwork = this
-    return StandardDialog().apply {
+    val parentWindow = SwingUtilities.getWindowAncestor(this@NetworkPanel)
+    return StandardDialog(parentWindow as? JFrame, "Train Network").apply {
 
-        title = "Train Network"
+        isModal = true
+        isAlwaysOnTop = false  // Ensure this is not always on top
+        modalityType = Dialog.ModalityType.APPLICATION_MODAL
+        
+        // Ensure proper focus management for child dialogs
+        addWindowFocusListener(object : java.awt.event.WindowAdapter() {
+            override fun windowGainedFocus(e: java.awt.event.WindowEvent?) {
+                // When this dialog gains focus, ensure it stays in front
+                toFront()
+            }
+        })
 
         // Run training algorithm
         val runControls = JPanel()
@@ -124,18 +155,50 @@ fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
             }
         }
 
-        fun createDataSetPanel(dataSet: MatrixDataset) = dataSet.createDataSetPanel { selectedRow -> commonApplyAction(selectedRow) }
+        fun createDataSetPanel(dataSet: TrainingDataset) = dataSet.createDataSetPanel(this@apply) { selectedRow ->
+            commonApplyAction(
+                selectedRow
+            )
+        }
 
         val trainingDataSetPanel = createDataSetPanel(trainingSet)
         val testingDataSetPanel = createDataSetPanel(testingSet)
 
-        fun DataSetPanel.exportMatrixDataSet() = MatrixDataset(
-            Matrix.of(inputs.table.model.get2DDoubleArray()),
-            Matrix.of(targets.table.model.get2DDoubleArray()),
-            inputDataFrame.rowNames.map { it.toString() } as List<String>?,
-            targetDataFrame.rowNames.map { it.toString() } as List<String>?,
-            inputDataFrame.columnNames,
-            targetDataFrame.columnNames
+        // Set up validation callbacks
+        fun updateOverallValidation() {
+            val trainingValid = trainingDataSetPanel.inputDataFrame.rowCount == trainingDataSetPanel.targetDataFrame.rowCount
+            val testingValid = testingDataSetPanel.inputDataFrame.rowCount == testingDataSetPanel.targetDataFrame.rowCount
+            
+            trainerControls.updateValidationState(
+                trainingInputRows = trainingDataSetPanel.inputDataFrame.rowCount,
+                trainingTargetRows = trainingDataSetPanel.targetDataFrame.rowCount,
+                testingInputRows = testingDataSetPanel.inputDataFrame.rowCount,
+                testingTargetRows = testingDataSetPanel.targetDataFrame.rowCount,
+                trainingValid = trainingValid,
+                testingValid = testingValid
+            )
+        }
+        
+        trainingDataSetPanel.onRowCountChanged = { _, _ ->
+            updateOverallValidation()
+        }
+        
+        testingDataSetPanel.onRowCountChanged = { _, _ ->
+            updateOverallValidation()
+        }
+        
+        // Initial validation check
+        updateOverallValidation()
+
+        fun DataSetPanel.exportMatrixDataSet() = TrainingDataset(
+            inputs.table.model.get2DDoubleList().toMutableListOfLists(),
+            targets.table.model.get2DDoubleList().toMutableListOfLists(),
+            inputSize = inputDataFrame.columnNames.size,
+            targetSize = targetDataFrame.columnNames.size,
+            inputRowNames = inputDataFrame.rowNames.map { it.toString() } as List<String>?,
+            targetRowNames = targetDataFrame.rowNames.map { it.toString() } as List<String>?,
+            inputColumnNames = inputDataFrame.columnNames,
+            targetColumnNames = targetDataFrame.columnNames
         )
 
         fun syncDataSet() {
@@ -155,56 +218,30 @@ fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
         addCommitTask { syncDataSet() }
 
         contentPane = runControls
+
+        setAsDoneDialog()
     }
 }
 
 context(NetworkPanel)
 fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, trainAction: context(Network)() -> Unit = {}): StandardDialog {
-    return StandardDialog().apply dialog@ {
+    val parentWindow = SwingUtilities.getWindowAncestor(this@NetworkPanel)
+    return StandardDialog(parentWindow as? JFrame, "Train Network").apply dialog@ {
 
-        title = "Train Network"
+        isModal = true
 
         val mainPanel = JPanel().apply {
             layout = MigLayout("gap 0px 0px, ins 15")
         }
 
         val trainer = unsupervisedNetwork.trainer
+        
+        // Track the training job so we can cancel it when dialog closes
+        var trainingJob: Job? = null
 
         val runControls = JPanel().apply { layout = MigLayout("nogrid") }
-        val runAction = createAction(
-            name = "Run",
-            description = "Run training algorithm",
-            iconPath = "menu_icons/Play.png",
-        ) {
-            with(network) {
-                launch {
-                    trainer.startTraining(unsupervisedNetwork)
-                }
-            }
-        }
-        val stopAction = createAction(
-            name = "Stop",
-            description = "Stop training algorithm",
-            iconPath = "menu_icons/Stop.png",
-        ) {
-            launch {
-                trainer.stopTraining()
-            }
-        }
-        runControls.add(ToggleButton(listOf(runAction, stopAction)).apply {
-            setAction("Run")
-            trainer.events.beginTraining.on {
-                this@dialog.cursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR)
-                setAction("Stop")
-            }
-            trainer.events.endTraining.on {
-                this@dialog.cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)
-                setAction("Run")
-            }
-        })
 
         val stepAction = createAction(
-            name = "Step",
             description = "Iterate training once",
             iconPath = "menu_icons/Step.png",
         ) {
@@ -218,6 +255,39 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         }
 
         runControls.add(JButton(stepAction))
+
+        val runAction = createAction(
+            name = "Run",
+            description = "Run training algorithm",
+            iconPath = "menu_icons/Play.png",
+        ) {
+            with(network) {
+                trainingJob = launch {
+                    trainer.startTraining(unsupervisedNetwork)
+                }
+            }
+        }
+        val stopAction = createAction(
+            name = "Stop",
+            description = "Stop training algorithm",
+            iconPath = "menu_icons/Stop.png",
+        ) {
+            launch {
+                trainer.stopTraining()
+            }
+            trainingJob?.cancel()
+        }
+        runControls.add(ToggleButton(listOf(runAction, stopAction)).apply {
+            setAction("Run")
+            trainer.events.beginTraining.on {
+                this@dialog.cursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR)
+                setAction("Stop")
+            }
+            trainer.events.endTraining.on {
+                this@dialog.cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)
+                setAction("Run")
+            }
+        })
 
         val resetAction = createAction(
             name = "Randomize",
@@ -252,54 +322,52 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         })
         runControls.add(preferencesButton)
 
-        // Create data panels for training and testing data
-        fun createUnsupervisedDataPanel(data: Matrix, label: String): JPanel {
-            val panel = JPanel().apply {
-                layout = MigLayout("gap 0px 0px, ins 0")
-            }
+        // Create data frame for unsupervised data with explicit columns like DataSetPanel
+        fun createUnsupervisedDataFrame(data: MutableList<MutableList<Double>>): BasicDataFrame {
+            val inputSize = unsupervisedNetwork.inputLayer.size
+            val columns = (0 until inputSize).map { i ->
+                Column("Input ${i + 1}", Column.DataType.DoubleType)
+            }.toMutableList()
             
-            val matrixEditor = MatrixEditor(data)
-            matrixEditor.toolbar.addSeparator()
-            val advanceRowCheckbox = JCheckBox("Auto advance").apply { isSelected = true }
-            matrixEditor.toolbar.add(
-                matrixEditor.table.createApplyAction("Apply inputs") { selectedRow ->
-                    unsupervisedNetwork.inputLayer.setActivations(matrixEditor.table.model.getCurrentDoubleRow().toDoubleArray())
-                    trainAction(network)
-                    if (advanceRowCheckbox.isSelected) {
-                        matrixEditor.table.incrementSelectedRow()
-                    }
-                }
+            return BasicDataFrame(
+                data.copy().map { it.map { value -> value as Any? }.toMutableList() }.toMutableList(),
+                columns
             )
-            matrixEditor.toolbar.add(advanceRowCheckbox)
-            
-            val addRemoveRows = AddRemoveRows(listOf(matrixEditor.table))
-            
-            panel.add(JSeparator(), "span, growx, wrap")
-            panel.add(matrixEditor, "span, grow")
-            panel.add(JLabel("Edit rows:"), "split 2")
-            panel.add(addRemoveRows)
-
-            return panel
         }
 
-        val trainingDataPanel = createUnsupervisedDataPanel(unsupervisedNetwork.trainingData, "Training")
-        val testingDataPanel = createUnsupervisedDataPanel(unsupervisedNetwork.testingData, "Testing")
+        // Create data panels for training and testing data
+        fun createUnsupervisedDataPanel(data: MutableList<MutableList<Double>>) = object : JPanel() {
+            val dataFrame = createUnsupervisedDataFrame(data)
+            val tablePanel = SimbrainTablePanel(dataFrame, false).apply {
+                applyCommonTrainerAttributes(this@dialog)
+                toolbar.addSeparator()
+                val advanceRowCheckbox = JCheckBox("Auto advance").apply { isSelected = true }
+                toolbar.add(
+                    table.createApplyAction("Apply inputs") {
+                        unsupervisedNetwork.inputLayer.setActivations(dataFrame.getRow<Double>(it).toDoubleArray())
+                        trainAction(network)
+                        if (advanceRowCheckbox.isSelected) {
+                            incrementSelectedRow()
+                        }
+                    }
+                )
+                toolbar.add(advanceRowCheckbox)
+            }
+            val addRemoveRows = AddRemoveRows(listOf(tablePanel.table))
+            init {
+                layout = MigLayout("gap 0px 0px, ins 0")
+                add(tablePanel, "wrap")
+                add(addRemoveRows)
+            }
+        }
+
+        val trainingDataPanel = createUnsupervisedDataPanel(unsupervisedNetwork.trainingData)
+        val testingDataPanel = createUnsupervisedDataPanel(unsupervisedNetwork.testingData)
 
         fun syncDataSet() {
-            // Extract data from the matrix editors and update the network's data
-            val trainingMatrixEditor = trainingDataPanel.components
-                .filterIsInstance<MatrixEditor>()
-                .firstOrNull()
-            val testingMatrixEditor = testingDataPanel.components
-                .filterIsInstance<MatrixEditor>()
-                .firstOrNull()
-                
-            trainingMatrixEditor?.let { editor ->
-                unsupervisedNetwork.trainingData = Matrix.of(editor.table.model.get2DDoubleArray())
-            }
-            testingMatrixEditor?.let { editor ->
-                unsupervisedNetwork.testingData = Matrix.of(editor.table.model.get2DDoubleArray())
-            }
+            // Extract data from the table panels and update the network's data
+            unsupervisedNetwork.trainingData = trainingDataPanel.tablePanel.table.model.get2DDoubleList().toMutableListOfLists()
+            unsupervisedNetwork.testingData = testingDataPanel.tablePanel.table.model.get2DDoubleList().toMutableListOfLists()
         }
 
         val dataSetTabPane = JTabbedPane().apply {
@@ -313,8 +381,12 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         mainPanel.add(dataSetTabPane, "span, grow")
 
         addCommitTask { syncDataSet() }
+        addCloseTask {
+            trainingJob?.cancel()
+        }
 
         contentPane = mainPanel
+        setAsDoneDialog()
     }
 }
 

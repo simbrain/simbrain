@@ -2,8 +2,8 @@ package org.simbrain.workspace.gui;
 
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.UpdateAction;
 import org.simbrain.workspace.Workspace;
-import org.simbrain.workspace.updater.UpdateAction;
 import org.simbrain.workspace.updater.UpdateActionManager.UpdateManagerListener;
 
 import javax.swing.*;
@@ -189,7 +189,7 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
 
         JButton downFullButton = new JButton(ResourceManager.getSmallIcon("menu_icons/DownFull.png"));
         downFullButton.setToolTipText("Move selected action to bottom of sequence");
-        downFullButton.addActionListener(evt -> moveSelectedUpdateAction(currentActionListModel.getSize() - currentActionJList.getSelectedIndex()));
+        downFullButton.addActionListener(evt -> moveSelectedUpdateAction(currentActionListModel.getSize() - 1 - currentActionJList.getSelectedIndex()));
         buttonPanel.add(downFullButton);
 
         add(buttonPanel, BorderLayout.SOUTH);
@@ -271,7 +271,8 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
             listModel.addElement(action);
         }
         configureAvailableJList(availableActionJList);
-        StandardDialog addActionsDialog = new StandardDialog() {
+        Window parentWindow = SwingUtilities.getWindowAncestor(this);
+        StandardDialog addActionsDialog = new StandardDialog(parentWindow, "Add Available Update Action") {
             @Override
             protected void closeDialogOk() {
                 super.closeDialogOk();
@@ -280,11 +281,9 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
                 }
             }
         };
-        addActionsDialog.setTitle("Add Available Update Action");
         addActionsDialog.setContentPane(availableListScroll);
-        addActionsDialog.pack();
-        addActionsDialog.setLocationRelativeTo(null);
-        addActionsDialog.setVisible(true);
+        addActionsDialog.setModal(true);
+        addActionsDialog.makeVisible();
     }
 
     /**
@@ -313,6 +312,9 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
             return;
         }
         int selected = currentActionJList.getSelectedIndex();
+        if (selected < 0) {
+            return; // No item selected
+        }
         int target = selected + move;
         if (target >= 0 && target < currentActionListModel.getSize()) {
             swap(selected, target);

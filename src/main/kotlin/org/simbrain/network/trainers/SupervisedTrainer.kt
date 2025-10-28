@@ -4,12 +4,13 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import org.simbrain.network.core.*
 import org.simbrain.network.events.TrainerEvents
+import org.simbrain.network.events.TrainingStats
 import org.simbrain.network.trainers.SupervisedTrainer.*
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
-import org.simbrain.util.rowVectorTransposed
+import org.simbrain.util.toColumnVector
 import smile.math.matrix.Matrix
 import kotlin.random.Random
 import kotlin.reflect.KFunction
@@ -22,34 +23,55 @@ open class SupervisedTrainerConfig(lossFunctionProvider: KFunction<List<Class<ou
 
     var lossFunction:BackpropLossFunction by GuiEditable(
         initValue = BackpropLossFunction.SSE,
+        description = "Loss function used to measure prediction error. SSE/MSE for regression; cross Entropy for classification",
         typeMapProvider = lossFunctionProvider
     )
 
     var optimizer: Optimizer by GuiEditable(
         initValue = AdamOptimizer(),
+        description = "Optimization algorithm for updating network weights.",
         showDetails = false,
         order = 20
     )
 
-    @UserParameter(label = "Update type", showDetails = false, order = 30)
+    @UserParameter(
+        label = "Update type", 
+        description = "Training update method. Epoch processes entire dataset; batch processes fixed-size batches",
+        showDetails = false, 
+        order = 30
+    )
     open var updateType: UpdateMethod = UpdateMethod.Epoch()
 
     var weightInitializationStrategy: WeightInitializationStrategy by GuiEditable(
         initValue = Xavier(),
+        description = "Strategy for initializing network weights. Xavier for general use, He for ReLU networks, LeCun for SELU networks",
         showDetails = false,
         order = 40
     )
 
     var stoppingCondition by GuiEditable(
         initValue = StoppingCondition(),
+        description = "Conditions for automatically stopping training. Can stop after max iterations, error threshold, or early stopping",
         showDetails = false,
         order = 50
     )
 
     var testConfiguration by GuiEditable(
         initValue = TestConfiguration(),
+        description = "Settings for testing the network on validation data during training to monitor generalization performance",
         showDetails = false,
         order = 60
+    )
+
+    @UserParameter(
+        label = "Compute accuracy",
+        description = "Calculate and display classification accuracy for networks with one-hot encoded targets",
+        order = 70
+    )
+    var computeAccuracy by GuiEditable(
+        initValue = false,
+        description = "Calculate and display classification accuracy for networks with one-hot encoded targets",
+        order = 70
     )
 
     override val name = "Optimizer Properties"
@@ -63,6 +85,7 @@ open class SupervisedTrainerConfig(lossFunctionProvider: KFunction<List<Class<ou
         it.weightInitializationStrategy = weightInitializationStrategy.copy()
         it.stoppingCondition = stoppingCondition.copy()
         it.testConfiguration = testConfiguration.copy()
+        it.computeAccuracy = computeAccuracy
     }
 
     override fun copy() = copyCurrentInto(SupervisedTrainerConfig())
@@ -73,7 +96,7 @@ open class SupervisedTrainerConfig(lossFunctionProvider: KFunction<List<Class<ou
  */
 class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedNetwork) : CoroutineScope {
 
-    private var job = SupervisorJob()
+    val job = SupervisorJob()
 
     override val coroutineContext = Dispatchers.Default + job
 
@@ -92,6 +115,22 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
      * Used when reopening the trainer controls so user knows where things left off
      */
     var lastTrainingError = 0.0
+
+    /**
+     * Last training accuracy (only available for softmax networks)
+     */
+    var lastTrainingAccuracy: Double? = null
+
+    /**
+     * Last testing accuracy (only available for softmax networks)
+     */
+    var lastTestingAccuracy: Double? = null
+
+    /**
+     * Accumulator for batch accuracy calculation (avoids recomputing forward passes)
+     */
+    private var batchAccuracySum = 0.0
+    private var batchSampleCount = 0
 
     var isRunning = false
 
@@ -138,6 +177,8 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
             iteration = 0
             events.iterationReset.fire()
         }
+        // Reset early stopping state when training starts
+        config.stoppingCondition.resetEarlyStopping()
         isRunning = true
         events.beginTraining.fire().await()
         submitTask(TrainerTask.Train)
@@ -158,9 +199,14 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
 
     private suspend fun trainOnceHandler() {
         iteration++
+        
+        // Reset batch accuracy accumulators
+        batchAccuracySum = 0.0
+        batchSampleCount = 0
+        
         with(config.updateType) {
             lastTrainingError = when (this) {
-                is UpdateMethod.Stochastic -> trainRow(Random.nextInt(supervisedNetwork.trainingSet.inputs.nrow()))
+                is UpdateMethod.Stochastic -> trainRow(Random.nextInt(supervisedNetwork.trainingSet.size))
                 is UpdateMethod.Epoch -> trainBatch(0 until supervisedNetwork.trainingSet.size)
                 is UpdateMethod.Batch -> {
                     val startIndex = Random.nextInt(0, supervisedNetwork.trainingSet.size - batchSize + 1)
@@ -169,14 +215,40 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
                 }
             }
         }
-        val testError = if (config.testConfiguration.enabled && iteration % config.testConfiguration.testFrequency == 1) {
+        
+        // Use accumulated accuracy from batch training (much faster!)
+        lastTrainingAccuracy = if (config.computeAccuracy && batchSampleCount > 0) {
+            batchAccuracySum / batchSampleCount
+        } else {
+            null
+        }
+        
+        val shouldComputeTest = config.testConfiguration.enabled && supervisedNetwork.testingSet.size > 0 && 
+                                iteration % config.testConfiguration.testFrequency == 0
+        
+        val testError = if (shouldComputeTest) {
             computeTestError()
         } else {
             null
         }
-        events.errorUpdated.fire(lastTrainingError to testError).await()
+        
+        // Compute test accuracy when test error is computed and accuracy is enabled
+        val testAccuracy = if (shouldComputeTest && config.computeAccuracy) {
+            lastTestingAccuracy = computeTestAccuracy()
+            lastTestingAccuracy
+        } else {
+            null
+        }
+        
+        val trainingStats = TrainingStats(
+            trainingError = lastTrainingError,
+            testingError = testError,
+            trainingAccuracy = lastTrainingAccuracy,
+            testingAccuracy = testAccuracy
+        )
+        events.errorUpdated.fire(trainingStats).await()
         if (isRunning) {
-            if (config.stoppingCondition.validate(iteration, lastTrainingError)) {
+            if (config.stoppingCondition.validate(iteration, lastTrainingError, testError)) {
                 stoppingConditionReached = true
                 submitTask(TrainerTask.Stop)
             } else {
@@ -209,12 +281,12 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
         val error = with(supervisedNetwork) {
             rowRange.sumOf { rowNum ->
                 val rowProbeContext = probeContext?.createMapProbe("trainRow-$rowNum")
-                inputLayer.setActivations(trainingSet.inputs.row(rowNum))
+                inputLayer.setActivations(trainingSet.inputs[rowNum].toDoubleArray())
                 
                 // Handle target reshaping for ActivationSequence outputs
                 val targetVec = if (outputLayer is ActivationSequence) {
                     // Reshape flattened target back to sequence format
-                    val flatTarget = trainingSet.targets.row(rowNum)
+                    val flatTarget = trainingSet.targets[rowNum].toDoubleArray()
                     val sequenceLayer = outputLayer as ActivationSequence
                     val sequenceSize = sequenceLayer.sequenceSize
                     val vocabSize = sequenceLayer.size
@@ -229,12 +301,22 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
                     }
                     reshapedTarget
                 } else {
-                    trainingSet.targets.rowVectorTransposed(rowNum)
+                    trainingSet.targets[rowNum].toDoubleArray().toColumnVector()
                 }
                 
                 with(network) {
                     forwardPass()
                     rowProbeContext?.write("forwardPassOutputActivations", outputLayer.activations.clone())
+                    
+                    // Accumulate accuracy during training (reuse forward pass results)
+                    if (config.computeAccuracy) {
+                        val accuracy = classificationAccuracy(outputLayer.activations, targetVec)
+                        if (accuracy != null) {
+                            batchAccuracySum += accuracy
+                            batchSampleCount++
+                        }
+                    }
+                    
                     supervisedNetwork.layers.accumulateBackprop(
                         listOf(inputLayer),
                         targetVec,
@@ -311,7 +393,12 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
      */
     open suspend fun computeTestError(): Double {
         return supervisedNetwork.testingSet.sumOf { (input, target) ->
-            supervisedNetwork.inputLayer.activations = input
+            // Handle input reshaping for ActivationSequence inputs
+            if (supervisedNetwork.inputLayer is ActivationSequence) {
+                supervisedNetwork.inputLayer.setActivations(input.toDoubleArray())
+            } else {
+                supervisedNetwork.inputLayer.activations = input.toDoubleArray().toColumnVector()
+            }
             with(network) { supervisedNetwork.forwardPass() }
             val output = supervisedNetwork.outputLayer.activations
             
@@ -327,22 +414,65 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
                 for (seqPos in 0 until sequenceSize) {
                     for (vocabPos in 0 until vocabSize) {
                         val flatIndex = seqPos * vocabSize + vocabPos
-                        reshapedTarget[seqPos, vocabPos] = target[flatIndex, 0]
+                        reshapedTarget[seqPos, vocabPos] = target[flatIndex]
                     }
                 }
                 reshapedTarget
             } else {
-                target
+                target.toDoubleArray().toColumnVector()
             }
             
             config.lossFunction.scalarLoss(output, reshapedTarget)
         } / supervisedNetwork.testingSet.size
     }
 
+    /**
+     * Compute the accuracy on the testing set
+     */
+    open suspend fun computeTestAccuracy(): Double {
+        return supervisedNetwork.testingSet.mapNotNull { (input, target) ->
+            // Handle input reshaping for ActivationSequence inputs
+            if (supervisedNetwork.inputLayer is ActivationSequence) {
+                supervisedNetwork.inputLayer.setActivations(input.toDoubleArray())
+            } else {
+                supervisedNetwork.inputLayer.activations = input.toDoubleArray().toColumnVector()
+            }
+            with(network) { supervisedNetwork.forwardPass() }
+            val output = supervisedNetwork.outputLayer.activations
+            
+            // Handle target reshaping for ActivationSequence outputs
+            val reshapedTarget = if (supervisedNetwork.outputLayer is ActivationSequence) {
+                // Reshape flattened target back to sequence format
+                val sequenceLayer = supervisedNetwork.outputLayer as ActivationSequence
+                val sequenceSize = sequenceLayer.sequenceSize
+                val vocabSize = sequenceLayer.size
+                
+                // Reshape from (sequenceSize * vocabSize, 1) to (sequenceSize, vocabSize)
+                val reshapedTarget = Matrix(sequenceSize, vocabSize)
+                for (seqPos in 0 until sequenceSize) {
+                    for (vocabPos in 0 until vocabSize) {
+                        val flatIndex = seqPos * vocabSize + vocabPos
+                        reshapedTarget[seqPos, vocabPos] = target[flatIndex]
+                    }
+                }
+                reshapedTarget
+            } else {
+                target.toDoubleArray().toColumnVector()
+            }
+            
+            classificationAccuracy(output, reshapedTarget)
+        }.let { validAccuracies ->
+            if (validAccuracies.isEmpty()) 0.0 else validAccuracies.sum() / validAccuracies.size
+        }
+    }
+
+
+
+
     sealed class UpdateMethod: CopyableObject {
         class Stochastic : UpdateMethod() {
             override fun copy() = this
-            override fun toString() = "Batch = 1"
+            override fun toString() = "Stochastic"
         }
 
         class Epoch : UpdateMethod() {
@@ -350,9 +480,14 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
             override fun toString() = "Epoch"
         }
 
-        class Batch(@UserParameter(label = "Batch Size", minimumValue = 1.0, order = 1) var batchSize: Int = 5) : UpdateMethod() {
+        class Batch(@UserParameter(
+            label = "Batch size", 
+            description = "Number of training examples processed together in each update. Larger batches are more stable but use more memory",
+            minimumValue = 1.0, 
+            order = 1
+        ) var batchSize: Int = 5) : UpdateMethod() {
             override fun copy() = Batch(batchSize)
-            override fun toString() = "Batch = $batchSize"
+            override fun toString() = "Batch"
         }
 
         override fun getTypeList(): List<Class<out CopyableObject>>? {
@@ -374,39 +509,116 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
     class StoppingCondition: CopyableObject {
         var maxIterations by GuiEditable(
             initValue = 10_000,
+            description = "Maximum number of training iterations before stopping automatically",
             order = 1
         )
         var useErrorThreshold by GuiEditable(
             initValue = false,
+            description = "Stop training when error falls below specified threshold",
             order = 2
         )
         var errorThreshold by GuiEditable(
             0.1,
+            description = "Training stops when error falls below this value",
             order = 3,
             conditionallyEnabledBy = StoppingCondition::useErrorThreshold
         )
+        
+        var useEarlyStopping by GuiEditable(
+            initValue = false,
+            order = 4,
+            description = "Stop training when test error stops improving (requires test data)"
+        )
+        var earlyStoppingPatience by GuiEditable(
+            initValue = 5,
+            order = 5,
+            description = "Number of test evaluations to wait for improvement before stopping",
+            conditionallyEnabledBy = StoppingCondition::useEarlyStopping
+        )
+        var earlyStoppingMinDelta by GuiEditable(
+            initValue = 0.0,
+            order = 6,
+            description = "Minimum improvement required to reset patience counter",
+            conditionallyEnabledBy = StoppingCondition::useEarlyStopping
+        )
+        
+        // Internal state for early stopping (not serialized)
+        @Transient
+        private var bestTestError = Double.MAX_VALUE
+        @Transient
+        private var patienceCounter = 0
 
         override fun copy(): StoppingCondition {
             return StoppingCondition().also {
                 it.maxIterations = maxIterations
                 it.useErrorThreshold = useErrorThreshold
                 it.errorThreshold = errorThreshold
+                it.useEarlyStopping = useEarlyStopping
+                it.earlyStoppingPatience = earlyStoppingPatience
+                it.earlyStoppingMinDelta = earlyStoppingMinDelta
+                // Don't copy transient state - let it reset
             }
         }
 
-        fun validate(iterations: Int, error: Double): Boolean {
-            return iterations >= maxIterations || (useErrorThreshold && error < errorThreshold)
+        fun validate(iterations: Int, trainingError: Double, testError: Double? = null): Boolean {
+            // Check standard stopping conditions
+            val standardStop = iterations >= maxIterations || (useErrorThreshold && trainingError < errorThreshold)
+            
+            // Check early stopping if enabled and test error is available
+            val earlyStop = if (useEarlyStopping && testError != null) {
+                checkEarlyStopping(testError)
+            } else {
+                false
+            }
+            
+            return standardStop || earlyStop
+        }
+        
+        private fun checkEarlyStopping(testError: Double): Boolean {
+            val improvement = bestTestError - testError
+            
+            if (improvement > earlyStoppingMinDelta) {
+                // Improvement found - reset patience and update best error
+                bestTestError = testError
+                patienceCounter = 0
+                return false
+            } else {
+                // No improvement - increment patience
+                patienceCounter++
+                return patienceCounter >= earlyStoppingPatience
+            }
+        }
+        
+        /**
+         * Reset early stopping state (called when training starts)
+         */
+        fun resetEarlyStopping() {
+            bestTestError = Double.MAX_VALUE
+            patienceCounter = 0
+        }
+        
+        /**
+         * Get current early stopping status for display
+         */
+        fun getEarlyStoppingStatus(): String? {
+            return if (useEarlyStopping) {
+                "Best test error: ${if (bestTestError == Double.MAX_VALUE) "N/A" else "%.6f".format(bestTestError)}, Patience: $patienceCounter/$earlyStoppingPatience"
+            } else {
+                null
+            }
         }
     }
 
     class TestConfiguration: CopyableObject {
         var enabled by GuiEditable(
             initValue = true,
+            description = "Enable testing on validation data during training to monitor generalization performance",
             order = 1
         )
 
         var testFrequency by GuiEditable(
             initValue = 10,
+            description = "How often to test on validation data (every N training iterations)",
             order = 2,
             conditionallyEnabledBy = TestConfiguration::enabled
         )

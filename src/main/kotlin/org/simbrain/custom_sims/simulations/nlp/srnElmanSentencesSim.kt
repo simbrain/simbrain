@@ -3,10 +3,11 @@ package org.simbrain.custom_sims.simulations
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.simbrain.custom_sims.addNetworkComponent
+import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.addTextWorld
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.subnetworks.SRNNetwork
-import org.simbrain.network.trainers.MatrixDataset
+import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.util.*
 import org.simbrain.world.textworld.EmbeddingType
 import org.simbrain.world.textworld.TokenEmbeddingBuilder
@@ -64,15 +65,16 @@ val srnElmanSentences = newSim {
     val trainingTargetTokens = trainingInputsTokens.drop(1)
     val trainingTarget = trainingInputs.shiftUpAndPadEndWithZero()
 
-    srn.trainingSet = MatrixDataset(
-        trainingInputs,
-        trainingTarget,
+    srn.trainingSet = TrainingDataset(
+        inputs = trainingInputs.toArray().map { it.toMutableList() }.toMutableList(),
+        targets = trainingTarget.toArray().map { it.toMutableList() }.toMutableList(),
         inputRowNames = trainingInputsTokens,
         inputColumnNames = textWorldInputs.world.tokenEmbedding.tokens,
         targetRowNames = trainingTargetTokens,
         targetColumnNames = textWorldInputs.world.tokenEmbedding.tokens
     )
     srn.trainerConfig.learningRate = learningRate
+    srn.trainerConfig.computeAccuracy = true
 
     // Comment this out to pretrain the network
     // From the original paper: "The training continued in this manner until the network had experienced 6 complete passes
@@ -119,6 +121,53 @@ val srnElmanSentences = newSim {
         delay(10L)
         workspace.iterateSuspend(1)
     }
+
+    addSidebarInfo(
+        """
+        # Introduction
+        
+        This simulation implements Elman's (1990) classic study of temporal pattern learning in Simple Recurrent Networks (SRNs). 
+        he network learns to predict the next word in grammatically constrained sentences, developing internal representations 
+        that capture syntactic and semantic relationships.
+
+        # Simulation Details
+        
+        The simulation creates sentences using grammatical templates with different word categories:
+        - **Noun categories**: Human, animal, inanimate objects, aggressive entities, fragile items, food
+        - **Verb categories**: Intransitive, transitive, aggressive-patient, perceptual, destructive, eating
+        
+        Example sentence templates:
+        - "man eat cookie" (human + eat + food)
+        - "dragon destroy glass" (aggressive + destroy + fragile)
+        - "cat chase mouse" (animal + transitive + animal)
+        
+        The SRN processes these sentences one word at a time, using its recurrent connections to maintain context and predict the next word based on grammatical constraints.
+
+        # What to Do
+        
+        1. **Run the simulation** to see the network processing the current sentence
+        
+        2. **Train the network** by right-clicking on the SRN network and opening the training dialog
+        
+        3. **Monitor learning progress** through the loss function - the network should learn to predict grammatically appropriate next words
+        
+        4. **Observe predictions** in the output text world to see what words the network thinks should come next
+        
+        5. **Experiment with parameters**:
+           - Adjust the number of training sentences
+           - Modify the learning rate
+           - Change the hidden layer size
+
+        # References
+        
+        Elman, J. L. (1990). [Finding structure in time](https://crl.ucsd.edu/~elman/Papers/fsit.pdf). _Cognitive Science_, _14_(2), 179-211.
+
+        # Credits
+        
+        [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
+        
+        """.trimIndent()
+    )
 
 }
 

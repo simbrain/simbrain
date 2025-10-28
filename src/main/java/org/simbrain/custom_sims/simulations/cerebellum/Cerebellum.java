@@ -11,8 +11,8 @@ import org.simbrain.network.neurongroups.NeuronGroup;
 import org.simbrain.network.updaterules.DecayRule;
 import org.simbrain.plot.timeseries.TimeSeriesModel;
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent;
+import org.simbrain.util.UpdateActionKt;
 import org.simbrain.workspace.gui.SimbrainDesktop;
-import org.simbrain.workspace.updater.UpdateActionKt;
 
 import javax.swing.*;
 import javax.swing.event.ChangeEvent;

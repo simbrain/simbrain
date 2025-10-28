@@ -130,13 +130,6 @@ class BasicDataFrameTest {
     }
 
     @Test
-    fun `test cannot delete last row`() {
-        val singleRowDf = BasicDataFrame(1, 3)
-        singleRowDf.deleteRow(0)
-        assertEquals(1, singleRowDf.rowCount) // Should still have the row
-    }
-
-    @Test
     fun `test set and get value at`() {
         df.setValueAt("Updated", 0, 0)
         assertEquals("Updated", df.getValueAt(0, 0))

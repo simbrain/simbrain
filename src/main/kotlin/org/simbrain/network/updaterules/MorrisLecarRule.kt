@@ -42,7 +42,7 @@ class MorrisLecarRule : SpikingNeuronUpdateRule<MorrisLecarData, SpikingMatrixDa
      * Leak conductance (micro Siemens/cm^2).
      */
     @UserParameter(
-        label = "Leak Conductance (µS/cm²)",
+        label = "Leak conductance (µS/cm²)",
         description = "Leak conductance. If higher, voltage pulled more quickly to Leak equilibrium.",
         increment = .1,
         order = 9,
@@ -78,7 +78,7 @@ class MorrisLecarRule : SpikingNeuronUpdateRule<MorrisLecarData, SpikingMatrixDa
      * Resting potential for leak current (mV).
      */
     @UserParameter(
-        label = "Leak Equilibrium (mV)",
+        label = "Leak equilibrium (mV)",
         description = "An option to add noise.",
         increment = .1,
         order = 12,
@@ -103,7 +103,7 @@ class MorrisLecarRule : SpikingNeuronUpdateRule<MorrisLecarData, SpikingMatrixDa
      * Membrane voltage constant 1.
      */
     @UserParameter(
-        label = "Voltage Const. 1",
+        label = "Voltage const. 1",
         description = "How does calcium respond to voltage.",
         increment = .1,
         order = 2,
@@ -115,7 +115,7 @@ class MorrisLecarRule : SpikingNeuronUpdateRule<MorrisLecarData, SpikingMatrixDa
      * Membrane voltage constant 2.
      */
     @UserParameter(
-        label = "Voltage Const. 2",
+        label = "Voltage const. 2",
         description = "How does calcium respond to voltage.",
         increment = .1,
         order = 3,
@@ -164,7 +164,7 @@ class MorrisLecarRule : SpikingNeuronUpdateRule<MorrisLecarData, SpikingMatrixDa
      * Background current (nA).
      */
     @UserParameter(
-        label = "Background Current (nA)",
+        label = "Background current (nA)",
         description = "A constant level of current that can be set.",
         increment = .1,
         order = 5,

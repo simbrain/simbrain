@@ -34,14 +34,14 @@ import kotlin.math.min
 class PointNeuronRule : SpikingNeuronUpdateRule<PointNeuronScalarData, SpikingMatrixData>() {
 
     @UserParameter(
-        label = "Output Function",
+        label = "Output function",
         description = "Current output function.",
         order = 5
     )
     var outputFunction: OutputFunction = OutputFunction.RATE_CODE
 
     @UserParameter(
-        label = "Excitatory Reversal",
+        label = "Excitatory reversal",
         description = "Equilibrium potential for excitatory currents.",
         minimumValue = 0.0,
         maximumValue = 1.0,
@@ -51,7 +51,7 @@ class PointNeuronRule : SpikingNeuronUpdateRule<PointNeuronScalarData, SpikingMa
     var excitatoryReversal: Double = 1.0
 
     @UserParameter(
-        label = "Inhibitory Reversal",
+        label = "Inhibitory reversal",
         description = "Inhibitory reversal field.",
         minimumValue = 0.0,
         maximumValue = 1.0,
@@ -61,7 +61,7 @@ class PointNeuronRule : SpikingNeuronUpdateRule<PointNeuronScalarData, SpikingMa
     var inhibitoryReversal: Double = 0.25
 
     @UserParameter(
-        label = "Leak Reversal",
+        label = "Leak reversal",
         description = "Equilibrium resting potential. With no inputs the voltage will approaches this.",
         minimumValue = 0.0,
         maximumValue = 1.0,
@@ -72,7 +72,7 @@ class PointNeuronRule : SpikingNeuronUpdateRule<PointNeuronScalarData, SpikingMa
 
     @UserParameter(
         label = "Reset potential",
-        description = "Membrane potential to reset to after a spike",
+        description = "Membrane potential to reset to after a spike.",
         minimumValue = 0.0,
         maximumValue = 1.0,
         increment = 0.1,
@@ -94,7 +94,7 @@ class PointNeuronRule : SpikingNeuronUpdateRule<PointNeuronScalarData, SpikingMa
 
     var thresholdPotential by GuiEditable(
         initValue = .5,
-        label = "Threshold Potential",
+        label = "Threshold potential",
         description = "Threshold of excitation field.",
         increment = .1,
         min = 0.0,
@@ -104,7 +104,7 @@ class PointNeuronRule : SpikingNeuronUpdateRule<PointNeuronScalarData, SpikingMa
 
 
     @UserParameter(
-        label = "Max Excitatory Conductance",
+        label = "Max excitatory conductance",
         description = "Higher values -> faster approach to excitatory reversal.",
         minimumValue = 0.0,
         maximumValue = 1.0,
@@ -115,7 +115,7 @@ class PointNeuronRule : SpikingNeuronUpdateRule<PointNeuronScalarData, SpikingMa
     var excitatoryMaxConductance: Double = 1.0
 
     @UserParameter(
-        label = "Max Inhibitory Conductance",
+        label = "Max inhibitory conductance",
         description = "Higher values -> faster approach to inhibitory reversal.",
         order = 20,
         increment = .1,
@@ -125,7 +125,7 @@ class PointNeuronRule : SpikingNeuronUpdateRule<PointNeuronScalarData, SpikingMa
     var inhibitoryMaxConductance: Double = 1.0
 
     @UserParameter(
-        label = "Leak Conductance",
+        label = "Leak conductance",
         description = "Higher values -> approaches leak reversal quicker.",
         minimumValue = 0.0,
         increment = .1,
@@ -133,7 +133,6 @@ class PointNeuronRule : SpikingNeuronUpdateRule<PointNeuronScalarData, SpikingMa
         tab = "Conductances"
     )
     var leakConductance: Double = .1
-
 
     var toolTipString = ""
 
@@ -215,10 +214,10 @@ class PointNeuronRule : SpikingNeuronUpdateRule<PointNeuronScalarData, SpikingMa
         data.membranePotential += timeStep * netCurrent
 
         toolTipString = """
-            membrane potential ${data.membranePotential.roundToString(2)}<br>
-            excitatory conductance ${data.excitatoryConductance.roundToString(2)}<br>
-            inhibitory conductance ${data.inhibitoryConductance.roundToString(2)}<br>
-            leak current ${leakCurrent.roundToString(2)}
+            Membrane potential: ${data.membranePotential.roundToString(2)}<br>
+            Excitatory conductance: ${data.excitatoryConductance.roundToString(2)}<br>
+            Inhibitory conductance: ${data.inhibitoryConductance.roundToString(2)}<br>
+            Leak current: ${leakCurrent.roundToString(2)}
         """.trimIndent()
 
 //        println(toolTipString)
@@ -273,7 +272,7 @@ class PointNeuronRule : SpikingNeuronUpdateRule<PointNeuronScalarData, SpikingMa
         return neuron.fanIn.filter { it.strength < 0.0 }.sumOf { abs(it.psr) }.clip(0.0..1.0)
     }
 
-    override fun getToolTipText(neuron: Neuron): String? {
+    override fun getToolTipText(neuron: Neuron): String {
         return toolTipString
     }
 
@@ -291,15 +290,15 @@ class PointNeuronScalarData(
     var membranePotential: Double = .15,
 
     @UserParameter(
-        label = "Excitatory Conductance",
-        description = "Current excitatory conductance.Proportion of channels open",
+        label = "Excitatory conductance",
+        description = "Current excitatory conductance. Proportion of channels open.",
         minimumValue = 0.0
     )
     var excitatoryConductance: Double = 0.0,
 
     @UserParameter(
-        label = "Inhibitory Conductance",
-        description = "Current inhibitory conductance. Proportion of channels open",
+        label = "Inhibitory conductance",
+        description = "Current inhibitory conductance. Proportion of channels open.",
         minimumValue = 0.0
     )
     var inhibitoryConductance: Double = 0.0,

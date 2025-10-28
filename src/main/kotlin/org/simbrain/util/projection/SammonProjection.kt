@@ -73,6 +73,6 @@ class SammonProjection: ProjectionMethod(), IterableProjectionMethod {
 
     override val name = "Sammon"
 
-    override fun copy() = SammonProjection()
+    override fun copy() = SammonProjection().also { it.epsilon = epsilon }
 
 }

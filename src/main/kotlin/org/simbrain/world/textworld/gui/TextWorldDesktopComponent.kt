@@ -108,7 +108,7 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
             edit.addSeparator()
             edit.add(
                 SimbrainDesktop.actionManager.createCoupledDataWorldAction(
-                    name = "Record Word Embeddings",
+                    name = "Record word embeddings",
                     world.getProducer(TextWorld::currentVector),
                     sourceName = "${world.id} Word Embeddings",
                     world.tokenEmbedding.dimension
@@ -131,6 +131,7 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
 
         // View Menu
         val viewMenu = JMenu("View")
+        viewMenu.add(world.extractEmbeddingFromCurrentText)
         viewMenu.add(world.viewTokenEmbedding)
         menuBar.add(viewMenu)
 

@@ -32,6 +32,11 @@ val buildMain = "${buildDir}/main"
 val includeAllPlatforms = project.findProperty("includeAllPlatforms")?.toString()?.toBoolean() ?: false
 val versionSuffixString = project.findProperty("versionSuffix")?.toString() ?: ""
 
+// Build information from CI/CD
+val buildNumber = project.findProperty("buildNumber")?.toString() ?: "dev"
+val commitSha = project.findProperty("commitSha")?.toString() ?: "unknown"
+val buildTimestamp = project.findProperty("buildTimestamp")?.toString() ?: "unknown"
+
 project.version = version
 
 val simbrainJvmArgs = listOf(
@@ -220,10 +225,86 @@ tasks.shadowJar {
         )
     }
     archiveFileName.set("Simbrain.jar")
+    
+    doLast {
+        println("=== SHADOW JAR VERIFICATION ===")
+        val jarFile = archiveFile.get().asFile
+        println("Shadow JAR created: ${jarFile.absolutePath}")
+        println("JAR size: ${jarFile.length()} bytes")
+        
+        // Check if build-info.properties is in the JAR
+        try {
+            val process = ProcessBuilder("jar", "tf", jarFile.absolutePath)
+                .redirectErrorStream(true)
+                .start()
+            
+            val output = process.inputStream.bufferedReader().readText()
+            val hasBuildInfo = output.contains("build-info.properties")
+            
+            if (hasBuildInfo) {
+                println("✓ build-info.properties found in JAR")
+            } else {
+                println("✗ ERROR: build-info.properties NOT found in JAR")
+                println("JAR contents (first 20 entries):")
+                output.lines().take(20).forEach { println("  $it") }
+            }
+        } catch (e: Exception) {
+            println("Could not verify JAR contents: ${e.message}")
+        }
+        println("=== END SHADOW JAR VERIFICATION ===")
+    }
+}
+
+// Generate build info properties file
+tasks.register("generateBuildInfo") {
+    val outputDir = File("${buildDir}/generated-resources/main")
+    val outputFile = File(outputDir, "build-info.properties")
+    
+    outputs.file(outputFile)
+    
+    doLast {
+        println("=== BUILD INFO GENERATION ===")
+        println("Build Number: ${buildNumber}")
+        println("Commit SHA: ${commitSha}")
+        println("Build Timestamp: ${buildTimestamp}")
+        
+        println("Creating build info directory: ${outputDir.absolutePath}")
+        val dirCreated = outputDir.mkdirs()
+        println("Directory created: ${dirCreated} (or already exists)")
+        
+        val content = """
+            version=${version}
+            versionName=${versionName}
+            buildNumber=${buildNumber}
+            commitSha=${commitSha}
+            buildTimestamp=${buildTimestamp}
+        """.trimIndent()
+        
+        println("Writing build info to: ${outputFile.absolutePath}")
+        outputFile.writeText(content)
+        
+        if (outputFile.exists()) {
+            println("✓ Build info file created successfully")
+            println("File size: ${outputFile.length()} bytes")
+            println("File content:")
+            println(outputFile.readText())
+        } else {
+            println("✗ ERROR: Build info file was not created!")
+        }
+        println("=== END BUILD INFO GENERATION ===")
+    }
+}
+
+// Register generated build info directory as additional output
+sourceSets {
+    main {
+        output.dir(tasks.named("generateBuildInfo"))
+    }
 }
 
 tasks.register<Copy>("buildDistribution") {
     dependsOn("shadowJar")
+    dependsOn("generateBuildInfo")
 
     doFirst {
         from("${buildDir}/libs/Simbrain.jar")
@@ -561,7 +642,14 @@ val runScriptFile = File.createTempFile("run", ".sh").apply {
         fi
 
         # Run the jar using the appropriate Java version
-        ${dollar}java_path -jar Simbrain.jar
+        ${dollar}java_path \
+            --add-opens java.base/java.util=ALL-UNNAMED \
+            --add-opens java.desktop/java.awt=ALL-UNNAMED \
+            --add-opens java.desktop/java.awt.geom=ALL-UNNAMED \
+            --add-opens java.base/java.util.concurrent=ALL-UNNAMED \
+            --add-opens java.base/java.util.concurrent.atomic=ALL-UNNAMED \
+            --add-opens java.base/java.lang=ALL-UNNAMED \
+            -jar Simbrain.jar
     """.trimIndent()
     )
     setExecutable(true)

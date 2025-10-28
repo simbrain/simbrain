@@ -86,7 +86,13 @@ abstract class ScreenElement protected constructor(val networkPanel: NetworkPane
         private fun showContextMenu(event: PInputEvent) {
             event.isHandled = true
             val (x, y) = event.canvasPosition.int
-            contextMenu?.show(networkPanel.canvas, x, y)
+            
+            contextMenu?.let { menu ->
+                // Apply both drag reset and mouse button fixes using the utility
+                org.simbrain.network.gui.MouseEventUtils.applyContextMenuFixes(networkPanel, event, menu)
+                menu.show(networkPanel.canvas, x, y)
+            }
+            
             event.pickedNode.firstScreenElement?.let {
                 networkPanel.selectionManager.add(it)
             }

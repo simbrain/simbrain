@@ -10,18 +10,16 @@ import org.simbrain.util.projection.DataPoint
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.objectWrapper
 import org.simbrain.util.widgets.CorrPlotPanel
+import org.simbrain.workspace.WorkspacePreferences
 import org.simbrain.workspace.gui.SimbrainDesktop
 import smile.io.Read
+import smile.math.matrix.Matrix
 import smile.plot.swing.BoxPlot
 import smile.plot.swing.Histogram
 import smile.plot.swing.PlotGrid
+import java.awt.Component
 import javax.swing.JOptionPane
 import kotlin.reflect.KClass
-
-/**
- * Default directory where tables are stored.
- */
-private val TABLE_DIRECTORY = "." + Utils.FS + "simulations" + Utils.FS + "wordembeddings"
 
 fun SimbrainTablePanel.addSimpleDefaults() {
     addAction(table.zeroFillAction)
@@ -33,7 +31,15 @@ val SimbrainJTable.randomizeAction
         name = "Randomize",
         description = "Randomize selected cells",
         iconPath = "menu_icons/Rand.png",
-        keyboardShortcut = CmdOrCtrl + 'R'
+        keyboardShortcut = CmdOrCtrl + 'R',
+        initBlock = {
+            fun updateAction() {
+                isEnabled = getSelectedCells().isNotEmpty()
+            }
+            updateAction()
+            selectionModel.addListSelectionListener { updateAction() }
+            columnModel.selectionModel.addListSelectionListener { updateAction() }
+        }
     ) {
         randomizeSelectedCells()
     }
@@ -42,7 +48,14 @@ val SimbrainJTable.randomizeColumnAction
     get() = createAction(
         name = "Randomize column",
         description = "Randomize cells in selected column",
-        iconPath = "menu_icons/Rand_C.png"
+        iconPath = "menu_icons/Rand_C.png",
+        initBlock = {
+            fun updateAction() {
+                isEnabled = selectedColumn >= 0
+            }
+            updateAction()
+            columnModel.selectionModel.addListSelectionListener { updateAction() }
+        }
     ) {
         model.randomizeColumn(selectedColumn)
     }
@@ -52,7 +65,15 @@ val SimbrainJTable.zeroFillAction
         name = "Zero Fill",
         description = "Zero Fill selected cells",
         iconPath = "menu_icons/Fill_0.png",
-        keyboardShortcut = 'Z'
+        keyboardShortcut = 'Z',
+        initBlock = {
+            fun updateAction() {
+                isEnabled = getSelectedCells().isNotEmpty()
+            }
+            updateAction()
+            selectionModel.addListSelectionListener { updateAction() }
+            columnModel.selectionModel.addListSelectionListener { updateAction() }
+        }
     ) {
         zeroFillSelectedCells()
     }
@@ -61,7 +82,15 @@ val SimbrainJTable.fillAction
     get() = createAction(
         name = "Fill...",
         description = "Fill selected cells",
-        iconPath = "menu_icons/fill.png"
+        iconPath = "menu_icons/fill.png",
+        initBlock = {
+            fun updateAction() {
+                isEnabled = getSelectedCells().isNotEmpty()
+            }
+            updateAction()
+            selectionModel.addListSelectionListener { updateAction() }
+            columnModel.selectionModel.addListSelectionListener { updateAction() }
+        }
     ) {
         JOptionPane.showInputDialog(this, "Value:", "0")
             ?.toDouble()
@@ -79,7 +108,7 @@ val SimbrainJTable.editRandomizerAction
     ) {
         objectWrapper("Table Randomizer", model.cellRandomizer).createEditorDialog {
             model.cellRandomizer = it.editingObject
-        }
+        }.display()
     }
 
 val SimbrainJTable.insertColumnAction
@@ -113,7 +142,15 @@ val SimbrainJTable.deleteRowAction
     get() = createAction(
         name = "Delete rows",
         description = "Delete selected rows",
-        iconPath = "menu_icons/DeleteTableRow.png"
+        iconPath = "menu_icons/DeleteTableRow.png",
+        initBlock = {
+            fun updateAction() {
+                isEnabled = getSelectedCells().isNotEmpty()
+            }
+            updateAction()
+            selectionModel.addListSelectionListener { updateAction() }
+            columnModel.selectionModel.addListSelectionListener { updateAction() }
+        }
     ) {
         deleteSelectedRows()
     }
@@ -147,7 +184,7 @@ val SimbrainJTable.setRowsColumnsAction
             }
             
             val result = JOptionPane.showConfirmDialog(
-                this@setRowsColumnsAction,
+                this@createAction,
                 panel,
                 "Set Table Dimensions",
                 JOptionPane.OK_CANCEL_OPTION,
@@ -162,7 +199,7 @@ val SimbrainJTable.setRowsColumnsAction
                         Pair(newRows, newCols)
                     } else {
                         JOptionPane.showMessageDialog(
-                            this@setRowsColumnsAction,
+                            this@createAction,
                             "Rows and columns must be positive integers",
                             "Invalid Input",
                             JOptionPane.ERROR_MESSAGE
@@ -171,7 +208,7 @@ val SimbrainJTable.setRowsColumnsAction
                     }
                 } catch (e: NumberFormatException) {
                     JOptionPane.showMessageDialog(
-                        this@setRowsColumnsAction,
+                        this@createAction,
                         "Please enter valid integer values",
                         "Invalid Input",
                         JOptionPane.ERROR_MESSAGE
@@ -194,7 +231,7 @@ val SimbrainJTable.setRowsColumnsAction
             when (val tableModel = model) {
                 is BasicDataFrame -> {
                     val newData = (0 until newRows).map { 
-                        (0 until newCols).map { 0.0 as Any? }.toMutableList()
+                        (0 until newCols).map<Int, Any?> { 0.0 }.toMutableList()
                     }.toMutableList()
                     
                     tableModel.data = newData
@@ -220,11 +257,19 @@ val SimbrainJTable.setRowsColumnsAction
         }
     }
 
+@Deprecated("Tables don't have obvious column selection now, and the panel is a bit ugly anyway")
 val SimbrainJTable.showHistogramAction
     get() = createAction(
         iconPath = "menu_icons/histogram.png",
         name = "Histogram",
-        description = "Create histograms for data in selected column"
+        description = "Create histograms for data in selected column",
+        initBlock = {
+            fun updateAction() {
+                isEnabled = selectedColumn >= 0
+            }
+            updateAction()
+            columnModel.selectionModel.addListSelectionListener { updateAction() }
+        }
     ) {
         // canvas.window() uses invokeAndWait, so this actually has to be invoked from a non-swing thread
         launch(Dispatchers.Default) {
@@ -239,8 +284,8 @@ val SimbrainJTable.showHistogramAction
 
 val SimbrainJTable.showBoxPlotAction
     get() = createAction(
-        name = "Boxplot column",
-        description = "Create boxplot for data all numeric columns",
+        name = "Boxplots for columns",
+        description = "Create a boxplot for data in all numeric columns",
         iconPath = "menu_icons/BarChart.png"
     ) {
         launch(context = Dispatchers.Default) {
@@ -317,9 +362,10 @@ val SimbrainJTable.importArff
         description = "Import WEKA arff file",
         iconPath = "menu_icons/import.png"
     ) {
-        val chooser = SFileChooser(TABLE_DIRECTORY, "", "arff")
+        val chooser = SFileChooser(WorkspacePreferences.tableDirectory, "", "arff")
         val arffFile = chooser.showOpenDialog()
         if (arffFile != null) {
+            WorkspacePreferences.tableDirectory = arffFile.parentFile.absolutePath
             model.let {
                 if (it is SmileDataFrame) {
                     it.df = Read.arff(arffFile.absolutePath)
@@ -347,14 +393,22 @@ val SimbrainJTable.importCsv
 /**
  * @dataTypes The data types to use for all cells in the table. Defaults to String. TODO: provide support for per-column data types.
  */
-fun SimbrainJTable.importCSVAction(fixedColumns: Boolean = true, skipImportOptions: Boolean = false, defaultOptions: ImportExportOptions = ImportExportOptions(), dataType: KClass<*>? = null) = createAction(
+fun SimbrainJTable.importCSVAction(
+    fixedColumns: Boolean = true,
+    skipImportOptions: Boolean = false,
+    defaultOptions: ImportExportOptions = ImportExportOptions(),
+    dataType: KClass<*>? = null,
+    customDir: String? = null,
+    parentComponent: Component? = null,
+    isModal: Boolean = true
+) = createAction(
     name = "Import csv...",
     description = "Import comma separated values file",
     iconPath = "menu_icons/import.png"
 ) {
     fun import(options: ImportExportOptions = defaultOptions) {
-        val chooser = SFileChooser(TABLE_DIRECTORY, "", "csv")
-        val csvFile = chooser.showOpenDialog()
+        val chooser = SFileChooser(customDir?:WorkspacePreferences.tableDirectory, "", "csv")
+        val csvFile = chooser.showOpenDialog(parentComponent)
         fun checkColumns(numColumns: Int): Boolean {
             if (numColumns != model.columnCount) {
                 JOptionPane.showOptionDialog(
@@ -369,23 +423,67 @@ fun SimbrainJTable.importCSVAction(fixedColumns: Boolean = true, skipImportOptio
             return true
         }
         if (csvFile != null) {
+            if (customDir == null) {
+                WorkspacePreferences.tableDirectory = csvFile.parentFile.absolutePath
+            }
             model.let {
                 if (it is BasicDataFrame) {
                     val rawData = Utils.getStringMatrix(csvFile)
                     val importedData = createFrom2DArray(rawData, options, dataType)
                     if (!fixedColumns || checkColumns(importedData.columnCount)) {
-                        it.data = importedData.data
+                        // Perform cell-by-cell data parsing with type validation
+                        val numRows = importedData.data.size
+                        val numCols = importedData.data.firstOrNull()?.size ?: 0
+                        
+                        // Resize the table if needed
+                        if (it.rowCount != numRows) {
+                            it.setNumRows(numRows)
+                        }
+                        
+                        // Update column names and row names first
                         it.columnNames = importedData.columnNames
                         it.rowNames = importedData.rowNames
+                        
+                        // Parse each cell individually using the column's data type
+                        for (row in 0 until numRows) {
+                            for (col in 0 until numCols) {
+                                val rawValue = importedData.data[row][col]
+                                it.withValidatedValue(rawValue, col) { parsedValue ->
+                                    it.data[row][col] = parsedValue
+                                }
+                            }
+                        }
+                        
                         it.fireTableStructureChanged()
                     }
                 } else if (it is MatrixDataFrame) {
                     val rawData = Utils.getDoubleMatrix(csvFile).map { l -> l.toTypedArray() }.toTypedArray()
                     val importedData = createFrom2DArray(rawData, options, dataType)
                     if (!fixedColumns || checkColumns(importedData.columnCount)) {
-                        it.data = importedData.data.map { l -> l.map { e -> e as Double }.toDoubleArray() }.toTypedArray().toMatrix()
+                        // Perform cell-by-cell data parsing for MatrixDataFrame (all numeric)
+                        val numRows = importedData.data.size
+                        val numCols = importedData.data.firstOrNull()?.size ?: 0
+                        
+                        // Create new matrix with proper dimensions
+                        it.data = Matrix(numRows, numCols)
+                        
+                        // Update column names and row names first
                         it.columnNames = importedData.columnNames
                         it.rowNames = importedData.rowNames
+                        
+                        // Parse each cell individually using tryParsingDouble
+                        for (row in 0 until numRows) {
+                            for (col in 0 until numCols) {
+                                val rawValue = importedData.data[row][col]
+                                try {
+                                    it.data[row, col] = tryParsingDouble(rawValue)
+                                } catch (e: NumberFormatException) {
+                                    // If parsing fails, use 0.0 as default for numeric matrix
+                                    it.data[row, col] = 0.0
+                                }
+                            }
+                        }
+                        
                         it.fireTableStructureChanged()
                     }
                 } else if (it is SmileDataFrame) {
@@ -404,19 +502,20 @@ fun SimbrainJTable.importCSVAction(fixedColumns: Boolean = true, skipImportOptio
         val options = ImportExportOptions()
         options.createEditorDialog("Import CSV") {
             import(it)
-        }.display()
+        }.display(parentComponent, isModal)
     }
 }
 
-fun SimbrainJTable.exportCsv(fileName: String = "", skipExportOptions: Boolean = false, defaultOptions: ImportExportOptions = ImportExportOptions()) = createAction(
+fun SimbrainJTable.exportCsv(fileName: String = "", skipExportOptions: Boolean = false, defaultOptions: ImportExportOptions = ImportExportOptions(), parentComponent: Component? = null, isModal: Boolean = true) = createAction(
     name = "Export csv...",
     description = "Export comma separated values file",
     iconPath = "menu_icons/export.png"
 ) {
     fun export(options: ImportExportOptions = defaultOptions) {
-        val chooser = SFileChooser(TABLE_DIRECTORY, "", "csv")
+        val chooser = SFileChooser(WorkspacePreferences.tableDirectory, "", "csv")
         val csvFile = chooser.showSaveDialog(fileName)
         if (csvFile != null) {
+            WorkspacePreferences.tableDirectory = csvFile.parentFile.absolutePath
             val writer = csvFile.bufferedWriter()
             val printer = CSVPrinter(writer)
 
@@ -431,7 +530,7 @@ fun SimbrainJTable.exportCsv(fileName: String = "", skipExportOptions: Boolean =
         val options = ImportExportOptions()
         options.createEditorDialog("Export CSV") {
             export(it)
-        }.display()
+        }.display(parentComponent, isModal)
     }
 }
 
@@ -439,7 +538,14 @@ val SimbrainJTable.editColumnAction
     get() = createAction(
         name = "Edit column...",
         description = "Edit column properties",
-        iconPath = "menu_icons/Tools.png"
+        iconPath = "menu_icons/Tools.png",
+        initBlock = {
+            fun updateAction() {
+                isEnabled = selectedColumn >= 0 && model is BasicDataFrame
+            }
+            updateAction()
+            columnModel.selectionModel.addListSelectionListener { updateAction() }
+        }
     ) {
         if (model is BasicDataFrame) {
             if (selectedColumn >= 0) {

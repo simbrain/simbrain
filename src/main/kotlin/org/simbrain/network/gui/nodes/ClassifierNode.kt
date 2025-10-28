@@ -6,10 +6,7 @@ import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.dialogs.getTrainingDialog
 import org.simbrain.network.smile.ClassifierNetwork
-import org.simbrain.util.StandardDialog
-import org.simbrain.util.createAction
-import org.simbrain.util.createClassifierProjectionPlot
-import org.simbrain.util.display
+import org.simbrain.util.*
 import org.simbrain.util.widgets.bezierArrow
 import org.simbrain.workspace.gui.SimbrainDesktop
 import javax.swing.JMenuItem
@@ -20,7 +17,14 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
 
     val arrow =  bezierArrow {
         color = NetworkPreferences.weightMatrixArrowColor
+        padding {
+            head = arrowSize
+            tail = 0.0
+        }
     }.also { addChild(it) }
+
+    val sourceNode by lazy { networkPanel.getNode(smileClassifier.inputNeuronGroup) }
+    val targetNode by lazy { networkPanel.getNode(smileClassifier.outputNeuronGroup) }
 
     override val contextMenu: JPopupMenu
         get() = JPopupMenu().apply {
@@ -42,8 +46,8 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
     override fun layoutChildren() {
         super.layoutChildren()
         arrow.layout(
-            smileClassifier.inputNeuronGroup.sides,
-            smileClassifier.outputNeuronGroup.sides,
+            sourceNode.globalFullBounds.outlines,
+            targetNode.globalFullBounds.outlines,
             false
         )
     }

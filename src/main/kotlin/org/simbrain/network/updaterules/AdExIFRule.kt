@@ -66,7 +66,7 @@ open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), Noi
      * potential has occurred (mV).
      */
     @UserParameter(
-        label = "Peak Voltage (mV)",
+        label = "Peak voltage (mV)",
         description = "The peak voltage after which we say with certainty that an action potential has occurred (mV).",
         increment = .1,
         order = 1,
@@ -78,7 +78,7 @@ open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), Noi
      * Leak Conductance (nS).
      */
     @UserParameter(
-        label = "Leak Conductance (nS)",
+        label = "Leak conductance (nS)",
         description = "The inverse of the resistance of the channels through which current leaks from the neuron.",
         increment = .1,
         order = 6,
@@ -90,7 +90,7 @@ open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), Noi
      * Maximal excitatory conductance. (nS)
      */
     @UserParameter(
-        label = "Max Ex. Conductance (nS)",
+        label = "Max ex. conductance (nS)",
         description = "The excitatory conductance if all excitatory channels are open.",
         increment = .1,
         order = 7,
@@ -102,7 +102,7 @@ open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), Noi
      * Maximal inhibitory conductance. (nS)
      */
     @UserParameter(
-        label = "Max In. Conductance (nS)",
+        label = "Max in. conductance (nS)",
         description = "The inhibitory conductance if all inhibitory channels are open.",
         increment = .1,
         order = 8,
@@ -114,7 +114,7 @@ open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), Noi
      * Leak strength (mV).
      */
     @UserParameter(
-        label = "Leak Reversal (mV)",
+        label = "Leak reversal (mV)",
         description = "The membrane potential at which leak currents would no longer have "
                 + "any effect on the neuron's membrane potential.",
         increment = .1,
@@ -127,7 +127,7 @@ open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), Noi
      * Excitatory reversal. (mV).
      */
     @UserParameter(
-        label = "Excitatory Reversal (mV)",
+        label = "Excitatory reversal (mV)",
         description = "The membrane potential at which impinging excitatory (depolarizing) "
                 + "inputs reach equilibrium.",
         increment = .1,
@@ -140,7 +140,7 @@ open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), Noi
      * Inhibitory reversal. (mV)
      */
     @UserParameter(
-        label = "Inbitatory Reversal (mV)",
+        label = "Inhibitory reversal (mV)",
         description = "The membrane potential at which impinging inhibitory (hyperpolarizing) "
                 + "inputs reach equilibrium.",
         increment = .1,
@@ -185,7 +185,7 @@ open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), Noi
      * mV
      */
     @UserParameter(
-        label = "Slope Factor", description = "A value which regulates the overall effect of the exponential term on "
+        label = "Slope factor", description = "A value which regulates the overall effect of the exponential term on "
                 + "the membrane potential equation.", increment = .1, order = 6, tab = "Membrane Voltage"
     )
     private var slopeFactor = 2.0
@@ -194,7 +194,7 @@ open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), Noi
      * Adaptation coupling parameter (nS).
      */
     @UserParameter(
-        label = "Coupling Const.",
+        label = "Coupling const.",
         description = "This represents the voltage to which the membrane potential will be reset after "
                 + "an action potential has fired.",
         increment = .1,
@@ -224,7 +224,7 @@ open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), Noi
      * Background current being directly injected into the neuron (nA).
      */
     @UserParameter(
-        label = "Background Current (nA)",
+        label = "Background current (nA)",
         description = "A tunable parameter in some ways similar to a bias parameter for non-spiking neurons.",
         increment = .1,
         order = 5,

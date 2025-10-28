@@ -102,7 +102,7 @@ class ImageWorldPanel(val imageWorldComponent: ImageWorldComponent) : JPanel(), 
         saveImage()
     }
 
-    val saveImageAllAction = createAction("Save All Images...") {
+    val saveImageAllAction = createAction("Save all images...") {
         saveAllImages()
     }
 

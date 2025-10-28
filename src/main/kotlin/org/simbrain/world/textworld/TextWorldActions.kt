@@ -4,6 +4,7 @@ import org.simbrain.util.*
 import org.simbrain.world.textworld.gui.TextWorldDesktopComponent
 import org.simbrain.world.textworld.gui.TokenEmbeddingDialog
 import org.simbrain.world.textworld.gui.showComparisonDialog
+import java.io.File
 
 /**
  * Action for loading a token embedding, by finding every distinct word and
@@ -12,20 +13,69 @@ import org.simbrain.world.textworld.gui.showComparisonDialog
  */
 fun createExtractEmbeddingAction(block: (TokenEmbedding) -> Unit) = createAction(
     name = "Extract embedding...",
-    description = "Extract embedding...",
+    description = "Generate word embedding from selected document.",
     iconPath = "menu_icons/Extract.png"
 ) {
-    val chooser = SFileChooser(tokenEmbeddingDirectory, "text file", "txt")
-    val trainingDocument = chooser.showOpenDialog()
-    if (trainingDocument != null) {
-        val tokenEmbeddingBuilder = TokenEmbeddingBuilder()
-        tokenEmbeddingBuilder.createEditorDialog(titleName = "Generate Word Embedding From Document") {
-            val tokenEmbedding = tokenEmbeddingBuilder.build(Utils.readFileContents(trainingDocument))
-            tokenEmbedding.trainingDocument = Utils.readFileContents(trainingDocument)
-            block(tokenEmbedding)
-        }.display()
+    val options = ExtractEmbeddingOptions()
+    val editor = org.simbrain.util.propertyeditor.AnnotatedPropertyEditor(listOf(options))
+    val dialog = StandardDialog(editor).apply {
+        title = "Generate Word Embedding From Document"
+        
+        // Add validation to prevent dialog from closing if validation fails
+        setClosingCheck {
+            // Commit changes first so we can validate the updated values
+            editor.commitChanges()
+            
+            if (options.documentPath.isEmpty()) {
+                showWarningDialog("Please select a training document")
+                false
+            } else {
+                val trainingDocument = File(options.documentPath)
+                if (!trainingDocument.exists()) {
+                    showWarningDialog("Selected file does not exist")
+                    false
+                } else {
+                    true
+                }
+            }
+        }
+        
+        addCommitTask {
+            block(options.buildEmbedding())
+        }
     }
+    
+    dialog.display()
 }
+
+/**
+ * Action for extracting embedding from the current text world document.
+ * This variant doesn't require file selection - it uses the text directly from the text world.
+ */
+val TextWorld.extractEmbeddingFromCurrentText
+    get() = createAction(
+        name = "Extract embedding from current text",
+        description = "Generate word embedding from the current text world document.",
+        iconPath = "menu_icons/Extract.png"
+    ) {
+        if (text.isEmpty()) {
+            showWarningDialog("No text in text world. Please load or enter some text first.")
+            return@createAction
+        }
+        
+        val options = ExtractEmbeddingOptions(showDocumentPath = false)
+        val editor = org.simbrain.util.propertyeditor.AnnotatedPropertyEditor(listOf(options))
+        val dialog = StandardDialog(editor).apply {
+            title = "Generate Word Embedding From Current Text"
+            
+            addCommitTask {
+                editor.commitChanges()
+                tokenEmbedding = options.buildEmbeddingFromText(text)
+            }
+        }
+        
+        dialog.display()
+    }
 
 /**
  * Action for viewing and editing the embedding.

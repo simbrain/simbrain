@@ -13,6 +13,7 @@ import org.simbrain.util.projection.DataPoint
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.workspace.WorkspaceComponent
+import org.simbrain.workspace.WorkspacePreferences
 import org.simbrain.workspace.gui.DesktopComponent
 import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.workspace.serialization.WorkspaceSerializer
@@ -256,6 +257,65 @@ class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, tru
         }
     }
 
+    /**
+     * Adds a slider with a synchronized text field showing the current value.
+     * Both the slider and text field can be used to change the value.
+     */
+    fun addSliderWithTextField(
+        label: String,
+        minValue: Double,
+        maxValue: Double,
+        initValue: Double,
+        increment: Double = 0.1,
+        textFieldColumns: Int = 5,
+        tab: String? = null,
+        onChange: suspend (Double) -> Unit = {}
+    ) {
+        val slider = JSlider(
+            (minValue / increment).toInt(),
+            (maxValue / increment).toInt(),
+            (initValue / increment).toInt()
+        )
+        
+        val textField = JFormattedTextField(NumberFormat.getNumberInstance().apply {
+            minimumFractionDigits = 1
+            maximumFractionDigits = 2
+        })
+        textField.columns = textFieldColumns
+        textField.value = initValue
+        
+        // Create a panel to hold both slider and text field
+        val panel = JPanel()
+        panel.layout = BoxLayout(panel, BoxLayout.X_AXIS)
+        panel.add(slider)
+        panel.add(Box.createHorizontalStrut(10))
+        panel.add(textField)
+        
+        // Slider updates text field and calls onChange
+        slider.addChangeListener {
+            val value = slider.value * increment
+            textField.value = value
+            launch {
+                onChange(value)
+            }
+        }
+        
+        // Text field updates slider and calls onChange
+        textField.addPropertyChangeListener("value") {
+            val value = (textField.value as? Number)?.toDouble() ?: initValue
+            val clampedValue = value.coerceIn(minValue, maxValue)
+            slider.value = (clampedValue / increment).toInt()
+            launch {
+                onChange(clampedValue)
+            }
+        }
+        
+        launch(Dispatchers.Swing) {
+            getTab(tab).addItem(label, panel)
+            pack()
+        }
+    }
+
     fun addCheckBox(label: String, checked: Boolean, tab: String? = null, onChange: suspend (Boolean) -> Unit = {}) =
         JCheckBox().also { checkBox ->
             checkBox.addActionListener {
@@ -277,7 +337,7 @@ class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, tru
 }
 
 suspend fun SimbrainDesktop.loadWorkspaceZipFromFileChooser(): Boolean {
-    val simulationChooser = SFileChooser(workspace.currentDirectory, "Zip Archive", "zip")
+    val simulationChooser = SFileChooser(WorkspacePreferences.simulationDirectory, "Zip Archive", "zip")
     val simFile = simulationChooser.showOpenDialog()
     val serializer = WorkspaceSerializer(workspace)
 

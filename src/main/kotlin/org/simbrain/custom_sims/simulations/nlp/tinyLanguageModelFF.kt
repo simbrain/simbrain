@@ -7,7 +7,7 @@ import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.addToNetwork
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.trainers.BackpropLossFunction
-import org.simbrain.network.trainers.MatrixDataset
+import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.util.*
@@ -78,9 +78,9 @@ val tinyLanguageModelFF = newSim {
             intArrayOf(contextSize * tokenEmbedding.dimension, hiddenLayerSize, tokenEmbedding.dimension),
         ).apply {
             label = "backprop"
-            trainingSet = MatrixDataset(
-                inputs = inputMatrix,
-                targets = targetMatrix
+            trainingSet = TrainingDataset(
+                inputs = inputMatrix.toArray().map { it.toMutableList() }.toMutableList(),
+                targets = targetMatrix.toArray().map { it.toMutableList() }.toMutableList()
             )
             (hiddenLayers().first().updateRule as? SigmoidalRule)?.apply {
                 lowerBound = -1.0

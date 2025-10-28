@@ -5,7 +5,7 @@ import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.update_actions.BufferedUpdate
 import org.simbrain.network.update_actions.PriorityUpdate
 import org.simbrain.network.update_actions.UpdateNetworkModel
-import org.simbrain.workspace.updater.UpdateAction
+import org.simbrain.util.UpdateAction
 import java.util.*
 
 /**

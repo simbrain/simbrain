@@ -8,7 +8,7 @@ import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.place
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.toMatrix
-import org.simbrain.workspace.updater.updateAction
+import org.simbrain.util.updateAction
 
 /**
  * Demonstration of representational capacities of recurrent networks based on
@@ -45,7 +45,7 @@ val edgeOfChaosBitStream = newSim("edgeOfChaosBitStream") {
     // Connect reservoirs
     val sgRes1 = connectReservoir(net, res1, variance, 4, seed)
     val sgRes2 = connectReservoir(net, res2, variance, 4, seed).apply {
-        label = "Recurrent Synapses"
+        label = "Recurrent synapses"
     }
 
     // Set up "bit-stream" inputs
@@ -70,8 +70,8 @@ val edgeOfChaosBitStream = newSim("edgeOfChaosBitStream") {
     val bitStream1 = buildBitStream(res1).apply { label = "Bit stream 1" }
     val bitStream2 = buildBitStream(res2).apply { label = "Bit stream 2" }
 
-    val connector1 = AllToAll(false, seed)
-    val connector2 = AllToAll(false, seed)
+    val connector1 = AllToAll(allowSelfConnection = false, seed = seed)
+    val connector2 = AllToAll(allowSelfConnection = false, seed = seed)
     val thing1 = connector1.connectNeurons(bitStream1.neuronList, res1.neuronList)
     val thing2 = connector2.connectNeurons(bitStream2.neuronList, res2.neuronList)
     net.addNetworkModels(thing1)

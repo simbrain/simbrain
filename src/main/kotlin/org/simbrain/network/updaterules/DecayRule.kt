@@ -26,8 +26,8 @@ open class DecayRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Cli
     }
 
     @UserParameter(
-        label = "Update Type",
-        description = "Relative (percentage decay of current activation) vs. absolute (fixed decay amount)",
+        label = "Update type",
+        description = "Relative (percentage decay of current activation) vs. absolute (fixed decay amount).",
         order = 10
     )
     var updateType: UpdateType = UpdateType.Relative
@@ -43,14 +43,14 @@ open class DecayRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Cli
     var decayFraction by GuiEditable(
         initValue = .1,
         label = "Decay fraction",
-        description = "The proportion of the distance between the current value and the base-line value, "
-                + "by which the activation is changed each iteration if relative decay is chosen.",
+        description = "The proportion of the distance between the current value and the base-line value, " +
+                "by which the activation is changed each iteration if relative decay is chosen.",
         onUpdate = { enableWidget(widgetValue(DecayRule::updateType) == UpdateType.Relative) },
         order = 30
     )
 
     @UserParameter(
-        label = "Base Line",
+        label = "Base line",
         description = "An option to add noise.",
         increment = .1,
         order = 40)

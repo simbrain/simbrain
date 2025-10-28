@@ -21,7 +21,7 @@ abstract class DecayFunction(
     /**
      * The "center" of the decay function where it takes its maximal value.
      */
-    @UserParameter(label = "Peak Distance", description = "Peak value", order = 2)
+    @UserParameter(label = "Peak distance", description = "Peak value.", order = 2)
     var peakDistance: Double = 0.0,
 
 

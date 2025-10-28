@@ -56,7 +56,11 @@ class TSNEProjection: ProjectionMethod(), IterableProjectionMethod  {
         }
     }
 
-    override fun copy() = TSNEProjection()
+    override fun copy() = TSNEProjection().also { 
+        it.perplexity = perplexity
+        it.eta = eta
+        it.iterations = iterations
+    }
 
     override val name = "TSNE"
 

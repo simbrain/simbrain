@@ -15,7 +15,7 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution
  */
 class IACRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), ClippedUpdateRule, NoisyUpdateRule {
     @UserParameter(
-        label = "Decay Rate",
+        label = "Decay rate",
         description = "The rate at which activation decays to its resting value.",
         increment = .1,
         order = 1

@@ -247,7 +247,7 @@ abstract class SimbrainDataFrame : AbstractTableModel() {
      */
     inline fun <reified T> getRow(index: Int): List<T> = (0 until columnCount).map {
         when(T::class) {
-            String::class -> getValueAt(index, it).toString()
+            String::class -> getValueAt(index, it)?.toString() ?: ""
             Double::class -> getValueAt(index, it)?.let { (it as Number).toDouble() } ?: Double.NaN
             Float::class -> getValueAt(index, it)?.let { (it as Number).toFloat() } ?: Float.NaN
             Int::class -> (getValueAt(index, it) as Number).toInt()
@@ -256,9 +256,13 @@ abstract class SimbrainDataFrame : AbstractTableModel() {
         } as T
     }
 
-    fun getCurrentStringRow() = getRow<String>(currentRowIndex)
+    fun getCurrentStringRow(): List<String> {
+        return if (rowCount > 0) getRow<String>(currentRowIndex) else emptyList()
+    }
 
-    fun getCurrentDoubleRow() = getRow<Double>(currentRowIndex)
+    fun getCurrentDoubleRow(): List<Double> {
+        return if (rowCount > 0) getRow<Double>(currentRowIndex) else emptyList()
+    }
 
     /**
      * Returns an array of float array columns for the table.
@@ -314,7 +318,9 @@ abstract class SimbrainDataFrame : AbstractTableModel() {
     }
 
     fun deleteLastRow() {
-        deleteRow(rowCount - 1 , true)
+        if (rowCount > 0) {
+            deleteRow(rowCount - 1, true)
+        }
     }
 
     /**

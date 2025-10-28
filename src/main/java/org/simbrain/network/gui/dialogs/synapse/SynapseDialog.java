@@ -1,5 +1,6 @@
 package org.simbrain.network.gui.dialogs.synapse;
 
+import org.jetbrains.annotations.Nullable;
 import org.simbrain.network.core.Synapse;
 import org.simbrain.network.gui.nodes.SynapseNode;
 import org.simbrain.network.learningrules.SynapseUpdateRule;
@@ -9,7 +10,6 @@ import org.simbrain.util.widgets.ShowHelpAction;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -72,9 +72,11 @@ public final class SynapseDialog extends StandardDialog {
      * @param selectedSynapses the synapses
      * @return the dialog.
      */
-    public static SynapseDialog createSynapseDialog(final List<Synapse> selectedSynapses) {
-        SynapseDialog sd = new SynapseDialog(selectedSynapses);
-        return sd;
+    public static @Nullable SynapseDialog createSynapseDialog(final List<Synapse> selectedSynapses) {
+        if (selectedSynapses.isEmpty()) {
+            return null;
+        }
+        return new SynapseDialog(selectedSynapses);
     }
 
     /**

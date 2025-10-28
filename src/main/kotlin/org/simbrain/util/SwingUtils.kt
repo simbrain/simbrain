@@ -90,10 +90,20 @@ fun showDirectorySelectionDialog(approveButtonText: String = "Select Folder"): S
  * Place the panel in a [StandardDialog] and show the dialog.
  */
 @JvmOverloads
-fun <T : JComponent> T.displayInDialog(block: T.() -> Unit = {}): StandardDialog {
-    val dialog = StandardDialog()
+fun <T : JComponent> T.displayInDialog(
+    isModal: Boolean = true,
+    parent: Component? = null,
+    block: T.() -> Unit = {}
+): StandardDialog {
+    val dialog = StandardDialog(getParentFrame(parent) as Frame?, "Dialog")
+    
     dialog.contentPane = this
     dialog.defaultCloseOperation = JDialog.DISPOSE_ON_CLOSE
+    dialog.isModal = isModal
+    
+    if (isModal) {
+        dialog.modalityType = Dialog.ModalityType.APPLICATION_MODAL
+    }
 
     // Add Escape key binding
     dialog.rootPane.registerKeyboardAction(
@@ -102,15 +112,42 @@ fun <T : JComponent> T.displayInDialog(block: T.() -> Unit = {}): StandardDialog
         JComponent.WHEN_IN_FOCUSED_WINDOW
     )
 
-    dialog.makeVisible()
     dialog.addCommitTask { block() }
+    dialog.makeVisible()
     return dialog
 }
 
-fun JDialog.display() {
+@JvmOverloads
+fun JDialog.display(
+    parent: Component? = null,
+    isModal: Boolean = true
+) {
+    // Auto-detect parent if not specified
+    val effectiveParent = parent ?: run {
+        // Try to find the currently focused window as potential parent
+        val focusedWindow = KeyboardFocusManager.getCurrentKeyboardFocusManager().focusedWindow
+        when (focusedWindow) {
+            is JDialog, is JFrame -> focusedWindow
+            else -> null
+        }
+    }
+    
+    // Set modality
+    this.isModal = isModal
+    if (isModal) {
+        modalityType = Dialog.ModalityType.APPLICATION_MODAL
+    }
+    
     pack()
-    setLocationRelativeTo(null)
-    isVisible = true
+    setLocationRelativeTo(effectiveParent)
+    
+    // Make visible and ensure it gets focus
+    SwingUtilities.invokeLater {
+        isVisible = true
+        toFront()
+        requestFocus()
+    }
+
 }
 
 inline fun Component.onDoubleClick(crossinline block: MouseEvent.() -> Unit) {
@@ -136,7 +173,7 @@ fun <T : JComponent> T.createAction(
 ): AbstractAction {
     return object : AbstractAction() {
         init {
-            if (iconPath != null) {
+            if (!iconPath.isNullOrEmpty()) {
                 putValue(SMALL_ICON, ResourceManager.getSmallIcon(iconPath))
             }
 
@@ -228,6 +265,17 @@ fun <T : JComponent> T.createAction(
 }
 
 /**
+ * Helper function to extract the appropriate parent frame from a component.
+ */
+private fun getParentFrame(parent: Component?): JFrame? {
+    return when (parent) {
+        is JFrame -> parent
+        is JDialog -> parent.owner as? JFrame
+        else -> null
+    }
+}
+
+/**
  * Shows a dialog for setting an editable object in an [AnnotatedPropertyEditor].
  *
  * The provided block is executed when closing the dialog.
@@ -237,11 +285,22 @@ fun <T : JComponent> T.createAction(
 @JvmOverloads
 fun <E : EditableObject> E.createEditorDialog(
     titleName: String = "Edit " + name.convertCamelCaseToSpaces(),
+    parent: Window? = null,
     block: (E) -> Unit = {}
 ): StandardDialog {
     val editor = AnnotatedPropertyEditor(listOf(this))
-    return StandardDialog(editor).apply {
-        title = titleName
+    val dialog = if (parent != null) {
+        StandardDialog(parent, titleName)
+    } else {
+        StandardDialog(editor)
+    }
+    return dialog.apply {
+        if (parent == null) {
+            title = titleName
+        }
+        if (parent != null) {
+            contentPane = editor
+        }
         addCommitTask {
             editor.commitChanges()
             block(this@createEditorDialog)
@@ -249,8 +308,10 @@ fun <E : EditableObject> E.createEditorDialog(
     }
 }
 
+@JvmOverloads
+@JvmName("createEditorDialogFromList")
 fun <E : EditableObject> List<E>.createEditorDialog(
-    titleName: String = "Edit $size ${first()::class.simpleName?.convertCamelCaseToSpaces()}",
+    titleName: String = "Edit $size ${first()::class.simpleName?.convertCamelCaseToSpaces()}${if (size > 1) "s" else ""}",
     block: (List<E>) -> Unit = {}
 ): StandardDialog {
     val editor = AnnotatedPropertyEditor(this)

@@ -9,9 +9,6 @@ import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connections.AllToAll
-import org.simbrain.network.connections.FixedDegree
-import org.simbrain.network.connections.RadialProbabilistic
-import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.*
 import org.simbrain.network.gui.MouseEventHandler.MouseCursor
 import org.simbrain.network.gui.dialogs.NetworkPreferences
@@ -38,6 +35,7 @@ import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
 import java.util.prefs.PreferenceChangeListener
 import javax.swing.JPanel
+import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.reflect.KClass
 
@@ -179,11 +177,16 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         network.flatNeuronList.map {
             it.events.colorChanged.fire()
         }
+        // Force update activation text for decimal places preference changes
+        filterScreenElements<NeuronNode>().forEach { it.forceUpdateActivationText() }
         network.flatSynapseList.forEach {
             it.events.colorPreferencesChanged.fire()
         }
         network.getModels<WeightMatrix>().forEach {
             it.events.colorPreferencesChanged.fire()
+            it.events.updateGraphics.fire()
+        }
+        network.getModels<TransformerBlock>().forEach {
             it.events.updateGraphics.fire()
         }
 
@@ -653,11 +656,9 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     }
 
     /**
-     * Connect free weights using the default connection strategy
+     * Connect free weights using AllToAll with 100% excitatory and no self-connections by default
      */
     fun connectFreeWeights(allowSelfConnection: Boolean = false) {
-        // TODO: For large numbers of connections maybe pop up a warning and depending on button pressed make the
-        // weights automatically be invisible
         with(selectionManager) {
             val sourceNeurons = filterSelectedSourceModels<Neuron>() +
                     filterSelectedSourceModels<NeuronCollection>().flatMap { it.neuronList } +
@@ -665,14 +666,9 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             val targetNeurons = filterSelectedModels<Neuron>() +
                     filterSelectedModels<NeuronCollection>().flatMap { it.neuronList } +
                     filterSelectedModels<NeuronGroup>().flatMap { it.neuronList }
-            val synapses = NetworkPreferences.connectionStrategy.copy().also {
-                it.percentExcitatory = 100.0
-                when (it) {
-                    is AllToAll -> it.allowSelfConnection = allowSelfConnection
-                    is Sparse -> it.allowSelfConnection = allowSelfConnection
-                    is FixedDegree -> it.allowSelfConnections = allowSelfConnection
-                    is RadialProbabilistic -> it.allowSelfConnections = allowSelfConnection
-                }
+            val synapses = AllToAll().apply {
+                this.allowSelfConnection = allowSelfConnection
+                this.percentExcitatory = 100.0
             }.connectNeurons(sourceNeurons, targetNeurons)
             synapses.addToNetworkAsync(network)
             undoManager.addUndoableAction(
@@ -878,7 +874,10 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
                 override fun mouseWheelRotated(event: PInputEvent) {
                     val swingEvent = (event.sourceSwingEvent as MouseWheelEvent)
                     val newScale = 1.1.pow(swingEvent.preciseWheelRotation)
-                    autoZoom = false
+                    // Only turn off autozoom if the mouse wheel is turned more than a few clicks.
+                    if (abs(swingEvent.preciseWheelRotation) > 2) {
+                        autoZoom = false
+                    }
                     scale(1 / newScale)
                 }
             })

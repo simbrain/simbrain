@@ -1,20 +1,17 @@
 package org.simbrain.network.subnetworks
 
-import org.simbrain.network.core.*
-import org.simbrain.network.gui.dialogs.NetworkPreferences
+import org.simbrain.network.core.InfoText
+import org.simbrain.network.core.Network
+import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.trainers.UnsupervisedNetwork
 import org.simbrain.network.trainers.UnsupervisedTrainer
-import org.simbrain.network.trainers.splitDataSet
 import org.simbrain.network.updaterules.BinaryRule
-import org.simbrain.network.util.Alignment
-import org.simbrain.network.util.Direction
-import org.simbrain.network.util.alignNetworkModels
-import org.simbrain.network.util.offsetNetworkModel
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
-import smile.math.matrix.Matrix
+import org.simbrain.util.stats.distributions.NormalDistribution
 
 /**
  * A discrete Hopfield network.
@@ -30,24 +27,29 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
 
     override val trainer = UnsupervisedTrainer()
 
-    override lateinit var trainingData: Matrix
+    override lateinit var trainingData: MutableList<MutableList<Double>>
 
-    override lateinit var testingData: Matrix
+    override var testingData: MutableList<MutableList<Double>> = mutableListOf()
 
-    @UserParameter(label = "Update function")
+    @UserParameter(label = "Update function", order = 10)
     var updateFunc = HopfieldUpdate.SYNC
 
-    @UserParameter(label = "Learning rate")
+    @UserParameter(label = "Learning rate", order = 20)
     var learningRate = 0.25
+
+    @UserParameter(
+        label = "Hopfield Weight randomizer",
+        showDetails = false,
+        description = "Randomizer for Hopfield Weights.",
+        order = 30,
+    )
+    var hopfieldWeightRandomizer = NormalDistribution(0.0, .1)
 
     override lateinit var customInfo: InfoText
 
     constructor(numNeurons: Int): super() {
 
-        val initialData = Matrix(10, numNeurons).binaryRandomize()
-        val (training, testing) = splitDataSet(initialData, 0.8)
-        this.trainingData = training
-        this.testingData = testing
+        this.trainingData = mutableListOf()
 
         // Create main neuron group
         neuronGroup = NeuronGroup(numNeurons)
@@ -72,22 +74,23 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
         // randomize() TODO()
 
         // Create info text
-        customInfo = InfoText(stateInfoText)
-        reapplyOffsets()
+        customInfo = InfoText(stateInfoText).apply {
+
+        }
     }
 
     @XStreamConstructor
     constructor(): super()
 
     context(Network) override fun trainOnInputData() {
-        trainingData.toArray().forEach { row ->
-            inputLayer.activationArray = row
+        trainingData.forEach { row ->
+            neuronGroup.activationArray = row.toDoubleArray()
             trainOnCurrentPattern()
         }
     }
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
-        weightMatrix.weights.randomizeSymmetric(randomizer ?: NetworkPreferences.weightRandomizer)
+        weightMatrix.weights.randomizeSymmetric(randomizer ?: hopfieldWeightRandomizer)
         weightMatrix.events.updated.fire()
     }
 
@@ -103,7 +106,7 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
     }
 
     val stateInfoText: String
-        get() = "Energy: " + getEnergy()
+        get() = "Energy: " + getEnergy().format(2)
 
     fun getEnergy(): Double {
         // Convert activations to bipolar (-1, +1) for proper Hopfield energy calculation
@@ -132,11 +135,13 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
         events.updated.fire()
     }
 
-    fun reapplyOffsets() {
-        alignNetworkModels(neuronGroup, customInfo, Alignment.HORIZONTAL)
-        val neuronGroupBound = neuronGroup.neuronList.bound
-        offsetNetworkModel(neuronGroup,
-            customInfo, Direction.NORTH, 40.0, neuronGroupBound.height, neuronGroupBound.width, 24.0, 0.0)
+
+    override fun toString(): String {
+        return """
+            Name: $displayName
+            Type: Hopfield Network
+            Neurons: ${neuronGroup.size}
+        """.trimIndent()
     }
 
     override fun copy(): Hopfield {
@@ -155,12 +160,11 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
         // Copy other properties
         copy.updateFunc = updateFunc
         copy.learningRate = learningRate
-        copy.trainingData = trainingData.clone()
-        copy.testingData = testingData.clone()
+        copy.trainingData = trainingData.copy()
+        copy.testingData = testingData.copy()
 
         // Copy custom info
         copy.customInfo = InfoText(stateInfoText)
-        copy.reapplyOffsets()
 
         return copy
     }

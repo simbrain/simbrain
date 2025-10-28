@@ -1,23 +1,14 @@
-package org.simbrain.workspace.updater
+package org.simbrain.util
 
 /**
- * Classes that implement this interface describe individual actions that
- * together comprise a workspace update.
- *
- * @author jyoshimi
+ * Executable actions and a description for those actions. Used by [org.simbrain.workspace.updater.WorkspaceUpdater] and by [org.simbrain.network.core.NetworkUpdateManager]
  */
 abstract class UpdateAction(
-    /**
-     * Provide a String description of this update method.
-     *
-     * @return the update description
-     */
+
     open val description: String?,
 
     /**
-     * Provide a longer description for tooltips, etc.
-     *
-     * @return the update description
+     * A longer description for tooltips, etc.
      */
     open val longDescription: String? = description
 

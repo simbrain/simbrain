@@ -5,6 +5,7 @@ import kotlinx.coroutines.swing.Swing
 import org.simbrain.util.TokenizerResult
 import org.simbrain.util.widgets.SimbrainTextArea
 import org.simbrain.world.textworld.TextWorld
+import org.simbrain.world.textworld.extractEmbeddingFromCurrentText
 import org.simbrain.world.textworld.textWorldPrefs
 import org.simbrain.world.textworld.viewTokenEmbedding
 import java.awt.*
@@ -61,6 +62,7 @@ class TextWorldPanel(
 
         // Top toolbar
         val topToolBar = JToolBar()
+        topToolBar.add(world.extractEmbeddingFromCurrentText)
         topToolBar.add(world.viewTokenEmbedding)
         topToolBar.addSeparator()
         topToolBar.add(world.textWorldPrefs)
@@ -86,19 +88,25 @@ class TextWorldPanel(
             override fun changedUpdate(arg0: DocumentEvent) {
                 // System.out.println("readerworld: changedUpdate");
                 world.setTextNoEvent(textArea.text)
-                updateHighlights()
+                // Clamp caret position to valid range to avoid race condition
+                val validPosition = textArea.caretPosition.coerceIn(0, world.text.length)
+                world.setPosition(validPosition, false)
             }
 
             override fun insertUpdate(arg0: DocumentEvent) {
                 // System.out.println("readerworld: insertUpdate");
                 world.setTextNoEvent(textArea.text)
-                updateHighlights()
+                // Clamp caret position to valid range to avoid race condition
+                val validPosition = textArea.caretPosition.coerceIn(0, world.text.length)
+                world.setPosition(validPosition, false)
             }
 
             override fun removeUpdate(arg0: DocumentEvent) {
                 // System.out.println("readerworld: removeUpdate");
                 world.setTextNoEvent(textArea.text)
-                updateHighlights()
+                // Clamp caret position to valid range to avoid race condition
+                val validPosition = textArea.caretPosition.coerceIn(0, world.text.length)
+                world.setPosition(validPosition, false)
             }
         })
 
@@ -136,14 +144,29 @@ class TextWorldPanel(
 
     fun updateHighlights() {
         textArea.highlighter.removeAllHighlights()
+        
+        // Validate that tokens match current text length to avoid race conditions
+        val docLength = textArea.document.length
+        if (world.tokens.isNotEmpty() && world.tokens.any { it.end > docLength }) {
+            // Tokens are stale (probably waiting for events), skip highlighting until they're regenerated
+            return
+        }
+        
         if (world.showTokenBoundaries) {
             world.tokens.forEach(::highlightToken)
         }
         world.tokens.getOrNull(world.currentTokenIndex)?.let { token ->
-            highlight(token.start, token.end + 1)
-            // Scroll to make the highlighted token visible
-            textArea.modelToView(token.start)?.let { rect ->
-                textArea.scrollRectToVisible(rect)
+            // Double-check token is within document bounds
+            if (token.end <= docLength) {
+                highlight(token.start, token.end + 1)
+                // Scroll to make the highlighted token visible
+                try {
+                    textArea.modelToView(token.start)?.let { rect ->
+                        textArea.scrollRectToVisible(rect)
+                    }
+                } catch (e: BadLocationException) {
+                    // Token position temporarily out of sync with text area, ignore
+                }
             }
         }
     }

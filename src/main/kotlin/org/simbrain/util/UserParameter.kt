@@ -88,9 +88,11 @@ annotation class UserParameter(
     val useLegacySetter: Boolean = false,
 
     /**
-     * Display vectors as columns rather than rows
+     * Display vectors as columns rather than rows. Does not apply to matrices.
      */
     val columnMode: Boolean = false,
 
     val useFileChooser: Boolean = false,
+
+    val fileChooserInitialDirectory: String = "",
 )

@@ -35,12 +35,9 @@ val rbmSim = newSim {
 
             # What to do
             
-            - Select an input pattern and click the train button on the Control panel to train the network on the selected pattern. 
-            - The model learns the pattern and “remembers” it.
-            - When randomizing the network (by clicking “N” [Neuron], “R” [Randomize], and “Space” [Iterate], or using “I” [Wand Mode] over the nodes), the network adjusts the nodes on each iteration to reconfigure the inputted pattern. 
-            - The Network remembers the pattern and the antipattern, and when iterating (“Space”), it iterates to recreate the pattern with the most similar nodes. 
-            
-            You can get the pattern to memorize all the different patterns and antipatterns by training each one, randomizing and iterating to see if it is remembered, and training that pattern again if it needs to be learned. 
+            - Click train on all patterns or click a pattern and click train on current pattern
+            - To test the trained network, click on the visible layer, click `R` to randomize it, and click space repeatedly to see if on of the training patterns is recreated
+            - Try training different patterns by different amounts to see how well they are remembered.
 
         """.trimIndent()
     )

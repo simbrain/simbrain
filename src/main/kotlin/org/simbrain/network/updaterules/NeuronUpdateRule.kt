@@ -169,11 +169,8 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
      * @param neuron reference to parent neuron
      * @return tool tip text
      */
-    open fun getToolTipText(neuron: Neuron): String? {
-        return neuron.id + ".  Location: (" + neuron.x.toInt() + "," + neuron.y.toInt() + "). Activation: " + Utils.round(
-            neuron.activation,
-            MAX_DIGITS
-        )
+    open fun getToolTipText(neuron: Neuron): String {
+        return neuron.toString()
     }
 
     open val isSpikingRule: Boolean

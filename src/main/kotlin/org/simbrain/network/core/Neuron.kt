@@ -1,6 +1,8 @@
 package org.simbrain.network.core
 
 import org.simbrain.network.events.NeuronEvents
+import org.simbrain.network.gui.createTooltipText
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.NeuronUpdateRule
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
@@ -9,7 +11,7 @@ import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.network.util.SpikingScalarData
 import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.UserParameter
-import org.simbrain.util.math.SimbrainMath
+import org.simbrain.util.format
 import org.simbrain.util.plus
 import org.simbrain.util.point
 import org.simbrain.util.propertyeditor.EditableObject
@@ -48,6 +50,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
         clamped = n.clamped
         increment = n.increment
         activation = n.activation
+        bias = n.bias
         x = n.x
         y = n.y
         label = n.label
@@ -58,7 +61,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
      * neuron it is.
      */
     @UserParameter(
-        label = "Update Rule",
+        label = "Update rule",
         description = "Neuron update rule, which determines how activations evolve and respond to inputs.",
         order = 100
     )
@@ -478,7 +481,11 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
     }
 
     override fun toString(): String {
-        return "$id: $type Activation = ${SimbrainMath.roundDouble(activation, 3)}"
+        return """
+            Name: $displayName
+            Update rule: $type 
+            Activation: ${activation.format(NetworkPreferences.tooltipDecimalPlaces)}
+        """.trimIndent()
     }
 
     override fun clear() {
@@ -511,7 +518,9 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
      *
      * @return tool tip text
      */
-    val toolTipText: String? get() = updateRule.getToolTipText(this)
+    val toolTipText: String get() = createTooltipText(this) {
+        updateRule.getToolTipText(this)
+    }
 
     /**
      * Randomize all synapses that attach to this neuron.

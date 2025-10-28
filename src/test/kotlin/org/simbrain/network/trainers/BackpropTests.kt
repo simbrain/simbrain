@@ -12,10 +12,12 @@ import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
+import org.simbrain.util.identityMutableList
 import org.simbrain.util.math.SigmoidFunctionEnum
 import org.simbrain.util.sse
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.toColumnVector
+import org.simbrain.util.toMutableListOfLists
 import smile.math.matrix.Matrix
 import kotlin.random.Random
 
@@ -105,7 +107,7 @@ class BackpropTests {
             weightInit.initializeWeights(wm2)
             na2.randomizeBiases(NormalDistribution(0.0, .01))
             na3.randomizeBiases(NormalDistribution(0.0, .01))
-            supervisedModel.trainingSet = MatrixDataset(inputVector.transpose(), targetVector.transpose())
+            supervisedModel.trainingSet = TrainingDataset(inputVector.transpose().toMutableListOfLists(), targetVector.transpose().toMutableListOfLists())
             val trainer = SupervisedTrainer(net, supervisedModel)
             repeat(nRuns) {
                 trainer.trainOnce()
@@ -170,12 +172,12 @@ class BackpropTests {
 
     @Test
     fun `train 10-7-10 auto-encoder`() {
-        val inputs = Matrix.eye(10)
+        val inputs = identityMutableList(10)
         val bp = BackpropNetwork(intArrayOf(10, 5, 10), null).apply {
             initWeights()
             initBiases()
             trainerConfig.learningRate = .01
-            trainingSet = MatrixDataset(
+            trainingSet = TrainingDataset(
                 inputs = inputs,
                 targets = inputs
             )

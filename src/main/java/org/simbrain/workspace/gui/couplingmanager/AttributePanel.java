@@ -92,11 +92,10 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
 
     private void showAttributeTypePanel() {
         if (attributeTypePanel != null) {
-            StandardDialog dialog = new StandardDialog();
+            Window parentWindow = SwingUtilities.getWindowAncestor(this);
+            StandardDialog dialog = new StandardDialog(parentWindow, "Set Visibility");
             dialog.setAsDoneDialog();
             dialog.setContentPane(attributeTypePanel);
-            dialog.pack();
-            dialog.setLocationRelativeTo(null);
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
             dialog.addWindowListener(new WindowAdapter() {
                 @Override
@@ -105,7 +104,8 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
                     refresh((WorkspaceComponent) componentComboBox.getSelectedItem());
                 }
             });
-            dialog.setVisible(true);
+            dialog.setModal(true);
+            dialog.makeVisible();
         }
     }
 

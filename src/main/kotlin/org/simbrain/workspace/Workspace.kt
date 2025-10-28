@@ -5,16 +5,23 @@ import org.pmw.tinylog.Logger
 import org.simbrain.custom_sims.NewSimulation
 import org.simbrain.custom_sims.simulations
 import org.simbrain.docviewer.DocViewer
+import org.simbrain.network.NetworkComponent
+import org.simbrain.network.update_actions.BufferedUpdate
+import org.simbrain.network.update_actions.PriorityUpdate
+import org.simbrain.network.update_actions.UpdateNetworkModel
+import org.simbrain.util.ControlPanelKt
 import org.simbrain.util.SimpleIdManager
-import org.simbrain.util.Utils
+import org.simbrain.util.UpdateAction
+import org.simbrain.util.updateAction
 import org.simbrain.workspace.couplings.Coupling
 import org.simbrain.workspace.couplings.CouplingManager
 import org.simbrain.workspace.events.WorkspaceEvents
 import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.workspace.serialization.WorkspaceSerializer
-import org.simbrain.workspace.updater.UpdateAction
+import org.simbrain.workspace.updater.UpdateAllAction
+import org.simbrain.workspace.updater.UpdateComponent
+import org.simbrain.workspace.updater.UpdateCoupling
 import org.simbrain.workspace.updater.WorkspaceUpdater
-import org.simbrain.workspace.updater.updateAction
 import java.io.*
 import java.util.*
 
@@ -268,9 +275,6 @@ class Workspace: CoroutineScope {
         this.workspaceChanged = workspaceChanged
     }
 
-    var currentDirectory = Utils.USER_DIR + Utils.FS + "simulations" + Utils.FS + "workspaces"
-
-
     fun getComponent(name: String?): WorkspaceComponent? {
         return componentList.firstOrNull { it.name.equals(name, ignoreCase = true) }
     }
@@ -319,14 +323,14 @@ class Workspace: CoroutineScope {
         savedTime = time
     }
 
-    suspend fun openWorkspace(theFile: File?, useDesktop: Boolean = false) {
+    suspend fun openWorkspace(theFile: File?, useDesktop: Boolean = false, progressCallback: ((Int, Int) -> Unit)? = null) {
         stop()
         val serializer = WorkspaceSerializer(this)
         try {
             if (theFile != null) {
                 clearWorkspace()
                 withContext(Dispatchers.IO) {
-                    serializer.deserialize(FileInputStream(theFile))
+                    serializer.deserialize(FileInputStream(theFile), progressCallback)
                 }
                 currentFile = theFile
                 simulations.items.firstNotNullOfOrNull { (_, sim) ->
@@ -437,5 +441,47 @@ class Workspace: CoroutineScope {
             baseNameGenerator = { cls -> cls.simpleName.removeSuffix("Component") },
             delimeter = " "
         )
+    }
+
+    /**
+     * Check if the workspace has custom update actions that won't be restored on reopen.
+     * Returns true if there are custom workspace-level or network-level update actions.
+     */
+    fun hasCustomUpdateActions(): Boolean {
+        // Check workspace-level custom actions
+        val hasWorkspaceCustomActions = updater.updateManager.actionList.any { action ->
+            action !is UpdateAllAction && action !is UpdateComponent && action !is UpdateCoupling
+        }
+        
+        if (hasWorkspaceCustomActions) {
+            return true
+        }
+        
+        // Check network-level custom actions
+        val networkComponents = componentList.filterIsInstance<NetworkComponent>()
+        return networkComponents.any { networkComponent ->
+            networkComponent.network.updateManager.actionList.any { action ->
+                action !is BufferedUpdate && action !is PriorityUpdate && action !is UpdateNetworkModel
+            }
+        }
+    }
+
+    /**
+     * Check if the workspace has control panels that won't be restored on reopen.
+     * Returns true if there are any ControlPanelKt instances in the desktop.
+     */
+    fun hasControlPanels(desktop: SimbrainDesktop?): Boolean {
+        if (desktop == null) {
+            return false
+        }
+        return desktop.desktopPane.allFrames.any { it is ControlPanelKt }
+    }
+
+    /**
+     * Check if saving this workspace would be problematic (has features that won't restore).
+     * Returns true if the workspace has custom update actions or control panels but no simulationId.
+     */
+    fun isSaveProblematic(desktop: SimbrainDesktop?): Boolean {
+        return (hasCustomUpdateActions() || hasControlPanels(desktop)) && simulationId == null
     }
 }

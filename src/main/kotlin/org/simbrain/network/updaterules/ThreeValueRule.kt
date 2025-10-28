@@ -24,44 +24,44 @@ class ThreeValueRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>() {
      * Lower threshold field.
      */
     @UserParameter(
-        label = "Lower Threshold",
-        description = "If the weighted input plus the bias is less than this value, the activation "
-                + "is set to the Lower Value.",
+        label = "Lower threshold",
+        description = "If the weighted input plus the bias is less than this value, the activation " +
+                "is set to the lower value.",
         increment = .1,
         order = 2
     )
     var lowerThreshold: Double = 0.0
 
     @UserParameter(
-        label = "Upper Threshold",
-        description = "If the weighted input plus the bias is greater than this value, the activation "
-                + "is set to the Upper Value.",
+        label = "Upper threshold",
+        description = "If the weighted input plus the bias is greater than this value, the activation " +
+                "is set to the upper value.",
         increment = .1,
         order = 3
     )
     var upperThreshold: Double = 1.0
 
     @UserParameter(
-        label = "Lower Value",
-        description = "The activation is set to this value if the weighted input plus the bias exceeds "
-                + "the Lower Threshold.",
+        label = "Lower value",
+        description = "The activation is set to this value if the weighted input plus the bias exceeds " +
+                "the lower threshold.",
         increment = .1,
         order = 4
     )
     var lowerValue: Double = -1.0
 
     @UserParameter(
-        label = "Middle Value",
-        description = "If the weighted input plus the bias does not exceed the Upper or Lower Thresholds, "
-                + "then the activation is set to this value.",
+        label = "Middle value",
+        description = "If the weighted input plus the bias does not exceed the upper or lower thresholds, " +
+                "then the activation is set to this value.",
         increment = .1,
         order = 5
     )
     var middleValue: Double = 0.0
 
     @UserParameter(
-        label = "Upper Value", description = "If the weighted input plus the bias is greater than the Upper Threshold, "
-                + "then the activation is set to this value.", increment = .1, order = 6
+        label = "Upper value", description = "If the weighted input plus the bias is greater than the upper threshold, " +
+                "then the activation is set to this value.", increment = .1, order = 6
     )
     var upperValue: Double = 1.0
 

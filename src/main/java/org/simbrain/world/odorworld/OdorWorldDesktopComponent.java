@@ -20,9 +20,6 @@ public class OdorWorldDesktopComponent extends DesktopComponent<OdorWorldCompone
      */
     private final OdorWorldPanel worldPanel;
 
-    /**
-     * Odor world frame menu.
-     */
     private OdorWorldFrameMenu menu;
 
     public OdorWorldDesktopComponent(GenericFrame frame, OdorWorldComponent component) {
@@ -78,27 +75,14 @@ public class OdorWorldDesktopComponent extends DesktopComponent<OdorWorldCompone
         SwingUtilities.invokeLater(() -> worldPanel.getCanvas().scale(0.01)); // zoom out all the way
     }
 
-    /**
-     * Return the odor world.
-     *
-     * @return Odor world
-     */
     public OdorWorldPanel getWorldPanel() {
         return worldPanel;
     }
 
-    /**
-     * @return Odor world frame menu.
-     */
     public OdorWorldFrameMenu getMenu() {
         return menu;
     }
 
-    /**
-     * Sets odor world frame menu.
-     *
-     * @param menu Menu
-     */
     public void setMenu(final OdorWorldFrameMenu menu) {
         this.menu = menu;
     }

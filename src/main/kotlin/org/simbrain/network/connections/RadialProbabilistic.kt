@@ -27,8 +27,8 @@ class RadialProbabilistic(
      * neurons with no polarity.
      */
     @UserParameter(
-        label = "Exc. Probability",
-        description = "Probability connections will be made to neighbor excitatory (or non-polar) neurons ",
+        label = "Exc. probability",
+        description = "Probability connections will be made to neighbor excitatory (or non-polar) neurons.",
         minimumValue = 0.0,
         maximumValue = 1.0,
         increment = .1,
@@ -41,8 +41,8 @@ class RadialProbabilistic(
      * inhibitory.
      */
     @UserParameter(
-        label = "Inh. Probability",
-        description = "Probability connections will be made to neighbor inhibitory neurons ",
+        label = "Inh. probability",
+        description = "Probability connections will be made to neighbor inhibitory neurons.",
         minimumValue = 0.0,
         maximumValue = 1.0,
         increment = .1,
@@ -54,8 +54,8 @@ class RadialProbabilistic(
      * Radius within which to connect excitatory excNeurons.
      */
     @UserParameter(
-        label = "Exc. Radius",
-        description = "Distance to search for excitatory neurons to connect to",
+        label = "Exc. radius",
+        description = "Distance to search for excitatory neurons to connect to.",
         minimumValue = 0.0,
         order = 3
     )
@@ -65,8 +65,8 @@ class RadialProbabilistic(
      * Radius within which to connect inhibitory excNeurons.
      */
     @UserParameter(
-        label = "Inh. Radius",
-        description = "Distance to search for inhibitory neurons to connect to",
+        label = "Inh. radius",
+        description = "Distance to search for inhibitory neurons to connect to.",
         minimumValue = 0.0,
         order = 4
     )
@@ -74,7 +74,7 @@ class RadialProbabilistic(
 
     @UserParameter(
         label = "Allow self connections",
-        description = "Allow synapses from neurons to themselves",
+        description = "Allow synapses from neurons to themselves.",
         order = 50
     )
     var allowSelfConnections: Boolean = false,
@@ -118,6 +118,8 @@ class RadialProbabilistic(
     override fun toString(): String {
         return name
     }
+
+    override fun tooltipText(): String = "Radial Prob (r=${excitatoryRadius.toInt()})"
 
     override fun copy(): RadialProbabilistic {
         return RadialProbabilistic(

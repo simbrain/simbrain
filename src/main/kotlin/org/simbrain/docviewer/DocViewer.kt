@@ -23,14 +23,18 @@ class DocViewer: EditableObject {
         2. Second item 
           - Unordered item with **bold** in one style
           - Unordered item with __bold__ in one style
-        
-        # Local image     
-        
-        ![Flower](//localfiles/simulations/images/Caltech101Sample/image_0036.jpg)
 
         # Remote image     
         
-        ![Bobcat Drawing](https://upload.wikimedia.org/wikipedia/commons/3/37/Ernest_Ingersoll_-_lynx_rufus_%26_lynx_canadensis.png)
+        ![Simbrain logo](https://simbrain.net/images/simbrain_logo.png)
+        
+
+
+               
+        # Local image     
+        
+        ![Sample figure](//localfiles/simulations/images/visualWorld/spiveyActivationDynamics.png)
+
         """.trimIndent()
         set(value) {
             field = value

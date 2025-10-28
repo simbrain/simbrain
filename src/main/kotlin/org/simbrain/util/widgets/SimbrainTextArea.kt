@@ -26,7 +26,7 @@ class SimbrainTextArea : RSyntaxTextArea() {
         val frame = JFrame()
         val dialog = FindReplaceDialog(frame, this)
         frame.contentPane = dialog
-        frame.title = "Find / Replace"
+        frame.title = "Find / replace..."
         frame.isVisible = true
         frame.pack()
         frame.setLocationRelativeTo(null)

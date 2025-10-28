@@ -48,8 +48,8 @@ public final class NeuronDialog extends StandardDialog {
         scroller.setBorder(null);
         setContentPane(scroller);
         this.addButton(helpButton);
-        neuronPropertiesPanel.getWidgetEventsByLabel("Update Rule").getValueChanged().on(newValue -> {
-            updateHelp((NeuronUpdateRule<?, ?>) neuronPropertiesPanel.getWidgetValueByLabel("Update Rule"));
+        neuronPropertiesPanel.getWidgetEventsByLabel("Update rule").getValueChanged().on(newValue -> {
+            updateHelp((NeuronUpdateRule<?, ?>) neuronPropertiesPanel.getWidgetValueByLabel("Update rule"));
         });
         updateHelp(neurons.stream().findFirst().get().getUpdateRule());
     }

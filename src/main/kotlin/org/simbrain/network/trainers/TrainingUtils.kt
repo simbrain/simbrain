@@ -19,7 +19,6 @@ import smile.math.matrix.Matrix
 import java.util.*
 import kotlin.math.abs
 import kotlin.math.ln
-import kotlin.math.min
 import kotlin.random.Random
 
 fun WeightMatrix.computeWeightDeltas(errorSignal: Matrix): Matrix {
@@ -154,6 +153,7 @@ sealed class BackpropLossFunction(
         }
 
         override fun canUse(layer: Layer) = layer.updateRule is SoftmaxRule
+
     }
 
     override fun toString() = description
@@ -502,6 +502,127 @@ fun List<WeightMatrix>.printActivationsAndWeights(showWeights: Boolean = false) 
 
 }
 
+/**
+ * Validates if a matrix contains valid one-hot encoded vectors.
+ * For column vectors: must have at least 2 elements, with exactly one 1.0 and the rest 0.0
+ * For sequence data: each row should have exactly one 1.0 and the rest 0.0
+ * 
+ * Single-element vectors like [1.0] or [0.0] are not considered valid one-hot encoding
+ * because they don't represent a choice between multiple classes.
+ * 
+ * @param matrix The matrix to validate
+ * @return true if the matrix contains valid one-hot encoded data, false otherwise
+ */
+fun isValidOneHot(matrix: Matrix): Boolean {
+    val tolerance = 1e-10
+    
+    // Handle sequence data (multiple rows with multiple columns)
+    if (matrix.ncol() > 1) {
+        // Each row should be a valid one-hot vector
+        for (i in 0 until matrix.nrow()) {
+            var oneCount = 0
+            var sumOfRow = 0.0
+            for (j in 0 until matrix.ncol()) {
+                val value = matrix[i, j]
+                sumOfRow += value
+                if (abs(value - 1.0) < tolerance) {
+                    oneCount++
+                } else if (abs(value) > tolerance) {
+                    // Value is neither 0 nor 1
+                    return false
+                }
+            }
+            // Each row should have exactly one 1.0 and sum should be 1.0
+            if (oneCount != 1 || abs(sumOfRow - 1.0) > tolerance) {
+                return false
+            }
+        }
+        return true
+    } else {
+        // Column vector case - need at least 2 elements for valid classification
+        if (matrix.nrow() < 2) {
+            return false  // Single-element vectors cannot be valid one-hot (no choice between classes)
+        }
+        
+        var oneCount = 0
+        var sumOfColumn = 0.0
+        for (i in 0 until matrix.nrow()) {
+            val value = matrix[i, 0]
+            sumOfColumn += value
+            if (abs(value - 1.0) < tolerance) {
+                oneCount++
+            } else if (abs(value) > tolerance) {
+                // Value is neither 0 nor 1
+                return false
+            }
+        }
+        // Should have exactly one 1.0 and sum should be 1.0
+        return oneCount == 1 && abs(sumOfColumn - 1.0) < tolerance
+    }
+}
+
+/**
+ * Calculate classification accuracy for softmax predictions.
+ * Validates that targets are properly one-hot encoded.
+ * 
+ * @param actual The softmax predictions (probabilities)
+ * @param target The one-hot encoded targets
+ * @return Accuracy as a value between 0.0 and 1.0, or null if targets are not valid one-hot encoded
+ */
+fun classificationAccuracy(actual: Matrix, target: Matrix): Double? {
+    actual.validateSameShape(target)
+    
+    // Validate that targets are properly one-hot encoded
+    if (!isValidOneHot(target)) {
+        return null
+    }
+    
+    // Handle sequence data (multiple rows with multiple columns)
+    // For single predictions, we expect a column vector (nrow > 1, ncol = 1)
+    if (actual.ncol() > 1) {
+        return classificationAccuracySequence(actual, target)
+    }
+    
+    // Single prediction case (column vector)
+    target.validateColumnVector()
+    actual.validateColumnVector()
+    
+    // Find the predicted class (highest probability)
+    val predictedClass = actual.toDoubleArray().indices.maxByOrNull { actual[it, 0] } ?: 0
+    
+    // Find the target class (should be 1.0 in one-hot encoding)
+    val targetClass = target.toDoubleArray().indices.maxByOrNull { target[it, 0] } ?: 0
+    
+    return if (predictedClass == targetClass) 1.0 else 0.0
+}
+
+/**
+ * Calculate accuracy for sequence data where each row is a separate prediction.
+ */
+private fun classificationAccuracySequence(actual: Matrix, target: Matrix): Double {
+    require(actual.nrow() == target.nrow()) {
+        "Sequence length mismatch: predictions has ${actual.nrow()} rows but targets has ${target.nrow()} rows"
+    }
+    require(actual.ncol() == target.ncol()) {
+        "Vocabulary size mismatch: predictions has ${actual.ncol()} columns but targets has ${target.ncol()} columns"
+    }
+
+    var correctPredictions = 0
+    for (i in 0 until actual.nrow()) {
+        // Find predicted class for this position
+        val predictedClass = (0 until actual.ncol()).maxByOrNull { actual[i, it] } ?: 0
+        
+        // Find target class for this position
+        val targetClass = (0 until target.ncol()).maxByOrNull { target[i, it] } ?: 0
+        
+        if (predictedClass == targetClass) {
+            correctPredictions++
+        }
+    }
+    
+    return correctPredictions.toDouble() / actual.nrow()
+}
+
 fun crossEntropy(predictions: Matrix, targets: Matrix): Double {
     // Handle sequence data (multiple rows)
     if (predictions.nrow() > 1 && targets.nrow() > 1) {
@@ -540,36 +661,88 @@ fun crossEntropySequence(predictions: Matrix, targets: Matrix): Double {
 }
 
 /**
- * Split a dataset (inputs and targets) into training and testing subsets.
- *
- * Split ratio of 0 is all testing. Split ratio of .8 is 80% training. Split ratio of 1 is 100% training.
- *
+ * Split a dataset into training and testing subsets using MutableList format.
  */
-fun splitDataSet(inputs: Matrix, targets: Matrix, splitRatio: Double, random: Random = Random(42L)): Pair<Pair<Matrix, Matrix>, Pair<Matrix, Matrix>> {
-    require(inputs.nrow() == targets.nrow()) { "inputs nrow (${inputs.nrow()}) must equal targets nrow (${targets.nrow()})" }
+fun splitDataSet(
+    inputs: MutableList<MutableList<Double>>,
+    targets: MutableList<MutableList<Double>>,
+    splitRatio: Double, 
+    random: Random = Random(42L)
+): Pair<Pair<MutableList<MutableList<Double>>, MutableList<MutableList<Double>>>, Pair<MutableList<MutableList<Double>>, MutableList<MutableList<Double>>>> {
+    require(inputs.size == targets.size) { "inputs size (${inputs.size}) must equal targets size (${targets.size})" }
     require(splitRatio in 0.0..1.0) { "splitRatio must be between 0.0 and 1.0" }
 
-    val nrows = inputs.nrow()
-
+    val nrows = inputs.size
     val rowIndices = (0 until nrows).shuffled(random)
-
-    val trainRowCount = (nrows * splitRatio).toInt().coerceAtLeast(1)
-    val testRowCount = (nrows - trainRowCount).coerceAtLeast(1)
+    
+    val trainRowCount = (nrows * splitRatio).toInt()
+    val testRowCount = nrows - trainRowCount
 
     val trainRowIndices = rowIndices.take(trainRowCount)
-
     val testRowIndices = rowIndices.takeLast(testRowCount)
 
-    return Pair(
-        Pair(
-            inputs.rows(*trainRowIndices.toIntArray()),
-            targets.rows(*trainRowIndices.toIntArray())
-        ),
-        Pair(
-            inputs.rows(*testRowIndices.toIntArray()),
-            targets.rows(*testRowIndices.toIntArray())
-        )
+    val trainingInputs = trainRowIndices.map { inputs[it].toMutableList() }.toMutableList()
+    val trainingTargets = trainRowIndices.map { targets[it].toMutableList() }.toMutableList()
+    val testingInputs = testRowIndices.map { inputs[it].toMutableList() }.toMutableList()
+    val testingTargets = testRowIndices.map { targets[it].toMutableList() }.toMutableList()
+
+    return (trainingInputs to trainingTargets) to (testingInputs to testingTargets)
+}
+
+/**
+ * Split a TrainingDataset into training and testing TrainingDatasets.
+ * Preserves input and target dimensions, allowing for empty datasets when splitRatio is 0.0 or 1.0.
+ */
+fun splitDataSet(
+    dataset: TrainingDataset,
+    splitRatio: Double,
+    random: Random = Random(42L)
+): Pair<TrainingDataset, TrainingDataset> {
+    require(splitRatio in 0.0..1.0) { "splitRatio must be between 0.0 and 1.0" }
+
+    // Generate the same row indices that will be used for data splitting
+    val nrows = dataset.inputs.size
+    val rowIndices = (0 until nrows).shuffled(random)
+    val trainRowCount = (nrows * splitRatio).toInt()
+    val trainRowIndices = rowIndices.take(trainRowCount)
+    val testRowIndices = rowIndices.drop(trainRowCount)
+
+    // Split the data using the existing function (but we already know the indices)
+    val (training, testing) = splitDataSet(dataset.inputs, dataset.targets, splitRatio, random)
+    val (trainingInputs, trainingTargets) = training
+    val (testingInputs, testingTargets) = testing
+
+    val trainingDataset = TrainingDataset(
+        inputs = trainingInputs,
+        targets = trainingTargets,
+        inputSize = dataset.inputSize,
+        targetSize = dataset.targetSize,
+        inputRowNames = dataset.inputRowNames?.let { names ->
+            trainRowIndices.map { names.getOrNull(it) ?: "Row $it" }
+        },
+        targetRowNames = dataset.targetRowNames?.let { names ->
+            trainRowIndices.map { names.getOrNull(it) ?: "Row $it" }
+        },
+        inputColumnNames = dataset.inputColumnNames,
+        targetColumnNames = dataset.targetColumnNames
     )
+
+    val testingDataset = TrainingDataset(
+        inputs = testingInputs,
+        targets = testingTargets,
+        inputSize = dataset.inputSize,
+        targetSize = dataset.targetSize,
+        inputRowNames = dataset.inputRowNames?.let { names ->
+            testRowIndices.map { names.getOrNull(it) ?: "Row $it" }
+        },
+        targetRowNames = dataset.targetRowNames?.let { names ->
+            testRowIndices.map { names.getOrNull(it) ?: "Row $it" }
+        },
+        inputColumnNames = dataset.inputColumnNames,
+        targetColumnNames = dataset.targetColumnNames
+    )
+
+    return trainingDataset to testingDataset
 }
 
 /**
@@ -592,6 +765,27 @@ fun splitDataSet(inputs: Matrix, splitRatio: Double, random: Random = Random(42L
         inputs.rows(*trainRowIndices.toIntArray()),
         inputs.rows(*testRowIndices.toIntArray())
     )
+}
+
+/**
+ * Split a dataset (inputs only) into training and testing subsets for unsupervised learning using MutableList format.
+ */
+fun splitDataSet(inputs: MutableList<MutableList<Double>>, splitRatio: Double, random: Random = Random(42L)): Pair<MutableList<MutableList<Double>>, MutableList<MutableList<Double>>> {
+    require(splitRatio in 0.0..1.0) { "splitRatio must be between 0.0 and 1.0" }
+
+    val nrows = inputs.size
+    val rowIndices = (0 until nrows).shuffled(random)
+
+    val trainRowCount = (nrows * splitRatio).toInt()
+    val testRowCount = nrows - trainRowCount
+
+    val trainRowIndices = rowIndices.take(trainRowCount)
+    val testRowIndices = rowIndices.takeLast(testRowCount)
+
+    val trainingInputs = trainRowIndices.map { inputs[it].toMutableList() }.toMutableList()
+    val testingInputs = testRowIndices.map { inputs[it].toMutableList() }.toMutableList()
+
+    return trainingInputs to testingInputs
 }
 
 /**

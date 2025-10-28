@@ -51,15 +51,25 @@ public class ResourceManager {
      * @return Returns a scaled ImageIcon.
      */
     public static ImageIcon getSmallIcon(String path) {
+        if (path == null || path.trim().isEmpty()) {
+            System.err.println("Could not load icon: invalid path (null or empty)");
+            System.err.println("Stack trace:");
+            Thread.dumpStack();
+            return null;
+        }
         path = assertForwardSlash(path);
         try {
             URL url = ClassLoader.getSystemClassLoader().getResource(path);
+            if (url == null) {
+                System.err.println("Could not load icon: resource not found: " + path);
+                return null;
+            }
             ImageIcon imageIcon = new ImageIcon(url);
             Image image = imageIcon.getImage().getScaledInstance(smallIconSize, smallIconSize, Image.SCALE_SMOOTH);
             imageIcon.setImage(image);
             return imageIcon;
         } catch (Exception e) {
-            System.err.println("Could not load icon: " + path);
+            System.err.println("Could not load icon: " + path + " (" + e.getMessage() + ")");
             return null;
         }
     }

@@ -1,6 +1,7 @@
 package org.simbrain.world.textworld.gui
 
 import org.simbrain.util.StandardDialog
+import org.simbrain.util.Utils
 import org.simbrain.util.createAction
 import org.simbrain.util.showMessageDialog
 import org.simbrain.util.table.*
@@ -45,7 +46,8 @@ class TokenEmbeddingDialog(val initialTokenEmbedding: TokenEmbedding, updateToke
                 fixedColumns = false,
                 skipImportOptions = true,
                 defaultOptions = ImportExportOptions(includeRowNames = true),
-                dataType = Double::class
+                dataType = Double::class,
+                customDir =  "." + Utils.FS + "simulations" + Utils.FS + "wordembeddings"
             )
         )
         addAction(table.exportCsv(skipExportOptions = true, defaultOptions = ImportExportOptions(includeRowNames = true)))

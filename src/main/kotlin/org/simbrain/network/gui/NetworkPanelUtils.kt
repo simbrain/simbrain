@@ -2,6 +2,7 @@ package org.simbrain.network.gui
 
 import org.simbrain.network.core.LocatableModel
 import org.simbrain.network.core.NetworkModel
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.ScreenElement
 import org.simbrain.util.KeyCombination
 import org.simbrain.util.createAction
@@ -10,13 +11,13 @@ import java.awt.event.ActionEvent
 import kotlin.coroutines.EmptyCoroutineContext
 
 /**
- * [createAction] that is conditionally enabled based on the state of the network, using [ConditionallyEnabledAction.EnablingCondition]
+ * [createAction] that is conditionally enabled based on the state of the network, using a function condition
  * with a list of keyboard shortcuts.
  */
 fun NetworkPanel.createConditionallyEnabledAction(
     iconPath: String? = null,
     name: String,
-    enablingCondition: ConditionallyEnabledAction.EnablingCondition,
+    enablingCondition: NetworkPanel.() -> Boolean,
     description: String = name,
     keyboardShortcuts: List<KeyCombination>,
     block: suspend NetworkPanel.(e: ActionEvent) -> Unit
@@ -27,11 +28,13 @@ fun NetworkPanel.createConditionallyEnabledAction(
     keyboardShortcuts = keyboardShortcuts,
     initBlock = {
         fun updateAction() {
-            isEnabled = selectionManager.checkEnablingFunction(enablingCondition)
+            isEnabled = this@NetworkPanel.enablingCondition()
         }
         updateAction()
         selectionManager.events.selection.on { _, _ -> updateAction() }
         selectionManager.events.sourceSelection.on { _, _ -> updateAction() }
+        // Also listen to clipboard changes for conditions that depend on clipboard state
+        Clipboard.addClipboardListener { updateAction() }
     },
     coroutineScope = null,
     coroutineContext = EmptyCoroutineContext,
@@ -44,7 +47,7 @@ fun NetworkPanel.createConditionallyEnabledAction(
 fun NetworkPanel.createConditionallyEnabledAction(
     iconPath: String? = null,
     name: String,
-    enablingCondition: ConditionallyEnabledAction.EnablingCondition,
+    enablingCondition: NetworkPanel.() -> Boolean,
     description: String = name,
     keyboardShortcuts: KeyCombination? = null,
     block: suspend NetworkPanel.(e: ActionEvent) -> Unit
@@ -60,9 +63,15 @@ fun NetworkPanel.createConditionallyEnabledAction(
 inline fun <reified T: NetworkModel> NetworkPanel.filterSelectedModelByClass(): List<T> = selectionManager.selectedModels.filterIsInstance<T>()
 inline fun <reified T: ScreenElement> NetworkPanel.filterSelectedNodeByClass(): List<T> = selectionManager.selection.filterIsInstance<T>()
 
+fun createTooltipText(networkModel: NetworkModel, convertToHtml: Boolean = true, stringSupplier: (NetworkModel) -> String = { it.toString() }) = """
+        <html>
+        ${stringSupplier(networkModel).let { if (convertToHtml) it.split("\n").joinToString("<br>") else it }} <br>
+        </html>
+    """.trimIndent()
+
 fun createTooltipTextWithLocation(locatableModel: LocatableModel, convertToHtml: Boolean = true, stringSupplier: (LocatableModel) -> String = { it.toString() }) = """
         <html>
         ${stringSupplier(locatableModel).let { if (convertToHtml) it.split("\n").joinToString("<br>") else it }} <br>
-        Location: ${locatableModel.location.format(0)}
+        Location: ${locatableModel.location.format(NetworkPreferences.tooltipDecimalPlaces)}
         </html>
     """.trimIndent()

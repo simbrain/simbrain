@@ -11,17 +11,16 @@ import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.network.util.SpikingScalarData
 import org.simbrain.util.LOG_10
 import org.simbrain.util.SimpleIdManager
+import org.simbrain.util.UpdateAction
 import org.simbrain.util.UserParameter
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.workspace.updater.PerformanceMonitor
-import org.simbrain.workspace.updater.UpdateAction
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.ln
 import kotlin.random.Random
-
 
 
 /**

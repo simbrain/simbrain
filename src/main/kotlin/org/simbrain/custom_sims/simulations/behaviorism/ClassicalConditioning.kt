@@ -9,9 +9,9 @@ import org.simbrain.network.core.getModelByLabel
 import org.simbrain.network.desktop.NetworkDesktopComponent
 import org.simbrain.network.updaterules.BinaryRule
 import org.simbrain.util.place
+import org.simbrain.util.updateAction
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.couplings.getProducer
-import org.simbrain.workspace.updater.updateAction
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.sensors.ObjectSensor
 

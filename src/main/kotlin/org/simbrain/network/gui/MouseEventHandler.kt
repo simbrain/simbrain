@@ -19,7 +19,6 @@ import org.simbrain.util.piccolo.SelectionMarquee
 import org.simbrain.util.piccolo.firstScreenElement
 import org.simbrain.util.piccolo.screenElements
 import java.awt.*
-import java.awt.event.InputEvent
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
 import java.awt.image.BufferedImage
@@ -57,8 +56,11 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
 
     init {
         // Only handle events in selection mode
-        eventFilter = object : PInputEventFilter(InputEvent.BUTTON1_MASK) {
+        eventFilter = object : PInputEventFilter() {
             override fun acceptsEvent(event: PInputEvent, type: Int): Boolean {
+
+                if (event.isPopupTrigger) return false
+
                 val mouseCursor = networkPanel.mouseCursor
                 return mouseCursor == MouseCursor.Selection || mouseCursor == MouseCursor.Pan && super.acceptsEvent(event, type)
             }
@@ -204,20 +206,22 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
      */
     private fun dragItems(event: PInputEvent) {
         val delta = event.position - marqueeEndPosition
-        networkPanel.selectionManager.selection.map { it.screenElements.firstOrNull(ScreenElement::isDraggable) }
-            .forEach { it?.offset(delta.x, delta.y) }
+        val draggableElements = networkPanel.selectionManager.selection.map { it.screenElements.firstOrNull(ScreenElement::isDraggable) }
+        draggableElements.forEach { it?.offset(delta.x, delta.y) }
+
+        val placementManager = networkPanel.network.placementManager
+        val selectionManager = networkPanel.selectionManager
+        val customOffsetAnchor = placementManager.customOffsetAnchor
 
         // Show placementManagerDelta for placement manager
-        if (event.isAltDown) {
-            val topLeft = networkPanel.selectionManager.filterSelectedModels<LocatableModel>().topLeftLocation
-            val pm = networkPanel.network.placementManager
+        if (event.isAltDown && customOffsetAnchor?.let { selectionManager.selectedModels.contains(it) } == false) {
+            val topLeft = selectionManager.filterSelectedModels<LocatableModel>().topLeftLocation
             networkPanel.canvas.layer.removeChild(placementManagerDelta)
-            val customOffsetAnchor = pm.customOffsetAnchor
             placementManagerDelta = PPath.createLine(
                 topLeft.x,
                 topLeft.y,
-                customOffsetAnchor?.location?.x ?: 0.0,
-                customOffsetAnchor?.location?.y ?: 0.0
+                customOffsetAnchor.location.x,
+                customOffsetAnchor.location.y
             ).apply {
                 this.stroke = PPath.DEFAULT_STROKE
                 this.strokePaint = Color.red

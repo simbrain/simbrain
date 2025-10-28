@@ -16,6 +16,7 @@ import org.simbrain.util.*
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.genericframe.GenericJFrame
 import org.simbrain.util.genericframe.GenericJInternalFrame
+import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.util.widgets.ShowHelpAction
 import org.simbrain.util.widgets.ToggleButton
 import org.simbrain.workspace.Workspace
@@ -50,12 +51,17 @@ object SimbrainDesktop {
     /**
      * Name to display in Simbrain desktop window.
      */
-    private const val FRAME_TITLE = "Simbrain 4 Beta"
+    private val FRAME_TITLE = BuildInfo.applicationTitle
 
     /**
      * The frame that will hold the workspace.
      */
     val frame: JFrame = JFrame(FRAME_TITLE)
+
+    /**
+     * Manager for onboarding popups
+     */
+    val onboardingManager = OnboardingPopupManager(frame)
 
     /**
      * Associates workspace components with their corresponding desktop components.
@@ -98,10 +104,9 @@ object SimbrainDesktop {
      */
     private var contextMenu: JPopupMenu? = null
 
-    /**
-     * Workspace toolbar.
-     */
-    private var wsToolBar = JToolBar()
+    var wsToolBar = JToolBar()
+
+    lateinit var infoDockButton: AbstractButton
 
     val screenSize = Toolkit.getDefaultToolkit().screenSize
 
@@ -115,7 +120,27 @@ object SimbrainDesktop {
         },
         orientation = JSplitPane.HORIZONTAL_SPLIT,
         defaultSize = (screenSize.width * .2).toInt()
-    )
+    ).apply {
+        // Add listener for when the info dock becomes visible to show onboarding popup
+        dockComponent.addComponentListener(object : ComponentAdapter() {
+            override fun componentShown(e: ComponentEvent?) {
+                swingInvokeLater {
+                    onboardingManager.showPopup(
+                        PopupConfig(
+                            title = "Info Panel Toggle",
+                            message = "Use this button to toggle the visibility of this info screen. The info panel shows documentation and help content for various features.",
+                            targetComponent = infoDockButton,
+                            placement = PopupPlacement.BOTTOM_CENTER,
+                            suppressionKey = "info_dock_help",
+                            style = PopupStyle.INFO
+                        )
+                    )
+
+                }
+
+            }
+        })
+    }
 
     val bottomDockSplitter = SimbrainDesktopDock(
         mainComponent = sideDockSplitter,
@@ -134,6 +159,10 @@ object SimbrainDesktop {
             if (dockComponent.isVisible) {
                 WorkspacePreferences.bottomDockSize = dividerLocation
             }
+        }
+        // Show dock based on preference
+        if (WorkspacePreferences.showBottomDockByDefault) {
+            showDock()
         }
     }
 
@@ -219,76 +248,7 @@ object SimbrainDesktop {
         // Add macOS About menu handler
         if (Utils.isMacOSX()) {
             Desktop.getDesktop().setAboutHandler {
-                val aboutDialog = JDialog(null as JFrame?, "About Simbrain")
-                aboutDialog.layout = BorderLayout()
-                
-                // Logo at the top
-                val logoPanel = JPanel(FlowLayout(FlowLayout.CENTER))
-                val logoLabel = JLabel()
-                val logoImage = ResourceManager.getImage("simbrain_iconset/icon_128x128.png")
-                logoLabel.icon = ImageIcon(logoImage)
-                logoPanel.add(logoLabel)
-                
-                // Middle section with info
-                val infoPanel = JPanel()
-                infoPanel.layout = BoxLayout(infoPanel, BoxLayout.Y_AXIS)
-                infoPanel.border = BorderFactory.createEmptyBorder(5, 15, 5, 15)
-
-                val titleLabel = JLabel("Simbrain 4")
-                titleLabel.font = Font("SansSerif", Font.BOLD, 18)
-                titleLabel.alignmentX = Component.CENTER_ALIGNMENT
-
-                val versionLabel = JLabel("Version 4.0.0 Beta")
-                versionLabel.font = Font("SansSerif", Font.PLAIN, 14)
-                versionLabel.alignmentX = Component.CENTER_ALIGNMENT
-
-
-                val descriptionLabel = JLabel("A framework for neural network simulation")
-                descriptionLabel.alignmentX = Component.CENTER_ALIGNMENT
-                
-                infoPanel.add(Box.createVerticalStrut(10))
-                infoPanel.add(titleLabel)
-                infoPanel.add(Box.createVerticalStrut(5))
-                infoPanel.add(versionLabel)
-                infoPanel.add(Box.createVerticalStrut(10))
-                infoPanel.add(descriptionLabel)
-                infoPanel.add(Box.createVerticalStrut(10))
-
-                // Links
-                val linkPanel = JPanel()
-                linkPanel.layout = BoxLayout(linkPanel, BoxLayout.Y_AXIS)
-                linkPanel.border = BorderFactory.createEmptyBorder(0, 0, 10, 0)
-                
-                val websiteButton = JButton("Visit Simbrain Website")
-                websiteButton.addActionListener { 
-                    Utils.displayURLInBrowser("https://simbrain.net")
-                }
-                websiteButton.alignmentX = Component.CENTER_ALIGNMENT
-                
-                val creditsButton = JButton("View Credits")
-                creditsButton.addActionListener { 
-                    Utils.displayURLInBrowser("https://simbrain.net/SimbrainCredits.html")
-                }
-                creditsButton.alignmentX = Component.CENTER_ALIGNMENT
-                
-                linkPanel.add(websiteButton)
-                linkPanel.add(Box.createVerticalStrut(5))
-                linkPanel.add(creditsButton)
-
-                // Add all components to the dialog
-                val centerPanel = JPanel(BorderLayout())
-                centerPanel.add(logoPanel, BorderLayout.NORTH)
-                centerPanel.add(infoPanel, BorderLayout.CENTER)
-                
-                aboutDialog.add(centerPanel, BorderLayout.CENTER)
-                aboutDialog.add(linkPanel, BorderLayout.SOUTH)
-
-                // Configure dialog
-                aboutDialog.size = Dimension(375, 380)
-                aboutDialog.isResizable = false
-                aboutDialog.isVisible = true
-
-                aboutDialog.setLocationRelativeTo(null)
+                showAboutDialog()
             }
         }
         
@@ -475,7 +435,7 @@ object SimbrainDesktop {
         // Toggle docks
         bar.addSeparator()
         bar.add(actionManager.toggleBottomDock)
-        bar.add(actionManager.toggleInfoDock)
+        infoDockButton = bar.add(actionManager.toggleInfoDock)
 
         // Initialize time label
         timeLabel.border = BorderFactory.createEmptyBorder(0, 10, 0, 10)
@@ -538,12 +498,20 @@ object SimbrainDesktop {
         fileMenu.addSeparator()
         fileMenu.add(actionManager.showUpdaterDialog)
         fileMenu.addSeparator()
+        fileMenu.add(actionManager.showWorkspacePreferencesAction)
+        fileMenu.add(actionManager.showNetworkPreferencesAction)
+        fileMenu.addSeparator()
+        fileMenu.add(actionManager.resetOnboardingWindows)
+        fileMenu.addSeparator()
         fileMenu.add(actionManager.quitWorkspaceAction)
         return fileMenu
     }
 
     private fun createViewMenu(): JMenu {
         val viewMenu = JMenu("View")
+        viewMenu.add(JMenuItem(actionManager.toggleBottomDock))
+        viewMenu.add(JMenuItem(actionManager.toggleInfoDock))
+        viewMenu.addSeparator()
         viewMenu.add(JMenuItem(actionManager.resizeAllWindowsAction))
         viewMenu.add(JMenuItem(actionManager.repositionAllWindowsAction))
         return viewMenu
@@ -579,11 +547,113 @@ object SimbrainDesktop {
 
     private fun createHelpMenu(): JMenu {
         val helpMenu = JMenu("Help")
-        helpMenu.add(ShowHelpAction("Main Help", "https://docs.simbrain.net/"))
+        helpMenu.add(ShowHelpAction("Documentation", "https://docs.simbrain.net/"))
+        helpMenu.add(ShowHelpAction("Quick start", "https://docs.simbrain.net/docs/quickstart.html"))
+        helpMenu.add(ShowHelpAction("Keyboard shortcuts", "https://docs.simbrain.net/docs/shortcuts.html"))
         helpMenu.addSeparator()
-        helpMenu.add(ShowHelpAction("Quick start and shortcuts", "https://docs.simbrain.net/docs/quickstart.html"))
+        helpMenu.add(actionManager.toggleInfoDock)
+        helpMenu.addSeparator()
         helpMenu.add(ShowHelpAction("Credits", "https://simbrain.net/SimbrainCredits.html"))
+        
+        // Add About menu item for non-macOS platforms (macOS has native About menu)
+        if (!Utils.isMacOSX()) {
+            helpMenu.addSeparator()
+            val aboutAction = object : AbstractAction("About Simbrain") {
+                override fun actionPerformed(e: ActionEvent) {
+                    showAboutDialog()
+                }
+            }
+            helpMenu.add(aboutAction)
+        }
+        
         return helpMenu
+    }
+    
+    /**
+     * Show the About dialog with version and build information
+     */
+    private fun showAboutDialog() {
+        val aboutDialog = JDialog(frame, "About Simbrain", true)
+        aboutDialog.layout = BorderLayout()
+        
+        // Logo at the top
+        val logoPanel = JPanel(FlowLayout(FlowLayout.CENTER))
+        val logoLabel = JLabel()
+        val logoImage = ResourceManager.getImage("simbrain_iconset/icon_128x128.png")
+        logoLabel.icon = ImageIcon(logoImage)
+        logoPanel.add(logoLabel)
+        
+        // Middle section with info
+        val infoPanel = JPanel()
+        infoPanel.layout = BoxLayout(infoPanel, BoxLayout.Y_AXIS)
+        infoPanel.border = BorderFactory.createEmptyBorder(5, 15, 5, 15)
+
+        val titleLabel = JLabel("Simbrain ${BuildInfo.versionName}")
+        titleLabel.font = Font("SansSerif", Font.BOLD, 18)
+        titleLabel.alignmentX = Component.CENTER_ALIGNMENT
+
+        val versionLabel = JLabel(BuildInfo.fullVersionString)
+        versionLabel.font = Font("SansSerif", Font.PLAIN, 14)
+        versionLabel.alignmentX = Component.CENTER_ALIGNMENT
+        
+        // Add build info if available
+        val buildInfoLabel = if (BuildInfo.buildNumber != "dev" && BuildInfo.commitSha != "unknown") {
+            JLabel("Commit: ${BuildInfo.commitSha}").apply {
+                font = Font("SansSerif", Font.PLAIN, 12)
+                alignmentX = Component.CENTER_ALIGNMENT
+                foreground = Color.GRAY
+            }
+        } else null
+
+        val descriptionLabel = JLabel("A framework for neural network simulation")
+        descriptionLabel.alignmentX = Component.CENTER_ALIGNMENT
+        
+        infoPanel.add(Box.createVerticalStrut(10))
+        infoPanel.add(titleLabel)
+        infoPanel.add(Box.createVerticalStrut(5))
+        infoPanel.add(versionLabel)
+        buildInfoLabel?.let {
+            infoPanel.add(Box.createVerticalStrut(3))
+            infoPanel.add(it)
+        }
+        infoPanel.add(Box.createVerticalStrut(10))
+        infoPanel.add(descriptionLabel)
+        infoPanel.add(Box.createVerticalStrut(10))
+
+        // Links
+        val linkPanel = JPanel()
+        linkPanel.layout = BoxLayout(linkPanel, BoxLayout.Y_AXIS)
+        linkPanel.border = BorderFactory.createEmptyBorder(0, 0, 10, 0)
+        
+        val websiteButton = JButton("Visit Simbrain Website")
+        websiteButton.addActionListener { 
+            Utils.displayURLInBrowser("https://simbrain.net")
+        }
+        websiteButton.alignmentX = Component.CENTER_ALIGNMENT
+        
+        val creditsButton = JButton("View Credits")
+        creditsButton.addActionListener { 
+            Utils.displayURLInBrowser("https://simbrain.net/SimbrainCredits.html")
+        }
+        creditsButton.alignmentX = Component.CENTER_ALIGNMENT
+        
+        linkPanel.add(websiteButton)
+        linkPanel.add(Box.createVerticalStrut(5))
+        linkPanel.add(creditsButton)
+
+        // Add all components to the dialog
+        val centerPanel = JPanel(BorderLayout())
+        centerPanel.add(logoPanel, BorderLayout.NORTH)
+        centerPanel.add(infoPanel, BorderLayout.CENTER)
+        
+        aboutDialog.add(centerPanel, BorderLayout.CENTER)
+        aboutDialog.add(linkPanel, BorderLayout.SOUTH)
+
+        // Configure dialog
+        aboutDialog.size = Dimension(375, 380)
+        aboutDialog.isResizable = false
+        aboutDialog.setLocationRelativeTo(frame)
+        aboutDialog.isVisible = true
     }
 
     private fun createContextMenu() {
@@ -763,9 +833,24 @@ object SimbrainDesktop {
         val simulationChooser = SFileChooser(WorkspacePreferences.simulationDirectory, "Zip Archive", "zip")
         val simFile = simulationChooser.showOpenDialog()
         if (simFile != null) {
-            workspace.openWorkspace(simFile, useDesktop = true)
-            workspace.currentDirectory = simulationChooser.currentLocation!!
-            workspace.currentFile = simFile
+            val progressWindow = ProgressWindow(100, "Loading workspace...")
+            progressWindow.minimumSize = Dimension(300, 100)
+            progressWindow.setLocationRelativeTo(null)
+            
+            try {
+                workspace.openWorkspace(simFile, useDesktop = true) { current, total ->
+                    swingInvokeLater {
+                        progressWindow.progressBar.maximum = total
+                        progressWindow.value = current
+                        progressWindow.text = "Loading components: $current / $total"
+                    }
+                }
+                WorkspacePreferences.simulationDirectory = simulationChooser.currentLocation!!
+                workspace.currentFile = simFile
+            } finally {
+                // Close progress window when done
+                progressWindow.close()
+            }
         }
     }
 
@@ -773,9 +858,24 @@ object SimbrainDesktop {
      * Show a save-as dialog.
      */
     fun saveAs() {
+        saveAs(checkForProblems = true)
+    }
+
+    /**
+     * Show a save-as dialog.
+     * @param checkForProblems whether to check for problematic save scenarios and show warning
+     */
+    private fun saveAs(checkForProblems: Boolean) {
+
+        // Check if save would be problematic and show warning before file chooser
+        if (checkForProblems && workspace.isSaveProblematic(this)) {
+            if (!showSaveWarningDialog()) {
+                return // User cancelled
+            }
+        }
 
         // Create the file chooser
-        val chooser = SFileChooser(workspace.currentDirectory, "Zip Archive", "zip")
+        val chooser = SFileChooser(WorkspacePreferences.simulationDirectory, "Zip Archive", "zip")
 
         // Set the file
         val theFile: File?
@@ -789,7 +889,7 @@ object SimbrainDesktop {
         // Save the file by setting the current file
         if (theFile != null) {
             workspace.currentFile = theFile
-            workspace.currentDirectory = chooser.currentLocation!!
+            WorkspacePreferences.simulationDirectory = chooser.currentLocation!!
             save(theFile)
         }
     }
@@ -803,10 +903,17 @@ object SimbrainDesktop {
 
         // Ignore the save command if there are no changes
         if (workspace.changesExist()) {
+            // Check if save would be problematic and show warning
+            if (workspace.isSaveProblematic(this)) {
+                if (!showSaveWarningDialog()) {
+                    return // User cancelled
+                }
+            }
+            
             if (workspace.currentFile != null) {
                 save(workspace.currentFile)
             } else {
-                saveAs() // Show save-as if there is no current file.
+                saveAs(checkForProblems = false) // Warning already shown above
             }
         }
     }
@@ -821,6 +928,68 @@ object SimbrainDesktop {
             frame.title = file.name
             workspace.save(file)
         }
+    }
+
+    /**
+     * Show a warning dialog when saving a workspace with custom update actions or control panels
+     * that won't be restored on reopen.
+     *
+     * @return true if user wants to proceed with save, false if cancelled
+     */
+    private fun showSaveWarningDialog(): Boolean {
+        // Get the default dialog font
+        val font = UIManager.getFont("Label.font")
+        val fontFamily = font.family
+        val fontSize = font.size
+        
+        val message = """
+            <html>
+            <body style='width: 400px; padding: 10px; font-family: $fontFamily; font-size: ${fontSize}pt;'>
+            <p>This workspace contains custom update actions or control panels
+            that will <b>NOT</b> be restored when reopening.</p>
+            
+            <p>To make this workspace reopenable, the simulation must:</p>
+            <ul>
+            <li>Have a unique simulationId (e.g., newSim("my_sim_id"))</li>
+            <li>Register a reopen function with .registerReopenFunction()</li>
+            </ul>
+            
+            <p>For more information, see:<br>
+            <a href="https://docs.simbrain.net/docs/simulations/#saving-and-reopening-simulations">
+            https://docs.simbrain.net/docs/simulations/#saving-and-reopening-simulations</a></p>
+            
+            <p>Do you want to save anyway?</p>
+            </body>
+            </html>
+        """.trimIndent()
+        
+        // Create a JEditorPane to display HTML with clickable links
+        val editorPane = JEditorPane("text/html", message).apply {
+            isEditable = false
+            isOpaque = false
+            addHyperlinkListener { e ->
+                if (e.eventType == HyperlinkEvent.EventType.ACTIVATED) {
+                    try {
+                        Desktop.getDesktop().browse(e.url.toURI())
+                    } catch (ex: Exception) {
+                        ex.printStackTrace()
+                    }
+                }
+            }
+        }
+        
+        val options = arrayOf("Yes", "No")
+        val result = JOptionPane.showOptionDialog(
+            frame,
+            editorPane,
+            "Warning: Workspace May Not Reopen Correctly",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE,
+            null, // icon
+            options, // button labels
+            options[1] // initial value - "No" is the default
+        )
+        return result == 0 // 0 = Yes, 1 = No
     }
 
     /**

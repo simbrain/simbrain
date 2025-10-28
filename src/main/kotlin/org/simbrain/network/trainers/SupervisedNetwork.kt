@@ -12,9 +12,9 @@ interface SupervisedNetwork {
 
     val trainerConfig: SupervisedTrainerConfig
 
-    var trainingSet: MatrixDataset
+    var trainingSet: TrainingDataset
 
-    var testingSet: MatrixDataset
+    var testingSet: TrainingDataset
 
     val inputLayer: Layer
 

@@ -5,10 +5,14 @@ import org.simbrain.util.projection.DataPoint
 import org.simbrain.util.projection.KDTree
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.util.stats.ProbabilityDistribution
+import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.table.BasicDataFrame
 import org.simbrain.util.table.SimbrainTablePanel
 import org.simbrain.util.table.createFromDoubleArray
 import smile.math.matrix.Matrix
+import java.io.File
 
 /**
  * Associates string tokens with vector representations. Each member of a list of String tokens is associated with
@@ -218,6 +222,39 @@ sealed class EmbeddingType<T : CopyableObject>(): CopyableObject {
         }
     }
     
+    class Random(
+        @UserParameter(label = "Vector length", minimumValue = 1.0, order = 20)
+        var vectorLength: Int = 10,
+        
+        @UserParameter(label = "Distribution", order = 1)
+        var distribution: ProbabilityDistribution = NormalDistribution()
+    ) : EmbeddingType<Random>() {
+        
+        override fun build(tokenizer: Tokenizer<*>, docString: String): TokenEmbedding {
+            val tokens = tokenizer.tokenize(docString)
+                .map { it.token }
+                .uniqueTokensFromArray()
+                .let { if (convertToLowerCase) it.map { token -> token.lowercase() } else it }
+            
+            // Generate random vector for each token by sampling from distribution
+            val randomMatrix = Matrix(tokens.size, vectorLength)
+            for (i in 0 until tokens.size) {
+                for (j in 0 until vectorLength) {
+                    randomMatrix[i, j] = distribution.sampleDouble()
+                }
+            }
+            
+            return TokenEmbedding(tokens, this, tokenizer, randomMatrix, docString)
+        }
+        
+        override fun copy(): Random {
+            return Random(vectorLength, distribution).also {
+                it.removeStopWords = this.removeStopWords
+                it.convertToLowerCase = this.convertToLowerCase
+            }
+        }
+    }
+    
     class Custom: EmbeddingType<Custom>() {
         override fun build(
             tokenizer: Tokenizer<*>,
@@ -260,6 +297,68 @@ class TokenEmbeddingBuilder(
      * Extract a token embedding from the provided string.
      */
     fun build(docString: String) = embeddingType.build(tokenizer.also { it.initialize(docString) }, docString)
+}
+
+/**
+ * Returns list of embedding types for the dropdown, excluding Custom which is for internal use only.
+ */
+fun getEmbeddingTypeListForExtraction(): List<Class<out EditableObject>> {
+    return listOf(
+        EmbeddingType.OneHot::class.java,
+        EmbeddingType.CoOccurrence::class.java,
+        EmbeddingType.Random::class.java
+    )
+}
+
+class ExtractEmbeddingOptions(
+    /**
+     * If true, show document path selector. If false, document will be provided directly.
+     */
+    var showDocumentPath: Boolean = true
+): EditableObject {
+    
+    var documentPath by GuiEditable(
+        initValue = "",
+        description = "Text file to extract embeddings from",
+        order = 0,
+        useFileChooser = true,
+        fileChooserInitialDirectory = TextWorldPreferences.sampleTextsDirectory,
+        conditionallyVisibleBy = ExtractEmbeddingOptions::showDocumentPath
+    )
+    
+    var embeddingType: EmbeddingType<*> by GuiEditable(
+        initValue = EmbeddingType.CoOccurrence() as EmbeddingType<*>,
+        description = "Method for converting text to vectors",
+        order = 1,
+        typeMapProvider = ::getEmbeddingTypeListForExtraction
+    )
+    
+    var tokenizer by GuiEditable(
+        initValue = SimpleTokenizer() as Tokenizer<*>,
+        description = "Options for tokenizing text",
+        order = 70
+    )
+    
+    override val name: String get() = "Extract Embedding Options"
+    
+    /**
+     * Build embedding from file path (when showDocumentPath is true).
+     */
+    fun buildEmbedding(): TokenEmbedding {
+        val docString = Utils.readFileContents(File(documentPath))
+        return embeddingType.build(tokenizer.also { it.initialize(docString) }, docString).also {
+            it.trainingDocument = docString
+        }
+    }
+    
+    /**
+     * Build embedding from provided document string (when showDocumentPath is false).
+     */
+    fun buildEmbeddingFromText(docString: String): TokenEmbedding {
+        return embeddingType.build(tokenizer.also { it.initialize(docString) }, docString).also {
+            it.trainingDocument = docString
+        }
+    }
 }
 
 fun main() {

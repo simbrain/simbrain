@@ -10,12 +10,12 @@ import org.simbrain.network.util.Direction
 import org.simbrain.network.util.alignNetworkModels
 import org.simbrain.network.util.offsetNetworkModel
 import org.simbrain.util.UserParameter
+import org.simbrain.util.copy
 import org.simbrain.util.point
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
-import smile.math.matrix.Matrix
 import java.awt.geom.Point2D
 import kotlin.math.ceil
 
@@ -32,9 +32,9 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
 
     lateinit var contextToHidden: WeightMatrix
 
-    override lateinit var trainingSet: MatrixDataset
+    override lateinit var trainingSet: TrainingDataset
 
-    override lateinit var testingSet: MatrixDataset
+    override lateinit var testingSet: TrainingDataset
 
     override lateinit var layers: LinkedHashSet<Layer>
 
@@ -48,12 +48,16 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
         initialPosition
     ) {
 
+        inputLayer.label = "Input"
+        
         hiddenLayer = layerList[1].also {
             it.updateRule = SigmoidalRule()
+            it.label = "Hidden"
         }
 
         contextLayer = NeuronArray(numHiddenNodes).apply {
             updateRule = LinearRule()
+            label = "Context"
         }
         contextLayer.fillActivations(.5)
         addModels(contextLayer)
@@ -61,6 +65,7 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
         inputLayer.isClamped = true
         contextLayer.isClamped = true
 
+        outputLayer.label = "Output"
         outputLayer.updateRule = SigmoidalRule()
 
         alignNetworkModels(inputLayer, contextLayer, Alignment.HORIZONTAL)
@@ -72,9 +77,9 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
         addModels(contextToHidden)
 
         trainingSet = createDiagonalDataset(numInputNodes, numOutputNodes, shiftAmount = 1)
-        testingSet = MatrixDataset(
-            inputs = Matrix(ceil(trainingSet.inputs.nrow() * 0.2).toInt(), trainingSet.inputs.ncol()),
-            targets = Matrix(ceil(trainingSet.targets.nrow() * 0.2).toInt(), trainingSet.targets.ncol())
+        testingSet = TrainingDataset(
+            inputs = MutableList(ceil(trainingSet.size * 0.2).toInt()) { MutableList(trainingSet.inputs.firstOrNull()?.size ?: 0) { 0.0 } },
+            targets = MutableList(ceil(trainingSet.size * 0.2).toInt()) { MutableList(trainingSet.targets.firstOrNull()?.size ?: 0) { 0.0 } }
         )
 
         setLocation(initialPosition.x, initialPosition.y)
@@ -149,6 +154,17 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
         }
     }
 
+    override fun toString(): String {
+        return """
+            Name: $displayName
+            Type: SRN Network
+            Input Layer: ${inputLayer.size} neurons
+            Hidden Layer: ${hiddenLayer.size} neurons
+            Context Layer: ${contextLayer.size} neurons
+            Output Layer: ${outputLayer.size} neurons
+        """.trimIndent()
+    }
+
     override fun copy(): SRNNetwork {
         val copy = SRNNetwork(inputLayer.size, hiddenLayer.size, outputLayer.size)
 
@@ -167,14 +183,8 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
         copy.contextToHidden.copyFrom(contextToHidden)
 
         // Copy training related properties
-        copy.trainingSet = MatrixDataset(
-            inputs = trainingSet.inputs.clone(),
-            targets = trainingSet.targets.clone()
-        )
-        copy.testingSet = MatrixDataset(
-            inputs = testingSet.inputs.clone(),
-            targets = testingSet.targets.clone()
-        )
+        copy.trainingSet = trainingSet.copy()
+        copy.testingSet = testingSet.copy()
         copy.trainerConfig = SRNTrainerConfig(lossFunctionProvider = ::possibleLossFunctions).copy()
 
         return copy

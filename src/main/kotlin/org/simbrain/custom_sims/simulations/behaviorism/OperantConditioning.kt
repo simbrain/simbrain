@@ -7,9 +7,9 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.*
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.neurongroups.NeuronGroup
+import org.simbrain.util.create
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.workspace.gui.SimbrainDesktop
-import org.simbrain.workspace.updater.create
 import kotlin.math.max
 
 /**

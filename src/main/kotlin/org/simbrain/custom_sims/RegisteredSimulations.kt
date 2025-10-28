@@ -1,8 +1,6 @@
 package org.simbrain.custom_sims
 
 import org.simbrain.custom_sims.simulations.*
-import org.simbrain.custom_sims.simulations.backprop.activationSequenceThreeLayer
-import org.simbrain.custom_sims.simulations.backprop.activationSequenceTwoLayer
 import org.simbrain.custom_sims.simulations.behaviorism.classicalConditioning
 import org.simbrain.custom_sims.simulations.behaviorism.operantWithEnvironment
 import org.simbrain.custom_sims.simulations.behaviorism.simpleOperant
@@ -13,11 +11,13 @@ import org.simbrain.custom_sims.simulations.braitenberg.pursuer
 import org.simbrain.custom_sims.simulations.demos.competitiveSim
 import org.simbrain.custom_sims.simulations.edge_of_chaos.edgeOfChaos
 import org.simbrain.custom_sims.simulations.edge_of_chaos.edgeOfChaosBitStream
-import org.simbrain.custom_sims.simulations.neuroscience.cortexLayers
+import org.simbrain.custom_sims.simulations.neuroscience.corticalLayers
 import org.simbrain.custom_sims.simulations.neuroscience.spikingNetworkSimulation
 import org.simbrain.custom_sims.simulations.nlp.tinyLanguageModel
 import org.simbrain.custom_sims.simulations.patterns_of_activity.cogMap3Objects
 import org.simbrain.custom_sims.simulations.patterns_of_activity.iacJetsSharks5People
+import org.simbrain.custom_sims.simulations.psychology.heatColdSim
+import org.simbrain.custom_sims.simulations.psychology.spiveyNet
 import org.simbrain.custom_sims.simulations.rl.braitenbergRL
 import org.simbrain.util.StructureDir
 import org.simbrain.util.dir
@@ -65,6 +65,11 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Object tracking reservoir") { objectTrackingSim }
     }
 
+    dir("Psychology") {
+        item("Mouse and eye tracking") { spiveyNet }
+        item("Heat-cold illusion") { heatColdSim }
+    }
+
     dir("Behaviorism") {
         item("Simple operant") { simpleOperant }
         item("Classical conditioning") { classicalConditioning }
@@ -96,7 +101,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         // item("Hippocampus") { Hippocampus() }
         // item("Cerebellum") { Cerebellum() }
         item("Spiking Network") { spikingNetworkSimulation }
-        item("Cortical layers") { cortexLayers }
+        item("Cortical layers") { corticalLayers }
         //item("Cortical areas") { cortexKuramoto }
     }
 
@@ -140,8 +145,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
     dir("Recurrent networks") {
         item("Recurrent net") { recurrentProjection }
         item("Recurrent net (array)") { recurrentNetArrayBased }
-        item("IAC Jets Sharks 5 People") { iacJetsSharks5People }
-        item("Spivey net") { spiveyNet }
+        item("IAC Jets Sharks 5 people") { iacJetsSharks5People }
     }
 
     dir("Reinforcement learning") {
@@ -161,11 +165,10 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Photo album (100 x 100)") { photoAlbumExample }
     }
 
-    dir("Temp") {
-        item("Activation sequence (2 layers)") { activationSequenceTwoLayer }
-        item("Activation sequence (3 layers)") { activationSequenceThreeLayer }
-        item("Denison Attention net") { denisonNet }
-    }
+    // dir("Temp") {
+    //     item("Activation sequence (2 layers)") { activationSequenceTwoLayer }
+    //     item("Activation sequence (3 layers)") { activationSequenceThreeLayer }
+    // }
 
     //dir("Testing") {
     //    // item("Test Sim") { testSim }

@@ -114,7 +114,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         // Create the image data from the weight matrix using nearest neighbor interpolation
         val imageData = matrix.toScaledImageData(imageWidth, imageHeight, scale)
 
-        val img = imageData.toSimbrainColorImage().let { if (NetworkPreferences.weightMatrixTransposeGraphics) it.transposed() else it }
+        val img = imageData.toSimbrainColorImage().let { if (NetworkPreferences.weightMatrixTargetSource) it else it.transposed() }
         imageBox.image = img
     }
 
@@ -132,7 +132,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
     override val isDraggable: Boolean = false
 
     override val toolTipText: String
-        get() = weightMatrix.toString()
+        get() = createTooltipText(weightMatrix)
 
     override val contextMenu: JPopupMenu
         get() {

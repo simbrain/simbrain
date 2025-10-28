@@ -4,11 +4,11 @@ import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.subnetworks.BackpropNetwork
-import org.simbrain.network.trainers.MatrixDataset
+import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.network.updaterules.SigmoidalRule
+import org.simbrain.util.identityMutableList
 import org.simbrain.util.math.SigmoidFunctionEnum
 import org.simbrain.util.place
-import smile.math.matrix.Matrix
 
 
 val backpropAutoEncoder = newSim {
@@ -28,28 +28,36 @@ val backpropAutoEncoder = newSim {
     }
     net.addNetworkModelsAsync(bp)
 
-    bp.trainingSet = MatrixDataset(
-        inputs = Matrix.eye(inputSize),
-        targets = Matrix.eye(inputSize)
+    bp.trainingSet = TrainingDataset(
+        inputs = identityMutableList(inputSize, inputSize),
+        targets = identityMutableList(inputSize, inputSize)
     )
 
     addSidebarInfo(
-        """ 
-            # Introduction
-            Backpropagation is an algorithm for supervised learning using gradient descent. This is an auto-encoder where the network must learn to associate each input with an identical output. The trick is that it must do so by compressing the input to a smaller hidden layer.  The smaller the hidden layer, the harder the task. 
-            
-            # What to Do
-            Double-click on the “Backprop” network in the “Backprop” network window to open the “Train Network” window.
-            In the top area of this window, select the “Iterate training until the stop button is pressed” button to play the simulation. 
-            The “Sum Squared Error” should decrease as the iterations increase and end up around 0. The goal is to get the error as low as possible.
-            Click “Apply current row as input and increment selected row” to check the network's performance. 
-            As you click the pattern on the bottom should be matched by the pattern on the top.
-            
-            # Further studies
-            By default this kind of auto-encoding training set is used for networks, so it’s easy to set up this kind of simulation with different sized hidden layers, or different numbers of hidden layers. You can add a new network using `insert > subnetwork > backprop` and use different numbers for the hidden layer, and then follow the directions above.  As the hidden layer gets smaller, it should become harder to train.
-            
-            # Also see
-            This is a very simple example of an auto-encode, which is related to variational auto-encoders [https://en.wikipedia.org/wiki/Variational_autoencoder]   
+        """
+        # Introduction
+        
+        Backpropagation is an algorithm for supervised learning using gradient descent. This is an auto-encoder where the network must learn to associate each input with an identical output. The trick is that it must do so by compressing the input to a smaller hidden layer. The smaller the hidden layer, the harder the task.
+        
+        # What to Do
+        
+        1. Double-click on the "Backprop" network in the "Backprop" network window to open the "Train Network" window
+        
+        2. In the top area of this window, select the "Iterate training until the stop button is pressed" button to play the simulation
+        
+        3. The "Sum Squared Error" should decrease as the iterations increase and end up around 0. The goal is to get the error as low as possible
+        
+        4. Click "Apply current row as input and increment selected row" to check the network's performance
+        
+        5. As you click the pattern on the bottom should be matched by the pattern on the top
+        
+        # Further Studies
+        
+        By default this kind of auto-encoding training set is used for networks, so it's easy to set up this kind of simulation with different sized hidden layers, or different numbers of hidden layers. You can add a new network using `insert > subnetwork > backprop` and use different numbers for the hidden layer, and then follow the directions above. As the hidden layer gets smaller, it should become harder to train.
+        
+        # Also See
+        
+        This is a very simple example of an auto-encoder, which is related to [variational auto-encoders](https://en.wikipedia.org/wiki/Variational_autoencoder).
         
         """.trimIndent()
     )

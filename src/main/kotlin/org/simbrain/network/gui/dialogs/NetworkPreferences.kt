@@ -8,91 +8,210 @@ import java.awt.Color
 
 object NetworkPreferences: PreferenceHolder() {
 
-    @UserParameter(label = "Network background color", tab = "Colors", order = 10)
+    @UserParameter(
+        label = "Network background color",
+        description = "Background color of the network canvas",
+        tab = "Colors",
+        order = 10
+    )
     var backgroundColor by ColorPreference(Color.WHITE)
 
-    @UserParameter(label = "Node Hot color", tab = "Colors", order = 20)
+    @UserParameter(
+        label = "Node hot color",
+        description = "Color for neurons with high positive activation or excitatory polarity",
+        tab = "Colors",
+        order = 20
+    )
     var hotNodeColor by ColorPreference(Color.RED)
 
-    @UserParameter(label = "Node Cool color", tab = "Colors", order = 30)
+    @UserParameter(
+        label = "Node cool color",
+        description = "Color for neurons with low/negative activation or inhibitory polarity",
+        tab = "Colors",
+        order = 30
+    )
     var coolNodeColor by ColorPreference(Color.BLUE)
 
-    @UserParameter(label = "Line color", tab = "Colors", order = 40)
+    @UserParameter(
+        label = "Line color",
+        description = "Default color for lines, borders, and neutral elements",
+        tab = "Colors",
+        order = 40
+    )
     var lineColor by ColorPreference(Color.BLACK)
 
-    @UserParameter(label = "Spiking color", tab = "Colors", order = 50)
+    @UserParameter(
+        label = "Spiking color",
+        description = "Color used to highlight neurons and connections when spiking",
+        tab = "Colors",
+        order = 50
+    )
     var spikingColor by ColorPreference(Color.YELLOW)
 
-    @UserParameter(label = "Excitatory color", tab = "Colors", order = 60)
+    @UserParameter(
+        label = "Excitatory color",
+        description = "Color for excitatory synapses (positive weights)",
+        tab = "Colors",
+        order = 60
+    )
     var excitatorySynapseColor by ColorPreference(Color.RED)
 
-    @UserParameter(label = "Inhibitory color", tab = "Colors", order = 70)
+    @UserParameter(
+        label = "Inhibitory color",
+        description = "Color for inhibitory synapses (negative weights)",
+        tab = "Colors",
+        order = 70
+    )
     var inhibitorySynapseColor by ColorPreference(Color.BLUE)
 
-    @UserParameter(label = "Zero color", tab = "Colors", order = 80)
+    @UserParameter(
+        label = "Zero color",
+        description = "Color for synapses with zero or near-zero weights",
+        tab = "Colors",
+        order = 80
+    )
     var zeroWeightColor by ColorPreference(Color.LIGHT_GRAY)
 
-    @UserParameter(label = "Weight matrix arrow color ", tab = "Colors", order = 90)
+    @UserParameter(
+        label = "Weight matrix arrow color",
+        description = "Color for arrows indicating weight matrix connections",
+        tab = "Colors",
+        order = 90
+    )
     var weightMatrixArrowColor by ColorPreference(Color.ORANGE)
 
-    @UserParameter(label = "Weight matrix boundary color ", tab = "Colors", order = 100)
+    @UserParameter(
+        label = "Weight matrix boundary color",
+        description = "Color for weight matrix boundaries and outlines",
+        tab = "Colors",
+        order = 100
+    )
     var weightMatrixBoundaryColor by ColorPreference(Color.ORANGE)
 
-    @UserParameter(label = "Synapse Group arrow color ", tab = "Colors", order = 110)
+    @UserParameter(
+        label = "Synapse group arrow color",
+        description = "Color for arrows indicating synapse group connections",
+        tab = "Colors",
+        order = 110
+    )
     var synapseGroupArrowColor by ColorPreference(Color.GREEN)
 
-    @UserParameter(label = "Min synapse size", tab = "GUI")
-    var minWeightSize by IntegerPreference(7)
-
-    @UserParameter(label = "Max synapse size", tab = "GUI")
-    var maxWeightSize by IntegerPreference(20)
-
-    @UserParameter(label = "Nudge amount", tab = "GUI")
+    @UserParameter(
+        label = "Nudge amount",
+        description = "Distance in pixels to move selected objects when using Shift + arrow keys",
+        tab = "GUI",
+        order = 10
+    )
     var nudgeAmount by DoublePreference(2.0)
 
-    @UserParameter(label = "Visibility threshold", tab = "GUI")
+    @UserParameter(
+        label = "Neuron activation decimal places",
+        description = "Number of decimal places to display in neuron activation text",
+        minimumValue = 0.0,
+        tab = "GUI",
+        order = 20
+    )
+    var neuronActivationDecimalPlaces by IntegerPreference(1)
+
+    @UserParameter(
+        label = "Tooltip decimal places",
+        description = "Number of decimal places to display in neuron tooltips",
+        minimumValue = 0.0,
+        tab = "GUI",
+        order = 30
+    )
+    var tooltipDecimalPlaces by IntegerPreference(8)
+
+    @UserParameter(
+        label = "Min synapse size",
+        description = "Minimum visual diameter for synapse circles (in pixels).",
+        tab = "GUI",
+        order = 40
+    )
+    var minWeightSize by IntegerPreference(7)
+
+    @UserParameter(
+        label = "Max synapse size",
+        description = "Maximum visual diameter for synapse circles (in pixels).",
+        tab = "GUI",
+        order = 50
+    )
+    var maxWeightSize by IntegerPreference(20)
+
+    @UserParameter(
+        label = "Visibility threshold",
+        description = "Hide individual synapses when synapse groups exceed this number.",
+        tab = "GUI",
+        order = 60
+    )
     var synapseVisibilityThreshold by IntegerPreference(200)
 
-    @UserParameter(label = "Wand radius", tab = "GUI")
+    @UserParameter(
+        label = "Wand radius",
+        description = "Radius in pixels for the wand selection tool.",
+        tab = "GUI",
+        order = 70
+    )
     var wandRadius by IntegerPreference(40)
 
     @UserParameter(
-        label = "Weight Matrix Target-Source Format",
-        description = "If yes, each row correspond to an output and each column corresponds to an input." +
-                "If no (source-target format),each row corresponds to an input and each column corresponds to an output." ,
-        tab = "GUI")
-    var weightMatrixTransposeGraphics by BooleanPreference(true)
+        label = "Weight matrix target-source format",
+        description = "If yes, each row corresponds to an output and each column corresponds to an input. " +
+                "If no (source-target format), each row corresponds to an input and each column corresponds to an output.",
+        tab = "GUI",
+        order = 80)
+    var weightMatrixTargetSource by BooleanPreference(true)
 
     @UserParameter(
         label = "Matrix image max width/height",
         description = "Maximum size of the weight matrix image in pixels in either dimension (i.e. width or height).",
         minimumValue = 1.0,
         maximumValue = 46340.0,
-        tab = "GUI"
+        tab = "GUI",
+        order = 90
     )
     var weightMatrixImageMaxSize by IntegerPreference(1000)
 
-    @UserParameter(label = "Default network time step", minimumValue = 0.0, increment = .1, tab = "Model")
+    @UserParameter(
+        label = "Default network time step",
+        description = "Default time step for network simulation (in milliseconds).",
+        minimumValue = 0.0,
+        increment = .1,
+        tab = "Model",
+        order = 10
+    )
     var defaultTimeStep by DoublePreference(.1)
 
     // Of course specific rules can have specific defaults
-    @UserParameter(label = "Default learning rate", minimumValue = 0.0, increment = .1, tab = "Model")
+    @UserParameter(
+        label = "Default learning rate",
+        description = "Default learning rate for learning algorithms.",
+        minimumValue = 0.0,
+        increment = .1,
+        tab = "Model",
+        order = 20
+    )
     var defaultLearningRate by DoublePreference(.1)
 
-    @UserParameter(label = "Default connection strategy", tab = "Connections")
+    @UserParameter(
+        label = "Default connection strategy",
+        description = "Default method for connecting neurons when creating synapses. Applied when using the 1-3 trick (press 1 to set sources, then 3 to connect with this strategy).",
+        tab = "Connections",
+        order = 10
+    )
     var connectionStrategy by ConnectionStrategyPreference(AllToAll())
 
     @UserParameter(
-        label = "Weight Randomizer",
+        label = "Weight randomizer",
         description = "Randomizer for all free weights, regardless of polarity. Applying it can change the polarity of a neuron.",
         showDetails = false,
         order = 10,
         tab = "Randomizers"
     )
-    var weightRandomizer by ProbabilityDistributionPreference(NormalDistribution(0.0, 0.1))
+    var weightRandomizer by ProbabilityDistributionPreference(NormalDistribution(0.0, 1.5))
 
     @UserParameter(
-        label = "Excitatory Randomizer",
+        label = "Excitatory randomizer",
         description = "Randomizer for all weights from polarized excitatory neurons. Applying it will not change the polarity of a neuron.",
         showDetails = false,
         order = 20,
@@ -101,7 +220,7 @@ object NetworkPreferences: PreferenceHolder() {
     var excitatoryRandomizer by ProbabilityDistributionPreference(UniformRealDistribution(0.0, 1.0))
 
     @UserParameter(
-        label = "Inhibitory Randomizer",
+        label = "Inhibitory randomizer",
         description = "Randomizer for all weights from polarized inhibitory neurons. Applying it will not change the polarity of a neuron.",
         showDetails = false,
         order = 30,
@@ -110,8 +229,8 @@ object NetworkPreferences: PreferenceHolder() {
     var inhibitoryRandomizer by ProbabilityDistributionPreference(UniformRealDistribution(-1.0, 0.0))
 
     @UserParameter(
-        label = "Activation Randomizer",
-        description = "Randomizer for all biases.",
+        label = "Activation randomizer",
+        description = "Randomizer for initial neuron activation values.",
         showDetails = false,
         order = 40,
         tab = "Randomizers"
@@ -119,7 +238,7 @@ object NetworkPreferences: PreferenceHolder() {
     var activationRandomizer by ProbabilityDistributionPreference(NormalDistribution(0.0, 1.0))
 
     @UserParameter(
-        label = "Bias Randomizer",
+        label = "Bias randomizer",
         description = "Randomizer for all biases.",
         showDetails = false,
         order = 50,

@@ -405,14 +405,6 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
         }
     }
 
-    val toolTipText: String
-        /**
-         * Returns string for tool tip or short description.
-         *
-         * @return tool tip text
-         */
-        get() = "Strength: " + Utils.round(this.strength, MAX_DIGITS)
-
     val symmetricSynapse: Synapse?
         /**
          * Returns symmetric synapse if there is one, null otherwise.
@@ -477,7 +469,13 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
     }
 
     override fun toString(): String {
-        return ("$id: Strength = ${SimbrainMath.roundDouble(strength, 3)} Connects ${source.id} to ${target.id}")
+        return """
+            Name: $displayName
+            Strength: $strength
+            Learning rule: ${learningRule.name}
+            Source: ${source.id}
+            Target: ${target.id}
+        """.trimIndent()
     }
 
     /**

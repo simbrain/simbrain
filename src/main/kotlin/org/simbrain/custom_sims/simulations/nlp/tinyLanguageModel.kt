@@ -12,9 +12,12 @@ import org.simbrain.network.util.Direction
 import org.simbrain.network.util.alignNetworkModels
 import org.simbrain.network.util.offsetNetworkModel
 import org.simbrain.util.*
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.util.propertyeditor.objectWrapper
 import org.simbrain.workspace.Workspace
+import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.workspace.updater.UpdateAllCouplings
 import org.simbrain.world.textworld.EmbeddingType
 import org.simbrain.world.textworld.TextWorldComponent
@@ -24,13 +27,6 @@ import smile.math.matrix.Matrix
 import java.io.File
 
 class TinyLanguageModelOptions(var showEmbeddingDimension: Boolean = true): EditableObject {
-
-    var samplingStrategy: SamplingStrategy by GuiEditable(
-        initValue = SamplingStrategy.TopK(k = 5),
-        description = "How to sample from softmax to produce new tokens",
-        showDetails = false,
-        order = 0,
-    )
 
     var contextSize by GuiEditable(
         initValue = 24,
@@ -45,12 +41,58 @@ class TinyLanguageModelOptions(var showEmbeddingDimension: Boolean = true): Edit
         conditionallyVisibleBy = TinyLanguageModelOptions::showEmbeddingDimension
     )
 
+    var hiddenSize by GuiEditable(
+        initValue = 30,
+        description = "Number of hidden units in the transformer block",
+        order = 25,
+    )
+
     var trainerTextPath by GuiEditable(
         initValue = simulationsPath / "texts" / "casual_texting_small.txt",
         description = "Text used to train the model",
-        tab = "Text Parsing",
-        order = 10,
+        order = 30,
         useFileChooser = true,
+    )
+
+    var testTextPath by GuiEditable(
+        initValue = "",
+        description = "Optional separate text file for testing. If empty, training text will be split automatically.",
+        order = 35,
+        useFileChooser = true,
+    )
+
+    var trainTestSplit by GuiEditable(
+        initValue = 0.8,
+        description = "Fraction of data to use for training (0.0-1.0). Only used if no separate test file is provided.",
+        order = 36,
+    )
+
+    var weightDecay by GuiEditable(
+        initValue = 0.01,
+        description = "L2 weight decay regularization strength",
+        order = 39,
+        tab = "Regularization"
+    )
+
+    var learningRateDecay by GuiEditable(
+        initValue = 0.001,
+        description = "Learning rate decay factor per iteration (0.0 = no decay, 0.01 = moderate decay)",
+        order = 40,
+        tab = "Regularization"
+    )
+
+    var useAdamW by GuiEditable(
+        initValue = true,
+        description = "Use AdamW optimizer (decoupled weight decay) instead of Adam",
+        order = 41,
+        tab = "Regularization"
+    )
+
+    var samplingStrategy: SamplingStrategy by GuiEditable(
+        initValue = SamplingStrategy.TopP(),
+        description = "How to sample from softmax to produce new tokens",
+        showDetails = false,
+        order = 50,
     )
 
     var tokenizer by GuiEditable(
@@ -69,6 +111,11 @@ class TinyLanguageModelOptions(var showEmbeddingDimension: Boolean = true): Edit
  * - contextSize: Number of tokens in context window (default: 24)
  * - embeddingDimension: Vector embedding dimensions (default: 20)  
  * - textFile: Training text filename in simulations/texts/ (default: "casual_texting_small.txt")
+ * - testFile: Optional test text filename in simulations/texts/ (default: none, auto-split training data)
+ * - trainTestSplit: Fraction for training when auto-splitting (default: 0.8)
+ * - weightDecay: L2 weight decay strength (default: 0.01)
+ * - learningRateDecay: Learning rate decay factor (default: 0.001)
+ * - useAdamW: Use AdamW optimizer instead of Adam (default: true)
  * - usePunctuation: Whether tokenizer should include punctuation (default: true)
  * - trainingIterations: Number of training iterations to run (default: 0, no training)
  * - workspaceIterations: Number of workspace iterations to run (default: 0)
@@ -96,15 +143,23 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         TinyLanguageModelOptions().apply {
             contextSize = jsonOptions.optInt("contextSize", contextSize)
             embeddingDimension = jsonOptions.optInt("embeddingDimension", embeddingDimension)
+            hiddenSize = jsonOptions.optInt("hiddenSize", hiddenSize)
             if (jsonOptions.has("textFile")) {
                 trainerTextPath = simulationsPath / "texts" / jsonOptions.getString("textFile")
             }
+            if (jsonOptions.has("testFile")) {
+                testTextPath = simulationsPath / "texts" / jsonOptions.getString("testFile")
+            }
+            trainTestSplit = jsonOptions.optDouble("trainTestSplit", trainTestSplit)
+            weightDecay = jsonOptions.optDouble("weightDecay", weightDecay)
+            learningRateDecay = jsonOptions.optDouble("learningRateDecay", learningRateDecay)
+            useAdamW = jsonOptions.optBoolean("useAdamW", useAdamW)
             if (jsonOptions.has("usePunctuation")) {
                 tokenizer = SimpleTokenizer(usePunctuation = jsonOptions.getBoolean("usePunctuation")) as Tokenizer<*>
             }
             
             // Parse sampling strategy
-            val samplingStrategyStr = jsonOptions.optString("samplingStrategy", "topk")
+            val samplingStrategyStr = jsonOptions.optString("samplingStrategy", "topp")
             samplingStrategy = when (samplingStrategyStr.lowercase()) {
                 "greedy" -> SamplingStrategy.Greedy
                 "topk" -> SamplingStrategy.TopK(
@@ -125,12 +180,41 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
 
     val contextSize = options.contextSize
 
+    // Load training and test data
     val trainingText = File(options.trainerTextPath).readText()
+    
+    val (trainingTextFinal, testTextFinal) = if (options.testTextPath.isNotEmpty() && File(options.testTextPath).exists()) {
+        // Use separate test file
+        val testText = File(options.testTextPath).readText()
+        trainingText to testText
+    } else {
+        // Auto-split the training text
+        val allTokens = trainingText.tokenize(options.tokenizer).map { it.token }
+        
+        // Ensure we have enough tokens for both training and testing
+        if (allTokens.size < contextSize + 2) {
+            println("Warning: Text is too short for train/test split. Using entire text for training only.")
+            trainingText to ""
+        } else {
+            val splitIndex = (allTokens.size * options.trainTestSplit).toInt()
+            // Ensure both splits have at least contextSize + 1 tokens
+            val adjustedSplitIndex = maxOf(contextSize + 1, minOf(splitIndex, allTokens.size - contextSize - 1))
+            
+            val trainTokens = allTokens.take(adjustedSplitIndex)
+            val testTokens = allTokens.drop(adjustedSplitIndex)
+            
+            val trainText = trainTokens.tokensToString(options.tokenizer)
+            val testText = testTokens.tokensToString(options.tokenizer)
+            trainText to testText
+        }
+    }
 
+    // Build token embedding from combined vocabulary (training + test)
+    val combinedText = "$trainingTextFinal $testTextFinal"
     val tokenEmbedding = TokenEmbeddingBuilder().apply {
         embeddingType = EmbeddingType.OneHot()
         tokenizer = options.tokenizer
-    }.build(trainingText)
+    }.build(combinedText)
 
     val tokenizer by tokenEmbedding::tokenizer
 
@@ -138,13 +222,30 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
     val networkComponent = addNetworkComponent("Network")
     val network = networkComponent.network
 
-    val tokenizedTrainingText = trainingText.tokenize(tokenizer).map { it.token }
+    // Create training and test datasets
+    val tokenizedTrainingText = trainingTextFinal.tokenize(tokenizer).map { it.token }
+    val tokenizedTestText = if (testTextFinal.isNotEmpty()) {
+        testTextFinal.tokenize(tokenizer).map { it.token }
+    } else {
+        emptyList()
+    }
+    
     val trainingSet = buildSequenceToSequenceDataset(tokenizedTrainingText, contextSize, tokenEmbedding)
+    val testingSet = if (tokenizedTestText.isNotEmpty()) {
+        buildSequenceToSequenceDataset(tokenizedTestText, contextSize, tokenEmbedding)
+    } else {
+        // Create empty test dataset with correct structure
+        TrainingDataset(
+            inputs = mutableListOf(),
+            targets = mutableListOf(),
+            inputSize = contextSize * tokenEmbedding.dimension,
+            targetSize = contextSize * tokenEmbedding.dimension
+        )
+    }
 
     // Text World for Inputs
-    val textWorldComponent = addTextWorld("Text World (Inputs)")
+    val textWorldComponent = addTextWorld("Text Inputs")
     textWorldComponent.world.tokenEmbedding = tokenEmbedding
-    textWorldComponent.world.text = tokenizedTrainingText.take(contextSize).tokensToString(tokenizer)
     textWorldComponent.world.highlightCurrentToken = false
     textWorldComponent.world.autoAdvance = false
     textWorldComponent.world.samplingStrategy = options.samplingStrategy
@@ -154,8 +255,8 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         isClamped = true
     }
 
-    val transformerBlock = TransformerBlock(contextSize, options.embeddingDimension, options.embeddingDimension).apply {
-        label = "Transformer Block"
+    val transformerBlock = TransformerBlock(contextSize, options.embeddingDimension, options.hiddenSize).apply {
+        label = "Transformer block"
     }
 
     // Sequence-to-sequence softmax layer
@@ -163,7 +264,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         updateRule = SoftmaxRule().apply {
             temperature = 0.2
         }
-        label = "Softmax Sequence"
+        label = "Softmax sequence"
     }
 
     // Separate inference layer for update actions
@@ -171,7 +272,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         circleMode = size < 100
         gridMode = true
         labelArray = tokenEmbedding.tokens.toTypedArray()
-        label = "Predicted Next Token"
+        label = "Predicted next token"
         (updateRule as? LinearRule)?.let {
             it.upperBound = 1.0
             it.lowerBound = -1.0
@@ -191,10 +292,27 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         model.initWeights()
         model.initBiases()
         model.trainingSet = trainingSet
+        model.testingSet = testingSet
         model.trainerConfig.lossFunction = BackpropLossFunction.CrossEntropy
         model.trainerConfig.learningRate = learningRate
-        model.trainerConfig.testConfiguration.enabled = false
-        model.trainerConfig.optimizer = AdamOptimizer()
+        model.trainerConfig.testConfiguration.enabled = testingSet.size > 0
+        model.trainerConfig.testConfiguration.testFrequency = 10
+        
+        // Configure early stopping if test data is available
+        if (testingSet.size > 0) {
+            model.trainerConfig.stoppingCondition.useEarlyStopping = true
+            model.trainerConfig.stoppingCondition.earlyStoppingPatience = 10
+            model.trainerConfig.stoppingCondition.earlyStoppingMinDelta = 0.0
+        }
+        model.trainerConfig.optimizer = if (options.useAdamW) {
+            AdamWOptimizer().apply {
+                weightDecay = options.weightDecay
+                learningRateDecay = options.learningRateDecay
+            }
+        } else {
+            AdamOptimizer() // Vanilla Adam - no weight decay or learning rate decay
+        }
+        model.trainerConfig.computeAccuracy = true
         addNetworkModels(model)
     }
 
@@ -207,6 +325,55 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
     withGui {
         place(textWorldComponent, 10, 10, 450, 350)
         place(networkComponent, 460, 10, 1000, 800)
+
+        // Create control panel for language model controls
+        createControlPanel("Language Model Controls", 10, 370) {
+
+            // Temperature control with slider and text field
+            addSliderWithTextField("Temperature", 0.01, 2.0, (softmaxSequence.updateRule as SoftmaxRule).temperature, 0.01) { temp ->
+                (softmaxSequence.updateRule as SoftmaxRule).temperature = temp
+            }
+
+            addSeparator()
+
+            // Quick generation button
+            addButton("Generate 10 Tokens") {
+                workspace.iterateSuspend(10)
+            }
+
+            addButton("Clear Text") {
+                textWorldComponent.world.text = ""
+            }
+
+            addSeparator()
+
+            addButton("Configure Sampling Strategy...") {
+                // Create a wrapper for the sampling strategy to edit it
+                val wrapper = objectWrapper("Sampling Strategy", textWorldComponent.world.samplingStrategy.copy() as SamplingStrategy)
+                val editor = AnnotatedPropertyEditor(wrapper)
+                val dialog = StandardDialog(editor).apply {
+                    title = "Configure Sampling Strategy"
+                    addCommitTask {
+                        editor.commitChanges()
+                        // Sync the edited value back to the TextWorld
+                        textWorldComponent.world.samplingStrategy = wrapper.editingObject as SamplingStrategy
+                    }
+                }
+                dialog.display()
+            }
+        }
+
+        val textWorldDesktopComponent = SimbrainDesktop.getDesktopComponent(textWorldComponent)
+        SimbrainDesktop.onboardingManager.showPopup(
+            PopupConfig(
+                title = "Language Model Prompt",
+                message = "To enter a prompt, add some text here. To process your prompt through the network, click the play button on the main toolbar.",
+                targetComponent = textWorldDesktopComponent as javax.swing.JComponent,
+                placement = PopupPlacement.BOTTOM_CENTER,
+                suppressionKey = "tiny_language_model_prompt_help",
+                style = PopupStyle.SUCCESS
+            )
+        )
     }
 
     offsetNetworkModel(inputs, transformerBlock, Direction.NORTH, transformerBlock.height / 2 + 300.0)
@@ -218,48 +385,143 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
     alignNetworkModels(transformerBlock, inferenceOutput, Alignment.HORIZONTAL)
 
     addSidebarInfo(
-        """ 
+        """
         # Tiny Language Model
-        A simple GPT-like model with one block and one head.
         
-        # Configuration / Startup
-        When you first start this script a dialog opens that allows you to set how large the context window 
-        is and also to select a document you will use to train the model. 
+        A simplified GPT-style language model with a single transformer block. This simulation demonstrates how neural networks can learn to predict text patterns and generate new text based on training data. The model learns from sequences of text and can generate continuations based on prompts.
         
-        Note: The longer the document, the slower training will be.
-
-        # Training your model
-        Click the "supervised model" interaction box and use the training dialog as explained [here](https://docs.simbrain.net/docs/network/trainingNetworks.html)  
-
-        # Using the model
-        At any time you can see how well the model is doing just by running the [workspace](https://docs.simbrain.net/docs/workspace/)
-        You can put partial text of any length in the text world to see how it does with it. 
-        This is a "prompt". 
+        # Simulation Details
         
-        Note that no turn-taking machinery here. The network will just keep generating text until you stop it. 
- 
-        # Save and Reopen
-        Once you have trained your model, you can save it. 
-        NOTE: When reopening you must use the `Load workspace` button in the control panel below the text world. 
+        The simulation consists of several interconnected components:
         
-        # Training data
-        Generated by windowing along the tokens in the document used to train the model.  Windows do not respect punctuation,
-        they are simply slid across the words.
-        To see the document used to train the model, in the text world open the word embedding viewer and click "view embedding word source"
-        For each window generate a "christmas tree" of all input / target pairs.
-        Example: if the window is "hi there old friend" target pairs are
+        ## Text Inputs Component
         
-        - "hi there old" -> "friend"
-        - "hi there" -> "old"
-        - "hi" -> "there"
+        The `Text Inputs` component at the left shows the current context window. This is where you enter prompts for the model to continue. The context window is a fixed-size sliding window of recent tokens that the model uses to predict what comes next.
         
-        # What to try
-        - Try different training sets
-        - Experiment with temperature and different sampling strategies:
-          - **Greedy**: Always picks the most probable token (deterministic)
-          - **Top-K**: Samples from the K most probable tokens (good balance)
-          - **Top-P (Nucleus)**: Samples from tokens whose cumulative probability exceeds P
-        - Adjust temperature on the Softmax Sequence to control randomness (higher = more random)
+        ## Network Components
+        
+        The network contains several key layers:
+        
+        - **Inputs**: An activation sequence that holds the encoded context window. Each token is represented as a one-hot vector, and the full sequence forms a matrix.
+        
+        - **Transformer block**: The core of the model. This layer processes the input sequence using self-attention and feed-forward transformations to create rich representations that capture patterns in the text.
+        
+        - **Softmax sequence**: Converts the transformer outputs into probability distributions over possible next tokens. Each position in the sequence predicts the next token at that position. Temperature controls randomness (lower = more deterministic, higher = more random).
+        
+        - **Predicted next token**: A separate output layer that shows the probability distribution for the next token that will be generated. This is what gets sampled to produce new text.
+        
+        ## Weight Matrices
+        
+        Two key weight matrices connect these components:
+        
+        - **Embedding**: Maps input tokens into the transformer's representation space
+        - **Unembedding**: Maps transformer outputs back to token probabilities
+        
+        These matrices are what the model learns during training.
+        
+        ## Configuration
+        
+        When you first start this simulation, a dialog appears with these options:
+        
+        - **Context Size**: Number of tokens the model can see at once. Larger contexts allow the model to capture longer-range patterns but require more memory and training time.
+        
+        - **Embedding Dimension**: Size of the internal representation vectors. Higher dimensions allow more expressive representations but require more training data.
+        
+        - **Hidden Size**: Number of units in the transformer's feed-forward layer.
+        
+        - **Training Text**: The document used to train the model. The longer the document, the more patterns the model can learn, but training will take longer.
+        
+        - **Test Text**: Optional separate text file for validation. If not provided, the training text is automatically split.
+        
+        - **Sampling Strategy**: How the model chooses the next token from the probability distribution (see experiments below).
+        
+        # What to Do
+        
+        ## Initial Setup
+        
+        When the simulation starts, you'll see a configuration dialog. Choose your settings or use the defaults. The simulation comes with several sample text files in the `simulations/texts/` directory.
+        
+        ## Training Your Model
+        
+        The model starts untrained. To train it:
+        
+        1. Click the `Supervised Model` interaction box in the network
+        2. Open the training dialog (see the [training networks documentation](https://docs.simbrain.net/docs/network/trainingNetworks.html) for details)
+        3. Click `Run` to train on your text corpus
+        4. Watch the error plots to monitor learning progress
+        
+        Training teaches the model to predict what token comes next based on context. The model learns patterns like common word sequences, grammar, and text structure.
+        
+        ## Using Your Trained Model
+        
+        Once trained, you can use the model to generate text:
+        
+        1. Type a prompt in the `Text Inputs` component (any text you want the model to continue)
+        2. Click the `Play` button in the main toolbar
+        3. Watch as the model generates new tokens, extending your prompt
+        4. The model will continue generating until you press `Stop`
+        
+        The `Predicted next token` layer shows the probability distribution over possible next tokens. Higher activations indicate more likely continuations.
+        
+        ## Saving and Reopening
+        
+        After training, save your workspace to preserve the learned weights. When reopening a saved workspace, use the `Load workspace` button in the control panel below the text world to properly restore the update actions.
+        
+        # Experiments
+        
+        ## Train on Different Text Types
+        
+        Try training on different text corpora to see how the model adapts:
+        
+        - `casual_texting_small.txt`: Informal conversational text
+        - `chess.txt`: Chess-related terminology and patterns
+        - `mlk.txt`: Formal speech text
+        - Your own text files
+        
+        Each text type will produce different learned patterns. A model trained on chess text will generate chess-related content, while one trained on casual text will produce more informal language.
+        
+        ## Adjust Context Size
+        
+        Experiment with different context sizes:
+        
+        - Small contexts (8-12 tokens): Faster training, captures local patterns
+        - Large contexts (24-48 tokens): Slower training, captures longer-range dependencies
+        
+        Try prompts that require different amounts of context to complete sensibly.
+        
+        ## Modify Sampling Strategies
+        
+        The sampling strategy determines how the model selects the next token. In the `Text Inputs` component, try different options:
+        
+        - **Greedy**: Always picks the most probable token. Produces deterministic, predictable output that may be repetitive.
+        
+        - **Top-K**: Randomly samples from the K most probable tokens. Good balance between creativity and coherence. Try K values from 3 to 10.
+        
+        - **Top-P (Nucleus)**: Samples from tokens whose cumulative probability exceeds P. More dynamic than Top-K. Try P values from 0.8 to 0.95.
+        
+        ## Adjust Temperature
+        
+        Click on the `Softmax sequence` layer and adjust its temperature parameter:
+        
+        - Low temperature (0.1-0.5): More confident, focused predictions (less random)
+        - Medium temperature (0.5-1.0): Balanced randomness
+        - High temperature (1.0-2.0): More diverse, creative, but potentially incoherent output
+        
+        Observe how temperature interacts with sampling strategy to affect generation quality.
+        
+        ## Regularization Experiments
+        
+        In the startup dialog's Regularization tab, try different settings:
+        
+        - **Weight Decay**: Prevents overfitting by penalizing large weights. Try values from 0.001 to 0.1.
+        - **Learning Rate Decay**: Gradually reduces the learning rate during training for more stable convergence.
+        - **AdamW vs Adam**: Compare the AdamW optimizer (with decoupled weight decay) to standard Adam.
+        
+        Regularization is especially important with small training datasets where overfitting is common.
+        
+        ## View Training Data
+        
+        To see what text the model was trained on, open the `Text Inputs` component, click the word embedding viewer button, and select `view embedding word source`. This shows the complete vocabulary and source text.
 
         """.trimIndent(),
         initiallyOpened = false
@@ -275,7 +537,14 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
             println("Learning rate: $learningRate")
             println("Context size: $contextSize")
             println("Embedding dimension: ${options.embeddingDimension}")
-            println("Text file: ${options.trainerTextPath}")
+            println("Training text file: ${options.trainerTextPath}")
+            if (options.testTextPath.isNotEmpty()) {
+                println("Test text file: ${options.testTextPath}")
+            } else {
+                println("Train/test split: ${options.trainTestSplit}")
+            }
+            println("Training set size: ${trainingSet.size}")
+            println("Test set size: ${testingSet.size}")
             println()
         }
 
@@ -290,6 +559,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
             // Run training iterations
             if (trainingIterations > 0) {
                 if (enableConsoleOutput) println("Starting training...")
+                
                 repeat(trainingIterations) { iteration ->
                     trainer.trainOnce()
                     
@@ -299,8 +569,16 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
                             supervisedModel.forwardPass()
                         }
 
-                        // Print error for every iteration
-                        println("Iteration ${iteration + 1}/$trainingIterations, Loss: ${"%.6f".format(trainer.lastTrainingError)}")
+                        // Print training error for every iteration
+                        val trainLoss = trainer.lastTrainingError
+                        print("Iteration ${iteration + 1}/$trainingIterations, Train Loss: ${"%.6f".format(trainLoss)}")
+                        
+                        // Print test error if available and it's time to compute it
+                        if (testingSet.size > 0 && (iteration + 1) % 10 == 0) {
+                            val testLoss = trainer.computeTestError()
+                            print(", Test Loss: ${"%.6f".format(testLoss)}")
+                        }
+                        println()
                         
                         // Sample activations every iteration
                         println("  Softmax Sequence activations (first 3 positions, first 5 tokens):")
@@ -350,7 +628,11 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
 
         if (enableConsoleOutput) {
             println("Headless execution completed successfully!")
-            println("Final loss: ${"%.6f".format(trainer.lastTrainingError)}")
+            println("Final training loss: ${"%.6f".format(trainer.lastTrainingError)}")
+            if (testingSet.size > 0) {
+                val finalTestLoss = trainer.computeTestError()
+                println("Final test loss: ${"%.6f".format(finalTestLoss)}")
+            }
         }
     }
 
@@ -439,7 +721,17 @@ fun buildSequenceToSequenceDataset(
     tokenizedText: List<String>,
     contextSize: Int,
     tokenEmbedding: TokenEmbedding
-): MatrixDataset {
+): TrainingDataset {
+
+    // Validate input
+    if (tokenizedText.size < contextSize + 1) {
+        return TrainingDataset(
+            inputs = mutableListOf(),
+            targets = mutableListOf(),
+            inputSize = contextSize * tokenEmbedding.dimension,
+            targetSize = contextSize * tokenEmbedding.dimension
+        )
+    }
 
     // Create sliding windows of contextSize + 1 for input + target
     val sequences = tokenizedText.windowed(contextSize + 1, step = 1)
@@ -486,8 +778,8 @@ fun buildSequenceToSequenceDataset(
         finalTargetMatrix.setRow(exampleIndex, targetMatrix.flatten())
     }
 
-    return MatrixDataset(
-        inputs = finalInputMatrix,
-        targets = finalTargetMatrix
+    return TrainingDataset(
+        inputs = finalInputMatrix.toArray().map { it.toMutableList() }.toMutableList(),
+        targets = finalTargetMatrix.toArray().map { it.toMutableList() }.toMutableList()
     )
 }

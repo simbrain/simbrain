@@ -7,9 +7,10 @@ import org.simbrain.network.core.randomizeBiases
 import org.simbrain.network.trainers.*
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.SigmoidalRule
+import org.simbrain.util.copy
 import org.simbrain.util.math.SigmoidFunctionEnum
 import org.simbrain.util.point
-import smile.math.matrix.Matrix
+import org.simbrain.util.randomMutableList
 import java.awt.geom.Point2D
 import kotlin.math.ceil
 import kotlin.math.min
@@ -40,19 +41,18 @@ class BackpropNetwork : FeedForward, SupervisedNetwork {
         }
         val nin = nodesPerLayer.first()
         val nout = nodesPerLayer.last()
-        trainingSet = createDiagonalDataset(nin, nout, min(nin,nout))
-        testingSet = MatrixDataset(
-            inputs = Matrix(ceil(trainingSet.inputs.nrow() * 0.2).toInt(), trainingSet.inputs.ncol()),
-            targets = Matrix(ceil(trainingSet.targets.nrow() * 0.2).toInt(), trainingSet.targets.ncol())
-        )
+        val initialData = createSimpleBinaryDataset(nin, nout)
+        val (training, testing) = splitDataSet(initialData, 0.8)
+        trainingSet = training
+        testingSet = testing
     }
 
     @XStreamConstructor()
     private constructor() : super()
 
-    override lateinit var trainingSet: MatrixDataset
+    override lateinit var trainingSet: TrainingDataset
 
-    override lateinit var testingSet: MatrixDataset
+    override lateinit var testingSet: TrainingDataset
 
     override var trainerConfig = SupervisedTrainerConfig(lossFunctionProvider = ::possibleLossFunctions)
 
@@ -72,6 +72,19 @@ class BackpropNetwork : FeedForward, SupervisedNetwork {
         layers.forwardPass(listOf(inputLayer.activations), listOf(inputLayer))
     }
 
+    override fun toString(): String {
+        val hiddenLayerSizes = hiddenLayers().map { it.size }
+        val hiddenInfo = if (hiddenLayerSizes.isEmpty()) "None" 
+                        else hiddenLayerSizes.joinToString(", ")
+        return """
+            Name: $displayName
+            Type: Backprop Network
+            Input Layer: ${inputLayer.size} neurons
+            Hidden Layers: $hiddenInfo
+            Output Layer: ${outputLayer.size} neurons
+        """.trimIndent()
+    }
+
     override fun copy(): BackpropNetwork {
         // Create a new instance with same structure
         val nodesPerLayer = layerList.map { it.size }.toIntArray()
@@ -83,14 +96,8 @@ class BackpropNetwork : FeedForward, SupervisedNetwork {
         }
 
         // Copy training related properties
-        copy.trainingSet = MatrixDataset(
-            inputs = trainingSet.inputs.clone(),
-            targets = trainingSet.targets.clone()
-        )
-        copy.testingSet = MatrixDataset(
-            inputs = testingSet.inputs.clone(),
-            targets = testingSet.targets.clone()
-        )
+        copy.trainingSet = trainingSet.copy()
+        copy.testingSet = testingSet.copy()
         copy.trainerConfig = SupervisedTrainerConfig().copy()
 
         return copy

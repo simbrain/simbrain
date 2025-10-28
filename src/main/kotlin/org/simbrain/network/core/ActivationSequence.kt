@@ -51,6 +51,7 @@ class ActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inpu
     @UserParameter(
         label = "Activations",
         description = "Activations in the sequence",
+        columnMode = true,
         order = 1)
     override var activations: Matrix = Matrix(sequenceSize, inputSize)
         set(value) {
@@ -109,6 +110,16 @@ class ActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inpu
         events.updated.fire()
     }
 
+    override fun toString(): String {
+        return """
+                Name: $displayName ($sequenceSize x $inputSize)
+                Sequence Size: $sequenceSize
+                Input Size: $inputSize
+            """.trimIndent()
+    }
+
+    override val shapeString: String get() = "$sequenceSize x $inputSize"
+
     override fun clear() {
         activations.fill(0.0)
         events.updated.fire()
@@ -140,10 +151,10 @@ class ActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inpu
 
     class CreationTemplate : EditableObject {
 
-        @UserParameter(label = "Sequence Size", description = "Number of activation vectors in the sequence", order = 1)
+        @UserParameter(label = "Sequence size", description = "Number of activation vectors in the sequence", order = 1)
         var sequenceSize = 7
 
-        @UserParameter(label = "Input Size", description = "Length of each activation vector", order = 2)
+        @UserParameter(label = "Input size", description = "Length of each activation vector.", order = 2)
         var inputSize = 4
 
         fun create(): ActivationSequence {

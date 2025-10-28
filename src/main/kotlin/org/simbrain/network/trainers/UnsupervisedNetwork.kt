@@ -9,13 +9,12 @@ import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.stats.ProbabilityDistribution
-import smile.math.matrix.Matrix
 
 interface UnsupervisedNetwork: EditableObject {
 
-    var trainingData: Matrix
+    var trainingData: MutableList<MutableList<Double>>
 
-    var testingData: Matrix
+    var testingData: MutableList<MutableList<Double>>
 
     val inputLayer: Layer
 
@@ -41,7 +40,10 @@ class UnsupervisedTrainer: EditableObject {
         initValue = 1000
     )
 
-    @UserParameter("Learning Rate")
+    @UserParameter(
+        label = "Learning Rate",
+        description = "Step size for unsupervised learning updates. Controls how quickly weights adapt to input patterns"
+    )
     var learningRate = .01
 
     @Transient

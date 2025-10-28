@@ -2,7 +2,6 @@ package org.simbrain.network.trainers
 
 import org.simbrain.network.core.Network
 import org.simbrain.network.subnetworks.BackpropNetwork
-import org.simbrain.util.matrix
 
 
 fun testBPProbe() {
@@ -10,14 +9,19 @@ fun testBPProbe() {
     val network = Network()
     val bp = BackpropNetwork(intArrayOf(2, 2, 1), null)
         .also { network.addNetworkModelsAsync(it) }
-    bp.trainingSet = MatrixDataset(
-        inputs = matrix[4, 2](
-            0, 0,
-            1, 0,
-            0, 1,
-            1, 1
+    bp.trainingSet = TrainingDataset(
+        inputs = mutableListOf(
+            mutableListOf(0.0, 0.0),
+            mutableListOf(1.0, 0.0),
+            mutableListOf(0.0, 1.0),
+            mutableListOf(1.0, 1.0)
         ),
-        targets = matrix[4, 1](0, 1, 1, 0)
+        targets = mutableListOf(
+            mutableListOf(0.0),
+            mutableListOf(1.0),
+            mutableListOf(1.0),
+            mutableListOf(0.0)
+        )
     )
     val trainer = SupervisedTrainer(network, bp).apply {
         config.optimizer = MomentumOptimizer()

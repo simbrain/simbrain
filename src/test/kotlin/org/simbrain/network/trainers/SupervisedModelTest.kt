@@ -11,7 +11,6 @@ import org.simbrain.util.allPropertiesToString
 import org.simbrain.util.copyFrom
 import org.simbrain.util.format
 import org.simbrain.util.math.SigmoidFunctionEnum
-import smile.math.matrix.Matrix
 
 class SupervisedModelTest {
 
@@ -48,9 +47,9 @@ class SupervisedModelTest {
 
         val backpropNetwork = BackpropNetwork(intArrayOf(2,2,1), null).also { network1.addNetworkModelsAsync(it) }
 
-        val layer1 = NeuronArray(2).also { network2.addNetworkModelsAsync(it) }.also { it.isClamped = true }
-        val layer2 = NeuronArray(2).also { network2.addNetworkModelsAsync(it) }.also { it.updateRule = SigmoidalRule() }
-        val layer3 = NeuronArray(1).also { network2.addNetworkModelsAsync(it) }.also { it.updateRule = SigmoidalRule() }
+        val layer1 = NeuronArray(2).also { network2.addNetworkModelsAsync(it) }.also { it.isClamped = true; it.label = "Input" }
+        val layer2 = NeuronArray(2).also { network2.addNetworkModelsAsync(it) }.also { it.updateRule = SigmoidalRule(); it.label = "Hidden" }
+        val layer3 = NeuronArray(1).also { network2.addNetworkModelsAsync(it) }.also { it.updateRule = SigmoidalRule(); it.label = "Output" }
 
         val wm1 = WeightMatrix(layer1, layer2).also { network2.addNetworkModelsAsync(it) }
         val wm2 = WeightMatrix(layer2, layer3).also { network2.addNetworkModelsAsync(it) }
@@ -64,28 +63,28 @@ class SupervisedModelTest {
             config.optimizer = MomentumOptimizer()
         }
 
-        val trainingInputs = Matrix.of(arrayOf(
-            doubleArrayOf(0.0, 0.0),
-            doubleArrayOf(1.0, 0.0),
-            doubleArrayOf(0.0, 1.0),
-            doubleArrayOf(1.0, 1.0)
-        ))
-
-        val trainingTargets = Matrix.of(arrayOf(
-            doubleArrayOf(0.0),
-            doubleArrayOf(1.0),
-            doubleArrayOf(1.0),
-            doubleArrayOf(0.0)
-        ))
-
-        backpropNetwork.trainingSet = MatrixDataset(
-            inputs = trainingInputs.clone(),
-            targets = trainingTargets.clone()
+        val trainingInputs = mutableListOf(
+            mutableListOf(0.0, 0.0),
+            mutableListOf(1.0, 0.0),
+            mutableListOf(0.0, 1.0),
+            mutableListOf(1.0, 1.0)
         )
 
-        supervisedModel.trainingSet = MatrixDataset(
-            inputs = trainingInputs.clone(),
-            targets = trainingTargets.clone()
+        val trainingTargets = mutableListOf(
+            mutableListOf(0.0),
+            mutableListOf(1.0),
+            mutableListOf(1.0),
+            mutableListOf(0.0)
+        )
+
+        backpropNetwork.trainingSet = TrainingDataset(
+            inputs = trainingInputs,
+            targets = trainingTargets
+        )
+
+        supervisedModel.trainingSet = TrainingDataset(
+            inputs = trainingInputs,
+            targets = trainingTargets
         )
 
         assertEquals(SupervisedTrainer.config.learningRate, supervisedTrainer.config.learningRate) { "Learning rate should be the same" }
@@ -99,11 +98,11 @@ class SupervisedModelTest {
         }
 
         with(network1) {
-            backpropNetwork.inputLayer.setActivations(trainingInputs.row(0))
+            backpropNetwork.inputLayer.setActivations(trainingInputs[0].toDoubleArray())
             backpropNetwork.forwardPass()
         }
         with(network2) {
-            supervisedModel.inputLayer.setActivations(trainingInputs.row(0))
+            supervisedModel.inputLayer.setActivations(trainingInputs[0].toDoubleArray())
             supervisedModel.forwardPass()
         }
 
@@ -178,28 +177,28 @@ class SupervisedModelTest {
             config.optimizer = MomentumOptimizer(0.0)
         }
 
-        val trainingInputs = Matrix.of(arrayOf(
-            doubleArrayOf(0.0, 0.0),
-            doubleArrayOf(1.0, 0.0),
-            doubleArrayOf(0.0, 1.0),
-            doubleArrayOf(1.0, 1.0)
-        ))
-
-        val trainingTargets = Matrix.of(arrayOf(
-            doubleArrayOf(0.0),
-            doubleArrayOf(1.0),
-            doubleArrayOf(1.0),
-            doubleArrayOf(0.0)
-        ))
-
-        naModel.trainingSet = MatrixDataset(
-            inputs = trainingInputs.clone(),
-            targets = trainingTargets.clone()
+        val trainingInputs = mutableListOf(
+            mutableListOf(0.0, 0.0),
+            mutableListOf(1.0, 0.0),
+            mutableListOf(0.0, 1.0),
+            mutableListOf(1.0, 1.0)
         )
 
-        ngModel.trainingSet = MatrixDataset(
-            inputs = trainingInputs.clone(),
-            targets = trainingTargets.clone()
+        val trainingTargets = mutableListOf(
+            mutableListOf(0.0),
+            mutableListOf(1.0),
+            mutableListOf(1.0),
+            mutableListOf(0.0)
+        )
+
+        naModel.trainingSet = TrainingDataset(
+            inputs = trainingInputs,
+            targets = trainingTargets
+        )
+
+        ngModel.trainingSet = TrainingDataset(
+            inputs = trainingInputs,
+            targets = trainingTargets
         )
 
         assertEquals(naTrainer.config.learningRate, ngTrainer.config.learningRate) { "Learning rate should be the same" }
@@ -212,11 +211,11 @@ class SupervisedModelTest {
         nawm2.weights.copyFrom(ngwm2.weights)
 
         with(network1) {
-            naModel.inputLayer.setActivations(trainingInputs.row(0))
+            naModel.inputLayer.setActivations(trainingInputs[0].toDoubleArray())
             naModel.forwardPass()
         }
         with(network2) {
-            ngModel.inputLayer.setActivations(trainingInputs.row(0))
+            ngModel.inputLayer.setActivations(trainingInputs[0].toDoubleArray())
             ngModel.forwardPass()
         }
 
@@ -288,28 +287,28 @@ class SupervisedModelTest {
             config.optimizer = MomentumOptimizer(0.0)
         }
 
-        val trainingInputs = Matrix.of(arrayOf(
-            doubleArrayOf(0.0, 0.0),
-            doubleArrayOf(1.0, 0.0),
-            doubleArrayOf(0.0, 1.0),
-            doubleArrayOf(1.0, 1.0)
-        ))
-
-        val trainingTargets = Matrix.of(arrayOf(
-            doubleArrayOf(0.0),
-            doubleArrayOf(1.0),
-            doubleArrayOf(1.0),
-            doubleArrayOf(0.0)
-        ))
-
-        backpropNetwork.trainingSet = MatrixDataset(
-            inputs = trainingInputs.clone(),
-            targets = trainingTargets.clone()
+        val trainingInputs = mutableListOf(
+            mutableListOf(0.0, 0.0),
+            mutableListOf(1.0, 0.0),
+            mutableListOf(0.0, 1.0),
+            mutableListOf(1.0, 1.0)
         )
 
-        supervisedModel.trainingSet = MatrixDataset(
-            inputs = trainingInputs.clone(),
-            targets = trainingTargets.clone()
+        val trainingTargets = mutableListOf(
+            mutableListOf(0.0),
+            mutableListOf(1.0),
+            mutableListOf(1.0),
+            mutableListOf(0.0)
+        )
+
+        backpropNetwork.trainingSet = TrainingDataset(
+            inputs = trainingInputs,
+            targets = trainingTargets
+        )
+
+        supervisedModel.trainingSet = TrainingDataset(
+            inputs = trainingInputs,
+            targets = trainingTargets
         )
 
         assertEquals(SupervisedTrainer.config.learningRate, supervisedTrainer.config.learningRate) { "Learning rate should be the same" }
@@ -327,11 +326,11 @@ class SupervisedModelTest {
         }
 
         with(network1) {
-            backpropNetwork.inputLayer.setActivations(trainingInputs.row(0))
+            backpropNetwork.inputLayer.setActivations(trainingInputs[0].toDoubleArray())
             backpropNetwork.forwardPass()
         }
         with(network2) {
-            supervisedModel.inputLayer.setActivations(trainingInputs.row(0))
+            supervisedModel.inputLayer.setActivations(trainingInputs[0].toDoubleArray())
             supervisedModel.forwardPass()
         }
 

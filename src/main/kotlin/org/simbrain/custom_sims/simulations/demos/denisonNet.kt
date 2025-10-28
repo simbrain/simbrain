@@ -74,6 +74,15 @@ val denisonNet = newSim {
     val vaLayer = net.addNeuronGroup(1).apply { label = "Voluntary Attention" }
     val iaLayer = net.addNeuronGroup(1).apply { label = "Involuntary Attention" }
 
+    sensory1.setUpperBound(0.1)
+    sensory2.setUpperBound(0.1)
+    decision.setLowerBound(-0.000002)
+    decision.setUpperBound(0.000002)
+    vaLayer.setLowerBound(-0.02)
+    vaLayer.setUpperBound(0.02)
+    iaLayer.setLowerBound(-0.02)
+    iaLayer.setUpperBound(0.02)
+
     net.addNetworkModels(sensory1, sensory2, decision, vaLayer, iaLayer, currentStatus, reportStatus, modelDecision)
 
     val component = addImageWorld("Gratings")
@@ -155,7 +164,6 @@ val denisonNet = newSim {
                     val preOut = prefilter(s1History, wFilter, n, dt, s1History.size - 1)
                     val summed = preOut.sum()
                     drive = doubleArrayOf(summed)
-                    println("IA drive=$summed")
                 } else {
                     drive = doubleArrayOf(0.0)
                 }
@@ -199,6 +207,9 @@ val denisonNet = newSim {
     }
     val fullCW = DoubleArray(12) { i -> sensory2.activationArray[i] }
     w_D = DoubleArray(12) { i -> fullCW[i] - fullCCW[i] }
+
+    sensory1.setActivations(DoubleArray(12) { 0.0 })
+    sensory2.setActivations(DoubleArray(12) { 0.0 })
 
     withGui {
         place(netComponent, 130, 15, 700, 700)

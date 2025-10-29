@@ -7,7 +7,8 @@ import org.simbrain.network.gui.dialogs.getSupervisedTrainingDialog
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.network.trainers.TrainingDataset
-import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
+import org.simbrain.network.updaterules.LinearRule
+import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.alignNetworkModels
@@ -20,7 +21,7 @@ import java.awt.image.BufferedImage
  */
 val simpleImageWorld = newSim {
 
-    val numCategories = 7
+    val numCategories = 8
     val numHiddenNodes = 64
 
     // Basic setup
@@ -36,18 +37,16 @@ val simpleImageWorld = newSim {
         layout(GridLayout(40.0, 40.0))
     }
 
-    val hidden = network.addNeuronCollection(numHiddenNodes).apply {
+    val hidden = network.addNeuronCollection(numHiddenNodes) {
+        updateRule = LinearRule().apply { clippingType = LinearRule.ClippingType.Relu }
+    }.apply {
         label = "Hidden"
         layout(GridLayout(40.0, 40.0))
     }
 
     // The number of neurons determines how many categories are shown
-    val outputs = network.addNeuronCollection(numCategories).apply {
-        label = "Outputs"
-        (updateRule as? BoundedUpdateRule)?.apply {
-            upperBound = 1.0
-            lowerBound = -1.0
-        }
+    val outputs = network.addNeuronCollection(numCategories) {
+        updateRule = SigmoidalRule()
     }
 
     val weights = listOf(
@@ -137,27 +136,43 @@ val simpleImageWorld = newSim {
         
         This simulation demonstrates basic image processing using a 10x10 pixel drawing canvas connected to a neural network. 
         You can draw simple images and train a network to classify them into different categories.
-
-        # Simulation Details
         
-        The simulation consists of:
-        - Image World: A 10x10 pixel canvas where you can draw simple images
-        - Input Layer: 100 neurons (10x10) that receive pixel brightness values
-        - Hidden Layer: ${numHiddenNodes} neurons for feature extraction
-        - Output Layer: ${numCategories} neurons representing different categories
-        - Training System: Supervised learning to classify drawn images
-
+        The simulation is useful for seeing what the process of training a network is like without having to create a bunch of data
+        and load it into the trainer. Instead, you can simply draw patterns, press a button, and train the associations.
+        
+        The simulation is useful for exploring generalization. If you make 8 different categories, it will probably not do well at recognizing variants. 
+        But if you make 4 versions of two categories, for exmaple x1, x2, x3, x4 and o1, o2, o3, o4, that vary in position, size, or style, you 
+        will probably get better results.
+        
+        To view your training data,  you can open the training dialog and click the step button in the input table. This will place the patters back 
+         in the input layer, but not in the image world.
+        
         # What to Do
         
-        1. Draw images in the image world canvas using the drawing tools
+        ## Basic Workflow
         
-        2. Assign categories by setting the target output for each drawing
+        1. Draw images in the Image World canvas using the drawing tools
         
-        3. Train the network using the supervised training dialog
+        2. Save training examples: For each category, draw an image and click the corresponding `Save Image for Category N` button. The image will be saved to the training set and displayed in the image album.
         
-        4. Test classification by drawing new images and observing which category the network predicts
+        3. Train the network: Click the `Train...` button to open the training dialog. Run training iterations until the error decreases to an acceptable level.
         
-        5. Experiment with different patterns to see how well the network can discriminate between categories
+        4. Test classification: Draw new images and observe which output neuron activates most strongly, indicating the network's predicted category.
+        
+        You can review your training dialog. This dialog shows all training examples and their target outputs. Use this to verify what patterns you've saved and to see the actual input arrays (note that the images themselves won't display in the training dialog, only the numerical input data).
+
+        ## Training Strategies
+        
+        You can approach this simulation in several ways:
+        
+        - Two-category classification: Train the network to distinguish between two types of patterns (e.g., X vs O). This is the simplest approach.
+        
+        - Multiple variations of one pattern: Use all ${numCategories} categories to teach the network to recognize different variations of a single pattern type (e.g., X in different positions or orientations).
+        
+        - Multiple pattern types: Train on several distinct pattern types (e.g., X, O, lines, dots) to create a multi-category classifier.
+        
+        - Multiple instances per category: For better generalization, create 3-4 variations of each pattern type and train on all of them. This helps the network learn the essential features rather than memorizing specific pixel configurations.
+        
 
         # Credits
         

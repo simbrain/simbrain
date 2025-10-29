@@ -521,7 +521,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         
         ## View Training Data
         
-        To see what text the model was trained on, open the `Text Inputs` component, click the word embedding viewer button, and select `view embedding word source`. This shows the complete vocabulary and source text.
+        To see what text the model was trained on, open the `Text Inputs` component, click the token embedding viewer button, and select `view embedding word source`. This shows the complete vocabulary and source text.
 
         """.trimIndent(),
         initiallyOpened = false

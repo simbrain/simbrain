@@ -13,13 +13,13 @@ import java.io.File
  */
 fun createExtractEmbeddingAction(block: (TokenEmbedding) -> Unit) = createAction(
     name = "Extract embedding...",
-    description = "Generate word embedding from selected document.",
+    description = "Generate token embedding from selected document.",
     iconPath = "menu_icons/Extract.png"
 ) {
     val options = ExtractEmbeddingOptions()
     val editor = org.simbrain.util.propertyeditor.AnnotatedPropertyEditor(listOf(options))
     val dialog = StandardDialog(editor).apply {
-        title = "Generate Word Embedding From Document"
+        title = "Generate Token Embedding From Document"
         
         // Add validation to prevent dialog from closing if validation fails
         setClosingCheck {
@@ -55,7 +55,7 @@ fun createExtractEmbeddingAction(block: (TokenEmbedding) -> Unit) = createAction
 val TextWorld.extractEmbeddingFromCurrentText
     get() = createAction(
         name = "Extract embedding from current text",
-        description = "Generate word embedding from the current text world document.",
+        description = "Generate token embedding from the current text world document.",
         iconPath = "menu_icons/Extract.png"
     ) {
         if (text.isEmpty()) {
@@ -66,7 +66,7 @@ val TextWorld.extractEmbeddingFromCurrentText
         val options = ExtractEmbeddingOptions(showDocumentPath = false)
         val editor = org.simbrain.util.propertyeditor.AnnotatedPropertyEditor(listOf(options))
         val dialog = StandardDialog(editor).apply {
-            title = "Generate Word Embedding From Current Text"
+            title = "Generate Token Embedding From Current Text"
             
             addCommitTask {
                 editor.commitChanges()
@@ -82,8 +82,8 @@ val TextWorld.extractEmbeddingFromCurrentText
  */
 val TextWorld.viewTokenEmbedding
     get() = createAction(
-        name = "Word embedding editor...",
-        description = "View word embedding editor",
+        name = "Token embedding editor...",
+        description = "View token embedding editor",
         iconPath = "menu_icons/TableBold.png"
     ) {
         TokenEmbeddingDialog(tokenEmbedding) { tokenEmbedding = it }.display()

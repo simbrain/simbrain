@@ -362,7 +362,7 @@ fun removeStopWords(words: List<String>) : List<String> {
  * not be considered meaningful in terms of co-occurrence are down-weighted. Less frequent words on the other, like
  * "platitude" or "espresso", that are more meaningful in terms of co-occurrences, are up-weighted.
  *
- * Generally considered better for word embeddings.
+ * Generally considered better for token embeddings.
  *
  * "PPMI measures how much the probability of a target–context pair estimated in the training corpus is higher than
  * the probability we should expect if the target and the context occurred independently of one another." (Lenci, 2018)

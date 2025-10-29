@@ -95,7 +95,7 @@ class TextUtilsTest {
     }
 
     @Test
-    fun `word embedding have correct size`() {
+    fun `token embedding have correct size`() {
         val tokenEmbedding = TokenEmbeddingBuilder(
             tokenizer = SimpleTokenizer(),
             embeddingType = EmbeddingType.CoOccurrence(windowSize = 2).apply { removeStopWords = true }

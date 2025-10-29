@@ -49,7 +49,7 @@ class TokenEmbedding(
     val size = tokensMap.size
 
     /**
-     * The number of dimensions in the word embedding space.
+     * The number of dimensions in the token embedding space.
      */
     val dimension = tokenVectorMatrix.ncol()
 

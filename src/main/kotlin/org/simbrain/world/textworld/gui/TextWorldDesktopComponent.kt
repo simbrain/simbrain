@@ -108,16 +108,16 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
             edit.addSeparator()
             edit.add(
                 SimbrainDesktop.actionManager.createCoupledDataWorldAction(
-                    name = "Record word embeddings",
+                    name = "Record token embeddings",
                     world.getProducer(TextWorld::currentVector),
-                    sourceName = "${world.id} Word Embeddings",
+                    sourceName = "${world.id} Token Embeddings",
                     world.tokenEmbedding.dimension
                 )
             )
             edit.add(
                 SimbrainDesktop.actionManager.createCoupledPlotMenu(
                     world.getProducer(TextWorld::currentVector),
-                    "${world.id} Word Embeddings",
+                    "${world.id} Token Embeddings",
                 )
             )
             edit.addSeparator()

@@ -342,8 +342,8 @@ fun SimbrainJTable.createShowEigenValuesAction() = createAction(
  * @param useRowLabels If true, the row labels for this dataset are shown as labels in the corresponding points of the projection plot.
  */
 fun SimbrainJTable.createOpenProjectionAction(useRowLabels: Boolean = false) = createAction(
-        name = "Plot word embedding",
-        description = "PCA plot of word embedding",
+        name = "Plot token embedding",
+        description = "PCA plot of token embedding",
         iconPath = "menu_icons/RasterPlot.png",
     ) {
         withContext(Dispatchers.Default) {

@@ -165,9 +165,10 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Photo album (100 x 100)") { photoAlbumExample }
     }
 
-    // dir("Temp") {
+    //dir("Temp") {
     //     item("Activation sequence (2 layers)") { activationSequenceTwoLayer }
     //     item("Activation sequence (3 layers)") { activationSequenceThreeLayer }
+    //     item("Denison Temporal Attention Net") { denisonNet }
     // }
 
     //dir("Testing") {

@@ -112,6 +112,8 @@ class ImageWorld: CoroutineScope {
 
     suspend fun previousFrame() = imageAlbum.previousFrame()
 
+    suspend fun setFrame(frameIndex: Int) = imageAlbum.setFrame(frameIndex)
+
     val currentImage: BufferedImage get() = currentBufferedImage
 
     suspend fun loadImages(files: Array<java.io.File>) {

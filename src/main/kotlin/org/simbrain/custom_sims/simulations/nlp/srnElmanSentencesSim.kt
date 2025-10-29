@@ -32,7 +32,10 @@ val srnElmanSentences = newSim {
     }.build(allWords)
 
     // Text World for Inputs
-    val textWorldInputs = addTextWorld("Text World (Inputs)").apply { updateOn = false }
+    val textWorldInputs = addTextWorld("Text World (Inputs)").apply {
+        updateOn = false
+        world.autoAdvance = true
+    }
     val text = makeElmanVector(numInputSentences)
     textWorldInputs.world.tokenEmbedding = tokenEmbedding
     textWorldInputs.world.text = text

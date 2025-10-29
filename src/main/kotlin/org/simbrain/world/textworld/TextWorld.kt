@@ -102,7 +102,7 @@ class TextWorld : AttributeContainer, EditableObject {
         description = "If true, automatically advance selected token on update.",
         order = 2
     )
-    var autoAdvance = true
+    var autoAdvance = false
 
     @UserParameter(
         label = "Highlight current token",
@@ -235,12 +235,12 @@ class TextWorld : AttributeContainer, EditableObject {
      */
     @Consumable
     fun addTextAtEnd(newText: String, spacing: String = " ") {
-        text += "$spacing$newText"
         runBlocking {
-            position = text.length
-            events.cursorPositionChanged.fire().await()
+            _text += "$spacing$newText"
             events.textChanged.fire().await()
-            events.currentTokenChanged.fire(tokens[tokens.lastIndex]).await()
+            position = _text.length
+            events.cursorPositionChanged.fire().await()
+            currentTokenIndex = tokens.lastIndex
         }
     }
 

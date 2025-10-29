@@ -68,6 +68,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
     dir("Psychology") {
         item("Mouse and eye tracking") { spiveyNet }
         item("Heat-cold illusion") { heatColdSim }
+        item("Temporal Attention Network") { denisonNet }
     }
 
     dir("Behaviorism") {
@@ -141,7 +142,6 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Iris classifier") { irisClassifier }
     }
 
-
     dir("Recurrent networks") {
         item("Recurrent net") { recurrentProjection }
         item("Recurrent net (array)") { recurrentNetArrayBased }
@@ -168,7 +168,6 @@ val simulations = dir("Simulations", alphabetical = true ) {
     //dir("Temp") {
     //     item("Activation sequence (2 layers)") { activationSequenceTwoLayer }
     //     item("Activation sequence (3 layers)") { activationSequenceThreeLayer }
-    //     item("Denison Temporal Attention Net") { denisonNet }
     // }
 
     //dir("Testing") {

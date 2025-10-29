@@ -2,10 +2,9 @@ package org.simbrain.custom_sims.simulations
 
 import kotlinx.coroutines.launch
 import org.simbrain.custom_sims.*
-import org.simbrain.network.core.*
 import org.simbrain.network.core.NetworkTextObject
+import org.simbrain.network.core.addNeuronGroup
 import org.simbrain.util.*
-import org.simbrain.util.toGrayScaleImage
 import org.simbrain.workspace.updater.UpdateCoupling
 import kotlin.math.*
 import kotlin.random.Random
@@ -309,7 +308,8 @@ val denisonNet = newSim {
 addSidebarInfo(
         """
         # Introduction
-        This is a neural network simulation of visual attention, based off the paper "A dynamic normalization
+        
+        This is a neural network simulation of visual attention, based on the paper "A dynamic normalization
         model of temporal attention" by Rachel Denison.
         
         In an experiment, participants were asked to pay attention to 2 rotating grates. The grates rotated
@@ -324,7 +324,11 @@ addSidebarInfo(
         is asked). A model was then built simulating this.
         
         The model consists of 5 layers. 2 of the layers are input layers, 2 of them are attention layers
-        (Involutary and Voluntary), and there is 1 decision layer.
+        (Involuntary and Voluntary), and there is 1 decision layer.
+        
+        # Credits 
+        Implemented by Jensen Guo
+        
         """.trimIndent()
     )
 }

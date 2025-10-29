@@ -275,6 +275,13 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val editSelectedModelsAction = networkPanel.createAction(
         name = "Edit selected models",
         keyboardShortcut = CmdOrCtrl + 'E',
+        initBlock = {
+            fun updateAction() {
+                isEnabled = networkPanel.selectionManager.selection.isNotEmpty()
+            }
+            updateAction()
+            networkPanel.selectionManager.events.selection.on { _, _ -> updateAction() }
+        }
     ) {
         networkPanel.showEditDialogsForSelectedModels()
     }

@@ -73,6 +73,9 @@ class Projector(initialDimension: Int = 25) : EditableObject, CoroutineScope {
     @UserParameter(label = "Use hot point", description = "If true, current point is rendered using the hotpoint color", order = 50)
     var useHotColor = true
 
+    @UserParameter(label = "Extreme Value Threshold", description = "Data points with absolute values >= this threshold (or infinite/NaN values) will be filtered out to prevent projection issues.", minimumValue = 1.0, order = 60)
+    var extremeValueThreshold: Double = 1e50
+
     var coloringManager: ColoringManager by GuiEditable(
         initValue = NoOpColoringManager(),
         order = 110,
@@ -82,6 +85,11 @@ class Projector(initialDimension: Int = 25) : EditableObject, CoroutineScope {
     )
 
     fun addDataPoint(newPoint: DataPoint) {
+        // Filter out extremely large numbers that can cause projection issues
+        if (hasExtremeValues(newPoint)) {
+            return
+        }
+        
         // If a different size point is added simply reset the dataset to match
         if (newPoint.upstairsPoint.size != dimension) {
             dimension = newPoint.upstairsPoint.size
@@ -97,6 +105,15 @@ class Projector(initialDimension: Int = 25) : EditableObject, CoroutineScope {
                 events.datasetChanged.fire()
             }
             events.pointUpdated.fire(newPoint)
+        }
+    }
+
+    /**
+     * Check if the data point contains extremely large, infinite, or NaN values that could cause issues with projections.
+     */
+    private fun hasExtremeValues(point: DataPoint): Boolean {
+        return point.upstairsPoint.any { value ->
+            !value.isFinite() || kotlin.math.abs(value) >= extremeValueThreshold
         }
     }
 

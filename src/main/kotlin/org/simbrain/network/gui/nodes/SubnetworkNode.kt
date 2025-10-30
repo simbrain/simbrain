@@ -114,8 +114,7 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
         addSeparator()
 
         // Edit Submenu
-        // TODO: Add check
-        add(networkPanel.createAction(name = "Edit...") {
+        add(networkPanel.createAction(name = "Edit ${subnetwork.displayName}...") {
             subnetwork.createEditorDialog().display()
         })
         addSeparator()

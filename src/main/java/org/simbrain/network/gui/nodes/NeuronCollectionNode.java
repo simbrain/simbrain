@@ -15,6 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
 import static org.simbrain.network.gui.NetworkPanelMenusKt.createCouplingMenu;
+import static org.simbrain.network.gui.NetworkPanelMenusKt.createEditNeuronCollectionAction;
 
 /**
  * PNode representation of a {@link NeuronCollection}.
@@ -82,6 +83,13 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
 
         JPopupMenu menu = new JPopupMenu();
 
+        // Edit action
+        Action editCollection = createEditNeuronCollectionAction(
+            getNetworkPanel(),
+            neuronCollection,
+            this::getPropertyDialog
+        );
+        menu.add(editCollection);
         menu.add(renameAction);
         menu.add(removeAction);
 

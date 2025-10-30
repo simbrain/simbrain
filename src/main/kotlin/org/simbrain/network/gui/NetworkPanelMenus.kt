@@ -1,10 +1,13 @@
 package org.simbrain.network.gui
 
 import org.simbrain.network.NetworkComponent
+import org.simbrain.network.core.AbstractNeuronCollection
 import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.gui.nodes.NeuronNode
 import org.simbrain.network.gui.nodes.SynapseNode
+import org.simbrain.util.createAction
 import org.simbrain.util.widgets.ShowHelpAction
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.gui.CouplingMenu
@@ -271,3 +274,31 @@ val NetworkPanel.synapseContextMenu
 fun NetworkComponent.createCouplingMenu(container: AttributeContainer) = CouplingMenu(this, container)
 
 fun AbstractAction.toMenuItem() = JCheckBoxMenuItem(this)
+
+/**
+ * Helper function for Java classes to create an edit action for a neuron group.
+ * Uses the displayName of the group in the action name and handles dialog display.
+ */
+fun NetworkPanel.createEditNeuronGroupAction(neuronGroup: AbstractNeuronCollection, getDialog: () -> org.simbrain.util.StandardDialog?): AbstractAction {
+    return createAction(name = "Edit ${neuronGroup.displayName}...") {
+        getDialog()?.apply {
+            pack()
+            setLocationRelativeTo(null)
+            isVisible = true
+        }
+    }
+}
+
+/**
+ * Helper function for Java classes to create an edit action for a neuron collection.
+ * Uses the displayName of the collection in the action name and handles dialog display.
+ */
+fun NetworkPanel.createEditNeuronCollectionAction(neuronCollection: NeuronCollection, getDialog: () -> org.simbrain.util.StandardDialog?): AbstractAction {
+    return createAction(name = "Edit ${neuronCollection.displayName}...") {
+        getDialog()?.apply {
+            pack()
+            setLocationRelativeTo(null)
+            isVisible = true
+        }
+    }
+}

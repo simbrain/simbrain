@@ -5,9 +5,7 @@ import org.piccolo2d.util.PBounds
 import org.simbrain.network.core.NetworkTextObject
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.util.*
-import java.awt.event.ActionEvent
 import java.util.stream.Collectors
-import javax.swing.AbstractAction
 import javax.swing.JPopupMenu
 import javax.swing.text.BadLocationException
 import javax.swing.text.DefaultStyledDocument
@@ -57,17 +55,11 @@ open class TextNode(
             textNodes.add(this)
 
             if (textNodes.size == 1) {
-                contextMenu.add(object : AbstractAction() {
-                    init {
-                        putValue(NAME, "Edit text...")
-                    }
-
-                    override fun actionPerformed(e: ActionEvent) {
-                        textEntryDialog(textObject.text, "Edit Text", 20, 5) {
-                            textObject.text = it
-                            update()
-                        }.display()
-                    }
+                contextMenu.add(networkPanel.createAction(name = "Edit ${textObject.displayName}...") {
+                    textEntryDialog(textObject.text, "Edit Text", 20, 5) {
+                        textObject.text = it
+                        update()
+                    }.display()
                 })
             }
 

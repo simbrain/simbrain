@@ -1,11 +1,7 @@
 package org.simbrain.network.gui.nodes
 
 import org.simbrain.network.core.SynapseGroup
-import org.simbrain.network.gui.NetworkPanel
-import org.simbrain.network.gui.WeightMatrixViewer
-import org.simbrain.network.gui.createCouplingMenu
-import org.simbrain.network.gui.createTooltipText
-import org.simbrain.network.gui.getDialog
+import org.simbrain.network.gui.*
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.createAction
 import org.simbrain.util.displayInDialog
@@ -35,7 +31,7 @@ class SynapseGroupInteractionBox(
             val menu = JPopupMenu()
 
             // Edit
-            menu.add(networkPanel.createAction(name = "Edit synapse group...") {
+            menu.add(networkPanel.createAction(name = "Edit ${synapseGroup.displayName}...") {
                 synapseGroupNode.getDialog().makeVisible()
             })
             menu.add(networkPanel.createAction(

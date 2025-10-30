@@ -286,12 +286,16 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         networkPanel.showEditDialogsForSelectedModels()
     }
 
-    val setNeuronPropertiesAction = networkPanel.createAction(
-        name = "Neuron properties...",
-        description = "Set the properties of selected neurons (Cmd/Ctrl-E)",
-        keyboardShortcut = CmdOrCtrl + 'E',
-    ) {
-        networkPanel.filterSelectedNodeByClass<NeuronNode>().firstOrNull()?.createEditDialog()?.display()
+    val setNeuronPropertiesAction get() = run {
+        val selectedNeurons = networkPanel.selectionManager.filterSelectedModels<Neuron>()
+        val count = selectedNeurons.size
+        networkPanel.createAction(
+            name = "Edit $count ${if (count == 1) "neuron" else "neurons"}...",
+            description = "Set the properties of selected neurons (Cmd/Ctrl-E)",
+            keyboardShortcut = CmdOrCtrl + 'E',
+        ) {
+            networkPanel.filterSelectedNodeByClass<NeuronNode>().firstOrNull()?.createEditDialog()?.display()
+        }
     }
     val setSourceNeurons get() = networkPanel.createConditionallyEnabledAction(
         name = "Set source neurons",
@@ -301,12 +305,16 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         selectionManager.convertSelectedNodesToSourceNodes()
     }
 
-    val setSynapsePropertiesAction get() = networkPanel.createAction(
-        name = "Synapse properties...",
-        description = "Set the properties of selected synapses (Cmd/Ctrl-E)",
-        keyboardShortcut = CmdOrCtrl + 'E',
-    ) {
-        networkPanel.filterSelectedNodeByClass<SynapseNode>().firstOrNull()?.createEditDialog()?.display()
+    val setSynapsePropertiesAction get() = run {
+        val selectedSynapses = networkPanel.selectionManager.filterSelectedModels<Synapse>()
+        val count = selectedSynapses.size
+        networkPanel.createAction(
+            name = "Edit $count ${if (count == 1) "synapse" else "synapses"}...",
+            description = "Set the properties of selected synapses (Cmd/Ctrl-E)",
+            keyboardShortcut = CmdOrCtrl + 'E',
+        ) {
+            networkPanel.filterSelectedNodeByClass<SynapseNode>().firstOrNull()?.createEditDialog()?.display()
+        }
     }
     val showEditToolBarAction = networkPanel.createAction(
         name = "Edit toolbar",

@@ -144,10 +144,12 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
             contextMenu.addSeparator()
 
             // Edit Submenu
-            val editArray: Action = object : AbstractAction("Edit...") {
-                override fun actionPerformed(event: ActionEvent) {
-                    propertyDialog?.display()
-                }
+            val selectedMatrices = networkPanel.selectionManager.filterSelectedModels<WeightMatrix>()
+            val count = selectedMatrices.size
+            val editArray = networkPanel.createAction(
+                name = "Edit $count weight ${if (count == 1) "matrix" else "matrices"}..."
+            ) {
+                propertyDialog?.display()
             }
             contextMenu.add(editArray)
             contextMenu.add(networkPanel.networkActions.deleteAction)

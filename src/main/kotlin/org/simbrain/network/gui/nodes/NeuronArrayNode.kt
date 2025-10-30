@@ -274,10 +274,12 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             contextMenu.add(networkPanel.networkActions.pasteAction)
             contextMenu.add(networkPanel.networkActions.duplicateAction)
             contextMenu.addSeparator()
-            val editArray: Action = object : AbstractAction("Edit...") {
-                override fun actionPerformed(event: ActionEvent) {
-                    propertyDialog?.display()
-                }
+            val selectedArrays = networkPanel.selectionManager.filterSelectedModels<NeuronArray>()
+            val count = selectedArrays.size
+            val editArray = networkPanel.createAction(
+                name = "Edit $count neuron ${if (count == 1) "array" else "arrays"}..."
+            ) {
+                propertyDialog?.display()
             }
             contextMenu.add(editArray)
             contextMenu.add(networkPanel.networkActions.deleteAction)

@@ -355,10 +355,12 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
             contextMenu.add(networkPanel.networkActions.pasteAction)
             contextMenu.add(networkPanel.networkActions.duplicateAction)
             contextMenu.addSeparator()
-            val editArray: Action = object : AbstractAction("Edit...") {
-                override fun actionPerformed(event: ActionEvent) {
-                    propertyDialog?.display()
-                }
+            val selectedBlocks = networkPanel.selectionManager.filterSelectedModels<TransformerBlock>()
+            val count = selectedBlocks.size
+            val editArray = networkPanel.createAction(
+                name = "Edit $count transformer ${if (count == 1) "block" else "blocks"}..."
+            ) {
+                propertyDialog?.display()
             }
             contextMenu.add(editArray)
             contextMenu.add(networkPanel.networkActions.deleteAction)

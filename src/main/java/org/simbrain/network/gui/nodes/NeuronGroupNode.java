@@ -16,6 +16,7 @@ import java.util.List;
 
 import static org.simbrain.network.gui.NetworkDialogsKt.createNeuronGroupDialog;
 import static org.simbrain.network.gui.NetworkPanelMenusKt.createCouplingMenu;
+import static org.simbrain.network.gui.NetworkPanelMenusKt.createEditNeuronGroupAction;
 
 /**
  * PNode representation of a group of neurons. Contains an interaction box and
@@ -87,15 +88,11 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
         JPopupMenu menu = new JPopupMenu();
 
         // Edit Submenu
-        Action editGroup = new AbstractAction("Edit...") {
-            @Override
-            public void actionPerformed(final ActionEvent event) {
-                StandardDialog dialog = getPropertyDialog();
-                dialog.pack();
-                dialog.setLocationRelativeTo(null);
-                dialog.setVisible(true);
-            }
-        };
+        Action editGroup = createEditNeuronGroupAction(
+            getNetworkPanel(),
+            neuronGroup,
+            this::getPropertyDialog
+        );
         menu.add(editGroup);
         menu.add(renameAction);
         menu.add(removeAction);

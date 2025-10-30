@@ -73,7 +73,14 @@ class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: Super
 
     override val contextMenu: JPopupMenu
         get() = JPopupMenu().apply {
-            add(createEditAction("Edit / Train..."))
+            add(createEditAction("Edit ${supervisedModel.displayName}..."))
+            add(createAction("Train...") {
+                propertyDialog.run {
+                    pack()
+                    setLocationRelativeTo(null)
+                    isVisible = true
+                }
+            })
             add(renameAction)
             add(removeAction)
             addSeparator()

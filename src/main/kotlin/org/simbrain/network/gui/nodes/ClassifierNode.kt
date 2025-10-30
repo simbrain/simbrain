@@ -9,7 +9,6 @@ import org.simbrain.network.smile.ClassifierNetwork
 import org.simbrain.util.*
 import org.simbrain.util.widgets.bezierArrow
 import org.simbrain.workspace.gui.SimbrainDesktop
-import javax.swing.JMenuItem
 import javax.swing.JPopupMenu
 
 class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifier: ClassifierNetwork):
@@ -28,10 +27,11 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
 
     override val contextMenu: JPopupMenu
         get() = JPopupMenu().apply {
-            add(JMenuItem("Set Properties / Train ...").apply {
-                addActionListener {
-                    propertyDialog.display()
-                }
+            add(networkPanel.createAction(name = "Edit ${smileClassifier.displayName}...") {
+                propertyDialog.display()
+            })
+            add(networkPanel.createAction(name = "Train...") {
+                propertyDialog.display()
             })
             add(createAction("Visualize Classifier") {
                 SimbrainDesktop.workspace.launch(Dispatchers.Default) {

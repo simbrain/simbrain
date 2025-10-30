@@ -24,7 +24,7 @@ class SRNNode(networkPanel: NetworkPanel, private val srn: SRNNetwork):
             applyBasicActions()
 
             // Train Submenu
-            add(networkPanel.createAction(name = "Train network") {
+            add(networkPanel.createAction(name = "Train...") {
                 srn.getSupervisedTrainingDialog().display()
             })
         }

@@ -73,6 +73,8 @@ val denisonNet = newSim {
     val vaLayer = net.addNeuronGroup(1).apply { label = "Voluntary Attention" }
     val iaLayer = net.addNeuronGroup(1).apply { label = "Involuntary Attention" }
 
+
+
     sensory1.setUpperBound(0.1)
     sensory2.setUpperBound(0.1)
     decision.setLowerBound(-0.000002)
@@ -218,15 +220,22 @@ val denisonNet = newSim {
         currentStatus.location = point(220, -240)
         reportStatus.location = point(220, -220)
         modelDecision.location = point(220, -180)
-        currentStatus.text = "Paying Attention to Both"
+
+        sensory1.location = point(0.0, 100.0)
+        sensory2.location = point(220.0, 100.0)
+        decision.location = point(440.0, 100.0)
+        vaLayer.location = point(90.0, -70.0)
+        iaLayer.location = point(330.0, -70.0)
+
+            currentStatus.text = "Paying Attention to Both"
 
         createControlPanel("Control Panel", 15, 15) {
             addButton("Cue T1") { vaState = 1; currentStatus.text = "Paying Attention to T1" }
             addButton("Cue T2") { vaState = 2; currentStatus.text = "Paying Attention to T2" }
             addButton("Cue Both") { vaState = 0; currentStatus.text = "Paying Attention to Both" }
-            addSeparator()
-            addButton("Report T1") { reportTarget = 1; reportStatus.text = "Reporting T1" }
-            addButton("Report T2") { reportTarget = 2; reportStatus.text = "Reporting T2" }
+            //addSeparator()
+            //addButton("Report T1") { reportTarget = 1; reportStatus.text = "Reporting T1" }
+            //addButton("Report T2") { reportTarget = 2; reportStatus.text = "Reporting T2" }
             addSeparator()
 
             workspace.updater.updateManager.clear()
@@ -235,6 +244,8 @@ val denisonNet = newSim {
 
             addButton("Start") {
                 workspace.launch {
+                    plot.model.clearData()
+
                     SOA = Random.nextInt(100, 801)
                     T1 = Random.nextInt(0, 24)
                     T2 = Random.nextInt(0, 24)
@@ -260,6 +271,8 @@ val denisonNet = newSim {
                     vaLayer.setActivations(doubleArrayOf(0.0))
                     iaLayer.setActivations(doubleArrayOf(0.0))
                     s1History.clear()
+
+                    workspace.resetTime()
 
                     while (workspace.time < 2100 / dt) {
                         // Record sensory1 history
@@ -299,7 +312,6 @@ val denisonNet = newSim {
                     val T2decision = if (decision.getNeuron(1).activation > 0) "Clockwise" else "Counterclockwise"
 
                     modelDecision.text = "T1 Decision: $T1decision | Correct: $T1correct\nT2 Decision: $T2decision | Correct: $T2correct"
-                    workspace.resetTime()
                 }
             }
         }
@@ -309,10 +321,10 @@ addSidebarInfo(
         """
         # Introduction
         
-        This is a neural network simulation of visual attention, based on the paper "A dynamic normalization
-        model of temporal attention" by Rachel Denison.
+        This is a neural network simulation of visual attention, based on the paper ["A dynamic normalization
+        model of temporal attention"](https://www.nature.com/articles/s41562-021-01129-1) by Rachel Denison.
         
-        In an experiment, participants were asked to pay attention to 2 rotating grates. The grates rotated
+        In an experiment, participants were asked to pay attention to 2 tilted grates. The grates rotated
         either clockwise or counterclockwise, and the grates were shown 1 after the other. Participants
         were cued with a noise, which told them which grate to pay attention to. Afterwards, they were
         asked to report the rotation direction of one of the grates. For example, a participant would be
@@ -321,13 +333,27 @@ addSidebarInfo(
         
         The researchers found that when the cued noise matched the reporting grate, the overall response
         times were faster than if they were mismatched (Ex. T1 is cued and asked vs. T1 is cued but T2
-        is asked). A model was then built simulating this.
+        is asked). A model was then built simulating these dynamics.
         
         The model consists of 5 layers. 2 of the layers are input layers, 2 of them are attention layers
         (Involuntary and Voluntary), and there is 1 decision layer.
         
+        # What to Do
+        
+        In the control panel, you are able set the parameters of a given trial. Start out by running the trial and
+        observe what happens. After the trial ends, open the graph on the attentions.
+        
+        When a grating appears in the panel to the right, the neurons in the first sensory layer pick it up. Each neuron
+        in this layer is tuned to a different orientation and has different responses to different orientations. These
+        activations are passed up through the network and are accumulated in the decision layer.
+        
+        Open up the attentions plot and take note of how it looks. Try different cueings, and see how that affects
+        how much attention the model allocates to each target. The first decision neuron accumulates evidence for the first grating,
+        and similarly for the second. Observe the strength of the neurons in the decision layer (which correspond to
+         how "sure" the model is of its answer) and how the different cueings affect it.
+        
         # Credits 
-        Implemented by Jensen Guo
+        [Jensen Guo](https://www.linkedin.com/in/jensen-guo/)
         
         """.trimIndent()
     )

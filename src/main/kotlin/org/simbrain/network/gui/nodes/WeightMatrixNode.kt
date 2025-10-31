@@ -141,18 +141,18 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
             contextMenu.add(networkPanel.networkActions.copyAction)
             contextMenu.add(networkPanel.networkActions.pasteAction)
             contextMenu.add(networkPanel.networkActions.duplicateAction)
+            contextMenu.add(networkPanel.networkActions.deleteAction)
             contextMenu.addSeparator()
 
             // Edit Submenu
             val selectedMatrices = networkPanel.selectionManager.filterSelectedModels<WeightMatrix>()
-            val count = selectedMatrices.size
+            val count = selectedMatrices.sizeIncluding(weightMatrix)
             val editArray = networkPanel.createAction(
                 name = "Edit $count weight ${if (count == 1) "matrix" else "matrices"}..."
             ) {
                 propertyDialog?.display()
             }
             contextMenu.add(editArray)
-            contextMenu.add(networkPanel.networkActions.deleteAction)
             contextMenu.addSeparator()
             val randomizeAction: Action = networkPanel.networkActions.randomizeObjectsAction
             contextMenu.add(randomizeAction)

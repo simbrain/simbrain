@@ -6,6 +6,7 @@ import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PBounds
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.network.gui.createSynapseContextMenu
 import org.simbrain.network.gui.createTooltipText
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.dialogs.NetworkPreferences.excitatorySynapseColor
@@ -14,7 +15,6 @@ import org.simbrain.network.gui.dialogs.NetworkPreferences.maxWeightSize
 import org.simbrain.network.gui.dialogs.NetworkPreferences.minWeightSize
 import org.simbrain.network.gui.dialogs.NetworkPreferences.spikingColor
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog
-import org.simbrain.network.gui.synapseContextMenu
 import org.simbrain.util.StandardDialog
 import java.awt.Color
 import java.awt.geom.Arc2D
@@ -343,7 +343,7 @@ class SynapseNode(
         }
 
     override val contextMenu: JPopupMenu
-        get() = networkPanel.synapseContextMenu
+        get() = networkPanel.createSynapseContextMenu(synapse)
 
     override fun createEditDialog(): StandardDialog? {
         return SynapseDialog.createSynapseDialog(networkPanel.selectionManager.filterSelectedModels<Synapse>())

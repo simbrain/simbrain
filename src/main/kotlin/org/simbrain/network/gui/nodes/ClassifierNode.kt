@@ -33,6 +33,7 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
             add(networkPanel.createAction(name = "Train...") {
                 propertyDialog.display()
             })
+            addSeparator()
             add(createAction("Visualize Classifier") {
                 SimbrainDesktop.workspace.launch(Dispatchers.Default) {
                     SimbrainDesktop.createClassifierProjectionPlot(smileClassifier)

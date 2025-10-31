@@ -191,6 +191,14 @@ fun Collection<Double>.normalize(): List<Double> {
 }
 
 /**
+ * Returns the size of this collection, including the given item if it's not already in the collection.
+ * Useful for context menus where the right-clicked item may not yet be in the selection.
+ */
+fun <T> Collection<T>.sizeIncluding(item: T?): Int {
+    return if (item != null && !contains(item)) size + 1 else size
+}
+
+/**
  * A map that associates keys with deferred values, allowing asynchronous retrieval and completion.
  *
  * Useful when a value is expected to be provided later, and other code can `await` its availability.

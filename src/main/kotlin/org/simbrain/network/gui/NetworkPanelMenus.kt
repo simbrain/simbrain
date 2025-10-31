@@ -7,7 +7,10 @@ import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.gui.nodes.NeuronNode
 import org.simbrain.network.gui.nodes.SynapseNode
+import org.simbrain.util.CmdOrCtrl
 import org.simbrain.util.createAction
+import org.simbrain.util.display
+import org.simbrain.util.sizeIncluding
 import org.simbrain.util.widgets.ShowHelpAction
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.gui.CouplingMenu
@@ -201,16 +204,26 @@ val NetworkPanel.connectionMenu
         }
     }
 
-fun NetworkPanel.createNeuronContextMenu() = with(networkActions) {
-    val selectedNeuronList = selectionManager.filterSelectedModels<Neuron>()
-    JPopupMenu().apply {
-        add(cutAction)
-        add(copyAction)
-        add(pasteAction)
-        add(duplicateAction)
-        addSeparator()
-        add(deleteAction)
-        addSeparator()
+fun NetworkPanel.createNeuronContextMenu(currentNeuron: Neuron? = null): JPopupMenu {
+    val panel = this
+    return with(networkActions) {
+        val selectedNeuronList = selectionManager.filterSelectedModels<Neuron>()
+        val count = selectedNeuronList.sizeIncluding(currentNeuron)
+        JPopupMenu().apply {
+            add(cutAction)
+            add(copyAction)
+            add(pasteAction)
+            add(duplicateAction)
+            add(deleteAction)
+            addSeparator()
+            add(panel.createAction(
+                name = "Edit $count ${if (count == 1) "neuron" else "neurons"}...",
+                description = "Set the properties of selected neurons (Cmd/Ctrl-E)",
+                keyboardShortcut = CmdOrCtrl + 'E',
+            ) {
+                panel.filterSelectedNodeByClass<NeuronNode>().firstOrNull()?.createEditDialog()?.display()
+            })
+            addSeparator()
         add(clearSourceNeurons)
         add(setSourceNeurons)
         add(connectionMenu)
@@ -226,8 +239,6 @@ fun NetworkPanel.createNeuronContextMenu() = with(networkActions) {
             add(spaceMenu)
             addSeparator()
         }
-        add(setNeuronPropertiesAction)
-        addSeparator()
         add(JMenu("Select").apply {
             add(selectIncomingWeightsAction)
             add(selectOutgoingWeightsAction)
@@ -244,19 +255,29 @@ fun NetworkPanel.createNeuronContextMenu() = with(networkActions) {
             addSeparator()
             add(CouplingMenu(node.networkPanel.networkComponent, node.neuron))
         }
+        }
     }
 }
 
-val NetworkPanel.synapseContextMenu
-    get() = with(networkActions) {
+fun NetworkPanel.createSynapseContextMenu(currentSynapse: Synapse? = null): JPopupMenu {
+    val panel = this
+    return with(networkActions) {
         val selectedSynapses = selectionManager.filterSelectedModels<Synapse>()
+        val count = selectedSynapses.sizeIncluding(currentSynapse)
         JPopupMenu().apply {
             add(cutAction)
             add(copyAction)
             add(pasteAction)
             add(duplicateAction)
-            addSeparator()
             add(deleteAction)
+            addSeparator()
+            add(panel.createAction(
+                name = "Edit $count ${if (count == 1) "synapse" else "synapses"}...",
+                description = "Set the properties of selected synapses (Cmd/Ctrl-E)",
+                keyboardShortcut = CmdOrCtrl + 'E',
+            ) {
+                panel.filterSelectedNodeByClass<SynapseNode>().firstOrNull()?.createEditDialog()?.display()
+            })
             if (selectedSynapses.isNotEmpty()) {
                 addSeparator()
                 add(selectedSynapses.createCoupleWeightToTimeSeriesAction())
@@ -266,10 +287,9 @@ val NetworkPanel.synapseContextMenu
                 addSeparator()
                 add(CouplingMenu(networkComponent, node.synapse))
             }
-            addSeparator()
-            add(setSynapsePropertiesAction)
         }
     }
+}
 
 fun NetworkComponent.createCouplingMenu(container: AttributeContainer) = CouplingMenu(this, container)
 

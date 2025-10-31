@@ -46,6 +46,7 @@ open class TextNode(
             contextMenu.add(actions.copyAction)
             contextMenu.add(actions.pasteAction)
             contextMenu.add(actions.duplicateAction)
+            contextMenu.add(networkPanel.networkActions.deleteAction)
             contextMenu.addSeparator()
 
             val textNodes = networkPanel.selectionManager.selection.stream()
@@ -64,9 +65,7 @@ open class TextNode(
             }
 
             contextMenu.add(networkPanel.networkActions.setTextPropertiesAction(textNodes))
-
             contextMenu.addSeparator()
-            contextMenu.add(networkPanel.networkActions.deleteAction)
 
             return contextMenu
         }

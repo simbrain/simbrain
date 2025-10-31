@@ -73,6 +73,9 @@ class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: Super
 
     override val contextMenu: JPopupMenu
         get() = JPopupMenu().apply {
+            add(renameAction)
+            add(removeAction)
+            addSeparator()
             add(createEditAction("Edit ${supervisedModel.displayName}..."))
             add(createAction("Train...") {
                 propertyDialog.run {
@@ -81,8 +84,6 @@ class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: Super
                     isVisible = true
                 }
             })
-            add(renameAction)
-            add(removeAction)
             addSeparator()
             add(createAction("Add Current Data to Training Set") {
                 supervisedModel.trainingSet.inputs.add(supervisedModel.inputLayer.activationArray.toMutableList())

@@ -30,9 +30,11 @@ class SynapseGroupInteractionBox(
 
             val menu = JPopupMenu()
 
-            // Edit
-            menu.add(networkPanel.createAction(name = "Edit ${synapseGroup.displayName}...") {
-                synapseGroupNode.getDialog().makeVisible()
+            menu.add(networkPanel.createAction(
+                name = "Rename synapse group..."
+            ) {
+                val newName = JOptionPane.showInputDialog("Name:", synapseGroup.label)
+                synapseGroup.label = newName
             })
             menu.add(networkPanel.createAction(
                 iconPath = "menu_icons/minus.png",
@@ -40,11 +42,12 @@ class SynapseGroupInteractionBox(
             ) {
                 synapseGroup.delete()
             })
-            menu.add(networkPanel.createAction(
-                name = "Rename synapse group..."
-            ) {
-                val newName = JOptionPane.showInputDialog("Name:", synapseGroup.label)
-                synapseGroup.label = newName
+            
+            menu.addSeparator()
+            
+            // Edit
+            menu.add(networkPanel.createAction(name = "Edit ${synapseGroup.displayName}...") {
+                synapseGroupNode.getDialog().makeVisible()
             })
 
             // Selection stuff

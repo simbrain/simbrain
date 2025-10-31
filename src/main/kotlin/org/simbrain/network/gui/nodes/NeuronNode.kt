@@ -114,7 +114,7 @@ class NeuronNode(net: NetworkPanel, val neuron: Neuron) : ScreenElement(net) {
         get() = neuron.location
 
     override val contextMenu: JPopupMenu
-        get() = networkPanel.createNeuronContextMenu()
+        get() = networkPanel.createNeuronContextMenu(neuron)
 
     override fun createEditDialog(): StandardDialog? {
         return networkPanel.filterSelectedModelByClass<Neuron>().let { neurons ->

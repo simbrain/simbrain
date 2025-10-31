@@ -354,16 +354,16 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
             contextMenu.add(networkPanel.networkActions.copyAction)
             contextMenu.add(networkPanel.networkActions.pasteAction)
             contextMenu.add(networkPanel.networkActions.duplicateAction)
+            contextMenu.add(networkPanel.networkActions.deleteAction)
             contextMenu.addSeparator()
             val selectedBlocks = networkPanel.selectionManager.filterSelectedModels<TransformerBlock>()
-            val count = selectedBlocks.size
+            val count = selectedBlocks.sizeIncluding(transformerBlock)
             val editArray = networkPanel.createAction(
                 name = "Edit $count transformer ${if (count == 1) "block" else "blocks"}..."
             ) {
                 propertyDialog?.display()
             }
             contextMenu.add(editArray)
-            contextMenu.add(networkPanel.networkActions.deleteAction)
             contextMenu.addSeparator()
             contextMenu.add(networkPanel.networkActions.connectSelectedModels)
             contextMenu.addSeparator()

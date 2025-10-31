@@ -87,6 +87,11 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
     public JPopupMenu getDefaultContextMenu() {
         JPopupMenu menu = new JPopupMenu();
 
+        menu.add(renameAction);
+        menu.add(removeAction);
+
+        menu.addSeparator();
+        
         // Edit Submenu
         Action editGroup = createEditNeuronGroupAction(
             getNetworkPanel(),
@@ -94,9 +99,7 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
             this::getPropertyDialog
         );
         menu.add(editGroup);
-        menu.add(renameAction);
-        menu.add(removeAction);
-
+        
         menu.addSeparator();
         menu.add(getNetworkPanel().getNetworkActions().showApplyLayoutDialogAction(neuronGroup));
 

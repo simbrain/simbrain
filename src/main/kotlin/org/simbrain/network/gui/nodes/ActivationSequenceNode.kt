@@ -98,16 +98,16 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
             contextMenu.add(networkPanel.networkActions.copyAction)
             contextMenu.add(networkPanel.networkActions.pasteAction)
             contextMenu.add(networkPanel.networkActions.duplicateAction)
+            contextMenu.add(networkPanel.networkActions.deleteAction)
             contextMenu.addSeparator()
             val selectedSequences = networkPanel.selectionManager.filterSelectedModels<ActivationSequence>()
-            val count = selectedSequences.size
+            val count = selectedSequences.sizeIncluding(activationSequence)
             val editArray = networkPanel.createAction(
                 name = "Edit $count activation ${if (count == 1) "sequence" else "sequences"}..."
             ) {
                 propertyDialog?.display()
             }
             contextMenu.add(editArray)
-            contextMenu.add(networkPanel.networkActions.deleteAction)
             contextMenu.addSeparator()
             contextMenu.add(networkPanel.networkActions.connectSelectedModels)
             contextMenu.addSeparator()

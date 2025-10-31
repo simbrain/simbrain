@@ -83,6 +83,11 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
 
         JPopupMenu menu = new JPopupMenu();
 
+        menu.add(renameAction);
+        menu.add(removeAction);
+
+        menu.addSeparator();
+        
         // Edit action
         Action editCollection = createEditNeuronCollectionAction(
             getNetworkPanel(),
@@ -90,9 +95,7 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
             this::getPropertyDialog
         );
         menu.add(editCollection);
-        menu.add(renameAction);
-        menu.add(removeAction);
-
+        
         menu.addSeparator();
         menu.add(getNetworkPanel().getNetworkActions().showApplyLayoutDialogAction(neuronCollection));
 

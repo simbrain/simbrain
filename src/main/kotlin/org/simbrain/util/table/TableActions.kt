@@ -348,7 +348,7 @@ fun SimbrainJTable.createOpenProjectionAction(useRowLabels: Boolean = false) = c
     ) {
         withContext(Dispatchers.Default) {
             val projectionComponent = ProjectionComponent("Projection of table data")
-            projectionComponent.projector.useHotColor = false
+            projectionComponent.projector.useHotPoint = false
             projectionComponent.projector.showLabels = useRowLabels
             SimbrainDesktop.workspace.addWorkspaceComponent(projectionComponent)
             val points = model.let { it.rowNames zip it.get2DDoubleArray() }.map { (name, data) -> DataPoint(data, label = name) }

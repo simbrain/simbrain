@@ -96,24 +96,6 @@ class DecayColoringManager: ColoringManager() {
             }
         }
 
-    var baseColor = Color.DARK_GRAY
-        set(value) {
-            if (field != value) {
-                field = value
-                isValuesToColorsDirty = true
-                updateAllColors()
-            }
-        }
-
-    var hotColor = Color.red
-        set(value) {
-            if (field != value) {
-                field = value
-                isValuesToColorsDirty = true
-                updateAllColors()
-            }
-        }
-
     /**
      * A list of colors indexed by values.
      */
@@ -123,8 +105,6 @@ class DecayColoringManager: ColoringManager() {
 
     context(Projector)
     fun initColors(): List<Color> {
-        this@DecayColoringManager.baseColor = baseColor
-        this@DecayColoringManager.hotColor = hotColor
         return HSBInterpolate(baseColor.toHSB(), hotColor.toHSB(), stepsToBase)
     }
 

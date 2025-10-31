@@ -377,7 +377,7 @@ private class CustomRenderer(val proj: ProjectionDesktopComponent) : XYLineAndSh
     }
 
     override fun getItemOutlineStroke(series: Int, index: Int): Stroke {
-        if (proj.pointList[index] === proj.projector.dataset.currentPoint) {
+        if (proj.projector.useHotPoint && proj.pointList[index] === proj.projector.dataset.currentPoint) {
             return BasicStroke(6f)
         }
         return BasicStroke(0f)

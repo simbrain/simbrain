@@ -71,7 +71,7 @@ class Projector(initialDimension: Int = 25) : EditableObject, CoroutineScope {
     var showLabels = true
 
     @UserParameter(label = "Use hot point", description = "If true, current point is rendered using the hotpoint color", order = 50)
-    var useHotColor = true
+    var useHotPoint = true
 
     @UserParameter(label = "Extreme Value Threshold", description = "Data points with absolute values >= this threshold (or infinite/NaN values) will be filtered out to prevent projection issues.", minimumValue = 1.0, order = 60)
     var extremeValueThreshold: Double = 1e50

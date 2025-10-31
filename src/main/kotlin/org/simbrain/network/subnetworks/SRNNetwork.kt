@@ -1,6 +1,5 @@
 package org.simbrain.network.subnetworks
 
-import kotlinx.coroutines.runBlocking
 import org.simbrain.network.core.*
 import org.simbrain.network.trainers.*
 import org.simbrain.network.updaterules.LinearRule
@@ -17,7 +16,6 @@ import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
 import java.awt.geom.Point2D
-import kotlin.math.ceil
 
 /**
  *  Implements a simple recurrent network (See Elman 1990, Finding Structure in Time).
@@ -76,11 +74,8 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
         contextToHidden.randomize()
         addModels(contextToHidden)
 
-        trainingSet = createDiagonalDataset(numInputNodes, numOutputNodes, shiftAmount = 1)
-        testingSet = TrainingDataset(
-            inputs = MutableList(ceil(trainingSet.size * 0.2).toInt()) { MutableList(trainingSet.inputs.firstOrNull()?.size ?: 0) { 0.0 } },
-            targets = MutableList(ceil(trainingSet.size * 0.2).toInt()) { MutableList(trainingSet.targets.firstOrNull()?.size ?: 0) { 0.0 } }
-        )
+        trainingSet = createBouncingDataset(numInputNodes)
+        testingSet = TrainingDataset(mutableListOf(), mutableListOf(), numInputNodes, numOutputNodes)
 
         setLocation(initialPosition.x, initialPosition.y)
 
@@ -103,9 +98,7 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
 
     context(Network)
     override fun update() {
-        runBlocking {
-            forwardPass()
-        }
+        forwardPass()
         //inputLayer.update()
         //hiddenLayer.accumulateInputs()
         //hiddenLayer.update()

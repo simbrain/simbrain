@@ -641,6 +641,11 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
 }
 
 class SRNTrainerConfig(lossFunctionProvider: KFunction<List<Class<out EditableObject>>>? = null): SupervisedTrainerConfig(lossFunctionProvider) {
+
+    init {
+        testConfiguration.enabled = false
+    }
+
     override var updateType: UpdateMethod by GuiEditable(
         initValue = UpdateMethod.Epoch(),
         typeMapProvider = UpdateMethod::srnTypeList, // Only allow epoch for SRN

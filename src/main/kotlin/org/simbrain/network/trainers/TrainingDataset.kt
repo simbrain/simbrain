@@ -88,6 +88,28 @@ fun createDiagonalDataset(nInputs: Int, nOutputs: Int, shiftAmount: Int = 0): Tr
     )
 }
 
+fun createBouncingDataset(size: Int): TrainingDataset {
+
+    val inputs = buildList {
+        (0 until size).forEach { i ->
+            add(MutableList(size) { j -> if (i == j) 1.0 else 0.0 })
+        }
+        (size - 2 downTo 1).forEach { i ->
+            add(MutableList(size) { j -> if (i == j) 1.0 else 0.0 })
+        }
+    }
+
+    val outputs = inputs.drop(1) + inputs.take(1)
+
+    return TrainingDataset(
+        inputs = inputs.toMutableList(),
+        targets = outputs.toMutableList(),
+        inputSize = size,
+        targetSize = size
+    )
+
+}
+
 /**
  * Creates a simple default training dataset that will look good in the Simbrain GUI.
  *

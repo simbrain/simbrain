@@ -12,7 +12,7 @@ import org.simbrain.util.stats.distributions.NormalDistribution
 
 
 /**
- * Demo for studying competitive networks,
+ * Demo for studying competitive networks.
  */
 val competitiveSim = newSim {
 
@@ -25,6 +25,8 @@ val competitiveSim = newSim {
     val competitive = CompetitiveNetwork(7, 5)
     network.addNetworkModelAsync(competitive)
     competitive.inputLayer.setUpperBound(1.0)
+    
+    competitive.competitive.params.learningRate = 0.05
 
     // Label for winner
     var winningLabel = ""
@@ -35,6 +37,8 @@ val competitiveSim = newSim {
         
         A simple competitive network is an unsupervised neural network trained to classify input patterns into output neurons. It learns to detect clusters in the input group, with the output responding to these clusters of patterns. The competitive group is initialized with randomized weights.
 
+        One way to get familiar with this simulation is to treat it as a game. Try to train the network so that each input pattern triggers a distinct output neuron. This may be impossible, but you should at least be able to get four distinct responses.
+        
         # Simulation Details
         
         The user selects different patterns using the buttons on the control panel. Each time a pattern is chosen and the network is iterated (stepped), the network trains a neuron to respond to the selected pattern. With each iteration the training algorithm is applied, strengthening the current response to the input.
@@ -43,17 +47,42 @@ val competitiveSim = newSim {
         
         Over time, the output neurons improve their ability to classify the clusters in the input space. The user repeats this process until the trained network responds to each pattern with a different output neuron. The network relies on the statistical properties of the inputs provided during training.
 
+        # Training Strategy
+        
+        Competitive networks can be challenging to train, especially with overlapping patterns. Here are key strategies for success:
+        
+        **Early Training:**
+        - Train each pattern ONCE before repeating any pattern
+        - This allows each competitive neuron to "claim" a pattern before they become too specialized
+        - The order matters: try presenting all patterns once before cycling through them again
+        
+        **Avoid Overtraining:**
+        - Don't train the same pattern multiple times in a row early on
+        - This causes one neuron to become too dominant, leaving fewer neurons available for other patterns
+        
+        **If Training Fails:**
+        - Use "Reset" to randomize weights and try again
+        - Try a different presentation order
+        - Right-click the competitive group to adjust learning rate (lower values like 0.02-0.05 work better for overlapping patterns)
+        
+        **Pattern Characteristics:**
+        - Patterns with more unique features (non-overlapping input nodes) are easier to separate
+        - Patterns that share many features will compete for the same neurons
+        - The network uses normalized inputs, so patterns with similar proportions are harder to distinguish
+        
         # What to Do
         
-        One way to get familiar with this simulation is to treat it as a game. Try to train the network so that each input pattern triggers a distinct output neuron, associating each input to a distinct output. This is not easy, since overlapping inputs often get mapped to the same output. So it requires using different inputs early on, and training just once per different input. Overtraining an input can cause it to be over-represented.
+        Try to train the network so that each input pattern triggers a distinct output neuron.
         
         1. Select a pattern using one of the buttons (Pattern 1-5)
         
-        2. Run the simulation to see which output neuron wins
+        2. Click "Train" to iterate the network and see which output neuron wins
         
-        3. Repeat with different patterns to train the network
+        3. Repeat with different patterns, training each one once before cycling
         
         4. Try to achieve a situation where each pattern activates a different output neuron
+        
+        5. Use "Reset" if you want to start over with fresh random weights
         
         """.trimIndent()
     )
@@ -94,6 +123,9 @@ val competitiveSim = newSim {
                 workspace.iterateSuspend()
                 val winner = competitive.competitive.neuronList[competitive.competitive.activationArray.indexOfFirst { it > 0.0 }]
                 winner.label = winningLabel
+            }
+            addButton("Reset") {
+                competitive.randomize()
             }
         }
     }

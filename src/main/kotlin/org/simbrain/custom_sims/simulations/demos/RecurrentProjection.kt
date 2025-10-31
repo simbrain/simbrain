@@ -3,7 +3,6 @@ package org.simbrain.custom_sims.simulations
 import org.simbrain.custom_sims.*
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connections.Sparse
-import org.simbrain.network.core.Network
 import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.network.core.connect
@@ -103,18 +102,18 @@ val recurrentProjection = newSim("recurrent_projection") {
             
             ## Tips and Tricks
             
-            - **Speed Up the Simulation**
-              - Click inside the **Network window** and press the `5` key to toggle **weight visibility** off.
+            - Speed Up the Simulation
+              - Click inside the Network window and press the `5` key to toggle weight visibility off.
               - This reduces rendering load and makes the simulation run faster.
             
-            - **Explore Different System Sizes**
-              - When the simulation starts, you’ll be prompted to enter the **number of neurons**.
+            - Explore Different System Sizes
+              - When the simulation starts, you’ll be prompted to enter the number of neurons.
               - Try different values to see how system size affects dynamics.
             
-            - **Types of Behavior to Look For**
-              - **Fixed points**: Trajectory settles into a single location.
-              - **Limit cycles**: Loops or rings in the projection plot.
-              - **Chaos**: Irregular paths, often with sudden changes and no repeating pattern.
+            - Types of Behavior to Look For
+              - Fixed points: Trajectory settles into a single location.
+              - Limit cycles: Loops or rings in the projection plot.
+              - Chaos: Irregular paths, often with sudden changes and no repeating pattern.
             
             You can experiment by repeatedly clicking the buttons in different sequences, observing the resulting behavior, 
             and thinking about how initial conditions and connection patterns shape neural dynamics.

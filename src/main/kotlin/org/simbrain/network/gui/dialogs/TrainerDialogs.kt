@@ -421,7 +421,6 @@ context(Network)
 fun UnsupervisedNetwork.createTrainOnPatternAction() = createAction(
     name = "Train on current pattern...",
     description = "Train network on current pattern for specified number of iterations.",
-    iconPath = "menu_icons/BatchPlay.png"
 ) {
     val iterations: Int? = showNumericInputDialog("Iterations: ", NetworkPreferences.numberOfIterations)?.toInt()
     if (iterations != null) {
@@ -430,4 +429,13 @@ fun UnsupervisedNetwork.createTrainOnPatternAction() = createAction(
             trainOnCurrentPattern()
         }
     }
+}
+
+context(NetworkPanel)
+fun UnsupervisedNetwork.createTrainOnceOnPatternAction() = createAction(
+    name = "Train once on current pattern",
+    description = "Train network for one iteration on current pattern.",
+    keyboardShortcut = KeyCombination('T')
+) {
+    with(network) {trainOnCurrentPattern()}
 }

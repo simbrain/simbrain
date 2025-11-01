@@ -7,6 +7,7 @@ import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.events.LocationEvents
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.dialogs.createTrainOnPatternAction
+import org.simbrain.network.gui.dialogs.createTrainOnceOnPatternAction
 import org.simbrain.network.gui.dialogs.getUnsupervisedTrainingPanel
 import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.trainers.UnsupervisedNetwork
@@ -133,10 +134,16 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
             }.display()
         })
         add(with(networkPanel.network) { net.createTrainOnPatternAction() })
+        add(net.createTrainOnceOnPatternAction())
         addSeparator()
-        add(createAction("Randomize") {
-            net.randomize()
-        })
+        add(
+            createAction(
+                iconPath = "menu_icons/Rand.png",
+                name = "Randomize",
+                keyboardShortcut = 'R'
+            ) {
+                net.randomize()
+            })
     }
 
     protected fun createEditAction(name: String) = createAction(name = name) {

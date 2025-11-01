@@ -1,9 +1,6 @@
 package org.simbrain.custom_sims.simulations.demos
 
-import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.addSidebarInfo
-import org.simbrain.custom_sims.createControlPanel
-import org.simbrain.custom_sims.newSim
+import org.simbrain.custom_sims.*
 import org.simbrain.network.core.activations
 import org.simbrain.network.subnetworks.CompetitiveNetwork
 import org.simbrain.util.add
@@ -29,7 +26,7 @@ val competitiveSim = newSim {
     competitive.competitive.params.learningRate = 0.05
 
     var winningLabel = ""
-    val labelToNodeMap = mutableMapOf<String, org.simbrain.network.core.Neuron>()
+    val labelTracker = WinnerLabeler()
 
     val docViewer = addSidebarInfo(
         """
@@ -151,26 +148,11 @@ val competitiveSim = newSim {
             addButton("Train") {
                 workspace.iterateSuspend()
                 val winner = competitive.competitive.neuronList[competitive.competitive.activationArray.indexOfFirst { it > 0.0 }]
-                
-                val previousNode = labelToNodeMap[winningLabel]
-                if (previousNode != null && previousNode != winner) {
-                    val oldLabel = previousNode.label ?: ""
-                    previousNode.label = oldLabel.replace(winningLabel, "").replace(", ,", ",").trim(',', ' ').ifEmpty { null }
-                }
-                
-                val currentLabel = winner.label
-                if (currentLabel.isNullOrEmpty()) {
-                    winner.label = winningLabel
-                } else if (!currentLabel.contains(winningLabel)) {
-                    winner.label = currentLabel + ", " + winningLabel
-                }
-                
-                labelToNodeMap[winningLabel] = winner
+                labelTracker.updateWinner(winningLabel, winner)
             }
             addButton("Reset") {
                 competitive.randomize()
-                competitive.competitive.neuronList.forEach { it.label = null }
-                labelToNodeMap.clear()
+                labelTracker.clear(competitive.competitive.neuronList)
             }
         }
     }

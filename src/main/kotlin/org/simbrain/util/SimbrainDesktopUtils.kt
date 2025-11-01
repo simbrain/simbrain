@@ -18,6 +18,7 @@ import org.simbrain.workspace.gui.DesktopComponent
 import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.workspace.serialization.WorkspaceSerializer
 import java.awt.BorderLayout
+import java.awt.FlowLayout
 import java.awt.Point
 import java.awt.Rectangle
 import java.awt.event.ActionEvent
@@ -332,6 +333,56 @@ class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, tru
 
     fun <O : EditableObject> addAnnotatedPropertyEditor(editor: AnnotatedPropertyEditor<O>, tab: String? = null) {
         launch(Dispatchers.Swing) { getTab(tab).addItem(editor) }
+    }
+
+    /**
+     * Add a horizontal row of components using a DSL builder.
+     * Can optionally have a label on the left side.
+     * 
+     * Example:
+     * ```
+     * addRow("Object") {
+     *     addButton("Move") { ... }
+     *     addButton("Train") { ... }
+     * }
+     * ```
+     */
+    fun addRow(label: String? = null, tab: String? = null, init: RowBuilder.() -> Unit) {
+        val panel = JPanel(FlowLayout(FlowLayout.LEFT, 5, 0))
+        val builder = RowBuilder(this, panel)
+        builder.init()
+        
+        if (label != null) {
+            launch(Dispatchers.Swing) {
+                getTab(tab).addItem(label, panel)
+                pack()
+            }
+        } else {
+            addComponent(panel, tab)
+        }
+    }
+
+    /**
+     * Builder for adding components horizontally in a row.
+     */
+    inner class RowBuilder(
+        private val parent: ControlPanelKt,
+        private val panel: JPanel
+    ) {
+        fun addButton(
+            label: String,
+            context: CoroutineContext = EmptyCoroutineContext,
+            task: suspend JButton.(ActionEvent) -> Unit
+        ) = JButton(label).also { button ->
+            button.addActionListener {
+                parent.launch(context) { button.task(it) }
+            }
+            panel.add(button)
+        }
+        
+        fun addComponent(component: JComponent) {
+            panel.add(component)
+        }
     }
 
 }

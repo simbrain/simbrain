@@ -279,3 +279,43 @@ suspend fun getOdorWorldPanel(component: OdorWorldComponent): OdorWorldPanel {
     return desktopComponent.worldPanel
 }
 
+/**
+ * Utility class for tracking which neurons "win" for each label in competitive/SOM networks.
+ * Automatically updates neuron labels to show which patterns they respond to.
+ */
+class WinnerLabeler {
+    private val labelToNodeMap = mutableMapOf<String, org.simbrain.network.core.Neuron>()
+    
+    /**
+     * Update the tracker with a new winning neuron for the given label.
+     * This will:
+     * - Remove the label from the previous winner (if different)
+     * - Add the label to the new winner
+     * - Update the internal map
+     */
+    fun updateWinner(label: String, winner: org.simbrain.network.core.Neuron) {
+        val previousNode = labelToNodeMap[label]
+        if (previousNode != null && previousNode != winner) {
+            val oldLabel = previousNode.label ?: ""
+            previousNode.label = oldLabel.replace(label, "").replace(", ,", ",").trim(',', ' ').ifEmpty { null }
+        }
+        
+        val currentLabel = winner.label
+        if (currentLabel.isNullOrEmpty()) {
+            winner.label = label
+        } else if (!currentLabel.contains(label)) {
+            winner.label = currentLabel + ", " + label
+        }
+        
+        labelToNodeMap[label] = winner
+    }
+    
+    /**
+     * Clear all tracked labels and remove labels from all neurons.
+     */
+    fun clear(neurons: List<org.simbrain.network.core.Neuron>) {
+        neurons.forEach { it.label = null }
+        labelToNodeMap.clear()
+    }
+}
+

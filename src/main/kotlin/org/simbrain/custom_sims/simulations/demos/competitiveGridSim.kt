@@ -52,21 +52,25 @@ val competitiveGridSim = newSim {
             
             5. Use `Reset` if you want to start over with fresh random weights
             
+            6. Use `Test` to see which neuron responds to the current pattern without updating weights (this is a shortcut to the `Clamp` menu item)
+            
             ## Training Tips
             
             - Train each pattern once before repeating any pattern (this helps neurons "claim" different patterns)
             - Avoid training the same pattern multiple times in a row early on
             - The `Add Noise` button adds small random variations to the current pattern
+            - If you're having trouble getting distinct responses, try right-clicking the competitive group and editing parameters. For example, turning off `Normalize inputs` sometimes improves results
+            - We haven't fully explored all parameter combinations, and it's not entirely clear what settings produce the best results or what all the patterns of behavior are, so experimentation is encouraged
             
             ## Testing Advanced Features
             
             Right-click the competitive group to access advanced parameters. Here are some experiments to try:
             
-            **Leaky Learning:** Enable `Use Leaky learning` and set rate to `0.01`. Train P1 ten times, then try other patterns. Compare with leaky learning disabled - you should see better pattern separation with it enabled.
+            **Leaky Learning:** Enable `Use Leaky learning` and set rate to `0.01`. Train P1 ten times, then try other patterns. Compare with leaky learning disabled. You should see better pattern separation with it enabled.
             
             **Alvarez-Squire Method:** Change `Update method` to `Alvarez-Squire`. Train all patterns, then iterate without training. Watch weights gradually decay over time.
             
-            **Normalization:** Disable `Normalize inputs`. Notice how patterns with more active pixels (like P2 - the diamond) produce stronger responses.
+            **Normalization:** Disable `Normalize inputs`. Notice how patterns with more active pixels (like P2, the diamond) produce stronger responses.
             
             **Activation Dynamics:** Enable `Use activation dynamics` and `Add noise`. Watch the competitive neurons show varying activation levels instead of fixed 0/1 values.
             
@@ -160,12 +164,22 @@ val competitiveGridSim = newSim {
                 winningLabel = "P5"
             }
 
-                addButton("Add Noise") {
-                    competitive.inputLayer.activationArray = competitive.inputLayer.activationArray.add(NormalDistribution(standardDeviation = .01).sampleDouble(competitive.inputLayer.activationArray.size))
-                }
-
+            addButton("Add Noise") {
+                competitive.inputLayer.activationArray = competitive.inputLayer.activationArray.add(NormalDistribution(standardDeviation = .01).sampleDouble(competitive.inputLayer.activationArray.size))
+            }
+            
+            addSeparator()
+            
             addButton("Train") {
                 workspace.iterateSuspend()
+                val winner = competitive.competitive.neuronList[competitive.competitive.activationArray.indexOfFirst { it > 0.0 }]
+                labelTracker.updateWinner(winningLabel, winner)
+            }
+            addButton("Test") {
+                val savedLearningRate = competitive.competitive.params.learningRate
+                competitive.competitive.params.learningRate = 0.0
+                workspace.iterateSuspend()
+                competitive.competitive.params.learningRate = savedLearningRate
                 val winner = competitive.competitive.neuronList[competitive.competitive.activationArray.indexOfFirst { it > 0.0 }]
                 labelTracker.updateWinner(winningLabel, winner)
             }

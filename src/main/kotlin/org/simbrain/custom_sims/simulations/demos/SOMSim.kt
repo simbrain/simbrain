@@ -26,8 +26,8 @@ val SOMSim = newSim {
     val labelTracker = WinnerLabeler()
 
     withGui {
-        place(networkComponent, 139, 10, 868, 619)
-        createControlPanel("Control Panel", 5, 10) {
+        place(networkComponent, 139, 10, 650, 619)
+        createControlPanel("Control Panel", 5, 10, 130, 619) {
 
             addButton("Pattern 1") {
                 SOM.inputLayer.neuronList.activations =
@@ -58,9 +58,23 @@ val SOMSim = newSim {
             addButton("Add Noise") {
                 SOM.inputLayer.activationArray = SOM.inputLayer.activationArray.add(NormalDistribution(standardDeviation = .01).sampleDouble(SOM.inputLayer.activationArray.size))
             }
-
+            
+            addSeparator()
+            
             addButton("Train") {
                 workspace.iterateSuspend()
+                val winner = SOM.som.winner
+                if (winner != null) {
+                    labelTracker.updateWinner(winningLabel, winner)
+                }
+            }
+            addButton("Test") {
+                val savedLearningRate = SOM.som.learningRate
+                val savedNeighborhoodSize = SOM.som.neighborhoodSize
+                SOM.som.learningRate = 0.0
+                workspace.iterateSuspend()
+                SOM.som.learningRate = savedLearningRate
+                SOM.som.neighborhoodSize = savedNeighborhoodSize
                 val winner = SOM.som.winner
                 if (winner != null) {
                     labelTracker.updateWinner(winningLabel, winner)
@@ -76,9 +90,9 @@ val SOMSim = newSim {
 
     addSidebarInfo(
         """
-        # Self-Organizing Map (SOM)
+        # Self Organizing Map (SOM)
         
-        This simulation demonstrates a Self-Organizing Map (SOM), also known as a Kohonen map. SOMs are unsupervised neural 
+        This simulation demonstrates a Self Organizing Map (SOM), also known as a Kohonen map. SOMs are unsupervised neural 
         networks that learn to create topologically ordered representations of input data. They organize similar inputs 
         to be mapped to nearby locations in the output space.
         
@@ -113,6 +127,8 @@ val SOMSim = newSim {
            - Try training patterns in different orders
         
         5. Watch the winner labels. The winning neuron gets labeled with the pattern name, helping you see the organization
+        
+        6. Use `Test` to see which neuron responds to the current pattern without updating weights or decaying learning parameters (this is a shortcut to easily-accessed menu items)
 
         # References
         

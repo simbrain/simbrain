@@ -34,7 +34,7 @@ val competitiveSim = newSim {
         
         A simple competitive network is an unsupervised neural network trained to classify input patterns into output neurons. It learns to detect clusters in the input group, with the output responding to these clusters of patterns. The competitive group is initialized with randomized weights.
 
-        One way to get familiar with this simulation is to treat it as a game. Try to train the network so that each input pattern triggers a distinct output neuron. This may be impossible, but you should at least be able to get four distinct responses.
+        One way to get familiar with this simulation is to treat it as a game. Try to train the network so that each input pattern triggers a distinct output neuron. This may be impossible, but you should at least be able to get four distinct responses. If you're having trouble, try right-clicking the competitive group and editing parameters. For example, turning off `Normalize inputs` sometimes improves results. We haven't fully explored all parameter combinations, and it's not entirely clear what settings produce the best results or what all the patterns of behavior are, so experimentation is encouraged.
         
         # Simulation Details
         
@@ -60,7 +60,7 @@ val competitiveSim = newSim {
         If Training Fails:
         - Use `Reset` to randomize weights and try again
         - Try a different presentation order
-        - Right-click the competitive group to adjust learning rate (lower values like `0.02-0.05` work better for overlapping patterns)
+        - Right-click the competitive group to adjust learning rate (lower values like `0.02` to `0.05` work better for overlapping patterns)
         
         Testing Performance:
         - To test the network without further learning, turn off weight updates by selecting the synapse group (click on the weights) and choosing `Clamp` from the right-click menu, or by right-clicking on the synapse group node and selecting `Clamp all`
@@ -78,14 +78,14 @@ val competitiveSim = newSim {
         
         Learning Rate:
         - Default is `0.05`, which works well for most cases
-        - Lower values (`0.01-0.03`): Slower but more stable learning, better for very similar patterns
-        - Higher values (`0.1-0.2`): Faster learning but may be unstable or cause neurons to switch patterns
+        - Lower values (`0.01` to `0.03`): Slower but more stable learning, better for very similar patterns
+        - Higher values (`0.1` to `0.2`): Faster learning but may be unstable or cause neurons to switch patterns
         
         Leaky Learning (Prevents Dead Neurons):
         - Enable `Use Leaky learning` to allow losing neurons to learn slowly
         - Set `Leaky learning rate` to about `0.01` (1/4 of main learning rate)
         - What to observe: Without leaky learning, some neurons may never win. With it enabled, all neurons should eventually participate
-        - Test it: Train on P1 repeatedly (10 times), then try P2-P5. Without leaky learning, you may find some patterns can't find a neuron
+        - Test it: Train on P1 repeatedly (10 times), then try P2 through P5. Without leaky learning, you may find some patterns can't find a neuron
         
         Update Method (Different Learning Algorithms):
         - Default is `Rummelhart-Zipser`, which normalizes inputs and moves weights toward input patterns
@@ -106,7 +106,7 @@ val competitiveSim = newSim {
         - Set `Activation decay` to `0.7` (winner activation decays over time)
         - Enable `Add noise` to inject random fluctuations in winner activation
         - What to observe: Winner activations become more variable and dynamic rather than fixed at 1.0
-        - Test it: Enable both options and watch the competitive neurons - they'll show varying activation levels
+        - Test it: Enable both options and watch the competitive neurons. They'll show varying activation levels
         
         Network Size:
         - The simulation uses 5 competitive neurons for 5 patterns
@@ -119,13 +119,15 @@ val competitiveSim = newSim {
         
         1. Select a pattern using one of the buttons (Pattern 1-5)
         
-        2. Click "Train" to iterate the network and see which output neuron wins
+        2. Click `Train` to iterate the network and see which output neuron wins
         
         3. Repeat with different patterns, training each one once before cycling
         
         4. Try to achieve a situation where each pattern activates a different output neuron
         
-        5. Use "Reset" if you want to start over with fresh random weights
+        5. Use `Reset` if you want to start over with fresh random weights
+        
+        6. Use `Test` to see which neuron responds to the current pattern without updating weights (this is a shortcut to the `Clamp` menu item)
         
         """.trimIndent()
     )
@@ -162,8 +164,19 @@ val competitiveSim = newSim {
             addButton("Add Noise") {
                 competitive.inputLayer.activationArray = competitive.inputLayer.activationArray.add(NormalDistribution(standardDeviation = .01).sampleDouble(competitive.inputLayer.activationArray.size))
             }
+            
+            addSeparator()
+            
             addButton("Train") {
                 workspace.iterateSuspend()
+                val winner = competitive.competitive.neuronList[competitive.competitive.activationArray.indexOfFirst { it > 0.0 }]
+                labelTracker.updateWinner(winningLabel, winner)
+            }
+            addButton("Test") {
+                val savedLearningRate = competitive.competitive.params.learningRate
+                competitive.competitive.params.learningRate = 0.0
+                workspace.iterateSuspend()
+                competitive.competitive.params.learningRate = savedLearningRate
                 val winner = competitive.competitive.neuronList[competitive.competitive.activationArray.indexOfFirst { it > 0.0 }]
                 labelTracker.updateWinner(winningLabel, winner)
             }

@@ -1,9 +1,6 @@
 package org.simbrain.custom_sims.simulations
 
-import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.addSidebarInfo
-import org.simbrain.custom_sims.createControlPanel
-import org.simbrain.custom_sims.newSim
+import org.simbrain.custom_sims.*
 import org.simbrain.network.core.activations
 import org.simbrain.network.subnetworks.SOMNetwork
 import org.simbrain.util.add
@@ -24,10 +21,9 @@ val SOMSim = newSim {
     val SOM = SOMNetwork(7, 16)
     network.addNetworkModelAsync(SOM)
     SOM.inputLayer.setUpperBound(1.0)
-    //SOM.weights.randomize()
 
-    // Label for winner
     var winningLabel = ""
+    val labelTracker = WinnerLabeler()
 
     withGui {
         place(networkComponent, 139, 10, 868, 619)
@@ -58,13 +54,22 @@ val SOMSim = newSim {
                     listOf(0.0, 0.0, 0.0, 0.0, 0.5, 1.0, 0.5)
                 winningLabel = "P5"
             }
+
+            addButton("Add Noise") {
+                SOM.inputLayer.activationArray = SOM.inputLayer.activationArray.add(NormalDistribution(standardDeviation = .01).sampleDouble(SOM.inputLayer.activationArray.size))
+            }
+
             addButton("Train") {
-                SOM.inputLayer.activationArray = SOM.inputLayer.activationArray.add(NormalDistribution().sampleDouble(SOM.inputLayer.activationArray.size))
                 workspace.iterateSuspend()
                 val winner = SOM.som.winner
-                if (winner != null && winningLabel.isNotEmpty()) {
-                    winner.label = winningLabel
+                if (winner != null) {
+                    labelTracker.updateWinner(winningLabel, winner)
                 }
+            }
+            addButton("Reset") {
+                SOM.randomize()
+                SOM.som.reset()
+                labelTracker.clear(SOM.som.neuronList)
             }
         }
     }

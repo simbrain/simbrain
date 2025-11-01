@@ -149,7 +149,7 @@ class SOMGroup @JvmOverloads constructor(
         }
 
         // Update alpha and neighborhood size
-        learningRate -= learningRate * params.initialLearningRate
+        learningRate -= learningRate * params.learningDecayRate
         if (neighborhoodSize - params.neighborhoodDecayAmount > 0.0) {
             neighborhoodSize -= params.neighborhoodDecayAmount
         } else {

@@ -80,7 +80,7 @@ val competitiveGridSim = newSim {
     )
 
     withGui {
-        place(networkComponent, 153, 10, 386, 619)
+        place(networkComponent, 153, 10, 528, 728)
         createControlPanel("Control Panel", 0, 13) {
 
             addButton("Pattern 1") {

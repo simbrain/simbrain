@@ -89,8 +89,8 @@ val srnElmanSentences = newSim {
 
     withGui {
         place(textWorldInputs, 0, 7, 531, 929)
-        place(textWorldOut, 523, 7, 516, 250)
-        place(networkComponent, 1046, 10, 500, 550)
+        place(textWorldOut, 523, 7, 500, 204)
+        place(networkComponent, 523, 208, 500, 550)
     }
 
     workspace.addUpdateAction("Update Inputs") {

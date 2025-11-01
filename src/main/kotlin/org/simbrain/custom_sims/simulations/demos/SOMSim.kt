@@ -26,8 +26,8 @@ val SOMSim = newSim {
     val labelTracker = WinnerLabeler()
 
     withGui {
-        place(networkComponent, 139, 10, 650, 619)
-        createControlPanel("Control Panel", 5, 10, 130, 619) {
+        place(networkComponent, 157, 10, 548, 750)
+        createControlPanel("Control Panel", 5, 10) {
 
             addButton("Pattern 1") {
                 SOM.inputLayer.neuronList.activations =
@@ -102,11 +102,6 @@ val SOMSim = newSim {
 
         # Simulation Details
         
-        The simulation consists of:
-        - Input Layer: 7 input neurons that receive pattern activations
-        - SOM Layer: A 4x4 grid of neurons that compete to respond to inputs
-        - Weight Matrix: Connections between input and SOM layers that adapt during learning
-        
         During training, the SOM learns to map similar input patterns to nearby locations in the 2D grid. 
         The "winning" neuron (most active) and its neighbors adjust their weights to become more responsive to the current input pattern.
         
@@ -129,6 +124,8 @@ val SOMSim = newSim {
         5. Watch the winner labels. The winning neuron gets labeled with the pattern name, helping you see the organization
         
         6. Use `Test` to see which neuron responds to the current pattern without updating weights or decaying learning parameters (this is a shortcut to easily-accessed menu items)
+        
+        7. Use the `Recall SOM Pattern` menu item (right-click on the SOM layer) to see what input pattern a specific output neuron is currently tuned to. This pushes the weights of the selected neuron back to the input layer
 
         # References
         

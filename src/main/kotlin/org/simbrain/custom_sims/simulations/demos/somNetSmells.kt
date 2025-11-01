@@ -1,6 +1,7 @@
 package org.simbrain.custom_sims.simulations.demos
 
 import org.simbrain.custom_sims.*
+import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.subnetworks.SOMNetwork
 import org.simbrain.util.SmellSource
 import org.simbrain.util.decayfunctions.GaussianDecayFunction
@@ -16,6 +17,9 @@ import org.simbrain.world.odorworld.sensors.SmellSensor
  * The mouse agent moves around an environment with different objects (cheeses and flowers),
  * each emitting a unique 9-dimensional smell vector. The SOM network learns to organize
  * these smells, with similar smells (e.g., different cheeses) activating nearby neurons.
+ * 
+ * As the simulation runs, move the mouse near objects (within radius 50) and watch the SOM
+ * neurons automatically get labeled based on which object is nearby.
  */
 val somNetSmells = newSim {
 
@@ -32,6 +36,8 @@ val somNetSmells = newSim {
     
     somNet.som.params.initialLearningRate = 0.06
     somNet.som.params.initNeighborhoodSize = 100.0
+    
+    somNet.modelList.get<SynapseGroup>().first().displaySynapses = false
     
     val labelTracker = WinnerLabeler()
 
@@ -106,145 +112,65 @@ val somNetSmells = newSim {
 
     couplingManager.createCoupling(smellCenter, somNet.inputLayer)
 
+    val objectsWithLabels = listOf(
+        swiss to "Swiss",
+        gouda to "Gouda",
+        blueCheese to "Blue",
+        flax to "Flax",
+        tulip to "Tulip",
+        pansy to "Pansy"
+    )
+    
+    val proximityRadius = 50.0
+    
+    workspace.addUpdateAction("Auto-label on proximity") {
+        objectsWithLabels.forEach { (entity, label) ->
+            val distance = mouse.location.distance(entity.location)
+            if (distance < proximityRadius) {
+                val winner = somNet.som.neuronList.maxByOrNull { it.activation }
+                winner?.let { labelTracker.updateWinner(label, it) }
+            }
+        }
+    }
+
     withGui {
-        place(networkComponent, 300, 10, 350, 720)
+        place(networkComponent, 182, 10, 450, 720)
         place(oc, 640, 10, 450, 520)
 
-        // store original learning rate for reset
-        val originalLearningRate = somNet.som.learningRate
+        val originalLearningRate = somNet.som.params.initialLearningRate
+        val originalNeighborhoodSize = somNet.som.params.initNeighborhoodSize
+        
+        var savedLearningRate = originalLearningRate
+        var savedNeighborhoodSize = originalNeighborhoodSize
         
         createControlPanel("Control Panel", 10, 10) {
+
+
+            val freezeLearning = addCheckBox("Freeze Learning", false)
+            freezeLearning.addActionListener {
+                if (freezeLearning.isSelected) {
+                    savedLearningRate = somNet.som.learningRate
+                    savedNeighborhoodSize = somNet.som.neighborhoodSize
+                    somNet.som.learningRate = 0.0
+                    somNet.som.neighborhoodSize = 0.0
+                } else {
+                    somNet.som.learningRate = savedLearningRate
+                    somNet.som.neighborhoodSize = savedNeighborhoodSize
+                }
+                somNet.som.updateStateInfoText()
+                somNet.som.events.customInfoUpdated.fire()
+            }
+
+            addButton("Reset Learning") {
+                somNet.som.reset()
+            }
+
             addButton("Reset Network") {
                 somNet.randomize()
-                somNet.som.learningRate = originalLearningRate
+                somNet.som.reset()
                 labelTracker.clear(somNet.som.neuronList)
             }
-            
-            addSeparator()
-            
-            addRow("Swiss") {
-                addButton("Move") { mouse.setLocation(36, 107) }
-                addButton("Train") { 
-                    mouse.setLocation(36, 107)
-                    workspace.iterateSuspend()
-                    val winner = somNet.som.neuronList.maxByOrNull { it.activation }
-                    winner?.let { labelTracker.updateWinner("Swiss", it) }
-                }
-                addButton("Test") {
-                    mouse.setLocation(36, 107)
-                    val savedLearningRate = somNet.som.learningRate
-                    val savedNeighborhoodSize = somNet.som.neighborhoodSize
-                    somNet.som.learningRate = 0.0
-                    workspace.iterateSuspend()
-                    somNet.som.learningRate = savedLearningRate
-                    somNet.som.neighborhoodSize = savedNeighborhoodSize
-                    val winner = somNet.som.neuronList.maxByOrNull { it.activation }
-                    winner?.let { labelTracker.updateWinner("Swiss", it) }
-                }
-            }
-            addRow("Gouda") {
-                addButton("Move") { mouse.setLocation(169, 32) }
-                addButton("Train") { 
-                    mouse.setLocation(169, 32)
-                    workspace.iterateSuspend()
-                    val winner = somNet.som.neuronList.maxByOrNull { it.activation }
-                    winner?.let { labelTracker.updateWinner("Gouda", it) }
-                }
-                addButton("Test") {
-                    mouse.setLocation(169, 32)
-                    val savedLearningRate = somNet.som.learningRate
-                    val savedNeighborhoodSize = somNet.som.neighborhoodSize
-                    somNet.som.learningRate = 0.0
-                    workspace.iterateSuspend()
-                    somNet.som.learningRate = savedLearningRate
-                    somNet.som.neighborhoodSize = savedNeighborhoodSize
-                    val winner = somNet.som.neuronList.maxByOrNull { it.activation }
-                    winner?.let { labelTracker.updateWinner("Gouda", it) }
-                }
-            }
-            addRow("Blue Cheese") {
-                addButton("Move") { mouse.setLocation(284, 90) }
-                addButton("Train") { 
-                    mouse.setLocation(284, 90)
-                    workspace.iterateSuspend()
-                    val winner = somNet.som.neuronList.maxByOrNull { it.activation }
-                    winner?.let { labelTracker.updateWinner("Blue", it) }
-                }
-                addButton("Test") {
-                    mouse.setLocation(284, 90)
-                    val savedLearningRate = somNet.som.learningRate
-                    val savedNeighborhoodSize = somNet.som.neighborhoodSize
-                    somNet.som.learningRate = 0.0
-                    workspace.iterateSuspend()
-                    somNet.som.learningRate = savedLearningRate
-                    somNet.som.neighborhoodSize = savedNeighborhoodSize
-                    val winner = somNet.som.neuronList.maxByOrNull { it.activation }
-                    winner?.let { labelTracker.updateWinner("Blue", it) }
-                }
-            }
-            
-            addSeparator()
-            
-            addRow("Flax") {
-                addButton("Move") { mouse.setLocation(315, 349) }
-                addButton("Train") { 
-                    mouse.setLocation(315, 349)
-                    workspace.iterateSuspend()
-                    val winner = somNet.som.neuronList.maxByOrNull { it.activation }
-                    winner?.let { labelTracker.updateWinner("Flax", it) }
-                }
-                addButton("Test") {
-                    mouse.setLocation(315, 349)
-                    val savedLearningRate = somNet.som.learningRate
-                    val savedNeighborhoodSize = somNet.som.neighborhoodSize
-                    somNet.som.learningRate = 0.0
-                    workspace.iterateSuspend()
-                    somNet.som.learningRate = savedLearningRate
-                    somNet.som.neighborhoodSize = savedNeighborhoodSize
-                    val winner = somNet.som.neuronList.maxByOrNull { it.activation }
-                    winner?.let { labelTracker.updateWinner("Flax", it) }
-                }
-            }
-            addRow("Tulip") {
-                addButton("Move") { mouse.setLocation(55, 349) }
-                addButton("Train") { 
-                    mouse.setLocation(55, 349)
-                    workspace.iterateSuspend()
-                    val winner = somNet.som.neuronList.maxByOrNull { it.activation }
-                    winner?.let { labelTracker.updateWinner("Tulip", it) }
-                }
-                addButton("Test") {
-                    mouse.setLocation(55, 349)
-                    val savedLearningRate = somNet.som.learningRate
-                    val savedNeighborhoodSize = somNet.som.neighborhoodSize
-                    somNet.som.learningRate = 0.0
-                    workspace.iterateSuspend()
-                    somNet.som.learningRate = savedLearningRate
-                    somNet.som.neighborhoodSize = savedNeighborhoodSize
-                    val winner = somNet.som.neuronList.maxByOrNull { it.activation }
-                    winner?.let { labelTracker.updateWinner("Tulip", it) }
-                }
-            }
-            addRow("Pansy") {
-                addButton("Move") { mouse.setLocation(198, 385) }
-                addButton("Train") { 
-                    mouse.setLocation(198, 385)
-                    workspace.iterateSuspend()
-                    val winner = somNet.som.neuronList.maxByOrNull { it.activation }
-                    winner?.let { labelTracker.updateWinner("Pansy", it) }
-                }
-                addButton("Test") {
-                    mouse.setLocation(198, 385)
-                    val savedLearningRate = somNet.som.learningRate
-                    val savedNeighborhoodSize = somNet.som.neighborhoodSize
-                    somNet.som.learningRate = 0.0
-                    workspace.iterateSuspend()
-                    somNet.som.learningRate = savedLearningRate
-                    somNet.som.neighborhoodSize = savedNeighborhoodSize
-                    val winner = somNet.som.neuronList.maxByOrNull { it.activation }
-                    winner?.let { labelTracker.updateWinner("Pansy", it) }
-                }
-            }
+
         }
     }
 
@@ -258,38 +184,42 @@ val somNetSmells = newSim {
         
         ## Using this Simulation
         
-        **Training Mode:**
+        **Interactive Training:**
         
-        Begin by "training" the network. Press the workspace play button and use the control 
-        panel buttons to move the mouse to each object. The network will only learn while the 
-        learning rate (in the SOM properties) is above 0, so you should expose the mouse to 
-        all the smells relatively quickly during the initial training phase.
+        1. Press the workspace play button to start the simulation
+        2. Drag the mouse around the environment to move it near different objects
+        3. When the mouse is within radius 50 of an object, the SOM neurons automatically 
+           get labeled based on the current winner neuron
+        4. Watch as the SOM learns to organize the smells - similar smells will activate 
+           nearby neurons
         
-        The learning rate and neighborhood size will gradually decrease as the network trains, 
+        The learning rate and neighborhood size gradually decrease as the network trains, 
         allowing the network to make finer distinctions between similar smells.
-        
-        **Testing Mode:**
-        
-        After training, keep the simulation running and move the mouse to different objects 
-        using the control panel buttons. Observe which SOM neurons activate for each smell.
         
         **Expected Behavior:**
         
         The cheese response nodes should cluster together, and the flower response nodes should 
         cluster together, since cheeses smell more similar to each other than to flowers, and 
-        vice versa.
+        vice versa. Similar smells (e.g., Swiss and Gouda) should activate nearby neurons in 
+        the SOM grid.
         
-        The SOM neurons are automatically labeled when you use the "Train" buttons, showing 
-        which smells they respond to. Similar smells (e.g., Swiss and Gouda) should activate 
-        nearby neurons in the SOM grid.
+        ## Control Panel
+        
+        - Reset Network: Randomize SOM weights and clear labels to start training over
+        - Reset Learning: Restore learning rate and neighborhood size to initial values 
+          without changing the network weights
+        - Freeze Learning: Stop learning and neighborhood decay while keeping the simulation 
+          running (useful for testing the trained network)
         
         ## Tips
         
-        - Use "Reset Network" to randomize the SOM weights and start training over
-        - Right-click the SOM layer to adjust learning parameters
         - Training works best when you expose the mouse to all objects multiple times
         - The hexagonal layout helps visualize the topological organization
-        - Use "Test" buttons to check which neuron responds to a smell without updating weights or decaying learning parameters (this is a shortcut to easily-accessed menu items)
+        - Try moving the mouse in circles around objects to see the encoding patterns form
+        - Use Freeze Learning to test the network after training
+        - Right-click the SOM layer to adjust learning parameters
+        - Use the `Recall SOM Pattern` menu item (right-click on the SOM layer) to see what 
+          smell pattern a specific output neuron is currently tuned to
         
         """.trimIndent()
     )

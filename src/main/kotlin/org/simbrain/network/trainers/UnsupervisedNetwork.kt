@@ -9,7 +9,6 @@ import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.stats.ProbabilityDistribution
-import org.simbrain.util.stats.distributions.UniformRealDistribution
 
 interface UnsupervisedNetwork: EditableObject {
 
@@ -27,7 +26,7 @@ interface UnsupervisedNetwork: EditableObject {
     context(Network)
     fun trainOnCurrentPattern()
 
-    fun randomize(randomizer: ProbabilityDistribution? = UniformRealDistribution())
+    fun randomize(randomizer: ProbabilityDistribution?)
 
 }
 

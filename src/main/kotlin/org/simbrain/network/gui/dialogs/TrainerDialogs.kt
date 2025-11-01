@@ -294,7 +294,7 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
             description = "Randomize network and reset iterations",
             iconPath = "menu_icons/Rand.png",
         ) {
-            unsupervisedNetwork.randomize()
+            unsupervisedNetwork.randomize(null)
             trainer.iteration = 0
             trainer.events.progressUpdated.fire("Iteration" to trainer.iteration)
         }

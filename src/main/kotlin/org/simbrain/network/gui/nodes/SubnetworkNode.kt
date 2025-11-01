@@ -142,7 +142,7 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
                 name = "Randomize",
                 keyboardShortcut = 'R'
             ) {
-                net.randomize()
+                net.randomize(null)
             })
     }
 

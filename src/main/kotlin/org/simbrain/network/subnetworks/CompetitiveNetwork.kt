@@ -15,6 +15,7 @@ import org.simbrain.util.UserParameter
 import org.simbrain.util.copy
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
+import org.simbrain.util.stats.distributions.UniformRealDistribution
 
 /**
  * **CompetitiveNetwork** is a small network encompassing a Competitive
@@ -95,7 +96,7 @@ class CompetitiveNetwork : Subnetwork, UnsupervisedNetwork {
     constructor(): super()
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
-        competitive.randomize(randomizer)
+        competitive.randomize(randomizer ?: UniformRealDistribution(0.0, 1.0))
     }
 
     override fun toString(): String {

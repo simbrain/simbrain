@@ -195,11 +195,9 @@ open class CompetitiveGroup @JvmOverloads constructor(
      * Randomize all weights coming in to this network.
      */
     override fun randomizeIncomingWeights(randomizer: ProbabilityDistribution?) {
-        val i: Iterator<Neuron> = neuronList.iterator()
-        while (i.hasNext()) {
-            val n = i.next()
-            for (s in n.fanIn) {
-                s.randomize()
+        neuronList.forEach { n ->
+            n.fanIn.forEach { s ->
+                s.randomize(randomizer)
             }
         }
         events.fanInUpdated.fire()

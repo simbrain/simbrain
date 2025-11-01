@@ -7,6 +7,7 @@ import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.CustomTypeName
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.stats.ProbabilityDistribution
+import org.simbrain.util.stats.distributions.UniformRealDistribution
 
 /**
  * Implements a simple competitive network.
@@ -39,6 +40,8 @@ open class CompetitiveGroup @JvmOverloads constructor(
     private var max = 0.0
     private var activation = 0.0
     private var winner = 0
+    
+    private var noiseGenerator: ProbabilityDistribution = UniformRealDistribution(-.05, .05)
 
     /**
      * Specific implementation of competitive learning.
@@ -90,8 +93,11 @@ open class CompetitiveGroup @JvmOverloads constructor(
         for (i in neuronList.indices) {
             val neuron = neuronList[i]
             if (i == winner) {
-                neuron.activation = params.winValue
-                neuron.isSpike = neuron.isSpike
+                if (params.useActivationDynamics) {
+                    applyActivationDynamics(neuron)
+                } else {
+                    neuron.activation = params.winValue
+                }
                 if (params.updateMethod === UpdateMethod.RUMM_ZIPSER) {
                     rummelhartZipser(neuron)
                 } else if (params.updateMethod === UpdateMethod.ALVAREZ_SQUIRE) {
@@ -100,7 +106,6 @@ open class CompetitiveGroup @JvmOverloads constructor(
                 }
             } else {
                 neuron.activation = params.loseValue
-                neuron.isSpike = neuron.isSpike
                 if (params.useLeakyLearning) {
                     leakyLearning(neuron)
                 }
@@ -111,9 +116,8 @@ open class CompetitiveGroup @JvmOverloads constructor(
 
     /**
      * Update winning neuron's weights in accordance with Alvarez and Squire
-     * 1994, eq 2. TODO: rate is unused... in fact everything before
-     * "double deltaw = learningRate" (line 200 at time of writing) cannot
-     * possibly change any variables in the class.
+     * 1994, eq 2: delta_w = lambda * y * (x - x_avg)
+     * where y is post-synaptic activation, x is pre-synaptic activation, x_avg is average input
      *
      * @param neuron winning neuron.
      */
@@ -153,7 +157,7 @@ open class CompetitiveGroup @JvmOverloads constructor(
     private fun decayAllSynapses() {
         for (n in neuronList) {
             for (synapse in n.fanIn) {
-                synapse.decay(params.synpaseDecayPercent)
+                synapse.decay(params.synapseDecayPercent)
             }
         }
         events.fanInUpdated.fire()
@@ -176,6 +180,18 @@ open class CompetitiveGroup @JvmOverloads constructor(
             incoming.strength = incoming.strength + params.leakyLearningRate * (activation - incoming.strength)
         }
         events.fanInUpdated.fire()
+    }
+    
+    /**
+     * Apply activation dynamics with decay and noise (from Alvarez-Squire hippocampus model).
+     * a(t+1) = decay * a(t) + input + noise, clipped to [0, 1]
+     *
+     * @param neuron winning neuron
+     */
+    private fun applyActivationDynamics(neuron: Neuron) {
+        val noise = if (params.addNoise) noiseGenerator.sampleDouble() else 0.0
+        val newActivation = params.activationDecay * neuron.activation + neuron.weightedInputs + noise
+        neuron.activation = newActivation.coerceIn(0.0, 1.0)
     }
 
     /**
@@ -245,48 +261,33 @@ open class CompetitiveGroup @JvmOverloads constructor(
 
 @CustomTypeName("Competitive Group")
 class CompetitiveGroupParams : NeuronGroupParams() {
-    val DEFAULT_LEARNING_RATE = .1
-
-    val DEFAULT_WIN_VALUE = 1.0
-
-    val DEFAULT_LOSE_VALUE = 0.0
-
-    val DEFAULT_NORM_INPUTS = true
-
-    val DEFAULT_USE_LEAKY = false
-
-    val DEFAULT_LEAKY_RATE = DEFAULT_LEARNING_RATE / 4
-
-    val DEFAULT_DECAY_PERCENT = .0008
-
-    val DEFAULT_UPDATE_METHOD = CompetitiveGroup.UpdateMethod.RUMM_ZIPSER
 
     @UserParameter(label = "Update method", order = 30)
-    var updateMethod = DEFAULT_UPDATE_METHOD
+    var updateMethod = CompetitiveGroup.UpdateMethod.RUMM_ZIPSER
 
     @UserParameter(label = "Learning rate", order = 40, increment = .1)
-    var learningRate = DEFAULT_LEARNING_RATE
+    var learningRate = 0.1
 
     @UserParameter(label = "Winner Value", order = 50)
-    var winValue = DEFAULT_WIN_VALUE
+    var winValue = 1.0
 
     @UserParameter(label = "Lose Value", order = 60)
-    var loseValue = DEFAULT_LOSE_VALUE
+    var loseValue = 0.0
 
     @UserParameter(label = "Normalize inputs", order = 70)
-    var normalizeInputs = DEFAULT_NORM_INPUTS
+    var normalizeInputs = true
 
     @UserParameter(label = "Use Leaky learning", order = 80)
-    var useLeakyLearning = DEFAULT_USE_LEAKY
+    var useLeakyLearning = false
 
     var leakyLearningRate by GuiEditable(
-        initValue = DEFAULT_LEAKY_RATE,
+        initValue = 0.025,
         conditionallyEnabledBy = CompetitiveGroupParams::useLeakyLearning,
         order = 90
     )
 
-    var synpaseDecayPercent by GuiEditable(
-        initValue = DEFAULT_DECAY_PERCENT,
+    var synapseDecayPercent by GuiEditable(
+        initValue = 0.0008,
         label = "Decay percent",
         description = "Percentage by which to decay synapses on each update for Alvarez-Squire update.",
         onUpdate = {
@@ -294,6 +295,20 @@ class CompetitiveGroupParams : NeuronGroupParams() {
         },
         order = 100
     )
+    
+    @UserParameter(label = "Use activation dynamics", description = "Use decay and noise in activation (from Alvarez-Squire hippocampus model)", order = 110)
+    var useActivationDynamics = false
+    
+    var activationDecay by GuiEditable(
+        initValue = 0.7,
+        label = "Activation decay",
+        description = "Decay factor for winner activation dynamics (typically 0.7)",
+        conditionallyEnabledBy = CompetitiveGroupParams::useActivationDynamics,
+        order = 120
+    )
+    
+    @UserParameter(label = "Add noise", description = "Add noise to winner activation", order = 130)
+    var addNoise = false
 
     override fun create(): CompetitiveGroup {
         return CompetitiveGroup(List(numNeurons) { Neuron() }, this)
@@ -309,7 +324,10 @@ class CompetitiveGroupParams : NeuronGroupParams() {
             it.normalizeInputs = normalizeInputs
             it.useLeakyLearning = useLeakyLearning
             it.leakyLearningRate = leakyLearningRate
-            it.synpaseDecayPercent = synpaseDecayPercent
+            it.synapseDecayPercent = synapseDecayPercent
+            it.useActivationDynamics = useActivationDynamics
+            it.activationDecay = activationDecay
+            it.addNoise = addNoise
         }
     }
 }

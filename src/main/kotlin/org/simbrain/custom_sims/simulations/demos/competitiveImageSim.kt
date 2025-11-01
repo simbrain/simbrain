@@ -20,14 +20,26 @@ val competitiveImageSim = newSim {
             
             # What to Do
             
-            - The user selects different image patterns using the buttons at the bottom of the Image World window. 
-            - Each time an image is chosen and the network is run, the network trains a neuron to respond to the selected pattern. 
-            - The images have overlapping pixels in the patterns, resulting in overlapping output neurons, which makes it challenging for users to train each output neuron in the competitive group to a different image. 
-            - The image pattern that activates the output neuron most will be the label of this output neuron, and the connection between the weight and neurons is strengthened. 
+            - Select different image patterns using the buttons at the bottom of the Image World window
+            - Each time an image is chosen and the network is iterated, the network trains a neuron to respond to the selected pattern
+            - The images have overlapping pixels, making it challenging to train each competitive neuron to a different image
+            - The image pattern that activates the output neuron most will be the label of this output neuron
             
-            Over time, the output neurons improve their ability to classify the clusters in the input space. The user repeats this process until the trained network responds to each pattern with a different output neuron. 
+            Over time, the output neurons improve their ability to classify the clusters in the input space. The objective is to train the network so that each input pattern triggers a distinct output neuron.
             
-            The network relies on the statistical properties of the inputs provided during training. The objective is to train the network so that each input pattern triggers a distinct output neuron, classifying each input into a unique output. 
+            ## Testing Advanced Features
+            
+            Right-click the competitive group to access advanced parameters. Here are experiments to try:
+            
+            **Leaky Learning:** Enable `Use Leaky learning` (rate `0.01`). This helps prevent dead neurons when patterns are highly overlapping. Train one image repeatedly, then try others - leaky learning should give better results.
+            
+            **Alvarez-Squire Method:** Change `Update method` to `Alvarez-Squire` with `Decay percent` of `0.001`. Train all images, then iterate without selecting new images. Watch the weights gradually decay, modeling memory consolidation.
+            
+            **Normalization:** Try disabling `Normalize inputs`. Images with more active pixels will produce stronger responses, which may help or hurt separation depending on the images.
+            
+            **Activation Dynamics:** Enable `Use activation dynamics` and `Add noise` to see more realistic, variable neuron responses instead of fixed 0/1 activations.
+            
+            For detailed explanations, see the `Competitive network (simple)` simulation documentation. 
         
         """.trimIndent()
     )

@@ -30,7 +30,7 @@ val competitiveGridSim = newSim {
         """ 
             # Introduction
             
-            A competitive network with a 10x10 grid of input neurons (100 total) competing to classify 5 visual patterns. This is similar to the `Competitive` simulation but with spatial input patterns arranged in a grid layout.
+            A competitive network with a 10x10 grid of input neurons (100 total) competing to classify 5 visual patterns. This is similar to the `Competitive network (simple)` simulation but with spatial input patterns arranged in a grid layout.
             
             # Simulation Details
             
@@ -58,7 +58,19 @@ val competitiveGridSim = newSim {
             - Avoid training the same pattern multiple times in a row early on
             - The `Add Noise` button adds small random variations to the current pattern
             
-            For detailed training strategies and advanced parameter tuning, see the `Competitive` simulation documentation.
+            ## Testing Advanced Features
+            
+            Right-click the competitive group to access advanced parameters. Here are some experiments to try:
+            
+            **Leaky Learning:** Enable `Use Leaky learning` and set rate to `0.01`. Train P1 ten times, then try other patterns. Compare with leaky learning disabled - you should see better pattern separation with it enabled.
+            
+            **Alvarez-Squire Method:** Change `Update method` to `Alvarez-Squire`. Train all patterns, then iterate without training. Watch weights gradually decay over time.
+            
+            **Normalization:** Disable `Normalize inputs`. Notice how patterns with more active pixels (like P2 - the diamond) produce stronger responses.
+            
+            **Activation Dynamics:** Enable `Use activation dynamics` and `Add noise`. Watch the competitive neurons show varying activation levels instead of fixed 0/1 values.
+            
+            For detailed explanations, see the `Competitive network (simple)` simulation documentation. 
         
         """.trimIndent()
     )

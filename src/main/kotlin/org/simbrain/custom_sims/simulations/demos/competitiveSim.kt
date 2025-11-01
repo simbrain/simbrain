@@ -48,21 +48,26 @@ val competitiveSim = newSim {
         
         Competitive networks can be challenging to train, especially with overlapping patterns. Here are key strategies for success:
         
-        **Early Training:**
+        Early Training:
         - Train each pattern ONCE before repeating any pattern
         - This allows each competitive neuron to "claim" a pattern before they become too specialized
         - The order matters: try presenting all patterns once before cycling through them again
         
-        **Avoid Overtraining:**
+        Avoid Overtraining:
         - Don't train the same pattern multiple times in a row early on
         - This causes one neuron to become too dominant, leaving fewer neurons available for other patterns
         
-        **If Training Fails:**
-        - Use "Reset" to randomize weights and try again
+        If Training Fails:
+        - Use `Reset` to randomize weights and try again
         - Try a different presentation order
-        - Right-click the competitive group to adjust learning rate (lower values like 0.02-0.05 work better for overlapping patterns)
+        - Right-click the competitive group to adjust learning rate (lower values like `0.02-0.05` work better for overlapping patterns)
         
-        **Pattern Characteristics:**
+        Testing Performance:
+        - To test the network without further learning, turn off weight updates by selecting the synapse group (click on the weights) and choosing `Clamp` from the right-click menu, or by right-clicking on the synapse group node and selecting `Clamp all`
+        - This "freezes" the weights so you can test pattern recognition without changing what the network has learned
+        - Unclamp to resume training
+        
+        Pattern Characteristics:
         - Patterns with more unique features (non-overlapping input nodes) are easier to separate
         - Patterns that share many features will compete for the same neurons
         - The network uses normalized inputs, so patterns with similar proportions are harder to distinguish
@@ -71,27 +76,39 @@ val competitiveSim = newSim {
         
         If you're having difficulty getting the network to separate patterns, try adjusting these parameters by right-clicking the competitive group:
         
-        **Learning Rate:**
+        Learning Rate:
         - Default is `0.05`, which works well for most cases
         - Lower values (`0.01-0.03`): Slower but more stable learning, better for very similar patterns
         - Higher values (`0.1-0.2`): Faster learning but may be unstable or cause neurons to switch patterns
         
-        **Leaky Learning:**
+        Leaky Learning (Prevents Dead Neurons):
         - Enable `Use Leaky learning` to allow losing neurons to learn slowly
         - Set `Leaky learning rate` to about `0.01` (1/4 of main learning rate)
-        - This helps prevent "dead" neurons that never win and improves coverage of the input space
+        - What to observe: Without leaky learning, some neurons may never win. With it enabled, all neurons should eventually participate
+        - Test it: Train on P1 repeatedly (10 times), then try P2-P5. Without leaky learning, you may find some patterns can't find a neuron
         
-        **Update Method:**
+        Update Method (Different Learning Algorithms):
         - Default is `Rummelhart-Zipser`, which normalizes inputs and moves weights toward input patterns
-        - Try `Alvarez-Squire` for an alternative algorithm that uses decay
+        - Try `Alvarez-Squire` for an alternative algorithm with weight decay (models memory consolidation)
+        - What to observe: Alvarez-Squire causes weights to gradually decay, so patterns need periodic retraining
+        - Test it: Switch to Alvarez-Squire, train all patterns once, then wait (iterate without training). Weights will slowly decay
         - If using Alvarez-Squire, set `Decay percent` to `0.001` or lower
         
-        **Input Normalization:**
+        Input Normalization (Scale Invariance):
         - Default `Normalize inputs` is enabled, which divides inputs by their sum
         - This makes patterns with different numbers of active units harder to distinguish
+        - What to observe: With normalization, P1 (3 active) and P5 (3 active) are treated similarly despite different positions
+        - Test it: Disable normalization and train again. Patterns with more active inputs will produce stronger responses
         - Disable to preserve absolute magnitudes, which can help separate patterns like P4 and P5
         
-        **Network Size:**
+        Activation Dynamics (Biological Realism):
+        - Enable `Use activation dynamics` for more realistic neuron behavior with decay
+        - Set `Activation decay` to `0.7` (winner activation decays over time)
+        - Enable `Add noise` to inject random fluctuations in winner activation
+        - What to observe: Winner activations become more variable and dynamic rather than fixed at 1.0
+        - Test it: Enable both options and watch the competitive neurons - they'll show varying activation levels
+        
+        Network Size:
         - The simulation uses 5 competitive neurons for 5 patterns
         - Try increasing to 7 or 10 neurons to give the network more flexibility
         - More neurons means the network can find better representations

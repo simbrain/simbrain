@@ -26,18 +26,42 @@ val competitiveGridSim = newSim {
     competitive.inputLayer.setUpperBound(1.0)
     val inputs = competitive.inputLayer
 
-    // Label for winner
     var winningLabel = ""
+    val labelToNodeMap = mutableMapOf<String, org.simbrain.network.core.Neuron>()
 
     val docViewer = addSidebarInfo(
         """ 
             # Introduction
             
-            This is like the competitive simple network, but the inputs form a grid here.  
+            A competitive network with a 10x10 grid of input neurons (100 total) competing to classify 5 visual patterns. This is similar to the `Competitive` simulation but with spatial input patterns arranged in a grid layout.
+            
+            # Simulation Details
+            
+            The network contains:
+            - **Input Layer**: 100 neurons arranged in a 10x10 grid
+            - **Competitive Layer**: 5 neurons that compete to represent the input patterns
+            
+            Each pattern is a 2D visual pattern with specific active pixels. The competitive neurons learn to respond to these patterns through winner-take-all dynamics and weight updates.
             
             # What to Do
             
-            As with the simple network, you can get this simulation to learn a set of patterns.     
+            1. Select a pattern using one of the buttons (Pattern 1-5)
+            
+            2. Click `Train` to iterate the network and see which output neuron wins
+            
+            3. Repeat with different patterns, training each one once before cycling
+            
+            4. Try to achieve a situation where each pattern activates a different output neuron
+            
+            5. Use `Reset` if you want to start over with fresh random weights
+            
+            ## Training Tips
+            
+            - Train each pattern once before repeating any pattern (this helps neurons "claim" different patterns)
+            - Avoid training the same pattern multiple times in a row early on
+            - The `Add Noise` button adds small random variations to the current pattern
+            
+            For detailed training strategies and advanced parameter tuning, see the `Competitive` simulation documentation.
         
         """.trimIndent()
     )
@@ -134,7 +158,26 @@ val competitiveGridSim = newSim {
             addButton("Train") {
                 workspace.iterateSuspend()
                 val winner = competitive.competitive.neuronList[competitive.competitive.activationArray.indexOfFirst { it > 0.0 }]
-                winner.label = winningLabel
+                
+                val previousNode = labelToNodeMap[winningLabel]
+                if (previousNode != null && previousNode != winner) {
+                    val oldLabel = previousNode.label ?: ""
+                    previousNode.label = oldLabel.replace(winningLabel, "").replace(", ,", ",").trim(',', ' ').ifEmpty { null }
+                }
+                
+                val currentLabel = winner.label
+                if (currentLabel.isNullOrEmpty()) {
+                    winner.label = winningLabel
+                } else if (!currentLabel.contains(winningLabel)) {
+                    winner.label = currentLabel + ", " + winningLabel
+                }
+                
+                labelToNodeMap[winningLabel] = winner
+            }
+            addButton("Reset") {
+                competitive.randomize()
+                competitive.competitive.neuronList.forEach { it.label = null }
+                labelToNodeMap.clear()
             }
         }
     }

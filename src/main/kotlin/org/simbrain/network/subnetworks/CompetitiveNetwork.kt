@@ -95,8 +95,7 @@ class CompetitiveNetwork : Subnetwork, UnsupervisedNetwork {
     constructor(): super()
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
-        weights.randomize(randomizer)
-        competitive.normalizeIncomingWeights()
+        competitive.randomize(randomizer)
     }
 
     override fun toString(): String {

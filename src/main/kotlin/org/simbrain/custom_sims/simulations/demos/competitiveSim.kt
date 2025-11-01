@@ -28,8 +28,8 @@ val competitiveSim = newSim {
     
     competitive.competitive.params.learningRate = 0.05
 
-    // Label for winner
     var winningLabel = ""
+    val labelToNodeMap = mutableMapOf<String, org.simbrain.network.core.Neuron>()
 
     val docViewer = addSidebarInfo(
         """
@@ -69,6 +69,35 @@ val competitiveSim = newSim {
         - Patterns with more unique features (non-overlapping input nodes) are easier to separate
         - Patterns that share many features will compete for the same neurons
         - The network uses normalized inputs, so patterns with similar proportions are harder to distinguish
+        
+        ## Advanced Parameters
+        
+        If you're having difficulty getting the network to separate patterns, try adjusting these parameters by right-clicking the competitive group:
+        
+        **Learning Rate:**
+        - Default is `0.05`, which works well for most cases
+        - Lower values (`0.01-0.03`): Slower but more stable learning, better for very similar patterns
+        - Higher values (`0.1-0.2`): Faster learning but may be unstable or cause neurons to switch patterns
+        
+        **Leaky Learning:**
+        - Enable `Use Leaky learning` to allow losing neurons to learn slowly
+        - Set `Leaky learning rate` to about `0.01` (1/4 of main learning rate)
+        - This helps prevent "dead" neurons that never win and improves coverage of the input space
+        
+        **Update Method:**
+        - Default is `Rummelhart-Zipser`, which normalizes inputs and moves weights toward input patterns
+        - Try `Alvarez-Squire` for an alternative algorithm that uses decay
+        - If using Alvarez-Squire, set `Decay percent` to `0.001` or lower
+        
+        **Input Normalization:**
+        - Default `Normalize inputs` is enabled, which divides inputs by their sum
+        - This makes patterns with different numbers of active units harder to distinguish
+        - Disable to preserve absolute magnitudes, which can help separate patterns like P4 and P5
+        
+        **Network Size:**
+        - The simulation uses 5 competitive neurons for 5 patterns
+        - Try increasing to 7 or 10 neurons to give the network more flexibility
+        - More neurons means the network can find better representations
         
         # What to Do
         
@@ -122,10 +151,26 @@ val competitiveSim = newSim {
             addButton("Train") {
                 workspace.iterateSuspend()
                 val winner = competitive.competitive.neuronList[competitive.competitive.activationArray.indexOfFirst { it > 0.0 }]
-                winner.label = winningLabel
+                
+                val previousNode = labelToNodeMap[winningLabel]
+                if (previousNode != null && previousNode != winner) {
+                    val oldLabel = previousNode.label ?: ""
+                    previousNode.label = oldLabel.replace(winningLabel, "").replace(", ,", ",").trim(',', ' ').ifEmpty { null }
+                }
+                
+                val currentLabel = winner.label
+                if (currentLabel.isNullOrEmpty()) {
+                    winner.label = winningLabel
+                } else if (!currentLabel.contains(winningLabel)) {
+                    winner.label = currentLabel + ", " + winningLabel
+                }
+                
+                labelToNodeMap[winningLabel] = winner
             }
             addButton("Reset") {
                 competitive.randomize()
+                competitive.competitive.neuronList.forEach { it.label = null }
+                labelToNodeMap.clear()
             }
         }
     }

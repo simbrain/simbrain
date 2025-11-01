@@ -193,7 +193,6 @@ open class CompetitiveGroup @JvmOverloads constructor(
 
     /**
      * Randomize all weights coming in to this network.
-     * TODO: Add gaussian option...
      */
     override fun randomizeIncomingWeights(randomizer: ProbabilityDistribution?) {
         val i: Iterator<Neuron> = neuronList.iterator()

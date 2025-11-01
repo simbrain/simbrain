@@ -123,7 +123,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
     dir("Competitive") {
         item("Competitive network (simple)") { competitiveSim }
         item("Competitive grid network") { competitiveGridSim }
-        item("Competitive image network") { competitiveImageSim }
+        //item("Competitive image network") { competitiveImageSim }
         item("SOM network") { SOMSim }
     }
 

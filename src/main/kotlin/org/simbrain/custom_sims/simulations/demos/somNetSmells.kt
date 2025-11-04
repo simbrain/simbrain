@@ -28,7 +28,7 @@ val somNetSmells = newSim {
     val network = networkComponent.network
 
     val somNet = SOMNetwork(9, 16)
-    network.addNetworkModelAsync(somNet)
+    network.addNetworkModel(somNet)
     somNet.inputLayer.apply {
         setUpperBound(1.0)
         isClamped = false
@@ -163,12 +163,14 @@ val somNetSmells = newSim {
 
             addButton("Reset Learning") {
                 somNet.som.reset()
+                network.events.updated.fire()
             }
 
             addButton("Reset Network") {
                 somNet.randomize()
                 somNet.som.reset()
                 labelTracker.clear(somNet.som.neuronList)
+                network.events.updated.fire()
             }
 
         }

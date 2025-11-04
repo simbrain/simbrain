@@ -644,6 +644,16 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         )?.displayInDialog()
     }
 
+    val showWeightMatrixAdjustmentPanel = networkPanel.createConditionallyEnabledAction(
+        name = "Histogram and custom randomization...",
+        enablingCondition = EnablingConditions.WEIGHT_MATRICES
+    ) {
+        val selectedMatrices = networkPanel.selectionManager.filterSelectedModels<WeightMatrix>()
+        if (selectedMatrices.isNotEmpty()) {
+            WeightMatrixAdjustmentPanel(selectedMatrices.first()).displayInDialog()
+        }
+    }
+
     val showPriorityTableAction = networkPanel.createAction(
         name = "Show priority table...",
         description = "Show a table of all network models and their update priorities",

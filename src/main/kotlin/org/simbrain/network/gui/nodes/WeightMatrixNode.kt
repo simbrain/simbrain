@@ -154,8 +154,6 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
             }
             contextMenu.add(editArray)
             contextMenu.addSeparator()
-            val randomizeAction: Action = networkPanel.networkActions.randomizeObjectsAction
-            contextMenu.add(randomizeAction)
             val diagAction: Action = object : AbstractAction("Diagonalize") {
                 init {
                     // putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/"));
@@ -171,6 +169,19 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
             contextMenu.add(diagAction)
             contextMenu.addSeparator()
             if (weightMatrix is WeightMatrix) {
+                val randomizeAction: Action = networkPanel.networkActions.randomizeObjectsAction
+                contextMenu.add(randomizeAction)
+                contextMenu.add(
+                    networkPanel.createAction(
+                        name = "Randomize symmetric",
+                        description = "Use network weight randomizer to randomize the matrix symmetrically.",
+                    ) {
+                            weightMatrix.weights.randomizeSymmetric(NetworkPreferences.weightRandomizer)
+                            weightMatrix.events.updated.fire()
+                    }
+                )
+                contextMenu.add(networkPanel.networkActions.showWeightMatrixAdjustmentPanel)
+                contextMenu.addSeparator()
                 contextMenu.add(
                     actionManager
                         .createCoupledPlotMenu(
@@ -217,15 +228,6 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
                             weightMatrix.weights.setSpectralRadius(radius)
                             weightMatrix.events.updated.fire()
                         }
-                    }
-                )
-                contextMenu.add(
-                    networkPanel.createAction(
-                        name = "Randomize symmetric",
-                        description = "Use network weight randomizer to randomize the matrix symmetrically ",
-                    ) {
-                            weightMatrix.weights.randomizeSymmetric(NetworkPreferences.weightRandomizer)
-                            weightMatrix.events.updated.fire()
                     }
                 )
                 contextMenu.add(

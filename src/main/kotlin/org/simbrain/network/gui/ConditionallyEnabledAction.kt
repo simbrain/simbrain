@@ -3,6 +3,7 @@ package org.simbrain.network.gui
 import org.simbrain.network.core.LocatableModel
 import org.simbrain.network.gui.nodes.NeuronNode
 import org.simbrain.network.gui.nodes.SynapseNode
+import org.simbrain.network.gui.nodes.WeightMatrixNode
 import javax.swing.AbstractAction
 
 abstract class ConditionallyEnabledAction(
@@ -47,6 +48,11 @@ object EnablingConditions {
     /** Enable if at least one synapse is selected */
     val SYNAPSES: NetworkPanel.() -> Boolean = {
         selectionManager.selection.any { it is SynapseNode }
+    }
+    
+    /** Enable if at least one weight matrix is selected */
+    val WEIGHT_MATRICES: NetworkPanel.() -> Boolean = {
+        selectionManager.selection.any { it is WeightMatrixNode }
     }
     
     /** Enable if at least one network model is selected */

@@ -79,4 +79,35 @@ class BackpropNetworkTest {
         Assertions.assertNotNull(fromXml.getModelByLabel(BackpropNetwork::class.java, "backprop"))
     }
 
+    @Test
+    fun `test automatic loss function update when output layer changes`() = runBlocking {
+        val network = Network()
+        val backpropNet = BackpropNetwork(intArrayOf(3, 3), null)
+        network.addNetworkModelsAsync(backpropNet)
+
+        // Initially, with SigmoidalRule (default for output layer), should have SSE
+        Assertions.assertEquals(org.simbrain.network.trainers.BackpropLossFunction.SSE, backpropNet.trainerConfig.lossFunction)
+        Assertions.assertTrue(backpropNet.trainerConfig.lossFunction.canUse(backpropNet.outputLayer))
+
+        // Change to SoftmaxRule - loss function should auto-update to CrossEntropy
+        backpropNet.outputLayer.updateRule = SoftmaxRule()
+        
+        // Give the event listener time to fire
+        kotlinx.coroutines.delay(100)
+        
+        // Verify the loss function was automatically updated to CrossEntropy
+        Assertions.assertEquals(org.simbrain.network.trainers.BackpropLossFunction.CrossEntropy, backpropNet.trainerConfig.lossFunction)
+        Assertions.assertTrue(backpropNet.trainerConfig.lossFunction.canUse(backpropNet.outputLayer))
+
+        // Change back to SigmoidalRule - loss function should auto-update back to SSE
+        backpropNet.outputLayer.updateRule = SigmoidalRule().apply { type = SigmoidFunctionEnum.LOGISTIC }
+        
+        // Give the event listener time to fire
+        kotlinx.coroutines.delay(100)
+        
+        // Verify the loss function was automatically updated back to SSE (first in the list)
+        Assertions.assertEquals(org.simbrain.network.trainers.BackpropLossFunction.SSE, backpropNet.trainerConfig.lossFunction)
+        Assertions.assertTrue(backpropNet.trainerConfig.lossFunction.canUse(backpropNet.outputLayer))
+    }
+
 }

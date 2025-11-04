@@ -370,4 +370,57 @@ class SupervisedModelTest {
 
     }
 
+    @Test
+    fun `test automatic loss function update when output layer changes`() = runBlocking {
+        val network = Network()
+        val inputLayer = NeuronArray(3).also { network.addNetworkModelsAsync(it) }
+        val outputLayer = NeuronArray(3).also { network.addNetworkModelsAsync(it) }
+        val wm = WeightMatrix(inputLayer, outputLayer).also { network.addNetworkModelsAsync(it) }
+        val supervisedModel = SupervisedModel(inputLayer, outputLayer).also { network.addNetworkModelsAsync(it) }
+
+        // Initially, with LinearRule (default), should have SSE
+        assertEquals(BackpropLossFunction.SSE, supervisedModel.trainerConfig.lossFunction)
+        assertTrue(supervisedModel.trainerConfig.lossFunction.canUse(outputLayer))
+
+        // Change to SoftmaxRule - loss function should auto-update to CrossEntropy
+        outputLayer.updateRule = org.simbrain.network.updaterules.SoftmaxRule()
+        
+        // Give the event listener time to fire
+        kotlinx.coroutines.delay(100)
+        
+        // Verify the loss function was automatically updated to CrossEntropy
+        assertEquals(BackpropLossFunction.CrossEntropy, supervisedModel.trainerConfig.lossFunction)
+        assertTrue(supervisedModel.trainerConfig.lossFunction.canUse(outputLayer))
+
+        // Change back to SigmoidalRule - loss function should auto-update back to SSE
+        outputLayer.updateRule = SigmoidalRule().apply { type = SigmoidFunctionEnum.LOGISTIC }
+        
+        // Give the event listener time to fire
+        kotlinx.coroutines.delay(100)
+        
+        // Verify the loss function was automatically updated back to SSE (first in the list)
+        assertEquals(BackpropLossFunction.SSE, supervisedModel.trainerConfig.lossFunction)
+        assertTrue(supervisedModel.trainerConfig.lossFunction.canUse(outputLayer))
+    }
+
+    @Test
+    fun `test automatic loss function update for initial softmax layer`() = runBlocking {
+        val network = Network()
+        val inputLayer = NeuronArray(3).also { network.addNetworkModelsAsync(it) }
+        
+        // Create output layer with SoftmaxRule BEFORE creating the SupervisedModel
+        val outputLayer = NeuronArray(3).apply {
+            updateRule = org.simbrain.network.updaterules.SoftmaxRule()
+        }.also { network.addNetworkModelsAsync(it) }
+        
+        val wm = WeightMatrix(inputLayer, outputLayer).also { network.addNetworkModelsAsync(it) }
+        
+        // Create SupervisedModel - it should detect the SoftmaxRule and set CrossEntropy immediately
+        val supervisedModel = SupervisedModel(inputLayer, outputLayer).also { network.addNetworkModelsAsync(it) }
+
+        // Verify the loss function was automatically set to CrossEntropy at initialization
+        assertEquals(BackpropLossFunction.CrossEntropy, supervisedModel.trainerConfig.lossFunction)
+        assertTrue(supervisedModel.trainerConfig.lossFunction.canUse(outputLayer))
+    }
+
 }

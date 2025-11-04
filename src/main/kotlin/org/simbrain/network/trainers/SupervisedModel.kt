@@ -100,6 +100,9 @@ class SupervisedModel(
                 delete()
             }
         }
+        
+        // Listen for output layer update rule changes and auto-adjust loss function if needed
+        setupLossFunctionAutoUpdate()
     }
 
     /**

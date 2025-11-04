@@ -10,10 +10,7 @@ import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.util.copy
 import org.simbrain.util.math.SigmoidFunctionEnum
 import org.simbrain.util.point
-import org.simbrain.util.randomMutableList
 import java.awt.geom.Point2D
-import kotlin.math.ceil
-import kotlin.math.min
 
 /**
  * Backprop network.
@@ -45,6 +42,9 @@ class BackpropNetwork : FeedForward, SupervisedNetwork {
         val (training, testing) = splitDataSet(initialData, 0.8)
         trainingSet = training
         testingSet = testing
+        
+        // Setup automatic loss function updates
+        setupLossFunctionAutoUpdate()
     }
 
     @XStreamConstructor()

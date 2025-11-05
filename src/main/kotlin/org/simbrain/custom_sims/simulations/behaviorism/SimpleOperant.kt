@@ -133,28 +133,30 @@ suspend fun SimulationScope.setUpSimpleOperantWorkpace(workspace: Workspace) {
 
         addSidebarInfo(
             """
-            # Introduction
+            # Simple Operant
             
-            This simulation demonstrates simple operant conditioning using a probabilistic model of behavior. The three nodes represent different behaviors (`Yell`, `Sit`, `Run`) that are initially performed with equal probability. Through selective reinforcement and punishment, you can shape the agent's spontaneous behavior to favor desired actions.
+            This simulation demonstrates simple operant conditioning using a probabilistic model of behavior. The three nodes represent different behaviors (`Yell`, `Sit`, `Run`) that 
+            are initially performed with equal probability. Through selective reinforcement and punishment, you can shape the agent's spontaneous behavior to favor desired actions.
 
             # Simulation Details
             
             In this model:
             - Three behavior neurons represent possible actions the agent can take
-            - Initial probabilities (visible in labels beneath the neurons) are equal (0.33 each) so all behaviors are equally likely
+            - Initial probabilities (visible in labels beneath the neurons) are equal (`0.33` each) so all behaviors are equally likely
             - Winning behavior is selected based on sampling from current probabilities each time step
             - Learning occurs when you reward or punish the currently active behavior
             
-            When you reward a behavior, its probability increases. When you punish it, the probability decreases. After each learning event, probabilities are normalized so they always sum to 1.0.
+            When you reward a behavior, its probability increases. When you punish it, the probability decreases. After each learning event, probabilities are normalized so they always
+            sum to `1.0`.
 
             # What to Do
             
             1. Run the simulation to see random behavior selection based on current probabilities
             
-            2. Choose a target behavior you want the agent to learn (e.g., make it always "Sit")
+            2. Choose a target behavior you want the agent to learn (e.g., make it always `Sit`)
             
             3. Apply reinforcement:
-               - When your target behavior is active (activation = 1.0), click `Reward Agent`
+               - When your target behavior is active (activation = `1.0`), click `Reward Agent`
                - When other behaviors are active, click `Punish Agent`
                - You can also click `Do Nothing` to just observe without learning
             
@@ -173,6 +175,7 @@ suspend fun SimulationScope.setUpSimpleOperantWorkpace(workspace: Workspace) {
             Tim Meyer
             
             [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
+            
             """.trimIndent()
         )
     }

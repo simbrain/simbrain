@@ -102,9 +102,10 @@ val operantWithEnvironment = newSim("operant_with_environment") {
     addSidebarInfo(
         """
         
-        # Introduction
+        # Operant with Environment
         
-        This simulation demonstrates operant conditioning in an environment where an agent learns to associate stimuli with behaviors through reward and punishment. The agent has three basic behaviors (`Wiggle`, `Explore`, `Spin`) that it performs with certain probabilities. These behaviors can be reinforced or discouraged based on environmental feedback.
+        This simulation demonstrates operant conditioning in an environment where an agent learns to associate stimuli with behaviors through reward and punishment. The agent has three
+        basic behaviors (`Wiggle`, `Explore`, `Spin`) that it performs with certain probabilities. These behaviors can be reinforced or discouraged based on environmental feedback.
         
         # Simulation Details
         
@@ -120,9 +121,11 @@ val operantWithEnvironment = newSim("operant_with_environment") {
         - Stimulus neurons detect objects in the environment  
         - Behavior neurons control which action the agent performs  
         - Intrinsic probabilities (shown as labels on behavior neurons) determine baseline or spontaneous behavior tendencies  
-        - Connections between stimuli and behaviors can be strengthened or weakened through learning. These connections determine behaviors that are conditional on the presence of stimuli.  
+        - Connections between stimuli and behaviors can be strengthened or weakened through learning. These connections determine behaviors that are conditional on the presence of 
+        stimuli.  
         
-        When the agent is near an object and performs a behavior, you can reward or punish that stimulus–response pairing. This increases or decreases the likelihood of that behavior occurring in that context.
+        When the agent is near an object and performs a behavior, you can reward or punish that stimulus–response pairing. This increases or decreases the likelihood of that behavior
+        occurring in that context.
         
         # What to Do
         
@@ -146,9 +149,13 @@ val operantWithEnvironment = newSim("operant_with_environment") {
            - Notice how the agent's behavior becomes more predictable near certain objects  
            - Observe how intrinsic behavior probabilities (shown on the behavior neurons) adjust when no stimuli are present  
         
-        At this point you can demonstrate the idea of a discriminative stimulus (also called a controlling stimulus). This is a stimulus that, after training, increases the probability of an operant behavior. It signals the relationship between a behavior and a reinforcer. The behavior can then be said to be under the control of that stimulus. For example, pressing a lever may only produce food when a light is on.  
+        At this point you can demonstrate the idea of a discriminative stimulus (also called a controlling stimulus). This is a stimulus that, after training, increases the probability
+        of an operant behavior. It signals the relationship between a behavior and a reinforcer. The behavior can then be said to be under the control of that stimulus. For example, 
+        pressing a lever may only produce food when a light is on.  
         
-        In this simulation, you might first train the agent to wiggle spontaneously. Then you can transfer control of this behavior to the candle, so that wiggling only occurs when the candle is present. You could punish wiggling when the candle is absent, and train the agent to do something else spontaneously instead. In that case, wiggling is said to be under the control of the candle, which is now the discriminative stimulus.
+        In this simulation, you might first train the agent to wiggle spontaneously. Then you can transfer control of this behavior to the candle, so that wiggling only occurs when the
+        candle is present. You could punish wiggling when the candle is absent, and train the agent to do something else spontaneously instead. In that case, wiggling is said to be under 
+        the control of the candle, which is now the discriminative stimulus.
         
         # References
         

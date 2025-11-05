@@ -124,7 +124,7 @@ val srnElmanSentences = newSim {
 
     addSidebarInfo(
         """
-        # Introduction
+        # Next Word Prediction (SRN)
         
         This simulation implements Elman's (1990) classic study of temporal pattern learning in Simple Recurrent Networks (SRNs). 
         he network learns to predict the next word in grammatically constrained sentences, developing internal representations 
@@ -137,9 +137,9 @@ val srnElmanSentences = newSim {
         - **Verb categories**: Intransitive, transitive, aggressive-patient, perceptual, destructive, eating
         
         Example sentence templates:
-        - "man eat cookie" (human + eat + food)
-        - "dragon destroy glass" (aggressive + destroy + fragile)
-        - "cat chase mouse" (animal + transitive + animal)
+        - `man eat cookie` (human + eat + food)
+        - `dragon destroy glass` (aggressive + destroy + fragile)
+        - `cat chase mouse` (animal + transitive + animal)
         
         The SRN processes these sentences one word at a time, using its recurrent connections to maintain context and predict the next word based on grammatical constraints.
 

@@ -110,7 +110,7 @@ val edgeOfChaosBitStream = newSim("edgeOfChaosBitStream") {
 
     addSidebarInfo(
         """   
-        # Introduction
+        # Edge of Chaos Bitstream
                         
         This simulation is an experimental study of reservoir networks, studying the ideas that Nils Bertschinger and Thomas Natschläger proposed in their paper, _Real-time
         computation at the edge of chaos in recurrent neural networks_.

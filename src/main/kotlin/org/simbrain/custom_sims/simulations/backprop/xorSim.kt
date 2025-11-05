@@ -61,30 +61,36 @@ val xorSim = newSim {
 
     addSidebarInfo(
         """
-        # Introduction
+        # XOR
         
         A basic demonstration of the backpropagation algorithm using the classic XOR problem. XOR (exclusive or) is a logical function that cannot be solved by a single layer network, making it a good test case for multi-layer neural networks.
         
         # What to Do
         
-        1. Double-click on the "XOR" network in the "XOR" network window to open the "Train Network" window
+        1. Double-click on the "XOR" network in the `XOR` network window to open the `Train Network` window.
         
-        2. In the top area of this window, select the "Iterate training until the stop button is pressed" button to play the simulation
+        2. In the top area of this window, select the `Iterate training until the stop button is pressed` button to play the simulation.
         
-        3. The "Sum Squared Error" should decrease as the iterations increase and end up around 0. The goal is to get the error as low as possible
+        3. The `Sum Squared Error` should decrease as the iterations increase and end up around 0. The goal is to get the error as low as possible.
         
-        4. Click "Apply current row as input and increment selected row" to check the network's performance
+        4. Click `Apply current row as input and increment selected row` to check the network's performance.
         
-        5. As you click through the training data, the pattern on the bottom should be matched by the pattern on the top
+        5. As you click through the training data, the pattern on the bottom should be matched by the pattern on the top.
         
         # Training Data
         
         The XOR training set consists of:
-        - Input (0,0) should produce output 0
-        - Input (1,0) should produce output 1  
-        - Input (0,1) should produce output 1
-        - Input (1,1) should produce output 0
+        - Input `(0,0)` should produce output `0`
+        - Input `(1,0)` should produce output `1`  
+        - Input `(0,1)` should produce output `1`
+        - Input `(1,1)` should produce output `0`
         
+        # Credits
+        
+        Jasmine Lau
+        
+        [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
+
         """.trimIndent()
     )
 

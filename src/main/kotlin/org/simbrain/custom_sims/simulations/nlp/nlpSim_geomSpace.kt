@@ -69,7 +69,7 @@ val nlpSimBasic = newSim {
     addSidebarInfo(
         """
             
-       ## Introduction
+       # Basic Word Embeddings
     
        This simulation demonstrates a simple approach to word embeddings using a co-occurrence method. 
        Words that occur in similar contexts develop similar vector representations, allowing us to visualize 
@@ -81,9 +81,9 @@ val nlpSimBasic = newSim {
        Word embeddings are numerical representations of word meaning built from patterns of co-occurrence in text. 
        The basic idea is that words used in similar contexts tend to have similar meanings. This simulation uses a 
        simple co-occurrence matrix, where each row represents a target word and each column represents a context word.
-        The values indicate how often a word appears near another within a moving window of text. These values are 
-        normalized using Positive Pointwise Mutual Information (PPMI), which highlights informative co-occurrences and 
-        downplays those that happen frequently by chance.
+       The values indicate how often a word appears near another within a moving window of text. These values are 
+       normalized using Positive Pointwise Mutual Information (PPMI), which highlights informative co-occurrences and 
+       downplays those that happen frequently by chance.
     
        To visualize embeddings, Principal Component Analysis (PCA) is used to reduce the high-dimensional co-occurrence 
        space to two dimensions. PCA preserves relative distances between words so that those with similar distributions 
@@ -94,14 +94,14 @@ val nlpSimBasic = newSim {
        regularities in linguistic experience. While our corpus is small and artificial, it demonstrates the same 
        principles that underlie larger-scale embeddings such as Word2Vec or GloVe.
     
-       ## Simulation Details
+       # Simulation Details
     
        The simulation consists of two main components:
     
        Text World: Displays a corpus of text and automatically iterates through tokens. The text is used to generate a 
        co-occurrence matrix and the resulting word embeddings.  
     
-       Projection Plot (labeled "Activations"): Shows the embeddings in a two-dimensional scatterplot using PCA. 
+       Projection Plot (labeled `Activations`): Shows the embeddings in a two-dimensional scatterplot using PCA. 
        Words with  similar co-occurrence patterns appear near one another.
     
        You can also view the co-occurrence matrix directly by clicking the matrix button. Rows represent target words and 
@@ -109,7 +109,7 @@ val nlpSimBasic = newSim {
        Selecting rows and clicking the view embedding button produces a similarity heatmap based on cosine similarity, 
        where higher values indicate greater similarity.
     
-       ## What to Do
+       # What to Do
     
        1. Run the simulation from the menu Simulations > NLP > Basic word embeddings.  
        2. Observe the interface: the text world on the left and the PCA projection on the right.  
@@ -118,17 +118,11 @@ val nlpSimBasic = newSim {
        Compare, for example, bus and butterfly.  
        5. Try loading a different corpus from the simulations/texts folder. Notice how changing the training text alters the positions of words in the projection plot.
     
-       ## Credits
+       # Credits
     
        [Jeff Yoshimi](https://jeffyoshimi.net/index.html)  
 
        Ellis Cain
-
-        # Credits
-        
-        [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
-        
-        Ellis Cain
         
         """.trimIndent()
     )

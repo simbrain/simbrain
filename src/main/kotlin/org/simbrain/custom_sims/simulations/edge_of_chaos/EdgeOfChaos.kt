@@ -130,10 +130,10 @@ val edgeOfChaos = newSim("edgeOfChaos") {
 
     addSidebarInfo(
         """
-        # Introduction
+        # Edge of Chaos Embodied
                 
         This simulation is an experimental study of how representations in a reservoir network are effected in different dynamic regimes: chaos, edge of chaos, and ordered. This simulation
-        builds upon the work in the `Edge of Chaos bitstream` simulation, specifically, the work of Nils Bertschinger and Thomas Natschl\u00E4ger, _Real-time computation at the edge of chaos in
+        builds upon the work in the `Edge of Chaos bitstream` simulation, specifically, the work of Nils Bertschinger and Thomas Natschläger, _Real-time computation at the edge of chaos in
         recurrent neural networks_. For an in-depth description and illustration of the different dynamical regimes, refer to the `Edge of Chaos bitstream` simulation. 
         The main goal of this simulation, similar to the other `Edge Of Chaos` simulation, is to find the edge of chaos and visualize its effects on an agent's representation of an object. Please note,
         we have not finished studying this network so if you find any patterns or structure, let us know!
@@ -175,15 +175,13 @@ val edgeOfChaos = newSim("edgeOfChaos") {
                 
         # References
                 
-        Bertschinger, N., & Natschl\u00E4ger, T. (2004). [Real-Time Computation at the Edge of Chaos in Recurrent Neural Networks](https://doi.org/10.1162/089976604323057443). _Neural Computation_, _16_(7), 1413\u20131436.
+        Bertschinger, N., & Natschläger, T. (2004). [Real-Time Computation at the Edge of Chaos in Recurrent Neural Networks](https://doi.org/10.1162/089976604323057443). _Neural Computation_, _16_(7), 1413\u20131436.
                 
         # Credits
                 
         [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
         
         Kanly Thao
-
-        
 
         """.trimIndent()
     )

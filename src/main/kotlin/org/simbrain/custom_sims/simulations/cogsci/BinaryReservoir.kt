@@ -175,14 +175,14 @@ val binaryReservoir = newSim {
 
     addSidebarInfo(
         """
-        # Introduction
+        # Binary Reservoir
         
         This simulation shows how research can be done in Simbrain and in coordination with other programming environments. Though this simulation can be 
         used directly in any way as desired, pressing the buttons can configure parameters, run simulations, and save data that is outputted to a .csv file 
         which can then be analyzed in other programming environments like Python. For more information on the `Binary Reservoir` simulation and its usage, 
         feel free to contact jponcedeleon@ucmerced.edu.
 
-        ## Simulation Details
+        # Simulation Details
         
         In this simulation, each trial resets the node connection parameters, and after `400` baseline iterations, it models a perturbation to the network by adding 
         an additional input signal to `10%` of the nodes, and continues to update activations for an additional `300` iterations to show the reservoir's response to new input

@@ -250,7 +250,7 @@ val objectTrackingSim = newSim {
 
     addSidebarInfo(
         """
-        # Introduction
+        # Object Tracking Reservoir
         
         This is one of the models presented in the paper, *A potential mechanism for Gibsonian resonance: behavioral entrainment emerges from local homeostasis 
         in an unsupervised reservoir network*. This simulation simulates an agent learning how to visually track an object using a reservoir network. 

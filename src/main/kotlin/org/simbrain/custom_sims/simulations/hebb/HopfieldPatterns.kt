@@ -33,7 +33,7 @@ val hopfieldPatterns = newSim {
 
     addSidebarInfo(
         """
-        # Introduction
+        # Hopfield Patterns
         
         This demo allows you to study [Hopfield networks](https://en.wikipedia.org/wiki/Hopfield_network), which are recurrent networks often used for pattern recognition and to model memory retrieval.
         
@@ -58,12 +58,12 @@ val hopfieldPatterns = newSim {
                     
         # What to Do        
         
-        - Select one of the patterns on the button panel. 
-        - Press the train button to train the network on that pattern. Each time you press "train" it will "burn in" the pattern further.
-        - Note that it will learn both the pattern and its anti-pattern.
-        - To confirm the pattern is remembered, try randomizing the network with `N -> R` and then iterating by pressing space to see if the pattern is recreated.
-        - You can also manually create part of the pattern you trained the network and see if it can recreate it.
-        - You can also select an already trained pattern and changing a few of the neurons to see if it will go back to the pattern.
+        1. Select one of the patterns on the button panel. 
+        2. Press the train button to train the network on that pattern. Each time you press "train" it will "burn in" the pattern further.
+        3. Note that it will learn both the pattern and its anti-pattern.
+        4. To confirm the pattern is remembered, try randomizing the network with `N -> R` and then iterating by pressing space to see if the pattern is recreated.
+        5. You can also manually create part of the pattern you trained the network and see if it can recreate it.
+        6. You can also select an already trained pattern and changing a few of the neurons to see if it will go back to the pattern.
         
         # A few experiments...
         - Train the network on the E, F, and L patterns, then randomize and iterate the network (N -> R). What do you notice?
@@ -75,7 +75,7 @@ val hopfieldPatterns = newSim {
         
         [Jensen Guo](https://www.linkedin.com/in/jensen-guo/) 
         
-            [Jeff Yoshimi](www.jeffyoshimi.net)
+        [Jeff Yoshimi](www.jeffyoshimi.net)
         
         """.trimIndent()
     )

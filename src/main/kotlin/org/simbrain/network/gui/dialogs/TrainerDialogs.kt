@@ -58,6 +58,7 @@ fun SimbrainTablePanel.applyCommonTrainerAttributes(parentDialog: StandardDialog
     addAction(table.exportCsv(parentComponent = parentDialog))
     addAction(table.randomizeAction)
     addAction(table.showBoxPlotAction)
+    addAction(table.createShowMatrixPlotAction())
     preferredSize = Dimension(400, 250)
 }
 

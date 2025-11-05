@@ -68,12 +68,9 @@ class SOMGroupTest {
         repeat(3) {
             net.update()
         }
-        assertEquals(99.85, SOM.neighborhoodSize, 0.001) // Starts at 100.0
-        assertEquals(0.0498, SOM.learningRate, 0.001) // Starts at 0.06
+        assertEquals(99.85, SOM.neighborhoodSize, 0.001)
+        assertEquals(0.05964, SOM.learningRate, 0.00001)
     }
 
-    @Test
-    fun `Test winner function`() {
 
-    }
 }

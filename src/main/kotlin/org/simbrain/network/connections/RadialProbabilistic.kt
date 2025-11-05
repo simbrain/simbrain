@@ -96,13 +96,13 @@ class RadialProbabilistic(
         source: List<Neuron>,
         target: List<Neuron>
     ): List<Synapse> {
-        val exc = createProbabilisticallySynapses(
+        val exc = createSynapsesProbabilistically(
             source, target, excitatoryProbability,
             excitatoryRadius, allowSelfConnections,
             exRandomizer,
             random
         )
-        val inh = createProbabilisticallySynapses(
+        val inh = createSynapsesProbabilistically(
             source, target, excitatoryProbability,
             excitatoryRadius, allowSelfConnections,
             inRandomizer,
@@ -131,7 +131,7 @@ class RadialProbabilistic(
 
 }
 
-fun createProbabilisticallySynapses(
+fun createSynapsesProbabilistically(
     src: List<Neuron>,
     tar: List<Neuron>,
     prob: Double,
@@ -141,14 +141,14 @@ fun createProbabilisticallySynapses(
     random: Random = Random
 ): List<Synapse> {
     return src.flatMap { n ->
-        n.createProbabilisticallySynapses(tar, prob, radius, allowSelfConnection, weightRandomizer, random)
+        n.createSynapsesProbabilistically(tar, prob, radius, allowSelfConnection, weightRandomizer, random)
     }
 }
 
 /**
  * Connect a neuron to N other neurons, in a provided pool of neurons, using a provided probability
  */
-fun Neuron.createProbabilisticallySynapses(
+fun Neuron.createSynapsesProbabilistically(
     pool: List<Neuron>,
     prob: Double,
     radius: Double,
@@ -162,7 +162,7 @@ fun Neuron.createProbabilisticallySynapses(
         }
         .filter { random.nextDouble() < prob }
         .map { otherNeuron ->
-            Synapse(this, otherNeuron, otherNeuron.polarity.value(weightRandomizer.sampleDouble()))
+            Synapse(this, otherNeuron, this.polarity.value(weightRandomizer.sampleDouble()))
         }
 }
 

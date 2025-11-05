@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.addNeuronCollection
+import org.simbrain.util.SimbrainConstants.Polarity
 
 class SparseTest {
 
@@ -125,6 +126,98 @@ class SparseTest {
             sparse,
             expectIdentical = false
         )
+    }
+
+    @Test
+    fun `percentExcitatory should be respected with all BOTH polarity neurons`() {
+        val sources = List(10) { Neuron() }
+        val targets = List(10) { Neuron() }
+        
+        sparse.connectionDensity = 0.5
+        sparse.allowSelfConnection = true
+        
+        sparse.percentExcitatory = 50.0
+        val syns = sparse.connectNeurons(sources, targets)
+        val excitatoryCount = syns.count { it.strength > 0 }
+        val expectedExcitatory = (syns.size * 0.5).toInt()
+        assertEquals(expectedExcitatory, excitatoryCount)
+        
+        sparse.percentExcitatory = 0.0
+        val syns2 = sparse.connectNeurons(sources, targets)
+        val excitatoryCount2 = syns2.count { it.strength > 0 }
+        assertEquals(0, excitatoryCount2)
+        
+        sparse.percentExcitatory = 100.0
+        val syns3 = sparse.connectNeurons(sources, targets)
+        assertTrue(syns3.all { it.strength > 0 })
+    }
+
+    @Test
+    fun `EXCITATORY neurons should always produce positive weights regardless of percentExcitatory`() {
+        val sources = List(10) { Neuron().apply { polarity = Polarity.EXCITATORY } }
+        val targets = List(10) { Neuron() }
+        
+        sparse.connectionDensity = 0.3
+        sparse.percentExcitatory = 0.0
+        val syns = sparse.connectNeurons(sources, targets)
+        assertTrue(syns.all { it.strength > 0 }) {
+            "All synapses from EXCITATORY neurons should be positive, but found: ${syns.map { it.strength }}"
+        }
+    }
+
+    @Test
+    fun `INHIBITORY neurons should always produce negative weights regardless of percentExcitatory`() {
+        val sources = List(10) { Neuron().apply { polarity = Polarity.INHIBITORY } }
+        val targets = List(10) { Neuron() }
+        
+        sparse.connectionDensity = 0.5
+        sparse.allowSelfConnection = true
+        sparse.percentExcitatory = 100.0
+        val syns = sparse.connectNeurons(sources, targets)
+        assertTrue(syns.isNotEmpty() && syns.all { it.strength < 0 }) {
+            "All synapses from INHIBITORY neurons should be negative, but found: ${syns.map { it.strength }}"
+        }
+    }
+
+    @Test
+    fun `mixed polarity neurons should respect both pre-polarized and BOTH neurons`() {
+        val excitatoryNeurons = List(3) { Neuron().apply { polarity = Polarity.EXCITATORY } }
+        val inhibitoryNeurons = List(3) { Neuron().apply { polarity = Polarity.INHIBITORY } }
+        val bothNeurons = List(4) { Neuron().apply { polarity = Polarity.BOTH } }
+        val sources = excitatoryNeurons + inhibitoryNeurons + bothNeurons
+        val targets = List(10) { Neuron() }
+        
+        sparse.connectionDensity = 0.5
+        sparse.percentExcitatory = 50.0
+        val syns = sparse.connectNeurons(sources, targets)
+        
+        val excitatorySourceSyns = syns.filter { it.source in excitatoryNeurons }
+        assertTrue(excitatorySourceSyns.all { it.strength > 0 })
+        
+        val inhibitorySourceSyns = syns.filter { it.source in inhibitoryNeurons }
+        assertTrue(inhibitorySourceSyns.all { it.strength < 0 })
+        
+        val totalSyns = syns.size
+        val expectedExcitatory = (totalSyns * 0.5).toInt()
+        val actualExcitatory = syns.count { it.strength > 0 }
+        assertEquals(expectedExcitatory, actualExcitatory)
+    }
+
+    @Test
+    fun `with only polarized neurons percentExcitatory should be ignored`() {
+        val excitatoryNeurons = List(5) { Neuron().apply { polarity = Polarity.EXCITATORY } }
+        val inhibitoryNeurons = List(5) { Neuron().apply { polarity = Polarity.INHIBITORY } }
+        val sources = excitatoryNeurons + inhibitoryNeurons
+        val targets = List(10) { Neuron() }
+        
+        sparse.connectionDensity = 0.5
+        sparse.allowSelfConnection = true
+        sparse.percentExcitatory = 30.0
+        val syns = sparse.connectNeurons(sources, targets)
+        
+        val excitatoryCount = syns.count { it.strength > 0 }
+        val inhibitoryCount = syns.count { it.strength < 0 }
+        assertTrue(excitatoryCount > 0 && inhibitoryCount > 0)
     }
 
 }

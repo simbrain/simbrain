@@ -11,7 +11,6 @@ import org.simbrain.network.spikeresponders.SpikeResponder
 import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.UserParameter
-import org.simbrain.util.Utils
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
@@ -255,6 +254,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
     constructor(source: Neuron, target: Neuron) {
         this.source = source
         this.target = target
+        _strength = source.polarity.value(_strength)
         if (!this.overlapsExistingSynapse()) {
             source.addToFanOut(this)
             target.addToFanIn(this)

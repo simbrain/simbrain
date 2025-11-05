@@ -1,9 +1,11 @@
 package org.simbrain.network.connections
 
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
+import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.point
 
 class FixedDegreeTest {
@@ -67,6 +69,111 @@ class FixedDegreeTest {
         val syns = conn.connectNeurons(listOf(n1), listOf(n1, n2, n3))
         assertEquals(2, syns.size)
         assertEquals(2, n1.fanIn.size)
+    }
+
+    @Test
+    fun `EXCITATORY source neurons with Direction IN should produce positive weights`() {
+        val sources = List(5) { i -> Neuron().apply {
+            polarity = Polarity.EXCITATORY
+            x = i * 10.0
+            y = 0.0
+        }}
+        val targets = List(10) { i -> Neuron().apply {
+            x = i * 10.0
+            y = 50.0
+        }}
+        val fixedDegree = FixedDegree(degree = 3, direction = Direction.IN)
+        
+        fixedDegree.percentExcitatory = 0.0
+        val syns = fixedDegree.connectNeurons(targets, sources)
+        
+        assertTrue(syns.all { it.strength > 0 }) {
+            "All synapses FROM EXCITATORY neurons should be positive, but found: ${syns.map { it.strength }}"
+        }
+    }
+
+    @Test
+    fun `INHIBITORY source neurons with Direction IN should produce negative weights`() {
+        val sources = List(5) { i -> Neuron().apply {
+            polarity = Polarity.INHIBITORY
+            x = i * 10.0
+            y = 0.0
+        }}
+        val targets = List(10) { i -> Neuron().apply {
+            x = i * 10.0
+            y = 50.0
+        }}
+        val fixedDegree = FixedDegree(degree = 3, direction = Direction.IN)
+        
+        fixedDegree.percentExcitatory = 100.0
+        val syns = fixedDegree.connectNeurons(targets, sources)
+        
+        assertTrue(syns.all { it.strength < 0 }) {
+            "All synapses FROM INHIBITORY neurons should be negative, but found: ${syns.map { it.strength }}"
+        }
+    }
+
+    @Test
+    fun `EXCITATORY source neurons with Direction OUT should produce positive weights`() {
+        val sources = List(5) { i -> Neuron().apply {
+            polarity = Polarity.EXCITATORY
+            x = i * 10.0
+            y = 0.0
+        }}
+        val targets = List(10) { i -> Neuron().apply {
+            x = i * 10.0
+            y = 50.0
+        }}
+        val fixedDegree = FixedDegree(degree = 3, direction = Direction.OUT)
+        
+        fixedDegree.percentExcitatory = 0.0
+        val syns = fixedDegree.connectNeurons(sources, targets)
+        
+        assertTrue(syns.all { it.strength > 0 }) {
+            "All synapses FROM EXCITATORY neurons should be positive, but found: ${syns.map { it.strength }}"
+        }
+    }
+
+    @Test
+    fun `INHIBITORY source neurons with Direction OUT should produce negative weights`() {
+        val sources = List(5) { i -> Neuron().apply {
+            polarity = Polarity.INHIBITORY
+            x = i * 10.0
+            y = 0.0
+        }}
+        val targets = List(10) { i -> Neuron().apply {
+            x = i * 10.0
+            y = 50.0
+        }}
+        val fixedDegree = FixedDegree(degree = 3, direction = Direction.OUT)
+        
+        fixedDegree.percentExcitatory = 100.0
+        val syns = fixedDegree.connectNeurons(sources, targets)
+        
+        assertTrue(syns.all { it.strength < 0 }) {
+            "All synapses FROM INHIBITORY neurons should be negative, but found: ${syns.map { it.strength }}"
+        }
+    }
+
+    @Test
+    fun `percentExcitatory should work with BOTH polarity neurons`() {
+        val sources = List(10) { i -> Neuron().apply {
+            polarity = Polarity.BOTH
+            x = i * 10.0
+            y = 0.0
+        }}
+        val targets = List(10) { i -> Neuron().apply {
+            x = i * 10.0
+            y = 50.0
+        }}
+        val fixedDegree = FixedDegree(degree = 5, direction = Direction.OUT)
+        
+        fixedDegree.percentExcitatory = 50.0
+        val syns = fixedDegree.connectNeurons(sources, targets)
+        
+        val excitatoryCount = syns.count { it.strength > 0 }
+        val expectedExcitatory = (syns.size * 0.5).toInt()
+        assertEquals(expectedExcitatory, excitatoryCount)
     }
 
 }

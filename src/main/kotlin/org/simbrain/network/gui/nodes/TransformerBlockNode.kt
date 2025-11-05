@@ -256,6 +256,11 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
                 .lineTo(selfAttentionImage.anchorCenterBottom())
                 .buildWithoutArrowhead(),
             createArrowPath()
+                .startAt(selfAttentionImage.anchorCenterRight())
+                .lineToX(vMatrixImage.anchorCenterTop().withOffset(offsetX = -40.0))
+                .lineToY(selfAttentionImage.anchorCenterTop().withOffset(offsetY = -10.0))
+                .buildWithMultiply(),
+            createArrowPath()
                 .startAt(vMatrixImage.anchorCenterTop())
                 .lineToXY(
                     vMatrixImage.anchorCenterTop(),
@@ -263,11 +268,6 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
                 )
                 .lineToX(busX)
                 .buildWithJunction(),
-            createArrowPath()
-                .startAt(selfAttentionImage.anchorCenterRight())
-                .lineToX(vMatrixImage.anchorCenterTop().withOffset(offsetX = -40.0))
-                .lineToY(selfAttentionImage.anchorCenterTop().withOffset(offsetY = -10.0))
-                .build(),
             createArrowPath()
                 .startAt(feedForwardInputImage.anchorRelative(1.0, 0.25))
                 .lineToX(feedForwardW1Image.anchorTopLeft())
@@ -573,6 +573,10 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
         fun buildWithJunction(strokeWidth: kotlin.Float = 1.0f, strokeColor: Color = Color.GRAY): Arrow {
             return Arrow(points.toList(), ArrowType.JUNCTION, strokeWidth = strokeWidth, strokeColor = strokeColor)
         }
+        
+        fun buildWithMultiply(strokeWidth: kotlin.Float = 1.0f, strokeColor: Color = Color.GRAY): Arrow {
+            return Arrow(points.toList(), ArrowType.MULTIPLY, strokeWidth = strokeWidth, strokeColor = strokeColor)
+        }
     }
     
     /**
@@ -592,7 +596,8 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
     enum class ArrowType {
         ARROWHEAD,
         NONE,
-        JUNCTION
+        JUNCTION,
+        MULTIPLY
     }
 
     class Arrow(
@@ -619,7 +624,7 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
             }
             // Expand bounds slightly for arrowhead or junction
             val expandSize = when (arrowType) {
-                ArrowType.JUNCTION -> junctionRadius
+                ArrowType.JUNCTION, ArrowType.MULTIPLY -> junctionRadius
                 else -> arrowHeadSize
             }
             bounds.setRect(
@@ -707,6 +712,45 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
                         (lastPoint.y - plusSize).toInt(),
                         lastPoint.x.toInt(),
                         (lastPoint.y + plusSize).toInt()
+                    )
+                }
+                ArrowType.MULTIPLY -> {
+                    val lastPoint = path.last()
+                    
+                    // Draw filled white circle
+                    val originalFillColor = g2.color
+                    g2.color = Color.WHITE
+                    g2.fillOval(
+                        (lastPoint.x - junctionRadius).toInt(),
+                        (lastPoint.y - junctionRadius).toInt(),
+                        (2 * junctionRadius).toInt(),
+                        (2 * junctionRadius).toInt()
+                    )
+                    
+                    // Draw circle border
+                    g2.color = strokeColor
+                    g2.drawOval(
+                        (lastPoint.x - junctionRadius).toInt(),
+                        (lastPoint.y - junctionRadius).toInt(),
+                        (2 * junctionRadius).toInt(),
+                        (2 * junctionRadius).toInt()
+                    )
+                    
+                    // Draw multiply sign (X)
+                    val multiplySize = junctionRadius * 0.5
+                    // Diagonal line from top-left to bottom-right
+                    g2.drawLine(
+                        (lastPoint.x - multiplySize).toInt(),
+                        (lastPoint.y - multiplySize).toInt(),
+                        (lastPoint.x + multiplySize).toInt(),
+                        (lastPoint.y + multiplySize).toInt()
+                    )
+                    // Diagonal line from top-right to bottom-left
+                    g2.drawLine(
+                        (lastPoint.x + multiplySize).toInt(),
+                        (lastPoint.y - multiplySize).toInt(),
+                        (lastPoint.x - multiplySize).toInt(),
+                        (lastPoint.y + multiplySize).toInt()
                     )
                 }
                 ArrowType.NONE -> {

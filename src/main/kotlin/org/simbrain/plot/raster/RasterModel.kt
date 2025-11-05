@@ -4,7 +4,6 @@ import com.thoughtworks.xstream.XStream
 import org.jfree.data.xy.XYSeries
 import org.jfree.data.xy.XYSeriesCollection
 import org.simbrain.plot.RasterPlotEvents
-import org.simbrain.plot.TimeSeriesEvents
 import org.simbrain.util.UserParameter
 import org.simbrain.util.getSimbrainXStream
 import org.simbrain.util.propertyeditor.EditableObject
@@ -122,8 +121,6 @@ class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject {
         val seriesCount = dataset.seriesCount
         var i = 0
         while (seriesCount > i) {
-            val rc = rasterConsumerList[i]
-            events.rasterConsumerRemoved.fire(rc)
             dataset.getSeries(i).clear()
             ++i
         }

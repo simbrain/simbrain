@@ -184,21 +184,39 @@ val somNetSmells = newSim {
         by making nodes respond to similar inputs. Nodes near each other end up representing 
         similar inputs.
         
-        ## Using this Simulation
+        # Simulation Details
         
-        **Interactive Training:**
+        The mouse agent moves through an environment containing cheeses and flowers, each emitting 
+        a unique 9-dimensional smell vector. As the mouse approaches objects (within radius `50`), 
+        the SOM learns to organize these smells spatially.
+        
+        ## About the Labeling System
+        
+        The automatic labeling system is designed to be simple and easy to follow. When the mouse 
+        is near an object, only the single most active neuron (the winner) gets labeled with that 
+        object's name. This label shows which object most recently activated that neuron.
+        
+        In reality, multiple neurons may respond to a given object, especially at different distances, 
+        since distance affects input strength. Additionally, when the mouse is positioned between 
+        objects, it receives a mixture of smells that could activate neurons not labeled with any 
+        single object. The labeling system only tracks the most recent winner for each object to 
+        keep the visualization straightforward and interpretable.
+        
+        # What to Do
+        
+        ## Interactive Training
         
         1. Press the workspace play button to start the simulation
         2. Drag the mouse around the environment to move it near different objects
-        3. When the mouse is within radius 50 of an object, the SOM neurons automatically 
-           get labeled based on the current winner neuron
+        3. When the mouse is within radius `50` of an object, the most active SOM neuron 
+           automatically gets labeled with that object's name
         4. Watch as the SOM learns to organize the smells - similar smells will activate 
            nearby neurons
         
         The learning rate and neighborhood size gradually decrease as the network trains, 
         allowing the network to make finer distinctions between similar smells.
         
-        **Expected Behavior:**
+        ## Expected Behavior
         
         The cheese response nodes should cluster together, and the flower response nodes should 
         cluster together, since cheeses smell more similar to each other than to flowers, and 
@@ -207,21 +225,22 @@ val somNetSmells = newSim {
         
         ## Control Panel
         
-        - Reset Network: Randomize SOM weights and clear labels to start training over
-        - Reset Learning: Restore learning rate and neighborhood size to initial values 
+        - `Reset Network`: Randomize SOM weights and clear labels to start training over
+        - `Reset Learning`: Restore learning rate and neighborhood size to initial values 
           without changing the network weights
-        - Freeze Learning: Stop learning and neighborhood decay while keeping the simulation 
+        - `Freeze Learning`: Stop learning and neighborhood decay while keeping the simulation 
           running (useful for testing the trained network)
         
-        ## Tips
+        ## Try This
         
         - Training works best when you expose the mouse to all objects multiple times
         - The hexagonal layout helps visualize the topological organization
         - Try moving the mouse in circles around objects to see the encoding patterns form
-        - Use Freeze Learning to test the network after training
+        - Use `Freeze Learning` to test the network after training
         - Right-click the SOM layer to adjust learning parameters
         - Use the `Recall SOM Pattern` menu item (right-click on the SOM layer) to see what 
           smell pattern a specific output neuron is currently tuned to
+        - Position the mouse between objects to observe how the network responds to smell mixtures
         
         """.trimIndent()
     )

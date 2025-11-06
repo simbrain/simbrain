@@ -213,6 +213,14 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
                     val endIndex = startIndex + batchSize
                     trainBatch(startIndex until  endIndex)
                 }
+                is UpdateMethod.SequentialOnline -> {
+                    // Process all examples in order, updating weights after each one
+                    var totalError = 0.0
+                    for (i in 0 until supervisedNetwork.trainingSet.size) {
+                        totalError += trainBatch(i until i + 1)
+                    }
+                    totalError / supervisedNetwork.trainingSet.size
+                }
             }
         }
         
@@ -490,18 +498,24 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
             override fun toString() = "Batch"
         }
 
+        class SequentialOnline : UpdateMethod() {
+            override fun copy() = this
+            override fun toString() = "Sequential Online"
+        }
+
         override fun getTypeList(): List<Class<out CopyableObject>>? {
             return listOf(
                 Stochastic::class.java,
                 Epoch::class.java,
-                Batch::class.java
+                Batch::class.java,
+                SequentialOnline::class.java
             )
         }
 
         /**
-         * Given the temporal nature of the rule, only Epoch should be used with SRN
+         * Given the temporal nature of the rule, SequentialOnline should be used with SRN
          */
-        fun srnTypeList() = listOf(Epoch::class.java)
+        fun srnTypeList() = listOf(SequentialOnline::class.java)
 
         abstract override fun copy(): UpdateMethod
     }
@@ -647,8 +661,8 @@ class SRNTrainerConfig(lossFunctionProvider: KFunction<List<Class<out EditableOb
     }
 
     override var updateType: UpdateMethod by GuiEditable(
-        initValue = UpdateMethod.Epoch(),
-        typeMapProvider = UpdateMethod::srnTypeList, // Only allow epoch for SRN
+        initValue = UpdateMethod.SequentialOnline(),
+        typeMapProvider = UpdateMethod::srnTypeList,
         order = 3
     )
 

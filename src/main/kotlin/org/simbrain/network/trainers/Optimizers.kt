@@ -37,7 +37,7 @@ abstract class Optimizer: CopyableObject {
 class MomentumOptimizer(
     @UserParameter(
         label = "Momentum",
-        description = "How much to weight the last delta. 0 turns it off. .8-.9 are standard defaults.",
+        description = "Weight applied to previous gradient update. Higher values (0.8-0.9) accelerate learning in consistent directions. 0 disables momentum",
         minimumValue = 0.0,
         maximumValue = 1.0,
         order = 1

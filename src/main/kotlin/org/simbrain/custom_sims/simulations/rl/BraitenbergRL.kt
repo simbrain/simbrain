@@ -21,13 +21,13 @@ import kotlin.math.exp
 
 
 /**
- * Using actor-critic to train a braitenberg vehicles
+ * Using actor-critic to train a Braitenberg vehicles
  *
- * Define behavioral modules that correspond to braitenberg vehicle types: Cheese Pursuer, Poison Pursuer, Cheese Avoider, Poison Avoider.
+ * Define behavioral modules that correspond to Braitenberg vehicle types: Cheese Pursuer, Poison Pursuer, Cheese Avoider, Poison Avoider.
  * At each time step estimate which of these modules was more responsible for the behavior.
  * Then reinforce that. These are theoretically motivated actions.
  *
- * This is better than updating each synapse because learning then is slow and noisey and can produce descrutive interference.
+ * This is better than updating each synapse because learning then is slow and noisy and can produce descriptive interference.
  */
 val braitenbergRL = newSim {
 

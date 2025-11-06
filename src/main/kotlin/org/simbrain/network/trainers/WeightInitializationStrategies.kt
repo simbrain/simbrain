@@ -35,7 +35,7 @@ class Xavier(seed: Long? = null): WeightInitializationStrategy(seed) {
 
     @UserParameter(
         label = "Distribution",
-        description = "Weight distribution type. Uniform uses bounded random values, Normal uses Gaussian distribution with calculated variance"
+        description = "Weight distribution type. Uniform uses bounded random values in [-(6/(nin+nout)), (6/(nin+nout))]; Normal uses Gaussian with variance 2/(nin+nout)"
     )
     var distribution = Distribution.UNIFORM
 
@@ -71,7 +71,7 @@ class He(seed: Long? = null): WeightInitializationStrategy(seed) {
 
     @UserParameter(
         label = "Distribution",
-        description = "Weight distribution type. Uniform uses bounded random values, Normal uses Gaussian distribution optimized for ReLU activations"
+        description = "Weight distribution type. Uniform uses bounded random values in [-(6/nin), (6/nin)]; Normal uses Gaussian with variance 2/nin, optimized for ReLU activations"
     )
     var distribution = Distribution.UNIFORM
 
@@ -107,7 +107,7 @@ class LeCun(seed: Long? = null): WeightInitializationStrategy(seed) {
 
     @UserParameter(
         label = "Distribution",
-        description = "Weight distribution type."
+        description = "Weight distribution type. Uniform uses bounded random values in [-(3/nin),(3/nin)]; Normal uses Gaussian with variance 1/nin"
     )
     var distribution = Distribution.UNIFORM
 

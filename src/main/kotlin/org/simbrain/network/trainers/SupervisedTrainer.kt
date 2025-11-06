@@ -36,7 +36,7 @@ open class SupervisedTrainerConfig(lossFunctionProvider: KFunction<List<Class<ou
 
     @UserParameter(
         label = "Update type", 
-        description = "Training update method. Epoch processes entire dataset; batch processes fixed-size batches",
+        description = "Training update method. Stochastic updates after each random example; Sequential Online processes all examples in order; Epoch processes entire dataset; Batch processes fixed-size random batches",
         showDetails = false, 
         order = 30
     )
@@ -662,6 +662,7 @@ class SRNTrainerConfig(lossFunctionProvider: KFunction<List<Class<out EditableOb
 
     override var updateType: UpdateMethod by GuiEditable(
         initValue = UpdateMethod.SequentialOnline(),
+        description = "Training update method. SRN networks require Sequential Online mode to properly handle temporal sequences by processing examples in order",
         typeMapProvider = UpdateMethod::srnTypeList,
         order = 3
     )

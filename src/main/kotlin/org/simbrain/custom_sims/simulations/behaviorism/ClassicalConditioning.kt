@@ -104,80 +104,57 @@ val classicalConditioning = newSim("classical conditioning") {
 
     addSidebarInfo(
         """
-        # Classical Conditioning in Simbrain
-        
-        ## Basic Definitions and Setup
+        # Classical Conditioning
         
         This lesson demonstrates classical conditioning using a simple simulation in Simbrain. In this simulation, visual elements such as circles and synapses are used to represent behaviors and associations rather than actual neurons.
         
-        Key terms:
+        # Simulation Details
         
-        - **Unconditioned Stimulus (US):** A stimulus that naturally triggers a response (e.g., cheese).
-        - **Unconditioned Response (UR):** A natural, automatic reaction to the unconditioned stimulus (e.g., mouse salivates or moves toward cheese).
-        - **Neutral Stimulus (NS):** A stimulus that initially does not trigger any response (e.g., bell).
-        - **Conditioned Stimulus (CS):** A previously neutral stimulus that, after being paired with the US, elicits a response.
-        - **Conditioned Response (CR):** The learned response to the conditioned stimulus.
-        - **Extinction:** The weakening of the association when the CS is presented without the US over time.
+        Key terms to keep note of:
         
-        To get started, run the simulation. You can move items like the bell and cheese near the agent (mouse) to observe learning in action.
+        - **Unconditioned Stimulus (US)**: A stimulus that naturally triggers a response (e.g., cheese).
+        - **Unconditioned Response (UR)**: A natural, automatic reaction to the unconditioned stimulus (e.g., mouse salivates or moves toward cheese).
+        - **Neutral Stimulus (NS)**: A stimulus that initially does not trigger any response (e.g., bell).
+        - **Conditioned Stimulus (CS)**: A previously neutral stimulus that, after being paired with the US, elicits a response.
+        - **Conditioned Response (CR)**: The learned response to the conditioned stimulus.
+        - **Extinction**: The weakening of the association when the CS is presented without the US over time.        
         
-        > **Note:** Although this simulation uses neurons and synapses, think of the connections as abstract representations of behavioral associations, not biological accuracy.
-        
-        ---
-        
-        ## Walkthrough
-        
-        1. **Unconditioned Stimulus and Response**
-           - Run the simulation and move the **cheese** near the **mouse**.
-           - The mouse will respond (e.g., approach or activate). 
-           - **Cheese** is the **US**; the mouse's reaction is the **UR**.
-        
-        2. **Neutral Stimulus**
-           - Move the **bell** near the mouse.
-           - There is **no response**—the bell is currently a **neutral stimulus (NS)**.
-        
-        3. **Pairing NS with US**
-           - Move both the **bell** and **cheese** near the mouse.
-           - Run the simulation.
-           - The mouse begins to associate the bell with the cheese.
-           - The bell becomes a **conditioned stimulus (CS)** as it begins to evoke a response.
-        
-        4. **Conditioned Response**
-           - Eventually, the **bell alone** will trigger the same behavior.
-           - The response to the bell is now a **conditioned response (CR)**.
-        
-        5. **Extinction**
-           - Show the **bell alone** repeatedly, without the cheese.
-           - The response gradually disappears—this is **extinction**.
-        
-        6. **Tracking Learning**
-           - The **strength of the association** is shown in the **time series window**.
-           - When this strength exceeds **0.7**, the CS-CR link is well established.
-        
-        ---
-        
-        ## Lesson Activities
-        
-        Provide your own examples of US, UR, NS, etc. out loud.  They can be from everyday life. As you do this show how these concepts
-        work in Simbrain.
-        
-        1. **Unconditioned Response Demo**
-           - Provide your own example of a **US** and **UR**.
-           - Demonstrate by dragging the agent over the cheese and observing the neuron produce the UR.
-        
-        2. **Neutral Stimulus Demo**
-           - Provide your own example of a **neutral stimulus (NS)**.
-           - Show that the bell does **not produce a response** when presented alone.
-        
-        3. **Training a Conditioned Response**
-           - Describe your own example of an NS becoming a US
-           - Show this in Simrian by pairing the **NS** with the **US** by placing both near the agent.
-           - Run the simulation until the **association strength > 0.7**.
-           - Identify the new **CS** and the resulting **CR**.
-        
-        You are encouraged to explore different pairings and observe how associations are formed and extinguished.
+        # What to Do
 
-            """.trimIndent()
+        Below are steps to exploring the different behaviors that emerge from classical conditioning. 
+        
+        1. Unconditioned Stimulus and Response
+           - Run the simulation and move the `cheese` near the `mouse`.
+           - The `mouse` will respond (e.g., approach or activate). 
+           - `Cheese` is the `US`; the mouse's reaction is the `UR`.
+        
+        2. Neutral Stimulus
+           - Move the `bell` near the `mouse`.
+           - There is no response—the `bell` is currently a neutral stimulus (NS).
+        
+        3. Pairing NS with US
+           - Move both the `bell` and `cheese` near the `mouse`.
+           - Run the simulation.
+           - The `mouse` begins to associate the bell with the `cheese`.
+           - The `bell` becomes a conditioned stimulus (CS) as it begins to evoke a response.
+
+        4. Conditioned Response
+           - Eventually, the `bell` alone will trigger the same behavior.
+           - The response to the `bell` is now a conditioned response (CR).
+        
+        5. Extinction
+           - Show the `bell` alone repeatedly, without the cheese.
+           - The response gradually disappears—this is `extinction`.
+        
+        6. Tracking Learning
+           - The strength of the association is shown in the `time series window`.
+           - When this strength exceeds `0.7`, the CS-CR link is well established.
+        
+        # Credits
+
+        [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
+
+        """.trimIndent()
     )
 
     setUpClassicalConditioning(workspace)

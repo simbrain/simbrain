@@ -150,7 +150,7 @@ val pursuer = newSim {
     // Add documentation sidebar
     addSidebarInfo(
         """
-        # Introduction
+        # Pursuer
 
         [Braitenberg vehicles](http://en.wikipedia.org/wiki/Braitenberg_vehicle) are simple agents that move around in response to environmental stimuli. This simulation simulates a Braitenberg vehicle as an agent in an odor world that is attracted to an object.
 

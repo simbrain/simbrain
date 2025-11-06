@@ -335,7 +335,7 @@ val isopodSim = newSim {
 
     addSidebarInfo(
         """ 
-        # Introduction
+        # Isopod Simulation
         
         This simulation explores the reactive behaviors in the isopod from sensorimotor connections. The isopod reacts to its environment, the fish stimuli, based on connections between 
         its sensors and actuators. The sensors detect the stimuli, which determine the strength and direction of movement, and the actuators control the actual movement of the vehicles.

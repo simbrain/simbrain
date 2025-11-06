@@ -113,7 +113,7 @@ val braitenbergSim = newSim {
 
     addSidebarInfo(
         """     
-        # Introduction
+        # Two Braitenberg Vehicles
         
         This simulation accompanies the book _The Open Dynamics of Braitenberg Vehicles_ by Scott Hotton and Jeff Yoshimi.
         

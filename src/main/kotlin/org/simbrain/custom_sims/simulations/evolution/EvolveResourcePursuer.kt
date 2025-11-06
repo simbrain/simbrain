@@ -544,7 +544,7 @@ val evolveResourcePursuer = newSim { optionString ->
 
     addSidebarInfo(
         """ 
-        # Introduction
+        # Evolving A Resource Pursuer
         
         This is a simulation of the evolution of a neural network that is coupled to an agent in an odor world that contains food resources. The neural network will evolve
         to optimize its foraging strategy within the limitations of caloric expenditure and gain using an evolutionary framework in Simbrain.

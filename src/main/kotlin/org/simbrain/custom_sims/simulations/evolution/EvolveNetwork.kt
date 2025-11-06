@@ -269,7 +269,7 @@ val evolveNetwork = newSim {
 
         addSidebarInfo(
         """ 
-        # Introduction
+        # Evolving A Network
         
         This is a simulation of the evolution of a network towards a or, multiple target qualities using an evolutionary framework in Simbrain. 
         

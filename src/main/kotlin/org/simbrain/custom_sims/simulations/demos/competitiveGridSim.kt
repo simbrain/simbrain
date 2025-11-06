@@ -26,23 +26,23 @@ val competitiveGridSim = newSim {
     var winningLabel = ""
     val labelTracker = WinnerLabeler()
 
-    val docViewer = addSidebarInfo(
+    addSidebarInfo(
         """ 
-            # Introduction
+            # Competitive Grid Network
             
-            A competitive network with a 10x10 grid of input neurons (100 total) competing to classify 5 visual patterns. This is similar to the `Competitive network (simple)` simulation but with spatial input patterns arranged in a grid layout.
+            A competitive network with a `10`x`10` grid of input neurons (`100` total) competing to classify `5` visual patterns. This is similar to the `Competitive network (simple)` simulation but with spatial input patterns arranged in a grid layout.
             
             # Simulation Details
             
             The network contains:
-            - **Input Layer**: 100 neurons arranged in a 10x10 grid
-            - **Competitive Layer**: 5 neurons that compete to represent the input patterns
+            - Input Layer: `100` neurons arranged in a `10`x`10` grid
+            - Competitive Layer: `5` neurons that compete to represent the input patterns
             
             Each pattern is a 2D visual pattern with specific active pixels. The competitive neurons learn to respond to these patterns through winner-take-all dynamics and weight updates.
             
             # What to Do
             
-            1. Select a pattern using one of the buttons (Pattern 1-5)
+            1. Select a pattern using one of the buttons (Pattern `1-5`)
             
             2. Click `Train` to iterate the network and see which output neuron wins
             
@@ -76,6 +76,12 @@ val competitiveGridSim = newSim {
             
             For detailed explanations, see the `Competitive network (simple)` simulation documentation. 
         
+            # Credits
+            
+            Jasmine Lau
+            
+            [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
+            
         """.trimIndent()
     )
 

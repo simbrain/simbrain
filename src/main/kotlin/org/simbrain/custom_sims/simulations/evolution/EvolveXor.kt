@@ -180,7 +180,7 @@ val evolveXor = newSim {
 
         addSidebarInfo(
         """ 
-        # Introduction
+        # Evolving A Network for XOR
         
         This is a simulation of the evolution of a neural network evolving to solve the XOR problem using an evolutionary framework in Simbrain. 
         

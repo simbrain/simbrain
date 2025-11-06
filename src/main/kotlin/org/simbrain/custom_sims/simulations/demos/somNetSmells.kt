@@ -242,6 +242,10 @@ val somNetSmells = newSim {
           smell pattern a specific output neuron is currently tuned to
         - Position the mouse between objects to observe how the network responds to smell mixtures
         
+        # Credits
+        
+        [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
+        
         """.trimIndent()
     )
 }

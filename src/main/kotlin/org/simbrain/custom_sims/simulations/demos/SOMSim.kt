@@ -110,7 +110,7 @@ val SOMSim = newSim {
 
         # What to Do
         
-        1. Select input patterns using the Pattern 1-5 buttons to present different input patterns to the network
+        1. Select input patterns using the Pattern `1-5` buttons to present different input patterns to the network
         
         2. Train the network by clicking the `Train` button after selecting a pattern. This updates the weights based on the current input
         

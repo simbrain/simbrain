@@ -79,7 +79,7 @@ val braitenbergGame = newSim {
 
     addSidebarInfo(
     """     
-    # Introduction
+    # Braitenberg Game
 
     [Braitenberg vehicles](http://en.wikipedia.org/wiki/Braitenberg_vehicle) are simple agents that move around in response to environmental stimuli. This simulation simulates a Braitenberg vehicle as a controllable
     agent that can be tweaked to avoid dangerous obstacles and pursue a target.      

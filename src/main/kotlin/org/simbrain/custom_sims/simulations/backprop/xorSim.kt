@@ -71,7 +71,7 @@ val xorSim = newSim {
         
         2. In the top area of this window, select the `Iterate training until the stop button is pressed` button to play the simulation.
         
-        3. The `Sum Squared Error` should decrease as the iterations increase and end up around 0. The goal is to get the error as low as possible.
+        3. The `Sum Squared Error` should decrease as the iterations increase and end up around `0`. The goal is to get the error as low as possible.
         
         4. Click `Apply current row as input and increment selected row` to check the network's performance.
         

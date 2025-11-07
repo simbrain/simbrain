@@ -176,27 +176,10 @@ class NeuronCircleNode(val networkPanel: NetworkPanel): PPath.Double() {
     }
 }
 
-/**
- * Default text visibility threshold.
- */
 const val TEXT_VISIBILITY_THRESHOLD = 0.5
 
-/**
- * Diameter of neuron.
- */
 const val NEURON_DIAMETER = 24
 
-/**
- * Neuron Font.
- */
 val NEURON_FONT = Font("Arial", Font.PLAIN, 11)
 
-/**
- * Priority Font.
- */
-val PRIORITY_FONT = Font("Courier", Font.PLAIN, 9)
-
-/**
- * Neuron font bold.
- */
 val NEURON_FONT_BOLD = Font("Arial", Font.BOLD, 11)

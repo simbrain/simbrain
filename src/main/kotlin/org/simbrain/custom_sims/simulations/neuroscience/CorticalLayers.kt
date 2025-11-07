@@ -30,11 +30,11 @@ import kotlin.random.Random
  */
 val corticalLayers = newSim {
 
-    // Location and scale params for lognormal dist of all synapse groups
-    var exlocation = 0.0
-    var exscale = .5
-    var inlocation = 1.0
-    var inscale = .5
+    // Location and scale params for lognormal dist of all synapse groups\
+    var exlocation = 2.3
+    var exscale = 1.0
+    var inlocation = 3.0
+    var inscale = 1.0
     var neuronsPerLayer = 300
 
     // TODO: Membrane properties
@@ -69,14 +69,16 @@ val corticalLayers = newSim {
     ): NeuronGroup {
         return with(Random) {
             net.addNeuronGroup(numNeurons) {
+                val restPot = restingPotential.sample()
                 updateRule = IntegrateAndFireRule().also {
-                    it.restingPotential = restingPotential.sample()
+                    it.restingPotential = restPot
                     it.timeConstant = timeConstant.sample()
                     it.threshold = threshold.sample()
                     it.resistance = resistance.sample()
                     it.backgroundCurrent = 0.0
-                    it.resetPotential = restingPotential.sample()
+                    it.resetPotential = restPot
                 }
+                activation = restPot
             }
         }
     }

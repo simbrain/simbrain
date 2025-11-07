@@ -5,8 +5,6 @@ import org.simbrain.network.events.SynapseGroupEvents
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.SynapseNode
 import org.simbrain.util.SimbrainConstants
-import org.simbrain.util.Utils
-import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.showWarningDialog
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
@@ -147,14 +145,14 @@ class SynapseGroup @JvmOverloads constructor(
 
     fun randomizeExcitatory() {
         this.synapses
-            .filter { s -> s.target.polarity == SimbrainConstants.Polarity.EXCITATORY }
+            .filter { s -> s.source.polarity == SimbrainConstants.Polarity.EXCITATORY }
             .forEach { it.forceSetStrength(connectionStrategy.exRandomizer.sampleDouble()) }
     }
 
     fun randomizeInhibitory() {
         this.synapses
-            .filter { s -> s.target.polarity == SimbrainConstants.Polarity.INHIBITORY }
-            .forEach { it.forceSetStrength(connectionStrategy.exRandomizer.sampleDouble()) }
+            .filter { s -> s.source.polarity == SimbrainConstants.Polarity.INHIBITORY }
+            .forEach { it.forceSetStrength(connectionStrategy.inRandomizer.sampleDouble()) }
     }
 
     override fun toggleClamping() {

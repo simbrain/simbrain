@@ -194,7 +194,9 @@ public abstract class AbstractNeuronCollectionNode extends ScreenElement {
         @Override
         public void actionPerformed(final ActionEvent event) {
             String newName = JOptionPane.showInputDialog("Name:", getModel().getLabel());
-            getModel().setLabel(newName);
+            if (newName != null) {
+                getModel().setLabel(newName);
+            }
         }
     };
 

@@ -161,7 +161,9 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
         name = "Rename..."
     ) {
         val newName = JOptionPane.showInputDialog("Name:", subnetwork.label)
-        subnetwork.label = newName
+        if (newName != null) {
+            subnetwork.label = newName
+        }
     }
 
     protected val <T: JComponent> T.removeAction get() = createAction(

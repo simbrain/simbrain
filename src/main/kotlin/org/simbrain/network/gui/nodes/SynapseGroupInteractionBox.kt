@@ -34,7 +34,9 @@ class SynapseGroupInteractionBox(
                 name = "Rename synapse group..."
             ) {
                 val newName = JOptionPane.showInputDialog("Name:", synapseGroup.label)
-                synapseGroup.label = newName
+                if (newName != null) {
+                    synapseGroup.label = newName
+                }
             })
             menu.add(networkPanel.createAction(
                 iconPath = "menu_icons/minus.png",

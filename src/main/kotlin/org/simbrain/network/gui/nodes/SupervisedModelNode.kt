@@ -112,7 +112,9 @@ class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: Super
         name = "Rename..."
     ) {
         val newName = JOptionPane.showInputDialog("Name:", supervisedModel.label)
-        supervisedModel.label = newName
+        if (newName != null) {
+            supervisedModel.label = newName
+        }
     }
 
     private val <T: JComponent> T.removeAction get() = createAction(

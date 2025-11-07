@@ -114,7 +114,9 @@ abstract class NetworkModel {
      */
     open fun toggleClamping() {}
 
-    val displayName get() = label ?: id ?: "Uninitialized Network Model"
+    val displayName get() = 
+        if (label.isNullOrEmpty()) id ?: "Uninitialized Network Model" 
+        else label
 
     fun commonCopyFrom(other: NetworkModel) {
         this.label = other.label

@@ -5,13 +5,13 @@ import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.addNeuronGroup
 import org.simbrain.network.neurongroups.NeuronGroup
+import org.simbrain.network.spikeresponders.JumpAndDecay
 import org.simbrain.network.spikeresponders.ShortTermPlasticity
 import org.simbrain.network.updaterules.IntegrateAndFireRule
 import org.simbrain.plot.rasterchart.RasterPlotDesktopComponent
 import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.place
-import org.simbrain.util.sample
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.LogNormalDistribution
 import kotlin.math.sqrt
@@ -30,11 +30,11 @@ import kotlin.random.Random
  */
 val corticalLayers = newSim {
 
-    // Location and scale params for lognormal dist of all synapse groups\
-    var exlocation = 2.3
-    var exscale = 1.0
-    var inlocation = 3.0
-    var inscale = 1.0
+    // Location and scale params for lognormal dist of all synapse groups
+    var exlocation = 1.8
+    var exscale = 0.5
+    var inlocation = 3.6
+    var inscale = 0.5
     var neuronsPerLayer = 300
 
     // TODO: Membrane properties
@@ -62,24 +62,21 @@ val corticalLayers = newSim {
 
     suspend fun buildLayer(
         numNeurons: Int,
-        restingPotential: ClosedRange<Double>,
-        timeConstant: ClosedRange<Double>,
-        threshold: ClosedRange<Double>,
-        resistance: ClosedRange<Double>
+        restingPotential: Double,
+        timeConstant: Double,
+        threshold: Double,
+        resistance: Double
     ): NeuronGroup {
-        return with(Random) {
-            net.addNeuronGroup(numNeurons) {
-                val restPot = restingPotential.sample()
-                updateRule = IntegrateAndFireRule().also {
-                    it.restingPotential = restPot
-                    it.timeConstant = timeConstant.sample()
-                    it.threshold = threshold.sample()
-                    it.resistance = resistance.sample()
-                    it.backgroundCurrent = 0.0
-                    it.resetPotential = restPot
-                }
-                activation = restPot
+        return net.addNeuronGroup(numNeurons) {
+            updateRule = IntegrateAndFireRule().also {
+                it.restingPotential = restingPotential
+                it.timeConstant = timeConstant
+                it.threshold = threshold
+                it.resistance = resistance
+                it.backgroundCurrent = 0.0
+                it.resetPotential = restingPotential
             }
+            activation = restingPotential
         }
     }
 
@@ -109,6 +106,7 @@ val corticalLayers = newSim {
         sg.synapses.forEach {
             val stp = ShortTermPlasticity()
             stp.init(it)
+            (stp.spikeResponderLocal as? JumpAndDecay)?.timeConstant = 2.0
             it.spikeResponder = stp
         }
         net.addNetworkModel(sg)
@@ -126,37 +124,33 @@ val corticalLayers = newSim {
         return (dist / maxDist * maxDly / net.timeStep).toInt()
     }
 
-    //    Group locations (503.25,-521.61). (-174.62,328.62). (481.16,1268.68).
     suspend fun buildNetwork() {
         net.timeStep = 0.2
 
-        fun range(start: Double, delta: Double) = start..(start + delta)
-
         // Make the layers.  Params from Petersen, 2009.
         val btwnLayerSpacing = 150
-        // resting potential, time constant, threshold, resistance
         val layer_23 = buildLayer(
             neuronsPerLayer,
-            range(-71.5, .35),
-            range(29.0, 0.45),
-            range(-38.4, 0.2),
-            range(190.0, 4.0)
+            restingPotential = -71.5,
+            timeConstant = 29.0,
+            threshold = -38.4,
+            resistance = 190.0
         )
         layer_23.label = "Layer 2/3"
         val layer_4 = buildLayer(
             neuronsPerLayer,
-            range(-66.0, 0.3),
-            range(34.8, 0.5),
-            range(-39.7, 0.2),
-            range(302.0, 4.0)
+            restingPotential = -66.0,
+            timeConstant = 34.8,
+            threshold = -39.7,
+            resistance = 302.0
         )
         layer_4.label = "Layer 4"
         val layer_56 = buildLayer(
             neuronsPerLayer,
-            range(-62.8, 0.2),
-            range(31.7, 0.65),
-            range(-40.0, 0.25),
-            range(187.0, 4.0)
+            restingPotential = -62.8,
+            timeConstant = 31.7,
+            threshold = -40.0,
+            resistance = 187.0
         )
         layer_56.label = "Layer 5/6"
         val tmp = DoubleArray(3)

@@ -27,7 +27,7 @@ class HebbianThresholdRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>
     var outputThreshold: Double = .5
 
     @UserParameter(
-        label = "Threshold Momentum",
+        label = "Threshold momentum",
         description = "Output threshold momentum for Hebb threshold rule",
         increment = .1,
         order = 1
@@ -35,7 +35,7 @@ class HebbianThresholdRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>
     var outputThresholdMomentum: Double = .1
 
     @UserParameter(
-        label = "Sliding Threshold",
+        label = "Sliding threshold",
         description = "Use sliding output threshold for Hebb threshold rule",
         order = 1
     )

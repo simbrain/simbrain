@@ -25,7 +25,7 @@ class TimedAccumulatorRule : SpikingThresholdRule() {
      * Refractory period
      */
     @UserParameter(
-        label = "Ref. Period",
+        label = "Ref. period",
         description = "The amount of time it takes for this neuron to spike again.",
         increment = 1.0,
         order = 3,
@@ -37,7 +37,7 @@ class TimedAccumulatorRule : SpikingThresholdRule() {
      * The probability that this neuron will spike spontaneously regardless of input.
      */
     @UserParameter(
-        label = "Spike Prob.",
+        label = "Spike prob.",
         description = "Probability that this neuron will fire spontaneously regardless of state or input.",
         increment = 1E-5,
         order = 4,
@@ -53,7 +53,7 @@ class TimedAccumulatorRule : SpikingThresholdRule() {
      * to become larger probabilities and larger numbers to become smaller probabilities.
      */
     @UserParameter(
-        label = "Shape Parameter",
+        label = "Shape parameter",
         description = "Affects the nonlinearty of the softmax.\nStronger weights will become exponentially more likely to cause spikes.",
         increment = 0.1,
         order = 1

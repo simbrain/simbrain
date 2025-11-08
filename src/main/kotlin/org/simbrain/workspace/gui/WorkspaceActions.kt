@@ -232,20 +232,20 @@ class WorkspaceActions {
     }
 
     val plotActions = listOf(
-        createComponentFactoryAction("Bar Chart", "menu_icons/BarChart.png"),
+        createComponentFactoryAction("Bar chart", "menu_icons/BarChart.png"),
         createComponentFactoryAction("Histogram", "menu_icons/histogram.png"),
-        createComponentFactoryAction("Pie Chart", "menu_icons/PieChart.png"),
-        createComponentFactoryAction("Pixel Plot", "menu_icons/PixelPlot.png"),
-        createComponentFactoryAction("Projection Plot", "menu_icons/CubeShadow.png"),
-        createComponentFactoryAction("Raster Plot", "menu_icons/RasterPlot.png"),
-        createComponentFactoryAction("Time Series", "menu_icons/TimeSeries.png")
+        createComponentFactoryAction("Pie chart", "menu_icons/PieChart.png"),
+        createComponentFactoryAction("Pixel plot", "menu_icons/PixelPlot.png"),
+        createComponentFactoryAction("Projection plot", "menu_icons/CubeShadow.png"),
+        createComponentFactoryAction("Raster plot", "menu_icons/RasterPlot.png"),
+        createComponentFactoryAction("Time series", "menu_icons/TimeSeries.png")
     )
     val newWorldActions = listOf(
-        createComponentFactoryAction("Data World", "menu_icons/TableBold.png"),
-        createComponentFactoryAction("Odor World", "menu_icons/mouse_icon.png"),
-        createComponentFactoryAction("Image World", "menu_icons/camera.png"),
-        createComponentFactoryAction("Text World", "menu_icons/Text.png"),
-        //createComponentFactoryAction("Sound World", "menu_icons/speaker.png")
+        createComponentFactoryAction("Data world", "menu_icons/TableBold.png"),
+        createComponentFactoryAction("Odor world", "menu_icons/mouse_icon.png"),
+        createComponentFactoryAction("Image world", "menu_icons/camera.png"),
+        createComponentFactoryAction("Text world", "menu_icons/Text.png"),
+        //createComponentFactoryAction("Sound world", "menu_icons/speaker.png")
     )
 
     fun <T: WorkspaceComponent> createImportAction(desktopComponent: DesktopComponent<T>) = desktopComponent.createAction(
@@ -317,7 +317,7 @@ class WorkspaceActions {
     }
 
     @JvmOverloads
-    fun createCoupledProjectionPlotAction(producer: Producer, objectName: String, plotType: String = "Projection Plot") = createCoupledPlotAction(
+    fun createCoupledProjectionPlotAction(producer: Producer, objectName: String, plotType: String = "Projection plot") = createCoupledPlotAction(
         producer = producer,
         plotType = plotType,
         objectName = objectName,
@@ -329,7 +329,7 @@ class WorkspaceActions {
     )
 
     @JvmOverloads
-    fun createCoupledTimeSeriesPlotAction(producer: Producer, objectName: String, plotType: String = "Time Series Plot") = createCoupledPlotAction(
+    fun createCoupledTimeSeriesPlotAction(producer: Producer, objectName: String, plotType: String = "Time series plot") = createCoupledPlotAction(
         producer = producer,
         plotType = plotType,
         objectName = objectName,
@@ -341,12 +341,12 @@ class WorkspaceActions {
     )
 
     fun createCoupledTimeSeriesPlotAction(producers: List<Producer>) = desktopPane.createAction(
-        name = "Time Series Plot of ${producers.size} ${producers.map { it.baseObject::class.simpleName }.toSet().joinToString(", ")}${if (producers.size > 1) "s" else ""}",
+        name = "Time series plot of ${producers.size} ${producers.map { it.baseObject::class.simpleName }.toSet().joinToString(", ")}${if (producers.size > 1) "s" else ""}",
         iconPath = "menu_icons/TimeSeries.png",
         description = "Create coupled time series plot",
         coroutineScope = workspace
     ) {
-        val component = TimeSeriesPlotComponent("Time Series Plot of ${producers.size} ${producers.map { it.baseObject::class.simpleName }.toSet().joinToString(", ")}${if (producers.size > 1) "s" else ""}")
+        val component = TimeSeriesPlotComponent("Time series plot of ${producers.size} ${producers.map { it.baseObject::class.simpleName }.toSet().joinToString(", ")}${if (producers.size > 1) "s" else ""}")
         workspace.addWorkspaceComponent(component)
         producers.forEach { producer ->
             with(workspace.couplingManager) {
@@ -357,7 +357,7 @@ class WorkspaceActions {
     }
 
     @JvmOverloads
-    fun createCoupledHistogramPlotAction(producer: Producer, objectName: String, plotType: String = "Histogram Plot") = createCoupledPlotAction(
+    fun createCoupledHistogramPlotAction(producer: Producer, objectName: String, plotType: String = "Histogram plot") = createCoupledPlotAction(
         producer = producer,
         plotType = plotType,
         objectName = objectName,
@@ -369,7 +369,7 @@ class WorkspaceActions {
     )
 
     @JvmOverloads
-    fun createCoupledPieChartAction(producer: Producer, objectName: String, plotType: String = "Pie Chart") = createCoupledPlotAction(
+    fun createCoupledPieChartAction(producer: Producer, objectName: String, plotType: String = "Pie chart") = createCoupledPlotAction(
         producer = producer,
         plotType = plotType,
         objectName = objectName,
@@ -381,7 +381,7 @@ class WorkspaceActions {
     )
 
     @JvmOverloads
-    fun createCoupledBarChartAction(producer: Producer, objectName: String, plotType: String = "Bar Chart") = createCoupledPlotAction(
+    fun createCoupledBarChartAction(producer: Producer, objectName: String, plotType: String = "Bar chart") = createCoupledPlotAction(
         producer = producer,
         plotType = plotType,
         objectName = objectName,
@@ -393,7 +393,7 @@ class WorkspaceActions {
     )
 
     @JvmOverloads
-    fun createCoupledRasterPlotAction(producer: Producer, objectName: String, plotType: String = "Raster Plot") = createCoupledPlotAction(
+    fun createCoupledRasterPlotAction(producer: Producer, objectName: String, plotType: String = "Raster plot") = createCoupledPlotAction(
         producer = producer,
         plotType = plotType,
         objectName = objectName,
@@ -405,7 +405,7 @@ class WorkspaceActions {
     )
 
     @JvmOverloads
-    fun createCoupledPixelPlotAction(producer: Producer, objectName: String, plotType: String = "Pixel Plot") = createCoupledPlotAction(
+    fun createCoupledPixelPlotAction(producer: Producer, objectName: String, plotType: String = "Pixel plot") = createCoupledPlotAction(
         producer = producer,
         plotType = plotType,
         objectName = objectName,
@@ -416,7 +416,7 @@ class WorkspaceActions {
         }
     )
 
-    fun createCoupledDataWorldAction(name: String = "Record Data", producer: Producer, sourceName: String, numCols: Int) = desktopPane.createAction(
+    fun createCoupledDataWorldAction(name: String = "Record data", producer: Producer, sourceName: String, numCols: Int) = desktopPane.createAction(
         name = name,
         iconPath = "menu_icons/Table.png",
         coroutineScope = workspace
@@ -453,7 +453,7 @@ class WorkspaceActions {
         description = "Create image input",
         coroutineScope = workspace
     ) {
-        val component = ImageWorldComponent("Image Input for ${consumer.baseObject.id}")
+        val component = ImageWorldComponent("Image input for ${consumer.baseObject.id}")
         val length = ceil(sqrt(numUnits.toDouble())).toInt()
         workspace.addWorkspaceComponent(component)
         component.world.resetImageAlbum(length, length)

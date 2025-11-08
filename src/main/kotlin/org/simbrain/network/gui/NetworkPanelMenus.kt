@@ -198,7 +198,7 @@ val NetworkPanel.viewMenu
     }
 
 val NetworkPanel.connectionMenu
-    get() = JMenu("Connect Neurons").apply {
+    get() = JMenu("Connect neurons").apply {
         with(networkActions) {
             connectionActions.forEach { add(it.toMenuItem()) }
         }

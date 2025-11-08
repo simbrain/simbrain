@@ -429,15 +429,34 @@ fun textEntryDialog(initialString: String, title: String = "Edit Text", columns:
     return dialog
 }
 
-fun String.convertCamelCaseToSpaces(): String {
+/**
+ * Converts a camelCase or PascalCase string to a human-readable format with spaces.
+ * 
+ * @param useTitleCase If true, capitalizes the first letter of each word (Title Case).
+ *                     If false (default), only capitalizes the first letter (Sentence case).
+ * @return The converted string with spaces and appropriate capitalization.
+ * 
+ * Examples:
+ * - "helloWorld".convertCamelCaseToSpaces() -> "Hello world"
+ * - "helloWorld".convertCamelCaseToSpaces(useTitleCase = true) -> "Hello World"
+ * - "XMLHttpRequest".convertCamelCaseToSpaces() -> "XML http request"
+ * - "XMLHttpRequest".convertCamelCaseToSpaces(useTitleCase = true) -> "XML Http Request"
+ */
+fun String.convertCamelCaseToSpaces(useTitleCase: Boolean = false): String {
     // This regex looks for places in the string where either:
     // 1. A lowercase letter is followed by an uppercase letter, or
     // 2. A sequence of uppercase letters is followed by a lowercase letter.
     val regex = "(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])".toRegex()
 
-    return regex.replace(this) { " " }
-        .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
-        .trim()
+    val withSpaces = regex.replace(this) { " " }.trim()
+    
+    return if (useTitleCase) {
+        // Title case: capitalize first letter of each word
+        withSpaces.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+    } else {
+        // Sentence case: lowercase everything except the first character
+        withSpaces.lowercase().replaceFirstChar { it.titlecase(Locale.getDefault()) }
+    }
 }
 
 /**

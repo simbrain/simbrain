@@ -63,12 +63,12 @@ val isopodSim = newSim {
     val neuronLeftTurning = network.addNeuron {
         location = point(0, 0)
         upperBound = 150.0
-        label = "Turn Left"
+        label = "Turn left"
     }
     val neuronRightTurning = network.addNeuron {
         location = point(100, 0)
         upperBound = 150.0
-        label = "Turn Right"
+        label = "Turn right"
     }
     val neuronStraight = network.addNeuron {
         location = point(50, 0)

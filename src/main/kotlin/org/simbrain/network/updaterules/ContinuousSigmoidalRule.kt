@@ -4,7 +4,6 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.util.EmptyScalarData
 import org.simbrain.util.UserParameter
-import org.simbrain.util.math.SigmoidFunctionEnum
 
 /**
  * **Continuous Sigmoidal Rule** provides various squashing function
@@ -23,7 +22,7 @@ class ContinuousSigmoidalRule() : AbstractSigmoidalRule() {
      * the time-step, the more slowly inputs will be integrated.
      */
     @UserParameter(
-        label = "Time Constant",
+        label = "Time constant",
         description = "The time constant controls how quickly the numerical integration occurs.",
         increment = .1,
         order = 1
@@ -35,7 +34,7 @@ class ContinuousSigmoidalRule() : AbstractSigmoidalRule() {
      * activation. If **timeConstant * leakConstant == network time-step**
      * (or vice versa), behavior is equivalent to discrete sigmoid.
      */
-    @UserParameter(label = "Leak Constant", description = "An option to add noise.", increment = .1, order = 2)
+    @UserParameter(label = "Leak constant", description = "An option to add noise.", increment = .1, order = 2)
     var leakConstant: Double = 1.0
 
     /**

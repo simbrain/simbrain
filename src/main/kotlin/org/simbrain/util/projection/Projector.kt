@@ -42,7 +42,7 @@ class Projector(initialDimension: Int = 25) : EditableObject, CoroutineScope {
     /**
      * The method used to project from high dimensional data upstairs to low dimensional data downstairs.
      */
-    @UserParameter(label = "Projection Method", order = 100)
+    @UserParameter(label = "Projection method", order = 100)
     var projectionMethod: ProjectionMethod = PCAProjection()
         set(value) {
             val oldMethod = field
@@ -73,7 +73,7 @@ class Projector(initialDimension: Int = 25) : EditableObject, CoroutineScope {
     @UserParameter(label = "Use hot point", description = "If true, current point is rendered using the hotpoint color", order = 50)
     var useHotPoint = true
 
-    @UserParameter(label = "Extreme Value Threshold", description = "Data points with absolute values >= this threshold (or infinite/NaN values) will be filtered out to prevent projection issues.", minimumValue = 1.0, order = 60)
+    @UserParameter(label = "Extreme value threshold", description = "Data points with absolute values >= this threshold (or infinite/NaN values) will be filtered out to prevent projection issues.", minimumValue = 1.0, order = 60)
     var extremeValueThreshold: Double = 1e50
 
     var coloringManager: ColoringManager by GuiEditable(

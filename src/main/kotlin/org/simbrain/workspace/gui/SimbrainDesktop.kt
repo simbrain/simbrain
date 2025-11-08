@@ -659,12 +659,12 @@ object SimbrainDesktop {
     private fun createContextMenu() {
         contextMenu = JPopupMenu()
         contextMenu!!.add(actionManager.newNetworkAction)
-        val newGaugeSubMenu = JMenu("New Plot")
+        val newGaugeSubMenu = JMenu("New plot")
         for (action in actionManager.plotActions) {
             newGaugeSubMenu.add(action)
         }
         contextMenu!!.add(newGaugeSubMenu)
-        val newWorldSubMenu = JMenu("New World")
+        val newWorldSubMenu = JMenu("New world")
         for (action in actionManager.newWorldActions) {
             newWorldSubMenu.add(action)
         }

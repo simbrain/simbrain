@@ -4,7 +4,9 @@ import org.simbrain.network.core.*
 import org.simbrain.network.gui.dialogs.NetworkPreferences.defaultLearningRate
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.EmptyScalarData
-import org.simbrain.util.*
+import org.simbrain.util.UserParameter
+import org.simbrain.util.hadamard
+import org.simbrain.util.scaleRows
 
 /**
  * **OjaSynapse** is a synapse which asymptotically normalizes the sum of
@@ -15,7 +17,7 @@ class OjaRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>() {
     @UserParameter(label = "Learning rate", description = "Learning rate for Oja rule", increment = .1, minimumValue = 0.0, order = 1)
     var learningRate = defaultLearningRate
 
-    @UserParameter(label = "Normalization Factor", description = "Normalization factor for Oja rule", increment = .1, order = 1)
+    @UserParameter(label = "Normalization factor", description = "Normalization factor for Oja rule", increment = .1, order = 1)
     var normalizationFactor = 1.0
     override fun init(synapse: Synapse) {}
 

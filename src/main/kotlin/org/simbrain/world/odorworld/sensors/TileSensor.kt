@@ -18,7 +18,7 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity
  * make the location editable at some point, if use-cases emerge.
  */
 class TileSensor @JvmOverloads constructor(
-    @UserParameter(label = "Tile Type", description = "What type of tile this sensor responds to", order = 3)
+    @UserParameter(label = "Tile type", description = "What type of tile this sensor responds to", order = 3)
     var tileType: String = "water",
     radius: Double = DEFAULT_RADIUS,
     angle: Double = DEFAULT_THETA
@@ -27,7 +27,7 @@ class TileSensor @JvmOverloads constructor(
     /**
      * Decay function
      */
-    @UserParameter(label = "Decay Function", showDetails = false, order = 15)
+    @UserParameter(label = "Decay function", showDetails = false, order = 15)
     override var decayFunction: DecayFunction = LinearDecayFunction(70.0)
         set(value) {
             field = value

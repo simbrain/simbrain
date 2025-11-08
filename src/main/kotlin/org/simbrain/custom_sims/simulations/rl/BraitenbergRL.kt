@@ -46,7 +46,7 @@ val braitenbergRL = newSim {
     var poisonRewardMultiplier = -1.0
 
     workspace.clearWorkspace()
-    val oc = addOdorWorldComponent("RL Braitenberg World")
+    val oc = addOdorWorldComponent("RL Braitenberg world")
     val world = oc.world
     world.isObjectsBlockMovement = true
     oc.world.isUseCameraCentering = false
@@ -79,19 +79,19 @@ val braitenbergRL = newSim {
     val entityOffset = Point2D.Double(100.0, 100.0)
     val agent = oc.world.addEntity(entityOffset.x, entityOffset.y, EntityType.Circle).apply {
         addSensor(ObjectSensor(EntityType.Swiss, 50.0, 45.0).apply {
-            label = "Cheese Left"
+            label = "Cheese left"
             decayFunction.dispersion = dispersion
         })
         addSensor(ObjectSensor(EntityType.Swiss, 50.0, -45.0).apply {
-            label = "Cheese Right"
+            label = "Cheese right"
             decayFunction.dispersion = dispersion
         })
         addSensor(ObjectSensor(EntityType.Poison, 50.0, 45.0).apply {
-            label = "Poison Left"
+            label = "Poison left"
             decayFunction.dispersion = dispersion
         })
         addSensor(ObjectSensor(EntityType.Poison, 50.0, -45.0).apply {
-            label = "Poison Right"
+            label = "Poison right"
             decayFunction.dispersion = dispersion
         })
         addDefaultEffectors()
@@ -147,11 +147,11 @@ val braitenbergRL = newSim {
     }
     val cheeseReward = network.addNeuron(300, 0).apply {
         clamped = true
-        label = "Cheese Reward"
+        label = "Cheese reward"
     }
     val poisonPenalty = network.addNeuron(300, 50).apply {
         clamped = true
-        label = "Poison Penalty"
+        label = "Poison penalty"
     }
     val rewardNeuron = network.addNeuron(300, 100).apply {
         clamped = true
@@ -162,7 +162,7 @@ val braitenbergRL = newSim {
         upperBound = 100.0
     }
     val tdErrorNeuron = network.addNeuron(400, 100).apply {
-        label = "TD Error"
+        label = "TD error"
         upperBound = 100.0
         lowerBound = -100.0
     }
@@ -380,8 +380,8 @@ val braitenbergRL = newSim {
         oc.getDesktopComponentAs<OdorWorldDesktopComponent>().fitWorldToFrameSize()
 
         // Combined control panel
-        createControlPanel("RL Parameters", 0, 10) {
-            addFormattedNumericTextField("Learning Rate", initValue = learningRate) {
+        createControlPanel("RL parameters", 0, 10) {
+            addFormattedNumericTextField("Learning rate", initValue = learningRate) {
                 learningRate = it
             }
             addFormattedNumericTextField("Gamma", initValue = gamma) {

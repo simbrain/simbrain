@@ -19,8 +19,8 @@ class SOMNetworkNode(networkPanel: NetworkPanel, val somNet: SOMNetwork):
             with(networkPanel) {
                 applyUnsupervisedActions(somNet)
                 addSeparator()
-                add(createAction(name = "Reset SOM Network") { somNet.som.reset() })
-                add(createAction(name = "Recall SOM Memory") { somNet.som.recall() })
+                add(createAction(name = "Reset SOM network") { somNet.som.reset() })
+                add(createAction(name = "Recall SOM memory") { somNet.som.recall() })
             }
         }
 

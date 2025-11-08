@@ -54,7 +54,7 @@ class FitzhughNagumo : SpikingNeuronUpdateRule<FitzHughData, FitzHughMatrixData>
      * Recovery rate
      */
     @UserParameter(
-        label = "A (Recovery Rate)",
+        label = "A (recovery rate)",
         description = "Abstract measure of how much \"resource\" a cell is depleting in response to large changes in voltage.",
         increment = .1,
         order = 1
@@ -65,7 +65,7 @@ class FitzhughNagumo : SpikingNeuronUpdateRule<FitzHughData, FitzHughMatrixData>
      * Recovery dependence on voltage.
      */
     @UserParameter(
-        label = "B (Rec. Voltage Dependence)",
+        label = "B (rec. voltage dependence)",
         description = "How much the recovery variable w depends on voltage.",
         increment = .1,
         order = 2
@@ -76,7 +76,7 @@ class FitzhughNagumo : SpikingNeuronUpdateRule<FitzHughData, FitzHughMatrixData>
      * Recovery self-dependence.
      */
     @UserParameter(
-        label = "C (Rec. Self Dependence)",
+        label = "C (rec. self dependence)",
         description = "How quickly the recovery variable recovers to its baseline value.",
         increment = .1,
         order = 3

@@ -174,21 +174,39 @@ class TextUtilsTest {
     }
 
     @Test
-    fun `convertCamelCaseToSpaces should work on UpperCamelCase`() {
+    fun `convertCamelCaseToSpaces should work on UpperCamelCase with sentence case by default`() {
         val inputString = "ThisIsCamelCase"
-        assertEquals("This Is Camel Case", inputString.convertCamelCaseToSpaces())
+        assertEquals("This is camel case", inputString.convertCamelCaseToSpaces())
     }
 
     @Test
-    fun `convertCamelCaseToSpaces should work on lowerCamelCase`() {
+    fun `convertCamelCaseToSpaces should work on lowerCamelCase with sentence case by default`() {
         val inputString = "thisIsCamelCase"
-        assertEquals("This Is Camel Case", inputString.convertCamelCaseToSpaces())
+        assertEquals("This is camel case", inputString.convertCamelCaseToSpaces())
     }
 
     @Test
-    fun `convertCamelCaseToSpaces should not break consecutive upper case letters`() {
+    fun `convertCamelCaseToSpaces should not break consecutive upper case letters with sentence case`() {
         val inputString = "ThisIsCamelCaseABC"
-        assertEquals("This Is Camel Case ABC", inputString.convertCamelCaseToSpaces())
+        assertEquals("This is camel case abc", inputString.convertCamelCaseToSpaces())
+    }
+
+    @Test
+    fun `convertCamelCaseToSpaces should support title case when requested`() {
+        val inputString = "thisIsCamelCase"
+        assertEquals("This Is Camel Case", inputString.convertCamelCaseToSpaces(useTitleCase = true))
+    }
+
+    @Test
+    fun `convertCamelCaseToSpaces should preserve acronyms in title case`() {
+        val inputString = "XMLHttpRequest"
+        assertEquals("XML Http Request", inputString.convertCamelCaseToSpaces(useTitleCase = true))
+    }
+
+    @Test
+    fun `convertCamelCaseToSpaces should lowercase acronyms in sentence case`() {
+        val inputString = "XMLHttpRequest"
+        assertEquals("Xml http request", inputString.convertCamelCaseToSpaces())
     }
 
 

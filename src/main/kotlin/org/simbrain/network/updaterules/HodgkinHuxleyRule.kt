@@ -21,13 +21,13 @@ class HodgkinHuxleyRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), 
     /**
      * Sodium Channels
      */
-    @UserParameter(label = "Sodium Channels", description = "Sodium Channels", order = 1)
+    @UserParameter(label = "Sodium channels", description = "Sodium channels", order = 1)
     private var perNaChannels = 100f
 
     /**
      * Potassium
      */
-    @UserParameter(label = "Potassium Channels", description = "Sodium Channels", order = 2)
+    @UserParameter(label = "Potassium channels", description = "Potassium channels", order = 2)
     private var perKChannels = 100f
 
     /**

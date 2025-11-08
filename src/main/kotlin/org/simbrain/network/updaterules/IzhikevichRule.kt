@@ -195,7 +195,7 @@ class IzhikevichScalarData(
 }
 
 class IzhikevichMatrixData(size: Int) : SpikingMatrixData(size) {
-    @UserParameter(label = "Recovery Matrix", description = "Recovery matrix for each neuron")
+    @UserParameter(label = "Recovery matrix", description = "Recovery matrix for each neuron")
     var recoveryMatrix = Matrix(size, 1)
     override fun copy(): SpikingMatrixData {
         return IzhikevichMatrixData(size).also {

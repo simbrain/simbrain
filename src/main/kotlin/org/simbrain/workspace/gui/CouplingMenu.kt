@@ -35,7 +35,7 @@ class CouplingMenu(
      * Construct the menu.
      */
     init {
-        text = "Create ${source.javaClass.simpleName} Coupling"
+        text = "Create ${source.javaClass.simpleName} coupling"
         removeAll()
         val sources = buildList {
             var current = listOf(source)

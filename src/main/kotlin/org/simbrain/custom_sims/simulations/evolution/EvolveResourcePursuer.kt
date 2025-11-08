@@ -390,7 +390,7 @@ val evolveResourcePursuer = newSim { optionString ->
         // Central food sensor to determine when food is actually found.
         val centerLakeSensor = TileSensor(foodTileType, radius = 0.0).apply {
             decayFunction.dispersion = EntityType.Lion.width / 1.4
-            label = "Center Food Sensor"
+            label = "Center food sensor"
         }.also { evolvedAgent.addSensor(it) }
 
         init {

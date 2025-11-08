@@ -10,7 +10,7 @@ class Beeper: SoundGenerator() {
     @UserParameter(label = "Duration")
     var beepDuration = 0.01f
 
-    @UserParameter(label = "Max Duration")
+    @UserParameter(label = "Max duration")
     var maxDuration = 0.1f
 
     private val numSamples get() = (sampleRate * beepDuration).toInt()

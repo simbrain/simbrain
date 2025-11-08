@@ -14,7 +14,7 @@ class ProductRule : LinearRule() {
      * Whether to use weights or not.
      */
     @UserParameter(
-        label = "Use Weights", description = "If false, activation is a product of incoming activations. "
+        label = "Use weights", description = "If false, activation is a product of incoming activations. "
                 + "If true, activation is a product of incoming activation / weight products, or "
                 + "(in the case of spiking neurons) post-synaptic-responses.", increment = .1, order = 0
     )

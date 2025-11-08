@@ -273,7 +273,7 @@ suspend fun connectReservoir(parentNet: Network, res: NeuronGroup, variance: Dou
     val con = FixedDegree(k, Direction.IN, false, 20.0, false, seed)
 
     val reservoir = SynapseGroup(res, res, con)
-    reservoir.label = "Recurrent Synapses"
+    reservoir.label = "Recurrent synapses"
     parentNet.addNetworkModel(reservoir)
 
     return reservoir

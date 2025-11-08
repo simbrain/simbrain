@@ -18,7 +18,7 @@ class MorrisLecarRule : SpikingNeuronUpdateRule<MorrisLecarData, SpikingMatrixDa
      * Calcium channel conductance (micro Siemens/cm^2).
      */
     @UserParameter(
-        label = "Ca²⁺ Conductance (µS/cm²)",
+        label = "Ca²⁺ conductance (µS/cm²)",
         description = "Calcium conductance. If higher, voltage pulled more quickly to Ca2+ equilibrium.",
         increment = .1,
         order = 7,
@@ -54,7 +54,7 @@ class MorrisLecarRule : SpikingNeuronUpdateRule<MorrisLecarData, SpikingMatrixDa
      * Resting potential calcium (mV).
      */
     @UserParameter(
-        label = "Ca²⁺ Equilibrium (mV)",
+        label = "Ca²⁺ equilibrium (mV)",
         description = "Calcium equilibrium.",
         increment = .1,
         order = 10,

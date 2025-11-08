@@ -32,12 +32,12 @@ val classicalConditioning = newSim("classical conditioning") {
     val bellDetectorNeuron = Neuron()
     net.addNetworkModelAsync(bellDetectorNeuron)
     bellDetectorNeuron.setLocation(295.0, 194.0)
-    bellDetectorNeuron.label = "Bell Detector"
+    bellDetectorNeuron.label = "Bell detector"
 
     val cheeseDetectorNeuron = Neuron()
     net.addNetworkModelAsync(cheeseDetectorNeuron)
     cheeseDetectorNeuron.setLocation(160.0, 194.0)
-    cheeseDetectorNeuron.label = "Cheese Detector"
+    cheeseDetectorNeuron.label = "Cheese detector"
 
     val responseRule = BinaryRule()
     responseRule.threshold = .5

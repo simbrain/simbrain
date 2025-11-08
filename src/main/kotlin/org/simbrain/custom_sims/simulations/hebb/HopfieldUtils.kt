@@ -200,7 +200,7 @@ fun ControlPanelKt.createHopfieldTestPane(
 class PatternTestOptions(val isDiscreteHopfield: Boolean): CopyableObject {
 
     var distancePercentThreshold by GuiEditable(
-        label = "Distance Threshold",
+        label = "Distance threshold",
         description = "Max allowable distance (for discrete Hopfield, Hamming distance) between the recalled and original pattern to be considered correctly remembered",
         initValue = 5.0,
         min = 0.0,
@@ -210,7 +210,7 @@ class PatternTestOptions(val isDiscreteHopfield: Boolean): CopyableObject {
     )
 
     var percentToTest by GuiEditable(
-        label = "Percent to Test",
+        label = "Percent to test",
         description = "Percent of total stored patterns that will be tested for recall.",
         initValue = 30.0,
         min = 0.0,

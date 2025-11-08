@@ -74,7 +74,7 @@ open class SupervisedTrainerConfig(lossFunctionProvider: KFunction<List<Class<ou
         order = 70
     )
 
-    override val name = "Optimizer Properties"
+    override val name = "Optimizer properties"
 
     var learningRate by optimizer::learningRate
 

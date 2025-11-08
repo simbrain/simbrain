@@ -29,7 +29,7 @@ class NakaRushtonRule : NeuronUpdateRule<NakaScalarData, NakaMatrixData>(), Clip
     var steepness: Double = 2.0
 
     @UserParameter(
-        label = "Semi-Saturation Constant",
+        label = "Semi-saturation constant",
         description = "This value is the point at which S(W) reaches half of its maximum value.",
         increment = .1,
         order = 2
@@ -37,7 +37,7 @@ class NakaRushtonRule : NeuronUpdateRule<NakaScalarData, NakaMatrixData>(), Clip
     var semiSaturationConstant: Double = 120.0
 
     @UserParameter(
-        label = "Adaptation Time Constant",
+        label = "Adaptation time constant",
         description = "This value controls the rate at which the adaptation variable tends to "
                 + "its minimum value.",
         increment = .1,
@@ -46,7 +46,7 @@ class NakaRushtonRule : NeuronUpdateRule<NakaScalarData, NakaMatrixData>(), Clip
     var adaptationTimeConstant: Double = 1.0
 
     @UserParameter(
-        label = "Adaptation Parameter",
+        label = "Adaptation parameter",
         description = "The parameter of spike rate adaptation.",
         increment = .1,
         order = 6
@@ -54,7 +54,7 @@ class NakaRushtonRule : NeuronUpdateRule<NakaScalarData, NakaMatrixData>(), Clip
     var adaptationParameter: Double = .7
 
     @UserParameter(
-        label = "Use Adaptation",
+        label = "Use adaptation",
         description = "If this is set to true, spike rate adaptation is utilized.",
         increment = .1,
         order = 5
@@ -62,7 +62,7 @@ class NakaRushtonRule : NeuronUpdateRule<NakaScalarData, NakaMatrixData>(), Clip
     var useAdaptation: Boolean = false
 
     @UserParameter(
-        label = "Time Constant",
+        label = "Time constant",
         description = "This value controls the rate at which the activation tends to the fixed "
                 + "point S(W).",
         increment = .1,

@@ -10,10 +10,10 @@ class TSNEProjection: ProjectionMethod(), IterableProjectionMethod  {
     @UserParameter(label = "Perplexity", order = 10)
     var perplexity: Double = 20.0
 
-    @UserParameter(label = "Learning Rate", order = 20)
+    @UserParameter(label = "Learning rate", order = 20)
     var eta: Double = 200.0
 
-    @UserParameter(label = "Iteration per Update", order = 30)
+    @UserParameter(label = "Iteration per update", order = 30)
     var iterations: Int = 100
 
     val downstairsInitializationMethod = CoordinateProjection()

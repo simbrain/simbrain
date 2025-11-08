@@ -16,7 +16,7 @@ import org.simbrain.util.propertyeditor.CustomTypeName
 class StochasticRule : SpikingNeuronUpdateRule<SpikingScalarData, SpikingMatrixData>(), ActivityGenerator {
 
     @UserParameter(
-        label = "Firing Probability",
+        label = "Firing probability",
         description = "This parameter determines the probability that the generator will fire, "
                 + "causing it to have an activation equal to its upper bound, given an iteration.",
         order = 1

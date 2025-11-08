@@ -54,13 +54,6 @@ class Projector(initialDimension: Int = 25) : EditableObject, CoroutineScope {
     @UserParameter(label = "Tolerance", description = "Only add new points if they are more than this distance from any existing point. Points below this distance are treated as being equivalent to an existing point.", minimumValue = 0.0, increment = .1, order =  1)
     var tolerance: Double = 0.1
 
-    @UserParameter(label = "Connect points", description = "Draw lines between points in plot", order = 10)
-    var connectPoints = false
-        set(value) {
-            field = value
-            events.settingsChanged.fire()
-        }
-
     @UserParameter(label = "Hot color", order = 20)
     var hotColor = Color.red
 
@@ -69,6 +62,13 @@ class Projector(initialDimension: Int = 25) : EditableObject, CoroutineScope {
 
     @UserParameter(label = "Show labels", description = "Show text labels sometimes associated with points", order = 40)
     var showLabels = true
+
+    @UserParameter(label = "Connect points", description = "Draw lines between points in plot", order = 45)
+    var connectPoints = false
+        set(value) {
+            field = value
+            events.settingsChanged.fire()
+        }
 
     @UserParameter(label = "Use hot point", description = "If true, current point is rendered using the hotpoint color", order = 50)
     var useHotPoint = true
@@ -99,7 +99,7 @@ class Projector(initialDimension: Int = 25) : EditableObject, CoroutineScope {
             if (closestPoint != null && closestPoint.euclideanDistance(newPoint) < tolerance) {
                 dataset.currentPoint = closestPoint
             } else {
-                dataset.kdTree.insert(newPoint)
+                dataset.insert(newPoint)
                 dataset.currentPoint = newPoint
                 projectionMethod.addPoint(dataset, newPoint)
                 events.datasetChanged.fire()

@@ -104,7 +104,7 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
     fun clearData() {
         synchronized(projector.dataset) {
             stopIterating()
-            projector.dataset.kdTree.clear()
+            projector.dataset.clear()
             projector.events.datasetChanged.fire()
             projector.events.datasetCleared.fire()
         }
@@ -260,7 +260,7 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
         withContext(Dispatchers.Swing) {
             xyCollection.getSeries(0).clear()
             pointList.clear()
-            projector.dataset.kdTree.forEach {
+            projector.dataset.pointsInInsertionOrder().forEach {
                 pointList.add(it)
                 val (x, y) = it.downstairsPoint
                 xyCollection.getSeries(0).add(x, y)

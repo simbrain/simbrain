@@ -6,6 +6,24 @@ import kotlin.random.Random
 class Dataset(val dimension: Int) {
 
     val kdTree = KDTree(dimension)
+    
+    /**
+     * Maintains the insertion order of data points. This is separate from kdTree which orders points
+     * spatially. Used for visualizations where insertion order matters (e.g., connecting points with lines).
+     */
+    private val insertionOrderList = mutableListOf<DataPoint>()
+
+    fun pointsInInsertionOrder(): List<DataPoint> = insertionOrderList.toList()
+
+    fun insert(point: DataPoint) {
+        kdTree.insert(point)
+        insertionOrderList.add(point)
+    }
+
+    fun clear() {
+        kdTree.clear()
+        insertionOrderList.clear()
+    }
 
     fun computeUpstairsArray() = kdTree.map { it.upstairsPoint }.toTypedArray()
 

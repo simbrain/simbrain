@@ -11,6 +11,8 @@ import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.addSubnetworkAction
 import org.simbrain.network.gui.nodes.subnetworkNodes.BackpropNetworkNode
 import org.simbrain.network.subnetworks.BackpropNetwork
+import org.simbrain.network.subnetworks.CompetitiveNetwork
+import org.simbrain.network.subnetworks.SOMNetwork
 import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.network.trainers.SupervisedNetwork
 import org.simbrain.network.trainers.SupervisedTrainer
@@ -22,6 +24,8 @@ import org.simbrain.util.widgets.ToggleButton
 import java.awt.Cursor
 import java.awt.Dialog
 import java.awt.Dimension
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import javax.swing.*
 
 fun TrainingDataset.createDataSetPanel(parentDialog: StandardDialog? = null, applyAction: suspend DataSetPanel.(selectedRow: Int) -> Unit): DataSetPanel {
@@ -257,38 +261,43 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
 
         runControls.add(JButton(stepAction))
 
-        val runAction = createAction(
-            name = "Run",
-            description = "Run training algorithm",
-            iconPath = "menu_icons/Play.png",
-        ) {
-            with(network) {
-                trainingJob = launch {
-                    trainer.startTraining(unsupervisedNetwork)
+        // Only add play/stop button for algorithms that benefit from repeated iteration
+        // SOM and Competitive networks use iterative learning with decaying parameters
+        // Hopfield and RBM typically use single-pass training
+        if (unsupervisedNetwork is SOMNetwork || unsupervisedNetwork is CompetitiveNetwork) {
+            val runAction = createAction(
+                name = "Run",
+                description = "Run training algorithm",
+                iconPath = "menu_icons/Play.png",
+            ) {
+                with(network) {
+                    trainingJob = launch {
+                        trainer.startTraining(unsupervisedNetwork)
+                    }
                 }
             }
-        }
-        val stopAction = createAction(
-            name = "Stop",
-            description = "Stop training algorithm",
-            iconPath = "menu_icons/Stop.png",
-        ) {
-            launch {
-                trainer.stopTraining()
+            val stopAction = createAction(
+                name = "Stop",
+                description = "Stop training algorithm",
+                iconPath = "menu_icons/Stop.png",
+            ) {
+                launch {
+                    trainer.stopTraining()
+                }
+                trainingJob?.cancel()
             }
-            trainingJob?.cancel()
-        }
-        runControls.add(ToggleButton(listOf(runAction, stopAction)).apply {
-            setAction("Run")
-            trainer.events.beginTraining.on {
-                this@dialog.cursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR)
-                setAction("Stop")
-            }
-            trainer.events.endTraining.on {
-                this@dialog.cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)
+            runControls.add(ToggleButton(listOf(runAction, stopAction)).apply {
                 setAction("Run")
-            }
-        })
+                trainer.events.beginTraining.on {
+                    this@dialog.cursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR)
+                    setAction("Stop")
+                }
+                trainer.events.endTraining.on {
+                    this@dialog.cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)
+                    setAction("Run")
+                }
+            })
+        }
 
         val resetAction = createAction(
             name = "Randomize",
@@ -306,6 +315,15 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         val labelPanel = LabelledItemPanel()
         val iterationsLabel = JLabel(trainer.iteration.toString())
         labelPanel.addItem("Iterations:", iterationsLabel)
+        labelPanel.addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(e: MouseEvent) {
+                if (e.clickCount == 2) {
+                    trainer.iteration = 0
+                    trainer.events.iterationReset.fire()
+                    iterationsLabel.text = trainer.iteration.toString()
+                }
+            }
+        })
         runControls.add(labelPanel, "wrap")
 
         trainer.events.progressUpdated.on(Dispatchers.Swing, wait = true) {

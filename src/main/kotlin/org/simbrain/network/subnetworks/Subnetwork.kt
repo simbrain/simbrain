@@ -126,6 +126,10 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
         modelList.allInUpdatingOrder.forEach { it.update() }
     }
 
+    override fun clear() {
+        modelList.all.forEach { it.clear() }
+    }
+
     private val locatableModels: List<LocatableModel>
         get() = modelList.all.filterIsInstance<LocatableModel>()
 

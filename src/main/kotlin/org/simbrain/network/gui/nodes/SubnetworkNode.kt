@@ -103,6 +103,9 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
     protected val defaultContextMenu: JPopupMenu = JPopupMenu().addDefaultSubnetActions()
 
     protected fun JPopupMenu.addDefaultSubnetActions(): JPopupMenu = apply {
+        add(clearAction)
+        add(randomizeAction)
+        addSeparator()
         add(renameAction)
         add(removeAction)
     }
@@ -110,6 +113,8 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
     protected fun JPopupMenu.applyBasicActions() = apply {
         add(networkPanel.networkActions.cutAction)
         add(networkPanel.networkActions.copyAction)
+        add(clearAction)
+        add(randomizeAction)
         add(renameAction)
         add(removeAction)
         addSeparator()
@@ -135,15 +140,6 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
         })
         add(with(networkPanel.network) { net.createTrainOnPatternAction() })
         add(net.createTrainOnceOnPatternAction())
-        addSeparator()
-        add(
-            createAction(
-                iconPath = "menu_icons/Rand.png",
-                name = "Randomize",
-                keyboardShortcut = 'R'
-            ) {
-                net.randomize(null)
-            })
     }
 
     protected fun createEditAction(name: String) = createAction(name = name) {
@@ -157,6 +153,24 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
     /**
      * Action for editing the group name.
      */
+    protected val <T: JComponent> T.clearAction get() = createAction(
+        name = "Clear",
+        iconPath = "menu_icons/Eraser.png",
+        description = "Clear activations (c)",
+        keyboardShortcut = 'C'
+    ) {
+        subnetwork.clear()
+    }
+
+    protected val <T: JComponent> T.randomizeAction get() = createAction(
+        name = "Randomize",
+        iconPath = "menu_icons/Rand.png",
+        description = "Randomize (r)",
+        keyboardShortcut = 'R'
+    ) {
+        subnetwork.randomize()
+    }
+
     protected val <T: JComponent> T.renameAction get() = createAction(
         name = "Rename..."
     ) {

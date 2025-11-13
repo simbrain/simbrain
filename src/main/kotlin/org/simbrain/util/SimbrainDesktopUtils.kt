@@ -130,6 +130,13 @@ class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, tru
         launch(Dispatchers.Swing) { getTab(tab).addItem(JSeparator(SwingConstants.HORIZONTAL)) }
     }
 
+    fun addLabel(text: String, tab: String? = null) = JLabel(text).also {
+        launch(Dispatchers.Swing) {
+            getTab(tab).addItem(it)
+            pack()
+        }
+    }
+
     fun addLabelledText(label: String, text: String, tab: String? = null) = JLabel(text).also {
         launch(Dispatchers.Swing) {
             getTab(tab).addItem(label, it)
@@ -214,6 +221,30 @@ class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, tru
                 }
             })
             getTab(tab).addItem(label, textField)
+        }
+    }
+
+    inline fun <reified T> addComboBox(
+        label: String,
+        items: List<T>,
+        initialSelection: T? = null,
+        tab: String? = null,
+        crossinline onChange: (T) -> Unit = {}
+    ) = JComboBox(items.toTypedArray()).also { comboBox ->
+        if (initialSelection != null) {
+            comboBox.selectedItem = initialSelection
+        }
+        comboBox.addActionListener {
+            @Suppress("UNCHECKED_CAST")
+            onChange(comboBox.selectedItem as T)
+        }
+        launch(Dispatchers.Swing) {
+            if (label.isEmpty()) {
+                getTab(tab).addItem(comboBox)
+            } else {
+                getTab(tab).addItem(label, comboBox)
+            }
+            pack()
         }
     }
 

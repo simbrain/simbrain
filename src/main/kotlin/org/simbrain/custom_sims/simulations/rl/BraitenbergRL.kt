@@ -2,6 +2,7 @@ package org.simbrain.custom_sims.simulations.rl
 
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.json.JSONObject
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.addNeuron
@@ -15,6 +16,9 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.fitWorldToFrameSize
 import org.simbrain.world.odorworld.sensors.ObjectSensor
 import java.awt.geom.Point2D
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 import javax.swing.JButton
 import kotlin.math.abs
 import kotlin.math.exp
@@ -28,8 +32,50 @@ import kotlin.math.exp
  * Then reinforce that. These are theoretically motivated actions.
  *
  * This is better than updating each synapse because learning then is slow and noisy and can produce descriptive interference.
+ *
+ * Run headless using:
+ * gradle runSim -PsimName="BraitenbergRL" -PoptionString='{"numTrials": 100, "taskIndex": 0, "learningRate": 0.05}'
+ *
+ * Parameters:
+ * - taskIndex: 0=Seek Cheese/Avoid Poison, 1=Seek Both, 2=Avoid Both, 3=Seek Poison/Avoid Cheese
+ * - learningRate: Learning rate (default: 0.05)
+ * - gamma: Discount factor (default: 0.95)
+ * - explorationRate: Initial exploration rate (default: 0.3)
+ * - explorationDecay: Exploration decay per trial (default: 0.995)
+ * - numTrials: Number of training trials (default: 100)
+ * - maxStepsPerTrial: Max steps per trial (default: 1000)
+ * - printInterval: Print stats every N trials (default: 10)
  */
-val braitenbergRL = newSim {
+val braitenbergRL = newSim { optionString ->
+
+    // Task configuration data class
+    data class Task(
+        val name: String,
+        val cheeseReward: Double,
+        val poisonReward: Double
+    ) {
+        override fun toString() = name
+    }
+
+    // Define available tasks
+    val tasks = listOf(
+        Task("Seek Cheese, Avoid Poison", 1.0, -1.0),
+        Task("Seek Both Objects", 1.0, 1.0),
+        Task("Avoid Both Objects", -1.0, -1.0),
+        Task("Seek Poison, Avoid Cheese", -1.0, 1.0)
+    )
+
+    // Data class to track training metrics
+    data class TrainingMetrics(
+        val trialNumber: Int,
+        val totalReward: Double,
+        val steps: Int,
+        val avgTDError: Double,
+        val cheeseReward: Double,
+        val poisonReward: Double
+    )
+
+    val trainingMetricsList = mutableListOf<TrainingMetrics>()
 
     var learningRate = 0.05
     var gamma = 0.95
@@ -41,6 +87,7 @@ val braitenbergRL = newSim {
     
     var explorationRate = 0.3
     var explorationDecay = 0.995
+    var printInterval = 10
 
     var cheeseRewardMultiplier = 1.0
     var poisonRewardMultiplier = -1.0
@@ -145,14 +192,6 @@ val braitenbergRL = newSim {
             upperBound = 200.0
         }
     }
-    val cheeseReward = network.addNeuron(300, 0).apply {
-        clamped = true
-        label = "Cheese reward"
-    }
-    val poisonPenalty = network.addNeuron(300, 50).apply {
-        clamped = true
-        label = "Poison penalty"
-    }
     val rewardNeuron = network.addNeuron(300, 100).apply {
         clamped = true
         label = "Reward"
@@ -168,14 +207,14 @@ val braitenbergRL = newSim {
     }
 
     // Add time series for monitoring
-    // val (plot, rewardSeries, valueSeries, tdErrorSeries) = addTimeSeries(
-    //     "Reward, Value, TD Error",
-    //     seriesNames = listOf("Reward", "Value", "TD Error")
-    // )
+    val (plot, rewardSeries, valueSeries, tdErrorSeries) = addTimeSeries(
+        "Reward, Value, TD Error",
+        seriesNames = listOf("Reward", "Value", "TD Error")
+    )
 
-    // couplingManager.createCoupling(rewardNeuron, rewardSeries)
-    // couplingManager.createCoupling(valueNeuron, valueSeries)
-    // couplingManager.createCoupling(tdErrorNeuron, tdErrorSeries)
+    couplingManager.createCoupling(rewardNeuron, rewardSeries)
+    couplingManager.createCoupling(valueNeuron, valueSeries)
+    couplingManager.createCoupling(tdErrorNeuron, tdErrorSeries)
 
     // All weights
     val cheeseLeftToLeftTurn = network.addSynapse(cheeseLeftInput, leftTurn)
@@ -199,10 +238,10 @@ val braitenbergRL = newSim {
         }
     }
 
-    val cheeseLeftSensor = agent.getSensor("Cheese Left")
-    val cheeseRightSensor = agent.getSensor("Cheese Right")
-    val poisonLeftSensor = agent.getSensor("Poison Left")
-    val poisonRightSensor = agent.getSensor("Poison Right")
+    val cheeseLeftSensor = agent.getSensor("Cheese left")
+    val cheeseRightSensor = agent.getSensor("Cheese right")
+    val poisonLeftSensor = agent.getSensor("Poison left")
+    val poisonRightSensor = agent.getSensor("Poison right")
     val (eStraight, eLeft, eRight) = agent.effectors
 
     with(couplingManager) {
@@ -243,12 +282,58 @@ val braitenbergRL = newSim {
         poison.location = poisonLoc
     }
 
+    fun exportMetricsToCSV() {
+        try {
+            // Create output directory if it doesn't exist
+            val outputDir = File("simulation_outputs")
+            if (!outputDir.exists()) {
+                outputDir.mkdirs()
+            }
+            
+            // Generate filename with timestamp
+            val timestamp = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(Date())
+            val filename = "simulation_outputs/braitenberg_rl_$timestamp.csv"
+            val file = File(filename)
+            
+            file.bufferedWriter().use { writer ->
+                // Write metadata header
+                writer.write("# BraitenbergRL Training Results\n")
+                writer.write("# Task: ${tasks.find { it.cheeseReward == cheeseRewardMultiplier && it.poisonReward == poisonRewardMultiplier }?.name ?: "Custom"}\n")
+                writer.write("# Learning Rate: $learningRate, Gamma: $gamma\n")
+                writer.write("# Exploration Rate: $explorationRate, Decay: $explorationDecay\n")
+                writer.write("# Trials: $numTrials, Max Steps: $maxStepsPerTrial\n")
+                writer.write("#\n")
+                
+                // Write CSV header
+                writer.write("trial,totalReward,steps,avgTDError,cheeseReward,poisonReward\n")
+                
+                // Write data
+                trainingMetricsList.forEach { metrics ->
+                    writer.write("${metrics.trialNumber},${metrics.totalReward},${metrics.steps},${metrics.avgTDError},${metrics.cheeseReward},${metrics.poisonReward}\n")
+                }
+            }
+            
+            println("\nTraining data exported to: $filename")
+        } catch (e: Exception) {
+            println("Error exporting CSV: ${e.message}")
+        }
+    }
 
-    fun applyLearning(button: JButton) {
-        button.isEnabled = false
+    fun applyLearning(button: JButton?) {
+        button?.isEnabled = false
         val random = java.util.Random()
         workspace.launch {
             try {
+                // Print header for headless mode
+                if (desktop == null) {
+                    println("\n=== BraitenbergRL Training Started ===")
+                    println("Task: ${tasks.find { it.cheeseReward == cheeseRewardMultiplier && it.poisonReward == poisonRewardMultiplier }?.name ?: "Custom"}")
+                    println("Learning Rate: $learningRate, Gamma: $gamma")
+                    println("Trials: $numTrials, Max Steps: $maxStepsPerTrial")
+                    println("Exploration Rate: $explorationRate, Decay: $explorationDecay")
+                    println("=".repeat(40))
+                }
+                
                 for (trial in 1..numTrials) {
                     trialStep = 0
                     resetVehicle()
@@ -256,6 +341,11 @@ val braitenbergRL = newSim {
                     
                     // Store previous value for TD error calculation
                     var previousValue = 0.0
+                    var totalReward = 0.0
+                    var totalTDError = 0.0
+                    var tdErrorCount = 0
+                    var totalCheeseReward = 0.0
+                    var totalPoisonReward = 0.0
 
                     val actorSynapses = listOf(
                         cheeseLeftToLeftTurn,
@@ -282,15 +372,22 @@ val braitenbergRL = newSim {
 
                         val (cheeseR, poisonR) = calculateReward(agent)
 
-                        cheeseReward.activation = cheeseR
-                        poisonPenalty.activation = poisonR
                         rewardNeuron.activation = cheeseR + poisonR
+                        
+                        // Track rewards
+                        totalReward += cheeseR + poisonR
+                        totalCheeseReward += cheeseR
+                        totalPoisonReward += poisonR
 
                         // Correct TD error calculation
                         val currentValue = valueNeuron.activation
                         val tdError = rewardNeuron.activation + gamma * currentValue - previousValue
                         tdErrorNeuron.activation = tdError.coerceIn(-1.0, 1.0)
                         tdErrorNeuron.activation = tdError
+                        
+                        // Track TD error
+                        totalTDError += abs(tdError)
+                        tdErrorCount++
 
                         // Update critic weights
                         valueNeuron.fanIn.forEach { syn ->
@@ -363,11 +460,75 @@ val braitenbergRL = newSim {
                         // Update previous value for next iteration
                         previousValue = currentValue
                     }
+                    
+                    // Record metrics for this trial
+                    val avgTDError = if (tdErrorCount > 0) totalTDError / tdErrorCount else 0.0
+                    val metrics = TrainingMetrics(
+                        trialNumber = trial,
+                        totalReward = totalReward,
+                        steps = trialStep - 1,
+                        avgTDError = avgTDError,
+                        cheeseReward = totalCheeseReward,
+                        poisonReward = totalPoisonReward
+                    )
+                    trainingMetricsList.add(metrics)
+                    
+                    // Print selectively in headless mode
+                    if (desktop == null) {
+                        val shouldPrint = trial % printInterval == 0 || trial == 1
+                        val significantImprovement = if (trial > 1) {
+                            val prevReward = trainingMetricsList[trial - 2].totalReward
+                            prevReward != 0.0 && (totalReward - prevReward) / abs(prevReward) > 0.1
+                        } else false
+                        
+                        if (shouldPrint || significantImprovement) {
+                            val improvement = if (trial > 1) {
+                                val prevReward = trainingMetricsList[trial - 2].totalReward
+                                if (prevReward != 0.0) {
+                                    val pctChange = ((totalReward - prevReward) / abs(prevReward) * 100)
+                                    if (pctChange > 0) " (+%.1f%%)".format(pctChange) else " (%.1f%%)".format(pctChange)
+                                } else ""
+                            } else ""
+                            println("Trial $trial: Reward=%.2f%s, Steps=%d, AvgTDError=%.3f".format(
+                                totalReward, improvement, trialStep - 1, avgTDError
+                            ))
+                        }
+                    }
 
                     if (stopRequested) break
                 }
+                
+                // Print final summary for headless mode
+                if (desktop == null && trainingMetricsList.isNotEmpty()) {
+                    println("\n" + "=".repeat(40))
+                    println("=== Training Complete ===")
+                    val avgReward = trainingMetricsList.map { it.totalReward }.average()
+                    val bestTrial = trainingMetricsList.maxByOrNull { it.totalReward }
+                    println("Average Reward: %.2f".format(avgReward))
+                    println("Best Trial: ${bestTrial?.trialNumber} (Reward: %.2f)".format(bestTrial?.totalReward ?: 0.0))
+                    
+                    // Check convergence (last 10 trials within 5%)
+                    if (trainingMetricsList.size >= 10) {
+                        val last10 = trainingMetricsList.takeLast(10).map { it.totalReward }
+                        val last10Avg = last10.average()
+                        val maxDeviation = last10.maxOfOrNull { abs(it - last10Avg) / (abs(last10Avg) + 0.001) } ?: 1.0
+                        val convergence = if (maxDeviation < 0.05) "Stable" else "Variable"
+                        println("Convergence: $convergence (last 10 trials deviation: %.1f%%)".format(maxDeviation * 100))
+                    }
+                    
+                    // Print some key synapse weights
+                    println("\nKey Synapse Weights:")
+                    println("  Cheese Left -> Left Turn: %.3f".format(cheeseLeftToLeftTurn.strength))
+                    println("  Cheese Right -> Right Turn: %.3f".format(cheeseRightToRightTurn.strength))
+                    println("  Poison Left -> Right Turn: %.3f".format(poisonLeftToRightTurn.strength))
+                    println("  Poison Right -> Left Turn: %.3f".format(poisonRightToLeftTurn.strength))
+                    println("=".repeat(40))
+                    
+                    // Export to CSV
+                    exportMetricsToCSV()
+                }
             } finally {
-                button.isEnabled = true
+                button?.isEnabled = true
                 stopRequested = false
             }
         }
@@ -376,15 +537,59 @@ val braitenbergRL = newSim {
     withGui {
         place(networkComponent, 272, 0, 404, 595)
         place(oc, 662, 0, 601, 592)
-        // place(plot, 1080, 0, 500, 500)
+        place(plot, 1080, 0, 500, 500)
         oc.getDesktopComponentAs<OdorWorldDesktopComponent>().fitWorldToFrameSize()
 
         // Combined control panel
-        createControlPanel("RL parameters", 0, 10) {
-            addFormattedNumericTextField("Learning rate", initValue = learningRate) {
+        createControlPanel("Control Panel", 0, 10) {
+            
+            // Keep references to fields that will be updated
+            var cheeseRewardField: javax.swing.JFormattedTextField? = null
+            var poisonRewardField: javax.swing.JFormattedTextField? = null
+            
+            addLabel("<html><b>Quick Start - Predefined Tasks</b></html>")
+            addLabel("Select Task:")
+            
+            addComboBox("", tasks, tasks[0]) { selectedTask ->
+                cheeseRewardMultiplier = selectedTask.cheeseReward
+                poisonRewardMultiplier = selectedTask.poisonReward
+                learningRate = 0.05
+                gamma = 0.95
+                explorationRate = 0.3
+                numTrials = 100
+                maxStepsPerTrial = 1000
+                
+                // Update the UI fields
+                cheeseRewardField?.value = selectedTask.cheeseReward
+                poisonRewardField?.value = selectedTask.poisonReward
+            }
+            
+            addSeparator()
+            
+            addLabel("<html><b>Training Controls</b></html>")
+            
+            addButton("Run Training") {
+                applyLearning(this@addButton)
+            }
+            
+            addButton("Stop Training") {
+                stopRequested = true
+            }
+            
+            addButton("Reset Weights to Zero") {
+                network.freeSynapses.forEach { s ->
+                    s.strength = 0.0
+                }
+            }
+            
+            addSeparator()
+            
+            addLabel("<html><b>Advanced Parameters</b></html>")
+            
+            addFormattedNumericTextField("Learning Rate", initValue = learningRate) {
                 learningRate = it
             }
-            addFormattedNumericTextField("Gamma", initValue = gamma) {
+            addFormattedNumericTextField("Gamma (Discount Factor)", initValue = gamma) {
                 gamma = it
             }
             addFormattedNumericTextField("Exploration Rate", initValue = explorationRate) {
@@ -393,42 +598,22 @@ val braitenbergRL = newSim {
             addFormattedNumericTextField("Exploration Decay", initValue = explorationDecay) {
                 explorationDecay = it
             }
-            addFormattedNumericTextField("Trials", initValue = numTrials) {
-                numTrials = it.toInt()
+            addFormattedNumericTextField("Number of Trials", initValue = numTrials) {
+                numTrials = it
             }
-            addFormattedNumericTextField("Max Steps", initValue = maxStepsPerTrial.toDouble()) {
+            addFormattedNumericTextField("Max Steps per Trial", initValue = maxStepsPerTrial.toDouble()) {
                 maxStepsPerTrial = it.toInt()
-            }
-            addButton("Stop") {
-                stopRequested = true
-            }
-            addButton("Run Trials") {
-                applyLearning(this@addButton)
             }
             
             addSeparator()
             
-            //addFormattedNumericTextField("Cheese Multiplier", initValue = cheeseRewardMultiplier) {
-            //    cheeseRewardMultiplier = it
-            //}
-            //addFormattedNumericTextField("Poison Multiplier", initValue = poisonRewardMultiplier) {
-            //    poisonRewardMultiplier = it
-            //}
-            addButton("Both Rewarding") {
-                cheeseRewardMultiplier = 1.0
-                poisonRewardMultiplier = 1.0
+            addLabel("<html><b>Custom Reward Configuration</b></html>")
+            
+            cheeseRewardField = addFormattedNumericTextField("Cheese Reward Multiplier", initValue = cheeseRewardMultiplier) {
+                cheeseRewardMultiplier = it
             }
-            addButton("Both Punishing") {
-                cheeseRewardMultiplier = -1.0
-                poisonRewardMultiplier = -1.0
-            }
-            addButton("Reverse") {
-                cheeseRewardMultiplier = -1.0
-                poisonRewardMultiplier = 1.0
-            }
-            addButton("Normal") {
-                cheeseRewardMultiplier = 1.0
-                poisonRewardMultiplier = -1.0
+            poisonRewardField = addFormattedNumericTextField("Poison Reward Multiplier", initValue = poisonRewardMultiplier) {
+                poisonRewardMultiplier = it
             }
         }
     }
@@ -436,35 +621,162 @@ val braitenbergRL = newSim {
 
     addSidebarInfo(
         """ 
-            
     # Braitenberg RL
         
-    Improved version with better learning dynamics.
+    A Braitenberg vehicle that learns different approach and avoidance behaviors using actor-critic reinforcement learning. The vehicle uses sensory inputs to detect cheese and poison objects, and learns to approach or avoid them based on reward feedback.
     
-    ### Key Improvements:
+    ## Background
     
-    1. **Fixed TD Error**: Now correctly calculates temporal difference error
-    2. **Better Exploration**: Decaying exploration rate for better learning
-    3. **Smoother Rewards**: Continuous reward gradients instead of binary
-    4. **Improved Module Selection**: Better scoring of behavioral modules
-    5. **Random Initialization**: Weights start with small random values
+    Braitenberg vehicles are simple agent models that exhibit complex behaviors through sensory-motor connections. In this simulation, instead of hand-coding the connection weights, the vehicle learns them through reinforcement learning. The actor-critic architecture combines policy learning (actor) with value estimation (critic) to efficiently learn behaviors.
     
-    ### References
+    The learning algorithm uses behavioral modules that correspond to different Braitenberg vehicle types (cheese pursuer, poison avoider, etc.). At each time step, the most active module receives reinforcement, which is more efficient than updating individual synapses.
+    
+    # Simulation Details
+    
+    ## Network Architecture
+    
+    The network consists of:
+    - **Input Neurons**: Four sensors detecting cheese and poison objects (left and right for each)
+    - **Output Neurons**: Three motor outputs controlling left turn, right turn, and forward speed
+    - **Actor Weights**: Connect inputs to motor outputs, determining behavior
+    - **Critic Network**: Learns to predict value of current state
+    - **Reward Neuron**: Displays the total reward signal
+    
+    ## Learning Algorithm
+    
+    The simulation uses temporal difference (TD) learning:
+    
+    1. The agent observes its environment through sensors
+    2. The actor selects actions based on current weights plus exploration noise
+    3. The agent receives rewards based on proximity to objects
+    4. The critic computes the TD error (difference between predicted and actual value)
+    5. Both actor and critic weights are updated based on TD error
+    
+    Rewards are distance-based with exponential decay, providing smooth gradients that guide learning. Exploration noise decays over trials to allow the agent to converge on optimal behavior.
+    
+    ## Behavioral Modules
+    
+    The actor weights are organized into four behavioral modules:
+    - **Cheese Pursuer**: Turn toward cheese (left sensor → left turn, right sensor → right turn)
+    - **Cheese Avoider**: Turn away from cheese (left sensor → right turn, right sensor → left turn)
+    - **Poison Pursuer**: Turn toward poison
+    - **Poison Avoider**: Turn away from poison
+    
+    During learning, the most active module receives the strongest weight updates.
+    
+    # What to Do
+    
+    ## Quick Start
+    
+    1. Select a task from the `Task` dropdown menu in the control panel
+    2. Click `▶ Run Training` to start the learning process
+    3. Watch the vehicle move around the environment as it learns
+    4. Observe the `Reward, Value, TD Error` plot to monitor learning progress
+    
+    The training will run for the specified number of trials. You can click `⏹ Stop Training` to interrupt it early.
+    
+    ## The Four Tasks
+    
+    Try each task to see how the vehicle learns different behaviors:
+    
+    - **Seek Cheese, Avoid Poison**: Standard Braitenberg behavior where cheese is rewarding and poison is penalizing
+    - **Seek Both Objects**: Both objects provide positive reward
+    - **Avoid Both Objects**: Both objects provide negative reward
+    - **Seek Poison, Avoid Cheese**: Opposite behavior where poison is rewarding and cheese is penalizing
+    
+    ## Observe
+    
+    During training, watch:
+    - How the vehicle's movement patterns change over trials
+    - The `Reward` trace showing how total reward increases (or becomes less negative)
+    - The `Value` trace showing the critic's learned predictions
+    - The `TD Error` showing the learning signal
+    - The network weights updating in real-time
+    
+    ## Experiment
+    
+    Try adjusting parameters in the `Advanced Parameters` section:
+    
+    - **Learning Rate**: Controls how quickly weights change (higher = faster but less stable learning)
+    - **Gamma**: Discount factor for future rewards (higher = more farsighted)
+    - **Exploration Rate**: Amount of random noise added to actions (higher = more exploration)
+    - **Exploration Decay**: How quickly exploration decreases (closer to 1 = slower decay)
+    - **Number of Trials**: How many learning episodes to run
+    - **Max Steps per Trial**: Maximum time steps per episode
+    
+    After training on one task, try clicking `Reset Weights to Zero` and training on a different task to see how the vehicle adapts.
+    
+    ## Custom Configurations
+    
+    Use the `Custom Reward Configuration` section to create your own reward structures:
+    - Set `Cheese Reward Multiplier` to a positive value to attract the vehicle, negative to repel
+    - Set `Poison Reward Multiplier` similarly
+    - The magnitude controls the strength of attraction or repulsion
+    
+    ## Headless Mode
+    
+    This simulation can be run in headless mode for batch experiments:
+    
+    ```
+    gradle runSim -PsimName="BraitenbergRL" -PoptionString='{"numTrials": 100, "taskIndex": 0, "learningRate": 0.05}'
+    ```
+    
+    Parameters:
+    - `taskIndex`: 0=Seek Cheese/Avoid Poison, 1=Seek Both, 2=Avoid Both, 3=Seek Poison/Avoid Cheese
+    - `learningRate`: Learning rate (default: 0.05)
+    - `gamma`: Discount factor (default: 0.95)
+    - `explorationRate`: Initial exploration rate (default: 0.3)
+    - `explorationDecay`: Exploration decay per trial (default: 0.995)
+    - `numTrials`: Number of training trials (default: 100)
+    - `maxStepsPerTrial`: Max steps per trial (default: 1000)
+    - `printInterval`: Print stats every N trials (default: 10)
+    
+    Results are printed to stdout and saved to `simulation_outputs/braitenberg_rl_TIMESTAMP.csv`
+    
+    # References
         
-    1. Braitenberg, V. (1986). [_Vehicles: Experiments in synthetic psychology_](https://mitpress.mit.edu/9780262521123/vehicles/). MIT press.
+    Braitenberg, V. (1986). [_Vehicles: Experiments in synthetic psychology_](https://mitpress.mit.edu/9780262521123/vehicles/). MIT Press.
             
-    2. Hotton, S., & Yoshimi, J. (2024). [_The Open Dynamics of Braitenberg Vehicles_](https://mitpress.mit.edu/9780262548199/the-open-dynamics-of-braitenberg-vehicles/). MIT Press.
+    Hotton, S., & Yoshimi, J. (2024). [_The Open Dynamics of Braitenberg Vehicles_](https://mitpress.mit.edu/9780262548199/the-open-dynamics-of-braitenberg-vehicles/). MIT Press.
+    
+    Sutton, R. S., & Barto, A. G. (2018). [_Reinforcement Learning: An Introduction_](http://incompleteideas.net/book/the-book.html) (2nd ed.). MIT Press.
             
-    ### Credits
-            
+    # Credits
+    
+    Dave Noelle
+    
     Veer Sahai
-    
+            
     Jeff Yoshimi
-    
-    Dave Noelle suggested the original idea
             
     """.trimIndent()
     )
 
+    // Parse optionString and run in headless mode if provided
+    if (optionString?.isNotEmpty() == true) {
+        val options = JSONObject(optionString)
+        
+        // Parse parameters
+        learningRate = options.optDouble("learningRate", learningRate)
+        gamma = options.optDouble("gamma", gamma)
+        explorationRate = options.optDouble("explorationRate", explorationRate)
+        explorationDecay = options.optDouble("explorationDecay", explorationDecay)
+        numTrials = options.optInt("numTrials", numTrials)
+        maxStepsPerTrial = options.optInt("maxStepsPerTrial", maxStepsPerTrial)
+        printInterval = options.optInt("printInterval", printInterval)
+        
+        // Set task based on taskIndex
+        if (options.has("taskIndex")) {
+            val taskIndex = options.getInt("taskIndex")
+            if (taskIndex in tasks.indices) {
+                val task = tasks[taskIndex]
+                cheeseRewardMultiplier = task.cheeseReward
+                poisonRewardMultiplier = task.poisonReward
+            }
+        }
+        
+        // Run training automatically in headless mode
+        applyLearning(null)
+    }
 
 }

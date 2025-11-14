@@ -637,7 +637,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         enablingCondition = EnablingConditions.SYNAPSES
     ) {
         createSynapseAdjustmentPanel(
-            network.getModels<Synapse>().toList(),
+            networkPanel.selectionManager.filterSelectedModels<Synapse>(),
             weightRandomizer,
             excitatoryRandomizer,
             inhibitoryRandomizer

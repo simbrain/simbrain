@@ -28,16 +28,42 @@ val rbmSim = newSim {
     network.addNetworkModelAsync(rbm)
 
     addSidebarInfo(
-        """ 
-            # Introduction
-            
-             Simulation of a restricted Boltzmann machine. 
+        """
+            # RBM
 
-            # What to do
-            
-            - Click train on all patterns or click a pattern and click train on current pattern
-            - To test the trained network, click on the visible layer, click `R` to randomize it, and click space repeatedly to see if on of the training patterns is recreated
-            - Try training different patterns by different amounts to see how well they are remembered.
+            Simulation of a restricted Boltzmann machine. RBMs are unsupervised learning models that can learn hidden representations of data and perform pattern completion.
+
+            # Simulation Details
+
+            This simulation contains an RBM with a visible layer (100 neurons by default) and a hidden layer (150 neurons by default). The network is pre-configured with four training patterns: circle, square, diagonal line, and cross.
+
+            The visible layer is arranged in a 10x10 grid, making it easy to visualize patterns. The hidden layer learns feature representations of these patterns through contrastive divergence learning.
+
+            # What to Do
+
+            Click `Train On All Patterns` to train the RBM on all four built-in patterns. The network will iterate through each pattern multiple times based on the `Training iterations` parameter.
+
+            To test the trained network:
+            - Click on the visible layer to select it
+            - Press `R` to randomize the activations
+            - Press spacebar repeatedly to let the network reconstruct one of the learned patterns from the random input
+
+            ## Experiment
+
+            - Try training individual patterns by clicking a pattern button, then clicking `Train on current pattern`
+            - Train different patterns by different amounts to see how well they are remembered
+            - Use the `Add noise` button to add noise to the visible layer and observe pattern completion
+            - Adjust `Training iterations` to see how learning quality changes with more or fewer iterations
+
+            ## Creating Custom Patterns
+
+            To create your own patterns for training:
+            1. Right-click on the visible layer and select `Add coupled image world`
+            2. In the Image World, load images or draw custom patterns
+            3. The pattern will automatically appear in the visible layer
+            4. Right-click on the RBM network and select `Add Current Pattern to Training Data`
+            5. Repeat for each custom pattern you want to train on
+            6. Use `Train On All Patterns` or `Train on current pattern` as before
 
         """.trimIndent()
     )

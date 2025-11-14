@@ -232,7 +232,7 @@ val binaryReservoir = newSim {
         
         Kanly Thao
         
-        Sergio Ponce de Leon
+        [Sergio Ponce de Leon](https://www.sergioponcedeleon.com/)
         
         """.trimIndent()
     )

@@ -29,6 +29,6 @@ class GaussianDecayFunction @JvmOverloads constructor(dispersion: Double = 70.0)
             }
     }
 
-    override val name = "Exponential"
+    override val name = "Gaussian"
 
 }

@@ -10,10 +10,10 @@ import org.simbrain.network.core.addSynapse
 import org.simbrain.network.core.getSynapse
 import org.simbrain.util.getDesktopComponentAs
 import org.simbrain.util.place
+import org.simbrain.util.swingInvokeLater
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
-import org.simbrain.world.odorworld.fitWorldToFrameSize
 import org.simbrain.world.odorworld.sensors.ObjectSensor
 import java.awt.geom.Point2D
 import java.io.File
@@ -34,7 +34,7 @@ import kotlin.math.exp
  * This is better than updating each synapse because learning then is slow and noisy and can produce descriptive interference.
  *
  * Run headless using:
- * gradle runSim -PsimName="BraitenbergRL" -PoptionString='{"numTrials": 100, "taskIndex": 0, "learningRate": 0.05}'
+ * gradle runSim -PsimName="Braitenberg RL" -PoptionString='{"numTrials": 100, "taskIndex": 0, "learningRate": 0.05}'
  *
  * Parameters:
  * - taskIndex: 0=Seek Cheese/Avoid Poison, 1=Seek Both, 2=Avoid Both, 3=Seek Poison/Avoid Cheese
@@ -42,6 +42,7 @@ import kotlin.math.exp
  * - gamma: Discount factor (default: 0.95)
  * - explorationRate: Initial exploration rate (default: 0.3)
  * - explorationDecay: Exploration decay per trial (default: 0.995)
+ * - dispersion: Sensor decay dispersion parameter (default: 75.0)
  * - numTrials: Number of training trials (default: 100)
  * - maxStepsPerTrial: Max steps per trial (default: 1000)
  * - printInterval: Print stats every N trials (default: 10)
@@ -84,16 +85,17 @@ val braitenbergRL = newSim { optionString ->
     var maxStepsPerTrial = 1000
     var trialStep = 0
     var stopRequested = false
-    
-    var explorationRate = 0.3
-    var explorationDecay = 0.995
+
     var printInterval = 10
 
     var cheeseRewardMultiplier = 1.0
     var poisonRewardMultiplier = -1.0
 
+    var dispersion = 75.0
+
     workspace.clearWorkspace()
     val oc = addOdorWorldComponent("RL Braitenberg world")
+    oc.world.tileMap.updateMapSize(16, 13)
     val world = oc.world
     world.isObjectsBlockMovement = true
     oc.world.isUseCameraCentering = false
@@ -120,7 +122,6 @@ val braitenbergRL = newSim { optionString ->
         return Pair(cheeseComponent, poisonComponent)
     }
 
-    val dispersion = 75.0
     val networkComponent = addNetworkComponent("Network")
     val network = networkComponent.network
     val entityOffset = Point2D.Double(100.0, 100.0)
@@ -142,7 +143,6 @@ val braitenbergRL = newSim { optionString ->
             decayFunction.dispersion = dispersion
         })
         addDefaultEffectors()
-        //isShowTrail = true
     }
     val cheeseLeftInput = runBlocking {
         network.addNeuron(0, 100).apply {
@@ -216,21 +216,12 @@ val braitenbergRL = newSim { optionString ->
     couplingManager.createCoupling(valueNeuron, valueSeries)
     couplingManager.createCoupling(tdErrorNeuron, tdErrorSeries)
 
-    // All weights
+    // Actor synapses - only 4 trainable connections based on Braitenberg vehicle design
     val cheeseLeftToLeftTurn = network.addSynapse(cheeseLeftInput, leftTurn)
-    val cheeseLeftToRightTurn = network.addSynapse(cheeseLeftInput, rightTurn)
-    val cheeseLeftToStraight = network.addSynapse(cheeseLeftInput, straight)
-    val cheeseRightToLeftTurn = network.addSynapse(cheeseRightInput, leftTurn)
     val cheeseRightToRightTurn = network.addSynapse(cheeseRightInput, rightTurn)
-    val cheeseRightToStraight = network.addSynapse(cheeseRightInput, straight)
     val poisonLeftToLeftTurn = network.addSynapse(poisonLeftInput, leftTurn)
-    val poisonLeftToRightTurn = network.addSynapse(poisonLeftInput, rightTurn)
-    val poisonLeftToStraight = network.addSynapse(poisonLeftInput, straight)
-    val poisonRightToLeftTurn = network.addSynapse(poisonRightInput, leftTurn)
     val poisonRightToRightTurn = network.addSynapse(poisonRightInput, rightTurn)
-    val poisonRightToStraightRight = network.addSynapse(poisonRightInput, straight)
 
-    // List of all input neurons
     val valueInputs = listOf(cheeseLeftInput, cheeseRightInput, poisonLeftInput, poisonRightInput)
     val criticWeights = valueInputs.map { input ->
         network.addSynapse(input, valueNeuron).apply {
@@ -257,7 +248,60 @@ val braitenbergRL = newSim { optionString ->
 
     network.freeSynapses.forEach { s ->
         s.strength = 0.0
-        //s.strength = (Math.random() - 0.5) * 0.1
+    }
+
+    // Behavioral modules - all reference the same 4 synapses
+    // Pursuers work with positive weights, avoiders work with negative weights
+    val cheesePursuer = mapOf(
+        cheeseLeftInput to leftTurn,
+        cheeseRightInput to rightTurn,
+    )
+
+    val cheeseAvoider = mapOf(
+        cheeseLeftInput to leftTurn,      // Same synapse as pursuer, but expects negative weight
+        cheeseRightInput to rightTurn,    // Same synapse as pursuer, but expects negative weight
+    )
+
+    val poisonPursuer = mapOf(
+        poisonLeftInput to leftTurn,
+        poisonRightInput to rightTurn,
+    )
+
+    val poisonAvoider = mapOf(
+        poisonLeftInput to leftTurn,      // Same synapse as pursuer, but expects negative weight
+        poisonRightInput to rightTurn,    // Same synapse as pursuer, but expects negative weight
+    )
+
+    // Track previous value for TD error calculation
+    var previousValue = 0.0
+
+    // Add workspace update action to compute reward, value, and TD error on every iteration
+    // This makes the time series work even when not training
+    workspace.addUpdateAction("update RL metrics") {
+        // Calculate current reward
+        val (cheeseR, poisonR) = calculateReward(agent)
+        rewardNeuron.activation = cheeseR + poisonR
+
+        // Calculate current value (critic network output)
+        // This is already computed by the network update, we just read it
+        val currentValue = valueNeuron.activation
+
+        // Calculate TD error: r + gamma * V(s') - V(s)
+        val tdError = rewardNeuron.activation + gamma * currentValue - previousValue
+        tdErrorNeuron.activation = tdError
+
+        // Update previous value for next iteration
+        previousValue = currentValue
+    }
+
+    var respawnCountPerTrial = 0
+
+    fun getObjectName(entity: OdorWorldEntity): String {
+        return when (entity.entityType) {
+            EntityType.Swiss -> "Cheese"
+            EntityType.Poison -> "Poison"
+            else -> entity.entityType.name
+        }
     }
 
     fun resetVehicle() {
@@ -265,21 +309,89 @@ val braitenbergRL = newSim { optionString ->
         agent.heading = (0..360).random().toDouble()
     }
 
-    // Minseparation is between cheese and poison so it does not confuse them
+    // Reset all objects to random locations far from each other
     fun resetObjects(minSeparation: Double = 100.0) {
-        val swiss = world.entityList.find { it.entityType == EntityType.Swiss } ?: return
-        val poison = world.entityList.find { it.entityType == EntityType.Poison } ?: return
+        val objectsToReset = listOf(cheese, poison)
+        val newLocations = mutableListOf<Point2D>()
 
-        var cheeseLoc: Point2D
-        var poisonLoc: Point2D
+        for (obj in objectsToReset) {
+            var newLoc: Point2D
+            do {
+                newLoc = Point2D.Double((100..500).random().toDouble(), (100..500).random().toDouble())
+            } while (newLocations.any { it.distance(newLoc) < minSeparation })
 
+            newLocations.add(newLoc)
+            obj.location = newLoc
+        }
+    }
+
+    // Respawn an object at a new location far from all other objects
+    fun respawnObject(obj: OdorWorldEntity, minSeparation: Double = 100.0) {
+        val objName = getObjectName(obj)
+        val oldLoc = obj.location
+
+        // Generate new location far from all other entities
+        var newLoc: Point2D
         do {
-            cheeseLoc = Point2D.Double((100..500).random().toDouble(), (100..500).random().toDouble())
-            poisonLoc = Point2D.Double((100..500).random().toDouble(), (100..500).random().toDouble())
-        } while (cheeseLoc.distance(poisonLoc) < minSeparation)
+            newLoc = Point2D.Double((100..500).random().toDouble(), (100..500).random().toDouble())
+        } while (world.entityList.any { it !== obj && newLoc.distance(it.location) < minSeparation })
 
-        swiss.location = cheeseLoc
-        poison.location = poisonLoc
+        obj.location = newLoc
+        respawnCountPerTrial++
+
+        // Log respawning event
+        println("[Respawn] $objName: Collision detected | Old=(${oldLoc.x.toInt()},${oldLoc.y.toInt()}) → New=(${newLoc.x.toInt()},${newLoc.y.toInt()}) | AgentDist=${"%.1f".format(newLoc.distance(agent.location))}px")
+    }
+
+    agent.events.collided.on { collidedWith ->
+        if (collidedWith === cheese || collidedWith === poison) {
+            println("[Collision] Agent collided with ${getObjectName(collidedWith).uppercase()}")
+            respawnObject(collidedWith)
+        }
+    }
+
+    fun selectWinningModule(
+        cheeseActivation: Double,
+        poisonActivation: Double
+    ): Map<Neuron, Neuron>? {
+        val totalSensorActivation = cheeseActivation + poisonActivation
+        val sensorsDelta = cheeseActivation - poisonActivation
+
+        // Skip learning if sensors have no meaningful activation
+        if (totalSensorActivation < 0.1 || sensorsDelta == 0.0) {
+            return null
+        }
+
+        return if (sensorsDelta > 0.0) {
+            // Cheese more active - select cheese pursuer or avoider based on current weights
+            val cheeseWeightSum = cheeseLeftToLeftTurn.strength + cheeseRightToRightTurn.strength
+            when {
+                cheeseWeightSum > 0 -> cheesePursuer
+                cheeseWeightSum < 0 -> cheeseAvoider
+                else -> cheesePursuer  // Default to pursuer when weights are 0
+            }
+        } else {
+            // Poison more active - select poison pursuer or avoider based on current weights
+            val poisonWeightSum = poisonLeftToLeftTurn.strength + poisonRightToRightTurn.strength
+            when {
+                poisonWeightSum > 0 -> poisonPursuer
+                poisonWeightSum < 0 -> poisonAvoider
+                else -> poisonPursuer  // Default to pursuer when weights are 0
+            }
+        }
+    }
+
+    fun updateCriticWeights(tdError: Double) {
+        valueNeuron.fanIn.forEach { syn ->
+            syn.strength += learningRate * tdError * syn.source.activation
+        }
+    }
+
+    fun updateActorWeights(module: Map<Neuron, Neuron>, tdError: Double) {
+        for ((input, output) in module) {
+            val syn = getSynapse(input, output) ?: continue
+            syn.strength += learningRate * tdError * input.activation
+        }
     }
 
     fun exportMetricsToCSV() {
@@ -289,39 +401,97 @@ val braitenbergRL = newSim { optionString ->
             if (!outputDir.exists()) {
                 outputDir.mkdirs()
             }
-            
+
             // Generate filename with timestamp
             val timestamp = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(Date())
             val filename = "simulation_outputs/braitenberg_rl_$timestamp.csv"
             val file = File(filename)
-            
+
             file.bufferedWriter().use { writer ->
                 // Write metadata header
                 writer.write("# BraitenbergRL Training Results\n")
                 writer.write("# Task: ${tasks.find { it.cheeseReward == cheeseRewardMultiplier && it.poisonReward == poisonRewardMultiplier }?.name ?: "Custom"}\n")
                 writer.write("# Learning Rate: $learningRate, Gamma: $gamma\n")
-                writer.write("# Exploration Rate: $explorationRate, Decay: $explorationDecay\n")
                 writer.write("# Trials: $numTrials, Max Steps: $maxStepsPerTrial\n")
                 writer.write("#\n")
-                
+
                 // Write CSV header
                 writer.write("trial,totalReward,steps,avgTDError,cheeseReward,poisonReward\n")
-                
+
                 // Write data
                 trainingMetricsList.forEach { metrics ->
                     writer.write("${metrics.trialNumber},${metrics.totalReward},${metrics.steps},${metrics.avgTDError},${metrics.cheeseReward},${metrics.poisonReward}\n")
                 }
             }
-            
+
             println("\nTraining data exported to: $filename")
         } catch (e: Exception) {
             println("Error exporting CSV: ${e.message}")
         }
     }
 
+    fun printTrialProgress(
+        trial: Int,
+        totalReward: Double,
+        steps: Int,
+        avgTDError: Double,
+        respawnCount: Int
+    ) {
+        if (desktop != null) return  // Only print in headless mode
+
+        val shouldPrint = trial % printInterval == 0 || trial == 1
+        val significantImprovement = if (trial > 1 && trainingMetricsList.size >= 2) {
+            val prevReward = trainingMetricsList[trial - 2].totalReward
+            prevReward != 0.0 && (totalReward - prevReward) / abs(prevReward) > 0.1
+        } else false
+
+        if (shouldPrint || significantImprovement) {
+            val improvement = if (trial > 1 && trainingMetricsList.size >= 2) {
+                val prevReward = trainingMetricsList[trial - 2].totalReward
+                if (prevReward != 0.0) {
+                    val pctChange = ((totalReward - prevReward) / abs(prevReward) * 100)
+                    if (pctChange > 0) " (+%.1f%%)".format(pctChange) else " (%.1f%%)".format(pctChange)
+                } else ""
+            } else ""
+            println("Trial $trial: Reward=%.2f%s, Steps=%d, AvgTDError=%.3f, Respawns=%d".format(
+                totalReward, improvement, steps, avgTDError, respawnCount
+            ))
+        }
+    }
+
+    fun printFinalSummary() {
+        if (desktop != null || trainingMetricsList.isEmpty()) return  // Only print in headless mode
+
+        println("\n" + "=".repeat(40))
+        println("=== Training Complete ===")
+        val avgReward = trainingMetricsList.map { it.totalReward }.average()
+        val bestTrial = trainingMetricsList.maxByOrNull { it.totalReward }
+        println("Average Reward: %.2f".format(avgReward))
+        println("Best Trial: ${bestTrial?.trialNumber} (Reward: %.2f)".format(bestTrial?.totalReward ?: 0.0))
+
+        // Check convergence (last 10 trials within 5%)
+        if (trainingMetricsList.size >= 10) {
+            val last10 = trainingMetricsList.takeLast(10).map { it.totalReward }
+            val last10Avg = last10.average()
+            val maxDeviation = last10.maxOfOrNull { abs(it - last10Avg) / (abs(last10Avg) + 0.001) } ?: 1.0
+            val convergence = if (maxDeviation < 0.05) "Stable" else "Variable"
+            println("Convergence: $convergence (last 10 trials deviation: %.1f%%)".format(maxDeviation * 100))
+        }
+
+        // Print the 4 learned synaptic weights
+        println("\nLearned Synapse Weights:")
+        println("  Cheese Left -> Left Turn: %.3f (Pursuer=Pos, Avoider=Neg)".format(cheeseLeftToLeftTurn.strength))
+        println("  Cheese Right -> Right Turn: %.3f (Pursuer=Pos, Avoider=Neg)".format(cheeseRightToRightTurn.strength))
+        println("  Poison Left -> Left Turn: %.3f (Pursuer=Pos, Avoider=Neg)".format(poisonLeftToLeftTurn.strength))
+        println("  Poison Right -> Right Turn: %.3f (Pursuer=Pos, Avoider=Neg)".format(poisonRightToRightTurn.strength))
+        println("=".repeat(40))
+
+        // Export to CSV
+        exportMetricsToCSV()
+    }
+
     fun applyLearning(button: JButton?) {
         button?.isEnabled = false
-        val random = java.util.Random()
         workspace.launch {
             try {
                 // Print header for headless mode
@@ -330,15 +500,15 @@ val braitenbergRL = newSim { optionString ->
                     println("Task: ${tasks.find { it.cheeseReward == cheeseRewardMultiplier && it.poisonReward == poisonRewardMultiplier }?.name ?: "Custom"}")
                     println("Learning Rate: $learningRate, Gamma: $gamma")
                     println("Trials: $numTrials, Max Steps: $maxStepsPerTrial")
-                    println("Exploration Rate: $explorationRate, Decay: $explorationDecay")
                     println("=".repeat(40))
                 }
-                
+
                 for (trial in 1..numTrials) {
                     trialStep = 0
                     resetVehicle()
                     resetObjects()
-                    
+                    respawnCountPerTrial = 0
+
                     // Store previous value for TD error calculation
                     var previousValue = 0.0
                     var totalReward = 0.0
@@ -349,31 +519,18 @@ val braitenbergRL = newSim { optionString ->
 
                     val actorSynapses = listOf(
                         cheeseLeftToLeftTurn,
-                        cheeseLeftToRightTurn,
-                        cheeseLeftToStraight,
-                        cheeseRightToLeftTurn,
                         cheeseRightToRightTurn,
-                        cheeseRightToStraight,
                         poisonLeftToLeftTurn,
-                        poisonLeftToRightTurn,
-                        poisonLeftToStraight,
-                        poisonRightToLeftTurn,
-                        poisonRightToRightTurn,
-                        poisonRightToStraightRight
+                        poisonRightToRightTurn
                     )
 
                     while (trialStep++ < maxStepsPerTrial && !stopRequested) {
                         workspace.iterateSuspend(1)
 
-                        // Add exploration noise that decays over time
-                        val currentExploration = explorationRate * Math.pow(explorationDecay, trial.toDouble())
-                        leftTurn.activation += random.nextGaussian() * currentExploration
-                        rightTurn.activation += random.nextGaussian() * currentExploration
-
                         val (cheeseR, poisonR) = calculateReward(agent)
 
                         rewardNeuron.activation = cheeseR + poisonR
-                        
+
                         // Track rewards
                         totalReward += cheeseR + poisonR
                         totalCheeseReward += cheeseR
@@ -382,75 +539,20 @@ val braitenbergRL = newSim { optionString ->
                         // Correct TD error calculation
                         val currentValue = valueNeuron.activation
                         val tdError = rewardNeuron.activation + gamma * currentValue - previousValue
-                        tdErrorNeuron.activation = tdError.coerceIn(-1.0, 1.0)
                         tdErrorNeuron.activation = tdError
-                        
+
                         // Track TD error
                         totalTDError += abs(tdError)
                         tdErrorCount++
 
                         // Update critic weights
-                        valueNeuron.fanIn.forEach { syn ->
-                            syn.strength += learningRate * tdError * syn.source.activation
-                        }
+                        updateCriticWeights(tdError)
 
-                        // Improved module selection based on actual behavior
-                        val cheesePursuer = mapOf(
-                            cheeseLeftInput to leftTurn,
-                            cheeseRightInput to rightTurn,
-                        )
-
-                        val cheeseAvoider = mapOf(
-                            cheeseLeftInput to rightTurn,
-                            cheeseRightInput to leftTurn,
-                        )
-
-                        val poisonPursuer = mapOf(
-                            poisonLeftInput to leftTurn,
-                            poisonRightInput to rightTurn,
-                        )
-
-                        val poisonAvoider = mapOf(
-                            poisonLeftInput to rightTurn,
-                            poisonRightInput to leftTurn,
-                        )
-
-                        val behaviorModules = listOf(
-                            "cheesePursuer" to cheesePursuer,
-                            "cheeseAvoider" to cheeseAvoider,
-                            "poisonPursuer" to poisonPursuer,
-                            "poisonAvoider" to poisonAvoider,
-                        )
-
-                        // Identify the most active module in the sense that those neurons
-                        // are most active
-                        fun scoreModule(module: Map<Neuron, Neuron>): Double {
-                            return module.entries.sumOf { (input, output) ->
-                                val syn = getSynapse(input, output)
-                                if (syn != null) {
-                                    syn.strength * input.activation * output.activation
-                                } else {
-                                    0.0
-                                }
-                            }
-                        }
-
-                        // Identify the most active module
-                        val (winningName, winningModule) = behaviorModules.maxByOrNull { scoreModule(it.second) } ?: continue
-
-                        // Only update if TD error is significant
-                        if (abs(tdError) > 0.1) {
-                            // Reinforce the winning module
-                            for ((input, output) in winningModule) {
-                                val syn = getSynapse(input, output) ?: continue
-                                val inputActivation = input.activation
-                                syn.strength += learningRate * tdError * inputActivation
-                            }
-
-                            //if (trial % 5 == 0) { // Print less frequently
-                            //    println("Trial $trial, Step $trialStep: $winningName, TD Error: $tdError")
-                            //}
-                        }
+                        // Update actor weights for the winning behavioral module
+                        val cheeseActivation = cheeseLeftInput.activation + cheeseRightInput.activation
+                        val poisonActivation = poisonLeftInput.activation + poisonRightInput.activation
+                        val winningModule = selectWinningModule(cheeseActivation, poisonActivation)
+                        winningModule?.let { updateActorWeights(it, tdError) }
 
                         // Clamp weights to prevent runaway
                         actorSynapses.forEach { syn ->
@@ -460,7 +562,7 @@ val braitenbergRL = newSim { optionString ->
                         // Update previous value for next iteration
                         previousValue = currentValue
                     }
-                    
+
                     // Record metrics for this trial
                     val avgTDError = if (tdErrorCount > 0) totalTDError / tdErrorCount else 0.0
                     val metrics = TrainingMetrics(
@@ -472,61 +574,12 @@ val braitenbergRL = newSim { optionString ->
                         poisonReward = totalPoisonReward
                     )
                     trainingMetricsList.add(metrics)
-                    
-                    // Print selectively in headless mode
-                    if (desktop == null) {
-                        val shouldPrint = trial % printInterval == 0 || trial == 1
-                        val significantImprovement = if (trial > 1) {
-                            val prevReward = trainingMetricsList[trial - 2].totalReward
-                            prevReward != 0.0 && (totalReward - prevReward) / abs(prevReward) > 0.1
-                        } else false
-                        
-                        if (shouldPrint || significantImprovement) {
-                            val improvement = if (trial > 1) {
-                                val prevReward = trainingMetricsList[trial - 2].totalReward
-                                if (prevReward != 0.0) {
-                                    val pctChange = ((totalReward - prevReward) / abs(prevReward) * 100)
-                                    if (pctChange > 0) " (+%.1f%%)".format(pctChange) else " (%.1f%%)".format(pctChange)
-                                } else ""
-                            } else ""
-                            println("Trial $trial: Reward=%.2f%s, Steps=%d, AvgTDError=%.3f".format(
-                                totalReward, improvement, trialStep - 1, avgTDError
-                            ))
-                        }
-                    }
+                    printTrialProgress(trial, totalReward, trialStep - 1, avgTDError, respawnCountPerTrial)
 
                     if (stopRequested) break
                 }
-                
-                // Print final summary for headless mode
-                if (desktop == null && trainingMetricsList.isNotEmpty()) {
-                    println("\n" + "=".repeat(40))
-                    println("=== Training Complete ===")
-                    val avgReward = trainingMetricsList.map { it.totalReward }.average()
-                    val bestTrial = trainingMetricsList.maxByOrNull { it.totalReward }
-                    println("Average Reward: %.2f".format(avgReward))
-                    println("Best Trial: ${bestTrial?.trialNumber} (Reward: %.2f)".format(bestTrial?.totalReward ?: 0.0))
-                    
-                    // Check convergence (last 10 trials within 5%)
-                    if (trainingMetricsList.size >= 10) {
-                        val last10 = trainingMetricsList.takeLast(10).map { it.totalReward }
-                        val last10Avg = last10.average()
-                        val maxDeviation = last10.maxOfOrNull { abs(it - last10Avg) / (abs(last10Avg) + 0.001) } ?: 1.0
-                        val convergence = if (maxDeviation < 0.05) "Stable" else "Variable"
-                        println("Convergence: $convergence (last 10 trials deviation: %.1f%%)".format(maxDeviation * 100))
-                    }
-                    
-                    // Print some key synapse weights
-                    println("\nKey Synapse Weights:")
-                    println("  Cheese Left -> Left Turn: %.3f".format(cheeseLeftToLeftTurn.strength))
-                    println("  Cheese Right -> Right Turn: %.3f".format(cheeseRightToRightTurn.strength))
-                    println("  Poison Left -> Right Turn: %.3f".format(poisonLeftToRightTurn.strength))
-                    println("  Poison Right -> Left Turn: %.3f".format(poisonRightToLeftTurn.strength))
-                    println("=".repeat(40))
-                    
-                    // Export to CSV
-                    exportMetricsToCSV()
-                }
+
+                printFinalSummary()
             } finally {
                 button?.isEnabled = true
                 stopRequested = false
@@ -535,68 +588,55 @@ val braitenbergRL = newSim { optionString ->
     }
 
     withGui {
-        place(networkComponent, 272, 0, 404, 595)
-        place(oc, 662, 0, 601, 592)
-        place(plot, 1080, 0, 500, 500)
-        oc.getDesktopComponentAs<OdorWorldDesktopComponent>().fitWorldToFrameSize()
+        place(networkComponent, 320, 10, 360, 400)
+        place(oc, 670, 10, 415, 415)
+        place(plot, 320, 410, 500, 300)
+        swingInvokeLater { oc.getDesktopComponentAs<OdorWorldDesktopComponent>().worldPanel.scalingFactor = 0.1 }
 
         // Combined control panel
         createControlPanel("Control Panel", 0, 10) {
-            
-            // Keep references to fields that will be updated
-            var cheeseRewardField: javax.swing.JFormattedTextField? = null
-            var poisonRewardField: javax.swing.JFormattedTextField? = null
-            
-            addLabel("<html><b>Quick Start - Predefined Tasks</b></html>")
+
             addLabel("Select Task:")
-            
+
             addComboBox("", tasks, tasks[0]) { selectedTask ->
                 cheeseRewardMultiplier = selectedTask.cheeseReward
                 poisonRewardMultiplier = selectedTask.poisonReward
                 learningRate = 0.05
                 gamma = 0.95
-                explorationRate = 0.3
                 numTrials = 100
                 maxStepsPerTrial = 1000
-                
-                // Update the UI fields
-                cheeseRewardField?.value = selectedTask.cheeseReward
-                poisonRewardField?.value = selectedTask.poisonReward
             }
-            
+
             addSeparator()
-            
+
             addLabel("<html><b>Training Controls</b></html>")
-            
+
             addButton("Run Training") {
                 applyLearning(this@addButton)
             }
-            
+
             addButton("Stop Training") {
                 stopRequested = true
             }
-            
+
             addButton("Reset Weights to Zero") {
                 network.freeSynapses.forEach { s ->
                     s.strength = 0.0
                 }
             }
-            
+
             addSeparator()
-            
+
             addLabel("<html><b>Advanced Parameters</b></html>")
-            
+
             addFormattedNumericTextField("Learning Rate", initValue = learningRate) {
                 learningRate = it
             }
             addFormattedNumericTextField("Gamma (Discount Factor)", initValue = gamma) {
                 gamma = it
             }
-            addFormattedNumericTextField("Exploration Rate", initValue = explorationRate) {
-                explorationRate = it
-            }
-            addFormattedNumericTextField("Exploration Decay", initValue = explorationDecay) {
-                explorationDecay = it
+            addFormattedNumericTextField("Dispersion", initValue = dispersion) {
+                dispersion = it
             }
             addFormattedNumericTextField("Number of Trials", initValue = numTrials) {
                 numTrials = it
@@ -604,17 +644,7 @@ val braitenbergRL = newSim { optionString ->
             addFormattedNumericTextField("Max Steps per Trial", initValue = maxStepsPerTrial.toDouble()) {
                 maxStepsPerTrial = it.toInt()
             }
-            
-            addSeparator()
-            
-            addLabel("<html><b>Custom Reward Configuration</b></html>")
-            
-            cheeseRewardField = addFormattedNumericTextField("Cheese Reward Multiplier", initValue = cheeseRewardMultiplier) {
-                cheeseRewardMultiplier = it
-            }
-            poisonRewardField = addFormattedNumericTextField("Poison Reward Multiplier", initValue = poisonRewardMultiplier) {
-                poisonRewardMultiplier = it
-            }
+            swingInvokeLater { pack() }
         }
     }
 
@@ -655,15 +685,19 @@ val braitenbergRL = newSim { optionString ->
     Rewards are distance-based with exponential decay, providing smooth gradients that guide learning. Exploration noise decays over trials to allow the agent to converge on optimal behavior.
     
     ## Behavioral Modules
-    
+
     The actor weights are organized into four behavioral modules:
     - **Cheese Pursuer**: Turn toward cheese (left sensor → left turn, right sensor → right turn)
     - **Cheese Avoider**: Turn away from cheese (left sensor → right turn, right sensor → left turn)
     - **Poison Pursuer**: Turn toward poison
     - **Poison Avoider**: Turn away from poison
-    
+
     During learning, the most active module receives the strongest weight updates.
-    
+
+    ## Dynamic Object Respawning
+
+    Objects automatically respawn at new locations when the agent collides with them. This prevents the vehicle from getting stuck on objects and encourages continuous exploration. Objects always respect a minimum separation distance of 100 pixels from each other to avoid confusion during learning. Collision detection uses accurate AABB (Axis-Aligned Bounding Box) collision testing that accounts for entity sizes.
+
     # What to Do
     
     ## Quick Start
@@ -703,18 +737,11 @@ val braitenbergRL = newSim { optionString ->
     - **Exploration Decay**: How quickly exploration decreases (closer to 1 = slower decay)
     - **Number of Trials**: How many learning episodes to run
     - **Max Steps per Trial**: Maximum time steps per episode
-    
+
     After training on one task, try clicking `Reset Weights to Zero` and training on a different task to see how the vehicle adapts.
-    
-    ## Custom Configurations
-    
-    Use the `Custom Reward Configuration` section to create your own reward structures:
-    - Set `Cheese Reward Multiplier` to a positive value to attract the vehicle, negative to repel
-    - Set `Poison Reward Multiplier` similarly
-    - The magnitude controls the strength of attraction or repulsion
-    
+
     ## Headless Mode
-    
+
     This simulation can be run in headless mode for batch experiments:
     
     ```
@@ -727,6 +754,7 @@ val braitenbergRL = newSim { optionString ->
     - `gamma`: Discount factor (default: 0.95)
     - `explorationRate`: Initial exploration rate (default: 0.3)
     - `explorationDecay`: Exploration decay per trial (default: 0.995)
+    - `dispersion`: Sensor decay dispersion parameter (default: 75.0)
     - `numTrials`: Number of training trials (default: 100)
     - `maxStepsPerTrial`: Max steps per trial (default: 1000)
     - `printInterval`: Print stats every N trials (default: 10)
@@ -734,19 +762,19 @@ val braitenbergRL = newSim { optionString ->
     Results are printed to stdout and saved to `simulation_outputs/braitenberg_rl_TIMESTAMP.csv`
     
     # References
-        
+
     Braitenberg, V. (1986). [_Vehicles: Experiments in synthetic psychology_](https://mitpress.mit.edu/9780262521123/vehicles/). MIT Press.
-            
+
     Hotton, S., & Yoshimi, J. (2024). [_The Open Dynamics of Braitenberg Vehicles_](https://mitpress.mit.edu/9780262548199/the-open-dynamics-of-braitenberg-vehicles/). MIT Press.
-    
+
     Sutton, R. S., & Barto, A. G. (2018). [_Reinforcement Learning: An Introduction_](http://incompleteideas.net/book/the-book.html) (2nd ed.). MIT Press.
-            
+
     # Credits
-    
+
     Dave Noelle
-    
+
     Veer Sahai
-            
+
     Jeff Yoshimi
             
     """.trimIndent()
@@ -755,12 +783,11 @@ val braitenbergRL = newSim { optionString ->
     // Parse optionString and run in headless mode if provided
     if (optionString?.isNotEmpty() == true) {
         val options = JSONObject(optionString)
-        
+
         // Parse parameters
         learningRate = options.optDouble("learningRate", learningRate)
         gamma = options.optDouble("gamma", gamma)
-        explorationRate = options.optDouble("explorationRate", explorationRate)
-        explorationDecay = options.optDouble("explorationDecay", explorationDecay)
+        dispersion = options.optDouble("dispersion", dispersion)
         numTrials = options.optInt("numTrials", numTrials)
         maxStepsPerTrial = options.optInt("maxStepsPerTrial", maxStepsPerTrial)
         printInterval = options.optInt("printInterval", printInterval)

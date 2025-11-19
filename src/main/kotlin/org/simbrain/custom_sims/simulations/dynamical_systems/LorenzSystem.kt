@@ -127,7 +127,7 @@ val lorenzSystem = newSim {
 
             val sigmaField = addTextField("σ (sigma)", "10.0")
             val rhoField = addTextField("ρ (rho)", "15.0")
-            val betaField = addTextField("β (beta)", "2.6667")
+            val betaField = addTextField("β (beta)", "2.7")
 
             addButton("Apply Custom Parameters") {
                 sigma = sigmaField.text.toDoubleOrNull() ?: sigma

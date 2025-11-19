@@ -4,8 +4,11 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
-import org.simbrain.network.trainers.*
-import org.simbrain.util.*
+import org.simbrain.network.trainers.He
+import org.simbrain.network.trainers.LeCun
+import org.simbrain.network.trainers.Randomize
+import org.simbrain.network.trainers.Xavier
+import org.simbrain.util.assertMatrixEquals
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 import smile.math.matrix.Matrix
@@ -241,7 +244,7 @@ class WeightInitializationStrategiesTest {
         assertNotSame(xavier, xavierCopy)
         
         // Test He copy
-        val he = He(666L).apply { distribution = He.Distribution.NORMAL }
+        val he = He(42L).apply { distribution = He.Distribution.NORMAL }
         val heCopy = he.copy()
         assertEquals(he.distribution, heCopy.distribution)
         assertNotSame(he, heCopy)

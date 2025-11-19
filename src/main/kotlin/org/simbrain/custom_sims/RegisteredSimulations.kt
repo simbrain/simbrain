@@ -11,6 +11,7 @@ import org.simbrain.custom_sims.simulations.braitenberg.pursuer
 import org.simbrain.custom_sims.simulations.demos.competitiveSim
 import org.simbrain.custom_sims.simulations.demos.somNetSmells
 import org.simbrain.custom_sims.simulations.dynamical_systems.lorenzSystem
+import org.simbrain.custom_sims.simulations.dynamical_systems.lorenzSystemSimbrain
 import org.simbrain.custom_sims.simulations.edge_of_chaos.edgeOfChaos
 import org.simbrain.custom_sims.simulations.edge_of_chaos.edgeOfChaosBitStream
 import org.simbrain.custom_sims.simulations.neuroscience.corticalLayers
@@ -132,6 +133,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
 
     dir("Dynamical systems") {
         item("Lorenz attractor") { lorenzSystem }
+        item("Lorenz attractor (Pure Simbrain)") { lorenzSystemSimbrain }
     }
 
     //dir("Leabra") {

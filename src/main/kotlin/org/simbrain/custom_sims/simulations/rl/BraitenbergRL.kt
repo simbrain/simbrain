@@ -103,7 +103,6 @@ val braitenbergRL = newSim { optionString ->
     val poison = oc.world.addEntity(398, 335, EntityType.Poison)
     val cheese = oc.world.addEntity(500, 184, EntityType.Swiss)
 
-    // Improved reward function with smoother gradients
     fun calculateReward(
         agent: OdorWorldEntity,
     ): Pair<Double, Double> {
@@ -206,7 +205,6 @@ val braitenbergRL = newSim { optionString ->
         lowerBound = -100.0
     }
 
-    // Add time series for monitoring
     val (plot, rewardSeries, valueSeries, tdErrorSeries) = addTimeSeries(
         "Reward, Value, TD Error",
         seriesNames = listOf("Reward", "Value", "TD Error")
@@ -216,7 +214,7 @@ val braitenbergRL = newSim { optionString ->
     couplingManager.createCoupling(valueNeuron, valueSeries)
     couplingManager.createCoupling(tdErrorNeuron, tdErrorSeries)
 
-    // Actor synapses - only 4 trainable connections based on Braitenberg vehicle design
+    // Actor synapses: only 4 trainable connections based on Braitenberg vehicle design
     val cheeseLeftToLeftTurn = network.addSynapse(cheeseLeftInput, leftTurn)
     val cheeseRightToRightTurn = network.addSynapse(cheeseRightInput, rightTurn)
     val poisonLeftToLeftTurn = network.addSynapse(poisonLeftInput, leftTurn)
@@ -250,7 +248,7 @@ val braitenbergRL = newSim { optionString ->
         s.strength = 0.0
     }
 
-    // Behavioral modules - all reference the same 4 synapses
+    // Behavioral modules
     // Pursuers work with positive weights, avoiders work with negative weights
     val cheesePursuer = mapOf(
         cheeseLeftInput to leftTurn,
@@ -258,8 +256,8 @@ val braitenbergRL = newSim { optionString ->
     )
 
     val cheeseAvoider = mapOf(
-        cheeseLeftInput to leftTurn,      // Same synapse as pursuer, but expects negative weight
-        cheeseRightInput to rightTurn,    // Same synapse as pursuer, but expects negative weight
+        cheeseLeftInput to leftTurn,
+        cheeseRightInput to rightTurn,
     )
 
     val poisonPursuer = mapOf(
@@ -268,15 +266,13 @@ val braitenbergRL = newSim { optionString ->
     )
 
     val poisonAvoider = mapOf(
-        poisonLeftInput to leftTurn,      // Same synapse as pursuer, but expects negative weight
-        poisonRightInput to rightTurn,    // Same synapse as pursuer, but expects negative weight
+        poisonLeftInput to leftTurn,
+        poisonRightInput to rightTurn,
     )
 
     // Track previous value for TD error calculation
     var previousValue = 0.0
 
-    // Add workspace update action to compute reward, value, and TD error on every iteration
-    // This makes the time series work even when not training
     workspace.addUpdateAction("update RL metrics") {
         // Calculate current reward
         val (cheeseR, poisonR) = calculateReward(agent)
@@ -340,12 +336,12 @@ val braitenbergRL = newSim { optionString ->
         respawnCountPerTrial++
 
         // Log respawning event
-        println("[Respawn] $objName: Collision detected | Old=(${oldLoc.x.toInt()},${oldLoc.y.toInt()}) → New=(${newLoc.x.toInt()},${newLoc.y.toInt()}) | AgentDist=${"%.1f".format(newLoc.distance(agent.location))}px")
+        //println("[Respawn] $objName: Collision detected | Old=(${oldLoc.x.toInt()},${oldLoc.y.toInt()}) → New=(${newLoc.x.toInt()},${newLoc.y.toInt()}) | AgentDist=${"%.1f".format(newLoc.distance(agent.location))}px")
     }
 
     agent.events.collided.on { collidedWith ->
         if (collidedWith === cheese || collidedWith === poison) {
-            println("[Collision] Agent collided with ${getObjectName(collidedWith).uppercase()}")
+            //println("[Collision] Agent collided with ${getObjectName(collidedWith).uppercase()}")
             respawnObject(collidedWith)
         }
     }
@@ -596,7 +592,7 @@ val braitenbergRL = newSim { optionString ->
         // Combined control panel
         createControlPanel("Control Panel", 0, 10) {
 
-            addLabel("Select Task:")
+            addLabel("Task:")
 
             addComboBox("", tasks, tasks[0]) { selectedTask ->
                 cheeseRewardMultiplier = selectedTask.cheeseReward
@@ -608,8 +604,6 @@ val braitenbergRL = newSim { optionString ->
             }
 
             addSeparator()
-
-            addLabel("<html><b>Training Controls</b></html>")
 
             addButton("Run Training") {
                 applyLearning(this@addButton)
@@ -626,8 +620,6 @@ val braitenbergRL = newSim { optionString ->
             }
 
             addSeparator()
-
-            addLabel("<html><b>Advanced Parameters</b></html>")
 
             addFormattedNumericTextField("Learning Rate", initValue = learningRate) {
                 learningRate = it
@@ -687,42 +679,47 @@ val braitenbergRL = newSim { optionString ->
     ## Behavioral Modules
 
     The actor weights are organized into four behavioral modules:
-    - **Cheese Pursuer**: Turn toward cheese (left sensor → left turn, right sensor → right turn)
-    - **Cheese Avoider**: Turn away from cheese (left sensor → right turn, right sensor → left turn)
-    - **Poison Pursuer**: Turn toward poison
-    - **Poison Avoider**: Turn away from poison
+    - Cheese Pursuer: Turn toward cheese (left sensor → left turn, right sensor → right turn)
+    - Cheese Avoider: Turn away from cheese (left sensor → right turn, right sensor → left turn)
+    - Poison Pursuer: Turn toward poison
+    - Poison Avoider: Turn away from poison
 
     During learning, the most active module receives the strongest weight updates.
 
+    ## Learning Dynamics and Turning Bias
+
+    The learning algorithm reinforces the behavioral module that is most active at each time step. When the vehicle's sensors detect one object more strongly than another, only that object's module gets reinforced. For example, if cheese sensors are more active, only the cheese pursuer or cheese avoider module updates its weights.
+
+    The vehicle can also develop a turning bias. If it frequently encounters cheese on one side, it will learn stronger weights for that side's cheese-related connections. The same happens for poison. These learned biases can cause the vehicle to show directional preferences even when objects are symmetrically positioned.
+
     ## Dynamic Object Respawning
 
-    Objects automatically respawn at new locations when the agent collides with them. This prevents the vehicle from getting stuck on objects and encourages continuous exploration. Objects always respect a minimum separation distance of 100 pixels from each other to avoid confusion during learning. Collision detection uses accurate AABB (Axis-Aligned Bounding Box) collision testing that accounts for entity sizes.
+    Objects automatically respawn at new locations when the agent collides with them. This prevents the vehicle from getting stuck on objects and encourages continuous exploration. Objects always respect a minimum separation distance of 100 pixels from each other to avoid confusion during learning. 
 
     # What to Do
-    
-    ## Quick Start
-    
+
+
     1. Select a task from the `Task` dropdown menu in the control panel
-    2. Click `▶ Run Training` to start the learning process
+    2. Click `Run Training` to start the learning process
     3. Watch the vehicle move around the environment as it learns
     4. Observe the `Reward, Value, TD Error` plot to monitor learning progress
-    
-    The training will run for the specified number of trials. You can click `⏹ Stop Training` to interrupt it early.
-    
-    ## The Four Tasks
-    
+
+    The training will run for the specified number of trials. You can click `Stop Training` to interrupt it early.
+
+    Note on training vs. running: The `Run Training` button runs the full learning algorithm for multiple trials. After training, you can use the main toolbar's run button to watch the trained vehicle operate continuously with its learned weights. Training mode updates weights; running mode just executes the learned behavior.
+
+    Performance tip: Training runs much faster if you minimize or iconify component windows (odor world, network, time series). The simulation still runs in the background but doesn't spend time rendering visualizations.
+
     Try each task to see how the vehicle learns different behaviors:
-    
-    - **Seek Cheese, Avoid Poison**: Standard Braitenberg behavior where cheese is rewarding and poison is penalizing
-    - **Seek Both Objects**: Both objects provide positive reward
-    - **Avoid Both Objects**: Both objects provide negative reward
-    - **Seek Poison, Avoid Cheese**: Opposite behavior where poison is rewarding and cheese is penalizing
-    
-    ## Observe
-    
+
+    - Seek Cheese, Avoid Poison: Standard Braitenberg behavior where cheese is rewarding and poison is penalizing
+    - Seek Both Objects: Both objects provide positive reward
+    - Avoid Both Objects: Both objects provide negative reward
+    - Seek Poison, Avoid Cheese: Opposite behavior where poison is rewarding and cheese is penalizing
+
     During training, watch:
     - How the vehicle's movement patterns change over trials
-    - The `Reward` trace showing how total reward increases (or becomes less negative)
+    - The `Reward` trace showing how total reward changes
     - The `Value` trace showing the critic's learned predictions
     - The `TD Error` showing the learning signal
     - The network weights updating in real-time

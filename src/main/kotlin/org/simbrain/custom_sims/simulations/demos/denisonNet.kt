@@ -219,8 +219,8 @@ val denisonNet = newSim {
 
     withGui {
         place(netComponent, 200, 15, 492, 447)
-        place(imageWorldComponent, 690, 15, 503, 446)
-        place(plot, 303, 442, 500, 300)
+        place(imageWorldComponent, 690, 15, 503, 447)
+        place(plot, 303, 450, 500, 300)
 
         currentStatus.location = point(145, -240)
         modelDecision.location = point(145, -180)
@@ -340,46 +340,82 @@ val denisonNet = newSim {
 
 addSidebarInfo(
         """
-        # Introduction
-        
-        This is a neural network simulation of visual attention, based on the paper ["A dynamic normalization
-        model of temporal attention"](https://www.nature.com/articles/s41562-021-01129-1) by Rachel Denison.
-        
-        In an experiment, participants were asked to pay attention to 2 tilted grating patterns. The patterns were rotated
-        either clockwise or counterclockwise, and were shown one after the other. Participants
-        were cued with a noise, which told them which pattern to pay attention to (first, second, or both). Afterwards, they were
-        asked to report the rotation direction of one of the patterns.
-        
-        The researchers found that when the cued pattern the matched they were asked to report on, the overall response
-        times were faster than if they were mismatched. In this simulation they are asked to report both, so there is no
-        congruence effect.
-        
-        The model consists of 5 layers. 2 of the layers are input layers, 2 of them are attention layers
-        (Involuntary and Voluntary), and there is 1 decision layer.
-        
-        # What to Do
-        
-        In the control panel, choose a trial type. Run the trial and observe what happens.
-        
-        When a grating appears in the panel to the right, the neurons in the first sensory layer pick it up. Each neuron
-        in this layer is tuned to a different orientation. Thus a given pattern produces a maximal response in one neuron
-        and fading activations in nearby neurons. Another network shows sustained echoes of the pattern in the sensory network.
-        The sustained activations are accumulated in the decision layer.
-        
-        The sensory neurons influence involuntary attention, and is thus stimulus-based. Voluntary attention is determimed by the cue type.
+        # Temporal Attention Model
 
-        The attention neurons adjust the gain (the overall activation) of the sensory layer.
-                
-        The decision neurons correspond to the first and second pattern. Positive activations signify clockwise orientation,
-        while negative activations signify counterclockwise.
-        
-        The first decision neuron accumulates evidence for the first pattern,
-        and similarly for the second. Observe the strength of the neurons in the decision layer (which correspond to
-         how "sure" the model is of its answer) and how the different cueings affect it.
-        
-        # Credits 
+        A neural network model of visual attention based on the paper ["A dynamic normalization model of temporal attention"](https://www.nature.com/articles/s41562-021-01129-1) by Rachel Denison. The simulation demonstrates how voluntary and involuntary attention interact to detect and classify briefly presented visual patterns.
+
+        ## Background
+
+        In Denison's experiment, participants viewed two tilted grating patterns presented one after the other. Each pattern was rotated either clockwise or counterclockwise. Before the patterns appeared, participants received an auditory cue telling them to pay attention to the first pattern, the second pattern, or both. After viewing the patterns, they reported the rotation direction.
+
+        The key finding: when participants were cued to attend to a specific pattern and then asked to report on that same pattern, their response times were faster and more accurate than when cued to one pattern but asked about the other. This demonstrates that voluntary attention (the cue) enhances perceptual processing of attended stimuli.
+
+        # Simulation Details
+
+        The model consists of five layers that process visual input and make decisions:
+
+        ## Network Architecture
+
+        - **Sensory Layer**: 12 neurons, each tuned to a different orientation (0°, 30°, 60°, etc.). When a grating pattern appears, the neuron matching that orientation activates most strongly, with nearby orientations showing weaker responses.
+
+        - **Sustained Response Layer**: 12 neurons that maintain prolonged activation after the sensory layer responds. These sustained activations are what get accumulated in the decision layer.
+
+        - **Decision Layer**: 2 neurons that accumulate evidence for each pattern. Positive activation indicates clockwise rotation, negative indicates counterclockwise. The strength of activation reflects the model's confidence.
+
+        - **Voluntary Attention**: A single neuron controlled by the attention cue selected in the control panel. It enhances processing in the sensory layer based on which pattern is cued.
+
+        - **Involuntary Attention**: A single neuron driven by the stimulus itself. It responds automatically to pattern onsets regardless of the cue, and also enhances processing in the sensory layer.
+
+        ## How Attention Works
+
+        Both attention systems modulate the gain of the sensory layer: they multiply the overall activation level. Voluntary attention is determined by your cue selection. Involuntary attention is stimulus-driven and responds to any visual pattern onset.
+
+        # What to Do
+
+        ## Run a Trial
+
+        1. Select an `Attention Cue` from the dropdown in the control panel.
+        2. Click `Start` to run a trial
+        3. Watch the simulation unfold
+
+        ## What to Observe
+
+        **Stimulus Presentation**: The status text shows which pattern is currently being displayed:
+        - Initially: "No stimulus"
+        - First pattern appears briefly with its orientation angle
+        - Gap with no stimulus
+        - Second pattern appears briefly with its orientation angle
+        - Final period with no stimulus
+
+        **Sensory Responses**: Watch the sensory layer activate when patterns appear, and the sustained response show a fading echo of sensory activations. The neuron corresponding to the pattern's orientation will activate most strongly.
+
+        **Attention Dynamics**: The `Attention` plot to see how voluntary and involuntary attention unfold over time. Notice:
+        - When involuntary attention spikes (at pattern onsets)
+        - How voluntary attention is allocated to one pattern or the other based on the cue you selected
+        - The interaction between the two attention systems
+
+        **Decision Formation**: Observe the `Decision` layer neurons accumulate evidence for each pattern. The final decision appears at the bottom of the network display, showing the model's judgment at the end of the trial, as well as the correct "ground truth" answer.
+        If the two match, then the person made a correct decision.
+
+        ## Experiment
+
+        Try different attention cues and observe how they affect:
+        - The decision layer activation strengths (model confidence)
+        - The voluntary attention trace in the plot
+        - Whether the model makes correct decisions
+
+        Run multiple trials with the same cue to see how random variation in stimulus timing (SOA) affects attention allocation.
+
+        # References
+
+        Denison, R. N., Yuval-Greenberg, S., & Carrasco, M. (2021). [A dynamic normalization model of temporal attention](https://www.nature.com/articles/s41562-021-01129-1). _Nature Human Behaviour_, _5_(12), 1674–1685.
+
+        # Credits
+
         [Jensen Guo](https://www.linkedin.com/in/jensen-guo/)
         
+        [Jeff Yoshimi](https://www.jeffyoshimi.net)
+
         """.trimIndent()
     )
 }

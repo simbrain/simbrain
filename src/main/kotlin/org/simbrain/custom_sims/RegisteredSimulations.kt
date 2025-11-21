@@ -72,7 +72,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Heat-cold illusion") { heatColdSim }
         item("IAC Jets Sharks 5 people") { iacJetsSharks5People }
         item("Mouse and eye tracking") { spiveyNet }
-        item("Temporal Attention Network") { denisonNet }
+        item("Temporal attention network") { denisonNet }
     }
 
     dir("Behaviorism") {
@@ -94,7 +94,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Basic word embeddings") { nlpSimBasic }
         item("Next-word prediction (SRN)") { srnElmanSentences }
         //item("Tiny language model") { tinyLanguageModelFF }
-        item("Tiny language model (Transformer)") { tinyLanguageModel }
+        item("Tiny language model (transformer)") { tinyLanguageModel }
     }
 
     dir("Neuroscience") {

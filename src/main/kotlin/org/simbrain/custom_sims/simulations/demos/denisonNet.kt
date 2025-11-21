@@ -4,6 +4,7 @@ import kotlinx.coroutines.launch
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.NetworkTextObject
 import org.simbrain.network.core.addNeuronGroup
+import org.simbrain.network.core.setLabels
 import org.simbrain.util.*
 import org.simbrain.workspace.updater.UpdateCoupling
 import kotlin.math.*
@@ -64,16 +65,21 @@ val denisonNet = newSim {
     val net = netComponent.network
 
     val currentStatus = NetworkTextObject("").apply { fontSize = 18 }
-    val reportStatus = NetworkTextObject("").apply { fontSize = 18 }
     val modelDecision = NetworkTextObject("").apply { fontSize = 18 }
 
-    val sensory1 = net.addNeuronGroup(12).apply { label = "Sensory 1" }
-    val sensory2 = net.addNeuronGroup(12).apply { label = "Sensory 2" }
-    val decision = net.addNeuronGroup(2).apply { label = "Decision" }
+    val sensory1 = net.addNeuronGroup(12).apply {
+        label = "Sensory"
+        setLabels((0..11).map { "${it * 30}°" })
+    }
+    val sensory2 = net.addNeuronGroup(12).apply {
+        label = "Sustained Response"
+        setLabels((0..11).map { "${it * 30}°" })
+    }
+    val decision = net.addNeuronGroup(2).apply { label = "Decision" }.apply {
+        setLabels(listOf("Pattern 1", "Pattern 2"))
+    }
     val vaLayer = net.addNeuronGroup(1).apply { label = "Voluntary Attention" }
     val iaLayer = net.addNeuronGroup(1).apply { label = "Involuntary Attention" }
-
-
 
     sensory1.setUpperBound(0.1)
     sensory2.setUpperBound(0.1)
@@ -84,19 +90,18 @@ val denisonNet = newSim {
     iaLayer.setLowerBound(-0.02)
     iaLayer.setUpperBound(0.02)
 
-    net.addNetworkModels(sensory1, sensory2, decision, vaLayer, iaLayer, currentStatus, reportStatus, modelDecision)
+    net.addNetworkModels(sensory1, sensory2, decision, vaLayer, iaLayer, modelDecision, currentStatus)
 
-    val component = addImageWorld("Gratings")
-    val imageWorld = component.world
+    val imageWorldComponent = addImageWorld("Gratings")
+    val imageWorld = imageWorldComponent.world
     imageWorld.loadImages(getFilesWithExtension("simulations/images/denisonGratings", "png"))
     val background = DoubleArray(10000) { 0.0 }.toGrayScaleImage(100, 100)
     imageWorld.imageAlbum.addImage(background)
 
-    val (plot, IASeries, VASeries) = addTimeSeries("Attention over Time", seriesNames = listOf("Involuntary Attention", "Voluntary Attention"))
+    val (plot, IASeries, VASeries) = addTimeSeries("Attention", seriesNames = listOf("Involuntary Attention", "Voluntary Attention"))
     plot.apply {
         model.isAutoRange = true
         model.fixedWidth = false
-        events.componentMinimized.fire(true)
     }
 
     val IAPlot = couplingManager.createCoupling(iaLayer.getNeuron(0), IASeries)
@@ -213,29 +218,35 @@ val denisonNet = newSim {
     sensory2.setActivations(DoubleArray(12) { 0.0 })
 
     withGui {
-        place(netComponent, 130, 15, 700, 700)
-        place(component, 830, 15, 600, 700)
-        place(plot, 760, 590, 520, 300)
+        place(netComponent, 200, 15, 492, 447)
+        place(imageWorldComponent, 690, 15, 503, 446)
+        place(plot, 303, 442, 500, 300)
 
-        currentStatus.location = point(220, -240)
-        reportStatus.location = point(220, -220)
-        modelDecision.location = point(220, -180)
+        currentStatus.location = point(145, -240)
+        modelDecision.location = point(145, -180)
 
         sensory1.location = point(0.0, 100.0)
         sensory2.location = point(220.0, 100.0)
         decision.location = point(440.0, 100.0)
-        vaLayer.location = point(90.0, -70.0)
-        iaLayer.location = point(330.0, -70.0)
+        vaLayer.location = point(44.0, -97.0)
+        iaLayer.location = point(370.0, -97.0)
 
-            currentStatus.text = "Paying Attention to Both"
+        // Define cue types
+        data class CueType(val name: String, val state: Int) {
+            override fun toString() = name
+        }
+
+        val cueTypes = listOf(
+            CueType("Cue Pattern 1", 0),
+            CueType("Cue Pattern 2", 1),
+            CueType("Cue Both", 2)
+        )
 
         createControlPanel("Control Panel", 15, 15) {
-            addButton("Cue T1") { vaState = 1; currentStatus.text = "Paying Attention to T1" }
-            addButton("Cue T2") { vaState = 2; currentStatus.text = "Paying Attention to T2" }
-            addButton("Cue Both") { vaState = 0; currentStatus.text = "Paying Attention to Both" }
-            //addSeparator()
-            //addButton("Report T1") { reportTarget = 1; reportStatus.text = "Reporting T1" }
-            //addButton("Report T2") { reportTarget = 2; reportStatus.text = "Reporting T2" }
+            addLabel("Attention Cue:")
+            addComboBox("", cueTypes, cueTypes[0]) { selectedCue ->
+                vaState = selectedCue.state
+            }
             addSeparator()
 
             workspace.updater.updateManager.clear()
@@ -245,6 +256,8 @@ val denisonNet = newSim {
             addButton("Start") {
                 workspace.launch {
                     plot.model.clearData()
+                    currentStatus.text = ""
+                    modelDecision.text = ""
 
                     SOA = Random.nextInt(100, 801)
                     T1 = Random.nextInt(0, 24)
@@ -280,14 +293,19 @@ val denisonNet = newSim {
                         if (s1History.size > maxHist) s1History.removeAt(0)
 
                         if (workspace.time < 1000 / dt) {
+                            currentStatus.text = "No stimulus"
                             currentTarget = -1; imageWorld.setFrame(24)
                         } else if (workspace.time < 1030 / dt) {
+                            currentStatus.text = "Pattern 1 (${grat_orientations[T1].toDegrees().roundTo(2)}°)"
                             currentTarget = T1; imageWorld.setFrame(T1)
                         } else if (workspace.time < (1030 + SOA) / dt) {
+                            currentStatus.text = "No stimulus"
                             currentTarget = -1; imageWorld.setFrame(24)
                         } else if (workspace.time < (1060 + SOA) / 2) {
+                            currentStatus.text = "Pattern 2 (${grat_orientations[T2].toDegrees().roundTo(2)}°)"
                             currentTarget = T2; imageWorld.setFrame(T2)
                         } else {
+                            currentStatus.text = "No stimulus"
                             currentTarget = -1; imageWorld.setFrame(24)
                         }
 
@@ -306,12 +324,15 @@ val denisonNet = newSim {
                         workspace.iterateSuspend()
                     }
 
-                    val T1correct = if (T1 < 12) "Counterclockwise" else "Clockwise"
-                    val T2correct = if (T2 < 12) "Counterclockwise" else "Clockwise"
+                    val T1GroundTruth = if (T1 < 12) "Counterclockwise" else "Clockwise"
+                    val T2GroundTruth = if (T2 < 12) "Counterclockwise" else "Clockwise"
                     val T1decision = if (decision.getNeuron(0).activation > 0) "Clockwise" else "Counterclockwise"
                     val T2decision = if (decision.getNeuron(1).activation > 0) "Clockwise" else "Counterclockwise"
 
-                    modelDecision.text = "T1 Decision: $T1decision | Correct: $T1correct\nT2 Decision: $T2decision | Correct: $T2correct"
+                    modelDecision.text = """
+                        Pattern 1: $T1GroundTruth       Pattern 1 decision: $T1decision
+                        Pattern 2: $T2GroundTruth       Pattern 2 decision: $T2decision
+                    """
                 }
             }
         }
@@ -324,31 +345,35 @@ addSidebarInfo(
         This is a neural network simulation of visual attention, based on the paper ["A dynamic normalization
         model of temporal attention"](https://www.nature.com/articles/s41562-021-01129-1) by Rachel Denison.
         
-        In an experiment, participants were asked to pay attention to 2 tilted grates. The grates rotated
-        either clockwise or counterclockwise, and the grates were shown 1 after the other. Participants
-        were cued with a noise, which told them which grate to pay attention to. Afterwards, they were
-        asked to report the rotation direction of one of the grates. For example, a participant would be
-        cued with a high pitch, indicating them to pay attention to the second grate (T2), and then
-        the researchers would ask them to report the rotation direction.
+        In an experiment, participants were asked to pay attention to 2 tilted grating patterns. The patterns were rotated
+        either clockwise or counterclockwise, and were shown one after the other. Participants
+        were cued with a noise, which told them which pattern to pay attention to (first, second, or both). Afterwards, they were
+        asked to report the rotation direction of one of the patterns.
         
-        The researchers found that when the cued noise matched the reporting grate, the overall response
-        times were faster than if they were mismatched (Ex. T1 is cued and asked vs. T1 is cued but T2
-        is asked). A model was then built simulating these dynamics.
+        The researchers found that when the cued pattern the matched they were asked to report on, the overall response
+        times were faster than if they were mismatched. In this simulation they are asked to report both, so there is no
+        congruence effect.
         
         The model consists of 5 layers. 2 of the layers are input layers, 2 of them are attention layers
         (Involuntary and Voluntary), and there is 1 decision layer.
         
         # What to Do
         
-        In the control panel, you are able set the parameters of a given trial. Start out by running the trial and
-        observe what happens. After the trial ends, open the graph on the attentions.
+        In the control panel, choose a trial type. Run the trial and observe what happens.
         
         When a grating appears in the panel to the right, the neurons in the first sensory layer pick it up. Each neuron
-        in this layer is tuned to a different orientation and has different responses to different orientations. These
-        activations are passed up through the network and are accumulated in the decision layer.
+        in this layer is tuned to a different orientation. Thus a given pattern produces a maximal response in one neuron
+        and fading activations in nearby neurons. Another network shows sustained echoes of the pattern in the sensory network.
+        The sustained activations are accumulated in the decision layer.
         
-        Open up the attentions plot and take note of how it looks. Try different cueings, and see how that affects
-        how much attention the model allocates to each target. The first decision neuron accumulates evidence for the first grating,
+        The sensory neurons influence involuntary attention, and is thus stimulus-based. Voluntary attention is determimed by the cue type.
+
+        The attention neurons adjust the gain (the overall activation) of the sensory layer.
+                
+        The decision neurons correspond to the first and second pattern. Positive activations signify clockwise orientation,
+        while negative activations signify counterclockwise.
+        
+        The first decision neuron accumulates evidence for the first pattern,
         and similarly for the second. Observe the strength of the neurons in the decision layer (which correspond to
          how "sure" the model is of its answer) and how the different cueings affect it.
         

@@ -129,6 +129,8 @@ val denisonNet = newSim {
     var T2Allocation = 0.0
     val dt = 2.0
 
+    var init_t = 200 //default is 1000
+
     // rolling S1 history and temporal kernel for IA layer
     val maxHist = 50
     val s1History = mutableListOf<DoubleArray>()
@@ -148,9 +150,9 @@ val denisonNet = newSim {
             Layer.S2 -> drive = DoubleArray(12) { i -> sensory1.activations[i].pow(n) }
             Layer.DECISION -> {
                 drive = doubleArrayOf(0.0, 0.0)
-                if (workspace.time >= 1000 / dt && workspace.time < (1030 + SOA) / dt) {
+                if (workspace.time >= init_t / dt && workspace.time < (init_t + 30 + SOA) / dt) {
                     drive[0] = w_D.zip(sensory2.activationArray) { x, y -> x * y }.sum()
-                } else if (workspace.time >= (1030 + SOA) / dt) {
+                } else if (workspace.time >= (init_t + 30 + SOA) / dt) {
                     drive[1] = w_D.zip(sensory2.activationArray) { x, y -> x * y }.sum()
                 }
             }
@@ -158,9 +160,9 @@ val denisonNet = newSim {
                 val t_VAOn = -34.0
                 val t_VADur = 124.0
                 drive = when {
-                    workspace.time >= (1000 + t_VAOn) / dt && workspace.time < (1000 + t_VAOn + t_VADur) / dt ->
+                    workspace.time >= (init_t + t_VAOn) / dt && workspace.time < (init_t + t_VAOn + t_VADur) / dt ->
                         doubleArrayOf(T1Allocation.pow(n))
-                    workspace.time >= (1030 + SOA + t_VAOn) / dt && workspace.time < (1030 + SOA + t_VAOn + t_VADur) / dt ->
+                    workspace.time >= (init_t + 30 + SOA + t_VAOn) / dt && workspace.time < (init_t + 30 + SOA + t_VAOn + t_VADur) / dt ->
                         doubleArrayOf(T2Allocation.pow(n))
                     else -> doubleArrayOf(0.0)
                 }
@@ -232,14 +234,27 @@ val denisonNet = newSim {
         iaLayer.location = point(370.0, -97.0)
 
         // Define cue types
-        data class CueType(val name: String, val state: Int) {
+        data class menuMap(val name: String, val state: Int) {
             override fun toString() = name
         }
 
+
         val cueTypes = listOf(
-            CueType("Cue Pattern 1", 0),
-            CueType("Cue Pattern 2", 1),
-            CueType("Cue Both", 2)
+            menuMap("Both", 0),
+            menuMap("Pattern 1", 1),
+            menuMap("Pattern 2", 2)
+        )
+
+        val SOADurs = listOf(
+            menuMap("100", 100),
+            menuMap("200", 200),
+            menuMap("300", 300),
+            menuMap("400", 400),
+            menuMap("500", 500),
+            menuMap("600", 600),
+            menuMap("700", 700),
+            menuMap("800", 800),
+
         )
 
         createControlPanel("Control Panel", 15, 15) {
@@ -248,6 +263,10 @@ val denisonNet = newSim {
                 vaState = selectedCue.state
             }
             addSeparator()
+            addLabel("SOA")
+            addComboBox("", SOADurs, SOADurs[0]) {selectedSOA ->
+                SOA = selectedSOA.state
+            }
 
             workspace.updater.updateManager.clear()
             workspace.updater.updateManager.addAction(UpdateCoupling(VAPlot))
@@ -259,7 +278,6 @@ val denisonNet = newSim {
                     currentStatus.text = ""
                     modelDecision.text = ""
 
-                    SOA = Random.nextInt(100, 801)
                     T1 = Random.nextInt(0, 24)
                     T2 = Random.nextInt(0, 24)
 
@@ -287,21 +305,21 @@ val denisonNet = newSim {
 
                     workspace.resetTime()
 
-                    while (workspace.time < 2100 / dt) {
+                    while (workspace.time < (init_t + 1100) / dt) {
                         // Record sensory1 history
                         s1History.add(sensory1.activations.toDoubleArray())
                         if (s1History.size > maxHist) s1History.removeAt(0)
 
-                        if (workspace.time < 1000 / dt) {
+                        if (workspace.time < init_t / dt) {
                             currentStatus.text = "No stimulus"
                             currentTarget = -1; imageWorld.setFrame(24)
-                        } else if (workspace.time < 1030 / dt) {
+                        } else if (workspace.time < (init_t + 30) / dt) {
                             currentStatus.text = "Pattern 1 (${grat_orientations[T1].toDegrees().roundTo(2)}°)"
                             currentTarget = T1; imageWorld.setFrame(T1)
-                        } else if (workspace.time < (1030 + SOA) / dt) {
+                        } else if (workspace.time < (init_t + 30 + SOA) / dt) {
                             currentStatus.text = "No stimulus"
                             currentTarget = -1; imageWorld.setFrame(24)
-                        } else if (workspace.time < (1060 + SOA) / 2) {
+                        } else if (workspace.time < (init_t + 60 + SOA) / 2) {
                             currentStatus.text = "Pattern 2 (${grat_orientations[T2].toDegrees().roundTo(2)}°)"
                             currentTarget = T2; imageWorld.setFrame(T2)
                         } else {

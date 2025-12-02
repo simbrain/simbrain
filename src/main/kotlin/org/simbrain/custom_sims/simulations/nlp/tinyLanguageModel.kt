@@ -7,10 +7,6 @@ import org.simbrain.network.core.*
 import org.simbrain.network.trainers.*
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.SoftmaxRule
-import org.simbrain.network.util.Alignment
-import org.simbrain.network.util.Direction
-import org.simbrain.network.util.alignNetworkModels
-import org.simbrain.network.util.offsetNetworkModel
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
@@ -188,7 +184,9 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         val testText = File(options.testTextPath).readText()
         trainingText to testText
     } else {
-        // Auto-split the training text
+
+        // Can't use splitDataSet in trainingutils (which shuffles rows before splitting) because order matters, so we need a sequential split
+
         val allTokens = trainingText.tokenize(options.tokenizer).map { it.token }
         
         // Ensure we have enough tokens for both training and testing
@@ -288,7 +286,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
     with(network) {
         addNetworkModels(inputs, transformerBlock, softmaxSequence, inferenceOutput)
         addNetworkModels(weightMatrices)
-        val model = SupervisedModel(inputs, softmaxSequence) // Train on sequence, not single output
+        val model = SupervisedModel(inputs, softmaxSequence)
         model.initWeights()
         model.initBiases()
         model.trainingSet = trainingSet
@@ -310,7 +308,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
                 learningRateDecay = options.learningRateDecay
             }
         } else {
-            AdamOptimizer() // Vanilla Adam - no weight decay or learning rate decay
+            AdamOptimizer()
         }
         model.trainerConfig.computeAccuracy = true
         addNetworkModels(model)
@@ -318,13 +316,9 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
 
     setupUpdateActions(workspace, options)
 
-    inputs.location = point(-625, -200)
-    transformerBlock.location = point(-300, -600)
-    softmaxSequence.location = point(-1000, -600)
-
     withGui {
-        place(textWorldComponent, 10, 10, 450, 350)
-        place(networkComponent, 460, 10, 1000, 800)
+        place(textWorldComponent, 10, 10, 401, 372)
+        place(networkComponent, 401, 10, 791, 622)
 
         // Create control panel for language model controls
         createControlPanel("Language Model Controls", 10, 370) {
@@ -336,7 +330,6 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
 
             addSeparator()
 
-            // Quick generation button
             addButton("Generate 10 Tokens") {
                 workspace.iterateSuspend(10)
             }
@@ -348,7 +341,6 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
             addSeparator()
 
             addButton("Configure Sampling Strategy...") {
-                // Create a wrapper for the sampling strategy to edit it
                 val wrapper = objectWrapper("Sampling Strategy", textWorldComponent.world.samplingStrategy.copy() as SamplingStrategy)
                 val editor = AnnotatedPropertyEditor(wrapper)
                 val dialog = StandardDialog(editor).apply {
@@ -376,13 +368,10 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         )
     }
 
-    offsetNetworkModel(inputs, transformerBlock, Direction.NORTH, transformerBlock.height / 2 + 300.0)
-    alignNetworkModels(inputs, transformerBlock, Alignment.VERTICAL)
-    offsetNetworkModel(transformerBlock, softmaxSequence, Direction.NORTH, transformerBlock.height / 2 + 300.0)
-    alignNetworkModels(transformerBlock, softmaxSequence, Alignment.VERTICAL)
-
-    offsetNetworkModel(transformerBlock, inferenceOutput, Direction.EAST, transformerBlock.width / 2 + 400.0)
-    alignNetworkModels(transformerBlock, inferenceOutput, Alignment.HORIZONTAL)
+    inputs.location = point(-820, -245)
+    transformerBlock.location = point(-300, -600)
+    softmaxSequence.location = point(-820, -1130)
+    inferenceOutput.location = point(-1271, -1024)
 
     addSidebarInfo(
         """
@@ -708,7 +697,6 @@ fun SimulationScope.setupUpdateActions(workspace: Workspace, options: TinyLangua
     }
 
 }
-
 
 /**
  * Creates sequence-to-sequence training data for proper GPT-style training.

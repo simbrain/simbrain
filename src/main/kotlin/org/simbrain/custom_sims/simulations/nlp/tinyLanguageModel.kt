@@ -697,12 +697,14 @@ fun SimulationScope.setupUpdateActions(workspace: Workspace, options: TinyLangua
     workspace.addUpdateAction("Predict Next Word") {
         val nextWord = textWorld.sampleToken(inferenceOutput.activationArray)
         // update text with predicted word and remove first word so that the context window maintains its size
-        textWorldComponent.world.text = textWorldComponent.world.text.tokenize(textWorld.tokenizer)
+        val newText = textWorldComponent.world.text.tokenize(textWorld.tokenizer)
             .map { it.token }
             .plus(nextWord)
             .takeLast(contextSize)
             .tokensToString(textWorld.tokenizer)
-        textWorldComponent.world.currentTokenIndex = textWorldComponent.world.tokens.lastIndex
+        // Use suspend versions to await UI updates and prevent backpressure
+        textWorldComponent.world.setTextSuspend(newText)
+        textWorldComponent.world.setCurrentTokenIndexSuspend(textWorldComponent.world.tokens.lastIndex)
     }
 
 }

@@ -85,17 +85,33 @@ class TextWorld : AttributeContainer, EditableObject {
     }
 
     @Transient
-    var currentTokenIndex = 0
+    private var _currentTokenIndex = 0
+
+    var currentTokenIndex: Int
         get() {
-            if (tokens.isEmpty()) return 0
-            field = field.coerceIn(0, tokens.lastIndex)
-            return field
+            val tokenList = tokens
+            if (tokenList.isEmpty()) return 0
+            _currentTokenIndex = _currentTokenIndex.coerceIn(0, tokenList.lastIndex)
+            return _currentTokenIndex
         }
         set(value) {
-            if (tokens.isEmpty()) return
-            field = value.coerceIn(0, tokens.lastIndex)
-            events.currentTokenChanged.fire(tokens[field])
+            val tokenList = tokens
+            if (tokenList.isEmpty()) return
+            _currentTokenIndex = value.coerceIn(0, tokenList.lastIndex)
+            events.currentTokenChanged.fire(tokenList[_currentTokenIndex])
         }
+
+    /**
+     * Suspend version of setting currentTokenIndex that awaits the event to complete.
+     * Use this in update actions to prevent backpressure when the simulation runs faster
+     * than the UI can update.
+     */
+    suspend fun setCurrentTokenIndexSuspend(value: Int) {
+        val tokenList = tokens
+        if (tokenList.isEmpty()) return
+        _currentTokenIndex = value.coerceIn(0, tokenList.lastIndex)
+        events.currentTokenChanged.fire(tokenList[_currentTokenIndex]).await()
+    }
 
     @UserParameter(
         label = "Auto advance",
@@ -129,6 +145,16 @@ class TextWorld : AttributeContainer, EditableObject {
      */
     fun setTextNoEvent(newText: String) {
         _text = newText
+    }
+
+    /**
+     * Suspend version of setting text that awaits the textChanged event to complete.
+     * Use this in update actions to prevent backpressure when the simulation runs faster
+     * than the UI can update.
+     */
+    suspend fun setTextSuspend(newText: String) {
+        _text = newText
+        events.textChanged.fire().await()
     }
 
     /**

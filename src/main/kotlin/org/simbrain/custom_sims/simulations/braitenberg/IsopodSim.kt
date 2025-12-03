@@ -1,6 +1,7 @@
 package org.simbrain.custom_sims.simulations
 
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.addNeuron
@@ -19,8 +20,19 @@ import org.simbrain.world.odorworld.sensors.SmellSensor
 
 /**
  * A simulation of Isopod navigation. With Peter Hinow and Kaiden Schmidt.
+ *
+ * Run headless using:
+ * gradle runSim -PsimName="Isopod Sim" -PoptionString='{"numTrials": 5, "speedInhibition": false}'
+ *
+ * Parameters:
+ * - numTrials: Number of trials to run
+ * - speedInhibition: Enable speed inhibition
+ * - maxIterationsPerTrial: Max steps per trial
+ * - hitRadius: Collision detection radius
+ * - smellDispersion: Smell decay dispersion
+ * - speed: Movement speed
  */
-val isopodSim = newSim {
+val isopodSim = newSim { optionString ->
 
     // Adjustable parameters for sim
     var defaultNumTrials = 5
@@ -366,8 +378,9 @@ val isopodSim = newSim {
 
         5) Save the results.
         
-        6) Analyze the results in a statistical computing environment. 
-              
+        6) Analyze the results in a statistical computing environment.
+
+
         # References
     
         Braitenberg, V. (1986). [_Vehicles: Experiments in synthetic psychology_](https://mitpress.mit.edu/9780262521123/vehicles/). MIT press.
@@ -381,9 +394,107 @@ val isopodSim = newSim {
         [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
         
         Kanly Thao
-        
+
         """.trimIndent()
     )
+
+    // Parse optionString and run in headless mode if provided
+    if (optionString?.isNotEmpty() == true) {
+        val options = JSONObject(optionString)
+
+        // Parse parameters
+        val numTrials = options.optInt("numTrials", defaultNumTrials)
+        val enableSpeedInhibition = options.optBoolean("speedInhibition", false)
+        val maxSteps = options.optInt("maxIterationsPerTrial", maxIterationsPerTrial)
+
+        // Apply speed inhibition if requested
+        if (enableSpeedInhibition && leftSpeedWeight == null) {
+            with(network) {
+                leftSpeedWeight = connect(neuronLeftSensor, neuronStraight, -1.0, -50.0, 50.0)
+                rightSpeedWeight = connect(neuronRightSensor, neuronStraight, -1.0, -50.0, 50.0)
+            }
+        }
+
+        println("\n=== Isopod Simulation Started (Headless Mode) ===")
+        println("Number of trials: $numTrials")
+        println("Max iterations per trial: $maxSteps")
+        println("Speed inhibition: $enableSpeedInhibition")
+        println("Hit radius: $hitRadius")
+        println("Smell dispersion: $smellDispersion")
+        println("Speed: $speed")
+        println("=" + "=".repeat(48))
+
+        val csvData = StringBuilder()
+        csvData.append("# Isopod Simulation Results\n")
+        csvData.append("# Trials: $numTrials, MaxSteps: $maxSteps, SpeedInhibition: $enableSpeedInhibition\n")
+        csvData.append("# HitRadius: $hitRadius, SmellDispersion: $smellDispersion, Speed: $speed\n")
+        csvData.append("#\n")
+
+        var successCount = 0
+        var wallCollisionCount = 0
+        var timeoutCount = 0
+
+        for (trial in 1..numTrials) {
+            csvData.append("# Trial: $trial\n")
+            resetIsopod()
+            csvData.append("# Heading: ${isopod.heading}\n")
+
+            collision = false
+            var iteration = 0
+            var outcome = "timeout"
+
+            while (!collision && iteration < maxSteps) {
+                workspace.iterateSuspend(1)
+
+                // Log state before checking collision
+                csvData.append("${isopod.x}, ${isopod.y}," +
+                        "${neuronLeftSensor.activation},${neuronRightSensor.activation}," +
+                        "${neuronLeftTurning.activation},${neuronRightTurning.activation}" +
+                        ",${neuronStraight.activation}\n")
+
+                iteration++
+            }
+
+            // Determine outcome based on collision type
+            if (collision) {
+                // Check if we hit a fish or wall
+                val hitFish = odorWorld.entityList
+                    .filter { it.entityType == EntityType.Fish }
+                    .any { fish -> fish.location.distance(isopod.location) < hitRadius }
+
+                if (hitFish) {
+                    outcome = "fish"
+                    successCount++
+                } else {
+                    outcome = "wall"
+                    wallCollisionCount++
+                }
+            } else {
+                timeoutCount++
+            }
+
+            println("Trial $trial: Steps=$iteration, Outcome=$outcome")
+            collision = false
+        }
+
+        println("\n" + "=".repeat(50))
+        println("=== Simulation Complete ===")
+        println("Total trials: $numTrials")
+        println("Fish collisions: $successCount (${String.format("%.1f", successCount.toDouble() / numTrials * 100)}%)")
+        println("Wall collisions: $wallCollisionCount (${String.format("%.1f", wallCollisionCount.toDouble() / numTrials * 100)}%)")
+        println("Timeouts: $timeoutCount (${String.format("%.1f", timeoutCount.toDouble() / numTrials * 100)}%)")
+        println("=".repeat(50))
+
+        // Export to CSV
+        val timestamp = java.text.SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(java.util.Date())
+        val outputDir = java.io.File("simulation_outputs")
+        if (!outputDir.exists()) {
+            outputDir.mkdirs()
+        }
+        val filename = "simulation_outputs/isopod_sim_$timestamp.csv"
+        java.io.File(filename).writeText(csvData.toString())
+        println("\nData exported to: $filename\n")
+    }
 
 }
 

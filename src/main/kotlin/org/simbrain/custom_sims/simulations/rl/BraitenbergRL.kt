@@ -77,12 +77,17 @@ val braitenbergRL = newSim { optionString ->
     var learningRate = 0.05
     var gamma = 0.95
 
-    var numTrials = 100
+    var numTrials = 10
     var maxStepsPerTrial = 1000
     var trialStep = 0
+    var currentTrial = 0
     var stopRequested = false
 
     var printInterval = 10
+
+    var trialLabel: javax.swing.JLabel? = null
+    var learningEnabled = true
+    var inBatchTraining = false  // Flag to prevent double-learning during batch training
 
     var cheeseRewardMultiplier = 1.0
     var poisonRewardMultiplier = -1.0
@@ -210,11 +215,22 @@ val braitenbergRL = newSim { optionString ->
     couplingManager.createCoupling(valueNeuron, valueSeries)
     couplingManager.createCoupling(tdErrorNeuron, tdErrorSeries)
 
+    // Actor synapses for learning
+    val actorSynapses = mutableListOf<org.simbrain.network.core.Synapse>()
+
     // Actor synapses: only 4 trainable connections based on Braitenberg vehicle design
     val cheeseLeftToLeftTurn = network.addSynapse(cheeseLeftInput, leftTurn)
     val cheeseRightToRightTurn = network.addSynapse(cheeseRightInput, rightTurn)
     val poisonLeftToLeftTurn = network.addSynapse(poisonLeftInput, leftTurn)
     val poisonRightToRightTurn = network.addSynapse(poisonRightInput, rightTurn)
+
+    // Add actor synapses to list for learning
+    actorSynapses.addAll(listOf(
+        cheeseLeftToLeftTurn,
+        cheeseRightToRightTurn,
+        poisonLeftToLeftTurn,
+        poisonRightToRightTurn
+    ))
 
     val valueInputs = listOf(cheeseLeftInput, cheeseRightInput, poisonLeftInput, poisonRightInput)
     val criticWeights = valueInputs.map { input ->
@@ -247,7 +263,7 @@ val braitenbergRL = newSim { optionString ->
     // Track previous value for TD error calculation
     var previousValue = 0.0
 
-    workspace.addUpdateAction("update RL metrics") {
+    workspace.addUpdateAction("Update RL metrics and learning") {
         // Calculate current reward
         val (cheeseR, poisonR) = calculateReward(agent)
         rewardNeuron.activation = cheeseR + poisonR
@@ -259,6 +275,18 @@ val braitenbergRL = newSim { optionString ->
         // Calculate TD error: r + gamma * V(s') - V(s)
         val tdError = rewardNeuron.activation + gamma * currentValue - previousValue
         tdErrorNeuron.activation = tdError
+
+        if (learningEnabled && !inBatchTraining) {
+            // Update critic weights
+            valueNeuron.fanIn.forEach { syn ->
+                syn.strength += learningRate * tdError * syn.source.activation
+            }
+
+            // Update actor weights
+            actorSynapses.forEach { syn ->
+                syn.strength += learningRate * tdError * syn.source.activation
+            }
+        }
 
         // Update previous value for next iteration
         previousValue = currentValue
@@ -424,6 +452,9 @@ val braitenbergRL = newSim { optionString ->
 
     fun applyLearning(button: JButton?) {
         button?.isEnabled = false
+        // Enable learning for training mode
+        learningEnabled = true
+        inBatchTraining = true
         workspace.launch {
             try {
                 // Print header for headless mode
@@ -435,7 +466,11 @@ val braitenbergRL = newSim { optionString ->
                     println("=".repeat(40))
                 }
 
-                for (trial in 1..numTrials) {
+                val startTrial = currentTrial + 1
+                val endTrial = numTrials
+                for (trial in startTrial..endTrial) {
+                    currentTrial = trial
+                    desktop?.let { swingInvokeLater { trialLabel?.text = "Trial: $currentTrial" } }
                     trialStep = 0
                     resetVehicle()
                     resetObjects()
@@ -507,6 +542,7 @@ val braitenbergRL = newSim { optionString ->
 
                 printFinalSummary()
             } finally {
+                inBatchTraining = false
                 button?.isEnabled = true
                 stopRequested = false
             }
@@ -524,48 +560,82 @@ val braitenbergRL = newSim { optionString ->
 
             addLabel("Task:")
 
-            addComboBox("", tasks, tasks[0]) { selectedTask ->
+            val taskComboBox = addComboBox("", tasks, tasks[0]) { selectedTask ->
                 cheeseRewardMultiplier = selectedTask.cheeseReward
                 poisonRewardMultiplier = selectedTask.poisonReward
                 learningRate = 0.05
                 gamma = 0.95
-                numTrials = 100
+                numTrials = 10
                 maxStepsPerTrial = 1000
             }
+            taskComboBox.toolTipText = "Select the learning task: which objects to seek or avoid"
 
             addSeparator()
 
-            addButton("Run Training") {
+            trialLabel = addLabel("Trial: 0")
+            trialLabel?.toolTipText = "Current trial number (continues across training runs)"
+
+            addSeparator()
+
+            val learningCheckbox = addCheckBox("Learning Enabled", learningEnabled) { enabled ->
+                learningEnabled = enabled
+                // Clamp/unclamp trainable weights
+                val allTrainableWeights = actorSynapses + valueNeuron.fanIn
+                allTrainableWeights.forEach { syn ->
+                    syn.clamped = !enabled
+                }
+            }
+            learningCheckbox.toolTipText = "Enable/disable weight updates (unchecking freezes all weights)"
+
+            addSeparator()
+
+            val runButton = addButton("Run Training") {
                 applyLearning(this@addButton)
             }
+            runButton.toolTipText = "Start or resume training for the specified number of trials"
 
-            addButton("Stop Training") {
+            val stopButton = addButton("Stop Training") {
                 stopRequested = true
             }
+            stopButton.toolTipText = "Pause training (can be resumed later)"
 
-            addButton("Reset Weights to Zero") {
+            val resetButton = addButton("Reset") {
                 network.freeSynapses.forEach { s ->
                     s.strength = 0.0
                 }
+                currentTrial = 0
+                trainingMetricsList.clear()
+                swingInvokeLater { trialLabel?.text = "Trial: 0" }
             }
+            resetButton.toolTipText = "Reset all weights to zero and restart trial counter"
 
             addSeparator()
 
-            addFormattedNumericTextField("Learning Rate", initValue = learningRate) {
+            val lrField = addFormattedNumericTextField("Learning Rate", initValue = learningRate) {
                 learningRate = it
             }
-            addFormattedNumericTextField("Gamma (Discount Factor)", initValue = gamma) {
+            lrField.toolTipText = "Step size for weight updates (higher = faster but less stable)"
+
+            val gammaField = addFormattedNumericTextField("Gamma (Discount Factor)", initValue = gamma) {
                 gamma = it
             }
-            addFormattedNumericTextField("Dispersion", initValue = dispersion) {
+            gammaField.toolTipText = "Importance of future rewards (0-1, higher = more farsighted)"
+
+            val dispersionField = addFormattedNumericTextField("Dispersion", initValue = dispersion) {
                 dispersion = it
             }
-            addFormattedNumericTextField("Number of Trials", initValue = numTrials) {
+            dispersionField.toolTipText = "Sensor range parameter (higher = wider detection range)"
+
+            val trialsField = addFormattedNumericTextField("Number of Trials", initValue = numTrials) {
                 numTrials = it
             }
-            addFormattedNumericTextField("Max Steps per Trial", initValue = maxStepsPerTrial.toDouble()) {
+            trialsField.toolTipText = "How many trials to run when 'Run Training' is clicked"
+
+            val stepsField = addFormattedNumericTextField("Max Steps per Trial", initValue = maxStepsPerTrial.toDouble()) {
                 maxStepsPerTrial = it.toInt()
             }
+            stepsField.toolTipText = "Maximum time steps per trial before reset"
+
             swingInvokeLater { pack() }
         }
     }
@@ -622,13 +692,18 @@ val braitenbergRL = newSim { optionString ->
 
 
     1. Select a task from the `Task` dropdown menu in the control panel
-    2. Click `Run Training` to start the learning process
+    2. Choose your learning mode:
+       - **Continuous Learning**: Check `Learning Enabled` and use the workspace run button to watch continuous learning in real-time
+       - **Batch Training**: Click `Run Training` to execute a specific number of trials and collect metrics
     3. Watch the vehicle move around the environment as it learns
     4. Observe the `Reward, Value, TD Error` plot to monitor learning progress
+    5. The `Trial` counter shows current progress and persists across training runs
 
-    The training will run for the specified number of trials. You can click `Stop Training` to interrupt it early.
-
-    Note on training vs. running: The `Run Training` button runs the full learning algorithm for multiple trials. After training, you can use the main toolbar's run button to watch the trained vehicle operate continuously with its learned weights. Training mode updates weights; running mode just executes the learned behavior.
+    **Learning Modes:**
+    - `Learning Enabled` checkbox: When checked, learning happens continuously whenever the workspace runs. Uncheck to freeze weights and observe behavior without learning.
+    - `Run Training` button: Executes batch training for a specified number of trials, collecting statistics. Good for systematic experiments.
+    - `Stop Training`: Pause batch training (resume by clicking `Run Training` again)
+    - `Reset`: Clear all weights to zero and restart trial counter
 
     Performance tip: Training runs much faster if you minimize or iconify component windows (time series, network, odor world). The simulation still runs in the background but doesn't spend time rendering visualizations.
     Another option is to leave the odor world open since it does not impact performance much and it’s fun to watch it learn.
@@ -648,17 +723,21 @@ val braitenbergRL = newSim { optionString ->
     - The network weights updating in real-time
     
     ## Experiment
-    
-    Try adjusting parameters in the `Advanced Parameters` section:
-    
+
+    Try different learning approaches:
+    - **Interactive Learning**: Use the workspace run button with `Learning Enabled` checked. Stop and examine weights at any time, then continue.
+    - **Run Trials**: Use `Run Training` for systematic experiments with multiple trials and automatic metric collection.
+    - **Observing Learned Behavior**: Uncheck `Learning Enabled` to freeze weights and watch the vehicle execute its learned policy without further updates.
+
+    Adjust parameters to see their effects:
+
     - **Learning Rate**: Controls how quickly weights change (higher = faster but less stable learning)
     - **Gamma**: Discount factor for future rewards (higher = more farsighted)
-    - **Exploration Rate**: Amount of random noise added to actions (higher = more exploration)
-    - **Exploration Decay**: How quickly exploration decreases (closer to 1 = slower decay)
-    - **Number of Trials**: How many learning episodes to run
+    - **Dispersion**: Sensor range (higher = wider detection)
+    - **Number of Trials**: How many trials to run in batch training mode
     - **Max Steps per Trial**: Maximum time steps per episode
 
-    After training on one task, try clicking `Reset Weights to Zero` and training on a different task to see how the vehicle adapts.
+    After training on one task, try clicking `Reset` and training on a different task to see how the vehicle adapts.
 
     ## Headless Mode
 
@@ -692,6 +771,8 @@ val braitenbergRL = newSim { optionString ->
     # Credits
 
     Dave Noelle
+    
+    Yulin Li
 
     Veer Sahai
 

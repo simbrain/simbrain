@@ -58,7 +58,7 @@ class TinyLanguageModelOptions(var showEmbeddingDimension: Boolean = true): Edit
     )
 
     var trainTestSplit by GuiEditable(
-        initValue = 0.8,
+        initValue = 0.6,
         description = "Fraction of data to use for training (0.0-1.0). Only used if no separate test file is provided.",
         order = 36,
     )
@@ -108,7 +108,7 @@ class TinyLanguageModelOptions(var showEmbeddingDimension: Boolean = true): Edit
  * - embeddingDimension: Vector embedding dimensions (default: 20)  
  * - textFile: Training text filename in simulations/texts/ (default: "casual_texting_small.txt")
  * - testFile: Optional test text filename in simulations/texts/ (default: none, auto-split training data)
- * - trainTestSplit: Fraction for training when auto-splitting (default: 0.8)
+ * - trainTestSplit: Fraction for training when auto-splitting (default: 0.6)
  * - weightDecay: L2 weight decay strength (default: 0.01)
  * - learningRateDecay: Learning rate decay factor (default: 0.001)
  * - useAdamW: Use AdamW optimizer instead of Adam (default: true)
@@ -184,27 +184,16 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         val testText = File(options.testTextPath).readText()
         trainingText to testText
     } else {
-
         // Can't use splitDataSet in trainingutils (which shuffles rows before splitting) because order matters, so we need a sequential split
-
         val allTokens = trainingText.tokenize(options.tokenizer).map { it.token }
-        
-        // Ensure we have enough tokens for both training and testing
-        if (allTokens.size < contextSize + 2) {
-            println("Warning: Text is too short for train/test split. Using entire text for training only.")
-            trainingText to ""
-        } else {
-            val splitIndex = (allTokens.size * options.trainTestSplit).toInt()
-            // Ensure both splits have at least contextSize + 1 tokens
-            val adjustedSplitIndex = maxOf(contextSize + 1, minOf(splitIndex, allTokens.size - contextSize - 1))
-            
-            val trainTokens = allTokens.take(adjustedSplitIndex)
-            val testTokens = allTokens.drop(adjustedSplitIndex)
-            
-            val trainText = trainTokens.tokensToString(options.tokenizer)
-            val testText = testTokens.tokensToString(options.tokenizer)
-            trainText to testText
-        }
+        val splitIndex = (allTokens.size * options.trainTestSplit).toInt()
+
+        val trainTokens = allTokens.take(splitIndex)
+        val testTokens = allTokens.drop(splitIndex)
+
+        val trainText = trainTokens.tokensToString(options.tokenizer)
+        val testText = testTokens.tokensToString(options.tokenizer)
+        trainText to testText
     }
 
     // Build token embedding from combined vocabulary (training + test)
@@ -230,7 +219,18 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
     
     val trainingSet = buildSequenceToSequenceDataset(tokenizedTrainingText, contextSize, tokenEmbedding)
     val testingSet = if (tokenizedTestText.isNotEmpty()) {
-        buildSequenceToSequenceDataset(tokenizedTestText, contextSize, tokenEmbedding)
+        val dataset = buildSequenceToSequenceDataset(tokenizedTestText, contextSize, tokenEmbedding)
+        // Warn if test set ended up empty due to insufficient data
+        if (dataset.size == 0) {
+            withGui {
+                showWarningDialog(
+                    "Warning: Test set is empty because there is insufficient test data.\n\n" +
+                    "If test data is desired, at least ${contextSize + 1} tokens are required for the test set.\n" +
+                    "To achieve this, consider lowering the train/test split ratio or using a larger dataset"
+                )
+            }
+        }
+        dataset
     } else {
         // Create empty test dataset with correct structure
         TrainingDataset(

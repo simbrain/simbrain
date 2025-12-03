@@ -21,6 +21,10 @@ import org.simbrain.world.textworld.TokenEmbedding
 import org.simbrain.world.textworld.TokenEmbeddingBuilder
 import smile.math.matrix.Matrix
 import java.io.File
+import javax.swing.JDialog
+import javax.swing.JOptionPane
+import javax.swing.JScrollPane
+import javax.swing.JTextArea
 
 class TinyLanguageModelOptions(var showEmbeddingDimension: Boolean = true): EditableObject {
 
@@ -298,7 +302,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         
         // Configure early stopping if test data is available
         if (testingSet.size > 0) {
-            model.trainerConfig.stoppingCondition.useEarlyStopping = true
+            model.trainerConfig.stoppingCondition.useEarlyStopping = false
             model.trainerConfig.stoppingCondition.earlyStoppingPatience = 10
             model.trainerConfig.stoppingCondition.earlyStoppingMinDelta = 0.0
         }
@@ -323,23 +327,48 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         // Create control panel for language model controls
         createControlPanel("Language Model Controls", 10, 370) {
 
+            addButton("Show Vocabulary") {
+                val tokensText = tokenEmbedding.tokens.joinToString("\n")
+                val textArea = JTextArea(tokensText).apply {
+                    isEditable = false
+                    rows = 20
+                    columns = 40
+                    lineWrap = true
+                    wrapStyleWord = true
+                }
+                val scrollPane = JScrollPane(textArea)
+                swingInvokeLater {
+                    val dialog = JDialog()
+                    dialog.title = "Vocabulary (${tokenEmbedding.tokens.size} tokens)"
+                    dialog.isAlwaysOnTop = true
+                    JOptionPane.showMessageDialog(dialog, scrollPane, "Vocabulary / Tokens", JOptionPane.PLAIN_MESSAGE)
+                }
+            }
+
+            addButton("Show Training Text") {
+                val textArea = JTextArea(trainingTextFinal).apply {
+                    isEditable = false
+                    rows = 20
+                    columns = 40
+                    lineWrap = true
+                    wrapStyleWord = true
+                }
+                val scrollPane = JScrollPane(textArea)
+                swingInvokeLater {
+                    val dialog = JDialog()
+                    dialog.title = "Training Text"
+                    dialog.isAlwaysOnTop = true
+                    JOptionPane.showMessageDialog(dialog, scrollPane, "Training Text", JOptionPane.PLAIN_MESSAGE)
+                }
+            }
+
+            addSeparator()
+
             // Temperature control with slider and text field
             addSliderWithTextField("Temperature", 0.01, 2.0, (softmaxSequence.updateRule as SoftmaxRule).temperature, 0.01) { temp ->
                 (softmaxSequence.updateRule as SoftmaxRule).temperature = temp
             }
-
-            addSeparator()
-
-            addButton("Generate 10 Tokens") {
-                workspace.iterateSuspend(10)
-            }
-
-            addButton("Clear Text") {
-                textWorldComponent.world.text = ""
-            }
-
-            addSeparator()
-
+            
             addButton("Configure Sampling Strategy...") {
                 val wrapper = objectWrapper("Sampling Strategy", textWorldComponent.world.samplingStrategy.copy() as SamplingStrategy)
                 val editor = AnnotatedPropertyEditor(wrapper)
@@ -376,37 +405,80 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
     addSidebarInfo(
         """
         # Tiny Language Model
-        
+
         A simplified GPT-style language model with a single transformer block. This simulation demonstrates how neural networks can learn to predict text patterns and generate new text based on training data. The model learns from sequences of text and can generate continuations based on prompts.
-        
+
         # Simulation Details
-        
-        The simulation consists of several interconnected components:
-        
-        ## Text Inputs Component
-        
-        The `Text Inputs` component at the left shows the current context window. This is where you enter prompts for the model to continue. The context window is a fixed-size sliding window of recent tokens that the model uses to predict what comes next.
-        
-        ## Network Components
-        
+
+        The simulation consists of several interconnected components that work together to process and generate text.
+
+        ## Overview of Components
+
         The network contains several key layers:
-        
-        - **Inputs**: An activation sequence that holds the encoded context window. Each token is represented as a one-hot vector, and the full sequence forms a matrix.
-        
+
+        - **Inputs**: An activation sequence that holds the encoded context window. Each token is represented as a one-hot vector, and the full sequence forms a matrix where each row corresponds to one token position.
+
         - **Transformer block**: The core of the model. This layer processes the input sequence using self-attention and feed-forward transformations to create rich representations that capture patterns in the text.
-        
+
         - **Softmax sequence**: Converts the transformer outputs into probability distributions over possible next tokens. Each position in the sequence predicts the next token at that position. Temperature controls randomness (lower = more deterministic, higher = more random).
+
+        - **Predicted next token**: A separate output layer that shows the probability distribution for the next token that will be generated. This layer extracts the prediction for the current position in the context window from the softmax sequence.
+
+        ## How Token Processing Works
+
+        Understanding the detailed flow through the network helps clarify what the model learns and how it generates text:
+
+        1. **Input encoding**: Each token in the context window is converted to a one-hot vector. These vectors stack together to form an input matrix where each row represents one token position. You can observe this in the `Inputs` layer. For each token in the context window there is a corresponding row of this layer, which should have one column in red.
+
+        2. **Embedding**: The `Embedding` weight matrix transforms the one-hot vectors into dense representations. Each one-hot row of inputs effectively selects one row from the embedding matrix, producing a token embedding for that position. The result is a stack of token embeddings flowing into the transformer.
+
+        3. **Self-attention mechanism**: Inside the transformer block, the input token embeddings are multiplied by three learned weight matrices (Q, K, and V) to produce the query (q), key (k), and value (v) matrices, where each row corresponds to a token position. The q and k representations are then used together to compute an attention scores matrix of size context_window × context_window. This is where context awareness emerges. Each entry at row i, column j represents how much token i attends to token j. A triangular mask is applied (visible as a zero pattern in the upper triangle) which prevents tokens from attending to future positions they shouldn't know about yet. For example token 3 (row 3) can attend to tokens 0, 1, 2, and 3 (columns 0-3 in row 3), but token 1 (row 1) can only attend to tokens 0 and 1 (columns 0-1 in row 1), not to future tokens 2 and 3. This creates the lower triangular pattern where later tokens can look back at earlier ones, but not forward in time. The attention scores determine how the v representations are weighted and combined. The v matrix carries the actual information that gets passed through based on these attention scores.
+
+        4. **Feed-forward processing**: After attention, the transformer applies a multi-layer perceptron (MLP). This is where much of the model's background knowledge about language patterns gets encoded. The MLP learns complex transformations that capture grammatical structures, semantic relationships, and other patterns from the training data.
+
+        5. **Unembedding**: The `Unembedding` weight matrix converts the transformer's output back into the vocabulary space. This produces a matrix where each row contains scores (logits) for predicting the next token at that position in the sequence.
+
+        6. **Softmax sequence**: The logits pass through a softmax function with temperature control, converting them into proper probability distributions. Each row of this layer corresponds to a current token, and the columns correspond to probabilities for next tokens that sum to 1.0 across all possible tokens. (This is also where temperature is applied). The `Softmax sequence` thus contains predictions for all positions in the context window simultaneously. This is useful during training when the model learns to predict the next token at every position, but during generation only one of these predictions matters, the one corresponding to the current number of tokens in the context.
+
+        7. **Predicted next token**: This layer serves primarily as a visualization aid. It extracts and displays the single row from the `Softmax sequence` that corresponds to the current number of tokens in the context window, that is, the row at the position from which the next token will be sampled. This makes it easier to see what the model predicts. In fact, after clicking step or play, you can verify that the last token produced in the text input window corresponds to one of the most active nodes in this layer.
+
+        8. **Generation**: During generation, a token is sampled from this probability distribution using the configured sampling strategy. The selected token is appended to the context window, the window slides forward (dropping the oldest token), and the process repeats.
+
+        ## Interpreting the Visual Activations
+
+        As you run the simulation, the network displays activation patterns as colors. Understanding these patterns helps you see how the model processes text. Try clicking the play or step button and watching tokens fill in one at a time as tokens are added to observe these patterns emerge. We suggest training first.
+
+        Most patterns are row by row, and are easy to understand when filling in tokens at first, because unused rows are associated with zero vectors. Thus we see "rows" of color filling in at the different component.
+
+        **Zero vectors and unknown tokens**: The model uses zero vectors in two situations. First, empty positions in the context window (positions not yet filled with tokens) are represented as zero vectors. Second, and importantly, if you type tokens in the `Text Inputs` window that aren't in the vocabulary, those tokens also produce zero vectors. You can type whatever you want, but any token not in the learned vocabulary becomes a zero row in the `Inputs` layer with no red dot. The vocabulary is determined by the training text—only tokens that appear in the training data are recognized. You can view the complete vocabulary by clicking `View token embedding editor` in the text inputs component.
+
+        **Inputs layer**: This is the easiest component to interpret. Each row represents one position in the context window. When a token occupies that position and is in the vocabulary, you'll see a single red dot in that row: this is the one-hot encoding. The column position of that red dot identifies the token. As the model generates more tokens, more rows fill in with red dots. Rows show all zeros (no red dots) in two cases: empty positions not yet filled, or positions containing tokens not in the vocabulary.
+
+        **Embedding transformation**: When a column is red in a given row of the inputs, matrix multiplication effectively selects the corresponding row from the `Embedding` weight matrix. In fact this is often visible after training: you can see that the rows do seem to be distinctive. This produces a matrix of dense embeddings (one per token position) that flows into the transformer block. Zero rows in the input produce zero rows going into the transformers. These empty positions don't contribute meaningful information yet.
+
+        **Q, K, and V activations**: Inside the transformer block, you'll see the same rowwise pattern. The q (Query), k (Key), and v (Value) matrices show rows of color only for positions that contain tokens. The number of colored rows matches the number of tokens in the current context. Empty positions remain zero.
+
+        **Attention scores**: The attention score matrix has dimensions of context_window × context_window and shows how each token attends to other tokens. You'll notice a triangular pattern in the activations. This comes from causal masking, described above. As tokens are added you can see a triangle pattern emerge from the top-down. Token 4 can attend to tokens 3,2, and 1, but not tokens 4,5, etc. Red in column 2 of row 4 means token 4 _should_ attend to token 2. Changes in this matrix are also evident as training progresses (you can  open the trainer and run the trainer to see this). As you do, the patterns in this matrix change, reflecting what the model learns about which tokens are relevant to each other. (Before training you won't see much in this matrix. The attention scores are computed as softmax(q × k^T / scale). With random weight matrices, tokens representations tend to be relatively similar across different token pairs. After softmax normalization, this produces relatively uniform attention distributions  across the lower triangle. Each token attends somewhat equally to all previous tokens rather than focusing on specific relevant ones.)
+
+        **MLP (feed-forward) layers**: Here you'll see colored rows for positions with tokens. However, positions without tokens show vertical bars of color rather than all zeros. This happens because of bias terms in the MLP. Even when the input is a zero vector, the bias gets added, producing non-zero activations. Each zero row receives the same bias, creating those vertical bar patterns.
+
+        **Softmax sequence**: Here each row corresponds to a probability distribution over the tokens. This is best to compare with the inputs. In both inputs and softmax each column is a token. But in softmax the shading determines how probable it is, and there will often be a few shaded columns but often one most shaded red. Here again as tokens are added the top "fills in" and the bottom has vertical bars for empty positions. These represent the probability distributions that the softmax produces in response to the MLP's bias-driven output for zero vectors. For positions with actual tokens, you see more varied activation patterns representing learned predictions.  
         
-        - **Predicted next token**: A separate output layer that shows the probability distribution for the next token that will be generated. This is what gets sampled to produce new text.
-        
+        **Predicted next token**: As noted above, this layer serves primarily as a visualization aid. It basically displays the row of `Softmax sequence` that corresponds to the current prediction. You can check that the last token produced in the context window corresponds to one of the most active nodes in this layer. 
+
+        **Summary**: As you watch generation, you'll see the network "fill up" row by row. The red dots in `Inputs` select embedding rows, colored activations flow through Q/K/V and attention (with triangular masking), the MLP adds knowledge (and bias for empty positions), and finally the `Predicted next token` layer shows what the model predicts should come next.
+
+        ## What's Not Visualized
+
+        Several important activation matrices are not directly shown but are indicated by the arrows showing information flow. The transformer block maintains a residual stream of activations that flows through the network, with each component adding information to this stream. The arrows and connection lines suggest this flow, but the actual activation values aren't displayed.
+
+        The activation matrices that exist but aren't visualized include: the actual input to the transformer block (what comes from the `Embedding` layer), the intermediate results along the residual stream (after the attention mechanism adds its contribution, and again after the feed-forward network adds its contribution), and the logits (pre-softmax scores) that feed into the `Softmax sequence` layer. You can see the results of operations (like `q`, `k`, `v`, `FF Input`, `FF Hidden`, `FF Output`) but not the residual stream itself as it accumulates information.
+
+        These activation matrices all share the same shape: `context_window × embedding_dim`. This consistent shape allows them to be added together in the residual connections, which is how information from earlier layers is preserved and combined with new information from attention and feed-forward processing. The `q`, `k`, and `v` visualizations show activation matrices produced by multiplying the residual stream by the `Q`, `K`, and `V` weight matrices respectively.
+
         ## Weight Matrices
-        
-        Two key weight matrices connect these components:
-        
-        - **Embedding**: Maps input tokens into the transformer's representation space
-        - **Unembedding**: Maps transformer outputs back to token probabilities
-        
-        These matrices are what the model learns during training.
+
+        Embedding, unembedding, K, Q, V, Input -> Hidden and Hidden->Output are weight matrices that don't change during inference, while clicking step or play, but that do change during training, as the system learns.
         
         ## Configuration
         
@@ -422,7 +494,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         
         - **Test Text**: Optional separate text file for validation. If not provided, the training text is automatically split.
         
-        - **Sampling Strategy**: How the model chooses the next token from the probability distribution (see experiments below).
+        - **Sampling Strategy**: How the model chooses the next token from the probability distribution (see  below for more details).
         
         # What to Do
         
@@ -431,27 +503,46 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         When the simulation starts, you'll see a configuration dialog. Choose your settings or use the defaults. The simulation comes with several sample text files in the `simulations/texts/` directory.
         
         ## Training Your Model
-        
+
         The model starts untrained. To train it:
-        
+
         1. Click the `Supervised Model` interaction box in the network
         2. Open the training dialog (see the [training networks documentation](https://docs.simbrain.net/docs/network/trainingNetworks.html) for details)
         3. Click `Run` to train on your text corpus
         4. Watch the error plots to monitor learning progress
+        5. Train until the loss curve appears to plateau (flatten out) - this typically indicates the model has learned as much as it can from the data
+
+        Early stopping is disabled by default, so you control when training stops. You can always resume training later if the model hasn't converged enough. Training teaches the model to predict what token comes next based on context. The model learns patterns like common word sequences, grammar, and text structure.
         
-        Training teaches the model to predict what token comes next based on context. The model learns patterns like common word sequences, grammar, and text structure.
-        
+        ### Details about the training process
+
+        First, the input text is tokenized and split sequentially into training and test sets based on the train-test split ratio (specified in the configuration dialog). This preserves the sequential nature of the text rather than shuffling it. Then a sliding window of size `contextSize + 1` moves across the training text. Each window splits into an input and a target that is offset by one. For example, with `contextSize = 3` and text "hello there old friend!", the first window creates input `["hello", "there", "old"]` and target `["there", "old", "friend"]`. The second window (shifted by one position) creates input `["there", "old", "friend"]` and target `["old", "friend", "!"]`.
+
+        This is a form of sequence-to-sequence prediction where all positions train simultaneously. In a single forward pass, position 0 learns to predict what comes after the first token, position 1 learns what comes after the second token, and so on. This is why the first row of the `Softmax sequence` layer predicts from minimal context: it represents what comes after just the first token. The targets are automatically generated by shifting inputs forward by one token.
+
         ## Using Your Trained Model
-        
+
         Once trained, you can use the model to generate text:
-        
+
         1. Type a prompt in the `Text Inputs` component (any text you want the model to continue)
         2. Click the `Play` button in the main toolbar
         3. Watch as the model generates new tokens, extending your prompt
         4. The model will continue generating until you press `Stop`
-        
+
         The `Predicted next token` layer shows the probability distribution over possible next tokens. Higher activations indicate more likely continuations.
-        
+
+        ### Control Panel Features
+
+        The Language Model Controls panel provides several tools for interacting with the trained model:
+
+        - **Show Vocabulary**: Display all tokens in the model's vocabulary in a scrollable window. Each token is shown on its own line, with the total count displayed in the window title. This helps you understand exactly what tokens the model can recognize and generate.
+
+        - **Show Training Text**: Display the original training text in a separate scrollable window. This is useful for viewing what the model was trained on, comparing model outputs to the original training data, and understanding the vocabulary and style the model learned.
+
+        - **Temperature slider**: Adjust the randomness of generation. Lower values (0.1-0.5) make output more deterministic and focused, higher values (1.0-2.0) make output more creative and random.
+
+        - **Configure Sampling Strategy**: Open a dialog to adjust how the model samples from the probability distribution (Greedy, Top-K, or Top-P sampling).
+
         ## Saving and Reopening
         
         After training, save your workspace to preserve the learned weights. When reopening a saved workspace, use the `Load workspace` button in the control panel below the text world to properly restore the update actions.
@@ -486,11 +577,11 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         
         - **Top-K**: Randomly samples from the K most probable tokens. Good balance between creativity and coherence. Try K values from 3 to 10.
         
-        - **Top-P (Nucleus)**: Samples from tokens whose cumulative probability exceeds P. More dynamic than Top-K. Try P values from 0.8 to 0.95.
+        - **Top-P (Nucleus)**: Builds a "nucleus" by sorting the tokens by probability, selecting enough to reach P (build up cumulative probability to at least P), then samples from that nucleus proportionally. More dynamic than Top-K because the number of tokens varies based on the probability distribution. Try P values from 0.8 to 0.95.
         
         ## Adjust Temperature
         
-        Click on the `Softmax sequence` layer and adjust its temperature parameter:
+        Click on the `Softmax sequence` layer and adjust its temperature parameter or just use the slider bar in the control panel:
         
         - Low temperature (0.1-0.5): More confident, focused predictions (less random)
         - Medium temperature (0.5-1.0): Balanced randomness
@@ -507,10 +598,6 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         - **AdamW vs Adam**: Compare the AdamW optimizer (with decoupled weight decay) to standard Adam.
         
         Regularization is especially important with small training datasets where overfitting is common.
-        
-        ## View Training Data
-        
-        To see what text the model was trained on, open the `Text Inputs` component, click the token embedding viewer button, and select `view embedding word source`. This shows the complete vocabulary and source text.
 
         """.trimIndent(),
         initiallyOpened = false

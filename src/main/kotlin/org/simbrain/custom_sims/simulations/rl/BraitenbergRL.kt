@@ -7,7 +7,6 @@ import org.simbrain.custom_sims.*
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.addNeuron
 import org.simbrain.network.core.addSynapse
-import org.simbrain.network.core.getSynapse
 import org.simbrain.util.getDesktopComponentAs
 import org.simbrain.util.place
 import org.simbrain.util.swingInvokeLater
@@ -25,13 +24,10 @@ import kotlin.math.exp
 
 
 /**
- * Using actor-critic to train a Braitenberg vehicles
+ * Using actor-critic to train a Braitenberg vehicle.
  *
- * Define behavioral modules that correspond to Braitenberg vehicle types: Cheese Pursuer, Poison Pursuer, Cheese Avoider, Poison Avoider.
- * At each time step estimate which of these modules was more responsible for the behavior.
- * Then reinforce that. These are theoretically motivated actions.
- *
- * This is better than updating each synapse because learning then is slow and noisy and can produce descriptive interference.
+ * The vehicle learns to approach or avoid cheese and poison objects based on reward feedback.
+ * All actor weights are updated uniformly using TD error at each time step.
  *
  * Run headless using:
  * gradle runSim -PsimName="Braitenberg RL" -PoptionString='{"numTrials": 100, "taskIndex": 0, "learningRate": 0.05}'
@@ -248,28 +244,6 @@ val braitenbergRL = newSim { optionString ->
         s.strength = 0.0
     }
 
-    // Behavioral modules
-    // Pursuers work with positive weights, avoiders work with negative weights
-    val cheesePursuer = mapOf(
-        cheeseLeftInput to leftTurn,
-        cheeseRightInput to rightTurn,
-    )
-
-    val cheeseAvoider = mapOf(
-        cheeseLeftInput to leftTurn,
-        cheeseRightInput to rightTurn,
-    )
-
-    val poisonPursuer = mapOf(
-        poisonLeftInput to leftTurn,
-        poisonRightInput to rightTurn,
-    )
-
-    val poisonAvoider = mapOf(
-        poisonLeftInput to leftTurn,
-        poisonRightInput to rightTurn,
-    )
-
     // Track previous value for TD error calculation
     var previousValue = 0.0
 
@@ -346,47 +320,9 @@ val braitenbergRL = newSim { optionString ->
         }
     }
 
-    fun selectWinningModule(
-        cheeseActivation: Double,
-        poisonActivation: Double
-    ): Map<Neuron, Neuron>? {
-        val totalSensorActivation = cheeseActivation + poisonActivation
-        val sensorsDelta = cheeseActivation - poisonActivation
-
-        // Skip learning if sensors have no meaningful activation
-        if (totalSensorActivation < 0.1 || sensorsDelta == 0.0) {
-            return null
-        }
-
-        return if (sensorsDelta > 0.0) {
-            // Cheese more active - select cheese pursuer or avoider based on current weights
-            val cheeseWeightSum = cheeseLeftToLeftTurn.strength + cheeseRightToRightTurn.strength
-            when {
-                cheeseWeightSum > 0 -> cheesePursuer
-                cheeseWeightSum < 0 -> cheeseAvoider
-                else -> cheesePursuer  // Default to pursuer when weights are 0
-            }
-        } else {
-            // Poison more active - select poison pursuer or avoider based on current weights
-            val poisonWeightSum = poisonLeftToLeftTurn.strength + poisonRightToRightTurn.strength
-            when {
-                poisonWeightSum > 0 -> poisonPursuer
-                poisonWeightSum < 0 -> poisonAvoider
-                else -> poisonPursuer  // Default to pursuer when weights are 0
-            }
-        }
-    }
-
     fun updateCriticWeights(tdError: Double) {
         valueNeuron.fanIn.forEach { syn ->
             syn.strength += learningRate * tdError * syn.source.activation
-        }
-    }
-
-    fun updateActorWeights(module: Map<Neuron, Neuron>, tdError: Double) {
-        for ((input, output) in module) {
-            val syn = getSynapse(input, output) ?: continue
-            syn.strength += learningRate * tdError * input.activation
         }
     }
 
@@ -544,15 +480,9 @@ val braitenbergRL = newSim { optionString ->
                         // Update critic weights
                         updateCriticWeights(tdError)
 
-                        // Update actor weights for the winning behavioral module
-                        val cheeseActivation = cheeseLeftInput.activation + cheeseRightInput.activation
-                        val poisonActivation = poisonLeftInput.activation + poisonRightInput.activation
-                        val winningModule = selectWinningModule(cheeseActivation, poisonActivation)
-                        winningModule?.let { updateActorWeights(it, tdError) }
-
-                        // Clamp weights to prevent runaway
+                        // Update all actor weights
                         actorSynapses.forEach { syn ->
-                            syn.strength = syn.strength.coerceIn(-10.0, 10.0)
+                            syn.strength += learningRate * tdError * syn.source.activation
                         }
 
                         // Update previous value for next iteration
@@ -648,11 +578,9 @@ val braitenbergRL = newSim { optionString ->
     A Braitenberg vehicle that learns different approach and avoidance behaviors using actor-critic reinforcement learning. The vehicle uses sensory inputs to detect cheese and poison objects, and learns to approach or avoid them based on reward feedback.
     
     ## Background
-    
+
     Braitenberg vehicles are simple agent models that exhibit complex behaviors through sensory-motor connections. In this simulation, instead of hand-coding the connection weights, the vehicle learns them through reinforcement learning. The actor-critic architecture combines policy learning (actor) with value estimation (critic) to efficiently learn behaviors.
-    
-    The learning algorithm uses behavioral modules that correspond to different Braitenberg vehicle types (cheese pursuer, poison avoider, etc.). At each time step, the most active module receives reinforcement, which is more efficient than updating individual synapses.
-    
+
     # Simulation Details
     
     ## Network Architecture
@@ -674,23 +602,17 @@ val braitenbergRL = newSim { optionString ->
     4. The critic computes the TD error (difference between predicted and actual value)
     5. Both actor and critic weights are updated based on TD error
     
-    Rewards are distance-based with exponential decay, providing smooth gradients that guide learning. Exploration noise decays over trials to allow the agent to converge on optimal behavior.
-    
-    ## Behavioral Modules
+    Rewards are distance-based with exponential decay, providing smooth gradients that guide learning.
 
-    The actor weights are organized into four behavioral modules:
-    - Cheese Pursuer: Turn toward cheese (left sensor → left turn, right sensor → right turn)
-    - Cheese Avoider: Turn away from cheese (left sensor → right turn, right sensor → left turn)
-    - Poison Pursuer: Turn toward poison
-    - Poison Avoider: Turn away from poison
+    ## Actor Weights
 
-    During learning, the most active module receives the strongest weight updates.
+    The vehicle has four trainable actor connections:
+    - Cheese Left sensor → Left Turn
+    - Cheese Right sensor → Right Turn
+    - Poison Left sensor → Left Turn
+    - Poison Right sensor → Right Turn
 
-    ## Learning Dynamics and Turning Bias
-
-    The learning algorithm reinforces the behavioral module that is most active at each time step. When the vehicle's sensors detect one object more strongly than another, only that object's module gets reinforced. For example, if cheese sensors are more active, only the cheese pursuer or cheese avoider module updates its weights.
-
-    The vehicle can also develop a turning bias. If it frequently encounters cheese on one side, it will learn stronger weights for that side's cheese-related connections. The same happens for poison. These learned biases can cause the vehicle to show directional preferences even when objects are symmetrically positioned.
+    All weights are updated uniformly at each time step based on the TD error. Positive weights create pursuit behavior (turn toward the object), while negative weights create avoidance behavior (turn away from the object).
 
     ## Dynamic Object Respawning
 
@@ -708,8 +630,9 @@ val braitenbergRL = newSim { optionString ->
 
     Note on training vs. running: The `Run Training` button runs the full learning algorithm for multiple trials. After training, you can use the main toolbar's run button to watch the trained vehicle operate continuously with its learned weights. Training mode updates weights; running mode just executes the learned behavior.
 
-    Performance tip: Training runs much faster if you minimize or iconify component windows (odor world, network, time series). The simulation still runs in the background but doesn't spend time rendering visualizations.
-
+    Performance tip: Training runs much faster if you minimize or iconify component windows (time series, network, odor world). The simulation still runs in the background but doesn't spend time rendering visualizations.
+    Another option is to leave the odor world open since it does not impact performance much and it’s fun to watch it learn.
+    
     Try each task to see how the vehicle learns different behaviors:
 
     - Seek Cheese, Avoid Poison: Standard Braitenberg behavior where cheese is rewarding and poison is penalizing

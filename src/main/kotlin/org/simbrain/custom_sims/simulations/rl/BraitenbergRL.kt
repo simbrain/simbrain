@@ -653,16 +653,12 @@ val braitenbergRL = newSim { optionString ->
 
     # Simulation Details
     
-    ## Network Architecture
-    
     The network consists of:
     - **Input Neurons**: Four sensors detecting cheese and poison objects (left and right for each)
     - **Output Neurons**: Three motor outputs controlling left turn, right turn, and forward speed
     - **Actor Weights**: Connect inputs to motor outputs, determining behavior
     - **Critic Network**: Learns to predict value of current state
     - **Reward Neuron**: Displays the total reward signal
-    
-    ## Learning Algorithm
     
     The simulation uses temporal difference (TD) learning:
     
@@ -674,8 +670,6 @@ val braitenbergRL = newSim { optionString ->
     
     Rewards are distance-based with exponential decay, providing smooth gradients that guide learning.
 
-    ## Actor Weights
-
     The vehicle has four trainable actor connections:
     - Cheese Left sensor → Left Turn
     - Cheese Right sensor → Right Turn
@@ -684,36 +678,21 @@ val braitenbergRL = newSim { optionString ->
 
     All weights are updated uniformly at each time step based on the TD error. Positive weights create pursuit behavior (turn toward the object), while negative weights create avoidance behavior (turn away from the object).
 
-    ## Dynamic Object Respawning
-
     Objects automatically respawn at new locations when the agent collides with them. This prevents the vehicle from getting stuck on objects and encourages continuous exploration. Objects always respect a minimum separation distance of 100 pixels from each other to avoid confusion during learning. 
 
     # What to Do
 
-
     1. Select a task from the `Task` dropdown menu in the control panel
     2. Choose your learning mode:
-       - **Continuous Learning**: Check `Learning Enabled` and use the workspace run button to watch continuous learning in real-time
-       - **Batch Training**: Click `Run Training` to execute a specific number of trials and collect metrics
+       - Continuous Learning: Check `Learning Enabled` and use the workspace run button to watch continuous learning in real-time
+       - Batch Training: Click `Run Training` to execute a specific number of trials and collect metrics
     3. Watch the vehicle move around the environment as it learns
     4. Observe the `Reward, Value, TD Error` plot to monitor learning progress
     5. The `Trial` counter shows current progress and persists across training runs
 
-    **Learning Modes:**
-    - `Learning Enabled` checkbox: When checked, learning happens continuously whenever the workspace runs. Uncheck to freeze weights and observe behavior without learning.
-    - `Run Training` button: Executes batch training for a specified number of trials, collecting statistics. Good for systematic experiments.
-    - `Stop Training`: Pause batch training (resume by clicking `Run Training` again)
-    - `Reset`: Clear all weights to zero and restart trial counter
+   You can test this simulation either "live" using the workspace run button with `Learning Enabled` checked. Stop and examine weights at any time, then continue. You can also run a set number of trials with the control panel. Uncheck `Learning Enabled` to freeze weights and watch the vehicle execute its learned policy without further updates.
 
-    Performance tip: Training runs much faster if you minimize or iconify component windows (time series, network, odor world). The simulation still runs in the background but doesn't spend time rendering visualizations.
-    Another option is to leave the odor world open since it does not impact performance much and it’s fun to watch it learn.
-    
-    Try each task to see how the vehicle learns different behaviors:
-
-    - Seek Cheese, Avoid Poison: Standard Braitenberg behavior where cheese is rewarding and poison is penalizing
-    - Seek Both Objects: Both objects provide positive reward
-    - Avoid Both Objects: Both objects provide negative reward
-    - Seek Poison, Avoid Cheese: Opposite behavior where poison is rewarding and cheese is penalizing
+    **Performance tip**: Training runs much faster if you minimize or iconify component windows (time series, network, odor world). The simulation still runs in the background but doesn't spend time rendering visualizations. Another option is to leave the odor world open since it does not impact performance much and it’s fun to watch it learn.
 
     During training, watch:
     - How the vehicle's movement patterns change over trials
@@ -721,15 +700,8 @@ val braitenbergRL = newSim { optionString ->
     - The `Value` trace showing the critic's learned predictions
     - The `TD Error` showing the learning signal
     - The network weights updating in real-time
-    
-    ## Experiment
 
-    Try different learning approaches:
-    - **Interactive Learning**: Use the workspace run button with `Learning Enabled` checked. Stop and examine weights at any time, then continue.
-    - **Run Trials**: Use `Run Training` for systematic experiments with multiple trials and automatic metric collection.
-    - **Observing Learned Behavior**: Uncheck `Learning Enabled` to freeze weights and watch the vehicle execute its learned policy without further updates.
-
-    Adjust parameters to see their effects:
+    You can adjust parameters to see their effects:
 
     - **Learning Rate**: Controls how quickly weights change (higher = faster but less stable learning)
     - **Gamma**: Discount factor for future rewards (higher = more farsighted)
@@ -738,27 +710,33 @@ val braitenbergRL = newSim { optionString ->
     - **Max Steps per Trial**: Maximum time steps per episode
 
     After training on one task, try clicking `Reset` and training on a different task to see how the vehicle adapts.
+    
+    # Interpreting the Graphs
 
-    ## Headless Mode
+    The time series plot shows three key signals that reveal the learning process:
 
-    This simulation can be run in headless mode for batch experiments:
-    
-    ```
-    gradle runSim -PsimName="BraitenbergRL" -PoptionString='{"numTrials": 100, "taskIndex": 0, "learningRate": 0.05}'
-    ```
-    
-    Parameters:
-    - `taskIndex`: 0=Seek Cheese/Avoid Poison, 1=Seek Both, 2=Avoid Both, 3=Seek Poison/Avoid Cheese
-    - `learningRate`: Learning rate (default: 0.05)
-    - `gamma`: Discount factor (default: 0.95)
-    - `explorationRate`: Initial exploration rate (default: 0.3)
-    - `explorationDecay`: Exploration decay per trial (default: 0.995)
-    - `dispersion`: Sensor decay dispersion parameter (default: 75.0)
-    - `numTrials`: Number of training trials (default: 100)
-    - `maxStepsPerTrial`: Max steps per trial (default: 1000)
-    - `printInterval`: Print stats every N trials (default: 10)
-    
-    Results are printed to stdout and saved to `simulation_outputs/braitenberg_rl_TIMESTAMP.csv`
+    **Reward**: Shows the immediate reward signal based on proximity to objects. Positive values indicate being near rewarding objects (cheese in most tasks), negative values indicate being near penalizing objects (poison in most tasks). This signal fluctuates continuously as the agent moves around.
+
+    **Value**: The critic's prediction of expected future cumulative reward from the current state. Early in training this is inaccurate, but it improves over time. You should see value increase as the agent approaches rewarding objects and decrease near penalizing ones, reflecting learned predictions about what will happen next.
+
+    **TD Error**: The temporal difference error = r + γ×V(s') - V(s), where s' is the current time step and s is the previous time step. This is the learning signal that drives weight updates. It represents the difference between what the critic predicted at the last time step (V(s)) and what actually happened (reward plus discounted next-state value, r + γ×V(s')).
+
+    What to expect during training
+    - Early trials: All three traces are noisy and uncorrelated as the agent explores randomly
+    - Mid training: Reward and TD error begin to track each other more closely
+    - Late training: Reward and TD error converge toward similar values, while value becomes smoother
+
+    Why don't reward and TD error go to zero? Unlike discrete episodic tasks, this is a continuous environment where the agent is always moving. The reward signal varies based on distance to objects, so it naturally fluctuates between positive and negative values depending on proximity.
+
+    Why do reward and TD error converge toward each other? The TD error formula is: TD_error = r + γ×V(s') - V(s). When the critic is well-trained, the value function changes smoothly as the agent moves (small difference between V(s') and V(s)), so that TD_error is close to r, so the two traces track each other closely.
+
+    What causes the sharp spikes in TD error when objects respawn?
+    - Downward spikes occur when a rewarding object disappears. This is an unexpected negative change. At s the agent was close to something good, and at s' the good thing is far away.
+    - Upward spikes occur when a penalizing object (poison) disappears. This is an unexpected positive change.  At s the agent was close to something bad, and at s' the bad thing is far away.
+
+    These spikes represent genuine prediction errors. The critic didn't predict the object would suddenly teleport away! However, these spikes don't disrupt learning much because weight updates are proportional to both TD error AND input activation: Δw = learningRate × tdError × activation. When objects respawn far away, the sensor activations are near zero, so even though TD error is large, the weight changes are minimal. The algorithm only learns strongly when sensory signals are present, which is exactly what we want. The agent shouldn't learn from situations it can't actually sense.
+
+
     
     # References
 

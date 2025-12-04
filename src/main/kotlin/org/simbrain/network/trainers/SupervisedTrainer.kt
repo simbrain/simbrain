@@ -172,11 +172,9 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
     }
 
     private suspend fun startTrainingHandler() {
-        if (stoppingConditionReached) {
-            stoppingConditionReached = false
-            iteration = 0
-            events.iterationReset.fire()
-        }
+        // Clear stopping condition flag to allow continued training
+        stoppingConditionReached = false
+
         // Reset early stopping state when training starts
         config.stoppingCondition.resetEarlyStopping()
         isRunning = true

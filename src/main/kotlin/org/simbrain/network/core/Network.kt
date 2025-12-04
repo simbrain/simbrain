@@ -308,6 +308,11 @@ class Network: CoroutineScope, EditableObject {
             if (usePlacementManager && model is LocatableModel && model.shouldBePlaced) {
                 placementManager.placeObject(model)
             }
+            (model as? LocatableModel)?.let { locatableModel ->
+                locatableModel.events.locationChanged.on {
+                    events.boundsChanged.fire()
+                }
+            }
             model.events.deleted.on(wait = true) {
                 networkModels.remove(it)
                 childToParentMap.remove(it)

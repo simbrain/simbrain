@@ -818,6 +818,9 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
                     canvas.repaint()
                 }
             }
+            boundsChanged.on(Dispatchers.Swing) {
+                zoomToFitPage.fire()
+            }
             selected.on { list ->
                 selectionManager.set(list.map { modelNodeMap.get(it) })
             }

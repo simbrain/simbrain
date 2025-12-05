@@ -2,7 +2,6 @@ package org.simbrain.network.trainers
 
 import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
-import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.util.propertyeditor.EditableObject
 
@@ -29,7 +28,7 @@ interface SupervisedNetwork {
 
     fun initBiases()
 
-    fun possibleLossFunctions() = when((outputLayer as? NeuronArray)?.updateRule) {
+    fun possibleLossFunctions() = when(outputLayer.updateRule) {
         is SoftmaxRule -> listOf(BackpropLossFunction.CrossEntropy::class.java)
         else -> listOf(BackpropLossFunction.SSE::class.java, BackpropLossFunction.MSE::class.java, BackpropLossFunction.RMSE::class.java)
     }

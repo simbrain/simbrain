@@ -12,6 +12,7 @@ import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.propertyeditor.objectWrapper
+import org.simbrain.util.widgets.SimbrainTextArea
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.workspace.updater.UpdateAllCouplings
@@ -340,13 +341,13 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
                 swingInvokeLater {
                     val dialog = JDialog()
                     dialog.title = "Vocabulary (${tokenEmbedding.tokens.size} tokens)"
-                    dialog.isAlwaysOnTop = true
                     JOptionPane.showMessageDialog(dialog, scrollPane, "Vocabulary / Tokens", JOptionPane.PLAIN_MESSAGE)
                 }
             }
 
             addButton("Show Training Text") {
-                val textArea = JTextArea(trainingTextFinal).apply {
+                val textArea = SimbrainTextArea().apply {
+                    text = trainingTextFinal
                     isEditable = false
                     rows = 20
                     columns = 40
@@ -355,10 +356,13 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
                 }
                 val scrollPane = JScrollPane(textArea)
                 swingInvokeLater {
-                    val dialog = JDialog()
-                    dialog.title = "Training Text"
-                    dialog.isAlwaysOnTop = true
-                    JOptionPane.showMessageDialog(dialog, scrollPane, "Training Text", JOptionPane.PLAIN_MESSAGE)
+                    StandardDialog().apply {
+                        title = "Training Text"
+                        contentPane = scrollPane
+                        isModal = false
+                        setAsDoneDialog()
+                        makeVisible()
+                    }
                 }
             }
 

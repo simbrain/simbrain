@@ -6,6 +6,7 @@ import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.widgets.DropDownTriangle
 import org.simbrain.util.widgets.ProgressWindow
+import org.simbrain.util.widgets.SimbrainTextArea
 import java.awt.*
 import java.awt.event.*
 import java.beans.PropertyChangeEvent
@@ -377,16 +378,21 @@ fun showOptionDialog(
 }
 
 fun showMessageDialog(message: String, title: String, rows: Int = 10, columns: Int = 50) {
-    val textArea = JTextArea(message).apply {
+    val textArea = SimbrainTextArea().apply {
+        text = message
         isEditable = false
         this.rows = rows
         this.columns = columns
     }
     val scrollPane = JScrollPane(textArea)
     SwingUtilities.invokeLater {
-        val dialog = JDialog()
-        dialog.isAlwaysOnTop = true
-        JOptionPane.showMessageDialog(dialog, scrollPane, title, JOptionPane.PLAIN_MESSAGE)
+        StandardDialog().apply {
+            this.title = title
+            contentPane = scrollPane
+            isModal = false
+            setAsDoneDialog()
+            makeVisible()
+        }
     }
 }
 

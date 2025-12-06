@@ -22,11 +22,10 @@ class SimbrainTextArea : RSyntaxTextArea() {
     }
 
     fun showFindReplaceDialog() {
-
         val frame = JFrame()
         val dialog = FindReplaceDialog(frame, this)
         frame.contentPane = dialog
-        frame.title = "Find / replace..."
+        frame.title = if (isEditable) "Find / Replace..." else "Find..."
         frame.isVisible = true
         frame.pack()
         frame.setLocationRelativeTo(null)

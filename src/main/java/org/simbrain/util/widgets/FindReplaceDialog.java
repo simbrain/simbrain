@@ -1,18 +1,13 @@
 package org.simbrain.util.widgets;
 
-
+import net.miginfocom.swing.MigLayout;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rtextarea.RTextArea;
 import org.fife.ui.rtextarea.SearchContext;
 import org.fife.ui.rtextarea.SearchEngine;
 import org.fife.ui.rtextarea.SearchResult;
-import org.simbrain.util.LabelledItemPanel;
 
 import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.border.CompoundBorder;
-import javax.swing.border.EmptyBorder;
-import java.awt.*;
 
 /**
  * A find / replace dialog for RSyntaxTextArea (by Robert Futrell).
@@ -36,7 +31,7 @@ public class FindReplaceDialog extends JPanel {
     /**
      * Whether to use regular expressions.
      */
-    private JCheckBox regexCB = new JCheckBox("Regular expressions");
+    private JCheckBox regexCB = new JCheckBox("Regex");
 
     /**
      * Match case.
@@ -44,14 +39,14 @@ public class FindReplaceDialog extends JPanel {
     private JCheckBox matchCaseCB = new JCheckBox("Match Case");
 
     /**
-     * Whole world.
+     * Whole word.
      */
-    private JCheckBox wholeWordCB = new JCheckBox("Whole word");
+    private JCheckBox wholeWordCB = new JCheckBox("Whole Word");
 
     /**
      * Wrap search.
      */
-    private JCheckBox wrapSearchCB = new JCheckBox("Wrap Search");
+    private JCheckBox wrapSearchCB = new JCheckBox("Wrap");
 
     /**
      * Search backward.
@@ -68,104 +63,114 @@ public class FindReplaceDialog extends JPanel {
      */
     private RSyntaxTextArea textArea;
 
-    // TODO
-    // Say how may replacements were made in replace all
-    // Various warnings, etc.
+    /**
+     * Whether to show replace functionality.
+     */
+    private final boolean showReplace;
+
     public FindReplaceDialog(final JFrame frame, final SimbrainTextArea textArea) {
-        setLayout(new GridLayout(4, 1));
         this.textArea = textArea;
+        this.showReplace = textArea.isEditable();
 
-        // Find replace Panel
-        LabelledItemPanel findReplacePanel = new LabelledItemPanel();
+        // Use MigLayout for cleaner layout
+        // Layout: label | text field | buttons
+        setLayout(new MigLayout(
+            "insets 15, gap 8",  // Layout constraints
+            "[right][grow, fill][fill][fill]",  // Column constraints
+            "[]8[]12[]8[]"  // Row constraints
+        ));
 
-        // Options Panel
-        JPanel optionsPanel = new JPanel(new GridLayout(2, 2));
-        Border paddingBorderOptions = new EmptyBorder(10, 10, 10, 10);
-        Border titleBorderOptions = BorderFactory.createTitledBorder("Options");
-        optionsPanel.setBorder(new CompoundBorder(paddingBorderOptions, titleBorderOptions));
-        optionsPanel.add(regexCB);
+        // Initialize fields
+        searchField = new JTextField(16);
+        searchField.setText(textArea.getLastSearchedString());
+
+        // Create buttons
+        JButton findButton = new JButton("Find Next");
+        findButton.addActionListener(e -> {
+            textArea.setLastSearchedString(searchField.getText());
+            SearchContext context = setUpContext();
+            find(context);
+        });
+
+        // Row 1: Find field and Find button
+        add(new JLabel("Find:"));
+        add(searchField, "growx");
+
+        if (showReplace) {
+            add(findButton);
+            JButton replaceFindButton = new JButton("Replace & Find");
+            replaceFindButton.addActionListener(e -> {
+                textArea.setLastSearchedString(searchField.getText());
+                textArea.setLastReplacedString(replaceField.getText());
+                SearchContext context = setUpContext();
+                replace(context);
+                find(context);
+            });
+            add(replaceFindButton, "wrap");
+
+            // Row 2: Replace field and Replace buttons
+            replaceField = new JTextField(16);
+            replaceField.setText(textArea.getLastReplacedString());
+
+            JButton replaceButton = new JButton("Replace");
+            replaceButton.addActionListener(e -> {
+                textArea.setLastReplacedString(replaceField.getText());
+                SearchContext context = setUpContext();
+                replace(context);
+            });
+
+            JButton replaceAllButton = new JButton("Replace All");
+            replaceAllButton.addActionListener(e -> {
+                textArea.setLastReplacedString(replaceField.getText());
+                SearchContext context = setUpContext();
+                if (context != null) {
+                    SearchResult replacements = SearchEngine.replaceAll(textArea, context);
+                    JOptionPane.showMessageDialog(frame,
+                        replacements.getCount() + " occurrence(s) replaced.",
+                        "Replace All",
+                        JOptionPane.INFORMATION_MESSAGE);
+                }
+            });
+
+            add(new JLabel("Replace:"));
+            add(replaceField, "growx");
+            add(replaceButton);
+            add(replaceAllButton, "wrap");
+        } else {
+            // Find-only mode: span the button across both button columns
+            add(findButton, "span 2, wrap");
+        }
+
+        // Row 3: Options (checkboxes) - skip first column to align with text fields
+        add(new JLabel());  // Empty label column
+        JPanel optionsPanel = new JPanel(new MigLayout("insets 0, gap 15", "[][][][]", "[]"));
         optionsPanel.add(matchCaseCB);
         optionsPanel.add(wholeWordCB);
+        optionsPanel.add(regexCB);
         optionsPanel.add(wrapSearchCB);
         wrapSearchCB.setSelected(true);
 
-        // Direction Panel
-        JPanel directionPanel = new JPanel(new GridLayout(1, 2));
-        Border paddingBorderDirection = new EmptyBorder(10, 10, 10, 10);
-        Border titleBorderDirection = BorderFactory.createTitledBorder("Direction");
-        directionPanel.setBorder(new CompoundBorder(paddingBorderDirection, titleBorderDirection));
+        add(optionsPanel, "span 3, align left, wrap");
+
+        // Row 4: Direction and Close button - skip first column to align with text fields
+        add(new JLabel());  // Empty label column
+        JPanel directionPanel = new JPanel(new MigLayout("insets 0, gap 10", "[][]", "[]"));
         ButtonGroup group = new ButtonGroup();
         group.add(forwardSearch);
         group.add(backwardSearch);
+        forwardSearch.setSelected(true);
         directionPanel.add(forwardSearch);
         directionPanel.add(backwardSearch);
-        forwardSearch.setSelected(true);
 
-        // Button Panel
-        JPanel buttonPanel = new JPanel(new GridLayout(3, 3));
-
-        // Add panels
-        add(findReplacePanel);
-        add(directionPanel);
-        add(optionsPanel);
-        add(buttonPanel);
-        this.setBorder(new EmptyBorder(10, 10, 15, 15)); // Padding around panel
-
-        // Search / Replace Field
-        searchField = new JTextField(20);
-        searchField.setText(textArea.getLastSearchedString());
-        replaceField = new JTextField(20);
-        replaceField.setText(textArea.getLastReplacedString());
-        findReplacePanel.addItem("Find", searchField);
-        findReplacePanel.addItem("Replace", replaceField);
-
-        // Next Button
-        final JButton nextButton = new JButton("Find");
-        nextButton.addActionListener(e -> {
-            textArea.setLastSearchedString(searchField.getText());
-            SearchContext context = setUpContext();
-            find(context);
-        });
-        buttonPanel.add(nextButton);
-        frame.getRootPane().setDefaultButton(nextButton);
-
-        // Replace / Find
-        final JButton replaceFindButton = new JButton("Replace / Find");
-        replaceFindButton.addActionListener(e -> {
-            textArea.setLastSearchedString(searchField.getText());
-            textArea.setLastReplacedString(replaceField.getText());
-            SearchContext context = setUpContext();
-            replace(context);
-            find(context);
-        });
-        buttonPanel.add(replaceFindButton);
-
-        // Replace Button
-        JButton replaceButton = new JButton("Replace");
-        replaceButton.addActionListener(e -> {
-            textArea.setLastReplacedString(replaceField.getText());
-            SearchContext context = setUpContext();
-            replace(context);
-        });
-        buttonPanel.add(replaceButton);
-
-        // Replace All Button
-        final JButton replaceAllButton = new JButton("Replace All");
-        replaceAllButton.addActionListener(e -> {
-            textArea.setLastReplacedString(replaceField.getText());
-            SearchContext context = setUpContext();
-            if (context != null) {
-                SearchResult replacements = SearchEngine.replaceAll(textArea, context);
-                // TODO: Display number of replacements made in dialog
-                // using replacements.getCount()
-            }
-        });
-        buttonPanel.add(replaceAllButton);
-
-        // Close Button
         JButton closeButton = new JButton("Close");
         closeButton.addActionListener(e -> frame.dispose());
-        buttonPanel.add(closeButton);
+
+        add(directionPanel);
+        add(new JLabel(), "growx");  // Spacer
+        add(closeButton, "align right, wrap");
+
+        // Set default button
+        frame.getRootPane().setDefaultButton(findButton);
     }
 
     /**
@@ -180,7 +185,9 @@ public class FindReplaceDialog extends JPanel {
             return null;
         }
         context.setSearchFor(text);
-        context.setReplaceWith(replaceField.getText());
+        if (replaceField != null) {
+            context.setReplaceWith(replaceField.getText());
+        }
         context.setSearchForward(forwardSearch.isSelected());
         context.setMatchCase(matchCaseCB.isSelected());
         context.setRegularExpression(regexCB.isSelected());
@@ -218,6 +225,5 @@ public class FindReplaceDialog extends JPanel {
         if (context != null) {
             SearchEngine.replace((RTextArea) textArea, context);
         }
-
     }
 }

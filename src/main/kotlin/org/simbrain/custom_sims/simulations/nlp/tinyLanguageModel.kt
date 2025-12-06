@@ -22,10 +22,7 @@ import org.simbrain.world.textworld.TokenEmbedding
 import org.simbrain.world.textworld.TokenEmbeddingBuilder
 import smile.math.matrix.Matrix
 import java.io.File
-import javax.swing.JDialog
-import javax.swing.JOptionPane
 import javax.swing.JScrollPane
-import javax.swing.JTextArea
 
 class TinyLanguageModelOptions(var showEmbeddingDimension: Boolean = true): EditableObject {
 
@@ -332,7 +329,8 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
 
             addButton("Show Vocabulary") {
                 val tokensText = tokenEmbedding.tokens.joinToString("\n")
-                val textArea = JTextArea(tokensText).apply {
+                val textArea = SimbrainTextArea().apply {
+                    text = tokensText
                     isEditable = false
                     rows = 20
                     columns = 40
@@ -341,9 +339,13 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
                 }
                 val scrollPane = JScrollPane(textArea)
                 swingInvokeLater {
-                    val dialog = JDialog()
-                    dialog.title = "Vocabulary (${tokenEmbedding.tokens.size} tokens)"
-                    JOptionPane.showMessageDialog(dialog, scrollPane, "Vocabulary / Tokens", JOptionPane.PLAIN_MESSAGE)
+                    StandardDialog().apply {
+                        title = "Vocabulary (${tokenEmbedding.tokens.size} tokens)"
+                        contentPane = scrollPane
+                        isModal = false
+                        setAsDoneDialog()
+                        makeVisible()
+                    }
                 }
             }
 

@@ -49,6 +49,7 @@ class TinyLanguageModelOptions(var showEmbeddingDimension: Boolean = true): Edit
     )
 
     var trainerTextPath by GuiEditable(
+        label = "Training text path",
         initValue = simulationsPath / "texts" / "casual_texting_small.txt",
         description = "Text used to train the model",
         order = 30,
@@ -56,6 +57,7 @@ class TinyLanguageModelOptions(var showEmbeddingDimension: Boolean = true): Edit
     )
 
     var testTextPath by GuiEditable(
+        label = "Testing text path",
         initValue = "",
         description = "Optional separate text file for testing. If empty, training text will be split automatically.",
         order = 35,

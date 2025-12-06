@@ -1,6 +1,12 @@
-name: Build and Push
+name: Build and Release
 
 on:
+  # Tag-triggered releases
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
+
+  # Manual dispatch for testing
   workflow_dispatch:
     inputs:
       build_linux:
@@ -28,14 +34,58 @@ env:
   AWS_CLI_VERSION: "2.22.35"
 
 jobs:
-  build-linux:
-    if: inputs.build_linux
+  # Prepare version and determine what to build
+  prepare:
     runs-on: ubuntu-latest
-    
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      is_release: ${{ steps.version.outputs.is_release }}
+      build_linux: ${{ steps.matrix.outputs.build_linux }}
+      build_windows: ${{ steps.matrix.outputs.build_windows }}
+      build_macos_arm64: ${{ steps.matrix.outputs.build_macos_arm64 }}
+      build_macos_x64: ${{ steps.matrix.outputs.build_macos_x64 }}
+    steps:
+      - name: Determine version
+        id: version
+        run: |
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            VERSION="${{ github.ref_name }}"
+            VERSION="${VERSION#v}"  # Remove 'v' prefix
+            IS_RELEASE="true"
+          else
+            VERSION="4.0.0"
+            IS_RELEASE="false"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "is_release=$IS_RELEASE" >> $GITHUB_OUTPUT
+          echo "Resolved version: $VERSION, is_release: $IS_RELEASE"
+
+      - name: Determine build matrix
+        id: matrix
+        run: |
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            # Build all platforms for releases
+            echo "build_linux=true" >> $GITHUB_OUTPUT
+            echo "build_windows=true" >> $GITHUB_OUTPUT
+            echo "build_macos_arm64=true" >> $GITHUB_OUTPUT
+            echo "build_macos_x64=true" >> $GITHUB_OUTPUT
+          else
+            # Use manual inputs
+            echo "build_linux=${{ inputs.build_linux }}" >> $GITHUB_OUTPUT
+            echo "build_windows=${{ inputs.build_windows }}" >> $GITHUB_OUTPUT
+            echo "build_macos_arm64=${{ inputs.build_macos_arm64 }}" >> $GITHUB_OUTPUT
+            echo "build_macos_x64=${{ inputs.build_macos_x64 }}" >> $GITHUB_OUTPUT
+          fi
+
+  build-linux:
+    needs: prepare
+    if: needs.prepare.outputs.build_linux == 'true'
+    runs-on: ubuntu-latest
+
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
-      
+
       - name: Setup AWS CLI
         run: |
           sudo rm -rf /usr/local/aws-cli /usr/local/bin/aws /usr/local/bin/aws_completer /usr/local/bin/aws-cli /usr/local/bin/aws-cli-plugin
@@ -44,37 +94,46 @@ jobs:
           unzip -q awscliv2.zip
           sudo ./aws/install
           aws --version
-      
+
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
-      
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-      
+
       - name: Generate build info
         run: |
           echo "BUILD_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
           echo "COMMIT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
           echo "BUILD_TIMESTAMP=$(date -u +%Y%m%d_%H%M%S)" >> $GITHUB_ENV
-      
+          echo "VERSION=${{ needs.prepare.outputs.version }}" >> $GITHUB_ENV
+
       - name: Build standard zip
-        run: ./gradlew createZip -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
-      
+        run: ./gradlew createZip -PreleaseVersion=$VERSION -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
+
       - name: Copy standard build artifacts
         run: cp build/dist/Simbrain*.zip $GITHUB_WORKSPACE
-      
+
       - name: Clean for full build
         run: ./gradlew clean
-      
+
       - name: Build full zip
-        run: ./gradlew createZip -PversionSuffix="_full" -PincludeAllPlatforms=true -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
-      
+        run: ./gradlew createZip -PreleaseVersion=$VERSION -PversionSuffix="_full" -PincludeAllPlatforms=true -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
+
       - name: Copy full build artifacts
-        run: cp build/dist/Simbrain4Beta_full.zip "$GITHUB_WORKSPACE"
-      
+        run: cp build/dist/Simbrain*_full.zip "$GITHUB_WORKSPACE"
+
+      - name: Upload artifacts for release
+        if: needs.prepare.outputs.is_release == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-artifacts
+          path: ${{ github.workspace }}/Simbrain*.zip
+          retention-days: 1
+
       - name: Configure AWS CLI
         env:
           R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
@@ -83,33 +142,35 @@ jobs:
           aws configure set aws_access_key_id $R2_ACCESS_KEY
           aws configure set aws_secret_access_key $R2_SECRET_KEY
           aws configure set default.region auto
-      
+
       - name: Upload to Cloudflare R2
         env:
           CLOUDFLARE_R2_BUCKET: ${{ secrets.CLOUDFLARE_R2_BUCKET }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
-          aws s3 cp "$GITHUB_WORKSPACE/Simbrain4Beta.zip" "s3://$CLOUDFLARE_R2_BUCKET/" --endpoint-url=https://$CLOUDFLARE_ACCOUNT_ID.r2.cloudflarestorage.com
-          aws s3 cp "$GITHUB_WORKSPACE/Simbrain4Beta_full.zip" "s3://$CLOUDFLARE_R2_BUCKET/" --endpoint-url=https://$CLOUDFLARE_ACCOUNT_ID.r2.cloudflarestorage.com
+          for file in $GITHUB_WORKSPACE/Simbrain*.zip; do
+            aws s3 cp "$file" "s3://$CLOUDFLARE_R2_BUCKET/" --endpoint-url=https://$CLOUDFLARE_ACCOUNT_ID.r2.cloudflarestorage.com
+          done
 
   build-windows:
-    if: inputs.build_windows
+    needs: prepare
+    if: needs.prepare.outputs.build_windows == 'true'
     runs-on: windows-latest
     environment: windows
-    
+
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
-      
+
       - name: Setup AWS CLI
         run: |
           choco uninstall awscli -y || echo "No existing AWS CLI via Chocolatey"
           choco install awscli --version=${{ env.AWS_CLI_VERSION }}
           aws --version
-      
+
       - name: Install Windows SDK
         run: choco install windows-sdk-10.1
-      
+
       - name: Install Certificate
         run: |
           $base64EncodedCert = "${{ secrets.CERTIFICATE_ENCODED }}"
@@ -117,16 +178,16 @@ jobs:
           [System.IO.File]::WriteAllBytes("simbrain.p12", $certBytes)
           $pfxPassword = ConvertTo-SecureString -String "${{ secrets.CERTIFICATE_PASSWORD }}" -AsPlainText -Force
           Import-PfxCertificate -FilePath "simbrain.p12" -CertStoreLocation Cert:\CurrentUser\My -Password $pfxPassword
-      
+
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
-      
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-      
+
       - name: Generate build info
         shell: pwsh
         run: |
@@ -134,16 +195,25 @@ jobs:
           echo "COMMIT_SHA=$(git rev-parse --short HEAD)" >> $env:GITHUB_ENV
           $timestamp = (Get-Date).ToUniversalTime().ToString("yyyyMMdd_HHmmss")
           echo "BUILD_TIMESTAMP=$timestamp" >> $env:GITHUB_ENV
-      
+          echo "VERSION=${{ needs.prepare.outputs.version }}" >> $env:GITHUB_ENV
+
       - name: Build Windows executable
-        run: ./gradlew renameWindowsExecutable -PbuildNumber=${{ env.BUILD_NUMBER }} -PcommitSha=${{ env.COMMIT_SHA }} -PbuildTimestamp=${{ env.BUILD_TIMESTAMP }}
-      
+        run: ./gradlew renameWindowsExecutable -PreleaseVersion=${{ env.VERSION }} -PbuildNumber=${{ env.BUILD_NUMBER }} -PcommitSha=${{ env.COMMIT_SHA }} -PbuildTimestamp=${{ env.BUILD_TIMESTAMP }}
+
+      - name: Upload artifacts for release
+        if: needs.prepare.outputs.is_release == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-artifacts
+          path: build/dist/Simbrain*.exe
+          retention-days: 1
+
       - name: Configure AWS CLI
         run: |
           & "C:\Program Files\Amazon\AWSCLIV2\aws" configure set aws_access_key_id ${{ secrets.R2_ACCESS_KEY }}
           & "C:\Program Files\Amazon\AWSCLIV2\aws" configure set aws_secret_access_key ${{ secrets.R2_SECRET_KEY }}
           & "C:\Program Files\Amazon\AWSCLIV2\aws" configure set default.region auto
-      
+
       - name: Upload to Cloudflare R2
         shell: pwsh
         run: |
@@ -158,24 +228,25 @@ jobs:
           }
 
   build-macos-arm64:
-    if: inputs.build_macos_arm64
+    needs: prepare
+    if: needs.prepare.outputs.build_macos_arm64 == 'true'
     runs-on: macos-latest
     environment: macos
-    
+
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
-      
+
       - name: Setup AWS CLI
         run: |
           curl "https://awscli.amazonaws.com/AWSCLIV2-${{ env.AWS_CLI_VERSION }}.pkg" -o "awscliv2.pkg"
           sudo installer -pkg awscliv2.pkg -target /
-      
+
       - name: Install Dependencies
         run: |
           brew update
           brew install jq
-      
+
       - name: Setup Apple Certificate
         env:
           CERTIFICATE_BASE64: ${{ secrets.MAC_CERTIFICATE }}
@@ -192,46 +263,55 @@ jobs:
           security set-key-partition-list -S "apple-tool:,apple:,codesign:" -s -k "${KEYCHAIN_PASSWORD}" "${KEYCHAIN_FULL_PATH}"
           security list-keychains -s "${KEYCHAIN_FULL_PATH}"
           rm -f certificate.p12
-      
+
       - name: Setup Apple ID
         run: |
           echo "APPLE_ID=${{ secrets.APPLE_ID }}" >> $GITHUB_ENV
           echo "APP_SPECIFIC_PASSWORD=${{ secrets.APP_SPECIFIC_PASSWORD }}" >> $GITHUB_ENV
           echo "TEAM_ID=${{ secrets.TEAM_ID }}" >> $GITHUB_ENV
-      
+
       - name: Authenticate with Apple Notary Service
         run: |
           xcrun notarytool store-credentials "AC_PASSWORD" --apple-id "$APPLE_ID" --team-id "$TEAM_ID" --password "$APP_SPECIFIC_PASSWORD"
-      
+
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
           java-version: '17'
           architecture: 'aarch64'
-      
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-      
+
       - name: Generate build info
         run: |
           echo "BUILD_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
           echo "COMMIT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
           echo "BUILD_TIMESTAMP=$(date -u +%Y%m%d_%H%M%S)" >> $GITHUB_ENV
-      
+          echo "VERSION=${{ needs.prepare.outputs.version }}" >> $GITHUB_ENV
+
       - name: Build and Sign
         env:
           DEVELOPER_ID: ${{ secrets.DEVELOPER_ID }}
         run: |
-          ./gradlew shadowJar -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
+          ./gradlew shadowJar -PreleaseVersion=$VERSION -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
           ./etc/sign_mac_jar.sh
           mkdir -p build/main
           cp build/libs/Simbrain.jar build/main/Simbrain.jar
           cp -r simulations build/main/simulations
           cp etc/License.txt build/main/License.txt
-          ./gradlew jpackageMacOS -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
-          ./gradlew notarizeMacApp -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
-      
+          ./gradlew jpackageMacOS -PreleaseVersion=$VERSION -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
+          ./gradlew notarizeMacApp -PreleaseVersion=$VERSION -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
+
+      - name: Upload artifacts for release
+        if: needs.prepare.outputs.is_release == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-arm64-artifacts
+          path: build/dist/Simbrain*.dmg
+          retention-days: 1
+
       - name: Configure AWS CLI
         env:
           R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
@@ -240,7 +320,7 @@ jobs:
           aws configure set aws_access_key_id $R2_ACCESS_KEY
           aws configure set aws_secret_access_key $R2_SECRET_KEY
           aws configure set default.region auto
-      
+
       - name: Upload to Cloudflare R2
         env:
           CLOUDFLARE_R2_BUCKET: ${{ secrets.CLOUDFLARE_R2_BUCKET }}
@@ -249,24 +329,25 @@ jobs:
           aws s3 cp build/dist/Simbrain*.dmg s3://$CLOUDFLARE_R2_BUCKET/ --endpoint-url=https://$CLOUDFLARE_ACCOUNT_ID.r2.cloudflarestorage.com
 
   build-macos-x64:
-    if: inputs.build_macos_x64
+    needs: prepare
+    if: needs.prepare.outputs.build_macos_x64 == 'true'
     runs-on: macos-latest
     environment: macos
-    
+
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
-      
+
       - name: Setup AWS CLI
         run: |
           curl "https://awscli.amazonaws.com/AWSCLIV2-${{ env.AWS_CLI_VERSION }}.pkg" -o "awscliv2.pkg"
           sudo installer -pkg awscliv2.pkg -target /
-      
+
       - name: Install Dependencies
         run: |
           brew update
           brew install jq
-      
+
       - name: Setup Apple Certificate
         env:
           CERTIFICATE_BASE64: ${{ secrets.MAC_CERTIFICATE }}
@@ -283,46 +364,55 @@ jobs:
           security set-key-partition-list -S "apple-tool:,apple:,codesign:" -s -k "${KEYCHAIN_PASSWORD}" "${KEYCHAIN_FULL_PATH}"
           security list-keychains -s "${KEYCHAIN_FULL_PATH}"
           rm -f certificate.p12
-      
+
       - name: Setup Apple ID
         run: |
           echo "APPLE_ID=${{ secrets.APPLE_ID }}" >> $GITHUB_ENV
           echo "APP_SPECIFIC_PASSWORD=${{ secrets.APP_SPECIFIC_PASSWORD }}" >> $GITHUB_ENV
           echo "TEAM_ID=${{ secrets.TEAM_ID }}" >> $GITHUB_ENV
-      
+
       - name: Authenticate with Apple Notary Service
         run: |
           xcrun notarytool store-credentials "AC_PASSWORD" --apple-id "$APPLE_ID" --team-id "$TEAM_ID" --password "$APP_SPECIFIC_PASSWORD"
-      
+
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           distribution: 'zulu'
           java-version: '17'
           architecture: 'x64'
-      
+
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
-      
+
       - name: Generate build info
         run: |
           echo "BUILD_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
           echo "COMMIT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
           echo "BUILD_TIMESTAMP=$(date -u +%Y%m%d_%H%M%S)" >> $GITHUB_ENV
-      
+          echo "VERSION=${{ needs.prepare.outputs.version }}" >> $GITHUB_ENV
+
       - name: Build and Sign
         env:
           DEVELOPER_ID: ${{ secrets.DEVELOPER_ID }}
         run: |
-          ./gradlew shadowJar -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
+          ./gradlew shadowJar -PreleaseVersion=$VERSION -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
           ./etc/sign_mac_jar.sh
           mkdir -p build/main
           cp build/libs/Simbrain.jar build/main/Simbrain.jar
           cp -r simulations build/main/simulations
           cp etc/License.txt build/main/License.txt
-          ./gradlew jpackageMacOS -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
-          ./gradlew notarizeMacApp -PversionSuffix="_x64" -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
-      
+          ./gradlew jpackageMacOS -PreleaseVersion=$VERSION -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
+          ./gradlew notarizeMacApp -PreleaseVersion=$VERSION -PversionSuffix="_x64" -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
+
+      - name: Upload artifacts for release
+        if: needs.prepare.outputs.is_release == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-x64-artifacts
+          path: build/dist/Simbrain*.dmg
+          retention-days: 1
+
       - name: Configure AWS CLI
         env:
           R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
@@ -331,10 +421,51 @@ jobs:
           aws configure set aws_access_key_id $R2_ACCESS_KEY
           aws configure set aws_secret_access_key $R2_SECRET_KEY
           aws configure set default.region auto
-      
+
       - name: Upload to Cloudflare R2
         env:
           CLOUDFLARE_R2_BUCKET: ${{ secrets.CLOUDFLARE_R2_BUCKET }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           aws s3 cp build/dist/Simbrain*.dmg s3://$CLOUDFLARE_R2_BUCKET/ --endpoint-url=https://$CLOUDFLARE_ACCOUNT_ID.r2.cloudflarestorage.com
+
+  create-release:
+    needs: [prepare, build-linux, build-windows, build-macos-arm64, build-macos-x64]
+    if: |
+      always() &&
+      needs.prepare.outputs.is_release == 'true' &&
+      needs.build-linux.result == 'success' &&
+      needs.build-windows.result == 'success' &&
+      needs.build-macos-arm64.result == 'success' &&
+      needs.build-macos-x64.result == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-artifacts
+
+      - name: List artifacts
+        run: |
+          echo "Downloaded artifacts:"
+          find release-artifacts -type f -name "Simbrain*"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Simbrain ${{ needs.prepare.outputs.version }}
+          draft: true
+          generate_release_notes: true
+          files: |
+            release-artifacts/**/*.zip
+            release-artifacts/**/*.exe
+            release-artifacts/**/*.dmg
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -8,7 +8,7 @@ import java.util.*
  * This information includes version, build number, commit SHA, and build timestamp.
  */
 object BuildInfo {
-    
+
     private val buildProperties: Properties by lazy {
         val properties = Properties()
         try {
@@ -23,65 +23,65 @@ object BuildInfo {
         }
         properties
     }
-    
+
     /**
-     * The version number (e.g., "4.0.0")
+     * The version number (e.g., "4.0.0" or "4.0.0-beta1")
      */
     val version: String
         get() = buildProperties.getProperty("version", "4.0.0")
-    
+
     /**
-     * The version name (e.g., "4Beta")
+     * The version name (same as version for consistency)
      */
     val versionName: String
-        get() = buildProperties.getProperty("versionName", "4Beta")
-    
+        get() = buildProperties.getProperty("versionName", "4.0.0")
+
+    /**
+     * Whether this is a beta release (version contains "-beta")
+     */
+    val isBeta: Boolean
+        get() = buildProperties.getProperty("isBeta", "false").toBoolean()
+
     /**
      * The build number from CI/CD (e.g., "123")
      */
     val buildNumber: String
         get() = buildProperties.getProperty("buildNumber", "dev")
-    
+
     /**
      * The commit SHA (short form, e.g., "abc1234")
      */
     val commitSha: String
         get() = buildProperties.getProperty("commitSha", "unknown")
-    
+
     /**
      * The build timestamp (e.g., "20240101_120000")
      */
     val buildTimestamp: String
         get() = buildProperties.getProperty("buildTimestamp", "unknown")
-    
+
     /**
-     * Get the full version string including build number
-     * Format: "Version 4.0.0 Beta (Build 123)"
+     * Get the full version string for the About dialog
+     * Format: "Version 4.0.0" or "Version 4.0.0-beta1 Beta (Build 123)"
      */
     val fullVersionString: String
         get() {
-            val baseVersion = "Version $version Beta"
+            val betaSuffix = if (isBeta) " Beta" else ""
+            val baseVersion = "Version $version$betaSuffix"
             return if (buildNumber != "dev" && buildNumber != "unknown") {
                 "$baseVersion (Build $buildNumber)"
             } else {
                 baseVersion
             }
         }
-    
+
     /**
-     * Get the application title including build number
-     * Format: "Simbrain 4 Beta (Build 123)"
+     * Get the application title for the window title bar
+     * Format: "Simbrain 4.0.0" (simple, no build number)
      */
     val applicationTitle: String
-        get() {
-            val baseTitle = "Simbrain $versionName"
-            return if (buildNumber != "dev" && buildNumber != "unknown") {
-                "$baseTitle (Build $buildNumber)"
-            } else {
-                baseTitle
-            }
-        }
-    
+        get() = "Simbrain $version"
+
     /**
      * Get detailed build information for debugging
      */
@@ -89,6 +89,7 @@ object BuildInfo {
         get() = """
             Version: $version
             Version Name: $versionName
+            Is Beta: $isBeta
             Build Number: $buildNumber
             Commit SHA: $commitSha
             Build Timestamp: $buildTimestamp

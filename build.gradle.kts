@@ -23,8 +23,25 @@ plugins {
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
 
-val versionName = "4Beta"
-val version = "4.0.0"
+// Dynamic version from CI property or git tag, with fallback for local dev
+val version: String = project.findProperty("releaseVersion")?.toString()
+    ?: run {
+        try {
+            val stdout = ByteArrayOutputStream()
+            exec {
+                commandLine("git", "describe", "--tags", "--exact-match", "HEAD")
+                standardOutput = stdout
+                errorOutput = ByteArrayOutputStream()
+                isIgnoreExitValue = true
+            }
+            stdout.toString().trim().takeIf { it.startsWith("v") }?.removePrefix("v")
+        } catch (e: Exception) { null }
+    } ?: "4.0.0"
+
+// For consistency, versionName = version
+val versionName = version
+val isBeta = version.contains("-beta")
+
 val docs = "docs"
 val dist = "${buildDir}/dist"
 val buildMain = "${buildDir}/main"
@@ -264,6 +281,8 @@ tasks.register("generateBuildInfo") {
     
     doLast {
         println("=== BUILD INFO GENERATION ===")
+        println("Version: ${version}")
+        println("Is Beta: ${isBeta}")
         println("Build Number: ${buildNumber}")
         println("Commit SHA: ${commitSha}")
         println("Build Timestamp: ${buildTimestamp}")
@@ -275,6 +294,7 @@ tasks.register("generateBuildInfo") {
         val content = """
             version=${version}
             versionName=${versionName}
+            isBeta=${isBeta}
             buildNumber=${buildNumber}
             commitSha=${commitSha}
             buildTimestamp=${buildTimestamp}

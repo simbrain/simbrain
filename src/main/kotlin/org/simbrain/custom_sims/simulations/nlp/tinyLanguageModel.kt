@@ -271,7 +271,12 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
 
     // Separate inference layer for update actions
     val inferenceOutput = NeuronArray(tokenEmbedding.dimension).apply {
-        circleMode = size < 100
+        circleMode = size < 150
+        if (size >= 150) {
+            showWarningDialog(
+                message = "Circle mode is disabled in the \"predicted next token\" window because there are so many tokens.\n To see all nodes and labels right click and select \"toggle circle mode\".",
+            )
+        }
         gridMode = true
         labelArray = tokenEmbedding.tokens.toTypedArray()
         label = "Predicted next token"

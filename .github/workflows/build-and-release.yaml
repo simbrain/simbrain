@@ -1,14 +1,17 @@
 name: Build and Release
 
 on:
-  # Tag-triggered releases
-  push:
-    tags:
-      - 'v[0-9]+.[0-9]+.[0-9]+*'
-
-  # Manual dispatch for testing
   workflow_dispatch:
     inputs:
+      version:
+        description: 'Version (e.g., 4.0.0, 4.0.1-beta1)'
+        required: true
+        type: string
+      create_release:
+        description: 'Create GitHub Release and tag'
+        required: false
+        default: true
+        type: boolean
       build_linux:
         description: 'Build Linux'
         required: false
@@ -34,43 +37,70 @@ env:
   AWS_CLI_VERSION: "2.22.35"
 
 jobs:
-  # Prepare version and determine what to build
+  # Prepare version, create tag if needed, and determine what to build
   prepare:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     outputs:
       version: ${{ steps.version.outputs.version }}
       is_release: ${{ steps.version.outputs.is_release }}
+      tag_name: ${{ steps.version.outputs.tag_name }}
       build_linux: ${{ steps.matrix.outputs.build_linux }}
       build_windows: ${{ steps.matrix.outputs.build_windows }}
       build_macos_arm64: ${{ steps.matrix.outputs.build_macos_arm64 }}
       build_macos_x64: ${{ steps.matrix.outputs.build_macos_x64 }}
     steps:
-      - name: Determine version
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate and set version
         id: version
         run: |
-          if [[ "${{ github.ref_type }}" == "tag" ]]; then
-            VERSION="${{ github.ref_name }}"
-            VERSION="${VERSION#v}"  # Remove 'v' prefix
-            IS_RELEASE="true"
-          else
-            VERSION="4.0.0"
-            IS_RELEASE="false"
+          VERSION="${{ inputs.version }}"
+          IS_RELEASE="${{ inputs.create_release }}"
+          TAG_NAME="v${VERSION}"
+
+          # Validate version format
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+)?$ ]]; then
+            echo "Error: Invalid version format '$VERSION'. Expected format: X.Y.Z or X.Y.Z-suffix"
+            exit 1
           fi
+
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "is_release=$IS_RELEASE" >> $GITHUB_OUTPUT
-          echo "Resolved version: $VERSION, is_release: $IS_RELEASE"
+          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION, Tag: $TAG_NAME, Create Release: $IS_RELEASE"
+
+      - name: Create and push tag
+        if: inputs.create_release == true
+        run: |
+          TAG_NAME="v${{ inputs.version }}"
+
+          # Check if tag already exists
+          if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
+            echo "Error: Tag $TAG_NAME already exists!"
+            exit 1
+          fi
+
+          # Create and push tag
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag -a "$TAG_NAME" -m "Release $TAG_NAME"
+          git push origin "$TAG_NAME"
+          echo "Created and pushed tag: $TAG_NAME"
 
       - name: Determine build matrix
         id: matrix
         run: |
-          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+          if [[ "${{ inputs.create_release }}" == "true" ]]; then
             # Build all platforms for releases
             echo "build_linux=true" >> $GITHUB_OUTPUT
             echo "build_windows=true" >> $GITHUB_OUTPUT
             echo "build_macos_arm64=true" >> $GITHUB_OUTPUT
             echo "build_macos_x64=true" >> $GITHUB_OUTPUT
           else
-            # Use manual inputs
+            # Use manual inputs for test builds
             echo "build_linux=${{ inputs.build_linux }}" >> $GITHUB_OUTPUT
             echo "build_windows=${{ inputs.build_windows }}" >> $GITHUB_OUTPUT
             echo "build_macos_arm64=${{ inputs.build_macos_arm64 }}" >> $GITHUB_OUTPUT
@@ -459,7 +489,7 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}
+          tag_name: ${{ needs.prepare.outputs.tag_name }}
           name: Simbrain ${{ needs.prepare.outputs.version }}
           draft: true
           generate_release_notes: true

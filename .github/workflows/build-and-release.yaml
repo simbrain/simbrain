@@ -228,7 +228,7 @@ jobs:
           echo "VERSION=${{ needs.prepare.outputs.version }}" >> $env:GITHUB_ENV
 
       - name: Build Windows executable
-        run: ./gradlew renameWindowsExecutable -PreleaseVersion=${{ env.VERSION }} -PbuildNumber=${{ env.BUILD_NUMBER }} -PcommitSha=${{ env.COMMIT_SHA }} -PbuildTimestamp=${{ env.BUILD_TIMESTAMP }}
+        run: ./gradlew renameWindowsExecutable "-PreleaseVersion=${{ env.VERSION }}" "-PbuildNumber=${{ env.BUILD_NUMBER }}" "-PcommitSha=${{ env.COMMIT_SHA }}" "-PbuildTimestamp=${{ env.BUILD_TIMESTAMP }}"
 
       - name: Upload artifacts for release
         if: needs.prepare.outputs.is_release == 'true'

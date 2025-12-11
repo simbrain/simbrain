@@ -59,41 +59,41 @@ public class AbstractComponentFactory {
         putWorkspaceComponentFactory("Network", () -> new NetworkComponent(""));
         putGuiComponentFactory(NetworkComponent.class, NetworkDesktopComponent::new);
 
-        putWorkspaceComponentFactory("Odor World", () -> {
+        putWorkspaceComponentFactory("Odor world", () -> {
             var component = new OdorWorldComponent("");
             OdorWorldUtilsKt.addDefaultEntities(component.getWorld());
             return component;
         });
         putGuiComponentFactory(OdorWorldComponent.class, OdorWorldDesktopComponent::new);
 
-        putWorkspaceComponentFactory("Data World", () -> new DataWorldComponent(""));
+        putWorkspaceComponentFactory("Data world", () -> new DataWorldComponent(""));
         putGuiComponentFactory(DataWorldComponent.class, DataWorldDesktopComponent::new);
 
-        putWorkspaceComponentFactory("Text World", () -> new TextWorldComponent(""));
+        putWorkspaceComponentFactory("Text world", () -> new TextWorldComponent(""));
         putGuiComponentFactory(TextWorldComponent.class, TextWorldDesktopComponent::new);
 
-        putWorkspaceComponentFactory("Image World", ImageWorldComponent::new);
+        putWorkspaceComponentFactory("Image world", ImageWorldComponent::new);
         putGuiComponentFactory(ImageWorldComponent.class, ImageWorldDesktopComponent::new);
 
-        putWorkspaceComponentFactory("Sound World", () -> new SoundWorldComponent(""));
+        putWorkspaceComponentFactory("Sound world", () -> new SoundWorldComponent(""));
         putGuiComponentFactory(SoundWorldComponent.class, SoundWorldDesktopComponent::new);
 
-        putWorkspaceComponentFactory("Bar Chart", () -> new BarChartComponent(""));
+        putWorkspaceComponentFactory("Bar chart", () -> new BarChartComponent(""));
         putGuiComponentFactory(BarChartComponent.class, BarChartDesktopComponent::new);
 
         putWorkspaceComponentFactory("Histogram", () -> new HistogramComponent(""));
         putGuiComponentFactory(HistogramComponent.class, HistogramDesktopComponent::new);
 
-        putWorkspaceComponentFactory("Pie Chart", () -> new PieChartComponent(""));
+        putWorkspaceComponentFactory("Pie chart", () -> new PieChartComponent(""));
         putGuiComponentFactory(PieChartComponent.class, PieChartDesktopComponent::new);
 
-        putWorkspaceComponentFactory("Pixel Plot", () -> new PixelPlotComponent(""));
+        putWorkspaceComponentFactory("Pixel plot", () -> new PixelPlotComponent(""));
         putGuiComponentFactory(PixelPlotComponent.class, PixelPlotDesktopComponent::new);
 
-        putWorkspaceComponentFactory("Projection Plot", () -> new ProjectionComponent(""));
+        putWorkspaceComponentFactory("Projection plot", () -> new ProjectionComponent(""));
         putGuiComponentFactory(ProjectionComponent.class, ProjectionDesktopComponent::new);
 
-        putWorkspaceComponentFactory("Time Series", () -> {
+        putWorkspaceComponentFactory("Time series", () -> {
             var plot = new TimeSeriesPlotComponent("");
             for (int i = 0; i < 3; i++) {
                 plot.getModel().addTimeSeries();
@@ -102,7 +102,7 @@ public class AbstractComponentFactory {
         });
         putGuiComponentFactory(TimeSeriesPlotComponent.class, TimeSeriesDesktopComponent::new);
 
-        putWorkspaceComponentFactory("Raster Plot", () -> new RasterPlotComponent(""));
+        putWorkspaceComponentFactory("Raster plot", () -> new RasterPlotComponent(""));
         putGuiComponentFactory(RasterPlotComponent.class, RasterPlotDesktopComponent::new);
 
         putWorkspaceComponentFactory("Document viewer", DocViewerComponent::new);

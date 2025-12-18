@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Simbrain
+Comment=Build, run, and analyze neural networks
+Exec=simbrain
+Icon=simbrain
+Categories=Science;Education;Development;
+Terminal=false
+StartupWMClass=org-simbrain-workspace-gui-Splasher
+Keywords=neural;network;simulation;ai;machine learning;

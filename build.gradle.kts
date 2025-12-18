@@ -48,6 +48,7 @@ val buildMain = "${buildDir}/main"
 
 val includeAllPlatforms = project.findProperty("includeAllPlatforms")?.toString()?.toBoolean() ?: false
 val versionSuffixString = project.findProperty("versionSuffix")?.toString() ?: ""
+val linuxArch: String? = project.findProperty("linuxArch")?.toString()  // "x86_64" or "aarch64" for AppImage builds
 
 // Build information from CI/CD
 val buildNumber = project.findProperty("buildNumber")?.toString() ?: "dev"
@@ -129,6 +130,16 @@ dependencies {
             "org.bytedeco:arpack-ng:${arpackVersion}:linux-arm64",
             "org.bytedeco:arpack-ng:${arpackVersion}:linux-x86_64"
         ),
+        "linux-x86_64" to listOf(
+            "org.bytedeco:openblas:${openBlasVersion}:linux-x86_64",
+            "org.bytedeco:javacpp:${javacppVersion}:linux-x86_64",
+            "org.bytedeco:arpack-ng:${arpackVersion}:linux-x86_64"
+        ),
+        "linux-aarch64" to listOf(
+            "org.bytedeco:openblas:${openBlasVersion}:linux-arm64",
+            "org.bytedeco:javacpp:${javacppVersion}:linux-arm64",
+            "org.bytedeco:arpack-ng:${arpackVersion}:linux-arm64"
+        ),
         "windows" to listOf(
             "org.bytedeco:openblas:${openBlasVersion}:windows-x86_64",
             "org.bytedeco:javacpp:${javacppVersion}:windows-x86_64",
@@ -137,16 +148,15 @@ dependencies {
     )
 
     if (includeAllPlatforms) {
-        platformSpecificDependencies.values.flatten().forEach(::implementation)
+        platformSpecificDependencies.values.flatten().distinct().forEach(::implementation)
     } else {
-        when {
+        val platformKey = when {
             OperatingSystem.current().isMacOsX -> "macosx"
-            OperatingSystem.current().isLinux -> "linux"
+            OperatingSystem.current().isLinux -> linuxArch?.let { "linux-$it" } ?: "linux"
             OperatingSystem.current().isWindows -> "windows"
             else -> throw GradleException("Unsupported platform: ${OperatingSystem.current().name}")
-        }.let {
-            platformSpecificDependencies[it]!!.forEach(::implementation)
         }
+        platformSpecificDependencies[platformKey]!!.forEach(::implementation)
     }
 
     // JUnit
@@ -688,6 +698,209 @@ tasks.register<Zip>("createZip") {
     from(runScriptFile) {
         into(dir)
         rename { "run.sh" }
+    }
+}
+
+// ============================================================
+// AppImage Build Configuration
+// ============================================================
+
+val appImageDir = "${buildDir}/appimage"
+val appDirPath = "${appImageDir}/Simbrain.AppDir"
+
+// Determine target architecture for AppImage (defaults to x86_64)
+val appImageArch: String = linuxArch ?: "x86_64"
+
+// JRE download URLs for Adoptium Temurin 17
+val temurinJreUrls = mapOf(
+    "x86_64" to "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.13%2B11/OpenJDK17U-jre_x64_linux_hotspot_17.0.13_11.tar.gz",
+    "aarch64" to "https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.13%2B11/OpenJDK17U-jre_aarch64_linux_hotspot_17.0.13_11.tar.gz"
+)
+
+// AppImageTool URLs
+val appImageToolUrls = mapOf(
+    "x86_64" to "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage",
+    "aarch64" to "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-aarch64.AppImage"
+)
+
+/**
+ * Downloads the JRE for AppImage bundling
+ */
+tasks.register("downloadJreForAppImage") {
+    val jreUrl = temurinJreUrls[appImageArch] ?: throw GradleException("Unsupported architecture: $appImageArch")
+    val jreDownloadDir = file("${buildDir}/jre-download")
+    val jreTarball = file("${jreDownloadDir}/jre-${appImageArch}.tar.gz")
+    val jreExtractDir = file("${buildDir}/jre-${appImageArch}")
+
+    outputs.dir(jreExtractDir)
+
+    doLast {
+        jreDownloadDir.mkdirs()
+
+        if (!jreTarball.exists()) {
+            println("Downloading JRE 17 for ${appImageArch}...")
+            ant.withGroovyBuilder {
+                "get"("src" to jreUrl, "dest" to jreTarball, "verbose" to true)
+            }
+        }
+
+        println("Extracting JRE...")
+        jreExtractDir.deleteRecursively()
+        jreExtractDir.mkdirs()
+
+        exec {
+            commandLine("tar", "-xzf", jreTarball.absolutePath,
+                "-C", jreExtractDir.absolutePath,
+                "--strip-components=1")
+        }
+
+        println("JRE extracted to: ${jreExtractDir.absolutePath}")
+    }
+}
+
+/**
+ * Downloads appimagetool for the target architecture
+ */
+tasks.register("downloadAppImageTool") {
+    val toolUrl = appImageToolUrls[appImageArch] ?: throw GradleException("Unsupported architecture: $appImageArch")
+    val toolsDir = file("${buildDir}/appimage-tools")
+    val toolPath = file("${toolsDir}/appimagetool")
+
+    outputs.file(toolPath)
+
+    doLast {
+        toolsDir.mkdirs()
+
+        if (!toolPath.exists()) {
+            println("Downloading appimagetool for ${appImageArch}...")
+            ant.withGroovyBuilder {
+                "get"("src" to toolUrl, "dest" to toolPath, "verbose" to true)
+            }
+            toolPath.setExecutable(true)
+        }
+    }
+}
+
+/**
+ * Creates the AppDir structure with all required files
+ */
+tasks.register("prepareAppDir") {
+    dependsOn("shadowJar", "downloadJreForAppImage", "generateBuildInfo")
+
+    val jreDir = file("${buildDir}/jre-${appImageArch}")
+    val appDir = file(appDirPath)
+
+    doLast {
+        // Clean previous AppDir
+        appDir.deleteRecursively()
+        appDir.mkdirs()
+
+        // Create directory structure
+        file("${appDir}/usr/lib").mkdirs()
+        file("${appDir}/usr/share/applications").mkdirs()
+        file("${appDir}/usr/share/icons/hicolor/512x512/apps").mkdirs()
+        file("${appDir}/usr/share/licenses/simbrain").mkdirs()
+        file("${appDir}/usr/simulations").mkdirs()
+
+        // Copy Simbrain.jar
+        copy {
+            from("${buildDir}/libs/Simbrain.jar")
+            into("${appDir}/usr/lib")
+        }
+
+        // Copy simulations folder
+        copy {
+            from("simulations")
+            into("${appDir}/usr/simulations")
+            exclude("**/*.zip")
+        }
+
+        // Copy license
+        copy {
+            from("etc/License.txt")
+            into("${appDir}/usr/share/licenses/simbrain")
+        }
+
+        // Copy icon to root (for AppImage)
+        copy {
+            from("src/main/resources/simbrain_iconset/icon_512x512.png")
+            into(appDir)
+            rename { "simbrain.png" }
+        }
+
+        // Copy icon to hicolor directory
+        copy {
+            from("src/main/resources/simbrain_iconset/icon_512x512.png")
+            into("${appDir}/usr/share/icons/hicolor/512x512/apps")
+            rename { "simbrain.png" }
+        }
+
+        // Copy desktop file to root (for AppImage)
+        copy {
+            from("etc/appimage/simbrain.desktop")
+            into(appDir)
+        }
+
+        // Copy desktop file to applications directory
+        copy {
+            from("etc/appimage/simbrain.desktop")
+            into("${appDir}/usr/share/applications")
+        }
+
+        // Copy AppRun script
+        copy {
+            from("etc/appimage/AppRun")
+            into(appDir)
+        }
+        file("${appDir}/AppRun").setExecutable(true, false)
+
+        // Copy JRE into AppDir
+        println("Copying JRE into AppDir...")
+        copy {
+            from(jreDir)
+            into("${appDir}/jre")
+        }
+
+        // Ensure java binary is executable
+        file("${appDir}/jre/bin/java").setExecutable(true, false)
+
+        println("AppDir prepared at: ${appDir.absolutePath}")
+    }
+}
+
+/**
+ * Creates the AppImage using appimagetool
+ */
+tasks.register<Exec>("createAppImage") {
+    dependsOn("prepareAppDir", "downloadAppImageTool")
+
+    val archSuffix = appImageArch
+    val appDir = file(appDirPath)
+    val outputDir = file(dist)
+    val appImageName = "Simbrain${versionName}${versionSuffixString}-${archSuffix}.AppImage"
+    val appImagePath = file("${outputDir}/${appImageName}")
+    val toolPath = file("${buildDir}/appimage-tools/appimagetool")
+
+    outputs.file(appImagePath)
+
+    doFirst {
+        outputDir.mkdirs()
+
+        // Set ARCH environment variable for appimagetool
+        environment("ARCH", archSuffix)
+    }
+
+    // Use --appimage-extract-and-run for CI environments without FUSE
+    commandLine(
+        toolPath.absolutePath,
+        "--appimage-extract-and-run",
+        appDir.absolutePath,
+        appImagePath.absolutePath
+    )
+
+    doLast {
+        println("AppImage created: ${appImagePath.absolutePath}")
+        println("Size: ${appImagePath.length() / 1024 / 1024} MB")
     }
 }
 

@@ -155,20 +155,11 @@ jobs:
           echo "BUILD_TIMESTAMP=$(date -u +%Y%m%d_%H%M%S)" >> $GITHUB_ENV
           echo "VERSION=${{ needs.prepare.outputs.version }}" >> $GITHUB_ENV
 
-      - name: Build standard zip
-        run: ./gradlew createZip -PreleaseVersion=$VERSION -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
-
-      - name: Copy standard build artifacts
-        run: cp build/dist/Simbrain*.zip $GITHUB_WORKSPACE
-
-      - name: Clean for full build
-        run: ./gradlew clean
-
-      - name: Build full zip
+      - name: Build full zip (all platforms)
         run: ./gradlew createZip -PreleaseVersion=$VERSION -PversionSuffix="_full" -PincludeAllPlatforms=true -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
 
-      - name: Copy full build artifacts
-        run: cp build/dist/Simbrain*_full.zip "$GITHUB_WORKSPACE"
+      - name: Copy build artifacts
+        run: cp build/dist/Simbrain*.zip "$GITHUB_WORKSPACE"
 
       - name: Upload artifacts for release
         if: needs.prepare.outputs.is_release == 'true'
@@ -193,6 +184,148 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           for file in $GITHUB_WORKSPACE/Simbrain*.zip; do
+            aws s3 cp "$file" "s3://$CLOUDFLARE_R2_BUCKET/" --endpoint-url=https://$CLOUDFLARE_ACCOUNT_ID.r2.cloudflarestorage.com
+          done
+
+  build-linux-appimage-x64:
+    needs: prepare
+    if: needs.prepare.outputs.build_linux == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Setup AWS CLI
+        run: |
+          sudo rm -rf /usr/local/aws-cli /usr/local/bin/aws /usr/local/bin/aws_completer /usr/local/bin/aws-cli /usr/local/bin/aws-cli-plugin
+          sudo apt-get remove -y awscli || true
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${{ env.AWS_CLI_VERSION }}.zip" -o "awscliv2.zip"
+          unzip -q awscliv2.zip
+          sudo ./aws/install
+          aws --version
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Install AppImage dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfuse2
+
+      - name: Generate build info
+        run: |
+          echo "BUILD_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
+          echo "COMMIT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "BUILD_TIMESTAMP=$(date -u +%Y%m%d_%H%M%S)" >> $GITHUB_ENV
+          echo "VERSION=${{ needs.prepare.outputs.version }}" >> $GITHUB_ENV
+
+      - name: Build AppImage x86_64
+        run: ./gradlew createAppImage -PlinuxArch=x86_64 -PreleaseVersion=$VERSION -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
+
+      - name: Copy build artifacts
+        run: cp build/dist/Simbrain*.AppImage "$GITHUB_WORKSPACE"
+
+      - name: Upload artifacts for release
+        if: needs.prepare.outputs.is_release == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-appimage-x64-artifacts
+          path: ${{ github.workspace }}/Simbrain*.AppImage
+          retention-days: 1
+
+      - name: Configure AWS CLI
+        env:
+          R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
+          R2_SECRET_KEY: ${{ secrets.R2_SECRET_KEY }}
+        run: |
+          aws configure set aws_access_key_id $R2_ACCESS_KEY
+          aws configure set aws_secret_access_key $R2_SECRET_KEY
+          aws configure set default.region auto
+
+      - name: Upload to Cloudflare R2
+        env:
+          CLOUDFLARE_R2_BUCKET: ${{ secrets.CLOUDFLARE_R2_BUCKET }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          for file in $GITHUB_WORKSPACE/Simbrain*.AppImage; do
+            aws s3 cp "$file" "s3://$CLOUDFLARE_R2_BUCKET/" --endpoint-url=https://$CLOUDFLARE_ACCOUNT_ID.r2.cloudflarestorage.com
+          done
+
+  build-linux-appimage-arm64:
+    needs: prepare
+    if: needs.prepare.outputs.build_linux == 'true'
+    runs-on: ubuntu-24.04-arm
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Setup AWS CLI
+        run: |
+          sudo rm -rf /usr/local/aws-cli /usr/local/bin/aws /usr/local/bin/aws_completer /usr/local/bin/aws-cli /usr/local/bin/aws-cli-plugin
+          sudo apt-get remove -y awscli || true
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64-${{ env.AWS_CLI_VERSION }}.zip" -o "awscliv2.zip"
+          unzip -q awscliv2.zip
+          sudo ./aws/install
+          aws --version
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Install AppImage dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libfuse2
+
+      - name: Generate build info
+        run: |
+          echo "BUILD_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
+          echo "COMMIT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "BUILD_TIMESTAMP=$(date -u +%Y%m%d_%H%M%S)" >> $GITHUB_ENV
+          echo "VERSION=${{ needs.prepare.outputs.version }}" >> $GITHUB_ENV
+
+      - name: Build AppImage aarch64
+        run: ./gradlew createAppImage -PlinuxArch=aarch64 -PreleaseVersion=$VERSION -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
+
+      - name: Copy build artifacts
+        run: cp build/dist/Simbrain*.AppImage "$GITHUB_WORKSPACE"
+
+      - name: Upload artifacts for release
+        if: needs.prepare.outputs.is_release == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-appimage-arm64-artifacts
+          path: ${{ github.workspace }}/Simbrain*.AppImage
+          retention-days: 1
+
+      - name: Configure AWS CLI
+        env:
+          R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
+          R2_SECRET_KEY: ${{ secrets.R2_SECRET_KEY }}
+        run: |
+          aws configure set aws_access_key_id $R2_ACCESS_KEY
+          aws configure set aws_secret_access_key $R2_SECRET_KEY
+          aws configure set default.region auto
+
+      - name: Upload to Cloudflare R2
+        env:
+          CLOUDFLARE_R2_BUCKET: ${{ secrets.CLOUDFLARE_R2_BUCKET }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          for file in $GITHUB_WORKSPACE/Simbrain*.AppImage; do
             aws s3 cp "$file" "s3://$CLOUDFLARE_R2_BUCKET/" --endpoint-url=https://$CLOUDFLARE_ACCOUNT_ID.r2.cloudflarestorage.com
           done
 
@@ -474,11 +607,13 @@ jobs:
           aws s3 cp build/dist/Simbrain*.dmg s3://$CLOUDFLARE_R2_BUCKET/ --endpoint-url=https://$CLOUDFLARE_ACCOUNT_ID.r2.cloudflarestorage.com
 
   create-release:
-    needs: [prepare, build-linux, build-windows, build-macos-arm64, build-macos-x64]
+    needs: [prepare, build-linux, build-linux-appimage-x64, build-linux-appimage-arm64, build-windows, build-macos-arm64, build-macos-x64]
     if: |
       always() &&
       needs.prepare.outputs.is_release == 'true' &&
       needs.build-linux.result == 'success' &&
+      needs.build-linux-appimage-x64.result == 'success' &&
+      needs.build-linux-appimage-arm64.result == 'success' &&
       needs.build-windows.result == 'success' &&
       needs.build-macos-arm64.result == 'success' &&
       needs.build-macos-x64.result == 'success'
@@ -511,5 +646,6 @@ jobs:
             release-artifacts/**/*.zip
             release-artifacts/**/*.exe
             release-artifacts/**/*.dmg
+            release-artifacts/**/*.AppImage
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

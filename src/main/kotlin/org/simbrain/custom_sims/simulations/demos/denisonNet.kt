@@ -64,8 +64,10 @@ val denisonNet = newSim {
     val netComponent = addNetworkComponent("Denison Net")
     val net = netComponent.network
 
-    val currentStatus = NetworkTextObject("").apply { fontSize = 18 }
-    val modelDecision = NetworkTextObject("").apply { fontSize = 18 }
+    val t1Stimulus = NetworkTextObject("").apply { fontSize = 18 }
+    val t1Decision = NetworkTextObject("").apply { fontSize = 18 }
+    val t2Stimulus = NetworkTextObject("").apply { fontSize = 18 }
+    val t2Decision = NetworkTextObject("").apply { fontSize = 18 }
 
     val sensory1 = net.addNeuronGroup(12).apply {
         label = "Sensory"
@@ -90,7 +92,7 @@ val denisonNet = newSim {
     iaLayer.setLowerBound(-0.02)
     iaLayer.setUpperBound(0.02)
 
-    net.addNetworkModels(sensory1, sensory2, decision, vaLayer, iaLayer, modelDecision, currentStatus)
+    net.addNetworkModels(sensory1, sensory2, decision, vaLayer, iaLayer, t1Stimulus, t1Decision, t2Stimulus, t2Decision)
 
     val imageWorldComponent = addImageWorld("Gratings")
     val imageWorld = imageWorldComponent.world
@@ -98,14 +100,22 @@ val denisonNet = newSim {
     val background = DoubleArray(10000) { 0.0 }.toGrayScaleImage(100, 100)
     imageWorld.imageAlbum.addImage(background)
 
-    val (plot, IASeries, VASeries) = addTimeSeries("Attention", seriesNames = listOf("Involuntary Attention", "Voluntary Attention"))
-    plot.apply {
+    val (attentionPlot, IASeries, VASeries) = addTimeSeries("Attention", seriesNames = listOf("Involuntary Attention", "Voluntary Attention"))
+    attentionPlot.apply {
+        model.isAutoRange = true
+        model.fixedWidth = false
+    }
+
+    val (decisionPlot, Decision1Series, Decision2Series) = addTimeSeries("Decisions", seriesNames = listOf("Pattern 1", "Pattern 2"))
+    decisionPlot.apply {
         model.isAutoRange = true
         model.fixedWidth = false
     }
 
     val IAPlot = couplingManager.createCoupling(iaLayer.getNeuron(0), IASeries)
     val VAPlot = couplingManager.createCoupling(vaLayer.getNeuron(0), VASeries)
+    val Decision1Plot = couplingManager.createCoupling(decision.getNeuron(0), Decision1Series)
+    val Decision2Plot = couplingManager.createCoupling(decision.getNeuron(1), Decision2Series)
 
     val m = 2 * sensory1.size - 1
     val pref_orientations = DoubleArray(12) { i -> i * PI / 12 }
@@ -118,7 +128,7 @@ val denisonNet = newSim {
     }
 
     var w_D = DoubleArray(12) { 0.0 }
-    var SOA = 0
+    var SOA = 300
     var T1 = 0
     var T2 = 0
     var currentTarget = -1
@@ -222,13 +232,19 @@ val denisonNet = newSim {
     withGui {
         place(netComponent, 200, 15, 492, 447)
         place(imageWorldComponent, 690, 15, 503, 447)
-        place(plot, 303, 450, 500, 300)
+        place(attentionPlot, 80, 450, 500, 300)
+        place(decisionPlot, 600, 450, 500, 300)
 
-        currentStatus.location = point(145, -240)
-        modelDecision.location = point(145, -180)
+        // Text positioning variables for easy adjustment
+        var textOffsetX = 0.0
+        var textOffsetY = -240.0
+        t1Stimulus.location = point(textOffsetX, textOffsetY)
+        t1Decision.location = point(textOffsetX + 400, textOffsetY)
+        t2Stimulus.location = point(textOffsetX, textOffsetY - 40)
+        t2Decision.location = point(textOffsetX + 400, textOffsetY - 40)
 
-        sensory1.location = point(0.0, 100.0)
-        sensory2.location = point(220.0, 100.0)
+        sensory1.location = point(-10.0, 100.0)
+        sensory2.location = point(230.0, 100.0)
         decision.location = point(440.0, 100.0)
         vaLayer.location = point(44.0, -97.0)
         iaLayer.location = point(370.0, -97.0)
@@ -237,7 +253,6 @@ val denisonNet = newSim {
         data class menuMap(val name: String, val state: Int) {
             override fun toString() = name
         }
-
 
         val cueTypes = listOf(
             menuMap("Both", 0),
@@ -254,7 +269,6 @@ val denisonNet = newSim {
             menuMap("600", 600),
             menuMap("700", 700),
             menuMap("800", 800),
-
         )
 
         createControlPanel("Control Panel", 15, 15) {
@@ -264,22 +278,35 @@ val denisonNet = newSim {
             }
             addSeparator()
             addLabel("SOA")
-            addComboBox("", SOADurs, SOADurs[0]) {selectedSOA ->
+            addComboBox("", SOADurs, SOADurs[2]) {selectedSOA ->
                 SOA = selectedSOA.state
             }
 
             workspace.updater.updateManager.clear()
             workspace.updater.updateManager.addAction(UpdateCoupling(VAPlot))
             workspace.updater.updateManager.addAction(UpdateCoupling(IAPlot))
+            workspace.updater.updateManager.addAction(UpdateCoupling(Decision1Plot))
+            workspace.updater.updateManager.addAction(UpdateCoupling(Decision2Plot))
 
             addButton("Start") {
                 workspace.launch {
-                    plot.model.clearData()
-                    currentStatus.text = ""
-                    modelDecision.text = ""
+                    attentionPlot.model.clearData()
+                    decisionPlot.model.clearData()
+                    t1Stimulus.text = ""
+                    t1Decision.text = ""
+                    t2Stimulus.text = ""
+                    t2Decision.text = ""
 
                     T1 = Random.nextInt(0, 24)
                     T2 = Random.nextInt(0, 24)
+
+                    val T1Direction = if (T1 < 12) "counterclockwise" else "clockwise"
+                    val T2Direction = if (T2 < 12) "counterclockwise" else "clockwise"
+                    val T1Angle = grat_orientations[T1].toDegrees().roundTo(2)
+                    val T2Angle = grat_orientations[T2].toDegrees().roundTo(2)
+
+                    t1Stimulus.text = "Stimulus (t1): $T1Direction (${T1Angle}°)"
+                    t2Stimulus.text = "Stimulus (t2): $T2Direction (${T2Angle}°)"
 
                     val t_R = 918.0
                     totalAttention = 1 + min(SOA.toDouble() / t_R, 1.0)
@@ -306,26 +333,30 @@ val denisonNet = newSim {
                     workspace.resetTime()
 
                     while (workspace.time < (init_t + 1100) / dt) {
-                        // Record sensory1 history
                         s1History.add(sensory1.activations.toDoubleArray())
                         if (s1History.size > maxHist) s1History.removeAt(0)
 
                         if (workspace.time < init_t / dt) {
-                            currentStatus.text = "No stimulus"
                             currentTarget = -1; imageWorld.setFrame(24)
                         } else if (workspace.time < (init_t + 30) / dt) {
-                            currentStatus.text = "Pattern 1 (${grat_orientations[T1].toDegrees().roundTo(2)}°)"
                             currentTarget = T1; imageWorld.setFrame(T1)
                         } else if (workspace.time < (init_t + 30 + SOA) / dt) {
-                            currentStatus.text = "No stimulus"
                             currentTarget = -1; imageWorld.setFrame(24)
                         } else if (workspace.time < (init_t + 60 + SOA) / 2) {
-                            currentStatus.text = "Pattern 2 (${grat_orientations[T2].toDegrees().roundTo(2)}°)"
                             currentTarget = T2; imageWorld.setFrame(T2)
                         } else {
-                            currentStatus.text = "No stimulus"
                             currentTarget = -1; imageWorld.setFrame(24)
                         }
+
+                        val T1DecisionText = if (decision.getNeuron(0).activation > 0) "clockwise" 
+                                        else if (decision.getNeuron(0).activation < 0) "counterclockwise"
+                                        else "none"
+                        val T2DecisionText = if (decision.getNeuron(1).activation > 0) "clockwise"
+                                        else if (decision.getNeuron(1).activation < 0) "counterclockwise"
+                                        else "none"
+
+                        t1Decision.text = "Current decision: $T1DecisionText"
+                        t2Decision.text = "Current decision: $T2DecisionText"
 
                         val newS1 = calculateActivations(Layer.S1)
                         val newS2 = calculateActivations(Layer.S2)
@@ -341,16 +372,6 @@ val denisonNet = newSim {
 
                         workspace.iterateSuspend()
                     }
-
-                    val T1GroundTruth = if (T1 < 12) "Counterclockwise" else "Clockwise"
-                    val T2GroundTruth = if (T2 < 12) "Counterclockwise" else "Clockwise"
-                    val T1decision = if (decision.getNeuron(0).activation > 0) "Clockwise" else "Counterclockwise"
-                    val T2decision = if (decision.getNeuron(1).activation > 0) "Clockwise" else "Counterclockwise"
-
-                    modelDecision.text = """
-                        Pattern 1: $T1GroundTruth       Pattern 1 decision: $T1decision
-                        Pattern 2: $T2GroundTruth       Pattern 2 decision: $T2decision
-                    """
                 }
             }
         }
@@ -370,21 +391,21 @@ addSidebarInfo(
 
         # Simulation Details
 
-        The model consists of five layers that process visual input and make decisions:
+        The model consists of five layers that process visual input and make decisions.
 
         ## Network Architecture
 
-        - **Sensory Layer**: 12 neurons, each tuned to a different orientation (0°, 30°, 60°, etc.). When a grating pattern appears, the neuron matching that orientation activates most strongly, with nearby orientations showing weaker responses.
+        - Sensory Layer: 12 neurons, each tuned to a different orientation (0°, 30°, 60°, etc.). When a grating pattern appears, the neuron matching that orientation activates most strongly, with nearby orientations showing weaker responses.
 
-        - **Sustained Response Layer**: 12 neurons that maintain prolonged activation after the sensory layer responds. These sustained activations are what get accumulated in the decision layer.
+        - Sustained Response Layer: 12 neurons that maintain prolonged activation after the sensory layer responds. These sustained activations are what get accumulated in the decision layer.
 
-        - **Decision Layer**: 2 neurons that accumulate evidence for each pattern. Positive activation indicates clockwise rotation, negative indicates counterclockwise. The strength of activation reflects the model's confidence.
+        - Decision Layer: 2 neurons that accumulate evidence for each pattern. Positive activation indicates clockwise rotation, negative indicates counterclockwise. The strength of activation reflects the model's confidence.
 
-        - **Voluntary Attention**: A single neuron controlled by the attention cue selected in the control panel. It enhances processing in the sensory layer based on which pattern is cued.
+        - Voluntary Attention: A single neuron controlled by the attention cue selected in the control panel. It enhances processing in the sensory layer based on which pattern is cued.
 
-        - **Involuntary Attention**: A single neuron driven by the stimulus itself. It responds automatically to pattern onsets regardless of the cue, and also enhances processing in the sensory layer.
+        - Involuntary Attention: A single neuron driven by the stimulus itself. It responds automatically to pattern onsets regardless of the cue, and also enhances processing in the sensory layer.
 
-        ## How Attention Works
+        ## How Attention Works in the Model
 
         Both attention systems modulate the gain of the sensory layer: they multiply the overall activation level. Voluntary attention is determined by your cue selection. Involuntary attention is stimulus-driven and responds to any visual pattern onset.
 
@@ -392,37 +413,37 @@ addSidebarInfo(
 
         ## Run a Trial
 
-        1. Select an `Attention Cue` from the dropdown in the control panel.
+        1. Select an `Attention Cue` and SOA (delay between stimuli) from the dropdown in the control panel.
         2. Click `Start` to run a trial
         3. Watch the simulation unfold
 
         ## What to Observe
 
-        **Stimulus Presentation**: The status text shows which pattern is currently being displayed:
-        - Initially: "No stimulus"
-        - First pattern appears briefly with its orientation angle
-        - Gap with no stimulus
-        - Second pattern appears briefly with its orientation angle
-        - Final period with no stimulus
+        Sensory Responses: Watch the sensory layer activate when patterns appear, and the sustained response layer show a fading echo of sensory activations. The neuron corresponding to the pattern's orientation will activate most strongly.
 
-        **Sensory Responses**: Watch the sensory layer activate when patterns appear, and the sustained response show a fading echo of sensory activations. The neuron corresponding to the pattern's orientation will activate most strongly.
-
-        **Attention Dynamics**: The `Attention` plot to see how voluntary and involuntary attention unfold over time. Notice:
+        Attention Dynamics: The `Attention` time series plot shows how voluntary and involuntary attention unfold over time. Notice:
         - When involuntary attention spikes (at pattern onsets)
         - How voluntary attention is allocated to one pattern or the other based on the cue you selected
         - The interaction between the two attention systems
 
-        **Decision Formation**: Observe the `Decision` layer neurons accumulate evidence for each pattern. The final decision appears at the bottom of the network display, showing the model's judgment at the end of the trial, as well as the correct "ground truth" answer.
-        If the two match, then the person made a correct decision.
+        Decision Formation: The `Decisions` time series plot shows how the two decision neurons accumulate evidence for each pattern over time. Positive activation indicates clockwise rotation, negative indicates counterclockwise. Watch how the decisions evolve as the model processes each stimulus and makes its judgment.
+        
+        Behavior: Text at the top of the network shows which stimulus patterns is presented at time 1 and time 2, along with the model's current decision for each pattern. 
 
         ## Experiment
 
         Try different attention cues and observe how they affect:
         - The decision layer activation strengths (model confidence)
-        - The voluntary attention trace in the plot
+        - The voluntary attention trace in the `Attention` plot
         - Whether the model makes correct decisions
 
-        Run multiple trials with the same cue to see how random variation in stimulus timing (SOA) affects attention allocation.
+        Run multiple trials with the same cue to see how random variation in stimulus patterns affects the model's performance.
+
+        Try different `SOA` (stimulus onset asynchrony) values to see how the timing between the two patterns affects attention allocation and decision accuracy.
+
+        ## Performance Tip
+
+        For better performance during trials, minimize the time series windows (`Attention` and `Decisions`). The simulation will run faster when these plots are not actively rendering.
 
         # References
 

@@ -47,9 +47,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
     var strength: Double
         get() = _strength
         set(wt) {
-            if (!clamped) {
-                _strength = source.polarity.value(wt).coerceIn(lowerBound, upperBound)
-            }
+            _strength = source.polarity.value(wt).coerceIn(lowerBound, upperBound)
             events.strengthUpdated.fire()
         }
 

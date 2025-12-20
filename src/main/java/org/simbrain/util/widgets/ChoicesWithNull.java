@@ -63,7 +63,6 @@ public class ChoicesWithNull extends JComboBox {
     public void removeNull() {
         if (hasNull) {
             removeItem(SimbrainConstants.NULL_STRING);
-            setSelectedIndex(getItemCount() - 1);
             hasNull = false;
         }
     }

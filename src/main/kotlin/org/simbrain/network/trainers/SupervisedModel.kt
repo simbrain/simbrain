@@ -165,13 +165,14 @@ class SupervisedModel(
         val output = outputLayer.activations.toDoubleArray()
 
         inputLayer.isClamped = true
-        trainingSet = TrainingDataset(
-            inputs = inputLayer.activations.transpose().clone().toMutableListOfLists(),
-            targets = Matrix.row(output).toMutableListOfLists(),
-            inputSize = inputLayer.size,
-            targetSize = outputLayer.size
-        )
-        SupervisedTrainer(this@Network, this@SupervisedModel).trainOnce()
+
+        val newInput = inputLayer.activations.transpose().clone().toMutableListOfLists()[0]
+        val newTarget = Matrix.row(output).toMutableListOfLists()[0]
+        trainingSet.inputs.add(newInput)
+        trainingSet.targets.add(newTarget)
+
+        val newRowIndex = trainingSet.size - 1
+        SupervisedTrainer(this@Network, this@SupervisedModel).trainBatch(newRowIndex until newRowIndex + 1)
 
         inputLayer.isClamped = isInputClamped
         outputLayer.setActivations(output)

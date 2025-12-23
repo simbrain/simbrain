@@ -22,6 +22,7 @@ import org.simbrain.custom_sims.simulations.patterns_of_activity.iacJetsSharks5P
 import org.simbrain.custom_sims.simulations.psychology.heatColdSim
 import org.simbrain.custom_sims.simulations.psychology.spiveyNet
 import org.simbrain.custom_sims.simulations.rl.braitenbergRL
+import org.simbrain.custom_sims.simulations.temp.attentionAsGain
 import org.simbrain.util.StructureDir
 import org.simbrain.util.dir
 
@@ -174,10 +175,9 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Photo album (100 x 100)") { photoAlbumExample }
     }
 
-    //dir("Temp") {
-    //     item("Activation sequence (2 layers)") { activationSequenceTwoLayer }
-    //     item("Activation sequence (3 layers)") { activationSequenceThreeLayer }
-    // }
+    dir("Temp") {
+        item("Attention as gain") { attentionAsGain }
+    }
 
     //dir("Testing") {
     //    // item("Test Sim") { testSim }

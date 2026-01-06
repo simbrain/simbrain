@@ -14,6 +14,7 @@ import org.simbrain.custom_sims.simulations.dynamical_systems.lorenzSystem
 import org.simbrain.custom_sims.simulations.dynamical_systems.lorenzSystemSimbrain
 import org.simbrain.custom_sims.simulations.edge_of_chaos.edgeOfChaos
 import org.simbrain.custom_sims.simulations.edge_of_chaos.edgeOfChaosBitStream
+import org.simbrain.custom_sims.simulations.imageworld.attentionAsGain
 import org.simbrain.custom_sims.simulations.neuroscience.corticalLayers
 import org.simbrain.custom_sims.simulations.neuroscience.spikingNetworkSimulation
 import org.simbrain.custom_sims.simulations.nlp.tinyLanguageModel
@@ -22,7 +23,6 @@ import org.simbrain.custom_sims.simulations.patterns_of_activity.iacJetsSharks5P
 import org.simbrain.custom_sims.simulations.psychology.heatColdSim
 import org.simbrain.custom_sims.simulations.psychology.spiveyNet
 import org.simbrain.custom_sims.simulations.rl.braitenbergRL
-import org.simbrain.custom_sims.simulations.temp.attentionAsGain
 import org.simbrain.util.StructureDir
 import org.simbrain.util.dir
 
@@ -173,9 +173,6 @@ val simulations = dir("Simulations", alphabetical = true ) {
     dir("Image world") {
         item("Simple drawings (10 x 10)") { simpleImageWorld }
         item("Photo album (100 x 100)") { photoAlbumExample }
-    }
-
-    dir("Temp") {
         item("Attention as gain") { attentionAsGain }
     }
 

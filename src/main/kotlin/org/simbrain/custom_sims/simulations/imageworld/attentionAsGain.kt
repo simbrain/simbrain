@@ -17,8 +17,8 @@ val attentionAsGain = newSim {
 
     // Create image world with drawable canvas
     val imageWorldComponent = addImageWorld("Visual Input")
-    val w = 25
-    val h = 25
+    val w = 24
+    val h = 24
     val halfSize = (w * h) / 2  
     val imageWorld = imageWorldComponent.world.apply {
         resetImageAlbum(w, h)
@@ -28,47 +28,33 @@ val attentionAsGain = newSim {
         
         // Image 1: Left side pattern (vertical bars on left)
         imageAlbum.addImage(
-            (0 until h).flatMap { y ->
-                (0 until w).map { x ->
-                    when {
-                        x in listOf(3, 6, 9, 12) -> 1.0  // Vertical bars on left
-                        else -> 0.0
-                    }
-                }
+            DoubleArray(w * h) {
+                val col = it % w
+                if (col < w / 2 && col % 2 == 0) 1.0 else 0.0
             }.toGrayScaleImage(w, h)
         )
         
         // Image 2: Right side pattern (vertical bars on right)
         imageAlbum.addImage(
-            (0 until h).flatMap { y ->
-                (0 until w).map { x ->
-                    when {
-                        x in listOf(17, 20, 23, 26) -> 1.0  // Vertical bars on right
-                        else -> 0.0
-                    }
-                }
+            DoubleArray(w * h) {
+                val col = it % w
+                if (col >= w / 2 && col % 2 == 0) 1.0 else 0.0
             }.toGrayScaleImage(w, h)
         )
         
         // Image 3: Both sides pattern (vertical bars on both sides)
         imageAlbum.addImage(
-            (0 until h).flatMap { y ->
-                (0 until w).map { x ->
-                    when {
-                        x in listOf(3, 7, 11) -> 1.0     // Left bars
-                        x in listOf(18, 22, 26) -> 1.0  // Right bars
-                        else -> 0.0
-                    }
-                }
+            DoubleArray(w * h) {
+                val col = it % w
+                if (col % 2 == 0) 1.0 else 0.0
             }.toGrayScaleImage(w, h)
         )
         
         // Image 4: Horizontal line across both sides
         imageAlbum.addImage(
-            (0 until h).flatMap { y ->
-                (0 until w).map { x ->
-                    if (y == 7) 1.0 else 0.0  // Horizontal line in middle
-                }
+            DoubleArray(w * h) {
+                val row = it / w
+                if (row == h / 2) 1.0 else 0.0
             }.toGrayScaleImage(w, h)
         )
         
@@ -76,13 +62,17 @@ val attentionAsGain = newSim {
         imageAlbum.addImage(
             DoubleArray(w * h) { 0.0 }.toGrayScaleImage(w, h)
         )
+
+        // Remove the default image when the album was first created
+        imageAlbum.setFrame(0)
+        imageAlbum.deleteCurrentImage()
     }
 
     val imageInput = network.addNeuronCollection(w*h).apply {
         label = "Visual Input"
         isClamped = true
         setUpperBound(1.0)
-        layout(GridLayout(40.0, 40.0))
+        layout(GridLayout(40.0, 40.0, w))
     }
 
     // Left region neurons - process left half of image
@@ -93,7 +83,7 @@ val attentionAsGain = newSim {
         }
     }.apply {
         label = "Left Region (Unattended)"
-        layout(GridLayout(40.0, 40.0))
+        layout(GridLayout(40.0, 40.0, w / 2))
     }
 
     // Right region neurons - process right half of image
@@ -104,29 +94,31 @@ val attentionAsGain = newSim {
         }
     }.apply {
         label = "Right Region (Unattended)"
-        layout(GridLayout(40.0, 40.0))
+        layout(GridLayout(40.0, 40.0, w / 2))
     }
 
     // Connect left half of input to left region (one-to-one)
     val leftConnection = OneToOne().apply {
         percentExcitatory = 100.0
     }.connectNeurons(
-        imageInput.neuronList.take(225),
+        imageInput.neuronList.filterIndexed { index, _ -> index % w < w / 2 },
         leftRegion.neuronList
-    ).also { network.addNetworkModelsAsync(it) }
+    )
+    network.addNetworkModels(leftConnection)
 
     // Connect right half of input to right region (one-to-one)
     val rightConnection = OneToOne().apply {
         percentExcitatory = 100.0
     }.connectNeurons(
-        imageInput.neuronList.drop(225),
+        imageInput.neuronList.filterIndexed { index, _ -> index % w >= w / 2 },
         rightRegion.neuronList
-    ).also { network.addNetworkModelsAsync(it) }
+    )
+    network.addNetworkModels(rightConnection)
 
     // Layout the network with specific positions
-    imageInput.location = point(360.0, -425.0)
-    leftRegion.location = point(-144.0, 477.0)
-    rightRegion.location = point(700.0, 477.0)
+    imageInput.location = point(0.0, -500.0)
+    leftRegion.location = point(-500.0, 500.0)
+    rightRegion.location = point(500.0, 500.0)
 
     // Coupling
     with(couplingManager) {

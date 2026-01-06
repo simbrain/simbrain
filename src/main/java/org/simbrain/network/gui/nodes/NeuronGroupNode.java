@@ -17,6 +17,7 @@ import java.util.List;
 import static org.simbrain.network.gui.NetworkDialogsKt.createNeuronGroupDialog;
 import static org.simbrain.network.gui.NetworkPanelMenusKt.createCouplingMenu;
 import static org.simbrain.network.gui.NetworkPanelMenusKt.createEditNeuronGroupAction;
+import static org.simbrain.network.gui.NetworkPanelUtilsKt.createTooltipTextWithLocation;
 
 /**
  * PNode representation of a group of neurons. Contains an interaction box and
@@ -258,6 +259,14 @@ public class NeuronGroupNode extends AbstractNeuronCollectionNode {
         @Override
         public StandardDialog getPropertyDialog() {
             return NeuronGroupNode.this.getPropertyDialog();
+        }
+
+        @Override
+        public String getToolTipText() {
+            return createTooltipTextWithLocation(getModel(), true, (model) -> {
+                AbstractNeuronCollection collection = (AbstractNeuronCollection) model;
+                return "Name: " + collection.getDisplayName() + " (" + collection.getSize() + " neurons)";
+            });
         }
 
     }

@@ -16,6 +16,7 @@ import java.awt.event.KeyEvent;
 
 import static org.simbrain.network.gui.NetworkPanelMenusKt.createCouplingMenu;
 import static org.simbrain.network.gui.NetworkPanelMenusKt.createEditNeuronCollectionAction;
+import static org.simbrain.network.gui.NetworkPanelUtilsKt.createTooltipTextWithLocation;
 
 /**
  * PNode representation of a {@link NeuronCollection}.
@@ -225,6 +226,14 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
         @Override
         public JPopupMenu getContextMenu() {
             return getNCContexMenu();
+        }
+
+        @Override
+        public String getToolTipText() {
+            return createTooltipTextWithLocation(getModel(), true, (model) -> {
+                AbstractNeuronCollection collection = (AbstractNeuronCollection) model;
+                return "Name: " + collection.getDisplayName() + " (" + collection.getSize() + " neurons)";
+            });
         }
 
     }

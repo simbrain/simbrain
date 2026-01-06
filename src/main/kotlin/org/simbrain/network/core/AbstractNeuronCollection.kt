@@ -487,8 +487,9 @@ abstract class AbstractNeuronCollection : Layer(), CopyableObject {
 
     override fun toString(): String {
         return """
-            Name: $displayName ($shapeString)
+            Name: $displayName ($size neurons)
             Activations: ${Utils.getTruncatedArrayString(activationArray, 10)}
+            Location: ${location.format(2)}
         """.trimIndent()
     }
 

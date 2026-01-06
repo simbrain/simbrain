@@ -525,8 +525,35 @@ class Network: CoroutineScope, EditableObject {
         updateCompleted.set(b)
     }
 
-    override fun toString(): String =
-        "------Network------\n" + networkModels
+    override fun toString(): String {
+        val printThreshold = 20
+        
+        fun <T> formatList(items: List<T>, label: String, summarize: (T) -> String = { it.toString() }): String {
+            return if (items.isEmpty()) {
+                ""
+            } else if (items.size <= printThreshold) {
+                "$label:\n" + items.joinToString("\n") { 
+                    summarize(it).lines().joinToString("\n") { line -> "  $line" }
+                }
+            } else {
+                "$label: ${items.size} total"
+            }
+        }
+        
+        return buildString {
+            appendLine("------Network------")
+            
+            formatList(freeNeurons.toList(), "Free Neurons").takeIf { it.isNotEmpty() }?.let { appendLine(it) }
+            formatList(freeSynapses.toList(), "Free Synapses").takeIf { it.isNotEmpty() }?.let { appendLine(it) }
+            formatList(getModels<NeuronGroup>().toList(), "Neuron Groups").takeIf { it.isNotEmpty() }?.let { appendLine(it) }
+            formatList(getModels<SynapseGroup>().toList(), "Synapse Groups").takeIf { it.isNotEmpty() }?.let { appendLine(it) }
+            formatList(getModels<WeightMatrix>().toList(), "Weight Matrices").takeIf { it.isNotEmpty() }?.let { appendLine(it) }
+            formatList(getModels<Subnetwork>().toList(), "Subnetworks").takeIf { it.isNotEmpty() }?.let { appendLine(it) }
+            formatList(getModels<NeuronArray>().toList(), "Neuron Arrays").takeIf { it.isNotEmpty() }?.let { appendLine(it) }
+            formatList(getModels<NeuronCollection>().toList(), "Neuron Collections").takeIf { it.isNotEmpty() }?.let { appendLine(it) }
+            formatList(getModels<Layer>().toList(), "Layers").takeIf { it.isNotEmpty() }?.let { appendLine(it) }
+        }
+    }
 
     /**
      * Forward to [NetworkUpdateManager.addAction]

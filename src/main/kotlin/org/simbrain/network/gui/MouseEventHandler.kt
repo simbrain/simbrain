@@ -45,6 +45,11 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
      */
     private var placementManagerDelta: PPath? = null
 
+    /**
+     * Stores the original autoZoom state to restore after dragging.
+     */
+    private var previousAutoZoomState: Boolean = true
+
     private val PInputEvent.isPanKeyDown get() = if (Utils.isMacOSX()) isMetaDown else isControlDown
 
     private val selectionMarquee by lazy {
@@ -83,9 +88,12 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
 
         super.startDrag(event)
 
+        previousAutoZoomState = networkPanel.autoZoom
+
         val pickedNode: PNode? = event.pickedNode
         pickedNode?.firstScreenElement?.let { pickedScreenElement ->
             mode = Mode.DRAG
+            networkPanel.autoZoom = false
             // Toggle selection
             if (event.isShiftDown) {
                 networkPanel.selectionManager.toggle(pickedScreenElement)
@@ -163,7 +171,8 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
             }
         }
         networkPanel.canvas.layer.removeChild(placementManagerDelta)
-        networkPanel.network.events.zoomToFitPage.fire()
+
+        networkPanel.autoZoom = previousAutoZoomState
     }
 
     /**

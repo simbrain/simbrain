@@ -2,13 +2,12 @@ package org.simbrain.world.imageworld.gui
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.simbrain.util.ResourceManager
-import org.simbrain.util.createAction
-import org.simbrain.util.swingDispatcher
+import org.simbrain.util.*
 import org.simbrain.world.imageworld.ImageWorldDesktopComponent
 import org.simbrain.world.imageworld.dialogs.ImageProcessingPipelineDialog
 import org.simbrain.world.imageworld.filters.ImageProcessingPipeline
 import org.simbrain.world.imageworld.transformations.ImagePipelineCollection
+import java.awt.Color
 import java.awt.Dimension
 import javax.swing.*
 
@@ -20,6 +19,7 @@ class ImagePipelineCollectionGui(
     private val imageWorldDesktopComponent: ImageWorldDesktopComponent,
     private val imagePipelineCollection: ImagePipelineCollection
 ) {
+    private val imageWorld = imageWorldDesktopComponent.workspaceComponent.world
 
     private val pipelineComboBox = JComboBox<ImageProcessingPipeline>().apply {
         toolTipText = "Which pipeline to view"
@@ -78,12 +78,46 @@ class ImagePipelineCollectionGui(
         }
     }).apply { toolTipText = "Delete pipeline" }
 
+    // Editing tools
+    private val fillCanvasAction = imageWorldDesktopComponent.createAction(
+        "Fill",
+        description = "Fill canvas using current color",
+        iconPath = "menu_icons/fill.png"
+    ) {
+        val confirm = showWarningConfirmDialog("Are you sure you want to fill the canvas?")
+        if (confirm == JOptionPane.YES_OPTION) {
+            imageWorld.imageAlbum.currentImage.fill(imageWorld.penColor)
+            imageWorld.imageAlbum.fireImageUpdate()
+        }
+    }
+
+    private val clearCanvasAction = imageWorldDesktopComponent.createAction(
+        "Clear",
+        description = "Clear canvas (with black pixels)",
+        iconPath = "menu_icons/Eraser.png"
+    ) {
+        val confirm = showWarningConfirmDialog("Are you sure you want to clear the canvas?")
+        if (confirm == JOptionPane.YES_OPTION) {
+            imageWorld.imageAlbum.currentImage.fill(Color.black)
+            imageWorld.imageAlbum.fireImageUpdate()
+        }
+    }
+
+    private val colorPickerButton = ColorPickerButton(imageWorld)
+    private val brushSettingsButton = BrushSettingsButton(imageWorld)
+
     val toolbar = JToolBar().apply {
         add(JLabel("Pipelines:"))
         add(pipelineComboBox)
         add(addPipelineButton)
         add(deletePipelineButton)
         add(editPipelineButton)
+        addSeparator()
+        add(fillCanvasAction)
+        add(clearCanvasAction)
+        addSeparator()
+        add(colorPickerButton)
+        add(brushSettingsButton)
         updateButtonStates()
     }
 

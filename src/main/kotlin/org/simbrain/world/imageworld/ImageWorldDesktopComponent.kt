@@ -1,8 +1,11 @@
 package org.simbrain.world.imageworld
 
 import kotlinx.coroutines.CoroutineScope
-import org.simbrain.util.*
+import org.simbrain.util.SFileChooser
+import org.simbrain.util.createAction
 import org.simbrain.util.genericframe.GenericFrame
+import org.simbrain.util.swingDispatcher
+import org.simbrain.util.swingInvokeLater
 import org.simbrain.util.widgets.ShowHelpAction
 import org.simbrain.workspace.gui.CouplingMenu
 import org.simbrain.workspace.gui.DesktopComponent
@@ -11,10 +14,7 @@ import org.simbrain.world.imageworld.ImageWorldPreferences.imageDirectory
 import org.simbrain.world.imageworld.filters.ImageProcessingPipeline
 import org.simbrain.world.imageworld.gui.ImagePipelineCollectionGui
 import java.awt.BorderLayout
-import java.awt.Color
 import java.awt.Dimension
-import java.awt.FlowLayout
-import java.awt.event.ActionEvent
 import javax.swing.*
 import kotlin.math.min
 
@@ -28,6 +28,8 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
     private val imageWorldPanel = ImageWorldPanel(component)
 
     private val frameLabel = JLabel()
+
+    private val outputSizeLabel = JLabel()
 
     private fun setupMenuBar(frame: GenericFrame) {
         val menuBar = JMenuBar()
@@ -109,113 +111,18 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
     }
 
     /**
-     * Set up toolbars depending on what type of world is being displayed
+     * Set up toolbars depending on what type of world is being displayed.
+     * Bottom toolbar contains navigation/read operations only.
+     * Editing tools are in the top toolbar (see ImagePipelineCollectionGui).
      */
     private fun setupToolbars() {
-
         imageToolbar.add(frameLabel)
         imageToolbar.add(imageWorldPanel.deleteImageAction)
         imageToolbar.add(imageWorldPanel.previousImageAction)
         imageToolbar.add(imageWorldPanel.nextImageAction)
         imageToolbar.add(imageWorldPanel.takeSnapshotAction)
         imageToolbar.addSeparator()
-
-
-        val fillCanvasAction = createAction(
-            "Fill",
-            description = "Fill canvas using current color",
-            iconPath =  "menu_icons/fill.png"
-        ) {
-            val confirm = showWarningConfirmDialog("Are you sure you want to fill the canvas?")
-            if (confirm == JOptionPane.YES_OPTION) {
-                imageWorld.imageAlbum.currentImage.fill(imageWorld.penColor)
-                imageWorld.imageAlbum.fireImageUpdate()
-            }
-        }
-        val clearCanvasAction = createAction(
-            "Clear",
-            description = "Clear canvas (with black pixels)",
-            iconPath =  "menu_icons/Eraser.png"
-        ) {
-            val confirm = showWarningConfirmDialog("Are you sure you want to clear the canvas?")
-            if (confirm == JOptionPane.YES_OPTION) {
-                imageWorld.imageAlbum.currentImage.fill(Color.black)
-                imageWorld.imageAlbum.fireImageUpdate()
-            }
-        }
-
-        imageToolbar.add(fillCanvasAction)
-        imageToolbar.add(clearCanvasAction)
-        imageToolbar.addSeparator()
-
-        // Color options
-        val colorList = arrayOf(
-            Color.white,
-            Color.black,
-            Color.red,
-            Color.blue,
-            Color.green,
-            Color.yellow,
-            Color.cyan,
-            Color.magenta
-        )
-        val colorNames =
-            arrayOf<String?>("White", "Black", "Red", "Blue", "Green", "Yellow", "Cyan", "Magenta", "Custom")
-        val cbColorChoice: JComboBox<*> = JComboBox<Any?>(colorNames)
-
-        cbColorChoice.addActionListener { e: ActionEvent ->
-            val len = cbColorChoice.itemCount
-            if ((e.source as JComboBox<*>).selectedIndex == len - 1) {
-                println("Custom...")
-            } else {
-                imageWorld.penColor = colorList[cbColorChoice.selectedIndex]
-            }
-        }
-        imageToolbar.add(cbColorChoice)
-
-        // Pen size slider for more precise control
-        val penSizeLabel = JLabel("${imageWorld.penSize}px")
-        val penSizeSlider = JSlider(JSlider.HORIZONTAL, 1, 30, imageWorld.penSize)
-        penSizeSlider.preferredSize = Dimension(80, penSizeSlider.preferredSize.height)
-        penSizeSlider.addChangeListener { 
-            imageWorld.penSize = penSizeSlider.value
-            penSizeSlider.toolTipText = "Pen size: ${imageWorld.penSize}px"
-            penSizeLabel.text = "${imageWorld.penSize}px"
-        }
-        imageToolbar.add(penSizeLabel)
-        imageToolbar.add(penSizeSlider)
-
-        // Smoothing checkbox and quality selection
-        val checkBoxSmoothing = JCheckBox("Smoothing")
-        checkBoxSmoothing.isSelected = imageWorld.useSmoothing
-        checkBoxSmoothing.addItemListener {
-            imageWorld.useSmoothing = checkBoxSmoothing.isSelected
-        }
-        
-        // Smoothing quality selection
-        val cbSmoothingQuality = JComboBox(ImageWorld.SmoothingQuality.values())
-        cbSmoothingQuality.selectedItem = imageWorld.smoothingQuality
-        cbSmoothingQuality.isEnabled = imageWorld.useSmoothing
-        cbSmoothingQuality.toolTipText = "Select smoothing quality level"
-        cbSmoothingQuality.addActionListener {
-            imageWorld.smoothingQuality = cbSmoothingQuality.selectedItem as ImageWorld.SmoothingQuality
-        }
-        
-        // Brush shape selection
-        val cbBrushShape = JComboBox(ImageWorld.BrushShape.entries.toTypedArray())
-        cbBrushShape.selectedItem = imageWorld.brushShape
-        cbBrushShape.toolTipText = "Select brush shape"
-        cbBrushShape.addActionListener {
-            imageWorld.brushShape = cbBrushShape.selectedItem as ImageWorld.BrushShape
-        }
-        val brushShapePanel = JPanel(FlowLayout(FlowLayout.LEFT, 2, 0))
-        brushShapePanel.add(JLabel("Brush:"))
-        brushShapePanel.add(cbBrushShape)
-        imageToolbar.add(brushShapePanel)
-
-        //smoothingPanel.add(cbSmoothingQuality)
-        imageToolbar.add(checkBoxSmoothing)
-
+        imageToolbar.add(outputSizeLabel)
     }
 
 
@@ -235,8 +142,14 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
             updateToolbar()
             repaint()
         }
-        imageWorld.imagePipelineCollection.events.pipelineChanged.on(swingDispatcher) { _: ImageProcessingPipeline, _: ImageProcessingPipeline -> this.repaint() }
-        imageWorld.imagePipelineCollection.events.pipelineSelectionChanged.on(swingDispatcher) { _: ImageProcessingPipeline -> this.repaint() }
+        imageWorld.imagePipelineCollection.events.pipelineChanged.on(swingDispatcher) { _: ImageProcessingPipeline, _: ImageProcessingPipeline ->
+            updateToolbar()
+            repaint()
+        }
+        imageWorld.imagePipelineCollection.events.pipelineSelectionChanged.on(swingDispatcher) { _: ImageProcessingPipeline ->
+            updateToolbar()
+            repaint()
+        }
 
         // Toolbars
         val transformationGui = ImagePipelineCollectionGui(this, imageWorld.imagePipelineCollection)
@@ -288,6 +201,11 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
         val numFrames = imageWorld.imageAlbum.numFrames
         val humanReadableFrameIndex = min((index + 1).toDouble(), numFrames.toDouble()).toInt()
         frameLabel.text = "$humanReadableFrameIndex/$numFrames"
+
+        // Update canvas size label (shows pipeline output size)
+        val processedImage = imageWorld.imagePipelineCollection.currentPipeline.processedImage
+        outputSizeLabel.text = "${processedImage.width}×${processedImage.height}"
+        outputSizeLabel.toolTipText = "Output size: ${processedImage.width} × ${processedImage.height} pixels"
     }
 
     override fun getPreferredSize(): Dimension {

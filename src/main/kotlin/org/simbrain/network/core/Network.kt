@@ -527,31 +527,24 @@ class Network: CoroutineScope, EditableObject {
 
     override fun toString(): String {
         val printThreshold = 20
-        
-        fun <T> formatList(items: List<T>, label: String, summarize: (T) -> String = { it.toString() }): String {
-            return if (items.isEmpty()) {
-                ""
-            } else if (items.size <= printThreshold) {
-                "$label:\n" + items.joinToString("\n") { 
-                    summarize(it).lines().joinToString("\n") { line -> "  $line" }
+
+        fun formatGroup(label: String, models: List<NetworkModel>): String? {
+            if (models.isEmpty()) return null
+            return if (models.size <= printThreshold) {
+                "$label:\n" + models.joinToString("\n") { model ->
+                    model.toString().lines().joinToString("\n") { "  $it" }
                 }
             } else {
-                "$label: ${items.size} total"
+                "$label: ${models.size} total"
             }
         }
-        
+
         return buildString {
             appendLine("------Network------")
-            
-            formatList(freeNeurons.toList(), "Free Neurons").takeIf { it.isNotEmpty() }?.let { appendLine(it) }
-            formatList(freeSynapses.toList(), "Free Synapses").takeIf { it.isNotEmpty() }?.let { appendLine(it) }
-            formatList(getModels<NeuronGroup>().toList(), "Neuron Groups").takeIf { it.isNotEmpty() }?.let { appendLine(it) }
-            formatList(getModels<SynapseGroup>().toList(), "Synapse Groups").takeIf { it.isNotEmpty() }?.let { appendLine(it) }
-            formatList(getModels<WeightMatrix>().toList(), "Weight Matrices").takeIf { it.isNotEmpty() }?.let { appendLine(it) }
-            formatList(getModels<Subnetwork>().toList(), "Subnetworks").takeIf { it.isNotEmpty() }?.let { appendLine(it) }
-            formatList(getModels<NeuronArray>().toList(), "Neuron Arrays").takeIf { it.isNotEmpty() }?.let { appendLine(it) }
-            formatList(getModels<NeuronCollection>().toList(), "Neuron Collections").takeIf { it.isNotEmpty() }?.let { appendLine(it) }
-            formatList(getModels<Layer>().toList(), "Layers").takeIf { it.isNotEmpty() }?.let { appendLine(it) }
+
+            allModels.groupBy { it::class.simpleName ?: "Unknown" }
+                .mapNotNull { (className, models) -> formatGroup(className, models) }
+                .forEach { appendLine(it) }
         }
     }
 

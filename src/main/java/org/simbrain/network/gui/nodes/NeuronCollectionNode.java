@@ -14,6 +14,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
+import static org.simbrain.network.gui.NetworkDialogsKt.createNeuronGroupDialog;
 import static org.simbrain.network.gui.NetworkPanelMenusKt.createCouplingMenu;
 import static org.simbrain.network.gui.NetworkPanelMenusKt.createEditNeuronCollectionAction;
 import static org.simbrain.network.gui.NetworkPanelUtilsKt.createTooltipTextWithLocation;
@@ -72,7 +73,7 @@ public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
      * @return the neuron group property dialog.
      */
     public StandardDialog getPropertyDialog() {
-        return null;
+        return createNeuronGroupDialog(getNetworkPanel(), neuronCollection);
     }
 
     /**

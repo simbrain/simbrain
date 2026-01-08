@@ -17,6 +17,9 @@ import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.sensors.ObjectSensor
 import java.awt.geom.Point2D
+import java.io.File
+import java.text.SimpleDateFormat
+import java.util.*
 
 
 /**
@@ -31,7 +34,13 @@ import java.awt.geom.Point2D
  *   "learningRate": 0.05,
  *   "decayFunction": {"type": "Gaussian", "dispersion": 75.0},
  *   "cheeseReward": {"maxReward": 15.0},
- *   "poisonReward": {"maxReward": 15.0}
+ *   "poisonReward": {"maxReward": 15.0},
+ *   "maxIterations": 10000,
+ *   "csvOutput": {},
+ *   "parameterSchedule": [
+ *     {"atIteration": 5000, "set": {"taskIndex": 1}},
+ *     {"atIteration": 8000, "set": {"learningRate": 0.01}}
+ *   ]
  * }'
  *
  * Parameters:
@@ -43,6 +52,21 @@ import java.awt.geom.Point2D
  * - cheeseReward: {maxReward} - maximum cheese reward magnitude
  * - poisonReward: {maxReward} - maximum poison reward magnitude
  * - decayFunction types: "Gaussian", "Linear", "Step"
+ * - maxIterations: Number of iterations to run before stopping (required for headless mode)
+ * - csvOutput: Enable CSV output of simulation data. Use {} for auto-generated filename,
+ *              or {"filePath": "path/to/file.csv"} for custom path
+ * - parameterSchedule: List of parameter changes triggered at specific iterations
+ *     - atIteration: Iteration number to trigger the change
+ *     - set: Object with parameters to change (taskIndex, learningRate, gamma, learningEnabled)
+ *
+ * CSV Output Columns:
+ *   iteration, taskIndex, learningRate, gamma,
+ *   cheeseLeftInput, cheeseRightInput, poisonLeftInput, poisonRightInput,
+ *   straight, leftTurn, rightTurn, reward, value, tdError,
+ *   actorW_cheeseL_leftTurn, actorW_cheeseR_rightTurn, actorW_poisonL_leftTurn, actorW_poisonR_rightTurn,
+ *   speedW_cheeseL, speedW_cheeseR, speedW_poisonL, speedW_poisonR,
+ *   criticW_cheeseL, criticW_cheeseR, criticW_poisonL, criticW_poisonR,
+ *   agentX, agentY, agentHeading, cheeseX, cheeseY, poisonX, poisonY
  */
 /**
  * Configuration for proximity-based rewards using configurable decay functions.
@@ -307,7 +331,132 @@ val braitenbergRL = newSim { optionString ->
     // Track previous value for TD error calculation
     var previousValue = 0.0
 
+    // Variables for headless mode features
+    var currentIteration = 0
+    var currentTaskIndex = 0
+    var csvData: StringBuilder? = null
+    var csvFilePath: String? = null
+    var maxIterations: Int? = null
+    var parameterSchedule: List<Pair<Int, JSONObject>> = emptyList()
+
+    // Helper function to apply parameter changes from schedule
+    fun applyParameterChanges(params: JSONObject) {
+        if (params.has("taskIndex")) {
+            val newTaskIndex = params.getInt("taskIndex")
+            if (newTaskIndex in tasks.indices) {
+                currentTaskIndex = newTaskIndex
+                val task = tasks[currentTaskIndex]
+                cheeseRewardMultiplier = task.cheeseReward
+                poisonRewardMultiplier = task.poisonReward
+                println("[Iteration $currentIteration] Task changed to: ${task.name}")
+            }
+        }
+        if (params.has("learningRate")) {
+            learningRate = params.getDouble("learningRate")
+            println("[Iteration $currentIteration] Learning rate changed to: $learningRate")
+        }
+        if (params.has("gamma")) {
+            gamma = params.getDouble("gamma")
+            println("[Iteration $currentIteration] Gamma changed to: $gamma")
+        }
+        if (params.has("learningEnabled")) {
+            learningEnabled = params.getBoolean("learningEnabled")
+            println("[Iteration $currentIteration] Learning enabled changed to: $learningEnabled")
+        }
+    }
+
+    // Helper function to append CSV row
+    fun appendCsvRow() {
+        csvData?.append(
+            listOf(
+                currentIteration,
+                currentTaskIndex,
+                learningRate,
+                gamma,
+                // Neuron activations
+                cheeseLeftInput.activation,
+                cheeseRightInput.activation,
+                poisonLeftInput.activation,
+                poisonRightInput.activation,
+                straight.activation,
+                leftTurn.activation,
+                rightTurn.activation,
+                rewardNeuron.activation,
+                valueNeuron.activation,
+                tdErrorNeuron.activation,
+                // Actor weights
+                cheeseLeftToLeftTurn.strength,
+                cheeseRightToRightTurn.strength,
+                poisonLeftToLeftTurn.strength,
+                poisonRightToRightTurn.strength,
+                // Speed weights
+                cheeseLeftToSpeed.strength,
+                cheeseRightToSpeed.strength,
+                poisonLeftToSpeed.strength,
+                poisonRightToSpeed.strength,
+                // Critic weights
+                criticWeights[0].strength,
+                criticWeights[1].strength,
+                criticWeights[2].strength,
+                criticWeights[3].strength,
+                // Agent state
+                agent.x,
+                agent.y,
+                agent.heading,
+                // Object locations
+                cheese.x,
+                cheese.y,
+                poison.x,
+                poison.y
+            ).joinToString(",") + "\n"
+        )
+    }
+
+    // Helper function to write CSV file
+    fun writeCsvFile() {
+        csvData?.let { data ->
+            val filePath = csvFilePath ?: run {
+                val outputDir = File("simulation_outputs")
+                if (!outputDir.exists()) {
+                    outputDir.mkdirs()
+                }
+                val timestamp = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(Date())
+                "simulation_outputs/braitenberg_rl_$timestamp.csv"
+            }
+            
+            val header = listOf(
+                "iteration", "taskIndex", "learningRate", "gamma",
+                "cheeseLeftInput", "cheeseRightInput", "poisonLeftInput", "poisonRightInput",
+                "straight", "leftTurn", "rightTurn", "reward", "value", "tdError",
+                "actorW_cheeseL_leftTurn", "actorW_cheeseR_rightTurn", "actorW_poisonL_leftTurn", "actorW_poisonR_rightTurn",
+                "speedW_cheeseL", "speedW_cheeseR", "speedW_poisonL", "speedW_poisonR",
+                "criticW_cheeseL", "criticW_cheeseR", "criticW_poisonL", "criticW_poisonR",
+                "agentX", "agentY", "agentHeading",
+                "cheeseX", "cheeseY", "poisonX", "poisonY"
+            ).joinToString(",")
+            
+            val fullContent = StringBuilder()
+            fullContent.append("# BraitenbergRL Simulation Results\n")
+            fullContent.append("# Generated: ${SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(Date())}\n")
+            fullContent.append("# MaxIterations: $maxIterations\n")
+            fullContent.append("#\n")
+            fullContent.append(header + "\n")
+            fullContent.append(data)
+            
+            File(filePath).writeText(fullContent.toString())
+            println("\nCSV data exported to: $filePath")
+        }
+    }
+
     workspace.addUpdateAction("Update RL metrics and learning") {
+        // Increment iteration counter
+        currentIteration++
+
+        // Check parameter schedule for changes
+        parameterSchedule.filter { it.first == currentIteration }.forEach { (_, params) ->
+            applyParameterChanges(params)
+        }
+
         // Calculate current reward
         val (cheeseR, poisonR) = calculateReward(agent)
         rewardNeuron.activation = cheeseR + poisonR
@@ -341,6 +490,17 @@ val braitenbergRL = newSim { optionString ->
 
         // Update previous value for next iteration
         previousValue = currentValue
+
+        // Append CSV row if CSV output is enabled
+        appendCsvRow()
+
+        // Check if max iterations reached
+        maxIterations?.let { max ->
+            if (currentIteration >= max) {
+                writeCsvFile()
+                workspace.stop()
+            }
+        }
     }
 
     var respawnCountPerTrial = 0
@@ -680,10 +840,60 @@ val braitenbergRL = newSim { optionString ->
         if (options.has("taskIndex")) {
             val taskIndex = options.getInt("taskIndex")
             if (taskIndex in tasks.indices) {
-                val task = tasks[taskIndex]
+                currentTaskIndex = taskIndex
+                val task = tasks[currentTaskIndex]
                 cheeseRewardMultiplier = task.cheeseReward
                 poisonRewardMultiplier = task.poisonReward
             }
+        }
+
+        // Parse maxIterations
+        if (options.has("maxIterations")) {
+            maxIterations = options.getInt("maxIterations")
+            println("Max iterations set to: $maxIterations")
+        }
+
+        // Parse CSV output configuration
+        if (options.has("csvOutput")) {
+            csvData = StringBuilder()
+            options.optJSONObject("csvOutput")?.let { csvConfig ->
+                if (csvConfig.has("filePath")) {
+                    csvFilePath = csvConfig.getString("filePath")
+                }
+            }
+            println("CSV output enabled" + (csvFilePath?.let { ": $it" } ?: " (auto-generated filename)"))
+        }
+
+        // Parse parameter schedule
+        options.optJSONArray("parameterSchedule")?.let { scheduleArray ->
+            parameterSchedule = (0 until scheduleArray.length()).mapNotNull { i ->
+                val item = scheduleArray.getJSONObject(i)
+                if (item.has("atIteration") && item.has("set")) {
+                    val iteration = item.getInt("atIteration")
+                    val params = item.getJSONObject("set")
+                    Pair(iteration, params)
+                } else {
+                    null
+                }
+            }
+            if (parameterSchedule.isNotEmpty()) {
+                println("Parameter schedule configured with ${parameterSchedule.size} triggers:")
+                parameterSchedule.forEach { (iter, params) ->
+                    println("  - At iteration $iter: ${params.keySet().joinToString(", ")}")
+                }
+            }
+        }
+
+        // Run the simulation in headless mode if maxIterations is set
+        maxIterations?.let { max ->
+            println("\n=== Starting Headless Simulation ===")
+            println("Running for $max iterations...")
+            
+            runBlocking {
+                workspace.iterateSuspend(max)
+            }
+            
+            println("=== Simulation Complete ===")
         }
     }
 

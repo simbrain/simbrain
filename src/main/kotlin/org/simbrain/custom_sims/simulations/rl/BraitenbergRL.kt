@@ -44,7 +44,7 @@ import java.util.*
  * }'
  *
  * Parameters:
- * - taskIndex: 0=Seek Cheese/Avoid Poison, 1=Seek Both, 2=Avoid Both, 3=Seek Poison/Avoid Cheese
+ * - taskIndex: 0=Seek Cheese/Avoid  Poison, 1=Seek Both, 2=Avoid Both, 3=Seek Poison/Avoid Cheese
  * - learningRate: Learning rate (default: 0.05)
  * - gamma: Discount factor (default: 0.95)
  * - trainSpeedConnections: Whether to train sensor-to-speed connections (default: true)

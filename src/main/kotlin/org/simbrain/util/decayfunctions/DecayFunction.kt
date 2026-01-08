@@ -5,6 +5,20 @@ import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.EditableObject
 import kotlin.math.abs
 
+/**
+ * Decay functions return a scaling factor between 0 and 1 based on distance.
+ *
+ * The scaling factor is 1 at the [peakDistance] (default 0) and decreases as distance from the peak increases.
+ * Beyond the [dispersion] radius, the scaling factor is 0 (or near 0 for Gaussian).
+ *
+ * These functions are used to model distance-dependent effects, such as how strongly a spatial object
+ * affects a network based on how far away it is. The scaling factor can also be interpreted as a probability.
+ *
+ * Available implementations:
+ * - [StepDecayFunction]: 1 within dispersion, 0 outside
+ * - [LinearDecayFunction]: Linear decrease from 1 to 0
+ * - [GaussianDecayFunction]: Smooth Gaussian falloff
+ */
 abstract class DecayFunction(
 
     /**
@@ -28,9 +42,12 @@ abstract class DecayFunction(
 ) : CopyableObject {
 
     /**
-     * Get the decay amount for the given distance.
+     * Get the scaling factor for the given distance.
      *
-     * Returns a number between 0 and 1 that can also be treated as a probability.
+     * Returns a value between 0 and 1 that scales with distance. The scaling factor is 1 at [peakDistance]
+     * and decreases as distance increases, reaching 0 at or beyond [dispersion] (or near 0 for Gaussian).
+     *
+     * Can also be treated as a probability.
      */
     abstract fun getScalingFactor(distance: Double): Double
 

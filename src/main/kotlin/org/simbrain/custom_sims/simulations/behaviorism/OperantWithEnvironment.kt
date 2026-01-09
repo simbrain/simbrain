@@ -46,11 +46,13 @@ val operantWithEnvironment = newSim("operant_with_environment") {
     val rewardNeuron = network.addNeuron {
         location = point(stimulusNet.maxX + 100, stimulusNet.locationY)
         label = "Food Pellet"
+        clamped = true
     }
 
     val punishNeuron = network.addNeuron {
         location = point(rewardNeuron.x + 100, rewardNeuron.locationY)
         label = "Shock"
+        clamped = true
     }
 
     val syns = with(network) {
@@ -68,22 +70,22 @@ val operantWithEnvironment = newSim("operant_with_environment") {
         heading = 90.0
     }
 
-    val cheese = odorWorld.addEntity(27, 50, EntityType.Candle)
+    val candle = odorWorld.addEntity(27, 50, EntityType.Candle)
     val flower = odorWorld.addEntity(79, 50, EntityType.Pansy)
-    val fish = odorWorld.addEntity(125, 50, EntityType.Fish)
-    odorWorld.addEntity(cheese)
+    val bell = odorWorld.addEntity(125, 50, EntityType.Bell)
+    odorWorld.addEntity(candle)
     odorWorld.addEntity(flower)
-    odorWorld.addEntity(fish)
+    odorWorld.addEntity(bell)
 
-    val cheeseSensor = mouse.addObjectSensor(EntityType.Swiss, 50.0, 0.0, 65.0)
+    val cndleSensor = mouse.addObjectSensor(EntityType.Candle, 50.0, 0.0, 65.0)
     val flowerSensor = mouse.addObjectSensor(EntityType.Pansy, 50.0, 0.0, 65.0)
-    val fishSensor = mouse.addObjectSensor(EntityType.Fish, 50.0, 0.0, 65.0)
+    val bellSensor = mouse.addObjectSensor(EntityType.Bell, 50.0, 0.0, 65.0)
 
     with(couplingManager) {
         val (n1, n2, n3) = stimulusNet.neuronList
-        cheeseSensor couple n1
+        cndleSensor couple n1
         flowerSensor couple n2
-        fishSensor couple n3
+        bellSensor couple n3
     }
 
     updateBehaviorNetNeuronLabels(behaviorNet)
@@ -109,7 +111,7 @@ val operantWithEnvironment = newSim("operant_with_environment") {
         
         # Simulation Details
         
-        In this simulation, an agent (mouse) can sense three different objects: a `Candle`, `Flower`, and `Fish`.  
+        In this simulation, an agent (mouse) can sense three different objects: a `Candle`, `Flower`, and `Bell`.  
         The agent can perform three behaviors:
         
         - Wiggle: oscillates left and right  
@@ -133,7 +135,7 @@ val operantWithEnvironment = newSim("operant_with_environment") {
         
         2. Train the agent to perform a behavior spontaneously. This is like the simple operant conditioning simulation.  
         
-        3. Add a conditional behavior. Wait for the agent to approach an object (candle, flower, or fish). You will see the corresponding stimulus neuron activate.  
+        3. Add a conditional behavior. Wait for the agent to approach an object (candle, flower, or bell). You will see the corresponding stimulus neuron activate.  
         
         4. Observe which behavior the agent performs near the object.  
         
@@ -213,6 +215,9 @@ suspend fun SimulationScope.setupOperantWithEnvironmentWorkspace(workspace: Work
             winningNode = firingProbabilityCDF.indexOfFirst {
                 selection < it
             }
+
+            // Set neuron activation based on winning node
+            behaviorNet.neuronList.forEachIndexed { index, neuron -> neuron.addInputValue(if (index == winningNode) 1.0 else 0.0) }
 
             network.bufferedUpdate()
         }

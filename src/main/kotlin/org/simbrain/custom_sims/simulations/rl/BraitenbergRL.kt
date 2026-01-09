@@ -21,56 +21,7 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
-
-/**
- * Using actor-critic to train a Braitenberg vehicle.
- *
- * The vehicle learns to approach or avoid cheese and poison objects based on reward feedback.
- * All actor weights are updated uniformly using TD error at each time step.
- *
- * Run headless using:
- * gradle runSim -PsimName="Braitenberg RL" -PoptionString='{
- *   "taskIndex": 0,
- *   "learningRate": 0.05,
- *   "decayFunction": {"type": "Gaussian", "dispersion": 75.0},
- *   "cheeseReward": {"maxReward": 15.0},
- *   "poisonReward": {"maxReward": 15.0},
- *   "maxIterations": 10000,
- *   "csvOutput": {},
- *   "parameterSchedule": [
- *     {"atIteration": 5000, "set": {"taskIndex": 1}},
- *     {"atIteration": 8000, "set": {"learningRate": 0.01}}
- *   ]
- * }'
- *
- * Parameters:
- * - taskIndex: 0=Seek Cheese/Avoid  Poison, 1=Seek Both, 2=Avoid Both, 3=Seek Poison/Avoid Cheese
- * - learningRate: Learning rate (default: 0.05)
- * - gamma: Discount factor (default: 0.95)
- * - trainSpeedConnections: Whether to train sensor-to-speed connections (default: true)
- * - decayFunction: Shared decay function for all sensors and rewards {type, dispersion, peakDistance}
- * - cheeseReward: {maxReward} - maximum cheese reward magnitude
- * - poisonReward: {maxReward} - maximum poison reward magnitude
- * - decayFunction types: "Gaussian", "Linear", "Step"
- * - maxIterations: Number of iterations to run before stopping (required for headless mode)
- * - csvOutput: Enable CSV output of simulation data. Use {} for auto-generated filename,
- *              or {"filePath": "path/to/file.csv"} for custom path
- * - parameterSchedule: List of parameter changes triggered at specific iterations
- *     - atIteration: Iteration number to trigger the change
- *     - set: Object with parameters to change (taskIndex, learningRate, gamma, learningEnabled)
- *
- * CSV Output Columns:
- *   iteration, taskIndex, learningRate, gamma,
- *   cheeseLeftInput, cheeseRightInput, poisonLeftInput, poisonRightInput,
- *   straight, leftTurn, rightTurn, reward, value, tdError,
- *   actorW_cheeseL_leftTurn, actorW_cheeseR_rightTurn, actorW_poisonL_leftTurn, actorW_poisonR_rightTurn,
- *   speedW_cheeseL, speedW_cheeseR, speedW_poisonL, speedW_poisonR,
- *   criticW_cheeseL, criticW_cheeseR, criticW_poisonL, criticW_poisonR,
- *   agentX, agentY, agentHeading, cheeseX, cheeseY, poisonX, poisonY
- */
-/**
- * Configuration for proximity-based rewards using configurable decay functions.
- */
+// Configuration for proximity-based rewards using configurable decay functions
 class RewardConfig(
     private val label: String,
     initDecayFunction: DecayFunction = GaussianDecayFunction(150.0)
@@ -87,7 +38,6 @@ class RewardConfig(
         return maxReward * decayFunction.getScalingFactor(distance) * multiplier
     }
 
-    /** Returns a compact summary string for display in UI */
     fun getSummary(): String {
         val typeName = decayFunction.name
         val disp = decayFunction.dispersion.toInt()
@@ -95,6 +45,13 @@ class RewardConfig(
     }
 }
 
+
+/**
+ * Using actor-critic to train a Braitenberg vehicle.
+ *
+ * The vehicle learns to approach or avoid cheese and poison objects based on reward feedback.
+ * All actor weights are updated uniformly using TD error at each time step.
+ */
 val braitenbergRL = newSim { optionString ->
 
     // Task configuration data class
@@ -148,6 +105,31 @@ val braitenbergRL = newSim { optionString ->
 
     val poison = oc.world.addEntity(398, 335, EntityType.Poison)
     val cheese = oc.world.addEntity(500, 184, EntityType.Swiss)
+
+    // Configuration for proximity-based rewards using configurable decay functions
+    class RewardConfig(
+        private val label: String,
+        initDecayFunction: DecayFunction = GaussianDecayFunction(150.0)
+    ) : EditableObject {
+        override val name = label
+
+        @UserParameter(label = "Max Reward", description = "Maximum reward magnitude", order = 1)
+        var maxReward: Double = 15.0
+
+        @UserParameter(label = "Decay Function", showDetails = false, order = 2)
+        var decayFunction: DecayFunction = initDecayFunction
+
+        fun calculateReward(distance: Double, multiplier: Double): Double {
+            return maxReward * decayFunction.getScalingFactor(distance) * multiplier
+        }
+
+        fun getSummary(): String {
+            val typeName = decayFunction.name
+            val disp = decayFunction.dispersion.toInt()
+            return "$typeName (max=${"%.1f".format(maxReward)}, disp=$disp)"
+        }
+    }
+
 
     fun calculateReward(agent: OdorWorldEntity): Pair<Double, Double> {
         val distanceToCheese = agent.location.distance(cheese.location)
@@ -758,24 +740,28 @@ val braitenbergRL = newSim { optionString ->
 
     **Value**: The critic's prediction of expected future cumulative reward from the current state. Early in training this is inaccurate, but it improves over time. You should see value increase as the agent approaches rewarding objects and decrease near penalizing ones, reflecting learned predictions about what will happen next.
 
-    **TD Error**: The temporal difference error = r + γ×V(s') - V(s), where s' is the current time step and s is the previous time step. This is the learning signal that drives weight updates. It represents the difference between what the critic predicted at the last time step (V(s)) and what actually happened (reward plus discounted next-state value, r + γ×V(s')).
+    **TD Error**: The temporal difference error, which can be understood as: TD_error = reward + γ×V(current) - V(previous). This is the learning signal that drives all weight updates. It represents the difference between what the critic predicted at the previous time step and what actually happened (current reward plus discounted current value). When value estimates are low or changing slowly, TD error tracks closely with reward. As the critic learns better predictions, TD error reflects prediction errors rather than just reward magnitude.
 
-    What to expect during training
-    - Early: All three traces are noisy and uncorrelated as the agent explores randomly
-    - Mid training: Reward and TD error begin to track each other more closely
-    - Late training: Reward and TD error converge toward similar values, while value becomes smoother
+    ## Reading the Learning Process
 
-    Why don't reward and TD error go to zero? Unlike discrete episodic tasks, this is a continuous environment where the agent is always moving. The reward signal varies based on distance to objects, so it naturally fluctuates between positive and negative values depending on proximity.
+    What to expect during training:
+    - **Early**: All three traces are noisy and uncorrelated as the agent explores randomly. Value stays near zero because the critic hasn't learned anything yet, so TD error closely tracks reward.
+    - **Mid training**: Reward and TD error begin to track each other more closely as value predictions improve but still have room to grow.
+    - **Late training**: Reward and TD error converge toward similar values as value becomes smoother and more accurate. The small difference between them reflects how well the critic is predicting future outcomes.
 
-    Why do reward and TD error converge toward each other? The TD error formula is: TD_error = r + γ×V(s') - V(s). When the critic is well-trained, the value function changes smoothly as the agent moves (small difference between V(s') and V(s)), so that TD_error is close to r, so the two traces track each other closely.
+    ## Common Questions
 
-    What causes the sharp spikes in TD error when objects respawn?
-    - Downward spikes occur when a rewarding object disappears. This is an unexpected negative change. At s the agent was close to something good, and at s' the good thing is far away.
-    - Upward spikes occur when a penalizing object (poison) disappears. This is an unexpected positive change.  At s the agent was close to something bad, and at s' the bad thing is far away.
+    **Why don't reward and TD error go to zero?**
+    Unlike discrete episodic tasks, this is a continuous environment where the agent is always moving. The reward signal varies based on distance to objects, so it naturally fluctuates between positive and negative values depending on proximity. TD error tracks these fluctuations.
 
-    These spikes represent genuine prediction errors. The critic didn't predict the object would suddenly teleport away! However, these spikes don't disrupt learning much because weight updates are proportional to both TD error AND input activation: Δw = learningRate × tdError × activation. When objects respawn far away, the sensor activations are near zero, so even though TD error is large, the weight changes are minimal. The algorithm only learns strongly when sensory signals are present, which is exactly what we want. The agent shouldn't learn from situations it can't actually sense.
+    **Why do reward and TD error converge toward each other?**
+    The TD error formula is: TD_error = r + γ×V(current) - V(previous). When the critic is well-trained, the value function changes smoothly as the agent moves, making the difference between V(current) and V(previous) small. This means TD_error ≈ r, so the two traces track each other closely. Early in training when value is near zero, TD error also approximates reward, but for a different reason: both value terms are near zero.
 
+    **What causes the sharp spikes in TD error when objects respawn?**
+    - Downward spikes occur when a rewarding object disappears. This is an unexpected negative change: at the previous step the agent was close to something good, and at the current step it's far away.
+    - Upward spikes occur when a penalizing object (poison) disappears. This is an unexpected positive change: at the previous step the agent was close to something bad, and at the current step it's far away.
 
+    These spikes represent genuine prediction errors: the critic didn't predict the object would suddenly teleport! However, these spikes don't disrupt learning much because weight updates are proportional to both TD error AND input activation: Δw = learningRate × tdError × activation. When objects respawn far away, sensor activations are near zero, so even though TD error is large, the weight changes are minimal. The algorithm only learns strongly when sensory signals are present, which is exactly what we want.
 
     # References
 
@@ -797,6 +783,45 @@ val braitenbergRL = newSim { optionString ->
 
     """.trimIndent()
     )
+
+    /*
+     * ============================================================================
+     * HEADLESS MODE DOCUMENTATION
+     * ============================================================================
+     *
+     * SAMPLE TERMINAL COMMANDS:
+     *
+     * Basic run with 10000 iterations:
+     *   ./gradlew runSim -PsimName="Braitenberg RL" -PoptionString='{"maxIterations": 10000, "csvOutput": {}}'
+     *
+     * Task switching mid-training:
+     *   ./gradlew runSim -PsimName="Braitenberg RL" -PoptionString='{"taskIndex": 0, "maxIterations": 20000, "csvOutput": {}, "parameterSchedule": [{"atIteration": 5000, "set": {"taskIndex": 1}}]}'
+     *
+     * PARAMETERS:
+     * - taskIndex: 0=Seek Cheese/Avoid Poison, 1=Seek Both, 2=Avoid Both, 3=Seek Poison/Avoid Cheese
+     * - learningRate: Learning rate (default: 0.05)
+     * - gamma: Discount factor (default: 0.95)
+     * - trainSpeedConnections: Whether to train sensor-to-speed connections (default: true)
+     * - decayFunction: Shared decay function for all sensors and rewards {type, dispersion, peakDistance}
+     * - cheeseReward: {maxReward} - maximum cheese reward magnitude
+     * - poisonReward: {maxReward} - maximum poison reward magnitude
+     * - decayFunction types: "Gaussian", "Linear", "Step"
+     * - maxIterations: Number of iterations to run before stopping (required for headless mode)
+     * - csvOutput: Enable CSV output of simulation data. Use {} for auto-generated filename,
+     *              or {"filePath": "path/to/file.csv"} for custom path
+     * - parameterSchedule: List of parameter changes triggered at specific iterations
+     *     - atIteration: Iteration number to trigger the change
+     *     - set: Object with parameters to change (taskIndex, learningRate, gamma, learningEnabled)
+     *
+     * CSV OUTPUT COLUMNS:
+     *   iteration, taskIndex, learningRate, gamma,
+     *   cheeseLeftInput, cheeseRightInput, poisonLeftInput, poisonRightInput,
+     *   straight, leftTurn, rightTurn, reward, value, tdError,
+     *   actorW_cheeseL_leftTurn, actorW_cheeseR_rightTurn, actorW_poisonL_leftTurn, actorW_poisonR_rightTurn,
+     *   speedW_cheeseL, speedW_cheeseR, speedW_poisonL, speedW_poisonR,
+     *   criticW_cheeseL, criticW_cheeseR, criticW_poisonL, criticW_poisonR,
+     *   agentX, agentY, agentHeading, cheeseX, cheeseY, poisonX, poisonY
+     */
 
     // Helper function to parse decay function from JSON
     fun parseDecayFunction(config: JSONObject): DecayFunction {

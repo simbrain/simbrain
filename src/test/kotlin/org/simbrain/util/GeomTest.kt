@@ -6,6 +6,53 @@ import java.awt.geom.Line2D
 
 class GeomTest {
 
+    // Wrap-around distance tests
+
+    @Test
+    fun `wrap around distance across x boundary should be shorter than direct distance`() {
+        // In a 300x300 world, point at x=10 and x=290 are 20 units apart via wrap-around
+        val p1 = point(10.0, 150.0)
+        val p2 = point(290.0, 150.0)
+        val distance = p1.wrapAroundDistanceTo(p2, 300.0, 300.0)
+        assertEquals(20.0, distance, 0.001)
+    }
+
+    @Test
+    fun `wrap around distance across y boundary should be shorter than direct distance`() {
+        // In a 300x300 world, point at y=10 and y=290 are 20 units apart via wrap-around
+        val p1 = point(150.0, 10.0)
+        val p2 = point(150.0, 290.0)
+        val distance = p1.wrapAroundDistanceTo(p2, 300.0, 300.0)
+        assertEquals(20.0, distance, 0.001)
+    }
+
+    @Test
+    fun `wrap around distance when direct is shorter should use direct distance`() {
+        // Points that are closer directly than via wrap-around
+        val p1 = point(100.0, 100.0)
+        val p2 = point(120.0, 100.0)
+        val distance = p1.wrapAroundDistanceTo(p2, 300.0, 300.0)
+        assertEquals(20.0, distance, 0.001)
+    }
+
+    @Test
+    fun `wrap around distance across both boundaries`() {
+        // Corner to corner wrap: (10,10) to (290,290) in 300x300 world
+        // dx = min(280, 20) = 20, dy = min(280, 20) = 20
+        // distance = sqrt(20^2 + 20^2) = sqrt(800) ≈ 28.28
+        val p1 = point(10.0, 10.0)
+        val p2 = point(290.0, 290.0)
+        val distance = p1.wrapAroundDistanceTo(p2, 300.0, 300.0)
+        assertEquals(28.284, distance, 0.001)
+    }
+
+    @Test
+    fun `wrap around distance for same point should be zero`() {
+        val p1 = point(150.0, 150.0)
+        val distance = p1.wrapAroundDistanceTo(p1, 300.0, 300.0)
+        assertEquals(0.0, distance, 0.001)
+    }
+
     @Test
     fun `p(0, 1)v(0, 2) and p(1, 0)v(2, 0) should intersect at t = 0_5`() {
         val line1 = point(0, 1).withVector(2, 0)

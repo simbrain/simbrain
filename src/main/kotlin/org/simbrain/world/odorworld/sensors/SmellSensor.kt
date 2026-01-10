@@ -1,6 +1,8 @@
 package org.simbrain.world.odorworld.sensors
 
+import org.simbrain.util.distanceTo
 import org.simbrain.util.math.SimbrainMath
+import org.simbrain.util.wrapAroundDistanceTo
 import org.simbrain.workspace.Producible
 import org.simbrain.workspace.couplings.HIGH_PRIORITY
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
@@ -25,9 +27,20 @@ class SmellSensor @JvmOverloads constructor(
      * Update the smell vector by iterating over entities and adding up their distance-scaled smell vectors.
      */
     override fun update(parent: OdorWorldEntity) {
+        val sensorLocation = computeAbsoluteLocation(parent)
         smellVector = parent.world.entityList
             .filter { it != parent } // Don't smell yourself
-            .map { Pair(it.smellSource, SimbrainMath.distance(it.location, computeAbsoluteLocation(parent))) }
+            .map { entity ->
+                val distance = if (parent.world.wrapAround) {
+                    entity.location.wrapAroundDistanceTo(
+                        sensorLocation,
+                        parent.world.width, parent.world.height
+                    )
+                } else {
+                    entity.location distanceTo sensorLocation
+                }
+                Pair(entity.smellSource, distance)
+            }
             .map { (smellSource, distance) -> smellSource.getStimulus(distance) }
             .fold(DoubleArray(smellVector.size) {0.0},  SimbrainMath::addVector)
     }

@@ -3,7 +3,8 @@ package org.simbrain.world.odorworld.sensors
 import org.simbrain.util.UserParameter
 import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.decayfunctions.LinearDecayFunction
-import org.simbrain.util.math.SimbrainMath
+import org.simbrain.util.distanceTo
+import org.simbrain.util.wrapAroundDistanceTo
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 
@@ -37,9 +38,15 @@ class ObjectSensor @JvmOverloads constructor(
         val sensorLocation = computeAbsoluteLocation(parent)
         for (otherEntity in parent.world.entityList - parent) {
             if (otherEntity.entityType == objectType) {
-                val scaleFactor = decayFunction.getScalingFactor(
-                    SimbrainMath.distance(sensorLocation, otherEntity.location)
-                )
+                val distance = if (parent.world.wrapAround) {
+                    sensorLocation.wrapAroundDistanceTo(
+                        otherEntity.location,
+                        parent.world.width, parent.world.height
+                    )
+                } else {
+                    sensorLocation distanceTo otherEntity.location
+                }
+                val scaleFactor = decayFunction.getScalingFactor(distance)
                 currentValue += baseValue * scaleFactor
             }
         }
@@ -51,9 +58,15 @@ class ObjectSensor @JvmOverloads constructor(
         val sensorLocation = computeAbsoluteLocation(parent)
         for (otherEntity in parent.world.entityList) {
             if (otherEntity.entityType == objectType) {
-                val scaleFactor = decayFunction.getScalingFactor(
-                    SimbrainMath.distance(sensorLocation, otherEntity.location)
-                )
+                val distance = if (parent.world.wrapAround) {
+                    sensorLocation.wrapAroundDistanceTo(
+                        otherEntity.location,
+                        parent.world.width, parent.world.height
+                    )
+                } else {
+                    sensorLocation distanceTo otherEntity.location
+                }
+                val scaleFactor = decayFunction.getScalingFactor(distance)
                 if ((baseValue * scaleFactor) > threshold) {
                     retList.add(otherEntity)
                 }

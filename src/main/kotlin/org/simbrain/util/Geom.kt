@@ -34,6 +34,18 @@ fun point(x: Int, y: Int): Point = Point(x, y)
 infix fun Point2D.distanceTo(other: Point2D) = this.distance(other)
 infix fun Point2D.distanceSqTo(other: Point2D) = this.distanceSq(other)
 
+/**
+ * Calculates distance considering wrap-around (torus topology).
+ * Uses the shortest path, which may cross the world boundary.
+ */
+fun Point2D.wrapAroundDistanceTo(other: Point2D, worldWidth: Double, worldHeight: Double): Double {
+    val dxDirect = abs(this.x - other.x)
+    val dyDirect = abs(this.y - other.y)
+    val dx = min(dxDirect, worldWidth - dxDirect)
+    val dy = min(dyDirect, worldHeight - dyDirect)
+    return sqrt(dx * dx + dy * dy)
+}
+
 operator fun Point2D.unaryMinus() = point(-x, -y)
 
 operator fun Point2D.plus(vector: Point2D) = point(this.x + vector.x, this.y + vector.y)

@@ -31,6 +31,7 @@ class DistanceBased (
     ): List<Synapse> {
         val syns = createRadialSynapses(source, target, decayFunction, random)
         polarizeSynapses(syns, percentExcitatory, random)
+        weightInitializer.initializeWeights(syns)
         return syns
     }
 

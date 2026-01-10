@@ -3,10 +3,9 @@ package org.simbrain.network.connections
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.gui.ConnectionStrategyPanel
+import org.simbrain.util.UserParameter
 import org.simbrain.util.displayInDialog
 import org.simbrain.util.propertyeditor.CopyableObject
-import org.simbrain.util.stats.ProbabilityDistribution
-import org.simbrain.util.stats.distributions.NormalDistribution
 import kotlin.random.Random
 
 /**
@@ -15,9 +14,9 @@ import kotlin.random.Random
  * creating them in synapse groups. Another distinction is between strategies that use polarity and those that do not.
  *
  * Note that connections are generally made in the following order.
- * 1) Weights are made using this class
+ * 1) Synapses are created using this class
  * 2) Their excitatory / inhibitory ratio is set using [percentExcitatory]
- * 3) The two sets of weights are then randomized using probability distributions.
+ * 3) Weights are initialized using [weightInitializer]
  *
  * @author Zoë Tosi
  * @author Jeff Yoshimi
@@ -25,24 +24,10 @@ import kotlin.random.Random
 abstract class ConnectionStrategy(seed: Long = Random.nextLong()) : CopyableObject {
 
     /**
-     * Whether excitatory connection should be randomized.
+     * Strategy for initializing synapse weights after connections are created.
      */
-    var isUseExcitatoryRandomization = true
-
-    /**
-     * Whether inhibitory connection should be randomized.
-     */
-    var isUseInhibitoryRandomization = true
-
-    /**
-     * The randomizer for excitatory synapses.
-     */
-    var exRandomizer: ProbabilityDistribution = NormalDistribution().apply { randomSeed = seed }
-
-    /**
-     * The randomizer for inhibitory synapses.
-     */
-    var inRandomizer: ProbabilityDistribution = NormalDistribution().apply { randomSeed = seed }
+    @UserParameter(label = "Weight Initializer", description = "How to initialize synapse weights", order = 100, showDetails = false)
+    var weightInitializer: WeightInitializer = RandomWeightInitializer(seed)
 
     /**
      * If true, then separately store [percentExcitatory]. If false, the connection strategy itself determines how
@@ -56,15 +41,12 @@ abstract class ConnectionStrategy(seed: Long = Random.nextLong()) : CopyableObje
     var percentExcitatory: Double = 50.0
 
     /**
-     * A random object that uses the strategy’s [seed] that can be passed to different functions (such as shuffle) to ensure deterministic results
+     * A random object that uses the strategy's [seed] that can be passed to different functions (such as shuffle) to ensure deterministic results
      */
     var random = Random(seed)
 
     fun commonCopy(toCopy: ConnectionStrategy) {
-        toCopy.exRandomizer = exRandomizer.copy()
-        toCopy.inRandomizer = inRandomizer.copy()
-        toCopy.isUseExcitatoryRandomization = isUseExcitatoryRandomization
-        toCopy.isUseInhibitoryRandomization = isUseInhibitoryRandomization
+        toCopy.weightInitializer = weightInitializer.copy()
         toCopy.percentExcitatory = percentExcitatory
     }
 

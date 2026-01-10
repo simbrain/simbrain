@@ -122,6 +122,7 @@ class RadialGaussian(
     ): List<Synapse> {
         val syns: List<Synapse> = createRadialPolarizedSynapses(source, target, eeDistConst, eiDistConst, ieDistConst, iiDistConst, distConst, lambda, random)
         polarizeSynapses(syns, percentExcitatory, random)
+        weightInitializer.initializeWeights(syns)
         return syns
     }
 

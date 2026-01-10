@@ -1,6 +1,7 @@
 package org.simbrain.custom_sims.simulations.patterns_of_activity
 
 import org.simbrain.custom_sims.*
+import org.simbrain.network.connections.RandomWeightInitializer
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.WeightMatrix
@@ -54,9 +55,10 @@ val cogMap3Objects = newSim {
 
     val sparseExcitatory = Sparse(0.7, true, false)
     sparseExcitatory.percentExcitatory = 100.0
+    sparseExcitatory.weightInitializer = RandomWeightInitializer().apply {
+        exRandomizer = NormalDistribution(10.0, 1.0)
+    }
     val inputToRes = SynapseGroup(inputNetwork, recurrent, sparseExcitatory)
-
-    inputToRes.connectionStrategy.exRandomizer = NormalDistribution(10.0, 1.0)
     inputToRes.displaySynapses = false
     inputToRes.label = "Sparse Excitatory"
     inputToRes.randomizeExcitatory()

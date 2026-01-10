@@ -5,8 +5,6 @@ import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.getEuclideanDist
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
-import org.simbrain.util.stats.ProbabilityDistribution
-import org.simbrain.util.stats.distributions.NormalDistribution
 import kotlin.random.Random
 
 /**
@@ -99,16 +97,15 @@ class RadialProbabilistic(
         val exc = createSynapsesProbabilistically(
             source, target, excitatoryProbability,
             excitatoryRadius, allowSelfConnections,
-            exRandomizer,
             random
         )
         val inh = createSynapsesProbabilistically(
-            source, target, excitatoryProbability,
-            excitatoryRadius, allowSelfConnections,
-            inRandomizer,
+            source, target, inhibitoryProbability,
+            inhibitoryRadius, allowSelfConnections,
             random
         )
         val syns = exc + inh
+        weightInitializer.initializeWeights(syns)
         return syns
     }
 
@@ -137,23 +134,23 @@ fun createSynapsesProbabilistically(
     prob: Double,
     radius: Double,
     allowSelfConnection: Boolean = false,
-    weightRandomizer: ProbabilityDistribution = NormalDistribution(0.0, 1.0),
     random: Random = Random
 ): List<Synapse> {
     return src.flatMap { n ->
-        n.createSynapsesProbabilistically(tar, prob, radius, allowSelfConnection, weightRandomizer, random)
+        n.createSynapsesProbabilistically(tar, prob, radius, allowSelfConnection, random)
     }
 }
 
 /**
- * Connect a neuron to N other neurons, in a provided pool of neurons, using a provided probability
+ * Connect a neuron to other neurons in a provided pool, using a provided probability.
+ * Synapses are created with default strength (±1.0 based on source polarity).
+ * Use a WeightInitializer to set weights after creation.
  */
 fun Neuron.createSynapsesProbabilistically(
     pool: List<Neuron>,
     prob: Double,
     radius: Double,
     allowSelfConnection: Boolean = false,
-    weightRandomizer: ProbabilityDistribution = NormalDistribution(0.0, 1.0),
     random: Random = Random
 ): List<Synapse> {
     return getNeuronsInRadius(pool, radius)
@@ -162,7 +159,7 @@ fun Neuron.createSynapsesProbabilistically(
         }
         .filter { random.nextDouble() < prob }
         .map { otherNeuron ->
-            Synapse(this, otherNeuron, this.polarity.value(weightRandomizer.sampleDouble()))
+            Synapse(this, otherNeuron)
         }
 }
 

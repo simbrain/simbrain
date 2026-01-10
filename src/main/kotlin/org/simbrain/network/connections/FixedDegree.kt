@@ -5,8 +5,6 @@ import org.simbrain.network.core.Synapse
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
-import org.simbrain.util.stats.ProbabilityDistribution
-import org.simbrain.util.stats.distributions.NormalDistribution
 import kotlin.random.Random
 
 /**
@@ -68,11 +66,12 @@ class FixedDegree(
         target: List<Neuron>
     ): List<Synapse> {
         val syns = if (useRadius) {
-            createFixedDegreeInRadiusSynapses(source, target, degree, radius, direction, allowSelfConnections, exRandomizer, random)
+            createFixedDegreeInRadiusSynapses(source, target, degree, radius, direction, allowSelfConnections, random)
         } else {
-            createFixedDegreeSynapses(source, target, degree, direction, allowSelfConnections, exRandomizer, random)
+            createFixedDegreeSynapses(source, target, degree, direction, allowSelfConnections, random)
         }
         polarizeSynapses(syns, percentExcitatory, random)
+        weightInitializer.initializeWeights(syns)
         return syns
     }
 
@@ -102,11 +101,10 @@ fun createFixedDegreeSynapses(
     degree: Int,
     direction: Direction = Direction.IN,
     allowSelfConnection: Boolean = false,
-    weightRandomizer: ProbabilityDistribution,
     random: Random
 ): List<Synapse> {
     val syns = ArrayList<Synapse>()
-    src.forEach { n -> syns.addAll(n.createToNSynapses(tar, degree, direction, allowSelfConnection, weightRandomizer, random)) }
+    src.forEach { n -> syns.addAll(n.createToNSynapses(tar, degree, direction, allowSelfConnection, random)) }
     return syns
 }
 
@@ -120,7 +118,6 @@ fun createFixedDegreeInRadiusSynapses(
     radius: Double,
     direction: Direction = Direction.IN,
     allowSelfConnection: Boolean = false,
-    weightRandomizer: ProbabilityDistribution = NormalDistribution(0.0, 1.0),
     random: Random = Random
 ): List<Synapse> {
     val syns = ArrayList<Synapse>()
@@ -128,7 +125,6 @@ fun createFixedDegreeInRadiusSynapses(
             n.createToNSynapses(
                 n.getNeuronsInRadius(tar, radius),
                 degree, direction, allowSelfConnection,
-                weightRandomizer = weightRandomizer,
                 random = random
             )
         )
@@ -138,13 +134,14 @@ fun createFixedDegreeInRadiusSynapses(
 
 /**
  * Connect a neuron to N other neurons, in a provided pool of neurons.
+ * Synapses are created with default strength (±1.0 based on source polarity).
+ * Use a WeightInitializer to set weights after creation.
  */
 fun Neuron.createToNSynapses(
     pool: List<Neuron>,
     N: Int,
     direction: Direction = Direction.IN,
     allowSelfConnection: Boolean = false,
-    weightRandomizer: ProbabilityDistribution = NormalDistribution(0.0, 1.0),
     random: Random = Random
 ): List<Synapse> {
     return pool.shuffled(random)
@@ -154,9 +151,9 @@ fun Neuron.createToNSynapses(
         .take(N)
         .map { otherNeuron ->
             if (direction == Direction.IN) {
-                Synapse(otherNeuron, this, otherNeuron.polarity.value(weightRandomizer.sampleDouble()))
+                Synapse(otherNeuron, this)
             } else {
-                Synapse(this, otherNeuron, this.polarity.value(weightRandomizer.sampleDouble()))
+                Synapse(this, otherNeuron)
             }
         }
 }

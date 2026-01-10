@@ -54,6 +54,7 @@ class AllToAll @JvmOverloads constructor(
     ): List<Synapse> {
         val syns = createAllToAllSynapses(source, target, allowSelfConnection, useBidirectionalConnections)
         polarizeSynapses(syns, percentExcitatory, random)
+        weightInitializer.initializeWeights(syns)
         return syns
     }
 

@@ -1,6 +1,7 @@
 package org.simbrain.custom_sims.simulations.patterns_of_activity
 
 import org.simbrain.custom_sims.*
+import org.simbrain.network.connections.RandomWeightInitializer
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.SynapseGroup
@@ -112,8 +113,10 @@ val kuramotoOscillators = newSim("kuramotoOscillators") {
     val sparseExcitatory = Sparse(0.7, true, false).apply {
         percentExcitatory = 100.0
     }
+    sparseExcitatory.weightInitializer = RandomWeightInitializer().apply {
+        exRandomizer = NormalDistribution(10.0, 1.0)
+    }
     val inputToRes = SynapseGroup(inputNetwork, reservoirNet, sparseExcitatory).apply {
-        connectionStrategy.exRandomizer = NormalDistribution(10.0, 1.0)
         net.addNetworkModelAsync(this)
         SwingUtilities.invokeLater { displaySynapses = false }
         randomizeExcitatory()

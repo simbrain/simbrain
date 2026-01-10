@@ -406,8 +406,10 @@ class PatternsOfActivity : Simulation {
         // synG.setLowerBound(0, Polarity.EXCITATORY);
         // synG.setLowerBound(-200, Polarity.INHIBITORY);
         // synG.setUpperBound(0, Polarity.INHIBITORY);
-        synG.connectionStrategy.exRandomizer = NormalDistribution(10.0, 2.5)
-        synG.connectionStrategy.inRandomizer = NormalDistribution(-10.0, 2.5)
+        synG.connectionStrategy.weightInitializer = RandomWeightInitializer().apply {
+            exRandomizer = NormalDistribution(10.0, 2.5)
+            inRandomizer = NormalDistribution(-10.0, 2.5)
+        }
         synG.randomize()
     }
 

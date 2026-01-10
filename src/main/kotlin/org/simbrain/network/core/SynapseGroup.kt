@@ -134,25 +134,25 @@ class SynapseGroup @JvmOverloads constructor(
     }
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
-        this.synapses.forEach {
-            when (it.target.polarity) {
-                SimbrainConstants.Polarity.EXCITATORY -> it.forceSetStrength(connectionStrategy.exRandomizer.sampleDouble())
-                SimbrainConstants.Polarity.INHIBITORY -> it.forceSetStrength(connectionStrategy.inRandomizer.sampleDouble())
-                SimbrainConstants.Polarity.BOTH -> it.forceSetStrength((randomizer ?: weightRandomizer).sampleDouble())
-            }
+        if (randomizer != null) {
+            // If a specific randomizer is provided, use it directly for all synapses
+            this.synapses.forEach { it.forceSetStrength(randomizer.sampleDouble()) }
+        } else {
+            // Otherwise use the connection strategy's weight initializer
+            connectionStrategy.weightInitializer.initializeWeights(this.synapses)
         }
     }
 
     fun randomizeExcitatory() {
-        this.synapses
+        val excitatorySynapses = this.synapses
             .filter { s -> s.source.polarity == SimbrainConstants.Polarity.EXCITATORY }
-            .forEach { it.forceSetStrength(connectionStrategy.exRandomizer.sampleDouble()) }
+        connectionStrategy.weightInitializer.initializeWeights(excitatorySynapses)
     }
 
     fun randomizeInhibitory() {
-        this.synapses
+        val inhibitorySynapses = this.synapses
             .filter { s -> s.source.polarity == SimbrainConstants.Polarity.INHIBITORY }
-            .forEach { it.forceSetStrength(connectionStrategy.inRandomizer.sampleDouble()) }
+        connectionStrategy.weightInitializer.initializeWeights(inhibitorySynapses)
     }
 
     override fun toggleClamping() {

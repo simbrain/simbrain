@@ -5,6 +5,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connections.ConnectionStrategy
+import org.simbrain.network.connections.RandomWeightInitializer
 import org.simbrain.network.core.*
 import org.simbrain.network.gui.dialogs.PercentExcitatoryPanel
 import org.simbrain.network.gui.dialogs.SynapseAdjustmentPanel
@@ -137,11 +138,17 @@ fun SynapseGroupNode.getDialog(): StandardDialog {
     val connectionStrategyPanel = ConnectionStrategyPanel(synapseGroup.connectionStrategy)
     val matrixViewer = WeightMatrixViewer(synapseGroup.source.neuronList, synapseGroup.target.neuronList)
 
+    val weightInitializer = synapseGroup.connectionStrategy.weightInitializer
+    val (exRandomizer, inRandomizer) = if (weightInitializer is RandomWeightInitializer) {
+        weightInitializer.exRandomizer to weightInitializer.inRandomizer
+    } else {
+        synapseGroup.weightRandomizer to synapseGroup.weightRandomizer
+    }
     val synapseAdjustmentPanel = SynapseAdjustmentPanel(
         synapseGroup.synapses,
         synapseGroup.weightRandomizer,
-        synapseGroup.connectionStrategy.exRandomizer,
-        synapseGroup.connectionStrategy.inRandomizer
+        exRandomizer,
+        inRandomizer
     ) {
         synapsesEditor.refreshValues()
         matrixViewer.refreshValues()

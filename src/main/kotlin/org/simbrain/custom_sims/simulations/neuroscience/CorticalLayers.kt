@@ -1,6 +1,7 @@
 package org.simbrain.custom_sims.simulations.neuroscience
 
 import org.simbrain.custom_sims.*
+import org.simbrain.network.connections.RandomWeightInitializer
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.addNeuronGroup
@@ -87,9 +88,11 @@ val corticalLayers = newSim {
         val exRand: ProbabilityDistribution = LogNormalDistribution(exlocation, exscale, false)
         val inRand: ProbabilityDistribution = LogNormalDistribution(inlocation, inscale, true)
         val con = Sparse(sparsity, false, false)
+        con.weightInitializer = RandomWeightInitializer().apply {
+            exRandomizer = exRand
+            inRandomizer = inRand
+        }
         val sg = SynapseGroup(src, tar, con)
-        sg.connectionStrategy.exRandomizer = exRand
-        sg.connectionStrategy.inRandomizer = inRand
         sg.randomizeExcitatory()
         sg.randomizeInhibitory()
         sg.label = "Synapses"

@@ -4,6 +4,7 @@ import org.simbrain.custom_sims.Simulation;
 import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.connections.Direction;
 import org.simbrain.network.connections.FixedDegree;
+import org.simbrain.network.connections.RandomWeightInitializer;
 import org.simbrain.network.connections.Sparse;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
@@ -147,10 +148,12 @@ public class SORN extends Simulation {
         input.applyLayout(new Point(x_loc, y_loc));
 
         Sparse input_ee_con = new Sparse(0.05, false, false);
+        RandomWeightInitializer input_ee_init = new RandomWeightInitializer();
+        input_ee_init.setExRandomizer(defWtPD);
+        input_ee_init.setInRandomizer(defWtPD);
+        input_ee_con.setWeightInitializer(input_ee_init);
         SynapseGroup input_ee = new SynapseGroup(input, ng, input_ee_con);
         input_ee.getConnectionStrategy().setPercentExcitatory(1.0);
-        input_ee.getConnectionStrategy().setExRandomizer(defWtPD);
-        input_ee.getConnectionStrategy().setInRandomizer(defWtPD);
         input_ee.setLabel("Input -> Excitatory");
         // TODO
         // input_ee.setLearningRule(stdp, Polarity.BOTH);
@@ -165,10 +168,12 @@ public class SORN extends Simulation {
 //        network.addGroup(ee_input);
 
         Sparse input_ie_con = new Sparse(0.05, true, false);
+        RandomWeightInitializer input_ie_init = new RandomWeightInitializer();
+        input_ie_init.setExRandomizer(defWtPD);
+        input_ie_init.setInRandomizer(defWtPD);
+        input_ie_con.setWeightInitializer(input_ie_init);
         SynapseGroup input_ie = new SynapseGroup(input, ngIn, input_ie_con);
         input_ie.getConnectionStrategy().setPercentExcitatory(1.0);
-        input_ie.getConnectionStrategy().setExRandomizer(defWtPD);
-        input_ie.getConnectionStrategy().setInRandomizer(defWtPD);
         input_ie.setLabel("Input -> Inhibitory");
         // TODO
         // input_ie.setSpikeResponder(new Step(), Polarity.BOTH);
@@ -254,6 +259,10 @@ public class SORN extends Simulation {
         FixedDegree connector = new FixedDegree();
         connector.setDirection(Direction.IN);
         connector.setDegree(kIn);
+        RandomWeightInitializer weightInit = new RandomWeightInitializer();
+        weightInit.setExRandomizer(random);
+        weightInit.setInRandomizer(random);
+        connector.setWeightInitializer(weightInit);
         // connector.setSelectMethod(SelectionStyle.IN);
         // connector.setConMethod(RadialSimple.ConnectStyle.DETERMINISTIC);
         // src.setPolarity(polarity);
@@ -261,8 +270,6 @@ public class SORN extends Simulation {
         // connector.setInhCons(kIn);
         SynapseGroup sg = new SynapseGroup(src, tar, connector);
         sg.getConnectionStrategy().setPercentExcitatory(excRat);
-        sg.getConnectionStrategy().setExRandomizer(random);
-        sg.getConnectionStrategy().setInRandomizer(random);
         sg.setLabel(label);
         // TODO
         // sg.setSpikeResponder(new Step(),

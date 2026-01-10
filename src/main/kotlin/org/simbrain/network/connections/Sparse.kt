@@ -74,10 +74,12 @@ class Sparse @JvmOverloads constructor(
         return when(result) {
             is ConnectionsResult.Add -> {
                 polarizeSynapses(result.connectionsToAdd, percentExcitatory)
+                weightInitializer.initializeWeights(result.connectionsToAdd)
                 result.connectionsToAdd
             }
             is ConnectionsResult.Reset -> {
                 polarizeSynapses(result.resultConnections, percentExcitatory)
+                weightInitializer.initializeWeights(result.resultConnections)
                 result.resultConnections
             }
             is ConnectionsResult.Remove -> {

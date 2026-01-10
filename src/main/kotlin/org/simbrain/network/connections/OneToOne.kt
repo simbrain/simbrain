@@ -31,6 +31,7 @@ class OneToOne(
     ): List<Synapse> {
         val syns = createOneToOneSynapses(source, target, useBidirectionalConnections)
         polarizeSynapses(syns, percentExcitatory, random)
+        weightInitializer.initializeWeights(syns)
         return syns
     }
 

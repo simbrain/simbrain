@@ -425,18 +425,6 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
 
         The simulation consists of several interconnected components that work together to process and generate text.
 
-        ## Overview of Components
-
-        The network contains several key layers:
-
-        - **Inputs**: An activation sequence that holds the encoded context window. Each token is represented as a one-hot vector, and the full sequence forms a matrix where each row corresponds to one token position.
-
-        - **Transformer block**: The core of the model. This layer processes the input sequence using self-attention and feed-forward transformations to create rich representations that capture patterns in the text.
-
-        - **Softmax sequence**: Converts the transformer outputs into probability distributions over possible next tokens. Each position in the sequence predicts the next token at that position. Temperature controls randomness (lower = more deterministic, higher = more random).
-
-        - **Predicted next token**: A separate output layer that shows the probability distribution for the next token that will be generated. This layer extracts the prediction for the current position in the context window from the softmax sequence.
-
         ## How Token Processing Works
 
         Understanding the detailed flow through the network helps clarify what the model learns and how it generates text:
@@ -451,7 +439,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
 
         5. **Unembedding**: The `Unembedding` weight matrix converts the transformer's output back into the vocabulary space. This produces a matrix where each row contains scores (logits) for predicting the next token at that position in the sequence.
 
-        6. **Softmax sequence**: The logits pass through a softmax function with temperature control, converting them into proper probability distributions. Each row of this layer corresponds to a current token, and the columns correspond to probabilities for next tokens that sum to 1.0 across all possible tokens. (This is also where temperature is applied). The `Softmax sequence` thus contains predictions for all positions in the context window simultaneously. This is useful during training when the model learns to predict the next token at every position, but during generation only one of these predictions matters, the one corresponding to the current number of tokens in the context.
+        6. **Softmax sequence**: The logits pass through a softmax function with temperature control, converting them into proper probability distributions. Each row of this layer corresponds to a current token, and the columns correspond to probabilities for next tokens that sum to 1.0 across all possible tokens. The `Softmax sequence` thus contains predictions for all positions in the context window simultaneously. This is useful during training when the model learns to predict the next token at every position, but during generation only one of these predictions matters, the one corresponding to the current number of tokens in the context.
 
         7. **Predicted next token**: This layer serves primarily as a visualization aid. It extracts and displays the single row from the `Softmax sequence` that corresponds to the current number of tokens in the context window, that is, the row at the position from which the next token will be sampled. This makes it easier to see what the model predicts. In fact, after clicking step or play, you can verify that the last token produced in the text input window corresponds to one of the most active nodes in this layer.
 
@@ -463,7 +451,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
 
         Most patterns are row by row, and are easy to understand when filling in tokens at first, because unused rows are associated with zero vectors. Thus we see "rows" of color filling in at the different component.
 
-        **Zero vectors and unknown tokens**: The model uses zero vectors in two situations. First, empty positions in the context window (positions not yet filled with tokens) are represented as zero vectors. Second, and importantly, if you type tokens in the `Text Inputs` window that aren't in the vocabulary, those tokens also produce zero vectors. You can type whatever you want, but any token not in the learned vocabulary becomes a zero row in the `Inputs` layer with no red dot. The vocabulary is determined by the training text—only tokens that appear in the training data are recognized. You can view the complete vocabulary by clicking `View token embedding editor` in the text inputs component.
+        **Zero vectors and unknown tokens**: The model uses zero vectors in two situations. First, empty positions in the context window (positions not yet filled with tokens) are represented as zero vectors. Second, and importantly, if you type tokens in the `Text Inputs` window that aren't in the vocabulary, those tokens also produce zero vectors. You can type whatever you want, but any token not in the vocabulary becomes a zero row in the `Inputs` layer with no red dot. The vocabulary is determined by the training text—only tokens that appear in the training data are recognized. You can view the complete vocabulary by clicking `View token embedding editor` in the text inputs component.
 
         **Inputs layer**: This is the easiest component to interpret. Each row represents one position in the context window. When a token occupies that position and is in the vocabulary, you'll see a single red dot in that row: this is the one-hot encoding. The column position of that red dot identifies the token. As the model generates more tokens, more rows fill in with red dots. Rows show all zeros (no red dots) in two cases: empty positions not yet filled, or positions containing tokens not in the vocabulary.
 
@@ -564,14 +552,19 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         
         ## Train on Different Text Types
         
-        Try training on different text corpora to see how the model adapts:
+        The default training text is `casual_texting_small.txt`, which was generated by AI to mimic short, casual human text exchanges. It contains conversational patterns like greetings, questions, and responses that help the model learn natural (albeit cringe!) dialogue flow.
         
-        - `casual_texting_small.txt`: Informal conversational text
-        - `chess.txt`: Chess-related terminology and patterns
-        - `mlk.txt`: Formal speech text
-        - Your own text files
+        Try training on different text corpora to see how the model adapts. Each text type will produce different learned patterns. You can also create your own training data.
         
-        Each text type will produce different learned patterns. A model trained on chess text will generate chess-related content, while one trained on casual text will produce more informal language.
+        ### Creating Training Data with AI
+        
+        You can generate custom training text using AI tools like ChatGPT or Claude. The key is to create coherent text with a limited vocabulary (around 50 unique tokens is a good starting point) that includes the patterns you want the model to learn.
+        
+        Example prompt for generating training data:
+        
+        "I am preparing training data for a small language model. Write a coherent, conversational dialogue about [your topic] that is suitable as training text. Constraints: Produce 25 sentences using EXACTLY 50 unique tokens (words + punctuation). Include multiple responses to the same question so the model can learn to generalize. Each sentence must be on its own line. Do NOT number the sentences. Do NOT include speaker labels. Make it sound like a conversation with questions, answers, and follow-ups. Use simple, clear English. Output ONLY the sentences."
+        
+        After generating the text, you can fine-tune it by hand to ensure it has the patterns and vocabulary you want the model to learn.
         
         ## Adjust Context Size
         
@@ -611,6 +604,12 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         - **AdamW vs Adam**: Compare the AdamW optimizer (with decoupled weight decay) to standard Adam.
         
         Regularization is especially important with small training datasets where overfitting is common.
+        
+        # Acknowledgements
+        
+        This simulation was developed with funding support from [UC Online](https://uconline.edu/).
+        
+        Designed by Jeff Yoshimi and Yulin Li. Thanks to Sergio Ponce de Leon, Ben Fried, and many students at UC Merced for helping with the design.
 
         """.trimIndent(),
         initiallyOpened = false

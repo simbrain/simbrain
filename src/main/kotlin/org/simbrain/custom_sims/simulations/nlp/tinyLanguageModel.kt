@@ -420,6 +420,8 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         # Tiny Language Model
 
         A simplified GPT-style language model with a single transformer block. This simulation demonstrates how neural networks can learn to predict text patterns and generate new text based on training data. The model learns from sequences of text and can generate continuations based on prompts.
+        
+        For a detailed walk-through on LLMs and transformer models that complements this discussion see the chapter on transformers [here]: https://downloads.jeffyoshimi.net/NeuralNetworksCogsci.pdf
 
         # Simulation Details
 

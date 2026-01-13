@@ -76,7 +76,7 @@ val braitenbergRL = newSim { optionString ->
     var gamma = 0.95
 
     var learningEnabled = true
-    var trainSpeedConnections = true
+    var trainSpeedConnections = false
 
     var cheeseRewardMultiplier = 1.0
     var poisonRewardMultiplier = -1.0
@@ -801,7 +801,7 @@ val braitenbergRL = newSim { optionString ->
      * - taskIndex: 0=Seek Cheese/Avoid Poison, 1=Seek Both, 2=Avoid Both, 3=Seek Poison/Avoid Cheese
      * - learningRate: Learning rate (default: 0.05)
      * - gamma: Discount factor (default: 0.95)
-     * - trainSpeedConnections: Whether to train sensor-to-speed connections (default: true)
+     * - trainSpeedConnections: Whether to train sensor-to-speed connections
      * - decayFunction: Shared decay function for all sensors and rewards {type, dispersion, peakDistance}
      * - cheeseReward: {maxReward} - maximum cheese reward magnitude
      * - poisonReward: {maxReward} - maximum poison reward magnitude

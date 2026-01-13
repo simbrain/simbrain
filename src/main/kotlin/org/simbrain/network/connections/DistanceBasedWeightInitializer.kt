@@ -26,7 +26,7 @@ class DistanceBasedWeightInitializer : WeightInitializer() {
      * This is scaled by the decay function based on distance.
      */
     @UserParameter(label = "Base Strength", description = "Maximum weight strength at peak distance", order = 2)
-    var baseStrength: Double = 10.0
+    var baseStrength: Double = 1.0
 
     override fun initializeWeights(synapses: List<Synapse>) {
         synapses.forEach { synapse ->

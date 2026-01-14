@@ -19,13 +19,13 @@ class RandomWeightInitializer(seed: Long = Random.nextLong()) : WeightInitialize
      * Whether excitatory connections should be randomized.
      */
     @UserParameter(label = "Randomize Excitatory", description = "Whether to randomize excitatory weights", order = 1)
-    var useExcitatoryRandomization = false
+    var useExcitatoryRandomization = true
 
     /**
      * Whether inhibitory connections should be randomized.
      */
     @UserParameter(label = "Randomize Inhibitory", description = "Whether to randomize inhibitory weights", order = 2)
-    var useInhibitoryRandomization = false
+    var useInhibitoryRandomization = true
 
     /**
      * The randomizer for excitatory synapses.

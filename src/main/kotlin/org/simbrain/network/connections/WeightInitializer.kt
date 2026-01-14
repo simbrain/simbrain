@@ -6,6 +6,7 @@ import org.simbrain.util.propertyeditor.CopyableObject
  * Strategy for initializing synapse weights after connections are created.
  *
  * Implementations determine how weights are assigned based on different criteria:
+ * - [ConstantWeightInitializer]: Uses fixed values for excitatory/inhibitory weights
  * - [RandomWeightInitializer]: Uses probability distributions for excitatory/inhibitory weights
  * - [DistanceBasedWeightInitializer]: Scales weights based on distance between neurons
  *
@@ -27,6 +28,7 @@ abstract class WeightInitializer : CopyableObject {
 }
 
 val weightInitializerTypes = listOf(
+    ConstantWeightInitializer::class.java,
     RandomWeightInitializer::class.java,
     DistanceBasedWeightInitializer::class.java
 )

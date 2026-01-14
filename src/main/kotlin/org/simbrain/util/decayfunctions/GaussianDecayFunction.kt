@@ -19,13 +19,14 @@ class GaussianDecayFunction @JvmOverloads constructor(dispersion: Double = 70.0)
     override fun getScalingFactor(distance: Double): Double {
         val mean = peakDistance
         val std = dispersion / 2
-        return exp(-.5 * ((distance - mean) / std).pow(2.0))
+        return baseMultiplier * exp(-.5 * ((distance - mean) / std).pow(2.0))
     }
 
     override fun copy(): GaussianDecayFunction {
         return GaussianDecayFunction(dispersion)
             .also {
                 it.peakDistance = peakDistance
+                it.baseMultiplier = baseMultiplier
             }
     }
 

@@ -1,7 +1,7 @@
 package org.simbrain.network.gui.dialogs
 
-import org.simbrain.network.connections.RadialProbabilistic
 import org.simbrain.network.connections.polarizeSynapses
+import org.simbrain.network.connections.radialProbabilisticStyle
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
@@ -643,7 +643,7 @@ fun main() {
     val net = Network()
     val neurons = List(20) { Neuron() }
     // val neurons = mutableListOf<Neuron>() // To test empty list case
-    val conn = RadialProbabilistic()
+    val conn = radialProbabilisticStyle()
     val syns = conn.connectNeurons(neurons, neurons).also { net.addNetworkModelsAsync(it) }
     createSynapseAdjustmentPanel(syns)?.displayInDialog()
 }

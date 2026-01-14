@@ -213,9 +213,13 @@ class PatternsOfActivity : Simulation {
         
         val recSyns = SynapseGroup(
             recurrentNetwork!!, recurrentNetwork!!,
-            RadialGaussian(
-                DEFAULT_EE_CONST * 3, DEFAULT_EI_CONST * 3,
-                DEFAULT_IE_CONST * 3, DEFAULT_II_CONST * 3, .25, 200.0
+            radialGaussianStyle(
+                eeDistConst = DEFAULT_EE_CONST * 3,
+                eiDistConst = DEFAULT_EI_CONST * 3,
+                ieDistConst = DEFAULT_IE_CONST * 3,
+                iiDistConst = DEFAULT_II_CONST * 3,
+                distConst = 0.25,
+                lambda = 200.0
             ),
             recurrentSynapses
         )

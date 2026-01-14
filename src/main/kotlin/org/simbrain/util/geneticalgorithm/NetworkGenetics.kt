@@ -215,20 +215,10 @@ fun ConnectionStrategyGene.mutateParam(changeProbability: Double = .1,) = mutate
                 if (this is Sparse) {
                     random.mutateProperty(::connectionDensity, delta = 0.1)
                 }
-                // RadialProbabilistic: excitatoryProbability, inhibitoryProbability, excitatoryRadius, inhibitoryRadius
-                if (this is RadialProbabilistic) {
-                    random.mutateProperty(::excitatoryProbability, delta = 0.1)
-                    random.mutateProperty(::inhibitoryProbability, delta = 0.1)
-                    random.mutateProperty(::excitatoryRadius, delta = 0.1)
-                    random.mutateProperty(::inhibitoryRadius, delta = 0.1)
-                }
                 // FixedDegree: degree, direction
                 if (this is FixedDegree) {
                     random.mutateProperty(::degree, delta = 1)
                     random.nextBoolean().let { direction = if (it) Direction.IN else Direction.OUT }
-                }
-                if (this is RadialGaussian) {
-                    random.mutateProperty(::distConst, delta = 0.1)
                 }
             }
         }

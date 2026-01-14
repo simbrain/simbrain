@@ -82,8 +82,6 @@ val connectionTypes = listOf(
     DistanceBased::class.java,
     OneToOne::class.java,
     FixedDegree::class.java,
-    RadialGaussian::class.java,
-    RadialProbabilistic::class.java,
     Sparse::class.java
 )
 

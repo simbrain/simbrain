@@ -759,8 +759,6 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             applyConnectionAction(DistanceBased()),
             applyConnectionAction(OneToOne()),
             applyConnectionAction(FixedDegree()),
-            applyConnectionAction(RadialGaussian()),
-            applyConnectionAction(RadialProbabilistic()),
             applyConnectionAction(Sparse())
         )
 

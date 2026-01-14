@@ -2,8 +2,8 @@ package org.simbrain.custom_sims.simulations
 
 import kotlinx.coroutines.joinAll
 import org.simbrain.custom_sims.*
-import org.simbrain.network.connections.RadialProbabilistic
 import org.simbrain.network.connections.Sparse
+import org.simbrain.network.connections.radialProbabilisticStyle
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.network.core.addSynapse
@@ -43,7 +43,7 @@ val testSim = newSim {
     }
 
     // Connection strategies to use below
-    val radial = RadialProbabilistic().apply {
+    val radial = radialProbabilisticStyle().apply {
         percentExcitatory = 20.0
     }
     val sparse = Sparse(connectionDensity = 0.3).apply {

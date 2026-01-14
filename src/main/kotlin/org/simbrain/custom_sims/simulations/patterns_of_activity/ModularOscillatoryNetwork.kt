@@ -150,9 +150,13 @@ class ModularOscillatoryNetwork : Simulation {
     }
 
     private fun connectRadialGaussian(sourceNg: NeuronGroup?, targetNg: NeuronGroup?): SynapseGroup {
-        val radialConnection: ConnectionStrategy = RadialGaussian(
-            DEFAULT_EE_CONST * 1, DEFAULT_EI_CONST * 2,
-            DEFAULT_IE_CONST * 3, DEFAULT_II_CONST * 0, .25, 50.0
+        val radialConnection: ConnectionStrategy = radialGaussianStyle(
+            eeDistConst = DEFAULT_EE_CONST * 1,
+            eiDistConst = DEFAULT_EI_CONST * 2,
+            ieDistConst = DEFAULT_IE_CONST * 3,
+            iiDistConst = DEFAULT_II_CONST * 0,
+            distConst = 0.25,
+            lambda = 50.0
         )
         val sg = SynapseGroup(sourceNg!!, targetNg!!, radialConnection)
         net.addNetworkModelAsync(sg)

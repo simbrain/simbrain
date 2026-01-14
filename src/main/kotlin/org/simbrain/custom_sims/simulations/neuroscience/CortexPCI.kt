@@ -2,11 +2,12 @@ package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.newSim
-import org.simbrain.network.connections.RadialProbabilistic
+import org.simbrain.network.connections.DistanceBased
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.*
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.updaterules.KuramotoRule
+import org.simbrain.util.decayfunctions.StepDecayFunction
 import org.simbrain.util.place
 import org.simbrain.util.point
 import kotlin.math.abs
@@ -37,13 +38,19 @@ val cortexKuramoto = newSim {
         percentExcitatory = 20.0
     }
 
-    // Radial connectivity
-    val radial = RadialProbabilistic().apply {
-        excitatoryRadius = 150.0
-        excitatoryProbability = .4
-        inhibitoryRadius = 150.0
-        inhibitoryProbability = .9
-    }
+    // Radial connectivity with separate probabilities for excitatory/inhibitory sources
+    val radius = 150.0
+    val excProb = 0.4  // Probability for excitatory source neurons
+    val inhProb = 0.9  // Probability for inhibitory source neurons
+
+    val radial = DistanceBased(
+        usePolarityMode = true,
+        eeDecayFunction = StepDecayFunction(radius).apply { baseMultiplier = excProb },  // Exc→Exc
+        eiDecayFunction = StepDecayFunction(radius).apply { baseMultiplier = excProb },  // Exc→Inh
+        ieDecayFunction = StepDecayFunction(radius).apply { baseMultiplier = inhProb },  // Inh→Exc
+        iiDecayFunction = StepDecayFunction(radius).apply { baseMultiplier = inhProb },  // Inh→Inh
+        npDecayFunction = StepDecayFunction(radius).apply { baseMultiplier = (excProb + inhProb) / 2 }  // Non-polar
+    )
 
     // SUBNETWORKS
     // Based on Schmidt et al., 2015: https://bmcneurosci.biomedcentral.com/articles/10.1186/s12868-015-0193-z

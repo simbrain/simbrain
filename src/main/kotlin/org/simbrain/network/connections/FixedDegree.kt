@@ -2,10 +2,37 @@ package org.simbrain.network.connections
 
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.getEuclideanDist
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import kotlin.random.Random
+
+/**
+ * Are neurons within a given radius being connected <emp>to</emp> the neuron in
+ * question (IN) or are they being connected <emp>from</emp> the neuron in
+ * question (OUT)?
+ */
+enum class Direction(private val description: String) {
+    OUT("Outdegree"), IN("Indegree");
+
+    override fun toString(): String {
+        return description
+    }
+}
+
+/**
+ * Get neurons within a specified radius.
+ */
+fun Neuron.getNeuronsInRadius(neighbors: List<Neuron>, radius: Double): List<Neuron> {
+    val ret = ArrayList<Neuron>()
+    for (neuron in neighbors) {
+        if (getEuclideanDist(this, neuron) < radius) {
+            ret.add(neuron)
+        }
+    }
+    return ret
+}
 
 /**
  * For each source neuron, create a fixed number of connections to or from target neurons (fixed indegree vs. fixed

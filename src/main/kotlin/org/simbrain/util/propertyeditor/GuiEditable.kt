@@ -55,7 +55,9 @@ class GuiEditable<O : EditableObject, T>(
     val useLegacySetter: Boolean = false,
     val tab: String? = null,
     val conditionallyEnabledBy: KMutableProperty1<O, Boolean>? = null,
+    val conditionallyDisabledBy: KMutableProperty1<O, Boolean>? = null,
     val conditionallyVisibleBy: KMutableProperty1<O, Boolean>? = null,
+    val conditionallyHiddenBy: KMutableProperty1<O, Boolean>? = null,
     val useCheckboxFrom: KMutableProperty1<O, Boolean>? = null,
     val typeMapProvider: KFunction<List<Class<out EditableObject>>>? = null,
     val columnMode: Boolean = false,
@@ -135,17 +137,33 @@ class GuiEditable<O : EditableObject, T>(
 
     fun update(context: UpdateFunctionContext<O, T>) {
         with(context) {
+            // conditionallyEnabledBy: enable when true
             if (conditionallyEnabledBy?.isWidget() == false) {
                 enableWidget(conditionallyEnabledBy.getter.call(baseObject))
-            }
-            if (conditionallyVisibleBy?.isWidget() == false) {
-                showWidget(conditionallyVisibleBy.getter.call(baseObject))
             }
             if (updateEventProperty == conditionallyEnabledBy) {
                 enableWidget(widgetValue(conditionallyEnabledBy))
             }
+            // conditionallyDisabledBy: disable when true (inverse of enabled)
+            if (conditionallyDisabledBy?.isWidget() == false) {
+                enableWidget(!conditionallyDisabledBy.getter.call(baseObject))
+            }
+            if (updateEventProperty == conditionallyDisabledBy) {
+                enableWidget(!widgetValue(conditionallyDisabledBy))
+            }
+            // conditionallyVisibleBy: show when true
+            if (conditionallyVisibleBy?.isWidget() == false) {
+                showWidget(conditionallyVisibleBy.getter.call(baseObject))
+            }
             if (updateEventProperty == conditionallyVisibleBy) {
                 showWidget(widgetValue(conditionallyVisibleBy))
+            }
+            // conditionallyHiddenBy: hide when true (inverse of visible)
+            if (conditionallyHiddenBy?.isWidget() == false) {
+                showWidget(!conditionallyHiddenBy.getter.call(baseObject))
+            }
+            if (updateEventProperty == conditionallyHiddenBy) {
+                showWidget(!widgetValue(conditionallyHiddenBy))
             }
         }
         if (context.monitoringPropertyNames == null || context.updateEventProperty.name in context.monitoringPropertyNames!!) {

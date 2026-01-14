@@ -38,6 +38,19 @@ abstract class DecayFunction(
     @UserParameter(label = "Peak distance", description = "Peak value.", order = 2)
     var peakDistance: Double = 0.0,
 
+    /**
+     * Scales the output of the decay function. Can be interpreted as a base probability
+     * that is further modulated by distance.
+     */
+    @UserParameter(
+        label = "Base Multiplier",
+        description = "Scales the output probability (0-1).",
+        minimumValue = 0.0,
+        maximumValue = 1.0,
+        increment = 0.1,
+        order = 3
+    )
+    var baseMultiplier: Double = 1.0,
 
 ) : CopyableObject {
 
@@ -68,6 +81,7 @@ abstract class DecayFunction(
     fun copy(copy: DecayFunction): DecayFunction {
         copy.dispersion = dispersion
         copy.peakDistance = peakDistance
+        copy.baseMultiplier = baseMultiplier
         return copy
     }
 

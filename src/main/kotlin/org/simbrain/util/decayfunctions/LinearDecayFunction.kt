@@ -4,13 +4,14 @@ class LinearDecayFunction @JvmOverloads constructor(dispersion: Double = 70.0) :
 
     override fun getScalingFactor(distance: Double): Double {
         val dist = distanceFromPeak(distance)
-        return if (dist > dispersion) 0.0 else 1 - dist / dispersion
+        return if (dist > dispersion) 0.0 else baseMultiplier * (1 - dist / dispersion)
     }
 
     override fun copy(): LinearDecayFunction {
         return LinearDecayFunction(dispersion)
             .also {
                 it.peakDistance = peakDistance
+                it.baseMultiplier = baseMultiplier
             }
     }
 

@@ -1,17 +1,17 @@
 package org.simbrain.network.connections
 
-import org.simbrain.network.core.Synapse
-import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.UserParameter
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.NormalDistribution
+import kotlin.math.abs
 import kotlin.random.Random
 
 /**
  * Initializes synapse weights using probability distributions.
  *
- * Supports separate distributions for excitatory and inhibitory synapses,
- * determined by the source neuron's polarity.
+ * Supports separate distributions for excitatory and inhibitory synapses.
+ * When randomization is disabled for a polarity, uses the default strength
+ * ([DEFAULT_EXCITATORY_STRENGTH] or [DEFAULT_INHIBITORY_STRENGTH]).
  */
 class RandomWeightInitializer(seed: Long = Random.nextLong()) : WeightInitializer() {
 
@@ -39,29 +39,23 @@ class RandomWeightInitializer(seed: Long = Random.nextLong()) : WeightInitialize
     @UserParameter(label = "Inhibitory Randomizer", description = "Distribution for inhibitory weights", order = 4, showDetails = false)
     var inRandomizer: ProbabilityDistribution = NormalDistribution().apply { randomSeed = seed }
 
-    override fun initializeWeights(synapses: List<Synapse>) {
-        synapses.forEach { synapse ->
-            // Use source neuron polarity if set, otherwise use synapse's current strength sign
-            // This allows polarizeSynapses to set the polarity before randomization
-            val isExcitatory = when (synapse.source.polarity) {
-                Polarity.EXCITATORY -> true
-                Polarity.INHIBITORY -> false
-                Polarity.BOTH -> synapse.strength >= 0
-            }
-
-            if (isExcitatory) {
-                if (useExcitatoryRandomization) {
-                    // For excitatory: ensure positive weight
-                    val sampledValue = exRandomizer.sampleDouble()
-                    synapse.forceSetStrength(kotlin.math.abs(sampledValue))
-                }
+    override fun initializeWeights(polarizedSynapses: PolarizedSynapseCollection) {
+        polarizedSynapses.excitatory.forEach { synapse ->
+            val strength = if (useExcitatoryRandomization) {
+                abs(exRandomizer.sampleDouble())
             } else {
-                if (useInhibitoryRandomization) {
-                    // For inhibitory: ensure negative weight
-                    val sampledValue = inRandomizer.sampleDouble()
-                    synapse.forceSetStrength(-kotlin.math.abs(sampledValue))
-                }
+                DEFAULT_EXCITATORY_STRENGTH
             }
+            synapse.forceSetStrength(strength)
+        }
+
+        polarizedSynapses.inhibitory.forEach { synapse ->
+            val strength = if (useInhibitoryRandomization) {
+                -abs(inRandomizer.sampleDouble())
+            } else {
+                DEFAULT_INHIBITORY_STRENGTH
+            }
+            synapse.forceSetStrength(strength)
         }
     }
 

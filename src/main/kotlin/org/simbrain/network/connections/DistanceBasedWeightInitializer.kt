@@ -10,7 +10,7 @@ import org.simbrain.util.decayfunctions.GaussianDecayFunction
  * Initializes synapse weights based on the distance between source and target neurons.
  *
  * Closer neurons receive stronger weights (scaled by the decay function).
- * The final weight respects the source neuron's polarity (excitatory = positive, inhibitory = negative).
+ * The final weight sign is determined by the polarity assignment from [PolarizedSynapseCollection].
  */
 class DistanceBasedWeightInitializer : WeightInitializer() {
 
@@ -28,13 +28,19 @@ class DistanceBasedWeightInitializer : WeightInitializer() {
     @UserParameter(label = "Base Strength", description = "Maximum weight strength at peak distance", order = 2)
     var baseStrength: Double = 1.0
 
-    override fun initializeWeights(synapses: List<Synapse>) {
-        synapses.forEach { synapse ->
-            val distance = getEuclideanDist(synapse.source, synapse.target)
-            val scalingFactor = decayFunction.getScalingFactor(distance)
-            val scaledStrength = baseStrength * scalingFactor
-            synapse.forceSetStrength(synapse.source.polarity.value(scaledStrength))
+    override fun initializeWeights(polarizedSynapses: PolarizedSynapseCollection) {
+        polarizedSynapses.excitatory.forEach { synapse ->
+            synapse.forceSetStrength(computeScaledStrength(synapse))
         }
+        polarizedSynapses.inhibitory.forEach { synapse ->
+            synapse.forceSetStrength(-computeScaledStrength(synapse))
+        }
+    }
+
+    private fun computeScaledStrength(synapse: Synapse): Double {
+        val distance = getEuclideanDist(synapse.source, synapse.target)
+        val scalingFactor = decayFunction.getScalingFactor(distance)
+        return baseStrength * scalingFactor
     }
 
     override fun copy(): DistanceBasedWeightInitializer {

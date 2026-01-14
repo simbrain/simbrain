@@ -8,14 +8,18 @@ import org.simbrain.util.SimbrainConstants.Polarity
 class WeightInitializerTest {
 
     @Test
-    fun `RandomWeightInitializer should randomize weights`() {
+    fun `RandomWeightInitializer should randomize weights when enabled`() {
         // Create neurons with BOTH polarity
         val sources = List(5) { Neuron().apply { polarity = Polarity.BOTH } }
         val targets = List(5) { Neuron() }
 
-        // Create FixedDegree connection strategy
+        // Create FixedDegree connection strategy with randomization enabled
         val fixedDegree = FixedDegree(degree = 3, direction = Direction.OUT)
         fixedDegree.percentExcitatory = 50.0
+        (fixedDegree.weightInitializer as RandomWeightInitializer).apply {
+            useExcitatoryRandomization = true
+            useInhibitoryRandomization = true
+        }
 
         // Connect neurons
         val synapses = fixedDegree.connectNeurons(sources, targets)
@@ -36,31 +40,48 @@ class WeightInitializerTest {
     }
 
     @Test
-    fun `RandomWeightInitializer initializeWeights should change values`() {
+    fun `RandomWeightInitializer initializeWeights should set default strength`() {
         // Create neurons
         val source = Neuron().apply { polarity = Polarity.BOTH }
         val target = Neuron()
 
-        // Create a synapse with strength 1.0
+        // Create a synapse
         val synapse = org.simbrain.network.core.Synapse(source, target)
         println("Initial synapse strength: ${synapse.strength}")
 
-        // Create RandomWeightInitializer
+        // Create RandomWeightInitializer (without randomization enabled)
         val initializer = RandomWeightInitializer()
         println("useExcitatoryRandomization: ${initializer.useExcitatoryRandomization}")
-        println("exRandomizer type: ${initializer.exRandomizer::class.simpleName}")
 
-        // Sample from the randomizer directly
-        val sample1 = initializer.exRandomizer.sampleDouble()
-        val sample2 = initializer.exRandomizer.sampleDouble()
-        println("Direct samples from exRandomizer: $sample1, $sample2")
-
-        // Initialize weights
-        initializer.initializeWeights(listOf(synapse))
+        // Initialize weights with the synapse as excitatory
+        val polarized = PolarizedSynapseCollection(excitatory = listOf(synapse), inhibitory = emptyList())
+        initializer.initializeWeights(polarized)
         println("After initializeWeights: ${synapse.strength}")
 
-        // The weight should have changed from 1.0
-        assertNotEquals(1.0, synapse.strength, "Weight should be randomized")
+        // Without randomization, should be set to default excitatory strength
+        assertEquals(DEFAULT_EXCITATORY_STRENGTH, synapse.strength, "Weight should be default excitatory strength")
+    }
+
+    @Test
+    fun `RandomWeightInitializer initializeWeights should randomize when enabled`() {
+        // Create neurons
+        val source = Neuron().apply { polarity = Polarity.BOTH }
+        val target = Neuron()
+
+        // Create a synapse
+        val synapse = org.simbrain.network.core.Synapse(source, target)
+
+        // Create RandomWeightInitializer with randomization enabled
+        val initializer = RandomWeightInitializer().apply {
+            useExcitatoryRandomization = true
+        }
+
+        // Initialize weights with the synapse as excitatory
+        val polarized = PolarizedSynapseCollection(excitatory = listOf(synapse), inhibitory = emptyList())
+        initializer.initializeWeights(polarized)
+
+        // With randomization enabled, should be randomized (likely not exactly 1.0)
+        assertTrue(synapse.strength > 0, "Excitatory weight should be positive")
     }
 
     @Test

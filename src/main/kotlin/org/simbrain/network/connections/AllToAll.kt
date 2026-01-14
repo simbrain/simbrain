@@ -53,8 +53,8 @@ class AllToAll @JvmOverloads constructor(
         target: List<Neuron>
     ): List<Synapse> {
         val syns = createAllToAllSynapses(source, target, allowSelfConnection, useBidirectionalConnections)
-        polarizeSynapses(syns, percentExcitatory, random)
-        weightInitializer.initializeWeights(syns)
+        val polarized = splitSynapsesByPolarity(syns, percentExcitatory, random)
+        weightInitializer.initializeWeights(polarized)
         return syns
     }
 

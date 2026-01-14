@@ -139,20 +139,21 @@ class SynapseGroup @JvmOverloads constructor(
             this.synapses.forEach { it.forceSetStrength(randomizer.sampleDouble()) }
         } else {
             // Otherwise use the connection strategy's weight initializer
-            connectionStrategy.weightInitializer.initializeWeights(this.synapses)
+            val polarized = splitSynapsesByPolarity(this.synapses, connectionStrategy.percentExcitatory)
+            connectionStrategy.weightInitializer.initializeWeights(polarized)
         }
     }
 
     fun randomizeExcitatory() {
         val excitatorySynapses = this.synapses
             .filter { s -> s.source.polarity == SimbrainConstants.Polarity.EXCITATORY }
-        connectionStrategy.weightInitializer.initializeWeights(excitatorySynapses)
+        connectionStrategy.weightInitializer.initializeWeights(PolarizedSynapseCollection(excitatorySynapses, emptyList()))
     }
 
     fun randomizeInhibitory() {
         val inhibitorySynapses = this.synapses
             .filter { s -> s.source.polarity == SimbrainConstants.Polarity.INHIBITORY }
-        connectionStrategy.weightInitializer.initializeWeights(inhibitorySynapses)
+        connectionStrategy.weightInitializer.initializeWeights(PolarizedSynapseCollection(emptyList(), inhibitorySynapses))
     }
 
     override fun toggleClamping() {

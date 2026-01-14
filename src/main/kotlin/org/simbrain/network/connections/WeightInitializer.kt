@@ -1,6 +1,5 @@
 package org.simbrain.network.connections
 
-import org.simbrain.network.core.Synapse
 import org.simbrain.util.propertyeditor.CopyableObject
 
 /**
@@ -15,11 +14,11 @@ import org.simbrain.util.propertyeditor.CopyableObject
 abstract class WeightInitializer : CopyableObject {
 
     /**
-     * Initialize weights for the given synapses.
+     * Initialize weights for synapses that have already been split by polarity.
      *
-     * @param synapses The synapses whose weights should be initialized
+     * @param polarizedSynapses The synapses pre-split into excitatory and inhibitory lists
      */
-    abstract fun initializeWeights(synapses: List<Synapse>)
+    abstract fun initializeWeights(polarizedSynapses: PolarizedSynapseCollection)
 
     abstract override fun copy(): WeightInitializer
 

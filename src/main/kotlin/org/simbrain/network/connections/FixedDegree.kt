@@ -97,8 +97,8 @@ class FixedDegree(
         } else {
             createFixedDegreeSynapses(source, target, degree, direction, allowSelfConnections, random)
         }
-        polarizeSynapses(syns, percentExcitatory, random)
-        weightInitializer.initializeWeights(syns)
+        val polarized = splitSynapsesByPolarity(syns, percentExcitatory, random)
+        weightInitializer.initializeWeights(polarized)
         return syns
     }
 

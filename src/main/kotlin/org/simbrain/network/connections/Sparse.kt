@@ -73,13 +73,13 @@ class Sparse @JvmOverloads constructor(
         val result = createSparseSynapses(source, target, connectionDensity, allowSelfConnection, equalizeEfferents, random)
         return when(result) {
             is ConnectionsResult.Add -> {
-                polarizeSynapses(result.connectionsToAdd, percentExcitatory)
-                weightInitializer.initializeWeights(result.connectionsToAdd)
+                val polarized = splitSynapsesByPolarity(result.connectionsToAdd, percentExcitatory)
+                weightInitializer.initializeWeights(polarized)
                 result.connectionsToAdd
             }
             is ConnectionsResult.Reset -> {
-                polarizeSynapses(result.resultConnections, percentExcitatory)
-                weightInitializer.initializeWeights(result.resultConnections)
+                val polarized = splitSynapsesByPolarity(result.resultConnections, percentExcitatory)
+                weightInitializer.initializeWeights(polarized)
                 result.resultConnections
             }
             is ConnectionsResult.Remove -> {

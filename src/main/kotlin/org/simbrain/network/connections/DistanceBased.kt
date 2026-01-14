@@ -150,8 +150,8 @@ class DistanceBased(
         } else {
             createRadialSynapses(source, target, decayFunction, allowSelfConnections, random)
         }
-        polarizeSynapses(syns, percentExcitatory, random)
-        weightInitializer.initializeWeights(syns)
+        val polarized = splitSynapsesByPolarity(syns, percentExcitatory, random)
+        weightInitializer.initializeWeights(polarized)
         return syns
     }
 

@@ -1,6 +1,7 @@
 package org.simbrain.network.gui.dialogs
 
 import org.simbrain.network.connections.AllToAll
+import org.simbrain.network.gui.WandPalette
 import org.simbrain.util.*
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
@@ -153,6 +154,12 @@ object NetworkPreferences: PreferenceHolder() {
         order = 70
     )
     var wandRadius by IntegerPreference(40)
+
+    /**
+     * The wand palette containing configured wand actions.
+     * Not exposed as a @UserParameter since it has its own dedicated UI.
+     */
+    var wandPalette by WandPalettePreference(WandPalette.createDefault())
 
     @UserParameter(
         label = "Weight matrix target-source format",

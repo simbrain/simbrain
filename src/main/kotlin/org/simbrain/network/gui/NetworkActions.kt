@@ -626,7 +626,6 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val networkModeActions
         get() = listOf(
             selectionEditModeAction,
-            wandEditModeAction,
             panEditModeAction
         )
 

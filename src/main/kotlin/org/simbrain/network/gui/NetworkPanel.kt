@@ -760,6 +760,14 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     private fun createMainToolBar() = CustomToolBar().apply {
         with(networkActions) {
             networkModeActions.forEach { add(it) }
+
+            // Wand palette button (handles its own color updates)
+            val paletteButton = WandPaletteButton(
+                NetworkPreferences.wandPalette,
+                this@NetworkPanel
+            )
+            add(paletteButton)
+
             addSeparator()
             add(networkActions.zoomInAction())
             add(networkActions.zoomOutAction())

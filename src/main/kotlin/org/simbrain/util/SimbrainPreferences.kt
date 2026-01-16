@@ -1,6 +1,7 @@
 package org.simbrain.util
 
 import org.simbrain.network.connections.ConnectionStrategy
+import org.simbrain.network.gui.WandPalette
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
@@ -137,6 +138,21 @@ class ProbabilityDistributionPreference(probabilityDistribution: ProbabilityDist
     }
 
     override fun serialize(value: ProbabilityDistribution): String {
+        return getSimbrainXStream().toXML(value)
+    }
+}
+
+class WandPalettePreference(wandPalette: WandPalette): Preference<WandPalette>(wandPalette) {
+    override fun deserialize(value: String): WandPalette {
+        return try {
+            getSimbrainXStream().fromXML(value) as WandPalette
+        } catch (e: Exception) {
+            // If deserialization fails, return default palette
+            WandPalette.createDefault()
+        }
+    }
+
+    override fun serialize(value: WandPalette): String {
         return getSimbrainXStream().toXML(value)
     }
 }

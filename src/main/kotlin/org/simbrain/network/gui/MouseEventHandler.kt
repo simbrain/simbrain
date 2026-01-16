@@ -264,26 +264,76 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
             override val cursor: Cursor get() = Cursor.getDefaultCursor()
         }
         object Wand : MouseCursor() {
+            /**
+             * Current wand color. Updated when wand action selection changes.
+             */
+            var wandColor: Color = Color(255, 230, 0, 220)
+                set(value) {
+                    field = value
+                    _cursor = null  // Invalidate cached cursor
+                }
 
-            override val cursor: Cursor = with(BufferedImage(wandRadius + 1, wandRadius + 1, BufferedImage.TYPE_INT_ARGB)) {
-                val g2 = graphics as Graphics2D
+            private var _cursor: Cursor? = null
 
-                // Draw stroke around wand
-                val stroke = 1
-                g2.color = Color.BLACK
-                g2.stroke = BasicStroke(stroke.toFloat())
-                g2.drawOval(0, 0, wandRadius, wandRadius)
+            override val cursor: Cursor
+                get() {
+                    if (_cursor == null) {
+                        _cursor = createWandCursor(wandColor, wandRadius)
+                    }
+                    return _cursor!!
+                }
 
-                // Draw wand itself
-                // Pure yellow is (255, 255,0) but this does not look good when transparent on a white background.
-                // To get it to actually look yellow reduce the green component a bit.
-                g2.color = Color(255, 230, 0, 180)
-                g2.stroke = BasicStroke(1f)
+            /**
+             * Creates a wand cursor with the given color and radius.
+             * Supports HiDPI/Retina displays using MultiResolutionImage.
+             */
+            private fun createWandCursor(color: Color, radius: Int): Cursor {
+                val baseSize = radius + 4
 
-                g2.fillOval(0, 0, wandRadius, wandRadius)
+                // Create 1x image
+                val image1x = createWandImage(color, baseSize, 1.0)
 
-                val tk = Toolkit.getDefaultToolkit()
-                tk.createCustomCursor(this, centerPoint, "wand")
+                // Create 2x image for HiDPI
+                val image2x = createWandImage(color, baseSize, 2.0)
+
+                // Use MultiResolutionImage for automatic HiDPI support
+                val multiResImage = java.awt.image.BaseMultiResolutionImage(image1x, image2x)
+
+                val center = baseSize / 2
+                val hotspot = Point(center, center)
+                return Toolkit.getDefaultToolkit().createCustomCursor(multiResImage, hotspot, "wand")
+            }
+
+            /**
+             * Renders the wand cursor image at the given scale.
+             */
+            private fun createWandImage(color: Color, baseSize: Int, scale: Double): BufferedImage {
+                val size = (baseSize * scale).toInt()
+                val image = BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB)
+                val g2 = image.createGraphics()
+
+                // High quality rendering hints
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+                g2.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY)
+                g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE)
+
+                val padding = 2.0 * scale
+                val circleSize = (size - padding * 2).coerceAtLeast(4.0)
+
+                // Use Ellipse2D for precise shapes
+                val circle = java.awt.geom.Ellipse2D.Double(padding, padding, circleSize, circleSize)
+
+                // Draw filled circle with action color (semi-transparent)
+                g2.color = Color(color.red, color.green, color.blue, 160)
+                g2.fill(circle)
+
+                // Draw crisp border ring
+                g2.color = Color(40, 40, 40)
+                g2.stroke = BasicStroke((1.5 * scale).toFloat(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
+                g2.draw(circle)
+
+                g2.dispose()
+                return image
             }
         }
         object Pan : MouseCursor() {

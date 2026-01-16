@@ -127,13 +127,14 @@ class WandPalettePanel(
             }
             add(deleteButton, BorderLayout.EAST)
 
-            // Click to select
+            // Click to select, double-click to edit
             addMouseListener(object : MouseAdapter() {
+                override fun mousePressed(e: MouseEvent) {
+                    palette.selectAction(index)
+                }
                 override fun mouseClicked(e: MouseEvent) {
                     if (e.clickCount == 2) {
                         editAction(index)
-                    } else if (e.clickCount == 1) {
-                        palette.selectAction(index)
                     }
                 }
             })

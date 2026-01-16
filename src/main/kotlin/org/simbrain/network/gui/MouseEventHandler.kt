@@ -21,6 +21,7 @@ import org.simbrain.util.piccolo.screenElements
 import java.awt.*
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
+import java.awt.image.BaseMultiResolutionImage
 import java.awt.image.BufferedImage
 
 class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHandler() {
@@ -270,18 +271,11 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
             var wandColor: Color = Color(255, 230, 0, 220)
                 set(value) {
                     field = value
-                    _cursor = null  // Invalidate cached cursor
+                    cursor = createWandCursor(value, wandRadius)
                 }
 
-            private var _cursor: Cursor? = null
-
-            override val cursor: Cursor
-                get() {
-                    if (_cursor == null) {
-                        _cursor = createWandCursor(wandColor, wandRadius)
-                    }
-                    return _cursor!!
-                }
+            override var cursor: Cursor = createWandCursor(wandColor, wandRadius)
+                private set
 
             /**
              * Creates a wand cursor with the given color and radius.
@@ -297,7 +291,7 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
                 val image2x = createWandImage(color, baseSize, 2.0)
 
                 // Use MultiResolutionImage for automatic HiDPI support
-                val multiResImage = java.awt.image.BaseMultiResolutionImage(image1x, image2x)
+                val multiResImage = BaseMultiResolutionImage(image1x, image2x)
 
                 val center = baseSize / 2
                 val hotspot = Point(center, center)

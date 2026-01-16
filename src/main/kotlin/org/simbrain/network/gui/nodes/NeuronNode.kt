@@ -17,20 +17,13 @@ import java.awt.geom.Point2D
 import javax.swing.JPopupMenu
 
 /**
- * **NeuronNode** is a Piccolo PNode corresponding to a Neuron in the neural
- * network model.
+ * A Piccolo PNode representation of a [Neuron]
  */
 class NeuronNode(net: NetworkPanel, val neuron: Neuron) : ScreenElement(net) {
 
     private val neuronCircleNode = NeuronCircleNode(net).also { addChild(it) }
 
-    /**
-     * Create a new neuron node.
-     */
     init {
-
-
-        // Set graphics of node based on neuron properties
         updateShape()
         updateActivation()
         updatePolarity()
@@ -39,7 +32,6 @@ class NeuronNode(net: NetworkPanel, val neuron: Neuron) : ScreenElement(net) {
         pullViewPositionFromModel()
         pickable = true
 
-        // Handle events
         val events = neuron.events
         events.activationChanged.on(Dispatchers.Swing) { _, _ ->
             updateActivation()

@@ -30,8 +30,8 @@ fun NetworkPanel.addKeyBindings() {
         selectionManager.selection.firstNotNullOfOrNull { it.propertyDialog }?.display()
     }
     bindTo("G", networkActions.addGroupAction)
+    bindTo("S", networkActions.selectionEditModeAction)
     bindTo("I", networkActions.wandEditModeAction)
-    bind("K") { selectionManager.set(filterScreenElements<NeuronNode>()); clearSelectedObjects() }
     bind("K") { selectionManager.set(filterScreenElements<NeuronNode>()); clearSelectedObjects() }
     // TODO: Is this the right place for this?
     bind(Shift + 'I') {
@@ -40,7 +40,6 @@ fun NetworkPanel.addKeyBindings() {
         }
     }
     bind(Ctrl + 'P') {showPiccoloDebugger()}
-    bind("S") { selectNeuronsInNeuronGroups() }
 
     bind(Alt + 'R') {
         selectionManager.selectedModels.forEach {

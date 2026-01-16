@@ -264,14 +264,6 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         }
     }
 
-    val selectionEditModeAction = networkPanel.createAction(
-        name = "Select",
-        description = "Select",
-        iconPath = "menu_icons/Arrow.png"
-    ) {
-        networkPanel.mouseCursor = MouseEventHandler.MouseCursor.Selection
-    }
-
     val editSelectedModelsAction = networkPanel.createAction(
         name = "Edit selected models",
         keyboardShortcut = CmdOrCtrl + 'E',
@@ -387,6 +379,16 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         enablingCondition = EnablingConditions.NEURONS
     ) {
         showInputPanel(networkPanel.selectionManager.filterSelectedModels<Neuron>())
+    }
+
+
+    val selectionEditModeAction = networkPanel.createAction(
+        name = "Select",
+        description = "Select (s)",
+        iconPath = "menu_icons/Arrow.png",
+        keyboardShortcut = KeyCombination('S')
+    ) {
+        networkPanel.mouseCursor = MouseEventHandler.MouseCursor.Selection
     }
 
     val wandEditModeAction = networkPanel.createAction(

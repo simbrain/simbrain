@@ -117,6 +117,24 @@ class WandPalettePanel(
             }
             add(descLabel, BorderLayout.CENTER)
 
+            // Right side buttons panel
+            val buttonPanel = JPanel(FlowLayout(FlowLayout.RIGHT, 2, 0)).apply {
+                isOpaque = false
+            }
+
+            // Kebab menu button for editing
+            val kebabButton = JButton().apply {
+                icon = KebabIcon()
+                preferredSize = Dimension(20, 24)
+                margin = Insets(0, 0, 0, 0)
+                isFocusPainted = false
+                isContentAreaFilled = false
+                isBorderPainted = false
+                toolTipText = "Edit this action"
+                addActionListener { editAction(index) }
+            }
+            buttonPanel.add(kebabButton)
+
             // Delete button
             val deleteButton = JButton("×").apply {
                 preferredSize = Dimension(24, 24)
@@ -125,7 +143,9 @@ class WandPalettePanel(
                 toolTipText = "Delete this action"
                 addActionListener { deleteAction(index) }
             }
-            add(deleteButton, BorderLayout.EAST)
+            buttonPanel.add(deleteButton)
+
+            add(buttonPanel, BorderLayout.EAST)
 
             // Click to select, double-click to edit
             addMouseListener(object : MouseAdapter() {
@@ -237,6 +257,33 @@ class WandIcon(private val color: Color, private val size: Int, private val lett
         val textX = (size - fm.stringWidth(displayLetter)) / 2
         val textY = (size - fm.height) / 2 + fm.ascent
         g2.drawString(displayLetter, textX, textY)
+    }
+}
+
+/**
+ * Kebab menu icon (three vertical dots).
+ */
+class KebabIcon : Icon {
+    private val dotSize = 2
+    private val dotSpacing = 2
+    private val width = dotSize + 4
+    private val height = (dotSize * 3) + (dotSpacing * 2) + 4
+
+    override fun getIconWidth() = width
+    override fun getIconHeight() = height
+
+    override fun paintIcon(c: Component?, g: Graphics, x: Int, y: Int) {
+        val g2 = g as Graphics2D
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+
+        g2.color = Color.DARK_GRAY
+        val startX = x + 2
+        val startY = y + 2
+
+        for (i in 0..2) {
+            val dotY = startY + i * (dotSize + dotSpacing)
+            g2.fill(Ellipse2D.Double(startX.toDouble(), dotY.toDouble(), dotSize.toDouble(), dotSize.toDouble()))
+        }
     }
 }
 

@@ -393,9 +393,9 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 
     val wandEditModeAction = networkPanel.createAction(
         name = "Activate",
-        description = "Activate nodes (i)",
+        description = "Activate nodes (d)",
         iconPath = "menu_icons/ActivationTool.png",
-        keyboardShortcut = KeyCombination('I')
+        keyboardShortcut = KeyCombination('D')
     ) {
         networkPanel.mouseCursor = MouseEventHandler.MouseCursor.Wand
     }

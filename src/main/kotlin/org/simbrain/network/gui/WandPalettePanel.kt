@@ -257,7 +257,7 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
 
         // Main button - activates wand mode
         mainButton = JButton().apply {
-            toolTipText = "Wand tool (i) - click to activate"
+            toolTipText = "Wand tool (d) - click to activate"
             icon = WandButtonIcon(palette, 18)
             addActionListener {
                 networkPanel.mouseCursor = MouseEventHandler.MouseCursor.Wand

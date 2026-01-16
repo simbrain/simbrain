@@ -3,6 +3,7 @@ package org.simbrain.network.gui
 import org.simbrain.network.core.LocatableModel
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.NeuronNode
 import org.simbrain.util.*
 import java.awt.event.KeyEvent.*
@@ -31,7 +32,13 @@ fun NetworkPanel.addKeyBindings() {
     }
     bindTo("G", networkActions.addGroupAction)
     bindTo("S", networkActions.selectionEditModeAction)
-    bindTo("I", networkActions.wandEditModeAction)
+    bind("D") {
+        if (mouseCursor == MouseEventHandler.MouseCursor.Wand) {
+            NetworkPreferences.wandPalette.cycleToNextAction()
+        } else {
+            mouseCursor = MouseEventHandler.MouseCursor.Wand
+        }
+    }
     bind("K") { selectionManager.set(filterScreenElements<NeuronNode>()); clearSelectedObjects() }
     // TODO: Is this the right place for this?
     bind(Shift + 'I') {

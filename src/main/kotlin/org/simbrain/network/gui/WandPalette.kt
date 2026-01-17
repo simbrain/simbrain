@@ -102,10 +102,15 @@ class WandPalette : EditableObject {
          * Create a default palette with standard actions.
          */
         fun createDefault(): WandPalette = WandPalette().apply {
-            addAction(ActivateAction())
-            addAction(InhibitAction())
-            addAction(SetToValueAction().apply { value = 0.0 })
-            addAction(RandomizeAction())
+            // Neuron actions
+            addAction(AdjustValueAction.activate())
+            addAction(AdjustValueAction.inhibit())
+            addAction(AdjustValueAction.setValue(0.0))
+            addAction(AdjustValueAction.randomize())
+            addAction(AdjustValueAction.increment())
+            addAction(AdjustValueAction.decrement())
+            // Synapse actions
+            addAction(AdjustValueAction.synapseStrength(1.0))
         }
     }
 }

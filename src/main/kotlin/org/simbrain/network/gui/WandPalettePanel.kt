@@ -123,9 +123,10 @@ class WandPalettePanel(
             }
             add(iconLabel, BorderLayout.WEST)
 
-            // Description label
+            // Description label with tooltip for long descriptions
             val descLabel = JLabel(action.description).apply {
                 font = font.deriveFont(12f)
+                toolTipText = action.description
             }
             add(descLabel, BorderLayout.CENTER)
 
@@ -160,7 +161,7 @@ class WandPalettePanel(
             add(buttonPanel, BorderLayout.EAST)
 
             // Click to select, double-click to edit
-            addMouseListener(object : MouseAdapter() {
+            val clickListener = object : MouseAdapter() {
                 override fun mousePressed(e: MouseEvent) {
                     palette.selectAction(index)
                 }
@@ -169,13 +170,17 @@ class WandPalettePanel(
                         editAction(index)
                     }
                 }
-            })
+            }
+            // Add listener to panel and its main children so clicks anywhere work
+            addMouseListener(clickListener)
+            iconLabel.addMouseListener(clickListener)
+            descLabel.addMouseListener(clickListener)
         }
     }
 
     private fun addNewAction() {
         // Create a default action wrapped for type selection
-        val wrapper = objectWrapper("Action", ActivateAction() as WandAction)
+        val wrapper = objectWrapper("Action", AdjustValueAction() as WandAction)
         AnnotatedPropertyEditor(listOf(wrapper)).displayInDialog {
             commitChanges()
             val newAction = wrapper.editingObject

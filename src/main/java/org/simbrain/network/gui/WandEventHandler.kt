@@ -9,10 +9,12 @@ import org.piccolo2d.event.PInputEventFilter
 import org.piccolo2d.util.PNodeFilter
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.Synapse
 import org.simbrain.network.gui.MouseEventHandler.MouseCursor
 import org.simbrain.network.gui.dialogs.NetworkPreferences.wandPalette
 import org.simbrain.network.gui.dialogs.NetworkPreferences.wandRadius
 import org.simbrain.network.gui.nodes.NeuronNode
+import org.simbrain.network.gui.nodes.SynapseNode
 import java.awt.event.InputEvent
 import java.awt.geom.Ellipse2D
 
@@ -54,8 +56,9 @@ class WandEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHandl
         wandPalette.selectedAction?.beginAction(networkPanel)
 
         val node = event.path.pickedNode
-        if (node is NeuronNode) {
-            modifyNode(node)
+        when (node) {
+            is NeuronNode -> modifyModel(node.neuron)
+            is SynapseNode -> modifyModel(node.synapse)
         }
     }
 
@@ -66,25 +69,27 @@ class WandEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHandl
         // Let the action handle its own undo if needed (e.g., ConnectFromSourceAction)
         action?.endAction(networkPanel)
 
-        // TODO: Move this logic to the action itself. Right now only activation actions are tracked.
+        // TODO: Move this logic to the action itself.
         if (undoState.isNotEmpty() && action !is ConnectFromSourceAction) {
             @Suppress("UNCHECKED_CAST")
-            val activationDiffs = undoState.filterKeys { it is Neuron }
-                as Map<Neuron, Double>
+            val neuronDiffs = undoState.filterKeys { it is Neuron } as Map<Neuron, Double>
+            @Suppress("UNCHECKED_CAST")
+            val synapseDiffs = undoState.filterKeys { it is Synapse } as Map<Synapse, Double>
 
-            if (activationDiffs.isNotEmpty()) {
-                val redos = activationDiffs.keys.associateWith { it.activation }
+            val totalCount = neuronDiffs.size + synapseDiffs.size
+            if (totalCount > 0) {
+                val neuronRedos = neuronDiffs.keys.associateWith { it.activation }
+                val synapseRedos = synapseDiffs.keys.associateWith { it.strength }
+
                 networkPanel.undoManager.addUndoableAction(
-                    description = action?.undoDescription(activationDiffs.size) ?: "Wand Action",
+                    description = action?.undoDescription(totalCount) ?: "Wand Action",
                     undo = {
-                        activationDiffs.forEach { (neuron, previousActivation) ->
-                            neuron.activation = previousActivation
-                        }
+                        neuronDiffs.forEach { (neuron, prev) -> neuron.activation = prev }
+                        synapseDiffs.forEach { (synapse, prev) -> synapse.strength = prev }
                     },
                     redo = {
-                        redos.forEach { (neuron, redoActivation) ->
-                            neuron.activation = redoActivation
-                        }
+                        neuronRedos.forEach { (neuron, redo) -> neuron.activation = redo }
+                        synapseRedos.forEach { (synapse, redo) -> synapse.strength = redo }
                     }
                 )
             }
@@ -112,10 +117,11 @@ class WandEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHandl
 
         val highlightedNodes = networkPanel.canvas.layer.root.getAllNodes(boundsFilter, null)
 
-        // Apply action to all neurons in bounds
+        // Apply action to all neurons and synapses in bounds
         for (node in highlightedNodes) {
-            if (node is NeuronNode) {
-                modifyNode(node)
+            when (node) {
+                is NeuronNode -> modifyModel(node.neuron)
+                is SynapseNode -> modifyModel(node.synapse)
             }
         }
     }
@@ -125,16 +131,11 @@ class WandEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHandl
     }
 
     /**
-     * Apply the selected wand action to the model.
+     * Apply the selected wand action to a model.
      * Skips models that have already been operated on in this drag session.
-     *
-     * @param node node to act on
      */
-    private fun modifyNode(node: NeuronNode) {
-        val model = node.neuron
-        // Skip if already touched in this session
+    private fun modifyModel(model: NetworkModel) {
         if (model in touchedModels) return
-
         touchedModels.add(model)
         wandPalette.selectedAction?.apply(model, networkPanel, undoState)
     }

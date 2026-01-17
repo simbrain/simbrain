@@ -55,7 +55,6 @@ class WandPalette : EditableObject {
         if (index >= 0 && index < actions.size) {
             val action = actions.removeAt(index)
             events.actionRemoved.fire(action)
-            // Adjust selection if needed
             if (selectedIndex >= actions.size) {
                 selectedIndex = (actions.size - 1).coerceAtLeast(0)
             }

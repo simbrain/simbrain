@@ -25,6 +25,8 @@ class WandPalettePanel(
     private val listPanel = JPanel().apply {
         layout = BoxLayout(this, BoxLayout.Y_AXIS)
     }
+    
+    private var isRebuilding = false
 
     init {
         layout = BorderLayout()
@@ -76,14 +78,24 @@ class WandPalettePanel(
     }
 
     private fun rebuildList() {
+        // Prevent re-entrant calls when events cascade (like when removing an action fires both
+        //  actionRemoved and selectionChanged events, each trying to rebuild the list).
+        // TODO: Should not be necessary. Try preventing this from happening in the first place.
+        if (isRebuilding) return
+        isRebuilding = true
+        
         listPanel.removeAll()
         palette.actions.forEachIndexed { index, action ->
+            if (index > 0) {
+                listPanel.add(Box.createVerticalStrut(2))
+            }
             listPanel.add(createActionRow(index, action))
-            listPanel.add(Box.createVerticalStrut(2))
         }
         listPanel.add(Box.createVerticalGlue())
         listPanel.revalidate()
         listPanel.repaint()
+        
+        isRebuilding = false
     }
 
     private fun updateSelection() {

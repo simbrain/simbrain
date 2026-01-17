@@ -1,5 +1,8 @@
 package org.simbrain.network.gui
 
+import org.simbrain.network.connections.AllToAll
+import org.simbrain.network.connections.ConnectionStrategy
+import org.simbrain.network.connections.getNeuronsInRadius
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
@@ -62,6 +65,7 @@ abstract class WandAction : CopyableObject {
     override fun getTypeList(): List<Class<out CopyableObject>> = listOf(
         AdjustValueAction::class.java,
         ConnectFromSourceAction::class.java,
+        ConnectToNeighborsAction::class.java,
     )
 }
 
@@ -369,16 +373,23 @@ class AdjustValueAction(
 
 /**
  * Creates synapses from currently selected neurons to the neurons the wand touches.
+ * Uses a configurable connection strategy to determine which connections to make and how to initialize weights.
  */
-class ConnectFromSourceAction : WandAction() {
+class ConnectFromSourceAction(
+    connectionStrategy: ConnectionStrategy = AllToAll()
+) : WandAction(), EditableObject {
 
-    @UserParameter(label = "Weight", description = "Weight for new synapses", order = 10)
-    var weight: Double = 1.0
+    /**
+     * The connection strategy determines which synapses to create and how to initialize their weights.
+     */
+    var connectionStrategy by GuiEditable(
+        initValue = connectionStrategy,
+        label = "Connection Strategy",
+        description = "Strategy for creating connections from source neurons to touched neurons",
+        order = 10
+    )
 
-    @UserParameter(label = "Only if no existing synapse", description = "Skip if synapse already exists from source to target", order = 20)
-    var skipExisting: Boolean = true
-
-    override val description: String get() = "Connect from selection (w=$weight)"
+    override val description: String get() = "Connect from selection (${connectionStrategy.name})"
 
     override var letter: String = "C"
     override var color: Color = Color(200, 100, 200, 220)  // Purple
@@ -395,15 +406,14 @@ class ConnectFromSourceAction : WandAction() {
         val sourceNeurons = networkPanel.selectionManager.filterSelectedModels<Neuron>()
         val network = networkPanel.network
 
-        for (source in sourceNeurons) {
-            if (source == model) continue  // Don't connect to self
+        // Use the connection strategy to create synapses from sources to this target
+        val newSynapses = connectionStrategy.connectNeurons(sourceNeurons, listOf(model))
 
-            // Check if synapse already exists (fanOut maps target neuron -> synapse)
-            if (skipExisting && source.fanOut.containsKey(model)) {
-                continue
-            }
+        // Filter and add synapses
+        for (synapse in newSynapses) {
+            // Skip self-connections (strategy may allow them but wand typically shouldn't)
+            if (synapse.source == synapse.target) continue
 
-            val synapse = Synapse(source, model, weight)
             network.addNetworkModelAsync(synapse)
             createdSynapses.add(synapse)
         }
@@ -427,12 +437,98 @@ class ConnectFromSourceAction : WandAction() {
 
     override fun undoDescription(count: Int): String = "Wand: Connect from selection"
 
-    override fun copy(): CopyableObject = ConnectFromSourceAction().also {
+    override fun copy(): CopyableObject = ConnectFromSourceAction(connectionStrategy.copy()).also {
         it.letter = letter
         it.color = color
-        it.weight = weight
-        it.skipExisting = skipExisting
     }
 
     override val name: String get() = "Connect from Selection"
+}
+
+/**
+ * Creates synapses from the touched neuron to neighboring neurons within a radius.
+ * Uses a configurable connection strategy to determine which connections to make and how to initialize weights.
+ */
+class ConnectToNeighborsAction(
+    connectionStrategy: ConnectionStrategy = AllToAll(),
+    radius: Double = 100.0
+) : WandAction(), EditableObject {
+
+    /**
+     * The connection strategy determines which synapses to create and how to initialize their weights.
+     */
+    var connectionStrategy by GuiEditable(
+        initValue = connectionStrategy,
+        label = "Connection Strategy",
+        description = "Strategy for creating connections to neighboring neurons",
+        order = 10
+    )
+
+    /**
+     * Radius within which to find target neurons.
+     */
+    var radius by GuiEditable(
+        initValue = radius,
+        label = "Radius",
+        description = "Radius within which to connect to neighboring neurons",
+        min = 1.0,
+        order = 20
+    )
+
+    override val description: String get() = "Connect to neighbors (r=${"%.0f".format(radius)})"
+
+    override var letter: String = "N"
+    override var color: Color = Color(100, 200, 200, 220)  // Cyan
+
+    @Transient
+    private val createdSynapses = mutableListOf<Synapse>()
+
+    override fun beginAction(networkPanel: NetworkPanel) {
+        createdSynapses.clear()
+    }
+
+    override fun apply(model: NetworkModel, networkPanel: NetworkPanel, undoState: MutableMap<Any, Any?>) {
+        if (model !is Neuron) return
+        val network = networkPanel.network
+
+        // Find all neurons within radius of the touched neuron
+        val neighbors = model.getNeuronsInRadius(network.flatNeuronList, radius)
+
+        // Use the connection strategy to create synapses from this neuron to neighbors
+        val newSynapses = connectionStrategy.connectNeurons(listOf(model), neighbors)
+
+        // Filter and add synapses
+        for (synapse in newSynapses) {
+            // Skip self-connections
+            if (synapse.source == synapse.target) continue
+
+            network.addNetworkModelAsync(synapse)
+            createdSynapses.add(synapse)
+        }
+    }
+
+    override fun endAction(networkPanel: NetworkPanel) {
+        if (createdSynapses.isNotEmpty()) {
+            val synapses = createdSynapses.toList()
+            networkPanel.undoManager.addUndoableAction(
+                description = "Wand: Created ${synapses.size} synapses to neighbors",
+                undo = {
+                    synapses.forEach { it.deleteBlocking() }
+                },
+                redo = {
+                    synapses.forEach { networkPanel.network.addNetworkModelAsync(Synapse(it.source, it.target, it.strength)) }
+                }
+            )
+        }
+        createdSynapses.clear()
+    }
+
+    override fun undoDescription(count: Int): String = "Wand: Connect to neighbors"
+
+    override fun copy(): CopyableObject = ConnectToNeighborsAction(connectionStrategy.copy(), radius).also {
+        it.letter = letter
+        it.color = color
+    }
+
+    override val name: String get() = "Connect to Neighbors"
 }

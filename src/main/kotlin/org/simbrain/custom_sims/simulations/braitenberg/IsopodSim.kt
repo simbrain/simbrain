@@ -20,26 +20,18 @@ import org.simbrain.world.odorworld.sensors.SmellSensor
 
 /**
  * A simulation of Isopod navigation. With Peter Hinow and Kaiden Schmidt.
- *
- * Run headless using:
- * gradle runSim -PsimName="Isopod Sim" -PoptionString='{"numTrials": 5, "speedInhibition": false}'
- *
- * Parameters:
- * - numTrials: Number of trials to run
- * - speedInhibition: Enable speed inhibition
- * - maxIterationsPerTrial: Max steps per trial
- * - hitRadius: Collision detection radius
- * - smellDispersion: Smell decay dispersion
- * - speed: Movement speed
+ * For command-line operation and sample run commands, see "headless mode documentation" below.
  */
 val isopodSim = newSim { optionString ->
 
     // Adjustable parameters for sim
     var defaultNumTrials = 5
-    val maxIterationsPerTrial = 5000
+    var maxIterationsPerTrial = 5000
     val hitRadius = 80
     val smellDispersion = 350.0
-    val speed = 5.0
+    var speed = 5.0
+    var noiseMean = 2.0
+    var noiseStdDev = 0.9
 
     // Other variables
     val log = StringBuilder()
@@ -52,7 +44,7 @@ val isopodSim = newSim { optionString ->
 
     val networkComponent = addNetworkComponent("Network")
     val network = networkComponent.network
-    var noiseSource = NormalDistribution(2.0, .9)
+    var noiseSource = NormalDistribution(noiseMean, noiseStdDev)
 
     val neuronLeftSensor = network.addNeuron {
         location = point(0, 100)
@@ -232,8 +224,8 @@ val isopodSim = newSim { optionString ->
     workspace.addUpdateAction(fishCollisionAction)
 
     fun logAgentState() {
-        log.append("${isopod.x}, ${isopod.y}," +
-                "${neuronLeftSensor.activation},${neuronRightSensor.activation}" +
+        log.append("${trialNum + 1},${isopod.x},${isopod.y},${isopod.heading}," +
+                "${neuronLeftSensor.activation},${neuronRightSensor.activation}," +
                 "${neuronLeftTurning.activation},${neuronRightTurning.activation}" +
                 ",${neuronStraight.activation}\n")
     }
@@ -247,14 +239,12 @@ val isopodSim = newSim { optionString ->
         createControlPanel("Control Panel", 130, 15) {
 
             suspend fun runTrials() {
-                // Reset before starting trials
-                log.clear() // Clear log to prevent memory accumulation
+                log.clear()
+                log.append("trial,x,y,heading,leftSensor,rightSensor,leftTurning,rightTurning,straight\n")
                 
                 var iteration = 0
                 while (trialNum < defaultNumTrials) {
-                    log.append("# Trial: ${trialNum + 1}\n")
                     resetIsopod()
-                    log.append("# Heading: ${isopod.heading}\n")
                     workspace.iterateWhile {
                         if (!collision) {
                             logAgentState()
@@ -283,13 +273,12 @@ val isopodSim = newSim { optionString ->
             }
 
             addButton("Run one trial") {
-                // Reset for single trial
                 resetIsopod()
-                log.clear() // Clear log to prevent memory accumulation
+                log.clear()
+                log.append("trial,x,y,heading,leftSensor,rightSensor,leftTurning,rightTurning,straight\n")
                 
                 var iteration = 0
                 workspace.launch {
-                    log.append("# Heading: ${isopod.heading}\n")
                     while (++iteration < maxIterationsPerTrial) {
                         workspace.iterateSuspend(1)
                         if (collision) {
@@ -398,16 +387,55 @@ val isopodSim = newSim { optionString ->
         """.trimIndent()
     )
 
-    // Parse optionString and run in headless mode if provided
+    /*
+     * Headless (command-line) operation
+     *
+     * Sample commands
+     *
+     * 5 trials, CSV to auto-generated file in simulation_outputs/:
+     *   ./gradlew runSim -PsimName="Isopod simulation" -PoptionString='{"numTrials": 5}'
+     *
+     * 10 trials with speed inhibition, custom output file:
+     *   ./gradlew runSim -PsimName="Isopod simulation" -PoptionString='{"numTrials": 10, "speedInhibition": true, "outputFile": "isopod_results.csv"}'
+     *
+     * Custom speed and noise:
+     *   ./gradlew runSim -PsimName="Isopod simulation" -PoptionString='{"numTrials": 5, "speed": 3.0, "noiseMean": 1.0, "noiseStdDev": 0.5}'
+     *
+     * PARAMETERS:
+     * - numTrials: Number of trials (default: 5)
+     * - speedInhibition: Enable speed inhibition (default: false)
+     * - maxIterationsPerTrial: Max steps per trial (default: 5000)
+     * - speed: Forward speed / straight neuron bias (default: 5.0)
+     * - noiseMean: Mean of sensor noise distribution (default: 2.0)
+     * - noiseStdDev: Standard deviation of sensor noise distribution (default: 0.9)
+     * - outputFile: Custom CSV path; if omitted, writes to simulation_outputs/isopod_sim_<timestamp>.csv
+     *
+     * CSV OUTPUT COLUMNS:
+     *   trial, x, y, heading, leftSensor, rightSensor, leftTurning, rightTurning, straight
+     */
+
     if (optionString?.isNotEmpty() == true) {
         val options = JSONObject(optionString)
 
-        // Parse parameters
         val numTrials = options.optInt("numTrials", defaultNumTrials)
         val enableSpeedInhibition = options.optBoolean("speedInhibition", false)
         val maxSteps = options.optInt("maxIterationsPerTrial", maxIterationsPerTrial)
+        val outputFile = options.optString("outputFile", "").takeIf { it.isNotEmpty() }
+        
+        // Parse speed and noise parameters
+        if (options.has("speed")) {
+            speed = options.getDouble("speed")
+            neuronStraight.bias = speed
+        }
+        
+        if (options.has("noiseMean") || options.has("noiseStdDev")) {
+            noiseMean = options.optDouble("noiseMean", noiseMean)
+            noiseStdDev = options.optDouble("noiseStdDev", noiseStdDev)
+            noiseSource = NormalDistribution(noiseMean, noiseStdDev)
+            (neuronLeftSensor.updateRule as LinearRule).noiseGenerator = noiseSource
+            (neuronRightSensor.updateRule as LinearRule).noiseGenerator = noiseSource
+        }
 
-        // Apply speed inhibition if requested
         if (enableSpeedInhibition && leftSpeedWeight == null) {
             with(network) {
                 leftSpeedWeight = connect(neuronLeftSensor, neuronStraight, -1.0, -50.0, 50.0)
@@ -415,29 +443,23 @@ val isopodSim = newSim { optionString ->
             }
         }
 
-        println("\n=== Isopod Simulation Started (Headless Mode) ===")
-        println("Number of trials: $numTrials")
-        println("Max iterations per trial: $maxSteps")
-        println("Speed inhibition: $enableSpeedInhibition")
-        println("Hit radius: $hitRadius")
-        println("Smell dispersion: $smellDispersion")
-        println("Speed: $speed")
-        println("=" + "=".repeat(48))
+        println("\n=== Isopod Simulation (Headless) ===")
+        println("Trials: $numTrials, MaxSteps: $maxSteps, SpeedInhibition: $enableSpeedInhibition")
+        println("Speed: $speed, NoiseMean: $noiseMean, NoiseStdDev: $noiseStdDev")
 
         val csvData = StringBuilder()
         csvData.append("# Isopod Simulation Results\n")
         csvData.append("# Trials: $numTrials, MaxSteps: $maxSteps, SpeedInhibition: $enableSpeedInhibition\n")
-        csvData.append("# HitRadius: $hitRadius, SmellDispersion: $smellDispersion, Speed: $speed\n")
+        csvData.append("# Speed: $speed, NoiseMean: $noiseMean, NoiseStdDev: $noiseStdDev\n")
         csvData.append("#\n")
+        csvData.append("trial,x,y,heading,leftSensor,rightSensor,leftTurning,rightTurning,straight\n")
 
         var successCount = 0
         var wallCollisionCount = 0
         var timeoutCount = 0
 
         for (trial in 1..numTrials) {
-            csvData.append("# Trial: $trial\n")
             resetIsopod()
-            csvData.append("# Heading: ${isopod.heading}\n")
 
             collision = false
             var iteration = 0
@@ -445,29 +467,23 @@ val isopodSim = newSim { optionString ->
 
             while (!collision && iteration < maxSteps) {
                 workspace.iterateSuspend(1)
-
-                // Log state before checking collision
-                csvData.append("${isopod.x}, ${isopod.y}," +
+                csvData.append("$trial,${isopod.x},${isopod.y},${isopod.heading}," +
                         "${neuronLeftSensor.activation},${neuronRightSensor.activation}," +
                         "${neuronLeftTurning.activation},${neuronRightTurning.activation}" +
                         ",${neuronStraight.activation}\n")
-
                 iteration++
             }
 
-            // Determine outcome based on collision type
             if (collision) {
-                // Check if we hit a fish or wall
                 val hitFish = odorWorld.entityList
                     .filter { it.entityType == EntityType.Fish }
                     .any { fish -> fish.location.distance(isopod.location) < hitRadius }
-
-                if (hitFish) {
-                    outcome = "fish"
+                outcome = if (hitFish) {
                     successCount++
+                    "fish"
                 } else {
-                    outcome = "wall"
                     wallCollisionCount++
+                    "wall"
                 }
             } else {
                 timeoutCount++
@@ -477,23 +493,15 @@ val isopodSim = newSim { optionString ->
             collision = false
         }
 
-        println("\n" + "=".repeat(50))
-        println("=== Simulation Complete ===")
-        println("Total trials: $numTrials")
-        println("Fish collisions: $successCount (${String.format("%.1f", successCount.toDouble() / numTrials * 100)}%)")
-        println("Wall collisions: $wallCollisionCount (${String.format("%.1f", wallCollisionCount.toDouble() / numTrials * 100)}%)")
-        println("Timeouts: $timeoutCount (${String.format("%.1f", timeoutCount.toDouble() / numTrials * 100)}%)")
-        println("=".repeat(50))
+        println("\n=== Complete: Fish=$successCount, Wall=$wallCollisionCount, Timeout=$timeoutCount ===")
 
-        // Export to CSV
-        val timestamp = java.text.SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(java.util.Date())
-        val outputDir = java.io.File("simulation_outputs")
-        if (!outputDir.exists()) {
-            outputDir.mkdirs()
+        val filename = outputFile ?: run {
+            val outputDir = java.io.File("simulation_outputs")
+            if (!outputDir.exists()) outputDir.mkdirs()
+            "simulation_outputs/isopod_sim_${java.text.SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(java.util.Date())}.csv"
         }
-        val filename = "simulation_outputs/isopod_sim_$timestamp.csv"
         java.io.File(filename).writeText(csvData.toString())
-        println("\nData exported to: $filename\n")
+        println("CSV: $filename\n")
     }
 
 }

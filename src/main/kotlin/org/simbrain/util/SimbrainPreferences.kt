@@ -6,6 +6,7 @@ import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
 import java.awt.Color
+import java.io.File
 import java.util.prefs.Preferences
 import javax.swing.JButton
 import javax.swing.JOptionPane
@@ -13,6 +14,37 @@ import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.jvm.isAccessible
+
+/**
+ * Returns a system-appropriate directory for application config files.
+ * - Windows: %AppData%/Simbrain
+ * - macOS: ~/Library/Application Support/Simbrain
+ * - Linux: ~/.config/simbrain
+ */
+fun getSimbrainConfigDirectory(): File {
+    val userHome = System.getProperty("user.home")
+    val osName = System.getProperty("os.name").lowercase()
+
+    val configDir = when {
+        osName.contains("win") -> {
+            val appData = System.getenv("APPDATA")
+            if (appData != null) File(appData, "Simbrain")
+            else File(userHome, "AppData/Roaming/Simbrain")
+        }
+        osName.contains("mac") -> {
+            File(userHome, "Library/Application Support/Simbrain")
+        }
+        else -> {
+            File(userHome, ".config/simbrain")
+        }
+    }
+
+    if (!configDir.exists()) {
+        configDir.mkdirs()
+    }
+
+    return configDir
+}
 
 /**
  * Marker interface for classes that hold [Preference] objects.
@@ -60,7 +92,7 @@ sealed class Preference<T>(val default: T) {
         }
     }
 
-    operator fun <H: PreferenceHolder> getValue(thisRef: H, property: KProperty<*>): T {
+    open operator fun <H: PreferenceHolder> getValue(thisRef: H, property: KProperty<*>): T {
         name = property.name
         if (cachedValue == null) {
             cachedValue = deserialize(systemPreferences.get(property.name, serialize(default)))
@@ -68,7 +100,7 @@ sealed class Preference<T>(val default: T) {
         return cachedValue!!
     }
 
-    operator fun <H: PreferenceHolder> setValue(thisRef: H, property: KProperty<*>, value: T) {
+    open operator fun <H: PreferenceHolder> setValue(thisRef: H, property: KProperty<*>, value: T) {
         systemPreferences.put(property.name, serialize(value))
         cachedValue = value
     }
@@ -142,18 +174,37 @@ class ProbabilityDistributionPreference(probabilityDistribution: ProbabilityDist
     }
 }
 
-class WandPalettePreference(wandPalette: WandPalette): Preference<WandPalette>(wandPalette) {
-    override fun deserialize(value: String): WandPalette {
-        return try {
-            getSimbrainXStream().fromXML(value) as WandPalette
-        } catch (e: Exception) {
-            // If deserialization fails, return default palette
-            WandPalette.createDefault()
+/**
+ * File-based storage for WandPalette since it can exceed Java Preferences size limit.
+ * Stores the palette as XML in the Simbrain config directory.
+ */
+object WandPaletteStorage {
+    private val paletteFile = File(getSimbrainConfigDirectory(), "wand_palette.xml")
+    private var cachedPalette: WandPalette? = null
+
+    fun load(): WandPalette {
+        if (cachedPalette == null) {
+            cachedPalette = try {
+                if (paletteFile.exists()) {
+                    getSimbrainXStream().fromXML(paletteFile) as WandPalette
+                } else {
+                    WandPalette.createDefault()
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
+                WandPalette.createDefault()
+            }
         }
+        return cachedPalette!!
     }
 
-    override fun serialize(value: WandPalette): String {
-        return getSimbrainXStream().toXML(value)
+    fun save(palette: WandPalette) {
+        try {
+            paletteFile.writeText(getSimbrainXStream().toXML(palette))
+            cachedPalette = palette
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }
 

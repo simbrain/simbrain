@@ -1,5 +1,6 @@
 package org.simbrain.network.gui
 
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.displayInDialog
 import org.simbrain.util.getSimbrainXStream
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
@@ -63,6 +64,14 @@ class WandPalettePanel(
             addActionListener { importPalette() }
         }
         buttonPanel.add(importButton)
+
+        buttonPanel.add(Box.createHorizontalStrut(20))
+
+        val revertButton = JButton("Revert to Default").apply {
+            toolTipText = "Reset palette to default actions"
+            addActionListener { revertToDefault() }
+        }
+        buttonPanel.add(revertButton)
 
         add(buttonPanel, BorderLayout.SOUTH)
 
@@ -186,6 +195,7 @@ class WandPalettePanel(
             val newAction = wrapper.editingObject
             palette.addAction(newAction)
             palette.selectAction(palette.actions.size - 1)
+            savePalette()
         }
     }
 
@@ -199,12 +209,14 @@ class WandPalettePanel(
             palette.events.actionEdited.fire(wrapper.editingObject)
             rebuildList()
             onSelectionChanged()
+            savePalette()
         }
     }
 
     private fun deleteAction(index: Int) {
         if (palette.actions.size > 1) {
             palette.removeAction(index)
+            savePalette()
         } else {
             JOptionPane.showMessageDialog(
                 this,
@@ -213,6 +225,13 @@ class WandPalettePanel(
                 JOptionPane.WARNING_MESSAGE
             )
         }
+    }
+
+    /**
+     * Persists the palette to system preferences.
+     */
+    private fun savePalette() {
+        NetworkPreferences.wandPalette = palette
     }
 
     private fun exportPalette() {
@@ -227,6 +246,7 @@ class WandPalettePanel(
             try {
                 val imported = getSimbrainXStream().fromXML(readText()) as WandPalette
                 palette.setActions(imported.actions)
+                savePalette()
             } catch (e: Exception) {
                 JOptionPane.showMessageDialog(
                     this@WandPalettePanel,
@@ -235,6 +255,21 @@ class WandPalettePanel(
                     JOptionPane.ERROR_MESSAGE
                 )
             }
+        }
+    }
+
+    private fun revertToDefault() {
+        val result = JOptionPane.showConfirmDialog(
+            this,
+            "Reset palette to default actions? This cannot be undone.",
+            "Revert to Default",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE
+        )
+        if (result == JOptionPane.YES_OPTION) {
+            val defaultPalette = WandPalette.createDefault()
+            palette.setActions(defaultPalette.actions)
+            savePalette()
         }
     }
 }

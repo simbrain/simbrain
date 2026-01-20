@@ -158,8 +158,11 @@ object NetworkPreferences: PreferenceHolder() {
     /**
      * The wand palette containing configured wand actions.
      * Not exposed as a @UserParameter since it has its own dedicated UI.
+     * Stored in a file since it can exceed Java Preferences size limit.
      */
-    var wandPalette by WandPalettePreference(WandPalette.createDefault())
+    var wandPalette: WandPalette
+        get() = WandPaletteStorage.load()
+        set(value) = WandPaletteStorage.save(value)
 
     @UserParameter(
         label = "Weight matrix target-source format",

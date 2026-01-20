@@ -99,7 +99,7 @@ sealed class AdjustValueTarget : EditableObject {
         override fun setValue(model: NetworkModel, value: Double) { (model as Neuron).activation = value }
         override fun getBounds(model: NetworkModel) = (model as Neuron).let { it.lowerBound to it.upperBound }
         override val targetName = "activation"
-        override val name = "Neuron Activation"
+        override val name: String get() = "Neuron Activation"
     }
 
     /** Target synapse strengths (weights) */
@@ -109,7 +109,7 @@ sealed class AdjustValueTarget : EditableObject {
         override fun setValue(model: NetworkModel, value: Double) { (model as Synapse).strength = value }
         override fun getBounds(model: NetworkModel) = (model as Synapse).let { it.lowerBound to it.upperBound }
         override val targetName = "strength"
-        override val name = "Synapse Strength"
+        override val name: String get() = "Synapse Strength"
     }
 }
 
@@ -125,14 +125,14 @@ sealed class AdjustValueOperation : EditableObject {
     object Set : AdjustValueOperation() {
         override fun apply(currentValue: Double, targetValue: Double) = targetValue
         override val verb = "Set"
-        override val name = "Set"
+        override val name: String get() = "Set"
     }
 
     /** Add the target value to the current value */
     object Add : AdjustValueOperation() {
         override fun apply(currentValue: Double, targetValue: Double) = currentValue + targetValue
         override val verb = "Add"
-        override val name = "Add"
+        override val name: String get() = "Add"
     }
 }
 
@@ -156,7 +156,7 @@ sealed class AdjustValueAmount : CopyableObject {
     class UpperBound : AdjustValueAmount(), EditableObject {
         override fun computeValue(lower: Double, upper: Double) = upper
         override val description = "upper bound"
-        override val name = "Upper Bound"
+        override val name: String get() = "Upper Bound"
         override fun copy() = UpperBound()
     }
 
@@ -164,7 +164,7 @@ sealed class AdjustValueAmount : CopyableObject {
     class LowerBound : AdjustValueAmount(), EditableObject {
         override fun computeValue(lower: Double, upper: Double) = lower
         override val description = "lower bound"
-        override val name = "Lower Bound"
+        override val name: String get() = "Lower Bound"
         override fun copy() = LowerBound()
     }
 
@@ -177,7 +177,7 @@ sealed class AdjustValueAmount : CopyableObject {
         )
         override fun computeValue(lower: Double, upper: Double) = this.value
         override val description get() = "$value"
-        override val name = "Value"
+        override val name: String get() = "Value"
         override fun copy() = Value(value)
     }
 
@@ -205,7 +205,7 @@ sealed class AdjustValueAmount : CopyableObject {
         }
 
         override val description get() = "relative $relativeValue"
-        override val name = "Relative"
+        override val name: String get() = "Relative"
         override fun copy() = Relative(relativeValue)
     }
 
@@ -219,7 +219,7 @@ sealed class AdjustValueAmount : CopyableObject {
         )
         override fun computeValue(lower: Double, upper: Double) = randomizer.sampleDouble()
         override val description get() = "random (${randomizer.name})"
-        override val name = "Random"
+        override val name: String get() = "Random"
         override fun copy() = Random(randomizer.copy())
     }
 }

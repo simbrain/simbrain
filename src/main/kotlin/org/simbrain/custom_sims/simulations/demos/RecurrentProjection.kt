@@ -64,42 +64,39 @@ val recurrentProjection = newSim("recurrent_projection") {
         """
             # Exploring Attractors in a Recurrent Neural Network
             
-            ## Basic Definitions and Setup
-            
             This simulation lets you explore how different recurrent neural networks evolve over time, forming patterns such as fixed points, limit cycles, or chaotic trajectories. 
             
-            The system consists of a fully recurrent neuron population with randomly initialized connections. A **projection plot** visualizes the evolution of the network in a reduced 2D space using **Principal Component Analysis (PCA)**, making it easier to see the underlying dynamics.
+            The system consists of a fully recurrent neuron population with randomly initialized connections. A **projection plot** visualizes the evolution of the network in a reduced 2D space using **Principal 
+            Component Analysis (PCA)**, making it easier to see the underlying dynamics.
             
-            Key terms:
+            # Simulation Details
             
-            - **Fixed Point:** A stable state the system settles into over time.
-            - **Limit Cycle:** A repeating, periodic trajectory in activation space.
-            - **Chaos:** Irregular, sensitive dynamics that never repeat and are hard to predict.
-            - **Projection Plot (PCA):** A dimensionality-reduced visualization of the network's activity over time.
+            Key terms to note:
             
-            To begin, just click **Run** in Simbrain's main toolbar. Everything else is handled through the custom control panel.
+            - **Fixed Point**: A stable state the system settles into over time.
+            - **Limit Cycle**: A repeating, periodic trajectory in activation space.
+            - **Chaos**: Irregular, sensitive dynamics that never repeat and are hard to predict.
+            - **Projection Plot (PCA)**: A dimensionality-reduced visualization of the network's activity over time.
             
-            ---
+            To begin, just click `Run` in Simbrain's main toolbar. Everything else is handled through the custom control panel.
             
-            ## Simulation Walkthrough
+            # What to Do
             
-            1. **Start the Simulation**
-               - Press **Run** in the Simbrain toolbar to begin updating the network.
+            1. Start the simulation:
+               - Press `Run` in the Simbrain toolbar to begin updating the network.
             
-            2. **Randomize Activations**
-               - Click **"Randomize Activations"** to set random starting values for all neurons.
+            2. Randomize Activations:
+               - Click `Randomize activations` to set random starting values for all neurons.
                - Observe the evolving trajectory in the projection plot.
                - Try this multiple times to explore different outcomes.
             
-            3. **Clear Plot**
-               - When the trajectory slows down or stabilizes, click **"Clear Plot"** to reset the display.
+            3. Clear Plot
+               - When the trajectory slows down or stabilizes, click `Clear Plot` to reset the display.
             
-            4. **Randomize Weights**
-               - Click **"Randomize Weights"** to create a new network with fresh, randomized connections.
+            4. Randomize Weights
+               - Click `Randomize Weights` to create a new network with fresh, randomized connections.
                - This changes the system's dynamics—try again with randomized activations to see what new behavior emerges.
-            
-            ---
-            
+
             ## Tips and Tricks
             
             - Speed Up the Simulation
@@ -117,6 +114,10 @@ val recurrentProjection = newSim("recurrent_projection") {
             
             You can experiment by repeatedly clicking the buttons in different sequences, observing the resulting behavior, 
             and thinking about how initial conditions and connection patterns shape neural dynamics.
+            
+            # Credits
+            
+            [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
 
             """.trimIndent()
     )

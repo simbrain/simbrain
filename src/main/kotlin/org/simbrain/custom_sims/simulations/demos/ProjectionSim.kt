@@ -40,24 +40,32 @@ val recurrentNetArrayBased = newSim {
 
     addSidebarInfo(
         """
-            # Recurrent network
-            A neuron array linked to itself by a weight matrix. Use this simulation to study simple recurrent dynamics.   
+            # Recurrent Network (Array Version)
+            
+            A neuron array linked to itself by a weight matrix. This simulation is used to study simple recurrent dynamics.   
 
-            The basic thing you do in this simulation is press run in the deskotop window and watch dynamics unfold.
+            The basic thing you do in this simulation is press `run` in the desktop window and watch dynamics unfold.
+             
+            # What to Do
             
-            # Basic study of dynamics
+            Basic method to study dynamics in this model:
             
-            - Randomize the neuron array by clicking on it and pressing "r". This sets a new initial condition for the dynamics.
-            - Randomize the weight matrix by clicking on it and pressing "r" to randomize. This creates a new dynamical system
-            - At any time you can press the `clear` button (the eraser) in the projection plot to start over with your plot
-            - You can press the clamp button in the plot, assuming PCA, to "freeze" the current projection pattern
+            - Randomize the neuron array by clicking on it and pressing `r`. This sets a new initial condition for the dynamics.
+            - Randomize the weight matrix by clicking on it and pressing `r` to randomize. This creates a new dynamical system.
+            - At any time you can press the `clear` button (the eraser) in the projection plot to start over with your plot.
+            - You can press the `clamp` button in the plot, assuming PCA, to _freeze_ the current projection pattern.
 
-            # Other things you can try
+            ## Other Things to Try
             
-            - Right click on the weight matrix and view the eigenvalues and associate its behavior with the dominant eigenvalue
-            - Right click on the weight matrix and set the spectral radius. Values a little below 1 can produce interesting dynamics
+            - Right click on the weight matrix and view the eigenvalues and associate its behavior with the dominant eigenvalue.
+            - Right click on the weight matrix and set the spectral radius. Values a little below `1` can produce interesting dynamics.
             - Double click on the neuron array and change the update rule, and see how this impacts the dynamics. 
-            - Changing the type of projection, for example changing it to `Sammon` and pressing `play` to see an alternative way of projecting data
+            - Changing the type of projection, for example changing it to `Sammon` and pressing `play` to see an alternative way of projecting data.
+            
+            # Credits
+            
+            [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
+        
         """.trimIndent()
     )
 

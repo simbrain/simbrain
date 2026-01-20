@@ -134,14 +134,14 @@ val simpleImageWorld = newSim {
         """
         # Simple Image World
         
-        This simulation demonstrates basic image processing using a 10x10 pixel drawing canvas connected to a neural network. 
+        This simulation demonstrates basic image processing using a `10x10` pixel drawing canvas connected to a neural network. 
         You can draw simple images and train a network to classify them into different categories.
         
         The simulation is useful for seeing what the process of training a network is like without having to create a bunch of data
         and load it into the trainer. Instead, you can simply draw patterns, press a button, and train the associations.
         
-        The simulation is useful for exploring generalization. If you make 8 different categories, it will probably not do well at recognizing variants. 
-        But if you make 4 versions of two categories, for exmaple x1, x2, x3, x4 and o1, o2, o3, o4, that vary in position, size, or style, you 
+        The simulation is useful for exploring generalization. If you make `8` different categories, it will probably not do well at recognizing variants. 
+        But if you make `4` versions of two categories, for exmaple `x1`, `x2`, `x3`, `x4` and `o1`, `o2`, `o3`, `o4`, that vary in position, size, or style, you 
         will probably get better results.
         
         To view your training data,  you can open the training dialog and click the step button in the input table. This will place the patters back 
@@ -165,13 +165,13 @@ val simpleImageWorld = newSim {
         
         You can approach this simulation in several ways:
         
-        - Two-category classification: Train the network to distinguish between two types of patterns (e.g., X vs O). This is the simplest approach.
+        - Two-category classification: Train the network to distinguish between two types of patterns (e.g., `X` vs `O`). This is the simplest approach.
         
-        - Multiple variations of one pattern: Use all ${numCategories} categories to teach the network to recognize different variations of a single pattern type (e.g., X in different positions or orientations).
+        - Multiple variations of one pattern: Use all ${numCategories} categories to teach the network to recognize different variations of a single pattern type (e.g., `X` in different positions or orientations).
         
-        - Multiple pattern types: Train on several distinct pattern types (e.g., X, O, lines, dots) to create a multi-category classifier.
+        - Multiple pattern types: Train on several distinct pattern types (e.g., `X`, `O`, `lines`, `dots`) to create a multi-category classifier.
         
-        - Multiple instances per category: For better generalization, create 3-4 variations of each pattern type and train on all of them. This helps the network learn the essential features rather than memorizing specific pixel configurations.
+        - Multiple instances per category: For better generalization, create `3-4` variations of each pattern type and train on all of them. This helps the network learn the essential features rather than memorizing specific pixel configurations.
         
 
         # Credits

@@ -508,9 +508,18 @@ val iacJetsSharks5People = newSim {
                 A fragment of the classic McClelland Jets and Sharks IAC Model.  This is a fragment of the full
                 [IAC](https://en.wikipedia.org/wiki/Interactive_activation_and_competition_networks) model
                 described in the documentation for IAC_Full. Because there are fewer nodes and links, this one runs
-                faster.  To see it in action, add activation to a person, or to any propery, run the network, and see what
-                pattern it settles in to. This models human associative memory. Again, for more info, see the documentation
-                for IAC_Full.
+                faster.
+                
+                # What to Do
+                
+                To see the Jets and Shark model in action:
+                
+                - Add activation to a person, or to any property, run the network, and see what pattern it settles in to. This models human associative memory. Again, for more info, see the documentation for IAC_Full.
+                
+                # Credits
+                
+                [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
+            
             """.trimIndent()
         )
     }

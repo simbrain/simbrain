@@ -65,7 +65,7 @@ val irisClassifier = newSim {
 
     addSidebarInfo(
     """
-    # Introduction
+    # Iris Classifier
 
     This simulation helps you learn how a machine learning model can classify data based on simple inputs, without needing to write any code.
    

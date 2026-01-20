@@ -322,7 +322,7 @@ val spiveyNet = newSim {
 
     addSidebarInfo(
         """ 
-        # Introduction
+        # Mouse and Eye Tracking
         
         This is a localist attractor network based on (Spivey, 2025) that simulates mouse trajectories relative to visual and auditory inputs.
          It is a computational model of behavioral studies described in (Spivey et al., 2005). It is not a model of learning
@@ -349,11 +349,11 @@ val spiveyNet = newSim {
         
         In the studies in (Spivey et al., 2005) participants were shown two objects and told which to point to.
         The scientists tracked their mouse and eyes as they pointed to the requested objects. This is the kind of data
-         that were gathered
+        that were gathered, shown below.
          
          <img src="//localfiles/simulations/images/visualWorld/spiveyMouseTrace.png" alt="Mouse trace icon" height="200">
         
-        There were three main conditions
+        There were three main conditions:
         
          1. **Control condition**: candle target and fork competitor. Eyes should go straight to target without being influenced by the competitor,
             because candle and fork have very different phonemic representations.
@@ -370,45 +370,44 @@ val spiveyNet = newSim {
         ## Compare conditions
         
         1. Control Condition
-        - Click on the `Control condition` button
-        - Click the `iterate` button repeatedly
-        - Observe the mouse goes straight to the candle
+        - Click on the `Control condition` button.
+        - Click the `iterate` button repeatedly.
+        - Observe the mouse goes straight to the candle.
         
         2. Cohort Condition
-        - Click on the `Cohort condition` button
-        - Click the `iterate` button repeatedly
-        - Observe the mouse goes towards the the candle, but is pulled a bit towards candy
+        - Click on the `Cohort condition` button.
+        - Click the `iterate` button repeatedly.
+        - Observe the mouse goes towards the the candle, but is pulled a bit towards candy.
 
         3. Rhyming Condition
-        - Click on the `Rhyming condition` button
-        - Click the `iterate` button repeatedly
+        - Click on the `Rhyming condition` button.
+        - Click the `iterate` button repeatedly.
         - Observe the mouse goes towards the the candle, but is pulled a bit towards the handle, but not as much as in the cohort condition, and
             is pulled more towards the end of the trajectory.
         
-        
-        You can reset at any time using the `reset button` to erase all the trajectories
-        You can reset without erasing trajectories by pressing the Control, Cohort, or Rhyming buttons.  
-        You can click the `feeback` button to simulate feedback in a way that is described in (Spivey, 2025).
+        You can reset at any time using the `reset button` to erase all the trajectories.
+        You can reset without erasing trajectories by pressing the `Control`, `Cohort`, or `Rhyming` buttons.  
+        You can click the `feedback` button to simulate feedback in a way that is described in (Spivey, 2025).
        
         ## To plot activations 
         
         In (Spivey, 2025), the central figure is Figure 5 which shows time series plots for activations in different parts of the network,
-        which illustrates the dynamics governing the mouse traces. 
+        which illustrates the dynamics governing the mouse traces. Shown below.
         
         <img src="//localfiles/simulations/images/visualWorld/spiveyActivationDynamics.png" alt="Activation dynamics icon" height="200">
         
         This can also be simulated in Simbrain (but note the colors and details will be slightly different)
         
-        1. Right-click on the interaction box (the yellow box of the groups of nodes) of whatever network is of interest (eyes, integration, etc)  
+        1. Right-click on the interaction box (the yellow box of the groups of nodes) of whatever network is of interest (eyes, integration, etc).  
         1. Select `Plot > Time Series Plot` from the dropdown.
-        1. Repeat the steps above (selecting a condition then iterating) to see activation dynamics in the time series
+        1. Repeat the steps above (selecting a condition then iterating) to see activation dynamics in the time series.
         1. There will generally be four lines corresponding to the four nodes in each neuron group.
         
         # Reference
         
-        Spivey, M. J. (2025). [A linking hypothesis for eyetracking and mousetracking in the visual world paradigm](https://www.sciencedirect.com/science/article/pii/S0006899325000356). Brain Research, 149477.
+        Spivey, M. J. (2025). [A linking hypothesis for eyetracking and mousetracking in the visual world paradigm](https://www.sciencedirect.com/science/article/pii/S0006899325000356). _Brain Research_, 149477.
         
-        Spivey, M. J., Grosjean, M., & Knoblich, G. (2005). [Continuous attraction toward phonological competitors](https://pmc.ncbi.nlm.nih.gov/articles/PMC1177386/). Proceedings of the National Academy of Sciences, 102(29), 10393-10398.
+        Spivey, M. J., Grosjean, M., & Knoblich, G. (2005). [Continuous attraction toward phonological competitors](https://pmc.ncbi.nlm.nih.gov/articles/PMC1177386/). _Proceedings of the National Academy of Sciences_, _102_(29), 10393-10398.
 
         # Credits
         
@@ -416,7 +415,7 @@ val spiveyNet = newSim {
         
         Olivia Gawel
         
-        [Jeff Yoshimi](www.jeffyoshimi.net)
+        [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
        
         """.trimIndent()
     )

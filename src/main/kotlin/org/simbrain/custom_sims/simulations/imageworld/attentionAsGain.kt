@@ -243,17 +243,17 @@ val attentionAsGain = newSim {
         they respond more strongly to the same stimulus. This is not an additive effect (adding a constant) but a 
         multiplicative one (scaling the response).
         
-        The equation is simple: **output = gain × input**
+        The equation is simple: **`output = gain × input`**
         
         Higher gain → stronger response to the same input → better signal for attended stimuli.
         
         ## Network Architecture
         
-        - **Visual Input Layer**: 450 neurons (30×15 grid), receiving brightness values from the image world
-        - **Left Region**: 225 neurons (15×15 grid) processing the left half of the image
-        - **Right Region**: 225 neurons (15×15 grid) processing the right half of the image
+        - **Visual Input Layer**: `450` neurons (`30×15` grid), receiving brightness values from the image world
+        - **Left Region**: `225` neurons (`15×15` grid) processing the left half of the image
+        - **Right Region**: `225` neurons (`15×15` grid) processing the right half of the image
         - **One-to-one connections**: Each input neuron connects to one region neuron
-        - **Linear neurons with ReLU**: Neurons use linear activation with rectification (negative values → 0)
+        - **Linear neurons with ReLU**: Neurons use linear activation with rectification (negative values → `0`)
         
         The gain/slope parameter directly controls how strongly each region responds to its input.
         
@@ -261,37 +261,37 @@ val attentionAsGain = newSim {
         
         ### Quick Start with Pre-loaded Images
         
-        1. Click **"Image 1: Left bars"** to load vertical bars on the left side
-        2. Move the **Left Gain** slider to 4.0 or 5.0
+        1. Click `**"`Image 1: Left bars` to load vertical bars on the left side
+        2. Move the `Left Gain` slider to `4.0` or `5.0`
         3. Iterate the workspace (play button or spacebar) and observe the left region neurons activate strongly
-        4. Move the **Left Gain** slider back to 1.0 and see how the response drops
-        5. Try **"Image 2: Right bars"** and experiment with the **Right Gain** slider
+        4. Move the `Left Gain` slider back to `1.0` and see how the response drops
+        5. Try `Image 2: Right bars` and experiment with the `Right Gain` slider
         
         ### Compare Attended vs Unattended
         
-        1. Click **"Image 3: Both sides"** to load a pattern spanning both regions
-        2. Set **Left Gain** to 4.0 and **Right Gain** to 1.0 - observe the left region shows strong activation
-        3. Reverse it: **Left Gain** to 1.0 and **Right Gain** to 4.0 - the relationship flips
-        4. Set both sliders to 4.0 - both regions show strong responses
-        5. Set both sliders to 1.0 - both regions show baseline responses
+        1. Click `Image 3: Both sides` to load a pattern spanning both regions
+        2. Set `Left Gain` to `4.0` and `Right Gain` to `1.0` - observe the left region shows strong activation
+        3. Reverse it: `Left Gain` to `1.0` and `Right Gain` to `4.0` - the relationship flips
+        4. Set both sliders to `4.0` - both regions show strong responses
+        5. Set both sliders to `1.0` - both regions show baseline responses
         
         ### Manual Gain Control
         
-        1. Use the **Left Gain** and **Right Gain** sliders to set arbitrary gain values
-        2. Try gain = 0.5 vs gain = 3.0 to see a 6-fold difference in response
+        1. Use the `Left Gain` and `Right Gain` sliders to set arbitrary gain values
+        2. Try gain = `0.5` vs gain = `3.0` to see a `6`-fold difference in response
         3. Observe how neuron group labels update to show attention state
         4. Watch the network visualization - attended regions have higher activations (brighter neuron colors)
         
         ### Draw Your Own Patterns
         
-        1. Click **"Image 5: Blank canvas"** to get a clean slate
+        1. Click `Image 5: Blank canvas` to get a clean slate
         2. Use the drawing tools in the Image World window to create your own patterns
         3. Try drawing on just the left or right side, or create patterns that span both
         4. Experiment with gain settings to see how attention modulates your custom patterns
         
         ## Key Observations
         
-        - **Multiplicative effect**: A neuron receiving input of 0.5 produces output of 0.5 with gain=1, but 2.0 with gain=4
+        - **Multiplicative effect**: A neuron receiving input of `0.5` produces output of `0.5` with gain=`1`, but `2.0` with gain=`4`
         - **Spatial selectivity**: Attention can be directed to specific spatial locations independently
         - **Response amplification**: Same stimulus → different neural response based on attention state
         - **Zero inputs stay zero**: Gain modulation only affects neurons receiving input (ReLU ensures no negative activations)
@@ -315,12 +315,15 @@ val attentionAsGain = newSim {
         - **Attention with noise**: Add noise to inputs to demonstrate signal-to-noise improvements
         - **Competitive attention**: Limited gain resources that must be allocated between regions
         
-        ## Relevant Literature
+        # References
         
-        - Reynolds, J. H., & Heeger, D. J. (2009). The normalization model of attention. *Neuron*, 61(2), 168-185.
-        - Maunsell, J. H., & Treue, S. (2006). Feature-based attention in visual cortex. *Trends in Neurosciences*, 29(6), 317-322.
-        - Carandini, M., & Heeger, D. J. (2012). Normalization as a canonical neural computation. *Nature Reviews Neuroscience*, 13(1), 51-62.
-        - Martinez-Trujillo, J. C., & Treue, S. (2002). Attentional modulation strength in cortical area MT depends on stimulus contrast. *Neuron*, 35(2), 365-370.
+        Reynolds, J. H., & Heeger, D. J. (2009). The normalization model of attention. *Neuron*, 61(2), 168-185.
+        
+        Maunsell, J. H., & Treue, S. (2006). Feature-based attention in visual cortex. *Trends in Neurosciences*, 29(6), 317-322.
+        
+        Carandini, M., & Heeger, D. J. (2012). Normalization as a canonical neural computation. *Nature Reviews Neuroscience*, 13(1), 51-62.
+        
+        Martinez-Trujillo, J. C., & Treue, S. (2002). Attentional modulation strength in cortical area MT depends on stimulus contrast. *Neuron*, 35(2), 365-370.
         
         ## Credits
         

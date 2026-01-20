@@ -60,17 +60,14 @@ val spikingNeuronTwoInputs = newSim {
         """
         # Two-Input Spiking Neuron
 
-        This simulation demonstrates how a single neuron responds to 
-        excitatory and inhibitory inputs using a biologically realistic spiking model. 
-        You can manually adjust both input levels and observe how they interact to control 
-        the neuron’s firing. When the excitatory signal is strong enough, the neuron spikes; 
-        when inhibition dominates, it may be silenced. This gives you a hands-on way to 
-        explore how neurons integrate multiple sources of input.
+        This simulation demonstrates how a single neuron responds to excitatory and inhibitory inputs using a biologically realistic spiking model. 
+        You can manually adjust both input levels and observe how they interact to control the neuron’s firing. When the excitatory signal is strong enough, the neuron spikes; 
+        when inhibition dominates, it may be silenced. This gives you a hands-on way to explore how neurons integrate multiple sources of input.
 
-        The spiking neuron uses the [Adex model](https://docs.simbrain.net/docs/network/neurons/adaptiveExIntegAndFire.html#adex-integrate-and-fire) 
+        The spiking neuron uses the [AdEx model](https://docs.simbrain.net/docs/network/neurons/adaptiveExIntegAndFire.html#adex-integrate-and-fire) 
         shows the neuron's activity over time, letting you visualize how input balance affects firing.
 
-        # Background
+        # Simulation Details
 
         Spiking neurons integrate signals from multiple sources and fire only when their internal voltage crosses a threshold. In this setup:
 
@@ -83,26 +80,30 @@ val spikingNeuronTwoInputs = newSim {
 
         # What to Do
 
-        1. Press Run to start the simulation.
-        2. Click either the Excitatory Input or Inhibitory Input neuron.
+        1. Press `Run` to start the simulation.
+        2. Click either the `Excitatory Input` or `Inhibitory Input` neuron.
         3. Use the arrow keys (`↑` / `↓`) to raise or lower the activation level.
-        4. Observe how the spiking neuron’s spiking behavior changes in the time series plot.
+        4. Observe how the spiking neuron's spiking behavior changes in the time series plot.
 
-        # Things to try
+        ## Exploration of the impacts of input activations
 
-        - Raise only the excitatory input: The neuron should spike consistently.
-        - Raise only the inhibitory input: The neuron may stop firing.
+        - Raise only the `Excitatory Input`: The neuron should spike consistently.
+        - Raise only the `Inhibitory Input`: The neuron may stop firing.
         - Adjust both inputs to fine-tune whether and when spikes occur.
         
-        Double-click the spiking neuron to:
-        - Modify spiking neuron parameters and explore different firing types.
-        - Swap in a simpler spiking neuron model like [Integrate-and-Fire](https://docs.simbrain.net/docs/network/neurons/integrateAndFire.html) and compare the behavior.
+        ## Exploration of other spiking neuron models
+        
+        You can also change the spiking neuron model to a different model (i.e., Izhikevich, [Integrate-and-Fire](https://docs.simbrain.net/docs/network/neurons/integrateAndFire.html),
+        etc) to see other learning model behaviors by double-clicking on `Spiking neuron` to `Update Rule`.
 
         # Credits
 
-        Jeff Yoshimi  
-        Kanly Thao  
-        Elijah Olson
+        Elijah Olson  
+        
+        [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
+        
+        Kanly Thao
+        
         """.trimIndent()
     )
 }

@@ -33,7 +33,7 @@ val kAgentTrails = newSim {
 
     addSidebarInfo(
     """
-    # Introduction
+    # Agent Trails
     
     This simulation accompanies the paper _Narrowing the Explanatory Gap with Bridge Metaphors_ by Jeff Yoshimi. This is a simulation that consists of a network that is connected to an agent that exists in a 2D world (an odor world) where, when the action nodes are activated, the agent moves according to the neural activation. The agent's movement is traced as an agent trail in a PCA plot.
     
@@ -73,7 +73,7 @@ val kAgentTrails = newSim {
     
     Jasmine Lau
     
-    [Jeff Yoshimi](www.jeffyoshimi.net)
+    [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
     
     Kanly Thao
     """.trimIndent()

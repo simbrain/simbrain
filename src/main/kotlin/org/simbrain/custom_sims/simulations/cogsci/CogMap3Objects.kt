@@ -132,7 +132,7 @@ val cogMap3Objects = newSim {
 
     addSidebarInfo(
     """ 
-    # Introduction
+    # Recurrent 3 Object Detector
     
     The Generic 3 Objects Simulation consists of a central recurrent network where, sparse input from the distributed olfactory neuron group (`Sensory Neurons`) are sent into the recurrent network. The inputs function 
     similarly to the `Agent Trails` simulation; objects sensed by the agent's receptors are plotted into the plot where, the agent's responses to each object are recorded.  
@@ -166,7 +166,7 @@ val cogMap3Objects = newSim {
     
     Jasmine Lau
     
-    [Jeff Yoshimi](www.jeffyoshimi.net)
+    [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
     
     Kanly Thao
     """.trimIndent(),

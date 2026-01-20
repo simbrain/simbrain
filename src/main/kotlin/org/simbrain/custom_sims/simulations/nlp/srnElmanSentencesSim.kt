@@ -153,15 +153,15 @@ val srnElmanSentences = newSim {
 
         # What to Do
         
-        1. **Run the simulation** to see the network processing the current sentence
+        1. Run the simulation to see the network processing the current sentence.
         
-        2. **Train the network** by right-clicking on the SRN network and opening the training dialog
+        2. Train the network by right-clicking on the SRN network and opening the training dialog.
         
-        3. **Monitor learning progress** through the loss function - the network should learn to predict grammatically appropriate next words
+        3. Monitor learning progress through the loss function - the network should learn to predict grammatically appropriate next words.
         
-        4. **Observe predictions** in the output text world to see what words the network thinks should come next
+        4. Observe predictions in the output text world to see what words the network thinks should come next.
         
-        5. **Experiment with parameters**:
+        5. Experiment with parameters:
            - Adjust the number of training sentences
            - Modify the learning rate
            - Change the hidden layer size

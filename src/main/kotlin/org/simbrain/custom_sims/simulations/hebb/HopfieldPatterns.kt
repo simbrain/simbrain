@@ -48,8 +48,8 @@ val hopfieldPatterns = newSim {
         together, fire together"). To start, this network is initialized with all weights equal to zero.
         When you train this network on a pattern, it takes the dot product of each neuron activation in the network with all other neuron activations in the network.
         Even though we show 1s and 0s here, we actually use bipolar activations (-1s and 1s) to train and update the network.
-        This matrix is then multiplied by a learning rate, typically 1/(pattern count), and then added to the weight matrix. Note that the diagonals need to be zeroed.
-        A typical Hopfield network can learn up to around 0.15*(Neuron count) perfectly orthogonal patterns.
+        This matrix is then multiplied by a learning rate, typically `1/(pattern count)`, and then added to the weight matrix. Note that the diagonals need to be zeroed.
+        A typical Hopfield network can learn up to around `0.15*(Neuron count)` perfectly orthogonal patterns.
         
         ## Testing
         Typically in a Hopfield network, the neurons are updated asynchonously. They are updated randomly, one at a time for a set amount of updates.
@@ -65,17 +65,18 @@ val hopfieldPatterns = newSim {
         5. You can also manually create part of the pattern you trained the network and see if it can recreate it.
         6. You can also select an already trained pattern and changing a few of the neurons to see if it will go back to the pattern.
         
-        # A few experiments...
-        - Train the network on the E, F, and L patterns, then randomize and iterate the network (N -> R). What do you notice?
+        # Experiments
+        
+        - Train the network on the `E`, `F`, and `L` patterns, then randomize and iterate the network (`N -> R`). What do you notice?
         - Click on `Show Correlations`. What do you notice about the above patterns?
-        - Now, reset the network try to train the network to try to remember as many patterns as possible. Recall that the theoretical limit is 15% of the number of nodes, assuming uncorrelated patterns. See how close you can get to that limit.
-        - Click on `Show correlations` again and note that some patterns are correlated, for example L, E, and F. The network should not do as well learning those patterns (they might interfere in different ways). 
+        - Now, reset the network try to train the network to try to remember as many patterns as possible. Recall that the theoretical limit is `15%` of the number of nodes, assuming uncorrelated patterns. See how close you can get to that limit.
+        - Click on `Show correlations` again and note that some patterns are correlated, for example `L`, `E`, and `F`. The network should not do as well learning those patterns (they might interfere in different ways). 
 
         # Credits
         
         [Jensen Guo](https://www.linkedin.com/in/jensen-guo/) 
         
-        [Jeff Yoshimi](www.jeffyoshimi.net)
+        [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
         
         """.trimIndent()
     )

@@ -52,7 +52,7 @@ val backpropAutoEncoder = newSim {
         
         5. As you click the pattern on the bottom should be matched by the pattern on the top.
         
-        # Further Studies
+        ## Further Studies
         
         By default this kind of auto-encoding training set is used for networks, so it's easy to set up this kind of simulation with different sized hidden layers, or different numbers 
         of hidden layers. You can add a new network using `insert > subnetwork > backprop` and use different numbers for the hidden layer, and then follow the directions above. As the 

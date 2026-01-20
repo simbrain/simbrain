@@ -96,21 +96,18 @@ val stdpSim = newSim {
         """
         # Spike Timing Dependent Plasticity (STDP)
 
-        This simulation shows how the precise timing of spikes between neurons affects synaptic strength. If a [**presynaptic neuron** fires just before a **postsynaptic neuron**](https://www.geeksforgeeks.org/biology/difference-between-presynaptic-neuron-and-postsynaptic-neuron/), the connection strengthens—a process known as long-term potentiation (LTP). If the order is reversed, the connection weakens—called long-term depression (LTD). This reflects the principle of *"fire together, wire together"*, modified by timing.
+        This simulation shows how the precise timing of spikes between neurons affects synaptic strength. If a [**presynaptic neuron** fires just before a **postsynaptic neuron**](https://www.geeksforgeeks.org/biology/difference-between-presynaptic-neuron-and-postsynaptic-neuron/),
+        the connection strengthens—a process known as long-term potentiation (LTP). If the order is reversed, the connection weakens—called long-term depression (LTD). This reflects
+        the principle of *fire together, wire together*, modified by timing.
 
-        Two spiking neurons ("Pre" and "Post") are activated using inputs from a looping data table. Their connection uses the [STDP learning rule](https://docs.simbrain.net/docs/network/synapses/stdp.html), and changes to the synaptic weight are displayed in a live time series plot.
+        Two spiking neurons (*Pre* and *Post*) are activated using inputs from a looping data table. Their connection uses the [STDP learning rule](https://docs.simbrain.net/docs/network/synapses/stdp.html) 
+        and changes to the synaptic weight are displayed in a live time series plot.
 
-        # Main Components
+        ## Background
 
-        - **SpikingThreshold Neurons**: The Pre and Post neurons are [SpikingThreshold neurons](https://docs.simbrain.net/docs/network/spikingneurons.html), which spike when they receive enough input.
-        - **Data Table Input**: Two linear input neurons inject current at specific times, defined in a looping data table.
-        - **STDP Synapse**: A single synapse connects the Pre to the Post neuron using the [STDP rule](https://docs.simbrain.net/docs/network/synapses/stdp.html), which updates weight based on spike timing.
-        - **Jump-and-Decay Responder**: The synapse includes a [Jump-and-Decay spike responder](https://docs.simbrain.net/docs/network/spikeresponders/jumpdecay.html) to model fast, decaying post-synaptic effects.
-        - **Synapse Strength Plot**: A time series graph shows how the Pre→Post connection strength changes over time.
-
-        # Background
-
-        Spike Timing Dependent Plasticity (STDP) is a biologically inspired learning mechanism that adjusts synaptic strength according to the timing difference between presynaptic and postsynaptic spikes. If the presynaptic neuron spikes slightly before the postsynaptic neuron, the synapse strengthens (LTP). If the postsynaptic neuron spikes first, the synapse weakens (LTD).
+        Spike Timing Dependent Plasticity (STDP) is a biologically inspired learning mechanism that adjusts synaptic strength according to the timing difference between presynaptic
+        and postsynaptic spikes. If the presynaptic neuron spikes slightly before the postsynaptic neuron, the synapse strengthens (LTP). If the postsynaptic neuron spikes first, 
+        the synapse weakens (LTD).
 
         The rule is parameterized by:
         
@@ -120,28 +117,42 @@ val stdpSim = newSim {
         - `wMinus`: Maximum weight decrease
         - `learningRate`: Controls how quickly weights update
 
-        To learn more about the theory behind this rule, see the [Scholarpedia article on STDP](http://www.scholarpedia.org/article/Spike-timing_dependent_plasticity).
+        To learn more about the theory behind this rule, see the [Scholarpedia article](http://www.scholarpedia.org/article/Spike-timing_dependent_plasticity) on STDP.
+        
+        # Simulation Details
+
+        - `SpikingThreshold Neurons`: The Pre and Post neurons are [SpikingThreshold neurons](https://docs.simbrain.net/docs/network/spikingneurons.html), which spike when they 
+        receive enough input.
+        - `Data Table Input`: Two linear input neurons inject current at specific times, defined in a looping data table.
+        - `STDP Synapse`: A single synapse connects the Pre to the Post neuron using the [STDP rule](https://docs.simbrain.net/docs/network/synapses/stdp.html), which updates weight
+         based on spike timing.
+        - `Jump-and-Decay Responder`: The synapse includes a [Jump-and-Decay spike responder](https://docs.simbrain.net/docs/network/spikeresponders/jumpdecay.html) to model fast,
+         decaying post-synaptic effects.
+        - `Synapse Strength Plot`: A time series graph shows how the Pre→Post connection strength changes over time.
 
         # What to Do
 
-        1. Click **Run** to begin the simulation.
+        1. Click `Run` to begin the simulation.
         2. Inspect the data table to see when the Pre and Post neurons receive input.
-        3. Observe how the Pre→Post synaptic weight changes in the time series plot.
+        3. Observe how the Pre → Post synaptic weight changes in the time series plot.
         4. Try reversing the spike order to watch the synapse weaken.
 
-        # Try This
+        ## Exploring the model
 
         - Modify the data table to change the spike timing between Pre and Post.
         - Double-click the synapse to adjust parameters like `tauPlus`, `tauMinus`, `wPlus`, `wMinus`, and `learningRate`.
         - Add delays, multiple spikes, or repeat patterns in the input to simulate bursting behavior.
-        - Reduce the time constants to explore more sensitive or rapid learning responses.
-        - Observe how changes in spike order and timing influence the pattern of plasticity.
+            1) Reduce the time constants to explore more sensitive or rapid learning responses.
+            2) Observe how changes in spike order and timing influence the pattern of plasticity.
 
         # Credits
-
-        Jeff Yoshimi  
-        Kanly Thao  
+        
         Elijah Olson
+
+        [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
+                
+        Kanly Thao
+
         """.trimIndent()
     )
 }

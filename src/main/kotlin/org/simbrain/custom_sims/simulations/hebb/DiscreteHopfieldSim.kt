@@ -38,26 +38,38 @@ val discreteHopfieldSim = newSim {
     // You can get the pattern to memorize all the different patterns and antipatterns by training each one, randomizing and iterating to see if it is remembered, and training that pattern again if it needs to be learned.
     addSidebarInfo(
         """ 
-            # Introduction
+            # Discrete Hopfield
             
-            [Hopfield networks](https://en.wikipedia.org/wiki/Hopfield_network) are recurent networks often used for pattern recognition and to model memory retrieval. 
-            In this simulation you can test the network's ability to store and retrieve memories in the form of activation patterns.
-
-            # Training on One pattern         
+            [Hopfield networks](https://en.wikipedia.org/wiki/Hopfield_network) are recurrent networks often used for pattern recognition and to model memory 
+            retrieval. In this simulation, you can test the network's ability to store and retrieve memories in the form of activation patterns.
             
-            - Select one of the six training patterns on the button panel. 
-            - Press the train button to train the network on that pattern. Each time you press "train" it will "burn in" the pattern further.
-            - Note that it will learn both the pattern and its anti-pattern.
-            - To confirm the pattern is remembered, try randomzing the network with `N -> R` and then iterating by pressing space to see if the pattern is recreated.
-            - You can also manually create part of the pattern you trained the network and see if it can recreate it.
+            # What to Do         
             
-            # Training on Multiple patterns
+            1. Select one of the four input patterns on the button panel. 
             
-            - Hopfield networks have a memory capacity of about 14% of the number of nodes. In this case about 8 memories. However those memories need to be sufficiently distinct.  So the network should be able to learn all 6 patterns, but you must very carefully train it on them, clickin the pattern, and then pressing train a certain number of times.
+            2. Press the `Train on current pattern` button to train the network on that pattern. Each time you press it, it will "burn in" the pattern further where
+            it reinforces that pattern into the network's "memory".
             
-            # Other things to observe
+            3. Note that it will learn both the pattern and its anti-pattern.
             
-            When you iterate the network it tends to go to lower energy states.      
+            4. To confirm that the pattern is remembered, randomize the network by pressing `N -> R` and then iterating by pressing `Space` to see if the pattern is 
+            recreated.
+            
+                - You can also manually create part of the pattern you trained the network and see if it can recreate it.
+            
+            ## Training on Multiple patterns
+            
+            Hopfield networks have a memory capacity of about `14%` of the number of nodes. In this case about `8` memories states. However those memories need to be 
+            sufficiently distinct.  So the network should be able to learn all `6` patterns, but you must very carefully train it on them by clicking the pattern, 
+            and then pressing `Train on current pattern` a certain number of times.
+            
+            ## Other things to observe
+            
+            When you iterate the network it tends to go to lower energy states.  
+                
+            # Credits
+            
+            [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
         
         """.trimIndent()
     )

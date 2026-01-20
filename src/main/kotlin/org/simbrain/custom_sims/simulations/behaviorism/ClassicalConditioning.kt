@@ -121,7 +121,8 @@ val classicalConditioning = newSim("classical conditioning") {
         
         # What to Do
 
-        Below are steps to exploring the different behaviors that emerge from classical conditioning. 
+        Below are steps to exploring the different behaviors that emerge from classical conditioning and how you can invoke them in the simulation. After each
+        invocation, reset the simulation by reopening the simulation before testing the other responses.
         
         1. Unconditioned Stimulus and Response
            - Run the simulation and move the `cheese` near the `mouse`.

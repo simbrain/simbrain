@@ -387,7 +387,7 @@ addSidebarInfo(
 
         In Denison's experiment, participants viewed two tilted grating patterns presented one after the other. Each pattern was rotated either clockwise or counterclockwise. Before the patterns appeared, participants received an auditory cue telling them to pay attention to the first pattern, the second pattern, or both. After viewing the patterns, they reported the rotation direction.
 
-        The key finding: when participants were cued to attend to a specific pattern and then asked to report on that same pattern, their response times were faster and more accurate than when cued to one pattern but asked about the other. This demonstrates that voluntary attention (the cue) enhances perceptual processing of attended stimuli.
+        The key finding: When participants were cued to attend to a specific pattern and then asked to report on that same pattern, their response times were faster and more accurate than when cued to one pattern but asked about the other. This demonstrates that voluntary attention (the cue) enhances perceptual processing of attended stimuli.
 
         # Simulation Details
 
@@ -413,7 +413,7 @@ addSidebarInfo(
 
         ## Run a Trial
 
-        1. Select an `Attention Cue` and SOA (delay between stimuli) from the dropdown in the control panel.
+        1. Select an `Attention Cue` and `SOA` (delay between stimuli) from the dropdown in the control panel.
         2. Click `Start` to run a trial
         3. Watch the simulation unfold
 
@@ -432,14 +432,14 @@ addSidebarInfo(
 
         ## Experiment
 
-        Try different attention cues and observe how they affect:
-        - The decision layer activation strengths (model confidence)
-        - The voluntary attention trace in the `Attention` plot
-        - Whether the model makes correct decisions
+        1. Try different attention cues and observe how they affect:
+            - The decision layer activation strengths (model confidence)
+            - The voluntary attention trace in the `Attention` plot
+            - Whether the model makes correct decisions
 
-        Run multiple trials with the same cue to see how random variation in stimulus patterns affects the model's performance.
+        2. Run multiple trials with the same cue to see how random variation in stimulus patterns affects the model's performance.
 
-        Try different `SOA` (stimulus onset asynchrony) values to see how the timing between the two patterns affects attention allocation and decision accuracy.
+        3. Try different `SOA` (stimulus onset asynchrony) values to see how the timing between the two patterns affects attention allocation and decision accuracy.
 
         ## Performance Tip
 

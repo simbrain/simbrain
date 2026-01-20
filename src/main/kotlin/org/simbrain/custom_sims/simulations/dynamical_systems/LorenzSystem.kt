@@ -148,13 +148,19 @@ val lorenzSystem = newSim {
 
         A demonstration of the famous Lorenz attractor, one of the first examples of chaotic dynamics discovered by Edward Lorenz in 1963. The system exhibits sensitive dependence on initial conditions—the "butterfly effect"—where tiny changes in starting values lead to dramatically different trajectories.
 
+        ## Background
+
+        Edward Lorenz discovered this system in 1963 while studying atmospheric convection for weather prediction. When he re-ran a simulation using slightly rounded initial conditions, he found completely different results. This led to the discovery of deterministic chaos and the popularization of the "butterfly effect"—the idea that a butterfly flapping its wings in Brazil could theoretically cause a tornado in Texas.
+
+        The Lorenz attractor became an icon of chaos theory, demonstrating how simple deterministic rules can produce unpredictable behavior. It has influenced fields from mathematics and physics to philosophy and art.
+
         # Simulation Details
 
         The Lorenz system is governed by three coupled differential equations:
 
-        - dx/dt = σ(y - x)
-        - dy/dt = x(ρ - z) - y
-        - dz/dt = xy - βz
+        - `dx/dt = σ(y - x)`
+        - `dy/dt = x(ρ - z) - y`
+        - `dz/dt = xy - βz`
 
         Where `x`, `y`, and `z` are state variables representing simplified atmospheric convection, and `σ` (sigma), `ρ` (rho), and `β` (beta) are parameters controlling the system's behavior.
 
@@ -166,13 +172,13 @@ val lorenzSystem = newSim {
 
         The Lorenz system exhibits qualitatively different behaviors depending on parameter values:
 
-        **Stable - Converge to Origin** (ρ < 1): All trajectories converge to the origin (0, 0, 0). The system is predictable and stable.
+        **Stable - Converge to Origin** (`ρ < 1`): All trajectories converge to the origin `(0, 0, 0)`. The system is predictable and stable.
 
-        **Stable - Fixed Points** (1 < ρ < ~24.74): Trajectories converge to one of two symmetric steady states. The system settles into non-zero equilibria.
+        **Stable - Fixed Points** (`1 < ρ < ~24.74`): Trajectories converge to one of two symmetric steady states. The system settles into non-zero equilibria.
 
-        **Pre-Chaotic** (ρ ≈ 24.5): Near the chaos threshold, the system exhibits complex oscillations. This transitional regime shows increasingly intricate dynamics.
+        **Pre-Chaotic** (`ρ ≈ 24.5`): Near the chaos threshold, the system exhibits complex oscillations. This transitional regime shows increasingly intricate dynamics.
 
-        **Chaotic** (ρ = 28, standard parameters): The famous butterfly attractor emerges. Trajectories loop unpredictably around two centers, never repeating but remaining bounded. This is the regime that made the Lorenz system famous.
+        **Chaotic** (`ρ = 28`, standard parameters): The famous butterfly attractor emerges. Trajectories loop unpredictably around two centers, never repeating but remaining bounded. This is the regime that made the Lorenz system famous.
 
         # What to Do
 
@@ -201,7 +207,7 @@ val lorenzSystem = newSim {
 
         ## Experiment with Parameters
 
-        The `Custom Parameters` section shows values for a stable fixed-point regime (σ=10, ρ=15, β=2.67). Try these or your own values:
+        The `Custom Parameters` section shows values for a stable fixed-point regime (`σ=10`, `ρ=15`, `β=2.67`). Try these or your own values:
 
         1. Enter custom values in the parameter fields
         2. Click `Apply Custom Parameters`
@@ -214,15 +220,9 @@ val lorenzSystem = newSim {
         ## Visualization Tips
 
         - The projection plot uses decay coloring: recent points appear red and gradually fade to transparency, making it easy to see the current trajectory
-        - For chaotic parameters, the butterfly shape becomes visible after ~500 iterations
+        - For chaotic parameters, the butterfly shape becomes visible after `~500` iterations
         - Right-click the `Lorenz Variables` neuron collection and create a time series plot to see how `x`, `y`, and `z` evolve over time
         - Different regimes produce distinct patterns: settling points (stable), loops (pre-chaotic), or irregular wandering (chaotic)
-
-        # Background
-
-        Edward Lorenz discovered this system in 1963 while studying atmospheric convection for weather prediction. When he re-ran a simulation using slightly rounded initial conditions, he found completely different results. This led to the discovery of deterministic chaos and the popularization of the "butterfly effect"—the idea that a butterfly flapping its wings in Brazil could theoretically cause a tornado in Texas.
-
-        The Lorenz attractor became an icon of chaos theory, demonstrating how simple deterministic rules can produce unpredictable behavior. It has influenced fields from mathematics and physics to philosophy and art.
 
         # References
 
@@ -230,7 +230,8 @@ val lorenzSystem = newSim {
 
         # Credits
 
-        Jeff Yoshimi
+        [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
+        
         """.trimIndent()
     )
 

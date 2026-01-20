@@ -87,7 +87,7 @@ val nlpSimBasic = newSim {
     
        To visualize embeddings, Principal Component Analysis (PCA) is used to reduce the high-dimensional co-occurrence 
        space to two dimensions. PCA preserves relative distances between words so that those with similar distributions 
-       appear closer together. The projection plot makes it easy to see clusters such as "bus" and "butterfly", 
+       appear closer together. The projection plot makes it easy to see clusters such as `bus` and `butterfly`, 
        which share almost identical contexts in the training text.
     
        This approach is related to usage-based theories of language, which see meaning as emerging from statistical 
@@ -111,11 +111,10 @@ val nlpSimBasic = newSim {
     
        # What to Do
     
-       1. Run the simulation from the menu Simulations > NLP > Basic word embeddings.  
+       1. Run the simulation.  
        2. Observe the interface: the text world on the left and the PCA projection on the right.  
        3. Step through the text using the play button. Each word’s embedding will be added to the projection plot.  
-       4. Use the matrix and heatmap tools to examine co-occurrence structure and similarity values. 
-       Compare, for example, bus and butterfly.  
+       4. Use the matrix and heatmap tools to examine co-occurrence structure and similarity values. Compare, for example, `bus` and `butterfly`.  
        5. Try loading a different corpus from the simulations/texts folder. Notice how changing the training text alters the positions of words in the projection plot.
     
        # Credits

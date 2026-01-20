@@ -685,7 +685,7 @@ val braitenbergRL = newSim { optionString ->
 
     All weights are updated uniformly at each time step based on the TD error. Positive weights create pursuit behavior (turn toward the object), while negative weights create avoidance behavior (turn away from the object). The speed connections allow the vehicle to learn to slow down or speed up based on what it detects.
 
-    Objects automatically respawn at new locations when the agent collides with them. This prevents the vehicle from getting stuck on objects and encourages continuous exploration. Objects always respect a minimum separation distance of 100 pixels from each other to avoid confusion during learning.
+    Objects automatically respawn at new locations when the agent collides with them. This prevents the vehicle from getting stuck on objects and encourages continuous exploration. Objects always respect a minimum separation distance of `100` pixels from each other to avoid confusion during learning.
 
     # What to Do
 
@@ -718,21 +718,21 @@ val braitenbergRL = newSim { optionString ->
 
     The proximity rewards use configurable decay functions. Each object type (cheese and poison) has independent settings:
 
-    - **Max Reward**: Maximum reward magnitude (default: 15.0)
+    - **Max Reward**: Maximum reward magnitude (default: `15.0`)
     - **Decay Function**: How reward diminishes with distance
       - **Gaussian**: Smooth bell-curve decay (recommended for natural behavior)
       - **Linear**: Linear interpolation to zero at dispersion radius
       - **Step**: Binary on/off at dispersion radius
     - **Dispersion**: Distance at which reward approaches zero
-    - **Peak Distance**: Distance where reward is maximum (usually 0)
+    - **Peak Distance**: Distance where reward is maximum (usually `0`)
 
     The actual reward is: `maxReward × decayFunction(distance) × taskMultiplier`
 
-    Task multipliers determine whether objects are rewarding (+1) or punishing (-1).
+    Task multipliers determine whether objects are rewarding (`+1`) or punishing (`-1`).
 
     After training on one task, try clicking `Reset` and training on a different task to see how the vehicle adapts.
 
-    # Interpreting the Graphs
+    ## Interpreting the Graphs
 
     The time series plot shows three key signals that reveal the learning process:
 
@@ -740,7 +740,7 @@ val braitenbergRL = newSim { optionString ->
 
     **Value**: The critic's prediction of expected future cumulative reward from the current state. Early in training this is inaccurate, but it improves over time. You should see value increase as the agent approaches rewarding objects and decrease near penalizing ones, reflecting learned predictions about what will happen next.
 
-    **TD Error**: The temporal difference error, which can be understood as: TD_error = reward + γ×V(current) - V(previous). This is the learning signal that drives all weight updates. It represents the difference between what the critic predicted at the previous time step and what actually happened (current reward plus discounted current value). When value estimates are low or changing slowly, TD error tracks closely with reward. As the critic learns better predictions, TD error reflects prediction errors rather than just reward magnitude.
+    **TD Error**: The temporal difference error, which can be understood as: `TD_error = reward + γ×V(current) - V(previous)`. This is the learning signal that drives all weight updates. It represents the difference between what the critic predicted at the previous time step and what actually happened (current reward plus discounted current value). When value estimates are low or changing slowly, TD error tracks closely with reward. As the critic learns better predictions, TD error reflects prediction errors rather than just reward magnitude.
 
     ## Reading the Learning Process
 
@@ -755,13 +755,13 @@ val braitenbergRL = newSim { optionString ->
     Unlike discrete episodic tasks, this is a continuous environment where the agent is always moving. The reward signal varies based on distance to objects, so it naturally fluctuates between positive and negative values depending on proximity. TD error tracks these fluctuations.
 
     **Why do reward and TD error converge toward each other?**
-    The TD error formula is: TD_error = r + γ×V(current) - V(previous). When the critic is well-trained, the value function changes smoothly as the agent moves, making the difference between V(current) and V(previous) small. This means TD_error ≈ r, so the two traces track each other closely. Early in training when value is near zero, TD error also approximates reward, but for a different reason: both value terms are near zero.
+    The TD error formula is: `TD_error = r + γ×V(current) - V(previous)`. When the critic is well-trained, the value function changes smoothly as the agent moves, making the difference between `V(current)` and `V(previous)` small. This means `TD_error ≈ r`, so the two traces track each other closely. Early in training when value is near zero, TD error also approximates reward, but for a different reason: both value terms are near zero.
 
     **What causes the sharp spikes in TD error when objects respawn?**
     - Downward spikes occur when a rewarding object disappears. This is an unexpected negative change: at the previous step the agent was close to something good, and at the current step it's far away.
     - Upward spikes occur when a penalizing object (poison) disappears. This is an unexpected positive change: at the previous step the agent was close to something bad, and at the current step it's far away.
 
-    These spikes represent genuine prediction errors: the critic didn't predict the object would suddenly teleport! However, these spikes don't disrupt learning much because weight updates are proportional to both TD error AND input activation: Δw = learningRate × tdError × activation. When objects respawn far away, sensor activations are near zero, so even though TD error is large, the weight changes are minimal. The algorithm only learns strongly when sensory signals are present, which is exactly what we want.
+    These spikes represent genuine prediction errors: the critic didn't predict the object would suddenly teleport! However, these spikes don't disrupt learning much because weight updates are proportional to both TD error AND input activation: `Δw = learningRate × tdError × activation`. When objects respawn far away, sensor activations are near zero, so even though TD error is large, the weight changes are minimal. The algorithm only learns strongly when sensory signals are present, which is exactly what we want.
 
     # References
 
@@ -779,7 +779,7 @@ val braitenbergRL = newSim { optionString ->
 
     Veer Sahai
 
-    Jeff Yoshimi
+    [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
 
     """.trimIndent()
     )

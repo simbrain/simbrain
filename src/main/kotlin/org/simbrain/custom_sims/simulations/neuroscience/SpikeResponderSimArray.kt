@@ -97,41 +97,39 @@ val spikeResponderSimArray = newSim {
         """
         # Spike Responders (Array Version)
         
-        This simulation demonstrates spike responders using neuron arrays instead of individual neurons. 
-        It shows how different types of spike responders affect multiple downstream neurons simultaneously, 
-        allowing you to see patterns across populations of neurons.
+        This simulation demonstrates spike responders using neuron arrays instead of individual neurons. It shows how different types of spike responders affect multiple 
+        downstream neurons simultaneously, allowing you to see patterns across populations of neurons.
         
-        It is basically the same as the spike responder simulation but showing how it can be implemented with neuron arrays as well
-        as free neurons.
+        It is basically the same as the spike responder simulation but showing how it can be implemented with neuron arrays as well as free neurons.
 
         # Simulation Details
         
         Similar to the single-neuron spike responder simulation, this version uses:
-        - Input Array: An array of 10 clamped input neurons
-        - Izhikevich Array: 10 spiking neurons that receive input and generate spikes
-        - Four Response Arrays: Each containing 10 neurons with different spike responders:
-          - Step Responder: Fixed response duration
-          - Jump and Decay: Immediate rise with exponential decay
-          - Rise and Decay: Gradual rise and fall
-          - Short Term Plasticity: Adaptive responses based on spike history
+        - `Input Array`: An array of `10` clamped input neurons
+        - `Izhikevich Array`: `10` spiking neurons that receive input and generate spikes
+        - Four `Response Arrays`: Each containing `10` neurons with different spike responders:
+            1. Step Responder: Fixed response duration
+            2. Jump and Decay: Immediate rise with exponential decay
+            3. Rise and Decay: Gradual rise and fall
+            4. Short Term Plasticity: Adaptive responses based on spike history
 
         # What to Do
         
-        1. Run the simulation to see the array-based spiking behavior
+        1. `Run` the simulation to see the array-based spiking behavior.
         
-        2. Adjust input levels by clicking on neurons in the input array and using arrow keys
+        2. Adjust input levels by clicking on neurons in the input array and using arrow keys.
         
-        3. Observe population dynamics in the membrane potential plot. You can see how different neurons in the array respond
+        3. Observe population dynamics in the membrane potential plot. You can see how different neurons in the array respond.
         
-        4. Compare response patterns across the different spike responder arrays
+        4. Compare response patterns across the different spike responder arrays.
         
         # Credits
         
-        [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
-        
-        Kanly Thao
-        
         Elijah Olson
+        
+        [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
+                
+        Kanly Thao
         
         """.trimIndent()
     )

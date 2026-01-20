@@ -34,12 +34,12 @@ object NetworkPreferences: PreferenceHolder() {
     var coolNodeColor by ColorPreference(Color.BLUE)
 
     @UserParameter(
-        label = "Line color",
-        description = "Default color for lines, borders, and neutral elements",
+        label = "Connection line color",
+        description = "Color for connections between neurons",
         tab = "Colors",
         order = 40
     )
-    var lineColor by ColorPreference(Color.BLACK)
+    var connectionLineColor by ColorPreference(Color.BLACK)
 
     @UserParameter(
         label = "Spiking color",

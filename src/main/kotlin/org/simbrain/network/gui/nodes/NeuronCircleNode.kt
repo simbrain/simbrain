@@ -96,7 +96,7 @@ class NeuronCircleNode(val networkPanel: NetworkPanel): PPath.Double() {
                 return
             }
             if (value == null) {
-                mainNode.strokePaint = NetworkPreferences.lineColor
+                mainNode.strokePaint = Color.BLACK
             } else {
                 mainNode.strokePaint = value
             }

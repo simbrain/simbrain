@@ -387,6 +387,6 @@ class SynapseNode(
 
         var minDiameter: Int = minWeightSize
 
-        var lineColor: Color = NetworkPreferences.lineColor
+        var lineColor: Color = NetworkPreferences.connectionLineColor
     }
 }

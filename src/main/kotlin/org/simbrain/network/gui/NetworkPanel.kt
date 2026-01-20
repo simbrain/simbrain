@@ -166,7 +166,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         canvas.background = NetworkPreferences.backgroundColor
         nudgeAmount = NetworkPreferences.nudgeAmount
 
-        SynapseNode.lineColor = NetworkPreferences.lineColor
+        SynapseNode.lineColor = NetworkPreferences.connectionLineColor
         SynapseNode.excitatoryColor = NetworkPreferences.excitatorySynapseColor
         SynapseNode.inhibitoryColor = NetworkPreferences.inhibitorySynapseColor
         SynapseNode.zeroWeightColor = NetworkPreferences.zeroWeightColor

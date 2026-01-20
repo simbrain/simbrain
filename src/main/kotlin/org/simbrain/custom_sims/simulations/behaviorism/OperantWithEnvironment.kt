@@ -109,33 +109,34 @@ val operantWithEnvironment = newSim("operant_with_environment") {
         This simulation demonstrates operant conditioning in an environment where an agent learns to associate stimuli with behaviors through reward and punishment. The agent has three
         basic behaviors (`Wiggle`, `Explore`, `Spin`) that it performs with certain probabilities. These behaviors can be reinforced or discouraged based on environmental feedback.
         
+        This is not meant to be a neurally realistic model. Rather, it implements basic behaviorist principles using a simple computational framework. The "neural network" here is 
+        just a convenient way to represent stimulus–response associations and behavior probabilities, not a model of actual brain circuits.
+        
         # Simulation Details
         
         In this simulation, an agent (mouse) can sense three different objects: a `Candle`, `Flower`, and `Bell`.  
         The agent can perform three behaviors:
         
-        - Wiggle: oscillates left and right  
-        - Explore: moves around randomly  
-        - Spin: rotates in place  
+        - `Wiggle`: oscillates left and right in place
+        - `Explore`: moves around randomly  
+        - `Spin`: rotates in place  
         
         The agent's behavior is controlled by a neural network with the following elements:
         
-        - Stimulus neurons detect objects in the environment  
-        - Behavior neurons control which action the agent performs  
-        - Intrinsic probabilities (shown as labels on behavior neurons) determine baseline or spontaneous behavior tendencies  
-        - Connections between stimuli and behaviors can be strengthened or weakened through learning. These connections determine behaviors that are conditional on the presence of 
-        stimuli.  
-        
-        When the agent is near an object and performs a behavior, you can reward or punish that stimulus–response pairing. This increases or decreases the likelihood of that behavior
-        occurring in that context.
+        - **Stimulus neurons** detect objects in the environment  
+        - **Behavior neurons** control which action the agent performs  
+        - **Intrinsic probabilities** (shown as labels on behavior neurons) determine baseline or spontaneous behavior tendencies  
+        - **Connections** between stimuli and behaviors can be strengthened or weakened through learning. These connections determine behaviors that are conditional on the presence of stimuli.
         
         # What to Do
         
-        1. Run the simulation and observe the agent's initial random behavior.  
+        1. Click `Play` to start the simulation and observe the agent's initial random behavior.  
         
-        2. Train the agent to perform a behavior spontaneously. This is like the simple operant conditioning simulation.  
+        2. Train the agent to perform a behavior spontaneously. When you see the agent perform a behavior you want to encourage (e.g., wiggling), click `Reward`. The intrinsic 
+        probability for that behavior will increase, making it more likely to occur spontaneously.  
         
-        3. Add a conditional behavior. Wait for the agent to approach an object (candle, flower, or bell). You will see the corresponding stimulus neuron activate.  
+        3. Add a conditional behavior. Drag an object (candle, flower, or bell) near the mouse in the odor world. You will see 
+        the corresponding stimulus neuron activate after you update the network or click one of the control panel buttons. 
         
         4. Observe which behavior the agent performs near the object.  
         
@@ -151,13 +152,29 @@ val operantWithEnvironment = newSim("operant_with_environment") {
            - Notice how the agent's behavior becomes more predictable near certain objects  
            - Observe how intrinsic behavior probabilities (shown on the behavior neurons) adjust when no stimuli are present  
         
-        At this point you can demonstrate the idea of a discriminative stimulus (also called a controlling stimulus). This is a stimulus that, after training, increases the probability
-        of an operant behavior. It signals the relationship between a behavior and a reinforcer. The behavior can then be said to be under the control of that stimulus. For example, 
-        pressing a lever may only produce food when a light is on.  
+        ## Discriminative Stimulus Control
         
-        In this simulation, you might first train the agent to wiggle spontaneously. Then you can transfer control of this behavior to the candle, so that wiggling only occurs when the
-        candle is present. You could punish wiggling when the candle is absent, and train the agent to do something else spontaneously instead. In that case, wiggling is said to be under 
-        the control of the candle, which is now the discriminative stimulus.
+        At this point you can demonstrate the idea of a _discriminative stimulus_ (also called a _controlling stimulus_). This is a stimulus that, after training, increases the 
+        probability of an operant behavior. It signals the relationship between a behavior and a reinforcer. The behavior can then be said to be under the control of that stimulus. 
+        For example, pressing a lever may only produce food when a light is on.  
+        
+        In this simulation, you might first train the agent to wiggle spontaneously by rewarding wiggling when no objects are near. Then you can transfer control of this behavior to 
+        the candle by rewarding wiggling only when the candle is present. You could punish wiggling when the candle is absent, and train the agent to do something else spontaneously 
+        instead. In that case, wiggling is said to be under the control of the candle, which is now the discriminative stimulus.
+        
+        
+        ## How the Code Works
+        
+        This section is included to clarify what is happening, for those curious about the underlying algorithm. The simulation uses two different learning rules depending on whether a stimulus is present. The goal is to show how spontaneous behaviors can be transferred to discriminative stimuli, allowing the agent to operate on its environment to obtain things that have been rewarded in the past.
+        
+        When no stimulus is detected (total stimulus activation ≤ `0.1`), the code updates the intrinsic probability associated with the winning behavior neuron. This 
+        changes the spontaneous or baseline tendency to perform that behavior. For example, rewarding wiggling when no objects are near increases the spontaneous wiggle probability.
+        
+        When a stimulus is detected (total stimulus activation > `0.1`), the code updates the weight between the active stimulus neuron and the winning behavior neuron. This creates 
+        a conditional stimulus–response association. For example, rewarding wiggling near the candle strengthens the candle→wiggle connection.
+        
+        This simple threshold-based switching between algorithms allows the simulation to model both spontaneous operant behavior and 
+        discriminative stimulus control.
         
         # References
         
@@ -222,25 +239,26 @@ suspend fun SimulationScope.setupOperantWithEnvironmentWorkspace(workspace: Work
             network.bufferedUpdate()
         }
 
-        /**
-         * Update behavior of odor world agent based on which node is active.
-         * Assumes behaviors partitioned into increments of (currently) 100 time steps
-         */
+        val behaviorNames = listOf("Wiggle", "Explore", "Spin")
+
         fun updateBehaviors() {
             val loopTime = workspace.time % 10
+            val behavior = behaviorNames[winningNode.coerceIn(0, behaviorNames.lastIndex)]
 
-            when (winningNode) {
-                0 -> {
-                    mouse.heading += if (loopTime < 5) 5 else -5
+            when (behavior) {
+                "Wiggle" -> {
+                    mouse.speed = 0.0
+                    mouse.heading += if (loopTime < 5) 5.0 else -5.0
                 }
-                1 -> {
+                "Explore" -> {
                     if (random.nextDouble() < 0.2) {
                         mouse.heading += random.nextDouble(-10.0, 10.0)
                     }
                     mouse.speed = 2.5
                 }
-                2 -> {
-                    mouse.heading += 20
+                "Spin" -> {
+                    mouse.speed = 0.0
+                    mouse.heading += 20.0
                 }
             }
         }

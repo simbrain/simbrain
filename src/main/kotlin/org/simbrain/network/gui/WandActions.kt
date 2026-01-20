@@ -66,6 +66,7 @@ abstract class WandAction : CopyableObject {
         AdjustValueAction::class.java,
         ConnectFromSourceAction::class.java,
         ConnectToNeighborsAction::class.java,
+        PruneWeightsAction::class.java,
     )
 }
 
@@ -531,4 +532,72 @@ class ConnectToNeighborsAction(
     }
 
     override val name: String get() = "Connect to Neighbors"
+}
+
+/**
+ * Prunes (deletes) synapses based on an absolute threshold.
+ * Synapses are deleted immediately as the wand touches them.
+ */
+class PruneWeightsAction(
+    threshold: Double = 0.5
+) : WandAction(), EditableObject {
+
+    var threshold by GuiEditable(
+        initValue = threshold,
+        label = "Threshold",
+        description = "Remove synapses where |strength| < threshold",
+        min = 0.0,
+        order = 10
+    )
+
+    override val description: String
+        get() = "Prune weights (|w| < ${"%.2f".format(threshold)})"
+
+    override var letter: String = "P"
+    override var color: Color = Color(200, 50, 50, 220)
+
+    @Transient
+    private val prunedSynapses = mutableListOf<Triple<Neuron, Neuron, Double>>()
+
+    override fun beginAction(networkPanel: NetworkPanel) {
+        prunedSynapses.clear()
+    }
+
+    override fun apply(model: NetworkModel, networkPanel: NetworkPanel, undoState: MutableMap<Any, Any?>) {
+        if (model !is Synapse) return
+        
+        if (Math.abs(model.strength) < threshold) {
+            prunedSynapses.add(Triple(model.source, model.target, model.strength))
+            model.deleteBlocking()
+        }
+    }
+
+    override fun endAction(networkPanel: NetworkPanel) {
+        if (prunedSynapses.isNotEmpty()) {
+            val synapseData = prunedSynapses.toList()
+            networkPanel.undoManager.addUndoableAction(
+                description = "Wand: Pruned ${synapseData.size} synapses",
+                undo = {
+                    synapseData.forEach { (source, target, strength) ->
+                        networkPanel.network.addNetworkModelAsync(Synapse(source, target, strength))
+                    }
+                },
+                redo = {
+                    synapseData.forEach { (source, target, _) ->
+                        source.fanOut[target]?.deleteBlocking()
+                    }
+                }
+            )
+            prunedSynapses.clear()
+        }
+    }
+
+    override fun undoDescription(count: Int): String = "Wand: Prune weights"
+
+    override fun copy(): CopyableObject = PruneWeightsAction(threshold).also {
+        it.letter = letter
+        it.color = color
+    }
+
+    override val name: String get() = "Prune Weights"
 }

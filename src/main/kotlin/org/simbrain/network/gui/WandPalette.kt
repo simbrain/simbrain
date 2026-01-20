@@ -2,6 +2,7 @@ package org.simbrain.network.gui
 
 import org.simbrain.util.Events
 import org.simbrain.util.propertyeditor.EditableObject
+import java.awt.Color
 
 /**
  * Manages a collection of wand actions. The user can select one action to be active.
@@ -107,10 +108,23 @@ class WandPalette : EditableObject {
             addAction(AdjustValueAction.inhibit())
             addAction(AdjustValueAction.setValue(0.0))
             addAction(AdjustValueAction.randomize())
+            // Synapse actions - weight setting
+            addAction(AdjustValueAction.synapseStrength(1.0))
+            addAction(AdjustValueAction.synapseStrength(-1.0).apply {
+                letter = "W-"
+                color = Color(100, 150, 255, 220)  // Light blue
+            })
+            addAction(AdjustValueAction.synapseStrength(0.0).apply {
+                letter = "W0"
+                color = Color(150, 150, 150, 220)  // Gray
+            })
+            // Connection actions
+            addAction(ConnectFromSourceAction())
+            addAction(ConnectToNeighborsAction())
+            addAction(PruneWeightsAction())
+            // Neuron increment/decrement
             addAction(AdjustValueAction.increment())
             addAction(AdjustValueAction.decrement())
-            // Synapse actions
-            addAction(AdjustValueAction.synapseStrength(1.0))
         }
     }
 }

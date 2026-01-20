@@ -11,7 +11,6 @@ import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PNodeFilter
 import org.simbrain.network.core.LocatableModel
 import org.simbrain.network.core.topLeftLocation
-import org.simbrain.network.gui.dialogs.NetworkPreferences.wandRadius
 import org.simbrain.network.gui.nodes.ScreenElement
 import org.simbrain.util.*
 import org.simbrain.util.ResourceManager.smallIconSize
@@ -269,10 +268,24 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
              * Current wand color. Updated when wand action selection changes.
              */
             var wandColor: Color = Color(255, 230, 0, 220)
-                set(value) {
-                    field = value
-                    cursor = createWandCursor(value, wandRadius)
-                }
+                private set
+
+            /**
+             * Current wand radius in pixels. This is the actual radius used for
+             * both the cursor display and the affected area.
+             */
+            var wandRadius: Int = 40
+                private set
+
+            /**
+             * Updates the wand cursor with new color and radius.
+             * Call this when the selected wand action changes.
+             */
+            fun update(color: Color, radius: Int) {
+                wandColor = color
+                wandRadius = radius.coerceAtLeast(10)
+                cursor = createWandCursor(wandColor, wandRadius)
+            }
 
             override var cursor: Cursor = createWandCursor(wandColor, wandRadius)
                 private set

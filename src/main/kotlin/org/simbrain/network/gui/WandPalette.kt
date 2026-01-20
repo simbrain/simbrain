@@ -136,5 +136,6 @@ class WandPaletteEvents : Events() {
     val selectionChanged = NoArgEvent()
     val actionAdded = OneArgEvent<WandAction>()
     val actionRemoved = OneArgEvent<WandAction>()
+    val actionEdited = OneArgEvent<WandAction>()
     val paletteChanged = NoArgEvent()
 }

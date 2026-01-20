@@ -12,7 +12,6 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.gui.MouseEventHandler.MouseCursor
 import org.simbrain.network.gui.dialogs.NetworkPreferences.wandPalette
-import org.simbrain.network.gui.dialogs.NetworkPreferences.wandRadius
 import org.simbrain.network.gui.nodes.NeuronNode
 import org.simbrain.network.gui.nodes.SynapseNode
 import java.awt.event.InputEvent
@@ -103,15 +102,18 @@ class WandEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHandl
     override fun drag(event: PInputEvent) {
         super.drag(event)
 
-        val radius = wandRadius
+        val baseRadius = wandPalette.selectedAction?.radius ?: 40
+        // Scale radius by inverse of zoom so cursor size matches effect area
+        val viewScale = networkPanel.canvas.camera.viewScale
+        val radius = baseRadius / viewScale
 
         // Create elliptical bounds
         val position = event.position
         val ellipse = Ellipse2D.Double(
             position.x - radius / 2,
             position.y - radius / 2,
-            radius.toDouble(),
-            radius.toDouble()
+            radius,
+            radius
         )
         boundsFilter.setEllipse(ellipse)
 

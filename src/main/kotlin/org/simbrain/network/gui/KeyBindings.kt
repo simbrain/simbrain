@@ -36,6 +36,9 @@ fun NetworkPanel.addKeyBindings() {
         if (mouseCursor == MouseEventHandler.MouseCursor.Wand) {
             NetworkPreferences.wandPalette.cycleToNextAction()
         } else {
+            NetworkPreferences.wandPalette.selectedAction?.let { action ->
+                MouseEventHandler.MouseCursor.Wand.update(action.color, action.radius)
+            }
             mouseCursor = MouseEventHandler.MouseCursor.Wand
         }
     }

@@ -196,6 +196,7 @@ class WandPalettePanel(
             commitChanges()
             // Replace the action in the list (type may have changed)
             palette.actions[index] = wrapper.editingObject
+            palette.events.actionEdited.fire(wrapper.editingObject)
             rebuildList()
             onSelectionChanged()
         }
@@ -324,8 +325,8 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
             toolTipText = "Wand tool (d) - click to activate"
             icon = WandButtonIcon(palette, 18)
             addActionListener {
+                updateWandCursor()
                 networkPanel.mouseCursor = MouseEventHandler.MouseCursor.Wand
-                updateWandCursorColor()
             }
         }
 
@@ -341,19 +342,29 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
         add(mainButton)
         add(dropdownButton)
 
-        // Update icon and cursor color when selection changes
+        // Update icon and cursor when selection changes
         palette.events.selectionChanged.on {
-            updateWandCursorColor()
+            updateWandCursor()
             mainButton.repaint()
         }
 
-        // Set initial cursor color
-        updateWandCursorColor()
+        // Update cursor when an action is edited
+        palette.events.actionEdited.on {
+            updateWandCursor()
+        }
+
+        // Update cursor when palette is loaded/changed
+        palette.events.paletteChanged.on {
+            updateWandCursor()
+        }
+
+        // Set initial cursor
+        updateWandCursor()
     }
 
-    private fun updateWandCursorColor() {
-        palette.selectedAction?.color?.let { color ->
-            MouseEventHandler.MouseCursor.Wand.wandColor = color
+    private fun updateWandCursor() {
+        palette.selectedAction?.let { action ->
+            MouseEventHandler.MouseCursor.Wand.update(action.color, action.radius)
         }
     }
 
@@ -363,8 +374,8 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
         popupMenu = JPopupMenu().apply {
             add(WandPalettePanel(palette) {
                 // On selection changed, activate wand mode and update
+                updateWandCursor()
                 networkPanel.mouseCursor = MouseEventHandler.MouseCursor.Wand
-                updateWandCursorColor()
                 mainButton.repaint()
             })
         }

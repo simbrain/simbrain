@@ -34,6 +34,12 @@ abstract class WandAction : CopyableObject {
     open var color: Color = Color.YELLOW
 
     /**
+     * Radius of the wand effect area in pixels.
+     */
+    @UserParameter(label = "Radius", description = "Radius of the wand effect in pixels", minimumValue = 1.0, order = 1001)
+    open var radius: Int = 40
+
+    /**
      * Short description shown in the palette.
      */
     abstract val description: String
@@ -299,6 +305,7 @@ class AdjustValueAction(
     ).also {
         it.letter = letter
         it.color = color
+        it.radius = radius
         it.clampToBounds = clampToBounds
     }
 
@@ -441,6 +448,7 @@ class ConnectFromSourceAction(
     override fun copy(): CopyableObject = ConnectFromSourceAction(connectionStrategy.copy()).also {
         it.letter = letter
         it.color = color
+        it.radius = radius
     }
 
     override val name: String get() = "Connect from Selection"
@@ -452,7 +460,7 @@ class ConnectFromSourceAction(
  */
 class ConnectToNeighborsAction(
     connectionStrategy: ConnectionStrategy = AllToAll(),
-    radius: Double = 100.0
+    connectionRadius: Double = 100.0
 ) : WandAction(), EditableObject {
 
     /**
@@ -466,17 +474,17 @@ class ConnectToNeighborsAction(
     )
 
     /**
-     * Radius within which to find target neurons.
+     * Radius within which to find target neurons for connection.
      */
-    var radius by GuiEditable(
-        initValue = radius,
-        label = "Radius",
+    var connectionRadius by GuiEditable(
+        initValue = connectionRadius,
+        label = "Connection Radius",
         description = "Radius within which to connect to neighboring neurons",
         min = 1.0,
         order = 20
     )
 
-    override val description: String get() = "Connect to neighbors (r=${"%.0f".format(radius)})"
+    override val description: String get() = "Connect to neighbors (r=${"%.0f".format(connectionRadius)})"
 
     override var letter: String = "N"
     override var color: Color = Color(100, 200, 200, 220)  // Cyan
@@ -492,8 +500,8 @@ class ConnectToNeighborsAction(
         if (model !is Neuron) return
         val network = networkPanel.network
 
-        // Find all neurons within radius of the touched neuron
-        val neighbors = model.getNeuronsInRadius(network.flatNeuronList, radius)
+        // Find all neurons within connectionRadius of the touched neuron
+        val neighbors = model.getNeuronsInRadius(network.flatNeuronList, connectionRadius)
 
         // Use the connection strategy to create synapses from this neuron to neighbors
         val newSynapses = connectionStrategy.connectNeurons(listOf(model), neighbors)
@@ -526,9 +534,10 @@ class ConnectToNeighborsAction(
 
     override fun undoDescription(count: Int): String = "Wand: Connect to neighbors"
 
-    override fun copy(): CopyableObject = ConnectToNeighborsAction(connectionStrategy.copy(), radius).also {
+    override fun copy(): CopyableObject = ConnectToNeighborsAction(connectionStrategy.copy(), connectionRadius).also {
         it.letter = letter
         it.color = color
+        it.radius = radius
     }
 
     override val name: String get() = "Connect to Neighbors"

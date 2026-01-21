@@ -6,6 +6,7 @@ import org.simbrain.network.connections.getNeuronsInRadius
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.addToNetwork
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.EditableObject
@@ -51,7 +52,7 @@ abstract class WandAction : CopyableObject {
      * @param networkPanel Access to network panel for selection, undo tracking, etc.
      * @param undoState Map to store original values for undo support
      */
-    abstract fun apply(model: NetworkModel, networkPanel: NetworkPanel, undoState: MutableMap<Any, Any?>)
+    abstract suspend fun apply(model: NetworkModel, networkPanel: NetworkPanel, undoState: MutableMap<Any, Any?>)
 
     /**
      * Called when wand drag starts. Override to capture initial state for undo.
@@ -60,8 +61,9 @@ abstract class WandAction : CopyableObject {
 
     /**
      * Called when wand drag ends. Override to finalize undo action.
+     * @param undoState Map containing original values captured during apply calls
      */
-    open fun endAction(networkPanel: NetworkPanel) {}
+    open fun endAction(networkPanel: NetworkPanel, undoState: Map<Any, Any?>) {}
 
     /**
      * Create undo description for this action.
@@ -286,7 +288,7 @@ class AdjustValueAction(
     override var letter: String = "A"
     override var color: Color = Color(255, 230, 0, 220)  // Yellow
 
-    override fun apply(model: NetworkModel, networkPanel: NetworkPanel, undoState: MutableMap<Any, Any?>) {
+    override suspend fun apply(model: NetworkModel, networkPanel: NetworkPanel, undoState: MutableMap<Any, Any?>) {
         if (!target.matches(model)) return
         undoState.putIfAbsent(model, target.getValue(model))
 
@@ -296,6 +298,33 @@ class AdjustValueAction(
         val newValue = operation.apply(currentValue, targetValue)
 
         target.setValue(model, if (clampToBounds) newValue.coerceIn(lower, upper) else newValue)
+    }
+
+    override fun endAction(networkPanel: NetworkPanel, undoState: Map<Any, Any?>) {
+        if (undoState.isEmpty()) return
+
+        @Suppress("UNCHECKED_CAST")
+        val neuronDiffs = undoState.filterKeys { it is Neuron } as Map<Neuron, Double>
+        @Suppress("UNCHECKED_CAST")
+        val synapseDiffs = undoState.filterKeys { it is Synapse } as Map<Synapse, Double>
+
+        val totalCount = neuronDiffs.size + synapseDiffs.size
+        if (totalCount > 0) {
+            val neuronRedos = neuronDiffs.keys.associateWith { it.activation }
+            val synapseRedos = synapseDiffs.keys.associateWith { it.strength }
+
+            networkPanel.undoManager.addUndoableAction(
+                description = undoDescription(totalCount),
+                undo = {
+                    neuronDiffs.forEach { (neuron, prev) -> neuron.activation = prev }
+                    synapseDiffs.forEach { (synapse, prev) -> synapse.strength = prev }
+                },
+                redo = {
+                    neuronRedos.forEach { (neuron, redo) -> neuron.activation = redo }
+                    synapseRedos.forEach { (synapse, redo) -> synapse.strength = redo }
+                }
+            )
+        }
     }
 
     override fun copy(): CopyableObject = AdjustValueAction(
@@ -409,9 +438,9 @@ class ConnectFromSourceAction(
         createdSynapses.clear()
     }
 
-    override fun apply(model: NetworkModel, networkPanel: NetworkPanel, undoState: MutableMap<Any, Any?>) {
+    override suspend fun apply(model: NetworkModel, networkPanel: NetworkPanel, undoState: MutableMap<Any, Any?>) {
         if (model !is Neuron) return
-        val sourceNeurons = networkPanel.selectionManager.filterSelectedModels<Neuron>()
+        val sourceNeurons = networkPanel.selectionManager.filterSelectedSourceModels<Neuron>()
         val network = networkPanel.network
 
         // Use the connection strategy to create synapses from sources to this target
@@ -427,17 +456,14 @@ class ConnectFromSourceAction(
         }
     }
 
-    override fun endAction(networkPanel: NetworkPanel) {
+    override fun endAction(networkPanel: NetworkPanel, undoState: Map<Any, Any?>) {
         if (createdSynapses.isNotEmpty()) {
             val synapses = createdSynapses.toList()
+            val network = networkPanel.network
             networkPanel.undoManager.addUndoableAction(
                 description = "Wand: Created ${synapses.size} synapses",
-                undo = {
-                    synapses.forEach { it.deleteBlocking() }
-                },
-                redo = {
-                    synapses.forEach { networkPanel.network.addNetworkModelAsync(Synapse(it.source, it.target, it.strength)) }
-                }
+                undo = { synapses.forEach { it.delete() } },
+                redo = { synapses.addToNetwork(network, usePlacementManager = false, useAutoAssignId = false) }
             )
         }
         createdSynapses.clear()
@@ -496,7 +522,7 @@ class ConnectToNeighborsAction(
         createdSynapses.clear()
     }
 
-    override fun apply(model: NetworkModel, networkPanel: NetworkPanel, undoState: MutableMap<Any, Any?>) {
+    override suspend fun apply(model: NetworkModel, networkPanel: NetworkPanel, undoState: MutableMap<Any, Any?>) {
         if (model !is Neuron) return
         val network = networkPanel.network
 
@@ -516,17 +542,14 @@ class ConnectToNeighborsAction(
         }
     }
 
-    override fun endAction(networkPanel: NetworkPanel) {
+    override fun endAction(networkPanel: NetworkPanel, undoState: Map<Any, Any?>) {
         if (createdSynapses.isNotEmpty()) {
             val synapses = createdSynapses.toList()
+            val network = networkPanel.network
             networkPanel.undoManager.addUndoableAction(
                 description = "Wand: Created ${synapses.size} synapses to neighbors",
-                undo = {
-                    synapses.forEach { it.deleteBlocking() }
-                },
-                redo = {
-                    synapses.forEach { networkPanel.network.addNetworkModelAsync(Synapse(it.source, it.target, it.strength)) }
-                }
+                undo = { synapses.forEach { it.delete() } },
+                redo = { synapses.addToNetwork(network, usePlacementManager = false, useAutoAssignId = false) }
             )
         }
         createdSynapses.clear()
@@ -566,36 +589,29 @@ class PruneWeightsAction(
     override var color: Color = Color(200, 50, 50, 220)
 
     @Transient
-    private val prunedSynapses = mutableListOf<Triple<Neuron, Neuron, Double>>()
+    private val prunedSynapses = mutableListOf<Synapse>()
 
     override fun beginAction(networkPanel: NetworkPanel) {
         prunedSynapses.clear()
     }
 
-    override fun apply(model: NetworkModel, networkPanel: NetworkPanel, undoState: MutableMap<Any, Any?>) {
+    override suspend fun apply(model: NetworkModel, networkPanel: NetworkPanel, undoState: MutableMap<Any, Any?>) {
         if (model !is Synapse) return
-        
+
         if (Math.abs(model.strength) < threshold) {
-            prunedSynapses.add(Triple(model.source, model.target, model.strength))
-            model.deleteBlocking()
+            prunedSynapses.add(model)
+            model.delete()
         }
     }
 
-    override fun endAction(networkPanel: NetworkPanel) {
+    override fun endAction(networkPanel: NetworkPanel, undoState: Map<Any, Any?>) {
         if (prunedSynapses.isNotEmpty()) {
-            val synapseData = prunedSynapses.toList()
+            val synapses = prunedSynapses.toList()
+            val network = networkPanel.network
             networkPanel.undoManager.addUndoableAction(
-                description = "Wand: Pruned ${synapseData.size} synapses",
-                undo = {
-                    synapseData.forEach { (source, target, strength) ->
-                        networkPanel.network.addNetworkModelAsync(Synapse(source, target, strength))
-                    }
-                },
-                redo = {
-                    synapseData.forEach { (source, target, _) ->
-                        source.fanOut[target]?.deleteBlocking()
-                    }
-                }
+                description = "Wand: Pruned ${synapses.size} synapses",
+                undo = { synapses.addToNetwork(network, usePlacementManager = false, useAutoAssignId = false) },
+                redo = { synapses.forEach { it.delete() } }
             )
             prunedSynapses.clear()
         }

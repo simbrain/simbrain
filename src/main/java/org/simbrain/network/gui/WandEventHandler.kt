@@ -1,5 +1,10 @@
 package org.simbrain.network.gui
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PCamera
 import org.piccolo2d.PLayer
 import org.piccolo2d.PNode
@@ -8,8 +13,6 @@ import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.event.PInputEventFilter
 import org.piccolo2d.util.PNodeFilter
 import org.simbrain.network.core.NetworkModel
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.Synapse
 import org.simbrain.network.gui.MouseEventHandler.MouseCursor
 import org.simbrain.network.gui.dialogs.NetworkPreferences.wandPalette
 import org.simbrain.network.gui.nodes.NeuronNode
@@ -46,10 +49,16 @@ class WandEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHandl
      */
     private val touchedModels = mutableSetOf<NetworkModel>()
 
+    /**
+     * Tracks pending apply jobs so we can await them before finalizing the action.
+     */
+    private val pendingJobs = mutableListOf<Job>()
+
     override fun mousePressed(event: PInputEvent) {
         super.mousePressed(event)
         undoState = mutableMapOf()
         touchedModels.clear()
+        pendingJobs.clear()
 
         // Notify action that we're starting
         wandPalette.selectedAction?.beginAction(networkPanel)
@@ -64,34 +73,12 @@ class WandEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHandl
     override fun mouseReleased(event: PInputEvent?) {
         super.mouseReleased(event)
         val action = wandPalette.selectedAction
+        val jobs = pendingJobs.toList()
 
-        // Let the action handle its own undo if needed (e.g., ConnectFromSourceAction)
-        action?.endAction(networkPanel)
-
-        // TODO: Move this logic to the action itself.
-        if (undoState.isNotEmpty() && action !is ConnectFromSourceAction) {
-            @Suppress("UNCHECKED_CAST")
-            val neuronDiffs = undoState.filterKeys { it is Neuron } as Map<Neuron, Double>
-            @Suppress("UNCHECKED_CAST")
-            val synapseDiffs = undoState.filterKeys { it is Synapse } as Map<Synapse, Double>
-
-            val totalCount = neuronDiffs.size + synapseDiffs.size
-            if (totalCount > 0) {
-                val neuronRedos = neuronDiffs.keys.associateWith { it.activation }
-                val synapseRedos = synapseDiffs.keys.associateWith { it.strength }
-
-                networkPanel.undoManager.addUndoableAction(
-                    description = action?.undoDescription(totalCount) ?: "Wand Action",
-                    undo = {
-                        neuronDiffs.forEach { (neuron, prev) -> neuron.activation = prev }
-                        synapseDiffs.forEach { (synapse, prev) -> synapse.strength = prev }
-                    },
-                    redo = {
-                        neuronRedos.forEach { (neuron, redo) -> neuron.activation = redo }
-                        synapseRedos.forEach { (synapse, redo) -> synapse.strength = redo }
-                    }
-                )
-            }
+        // Launch a coroutine to await all pending apply jobs, then finalize
+        networkPanel.launch(Dispatchers.Swing) {
+            jobs.joinAll()
+            action?.endAction(networkPanel, undoState)
         }
     }
 
@@ -139,7 +126,10 @@ class WandEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHandl
     private fun modifyModel(model: NetworkModel) {
         if (model in touchedModels) return
         touchedModels.add(model)
-        wandPalette.selectedAction?.apply(model, networkPanel, undoState)
+        val job = networkPanel.launch(Dispatchers.Swing) {
+            wandPalette.selectedAction?.apply(model, networkPanel, undoState)
+        }
+        pendingJobs.add(job)
     }
 
     /**

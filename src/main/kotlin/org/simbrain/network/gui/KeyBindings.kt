@@ -42,6 +42,11 @@ fun NetworkPanel.addKeyBindings() {
             mouseCursor = MouseEventHandler.MouseCursor.Wand
         }
     }
+    bind(Shift + 'D') {
+        if (mouseCursor == MouseEventHandler.MouseCursor.Wand) {
+            NetworkPreferences.wandPalette.cycleToPreviousAction()
+        }
+    }
     bind("K") { selectionManager.set(filterScreenElements<NeuronNode>()); clearSelectedObjects() }
     // TODO: Is this the right place for this?
     bind(Shift + 'I') {

@@ -79,6 +79,15 @@ class WandPalette : EditableObject {
     }
 
     /**
+     * Cycle to the previous action in the palette.
+     */
+    fun cycleToPreviousAction() {
+        if (actions.isNotEmpty()) {
+            selectedIndex = (selectedIndex - 1 + actions.size) % actions.size
+        }
+    }
+
+    /**
      * Replace all actions with the given list.
      */
     fun setActions(newActions: List<WandAction>) {

@@ -5,7 +5,6 @@ import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PBounds
-import org.simbrain.util.createAction
 import org.simbrain.util.distanceTo
 import org.simbrain.util.div
 import org.simbrain.util.minus
@@ -282,9 +281,7 @@ class EntityNode(
 
     fun createContextMenu(odorWorldPanel: OdorWorldPanel) = JPopupMenu().apply {
         add(odorWorldPanel.odorWorldActions.showPropertyDialogAction)
-        add(odorWorldPanel.createAction(name = "Delete entity") {
-            entity.delete()
-        })
+        add(odorWorldPanel.odorWorldActions.deleteSelectedAction())
         addSeparator()
         add(JMenuItem(odorWorldPanel.odorWorldActions.toggleTrailAction(entity)))
         addSeparator()

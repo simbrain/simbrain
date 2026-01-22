@@ -3,6 +3,7 @@ package org.simbrain.world.odorworld.gui;
 import org.piccolo2d.PNode;
 import org.piccolo2d.event.PBasicInputEventHandler;
 import org.piccolo2d.event.PInputEvent;
+import org.simbrain.util.piccolo.PiccoloUtilsKt;
 import org.simbrain.world.odorworld.OdorWorld;
 import org.simbrain.world.odorworld.OdorWorldPanel;
 
@@ -43,13 +44,15 @@ public class WorldContextMenuEventHandler extends PBasicInputEventHandler {
         // Show context menu for right click
         if (mouseEvent.isPopupTrigger()) {
             mouseEvent.setHandled(true);
+            JPopupMenu menu;
             if (pickedNode.getParent() instanceof EntityNode entity) {
-                JPopupMenu menu = entity.createContextMenu(odorWorldPanel);
-                menu.show(odorWorldPanel, (int) menuPosition.getX(), (int) menuPosition.getY());
+                menu = entity.createContextMenu(odorWorldPanel);
             } else {
-                JPopupMenu menu = odorWorldPanel.getContextMenu();
-                menu.show(odorWorldPanel, (int) menuPosition.getX(), (int) menuPosition.getY());
+                menu = odorWorldPanel.getContextMenu();
             }
+            // Apply fix for Piccolo2D mouse button counting bug when JPopupMenu consumes mouse release events
+            PiccoloUtilsKt.applyMouseButtonFix(menu, odorWorldPanel.getCanvas());
+            menu.show(odorWorldPanel, (int) menuPosition.getX(), (int) menuPosition.getY());
         }
     }
 

@@ -1,6 +1,7 @@
 package org.simbrain.util.piccolo
 
 import org.piccolo2d.PCamera
+import org.piccolo2d.PCanvas
 import org.piccolo2d.PNode
 import org.piccolo2d.activities.PTransformActivity
 import org.piccolo2d.event.PInputEvent
@@ -16,8 +17,12 @@ import org.simbrain.util.plus
 import org.simbrain.util.point
 import java.awt.BasicStroke
 import java.awt.Color
+import java.awt.event.InputEvent
 import java.awt.event.MouseEvent
 import java.awt.geom.Rectangle2D
+import javax.swing.JPopupMenu
+import javax.swing.event.PopupMenuEvent
+import javax.swing.event.PopupMenuListener
 import kotlin.math.max
 
 val PNode.parents
@@ -129,3 +134,57 @@ fun PNodeAnchor.alignXTo(reference: PNodeAnchor, offsetX: Double = 0.0) =
 
 fun PNodeAnchor.alignYTo(reference: PNodeAnchor, offsetY: Double = 0.0) =
     alignY(reference, this, offsetY)
+
+/**
+ * Creates a PopupMenuListener that fixes the Piccolo2D mouse button counting bug
+ * when JPopupMenu consumes mouse release events.
+ *
+ * When right-clicking to open a context menu, the JPopupMenu consumes the mouse release event.
+ * This causes Piccolo2D's internal button counter (buttonsPressed field) to become misaligned -
+ * it thinks a button is still pressed when it's actually released. This listener fixes that
+ * by dispatching a synthetic mouse release event when the popup menu closes.
+ */
+fun createMouseButtonFixListener(canvas: PCanvas): PopupMenuListener {
+    return object : PopupMenuListener {
+        override fun popupMenuWillBecomeVisible(e: PopupMenuEvent?) {}
+
+        override fun popupMenuWillBecomeInvisible(e: PopupMenuEvent?) {
+            try {
+                val inputManager = canvas.root.defaultInputManager
+                val buttonsField = inputManager.javaClass.getDeclaredField("buttonsPressed")
+                buttonsField.isAccessible = true
+                val currentCount = buttonsField.getInt(inputManager)
+
+                // Only fix if we have exactly 1 unmatched button (the right mouse button)
+                if (currentCount == 1) {
+                    // Create a synthetic mouse release event for the right button
+                    val mouseEvent = MouseEvent(
+                        canvas,
+                        MouseEvent.MOUSE_RELEASED,
+                        System.currentTimeMillis(),
+                        InputEvent.BUTTON3_DOWN_MASK,
+                        0, 0, // x, y coordinates (not important for this fix)
+                        1, // click count
+                        false, // popup trigger = false to prevent feedback loop
+                        MouseEvent.BUTTON3
+                    )
+
+                    // Dispatch the synthetic event through the canvas
+                    canvas.dispatchEvent(mouseEvent)
+                }
+            } catch (ex: Exception) {
+                // Silently ignore reflection errors
+            }
+        }
+
+        override fun popupMenuCanceled(e: PopupMenuEvent?) {}
+    }
+}
+
+/**
+ * Extension function to apply the mouse button fix to a JPopupMenu.
+ * Call this before showing the popup menu.
+ */
+fun JPopupMenu.applyMouseButtonFix(canvas: PCanvas) {
+    addPopupMenuListener(createMouseButtonFixListener(canvas))
+}

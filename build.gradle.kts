@@ -350,7 +350,7 @@ tasks.register<Copy>("buildDistribution") {
         into("scripts")
     }
 
-    from("etc/License.txt")
+    from("LICENSE")
 
     // Set the base destination directory for all copy operations
     into(buildMain)
@@ -817,7 +817,7 @@ tasks.register("prepareAppDir") {
 
         // Copy license
         copy {
-            from("etc/License.txt")
+            from("LICENSE")
             into("${appDir}/usr/share/licenses/simbrain")
         }
 

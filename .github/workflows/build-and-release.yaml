@@ -477,7 +477,7 @@ jobs:
           mkdir -p build/main
           cp build/libs/Simbrain.jar build/main/Simbrain.jar
           cp -r simulations build/main/simulations
-          cp etc/License.txt build/main/License.txt
+          cp LICENSE build/main/License.txt
           ./gradlew jpackageMacOS -PreleaseVersion=$VERSION -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
           ./gradlew notarizeMacApp -PreleaseVersion=$VERSION -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
 
@@ -578,7 +578,7 @@ jobs:
           mkdir -p build/main
           cp build/libs/Simbrain.jar build/main/Simbrain.jar
           cp -r simulations build/main/simulations
-          cp etc/License.txt build/main/License.txt
+          cp LICENSE build/main/License.txt
           ./gradlew jpackageMacOS -PreleaseVersion=$VERSION -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
           ./gradlew notarizeMacApp -PreleaseVersion=$VERSION -PversionSuffix="_x64" -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
 

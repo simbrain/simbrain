@@ -68,7 +68,7 @@ class OdorWorldFrameMenu(private val parent: OdorWorldDesktopComponent, private 
         fileMenu.add(odorWorldActions.clearTileMapAction())
 
         fileMenu.addSeparator()
-        fileMenu.add(odorWorldActions.showWorldPrefsAction())
+        fileMenu.add(odorWorldActions.showWorldPropertiesAction())
         fileMenu.addSeparator()
         fileMenu.add(SimbrainDesktop.actionManager.createRenameAction<OdorWorldComponent>(parent))
         fileMenu.addSeparator()

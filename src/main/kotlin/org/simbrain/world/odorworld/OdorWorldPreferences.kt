@@ -7,7 +7,7 @@ import org.simbrain.util.div
 
 object OdorWorldPreferences: PreferenceHolder() {
 
-    @UserParameter(label = "World directory")
+    @UserParameter(label = "Tile map directory")
     var tileMapDirectory by StringPreference("." / "simulations" / "worlds" / "tilemaps");
 
 }

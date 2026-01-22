@@ -500,6 +500,7 @@ object SimbrainDesktop {
         fileMenu.addSeparator()
         fileMenu.add(actionManager.showWorkspacePreferencesAction)
         fileMenu.add(actionManager.showNetworkPreferencesAction)
+        fileMenu.add(actionManager.showOdorWorldPreferencesAction)
         fileMenu.addSeparator()
         fileMenu.add(actionManager.resetOnboardingWindows)
         fileMenu.addSeparator()

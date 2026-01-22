@@ -476,7 +476,7 @@ class OdorWorldPanel(
         add(odorWorldActions.createChooseLayerMenu(world))
         add(odorWorldActions.editLayersAction)
         addSeparator()
-        add(JMenuItem(odorWorldActions.showWorldPrefsAction()))
+        add(JMenuItem(odorWorldActions.showWorldPropertiesAction()))
     }
 
     fun clearSelection() {

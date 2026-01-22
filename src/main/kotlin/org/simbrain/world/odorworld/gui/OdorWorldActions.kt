@@ -49,13 +49,13 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
         odorWorldPanel.deleteSelectedEntities()
     }
 
-    fun showWorldPrefsAction() = odorWorldPanel.createAction(
-        name = "Preferences...",
-        description = "Show odor world preferences (Cmd/Ctrl-,)",
+    fun showWorldPropertiesAction() = odorWorldPanel.createAction(
+        name = "Properties...",
+        description = "Show odor world properties (Cmd/Ctrl-,)",
         iconPath = "menu_icons/Tools.png",
         keyboardShortcut = CmdOrCtrl + ','
     ) {
-        world.createEditorDialog().apply { title = "World Preferences" }.display()
+        world.createEditorDialog().apply { title = "World Properties" }.display()
     }
 
     val showPropertyDialogAction = odorWorldPanel.createAction(

@@ -27,6 +27,7 @@ import org.simbrain.world.dataworld.DataWorld
 import org.simbrain.world.dataworld.DataWorldComponent
 import org.simbrain.world.imageworld.ImageWorldComponent
 import org.simbrain.world.imageworld.filters.ImageProcessingPipeline
+import org.simbrain.world.odorworld.OdorWorldPreferences
 import java.lang.Math.ceil
 import java.lang.Math.sqrt
 import javax.swing.Action
@@ -177,6 +178,13 @@ class WorkspaceActions {
         description = "Set default properties that apply to all networks in the Simbrain workspace.",
     ) {
         getPreferenceDialog(NetworkPreferences).display()
+    }
+
+    val showOdorWorldPreferencesAction = desktopPane.createAction(
+        name = "Odor world preferences...",
+        description = "Set default properties that apply to all odor worlds in the Simbrain workspace.",
+    ) {
+        getPreferenceDialog(OdorWorldPreferences).display()
     }
 
     val showWorkspacePreferencesAction = createAction(

@@ -114,22 +114,22 @@ class WandPalette : EditableObject {
         fun createDefault(): WandPalette = WandPalette().apply {
             // Neuron actions
             addAction(AdjustValueAction.activate())
-            addAction(AdjustValueAction.inhibit())
+            //addAction(AdjustValueAction.inhibit())
             addAction(AdjustValueAction.setValue(0.0))
-            addAction(AdjustValueAction.randomize())
+            //addAction(AdjustValueAction.randomize())
             // Synapse actions - weight setting
-            addAction(AdjustValueAction.synapseStrength(1.0))
-            addAction(AdjustValueAction.synapseStrength(-1.0).apply {
-                letter = "W-"
-                color = Color(100, 150, 255, 220)  // Light blue
-            })
+            //addAction(AdjustValueAction.synapseStrength(1.0))
+            //addAction(AdjustValueAction.synapseStrength(-1.0).apply {
+            //    letter = "W-"
+            //    color = Color(100, 150, 255, 220)  // Light blue
+            //})
             addAction(AdjustValueAction.synapseStrength(0.0).apply {
                 letter = "W0"
                 color = Color(150, 150, 150, 220)  // Gray
             })
             // Connection actions
-            addAction(ConnectFromSourceAction())
             addAction(ConnectToNeighborsAction())
+            addAction(ConnectFromSourceAction())
             addAction(PruneWeightsAction())
             // Neuron increment/decrement
             addAction(AdjustValueAction.increment())

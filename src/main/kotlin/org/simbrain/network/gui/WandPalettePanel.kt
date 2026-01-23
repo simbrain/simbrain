@@ -75,6 +75,18 @@ class WandPalettePanel(
 
         add(buttonPanel, BorderLayout.SOUTH)
 
+        // Add Esc key binding to close popup
+        val inputMap = getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+        val actionMap = actionMap
+        inputMap.put(KeyStroke.getKeyStroke("ESCAPE"), "closePopup")
+        actionMap.put("closePopup", object : AbstractAction() {
+            override fun actionPerformed(e: java.awt.event.ActionEvent) {
+                SwingUtilities.getAncestorOfClass(JPopupMenu::class.java, this@WandPalettePanel)?.let {
+                    (it as JPopupMenu).isVisible = false
+                }
+            }
+        })
+
         // Listen for palette changes
         palette.events.apply {
             actionAdded.on { rebuildList() }
@@ -357,7 +369,6 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
 
         // Main button - activates wand mode
         mainButton = JButton().apply {
-            toolTipText = "Wand tool (d) - click to activate"
             icon = WandButtonIcon(palette, 18)
             addActionListener {
                 updateWandCursor()
@@ -376,21 +387,27 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
 
         add(mainButton)
         add(dropdownButton)
+        
+        // Set initial tooltip after button is created
+        updateTooltip()
 
         // Update icon and cursor when selection changes
         palette.events.selectionChanged.on {
             updateWandCursor()
+            updateTooltip()
             mainButton.repaint()
         }
 
         // Update cursor when an action is edited
         palette.events.actionEdited.on {
             updateWandCursor()
+            updateTooltip()
         }
 
         // Update cursor when palette is loaded/changed
         palette.events.paletteChanged.on {
             updateWandCursor()
+            updateTooltip()
         }
 
         // Set initial cursor
@@ -401,6 +418,11 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
         palette.selectedAction?.let { action ->
             MouseEventHandler.MouseCursor.Wand.update(action.color, action.radius)
         }
+    }
+
+    private fun updateTooltip() {
+        val actionDesc = palette.selectedAction?.description ?: "No action selected"
+        mainButton.toolTipText = "Wand tool (d) - $actionDesc"
     }
 
     private fun showPalettePopup() {

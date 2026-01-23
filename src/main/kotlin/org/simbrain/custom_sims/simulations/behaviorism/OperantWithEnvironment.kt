@@ -21,7 +21,7 @@ import kotlin.random.Random
 val operantWithEnvironment = newSim("operant_with_environment") {
     workspace.clearWorkspace()
 
-    val networkComponent = addNetworkComponent("Brain")
+    val networkComponent = addNetworkComponent("Behavioral Control Unit")
     val network = networkComponent.network
 
     val numNeurons = 3
@@ -36,7 +36,6 @@ val operantWithEnvironment = newSim("operant_with_environment") {
 
     val stimulusNet = network.addNeuronGroup(numNeurons, location = point(-9.25, 295.93)).apply {
         layout = LineLayout(100.0, LineLayout.LineOrientation.HORIZONTAL)
-        isClamped = true
         label = "Stimuli"
         setIncrement(1.0)
         neuronList.labels = listOf("Candle", "Flower", "Bell")
@@ -77,13 +76,13 @@ val operantWithEnvironment = newSim("operant_with_environment") {
     odorWorld.addEntity(flower)
     odorWorld.addEntity(bell)
 
-    val cndleSensor = mouse.addObjectSensor(EntityType.Candle, 50.0, 0.0, 65.0)
-    val flowerSensor = mouse.addObjectSensor(EntityType.Pansy, 50.0, 0.0, 65.0)
-    val bellSensor = mouse.addObjectSensor(EntityType.Bell, 50.0, 0.0, 65.0)
+    val candleSensor = mouse.addObjectSensor(EntityType.Candle, 0.0, 0.0, 65.0)
+    val flowerSensor = mouse.addObjectSensor(EntityType.Pansy, 0.0, 0.0, 65.0)
+    val bellSensor = mouse.addObjectSensor(EntityType.Bell, 0.0, 0.0, 65.0)
 
     with(couplingManager) {
         val (n1, n2, n3) = stimulusNet.neuronList
-        cndleSensor couple n1
+        candleSensor couple n1
         flowerSensor couple n2
         bellSensor couple n3
     }
@@ -91,11 +90,11 @@ val operantWithEnvironment = newSim("operant_with_environment") {
     updateBehaviorNetNeuronLabels(behaviorNet)
 
     withGui {
-        place(networkComponent, 155, 9, 575, 500)
+        place(networkComponent, 239, 10, 575, 500)
         (getDesktopComponent(networkComponent) as NetworkDesktopComponent)
             .networkPanel.selectionManager.clear()
 
-        place(odorWorldComponent, 730, 7, 315, 383)
+        place(odorWorldComponent, 804, 10, 315, 383)
         (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).worldPanel.scalingFactor = .5
     }
 
@@ -143,7 +142,7 @@ val operantWithEnvironment = newSim("operant_with_environment") {
         5. Provide feedback:  
            - Click `Reward` to encourage the stimulus–behavior pairing  
            - Click `Punish` to discourage it  
-           - Click `Do nothing` to let the agent continue without feedback  
+           - Click `Don't reinforce or punish` to let the agent continue without feedback  
         
         6. Repeat the process. Over time, the agent will learn to associate certain stimuli with rewarded behaviors.  
         
@@ -159,8 +158,7 @@ val operantWithEnvironment = newSim("operant_with_environment") {
         For example, pressing a lever may only produce food when a light is on.  
         
         In this simulation, you might first train the agent to wiggle spontaneously by rewarding wiggling when no objects are near. Then you can transfer control of this behavior to 
-        the candle by rewarding wiggling only when the candle is present. You could punish wiggling when the candle is absent, and train the agent to do something else spontaneously 
-        instead. In that case, wiggling is said to be under the control of the candle, which is now the discriminative stimulus.
+        the candle by rewarding wiggling only when the candle is present. To do this, first put the spontaneously wiggling mouse by the candle and reinforce it a few times. Then move the candle away and train the agent to do something else spontaneously. After that, wiggling is said to be under the control of the candle, which is now the "controlling or "discriminative" stimulus.
         
         
         ## How the Code Works
@@ -170,8 +168,8 @@ val operantWithEnvironment = newSim("operant_with_environment") {
         When no stimulus is detected (total stimulus activation ≤ `0.1`), the code updates the intrinsic probability associated with the winning behavior neuron. This 
         changes the spontaneous or baseline tendency to perform that behavior. For example, rewarding wiggling when no objects are near increases the spontaneous wiggle probability.
         
-        When a stimulus is detected (total stimulus activation > `0.1`), the code updates the weight between the active stimulus neuron and the winning behavior neuron. This creates 
-        a conditional stimulus–response association. For example, rewarding wiggling near the candle strengthens the candle→wiggle connection.
+        When a stimulus is detected (total stimulus activation > `0.1`), the code updates the weight between the active stimulus neuron and the winning behavior neuron, either strengthening it (when rewarding) or weakening it (when punishing). This creates 
+        a conditional stimulus–response association. For example, rewarding wiggling near the candle strengthens the candle→wiggle connection. Punishing wiggling near the candle weakens the candle→wiggle connection.
         
         This simple threshold-based switching between algorithms allows the simulation to model both spontaneous operant behavior and 
         discriminative stimulus control.
@@ -318,7 +316,7 @@ suspend fun SimulationScope.setupOperantWithEnvironmentWorkspace(workspace: Work
                 SimbrainDesktop.workspace.iterateSuspend()
             }
 
-            addButton("Do nothing") {
+            addButton("Don't reinforce or punish") {
                 rewardNeuron.activation = 0.0
                 punishNeuron.activation = 0.0
                 SimbrainDesktop.workspace.iterateSuspend()

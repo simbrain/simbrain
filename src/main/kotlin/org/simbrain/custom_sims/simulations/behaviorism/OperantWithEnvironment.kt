@@ -45,13 +45,11 @@ val operantWithEnvironment = newSim("operant_with_environment") {
     val rewardNeuron = network.addNeuron {
         location = point(stimulusNet.maxX + 100, stimulusNet.locationY)
         label = "Food Pellet"
-        clamped = true
     }
 
     val punishNeuron = network.addNeuron {
         location = point(rewardNeuron.x + 100, rewardNeuron.locationY)
         label = "Shock"
-        clamped = true
     }
 
     val syns = with(network) {
@@ -304,21 +302,21 @@ suspend fun SimulationScope.setupOperantWithEnvironmentWorkspace(workspace: Work
 
             addButton("Reward") {
                 learn(1.0)
-                rewardNeuron.activation = 1.0
-                punishNeuron.activation = 0.0
+                rewardNeuron.addInputValue(1.0)
+                punishNeuron.addInputValue(0.0)
                 SimbrainDesktop.workspace.iterateSuspend()
             }
 
             addButton("Punish") {
                 learn(-1.0)
-                rewardNeuron.activation = 0.0
-                punishNeuron.activation = 1.0
+                rewardNeuron.addInputValue(0.0)
+                punishNeuron.addInputValue(1.0)
                 SimbrainDesktop.workspace.iterateSuspend()
             }
 
             addButton("Don't reinforce or punish") {
-                rewardNeuron.activation = 0.0
-                punishNeuron.activation = 0.0
+                rewardNeuron.addInputValue(0.0)
+                punishNeuron.addInputValue(0.0)
                 SimbrainDesktop.workspace.iterateSuspend()
             }
 

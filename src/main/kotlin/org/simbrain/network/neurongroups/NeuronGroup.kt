@@ -44,7 +44,11 @@ open class NeuronGroup() : AbstractNeuronCollection() {
 
     context(Network)
     override fun update() {
-        neuronList.forEach { it.accumulateInputs() }
+        // Accumulate fanIn (synapse) inputs without adding bias.
+        // Biases and connector inputs are already accumulated via AbstractNeuronCollection.accumulateInputs()
+        // which is called by the network's bufferedUpdate() before update().
+        // We use accumulateFanInInputs() instead of accumulateInputs() to avoid adding biases twice.
+        neuronList.forEach { it.accumulateFanInInputs() }
         neuronList.forEach { it.update() }
         neuronList.forEach { it.clearInput() }
         super.update()

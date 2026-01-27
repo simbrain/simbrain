@@ -38,7 +38,8 @@ class NormalizationGroup @JvmOverloads constructor(
 
     context(Network)
     override fun update() {
-        neuronList.forEach { it.accumulateInputs() }
+        // Accumulate fanIn inputs without bias (bias already added by AbstractNeuronCollection.accumulateInputs())
+        neuronList.forEach { it.accumulateFanInInputs() }
         neuronList.forEach { it.update() }
         val total = neuronList.activations.sum()
         if (total != 0.0) {

@@ -260,6 +260,17 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
         addInputValue(bias)
     }
 
+    /**
+     * Accumulate only fanIn (synapse) inputs without adding bias.
+     * Used by NeuronGroup.update() where bias is already added via
+     * AbstractNeuronCollection.accumulateInputs().
+     */
+    context(Network)
+    fun accumulateFanInInputs() {
+        fanIn.forEach { it.updatePSR() }
+        addInputValue(weightedInputs)
+    }
+
     context(Network)
     override fun update() {
         if (isSpike) {

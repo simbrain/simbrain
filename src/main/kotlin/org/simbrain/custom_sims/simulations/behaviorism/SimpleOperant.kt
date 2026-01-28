@@ -27,7 +27,7 @@ val simpleOperant = newSim("simple operant conditioning") {
 
     val nc = addNetworkComponent("Behaviors")
     withGui {
-        place(nc, 195, 9, 447, 296)
+        place(nc, 239, 10, 575, 500)
     }
     val behaviorNet = nc.network.addNeuronGroup(-9.25, 95.93, numNeurons)
     behaviorNet.label = "Behaviors"
@@ -50,9 +50,9 @@ suspend fun SimulationScope.setUpSimpleOperantWorkpace(workspace: Workspace) {
     val network = workspace.componentList.filterIsInstance<NetworkComponent>().first().network
     val behaviorNet = network.getModelByLabel<NeuronGroup>("Behaviors")
     val nodeToLabel = HashMap<Neuron, String>()
-    nodeToLabel[behaviorNet.getNeuron(0)] = "Yell"
-    nodeToLabel[behaviorNet.getNeuron(1)] = "Sit"
-    nodeToLabel[behaviorNet.getNeuron(2)] = "Run"
+    nodeToLabel[behaviorNet.getNeuron(0)] = "Wiggle"
+    nodeToLabel[behaviorNet.getNeuron(1)] = "Explore"
+    nodeToLabel[behaviorNet.getNeuron(2)] = "Spin"
 
     fun setWinningNode(nodeIndex: Int) {
         for (i in 0 until behaviorNet.size) {
@@ -100,7 +100,7 @@ suspend fun SimulationScope.setUpSimpleOperantWorkpace(workspace: Workspace) {
             }
         }
 
-        createControlPanel("Control Panel", 0, 15) {
+        createControlPanel("Control Panel", 5, 10) {
 
             addButton("Reward Agent") {
                 for (n in behaviorNet.neuronList) {
@@ -126,7 +126,7 @@ suspend fun SimulationScope.setUpSimpleOperantWorkpace(workspace: Workspace) {
                 SimbrainDesktop.workspace.simpleIterate()
             }
 
-            addButton("Do Nothing") {
+            addButton("Don't reinforce or punish") {
                 SimbrainDesktop.workspace.simpleIterate()
             }
         }
@@ -135,8 +135,17 @@ suspend fun SimulationScope.setUpSimpleOperantWorkpace(workspace: Workspace) {
             """
             # Simple Operant
             
-            This simulation demonstrates simple operant conditioning using a probabilistic model of behavior. The three nodes represent different behaviors (`Yell`, `Sit`, `Run`) that 
-            are initially performed with equal probability. Through selective reinforcement and punishment, you can shape the agent's spontaneous behavior to favor desired actions.
+            This simulation demonstrates simple or "free" operant conditioning using a probabilistic model of behavior. A simple operant is a behavior that occurs spontaneously without 
+            requiring any external stimulus to trigger it. The organism simply emits the behavior as part of its natural behavioral repertoire, and the frequency of that behavior can be 
+            shaped through reinforcement and punishment.
+            
+            For example, imagine a rat in an operant chamber that spontaneously engages in various behaviors like standing, grooming, sniffing, and lever pressing. If the experimenter 
+            selectively rewards only lever pressing (by delivering food whenever it occurs), that behavior will increase in frequency even though no signal tells the rat when to press. 
+            Similarly, an infant spontaneously babbles different sounds, and when parents get excited about certain sounds (like "mama"), those vocalizations become more frequent.
+            
+            The three nodes represent different behaviors (`Wiggle`, `Explore`, `Spin`) that are initially performed with equal probability. Through selective reinforcement and punishment, 
+            you can shape the agent's spontaneous behavior to favor desired actions. This differs from more complex operant conditioning scenarios where behaviors come under the control of 
+            discriminative stimuli. For an example of that, see the "Operant with Environment" simulation, which builds on this one by adding controlling stimuli that signal when certain behaviors will be reinforced.
 
             # Simulation Details
             

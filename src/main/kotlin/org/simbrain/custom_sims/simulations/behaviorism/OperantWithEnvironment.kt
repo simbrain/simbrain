@@ -156,8 +156,7 @@ val operantWithEnvironment = newSim("operant_with_environment") {
         For example, pressing a lever may only produce food when a light is on.  
         
         In this simulation, you might first train the agent to wiggle spontaneously by rewarding wiggling when no objects are near. Then you can transfer control of this behavior to 
-        the candle by rewarding wiggling only when the candle is present. To do this, first put the spontaneously wiggling mouse by the candle and reinforce it a few times. Then move the candle away and train the agent to do something else spontaneously. After that, wiggling is said to be under the control of the candle, which is now the "controlling or "discriminative" stimulus.
-        
+        the candle by rewarding wiggling only when the candle is present. To do this, first put the spontaneously wiggling mouse by the candle and reinforce it a few times. Then move the candle away and start to punish wiggling in order to extinguish it as a spontaneous behavior (in practice, it would be better to stop reinforcing it, but that takes too long in simbrain). After that, wiggling only happens around the candle. Wiggling is now under the control of the candle; the candle is the "controlling" or "discriminative" stimulus for this behavior.
         
         ## How the Code Works
         

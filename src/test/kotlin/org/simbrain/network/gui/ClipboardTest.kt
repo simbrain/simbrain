@@ -1625,6 +1625,49 @@ class ClipboardTest {
     }
 
     @Test
+    fun `test paste neuron respects polarity`() = runBlocking {
+
+        val networkPanel = (SimbrainDesktop.getDesktopComponent(networkComponent) as NetworkDesktopComponent).networkPanel
+
+        val excitatoryNeuron = Neuron().apply {
+            label = "Excitatory"
+            activation = 0.5
+            polarity = org.simbrain.util.SimbrainConstants.Polarity.EXCITATORY
+            x = 100.0
+            y = 100.0
+        }
+        val inhibitoryNeuron = Neuron().apply {
+            label = "Inhibitory"
+            activation = 0.3
+            polarity = org.simbrain.util.SimbrainConstants.Polarity.INHIBITORY
+            x = 200.0
+            y = 100.0
+        }
+        network.addNetworkModelAsync(excitatoryNeuron)
+        network.addNetworkModelAsync(inhibitoryNeuron)
+
+        Clipboard.add(listOf(excitatoryNeuron, inhibitoryNeuron))
+
+        val initialNeuronCount = network.flatNeuronList.size
+
+        Clipboard.paste(networkPanel)
+
+        assertEquals(initialNeuronCount + 2, network.flatNeuronList.size, "Two neurons should be added after pasting")
+
+        val pastedNeurons = network.flatNeuronList.takeLast(2)
+        val pastedExcitatory = pastedNeurons.find { it.label == "Excitatory" }
+        val pastedInhibitory = pastedNeurons.find { it.label == "Inhibitory" }
+
+        assertNotNull(pastedExcitatory, "Pasted excitatory neuron should exist")
+        assertNotNull(pastedInhibitory, "Pasted inhibitory neuron should exist")
+
+        assertEquals(org.simbrain.util.SimbrainConstants.Polarity.EXCITATORY, pastedExcitatory!!.polarity,
+            "Pasted excitatory neuron should maintain excitatory polarity")
+        assertEquals(org.simbrain.util.SimbrainConstants.Polarity.INHIBITORY, pastedInhibitory!!.polarity,
+            "Pasted inhibitory neuron should maintain inhibitory polarity")
+    }
+
+    @Test
     fun `test copy neuron collection with connected synapses`() = runBlocking {
         // This test verifies that copying a neuron collection along with synapses that connect 
         // neurons within that collection works correctly when both the collection and synapses 

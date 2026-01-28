@@ -51,6 +51,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
         increment = n.increment
         activation = n.activation
         bias = n.bias
+        polarity = n.polarity
         x = n.x
         y = n.y
         label = n.label

@@ -49,9 +49,48 @@ val hopfieldSimContinuous = newSim {
 
     addSidebarInfo(
         """
-            # Simulation of forgetting in a Hopfield-like attractor network
+            # Forgetting in a Hopfield-like attractor network
             
-            See https://arxiv.org/abs/2112.00119
+            This simulation is a model to study continuous Hopfield networks in conjunction with forgetting dynamics. This model was inspired 
+            by Pereira-Obilinovic et al.'s work on the study of forgetting in attractor networks. To learn more about the model, see their paper below.
+            
+            # What to Do
+            
+            ## Learning a Memory
+            
+            1. Click the `Randomize Weights` button to get a fresh random weight matrix.
+            
+            2. `Train` the model on one object multiple times (e.g., `Circle`, `Square`, `Diagonal Line`, `Cross`).
+            
+            3. Click `Random Pattern` or the `-1 Canvas` button and iterate the model repeatedly to see the change in real-time.
+            
+            4. See how well the network has remembered the pattern by looking if the network can reproduce the same pattern or its anti-pattern. Do this
+            multiple times by repeating step 3.
+            
+            ## Creating a Memory
+            
+            You can also create one of your own images for the network to be trained on.
+            
+            1. Start by clicking the `-1 Canvas` button to get a fresh canvas.
+            
+            2. Now, click on the `Wand tool` or press `d` and then draw your image in the network.
+            
+            3. After that, click the `Train` button and repeat the steps above in the `Learning a Memory` section.
+            
+            ## Forgetting Dynamics using the Capacity Test
+            
+            More info to come.
+            
+            # References
+            
+            Pereira-Obilinovic, U., Aljadeff, J., & Brunel, N. (2023). [Forgetting Leads to Chaos in Attractor Networks](https://doi.org/10.1103/physrevx.13.011009). _Physical Review X_, _13_(1).
+            
+            # Credits
+ 
+            [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
+
+            Kanly Thao
+            
         """.trimIndent(),
         initiallyOpened = false
     )

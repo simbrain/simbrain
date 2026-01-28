@@ -423,4 +423,264 @@ class SupervisedModelTest {
         assertTrue(supervisedModel.trainerConfig.lossFunction.canUse(outputLayer))
     }
 
+    @Test
+    fun `network update should match trainer forward pass before training with NeuronArray`() = runBlocking {
+        val network = Network()
+
+        val inputLayer = NeuronArray(2).also { network.addNetworkModelsAsync(it) }.also { 
+            it.isClamped = true
+            it.label = "Input"
+        }
+        val hiddenLayer = NeuronArray(2).also { network.addNetworkModelsAsync(it) }.also { 
+            it.updateRule = SigmoidalRule()
+            it.label = "Hidden"
+        }
+        val outputLayer = NeuronArray(1).also { network.addNetworkModelsAsync(it) }.also { 
+            it.updateRule = SigmoidalRule()
+            it.label = "Output"
+        }
+
+        val wm1 = WeightMatrix(inputLayer, hiddenLayer).also { network.addNetworkModelsAsync(it) }
+        val wm2 = WeightMatrix(hiddenLayer, outputLayer).also { network.addNetworkModelsAsync(it) }
+
+        val supervisedModel = SupervisedModel(inputLayer, outputLayer).also { network.addNetworkModelsAsync(it) }
+
+        val testInput = mutableListOf(1.0, 0.0)
+
+        with(network) {
+            inputLayer.setActivations(testInput.toDoubleArray())
+            
+            println("=== FORWARD PASS ===")
+            println("Input layer activations: ${inputLayer.activationArray.contentToString()}")
+            println("Hidden layer before: ${hiddenLayer.activationArray.contentToString()}")
+            println("Output layer before: ${outputLayer.activationArray.contentToString()}")
+            supervisedModel.forwardPass()
+            println("Hidden layer after forwardPass: ${hiddenLayer.activationArray.contentToString()}")
+            println("Output layer after forwardPass: ${outputLayer.activationArray.contentToString()}")
+            val forwardPassOutput = outputLayer.activationArray.clone()
+            
+            inputLayer.setActivations(testInput.toDoubleArray())
+            hiddenLayer.clear()
+            outputLayer.clear()
+            
+            println("\n=== NETWORK UPDATE ===")
+            println("Input layer activations: ${inputLayer.activationArray.contentToString()}")
+            println("Hidden layer before: ${hiddenLayer.activationArray.contentToString()}")
+            println("Output layer before: ${outputLayer.activationArray.contentToString()}")
+            network.bufferedUpdate()
+            println("Hidden layer after update: ${hiddenLayer.activationArray.contentToString()}")
+            println("Output layer after update: ${outputLayer.activationArray.contentToString()}")
+            val networkUpdateOutput = outputLayer.activationArray.clone()
+            
+            assertArrayEquals(forwardPassOutput, networkUpdateOutput, 1e-10) {
+                "BEFORE training: network.update() output ${networkUpdateOutput.contentToString()} should match forwardPass() output ${forwardPassOutput.contentToString()}"
+            }
+        }
+    }
+
+    @Test
+    fun `network update should match trainer forward pass after training with NeuronArray`() = runBlocking {
+        val network = Network()
+
+        val inputLayer = NeuronArray(2).also { network.addNetworkModelsAsync(it) }.also { 
+            it.isClamped = true
+            it.label = "Input"
+        }
+        val hiddenLayer = NeuronArray(2).also { network.addNetworkModelsAsync(it) }.also { 
+            it.updateRule = SigmoidalRule()
+            it.label = "Hidden"
+        }
+        val outputLayer = NeuronArray(1).also { network.addNetworkModelsAsync(it) }.also { 
+            it.updateRule = SigmoidalRule()
+            it.label = "Output"
+        }
+
+        val wm1 = WeightMatrix(inputLayer, hiddenLayer).also { network.addNetworkModelsAsync(it) }
+        val wm2 = WeightMatrix(hiddenLayer, outputLayer).also { network.addNetworkModelsAsync(it) }
+
+        val supervisedModel = SupervisedModel(inputLayer, outputLayer).also { network.addNetworkModelsAsync(it) }
+
+        val trainingInputs = mutableListOf(
+            mutableListOf(0.0, 0.0),
+            mutableListOf(1.0, 0.0),
+            mutableListOf(0.0, 1.0),
+            mutableListOf(1.0, 1.0)
+        )
+
+        val trainingTargets = mutableListOf(
+            mutableListOf(0.0),
+            mutableListOf(1.0),
+            mutableListOf(1.0),
+            mutableListOf(0.0)
+        )
+
+        supervisedModel.trainingSet = TrainingDataset(
+            inputs = trainingInputs,
+            targets = trainingTargets
+        )
+
+        val trainer = SupervisedTrainer(network, supervisedModel)
+        
+        with(network) {
+            repeat(100) {
+                trainer.trainBatch(0 until trainingInputs.size)
+            }
+        }
+
+        trainingInputs.forEachIndexed { index, input ->
+            with(network) {
+                inputLayer.setActivations(input.toDoubleArray())
+                
+                supervisedModel.forwardPass()
+                val forwardPassOutput = outputLayer.activationArray.clone()
+                
+                inputLayer.setActivations(input.toDoubleArray())
+                network.bufferedUpdate()
+                val networkUpdateOutput = outputLayer.activationArray.clone()
+                
+                assertArrayEquals(forwardPassOutput, networkUpdateOutput, 1e-10) {
+                    "For input $index ($input): network.update() output ${networkUpdateOutput.contentToString()} should match forwardPass() output ${forwardPassOutput.contentToString()}"
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `network update should match trainer forward pass after training with NeuronGroup`() = runBlocking {
+        val network = Network()
+
+        val inputLayer = NeuronGroup(2).also { network.addNetworkModelsAsync(it) }.also { 
+            it.isClamped = true
+            it.label = "Input"
+        }
+        val hiddenLayer = NeuronGroup(2).also { network.addNetworkModelsAsync(it) }.also { 
+            it.updateRule = SigmoidalRule()
+            it.label = "Hidden"
+        }
+        val outputLayer = NeuronGroup(1).also { network.addNetworkModelsAsync(it) }.also { 
+            it.updateRule = SigmoidalRule()
+            it.label = "Output"
+        }
+
+        val sg1 = SynapseGroup(inputLayer, hiddenLayer).also { network.addNetworkModelsAsync(it) }
+        val sg2 = SynapseGroup(hiddenLayer, outputLayer).also { network.addNetworkModelsAsync(it) }
+
+        val supervisedModel = SupervisedModel(inputLayer, outputLayer).also { network.addNetworkModelsAsync(it) }
+
+        val trainingInputs = mutableListOf(
+            mutableListOf(0.0, 0.0),
+            mutableListOf(1.0, 0.0),
+            mutableListOf(0.0, 1.0),
+            mutableListOf(1.0, 1.0)
+        )
+
+        val trainingTargets = mutableListOf(
+            mutableListOf(0.0),
+            mutableListOf(1.0),
+            mutableListOf(1.0),
+            mutableListOf(0.0)
+        )
+
+        supervisedModel.trainingSet = TrainingDataset(
+            inputs = trainingInputs,
+            targets = trainingTargets
+        )
+
+        val trainer = SupervisedTrainer(network, supervisedModel)
+        
+        with(network) {
+            repeat(100) {
+                trainer.trainBatch(0 until trainingInputs.size)
+            }
+        }
+
+        trainingInputs.forEachIndexed { index, input ->
+            with(network) {
+                inputLayer.setActivations(input.toDoubleArray())
+                
+                supervisedModel.forwardPass()
+                val forwardPassOutput = outputLayer.activationArray.clone()
+                
+                inputLayer.setActivations(input.toDoubleArray())
+                network.bufferedUpdate()
+                val networkUpdateOutput = outputLayer.activationArray.clone()
+                
+                assertArrayEquals(forwardPassOutput, networkUpdateOutput, 1e-10) {
+                    "For input $index ($input): network.update() output ${networkUpdateOutput.contentToString()} should match forwardPass() output ${forwardPassOutput.contentToString()}"
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `network update should match trainer forward pass after training with NeuronCollection`() = runBlocking {
+        val network = Network()
+
+        val inputNeurons = (0 until 2).map { Neuron().also { network.addNetworkModelsAsync(it) } }
+        val hiddenNeurons = (0 until 2).map { Neuron().also { network.addNetworkModelsAsync(it) } }
+        val outputNeurons = (0 until 1).map { Neuron().also { network.addNetworkModelsAsync(it) } }
+
+        val inputLayer = NeuronCollection(inputNeurons).also { network.addNetworkModelsAsync(it) }.also { 
+            it.isClamped = true
+            it.label = "Input"
+        }
+        val hiddenLayer = NeuronCollection(hiddenNeurons).also { network.addNetworkModelsAsync(it) }.also { 
+            it.setNeuronType(SigmoidalRule())
+            it.label = "Hidden"
+        }
+        val outputLayer = NeuronCollection(outputNeurons).also { network.addNetworkModelsAsync(it) }.also { 
+            it.setNeuronType(SigmoidalRule())
+            it.label = "Output"
+        }
+
+        val sg1 = SynapseGroup(inputLayer, hiddenLayer).also { network.addNetworkModelsAsync(it) }
+        val sg2 = SynapseGroup(hiddenLayer, outputLayer).also { network.addNetworkModelsAsync(it) }
+
+        val supervisedModel = SupervisedModel(inputLayer, outputLayer).also { network.addNetworkModelsAsync(it) }
+
+        val trainingInputs = mutableListOf(
+            mutableListOf(0.0, 0.0),
+            mutableListOf(1.0, 0.0),
+            mutableListOf(0.0, 1.0),
+            mutableListOf(1.0, 1.0)
+        )
+
+        val trainingTargets = mutableListOf(
+            mutableListOf(0.0),
+            mutableListOf(1.0),
+            mutableListOf(1.0),
+            mutableListOf(0.0)
+        )
+
+        supervisedModel.trainingSet = TrainingDataset(
+            inputs = trainingInputs,
+            targets = trainingTargets
+        )
+
+        val trainer = SupervisedTrainer(network, supervisedModel)
+        
+        with(network) {
+            repeat(100) {
+                trainer.trainBatch(0 until trainingInputs.size)
+            }
+        }
+
+        trainingInputs.forEachIndexed { index, input ->
+            with(network) {
+                inputLayer.setActivations(input.toDoubleArray())
+                
+                supervisedModel.forwardPass()
+                val forwardPassOutput = outputLayer.activationArray.clone()
+                
+                inputLayer.setActivations(input.toDoubleArray())
+                network.bufferedUpdate()
+                val networkUpdateOutput = outputLayer.activationArray.clone()
+                
+                assertArrayEquals(forwardPassOutput, networkUpdateOutput, 1e-10) {
+                    "For input $index ($input): network.update() output ${networkUpdateOutput.contentToString()} should match forwardPass() output ${forwardPassOutput.contentToString()}"
+                }
+            }
+        }
+    }
+
 }

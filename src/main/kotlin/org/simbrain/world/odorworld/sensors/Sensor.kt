@@ -81,5 +81,6 @@ val sensorTypes: List<Class<out CopyableObject>> = listOf(
     GridSensor::class.java,
     ObjectSensor::class.java,
     BumpSensor::class.java,
-    TileSensor::class.java
+    TileSensor::class.java,
+    View3DSensor::class.java
 )

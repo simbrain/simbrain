@@ -375,6 +375,48 @@ class OdorWorldEntity @JvmOverloads constructor(
         }
 
     /**
+     * Current animation frame index. Used for entities with multiple animation frames.
+     * This is transient state that syncs between model and view.
+     */
+    @Transient
+    var animationFrame: Int = 0
+        private set
+
+    /**
+     * Accumulator for fractional frame advancement. Animation advances when this reaches 1.0.
+     */
+    @Transient
+    private var animationFrameAccumulator: Double = 0.0
+
+    /**
+     * Advance the animation frame based on current speed.
+     * Call this each update tick to sync animation with movement.
+     *
+     * @return the number of frames advanced (usually 0 or 1)
+     */
+    fun advanceAnimation(): Int {
+        val numFrames = entityType.imageBasePaths.firstOrNull()?.size ?: 1
+        if (numFrames <= 1) return 0
+
+        animationFrameAccumulator += speed / 5.0
+        var framesAdvanced = 0
+        while (animationFrameAccumulator >= 1.0) {
+            animationFrame = (animationFrame + 1) % numFrames
+            animationFrameAccumulator -= 1.0
+            framesAdvanced++
+        }
+        return framesAdvanced
+    }
+
+    /**
+     * Reset animation to the first frame (static pose).
+     */
+    fun resetAnimation() {
+        animationFrame = 0
+        animationFrameAccumulator = 0.0
+    }
+
+    /**
      * Returns the name of the first object encountered in the provided radius, or an empty string if none is found.
      */
     @Producible

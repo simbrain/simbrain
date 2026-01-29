@@ -5,19 +5,16 @@ import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PBounds
+import org.piccolo2d.util.PPaintContext
 import org.simbrain.util.distanceTo
-import org.simbrain.util.div
 import org.simbrain.util.minus
-import org.simbrain.util.piccolo.Animations
-import org.simbrain.util.piccolo.RotatingSprite
-import org.simbrain.util.piccolo.Sprite
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.CouplingMenu
 import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.world.odorworld.OdorWorldPanel
-import org.simbrain.world.odorworld.OdorWorldResourceManager
 import org.simbrain.world.odorworld.effectors.Effector
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
+import org.simbrain.world.odorworld.getCurrentImage
 import org.simbrain.world.odorworld.sensors.Sensor
 import org.simbrain.world.odorworld.sensors.VisualizableEntityAttribute
 import java.awt.geom.Point2D
@@ -33,9 +30,40 @@ class EntityNode(
 ) : PNode(), NodeWithDispersion by DispersionNode(entity) {
 
     /**
-     * Sprite representing this entity.
+     * Simple sprite node that renders the entity's current image.
+     * Uses the shared image utilities from OdorWorldUtils.
      */
-    lateinit var sprite: Sprite
+    private inner class EntitySprite : PNode() {
+        init {
+            updateBounds()
+        }
+
+        fun updateBounds() {
+            val w = entity.entityType.width.toDouble()
+            val h = entity.entityType.height.toDouble()
+            setBounds(-w / 2, -h / 2, w, h)
+        }
+
+        override fun paint(paintContext: PPaintContext) {
+            val g = paintContext.graphics
+            val image = entity.getCurrentImage()
+            val bounds = boundsReference
+
+            val imgW = image.width.toDouble()
+            val imgH = image.height.toDouble()
+
+            g.translate(bounds.x, bounds.y)
+            g.scale(bounds.width / imgW, bounds.height / imgH)
+            g.drawImage(image, 0, 0, null)
+            g.scale(imgW / bounds.width, imgH / bounds.height)
+            g.translate(-bounds.x, -bounds.y)
+        }
+    }
+
+    /**
+     * Sprite node for rendering the entity image.
+     */
+    private val sprite = EntitySprite()
 
     /**
      * Represents path taken by the agent, if [OdorWorldEntity.isShowTrail] is turned on
@@ -44,11 +72,6 @@ class EntityNode(
         paint = null
         pickable = false
     }
-
-    /**
-     * For advancing animation proportional to velocity.
-     */
-    private var frameCounter = 0.0
 
     /**
      * A map from [VisualizableEntityAttribute] (model) to [EntityAttributeNode] (view).
@@ -62,12 +85,15 @@ class EntityNode(
      * @param entity represented entity
      */
     init {
-        updateImage()
+        addChild(sprite)
         updateEntityAttributeModel()
         setOffset(entity.x, entity.y)
         entity.events.deleted.on(dispatcher = Dispatchers.Swing) { removeFromParent() }
         entity.events.moved.on(dispatcher = Dispatchers.Swing) { update() }
-        entity.events.typeChanged.on(dispatcher = Dispatchers.Swing) { _, _ -> updateImage() }
+        entity.events.typeChanged.on(dispatcher = Dispatchers.Swing) { _, _ ->
+            sprite.updateBounds()
+            sprite.repaint()
+        }
         entity.events.trailVisibilityChanged.on(dispatcher = Dispatchers.Swing) { new, _ ->
             if (new) {
                 trail = PPath.createPolyline(arrayOf(Point2D.Float(entity.x.toFloat(),entity.y.toFloat()))).apply {
@@ -205,46 +231,12 @@ class EntityNode(
         visualizableAttributeMap.values.forEach { it?.update(entity) }
     }
 
-    /**
-     * Initialize the image associated with the object. Only called when changing the image.
-     */
-    private fun updateImage() {
-        if (::sprite.isInitialized) {
-            removeChild(sprite)
-        }
-        fun getRotatingImage(imagePath: String) = OdorWorldResourceManager.getBufferedImage("rotating" / imagePath)
-        fun getStaticImage(imagePath: String) = OdorWorldResourceManager.getBufferedImage("static" / imagePath)
-        fun createRotatingTileSet(images: List<List<String>>) = images.map { frames ->
-            if (frames.size == 1) {
-                Animations.createAnimation(getRotatingImage(frames.first()))
-            } else {
-                Animations.createLoopedAnimation(frames.map { frame -> getRotatingImage(frame) })
-            }
-        }
-        fun createStaticTileSet(images: List<List<String>>) = getStaticImage(images.flatten().first())
-
-        sprite = with(entity.entityType) {
-            if (rotating) {
-                RotatingSprite(createRotatingTileSet(imageBasePaths))
-            } else {
-                Sprite(createStaticTileSet(imageBasePaths))
-            }
-        }
-        addChild(sprite)
-        visualizableAttributeMap.values.forEach { it?.raiseToTop() }
-        updateAttributesNodes()
-        if (entity.isRotating) {
-            (sprite as RotatingSprite?)!!.updateHeading(entity.heading)
-        }
-    }
-
     private fun update() {
-        if (entity.isRotating) {
-            (sprite as? RotatingSprite)?.updateHeading(entity.heading)
-        }
         updateAttributesNodes()
         val isCrossingBorder = !entity.world.contains(entity.location - entity.velocity)
         setOffset(entity.x, entity.y)
+        // Repaint sprite to show updated heading/animation frame
+        sprite.repaint()
         if (entity.isShowTrail && (SimbrainDesktop.workspace.updater.isRunning || entity.drawTrailWithoutRunningWorkspace)) {
             if (isCrossingBorder) {
                 trail.moveTo(entity.x, entity.y)
@@ -260,23 +252,19 @@ class EntityNode(
     }
 
     /**
-     * Advancing animation frame based on the velocity of the entity.
+     * Advance the entity's animation frame based on velocity.
      */
     fun advance() {
-        frameCounter += entity.speed / 5
-        var i = 0
-        while (i < frameCounter) {
-            sprite.advance()
-            i++
-        }
-        frameCounter -= i.toDouble()
+        entity.advanceAnimation()
+        sprite.repaint()
     }
 
     /**
-     * Set the sprite to frame where the entity is standing still.
+     * Reset the entity's animation to the first frame (static pose).
      */
     fun resetToStaticFrame() {
-        sprite.resetToStaticFrame()
+        entity.resetAnimation()
+        sprite.repaint()
     }
 
     fun createContextMenu(odorWorldPanel: OdorWorldPanel) = JPopupMenu().apply {

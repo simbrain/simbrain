@@ -10,6 +10,7 @@ import org.simbrain.custom_sims.simulations.braitenberg.braitenbergSim
 import org.simbrain.custom_sims.simulations.braitenberg.pursuer
 import org.simbrain.custom_sims.simulations.demos.competitiveSim
 import org.simbrain.custom_sims.simulations.demos.somNetSmells
+import org.simbrain.custom_sims.simulations.demos.view3dDemo
 import org.simbrain.custom_sims.simulations.dynamical_systems.lorenzSystem
 import org.simbrain.custom_sims.simulations.dynamical_systems.lorenzSystemSimbrain
 import org.simbrain.custom_sims.simulations.edge_of_chaos.edgeOfChaos
@@ -174,6 +175,10 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Simple drawings (10 x 10)") { simpleImageWorld }
         item("Photo album (100 x 100)") { photoAlbumExample }
         item("Attention as gain") { attentionAsGain }
+    }
+
+    dir("Odor World") {
+        item("3D View Sensor") { view3dDemo }
     }
 
     //dir("Testing") {

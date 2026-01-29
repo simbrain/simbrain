@@ -3,6 +3,7 @@ package org.simbrain.util
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.simbrain.util.decayfunctions.ExponentialDecayFunction
 import org.simbrain.util.decayfunctions.GaussianDecayFunction
 import org.simbrain.util.decayfunctions.LinearDecayFunction
 import org.simbrain.util.decayfunctions.StepDecayFunction
@@ -69,6 +70,25 @@ class DecayFunctionTest {
         decay.peakDistance = 10.0
         assertEquals(1.0 , decay.getScalingFactor(10.0))
         assertEquals(valAtOneStdev, decay.getScalingFactor(10 +decay.dispersion/2))
+    }
+
+    @Test
+    fun `test exponential`() {
+        val decay = ExponentialDecayFunction(10.0)
+        assertEquals(1.0, decay.getScalingFactor(0.0))
+        assertEquals(0.0, decay.getScalingFactor(11.0))
+        assertTrue(decay.getScalingFactor(5.0) > decay.getScalingFactor(7.0))
+    }
+
+    @Test
+    fun `test exponential with peak`() {
+        val decay = ExponentialDecayFunction(10.0)
+        decay.dispersion = 9.0
+        decay.peakDistance = 10.0
+        assertEquals(1.0, decay.getScalingFactor(10.0))
+        assertEquals(0.0, decay.getScalingFactor(1.0))
+        assertEquals(0.0, decay.getScalingFactor(19.0))
+        assertTrue(decay.getScalingFactor(11.0) > decay.getScalingFactor(13.0))
     }
 
 }

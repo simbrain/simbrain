@@ -17,6 +17,7 @@ import kotlin.math.abs
  * Available implementations:
  * - [StepDecayFunction]: 1 within dispersion, 0 outside
  * - [LinearDecayFunction]: Linear decrease from 1 to 0
+ * - [ExponentialDecayFunction]: Exponential decrease from 1 to 0
  * - [GaussianDecayFunction]: Smooth Gaussian falloff
  */
 abstract class DecayFunction(
@@ -102,5 +103,6 @@ abstract class DecayFunction(
 val decayFunctionTypes = listOf(
     StepDecayFunction::class.java,
     LinearDecayFunction::class.java,
+    ExponentialDecayFunction::class.java,
     GaussianDecayFunction::class.java,
 )

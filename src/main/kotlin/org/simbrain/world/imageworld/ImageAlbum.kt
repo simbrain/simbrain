@@ -3,6 +3,7 @@ package org.simbrain.world.imageworld
 import org.simbrain.util.copy
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.workspace.AttributeContainer
+import org.simbrain.workspace.Consumable
 import java.awt.image.BufferedImage
 import java.io.File
 import java.io.IOException
@@ -10,6 +11,8 @@ import java.util.*
 import javax.imageio.ImageIO
 import javax.swing.ImageIcon
 import javax.swing.JOptionPane
+import kotlin.math.ceil
+import kotlin.math.sqrt
 
 /**
  * ImageAlbum stores a list of static images and lets you load, advance through them etc.
@@ -29,6 +32,12 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
      */
     var frameIndex: Int = 0
         private set
+
+    /**
+     * Store RGB channel data for consumer updates.
+     * channels[0] = red, channels[1] = green, channels[2] = blue
+     */
+    private var channels: Array<DoubleArray> = Array(3) { DoubleArray(0) }
 
     /**
      * Construct a new StaticImageSource.
@@ -180,6 +189,88 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
         _frames.removeAt(frameIndex)
         frameIndex = (frameIndex + _frames.size - 1) % _frames.size
         setCurrentImage(_frames[frameIndex])
+    }
+
+    /**
+     * Ensure frames[0] exists and has the correct dimensions to fit the incoming data.
+     * Creates a square image with side length = ceil(sqrt(values.size)).
+     * Returns false if values is empty (nothing to resize for).
+     */
+    private fun resizeToFit(values: DoubleArray): Boolean {
+        if (values.isEmpty()) {
+            return false
+        }
+
+        val length = ceil(sqrt(values.size.toDouble())).toInt()
+
+        val needsResize = frames.isEmpty() ||
+                _frames[0].width != length ||
+                _frames[0].height != length
+
+        if (needsResize) {
+            val newImage = BufferedImage(length, length, BufferedImage.TYPE_INT_RGB)
+            if (frames.isEmpty()) {
+                _frames.add(newImage)
+            } else {
+                _frames[0] = newImage
+            }
+            currentImage = newImage
+            channels = Array(3) { DoubleArray(length * length) }
+            events.resize.fire()
+        }
+        return true
+    }
+
+    /**
+     * Update frames[0] pixel data from the channels arrays.
+     */
+    private fun updateImageFromChannels() {
+        val image = _frames[0]
+        val rgbArray = IntArray(image.width * image.height)
+
+        for (i in rgbArray.indices) {
+            val r = (channels[0][i] * 255.0).toInt().coerceIn(0, 255)
+            val g = (channels[1][i] * 255.0).toInt().coerceIn(0, 255)
+            val b = (channels[2][i] * 255.0).toInt().coerceIn(0, 255)
+            rgbArray[i] = (r shl 16) or (g shl 8) or b
+        }
+
+        image.setRGB(0, 0, image.width, image.height, rgbArray, 0, image.width)
+    }
+
+    @Consumable
+    fun setBrightness(values: DoubleArray) {
+        if (!resizeToFit(values)) return
+        // Copy to all three channels for grayscale
+        System.arraycopy(values, 0, channels[0], 0, values.size)
+        System.arraycopy(values, 0, channels[1], 0, values.size)
+        System.arraycopy(values, 0, channels[2], 0, values.size)
+        updateImageFromChannels()
+        events.imageUpdate.fire()
+    }
+
+    @Consumable
+    fun setRed(values: DoubleArray) {
+        if (!resizeToFit(values)) return
+        System.arraycopy(values, 0, channels[0], 0, values.size)
+        updateImageFromChannels()
+        events.imageUpdate.fire()
+    }
+
+    @Consumable
+    fun setGreen(values: DoubleArray) {
+        if (!resizeToFit(values)) return
+        System.arraycopy(values, 0, channels[1], 0, values.size)
+        updateImageFromChannels()
+        events.imageUpdate.fire()
+    }
+
+    @Consumable
+    fun setBlue(values: DoubleArray) {
+        if (!resizeToFit(values)) return
+        System.arraycopy(values, 0, channels[2], 0, values.size)
+        updateImageFromChannels()
+        events.imageUpdate.fire()
     }
 
     override val id: String

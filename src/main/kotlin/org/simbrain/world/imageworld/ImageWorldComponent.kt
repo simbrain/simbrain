@@ -32,6 +32,7 @@ class ImageWorldComponent : WorkspaceComponent {
 
     override val attributeContainers: List<AttributeContainer>
         get() = buildList {
+            add(world.imageAlbum)
             add(world.imagePipelineCollection)
             addAll(world.imagePipelineCollection.pipelines)
         }

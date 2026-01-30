@@ -25,7 +25,7 @@ abstract class ImageSource {
      * Image backing the source.
      */
     var currentImage: BufferedImage
-        private set
+        protected set
 
     /**
      * Handle Image source Events.

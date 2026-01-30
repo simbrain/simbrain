@@ -468,6 +468,7 @@ class SupervisedModelTest {
             println("Hidden layer before: ${hiddenLayer.activationArray.contentToString()}")
             println("Output layer before: ${outputLayer.activationArray.contentToString()}")
             network.bufferedUpdate()
+            network.bufferedUpdate()
             println("Hidden layer after update: ${hiddenLayer.activationArray.contentToString()}")
             println("Output layer after update: ${outputLayer.activationArray.contentToString()}")
             val networkUpdateOutput = outputLayer.activationArray.clone()
@@ -530,14 +531,17 @@ class SupervisedModelTest {
         trainingInputs.forEachIndexed { index, input ->
             with(network) {
                 inputLayer.setActivations(input.toDoubleArray())
-                
+
                 supervisedModel.forwardPass()
                 val forwardPassOutput = outputLayer.activationArray.clone()
-                
+
+                hiddenLayer.clearInputs()
+                outputLayer.clearInputs()
+
                 inputLayer.setActivations(input.toDoubleArray())
                 network.bufferedUpdate()
                 val networkUpdateOutput = outputLayer.activationArray.clone()
-                
+
                 assertArrayEquals(forwardPassOutput, networkUpdateOutput, 1e-10) {
                     "For input $index ($input): network.update() output ${networkUpdateOutput.contentToString()} should match forwardPass() output ${forwardPassOutput.contentToString()}"
                 }
@@ -597,14 +601,17 @@ class SupervisedModelTest {
         trainingInputs.forEachIndexed { index, input ->
             with(network) {
                 inputLayer.setActivations(input.toDoubleArray())
-                
+
                 supervisedModel.forwardPass()
                 val forwardPassOutput = outputLayer.activationArray.clone()
-                
+
+                hiddenLayer.clearInputs()
+                outputLayer.clearInputs()
+
                 inputLayer.setActivations(input.toDoubleArray())
                 network.bufferedUpdate()
                 val networkUpdateOutput = outputLayer.activationArray.clone()
-                
+
                 assertArrayEquals(forwardPassOutput, networkUpdateOutput, 1e-10) {
                     "For input $index ($input): network.update() output ${networkUpdateOutput.contentToString()} should match forwardPass() output ${forwardPassOutput.contentToString()}"
                 }
@@ -668,14 +675,17 @@ class SupervisedModelTest {
         trainingInputs.forEachIndexed { index, input ->
             with(network) {
                 inputLayer.setActivations(input.toDoubleArray())
-                
+
                 supervisedModel.forwardPass()
                 val forwardPassOutput = outputLayer.activationArray.clone()
-                
+
+                hiddenLayer.clearInputs()
+                outputLayer.clearInputs()
+
                 inputLayer.setActivations(input.toDoubleArray())
                 network.bufferedUpdate()
                 val networkUpdateOutput = outputLayer.activationArray.clone()
-                
+
                 assertArrayEquals(forwardPassOutput, networkUpdateOutput, 1e-10) {
                     "For input $index ($input): network.update() output ${networkUpdateOutput.contentToString()} should match forwardPass() output ${forwardPassOutput.contentToString()}"
                 }

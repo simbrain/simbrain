@@ -120,7 +120,7 @@ class View3DSensor @JvmOverloads constructor(
      * Grayscale brightness values for each pixel (width * height).
      * Values are normalized to 0.0-1.0.
      */
-    @get:Producible(customDescriptionMethod = "getAttributeDescription")
+    @get:Producible(description = "Brightness")
     val brightness: DoubleArray
         get() = _brightness
 
@@ -128,7 +128,7 @@ class View3DSensor @JvmOverloads constructor(
      * Red channel values for each pixel (width * height).
      * Values are normalized to 0.0-1.0.
      */
-    @get:Producible(customDescriptionMethod = "getAttributeDescription", defaultVisibility = false)
+    @get:Producible(description = "Red", defaultVisibility = false)
     val red: DoubleArray
         get() = _red
 
@@ -136,7 +136,7 @@ class View3DSensor @JvmOverloads constructor(
      * Green channel values for each pixel (width * height).
      * Values are normalized to 0.0-1.0.
      */
-    @get:Producible(customDescriptionMethod = "getAttributeDescription", defaultVisibility = false)
+    @get:Producible(description = "Green", defaultVisibility = false)
     val green: DoubleArray
         get() = _green
 
@@ -144,7 +144,7 @@ class View3DSensor @JvmOverloads constructor(
      * Blue channel values for each pixel (width * height).
      * Values are normalized to 0.0-1.0.
      */
-    @get:Producible(customDescriptionMethod = "getAttributeDescription", defaultVisibility = false)
+    @get:Producible(description = "Blue", defaultVisibility = false)
     val blue: DoubleArray
         get() = _blue
 

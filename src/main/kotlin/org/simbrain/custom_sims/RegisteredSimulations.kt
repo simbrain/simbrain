@@ -24,6 +24,7 @@ import org.simbrain.custom_sims.simulations.patterns_of_activity.cogMap3Objects
 import org.simbrain.custom_sims.simulations.patterns_of_activity.iacJetsSharks5People
 import org.simbrain.custom_sims.simulations.psychology.heatColdSim
 import org.simbrain.custom_sims.simulations.psychology.spiveyNet
+import org.simbrain.custom_sims.simulations.rl.braitenbergProgramLearning
 import org.simbrain.custom_sims.simulations.rl.braitenbergRL
 import org.simbrain.util.StructureDir
 import org.simbrain.util.dir
@@ -164,6 +165,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
     dir("Reinforcement learning") {
         item("Actor critic") { actorCritic }
         item("Braitenberg RL") { braitenbergRL }
+        item("Braitenberg Program Learning") { braitenbergProgramLearning }
     }
 
     // dir("Other Demos") {

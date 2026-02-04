@@ -2,9 +2,7 @@ package org.simbrain.network.spikeresponders
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.*
 import org.simbrain.network.updaterules.SpikingThresholdRule
 import org.simbrain.util.getSimbrainXStream
 
@@ -311,5 +309,79 @@ class ShortTermPlasticityTest {
         
         // Values should have changed
         assert(dataHolder.u != initialU || dataHolder.R != initialR)
+    }
+
+    @Test
+    fun `short term plasticity matrix operations`() {
+        val net = Network()
+        val inputArray = NeuronArray(3)
+        val spikingArray = NeuronArray(3).apply {
+            updateRule = SpikingThresholdRule()
+        }
+        val targetArray = NeuronArray(2)
+        val wm1 = WeightMatrix(inputArray, spikingArray)
+        val wm2 = WeightMatrix(spikingArray, targetArray)
+        wm2.setWeights(doubleArrayOf(1.0, 0.5, 0.8, 1.2, 0.6, 0.9))
+        
+        val stp = ShortTermPlasticity()
+        stp.U = 0.5
+        stp.D = 100.0
+        stp.F = 200.0
+        wm2.spikeResponder = stp
+        
+        net.addNetworkModelsAsync(inputArray, spikingArray, targetArray, wm1, wm2)
+        
+        inputArray.setActivations(doubleArrayOf(1.0, 1.0, 1.0))
+        net.update()
+        net.update()
+        
+        assert(targetArray.activations.sum() != 0.0)
+        
+        repeat(3) {
+            inputArray.setActivations(doubleArrayOf(1.0, 1.0, 1.0))
+            net.update()
+            net.update()
+        }
+        
+        assert(targetArray.activations.sum() >= 0.0)
+    }
+
+    @Test
+    fun `short term plasticity matrix data holder operations`() {
+        val stp = ShortTermPlasticity()
+        val matrixData = stp.createMatrixData(2, 3) as STPMatrixData
+        
+        assertEquals(2, matrixData.rows)
+        assertEquals(3, matrixData.cols)
+        assertEquals(2, matrixData.u.nrow())
+        assertEquals(3, matrixData.u.ncol())
+        assertEquals(2, matrixData.R.nrow())
+        assertEquals(3, matrixData.R.ncol())
+        
+        matrixData.u.set(0, 0, 0.5)
+        matrixData.R.set(1, 2, 0.8)
+        
+        val copy = matrixData.copy()
+        assertEquals(0.5, copy.u[0, 0])
+        assertEquals(0.8, copy.R[1, 2])
+        
+        matrixData.u.set(0, 0, 0.9)
+        assertEquals(0.5, copy.u[0, 0])
+        
+        matrixData.clear()
+        assertEquals(0.0, matrixData.u[0, 0])
+        assertEquals(0.0, matrixData.R[1, 2])
+    }
+
+    @Test
+    fun `short term plasticity matrix update mechanism`() {
+        val stp = ShortTermPlasticity()
+        val matrixData = stp.createMatrixData(2, 3) as STPMatrixData
+        
+        val lastSpikeTimes = doubleArrayOf(0.0, 0.5, 1.0)
+        
+        matrixData.update(1.0, lastSpikeTimes, 0.5, 100.0, 200.0)
+        
+        assert(matrixData.u[0, 0] != 0.0 || matrixData.R[0, 0] != 0.0)
     }
 } 

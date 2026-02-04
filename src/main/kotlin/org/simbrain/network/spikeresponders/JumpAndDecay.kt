@@ -28,10 +28,13 @@ class JumpAndDecay : SpikeResponder() {
         description = "Time constant of decay (ms). Roughly the time it takes to decay to\n" +
                 "near-baseline. Larger time constants produce slower decay.",
         increment = .1,
-        minimumValue = 0.0,
+        minimumValue = 0.001,
         order = 3
     )
     var timeConstant = 3.0
+        set(value) {
+            field = value.coerceAtLeast(0.001)
+        }
 
     @UserParameter(
         label = "Use Convolution",

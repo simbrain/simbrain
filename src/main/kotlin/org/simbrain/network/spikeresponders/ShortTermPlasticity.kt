@@ -44,11 +44,14 @@ class ShortTermPlasticity : SpikeResponder() {
     @UserParameter(
         label = "Mean Depression ",
         description = "Time constant in ms for short term depression (STD). Higher values produce more STD",
-        minimumValue = 0.0,
+        minimumValue = 0.001,
         increment = 10.0,
         order = 20
     )
     var D = 50.0
+        set(value) {
+            field = value.coerceAtLeast(0.001)
+        }
 
     /**
      * Facilitation constant.
@@ -56,11 +59,14 @@ class ShortTermPlasticity : SpikeResponder() {
     @UserParameter(
         label = "Mean Facilitation ",
         description = "Time constant in ms. for short term facilitation (STF). Higher values produce more STF",
-        minimumValue = 0.0,
+        minimumValue = 0.001,
         increment = 10.0,
         order = 30
     )
     var F = 750.0
+        set(value) {
+            field = value.coerceAtLeast(0.001)
+        }
 
     fun validSpikeResponderLocals() = listOf(
         JumpAndDecay::class.java,

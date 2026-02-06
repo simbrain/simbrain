@@ -77,9 +77,22 @@ val hopfieldSimContinuous = newSim {
             
             3. After that, click the `Train` button and repeat the steps above in the `Learning a Memory` section.
             
-            ## Forgetting Dynamics using the Capacity Test
+            ## Memory Capacity Testing
             
-            More info to come.
+            This simulation includes capacity testing tools in the Capacity tab. These tools allow you to systematically study how many patterns 
+            the network can reliably store and retrieve, both with and without forgetting dynamics.
+            
+            The continuous Hopfield network uses the same capacity testing framework as the discrete Hopfield simulation. The main difference is 
+            that this version uses Euclidean distance for measuring pattern similarity (since activations are continuous values), while the discrete 
+            version uses Hamming distance (for binary patterns).
+            
+            For detailed information on the background, theory, and usage of the capacity tests, see the **Discrete Hopfield** simulation's documentation, 
+            which includes:
+            - Background on Hopfield network memory capacity (the classical 0.138N limit)
+            - How forgetting mechanisms (weight decay and synaptic noise) affect memory stability
+            - Step-by-step explanation of how the capacity test works
+            - How to interpret the results
+            - References to the relevant literature
             
             # References
             
@@ -89,6 +102,8 @@ val hopfieldSimContinuous = newSim {
  
             [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
 
+            Makenzy Gilbert
+            
             Kanly Thao
             
         """.trimIndent(),

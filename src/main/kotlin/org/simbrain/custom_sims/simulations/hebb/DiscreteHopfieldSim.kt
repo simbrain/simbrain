@@ -45,31 +45,97 @@ val discreteHopfieldSim = newSim {
             
             # What to Do         
             
-            1. Select one of the four input patterns on the button panel. 
+            Select one of the input patterns from the button panel (Circle, Square, Diagonal Line, Cross, Vertical Line, or Horizontal Line) and press Train on current pattern to train the network on that pattern. Each time you press it, the pattern is reinforced into the network's memory. Note that the network learns both the pattern and its anti-pattern (the version with all activations flipped).
             
-            2. Press the `Train on current pattern` button to train the network on that pattern. Each time you press it, it will "burn in" the pattern further where
-            it reinforces that pattern into the network's "memory".
+            To confirm the pattern is remembered, randomize the network by pressing `N -> R` and then iterate by pressing `Space` to see if the pattern is recreated. You can also manually create part of a pattern using the wand tool (press `D` to activate) and see if the network completes it. The Random Pattern button generates a new random activation pattern, and -1 Canvas sets all neurons to -1.
             
-            3. Note that it will learn both the pattern and its anti-pattern.
+            The Training iterations field controls how many learning steps occur when you press Train on current pattern. Increasing this value strengthens the memory trace more quickly.
             
-            4. To confirm that the pattern is remembered, randomize the network by pressing `N -> R` and then iterating by pressing `Space` to see if the pattern is 
-            recreated.
+            ## Training on Multiple Patterns
             
-                - You can also manually create part of the pattern you trained the network and see if it can recreate it.
-            
-            ## Training on Multiple patterns
-            
-            Hopfield networks have a memory capacity of about `14%` of the number of nodes. In this case about `8` memories states. However those memories need to be 
-            sufficiently distinct.  So the network should be able to learn all `6` patterns, but you must very carefully train it on them by clicking the pattern, 
-            and then pressing `Train on current pattern` a certain number of times.
+            Hopfield networks have a memory capacity of about 14% of the number of nodes. In this case, about 8 memory states. However, those memories need to be sufficiently distinct. The network should be able to learn all 6 provided patterns, but you must carefully train it on them by selecting each pattern and pressing Train on current pattern multiple times. If patterns are too similar or you store too many, the network may converge to spurious states or fail to recall correctly.
             
             ## Other things to observe
             
-            When you iterate the network it tends to go to lower energy states.  
+            When you iterate the network it tends to go to lower energy states.
+            
+            ## Memory Capacity Testing
+            
+            The Capacity tab provides tools to systematically test how many patterns the network can reliably store and retrieve. You can run automated tests that measure recall success rates across different numbers of stored patterns, with or without forgetting dynamics. A slider lets you explore individual test patterns, and the Capacity Test button launches the full analysis.
+            
+            ### Background on Memory Capacity
+            
+            Hopfield networks have a finite storage capacity—the maximum number of distinct patterns they can reliably store and recall. 
+            The classic result shows that a network with N neurons can stably store approximately 0.138N patterns before performance degrades 
+            (Amit et al., 1985). For example, a 100-neuron network can store about 13-14 uncorrelated patterns. Beyond this limit, the attractor 
+            landscape becomes crowded, leading to spurious states and retrieval errors.
+            
+            This simulation extends the classical capacity analysis by examining how forgetting mechanisms affect memory stability. While traditional 
+            models focus on interference from new memories overwriting old ones (palimpsest networks), this approach isolates forgetting as a 
+            standalone process using two biologically plausible mechanisms: weight decay (synaptic weakening over time) and synaptic plasticity 
+            noise (random fluctuations in connection strengths). These mechanisms reflect the intrinsic instability of biological synapses in the 
+            absence of reactivation (Mongillo et al., 2017; Susman et al., 2019).
+            
+            Recent work has shown that forgetting in attractor networks can produce diverse dynamics. Gilbert (2024) demonstrated that weight decay 
+            alone is insufficient to disrupt recall—proportional scaling preserves the relative structure of stored memories. However, adding 
+            synaptic noise destabilizes attractors and generates realistic forgetting curves that are often linear or piecewise-linear rather than 
+            exponential, consistent with behavioral data on meaningful memory (Radvansky et al., 2022).
+            
+            ### How the Capacity Test Works
+            
+            The Capacity tab provides tools to systematically study how many patterns a Hopfield network can reliably store and retrieve, 
+            both with and without forgetting dynamics.
+            
+            1. **Pattern Generation**: When the control panel is created, a fixed set of random patterns is generated (one pattern for each neuron in the network). 
+            This ensures reproducible results across test runs.
+            
+            2. **Running the Test**: Click the `Capacity Test` button to open a configuration dialog where you can set:
+               - **Distance threshold**: Maximum allowable distance between recalled and original pattern (as a percentage). For discrete Hopfield, this uses Hamming distance.
+               - **Percent to test**: What percentage of the network size to use as the number of test patterns
+               - **Cue distance**: How much to perturb the pattern when testing retrieval (Hamming distance for discrete Hopfield)
+               - **Test iterations**: How many iterations to run when testing pattern recall
+               - **Forgetting options**: Enable forgetting with decay rates, perturbation, and forgetting iterations
+            
+            3. **Test Process**: For each number of patterns from 1 to the specified maximum:
+               - Reset the network and weights
+               - Set learning rate to 1/n where n is the number of patterns being tested
+               - Train the network on n patterns
+               - Apply forgetting process if enabled (decay weights, add noise, repeat for specified iterations)
+               - Test each pattern by presenting a perturbed version as a cue
+               - Run the network for the specified number of iterations
+               - Check if the network settles within the distance threshold of the original pattern
+               - Plot the percentage of successfully recalled patterns
+            
+            4. **Results**: The test generates a time series plot showing:
+               - Blue line: Percentage of patterns successfully recalled without forgetting
+               - Orange line (if forgetting enabled): Percentage of patterns successfully recalled with forgetting
+               
+            The x-axis shows the number of patterns stored, and the y-axis shows the recall success rate (0-100%).
+            
+            ### Exploring Individual Patterns
+            
+            Use the slider in the Capacity tab to load specific patterns from the test set into the network. This lets you manually 
+            examine individual patterns and see how the network responds to them.
+            
+            # References
+            
+            Amit, D. J., Gutfreund, H., & Sompolinsky, H. (1985). Storing infinite numbers of patterns in a spin-glass model of neural networks. _Physical Review Letters_, _55_(14), 1530–1533.
+            
+            Gilbert, M. (2024). [Modeling Forgetting with Attractor Neural Networks](https://escholarship.org/content/qt9fb9d61n/qt9fb9d61n.pdf). Cognitive and Information Sciences, University of California Merced.
+            
+            Hopfield, J. J. (1982). [Neural networks and physical systems with emergent collective computational abilities](https://doi.org/10.1073/pnas.79.8.2554). _Proceedings of the National Academy of Sciences_, _79_(8), 2554–2558.
+            
+            Mongillo, G., Rumpel, S., & Loewenstein, Y. (2017). [Intrinsic volatility of synaptic connections—a challenge to the synaptic trace theory of memory](https://doi.org/10.1016/j.conb.2017.06.006). _Current Opinion in Neurobiology_, _46_, 7–13.
+            
+            Radvansky, G. A., Doolen, A. C., Pettijohn, K. A., & Ritchey, M. (2022). [A new look at memory retention and forgetting](https://doi.org/10.1037/xlm0001110). _Journal of Experimental Psychology: Learning, Memory, and Cognition_, _48_(11), 1698–1723.
+            
+            Susman, L., Brenner, N., & Barak, O. (2019). [Stable memory with unstable synapses](https://doi.org/10.1038/s41467-019-12306-2). _Nature Communications_, _10_, 4441.
                 
             # Credits
             
             [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
+            
+            Makenzy Gilbert
         
         """.trimIndent()
     )

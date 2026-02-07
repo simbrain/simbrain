@@ -228,9 +228,50 @@ val corticalLayers = newSim {
 
         ## Background
 
-        The [cerebral cortex](https://en.wikipedia.org/wiki/Cerebral_cortex) is organized into distinct layers, each with specialized types of neurons and connection patterns. `Layer 2/3` is involved in processing 
-        and integrating information, `Layer 4` primarily receives sensory input, and `Layer 5/6` projects to other brain areas. This layered structure supports complex computations like perception, motor control, and 
-        cognition.
+        ### Cortical Organization
+        
+        The [cerebral cortex](https://en.wikipedia.org/wiki/Cerebral_cortex) (Latin for 'bark' or 'rind') is a large sheet of grey matter on the outer part of the brain, also known as the *neo-cortex* or telencephalon. 
+        It consists primarily of cell bodies of neurons and glial cells, and surrounds white matter that connects different cortical regions together and to subcortical structures like the thalamus. The cortex is 
+        thought to be the seat of most cognitive functions, including sensation, perception, motor processing, action planning, abstract reasoning, and thought.
+        
+        ### Laminar Structure
+        
+        The cortex has a repeating laminar (layered) structure with six distinct layers in mammals. Layer 1 is the outermost layer (closest to the skull), and layer 6 is the deepest. Each layer has distinctive 
+        anatomical and physiological properties:
+        
+        <img src="//localfiles/simulations/images/corticalLayers/laminar_structure.png" width="300" alt="Laminar structure" />
+        
+        - **Layer 1**: Very sparse, containing few cell bodies but dendritic tufts and axons that enable local connectivity. Receives modulatory inputs from thalamus.
+        
+        - **Layer 2/3**: Primarily involved in cortico-cortical connections, receiving and sending information to other cortical areas both within the same hemisphere (ipsilateral) and across the corpus callosum 
+        (contralateral). Thickest in non-sensory-motor areas like the frontal cortex. Layer 2/3 serves as a "meeting place" where inputs from Layer 4 and from other cortical areas converge.
+        
+        - **Layer 4**: The primary input layer, receiving dense projections from thalamus which in turn receives sensory information. It functions as an "input module" and is thus thicker in primary sensory areas. 
+        Layer 4 exhibits the most irregular firing patterns.
+        
+        - **Layer 5/6**: The primary output layers, projecting to thalamus, subcortical structures (basal ganglia, cerebellum), and directly to the spinal cord. Contains large pyramidal cells and tends to be 
+        thicker in motor areas. Layer 5 produces more "bursty" activity with higher average firing rates. Layer 6 creates precise reciprocal connections with thalamus, forming thalamocortical loops important 
+        for gain control and can effectively silence or amplify thalamic input to its home column.
+        
+        ### Inter-Layer Connectivity
+        
+        The layers are interconnected in specific patterns that support the flow of information through cortex:
+        
+        <img src="//localfiles/simulations/images/corticalLayers/connectivity_data.png" width="300" alt="Connectivity patterns" />
+        
+        This figure shows empirical data from Lefort et al. (2009) demonstrating connectivity patterns. Each panel shows which layers activate when 10 neurons in a specific layer are stimulated. Notice that:
+        
+        - **Layer 4** activates itself (recurrent connections) and strongly activates **Layer 2/3** and **Layer 5/6**
+        - **Layer 2/3** projects strongly to **Layer 5**
+        - **Layer 5/6** shows relatively little activation of other layers
+        
+        In this simplified model, the layers function as:
+        
+        - **Layer 2/3**: Internal processing and communication between cortical areas
+        - **Layer 4**: Input from sensory areas
+        - **Layer 5/6**: Output to motor areas
+        
+        ### Model Details
 
         This model is inspired by canonical microcircuitry described in Douglas and Martin (2004) and empirical data from rodent barrel cortex studies (Lefort et al., 2009). Neurons are modeled with leaky 
         [integrate-and-fire dynamics](https://docs.simbrain.net/docs/network/neurons/integrateAndFire.html#integrate-and-fire), and [synapses](https://docs.simbrain.net/docs/network/synapses/) using 
@@ -238,7 +279,7 @@ val corticalLayers = newSim {
 
         The simulation uses [sparse connectivity](https://docs.simbrain.net/docs/network/connections/sparse.html) with varying synaptic strengths and delays to reflect realistic cortical connectivity. 
         [Excitatory and inhibitory](https://docs.simbrain.net/docs/network/networkDialogs.html#excitatory--inhibitory-ratio) neuron populations are assigned according to experimentally observed ratios 
-        (~`20%` inhibitory neurons).
+        (~`20%` inhibitory neurons). Connection densities between layers are based on the empirical data shown above.
 
         # What to Do
 
@@ -260,11 +301,13 @@ val corticalLayers = newSim {
 
         # Credits
 
+        [John Beggs](http://www.beggslab.com/about-john.html)
+
         Elijah Olson
 
-        [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
-
         Zoë Tosi
+
+        [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
   
         """.trimIndent()
     )

@@ -167,6 +167,34 @@ addSidebarInfo("""
 
 Supports markdown, LaTeX math, code blocks.
 
+### Adding Images to Documentation
+
+Images can be embedded in sidebar documentation using the `//localfiles/` path prefix:
+
+1. Create a subdirectory in `simulations/images/` for your simulation (e.g., `simulations/images/mySimulation/`)
+2. Place your image files in this directory
+3. Reference images in markdown using either:
+   - Standard markdown: `![Alt text](//localfiles/simulations/images/mySimulation/image.png)`
+   - HTML with size control: `<img src="//localfiles/simulations/images/mySimulation/image.png" width="400" alt="Alt text" />`
+
+**Example:**
+
+```kotlin
+addSidebarInfo("""
+    # My Simulation
+    
+    Here's a diagram showing the structure:
+    
+    <img src="//localfiles/simulations/images/mySimulation/diagram.png" width="400" alt="Network structure" />
+    
+    The image above illustrates...
+""")
+```
+
+Use HTML `<img>` tags with `width` attribute to control display size without modifying the original image files.
+
+See `irisSim.kt` or `CorticalLayers.kt` for complete examples.
+
 ## Testing
 
 **From GUI:** Run Simbrain, navigate to `Simulations` menu

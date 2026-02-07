@@ -1178,10 +1178,36 @@ object SimbrainDesktop {
      * Reposition all the windows. Useful when windows get resized and can't be "recaptured".
      */
     suspend fun repositionAllWindows() {
-        // TODO: Do this for non-component internal frames as well?
         var i = 0
-        for (component in workspaceComponentDesktopComponentMap.keys) {
-            positionComponent(i++, workspaceComponentDesktopComponentMap.get(component))
+        for (frame in desktopPane.allFrames) {
+            if (frame is JInternalFrame) {
+                positionFrame(i++, frame)
+            }
+        }
+    }
+
+    private fun positionFrame(positionIndex: Int, frame: JInternalFrame) {
+        if (positionIndex == 0) {
+            frame.setBounds(
+                DEFAULT_WINDOW_OFFSET,
+                DEFAULT_WINDOW_OFFSET,
+                frame.width,
+                frame.height
+            )
+        } else {
+            val xMax = desktopPane.width - frame.width
+            val yMax = desktopPane.height - frame.height
+            frame.setBounds(
+                ((positionIndex + 1) * DEFAULT_WINDOW_OFFSET % xMax).toInt(),
+                ((positionIndex + 1) * DEFAULT_WINDOW_OFFSET % yMax).toInt(),
+                frame.width,
+                frame.height
+            )
+            try {
+                frame.isSelected = true
+            } catch (e: PropertyVetoException) {
+                e.printStackTrace()
+            }
         }
     }
 

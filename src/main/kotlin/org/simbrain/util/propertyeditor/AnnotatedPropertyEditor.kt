@@ -6,9 +6,7 @@ import org.simbrain.util.invokeLegacySetter
 import org.simbrain.util.swingInvokeLater
 import smile.math.matrix.Matrix
 import java.awt.Color
-import javax.swing.JPanel
-import javax.swing.JTabbedPane
-import javax.swing.SwingUtilities
+import javax.swing.*
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.full.allSuperclasses
 import kotlin.reflect.full.declaredMemberProperties
@@ -143,7 +141,7 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
             }
         }.toMap()
 
-    val mainPanel = if (labelledItemPanelsByTab.size == 1) {
+    val mainPanel: JComponent = if (labelledItemPanelsByTab.size == 1) {
         labelledItemPanelsByTab.values.first()
     } else {
         JTabbedPane().also {
@@ -164,7 +162,7 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
                 }
             }
         }
-    }.also { add(it) }
+    }
 
     /**
      * Returns a string describing what object or objects are being edited
@@ -308,6 +306,17 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
     }
 
     init {
+        layout = java.awt.BorderLayout()
+        
+        val scrollPane = JScrollPane(mainPanel).apply {
+            verticalScrollBarPolicy = ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED
+            horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
+            border = null
+            viewportBorder = null
+            viewport.background = mainPanel.background
+        }
+        
+        add(scrollPane, java.awt.BorderLayout.CENTER)
         refreshValues()
     }
 

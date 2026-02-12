@@ -32,9 +32,9 @@ import kotlin.random.Random
 val corticalLayers = newSim {
 
     // Location and scale params for lognormal dist of all synapse groups
-    var exlocation = 1.8
+    var exlocation = 0.0
     var exscale = 0.5
-    var inlocation = 3.6
+    var inlocation = 1.0
     var inscale = 0.5
     var neuronsPerLayer = 300
 

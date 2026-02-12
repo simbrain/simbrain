@@ -5,7 +5,12 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.Sparse
+import org.simbrain.network.learningrules.HebbianRule
 import org.simbrain.network.neurongroups.NeuronGroup
+import org.simbrain.network.spikeresponders.JumpAndDecay
+import org.simbrain.network.spikeresponders.RiseAndDecay
+import org.simbrain.network.spikeresponders.SpikeResponder
+import org.simbrain.network.updaterules.SpikingThresholdRule
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 import smile.math.matrix.Matrix
 
@@ -18,7 +23,6 @@ class SynapseGroupTestKt {
     private val sourceGroup: NeuronGroup
     private val targetGroup: NeuronGroup
 
-    // One source node, two target nodes
     init {
         network = Network()
         n1 = Neuron().apply { network.addNetworkModelAsync(this) }
@@ -26,6 +30,92 @@ class SynapseGroupTestKt {
         n3 = Neuron().apply { network.addNetworkModelAsync(this) }
         sourceGroup = NeuronGroup(listOf(n1)).apply { network.addNetworkModelAsync(this) }
         targetGroup = NeuronGroup(listOf(n2, n3)).apply { network.addNetworkModelAsync(this) }
+    }
+
+    private fun createParallelSynapses(
+        srcActivation: Double = 0.0,
+        tgtActivation: Double = 0.0,
+        strength: Double = 0.5
+    ): Pair<Synapse, Synapse> {
+        val freeSrc = Neuron().apply {
+            network.addNetworkModelAsync(this)
+            activation = srcActivation
+        }
+        val freeTgt = Neuron().apply {
+            network.addNetworkModelAsync(this)
+            activation = tgtActivation
+        }
+        val freeSynapse = Synapse(freeSrc, freeTgt).apply {
+            network.addNetworkModelAsync(this)
+            forceSetStrength(strength)
+        }
+
+        val groupSrc = Neuron().apply {
+            network.addNetworkModelAsync(this)
+            activation = srcActivation
+        }
+        val groupTgt = Neuron().apply {
+            network.addNetworkModelAsync(this)
+            activation = tgtActivation
+        }
+        val srcGroup = NeuronGroup(listOf(groupSrc)).apply { network.addNetworkModelAsync(this) }
+        val tgtGroup = NeuronGroup(listOf(groupTgt)).apply { network.addNetworkModelAsync(this) }
+        val sg = SynapseGroup(srcGroup, tgtGroup).apply { network.addNetworkModelAsync(this) }
+        val groupSynapse = sg.synapses.first().apply {
+            forceSetStrength(strength)
+        }
+
+        return freeSynapse to groupSynapse
+    }
+
+    private fun createSpikeChains(
+        spikeResponder: SpikeResponder,
+        delay: Int = 0
+    ): Pair<Neuron, Neuron> {
+        val freeInput = Neuron().apply {
+            network.addNetworkModelAsync(this)
+            clamped = true
+            activation = 1.0
+        }
+        val freeSpiker = Neuron(SpikingThresholdRule()).apply {
+            network.addNetworkModelAsync(this)
+        }
+        val freeTarget = Neuron().apply {
+            network.addNetworkModelAsync(this)
+            upperBound = 10.0
+        }
+        Synapse(freeInput, freeSpiker).apply { network.addNetworkModelAsync(this) }
+        Synapse(freeSpiker, freeTarget).apply {
+            network.addNetworkModelAsync(this)
+            this.spikeResponder = spikeResponder
+            strength = 1.0
+            this.delay = delay
+        }
+
+        val groupInput = Neuron().apply {
+            network.addNetworkModelAsync(this)
+            clamped = true
+            activation = 1.0
+        }
+        val groupSpiker = Neuron(SpikingThresholdRule()).apply {
+            network.addNetworkModelAsync(this)
+        }
+        val groupTarget = Neuron().apply {
+            network.addNetworkModelAsync(this)
+            upperBound = 10.0
+        }
+        val spikerGroup = NeuronGroup(listOf(groupSpiker)).apply { network.addNetworkModelAsync(this) }
+        val targetGroup = NeuronGroup(listOf(groupTarget)).apply { network.addNetworkModelAsync(this) }
+
+        Synapse(groupInput, groupSpiker).apply { network.addNetworkModelAsync(this) }
+        val sg = SynapseGroup(spikerGroup, targetGroup).apply { network.addNetworkModelAsync(this) }
+        sg.synapses.first().apply {
+            this.spikeResponder = spikeResponder.copy()
+            strength = 1.0
+            this.delay = delay
+        }
+
+        return freeTarget to groupTarget
     }
 
     @Test
@@ -227,6 +317,163 @@ class SynapseGroupTestKt {
         }.toSet()
 
         assertEquals(looseConnections, groupConnections)
+    }
+
+    @Test
+    fun `synapse group delays should behave identically to free synapses`() {
+        val (freeSynapse, groupSynapse) = createParallelSynapses(strength = 1.0)
+        val freeSrc = freeSynapse.source
+        val groupSrc = groupSynapse.source
+
+        freeSynapse.delay = 2
+        groupSynapse.delay = 2
+
+        listOf(1.0, 2.0, 3.0, 4.0, 5.0).forEach { value ->
+            freeSrc.activation = value
+            groupSrc.activation = value
+
+            with(network) {
+                freeSynapse.updatePSR()
+                groupSynapse.updatePSR()
+            }
+
+            assertEquals(freeSynapse.output, groupSynapse.output, 0.001)
+        }
+    }
+
+    @Test
+    fun `synapse group clear should reset delay manager like free`() {
+        val (freeSynapse, groupSynapse) = createParallelSynapses(srcActivation = 5.0, strength = 1.0)
+
+        freeSynapse.delay = 2
+        groupSynapse.delay = 2
+
+        with(network) {
+            freeSynapse.updatePSR()
+            groupSynapse.updatePSR()
+            freeSynapse.updatePSR()
+            groupSynapse.updatePSR()
+        }
+
+        freeSynapse.clear()
+        groupSynapse.clear()
+
+        with(network) {
+            freeSynapse.updatePSR()
+            groupSynapse.updatePSR()
+        }
+
+        assertEquals(0.0, groupSynapse.output, 0.001)
+        assertEquals(freeSynapse.output, groupSynapse.output, 0.001)
+    }
+
+    @Test
+    fun `synapse group spike responders should behave identically to free`() {
+        val (freeTarget, groupTarget) = createSpikeChains(JumpAndDecay())
+
+        repeat(5) { iteration ->
+            network.update()
+            assertEquals(freeTarget.activation, groupTarget.activation, 0.001,
+                "Iteration $iteration: expected ${freeTarget.activation}, got ${groupTarget.activation}")
+        }
+    }
+
+    @Test
+    fun `synapse group learning rules should update identically to free`() {
+        val (freeSynapse, groupSynapse) = createParallelSynapses(
+            srcActivation = 0.5,
+            tgtActivation = 0.8,
+            strength = 0.5
+        )
+
+        freeSynapse.learningRule = HebbianRule()
+        groupSynapse.learningRule = HebbianRule()
+
+        repeat(5) {
+            with(network) {
+                freeSynapse.learningRule.apply(freeSynapse, freeSynapse.learningRuleData)
+                groupSynapse.learningRule.apply(groupSynapse, groupSynapse.learningRuleData)
+            }
+            assertEquals(freeSynapse.strength, groupSynapse.strength, 0.001)
+        }
+    }
+
+    @Test
+    fun `synapse group clamping should prevent updates like free`() {
+        val (freeSynapse, groupSynapse) = createParallelSynapses(
+            srcActivation = 0.5,
+            tgtActivation = 0.8,
+            strength = 0.5
+        )
+
+        freeSynapse.learningRule = HebbianRule()
+        freeSynapse.clamped = true
+        groupSynapse.learningRule = HebbianRule()
+        groupSynapse.clamped = true
+
+        repeat(5) {
+            network.update()
+        }
+
+        assertEquals(0.5, freeSynapse.strength, 0.001)
+        assertEquals(0.5, groupSynapse.strength, 0.001)
+    }
+
+    @Test
+    fun `synapse group with different spike responders should match free`() {
+        val (freeTarget, groupTarget) = createSpikeChains(RiseAndDecay())
+
+        repeat(8) { iteration ->
+            network.update()
+            assertEquals(freeTarget.activation, groupTarget.activation, 0.001,
+                "Iteration $iteration: expected ${freeTarget.activation}, got ${groupTarget.activation}")
+        }
+    }
+
+    @Test
+    fun `synapse group with delays and spike responders should match free`() {
+        val (freeTarget, groupTarget) = createSpikeChains(JumpAndDecay(), delay = 2)
+
+        repeat(10) { iteration ->
+            network.update()
+            assertEquals(freeTarget.activation, groupTarget.activation, 0.001,
+                "Iteration $iteration: expected ${freeTarget.activation}, got ${groupTarget.activation}")
+        }
+    }
+
+    @Test
+    fun `synapse group polarity constraints should match free`() {
+        val (freeSynapse, groupSynapse) = createParallelSynapses()
+
+        freeSynapse.source.polarity = org.simbrain.util.SimbrainConstants.Polarity.EXCITATORY
+        groupSynapse.source.polarity = org.simbrain.util.SimbrainConstants.Polarity.EXCITATORY
+
+        freeSynapse.strength = -5.0
+        groupSynapse.strength = -5.0
+
+        assertTrue(freeSynapse.strength >= 0.0)
+        assertTrue(groupSynapse.strength >= 0.0)
+        assertEquals(freeSynapse.strength, groupSynapse.strength, 0.001)
+    }
+
+    @Test
+    fun `synapse group increment should work identically to free`() {
+        val (freeSynapse, groupSynapse) = createParallelSynapses(strength = 1.0)
+
+        freeSynapse.increment = 0.5
+        groupSynapse.increment = 0.5
+
+        freeSynapse.increment()
+        groupSynapse.increment()
+
+        assertEquals(1.5, freeSynapse.strength, 0.001)
+        assertEquals(1.5, groupSynapse.strength, 0.001)
+
+        freeSynapse.decrement()
+        groupSynapse.decrement()
+
+        assertEquals(1.0, freeSynapse.strength, 0.001)
+        assertEquals(1.0, groupSynapse.strength, 0.001)
     }
 
 }

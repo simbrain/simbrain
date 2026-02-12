@@ -14,15 +14,7 @@ class IntegrateAndFireTest {
         val intFire = IntegrateAndFireRule()
         val n = Neuron(intFire)
         net.addNetworkModelAsync(n)
-        // S3 defaults lastSpikeTime=0.0, so neuron can't spike until time > refractoryPeriod.
-        // To allow immediate spiking in tests, set lastSpikeTime to large negative value.
-        (n.dataHolder as org.simbrain.network.util.SpikingScalarData).lastSpikeTime = -1000.0
-    }
-
-    // TODO: Test threshold, time constant, resistance
-
-    @Test
-    fun `stays at resting potential when resistance is 0`() {
+        
         intFire.resistance = 0.0
         n.activation = intFire.restingPotential
         repeat(10) {

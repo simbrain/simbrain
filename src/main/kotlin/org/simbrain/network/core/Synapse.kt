@@ -370,7 +370,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
      */
     override fun increment() {
         val newStrength = _strength + increment
-        if (newStrength < upperBound) {
+        if (newStrength <= upperBound) {
             forceSetStrength(newStrength)
         }
     }
@@ -380,7 +380,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
      */
     override fun decrement() {
         val newStrength = _strength - increment
-        if (newStrength > lowerBound) {
+        if (newStrength >= lowerBound) {
             forceSetStrength(newStrength)
         }
     }
@@ -464,13 +464,13 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
     /**
      * Enqueeu.
      *
-     * @param val Value to enqueu
+     * @param val Value to enqueu, a psr
      */
-    private fun enqueue(`val`: Double) {
+    private fun enqueue(psr: Double) {
         if (dlyPtr == 0) {
-            delayManager!![delay - 1] = `val`
+            delayManager!![delay - 1] = psr
         } else {
-            delayManager!![dlyPtr - 1] = `val`
+            delayManager!![dlyPtr - 1] = psr
         }
     }
 

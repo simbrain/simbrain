@@ -388,9 +388,8 @@ class ShortTermPlasticityTest {
         val stp = ShortTermPlasticity()
         val matrixData = stp.createMatrixData(2, 3) as STPMatrixData
         
-        val lastSpikeTimes = doubleArrayOf(0.0, 0.5, 1.0)
-        
-        matrixData.update(1.0, lastSpikeTimes, 0.5, 100.0, 200.0)
+        matrixData.updateSingle(0, 0, 1.0, 0.5, 100.0, 200.0)
+        matrixData.updateSingle(1, 2, 1.5, 0.5, 100.0, 200.0)
         
         assert(matrixData.u[0, 0] != 0.0 || matrixData.R[0, 0] != 0.0)
     }

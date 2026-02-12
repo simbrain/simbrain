@@ -13,7 +13,6 @@ import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.EmptyScalarData
 import org.simbrain.network.util.MatrixDataHolder
 import org.simbrain.network.util.ScalarDataHolder
-import org.simbrain.util.Utils
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.stats.ProbabilityDistribution
 import smile.math.matrix.Matrix
@@ -172,6 +171,14 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
     open fun getToolTipText(neuron: Neuron): String {
         return neuron.toString()
     }
+
+    /**
+     * Whether the neuron is currently in a refractory state where synaptic
+     * input should be suppressed. Default is false. Override in rules like
+     * IntegrateAndFireRule where synaptic current is zeroed during refractory.
+     */
+    context(Network)
+    open fun isInRefractory(data: @UnsafeVariance DS): Boolean = false
 
     open val isSpikingRule: Boolean
         get() = false

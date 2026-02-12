@@ -256,8 +256,10 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
 
     context(Network)
     override fun accumulateInputs() {
-        fanIn.forEach { it.updatePSR() }
-        addInputValue(weightedInputs)
+        if (!updateRule.isInRefractory(dataHolder)) {
+            fanIn.forEach { it.updatePSR() }
+            addInputValue(weightedInputs)
+        }
         addInputValue(bias)
     }
 
@@ -268,8 +270,10 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
      */
     context(Network)
     fun accumulateFanInInputs() {
-        fanIn.forEach { it.updatePSR() }
-        addInputValue(weightedInputs)
+        if (!updateRule.isInRefractory(dataHolder)) {
+            fanIn.forEach { it.updatePSR() }
+            addInputValue(weightedInputs)
+        }
     }
 
     context(Network)
@@ -356,7 +360,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
         get() {
             var wtdSum = 0.0
             for (synapse in fanIn) {
-                wtdSum += synapse.psr
+                wtdSum += synapse.output
             }
             return wtdSum
         }
@@ -369,7 +373,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
     val excitatoryInputs: Double
         get() = fanIn.stream()
             .filter { s: Synapse -> s.strength > 0.0 }
-            .map { obj: Synapse -> obj.psr }
+            .map { obj: Synapse -> obj.output }
             .reduce { a: Double, b: Double -> java.lang.Double.sum(a, b) }.orElse(0.0)
 
     /**
@@ -379,7 +383,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
      */
     val inhibitoryInputs: Double
         get() = fanIn.filter { it.strength < 0.0 }
-            .sumOf { it.psr }
+            .sumOf { it.output }
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
         activation = updateRule.getRandomValue(randomizer)

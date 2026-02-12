@@ -300,15 +300,25 @@ class ShortTermPlasticityTest {
     fun `short term plasticity data update mechanism`() {
         val stp = ShortTermPlasticity()
         val dataHolder = stp.createResponderData() as STPScalarData
-        
-        val initialU = dataHolder.u
-        val initialR = dataHolder.R
-        
-        // Update with some time progression
-        dataHolder.update(1.0, 0.0, 0.5, 100.0, 200.0)
-        
-        // Values should have changed
-        assert(dataHolder.u != initialU || dataHolder.R != initialR)
+
+        // First spike at time 0 - this sets up lastSpikeTime
+        dataHolder.update(0.0, 0.5, 100.0, 200.0)
+
+        val uAfterFirstSpike = dataHolder.u
+        val rAfterFirstSpike = dataHolder.R
+
+        // Second spike at time 50 - now ISI is calculated correctly
+        dataHolder.update(50.0, 0.5, 100.0, 200.0)
+
+        // Values should have changed due to inter-spike interval effects
+        assert(dataHolder.u != uAfterFirstSpike || dataHolder.R != rAfterFirstSpike) {
+            "u and R should change between spikes due to facilitation/depression dynamics"
+        }
+
+        // Also verify lastSpikeTime is updated correctly
+        assert(dataHolder.lastSpikeTime == 50.0) {
+            "lastSpikeTime should be updated to the time of the most recent spike"
+        }
     }
 
     @Test

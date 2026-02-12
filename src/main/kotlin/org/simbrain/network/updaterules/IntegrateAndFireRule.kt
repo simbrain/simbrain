@@ -6,7 +6,6 @@ import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.network.util.SpikingScalarData
 import org.simbrain.util.UserParameter
 import org.simbrain.util.Utils.round
-import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 
@@ -94,6 +93,15 @@ open class IntegrateAndFireRule : SpikingNeuronUpdateRule<SpikingScalarData, Spi
     var refractoryPeriod = 3.0
 
     /**
+     * In S3, IntegrateAndFireRule zeroes synaptic current during refractory,
+     * meaning getSynapticInput() is never called and spike responders don't update.
+     */
+    context(Network)
+    override fun isInRefractory(data: SpikingScalarData): Boolean {
+        return time < data.lastSpikeTime + refractoryPeriod
+    }
+
+    /**
      * Noise generator.
      */
     override var noiseGenerator: ProbabilityDistribution = UniformRealDistribution()
@@ -171,11 +179,14 @@ open class IntegrateAndFireRule : SpikingNeuronUpdateRule<SpikingScalarData, Spi
         val dVm =
             timeStep * (-(memPotential - restingPotential) + resistance * synCurrent) / timeConstant
 
-        return if (memPotential >= threshold && t > lastSpikeTime + refractoryPeriod) {
+        // Update voltage FIRST, then check threshold (matches S3 behavior)
+        val newMemPotential = memPotential + dVm
+
+        return if (newMemPotential >= threshold && t > lastSpikeTime + refractoryPeriod) {
             // println("Spike!")
             Pair(true, resetPotential)
         } else {
-            Pair(false, memPotential + dVm)
+            Pair(false, newMemPotential)
         }
 
     }

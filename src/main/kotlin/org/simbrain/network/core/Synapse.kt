@@ -335,13 +335,21 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
             spikeResponder.apply(this, spikeResponderData)
         }
 
-        // Handle delays
+        // Handle delays: enqueue fresh psr for future delivery, dequeue old value.
+        // psr field stays fresh for the spike responder to use on the next iteration
+        // (matching S3's calcPSR() semantics). Use [output] for neuron input.
         if (delay != 0) {
             dlyVal = dequeue()
             enqueue(psr)
-            psr = dlyVal
         }
     }
+
+    /**
+     * The output of this synapse for neuron input accumulation, accounting for delays.
+     * When delay > 0, returns the delayed value while [psr] stays fresh for the spike responder.
+     */
+    val output: Double
+        get() = if (delay != 0) dlyVal else psr
 
     val type: String
         /**

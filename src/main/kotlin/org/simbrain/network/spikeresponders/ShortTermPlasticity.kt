@@ -6,9 +6,7 @@ import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.UserParameter
-import org.simbrain.util.applyFunctionInPlace
 import org.simbrain.util.propertyeditor.GuiEditable
-import org.simbrain.util.setValuesInPlace
 import org.simbrain.util.stats.distributions.NormalDistribution
 import smile.math.matrix.Matrix
 import kotlin.math.exp
@@ -106,9 +104,11 @@ class ShortTermPlasticity : SpikeResponder() {
     context(Network)
     override fun apply(synapse: Synapse, responderData: ScalarDataHolder) {
         val udfData = responderData as STPScalarData
-        udfData.update(time, synapse.source.lastSpikeTime, U, D, F)
-        val jumpHeight = udfData.R * synapse.strength * udfData.u
         val spiked = synapse.source.isSpike && probabilisticSpikeCheck()
+        if (spiked) {
+            udfData.update(time, U, D, F)
+        }
+        val jumpHeight = udfData.R * synapse.strength * udfData.u
         synapse.psr = when (val sr = spikeResponderLocal) {
             is JumpAndDecay -> sr.jumpAndDecay(spiked, synapse.psr, jumpHeight, timeStep)
             else -> throw IllegalStateException("STP can only be used with JumpAndDecay")
@@ -123,11 +123,13 @@ class ShortTermPlasticity : SpikeResponder() {
         val stpData = responderData as STPMatrixData
         val spikeData = na.dataHolder as SpikingMatrixData
         if (na.updateRule.isSpikingRule) {
-            stpData.update(time, spikeData.lastSpikeTimes, U, D, F)
             for (i in 0 until wm.weights.nrow()) {
                 for (j in 0 until wm.weights.ncol()) {
-                    val jumpHeight = stpData.R[i, j] * wm.weights[i, j] * stpData.u[i, j]
                     val spiked = spikeData.spikes[j] && probabilisticSpikeCheck()
+                    if (spiked) {
+                        stpData.updateSingle(i, j, time, U, D, F)
+                    }
+                    val jumpHeight = stpData.R[i, j] * wm.weights[i, j] * stpData.u[i, j]
                     wm.psrMatrix.set(
                         i, j, when (val sr = spikeResponderLocal) {
                             is JumpAndDecay -> sr.jumpAndDecay(spiked, wm.psrMatrix[i, j], jumpHeight, timeStep)
@@ -136,18 +138,6 @@ class ShortTermPlasticity : SpikeResponder() {
                 }
             }
         }
-    }
-
-    context(Network)
-    private fun shortTermPlasticity(
-        lastSpikeTime: Double,
-        u: Double,
-        R: Double,
-    ): Pair<Double, Double> {
-        val ISI = lastSpikeTime - time
-        val newU = U + u * (1 - U) * exp(ISI / F)
-        val newR = 1 + (R - u * R - 1) * exp(ISI / D)
-        return Pair(newU, newR)
     }
 
     override fun createResponderData(): STPScalarData {
@@ -175,7 +165,7 @@ class ShortTermPlasticity : SpikeResponder() {
      */
     fun init(s: Synapse) {
         val minValue = 0.0000001
-        
+
         when {
             s.source.polarity === Polarity.EXCITATORY
                     && s.target.polarity === Polarity.EXCITATORY -> {
@@ -219,27 +209,37 @@ class STPScalarData(
     @UserParameter(label = "U", description = "Use/Facilitation variable", order = 1)
     var u: Double,
     @UserParameter(label = "R", description = "Depression variable", order = 2)
-    var R: Double
+    var R: Double,
+    /**
+     * Time of the last spike processed by this responder.
+     * Initialized to 0.0 to match S3 UDF behavior, where Java default is 0.0.
+     * This affects the first spike's ISI calculation: exp((0.0 - time)/F) ≈ 1
+     * instead of exp(-∞) = 0.
+     */
+    var lastSpikeTime: Double = 0.0
 ) : ScalarDataHolder {
     override fun copy(): STPScalarData {
-        return STPScalarData(u, R)
+        return STPScalarData(u, R, lastSpikeTime)
     }
 
     fun update(
         time: Double,
-        lastSpikeTime: Double,
         U: Double,
         D: Double,
         F: Double,
     ) {
+        // ISI is the interval from the PREVIOUS spike to the CURRENT spike
         val ISI = lastSpikeTime - time
         u = U + u * (1 - U) * exp(ISI / F)
         R = 1 + (R - u * R - 1) * exp(ISI / D)
+        // Update lastSpikeTime AFTER the calculation (like S3 UDF)
+        lastSpikeTime = time
     }
 
     override fun clear() {
         u = 0.0
         R = 0.0
+        lastSpikeTime = 0.0
     }
 }
 
@@ -248,35 +248,40 @@ class STPMatrixData(val rows: Int, val cols: Int): MatrixDataHolder  {
     var u = Matrix(rows, cols)
     @UserParameter(label = "R", description = "Depression variable", order = 2)
     var R = Matrix(rows, cols)
+    /**
+     * Time of the last spike processed for each synapse (i,j).
+     * Initialized to 0.0 to match S3 UDF behavior, where Java default is 0.0.
+     * This affects the first spike's ISI calculation.
+     */
+    var lastSpikeTimes = Matrix(rows, cols).apply { fill(0.0) }
 
-    fun update(
+    fun updateSingle(
+        i: Int,
+        j: Int,
         time: Double,
-        lastSpikeTime: DoubleArray,
         U: Double,
         D: Double,
         F: Double,
     ) {
-        val ISIArray = lastSpikeTime.applyFunctionInPlace { it - time }
-        u.setValuesInPlace { i, j ->
-            val ISI = ISIArray[j]
-            val u = this[i, j]
-            U + u * (1 - U) * exp(ISI / F)
-        }
-        R.setValuesInPlace { i, j ->
-            val ISI = ISIArray[j]
-            val R = this[i, j]
-            val u = u[i, j]
-            1 + (R - u * R - 1) * exp(ISI / D)
-        }
+        // ISI is the interval from the PREVIOUS spike to the CURRENT spike
+        val ISI = lastSpikeTimes[i, j] - time
+        val oldU = u[i, j]
+        val oldR = R[i, j]
+        u[i, j] = U + oldU * (1 - U) * exp(ISI / F)
+        R[i, j] = 1 + (oldR - u[i, j] * oldR - 1) * exp(ISI / D)
+        // Update lastSpikeTime AFTER the calculation (like S3 UDF)
+        lastSpikeTimes[i, j] = time
     }
 
     override fun copy() = STPMatrixData(rows, cols).also {
         it.u = u.clone()
         it.R = R.clone()
+        it.lastSpikeTimes = lastSpikeTimes.clone()
     }
 
     override fun clear() {
         u.fill(0.0)
         R.fill(0.0)
+        lastSpikeTimes.fill(0.0)
     }
 }

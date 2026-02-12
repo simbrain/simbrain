@@ -14,7 +14,15 @@ class IntegrateAndFireTest {
         val intFire = IntegrateAndFireRule()
         val n = Neuron(intFire)
         net.addNetworkModelAsync(n)
-        
+        // S3 defaults lastSpikeTime=0.0, so neuron can't spike until time > refractoryPeriod.
+        // To allow immediate spiking in tests, set lastSpikeTime to large negative value.
+        (n.dataHolder as org.simbrain.network.util.SpikingScalarData).lastSpikeTime = -1000.0
+    }
+
+    // TODO: Test threshold, time constant, resistance
+
+    @Test
+    fun `stays at resting potential when resistance is 0`() {
         intFire.resistance = 0.0
         n.activation = intFire.restingPotential
         repeat(10) {
@@ -29,7 +37,7 @@ class IntegrateAndFireTest {
         val intFire = IntegrateAndFireRule()
         val n = Neuron(intFire)
         net.addNetworkModelAsync(n)
-        
+
         intFire.backgroundCurrent = 1000.0
         with(net) {
             update()
@@ -45,7 +53,7 @@ class IntegrateAndFireTest {
         val intFire = IntegrateAndFireRule()
         val n = Neuron(intFire)
         net.addNetworkModelAsync(n)
-        
+
         intFire.backgroundCurrent = 1000.0
         net.update()
         assertEquals(intFire.resetPotential, n.activation)
@@ -57,7 +65,7 @@ class IntegrateAndFireTest {
         val intFire = IntegrateAndFireRule()
         val n = Neuron(intFire)
         net.addNetworkModelAsync(n)
-        
+
         intFire.backgroundCurrent = 0.0
         intFire.timeConstant = 1.0
         repeat(100) {
@@ -72,12 +80,12 @@ class IntegrateAndFireTest {
         val intFire = IntegrateAndFireRule()
         val n = Neuron(intFire)
         net.addNetworkModelAsync(n)
-        
+
         intFire.refractoryPeriod = 5.0
         intFire.backgroundCurrent = 1000.0
         intFire.timeConstant = 1.0
         net.timeStep = 1.0
-        
+
         with(net) {
             var lastSpikeTime = -100.0
             repeat(50) { iteration ->
@@ -98,11 +106,11 @@ class IntegrateAndFireTest {
         val intFire = IntegrateAndFireRule()
         val n = Neuron(intFire)
         net.addNetworkModelAsync(n)
-        
+
         intFire.threshold = -45.0
         intFire.backgroundCurrent = 1000.0
         n.activation = -46.0
-        
+
         with(net) {
             update()
             assertTrue(n.isSpike)
@@ -116,20 +124,20 @@ class IntegrateAndFireTest {
         val intFire1 = IntegrateAndFireRule()
         val n1 = Neuron(intFire1)
         net1.addNetworkModelAsync(n1)
-        
+
         val net2 = Network()
         val intFire2 = IntegrateAndFireRule()
         val n2 = Neuron(intFire2)
         net2.addNetworkModelAsync(n2)
-        
+
         intFire1.timeConstant = 10.0
         intFire1.backgroundCurrent = 0.0
         n1.activation = -60.0
-        
+
         intFire2.timeConstant = 100.0
         intFire2.backgroundCurrent = 0.0
         n2.activation = -60.0
-        
+
         with(net1) {
             repeat(10) {
                 update()
@@ -140,7 +148,7 @@ class IntegrateAndFireTest {
                 update()
             }
         }
-        
+
         val decay1 = kotlin.math.abs(n1.activation - intFire1.restingPotential)
         val decay2 = kotlin.math.abs(n2.activation - intFire2.restingPotential)
         assertTrue(decay1 < decay2, "Smaller time constant should decay faster")
@@ -152,27 +160,27 @@ class IntegrateAndFireTest {
         val intFire1 = IntegrateAndFireRule()
         val n1 = Neuron(intFire1)
         net1.addNetworkModelAsync(n1)
-        
+
         val net2 = Network()
         val intFire2 = IntegrateAndFireRule()
         val n2 = Neuron(intFire2)
         net2.addNetworkModelAsync(n2)
-        
+
         intFire1.resistance = 1.0
         intFire1.backgroundCurrent = 10.0
         n1.activation = -70.0
-        
+
         intFire2.resistance = 5.0
         intFire2.backgroundCurrent = 10.0
         n2.activation = -70.0
-        
+
         with(net1) {
             update()
         }
         with(net2) {
             update()
         }
-        
+
         val change1 = n1.activation - (-70.0)
         val change2 = n2.activation - (-70.0)
         assertTrue(change2 > change1, "Higher resistance should amplify current effect")
@@ -184,15 +192,15 @@ class IntegrateAndFireTest {
         val intFire = IntegrateAndFireRule()
         val n = Neuron(intFire)
         net.addNetworkModelAsync(n)
-        
+
         intFire.backgroundCurrent = 10000.0
         intFire.refractoryPeriod = 1.0
-        
+
         repeat(100) {
             net.update()
             assertFalse(n.activation.isNaN(), "Activation should not be NaN at iteration $it")
             assertFalse(n.activation.isInfinite(), "Activation should not be infinite at iteration $it")
-            assertTrue(n.activation >= intFire.restingPotential - 50.0, 
+            assertTrue(n.activation >= intFire.restingPotential - 50.0,
                 "Activation should not go far below resting potential, got ${n.activation}")
         }
     }
@@ -203,9 +211,9 @@ class IntegrateAndFireTest {
         val intFire = IntegrateAndFireRule()
         val n = Neuron(intFire)
         net.addNetworkModelAsync(n)
-        
+
         intFire.backgroundCurrent = -10000.0
-        
+
         repeat(100) {
             net.update()
             assertFalse(n.activation.isNaN(), "Activation should not be NaN at iteration $it")
@@ -219,10 +227,10 @@ class IntegrateAndFireTest {
         val intFire = IntegrateAndFireRule()
         val n = Neuron(intFire)
         net.addNetworkModelAsync(n)
-        
+
         intFire.timeConstant = 1.0
         intFire.backgroundCurrent = 50.0
-        
+
         repeat(100) {
             net.update()
             assertFalse(n.activation.isNaN(), "Activation should not be NaN with small time constant")
@@ -236,10 +244,10 @@ class IntegrateAndFireTest {
         val intFire = IntegrateAndFireRule()
         val n = Neuron(intFire)
         net.addNetworkModelAsync(n)
-        
+
         intFire.timeConstant = 10000.0
         intFire.backgroundCurrent = 50.0
-        
+
         repeat(100) {
             net.update()
             assertFalse(n.activation.isNaN(), "Activation should not be NaN with large time constant")
@@ -253,14 +261,14 @@ class IntegrateAndFireTest {
         val intFire = IntegrateAndFireRule()
         val n = Neuron(intFire)
         net.addNetworkModelAsync(n)
-        
+
         intFire.timeConstant = 0.0
         intFire.backgroundCurrent = 10.0
-        
+
         with(net) {
             update()
         }
-        assertTrue(n.activation.isInfinite() || n.activation.isNaN(), 
+        assertTrue(n.activation.isInfinite() || n.activation.isNaN(),
             "Zero time constant creates numerical instability (expected behavior)")
     }
 
@@ -270,11 +278,11 @@ class IntegrateAndFireTest {
         val intFire = IntegrateAndFireRule()
         val n = Neuron(intFire)
         net.addNetworkModelAsync(n)
-        
+
         net.timeStep = 100.0
         intFire.backgroundCurrent = 50.0
         intFire.refractoryPeriod = 10.0
-        
+
         repeat(50) {
             net.update()
             assertFalse(n.activation.isNaN(), "Activation should not be NaN with large timestep")
@@ -288,16 +296,16 @@ class IntegrateAndFireTest {
         val intFire = IntegrateAndFireRule()
         val n = Neuron(intFire)
         net.addNetworkModelAsync(n)
-        
+
         intFire.refractoryPeriod = 10.0
         intFire.backgroundCurrent = 1000.0
         net.timeStep = 1.0
-        
+
         with(net) {
             update()
             assertTrue(n.isSpike)
             val afterSpikeActivation = n.activation
-            
+
             repeat(9) {
                 update()
                 assertFalse(n.isSpike, "Should not spike during refractory period at time ${time}")
@@ -311,17 +319,17 @@ class IntegrateAndFireTest {
         val intFire = IntegrateAndFireRule()
         val n = Neuron(intFire)
         net.addNetworkModelAsync(n)
-        
+
         intFire.backgroundCurrent = 100000.0
         intFire.resetPotential = -70.0
         intFire.refractoryPeriod = 10.0
         net.timeStep = 1.0
-        
+
         n.addInputValue(intFire.threshold + 100.0)
         with(net) {
             update()
             assertTrue(n.isSpike, "Should spike when above threshold")
-            assertEquals(intFire.resetPotential, n.activation, 0.001, 
+            assertEquals(intFire.resetPotential, n.activation, 0.001,
                 "Should reset to exactly reset potential, got ${n.activation}")
         }
     }
@@ -332,16 +340,16 @@ class IntegrateAndFireTest {
         val intFire = IntegrateAndFireRule()
         val n = Neuron(intFire)
         net.addNetworkModelAsync(n)
-        
+
         intFire.backgroundCurrent = 50.0
         intFire.threshold = -50.0
         intFire.refractoryPeriod = 2.0
-        
+
         with(net) {
             repeat(200) {
                 update()
                 if (!n.isSpike) {
-                    assertTrue(n.activation <= intFire.threshold, 
+                    assertTrue(n.activation <= intFire.threshold,
                         "Activation should not exceed threshold without spiking, got ${n.activation}")
                 }
             }
@@ -354,25 +362,25 @@ class IntegrateAndFireTest {
         val intFire = IntegrateAndFireRule()
         val n = Neuron(intFire)
         net.addNetworkModelAsync(n)
-        
+
         intFire.backgroundCurrent = 0.0
         intFire.timeConstant = 30.0
         intFire.resistance = 1.0
         n.activation = -60.0
         val initialActivation = n.activation
         val dt = net.timeStep
-        
+
         with(net) {
             repeat(10) {
                 update()
             }
         }
-        
+
         val totalTime = 10 * dt
-        val expectedActivation = intFire.restingPotential + 
+        val expectedActivation = intFire.restingPotential +
             (initialActivation - intFire.restingPotential) * exp(-totalTime / intFire.timeConstant)
-        
-        assertEquals(expectedActivation, n.activation, 0.5, 
+
+        assertEquals(expectedActivation, n.activation, 0.5,
             "Should follow exponential decay: expected $expectedActivation, got ${n.activation}")
     }
 
@@ -382,11 +390,11 @@ class IntegrateAndFireTest {
         val intFire = IntegrateAndFireRule()
         val n = Neuron(intFire)
         net.addNetworkModelAsync(n)
-        
+
         intFire.threshold = -50.0
         n.activation = -50.001
         intFire.backgroundCurrent = 0.0
-        
+
         with(net) {
             update()
             assertFalse(n.isSpike, "Should not spike when just below threshold")
@@ -399,7 +407,7 @@ class IntegrateAndFireTest {
         val intFire = IntegrateAndFireRule()
         val n = Neuron(intFire)
         net.addNetworkModelAsync(n)
-        
+
         intFire.threshold = -50.0
         intFire.restingPotential = -70.0
         intFire.timeConstant = 30.0
@@ -407,7 +415,7 @@ class IntegrateAndFireTest {
         n.activation = -51.0
         intFire.backgroundCurrent = 100.0
         net.timeStep = 0.5
-        
+
         with(net) {
             update()
             assertTrue(n.isSpike, "Should spike when crossing threshold, activation was ${n.activation}")
@@ -420,32 +428,32 @@ class IntegrateAndFireTest {
         val intFire1 = IntegrateAndFireRule()
         val n1 = Neuron(intFire1)
         net1.addNetworkModelAsync(n1)
-        
+
         val net2 = Network()
         val intFire2 = IntegrateAndFireRule()
         val n2 = Neuron(intFire2)
         net2.addNetworkModelAsync(n2)
-        
+
         intFire1.resistance = 2.0
         intFire1.backgroundCurrent = 5.0
         intFire1.timeConstant = 10.0
         n1.activation = -70.0
-        
+
         intFire2.resistance = 5.0
         intFire2.backgroundCurrent = 2.0
         intFire2.timeConstant = 10.0
         n2.activation = -70.0
-        
+
         with(net1) {
             update()
         }
         with(net2) {
             update()
         }
-        
+
         val change1 = n1.activation - (-70.0)
         val change2 = n2.activation - (-70.0)
-        assertEquals(change1, change2, 0.001, 
+        assertEquals(change1, change2, 0.001,
             "R*I products should produce same effect: ${change1} vs ${change2}")
     }
 

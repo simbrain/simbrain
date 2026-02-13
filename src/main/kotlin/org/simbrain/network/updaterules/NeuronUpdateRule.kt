@@ -172,14 +172,6 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
         return neuron.toString()
     }
 
-    /**
-     * Whether the neuron is currently in a refractory state where synaptic
-     * input should be suppressed. Default is false. Override in rules like
-     * IntegrateAndFireRule where synaptic current is zeroed during refractory.
-     */
-    context(Network)
-    open fun isInRefractory(data: @UnsafeVariance DS): Boolean = false
-
     open val isSpikingRule: Boolean
         get() = false
 

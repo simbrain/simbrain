@@ -93,15 +93,6 @@ open class IntegrateAndFireRule : SpikingNeuronUpdateRule<SpikingScalarData, Spi
     var refractoryPeriod = 3.0
 
     /**
-     * In S3, IntegrateAndFireRule zeroes synaptic current during refractory,
-     * meaning getSynapticInput() is never called and spike responders don't update.
-     */
-    context(Network)
-    override fun isInRefractory(data: SpikingScalarData): Boolean {
-        return time < data.lastSpikeTime + refractoryPeriod
-    }
-
-    /**
      * Noise generator.
      */
     override var noiseGenerator: ProbabilityDistribution = UniformRealDistribution()

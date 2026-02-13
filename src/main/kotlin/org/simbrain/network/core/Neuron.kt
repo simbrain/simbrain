@@ -256,10 +256,8 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
 
     context(Network)
     override fun accumulateInputs() {
-        if (!updateRule.isInRefractory(dataHolder)) {
-            fanIn.forEach { it.updatePSR() }
-            addInputValue(weightedInputs)
-        }
+        fanIn.forEach { it.updatePSR() }
+        addInputValue(weightedInputs)
         addInputValue(bias)
     }
 
@@ -270,10 +268,8 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
      */
     context(Network)
     fun accumulateFanInInputs() {
-        if (!updateRule.isInRefractory(dataHolder)) {
-            fanIn.forEach { it.updatePSR() }
-            addInputValue(weightedInputs)
-        }
+        fanIn.forEach { it.updatePSR() }
+        addInputValue(weightedInputs)
     }
 
     context(Network)

@@ -35,7 +35,7 @@ class ProductRule : LinearRule() {
         var `val` = 1.0
         if (useWeights) {
             for (s in neuron.fanIn) {
-                `val` *= s.psr
+                `val` *= s.rawPSR
             }
         } else {
             for (s in neuron.fanIn) {

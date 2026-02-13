@@ -37,9 +37,9 @@ class StepResponder(
     context(Network)
     override fun apply(synapse: Synapse, responderData: ScalarDataHolder) {
         if (synapse.source.lastSpikeTime + responseDuration * timeStep >= time && probabilisticSpikeCheck()) {
-            synapse.psr = synapse.strength
+            synapse.rawPSR = synapse.strength
         } else {
-            synapse.psr = 0.0
+            synapse.rawPSR = 0.0
         }
     }
 

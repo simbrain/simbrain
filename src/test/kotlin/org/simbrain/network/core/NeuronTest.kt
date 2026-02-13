@@ -42,22 +42,22 @@ class NeuronTest {
     @Test
     fun `test excitatory inputs`() {
         s1.strength = 1.0
-        s1.psr = .5
+        s1.rawPSR = .5
         s2.strength = 1.0
-        s2.psr = 1.0
+        s2.rawPSR = 1.0
         assertEquals(1.5, n3.excitatoryInputs)
         assertEquals(0.0, n3.inhibitoryInputs)
         // Excitatory input can in principle be negative, when the synapse is excitatory, but the psr is negative
-        s2.psr = -1.0
+        s2.rawPSR = -1.0
         assertEquals(-.5, n3.excitatoryInputs)
     }
 
     @Test
     fun `test inhibitory inputs`() {
         s1.strength = -1.0
-        s1.psr = .5
+        s1.rawPSR = .5
         s2.strength = -1.0
-        s2.psr = 1.0
+        s2.rawPSR = 1.0
         assertEquals(1.5, n3.inhibitoryInputs)
         assertEquals(0.0, n3.excitatoryInputs)
     }

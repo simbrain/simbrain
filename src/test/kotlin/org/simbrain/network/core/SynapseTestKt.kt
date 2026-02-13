@@ -33,7 +33,7 @@ class SynapseTestKt {
             synapse.updatePSR()
         }
 
-        assertEquals(2.0, synapse.psr, 0.001)
+        assertEquals(2.0, synapse.rawPSR, 0.001)
     }
 
     @Test
@@ -53,12 +53,12 @@ class SynapseTestKt {
         with(network) {
             synapse.updatePSR()
         }
-        assertEquals(0.0, synapse.output, 0.001)
+        assertEquals(0.0, synapse.psr, 0.001)
 
         with(network) {
             synapse.updatePSR()
         }
-        assertEquals(5.0, synapse.output, 0.001)
+        assertEquals(5.0, synapse.psr, 0.001)
     }
 
     @Test
@@ -78,22 +78,22 @@ class SynapseTestKt {
         with(network) {
             synapse.updatePSR()
         }
-        assertEquals(0.0, synapse.output, 0.001)
+        assertEquals(0.0, synapse.psr, 0.001)
 
         with(network) {
             synapse.updatePSR()
         }
-        assertEquals(0.0, synapse.output, 0.001)
+        assertEquals(0.0, synapse.psr, 0.001)
 
         with(network) {
             synapse.updatePSR()
         }
-        assertEquals(0.0, synapse.output, 0.001)
+        assertEquals(0.0, synapse.psr, 0.001)
 
         with(network) {
             synapse.updatePSR()
         }
-        assertEquals(10.0, synapse.output, 0.001)
+        assertEquals(10.0, synapse.psr, 0.001)
     }
 
     @Test
@@ -111,27 +111,27 @@ class SynapseTestKt {
 
         source.activation = 1.0
         with(network) { synapse.updatePSR() }
-        assertEquals(0.0, synapse.output, 0.001)
+        assertEquals(0.0, synapse.psr, 0.001)
 
         source.activation = 2.0
         with(network) { synapse.updatePSR() }
-        assertEquals(0.0, synapse.output, 0.001)
+        assertEquals(0.0, synapse.psr, 0.001)
 
         source.activation = 3.0
         with(network) { synapse.updatePSR() }
-        assertEquals(0.0, synapse.output, 0.001)
+        assertEquals(0.0, synapse.psr, 0.001)
 
         source.activation = 4.0
         with(network) { synapse.updatePSR() }
-        assertEquals(1.0, synapse.output, 0.001)
+        assertEquals(1.0, synapse.psr, 0.001)
 
         source.activation = 5.0
         with(network) { synapse.updatePSR() }
-        assertEquals(2.0, synapse.output, 0.001)
+        assertEquals(2.0, synapse.psr, 0.001)
 
         source.activation = 6.0
         with(network) { synapse.updatePSR() }
-        assertEquals(3.0, synapse.output, 0.001)
+        assertEquals(3.0, synapse.psr, 0.001)
     }
 
     @Test
@@ -153,7 +153,7 @@ class SynapseTestKt {
         values.zip(expectedOutputs).forEach { (input, expected) ->
             source.activation = input
             with(network) { synapse.updatePSR() }
-            assertEquals(expected, synapse.output, 0.001)
+            assertEquals(expected, synapse.psr, 0.001)
         }
     }
 
@@ -172,15 +172,15 @@ class SynapseTestKt {
         source.activation = 5.0
 
         with(network) { synapse.updatePSR() }
-        assertEquals(0.0, synapse.output, 0.001)
+        assertEquals(0.0, synapse.psr, 0.001)
 
         synapse.delay = 1
 
         with(network) { synapse.updatePSR() }
-        assertEquals(0.0, synapse.output, 0.001)
+        assertEquals(0.0, synapse.psr, 0.001)
 
         with(network) { synapse.updatePSR() }
-        assertEquals(5.0, synapse.output, 0.001)
+        assertEquals(5.0, synapse.psr, 0.001)
     }
 
     @Test
@@ -198,12 +198,12 @@ class SynapseTestKt {
         source.activation = 5.0
 
         with(network) { synapse.updatePSR() }
-        assertEquals(0.0, synapse.output, 0.001)
+        assertEquals(0.0, synapse.psr, 0.001)
 
         synapse.delay = 0
 
         with(network) { synapse.updatePSR() }
-        assertEquals(5.0, synapse.psr, 0.001)
+        assertEquals(5.0, synapse.rawPSR, 0.001)
     }
 
     @Test
@@ -239,13 +239,13 @@ class SynapseTestKt {
         source.activation = 4.0
 
         with(network) { synapse.updatePSR() }
-        assertEquals(0.0, synapse.output, 0.001)
+        assertEquals(0.0, synapse.psr, 0.001)
 
         with(network) { synapse.updatePSR() }
-        assertEquals(0.0, synapse.output, 0.001)
+        assertEquals(0.0, synapse.psr, 0.001)
 
         with(network) { synapse.updatePSR() }
-        assertEquals(12.0, synapse.output, 0.001)
+        assertEquals(12.0, synapse.psr, 0.001)
     }
 
     @Test
@@ -268,7 +268,7 @@ class SynapseTestKt {
         synapse.clear()
 
         with(network) { synapse.updatePSR() }
-        assertEquals(0.0, synapse.output, 0.001)
+        assertEquals(0.0, synapse.psr, 0.001)
     }
 
     @Test
@@ -288,7 +288,7 @@ class SynapseTestKt {
 
         with(network) { synapse.updatePSR() }
 
-        assertEquals(0.0, synapse.psr, 0.001)
+        assertEquals(0.0, synapse.rawPSR, 0.001)
     }
 
 }

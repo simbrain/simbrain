@@ -74,8 +74,8 @@ class JumpAndDecay : SpikeResponder() {
 
     context(Network)
     override fun apply(synapse: Synapse, responderData: ScalarDataHolder) {
-        synapse.psr = jumpAndDecay(
-            synapse.source.isSpike, synapse.psr, synapse.strength, timeStep
+        synapse.rawPSR = jumpAndDecay(
+            synapse.source.isSpike, synapse.rawPSR, synapse.strength, timeStep
         )
     }
 

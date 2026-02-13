@@ -117,7 +117,7 @@ class TimedAccumulatorRule : SpikingThresholdRule() {
                 // Using the exp weight value stored in the PSR from before
                 // divide that by the exp sum to get the softmax value
                 // then set this to a 1 state from a 0 with that probability.
-                if (ThreadLocalRandom.current().nextDouble() < kappa * neuron.fanInUnsafe!![ii].psr / expSum) {
+                if (ThreadLocalRandom.current().nextDouble() < kappa * neuron.fanInUnsafe!![ii].rawPSR / expSum) {
                     currentState++
                     neuron.activation = 1.0
                     neuron.isSpike = true

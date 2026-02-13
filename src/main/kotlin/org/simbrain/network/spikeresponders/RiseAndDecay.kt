@@ -63,12 +63,12 @@ class RiseAndDecay : SpikeResponder() {
         val data = responderData as RiseAndDecayData
         val (psr, recovery) = riseAndDecay(
             synapse.source.isSpike,
-            synapse.psr,
+            synapse.rawPSR,
             data.recovery,
             synapse.strength,
             timeStep
         )
-        synapse.psr = psr
+        synapse.rawPSR = psr
         data.recovery = recovery
     }
 

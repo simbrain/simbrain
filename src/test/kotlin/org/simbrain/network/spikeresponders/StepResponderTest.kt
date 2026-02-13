@@ -29,19 +29,19 @@ class StepResponderTest {
 
         n1.activation = 1.0
         net.update() // First update propagates from n1 to n2, no spike response yet
-        assertEquals(0.0, s2.psr)
+        assertEquals(0.0, s2.rawPSR)
         assertEquals(0.0, n3.activation)
         net.update()
-        assertEquals(s2.strength, s2.psr)
+        assertEquals(s2.strength, s2.rawPSR)
         assertEquals(s2.strength, n3.activation)
         net.update()
-        assertEquals(s2.strength, s2.psr)
+        assertEquals(s2.strength, s2.rawPSR)
         assertEquals(s2.strength, n3.activation)
         net.update()
-        assertEquals(s2.strength, s2.psr)
+        assertEquals(s2.strength, s2.rawPSR)
         assertEquals(s2.strength, n3.activation)
         net.update()
-        assertEquals(0.0, s2.psr)
+        assertEquals(0.0, s2.rawPSR)
         assertEquals(0.0, n3.activation)
     }
 
@@ -54,11 +54,11 @@ class StepResponderTest {
 
         n1.activation = 1.0
         net.update()
-        assertEquals(0.0, s2.psr)
+        assertEquals(0.0, s2.rawPSR)
         net.update()
-        assertEquals(0.5, s2.psr)
+        assertEquals(0.5, s2.rawPSR)
         net.update()
-        assertEquals(0.0, s2.psr)
+        assertEquals(0.0, s2.rawPSR)
     }
 
     @Test
@@ -71,7 +71,7 @@ class StepResponderTest {
         n1.activation = 1.0
         net.update()
         net.update()
-        assertEquals(0.0, s2.psr)
+        assertEquals(0.0, s2.rawPSR)
     }
 
     @Test
@@ -84,11 +84,11 @@ class StepResponderTest {
         n1.activation = 1.0
         net.update()
         net.update()
-        assertEquals(-0.6, s2.psr)
+        assertEquals(-0.6, s2.rawPSR)
         net.update()
-        assertEquals(-0.6, s2.psr)
+        assertEquals(-0.6, s2.rawPSR)
         net.update()
-        assertEquals(0.0, s2.psr)
+        assertEquals(0.0, s2.rawPSR)
     }
 
     @Test
@@ -148,13 +148,13 @@ class StepResponderTest {
         n1.activation = 1.0
         net.update()
         net.update()
-        assertEquals(0.4, s2.psr)
+        assertEquals(0.4, s2.rawPSR)
         
         // Second spike while still in response period
         n1.activation = 1.0
         net.update()
         net.update()
-        assertEquals(0.4, s2.psr) // Should still be responding
+        assertEquals(0.4, s2.rawPSR) // Should still be responding
     }
 
     @Test
@@ -167,14 +167,14 @@ class StepResponderTest {
         n1.activation = 1.0
         net.update()
         net.update()
-        assertEquals(0.3, s2.psr)
+        assertEquals(0.3, s2.rawPSR)
         
         // Check that it's still active after several updates
         repeat(5) { net.update() }
-        assertEquals(0.3, s2.psr)
+        assertEquals(0.3, s2.rawPSR)
         
         // Check that it eventually stops
         repeat(10) { net.update() }
-        assertEquals(0.0, s2.psr)
+        assertEquals(0.0, s2.rawPSR)
     }
 } 

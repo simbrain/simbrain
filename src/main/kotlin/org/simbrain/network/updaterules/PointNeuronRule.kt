@@ -3,9 +3,6 @@ package org.simbrain.network.updaterules
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.SpikingNeuronUpdateRule
-import org.simbrain.network.updaterules.LinearRule.ClippingType
-import org.simbrain.network.util.EmptyMatrixData
-import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.network.util.SpikingScalarData
 import org.simbrain.util.UserParameter
@@ -16,8 +13,6 @@ import org.simbrain.util.roundToString
 import org.simbrain.util.stats.ProbabilityDistribution
 import java.util.*
 import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
 
 /**
  * PointNeuron from O'Reilly and Munakata, Computational Explorations in
@@ -257,7 +252,7 @@ class PointNeuronRule : SpikingNeuronUpdateRule<PointNeuronScalarData, SpikingMa
      * Excitatory inputs correspond to weights with strengths above 0. More notes at [#getInhibitoryInputs]
      */
     private fun getExcitatoryInputs(neuron: Neuron): Double {
-        return neuron.fanIn.filter { it.strength > 0.0 }.sumOf { it.psr }.clip(0.0..1.0)
+        return neuron.fanIn.filter { it.strength > 0.0 }.sumOf { it.rawPSR }.clip(0.0..1.0)
     }
 
     /**
@@ -269,7 +264,7 @@ class PointNeuronRule : SpikingNeuronUpdateRule<PointNeuronScalarData, SpikingMa
      *
      */
     private fun getInhibitoryInputs(neuron: Neuron): Double {
-        return neuron.fanIn.filter { it.strength < 0.0 }.sumOf { abs(it.psr) }.clip(0.0..1.0)
+        return neuron.fanIn.filter { it.strength < 0.0 }.sumOf { abs(it.rawPSR) }.clip(0.0..1.0)
     }
 
     override fun getToolTipText(neuron: Neuron): String {

@@ -109,8 +109,8 @@ class ShortTermPlasticity : SpikeResponder() {
             udfData.update(time, U, D, F)
         }
         val jumpHeight = udfData.R * synapse.strength * udfData.u
-        synapse.psr = when (val sr = spikeResponderLocal) {
-            is JumpAndDecay -> sr.jumpAndDecay(spiked, synapse.psr, jumpHeight, timeStep)
+        synapse.rawPSR = when (val sr = spikeResponderLocal) {
+            is JumpAndDecay -> sr.jumpAndDecay(spiked, synapse.rawPSR, jumpHeight, timeStep)
             else -> throw IllegalStateException("STP can only be used with JumpAndDecay")
         }
 

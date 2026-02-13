@@ -107,14 +107,14 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
         }
 
     /**
-     * Post synaptic response. The totality of the output of this synapse; the total contribution of this synapse to the
-     * post-synaptic or target neuron. This is computed using a [SpikeResponder] in the case of a spiking
-     * pre-synaptic neuron.
+     * The raw (undelayed) post-synaptic response, computed each iteration by [updatePSR].
+     * For spiking sources this is set by the [SpikeResponder]; for non-spiking sources it is
+     * source activation * strength. Spike responders read and write this value directly.
      *
-     * In the case of a non-spiking node this is the product of the source activation and the
-     * weight of a synapse, i.e. one term in a classical weighted input.
+     * Consumers that need the synapse's contribution to target neuron input should use [psr],
+     * which accounts for synaptic delay.
      */
-    var psr: Double = 0.0
+    var rawPSR: Double = 0.0
 
     /**
      * Amount to increment the neuron.
@@ -329,7 +329,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
         // Update the output of this synapse
         if (spikeResponder is NonResponder) {
             // For "connectionist" case
-            psr = target.updateRule.synapticInputModifier(source.activation) * _strength
+            rawPSR = target.updateRule.synapticInputModifier(source.activation) * _strength
         } else {
             // Updates psr for spiking source neurons
             spikeResponder.apply(this, spikeResponderData)
@@ -340,16 +340,19 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
         // (matching S3's calcPSR() semantics). Use [output] for neuron input.
         if (delay != 0) {
             dlyVal = dequeue()
-            enqueue(psr)
+            enqueue(rawPSR)
         }
     }
 
     /**
-     * The output of this synapse for neuron input accumulation, accounting for delays.
-     * When delay > 0, returns the delayed value while [psr] stays fresh for the spike responder.
+     * The post-synaptic response used for neuron input accumulation. This is the value that
+     * should be read when computing a target neuron's weighted input.
+     *
+     * When there is no delay, this is the same as [rawPSR]. When delay > 0, this returns the
+     * delayed value while [rawPSR] stays current for the spike responder's next iteration.
      */
-    val output: Double
-        get() = if (delay != 0) dlyVal else psr
+    val psr: Double
+        get() = if (delay != 0) dlyVal else rawPSR
 
     val type: String
         /**
@@ -501,7 +504,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
      * the same GUI actions as the high level "clear".
      */
     override fun clear() {
-        psr = 0.0
+        rawPSR = 0.0
         if (delayManager != null) {
             Arrays.fill(delayManager, 0.0)
         }

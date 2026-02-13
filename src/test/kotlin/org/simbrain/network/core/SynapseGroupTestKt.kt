@@ -340,7 +340,7 @@ class SynapseGroupTestKt {
                 groupSynapse.updatePSR()
             }
 
-            assertEquals(freeSynapse.output, groupSynapse.output, 0.001)
+            assertEquals(freeSynapse.psr, groupSynapse.psr, 0.001)
         }
     }
 
@@ -366,8 +366,8 @@ class SynapseGroupTestKt {
             groupSynapse.updatePSR()
         }
 
-        assertEquals(0.0, groupSynapse.output, 0.001)
-        assertEquals(freeSynapse.output, groupSynapse.output, 0.001)
+        assertEquals(0.0, groupSynapse.psr, 0.001)
+        assertEquals(freeSynapse.psr, groupSynapse.psr, 0.001)
     }
 
     @Test

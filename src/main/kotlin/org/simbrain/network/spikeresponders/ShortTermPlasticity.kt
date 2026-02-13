@@ -211,9 +211,10 @@ class STPScalarData(
     @UserParameter(label = "R", description = "Depression variable", order = 2)
     var R: Double,
     /**
-     * Separately track the last spike time to account for buffering
+     * Separately track the last spike time to account for buffering. This is the time the responder receives the spike.
+     * If we used the neuron's lastspiketime it would be off by one too early (e.g., the synapse would have decayed a bit)
      */
-    var lastSpikeTime: Double = 0.0
+    var lastSpikeTime: Double = Double.NEGATIVE_INFINITY
 ) : ScalarDataHolder {
     override fun copy(): STPScalarData {
         return STPScalarData(u, R, lastSpikeTime)

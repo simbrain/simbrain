@@ -211,10 +211,7 @@ class STPScalarData(
     @UserParameter(label = "R", description = "Depression variable", order = 2)
     var R: Double,
     /**
-     * Time of the last spike processed by this responder.
-     * Initialized to 0.0 to match S3 UDF behavior, where Java default is 0.0.
-     * This affects the first spike's ISI calculation: exp((0.0 - time)/F) ≈ 1
-     * instead of exp(-∞) = 0.
+     * Separately track the last spike time to account for buffering
      */
     var lastSpikeTime: Double = 0.0
 ) : ScalarDataHolder {

@@ -97,6 +97,9 @@ class SynapseGroupTestKt {
             clamped = true
             activation = 1.0
         }
+        // Use NeuronCollection (not NeuronGroup) so neurons are updated individually,
+        // matching the free neuron timing in buffered update.
+        // NeuronGroup has its own update() that changes accumulate/update ordering.
         val groupSpiker = Neuron(SpikingThresholdRule()).apply {
             network.addNetworkModelAsync(this)
         }
@@ -104,8 +107,8 @@ class SynapseGroupTestKt {
             network.addNetworkModelAsync(this)
             upperBound = 10.0
         }
-        val spikerGroup = NeuronGroup(listOf(groupSpiker)).apply { network.addNetworkModelAsync(this) }
-        val targetGroup = NeuronGroup(listOf(groupTarget)).apply { network.addNetworkModelAsync(this) }
+        val spikerGroup = NeuronCollection(listOf(groupSpiker)).apply { network.addNetworkModelAsync(this) }
+        val targetGroup = NeuronCollection(listOf(groupTarget)).apply { network.addNetworkModelAsync(this) }
 
         Synapse(groupInput, groupSpiker).apply { network.addNetworkModelAsync(this) }
         val sg = SynapseGroup(spikerGroup, targetGroup).apply { network.addNetworkModelAsync(this) }

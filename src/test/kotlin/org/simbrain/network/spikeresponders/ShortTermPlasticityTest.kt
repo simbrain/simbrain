@@ -257,7 +257,7 @@ class ShortTermPlasticityTest {
         
         dataHolder.clear()
         assertEquals(0.0, dataHolder.u)
-        assertEquals(0.0, dataHolder.R)
+        assertEquals(1.0, dataHolder.R)
     }
 
     @Test
@@ -380,7 +380,7 @@ class ShortTermPlasticityTest {
         
         matrixData.clear()
         assertEquals(0.0, matrixData.u[0, 0])
-        assertEquals(0.0, matrixData.R[1, 2])
+        assertEquals(1.0, matrixData.R[1, 2])
     }
 
     @Test

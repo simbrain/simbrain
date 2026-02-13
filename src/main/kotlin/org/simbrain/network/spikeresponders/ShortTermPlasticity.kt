@@ -236,8 +236,8 @@ class STPScalarData(
 
     override fun clear() {
         u = 0.0
-        R = 0.0
-        lastSpikeTime = 0.0
+        R = 1.0
+        lastSpikeTime = Double.NEGATIVE_INFINITY
     }
 }
 
@@ -248,10 +248,9 @@ class STPMatrixData(val rows: Int, val cols: Int): MatrixDataHolder  {
     var R = Matrix(rows, cols)
     /**
      * Time of the last spike processed for each synapse (i,j).
-     * Initialized to 0.0 to match S3 UDF behavior, where Java default is 0.0.
-     * This affects the first spike's ISI calculation.
+     * Initialized to -infinity so the first spike starts from a fully recovered state.
      */
-    var lastSpikeTimes = Matrix(rows, cols).apply { fill(0.0) }
+    var lastSpikeTimes = Matrix(rows, cols).apply { fill(Double.NEGATIVE_INFINITY) }
 
     fun updateSingle(
         i: Int,
@@ -279,7 +278,7 @@ class STPMatrixData(val rows: Int, val cols: Int): MatrixDataHolder  {
 
     override fun clear() {
         u.fill(0.0)
-        R.fill(0.0)
-        lastSpikeTimes.fill(0.0)
+        R.fill(1.0)
+        lastSpikeTimes.fill(Double.NEGATIVE_INFINITY)
     }
 }

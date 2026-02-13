@@ -500,10 +500,10 @@ class Network: CoroutineScope, EditableObject {
     fun resetTime() {
         time = 0.0
         flatNeuronList.forEach {
-            (it.dataHolder as? SpikingScalarData)?.lastSpikeTime = Double.MIN_VALUE
+            (it.dataHolder as? SpikingScalarData)?.lastSpikeTime = Double.NEGATIVE_INFINITY
         }
         networkModels.get<NeuronArray>().forEach {
-            (it.dataHolder as? SpikingMatrixData)?.lastSpikeTimes?.fill(Double.MIN_VALUE)
+            (it.dataHolder as? SpikingMatrixData)?.lastSpikeTimes?.fill(Double.NEGATIVE_INFINITY)
         }
     }
 

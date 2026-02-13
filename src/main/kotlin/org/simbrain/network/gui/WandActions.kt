@@ -7,6 +7,7 @@ import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.addToNetwork
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.EditableObject
@@ -72,6 +73,7 @@ abstract class WandAction : CopyableObject {
 
     override fun getTypeList(): List<Class<out CopyableObject>> = listOf(
         AdjustValueAction::class.java,
+        ForceSpikeAction::class.java,
         ConnectFromSourceAction::class.java,
         ConnectToNeighborsAction::class.java,
         PruneWeightsAction::class.java,
@@ -406,6 +408,49 @@ class AdjustValueAction(
             color = Color(255, 180, 100, 220)  // Orange
         }
     }
+}
+
+/**
+ * Forces touched spiking neurons to spike by setting [Neuron.isSpike] to true.
+ * Non-spiking neurons are ignored.
+ */
+class ForceSpikeAction : WandAction(), EditableObject {
+
+    override val description: String get() = "Force spike"
+
+    override var letter: String = "F"
+    override var color: Color = NetworkPreferences.spikingColor
+
+    override suspend fun apply(model: NetworkModel, networkPanel: NetworkPanel, undoState: MutableMap<Any, Any?>) {
+        if (model !is Neuron || !model.updateRule.isSpikingRule) return
+        val network = networkPanel.network
+        undoState.putIfAbsent(model, with(network) { model.isSpike })
+        with(network) { model.isSpike = true }
+    }
+
+    override fun endAction(networkPanel: NetworkPanel, undoState: Map<Any, Any?>) {
+        if (undoState.isEmpty()) return
+        val network = networkPanel.network
+
+        @Suppress("UNCHECKED_CAST")
+        val neuronDiffs = undoState.filterKeys { it is Neuron } as Map<Neuron, Boolean>
+        if (neuronDiffs.isEmpty()) return
+
+        val neuronRedos = neuronDiffs.keys.associateWith { with(network) { it.isSpike } }
+        networkPanel.undoManager.addUndoableAction(
+            description = undoDescription(neuronDiffs.size),
+            undo = { neuronDiffs.forEach { (neuron, prev) -> with(network) { neuron.isSpike = prev } } },
+            redo = { neuronRedos.forEach { (neuron, redo) -> with(network) { neuron.isSpike = redo } } }
+        )
+    }
+
+    override fun copy(): CopyableObject = ForceSpikeAction().also {
+        it.letter = letter
+        it.color = color
+        it.radius = radius
+    }
+
+    override val name: String get() = "Force Spike"
 }
 
 /**

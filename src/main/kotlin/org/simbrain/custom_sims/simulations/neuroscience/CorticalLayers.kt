@@ -5,6 +5,8 @@ import org.simbrain.network.connections.RandomWeightInitializer
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.addNeuronGroup
+import org.simbrain.network.gui.ForceSpikeAction
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.spikeresponders.JumpAndDecay
 import org.simbrain.network.spikeresponders.ShortTermPlasticity
@@ -218,6 +220,18 @@ val corticalLayers = newSim {
 
     buildNetwork()
 
+    withGui {
+        // Make sure the force spike wand tool is present and selected
+        val palette = NetworkPreferences.wandPalette
+        var forceSpikeIndex = palette.actions.indexOfFirst { it is ForceSpikeAction }
+        if (forceSpikeIndex < 0) {
+            palette.addAction(ForceSpikeAction())
+            forceSpikeIndex = palette.actions.lastIndex
+        }
+        palette.selectAction(forceSpikeIndex)
+        NetworkPreferences.wandPalette = palette
+    }
+
     addSidebarInfo(
         """
         # Cortical Layers Simulation
@@ -287,11 +301,11 @@ val corticalLayers = newSim {
 
         1. Click `Run` to start the simulation.
         
-        2. Use the `wand` tool or press `d` to inject activation into `Layer 5/6`. Few spikes in the other layers should be observed.
+        2. Use the `wand` tool with the `Force Spike` action to force spikes in `Layer 5/6`. Few spikes in the other layers should be observed.
         
-        3. Use the `wand` tool to inject activation into `Layer 4`. A burst of activity in `Layer 2/3` should then be observed, followed by a burst of activity in `Layer 5/6`, consistent with known connectivity.
+        3. Use the wand on `Layer 4`. A burst of activity in `Layer 2/3` should then be observed, followed by a burst of activity in `Layer 5/6`, consistent with known connectivity.
         
-        4. Use the `wand` tool to inject activation into `Layer 2/3`. This should lead, after some delay, to activity in `Layer 5/6`, and then to a burst of activity in `Layer 4`.
+        4. Use the wand on `Layer 2/3`. This should lead, after some delay, to activity in `Layer 5/6`, and then to a burst of activity in `Layer 4`.
 
         # References
 

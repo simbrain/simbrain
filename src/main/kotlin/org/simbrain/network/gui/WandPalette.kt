@@ -114,6 +114,7 @@ class WandPalette : EditableObject {
         fun createDefault(): WandPalette = WandPalette().apply {
             // Neuron actions
             addAction(AdjustValueAction.activate())
+            addAction(ForceSpikeAction())
             //addAction(AdjustValueAction.inhibit())
             addAction(AdjustValueAction.setValue(0.0))
             //addAction(AdjustValueAction.randomize())

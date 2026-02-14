@@ -255,6 +255,9 @@ class OdorWorldEntity @JvmOverloads constructor(
         addSensor(
             ObjectSensor(EntityType.Swiss, 50.0, -45.0)
         )
+        if (sensors.none { it is View3DSensor }) {
+            addSensor(View3DSensor())
+        }
         // TODO: Add more defaults
     }
 

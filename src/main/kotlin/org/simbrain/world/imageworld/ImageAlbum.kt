@@ -162,6 +162,7 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
         frameIndex = 0
         val newImage = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
         _frames.add(newImage)
+        channels = Array(3) { DoubleArray(width * height) }
         setCurrentImage(newImage, true)
     }
 

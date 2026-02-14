@@ -39,7 +39,7 @@ class ImagePipelineCollection(val imageSource: ImageSource): AttributeContainer 
     init {
         initializeDefaultPipelines()
         imageSource.events.imageUpdate.on(null, true) {
-            pipelinesList.forEach { it.applyPipeline() }
+            pipelinesList.toList().forEach { it.applyPipeline() }
         }
     }
 
@@ -49,7 +49,7 @@ class ImagePipelineCollection(val imageSource: ImageSource): AttributeContainer 
     fun readResolve(): Any {
         events = ImagePipelineCollectionEvents()
         imageSource.events.imageUpdate.on {
-            pipelinesList.forEach { it.applyPipeline() }
+            pipelinesList.toList().forEach { it.applyPipeline() }
         }
         // Reinitialize the default unfiltered pipeline reference
         if (pipelinesList.isNotEmpty()) {

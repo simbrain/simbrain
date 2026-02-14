@@ -8,6 +8,7 @@ import org.simbrain.util.updateAction
 
 /**
  * 3D sensor stream -> competitive feature learning.
+ * Lots of tuning needed. Consider deleting and starting over.
  */
 val view3dNavigationCompetitiveLearningDemo = newSim {
 

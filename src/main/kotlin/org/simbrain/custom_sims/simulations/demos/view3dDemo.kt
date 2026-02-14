@@ -19,7 +19,7 @@ import java.awt.Graphics
 import javax.swing.JPanel
 
 /**
- * Demo simulation for the View3DSensor - a pseudo-3D first-person view from an entity's perspective.
+ * Initial demo simulation for the View3DSensor - a pseudo-3D first-person view from an entity's perspective.
  *
  * The sensor uses raycasting to render:
  * - Textured floor from the tilemap

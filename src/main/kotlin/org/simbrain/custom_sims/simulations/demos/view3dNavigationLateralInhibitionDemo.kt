@@ -18,9 +18,7 @@ import java.awt.Dimension
 import java.awt.Graphics
 
 /**
- * 3D sensor stream -> lateral inhibition retina.
- *
- * This version emphasizes standard Simbrain components so users can recreate it manually.
+ * A retina-like simulation / first effort to link 3d sensor to free nodes with recurrent connections
  */
 val view3dNavigationLateralInhibitionDemo = newSim {
 
@@ -63,6 +61,7 @@ val view3dNavigationLateralInhibitionDemo = newSim {
     var excitStrength = 0.20
     var inhibStrength = 0.12
     var inputGain = 1.0
+    var reverseInput = false
     var rawInputMode = false
     var savedExcitStrength = excitStrength
     var savedInhibStrength = inhibStrength
@@ -73,18 +72,15 @@ val view3dNavigationLateralInhibitionDemo = newSim {
     }
     applyStrengths()
 
-    workspace.updater.updateManager.addAction(updateAction("Scale input gain") {
-        retina.activationArray = retina.activationArray.map { a ->
-            (a * inputGain).coerceIn(0.0, 1.0)
-        }.toDoubleArray()
+    workspace.updater.updateManager.addAction(updateAction("Inject sensor input") {
+        val raw = view3dSensor.brightness
+        if (raw.size != imageSize) return@updateAction
+        val processed = DoubleArray(imageSize) { i ->
+            val base = if (reverseInput) 1.0 - raw[i] else raw[i]
+            (base * inputGain).coerceIn(0.0, 1.0)
+        }
+        retina.addInputs(processed)
     }, 0)
-
-    with(couplingManager) {
-        createCoupling(
-            view3dSensor.getProducer(view3dSensor::brightness),
-            retina.getConsumer("addInputs")
-        )
-    }
 
     withGui {
         place(odorWorldComponent, 345, 0, 400, 620)
@@ -117,6 +113,9 @@ val view3dNavigationLateralInhibitionDemo = newSim {
             addSeparator()
             addSlider("Input Gain", 0.1, 2.5, inputGain, 0.05) {
                 inputGain = it
+            }
+            addCheckBox("Reverse Input (1-x)", reverseInput) { enabled ->
+                reverseInput = enabled
             }
             addSlider("Excitatory Lateral", 0.0, 0.6, excitStrength, 0.01) {
                 excitStrength = it
@@ -162,21 +161,20 @@ val view3dNavigationLateralInhibitionDemo = newSim {
         """
         # 3D Navigation + Local Inhibition Edge Map
 
-        This version is built from standard Simbrain parts that can be recreated by hand:
-
-        - `View3DSensor` -> **coupling** -> `Lateral Inhibition Retina`.
-        - `Retina` recurrently connected by two **distance-based (radial Gaussian) strategies**:
+        A retina-like model to illustrate coupling from Odor World with 3d sensor to a local circuit.
+        The circuit is recurrently connected by two [distance-based](https://docs.simbrain.net/docs/network/connections/distanceBased.html) strategies**:
           one short-range excitatory and one broader inhibitory.
 
         ## What to Do
 
         1. Run and move the agent in Odor World.
-        2. Watch `Brightness Array` in the control panel to see what is being coupled.
-        3. Watch `Lateral Inhibition Retina` in the network window.
+        2. Watch `Brightness Array` in the control panel to see the raw data sent to the network
+        3. Watch the network window which shows how a simple retina-like circuit processes this information
         4. Adjust controls and compare:
            - More `Inhibitory Lateral`: sharper contrast, stronger surround suppression.
            - More `Excitatory Lateral`: broader local spread / smoothing.
-           - `Raw Input Mode`: disables recurrent effects so you can compare with direct input.
+           - `Reverse Input (1-x)`: inverts polarity so that darker regions map to less rather than more neural activity
+           - `Raw Input Mode`: disables recurrent effects so you can compare what the network does with direct input.
 
         ## Scientific Backing
 
@@ -185,12 +183,9 @@ val view3dNavigationLateralInhibitionDemo = newSim {
         - lateral inhibition as contrast enhancement
         - recurrent dynamics shaping the final response
 
-        It is still a simplified model, not a full retinal circuit:
-        - no explicit bipolar / horizontal / amacrine cell types
-        - no realistic photoreceptor adaptation or noise statistics
-        - no full biophysical membrane dynamics
+        It is a simplified model, not a realistic retinal circuit, and it's also fairly provisional (as of Spring 2026). 
+        We have only recently implemented 3d and this is a first example of what's possible. More is coming!
 
-        So it is useful as a conceptual and algorithmic retina-like demo, not a detailed biological retina simulation.
         """.trimIndent()
     )
 }

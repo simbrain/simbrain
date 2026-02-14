@@ -10,6 +10,7 @@ import org.simbrain.custom_sims.simulations.braitenberg.braitenbergSim
 import org.simbrain.custom_sims.simulations.braitenberg.pursuer
 import org.simbrain.custom_sims.simulations.demos.competitiveSim
 import org.simbrain.custom_sims.simulations.demos.somNetSmells
+import org.simbrain.custom_sims.simulations.demos.view3dNavigationLateralInhibitionDemo
 import org.simbrain.custom_sims.simulations.demos.view3dNavigationPipelineDemo
 import org.simbrain.custom_sims.simulations.dynamical_systems.lorenzSystem
 import org.simbrain.custom_sims.simulations.dynamical_systems.lorenzSystemSimbrain
@@ -178,6 +179,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Photo album (100 x 100)") { photoAlbumExample }
         //item("3D View Example") { view3dDemo }
         item("3D Navigation and Image World") { view3dNavigationPipelineDemo }
+        item("3D Navigation and Lateral Inhibition") { view3dNavigationLateralInhibitionDemo }
         //item("Attention as gain") { attentionAsGain }
     }
 

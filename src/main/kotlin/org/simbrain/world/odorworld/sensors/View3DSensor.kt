@@ -148,6 +148,17 @@ class View3DSensor @JvmOverloads constructor(
     val blue: DoubleArray
         get() = _blue
 
+    @Transient
+    private var _rgbTensor: DoubleArray = DoubleArray(0)
+
+    /**
+     * RGB tensor in HWC format (height * width * 3). Values normalized to 0.0-1.0.
+     * Can be coupled directly to a [org.simbrain.network.core.Tensor] with shape (height, width, 3).
+     */
+    @get:Producible(description = "RGB Tensor (HWC)")
+    val rgbTensor: DoubleArray
+        get() = _rgbTensor
+
     /**
      * The rendered image for visualization purposes.
      * Returns the display buffer (not the back buffer being rendered to) to prevent flickering.
@@ -196,6 +207,7 @@ class View3DSensor @JvmOverloads constructor(
             _red = DoubleArray(size)
             _green = DoubleArray(size)
             _blue = DoubleArray(size)
+            _rgbTensor = DoubleArray(size * 3)
         }
     }
 
@@ -211,6 +223,11 @@ class View3DSensor @JvmOverloads constructor(
             _blue[i] = b
             // Standard luminance formula
             _brightness[i] = r * 0.2126 + g * 0.7152 + b * 0.0722
+            // HWC layout: pixel i -> (r at i*3, g at i*3+1, b at i*3+2)
+            val hwcBase = i * 3
+            _rgbTensor[hwcBase] = r
+            _rgbTensor[hwcBase + 1] = g
+            _rgbTensor[hwcBase + 2] = b
         }
     }
 

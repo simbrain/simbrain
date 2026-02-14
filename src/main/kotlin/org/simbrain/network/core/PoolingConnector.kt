@@ -1,0 +1,57 @@
+package org.simbrain.network.core
+
+import org.simbrain.network.conv.ConvOps
+import org.simbrain.util.UserParameter
+
+/**
+ * Pooling type.
+ */
+enum class PoolingType {
+    MAX, AVERAGE
+}
+
+/**
+ * Connects two [Tensor] nodes via a pooling operation (max or average).
+ * No learnable weights - this is a purely structural downsampling operation.
+ */
+class PoolingConnector(
+    source: Tensor, target: Tensor,
+    @UserParameter(label = "Pool Size", description = "Spatial size of pooling window", displayOnly = true, order = 1)
+    val poolSize: Int = 2,
+    @UserParameter(label = "Stride", description = "Pooling stride", displayOnly = true, order = 2)
+    val stride: Int = 2,
+    @UserParameter(label = "Pooling Type", description = "MAX or AVERAGE pooling", displayOnly = true, order = 3)
+    val poolingType: PoolingType = PoolingType.MAX
+) : TensorConnector(source, target) {
+
+    /** Indices of max elements for each output position (for future backprop). */
+    var maxIndices: IntArray? = if (poolingType == PoolingType.MAX) IntArray(target.shape.size) else null
+
+    init {
+        val expectedShape = source.shape.poolOutputShape(poolSize, stride)
+        require(target.shape == expectedShape) {
+            "Target shape ${target.shape} does not match expected pool output shape $expectedShape"
+        }
+    }
+
+    override fun propagate() {
+        when (poolingType) {
+            PoolingType.MAX -> ConvOps.maxPool2d(
+                source.activations, source.shape,
+                target.inputs, target.shape,
+                poolSize, stride, maxIndices
+            )
+            PoolingType.AVERAGE -> ConvOps.avgPool2d(
+                source.activations, source.shape,
+                target.inputs, target.shape,
+                poolSize, stride
+            )
+        }
+    }
+
+    override val name: String get() = "Pooling"
+
+    override fun toString(): String =
+        "$displayName (${poolingType.name} Pool ${poolSize}x${poolSize})"
+
+}

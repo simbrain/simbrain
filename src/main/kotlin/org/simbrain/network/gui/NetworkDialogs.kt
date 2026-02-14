@@ -17,6 +17,7 @@ import org.simbrain.network.smile.ClassifierNetwork
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.SceneGraphBrowser
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
+import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.objectWrapper
 import org.simbrain.util.propertyeditor.wrapperWidget
 import java.awt.BorderLayout
@@ -69,6 +70,98 @@ fun NetworkPanel.showActivationSequenceCreationDialog() {
     }.also {
         it.title = "Create Activation Sequence"
     }.display()
+}
+
+fun NetworkPanel.showTensorCreationDialog() {
+    Tensor.CreationTemplate().createEditorDialog {
+        val tensor = it.create()
+        network.addNetworkModelAsync(tensor)
+        undoManager.addUndoableAction(
+            description = "Create tensor ${tensor.id}",
+            undo = { tensor.delete() },
+            redo = { network.addNetworkModel(tensor, usePlacementManager = false, useAutoAssignedId = false) }
+        )
+    }.also {
+        it.title = "Create Tensor"
+    }.display()
+}
+
+/**
+ * Dialog for adding a convolution layer (target Tensor + ConvolutionConnector) from a source Tensor.
+ */
+fun NetworkPanel.showAddConvLayerDialog(sourceTensor: Tensor) {
+    val template = ConvLayerTemplate()
+    template.createEditorDialog {
+        val outputShape = sourceTensor.shape.convOutputShape(
+            it.kernelSize, it.stride, it.padding, it.numFilters
+        )
+        val targetTensor = Tensor(outputShape)
+        targetTensor.activationFunction = it.activation
+        // Place target below source
+        targetTensor.shouldBePlaced = false
+        val connector = ConvolutionConnector(sourceTensor, targetTensor, it.kernelSize, it.numFilters, it.stride, it.padding)
+        network.addNetworkModelAsync(targetTensor, usePlacementManager = false)
+        targetTensor.setLocation(sourceTensor.locationX, sourceTensor.locationY + 200)
+        network.addNetworkModelAsync(connector, usePlacementManager = false)
+    }.also {
+        it.title = "Add Conv Layer from ${sourceTensor.displayName}"
+    }.display()
+}
+
+/**
+ * Dialog for adding a pooling layer (target Tensor + PoolingConnector) from a source Tensor.
+ */
+fun NetworkPanel.showAddPoolLayerDialog(sourceTensor: Tensor) {
+    val template = PoolLayerTemplate()
+    template.createEditorDialog {
+        val outputShape = sourceTensor.shape.poolOutputShape(it.poolSize, it.stride)
+        val targetTensor = Tensor(outputShape)
+        targetTensor.shouldBePlaced = false
+        val connector = PoolingConnector(sourceTensor, targetTensor, it.poolSize, it.stride, it.poolingType)
+        network.addNetworkModelAsync(targetTensor, usePlacementManager = false)
+        targetTensor.setLocation(sourceTensor.locationX, sourceTensor.locationY + 200)
+        network.addNetworkModelAsync(connector, usePlacementManager = false)
+    }.also {
+        it.title = "Add Pool Layer from ${sourceTensor.displayName}"
+    }.display()
+}
+
+/**
+ * Template for convolution layer creation dialog.
+ */
+class ConvLayerTemplate : EditableObject {
+    @UserParameter(label = "Kernel Size", description = "Spatial size of kernel", order = 1)
+    var kernelSize = 3
+
+    @UserParameter(label = "Num Filters", description = "Number of output filters", order = 2)
+    var numFilters = 16
+
+    @UserParameter(label = "Stride", description = "Convolution stride", order = 3)
+    var stride = 1
+
+    @UserParameter(label = "Padding", description = "Padding strategy", order = 4)
+    var padding = Padding.SAME
+
+    @UserParameter(label = "Activation", description = "Activation function for output tensor", order = 5)
+    var activation = TensorActivation.RELU
+
+    override val name = "Convolution Layer"
+}
+
+/**
+ * Template for pooling layer creation dialog.
+ */
+class PoolLayerTemplate : EditableObject {
+    @UserParameter(label = "Pool Size", description = "Spatial size of pooling window", order = 1)
+    var poolSize = 2
+
+    @UserParameter(label = "Stride", description = "Pooling stride", order = 2)
+    var stride = 2
+
+    @UserParameter(label = "Pooling Type", description = "MAX or AVERAGE pooling", order = 3)
+    var poolingType = PoolingType.MAX
+
+    override val name = "Pooling Layer"
 }
 
 fun NetworkPanel.showTransformerBlockCreationDialog() {

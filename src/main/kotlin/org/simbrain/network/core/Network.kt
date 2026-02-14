@@ -457,7 +457,13 @@ class Network: CoroutineScope, EditableObject {
         networkModels.allInUpdatingOrder.filterIsInstance<AbstractNeuronCollection>().forEach { collection ->
             collection.setupNeuronListeners()
         }
-        
+
+        // Re-wire TensorConnector source/target lists after deserialization
+        getModels<TensorConnector>().forEach { connector ->
+            connector.source.addOutgoingConnector(connector)
+            connector.target.addIncomingConnector(connector)
+        }
+
         idManager = SimpleIdManager ({ cls -> networkModels.getRawModelSet(cls).size + 1 })
         return this
     }

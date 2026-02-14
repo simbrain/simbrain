@@ -8,6 +8,7 @@ import org.simbrain.custom_sims.simulations.braitenberg.avoider
 import org.simbrain.custom_sims.simulations.braitenberg.braitenbergGame
 import org.simbrain.custom_sims.simulations.braitenberg.braitenbergSim
 import org.simbrain.custom_sims.simulations.braitenberg.pursuer
+import org.simbrain.custom_sims.simulations.demos.cnnDemo
 import org.simbrain.custom_sims.simulations.demos.competitiveSim
 import org.simbrain.custom_sims.simulations.demos.somNetSmells
 import org.simbrain.custom_sims.simulations.demos.view3dNavigationPipelineDemo
@@ -179,6 +180,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         //item("3D View Example") { view3dDemo }
         item("3D Navigation and Image World") { view3dNavigationPipelineDemo }
         //item("Attention as gain") { attentionAsGain }
+        item("CNN Demo") { cnnDemo }
     }
 
     //dir("Testing") {

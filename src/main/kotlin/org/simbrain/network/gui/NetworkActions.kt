@@ -121,6 +121,13 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     ) {
         showNeuronArrayCreationDialog()
     }
+    val addTensorAction = networkPanel.createAction(
+        name = "Add tensor...",
+        description = "Add a tensor (CNN layer) to the network",
+        keyboardShortcut = Shift + 'T'
+    ) {
+        showTensorCreationDialog()
+    }
     val addActivationSequenceAction = networkPanel.createAction(
         name = "Add activation sequence...",
         description = "Add an activation sequence to the network",

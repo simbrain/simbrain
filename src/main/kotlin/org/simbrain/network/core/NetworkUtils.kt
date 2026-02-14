@@ -29,7 +29,9 @@ fun updatingOrder(obj: NetworkModel): Int = when (obj) {
     is NeuronGroup -> 20
     is NeuronCollection -> 30
     is NeuronArray -> 40
+    is Tensor -> 45
     is Connector -> 50
+    is TensorConnector -> 55
     is SynapseGroup -> 60
     is Subnetwork -> 70
     is Synapse -> 80

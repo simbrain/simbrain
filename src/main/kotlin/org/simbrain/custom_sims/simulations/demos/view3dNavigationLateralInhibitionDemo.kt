@@ -4,7 +4,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
-import org.simbrain.custom_sims.*
+import org.simbrain.custom_sims.addNetworkComponent
+import org.simbrain.custom_sims.addSidebarInfo
+import org.simbrain.custom_sims.createControlPanel
+import org.simbrain.custom_sims.newSim
 import org.simbrain.network.connections.radialGaussianStyle
 import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.network.core.addToNetwork
@@ -156,6 +159,9 @@ val view3dNavigationLateralInhibitionDemo = newSim {
             }
         }
     }
+
+    // Iterate once so that something is showing in control panel
+    workspace.updater.iterate(1)
 
     addSidebarInfo(
         """

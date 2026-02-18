@@ -12,8 +12,7 @@ import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.sensors.View3DSensor
 
 /**
- * A navigation-first vision demo: move through a 3D world while feeding a live
- * first-person view through an editable image pipeline.
+ * A demo to illustrate how to link 3d sensors to an image world for image processing.
  */
 val view3dNavigationPipelineDemo = newSim {
 
@@ -107,7 +106,7 @@ val view3dNavigationPipelineDemo = newSim {
         """
         # 3D Navigation + Edge Pipeline
 
-        This demo is meant to familiarize you with how **Image World** and
+        This demo is meant to familiarize you with how [Image World](https://docs.simbrain.net/docs/worlds/imageworld.html) and
         **image processing pipelines** work using a live 3D sensor stream.
 
         ## What to do

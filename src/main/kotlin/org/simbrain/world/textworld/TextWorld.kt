@@ -236,12 +236,12 @@ class TextWorld : AttributeContainer, EditableObject {
         }
     }
 
-    fun advance() {
+    suspend fun advance() {
         if (currentTokenIndex < tokens.size - 1) {
-            currentTokenIndex++
+            setCurrentTokenIndexSuspend(currentTokenIndex + 1)
         } else {
-            events.atEnd.fire()
-            currentTokenIndex = 0
+            events.atEnd.fire().await()
+            setCurrentTokenIndexSuspend(0)
         }
         position = tokens[currentTokenIndex].end
     }

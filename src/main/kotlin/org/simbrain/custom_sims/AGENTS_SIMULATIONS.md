@@ -212,6 +212,7 @@ For headless options, parse `optionString` parameter in `newSim` (see `evolution
 ## Best Practices
 
 - Start with a template - find similar simulation and copy
+- In simulation docs, prefer linking first mentions to relevant docs pages (e.g., [ImageWorld](https://docs.simbrain.net/docs/worlds/imageworld.html)) instead of using bold text
 - Batch add neurons: `network.addNeurons(List(100) { Neuron() })`
 - Get layout coordinates by arranging manually in GUI first
 - Wrap GUI code in `withGui { }` for headless compatibility

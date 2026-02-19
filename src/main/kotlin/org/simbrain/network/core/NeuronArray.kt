@@ -159,6 +159,23 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
     @Transient
     override var events: NeuronArrayEvents = NeuronArrayEvents()
 
+    @Transient
+    var incomingFlattenConnectors: MutableList<FlattenConnector> = mutableListOf()
+
+    fun addIncomingFlattenConnector(connector: FlattenConnector) {
+        incomingFlattenConnectors.add(connector)
+    }
+
+    fun removeIncomingFlattenConnector(connector: FlattenConnector) {
+        incomingFlattenConnectors.remove(connector)
+    }
+
+    context(Network)
+    override fun accumulateInputs() {
+        super.accumulateInputs()
+        incomingFlattenConnectors.forEach { it.propagate() }
+    }
+
     init {
         randomize()
     }

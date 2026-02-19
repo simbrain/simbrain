@@ -11,7 +11,7 @@ import org.simbrain.world.odorworld.sensors.View3DSensor
 /**
  * Demo simulation showing a CNN pipeline connected to a 3D view sensor.
  *
- * Pipeline: View3DSensor (64x64x3) -> Conv(3x3, 8 filters, SAME) -> ReLU -> MaxPool(2x2) -> Conv(3x3, 16 filters, SAME) -> ReLU
+ * Pipeline: View3DSensor (64x64x3) -> Conv1 -> ReLU -> Pool1 -> Conv2 -> ReLU -> Pool2 -> Flatten -> Dense
  */
 val cnnDemo = newSim {
 
@@ -101,6 +101,35 @@ val cnnDemo = newSim {
     val conv2 = ConvolutionConnector(pool1Output, conv2Output, kernelSize = 3, numFilters = 16, stride = 1, padding = Padding.SAME)
     network.addNetworkModelAsync(conv2, usePlacementManager = false)
 
+    // MaxPool2: 2x2 -> output 16x16x16
+    val pool2OutputShape = conv2OutputShape.poolOutputShape(2, 2)
+    val pool2Output = Tensor(pool2OutputShape).apply {
+        label = "Pool2 (${pool2OutputShape})"
+    }
+    network.addNetworkModelAsync(pool2Output, usePlacementManager = false)
+    pool2Output.setLocation(0.0, 800.0)
+    val pool2 = PoolingConnector(conv2Output, pool2Output, poolSize = 2, stride = 2, poolingType = PoolingType.MAX)
+    network.addNetworkModelAsync(pool2, usePlacementManager = false)
+
+    // Flatten: 16x16x16 = 4096 -> NeuronArray(4096)
+    val flattenSize = pool2OutputShape.size
+    val flattenArray = NeuronArray(flattenSize).apply {
+        label = "Flatten ($flattenSize)"
+    }
+    network.addNetworkModelAsync(flattenArray, usePlacementManager = false)
+    flattenArray.setLocation(0.0, 1000.0)
+    val flatten = FlattenConnector(pool2Output, flattenArray)
+    network.addNetworkModelAsync(flatten, usePlacementManager = false)
+
+    // Dense output: small output layer (e.g. 3 categories)
+    val outputArray = NeuronArray(3).apply {
+        label = "Output (3)"
+    }
+    network.addNetworkModelAsync(outputArray, usePlacementManager = false)
+    outputArray.setLocation(0.0, 1200.0)
+    val dense = WeightMatrix(flattenArray, outputArray)
+    network.addNetworkModelAsync(dense, usePlacementManager = false)
+
     // --- Coupling: View3DSensor.rgbTensor -> inputTensor.setActivations ---
     with(couplingManager) {
         view3dSensor.getProducer(View3DSensor::rgbTensor) couple
@@ -109,7 +138,7 @@ val cnnDemo = newSim {
 
     // --- Layout ---
     place(odorWorldComponent, 0, 0, 400, 400)
-    place(networkComponent, 410, 0, 500, 700)
+    place(networkComponent, 410, 0, 500, 900)
 
     addSidebarInfo(
         """
@@ -122,14 +151,18 @@ val cnnDemo = newSim {
         ## Pipeline
         - **Input**: 64x64x3 RGB tensor from View3DSensor
         - **Conv1**: 3x3 kernel, 8 filters, SAME padding, ReLU
-        - **MaxPool**: 2x2 pool
+        - **MaxPool1**: 2x2 pool
         - **Conv2**: 3x3 kernel, 16 filters, SAME padding, ReLU
+        - **MaxPool2**: 2x2 pool
+        - **Flatten**: 16x16x16 = 4096 -> NeuronArray
+        - **Dense**: 4096 -> 3 output neurons (via WeightMatrix)
 
         ## How to use
         - Use arrow keys in the OdorWorld to move the agent
         - Observe channel activations updating in each tensor layer
         - Right-click on tensors to navigate channels or toggle RGB view
         - Right-click on conv connectors to browse kernel weights
+        - The output neurons show the full CNN-to-dense pipeline in action
         """.trimIndent()
     )
 }

@@ -249,6 +249,9 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
             contextMenu.add(networkPanel.createAction(name = "Add Pool Layer...") {
                 networkPanel.showAddPoolLayerDialog(tensor)
             })
+            contextMenu.add(networkPanel.createAction(name = "Add Flatten Layer") {
+                networkPanel.addFlattenLayer(tensor)
+            })
             contextMenu.addSeparator()
 
             // Channel navigation

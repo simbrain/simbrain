@@ -66,6 +66,9 @@ class Tensor(val shape: TensorShape) : LocatableModel(), EditableObject, Attribu
     var outgoingTensorConnectors: MutableList<TensorConnector> = mutableListOf()
 
     @Transient
+    var outgoingFlattenConnectors: MutableList<FlattenConnector> = mutableListOf()
+
+    @Transient
     override var events: TensorEvents = TensorEvents()
 
     /** Width/height used by GUI for arrow placement. */
@@ -137,6 +140,14 @@ class Tensor(val shape: TensorShape) : LocatableModel(), EditableObject, Attribu
         outgoingTensorConnectors.remove(connector)
     }
 
+    fun addOutgoingFlattenConnector(connector: FlattenConnector) {
+        outgoingFlattenConnectors.add(connector)
+    }
+
+    fun removeOutgoingFlattenConnector(connector: FlattenConnector) {
+        outgoingFlattenConnectors.remove(connector)
+    }
+
     // --- Update ---
 
     context(Network)
@@ -169,7 +180,7 @@ class Tensor(val shape: TensorShape) : LocatableModel(), EditableObject, Attribu
     }
 
     override suspend fun delete(): List<NetworkModel> {
-        val connectors = LinkedHashSet(incomingTensorConnectors + outgoingTensorConnectors)
+        val connectors = LinkedHashSet<NetworkModel>(incomingTensorConnectors + outgoingTensorConnectors + outgoingFlattenConnectors)
         connectors.forEach { it.delete() }
         events.deleted.fire(this).await()
         return buildList {

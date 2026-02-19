@@ -127,6 +127,20 @@ fun NetworkPanel.showAddPoolLayerDialog(sourceTensor: Tensor) {
 }
 
 /**
+ * Add a flatten layer: creates a NeuronArray sized to the source Tensor's total element count
+ * and a FlattenConnector linking them. No dialog needed since the size is fully determined.
+ */
+fun NetworkPanel.addFlattenLayer(sourceTensor: Tensor) {
+    val flatSize = sourceTensor.shape.size
+    val targetArray = NeuronArray(flatSize)
+    targetArray.shouldBePlaced = false
+    val connector = FlattenConnector(sourceTensor, targetArray)
+    network.addNetworkModelAsync(targetArray, usePlacementManager = false)
+    targetArray.setLocation(sourceTensor.locationX, sourceTensor.locationY + 200)
+    network.addNetworkModelAsync(connector, usePlacementManager = false)
+}
+
+/**
  * Template for convolution layer creation dialog.
  */
 class ConvLayerTemplate : EditableObject {

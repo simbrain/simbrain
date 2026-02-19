@@ -203,4 +203,77 @@ class TensorNetworkTest {
         assertTrue(restoredPoolOut.activations.any { it != 0.0 },
             "Restored pipeline should produce non-zero output after update")
     }
+
+    @Test
+    fun `FlattenConnector survives serialization round-trip`() {
+        val net = Network()
+
+        // Tensor(4x4x2) -> Flatten -> NeuronArray(32)
+        val tensor = Tensor(TensorShape(4, 4, 2)).apply {
+            label = "source"
+            isClamped = true
+        }
+        val array = NeuronArray(32).apply {
+            label = "target"
+        }
+        val flatten = FlattenConnector(tensor, array)
+
+        net.addNetworkModelAsync(tensor, usePlacementManager = false)
+        net.addNetworkModelAsync(array, usePlacementManager = false)
+        net.addNetworkModelAsync(flatten, usePlacementManager = false)
+
+        // Serialize and deserialize
+        val xstream = getNetworkXStream()
+        val xml = xstream.toXML(net)
+        val restored = xstream.fromXML(xml) as Network
+
+        // Verify models survived
+        val restoredTensor = restored.getModelByLabel(Tensor::class.java, "source")
+        val restoredArray = restored.getModelByLabel(NeuronArray::class.java, "target")
+        val restoredFlatten = restored.getModels<FlattenConnector>().firstOrNull()
+        assertNotNull(restoredTensor, "Source tensor should survive serialization")
+        assertNotNull(restoredArray, "Target NeuronArray should survive serialization")
+        assertNotNull(restoredFlatten, "FlattenConnector should survive serialization")
+
+        // Verify wiring
+        assertEquals(restoredTensor, restoredFlatten!!.source)
+        assertEquals(restoredArray, restoredFlatten.target)
+        assertTrue(restoredTensor!!.outgoingFlattenConnectors.contains(restoredFlatten),
+            "Tensor should have flatten as outgoing connector after deserialization")
+        assertTrue(restoredArray!!.incomingFlattenConnectors.contains(restoredFlatten),
+            "NeuronArray should have flatten as incoming connector after deserialization")
+
+        // Verify data flows through the restored pipeline
+        restoredTensor.activations.fill(0.5)
+        restored.update()  // Tensor clamped -> activations stay, flatten propagates
+        restored.update()  // NeuronArray accumulates + updates
+
+        val expected = 0.5
+        assertTrue(restoredArray.activationArray.any { Math.abs(it - expected) < 1e-9 },
+            "Flattened activations should propagate through restored pipeline")
+    }
+
+    @Test
+    fun `FlattenConnector deletion cascades properly`() = runBlocking {
+        val net = Network()
+
+        val tensor = Tensor(TensorShape(2, 2, 1))
+        val array = NeuronArray(4)
+        val flatten = FlattenConnector(tensor, array)
+
+        net.addNetworkModelAsync(tensor, usePlacementManager = false)
+        net.addNetworkModelAsync(array, usePlacementManager = false)
+        net.addNetworkModelAsync(flatten, usePlacementManager = false)
+
+        // Deleting the source tensor should cascade to the FlattenConnector
+        assertEquals(1, tensor.outgoingFlattenConnectors.size)
+        assertEquals(1, array.incomingFlattenConnectors.size)
+
+        net.deleteModels(listOf(tensor))
+
+        assertTrue(net.getModels<FlattenConnector>().isEmpty(),
+            "FlattenConnector should be deleted when source Tensor is deleted")
+        assertTrue(array.incomingFlattenConnectors.isEmpty(),
+            "NeuronArray should have no incoming flatten connectors after cascade delete")
+    }
 }

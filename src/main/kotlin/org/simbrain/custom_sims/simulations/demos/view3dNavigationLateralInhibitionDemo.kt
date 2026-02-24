@@ -4,10 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
-import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.addSidebarInfo
-import org.simbrain.custom_sims.createControlPanel
-import org.simbrain.custom_sims.newSim
+import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.radialGaussianStyle
 import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.network.core.addToNetwork
@@ -16,7 +13,8 @@ import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.util.toGrayScaleImage
-import org.simbrain.util.updateAction
+import org.simbrain.workspace.AttributeContainer
+import org.simbrain.workspace.Consumable
 import java.awt.Dimension
 import java.awt.Graphics
 
@@ -75,15 +73,26 @@ val view3dNavigationLateralInhibitionDemo = newSim {
     }
     applyStrengths()
 
-    workspace.updater.updateManager.addAction(updateAction("Inject sensor input") {
-        val raw = view3dSensor.brightness
-        if (raw.size != imageSize) return@updateAction
-        val processed = DoubleArray(imageSize) { i ->
-            val base = if (reverseInput) 1.0 - raw[i] else raw[i]
-            (base * inputGain).coerceIn(0.0, 1.0)
+    val sensorInputAdapter = object : AttributeContainer {
+        override val id: String = "Sensor input adapter"
+
+        @Consumable
+        fun setInput(raw: DoubleArray) {
+            if (raw.size != imageSize) return
+            val processed = DoubleArray(imageSize) { i ->
+                val base = if (reverseInput) 1.0 - raw[i] else raw[i]
+                (base * inputGain).coerceIn(0.0, 1.0)
+            }
+            retina.addInputs(processed)
         }
-        retina.addInputs(processed)
-    }, 0)
+    }
+
+    with(couplingManager) {
+        createCoupling(
+            view3dSensor.getProducer(view3dSensor::brightness),
+            sensorInputAdapter.getConsumer("setInput")
+        )
+    }
 
     withGui {
         place(odorWorldComponent, 345, 0, 400, 620)
@@ -161,7 +170,7 @@ val view3dNavigationLateralInhibitionDemo = newSim {
     }
 
     // Iterate once so that something is showing in control panel
-    workspace.updater.iterate(1)
+    workspace.updater.iterate(2)
 
     addSidebarInfo(
         """

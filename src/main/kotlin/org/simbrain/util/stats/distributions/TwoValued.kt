@@ -16,7 +16,10 @@ class TwoValued(
 
     @UserParameter(
         label = "Probability",
-        description = "Probabiliy of selecting the upper value",
+        description = "Probability of selecting the upper value",
+        minimumValue = 0.0,
+        maximumValue = 1.0,
+        increment = 0.1,
         order = 3)
     var p: Double = .5
 ) : ProbabilityDistribution() {

@@ -76,6 +76,7 @@ val probDistTypes = listOf(
     ExponentialDistribution::class.java,
     GammaDistribution::class.java, LogNormalDistribution::class.java,
     NormalDistribution::class.java, ParetoDistribution::class.java,
+    TwoValued::class.java,
     UniformRealDistribution::class.java,
     PoissonDistribution::class.java,
     UniformIntegerDistribution::class.java

@@ -21,20 +21,20 @@ import org.simbrain.network.trainers.computeOrderedUpdatePath
 import org.simbrain.network.util.Alignment
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
+import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.objectWrapper
 import org.simbrain.util.stats.ProbabilityDistribution
-import org.simbrain.util.stats.distributions.UniformRealDistribution
+import org.simbrain.util.stats.distributions.TwoValued
 import org.simbrain.workspace.couplings.getConsumer
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
+import java.awt.BorderLayout
 import java.awt.event.KeyEvent
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import javax.swing.AbstractAction
+import javax.swing.*
 import javax.swing.Action.SHORT_DESCRIPTION
-import javax.swing.JCheckBoxMenuItem
-import javax.swing.JOptionPane
 
 class NetworkActions(val networkPanel: NetworkPanel) {
     // For testing purposes only
@@ -838,11 +838,27 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Randomize polarity of selected neurons",
         enablingCondition = EnablingConditions.NEURONS
     ) {
-        // TODO: Indicate the threshold somehow in a prompt
-        objectWrapper<ProbabilityDistribution>("Randomize polarity", UniformRealDistribution()).createEditorDialog { dist ->
-            selectionManager.filterSelectedModels<Neuron>().forEach { n ->
-                if (dist.editingObject.sampleDouble() > .5) n.polarity = SimbrainConstants.Polarity.EXCITATORY
-                else n.polarity = SimbrainConstants.Polarity.INHIBITORY
+        val wrapper = objectWrapper<ProbabilityDistribution>(
+            "Randomize polarity",
+            TwoValued(lowerValue = 0.0, upperValue = 1.0, p = 0.8)
+        )
+        val editor = AnnotatedPropertyEditor(listOf(wrapper))
+        val instructions = JLabel(
+            "<html><b>Mapping:</b> sample &gt; 0.5 = excitatory, sample &le; 0.5 = inhibitory.<br>" +
+                "Suggest using two valued distribution with lower=0 and upper=1, so that probability is for percent excitatory.</html>"
+        )
+        StandardDialog().apply {
+            title = "Randomize polarity"
+            contentPane = JPanel(BorderLayout()).apply {
+                add(instructions, BorderLayout.NORTH)
+                add(editor, BorderLayout.CENTER)
+            }
+            addCommitTask {
+                editor.commitChanges()
+                selectionManager.filterSelectedModels<Neuron>().forEach { n ->
+                    if (wrapper.editingObject.sampleDouble() > .5) n.polarity = SimbrainConstants.Polarity.EXCITATORY
+                    else n.polarity = SimbrainConstants.Polarity.INHIBITORY
+                }
             }
         }.display()
     }

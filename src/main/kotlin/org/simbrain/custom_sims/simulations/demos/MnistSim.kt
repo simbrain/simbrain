@@ -82,7 +82,7 @@
 //         progressWindow.close()
 //     }
 //
-//     // world.imageAlbum.addImage(ResourceManager.getBufferedImage("odorworld/static/Swiss.gif"))
+//     // world.imageAlbum.addImage(ResourceManager.getBufferedImage("odorworld/static/Swiss.png"))
 //     // world.imageAlbum.addImage(ResourceManager.getBufferedImage("odorworld/static/Poison.gif"))
 //     // world.imageAlbum.addImage(ResourceManager.getBufferedImage("odorworld/static/Fish.gif"))
 //

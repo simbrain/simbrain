@@ -33,14 +33,14 @@ sealed class EntityType(
     val headLocation: Point2D = point(0.5, 0.5),
     val pivotLocation: Point2D = headLocation
 ): EditableObject {
-    object Swiss: EntityType("Swiss", rotating = false, width = 32, height = 32, imageExt = "gif")
-    object Gouda : EntityType("Gouda", rotating = false, width = 32, height = 32, imageExt = "gif")
+    object Swiss: EntityType("Swiss", rotating = false, width = 32, height = 32)
+    object Gouda : EntityType("Gouda", rotating = false, width = 32, height = 32)
     object BlueCheese : EntityType("Blue Cheese", imageName = "Bluecheese", rotating = false, width = 32, height = 32, imageExt = "gif")
     object Bell : EntityType("Bell", rotating = false, width = 32, height = 32, imageExt = "gif")
     object Poison : EntityType("Poison", rotating = false, width = 32, height = 32, imageExt = "gif")
     object Candle : EntityType("Candle", rotating = false, width = 32, height = 32)
     object Fish : EntityType("Fish", rotating = false, width = 32, height = 32, imageExt = "gif")
-    object Flower : EntityType("Flower", rotating = false, width = 32, height = 32, imageExt = "gif")
+    object Flower : EntityType("Flower", rotating = false, width = 32, height = 32)
     object Dandelions : EntityType("Dandelions", rotating = false, width = 32, height = 32)
     object Geraniums : EntityType("Geraniums", rotating = false, width = 32, height = 32)
     object Tulip : EntityType("Tulip", rotating = false, width = 32, height = 32, imageExt = "gif")
@@ -71,7 +71,7 @@ sealed class EntityType(
     object Mouse : EntityType("Mouse", rotating = true, width = 40, height = 40, headLocation = point(1.1, 0.5), pivotLocation = point(0.5, 0.5)) {
         override val imageBasePaths by lazy {
             (0 until 360 step 15).map { angle ->
-                listOf("mouse" / "Mouse_$angle.gif")
+                listOf("mouse" / "Mouse_$angle.png")
             }
         }
     }

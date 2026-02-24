@@ -98,28 +98,20 @@ class DataWorldDesktopComponent(frame: GenericFrame, val component: DataWorldCom
         file.add(actionManager.createCloseAction(this))
 
         // Edit Menu
-        fun createEditMenu() {
-            edit.removeAll()
-
-            edit.add(tablePanel.table.setRowsColumnsAction)
-            edit.addSeparator()
-            edit.add(tablePanel.table.fillAction)
-            edit.add(tablePanel.table.randomizeAction)
-            edit.add(tablePanel.table.editRandomizerAction)
-            edit.addSeparator()
-            
-            // Add coupling menu
-            edit.add(
-                actionManager.createCoupledPlotMenu(
-                    dataWorld.getProducer(DataWorld::getCurrentNumericRow),
-                    "${dataWorld.id} Data",
-                )
+        edit.add(tablePanel.table.setRowsColumnsAction)
+        edit.addSeparator()
+        edit.add(tablePanel.table.fillAction)
+        edit.add(tablePanel.table.randomizeAction)
+        edit.add(tablePanel.table.editRandomizerAction)
+        edit.addSeparator()
+        edit.add(
+            actionManager.createCoupledPlotMenu(
+                dataWorld.getProducer(DataWorld::getCurrentNumericRow),
+                "${dataWorld.id} Data",
             )
-            edit.addSeparator()
-            edit.add(CouplingMenu(workspaceComponent, dataWorld))
-        }
-        createEditMenu()
-        onCouplingAttributesChanged { createEditMenu() }
+        )
+        edit.addSeparator()
+        edit.add(CouplingMenu(workspaceComponent, dataWorld))
         menuBar.add(edit)
 
         // Help Menu

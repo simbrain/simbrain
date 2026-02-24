@@ -101,32 +101,27 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
         file.add(SimbrainDesktop.actionManager.createCloseAction(this))
 
         // Edit menu
-        fun createEditMenu() {
-            edit.removeAll()
-            preferences.action = world.textWorldPrefs
-            edit.add(createShowFindAndReplaceAction())
-            edit.addSeparator()
-            edit.add(
-                SimbrainDesktop.actionManager.createCoupledDataWorldAction(
-                    name = "Record token embeddings",
-                    world.getProducer(TextWorld::currentVector),
-                    sourceName = "${world.id} Token Embeddings",
-                    world.tokenEmbedding.dimension
-                )
+        preferences.action = world.textWorldPrefs
+        edit.add(createShowFindAndReplaceAction())
+        edit.addSeparator()
+        edit.add(
+            SimbrainDesktop.actionManager.createCoupledDataWorldAction(
+                name = "Record token embeddings",
+                world.getProducer(TextWorld::currentVector),
+                sourceName = "${world.id} Token Embeddings",
+                world.tokenEmbedding.dimension
             )
-            edit.add(
-                SimbrainDesktop.actionManager.createCoupledPlotMenu(
-                    world.getProducer(TextWorld::currentVector),
-                    "${world.id} Token Embeddings",
-                )
+        )
+        edit.add(
+            SimbrainDesktop.actionManager.createCoupledPlotMenu(
+                world.getProducer(TextWorld::currentVector),
+                "${world.id} Token Embeddings",
             )
-            edit.addSeparator()
-            edit.add(CouplingMenu(workspaceComponent, world))
-            edit.addSeparator()
-            edit.add(preferences)
-        }
-        createEditMenu()
-        onCouplingAttributesChanged { createEditMenu() }
+        )
+        edit.addSeparator()
+        edit.add(CouplingMenu(workspaceComponent, world))
+        edit.addSeparator()
+        edit.add(preferences)
         menuBar.add(edit)
 
         // View Menu

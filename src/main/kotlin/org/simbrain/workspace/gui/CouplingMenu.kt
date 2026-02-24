@@ -1,8 +1,5 @@
 package org.simbrain.workspace.gui
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.swing.Swing
 import org.simbrain.util.createAction
 import org.simbrain.util.displayInDialog
 import org.simbrain.workspace.Attribute
@@ -14,12 +11,17 @@ import smile.math.matrix.Matrix
 import javax.swing.JMenu
 import javax.swing.JMenuItem
 import javax.swing.JSeparator
+import javax.swing.event.MenuEvent
+import javax.swing.event.MenuListener
 import kotlin.math.max
 
 /**
  * A JMenu that appears relative to some object (an [AttributeContainer]) in
  * a workspace component. The menu allows you to create a coupling from that object
  * to any other attribute container of the same data type in Simbrain.
+ *
+ * Populates lazily when the menu is opened, so it always reflects the current
+ * workspace state without needing event-driven refresh.
  *
  * @param sourceComponent The workspace component where this menu will be shown.
  * @param source The source object that will be the producer in whatever coupling is created using this menu.
@@ -31,11 +33,27 @@ class CouplingMenu(
 
     private val maxVisibleMenuItems = 36
 
-    /**
-     * Construct the menu.
-     */
     init {
         text = "Create ${source.javaClass.simpleName} coupling"
+        addMenuListener(object : MenuListener {
+            override fun menuSelected(e: MenuEvent?) {
+                populate()
+            }
+            override fun menuDeselected(e: MenuEvent?) {}
+            override fun menuCanceled(e: MenuEvent?) {}
+        })
+    }
+
+    /**
+     * Create a custom name for this menu besides the default "Create X coupling".
+     *
+     * @param name the custom name.
+     */
+    fun setCustomName(name: String) {
+        text = name
+    }
+
+    private fun populate() {
         removeAll()
         val sources = buildList {
             var current = listOf(source)
@@ -45,10 +63,8 @@ class CouplingMenu(
             }
         }
         with(sourceComponent.couplingManager) {
-            sourceComponent.workspace.launch(Dispatchers.Swing) {
-                sources.flatMap { it.producers }.forEach { createProducerSubmenu(it) }
-                sources.flatMap { it.consumers }.forEach { createConsumerSubmenu(it) }
-            }
+            sources.flatMap { it.producers.toList() }.forEach { createProducerSubmenu(it) }
+            sources.flatMap { it.consumers.toList() }.forEach { createConsumerSubmenu(it) }
         }
     }
 
@@ -65,15 +81,6 @@ class CouplingMenu(
                 else -> simpleName
             }
         }
-
-    /**
-     * Create a custom name for this menu besides the default "Create X coupling".
-     *
-     * @param name the custom name.
-     */
-    fun setCustomName(name: String) {
-        text = name
-    }
 
     /**
      * Create a submenu for a specific producer, that will "send" to a consumer

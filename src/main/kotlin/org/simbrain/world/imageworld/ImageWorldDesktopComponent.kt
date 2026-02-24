@@ -5,7 +5,6 @@ import org.simbrain.util.SFileChooser
 import org.simbrain.util.createAction
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.swingDispatcher
-import org.simbrain.util.swingInvokeLater
 import org.simbrain.util.widgets.ShowHelpAction
 import org.simbrain.workspace.gui.CouplingMenu
 import org.simbrain.workspace.gui.DesktopComponent
@@ -85,19 +84,12 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
                 imageWorld.resetImageAlbum(wInp.text.toInt(), hInp.text.toInt())
             }
         }
+        editMenu.add(resetCanvasAction)
+        editMenu.addSeparator()
+        imageWorld.imagePipelineCollection.currentPipeline?.let { pipeline ->
+            editMenu.add(CouplingMenu(workspaceComponent, pipeline))
+        }
         menuBar.add(editMenu)
-        fun createEditMenu() {
-            editMenu.removeAll()
-            editMenu.add(resetCanvasAction)
-            editMenu.addSeparator()
-            imageWorld.imagePipelineCollection.currentPipeline?.let { pipeline ->
-                editMenu.add(CouplingMenu(workspaceComponent, pipeline))
-            }
-        }
-        swingInvokeLater {
-            createEditMenu()
-            onCouplingAttributesChanged { createEditMenu() }
-        }
 
         // Help Menu
         val helpMenu = JMenu("Help")

@@ -38,8 +38,8 @@ val view3dNavigationPipelineDemo = newSim {
         odorWorld.height / 2,
         EntityType.Amy
     ).apply {
-        heading = 0.0
-        location = point(281, 373)
+        heading = 344.0
+        location = point(54, 116)
         name = "Agent"
     }
 
@@ -55,18 +55,14 @@ val view3dNavigationPipelineDemo = newSim {
     }
     agent.addSensor(view3dSensor)
     agent.addDefaultEffectors()
-    agent.select()
 
     // Add landmarks to create visually distinct viewpoints while navigating.
     listOf(
         Triple(120, 120, EntityType.Swiss),
         Triple(430, 120, EntityType.Fish),
         Triple(120, 430, EntityType.Candle),
-        Triple(430, 430, EntityType.Poison),
-        Triple(280, 190, EntityType.Flower),
-        Triple(190, 320, EntityType.Tulip),
         Triple(360, 300, EntityType.Pansy),
-        Triple(90, 270, EntityType.Lion),
+        Triple(430, 430, EntityType.Poison),
     ).forEach { (x, y, type) ->
         odorWorld.addEntity(x, y, type).apply {
             if (type == EntityType.Swiss) {
@@ -74,6 +70,9 @@ val view3dNavigationPipelineDemo = newSim {
             }
         }
     }
+
+    // Selecting the agent affords that it is the one whose pov we are taking
+    agent.select()
 
     val imageWorldComponent = addImageWorld("Pipeline View")
     val imageWorld = imageWorldComponent.world.apply {
@@ -101,6 +100,8 @@ val view3dNavigationPipelineDemo = newSim {
         place(odorWorldComponent, 0, 0, 600, 600)
         place(imageWorldComponent, 605, 0, 600, 600)
     }
+
+    workspace.updater.iterate(2)
 
     addSidebarInfo(
         """

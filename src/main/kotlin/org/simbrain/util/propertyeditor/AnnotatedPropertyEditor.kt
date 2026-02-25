@@ -273,11 +273,14 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
 
     fun commitChanges() {
         parameterWidgetMap.forEach { (parameter, widget) ->
-            editingObjects.forEach { eo ->
-                if (widget.isConsistent) {
+            if (widget.isConsistent) {
+                val isObjectWidget = widget is ObjectWidget<*, *> && !widget.useEnumStyle
+                if (isObjectWidget) {
+                    widget.objectTypeEditor.commitChanges()
+                }
+                editingObjects.forEach { eo ->
                     (parameter.property as? KMutableProperty1<O, Any>)?.let commitProperty@ { property ->
-                        if (widget is ObjectWidget<*, *> && !widget.useEnumStyle) {
-                            widget.objectTypeEditor.commitChanges()
+                        if (isObjectWidget) {
                             (widget.value as? CopyableObject)?.let { co ->
                                 if (parameter.useLegacySetter) {
                                     property.invokeLegacySetter(eo, co.copy())
@@ -296,7 +299,6 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
                         eo.onCommit()
                     }
                 }
-
             }
         }
     }

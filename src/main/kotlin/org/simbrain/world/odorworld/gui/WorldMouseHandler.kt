@@ -170,6 +170,10 @@ class WorldMouseHandler(
         odorWorldPanel.selectedEntityNodes.forEach {
             selectedEntityLocations[it.entity] = it.entity.location
         }
+
+        if (selectedEntityLocations.isNotEmpty()) {
+            odorWorldPanel.isDraggingEntity = true
+        }
     }
 
     override fun drag(event: PInputEvent) {
@@ -261,6 +265,7 @@ class WorldMouseHandler(
 
         selectedEntityLocations.clear()
         priorSelection.clear()
+        odorWorldPanel.isDraggingEntity = false
         odorWorldPanel.repaint()
     }
 

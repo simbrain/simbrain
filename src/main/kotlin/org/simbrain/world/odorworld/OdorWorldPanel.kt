@@ -79,6 +79,11 @@ class OdorWorldPanel(
      */
     private var layerImageList: List<PImage?>
 
+    /**
+     * Set to true while the user is dragging an entity, to suppress camera centering.
+     */
+    var isDraggingEntity = false
+
     val odorWorldActions: OdorWorldActions = OdorWorldActions(this)
 
     /**
@@ -367,7 +372,7 @@ class OdorWorldPanel(
     }
 
     private fun centerCameraToSelectedEntity() {
-        if (!world.isUseCameraCentering) {
+        if (!world.isUseCameraCentering || isDraggingEntity) {
             repaint()
             return
         }

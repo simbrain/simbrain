@@ -221,6 +221,17 @@ val corticalLayers = newSim {
     buildNetwork()
 
     withGui {
+        val previousSelectedWandIndex = NetworkPreferences.wandPalette.selectedIndex
+        var unregisterRestoreWandListener: (() -> Boolean?)? = null
+        unregisterRestoreWandListener = workspace.events.workspaceCleared.on {
+            val restorePalette = NetworkPreferences.wandPalette
+            val restoredIndex = previousSelectedWandIndex.coerceIn(0, (restorePalette.actions.size - 1).coerceAtLeast(0))
+            restorePalette.selectAction(restoredIndex)
+            NetworkPreferences.wandPalette = restorePalette
+            unregisterRestoreWandListener?.invoke()
+            unregisterRestoreWandListener = null
+        }
+
         // Make sure the force spike wand tool is present and selected
         val palette = NetworkPreferences.wandPalette
         var forceSpikeIndex = palette.actions.indexOfFirst { it is ForceSpikeAction }

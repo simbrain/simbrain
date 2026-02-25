@@ -16,7 +16,6 @@ import org.simbrain.custom_sims.simulations.dynamical_systems.lorenzSystem
 import org.simbrain.custom_sims.simulations.dynamical_systems.lorenzSystemSimbrain
 import org.simbrain.custom_sims.simulations.edge_of_chaos.edgeOfChaos
 import org.simbrain.custom_sims.simulations.edge_of_chaos.edgeOfChaosBitStream
-import org.simbrain.custom_sims.simulations.neuroscience.corticalLayers
 import org.simbrain.custom_sims.simulations.neuroscience.excitatoryInhibitoryBalance
 import org.simbrain.custom_sims.simulations.neuroscience.spikingNetworkSimulation
 import org.simbrain.custom_sims.simulations.nlp.tinyLanguageModel
@@ -110,8 +109,8 @@ val simulations = dir("Simulations", alphabetical = true ) {
         // item("Cerebellum") { Cerebellum() }
         item("Spiking Network") { spikingNetworkSimulation }
         item("E/I Balance") { excitatoryInhibitoryBalance }
-        item("Cortical layers") { corticalLayers }
-        //item("Cortical areas") { cortexKuramoto }
+        //item("Cortical layers") { corticalLayers }
+         //item("Cortical areas") { cortexKuramoto }
     }
 
     dir("Evolution") {

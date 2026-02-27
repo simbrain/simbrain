@@ -49,26 +49,30 @@ data class Placement(
 
 suspend fun SimbrainDesktop.place(workspaceComponent: WorkspaceComponent, placement: suspend Placement.() -> Unit) {
     val (location, width, height) = Placement().apply { placement() }
-    val desktopComponent = withContext(Dispatchers.Main) {
-        getDesktopComponent(workspaceComponent)
+    withContext(Dispatchers.Main) {
+        val desktopComponent = getDesktopComponent(workspaceComponent)
+        val bounds = desktopComponent.parentFrame.bounds
+        desktopComponent.parentFrame.bounds = Rectangle(
+            location?.x ?: bounds.x,
+            location?.y ?: bounds.y,
+            width ?: bounds.width,
+            height ?: bounds.height
+        )
     }
-    val bounds = desktopComponent.parentFrame.bounds
-    desktopComponent.parentFrame.bounds = Rectangle(
-        location?.x ?: bounds.x,
-        location?.y ?: bounds.y,
-        width ?: bounds.width,
-        height ?: bounds.height
-    )
 }
 
 suspend fun SimbrainDesktop.place(workspaceComponent: WorkspaceComponent, x: Int, y: Int, width: Int, height: Int) {
-    val desktopComponent = getDesktopComponent(workspaceComponent)
-    desktopComponent.parentFrame.bounds = Rectangle(x, y, width, height)
+    withContext(Dispatchers.Main) {
+        val desktopComponent = getDesktopComponent(workspaceComponent)
+        desktopComponent.parentFrame.bounds = Rectangle(x, y, width, height)
+    }
 }
 
 fun SimbrainDesktop.placeBlocking(workspaceComponent: WorkspaceComponent, x: Int, y: Int, width: Int, height: Int) {
-    val desktopComponent = runBlocking { getDesktopComponent(workspaceComponent) }
-    desktopComponent.parentFrame.bounds = Rectangle(x, y, width, height)
+    runBlocking(Dispatchers.Main) {
+        val desktopComponent = getDesktopComponent(workspaceComponent)
+        desktopComponent.parentFrame.bounds = Rectangle(x, y, width, height)
+    }
 }
 
 suspend fun SimulationScope.place(workspaceComponent: WorkspaceComponent, x: Int, y: Int, width: Int, height: Int) {

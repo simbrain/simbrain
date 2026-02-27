@@ -69,7 +69,7 @@ suspend fun SimbrainDesktop.place(workspaceComponent: WorkspaceComponent, x: Int
 }
 
 fun SimbrainDesktop.placeBlocking(workspaceComponent: WorkspaceComponent, x: Int, y: Int, width: Int, height: Int) {
-    runBlocking(Dispatchers.Main) {
+    runBlocking {
         val desktopComponent = getDesktopComponent(workspaceComponent)
         desktopComponent.parentFrame.bounds = Rectangle(x, y, width, height)
     }

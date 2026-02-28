@@ -4,7 +4,7 @@ import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.addNeuron
-import org.simbrain.network.core.addSynapse
+import org.simbrain.network.core.addSynapseAsync
 import org.simbrain.network.updaterules.IACRule
 import org.simbrain.util.place
 import org.simbrain.util.point
@@ -124,376 +124,376 @@ val iacJetsSharks5People = newSim {
     }
 
     val synapses = buildList {
-        add(network.addSynapse(neuronList[0], neuronList[1]) {
+        add(network.addSynapseAsync(neuronList[0], neuronList[1]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[0], neuronList[2]) {
+        add(network.addSynapseAsync(neuronList[0], neuronList[2]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[0], neuronList[3]) {
+        add(network.addSynapseAsync(neuronList[0], neuronList[3]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[0], neuronList[4]) {
+        add(network.addSynapseAsync(neuronList[0], neuronList[4]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[1], neuronList[0]) {
+        add(network.addSynapseAsync(neuronList[1], neuronList[0]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[1], neuronList[2]) {
+        add(network.addSynapseAsync(neuronList[1], neuronList[2]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[1], neuronList[3]) {
+        add(network.addSynapseAsync(neuronList[1], neuronList[3]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[1], neuronList[4]) {
+        add(network.addSynapseAsync(neuronList[1], neuronList[4]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[2], neuronList[0]) {
+        add(network.addSynapseAsync(neuronList[2], neuronList[0]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[2], neuronList[1]) {
+        add(network.addSynapseAsync(neuronList[2], neuronList[1]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[2], neuronList[3]) {
+        add(network.addSynapseAsync(neuronList[2], neuronList[3]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[2], neuronList[4]) {
+        add(network.addSynapseAsync(neuronList[2], neuronList[4]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[3], neuronList[0]) {
+        add(network.addSynapseAsync(neuronList[3], neuronList[0]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[3], neuronList[1]) {
+        add(network.addSynapseAsync(neuronList[3], neuronList[1]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[3], neuronList[2]) {
+        add(network.addSynapseAsync(neuronList[3], neuronList[2]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[3], neuronList[4]) {
+        add(network.addSynapseAsync(neuronList[3], neuronList[4]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[4], neuronList[0]) {
+        add(network.addSynapseAsync(neuronList[4], neuronList[0]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[4], neuronList[1]) {
+        add(network.addSynapseAsync(neuronList[4], neuronList[1]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[4], neuronList[2]) {
+        add(network.addSynapseAsync(neuronList[4], neuronList[2]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[4], neuronList[3]) {
+        add(network.addSynapseAsync(neuronList[4], neuronList[3]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[9], neuronList[8]) {
+        add(network.addSynapseAsync(neuronList[9], neuronList[8]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[9], neuronList[7]) {
+        add(network.addSynapseAsync(neuronList[9], neuronList[7]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[9], neuronList[6]) {
+        add(network.addSynapseAsync(neuronList[9], neuronList[6]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[9], neuronList[5]) {
+        add(network.addSynapseAsync(neuronList[9], neuronList[5]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[8], neuronList[9]) {
+        add(network.addSynapseAsync(neuronList[8], neuronList[9]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[8], neuronList[7]) {
+        add(network.addSynapseAsync(neuronList[8], neuronList[7]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[8], neuronList[6]) {
+        add(network.addSynapseAsync(neuronList[8], neuronList[6]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[8], neuronList[5]) {
+        add(network.addSynapseAsync(neuronList[8], neuronList[5]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[7], neuronList[9]) {
+        add(network.addSynapseAsync(neuronList[7], neuronList[9]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[7], neuronList[8]) {
+        add(network.addSynapseAsync(neuronList[7], neuronList[8]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[7], neuronList[6]) {
+        add(network.addSynapseAsync(neuronList[7], neuronList[6]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[7], neuronList[5]) {
+        add(network.addSynapseAsync(neuronList[7], neuronList[5]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[6], neuronList[9]) {
+        add(network.addSynapseAsync(neuronList[6], neuronList[9]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[6], neuronList[8]) {
+        add(network.addSynapseAsync(neuronList[6], neuronList[8]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[6], neuronList[7]) {
+        add(network.addSynapseAsync(neuronList[6], neuronList[7]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[6], neuronList[5]) {
+        add(network.addSynapseAsync(neuronList[6], neuronList[5]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[5], neuronList[9]) {
+        add(network.addSynapseAsync(neuronList[5], neuronList[9]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[5], neuronList[8]) {
+        add(network.addSynapseAsync(neuronList[5], neuronList[8]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[5], neuronList[7]) {
+        add(network.addSynapseAsync(neuronList[5], neuronList[7]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[5], neuronList[6]) {
+        add(network.addSynapseAsync(neuronList[5], neuronList[6]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[11], neuronList[10]) {
+        add(network.addSynapseAsync(neuronList[11], neuronList[10]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[10], neuronList[11]) {
+        add(network.addSynapseAsync(neuronList[10], neuronList[11]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[14], neuronList[13]) {
+        add(network.addSynapseAsync(neuronList[14], neuronList[13]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[14], neuronList[12]) {
+        add(network.addSynapseAsync(neuronList[14], neuronList[12]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[13], neuronList[14]) {
+        add(network.addSynapseAsync(neuronList[13], neuronList[14]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[13], neuronList[12]) {
+        add(network.addSynapseAsync(neuronList[13], neuronList[12]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[12], neuronList[14]) {
+        add(network.addSynapseAsync(neuronList[12], neuronList[14]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[12], neuronList[13]) {
+        add(network.addSynapseAsync(neuronList[12], neuronList[13]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[15], neuronList[16]) {
+        add(network.addSynapseAsync(neuronList[15], neuronList[16]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[16], neuronList[15]) {
+        add(network.addSynapseAsync(neuronList[16], neuronList[15]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[17], neuronList[18]) {
+        add(network.addSynapseAsync(neuronList[17], neuronList[18]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[17], neuronList[19]) {
+        add(network.addSynapseAsync(neuronList[17], neuronList[19]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[18], neuronList[17]) {
+        add(network.addSynapseAsync(neuronList[18], neuronList[17]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[18], neuronList[19]) {
+        add(network.addSynapseAsync(neuronList[18], neuronList[19]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[19], neuronList[17]) {
+        add(network.addSynapseAsync(neuronList[19], neuronList[17]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[19], neuronList[18]) {
+        add(network.addSynapseAsync(neuronList[19], neuronList[18]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[1], neuronList[6]) {
+        add(network.addSynapseAsync(neuronList[1], neuronList[6]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[6], neuronList[1]) {
+        add(network.addSynapseAsync(neuronList[6], neuronList[1]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[6], neuronList[11]) {
+        add(network.addSynapseAsync(neuronList[6], neuronList[11]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[11], neuronList[6]) {
+        add(network.addSynapseAsync(neuronList[11], neuronList[6]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[6], neuronList[12]) {
+        add(network.addSynapseAsync(neuronList[6], neuronList[12]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[12], neuronList[6]) {
+        add(network.addSynapseAsync(neuronList[12], neuronList[6]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[6], neuronList[15]) {
+        add(network.addSynapseAsync(neuronList[6], neuronList[15]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[15], neuronList[6]) {
+        add(network.addSynapseAsync(neuronList[15], neuronList[6]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[6], neuronList[19]) {
+        add(network.addSynapseAsync(neuronList[6], neuronList[19]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[19], neuronList[6]) {
+        add(network.addSynapseAsync(neuronList[19], neuronList[6]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[22], neuronList[21]) {
+        add(network.addSynapseAsync(neuronList[22], neuronList[21]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[22], neuronList[20]) {
+        add(network.addSynapseAsync(neuronList[22], neuronList[20]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[21], neuronList[22]) {
+        add(network.addSynapseAsync(neuronList[21], neuronList[22]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[21], neuronList[20]) {
+        add(network.addSynapseAsync(neuronList[21], neuronList[20]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[20], neuronList[22]) {
+        add(network.addSynapseAsync(neuronList[20], neuronList[22]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[20], neuronList[21]) {
+        add(network.addSynapseAsync(neuronList[20], neuronList[21]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[6], neuronList[20]) {
+        add(network.addSynapseAsync(neuronList[6], neuronList[20]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[20], neuronList[6]) {
+        add(network.addSynapseAsync(neuronList[20], neuronList[6]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[2], neuronList[7]) {
+        add(network.addSynapseAsync(neuronList[2], neuronList[7]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[7], neuronList[2]) {
+        add(network.addSynapseAsync(neuronList[7], neuronList[2]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[7], neuronList[11]) {
+        add(network.addSynapseAsync(neuronList[7], neuronList[11]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[11], neuronList[7]) {
+        add(network.addSynapseAsync(neuronList[11], neuronList[7]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[7], neuronList[12]) {
+        add(network.addSynapseAsync(neuronList[7], neuronList[12]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[12], neuronList[7]) {
+        add(network.addSynapseAsync(neuronList[12], neuronList[7]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[7], neuronList[18]) {
+        add(network.addSynapseAsync(neuronList[7], neuronList[18]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[18], neuronList[7]) {
+        add(network.addSynapseAsync(neuronList[18], neuronList[7]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[7], neuronList[16]) {
+        add(network.addSynapseAsync(neuronList[7], neuronList[16]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[16], neuronList[7]) {
+        add(network.addSynapseAsync(neuronList[16], neuronList[7]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[7], neuronList[20]) {
+        add(network.addSynapseAsync(neuronList[7], neuronList[20]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[20], neuronList[7]) {
+        add(network.addSynapseAsync(neuronList[20], neuronList[7]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[0], neuronList[5]) {
+        add(network.addSynapseAsync(neuronList[0], neuronList[5]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[5], neuronList[0]) {
+        add(network.addSynapseAsync(neuronList[5], neuronList[0]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[5], neuronList[11]) {
+        add(network.addSynapseAsync(neuronList[5], neuronList[11]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[11], neuronList[5]) {
+        add(network.addSynapseAsync(neuronList[11], neuronList[5]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[5], neuronList[12]) {
+        add(network.addSynapseAsync(neuronList[5], neuronList[12]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[12], neuronList[5]) {
+        add(network.addSynapseAsync(neuronList[12], neuronList[5]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[5], neuronList[22]) {
+        add(network.addSynapseAsync(neuronList[5], neuronList[22]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[22], neuronList[5]) {
+        add(network.addSynapseAsync(neuronList[22], neuronList[5]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[5], neuronList[16]) {
+        add(network.addSynapseAsync(neuronList[5], neuronList[16]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[16], neuronList[5]) {
+        add(network.addSynapseAsync(neuronList[16], neuronList[5]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[5], neuronList[19]) {
+        add(network.addSynapseAsync(neuronList[5], neuronList[19]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[19], neuronList[5]) {
+        add(network.addSynapseAsync(neuronList[19], neuronList[5]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[3], neuronList[8]) {
+        add(network.addSynapseAsync(neuronList[3], neuronList[8]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[8], neuronList[3]) {
+        add(network.addSynapseAsync(neuronList[8], neuronList[3]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[8], neuronList[10]) {
+        add(network.addSynapseAsync(neuronList[8], neuronList[10]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[10], neuronList[8]) {
+        add(network.addSynapseAsync(neuronList[10], neuronList[8]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[8], neuronList[13]) {
+        add(network.addSynapseAsync(neuronList[8], neuronList[13]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[13], neuronList[8]) {
+        add(network.addSynapseAsync(neuronList[13], neuronList[8]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[8], neuronList[18]) {
+        add(network.addSynapseAsync(neuronList[8], neuronList[18]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[18], neuronList[8]) {
+        add(network.addSynapseAsync(neuronList[18], neuronList[8]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[8], neuronList[15]) {
+        add(network.addSynapseAsync(neuronList[8], neuronList[15]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[15], neuronList[8]) {
+        add(network.addSynapseAsync(neuronList[15], neuronList[8]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[8], neuronList[20]) {
+        add(network.addSynapseAsync(neuronList[8], neuronList[20]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[20], neuronList[8]) {
+        add(network.addSynapseAsync(neuronList[20], neuronList[8]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[4], neuronList[9]) {
+        add(network.addSynapseAsync(neuronList[4], neuronList[9]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[9], neuronList[4]) {
+        add(network.addSynapseAsync(neuronList[9], neuronList[4]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[9], neuronList[10]) {
+        add(network.addSynapseAsync(neuronList[9], neuronList[10]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[10], neuronList[9]) {
+        add(network.addSynapseAsync(neuronList[10], neuronList[9]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[9], neuronList[13]) {
+        add(network.addSynapseAsync(neuronList[9], neuronList[13]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[13], neuronList[9]) {
+        add(network.addSynapseAsync(neuronList[13], neuronList[9]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[9], neuronList[17]) {
+        add(network.addSynapseAsync(neuronList[9], neuronList[17]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[17], neuronList[9]) {
+        add(network.addSynapseAsync(neuronList[17], neuronList[9]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[9], neuronList[23]) {
+        add(network.addSynapseAsync(neuronList[9], neuronList[23]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[23], neuronList[9]) {
+        add(network.addSynapseAsync(neuronList[23], neuronList[9]) {
             strength = 0.05
         })
-        add(network.addSynapse(neuronList[23], neuronList[15]) {
+        add(network.addSynapseAsync(neuronList[23], neuronList[15]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[15], neuronList[23]) {
+        add(network.addSynapseAsync(neuronList[15], neuronList[23]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[23], neuronList[16]) {
+        add(network.addSynapseAsync(neuronList[23], neuronList[16]) {
             strength = -0.03
         })
-        add(network.addSynapse(neuronList[16], neuronList[23]) {
+        add(network.addSynapseAsync(neuronList[16], neuronList[23]) {
             strength = -0.03
         })
 

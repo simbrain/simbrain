@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations.braitenberg
 
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.addNeuron
-import org.simbrain.network.core.addSynapse
+import org.simbrain.network.core.addSynapseAsync
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.util.SmellSource
 import org.simbrain.util.decayfunctions.GaussianDecayFunction
@@ -76,13 +76,13 @@ val avoider = newSim {
     // Create synapses - from Network6.xml
     // Note that the connections in the avoider configuration are cross-coupled
     // Left sensor connects to right turn, and right sensor connects to left turn
-    network.addSynapse(leftSensor, turnRight) {
+    network.addSynapseAsync(leftSensor, turnRight) {
         strength = 45.0
         upperBound = 100.0
         lowerBound = -10.0
     }
     
-    network.addSynapse(rightSensor, turnLeft) {
+    network.addSynapseAsync(rightSensor, turnLeft) {
         strength = 45.0
         upperBound = 100.0
         lowerBound = -10.0

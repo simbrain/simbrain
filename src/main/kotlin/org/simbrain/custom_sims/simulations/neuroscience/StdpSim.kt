@@ -3,7 +3,7 @@ package org.simbrain.custom_sims.simulations
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.addNeuron
-import org.simbrain.network.core.addSynapse
+import org.simbrain.network.core.addSynapseAsync
 import org.simbrain.network.learningrules.STDPRule
 import org.simbrain.network.spikeresponders.JumpAndDecay
 import org.simbrain.network.updaterules.LinearRule
@@ -55,12 +55,12 @@ val stdpSim = newSim {
     val nc = NeuronCollection(listOf(input1, input2))
     network.addNetworkModelAsync(nc)
 
-    network.addSynapse(input1, pre)
-    network.addSynapse(input2, post)
+    network.addSynapseAsync(input1, pre)
+    network.addSynapseAsync(input2, post)
 
     // STDP synapse from pre to post
     // Use a small time window (tauMinu/tauPlus) to avoid interference from spikes at the end of the data looping around to the beginning.
-    val syn = network.addSynapse(pre, post).apply {
+    val syn = network.addSynapseAsync(pre, post).apply {
         strength = 0.0
         learningRule = STDPRule().apply {
             tauMinus = .1 // Make a small time window so we don't get "roll-around" effects

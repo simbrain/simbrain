@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.addNeuron
-import org.simbrain.network.core.addSynapse
+import org.simbrain.network.core.addSynapseAsync
 import org.simbrain.network.updaterules.AdExIFRule
 import org.simbrain.util.place
 import org.simbrain.util.point
@@ -39,8 +39,8 @@ val spikingNeuronTwoInputs = newSim {
     }
 
     // Connect input neurons to the spiking neuron
-    net.addSynapse(excitatoryInput, spikingNeuron).strength = 5.0
-    net.addSynapse(inhibitoryInput, spikingNeuron).strength = -5.0
+    net.addSynapseAsync(excitatoryInput, spikingNeuron).strength = 5.0
+    net.addSynapseAsync(inhibitoryInput, spikingNeuron).strength = -5.0
 
     // Time series plot for spiking neuron
     val timeSeriesPlot = addTimeSeriesComponent("Membrane potential", listOf("Spiking neuron"))

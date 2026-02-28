@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations.braitenberg
 
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.addNeuron
-import org.simbrain.network.core.addSynapse
+import org.simbrain.network.core.addSynapseAsync
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.util.SmellSource
 import org.simbrain.util.decayfunctions.LinearDecayFunction
@@ -73,13 +73,13 @@ val pursuer = newSim {
     }
     
     // Create synapses - from Network6.xml
-    network.addSynapse(leftSensor, turnLeft) {
+    network.addSynapseAsync(leftSensor, turnLeft) {
         strength = 10.0
         upperBound = 200.0
         lowerBound = -10.0
     }
     
-    network.addSynapse(rightSensor, turnRight) {
+    network.addSynapseAsync(rightSensor, turnRight) {
         strength = 10.0
         upperBound = 200.0
         lowerBound = -10.0

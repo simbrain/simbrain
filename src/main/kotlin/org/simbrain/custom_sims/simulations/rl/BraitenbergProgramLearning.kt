@@ -5,7 +5,7 @@ import org.json.JSONObject
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.NetworkTextObject
 import org.simbrain.network.core.addNeuron
-import org.simbrain.network.core.addSynapse
+import org.simbrain.network.core.addSynapseAsync
 import org.simbrain.util.decayfunctions.GaussianDecayFunction
 import org.simbrain.util.place
 import org.simbrain.util.point
@@ -139,10 +139,10 @@ val braitenbergProgramLearning = newSim { optionString ->
         }
     }
 
-    val cheeseLeftToLeftTurn = network.addSynapse(cheeseLeftInput, leftTurn)
-    val cheeseRightToRightTurn = network.addSynapse(cheeseRightInput, rightTurn)
-    val poisonLeftToLeftTurn = network.addSynapse(poisonLeftInput, leftTurn)
-    val poisonRightToRightTurn = network.addSynapse(poisonRightInput, rightTurn)
+    val cheeseLeftToLeftTurn = network.addSynapseAsync(cheeseLeftInput, leftTurn)
+    val cheeseRightToRightTurn = network.addSynapseAsync(cheeseRightInput, rightTurn)
+    val poisonLeftToLeftTurn = network.addSynapseAsync(poisonLeftInput, leftTurn)
+    val poisonRightToRightTurn = network.addSynapseAsync(poisonRightInput, rightTurn)
 
     val programNames = listOf(
         "Seek Cheese, Avoid Poison",
@@ -201,7 +201,7 @@ val braitenbergProgramLearning = newSim { optionString ->
     }
 
     val criticWeights = programNodes.map { programNode ->
-        network.addSynapse(programNode, valueNeuron).apply {
+        network.addSynapseAsync(programNode, valueNeuron).apply {
             strength = 0.0
         }
     }

@@ -6,6 +6,7 @@ import org.simbrain.custom_sims.*
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.addNeuron
 import org.simbrain.network.core.addSynapse
+import org.simbrain.network.core.addSynapseAsync
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.decayfunctions.GaussianDecayFunction
@@ -246,10 +247,10 @@ val braitenbergRL = newSim { optionString ->
     val actorSynapses = mutableListOf<org.simbrain.network.core.Synapse>()
 
     // Actor synapses: only 4 trainable connections based on Braitenberg vehicle design
-    val cheeseLeftToLeftTurn = network.addSynapse(cheeseLeftInput, leftTurn)
-    val cheeseRightToRightTurn = network.addSynapse(cheeseRightInput, rightTurn)
-    val poisonLeftToLeftTurn = network.addSynapse(poisonLeftInput, leftTurn)
-    val poisonRightToRightTurn = network.addSynapse(poisonRightInput, rightTurn)
+    val cheeseLeftToLeftTurn = network.addSynapseAsync(cheeseLeftInput, leftTurn)
+    val cheeseRightToRightTurn = network.addSynapseAsync(cheeseRightInput, rightTurn)
+    val poisonLeftToLeftTurn = network.addSynapseAsync(poisonLeftInput, leftTurn)
+    val poisonRightToRightTurn = network.addSynapseAsync(poisonRightInput, rightTurn)
 
     // Add actor synapses to list for learning
     actorSynapses.addAll(listOf(
@@ -295,7 +296,7 @@ val braitenbergRL = newSim { optionString ->
 
     val valueInputs = listOf(cheeseLeftInput, cheeseRightInput, poisonLeftInput, poisonRightInput)
     val criticWeights = valueInputs.map { input ->
-        network.addSynapse(input, valueNeuron).apply {
+        network.addSynapseAsync(input, valueNeuron).apply {
             strength = 0.0
         }
     }

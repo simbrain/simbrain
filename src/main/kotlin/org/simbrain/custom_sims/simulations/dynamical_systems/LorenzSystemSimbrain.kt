@@ -3,7 +3,7 @@ package org.simbrain.custom_sims.simulations.dynamical_systems
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.addNeuron
-import org.simbrain.network.core.addSynapse
+import org.simbrain.network.core.addSynapseAsync
 import org.simbrain.network.core.getSynapse
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.updaterules.DecayRule
@@ -109,39 +109,39 @@ val lorenzSystemSimbrain = newSim {
 
     // dx/dt = σ(y - x)
     // Input to x should be: σ(y - x) * dt = σy*dt - σx*dt
-    network.addSynapse(yNeuron, xNeuron).apply {
+    network.addSynapseAsync(yNeuron, xNeuron).apply {
         strength = sigma * network.timeStep
     }
-    network.addSynapse(xNeuron, xNeuron).apply {
+    network.addSynapseAsync(xNeuron, xNeuron).apply {
         strength = -sigma * network.timeStep
     }
 
     // dy/dt = x(ρ - z) - y = xρ - xz - y
     // Input to y should be: (xρ - xz - y) * dt = xρ*dt - xz*dt - y*dt
-    network.addSynapse(xNeuron, yNeuron).apply {
+    network.addSynapseAsync(xNeuron, yNeuron).apply {
         strength = rho * network.timeStep
     }
-    network.addSynapse(yNeuron, yNeuron).apply {
+    network.addSynapseAsync(yNeuron, yNeuron).apply {
         strength = -network.timeStep
     }
 
     // Connect to xz product
-    network.addSynapse(xNeuron, xzProduct)
-    network.addSynapse(zNeuron, xzProduct)
-    network.addSynapse(xzProduct, yNeuron).apply {
+    network.addSynapseAsync(xNeuron, xzProduct)
+    network.addSynapseAsync(zNeuron, xzProduct)
+    network.addSynapseAsync(xzProduct, yNeuron).apply {
         strength = -network.timeStep
     }
 
     // dz/dt = xy - βz
     // Input to z should be: (xy - βz) * dt = xy*dt - βz*dt
-    network.addSynapse(zNeuron, zNeuron).apply {
+    network.addSynapseAsync(zNeuron, zNeuron).apply {
         strength = -beta * network.timeStep
     }
 
     // Connect to xy product
-    network.addSynapse(xNeuron, xyProduct)
-    network.addSynapse(yNeuron, xyProduct)
-    network.addSynapse(xyProduct, zNeuron).apply {
+    network.addSynapseAsync(xNeuron, xyProduct)
+    network.addSynapseAsync(yNeuron, xyProduct)
+    network.addSynapseAsync(xyProduct, zNeuron).apply {
         strength = network.timeStep
     }
 

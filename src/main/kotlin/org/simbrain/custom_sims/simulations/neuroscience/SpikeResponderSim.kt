@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.addNeuron
-import org.simbrain.network.core.addSynapse
+import org.simbrain.network.core.addSynapseAsync
 import org.simbrain.network.spikeresponders.JumpAndDecay
 import org.simbrain.network.spikeresponders.RiseAndDecay
 import org.simbrain.network.spikeresponders.ShortTermPlasticity
@@ -34,13 +34,13 @@ val spikeResponderSim = newSim {
         label = "Izhikevich"
         location = point(200, 80)
     }
-    network.addSynapse(input, spiking)
+    network.addSynapseAsync(input, spiking)
 
     val stepResponder = network.addNeuron {
         label = "Step responder"
         location = point(290, 10)
     }
-    network.addSynapse(spiking, stepResponder).apply {
+    network.addSynapseAsync(spiking, stepResponder).apply {
         spikeResponder = StepResponder()
     }
 
@@ -48,7 +48,7 @@ val spikeResponderSim = newSim {
         label = "Jump and Decay"
         location = point(290, 60)
     }
-    network.addSynapse(spiking, jumpAndDecay).apply {
+    network.addSynapseAsync(spiking, jumpAndDecay).apply {
         spikeResponder = JumpAndDecay()
     }
 
@@ -56,7 +56,7 @@ val spikeResponderSim = newSim {
         label = "Rise and decay"
         location = point(290, 110)
     }
-    network.addSynapse(spiking, riseAndDecay).apply {
+    network.addSynapseAsync(spiking, riseAndDecay).apply {
         spikeResponder = RiseAndDecay()
     }
 
@@ -64,7 +64,7 @@ val spikeResponderSim = newSim {
         label = "Short term plasticity"
         location = point(290, 160)
     }
-    network.addSynapse(spiking, stp).apply {
+    network.addSynapseAsync(spiking, stp).apply {
         spikeResponder = ShortTermPlasticity()
     }
 

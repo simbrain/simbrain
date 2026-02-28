@@ -4,7 +4,7 @@ import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.addNeuron
-import org.simbrain.network.core.addSynapse
+import org.simbrain.network.core.addSynapseAsync
 import org.simbrain.network.updaterules.BinaryRule
 import org.simbrain.util.place
 import org.simbrain.util.point
@@ -84,37 +84,37 @@ val heatColdSim = newSim {
 
     // Create synapses based on the XML structure
     // Heat Receptor -> Heat Sensation (strength 2.0)
-    network.addSynapse(heatReceptor, heatSensation).apply {
+    network.addSynapseAsync(heatReceptor, heatSensation).apply {
         strength = 2.0
     }
 
     // Cold Receptor -> Cold Sensation (strength 2.0) 
-    network.addSynapse(coldReceptor, coldSensation).apply {
+    network.addSynapseAsync(coldReceptor, coldSensation).apply {
         strength = 2.0
     }
 
     // Cold Receptor -> B (strength 2.0)
-    network.addSynapse(coldReceptor, neuronB).apply {
+    network.addSynapseAsync(coldReceptor, neuronB).apply {
         strength = 2.0
     }
 
     // B -> A (strength 2.0)
-    network.addSynapse(neuronB, neuronA).apply {
+    network.addSynapseAsync(neuronB, neuronA).apply {
         strength = 2.0
     }
 
     // B -> Cold Sensation (strength 1.0)
-    network.addSynapse(neuronB, coldSensation).apply {
+    network.addSynapseAsync(neuronB, coldSensation).apply {
         strength = 1.0
     }
 
     // A -> Heat Sensation (strength 2.0)
-    network.addSynapse(neuronA, heatSensation).apply {
+    network.addSynapseAsync(neuronA, heatSensation).apply {
         strength = 2.0
     }
 
     // Cold Receptor -> A (inhibitory, strength -1.0)
-    network.addSynapse(coldReceptor, neuronA).apply {
+    network.addSynapseAsync(coldReceptor, neuronA).apply {
         strength = -1.0
     }
 

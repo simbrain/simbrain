@@ -5,7 +5,7 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.addNeuron
-import org.simbrain.network.core.addSynapse
+import org.simbrain.network.core.addSynapseAsync
 import org.simbrain.util.graphicalUpperBound
 import org.simbrain.util.place
 import org.simbrain.workspace.couplings.CouplingManager
@@ -268,9 +268,9 @@ suspend fun OdorWorld.createVehicle(name: String, entityType: EntityType, sensor
         upperBound = 200.0
     }
 
-    val leftSynapse = network.addSynapse(leftInput, leftTurn)
+    val leftSynapse = network.addSynapseAsync(leftInput, leftTurn)
 
-    val rightSynapse = network.addSynapse(rightInput, rightTurn)
+    val rightSynapse = network.addSynapseAsync(rightInput, rightTurn)
 
     return Vehicle(
         couplingManager,

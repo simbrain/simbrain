@@ -253,7 +253,7 @@ val spikingNetworkSimulation = newSim {
                     val pacemakerSynapses = buildList {
                         neurons.forEach { targetNeuron ->
                             val synapse = runBlocking {
-                                network.addSynapse(pacemakerNeuron!!, targetNeuron)
+                                network.addSynapseAsync(pacemakerNeuron!!, targetNeuron)
                             }
                             synapse.strength = 10.0
                             //synapse.delay = 1

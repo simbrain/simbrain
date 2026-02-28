@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.addNeuron
-import org.simbrain.network.core.addSynapse
+import org.simbrain.network.core.addSynapseAsync
 import org.simbrain.network.spikeresponders.JumpAndDecay
 import org.simbrain.network.updaterules.IzhikevichRule
 import org.simbrain.util.place
@@ -35,8 +35,8 @@ val spikingNeuron = newSim {
         location = point(300, 100)
     }
 
-    network.addSynapse(input, spiking)
-    network.addSynapse(spiking, postSpiking).apply {
+    network.addSynapseAsync(input, spiking)
+    network.addSynapseAsync(spiking, postSpiking).apply {
         spikeResponder = JumpAndDecay()
     }
 

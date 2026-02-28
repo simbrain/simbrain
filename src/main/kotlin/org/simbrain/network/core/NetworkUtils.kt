@@ -222,7 +222,12 @@ suspend fun Network.addNeuron(usePlacementManager: Boolean = false, block: Neuro
 suspend fun Network.addNeuron(x: Int, y: Int, usePlacementManager: Boolean = false, block: Neuron.() -> Unit = { }) = addNeuron(usePlacementManager, block)
     .also{ it.location = point(x,y) }
 
-fun Network.addSynapse(source: Neuron, target: Neuron, block: Synapse.() -> Unit = { }) = Synapse(source, target)
+suspend fun Network.addSynapse(source: Neuron, target: Neuron, block: Synapse.() -> Unit = { }) =
+    Synapse(source, target)
+        .apply(block)
+        .also { addNetworkModel(it) }
+
+fun Network.addSynapseAsync(source: Neuron, target: Neuron, block: Synapse.() -> Unit = { }) = Synapse(source, target)
     .apply(block)
     .also(this::addNetworkModelAsync)
 

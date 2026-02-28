@@ -6,7 +6,7 @@ import org.simbrain.network.connections.Sparse
 import org.simbrain.network.connections.radialProbabilisticStyle
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.addNeuronCollection
-import org.simbrain.network.core.addSynapse
+import org.simbrain.network.core.addSynapseAsync
 import org.simbrain.network.core.addToNetwork
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.HexagonalGridLayout
@@ -211,7 +211,7 @@ val linkedNeuronList = newSim {
 
         val synapses = with(network) {
             neurons.windowed(2) { (n1, n2) ->
-                addSynapse(n1, n2) {
+                addSynapseAsync(n1, n2) {
                     strength = 1.0
                 }
             }

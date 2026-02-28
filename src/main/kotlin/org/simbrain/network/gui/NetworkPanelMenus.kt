@@ -173,6 +173,19 @@ fun NetworkPanel.creatContextMenu() = JPopupMenu().apply {
 val NetworkPanel.viewMenu
     get() = JMenu("View").apply {
         with(networkActions) {
+            add(JMenu("Zoom").apply {
+                add(zoomInAction())
+                add(zoomOutAction())
+                add(resetZoomAction())
+                addSeparator()
+                add(JCheckBoxMenuItem(toggleAutoZoom).apply {
+                    this.state = networkPanel.autoZoom
+                    networkPanel.network.events.zoomModeChanged.on {
+                        this.state = it
+                    }
+                })
+            })
+            addSeparator()
             add(JMenu("Toolbars").apply {
                 add(showMainToolBarAction.toMenuItem().apply { isSelected = mainToolBar.isVisible })
                 add(showEditToolBarAction.toMenuItem().apply { isSelected = editToolBar.isVisible })

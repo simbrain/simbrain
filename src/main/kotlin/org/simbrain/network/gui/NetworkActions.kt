@@ -601,6 +601,19 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         }
     }
 
+    val toggleAutoZoom = networkPanel.createAction(
+        name = "Auto-zoom",
+        description = "Automatically fit all network objects in the window"
+    ) { event ->
+        event?.source?.let {
+            autoZoom = if (it is JCheckBoxMenuItem) {
+                it.state
+            } else {
+                !autoZoom
+            }
+        }
+    }
+
     val connectSelectedModels = networkPanel.createAction(
         name = "Connect selected objects...",
         description = "Creates synapse, weight matrix, etc. between selected source and target entities",

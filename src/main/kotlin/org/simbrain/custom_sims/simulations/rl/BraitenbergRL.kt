@@ -281,6 +281,17 @@ val braitenbergRL = newSim { optionString ->
         upperBound = 50.0
     }
     val speedSynapses = listOf(cheeseLeftToSpeed, cheeseRightToSpeed, poisonLeftToSpeed, poisonRightToSpeed)
+    fun setSpeedSynapsesEnabled(enabled: Boolean) {
+        if (enabled) {
+            speedSynapses.forEach { syn -> syn.isVisible = true}
+            speedSynapses.forEach { syn -> syn.isEnabled = true}
+        } else {
+            speedSynapses.forEach { syn -> syn.isVisible = false}
+            speedSynapses.forEach { syn -> syn.isEnabled = false}
+        }
+    }
+    setSpeedSynapsesEnabled(trainSpeedConnections)
+
 
     val valueInputs = listOf(cheeseLeftInput, cheeseRightInput, poisonLeftInput, poisonRightInput)
     val criticWeights = valueInputs.map { input ->
@@ -583,6 +594,7 @@ val braitenbergRL = newSim { optionString ->
                 speedSynapses.forEach { syn ->
                     syn.clamped = !enabled
                 }
+                setSpeedSynapsesEnabled(enabled)
             }
             trainSpeedCheckbox.toolTipText = "Include sensor-to-speed connections in learning"
 

@@ -90,9 +90,10 @@ class SynapseNode(
             updateDiameter()
             updateSpikeColor()
         }
-        events.visbilityChanged.on(dispatcher = Dispatchers.Swing) { _, newVisibility -> updateVisibility(newVisibility) }
+        events.visbilityChanged.on(dispatcher = Dispatchers.Swing) { _, newVisibility ->
+            updateVisibility(newVisibility) }
         updateVisibility(synapse.isVisible)
-        events.clampChanged.on { this.updateClampStatus() }
+        events.clampChanged.on(dispatcher = Dispatchers.Swing) { this.updateClampStatus() }
         updateClampStatus()
 
         events.locationChanged.on(dispatcher = Dispatchers.Swing) { this.updatePosition() }

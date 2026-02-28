@@ -554,7 +554,7 @@ object SimbrainDesktop {
         helpMenu.addSeparator()
         helpMenu.add(actionManager.toggleInfoDock)
         helpMenu.addSeparator()
-        helpMenu.add(ShowHelpAction("Credits", "https://simbrain.net/SimbrainCredits.html"))
+        helpMenu.add(ShowHelpAction("Credits", "https://simbrain.net/credits/"))
         
         // Add About menu item for non-macOS platforms (macOS has native About menu)
         if (!Utils.isMacOSX()) {
@@ -634,7 +634,7 @@ object SimbrainDesktop {
         
         val creditsButton = JButton("View Credits")
         creditsButton.addActionListener { 
-            Utils.displayURLInBrowser("https://simbrain.net/SimbrainCredits.html")
+            Utils.displayURLInBrowser("https://simbrain.net/credits/")
         }
         creditsButton.alignmentX = Component.CENTER_ALIGNMENT
         
